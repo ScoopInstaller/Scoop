@@ -9,7 +9,7 @@ function env($name,$val) {
 }
 function abort($msg) { write-host $msg -b darkred -f white; exit 1 }
 function success($msg) { write-host $msg -b green -f black; }
-function appdir($name, $version) { "$scoopdir\$name\$version" }
+function appdir($name, $version) { "$scoopdir\apps\$name\$version" }
 function fname($path) { split-path $path -leaf }
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function stub($path) {
@@ -38,6 +38,6 @@ function assert_not_installed($name, $version) {
 }
 function unzip($path,$to) {
     $shell = (new-object -com shell.application)
-    $zipfiles = $shell.namespace($path).items()
-    $shell.namespace($to).copyHere($zipFiles, 4) # 4 = don't show progress dialog
+    $zipfiles = $shell.namespace("$path").items()
+    $shell.namespace("$to").copyHere($zipFiles, 4) # 4 = don't show progress dialog
 }
