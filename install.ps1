@@ -16,11 +16,11 @@ $abs_appdir = ensure $appdir
 $zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
 $zipfile = "$abs_appdir\scoop.zip"
 echo 'downloading...'
-dl $zipurl $zipurl
+dl $zipurl $zipfile
 
 echo 'extracting...'
-unzip $zipurl $abs_appdir
-rm $zipurl
+unzip $zipfile $abs_appdir
+rm $zipfile
 
 echo 'creating stub...'
 stub "$abs_appdir\scoop.ps1"

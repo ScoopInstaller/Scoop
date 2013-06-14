@@ -8,7 +8,7 @@ function env($name,$val) {
   else { [environment]::getEnvironmentVariable($name, 'User') } # get
 }
 function abort($msg) { write-host $msg -b darkred -f white; exit 1 }
-function success($msg) { write-host $msg -b darkgreen -f white; }
+function success($msg) { write-host $msg -b green -f black; }
 function appdir($name, $version) { "$scoopdir\$name\$version" }
 function fname($path) { split-path $path -leaf }
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
@@ -20,7 +20,6 @@ function stub($path) {
   echo "iex `"$path `$rawargs`"" >> "$stub"
 }
 function friendly_path($path) {
-  $home = "$(resolve-path "~")"
   return "$path" -replace ([regex]::escape($home)), "~"
 }
 function ensure_scoop_in_path { 
@@ -35,7 +34,7 @@ function ensure_scoop_in_path {
 }
 function installed($name, $version) { return test-path (appdir $name $version) }
 function assert_not_installed($name, $version) {
-  if(installed $name $version) { abort("``$name`` ($version) is already installed.") }
+  if(installed $name $version) { abort("$name ($version) is already installed.") }
 }
 function unzip($path,$to) {
     $shell = (new-object -com shell.application)
