@@ -33,7 +33,7 @@ unzip "$srcdir\dl.zip" "$srcdir"
 rm "$srcdir\dl.zip"
 exit
 
-# check for, download .net
+# check for, download .net 4
 
 # build scriptcs
 
