@@ -14,7 +14,7 @@ function fname($path) { split-path $path -leaf }
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function stub($path) {
   $abs_bindir = ensure $bindir
-  $stub = "$absbindir\$(fname $path).ps1"
+  $stub = "$abs_bindir\$(fname $path)"
 
   echo "`$rawargs = `$myInvocation.line -replace `"^`$([regex]::escape(`$myInvocation.invocationName))\s+`", `"`"" >> "$stub"
   echo "iex `"$path `$rawargs`"" >> "$stub"
