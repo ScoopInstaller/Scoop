@@ -35,9 +35,7 @@ function ensure_scoop_in_path {
 }
 function installed($name, $version) { return test-path (appdir $name $version) }
 function assert_not_installed($name, $version) {
-  if(installed $name $version) {
-    abort("``$name`` ($version) is already installed.") }
-  }
+  if(installed $name $version) { abort("``$name`` ($version) is already installed.") }
 }
 function unzip($path,$to) {
     $shell = (new-object -com shell.application)

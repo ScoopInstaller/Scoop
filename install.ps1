@@ -1,3 +1,7 @@
+# install with:
+#   iex (new-object net.webclient).downloadstring('https://raw.github.com/lukesampson/scoop/master/install.ps1')
+$erroractionpreference='stop' # for try-catch to work
+
 # get core functions
 $init_url = 'https://raw.github.com/lukesampson/scoop/master/lib/init.ps1'
 echo 'initializing...'
@@ -5,7 +9,7 @@ iex (new-object net.webclient).downloadstring($init_url)
 
 # prep
 assert_not_installed 'scoop' 'bootstrap'
-$appdir = appdir 'scoop' 'bootstrap')
+$appdir = appdir 'scoop' 'bootstrap'
 $abs_appdir = ensure $appdir
 
 # download scoop zip
