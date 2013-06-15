@@ -12,6 +12,9 @@ function success($msg) { write-host $msg -b green -f black; }
 function appdir($name) { "$scoopdir\apps\$name" }
 function fname($path) { split-path $path -leaf }
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
+function full_path($path) {
+  $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
+}
 function friendly_path($path) {
   return "$path" -replace ([regex]::escape($home)), "~"
 }
@@ -24,6 +27,7 @@ function unzip($path,$to) {
     $zipfiles = $shell.namespace("$path").items()
     $shell.namespace("$to").copyHere($zipFiles, 4) # 4 = don't show progress dialog
 }
+function coalesce($a, $b) { if($a) { return $a } $b }
 
 function stub($path) {
   if(!(test-path $path)) { abort "can't stub $(fname $path): couldn't find $path"}
@@ -39,7 +43,7 @@ function ensure_scoop_in_path {
   $abs_bindir = ensure $bindir
   if($userpath -notmatch [regex]::escape($abs_bindir)) {
       # be aggressive (b-e-aggressive) and install scoop first in the path
-      echo "adding $(friendly_path $abs_bindir) to your user path"
+      echo "adding $(friendly_path $abs_bindir) to your path"
       env 'path' "$abs_bindir;$userpath"  # for future sessions
       $env:path = "$abs_bindir;$env:path" # for this session
   }

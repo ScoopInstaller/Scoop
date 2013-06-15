@@ -26,5 +26,5 @@ echo 'creating stub...'
 stub "$abs_appdir\scoop-master\scoop.ps1"
 
 ensure_scoop_in_path
-success 'you successfully installed scoop!'
+success 'scoop was successfully installed!'
 echo 'type "scoop help" for instructions'
