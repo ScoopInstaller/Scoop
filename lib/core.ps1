@@ -13,13 +13,13 @@ function appdir($name) { "$scoopdir\apps\$name" }
 
 function fname($path) { split-path $path -leaf }
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
-function full_path($path) {
+function full_path($path) { # should be ~ rooted
   $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }
 function friendly_path($path) {
   return "$path" -replace ([regex]::escape($home)), "~"
 }
-function script_rel_path($path) { full_path "$($myInvocation.PSScriptRoot)\$path" }
+function resolve($path) { "$($myInvocation.PSScriptRoot)\$path" } # relative to calling script
 
 function installed($name) { return test-path (appdir $name) }
 function assert_not_installed($name) {
@@ -51,7 +51,9 @@ function ensure_scoop_in_path {
   }
 }
 
-$required = @( $myInvocation.myCommand.path.tolower )
+# failed
+<#
+$required = @( $myInvocation.myCommand.path.tolower() )
 function require($name) {
   if(!$name.endsWith('.ps1')) { $name += '.ps1' }
   $path = "$($myInvocation.PSScriptRoot)\$name"
@@ -59,6 +61,9 @@ function require($name) {
   $path = "$(resolve-path $path)".tolower()
   if(!($required -contains $path)) {
     $required += $path
-    iex "$path"
+    #iex $path
+    #. $path -global
+    #import-module $path -global
   }
 }
+#>

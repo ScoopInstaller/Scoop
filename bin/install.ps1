@@ -3,9 +3,9 @@
 $erroractionpreference='stop' # quit if anything goes wrong
 
 # get core functions
-$init_url = 'https://raw.github.com/lukesampson/scoop/master/lib/init.ps1'
+$core_url = 'https://raw.github.com/lukesampson/scoop/master/lib/core.ps1'
 echo 'initializing...'
-iex (new-object net.webclient).downloadstring($init_url)
+iex (new-object net.webclient).downloadstring($core_url)
 
 # prep
 assert_not_installed 'scoop'
