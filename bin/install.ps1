@@ -1,6 +1,6 @@
 # install with:
 #   iex (new-object net.webclient).downloadstring('https://raw.github.com/lukesampson/scoop/master/install.ps1')
-$erroractionpreference='stop' # for try-catch to work
+$erroractionpreference='stop' # quit if anything goes wrong
 
 # get core functions
 $init_url = 'https://raw.github.com/lukesampson/scoop/master/lib/init.ps1'

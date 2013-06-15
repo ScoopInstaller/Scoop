@@ -30,7 +30,7 @@ function unzip($path,$to) {
 function coalesce($a, $b) { if($a) { return $a } $b }
 
 function stub($path) {
-  if(!(test-path $path)) { abort "can't stub $(fname $path): couldn't find $path"}
+  if(!(test-path $path)) { abort "can't stub $(fname $path): couldn't find $path" }
   $abs_bindir = ensure $bindir
   $stub = "$abs_bindir\$(fname $path)"
 

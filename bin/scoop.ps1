@@ -1,4 +1,4 @@
 param($cmd)
 
-. ..\lib\init.ps1
+. "$(split-path $myinvocation.mycommand.path)\..\lib\init.ps1"
 
