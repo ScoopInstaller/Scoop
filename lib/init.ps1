@@ -37,7 +37,6 @@ function stub($path) {
   echo "`$rawargs = `$myInvocation.line -replace `"^`$([regex]::escape(`$myInvocation.invocationName))\s+`", `"`"" >> "$stub"
   echo "iex `"$path `$rawargs`"" >> "$stub"
 }
-
 function ensure_scoop_in_path { 
   $userpath = env 'path'
   $abs_bindir = ensure $bindir
@@ -46,5 +45,18 @@ function ensure_scoop_in_path {
       echo "adding $(friendly_path $abs_bindir) to your path"
       env 'path' "$abs_bindir;$userpath"  # for future sessions
       $env:path = "$abs_bindir;$env:path" # for this session
+  }
+}
+
+$required = @( $myInvocation.myCommand.path.tolower )
+function require($name) {
+  if(!$name.endsWith('.ps1')) { $name += '.ps1' }
+  $path = "$($myInvocation.PSScriptRoot)\$name"
+  if(!(test-path $path)) { abort "$path doesn't exist" }
+  $path = "$(resolve-path $path)".tolower()
+  if(!($required -contains $path)) {
+    echo "requiring $name"
+    $required += $path
+    iex "$path"
   }
 }
