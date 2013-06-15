@@ -10,6 +10,7 @@ function env($name,$val) {
 function abort($msg) { write-host $msg -b darkred -f white; exit 1 }
 function success($msg) { write-host $msg -b green -f black; }
 function appdir($name) { "$scoopdir\apps\$name" }
+
 function fname($path) { split-path $path -leaf }
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function full_path($path) {
@@ -18,6 +19,8 @@ function full_path($path) {
 function friendly_path($path) {
   return "$path" -replace ([regex]::escape($home)), "~"
 }
+function script_rel_path($path) { full_path "$($myInvocation.PSScriptRoot)\$path" }
+
 function installed($name) { return test-path (appdir $name) }
 function assert_not_installed($name) {
   if(installed $name) { abort("$name is already installed.") }
@@ -55,7 +58,6 @@ function require($name) {
   if(!(test-path $path)) { abort "$path doesn't exist" }
   $path = "$(resolve-path $path)".tolower()
   if(!($required -contains $path)) {
-    echo "requiring $name"
     $required += $path
     iex "$path"
   }

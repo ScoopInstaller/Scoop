@@ -4,4 +4,3 @@ param($cmd)
 
 require '..\lib\commands'
 
-all_commands
