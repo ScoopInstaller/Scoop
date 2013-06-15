@@ -8,8 +8,8 @@ echo 'initializing...'
 iex (new-object net.webclient).downloadstring($init_url)
 
 # prep
-assert_not_installed 'scoop' 'bootstrap'
-$appdir = appdir 'scoop' 'bootstrap'
+assert_not_installed 'scoop'
+$appdir = appdir 'scoop'
 $abs_appdir = ensure $appdir
 
 # download scoop zip
@@ -23,7 +23,7 @@ unzip $zipfile $abs_appdir
 rm $zipfile
 
 echo 'creating stub...'
-stub "$abs_appdir\scoop.ps1"
+stub "$abs_appdir\scoop-master\scoop.ps1"
 
 ensure_scoop_in_path
 success 'you successfully installed scoop!'

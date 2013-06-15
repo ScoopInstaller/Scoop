@@ -9,15 +9,15 @@ function env($name,$val) {
 }
 function abort($msg) { write-host $msg -b darkred -f white; exit 1 }
 function success($msg) { write-host $msg -b green -f black; }
-function appdir($name, $version) { "$scoopdir\apps\$name\$version" }
+function appdir($name) { "$scoopdir\apps\$name" }
 function fname($path) { split-path $path -leaf }
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function friendly_path($path) {
   return "$path" -replace ([regex]::escape($home)), "~"
 }
-function installed($name, $version) { return test-path (appdir $name $version) }
-function assert_not_installed($name, $version) {
-  if(installed $name $version) { abort("$name ($version) is already installed.") }
+function installed($name) { return test-path (appdir $name) }
+function assert_not_installed($name) {
+  if(installed $name) { abort("$name is already installed.") }
 }
 function unzip($path,$to) {
     $shell = (new-object -com shell.application)
@@ -26,6 +26,7 @@ function unzip($path,$to) {
 }
 
 function stub($path) {
+  if(!(test-path $path)) { abort "can't stub $(fname $path): couldn't find $path"}
   $abs_bindir = ensure $bindir
   $stub = "$abs_bindir\$(fname $path)"
 
@@ -37,7 +38,7 @@ function ensure_scoop_in_path {
   $userpath = env 'path'
   $abs_bindir = ensure $bindir
   if($userpath -notmatch [regex]::escape($abs_bindir)) {
-      # be aggressive and install scoop first in the path
+      # be aggressive (b-e-aggressive) and install scoop first in the path
       echo "adding $(friendly_path $abs_bindir) to your user path"
       env 'path' "$abs_bindir;$userpath"  # for future sessions
       $env:path = "$abs_bindir;$env:path" # for this session
