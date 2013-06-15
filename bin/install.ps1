@@ -23,7 +23,7 @@ unzip $zipfile $abs_appdir
 rm $zipfile
 
 echo 'creating stub...'
-stub "$abs_appdir\scoop-master\scoop.ps1"
+stub "$abs_appdir\scoop-master\bin\scoop.ps1"
 
 ensure_scoop_in_path
 success 'scoop was successfully installed!'

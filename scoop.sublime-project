@@ -2,7 +2,8 @@
 	"folders":
 	[
 		{
-			"path": "."
+			"path": ".",
+			"file_exclude_patterns": [ "*.git*", "*.sublime-*"]
 		}
 	],
 	"settings": {

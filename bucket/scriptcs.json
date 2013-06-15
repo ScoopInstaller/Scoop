@@ -1,0 +1,6 @@
+{
+	"url": "https://github.com/scriptcs/scriptcs/archive/master.zip",
+	"require": [
+		"roslyn"
+	]
+}
