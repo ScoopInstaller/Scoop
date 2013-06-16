@@ -5,22 +5,27 @@ param($cmd)
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
 . (resolve '..\commands.ps1')
 
-function usage($filetext) {
-    $filetext | sls '(?m)^#\s*Usage:\s*([^\n]*)$' | % { $_.matches[0].groups[1] }
+function usage($text) {
+    $text | sls '(?m)^# Usage: ([^\n]*)$' | % { $_.matches[0].groups[1] }
 }
 
-function summary($filetext) {
-    $filetext | sls '(?m)^#\s*Summary:\s*([^\n]*)$' | % { $_.matches[0].groups[1] }
+function summary($text) {
+    $text | sls '(?m)^# Summary: ([^\n]*)$' | % { $_.matches[0].groups[1] }
+}
+
+function help($text) {
+    $help_lines = $text | sls '(?ms)^# Help:(.(?!^[^#]))*' | % { $_.matches[0].value; }
+    $help_lines -replace '(?ms)^# (Help: )?', ''
 }
 
 function print_help($cmd) {
-    $filetext = gc (resolve ".\$cmd.ps1") -raw
+    $file = gc (resolve ".\$cmd.ps1") -raw
 
-    $usage = usage $filetext
-    $summary = summary $filetext
-    # $help = help $filetext
+    $usage = usage $file
+    $summary = summary $file
+    $help = help $file
 
-    if($usage) { echo "usage: $usage" }
+    if($usage) { echo "usage: $usage`n" }
     if($help) { echo $help }
 }
 
