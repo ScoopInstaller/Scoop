@@ -1,5 +1,5 @@
 # Usage: scoop install <name>
-# Summary: Installs an app
+# Summary: Install an app
 # Help: e.g. `scoop install git`
 param($name)
 

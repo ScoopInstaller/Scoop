@@ -1,5 +1,5 @@
 # Usage: scoop help <cmd>
-# Summary: show help for a command
+# Summary: Show help for a command
 param($cmd)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
@@ -29,9 +29,27 @@ function print_help($cmd) {
     if($help) { echo $help }
 }
 
+function print_summaries {
+    $commands = @{}
+
+    command_files | % {
+        $command = command_name $_
+        $summary = summary (gc (resolve $_) -raw )
+        if(!($summary)) { $summary = '' }
+        $commands.add("$command ", $summary) # add padding
+    }
+
+    $commands | ft -hidetablehead -autosize -wrap
+}
+
 $commands = commands
 
-if($commands -contains $cmd) {
+if(!($cmd)) {
+    echo "usage: scoop <command> [<args]
+
+Some useful commands are:"
+    print_summaries
+} elseif($commands -contains $cmd) {
     print_help $cmd
 } else {
     echo "scoop help: no such command '$cmd'"
