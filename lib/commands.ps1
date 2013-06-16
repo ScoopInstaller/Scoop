@@ -4,6 +4,6 @@ function commands {
         % { ($_.name -replace '\.ps1$', '') }
 }
 
-function exec($cmd) {
-    & (resolve "cmd\$cmd.ps1")
+function exec($cmd, $arguments) {
+    & (resolve "cmd\$cmd.ps1") @arguments
 }
