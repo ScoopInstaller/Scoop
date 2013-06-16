@@ -1,7 +1,7 @@
-# Usage: scoop install <name>
+# Usage: scoop install <appname>
 # Summary: Install an app
 # Help: e.g. `scoop install git`
-param($name)
+param($appname)
 
 echo 'install!'
 echo "args: $args"

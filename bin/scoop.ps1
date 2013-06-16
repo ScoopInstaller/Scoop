@@ -1,4 +1,3 @@
-# Usage: sub <cmd>
 param($cmd)
 
 . "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
