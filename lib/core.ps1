@@ -22,9 +22,6 @@ function friendly_path($path) {
 function resolve($path) { "$($myInvocation.PSScriptRoot)\$path" } # relative to calling script
 
 function installed($name) { return test-path (appdir $name) }
-function assert_not_installed($name) {
-  if(installed $name) { abort("$name is already installed.") }
-}
 function unzip($path,$to) {
     $shell = (new-object -com shell.application)
     $zipfiles = $shell.namespace("$path").items()

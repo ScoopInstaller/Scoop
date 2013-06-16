@@ -1,3 +1,4 @@
+# designed to be run remotely, when scoop is not already installed
 # install with:
 #   iex (new-object net.webclient).downloadstring('https://raw.github.com/lukesampson/scoop/master/install.ps1')
 $erroractionpreference='stop' # quit if anything goes wrong
@@ -8,7 +9,7 @@ echo 'initializing...'
 iex (new-object net.webclient).downloadstring($core_url)
 
 # prep
-assert_not_installed 'scoop'
+if(installed 'scoop') { abort "scoop is already installed." }
 $appdir = appdir 'scoop'
 $abs_appdir = ensure $appdir
 
