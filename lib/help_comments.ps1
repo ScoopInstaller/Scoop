@@ -11,6 +11,6 @@ function help($text) {
 	$help_lines -replace '(?ms)^# (Help: )?', ''
 }
 
-function my_usage {
-	"usage: $(usage (gc $myInvocation.PSCommandPath -raw))"
+function my_usage { # gets usage for the calling script
+    usage (gc $myInvocation.PSCommandPath -raw)
 }

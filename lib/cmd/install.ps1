@@ -5,6 +5,9 @@ param($app)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
 . (resolve ../manifest.ps1)
+. (resolve ../help_comments.ps1)
+
+if(!$app) { "ERROR: <app> missing"; my_usage; exit }
 
 $manifest = manifest $app
 if(!$manifest) { abort "couldn't find manifest for '$app'" }
