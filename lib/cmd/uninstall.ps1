@@ -7,3 +7,14 @@ param($app)
 . (resolve ../manifest.ps1)
 
 if(!(installed $app)) { abort "'$app' isn't installed" }
+
+# todo: run other uninstall steps from manifest?
+
+$appdir = appdir $app
+try {
+    rm -r $appdir -ea stop
+} catch {
+    abort "couldn't remove $(friendly_path $appdir): it may be in use"
+}
+
+success "$app was uninstalled"
