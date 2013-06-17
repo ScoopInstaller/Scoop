@@ -1,4 +1,5 @@
 {
 	"name": "runat",
-	"url": "https://gist.github.com/lukesampson/5778559/raw/runat.ps1"
+	"url": "https://gist.github.com/lukesampson/5778559/raw/runat.ps1",
+	"bin": "runat.ps1"
 }

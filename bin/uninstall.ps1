@@ -8,8 +8,8 @@ if(test-path $scoopdir) {
     }
 }
 
-$bindir_regex = [regex]::escape((full_path $bindir))
-if((env 'path') -match $bindir_regex) { # future sessions
+$bindir_regex = "$([regex]::escape((full_path $bindir)));?"
+if((env 'path') -match $bindir_regex) { # future sessions only
     echo "removing $(friendly_path $bindir) from your path"
     env 'path' ((env 'path') -replace $bindir_regex, '')
 }
