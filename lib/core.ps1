@@ -41,7 +41,7 @@ function stub($path) {
 	$abs_bindir = ensure $bindir
 	$stub = "$abs_bindir\$(strip_ext(fname $path)).ps1"
 
-	echo "`$rawargs = `$myInvocation.line -replace `"^`$([regex]::escape(`$myInvocation.invocationName))\s+`", `"`"" >> "$stub"
+	echo "`$rawargs = `$myInvocation.line -replace `"^`$([regex]::escape(`$myInvocation.invocationName))\s*`", `"`"" >> "$stub"
 	echo "iex `"$path `$rawargs`"" >> "$stub"
 }
 function ensure_scoop_in_path { 
