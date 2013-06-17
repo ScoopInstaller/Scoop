@@ -13,25 +13,46 @@ if(installed $app) { abort "'$app' is already installed"}
 $appdir = appdir $app
 mkdir $appdir > $null
 $appdir = resolve-path $appdir
+$delete_dl_file = $false;
 
 echo "downloading $($manifest.url)..."
 $fname = split-path $manifest.url -leaf
 dl $manifest.url "$appdir\$fname"
 
-# todo: unzip?
+# unzip
+if($fname -match '\.zip') {
+	unzip "$appdir\$fname" $appdir
+	$delete_dl_file = $true
+}
+
+# installer
+if($manifest.installer) {
+	$arguments = $manifest.installer.args
+	$a = @()
+
+	if($arguments) { $arguments | % { $a += (format $_ @{'appdir'=$appdir}) } }
+	echo "executing: $fname $a"
+	& "$appdir\$fname" /verysilent
+	$delete_dl_file = $true
+}
+
+# delete downloaded file
+if($delete_dl_file) {
+	rm "$appdir\$fname"
+}
 
 # create bin stubs
 $manifest.bin | % {
-    echo "creating stub for $_ in ~\appdata\local\bin"
-    
-    # check valid bin
-    $binpath = full_path "$appdir\$_"
-    if($binpath -notmatch "^$([regex]::escape("$appdir\"))") {
-        abort "error in manifest: bin '$_' is outside the app directory"
-    }
-    if(!(test-path $binpath)) { abort "can't stub $_`: file doesn't exist"}
+	echo "creating stub for $_ in ~\appdata\local\bin"
 
-    stub "$appdir\$_"
+	# check valid bin
+	$binpath = full_path "$appdir\$_"
+	if($binpath -notmatch "^$([regex]::escape("$appdir\"))") {
+		abort "error in manifest: bin '$_' is outside the app directory"
+	}
+	if(!(test-path $binpath)) { abort "can't stub $_`: file doesn't exist"}
+
+	stub "$appdir\$_"
 }
 
 success "$app was succesfully installed"

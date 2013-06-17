@@ -6,52 +6,53 @@ param($cmd)
 . (resolve '..\commands.ps1')
 
 function usage($text) {
-    $text | sls '(?m)^# Usage: ([^\n]*)$' | % { $_.matches[0].groups[1] }
+	$text | sls '(?m)^# Usage: ([^\n]*)$' | % { $_.matches[0].groups[1] }
 }
 
 function summary($text) {
-    $text | sls '(?m)^# Summary: ([^\n]*)$' | % { $_.matches[0].groups[1] }
+	$text | sls '(?m)^# Summary: ([^\n]*)$' | % { $_.matches[0].groups[1] }
 }
 
 function help($text) {
-    $help_lines = $text | sls '(?ms)^# Help:(.(?!^[^#]))*' | % { $_.matches[0].value; }
-    $help_lines -replace '(?ms)^# (Help: )?', ''
+	$help_lines = $text | sls '(?ms)^# Help:(.(?!^[^#]))*' | % { $_.matches[0].value; }
+	$help_lines -replace '(?ms)^# (Help: )?', ''
 }
 
 function print_help($cmd) {
-    $file = gc (resolve ".\$cmd.ps1") -raw
+	$file = gc (resolve ".\$cmd.ps1") -raw
 
-    $usage = usage $file
-    $summary = summary $file
-    $help = help $file
+	$usage = usage $file
+	$summary = summary $file
+	$help = help $file
 
-    if($usage) { echo "usage: $usage`n" }
-    if($help) { echo $help }
+	if($usage) { echo "usage: $usage`n" }
+	if($help) { echo $help }
 }
 
 function print_summaries {
-    $commands = @{}
+	$commands = @{}
 
-    command_files | % {
-        $command = command_name $_
-        $summary = summary (gc (resolve $_) -raw )
-        if(!($summary)) { $summary = '' }
-        $commands.add("$command ", $summary) # add padding
-    }
+	command_files | % {
+		$command = command_name $_
+		$summary = summary (gc (resolve $_) -raw )
+		if(!($summary)) { $summary = '' }
+		$commands.add("$command ", $summary) # add padding
+	}
 
-    $commands | ft -hidetablehead -autosize -wrap
+	$commands | ft -hidetablehead -autosize -wrap
 }
 
 $commands = commands
 
 if(!($cmd)) {
-    echo "usage: scoop <command> [<args]
+	echo "usage: scoop <command> [<args]
 
 Some useful commands are:"
-    print_summaries
+	print_summaries
+	echo "type scoop help <command> to get help for a command"
 } elseif($commands -contains $cmd) {
-    print_help $cmd
+	print_help $cmd
 } else {
-    echo "scoop help: no such command '$cmd'"
+	echo "scoop help: no such command '$cmd'"
 }
 
