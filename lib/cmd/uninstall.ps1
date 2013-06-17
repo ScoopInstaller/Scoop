@@ -11,10 +11,27 @@ if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if(!(installed $app)) { abort "'$app' isn't installed" }
 
-# todo: run uninstaller from manifest
-# todo: remove bin stubs from manifest
-
 $appdir = appdir $app
+$manifest = manifest $app
+
+if($manifest.uninstaller) {
+	$arguments = $manifest.uninstaller.args
+	$a = @()
+	if($arguments) { $arguments | % { $a += (format $_ @{'appdir'=$appdir}) } }
+
+	write-host "uninstalling..." -nonewline
+	try {
+		start-process "$appdir\$($manifest.uninstaller.exe)" -ea 0 -wait -arg $a
+	} catch { throw }
+	write-host "done"
+}
+
+# remove bin stubs from manifest
+$manifest.bin | ?{ $_ -ne $null } | % {
+	echo "removing stub for $_"
+	rm "$bindir\$(strip_ext(fname $_)).ps1"
+}
+
 try {
 	rm -r $appdir -ea stop
 } catch {

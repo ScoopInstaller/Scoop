@@ -32,20 +32,20 @@ if($fname -match '\.zip') {
 if($manifest.installer) {
 	$arguments = $manifest.installer.args
 	$a = @()
-
 	if($arguments) { $arguments | % { $a += (format $_ @{'appdir'=$appdir}) } }
-	echo "executing: $fname $a"
-	& "$appdir\$fname" /verysilent
+	
+	write-host "installing..." -nonewline
+	start-process "$appdir\$fname" -wait -ea 0 -arg $a
+	write-host "done"
 	$delete_dl_file = $true
 }
 
-# delete downloaded file
 if($delete_dl_file) {
 	rm "$appdir\$fname"
 }
 
 # create bin stubs
-$manifest.bin | % {
+$manifest.bin | ?{ $_ -ne $null } | % {
 	echo "creating stub for $_ in ~\appdata\local\bin"
 
 	# check valid bin

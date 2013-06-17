@@ -2,5 +2,5 @@
 	"url": "https://msysgit.googlecode.com/files/Git-1.8.3-preview20130601.exe",
 	"installer": { "args": ["/verysilent", "/dir=\"$appdir\""] },
 	"bin": [ "cmd\\git.exe", "cmd\\gitk.cmd" ],
-	"uninstall": "unins000.exe"
+	"uninstaller": { "exe": "unins000.exe", "args": ["/verysilent"] }
 }
