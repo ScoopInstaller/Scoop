@@ -5,8 +5,8 @@ param($app)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
 . (resolve ..\manifest.ps1)
-. (resolve ..\help.ps1)
 . (resolve ..\install.ps1)
+. (resolve ..\help.ps1)
 
 if(!$app) { "ERROR: <app> missing"; my_usage; exit }
 
@@ -19,9 +19,10 @@ mkdir $appdir > $null
 $appdir = resolve-path $appdir
 $delete_dl_file = $false;
 
-echo "downloading $($manifest.url)..."
-$fname = split-path $manifest.url -leaf
-dl $manifest.url "$appdir\$fname"
+$url = url $manifest
+echo "downloading $url..."
+$fname = split-path $url -leaf
+dl $url "$appdir\$fname"
 
 # unzip
 if($fname -match '\.zip') {

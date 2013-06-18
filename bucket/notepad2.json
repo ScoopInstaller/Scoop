@@ -1,0 +1,7 @@
+{
+	"urls": {
+		"64bit": "http://www.flos-freeware.ch/zip/notepad2_4.2.25_x64.zip",
+		"32bit": "http://www.flos-freeware.ch/zip/notepad2_4.2.25_x86.zip"
+	},
+	"bin": "Notepad2.exe"
+}
