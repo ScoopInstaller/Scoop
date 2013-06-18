@@ -29,9 +29,13 @@ if($fname -match '\.zip') {
 	$delete_dl_file = $true
 }
 
-# installer
+# run installer
 if($manifest.installer) {
-	$installed = run "$appdir\$fname" (args $manifest.installer.args) "installing..."
+	$exe = "$appdir\$(coalesce $manifest.installer.exe "$fname")"
+	if(!(is_in_dir $appdir $exe)) {
+		abort "error in manifest: installer $exe is outside the app directory"
+	}
+	$installed = run $exe (args $manifest.installer.args) "installing..."
 	if(!$installed) {
 		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
 	}
@@ -47,11 +51,11 @@ $manifest.bin | ?{ $_ -ne $null } | % {
 	echo "creating stub for $_ in ~\appdata\local\bin"
 
 	# check valid bin
-	$binpath = full_path "$appdir\$_"
-	if($binpath -notmatch "^$([regex]::escape("$appdir\"))") {
+	$bin = "$appdir\$_"
+	if(!(is_in_dir $appdir $bin)) {
 		abort "error in manifest: bin '$_' is outside the app directory"
 	}
-	if(!(test-path $binpath)) { abort "can't stub $_`: file doesn't exist"}
+	if(!(test-path $bin)) { abort "can't stub $_`: file doesn't exist"}
 
 	stub "$appdir\$_"
 }

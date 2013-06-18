@@ -16,3 +16,9 @@ function run($exe, $arg, $msg) {
     write-host "done"
     return $true
 }
+
+function is_in_dir($dir, $file) {
+    $file = "$(full_path $file)"
+    $dir = "$(full_path $dir)"
+    $file -match "^$([regex]::escape("$dir\"))"
+}

@@ -17,11 +17,13 @@ $manifest = manifest $app
 
 if($manifest.uninstaller) {
 	$exe = "$appdir\$($manifest.uninstaller.exe)";
-	if(test-path $exe) {
+	if(!(is_in_dir $appdir $exe)) {
+		warn "error in manifest: installer $exe is outside the app directory, skipping"
+	} elseif(!(test-path $exe)) {
+		warn "uninstaller $($manifest.uninstaller.exe) is missing, skipping"
+	} else {
 		$uninstalled = run $exe (args $manifest.uninstaller.args) "uninstalling..."
 		if(!$uninstalled) { abort "uninstallation aborted."	}
-	} else {
-		warn "uninstaller $($manifest.uninstaller.exe) not found, skipping"
 	}
 }
 
@@ -29,7 +31,7 @@ if($manifest.uninstaller) {
 $manifest.bin | ?{ $_ -ne $null } | % {
 	$stub = "$bindir\$(strip_ext(fname $_)).ps1"
 	if(!(test-path $stub)) { # handle no stub from failed install
-		warn "stub for $_ was missing, skipped"
+		warn "stub for $_ is missing, skipping"
 	} else {
 		echo "removing stub for $_"
 		rm $stub
