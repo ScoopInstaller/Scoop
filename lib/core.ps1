@@ -8,6 +8,7 @@ function env($name,$val) {
 	else { [environment]::getEnvironmentVariable($name, 'User') } # get
 }
 function abort($msg) { write-host $msg -b darkred -f white; exit 1 }
+function warn($msg) { write-host $msg -f yellow; }
 function success($msg) { write-host $msg -b green -f black; }
 function appdir($name) { "$scoopdir\apps\$name" }
 

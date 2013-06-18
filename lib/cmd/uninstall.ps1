@@ -5,7 +5,8 @@ param($app)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
 . (resolve ../manifest.ps1)
-. (resolve ../help_comments.ps1)
+. (resolve ../help.ps1)
+. (resolve ../install.ps1)
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
@@ -15,21 +16,24 @@ $appdir = appdir $app
 $manifest = manifest $app
 
 if($manifest.uninstaller) {
-	$arguments = $manifest.uninstaller.args
-	$a = @()
-	if($arguments) { $arguments | % { $a += (format $_ @{'appdir'=$appdir}) } }
-
-	write-host "uninstalling..." -nonewline
-	try {
-		start-process "$appdir\$($manifest.uninstaller.exe)" -ea 0 -wait -arg $a
-	} catch { throw }
-	write-host "done"
+	$exe = "$appdir\$($manifest.uninstaller.exe)";
+	if(test-path $exe) {
+		$uninstalled = run $exe (args $manifest.uninstaller.args) "uninstalling..."
+		if(!$uninstalled) { abort "uninstallation aborted."	}
+	} else {
+		warn "uninstaller $($manifest.uninstaller.exe) not found, skipping"
+	}
 }
 
-# remove bin stubs from manifest
+# remove bin stubs
 $manifest.bin | ?{ $_ -ne $null } | % {
-	echo "removing stub for $_"
-	rm "$bindir\$(strip_ext(fname $_)).ps1"
+	$stub = "$bindir\$(strip_ext(fname $_)).ps1"
+	if(!(test-path $stub)) { # handle no stub from failed install
+		warn "stub for $_ was missing, skipped"
+	} else {
+		echo "removing stub for $_"
+		rm $stub
+	}	
 }
 
 try {

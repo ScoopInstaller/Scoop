@@ -3,8 +3,8 @@
 param($cmd)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
-. (resolve '..\commands.ps1')
-. (resolve '..\help_comments.ps1')
+. (resolve ..\commands.ps1)
+. (resolve ..\help.ps1)
 
 function print_help($cmd) {
 	$file = gc (resolve ".\$cmd.ps1") -raw

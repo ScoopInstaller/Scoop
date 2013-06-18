@@ -4,8 +4,9 @@
 param($app)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
-. (resolve ../manifest.ps1)
-. (resolve ../help_comments.ps1)
+. (resolve ..\manifest.ps1)
+. (resolve ..\help.ps1)
+. (resolve ..\install.ps1)
 
 if(!$app) { "ERROR: <app> missing"; my_usage; exit }
 
@@ -30,13 +31,10 @@ if($fname -match '\.zip') {
 
 # installer
 if($manifest.installer) {
-	$arguments = $manifest.installer.args
-	$a = @()
-	if($arguments) { $arguments | % { $a += (format $_ @{'appdir'=$appdir}) } }
-	
-	write-host "installing..." -nonewline
-	start-process "$appdir\$fname" -wait -ea 0 -arg $a
-	write-host "done"
+	$installed = run "$appdir\$fname" (args $manifest.installer.args) "installing..."
+	if(!$installed) {
+		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
+	}
 	$delete_dl_file = $true
 }
 

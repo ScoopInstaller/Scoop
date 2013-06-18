@@ -14,6 +14,15 @@ To install:
     
 Once installed, run `scoop help` for instructions.
 
+What problems Scoop is trying to solve?
+---------------------------------------
+
+*todo: these aren't really problems—rewrite to be more provocative and insulting?*
+
+* Quickly install the tools and utilities you need to make your system useful.
+* Make sharing scripts and utilities easy.
+* Enable productive scripting in Windows using a composition of collected utilities.
+
 
 Scoop vs [Chocolatey](http://chocolatey.org)
 --------------------------------------------
@@ -28,3 +37,9 @@ Pros:
 
 Cons:
 * **Not as many apps.** Scoop has [nowhere near the number of apps](https://github.com/lukesampson/scoop/tree/master/bucket) that Chocolatey has. Contributions via pull-request are welcome!
+
+Inspiration
+-----------
+
+* [Homebrew](http://mxcl.github.io/homebrew/)
+* [sub](https://github.com/37signals/sub#readme)
