@@ -12,7 +12,7 @@ if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if(!(installed $app)) { abort "'$app' isn't installed" }
 
-$appdir = appdir $app
+$appdir = appdir_highestversion $app
 $manifest = manifest $app
 
 if($manifest.uninstaller) {

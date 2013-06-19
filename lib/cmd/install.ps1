@@ -12,9 +12,13 @@ if(!$app) { "ERROR: <app> missing"; my_usage; exit }
 
 $manifest = manifest $app
 if(!$manifest) { abort "couldn't find manifest for '$app'" }
-if(installed $app) { abort "'$app' is already installed"}
 
-$appdir = appdir $app
+$version = $manifest.version
+if(!$version) { abort "manifest doesn't specify a version" }
+
+if(installed $app $version) { abort "'$app' is already installed"}
+
+$appdir = appdir $app $version
 mkdir $appdir > $null
 $appdir = resolve-path $appdir
 $delete_dl_file = $false;

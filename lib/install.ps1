@@ -1,6 +1,6 @@
 # stuff for dealing with installers
-function args($config) {
-	if($config) { return $config | % { (format $_ @{'appdir'=$appdir}) } }
+function args($config, $dir) {
+	if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }
 	@()
 }
 

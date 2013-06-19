@@ -1,4 +1,7 @@
 {
+	"homepage": "http://www.7-zip.org/",
+	"license": "http://www.7-zip.org/license.txt",
+	"version": "9.20",
 	"url": "http://downloads.sourceforge.net/sevenzip/7za920.zip",
 	"bin": "7za.exe"
 }

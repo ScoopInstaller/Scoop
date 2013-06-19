@@ -9,22 +9,21 @@ echo 'initializing...'
 iex (new-object net.webclient).downloadstring($core_url)
 
 # prep
-if(installed 'scoop') { abort "scoop is already installed." }
-$appdir = appdir 'scoop'
-$abs_appdir = ensure $appdir
+if(installed 'scoop') { abort "scoop is already installed. run 'scoop update' to get the latest version." }
+$dir = ensure (versiondir 'scoop' 'current')
 
 # download scoop zip
 $zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
-$zipfile = "$abs_appdir\scoop.zip"
+$zipfile = "$dir\scoop.zip"
 echo 'downloading...'
 dl $zipurl $zipfile
 
 echo 'extracting...'
-unzip $zipfile $abs_appdir
+unzip $zipfile $dir
 rm $zipfile
 
 echo 'creating stub...'
-stub "$abs_appdir\scoop-master\bin\scoop.ps1"
+stub "$dir\scoop-master\bin\scoop.ps1"
 
 ensure_scoop_in_path
 success 'scoop was successfully installed!'

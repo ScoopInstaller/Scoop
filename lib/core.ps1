@@ -2,16 +2,26 @@ $scoopdir = "~\appdata\local\scoop"
 $bindir = "$scoopdir\bin"
 
 # helper functions
-function dl($url,$to) { (new-object system.net.webClient).downloadFile($url,$to) }
-function env($name,$val) {
-	if($val) { [environment]::setEnvironmentVariable($name,$val,'User') } # set
-	else { [environment]::getEnvironmentVariable($name, 'User') } # get
+function coalesce($a, $b) { if($a) { return $a } $b }
+function format($str, $hash) {
+	$hash.keys | % { set-variable $_ $hash[$_] }
+	$executionContext.invokeCommand.expandString($str)
 }
+
+# messages
 function abort($msg) { write-host $msg -b darkred -f white; exit 1 }
 function warn($msg) { write-host $msg -f yellow; }
 function success($msg) { write-host $msg -b green -f black; }
-function appdir($name) { "$scoopdir\apps\$name" }
 
+# apps
+function appdir($app) { "$scoopdir\apps\$app" }
+function versiondir($app, $version) { "$(appdir $app)\$version" }
+function installed($app) { return test-path (appdir $app) }
+function versions($app) {
+	gci "$scoopdir\apps\$app" -dir | sort-object name | % { $_.name }
+}
+
+# paths
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 
@@ -24,19 +34,18 @@ function friendly_path($path) {
 }
 function resolve($path) { "$($myInvocation.PSScriptRoot)\$path" } # relative to calling script
 
-function installed($name) { return test-path (appdir $name) }
+# operations
+function dl($url,$to) { (new-object system.net.webClient).downloadFile($url,$to) }
+function env($name,$val) {
+	if($val) { [environment]::setEnvironmentVariable($name,$val,'User') } # set
+	else { [environment]::getEnvironmentVariable($name, 'User') } # get
+}
 function unzip($path,$to) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
 	$shell = (new-object -com shell.application)
 	$zipfiles = $shell.namespace("$path").items()
 	$shell.namespace("$to").copyHere($zipFiles, 4) # 4 = don't show progress dialog
 }
-function coalesce($a, $b) { if($a) { return $a } $b }
-function format($str, $hash) {
-	$hash.keys | % { set-variable $_ $hash[$_] }
-	$executionContext.invokeCommand.expandString($str)
-}
-
 function stub($path) {
 	if(!(test-path $path)) { abort "can't stub $(fname $path): couldn't find $path" }
 	$abs_bindir = ensure $bindir
