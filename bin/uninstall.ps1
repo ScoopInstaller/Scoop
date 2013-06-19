@@ -4,6 +4,7 @@ if(test-path $scoopdir) {
 	try {
 		rm -r $scoopdir -ea stop
 	} catch {
+        echo $_.exception
 		abort "couldn't remove $(friendly_path $scoopdir): it may be in use"
 	}
 }

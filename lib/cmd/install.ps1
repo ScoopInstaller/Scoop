@@ -16,39 +16,34 @@ if(!$manifest) { abort "couldn't find manifest for '$app'" }
 $version = $manifest.version
 if(!$version) { abort "manifest doesn't specify a version" }
 
-if(installed $app $version) { abort "'$app' is already installed"}
+if(installed $app) { abort "'$app' is already installed. use 'scoop update' to install a new version."}
 
-$appdir = appdir $app $version
-mkdir $appdir > $null
-$appdir = resolve-path $appdir
-$delete_dl_file = $false;
+$dir = ensure (versiondir $app $version)
 
 $url = url $manifest
 echo "downloading $url..."
 $fname = split-path $url -leaf
-dl $url "$appdir\$fname"
+dl $url "$dir\$fname"
+
+function rm_dl { rm "$dir\$fname"}
 
 # unzip
 if($fname -match '\.zip') {
-	unzip "$appdir\$fname" $appdir
-	$delete_dl_file = $true
+	unzip "$dir\$fname" $dir
+	rm_dl
 }
 
 # run installer
 if($manifest.installer) {
-	$exe = "$appdir\$(coalesce $manifest.installer.exe "$fname")"
-	if(!(is_in_dir $appdir $exe)) {
+	$exe = "$dir\$(coalesce $manifest.installer.exe "$fname")"
+	if(!(is_in_dir $dir $exe)) {
 		abort "error in manifest: installer $exe is outside the app directory"
 	}
-	$installed = run $exe (args $manifest.installer.args) "installing..."
+	$installed = run $exe (args $manifest.installer.args $dir) "installing..."
 	if(!$installed) {
 		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
 	}
-	$delete_dl_file = $true
-}
-
-if($delete_dl_file) {
-	rm "$appdir\$fname"
+	rm_dl
 }
 
 # create bin stubs
@@ -56,13 +51,13 @@ $manifest.bin | ?{ $_ -ne $null } | % {
 	echo "creating stub for $_ in ~\appdata\local\bin"
 
 	# check valid bin
-	$bin = "$appdir\$_"
-	if(!(is_in_dir $appdir $bin)) {
+	$bin = "$dir\$_"
+	if(!(is_in_dir $dir $bin)) {
 		abort "error in manifest: bin '$_' is outside the app directory"
 	}
 	if(!(test-path $bin)) { abort "can't stub $_`: file doesn't exist"}
 
-	stub "$appdir\$_"
+	stub "$dir\$_"
 }
 
-success "$app was succesfully installed"
+success "$app was installed successfully!"

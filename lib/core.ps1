@@ -49,7 +49,7 @@ function unzip($path,$to) {
 function stub($path) {
 	if(!(test-path $path)) { abort "can't stub $(fname $path): couldn't find $path" }
 	$abs_bindir = ensure $bindir
-	$stub = "$abs_bindir\$(strip_ext(fname $path)).ps1"
+	$stub = "$abs_bindir\$(strip_ext(fname $path).tolower()).ps1"
 
 	echo "`$rawargs = `$myInvocation.line -replace `"^`$([regex]::escape(`$myInvocation.invocationName))\s*`", `"`"" >> "$stub"
 	echo "iex `"$path `$rawargs`"" >> "$stub"

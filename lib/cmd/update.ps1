@@ -1,5 +1,5 @@
 # Usage: scoop update [app]
-# Summary: Update an app, or Scoop itself.
+# Summary: Update an app, or Scoop itself
 # Help: 'scoop update' updates Scoop to the latest version.
 # 'scoop update [app]' installs a new version of that app, if there is one.
 param($app)
