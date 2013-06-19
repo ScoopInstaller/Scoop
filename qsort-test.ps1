@@ -1,7 +1,6 @@
 function qsort($ary) {
-    if(($ary -eq $null) -or ($ary.length -eq 0)) { return @() }
+    if($ary -eq $null) { return @() }
     if(!($ary -is [array])) { return @($ary) }
-    if($ary.length -eq 1) { return $ary }
 
     $pivot = $ary[0]
     $rem = $ary[1..($ary.length-1)]
