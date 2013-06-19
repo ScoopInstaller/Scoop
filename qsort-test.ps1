@@ -6,7 +6,7 @@ function qsort($ary) {
     $rem = $ary[1..($ary.length-1)]
 
     $lesser = qsort ($rem | where { $_ -lt $pivot })
-    $greater = qsort ( $rem | where { $_ -ge $pivot })
+    $greater = qsort ($rem | where { $_ -ge $pivot })
 
     return @() + $lesser + @($pivot) + $greater
 }
