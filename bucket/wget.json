@@ -1,0 +1,7 @@
+{
+	"homepage": "http://users.ugent.be/~bpuype/wget/",
+	"license": "GPL3",
+	"version": "1.11.4",
+	"url": "http://users.ugent.be/~bpuype/cgi-bin/fetch.pl?dl=wget/wget.exe",
+	"bin": "wget.exe"
+}
