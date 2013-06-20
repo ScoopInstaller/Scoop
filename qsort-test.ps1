@@ -11,7 +11,17 @@ function qsort($ary) {
     return @() + $lesser + @($pivot) + $greater
 }
 
-$test = "fred,1,6,2,7,9,12,89,45,12,65,1,12,amy".split(',')
+function comp_ver($a, $b) {
+    if($a -lt $b) { return -1 }
+    if($a -gt $b) { return 1 }
+    return 0
+}
+
+
+#comp_ver 'a', 1
+#$test = "fred,1,6,2,7,9,12,89,45,12,65,1,12,amy".split(',')
+
+$test = "fred,1".split(',')
 $sorted = $(qsort $test)
-#"result: $sorted"
-$sorted |% { "el: $_" }
+$sorted |% { write-host "'$_'," -no }
+write-host ""
