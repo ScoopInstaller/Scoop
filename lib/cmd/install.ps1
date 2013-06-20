@@ -11,12 +11,12 @@ param($app)
 if(!$app) { "ERROR: <app> missing"; my_usage; exit }
 
 $manifest = manifest $app
-if(!$manifest) { abort "couldn't find manifest for '$app'" }
+if(!$manifest) { abort "couldn't find manifest for $app" }
 
 $version = $manifest.version
 if(!$version) { abort "manifest doesn't specify a version" }
 
-if(installed $app) { abort "'$app' is already installed. use 'scoop update' to install a new version."}
+if(installed $app) { abort "$app is already installed. Use 'scoop update' to install a new version."}
 
 $dir = ensure (versiondir $app $version)
 
@@ -25,8 +25,10 @@ echo "downloading $url..."
 $fname = split-path $url -leaf
 dl $url "$dir\$fname"
 
-function rm_dl { rm "$dir\$fname"}
+# save manifest for uninstall
+cp (manifest_path $app) "$dir\manifest.json"
 
+function rm_dl { rm "$dir\$fname"}
 # unzip
 if($fname -match '\.zip') {
 	unzip "$dir\$fname" $dir

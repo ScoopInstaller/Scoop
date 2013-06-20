@@ -9,13 +9,13 @@ param($app)
 if($app) { abort "updating apps isn't implemented yet" }
 
 # update scoop
-$tempdir = "$scoopdir\temp"
+$tempdir = versiondir 'scoop' 'update'
+$currentdir = versiondir 'scoop' 'current'
+
 if(test-path $tempdir) {
-    try { rm $tempdir -ea 0 } catch { abort "couldn't remove $tempdir: it may be in use" }
+    try { rm -r $tempdir -ea stop -force } catch { abort "couldn't remove $tempdir`: it may be in use" }
 }
-mkdir $tempdir
-
-
+$tempdir = ensure $tempdir
 
 $zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
 $zipfile = "$tempdir\scoop.zip"
@@ -23,5 +23,12 @@ echo 'downloading...'
 dl $zipurl $zipfile
 
 echo 'extracting...'
-unzip $zipfile $abs_appdir
+unzip $zipfile $tempdir
 rm $zipfile
+
+echo 'replacing files..'
+rm -r -force $currentdir -ea stop
+rni $tempdir 'current' -ea stop
+
+ensure_scoop_in_path
+success 'scoop was updated successfully!'

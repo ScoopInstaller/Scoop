@@ -10,3 +10,5 @@ echo "Available apps:
 gci (resolve '..\..\bucket') |
 	where { $_.name.endswith('.json') } |
 	% { $_ -replace '.json$', '' }
+
+""

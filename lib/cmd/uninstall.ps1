@@ -10,16 +10,18 @@ param($app)
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
-if(!(installed $app)) { abort "'$app' isn't installed" }
+if(!(installed $app)) { abort "$app isn't installed" }
 
 $versions = @(versions $app)
-echo $versions[-1]
-abort "don't know how to get latest version yet!"
-$manifest = manifest $app
+$version = $versions[-1]
+"uninistalling $app $version"
+
+$dir = versiondir $app $version
+$manifest = installed_manifest $app $version
 
 if($manifest.uninstaller) {
-	$exe = "$appdir\$($manifest.uninstaller.exe)";
-	if(!(is_in_dir $appdir $exe)) {
+	$exe = "$dir\$($manifest.uninstaller.exe)";
+	if(!(is_in_dir $dir $exe)) {
 		warn "error in manifest: installer $exe is outside the app directory, skipping"
 	} elseif(!(test-path $exe)) {
 		warn "uninstaller $($manifest.uninstaller.exe) is missing, skipping"
@@ -41,9 +43,14 @@ $manifest.bin | ?{ $_ -ne $null } | % {
 }
 
 try {
-	rm -r $appdir -ea stop
+	rm -r $dir -ea stop -force
 } catch {
-	abort "couldn't remove $(friendly_path $appdir): it may be in use"
+	abort "couldn't remove $(friendly_path $dir): it may be in use"
 }
+
+if(@(versions $app).length -eq 0) {
+	rm -r (appdir $app) -ea stop -force
+}
+
 
 success "$app was uninstalled"

@@ -1,4 +1,4 @@
-# stuff for dealing with installers
+# for dealing with installers
 function args($config, $dir) {
 	if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }
 	@()
@@ -7,7 +7,7 @@ function args($config, $dir) {
 function run($exe, $arg, $msg) {
 	write-host $msg -nonewline
 	try {
-		$proc = start-process $exe -wait -ea 0 -passthru -arg $arg
+		$proc = start-process $exe -wait -ea stop -passthru -arg $arg
 		if($proc.exitcode -ne 0) { write-host "exit code was $($proc.exitcode)"; return $false }
 	} catch {
 		write-host -f red $_.exception.tostring()
@@ -23,6 +23,8 @@ function is_in_dir($dir, $file) {
 	$file -match "^$([regex]::escape("$dir\"))"
 }
 
+
+# versions
 function versions($app) {
 	sort_versions (gci "$scoopdir\apps\$app" -dir | % { $_.name })
 }
