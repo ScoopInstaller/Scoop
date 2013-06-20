@@ -17,9 +17,6 @@ function success($msg) { write-host $msg -b green -f black; }
 function appdir($app) { "$scoopdir\apps\$app" }
 function versiondir($app, $version) { "$(appdir $app)\$version" }
 function installed($app) { return test-path (appdir $app) }
-function versions($app) {
-	gci "$scoopdir\apps\$app" -dir | sort-object name | % { $_.name }
-}
 
 # paths
 function fname($path) { split-path $path -leaf }

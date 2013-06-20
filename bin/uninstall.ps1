@@ -2,10 +2,9 @@
 
 if(test-path $scoopdir) {
 	try {
-		rm -r $scoopdir -ea stop
+		rm -r -force $scoopdir -ea 0
 	} catch {
-        echo $_.exception
-		abort "couldn't remove $(friendly_path $scoopdir): it may be in use"
+		abort "couldn't remove $(friendly_path $scoopdir): $_.exception.tostring()"
 	}
 }
 

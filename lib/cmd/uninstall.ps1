@@ -12,8 +12,8 @@ if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if(!(installed $app)) { abort "'$app' isn't installed" }
 
-$versions = versions $app
-echo $versions
+$versions = @(versions $app)
+echo $versions[-1]
 abort "don't know how to get latest version yet!"
 $manifest = manifest $app
 
