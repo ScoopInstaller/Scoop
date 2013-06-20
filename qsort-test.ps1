@@ -12,17 +12,30 @@ function qsort($ary, $fn) {
 	return @() + $lesser + @($pivot) + $greater
 }
 
-function comp_ver($a, $b) {
-	if($a -lt $b) { return -1 }
-	if($a -gt $b) { return 1 }
+function version($ver) {
+	$ver.split('.') | % {
+		$num = $_ -as [int]
+		if($num) { $num } else { $_ }
+	}
+}
+
+function compare_versions($a, $b) {
+	$ver_a = version $a
+	$ver_b = version $b
+
+	for($i=0;$i -lt $ver_a.length;$i++) {
+		if($i -gt $ver_b.length) { return 1; }
+		if($ver_a[$i] -gt $ver_b[$i]) { return 1; }
+		if($ver_a[$i] -lt $ver_b[$i]) { return -1; }
+	}
+	if($ver_b.length -gt $ver_a.length) { return -1 }
 	return 0
 }
 
+$test = "10.1.1,4.2.4,4.2.25,4.2,10.1.1.r0-preview,10.1.1.r2-final".split(',')
 
-#comp_ver 'a', 1
-$test = "fred,1,6,2,7,9,12,89,45,12,65,1,12,amy".split(',')
-
-#$test = "fred,1,6".split(',')
-$sorted = qsort $test comp_ver
+#split_version '10.1.r0-preview'
+compare_versions '4.2.4' '4.2.4.25'
+$sorted = qsort $test compare_versions
 $sorted |% { write-host "'$_'," -no }
 write-host ""
