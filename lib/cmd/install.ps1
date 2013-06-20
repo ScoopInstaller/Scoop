@@ -22,7 +22,7 @@ $dir = ensure (versiondir $app $version)
 
 $url = url $manifest
 echo "downloading $url..."
-$fname = split-path $url -leaf
+$fname = coalesce $manifest.url_filename (split-path $url -leaf)
 dl $url "$dir\$fname"
 
 # save manifest for uninstall

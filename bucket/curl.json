@@ -1,0 +1,7 @@
+{
+	"homepage": "http://curl.haxx.se/",
+	"version": "7.30.0",
+	"licence": "MIT",
+	"url": "http://curl.haxx.se/gknw.net/7.30.0/dist-w32/curl-7.30.0-rtmp-ssh2-ssl-sspi-zlib-idn-static-bin-w32.zip",
+	"bin": "curl-7.30.0-rtmp-ssh2-ssl-sspi-zlib-idn-static-bin-w32\\curl.exe"
+}
