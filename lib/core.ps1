@@ -77,7 +77,6 @@ function exec_stub($path, $inv) {
 	$cmd = $inv.line.substring($inv.offsetinline-1,$len)
 
 	$rawargs = $cmd -replace "^\s*&?\s*(('?[^']*')|([^\s]*))\s*", ""
-	$rawargs = $rawargs -replace '"', '""'
 
 	iex "&'$path' $rawargs"
 }
