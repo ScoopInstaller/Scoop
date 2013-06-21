@@ -49,10 +49,10 @@ function stub($path) {
 	$stub = "$abs_bindir\$(strip_ext(fname $path).tolower()).ps1"
 
 	# note: use > for first line to replace, then >> for second line to append
-	echo "`$rawargs = `$myInvocation.line -replace `"^`$([regex]::escape(`$myInvocation.invocationName))\s*`", `"`"" > "$stub"
-	echo "iex `"$path `$rawargs`"" >> "$stub"
+	echo "`$rawargs = `$myinvocation.line -replace `"^\s*&?\s*(('?[^']*')|([^\s]*))\s*`", `"`"" > "$stub"
+	echo "iex `"&'$path' `$rawargs`"" >> "$stub"
 }
-function ensure_scoop_in_path { 
+function ensure_scoop_in_path {
 	$userpath = env 'path'
 	$abs_bindir = ensure $bindir
 	if($userpath -notmatch [regex]::escape($abs_bindir)) {
