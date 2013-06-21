@@ -43,17 +43,18 @@ function unzip($path,$to,$folder) {
 	$zipfiles = $shell.namespace("$path").items()
 	
 	if($folder) { # note: couldn't get this to work as a separate function
-		$next, $folder = $folder.split('\')
+		$next, $rem = $folder.split('\')
 		while($next) {
-			write-host "looking for $next"
+			$found = $false
 			foreach($item in $zipfiles) {
 				if($item.isfolder -and ($item.name -eq $next)) {
-					write-host "found it"
 					$zipfiles = $item.getfolder.items()
+					$found = $true
 					break
 				}
 			}
-			$next, $folder = $folder
+			if(!$found) { abort "couldn't find folder '$folder' inside $(friendly_path $path)" }
+			$next, $rem = $rem
 		}
 	}
 
