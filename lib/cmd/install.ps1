@@ -31,7 +31,7 @@ cp (manifest_path $app) "$dir\manifest.json"
 function rm_dl { rm "$dir\$fname"}
 # unzip
 if($fname -match '\.zip') {
-	unzip "$dir\$fname" $dir
+	unzip "$dir\$fname" $dir $manifest.unzip_folder
 	rm_dl
 }
 
