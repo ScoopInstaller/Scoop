@@ -1,6 +1,6 @@
 # Usage: scoop which <command>
 # Summary: Locate a program path
-# Help: Find where a program is actually installed, if it was installed with scoop.
+# Help: Finds the path to a program that was installed with Scoop
 param($command)
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
 

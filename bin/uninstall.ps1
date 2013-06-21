@@ -4,7 +4,7 @@ if(test-path $scoopdir) {
 	try {
 		rm -r -force $scoopdir -ea stop
 	} catch {
-		abort "couldn't remove $(friendly_path $scoopdir): $_.exception"
+		abort "couldn't remove $(friendly_path $scoopdir): $_"
 	}
 }
 

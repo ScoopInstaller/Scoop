@@ -37,21 +37,49 @@ function env($name,$val) {
 	if($val) { [environment]::setEnvironmentVariable($name,$val,'User') } # set
 	else { [environment]::getEnvironmentVariable($name, 'User') } # get
 }
-function unzip($path,$to) {
+function unzip($path,$to,$folder) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
-	$shell = (new-object -com shell.application)
+	$shell = (new-object -com shell.application -strict)
 	$zipfiles = $shell.namespace("$path").items()
-	$shell.namespace("$to").copyHere($zipFiles, 4) # 4 = don't show progress dialog
+	
+	if($folder) { # note: couldn't get this to work as a separate function
+		$next, $folder = $folder.split('\')
+		while($next) {
+			write-host "looking for $next"
+			foreach($item in $zipfiles) {
+				if($item.isfolder -and ($item.name -eq $next)) {
+					write-host "found it"
+					$zipfiles = $item.getfolder.items()
+					break
+				}
+			}
+			$next, $folder = $folder
+		}
+	}
+
+	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
+
 function stub($path) {
 	if(!(test-path $path)) { abort "can't stub $(fname $path): couldn't find $path" }
 	$abs_bindir = ensure $bindir
 	$stub = "$abs_bindir\$(strip_ext(fname $path).tolower()).ps1"
 
-	# note: use > for first line to replace, then >> for second line to append
-	echo "`$rawargs = `$myinvocation.line -replace `"^\s*&?\s*(('?[^']*')|([^\s]*))\s*`", `"`"" > "$stub"
-	echo "iex `"&'$path' `$rawargs`"" >> "$stub"
+	# note: use > for first line to replace, then >> to append following lines
+	echo ". ""$(versiondir 'scoop' 'current')\lib\core.ps1""" > $stub
+	echo "`$path = '$path'" >> $stub
+	echo "exec_stub $path $myinvocation" >> $stub
 }
+
+function exec_stub($path, $inv) {
+	$len = $inv.positionmessage.split("`n")[2] | sls '~+' | % { $_.matches[0].value.length }
+	$cmd = $inv.line.substring($inv.offsetinline-1,$len)
+
+	$rawargs = $cmd -replace "^\s*&?\s*(('?[^']*')|([^\s]*))\s*", ""
+
+	iex "&'$path' $rawargs"
+}
+
 function ensure_scoop_in_path {
 	$userpath = env 'path'
 	$abs_bindir = ensure $bindir

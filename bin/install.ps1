@@ -1,6 +1,6 @@
 # remote install:
 #   iex (new-object net.webclient).downloadstring('https://raw.github.com/lukesampson/scoop/master/install.ps1')
-$erroractionpreference=stop # quit if anything goes wrong
+$erroractionpreference='stop' # quit if anything goes wrong
 
 # get core functions
 $core_url = 'https://raw.github.com/lukesampson/scoop/master/lib/core.ps1'
@@ -8,7 +8,7 @@ echo 'initializing...'
 iex (new-object net.webclient).downloadstring($core_url)
 
 # prep
-if(installed 'scoop') abort "scoop is already installed. run 'scoop update' to get the latest version."
+if(installed 'scoop') { abort "scoop is already installed. run 'scoop update' to get the latest version." }
 $dir = ensure (versiondir 'scoop' 'current')
 
 # download scoop zip
@@ -18,11 +18,11 @@ echo 'downloading...'
 dl $zipurl $zipfile
 
 'extracting...'
-unzip $zipfile $dir
+unzip $zipfile $dir 'scoop-master'
 rm $zipfile
 
 echo 'creating stub...'
-stub "$dir\scoop-master\bin\scoop.ps1"
+stub "$dir\bin\scoop.ps1"
 
 ensure_scoop_in_path
 success 'scoop was installed successfully!'
