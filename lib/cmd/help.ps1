@@ -27,7 +27,7 @@ function print_summaries {
 		$commands.add("$command ", $summary) # add padding
 	}
 
-	$commands | ft -hidetablehead -autosize -wrap
+	$commands.getenumerator() | sort name | ft -hidetablehead -autosize -wrap
 }
 
 $commands = commands
