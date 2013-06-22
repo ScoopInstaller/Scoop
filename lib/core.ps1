@@ -72,19 +72,27 @@ function stub($path) {
 	echo "exec_stub `$path `$myinvocation" >> $stub
 }
 
-function exec_stub($path, $inv) {
-	# re-parse the command line to work out which part of it to pass to the bin
-	# needs to handle brackets, pipes and `& 'cmd'`
+# re-parses to get the raw command for this invocation (minus pipes, other expressions etc.)
+function command($inv) {
 	$cmdName = $inv.InvocationName
 	$ast = [System.Management.Automation.Language.Parser]::ParseInput($inv.line, [ref]$null, [ref]$null)
 
 	$cmd = $ast.find({
-		($args[0].gettype().name -eq 'commandast') -and ($args.getcommandname() -eq $cmdName)
+		($args[0].gettype().name -eq 'commandast') -and	(
+			($cmdName -eq '&' -and $args[0].invocationoperator -eq 'Ampersand') -or
+			($args[0].getcommandname() -eq $cmdName)
+		)
 	}, $true)
 
-	$rawargs = $cmd -replace "^\s*&?\s*(('?[^']*')|([^\s]*))\s*", ""
+	$cmd.extent.text
+}
 
-	iex "&'$path' $rawargs"
+function rawargs($inv) {
+	(command $inv) -replace "^\s*(&?\s*)?(('[^']*')|([^\s]*))\s*", ""
+}
+
+function exec_stub($path, $inv) {
+	iex "&'$path' $(rawargs $inv)"
 }
 
 function ensure_scoop_in_path {
