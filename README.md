@@ -1,7 +1,7 @@
 Scoop (alpha)
 =============
 
-Scoop is a simple package manager for Windows, designed for people who like working on the command-line.
+Scoop is a simple package manager for Windows, designed for developers who like working on the command-line.
 
 Requirements:
 
