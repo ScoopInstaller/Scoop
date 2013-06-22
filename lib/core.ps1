@@ -73,8 +73,14 @@ function stub($path) {
 }
 
 function exec_stub($path, $inv) {
-	$len = $inv.positionmessage.split("`n")[2] | sls '~+' | % { $_.matches[0].value.length }
-	$cmd = $inv.line.substring($inv.offsetinline-1,$len)
+	# re-parse the command line to work out which part of it to pass to the bin
+	# needs to handle brackets, pipes and `& 'cmd'`
+	$cmdName = $inv.InvocationName
+	$ast = [System.Management.Automation.Language.Parser]::ParseInput($inv.line, [ref]$null, [ref]$null)
+
+	$cmd = $ast.find({
+		($args[0].gettype().name -eq 'commandast') -and ($args.getcommandname() -eq $cmdName)
+	}, $true)
 
 	$rawargs = $cmd -replace "^\s*&?\s*(('?[^']*')|([^\s]*))\s*", ""
 

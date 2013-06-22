@@ -1,13 +1,18 @@
+
 $inv = $myinvocation
+#$inv
 
 $name = $inv.InvocationName
 
-[System.Management.Automation.Language.Token[]]$tokens = $null
-[System.Management.Automation.Language.ScriptBlockAst]$ast =
-    [System.Management.Automation.Language.Parser]::ParseInput($inv.line, [ref]$tokens, [ref]$null)
+$tokens = $null
 
-#$tokens | % { $_ }
+$ast = [System.Management.Automation.Language.Parser]::ParseInput($inv.line, [ref]$tokens, [ref]$null)
 
-$commands = $ast.FindAll({ ($args[0] -is [System.Management.Automation.Language.CommandAst]) -and ($args.getcommandname() -eq $name)}, $true)
+
+$commands = $ast.FindAll({ ($args[0].gettype().name -eq 'commandast') -and ($args[0].invocationoperator -eq 'Ampersand')}, $true)
+
+#$ast
+
+#$tokens | where { $_.text -eq '&' } | % { $_.gettype() }
 
 $commands | % { $_.extent.text }
