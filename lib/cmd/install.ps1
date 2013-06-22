@@ -21,9 +21,15 @@ if(installed $app) { abort "$app is already installed. Use 'scoop update' to ins
 $dir = ensure (versiondir $app $version)
 
 $url = url $manifest
-echo "downloading $url..."
 $fname = coalesce $manifest.url_filename (split-path $url -leaf)
-dl $url "$dir\$fname"
+
+if(is_local $url) {
+	echo "copying $url..."
+	cp $url "$dir\$fname"
+} else {
+	echo "downloading $url..."
+	dl $url "$dir\$fname"
+}
 
 # save manifest for uninstall
 cp (manifest_path $app) "$dir\manifest.json"

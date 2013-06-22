@@ -30,6 +30,9 @@ function friendly_path($path) {
 	return "$path" -replace ([regex]::escape($home)), "~"
 }
 function resolve($path) { "$($myInvocation.PSScriptRoot)\$path" } # relative to calling script
+function is_local($path) {
+	($path -notmatch '^https?://') -and (test-path $path)
+}
 
 # operations
 function dl($url,$to) { (new-object system.net.webClient).downloadFile($url,$to) }
