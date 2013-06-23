@@ -75,37 +75,36 @@ function stub($path) {
 	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $stub
 }
 
-<#
-# re-parses to get the raw command for this invocation (minus pipes, other expressions etc.)
-function command($inv) {
-	$cmdName = $inv.InvocationName
-	$ast = [System.Management.Automation.Language.Parser]::ParseInput($inv.line, [ref]$null, [ref]$null)
+function ensure_in_path($dir,$first=$false) {
+	$userpath = env 'path'
+	$dir = full_path $dir
+	if($userpath -notmatch [regex]::escape($dir)) {
+		echo "adding $(friendly_path $dir) to your path"
+		
+		# for future sessions...
+		if($first) { env 'path' "$dir;$userpath" }
+		else { env 'path' "$userpath;$dir"	}
 
-	$cmd = $ast.find({
-		($args[0].gettype().name -eq 'commandast') -and	(
-			($cmdName -eq '&' -and $args[0].invocationoperator -eq 'Ampersand') -or
-			($args[0].getcommandname() -eq $cmdName)
-		)
-	}, $true)
-
-	$cmd.extent.text
+		# for this session
+		if($first) { $env:path = "$dir;$env:path" }
+		else { $env:path = "$env:path;$dir" }
+	}
 }
 
-function rawargs($inv) {
-	(command $inv) -replace "^\s*(&?\s*)?(('[^']*')|([^\s]*))\s*", ""
-}
+function remove_from_path($dir) {
+	$dir = full_path $dir
+	$old = env 'path'
+	$new = [string]::join(';', @( $old.split(';') | ? { $_ -and $_ -ne $dir } ))
 
-function exec_stub($path, $inv) {
-	iex "&'$path' $(rawargs $inv)"
-}#>
+	if($new -ne $old) { # future sessions only
+		echo "removing $(friendly_path $dir) from your path"
+		env 'path' $new
+	}
+}
 
 function ensure_scoop_in_path {
 	$userpath = env 'path'
 	$abs_bindir = ensure $bindir
-	if($userpath -notmatch [regex]::escape($abs_bindir)) {
-		# be aggressive (b-e-aggressive) and install scoop first in the path
-		echo "adding $(friendly_path $abs_bindir) to your path"
-		env 'path' "$abs_bindir;$userpath"  # for future sessions
-		$env:path = "$abs_bindir;$env:path" # for this session
-	}
+	# be aggressive (b-e-aggressive) and install scoop first in the path
+	ensure_in_path $abs_bindir $true
 }

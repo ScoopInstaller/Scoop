@@ -14,7 +14,7 @@ if(!(installed $app)) { abort "$app isn't installed" }
 
 $versions = @(versions $app)
 $version = $versions[-1]
-"uninistalling $app $version"
+"uninstalling $app $version"
 
 $dir = versiondir $app $version
 $manifest = installed_manifest $app $version
@@ -43,8 +43,6 @@ if($manifest.msi -or $manifest.uninstaller) {
 	}
 }
 
-
-
 # remove bin stubs
 $manifest.bin | ?{ $_ -ne $null } | % {
 	$stub = "$bindir\$(strip_ext(fname $_)).ps1"
@@ -54,6 +52,12 @@ $manifest.bin | ?{ $_ -ne $null } | % {
 		echo "removing stub for $_"
 		rm $stub
 	}	
+}
+
+# remove from path
+$manifest.add_path | ? { $_ } | % {
+	$path_dir = "$dir\$($_)"
+	remove_from_path $path_dir
 }
 
 try {

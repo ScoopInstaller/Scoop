@@ -83,4 +83,13 @@ $manifest.bin | ?{ $_ -ne $null } | % {
 	stub "$dir\$_"
 }
 
+# add to path
+$manifest.add_path | ? { $_ } | % {
+	$path_dir = "$dir\$($_)"
+	if(!(is_in_dir $dir $path_dir)) {
+		abort "error in manifest: add_to_path '$_' is outside the app directory"
+	}
+	ensure_in_path $path_dir
+}
+
 success "$app was installed successfully!"

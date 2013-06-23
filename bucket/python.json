@@ -12,5 +12,6 @@
 			"64bit": "{9FA9A2A6-19E4-381A-8AF3-F8CF12F0DCF0}"
 		}
 	},
-	"bin": [ "python.exe", "py.exe" ]
+	"bin": [ "python.exe", "py.exe" ],
+	"add_path": [ "scripts" ]
 }
