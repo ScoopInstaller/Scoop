@@ -72,7 +72,7 @@ function stub($path) {
 	# note: use > for first line to replace, then >> to append following lines
 	echo ". ""$(versiondir 'scoop' 'current')\lib\core.ps1""" > $stub
 	echo "`$path = '$path'" >> $stub
-	echo 'if($myinvocation.expectingInput) { foreach($i in $input) { $i | & $path @args } } else { & $path @args }' >> $stub
+	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $stub
 }
 
 <#

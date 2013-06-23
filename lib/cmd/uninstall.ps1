@@ -24,7 +24,7 @@ if($manifest.msi -or $manifest.uninstaller) {
 
 	if($manifest.msi) {
 		$code = msi_code $manifest
-		$exe = "msiexec"; $arg = @("/x $code", '/quiet')
+		$exe = "msiexec"; $arg = @("/x $code", '/quiet'); 
 	} elseif($manifest.uninstaller) {
 		$exe = "$dir\$($manifest.uninstaller.exe)"
 		$arg = args $manifest.uninstaller.args
@@ -38,7 +38,7 @@ if($manifest.msi -or $manifest.uninstaller) {
 	}
 
 	if($exe) {
-		$uninstalled = run $exe $arg "uninstalling..."
+		$uninstalled = run $exe $arg "running uninstall..."
 		if(!$uninstalled) { abort "uninstallation aborted."	}
 	}
 }
