@@ -5,10 +5,8 @@
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
 
-echo "Available apps:
+echo "Installed apps:
 "
-gci (resolve '..\..\bucket') |
-	where { $_.name.endswith('.json') } |
-	% { $_ -replace '.json$', '' }
+gci ( "$scoopdir\apps") | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
 
 ""
