@@ -26,7 +26,8 @@ if($manifest.msi -or $manifest.uninstaller) {
 		$code = msi_code $manifest
 		$exe = "msiexec"; $arg = @("/x $code", '/quiet')
 	} elseif($manifest.uninstaller) {
-		$exe = "$dir\$($manifest.uninstaller.exe)";
+		$exe = "$dir\$($manifest.uninstaller.exe)"
+		$arg = args $manifest.uninstaller.args
 		if(!(is_in_dir $dir $exe)) {
 			warn "error in manifest: installer $exe is outside the app directory, skipping"
 			$exe = $null;

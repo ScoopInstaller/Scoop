@@ -72,9 +72,10 @@ function stub($path) {
 	# note: use > for first line to replace, then >> to append following lines
 	echo ". ""$(versiondir 'scoop' 'current')\lib\core.ps1""" > $stub
 	echo "`$path = '$path'" >> $stub
-	echo "exec_stub `$path `$myinvocation" >> $stub
+	echo 'if($myinvocation.expectingInput) { foreach($i in $input) { $i | & $path @args } } else { & $path @args }' >> $stub
 }
 
+<#
 # re-parses to get the raw command for this invocation (minus pipes, other expressions etc.)
 function command($inv) {
 	$cmdName = $inv.InvocationName
@@ -96,7 +97,7 @@ function rawargs($inv) {
 
 function exec_stub($path, $inv) {
 	iex "&'$path' $(rawargs $inv)"
-}
+}#>
 
 function ensure_scoop_in_path {
 	$userpath = env 'path'
