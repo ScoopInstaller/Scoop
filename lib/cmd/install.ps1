@@ -35,19 +35,34 @@ if(is_local $url) {
 cp (manifest_path $app) "$dir\manifest.json"
 
 function rm_dl { rm "$dir\$fname"}
+
 # unzip
 if($fname -match '\.zip') {
 	unzip "$dir\$fname" $dir $manifest.unzip_folder
 	rm_dl
 }
 
-# run installer
-if($manifest.installer) {
-	$exe = "$dir\$(coalesce $manifest.installer.exe "$fname")"
-	if(!(is_in_dir $dir $exe)) {
-		abort "error in manifest: installer $exe is outside the app directory"
+# installer
+if($manifest.msi -or $manifest.installer) {
+	$exe = $null; $arg = $null;
+	
+	if($manifest.msi) { # msi
+		$msifile = "$dir\$(coalesce $manifest.msi.file "$fname")"
+		if(!(is_in_dir $dir $msifile)) {
+			abort "error in manifest: MSI file $msifile is outside the app directory"
+		}
+		if(!(msi_code $manifest)) { abort "error in manifest: couldn't find MSI code"}
+		$exe = 'msiexec'
+		$arg = @("/I `"$msifile`"", '/qb-!', "TARGETDIR=`"$dir`"")
+	} elseif($manifest.installer) { # other installer
+		$exe = "$dir\$(coalesce $manifest.installer.exe "$fname")"
+		if(!(is_in_dir $dir $exe)) {
+			abort "error in manifest: installer $exe is outside the app directory"
+		}
+		$arg = args $manifest.installer.args $dir
 	}
-	$installed = run $exe (args $manifest.installer.args $dir) "installing..."
+	
+	$installed = run $exe $arg "installing..."
 	if(!$installed) {
 		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
 	}

@@ -19,17 +19,30 @@ $version = $versions[-1]
 $dir = versiondir $app $version
 $manifest = installed_manifest $app $version
 
-if($manifest.uninstaller) {
-	$exe = "$dir\$($manifest.uninstaller.exe)";
-	if(!(is_in_dir $dir $exe)) {
-		warn "error in manifest: installer $exe is outside the app directory, skipping"
-	} elseif(!(test-path $exe)) {
-		warn "uninstaller $($manifest.uninstaller.exe) is missing, skipping"
-	} else {
-		$uninstalled = run $exe (args $manifest.uninstaller.args) "uninstalling..."
+if($manifest.msi -or $manifest.uninstaller) {
+	$exe = $null; $arg = $null;
+
+	if($manifest.msi) {
+		$code = msi_code $manifest
+		$exe = "msiexec"; $arg = @("/x $code", '/quiet')
+	} elseif($manifest.uninstaller) {
+		$exe = "$dir\$($manifest.uninstaller.exe)";
+		if(!(is_in_dir $dir $exe)) {
+			warn "error in manifest: installer $exe is outside the app directory, skipping"
+			$exe = $null;
+		} elseif(!(test-path $exe)) {
+			warn "uninstaller $($manifest.uninstaller.exe) is missing, skipping"
+			$exe = $null;
+		}
+	}
+
+	if($exe) {
+		$uninstalled = run $exe $arg "uninstalling..."
 		if(!$uninstalled) { abort "uninstallation aborted."	}
 	}
 }
+
+
 
 # remove bin stubs
 $manifest.bin | ?{ $_ -ne $null } | % {

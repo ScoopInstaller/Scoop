@@ -25,3 +25,11 @@ function url($manifest) {
 		$manifest.urls.(architecture)
 	}
 }
+
+function msi_code($manifest) {
+	if($manifest.msi.code) { return $manifest.msi.code }
+
+	if($manifest.msi.codes) {
+		$manifest.msi.codes.(architecture)
+	}
+}
