@@ -1,3 +1,17 @@
+function cache_path($app, $version, $url) {
+	"$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')"
+}
+
+function dl_with_cache($app, $version, $url, $to) {
+	$cached = full_path (cache_path $app $version $url)
+	if(!(test-path $cached)) {
+		$null = ensure $cachedir
+		echo "downloading $url..."
+		dl $url $cached
+	} else { echo "loading $url from cache..."}
+	cp $cached $to
+}
+
 # for dealing with installers
 function args($config, $dir) {
 	if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }

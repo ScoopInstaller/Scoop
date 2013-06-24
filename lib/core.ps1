@@ -1,5 +1,6 @@
 $scoopdir = "~\appdata\local\scoop"
-$bindir = "$scoopdir\bin"
+$bindir   = "$scoopdir\bin"
+$cachedir = "$scoopdir\cache"
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }

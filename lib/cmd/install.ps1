@@ -15,6 +15,7 @@ if(!$manifest) { abort "couldn't find manifest for $app" }
 
 $version = $manifest.version
 if(!$version) { abort "manifest doesn't specify a version" }
+if($version -match '[^\w\.\-_]') { abort "manifest version has unsupported character '$($matches[0])'" }
 
 if(installed $app) { abort "$app is already installed. Use 'scoop update' to install a new version."}
 
@@ -23,13 +24,7 @@ $dir = ensure (versiondir $app $version)
 $url = url $manifest
 $fname = coalesce $manifest.url_filename (split-path $url -leaf)
 
-if(is_local $url) {
-	echo "copying $url..."
-	cp $url "$dir\$fname"
-} else {
-	echo "downloading $url..."
-	dl $url "$dir\$fname"
-}
+dl_with_cache $app $version $url "$dir\$fname"
 
 # save manifest for uninstall
 cp (manifest_path $app) "$dir\manifest.json"
