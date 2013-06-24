@@ -38,7 +38,7 @@ if($manifest.msi -or $manifest.uninstaller) {
 	}
 
 	if($exe) {
-		$uninstalled = run $exe $arg "running uninstall..."
+		$uninstalled = run $exe $arg "running uninstaller..."
 		if(!$uninstalled) { abort "uninstallation aborted."	}
 	}
 }

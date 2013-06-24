@@ -57,7 +57,7 @@ if($manifest.msi -or $manifest.installer) {
 		$arg = args $manifest.installer.args $dir
 	}
 	
-	$installed = run $exe $arg "installing..."
+	$installed = run $exe $arg "running installer..."
 	if(!$installed) {
 		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
 	}
