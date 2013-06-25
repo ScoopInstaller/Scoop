@@ -14,6 +14,7 @@ function installed_manifest($app, $version) {
 }
 
 function architecture {
+	if($script:architecture) { return $script:architecture } # watch out, uses variable from parent scope!
 	if([intptr]::size -eq 8) { return "64bit" }
 	"32bit"
 }

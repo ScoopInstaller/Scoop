@@ -1,12 +1,18 @@
 # Usage: scoop install <app>
 # Summary: Install an app
 # Help: e.g. `scoop install git`
-param($app)
+param($app, $architecture)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
 . (resolve ..\manifest.ps1)
 . (resolve ..\install.ps1)
 . (resolve ..\help.ps1)
+
+switch($architecture) {
+	'' { }
+	{ @('32bit','64bit') -contains $_ } { $script:architecture = $architecture }
+	default { abort "invalid architecture: '$architecture'"}
+}
 
 if(!$app) { "ERROR: <app> missing"; my_usage; exit }
 
@@ -27,6 +33,7 @@ cp (manifest_path $app) "$dir\manifest.json"
 # can be multiple urls: if there are, then msi or installer should go last,
 # so that $fname is set properly
 $urls = @(url $manifest)
+
 $fname = $null
 
 foreach($url in $urls) {
