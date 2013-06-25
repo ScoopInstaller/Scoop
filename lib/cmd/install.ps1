@@ -21,47 +21,58 @@ if(installed $app) { abort "$app is already installed. Use 'scoop update' to ins
 
 $dir = ensure (versiondir $app $version)
 
-$url = url $manifest
-$fname = coalesce $manifest.url_filename (split-path $url -leaf)
-
-dl_with_cache $app $version $url "$dir\$fname"
-
 # save manifest for uninstall
 cp (manifest_path $app) "$dir\manifest.json"
 
-function rm_dl { rm "$dir\$fname"}
+# can be multiple urls: if there are, then msi or installer should go last,
+# so that $fname is set properly
+$urls = @(url $manifest)
+$fname = $null
 
-# unzip
-if($fname -match '\.zip') {
-	unzip "$dir\$fname" $dir $manifest.unzip_folder
-	rm_dl
+foreach($url in $urls) {
+	$fname = split-path $url -leaf
+
+	dl_with_cache $app $version $url "$dir\$fname"
+
+	# unzip
+	if($fname -match '\.zip') {
+		# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
+		$null = mkdir "$dir\_scoop_unzip"
+		unzip "$dir\$fname" "$dir\_scoop_unzip" $manifest.unzip_folder
+		cp "$dir\_scoop_unzip\*" "$dir" -recurse -force
+		rm -r -force "$dir\_scoop_unzip"
+		rm "$dir\$fname"
+	}
 }
 
-# installer
-if($manifest.msi -or $manifest.installer) {
-	$exe = $null; $arg = $null;
+# MSI or other installer
+$msi = msi $manifest
+$installer = installer $manifest
+
+if($msi -or $installer) {
+	$exe = $null; $arg = $null; $rmfile = $null
 	
-	if($manifest.msi) { # msi
-		$msifile = "$dir\$(coalesce $manifest.msi.file "$fname")"
+	if($msi) { # msi
+		$rmfile = $msifile = "$dir\$(coalesce $msi.file "$fname")"
 		if(!(is_in_dir $dir $msifile)) {
 			abort "error in manifest: MSI file $msifile is outside the app directory"
 		}
-		if(!(msi_code $manifest)) { abort "error in manifest: couldn't find MSI code"}
+		if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
 		$exe = 'msiexec'
 		$arg = @("/I `"$msifile`"", '/qb-!', "TARGETDIR=`"$dir`"")
-	} elseif($manifest.installer) { # other installer
-		$exe = "$dir\$(coalesce $manifest.installer.exe "$fname")"
+	} elseif($installer) { # other installer
+		$rmfile = $exe = "$dir\$(coalesce $installer.exe "$fname")"
 		if(!(is_in_dir $dir $exe)) {
 			abort "error in manifest: installer $exe is outside the app directory"
 		}
-		$arg = args $manifest.installer.args $dir
+		$arg = args $installer.args $dir
 	}
 	
 	$installed = run $exe $arg "running installer..."
 	if(!$installed) {
 		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
 	}
-	rm_dl
+	rm "$rmfile"
 }
 
 # create bin stubs

@@ -18,18 +18,15 @@ function architecture {
 	"32bit"
 }
 
-function url($manifest) {
-	if($manifest.url) { return $manifest.url } # only one URL
+function arch_specific($prop, $manifest) {
+	if($manifest.$prop) { return $manifest.$prop }
 
-	if($manifest.urls) {
-		$manifest.urls.(architecture)
+	if($manifest.architecture) {
+		$manifest.architecture.(architecture).$prop
 	}
 }
 
-function msi_code($manifest) {
-	if($manifest.msi.code) { return $manifest.msi.code }
-
-	if($manifest.msi.codes) {
-		$manifest.msi.codes.(architecture)
-	}
-}
+function url($manifest) { arch_specific 'url' $manifest }
+function installer($manifest) { arch_specific 'installer' $manifest }
+function uninstaller($manifest) { arch_specific 'installer' $manifest }
+function msi($manifest) { arch_specific 'msi' $manifest }

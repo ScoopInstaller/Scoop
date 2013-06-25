@@ -19,20 +19,23 @@ $version = $versions[-1]
 $dir = versiondir $app $version
 $manifest = installed_manifest $app $version
 
-if($manifest.msi -or $manifest.uninstaller) {
+$msi = msi $manifest
+$uninstaller = uninstaller $manifest
+
+if($msi -or $uninstaller) {
 	$exe = $null; $arg = $null;
 
-	if($manifest.msi) {
-		$code = msi_code $manifest
+	if($msi) {
+		$code = $msi.code
 		$exe = "msiexec"; $arg = @("/x $code", '/quiet'); 
-	} elseif($manifest.uninstaller) {
-		$exe = "$dir\$($manifest.uninstaller.exe)"
-		$arg = args $manifest.uninstaller.args
+	} elseif($uninstaller) {
+		$exe = "$dir\$($uninstaller.exe)"
+		$arg = args $uninstaller.args
 		if(!(is_in_dir $dir $exe)) {
 			warn "error in manifest: installer $exe is outside the app directory, skipping"
 			$exe = $null;
 		} elseif(!(test-path $exe)) {
-			warn "uninstaller $($manifest.uninstaller.exe) is missing, skipping"
+			warn "uninstaller $exe is missing, skipping"
 			$exe = $null;
 		}
 	}
