@@ -27,13 +27,17 @@ function hash_for_url($manifest, $url) {
 
 function check_hash($file, $url, $manifest) {
 	$hash = hash_for_url $manifest $url
-	if(!$hash) { return }
+	if(!$hash) {
+		warn "warning: no hash in manifest. sha256 is $(compute_hash (full_path $file) 'sha256')"
+		return
+	}
 
 	write-host "checking hash..." -nonewline
 	$expected = $null; $actual = $null;
 	if($hash.md5) {
-		$expected = $hash.md5
-		$actual = compute_hash (full_path $file) 'md5'
+		$expected = $hash.md5; $actual = compute_hash (full_path $file) 'md5'
+	} elseif($hash.sha256){
+		$expected = $hash.sha256; $actual = compute_hash (full_path $file) 'sha256'
 	} else {
 		$type = $hash | gm -membertype noteproperty | % { $_.name }
 		abort "hash type $type isn't supported"		
