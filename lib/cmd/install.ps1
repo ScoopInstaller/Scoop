@@ -34,6 +34,8 @@ foreach($url in $urls) {
 
 	dl_with_cache $app $version $url "$dir\$fname"
 
+	check_hash "$dir\$fname" $url $manifest
+
 	# unzip
 	if($fname -match '\.zip') {
 		# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs

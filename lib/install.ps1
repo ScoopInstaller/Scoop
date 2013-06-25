@@ -12,6 +12,51 @@ function dl_with_cache($app, $version, $url, $to) {
 	cp $cached $to
 }
 
+# hashes
+function hash_for_url($manifest, $url) {
+	$hashes = @(hash $manifest);
+	if($hashes.length -eq 0) { return $null }
+
+	$urls = @(url $manifest)
+
+	$index = [array]::indexof($urls, $url)
+	if($index -eq -1) { abort "couldn't find hash in manifest for $url" }
+
+	$hashes[$index]
+}
+
+function check_hash($file, $url, $manifest) {
+	$hash = hash_for_url $manifest $url
+	if(!$hash) { return }
+
+	write-host "checking hash..." -nonewline
+	$expected = $null; $actual = $null;
+	if($hash.md5) {
+		$expected = $hash.md5
+		$actual = compute_hash (full_path $file) 'md5'
+	} else {
+		$type = $hash | gm -membertype noteproperty | % { $_.name }
+		abort "hash type $type isn't supported"		
+	}
+
+	if($actual -ne $expected) {
+		abort "hash check failed for $url. expected: $($expected), actual: $($actual)!"
+	}
+	write-host "ok"
+}
+
+function compute_hash($file, $algname) {
+	$alg = [system.security.cryptography.hashalgorithm]::create($algname)
+	$fs = [system.io.file]::openread($file)
+	try {
+		$hexbytes = $alg.computehash($fs) | % { $_.tostring('x2') }
+		[string]::join('', $hexbytes)
+	} finally {
+		$fs.dispose()
+		$alg.dispose()
+	}
+}
+
 # for dealing with installers
 function args($config, $dir) {
 	if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }

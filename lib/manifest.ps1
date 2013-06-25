@@ -30,3 +30,4 @@ function url($manifest) { arch_specific 'url' $manifest }
 function installer($manifest) { arch_specific 'installer' $manifest }
 function uninstaller($manifest) { arch_specific 'installer' $manifest }
 function msi($manifest) { arch_specific 'msi' $manifest }
+function hash($manifest) { arch_specific 'hash' $manifest }
