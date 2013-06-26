@@ -6,5 +6,8 @@
 	"hash": { "sha256": "ddd2e02aec58c48ae6812a7df0287b03c6c26063fe5ac36bf757efd60fd7d2e4" },
 	"installer": { "args": ["/verysilent", "/dir=\"$dir\""] },
 	"bin": [ "cmd\\git.exe", "cmd\\gitk.cmd" ],
+	"post_install": [
+		"git config --global credential.helper wincred"
+	],
 	"uninstaller": { "exe": "unins000.exe", "args": ["/verysilent"] }
 }

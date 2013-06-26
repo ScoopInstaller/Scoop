@@ -108,4 +108,9 @@ $manifest.add_path | ? { $_ } | % {
 	ensure_in_path $path_dir
 }
 
+ # post-install commands
+$manifest.post_install | ? {$_ } | % {
+ 	iex $_
+ }
+
 success "$app was installed successfully!"
