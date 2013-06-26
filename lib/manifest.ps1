@@ -1,34 +1,42 @@
 function manifest_path($app) { (resolve "..\bucket\$app.json") }
 
-function parse_manifest($path) {
+function parse_json($path) {
 	if(!(test-path $path)) { return $null }
 	gc $path -raw | convertfrom-json
 }
 
 function manifest($app) {
-	parse_manifest (manifest_path $app)	
+	parse_json (manifest_path $app)	
 }
 
 function installed_manifest($app, $version) {
-	parse_manifest "$(versiondir $app $version)\manifest.json"
+	parse_json "$(versiondir $app $version)\manifest.json"
+}
+
+function install_info($app, $version) {
+	parse_json "$(versiondir $app $version)\install.json"
 }
 
 function architecture {
-	if($script:architecture) { return $script:architecture } # watch out, uses variable from parent scope!
 	if([intptr]::size -eq 8) { return "64bit" }
 	"32bit"
 }
 
-function arch_specific($prop, $manifest) {
+function arch_specific($prop, $manifest, $architecture) {
 	if($manifest.$prop) { return $manifest.$prop }
 
 	if($manifest.architecture) {
-		$manifest.architecture.(architecture).$prop
+		$manifest.architecture.$architecture.$prop
 	}
 }
 
-function url($manifest) { arch_specific 'url' $manifest }
-function installer($manifest) { arch_specific 'installer' $manifest }
-function uninstaller($manifest) { arch_specific 'uninstaller' $manifest }
-function msi($manifest) { arch_specific 'msi' $manifest }
-function hash($manifest) { arch_specific 'hash' $manifest }
+function add_installed($manifest, $props) { # add info about installation
+	$installed = new-object -typename pscustomobject -prop $props
+	$manifest | add-member -membertype noteproperty -name 'installed' -value $installed -passthru
+}
+
+function url($manifest, $arch) { arch_specific 'url' $manifest $arch }
+function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch }
+function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
+function msi($manifest, $arch) { arch_specific 'msi' $manifest $arch }
+function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }

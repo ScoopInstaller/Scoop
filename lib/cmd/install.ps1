@@ -9,8 +9,8 @@ param($app, $architecture)
 . (resolve ..\help.ps1)
 
 switch($architecture) {
-	'' { }
-	{ @('32bit','64bit') -contains $_ } { $script:architecture = $architecture }
+	'' { $architecture = architecture }
+	{ @('32bit','64bit') -contains $_ } { }
 	default { abort "invalid architecture: '$architecture'"}
 }
 
@@ -29,10 +29,11 @@ $dir = ensure (versiondir $app $version)
 
 # save manifest for uninstall
 cp (manifest_path $app) "$dir\manifest.json"
+@{ 'architecture' = $architecture} | convertto-json | out-file "$dir\install.json"
 
 # can be multiple urls: if there are, then msi or installer should go last,
 # so that $fname is set properly
-$urls = @(url $manifest)
+$urls = @(url $manifest $architecture)
 
 $fname = $null
 
@@ -41,7 +42,7 @@ foreach($url in $urls) {
 
 	dl_with_cache $app $version $url "$dir\$fname"
 
-	check_hash "$dir\$fname" $url $manifest
+	check_hash "$dir\$fname" $url $manifest $architecture
 
 	# unzip
 	if($fname -match '\.zip') {
@@ -55,8 +56,8 @@ foreach($url in $urls) {
 }
 
 # MSI or other installer
-$msi = msi $manifest
-$installer = installer $manifest
+$msi = msi $manifest $architecture
+$installer = installer $manifest $architecture
 
 if($msi -or $installer) {
 	$exe = $null; $arg = $null; $rmfile = $null

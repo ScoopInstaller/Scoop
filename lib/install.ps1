@@ -13,11 +13,11 @@ function dl_with_cache($app, $version, $url, $to) {
 }
 
 # hashes
-function hash_for_url($manifest, $url) {
-	$hashes = @(hash $manifest);
+function hash_for_url($manifest, $url, $arch) {
+	$hashes = @(hash $manifest $arch) | ? { $_ -ne $null };
 	if($hashes.length -eq 0) { return $null }
 
-	$urls = @(url $manifest)
+	$urls = @(url $manifest $arch)
 
 	$index = [array]::indexof($urls, $url)
 	if($index -eq -1) { abort "couldn't find hash in manifest for $url" }
@@ -25,8 +25,8 @@ function hash_for_url($manifest, $url) {
 	$hashes[$index]
 }
 
-function check_hash($file, $url, $manifest) {
-	$hash = hash_for_url $manifest $url
+function check_hash($file, $url, $manifest, $arch) {
+	$hash = hash_for_url $manifest $url $arch
 	if(!$hash) {
 		warn "warning: no hash in manifest. sha256 is:`n$(compute_hash (full_path $file) 'sha256')"
 		return
@@ -67,11 +67,17 @@ function args($config, $dir) {
 	@()
 }
 
-function run($exe, $arg, $msg) {
+function run($exe, $arg, $msg, $continue_exit_codes) {
 	write-host $msg -nonewline
 	try {
 		$proc = start-process $exe -wait -ea stop -passthru -arg $arg
-		if($proc.exitcode -ne 0) { write-host "exit code was $($proc.exitcode)"; return $false }
+		if($proc.exitcode -ne 0) {
+			if($continue_exit_codes -and ($continue_exit_codes.containskey($proc.exitcode))) {
+				warn $continue_exit_codes[$proc.exitcode]
+				return $true
+			}
+			write-host "exit code was $($proc.exitcode)"; return $false
+		}
 	} catch {
 		write-host -f red $_.exception.tostring()
 		return $false

@@ -18,16 +18,19 @@ $version = $versions[-1]
 
 $dir = versiondir $app $version
 $manifest = installed_manifest $app $version
+$install = install_info $app $version
+$architecture = $install.architecture
 
-$msi = msi $manifest
-$uninstaller = uninstaller $manifest
+$msi = msi $manifest $architecture
+$uninstaller = uninstaller $manifest $architecture
 
 if($msi -or $uninstaller) {
-	$exe = $null; $arg = $null;
+	$exe = $null; $arg = $null; $continue_exit_codes = @{}
 
 	if($msi) {
 		$code = $msi.code
-		$exe = "msiexec"; $arg = @("/x $code", '/quiet'); 
+		$exe = "msiexec"; $arg = @("/x $code", '/quiet');
+		$continue_exit_codes.1605 = 'not installed, skipping'
 	} elseif($uninstaller) {
 		$exe = "$dir\$($uninstaller.exe)"
 		$arg = args $uninstaller.args
@@ -41,7 +44,7 @@ if($msi -or $uninstaller) {
 	}
 
 	if($exe) {
-		$uninstalled = run $exe $arg "running uninstaller..."
+		$uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
 		if(!$uninstalled) { abort "uninstallation aborted."	}
 	}
 }
