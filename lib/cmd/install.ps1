@@ -110,6 +110,7 @@ $manifest.add_path | ? { $_ } | % {
 
  # post-install commands
 $manifest.post_install | ? {$_ } | % {
+	echo "running '$_'"
  	iex $_
  }
 
