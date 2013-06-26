@@ -69,7 +69,7 @@ if($msi -or $installer) {
 		}
 		if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
 		$exe = 'msiexec'
-		$arg = @("/I `"$msifile`"", '/qb-!', "TARGETDIR=`"$dir`"")
+		$arg = @("/i `"$msifile`"", '/qb-!', "TARGETDIR=`"$dir`"") + $msi.args
 	} elseif($installer) { # other installer
 		$rmfile = $exe = "$dir\$(coalesce $installer.exe "$fname")"
 		if(!(is_in_dir $dir $exe)) {
