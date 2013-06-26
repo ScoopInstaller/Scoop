@@ -3,5 +3,6 @@
 	"license": "GPL3",
 	"version": "1.11.4",
 	"url": "http://users.ugent.be/~bpuype/cgi-bin/fetch.pl?dl=wget/wget.exe",
+	"hash": { "sha1": "457b1cd985ed07baffd8c66ff40e9c1b6da93753"},
 	"bin": "wget.exe"
 }

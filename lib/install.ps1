@@ -36,6 +36,8 @@ function check_hash($file, $url, $manifest, $arch) {
 	$expected = $null; $actual = $null;
 	if($hash.md5) {
 		$expected = $hash.md5; $actual = compute_hash (full_path $file) 'md5'
+	} elseif($hash.sha1){
+		$expected = $hash.sha1; $actual = compute_hash (full_path $file) 'sha1'
 	} elseif($hash.sha256){
 		$expected = $hash.sha256; $actual = compute_hash (full_path $file) 'sha256'
 	} else {
