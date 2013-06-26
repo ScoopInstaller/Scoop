@@ -115,3 +115,9 @@ $manifest.post_install | ? {$_ } | % {
  }
 
 success "$app was installed successfully!"
+
+if($manifest.notes) {
+	echo "Notes"
+	echo "-----"
+	echo $manifest.notes
+}

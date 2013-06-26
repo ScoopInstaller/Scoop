@@ -9,5 +9,8 @@
 	"post_install": [
 		"git config --global credential.helper wincred"
 	],
-	"uninstaller": { "exe": "unins000.exe", "args": ["/verysilent"] }
+	"uninstaller": { "exe": "unins000.exe", "args": ["/verysilent"] },
+	"notes": "Git has been configured to use the Windows Credential Manager.
+To revert to the default (no credential caching), run:
+	`git config --global --unset credential.helper`."
 }
