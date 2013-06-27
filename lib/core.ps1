@@ -1,5 +1,5 @@
 $scoopdir = "~\appdata\local\scoop"
-$shimdir  = "$scoopdir\shim"
+$shimdir  = "$scoopdir\shims"
 $cachedir = "$scoopdir\cache"
 
 # helper functions
@@ -97,19 +97,27 @@ function ensure_in_path($dir,$first=$false) {
 	}
 }
 
+function strip_path($orig_path, $dir) {
+	$stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
+	return ($stripped -ne $orig_path), $stripped
+}
+
 function remove_from_path($dir) {
 	$dir = full_path $dir
-	$old = env 'path'
-	$new = [string]::join(';', @( $old.split(';') | ? { $_ -and $_ -ne $dir } ))
 
-	if($new -ne $old) { # future sessions only
+	# future sessions
+	$was_in_path, $newpath = strip_path (env 'path') $dir
+	if($was_in_path) { 
 		echo "removing $(friendly_path $dir) from your path"
-		env 'path' $new
+		env 'path' $newpath
 	}
+
+	# current session
+	$was_in_path, $newpath = strip_path $env:path $dir
+	if($was_in_path) { $env:path = $newpath	}
 }
 
 function ensure_scoop_in_path {
-	$userpath = env 'path'
 	$abs_shimdir = ensure $shimdir
 	# be aggressive (b-e-aggressive) and install scoop first in the path
 	ensure_in_path $abs_shimdir $true
