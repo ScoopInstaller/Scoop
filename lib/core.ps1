@@ -19,7 +19,9 @@ function appdir($app) { "$scoopdir\apps\$app" }
 function versiondir($app, $version) { "$(appdir $app)\$version" }
 function installed($app) { return test-path (appdir $app) }
 function installed_apps {
-	gci ( "$scoopdir\apps") | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
+	if(test-path "$scoopdir\apps") {
+		gci ( "$scoopdir\apps") | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
+	}
 }
 
 # paths
