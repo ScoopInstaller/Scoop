@@ -1,6 +1,9 @@
 {
-	"url": "https://github.com/scriptcs/scriptcs/archive/master.zip",
-	"require": [
-		"roslyn"
-	]
+	"homepage": "http://scriptcs.net/",
+	"version": "0.6.0-alpha-130626",
+	"license": "Apache 2.0",
+	"url": "https://www.myget.org/F/scriptcsnightly/api/v2/package/scriptcs/0.6.0-alpha-130626?fn=/dl.zip",
+	"unzip_folder": "tools\\scriptcs",
+	"hash": { "sha256": "2c7074361d1df8806c0036e3f78ce2e4c55e708c4fe26cba5a9e8b1c819266b5" },
+	"bin": "scriptcs.exe"
 }
