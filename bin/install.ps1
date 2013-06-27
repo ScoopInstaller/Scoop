@@ -21,8 +21,8 @@ dl $zipurl $zipfile
 unzip $zipfile $dir 'scoop-master'
 rm $zipfile
 
-echo 'creating stub...'
-stub "$dir\bin\scoop.ps1"
+echo 'creating shim...'
+shim "$dir\bin\scoop.ps1"
 
 ensure_scoop_in_path
 success 'scoop was installed successfully!'

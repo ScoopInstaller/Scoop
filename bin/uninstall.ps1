@@ -24,6 +24,6 @@ if(test-path $scoopdir) {
 	}
 }
 
-remove_from_path $bindir
+remove_from_path $shimdir
 
 success "scoop has been uninstalled"

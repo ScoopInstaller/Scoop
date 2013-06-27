@@ -10,8 +10,8 @@ if("$src" -eq "$dest") { abort "$(strip_ext $myinvocation.mycommand.name) is for
 'copying files...'
 cp "$src\*" $dest -recurse -force -exclude '.git'
 
-echo 'creating stub...'
-stub "$dest\bin\scoop.ps1"
+echo 'creating shim...'
+shim "$dest\bin\scoop.ps1"
 
 ensure_scoop_in_path
 success 'scoop was refreshed!'

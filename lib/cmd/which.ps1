@@ -11,11 +11,11 @@ $gcm = gcm $command
 if(!$gcm) { "$command not found"; exit 1 }
 
 $path = $gcm.path
-$abs_bindir = "$(resolve-path $bindir)"
+$abs_shimdir = "$(resolve-path $shimdir)"
 
-if("$path" -like "$abs_bindir*") {
-	$stubtext = gc $path
-	$stubtext | sls '(?m)^\$path = ''([^'']+)''' | % { $_.matches[0].groups[1].value }
+if("$path" -like "$abs_shimdir*") {
+	$shimtext = gc $path
+	$shimtext | sls '(?m)^\$path = ''([^'']+)''' | % { $_.matches[0].groups[1].value }
 } else {
 	"(non-scoop) $path"
 }

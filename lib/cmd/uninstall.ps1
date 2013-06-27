@@ -23,7 +23,7 @@ $install = install_info $app $version
 $architecture = $install.architecture
 
 run_uninstaller $manifest $architecture $dir
-rm_bin_stubs $manifest
+rm_shims $manifest
 rm_user_path $manifest $dir
 
 try {

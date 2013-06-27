@@ -1,5 +1,5 @@
 $scoopdir = "~\appdata\local\scoop"
-$bindir   = "$scoopdir\bin"
+$shimdir  = "$scoopdir\shim"
 $cachedir = "$scoopdir\cache"
 
 # helper functions
@@ -68,15 +68,15 @@ function unzip($path,$to,$folder) {
 	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
-function stub($path) {
-	if(!(test-path $path)) { abort "can't stub $(fname $path): couldn't find $path" }
-	$abs_bindir = ensure $bindir
-	$stub = "$abs_bindir\$(strip_ext(fname $path).tolower()).ps1"
+function shim($path) {
+	if(!(test-path $path)) { abort "can't shim $(fname $path): couldn't find $path" }
+	$abs_shimdir = ensure $shimdir
+	$shim = "$abs_shimdir\$(strip_ext(fname $path).tolower()).ps1"
 
 	# note: use > for first line to replace, then >> to append following lines
-	echo ". ""$(versiondir 'scoop' 'current')\lib\core.ps1""" > $stub
-	echo "`$path = '$path'" >> $stub
-	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $stub
+	echo ". ""$(versiondir 'scoop' 'current')\lib\core.ps1""" > $shim
+	echo "`$path = '$path'" >> $shim
+	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $shim
 }
 
 function ensure_in_path($dir,$first=$false) {
@@ -108,7 +108,7 @@ function remove_from_path($dir) {
 
 function ensure_scoop_in_path {
 	$userpath = env 'path'
-	$abs_bindir = ensure $bindir
+	$abs_shimdir = ensure $shimdir
 	# be aggressive (b-e-aggressive) and install scoop first in the path
-	ensure_in_path $abs_bindir $true
+	ensure_in_path $abs_shimdir $true
 }

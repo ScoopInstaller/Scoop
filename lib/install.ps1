@@ -185,28 +185,28 @@ function run_uninstaller($manifest, $architecture, $dir) {
 	}
 }
 
-function create_bin_stubs($manifest, $dir) {
+function create_shims($manifest, $dir) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
-		echo "creating stub for $_ in ~\appdata\local\bin"
+		echo "creating shim for $_ in ~\appdata\local\bin"
 
 		# check valid bin
 		$bin = "$dir\$_"
 		if(!(is_in_dir $dir $bin)) {
 			abort "error in manifest: bin '$_' is outside the app directory"
 		}
-		if(!(test-path $bin)) { abort "can't stub $_`: file doesn't exist"}
+		if(!(test-path $bin)) { abort "can't shim $_`: file doesn't exist"}
 
-		stub "$dir\$_"
+		shim "$dir\$_"
 	}
 }
-function rm_bin_stubs($manifest) {
+function rm_shims($manifest) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
-		$stub = "$bindir\$(strip_ext(fname $_)).ps1"
-		if(!(test-path $stub)) { # handle no stub from failed install
-			warn "stub for $_ is missing, skipping"
+		$shim = "$shimdir\$(strip_ext(fname $_)).ps1"
+		if(!(test-path $shim)) { # handle no shim from failed install
+			warn "shim for $_ is missing, skipping"
 		} else {
-			echo "removing stub for $_"
-			rm $stub
+			echo "removing shim for $_"
+			rm $shim
 		}	
 	}
 }
