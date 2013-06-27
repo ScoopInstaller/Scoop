@@ -25,7 +25,7 @@ if(!$app) {
 	dl $zipurl $zipfile
 
 	echo 'extracting...'
-	unzip $zipfile $tempdir
+	unzip $zipfile $tempdir 'scoop-master'
 	rm $zipfile
 
 	echo 'replacing files..'
