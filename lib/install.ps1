@@ -137,7 +137,8 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 			}
 			if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
 			$exe = 'msiexec'
-			$arg = @("/i `"$msifile`"", '/qb-!', "TARGETDIR=`"$dir`"") + $msi.args
+			$arg = @("/i `"$msifile`"", '/qb-!', "TARGETDIR=`"$dir`"", "INSTALLDIR=`"$dir`"") +
+				(@($msi.args) | ? { $_ })
 		} elseif($installer) { # other installer
 			$rmfile = $exe = "$dir\$(coalesce $installer.exe "$fname")"
 			if(!(is_in_dir $dir $exe)) {
@@ -163,7 +164,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
 		if($msi) {
 			$code = $msi.code
-			$exe = "msiexec"; $arg = @("/x $code", '/quiet');
+			$exe = "msiexec"; $arg = @("/x $code", '/qb-!');
 			$continue_exit_codes.1605 = 'not installed, skipping'
 		} elseif($uninstaller) {
 			$exe = "$dir\$($uninstaller.exe)"
