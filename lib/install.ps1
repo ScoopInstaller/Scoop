@@ -6,10 +6,44 @@ function dl_with_cache($app, $version, $url, $to) {
 	$cached = full_path (cache_path $app $version $url)
 	if(!(test-path $cached)) {
 		$null = ensure $cachedir
-		echo "downloading $url..."
+		write-host "downloading $url..."
 		dl $url $cached
-	} else { echo "loading $url from cache..."}
+	} else { write-host "loading $url from cache..."}
 	cp $cached $to
+}
+
+function dl_urls($app, $version, $manifest, $architecture, $dir) {
+	# can be multiple urls: if there are, then msi or installer should go last,
+	# so that $fname is set properly
+	$urls = @(url $manifest $architecture)
+
+	$fname = $null
+
+	foreach($url in $urls) {
+		$fname = split-path $url -leaf
+
+		dl_with_cache $app $version $url "$dir\$fname"
+
+		check_hash "$dir\$fname" $url $manifest $architecture
+
+		# unzip
+		if($fname -match '\.zip') {
+			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
+			$null = mkdir "$dir\_scoop_unzip"
+			unzip "$dir\$fname" "$dir\_scoop_unzip" $manifest.unzip_folder
+			cp "$dir\_scoop_unzip\*" "$dir" -recurse -force
+			rm -r -force "$dir\_scoop_unzip"
+			rm "$dir\$fname"
+		}
+	}
+
+	$fname # returns the last downloaded file
+}
+
+function is_in_dir($dir, $file) {
+	$file = "$(full_path $file)"
+	$dir = "$(full_path $dir)"
+	$file -match "^$([regex]::escape("$dir\"))"
 }
 
 # hashes
@@ -88,49 +122,122 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
 	return $true
 }
 
-function is_in_dir($dir, $file) {
-	$file = "$(full_path $file)"
-	$dir = "$(full_path $dir)"
-	$file -match "^$([regex]::escape("$dir\"))"
-}
+function run_installer($fname, $manifest, $architecture, $dir) {
+	# MSI or other installer
+	$msi = msi $manifest $architecture
+	$installer = installer $manifest $architecture
 
-
-# versions
-function versions($app) {
-	sort_versions (gci "$scoopdir\apps\$app" -dir | % { $_.name })
-}
-
-function version($ver) {
-	$ver.split('.') | % {
-		$num = $_ -as [int]
-		if($num) { $num } else { $_ }
+	if($msi -or $installer) {
+		$exe = $null; $arg = $null; $rmfile = $null
+		
+		if($msi) { # msi
+			$rmfile = $msifile = "$dir\$(coalesce $msi.file "$fname")"
+			if(!(is_in_dir $dir $msifile)) {
+				abort "error in manifest: MSI file $msifile is outside the app directory"
+			}
+			if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
+			$exe = 'msiexec'
+			$arg = @("/i `"$msifile`"", '/qb-!', "TARGETDIR=`"$dir`"") + $msi.args
+		} elseif($installer) { # other installer
+			$rmfile = $exe = "$dir\$(coalesce $installer.exe "$fname")"
+			if(!(is_in_dir $dir $exe)) {
+				abort "error in manifest: installer $exe is outside the app directory"
+			}
+			$arg = args $installer.args $dir
+		}
+		
+		$installed = run $exe $arg "running installer..."
+		if(!$installed) {
+			abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
+		}
+		rm "$rmfile"
 	}
 }
 
-function compare_versions($a, $b) {
-	$ver_a = version $a
-	$ver_b = version $b
+function run_uninstaller($manifest, $architecture, $dir) {
+	$msi = msi $manifest $architecture
+	$uninstaller = uninstaller $manifest $architecture
 
-	for($i=0;$i -lt $ver_a.length;$i++) {
-		if($i -gt $ver_b.length) { return 1; }
-		if($ver_a[$i] -gt $ver_b[$i]) { return 1; }
-		if($ver_a[$i] -lt $ver_b[$i]) { return -1; }
+	if($msi -or $uninstaller) {
+		$exe = $null; $arg = $null; $continue_exit_codes = @{}
+
+		if($msi) {
+			$code = $msi.code
+			$exe = "msiexec"; $arg = @("/x $code", '/quiet');
+			$continue_exit_codes.1605 = 'not installed, skipping'
+		} elseif($uninstaller) {
+			$exe = "$dir\$($uninstaller.exe)"
+			$arg = args $uninstaller.args
+			if(!(is_in_dir $dir $exe)) {
+				warn "error in manifest: installer $exe is outside the app directory, skipping"
+				$exe = $null;
+			} elseif(!(test-path $exe)) {
+				warn "uninstaller $exe is missing, skipping"
+				$exe = $null;
+			}
+		}
+
+		if($exe) {
+			$uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
+			if(!$uninstalled) { abort "uninstallation aborted."	}
+		}
 	}
-	if($ver_b.length -gt $ver_a.length) { return -1 }
-	return 0
 }
 
-function qsort($ary, $fn) {
-	if($ary -eq $null) { return @() }
-	if(!($ary -is [array])) { return @($ary) }
+function create_bin_stubs($manifest, $dir) {
+	$manifest.bin | ?{ $_ -ne $null } | % {
+		echo "creating stub for $_ in ~\appdata\local\bin"
 
-	$pivot = $ary[0]
-	$rem = $ary[1..($ary.length-1)]
+		# check valid bin
+		$bin = "$dir\$_"
+		if(!(is_in_dir $dir $bin)) {
+			abort "error in manifest: bin '$_' is outside the app directory"
+		}
+		if(!(test-path $bin)) { abort "can't stub $_`: file doesn't exist"}
 
-	$lesser = qsort ($rem | where { (& $fn $_ $pivot) -lt 0 }) $fn
-
-	$greater = qsort ($rem | where { (& $fn $_ $pivot) -ge 0 }) $fn
-
-	return @() + $lesser + @($pivot) + $greater
+		stub "$dir\$_"
+	}
 }
-function sort_versions($versions) {	qsort $versions compare_versions }
+function rm_bin_stubs($manifest) {
+	$manifest.bin | ?{ $_ -ne $null } | % {
+		$stub = "$bindir\$(strip_ext(fname $_)).ps1"
+		if(!(test-path $stub)) { # handle no stub from failed install
+			warn "stub for $_ is missing, skipping"
+		} else {
+			echo "removing stub for $_"
+			rm $stub
+		}	
+	}
+}
+
+function add_user_path($manifest, $dir) {
+	$manifest.add_path | ? { $_ } | % {
+		$path_dir = "$dir\$($_)"
+		if(!(is_in_dir $dir $path_dir)) {
+			abort "error in manifest: add_to_path '$_' is outside the app directory"
+		}
+		ensure_in_path $path_dir
+	}
+}
+function rm_user_path($manifest, $dir) {
+	# remove from path
+	$manifest.add_path | ? { $_ } | % {
+		$path_dir = "$dir\$($_)"
+		remove_from_path $path_dir
+	}
+}
+
+function post_install($manifest) {
+	$manifest.post_install | ? {$_ } | % {
+		echo "running '$_'"
+		iex $_
+	}
+}
+
+function show_notes($manifest) {
+	if($manifest.notes) {
+		echo "Notes"
+		echo "-----"
+		echo $manifest.notes
+	}
+}

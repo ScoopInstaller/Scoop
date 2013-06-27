@@ -9,8 +9,16 @@ function manifest($app) {
 	parse_json (manifest_path $app)	
 }
 
+function save_installed_manifest($app, $dir) {
+	cp (manifest_path $app) "$dir\manifest.json"
+}
+
 function installed_manifest($app, $version) {
 	parse_json "$(versiondir $app $version)\manifest.json"
+}
+
+function save_install_info($info, $dir) {
+	$info | convertto-json | out-file "$dir\install.json"
 }
 
 function install_info($app, $version) {

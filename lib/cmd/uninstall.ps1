@@ -7,6 +7,7 @@ param($app)
 . (resolve ../manifest.ps1)
 . (resolve ../help.ps1)
 . (resolve ../install.ps1)
+. (resolve ../versions.ps1)
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
@@ -21,50 +22,9 @@ $manifest = installed_manifest $app $version
 $install = install_info $app $version
 $architecture = $install.architecture
 
-$msi = msi $manifest $architecture
-$uninstaller = uninstaller $manifest $architecture
-
-if($msi -or $uninstaller) {
-	$exe = $null; $arg = $null; $continue_exit_codes = @{}
-
-	if($msi) {
-		$code = $msi.code
-		$exe = "msiexec"; $arg = @("/x $code", '/quiet');
-		$continue_exit_codes.1605 = 'not installed, skipping'
-	} elseif($uninstaller) {
-		$exe = "$dir\$($uninstaller.exe)"
-		$arg = args $uninstaller.args
-		if(!(is_in_dir $dir $exe)) {
-			warn "error in manifest: installer $exe is outside the app directory, skipping"
-			$exe = $null;
-		} elseif(!(test-path $exe)) {
-			warn "uninstaller $exe is missing, skipping"
-			$exe = $null;
-		}
-	}
-
-	if($exe) {
-		$uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
-		if(!$uninstalled) { abort "uninstallation aborted."	}
-	}
-}
-
-# remove bin stubs
-$manifest.bin | ?{ $_ -ne $null } | % {
-	$stub = "$bindir\$(strip_ext(fname $_)).ps1"
-	if(!(test-path $stub)) { # handle no stub from failed install
-		warn "stub for $_ is missing, skipping"
-	} else {
-		echo "removing stub for $_"
-		rm $stub
-	}	
-}
-
-# remove from path
-$manifest.add_path | ? { $_ } | % {
-	$path_dir = "$dir\$($_)"
-	remove_from_path $path_dir
-}
+run_uninstaller $manifest $architecture $dir
+rm_bin_stubs $manifest
+rm_user_path $manifest $dir
 
 try {
 	rm -r $dir -ea stop -force
