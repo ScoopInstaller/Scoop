@@ -5,12 +5,20 @@ function parse_json($path) {
 	gc $path -raw | convertfrom-json
 }
 
-function manifest($app) {
-	parse_json (manifest_path $app)	
+function url_manifest($app, $url) {
+	$str = (new-object net.webclient).downloadstring($url)
+	if(!$str) { return $null }
+	$str| convertfrom-json
 }
 
-function save_installed_manifest($app, $dir) {
-	cp (manifest_path $app) "$dir\manifest.json"
+function manifest($app, $url) {
+	if($url) { url_manifest $app $url }
+	else { parse_json (manifest_path $app) }
+}
+
+function save_installed_manifest($app, $dir, $url) {
+	if($url) { (new-object net.webclient).downloadstring($url) > "$dir\manifest.json" }
+	else { cp (manifest_path $app) "$dir\manifest.json" }
 }
 
 function installed_manifest($app, $version) {

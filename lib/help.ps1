@@ -8,7 +8,7 @@ function summary($text) {
 
 function help($text) {
 	$help_lines = $text | sls '(?ms)^# Help:(.(?!^[^#]))*' | % { $_.matches[0].value; }
-	$help_lines -replace '(?ms)^# (Help: )?', ''
+	$help_lines -replace '(?ms)^#\s?(Help: )?', ''
 }
 
 function my_usage { # gets usage for the calling script

@@ -1,7 +1,12 @@
-# Usage: scoop install <app>
+# Usage: scoop install <app> [url]
 # Summary: Install an app
-# Help: e.g. `scoop install git`
-param($app, $architecture)
+# Help: e.g. To install an app from your local Scoop bucket:
+#      scoop install git
+#
+# To install an app from a manifest provided at a URL:
+#      scoop install runat https://raw.github.com/lukesampson/scoop/master/bucket/runat.json
+/bucket/runat.json
+param($app, $url, $architecture)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
 . (resolve ..\manifest.ps1)
@@ -17,8 +22,8 @@ switch($architecture) {
 
 if(!$app) { "ERROR: <app> missing"; my_usage; exit }
 
-$manifest = manifest $app
-if(!$manifest) { abort "couldn't find manifest for $app" }
+$manifest = manifest $app $url
+if(!$manifest) { abort "couldn't find the manifest for $app$(if($url) { " at the URL $url" })" }
 
 $version = $manifest.version
 if(!$version) { abort "manifest doesn't specify a version" }
@@ -29,8 +34,8 @@ if(installed $app) { abort "$app is already installed. Use 'scoop update' to ins
 $dir = ensure (versiondir $app $version)
 
 # save info for uninstall
-save_installed_manifest $app $dir
-save_install_info @{ 'architecture' = $architecture } $dir
+save_installed_manifest $app $dir $url
+save_install_info @{ 'architecture' = $architecture; 'url' = $url } $dir
 
 $fname = dl_urls $app $version $manifest $architecture $dir
 run_installer $fname $manifest $architecture $dir
