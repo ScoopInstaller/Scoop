@@ -211,6 +211,36 @@ function rm_shims($manifest) {
 	}
 }
 
+# for installers that insist on changing path
+function ensure_install_dir_not_in_path($dir) {
+	$user_path = (env 'path')
+	$machine_path = [environment]::getEnvironmentVariable('path', 'Machine')
+
+	$fixed, $removed = find_dir_or_subdir $user_path "$dir"
+	if($removed) {
+		$removed | % { "installer added $(friendly_path $_) to path, removing"}
+		env 'path' $fixed
+	}
+
+	$fixed, $removed = find_dir_or_subdir $machine_path "$dir"
+	if($removed) {
+		$removed | % { warn "installer added $_ to system path: you might want to remove this manually (requires admin permission)"}
+	}
+}
+
+function find_dir_or_subdir($path, $dir) {
+	$dir = $dir.trimend('\')
+	$fixed = @()
+	$removed = @() 
+	$path.split(';') | % {
+		if($_) {
+			if(($_ -eq $dir) -or ($_ -like "$dir\*")) { $removed += $_ }
+			else { $fixed += $_ }
+		}
+	}
+	return [string]::join(';', $fixed), $removed
+}
+
 function add_user_path($manifest, $dir) {
 	$manifest.add_path | ? { $_ } | % {
 		$path_dir = "$dir\$($_)"
