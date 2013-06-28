@@ -12,7 +12,7 @@
 	],
 	"unzip_folder": "vim\\vim73",
 	"bin": [ "vim.exe" ],
-	"note": "The vimtutor supplied with this distribution doesn't work Scoop.
+	"notes": "The `vimtutor` in this distribution doesn't work with Scoop (it‘s a .bat file).
 
-Run `scoop install vimtutor` to get the Vim Tutor."
+Run `scoop install vimtutor` to get a Vim Tutor that will work."
 }
