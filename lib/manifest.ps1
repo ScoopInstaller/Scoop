@@ -26,6 +26,7 @@ function installed_manifest($app, $version) {
 }
 
 function save_install_info($info, $dir) {
+	$info.keys | ? { $x[$_] -eq $null } | select $_ | % { $info.remove($_) }
 	$info | convertto-json | out-file "$dir\install.json"
 }
 
