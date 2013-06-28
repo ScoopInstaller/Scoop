@@ -11,5 +11,8 @@
 		{ "md5": "e16ec5b633d2f00bf511529e6abf3670" }
 	],
 	"unzip_folder": "vim\\vim73",
-	"bin": [ "vim.exe" ]
+	"bin": [ "vim.exe" ],
+	"note": "The vimtutor supplied with this distribution doesn't work Scoop.
+
+Run `scoop install vimtutor` to get the Vim Tutor."
 }
