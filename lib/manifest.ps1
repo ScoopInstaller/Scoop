@@ -5,14 +5,14 @@ function parse_json($path) {
 	gc $path -raw | convertfrom-json
 }
 
-function url_manifest($app, $url) {
+function url_manifest($url) {
 	$str = (new-object net.webclient).downloadstring($url)
 	if(!$str) { return $null }
-	$str| convertfrom-json
+	$str | convertfrom-json
 }
 
 function manifest($app, $url) {
-	if($url) { url_manifest $app $url }
+	if($url) { url_manifest $url }
 	else { parse_json (manifest_path $app) }
 }
 
@@ -26,7 +26,7 @@ function installed_manifest($app, $version) {
 }
 
 function save_install_info($info, $dir) {
-	$info.keys | ? { $x[$_] -eq $null } | select $_ | % { $info.remove($_) }
+	$info.keys | ? { $x[$_] -eq $null } | select $_ | % { $info.remove($_) } # strip null-valued
 	$info | convertto-json | out-file "$dir\install.json"
 }
 

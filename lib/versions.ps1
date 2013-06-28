@@ -1,7 +1,6 @@
 # versions
 function latest_version($app, $url) {
-	if($url) { abort "checking version from URL not implemented!" }
-	(manifest $app).version
+	(manifest $app $url).version
 }
 function current_version($app) {
 	@(versions $app)[-1]
