@@ -28,7 +28,7 @@ $version = $manifest.version
 if(!$version) { abort "manifest doesn't specify a version" }
 if($version -match '[^\w\.\-_]') { abort "manifest version has unsupported character '$($matches[0])'" }
 
-if(installed $app) { abort "$app is already installed. Use 'scoop update' to install a new version."}
+if(installed $app) { abort "$app is already installed. Use 'scoop update $app' to install a new version."}
 
 $dir = ensure (versiondir $app $version)
 
