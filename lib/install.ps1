@@ -28,6 +28,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 
 		# unzip
 		if($fname -match '\.zip') {
+			write-host "extracting..."
 			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
 			$null = mkdir "$dir\_scoop_unzip"
 			unzip "$dir\$fname" "$dir\_scoop_unzip" $manifest.unzip_folder

@@ -1,0 +1,15 @@
+{
+	"url": "http://www.vim.org",
+	"license": "",
+	"version": "7.3.046",
+	"url": [
+		"ftp://ftp.vim.org/pub/vim/pc/vim73_46rt.zip",
+		"ftp://ftp.vim.org/pub/vim/pc/vim73_46w32.zip"
+	],
+	"hash": [
+		{ "md5": "29142b7d4ff0b65c394c4a1ef1263ded" },
+		{ "md5": "e16ec5b633d2f00bf511529e6abf3670" }
+	],
+	"unzip_folder": "vim\\vim73",
+	"bin": [ "vim.exe" ]
+}

@@ -75,5 +75,6 @@ if(!$app) {
 	success "$app was updated from $old_version to $version"
 
 	show_notes $manifest
-
 }
+
+exit 0

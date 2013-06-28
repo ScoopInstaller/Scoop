@@ -16,3 +16,5 @@ gci (resolve '..\..\bucket') |
     % { $_ -replace '.json$', '' }
 
 ""
+
+exit 0

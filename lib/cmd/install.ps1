@@ -46,3 +46,5 @@ post_install $manifest
 success "$app $version was installed successfully!"
 
 show_notes $manifest
+
+exit 0

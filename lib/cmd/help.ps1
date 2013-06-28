@@ -41,6 +41,8 @@ Some useful commands are:"
 } elseif($commands -contains $cmd) {
 	print_help $cmd
 } else {
-	"scoop help: no such command '$cmd'"
+	"scoop help: no such command '$cmd'"; exit 1
 }
+
+exit 0
 

@@ -38,3 +38,4 @@ if(@(versions $app).length -eq 0) {
 
 
 success "$app was uninstalled"
+exit 0
