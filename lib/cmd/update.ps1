@@ -39,18 +39,19 @@ if(!$app) {
 	if(!(installed $app)) { abort "$app isn't installed" }
 
 	$old_version = current_version $app
-	$version = latest_version $app
-
-	if($old_version -eq $version) { abort "$app $version is already installed. run 'scoop update' to check for new versions." }
-	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
-
-	$dir = versiondir $app $old_version
 	$manifest = installed_manifest $app $old_version
 	$install = install_info $app $old_version
 
 	# re-use architecture and url from first install
 	$architecture = $install.architecture
 	$url = $install.url
+
+	$version = latest_version $app $url
+
+	if($old_version -eq $version) { abort "$app $version is already installed. run 'scoop update' to check for new versions." }
+	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
+
+	$dir = versiondir $app $old_version	
 
 	echo "uninstalling $old_version"
 	run_uninstaller $manifest $architecture $dir

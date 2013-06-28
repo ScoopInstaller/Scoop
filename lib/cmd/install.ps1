@@ -5,7 +5,6 @@
 #
 # To install an app from a manifest provided at a URL:
 #      scoop install runat https://raw.github.com/lukesampson/scoop/master/bucket/runat.json
-/bucket/runat.json
 param($app, $url, $architecture)
 
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
