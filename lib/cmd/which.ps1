@@ -7,7 +7,7 @@ param($command)
 
 if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 
-$gcm = gcm $command
+try { $gcm = gcm $command -ea stop } catch { }
 if(!$gcm) { "$command not found"; exit 1 }
 
 $path = $gcm.path
@@ -17,8 +17,7 @@ if("$path" -like "$abs_shimdir*") {
 	$shimtext = gc $path
 	$shimtext | sls '(?m)^\$path = ''([^'']+)''' | % { $_.matches[0].groups[1].value }
 } else {
-	write-host "(non-scoop)" -f yellow -nonewline
-	write-host " $path"
+	warn "(non-scoop) $path" -f yellow -nonewline
 	exit 1
 }
 
