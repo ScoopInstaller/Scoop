@@ -18,6 +18,7 @@ if(!$app) {
 		try { rm -r $tempdir -ea stop -force } catch { abort "couldn't remove $tempdir`: it may be in use" }
 	}
 	$tempdir = ensure $tempdir
+	$currentdir = full_path $currentdir
 
 	$zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
 	$zipfile = "$tempdir\scoop.zip"
@@ -29,8 +30,12 @@ if(!$app) {
 	rm $zipfile
 
 	echo 'replacing files..'
-	rm -r -force $currentdir -ea stop
-	rni $tempdir 'current' -ea stop
+	# old method, doesn't purge old files
+	#rm -r -force $currentdir -ea stop
+	#rni $tempdir 'current' -ea stop
+
+	$null = robocopy $tempdir $currentdir /mir /njh /njs /nfl /ndl
+	rm -r -force $tempdir -ea stop
 
 	ensure_scoop_in_path
 	success 'scoop was updated successfully!'

@@ -8,7 +8,7 @@ $dest = ensure (versiondir 'scoop' 'current')
 if("$src" -eq "$dest") { abort "$(strip_ext $myinvocation.mycommand.name) is for development only" }
 
 'copying files...'
-cp "$src\*" $dest -recurse -force -exclude '.git'
+cp "$src\*" $dest -recurse -force -exclude '.git', 'tests'
 
 echo 'creating shim...'
 shim "$dest\bin\scoop.ps1"
