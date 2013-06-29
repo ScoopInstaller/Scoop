@@ -6,14 +6,15 @@
 # Without [query], shows all the available apps.
 param($query)
 . "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
+. (resolve '..\manifest.ps1')
+. (resolve '..\versions.ps1')
 
-if($query) { warn "sorry, queries aren't implemented yet" }
+$bucket = resolve '..\..\bucket'
+$apps = apps_in_bucket $bucket
 
-echo "Available apps:
-"
-gci (resolve '..\..\bucket') |
-    where { $_.name.endswith('.json') } |
-    % { $_ -replace '.json$', '' }
+if($query) { $apps = $apps | ? { $_ -like "*$query*" } }
+
+$apps | % { "$_ ($(latest_version $_))"}
 
 ""
 

@@ -49,9 +49,8 @@ function arch_specific($prop, $manifest, $architecture) {
 	}
 }
 
-function add_installed($manifest, $props) { # add info about installation
-	$installed = new-object -typename pscustomobject -prop $props
-	$manifest | add-member -membertype noteproperty -name 'installed' -value $installed -passthru
+function apps_in_bucket($path) {
+	gci $path | ? { $_.name.endswith('.json') } | % { $_ -replace '.json$', '' }
 }
 
 function url($manifest, $arch) { arch_specific 'url' $manifest $arch }
