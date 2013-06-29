@@ -26,16 +26,21 @@ run_uninstaller $manifest $architecture $dir
 rm_shims $manifest
 rm_user_path $manifest $dir
 
-try {
-	rm -r $dir -ea stop -force
-} catch {
-	abort "couldn't remove $(friendly_path $dir): it may be in use"
+try { rm -r $dir -ea stop -force }
+catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }
+
+# remove older versions
+$old = @(versions $app)
+foreach($oldver in $old) {
+    "removing older version, $oldver"
+    $dir = versiondir $app $oldver
+    try { rm -r -force -ea stop $dir }
+    catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }
 }
 
 if(@(versions $app).length -eq 0) {
 	rm -r (appdir $app) -ea stop -force
 }
-
 
 success "$app was uninstalled"
 exit 0
