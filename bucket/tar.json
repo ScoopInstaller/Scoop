@@ -7,8 +7,8 @@
 		"http://downloads.sourceforge.net/project/gnuwin32/tar/1.13-1/tar-1.13-1-dep.zip"
 	],
 	"hash": [
-		{ "md5": "a92857ec82db569f0a8fa5370642dc69" },
-		{ "md5": "2606b30c140eb1d1ea15612150eb2e6b" }
+		"md5:a92857ec82db569f0a8fa5370642dc69",
+		"md5:2606b30c140eb1d1ea15612150eb2e6b"
 	],
 	"bin": [ "bin\\tar.exe" ]
 }

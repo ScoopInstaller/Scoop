@@ -4,6 +4,6 @@
 	"licence": "MIT",
 	"url": "http://curl.haxx.se/gknw.net/7.30.0/dist-w32/curl-7.30.0-rtmp-ssh2-ssl-sspi-zlib-idn-static-bin-w32.zip",
 	"unzip_folder": "curl-7.30.0-rtmp-ssh2-ssl-sspi-zlib-idn-static-bin-w32",
-	"hash": { "sha256": "90af768c246136c14a2ae52e8775fa4d976eda4632159bc565e1a539b4f15e1a" },
+	"hash": "sha256:90af768c246136c14a2ae52e8775fa4d976eda4632159bc565e1a539b4f15e1a",
 	"bin": "curl.exe"
 }

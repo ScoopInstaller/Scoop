@@ -28,13 +28,14 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 
 		# unzip
 		if($fname -match '\.zip') {
-			write-host "extracting..."
+			write-host "extracting..." -nonewline
 			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
 			$null = mkdir "$dir\_scoop_unzip"
 			unzip "$dir\$fname" "$dir\_scoop_unzip" $manifest.unzip_folder
 			cp "$dir\_scoop_unzip\*" "$dir" -recurse -force
 			rm -r -force "$dir\_scoop_unzip"
 			rm "$dir\$fname"
+			write-host "done"
 		}
 	}
 
@@ -68,17 +69,11 @@ function check_hash($file, $url, $manifest, $arch) {
 	}
 
 	write-host "checking hash..." -nonewline
-	$expected = $null; $actual = $null;
-	if($hash.md5) {
-		$expected = $hash.md5; $actual = compute_hash (full_path $file) 'md5'
-	} elseif($hash.sha1){
-		$expected = $hash.sha1; $actual = compute_hash (full_path $file) 'sha1'
-	} elseif($hash.sha256){
-		$expected = $hash.sha256; $actual = compute_hash (full_path $file) 'sha256'
-	} else {
-		$type = $hash | gm -membertype noteproperty | % { $_.name }
-		abort "hash type $type isn't supported"		
-	}
+	$type, $expected = $hash.split(':')
+
+	if(@('md5','sha1','sha256') -notcontains $type) { "hash type $type isn't supported"	}
+	
+	$actual = compute_hash (full_path $file) $type
 
 	if($actual -ne $expected) {
 		abort "hash check failed for $url. expected: $($expected), actual: $($actual)!"
@@ -261,7 +256,7 @@ function rm_user_path($manifest, $dir) {
 
 function post_install($manifest) {
 	$manifest.post_install | ? {$_ } | % {
-		echo "running '$_'"
+		echo "running post-install script..."
 		iex $_
 	}
 }

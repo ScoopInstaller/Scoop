@@ -5,12 +5,12 @@
 	"architecture": {
 		"64bit": {
 			"url": "http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920-x64.msi",
-			"hash": { "sha256": "62df458bc521001cd9a947643a84810ecbaa5a16b5c8e87d80df8e34c4a16fe2" },
+			"hash": "sha256:62df458bc521001cd9a947643a84810ecbaa5a16b5c8e87d80df8e34c4a16fe2",
 			"msi": { "code": "{23170F69-40C1-2702-0920-000001000000}" }
 		},
 		"32bit": {
 			"url": "http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920.msi",
-			"hash": { "sha256": "fe4807b4698ec89f82de7d85d32deaa4c772fc871537e31fb0fccf4473455cb8" },
+			"hash": "sha256:fe4807b4698ec89f82de7d85d32deaa4c772fc871537e31fb0fccf4473455cb8",
 			"msi": { "code": "{23170F69-40C1-2701-0920-000001000000}" }
 		}
 	},

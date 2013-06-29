@@ -5,11 +5,11 @@
 	"architecture": {
 		"64bit": {
 			"url": "http://www.flos-freeware.ch/zip/notepad2_4.2.25_x64.zip",
-			"hash": { "sha256": "37a62f7e891335a1e671f444cefe761fcd814a2fa1a3141fe2501d8433d8920b" }
+			"hash": "sha256:37a62f7e891335a1e671f444cefe761fcd814a2fa1a3141fe2501d8433d8920b"
 		},
 		"32bit": {
 			"url": "http://www.flos-freeware.ch/zip/notepad2_4.2.25_x86.zip",
-			"hash": { "sha256": "c87a20d6953fd3c33475dd7391e7e0dd7dde1faca6b86c7478bd009ae65eace5" }
+			"hash": "sha256:c87a20d6953fd3c33475dd7391e7e0dd7dde1faca6b86c7478bd009ae65eace5"
 		}
 	},
 	"bin": "Notepad2.exe"

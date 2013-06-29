@@ -3,7 +3,7 @@
 	"license": "GPL2",
 	"version": "1.8.3",
 	"url": "https://msysgit.googlecode.com/files/Git-1.8.3-preview20130601.exe",
-	"hash": { "sha256": "ddd2e02aec58c48ae6812a7df0287b03c6c26063fe5ac36bf757efd60fd7d2e4" },
+	"hash": "sha256:ddd2e02aec58c48ae6812a7df0287b03c6c26063fe5ac36bf757efd60fd7d2e4",
 	"installer": { "args": ["/verysilent", "/dir=\"$dir\"", "/noicons", "/components=\"\"", "/tasks=\"\"" ] },
 	"bin": [ "cmd\\git.exe", "cmd\\gitk.cmd" ],
 	"post_install": [

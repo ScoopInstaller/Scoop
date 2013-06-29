@@ -5,11 +5,11 @@
 	"architecture": {
 		"64bit": {
 			"url": "http://get.enterprisedb.com/postgresql/postgresql-9.2.4-1-windows-x64-binaries.zip",
-			"hash": { "sha256": "94cfc08dfaec35fad3558e17c22b89473c006b306d40535210f5a6830739d0d5" }
+			"hash": "sha256:94cfc08dfaec35fad3558e17c22b89473c006b306d40535210f5a6830739d0d5"
 		},
 		"32bit": {
 			"url": "http://get.enterprisedb.com/postgresql/postgresql-9.2.4-1-windows-binaries.zip",
-			"hash": { "sha256": "26bd5d1555a3c010b0c58a4aaf5e1acd16bcf819926984f0716496d326768502" }
+			"hash": "sha256:26bd5d1555a3c010b0c58a4aaf5e1acd16bcf819926984f0716496d326768502"
 		}
 	},
 	"unzip_folder": "pgsql",
