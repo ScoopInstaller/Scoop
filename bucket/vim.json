@@ -1,6 +1,6 @@
 {
 	"url": "http://www.vim.org",
-	"license": "",
+	"license": "http://vimdoc.sourceforge.net/htmldoc/uganda.html#license",
 	"version": "7.3.046",
 	"url": [
 		"ftp://ftp.vim.org/pub/vim/pc/vim73_46rt.zip",
