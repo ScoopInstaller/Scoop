@@ -1,3 +1,5 @@
+#requires -v 3
+
 # remote install:
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 $erroractionpreference='stop' # quit if anything goes wrong
