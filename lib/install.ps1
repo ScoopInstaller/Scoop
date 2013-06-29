@@ -51,14 +51,15 @@ function is_in_dir($dir, $file) {
 # hashes
 function hash_for_url($manifest, $url, $arch) {
 	$hashes = @(hash $manifest $arch) | ? { $_ -ne $null };
+
 	if($hashes.length -eq 0) { return $null }
 
 	$urls = @(url $manifest $arch)
 
 	$index = [array]::indexof($urls, $url)
 	if($index -eq -1) { abort "couldn't find hash in manifest for $url" }
-
-	$hashes[$index]
+	
+	@($hashes)[$index]
 }
 
 function check_hash($file, $url, $manifest, $arch) {
