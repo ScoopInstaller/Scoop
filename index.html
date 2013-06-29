@@ -58,8 +58,8 @@
 
 <p>Make sure <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595">Powershell 3</a> is installed, then run:</p>
 
-<pre><code>PS&gt; set-executionpolicy unrestricted -s cu # let powershell run remote scripts
-PS&gt; iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+<pre><code>set-executionpolicy unrestricted -s cu
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 </code></pre>
       </section>
 

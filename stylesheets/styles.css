@@ -771,12 +771,10 @@ dt {
   margin-left: 0px;
 }
 #header nav li.downloads {
-  display: none;
   float: right;
   margin-left: 6px;
 }
 #header nav li.title {
-  display: none;
   float: right;
   margin-right: 10px;
   font-size: 11px;
@@ -809,7 +807,6 @@ section #title p {
   text-align: center;
 }
 section #title .credits {
-  display: none;
   font-size: 11px;
   font-family: 'OpenSansRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: normal;
