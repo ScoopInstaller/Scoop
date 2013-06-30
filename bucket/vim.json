@@ -16,7 +16,7 @@
 	"bin": [ "vim.exe", "vimtutor.ps1" ],
 	"post_install": "if(!(test-path ~\\.vimrc)) {
 		cp \"$(split-path(scoop which vim))\\vimrc_example.vim\" ~\\.vimrc
-		echo \"set shell=$((gcm powershell).path)\" >> ~\\.vimrc
+		\"set shell=$((gcm powershell).path)\" | out-file  ~\\.vimrc -append -encoding ascii
 		echo '~/.vimrc was created with your shell set to Powershell.'
 	} else { echo '~/.vimrc exists, skipping' }"
 }

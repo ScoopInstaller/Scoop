@@ -3,7 +3,8 @@
 	[
 		{
 			"path": ".",
-			"file_exclude_patterns": [ "*.git*", "*.sublime-*"]
+			"file_exclude_patterns": [ "*.git*", "*.sublime-*"],
+			"folder_exclude_patterns": [ "tmp" ]
 		}
 	],
 	"settings": {

@@ -2,3 +2,4 @@
 ._.DS_Store
 scoop.sublime-workspace
 tests/installer/tmp
+tests/tmp
