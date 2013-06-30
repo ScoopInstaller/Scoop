@@ -17,7 +17,7 @@ if("$path" -like "$abs_shimdir*") {
 	$shimtext = gc $path
 	$shimtext | sls '(?m)^\$path = ''([^'']+)''' | % { $_.matches[0].groups[1].value }
 } else {
-	warn "(non-scoop) $path" -f yellow -nonewline
+	warn "(non-scoop) $path" -f darkyellow -nonewline
 	exit 1
 }
 

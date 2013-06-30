@@ -112,7 +112,7 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
 			write-host "exit code was $($proc.exitcode)"; return $false
 		}
 	} catch {
-		write-host -f red $_.exception.tostring()
+		write-host -f darkred $_.exception.tostring()
 		return $false
 	}
 	write-host "done"

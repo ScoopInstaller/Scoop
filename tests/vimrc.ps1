@@ -15,7 +15,7 @@ $append = "set shell=powershell.exe"
 $append | out-file $dst -append -encoding ascii
 
 if((gc $dst)[-1] -eq $append) {
-    write-host "ok" -f green
+    write-host "ok" -f darkgreen
 } else {
-    write-host ((gc $dst) | select -last 3) -f red
+    write-host ((gc $dst) | select -last 3) -f darkred
 }
