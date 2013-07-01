@@ -1,0 +1,17 @@
+{
+	"homepage": "http://nuget.codeplex.com/",
+	"version": "2.0",
+	"license": "Apache 2.0",
+	"url": "http://download-codeplex.sec.s-msft.com/Download/Release?ProjectName=nuget&DownloadId=412077&FileTime=129851621946970000&Build=20588&scoop_fn=/nuget.exe",
+	"hash": "sha256:52036bde087d6f7879ce3d0d152d53774e723f9779a7f3212a4377da5fb03632",
+	"bin": "nuget.exe",
+	"notes": "From the release notes:
+	
+> This is a bootstrapper that will download the latest version of nuget.exe
+> available and perform an in-place update the first time it's run.
+
+> Note that once you get nuget.exe, you can easily keep it up to date by
+> running 'nuget update', which will perform another in-place update if a newer
+> version is available.
+"
+}
