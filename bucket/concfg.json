@@ -1,0 +1,7 @@
+{
+	"homepage": "https://github.com/lukesampson/concfg",
+	"version": "2013-07-01-master",
+	"url": "https://github.com/lukesampson/concfg/archive/master.zip",
+	"unzip_folder": "concfg-master",
+	"bin": "concfg.ps1"
+}
