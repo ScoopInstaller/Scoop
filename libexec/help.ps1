@@ -2,9 +2,9 @@
 # Summary: Show help for a command
 param($cmd)
 
-. "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
-. (resolve ..\commands.ps1)
-. (resolve ..\help.ps1)
+. "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
+. (resolve ..\lib\commands.ps1)
+. (resolve ..\lib\help.ps1)
 
 function print_help($cmd) {
 	$file = gc (resolve ".\$cmd.ps1") -raw

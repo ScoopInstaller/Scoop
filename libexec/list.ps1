@@ -2,9 +2,9 @@
 # Summary: List installed apps
 # Help: Lists all installed apps
 
-. "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
-. (resolve '..\versions.ps1')
-. (resolve '..\manifest.ps1')
+. "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
+. (resolve '..\lib\versions.ps1')
+. (resolve '..\lib\manifest.ps1')
 
 $apps = installed_apps
 

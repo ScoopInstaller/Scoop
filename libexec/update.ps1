@@ -4,10 +4,10 @@
 # 'scoop update [app]' installs a new version of that app, if there is one.
 param($app)
 
-. "$(split-path $myinvocation.mycommand.path)\..\core.ps1"
-. (resolve ..\install.ps1)
-. (resolve ..\manifest.ps1)
-. (resolve ..\versions.ps1)
+. "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
+. (resolve ..\lib\install.ps1)
+. (resolve ..\lib\manifest.ps1)
+. (resolve ..\lib\versions.ps1)
 
 if(!$app) { 
 	# update scoop
