@@ -1,7 +1,7 @@
 #requires -v 3
 param($cmd)
 
-. "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
+. "$psscriptroot\..\lib\core.ps1"
 . (resolve '..\lib\commands')
 
 $commands = commands

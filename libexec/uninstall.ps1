@@ -3,7 +3,7 @@
 # Help: e.g. scoop uninstall git
 param($app)
 
-. "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
+. "$psscriptroot\..\lib\core.ps1"
 . (resolve ..\lib\manifest.ps1)
 . (resolve ..\lib\help.ps1)
 . (resolve ..\lib\install.ps1)

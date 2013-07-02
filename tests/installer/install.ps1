@@ -1,6 +1,6 @@
 param($app, $architecture='64bit',[switch]$help)
 
-. "$(split-path $myinvocation.mycommand.path)\..\..\lib\core.ps1"
+. "$psscriptroot\..\..\lib\core.ps1"
 . (resolve ..\..\lib\manifest.ps1)
 . (resolve ..\..\lib\versions.ps1)
 . (resolve ..\..\lib\install.ps1)

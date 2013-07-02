@@ -1,4 +1,4 @@
-. "$(split-path $myinvocation.mycommand.path)\supporting\util.ps1"
+. "$psscriptroot\supporting\util.ps1"
 
 # used to work out how to modify default .vimrc using the right encoding
 # does actually test any scoop code

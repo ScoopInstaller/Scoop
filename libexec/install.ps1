@@ -7,7 +7,7 @@
 #      scoop install runat https://raw.github.com/lukesampson/scoop/master/bucket/runat.json
 param($app, $url, $architecture)
 
-. "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
+. "$psscriptroot\..\lib\core.ps1"
 . (resolve ..\lib\manifest.ps1)
 . (resolve ..\lib\install.ps1)
 . (resolve ..\lib\versions.ps1)

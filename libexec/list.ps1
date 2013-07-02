@@ -2,7 +2,7 @@
 # Summary: List installed apps
 # Help: Lists all installed apps
 
-. "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
+. "$psscriptroot\..\lib\core.ps1"
 . (resolve '..\lib\versions.ps1')
 . (resolve '..\lib\manifest.ps1')
 

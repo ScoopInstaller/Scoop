@@ -1,5 +1,5 @@
 # for development, update the installed scripts to match local source
-. "$(split-path $myinvocation.mycommand.path)\..\lib\core.ps1"
+. "$psscriptroot\..\lib\core.ps1"
 
 $src = resolve-path (resolve "..")
 $dest = ensure (versiondir 'scoop' 'current')
