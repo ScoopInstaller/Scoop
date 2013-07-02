@@ -30,10 +30,6 @@ if(!$app) {
 	rm $zipfile
 
 	echo 'replacing files..'
-	# old method, doesn't purge old files
-	#rm -r -force $currentdir -ea stop
-	#rni $tempdir 'current' -ea stop
-
 	$null = robocopy $tempdir $currentdir /mir /njh /njs /nfl /ndl
 	rm -r -force $tempdir -ea stop
 
