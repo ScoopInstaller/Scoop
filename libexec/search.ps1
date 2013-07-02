@@ -6,10 +6,10 @@
 # Without [query], shows all the available apps.
 param($query)
 . "$psscriptroot\..\lib\core.ps1"
-. (resolve '..\lib\manifest.ps1')
-. (resolve '..\lib\versions.ps1')
+. (relpath '..\lib\manifest.ps1')
+. (relpath '..\lib\versions.ps1')
 
-$bucket = resolve '..\bucket'
+$bucket = relpath '..\bucket'
 $apps = apps_in_bucket $bucket
 
 if($query) { $apps = $apps | ? { $_ -like "*$query*" } }

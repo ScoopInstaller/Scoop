@@ -3,8 +3,8 @@
 # Help: Lists all installed apps
 
 . "$psscriptroot\..\lib\core.ps1"
-. (resolve '..\lib\versions.ps1')
-. (resolve '..\lib\manifest.ps1')
+. (relpath '..\lib\versions.ps1')
+. (relpath '..\lib\manifest.ps1')
 
 $apps = installed_apps
 

@@ -2,7 +2,7 @@
 param($cmd)
 
 . "$psscriptroot\..\lib\core.ps1"
-. (resolve '..\lib\commands')
+. (relpath '..\lib\commands')
 
 $commands = commands
 

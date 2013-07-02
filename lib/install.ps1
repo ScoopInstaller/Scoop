@@ -3,7 +3,7 @@ function cache_path($app, $version, $url) {
 }
 
 function dl_with_cache($app, $version, $url, $to) {
-	$cached = full_path (cache_path $app $version $url)
+	$cached = fullpath (cache_path $app $version $url)
 	if(!(test-path $cached)) {
 		$null = ensure $cachedir
 		write-host "downloading $url..."
@@ -43,8 +43,8 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 }
 
 function is_in_dir($dir, $file) {
-	$file = "$(full_path $file)"
-	$dir = "$(full_path $dir)"
+	$file = "$(fullpath $file)"
+	$dir = "$(fullpath $dir)"
 	$file -match "^$([regex]::escape("$dir\"))"
 }
 
@@ -65,7 +65,7 @@ function hash_for_url($manifest, $url, $arch) {
 function check_hash($file, $url, $manifest, $arch) {
 	$hash = hash_for_url $manifest $url $arch
 	if(!$hash) {
-		warn "warning: no hash in manifest. sha256 is:`n$(compute_hash (full_path $file) 'sha256')"
+		warn "warning: no hash in manifest. sha256 is:`n$(compute_hash (fullpath $file) 'sha256')"
 		return
 	}
 
@@ -74,7 +74,7 @@ function check_hash($file, $url, $manifest, $arch) {
 
 	if(@('md5','sha1','sha256') -notcontains $type) { "hash type $type isn't supported"	}
 	
-	$actual = compute_hash (full_path $file) $type
+	$actual = compute_hash (fullpath $file) $type
 
 	if($actual -ne $expected) {
 		abort "hash check failed for $url. expected: $($expected), actual: $($actual)!"

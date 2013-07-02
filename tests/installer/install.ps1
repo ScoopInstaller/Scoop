@@ -1,14 +1,14 @@
 param($app, $architecture='64bit',[switch]$help)
 
 . "$psscriptroot\..\..\lib\core.ps1"
-. (resolve ..\..\lib\manifest.ps1)
-. (resolve ..\..\lib\versions.ps1)
-. (resolve ..\..\lib\install.ps1)
+. (relpath ..\..\lib\manifest.ps1)
+. (relpath ..\..\lib\versions.ps1)
+. (relpath ..\..\lib\install.ps1)
 
 # override to use dev version for manifest
-$scoopdir = resolve '..\..\'
+$scoopdir = relpath '..\..\'
 
-$dir = full_path (resolve .\tmp)
+$dir = fullpath (relpath .\tmp)
 $manifest = manifest $app
 
 $version = $manifest.version

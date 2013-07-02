@@ -4,7 +4,7 @@
 # does actually test any scoop code
 
 $tmp = ensure tmp
-$src = resolve fixtures\_vimrc
+$src = relpath fixtures\_vimrc
 $dst = "$tmp\_vimrc"
 
 if(test-path $dst) { rm $dst }

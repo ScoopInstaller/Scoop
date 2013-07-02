@@ -3,11 +3,11 @@
 param($cmd)
 
 . "$psscriptroot\..\lib\core.ps1"
-. (resolve ..\lib\commands.ps1)
-. (resolve ..\lib\help.ps1)
+. (relpath ..\lib\commands.ps1)
+. (relpath ..\lib\help.ps1)
 
 function print_help($cmd) {
-	$file = gc (resolve ".\$cmd.ps1") -raw
+	$file = gc (relpath ".\$cmd.ps1") -raw
 
 	$usage = usage $file
 	$summary = summary $file
@@ -22,7 +22,7 @@ function print_summaries {
 
 	command_files | % {
 		$command = command_name $_
-		$summary = summary (gc (resolve $_) -raw )
+		$summary = summary (gc (relpath $_) -raw )
 		if(!($summary)) { $summary = '' }
 		$commands.add("$command ", $summary) # add padding
 	}

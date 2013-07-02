@@ -5,9 +5,9 @@
 param($app)
 
 . "$psscriptroot\..\lib\core.ps1"
-. (resolve ..\lib\install.ps1)
-. (resolve ..\lib\manifest.ps1)
-. (resolve ..\lib\versions.ps1)
+. (relpath ..\lib\install.ps1)
+. (relpath ..\lib\manifest.ps1)
+. (relpath ..\lib\versions.ps1)
 
 if(!$app) { 
 	# update scoop
@@ -18,7 +18,7 @@ if(!$app) {
 		try { rm -r $tempdir -ea stop -force } catch { abort "couldn't remove $tempdir`: it may be in use" }
 	}
 	$tempdir = ensure $tempdir
-	$currentdir = full_path $currentdir
+	$currentdir = fullpath $currentdir
 
 	$zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
 	$zipfile = "$tempdir\scoop.zip"

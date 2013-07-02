@@ -3,7 +3,7 @@
 # Help: Finds the path to a program that was installed with Scoop
 param($command)
 . "$psscriptroot\..\lib\core.ps1"
-. (resolve '..\lib\help.ps1')
+. (relpath '..\lib\help.ps1')
 
 if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 

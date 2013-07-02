@@ -29,13 +29,13 @@ function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
-function full_path($path) { # should be ~ rooted
+function fullpath($path) { # should be ~ rooted
 	$executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }
+function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
 function friendly_path($path) {
 	return "$path" -replace ([regex]::escape($home)), "~"
 }
-function resolve($path) { "$($myInvocation.PSScriptRoot)\$path" } # relative to calling script
 function is_local($path) {
 	($path -notmatch '^https?://') -and (test-path $path)
 }
@@ -83,7 +83,7 @@ function shim($path) {
 
 function ensure_in_path($dir,$first=$false) {
 	$userpath = env 'path'
-	$dir = full_path $dir
+	$dir = fullpath $dir
 	if($userpath -notmatch [regex]::escape($dir)) {
 		echo "adding $(friendly_path $dir) to your path"
 		
@@ -103,7 +103,7 @@ function strip_path($orig_path, $dir) {
 }
 
 function remove_from_path($dir) {
-	$dir = full_path $dir
+	$dir = fullpath $dir
 
 	# future sessions
 	$was_in_path, $newpath = strip_path (env 'path') $dir

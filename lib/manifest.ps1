@@ -1,4 +1,4 @@
-function manifest_path($app) { (resolve "..\bucket\$app.json") }
+function manifest_path($app) { (relpath "..\bucket\$app.json") }
 
 function parse_json($path) {
 	if(!(test-path $path)) { return $null }
