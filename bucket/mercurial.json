@@ -14,5 +14,5 @@
 	},
 	"installer": { "args": [ "/verysilent", "/dir=\"$dir\"", "/noicons" ] },
 	"uninstaller": { "exe": "unins000.exe", "args": ["/verysilent"] },
-	"bin": [ "hg.exe" ]
+	"bin": "hg.exe"
 }

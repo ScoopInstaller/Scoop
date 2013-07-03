@@ -1,4 +1,5 @@
 {
+	"homepage": "https://github.com/lukesampson/psutils",
 	"version": "2013-07-02",
 	"url": "https://raw.github.com/lukesampson/psutils/master/touch.ps1",
 	"bin": "touch.ps1"
