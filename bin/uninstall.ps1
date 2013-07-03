@@ -3,6 +3,10 @@
 . (relpath ..\lib\versions.ps1)
 . (relpath ..\lib\manifest.ps1)
 
+warn 'this will uninstall scoop and all the programs that have been installed with scoop!'
+$yn = read-host 'are you sure? (yN)'
+if($yn -notlike 'y*') { exit }
+
 # run uninstallers if necessary
 installed_apps | % {
     $app = $_
