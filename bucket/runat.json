@@ -1,6 +1,6 @@
 {
 	"homepage": "https://github.com/lukesampson/psutils",
-	"version": "2013-06-28",
+	"version": "0.2013.06.28",
 	"url": "https://raw.github.com/lukesampson/psutils/master/runat.ps1",
 	"bin": "runat.ps1"
 }
