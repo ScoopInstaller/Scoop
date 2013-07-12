@@ -19,7 +19,7 @@ switch($architecture) {
 	default { abort "invalid architecture: '$architecture'"}
 }
 
-if(!$app) { "ERROR: <app> missing"; my_usage; exit }
+if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 $manifest = manifest $app $url
 if(!$manifest) { abort "couldn't find the manifest for $app$(if($url) { " at the URL $url" })" }
