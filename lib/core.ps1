@@ -76,8 +76,7 @@ function shim($path) {
 	$shim = "$abs_shimdir\$(strip_ext(fname $path).tolower()).ps1"
 
 	# note: use > for first line to replace, then >> to append following lines
-	echo ". ""$(versiondir 'scoop' 'current')\lib\core.ps1""" > $shim
-	echo "`$path = '$path'" >> $shim
+	echo "`$path = '$path'" > $shim
 	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $shim
 }
 
