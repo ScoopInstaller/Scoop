@@ -1,9 +1,9 @@
 {
 	"homepage": "http://scriptcs.net/",
-	"version": "0.6.0-alpha-130626",
+	"version": "0.6.0-alpha-130707",
 	"license": "Apache 2.0",
-	"url": "https://www.myget.org/F/scriptcsnightly/api/v2/package/scriptcs/0.6.0-alpha-130626?fn=/dl.zip",
+	"url": "https://www.myget.org/F/scriptcsnightly/api/v2/package/scriptcs/0.6.0-alpha-130707?fn=/dl.zip",
 	"unzip_folder": "tools\\scriptcs",
-	"hash": "sha256:2c7074361d1df8806c0036e3f78ce2e4c55e708c4fe26cba5a9e8b1c819266b5",
+	"hash": "sha256:d0521827f09813cb3e22402e32a0089cf0b425981f3182568c47811717682750",
 	"bin": "scriptcs.exe"
 }
