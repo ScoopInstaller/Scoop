@@ -80,7 +80,7 @@ function shim($path) {
 	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $shim
 
 	$shim_cmd = "$(strip_ext($shim)).cmd"
-	echo "@`"$path`" %*" > $shim_cmd
+	"@`"$path`" %*" | out-file $shim_cmd -encoding oem
 }
 
 function ensure_in_path($dir,$first=$false) {
