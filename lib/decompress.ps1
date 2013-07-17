@@ -4,7 +4,7 @@ function 7zip_installed {
 }
 
 function requires_7zip($fname) {
-    $fname -match '(\.gz)|(\.tar)|(\.lzma)$'
+    $fname -match '(\.gz)|(\.tar)|(\.lzma)|(\.7z)$'
 }
 
 function extract_7zip($path) {
