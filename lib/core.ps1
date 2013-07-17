@@ -78,6 +78,9 @@ function shim($path) {
 	# note: use > for first line to replace, then >> to append following lines
 	echo "`$path = '$path'" > $shim
 	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $shim
+
+	$shim_cmd = "$(strip_ext($shim)).cmd"
+	echo "@`"$path`" %*" > $shim_cmd
 }
 
 function ensure_in_path($dir,$first=$false) {

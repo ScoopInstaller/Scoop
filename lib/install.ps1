@@ -205,12 +205,16 @@ function create_shims($manifest, $dir) {
 function rm_shims($manifest) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
 		$shim = "$shimdir\$(strip_ext(fname $_)).ps1"
+		$shim_cmd = "$(strip_ext $shim).cmd"
+
 		if(!(test-path $shim)) { # handle no shim from failed install
 			warn "shim for $_ is missing, skipping"
 		} else {
 			echo "removing shim for $_"
 			rm $shim
-		}	
+		}
+
+		if(test-path $shim_cmd) { rm $shim_cmd }
 	}
 }
 
