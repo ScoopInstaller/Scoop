@@ -41,9 +41,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 				warn "aborting: you'll need to run 'scoop uninstall $app' to clean up"
 				abort "7-zip is required. you can install it with 'scoop install 7zip'"
 			}
-			write-host "extracting..." -nonewline
 			extract_7zip "$dir\$fname"
-			write-host "done"
 		}
 	}
 
