@@ -9,6 +9,7 @@ param($app, $url, $architecture)
 
 . "$psscriptroot\..\lib\core.ps1"
 . (relpath ..\lib\manifest.ps1)
+. (relpath ..\lib\decompress.ps1)
 . (relpath ..\lib\install.ps1)
 . (relpath ..\lib\versions.ps1)
 . (relpath ..\lib\help.ps1)
