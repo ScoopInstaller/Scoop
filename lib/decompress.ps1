@@ -1,5 +1,5 @@
 function 7zip_installed {
-    try { gcm 7z -ea 0 } catch { return $false }
+    try { gcm 7z -ea stop } catch { return $false }
     $true
 }
 
