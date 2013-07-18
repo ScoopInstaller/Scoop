@@ -20,22 +20,22 @@ if($dummy) {
     $wc = new-object net.webclient
     $i = 0;
     try {
-        $null = register-objectevent $wc downloadprogresschanged progress {
+        $a = register-objectevent $wc downloadprogresschanged progress
+        $wc.downloadfileasync($url, $path)
+        while($true) {
+            $e = wait-event progress
+            remove-event progress
+            $p = $e.sourceeventargs.progresspercentage
             [console]::cursorleft = $left
-            write-host "$i`: $($eventargs.progresspercentage)%" -nonewline
+            write-host "$i`: $p%" -nonewline
             $i++;
         }
-        $null = register-objectevent $wc downloadfilecompleted finished
-        $wc.downloadfileasync($url, $path)
-        $finished = wait-event finished
-        remove-event finished
     } catch {
-        "ERROR! ERROR! ERROR! press a key..."
+        "ERROR! $($_.exception)`npress a key..."
 
         [console]::readkey()
     } finally {
         write-host 'clean-up'
-        unregister-event finished
         unregister-event progress
         $wc.cancelasync()
         $wc.dispose()
