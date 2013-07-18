@@ -1,7 +1,7 @@
 Scoop (alpha)
 =============
 
-Scoop is a simple package manager for Windows, designed for developers who like working on the command-line.
+Scoop is a simple command-line installer for windows.
 
 Requirements:
 
@@ -17,10 +17,9 @@ Once installed, run `scoop help` for instructions.
 What does Scoop do?
 -------------------
 
-* Quickly installs the tools and utilities you need, with minimum fuss.
+* Quickly installs tools and utilities.
 * Makes sharing scripts and utilities easy.
 * Enables productive scripting in Windows using a composition of collected utilities.
-* Doesn't follow PowerShell conventions.
 
 
 Scoop vs [Chocolatey](http://chocolatey.org)

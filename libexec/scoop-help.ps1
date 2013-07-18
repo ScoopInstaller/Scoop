@@ -7,7 +7,7 @@ param($cmd)
 . (relpath ..\lib\help.ps1)
 
 function print_help($cmd) {
-	$file = gc (relpath ".\$cmd.ps1") -raw
+	$file = gc (relpath ".\scoop-$cmd.ps1") -raw
 
 	$usage = usage $file
 	$summary = summary $file
