@@ -6,10 +6,43 @@ function dl_with_cache($app, $version, $url, $to) {
 	$cached = fullpath (cache_path $app $version $url)
 	if(!(test-path $cached)) {
 		$null = ensure $cachedir
-		write-host "downloading $url..."
-		dl $url $cached
+		write-host "downloading $url..." -nonewline
+		dl_progress $url $cached
+		write-host "done"
 	} else { write-host "loading $url from cache..."}
 	cp $cached $to
+}
+
+function dl_progress($url, $to) {
+	$left = [console]::cursorleft
+
+	$wc = new-object net.webclient
+	register-objectevent $wc downloadprogresschanged progress | out-null
+    register-objectevent $wc downloadfilecompleted complete | out-null
+    try {
+        $wc.downloadfileasync($url, $to)
+
+        function is_complete {
+            try { get-event complete -ea stop; $true } catch { $false }
+        }
+
+        while(!(is_complete)) {
+            $e = wait-event progress
+            remove-event progress
+            $p = $e.sourceeventargs.progresspercentage
+            [console]::cursorleft = $left
+            write-host "$p%" -nonewline
+        }
+        remove-event complete
+    } finally {
+        remove-event *
+        unregister-event progress
+        unregister-event complete
+        
+        $wc.cancelasync()
+        $wc.dispose()
+    }
+    [console]::cursorleft = $left
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir) {
