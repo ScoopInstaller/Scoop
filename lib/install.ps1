@@ -7,7 +7,8 @@ function dl_with_cache($app, $version, $url, $to) {
 	if(!(test-path $cached)) {
 		$null = ensure $cachedir
 		write-host "downloading $url..." -nonewline
-		dl_progress $url $cached
+		dl_progress $url "$cached.download"
+		mv "$cached.download" $cached
 		write-host "done"
 	} else { write-host "loading $url from cache..."}
 	cp $cached $to
