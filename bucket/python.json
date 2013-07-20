@@ -5,12 +5,20 @@
 	"architecture": {
 		"64bit": {
 			"url": "http://www.python.org/ftp/python/3.3.2/python-3.3.2.amd64.msi",
-			"msi": { "code": "{9FA9A2A6-19E4-381A-8AF3-F8CF12F0DCF0}", "args": ["addlocal=\"DefaultFeature\""] },
+			"msi": {
+				"silent": true,
+				"code": "{9FA9A2A6-19E4-381A-8AF3-F8CF12F0DCF0}",
+				"args": ["addlocal=\"DefaultFeature\""]
+			},
 			"hash": "md5:2477b4bd8e9a337705f7b5fda8b3b45f"
 		},
 		"32bit": {
 			"url": "http://www.python.org/ftp/python/3.3.2/python-3.3.2.msi",
-			"msi": { "code": "{92389DE9-939E-341B-A076-1D52D7DBCA71}", "args": ["addlocal=\"DefaultFeature\""] },
+			"msi": {
+				"silent": true,
+				"code": "{92389DE9-939E-341B-A076-1D52D7DBCA71}",
+				"args": ["addlocal=\"DefaultFeature\""]
+			},
 			"hash": "md5:0d9db9c2316562c62e1e4c347b6f9430"
 		}
 	},
