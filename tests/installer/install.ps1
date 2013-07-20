@@ -5,6 +5,13 @@
 # * Will make use of scoop's manifest and download cache so you don't have to
 #     keep track of the installer file.
 # * Passing the -help switch should show the installer's help popup
+#
+# 
+# How to silence the UAC prompt:
+#   http://csi-windows.com/blog/all/27-csi-news-general/335-how-to-silence-the-uac-prompt-for-per-machine-msi-packages-for-non-admins
+#
+# MSIINSTALLPERUSER
+#   http://msdn.microsoft.com/en-us/library/windows/desktop/dd408007(v=vs.85).aspx
 
 param($app, $architecture='64bit',[switch]$help)
 
@@ -33,7 +40,7 @@ if($fname -match '\.msi$') {
 	$exe = 'msiexec'
 	$file = resolve-path "$dir\$fname"
 	$log = "$dir\$($app)_log.txt"
-	$arg = @("/i `"$file`"", "/qb-!", "/norestart", "ALLUSERS=''", "INSTALLDIR=`"$dir\install_$app`"", "/lvp `"$log`"")
+	$arg = @("/i `"$file`"", "/qb-!", "/norestart", "ALLUSERS=2", "MSIINSTALLPERUSER=2", "INSTALLDIR=`"$dir\install_$app`"", "/lvp `"$log`"")
 	if($help) { $arg = '/?' }
 	$installed = run $exe $arg "testing $fname..."
 	"installed: $installed"

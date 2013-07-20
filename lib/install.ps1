@@ -164,7 +164,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 	$installer = installer $manifest $architecture
 
 	if($msi -or $installer) {
-		$exe = $null; $arg = $null; $rmfile = $null; $logfile = $null;
+		$exe = $null; $arg = $null; $rmfile = $null; $logfile = $null; $continue_exit_codes = $null
 		
 		if($msi) { # msi
 			$rmfile = $msifile = "$dir\$(coalesce $msi.file "$fname")"
@@ -175,7 +175,8 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 			$exe = 'msiexec'
 			$logfile = "$dir\install.log"
 			$arg = @("/i `"$msifile`"", '/qb-!', "/norestart", "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"", "INSTALLDIR=`"$dir`"") +
-				(@($msi.args) | ? { $_ })
+				@(args $msi.args $dir)
+			$continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
 		} elseif($installer) { # other installer
 			$rmfile = $exe = "$dir\$(coalesce $installer.exe "$fname")"
 			if(!(is_in_dir $dir $exe)) {
@@ -184,7 +185,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 			$arg = args $installer.args $dir
 		}
 		
-		$installed = run $exe $arg "running installer..."
+		$installed = run $exe $arg "running installer..." $continue_exit_codes
 		if(!$installed) {
 			abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
 		}
@@ -202,8 +203,9 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
 		if($msi) {
 			$code = $msi.code
-			$exe = "msiexec"; $arg = @("/x $code", '/qb-!');
+			$exe = "msiexec"; $arg = @("/norestart", "/x $code", '/qb-!');
 			$continue_exit_codes.1605 = 'not installed, skipping'
+			$continue_exit_codes.3010 = 'restart required'
 		} elseif($uninstaller) {
 			$exe = "$dir\$($uninstaller.exe)"
 			$arg = args $uninstaller.args

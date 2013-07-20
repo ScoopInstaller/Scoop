@@ -6,7 +6,10 @@ function current_version($app) {
 	@(versions $app)[-1]
 }
 function versions($app) {
-	sort_versions (gci "$scoopdir\apps\$app" -dir | % { $_.name })
+	$appdir = "$scoopdir\apps\$app"
+	if(!(test-path $appdir)) { return @() }
+
+	sort_versions (gci $appdir -dir | % { $_.name })
 }
 
 function version($ver) {
