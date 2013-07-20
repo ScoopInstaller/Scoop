@@ -203,7 +203,9 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
 		if($msi) {
 			$code = $msi.code
-			$exe = "msiexec"; $arg = @("/norestart", "/x $code", '/qb-!');
+			$exe = "msiexec";
+			$arg = @("/norestart", "/x $code", '/qb-!') + @(args $msi.uninstall_args $dir)
+
 			$continue_exit_codes.1605 = 'not installed, skipping'
 			$continue_exit_codes.3010 = 'restart required'
 		} elseif($uninstaller) {

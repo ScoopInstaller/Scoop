@@ -5,7 +5,8 @@
 	"hash": "sha256:f160bb5474083aa49f17a74d80448c1850f0139c40551565b75a3b6a74b22d2d",
 	"msi": {
 		"code": "{BBD54C5B-F7BB-4127-A707-A13A667E3102}",
-		"args": [ "/qn", "MANUFACTURERDIR=\"$dir\"", "VAGRANTAPPDIR=\"$dir\"", "ALLUSERS=2", "MSIINSTALLPERUSER=1" ]
+		"args": [ "/qn", "MANUFACTURERDIR=\"$dir\"", "VAGRANTAPPDIR=\"$dir\"", "ALLUSERS=2", "MSIINSTALLPERUSER=1" ],
+		"uninstall_args": [ "/qn", "ALLUSERS=2", "MSIINSTALLPERUSER=1" ]
 	},
 	"bin": "bin\\vagrant.bat"
 }
