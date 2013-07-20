@@ -211,7 +211,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
 			$exe = "msiexec";
 			$arg = @("/norestart", "/x $code")
 			if($msi.silent) {
-				$arg += '/qn', 'ALLUSERS=2','MSIINSTALLPERUSER=1'
+				$arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1'
 			} else {
 				$arg += '/qb-!'
 			}
