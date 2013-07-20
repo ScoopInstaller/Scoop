@@ -174,8 +174,13 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 			if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
 			$exe = 'msiexec'
 			$logfile = "$dir\install.log"
-			$arg = @("/i `"$msifile`"", '/qb-!', "/norestart", "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"", "INSTALLDIR=`"$dir`"") +
+			$arg = @("/i `"$msifile`"", '/norestart', "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"", "INSTALLDIR=`"$dir`"") +
 				@(args $msi.args $dir)
+			if($msi.silent) {
+				$arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1'
+			} else {
+				$arg += '/qb-!'
+			}
 			$continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
 		} elseif($installer) { # other installer
 			$rmfile = $exe = "$dir\$(coalesce $installer.exe "$fname")"
@@ -204,7 +209,12 @@ function run_uninstaller($manifest, $architecture, $dir) {
 		if($msi) {
 			$code = $msi.code
 			$exe = "msiexec";
-			$arg = @("/norestart", "/x $code", '/qb-!') + @(args $msi.uninstall_args $dir)
+			$arg = @("/norestart", "/x $code")
+			if($msi.silent) {
+				$arg += '/qn', 'ALLUSERS=2','MSIINSTALLPERUSER=1'
+			} else {
+				$arg += '/qb-!'
+			}
 
 			$continue_exit_codes.1605 = 'not installed, skipping'
 			$continue_exit_codes.3010 = 'restart required'
