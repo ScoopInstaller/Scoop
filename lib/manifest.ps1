@@ -33,7 +33,9 @@ function save_install_info($info, $dir) {
 }
 
 function install_info($app, $version) {
-	parse_json "$(versiondir $app $version)\install.json"
+	$path = "$(versiondir $app $version)\install.json"
+	if(!(test-path $path)) { return $null }
+	parse_json $path
 }
 
 function architecture {

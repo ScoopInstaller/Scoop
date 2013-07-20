@@ -164,7 +164,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 	$installer = installer $manifest $architecture
 
 	if($msi -or $installer) {
-		$exe = $null; $arg = $null; $rmfile = $null
+		$exe = $null; $arg = $null; $rmfile = $null; $logfile = $null;
 		
 		if($msi) { # msi
 			$rmfile = $msifile = "$dir\$(coalesce $msi.file "$fname")"
@@ -173,7 +173,8 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 			}
 			if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
 			$exe = 'msiexec'
-			$arg = @("/i `"$msifile`"", '/qb-!', "TARGETDIR=`"$dir`"", "INSTALLDIR=`"$dir`"") +
+			$logfile = "$dir\install.log"
+			$arg = @("/i `"$msifile`"", '/qb-!', "/norestart", "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"", "INSTALLDIR=`"$dir`"") +
 				(@($msi.args) | ? { $_ })
 		} elseif($installer) { # other installer
 			$rmfile = $exe = "$dir\$(coalesce $installer.exe "$fname")"
@@ -187,6 +188,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 		if(!$installed) {
 			abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
 		}
+		if($logfile) { rm $logfile }
 		rm "$rmfile"
 	}
 }

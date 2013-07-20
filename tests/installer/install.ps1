@@ -1,4 +1,16 @@
+# Designed to be run manually to help figure out parameters for installers
+# e.g. `tests\installer\install <app> [64bit|32bit] [-help]`
+#
+# * Knows about MSI and InnoSetup.
+# * Will make use of scoop's manifest and download cache so you don't have to
+#     keep track of the installer file.
+# * Passing the -help switch should show the installer's help popup
+
 param($app, $architecture='64bit',[switch]$help)
+
+if(!$app) {
+	"app is required"; exit 1;
+}
 
 . "$psscriptroot\..\..\lib\core.ps1"
 . (relpath ..\..\lib\manifest.ps1)
@@ -21,7 +33,7 @@ if($fname -match '\.msi$') {
 	$exe = 'msiexec'
 	$file = resolve-path "$dir\$fname"
 	$log = "$dir\$($app)_log.txt"
-	$arg = @("/i `"$file`"", "/qb-!", "ALLUSERS=''", "INSTALLDIR=`"$dir\install_$app`"", "/lvp `"$log`"")
+	$arg = @("/i `"$file`"", "/qb-!", "/norestart", "ALLUSERS=''", "INSTALLDIR=`"$dir\install_$app`"", "/lvp `"$log`"")
 	if($help) { $arg = '/?' }
 	$installed = run $exe $arg "testing $fname..."
 	"installed: $installed"

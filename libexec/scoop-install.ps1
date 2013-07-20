@@ -29,7 +29,13 @@ $version = $manifest.version
 if(!$version) { abort "manifest doesn't specify a version" }
 if($version -match '[^\w\.\-_]') { abort "manifest version has unsupported character '$($matches[0])'" }
 
-if(installed $app) { abort "$app is already installed. Use 'scoop update $app' to install a new version." }
+if(installed $app) {
+    $version = @(versions $app)[-1]
+    if(!(install_info $app $version)) {
+        abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app' before retrying the install."
+    }
+    abort "$app ($version) is already installed.`nuse 'scoop update $app' to install a new version."
+}
 
 # check 7zip installed if required
 if(!(7zip_installed)) {
@@ -42,16 +48,16 @@ if(!(7zip_installed)) {
 
 $dir = ensure (versiondir $app $version)
 
-# save info for uninstall
-save_installed_manifest $app $dir $url
-save_install_info @{ 'architecture' = $architecture; 'url' = $url } $dir
-
 $fname = dl_urls $app $version $manifest $architecture $dir
 run_installer $fname $manifest $architecture $dir
 ensure_install_dir_not_in_path $dir
 create_shims $manifest $dir
 add_user_path $manifest $dir
 post_install $manifest
+
+# save info for uninstall
+save_installed_manifest $app $dir $url
+save_install_info @{ 'architecture' = $architecture; 'url' = $url } $dir
 
 success "$app $version was installed successfully!"
 
