@@ -2,7 +2,7 @@ function manifest_path($app) { (relpath "..\bucket\$app.json") }
 
 function parse_json($path) {
 	if(!(test-path $path)) { return $null }
-	gc $path -raw | convertfrom-json
+	gc $path -raw | convertfrom-json -ea stop
 }
 
 function url_manifest($url) {
