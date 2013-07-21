@@ -31,7 +31,8 @@ gci "$scoopdir\apps" | ? name -ne 'scoop' | % {
 if($old) {
     "Updates are available for:"
     $old.keys | % { 
-        "    $_"
+        $versions = $old.$_
+        "    $_`: $($versions[0]) -> $($versions[1])"
     }
 }
 
