@@ -164,40 +164,48 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 	$msi = msi $manifest $architecture
 	$installer = installer $manifest $architecture
 
-	if($msi -or $installer) {
-		$exe = $null; $arg = $null; $rmfile = $null; $logfile = $null; $continue_exit_codes = $null
-		
-		if($msi) { # msi
-			$rmfile = $msifile = "$dir\$(coalesce $msi.file "$fname")"
-			if(!(is_in_dir $dir $msifile)) {
-				abort "error in manifest: MSI file $msifile is outside the app directory"
-			}
-			if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
-			$exe = 'msiexec'
-			$logfile = "$dir\install.log"
-			$arg = @("/i `"$msifile`"", '/norestart', "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"", "INSTALLDIR=`"$dir`"") +
-				@(args $msi.args $dir)
-			if($msi.silent) {
-				$arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1'
-			} else {
-				$arg += '/qb-!'
-			}
-			$continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
-		} elseif($installer) { # other installer
-			$rmfile = $exe = "$dir\$(coalesce $installer.exe "$fname")"
-			if(!(is_in_dir $dir $exe)) {
-				abort "error in manifest: installer $exe is outside the app directory"
-			}
-			$arg = args $installer.args $dir
-		}
-		
-		$installed = run $exe $arg "running installer..." $continue_exit_codes
-		if(!$installed) {
-			abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
-		}
-		if($logfile) { rm $logfile }
-		rm "$rmfile"
+	if($msi) { 
+		install_msi $fname $dir $msi
+	} elseif($installer) {
+		install_exe $fname $dir $installer
 	}
+}
+
+function install_msi($fname, $dir, $msi) {
+	$msifile = "$dir\$(coalesce $msi.file "$fname")"
+	if(!(is_in_dir $dir $msifile)) {
+		abort "error in manifest: MSI file $msifile is outside the app directory"
+	}
+	if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
+	$logfile = "$dir\install.log"
+
+	$arg = @("/i `"$msifile`"", '/norestart', "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"",
+		"INSTALLDIR=`"$dir`"") + @(args $msi.args $dir)
+
+	if($msi.silent) { $arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1' }
+	else { $arg += '/qb-!' }
+
+	$continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
+
+	$installed = run 'msiexec' $arg "running installer..." $continue_exit_codes
+	if(!$installed) {
+		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
+	}
+	rm $logfile
+	rm $msifile
+}
+
+function install_exe($fname, $dir, $installer) {
+	$exe = "$dir\$(coalesce $installer.exe "$fname")"
+	if(!(is_in_dir $dir $exe)) {
+		abort "error in manifest: installer $exe is outside the app directory"
+	}
+	$arg = args $installer.args $dir
+	$installed = run $exe $arg "running installer..."
+	if(!$installed) {
+		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
+	}
+	rm $exe
 }
 
 function run_uninstaller($manifest, $architecture, $dir) {
