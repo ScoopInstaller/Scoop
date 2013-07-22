@@ -306,8 +306,8 @@ function find_dir_or_subdir($path, $dir) {
 	return [string]::join(';', $fixed), $removed
 }
 
-function add_user_path($manifest, $dir) {
-	$manifest.add_path | ? { $_ } | % {
+function add_env_path($manifest, $dir) {
+	$manifest.add_env_path | ? { $_ } | % {
 		$path_dir = "$dir\$($_)"
 		if(!(is_in_dir $dir $path_dir)) {
 			abort "error in manifest: add_to_path '$_' is outside the app directory"
@@ -315,11 +315,31 @@ function add_user_path($manifest, $dir) {
 		ensure_in_path $path_dir
 	}
 }
-function rm_user_path($manifest, $dir) {
+function rm_env_path($manifest, $dir) {
 	# remove from path
-	$manifest.add_path | ? { $_ } | % {
+	$manifest.add_env_path | ? { $_ } | % {
 		$path_dir = "$dir\$($_)"
 		remove_from_path $path_dir
+	}
+}
+
+function set_env($manifest, $dir) {
+	if($manifest.set_env) {
+		$manifest.set_env | gm -member noteproperty | % {
+			$name = $_.name;
+			$val = format $manifest.set_env.$($_.name) @{ "dir" = $dir }
+			env $name $val
+			sc env:\$name $val
+		}
+	}
+}
+function rm_env($manifest) {
+	if($manifest.set_env) {
+		$manifest.set_env | gm -member noteproperty | % {
+			$name = $_.name;
+			env $name $null
+			rm env:\$name
+		}
 	}
 }
 

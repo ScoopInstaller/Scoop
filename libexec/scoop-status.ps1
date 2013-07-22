@@ -29,7 +29,7 @@ gci "$scoopdir\apps" | ? name -ne 'scoop' | % {
 }
 
 if($old) {
-    "Updates are available for:"
+    "updates are available for:"
     $old.keys | % { 
         $versions = $old.$_
         "    $_`: $($versions[0]) -> $($versions[1])"
@@ -37,21 +37,21 @@ if($old) {
 }
 
 if($removed) {
-    "These app manifests have been removed:"
+    "these app manifests have been removed:"
     $removed.keys | % {
         "    $_"
     }
 }
 
 if($failed) {
-    "These apps failed to install:"
+    "these apps failed to install:"
     $failed.keys | % {
         "    $_"
     }
 }
 
 if(!$old -and !$removed -and !$failed) {
-    "Everything is ok!"
+    success "everything is ok!"
 }
 
 exit 0

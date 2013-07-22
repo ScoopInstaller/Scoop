@@ -24,7 +24,8 @@ $architecture = $install.architecture
 
 run_uninstaller $manifest $architecture $dir
 rm_shims $manifest
-rm_user_path $manifest $dir
+rm_env_path $manifest $dir
+rm_env $manifest
 
 try { rm -r $dir -ea stop -force }
 catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }

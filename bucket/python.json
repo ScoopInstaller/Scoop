@@ -23,7 +23,7 @@
 		}
 	},
 	"bin": [ "python.exe", "py.exe" ],
-	"add_path": [ "scripts" ],
+	"add_env_path": [ "scripts" ],
 	"notes": "To use PIP to manage Python packages, run:
 	`scoop install curl`
 	`curl http://python-distribute.org/distribute_setup.py | python`

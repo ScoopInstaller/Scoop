@@ -52,7 +52,8 @@ $fname = dl_urls $app $version $manifest $architecture $dir
 run_installer $fname $manifest $architecture $dir
 ensure_install_dir_not_in_path $dir
 create_shims $manifest $dir
-add_user_path $manifest $dir
+add_env_path $manifest $dir
+set_env $manifest $dir
 post_install $manifest
 
 # save info for uninstall

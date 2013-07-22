@@ -71,7 +71,8 @@ if(!$app) {
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir
 	create_shims $manifest $dir
-	add_user_path $manifest $dir
+	add_env_path $manifest $dir
+	set_env $manifest $dir
 	post_install $manifest
 
 	success "$app was updated from $old_version to $version"

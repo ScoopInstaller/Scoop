@@ -18,7 +18,8 @@ installed_apps | % {
 
     echo "uninstalling $app"
     run_uninstaller $manifest $architecture $dir
-    rm_user_path $manifest $dir
+    rm_env_path $manifest $dir
+    rm_env $manifest
 }
 
 if(test-path $scoopdir) {

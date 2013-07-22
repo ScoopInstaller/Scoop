@@ -42,9 +42,9 @@ function is_local($path) {
 
 # operations
 function dl($url,$to) { (new-object system.net.webClient).downloadFile($url,$to) }
-function env($name,$val) {
-	if($val) { [environment]::setEnvironmentVariable($name,$val,'User') } # set
-	else { [environment]::getEnvironmentVariable($name, 'User') } # get
+function env($name,$val='__get') {
+	if($val -eq '__get') { [environment]::getEnvironmentVariable($name, 'User') }
+	else { [environment]::setEnvironmentVariable($name,$val,'User') }
 }
 function unzip($path,$to,$folder) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
