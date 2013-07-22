@@ -15,6 +15,6 @@
 	"unzip_folder": "go",
 	"add_env_path": "bin",
 	"set_env": {
-		"GOPATH": "$dir"
+		"GOROOT": "$dir"
 	}
 }
