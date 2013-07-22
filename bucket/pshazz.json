@@ -2,5 +2,5 @@
 	"version": "0.2013.07.10",
 	"url": "https://github.com/lukesampson/pshazz/archive/master.zip",
 	"unzip_folder": "pshazz-master",
-	"bin": [ "bin\\pshazz.ps1", "bin\\git-completion.ps1" ]
+	"bin": [ "bin\\pshazz.ps1" ]
 }
