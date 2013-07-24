@@ -1,11 +1,11 @@
-# Usage: scoop cache show|clear [app]
+# Usage: scoop cache show|rm [app]
 # Summary: Show or clear the download cache
 param($cmd, $app)
 
 . "$psscriptroot\..\lib\help.ps1"
 
 switch($cmd) {
-    'clear' {
+    'rm' {
         if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
         rm "$scoopdir\cache\$app#*"
     }
