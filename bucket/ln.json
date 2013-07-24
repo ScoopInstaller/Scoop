@@ -1,0 +1,6 @@
+{
+	"homepage": "https://github.com/lukesampson/psutils",
+	"version": "0.2013.07.24",
+	"url": "https://raw.github.com/lukesampson/psutils/master/ln.ps1",
+	"bin": "ln.ps1"
+}
