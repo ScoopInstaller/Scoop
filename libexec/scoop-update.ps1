@@ -34,6 +34,8 @@ if(!$app) {
 	$null = robocopy $tempdir $currentdir /mir /njh /njs /nfl /ndl
 	rm -r -force $tempdir -ea stop
 
+	$null > "$currentdir\last_updated" # save update timestamp
+
 	ensure_scoop_in_path
 	success 'scoop was updated successfully!'
 } else {

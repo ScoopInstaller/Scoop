@@ -27,6 +27,8 @@ dl $zipurl $zipfile
 unzip $zipfile $dir 'scoop-master'
 rm $zipfile
 
+$null > "$currentdir\last_updated" # save install timestamp
+
 echo 'creating shim...'
 shim "$dir\bin\scoop.ps1"
 

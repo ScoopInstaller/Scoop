@@ -5,6 +5,22 @@
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 
+function timeago($when) {
+    $diff = [datetime]::now - $last_update
+
+    if($diff.totaldays -gt 2) { return "$([int]$diff.totaldays) days ago" }
+    if($diff.totalhours -gt 2) { return "$([int]$diff.totalhours) hours ago" }
+    if($diff.totalminutes -gt 2) { return "$([int]$diff.totalminutes) minutes ago" }
+    return "$([int]$diff.totalseconds) seconds ago"
+}
+
+# check when scoop was last updated
+$timestamp = "$(versiondir 'scoop' 'current')\last_updated"
+if(test-path $timestamp) {
+    $last_update = [io.file]::getlastwritetime((resolve-path $timestamp))
+    "scoop was last updated $(timeago($last_update))"
+}
+
 $failed = @()
 $old = @()
 $removed = @()
