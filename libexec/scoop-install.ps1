@@ -23,7 +23,7 @@ switch($architecture) {
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 $manifest = manifest $app $url
-if(!$manifest) { abort "couldn't find the manifest for $app$(if($url) { " at the URL $url" })" }
+if(!$manifest) { abort "invalid or missing manifest for $app$(if($url) { " at the URL $url" })" }
 
 $version = $manifest.version
 if(!$version) { abort "manifest doesn't specify a version" }

@@ -44,11 +44,12 @@ function architecture {
 }
 
 function arch_specific($prop, $manifest, $architecture) {
-	if($manifest.$prop) { return $manifest.$prop }
-
 	if($manifest.architecture) {
-		$manifest.architecture.$architecture.$prop
+		$val = $manifest.architecture.$architecture.$prop
+		if($val) { return $val } # else fallback to generic prop
 	}
+
+	if($manifest.$prop) { return $manifest.$prop }
 }
 
 function apps_in_bucket($path) {
