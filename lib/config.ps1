@@ -3,10 +3,11 @@ function config_path { return "$scoopdir\config.json" }
 function hashtable_val($obj) {
     if($obj -is [object[]]) {
         return $_.value | % {
-            hashtable_val($_.psobject.baseobject)
+            write-host "   -> el: $_"
+            hashtable_val($_)
         }
     }
-    if($obj -is [pscustomobject]) {
+    if($obj.gettype().name -eq 'pscustomobject') { # -is is unreliable
         return hashtable($obj)
     }
     return $obj # assume primitive
