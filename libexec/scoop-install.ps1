@@ -24,7 +24,7 @@ if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 $manifest = manifest $app $url
 if(!$manifest) {
-    abort "invalid or missing manifest for $app$(if($url) { " at the URL $url" })"
+    abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
 }
 
 $version = $manifest.version

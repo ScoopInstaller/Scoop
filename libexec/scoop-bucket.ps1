@@ -18,14 +18,21 @@ param($cmd, $name, $repo)
 $usage_add = "usage: scoop add <name> <repo>"
 
 function add_bucket($name, $repo) {
+    if(!$repo.endswith('.git')) {
+        abort "bucket must be a Git repo ending with .git"
+    }
 
+    $git = try { gcm 'git' -ea stop } catch { $null }
+    if(!$git) {
+        abort "git is required for buckets. run 'scoop install git'."
+    }
 }
 
 switch($cmd) {
     "add" {
         if(!$name) { "<name> missing"; $usage_add; exit 1 }
         if(!$repo) { "<repo> missing"; $usage_add; exit 1 }
-        add_bucket($name, $repo)
+        add_bucket $name $repo
     }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
