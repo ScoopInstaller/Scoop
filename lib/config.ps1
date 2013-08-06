@@ -1,9 +1,7 @@
 function config_path { return "$scoopdir\config.json" }
 
 function hashtable_val($obj) {
-    $t = $obj.gettype()
-
-    if($t -eq [object[]]) {
+    if($obj -is [object[]]) {
         return $_.value | % {
             hashtable_val($_.psobject.baseobject)
         }
