@@ -40,7 +40,14 @@ foreach($oldver in $old) {
 }
 
 if(@(versions $app).length -eq 0) {
-	rm -r (appdir $app) -ea stop -force
+    $appdir = appdir $app
+    try {
+        # if last install failed, the directory seems to be locked and this
+        # will throw an error about the directory not existing
+        rm -r $appdir -ea stop -force
+    } catch {
+        if((test-path $appdir)) { throw } # only throw if the dir still exists
+    }
 }
 
 success "$app was uninstalled"

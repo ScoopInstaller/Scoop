@@ -33,7 +33,7 @@ function print_summaries {
 $commands = commands
 
 if(!($cmd)) {
-	"usage: scoop <command> [<args]
+	"usage: scoop <command> [<args>]
 
 Some useful commands are:"
 	print_summaries
