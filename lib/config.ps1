@@ -1,9 +1,8 @@
-function config_path { return "$scoopdir\config.json" }
+function config_path { "$scoopdir\config.json" }
 
 function hashtable_val($obj) {
     if($obj -is [object[]]) {
         return $_.value | % {
-            write-host "   -> el: $_"
             hashtable_val($_)
         }
     }
@@ -23,15 +22,13 @@ function hashtable($obj) {
 
 function config {
     $path = config_path
-    if(!(test-path $path)) { "{ }" > $path } 
+    if(!(test-path $path)) { return @{ } } 
 
-    $json = convertfrom-json $path -ea stop
-
+    $json = gc $path -raw | convertfrom-json -ea stop
+    hashtable($json)
 }
 
-function config_add_list($name, $value) {
-    $config = config
-    if($config.$name) {
-
-    }
+function save_config($config) {
+    $path = config_path
+    $config | convertto-json -depth 10 > $path
 }
