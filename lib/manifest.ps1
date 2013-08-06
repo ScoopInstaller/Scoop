@@ -6,7 +6,14 @@ function parse_json($path) {
 }
 
 function url_manifest($url) {
-	$str = (new-object net.webclient).downloadstring($url)
+	$str = $null
+	try {
+		$str = (new-object net.webclient).downloadstring($url)
+	} catch [system.management.automation.methodinvocationexception] {
+		warn "error: $($_.exception.innerexception.message)"
+	} catch {
+		throw
+	}
 	if(!$str) { return $null }
 	$str | convertfrom-json
 }
