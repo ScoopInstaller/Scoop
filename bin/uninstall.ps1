@@ -10,7 +10,7 @@ if($yn -notlike 'y*') { exit }
 # run uninstallers if necessary
 installed_apps | % {
     $app = $_
-    $version = latest_version $app
+    $version = current_version $app
     $dir = versiondir $app $version
     $manifest = installed_manifest $app $version
     $install = install_info $app $version

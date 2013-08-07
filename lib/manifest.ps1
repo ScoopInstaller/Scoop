@@ -1,4 +1,6 @@
-function manifest_path($app) { (relpath "..\bucket\$app.json") }
+function manifest_path($app, $bucket) {
+	"$(bucketdir $bucket)\$app.json"
+}
 
 function parse_json($path) {
 	if(!(test-path $path)) { return $null }
@@ -57,10 +59,6 @@ function arch_specific($prop, $manifest, $architecture) {
 	}
 
 	if($manifest.$prop) { return $manifest.$prop }
-}
-
-function apps_in_bucket($path) {
-	gci $path | ? { $_.name.endswith('.json') } | % { $_ -replace '.json$', '' }
 }
 
 function url($manifest, $arch) { arch_specific 'url' $manifest $arch }

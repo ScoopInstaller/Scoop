@@ -64,11 +64,7 @@ function rm_bucket($name) {
 }
 
 function list_buckets {
-    $buckets = @()
-    if(test-path $bucketsdir) {
-        gci $bucketsdir | % { $buckets += $_.name }
-    }
-    $buckets
+    buckets
 }
 
 switch($cmd) {
