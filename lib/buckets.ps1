@@ -4,6 +4,13 @@ function bucketdir($name) {
     "$bucketsdir\$name"
 }
 
+function known_bucket_repo($name) {
+    $dir = versiondir 'scoop' 'current'
+    $json = "$dir\buckets.json"
+    $buckets = gc $json -raw | convertfrom-json -ea stop
+    $buckets.$name
+}
+
 <#
 # convert an object to a hashtable
 function hashtable($obj) {

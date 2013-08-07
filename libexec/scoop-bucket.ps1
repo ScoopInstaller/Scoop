@@ -25,7 +25,10 @@ $usage_rm = "usage: scoop bucket rm <name>"
 
 function add_bucket($name, $repo) {
     if(!$name) { "<name> missing"; $usage_add; exit 1 }
-    if(!$repo) { "<repo> missing"; $usage_add; exit 1 }
+    if(!$repo) {
+        $repo = known_bucket_repo $name
+        if(!$repo) { "unknown bucket '$name': try specifying <repo>"; $usage_add; exit 1 }
+    }
 
     $git = try { gcm 'git' -ea stop } catch { $null }
     if(!$git) {
