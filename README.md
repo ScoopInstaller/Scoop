@@ -27,6 +27,8 @@ Scoop vs [Chocolatey](http://chocolatey.org)
 
 Pros:
 
+* **Installs to ~/appdata/local.**
+* **No UAC popups, doesn't require admin privileges*.** *Usually. InnoSetup installers are the exception when no other install method is available.
 * **Doesn't pollute your path.** Scoop adds just one directory to your path, no matter how many apps you install with it. Since symlinks are broken on Windows, this is done by creating shim programs in your Scoop bin directory.
 * **Doesn't use NuGet.** NuGet helps manage library dependencies for software. Scoop doesn't try to stretch NuGet into doing something it isn't designed to do.
 * **Packages are easier to make.** Scoop packages can be written in JSON in any text editor—nothing else needed. Check out a [simple example](https://github.com/lukesampson/scoop/blob/master/bucket/runat.json), and [something slightly more complex](https://github.com/lukesampson/scoop/blob/master/bucket/git.json). Chocolatey packages, on the other hand, require NuGet and .nuspecs—and then you have to write a PS script anyway to do the install. It downloads the 
