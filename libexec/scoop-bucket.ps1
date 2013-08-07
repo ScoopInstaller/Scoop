@@ -21,7 +21,7 @@ param($cmd, $name, $repo)
 . "$psscriptroot\..\lib\help.ps1"
 
 $usage_add = "usage: scoop bucket add <name> [<repo>]"
-$usage_add = "usage: scoop bucket rm <name>"
+$usage_rm = "usage: scoop bucket rm <name>"
 
 function add_bucket($name, $repo) {
     if(!$name) { "<name> missing"; $usage_add; exit 1 }
