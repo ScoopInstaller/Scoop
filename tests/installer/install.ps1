@@ -21,6 +21,7 @@ if(!$app) {
 
 . "$psscriptroot\..\..\lib\core.ps1"
 . (relpath ..\..\lib\manifest.ps1)
+. (relpath ..\..\lib\buckets.ps1)
 . (relpath ..\..\lib\versions.ps1)
 . (relpath ..\..\lib\install.ps1)
 
@@ -40,7 +41,7 @@ if($fname -match '\.msi$') {
 	$exe = 'msiexec'
 	$file = resolve-path "$dir\$fname"
 	$log = "$dir\$($app)_log.txt"
-	$arg = @("/i `"$file`"", "/qb-!", "/norestart", "ALLUSERS=2", "MSIINSTALLPERUSER=2", "INSTALLDIR=`"$dir\install_$app`"", "/lvp `"$log`"")
+	$arg = @("/i `"$file`"", "/qb-!", "/norestart", "ALLUSERS=2", "MSIINSTALLPERUSER=1", "INSTALLDIR=`"$dir\install_$app`"", "/lvp `"$log`"")
 	if($help) { $arg = '/?' }
 	$installed = run $exe $arg "testing $fname..."
 	"installed: $installed"
