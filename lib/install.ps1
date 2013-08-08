@@ -27,12 +27,16 @@ function dl_progress($url, $to) {
             try { get-event complete -ea stop; $true } catch { $false }
         }
 
+        $last_p = -1
         while(!(is_complete)) {
             $e = wait-event progress
             remove-event progress
             $p = $e.sourceeventargs.progresspercentage
-            [console]::cursorleft = $left
-            write-host "$p%" -nonewline
+            if($p -ne $last_p) {
+            	[console]::cursorleft = $left
+            	write-host "$p%" -nonewline
+            	$last_p = $p
+            }
         }
         remove-event complete
     } finally {
