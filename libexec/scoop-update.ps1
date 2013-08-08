@@ -54,7 +54,11 @@ if(!$app) {
 
 	$version = latest_version $app $bucket $url
 
-	if($old_version -eq $version) { abort "$app $version is already installed. run 'scoop update' to check for new versions." }
+	if($old_version -eq $version) {
+		"the latest version of $app ($version) is already installed."
+		"run 'scoop update' to check for new versions."
+		exit 1
+	}
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
 
 	$dir = versiondir $app $old_version	
