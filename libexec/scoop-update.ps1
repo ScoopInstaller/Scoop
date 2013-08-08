@@ -40,9 +40,13 @@ if(!$app) {
 
 	@(buckets) | % {
 		"updating $_ bucket..."
-		pushd (bucketdir $_)
-		git pull
-		popd
+		$git = try { gcm git -ea stop } catch { $null }
+		if(!$git) { warn "git is required for buckets. run 'scoop install git'." }
+		else {
+			pushd (bucketdir $_)
+			git pull
+			popd
+		}
 	}
 	success 'scoop was updated successfully!'
 } else {
