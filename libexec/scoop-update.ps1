@@ -36,8 +36,14 @@ if(!$app) {
 	rm -r -force $tempdir -ea stop
 
 	$null > "$currentdir\last_updated" # save update timestamp
-
 	ensure_scoop_in_path
+
+	@(buckets) | % {
+		"updating $_ bucket..."
+		pushd (bucketdir $_)
+		git pull
+		popd
+	}
 	success 'scoop was updated successfully!'
 } else {
 	# update app
