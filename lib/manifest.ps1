@@ -20,14 +20,14 @@ function url_manifest($url) {
 	$str | convertfrom-json
 }
 
-function manifest($app, $url) {
-	if($url) { url_manifest $url }
-	else { parse_json (manifest_path $app) }
+function manifest($app, $bucket, $url) {
+	if($url) { return url_manifest $url }
+	parse_json (manifest_path $app $bucket)
 }
 
-function save_installed_manifest($app, $dir, $url) {
+function save_installed_manifest($app, $bucket, $dir, $url) {
 	if($url) { (new-object net.webclient).downloadstring($url) > "$dir\manifest.json" }
-	else { cp (manifest_path $app) "$dir\manifest.json" }
+	else { cp (manifest_path $app $bucket) "$dir\manifest.json" }
 }
 
 function installed_manifest($app, $version) {

@@ -1,6 +1,6 @@
 # versions
-function latest_version($app, $url) {
-	(manifest $app $url).version
+function latest_version($app, $bucket, $url) {
+	(manifest $app $bucket $url).version
 }
 function current_version($app) {
 	@(versions $app)[-1]

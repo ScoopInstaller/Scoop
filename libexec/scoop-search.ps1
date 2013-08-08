@@ -13,17 +13,19 @@ param($query)
 function search_bucket($bucket) {
     $apps = apps_in_bucket (bucketdir $bucket)
     if($query) { $apps = $apps | ? { $_ -like "*$query*" } }
-    $apps | % { "  $_ ($(latest_version $_))"}
+    $apps | % { "  $_ ($(latest_version $_ $bucket))"}
 }
 
-"main bucket:"
-search_bucket($null)
-""
-
-@(buckets) | % { 
-    "'$_' bucket:"
-    search_bucket $_
-    ""
+@($null) + @(buckets) | % { # $null is main bucket
+    $res = search_bucket($_)
+    if($res) {
+        $name = "$_"
+        if(!$_) { $name = "main" }
+        
+        "$name bucket:"
+        $res
+        ""
+    }
 }
 
 exit 0

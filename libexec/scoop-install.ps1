@@ -8,11 +8,12 @@
 param($app, $url, $architecture)
 
 . "$psscriptroot\..\lib\core.ps1"
-. (relpath ..\lib\manifest.ps1)
-. (relpath ..\lib\decompress.ps1)
-. (relpath ..\lib\install.ps1)
-. (relpath ..\lib\versions.ps1)
-. (relpath ..\lib\help.ps1)
+. "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\buckets.ps1"
+. "$psscriptroot\..\lib\decompress.ps1"
+. "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\versions.ps1"
+. "$psscriptroot\..\lib\help.ps1"
 
 switch($architecture) {
 	'' { $architecture = architecture }
@@ -22,7 +23,11 @@ switch($architecture) {
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
-$manifest = manifest $app $url
+$manifest, $bucket = $null, $null
+
+if($url) { $manifest = url_manifest $url }
+else { $manifest, $bucket = find_manifest $app }
+
 if(!$manifest) {
     abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
 }
@@ -61,8 +66,8 @@ set_env $manifest $dir
 post_install $manifest
 
 # save info for uninstall
-save_installed_manifest $app $dir $url
-save_install_info @{ 'architecture' = $architecture; 'url' = $url } $dir
+save_installed_manifest $app $bucket $dir $url
+save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
 success "$app $version was installed successfully!"
 

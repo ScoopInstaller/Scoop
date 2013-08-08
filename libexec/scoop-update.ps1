@@ -5,10 +5,11 @@
 param($app)
 
 . "$psscriptroot\..\lib\core.ps1"
-. (relpath ..\lib\install.ps1)
-. (relpath ..\lib\decompress.ps1)
-. (relpath ..\lib\manifest.ps1)
-. (relpath ..\lib\versions.ps1)
+. "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\decompress.ps1"
+. "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\buckets.ps1"
+. "$psscriptroot\..\lib\versions.ps1"
 
 if(!$app) { 
 	# update scoop
@@ -46,11 +47,12 @@ if(!$app) {
 	$manifest = installed_manifest $app $old_version
 	$install = install_info $app $old_version
 
-	# re-use architecture and url from first install
+	# re-use architecture, bucket and url from first install
 	$architecture = $install.architecture
+	$bucket = $install.bucket
 	$url = $install.url
 
-	$version = latest_version $app $url
+	$version = latest_version $app $bucket $url
 
 	if($old_version -eq $version) { abort "$app $version is already installed. run 'scoop update' to check for new versions." }
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
@@ -63,11 +65,12 @@ if(!$app) {
 	# note: keep the old dir in case in contains user files
 
 	$dir = ensure (versiondir $app $version)
-	$manifest = manifest $app $url
 
+	$manifest = manifest $app $bucket $url
+		
 	# save info for uninstall
-	save_installed_manifest $app $dir
-	save_install_info @{ 'architecture' = $architecture; 'url' = $url } $dir
+	save_installed_manifest $app $bucket $dir $url
+	save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
 	$fname = dl_urls $app $version $manifest $architecture $dir
 	run_installer $fname $manifest $architecture $dir

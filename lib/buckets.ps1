@@ -2,7 +2,7 @@ $bucketsdir = "$scoopdir\buckets"
 
 function bucketdir($name) {
     if(!$name) { return relpath "..\bucket" } # main bucket
-    
+
     "$bucketsdir\$name"
 }
 
@@ -23,6 +23,13 @@ function buckets {
         gci $bucketsdir | % { $buckets += $_.name }
     }
     $buckets
+}
+
+function find_manifest($app) {
+    @($null) + @(buckets) | % { # null for main bucket
+        $manifest = manifest $app $_
+        if($manifest) { return $manifest, $_ }
+    }
 }
 
 <#

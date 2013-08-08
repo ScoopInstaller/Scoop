@@ -3,6 +3,7 @@
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 
 function timeago($when) {
@@ -36,7 +37,7 @@ gci "$scoopdir\apps" | ? name -ne 'scoop' | % {
         $failed += @{ $app = $version }; return 
     }
 
-    $manifest = manifest $app $install_info.url
+    $manifest = manifest $app $install_info.bucket $install_info.url    
     if(!$manifest) { $removed += @{ $app = $version }; return }
 
     if((compare_versions $manifest.version $version) -gt 0) {
