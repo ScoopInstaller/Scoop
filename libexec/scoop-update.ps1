@@ -44,7 +44,7 @@ if(!$app) {
 		if(!$git) { warn "git is required for buckets. run 'scoop install git'." }
 		else {
 			pushd (bucketdir $_)
-			git pull
+			git pull -q
 			popd
 		}
 	}
