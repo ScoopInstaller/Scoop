@@ -265,7 +265,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
 function create_shims($manifest, $dir) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
-		echo "creating shim for $_ in ~\appdata\local\bin"
+		echo "creating shim for $_"
 
 		# check valid bin
 		$bin = "$dir\$_"
