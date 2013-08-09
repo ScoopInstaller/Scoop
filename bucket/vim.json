@@ -12,7 +12,7 @@
 		"md5:e16ec5b633d2f00bf511529e6abf3670",
 		"sha256:f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498"
 	],
-	"extract_subdir": "vim\\vim73",
+	"extract_dir": "vim\\vim73",
 	"bin": [ "vim.exe", "vimtutor.ps1" ],
 	"post_install": "if(!(test-path ~\\.vimrc)) {
 		cp \"$(split-path(scoop which vim))\\vimrc_example.vim\" ~\\.vimrc

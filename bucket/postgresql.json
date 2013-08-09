@@ -12,7 +12,7 @@
 			"hash": "sha256:26bd5d1555a3c010b0c58a4aaf5e1acd16bcf819926984f0716496d326768502"
 		}
 	},
-	"extract_subdir": "pgsql",
+	"extract_dir": "pgsql",
 	"bin": [
 		"bin\\clusterdb.exe",
 		"bin\\createdb.exe",

@@ -2,6 +2,6 @@
 	"homepage": "https://github.com/lukesampson/concfg",
 	"version": "0.2013.07.01",
 	"url": "https://github.com/lukesampson/concfg/archive/master.zip",
-	"extract_subdir": "concfg-master",
+	"extract_dir": "concfg-master",
 	"bin": "bin\\concfg.ps1"
 }

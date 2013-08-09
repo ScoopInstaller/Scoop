@@ -1,6 +1,6 @@
 {
 	"version": "0.2013.07.10",
 	"url": "https://github.com/lukesampson/pshazz/archive/master.zip",
-	"extract_subdir": "pshazz-master",
+	"extract_dir": "pshazz-master",
 	"bin": [ "bin\\pshazz.ps1" ]
 }

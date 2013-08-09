@@ -69,7 +69,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			write-host "extracting..." -nonewline
 			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
 			$null = mkdir "$dir\_scoop_unzip"
-			unzip "$dir\$fname" "$dir\_scoop_unzip" $manifest.extract_subdir
+			unzip "$dir\$fname" "$dir\_scoop_unzip" (extract_dir $manifest $architecture)
 			cp "$dir\_scoop_unzip\*" "$dir" -recurse -force
 			rm -r -force "$dir\_scoop_unzip"
 			rm "$dir\$fname"
@@ -79,7 +79,16 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 				warn "aborting: you'll need to run 'scoop uninstall $app' to clean up"
 				abort "7-zip is required. you can install it with 'scoop install 7zip'"
 			}
-			extract_7zip "$dir\$fname" $manifest.extract_subdir
+			$to = $dir
+			$extract_dir = extract_dir $manifest $architecture
+			if($extract_dir) {
+				$to = "$dir\_scoop_extract"
+			}
+			extract_7zip "$dir\$fname" $to
+			if($extract_dir) {
+				gci "$to\$extract_dir" -r | mv -dest "$dir" -force
+				rm -r -force "$to"
+			}			
 		}
 	}
 
@@ -342,7 +351,7 @@ function rm_env($manifest) {
 		$manifest.set_env | gm -member noteproperty | % {
 			$name = $_.name;
 			env $name $null
-			rm env:\$name
+			if(test-path env:\$name) { rm env:\$name }
 		}
 	}
 }

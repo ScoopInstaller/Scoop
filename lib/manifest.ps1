@@ -66,3 +66,4 @@ function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch
 function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
 function msi($manifest, $arch) { arch_specific 'msi' $manifest $arch }
 function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
+function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch}
