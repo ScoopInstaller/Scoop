@@ -37,6 +37,7 @@ Pros:
 
 Cons:
 * **Not as many apps.** Scoop has [nowhere near the number of apps](https://github.com/lukesampson/scoop/tree/master/bucket) that [Chocolatey has](http://chocolatey.org/packages).
+* **Can't target a specific version of an app.**
 
 
 Inspiration
