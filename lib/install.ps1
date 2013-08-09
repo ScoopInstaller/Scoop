@@ -70,7 +70,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
 			$null = mkdir "$dir\_scoop_unzip"
 			unzip "$dir\$fname" "$dir\_scoop_unzip" (extract_dir $manifest $architecture)
-			gci "$dir\_scoop_unzip" -r | mv -dest "$dir" -force
+			cp "$dir\_scoop_unzip\*" "$dir" -r -force
 			rm -r -force "$dir\_scoop_unzip"
 			rm "$dir\$fname"
 			write-host "done"
