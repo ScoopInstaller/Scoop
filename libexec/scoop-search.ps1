@@ -12,7 +12,7 @@ param($query)
 
 function search_bucket($bucket) {
     $apps = apps_in_bucket (bucketdir $bucket)
-    if($query) { $apps = $apps | ? { $_ -like "*$query*" } }
+    if($query) { $apps = $apps | ? { $_ -match $query } }
     $apps | % { "  $_ ($(latest_version $_ $bucket))"}
 }
 
