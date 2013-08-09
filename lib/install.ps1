@@ -69,7 +69,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			write-host "extracting..." -nonewline
 			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
 			$null = mkdir "$dir\_scoop_unzip"
-			unzip "$dir\$fname" "$dir\_scoop_unzip" $manifest.unzip_folder
+			unzip "$dir\$fname" "$dir\_scoop_unzip" $manifest.extract_subdir
 			cp "$dir\_scoop_unzip\*" "$dir" -recurse -force
 			rm -r -force "$dir\_scoop_unzip"
 			rm "$dir\$fname"
@@ -79,7 +79,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 				warn "aborting: you'll need to run 'scoop uninstall $app' to clean up"
 				abort "7-zip is required. you can install it with 'scoop install 7zip'"
 			}
-			extract_7zip "$dir\$fname"
+			extract_7zip "$dir\$fname" $manifest.extract_subdir
 		}
 	}
 

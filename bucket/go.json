@@ -12,7 +12,7 @@
 			"hash": "sha1:dee46d45e27193c14e07e695aa4c13d7fdc9de9b"
 		}
 	},
-	"unzip_folder": "go",
+	"extract_subdir": "go",
 	"add_env_path": "bin",
 	"set_env": {
 		"GOROOT": "$dir"

@@ -2,6 +2,6 @@
 	"version": "0.2013.07.19",
 	"homepage": "https://github.com/lukesampson/cowsay-psh",
 	"url": "https://github.com/lukesampson/cowsay-psh/archive/master.zip",
-	"unzip_folder": "cowsay-psh-master",
+	"extract_subdir": "cowsay-psh-master",
 	"bin": ["cowsay.ps1","cowthink.ps1"]
 }
