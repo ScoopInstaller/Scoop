@@ -19,5 +19,5 @@ function extract_7zip($path, $to, $recurse) {
     }
 
     rm $path
-    write-host "done"
+    if(!$recurse) { write-host "done" }
 }

@@ -69,7 +69,7 @@ post_install $manifest
 save_installed_manifest $app $bucket $dir $url
 save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
-success "$app $version was installed successfully!"
+success "$app ($version) was installed successfully!"
 
 show_notes $manifest
 
