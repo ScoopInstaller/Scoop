@@ -3,7 +3,7 @@
 	"license": "GPL2",
 	"version": "1.8.3",
 	"url": "https://msysgit.googlecode.com/files/PortableGit-1.8.3-preview20130601.7z",
-	"hash": "sha256:d890f1c9e27b2027feca816d93978f22b49b6a167f928809f5982354c5a50b67",
+	"hash": "d890f1c9e27b2027feca816d93978f22b49b6a167f928809f5982354c5a50b67",
 	"bin": [ "cmd\\git.exe", "cmd\\gitk.cmd" ],
 	"post_install": [
 		"git config --global credential.helper wincred"

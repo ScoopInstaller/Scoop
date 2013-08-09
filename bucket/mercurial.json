@@ -5,11 +5,11 @@
 	"architecture": {
 		"64bit": {
 			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.6.2-x64.exe",
-			"hash": "sha256:d61b7ce3193507aee3214bbd890bdd9cda9d6bc45f134d2563a038f81e2a2331"
+			"hash": "d61b7ce3193507aee3214bbd890bdd9cda9d6bc45f134d2563a038f81e2a2331"
 		},
 		"32bit": {
 			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.6.2.exe",
-			"hash": "sha256:4ea3d91831521e720517c48fd80bcbbeb54a514186118cb2f6b9e023893443b6"
+			"hash": "4ea3d91831521e720517c48fd80bcbbeb54a514186118cb2f6b9e023893443b6"
 		}
 	},
 	"installer": { "args": [ "/verysilent", "/dir=\"$dir\"", "/noicons" ] },

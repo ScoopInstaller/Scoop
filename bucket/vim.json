@@ -10,7 +10,7 @@
 	"hash": [
 		"md5:29142b7d4ff0b65c394c4a1ef1263ded",
 		"md5:e16ec5b633d2f00bf511529e6abf3670",
-		"sha256:f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498"
+		"f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498"
 	],
 	"extract_dir": "vim\\vim73",
 	"bin": [ "vim.exe", "vimtutor.ps1" ],

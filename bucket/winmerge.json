@@ -2,7 +2,7 @@
 	"version": "2.14.0",
 	"license": "GPL2",
 	"url": "http://downloads.sourceforge.net/project/winmerge/stable/2.14.0/WinMerge-2.14.0-exe.zip",
-	"hash": "sha256:9c77580ff9594536ce84dbbf0095e4b8654892a713989c378b9349c833c0f177",
+	"hash": "9c77580ff9594536ce84dbbf0095e4b8654892a713989c378b9349c833c0f177",
 	"extract_dir": "WinMerge-2.14.0-exe",
 	"bin": "WinMergeU.exe"
 }

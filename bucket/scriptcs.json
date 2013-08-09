@@ -4,6 +4,6 @@
 	"license": "Apache 2.0",
 	"url": "https://www.myget.org/F/scriptcsnightly/api/v2/package/scriptcs/0.6.0-alpha-130707?fn=/dl.zip",
 	"extract_dir": "tools\\scriptcs",
-	"hash": "sha256:d0521827f09813cb3e22402e32a0089cf0b425981f3182568c47811717682750",
+	"hash": "d0521827f09813cb3e22402e32a0089cf0b425981f3182568c47811717682750",
 	"bin": "scriptcs.exe"
 }

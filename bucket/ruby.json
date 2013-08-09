@@ -4,12 +4,12 @@
 	"architecture": {
 		"64bit": {
 			"url": "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p247-x64-mingw32.7z?direct#/dl.7z",
-			"hash": "sha256:2c3399a96c9c2f3fe6bce1ad6e569e7534fd36318b6ca0077026e3c077172afe",
+			"hash": "2c3399a96c9c2f3fe6bce1ad6e569e7534fd36318b6ca0077026e3c077172afe",
 			"extract_dir": "ruby-2.0.0-p247-x64-mingw32"
 		},
 		"32bit": {
 			"url": "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p247-i386-mingw32.7z?direct#/dl.7z",
-			"hash": "sha256:ac4c80b23623449f31aaa908818d48c504f4c364c2a2e127a9ae8d2fae5f99e4",
+			"hash": "ac4c80b23623449f31aaa908818d48c504f4c364c2a2e127a9ae8d2fae5f99e4",
 			"extract_dir": "ruby-2.0.0-p247-i386-mingw32"
 		}
 	},

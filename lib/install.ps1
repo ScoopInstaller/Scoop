@@ -124,6 +124,10 @@ function check_hash($file, $url, $manifest, $arch) {
 
 	write-host "checking hash..." -nonewline
 	$type, $expected = $hash.split(':')
+	if(!$expected) {
+		# no type specified, assume sha256
+		$type, $expected = 'sha256', $type
+	}
 
 	if(@('md5','sha1','sha256') -notcontains $type) { "hash type $type isn't supported"	}
 	

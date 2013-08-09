@@ -2,7 +2,7 @@
 	"version": "1.2.4",
 	"license": "MIT",
 	"url": "http://files.vagrantup.com/packages/0219bb87725aac28a97c0e924c310cc97831fd9d/Vagrant_1.2.4.msi",
-	"hash": "sha256:f160bb5474083aa49f17a74d80448c1850f0139c40551565b75a3b6a74b22d2d",
+	"hash": "f160bb5474083aa49f17a74d80448c1850f0139c40551565b75a3b6a74b22d2d",
 	"msi": {
 		"silent": true,
 		"code": "{BBD54C5B-F7BB-4127-A707-A13A667E3102}",
