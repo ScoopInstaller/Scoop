@@ -15,7 +15,7 @@ if(!(installed $app)) { abort "$app isn't installed" }
 
 $versions = @(versions $app)
 $version = $versions[-1]
-"uninstalling $app $version"
+"uninstalling $app ($version)"
 
 $dir = versiondir $app $version
 $manifest = installed_manifest $app $version
