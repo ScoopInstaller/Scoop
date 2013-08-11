@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Scoop — Command-line installer</title>
+    <title>Scoop by lukesampson</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -58,13 +58,24 @@
 
 <p>Make sure <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595">Powershell 3</a> is installed, then run:</p>
 
-<pre><code>set-executionpolicy unrestricted -s cu
-iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+<pre><code>iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 </code></pre>
+
+<p><strong>Note:</strong> if you get an error you might need to change the execution policy (i.e. enable Powershell) with <code>set-executionpolicy unrestricted -s cu</code></p>
       </section>
 
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-42894266-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
   </body>
 </html>
