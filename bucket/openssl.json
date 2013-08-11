@@ -1,0 +1,18 @@
+{
+	"homepage": "http://www.blogcompiler.com/2011/12/21/openssl-for-windows/",
+	"version": "1.0.1e",
+	"license": "https://www.openssl.org/source/license.html",
+	"architecture": {
+		"64bit": {
+			"url": "http://www.blogcompiler.com/wp-content/uploads/2011/12/openssl-1.0.0e-mingw64.tar.gz",
+			"hash": "ed71fa9c3285934c516e0a3cea2dccce7cbf2d8e20dadafec3bf11e36fc5e205",
+			"extract_dir": "mingw64"
+		},
+		"32bit": {
+			"url": "http://www.blogcompiler.com/wp-content/uploads/2011/12/openssl-1.0.0e-mingw32.tar.gz",
+			"hash": "96e0028261af7e329027e941ad8a0d0e164024cf37d5cf70ace1152ce49bcc71",
+			"extract_dir": "mingw32"
+		}
+	},
+	"bin": "bin\\openssl.exe"
+}
