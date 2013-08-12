@@ -12,20 +12,26 @@ param($query)
 
 function bin_match($manifest, $query) {
     if(!$manifest.bin) { return $false }
-    @($manifest.bin) | % {
-        $fname = strip_ext (split-path $_ -leaf)
-        if($fname -match $query) { return $true }
+    foreach($bin in $manifest.bin) {
+        $fname = split-path $bin -leaf
+        if((strip_ext $fname) -match $query) { return $fname }
     }
     $false
 }
 
 function search_bucket($bucket, $query) {
-    $apps = apps_in_bucket (bucketdir $bucket)
-    if($query) { $apps = $apps | ? {
-        ($_ -match $query) -or (bin_match (manifest $_) $query)
+    $apps = apps_in_bucket (bucketdir $bucket) | % {
+        @{ name = $_ }
+    }
 
+    if($query) { $apps = $apps | ? {
+        if($_.name -match $query) { return $true }
+        $bin = bin_match (manifest $_.name) $query
+        if($bin) {
+            $_.bin = $bin; return $true;
+        }
     } }
-    $apps | % { "  $_ ($(latest_version $_ $bucket))"}
+    $apps | % { $_.version = (latest_version $_.name $bucket); $_ }
 }
 
 @($null) + @(buckets) | % { # $null is main bucket
@@ -35,7 +41,11 @@ function search_bucket($bucket, $query) {
         if(!$_) { $name = "main" }
         
         "$name bucket:"
-        $res
+        $res | % {
+            $item = "  $($_.name) ($($_.version))"
+            if($_.bin) { $item += " --> includes '$($_.bin)'" }
+            $item
+        }
         ""
     }
 }
