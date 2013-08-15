@@ -48,8 +48,8 @@ if(installed $app) {
 
 # check 7zip installed if required
 if(!(7zip_installed)) {
-	foreach($url in @($manifest.url)) {
-		if(requires_7zip $url) {
+	foreach($dlurl in @($manifest.url)) {
+		if(requires_7zip $dlurl) {
 			abort "7zip is required to install this app. please run 'scoop install 7zip'"
 		}
 	}
