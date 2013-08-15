@@ -22,10 +22,12 @@ installed_apps | % {
     rm_env $manifest
 }
 
+$appsdir = "$scoopdir\apps"
+
 # try deleting app directories one-by-one except for scoop, in case uninstall fails
 # and we need to run `scoop uninstall scoop` again
 $errors = $false
-gci $appdir | ? name -ne 'scoop' | % {
+gci $appsdir -directory | ? name -ne 'scoop' | % {
     $dir = $_
     try {
         rm -r -force $dir -ea stop
