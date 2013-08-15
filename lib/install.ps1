@@ -184,7 +184,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 	if($msi) { 
 		install_msi $fname $dir $msi
 	} elseif($installer) {
-		install_exe $fname $dir $installer
+		install_prog $fname $dir $installer
 	}
 }
 
@@ -212,17 +212,22 @@ function install_msi($fname, $dir, $msi) {
 	rm $msifile
 }
 
-function install_exe($fname, $dir, $installer) {
-	$exe = "$dir\$(coalesce $installer.exe "$fname")"
-	if(!(is_in_dir $dir $exe)) {
-		abort "error in manifest: installer $exe is outside the app directory"
+function install_prog($fname, $dir, $installer) {
+	$prog = "$dir\$(coalesce $installer.file "$fname")"
+	if(!(is_in_dir $dir $prog)) {
+		abort "error in manifest: installer $prog is outside the app directory"
 	}
 	$arg = args $installer.args $dir
-	$installed = run $exe $arg "running installer..."
-	if(!$installed) {
-		abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
+
+	if($prog.endswith('.ps1')) {
+		& $prog @arg
+	} else {
+		$installed = run $prog $arg "running installer..."
+		if(!$installed) {
+			abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
+		}
+		rm $prog
 	}
-	rm $exe
 }
 
 function run_uninstaller($manifest, $architecture, $dir) {
@@ -245,7 +250,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
 			$continue_exit_codes.1605 = 'not installed, skipping'
 			$continue_exit_codes.3010 = 'restart required'
 		} elseif($uninstaller) {
-			$exe = "$dir\$($uninstaller.exe)"
+			$exe = "$dir\$($uninstaller.file)"
 			$arg = args $uninstaller.args
 			if(!(is_in_dir $dir $exe)) {
 				warn "error in manifest: installer $exe is outside the app directory, skipping"

@@ -13,6 +13,6 @@
 		}
 	},
 	"installer": { "args": [ "/verysilent", "/dir=\"$dir\"", "/noicons" ] },
-	"uninstaller": { "exe": "unins000.exe", "args": ["/verysilent"] },
+	"uninstaller": { "file": "unins000.exe", "args": ["/verysilent"] },
 	"bin": "hg.exe"
 }

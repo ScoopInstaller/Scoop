@@ -3,13 +3,5 @@
 	"url": "https://github.com/lukesampson/pshazz/archive/master.zip",
 	"extract_dir": "pshazz-master",
 	"bin": [ "bin\\pshazz.ps1" ],
-	"post_install": 
-		"if(!(test-path $profile)) { '' > $profile }
-		if((gc $profile | sls pshazz) -eq $null) {
-			write-host 'adding pshazz to your powershell profile'
-			(gc $profile -raw) + \"`r`ntry { `$null = gcm pshazz -ea stop; pshazz init 'default' } catch { }`r`n\" > $profile
-		} else {
-			write-host 'it looks like pshazz is already in your powershell profile, skipping'
-		}
-		pshazz init 'default'"
+	"installer": { "file": "bin\\install.ps1" }
 }
