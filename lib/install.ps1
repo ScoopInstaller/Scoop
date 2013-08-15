@@ -19,35 +19,35 @@ function dl_progress($url, $to) {
 
 	$wc = new-object net.webclient
 	register-objectevent $wc downloadprogresschanged progress | out-null
-    register-objectevent $wc downloadfilecompleted complete | out-null
-    try {
-        $wc.downloadfileasync($url, $to)
+	register-objectevent $wc downloadfilecompleted complete | out-null
+	try {
+		$wc.downloadfileasync($url, $to)
 
-        function is_complete {
-            try { get-event complete -ea stop; $true } catch { $false }
-        }
+		function is_complete {
+			try { get-event complete -ea stop; $true } catch { $false }
+		}
 
-        $last_p = -1
-        while(!(is_complete)) {
-            $e = wait-event progress
-            remove-event progress
-            $p = $e.sourceeventargs.progresspercentage
-            if($p -ne $last_p) {
-            	[console]::cursorleft = $left
-            	write-host "$p%" -nonewline
-            	$last_p = $p
-            }
-        }
-        remove-event complete
-    } finally {
-        remove-event *
-        unregister-event progress
-        unregister-event complete
-        
-        $wc.cancelasync()
-        $wc.dispose()
-    }
-    [console]::cursorleft = $left
+		$last_p = -1
+		while(!(is_complete)) {
+			$e = wait-event progress
+			remove-event progress
+			$p = $e.sourceeventargs.progresspercentage
+			if($p -ne $last_p) {
+				[console]::cursorleft = $left
+				write-host "$p%" -nonewline
+				$last_p = $p
+			}
+		}
+		remove-event complete
+	} finally {
+		remove-event *
+		unregister-event progress
+		unregister-event complete
+		
+		$wc.cancelasync()
+		$wc.dispose()
+	}
+	[console]::cursorleft = $left
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir) {

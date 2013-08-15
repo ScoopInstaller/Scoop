@@ -11,12 +11,12 @@ param($query)
 $apps = installed_apps
 
 if($apps) {
-    echo "Installed apps$(if($query) { `" matching '$query'`"}):
+	echo "Installed apps$(if($query) { `" matching '$query'`"}):
 "
-    $apps | ? { !$query -or ($_ -match $query) } | % {
-        "  $_ ($(current_version $_))"
-    }
-    ""
+	$apps | ? { !$query -or ($_ -match $query) } | % {
+		"  $_ ($(current_version $_))"
+	}
+	""
 } else { "there aren't any apps installed" }
 
 exit 0

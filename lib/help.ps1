@@ -12,5 +12,5 @@ function help($text) {
 }
 
 function my_usage { # gets usage for the calling script
-    usage (gc $myInvocation.PSCommandPath -raw)
+	usage (gc $myInvocation.PSCommandPath -raw)
 }

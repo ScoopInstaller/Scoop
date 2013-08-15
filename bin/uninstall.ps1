@@ -9,17 +9,17 @@ if($yn -notlike 'y*') { exit }
 
 # run uninstallers if necessary
 installed_apps | % {
-    $app = $_
-    $version = current_version $app
-    $dir = versiondir $app $version
-    $manifest = installed_manifest $app $version
-    $install = install_info $app $version
-    $architecture = $install.architecture
+	$app = $_
+	$version = current_version $app
+	$dir = versiondir $app $version
+	$manifest = installed_manifest $app $version
+	$install = install_info $app $version
+	$architecture = $install.architecture
 
-    echo "uninstalling $app"
-    run_uninstaller $manifest $architecture $dir
-    rm_env_path $manifest $dir
-    rm_env $manifest
+	echo "uninstalling $app"
+	run_uninstaller $manifest $architecture $dir
+	rm_env_path $manifest $dir
+	rm_env $manifest
 }
 
 if(test-path $scoopdir) {

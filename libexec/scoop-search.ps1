@@ -11,43 +11,43 @@ param($query)
 . (relpath '..\lib\versions.ps1')
 
 function bin_match($manifest, $query) {
-    if(!$manifest.bin) { return $false }
-    foreach($bin in $manifest.bin) {
-        $fname = split-path $bin -leaf
-        if((strip_ext $fname) -match $query) { return $fname }
-    }
-    $false
+	if(!$manifest.bin) { return $false }
+	foreach($bin in $manifest.bin) {
+		$fname = split-path $bin -leaf
+		if((strip_ext $fname) -match $query) { return $fname }
+	}
+	$false
 }
 
 function search_bucket($bucket, $query) {
-    $apps = apps_in_bucket (bucketdir $bucket) | % {
-        @{ name = $_ }
-    }
+	$apps = apps_in_bucket (bucketdir $bucket) | % {
+		@{ name = $_ }
+	}
 
-    if($query) { $apps = $apps | ? {
-        if($_.name -match $query) { return $true }
-        $bin = bin_match (manifest $_.name) $query
-        if($bin) {
-            $_.bin = $bin; return $true;
-        }
-    } }
-    $apps | % { $_.version = (latest_version $_.name $bucket); $_ }
+	if($query) { $apps = $apps | ? {
+		if($_.name -match $query) { return $true }
+		$bin = bin_match (manifest $_.name) $query
+		if($bin) {
+			$_.bin = $bin; return $true;
+		}
+	} }
+	$apps | % { $_.version = (latest_version $_.name $bucket); $_ }
 }
 
 @($null) + @(buckets) | % { # $null is main bucket
-    $res = search_bucket $_ $query
-    if($res) {
-        $name = "$_"
-        if(!$_) { $name = "main" }
-        
-        "$name bucket:"
-        $res | % {
-            $item = "  $($_.name) ($($_.version))"
-            if($_.bin) { $item += " --> includes '$($_.bin)'" }
-            $item
-        }
-        ""
-    }
+	$res = search_bucket $_ $query
+	if($res) {
+		$name = "$_"
+		if(!$_) { $name = "main" }
+		
+		"$name bucket:"
+		$res | % {
+			$item = "  $($_.name) ($($_.version))"
+			if($_.bin) { $item += " --> includes '$($_.bin)'" }
+			$item
+		}
+		""
+	}
 }
 
 exit 0

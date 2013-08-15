@@ -33,21 +33,21 @@ catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }
 # remove older versions
 $old = @(versions $app)
 foreach($oldver in $old) {
-    "removing older version, $oldver"
-    $dir = versiondir $app $oldver
-    try { rm -r -force -ea stop $dir }
-    catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }
+	"removing older version, $oldver"
+	$dir = versiondir $app $oldver
+	try { rm -r -force -ea stop $dir }
+	catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }
 }
 
 if(@(versions $app).length -eq 0) {
-    $appdir = appdir $app
-    try {
-        # if last install failed, the directory seems to be locked and this
-        # will throw an error about the directory not existing
-        rm -r $appdir -ea stop -force
-    } catch {
-        if((test-path $appdir)) { throw } # only throw if the dir still exists
-    }
+	$appdir = appdir $app
+	try {
+		# if last install failed, the directory seems to be locked and this
+		# will throw an error about the directory not existing
+		rm -r $appdir -ea stop -force
+	} catch {
+		if((test-path $appdir)) { throw } # only throw if the dir still exists
+	}
 }
 
 success "$app was uninstalled"

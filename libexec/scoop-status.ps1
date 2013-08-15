@@ -7,19 +7,19 @@
 . "$psscriptroot\..\lib\versions.ps1"
 
 function timeago($when) {
-    $diff = [datetime]::now - $last_update
+	$diff = [datetime]::now - $last_update
 
-    if($diff.totaldays -gt 2) { return "$([int]$diff.totaldays) days ago" }
-    if($diff.totalhours -gt 2) { return "$([int]$diff.totalhours) hours ago" }
-    if($diff.totalminutes -gt 2) { return "$([int]$diff.totalminutes) minutes ago" }
-    return "$([int]$diff.totalseconds) seconds ago"
+	if($diff.totaldays -gt 2) { return "$([int]$diff.totaldays) days ago" }
+	if($diff.totalhours -gt 2) { return "$([int]$diff.totalhours) hours ago" }
+	if($diff.totalminutes -gt 2) { return "$([int]$diff.totalminutes) minutes ago" }
+	return "$([int]$diff.totalseconds) seconds ago"
 }
 
 # check when scoop was last updated
 $timestamp = "$(versiondir 'scoop' 'current')\last_updated"
 if(test-path $timestamp) {
-    $last_update = [io.file]::getlastwritetime((resolve-path $timestamp))
-    "scoop was last updated $(timeago($last_update))"
+	$last_update = [io.file]::getlastwritetime((resolve-path $timestamp))
+	"scoop was last updated $(timeago($last_update))"
 }
 
 $failed = @()
@@ -27,48 +27,48 @@ $old = @()
 $removed = @()
 
 gci "$scoopdir\apps" | ? name -ne 'scoop' | % {
-    $app = $_.name
-    $version = @(versions $app)[-1]
-    if($version) {
-        $install_info = install_info $app $version
-    }
-    
-    if(!$install_info) {
-        $failed += @{ $app = $version }; return 
-    }
+	$app = $_.name
+	$version = @(versions $app)[-1]
+	if($version) {
+		$install_info = install_info $app $version
+	}
+	
+	if(!$install_info) {
+		$failed += @{ $app = $version }; return 
+	}
 
-    $manifest = manifest $app $install_info.bucket $install_info.url    
-    if(!$manifest) { $removed += @{ $app = $version }; return }
+	$manifest = manifest $app $install_info.bucket $install_info.url    
+	if(!$manifest) { $removed += @{ $app = $version }; return }
 
-    if((compare_versions $manifest.version $version) -gt 0) {
-        $old += @{ $app = @($version, $manifest.version) }
-    }
+	if((compare_versions $manifest.version $version) -gt 0) {
+		$old += @{ $app = @($version, $manifest.version) }
+	}
 }
 
 if($old) {
-    "updates are available for:"
-    $old.keys | % { 
-        $versions = $old.$_
-        "    $_`: $($versions[0]) -> $($versions[1])"
-    }
+	"updates are available for:"
+	$old.keys | % { 
+		$versions = $old.$_
+		"    $_`: $($versions[0]) -> $($versions[1])"
+	}
 }
 
 if($removed) {
-    "these app manifests have been removed:"
-    $removed.keys | % {
-        "    $_"
-    }
+	"these app manifests have been removed:"
+	$removed.keys | % {
+		"    $_"
+	}
 }
 
 if($failed) {
-    "these apps failed to install:"
-    $failed.keys | % {
-        "    $_"
-    }
+	"these apps failed to install:"
+	$failed.keys | % {
+		"    $_"
+	}
 }
 
 if(!$old -and !$removed -and !$failed) {
-    success "everything is ok!"
+	success "everything is ok!"
 }
 
 exit 0

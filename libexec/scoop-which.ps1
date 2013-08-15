@@ -18,7 +18,7 @@ if("$path" -like "$abs_shimdir*") {
 	$shimtext | sls '(?m)^\$path = ''([^'']+)''' | % { $_.matches[0].groups[1].value }
 } else {
 	[console]::error.writeline("not a scoop shim")
-    $path
+	$path
 	exit 2
 }
 

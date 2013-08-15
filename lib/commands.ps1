@@ -7,7 +7,7 @@ function commands {
 }
 
 function command_name($filename) {
-    $filename.name | sls 'scoop-(.*?)\.ps1$' | % { $_.matches[0].groups[1].value }
+	$filename.name | sls 'scoop-(.*?)\.ps1$' | % { $_.matches[0].groups[1].value }
 }
 
 function exec($cmd, $arguments) {

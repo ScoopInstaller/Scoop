@@ -29,30 +29,30 @@ if($url) { $manifest = url_manifest $url }
 else { $manifest, $bucket = find_manifest $app }
 
 if(!$manifest) {
-    abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
+	abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
 }
 
 $version = $manifest.version
 if(!$version) { abort "manifest doesn't specify a version" }
 if($version -match '[^\w\.\-_]') {
-    abort "manifest version has unsupported character '$($matches[0])'"
+	abort "manifest version has unsupported character '$($matches[0])'"
 }
 
 if(installed $app) {
-    $version = @(versions $app)[-1]
-    if(!(install_info $app $version)) {
-        abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app' before retrying the install."
-    }
-    abort "$app ($version) is already installed.`nuse 'scoop update $app' to install a new version."
+	$version = @(versions $app)[-1]
+	if(!(install_info $app $version)) {
+		abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app' before retrying the install."
+	}
+	abort "$app ($version) is already installed.`nuse 'scoop update $app' to install a new version."
 }
 
 # check 7zip installed if required
 if(!(7zip_installed)) {
-    foreach($url in @($manifest.url)) {
-        if(requires_7zip $url) {
-            abort "7zip is required to install this app. please run 'scoop install 7zip'"
-        }
-    }
+	foreach($url in @($manifest.url)) {
+		if(requires_7zip $url) {
+			abort "7zip is required to install this app. please run 'scoop install 7zip'"
+		}
+	}
 }
 
 $dir = ensure (versiondir $app $version)
