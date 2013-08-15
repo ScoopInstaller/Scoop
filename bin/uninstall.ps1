@@ -7,44 +7,39 @@ warn 'this will uninstall scoop and all the programs that have been installed wi
 $yn = read-host 'are you sure? (yN)'
 if($yn -notlike 'y*') { exit }
 
-# run uninstallers if necessary
-installed_apps | % {
-    $app = $_
-    $version = current_version $app
-    $dir = versiondir $app $version
-    $manifest = installed_manifest $app $version
-    $install = install_info $app $version
-    $architecture = $install.architecture
-
-    echo "uninstalling $app"
-    run_uninstaller $manifest $architecture $dir
-    rm_env_path $manifest $dir
-    rm_env $manifest
-}
-
-$appsdir = "$scoopdir\apps"
-
-# try deleting app directories one-by-one except for scoop, in case uninstall fails
-# and we need to run `scoop uninstall scoop` again
 $errors = $false
-gci $appsdir -directory | ? name -ne 'scoop' | % {
-    $dir = $_
-    try {
-        rm -r -force $dir -ea stop
-    } catch {
-        $errors = $true
-        warn "couldn't remove $(friendly_path $dir): $_.exception"
-    }
+# run uninstallation for each app if necessary, continuing if there's
+# a problem deleting a directory (which is quite likely)
+installed_apps | % {
+	$app = $_
+	$version = current_version $app
+	$dir = versiondir $app $version
+	$manifest = installed_manifest $app $version
+	$install = install_info $app $version
+	$architecture = $install.architecture
+
+	echo "uninstalling $app"
+	run_uninstaller $manifest $architecture $dir
+	rm_env_path $manifest $dir
+	rm_env $manifest
+
+	$appdir = appdir $app
+	try {
+		rm -r -force $appdir -ea stop
+	} catch {
+		$errors = $true
+		warn "couldn't remove $(friendly_path $appdir): $_.exception"
+	}
 }
 
 if($errors) {
-    abort "not all apps could be deleted. try again or restart"
+	abort "not all apps could be deleted. try again or restart"
 }
 
 try {
-    rm -r -force $scoopdir -ea stop
+	rm -r -force $scoopdir -ea stop
 } catch {
-    abort "couldn't remove $(friendly_path $scoopdir): $_"
+	abort "couldn't remove $(friendly_path $scoopdir): $_"
 }
 
 remove_from_path $shimdir
