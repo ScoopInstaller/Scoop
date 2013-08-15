@@ -220,7 +220,12 @@ function install_prog($fname, $dir, $installer) {
 	$arg = args $installer.args $dir
 
 	if($prog.endswith('.ps1')) {
-		& $prog @arg
+		try {
+			& $prog @arg
+		} catch {
+			write-error "$_"
+			abort "installation failed. you might need to run 'scoop uninstall $app' before trying again."
+		}
 	} else {
 		$installed = run $prog $arg "running installer..."
 		if(!$installed) {
