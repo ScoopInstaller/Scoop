@@ -12,6 +12,10 @@ param($app)
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if(!(installed $app)) { abort "$app isn't installed" }
+if($app -eq 'scoop') {
+    "to uninstall scoop (including apps installed with scoop), run:`n$(fullpath $psscriptroot\..\bin\uninstall.ps1)"
+    exit 1;
+}
 
 $versions = @(versions $app)
 $version = $versions[-1]

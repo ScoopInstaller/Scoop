@@ -1,5 +1,0 @@
-{
-	"_comment": "this is used for `scoop uninstall scoop`. it mimics
-				the format of manifests in the bucket",
-	"bin": "bin\\scoop.ps1"
-}
