@@ -10,7 +10,6 @@
 	"settings": {
 		"default_line_ending": "windows",
 		"tab_size": 4,
-		"translate_tabs_to_spaces": false,
-		"detect_indentation": false
+		"translate_tabs_to_spaces": false
 	}
 }

@@ -13,29 +13,30 @@
 # MSIINSTALLPERUSER
 #   http://msdn.microsoft.com/en-us/library/windows/desktop/dd408007(v=vs.85).aspx
 
-param($app, $architecture='64bit',[switch]$help)
+param($app, $url, $architecture='64bit',[switch]$help)
 
 if(!$app) {
 	"app is required"; exit 1;
 }
 
-. "$psscriptroot\..\..\lib\core.ps1"
-. (relpath ..\..\lib\manifest.ps1)
-. (relpath ..\..\lib\buckets.ps1)
-. (relpath ..\..\lib\versions.ps1)
-. (relpath ..\..\lib\install.ps1)
+. "$psscriptroot\..\lib\core.ps1"
+. (relpath ..\lib\manifest.ps1)
+. (relpath ..\lib\buckets.ps1)
+. (relpath ..\lib\versions.ps1)
+. (relpath ..\lib\install.ps1)
 
 # override to use dev version for manifest
-$scoopdir = relpath '..\..\'
+$scoopdir = relpath '..\'
 
 $dir = fullpath (relpath .\tmp)
-$manifest = manifest $app
+if(!(test-path $dir)) { mkdir $dir > $null }
+$manifest = manifest $app $null $url
 
 $version = $manifest.version
-$url = url $manifest $architecture
-$fname = split-path $url -leaf
+$dlurl = url $manifest $architecture
+$fname = split-path $dlurl -leaf
 
-dl_with_cache $app $version $url "$dir\$fname"
+dl_with_cache $app $version $dlurl "$dir\$fname"
 
 if($fname -match '\.msi$') {
 	$exe = 'msiexec'
