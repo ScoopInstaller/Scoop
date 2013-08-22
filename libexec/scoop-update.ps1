@@ -31,7 +31,7 @@ if(!$app) {
 	unzip $zipfile $tempdir 'scoop-master'
 	rm $zipfile
 
-	echo 'replacing files..'
+	echo 'replacing files...'
 	$null = robocopy $tempdir $currentdir /mir /njh /njs /nfl /ndl
 	rm -r -force $tempdir -ea stop
 
