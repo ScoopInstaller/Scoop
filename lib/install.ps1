@@ -217,7 +217,7 @@ function install_prog($fname, $dir, $installer) {
 	if(!(is_in_dir $dir $prog)) {
 		abort "error in manifest: installer $prog is outside the app directory"
 	}
-	$arg = args $installer.args $dir
+	$arg = @(args $installer.args $dir)
 
 	if($prog.endswith('.ps1')) {
 		& $prog @arg
