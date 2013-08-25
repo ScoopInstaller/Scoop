@@ -13,14 +13,5 @@
 			"extract_dir": "ruby-2.0.0-p247-i386-mingw32"
 		}
 	},
-	"bin": [
-		"bin\\erb.bat",
-		"bin\\gem.bat",
-		"bin\\irb.bat",
-		"bin\\rake.bat",
-		"bin\\rdoc.bat",
-		"bin\\ri.bat",
-		"bin\\ruby.exe",
-		"bin\\testrb.bat"
-	]
+	"env_add_path": "bin"
 }

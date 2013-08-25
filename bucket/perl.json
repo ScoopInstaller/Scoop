@@ -12,5 +12,5 @@
 			"hash": "5c07f6340401f43f1e0fd71d967dde434a8a32491f35114ad825f648458398ee"
 		}
 	},
-	"add_env_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ]
+	"env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ]
 }

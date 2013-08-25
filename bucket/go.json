@@ -13,8 +13,8 @@
 		}
 	},
 	"extract_dir": "go",
-	"add_env_path": "bin",
-	"set_env": {
+	"env_add_path": "bin",
+	"env_set": {
 		"GOROOT": "$dir"
 	}
 }

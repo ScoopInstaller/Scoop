@@ -21,8 +21,8 @@ installed_apps | % {
 	echo "uninstalling $app"
 	run_uninstaller $manifest $architecture $dir
 	rm_shims $manifest
-	rm_env_path $manifest $dir
-	rm_env $manifest
+	env_rm_path $manifest $dir
+	env_rm $manifest
 
 	$appdir = appdir $app
 	try {
