@@ -57,6 +57,12 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 
 	$fname = $null
 
+	# extract_dir and extract_to in manifest are like queues: for each url that
+	# needs to be extracted, will get the next dir from the queue
+	$extract_dirs = @(extract_dir $manifest $architecture)
+	$extract_tos = @(extract_to $manifest $architecture)
+	$extracted = 0;
+
 	foreach($url in $urls) {
 		$fname = split-path $url -leaf
 
@@ -64,31 +70,40 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 
 		check_hash "$dir\$fname" $url $manifest $architecture
 
+		$extract_dir = $extract_dirs[$extracted]
+		$extract_to = $extract_tos[$extracted]
+
 		# extract
 		if($fname -match '\.zip$') { # unzip
 			write-host "extracting..." -nonewline
 			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
 			$null = mkdir "$dir\_scoop_unzip"
-			unzip "$dir\$fname" "$dir\_scoop_unzip" (extract_dir $manifest $architecture)
-			cp "$dir\_scoop_unzip\*" "$dir" -r -force
+			unzip "$dir\$fname" "$dir\_scoop_unzip" $extract_dir
+			cp "$dir\_scoop_unzip\*" "$dir\$extract_to" -r -force
 			rm -r -force "$dir\_scoop_unzip"
 			rm "$dir\$fname"
 			write-host "done"
+
+			$extracted++
 		} elseif(requires_7zip $fname) { # 7zip
 			if(!(7zip_installed)) {
 				warn "aborting: you'll need to run 'scoop uninstall $app' to clean up"
 				abort "7-zip is required. you can install it with 'scoop install 7zip'"
 			}
 			$to = $dir
-			$extract_dir = extract_dir $manifest $architecture
+
 			if($extract_dir) {
 				$to = "$dir\_scoop_extract"
 			}
-			extract_7zip "$dir\$fname" $to
+
+			extract_7zip "$dir\$fname" "$to\$extract_to"
+
 			if($extract_dir) {
-				gci "$to\$extract_dir" -r | mv -dest "$dir" -force
+				gci "$to\$extract_to\$extract_dir" -r | mv -dest "$dir" -force
 				rm -r -force "$to"
-			}			
+			}
+
+			$extracted++
 		}
 	}
 
