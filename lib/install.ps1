@@ -29,7 +29,9 @@ function dl_progress($url, $to) {
 
 		$last_p = -1
 		while(!(is_complete)) {
-			$e = wait-event progress
+			$e = wait-event progress -timeout 2
+			if(!$e) { continue } # check is_complete again to avoid race
+
 			remove-event progress
 			$p = $e.sourceeventargs.progresspercentage
 			if($p -ne $last_p) {
