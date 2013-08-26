@@ -29,7 +29,7 @@ function dl_progress($url, $to) {
 
 		$last_p = -1
 		while(!(is_complete)) {
-			$e = wait-event progress -timeout 2
+			$e = wait-event progress -timeout 1
 			if(!$e) { continue } # avoid deadlock
 
 			remove-event progress
