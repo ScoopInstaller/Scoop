@@ -1,0 +1,8 @@
+{
+	"homepage": "http://www.sqlite.org/",
+	"version": "3.8.0",
+	"license": "Public Domain",
+	"url": "http://www.sqlite.org/2013/sqlite-shell-win32-x86-3080000.zip",
+	"hash": "b13bb996bcfe9dba4bcc73a8696ed389b8891a80cf2bb6d6848b7cdf61355efb",
+	"bin": "sqlite3.exe"
+}
