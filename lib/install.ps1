@@ -2,6 +2,10 @@ function cache_path($app, $version, $url) {
 	"$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')"
 }
 
+function appname_from_url($url) {
+	(split-path $url -leaf) -replace '.json$', ''
+}
+
 function dl_with_cache($app, $version, $url, $to) {
 	$cached = fullpath (cache_path $app $version $url)
 	if(!(test-path $cached)) {

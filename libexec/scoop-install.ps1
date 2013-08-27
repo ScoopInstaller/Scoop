@@ -1,11 +1,11 @@
-# Usage: scoop install <app> [url]
+# Usage: scoop install <app> [-arch 32bit|64bit]
 # Summary: Install an app
 # Help: e.g. To install an app from your local Scoop bucket:
 #      scoop install git
 #
 # To install an app from a manifest provided at a URL:
-#      scoop install runat https://raw.github.com/lukesampson/scoop/master/bucket/runat.json
-param($app, $url, $architecture)
+#      scoop install https://raw.github.com/lukesampson/scoop/master/bucket/runat.json
+param($app, $architecture)
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -25,8 +25,27 @@ if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 $manifest, $bucket = $null, $null
 
-if($url) { $manifest = url_manifest $url }
-else { $manifest, $bucket = find_manifest $app }
+# check if app is a url
+$url = $null
+if($app -match '^((ht)|f)tps?://') {
+	$url = $app
+	$app = appname_from_url $url
+	$manifest = url_manifest $url
+} else {
+	# check buckets
+	$manifest, $bucket = find_manifest $app
+
+	if(!$manifest) {
+		# couldn't find app in buckets: check if it's a local path
+		$path = $app
+		if(!$path.endswith('.json')) { $path += '.json' }
+		if(test-path $path) {
+			$url = "$(resolve-path $path)"
+			$app = appname_from_url $url
+			$manifest, $bucket = url_manifest $url
+		}
+	}
+}
 
 if(!$manifest) {
 	abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
