@@ -355,9 +355,21 @@ function env_add_path($manifest, $dir) {
 		if(!(is_in_dir $dir $path_dir)) {
 			abort "error in manifest: add_to_path '$_' is outside the app directory"
 		}
-		ensure_in_path $path_dir
+		add_first_in_path $path_dir
 	}
 }
+function add_first_in_path($dir) {
+	$dir = fullpath $dir
+
+	# future sessions
+	$null, $userpath = strip_path (env 'path') $dir
+	env 'path' "$dir;$userpath" 
+
+	# this session
+	$null, $env:path = strip_path $env:path $dir
+	$env:path = "$dir;$env:path"
+}
+
 function env_rm_path($manifest, $dir) {
 	# remove from path
 	$manifest.env_add_path | ? { $_ } | % {

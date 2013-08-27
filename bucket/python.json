@@ -24,9 +24,9 @@
 	},
 	"bin": [ "python.exe", "py.exe" ],
 	"env_add_path": [ "scripts" ],
-	"notes": "To use PIP to manage Python packages, run:
-	`scoop install curl`
-	`curl http://python-distribute.org/distribute_setup.py | python`
-	`curl -k https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python`
-	"
+	"post_install": "pushd $env:temp
+	$s = 'http://python-distribute.org/distribute_setup.py'
+	echo 'running $s...';(new-object net.webclient).downloadstring($s) | python > $null
+	popd",
+	"notes": "To use PIP to manage Python packages, run 'easy_install pip'"
 }
