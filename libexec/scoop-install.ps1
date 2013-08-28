@@ -1,12 +1,15 @@
-# Usage: scoop install <app> [-arch 32bit|64bit]
-# Summary: Install an app
-# Help: e.g. To install an app from your local Scoop bucket:
+# Usage: scoop install <app> [ -arch 32bit|64bit ]
+# Summary: Install apps
+# Help: e.g. The usual way to install an app (uses your local 'buckets'):
 #      scoop install git
 #
-# To install an app from a manifest provided at a URL:
+# To install an app from a manifest at a URL:
 #      scoop install https://raw.github.com/lukesampson/scoop/master/bucket/runat.json
-param($app, $architecture)
-
+#
+# To install an app from a manifest on your computer
+#      scoop install \path\to\app.json
+#
+# When installing from your computer, you can leave the .json extension off if you like.
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
@@ -15,81 +18,81 @@ param($app, $architecture)
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
+function parse_args($a) {
+	$apps = @(); $arch = $null
+
+	for($i = 0; $i -lt $a.length; $i++) {
+		$arg = $a[$i]
+		if($arg.startswith('-a') -and '-arch' -like "$arg*") {
+			if($a.length -gt $i + 1) { $arch = $a[$i++] }
+			else { abort '-arch parameter requires a value'; myusage; exit 1 }
+		} else {
+			$apps += $arg
+		}
+	}
+
+	$apps, $arch
+}
+
+function install($app, $architecture) {
+	$app, $manifest, $bucket, $url = locate $app
+
+	if(!$manifest) {
+		abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
+	}
+
+	$version = $manifest.version
+	if(!$version) { abort "manifest doesn't specify a version" }
+	if($version -match '[^\w\.\-_]') {
+		abort "manifest version has unsupported character '$($matches[0])'"
+	}
+
+	if(installed $app) {
+		$version = @(versions $app)[-1]
+		if(!(install_info $app $version)) {
+			abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app' before retrying the install."
+		}
+		abort "$app ($version) is already installed.`nuse 'scoop update $app' to install a new version."
+	}
+
+	# check 7zip installed if required
+	if(!(7zip_installed)) {
+		foreach($dlurl in @($manifest.url)) {
+			if(requires_7zip $dlurl) {
+				abort "7zip is required to install this app. please run 'scoop install 7zip'"
+			}
+		}
+	}
+
+	$dir = ensure (versiondir $app $version)
+
+	$fname = dl_urls $app $version $manifest $architecture $dir
+	run_installer $fname $manifest $architecture $dir
+	ensure_install_dir_not_in_path $dir
+	create_shims $manifest $dir
+	env_add_path $manifest $dir
+	env_set $manifest $dir
+	post_install $manifest
+
+	# save info for uninstall
+	save_installed_manifest $app $bucket $dir $url
+	save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
+
+	success "$app ($version) was installed successfully!"
+
+	show_notes $manifest
+}
+
+$apps, $architecture = parse_args $args
+
 switch($architecture) {
 	'' { $architecture = architecture }
 	{ @('32bit','64bit') -contains $_ } { }
 	default { abort "invalid architecture: '$architecture'"}
 }
 
-if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
+if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
-$manifest, $bucket = $null, $null
-
-# check if app is a url
-$url = $null
-if($app -match '^((ht)|f)tps?://') {
-	$url = $app
-	$app = appname_from_url $url
-	$manifest = url_manifest $url
-} else {
-	# check buckets
-	$manifest, $bucket = find_manifest $app
-
-	if(!$manifest) {
-		# couldn't find app in buckets: check if it's a local path
-		$path = $app
-		if(!$path.endswith('.json')) { $path += '.json' }
-		if(test-path $path) {
-			$url = "$(resolve-path $path)"
-			$app = appname_from_url $url
-			$manifest, $bucket = url_manifest $url
-		}
-	}
-}
-
-if(!$manifest) {
-	abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
-}
-
-$version = $manifest.version
-if(!$version) { abort "manifest doesn't specify a version" }
-if($version -match '[^\w\.\-_]') {
-	abort "manifest version has unsupported character '$($matches[0])'"
-}
-
-if(installed $app) {
-	$version = @(versions $app)[-1]
-	if(!(install_info $app $version)) {
-		abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app' before retrying the install."
-	}
-	abort "$app ($version) is already installed.`nuse 'scoop update $app' to install a new version."
-}
-
-# check 7zip installed if required
-if(!(7zip_installed)) {
-	foreach($dlurl in @($manifest.url)) {
-		if(requires_7zip $dlurl) {
-			abort "7zip is required to install this app. please run 'scoop install 7zip'"
-		}
-	}
-}
-
-$dir = ensure (versiondir $app $version)
-
-$fname = dl_urls $app $version $manifest $architecture $dir
-run_installer $fname $manifest $architecture $dir
-ensure_install_dir_not_in_path $dir
-create_shims $manifest $dir
-env_add_path $manifest $dir
-env_set $manifest $dir
-post_install $manifest
-
-# save info for uninstall
-save_installed_manifest $app $bucket $dir $url
-save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
-
-success "$app ($version) was installed successfully!"
-
-show_notes $manifest
+$apps | % { install $_ $architecture }
 
 exit 0

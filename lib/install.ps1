@@ -6,6 +6,33 @@ function appname_from_url($url) {
 	(split-path $url -leaf) -replace '.json$', ''
 }
 
+function locate($app) {
+	$manifest, $bucket, $url = $null, $null, $null
+
+	# check if app is a url
+	if($app -match '^((ht)|f)tps?://') {
+		$url = $app
+		$app = appname_from_url $url
+		$manifest = url_manifest $url
+	} else {
+		# check buckets
+		$manifest, $bucket = find_manifest $app
+
+		if(!$manifest) {
+			# couldn't find app in buckets: check if it's a local path
+			$path = $app
+			if(!$path.endswith('.json')) { $path += '.json' }
+			if(test-path $path) {
+				$url = "$(resolve-path $path)"
+				$app = appname_from_url $url
+				$manifest, $bucket = url_manifest $url
+			}
+		}
+	}
+
+	return $app, $manifest, $bucket, $url
+}
+
 function dl_with_cache($app, $version, $url, $to) {
 	$cached = fullpath (cache_path $app $version $url)
 	if(!(test-path $cached)) {
