@@ -32,17 +32,15 @@ function parse_args($a) {
 			switch($arg) {
 				'-arch' {
 					if($a.length -gt $i + 1) { $arch = $a[$i++] }
-					else { '-arch parameter requires a value'; myusage; exit 1 }
+					else { write-host '-arch parameter requires a value'; exit 1 }
 				}
 				'-global' {
 					$global = $true
 				}
 				default {
-					"unrecognised parameter: $arg"; myusage; exit 1
+					write-host "unrecognised parameter: $arg"; exit 1
 				}
 			}
-		}
-		
 		} else {
 			$apps += $arg
 		}
