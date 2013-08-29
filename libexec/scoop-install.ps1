@@ -1,4 +1,4 @@
-# Usage: scoop install <app> [ -arch 32bit|64bit ]
+# Usage: scoop install <app> [options]
 # Summary: Install apps
 # Help: e.g. The usual way to install an app (uses your local 'buckets'):
 #      scoop install git
@@ -10,6 +10,11 @@
 #      scoop install \path\to\app.json
 #
 # When installing from your computer, you can leave the .json extension off if you like.
+#
+# Options:
+#   -arch 32bit|64bit   use the specified architecture, if the app supports it
+#   -global             install the app globally
+
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
@@ -19,22 +24,34 @@
 . "$psscriptroot\..\lib\help.ps1"
 
 function parse_args($a) {
-	$apps = @(); $arch = $null
+	$apps = @(); $arch = $null; $global = $false
 
 	for($i = 0; $i -lt $a.length; $i++) {
 		$arg = $a[$i]
-		if($arg.startswith('-a') -and '-arch' -like "$arg*") {
-			if($a.length -gt $i + 1) { $arch = $a[$i++] }
-			else { abort '-arch parameter requires a value'; myusage; exit 1 }
+		if($arg.startswith('-')) {
+			switch($arg) {
+				'-arch' {
+					if($a.length -gt $i + 1) { $arch = $a[$i++] }
+					else { '-arch parameter requires a value'; myusage; exit 1 }
+				}
+				'-global' {
+					$global = $true
+				}
+				default {
+					"unrecognised parameter: $arg"; myusage; exit 1
+				}
+			}
+		}
+		
 		} else {
 			$apps += $arg
 		}
 	}
 
-	$apps, $arch
+	$apps, $arch, $global
 }
 
-function install($app, $architecture) {
+function install($app, $architecture, $global) {
 	$app, $manifest, $bucket, $url = locate $app
 
 	if(!$manifest) {
@@ -83,7 +100,7 @@ function install($app, $architecture) {
 	show_notes $manifest
 }
 
-$apps, $architecture = parse_args $args
+$apps, $architecture, $global = parse_args $args
 
 switch($architecture) {
 	'' { $architecture = architecture }
@@ -93,6 +110,6 @@ switch($architecture) {
 
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
-$apps | % { install $_ $architecture }
+$apps | % { install $_ $architecture $global }
 
 exit 0
