@@ -26,7 +26,7 @@ $install = install_info $app $version
 $architecture = $install.architecture
 
 run_uninstaller $manifest $architecture $dir
-rm_shims $manifest
+rm_shims $manifest $false
 env_rm_path $manifest $dir
 env_rm $manifest
 

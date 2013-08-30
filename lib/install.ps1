@@ -316,7 +316,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
 	}
 }
 
-function create_shims($manifest, $dir) {
+function create_shims($manifest, $dir, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
 		echo "creating shim for $_"
 
@@ -327,12 +327,12 @@ function create_shims($manifest, $dir) {
 		}
 		if(!(test-path $bin)) { abort "can't shim $_`: file doesn't exist"}
 
-		shim "$dir\$_"
+		shim "$dir\$_" $global
 	}
 }
-function rm_shims($manifest) {
+function rm_shims($manifest, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
-		$shim = "$shimdir\$(strip_ext(fname $_)).ps1"
+		$shim = "$(shimdir $global)\$(strip_ext(fname $_)).ps1"
 		$shim_cmd = "$(strip_ext $shim).cmd"
 
 		if(!(test-path $shim)) { # handle no shim from failed install
@@ -346,7 +346,7 @@ function rm_shims($manifest) {
 	}
 }
 
-# for installers that insist on changing path
+# for installers that add to path without scoop's knowledge
 function ensure_install_dir_not_in_path($dir) {
 	$user_path = (env 'path')
 	$machine_path = [environment]::getEnvironmentVariable('path', 'Machine')

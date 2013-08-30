@@ -20,7 +20,7 @@ installed_apps | % {
 
 	echo "uninstalling $app"
 	run_uninstaller $manifest $architecture $dir
-	rm_shims $manifest
+	rm_shims $manifest $false
 	env_rm_path $manifest $dir
 	env_rm $manifest
 
@@ -43,6 +43,6 @@ try {
 	abort "couldn't remove $(friendly_path $scoopdir): $_"
 }
 
-remove_from_path $shimdir
+remove_from_path (shimdir $false)
 
 success "scoop has been uninstalled"

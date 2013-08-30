@@ -13,7 +13,7 @@ $output = robocopy $src $dest /mir /njh /njs /nfl /ndl /xd .git /xf .DS_Store la
 $output | ? { $_ -ne "" }
 
 echo 'creating shim...'
-shim "$dest\bin\scoop.ps1"
+shim "$dest\bin\scoop.ps1" $false
 
 ensure_scoop_in_path
 success 'scoop was refreshed!'

@@ -62,12 +62,14 @@ function install($app, $architecture, $global) {
 		abort "manifest version has unsupported character '$($matches[0])'"
 	}
 
-	if(installed $app) {
+	if(installed $app $global) {
+		$global_flag = $null; if($global){$global_flag = ' -global'}
+
 		$version = @(versions $app)[-1]
 		if(!(install_info $app $version)) {
-			abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app' before retrying the install."
+			abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app$global_flag' before retrying the install."
 		}
-		abort "$app ($version) is already installed.`nuse 'scoop update $app' to install a new version."
+		abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
 	}
 
 	# check 7zip installed if required
@@ -84,7 +86,7 @@ function install($app, $architecture, $global) {
 	$fname = dl_urls $app $version $manifest $architecture $dir
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir
-	create_shims $manifest $dir
+	create_shims $manifest $dir $global
 	env_add_path $manifest $dir
 	env_set $manifest $dir
 	post_install $manifest
@@ -107,6 +109,10 @@ switch($architecture) {
 }
 
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
+
+if($global -and !(is_admin)) {
+	'ERROR: admin rights required to install global apps'; exit 1
+}
 
 $apps | % { install $_ $architecture $global }
 

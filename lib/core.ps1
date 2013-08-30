@@ -1,6 +1,6 @@
 $scoopdir = "~\appdata\local\scoop"
-$shimdir  = "$scoopdir\shims"
-$cachedir = "$scoopdir\cache"
+$globaldir = "$($env:programdata.tolower())\scoop"
+$cachedir = "$scoopdir\cache" # always local
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
@@ -8,6 +8,11 @@ function format($str, $hash) {
 	$hash.keys | % { set-variable $_ $hash[$_] }
 	$executionContext.invokeCommand.expandString($str)
 }
+function is_admin {
+	$id = [Security.Principal.WindowsIdentity]::GetCurrent()
+	([Security.Principal.WindowsPrincipal]($id)).isinrole("Administrators")
+}
+
 
 # messages
 function abort($msg) { write-host $msg -f darkred; exit 1 }
@@ -15,9 +20,13 @@ function warn($msg) { write-host $msg -f darkyellow; }
 function success($msg) { write-host $msg -f darkgreen }
 
 # apps
-function appdir($app) { "$scoopdir\apps\$app" }
+function basedir($global) {	if($global) { return $globaldir } $scoopdir }
+function appdir($app, $global) { "$(basedir $global)\apps\$app" }
+function shimdir($global) { "$(basedir $global))\shims" }
+
 function versiondir($app, $version) { "$(appdir $app)\$version" }
-function installed($app) { return test-path (appdir $app) }
+
+function installed($app, $global) { return test-path (appdir $app $global) }
 function installed_apps {
 	if(test-path "$scoopdir\apps") {
 		gci ( "$scoopdir\apps") | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
@@ -70,9 +79,9 @@ function unzip($path,$to,$folder) {
 	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
-function shim($path) {
+function shim($path, $global) {
 	if(!(test-path $path)) { abort "can't shim $(fname $path): couldn't find $path" }
-	$abs_shimdir = ensure $shimdir
+	$abs_shimdir = ensure (shimdir $global)
 	$shim = "$abs_shimdir\$(strip_ext(fname $path).tolower()).ps1"
 
 	# note: use > for first line to replace file, then >> to append following lines
@@ -90,19 +99,14 @@ function shim($path) {
 	}
 }
 
-function ensure_in_path($dir,$first=$false) {
+function ensure_in_path($dir) {
 	$userpath = env 'path'
 	$dir = fullpath $dir
 	if($userpath -notmatch [regex]::escape($dir)) {
 		echo "adding $(friendly_path $dir) to your path"
 		
-		# for future sessions...
-		if($first) { env 'path' "$dir;$userpath" }
-		else { env 'path' "$userpath;$dir"	}
-
-		# for this session
-		if($first) { $env:path = "$dir;$env:path" }
-		else { $env:path = "$env:path;$dir" }
+		env 'path' "$dir;$userpath" # for future sessions...
+		$env:path = "$dir;$env:path" # for this session
 	}
 }
 
@@ -127,7 +131,7 @@ function remove_from_path($dir) {
 }
 
 function ensure_scoop_in_path {
-	$abs_shimdir = ensure $shimdir
+	$abs_shimdir = ensure (shimdir $false)
 	# be aggressive (b-e-aggressive) and install scoop first in the path
 	ensure_in_path $abs_shimdir $true
 }

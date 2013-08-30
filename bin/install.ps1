@@ -30,7 +30,7 @@ rm $zipfile
 $null > "$dir\last_updated" # save install timestamp
 
 echo 'creating shim...'
-shim "$dir\bin\scoop.ps1"
+shim "$dir\bin\scoop.ps1" $false
 
 ensure_scoop_in_path
 success 'scoop was installed successfully!'

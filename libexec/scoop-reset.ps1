@@ -21,6 +21,6 @@ $version = current_version $app
 $dir = versiondir $app $version
 $manifest = installed_manifest $app $version
 
-create_shims $manifest $dir
+create_shims $manifest $dir $false
 env_add_path $manifest $dir
 env_set $manifest $dir

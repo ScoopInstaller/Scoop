@@ -75,7 +75,7 @@ if(!$app) {
 
 	echo "uninstalling $old_version"
 	run_uninstaller $manifest $architecture $dir
-	rm_shims $manifest
+	rm_shims $manifest $false
 	# note: keep the old dir in case in contains user files
 
 	$dir = ensure (versiondir $app $version)
@@ -89,7 +89,7 @@ if(!$app) {
 	$fname = dl_urls $app $version $manifest $architecture $dir
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir
-	create_shims $manifest $dir
+	create_shims $manifest $dir $false
 	env_add_path $manifest $dir
 	env_set $manifest $dir
 	post_install $manifest

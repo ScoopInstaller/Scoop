@@ -11,7 +11,7 @@ try { $gcm = gcm $command -ea stop } catch { }
 if(!$gcm) { [console]::error.writeline("'$command' not found"); exit 3 }
 
 $path = $gcm.path
-$abs_shimdir = "$(resolve-path $shimdir)"
+$abs_shimdir = "$(resolve-path $(shimdir $false))"
 
 if("$path" -like "$abs_shimdir*") {
 	$shimtext = gc $path
