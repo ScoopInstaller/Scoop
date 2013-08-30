@@ -377,7 +377,7 @@ function find_dir_or_subdir($path, $dir) {
 	return [string]::join(';', $fixed), $removed
 }
 
-function env_add_path($manifest, $dir) {
+function env_add_path($manifest, $dir, $global) {
 	$manifest.env_add_path | ? { $_ } | % {
 		$path_dir = "$dir\$($_)"
 		if(!(is_in_dir $dir $path_dir)) {
@@ -386,12 +386,13 @@ function env_add_path($manifest, $dir) {
 		add_first_in_path $path_dir
 	}
 }
-function add_first_in_path($dir) {
+
+function add_first_in_path($dir, $global) {
 	$dir = fullpath $dir
 
 	# future sessions
-	$null, $userpath = strip_path (env 'path') $dir
-	env 'path' "$dir;$userpath" 
+	$null, $currpath = strip_path (env 'path' $global) $dir
+	env 'path' "$dir;$currpath" $global
 
 	# this session
 	$null, $env:path = strip_path $env:path $dir

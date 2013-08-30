@@ -51,9 +51,10 @@ function is_local($path) {
 
 # operations
 function dl($url,$to) { (new-object system.net.webClient).downloadFile($url,$to) }
-function env($name,$val='__get') {
-	if($val -eq '__get') { [environment]::getEnvironmentVariable($name, 'User') }
-	else { [environment]::setEnvironmentVariable($name,$val,'User') }
+function env($name,$val='__get',$global) {
+	$target = 'User'; if($global) {$target = 'Machine'}
+	if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
+	else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
 function unzip($path,$to,$folder) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
@@ -130,8 +131,8 @@ function remove_from_path($dir) {
 	if($was_in_path) { $env:path = $newpath	}
 }
 
-function ensure_scoop_in_path {
-	$abs_shimdir = ensure (shimdir $false)
+function ensure_scoop_in_path($global) {
+	$abs_shimdir = ensure (shimdir $global)
 	# be aggressive (b-e-aggressive) and install scoop first in the path
-	ensure_in_path $abs_shimdir $true
+	ensure_in_path $abs_shimdir
 }
