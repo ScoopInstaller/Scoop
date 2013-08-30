@@ -51,7 +51,7 @@ function is_local($path) {
 
 # operations
 function dl($url,$to) { (new-object system.net.webClient).downloadFile($url,$to) }
-function env($name,$val='__get',$global) {
+function env($name,$global,$val='__get') {
 	$target = 'User'; if($global) {$target = 'Machine'}
 	if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
 	else { [environment]::setEnvironmentVariable($name,$val,$target) }
@@ -100,13 +100,13 @@ function shim($path, $global) {
 	}
 }
 
-function ensure_in_path($dir) {
-	$userpath = env 'path'
+function ensure_in_path($dir, $global) {
+	$path = env 'path' $global
 	$dir = fullpath $dir
-	if($userpath -notmatch [regex]::escape($dir)) {
-		echo "adding $(friendly_path $dir) to your path"
+	if($path -notmatch [regex]::escape($dir)) {
+		echo "adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path"
 		
-		env 'path' "$dir;$userpath" # for future sessions...
+		env 'path' $global "$dir;$path" # for future sessions...
 		$env:path = "$dir;$env:path" # for this session
 	}
 }
@@ -116,14 +116,14 @@ function strip_path($orig_path, $dir) {
 	return ($stripped -ne $orig_path), $stripped
 }
 
-function remove_from_path($dir) {
+function remove_from_path($dir,$global) {
 	$dir = fullpath $dir
 
 	# future sessions
-	$was_in_path, $newpath = strip_path (env 'path') $dir
+	$was_in_path, $newpath = strip_path (env 'path' $global) $dir
 	if($was_in_path) { 
 		echo "removing $(friendly_path $dir) from your path"
-		env 'path' $newpath
+		env 'path' $global $newpath
 	}
 
 	# current session
@@ -134,5 +134,5 @@ function remove_from_path($dir) {
 function ensure_scoop_in_path($global) {
 	$abs_shimdir = ensure (shimdir $global)
 	# be aggressive (b-e-aggressive) and install scoop first in the path
-	ensure_in_path $abs_shimdir
+	ensure_in_path $abs_shimdir $global
 }
