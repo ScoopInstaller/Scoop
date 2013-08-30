@@ -22,9 +22,9 @@ function success($msg) { write-host $msg -f darkgreen }
 # apps
 function basedir($global) {	if($global) { return $globaldir } $scoopdir }
 function appdir($app, $global) { "$(basedir $global)\apps\$app" }
-function shimdir($global) { "$(basedir $global))\shims" }
+function shimdir($global) { "$(basedir $global)\shims" }
 
-function versiondir($app, $version) { "$(appdir $app)\$version" }
+function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 function installed($app, $global) { return test-path (appdir $app $global) }
 function installed_apps {

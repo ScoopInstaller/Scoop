@@ -65,8 +65,8 @@ function install($app, $architecture, $global) {
 	if(installed $app $global) {
 		$global_flag = $null; if($global){$global_flag = ' -global'}
 
-		$version = @(versions $app)[-1]
-		if(!(install_info $app $version)) {
+		$version = @(versions $app $global)[-1]
+		if(!(install_info $app $version $global)) {
 			abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app$global_flag' before retrying the install."
 		}
 		abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
@@ -81,7 +81,7 @@ function install($app, $architecture, $global) {
 		}
 	}
 
-	$dir = ensure (versiondir $app $version)
+	$dir = ensure (versiondir $app $version $global)
 
 	$fname = dl_urls $app $version $manifest $architecture $dir
 	run_installer $fname $manifest $architecture $dir

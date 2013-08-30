@@ -41,8 +41,8 @@ function save_install_info($info, $dir) {
 	$info | convertto-json | out-file "$dir\install.json"
 }
 
-function install_info($app, $version) {
-	$path = "$(versiondir $app $version)\install.json"
+function install_info($app, $version, $global) {
+	$path = "$(versiondir $app $version $global)\install.json"
 	if(!(test-path $path)) { return $null }
 	parse_json $path
 }

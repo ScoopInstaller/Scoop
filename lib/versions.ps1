@@ -5,8 +5,8 @@ function latest_version($app, $bucket, $url) {
 function current_version($app) {
 	@(versions $app)[-1]
 }
-function versions($app) {
-	$appdir = "$scoopdir\apps\$app"
+function versions($app, $global) {
+	$appdir = "$(basedir $global)\apps\$app"
 	if(!(test-path $appdir)) { return @() }
 
 	sort_versions (gci $appdir -dir | % { $_.name })

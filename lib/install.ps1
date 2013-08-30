@@ -333,6 +333,7 @@ function create_shims($manifest, $dir, $global) {
 function rm_shims($manifest, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
 		$shim = "$(shimdir $global)\$(strip_ext(fname $_)).ps1"
+
 		$shim_cmd = "$(strip_ext $shim).cmd"
 
 		if(!(test-path $shim)) { # handle no shim from failed install
@@ -346,7 +347,7 @@ function rm_shims($manifest, $global) {
 	}
 }
 
-# for installers that add to path without scoop's knowledge
+# to undo after installers add to path so that scoop manifest can keep track of this instead
 function ensure_install_dir_not_in_path($dir) {
 	$user_path = (env 'path')
 	$machine_path = [environment]::getEnvironmentVariable('path', 'Machine')
