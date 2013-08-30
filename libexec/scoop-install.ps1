@@ -89,7 +89,7 @@ function install($app, $architecture, $global) {
 	create_shims $manifest $dir $global
 	if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
 	env_add_path $manifest $dir $global
-	env_set $manifest $dir
+	env_set $manifest $dir $global
 	post_install $manifest
 
 	# save info for uninstall
