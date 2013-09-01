@@ -30,8 +30,8 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
 	else { cp (manifest_path $app $bucket) "$dir\manifest.json" }
 }
 
-function installed_manifest($app, $version) {
-	parse_json "$(versiondir $app $version)\manifest.json"
+function installed_manifest($app, $version, $global) {
+	parse_json "$(versiondir $app $version $global)\manifest.json"
 }
 
 function save_install_info($info, $dir) {

@@ -384,7 +384,7 @@ function env_add_path($manifest, $dir, $global) {
 		if(!(is_in_dir $dir $path_dir)) {
 			abort "error in manifest: add_to_path '$_' is outside the app directory"
 		}
-		add_first_in_path $path_dir
+		add_first_in_path $path_dir $global
 	}
 }
 
@@ -400,11 +400,11 @@ function add_first_in_path($dir, $global) {
 	$env:path = "$dir;$env:path"
 }
 
-function env_rm_path($manifest, $dir) {
+function env_rm_path($manifest, $dir, $global) {
 	# remove from path
 	$manifest.env_add_path | ? { $_ } | % {
 		$path_dir = "$dir\$($_)"
-		remove_from_path $path_dir
+		remove_from_path $path_dir $global
 	}
 }
 
@@ -421,7 +421,7 @@ function env_set($manifest, $dir, $global) {
 function env_rm($manifest, $global) {
 	if($manifest.env_set) {
 		$manifest.env_set | gm -member noteproperty | % {
-			$name = $_.name;
+			$name = $_.name
 			env $name $global $null
 			if(test-path env:\$name) { rm env:\$name }
 		}

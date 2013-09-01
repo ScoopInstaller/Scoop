@@ -4,9 +4,9 @@
 param($query)
 
 . "$psscriptroot\..\lib\core.ps1"
-. (relpath '..\lib\versions.ps1')
-. (relpath '..\lib\manifest.ps1')
-. (relpath '..\lib\buckets.ps1')
+. "$psscriptroot\..\lib\versions.ps1"
+. "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\buckets.ps1"
 
 $local = installed_apps $false | % { @{ name = $_ } }
 $global = installed_apps $true | % { @{ name = $_; global = $true } }
@@ -19,7 +19,10 @@ if($apps) {
 	$apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
         $app = $_.name
         $global = $_.global
-		"  $app ($(current_version $app $global))$(if($global) { ' *global*'})"
+        $ver = current_version $app $global
+        $global_display = $null; if($global) { $global_display = '*global*'}
+
+		"  $app ($ver) $global_display"
 	}
 	""
 } else { "there aren't any apps installed" }
