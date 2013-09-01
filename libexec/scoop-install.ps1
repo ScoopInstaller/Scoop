@@ -112,7 +112,7 @@ switch($architecture) {
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if($global -and !(is_admin)) {
-	'ERROR: admin rights required to install global apps'; exit 1
+	'ERROR: you need admin rights to install global apps'; exit 1
 }
 
 $apps | % { install $_ $architecture $global }
