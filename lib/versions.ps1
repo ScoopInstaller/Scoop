@@ -6,7 +6,7 @@ function current_version($app) {
 	@(versions $app)[-1]
 }
 function versions($app, $global) {
-	$appdir = "$(basedir $global)\apps\$app"
+	$appdir = appdir $app $global
 	if(!(test-path $appdir)) { return @() }
 
 	sort_versions (gci $appdir -dir | % { $_.name })

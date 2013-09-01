@@ -13,23 +13,24 @@ function is_admin {
 	([Security.Principal.WindowsPrincipal]($id)).isinrole("Administrators")
 }
 
-
 # messages
 function abort($msg) { write-host $msg -f darkred; exit 1 }
 function warn($msg) { write-host $msg -f darkyellow; }
 function success($msg) { write-host $msg -f darkgreen }
 
-# apps
+# dirs
 function basedir($global) {	if($global) { return $globaldir } $scoopdir }
-function appdir($app, $global) { "$(basedir $global)\apps\$app" }
+function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
-
+function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
+# apps
 function installed($app, $global) { return test-path (appdir $app $global) }
-function installed_apps {
-	if(test-path "$scoopdir\apps") {
-		gci ( "$scoopdir\apps") | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
+function installed_apps($global) {
+	$dir = appsdir $global
+	if(test-path $dir) {
+		gci $dir | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
 	}
 }
 

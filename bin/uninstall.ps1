@@ -10,7 +10,7 @@ if($yn -notlike 'y*') { exit }
 $errors = $false
 # run uninstallation for each app if necessary, continuing if there's
 # a problem deleting a directory (which is quite likely)
-installed_apps | % {
+installed_apps $false | % {
 	$app = $_
 	$version = current_version $app
 	$dir = versiondir $app $version

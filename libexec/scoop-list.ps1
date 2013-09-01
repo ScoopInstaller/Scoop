@@ -8,7 +8,7 @@ param($query)
 . (relpath '..\lib\manifest.ps1')
 . (relpath '..\lib\buckets.ps1')
 
-$apps = installed_apps
+$apps = installed_apps $false
 
 if($apps) {
 	echo "Installed apps$(if($query) { `" matching '$query'`"}):
