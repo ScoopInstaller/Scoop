@@ -2,8 +2,8 @@
 function latest_version($app, $bucket, $url) {
 	(manifest $app $bucket $url).version
 }
-function current_version($app) {
-	@(versions $app)[-1]
+function current_version($app, $global) {
+	@(versions $app $global)[-1]
 }
 function versions($app, $global) {
 	$appdir = appdir $app $global
