@@ -16,7 +16,7 @@ $apps = $local + $global
 if($apps) {
 	echo "Installed apps$(if($query) { `" matching '$query'`"}):
 "
-	$apps | sort name | ? { !$query -or ($_.name -match $query) } | % {
+	$apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
         $app = $_.name
         $global = $_.global
 		"  $app ($(current_version $app $global))$(if($global) { ' *global*'})"
