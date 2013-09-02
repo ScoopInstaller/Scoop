@@ -33,7 +33,10 @@ function getopt($argv, $shortopts, $longopts) {
 		$opts, $rem, $msg
 	}
 
+	# ensure these are arrays
+	$argv = @($argv)
 	$longopts = @($longopts)
+
 	for($i = 0; $i -lt $argv.length; $i++) {
 		$arg = $argv[$i]
 
@@ -56,7 +59,21 @@ function getopt($argv, $shortopts, $longopts) {
 			}
 		} elseif($arg.startswith('-') -and $arg -ne '-') {
 			for($j = 1; $j -lt $arg.length; $j++) {
-				$letter = $arg[$j]
+				$letter = $arg[$j].tostring()
+
+				if($shortopts -match "$letter`:?") {
+					$shortopt = $matches[0]
+					if($shortopt[1] -eq ':') {
+						if($j -ne $arg.length -1 -or $i -eq $argv.length) {
+							return err "option -$letter requires an argument"
+						}
+						$opts.$letter = $argv[++$i]
+					} else {
+						$opts.$letter = $true
+					}
+				} else {
+					return err "option -$letter not recognized"
+				}
 			}
 		}
 	}

@@ -7,8 +7,13 @@ function fail($msg) {
 
 	$script = split-path $invoked.scriptname -leaf
 	$line = $invoked.scriptlinenumber
-	write-host "FAIL: $msg ($script line $line)" -f red
+	write-host "FAIL: $msg" -f red
 	write-host $invoked.positionmessage
+}
+
+function fmt($var) {
+	if($var -is [string]) { return "'$var'" }
+	return $var
 }
 
 function assert(
@@ -20,11 +25,11 @@ function assert(
 	}
 
 	if($eq -ne "__undefined") {
-		if($x -ne $eq) { fail "$x != $eq" }
+		if($x -ne $eq) { fail "$(fmt($x)) != $(fmt($eq))" }
 	}
 
 	if($ne -ne "__undefined") {
-		if($x -eq $ne) { fail "$x == $ne" }	
+		if($x -eq $ne) { fail "$(fmt($x)) == $(fmt($ne))" }	
 	}
 }
 
