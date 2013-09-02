@@ -3,8 +3,9 @@
 
 $a = "--global -a 32bit test" -split ' '
 
-$opt, $rem, $err = getopt $a "ga" "global", "arch"
+$opt, $rem, $err = getopt $a "ga:" "global", "arch="
 
+is_equal $err, $null
 is_equal $opt.global $true
 is_equal $opt.a "32bit"
 

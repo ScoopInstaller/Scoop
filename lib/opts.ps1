@@ -24,7 +24,8 @@ function parse_args($a) {
 	$apps, $arch, $global
 }
 
-# returns opts (hash), remaining args (array), error (string)
+# adapted from http://hg.python.org/cpython/file/2.7/Lib/getopt.py
+# returns @(opts hash, rem_args array, error string)
 function getopt($argv, $shortopts, $longopts) {
 	$opts = @{}; $rem = @()
 
@@ -38,8 +39,24 @@ function getopt($argv, $shortopts, $longopts) {
 
 		if($arg.startswith('--')) {
 			$name = $arg.substring(2)
-			if(!($longopts -contains $name)) {
+
+			$longopt = $longopts | ? { $_ -match "^$name=?$" }
+
+			if($longopt) {
+				if($longopt.endswith('=')) { # requires arg
+					if($i -eq $argv.length - 1) {
+						return err "option --$name requires an argument"
+					}
+					$opts.$name = $argv[++$i]
+				} else {
+					$opts.$name = $true
+				}
+			} else {
 				return err "option --$name not recognized"
+			}
+		} elseif($arg.startswith('-') -and $arg -ne '-') {
+			for($j = 1; $j -lt $arg.length; $j++) {
+				$letter = $arg[$j]
 			}
 		}
 	}
