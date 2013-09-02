@@ -4,11 +4,12 @@ function fail($msg) {
 	$script = split-path $invoked.scriptname -leaf
 	$line = $invoked.scriptlinenumber
 	write-host "$msg ($script line $line)" -f red
+    write-host $invoked.positionmessage
 }
 
-function assert_eq($a, $b) {
+function is_equal($a, $b) {
 	if($a -ne $b) { fail "$a != $b" }
 }
-function assert_neq($a, $b) {
+function is_not_equal($a, $b) {
 	if($a -eq $b) { fail "$a == $b" }
 }

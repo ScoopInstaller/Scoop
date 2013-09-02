@@ -5,9 +5,9 @@ $a = "--global -a 32bit test" -split ' '
 
 $opt, $rem, $err = getopt $a "ga" "global", "arch"
 
-assert_eq $opt.global $true
-assert_eq $opt.a "32bit"
+is_equal $opt.global $true
+is_equal $opt.a "32bit"
 
 $null, $null, $err = getopt "--non-exist", "", ""
-assert_neq $err $null
-assert_eq $err "option --non-exist not recognized"
+is_not_equal $err $null
+is_equal $err "option --non-exist not recognized"
