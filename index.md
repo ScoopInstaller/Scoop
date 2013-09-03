@@ -12,7 +12,7 @@ layout: default
 Looking for familiar UNIX tools? Tired of Powershell&rsquo;s *Verb-Noun* verbosity? Scoop
 helps you get
 [programs you need](https://github.com/lukesampson/scoop/tree/master/bucket)
-(+ [extras](https://github.com/lukesampson/scoop-extras)),
+(and [more](https://github.com/lukesampson/scoop-extras)),
 with a minimal amount of point-and-clicking.
 
 <br>
