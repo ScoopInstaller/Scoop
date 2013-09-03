@@ -16,7 +16,7 @@ $globalshims = "$(resolve-path $(shimdir $true))"
 
 if($path -like "$usershims*" -or $path -like "$globalshims*") {
 	$shimtext = gc $path
-	$shimtext | sls '(?m)^\$path = ''([^'']+)''' | % { $_.matches[0].groups[1].value }
+	friendly_path ($shimtext | sls '(?m)^\$path = ''([^'']+)''' | % { $_.matches[0].groups[1].value })
 } else {
 	[console]::error.writeline("not a scoop shim")
 	$path
