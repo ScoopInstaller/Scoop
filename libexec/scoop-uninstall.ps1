@@ -3,7 +3,7 @@
 # Help: e.g. scoop uninstall git
 #
 # Options:
-#   -global     uninstall a globally installed app
+#   -g, --global   uninstall a globally installed app
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\help.ps1"
@@ -11,8 +11,10 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\opts.ps1"
 
-$apps, $_, $global = parse_args $args
-$app = $apps[0]
+# options
+$opt, $app, $err = getopt $args 'g' 'global'
+if($err) { "scoop uninstall: $err"; exit 1 }
+$global = $opt.g -or $opt.global
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
