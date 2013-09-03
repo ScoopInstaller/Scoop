@@ -12,8 +12,8 @@
 # When installing from your computer, you can leave the .json extension off if you like.
 #
 # Options:
-#   -arch 32bit|64bit   use the specified architecture, if the app supports it
-#   -global             install the app globally
+#   -a, --arch <32bit|64bit>  use the specified architecture, if the app supports it
+#   -g, --global              install the app globally
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -76,7 +76,11 @@ function install($app, $architecture, $global) {
 	show_notes $manifest
 }
 
-$apps, $architecture, $global = parse_args $args
+$opt, $apps, $err = getopt $args 'ga:' 'global', 'arch='
+if($err) { "scoop install: $err"; exit 1 }
+
+$global = $opt.g -or $opt.global
+$architecture = $opt.a + $opt.arch
 
 switch($architecture) {
 	'' { $architecture = architecture }

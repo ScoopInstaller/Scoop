@@ -1,29 +1,3 @@
-function parse_args($a) {
-	$apps = @(); $arch = $null; $global = $false
-
-	for($i = 0; $i -lt $a.length; $i++) {
-		$arg = $a[$i]
-		if($arg.startswith('-')) {
-			switch($arg) {
-				'-arch' {
-					if($a.length -gt $i + 1) { $arch = $a[$i++] }
-					else { write-host '-arch parameter requires a value'; exit 1 }
-				}
-				'-global' {
-					$global = $true
-				}
-				default {
-					write-host "unrecognised parameter: $arg"; exit 1
-				}
-			}
-		} else {
-			$apps += $arg
-		}
-	}
-
-	$apps, $arch, $global
-}
-
 # adapted from http://hg.python.org/cpython/file/2.7/Lib/getopt.py
 # returns @(opts hash, rem_args array, error string)
 function getopt($argv, $shortopts, $longopts) {
@@ -75,6 +49,8 @@ function getopt($argv, $shortopts, $longopts) {
 					return err "option -$letter not recognized"
 				}
 			}
+		} else {
+			$rem += $arg
 		}
 	}
 

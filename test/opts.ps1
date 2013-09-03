@@ -26,13 +26,22 @@ test 'handle unrecognized long option' {
 	assert $err -ne $null
 	assert $err -eq 'option --non-exist not recognized'
 
-	$null, $null, $err = getopt '--global', '--another' 'abc:de:' 'global', 'one'
+	$null, $null, $err = getopt '--global','--another' 'abc:de:' 'global','one'
 	assert $err -eq 'option --another not recognized'
+}
+
+test 'remaining args returned' {
+	$opt, $rem, $err = getopt '-g','rem' 'g' ''
+	assert $err -eq $null
+	assert $opt.g -eq $true
+	assert $rem -ne $null
+	assert $rem.length -eq 1
+	assert $rem[0] -eq 'rem'
 }
 
 test 'get a long flag and a short option with argument' {
 	$a = "--global -a 32bit test" -split ' '
-	$opt, $rem, $err = getopt $a 'ga:' 'global', 'arch='
+	$opt, $rem, $err = getopt $a 'ga:' 'global','arch='
 	assert $err -eq $null
 	assert $opt.global -eq $true
 	assert $opt.a -eq '32bit'
