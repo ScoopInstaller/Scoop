@@ -242,7 +242,7 @@ function install_msi($fname, $dir, $msi) {
 		abort "error in manifest: MSI file $msifile is outside the app directory"
 	}
 	if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
-    if(msi_installed $msi.code) { abort "the MSI package is already installed on this system" }
+	if(msi_installed $msi.code) { abort "the MSI package is already installed on this system" }
 
 	$logfile = "$dir\install.log"
 
@@ -262,8 +262,17 @@ function install_msi($fname, $dir, $msi) {
 	rm $msifile
 }
 
+# get-wmiobject win32_product is slow and checks integrity of each installed program,
+# so this uses the [wmi] type accelerator instead
+# http://blogs.technet.com/b/heyscriptingguy/archive/2011/12/14/use-powershell-to-find-and-uninstall-software.aspx
 function msi_installed($code) {
-    test-path "hklm:\software\microsoft\windows\currentversion\uninstall\$code"
+	$path = "hklm:\software\microsoft\windows\currentversion\uninstall\$code"
+	if(!(test-path $path)) { return $false }
+	$key = gi $path
+	$name = $key.getvalue('displayname')
+	$version = $key.getvalue('displayversion')
+	$classkey = "IdentifyingNumber=`"$code`",Name=`"$name`",Version=`"$version`""
+	try { $wmi = [wmi]"Win32_Product.$classkey"; $true } catch { $false }
 }
 
 function install_prog($fname, $dir, $installer) {
