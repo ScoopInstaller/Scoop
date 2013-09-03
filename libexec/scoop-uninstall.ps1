@@ -30,7 +30,7 @@ if(!(installed $app $global)) {
 }
 
 if($global -and !(is_admin)) {
-	'ERROR: you need admin rights to install global apps'; exit 1
+	'ERROR: you need admin rights to uninstall global apps'; exit 1
 }
 if($app -eq 'scoop') {
 	& "$psscriptroot\..\bin\uninstall.ps1"; exit

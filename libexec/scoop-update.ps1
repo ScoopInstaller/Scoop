@@ -1,17 +1,26 @@
-# Usage: scoop update [app]
+# Usage: scoop update [app] [options]
 # Summary: Update an app, or Scoop itself
 # Help: 'scoop update' updates Scoop to the latest version.
 # 'scoop update [app]' installs a new version of that app, if there is one.
-param($app)
-
+#
+# Options:
+#   --global, -g  update a globally installed app
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
+. "$psscriptroot\..\lib\opts.ps1"
 
-if(!$app) { 
+$opt, $app, $err = getopt $args 'g' 'global'
+if($err) { "scoop update: $err"; exit 1 }
+$global = $opt.g -or $opt.global
+
+if(!$app) {
+    if($global) {
+        "scoop update: --global is invalid when <app> not specified"; exit 1
+    }
 	# update scoop
 	$tempdir = versiondir 'scoop' 'update'
 	$currentdir = versiondir 'scoop' 'current'
@@ -53,9 +62,13 @@ if(!$app) {
 	# update app
 	if(!(installed $app)) { abort "$app isn't installed" }
 
-	$old_version = current_version $app
-	$manifest = installed_manifest $app $old_version
-	$install = install_info $app $old_version
+    if($global -and !(is_admin)) {
+        'ERROR: you need admin rights to update global apps'; exit 1
+    }
+
+	$old_version = current_version $app $global
+	$manifest = installed_manifest $app $old_version $global
+	$install = install_info $app $old_version $global
 
 	# re-use architecture, bucket and url from first install
 	$architecture = $install.architecture
@@ -71,14 +84,14 @@ if(!$app) {
 	}
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
 
-	$dir = versiondir $app $old_version	
+	$dir = versiondir $app $old_version	$global
 
 	echo "uninstalling $old_version"
 	run_uninstaller $manifest $architecture $dir
-	rm_shims $manifest $false
-	# note: keep the old dir in case in contains user files
+	rm_shims $manifest $global
+	# note: keep the old dir in case it contains user files
 
-	$dir = ensure (versiondir $app $version)
+	$dir = ensure (versiondir $app $version $global)
 
 	$manifest = manifest $app $bucket $url
 		
@@ -89,9 +102,9 @@ if(!$app) {
 	$fname = dl_urls $app $version $manifest $architecture $dir
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir
-	create_shims $manifest $dir $false
-	env_add_path $manifest $dir
-	env_set $manifest $dir
+	create_shims $manifest $dir $global
+	env_add_path $manifest $dir $global
+	env_set $manifest $dir $global
 	post_install $manifest
 
 	success "$app was updated from $old_version to $version"
