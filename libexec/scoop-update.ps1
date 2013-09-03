@@ -18,9 +18,9 @@ if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 
 if(!$app) {
-    if($global) {
-        "scoop update: --global is invalid when <app> not specified"; exit 1
-    }
+	if($global) {
+		"scoop update: --global is invalid when <app> not specified"; exit 1
+	}
 	# update scoop
 	$tempdir = versiondir 'scoop' 'update'
 	$currentdir = versiondir 'scoop' 'current'
@@ -60,11 +60,20 @@ if(!$app) {
 	success 'scoop was updated successfully!'
 } else {
 	# update app
-	if(!(installed $app)) { abort "$app isn't installed" }
+	if(!(installed $app $global)) {
+		if(installed $app (!$global)) {
+			function wh($g) { if($g) { "globally" } else { "for your account" } }
+			write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))" -f darkred
+			write-host "try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
+			exit 1
+		} else {
+			abort "$app isn't installed"
+		}
+	}
 
-    if($global -and !(is_admin)) {
-        'ERROR: you need admin rights to update global apps'; exit 1
-    }
+	if($global -and !(is_admin)) {
+		'ERROR: you need admin rights to update global apps'; exit 1
+	}
 
 	$old_version = current_version $app $global
 	$manifest = installed_manifest $app $old_version $global
