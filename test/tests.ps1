@@ -21,11 +21,11 @@ function assert($x,$eq='__undefined',$ne='__undefined') {
 	}
 
 	if($eq -ne "__undefined") {
-		if($x -ne $eq) { fail "$(fmt($x)) != $(fmt($eq))" }
+		if($x -ne $eq) { fail "$(fmt $x) != $(fmt $eq)" }
 	}
 
 	if($ne -ne "__undefined") {
-		if($x -eq $ne) { fail "$(fmt($x)) == $(fmt($ne))" }	
+		if($x -eq $ne) { fail "$(fmt $x) == $(fmt $ne)" }	
 	}
 }
 
