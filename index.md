@@ -2,7 +2,7 @@
 layout: default
 ---
 
-### Scoop installs tools and utilities
+### Scoop installs the tools you know and love
 
     scoop install curl
 <br>
