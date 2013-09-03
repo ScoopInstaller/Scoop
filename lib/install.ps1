@@ -242,6 +242,8 @@ function install_msi($fname, $dir, $msi) {
 		abort "error in manifest: MSI file $msifile is outside the app directory"
 	}
 	if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
+    if(msi_installed $msi.code) { abort "the MSI package is already installed on this system" }
+
 	$logfile = "$dir\install.log"
 
 	$arg = @("/i `"$msifile`"", '/norestart', "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"",
@@ -258,6 +260,10 @@ function install_msi($fname, $dir, $msi) {
 	}
 	rm $logfile
 	rm $msifile
+}
+
+function msi_installed($code) {
+    test-path "hklm:\software\microsoft\windows\currentversion\uninstall\$code"
 }
 
 function install_prog($fname, $dir, $installer) {
