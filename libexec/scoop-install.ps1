@@ -38,7 +38,7 @@ function install($app, $architecture, $global) {
 	}
 
 	if(installed $app $global) {
-		$global_flag = $null; if($global){$global_flag = ' -global'}
+		$global_flag = $null; if($global){$global_flag = ' --global'}
 
 		$version = @(versions $app $global)[-1]
 		if(!(install_info $app $version $global)) {

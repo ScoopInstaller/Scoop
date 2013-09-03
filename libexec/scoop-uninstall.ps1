@@ -19,13 +19,15 @@ $global = $opt.g -or $opt.global
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if(!(installed $app $global)) {
-	if(installed $app (!$global)) {
-		function wh($g) { if($g) { "globally" } else { "for your account" } }
-		write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))" -f darkred
-		write-host "try uninstalling $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
-		exit 1
-	} else {
-		abort "$app isn't installed"
+	if($app -ne 'scoop') {
+		if(installed $app (!$global)) {
+			function wh($g) { if($g) { "globally" } else { "for your account" } }
+			write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))" -f darkred
+			"try uninstalling $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
+			exit 1
+		} else {
+			abort "$app isn't installed"
+		}
 	}
 }
 
@@ -33,7 +35,7 @@ if($global -and !(is_admin)) {
 	'ERROR: you need admin rights to uninstall global apps'; exit 1
 }
 if($app -eq 'scoop') {
-	& "$psscriptroot\..\bin\uninstall.ps1"; exit
+	& "$psscriptroot\..\bin\uninstall.ps1" $global; exit
 }
 
 $version = current_version $app $global

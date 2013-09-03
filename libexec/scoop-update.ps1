@@ -64,7 +64,7 @@ if(!$app) {
 		if(installed $app (!$global)) {
 			function wh($g) { if($g) { "globally" } else { "for your account" } }
 			write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))" -f darkred
-			write-host "try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
+			"try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
 			exit 1
 		} else {
 			abort "$app isn't installed"
