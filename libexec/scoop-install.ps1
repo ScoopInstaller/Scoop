@@ -49,7 +49,7 @@ function install($app, $architecture, $global) {
 
 	# check 7zip installed if required
 	if(!(7zip_installed)) {
-		foreach($dlurl in @($manifest.url)) {
+		foreach($dlurl in @(url $manifest $architecture)) {
 			if(requires_7zip $dlurl) {
 				abort "7zip is required to install this app. please run 'scoop install 7zip'"
 			}
