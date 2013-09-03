@@ -1,0 +1,32 @@
+{
+	"homepage": "http://www.python.org",
+	"license": "http://docs.python.org/2/license.html",
+	"version": "2.7.5",
+	"architecture": {
+		"64bit": {
+			"url": "http://www.python.org/ftp/python/2.7.5/python-2.7.5.amd64.msi",
+			"hash": "md5:83f5d9ba639bd2e33d104df9ea969f31",
+			"msi": {
+				"silent": true,
+				"code": "{DBDD570E-0952-475F-9453-AB88F3DD565A}",
+				"args": ["TARGETDIR=\"$dir\""]
+			}
+		},
+		"32bit": {
+			"url": "http://www.python.org/ftp/python/2.7.5/python-2.7.5.msi",
+			"hash": "md5:0006d6219160ce6abe711a71c835ebb0",
+			"msi": {
+				"silent": true,
+				"code": "{DBDD570E-0952-475F-9453-AB88F3DD5659}",
+				"args": ["TARGETDIR=\"$dir\""]
+			}
+		}
+	},
+	"bin": [ "python.exe" ],
+	"env_add_path": [ "scripts" ],
+	"post_install": "pushd $env:temp
+	$s = 'http://python-distribute.org/distribute_setup.py'
+	echo \"running $s...\";(new-object net.webclient).downloadstring($s) | python 2>&1 > $null
+	popd",
+	"notes": "To use PIP to manage Python packages, run 'easy_install pip'"
+}
