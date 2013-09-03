@@ -64,7 +64,7 @@ function getopt($argv, $shortopts, $longopts) {
 				if($shortopts -match "$letter`:?") {
 					$shortopt = $matches[0]
 					if($shortopt[1] -eq ':') {
-						if($j -ne $arg.length -1 -or $i -eq $argv.length) {
+						if($j -ne $arg.length -1 -or $i -eq $argv.length - 1) {
 							return err "option -$letter requires an argument"
 						}
 						$opts.$letter = $argv[++$i]
