@@ -10,9 +10,9 @@ layout: default
 ### Get comfortable on the Windows command line
 
 Looking for familiar UNIX tools? Tired of Powershell&rsquo;s *Verb-Noun* verbosity? Scoop
-helps you get
-[programs you need](https://github.com/lukesampson/scoop/tree/master/bucket)
-(and [more](https://github.com/lukesampson/scoop-extras)),
+helps you get the
+[programs](https://github.com/lukesampson/scoop/tree/master/bucket) you
+[need](https://github.com/lukesampson/scoop-extras),
 with a minimal amount of point-and-clicking.
 
 <br>
