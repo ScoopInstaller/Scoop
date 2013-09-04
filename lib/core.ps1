@@ -88,7 +88,7 @@ function shim($path, $global) {
 
 	# note: use > for first line to replace file, then >> to append following lines
 	echo '# ensure $HOME is set for MSYS programs' > $shim
-	echo "if(!`$env:home) { `$env:home = `"`$home\`" }" >> $shim
+	echo "if(!`$env:home) { `$env:home = `"`$home`" }" >> $shim
 	echo "`$path = '$path'" >> $shim
 	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $shim
 
@@ -96,7 +96,7 @@ function shim($path, $global) {
 	if($path -match '\.exe$') {
 		$shim_cmd = "$(strip_ext($shim)).cmd"
 		':: ensure $HOME is set for MSYS programs'           | out-file $shim_cmd -encoding oem
-		'@if "%home%"=="" set home="%homedrive%%homepath%\"' | out-file $shim_cmd -encoding oem -append
+		'@if "%home%"=="" set home="%homedrive%%homepath%"'  | out-file $shim_cmd -encoding oem -append
 		"@`"$path`" %*"                                      | out-file $shim_cmd -encoding oem -append
 	}
 }
