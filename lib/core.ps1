@@ -98,7 +98,7 @@ function shim($path, $global) {
 		$shim_cmd = "$(strip_ext($shim)).cmd"
 		':: ensure $HOME is set for MSYS programs'           | out-file $shim_cmd -encoding oem
 		'@if "%home%"=="" set home=%homedrive%%homepath%\'   | out-file $shim_cmd -encoding oem -append
-		'@if "%home%"==""\"" set home=%allusersprofile%\'    | out-file $shim_cmd -encoding oem -append
+		'@if "%home%"=="\ set home=%allusersprofile%\'       | out-file $shim_cmd -encoding oem -append
 		"@`"$path`" %*"                                      | out-file $shim_cmd -encoding oem -append
 	}
 }
