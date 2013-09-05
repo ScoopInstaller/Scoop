@@ -4,9 +4,9 @@
 # when you uninstall and re-install the same version of an app.
 #
 # You can use
-#     scoop show [app]
+#     scoop cache show [app]
 # to see what's in the cache, and
-#     scoop rm <app> to remove downloads for a specific app.
+#     scoop cache rm <app> to remove downloads for a specific app.
 param($cmd, $app)
 
 . "$psscriptroot\..\lib\help.ps1"
