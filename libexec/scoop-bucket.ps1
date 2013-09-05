@@ -1,5 +1,5 @@
 # Usage: scoop bucket add|list|rm [<args>]
-# Summary: Manage scoop buckets
+# Summary: Manage Scoop buckets
 # Help: Add, list or remove buckets.
 #
 # Buckets are repositories of apps available to install. Scoop comes with
