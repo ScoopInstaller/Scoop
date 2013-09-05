@@ -26,24 +26,28 @@ $failed = @()
 $old = @()
 $removed = @()
 
-gci "$scoopdir\apps" | ? name -ne 'scoop' | % {
-	$app = $_.name
-	$version = @(versions $app)[-1]
-	if($version) {
-		$install_info = install_info $app $version
-	}
-	
-	if(!$install_info) {
-		$failed += @{ $app = $version }; return 
-	}
+$true, $false | % { # local and global apps
+	gci (appsdir $_) | ? name -ne 'scoop' | % {
+		$app = $_.name
+		$version = @(versions $app)[-1]
+		if($version) {
+			$install_info = install_info $app $version
+		}
+		
+		if(!$install_info) {
+			$failed += @{ $app = $version }; return 
+		}
 
-	$manifest = manifest $app $install_info.bucket $install_info.url    
-	if(!$manifest) { $removed += @{ $app = $version }; return }
+		$manifest = manifest $app $install_info.bucket $install_info.url    
+		if(!$manifest) { $removed += @{ $app = $version }; return }
 
-	if((compare_versions $manifest.version $version) -gt 0) {
-		$old += @{ $app = @($version, $manifest.version) }
+		if((compare_versions $manifest.version $version) -gt 0) {
+			$old += @{ $app = @($version, $manifest.version) }
+		}
 	}
 }
+
+
 
 if($old) {
 	"updates are available for:"
