@@ -27,7 +27,10 @@ $old = @()
 $removed = @()
 
 $true, $false | % { # local and global apps
-	gci (appsdir $_) | ? name -ne 'scoop' | % {
+	$dir = appsdir $_
+	if(!(test-path $dir)) { return }
+	
+	gci $dir | ? name -ne 'scoop' | % {
 		$app = $_.name
 		$version = @(versions $app)[-1]
 		if($version) {
