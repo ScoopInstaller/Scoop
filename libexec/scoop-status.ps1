@@ -27,14 +27,15 @@ $old = @()
 $removed = @()
 
 $true, $false | % { # local and global apps
-	$dir = appsdir $_
+	$global = $_
+	$dir = appsdir $global
 	if(!(test-path $dir)) { return }
-	
+
 	gci $dir | ? name -ne 'scoop' | % {
 		$app = $_.name
-		$version = @(versions $app)[-1]
+		$version = current_version $app $global
 		if($version) {
-			$install_info = install_info $app $version
+			$install_info = install_info $app $version $global
 		}
 		
 		if(!$install_info) {
