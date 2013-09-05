@@ -4,7 +4,7 @@
 # when you uninstall and re-install the same version of an app.
 #
 # You can use
-#     scoop cache show [app]
+#     scoop cache show
 # to see what's in the cache, and
 #     scoop cache rm <app> to remove downloads for a specific app.
 param($cmd, $app)
