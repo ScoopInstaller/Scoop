@@ -1,5 +1,12 @@
 # Usage: scoop cache show|rm [app]
 # Summary: Show or clear the download cache
+# Help: Scoop caches downloads so you don't need to download the same files
+# when you uninstall and re-install the same version of an app.
+#
+# You can use
+#     scoop show [app]
+# to see what's in the cache, and
+#     scoop rm <app> to remove downloads for a specific app.
 param($cmd, $app)
 
 . "$psscriptroot\..\lib\help.ps1"
