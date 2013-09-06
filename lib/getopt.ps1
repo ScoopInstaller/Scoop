@@ -7,7 +7,7 @@
 # longopts:
 #    array of strings that are long-form options. options that take
 #    a parameter should end with '='
-# returns @(opts hash, rem_args array, error string)
+# returns @(opts hash, remaining_args array, error string)
 function getopt($argv, $shortopts, $longopts) {
 	$opts = @{}; $rem = @()
 
@@ -21,6 +21,8 @@ function getopt($argv, $shortopts, $longopts) {
 
 	for($i = 0; $i -lt $argv.length; $i++) {
 		$arg = $argv[$i]
+		# don't try to parse array arguments
+		if($arg -is [array]) { $rem += ,$arg; continue }
 
 		if($arg.startswith('--')) {
 			$name = $arg.substring(2)
