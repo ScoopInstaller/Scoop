@@ -11,7 +11,7 @@
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\opts.ps1"
+. "$psscriptroot\..\lib\getopt.ps1"
 
 $opt, $app, $err = getopt $args 'g' 'global'
 if($err) { "scoop update: $err"; exit 1 }

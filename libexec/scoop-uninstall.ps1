@@ -9,7 +9,7 @@
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\opts.ps1"
+. "$psscriptroot\..\lib\getopt.ps1"
 
 # options
 $opt, $app, $err = getopt $args 'g' 'global'

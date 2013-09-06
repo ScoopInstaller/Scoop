@@ -1,5 +1,5 @@
 . "$psscriptroot\tests.ps1"
-. "$psscriptroot\..\lib\opts.ps1"
+. "$psscriptroot\..\lib\getopt.ps1"
 
 filter_tests $args
 

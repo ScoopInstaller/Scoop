@@ -1,4 +1,12 @@
 # adapted from http://hg.python.org/cpython/file/2.7/Lib/getopt.py
+# argv:
+#    array of arguments
+# shortopts:
+#    string of single-letter options. options that take a parameter
+#    should be follow by ':'
+# longopts:
+#    array of strings that are long-form options. options that take
+#    a parameter should end with '='
 # returns @(opts hash, rem_args array, error string)
 function getopt($argv, $shortopts, $longopts) {
 	$opts = @{}; $rem = @()
