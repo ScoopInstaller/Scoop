@@ -12,7 +12,7 @@ if(!$gcm) { [console]::error.writeline("'$command' not found"); exit 3 }
 
 $path = "$($gcm.path)"
 $usershims = "$(resolve-path $(shimdir $false))"
-$globalshims = "$(resolve-path $(shimdir $true))"
+$globalshims = fullpath (shimdir $true) # don't resolve: may not exist
 
 if($path -like "$usershims*" -or $path -like "$globalshims*") {
 	$shimtext = gc $path
