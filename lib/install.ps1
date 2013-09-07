@@ -47,6 +47,7 @@ function dl_with_cache($app, $version, $url, $to) {
 
 function dl_progress($url, $to) {
 	$left = [console]::cursorleft
+	$top = [console]::cursortop
 
 	$wc = new-object net.webclient
 	register-objectevent $wc downloadprogresschanged progress | out-null
@@ -66,7 +67,7 @@ function dl_progress($url, $to) {
 			remove-event progress
 			$p = $e.sourceeventargs.progresspercentage
 			if($p -ne $last_p) {
-				[console]::cursorleft = $left
+				[console]::setcursorposition($left, $top)
 				write-host "$p%" -nonewline
 				$last_p = $p
 			}
@@ -80,7 +81,7 @@ function dl_progress($url, $to) {
 		$wc.cancelasync()
 		$wc.dispose()
 	}
-	[console]::cursorleft = $left
+	[console]::setcursorposition($left, $top)
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir) {
