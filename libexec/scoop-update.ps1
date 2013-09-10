@@ -93,6 +93,8 @@ if(!$app) {
 	}
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
 
+	"updating $app ($old_version -> $version)"
+
 	$dir = versiondir $app $old_version	$global
 
 	echo "uninstalling $old_version"

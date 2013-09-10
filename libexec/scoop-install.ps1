@@ -56,7 +56,7 @@ function install($app, $architecture, $global) {
 		}
 	}
 
-	"installing $app ($version)..."
+	"installing $app ($version)"
 
 	$dir = ensure (versiondir $app $version $global)
 
