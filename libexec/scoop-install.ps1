@@ -56,6 +56,8 @@ function install($app, $architecture, $global) {
 		}
 	}
 
+	"installing $app ($version)..."
+
 	$dir = ensure (versiondir $app $version $global)
 
 	$fname = dl_urls $app $version $manifest $architecture $dir
