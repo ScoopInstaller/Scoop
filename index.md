@@ -19,7 +19,7 @@ with a minimal amount of point-and-clicking.
 
 ### Demo
 
-<iframe width="640" height="360" src="//www.youtube.com/embed/a85QLUJ0Wbs?rel=0" frameborder="0" allowfullscreen="true">
+<iframe width="854" height="480" src="//www.youtube.com/embed/a85QLUJ0Wbs?rel=0" frameborder="0" allowfullscreen="true">
 </iframe>
 
 <br>
