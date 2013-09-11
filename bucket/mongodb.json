@@ -1,0 +1,31 @@
+{
+	"version": "2.4.6",
+	"license": "http://www.mongodb.org/about/licensing/",
+	"architecture": {
+		"64bit": {
+			"url": "http://downloads.mongodb.org/win32/mongodb-win32-x86_64-2008plus-2.4.6.zip",
+			"hash": "4b6b7e4c466dfebc149068edc23a2975a48dddf5d88d8e32ebf622eebc342465",
+			"extract_dir": "mongodb-win32-x86_64-2008plus-2.4.6"
+		},
+		"32bit": {
+			"url": "http://downloads.mongodb.org/win32/mongodb-win32-i386-2.4.6.zip",
+			"hash": "090ffa64f801326c5af56f70503161d2c5dc27fd70d17f7b1a482aca3b18e552",
+			"extract_dir": "mongodb-win32-i386-2.4.6"
+		}
+	},
+	"bin": [
+		"bin\\bsondump.exe",
+		"bin\\mongo.exe",
+		"bin\\mongod.exe",
+		"bin\\mongodump.exe",
+		"bin\\mongoexport.exe",
+		"bin\\mongofiles.exe",
+		"bin\\mongoimport.exe",
+		"bin\\mongooplog.exe",
+		"bin\\mongoperf.exe",
+		"bin\\mongorestore.exe",
+		"bin\\mongos.exe",
+		"bin\\mongostat.exe",
+		"bin\\mongotop.exe"
+	]
+}
