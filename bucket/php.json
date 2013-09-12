@@ -1,0 +1,9 @@
+{
+	"homepage": "windows.php.net",
+	"version": "5.5.3",
+	"license": "http://www.php.net/license/",
+	"url": "http://windows.php.net/downloads/releases/php-5.5.3-nts-Win32-VC11-x86.zip",
+	"hash": "sha1:9403aefdc9d56db7a875a5ca877150c59d97ebd6",
+	"bin": "php.exe",
+	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\""
+}
