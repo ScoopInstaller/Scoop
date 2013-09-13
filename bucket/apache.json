@@ -18,29 +18,9 @@
 		"bin\\rotatelogs.exe"
 	],
 	"post_install": "
-
 # set directory in httpd.conf
 $conf = \"$dir/conf/httpd.conf\"
 $root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\\', '/';
 (gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf
-
-# enable php if it's installed
-$php = scoop which php
-if($lastexitcode -eq 0) {
-	'enabling PHP handler...'
-	$phpmodule = \"$(split-path $php -resolve)\\php5apache2_4.dll\"
-	if(test-path $phpmodule) {
-		$lines = gc $conf
-		$phpmodule = $phpmodule -replace '\\\\', '/'
-		\"
-		# php setup
-		LoadModule php5_module '$phpmodule'
-		AddHandler application/x-httpd-php .php
-		PHPIniDir `\"$(split-path $phpmodule)`\"
-		\" | out-file $conf -append -encoding utf8
-	} else {
-		\"couldn't find $phpmodule\"
-	}
-}
 "
 }
