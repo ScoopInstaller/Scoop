@@ -1,0 +1,46 @@
+{
+	"homepage": "http://www.apachelounge.com",
+	"version": "2.4.6",
+	"license": "Apache 2.0",
+	"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.6-win32-VC11.zip",
+	"hash": "E112445A222916FF6C60F4258373CF9B427B0E9EBCEB01E67DDB7C3CECEF892B",
+	"extract_dir": "Apache24",
+	"bin": [
+		"bin\\ab.exe",
+		"bin\\abs.exe",
+		"bin\\htcacheclean.exe",
+		"bin\\htdbm.exe",
+		"bin\\htdigest.exe",
+		"bin\\htpasswd.exe",
+		"bin\\httpd.exe",
+		"bin\\httxt2dbm.exe",
+		"bin\\logresolve.exe",
+		"bin\\rotatelogs.exe"
+	],
+	"post_install": "
+
+# set directory in httpd.conf
+$conf = \"$dir/conf/httpd.conf\"
+$root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\\', '/';
+(gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf
+
+# enable php if it's installed
+$php = scoop which php
+if($lastexitcode -eq 0) {
+	'enabling PHP handler...'
+	$phpmodule = \"$(split-path $php -resolve)\\php5apache2_4.dll\"
+	if(test-path $phpmodule) {
+		$lines = gc $conf
+		$phpmodule = $phpmodule -replace '\\\\', '/'
+		\"
+		# php setup
+		LoadModule php5_module '$phpmodule'
+		AddHandler application/x-httpd-php .php
+		PHPIniDir `\"$(split-path $phpmodule)`\"
+		\" | out-file $conf -append -encoding utf8
+	} else {
+		\"couldn't find $phpmodule\"
+	}
+}
+"
+}
