@@ -93,8 +93,8 @@ function shim($path, $global) {
 	echo "`$path = '$path'" >> $shim
 	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $shim
 
-	# shim .exe so it can be used by programs with no awareness of PSH
-	if($path -match '\.exe$') {
+	# shim .exe, .bat, .cmd so they can be used by programs with no awareness of PSH
+	if($path -match '\.(exe)|(bat)|(cmd)$') {
 		$shim_cmd = "$(strip_ext($shim)).cmd"
 		':: ensure $HOME is set for MSYS programs'           | out-file $shim_cmd -encoding oem
 		'@if "%home%"=="" set home=%homedrive%%homepath%\'   | out-file $shim_cmd -encoding oem -append
