@@ -1,0 +1,12 @@
+{
+	"homepage": "http://elixir-lang.org/",
+	"version": "0.10.2",
+	"url": "https://github.com/elixir-lang/elixir/releases/download/v0.10.2/v0.10.2.zip",
+	"hash": "fd7a48e370e8d62c89826a0588b817c3b09880e7bca451dcd729f8905892e10b",
+	"bin": [
+		"bin\\elixir.bat",
+		"bin\\elixirc.bat",
+		"bin\\iex.bat",
+		"bin\\mix.bat"
+	]
+}
