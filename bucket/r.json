@@ -1,0 +1,15 @@
+{
+	"homepage": "http://www.r-project.org",
+	"version": "3.0.1",
+	"license": "GPL2",
+	"url": "http://cran.r-project.org/bin/windows/base/R-3.0.1-win.exe",
+	"hash": "9a511b4261e60702618c0c5811fbadc9e8b184ac2aef53997d20a472657d50b2",
+	"installer": {
+		"args": [ "/verysilent", "/dir=\"$dir\"", "/saveinf=\"$dir\\install.txt\"", "/noicons" ]
+	},
+	"uninstaller": { "file": "unins000.exe", "args": ["/verysilent"] },
+	"bin": [
+		"bin\\r.exe",
+		"bin\\rscript.exe"
+	]
+}
