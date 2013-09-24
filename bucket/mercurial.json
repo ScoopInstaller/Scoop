@@ -1,15 +1,15 @@
 {
 	"homepage": "mercurial.selenic.com",
-	"version": "2.6.2",
+	"version": "2.7.1",
 	"license": "GPL2",
 	"architecture": {
 		"64bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.6.2-x64.exe",
-			"hash": "d61b7ce3193507aee3214bbd890bdd9cda9d6bc45f134d2563a038f81e2a2331"
+			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.7.1-x64.exe",
+			"hash": "1eb71dfdfde1f7fc51487c2e8c62a2421f73885e6506980ed98984a1882b9070"
 		},
 		"32bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.6.2.exe",
-			"hash": "4ea3d91831521e720517c48fd80bcbbeb54a514186118cb2f6b9e023893443b6"
+			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.7.1.exe",
+			"hash": "83fa25ded2a502adc8f4bcf4e78da5d3b56a3fe5f5dfac11e991c9938c10ab6f"
 		}
 	},
 	"installer": { "args": [ "/verysilent", "/dir=\"$dir\"", "/noicons" ] },
