@@ -1,7 +1,8 @@
 {
 	"homepage": "https://github.com/lukesampson/concfg",
-	"version": "0.2013.07.01",
-	"url": "https://github.com/lukesampson/concfg/archive/master.zip",
-	"extract_dir": "concfg-master",
+	"version": "0.2013.09.25",
+	"url": "https://github.com/lukesampson/concfg/archive/7c12814ff8.zip",
+	"hash": "8be6925c7dcee6da01aaedfd75743ca0e0b9eb0de29dab60de9f60a402406f74",
+	"extract_dir": "concfg-7c12814ff888233557df4530d7fec77d6972822b",
 	"bin": "bin\\concfg.ps1"
 }
