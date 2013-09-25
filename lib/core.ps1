@@ -93,13 +93,17 @@ function shim($path, $global) {
 	echo "`$path = '$path'" >> $shim
 	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $shim
 
-	# shim .exe, .bat, .cmd so they can be used by programs with no awareness of PSH
-	if($path -match '\.(exe)|(bat)|(cmd)$') {
+	if($path -match '\.((exe)|(bat)|(cmd))$') {
+		# shim .exe, .bat, .cmd so they can be used by programs with no awareness of PSH
 		$shim_cmd = "$(strip_ext($shim)).cmd"
 		':: ensure $HOME is set for MSYS programs'           | out-file $shim_cmd -encoding oem
 		'@if "%home%"=="" set home=%homedrive%%homepath%\'   | out-file $shim_cmd -encoding oem -append
 		'@if "%home%"=="\" set home=%allusersprofile%\'      | out-file $shim_cmd -encoding oem -append
 		"@`"$path`" %*"                                      | out-file $shim_cmd -encoding oem -append
+	} elseif($path -match '\.ps1$') {
+		# make ps1 accessible from cmd.exe
+		$shim_cmd = "$(strip_ext($shim)).cmd"
+		"@powershell -noprofile -ex unrestricted `"& '$path' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding oem
 	}
 }
 
