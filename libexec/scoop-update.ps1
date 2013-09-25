@@ -47,6 +47,8 @@ if(!$app) {
 	$null > "$currentdir\last_updated" # save update timestamp
 	ensure_scoop_in_path
 
+	shim "$currentdir\bin\scoop.ps1" $false
+
 	@(buckets) | % {
 		"updating $_ bucket..."
 		$git = try { gcm git -ea stop } catch { $null }
