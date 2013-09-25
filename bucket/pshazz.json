@@ -1,7 +1,8 @@
 {
-	"version": "0.2013.07.10",
-	"url": "https://github.com/lukesampson/pshazz/archive/master.zip",
-	"extract_dir": "pshazz-master",
+	"version": "0.2013.09.25",
+	"url": "https://github.com/lukesampson/pshazz/archive/1b4e7215f8.zip",
+	"extract_dir": "pshazz-1b4e7215f8ef23a46598ffb1418ae88a3db17f1d",
+	"hash": "5795f75a0421be88b12c0462801bfd00291812114c215290c1dca18630d3aac7",
 	"bin": [ "bin\\pshazz.ps1" ],
 	"installer": { "file": "bin\\install.ps1" }
 }
