@@ -11,7 +11,7 @@ param($query)
 $local = installed_apps $false | % { @{ name = $_ } }
 $global = installed_apps $true | % { @{ name = $_; global = $true } }
 
-$apps = $local + $global
+$apps = @($local) + @($global)
 
 if($apps) {
 	echo "Installed apps$(if($query) { `" matching '$query'`"}):
