@@ -46,6 +46,12 @@ function dl_with_cache($app, $version, $url, $to) {
 }
 
 function dl_progress($url, $to) {
+	if([console]::isoutputredirected) {
+		# can't set cursor position: just do simple download
+		(new-object net.webclient).downloadfile($url, $to)
+		return
+	}
+
 	$left = [console]::cursorleft
 	$top = [console]::cursortop
 
