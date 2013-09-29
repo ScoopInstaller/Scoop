@@ -201,6 +201,7 @@ function check_hash($file, $url, $manifest, $arch) {
 		return $false, "hash check failed for $url. expected: $($expected), actual: $($actual)!"
 	}
 	write-host "ok"
+	return $true
 }
 
 function compute_hash($file, $algname) {
