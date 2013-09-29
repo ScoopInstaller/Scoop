@@ -108,7 +108,13 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 
 		dl_with_cache $app $version $url "$dir\$fname"
 
-		check_hash "$dir\$fname" $url $manifest $architecture
+		$ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
+		if(!$ok) {
+			# rm cached
+			$cached = cache_path $app $version $url
+			if(test-path $cached) { rm -force $cached }
+			abort $err
+		}
 
 		$extract_dir = $extract_dirs[$extracted]
 		$extract_to = $extract_tos[$extracted]
@@ -170,11 +176,12 @@ function hash_for_url($manifest, $url, $arch) {
 	@($hashes)[$index]
 }
 
+# returns (ok, err)
 function check_hash($file, $url, $manifest, $arch) {
 	$hash = hash_for_url $manifest $url $arch
 	if(!$hash) {
 		warn "warning: no hash in manifest. sha256 is:`n$(compute_hash (fullpath $file) 'sha256')"
-		return
+		return $true
 	}
 
 	write-host "checking hash..." -nonewline
@@ -184,12 +191,14 @@ function check_hash($file, $url, $manifest, $arch) {
 		$type, $expected = 'sha256', $type
 	}
 
-	if(@('md5','sha1','sha256') -notcontains $type) { "hash type $type isn't supported"	}
+	if(@('md5','sha1','sha256') -notcontains $type) {
+		return $false, "hash type $type isn't supported"
+	}
 	
 	$actual = compute_hash (fullpath $file) $type
 
 	if($actual -ne $expected) {
-		abort "hash check failed for $url. expected: $($expected), actual: $($actual)!"
+		return $false, "hash check failed for $url. expected: $($expected), actual: $($actual)!"
 	}
 	write-host "ok"
 }
