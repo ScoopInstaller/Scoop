@@ -99,11 +99,12 @@ if(!$app) {
 
 	$dir = versiondir $app $old_version	$global
 
-	echo "uninstalling $old_version"
+	"uninstalling $app ($old_version)"
 	run_uninstaller $manifest $architecture $dir
 	rm_shims $manifest $global
 	# note: keep the old dir in case it contains user files
 
+	"installing $app ($version)"
 	$dir = ensure (versiondir $app $version $global)
 
 	$manifest = manifest $app $bucket $url
