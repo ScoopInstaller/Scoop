@@ -42,6 +42,12 @@ $version = current_version $app $global
 "uninstalling $app ($version)"
 
 $dir = versiondir $app $version $global
+try {
+	test-path $dir -ea stop | out-null
+} catch [unauthorizedaccessexception] {
+	abort "access denied: $dir. you might need to restart"
+}
+
 $manifest = installed_manifest $app $version $global
 $install = install_info $app $version $global
 $architecture = $install.architecture
@@ -50,6 +56,7 @@ run_uninstaller $manifest $architecture $dir
 rm_shims $manifest $global
 env_rm_path $manifest $dir $global
 env_rm $manifest $global
+
 
 try { rm -r $dir -ea stop -force }
 catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }
