@@ -26,9 +26,10 @@ function buckets {
 }
 
 function find_manifest($app) {
-	@($null) + @(buckets) | % { # null for main bucket
-		$manifest = manifest $app $_
-		if($manifest) { return $manifest, $_ }
+	$buckets = @($null) + @(buckets) # null for main bucket
+	foreach($bucket in $buckets) {
+		$manifest = manifest $app $bucket
+		if($manifest) {	return $manifest, $bucket }
 	}
 }
 
