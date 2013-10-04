@@ -54,6 +54,7 @@ function install($app, $architecture, $global) {
 	$dir = ensure (versiondir $app $version $global)
 
 	$fname = dl_urls $app $version $manifest $architecture $dir
+	unpack_inno $fname $manifest $dir
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir $global
 	create_shims $manifest $dir $global

@@ -258,6 +258,23 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
 	return $true
 }
 
+function unpack_inno($fname, $manifest, $dir) {
+	if(!$manifest.innosetup) { return }
+
+	write-host "unpacking innosetup..." -nonewline
+	innounp -x -d"$dir\_scoop_unpack" "$dir\$fname" > "$dir\innounp.log"
+	if($lastexitcode -ne 0) {
+		abort "failed to unpack innosetup file. see $dir\innounp.log"
+	}
+
+	gci "$dir\_scoop_unpack\{app}" -r | mv -dest "$dir" -force
+
+	rmdir -r -force "$dir\_scoop_unpack"
+
+	rm "$dir\$fname"
+	write-host "done"
+}
+
 function run_installer($fname, $manifest, $architecture, $dir) {
 	# MSI or other installer
 	$msi = msi $manifest $architecture
