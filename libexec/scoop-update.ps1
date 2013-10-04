@@ -115,6 +115,7 @@ if(!$app) {
 	save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
 	$fname = dl_urls $app $version $manifest $architecture $dir
+	unpack_inno $fname $manifest $dir
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir
 	create_shims $manifest $dir $global
