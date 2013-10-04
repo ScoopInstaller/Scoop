@@ -131,7 +131,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			write-host "done"
 
 			$extracted++
-		} elseif(requires_7zip $fname) { # 7zip
+		} elseif(file_requires_7zip $fname) { # 7zip
 			if(!(7zip_installed)) {
 				warn "aborting: you'll need to run 'scoop uninstall $app' to clean up"
 				abort "7-zip is required. you can install it with 'scoop install 7zip'"
