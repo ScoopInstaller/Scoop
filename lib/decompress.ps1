@@ -1,7 +1,4 @@
-function 7zip_installed {
-	try { gcm 7z -ea stop } catch { return $false }
-	$true
-}
+function 7zip_installed { cmd_available '7z' }
 
 function requires_7zip($manifest, $architecture) {
 	foreach($dlurl in @(url $manifest $architecture)) {

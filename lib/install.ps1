@@ -216,12 +216,21 @@ function compute_hash($file, $algname) {
 	}
 }
 
+function cmd_available($cmd) {
+	try { gcm $cmd -ea stop } catch { return $false }
+	$true
+}
+
 function check_requirements($manifest, $architecture) {
 	if(!(7zip_installed)) {
 		if(requires_7zip $manifest $architecture) {
 			abort "7zip is required to install this app. please run 'scoop install 7zip'"
 		}
 	}
+
+	if($manifest.innosetup -and !(cmd_available 'innounp')) {
+		abort "innounp is required to install this app. please run 'scoop install innounp'"
+	} 
 }
 
 # for dealing with installers
