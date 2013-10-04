@@ -78,7 +78,7 @@ if(!$app) {
 	}
 
 	$old_version = current_version $app $global
-	$manifest = installed_manifest $app $old_version $global
+	$old_manifest = installed_manifest $app $old_version $global
 	$install = install_info $app $old_version $global
 
 	# re-use architecture, bucket and url from first install
@@ -95,19 +95,20 @@ if(!$app) {
 	}
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
 
+	$manifest = manifest $app $bucket $url
+	check_requirements $manifest $architecture
+
 	"updating $app ($old_version -> $version)"
 
 	$dir = versiondir $app $old_version	$global
 
 	"uninstalling $app ($old_version)"
-	run_uninstaller $manifest $architecture $dir
-	rm_shims $manifest $global
+	run_uninstaller $old_manifest $architecture $dir
+	rm_shims $old_manifest $global
 	# note: keep the old dir in case it contains user files
 
 	"installing $app ($version)"
 	$dir = ensure (versiondir $app $version $global)
-
-	$manifest = manifest $app $bucket $url
 		
 	# save info for uninstall
 	save_installed_manifest $app $bucket $dir $url

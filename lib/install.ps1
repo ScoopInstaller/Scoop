@@ -216,6 +216,14 @@ function compute_hash($file, $algname) {
 	}
 }
 
+function check_requirements($manifest, $architecture) {
+	if(!(7zip_installed)) {
+		if(requires_7zip $manifest $architecture) {
+			abort "7zip is required to install this app. please run 'scoop install 7zip'"
+		}
+	}
+}
+
 # for dealing with installers
 function args($config, $dir) {
 	if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }

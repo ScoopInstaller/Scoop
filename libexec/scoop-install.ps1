@@ -47,11 +47,7 @@ function install($app, $architecture, $global) {
 		abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
 	}
 
-	if(!(7zip_installed)) {
-		if(requires_7zip $manifest $architecture) {
-			abort "7zip is required to install this app. please run 'scoop install 7zip'"
-		}
-	}
+	check_requirements $manifest $architecture
 
 	"installing $app ($version)"
 
