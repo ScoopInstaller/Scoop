@@ -1,18 +1,17 @@
 {
 	"homepage": "mercurial.selenic.com",
-	"version": "2.7.1",
+	"version": "2.7.2",
 	"license": "GPL2",
 	"architecture": {
 		"64bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.7.1-x64.exe",
-			"hash": "1eb71dfdfde1f7fc51487c2e8c62a2421f73885e6506980ed98984a1882b9070"
+			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.7.2-x64.exe",
+			"hash": "ad17de523769b6dbe0c1a735c81630d3afe495988a7fc674571a9746d5abd7e5"
 		},
 		"32bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.7.1.exe",
-			"hash": "83fa25ded2a502adc8f4bcf4e78da5d3b56a3fe5f5dfac11e991c9938c10ab6f"
+			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.7.2.exe",
+			"hash": "3f9b055d54989bb456f0dc5fafd19da0de82a1f85b3dd021f9472d7d51f803a6"
 		}
 	},
-	"installer": { "args": [ "/verysilent", "/dir=\"$dir\"", "/noicons" ] },
-	"uninstaller": { "file": "unins000.exe", "args": ["/verysilent"] },
+	"innosetup": true,
 	"bin": "hg.exe"
 }
