@@ -1,8 +1,8 @@
 {
 	"homepage": "http://elixir-lang.org/",
-	"version": "0.10.2",
-	"url": "https://github.com/elixir-lang/elixir/releases/download/v0.10.2/v0.10.2.zip",
-	"hash": "fd7a48e370e8d62c89826a0588b817c3b09880e7bca451dcd729f8905892e10b",
+	"version": "0.10.3",
+	"url": "https://github.com/elixir-lang/elixir/releases/download/v0.10.3/v0.10.3.zip",
+	"hash": "c898906651b3edb40e642221e58642a0abc165c97b3624a251bfe337efae9278",
 	"bin": [
 		"bin\\elixir.bat",
 		"bin\\elixirc.bat",
