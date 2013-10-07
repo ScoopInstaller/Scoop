@@ -13,7 +13,12 @@ function file_requires_7zip($fname) {
 function extract_7zip($path, $to, $recurse) {
 	if(!$recurse) { write-host "extracting..." -nonewline }
 	$output = 7z x "$path" -o"$to" -y
-	if($lastexitcode -ne 0) { abort "exit code was $lastexitcode" }
+	if($lastexitcode -ne 0) {
+		if($recurse) {
+			warn "couldn't extract $path, continuing"; return
+		}
+		abort "exit code was $lastexitcode"
+	}
 
 	# recursively extract files, e.g. for .tar.gz
 	$output | sls '^Extracting\s+(.*)$' | % {
