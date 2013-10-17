@@ -505,6 +505,6 @@ function show_notes($manifest) {
 	if($manifest.notes) {
 		echo "Notes"
 		echo "-----"
-		echo $manifest.notes
+		echo (wraptext $manifest.notes)
 	}
 }

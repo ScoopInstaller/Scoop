@@ -127,7 +127,7 @@ function remove_from_path($dir,$global) {
 	$dir = fullpath $dir
 
 	# future sessions
-	$was_in_path, $newpath = strip_path (env 'path' $global) $dir
+	$widthas_in_path, $newpath = strip_path (env 'path' $global) $dir
 	if($was_in_path) { 
 		echo "removing $(friendly_path $dir) from your path"
 		env 'path' $global $newpath
@@ -142,4 +142,21 @@ function ensure_scoop_in_path($global) {
 	$abs_shimdir = ensure (shimdir $global)
 	# be aggressive (b-e-aggressive) and install scoop first in the path
 	ensure_in_path $abs_shimdir $global
+}
+
+function wraptext($text, $width) {
+	if(!$width) { $width = $host.ui.rawui.windowsize.width };
+	$width -= 1 # be conservative: doesn't seem to print the last char
+
+	$text -split '\r?\n' | % {
+		$line = ''
+		$_ -split ' ' | % {
+			if($line.length -eq 0) { $line = $_ }
+			elseif($line.length + $_.length + 1 -le $width) { $line += " $_" }
+			else { $lines += ,$line; $line = $_ }
+		}
+		$lines += ,$line
+	}
+
+	$lines -join "`n"
 }
