@@ -2,7 +2,14 @@
 	"homepage": "http://users.ugent.be/~bpuype/wget/",
 	"license": "GPL3",
 	"version": "1.11.4",
-	"url": "http://users.ugent.be/~bpuype/cgi-bin/fetch.pl?dl=wget/wget.exe",
-	"hash": "sha1:457b1cd985ed07baffd8c66ff40e9c1b6da93753",
-	"bin": "wget.exe"
+	"url": [
+		"http://users.ugent.be/~bpuype/cgi-bin/fetch.pl?dl=wget/wget.exe",
+		"http://curl.haxx.se/ca/cacert.pem"
+	],
+	"hash": [
+		"sha1:457b1cd985ed07baffd8c66ff40e9c1b6da93753",
+		""
+	],
+	"bin": "wget.exe",
+	"post_install": "\"ca_certificate=$dir\\cacert.pem\" | out-file $dir\\wget.ini -encoding default"
 }
