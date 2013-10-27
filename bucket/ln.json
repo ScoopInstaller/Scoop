@@ -1,6 +1,7 @@
 {
 	"homepage": "https://github.com/lukesampson/psutils",
-	"version": "0.2013.07.24",
-	"url": "https://raw.github.com/lukesampson/psutils/master/ln.ps1",
+	"version": "0.2013.10.28",
+	"url": "https://raw.github.com/lukesampson/psutils/f7043c735a/ln.ps1",
+	"hash": "4d9d152150e36072842bf21c17752496a5863e58f775db2adfc5abdc01645b9e",
 	"bin": "ln.ps1"
 }
