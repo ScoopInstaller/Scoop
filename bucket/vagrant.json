@@ -1,11 +1,11 @@
 {
-	"version": "1.2.4",
+	"version": "1.3.5",
 	"license": "MIT",
-	"url": "http://files.vagrantup.com/packages/0219bb87725aac28a97c0e924c310cc97831fd9d/Vagrant_1.2.4.msi",
-	"hash": "f160bb5474083aa49f17a74d80448c1850f0139c40551565b75a3b6a74b22d2d",
+	"url": "http://files.vagrantup.com/packages/a40522f5fabccb9ddabad03d836e120ff5d14093/Vagrant_1.3.5.msi",
+	"hash": "d4d6899a324f009c8bbd331cb48e7f23dcb15a54e08c86b05ab441f7b4a8c091",
 	"msi": {
 		"silent": true,
-		"code": "{BBD54C5B-F7BB-4127-A707-A13A667E3102}",
+		"code": "{DC983148-AD0C-400F-8BF3-8D6B84DE37B8}",
 		"args": [ "MANUFACTURERDIR=\"$dir\"", "VAGRANTAPPDIR=\"$dir\"" ]
 	},
 	"bin": "bin\\vagrant.bat"
