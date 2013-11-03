@@ -1,3 +1,11 @@
+function ensure_architecture($architecture_opt) {
+	switch($architecture_opt) {
+		'' { return default_architecture }
+		{ @('32bit','64bit') -contains $_ } { return $_ }
+		default { abort "invalid architecture: '$architecture'"}
+	}
+}
+
 function cache_path($app, $version, $url) {
 	"$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')"
 }

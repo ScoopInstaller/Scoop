@@ -76,13 +76,7 @@ $opt, $apps, $err = getopt $args 'ga:' 'global', 'arch='
 if($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
-$architecture = $opt.a + $opt.arch
-
-switch($architecture) {
-	'' { $architecture = architecture }
-	{ @('32bit','64bit') -contains $_ } { }
-	default { abort "invalid architecture: '$architecture'"}
-}
+$architecture = ensure_architecture $opt.a + $opt.arch
 
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 

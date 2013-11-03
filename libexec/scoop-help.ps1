@@ -3,8 +3,8 @@
 param($cmd)
 
 . "$psscriptroot\..\lib\core.ps1"
-. (relpath ..\lib\commands.ps1)
-. (relpath ..\lib\help.ps1)
+. "$psscriptroot\..\lib\commands.ps1"
+. "$psscriptroot\..\lib\help.ps1"
 
 function print_help($cmd) {
 	$file = gc (relpath ".\scoop-$cmd.ps1") -raw
