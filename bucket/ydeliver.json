@@ -1,0 +1,7 @@
+{
+    "version": "0.8.1",
+    "url": "https://github.com/manojlds/YDeliver/releases/download/v0.8.1/YDeliver.zip",
+    "hash": "584749C759CCCD464D1C72CC8CE5F7C29A29A8233CBBC3DB1D4F4473AA91B7D0",
+    "homepage": "http://ydeliver.stacktoheap.com",
+    "installer": { "file": "scoopInstall.ps1" }
+}
