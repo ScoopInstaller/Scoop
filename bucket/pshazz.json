@@ -1,8 +1,8 @@
 {
-	"version": "0.2013.09.25",
-	"url": "https://github.com/lukesampson/pshazz/archive/1b4e7215f8.zip",
-	"extract_dir": "pshazz-1b4e7215f8ef23a46598ffb1418ae88a3db17f1d",
-	"hash": "5795f75a0421be88b12c0462801bfd00291812114c215290c1dca18630d3aac7",
+	"version": "0.2013.11.06",
+	"url": "https://github.com/lukesampson/pshazz/archive/f68a29262c.zip",
+	"extract_dir": "pshazz-f68a29262c7280a1b68112bd17dc8aa29cdab67d",
+	"hash": "6fe26fc83546a43a9d419687e4b48f80a192cf00410b591529acf6495c871b4a",
 	"bin": [ "bin\\pshazz.ps1" ],
 	"installer": { "file": "bin\\install.ps1" }
 }
