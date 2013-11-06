@@ -1,18 +1,18 @@
 {
 	"url": "http://www.vim.org",
 	"license": "http://vimdoc.sourceforge.net/htmldoc/uganda.html#license",
-	"version": "7.3.046",
+	"version": "7.4",
 	"url": [
-		"ftp://ftp.vim.org/pub/vim/pc/vim73_46rt.zip",
-		"ftp://ftp.vim.org/pub/vim/pc/vim73_46w32.zip",
-		"https://raw.github.com/lukesampson/psutils/master/vimtutor.ps1"
+		"http://ftp.vim.org/pub/vim/pc/vim74w32.zip",
+		"http://ftp.vim.org/pub/vim/pc/vim74rt.zip",
+		"https://raw.github.com/lukesampson/psutils/3653063/vimtutor.ps1"
 	],
 	"hash": [
-		"md5:29142b7d4ff0b65c394c4a1ef1263ded",
-		"md5:e16ec5b633d2f00bf511529e6abf3670",
+		"md5:e53fa93de55b29b45224a5504ad78a4f",
+		"md5:819c04edd9ec4df8e30cb9d6bb9ef0ca",
 		"f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498"
 	],
-	"extract_dir": [ "vim\\vim73", "vim\\vim73" ],
+	"extract_dir": [ "vim\\vim74", "vim\\vim74" ],
 	"bin": [ "vim.exe", "vimtutor.ps1" ],
 	"post_install": "if(!(test-path ~\\.vimrc)) {
 		cp \"$(split-path(scoop which vim))\\vimrc_example.vim\" ~\\.vimrc
