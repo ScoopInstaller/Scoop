@@ -44,7 +44,8 @@ function fullpath($path) { # should be ~ rooted
 }
 function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
 function friendly_path($path) {
-	return "$path" -replace ([regex]::escape($home)), "~"
+	$h = $home; if(!$h.endswith('\')) { $h += '\' }
+	return "$path" -replace ([regex]::escape($h)), "~\"
 }
 function is_local($path) {
 	($path -notmatch '^https?://') -and (test-path $path)
