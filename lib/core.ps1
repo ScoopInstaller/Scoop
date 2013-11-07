@@ -9,8 +9,9 @@ function format($str, $hash) {
 	$executionContext.invokeCommand.expandString($str)
 }
 function is_admin {
-	$id = [Security.Principal.WindowsIdentity]::GetCurrent()
-	([Security.Principal.WindowsPrincipal]($id)).isinrole("Administrators")
+	$admin = [security.principal.windowsbuiltinrole]::administrator
+	$id = [security.principal.windowsidentity]::getcurrent()
+	([security.principal.windowsprincipal]($id)).isinrole($admin)
 }
 
 # messages
