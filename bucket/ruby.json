@@ -5,7 +5,7 @@
 		"64bit": {
 			"url": [
 				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p247-x64-mingw32.7z?direct#/dl.7z",
-				"http://rubyforge.org/frs/download.php/76808/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
+				"http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
 			],
 			"hash": [
 				"2c3399a96c9c2f3fe6bce1ad6e569e7534fd36318b6ca0077026e3c077172afe",
@@ -16,7 +16,7 @@
 		"32bit": {
 			"url": [
 				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p247-i386-mingw32.7z?direct#/dl.7z",
-				"http://rubyforge.org/frs/download.php/76805/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
+				"http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
 			],
 			"hash": [
 				"ac4c80b23623449f31aaa908818d48c504f4c364c2a2e127a9ae8d2fae5f99e4",
