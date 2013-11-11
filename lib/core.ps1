@@ -129,7 +129,7 @@ function remove_from_path($dir,$global) {
 	$dir = fullpath $dir
 
 	# future sessions
-	$widthas_in_path, $newpath = strip_path (env 'path' $global) $dir
+	$was_in_path, $newpath = strip_path (env 'path' $global) $dir
 	if($was_in_path) { 
 		echo "removing $(friendly_path $dir) from your path"
 		env 'path' $global $newpath
