@@ -1,0 +1,10 @@
+{
+	"url": "http://www.gnu.org/software/emacs/",
+	"license": "https://gnu.org/licenses/gpl.html",
+	"version": "23.4",
+	"url": ["http://ftp.gnu.org/gnu/emacs/windows/emacs-24.3-bin-i386.zip"],
+	"hash": ["md5:06033dc7a9869dacb10299a8df99b9c2"],
+	"extract_dir": [ "emacs-24.3" ],
+	"bin": [ "bin\\runemacs.exe", "bin\\emacs.exe", "bin\\emacsclientw.exe" ],
+    "post_install": '. "$(split-path(scoop which runemacs))\\addpm.exe" -q'
+}
