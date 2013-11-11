@@ -448,7 +448,7 @@ function env_add_path($manifest, $dir, $global) {
 	$manifest.env_add_path | ? { $_ } | % {
 		$path_dir = "$dir\$($_)"
 		if(!(is_in_dir $dir $path_dir)) {
-			abort "error in manifest: add_to_path '$_' is outside the app directory"
+			abort "error in manifest: env_add_path '$_' is outside the app directory"
 		}
 		add_first_in_path $path_dir $global
 	}
