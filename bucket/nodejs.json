@@ -24,5 +24,6 @@
 			]
 		}
 	},
+	"env_add_path": "\\",
 	"bin": [ "node.exe", "npm.cmd" ]
 }
