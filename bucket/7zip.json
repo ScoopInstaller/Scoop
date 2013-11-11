@@ -20,9 +20,6 @@
 			}
 		}
 	},
-	"bin": [
-		"7z.exe",
-		"7zFM.exe",
-		"7zG.exe"
-	]
+	"env_add_path": "\\",
+	"bin": "7z.exe"
 }
