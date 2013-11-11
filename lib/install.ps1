@@ -156,10 +156,10 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 	$fname # returns the last downloaded file
 }
 
-function is_in_dir($dir, $file) {
-	$file = "$(fullpath $file)"
+function is_in_dir($dir, $check) {
+	$check = "$(fullpath $check)"
 	$dir = "$(fullpath $dir)"
-	$file -match "^$([regex]::escape("$dir\"))"
+	$check -match "^$([regex]::escape("$dir"))(\\|`$)"
 }
 
 # hashes
