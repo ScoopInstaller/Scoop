@@ -14,7 +14,7 @@
 # options
 $opt, $app, $err = getopt $args 'g' 'global'
 if($err) { "scoop uninstall: $err"; exit 1 }
-$global = $opt.g -or $opt.global
+$global = $opt['g'] -or $opt['global']
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
