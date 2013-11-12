@@ -75,8 +75,8 @@ function install($app, $architecture, $global) {
 $opt, $apps, $err = getopt $args 'ga:' 'global', 'arch='
 if($err) { "scoop install: $err"; exit 1 }
 
-$global = $opt.g -or $opt.global
-$architecture = $opt.a + $opt.arch
+$global = $opt['g'] -or $opt['global']
+$architecture = $opt['a'] + $opt['arch']
 
 switch($architecture) {
 	'' { $architecture = architecture }

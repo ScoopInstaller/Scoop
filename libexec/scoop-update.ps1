@@ -15,7 +15,7 @@
 
 $opt, $app, $err = getopt $args 'g' 'global'
 if($err) { "scoop update: $err"; exit 1 }
-$global = $opt.g -or $opt.global
+$global = $opt['g'] -or $opt['global']
 
 if(!$app) {
 	if($global) {
