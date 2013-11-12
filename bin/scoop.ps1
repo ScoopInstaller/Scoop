@@ -1,6 +1,8 @@
 #requires -v 3
 param($cmd)
 
+set-strictmode -off
+
 . "$psscriptroot\..\lib\core.ps1"
 . (relpath '..\lib\commands')
 
