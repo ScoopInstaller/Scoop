@@ -20,5 +20,6 @@
 			}
 		}
 	},
+	"env_add_path": "\\",
 	"bin": "7z.exe"
 }
