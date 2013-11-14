@@ -8,5 +8,6 @@
 	"bin": [
 		"bin\\r.exe",
 		"bin\\rscript.exe"
-	]
+	],
+	"notes": "You'll need to type 'r.ps1' or 'r.cmd' to run R, because in Powershell 'r' runs the last command."
 }
