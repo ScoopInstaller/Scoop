@@ -9,5 +9,11 @@
 		"bin\\r.exe",
 		"bin\\rscript.exe"
 	],
-	"notes": "You'll need to type 'r.ps1' or 'r.cmd' to run R, because in Powershell 'r' runs the last command."
+	"notes": "You'll need to type 'r.ps1' or 'r.cmd' to run R, because in Powershell 'r' runs the last command.
+
+Alternatively, can remove Powershell's 'r' command with:
+    rm alias:\\r
+
+This only affects your current session: if you'd like to remove it for all future sessions you can add the command above to your Powershell profile.    
+"
 }
