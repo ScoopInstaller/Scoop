@@ -1,16 +1,16 @@
 {
 	"homepage": "https://www.dartlang.org",
 	"license": "BSD",
-	"version": "0.8.5.1",
+	"version": "1.0.0.3_r30188",
 	"_comment": "for versions, see https://storage.googleapis.com/dart-editor-archive-integration/latest/changelog.html",
 	"architecture": {
 		"64bit": {
-			"url": "https://storage.googleapis.com/dart-editor-archive-integration/28990/dartsdk-win32-64.zip",
-			"hash": "4a2898fb38b304e306419c02f53cbfabb776532b41f762fac4838d8c0a3d2ad7"
+			"url": "http://storage.googleapis.com/dart-archive/channels/stable/release/30188/sdk/dartsdk-windows-x64-release.zip",
+			"hash": "fa36844e2351b301762a09ddc2da8b24fb82dc7504ce9dfac2f4827ea94fbe4c"
 		},
 		"32bit": {
-			"url": "https://storage.googleapis.com/dart-editor-archive-integration/28990/dartsdk-win32-32.zip",
-			"hash": "846ac309fa90722c278b5e090763380e696225ba146818aac84218044ff2baae"
+			"url": "http://storage.googleapis.com/dart-archive/channels/stable/release/30188/sdk/dartsdk-windows-ia32-release.zip",
+			"hash": "6c8ac51dff597d8bca5d96a5a53808f60682507ca01b870e5136392e50d6efa4"
 		}
 	},
 	"extract_dir": "dart-sdk",
