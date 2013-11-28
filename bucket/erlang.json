@@ -14,7 +14,8 @@
 	},
 	"extract_dir": "$_OUTDIR",
 	"bin": [
-		"bin\\erl.exe"
+		"bin\\erl.exe",
+		"bin\\escript.exe"
 	],
 	"post_install": "
 $ini = \"$dir\\bin\\erl.ini\"
