@@ -1,0 +1,11 @@
+{
+	"homepage": "http://www.scala-sbt.org/",
+	"version": "0.13.0",
+	"license": "BSD",
+	"url": "http://repo.scala-sbt.org/scalasbt/sbt-native-packages/org/scala-sbt/sbt/0.13.0/sbt.zip",
+	"hash": "7e9b413736b9ad841f1588dd3116c848110a2fc37ba663461523a4383bb236ae",
+	"extract_dir": "sbt",
+	"bin": [
+		"bin\\sbt.bat"
+	]
+}
