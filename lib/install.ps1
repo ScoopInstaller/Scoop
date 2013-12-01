@@ -33,16 +33,22 @@ function locate($app) {
 	return $app, $manifest, $bucket, $url
 }
 
+# returns (ok, err)
 function dl_with_cache($app, $version, $url, $to) {
 	$cached = fullpath (cache_path $app $version $url)
 	if(!(test-path $cached)) {
 		$null = ensure $cachedir
 		write-host "downloading $url..." -nonewline
 		dl_progress $url "$cached.download"
+		if (!((Get-Item "$cached.download").length)) {
+			write-host "failed"
+			return $false, "download failed for $url"
+		}
 		mv "$cached.download" $cached
 		write-host "done"
 	} else { write-host "loading $url from cache..."}
 	cp $cached $to
+	return $true
 }
 
 function dl_progress($url, $to) {
@@ -106,7 +112,13 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 	foreach($url in $urls) {
 		$fname = split-path $url -leaf
 
-		dl_with_cache $app $version $url "$dir\$fname"
+		$ok, $err = dl_with_cache $app $version $url "$dir\$fname"
+		if(!$ok) {
+			# rm cached.download
+			$cached = cache_path $app $version $url
+			if(test-path "$cached.download") { rm -force "$cached.download" }
+			abort $err
+		}
 
 		$ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
 		if(!$ok) {
@@ -192,12 +204,14 @@ function check_hash($file, $url, $manifest, $arch) {
 	}
 
 	if(@('md5','sha1','sha256') -notcontains $type) {
+		write-host "failed"
 		return $false, "hash type $type isn't supported"
 	}
 	
 	$actual = compute_hash (fullpath $file) $type
 
 	if($actual -ne $expected) {
+		write-host "failed"
 		return $false, "hash check failed for $url. expected: $($expected), actual: $($actual)!"
 	}
 	write-host "ok"
