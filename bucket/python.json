@@ -25,7 +25,7 @@
 	"bin": [ "python.exe", "py.exe" ],
 	"env_add_path": [ "scripts" ],
 	"post_install": "pushd $env:temp
-	$s = 'https://python-distribute.org/distribute_setup.py'
+	$s = 'http://python-distribute.org/distribute_setup.py'
 	echo \"running $s...\";(new-object net.webclient).downloadstring($s) | python 2>&1 > $null
 	popd",
 	"notes": "To use PIP to manage Python packages, run 'easy_install pip'"
