@@ -124,8 +124,8 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			write-host "extracting..." -nonewline
 			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
 			$null = mkdir "$dir\_scoop_unzip"
-			unzip "$dir\$fname" "$dir\_scoop_unzip" $extract_dir
-			cp "$dir\_scoop_unzip\*" "$dir\$extract_to" -r -force
+			unzip "$dir\$fname" "$dir\_scoop_unzip"
+			cp "$dir\_scoop_unzip\$extract_dir\*" "$dir\$extract_to" -r -force
 			rm -r -force "$dir\_scoop_unzip"
 			rm "$dir\$fname"
 			write-host "done"

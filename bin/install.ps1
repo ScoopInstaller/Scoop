@@ -24,7 +24,9 @@ echo 'downloading...'
 dl $zipurl $zipfile
 
 'extracting...'
-unzip $zipfile $dir 'scoop-master'
+unzip $zipfile "$dir\_scoop_unzip"
+cp "$dir\_scoop_unzip\scoop-master\*" $dir -r -force
+rm "$dir\_scoop_unzip" -r -force
 rm $zipfile
 
 $null > "$dir\last_updated" # save install timestamp

@@ -37,11 +37,11 @@ if(!$app) {
 	dl $zipurl $zipfile
 
 	echo 'extracting...'
-	unzip $zipfile $tempdir 'scoop-master'
+	unzip $zipfile $tempdir
 	rm $zipfile
 
 	echo 'replacing files...'
-	$null = robocopy $tempdir $currentdir /mir /njh /njs /nfl /ndl
+	$null = robocopy "$tempdir\scoop-master" $currentdir /mir /njh /njs /nfl /ndl
 	rm -r -force $tempdir -ea stop
 
 	$null > "$currentdir\last_updated" # save update timestamp

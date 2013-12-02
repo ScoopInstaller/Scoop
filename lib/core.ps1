@@ -59,28 +59,10 @@ function env($name,$global,$val='__get') {
 	if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
 	else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
-function unzip($path,$to,$folder) {
+function unzip($path,$to) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
-	$shell = (new-object -com shell.application -strict)
-	$zipfiles = $shell.namespace("$path").items()
-	
-	if($folder) { # note: couldn't get this to work as a separate function
-		$next, $rem = $folder.split('\')
-		while($next) {
-			$found = $false
-			foreach($item in $zipfiles) {
-				if($item.isfolder -and ($item.name -eq $next)) {
-					$zipfiles = $item.getfolder.items()
-					$found = $true
-					break
-				}
-			}
-			if(!$found) { abort "couldn't find folder '$folder' inside $(friendly_path $path)" }
-			$next, $rem = $rem
-		}
-	}
-
-	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
+	add-type -assembly "System.IO.Compression.FileSystem"
+	[io.compression.zipfile]::extracttodirectory($path,$to)
 }
 
 function shim($path, $global) {
