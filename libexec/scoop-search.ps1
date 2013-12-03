@@ -26,7 +26,7 @@ function search_bucket($bucket, $query) {
 
 	if($query) { $apps = $apps | ? {
 		if($_.name -match $query) { return $true }
-		$bin = bin_match (manifest $_.name) $query
+		$bin = bin_match (manifest $_.name $bucket) $query
 		if($bin) {
 			$_.bin = $bin; return $true;
 		}
