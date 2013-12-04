@@ -1,0 +1,7 @@
+{
+        "homepage": "http://technet.microsoft.com/en-us/sysinternals/bb842062",
+        "license": "http://technet.microsoft.com/sysinternals/bb469936",
+        "version": "1.11.0.0",
+        "url": "http://download.sysinternals.com/files/WhoIs.zip",
+        "bin": "whois.exe"
+ }
