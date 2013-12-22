@@ -47,7 +47,7 @@ function install_info($app, $version, $global) {
 	parse_json $path
 }
 
-function architecture {
+function default_architecture {
 	if([intptr]::size -eq 8) { return "64bit" }
 	"32bit"
 }
