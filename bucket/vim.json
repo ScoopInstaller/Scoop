@@ -5,17 +5,22 @@
 	"url": [
 		"http://ftp.vim.org/pub/vim/pc/vim74w32.zip",
 		"http://ftp.vim.org/pub/vim/pc/vim74rt.zip",
+		"http://downloads.sourceforge.net/project/gettext/libiconv-win32/1.9.1/libiconv-1.9.1.bin.woe32.zip",
+		"http://downloads.sourceforge.net/project/gettext/gettext-win32/0.13.1/gettext-runtime-0.13.1.bin.woe32.zip",
 		"https://raw.github.com/lukesampson/psutils/3653063/vimtutor.ps1"
 	],
 	"hash": [
 		"md5:e53fa93de55b29b45224a5504ad78a4f",
 		"md5:819c04edd9ec4df8e30cb9d6bb9ef0ca",
+		"c0aa25c4c16f297a262dbcfcac7bed95d2cb2dc39603eac10e5d79be50a562a3",
+		"68a49890f4469afebb24c28d2f1396f019607f3acc137963de0da789d93dc58f",
 		"f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498"
 	],
-	"extract_dir": [ "vim\\vim74", "vim\\vim74" ],
+	"extract_dir": [ "vim\\vim74", "vim\\vim74", "bin", "bin" ],
 	"bin": [ "vim.exe", "vimtutor.ps1" ],
-	"post_install": "if(!(test-path ~\\.vimrc)) {
-		cp \"$(split-path(scoop which vim))\\vimrc_example.vim\" ~\\.vimrc
+	"post_install": "mv -force \"$dir\\intl.dll\" \"$dir\\libintl.dll\"
+		if(!(test-path ~\\.vimrc)) {
+		cp \"$dir\\vimrc_example.vim\" ~\\.vimrc
 		\"set shell=$((gcm powershell).path)\" | out-file  ~\\.vimrc -append -encoding ascii
 		echo '~/.vimrc was created with your shell set to Powershell.'
 	} else { echo '~/.vimrc exists, skipping' }"
