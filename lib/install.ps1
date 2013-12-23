@@ -127,35 +127,34 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 		$extract_dir = $extract_dirs[$extracted]
 		$extract_to = $extract_tos[$extracted]
 
-		# extract
+		# work out extraction method, if applicable
+		$extract_fn = $null
 		if($fname -match '\.zip$') { # unzip
-			write-host "extracting..." -nonewline
-			# use tmp directory and copy so we can prevent 'folder merge' errors when multiple URLs
-			$null = mkdir "$dir\_scoop_unzip"
-			unzip "$dir\$fname" "$dir\_scoop_unzip"
-			cp "$dir\_scoop_unzip\$extract_dir\*" "$dir\$extract_to" -r -force
-			rm -r -force "$dir\_scoop_unzip"
-			rm "$dir\$fname"
-			write-host "done"
-
-			$extracted++
+			$extract_fn = 'unzip'
+		} elseif($fname -match '\.msi$') {
+			# check manifest doesn't use deprecated install method
+			$msi = msi $manifest $architecture
+			if(!$msi) {
+				$extract_fn = 'extract_msi'
+			} else {
+				warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs"
+			}
 		} elseif(file_requires_7zip $fname) { # 7zip
 			if(!(7zip_installed)) {
 				warn "aborting: you'll need to run 'scoop uninstall $app' to clean up"
 				abort "7-zip is required. you can install it with 'scoop install 7zip'"
 			}
-			$to = $dir
+			$extract_fn = 'extract_7zip'
+		}
 
-			if($extract_dir) {
-				$to = "$dir\_scoop_extract"
-			}
-
-			extract_7zip "$dir\$fname" "$to\$extract_to"
-
-			if($extract_dir) {
-				gci "$to\$extract_to\$extract_dir" -r | mv -dest "$dir" -force
-				rm -r -force "$to"
-			}
+		if($extract_fn) {
+			write-host "extracting..." -nonewline
+			$null = mkdir "$dir\_scoop_extract"
+			& $extract_fn "$dir\$fname" "$dir\_scoop_extract"
+			cp "$dir\_scoop_extract\$extract_dir\*" "$dir\$extract_to" -r -force
+			rm -r -force "$dir\_scoop_extract"
+			rm "$dir\$fname"
+			write-host "done"
 
 			$extracted++
 		}
@@ -248,7 +247,7 @@ function args($config, $dir) {
 }
 
 function run($exe, $arg, $msg, $continue_exit_codes) {
-	write-host $msg -nonewline
+	if($msg) { write-host $msg -nonewline }
 	try {
 		$proc = start-process $exe -wait -ea stop -passthru -arg $arg
 		if($proc.exitcode -ne 0) {
@@ -262,7 +261,7 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
 		write-host -f darkred $_.exception.tostring()
 		return $false
 	}
-	write-host "done"
+	if($msg) { write-host "done" }
 	return $true
 }
 
@@ -295,6 +294,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 	}
 }
 
+# deprecated
 function install_msi($fname, $dir, $msi) {
 	$msifile = "$dir\$(coalesce $msi.file "$fname")"
 	if(!(is_in_dir $dir $msifile)) {
@@ -319,6 +319,12 @@ function install_msi($fname, $dir, $msi) {
 	}
 	rm $logfile
 	rm $msifile
+}
+
+function extract_msi($path, $to) {
+	$arg = '/a', "TARGETDIR=`"$to`""
+	$ok = run 'msiexec' @('/a', "$dir\$fname", '/qn', "TARGETDIR=`"$to`"")
+	if(!$ok) { abort "failed to extract files from $path" }
 }
 
 # get-wmiobject win32_product is slow and checks integrity of each installed program,
