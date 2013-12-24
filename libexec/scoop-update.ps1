@@ -96,7 +96,6 @@ if(!$app) {
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
 
 	$manifest = manifest $app $bucket $url
-	check_requirements $manifest $architecture
 
 	"updating $app ($old_version -> $version)"
 

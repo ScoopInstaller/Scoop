@@ -1,3 +1,15 @@
+# resolve dependencies for the supplied apps, and sort into the correct order
+function install_order($apps, $arch) {
+	$res = @()
+	foreach($app in $apps) {
+		foreach($dep in deps $app $arch) {
+			if($res -notcontains $dep) { $res += $dep}
+		}
+		if($res -notcontains $app) { $res += $app }
+	}
+	return $res
+}
+
 # http://www.electricmonk.nl/docs/dependency_resolving_algorithm/dependency_resolving_algorithm.html
 function deps($app, $arch) {
 	$resolved = new-object collections.arraylist

@@ -228,18 +228,6 @@ function cmd_available($cmd) {
 	$true
 }
 
-function check_requirements($manifest, $architecture) {
-	if(!(7zip_installed)) {
-		if(requires_7zip $manifest $architecture) {
-			abort "7zip is required to install this app. please run 'scoop install 7zip'"
-		}
-	}
-
-	if($manifest.innosetup -and !(cmd_available 'innounp')) {
-		abort "innounp is required to install this app. please run 'scoop install innounp'"
-	} 
-}
-
 # for dealing with installers
 function args($config, $dir) {
 	if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }
@@ -509,7 +497,7 @@ function env_rm($manifest, $global) {
 }
 
 function post_install($manifest) {
-	$manifest.post_install | ? {$_ } | % {
+	$manifest.post_install | ? { $_ } | % {
 		echo "running post-install script..."
 		iex $_
 	}
@@ -521,4 +509,17 @@ function show_notes($manifest) {
 		echo "-----"
 		echo (wraptext $manifest.notes)
 	}
+}
+
+function all_installed($apps, $global) {
+	$installed = @()
+	foreach($app in $apps) {
+		if(installed $app $global) { $installed += $app}
+	}
+	$installed
+}
+
+function prune_installed($apps, $global) {
+	$installed = all_installed($apps, $global)
+	$apps | ? { $installed -notcontains $_ }
 }

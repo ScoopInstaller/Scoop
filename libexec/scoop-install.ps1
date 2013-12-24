@@ -23,6 +23,7 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
+. "$psscriptroot\..\lib\depends.ps1"
 
 function install($app, $architecture, $global) {
 	$app, $manifest, $bucket, $url = locate $app
@@ -36,18 +37,6 @@ function install($app, $architecture, $global) {
 	if($version -match '[^\w\.\-_]') {
 		abort "manifest version has unsupported character '$($matches[0])'"
 	}
-
-	if(installed $app $global) {
-		$global_flag = $null; if($global){$global_flag = ' --global'}
-
-		$version = @(versions $app $global)[-1]
-		if(!(install_info $app $version $global)) {
-			abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app$global_flag' before retrying the install."
-		}
-		abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
-	}
-
-	check_requirements $manifest $architecture
 
 	"installing $app ($version)"
 
@@ -72,6 +61,19 @@ function install($app, $architecture, $global) {
 	show_notes $manifest
 }
 
+function ensure_none_installed($apps, $global) {
+	$app = @(all_installed $apps $global)[0] # might return more than one; just get the first
+	if($app) {
+		$global_flag = $null; if($global){$global_flag = ' --global'}
+
+		$version = @(versions $app $global)[-1]
+		if(!(install_info $app $version $global)) {
+			abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app$global_flag' before retrying the install."
+		}
+		abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
+	}
+}
+
 $opt, $apps, $err = getopt $args 'ga:' 'global', 'arch='
 if($err) { "scoop install: $err"; exit 1 }
 
@@ -83,6 +85,11 @@ if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 if($global -and !(is_admin)) {
 	'ERROR: you need admin rights to install global apps'; exit 1
 }
+
+ensure_none_installed $apps $global
+
+$apps = install_order $apps $architecture
+$apps = prune_installed $apps $global
 
 $apps | % { install $_ $architecture $global }
 
