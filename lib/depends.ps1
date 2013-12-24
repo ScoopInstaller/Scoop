@@ -2,7 +2,9 @@
 function deps($app, $arch) {
 	$resolved = new-object collections.arraylist
 	dep_resolve $app $arch $resolved @()
-	$resolved
+
+	if($resolved.count -eq 1) { return @() } # no dependencies
+	return $resolved[0..($resolved.count - 2)]
 }
 
 function dep_resolve($app, $arch, $resolved, $unresolved) {
