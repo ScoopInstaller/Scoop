@@ -151,6 +151,9 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			write-host "extracting..." -nonewline
 			$null = mkdir "$dir\_scoop_extract"
 			& $extract_fn "$dir\$fname" "$dir\_scoop_extract"
+			if ($extract_to) {
+				$null = mkdir "$dir\$extract_to" -force
+			}
 			cp "$dir\_scoop_extract\$extract_dir\*" "$dir\$extract_to" -r -force
 			rm -r -force "$dir\_scoop_extract"
 			rm "$dir\$fname"
