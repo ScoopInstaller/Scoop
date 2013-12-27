@@ -522,7 +522,7 @@ function all_installed($apps, $global) {
 	$installed
 }
 
-function prune_installed($apps, $global) {
-	$installed = all_installed($apps, $global)
+function prune_installed($apps) {
+	$installed = @(all_installed $apps $true) + @(all_installed $apps $false)
 	$apps | ? { $installed -notcontains $_ }
 }
