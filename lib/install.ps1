@@ -1,3 +1,39 @@
+function install_app($app, $architecture, $global) {
+	$app, $manifest, $bucket, $url = locate $app
+
+	if(!$manifest) {
+		abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
+	}
+
+	$version = $manifest.version
+	if(!$version) { abort "manifest doesn't specify a version" }
+	if($version -match '[^\w\.\-_]') {
+		abort "manifest version has unsupported character '$($matches[0])'"
+	}
+
+	echo "installing $app ($version)"
+
+	$dir = ensure (versiondir $app $version $global)
+
+	$fname = dl_urls $app $version $manifest $architecture $dir
+	unpack_inno $fname $manifest $dir
+	run_installer $fname $manifest $architecture $dir
+	ensure_install_dir_not_in_path $dir $global
+	create_shims $manifest $dir $global
+	if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
+	env_add_path $manifest $dir $global
+	env_set $manifest $dir $global
+	post_install $manifest
+
+	# save info for uninstall
+	save_installed_manifest $app $bucket $dir $url
+	save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
+
+	success "$app ($version) was installed successfully!"
+
+	show_notes $manifest
+}
+
 function ensure_architecture($architecture_opt) {
 	switch($architecture_opt) {
 		'' { return default_architecture }
@@ -515,11 +551,7 @@ function show_notes($manifest) {
 }
 
 function all_installed($apps, $global) {
-	$installed = @()
-	foreach($app in $apps) {
-		if(installed $app $global) { $installed += $app}
-	}
-	$installed
+	$apps | ? { installed $_ $global }
 }
 
 function prune_installed($apps) {

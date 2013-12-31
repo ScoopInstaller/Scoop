@@ -1,7 +1,7 @@
-# Usage: scoop update [app] [options]
-# Summary: Update an app, or Scoop itself
+# Usage: scoop update <app> [options]
+# Summary: Update apps, or Scoop itself
 # Help: 'scoop update' updates Scoop to the latest version.
-# 'scoop update [app]' installs a new version of that app, if there is one.
+# 'scoop update <app>' installs a new version of that app, if there is one.
 #
 # Options:
 #   --global, -g  update a globally installed app
@@ -12,16 +12,13 @@
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
+. "$psscriptroot\..\lib\depends.ps1"
 
-$opt, $app, $err = getopt $args 'g' 'global'
+$opt, $apps, $err = getopt $args 'g' 'global'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 
-if(!$app) {
-	if($global) {
-		"scoop update: --global is invalid when <app> not specified"; exit 1
-	}
-	# update scoop
+function update_scoop() {
 	$tempdir = versiondir 'scoop' 'update'
 	$currentdir = versiondir 'scoop' 'current'
 
@@ -60,23 +57,9 @@ if(!$app) {
 		}
 	}
 	success 'scoop was updated successfully!'
-} else {
-	# update app
-	if(!(installed $app $global)) {
-		if(installed $app (!$global)) {
-			function wh($g) { if($g) { "globally" } else { "for your account" } }
-			write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))" -f darkred
-			"try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
-			exit 1
-		} else {
-			abort "$app isn't installed"
-		}
-	}
+}
 
-	if($global -and !(is_admin)) {
-		'ERROR: you need admin rights to update global apps'; exit 1
-	}
-
+function update($app, $global) {
 	$old_version = current_version $app $global
 	$old_manifest = installed_manifest $app $old_version $global
 	$install = install_info $app $old_version $global
@@ -86,12 +69,16 @@ if(!$app) {
 	$bucket = $install.bucket
 	$url = $install.url
 
+	# check dependencies
+	$deps = @(deps $app $architecture) | ? { !(installed $_) }
+	$deps | % { install_app $_ $architecture $global }
+
 	$version = latest_version $app $bucket $url
 
 	if($old_version -eq $version) {
-		"the latest version of $app ($version) is already installed."
+		warn "the latest version of $app ($version) is already installed."
 		"run 'scoop update' to check for new versions."
-		exit 1
+		return
 	}
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
 
@@ -125,6 +112,35 @@ if(!$app) {
 	success "$app was updated from $old_version to $version"
 
 	show_notes $manifest
+}
+
+function ensure_all_installed($apps, $global) {
+	$app = $apps | ? { !(installed $_ $global) } | select -first 1 # just get the first one that's not installed
+	if($app) {
+		if(installed $app (!$global)) {
+			function wh($g) { if($g) { "globally" } else { "for your account" } }
+			write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))" -f darkred
+			"try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
+			exit 1
+		} else {
+			abort "$app isn't installed"
+		}
+	}
+}
+
+if(!$apps) {
+	if($global) {
+		"scoop update: --global is invalid when <app> not specified"; exit 1
+	}
+	update_scoop
+} else {
+	if($global -and !(is_admin)) {
+		'ERROR: you need admin rights to update global apps'; exit 1
+	}
+
+	ensure_all_installed $apps $global
+
+	$apps | % { update $_ $global }
 }
 
 exit 0

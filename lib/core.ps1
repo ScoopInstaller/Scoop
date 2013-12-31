@@ -27,7 +27,10 @@ function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 # apps
-function installed($app, $global) { return test-path (appdir $app $global) }
+function installed($app, $global=$null) {
+	if($global -eq $null) { return (installed $app $true) -or (installed $app $false) }
+	return test-path (appdir $app $global)
+}
 function installed_apps($global) {
 	$dir = appsdir $global
 	if(test-path $dir) {
