@@ -321,7 +321,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 	}
 }
 
-# deprecated
+# deprecated (see also msi_installed)
 function install_msi($fname, $dir, $msi) {
 	$msifile = "$dir\$(coalesce $msi.file "$fname")"
 	if(!(is_in_dir $dir $msifile)) {
@@ -353,6 +353,7 @@ function extract_msi($path, $to) {
 	if(!$ok) { abort "failed to extract files from $path" }
 }
 
+# deprecated
 # get-wmiobject win32_product is slow and checks integrity of each installed program,
 # so this uses the [wmi] type accelerator instead
 # http://blogs.technet.com/b/heyscriptingguy/archive/2011/12/14/use-powershell-to-find-and-uninstall-software.aspx
