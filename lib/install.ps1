@@ -349,7 +349,6 @@ function install_msi($fname, $dir, $msi) {
 }
 
 function extract_msi($path, $to) {
-	$arg = '/a', "TARGETDIR=`"$to`""
 	$ok = run 'msiexec' @('/a', "$dir\$fname", '/qn', "TARGETDIR=`"$to`"")
 	if(!$ok) { abort "failed to extract files from $path" }
 }
