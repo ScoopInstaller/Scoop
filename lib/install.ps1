@@ -190,7 +190,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			if ($extract_to) {
 				$null = mkdir "$dir\$extract_to" -force
 			}
-			mv "$dir\_scoop_extract\$extract_dir\*" "$dir\$extract_to" -force
+			cp "$dir\_scoop_extract\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
 			rm -r -force "$dir\_scoop_extract"
 			rm "$dir\$fname"
 			write-host "done"
