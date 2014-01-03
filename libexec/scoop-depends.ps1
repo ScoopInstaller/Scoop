@@ -15,4 +15,7 @@ if(!$app) { "<app> missing"; my_usage; exit 1 }
 
 $architecture = ensure_architecture ($opt.a + $opt.architecture)
 
-deps $app $architecture
+$deps = @(deps $app $architecture)
+if($deps) {
+	$deps[($deps.length - 1)..0]
+}
