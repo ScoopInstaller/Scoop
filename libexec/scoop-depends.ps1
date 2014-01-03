@@ -8,7 +8,11 @@
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 
-$opt, $app, $err = getopt $args 'a:' 'arch='
+$opt, $apps, $err = getopt $args 'a:' 'arch='
+$app = $apps[0]
+
+if(!$app) { "<app> missing"; my_usage; exit 1 }
+
 $architecture = ensure_architecture ($opt.a + $opt.architecture)
 
 deps $app $architecture
