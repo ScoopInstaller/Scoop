@@ -10,5 +10,6 @@
 		"ae0025264557c146044930e5085f1dffd479f2ff21492b1c2454efd689d287be",
 		"4e262a414f238773b311c8bb55a52e62743c06e0e55b319ca5b47e3e306464d5"
 	],
+	"_comment": "add to path rather than shim so that tar can find it",
 	"env_add_path": "bin"
 }
