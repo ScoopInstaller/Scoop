@@ -14,5 +14,6 @@
 			"extract_dir": "openjdk-1.7.0-u45-unofficial-icedtea-2.4.3-windows-i586-image"
 		}
 	},
-	"env_add_path": "bin"
+	"env_add_path": "bin",
+	"env_set": { "JAVA_HOME": "$dir" }
 }
