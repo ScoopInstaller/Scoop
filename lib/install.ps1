@@ -441,8 +441,6 @@ function rm_shims($manifest, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
 		$shim = "$(shimdir $global)\$(strip_ext(fname $_)).ps1"
 
-		$shim_cmd = "$(strip_ext $shim).cmd"
-
 		if(!(test-path $shim)) { # handle no shim from failed install
 			warn "shim for $_ is missing, skipping"
 		} else {
@@ -450,7 +448,11 @@ function rm_shims($manifest, $global) {
 			rm $shim
 		}
 
-		if(test-path $shim_cmd) { rm $shim_cmd }
+		# other shim types might be present
+		$base = strip_ext $shim
+		'.exe', '.shim', '.cmd' | % {
+			if(test-path "$base$_") { rm "$base$_" }
+		}
 	}
 }
 
