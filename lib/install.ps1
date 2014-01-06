@@ -106,7 +106,15 @@ function dl_progress($url, $to) {
 		$wc.downloadfileasync($url, $to)
 
 		function is_complete {
-			try { get-event complete -ea stop; $true } catch { $false }
+			try {
+				$complete = get-event complete -ea stop
+				$err = $complete.sourceeventargs.error
+				if($err) { abort "$($err.message)" }
+				$true
+			}
+			catch {
+				$false
+			}
 		}
 
 		$last_p = -1
