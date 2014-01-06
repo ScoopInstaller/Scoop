@@ -111,8 +111,7 @@ function dl_progress($url, $to) {
 				$err = $complete.sourceeventargs.error
 				if($err) { abort "$($err.message)" }
 				$true
-			}
-			catch {
+			} catch {
 				$false
 			}
 		}
