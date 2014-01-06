@@ -1,0 +1,16 @@
+{
+	"homepage": "http://www.haskell.org",
+	"version": "2013.2.0.0",
+	"url": "http://www.haskell.org/platform/download/2013.2.0.0/HaskellPlatform-2013.2.0.0-setup.exe#/dl.7z",
+	"hash": "1d835835e71d71b1cb8dc6db6f94c6460ffc63d4e86d3a58062ebd1e21420a2d",
+	"bin": [
+		"bin\\ghc.exe",
+		"bin\\ghc-pkg.exe",
+		"bin\\haddock.exe",
+		"bin\\hp2ps.exe",
+		"bin\\hpc.exe",
+		"bin\\hsc2hs.exe",
+		"bin\\runghc.exe",
+		"bin\\runhaskell.exe"
+	]
+}
