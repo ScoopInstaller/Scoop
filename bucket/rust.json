@@ -1,16 +1,14 @@
 {
 	"homepage": "http://www.rust-lang.org",
-	"version": "0.8",
+	"version": "0.9",
 	"license": "MIT/Apache 2.0",
 	"depends": "gcc45",
-	"url": "http://static.rust-lang.org/dist/rust-0.8-install.exe",
-	"hash": "4d303232144cb4c3a6f34af6ff0cfe9f8eefae114c88c52ac63128c49cdef7f1",
+	"url": "http://static.rust-lang.org/dist/rust-0.9-install.exe",
+	"hash": "6ab14e25761d61ba724c5f77403d09d566d3187a2e048e006036b960d938fe90",
 	"innosetup": true,
 	"bin": [
-		"bin\\rust.exe",
 		"bin\\rustc.exe",
 		"bin\\rustdoc.exe",
-		"bin\\rusti.exe",
 		"bin\\rustpkg.exe"
 	]
 }
