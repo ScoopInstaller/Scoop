@@ -44,6 +44,10 @@ namespace shim {
 			ReadChars(p.StandardError, Console.Error);
 
 			p.WaitForExit();
+
+			Console.Write(p.StandardOutput.ReadToEnd());
+			Console.Error.Write(p.StandardError.ReadToEnd());
+			
 			return p.ExitCode;
 		}
 
