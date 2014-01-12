@@ -439,7 +439,7 @@ function shim_def($item) {
 function create_shims($manifest, $dir, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
 		$target, $name, $arg = shim_def $_
-		echo "creating $name shim"
+		echo "creating shim for $name"
 
 		# check valid bin
 		$bin = "$dir\$target"
