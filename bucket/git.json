@@ -1,9 +1,9 @@
 {
-	"homepage": "http://git-scm.com/",
+	"homepage": "http://msysgit.github.io/",
 	"license": "GPL2",
-	"version": "1.8.4",
-	"url": "https://msysgit.googlecode.com/files/PortableGit-1.8.4-preview20130916.7z",
-	"hash": "461da0652d2dbe6b74eab22799b135f87786d3c5ab56c664291e16475896671c",
+	"version": "1.8.5.2",
+	"url": "https://msysgit.googlecode.com/files/PortableGit-1.8.5.2-preview20131230.7z",
+	"hash": "a59a412830b5485bc9bea5ba7b53128c086bfbe8bf188c87ec93fe0396379a39",
 	"bin": [ "cmd\\git.exe", "cmd\\gitk.cmd" ],
 	"post_install": [
 		"git config --global credential.helper wincred"
