@@ -23,10 +23,16 @@ namespace shim {
 
 			var config = Config(configPath);
 			var path = Get(config, "path");
+			var add_args = Get(config, "args");
+			if(!string.IsNullOrEmpty(add_args)) {
+				add_args += " ";
+			} else {
+				add_args = "";
+			}
 
 			var p = new Process();
 			p.StartInfo.FileName = path;
-			p.StartInfo.Arguments = Serialize(args);
+			p.StartInfo.Arguments = add_args + Serialize(args);
 
 			p.StartInfo.UseShellExecute = false;
 			p.StartInfo.RedirectStandardError = true;

@@ -430,35 +430,43 @@ function run_uninstaller($manifest, $architecture, $dir) {
 	}
 }
 
+# get target, name, arguments for shim
+function shim_def($item) {
+	if($item -is [array]) { return $item }
+	return $item, (strip_ext (fname $item)), $null
+}
+
 function create_shims($manifest, $dir, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
-		echo "creating shim for $_"
+		$target, $name, $arg = shim_def $_
+		echo "creating $name shim"
 
 		# check valid bin
-		$bin = "$dir\$_"
+		$bin = "$dir\$target"
 		if(!(is_in_dir $dir $bin)) {
-			abort "error in manifest: bin '$_' is outside the app directory"
+			abort "error in manifest: bin '$target' is outside the app directory"
 		}
-		if(!(test-path $bin)) { abort "can't shim $_`: file doesn't exist"}
+		if(!(test-path $bin)) { abort "can't shim $target`: file doesn't exist"}
 
-		shim "$dir\$_" $global
+		shim "$dir\$target" $global $name $arg
 	}
 }
 function rm_shims($manifest, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
-		$shim = "$(shimdir $global)\$(strip_ext(fname $_)).ps1"
+		$target, $name, $null = shim_def $_
+		$shimdir = shimdir $global
+		$shim = "$shimdir\$name.ps1"
 
 		if(!(test-path $shim)) { # handle no shim from failed install
-			warn "shim for $_ is missing, skipping"
+			warn "shim for $name is missing, skipping"
 		} else {
-			echo "removing shim for $_"
+			echo "removing shim for $name"
 			rm $shim
 		}
 
 		# other shim types might be present
-		$base = strip_ext $shim
 		'.exe', '.shim', '.cmd' | % {
-			if(test-path "$base$_") { rm "$base$_" }
+			if(test-path "$shimdir\$name$_") { rm "$shimdir\$name$_" }
 		}
 	}
 }
