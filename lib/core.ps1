@@ -65,7 +65,11 @@ function env($name,$global,$val='__get') {
 function unzip($path,$to) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
 	add-type -assembly "System.IO.Compression.FileSystem"
-	[io.compression.zipfile]::extracttodirectory($path,$to)
+	try {
+		[io.compression.zipfile]::extracttodirectory($path,$to)
+	} catch {
+		abort "unzip failed: $_"
+	}
 }
 
 function shim($path, $global, $name, $arg) {
