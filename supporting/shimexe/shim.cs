@@ -6,10 +6,61 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices; 
 
 namespace shim {
 	
 	class Program {
+		[DllImport("kernel32.dll", SetLastError=true)]
+		static extern bool CreateProcess(string lpApplicationName,
+			string lpCommandLine, IntPtr lpProcessAttributes, 
+			IntPtr lpThreadAttributes, bool bInheritHandles, 
+			uint dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory,
+			[In] ref STARTUPINFO lpStartupInfo, 
+			out PROCESS_INFORMATION lpProcessInformation);
+
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+		struct STARTUPINFO {
+			public Int32 cb;
+			public string lpReserved;
+			public string lpDesktop;
+			public string lpTitle;
+			public Int32 dwX;
+			public Int32 dwY;
+			public Int32 dwXSize;
+			public Int32 dwYSize;
+			public Int32 dwXCountChars;
+			public Int32 dwYCountChars;
+			public Int32 dwFillAttribute;
+			public Int32 dwFlags;
+			public Int16 wShowWindow;
+			public Int16 cbReserved2;
+			public IntPtr lpReserved2;
+			public IntPtr hStdInput;
+			public IntPtr hStdOutput;
+			public IntPtr hStdError;
+		}
+
+		[StructLayout(LayoutKind.Sequential)]
+		internal struct PROCESS_INFORMATION {
+			public IntPtr hProcess;
+			public IntPtr hThread;
+			public int dwProcessId;
+			public int dwThreadId;
+		}
+
+		[DllImport("kernel32.dll", SetLastError=true)]
+  		static extern UInt32 WaitForSingleObject(IntPtr hHandle, UInt32 dwMilliseconds);
+  		const UInt32 INFINITE = 0xFFFFFFFF;
+
+  		[DllImport("kernel32.dll", SetLastError=true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		static extern bool CloseHandle(IntPtr hObject);
+
+		[DllImport("kernel32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		static extern bool GetExitCodeProcess(IntPtr hProcess, out uint lpExitCode);
+
 		static int Main(string[] args) {
 			var exe = Assembly.GetExecutingAssembly().Location;
 			var dir = Path.GetDirectoryName(exe);
@@ -30,44 +81,29 @@ namespace shim {
 				add_args = "";
 			}
 
-			var p = new Process();
-			p.StartInfo.FileName = path;
-			p.StartInfo.Arguments = add_args + Serialize(args);
+			var si = new STARTUPINFO();
+			var pi = new PROCESS_INFORMATION();
+			if(!CreateProcess(path, add_args + Serialize(args), IntPtr.Zero, IntPtr.Zero,
+				bInheritHandles: true,
+				dwCreationFlags: 0,
+				lpEnvironment: IntPtr.Zero, // inherit parent
+				lpCurrentDirectory: null, // inherit parent
+				lpStartupInfo: ref si,
+				lpProcessInformation: out pi)) {
 
-			p.StartInfo.UseShellExecute = false;
-			p.StartInfo.RedirectStandardError = true;
-			p.StartInfo.RedirectStandardOutput = true;
-			
-			p.Start();
-
-			ReadChars(p.StandardOutput, Console.Out);
-			ReadChars(p.StandardError, Console.Error);
-
-			p.WaitForExit();
-
-			Console.Write(p.StandardOutput.ReadToEnd());
-			Console.Error.Write(p.StandardError.ReadToEnd());
-			
-			return p.ExitCode;
-		}
-
-		// Once stdout or stderr starts sending, keep forwarding the stream to the console
-		// until it stops sending. Otherwise the output from both streams is mixed up.
-		static object sync = new object();
-		static async void ReadChars(StreamReader r, TextWriter sendTo) {
-			var buffer = new char[100];
-			while(true) {
-				var read = await r.ReadAsync(buffer, 0, buffer.Length);
-				lock(sync) { // prevent other streams from writing
-					while(true) {
-						sendTo.Write(buffer, 0, read);
-
-						if(read < buffer.Length) break; // release lock
-						read = r.Read(buffer, 0, buffer.Length);	
-					}
-					if(read == 0) return; // EOF
-				}
+				return Marshal.GetLastWin32Error();
 			}
+
+			WaitForSingleObject(pi.hProcess, INFINITE);
+
+			uint exit_code = 0;
+			GetExitCodeProcess(pi.hProcess, out exit_code);
+
+			// Close process and thread handles. 
+    		CloseHandle(pi.hProcess);
+    		CloseHandle(pi.hThread);
+
+			return (int)exit_code;
 		}
 
 		static string Serialize(string[] args) {
