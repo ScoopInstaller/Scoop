@@ -1,0 +1,17 @@
+{
+	"homepage": "http://julialang.org",
+	"version": "0.2.0",
+	"license": "MIT",
+	"url": "http://s3.amazonaws.com/julialang/bin/winnt/x64/0.2/julia-0.2.0-win64.exe#/dl.7z",
+	"hash": "cbbd49a6c68dcdfa636febf2318a846506a2f89b0dc7fe2f2b79a56a12741630",
+	"extract_dir": "julia-05c6461b55",
+	"env_set": {
+		"JULIA_HOME": "$dir\\bin",
+		"JULIA_EXE": "julia-readline.exe",
+		"JULIA": "$dir\\bin\\julia-readline.exe",
+		"JL_PRIVATE_LIB_DIR": "bin"
+	},
+	"bin": [
+		[ "bin\\julia-readline.exe", "julia" ]
+	]
+}
