@@ -2,8 +2,16 @@
 	"homepage": "http://julialang.org",
 	"version": "0.2.0",
 	"license": "MIT",
-	"url": "http://s3.amazonaws.com/julialang/bin/winnt/x64/0.2/julia-0.2.0-win64.exe#/dl.7z",
-	"hash": "cbbd49a6c68dcdfa636febf2318a846506a2f89b0dc7fe2f2b79a56a12741630",
+	"architecture": {
+		"64bit": {
+			"url": "http://s3.amazonaws.com/julialang/bin/winnt/x64/0.2/julia-0.2.0-win64.exe#/dl.7z",
+			"hash": "cbbd49a6c68dcdfa636febf2318a846506a2f89b0dc7fe2f2b79a56a12741630"
+		},
+		"32bit": {
+			"url": "http://s3.amazonaws.com/julialang/bin/winnt/x86/0.2/julia-0.2.0-win32.exe#/dl.7z",
+			"hash": "57609de432c4fecff11ffafba819848d1564b338d2a9659aac850d92f84a1a8e"
+		}
+	},
 	"extract_dir": "julia-05c6461b55",
 	"env_set": {
 		"JULIA_HOME": "$dir\\bin",
