@@ -9,7 +9,7 @@
 				"http://nodejs.org/dist/npm/npm-1.3.26.zip"
 			],
 			"hash": [
-				"sha1:d2f884d75d5f30693f62625787f27fb2a8824178",
+				"fda189eccd1f63c08e8b5783e084269a955ef5869372866fcd11739d46677f42",
 				"898a3bfa1be68a6e08c419a63ca44ba8bb8f955c96542562fae3f6536076506c"
 			]
 		},
@@ -19,7 +19,7 @@
 				"http://nodejs.org/dist/npm/npm-1.3.26.zip"
 			],
 			"hash": [
-				"sha1:e3779ed14a68dc6f711ead628fe11a127d09547c",
+				"3154c7b90eb3f21985632c9e9c13cf92205ea1b9d69289df795169d0e259c35f",
 				"898a3bfa1be68a6e08c419a63ca44ba8bb8f955c96542562fae3f6536076506c"
 			]
 		}
