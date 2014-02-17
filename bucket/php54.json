@@ -1,9 +1,9 @@
 {
 	"homepage": "http://windows.php.net",
-	"version": "5.4.24",
+	"version": "5.4.25",
 	"license": "http://www.php.net/license/",
-	"url": "http://windows.php.net/downloads/releases/php-5.4.24-Win32-VC9-x86.zip",
-	"hash": "sha1:3a4cf434a078d5372718749e2603593315cb9d7e",
+	"url": "http://windows.php.net/downloads/releases/php-5.4.25-Win32-VC9-x86.zip",
+	"hash": "sha1:19c75c9f63bfdac240a72777bbb134d6d93aff0e",
 	"bin": "php.exe",
 	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\""
 }
