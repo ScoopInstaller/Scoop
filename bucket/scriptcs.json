@@ -1,8 +1,8 @@
 {
 	"homepage": "http://scriptcs.net/",
-	"version": "0.8.0-alpha-130904",
+	"version": "0.9.0-alpha-140203",
 	"license": "Apache 2.0",
-	"url": "https://www.myget.org/F/scriptcsnightly/api/v2/package/scriptcs/0.8.0-alpha-130904?fn=/dl.zip",
+	"url": "https://www.myget.org/F/scriptcsnightly/api/v2/package/scriptcs/0.9.0-alpha-140203?fn=/dl.zip",
 	"hash": "ea183be0f3062a1ff1eecfdaf54bc62ae06d1b590456bed8325abae228cbeb54",
 	"extract_dir": "tools\\scriptcs",
 	"bin": "scriptcs.exe"
