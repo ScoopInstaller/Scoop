@@ -1,0 +1,14 @@
+{
+	"homepage": "http://gnuwin32.sourceforge.net/packages/libiconv.htm",
+	"version": "1.9.2-1",
+	"license": "GPL2",
+	"url": [
+		"http://downloads.sourceforge.net/project/gnuwin32/libiconv/1.9.2-1/libiconv-1.9.2-1-bin.zip",
+		"http://downloads.sourceforge.net/gnuwin32/libiconv-1.9.2-1-dep.zip"
+	],
+	"hash": [
+		"md5:2ded584cdcfc87e1e3db257dd5b44651",
+		"md5:51488157b1202e06e840b6d745a7be32"
+	],
+	"bin": "bin\\iconv.exe"
+}
