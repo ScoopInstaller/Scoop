@@ -3,7 +3,7 @@
 	"version": "0.9.0-alpha-140203",
 	"license": "Apache 2.0",
 	"url": "https://www.myget.org/F/scriptcsnightly/api/v2/package/scriptcs/0.9.0-alpha-140203?fn=/dl.zip",
-	"hash": "ea183be0f3062a1ff1eecfdaf54bc62ae06d1b590456bed8325abae228cbeb54",
+	"hash": "5917f1b2c477f7971d040ceab6dee33679fc0c33c1fd9ba71d4ef73c1e5fc0a8",
 	"extract_dir": "tools\\scriptcs",
 	"bin": "scriptcs.exe"
 }
