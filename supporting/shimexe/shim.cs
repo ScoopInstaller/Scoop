@@ -74,11 +74,21 @@ namespace shim {
 
 			var config = Config(configPath);
 			var path = Get(config, "path");
-			var add_args = " " + Get(config, "args");
+			var add_args = Get(config, "args");
 
 			var si = new STARTUPINFO();
 			var pi = new PROCESS_INFORMATION();
-			var cmd = "\"" + path + "\"" + add_args + Serialize(args);
+
+			// create command line
+			var cmd_args = add_args ?? "";
+			var pass_args = Serialize(args);
+			if(!string.IsNullOrEmpty(pass_args)) {
+				if(!string.IsNullOrEmpty(cmd_args)) cmd_args += " ";
+				cmd_args += pass_args;
+			}
+			if(!string.IsNullOrEmpty(cmd_args)) cmd_args = " " + cmd_args;
+			var cmd = "\"" + path + "\"" + cmd_args;
+
 			if(!CreateProcess(null, cmd, IntPtr.Zero, IntPtr.Zero,
 				bInheritHandles: true,
 				dwCreationFlags: 0,
