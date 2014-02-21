@@ -64,7 +64,7 @@ function env($name,$global,$val='__get') {
 }
 function unzip($path,$to) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
-	try { add-type -assembly "System.IO.Compression.FileSystemTest" -ea stop }
+	try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
 	catch { unzip_old $path $to; return } # for .net earlier than 4.5
 	try {
 		[io.compression.zipfile]::extracttodirectory($path,$to)
