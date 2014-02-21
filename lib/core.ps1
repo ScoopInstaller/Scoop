@@ -72,9 +72,8 @@ function unzip($path,$to) {
 		abort "unzip failed: $_"
 	}
 }
-
-# for earlier than .net 4.5
 function unzip_old($path,$to) {
+	# for .net earlier than 4.5
 	$shell = (new-object -com shell.application -strict)
 	$zipfiles = $shell.namespace("$path").items()
 	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
