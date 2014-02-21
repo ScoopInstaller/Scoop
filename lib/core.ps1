@@ -64,12 +64,20 @@ function env($name,$global,$val='__get') {
 }
 function unzip($path,$to) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
-	add-type -assembly "System.IO.Compression.FileSystem"
+	try { add-type -assembly "System.IO.Compression.FileSystemTest" -ea stop }
+	catch { unzip_old $path $to; return } # for .net earlier than 4.5
 	try {
 		[io.compression.zipfile]::extracttodirectory($path,$to)
 	} catch {
 		abort "unzip failed: $_"
 	}
+}
+
+# for earlier than .net 4.5
+function unzip_old($path,$to) {
+	$shell = (new-object -com shell.application -strict)
+	$zipfiles = $shell.namespace("$path").items()
+	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
 function shim($path, $global, $name, $arg) {
