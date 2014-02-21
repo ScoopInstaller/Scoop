@@ -1,0 +1,15 @@
+{
+	"homepage": "http://www.cmake.org/",
+	"version": "2.8.12.2",
+	"license": "",
+	"url": "http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip",
+	"hash": "2ffc4a9ffeb3605f30f705b4f8b5f62e3eca996e3c8f8d87ec22937a343e350d",
+	"extract_dir": "cmake-2.8.12.2-win32-x86",
+	"bin": [
+		"bin/cmake.exe",
+		"bin/cmcldeps.exe",
+		"bin/cmw9xcom.exe",
+		"bin/cpack.exe",
+		"bin/ctest.exe"
+	]
+}
