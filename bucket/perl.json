@@ -1,16 +1,17 @@
 {
 	"homepage": "http://strawberryperl.com",
-	"version": "5.16.3.1",
+	"version": "5.18.2.1",
 	"license": "GPL",
 	"architecture": {
 		"32bit": {
-			"url": "http://strawberryperl.com/download/5.16.3.1/strawberry-perl-5.16.3.1-32bit-portable.zip",
-			"hash": "c800af811ba9ecc67399e4f15548504375e84d7770b3a2fbc165156c066fcee9"
+			"url": "http://strawberryperl.com/download/5.18.2.1/strawberry-perl-5.18.2.1-32bit-portable.zip",
+			"hash": "sha1:ca6081888dca6844038ac4a99f2a82c81d48f9d0"
 		},
 		"64bit": {
-			"url": "http://strawberryperl.com/download/5.16.3.1/strawberry-perl-5.16.3.1-64bit-portable.zip",
-			"hash": "5c07f6340401f43f1e0fd71d967dde434a8a32491f35114ad825f648458398ee"
+			"url": "http://strawberryperl.com/download/5.18.2.1/strawberry-perl-5.18.2.1-64bit-portable.zip",
+			"hash": "sha1:d1b5d8ed03b87aa14db0a881b2d7bbb1e5b09ad5"
 		}
 	},
-	"env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ]
+	"env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ],
+	"checkver": "<b>Recommended stable versions:</b></p>\\s*<a[^>]*><b>Strawberry Perl ([0-9\\.]+) \\(32bit\\)</b>"
 }
