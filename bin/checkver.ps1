@@ -1,4 +1,4 @@
-param($dir)
+param($dir, $app)
 # checks websites for newer versions using an (optional) regular expression defined in the manifest
 # use $dir to specify a manifest directory to check from, otherwise ./bucket is used
 
@@ -10,12 +10,15 @@ $dir = resolve-path $dir
 
 $wc = new-object net.webclient
 
-gci $dir '*.json' | % {
+$search = "*"
+if($app) { $search = $app }
+
+gci $dir "$search.json" | % {
 	$json = parse_json "$dir\$_"
 	if($json.checkver) {
 		write-host "checking $(strip_ext (fname $_))..." -nonewline
 		$expected_ver = $json.version
-		
+
 		$url = $json.checkver.url
 		if(!$url) { $url = $json.homepage }
 
@@ -34,7 +37,7 @@ gci $dir '*.json' | % {
 			}
 			
 		} else {
-			write-host "couldn't match regexp:`n$regexp`nin:`n$page" -f darkred
+			write-host "couldn't match '$regexp' in $url" -f darkred
 		}
 
 	}
