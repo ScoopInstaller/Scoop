@@ -1,4 +1,4 @@
-param($dir, $app)
+param($app, $dir)
 # checks websites for newer versions using an (optional) regular expression defined in the manifest
 # use $dir to specify a manifest directory to check from, otherwise ./bucket is used
 
