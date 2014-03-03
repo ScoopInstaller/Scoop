@@ -171,3 +171,7 @@ function wraptext($text, $width) {
 
 	$lines -join "`n"
 }
+
+function pluralize($count, $singular, $plural) {
+	if($count -eq 1) { $singular } else { $plural }
+}
