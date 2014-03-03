@@ -13,5 +13,6 @@
 		}
 	},
 	"extract_dir": "Files/7-Zip",
-	"bin": "7z.exe"
+	"bin": "7z.exe",
+	"checkver": { "regexp": "Download 7-zip ([^\\ ]+)" }
 }
