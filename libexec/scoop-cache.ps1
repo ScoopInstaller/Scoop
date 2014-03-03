@@ -39,7 +39,7 @@ switch($cmd) {
 		rm "$scoopdir\cache\$app#*"
 	}
 	'show' {
-		$files = gci "$scoopdir\cache" | ? { $_.name -match "^$app" }
+		$files = @(gci "$scoopdir\cache" | ? { $_.name -match "^$app" })
 		$total_length = ($files | measure length -sum).sum
 
 		$f_app  = @{ expression={"$($_.app) ($($_.version))" }}
@@ -49,7 +49,7 @@ switch($cmd) {
 
 		$files | % { cacheinfo $_ } | ft $f_size, $f_app, $f_url -auto -hide
 
-		"total: $($files.length) files, $(filesize $total_length)"
+		"total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
 	}
 	default {
 		"cache '$cmd' not supported"; my_usage; exit 1
