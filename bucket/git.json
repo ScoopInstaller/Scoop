@@ -1,9 +1,9 @@
 {
 	"homepage": "http://msysgit.github.io/",
 	"license": "GPL2",
-	"version": "1.8.5.2",
-	"url": "https://msysgit.googlecode.com/files/PortableGit-1.8.5.2-preview20131230.7z",
-	"hash": "a59a412830b5485bc9bea5ba7b53128c086bfbe8bf188c87ec93fe0396379a39",
+	"version": "1.9",
+	"url": "https://msysgit.googlecode.com/files/PortableGit-1.9.0-preview20140217.7z",
+	"hash": "sha1:a26032341b4f3c0bb57eb298ba886438f974fc38",
 	"bin": [ "cmd\\git.exe", "cmd\\gitk.cmd" ],
 	"post_install": [
 		"git config --global credential.helper wincred"
