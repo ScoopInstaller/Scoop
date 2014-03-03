@@ -13,5 +13,9 @@
 		}
 	},
 	"innosetup": true,
-	"bin": "hg.exe"
+	"bin": "hg.exe",
+	"checkver": {
+		"url": "http://mercurial.selenic.com/sources.js",
+		"re": "Mercurial ([0-9\\.]+) Inno Setup installer - x86 Windows - does not require admin rights"
+	}
 }
