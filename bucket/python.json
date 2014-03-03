@@ -1,15 +1,15 @@
 {
 	"homepage": "http://www.python.org",
 	"license": "http://docs.python.org/3.3/license.html",
-	"version": "3.3.3",
+	"version": "3.3.4",
 	"architecture": {
 		"64bit": {
-			"url": "http://www.python.org/ftp/python/3.3.3/python-3.3.3.amd64.msi",
-			"hash": "md5:8de52d1e2e4bbb3419b7f40bdf48e855"
+			"url": "http://python.org/ftp/python/3.3.4/python-3.3.4.amd64.msi",
+			"hash": "md5:fe66db6a92f8135cbbefa3265e8a99ec"
 		},
 		"32bit": {
-			"url": "http://www.python.org/ftp/python/3.3.3/python-3.3.3.msi",
-			"hash": "md5:ab6a031aeca66507e4c8697ff93a0007"
+			"url": "http://python.org/ftp/python/3.3.4/python-3.3.4.msi",
+			"hash": "md5:839af9c8044a1c45338b618294d7a6f3"
 		}
 	},
 	"bin": [ "python.exe", "py.exe" ],
@@ -18,5 +18,6 @@
 	$s = 'https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py'
 	echo \"running $s...\";(new-object net.webclient).downloadstring($s) | python 2>&1 > $null
 	popd",
-	"notes": "To use PIP to manage Python packages, run 'easy_install pip'"
+	"notes": "To use PIP to manage Python packages, run 'easy_install pip'",
+	"checkver": "<p>Latest: <a.*>.*</a> - <a href=\".*\">Python ([0-9\\.]+)</a></p>"
 }
