@@ -15,8 +15,11 @@ gci $dir '*.json' | % {
 	if($json.checkver) {
 		write-host "checking $(strip_ext (fname $_))..." -nonewline
 		$expected_ver = $json.version
-		$url = $json.homepage
-		$regexp = $json.checkver.regexp
+		
+		$url = $json.checkver.url
+		if(!$url) { $url = $json.homepage }
+
+		$regexp = $json.checkver.re
 		if(!$regexp) { $regexp = $json.checkver }
 
 		$page = $wc.downloadstring($url)
@@ -31,7 +34,7 @@ gci $dir '*.json' | % {
 			}
 			
 		} else {
-			write-host "couldn't match regexp:`n$regexp`nin:`n$url" -f darkred
+			write-host "couldn't match regexp:`n$regexp`nin:`n$page" -f darkred
 		}
 
 	}
