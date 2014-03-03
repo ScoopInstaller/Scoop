@@ -1,31 +1,35 @@
 {
 	"homepage": "http://rubyinstaller.org",
-	"version": "2.0.0-p247",
+	"version": "2.0.0-p451",
 	"architecture": {
 		"64bit": {
 			"url": [
-				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p247-x64-mingw32.7z?direct#/dl.7z",
+				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p451-x64-mingw32.7z?direct#/dl.7z",
 				"http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
 			],
 			"hash": [
-				"2c3399a96c9c2f3fe6bce1ad6e569e7534fd36318b6ca0077026e3c077172afe",
+				"0970beef635e500bc988bef43e500913e12c51b6e281ef2fcd0eb779b981f841",
 				"2ada04c7234199126c0f34f6ea7163a8f8dccb1e15814af175a189f6ac48b8ac"
 			],
-			"extract_dir": "ruby-2.0.0-p247-x64-mingw32"
+			"extract_dir": "ruby-2.0.0-p451-x64-mingw32"
 		},
 		"32bit": {
 			"url": [
-				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p247-i386-mingw32.7z?direct#/dl.7z",
+				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p451-i386-mingw32.7z?direct#/dl.7z",
 				"http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
 			],
 			"hash": [
-				"ac4c80b23623449f31aaa908818d48c504f4c364c2a2e127a9ae8d2fae5f99e4",
+				"7a4c258b3c86bccddcf0f797bedf3362c0904e7fc3a66cf33a1032dc4bd4bb19",
 				"61a06b5da06dd94343e591163ac0d43c544e9cd4df770f01275645b268b44dc7"
 			],
-			"extract_dir": "ruby-2.0.0-p247-i386-mingw32"
+			"extract_dir": "ruby-2.0.0-p451-i386-mingw32"
 		}
 	},
 	"extract_to": [ "", "devkit" ],
 	"env_add_path": "bin",
-	"post_install": "pushd $dir\\devkit;ruby dk.rb init > $null;echo \"- $dir\" | out-file config.yml -a -enc default; ruby dk.rb install;popd;"
+	"post_install": "pushd $dir\\devkit;ruby dk.rb init > $null;echo \"- $dir\" | out-file config.yml -a -enc default; ruby dk.rb install;popd;",
+	"checkver": {
+		"url": "http://rubyinstaller.org/downloads/",
+		"re": "<ul>\\s*<li class=\"exe\"><a.*>Ruby ([0-9\\.p-]+)</a></li>"
+	}
 }
