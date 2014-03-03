@@ -2,7 +2,6 @@
 # use $dir to specify a manifest directory to check from, otherwise ./bucket is used
 param($app, $dir)
 
-
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 
@@ -19,6 +18,11 @@ gci $dir "$search.json" | % {
 	if($json.checkver) {
 		$queue += ,@($_, $json)
 	}
+}
+
+# clear any existing events
+get-event | % {
+	remove-event $_.sourceidentifier
 }
 
 # start all downloads
@@ -62,7 +66,7 @@ while($in_progress -gt 0) {
 	write-host "$app`: " -nonewline
 
 	if($err) {
-		write-host "ERROR: $err"
+		write-host "ERROR: $err" -f darkyellow
 	} else {
 		if($page -match $regexp) {
 			$ver = $matches[1]
