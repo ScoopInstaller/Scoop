@@ -3,11 +3,11 @@
 	"version": "2.6",
 	"architecture": {
 		"32bit": {
-			"url": "https://github.com/MSOpenTech/redis/blob/2.6/bin/release/redisbin.zip",
-			"hash": "51ad02f580ec7f3a4f23b7fce62f475920270d1e959c1c00b6590c8c6eff11c0"
+			"url": "https://github.com/MSOpenTech/redis/raw/2.6/bin/release/redisbin.zip",
+			"hash": "c510f1f3b22e53d29e1b31f27cddbeee16495274e9cadb4ff091ec8198d41473"			
 		},
 		"64bit": {
-			"url": "https://github.com/MSOpenTech/redis/blob/2.6/bin/release/redisbin64.zip",
+			"url": "https://github.com/MSOpenTech/redis/raw/2.6/bin/release/redisbin64.zip",
 			"hash": "c510f1f3b22e53d29e1b31f27cddbeee16495274e9cadb4ff091ec8198d41473"
 		}
 	},
