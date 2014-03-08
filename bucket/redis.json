@@ -4,11 +4,11 @@
 	"architecture": {
 		"32bit": {
 			"url": "https://github.com/MSOpenTech/redis/raw/2.6/bin/release/redisbin.zip",
-			"hash": "c510f1f3b22e53d29e1b31f27cddbeee16495274e9cadb4ff091ec8198d41473"			
+			"hash": "1605f2ba22f9eed2472a80d7f3c74bb34d537862a9ae9db556167ac5850432be"			
 		},
 		"64bit": {
 			"url": "https://github.com/MSOpenTech/redis/raw/2.6/bin/release/redisbin64.zip",
-			"hash": "c510f1f3b22e53d29e1b31f27cddbeee16495274e9cadb4ff091ec8198d41473"
+			"hash": "9a36893304232f92230cd902a7ab396ed70f064a3ae351c9c75bc009c2408154"
 		}
 	},
 	"bin": [
