@@ -1,9 +1,9 @@
 {
 	"homepage": "http://intgat.tigress.co.uk/rmy/busybox/index.html",
-	"version": "1.23.0-TIG-1337",
+	"version": "1.23.0-TIG-1381",
 	"license": "GPL2",
-	"url": "ftp://ftp.tigress.co.uk/public/gpl/6.0.0/busybox/busybox-w32-TIG-1337-g3eff461.exe#/busybox.exe",
-	"hash": "b06de312e6d8ddcc33037dfeb02423f6a3b8a801efbd421433554ab964eccc9b",
+	"url": "ftp://ftp.tigress.co.uk/public/gpl/6.0.0/busybox/busybox-w32-TIG-1381-g883817e.exe#/busybox.exe",
+	"hash": "6f715087ca6353c839def71d1971b6e12f86c067c55756d1922d572840f7ac4b",
 	"bin": [
 		"busybox.exe",
 		[ "busybox.exe", "ar", "ar" ],
