@@ -10,5 +10,6 @@
 		"bin\\rustc.exe",
 		"bin\\rustdoc.exe",
 		"bin\\rustpkg.exe"
-	]
+	],
+	"checkver": "<h2>Downloads</h2>\\s*<ul>\\s*<li>\\s*([0-9\\.]+)"
 }
