@@ -1,14 +1,14 @@
 {
 	"homepage": "http://redis.io",
-	"version": "2.6.14",
+	"version": "2.6",
 	"architecture": {
 		"32bit": {
-			"url": "https://github.com/MSOpenTech/redis/raw/2_6_14_rebase/bin/release/redisbin.zip",
-			"hash": "f2d1c77421b01098d49d465bc4c549f83a25d1292896d6bc746030f85a02e988"
+			"url": "https://github.com/MSOpenTech/redis/raw/2.6/bin/release/redisbin.zip",
+			"hash": "1605f2ba22f9eed2472a80d7f3c74bb34d537862a9ae9db556167ac5850432be"			
 		},
 		"64bit": {
-			"url": "https://github.com/MSOpenTech/redis/raw/2_6_14_rebase/bin/release/redisbin64.zip",
-			"hash": "e50556431058be6aab02380d71d234fa3ba488b16378c43725aec9fcda1ef6f3"
+			"url": "https://github.com/MSOpenTech/redis/raw/2.6/bin/release/redisbin64.zip",
+			"hash": "9a36893304232f92230cd902a7ab396ed70f064a3ae351c9c75bc009c2408154"
 		}
 	},
 	"bin": [
