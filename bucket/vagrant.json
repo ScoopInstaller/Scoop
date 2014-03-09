@@ -1,8 +1,13 @@
 {
-	"version": "1.4.1",
+	"homepage": "http://www.vagrantup.com/",
+	"version": "1.4.3",
 	"license": "MIT",
-	"url": "https://dl.bintray.com/mitchellh/vagrant/Vagrant_1.4.1.msi",
-	"hash": "617181becb2b6da7456c25e6ea6e756dcc0d5236c5b42399b19f2e71f6fc53c0",
+	"url": "https://dl.bintray.com/mitchellh/vagrant/Vagrant_1.4.3.msi",
+	"hash": "78a910a5274b127496a9963839dc24860bbabdd870d00c433621801dad690469",
 	"extract_dir": "HashiCorp/Vagrant",
-	"bin": "bin\\vagrant.bat"
+	"bin": "bin\\vagrant.bat",
+	"checkver": {
+		"url": "http://www.vagrantup.com/downloads.html",
+		"re": "latest version of Vagrant \\(([^\\)]+)\\)"
+	}
 }

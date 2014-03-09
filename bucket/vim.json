@@ -23,5 +23,9 @@
 		cp \"$dir\\vimrc_example.vim\" ~\\.vimrc
 		\"set shell=$((gcm powershell).path)\" | out-file  ~\\.vimrc -append -encoding ascii
 		echo '~/.vimrc was created with your shell set to Powershell.'
-	} else { echo '~/.vimrc exists, skipping' }"
+	} else { echo '~/.vimrc exists, skipping' }",
+	"checkver": {
+		"url": "http://www.vim.org/download.php",
+		"re": "Vim ([0-9\\.]+) is the latest stable version"
+	}
 }
