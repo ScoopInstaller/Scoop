@@ -2,7 +2,7 @@
 	"homepage": "http://redis.io",
 	"version": "2.8.4",
 	"url": "https://github.com/MSOpenTech/redis/raw/2.8.4_msopen/bin/release/redis-2.8.4.zip",
-	"hash": "1605f2ba22f9eed2472a80d7f3c74bb34d537862a9ae9db556167ac5850432be",
+	"hash": "e39e13fa48f97e0332176b992b5a32d7c460f28b4aceeca66e7ef8c14b679295",
 	"bin": [
 		"redis-benchmark.exe",
 		"redis-check-aof.exe",
