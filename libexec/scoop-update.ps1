@@ -91,6 +91,8 @@ function update($app, $global) {
 	"uninstalling $app ($old_version)"
 	run_uninstaller $old_manifest $architecture $dir
 	rm_shims $old_manifest $global
+	env_rm_path $old_manifest $dir $global
+	env_rm $old_manifest $global
 	# note: keep the old dir in case it contains user files
 
 	"installing $app ($version)"
