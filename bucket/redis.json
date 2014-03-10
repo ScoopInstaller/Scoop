@@ -1,16 +1,8 @@
 {
 	"homepage": "http://redis.io",
-	"version": "2.6",
-	"architecture": {
-		"32bit": {
-			"url": "https://github.com/MSOpenTech/redis/raw/2.6/bin/release/redisbin.zip",
-			"hash": "1605f2ba22f9eed2472a80d7f3c74bb34d537862a9ae9db556167ac5850432be"			
-		},
-		"64bit": {
-			"url": "https://github.com/MSOpenTech/redis/raw/2.6/bin/release/redisbin64.zip",
-			"hash": "9a36893304232f92230cd902a7ab396ed70f064a3ae351c9c75bc009c2408154"
-		}
-	},
+	"version": "2.8.4",
+	"url": "https://github.com/MSOpenTech/redis/raw/2.8.4_msopen/bin/release/redis-2.8.4.zip",
+	"hash": "1605f2ba22f9eed2472a80d7f3c74bb34d537862a9ae9db556167ac5850432be",
 	"bin": [
 		"redis-benchmark.exe",
 		"redis-check-aof.exe",
