@@ -1,18 +1,22 @@
 {
 	"homepage": "http://www.python.org",
 	"license": "http://docs.python.org/3.3/license.html",
-	"version": "3.3.4",
+	"version": "3.3.5",
 	"architecture": {
 		"64bit": {
-			"url": "http://python.org/ftp/python/3.3.4/python-3.3.4.amd64.msi",
-			"hash": "md5:fe66db6a92f8135cbbefa3265e8a99ec"
+			"url": "http://www.python.org/ftp/python/3.3.5/python-3.3.5.amd64.msi",
+			"hash": "md5:ebb3ab0df91389a6dd45317d6f4ac838"
 		},
 		"32bit": {
-			"url": "http://python.org/ftp/python/3.3.4/python-3.3.4.msi",
-			"hash": "md5:839af9c8044a1c45338b618294d7a6f3"
+			"url": "http://www.python.org/ftp/python/3.3.5/python-3.3.5.msi",
+			"hash": "md5:ee4de0c34fd8c575db8a7805e2b9584a"
 		}
 	},
-	"bin": [ "python.exe", "py.exe" ],
+	"bin": [
+		"python.exe",
+		"py.exe",
+		[ "python.exe", "python3" ]
+	],
 	"env_add_path": [ "scripts" ],
 	"post_install": "pushd $env:temp
 	$s = 'https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py'
