@@ -12,7 +12,10 @@
 			"hash": "md5:ac54e14f7ba180253b9bae6635d822ea"
 		}
 	},
-	"bin": [ "python.exe" ],
+	"bin": [
+		"python.exe",
+		[ "python.exe", "python2" ]
+	],
 	"env_add_path": [ "scripts" ],
 	"post_install": "pushd $env:temp
 	$s = 'https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py'
