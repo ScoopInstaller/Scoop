@@ -15,6 +15,7 @@
 	"bin": [
 		"python.exe",
 		"py.exe",
+		"pythonw.exe"
 		[ "python.exe", "python3" ]
 	],
 	"env_add_path": [ "scripts" ],
