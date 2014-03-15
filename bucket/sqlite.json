@@ -1,9 +1,9 @@
 {
 	"homepage": "http://www.sqlite.org/",
-	"version": "3.8.3.1",
+	"version": "3.8.4.1",
 	"license": "Public Domain",
-	"url": "http://sqlite.org/2014/sqlite-shell-win32-x86-3080301.zip",
-	"hash": "28fb226fc82fc3d7f45cc9a5c79ba4e34619460ad16a4e74186d9112733b83ad",
+	"url": "http://sqlite.org/2014/sqlite-shell-win32-x86-3080401.zip",
+	"hash": "260f74ea3111d67f28b0810c3b0463b9d53aac56bdea17051ac80a40b08f0ab7",
 	"bin": "sqlite3.exe",
 	"checkver": "<h3>Current Status</h3>\\s*<p><ul>\\s*<li><a.*>Version ([0-9\\.]+)</a>"
 }
