@@ -24,5 +24,9 @@
 		"bin\\svnserve.exe",
 		"bin\\svnsync.exe",
 		"bin\\svnversion.exe"
-	]
+	],
+	"checkver": {
+		"url": "http://sliksvn.com/en/download/",
+		"re": "<a href=\"http://www.sliksvn.com/pub/Slik-Subversion-(.*)-win32.msi\" class=\"download arch32\">"
+	}
 }
