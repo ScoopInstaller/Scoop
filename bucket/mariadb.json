@@ -4,12 +4,12 @@
 	"license": "GPL2",
 	"architecture": {
 		"64bit": {
-			"url": "http://mirror.mephi.ru/mariadb/mariadb-5.5.36/winx64-packages/mariadb-5.5.36-winx64.zip",
+			"url": "https://downloads.mariadb.org/f/mariadb-5.5.36/winx64-packages/mariadb-5.5.36-winx64.zip?serve",
 			"hash": "md5:2d920564a6f44d7b767e066c71ec7fa7",
 			"extract_dir": "mariadb-5.5.36-winx64"
 		},
 		"32bit": {
-			"url": "http://mirror.mephi.ru/mariadb/mariadb-5.5.36/winx64-packages/mariadb-5.5.36-win32.zip",
+			"url": "https://downloads.mariadb.org/f/mariadb-5.5.36/win32-packages/mariadb-5.5.36-win32.zip?serve",
 			"hash": "md5:82f4502f1e262799e59c968a67eee2b2",
 			"extract_dir": "mariadb-5.5.36-win32"
 		}
