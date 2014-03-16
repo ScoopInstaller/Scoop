@@ -76,6 +76,7 @@ function unzip_old($path,$to) {
 	# fallback for .net earlier than 4.5
 	$shell = (new-object -com shell.application -strict)
 	$zipfiles = $shell.namespace("$path").items()
+	$to = ensure $to
 	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
