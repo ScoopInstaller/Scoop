@@ -23,5 +23,5 @@
 	echo \"running $s...\";(new-object net.webclient).downloadstring($s) | python 2>&1 > $null
 	popd",
 	"notes": "To use PIP to manage Python packages, run 'easy_install pip'",
-	"checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
+	"checkver": "<p>Latest: <a.*>.*</a> - <a href=\".*\">Python ([0-9\\.]+)</a></p>"
 }
