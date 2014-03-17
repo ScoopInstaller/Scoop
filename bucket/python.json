@@ -1,15 +1,15 @@
 {
 	"homepage": "http://www.python.org",
-	"license": "http://docs.python.org/3.3/license.html",
-	"version": "3.3.5",
+	"license": "http://docs.python.org/3.4/license",
+	"version": "3.4.0",
 	"architecture": {
 		"64bit": {
-			"url": "http://www.python.org/ftp/python/3.3.5/python-3.3.5.amd64.msi",
-			"hash": "md5:ebb3ab0df91389a6dd45317d6f4ac838"
+			"url": "https://www.python.org/ftp/python/3.4.0/python-3.4.0.amd64.msi",
+			"hash": "md5:d59aaf1bb32d1bc01a051b3613ab0966"
 		},
 		"32bit": {
-			"url": "http://www.python.org/ftp/python/3.3.5/python-3.3.5.msi",
-			"hash": "md5:ee4de0c34fd8c575db8a7805e2b9584a"
+			"url": "https://www.python.org/ftp/python/3.4.0/python-3.4.0.msi",
+			"hash": "md5:e3be8a63294e42e126493ca96cfe48bd"
 		}
 	},
 	"bin": [
@@ -24,5 +24,5 @@
 	echo \"running $s...\";(new-object net.webclient).downloadstring($s) | python 2>&1 > $null
 	popd",
 	"notes": "To use PIP to manage Python packages, run 'easy_install pip'",
-	"checkver": "<p>Latest: <a.*>.*</a> - <a href=\".*\">Python ([0-9\\.]+)</a></p>"
+	"checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
 }
