@@ -15,9 +15,9 @@ function is_admin {
 }
 
 # messages
-function abort($msg) { write-host $msg -f darkred; exit 1 }
-function warn($msg) { write-host $msg -f darkyellow; }
-function success($msg) { write-host $msg -f darkgreen }
+function abort($msg) { write-host $msg -f red; exit 1 }
+function warn($msg) { write-host $msg -f yellow }
+function success($msg) { write-host $msg -f green }
 
 # dirs
 function basedir($global) {	if($global) { return $globaldir } $scoopdir }

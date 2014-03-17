@@ -66,19 +66,19 @@ while($in_progress -gt 0) {
 	write-host "$app`: " -nonewline
 
 	if($err) {
-		write-host "ERROR: $err" -f darkyellow
+		write-host "ERROR: $err" -f yellow
 	} else {
 		if($page -match $regexp) {
 			$ver = $matches[1]
 			if($ver -eq $expected_ver) {
-				write-host "$ver" -f darkgreen
+				write-host "$ver" -f green
 			} else {
-				write-host "$ver" -f darkred -nonewline
+				write-host "$ver" -f red -nonewline
 				write-host " (scoop version is $expected_ver)"
 			}
 			
 		} else {
-			write-host "couldn't match '$regexp' in $url" -f darkred
+			write-host "couldn't match '$regexp' in $url" -f red
 		}
 	}
 }
@@ -98,13 +98,13 @@ $page = $wc.downloadstring($url)
 if($page -match $regexp) {
 	$ver = $matches[1]
 	if($ver -eq $expected_ver) {
-		write-host "$ver" -f darkgreen
+		write-host "$ver" -f green
 	} else {
-		write-host "$ver" -f darkred -nonewline
+		write-host "$ver" -f red -nonewline
 		write-host " (scoop version is $expected_ver)"
 	}
 	
 } else {
-	write-host "couldn't match '$regexp' in $url" -f darkred
+	write-host "couldn't match '$regexp' in $url" -f red
 }
 #>
