@@ -1,17 +1,9 @@
 {
 	"homepage": "http://www.apachelounge.com",
-	"version": "2.4.7",
+	"version": "2.4.9",
 	"license": "Apache 2.0",
-	"architecture": {
-		"64bit": {
-			"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.7-win64-VC11.zip",
-			"hash": "sha1:88A586D2794BF46952259E2C76D781246D70C057"
-		},
-		"32bit": {
-			"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.7-win32-VC11.zip",
-			"hash": "sha1:B155FC75A540385E18F59E391DB035318D9B21F4"
-		}
-	},
+	"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.9-win32-VC11.zip",
+	"hash": "2CA9660BC5CCB467A092331F50CA0AB4AA2E80820FB8EAE8BA3803B0EF677729",
 	"extract_dir": "Apache24",
 	"bin": [
 		"bin\\ab.exe",
