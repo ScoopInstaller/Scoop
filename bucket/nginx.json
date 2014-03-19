@@ -1,9 +1,9 @@
 {
 	"homepage": "http://nginx.org",
-	"version": "1.5.11",
+	"version": "1.5.12",
 	"license": "BSD",
-	"url": "http://nginx.org/download/nginx-1.5.11.zip",
-	"hash": "F78FF1DD4608D55F7E77267F39010A6A1D97390B02127A03FE39014541B9B6A5",
-	"extract_dir": "nginx-1.5.11",
+	"url": "http://nginx.org/download/nginx-1.5.12.zip",
+	"hash": "DB21C0525F0F6DCEE9ADC9B1042A8C95E99E25E185F56298A6CC25D33EBC19EF",
+	"extract_dir": "nginx-1.5.12",
 	"bin": "nginx.exe"
 }
