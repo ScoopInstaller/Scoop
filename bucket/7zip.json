@@ -1,15 +1,15 @@
 {
 	"homepage": "http://www.7-zip.org/",
 	"license": "http://www.7-zip.org/license.txt",
-	"version": "9.20",
+	"version": "9.22",
 	"architecture": {
 		"64bit": {
-			"url": "http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920-x64.msi",
-			"hash": "62df458bc521001cd9a947643a84810ecbaa5a16b5c8e87d80df8e34c4a16fe2"
+			"url": "http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.22/7z922-x64.msi",
+			"hash": "F09BF515289EEA45185A4CC673E3BBC18CE608C55B4CF96E77833435C9CDF3DC"
 		},
 		"32bit": {
-			"url": "http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920.msi",
-			"hash": "fe4807b4698ec89f82de7d85d32deaa4c772fc871537e31fb0fccf4473455cb8"
+			"url": "http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.22/7z922.msi",
+			"hash": "86DF264D22C3DD3AB80CB55A118DA2D41BDD95C2DB2CD09A6BBDF48F069E3D7A"
 		}
 	},
 	"extract_dir": "Files/7-Zip",
