@@ -10,7 +10,13 @@ function parse_json($path) {
 function url_manifest($url) {
 	$str = $null
 	try {
-		$str = (new-object net.webclient).downloadstring($url)
+		$wc = New-Object Net.WebClient
+		$proxy = New-Object System.Net.WebProxy
+		$proxy.Address = $wc.Proxy.GetProxy($url).AbsoluteUri
+		$proxy.UseDefaultCredentials = $true
+		$wc.Proxy = $proxy
+		
+		$str = $wc.downloadstring($url)
 	} catch [system.management.automation.methodinvocationexception] {
 		warn "error: $($_.exception.innerexception.message)"
 	} catch {
@@ -26,7 +32,15 @@ function manifest($app, $bucket, $url) {
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
-	if($url) { (new-object net.webclient).downloadstring($url) > "$dir\manifest.json" }
+	if($url) { 
+		$wc = New-Object Net.WebClient
+		$proxy = New-Object System.Net.WebProxy
+		$proxy.Address = $wc.Proxy.GetProxy($url).AbsoluteUri
+		$proxy.UseDefaultCredentials = $true
+		$wc.Proxy = $proxy
+
+		$wc.downloadstring($url) > "$dir\manifest.json"
+	}
 	else { cp (manifest_path $app $bucket) "$dir\manifest.json" }
 }
 

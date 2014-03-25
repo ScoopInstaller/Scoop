@@ -7,7 +7,14 @@ $erroractionpreference='stop' # quit if anything goes wrong
 # get core functions
 $core_url = 'https://raw.github.com/lukesampson/scoop/master/lib/core.ps1'
 echo 'initializing...'
-iex (new-object net.webclient).downloadstring($core_url)
+
+$wc = New-Object Net.WebClient
+$proxy = New-Object System.Net.WebProxy
+$proxy.Address = $wc.Proxy.GetProxy($core_url).AbsoluteUri
+$proxy.UseDefaultCredentials = $true
+$wc.Proxy = $proxy
+
+iex $wc.downloadstring($core_url)
 
 # prep
 if(installed 'scoop') {
