@@ -28,7 +28,7 @@ function update_scoop() {
 	$tempdir = ensure $tempdir
 	$currentdir = fullpath $currentdir
 
-	$zipurl = 'https://github.com/dennislloydjr/scoop/archive/master.zip'
+	$zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
 	$zipfile = "$tempdir\scoop.zip"
 	echo 'downloading...'
 	dl $zipurl $zipfile
