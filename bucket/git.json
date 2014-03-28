@@ -9,7 +9,7 @@
 		"git config --global credential.helper wincred"
 	],
 	"checkver": {
-		"url": "http://git-scm.com/",
-		"re": "<span class='version'>([^<]+)</span>"
+		"url": "http://git-scm.com/download/win",
+		"re": "downloading version <strong>([^<]+)</strong>"
 	}
 }
