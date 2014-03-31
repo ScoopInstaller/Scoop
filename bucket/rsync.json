@@ -1,0 +1,9 @@
+{
+	"homepage": "https://www.itefix.no/i2/cwrsync",
+	"version": "3.1.0",
+	"license": "",
+	"url": "https://www.itefix.no/download/cwRsync_5.2.2_Free.zip",
+	"hash": "08a6618b73c1b8467813aac76cceb05d1d0c658a7b93fa10080e8654fd94c275",
+	"extract_dir": "3.1.0",
+	"bin": "rsync.exe"
+}
