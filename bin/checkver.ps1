@@ -62,6 +62,8 @@ while($in_progress -gt 0) {
 
 	$regexp = $json.checkver.re
 	if(!$regexp) { $regexp = $json.checkver }
+
+	$regexp = "(?s)$regexp"
 	
 	write-host "$app`: " -nonewline
 
