@@ -30,6 +30,6 @@
 	"post_install": "pushd $dir\\devkit;ruby dk.rb init > $null;echo \"- $dir\" | out-file config.yml -a -enc default; ruby dk.rb install;popd;",
 	"checkver": {
 		"url": "http://rubyinstaller.org/downloads/",
-		"re": "<ul>\\s*<li class=\"exe\"><a.*>Ruby ([0-9\\.p-]+)</a></li>"
+		"re": "<li class=\"exe\"><a.*?>Ruby ([0-9\\.p-]+)</a></li>"
 	}
 }
