@@ -1,10 +1,10 @@
 {
 	"homepage": "http://curl.haxx.se/",
-	"version": "7.35.0",
+	"version": "7.36.0",
 	"licence": "MIT",
-	"url": "http://www.confusedbycode.com/curl/curl-7.35.0-win32-fix1.zip",
-	"hash": "698761238e77dfc940c8ee4d71ca6558320bd0a986321e7126efac8579cd54c6",
-	"extract_dir": "curl-7.35.0-win32",
+	"url": "http://www.confusedbycode.com/curl/curl-7.36.0-win32-fix1.zip",
+	"hash": "dc0843904a2346d9de20386c50520270fede766549fd52fc90e54509ade68dde",
+	"extract_dir": "curl-7.36.0-win32",
 	"bin": "bin/curl.exe",
 	"checkver": "The most recent stable version of curl is version ([0-99\\.]+)"
 }
