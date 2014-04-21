@@ -1,15 +1,15 @@
 {
 	"homepage": "mercurial.selenic.com",
-	"version": "2.9.1",
+	"version": "2.9.2",
 	"license": "GPL2",
 	"architecture": {
 		"64bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.9.1-x64.exe",
-			"hash": "cbdaa7559ea21534055fdf79b0cfe913ee4a14dc40bc7805059c85acfc9dfedf"
+			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.9.2-x64.exe",
+			"hash": "062c96f6f16def4677e506d5daaae36c36e18375a92f58066509f106af07d672"
 		},
 		"32bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.9.1.exe",
-			"hash": "1e2ab495a88c5bcc56ed18f956da16efa4138457f0d5f7d99d2b59f391a3bfcf"
+			"url": "http://mercurial.selenic.com/release/windows/Mercurial-2.9.2.exe",
+			"hash": "bc8fb6683d71c5c4d1a6cec36c8df4abc97674688b625971430dbf9ad657571a"
 		}
 	},
 	"innosetup": true,
