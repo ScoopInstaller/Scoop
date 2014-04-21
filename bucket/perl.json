@@ -1,15 +1,15 @@
 {
 	"homepage": "http://strawberryperl.com",
-	"version": "5.18.2.1",
+	"version": "5.18.2.2",
 	"license": "GPL",
 	"architecture": {
 		"32bit": {
-			"url": "http://strawberryperl.com/download/5.18.2.1/strawberry-perl-5.18.2.1-32bit-portable.zip",
-			"hash": "sha1:ca6081888dca6844038ac4a99f2a82c81d48f9d0"
+			"url": "http://strawberryperl.com/download/5.18.2.2/strawberry-perl-5.18.2.2-32bit-portable.zip",
+			"hash": "sha1:b377748f9c908cd7ccfbc1689a67d47709b77ca4"
 		},
 		"64bit": {
-			"url": "http://strawberryperl.com/download/5.18.2.1/strawberry-perl-5.18.2.1-64bit-portable.zip",
-			"hash": "sha1:d1b5d8ed03b87aa14db0a881b2d7bbb1e5b09ad5"
+			"url": "http://strawberryperl.com/download/5.18.2.2/strawberry-perl-5.18.2.2-64bit-portable.zip",
+			"hash": "sha1:a69902b2b906cdc1ec9d63e06c18acf63c70dc38"
 		}
 	},
 	"env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ],
