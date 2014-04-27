@@ -1,6 +1,6 @@
 {
 	"homepage": "http://www.mongodb.org",
-	"version": "2.4.6",
+	"version": "2.6.0",
 	"license": "http://www.mongodb.org/about/licensing/",
 	"architecture": {
 		"64bit": {
