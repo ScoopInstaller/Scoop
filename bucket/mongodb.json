@@ -28,5 +28,9 @@
 		"bin\\mongos.exe",
 		"bin\\mongostat.exe",
 		"bin\\mongotop.exe"
-	]
+	],
+	"checkver": {
+		"url": "http://www.mongodb.org/downloads",
+		"re": "Production Release \\(([^<]+)\\)"
+	}
 }
