@@ -6,9 +6,9 @@
 # Without [query], shows all the available apps.
 param($query)
 . "$psscriptroot\..\lib\core.ps1"
-. (relpath '..\lib\buckets.ps1')
-. (relpath '..\lib\manifest.ps1')
-. (relpath '..\lib\versions.ps1')
+. "$psscriptroot\..\lib\buckets.ps1"
+. "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\versions.ps1"
 
 function bin_match($manifest, $query) {
 	if(!$manifest.bin) { return $false }

@@ -17,7 +17,15 @@
 # Settings
 # --------
 #
-# proxy = username:password@host:port
+# proxy: [username:password@]host:port
+# 
+# By default, Scoop will use the proxy settings from Internet Options, but with anonymous authentication.
+#
+# * To use the credentials for the current logged-in user, use 'currentuser' in place of username:password
+# * To use the system proxy settings configured in Internet Options, use 'default' in place of host:port
+# * An empty or unset value for proxy is equivalent to 'default' (with no username or password)
+# * To bypass the system proxy and connect directly, use 'none' (with no username or password)
+
 param($name, $value)
 
 . "$psscriptroot\..\lib\config.ps1"

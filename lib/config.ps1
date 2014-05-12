@@ -57,3 +57,29 @@ function set_config($name, $val) {
 }
 
 $cfg = load_cfg
+
+# setup proxy
+$p = get_config 'proxy'
+if($p) {
+	try {
+		$cred, $address = $p -split '@'
+		if(!$address) {
+			$address, $cred = $cred, $null # no credentials supplied
+		}
+
+		if($address -eq 'none') {
+			[net.webrequest]::defaultwebproxy = $null
+		} elseif($address -ne 'default') {
+			[net.webrequest]::defaultwebproxy = new-object net.webproxy "http://$address"
+		}
+
+		if($cred -eq 'currentuser') {
+			[net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
+		} elseif($cred) {
+			$user, $pass = $cred -split ':'
+			[net.webrequest]::defaultwebproxy.credentials = new-object net.networkcredential($user, $pass)
+		}
+	} catch {
+		warn "failed to use proxy '$p': $($_.exception.message)"
+	}
+}

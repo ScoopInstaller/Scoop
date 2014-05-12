@@ -6,6 +6,7 @@
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 
 function timeago($when) {
 	$diff = [datetime]::now - $last_update
