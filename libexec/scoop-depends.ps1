@@ -1,5 +1,5 @@
-# usage: scoop depends <app>
-# summary: List dependencies for an app
+# Usage: scoop depends <app>
+# Summary: List dependencies for an app
 
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\install.ps1"
