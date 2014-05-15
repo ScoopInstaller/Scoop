@@ -356,8 +356,10 @@ function install_msi($fname, $dir, $msi) {
 }
 
 function extract_msi($path, $to) {
-	$ok = run 'msiexec' @('/a', "`"$dir\$fname`"", '/qn', "TARGETDIR=`"$to`"")
-	if(!$ok) { abort "failed to extract files from $path" }
+	$logfile = "$(split-path $path)\msi.log"
+	$ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
+	if(!$ok) { abort "failed to extract files from $path.`nlog file: $(friendly_path $logfile)" }
+	if(test-path $logfile) { rm $logfile }
 }
 
 # deprecated
