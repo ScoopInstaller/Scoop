@@ -90,16 +90,21 @@ function dl_with_cache($app, $version, $url, $to) {
 }
 
 function dl_progress($url, $to) {
+	$wc = New-Object Net.WebClient
+	$proxy = New-Object System.Net.WebProxy
+	$proxy.Address = $wc.Proxy.GetProxy($url).AbsoluteUri
+	$proxy.UseDefaultCredentials = $true
+	$wc.Proxy = $proxy
+
 	if([console]::isoutputredirected) {
 		# can't set cursor position: just do simple download
-		(new-object net.webclient).downloadfile($url, $to)
+		$wc.downloadfile($url, $to)
 		return
 	}
 
 	$left = [console]::cursorleft
 	$top = [console]::cursortop
 
-	$wc = new-object net.webclient
 	register-objectevent $wc downloadprogresschanged progress | out-null
 	register-objectevent $wc downloadfilecompleted complete | out-null
 	try {

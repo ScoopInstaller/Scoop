@@ -28,7 +28,11 @@ get-event | % {
 
 # start all downloads
 $queue | % {
-	$wc = new-object net.webclient
+	$wc = New-Object Net.WebClient
+	$proxy = New-Object System.Net.WebProxy
+	$proxy.UseDefaultCredentials = $true
+	$wc.Proxy = $proxy
+
 	register-objectevent $wc downloadstringcompleted -ea stop | out-null
 
 	$name, $json = $_
@@ -42,6 +46,7 @@ $queue | % {
 		json = $json;
 	}
 
+	$proxy.Address = $wc.Proxy.GetProxy($url).AbsoluteUri
 	$wc.downloadstringasync($url, $state)
 }
 

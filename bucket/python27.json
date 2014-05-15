@@ -20,7 +20,14 @@
 	"env_add_path": [ "scripts" ],
 	"post_install": "pushd $env:temp
 	$s = 'https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py'
-	echo \"running $s...\";(new-object net.webclient).downloadstring($s) | python 2>&1 > $null
+	
+	$wc = New-Object Net.WebClient
+	$proxy = New-Object System.Net.WebProxy
+	$proxy.Address = $wc.Proxy.GetProxy($s).AbsoluteUri
+	$proxy.UseDefaultCredentials = $true
+	$wc.Proxy = $proxy
+
+	echo \"running $s...\";$wc.downloadstring($s) | python 2>&1 > $null
 	popd",
 	"notes": "To use PIP to manage Python packages, run 'easy_install pip'",
 	"checkver": "<p>Latest: <a.*>.*</a> - <a href=\".*\">Python ([0-9\\.]+)</a></p>"
