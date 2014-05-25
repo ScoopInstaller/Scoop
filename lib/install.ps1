@@ -100,6 +100,7 @@ function dl_progress($url, $to) {
 	$top = [console]::cursortop
 
 	$wc = new-object net.webclient
+	$wc.headers.add('User-Agent', 'Scoop/1.0')
 	register-objectevent $wc downloadprogresschanged progress | out-null
 	register-objectevent $wc downloadfilecompleted complete | out-null
 	try {

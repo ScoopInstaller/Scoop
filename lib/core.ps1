@@ -56,7 +56,12 @@ function is_local($path) {
 }
 
 # operations
-function dl($url,$to) { (new-object system.net.webClient).downloadFile($url,$to) }
+function dl($url,$to) {
+	$wc = new-object system.net.webClient
+	$wc.headers.add('User-Agent', 'Scoop/1.0')
+	$wc.downloadFile($url,$to)
+
+}
 function env($name,$global,$val='__get') {
 	$target = 'User'; if($global) {$target = 'Machine'}
 	if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
