@@ -1,15 +1,15 @@
 {
 	"homepage": "http://www.python.org",
 	"license": "http://docs.python.org/3.4/license",
-	"version": "3.4.0",
+	"version": "3.4.1",
 	"architecture": {
 		"64bit": {
-			"url": "https://www.python.org/ftp/python/3.4.0/python-3.4.0.amd64.msi",
-			"hash": "md5:d59aaf1bb32d1bc01a051b3613ab0966"
+			"url": "https://www.python.org/ftp/python/3.4.1/python-3.4.1.amd64.msi",
+			"hash": "md5:25440653f27ee1597fd6b3e15eee155f"
 		},
 		"32bit": {
-			"url": "https://www.python.org/ftp/python/3.4.0/python-3.4.0.msi",
-			"hash": "md5:e3be8a63294e42e126493ca96cfe48bd"
+			"url": "https://www.python.org/ftp/python/3.4.1/python-3.4.1.msi",
+			"hash": "md5:4940c3fad01ffa2ca7f9cc43a005b89a"
 		}
 	},
 	"bin": [
