@@ -1,26 +1,26 @@
 {
 	"homepage": "http://nodejs.org",
-	"version": "0.10.28",
+	"version": "0.10.29",
 	"license": "MIT",
 	"architecture": {
 		"64bit": {
 			"url": [
-				"http://nodejs.org/dist/v0.10.28/x64/node.exe",
-				"http://nodejs.org/dist/npm/npm-1.4.9.zip"
+				"http://nodejs.org/dist/v0.10.29/x64/node.exe",
+				"http://nodejs.org/dist/npm/npm-1.4.10.zip"
 			],
 			"hash": [
-				"b3bdc122c27eaf3aa89f226fb6084934aa0a484949bead9bd696908fa2a8aa02",
-				"d4121588a78bab28f574e83a27ab822dbd1231492b9f849aebdf78b574251ff6"
+				"8ca647c61cadd0bc91e1a43ceb021d89afc580a95e708b52fc283bcb2634a15d",
+				"17cbe14f6d3d9e4149f32b8df7ebf67f300783e6e51fbc1b0987c0582466e1b6"
 			]
 		},
 		"32bit": {
 			"url": [
-				"http://nodejs.org/dist/v0.10.28/node.exe",
-				"http://nodejs.org/dist/npm/npm-1.4.9.zip"
+				"http://nodejs.org/dist/v0.10.29/node.exe",
+				"http://nodejs.org/dist/npm/npm-1.4.10.zip"
 			],
 			"hash": [
-				"ce2d989807a9bfcc63fed484a435d9d37d13af022daafedfc60e2b64634a6ffd",
-				"d4121588a78bab28f574e83a27ab822dbd1231492b9f849aebdf78b574251ff6"
+				"fbd516aa3752da8bfb14d557d4ae16315f500376c3688ed0cfb087c95c95ea20",
+				"17cbe14f6d3d9e4149f32b8df7ebf67f300783e6e51fbc1b0987c0582466e1b6"
 			]
 		}
 	},
