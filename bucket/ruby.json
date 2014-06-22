@@ -1,28 +1,28 @@
 {
 	"homepage": "http://rubyinstaller.org",
-	"version": "2.0.0-p451",
+	"version": "2.0.0-p481",
 	"architecture": {
 		"64bit": {
 			"url": [
-				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p451-x64-mingw32.7z?direct#/dl.7z",
+				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p481-x64-mingw32.7z?direct#/dl.7z",
 				"http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
 			],
 			"hash": [
-				"0970beef635e500bc988bef43e500913e12c51b6e281ef2fcd0eb779b981f841",
+				"8f23120e671f6262afb0c73ac707fce45d3b347ea7dc35fc6e861ecf55042a56",
 				"2ada04c7234199126c0f34f6ea7163a8f8dccb1e15814af175a189f6ac48b8ac"
 			],
-			"extract_dir": "ruby-2.0.0-p451-x64-mingw32"
+			"extract_dir": "ruby-2.0.0-p481-x64-mingw32"
 		},
 		"32bit": {
 			"url": [
-				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p451-i386-mingw32.7z?direct#/dl.7z",
+				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.0.0-p481-i386-mingw32.7z?direct#/dl.7z",
 				"http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
 			],
 			"hash": [
-				"7a4c258b3c86bccddcf0f797bedf3362c0904e7fc3a66cf33a1032dc4bd4bb19",
+				"6de5435963a3d811a8ba8fc5191984c271a80040813c14c54b0bed042fe528a9",
 				"61a06b5da06dd94343e591163ac0d43c544e9cd4df770f01275645b268b44dc7"
 			],
-			"extract_dir": "ruby-2.0.0-p451-i386-mingw32"
+			"extract_dir": "ruby-2.0.0-p481-i386-mingw32"
 		}
 	},
 	"extract_to": [ "", "devkit" ],
