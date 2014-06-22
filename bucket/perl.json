@@ -13,5 +13,5 @@
 		}
 	},
 	"env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ],
-	"checkver": "<b>Recommended stable versions:</b></p>\\s*<a[^>]*><b>Strawberry Perl ([0-9\\.]+) \\(32bit\\)</b>"
+	"checkver": "<b>Recommended version:</b></p>\\s*<a[^>]*><b>Strawberry Perl ([0-9\\.]+) \\(32bit\\)</b>"
 }
