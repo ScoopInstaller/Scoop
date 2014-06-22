@@ -24,6 +24,12 @@ function compare_versions($a, $b) {
 
 	for($i=0;$i -lt $ver_a.length;$i++) {
 		if($i -gt $ver_b.length) { return 1; }
+		
+		# don't try to compare int to string
+		if($ver_b[$i] -is [string] -and $ver_a[$i] -isnot [string]) {
+			$ver_a[$i] = "$($ver_a[$i])"
+		}
+
 		if($ver_a[$i] -gt $ver_b[$i]) { return 1; }
 		if($ver_a[$i] -lt $ver_b[$i]) { return -1; }
 	}
