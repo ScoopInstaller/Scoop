@@ -1,17 +1,17 @@
 {
 	"homepage": "http://www.mongodb.org",
-	"version": "2.6.1",
+	"version": "2.6.3",
 	"license": "http://www.mongodb.org/about/licensing/",
 	"architecture": {
 		"64bit": {
-			"url": "http://downloads.mongodb.org/win32/mongodb-win32-x86_64-2008plus-2.6.1.zip",
-			"hash": "32f542f73cb9c0afac7006aab0a7b5dcd72615f98e30141304c5cf7d6b4b4ec2",
-			"extract_dir": "mongodb-win32-x86_64-2008plus-2.6.1"
+			"url": "http://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-2.6.3.zip",
+			"hash": "40fdbd41bf699bf0881965fcaaf9c74e05f6cf80eda303fc3393acd707e7ae93",
+			"extract_dir": "mongodb-win32-x86_64-2008plus-2.6.3"
 		},
 		"32bit": {
-			"url": "http://downloads.mongodb.org/win32/mongodb-win32-i386-2.6.1.zip",
-			"hash": "2fb9668a7f107df918f7d43d69365baef3ee134d7aa3fc9cdb33deb614956078",
-			"extract_dir": "mongodb-win32-i386-2.6.1"
+			"url": "http://fastdl.mongodb.org/win32/mongodb-win32-i386-2.6.3.zip",
+			"hash": "1aeae0298fb00fe70da450f3c4b532d58c472f7e37c2c3b828db00ddd7367ba8",
+			"extract_dir": "mongodb-win32-i386-2.6.3"
 		}
 	},
 	"bin": [
