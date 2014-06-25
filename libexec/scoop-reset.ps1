@@ -18,7 +18,7 @@ if(!(installed $app)) { abort "$app isn't installed" }
 $version = current_version $app
 "resetting $app ($version)"
 
-$dir = versiondir $app $version
+$dir = resolve-path (versiondir $app $version)
 $manifest = installed_manifest $app $version
 
 create_shims $manifest $dir $false
