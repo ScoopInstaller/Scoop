@@ -200,7 +200,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			}
 			# fails if zip contains long paths (e.g. atom.json)
 			#cp "$dir\_scoop_extract\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-			robocopy "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to" /e
+			movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
 
 			try {
 				rm -r -force "$dir\_scoop_extract" -ea stop

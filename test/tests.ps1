@@ -9,13 +9,16 @@ function filter_tests($arg) {
 function test($desc, $assertions) {
 	if($filter -and $desc -notlike "*$filter*") { return }
 	$script:test = $desc
-	$assertions.invoke()
+	$script:run++
+	try {
+		$assertions.invoke()
+	} catch {
+		script:fail $_.exception.innerexception.message
+	}
 	$script:test = $null
 }
 
 function assert($x,$eq='__undefined',$ne='__undefined') {
-	$script:run++
-
 	if($args.length -gt 0) {
 		fail "unexpected arguments: $args"
 	}
@@ -30,7 +33,15 @@ function assert($x,$eq='__undefined',$ne='__undefined') {
 }
 
 function test_results {
-	"$script:run tests run, $script:failed failed"
+	$col = 'darkgreen'
+	$res = 'all passed'
+	if($script:failed -gt 0) {
+		$col = 'darkred'
+		$res = "$script:failed failed"
+	}
+
+	write-host "ran $script:run tests, " -nonewline
+	write-host $res -f $col
 }
 
 function script:fail($msg) {
@@ -42,7 +53,7 @@ function script:fail($msg) {
 
 	if($script:test) { $msg = "$script:test`r`n      -> $msg" }
 
-	write-host "FAIL: $msg" -f red
+	write-host "FAIL: $msg" -f darkred
 	write-host "$script line $line`:"
 	write-host (($invoked.positionmessage -split "`r`n")[1..2] -join "`r`n")
 }
@@ -51,4 +62,28 @@ function script:fmt($var) {
 	if($var -eq $null) { return "`$null" }
 	if($var -is [string]) { return "'$var'" }
 	return $var
+}
+
+# copies fixtures to a working directory
+function setup_working {
+	# get the name of the test from the file that called this function
+	$file = (get-variable -scope 1 myinvocation).value.mycommand.name
+	$name = [io.path]::getfilenamewithoutextension($file)
+
+	$fixtures = "$psscriptroot\fixtures\$name"
+	if(!(test-path $fixtures)) {
+		write-host "couldn't find fixtures for $name at $fixtures" -f red
+		exit 1
+	}
+
+	# reset working dir
+	$working_dir = "$psscriptroot\tmp\$name"
+	if(test-path $working_dir) {
+		rm -r -force $working_dir
+	}
+
+	# set up
+	cp $fixtures $working_dir -r
+
+	return $working_dir
 }

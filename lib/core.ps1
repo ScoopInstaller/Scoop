@@ -93,6 +93,16 @@ function unzip_old($path,$to) {
 	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
+function movedir($from, $to) {
+	$from = $from.trimend('\')
+	$to = $to.trimend('\')
+
+	$out = robocopy "$from" "$to" /e /move
+	if($lastexitcode -ge 8) {
+		throw "error moving directory: `n$out"
+	}
+}
+
 function shim($path, $global, $name, $arg) {
 	if(!(test-path $path)) { abort "can't shim $(fname $path): couldn't find $path" }
 	$abs_shimdir = ensure (shimdir $global)

@@ -1,18 +1,7 @@
 . "$psscriptroot\tests.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
-# tests to work out how to copy packages between
-
-$fixtures = "$psscriptroot\fixtures\packages"
-
-# reset working dir
-$working_dir = "$psscriptroot\tmp\packages"
-if(test-path $working_dir) {
-	rm -r -force $working_dir
-}
-
-# set up
-cp $fixtures $working_dir -r
+$working_dir = setup_working
 
 # copy packages from 1.0 to 1.1
 $from = "$working_dir\1.0"
