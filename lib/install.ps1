@@ -202,10 +202,12 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 			#cp "$dir\_scoop_extract\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
 			movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
 
-			try {
-				rm -r -force "$dir\_scoop_extract" -ea stop
-			} catch [system.io.pathtoolongexception] {
-				cmd /c "rmdir /s /q $dir\_scoop_extract"
+			if(test-path "$dir\_scoop_extract") { # might have been moved by movedir
+				try {
+					rm -r -force "$dir\_scoop_extract" -ea stop
+				} catch [system.io.pathtoolongexception] {
+					cmd /c "rmdir /s /q $dir\_scoop_extract"
+				}
 			}
 
 			rm "$dir\$fname"
