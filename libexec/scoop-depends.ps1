@@ -8,6 +8,7 @@
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 . "$psscriptroot\..\lib\config.ps1"
+. "$psscriptroot\..\lib\help.ps1"
 
 $opt, $apps, $err = getopt $args 'a:' 'arch='
 $app = $apps[0]
