@@ -11,6 +11,7 @@
 		"bin\\hpc.exe",
 		"bin\\hsc2hs.exe",
 		"bin\\runghc.exe",
-		"bin\\runhaskell.exe"
+		"bin\\runhaskell.exe",
+		"lib\\extralibs\\bin\\cabal.exe"
 	]
 }
