@@ -3,7 +3,7 @@
 	"version": "5.5.15",
 	"license": "http://www.php.net/license/",
 	"url": "http://windows.php.net/downloads/releases/php-5.5.15-Win32-VC11-x86.zip",
-	"hash": "sha1:d367fd9c56d48649b01e2818d43bc46196b74a7e",
+	"hash": "sha1:41ff9a5b5f44b927f4e3105577ffd2138ed647ce",
 	"bin": "php.exe",
 	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\""
 }
