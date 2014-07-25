@@ -7,7 +7,7 @@ function requires_7zip($manifest, $architecture) {
 }
 
 function file_requires_7zip($fname) {
-	$fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(7z)|(rar)|(iso))$'
+	$fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(7z)|(rar)|(iso)|(xz))$'
 }
 
 function extract_7zip($path, $to, $recurse) {
