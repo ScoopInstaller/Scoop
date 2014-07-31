@@ -10,6 +10,6 @@
     ],
     "checkver": {
         "url": "https://raw.githubusercontent.com/puppetlabs/puppet/master/lib/puppet/version.rb",
-        "re": "PUPPETVERSION = '[0-9\\.]+'"
+        "re": "PUPPETVERSION = '([0-9\\.]+)'"
     }
 }
