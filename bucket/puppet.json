@@ -1,0 +1,15 @@
+{
+    "homepage": "http://puppetlabs.com",
+    "version": "3.6.2",
+    "url": "https://downloads.puppetlabs.com/windows/puppet-3.6.2.msi",
+    "hash": "1e002084ac4bd69f53c64922eef204dc540a1181b84ee58fa7522910ed43a170",
+    "bin": [
+            "Puppet Labs/Puppet/bin\\facter.bat",
+            "Puppet Labs/Puppet/bin\\hiera.bat",
+            "Puppet Labs/Puppet/bin\\puppet.bat"
+    ],
+    "checkver": {
+        "url": "https://raw.githubusercontent.com/puppetlabs/puppet/master/lib/puppet/version.rb",
+        "re": "PUPPETVERSION = '[0-9\\.]+'"
+    }
+}
