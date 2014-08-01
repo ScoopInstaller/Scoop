@@ -25,5 +25,5 @@
 		}
 	},
 	"env_add_path": ".",
-	"checkver": "<p>Current Version: v([0-9\\.]+)</p>"
+	"checkver": "<p class=\"version\">Current Version: v([0-9\\.]+)</p>"
 }
