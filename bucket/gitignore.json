@@ -1,0 +1,7 @@
+{
+    "homepage": "https://github.com/lukesampson/psutils",
+    "version": "0.2014.08.01",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/master/gitignore.ps1",
+    "hash": "6504170f3822ac1d7c4d00ba2f6b1a3de42ca6af206adacd85df04028c0c9429",
+    "bin": "gitignore.ps1"
+}
