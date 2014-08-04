@@ -1,9 +1,9 @@
 {
 	"homepage": "http://www.r-project.org",
-	"version": "3.1.0",
+	"version": "3.1.1",
 	"license": "GPL2",
-	"url": "http://cran.rstudio.com/bin/windows/base/R-3.1.0-win.exe",
-	"hash": "c3f11723b60972344ff87aed6b53a58209dd463e2c3286259624754b077f84e8",
+	"url": "http://cran.rstudio.com/bin/windows/base/R-3.1.1-win.exe",
+	"hash": "ce6fb76612aefc482583fb92f4f5c3cb8e8e3bf1a8dda97df7ec5caf746e53fe",
 	"innosetup": true,
 	"bin": [
 		"bin\\r.exe",
