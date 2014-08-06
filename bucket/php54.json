@@ -3,7 +3,7 @@
 	"version": "5.4.26",
 	"license": "http://www.php.net/license/",
 	"url": "http://windows.php.net/downloads/releases/php-5.4.31-Win32-VC9-x86.zip",
-	"hash": "sha1:e7c489bdc4c7e0d552ef4e95ca68111e0ccb280a",
+	"hash": "sha:7f46b68b881d4373a5842283a158909887218dc2",
 	"bin": "php.exe",
 	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\""
 }
