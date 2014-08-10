@@ -1,8 +1,16 @@
 {
 	"homepage": "http://www.haskell.org",
-	"version": "2013.2.0.0",
-	"url": "http://www.haskell.org/platform/download/2013.2.0.0/HaskellPlatform-2013.2.0.0-setup.exe#/dl.7z",
-	"hash": "1d835835e71d71b1cb8dc6db6f94c6460ffc63d4e86d3a58062ebd1e21420a2d",
+	"version": "2014.2.0.0",
+	"architecture": {
+		"64bit": {
+			"url": "http://www.haskell.org/platform/download/2014.2.0.0/HaskellPlatform-2014.2.0.0-x86_64-setup.exe#/dl.7z",
+			"hash": "11f09ed6492441d4b3ed61f04614c09ca88244fa18e248f5f22804c9a7bda116"
+		},
+		"32bit": {
+			"url": "http://www.haskell.org/platform/download/2014.2.0.0/HaskellPlatform-2014.2.0.0-i386-setup.exe#/dl.7z",
+			"hash": "719bd61329d1cd8c015c700661c7ba02f17c0c1c4a9e87495270132a5be3bbc4"
+		}
+	},
 	"bin": [
 		"bin\\ghc.exe",
 		"bin\\ghc-pkg.exe",
