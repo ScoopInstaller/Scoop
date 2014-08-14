@@ -4,7 +4,9 @@
 # 'scoop update <app>' installs a new version of that app, if there is one.
 #
 # Options:
+#   --local, -l   update a locally installed app (default)
 #   --global, -g  update a globally installed app
+#   --all, -a     updates all installed apps (use -l or -g to limit)
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
@@ -15,9 +17,11 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-$opt, $apps, $err = getopt $args 'g' 'global'
+$opt, $apps, $err = getopt $args 'lga' 'local','global','all'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
+$all = $opt.all
+$local = $opt.l -or $opt.local
 
 function update_scoop() {
 	$tempdir = versiondir 'scoop' 'update'
@@ -131,7 +135,38 @@ function ensure_all_installed($apps, $global) {
 	}
 }
 
-if(!$apps) {
+function update_all() {
+	# Get the list of apps
+	$localapps = @()
+	if($local -or !($global)) {
+		$localapps = installed_apps $false | % { @{ name = $_ } }
+	}
+	$globalapps = @()
+	if(!($local) -and $global) {
+		$globalapps = installed_apps $true | % { @{ name = $_; global = $true } }
+	}
+
+	$apps = @($localapps) + @($globalapps)
+
+	# For each app, call update(--$app--, $global)
+	if($apps) {
+		$apps | % { update $_.name $_.global }
+		""
+	} else {
+		if($local -and !($global)) {
+			$x = "local "
+		} elseif ($global) {
+			$x = "global "
+		} else {
+			$x = ""
+		}
+		"there aren't any $($x)apps installed"
+	}
+}
+
+if($all) {
+	update_all
+} elseif(!$apps) {
 	if($global) {
 		"scoop update: --global is invalid when <app> not specified"; exit 1
 	}
