@@ -3,6 +3,8 @@
 # Help: 'scoop update' updates Scoop to the latest version.
 # 'scoop update <app>' installs a new version of that app, if there is one.
 #
+# You can use '*' in place of <app> to update all apps. 
+#
 # Options:
 #   --global, -g  update a globally installed app
 . "$psscriptroot\..\lib\core.ps1"
@@ -131,6 +133,11 @@ function ensure_all_installed($apps, $global) {
 	}
 }
 
+# convert list of apps to list of ($app, $global) tuples
+function applist($apps, $global) {
+	return ,@($apps |% { ,@($_, $global) })
+}
+
 if(!$apps) {
 	if($global) {
 		"scoop update: --global is invalid when <app> not specified"; exit 1
@@ -141,9 +148,18 @@ if(!$apps) {
 		'ERROR: you need admin rights to update global apps'; exit 1
 	}
 
-	ensure_all_installed $apps $global
+	if($apps -eq '*') {
+		$apps = applist (installed_apps $false) $false
+		if($global) {
+			$apps += applist (installed_apps $true) $true
+		}
+	} else {
+		ensure_all_installed $apps $global
+		$apps = applist $apps $global
+	}
 
-	$apps | % { update $_ $global }
+	# $apps is now a list of ($app, $global) tuples
+	$apps | % { update @_ }
 }
 
 exit 0
