@@ -109,6 +109,7 @@ function update($app, $global) {
 	unpack_inno $fname $manifest $dir
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir
+	before_create_shims $manifest
 	create_shims $manifest $dir $global
 	env_add_path $manifest $dir $global
 	env_set $manifest $dir $global
