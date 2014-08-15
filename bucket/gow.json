@@ -8,7 +8,7 @@
 		"url": "https://github.com/bmatzelle/gow/releases",
 		"re": "<a.*?>Gow ([0-9\\.]+)</a>"
 	},
-	"before_shims": "echo \"@cscript //NoLogo \"\"$dir\\bin\\gow.vbs\"\" %1\" > \"$dir\\bin\\gow.bat\" ",
+	"pre_install": "echo \"@cscript //NoLogo \"\"$dir\\bin\\gow.vbs\"\" %1\" > \"$dir\\bin\\gow.bat\" ",
 	"bin": [
 		"bin\\awk.exe",
 		"bin\\basename.exe",
