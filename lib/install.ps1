@@ -17,6 +17,7 @@ function install_app($app, $architecture, $global) {
 
 	$fname = dl_urls $app $version $manifest $architecture $dir
 	unpack_inno $fname $manifest $dir
+	pre_install $manifest
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir $global
 	create_shims $manifest $dir $global
@@ -562,6 +563,13 @@ function env_rm($manifest, $global) {
 			env $name $global $null
 			if(test-path env:\$name) { rm env:\$name }
 		}
+	}
+}
+
+function pre_install($manifest) {
+	$manifest.pre_install | ? { $_ } | % {
+		echo "running pre-install script..."
+		iex $_
 	}
 }
 
