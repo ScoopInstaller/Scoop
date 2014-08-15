@@ -19,6 +19,7 @@ function install_app($app, $architecture, $global) {
 	unpack_inno $fname $manifest $dir
 	run_installer $fname $manifest $architecture $dir
 	ensure_install_dir_not_in_path $dir $global
+	before_create_shims $manifest
 	create_shims $manifest $dir $global
 	if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
 	env_add_path $manifest $dir $global
@@ -562,6 +563,13 @@ function env_rm($manifest, $global) {
 			env $name $global $null
 			if(test-path env:\$name) { rm env:\$name }
 		}
+	}
+}
+
+function before_create_shims($manifest) {
+	$manifest.before_shims | ? { $_ } | % {
+		echo "running before_shims script..."
+		iex $_
 	}
 }
 
