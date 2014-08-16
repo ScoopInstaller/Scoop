@@ -3,7 +3,7 @@
 # Help: 'scoop update' updates Scoop to the latest version.
 # 'scoop update <app>' installs a new version of that app, if there is one.
 #
-# You can use '*' in place of <app> to update all apps. 
+# You can use '*' in place of <app> to update all apps.
 #
 # Options:
 #   --global, -g  update a globally installed app
@@ -17,9 +17,10 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-$opt, $apps, $err = getopt $args 'g' 'global'
+$opt, $apps, $err = getopt $args 'gf' 'global','force'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
+$force = $opt.f -or $opt.force
 
 function update_scoop() {
 	$tempdir = versiondir 'scoop' 'update'
@@ -78,7 +79,7 @@ function update($app, $global) {
 
 	$version = latest_version $app $bucket $url
 
-	if($old_version -eq $version) {
+	if(!$force -and ($old_version -eq $version)) {
 		warn "the latest version of $app ($version) is already installed."
 		"run 'scoop update' to check for new versions."
 		return
@@ -100,7 +101,7 @@ function update($app, $global) {
 
 	"installing $app ($version)"
 	$dir = ensure (versiondir $app $version $global)
-		
+
 	# save info for uninstall
 	save_installed_manifest $app $bucket $dir $url
 	save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
