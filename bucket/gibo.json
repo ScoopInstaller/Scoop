@@ -1,0 +1,9 @@
+{
+	"version": "0.1",
+	"homepage": "https://github.com/kodybrown/gibo",
+	"license": "https://github.com/kodybrown/gibo/blob/master/UNLICENSE",
+	"description": "gibo (short for .gitignore boilerplates) is a shell script to help you easily access .gitignore boilerplates from github.com/github/gitignore.",
+	"url": "https://raw.githubusercontent.com/kodybrown/gibo/master/gibo.bat",
+	"hash": "e77e8f73cf253141096d36927da5b9d72b05823c27a8b5b40805b22407385c05",
+	"bin": "gibo.bat"
+}
