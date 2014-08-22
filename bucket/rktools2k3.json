@@ -1,9 +1,9 @@
 {
-	"homepage": "https://github.com/kodybrown/resourcekit2013",
+	"homepage": "https://github.com/kodybrown/rktools2k3",
 	"version": "1.0",
-	"url": "https://github.com/kodybrown/resourcekit2013/archive/master.zip",
-	"hash": "b096b2ffb7f09085bf3d79ad8480b5e4423f1d233207cff5bc8d03038e26f2c4",
-	"extract_dir": "resourcekit2013-master",
+	"url": "https://github.com/kodybrown/rktools2k3/archive/master.zip",
+	"hash": "ca60a82f443988c66ba0e5c16816adaae826b21a29e5c8b9777699b172f9b4cd",
+	"extract_dir": "rktools2k3-master",
 	"bin": [
 		"adlb.exe",
 		"atmarp.exe",
