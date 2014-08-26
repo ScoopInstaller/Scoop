@@ -25,6 +25,8 @@ if($apps) {
 		"  $app ($ver) $global_display"
 	}
 	""
-} else { "there aren't any apps installed" }
-
-exit 0
+    exit 0
+} else {
+    "there aren't any apps installed"
+    exit 1
+}
