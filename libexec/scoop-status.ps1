@@ -1,5 +1,5 @@
 # Usage: scoop status
-# Summary: Show status information
+# Summary: Show status and check for new app versions
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
