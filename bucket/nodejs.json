@@ -1,29 +1,20 @@
 {
 	"homepage": "http://nodejs.org",
-	"version": "0.10.29",
+	"version": "0.10.31",
 	"license": "MIT",
 	"architecture": {
 		"64bit": {
-			"url": [
-				"http://nodejs.org/dist/v0.10.29/x64/node.exe",
-				"http://nodejs.org/dist/npm/npm-1.4.10.zip"
-			],
-			"hash": [
-				"8ca647c61cadd0bc91e1a43ceb021d89afc580a95e708b52fc283bcb2634a15d",
-				"17cbe14f6d3d9e4149f32b8df7ebf67f300783e6e51fbc1b0987c0582466e1b6"
-			]
+			"url": "http://nodejs.org/dist/v0.10.31/x64/node-v0.10.31-x64.msi",
+			"hash": "85178339767794c06ce7f035a25f10542375049b8c1b8a8521b8c131b571adc6"
 		},
 		"32bit": {
-			"url": [
-				"http://nodejs.org/dist/v0.10.29/node.exe",
-				"http://nodejs.org/dist/npm/npm-1.4.10.zip"
-			],
-			"hash": [
-				"fbd516aa3752da8bfb14d557d4ae16315f500376c3688ed0cfb087c95c95ea20",
-				"17cbe14f6d3d9e4149f32b8df7ebf67f300783e6e51fbc1b0987c0582466e1b6"
-			]
+			"url": "http://nodejs.org/dist/v0.10.31/node-v0.10.31-x86.msi",
+			"hash": "6d07347395f30e70af7ad2a7cb333e497655dd6489fc8a7b4e0d903c4abf6b0b"
 		}
 	},
-	"env_add_path": ".",
+	"env_add_path": "nodejs",
+	"post_install": "
+# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
+rm $dir\\nodejs\\node_modules\\npm\\npmrc",
 	"checkver": "<p class=\"version\">Current Version: v([0-9\\.]+)</p>"
 }
