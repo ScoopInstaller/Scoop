@@ -5,5 +5,9 @@
 	"url": "http://windows.php.net/downloads/releases/php-5.3.29-Win32-VC9-x86.zip",
 	"hash": "sha1:61615fe9db85c3ab630fe35673a1b6f45782e5d4",
 	"bin": "php.exe",
-	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\""
+	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
+	"checkver": {
+		"url": "http://windows.php.net/download/",
+		"re": "<h3 id=\"php-5.3\".*?>.*?\\(([0-9\\.]+)\\)</h3>"
+	}
 }
