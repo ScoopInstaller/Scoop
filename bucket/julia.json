@@ -12,15 +12,25 @@
 			"hash": "214d2a57da9d12ba7e39ef9cb2a41478d0901e1f79943a6c8b54ffe6958e0936"
 		}
 	},
-	"extract_dir": "julia-e44b593905",
+	"installer": {
+    	"file": "julia-installer.exe",
+    	"args": [
+	      		"/S",
+	      		"/D=$dir"
+    		]
+  	},
+  	"uninstaller": {
+    		"file": "uninstall.exe",
+    		"args": "/S"
+  	},
 	"env_set": {
 		"JULIA_HOME": "$dir\\bin",
-		"JULIA_EXE": "julia-readline.exe",
-		"JULIA": "$dir\\bin\\julia-readline.exe",
+		"JULIA_EXE": "julia.exe",
+		"JULIA": "$dir\\bin\\julia.exe",
 		"JL_PRIVATE_LIB_DIR": "bin"
 	},
 	"bin": [
-		[ "bin\\julia-readline.exe", "julia" ]
+		[ "bin\\julia.exe", "julia" ]
 	],
 	"checkver": {
 		"url": "http://julialang.org/downloads/",
