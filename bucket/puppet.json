@@ -1,8 +1,8 @@
 {
     "homepage": "http://puppetlabs.com",
-    "version": "3.6.2",
-    "url": "https://downloads.puppetlabs.com/windows/puppet-3.6.2.msi",
-    "hash": "1e002084ac4bd69f53c64922eef204dc540a1181b84ee58fa7522910ed43a170",
+    "version": "3.7.1",
+    "url": "https://downloads.puppetlabs.com/windows/puppet-3.7.1.msi",
+    "hash": "fb8335694753f14b1b407dc393141fda25aa05a388fffae3aa003f73034f459c",
     "bin": [
             "Puppet Labs/Puppet/bin\\facter.bat",
             "Puppet Labs/Puppet/bin\\hiera.bat",
