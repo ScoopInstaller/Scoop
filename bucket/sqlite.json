@@ -3,7 +3,7 @@
 	"version": "3.8.6",
 	"license": "Public Domain",
 	"url": "https://sqlite.org/2014/sqlite-shell-win32-x86-3080600.zip",
-	"hash": "sha1:163d43f9a1bbc8a65c53b051a56371a305e6054a",
+	"hash": "sha1:e25f75ed380d9f7458fd024db01a946a65852e8c",
 	"bin": "sqlite3.exe",
 	"checkver": "<h3>Current Status</h3>\\s*<p><ul>\\s*<li><a.*>Version ([0-9\\.]+)</a>"
 }
