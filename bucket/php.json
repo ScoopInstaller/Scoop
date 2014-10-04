@@ -3,7 +3,7 @@
 	"version": "5.6.1",
 	"license": "http://www.php.net/license/",
 	"url": "http://windows.php.net/downloads/releases/php-5.6.1-Win32-VC11-x86.zip",
-	"hash": "sha1:952efba8b500617767826e5ef065756984b72e3a",
+	"hash": "sha1:8bd80405d05d5560455203fd3669df14bce4ead1",
 	"bin": "php.exe",
 	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
 	"checkver": {
