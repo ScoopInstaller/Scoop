@@ -7,6 +7,7 @@
 #
 # Options:
 #   --global, -g  update a globally installed app
+#   --force, -f   force update even when there isn't a newer version
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
