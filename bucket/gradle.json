@@ -1,0 +1,10 @@
+{
+	"homepage": "http://www.gradle.org",
+	"version": "2.1",
+	"license": "Apache 2.0",
+	"hash": "3eee4f9ea2ab0221b89f8e4747a96d4554d00ae46d8d633f11cfda60988bf878",
+	"url": "https://services.gradle.org/distributions/gradle-2.1-bin.zip",
+	"extract_dir": "gradle-2.1",
+	"bin": "bin\\gradle.bat",
+	"depends": "openjdk"
+}
