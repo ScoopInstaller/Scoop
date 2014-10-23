@@ -1,9 +1,13 @@
 {
 	"homepage": "http://windows.php.net",
-	"version": "5.3.28",
+	"version": "5.3.29",
 	"license": "http://www.php.net/license/",
-	"url": "http://windows.php.net/downloads/releases/php-5.3.28-Win32-VC9-x86.zip",
-	"hash": "sha1:fa7e8f6e8bff442e0e0b1889f52e0c3b93a84b2b",
+	"url": "http://windows.php.net/downloads/releases/php-5.3.29-Win32-VC9-x86.zip",
+	"hash": "sha1:61615fe9db85c3ab630fe35673a1b6f45782e5d4",
 	"bin": "php.exe",
-	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\""
+	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
+	"checkver": {
+		"url": "http://windows.php.net/download/",
+		"re": "<h3 id=\"php-5.3\".*?>.*?\\(([0-9\\.]+)\\)</h3>"
+	}
 }

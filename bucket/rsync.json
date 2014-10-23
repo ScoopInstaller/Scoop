@@ -5,9 +5,5 @@
 	"url": "https://www.itefix.no/download/cwRsync_5.3.0_Free.zip",
 	"hash": "58569d0f816373f929abc6468b246c25580c1a614f0768a8a119c5119dac739f",
 	"extract_dir": "cwRsync_5.3.0_Free",
-	"bin": "rsync.exe",
-	"checkver": {
-		"url": "https://www.itefix.no/i2/content/cwrsync-free-edition",
-		"re": "<br>Rsync ([^<]+)"
-	}
+	"bin": "rsync.exe"
 }

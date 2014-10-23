@@ -1,19 +1,19 @@
 {
 	"homepage": "http://curl.haxx.se/",
-	"version": "7.37.0",
+	"version": "7.38.0",
 	"licence": "MIT",
 	"architecture": {
 		"64bit": {
-			"url": "http://www.confusedbycode.com/curl/curl-7.37.0-win64.zip",
-			"hash": "4a6bc5a90845c4308a7021a57c026d66d34f0a1a77e17ecda53a3908c6563769",
-			"extract_dir": "curl-7.37.0-win64"
+			"url": "http://www.confusedbycode.com/curl/curl-7.38.0-win64.zip",
+			"hash": "e9006f17fd9555776f7efefc4dee67a8176d65878015d185c9752f58bddcac59",
+			"extract_dir": "curl-7.38.0-win64"
 		},
 		"32bit": {
-			"url": "http://www.confusedbycode.com/curl/curl-7.37.0-win32.zip",
-			"hash": "21961bc650f8fced26ca5addb8a1012e15e53ac96f774479c6da6c5a4f925cb5",
-			"extract_dir": "curl-7.37.0-win32"
+			"url": "http://www.confusedbycode.com/curl/curl-7.38.0-win32.zip",
+			"hash": "0d81d8737bf44156f45c7d022f8bba5d169c5e8a3fe4a6b60c0698bd6c66c041",
+			"extract_dir": "curl-7.38.0-win32"
 		}
 	},
 	"bin": "bin/curl.exe",
-	"checkver": "The most recent stable version of curl is version ([0-99\\.]+)"
+	"checkver": "The most recent stable version is\\s*<b>([0-99\\.]+)"
 }

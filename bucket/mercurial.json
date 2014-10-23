@@ -1,15 +1,15 @@
 {
 	"homepage": "mercurial.selenic.com",
-	"version": "3.0.1",
+	"version": "3.1.1",
 	"license": "GPL2",
 	"architecture": {
 		"64bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-3.0.1-x64.exe",
-			"hash": "41fea6d7f085c670e54c5856f1e982e43c867e3b3a621c568349391176c9719e"
+			"url": "http://mercurial.selenic.com/release/windows/Mercurial-3.1.1-x64.exe",
+			"hash": "a9d5e613540aa2934f34b763e6ceed783605eb80822992501f44e8be6667a495"
 		},
 		"32bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-3.0.1.exe",
-			"hash": "d34dbeb07d623f9cb3030e88f062da0a7276d0ebdff626f9f4e7152eeef24d10"
+			"url": "http://mercurial.selenic.com/release/windows/Mercurial-3.1.1.exe",
+			"hash": "0a4fee43a25decae7e1c8cec1eb76a34a16e43284cabff3931daf2ad873409a5"
 		}
 	},
 	"innosetup": true,
@@ -19,3 +19,4 @@
 		"re": "Mercurial ([0-9\\.]+) Inno Setup installer - x86 Windows - does not require admin rights"
 	}
 }
+
