@@ -597,6 +597,23 @@ function prune_installed($apps) {
 	$apps | ? { $installed -notcontains $_ }
 }
 
+# check whether the app failed to install
+function failed($app, $global) {
+	$ver = current_version $app
+	if(!$ver) { return $false }
+	$info = install_info $app $ver $global
+	if(!$info) { return $true }
+	return $false
+}
+
+function ensure_none_failed($apps, $global) {
+	foreach($app in $apps) {
+		if(failed $app $global) {
+			abort "$app install failed previously. please uninstall it and try again."
+		}
+	}
+}
+
 # travelling directories have their contents moved from
 # $from to $to when the app is updated.
 # any files or directories that already exist in $to are skipped

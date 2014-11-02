@@ -53,8 +53,9 @@ if($global -and !(is_admin)) {
 
 ensure_none_installed $apps $global
 
-$apps = install_order $apps $architecture
-$apps = prune_installed $apps $global
+$apps = install_order $apps $architecture # adds dependencies
+ensure_none_failed $apps $global
+$apps = prune_installed $apps $global # removes dependencies that are already installed
 
 $apps | % { install_app $_ $architecture $global }
 
