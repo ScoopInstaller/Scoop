@@ -27,5 +27,8 @@
 	"checkver": {
 		"url": "http://www.vim.org/download.php",
 		"re": "Vim ([0-9\\.]+) is the latest stable version"
+	},
+	"env_set": {
+		"VIM": "$dir"
 	}
 }
