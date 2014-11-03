@@ -1,0 +1,17 @@
+{
+    "homepage": "http://ant.apache.org/",
+    "version": "1.9.4",
+    "license": "Apache 2.0",
+    "url": "http://mirror.ventraip.net.au/apache//ant/binaries/apache-ant-1.9.4-bin.zip",
+    "hash": "973d97d656e65561e2753823de6cf6db35570aaf93eeec6e7cb3d68e1ec4d0e8",
+    "extract_dir": "apache-ant-1.9.4",
+    "env_add_path": "bin",
+    "env_set": {
+        "ANT_HOME": "$dir"
+    },
+    "notes": "Apache Ant requires,
+
+>   JDK (either openJDK or Oracle JDK)
+>   JAVA_HOME environment variable pointing to JDK
+"
+}
