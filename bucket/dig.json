@@ -1,0 +1,8 @@
+{
+  "homepage": "https://www.isc.org/",
+	"license": "https://www.isc.org/downloads/software-support-policy/isc-license/",
+	"version": "9.9.6",
+	"url" : "ftp://ftp.isc.org/isc/bind9/9.9.6/BIND9.9.6.x86.zip",
+	"hash" : "CC03FC37502650D2DCEC6DB3FAA0256672B67B5CCDAF4AA5F8ED08F2F5755452",
+	"bin": "dig.exe"
+}
