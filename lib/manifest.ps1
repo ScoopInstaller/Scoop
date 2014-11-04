@@ -62,6 +62,7 @@ function arch_specific($prop, $manifest, $architecture) {
 }
 
 function url($manifest, $arch) { arch_specific 'url' $manifest $arch }
+function cookie($manifest, $arch) { arch_specific 'cookie' $manifest $arch }
 function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch }
 function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
 function msi($manifest, $arch) { arch_specific 'msi' $manifest $arch }
