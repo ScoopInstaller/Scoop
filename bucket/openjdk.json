@@ -1,19 +1,21 @@
 {
 	"homepage": "https://github.com/alexkasko/openjdk-unofficial-builds",
-	"version": "1.7.0-u45",
+	"version": "1.7.0-u60",
 	"license": "GPL2",
 	"architecture": {
 		"64bit": {
-			"url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u45-unofficial-icedtea-2.4.3-windows-amd64-image.zip",
-			"hash": "e3407d314f38638be0a6352ee9cc51ad77bf5b79ad4ea15628e6bc36632f52bc",
-			"extract_dir": "openjdk-1.7.0-u45-unofficial-icedtea-2.4.3-windows-amd64-image"
+			"url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u60-unofficial-windows-amd64-image.zip",
+			"hash": "a84e4ab93092577cdc45116f5a1b241ba44b4cf23bc9798b997d28476f45d96a",
+			"extract_dir": "openjdk-1.7.0-u60-unofficial-windows-amd64-image"
 		},
 		"32bit": {
-			"url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u45-unofficial-icedtea-2.4.3-windows-i586-image.zip",
-			"hash": "e6f6d2128235e3bdfcebd4440db7e3c1376bffe4c6272245dd53358766766142",
-			"extract_dir": "openjdk-1.7.0-u45-unofficial-icedtea-2.4.3-windows-i586-image"
+			"url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u60-unofficial-windows-i586-image.zip",
+			"hash": "70691d01a3448d718a9319107fc9ab04cd86020869827573f93df89289258289",
+			"extract_dir": "openjdk-1.7.0-u60-unofficial-windows-i586-image"
 		}
 	},
 	"env_add_path": "bin",
-	"env_set": { "JAVA_HOME": "$dir" }
+	"env_set": {
+		"JAVA_HOME": "$dir"
+	}
 }
