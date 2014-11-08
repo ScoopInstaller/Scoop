@@ -1,0 +1,19 @@
+{
+    "homepage": "http://www.scala-lang.org/",
+    "version": "2.11.4",
+    "license": "BSD 3-Clause",
+    "url": "http://downloads.typesafe.com/scala/2.11.4/scala-2.11.4.zip",
+    "hash": "b52e6a2cfef8312f13a1106bbe50bf364fc9e20c3a58600bc47987edd602703e",
+    "extract_dir": "scala-2.11.4",
+    "bin": [
+        "bin\\fsc.bat",
+        "bin\\scala.bat",
+        "bin\\scalac.bat",
+        "bin\\scaladoc.bat",
+        "bin\\scalap.bat"
+    ],
+    "set_env": {
+        "SCALA_HOME": "$dir"
+    },
+    "depends": "openjdk"
+}

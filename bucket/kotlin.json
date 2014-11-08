@@ -1,0 +1,17 @@
+{
+    "homepage": "http://kotlinlang.org/",
+    "version": "0.9.66",
+    "license": "Apache 2.0",
+    "url": "https://github.com/JetBrains/kotlin/releases/download/build-0.9.66/kotlin-compiler-0.9.66.zip",
+    "hash": "b52e6a2cfef8312f13a1106bbe50bf364fc9e20c3a58600bc47987edd602703e",
+    "extract_dir": "kotlinc",
+    "bin": [
+        "bin\\kotlinc.bat",
+        "bin\\kotlinc-js.bat",
+        "bin\\kotlinc-jvm.bat"
+    ],
+    "set_env": {
+        "KOTLIN_HOME": "$dir"
+    },
+    "depends": "openjdk"
+}

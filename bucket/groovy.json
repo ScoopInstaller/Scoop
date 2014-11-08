@@ -1,0 +1,22 @@
+{
+    "homepage": "http://groovy.codehaus.org/",
+    "version": "2.3.7",
+    "license": "Apache 2.0",
+    "url": "http://dl.bintray.com/groovy/maven/groovy-binary-2.3.7.zip",
+    "hash": "38d6faaf3cae78d91852ab1be8070a7a7c5d206bd172f2cd7c0bb131e23e2525",
+    "extract_dir": "groovy-2.3.7",
+    "bin": [
+        "bin\\grape.bat",
+        "bin\\groovy.bat",
+        "bin\\groovyc.bat",
+        "bin\\groovyConsole.bat",
+        "bin\\groovydoc.bat",
+        "bin\\groovysh.bat",
+        "bin\\java2groovy.bat",
+        "bin\\startGroovy.bat"
+    ],
+    "set_env": {
+        "GROOVY_HOME": "$dir"
+    },
+    "depends": "openjdk"
+}
