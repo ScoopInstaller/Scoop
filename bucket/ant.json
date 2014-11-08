@@ -9,9 +9,5 @@
     "env_set": {
         "ANT_HOME": "$dir"
     },
-    "notes": "Apache Ant requires,
-
->   JDK (either openJDK or Oracle JDK)
->   JAVA_HOME environment variable pointing to JDK
-"
+    "depends": "openjdk"
 }

@@ -10,5 +10,6 @@
 	],
 	"env_set": {
 		"M2_HOME": "$dir"
-	}
+	},
+	"depends": "openjdk"
 }
