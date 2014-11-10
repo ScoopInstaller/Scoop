@@ -1,8 +1,0 @@
-{
-	"homepage": "http://technet.microsoft.com/en-us/sysinternals/bb897439.aspx",
-	"version": "2.52",
-	"url": "http://download.sysinternals.com/files/Strings.zip",
-	"hash": "sha160:855a1103fd1fddd33a4631990e943ebf632a20b9",
-	"extract_dir": "strings",
-	"bin": "strings.exe,
-}
