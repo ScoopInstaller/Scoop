@@ -8,7 +8,7 @@
 # Options:
 #   --global, -g  update a globally installed app
 #   --force, -f   force update even when there isn't a newer version
-#   --preview, -p show which apps have an update available, 
+#   --preview, -p show which apps have an update available,
 #                 but do not update them
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
@@ -86,20 +86,20 @@ function update($app, $global) {
 
 	if(!$force -and ($old_version -eq $version)) {
 		$global:notify = 1
-        if($preview) {
-            success "the latest version of $app ($version) is already installed."
-            return
-        }
+		if($preview) {
+			success "the latest version of $app ($version) is already installed."
+			return
+		}
 		warn "the latest version of $app ($version) is already installed."
 		return
 	}
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
 
-    if($preview) {
-        warn "an update is available for $app ($old_version -> $version)"
-        return
-    }
-    
+	if($preview) {
+		warn "an update is available for $app ($old_version -> $version)"
+		return
+	}
+
 	$manifest = manifest $app $bucket $url
 
 	"updating $app ($old_version -> $version)"
@@ -176,10 +176,10 @@ if(!$apps) {
 
 	# $apps is now a list of ($app, $global) tuples
 	$apps | % { update @_ }
-	
+
 	if($notify -eq 1) {
-        "run 'scoop update' to check for new versions."
-    }
+		"run 'scoop update' to check for new versions."
+	}
 }
 
 exit 0
