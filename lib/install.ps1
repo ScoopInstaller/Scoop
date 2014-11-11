@@ -91,22 +91,18 @@ function dl_with_cache($app, $version, $url, $to, $cookies) {
 }
 
 function dl_progress($url, $to, $cookies) {
-	write-host (parse_cookies $cookies)
+	$wc = new-object net.webclient
+	$wc.headers.add('User-Agent', 'Scoop/1.0')
+	$wc.headers.add('Cookie', (cookie_header $cookies))
+
 	if([console]::isoutputredirected) {
 		# can't set cursor position: just do simple download
-		$wc = new-object net.webclient
-		$wc.headers.add('User-Agent', 'Scoop/1.0')
-		$wc.headers.add('Cookie', (parse_cookies $cookies))
 		$wc.downloadfile($url, $to)
 		return
 	}
 
 	$left = [console]::cursorleft
 	$top = [console]::cursortop
-
-	$wc = new-object net.webclient
-	$wc.headers.add('User-Agent', 'Scoop/1.0')
-	$wc.headers.add('Cookie', (parse_cookies $cookies))
 	register-objectevent $wc downloadprogresschanged progress | out-null
 	register-objectevent $wc downloadfilecompleted complete | out-null
 	try {
@@ -153,9 +149,8 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 	# so that $fname is set properly
 	$urls = @(url $manifest $architecture)
 
-	# can be multiple cookies: they will be inserted into the header of all
-	# HTTP requests.
-	$cookies = @($manifest.cookie)
+	# can be multiple cookies: they will be used for all HTTP requests.
+	$cookies = $manifest.cookie
 
 	$fname = $null
 
@@ -230,15 +225,14 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 	$fname # returns the last downloaded file
 }
 
-# Coverts cookies object to HTTP compliant flat string
-function parse_cookies($cookies) {
-	if(!$cookies) { return '' }
-	$cookies | gm -member noteproperty | % {
-			$name = $_.name
-			$val = $manifest.cookie.$name
-			$parsed += "$name=$val;"
+function cookie_header($cookies) {
+	if(!$cookies) { return }
+
+	$vals = $cookies.psobject.properties | % {
+		"$($_.name)=$($_.value)"
 	}
-	$parsed
+
+	[string]::join(';', $vals)
 }
 
 function is_in_dir($dir, $check) {
