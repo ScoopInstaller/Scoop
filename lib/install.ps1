@@ -78,22 +78,26 @@ function locate($app) {
 	return $app, $manifest, $bucket, $url
 }
 
-function dl_with_cache($app, $version, $url, $to) {
+function dl_with_cache($app, $version, $url, $to, $cookies) {
 	$cached = fullpath (cache_path $app $version $url)
 	if(!(test-path $cached)) {
 		$null = ensure $cachedir
 		write-host "downloading $url..." -nonewline
-		dl_progress $url "$cached.download"
+		dl_progress $url "$cached.download" $cookies
 		mv "$cached.download" $cached
 		write-host "done"
 	} else { write-host "loading $url from cache..."}
 	cp $cached $to
 }
 
-function dl_progress($url, $to) {
+function dl_progress($url, $to, $cookies) {
+	write-host (parse_cookies $cookies)
 	if([console]::isoutputredirected) {
 		# can't set cursor position: just do simple download
-		(new-object net.webclient).downloadfile($url, $to)
+		$wc = new-object net.webclient
+		$wc.headers.add('User-Agent', 'Scoop/1.0')
+		$wc.headers.add('Cookie', (parse_cookies $cookies))
+		$wc.downloadfile($url, $to)
 		return
 	}
 
@@ -102,6 +106,7 @@ function dl_progress($url, $to) {
 
 	$wc = new-object net.webclient
 	$wc.headers.add('User-Agent', 'Scoop/1.0')
+	$wc.headers.add('Cookie', (parse_cookies $cookies))
 	register-objectevent $wc downloadprogresschanged progress | out-null
 	register-objectevent $wc downloadfilecompleted complete | out-null
 	try {
@@ -136,7 +141,7 @@ function dl_progress($url, $to) {
 		remove-event *
 		unregister-event progress
 		unregister-event complete
-		
+
 		$wc.cancelasync()
 		$wc.dispose()
 	}
@@ -147,6 +152,10 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 	# can be multiple urls: if there are, then msi or installer should go last,
 	# so that $fname is set properly
 	$urls = @(url $manifest $architecture)
+
+	# can be multiple cookies: they will be inserted into the header of all
+	# HTTP requests.
+	$cookies = @($manifest.cookie)
 
 	$fname = $null
 
@@ -159,7 +168,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 	foreach($url in $urls) {
 		$fname = split-path $url -leaf
 
-		dl_with_cache $app $version $url "$dir\$fname"
+		dl_with_cache $app $version $url "$dir\$fname" $cookies
 
 		$ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
 		if(!$ok) {
@@ -221,6 +230,17 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 	$fname # returns the last downloaded file
 }
 
+# Coverts cookies object to HTTP compliant flat string
+function parse_cookies($cookies) {
+	if(!$cookies) { return '' }
+	$cookies | gm -member noteproperty | % {
+			$name = $_.name
+			$val = $manifest.cookie.$name
+			$parsed += "$name=$val;"
+	}
+	$parsed
+}
+
 function is_in_dir($dir, $check) {
 	$check = "$(fullpath $check)"
 	$dir = "$(fullpath $dir)"
@@ -237,7 +257,7 @@ function hash_for_url($manifest, $url, $arch) {
 
 	$index = [array]::indexof($urls, $url)
 	if($index -eq -1) { abort "couldn't find hash in manifest for $url" }
-	
+
 	@($hashes)[$index]
 }
 
@@ -259,7 +279,7 @@ function check_hash($file, $url, $manifest, $arch) {
 	if(@('md5','sha1','sha256') -notcontains $type) {
 		return $false, "hash type $type isn't supported"
 	}
-	
+
 	$actual = compute_hash (fullpath $file) $type
 
 	if($actual -ne $expected) {
@@ -333,7 +353,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
 	$msi = msi $manifest $architecture
 	$installer = installer $manifest $architecture
 
-	if($msi) { 
+	if($msi) {
 		install_msi $fname $dir $msi
 	} elseif($installer) {
 		install_prog $fname $dir $installer
@@ -506,7 +526,7 @@ function ensure_install_dir_not_in_path($dir, $global) {
 function find_dir_or_subdir($path, $dir) {
 	$dir = $dir.trimend('\')
 	$fixed = @()
-	$removed = @() 
+	$removed = @()
 	$path.split(';') | % {
 		if($_) {
 			if(($_ -eq $dir) -or ($_ -like "$dir\*")) { $removed += $_ }
