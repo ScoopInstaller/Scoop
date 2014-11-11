@@ -38,6 +38,16 @@ function installed_apps($global) {
 	}
 }
 
+# date/time
+function timeago($when) {
+	$diff = [datetime]::now - $last_update
+
+	if($diff.totaldays -gt 2) { return "$([int]$diff.totaldays) days ago" }
+	if($diff.totalhours -gt 2) { return "$([int]$diff.totalhours) hours ago" }
+	if($diff.totalminutes -gt 2) { return "$([int]$diff.totalminutes) minutes ago" }
+	return "$([int]$diff.totalseconds) seconds ago"
+}
+
 # paths
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
@@ -147,7 +157,7 @@ function ensure_in_path($dir, $global) {
 	$dir = fullpath $dir
 	if($path -notmatch [regex]::escape($dir)) {
 		echo "adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path"
-		
+
 		env 'path' $global "$dir;$path" # for future sessions...
 		$env:path = "$dir;$env:path" # for this session
 	}
@@ -163,7 +173,7 @@ function remove_from_path($dir,$global) {
 
 	# future sessions
 	$was_in_path, $newpath = strip_path (env 'path' $global) $dir
-	if($was_in_path) { 
+	if($was_in_path) {
 		echo "removing $(friendly_path $dir) from your path"
 		env 'path' $global $newpath
 	}
