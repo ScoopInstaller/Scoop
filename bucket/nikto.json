@@ -1,0 +1,9 @@
+{
+	"homepage": "http://projects.giacomodrago.com/nikto-win/",
+	"version": "2.1.5",
+	"license": "GPL",
+	"url": "http://projects.giacomodrago.com/nikto-win/nikto-2.1.5-win.7z",
+	"hash": "43cedfae06da041734610cc3ba84fa5c",
+	"extract_dir": "nikto-2.1.5-win",
+	"bin": "nikto.bat"
+}
