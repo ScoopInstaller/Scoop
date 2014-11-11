@@ -1,0 +1,29 @@
+{
+    "homepage": "http://nimrod-lang.org/",
+    "version": "0.9.6",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "http://nimrod-lang.org/download/nimrod_0.9.6_x64.exe#/dl.7z",
+            "hash": "387e7fe5084b8a56432554dc3162f98808622315a62c99e37d4851d1e9c26339"
+        },
+        "32bit": {
+            "url": "http://nimrod-lang.org/download/nimrod_0.9.6.exe#/dl.7z",
+            "hash": "175e9e163328a3294318a1320151c4b4e7baaf203314ac7098324a2c27ed171ex"
+        }
+    },
+    "bin": [
+        "bin\\nimgrep.exe",
+        "bin\\niminst.exe",
+        "bin\\nimrod.exe",
+        "bin\\nimrod_debug.exe"
+    ],
+    "env_set": {
+        "NIMRODPATH": "$dir"
+    },
+    "depends": "gcc",
+    "post_install": "
+# Removes installation cruft
+rm -r $dir\\`$PLUGINSDIR
+rm -r $dir\\`$COMMONFILES"
+}
