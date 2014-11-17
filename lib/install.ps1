@@ -613,7 +613,7 @@ function prune_installed($apps) {
 
 # check whether the app failed to install
 function failed($app, $global) {
-	$ver = current_version $app
+	$ver = current_version $app $global
 	if(!$ver) { return $false }
 	$info = install_info $app $ver $global
 	if(!$info) { return $true }
