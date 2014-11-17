@@ -1,0 +1,21 @@
+{
+	"homepage": "http://http://www.sbcl.org/",
+	"version": "1.2.1",
+	"license": "http://www.sbcl.org/history.html",
+	"architecture": {
+		"64bit": {
+			"url": "http://prdownloads.sourceforge.net/sbcl/sbcl-1.2.1-x86-64-windows-binary.msi",
+			"hash": "sha1:a57593193f49fc6d154ba7af9b8417d1296d3455"
+		},
+		"32bit": {
+			"url": "http://prdownloads.sourceforge.net/sbcl/sbcl-1.2.1-x86-windows-binary.msi",
+			"hash": "sha1:43741068c7049e3cdee455fc3b262da34513d9ca"
+		}
+	},
+	"env_set": {
+        	"SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.2.1"
+    	},
+	"bin": [ "PFiles\\Steel Bank Common Lisp\\1.2.1\\sbcl.exe"],
+	"checkver": "The most recent version is SBCL ([^\\ ]+)",
+	"notes": "Please restart you command line for SBCL_HOME to take effect. Please consider installing http://www.quicklisp.org/"
+}
