@@ -1,20 +1,21 @@
 {
 	"homepage": "http://nodejs.org",
-	"version": "0.10.32",
+	"version": "0.10.33",
 	"license": "MIT",
 	"architecture": {
 		"64bit": {
-			"url": "http://nodejs.org/dist/v0.10.32/x64/node-v0.10.32-x64.msi",
-			"hash": "sha1:df83faf27410a6fb7f099c29338c52b7d4224e2f"
+			"url": "http://nodejs.org/dist/v0.10.33/x64/node-v0.10.33-x64.msi",
+			"hash": "sha1:6173345fb3c8388abb2a415b99bb4962ebd8e123"
 		},
 		"32bit": {
-			"url": "http://nodejs.org/dist/v0.10.32/node-v0.10.32-x86.msi",
-			"hash": "sha1:f2538f0037c017f245db6b54c6b8198bec2868c9"
+			"url": "http://nodejs.org/dist/v0.10.33/node-v0.10.33-x86.msi",
+			"hash": "sha1:8a637d14609208d31fe466cd4961bec58a8f8f9b"
 		}
 	},
 	"env_add_path": "nodejs",
 	"post_install": "
 # Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
-rm $dir\\nodejs\\node_modules\\npm\\npmrc",
+rm $dir\\nodejs\\node_modules\\npm\\npmrc
+npm update -g",
 	"checkver": "<p class=\"version\">Current Version: v([0-9\\.]+)</p>"
 }

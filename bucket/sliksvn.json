@@ -3,11 +3,11 @@
 	"version": "1.8.10",
 	"architecture": {
 		"64bit": {
-			"url": "http://sliksvn.com/pub/Slik-Subversion-1.8.10-x64.msi",
+			"url": "https://sliksvn.com/pub/Slik-Subversion-1.8.10-x64.msi",
 			"hash": "4f90b4f51ccec1cb309022ee2db98be8297a2cdee33ae6ce218d1cf93883a222"
 		},
 		"32bit": {
-			"url": "http://sliksvn.com/pub/Slik-Subversion-1.8.10-win32.msi",
+			"url": "https://sliksvn.com/pub/Slik-Subversion-1.8.10-win32.msi",
 			"hash": "7f1e4d9080fb8c591cc354b91bb1ede9c17ab8a3b0dbf5347525f6c79c6e059a"
 		}
 	},
@@ -27,6 +27,6 @@
 	],
 	"checkver": {
 		"url": "http://sliksvn.com/en/download/",
-		"re": "<a href=\"http://www.sliksvn.com/pub/Slik-Subversion-(.*)-win32.msi\" class=\"download arch32\">"
+		"re": "<a href=\"https://sliksvn.com/pub/Slik-Subversion-(.*)-win32.msi\" class=\"button default\">"
 	}
 }
