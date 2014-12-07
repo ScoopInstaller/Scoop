@@ -1,7 +1,7 @@
 {
 	"homepage": "http://innounp.sourceforge.net",
 	"version": "0.40",
-	"url": "http://downloads.sourceforge.net/project/innounp/innounp/innounp%200.40/innounp040.rar",
+	"url": "http://ufpr.dl.sourceforge.net/project/innounp/innounp/innounp%200.40/innounp040.rar",
 	"hash": "e661ae8b5ed3cfb5a5536b5848d4f10d41a3b0a2249543781195f8fabd37b6e4",
 	"bin": "innounp.exe",
 	"checkver": "<a name=\"History\">.*?<b>([0-9\\.]+)</b>"
