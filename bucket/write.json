@@ -1,0 +1,8 @@
+﻿{
+	"homepage": "wri.tt/",
+	"version": "0.6.6",
+	"url": "http://dl.wri.tt/releases/Write!-Beta6.6.exe",
+	"hash": "9BD48B116220563046B0978FFBDEEB27A2EC8800E5B047CD816AC76C99787349",
+	"innosetup": true,
+	"bin": "Write!.exe"
+}
