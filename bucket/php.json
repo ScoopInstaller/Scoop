@@ -2,16 +2,8 @@
 	"homepage": "http://windows.php.net",
 	"version": "5.6.3",
 	"license": "http://www.php.net/license/",
-	"architecture": {
-		"64bit": {
-			"url": "http://windows.php.net/downloads/releases/php-5.6.3-Win32-VC11-x64.zip",
-			"hash": "sha1:b76b13e0476189bf0b38ee755dfaa790e15c44ee"
-		},
-		"32bit": {
-			"url": "http://windows.php.net/downloads/releases/php-5.6.3-Win32-VC11-x86.zip",
-			"hash": "sha1:fbce3196db0c4caccef221e7a4a54e0353361dcf"
-		}
-	},
+	"url": "http://windows.php.net/downloads/releases/php-5.6.3-Win32-VC11-x86.zip",
+	"hash": "sha1:fbce3196db0c4caccef221e7a4a54e0353361dcf",
 	"bin": "php.exe",
 	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
 	"checkver": {
