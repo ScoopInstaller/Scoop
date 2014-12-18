@@ -1,16 +1,9 @@
 {
 	"homepage": "http://nuget.codeplex.com/",
-	"version": "2.0",
+	"version": "2.8.3",
 	"license": "Apache 2.0",
-	"url": "http://nuget.org/nuget.exe",
-	"bin": "nuget.exe",
-	"notes": "From the release notes:
-	
-> This is a bootstrapper that will download the latest version of nuget.exe
-> available and perform an in-place update the first time it's run.
-
-> Note that once you get nuget.exe, you can easily keep it up to date by
-> running 'nuget update', which will perform another in-place update if a newer
-> version is available.
-"
+	"url": "http://nuget.org/api/v2/package/NuGet.CommandLine/2.8.3?fn=/dl.zip",
+	"hash": "cbb474f62f55b292b81a1506ec964d9d547b1723c682fe4c9f38d1ab9c72b27f",
+	"extract_dir": "tools",
+	"bin": "nuget.exe"
 }
