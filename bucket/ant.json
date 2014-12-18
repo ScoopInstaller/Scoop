@@ -8,6 +8,5 @@
     "env_add_path": "bin",
     "env_set": {
         "ANT_HOME": "$dir"
-    },
-    "depends": "openjdk"
+    }
 }
