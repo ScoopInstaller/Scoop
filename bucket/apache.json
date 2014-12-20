@@ -3,7 +3,7 @@
 	"version": "2.4.10",
 	"license": "Apache 2.0",
 	"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.10-win32-VC11.zip",
-	"hash": "a0340b2b0312be243275d89142fde5d2daf1532a9aa5431d8c1f4d3580d46518",
+	"hash": "C16059A0C13B69F77556B29A3C8F4B356F66C69EDA007B785333AEA0A6094110",
 	"extract_dir": "Apache24",
 	"bin": [
 		"bin\\ab.exe",
