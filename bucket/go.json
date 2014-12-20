@@ -9,7 +9,7 @@
 		},
 		"32bit": {
 			"url": "https://storage.googleapis.com/golang/go1.4.windows-386.zip",
-			"hash": "sha1:cb18d8122bfd3bbba20fa1a19b8f7566dcff795d"
+			"hash": "sha1:f44240a1750dd051476ae78e9ad0502bc5c7661d"
 		}
 	},
 	"extract_dir": "go",
