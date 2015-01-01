@@ -1,9 +1,9 @@
 {
 	"homepage": "http://windows.php.net",
-	"version": "5.4.35",
+	"version": "5.4.36",
 	"license": "http://www.php.net/license/",
-	"url": "http://windows.php.net/downloads/releases/php-5.4.35-Win32-VC9-x86.zip",
-	"hash": "sha1:a2b9d03013ff7fb6b17e21790c61021701c9af26",
+	"url": "http://windows.php.net/downloads/releases/php-5.4.36-Win32-VC9-x86.zip",
+	"hash": "sha1:260b3be8ab27c9294dfe0aba8e745bbef6216281",
 	"bin": "php.exe",
 	"post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
 	"checkver": {

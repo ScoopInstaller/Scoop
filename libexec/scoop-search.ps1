@@ -13,8 +13,11 @@ param($query)
 function bin_match($manifest, $query) {
 	if(!$manifest.bin) { return $false }
 	foreach($bin in $manifest.bin) {
-		$fname = split-path $bin -leaf
+		$exe, $alias, $args = $bin
+		$fname = split-path $exe -leaf -ea stop
+		
 		if((strip_ext $fname) -match $query) { return $fname }
+		if($alias -match $query) { return $alias }
 	}
 	$false
 }
