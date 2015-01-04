@@ -1,30 +1,39 @@
 {
-	"homepage": "http://www.apachelounge.com",
-	"version": "2.4.10",
-	"license": "Apache 2.0",
-	"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.10-win32-VC11.zip",
-	"hash": "C16059A0C13B69F77556B29A3C8F4B356F66C69EDA007B785333AEA0A6094110",
-	"extract_dir": "Apache24",
-	"bin": [
-		"bin\\ab.exe",
-		"bin\\abs.exe",
-		"bin\\htcacheclean.exe",
-		"bin\\htdbm.exe",
-		"bin\\htdigest.exe",
-		"bin\\htpasswd.exe",
-		"bin\\httpd.exe",
-		"bin\\httxt2dbm.exe",
-		"bin\\logresolve.exe",
-		"bin\\rotatelogs.exe"
-	],
-	"post_install": "
-# set directory in httpd.conf
-$conf = \"$dir/conf/httpd.conf\"
-$root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\\', '/';
-(gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf
-",
-	"checkver": {
-		"url": "http://www.apachelounge.com/download/",
-		"re": "Apache ([0-9\\.]+) Win64"
-	}
+    "homepage": "http://www.apachelounge.com",
+    "version": "2.4.10",
+    "license": "Apache 2.0",
+    "extract_dir": "Apache24",
+    "architecture": {
+        "32bit": {
+            "url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.10-win32-VC11.zip",
+            "hash": "C16059A0C13B69F77556B29A3C8F4B356F66C69EDA007B785333AEA0A609411"
+        },
+        "64bit": {
+            "url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.10-win64-VC11.zip",
+            "hash": "EAFF3A1002FD288B1D5170E37A7BA772BB9E0D76F1979EAD5766D87220791D18"
+        }
+    },
+    "extract_dir": "Apache24",
+    "bin": [
+        "bin\\ab.exe",
+        "bin\\abs.exe",
+        "bin\\htcacheclean.exe",
+        "bin\\htdbm.exe",
+        "bin\\htdigest.exe",
+        "bin\\htpasswd.exe",
+        "bin\\httpd.exe",
+        "bin\\httxt2dbm.exe",
+        "bin\\logresolve.exe",
+        "bin\\rotatelogs.exe"
+    ],
+    "post_install": "
+        # set directory in httpd.conf
+        $conf = \"$dir/conf/httpd.conf\"
+        $root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\\', '/';
+        (gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf
+    ",
+    "checkver": {
+        "url": "http://www.apachelounge.com/download/",
+        "re": "Apache ([0-9\\.]+) Win64"
+    }
 }
