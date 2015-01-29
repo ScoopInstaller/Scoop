@@ -4,6 +4,6 @@
 	"license": "Apache 2.0",
 	"url": "http://chocolatey.org/api/v2/package/ScriptCs/0.13.0?fn=/dl.zip",
 	"hash": "b555016e4f8fc72b7c7fb616b37c8b02e5141e8ac615baec0301c9d29867fab8",
-	"extract_dir": "tools\\scriptcs",
+	"extract_dir": "tools",
 	"bin": "scriptcs.exe"
 }
