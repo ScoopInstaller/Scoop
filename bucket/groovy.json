@@ -1,10 +1,10 @@
 {
     "homepage": "http://groovy.codehaus.org/",
-    "version": "2.3.7",
+    "version": "2.4.0",
     "license": "Apache 2.0",
-    "url": "http://dl.bintray.com/groovy/maven/groovy-binary-2.3.7.zip",
-    "hash": "38d6faaf3cae78d91852ab1be8070a7a7c5d206bd172f2cd7c0bb131e23e2525",
-    "extract_dir": "groovy-2.3.7",
+    "url": "http://dl.bintray.com/groovy/maven/groovy-binary-2.4.0.zip",
+    "hash": "69a01bcce68295b185036c61d5a7dde27078ab1c3f7da488e9c1ef9ad0ca60f1",
+    "extract_dir": "groovy-2.4.0",
     "bin": [
         "bin\\grape.bat",
         "bin\\groovy.bat",
