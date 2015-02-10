@@ -5,8 +5,8 @@
 	"url": [
 		"http://ftp.vim.org/pub/vim/pc/vim74w32.zip",
 		"http://ftp.vim.org/pub/vim/pc/vim74rt.zip",
-		"http://downloads.sourceforge.net/project/gettext/libiconv-win32/1.9.1/libiconv-1.9.1.bin.woe32.zip",
-		"http://downloads.sourceforge.net/project/gettext/gettext-win32/0.13.1/gettext-runtime-0.13.1.bin.woe32.zip",
+		"http://ufpr.dl.sourceforge.net/project/gettext/libiconv-win32/1.9.1/libiconv-1.9.1.bin.woe32.zip",
+		"http://ufpr.dl.sourceforge.net/project/gettext/gettext-win32/0.13.1/gettext-runtime-0.13.1.bin.woe32.zip",
 		"https://raw.github.com/lukesampson/psutils/3653063/vimtutor.ps1"
 	],
 	"hash": [
