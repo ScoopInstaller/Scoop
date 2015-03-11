@@ -7,8 +7,16 @@ function script:cp() { copy-item @args }
 function script:echo() { write-output @args } 
 function script:gc() { get-content @args } 
 function script:gci() { get-childitem @args } 
+function script:gcm() { get-command @args } 
 function script:iex() { invoke-expression @args } 
+function script:ls() { get-childitem @args } 
+function script:mkdir() { new-item @args } 
+function script:mv() { move-item @args } 
 function script:rm() { remove-item @args } 
+function script:rmdir() { remove-item @args } 
+function script:sc() { set-content @args } 
+function script:select() { select-object @args } 
+function script:sls() { select-string @args } 
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
