@@ -10,7 +10,7 @@ function script:gci() { get-childitem @args }
 function script:gcm() { get-command @args } 
 function script:iex() { invoke-expression @args } 
 function script:ls() { get-childitem @args } 
-function script:mkdir() { new-item @args } 
+function script:mkdir() { new-item -type directory @args } 
 function script:mv() { move-item @args } 
 function script:rm() { remove-item @args } 
 function script:rmdir() { remove-item @args } 
