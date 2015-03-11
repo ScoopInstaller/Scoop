@@ -7,7 +7,14 @@ function create_manifest($url) {
     $manifest = new_manifest
 
     $manifest.url = $url
-    $url_parts = parse_url $url
+
+    $url_parts = $null
+    try {
+        $url_parts = parse_url $url
+    }
+    catch {
+        abort "Error: $url is not a valid URL"
+    }
 
     $name = choose_item $url_parts "App name" 
     $name = if ($name.Length -gt 0) { 
@@ -52,4 +59,9 @@ function choose_item($list, $query) {
     $sel
 }
 
-create_manifest $url
+if (!$url) {
+    scoop help create
+}
+else {
+    create_manifest $url
+}
