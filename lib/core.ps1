@@ -2,6 +2,14 @@ $scoopdir = $env:SCOOP, "~\appdata\local\scoop" | select -first 1
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
 $cachedir = "$scoopdir\cache" # always local
 
+# using functions as aliases for powershell commands
+function script:cp() { copy-item @args } 
+function script:echo() { write-output @args } 
+function script:gc() { get-content @args } 
+function script:gci() { get-childitem @args } 
+function script:iex() { invoke-expression @args } 
+function script:rm() { remove-item @args } 
+
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 function format($str, $hash) {
