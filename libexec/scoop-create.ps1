@@ -26,7 +26,7 @@ function create_manifest($url) {
 
     $manifest.version = choose_item $url_parts "Version"
 
-    $manifest | convertto-json | out-file -filepath "$name.json"
+    $manifest | convertto-json | out-file -filepath "$name.json" -encoding utf8
     $manifest_path = join-path $pwd "$name.json"
     write-host "Created $manifest_path"
 }
