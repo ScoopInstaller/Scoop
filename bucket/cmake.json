@@ -1,14 +1,15 @@
 {
 	"homepage": "http://www.cmake.org/",
-	"version": "3.1.1",
+	"version": "3.2.1",
 	"license": "http://www.cmake.org/licensing/",
-	"url": "http://www.cmake.org/files/v3.1/cmake-3.1.1-win32-x86.zip",
-	"hash": "b254ba139d6d5411d998717070f94e0be2e924e6ad9f18e4ffeffa5409bebc0e",
-	"extract_dir": "cmake-3.1.1-win32-x86",
+	"url": "http://www.cmake.org/files/v3.2/cmake-3.2.1-win32-x86.zip",
+	"hash": "e51bd0748803665c33e9dda7f92f40ad2371617b41478d2284f1aa4f4db68988",
+	"extract_dir": "cmake-3.2.1-win32-x86",
 	"bin": [
 		"bin/cmake.exe",
 		"bin/cmcldeps.exe",
 		"bin/cpack.exe",
 		"bin/ctest.exe"
-	]
+	],
+	"checkver": "Download CMake Version ([0-9\\.]+)"
 }
