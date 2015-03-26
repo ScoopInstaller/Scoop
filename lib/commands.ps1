@@ -30,5 +30,5 @@ function command_path($cmd) {
 function exec($cmd, $arguments) {
     $cmd_path = command_path $cmd
 
-    & $cmd_path @arguments
+	& $cmd_path @arguments
 }
