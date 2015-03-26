@@ -1,6 +1,6 @@
 function command_files {
 	(gci (relpath '..\libexec')) `
-        + (gci "$env:scoop\shims") `
+        + (gci "$scoopdir\shims") `
         | where { $_.name -match 'scoop-.*?\.ps1$' }
 }
 
@@ -18,7 +18,7 @@ function command_path($cmd) {
     # built in commands
     if (!(Test-Path $cmd_path)) {
         # get path from shim
-        $shim_path = "$env:scoop\shims\scoop-$cmd.ps1"
+        $shim_path = "$scoopdir\shims\scoop-$cmd.ps1"
         $line = ((gc $shim_path) | where { $_.startswith('$path') })
         iex -command "$line"
         $cmd_path = $path
