@@ -8,6 +8,8 @@
 # Options:
 #   --global, -g  update a globally installed app
 #   --force, -f   force update even when there isn't a newer version
+#   --preview, -p show which apps have an update available,
+#                 but do not update them
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
@@ -18,10 +20,12 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-$opt, $apps, $err = getopt $args 'gf' 'global','force'
+$opt, $apps, $err = getopt $args 'gfp' 'global','force','preview'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
+$preview = $opt.p -or $opt.preview
+$global:notify = 0
 
 function update_scoop() {
 	$tempdir = versiondir 'scoop' 'update'
@@ -81,11 +85,20 @@ function update($app, $global) {
 	$version = latest_version $app $bucket $url
 
 	if(!$force -and ($old_version -eq $version)) {
+		$global:notify = 1
+		if($preview) {
+			success "the latest version of $app ($version) is already installed."
+			return
+		}
 		warn "the latest version of $app ($version) is already installed."
-		"run 'scoop update' to check for new versions."
 		return
 	}
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
+
+	if($preview) {
+		warn "an update is available for $app ($old_version -> $version)"
+		return
+	}
 
 	$manifest = manifest $app $bucket $url
 
@@ -163,6 +176,10 @@ if(!$apps) {
 
 	# $apps is now a list of ($app, $global) tuples
 	$apps | % { update @_ }
+
+	if($notify -eq 1) {
+		"run 'scoop update' to check for new versions."
+	}
 }
 
 exit 0

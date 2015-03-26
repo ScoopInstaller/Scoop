@@ -8,15 +8,6 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-function timeago($when) {
-	$diff = [datetime]::now - $last_update
-
-	if($diff.totaldays -gt 2) { return "$([int]$diff.totaldays) days ago" }
-	if($diff.totalhours -gt 2) { return "$([int]$diff.totalhours) hours ago" }
-	if($diff.totalminutes -gt 2) { return "$([int]$diff.totalminutes) minutes ago" }
-	return "$([int]$diff.totalseconds) seconds ago"
-}
-
 # check when scoop was last updated
 $timestamp = "$(versiondir 'scoop' 'current')\last_updated"
 if(test-path $timestamp) {
@@ -40,12 +31,12 @@ $true, $false | % { # local and global apps
 		if($version) {
 			$install_info = install_info $app $version $global
 		}
-		
+
 		if(!$install_info) {
-			$failed += @{ $app = $version }; return 
+			$failed += @{ $app = $version }; return
 		}
 
-		$manifest = manifest $app $install_info.bucket $install_info.url    
+		$manifest = manifest $app $install_info.bucket $install_info.url
 		if(!$manifest) { $removed += @{ $app = $version }; return }
 
 		if((compare_versions $manifest.version $version) -gt 0) {
@@ -63,7 +54,7 @@ $true, $false | % { # local and global apps
 
 if($old) {
 	"updates are available for:"
-	$old.keys | % { 
+	$old.keys | % {
 		$versions = $old.$_
 		"    $_`: $($versions[0]) -> $($versions[1])"
 	}
