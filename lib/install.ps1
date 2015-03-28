@@ -80,13 +80,13 @@ function locate($app) {
 
 function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) {
 	$cached = fullpath (cache_path $app $version $url)
-	warn "cache is being ignored"
+	if(!$use_cache) { warn "cache is being ignored" }
 
 	if(!(test-path $cached) -or !$use_cache) {
 		$null = ensure $cachedir
 		write-host "downloading $url..." -nonewline
 		dl_progress $url "$cached.download" $cookies
-		mv "$cached.download" $cached
+		mv "$cached.download" $cached -force
 		write-host "done"
 	} else { write-host "loading $url from cache..."}
 	cp $cached $to
