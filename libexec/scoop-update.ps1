@@ -8,6 +8,7 @@
 # Options:
 #   --global, -g  update a globally installed app
 #   --force, -f   force update even when there isn't a newer version
+#   --no-cache, -k   don't use the download cache
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
@@ -18,10 +19,11 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-$opt, $apps, $err = getopt $args 'gf' 'global','force'
+$opt, $apps, $err = getopt $args 'gfk' 'global','force', 'no-cache'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
+$use_cache = !($opt.k -or $opt.'no-cache')
 
 function update_scoop() {
 	$tempdir = versiondir 'scoop' 'update'
@@ -107,7 +109,7 @@ function update($app, $global) {
 	save_installed_manifest $app $bucket $dir $url
 	save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
-	$fname = dl_urls $app $version $manifest $architecture $dir
+	$fname = dl_urls $app $version $manifest $architecture $dir $use_cache
 	unpack_inno $fname $manifest $dir
 	pre_install $manifest
 	run_installer $fname $manifest $architecture $dir
@@ -144,6 +146,9 @@ function applist($apps, $global) {
 if(!$apps) {
 	if($global) {
 		"scoop update: --global is invalid when <app> not specified"; exit 1
+	}
+	if (!$use_cache) {
+		"scoop update: --no-cache is invalid when <app> not specified"; exit 1
 	}
 	update_scoop
 } else {

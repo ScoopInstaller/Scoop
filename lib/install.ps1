@@ -78,13 +78,15 @@ function locate($app) {
 	return $app, $manifest, $bucket, $url
 }
 
-function dl_with_cache($app, $version, $url, $to, $cookies) {
+function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) {
 	$cached = fullpath (cache_path $app $version $url)
-	if(!(test-path $cached)) {
+	if(!$use_cache) { warn "cache is being ignored" }
+
+	if(!(test-path $cached) -or !$use_cache) {
 		$null = ensure $cachedir
 		write-host "downloading $url..." -nonewline
 		dl_progress $url "$cached.download" $cookies
-		mv "$cached.download" $cached
+		mv "$cached.download" $cached -force
 		write-host "done"
 	} else { write-host "loading $url from cache..."}
 	cp $cached $to
@@ -144,7 +146,7 @@ function dl_progress($url, $to, $cookies) {
 	[console]::setcursorposition($left, $top)
 }
 
-function dl_urls($app, $version, $manifest, $architecture, $dir) {
+function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true) {
 	# can be multiple urls: if there are, then msi or installer should go last,
 	# so that $fname is set properly
 	$urls = @(url $manifest $architecture)
@@ -163,7 +165,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir) {
 	foreach($url in $urls) {
 		$fname = split-path $url -leaf
 
-		dl_with_cache $app $version $url "$dir\$fname" $cookies
+		dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
 
 		$ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
 		if(!$ok) {
