@@ -3,7 +3,7 @@
 	"version": "1.24.0-TIG-1778",
 	"license": "GPL2",
 	"url": "ftp://ftp.tigress.co.uk/public/gpl/6.0.0/busybox/busybox-w32-TIG-1778-g15efec6.exe#/busybox.exe",
-	"hash": "6f715087ca6353c839def71d1971b6e12f86c067c55756d1922d572840f7ac4b",
+	"hash": "0869cd27010fb972b7a4f3cc99671b5fbd1f3109bb38adf66299e0f011e6333f",
 	"bin": [
 		"busybox.exe",
 		[ "busybox.exe", "ar", "ar" ],
