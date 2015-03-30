@@ -70,6 +70,7 @@ function update($app, $global) {
 	$old_version = current_version $app $global
 	$old_manifest = installed_manifest $app $old_version $global
 	$install = install_info $app $old_version $global
+	$check_hash = $true
 
 	# re-use architecture, bucket and url from first install
 	$architecture = $install.architecture
@@ -81,6 +82,11 @@ function update($app, $global) {
 	$deps | % { install_app $_ $architecture $global }
 
 	$version = latest_version $app $bucket $url
+	$is_nightly = $version -eq 'nightly'
+	if($is_nightly) {
+		$version = nightly_version $(get-date)
+		$check_hash = $false
+	}
 
 	if(!$force -and ($old_version -eq $version)) {
 		warn "the latest version of $app ($version) is already installed."
@@ -109,7 +115,7 @@ function update($app, $global) {
 	save_installed_manifest $app $bucket $dir $url
 	save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
-	$fname = dl_urls $app $version $manifest $architecture $dir $use_cache
+	$fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
 	unpack_inno $fname $manifest $dir
 	pre_install $manifest
 	run_installer $fname $manifest $architecture $dir
