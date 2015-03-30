@@ -1,5 +1,13 @@
+function nightly_version($date) {
+	$date_str = $date.tostring("yyyyMMdd") 
+	warn "this is a nightly version: downloaded files won't be verified"
+	"nightly-$date_str"
+}
+
 function install_app($app, $architecture, $global) {
 	$app, $manifest, $bucket, $url = locate $app
+	$use_cache = $true
+	$check_hash = $true
 
 	if(!$manifest) {
 		abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
@@ -11,11 +19,17 @@ function install_app($app, $architecture, $global) {
 		abort "manifest version has unsupported character '$($matches[0])'"
 	}
 
+	$is_nightly = $version -eq 'nightly'
+	if ($is_nightly) {
+		$version = nightly_version $(get-date)
+		$check_hash = $false
+	}
+
 	echo "installing $app ($version)"
 
 	$dir = ensure (versiondir $app $version $global)
 
-	$fname = dl_urls $app $version $manifest $architecture $dir
+	$fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
 	unpack_inno $fname $manifest $dir
 	pre_install $manifest
 	run_installer $fname $manifest $architecture $dir
@@ -146,7 +160,7 @@ function dl_progress($url, $to, $cookies) {
 	[console]::setcursorposition($left, $top)
 }
 
-function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true) {
+function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
 	# can be multiple urls: if there are, then msi or installer should go last,
 	# so that $fname is set properly
 	$urls = @(url $manifest $architecture)
@@ -167,12 +181,14 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
 
 		dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
 
-		$ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
-		if(!$ok) {
-			# rm cached
-			$cached = cache_path $app $version $url
-			if(test-path $cached) { rm -force $cached }
-			abort $err
+		if($check_hash) {
+			$ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
+			if(!$ok) {
+				# rm cached
+				$cached = cache_path $app $version $url
+				if(test-path $cached) { rm -force $cached }
+				abort $err
+			}
 		}
 
 		$extract_dir = $extract_dirs[$extracted]
