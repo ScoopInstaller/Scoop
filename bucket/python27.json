@@ -18,6 +18,13 @@
 		[ "python.exe", "python2" ]
 	],
 	"env_add_path": [ "scripts" ],
-	"post_install": "python2 -m ensurepip",
+	"post_install": "
+		python2 -m ensurepip
+
+		$reg_path = \"Registry::HKEY_CURRENT_USER\\Software\\Python\\PythonCore\\2.7\\InstallPath\"
+		new-item -path $reg_path -force | out-null
+		new-itemproperty -path $reg_path `
+			-name \"(Default)\" -value \"$dir\" -force | out-null
+	",
 	"checkver": "<p>Latest: <a.*>.*</a> - <a href=\".*\">Python ([0-9\\.]+)</a></p>"
 }
