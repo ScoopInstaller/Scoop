@@ -1,21 +1,21 @@
 {
-	"homepage": "mercurial.selenic.com",
-	"version": "3.2.3",
-	"license": "GPL2",
-	"architecture": {
-		"64bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-3.2.3-x64.exe",
-			"hash": "9A494D5DED2FD6E2F8689A07E55E6D8A6DE903C7AAEC466732D538A52608330E"
-		},
-		"32bit": {
-			"url": "http://mercurial.selenic.com/release/windows/Mercurial-3.2.3.exe",
-			"hash": "CB9AE8FD9A78C886E6E4B2EEA554B3E67EE380B39C657956CFE8C1E71DD49313"
-		}
-	},
-	"innosetup": true,
-	"bin": "hg.exe",
-	"checkver": {
-		"url": "http://mercurial.selenic.com/sources.js",
-		"re": "Mercurial ([0-9\\.]+) Inno Setup installer - x86 Windows - does not require admin rights"
-	}
+        "homepage": "mercurial.selenic.com",
+        "version": "3.3.3",
+        "license": "GPL2",
+        "architecture": {
+                "64bit": {
+                        "url": "http://mercurial.selenic.com/release/windows/Mercurial-3.3.3-x64.exe",
+                        "hash": "2a4d6b598385794d890715a54cf751b72c67119d4fc06523e1eba320f7b51e36"
+                },
+                "32bit": {
+                        "url": "http://mercurial.selenic.com/release/windows/Mercurial-3.3.3.exe",
+                        "hash": "47295229aecab1ee4b4750bef134d0aaaab1fcc2064a90df620739774e30400f"
+                }
+        },
+        "innosetup": true,
+        "bin": "hg.exe",
+        "checkver": {
+                "url": "http://mercurial.selenic.com/sources.js",
+                "re": "Mercurial ([0-9\\.]+) Inno Setup installer - x86 Windows - does not require admin rights"
+        }
 }
