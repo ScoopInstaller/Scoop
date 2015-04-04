@@ -18,11 +18,12 @@ function timeago($when) {
 }
 
 # check when scoop was last updated
-$timestamp = "$(versiondir 'scoop' 'current')\last_updated"
-if(test-path $timestamp) {
-	$last_update = [io.file]::getlastwritetime((resolve-path $timestamp))
-	"scoop was last updated $(timeago($last_update))"
+git fetch origin
+$commits = $(git log HEAD..origin/master --oneline)
+if($commits) {
+	"scoop is out of date. run scoop update to get the latest changes."
 }
+else { "scoop is up-to-date."}
 
 $failed = @()
 $old = @()
