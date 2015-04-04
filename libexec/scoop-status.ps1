@@ -14,7 +14,7 @@ $needs_update = $false
 
 if(test-path "$currentdir\.git") {
 	pushd $currentdir
-	git fetch origin
+	git fetch -q origin
 	$commits = $(git log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
 	if($commits) { $needs_update = $true }
 	popd
