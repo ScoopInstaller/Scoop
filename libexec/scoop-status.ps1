@@ -17,10 +17,22 @@ function timeago($when) {
 	return "$([int]$diff.totalseconds) seconds ago"
 }
 
-# check when scoop was last updated
-git fetch origin
-$commits = $(git log HEAD..origin/master --oneline)
-if($commits) {
+# check if scoop needs updating
+$currentdir = fullpath $(versiondir 'scoop' 'current')
+$needs_update = $false
+
+if(test-path "$currentdir\.git") {
+	pushd $currentdir
+	git fetch origin
+	$commits = $(git log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
+	if($commits) { $needs_update = $true }
+	popd
+}
+else {
+	$needs_update = $true
+}
+
+if($needs_update) {
 	"scoop is out of date. run scoop update to get the latest changes."
 }
 else { "scoop is up-to-date."}

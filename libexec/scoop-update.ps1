@@ -33,12 +33,24 @@ function update_scoop() {
 	"updating scoop..."
 	$currentdir = fullpath $(versiondir 'scoop' 'current')
 	if(!(test-path "$currentdir\.git")) {
+		# load config
+		$repo = $(scoop config SCOOP_REPO)
+		if(!$repo) { 
+			$repo = "http://github.com/lukesampson/scoop" 
+			scoop config SCOOP_REPO "$repo"
+		}
+
+		$branch = $(scoop config SCOOP_BRANCH)
+		if(!$branch) { 
+			$branch = "master" 
+			scoop config SCOOP_BRANCH "$branch"
+		}
+
 		# remove non-git scoop
 		rm -r -force $currentdir -ea stop
 
 		# get git scoop
-		# todo: pull the address out into a variable somewhere
-		git clone "http://github.com/lukesampson/scoop" $currentdir
+		git clone -q $repo --branch $branch --single-branch $currentdir
 	}
 	else {
 		pushd $currentdir
