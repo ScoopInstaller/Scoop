@@ -8,15 +8,6 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-function timeago($when) {
-	$diff = [datetime]::now - $last_update
-
-	if($diff.totaldays -gt 2) { return "$([int]$diff.totaldays) days ago" }
-	if($diff.totalhours -gt 2) { return "$([int]$diff.totalhours) hours ago" }
-	if($diff.totalminutes -gt 2) { return "$([int]$diff.totalminutes) minutes ago" }
-	return "$([int]$diff.totalseconds) seconds ago"
-}
-
 # check if scoop needs updating
 $currentdir = fullpath $(versiondir 'scoop' 'current')
 $needs_update = $false
