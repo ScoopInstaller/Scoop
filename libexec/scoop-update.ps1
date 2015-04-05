@@ -26,42 +26,46 @@ $force = $opt.f -or $opt.force
 $use_cache = !($opt.k -or $opt.'no-cache')
 
 function update_scoop() {
-	$tempdir = versiondir 'scoop' 'update'
-	$currentdir = versiondir 'scoop' 'current'
+	# check for git
+	$git = try { gcm git -ea stop } catch { $null }
+	if(!$git) { abort "scoop uses git to update itself. run 'scoop install git'." }
 
-	if(test-path $tempdir) {
-		try { rm -r $tempdir -ea stop -force } catch { abort "couldn't remove $tempdir`: it may be in use" }
+	"updating scoop..."
+	$currentdir = fullpath $(versiondir 'scoop' 'current')
+	if(!(test-path "$currentdir\.git")) {
+		# load config
+		$repo = $(scoop config SCOOP_REPO)
+		if(!$repo) { 
+			$repo = "http://github.com/lukesampson/scoop" 
+			scoop config SCOOP_REPO "$repo"
+		}
+
+		$branch = $(scoop config SCOOP_BRANCH)
+		if(!$branch) { 
+			$branch = "master" 
+			scoop config SCOOP_BRANCH "$branch"
+		}
+
+		# remove non-git scoop
+		rm -r -force $currentdir -ea stop
+
+		# get git scoop
+		git clone -q $repo --branch $branch --single-branch $currentdir
 	}
-	$tempdir = ensure $tempdir
-	$currentdir = fullpath $currentdir
+	else {
+		pushd $currentdir
+		git pull -q
+		popd
+	}
 
-	$zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
-	$zipfile = "$tempdir\scoop.zip"
-	echo 'downloading...'
-	dl $zipurl $zipfile
-
-	echo 'extracting...'
-	unzip $zipfile $tempdir
-	rm $zipfile
-
-	echo 'replacing files...'
-	$null = robocopy "$tempdir\scoop-master" $currentdir /mir /njh /njs /nfl /ndl
-	rm -r -force $tempdir -ea stop
-
-	$null > "$currentdir\last_updated" # save update timestamp
 	ensure_scoop_in_path
-
 	shim "$currentdir\bin\scoop.ps1" $false
 
 	@(buckets) | % {
 		"updating $_ bucket..."
-		$git = try { gcm git -ea stop } catch { $null }
-		if(!$git) { warn "git is required for buckets. run 'scoop install git'." }
-		else {
-			pushd (bucketdir $_)
-			git pull -q
-			popd
-		}
+		pushd (bucketdir $_)
+		git pull -q
+		popd
 	}
 	success 'scoop was updated successfully!'
 }
