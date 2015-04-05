@@ -8,4 +8,11 @@ test 'compare version with integer-string mismatch' {
 	assert $res -eq 1
 }
 
+test 'handle plain string version comparison to int version' {
+    $a = 'latest'
+    $b = '20150405'
+    $res = compare_versions $a $b
+    assert $res -eq 1
+}
+
 test_results
