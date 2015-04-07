@@ -11,7 +11,7 @@ if(test-path $dst) { rm $dst }
 
 cp $src $dst
 
-$append = "set shell=powershell.exe"
+$append = "set shell=powershell.exe\ -executionpolicy\ bypass"
 $append | out-file $dst -append -encoding ascii
 
 if((gc $dst)[-1] -eq $append) {
