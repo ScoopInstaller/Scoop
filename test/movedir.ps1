@@ -30,4 +30,12 @@ test 'move with spaces in path' {
 	assert (!(test-path "$dir\_scoop_extract"))
 }
 
+test 'move with quotes in path' {
+	$dir = "$working_dir\user with 'quote"
+	movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
+
+	assert (gc "$dir\test.txt") -eq "this is the one" 
+	assert (!(test-path "$dir\_scoop_extract\$extract_dir"))
+}
+
 test_results
