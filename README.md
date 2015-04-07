@@ -1,6 +1,8 @@
 Scoop
 =====
 
+[![Join the chat at https://gitter.im/lukesampson/scoop](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/lukesampson/scoop?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Scoop is a command-line installer for windows.
 
 Requirements:
