@@ -21,7 +21,7 @@
 	"post_install": "mv -force \"$dir\\intl.dll\" \"$dir\\libintl.dll\"
 		if(!(test-path ~\\.vimrc)) {
 		cp \"$dir\\vimrc_example.vim\" ~\\.vimrc
-		\"set shell=$((gcm powershell).path)\\ -executionpolicy\\ bypass" | out-file  ~\\.vimrc -append -encoding ascii
+		\"set shell=$((gcm powershell).path)\\ -executionpolicy\\ bypass\" | out-file  ~\\.vimrc -append -encoding ascii
 		echo '~/.vimrc was created with your shell set to Powershell.'
 	} else { echo '~/.vimrc exists, skipping' }",
 	"checkver": {
