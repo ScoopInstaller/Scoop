@@ -4,18 +4,14 @@ branches:
   except: 
     - gh-pages
 
-environment:
-  scoop: c:\tools\scoop
-
 init:
-  - ps: (Get-PSProvider FileSystem).Home = 'c:\tools\'
-  - ps: iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
-  - ps: scoop install invoke-build
+  - ps: choco install -y pester
 
 build: off
 
 test_script:
-  - ps: invoke-build test
+  - ps: invoke-pester -path test/ -outputfile TestResults.xml -outputformat NUnitXML
+  - ps: (new-object net.webclient).uploadfile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (resolve-path ./TestResults.xml))
 
 notifications:
   - provider: Slack

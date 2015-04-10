@@ -65,11 +65,7 @@ function script:fmt($var) {
 }
 
 # copies fixtures to a working directory
-function setup_working {
-	# get the name of the test from the file that called this function
-	$file = (get-variable -scope 1 myinvocation).value.mycommand.name
-	$name = [io.path]::getfilenamewithoutextension($file)
-
+function setup_working($name) {
 	$fixtures = "$psscriptroot\fixtures\$name"
 	if(!(test-path $fixtures)) {
 		write-host "couldn't find fixtures for $name at $fixtures" -f red
