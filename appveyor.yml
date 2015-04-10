@@ -5,6 +5,7 @@ branches:
     - gh-pages
 
 init:
+  - ps: (get-psprovider 'FileSystem').Home = $(pwd)
   - ps: choco install -y pester
 
 build: off
