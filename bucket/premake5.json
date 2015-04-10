@@ -1,0 +1,10 @@
+{
+    "homepage": "http://premake.github.io/download.html",
+    "version": "5.0-a1",
+    "license": "BSD 3-Clause",
+    "url": "http://sourceforge.net/projects/premake/files/5.0/premake-5.0-alpha1-windows.zip",
+    "hash": "1fe4e32fe8d0662ebd00e8333c33eca28a14fd773a351fb4eb702e246d7b7110",
+    "bin": [
+        "premake5.exe"
+    ]
+}
