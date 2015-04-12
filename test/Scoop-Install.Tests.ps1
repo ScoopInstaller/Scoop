@@ -13,10 +13,6 @@ describe "travel_dir" {
 		travel_dir $from $to
 	}
 
-	afterall {
-		rm -r -force $working_dir
-	}
-
 	it 'common directory remains unchanged in destination' {
 		"$to\common\version.txt" | should contain "version 1.1" 
 		"$to\common with spaces\version.txt" | should contain "version 1.1" 

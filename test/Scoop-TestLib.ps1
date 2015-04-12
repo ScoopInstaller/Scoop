@@ -73,7 +73,7 @@ function setup_working($name) {
 	}
 
 	# reset working dir
-	$working_dir = "$psscriptroot\tmp\$name"
+	$working_dir = "$env:temp\ScoopTestFixtures\$name"
 	if(test-path $working_dir) {
 		rm -r -force $working_dir
 	}

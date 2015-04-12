@@ -2,9 +2,12 @@
 . "$psscriptroot\Scoop-TestLib.ps1"
 
 describe "movedir" {
-    $working_dir = setup_working "movedir"
     $extract_dir = "subdir"
     $extract_to = $null
+
+    beforeall {
+        $working_dir = setup_working "movedir"
+    }
 
     it "moves directories with no spaces in path" {
         $dir = "$working_dir\user"
@@ -37,13 +40,12 @@ describe "movedir" {
 }
 
 describe "unzip_old" {
-    function test-unzip($from) {
-        $to = "$psscriptroot\tmp\$(strip_ext (fname $from))"
+    beforeall {
+        $working_dir = setup_working "unzip_old"
+    }
 
-        # clean-up from previous runs
-        if(test-path $to) {
-            rm -r -force $to
-        }
+    function test-unzip($from) {
+        $to = strip_ext $from
 
         unzip_old $from $to 
 
@@ -51,7 +53,7 @@ describe "unzip_old" {
     }
 
     context "zip file size is zero bytes" {
-        $zerobyte = "$psscriptroot\fixtures\zerobyte.zip"
+        $zerobyte = "$working_dir\zerobyte.zip"
 
         it "unzips file with zero bytes without error" {
             $to = test-unzip $zerobyte
@@ -62,7 +64,7 @@ describe "unzip_old" {
     }
 
     context "zip file is small in size" {
-        $small = "$psscriptroot\fixtures\small.zip"
+        $small = "$working_dir\small.zip"
         
         it "unzips file which is small in size" {
             $to = test-unzip $small

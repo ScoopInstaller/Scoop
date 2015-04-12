@@ -1,1 +1,0 @@
-. "$psscriptroot\..\..\lib\core.ps1"
