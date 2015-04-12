@@ -21,3 +21,15 @@ describe "manifest-validation" {
         }
     }
 }
+
+describe "parse_json" {
+    beforeall {
+        $working_dir = setup_working "parse_json"
+    }
+
+    context "json is invalid" {
+        it "fails with invalid json" {
+            { parse_json "$working_dir\wget.json" } | should throw
+        }
+    }
+}
