@@ -80,8 +80,11 @@ describe "unzip_old" {
 }
 
 describe "shim" {
-    $working_dir = setup_working "shim"
-    $shimdir = shimdir $false
+    beforeall {
+        $working_dir = setup_working "shim"
+        $shimdir = shimdir
+        $(ensure_in_path $shimdir) | out-null
+    }
 
     it "links a file onto the user's path" {
         { get-command "shim-test" -ea stop } | should throw
@@ -113,8 +116,11 @@ describe "shim" {
 }
 
 describe "rm_shim" {
-    $working_dir = setup_working "shim"
-    $shimdir = shimdir $false
+    beforeall {
+        $working_dir = setup_working "shim"
+        $shimdir = shimdir
+        $(ensure_in_path $shimdir) | out-null
+    }
 
     it "removes shim from path" {
         shim "$working_dir\shim-test.ps1" $false "shim-test"
