@@ -130,7 +130,7 @@ function shim($path, $global, $name, $arg) {
 	echo '# ensure $HOME is set for MSYS programs' > $shim
 	echo "if(!`$env:home) { `$env:home = `"`$home\`" }" >> $shim
 	echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' >> $shim
-	echo "`$path = '$path'" >> $shim
+	echo "`$path = `"$path`"" >> $shim
 	if($arg) {
 		echo "`$args = '$($arg -join "', '")', `$args" >> $shim
 	}

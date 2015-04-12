@@ -497,23 +497,29 @@ function create_shims($manifest, $dir, $global) {
 		shim "$dir\$target" $global $name $arg
 	}
 }
+
+function rm_shim($name, $shimdir) {
+	$shim = "$shimdir\$name.ps1"
+
+	if(!(test-path $shim)) { # handle no shim from failed install
+		warn "shim for $name is missing, skipping"
+	} else {
+		echo "removing shim for $name"
+		rm $shim
+	}
+
+	# other shim types might be present
+	'.exe', '.shim', '.cmd' | % {
+		if(test-path "$shimdir\$name$_") { rm "$shimdir\$name$_" }
+	}	
+}
+
 function rm_shims($manifest, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
 		$target, $name, $null = shim_def $_
 		$shimdir = shimdir $global
-		$shim = "$shimdir\$name.ps1"
-
-		if(!(test-path $shim)) { # handle no shim from failed install
-			warn "shim for $name is missing, skipping"
-		} else {
-			echo "removing shim for $name"
-			rm $shim
-		}
-
-		# other shim types might be present
-		'.exe', '.shim', '.cmd' | % {
-			if(test-path "$shimdir\$name$_") { rm "$shimdir\$name$_" }
-		}
+		
+		rm_shim $name $shimdir
 	}
 }
 
