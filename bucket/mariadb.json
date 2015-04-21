@@ -1,17 +1,17 @@
 {
 	"homepage": "http://mariadb.org",
-	"version": "10.0.14",
+	"version": "10.0.17",
 	"license": "GPL2",
 	"architecture": {
 		"64bit": {
-			"url": "https://downloads.mariadb.org/f/mariadb-10.0.14/winx64-packages/mariadb-10.0.14-winx64.zip",
-			"hash": "md5:6880f94badb9a0198549d61d243af1e3",
-			"extract_dir": "mariadb-10.0.14-winx64"
+			"url": "https://downloads.mariadb.org/f/mariadb-10.0.17/winx64-packages/mariadb-10.0.17-winx64.zip",
+			"hash": "md5:e1c0bf484eb36c2e7323be0a4262577b",
+			"extract_dir": "mariadb-10.0.17-winx64"
 		},
 		"32bit": {
-			"url": "https://downloads.mariadb.org/f/mariadb-10.0.14/win32-packages/mariadb-10.0.14-win32.zip",
-			"hash": "md5:daff6549e7a924d550f369ce665e72bc",
-			"extract_dir": "mariadb-10.0.14-win32"
+			"url": "https://downloads.mariadb.org/f/mariadb-10.0.17/win32-packages/mariadb-10.0.17-win32.zip",
+			"hash": "md5:0ddb1003dc2a39f281b57ca408c5867d",
+			"extract_dir": "mariadb-10.0.17-win32"
 		}
 	},
 	"bin": [
