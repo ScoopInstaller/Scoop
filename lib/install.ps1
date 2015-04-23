@@ -5,7 +5,7 @@ function nightly_version($date) {
 }
 
 function install_app($app, $architecture, $global) {
-	$app, $manifest, $bucket, $url = locate $app
+	$app, $manifest, $bucket, $url = find $app
 	$use_cache = $true
 	$check_hash = $true
 
@@ -65,7 +65,7 @@ function appname_from_url($url) {
 	(split-path $url -leaf) -replace '.json$', ''
 }
 
-function locate($app) {
+function find($app) {
 	$manifest, $bucket, $url = $null, $null, $null
 
 	# check if app is a url
