@@ -19,8 +19,8 @@ function version($ver) {
 	}
 }
 function compare_versions($a, $b) {
-	$ver_a = version $a
-	$ver_b = version $b
+	$ver_a = @(version $a)
+	$ver_b = @(version $b)
 
 	for($i=0;$i -lt $ver_a.length;$i++) {
 		if($i -gt $ver_b.length) { return 1; }

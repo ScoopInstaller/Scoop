@@ -8,21 +8,25 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-function timeago($when) {
-	$diff = [datetime]::now - $last_update
+# check if scoop needs updating
+$currentdir = fullpath $(versiondir 'scoop' 'current')
+$needs_update = $false
 
-	if($diff.totaldays -gt 2) { return "$([int]$diff.totaldays) days ago" }
-	if($diff.totalhours -gt 2) { return "$([int]$diff.totalhours) hours ago" }
-	if($diff.totalminutes -gt 2) { return "$([int]$diff.totalminutes) minutes ago" }
-	return "$([int]$diff.totalseconds) seconds ago"
+if(test-path "$currentdir\.git") {
+	pushd $currentdir
+	git fetch -q origin
+	$commits = $(git log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
+	if($commits) { $needs_update = $true }
+	popd
+}
+else {
+	$needs_update = $true
 }
 
-# check when scoop was last updated
-$timestamp = "$(versiondir 'scoop' 'current')\last_updated"
-if(test-path $timestamp) {
-	$last_update = [io.file]::getlastwritetime((resolve-path $timestamp))
-	"scoop was last updated $(timeago($last_update))"
+if($needs_update) {
+	"scoop is out of date. run scoop update to get the latest changes."
 }
+else { "scoop is up-to-date."}
 
 $failed = @()
 $old = @()

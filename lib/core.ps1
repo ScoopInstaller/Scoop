@@ -2,6 +2,22 @@ $scoopdir = $env:SCOOP, "~\appdata\local\scoop" | select -first 1
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
 $cachedir = "$scoopdir\cache" # always local
 
+# using functions as aliases for powershell commands
+function script:cp() { copy-item @args } 
+function script:echo() { write-output @args } 
+function script:gc() { get-content @args } 
+function script:gci() { get-childitem @args } 
+function script:gcm() { get-command @args } 
+function script:iex() { invoke-expression @args } 
+function script:ls() { get-childitem @args } 
+function script:mkdir() { new-item -type directory @args } 
+function script:mv() { move-item @args } 
+function script:rm() { remove-item @args } 
+function script:rmdir() { remove-item @args } 
+function script:sc() { set-content @args } 
+function script:select() { select-object @args } 
+function script:sls() { select-string @args } 
+
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 function format($str, $hash) {
@@ -114,7 +130,7 @@ function shim($path, $global, $name, $arg) {
 	echo '# ensure $HOME is set for MSYS programs' > $shim
 	echo "if(!`$env:home) { `$env:home = `"`$home\`" }" >> $shim
 	echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' >> $shim
-	echo "`$path = '$path'" >> $shim
+	echo "`$path = `"$path`"" >> $shim
 	if($arg) {
 		echo "`$args = '$($arg -join "', '")', `$args" >> $shim
 	}

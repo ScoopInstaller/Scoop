@@ -8,6 +8,7 @@
 # Options:
 #   --global, -g  update a globally installed app
 #   --force, -f   force update even when there isn't a newer version
+#   --no-cache, -k   don't use the download cache
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
@@ -18,48 +19,53 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-$opt, $apps, $err = getopt $args 'gf' 'global','force'
+$opt, $apps, $err = getopt $args 'gfk' 'global','force', 'no-cache'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
+$use_cache = !($opt.k -or $opt.'no-cache')
 
 function update_scoop() {
-	$tempdir = versiondir 'scoop' 'update'
-	$currentdir = versiondir 'scoop' 'current'
+	# check for git
+	$git = try { gcm git -ea stop } catch { $null }
+	if(!$git) { abort "scoop uses git to update itself. run 'scoop install git'." }
 
-	if(test-path $tempdir) {
-		try { rm -r $tempdir -ea stop -force } catch { abort "couldn't remove $tempdir`: it may be in use" }
+	"updating scoop..."
+	$currentdir = fullpath $(versiondir 'scoop' 'current')
+	if(!(test-path "$currentdir\.git")) {
+		# load config
+		$repo = $(scoop config SCOOP_REPO)
+		if(!$repo) { 
+			$repo = "http://github.com/lukesampson/scoop" 
+			scoop config SCOOP_REPO "$repo"
+		}
+
+		$branch = $(scoop config SCOOP_BRANCH)
+		if(!$branch) { 
+			$branch = "master" 
+			scoop config SCOOP_BRANCH "$branch"
+		}
+
+		# remove non-git scoop
+		rm -r -force $currentdir -ea stop
+
+		# get git scoop
+		git clone -q $repo --branch $branch --single-branch $currentdir
 	}
-	$tempdir = ensure $tempdir
-	$currentdir = fullpath $currentdir
+	else {
+		pushd $currentdir
+		git pull -q
+		popd
+	}
 
-	$zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
-	$zipfile = "$tempdir\scoop.zip"
-	echo 'downloading...'
-	dl $zipurl $zipfile
-
-	echo 'extracting...'
-	unzip $zipfile $tempdir
-	rm $zipfile
-
-	echo 'replacing files...'
-	$null = robocopy "$tempdir\scoop-master" $currentdir /mir /njh /njs /nfl /ndl
-	rm -r -force $tempdir -ea stop
-
-	$null > "$currentdir\last_updated" # save update timestamp
 	ensure_scoop_in_path
-
 	shim "$currentdir\bin\scoop.ps1" $false
 
 	@(buckets) | % {
 		"updating $_ bucket..."
-		$git = try { gcm git -ea stop } catch { $null }
-		if(!$git) { warn "git is required for buckets. run 'scoop install git'." }
-		else {
-			pushd (bucketdir $_)
-			git pull -q
-			popd
-		}
+		pushd (bucketdir $_)
+		git pull -q
+		popd
 	}
 	success 'scoop was updated successfully!'
 }
@@ -68,6 +74,7 @@ function update($app, $global) {
 	$old_version = current_version $app $global
 	$old_manifest = installed_manifest $app $old_version $global
 	$install = install_info $app $old_version $global
+	$check_hash = $true
 
 	# re-use architecture, bucket and url from first install
 	$architecture = $install.architecture
@@ -79,6 +86,11 @@ function update($app, $global) {
 	$deps | % { install_app $_ $architecture $global }
 
 	$version = latest_version $app $bucket $url
+	$is_nightly = $version -eq 'nightly'
+	if($is_nightly) {
+		$version = nightly_version $(get-date)
+		$check_hash = $false
+	}
 
 	if(!$force -and ($old_version -eq $version)) {
 		warn "the latest version of $app ($version) is already installed."
@@ -107,7 +119,7 @@ function update($app, $global) {
 	save_installed_manifest $app $bucket $dir $url
 	save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
-	$fname = dl_urls $app $version $manifest $architecture $dir
+	$fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
 	unpack_inno $fname $manifest $dir
 	pre_install $manifest
 	run_installer $fname $manifest $architecture $dir
@@ -144,6 +156,9 @@ function applist($apps, $global) {
 if(!$apps) {
 	if($global) {
 		"scoop update: --global is invalid when <app> not specified"; exit 1
+	}
+	if (!$use_cache) {
+		"scoop update: --no-cache is invalid when <app> not specified"; exit 1
 	}
 	update_scoop
 } else {

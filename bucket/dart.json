@@ -22,5 +22,9 @@
 	],
 	"env_set": {
 		"DART_SDK": "$dir"
+	},
+	"checkver": {
+		"url": "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
+		"re": "\"version\"\\s*:\\s*\"([^\"]+)\""
 	}
 }
