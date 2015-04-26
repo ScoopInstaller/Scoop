@@ -1,16 +1,12 @@
 ﻿{
-    "version":  "2.9.14",
+    "version":  "2.12.0",
     "license":  "Apache 2.0",
     "extract_dir":  "tools",
-    "url":  "http://nuget.org/api/v2/package/Invoke-Build/2.9.14#.zip",
+    "url":  "http://nuget.org/api/v2/package/Invoke-Build/2.12.0#.zip",
     "homepage":  "https://github.com/nightroman/Invoke-Build",
-    "hash":  "1433471d81ab6fc3cd26ad8dd471cab4037418018261a39d90885250b7af1315",
+    "hash":  "573e12ba650d7a7e9c3b9545a62d28804843bfc3b1d6a9930069a4fd7c647c91",
     "bin":  [
         "Invoke-Build.ps1",
-        "Invoke-Builds.ps1",
-        "Convert-psake.ps1",
-        "Invoke-TaskFromISE.ps1",
-        "Show-BuildTree.ps1",
-        "Show-BuildGraph.ps1"
+        "Invoke-Builds.ps1"
     ]
 }
