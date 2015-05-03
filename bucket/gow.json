@@ -1,9 +1,9 @@
 {
 	"homepage": "https://github.com/bmatzelle/gow",
 	"version": "0.8.0",
-	"url": "https://github.com/bmatzelle/gow/archive/master.zip",
-	"hash": "12c527edbff9c90fed4b7cc5168b2ba1b64cc57ce4b12d79f2bcd40c2839d36b",
-	"extract_dir": "gow-master",
+	"url": "https://github.com/bmatzelle/gow/releases/download/v0.8.0/Gow-0.8.0.exe#.7z",
+	"hash": "9b06e0f9471d61d1019bf4d133c0ed23a4ccee27b6b8758a922d681469b82e42",
+	"extract_dir": "",
 	"checkver": {
 		"url": "https://github.com/bmatzelle/gow/releases",
 		"re": "<a.*?>Gow ([0-9\\.]+)</a>"
