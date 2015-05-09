@@ -11,7 +11,7 @@
 		[ "busybox.exe", "awk", "awk" ],
 		[ "busybox.exe", "base64", "base64" ],
 		[ "busybox.exe", "basename", "basename" ],
-		[ "busybox.exe", "bash", "bash" ],
+		[ "busybox.exe", "bash", "bash", "-l" ],
 		[ "busybox.exe", "bbconfig", "bbconfig" ],
 		[ "busybox.exe", "bunzip2", "bunzip2" ],
 		[ "busybox.exe", "bzcat", "bzcat" ],
@@ -119,5 +119,16 @@
 		[ "busybox.exe", "xzcat", "xzcat" ],
 		[ "busybox.exe", "yes", "yes" ],
 		[ "busybox.exe", "zcat", "zcat" ]
-	]
+	],
+	"post_install": " 
+		if(!(test-path ~/.profile)) {
+			'creating ~/.profile'
+@\"
+if [ -e ~/.bashrc ] 
+then
+	source ~/.bashrc
+fi
+\"@ | out-file -en oem ~/.profile
+		}
+	"
 }
