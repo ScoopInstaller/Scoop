@@ -70,7 +70,7 @@ function update_scoop() {
 	success 'scoop was updated successfully!'
 }
 
-function update($app, $global) {
+function cmd_update($app, $global) {
 	$old_version = current_version $app $global
 	$old_manifest = installed_manifest $app $old_version $global
 	$install = install_info $app $old_version $global
@@ -133,6 +133,7 @@ function update($app, $global) {
 
 	show_notes $manifest
 }
+set-alias update cmd_update
 
 function ensure_all_installed($apps, $global) {
 	$app = $apps | ? { !(installed $_ $global) } | select -first 1 # just get the first one that's not installed
@@ -149,9 +150,10 @@ function ensure_all_installed($apps, $global) {
 }
 
 # convert list of apps to list of ($app, $global) tuples
-function applist($apps, $global) {
+function scoop_applist($apps, $global) {
 	return ,@($apps |% { ,@($_, $global) })
 }
+set-alias applist scoop_applist
 
 if(!$apps) {
 	if($global) {

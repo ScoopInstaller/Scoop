@@ -5,19 +5,21 @@ function latest_version($app, $bucket, $url) {
 function current_version($app, $global) {
 	@(versions $app $global)[-1]
 }
-function versions($app, $global) {
+function app_versions($app, $global) {
 	$appdir = appdir $app $global
 	if(!(test-path $appdir)) { return @() }
 
 	sort_versions (gci $appdir -dir | % { $_.name })
 }
+set-alias versions app_versions
 
-function version($ver) {
+function version_string($ver) {
 	$ver.split('.') | % {
 		$num = $_ -as [int]
 		if($num) { $num } else { $_ }
 	}
 }
+set-alias version version_string
 function compare_versions($a, $b) {
 	$ver_a = @(version $a)
 	$ver_b = @(version $b)
@@ -37,7 +39,7 @@ function compare_versions($a, $b) {
 	return 0
 }
 
-function qsort($ary, $fn) {
+function scoop_qsort($ary, $fn) {
 	if($ary -eq $null) { return @() }
 	if(!($ary -is [array])) { return @($ary) }
 
@@ -50,4 +52,6 @@ function qsort($ary, $fn) {
 
 	return @() + $lesser + @($pivot) + $greater
 }
+set-alias qsort scoop_qsort
+
 function sort_versions($versions) {	qsort $versions compare_versions }

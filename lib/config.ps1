@@ -1,12 +1,13 @@
 $cfgpath = "~/.scoop"
 
-function hashtable($obj) {
+function scoop_hashtable($obj) {
 	$h = @{ }
 	$obj.psobject.properties | % {
 		$h[$_.name] = hashtable_val $_.value		
 	}
 	return $h
 }
+set-alias hashtable scoop_hashtable
 
 function hashtable_val($obj) {
 	if($obj -eq $null) { return $null }
