@@ -32,18 +32,6 @@ rm $zipfile
 echo 'creating shim...'
 shim "$dir\bin\scoop.ps1" $false
 
-if(!(test-path ~/.bashrc)) {
-  'creating ~/.bashrc'
-  new-item -type file ~/.bashrc | out-null
-}
-if (!(get-content ~/.bashrc | select-string 'alias scoop' -quiet)) {
-  'creating bash alias for scoop...'
-  'alias scoop="powershell scoop.ps1"' | out-file ~/.bashrc -en oem -append
-}
-else {
-  'bash alias for scoop already exists... skipping...'
-}
-
 ensure_scoop_in_path
 success 'scoop was installed successfully!'
 echo "type 'scoop help' for instructions"
