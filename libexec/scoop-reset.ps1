@@ -13,31 +13,14 @@ param($app)
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
-if ($app -eq "scoop") {
-  "resetting scoop"
+if(!(installed $app)) { abort "$app isn't installed" }
 
-  if(!(test-path ~/.bashrc)) {
-    'creating ~/.bashrc'
-    new-item -type file ~/.bashrc | out-null
-  }
-  if (!(get-content ~/.bashrc | select-string 'alias scoop' -quiet)) {
-    'creating bash alias for scoop...'
-    'alias scoop="powershell scoop.ps1"' | out-file ~/.bashrc -en oem -append
-  }
-  else {
-    'bash alias for scoop already exists... skipping...'
-  }
-} 
-else {
-  if(!(installed $app)) { abort "$app isn't installed" }
+$version = current_version $app
+"resetting $app ($version)"
 
-  $version = current_version $app
-  "resetting $app ($version)"
+$dir = resolve-path (versiondir $app $version)
+$manifest = installed_manifest $app $version
 
-  $dir = resolve-path (versiondir $app $version)
-  $manifest = installed_manifest $app $version
-
-  create_shims $manifest $dir $false
-  env_add_path $manifest $dir
-  env_set $manifest $dir
-}
+create_shims $manifest $dir $false
+env_add_path $manifest $dir
+env_set $manifest $dir
