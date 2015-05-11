@@ -5,6 +5,8 @@ param($command)
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
+reset_aliases
+
 if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 
 try { $gcm = gcm $command -ea stop } catch { }

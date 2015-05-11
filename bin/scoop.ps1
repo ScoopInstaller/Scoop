@@ -6,6 +6,8 @@ set-strictmode -off
 . "$psscriptroot\..\lib\core.ps1"
 . (relpath '..\lib\commands')
 
+reset_aliases
+
 $commands = commands
 
 if (@($null, '-h', '--help', '/?') -contains $cmd) { exec 'help' $args }

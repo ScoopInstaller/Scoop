@@ -26,6 +26,8 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
+reset_aliases
+
 function ensure_none_installed($apps, $global) {
 	$app = @(all_installed $apps $global)[0] # might return more than one; just get the first
 	if($app) {
