@@ -222,12 +222,11 @@ function reset_alias($name, $value) {
 		if($existing.definition -ne $value) {
 			write-host "alias $name is read-only; can't reset it" -f darkyellow
 		}
-		
-		return;
+		return # already set
 	}
 	if($value -is [scriptblock]) {
 		new-item -path function: -name "script:$name" -value $value | out-null
-		$value = "script:$name"
+		return
 	}
 	
 	set-alias $name $value -scope script -option allscope
@@ -235,7 +234,7 @@ function reset_alias($name, $value) {
 
 function reset_aliases() {
 	# for aliases where there's a local function, re-alias so the function takes precedence
-	$aliases = get-alias -scope global |? { $_.options -notmatch 'readonly' } |% { $_.name }
+	$aliases = get-alias |? { $_.options -notmatch 'readonly' } |% { $_.name }
 	get-childitem function: | % {
 		$fn = $_.name
 		if($aliases -contains $fn) {
