@@ -1,10 +1,14 @@
 {
-    "homepage": "http://premake.github.io/download.html",
-    "version": "5.0-a1",
+    "homepage": "http://premake.github.io/",
+    "version": "5.0-alpha3",
     "license": "BSD 3-Clause",
-    "url": "http://sourceforge.net/projects/premake/files/5.0/premake-5.0-alpha1-windows.zip",
-    "hash": "1fe4e32fe8d0662ebd00e8333c33eca28a14fd773a351fb4eb702e246d7b7110",
+    "url": "http://sourceforge.net/projects/premake/files/5.0/premake-5.0-alpha3-windows.zip",
+    "hash": "b327c31181ccc68955cd00938c1875f9d539340dbe5170c87cb0d52b648a2951",
     "bin": [
         "premake5.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://premake.github.io/download.html",
+        "re": "(5[0-9.]+-?(alpha|beta)?[0-9.]?)-windows.zip"
+    }
 }
