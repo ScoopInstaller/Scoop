@@ -1,0 +1,21 @@
+{
+    "version": "1.11.0-dev.0.0",
+    "license": "BSD",
+    "homepage": "https://www.dartlang.org/",
+    "extract_dir": "dart-sdk",
+    "env_add_path": ["bin"],
+    "architecture": {
+        "64bit": {
+            "url": ["https://storage.googleapis.com/dart-archive/channels/dev/release/45519/sdk/dartsdk-windows-x64-release.zip"],
+            "hash": ["a9b82eef2eb5c2e53eebf09b3af1a89c67b2f8d1f8cb6a135b5ec4766cc820fd"]
+        },
+        "32bit": {
+            "url": ["https://storage.googleapis.com/dart-archive/channels/dev/release/45519/sdk/dartsdk-windows-ia32-release.zip"],
+            "hash": ["2d6640ccc06eb6717c7d2c2d6e4eb199b7b648824ef320de64da9fd8c07ab0d5"]
+        }
+    },
+    "checkver": {
+        "url": "http://storage.googleapis.com/dart-archive/channels/dev/release/latest/VERSION",
+        "re": "\\s*\"version\"\\s*:\\s*(\\d+\\.\\d+\\.\\d+.*)"
+    }
+}
