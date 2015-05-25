@@ -1,30 +1,21 @@
 {
-	"homepage": "https://www.dartlang.org",
-	"license": "BSD",
-	"version": "1.0.0.3_r30188",
-	"_comment": "for versions, see https://storage.googleapis.com/dart-editor-archive-integration/latest/changelog.html",
-	"architecture": {
-		"64bit": {
-			"url": "http://storage.googleapis.com/dart-archive/channels/stable/release/30188/sdk/dartsdk-windows-x64-release.zip",
-			"hash": "fa36844e2351b301762a09ddc2da8b24fb82dc7504ce9dfac2f4827ea94fbe4c"
-		},
-		"32bit": {
-			"url": "http://storage.googleapis.com/dart-archive/channels/stable/release/30188/sdk/dartsdk-windows-ia32-release.zip",
-			"hash": "6c8ac51dff597d8bca5d96a5a53808f60682507ca01b870e5136392e50d6efa4"
-		}
-	},
-	"extract_dir": "dart-sdk",
-	"bin": [
-		"bin\\dart.exe",
-		"bin\\dart2js.bat",
-		"bin\\dartanalyzer.bat",
-		"bin\\dartdoc.bat"
-	],
-	"env_set": {
-		"DART_SDK": "$dir"
-	},
-	"checkver": {
-		"url": "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
-		"re": "\"version\"\\s*:\\s*\"([^\"]+)\""
-	}
+    "version": "1.10.0",
+    "license": "BSD",
+    "homepage": "https://www.dartlang.org/",
+    "extract_dir": "dart-sdk",
+    "env_add_path": ["bin"],
+    "architecture": {
+        "64bit": {
+            "url": ["https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-windows-x64-release.zip"],
+            "hash": ["D7780A9C86E6E971670F8F9213DF5AC95FCC09D18629199EF2FA187D72B64967"]
+        },
+        "32bit": {
+            "url": ["https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-windows-ia32-release.zip"],
+            "hash": ["992F9242FA58722D5C75CAD0CE28D8BD9CE444E0C7B0F54A567CE4901C0F3784"]
+        }
+    },
+    "checkver": {
+        "url": "http://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
+        "re": "\\s*\"version\"\\s*:\\s*(\\d+\\.\\d+\\.\\d+.*)"
+    }
 }
