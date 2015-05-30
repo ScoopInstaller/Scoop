@@ -11,13 +11,14 @@ function install_order($apps, $arch) {
 }
 
 # http://www.electricmonk.nl/docs/dependency_resolving_algorithm/dependency_resolving_algorithm.html
-function deps($app, $arch) {
+function resolve_deps($app, $arch) {
 	$resolved = new-object collections.arraylist
 	dep_resolve $app $arch $resolved @()
 
 	if($resolved.count -eq 1) { return @() } # no dependencies
 	return $resolved[0..($resolved.count - 2)]
 }
+set-alias deps resolve_deps
 
 function dep_resolve($app, $arch, $resolved, $unresolved) {
 	$unresolved += $app

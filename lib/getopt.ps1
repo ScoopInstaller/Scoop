@@ -8,7 +8,7 @@
 #    array of strings that are long-form options. options that take
 #    a parameter should end with '='
 # returns @(opts hash, remaining_args array, error string)
-function getopt($argv, $shortopts, $longopts) {
+function scoop_getopt($argv, $shortopts, $longopts) {
 	$opts = @{}; $rem = @()
 
 	function err($msg) {
@@ -67,3 +67,4 @@ function getopt($argv, $shortopts, $longopts) {
 
 	$opts, $rem
 }
+set-alias getopt scoop_getopt

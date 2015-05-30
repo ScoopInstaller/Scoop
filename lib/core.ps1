@@ -20,10 +20,12 @@ function script:sls() { select-string @args }
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
-function format($str, $hash) {
+function scoop_format($str, $hash) {
 	$hash.keys | % { set-variable $_ $hash[$_] }
 	$executionContext.invokeCommand.expandString($str)
 }
+set-alias format scoop_format
+
 function is_admin {
 	$admin = [security.principal.windowsbuiltinrole]::administrator
 	$id = [security.principal.windowsidentity]::getcurrent()
@@ -31,9 +33,12 @@ function is_admin {
 }
 
 # messages
-function abort($msg) { write-host $msg -f darkred; exit 1 }
-function warn($msg) { write-host $msg -f darkyellow; }
-function success($msg) { write-host $msg -f darkgreen }
+function message_abort($msg) { write-host $msg -f darkred; exit 1 }
+set-alias abort message_abort
+function message_warn($msg) { write-host $msg -f darkyellow; }
+set-alias warn message_warn
+function message_success($msg) { write-host $msg -f darkgreen }
+set-alias success message_success
 
 # dirs
 function basedir($global) {	if($global) { return $globaldir } $scoopdir }
@@ -43,10 +48,12 @@ function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 # apps
-function installed($app, $global=$null) {
+function scoop_installed($app, $global=$null) {
 	if($global -eq $null) { return (installed $app $true) -or (installed $app $false) }
 	return test-path (appdir $app $global)
 }
+set-alias installed scoop_installed
+
 function installed_apps($global) {
 	$dir = appsdir $global
 	if(test-path $dir) {
@@ -55,14 +62,18 @@ function installed_apps($global) {
 }
 
 # paths
-function fname($path) { split-path $path -leaf }
+function scoop_fname($path) { split-path $path -leaf }
+set-alias fname scoop_fname
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 
-function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
-function fullpath($path) { # should be ~ rooted
+function scoop_ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
+set-alias ensure scoop_ensure
+function scoop_fullpath($path) { # should be ~ rooted
 	$executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }
-function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
+set-alias fullpath scoop_fullpath
+function scoop_relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
+set-alias relpath scoop_relpath
 function friendly_path($path) {
 	$h = $home; if(!$h.endswith('\')) { $h += '\' }
 	return "$path" -replace ([regex]::escape($h)), "~\"
@@ -72,18 +83,22 @@ function is_local($path) {
 }
 
 # operations
-function dl($url,$to) {
+function scoop_download($url,$to) {
 	$wc = new-object system.net.webClient
 	$wc.headers.add('User-Agent', 'Scoop/1.0')
 	$wc.downloadFile($url,$to)
 
 }
-function env($name,$global,$val='__get') {
+set-alias dl scoop_download
+
+function scoop_env($name,$global,$val='__get') {
 	$target = 'User'; if($global) {$target = 'Machine'}
 	if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
 	else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
-function unzip($path,$to) {
+set-alias env scoop_env
+
+function scoop_unzip($path,$to) {
 	if(!(test-path $path)) { abort "can't find $path to unzip"}
 	try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
 	catch { unzip_old $path $to; return } # for .net earlier than 4.5
@@ -101,6 +116,8 @@ function unzip($path,$to) {
 		abort "unzip failed: $_"
 	}
 }
+set-alias unzip scoop_unzip
+
 function unzip_old($path,$to) {
 	# fallback for .net earlier than 4.5
 	$shell = (new-object -com shell.application -strict)
@@ -109,7 +126,7 @@ function unzip_old($path,$to) {
 	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
-function movedir($from, $to) {
+function scoop_movedir($from, $to) {
 	$from = $from.trimend('\')
 	$to = $to.trimend('\')
 
@@ -118,8 +135,9 @@ function movedir($from, $to) {
 		throw "error moving directory: `n$out"
 	}
 }
+set-alias movedir scoop_movedir
 
-function shim($path, $global, $name, $arg) {
+function scoop_shim($path, $global, $name, $arg) {
 	if(!(test-path $path)) { abort "can't shim $(fname $path): couldn't find $path" }
 	$abs_shimdir = ensure (shimdir $global)
 	if(!$name) { $name = strip_ext (fname $path) }
@@ -157,6 +175,7 @@ function shim($path, $global, $name, $arg) {
 		"@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding oem
 	}
 }
+set-alias shim scoop_shim
 
 function ensure_in_path($dir, $global) {
 	$path = env 'path' $global
@@ -195,7 +214,7 @@ function ensure_scoop_in_path($global) {
 	ensure_in_path $abs_shimdir $global
 }
 
-function wraptext($text, $width) {
+function scoop_wraptext($text, $width) {
 	if(!$width) { $width = $host.ui.rawui.windowsize.width };
 	$width -= 1 # be conservative: doesn't seem to print the last char
 
@@ -211,7 +230,9 @@ function wraptext($text, $width) {
 
 	$lines -join "`n"
 }
+set-alias wraptext scoop_wraptext
 
-function pluralize($count, $singular, $plural) {
+function scoop_pluralize($count, $singular, $plural) {
 	if($count -eq 1) { $singular } else { $plural }
 }
+set-alias pluralize scoop_pluralize

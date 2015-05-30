@@ -11,13 +11,14 @@ param($cmd, $app)
 
 . "$psscriptroot\..\lib\help.ps1"
 
-function cacheinfo($file) {
+function scoop_cacheinfo($file) {
 	$app, $version, $url = $file.name -split '#'
 	$size = filesize $file.length
 	return new-object psobject -prop @{ app=$app; version=$version; url=$url; size=$size }
 }
+set-alias cacheinfo scoop_cacheinfo
 
-function filesize($length) {
+function cache_filesize($length) {
 	$gb = [math]::pow(2, 30)
 	$mb = [math]::pow(2, 20)
 	$kb = [math]::pow(2, 10)
@@ -32,6 +33,7 @@ function filesize($length) {
 		"$($length) B"
 	}
 }
+set-alias filesize cache_filesize
 
 switch($cmd) {
 	'rm' {

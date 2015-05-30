@@ -4,9 +4,10 @@ function command_files {
         | where { $_.name -match 'scoop-.*?\.ps1$' }
 }
 
-function commands {
+function scoop_commands {
 	command_files | % { command_name $_ }
 }
+set-alias commands scoop_commands
 
 function command_name($filename) {
 	$filename.name | sls 'scoop-(.*?)\.ps1$' | % { $_.matches[0].groups[1].value }
@@ -27,8 +28,9 @@ function command_path($cmd) {
     $cmd_path
 }
 
-function exec($cmd, $arguments) {
+function command_exec($cmd, $arguments) {
     $cmd_path = command_path $cmd
 
 	& $cmd_path @arguments
 }
+set-alias exec command_exec

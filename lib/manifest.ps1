@@ -61,10 +61,15 @@ function arch_specific($prop, $manifest, $architecture) {
 	if($manifest.$prop) { return $manifest.$prop }
 }
 
-function url($manifest, $arch) { arch_specific 'url' $manifest $arch }
-function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch }
-function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
-function msi($manifest, $arch) { arch_specific 'msi' $manifest $arch }
-function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
+function manifest_url($manifest, $arch) { arch_specific 'url' $manifest $arch }
+set-alias url manifest_url
+function manifest_installer($manifest, $arch) { arch_specific 'installer' $manifest $arch }
+set-alias installer manifest_installer
+function manifest_uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
+set-alias uninstaller manifest_uninstaller
+function manifest_msi($manifest, $arch) { arch_specific 'msi' $manifest $arch }
+set-alias msi manifest_msi
+function manifest_hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
+set-alias hash manifest_hash
 function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch}
 function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch}

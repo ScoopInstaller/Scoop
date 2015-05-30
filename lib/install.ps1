@@ -65,7 +65,7 @@ function appname_from_url($url) {
 	(split-path $url -leaf) -replace '.json$', ''
 }
 
-function locate($app) {
+function locate_app($app) {
 	$manifest, $bucket, $url = $null, $null, $null
 
 	# check if app is a url
@@ -91,6 +91,7 @@ function locate($app) {
 
 	return $app, $manifest, $bucket, $url
 }
+set-alias locate locate_app
 
 function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) {
 	$cached = fullpath (cache_path $app $version $url)
@@ -319,12 +320,13 @@ function cmd_available($cmd) {
 }
 
 # for dealing with installers
-function args($config, $dir) {
+function scoop_args($config, $dir) {
 	if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }
 	@()
 }
+set-alias args scoop_args
 
-function run($exe, $arg, $msg, $continue_exit_codes) {
+function scoop_run($exe, $arg, $msg, $continue_exit_codes) {
 	if($msg) { write-host $msg -nonewline }
 	try {
 		$proc = start-process $exe -wait -ea stop -passthru -arg $arg
@@ -342,6 +344,7 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
 	if($msg) { write-host "done" }
 	return $true
 }
+set-alias run scoop_run
 
 function unpack_inno($fname, $manifest, $dir) {
 	if(!$manifest.innosetup) { return }
@@ -636,13 +639,14 @@ function prune_installed($apps) {
 }
 
 # check whether the app failed to install
-function failed($app, $global) {
+function install_failed($app, $global) {
 	$ver = current_version $app $global
 	if(!$ver) { return $false }
 	$info = install_info $app $ver $global
 	if(!$info) { return $true }
 	return $false
 }
+set-alias failed install_failed
 
 function ensure_none_failed($apps, $global) {
 	foreach($app in $apps) {
