@@ -6,6 +6,8 @@ param($cmd)
 . "$psscriptroot\..\lib\commands.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
+reset_aliases
+
 function print_help($cmd) {
 	$file = gc (command_path $cmd) -raw
 

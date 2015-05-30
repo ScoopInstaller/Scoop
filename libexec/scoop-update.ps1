@@ -19,6 +19,8 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
+reset_aliases
+
 $opt, $apps, $err = getopt $args 'gfk' 'global','force', 'no-cache'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global

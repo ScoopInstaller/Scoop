@@ -31,6 +31,8 @@ param($name, $value)
 . "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
+reset_aliases
+
 if(!$name) { my_usage; exit 1 }
 
 if($name -like 'rm') {

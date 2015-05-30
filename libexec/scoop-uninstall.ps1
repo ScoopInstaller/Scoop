@@ -11,6 +11,8 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 
+reset_aliases
+
 # options
 $opt, $app, $err = getopt $args 'g' 'global'
 if($err) { "scoop uninstall: $err"; exit 1 }
