@@ -195,6 +195,12 @@ function ensure_scoop_in_path($global) {
 	ensure_in_path $abs_shimdir $global
 }
 
+function ensure_robocopy_in_path {
+	if(!(gcm robocopy -ea ignore)) {
+		shim "C:\Windows\System32\Robocopy.exe" $false
+	}
+}
+
 function wraptext($text, $width) {
 	if(!$width) { $width = $host.ui.rawui.windowsize.width };
 	$width -= 1 # be conservative: doesn't seem to print the last char
