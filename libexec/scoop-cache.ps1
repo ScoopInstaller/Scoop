@@ -11,6 +11,8 @@ param($cmd, $app)
 
 . "$psscriptroot\..\lib\help.ps1"
 
+reset_aliases
+
 function cacheinfo($file) {
 	$app, $version, $url = $file.name -split '#'
 	$size = filesize $file.length

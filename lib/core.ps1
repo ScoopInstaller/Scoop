@@ -2,22 +2,6 @@ $scoopdir = $env:SCOOP, "~\appdata\local\scoop" | select -first 1
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
 $cachedir = "$scoopdir\cache" # always local
 
-# using functions as aliases for powershell commands
-function script:cp() { copy-item @args } 
-function script:echo() { write-output @args } 
-function script:gc() { get-content @args } 
-function script:gci() { get-childitem @args } 
-function script:gcm() { get-command @args } 
-function script:iex() { invoke-expression @args } 
-function script:ls() { get-childitem @args } 
-function script:mkdir() { new-item -type directory @args } 
-function script:mv() { move-item @args } 
-function script:rm() { remove-item @args } 
-function script:rmdir() { remove-item @args } 
-function script:sc() { set-content @args } 
-function script:select() { select-object @args } 
-function script:sls() { select-string @args } 
-
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 function format($str, $hash) {
@@ -220,4 +204,50 @@ function wraptext($text, $width) {
 
 function pluralize($count, $singular, $plural) {
 	if($count -eq 1) { $singular } else { $plural }
+}
+
+# for dealing with user aliases
+$default_aliases = @{
+	'cp' = 'copy-item'
+	'echo' = 'write-output'
+	'gc' = 'get-content'
+	'gci' = 'get-childitem'
+	'gcm' = 'get-command'
+	'iex' = 'invoke-expression'
+	'ls' = 'get-childitem'
+	'mkdir' = { new-item -type directory @args }
+	'mv' = 'move-item'
+	'rm' = 'remove-item'
+	'sc' = 'set-content'
+	'select' = 'select-object'
+	'sls' = 'select-string'
+}
+
+function reset_alias($name, $value) {
+	if($existing = get-alias $name -ea ignore |? { $_.options -match 'readonly' }) {
+		if($existing.definition -ne $value) {
+			write-host "alias $name is read-only; can't reset it" -f darkyellow
+		}
+		return # already set
+	}
+	if($value -is [scriptblock]) {
+		new-item -path function: -name "script:$name" -value $value | out-null
+		return
+	}
+	
+	set-alias $name $value -scope script -option allscope
+}
+
+function reset_aliases() {
+	# for aliases where there's a local function, re-alias so the function takes precedence
+	$aliases = get-alias |? { $_.options -notmatch 'readonly' } |% { $_.name }
+	get-childitem function: | % {
+		$fn = $_.name
+		if($aliases -contains $fn) {
+			set-alias $fn local:$fn -scope script
+		}
+	}
+
+	# set default aliases
+	$default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
 }

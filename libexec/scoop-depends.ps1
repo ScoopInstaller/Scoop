@@ -10,6 +10,8 @@
 . "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
+reset_aliases
+
 $opt, $apps, $err = getopt $args 'a:' 'arch='
 $app = $apps[0]
 

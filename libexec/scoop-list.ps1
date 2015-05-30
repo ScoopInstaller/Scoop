@@ -8,6 +8,8 @@ param($query)
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 
+reset_aliases
+
 $local = installed_apps $false | % { @{ name = $_ } }
 $global = installed_apps $true | % { @{ name = $_; global = $true } }
 
