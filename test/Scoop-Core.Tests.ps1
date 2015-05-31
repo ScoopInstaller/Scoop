@@ -136,6 +136,11 @@ describe "rm_shim" {
 
 describe "ensure_robocopy_in_path" {
     $shimdir = shimdir $false
+    mock versiondir { ".\" }
+
+    beforeall {
+        reset_aliases
+    }
 
     context "robocopy is not in path" {
         it "shims robocopy when not on path" {
