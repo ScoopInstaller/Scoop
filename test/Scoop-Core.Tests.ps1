@@ -133,3 +133,37 @@ describe "rm_shim" {
         { shim-test } | should throw
     }
 }
+
+describe "ensure_robocopy_in_path" {
+    $shimdir = shimdir $false
+    mock versiondir { ".\" }
+
+    beforeall {
+        reset_aliases
+    }
+
+    context "robocopy is not in path" {
+        it "shims robocopy when not on path" {
+            mock gcm { $false }
+            gcm robocopy | should be $false
+
+            ensure_robocopy_in_path
+
+            "$shimdir/robocopy.ps1" | should exist
+            "$shimdir/robocopy.exe" | should exist
+
+            # clean up
+            rm_shim robocopy $(shimdir $false) | out-null
+        }
+    }
+
+    context "robocopy is in path" {
+        it "does not shim robocopy when it is in path" {
+            mock gcm { $true }
+            ensure_robocopy_in_path
+
+            "$shimdir/robocopy.ps1" | should not exist
+            "$shimdir/robocopy.exe" | should not exist
+        }
+    }
+}

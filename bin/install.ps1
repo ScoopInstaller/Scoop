@@ -32,6 +32,7 @@ rm $zipfile
 echo 'creating shim...'
 shim "$dir\bin\scoop.ps1" $false
 
+ensure_robocopy_in_path
 ensure_scoop_in_path
 success 'scoop was installed successfully!'
 echo "type 'scoop help' for instructions"
