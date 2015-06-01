@@ -20,8 +20,11 @@ function command_path($cmd) {
         # get path from shim
         $shim_path = "$scoopdir\shims\scoop-$cmd.ps1"
         $line = ((gc $shim_path) | where { $_.startswith('$path') })
-        iex -command "$line"
-        $cmd_path = $path
+        if($line) {
+            iex -command "$line"
+            $cmd_path = $path
+        }
+        else { $cmd_path = $shim_path }
     } 
 
     $cmd_path
