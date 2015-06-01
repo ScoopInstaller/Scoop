@@ -1,5 +1,7 @@
 {
     "version": "0.7.73",
+    "homepage": "https://mediaarea.net/en/MediaInfo",
+    "license": "BSD",
     "architecture": {
       "64bit": {
         "url": "http://downloads.sourceforge.net/project/mediainfo/binary/mediainfo/0.7.73/MediaInfo_CLI_0.7.73_Windows_x64.zip",
