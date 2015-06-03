@@ -81,7 +81,7 @@ namespace shim {
 
 			// create command line
 			var cmd_args = add_args ?? "";
-			var pass_args = Serialize(args);
+			var pass_args = GetArgs(Environment.CommandLine);
 			if(!string.IsNullOrEmpty(pass_args)) {
 				if(!string.IsNullOrEmpty(cmd_args)) cmd_args += " ";
 				cmd_args += pass_args;
@@ -112,8 +112,21 @@ namespace shim {
 			return (int)exit_code;
 		}
 
+		// now uses GetArgs instead
 		static string Serialize(string[] args) {
 			return string.Join(" ", args.Select(a => a.Contains(' ') ? '"' + a + '"' : a));
+		}
+
+		// strips the program name from the command line, returns just the arguments
+		static string GetArgs(string cmdLine) {
+			if(cmdLine.StartsWith("\"")) {
+				var endQuote = cmdLine.IndexOf("\" ", 1);
+				if(endQuote < 0) return "";
+				return cmdLine.Substring(endQuote + 1);
+			}
+			var space = cmdLine.IndexOf(' ');
+			if(space < 0 || space == cmdLine.Length - 1) return "";
+			return cmdLine.Substring(space + 1);
 		}
 
 		static string Get(Dictionary<string, string> dic, string key) {
