@@ -6,9 +6,10 @@
 # You can use '*' in place of <app> to update all apps.
 #
 # Options:
-#   --global, -g  update a globally installed app
-#   --force, -f   force update even when there isn't a newer version
-#   --no-cache, -k   don't use the download cache
+#   --global, -g  	update a globally installed app
+#   --force, -f   	force update even when there isn't a newer version
+#   --no-cache, -k 	don't use the download cache
+#   --quiet, -q   	hide extraneous messages
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
@@ -21,11 +22,12 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'gfk' 'global','force', 'no-cache'
+$opt, $apps, $err = getopt $args 'gfkq' 'global','force', 'no-cache', 'quiet'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
 $use_cache = !($opt.k -or $opt.'no-cache')
+$quiet = $opt.q -or $opt.quiet
 
 function update_scoop() {
 	# check for git
@@ -72,7 +74,7 @@ function update_scoop() {
 	success 'scoop was updated successfully!'
 }
 
-function update($app, $global) {
+function update($app, $global, $quiet = $false) {
 	$old_version = current_version $app $global
 	$old_manifest = installed_manifest $app $old_version $global
 	$install = install_info $app $old_version $global
@@ -90,13 +92,15 @@ function update($app, $global) {
 	$version = latest_version $app $bucket $url
 	$is_nightly = $version -eq 'nightly'
 	if($is_nightly) {
-		$version = nightly_version $(get-date)
+		$version = nightly_version $(get-date) $quiet
 		$check_hash = $false
 	}
 
 	if(!$force -and ($old_version -eq $version)) {
-		warn "the latest version of $app ($version) is already installed."
-		"run 'scoop update' to check for new versions."
+		if (!$quiet) {
+			warn "the latest version of $app ($version) is already installed."
+			"run 'scoop update' to check for new versions."
+		}
 		return
 	}
 	if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
@@ -179,7 +183,7 @@ if(!$apps) {
 	}
 
 	# $apps is now a list of ($app, $global) tuples
-	$apps | % { update @_ }
+	$apps | % { update @_ $quiet }
 }
 
 exit 0

@@ -1,6 +1,8 @@
-function nightly_version($date) {
+function nightly_version($date, $quiet = $false) {
 	$date_str = $date.tostring("yyyyMMdd") 
-	warn "this is a nightly version: downloaded files won't be verified"
+	if (!$quiet) {
+		warn "this is a nightly version: downloaded files won't be verified"
+	}
 	"nightly-$date_str"
 }
 
