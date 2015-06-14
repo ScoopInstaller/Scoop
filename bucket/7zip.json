@@ -4,11 +4,11 @@
 	"version": "9.20",
 	"architecture": {
 		"64bit": {
-			"url": "http://tcpdiag.dl.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920-x64.msi",
+			"url": "http://nbtelecom.dl.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920-x64.msi",
 			"hash": "62df458bc521001cd9a947643a84810ecbaa5a16b5c8e87d80df8e34c4a16fe2"
 		},
 		"32bit": {
-			"url": "http://tcpdiag.dl.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920.msi",
+			"url": "http://nbtelecom.dl.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920.msi",
 			"hash": "fe4807b4698ec89f82de7d85d32deaa4c772fc871537e31fb0fccf4473455cb8"
 		}
 	},
