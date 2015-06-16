@@ -37,6 +37,8 @@
 		$create_reg.Invoke(\"Classes\\.py\", \"Python.File\")
 		$create_reg.Invoke(\"Python\\PythonCore\\3.4\\InstallPath\", `
 			\"$dir\")
+		$create_reg.Invoke(\"Python\\PythonCore\\3.4\\PythonPath\", `
+			\"$dir;$dir\\Lib\\;$dir\\DLLs\\\")
 	",
 	"checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
 }
