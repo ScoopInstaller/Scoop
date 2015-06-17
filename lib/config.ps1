@@ -59,10 +59,11 @@ function set_config($name, $val) {
 $cfg = load_cfg
 
 # setup proxy
+# note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
 $p = get_config 'proxy'
 if($p) {
 	try {
-		$cred, $address = $p -split '@'
+		$cred, $address = $p -split '(?<!\\)@'
 		if(!$address) {
 			$address, $cred = $cred, $null # no credentials supplied
 		}
@@ -76,7 +77,7 @@ if($p) {
 		if($cred -eq 'currentuser') {
 			[net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
 		} elseif($cred) {
-			$user, $pass = $cred -split ':'
+			$user, $pass = $cred -split '(?<!\\):' |% { $_ -replace '\\([@:])','$1' }
 			[net.webrequest]::defaultwebproxy.credentials = new-object net.networkcredential($user, $pass)
 		}
 	} catch {
