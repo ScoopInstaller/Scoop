@@ -1,14 +1,13 @@
 {
 	"homepage": "http://www.rust-lang.org",
-	"version": "0.11.0",
+	"version": "1.0.0",
 	"license": "MIT/Apache 2.0",
-	"depends": "gcc45",
-	"url": "http://static.rust-lang.org/dist/rust-0.11.0-install.exe",
-	"hash": "fb253072ba5373eb0af388f63e51122af9dd13379d762ca4100ee7334dbec9d2",
-	"innosetup": true,
+	"url": "https://static.rust-lang.org/dist/rust-1.0.0-x86_64-pc-windows-gnu.msi",
+	"hash": "530DB0D340F2A7392B1CDD441CBC1E7176CE9C35EF161857E62C11185E1B14C2",
 	"bin": [
-		"bin\\rustc.exe",
-		"bin\\rustdoc.exe"
+		"Rust\\bin\\rustc.exe",
+		"Rust\\bin\\rustdoc.exe",
+		"Rust\\bin\\cargo.exe"
 	],
 	"checkver": "<h2>Docs \\(([0-9\\.]+)\\)</h2>"
 }
