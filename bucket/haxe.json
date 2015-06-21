@@ -1,10 +1,10 @@
 {
     "homepage": "http://haxe.org/",
-    "version": "3.1.3",
+    "version": "3.2.0",
     "license": "GPL2",
-    "url": "http://haxe.org/website-content/downloads/3,1,3/downloads/haxe-3.1.3-win.zip",
-    "hash": "4cf84cdbf7960a61ae70b0d9166c6f9bde16388c3b81e54af91446f4c9e44ae4",
-    "extract_dir": "haxe-3.1.3",
+    "url": "http://haxe.org/website-content/downloads/3.2.0/downloads/haxe-3.2.0-win.zip",
+    "hash": "fd47a5e1dd45052714979c1b075b0c991bb9ec719396d8a767b6be5937875722",
+    "extract_dir": "haxe-3.2.0",
     "bin": [
         "haxe.exe",
         "haxelib.exe"
