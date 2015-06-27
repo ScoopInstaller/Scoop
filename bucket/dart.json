@@ -1,21 +1,23 @@
 {
-    "version": "1.10.0",
-    "license": "BSD",
-    "homepage": "https://www.dartlang.org/",
-    "extract_dir": "dart-sdk",
-    "env_add_path": ["bin"],
-    "architecture": {
-        "64bit": {
-            "url": ["https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-windows-x64-release.zip"],
-            "hash": ["D7780A9C86E6E971670F8F9213DF5AC95FCC09D18629199EF2FA187D72B64967"]
-        },
-        "32bit": {
-            "url": ["https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-windows-ia32-release.zip"],
-            "hash": ["992F9242FA58722D5C75CAD0CE28D8BD9CE444E0C7B0F54A567CE4901C0F3784"]
-        }
-    },
-    "checkver": {
-        "url": "http://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
-        "re": "\\s*\"version\"\\s*:\\s*(\\d+\\.\\d+\\.\\d+.*)"
-    }
+    "version":  "1.11.0",
+    "license":  "BSD",
+    "homepage":  "https://www.dartlang.org/",
+    "extract_dir":  "dart-sdk",
+    "env_add_path":  [
+                         "bin"
+                     ],
+    "architecture":  {
+                         "64bit":  {
+                                       "url":  "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-windows-x64-release.zip",
+                                       "hash":  "891358dd2ac397d9059e823a6332cb1c9f02633ff507396ad78ec7fb5a2e0a2c"
+                                   },
+                         "32bit":  {
+                                       "url":  "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-windows-ia32-release.zip",
+                                       "hash":  "420c9554895add8ad630c2671844731676a0d039c3be3bb9df2004f12513c534"
+                                   }
+                     },
+    "checkver":  {
+                     "url":  "http://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
+                     "re":  "\\s*\"version\"\\s*:\\s*(\\d+\\.\\d+\\.\\d+.*)"
+                 }
 }
