@@ -7,6 +7,7 @@ Requirements:
 
 * [PowerShell 3](http://www.microsoft.com/en-us/download/details.aspx?id=34595)
 * PowerShell must be enabled for your user account e.g. `set-executionpolicy unrestricted -s cu`
+* PowerShell SSL Trust must be disabled. `[System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}`
 
 To install:
 
