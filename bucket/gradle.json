@@ -1,10 +1,10 @@
 {
 	"homepage": "http://www.gradle.org",
-	"version": "2.2.1",
+	"version": "2.4",
 	"license": "Apache 2.0",
-	"hash": "420aa50738299327b611c10b8304b749e8d3a579407ee9e755b15921d95ff418",
-	"url": "https://services.gradle.org/distributions/gradle-2.2.1-bin.zip",
-	"extract_dir": "gradle-2.2.1",
+	"hash": "c4eaecc621a81f567ded1aede4a5ddb281cc02a03a6a87c4f5502add8fc2f16f",
+	"url": "https://services.gradle.org/distributions/gradle-2.4-bin.zip",
+	"extract_dir": "gradle-2.4",
 	"bin": "bin\\gradle.bat",
 	"depends": "openjdk"
 }
