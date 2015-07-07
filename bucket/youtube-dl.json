@@ -1,9 +1,9 @@
 {
     	"homepage": "http://rg3.github.io/youtube-dl/",
     	"license": "Unlicense",
-    	"version": "2015.04.03",
-    	"url": "https://yt-dl.org/downloads/2015.04.03/youtube-dl.exe",
-    	"hash": "md5:1eb53c85ced7e75ac7a3c9edc5cedd5e",
+    	"version": "2015.07.07",
+    	"url": "https://yt-dl.org/downloads/2015.07.07/youtube-dl.exe",
+    	"hash": "md5:f89b1e3be159abf7c7444660dd332fb8",
     	"bin": "youtube-dl.exe",
 	"depends": [
         	"ffmpeg",
