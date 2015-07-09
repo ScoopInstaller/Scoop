@@ -1,8 +1,8 @@
 {
 	"homepage": "http://redis.io",
-	"version": "2.8.4",
-	"url": "https://github.com/MSOpenTech/redis/raw/a2ef6a4fdc9b76816641c4652595e75f77c9e960/bin/release/redis-2.8.4.zip",
-	"hash": "35859d952da5d1c22fd3fcc6a3223ad2763019cc6c41fbfba50da8168d928150",
+	"version": "2.8.21",
+	"url": "https://github.com/MSOpenTech/redis/releases/download/win-2.8.21/redis-x64-2.8.21.zip",
+	"hash": "d49865ce057c6cd7883df36b11f050a9dadd1f77ca87976fe20a525c829f74c3",
 	"bin": [
 		"redis-benchmark.exe",
 		"redis-check-aof.exe",
