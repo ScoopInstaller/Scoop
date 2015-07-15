@@ -1,9 +1,9 @@
 {
 	"homepage": "http://www.rust-lang.org",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"license": "MIT/Apache 2.0",
-	"url": "https://static.rust-lang.org/dist/rust-1.0.0-x86_64-pc-windows-gnu.msi",
-	"hash": "530DB0D340F2A7392B1CDD441CBC1E7176CE9C35EF161857E62C11185E1B14C2",
+	"url": "https://static.rust-lang.org/dist/rust-1.1.0-x86_64-pc-windows-gnu.msi",
+	"hash": "48437584a1788711d96c8f8047c3cad9c41654e6cf8596459fdce4ed519a101d",
 	"bin": [
 		"Rust\\bin\\rustc.exe",
 		"Rust\\bin\\rustdoc.exe",
