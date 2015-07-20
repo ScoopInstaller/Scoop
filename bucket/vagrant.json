@@ -8,6 +8,6 @@
 	"bin": "bin\\vagrant.exe",
 	"checkver": {
 		"url": "http://www.vagrantup.com/downloads.html",
-		"re": "latest version of Vagrant \\(([^\\)]+)\\)"
+		"re": "latest\\s+version\\s+of\\s+Vagrant\\s+\\(([^\\)]+)\\)"
 	}
 }
