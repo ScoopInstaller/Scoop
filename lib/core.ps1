@@ -63,10 +63,29 @@ function dl($url,$to) {
     $wc.downloadFile($url,$to)
 
 }
-function env($name,$global,$val='__get') {
-    $target = 'User'; if($global) {$target = 'Machine'}
-    if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
-    else { [environment]::setEnvironmentVariable($name,$val,$target) }
+function env { param($name,$value,$targetEnvironment)
+    if ( $PSBoundParameters.ContainsKey('targetEnvironment') ) {
+        # $targetEnvironment is expected to be $null, [bool], [string], or [System.EnvironmentVariableTarget]
+        if ($targetEnvironment -eq $null) { $targetEnvironment = [System.EnvironmentVariableTarget]::Process }
+        elseif ($targetEnvironment -is [bool]) {
+            # from initial usage pattern
+            if ($targetEnvironment) { $targetEnvironment = [System.EnvironmentVariableTarget]::Machine }
+            else { $targetEnvironment = [System.EnvironmentVariableTarget]::User }
+        }
+        elseif (($targetEnvironment -eq '') -or ($targetEnvironment -eq 'Process') -or ($targetEnvironment -eq 'Session')) { $targetEnvironment = [System.EnvironmentVariableTarget]::Process }
+        elseif ($targetEnvironment -eq 'User') { $targetEnvironment = [System.EnvironmentVariableTarget]::User }
+        elseif (($targetEnvironment -eq 'Global') -or ($targetEnvironment -eq 'Machine')) { $targetEnvironment = [System.EnvironmentVariableTarget]::Machine }
+        elseif ($targetEnvironment -is [System.EnvironmentVariableTarget]) { <# NoOP #> }
+        else {
+            throw "ERROR: logic: incorrect targetEnvironment parameter ('$targetEnvironment') used for env()"
+        }
+    }
+    else { $targetEnvironment = [System.EnvironmentVariableTarget]::Process }
+
+    if($PSBoundParameters.ContainsKey('value')) {
+        [environment]::setEnvironmentVariable($name,$value,$targetEnvironment)
+    }
+    else { [environment]::getEnvironmentVariable($name,$targetEnvironment) }
 }
 function unzip($path,$to) {
     if(!(test-path $path)) { abort "can't find $path to unzip"}
@@ -148,13 +167,13 @@ function shim($path, $global, $name, $arg) {
 }
 
 function ensure_in_path($dir, $global) {
-    $path = env 'path' $global
+    $path = env 'path' -t $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
         echo "adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path"
 
-        env 'path' $global "$dir;$path" # for future sessions...
-        $env:path = "$dir;$env:path" # for this session
+        env 'path' -t $global "$dir;$path" # for future sessions...
+        env 'path' "$dir;$env:path"        # for this session
     }
 }
 
@@ -167,15 +186,15 @@ function remove_from_path($dir,$global) {
     $dir = fullpath $dir
 
     # future sessions
-    $was_in_path, $newpath = strip_path (env 'path' $global) $dir
+    $was_in_path, $newpath = strip_path (env 'path' -t $global) $dir
     if($was_in_path) {
         echo "removing $(friendly_path $dir) from your path"
-        env 'path' $global $newpath
+        env 'path' -t $global $newpath
     }
 
     # current session
     $was_in_path, $newpath = strip_path $env:path $dir
-    if($was_in_path) { $env:path = $newpath }
+    if($was_in_path) { env 'path' $newpath }
 }
 
 function ensure_scoop_in_path($global) {
