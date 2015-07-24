@@ -1,5 +1,5 @@
 function nightly_version($date, $quiet = $false) {
-	$date_str = $date.tostring("yyyyMMdd") 
+	$date_str = $date.tostring("yyyyMMdd")
 	if (!$quiet) {
 		warn "this is a nightly version: downloaded files won't be verified"
 	}
@@ -513,14 +513,14 @@ function rm_shim($name, $shimdir) {
 	# other shim types might be present
 	'.exe', '.shim', '.cmd' | % {
 		if(test-path "$shimdir\$name$_") { rm "$shimdir\$name$_" }
-	}	
+	}
 }
 
 function rm_shims($manifest, $global) {
 	$manifest.bin | ?{ $_ -ne $null } | % {
 		$target, $name, $null = shim_def $_
 		$shimdir = shimdir $global
-		
+
 		rm_shim $name $shimdir
 	}
 }

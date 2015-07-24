@@ -6,7 +6,7 @@ describe "manifest-validation" {
     $bucketdir = "$psscriptroot\..\bucket\"
     $manifest_files = gci $bucketdir *.json
 
-    $manifest_files | % { 
+    $manifest_files | % {
         it "test validity of $_" {
             $manifest = parse_json $_.fullname
 

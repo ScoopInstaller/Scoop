@@ -27,6 +27,7 @@ function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 # apps
+function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global=$null) {
 	if($global -eq $null) { return (installed $app $true) -or (installed $app $false) }
 	return test-path (appdir $app $global)
@@ -147,7 +148,7 @@ function ensure_in_path($dir, $global) {
 	$dir = fullpath $dir
 	if($path -notmatch [regex]::escape($dir)) {
 		echo "adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path"
-		
+
 		env 'path' $global "$dir;$path" # for future sessions...
 		$env:path = "$dir;$env:path" # for this session
 	}
@@ -163,7 +164,7 @@ function remove_from_path($dir,$global) {
 
 	# future sessions
 	$was_in_path, $newpath = strip_path (env 'path' $global) $dir
-	if($was_in_path) { 
+	if($was_in_path) {
 		echo "removing $(friendly_path $dir) from your path"
 		env 'path' $global $newpath
 	}
@@ -234,7 +235,7 @@ function reset_alias($name, $value) {
 		new-item -path function: -name "script:$name" -value $value | out-null
 		return
 	}
-	
+
 	set-alias $name $value -scope script -option allscope
 }
 
