@@ -48,7 +48,7 @@ describe "unzip_old" {
     function test-unzip($from) {
         $to = strip_ext $from
 
-        unzip_old $from $to 
+        unzip_old $from $to
 
         $to
     }
@@ -66,7 +66,7 @@ describe "unzip_old" {
 
     context "zip file is small in size" {
         $small = "$working_dir\small.zip"
-        
+
         it "unzips file which is small in size" {
             $to = test-unzip $small
 
@@ -166,4 +166,13 @@ describe "ensure_robocopy_in_path" {
             "$shimdir/robocopy.exe" | should not exist
         }
     }
+}
+
+describe 'sanitary_path' {
+  it 'removes invalid path characters from a string' {
+    $path = 'test?.json'
+    $valid_path = sanitary_path $path
+
+    $valid_path | should be "test.json"
+  }
 }
