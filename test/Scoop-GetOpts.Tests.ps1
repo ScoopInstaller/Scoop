@@ -45,4 +45,27 @@ describe "getopt" {
 		$opt.global | should be $true
 		$opt.a | should be '32bit'
 	}
+
+	it 'handles regex characters' {
+		$a = "-?"
+		{ $opt, $rem, $err = getopt $a 'ga:' 'global' 'arch=' } | should not throw
+		{ $null, $null, $null = getopt $a '?:' 'help' | should not throw }
+	}
+
+	it 'handles short option without required argument' {
+		$null, $null, $err = getopt '-x' 'x' ''
+		$err | should be $null
+	}
+
+	it 'handles long option without required argument' {
+		$opt, $null, $err = getopt '--long-arg' '' 'long-arg'
+		$err | should be $null
+		$opt."long-arg" | should be $true
+	}
+
+	it 'handles long option with required argument' {
+		$opt, $null, $err = getopt '--long-arg', 'test' '' 'long-arg='
+		$err | should be $null
+		$opt."long-arg" | should be "test"
+	}
 }
