@@ -1,5 +1,8 @@
+. "$psscriptroot/core.ps1"
+
 function manifest_path($app, $bucket) {
-	"$(bucketdir $bucket)\$app.json"
+
+	"$(bucketdir $bucket)\$(sanitary_path $app).json"
 }
 
 function parse_json($path) {
