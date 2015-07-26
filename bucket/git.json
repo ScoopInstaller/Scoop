@@ -1,15 +1,19 @@
 {
-	"homepage": "http://msysgit.github.io/",
-	"license": "GPL2",
-	"version": "1.9.5-preview20150319",
-	"url": "https://github.com/msysgit/msysgit/releases/download/Git-1.9.5-preview20150319/PortableGit-1.9.5-preview20150319.7z",
-	"hash": "26261872847b18d171a197c8e4b3f4c0e60b4310c4b8ef1f4d9884950288aa7c",
-	"bin": [ "cmd\\git.exe", "cmd\\gitk.cmd" ],
-	"post_install": [
-		"git config --global credential.helper wincred"
-	],
-	"checkver": {
-		"url": "http://git-scm.com/download/win",
-		"re": "downloading version <strong>([^<]+)</strong>"
-	}
+  "homepage": "https://git-for-windows.github.io/",
+  "license": "GPL2",
+  "version": "2.4.6.windows.1",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/git-for-windows/git/releases/download/v2.4.6.windows.1/PortableGit-2.4.6-5th-release-candidate-64-bit.7z.exe#/dl.7z",
+      "hash": "cc7d8df6edf7bd3689d685a2da7561ca7aee34936e868b475cddd72bfc6f953b"
+    },
+  	"32bit": {
+  	  "url": "https://github.com/git-for-windows/git/releases/download/v2.4.6.windows.1/PortableGit-2.4.6-5th-release-candidate-32-bit.7z.exe#/dl.7z",
+  	  "hash": "1b373b2238f44b0d96ae07a9965399caeb31180bf3cdd6585e3c34a4851dc9c2"
+  	}
+  },
+  "bin": [ "cmd\\git.exe", "cmd\\gitk.exe", "cmd\\git-gui.exe" ],
+  "post_install": [
+    "git config --global credential.helper wincred"
+  ]
 }
