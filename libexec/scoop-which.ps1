@@ -9,7 +9,7 @@ reset_aliases
 
 if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 
-try { $gcm = gcm $command -ea stop } catch { }
+try { $gcm = gcm "$command.ps1" -ea stop } catch { }
 if(!$gcm) { [console]::error.writeline("'$command' not found"); exit 3 }
 
 $path = "$($gcm.path)"
@@ -18,8 +18,16 @@ $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
 
 if($path -like "$usershims*" -or $path -like "$globalshims*") {
 	$shimtext = gc $path
-    $exepath = $shimtext | sls '(?m)^\$path = (''|")([^\1]+)\1' | % { $_.matches[0].groups[2].value }
+    $exepath = ($shimtext |? { $_.startswith('$path') }).split(' ') `
+		| select -Last 1 | iex
+
+	if (![system.io.path]::ispathrooted($exepath)) {
+		$exepath = resolve-path (join-path (split-path $path) $exepath)
+	}
+
 	friendly_path $exepath
+} elseif($gcm.commandtype -eq 'Alias') {
+	scoop which $gcm.resolvedcommandname
 } else {
 	[console]::error.writeline("not a scoop shim")
 	$path
