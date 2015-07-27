@@ -111,11 +111,16 @@ function shim($path, $global, $name, $arg) {
 
 	$shim = "$abs_shimdir\$($name.tolower()).ps1"
 
+	# convert to relative path
+	pushd $abs_shimdir
+	$relative_path = resolve-path -relative $path
+	popd
+
 	# note: use > for first line to replace file, then >> to append following lines
 	echo '# ensure $HOME is set for MSYS programs' > $shim
 	echo "if(!`$env:home) { `$env:home = `"`$home\`" }" >> $shim
 	echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' >> $shim
-	echo "`$path = `"$path`"" >> $shim
+	echo "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" >> $shim
 	if($arg) {
 		echo "`$args = '$($arg -join "', '")', `$args" >> $shim
 	}
