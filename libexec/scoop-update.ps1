@@ -22,6 +22,9 @@
 
 reset_aliases
 
+$update_restart = [int]$env:SCOOP__updateRestart
+$args_initial = $args
+
 $opt, $apps, $err = getopt $args 'gfkq' 'global','force', 'no-cache', 'quiet'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
@@ -35,7 +38,13 @@ function update_scoop() {
 	if(!$git) { abort "scoop uses git to update itself. run 'scoop install git'." }
 
 	"updating scoop..."
-	$currentdir = fullpath $(versiondir 'scoop' 'current')
+    $update_code_paths = @( $script:MyInvocation.MyCommand.Path, "$psscriptroot\..\lib\core.ps1" )
+    # ref: http://stackoverflow.com/questions/10521061/how-to-get-an-md5-checksum-in-powershell/10521162#10521162
+    [byte[]] $code_bytes = @();
+    foreach ($path in $update_code_paths) { $code_bytes += [System.IO.File]::ReadAllBytes($path) }
+    $md5 = New-Object -TypeName System.Security.Cryptography.MD5CryptoServiceProvider
+    $hash_original = [System.BitConverter]::ToString($md5.ComputeHash($code_bytes))
+    $currentdir = fullpath $(versiondir 'scoop' 'current')
 	if(!(test-path "$currentdir\.git")) {
 		# load config
 		$repo = $(scoop config SCOOP_REPO)
@@ -64,6 +73,21 @@ function update_scoop() {
 
 	ensure_scoop_in_path
 	shim "$currentdir\bin\scoop.ps1" $false
+
+    [byte[]] $code_bytes = @();
+    foreach ($path in $update_code_paths) { $code_bytes += [System.IO.File]::ReadAllBytes($path) }
+    $hash_new = [System.BitConverter]::ToString($md5.ComputeHash($code_bytes))
+    if ( $hash_new -ne $hash_original ) {
+        $max_restarts = 1
+        if ( $update_restart -gt $max_restarts ) {
+            warn "scoop update code was changed, please re-run 'scoop update'"
+        }
+        else {
+            write-host "scoop update code was changed, restarting update..."
+            scoop update -__updateRestart $($update_restart + 1) $args_initial
+            exit $lastExitCode
+        }
+    }
 
 	@(buckets) | % {
 		"updating $_ bucket..."
