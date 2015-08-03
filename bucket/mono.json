@@ -1,0 +1,12 @@
+{
+    "version":  "4.0.2",
+    "license":  "https://raw.githubusercontent.com/mono/mono/master/LICENSE",
+    "url":  "http://download.mono-project.com/archive/4.0.2/windows-installer/mono-4.0.2-gtksharp-2.12.26-win32-0.msi",
+    "homepage":  "http://www.mono-project.com/",
+    "hash":  "15240b0d447c3e438c9df95378848a6ea3dccbdd463dce4e8f38c42df55f27ca",
+    "extract_dir":  "Mono",
+    "bin":  [
+        "bin\\mono.exe",
+        "bin\\xbuild.bat"
+    ]
+}
