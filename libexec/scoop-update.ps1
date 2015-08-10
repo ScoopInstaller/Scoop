@@ -62,7 +62,7 @@ function update_scoop() {
         popd
     }
 
-    ensure_scoop_in_path
+    ensure_scoop_in_path $false
     shim "$currentdir\bin\scoop.ps1" $false
 
     @(buckets) | % {
