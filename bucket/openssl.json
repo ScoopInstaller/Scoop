@@ -1,18 +1,18 @@
 {
-	"homepage": "http://slproweb.com/products/Win32OpenSSL.html",
-	"version": "1.0.2b",
-	"license": "https://www.openssl.org/source/license.html",
-	"architecture": {
-		"64bit": {
-			"url": "http://slproweb.com/download/Win64OpenSSL-1_0_2b.exe",
-			"hash": "e95f5b70e0275d5766348f4ab8120b5ad82e9af69242665777cb4300dee216a5"
-		},
-		"32bit": {
-			"url": "http://slproweb.com/download/Win32OpenSSL-1_0_2b.exe",
-			"hash": "3a017ee86a8e22304dadd960524546fb65ab80cb75b058f46b719ec244c40c23"
-		}
-	},
-	"innosetup": true,
-	"bin": "bin\\openssl.exe",
-	"checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^ ]+) Light</a>"
+    "homepage": "http://slproweb.com/products/Win32OpenSSL.html",
+    "version": "1.0.2d",
+    "license": "https://www.openssl.org/source/license.html",
+    "architecture": {
+        "64bit": {
+            "url": "http://slproweb.com/download/Win64OpenSSL-1_0_2d.exe",
+            "hash": "9e62364a75cf7a55ce8167f9a4992aa38c55ba362594e4579e27f9c0758c2284"
+        },
+        "32bit": {
+            "url": "http://slproweb.com/download/Win32OpenSSL-1_0_2d.exe",
+            "hash": "68796d75cd8cc5a34d5fa997805a373d2c701179a270efd0a513b197ea15736c"
+        }
+    },
+    "innosetup": true,
+    "bin": "bin\\openssl.exe",
+    "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^ ]+) Light</a>"
 }
