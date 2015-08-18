@@ -15,75 +15,75 @@ if($app) { $search = $app }
 # get apps to check
 $queue = @()
 gci $dir "$search.json" | % {
-	$json = parse_json "$dir\$_"
-	if($json.checkver) {
-		$queue += ,@($_, $json)
-	}
+    $json = parse_json "$dir\$_"
+    if($json.checkver) {
+        $queue += ,@($_, $json)
+    }
 }
 
 # clear any existing events
 get-event | % {
-	remove-event $_.sourceidentifier
+    remove-event $_.sourceidentifier
 }
 
 # start all downloads
 $queue | % {
-	$wc = new-object net.webclient
-	register-objectevent $wc downloadstringcompleted -ea stop | out-null
+    $wc = new-object net.webclient
+    register-objectevent $wc downloadstringcompleted -ea stop | out-null
 
-	$name, $json = $_
+    $name, $json = $_
 
-	$url = $json.checkver.url
-	if(!$url) { $url = $json.homepage }
+    $url = $json.checkver.url
+    if(!$url) { $url = $json.homepage }
 
-	$state = new-object psobject @{
-		app = (strip_ext $name);
-		url = $url;
-		json = $json;
-	}
+    $state = new-object psobject @{
+        app = (strip_ext $name);
+        url = $url;
+        json = $json;
+    }
 
-	$wc.downloadstringasync($url, $state)
+    $wc.downloadstringasync($url, $state)
 }
 
 # wait for all to complete
 $in_progress = $queue.length
 while($in_progress -gt 0) {
-	$ev = wait-event
-	remove-event $ev.sourceidentifier
-	$in_progress--
+    $ev = wait-event
+    remove-event $ev.sourceidentifier
+    $in_progress--
 
-	$state = $ev.sourceeventargs.userstate
-	$app = $state.app
-	$json = $state.json
-	$url = $state.url
-	$expected_ver = $json.version
+    $state = $ev.sourceeventargs.userstate
+    $app = $state.app
+    $json = $state.json
+    $url = $state.url
+    $expected_ver = $json.version
 
-	$err = $ev.sourceeventargs.error
-	$page = $ev.sourceeventargs.result
+    $err = $ev.sourceeventargs.error
+    $page = $ev.sourceeventargs.result
 
-	$regexp = $json.checkver.re
-	if(!$regexp) { $regexp = $json.checkver }
+    $regexp = $json.checkver.re
+    if(!$regexp) { $regexp = $json.checkver }
 
-	$regexp = "(?s)$regexp"
-	
-	write-host "$app`: " -nonewline
+    $regexp = "(?s)$regexp"
 
-	if($err) {
-		write-host "ERROR: $err" -f darkyellow
-	} else {
-		if($page -match $regexp) {
-			$ver = $matches[1]
-			if($ver -eq $expected_ver) {
-				write-host "$ver" -f darkgreen
-			} else {
-				write-host "$ver" -f darkred -nonewline
-				write-host " (scoop version is $expected_ver)"
-			}
-			
-		} else {
-			write-host "couldn't match '$regexp' in $url" -f darkred
-		}
-	}
+    write-host "$app`: " -nonewline
+
+    if($err) {
+        write-host "ERROR: $err" -f darkyellow
+    } else {
+        if($page -match $regexp) {
+            $ver = $matches[1]
+            if($ver -eq $expected_ver) {
+                write-host "$ver" -f darkgreen
+            } else {
+                write-host "$ver" -f darkred -nonewline
+                write-host " (scoop version is $expected_ver)"
+            }
+
+        } else {
+            write-host "couldn't match '$regexp' in $url" -f darkred
+        }
+    }
 }
 
 <#
@@ -99,15 +99,15 @@ if(!$regexp) { $regexp = $json.checkver }
 $page = $wc.downloadstring($url)
 
 if($page -match $regexp) {
-	$ver = $matches[1]
-	if($ver -eq $expected_ver) {
-		write-host "$ver" -f darkgreen
-	} else {
-		write-host "$ver" -f darkred -nonewline
-		write-host " (scoop version is $expected_ver)"
-	}
-	
+    $ver = $matches[1]
+    if($ver -eq $expected_ver) {
+        write-host "$ver" -f darkgreen
+    } else {
+        write-host "$ver" -f darkred -nonewline
+        write-host " (scoop version is $expected_ver)"
+    }
+
 } else {
-	write-host "couldn't match '$regexp' in $url" -f darkred
+    write-host "couldn't match '$regexp' in $url" -f darkred
 }
 #>

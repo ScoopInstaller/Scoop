@@ -16,17 +16,17 @@ $global = installed_apps $true | % { @{ name = $_; global = $true } }
 $apps = @($local) + @($global)
 
 if($apps) {
-	echo "Installed apps$(if($query) { `" matching '$query'`"}):
+    echo "Installed apps$(if($query) { `" matching '$query'`"}):
 "
-	$apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
+    $apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
         $app = $_.name
         $global = $_.global
         $ver = current_version $app $global
         $global_display = $null; if($global) { $global_display = '*global*'}
 
-		"  $app ($ver) $global_display"
-	}
-	""
+        "  $app ($ver) $global_display"
+    }
+    ""
     exit 0
 } else {
     "there aren't any apps installed"

@@ -1,21 +1,21 @@
 {
-	"homepage": "http://nodejs.org",
-	"version": "0.12.7",
-	"license": "MIT",
-	"architecture": {
-		"64bit": {
-			"url": "http://nodejs.org/dist/v0.12.7/x64/node-v0.12.7-x64.msi",
-			"hash": "sha1:05cfffda323563c42ff2e461a8e98ee984ad15d1"
-		},
-		"32bit": {
-			"url": "http://nodejs.org/dist/v0.12.7/node-v0.12.7-x86.msi",
-			"hash": "sha1:7aa06c0d54c97e5193bafc927dbe1bede308da97"
-		}
-	},
-	"env_add_path": "nodejs",
-	"post_install": "
+    "homepage": "http://nodejs.org",
+    "version": "0.12.7",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "http://nodejs.org/dist/v0.12.7/x64/node-v0.12.7-x64.msi",
+            "hash": "sha1:05cfffda323563c42ff2e461a8e98ee984ad15d1"
+        },
+        "32bit": {
+            "url": "http://nodejs.org/dist/v0.12.7/node-v0.12.7-x86.msi",
+            "hash": "sha1:7aa06c0d54c97e5193bafc927dbe1bede308da97"
+        }
+    },
+    "env_add_path": "nodejs",
+    "post_install": "
 # Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
 rm $dir\\nodejs\\node_modules\\npm\\npmrc
 npm update -g",
-	"checkver": "<p class=\"version\">Current Version: v([0-9\\.]+)</p>"
+    "checkver": "<p class=\"version\">Current Version: v([0-9\\.]+)</p>"
 }

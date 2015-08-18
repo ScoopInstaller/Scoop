@@ -5,9 +5,9 @@
         "https://raw.githubusercontent.com/aspnet/Home/master/kvm.ps1"
     ],
     "homepage":  "https://github.com/aspnet/Home",
-    "env_set": { 
+    "env_set": {
         "KRE_HOME": "$dir\\.k",
-        "KRE_USER_HOME": "$dir\\.k" 
+        "KRE_USER_HOME": "$dir\\.k"
         },
     "bin": "kvm.ps1",
     "post_install": "iex \"kvm upgrade\""

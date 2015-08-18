@@ -1,4 +1,4 @@
 {
-	"extras": "https://github.com/lukesampson/scoop-extras.git",
-	"nirsoft": "https://github.com/kodybrown/scoop-nirsoft"
+    "extras": "https://github.com/lukesampson/scoop-extras.git",
+    "nirsoft": "https://github.com/kodybrown/scoop-nirsoft"
 }

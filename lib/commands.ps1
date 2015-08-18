@@ -1,15 +1,15 @@
 function command_files {
-	(gci (relpath '..\libexec')) `
+    (gci (relpath '..\libexec')) `
         + (gci "$scoopdir\shims") `
         | where { $_.name -match 'scoop-.*?\.ps1$' }
 }
 
 function commands {
-	command_files | % { command_name $_ }
+    command_files | % { command_name $_ }
 }
 
 function command_name($filename) {
-	$filename.name | sls 'scoop-(.*?)\.ps1$' | % { $_.matches[0].groups[1].value }
+    $filename.name | sls 'scoop-(.*?)\.ps1$' | % { $_.matches[0].groups[1].value }
 }
 
 function command_path($cmd) {
@@ -25,7 +25,7 @@ function command_path($cmd) {
             $cmd_path = $path
         }
         else { $cmd_path = $shim_path }
-    } 
+    }
 
     $cmd_path
 }
@@ -33,5 +33,5 @@ function command_path($cmd) {
 function exec($cmd, $arguments) {
     $cmd_path = command_path $cmd
 
-	& $cmd_path @arguments
+    & $cmd_path @arguments
 }

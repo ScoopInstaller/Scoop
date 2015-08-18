@@ -16,12 +16,12 @@ function create_manifest($url) {
         abort "Error: $url is not a valid URL"
     }
 
-    $name = choose_item $url_parts "App name" 
-    $name = if ($name.Length -gt 0) { 
-        $name 
-    } 
-    else { 
-        file_name ($url_parts | select-object -last 1) 
+    $name = choose_item $url_parts "App name"
+    $name = if ($name.Length -gt 0) {
+        $name
+    }
+    else {
+        file_name ($url_parts | select-object -last 1)
     }
 
     $manifest.version = choose_item $url_parts "Version"

@@ -1,12 +1,12 @@
 {
-	"version": "1.0.5",
-	"homepage": "http://gnuwin32.sourceforge.net/packages/bzip2.htm",
-	"url": "http://ufpr.dl.sourceforge.net/project/gnuwin32/bzip2/1.0.5/bzip2-1.0.5-bin.zip",
-	"hash": "md5:a1155c41b1954a2f6da1014c7c1a1263",
-	"bin": [
-		"bin\\bunzip2.exe",
-		"bin\\bzcat.exe",
-		"bin\\bzip2.exe",
-		"bin\\bzip2recover.exe"
-	]
+    "version": "1.0.5",
+    "homepage": "http://gnuwin32.sourceforge.net/packages/bzip2.htm",
+    "url": "http://ufpr.dl.sourceforge.net/project/gnuwin32/bzip2/1.0.5/bzip2-1.0.5-bin.zip",
+    "hash": "md5:a1155c41b1954a2f6da1014c7c1a1263",
+    "bin": [
+        "bin\\bunzip2.exe",
+        "bin\\bzcat.exe",
+        "bin\\bzip2.exe",
+        "bin\\bzip2recover.exe"
+    ]
 }

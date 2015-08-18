@@ -1,8 +1,8 @@
 {
-	"homepage": "http://www.rodneybeede.com/Compile_Netcat_on_Windows_using_MinGW.html",
-	"version": "1.11",
-	"url": "http://www.rodneybeede.com/downloads/nc111nt_rodneybeede.zip",
-	"hash": "cf46a1a2bd75260638598908075ebfa37ac0a5073e9555025895e506fe8a0807",
-	"extract_dir": "nc111nt_rodneybeede",
-	"bin": "nc.exe"
+    "homepage": "http://www.rodneybeede.com/Compile_Netcat_on_Windows_using_MinGW.html",
+    "version": "1.11",
+    "url": "http://www.rodneybeede.com/downloads/nc111nt_rodneybeede.zip",
+    "hash": "cf46a1a2bd75260638598908075ebfa37ac0a5073e9555025895e506fe8a0807",
+    "extract_dir": "nc111nt_rodneybeede",
+    "bin": "nc.exe"
 }

@@ -3,7 +3,7 @@
 # Help: Add, remove or list Scoop aliases
 #
 # Aliases are custom Scoop subcommands that can be created to make common tasks
-# easier. 
+# easier.
 #
 # To add an Alias:
 #     scoop alias add <name> <command> <description>
@@ -44,7 +44,7 @@ function add_alias($name, $command) {
 
   # generate script
   $shimdir = shimdir $false
-  $script = 
+  $script =
 @"
 # Summary: $description
 $command
@@ -72,7 +72,7 @@ function rm_alias($name) {
 
 function list_aliases {
   $aliases = @{}
-  (get_config $script:config_alias).getenumerator() |% { 
+  (get_config $script:config_alias).getenumerator() |% {
     $summary = summary (gc (command_path $_.name) -raw)
     if(!($summary)) { $summary = '' }
     $aliases.add("$($_.name) ", $summary)

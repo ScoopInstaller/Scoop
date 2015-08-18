@@ -5,7 +5,7 @@
         "https://raw.githubusercontent.com/aspnet/Home/dev/dnvm.ps1"
     ],
     "homepage":  "https://github.com/aspnet/Home",
-    "env_set": { 
+    "env_set": {
         "DNX_HOME": "$dir\\.dnx",
         "DNX_USER_HOME": "$dir\\.dnx"
         },
