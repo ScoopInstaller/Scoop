@@ -1,8 +1,8 @@
 {
 	"homepage": "http://www.apachelounge.com",
-	"version": "2.4.12",
+	"version": "2.4.16",
 	"license": "Apache 2.0",
-	"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.12-win32-VC11.zip",
+	"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.16-win32-VC11.zip",
 	"hash": "DBA963DB9819CD2AE3CB0E970F4159E199981F9BA0B33C537395C6AE1222951D",
 	"extract_dir": "Apache24",
 	"bin": [
