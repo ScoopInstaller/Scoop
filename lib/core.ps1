@@ -116,7 +116,6 @@ function shim($path, $global, $name, $arg) {
 	$relative_path = resolve-path -relative $path
 	popd
 
-	# note: use > for first line to replace file, then >> to append following lines
 	echo '# ensure $HOME is set for MSYS programs' | out-file $shim -encoding oem
 	echo "if(!`$env:home) { `$env:home = `"`$home\`" }" | out-file $shim -encoding oem -append
 	echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' | out-file $shim -encoding oem -append
