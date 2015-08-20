@@ -116,15 +116,14 @@ function shim($path, $global, $name, $arg) {
 	$relative_path = resolve-path -relative $path
 	popd
 
-	# note: use > for first line to replace file, then >> to append following lines
-	echo '# ensure $HOME is set for MSYS programs' > $shim
-	echo "if(!`$env:home) { `$env:home = `"`$home\`" }" >> $shim
-	echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' >> $shim
-	echo "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" >> $shim
+	echo '# ensure $HOME is set for MSYS programs' | out-file $shim -encoding oem
+	echo "if(!`$env:home) { `$env:home = `"`$home\`" }" | out-file $shim -encoding oem -append
+	echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' | out-file $shim -encoding oem -append
+	echo "`$path = `"$path`"" | out-file $shim -encoding oem -append
 	if($arg) {
-		echo "`$args = '$($arg -join "', '")', `$args" >> $shim
+		echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding oem -append
 	}
-	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' >> $shim
+	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding oem -append
 
 	if($path -match '\.exe$') {
 		# for programs with no awareness of any shell
