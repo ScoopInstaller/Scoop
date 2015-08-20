@@ -1,8 +1,8 @@
 {
 	"homepage": "http://innounp.sourceforge.net",
-	"version": "0.40",
-	"url": "http://heanet.dl.sourceforge.net/project/innounp/innounp/innounp%200.40/innounp040.rar",
-	"hash": "e661ae8b5ed3cfb5a5536b5848d4f10d41a3b0a2249543781195f8fabd37b6e4",
+	"version": "0.43",
+	"url": "http://sourceforge.net/projects/innounp/files/innounp/innounp%200.43/innounp043.rar",
+	"hash": "b03cbbfabd7be82a148aed2a8b4de9f554b40f8dc84e2577420ba2ef7d866338",
 	"bin": "innounp.exe",
 	"checkver": "<a name=\"History\">.*?<b>([0-9\\.]+)</b>"
 }

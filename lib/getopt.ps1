@@ -15,6 +15,10 @@ function getopt($argv, $shortopts, $longopts) {
 		$opts, $rem, $msg
 	}
 
+	function regex_escape($str) {
+		return [regex]::escape($str)
+	}
+
 	# ensure these are arrays
 	$argv = @($argv)
 	$longopts = @($longopts)
@@ -46,7 +50,7 @@ function getopt($argv, $shortopts, $longopts) {
 			for($j = 1; $j -lt $arg.length; $j++) {
 				$letter = $arg[$j].tostring()
 
-				if($shortopts -match "$letter`:?") {
+				if($shortopts -match "$(regex_escape $letter)`:?") {
 					$shortopt = $matches[0]
 					if($shortopt[1] -eq ':') {
 						if($j -ne $arg.length -1 -or $i -eq $argv.length - 1) {

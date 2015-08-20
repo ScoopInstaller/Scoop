@@ -14,8 +14,8 @@ describe "travel_dir" {
 	}
 
 	it 'common directory remains unchanged in destination' {
-		"$to\common\version.txt" | should contain "version 1.1" 
-		"$to\common with spaces\version.txt" | should contain "version 1.1" 
+		"$to\common\version.txt" | should contain "version 1.1"
+		"$to\common with spaces\version.txt" | should contain "version 1.1"
 	}
 
 	it 'common directory remains unchanged in source' {
