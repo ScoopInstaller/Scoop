@@ -3,7 +3,7 @@
 	"version": "2.4.16",
 	"license": "Apache 2.0",
 	"url": "http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.16-win32-VC11.zip",
-	"hash": "DBA963DB9819CD2AE3CB0E970F4159E199981F9BA0B33C537395C6AE1222951D",
+	"hash": "8AD891742E985DB1B7785B49E2C9D517CC953691B4355EE178ECCB58DEED3C0D",
 	"extract_dir": "Apache24",
 	"bin": [
 		"bin\\ab.exe",
@@ -25,6 +25,6 @@ $root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\
 ",
 	"checkver": {
 		"url": "http://www.apachelounge.com/download/",
-		"re": "Apache ([0-9\\.]+) Win64"
+		"re": "Apache ([0-9\\.]+) Win32"
 	}
 }
