@@ -2,6 +2,8 @@
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\Scoop-TestLib.ps1"
 
+$repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
+
 describe "movedir" {
     $extract_dir = "subdir"
     $extract_to = $null
@@ -59,7 +61,9 @@ describe "unzip_old" {
         it "unzips file with zero bytes without error" {
             $to = test-unzip $zerobyte
 
+            $to | should not be $null
             $to | should exist
+
             (gci $to).count | should be 0
         }
     }
@@ -136,7 +140,7 @@ describe "rm_shim" {
 
 describe "ensure_robocopy_in_path" {
     $shimdir = shimdir $false
-    mock versiondir { ".\" }
+    mock versiondir { $repo_dir }
 
     beforeall {
         reset_aliases
