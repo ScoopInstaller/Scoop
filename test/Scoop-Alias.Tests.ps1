@@ -1,12 +1,14 @@
-. "$psscriptroot\..\libexec\scoop-alias.ps1"
+. "$psscriptroot\..\libexec\scoop-alias.ps1" | out-null
 
 reset_aliases
 
 describe "add_alias" {
-  mock shimdir { "test\fixtures\shim" }
+  mock shimdir { "TestDrive:\shim" }
   mock set_config { }
   mock get_config { @{} }
+
   $shimdir = shimdir
+  mkdir $shimdir
 
   context "alias doesn't exist" {
     it "creates a new alias" {
@@ -28,17 +30,15 @@ describe "add_alias" {
       $alias_file | should contain ""
     }
   }
-
-  aftereach {
-    rm "test\fixtures\shim\scoop-rm.ps1" -ea ignore
-  }
 }
 
 describe "rm_alias" {
-  mock shimdir { "test\fixtures\shim" }
-  $shimdir = shimdir
+  mock shimdir { "TestDrive:\shim" }
   mock set_config { }
   mock get_config { @{} }
+
+  $shimdir = shimdir
+  mkdir $shimdir
 
   context "alias exists" {
     it "removes an existing alias" {
@@ -51,9 +51,5 @@ describe "rm_alias" {
       rm_alias "rm"
       $alias_file | should not exist
     }
-  }
-
-  afterall {
-    rm "test\fixtures\shim\scoop-rm.ps1" -ea ignore
   }
 }
