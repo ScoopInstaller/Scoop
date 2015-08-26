@@ -9,10 +9,8 @@ describe 'Project style constraints' {
 
     it 'files do not contain leading utf-8 BOM' {
         # utf-8 BOM == 0xEF 0xBB 0xBF
-        # NOTE: utf-16LE BOM == 0xFF 0xFE; utf-16LE BOM == 0xFF 0xFE
         # see http://www.powershellmagazine.com/2012/12/17/pscxtip-how-to-determine-the-byte-order-mark-of-a-text-file @@ https://archive.is/RgT42
         # ref: http://poshcode.org/2153 @@ https://archive.is/sGnnu
-        # ref: http://www.johndcook.com/blog/powershell_perl_regex @@ https://archive.is/gHa60
         $badFiles = @(
             foreach ($file in $files)
             {
@@ -31,7 +29,6 @@ describe 'Project style constraints' {
     }
 
     it 'files all have line endings which are CRLF' {
-        # ref: http://www.johndcook.com/blog/powershell_perl_regex @@ https://archive.is/gHa60
         $badFiles = @(
             foreach ($file in $files)
             {
