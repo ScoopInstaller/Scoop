@@ -7,7 +7,8 @@ describe 'Project code' {
     )
 
     function Test-PowerShellSyntax {
-        #ref: http://powershell.org/wp/forums/topic/how-to-check-syntax-of-scripts-automatically @@ https://archive.is/xtSv6
+        # ref: http://powershell.org/wp/forums/topic/how-to-check-syntax-of-scripts-automatically @@ https://archive.is/xtSv6
+        # originally created by Alexander Petrovskiy & Dave Wyatt
         [CmdletBinding()]
         param (
             [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
