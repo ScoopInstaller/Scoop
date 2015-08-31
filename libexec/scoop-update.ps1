@@ -22,6 +22,9 @@
 
 reset_aliases
 
+$update_restart = [int]$env:SCOOP__updateRestart
+$args_initial = $args
+
 $opt, $apps, $err = getopt $args 'gfkq' 'global','force', 'no-cache', 'quiet'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
@@ -36,6 +39,7 @@ function update_scoop() {
 
 	"updating scoop..."
 	$currentdir = fullpath $(versiondir 'scoop' 'current')
+    $hash_original = ""
 	if(!(test-path "$currentdir\.git")) {
 		# load config
 		$repo = $(scoop config SCOOP_REPO)
@@ -58,9 +62,24 @@ function update_scoop() {
 	}
 	else {
 		pushd $currentdir
+        $hash_original = git describe --all --long
 		git pull -q
 		popd
 	}
+    pushd $currentdir
+    $hash_new = git describe --all --long
+    popd
+    if ( $hash_new -ne $hash_original ) {
+        $max_restarts = 1
+        if ( $update_restart -gt $max_restarts ) {
+            warn "scoop code was changed, please re-run 'scoop update'"
+        }
+        else {
+            write-host "scoop code was changed, restarting update..."
+            scoop update -__updateRestart $($update_restart + 1) $args_initial
+            exit $lastExitCode
+        }
+    }
 
 	ensure_scoop_in_path
 	shim "$currentdir\bin\scoop.ps1" $false
