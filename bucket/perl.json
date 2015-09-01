@@ -1,23 +1,23 @@
 {
-	"homepage": "http://strawberryperl.com",
-	"version": "5.20.1.1",
-	"license": "GPL",
-	"architecture": {
-		"32bit": {
-			"url": "http://strawberryperl.com/download/5.20.1.1/strawberry-perl-5.20.1.1-32bit-portable.zip",
-			"hash": "sha1:6929ca3d0b65e514ed73c829f6f648f92cc47b80"
-		},
-		"64bit": {
-			"url": "http://strawberryperl.com/download/5.20.1.1/strawberry-perl-5.20.1.1-64bit-portable.zip",
-			"hash": "sha1:844e7c2d741bda915ece0688bf3a00ab12577460"
-		}
-	},
-	"post_install":"
-		# enable standard idiomatic access to user's home directory
-		## remove HomeDir section from portable.perl (disables Portable.pm override of File::HomeDir)
-		## NOTE: conversion to byte[] avoids adding an extra trailing newline to the output file
-		[byte[]][char[]]((Get-Content -raw $dir\\portable.perl) -replace \"(?ms)^HomeDir:.*?^(?=\\S)\",\"\") | Set-Content $dir\\portable.perl -encoding byte
-	",
-	"env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ],
-	"checkver": "<b>Recommended version:</b></p>\\s*<a[^>]*><b>Strawberry Perl ([0-9\\.]+) \\(32bit\\)</b>"
+    "homepage": "http://strawberryperl.com",
+    "version": "5.20.1.1",
+    "license": "GPL",
+    "architecture": {
+        "32bit": {
+            "url": "http://strawberryperl.com/download/5.20.1.1/strawberry-perl-5.20.1.1-32bit-portable.zip",
+            "hash": "sha1:6929ca3d0b65e514ed73c829f6f648f92cc47b80"
+        },
+        "64bit": {
+            "url": "http://strawberryperl.com/download/5.20.1.1/strawberry-perl-5.20.1.1-64bit-portable.zip",
+            "hash": "sha1:844e7c2d741bda915ece0688bf3a00ab12577460"
+        }
+    },
+    "post_install":"
+        # enable standard idiomatic access to user's home directory
+        ## remove HomeDir section from portable.perl (disables Portable.pm override of File::HomeDir)
+        ## NOTE: conversion to byte[] avoids adding an extra trailing newline to the output file
+        [byte[]][char[]]((Get-Content -raw $dir\\portable.perl) -replace \"(?ms)^HomeDir:.*?^(?=\\S)\",\"\") | Set-Content $dir\\portable.perl -encoding byte
+    ",
+    "env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ],
+    "checkver": "<b>Recommended version:</b></p>\\s*<a[^>]*><b>Strawberry Perl ([0-9\\.]+) \\(32bit\\)</b>"
 }

@@ -21,5 +21,5 @@ $architecture = ensure_architecture ($opt.a + $opt.architecture)
 
 $deps = @(deps $app $architecture)
 if($deps) {
-	$deps[($deps.length - 1)..0]
+    $deps[($deps.length - 1)..0]
 }

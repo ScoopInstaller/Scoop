@@ -1,55 +1,55 @@
 {
-	"homepage": "http://www.postgresql.org/",
-	"version": "9.3.0",
-	"license": "http://www.postgresql.org/about/licence/",
-	"architecture": {
-		"64bit": {
-			"url": "http://get.enterprisedb.com/postgresql/postgresql-9.3.0-1-windows-x64-binaries.zip",
-			"hash": "e6467ab923b355942ae0ff7dd4365e4e292c29f0d14f0c94874623779351f952"
-		},
-		"32bit": {
-			"url": "http://get.enterprisedb.com/postgresql/postgresql-9.3.0-1-windows-binaries.zip",
-			"hash": "391c7963edbfc036c6c4cf256930323286b0ca2384cf2c2e0ae8ad7a47778553"
-		}
-	},
-	"extract_dir": "pgsql",
-	"bin": [
-		"bin\\clusterdb.exe",
-		"bin\\createdb.exe",
-		"bin\\createlang.exe",
-		"bin\\createuser.exe",
-		"bin\\dropdb.exe",
-		"bin\\droplang.exe",
-		"bin\\dropuser.exe",
-		"bin\\ecpg.exe",
-		"bin\\initdb.exe",
-		"bin\\isolationtester.exe",
-		"bin\\oid2name.exe",
-		"bin\\pg_archivecleanup.exe",
-		"bin\\pg_basebackup.exe",
-		"bin\\pg_config.exe",
-		"bin\\pg_controldata.exe",
-		"bin\\pg_ctl.exe",
-		"bin\\pg_dump.exe",
-		"bin\\pg_dumpall.exe",
-		"bin\\pg_isolation_regress.exe",
-		"bin\\pg_receivexlog.exe",
-		"bin\\pg_regress.exe",
-		"bin\\pg_regress_ecpg.exe",
-		"bin\\pg_resetxlog.exe",
-		"bin\\pg_restore.exe",
-		"bin\\pg_standby.exe",
-		"bin\\pg_test_fsync.exe",
-		"bin\\pg_test_timing.exe",
-		"bin\\pg_upgrade.exe",
-		"bin\\pgAdmin3.exe",
-		"bin\\pgbench.exe",
-		"bin\\postgres.exe",
-		"bin\\psql.exe",
-		"bin\\reindexdb.exe",
-		"bin\\stackbuilder.exe",
-		"bin\\vacuumdb.exe",
-		"bin\\vacuumlo.exe",
-		"bin\\zic.exe"
-	]
+    "homepage": "http://www.postgresql.org/",
+    "version": "9.3.0",
+    "license": "http://www.postgresql.org/about/licence/",
+    "architecture": {
+        "64bit": {
+            "url": "http://get.enterprisedb.com/postgresql/postgresql-9.3.0-1-windows-x64-binaries.zip",
+            "hash": "e6467ab923b355942ae0ff7dd4365e4e292c29f0d14f0c94874623779351f952"
+        },
+        "32bit": {
+            "url": "http://get.enterprisedb.com/postgresql/postgresql-9.3.0-1-windows-binaries.zip",
+            "hash": "391c7963edbfc036c6c4cf256930323286b0ca2384cf2c2e0ae8ad7a47778553"
+        }
+    },
+    "extract_dir": "pgsql",
+    "bin": [
+        "bin\\clusterdb.exe",
+        "bin\\createdb.exe",
+        "bin\\createlang.exe",
+        "bin\\createuser.exe",
+        "bin\\dropdb.exe",
+        "bin\\droplang.exe",
+        "bin\\dropuser.exe",
+        "bin\\ecpg.exe",
+        "bin\\initdb.exe",
+        "bin\\isolationtester.exe",
+        "bin\\oid2name.exe",
+        "bin\\pg_archivecleanup.exe",
+        "bin\\pg_basebackup.exe",
+        "bin\\pg_config.exe",
+        "bin\\pg_controldata.exe",
+        "bin\\pg_ctl.exe",
+        "bin\\pg_dump.exe",
+        "bin\\pg_dumpall.exe",
+        "bin\\pg_isolation_regress.exe",
+        "bin\\pg_receivexlog.exe",
+        "bin\\pg_regress.exe",
+        "bin\\pg_regress_ecpg.exe",
+        "bin\\pg_resetxlog.exe",
+        "bin\\pg_restore.exe",
+        "bin\\pg_standby.exe",
+        "bin\\pg_test_fsync.exe",
+        "bin\\pg_test_timing.exe",
+        "bin\\pg_upgrade.exe",
+        "bin\\pgAdmin3.exe",
+        "bin\\pgbench.exe",
+        "bin\\postgres.exe",
+        "bin\\psql.exe",
+        "bin\\reindexdb.exe",
+        "bin\\stackbuilder.exe",
+        "bin\\vacuumdb.exe",
+        "bin\\vacuumlo.exe",
+        "bin\\zic.exe"
+    ]
 }

@@ -1,14 +1,14 @@
 {
-	"homepage": "http://gnuwin32.sourceforge.net/packages/sed.htm",
-	"version": "4.2.1",
-	"license": "GPL2",
-	"url": [
-		"http://ufpr.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip",
-		"http://ufpr.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip"
-	],
-	"hash": [
-		"md5:d94e045d98bcd3142bc3c665a5d82a84",
-		"md5:6b0997fa87158fff67457ec1eb96e332"
-	],
-	"bin": "bin\\sed.exe"
+    "homepage": "http://gnuwin32.sourceforge.net/packages/sed.htm",
+    "version": "4.2.1",
+    "license": "GPL2",
+    "url": [
+        "http://ufpr.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip",
+        "http://ufpr.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip"
+    ],
+    "hash": [
+        "md5:d94e045d98bcd3142bc3c665a5d82a84",
+        "md5:6b0997fa87158fff67457ec1eb96e332"
+    ],
+    "bin": "bin\\sed.exe"
 }

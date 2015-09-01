@@ -9,6 +9,6 @@
     "env_set": { "BFG_HOME": "$dir" },
     "pre_install": "
         $exe = 'java -jar $env:BFG_HOME\\bfg-1.12.3.jar $args'
-        write-output $exe | out-file -filepath $dir\\bfg.ps1 
+        write-output $exe | out-file -filepath $dir\\bfg.ps1
     "
 }

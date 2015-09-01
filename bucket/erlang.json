@@ -1,23 +1,23 @@
 {
-	"homepage": "http://www.erlang.org",
-	"version": "R16B02",
-	"license": "http://www.erlang.org/EPLICENSE",
-	"architecture": {
-		"64bit": {
-			"url": "http://www.erlang.org/download/otp_win64_R16B02.exe#/dl.bz",
-			"hash": "8f2f50e377319d364938475b1492f44d257eafd67c23f90246799bf87158a452"
-		},
-		"32bit": {
-			"url": "http://www.erlang.org/download/otp_win32_R16B02.exe#/dl.bz",
-			"hash": "504a7ce4d44e2558b400e64135b6e164d48980cd27b2f869321c5f4d799198b2"
-		}
-	},
-	"extract_dir": "$_OUTDIR",
-	"bin": [
-		"bin\\erl.exe",
-		"bin\\escript.exe"
-	],
-	"post_install": "
+    "homepage": "http://www.erlang.org",
+    "version": "R16B02",
+    "license": "http://www.erlang.org/EPLICENSE",
+    "architecture": {
+        "64bit": {
+            "url": "http://www.erlang.org/download/otp_win64_R16B02.exe#/dl.bz",
+            "hash": "8f2f50e377319d364938475b1492f44d257eafd67c23f90246799bf87158a452"
+        },
+        "32bit": {
+            "url": "http://www.erlang.org/download/otp_win32_R16B02.exe#/dl.bz",
+            "hash": "504a7ce4d44e2558b400e64135b6e164d48980cd27b2f869321c5f4d799198b2"
+        }
+    },
+    "extract_dir": "$_OUTDIR",
+    "bin": [
+        "bin\\erl.exe",
+        "bin\\escript.exe"
+    ],
+    "post_install": "
 $ini = \"$dir\\bin\\erl.ini\"
 $escdir = $dir -replace '\\\\', '\\\\'
 '[erlang]' | out-file $ini -encoding default

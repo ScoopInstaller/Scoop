@@ -29,16 +29,16 @@
 reset_aliases
 
 function ensure_none_installed($apps, $global) {
-	$app = @(all_installed $apps $global)[0] # might return more than one; just get the first
-	if($app) {
-		$global_flag = $null; if($global){$global_flag = ' --global'}
+    $app = @(all_installed $apps $global)[0] # might return more than one; just get the first
+    if($app) {
+        $global_flag = $null; if($global){$global_flag = ' --global'}
 
-		$version = @(versions $app $global)[-1]
-		if(!(install_info $app $version $global)) {
-			abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app$global_flag' before retrying the install."
-		}
-		abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
-	}
+        $version = @(versions $app $global)[-1]
+        if(!(install_info $app $version $global)) {
+            abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app$global_flag' before retrying the install."
+        }
+        abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
+    }
 }
 
 $opt, $apps, $err = getopt $args 'ga:' 'global', 'arch='
@@ -50,7 +50,7 @@ $architecture = ensure_architecture $opt.a + $opt.arch
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if($global -and !(is_admin)) {
-	'ERROR: you need admin rights to install global apps'; exit 1
+    'ERROR: you need admin rights to install global apps'; exit 1
 }
 
 ensure_none_installed $apps $global

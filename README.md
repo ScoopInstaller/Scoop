@@ -11,7 +11,7 @@ Requirements:
 To install:
 
     iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
-    
+
 Once installed, run `scoop help` for instructions.
 
 What does Scoop do?

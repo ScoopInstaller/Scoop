@@ -5,13 +5,13 @@ $cachedir = "$scoopdir\cache" # always local
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 function format($str, $hash) {
-	$hash.keys | % { set-variable $_ $hash[$_] }
-	$executionContext.invokeCommand.expandString($str)
+    $hash.keys | % { set-variable $_ $hash[$_] }
+    $executionContext.invokeCommand.expandString($str)
 }
 function is_admin {
-	$admin = [security.principal.windowsbuiltinrole]::administrator
-	$id = [security.principal.windowsidentity]::getcurrent()
-	([security.principal.windowsprincipal]($id)).isinrole($admin)
+    $admin = [security.principal.windowsbuiltinrole]::administrator
+    $id = [security.principal.windowsidentity]::getcurrent()
+    ([security.principal.windowsprincipal]($id)).isinrole($admin)
 }
 
 # messages
@@ -20,7 +20,7 @@ function warn($msg) { write-host $msg -f darkyellow; }
 function success($msg) { write-host $msg -f darkgreen }
 
 # dirs
-function basedir($global) {	if($global) { return $globaldir } $scoopdir }
+function basedir($global) { if($global) { return $globaldir } $scoopdir }
 function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
 function appdir($app, $global) { "$(appsdir $global)\$app" }
@@ -29,14 +29,14 @@ function versiondir($app, $version, $global) { "$(appdir $app $global)\$version"
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global=$null) {
-	if($global -eq $null) { return (installed $app $true) -or (installed $app $false) }
-	return test-path (appdir $app $global)
+    if($global -eq $null) { return (installed $app $true) -or (installed $app $false) }
+    return test-path (appdir $app $global)
 }
 function installed_apps($global) {
-	$dir = appsdir $global
-	if(test-path $dir) {
-		gci $dir | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
-	}
+    $dir = appsdir $global
+    if(test-path $dir) {
+        gci $dir | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
+    }
 }
 
 # paths
@@ -45,214 +45,214 @@ function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
-	$executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
+    $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }
 function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
 function friendly_path($path) {
-	$h = $home; if(!$h.endswith('\')) { $h += '\' }
-	return "$path" -replace ([regex]::escape($h)), "~\"
+    $h = $home; if(!$h.endswith('\')) { $h += '\' }
+    return "$path" -replace ([regex]::escape($h)), "~\"
 }
 function is_local($path) {
-	($path -notmatch '^https?://') -and (test-path $path)
+    ($path -notmatch '^https?://') -and (test-path $path)
 }
 
 # operations
 function dl($url,$to) {
-	$wc = new-object system.net.webClient
-	$wc.headers.add('User-Agent', 'Scoop/1.0')
-	$wc.downloadFile($url,$to)
+    $wc = new-object system.net.webClient
+    $wc.headers.add('User-Agent', 'Scoop/1.0')
+    $wc.downloadFile($url,$to)
 
 }
 function env($name,$global,$val='__get') {
-	$target = 'User'; if($global) {$target = 'Machine'}
-	if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
-	else { [environment]::setEnvironmentVariable($name,$val,$target) }
+    $target = 'User'; if($global) {$target = 'Machine'}
+    if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
+    else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
 function unzip($path,$to) {
-	if(!(test-path $path)) { abort "can't find $path to unzip"}
-	try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
-	catch { unzip_old $path $to; return } # for .net earlier than 4.5
-	try {
-		[io.compression.zipfile]::extracttodirectory($path,$to)
-	} catch [system.io.pathtoolongexception] {
-		# try to fall back to 7zip if path is too long
-		if(7zip_installed) {
-			extract_7zip $path $to $false
-			return
-		} else {
-			abort "unzip failed: Windows can't handle the long paths in this zip file.`nrun 'scoop install 7zip' and try again."
-		}
-	} catch {
-		abort "unzip failed: $_"
-	}
+    if(!(test-path $path)) { abort "can't find $path to unzip"}
+    try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
+    catch { unzip_old $path $to; return } # for .net earlier than 4.5
+    try {
+        [io.compression.zipfile]::extracttodirectory($path,$to)
+    } catch [system.io.pathtoolongexception] {
+        # try to fall back to 7zip if path is too long
+        if(7zip_installed) {
+            extract_7zip $path $to $false
+            return
+        } else {
+            abort "unzip failed: Windows can't handle the long paths in this zip file.`nrun 'scoop install 7zip' and try again."
+        }
+    } catch {
+        abort "unzip failed: $_"
+    }
 }
 function unzip_old($path,$to) {
-	# fallback for .net earlier than 4.5
-	$shell = (new-object -com shell.application -strict)
-	$zipfiles = $shell.namespace("$path").items()
-	$to = ensure $to
-	$shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
+    # fallback for .net earlier than 4.5
+    $shell = (new-object -com shell.application -strict)
+    $zipfiles = $shell.namespace("$path").items()
+    $to = ensure $to
+    $shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
 function movedir($from, $to) {
-	$from = $from.trimend('\')
-	$to = $to.trimend('\')
+    $from = $from.trimend('\')
+    $to = $to.trimend('\')
 
-	$out = robocopy "$from" "$to" /e /move
-	if($lastexitcode -ge 8) {
-		throw "error moving directory: `n$out"
-	}
+    $out = robocopy "$from" "$to" /e /move
+    if($lastexitcode -ge 8) {
+        throw "error moving directory: `n$out"
+    }
 }
 
 function shim($path, $global, $name, $arg) {
-	if(!(test-path $path)) { abort "can't shim $(fname $path): couldn't find $path" }
-	$abs_shimdir = ensure (shimdir $global)
-	if(!$name) { $name = strip_ext (fname $path) }
+    if(!(test-path $path)) { abort "can't shim $(fname $path): couldn't find $path" }
+    $abs_shimdir = ensure (shimdir $global)
+    if(!$name) { $name = strip_ext (fname $path) }
 
-	$shim = "$abs_shimdir\$($name.tolower()).ps1"
+    $shim = "$abs_shimdir\$($name.tolower()).ps1"
 
-	# convert to relative path
-	pushd $abs_shimdir
-	$relative_path = resolve-path -relative $path
-	popd
+    # convert to relative path
+    pushd $abs_shimdir
+    $relative_path = resolve-path -relative $path
+    popd
 
-	echo '# ensure $HOME is set for MSYS programs' | out-file $shim -encoding oem
-	echo "if(!`$env:home) { `$env:home = `"`$home\`" }" | out-file $shim -encoding oem -append
-	echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' | out-file $shim -encoding oem -append
-	echo "`$path = `"$path`"" | out-file $shim -encoding oem -append
-	if($arg) {
-		echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding oem -append
-	}
-	echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding oem -append
+    echo '# ensure $HOME is set for MSYS programs' | out-file $shim -encoding oem
+    echo "if(!`$env:home) { `$env:home = `"`$home\`" }" | out-file $shim -encoding oem -append
+    echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' | out-file $shim -encoding oem -append
+    echo "`$path = `"$path`"" | out-file $shim -encoding oem -append
+    if($arg) {
+        echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding oem -append
+    }
+    echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding oem -append
 
-	if($path -match '\.exe$') {
-		# for programs with no awareness of any shell
-		$shim_exe = "$(strip_ext($shim)).shim"
-		cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$(strip_ext($shim)).exe" -force
-		echo "path = $(resolve-path $path)" | out-file $shim_exe -encoding oem
-		if($arg) {
-			echo "args = $arg" | out-file $shim_exe -encoding oem -append
-		}
-	} elseif($path -match '\.((bat)|(cmd))$') {
-		# shim .bat, .cmd so they can be used by programs with no awareness of PSH
-		$shim_cmd = "$(strip_ext($shim)).cmd"
-		':: ensure $HOME is set for MSYS programs'           | out-file $shim_cmd -encoding oem
-		'@if "%home%"=="" set home=%homedrive%%homepath%\'   | out-file $shim_cmd -encoding oem -append
-		'@if "%home%"=="\" set home=%allusersprofile%\'      | out-file $shim_cmd -encoding oem -append
-		"@`"$(resolve-path $path)`" $arg %*"                 | out-file $shim_cmd -encoding oem -append
-	} elseif($path -match '\.ps1$') {
-		# make ps1 accessible from cmd.exe
-		$shim_cmd = "$(strip_ext($shim)).cmd"
-		"@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding oem
-	}
+    if($path -match '\.exe$') {
+        # for programs with no awareness of any shell
+        $shim_exe = "$(strip_ext($shim)).shim"
+        cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$(strip_ext($shim)).exe" -force
+        echo "path = $(resolve-path $path)" | out-file $shim_exe -encoding oem
+        if($arg) {
+            echo "args = $arg" | out-file $shim_exe -encoding oem -append
+        }
+    } elseif($path -match '\.((bat)|(cmd))$') {
+        # shim .bat, .cmd so they can be used by programs with no awareness of PSH
+        $shim_cmd = "$(strip_ext($shim)).cmd"
+        ':: ensure $HOME is set for MSYS programs'           | out-file $shim_cmd -encoding oem
+        '@if "%home%"=="" set home=%homedrive%%homepath%\'   | out-file $shim_cmd -encoding oem -append
+        '@if "%home%"=="\" set home=%allusersprofile%\'      | out-file $shim_cmd -encoding oem -append
+        "@`"$(resolve-path $path)`" $arg %*"                 | out-file $shim_cmd -encoding oem -append
+    } elseif($path -match '\.ps1$') {
+        # make ps1 accessible from cmd.exe
+        $shim_cmd = "$(strip_ext($shim)).cmd"
+        "@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding oem
+    }
 }
 
 function ensure_in_path($dir, $global) {
-	$path = env 'path' $global
-	$dir = fullpath $dir
-	if($path -notmatch [regex]::escape($dir)) {
-		echo "adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path"
+    $path = env 'path' $global
+    $dir = fullpath $dir
+    if($path -notmatch [regex]::escape($dir)) {
+        echo "adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path"
 
-		env 'path' $global "$dir;$path" # for future sessions...
-		$env:path = "$dir;$env:path" # for this session
-	}
+        env 'path' $global "$dir;$path" # for future sessions...
+        $env:path = "$dir;$env:path" # for this session
+    }
 }
 
 function strip_path($orig_path, $dir) {
-	$stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
-	return ($stripped -ne $orig_path), $stripped
+    $stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
+    return ($stripped -ne $orig_path), $stripped
 }
 
 function remove_from_path($dir,$global) {
-	$dir = fullpath $dir
+    $dir = fullpath $dir
 
-	# future sessions
-	$was_in_path, $newpath = strip_path (env 'path' $global) $dir
-	if($was_in_path) {
-		echo "removing $(friendly_path $dir) from your path"
-		env 'path' $global $newpath
-	}
+    # future sessions
+    $was_in_path, $newpath = strip_path (env 'path' $global) $dir
+    if($was_in_path) {
+        echo "removing $(friendly_path $dir) from your path"
+        env 'path' $global $newpath
+    }
 
-	# current session
-	$was_in_path, $newpath = strip_path $env:path $dir
-	if($was_in_path) { $env:path = $newpath	}
+    # current session
+    $was_in_path, $newpath = strip_path $env:path $dir
+    if($was_in_path) { $env:path = $newpath }
 }
 
 function ensure_scoop_in_path($global) {
-	$abs_shimdir = ensure (shimdir $global)
-	# be aggressive (b-e-aggressive) and install scoop first in the path
-	ensure_in_path $abs_shimdir $global
+    $abs_shimdir = ensure (shimdir $global)
+    # be aggressive (b-e-aggressive) and install scoop first in the path
+    ensure_in_path $abs_shimdir $global
 }
 
 function ensure_robocopy_in_path {
-	if(!(gcm robocopy -ea ignore)) {
-		shim "C:\Windows\System32\Robocopy.exe" $false
-	}
+    if(!(gcm robocopy -ea ignore)) {
+        shim "C:\Windows\System32\Robocopy.exe" $false
+    }
 }
 
 function wraptext($text, $width) {
-	if(!$width) { $width = $host.ui.rawui.windowsize.width };
-	$width -= 1 # be conservative: doesn't seem to print the last char
+    if(!$width) { $width = $host.ui.rawui.windowsize.width };
+    $width -= 1 # be conservative: doesn't seem to print the last char
 
-	$text -split '\r?\n' | % {
-		$line = ''
-		$_ -split ' ' | % {
-			if($line.length -eq 0) { $line = $_ }
-			elseif($line.length + $_.length + 1 -le $width) { $line += " $_" }
-			else { $lines += ,$line; $line = $_ }
-		}
-		$lines += ,$line
-	}
+    $text -split '\r?\n' | % {
+        $line = ''
+        $_ -split ' ' | % {
+            if($line.length -eq 0) { $line = $_ }
+            elseif($line.length + $_.length + 1 -le $width) { $line += " $_" }
+            else { $lines += ,$line; $line = $_ }
+        }
+        $lines += ,$line
+    }
 
-	$lines -join "`n"
+    $lines -join "`n"
 }
 
 function pluralize($count, $singular, $plural) {
-	if($count -eq 1) { $singular } else { $plural }
+    if($count -eq 1) { $singular } else { $plural }
 }
 
 # for dealing with user aliases
 $default_aliases = @{
-	'cp' = 'copy-item'
-	'echo' = 'write-output'
-	'gc' = 'get-content'
-	'gci' = 'get-childitem'
-	'gcm' = 'get-command'
-	'iex' = 'invoke-expression'
-	'ls' = 'get-childitem'
-	'mkdir' = { new-item -type directory @args }
-	'mv' = 'move-item'
-	'rm' = 'remove-item'
-	'sc' = 'set-content'
-	'select' = 'select-object'
-	'sls' = 'select-string'
+    'cp' = 'copy-item'
+    'echo' = 'write-output'
+    'gc' = 'get-content'
+    'gci' = 'get-childitem'
+    'gcm' = 'get-command'
+    'iex' = 'invoke-expression'
+    'ls' = 'get-childitem'
+    'mkdir' = { new-item -type directory @args }
+    'mv' = 'move-item'
+    'rm' = 'remove-item'
+    'sc' = 'set-content'
+    'select' = 'select-object'
+    'sls' = 'select-string'
 }
 
 function reset_alias($name, $value) {
-	if($existing = get-alias $name -ea ignore |? { $_.options -match 'readonly' }) {
-		if($existing.definition -ne $value) {
-			write-host "alias $name is read-only; can't reset it" -f darkyellow
-		}
-		return # already set
-	}
-	if($value -is [scriptblock]) {
-		new-item -path function: -name "script:$name" -value $value | out-null
-		return
-	}
+    if($existing = get-alias $name -ea ignore |? { $_.options -match 'readonly' }) {
+        if($existing.definition -ne $value) {
+            write-host "alias $name is read-only; can't reset it" -f darkyellow
+        }
+        return # already set
+    }
+    if($value -is [scriptblock]) {
+        new-item -path function: -name "script:$name" -value $value | out-null
+        return
+    }
 
-	set-alias $name $value -scope script -option allscope
+    set-alias $name $value -scope script -option allscope
 }
 
 function reset_aliases() {
-	# for aliases where there's a local function, re-alias so the function takes precedence
-	$aliases = get-alias |? { $_.options -notmatch 'readonly' } |% { $_.name }
-	get-childitem function: | % {
-		$fn = $_.name
-		if($aliases -contains $fn) {
-			set-alias $fn local:$fn -scope script
-		}
-	}
+    # for aliases where there's a local function, re-alias so the function takes precedence
+    $aliases = get-alias |? { $_.options -notmatch 'readonly' } |% { $_.name }
+    get-childitem function: | % {
+        $fn = $_.name
+        if($aliases -contains $fn) {
+            set-alias $fn local:$fn -scope script
+        }
+    }
 
-	# set default aliases
-	$default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
+    # set default aliases
+    $default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
 }

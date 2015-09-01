@@ -1,4 +1,4 @@
-﻿{
+{
     "version":  "1.8.0",
     "license":  "https://github.com/docker/docker/blob/master/LICENSE",
     "architecture": {
@@ -12,12 +12,12 @@
       }
     },
     "homepage":  "https://docker.com",
-    "bin": [ 
-      ["docker-1.8.0.exe", "docker"] 
+    "bin": [
+      ["docker-1.8.0.exe", "docker"]
     ],
-    "notes": [ 
+    "notes": [
       "This is the docker client only. Until the docker daemon can run natively",
-      "on Windows you will need a Virtual Machine such as Boot2Docker or", 
+      "on Windows you will need a Virtual Machine such as Boot2Docker or",
       "Docker Machine",
       "",
       "Boot2Docker: https://github.com/boot2docker/windows-installer/releases/",

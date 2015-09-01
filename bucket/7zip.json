@@ -1,18 +1,18 @@
 {
-	"homepage": "http://www.7-zip.org/",
-	"license": "http://www.7-zip.org/license.txt",
-	"version": "9.38",
-	"architecture": {
-		"64bit": {
-			"url": "http://www.7-zip.org/a/7z938-x64.msi",
-			"hash": "7c8e873991c82ad9cfcdbdf45254ea6101e9a645e12977dcd518979e50fdedf3"
-		},
-		"32bit": {
-			"url": "http://www.7-zip.org/a/7z938.msi",
-			"hash": "c48f13efbde87f370f2a70885df55c1e53f2c791c2007f9587810f915fecc0d8"
-		}
-	},
-	"extract_dir": "Files/7-Zip",
-	"bin": "7z.exe",
-	"checkver": "Download 7-zip ([^\\ ]+)"
+    "homepage": "http://www.7-zip.org/",
+    "license": "http://www.7-zip.org/license.txt",
+    "version": "9.38",
+    "architecture": {
+        "64bit": {
+            "url": "http://www.7-zip.org/a/7z938-x64.msi",
+            "hash": "7c8e873991c82ad9cfcdbdf45254ea6101e9a645e12977dcd518979e50fdedf3"
+        },
+        "32bit": {
+            "url": "http://www.7-zip.org/a/7z938.msi",
+            "hash": "c48f13efbde87f370f2a70885df55c1e53f2c791c2007f9587810f915fecc0d8"
+        }
+    },
+    "extract_dir": "Files/7-Zip",
+    "bin": "7z.exe",
+    "checkver": "Download 7-zip ([^\\ ]+)"
 }

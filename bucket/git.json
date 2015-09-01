@@ -7,10 +7,10 @@
       "url": "https://github.com/git-for-windows/git/releases/download/v2.5.0.windows.1/PortableGit-2.5.0-64-bit.7z.exe#/dl.7z",
       "hash": "2ace32df8b8449e2b48cc6e4d0152be7f4bf8e7174d0dc43f67a1ae23bf26f9d"
     },
-  	"32bit": {
-  	  "url": "https://github.com/git-for-windows/git/releases/download/v2.5.0.windows.1/PortableGit-2.5.0-32-bit.7z.exe#/dl.7z",
-  	  "hash": "207f40828b7ad2f93f27b74443b89540a134d1fd735a849db14df2a0a64d5896"
-  	}
+    "32bit": {
+      "url": "https://github.com/git-for-windows/git/releases/download/v2.5.0.windows.1/PortableGit-2.5.0-32-bit.7z.exe#/dl.7z",
+      "hash": "207f40828b7ad2f93f27b74443b89540a134d1fd735a849db14df2a0a64d5896"
+    }
   },
   "bin": [ "cmd\\git.exe", "cmd\\gitk.exe", "cmd\\git-gui.exe" ],
   "post_install": [

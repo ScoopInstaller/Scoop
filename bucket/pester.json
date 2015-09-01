@@ -1,4 +1,4 @@
-﻿{
+{
     "version":  "3.3.6",
     "license":  "https://raw.githubusercontent.com/pester/Pester/master/LICENSE",
     "url":  "https://github.com/pester/pester/archive/3.3.6.tar.gz",
@@ -6,7 +6,7 @@
     "hash":  "38a9ae3c829b02fe90fb8acbed564ffb883fb0175a6a00b501ac3663f03d6b9a",
     "extract_dir": "pester-3.3.6",
     "bin": "bin\\pester.bat",
-    "post_install": " 
+    "post_install": "
         $import = \"try { `$null = gcm pester -ea stop; import-module `\"$dir\\pester.psm1`\" } catch { }\"
 
         if($profile) {
@@ -14,7 +14,7 @@
             if(!(test-path $profile)) {
                 'powershell profile doesn''t exist. creating...'
                 $profile_dir = split-path $profile
-                if(!(test-path $profile_dir)) { mkdir $profile_dir > $null } 
+                if(!(test-path $profile_dir)) { mkdir $profile_dir > $null }
                 '' > $profile
             }
 

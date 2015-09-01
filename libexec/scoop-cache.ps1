@@ -14,48 +14,48 @@ param($cmd, $app)
 reset_aliases
 
 function cacheinfo($file) {
-	$app, $version, $url = $file.name -split '#'
-	$size = filesize $file.length
-	return new-object psobject -prop @{ app=$app; version=$version; url=$url; size=$size }
+    $app, $version, $url = $file.name -split '#'
+    $size = filesize $file.length
+    return new-object psobject -prop @{ app=$app; version=$version; url=$url; size=$size }
 }
 
 function filesize($length) {
-	$gb = [math]::pow(2, 30)
-	$mb = [math]::pow(2, 20)
-	$kb = [math]::pow(2, 10)
+    $gb = [math]::pow(2, 30)
+    $mb = [math]::pow(2, 20)
+    $kb = [math]::pow(2, 10)
 
-	if($length -gt $gb) {
-		"{0:n1} GB" -f ($length / $gb)
-	} elseif($length -gt $mb) {
-		"{0:n1} MB" -f ($length / $mb)
-	} elseif($length -gt $kb) {
-		"{0:n1} KB" -f ($length / $kb)
-	} else {
-		"$($length) B"
-	}
+    if($length -gt $gb) {
+        "{0:n1} GB" -f ($length / $gb)
+    } elseif($length -gt $mb) {
+        "{0:n1} MB" -f ($length / $mb)
+    } elseif($length -gt $kb) {
+        "{0:n1} KB" -f ($length / $kb)
+    } else {
+        "$($length) B"
+    }
 }
 
 switch($cmd) {
-	'rm' {
-		if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
-		rm "$scoopdir\cache\$app#*"
-	}
-	'show' {
-		$files = @(gci "$scoopdir\cache" | ? { $_.name -match "^$app" })
-		$total_length = ($files | measure length -sum).sum
+    'rm' {
+        if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
+        rm "$scoopdir\cache\$app#*"
+    }
+    'show' {
+        $files = @(gci "$scoopdir\cache" | ? { $_.name -match "^$app" })
+        $total_length = ($files | measure length -sum).sum
 
-		$f_app  = @{ expression={"$($_.app) ($($_.version))" }}
-		$f_url  = @{ expression={$_.url};alignment='right'}
-		$f_size = @{ expression={$_.size}; alignment='right'}
+        $f_app  = @{ expression={"$($_.app) ($($_.version))" }}
+        $f_url  = @{ expression={$_.url};alignment='right'}
+        $f_size = @{ expression={$_.size}; alignment='right'}
 
 
-		$files | % { cacheinfo $_ } | ft $f_size, $f_app, $f_url -auto -hide
+        $files | % { cacheinfo $_ } | ft $f_size, $f_app, $f_url -auto -hide
 
-		"total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
-	}
-	default {
-		"cache '$cmd' not supported"; my_usage; exit 1
-	}
+        "total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
+    }
+    default {
+        "cache '$cmd' not supported"; my_usage; exit 1
+    }
 }
 
 exit 0

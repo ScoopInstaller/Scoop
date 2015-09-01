@@ -1,15 +1,15 @@
 {
-	"homepage": "http://www.r-project.org",
-	"version": "3.1.1",
-	"license": "GPL2",
-	"url": "http://cran.rstudio.com/bin/windows/base/R-3.1.1-win.exe",
-	"hash": "ce6fb76612aefc482583fb92f4f5c3cb8e8e3bf1a8dda97df7ec5caf746e53fe",
-	"innosetup": true,
-	"bin": [
-		"bin\\r.exe",
-		"bin\\rscript.exe"
-	],
-	"notes": "You'll need to type 'r.ps1' or 'r.cmd' to run R, because in Powershell 'r' runs the last command.
+    "homepage": "http://www.r-project.org",
+    "version": "3.1.1",
+    "license": "GPL2",
+    "url": "http://cran.rstudio.com/bin/windows/base/R-3.1.1-win.exe",
+    "hash": "ce6fb76612aefc482583fb92f4f5c3cb8e8e3bf1a8dda97df7ec5caf746e53fe",
+    "innosetup": true,
+    "bin": [
+        "bin\\r.exe",
+        "bin\\rscript.exe"
+    ],
+    "notes": "You'll need to type 'r.ps1' or 'r.cmd' to run R, because in Powershell 'r' runs the last command.
 
 You can remove Powershell's 'r' command with:
     rm alias:\\r
@@ -18,8 +18,8 @@ You can remove Powershell's 'r' command with:
 
 Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--this has a plugin to remove some crazy aliases from Powershell, as well as many other improvements.
 ",
-	"checkver": {
-		"url": "http://cran.rstudio.com/bin/windows/base/",
-		"re": "<h1>R-([0-9\\.]+)"
-	}
+    "checkver": {
+        "url": "http://cran.rstudio.com/bin/windows/base/",
+        "re": "<h1>R-([0-9\\.]+)"
+    }
 }
