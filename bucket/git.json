@@ -1,19 +1,23 @@
 {
-  "homepage": "https://git-for-windows.github.io/",
-  "license": "GPL2",
-  "version": "2.5.0.windows.1",
-  "architecture": {
-    "64bit": {
-      "url": "https://github.com/git-for-windows/git/releases/download/v2.5.0.windows.1/PortableGit-2.5.0-64-bit.7z.exe#/dl.7z",
-      "hash": "2ace32df8b8449e2b48cc6e4d0152be7f4bf8e7174d0dc43f67a1ae23bf26f9d"
+    "homepage": "https://git-for-windows.github.io/",
+    "license": "GPL2",
+    "version": "2.5.1.windows.1",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.5.1.windows.1/PortableGit-2.5.1-64-bit.7z.exe#/dl.7z",
+            "hash": "f1853c63cd27a28510d80d5ffa2d70e2c9392d0a0174d5821fb7b764bff24b89"
+        },
+        "32bit": {
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.5.1.windows.1/PortableGit-2.5.1-32-bit.7z.exe#/dl.7z",
+            "hash": "0b41ea39d2c4c3c9cfb64cc37045ee7c496b0f2db931b1e62a0eb441dbda39b9"
+        }
     },
-    "32bit": {
-      "url": "https://github.com/git-for-windows/git/releases/download/v2.5.0.windows.1/PortableGit-2.5.0-32-bit.7z.exe#/dl.7z",
-      "hash": "207f40828b7ad2f93f27b74443b89540a134d1fd735a849db14df2a0a64d5896"
-    }
-  },
-  "bin": [ "cmd\\git.exe", "cmd\\gitk.exe", "cmd\\git-gui.exe" ],
-  "post_install": [
-    "git config --global credential.helper wincred"
-  ]
+    "bin": [ "cmd\\git.exe", "cmd\\gitk.exe", "cmd\\git-gui.exe" ],
+    "post_install": [
+        "git config --global credential.helper wincred"
+    ],
+    "env_set": {
+        "GIT_SSH": "$(resolve-path $(scoop which ssh))"
+    },
+    "depends": "openssh"
 }
