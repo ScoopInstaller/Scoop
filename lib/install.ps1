@@ -527,16 +527,16 @@ function rm_shims($manifest, $global) {
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead
 function ensure_install_dir_not_in_path($dir, $global) {
-    $path = (env 'path' $global)
+    $path = (env 'path' -t $global)
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if($removed) {
         $removed | % { "installer added $(friendly_path $_) to path, removing"}
-        env 'path' $global $fixed
+        env 'path' -t $global $fixed
     }
 
     if(!$global) {
-        $fixed, $removed = find_dir_or_subdir (env 'path' $true) "$dir"
+        $fixed, $removed = find_dir_or_subdir (env 'path' -t $true) "$dir"
         if($removed) {
             $removed | % { warn "installer added $_ to system path: you might want to remove this manually (requires admin permission)"}
         }
@@ -570,12 +570,12 @@ function add_first_in_path($dir, $global) {
     $dir = fullpath $dir
 
     # future sessions
-    $null, $currpath = strip_path (env 'path' $global) $dir
-    env 'path' $global "$dir;$currpath"
+    $null, $currpath = strip_path (env 'path' -t $global) $dir
+    env 'path' -t $global "$dir;$currpath"
 
     # this session
     $null, $env:path = strip_path $env:path $dir
-    $env:path = "$dir;$env:path"
+    env 'path' "$dir;$env:path"
 }
 
 function env_rm_path($manifest, $dir, $global) {
@@ -591,8 +591,8 @@ function env_set($manifest, $dir, $global) {
         $manifest.env_set | gm -member noteproperty | % {
             $name = $_.name;
             $val = format $manifest.env_set.$($_.name) @{ "dir" = $dir }
-            env $name $global $val
-            sc env:\$name $val
+            env $name -t $global $val
+            env $name $val
         }
     }
 }
@@ -600,8 +600,8 @@ function env_rm($manifest, $global) {
     if($manifest.env_set) {
         $manifest.env_set | gm -member noteproperty | % {
             $name = $_.name
-            env $name $global $null
-            if(test-path env:\$name) { rm env:\$name }
+            env $name -t $global $null
+            env $name $null
         }
     }
 }
