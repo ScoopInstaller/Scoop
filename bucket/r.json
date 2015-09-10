@@ -1,8 +1,8 @@
 {
-    "homepage": "http://www.r-project.org",
+    "homepage": "https://www.r-project.org",
     "version": "3.1.1",
     "license": "GPL2",
-    "url": "http://cran.rstudio.com/bin/windows/base/R-3.1.1-win.exe",
+    "url": "https://cran.rstudio.com/bin/windows/base/old/3.1.1/R-3.1.1-win.exe",
     "hash": "ce6fb76612aefc482583fb92f4f5c3cb8e8e3bf1a8dda97df7ec5caf746e53fe",
     "innosetup": true,
     "bin": [
@@ -19,7 +19,7 @@ You can remove Powershell's 'r' command with:
 Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--this has a plugin to remove some crazy aliases from Powershell, as well as many other improvements.
 ",
     "checkver": {
-        "url": "http://cran.rstudio.com/bin/windows/base/",
+        "url": "https://cran.rstudio.com/bin/windows/base/",
         "re": "<h1>R-([0-9\\.]+)"
     }
 }
