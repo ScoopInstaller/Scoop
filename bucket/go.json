@@ -1,15 +1,15 @@
 {
-    "version": "1.5",
+    "version": "1.5.1",
     "homepage": "http://golang.org",
     "license": "http://golang.org/LICENSE",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/golang/go1.5.windows-amd64.zip",
-            "hash": "sha1:559cddfd341c20531689efad5412dcc304f8d85b"
+            "url": "https://storage.googleapis.com/golang/go1.5.1.windows-amd64.zip",
+            "hash": "sha1:7815772347ad3e11a096d927c65bfb15d5b0f490"
         },
         "32bit": {
-            "url": "https://storage.googleapis.com/golang/go1.5.windows-386.zip",
-            "hash": "sha1:f5014cd70be18b79bc401f1e35c8d73062124bf0"
+            "url": "https://storage.googleapis.com/golang/go1.5.1.windows-386.zip",
+            "hash": "sha1:bb071ec45ef39cd5ed9449b54c5dd083b8233bfa"
         }
     },
     "extract_dir": "go",
