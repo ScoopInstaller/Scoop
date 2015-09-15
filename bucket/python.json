@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.python.org",
-    "license": "http://docs.python.org/3.4/license",
-    "version": "3.4.3",
+    "license": "https://docs.python.org/3/license.html",
+    "version": "3.5.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.4.3/python-3.4.3.amd64.msi",
-            "hash": "md5:f6ade29acaf8fcdc0463e69a6e7ccf87"
+            "url": "https://www.python.org/ftp/python/3.5.0/python-3.5.0-amd64.exe",
+            "hash": "md5:facc4c9fb6f359b0ca45db0e11455421"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.4.3/python-3.4.3.msi",
-            "hash": "md5:cb450d1cc616bfc8f7a2d6bd88780bf6"
+            "url": "https://www.python.org/ftp/python/3.5.0/python-3.5.0.exe",
+            "hash": "md5:1e87ad24225657a3de447171f0eda1df"
         }
     },
     "bin": [
@@ -35,9 +35,9 @@
         $create_reg.Invoke(\"Classes\\Python.File\\shell\\open\\command\", `
             \"`\"$dir\\py.exe`\" `\"%1`\" %*\")
         $create_reg.Invoke(\"Classes\\.py\", \"Python.File\")
-        $create_reg.Invoke(\"Python\\PythonCore\\3.4\\InstallPath\", `
+        $create_reg.Invoke(\"Python\\PythonCore\\3.5\\InstallPath\", `
             \"$dir\")
-        $create_reg.Invoke(\"Python\\PythonCore\\3.4\\PythonPath\", `
+        $create_reg.Invoke(\"Python\\PythonCore\\3.5\\PythonPath\", `
             \"$dir;$dir\\Lib\\;$dir\\DLLs\\\")
     ",
     "checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
