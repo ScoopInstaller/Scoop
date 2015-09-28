@@ -1,14 +1,14 @@
 {
     "homepage": "http://www.haskell.org",
-    "version": "2014.2.0.0",
+    "version": "7.10.2-a",
     "architecture": {
         "64bit": {
-            "url": "http://www.haskell.org/platform/download/2014.2.0.0/HaskellPlatform-2014.2.0.0-x86_64-setup.exe#/dl.7z",
-            "hash": "11f09ed6492441d4b3ed61f04614c09ca88244fa18e248f5f22804c9a7bda116"
+            "url": "https://haskell.org/platform/download/7.10.2/HaskellPlatform-7.10.2-a-x86_64-setup.exe#/dl.7z",
+            "hash": "acfd8144a090c1fa17dc5d9e564355ffdb159012ab0550a012abaacb4a1d58fa"
         },
         "32bit": {
-            "url": "http://www.haskell.org/platform/download/2014.2.0.0/HaskellPlatform-2014.2.0.0-i386-setup.exe#/dl.7z",
-            "hash": "719bd61329d1cd8c015c700661c7ba02f17c0c1c4a9e87495270132a5be3bbc4"
+            "url": "https://haskell.org/platform/download/7.10.2/HaskellPlatform-7.10.2-a-i386-setup.exe#/dl.7z",
+            "hash": "8c1a2e116e3a3b00857901bfd4f98b47c1ed07b562c438428d0e75a480b8d2f5"
         }
     },
     "bin": [
