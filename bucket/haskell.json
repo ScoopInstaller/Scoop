@@ -13,6 +13,7 @@
     },
     "bin": [
         "bin\\ghc.exe",
+        "bin\\ghci.exe",
         "bin\\ghc-pkg.exe",
         "bin\\haddock.exe",
         "bin\\hp2ps.exe",
