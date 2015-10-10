@@ -1,15 +1,15 @@
 {
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL2",
-    "version": "2.5.2.windows.1",
+    "version": "2.6.1.windows.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.5.2.windows.1/PortableGit-2.5.2-64-bit.7z.exe#/dl.7z",
-            "hash": "91be472598396e67a4ecf347c0ddd5bc0a68f716d1955071bb274069a62a9ecd"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.6.1.windows.1/PortableGit-2.6.1-64-bit.7z.exe#/dl.7z",
+            "hash": "4e1d75f04d080cba8e798806f0c01f80a5c421445ab9d10c517e5f6dae702543"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.5.2.windows.1/PortableGit-2.5.2-32-bit.7z.exe#/dl.7z",
-            "hash": "bdf93a99d23ca40c57b6a3a1933412f22cad11535c60b4b982607b99e38a6d02"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.6.1.windows.1/PortableGit-2.6.1-32-bit.7z.exe#/dl.7z",
+            "hash": "27ad060b636cfc0feacf6cef25ddf3eb7ce7fb9ffcd8d53e4223ec5e61f44323"
         }
     },
     "bin": [ "cmd\\git.exe", "cmd\\gitk.exe", "cmd\\git-gui.exe" ],
