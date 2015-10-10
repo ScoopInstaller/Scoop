@@ -1,10 +1,10 @@
 {
     "homepage": "https://maven.apache.org/",
-    "version": "3.2.5",
+    "version": "3.3.3",
     "license": "Apache 2.0",
-    "url": "http://mirror.rackcentral.com.au/apache/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.zip",
-    "hash": "b7c558dc0b2ebb604724ccb76e95dc40697d0a5a4112d5b0c8ab9019bc078fd3",
-    "extract_dir": "apache-maven-3.2.5",
+    "url": "http://mirror.rackcentral.com.au/apache/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.zip",
+    "hash": "f2a0a4fdbb8748280db966419ba776d42e056eecbe87fd6dc3301b88086c3f71",
+    "extract_dir": "apache-maven-3.3.3",
     "bin": [
         "bin\\mvn.bat"
     ],
