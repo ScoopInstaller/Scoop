@@ -2,7 +2,7 @@
     "homepage": "http://www.gradle.org",
     "version": "2.7",
     "license": "Apache 2.0",
-    "hash": "dc51b73a4d8159e25978e0a384bafbe4a2caa6af026333b038b0c505914d128c",
+    "hash": "cde43b90945b5304c43ee36e58aab4cc6fb3a3d5f9bd9449bb1709a68371cb06",
     "url": "https://services.gradle.org/distributions/gradle-2.7-bin.zip",
     "extract_dir": "gradle-2.7",
     "bin": "bin\\gradle.bat",
