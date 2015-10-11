@@ -2,8 +2,8 @@
     "homepage": "http://groovy.codehaus.org/",
     "version": "2.4.5",
     "license": "Apache 2.0",
-    "url": "http://dl.bintray.com/groovy/maven/groovy-binary-2.4.5.zip",
-    "hash": "2819f3c0e0b66bc60362505fa4794a537f369ca59b82aeea7b7a38710b18fc60",
+    "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.4.5.zip",
+    "hash": "87e8e9af1f718b84c9bca5a8c42425aadb9e97d8e4ad64e0c91f7c1454cd4caa",
     "extract_dir": "groovy-2.4.5",
     "bin": [
         "bin\\grape.bat",
