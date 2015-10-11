@@ -8,7 +8,7 @@
                 "http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
             ],
             "hash": [
-                "07c586fce3394c77736bae63594385dcaf67e8f5c331df460aaee2d5f049122d",
+                "683270a7e09ef756476c00902eda9999137468eb21a371831b7c01602d2fd069",
                 "2ada04c7234199126c0f34f6ea7163a8f8dccb1e15814af175a189f6ac48b8ac"
             ],
             "extract_dir": "ruby-2.2.3-x64-mingw32"
@@ -19,7 +19,7 @@
                 "http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
             ],
             "hash": [
-                "58bb5487c9cfe79ba5a3ea0b2719e71879cf1e9b8028a36f0bd842f0c27005c1",
+                "08b33a85ec26c01a6d305a258680976b57081e22ad9196623c1cf154e558e3ce",
                 "61a06b5da06dd94343e591163ac0d43c544e9cd4df770f01275645b268b44dc7"
             ],
             "extract_dir": "ruby-2.2.3-i386-mingw32"

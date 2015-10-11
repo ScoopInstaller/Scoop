@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/git-for-windows/git/releases/download/v2.6.1.windows.1/PortableGit-2.6.1-64-bit.7z.exe#/dl.7z",
-            "hash": "4e1d75f04d080cba8e798806f0c01f80a5c421445ab9d10c517e5f6dae702543"
+            "hash": "5118b86924fd586caa1f31ebda2d71ed4f7c18ba6c0df4a71f06b90d625837e8"
         },
         "32bit": {
             "url": "https://github.com/git-for-windows/git/releases/download/v2.6.1.windows.1/PortableGit-2.6.1-32-bit.7z.exe#/dl.7z",
-            "hash": "27ad060b636cfc0feacf6cef25ddf3eb7ce7fb9ffcd8d53e4223ec5e61f44323"
+            "hash": "ec7fcd8e04835ecf0ce03eaecf74f437b4412f4b0e022573539ba7b2eba7b912"
         }
     },
     "bin": [ "cmd\\git.exe", "cmd\\gitk.exe", "cmd\\git-gui.exe" ],
