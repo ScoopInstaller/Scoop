@@ -1,9 +1,8 @@
 {
     "homepage": "http://nuget.codeplex.com/",
-    "version": "2.8.3",
+    "version": "3.2.0",
     "license": "Apache 2.0",
-    "url": "http://nuget.org/api/v2/package/NuGet.CommandLine/2.8.3?fn=/dl.zip",
-    "hash": "cbb474f62f55b292b81a1506ec964d9d547b1723c682fe4c9f38d1ab9c72b27f",
-    "extract_dir": "tools",
+    "url": "https://dist.nuget.org/win-x86-commandline/v3.2.0/nuget.exe",
+    "hash": "2760cee595d00461202e82e2c3d786433c12646e3bc5de0535537c071eed454f",
     "bin": "nuget.exe"
 }
