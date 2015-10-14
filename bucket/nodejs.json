@@ -17,5 +17,5 @@
 # Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
 rm $dir\\nodejs\\node_modules\\npm\\npmrc
 npm update -g",
-    "checkver": "<p class=\"version\">Current Version: v([0-9\\.]+)</p>"
+    "checkver": "<p class=\"home-version home-version-banner\">\\s*Current Version: v([0-9\\.]+)"
 }
