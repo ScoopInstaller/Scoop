@@ -1,17 +1,17 @@
 {
     "homepage": "https://github.com/alexkasko/openjdk-unofficial-builds",
-    "version": "1.7.0-u60",
+    "version": "1.7.0-u80",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u60-unofficial-windows-amd64-image.zip",
-            "hash": "a84e4ab93092577cdc45116f5a1b241ba44b4cf23bc9798b997d28476f45d96a",
-            "extract_dir": "openjdk-1.7.0-u60-unofficial-windows-amd64-image"
+            "url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-windows-amd64-image.zip",
+            "hash": "F6DF07CEC3B1BD53B857E5F4E20309AB5E8AEAA29CA9152AB0D26B77B339780A",
+            "extract_dir": "openjdk-1.7.0-u80-unofficial-windows-amd64-image"
         },
         "32bit": {
-            "url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u60-unofficial-windows-i586-image.zip",
-            "hash": "70691d01a3448d718a9319107fc9ab04cd86020869827573f93df89289258289",
-            "extract_dir": "openjdk-1.7.0-u60-unofficial-windows-i586-image"
+            "url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-windows-i586-image.zip",
+            "hash": "F3B715BC049B3C88BC47695278433C7DC4B2648E2B156F5E24346AECBA343035",
+            "extract_dir": "openjdk-1.7.0-u80-unofficial-windows-i586-image"
         }
     },
     "env_add_path": "bin",
