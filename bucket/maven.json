@@ -2,7 +2,7 @@
     "homepage": "https://maven.apache.org/",
     "version": "3.3.3",
     "license": "Apache 2.0",
-    "url": "http://mirror.rackcentral.com.au/apache/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.zip",
+    "url": "https://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.zip",
     "hash": "f2a0a4fdbb8748280db966419ba776d42e056eecbe87fd6dc3301b88086c3f71",
     "extract_dir": "apache-maven-3.3.3",
     "bin": [
