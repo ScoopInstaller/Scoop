@@ -1,26 +1,26 @@
 {
-	"homepage": "http://www.erlang.org",
-	"version": "18.0",
-	"license": "http://www.erlang.org/EPLICENSE",
-	"architecture": {
-		"64bit": {
-			"url": "http://www.erlang.org/download/otp_win64_18.0.exe",
-			"hash": "4C1C91F2C2CABDB4699A2D6FF75F91A693518080BA1FF09C019E39780C98F58D"
-		},
-		"32bit": {
-			"url": "http://www.erlang.org/download/otp_win32_18.0.exe",
-			"hash": "D19F3FCE38F86F28610A6A696111F11D67AABA910967E8D661B957DAE084A550"
-		}
-	},
-	"bin": [
-		"bin\\erl.exe",
-		"bin\\escript.exe"
-	],
-	"env_set": {
+    "homepage": "http://www.erlang.org",
+    "version": "18.0",
+    "license": "http://www.erlang.org/EPLICENSE",
+    "architecture": {
+        "64bit": {
+            "url": "http://www.erlang.org/download/otp_win64_18.0.exe",
+            "hash": "4C1C91F2C2CABDB4699A2D6FF75F91A693518080BA1FF09C019E39780C98F58D"
+        },
+        "32bit": {
+            "url": "http://www.erlang.org/download/otp_win32_18.0.exe",
+            "hash": "D19F3FCE38F86F28610A6A696111F11D67AABA910967E8D661B957DAE084A550"
+        }
+    },
+    "bin": [
+        "bin\\erl.exe",
+        "bin\\escript.exe"
+    ],
+    "env_set": {
         "ERLANG_HOME": "$dir"
     },
     "installer": {
-    	"args": ["/S", "/D=$dir"]
+        "args": ["/S", "/D=$dir"]
     },
     "uninstaller": {
         "file" : "Uninstall.exe",
