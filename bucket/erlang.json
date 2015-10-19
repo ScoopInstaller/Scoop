@@ -1,47 +1,29 @@
 {
     "homepage": "http://www.erlang.org",
-    "version": "R16B02",
+    "version": "18.1",
     "license": "http://www.erlang.org/EPLICENSE",
     "architecture": {
         "64bit": {
-            "url": "http://www.erlang.org/download/otp_win64_R16B02.exe#/dl.bz",
-            "hash": "8f2f50e377319d364938475b1492f44d257eafd67c23f90246799bf87158a452"
+            "url": "http://www.erlang.org/download/otp_win64_18.1.exe",
+            "hash": "F21E15C191C9F34AE0DDDBB730C837B0E3AD13000B09B2D5BA9BCCFE3B2D5791"
         },
         "32bit": {
-            "url": "http://www.erlang.org/download/otp_win32_R16B02.exe#/dl.bz",
-            "hash": "504a7ce4d44e2558b400e64135b6e164d48980cd27b2f869321c5f4d799198b2"
+            "url": "http://www.erlang.org/download/otp_win32_18.1.exe",
+            "hash": "0B9356D13856C28B20A0BA7D7FBC53F541B55D3419654CDCEE1C241AE395E30A"
         }
     },
-    "extract_dir": "$_OUTDIR",
     "bin": [
         "bin\\erl.exe",
         "bin\\escript.exe"
     ],
-    "post_install": "
-$ini = \"$dir\\bin\\erl.ini\"
-$escdir = $dir -replace '\\\\', '\\\\'
-'[erlang]' | out-file $ini -encoding default
-\"Bindir=$escdir\\\\erts-5.10.3\\\\bin\" | out-file $ini -encoding default -append
-'Progname=erl' | out-file $ini -encoding default -append
-\"Rootdir=$escdir\" | out-file $ini -encoding default -append
-
-ls -dir \"$dir\" | ? name -match '-(\\d+\\.)+\\d+$' | cp -r -force -dest \"$dir.\\lib\"
-ls -dir \"$dir\" | ? name -match '-(\\d+\\.)+\\d+$' | rm -r
-
-$null = mkdir \"$dir\\releases\"
-
-$null = mkdir \"$dir\\erts-5.10.3\"
-cp -r \"$dir\\bin\" \"$dir\\erts-5.10.3\\bin\"
-mv \"$dir\\include\" \"$dir\\erts-5.10.3\\include\"
-mv \"$dir\\src\" \"$dir\\erts-5.10.3\\src\"
-
-rm -r \"$dir\\`$PLUGINSDIR\"
-
-$null = mkdir \"$dir\\erts-5.10.3\\lib\"
-mv \"$dir\\lib\\*.lib\" \"$dir\\erts-5.10.3\\lib\"
-mv \"$dir\\lib\\internal\" \"$dir\\erts-5.10.3\\lib\\internal\"
-
-cp \"$dir\\R16B02\\*.boot\" \"$dir\\bin\"
-mv \"$dir\\R16B02\" \"$dir\\releases\\R16B02\"
-"
+    "env_set": {
+        "ERLANG_HOME": "$dir"
+    },
+    "installer": {
+        "args": ["/S", "/D=$dir"]
+    },
+    "uninstaller": {
+        "file" : "Uninstall.exe",
+        "args" : ["/S"]
+    }
 }
