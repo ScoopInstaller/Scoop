@@ -5,12 +5,12 @@
     "architecture": {
         "64bit": {
             "url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-windows-amd64-image.zip",
-            "hash": "F6DF07CEC3B1BD53B857E5F4E20309AB5E8AEAA29CA9152AB0D26B77B339780A",
+            "hash": "1b835601f4ae689b9271040713b01d6bdd186c6a57bb4a7c47e1f7244d5ac928",
             "extract_dir": "openjdk-1.7.0-u80-unofficial-windows-amd64-image"
         },
         "32bit": {
             "url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-windows-i586-image.zip",
-            "hash": "F3B715BC049B3C88BC47695278433C7DC4B2648E2B156F5E24346AECBA343035",
+            "hash": "f3b715bc049b3c88bc47695278433c7dc4b2648e2b156f5e24346aecba343035",
             "extract_dir": "openjdk-1.7.0-u80-unofficial-windows-i586-image"
         }
     },
