@@ -1,0 +1,17 @@
+{
+    "homepage": "http://www.rust-lang.org",
+    "version": "1.4.0",
+    "license": "MIT/Apache 2.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://static.rust-lang.org/dist/rust-1.4.0-x86_64-pc-windows-msvc.msi",
+            "hash": "ad1f8fd20384912d511728593eb22018461df35378c96b33b80276dfc5d76ca8"
+        }
+    },
+    "bin": [
+        "Rust\\bin\\rustc.exe",
+        "Rust\\bin\\rustdoc.exe",
+        "Rust\\bin\\cargo.exe"
+    ],
+    "checkver": "<h2>Docs \\(([0-9\\.]+)\\)</h2>"
+}
