@@ -16,8 +16,5 @@
     "post_install": [
         "git config --global credential.helper wincred"
     ],
-    "env_set": {
-        "GIT_SSH": "$(resolve-path $(scoop which ssh))"
-    },
-    "depends": "openssh"
+    "notes": "To get Git to recognise OpenSSH, you will need to run\n\nscoop install openssh\n[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')\n\nand then restart powershell."
 }
