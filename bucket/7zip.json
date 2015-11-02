@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.7-zip.org/",
     "license": "http://www.7-zip.org/license.txt",
-    "version": "9.38",
+    "version": "15.10",
     "architecture": {
         "64bit": {
-            "url": "http://www.7-zip.org/a/7z938-x64.msi",
-            "hash": "7c8e873991c82ad9cfcdbdf45254ea6101e9a645e12977dcd518979e50fdedf3"
+            "url": "http://www.7-zip.org/a/7z1510-x64.msi",
+            "hash": "7dcedf4fc500c888ee89c7cf898653fd25f2947bf9eac7946e261029a6912326"
         },
         "32bit": {
-            "url": "http://www.7-zip.org/a/7z938.msi",
-            "hash": "c48f13efbde87f370f2a70885df55c1e53f2c791c2007f9587810f915fecc0d8"
+            "url": "http://www.7-zip.org/a/7z1510.msi",
+            "hash": "73ebf4cb2051083cc60da97025228cae0b06af69cedc4edf66863dc080bf371e"
         }
     },
     "extract_dir": "Files/7-Zip",
