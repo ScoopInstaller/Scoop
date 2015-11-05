@@ -1,0 +1,14 @@
+{
+    "version":  "1.5.0",
+    "license":  "https://github.com/docker/compose/blob/master/LICENSE",
+    "architecture": {
+        "64bit": {
+            "url":  "https://github.com/docker/compose/releases/download/1.5.0/docker-compose-Windows-x86_64.exe",
+            "hash": "ef53798f6df7a5f0b640f405100d8025c2151821c731438b1b94b21ce6b84adc"
+        }
+    },
+    "homepage":  "https://docker.com",
+    "bin": [
+        ["docker-compose-Windows-x86_64.exe", "docker-compose"]
+    ]
+}
