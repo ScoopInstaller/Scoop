@@ -13,6 +13,21 @@
         }
     },
     "bin": [
-        ["docker-machine.exe", "docker-machine"]
+        "docker-machine.exe",
+        "docker-machine-driver-amazonec2.exe",
+        "docker-machine-driver-azure.exe",
+        "docker-machine-driver-digitalocean.exe",
+        "docker-machine-driver-exoscale.exe",
+        "docker-machine-driver-generic.exe",
+        "docker-machine-driver-google.exe",
+        "docker-machine-driver-hyperv.exe",
+        "docker-machine-driver-none.exe",
+        "docker-machine-driver-openstack.exe",
+        "docker-machine-driver-rackspace.exe",
+        "docker-machine-driver-softlayer.exe",
+        "docker-machine-driver-virtualbox.exe",
+        "docker-machine-driver-vmwarefusion.exe",
+        "docker-machine-driver-vmwarevcloudair.exe",
+        "docker-machine-driver-vmwarevsphere.exe"
     ]
 }
