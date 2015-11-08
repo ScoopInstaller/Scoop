@@ -19,8 +19,8 @@
         "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/mpfr/mpfr-2.4.1-1/mpfr-2.4.1-1-mingw32-dev.tar.lzma",
         "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/pthreads-w32/pthreads-w32-2.8.0-3/libpthread-2.8.0-3-mingw32-dll-2.tar.lzma",
         "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/pthreads-w32/pthreads-w32-2.8.0-3/pthreads-w32-2.8.0-3-mingw32-dev.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/mingw-rt/mingwrt-3.18/mingwrt-3.18-mingw32-dll.tar.gz",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/mingw-rt/mingwrt-3.18/mingwrt-3.18-mingw32-dev.tar.gz",
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/mingwrt/mingwrt-3.18/mingwrt-3.18-mingw32-dll.tar.gz",
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/mingwrt/mingwrt-3.18/mingwrt-3.18-mingw32-dev.tar.gz",
         "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/w32api/w32api-3.15/w32api-3.15-1-mingw32-dev.tar.lzma",
         "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/libiconv/libiconv-1.13.1-1/libiconv-1.13.1-1-mingw32-dll-2.tar.lzma",
         "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/libiconv/libiconv-1.13.1-1/libiconv-1.13.1-1-mingw32-dev.tar.lzma"
