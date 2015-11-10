@@ -1,0 +1,13 @@
+{
+    "version": "2.12.4",
+    "license": "Apache 2.0",
+    "extract_dir": "tools",
+    "url": "http://nuget.org/api/v2/package/Invoke-Build/2.12.4#.zip",
+    "homepage": "https://github.com/nightroman/Invoke-Build",
+    "hash": "1237b0887cda294986f177cf09589b76f2ca0590199b68515962befb0369a3de",
+    "env_add_path": ".",
+    "checkver": {
+        "url": "https://github.com/nightroman/Invoke-Build/raw/master/Release-Notes.md",
+        "re": "##\\s+v(\\d+\\.\\d+\\.\\d+)"
+    }
+}

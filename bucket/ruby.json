@@ -1,35 +1,35 @@
 {
-	"homepage": "http://rubyinstaller.org",
-	"version": "2.1.5",
-	"architecture": {
-		"64bit": {
-			"url": [
-				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.1.5-x64-mingw32.7z?direct#/dl.7z",
-				"http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
-			],
-			"hash": [
-				"120dc70369c90ae66e3c02f1c9e70579841ab204a3eac1b25110d9ae542199a7",
-				"2ada04c7234199126c0f34f6ea7163a8f8dccb1e15814af175a189f6ac48b8ac"
-			],
-			"extract_dir": "ruby-2.1.5-x64-mingw32"
-		},
-		"32bit": {
-			"url": [
-				"http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.1.5-i386-mingw32.7z?direct#/dl.7z",
-				"http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
-			],
-			"hash": [
-				"1e1619d41ffae46826bb7866f9e6f148cf13730c40aba80e520f835ccd005f18",
-				"61a06b5da06dd94343e591163ac0d43c544e9cd4df770f01275645b268b44dc7"
-			],
-			"extract_dir": "ruby-2.1.5-i386-mingw32"
-		}
-	},
-	"extract_to": [ "", "devkit" ],
-	"env_add_path": "bin",
-	"post_install": "pushd $dir\\devkit;echo \"---`n- $dir\" | out-file config.yml -enc default; ruby dk.rb install;popd;",
-	"checkver": {
-		"url": "http://rubyinstaller.org/downloads/",
-		"re": "<li class=\"exe\"><a.*?>Ruby ([0-9\\.p-]+)</a></li>"
-	}
+    "homepage": "http://rubyinstaller.org",
+    "version": "2.2.3",
+    "architecture": {
+        "64bit": {
+            "url": [
+                "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.3-x64-mingw32.7z?direct#/dl.7z",
+                "http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
+            ],
+            "hash": [
+                "683270a7e09ef756476c00902eda9999137468eb21a371831b7c01602d2fd069",
+                "2ada04c7234199126c0f34f6ea7163a8f8dccb1e15814af175a189f6ac48b8ac"
+            ],
+            "extract_dir": "ruby-2.2.3-x64-mingw32"
+        },
+        "32bit": {
+            "url": [
+                "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.3-i386-mingw32.7z?direct#/dl.7z",
+                "http://cdn.rubyinstaller.org/archives/devkits/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
+            ],
+            "hash": [
+                "08b33a85ec26c01a6d305a258680976b57081e22ad9196623c1cf154e558e3ce",
+                "61a06b5da06dd94343e591163ac0d43c544e9cd4df770f01275645b268b44dc7"
+            ],
+            "extract_dir": "ruby-2.2.3-i386-mingw32"
+        }
+    },
+    "extract_to": [ "", "devkit" ],
+    "env_add_path": "bin",
+    "post_install": "pushd $dir\\devkit;echo \"---`n- $dir\" | out-file config.yml -enc default; ruby dk.rb install;popd;",
+    "checkver": {
+        "url": "http://rubyinstaller.org/downloads/",
+        "re": "<li class=\"exe\"><a.*?>Ruby ([0-9\\.p-]+)</a></li>"
+    }
 }

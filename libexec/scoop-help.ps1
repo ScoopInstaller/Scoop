@@ -6,42 +6,44 @@ param($cmd)
 . "$psscriptroot\..\lib\commands.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
+reset_aliases
+
 function print_help($cmd) {
-	$file = gc (relpath ".\scoop-$cmd.ps1") -raw
+    $file = gc (command_path $cmd) -raw
 
-	$usage = usage $file
-	$summary = summary $file
-	$help = help $file
+    $usage = usage $file
+    $summary = summary $file
+    $help = help $file
 
-	if($usage) { "$usage`n" }
-	if($help) { $help }
+    if($usage) { "$usage`n" }
+    if($help) { $help }
 }
 
 function print_summaries {
-	$commands = @{}
+    $commands = @{}
 
-	command_files | % {
-		$command = command_name $_
-		$summary = summary (gc (relpath $_) -raw )
-		if(!($summary)) { $summary = '' }
-		$commands.add("$command ", $summary) # add padding
-	}
+    command_files | % {
+        $command = command_name $_
+        $summary = summary (gc (command_path $command) -raw)
+        if(!($summary)) { $summary = '' }
+        $commands.add("$command ", $summary) # add padding
+    }
 
-	$commands.getenumerator() | sort name | ft -hidetablehead -autosize -wrap
+    $commands.getenumerator() | sort name | ft -hidetablehead -autosize -wrap
 }
 
 $commands = commands
 
 if(!($cmd)) {
-	"usage: scoop <command> [<args>]
+    "usage: scoop <command> [<args>]
 
 Some useful commands are:"
-	print_summaries
-	"type 'scoop help <command>' to get help for a specific command"
+    print_summaries
+    "type 'scoop help <command>' to get help for a specific command"
 } elseif($commands -contains $cmd) {
-	print_help $cmd
+    print_help $cmd
 } else {
-	"scoop help: no such command '$cmd'"; exit 1
+    "scoop help: no such command '$cmd'"; exit 1
 }
 
 exit 0

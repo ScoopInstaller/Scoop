@@ -1,32 +1,32 @@
 {
-	"homepage": "http://sliksvn.com/",
-	"version": "1.8.10",
-	"architecture": {
-		"64bit": {
-			"url": "https://sliksvn.com/pub/Slik-Subversion-1.8.10-x64.msi",
-			"hash": "4f90b4f51ccec1cb309022ee2db98be8297a2cdee33ae6ce218d1cf93883a222"
-		},
-		"32bit": {
-			"url": "https://sliksvn.com/pub/Slik-Subversion-1.8.10-win32.msi",
-			"hash": "7f1e4d9080fb8c591cc354b91bb1ede9c17ab8a3b0dbf5347525f6c79c6e059a"
-		}
-	},
-	"extract_dir": "SlikSvn",
-	"bin": [
-		"bin\\svn.exe",
-		"bin\\svnadmin.exe",
-		"bin\\svnauthz-validate.exe",
-		"bin\\svndumpfilter.exe",
-		"bin\\svnlook.exe",
-		"bin\\svnmucc.exe",
-		"bin\\svn-populate-node-origins-index.exe",
-		"bin\\svnrdump.exe",
-		"bin\\svnserve.exe",
-		"bin\\svnsync.exe",
-		"bin\\svnversion.exe"
-	],
-	"checkver": {
-		"url": "http://sliksvn.com/en/download/",
-		"re": "<a href=\"https://sliksvn.com/pub/Slik-Subversion-(.*)-win32.msi\" class=\"button default\">"
-	}
+    "homepage": "http://sliksvn.com/",
+    "version": "1.8.13",
+    "architecture": {
+        "64bit": {
+            "url": "https://sliksvn.com/pub/Slik-Subversion-1.8.13-x64.msi",
+            "hash": "0d4fde7f9113a8b4436a68c74beba7b27e9043002e3fe5730c09f918f606483c"
+        },
+        "32bit": {
+            "url": "https://sliksvn.com/pub/Slik-Subversion-1.8.13-win32.msi",
+            "hash": "2852bb8cacbecbbc52cf0d9edba40239daa593343f78b88713eba100119def09"
+        }
+    },
+    "extract_dir": "SlikSvn",
+    "bin": [
+        "bin\\svn.exe",
+        "bin\\svnadmin.exe",
+        "bin\\svnauthz-validate.exe",
+        "bin\\svndumpfilter.exe",
+        "bin\\svnlook.exe",
+        "bin\\svnmucc.exe",
+        "bin\\svn-populate-node-origins-index.exe",
+        "bin\\svnrdump.exe",
+        "bin\\svnserve.exe",
+        "bin\\svnsync.exe",
+        "bin\\svnversion.exe"
+    ],
+    "checkver": {
+        "url": "http://sliksvn.com/en/download/",
+        "re": "<a href=\"https://sliksvn.com/pub/Slik-Subversion-(.*)-win32.msi\" class=\"button default\">"
+    }
 }

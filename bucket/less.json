@@ -1,14 +1,14 @@
 {
-	"homepage": "http://gnuwin32.sourceforge.net/packages/less.htm",
-	"version": "394",
-	"license": "Simplified BSD",
-	"url": [
-		"http://downloads.sourceforge.net/project/gnuwin32/less/394/less-394-bin.zip",
-		"http://downloads.sourceforge.net/project/gnuwin32/less/394/less-394-dep.zip"
-	],
-	"hash": [
-		"md5:20f94bcc8a3347bd9a9ca32587d82eae",
-		"md5:539dce63be2b89a22af7b526d1022f72"
-	],
-	"bin": "bin\\less.exe"
+    "homepage": "http://gnuwin32.sourceforge.net/packages/less.htm",
+    "version": "394",
+    "license": "Simplified BSD",
+    "url": [
+        "http://ufpr.dl.sourceforge.net/project/gnuwin32/less/394/less-394-bin.zip",
+        "http://ufpr.dl.sourceforge.net/project/gnuwin32/less/394/less-394-dep.zip"
+    ],
+    "hash": [
+        "md5:20f94bcc8a3347bd9a9ca32587d82eae",
+        "md5:539dce63be2b89a22af7b526d1022f72"
+    ],
+    "bin": "bin\\less.exe"
 }

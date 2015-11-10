@@ -10,6 +10,8 @@
 . "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
+reset_aliases
+
 $opt, $apps, $err = getopt $args 'a:' 'arch='
 $app = $apps[0]
 
@@ -19,5 +21,5 @@ $architecture = ensure_architecture ($opt.a + $opt.architecture)
 
 $deps = @(deps $app $architecture)
 if($deps) {
-	$deps[($deps.length - 1)..0]
+    $deps[($deps.length - 1)..0]
 }

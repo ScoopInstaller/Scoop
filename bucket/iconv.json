@@ -1,24 +1,24 @@
 {
-	"homepage": "http://www.mingw.org/",
-	"version": "1.14-3",
-	"license": "GPLv3+",
-	"url": [
-		"http://downloads.sourceforge.net/project/mingw/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-bin.tar.lzma",
-		"http://downloads.sourceforge.net/project/mingw/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dll.tar.lzma",
-		"http://downloads.sourceforge.net/project/mingw/MinGW/Base/gettext/gettext-0.18.3.1-1/gettext-0.18.3.1-1-mingw32-dll.tar.lzma",
-		"http://downloads.sourceforge.net/project/mingw/MinGW/Base/gcc/Version4/gcc-4.8.1-4/gcc-core-4.8.1-4-mingw32-dll.tar.lzma",
-		"http://downloads.sourceforge.net/project/mingw/MinGW/Base/mpc/mpc-1.0.1-2/mpc-1.0.1-2-mingw32-dll.tar.lzma",
-		"http://downloads.sourceforge.net/project/mingw/MinGW/Base/mpfr/mpfr-3.1.2-2/mpfr-3.1.2-2-mingw32-dll.tar.lzma",
-		"http://downloads.sourceforge.net/project/mingw/MinGW/Base/gmp/gmp-5.1.2/gmp-5.1.2-1-mingw32-dll.tar.lzma"
-	],
-	"hash": [
-		"540592b29a5964a566127d3e976f0c0df8ffc1137788030c17a44750e7b02340",
-		"fbdab03c19c6c50f15b58d02a3cb8c31e8d95baafaa67239f389b9023c7757fd",
-		"3c1daf9fade6342de5bb00aacdf85155eb04b07ee3ffe4b1c33b99692329391f",
-		"0dab5f923c5d289b8e7e22a3b16ebff5ff8b7c7c0d295ac71806d97ef87b8bee",
-		"d0cd8770aee5df0f3008f2d11383ed3b9c918902ba43ac20374b91fb37a4e58c",
-		"063e607c9a576a3ed62d3986f7263cff69cbb5f9e366b981ba36001c08c6a973",
-		"7fe1d9de26875386c1fbce1f9a971d43c45644b2df3ead2c5ff0042053b5b75d"
-	],
-	"bin": "bin\\iconv.exe"
+    "homepage": "http://www.mingw.org/",
+    "version": "1.14-3",
+    "license": "GPLv3+",
+    "url": [
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-bin.tar.lzma",
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dll.tar.lzma",
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/gettext/gettext-0.18.3.1-1/gettext-0.18.3.1-1-mingw32-dll.tar.lzma",
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/gcc/Version4/gcc-4.8.1-4/gcc-core-4.8.1-4-mingw32-dll.tar.lzma",
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/mpc/mpc-1.0.1-2/mpc-1.0.1-2-mingw32-dll.tar.lzma",
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/mpfr/mpfr-3.1.2-2/mpfr-3.1.2-2-mingw32-dll.tar.lzma",
+        "http://ufpr.dl.sourceforge.net/project/mingw/MinGW/Base/gmp/gmp-5.1.2/gmp-5.1.2-1-mingw32-dll.tar.lzma"
+    ],
+    "hash": [
+        "540592b29a5964a566127d3e976f0c0df8ffc1137788030c17a44750e7b02340",
+        "fbdab03c19c6c50f15b58d02a3cb8c31e8d95baafaa67239f389b9023c7757fd",
+        "3c1daf9fade6342de5bb00aacdf85155eb04b07ee3ffe4b1c33b99692329391f",
+        "0dab5f923c5d289b8e7e22a3b16ebff5ff8b7c7c0d295ac71806d97ef87b8bee",
+        "d0cd8770aee5df0f3008f2d11383ed3b9c918902ba43ac20374b91fb37a4e58c",
+        "063e607c9a576a3ed62d3986f7263cff69cbb5f9e366b981ba36001c08c6a973",
+        "7fe1d9de26875386c1fbce1f9a971d43c45644b2df3ead2c5ff0042053b5b75d"
+    ],
+    "bin": "bin\\iconv.exe"
 }

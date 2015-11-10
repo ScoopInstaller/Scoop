@@ -1,9 +1,9 @@
 {
-	"homepage": "http://nginx.org",
-	"version": "1.5.13",
-	"license": "BSD",
-	"url": "http://nginx.org/download/nginx-1.5.13.zip",
-	"hash": "3DB4C66079F70678567D10BCD4337A127FE5C98D137F370F4C3CF6C0DD39CB14",
-	"extract_dir": "nginx-1.5.13",
-	"bin": "nginx.exe"
+    "homepage": "http://nginx.org",
+    "version": "1.9.6",
+    "license": "BSD",
+    "url": "http://nginx.org/download/nginx-1.9.6.zip",
+    "hash": "728f857eed412afd136276828295d10b6345c6879e74c0bc8872bbd7a2a55652",
+    "extract_dir": "nginx-1.9.6",
+    "bin": "nginx.exe"
 }

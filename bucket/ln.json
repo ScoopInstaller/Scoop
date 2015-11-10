@@ -1,7 +1,7 @@
 {
-	"homepage": "https://github.com/lukesampson/psutils",
-	"version": "0.2013.10.28",
-	"url": "https://raw.github.com/lukesampson/psutils/f7043c735a/ln.ps1",
-	"hash": "4d9d152150e36072842bf21c17752496a5863e58f775db2adfc5abdc01645b9e",
-	"bin": "ln.ps1"
+    "homepage": "https://github.com/lukesampson/psutils",
+    "version": "0.2015.04.25",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/4e363db/ln.ps1",
+    "hash": "81e9447d5d0108057c54380a8e49f6db9fa5806d2018e7b27bd68f3fb8332b98",
+    "bin": "ln.ps1"
 }

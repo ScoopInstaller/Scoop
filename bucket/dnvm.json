@@ -1,0 +1,13 @@
+{
+    "version":  "latest",
+    "license":  "Apache 2.0",
+    "url":  [
+        "https://raw.githubusercontent.com/aspnet/Home/dev/dnvm.ps1"
+    ],
+    "homepage":  "https://github.com/aspnet/Home",
+    "env_set": {
+        "DNX_HOME": "$dir\\.dnx",
+        "DNX_USER_HOME": "$dir\\.dnx"
+        },
+    "bin": "dnvm.ps1"
+}

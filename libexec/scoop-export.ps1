@@ -7,6 +7,8 @@
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 
+reset_aliases
+
 $local = installed_apps $false | % { @{ name = $_; global = $false } }
 $global = installed_apps $true | % { @{ name = $_; global = $true } }
 
@@ -17,7 +19,7 @@ $count = 0
 # echo "{["
 
 if($apps) {
-	$apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
+    $apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
         $app = $_.name
         $global = $_.global
         $ver = current_version $app $global
@@ -35,7 +37,7 @@ if($apps) {
         "$app (v:$ver) $global_display"
 
         $count++
-	}
+    }
 }
 
 # json

@@ -1,0 +1,10 @@
+{
+    "version":  "v0.1.1-alpha",
+    "license":  "https://raw.githubusercontent.com/deevus/CsvToSql/master/UNLICENSE.txt",
+    "url":  "https://github.com/deevus/CsvToSql/archive/v0.1.1-alpha.zip",
+    "depends":  "gow",
+    "homepage":  "https://github.com/deevus/CsvToSql",
+    "hash":  "eb248d286cf5fd06c8ff99d527759e153513396baf08f0398a6d34fa1cba1116",
+    "bin":  "ConvertCsvTo-Sql.ps1",
+    "extract_dir": "CsvToSql-0.1.1-alpha"
+}

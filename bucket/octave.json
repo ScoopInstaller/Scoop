@@ -1,0 +1,15 @@
+{
+    "version":  "3.8.2-5",
+    "license":  "GNU GPL",
+    "extract_dir":  "octave-3.8.2",
+    "url":  "http://mxeoctave.osuv.de/octave-3.8.2-5-portable.7z",
+    "depends":  "7zip",
+    "homepage":  "https://www.gnu.org/software/octave/",
+    "hash":  "md5:cc0c58770516c9c8d7659b65a2a4992c",
+    "bin":  [
+        "bin\\octave.exe",
+        "bin\\octave-gui.exe",
+        "bin\\octave-cli.exe",
+        "bin\\octave-config.exe"
+    ]
+}

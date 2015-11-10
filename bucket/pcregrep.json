@@ -1,0 +1,21 @@
+{
+    "homepage": "http://pcre.org",
+    "version": "10.20",
+    "license": "BSD",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/rivy/PCRE/releases/download/10.20/pcre2grep-10.20-x32.zip"
+           ,"hash": "a07c0d43132855bf350d85f71a9ee781d0e62721cd9053f1ff2894c52f4cfd85"
+            },
+        "64bit": {
+            "url": "https://github.com/rivy/PCRE/releases/download/10.20/pcre2grep-10.20-x64.zip"
+           ,"hash": "6b69d123b9e09e288f12e828f4a827e2bec59991e743802287c389fbbc99f54d"
+            }
+        },
+    "bin": [
+        "pcre2grep.exe"
+       ,"pcre2test.exe"
+       ,[ "pcre2grep.exe", "pcregrep" ]
+       ,[ "pcre2test.exe", "pcretest" ]
+        ]
+}

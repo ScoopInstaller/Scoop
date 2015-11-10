@@ -1,0 +1,10 @@
+{
+    "version":  "0.1.3-alpha",
+    "license":  "",
+    "extract_dir":  "Scholdoc",
+    "url":  "http://scholarlymarkdown.com/scholdoc-distribution/windows/scholdoc-0.1.3-alpha-windows.msi",
+    "depends":  "",
+    "homepage":  "https://github.com/timtylin/scholdoc",
+    "hash":  "e58036686c3c05db4a50d5fabd875eaa33aff2b0dd4d930c6bc2067c2bcd2b86",
+    "bin":  "scholdoc.exe"
+}

@@ -1,0 +1,14 @@
+{
+    "version":  "1.12.3",
+    "license":  "GPL",
+    "url":  "http://repo1.maven.org/maven2/com/madgag/bfg/1.12.3/bfg-1.12.3.jar",
+    "depends":  "openjdk",
+    "homepage":  "https://rtyley.github.io/bfg-repo-cleaner/",
+    "hash":  "2e237631235cfb8cc2d49dabb986389851dca8a28a07083345274b443dfa4911",
+    "bin":  "bfg.ps1",
+    "env_set": { "BFG_HOME": "$dir" },
+    "pre_install": "
+        $exe = 'java -jar $env:BFG_HOME\\bfg-1.12.3.jar $args'
+        write-output $exe | out-file -filepath $dir\\bfg.ps1
+    "
+}

@@ -11,6 +11,8 @@ param($app)
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 
+reset_aliases
+
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if(!(installed $app)) { abort "$app isn't installed" }

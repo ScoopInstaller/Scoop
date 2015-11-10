@@ -1,0 +1,26 @@
+{
+    "version":  "1.9.0",
+    "license":  "https://github.com/docker/docker/blob/master/LICENSE",
+    "architecture": {
+      "64bit": {
+        "url":  "https://get.docker.com/builds/Windows/x86_64/docker-1.9.0.exe",
+        "hash": "08c90f0efa34d8fc40b375646832d222d04667270f84eb4aafcbc47280c6fe48"
+      },
+      "32bit": {
+        "url":  "https://get.docker.com/builds/Windows/i386/docker-1.9.0.exe",
+        "hash":  "b2680969952d12fcd1dd84f7056bebe6bcfb3fb5314f16e29830c5bc0d2f86f0"
+      }
+    },
+    "homepage":  "https://docker.com",
+    "bin": [
+      ["docker-1.9.0.exe", "docker"]
+    ],
+    "notes": [
+      "This is the docker client only. Until the docker daemon can run natively",
+      "on Windows you will need a Virtual Machine such as Boot2Docker or",
+      "Docker Machine",
+      "",
+      "Boot2Docker: https://github.com/boot2docker/windows-installer/releases/",
+      "Docker Machine: http://docs.docker.com/machine/"
+    ]
+}

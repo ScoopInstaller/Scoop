@@ -1,24 +1,38 @@
 {
-	"homepage": "http://www.python.org",
-	"license": "http://docs.python.org/3.4/license",
-	"version": "3.4.2",
-	"architecture": {
-		"64bit": {
-			"url": "https://www.python.org/ftp/python/3.4.2/python-3.4.2.amd64.msi",
-			"hash": "md5:45140ce7891a18cd52530cecdf7717ff"
-		},
-		"32bit": {
-			"url": "https://www.python.org/ftp/python/3.4.2/python-3.4.2.msi",
-			"hash": "md5:0aa1a556892d8dc0b60c19bf3102fb3f"
-		}
-	},
-	"bin": [
-		"python.exe",
-		"py.exe",
-		"pythonw.exe",
-		[ "python.exe", "python3" ]
-	],
-	"env_add_path": [ "scripts" ],
-	"post_install": "python -m ensurepip; cp (gcm pip3).path \"$(split-path (gcm pip3).path)/pip.exe\"",
-	"checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
+    "homepage": "http://www.python.org",
+    "license": "https://docs.python.org/3/license.html",
+    "version": "3.5.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://www.python.org/ftp/python/3.5.0/python-3.5.0-amd64.exe#/py350.exe",
+            "hash": "md5:facc4c9fb6f359b0ca45db0e11455421"
+        },
+        "32bit": {
+            "url": "https://www.python.org/ftp/python/3.5.0/python-3.5.0.exe#/py350.exe",
+            "hash": "md5:1e87ad24225657a3de447171f0eda1df"
+        }
+    },
+    "pre_install": "copy-item $dir\\py350.exe $dir\\uninstall.exe",
+    "installer": {
+        "args": [
+            "/quiet",
+            "InstallAllUsers=0",
+            "TargetDir=$dir",
+            "AssociateFiles=0",
+            "Shortcuts=0",
+            "InstallLauncherAllUsers=0"
+        ]
+    },
+    "uninstaller": {
+        "file": "uninstall.exe",
+        "args": [ "/uninstall", "/quiet", "InstallAllUsers=0"]
+    },
+    "bin": [
+        "python.exe",
+        "pythonw.exe",
+        [ "python.exe", "python3" ]
+    ],
+    "env_add_path": [ "scripts" ],
+    "checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
 }
+

@@ -1,0 +1,25 @@
+{
+    "homepage": "http://nim-lang.org/",
+    "version": "0.11.2",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "http://nim-lang.org/download/nim-0.11.2_x64.exe#/dl.7z",
+            "hash": "27d23d16a6b7a30d1db24c522623cf7128eb2c2c4f8cb9b503ebf78568c174bc"
+        },
+        "32bit": {
+            "url": "http://nim-lang.org/download/nim-0.11.2_x32.exe#/dl.7z",
+            "hash": "88bbda792dc95a50f5d04c5411ce32cc2c5bb06116410387b71d838281331cdc"
+        }
+    },
+    "bin": [
+        "bin\\nimgrep.exe",
+        "bin\\nim.exe",
+        "bin\\nimble.exe"
+    ],
+    "depends": "gcc",
+    "post_install": "
+# Removes installation cruft
+rm -r $dir\\`$PLUGINSDIR
+rm -r $dir\\`$COMMONFILES"
+}

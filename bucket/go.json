@@ -1,21 +1,21 @@
 {
-	"version": "1.4",
-	"homepage": "http://golang.org",
-	"license": "http://golang.org/LICENSE",
-	"architecture": {
-		"64bit": {
-			"url": "https://storage.googleapis.com/golang/go1.4.windows-amd64.zip",
-			"hash": "sha1:44f103d558b293919eb680041625c262dd00eb9a"
-		},
-		"32bit": {
-			"url": "https://storage.googleapis.com/golang/go1.4.windows-386.zip",
-			"hash": "sha1:f44240a1750dd051476ae78e9ad0502bc5c7661d"
-		}
-	},
-	"extract_dir": "go",
-	"env_add_path": "bin",
-	"env_set": {
-		"GOROOT": "$dir"
-	},
-	"checkver": "<div id=\"footer\">\\s*Build version go([0-9\\.]+)\\.<br>"
+    "version": "1.5.1",
+    "homepage": "http://golang.org",
+    "license": "http://golang.org/LICENSE",
+    "architecture": {
+        "64bit": {
+            "url": "https://storage.googleapis.com/golang/go1.5.1.windows-amd64.zip",
+            "hash": "sha1:7815772347ad3e11a096d927c65bfb15d5b0f490"
+        },
+        "32bit": {
+            "url": "https://storage.googleapis.com/golang/go1.5.1.windows-386.zip",
+            "hash": "sha1:bb071ec45ef39cd5ed9449b54c5dd083b8233bfa"
+        }
+    },
+    "extract_dir": "go",
+    "env_add_path": "bin",
+    "env_set": {
+        "GOROOT": "$dir"
+    },
+    "checkver": "<div id=\"footer\">\\s*Build version go([0-9\\.]+)\\.<br>"
 }

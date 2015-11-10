@@ -1,7 +1,7 @@
-Scoop
+Scoop [![Build status](https://ci.appveyor.com/api/projects/status/bfsfu6bwyviaqjhi/branch/master?svg=true)](https://ci.appveyor.com/project/deevus/scoop/branch/master)
 =====
 
-Scoop is a command-line installer for windows.
+Scoop is a command-line installer for Windows.
 
 Requirements:
 
@@ -11,7 +11,7 @@ Requirements:
 To install:
 
     iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
-    
+
 Once installed, run `scoop help` for instructions.
 
 What does Scoop do?

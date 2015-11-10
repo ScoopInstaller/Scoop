@@ -1,0 +1,33 @@
+{
+    "homepage": "https://github.com/docker/machine",
+    "version": "0.5.0",
+    "license": "Apache",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/docker/machine/releases/download/v0.5.0/docker-machine_windows-amd64.zip",
+            "hash": "fd236a3fea82e240d5a5daaeee5c1ed29c6ac1805c98ce23f2281240c6815b51"
+        },
+        "32bit": {
+            "url": "https://github.com/docker/machine/releases/download/v0.5.0/docker-machine_windows-386.zip",
+            "hash": "383213419f4a8fc13e32f946f91370855c71bf84cc9f93b1d172462fd2c396a6"
+        }
+    },
+    "bin": [
+        "docker-machine.exe",
+        "docker-machine-driver-amazonec2.exe",
+        "docker-machine-driver-azure.exe",
+        "docker-machine-driver-digitalocean.exe",
+        "docker-machine-driver-exoscale.exe",
+        "docker-machine-driver-generic.exe",
+        "docker-machine-driver-google.exe",
+        "docker-machine-driver-hyperv.exe",
+        "docker-machine-driver-none.exe",
+        "docker-machine-driver-openstack.exe",
+        "docker-machine-driver-rackspace.exe",
+        "docker-machine-driver-softlayer.exe",
+        "docker-machine-driver-virtualbox.exe",
+        "docker-machine-driver-vmwarefusion.exe",
+        "docker-machine-driver-vmwarevcloudair.exe",
+        "docker-machine-driver-vmwarevsphere.exe"
+    ]
+}
