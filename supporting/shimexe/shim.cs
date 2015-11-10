@@ -75,6 +75,7 @@ namespace shim {
             var config = Config(configPath);
             var path = Get(config, "path");
             var add_args = Get(config, "args");
+            var wait = Get(config, "wait", "yes");
 
             var si = new STARTUPINFO();
             var pi = new PROCESS_INFORMATION();
@@ -100,10 +101,13 @@ namespace shim {
                 return Marshal.GetLastWin32Error();
             }
 
-            WaitForSingleObject(pi.hProcess, INFINITE);
-
             uint exit_code = 0;
-            GetExitCodeProcess(pi.hProcess, out exit_code);
+
+            if (!wait.Equals("no") && !wait.Equals("false")) {
+                WaitForSingleObject(pi.hProcess, INFINITE);
+
+                GetExitCodeProcess(pi.hProcess, out exit_code);
+            }
 
             // Close process and thread handles.
             CloseHandle(pi.hProcess);
@@ -129,9 +133,11 @@ namespace shim {
             return cmdLine.Substring(space + 1);
         }
 
-        static string Get(Dictionary<string, string> dic, string key) {
-            string value = null;
-            dic.TryGetValue(key, out value);
+        static string Get(Dictionary<string, string> dic, string key, string defaultValue = null) {
+            string value;
+            if (!dic.TryGetValue(key, out value)) {
+                return defaultValue;
+            }
             return value;
         }
 
