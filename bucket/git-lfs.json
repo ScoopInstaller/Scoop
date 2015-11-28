@@ -1,0 +1,18 @@
+{
+    "version":  "v1.1.0",
+    "license":  "",
+    "extract_dir":  "",
+    "architecture":  {
+        "32bit": {
+            "url":  "https://github.com/github/git-lfs/releases/download/v1.1.0/git-lfs-windows-386-1.1.0.zip",
+            "hash":  "e8cbc1b9336643c8ba2ac490ecdc4690f4528e98fecc08983a816ea410650d5b"
+        },
+        "64bit": {
+            "url":  "https://github.com/github/git-lfs/releases/download/v1.1.0/git-lfs-windows-amd64-1.1.0.zip",
+            "hash":  "421ab329dfa5af44430497d7fcca9194e7916ddcbf862c2dcbb5bb727db6c6a8"
+        }
+    },
+    "depends":  "git",
+    "homepage":  "https://git-lfs.github.com/",
+    "bin":  "git-lfs.exe"
+}
