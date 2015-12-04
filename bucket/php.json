@@ -9,7 +9,7 @@
         },
         "32bit": {
             "url": "http://windows.php.net/downloads/releases/php-7.0.0-Win32-VC14-x86.zip",
-            "hash": "sha1:c37a1ce5883c39278eefda624e4bd3821f1af24c"
+            "hash": "sha1:1fef2a4893f448c4597db27326eef6db2b38331c"
         }
     },
     "bin": "php.exe",
