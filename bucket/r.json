@@ -3,7 +3,7 @@
     "version": "3.2.2",
     "license": "GPL2",
     "url": "https://cran.rstudio.com/bin/windows/base/R-3.2.2-win.exe",
-    "hash": "aee512f5c4ed3099301721d8d0e8c779caf5232313f5fda44f3de800cd20266a",
+    "hash": "c5ea69d2142b65fc798ef3516c5f669d761010d065a743661341b66825d8348b",
     "innosetup": true,
     "bin": [
         "bin\\r.exe",
