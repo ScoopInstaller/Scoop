@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.r-project.org",
-    "version": "3.2.2",
+    "version": "3.2.3",
     "license": "GPL2",
-    "url": "https://cran.rstudio.com/bin/windows/base/R-3.2.2-win.exe",
-    "hash": "c5ea69d2142b65fc798ef3516c5f669d761010d065a743661341b66825d8348b",
+    "url": "https://cran.rstudio.com/bin/windows/base/R-3.2.3-win.exe",
+    "hash": "b88083895164a483c7583a69f16921cc93e07c327b016740a167607f335c0b3d",
     "innosetup": true,
     "pre_install": "if ([intptr]::size -eq 8) { $r_arch = \"x64\" } else { $r_arch = \"i386\" }; copy-item -recurse $dir\\bin\\$r_arch $dir\\bin\\curr_arch;",
     "bin": [
