@@ -4,12 +4,12 @@
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.0.0-Win32-VC14-x64.zip",
-            "hash": "sha1:651a0aad1522ea8c6568f3153f0a4de742d880be"
+            "url": "http://windows.php.net/downloads/releases/php-7.0.1-Win32-VC14-x64.zip",
+            "hash": "sha1:0cf3e2c53d3d54a94044b993115e5f5cc425b511"
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.0.0-Win32-VC14-x86.zip",
-            "hash": "sha1:1fef2a4893f448c4597db27326eef6db2b38331c"
+            "url": "http://windows.php.net/downloads/releases/php-7.0.1-Win32-VC14-x86.zip",
+            "hash": "sha1:9a6c8d44d658ef7710ea0b45028d501490ee94a1"
         }
     },
     "bin": "php.exe",
