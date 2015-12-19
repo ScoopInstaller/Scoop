@@ -1,6 +1,6 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.0.0",
+    "version": "7.0.1",
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
