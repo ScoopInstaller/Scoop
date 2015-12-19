@@ -1,4 +1,4 @@
-Scoop [![Build status](https://ci.appveyor.com/api/projects/status/bfsfu6bwyviaqjhi/branch/master?svg=true)](https://ci.appveyor.com/project/deevus/scoop/branch/master)
+Scoop [![Build status](https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true)](https://ci.appveyor.com/project/lukesampson/scoop)
 =====
 
 Scoop is a command-line installer for Windows.
