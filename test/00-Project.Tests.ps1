@@ -9,9 +9,9 @@ $project_file_exclusions = @(
 describe 'Project code' {
 
     $files = @(
-        Get-ChildItem $repo_dir -file -recurse -force |
-            ? { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
-            ? { $_.fullname -imatch '.(ps1|psm1)$' }
+        $repo_files |
+            where-object { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
+            where-object { $_.fullname -imatch '.(ps1|psm1)$' }
     )
 
     $files_exist = ($files.Count -gt 0)
@@ -75,9 +75,9 @@ describe 'Style constraints for non-binary project files' {
 
     $files = @(
         # gather all files except '*.exe', '*.zip', or any .git repository files
-        Get-ChildItem $repo_dir -file -recurse -force |
-            ? { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
-            ? { $_.fullname -inotmatch '(.exe|.zip)$' }
+        $repo_files |
+            where-object { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
+            where-object { $_.fullname -inotmatch '(.exe|.zip)$' }
     )
 
     $files_exist = ($files.Count -gt 0)
