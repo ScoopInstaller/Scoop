@@ -1,0 +1,21 @@
+{
+    "homepage": "http://nodejs.org",
+    "version": "4.2.4",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://nodejs.org/dist/v4.2.4/node-v4.2.4-x64.msi",
+            "hash": "1b645f3c2ebefeba0ec21de94435878f5f4d885a41725d3b349da4c8d78cf4b8"
+        },
+        "32bit": {
+            "url": "https://nodejs.org/dist/v4.2.4/node-v4.2.4-x86.msi",
+            "hash": "c7c9ab4a1917add9289230805cc070c9daf383eecfe77540ee7ae31218bdbec3"
+        }
+    },
+    "env_add_path": "nodejs",
+    "post_install": "
+# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
+rm $dir\\nodejs\\node_modules\\npm\\npmrc
+npm update -g",
+    "checkver": "<p class=\"home-version home-version-banner\">\\s*Current Version: v([0-9\\.]+)"
+}
