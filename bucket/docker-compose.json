@@ -1,10 +1,10 @@
 {
-    "version":  "1.5.1",
+    "version":  "1.5.2",
     "license":  "https://github.com/docker/compose/blob/master/LICENSE",
     "architecture": {
         "64bit": {
-            "url":  "https://github.com/docker/compose/releases/download/1.5.1/docker-compose-Windows-x86_64.exe",
-            "hash": "81bc31ed1a2f2b50fa499d8cc541030150b465a513a1ff7ee696a9399183f0fe"
+            "url":  "https://github.com/docker/compose/releases/download/1.5.2/docker-compose-Windows-x86_64.exe",
+            "hash": "77c32fcc66c85b11a127df4d30ea6669785cb495e3692d85bdbe458521f5f776"
         }
     },
     "homepage":  "https://docker.com",
