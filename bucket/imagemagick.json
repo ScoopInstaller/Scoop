@@ -1,0 +1,31 @@
+{
+    "homepage": "http://www.imagemagick.org/script/index.php",
+    "license": "http://www.imagemagick.org/script/license.php",
+    "version": "6.9.3-0",
+    "architecture": {
+        "64bit": {
+            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.3-0-portable-Q16-x64.zip",
+            "hash": "md5:5453d46dd59a4bea482e659a0fbdfa55"
+        },
+        "32bit": {
+            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.3-0-portable-Q16-x86.zip",
+            "hash": "md5:5266279620f857475e74e307f51df0fc"
+        }
+    },
+    "env_add_path": ".",
+    "bin": [
+        "compare.exe",
+        "composite.exe",
+        "conjure.exe",
+        "convert.exe",
+        "dcraw.exe",
+        "ffmpeg.exe",
+        "hp2xx.exe",
+        "identify.exe",
+        "IMDisplay.exe",
+        "mogrify.exe",
+        "montage.exe",
+        "stream.exe"
+    ],
+    "checkver": "The current release is ImageMagick <a.*?>([0-9\\.p-]+)</a>"
+}
