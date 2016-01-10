@@ -179,7 +179,9 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extracted = 0;
 
     foreach($url in $urls) {
-        $fname = split-path $url -leaf
+        # NOTE: uri/url fragment identifiers are used to optionally specify file type for extraction
+        $uri = [System.URI]$url
+        $fname = split-path $($uri.LocalPath + $uri.Fragment) -leaf
 
         dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
 
