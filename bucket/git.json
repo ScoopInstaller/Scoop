@@ -8,7 +8,7 @@
             "hash": "d7cf3f8ceef88b824fd7dfa476e2bbffd1bff0011b7577bc864e7fbb61fb95f1"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.6.2.windows.1/PortableGit-2.7.0-32-bit.7z.exe#/dl.7z",
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.7.0.windows.1/PortableGit-2.7.0-32-bit.7z.exe#/dl.7z",
             "hash": "d1d46375004451beceb15c33c4807d50c925c039173df9f4bd0de0c01cd0f30c"
         }
     },
