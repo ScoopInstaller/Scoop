@@ -1,30 +1,22 @@
 {
-    "version": "5.4p1-1",
-    "license": "http://www.openbsd.org/cgi-bin/cvsweb/src/usr.bin/ssh/LICENCE?rev=HEAD",
+    "version": "7.1p1",
+    "license": "https://github.com/PowerShell/Win32-OpenSSH/blob/L1/LICENCE",
     "url": [
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Extension/openssh/openssh-5.4p1-1/openssh-5.4p1-1-msys-1.0.13-bin.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Extension/openssh/openssh-5.4p1-1/openssh-5.4p1-1-msys-1.0.13-lic.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Extension/zlib/zlib-1.2.3-2/zlib-1.2.3-2-msys-1.0.13-dll.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Extension/minires/minires-1.02_1-2/libminires-1.02_1-2-msys-1.0.13-dll.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Extension/openssl/openssl-1.0.0-1/libopenssl-1.0.0-1-msys-1.0.13-dll-100.tar.lzma"
+        "https://github.com/PowerShell/Win32-OpenSSH/releases/download/12_22_2015/OpenSSH-Win32.zip"
     ],
     "hash": [
-        "8c8e6a030a34c341394bb8b9f1760743468a8cc5e4244efc34f7ab3cd3e67b64",
-        "edef96034d9ec958b9a58023bcfef54bb4f6b56c6df94c2cced178a675cc3a98",
-        "41c7d5561662e41da74951f373a08a95db40b27b1246227bbbc13abc44976ea7",
-        "4178940828b928b2d5a33042cc83fbb992b4bfb9ffeaef6dc3e555f2a6a8c0d1",
-        "e42fbdcff71404a76306f3b8f0024f453aafa7fe7dd9dac43c82b2e8d33e23f1",
-        "463ed0e62cc5ae102a8e2f4d30e665507cf8a3930f23668629eea48cb4dda71c"
+        "ac16277778b3b2f248ad8d5517aa1f0f0391b5f8725a285c9450bd317495e8de"
     ],
     "bin": [
-        "bin\\scp.exe",
-        "bin\\sftp.exe",
-        "bin\\slogin.exe",
-        "bin\\ssh-add.exe",
-        "bin\\ssh-agent.exe",
-        "bin\\ssh-keygen.exe",
-        "bin\\ssh-keyscan.exe",
-        "bin\\ssh.exe"
+        "OpenSSH-Win32\\scp.exe",
+        "OpenSSH-Win32\\sftp.exe",
+        "OpenSSH-Win32\\sftp-server.exe",
+        "OpenSSH-Win32\\ssh-add.exe",
+        "OpenSSH-Win32\\ssh-agent.exe",
+        "OpenSSH-Win32\\ssh-keygen.exe",
+        "OpenSSH-Win32\\ssh-keyscan.exe",
+        "OpenSSH-Win32\\ssh-keysign.exe",
+        "OpenSSH-Win32\\ssh.exe",
+        "OpenSSH-Win32\\ssh-pkcs11-helper.exe"
     ]
 }
