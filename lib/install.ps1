@@ -6,8 +6,43 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global) {
+function app_history($app) {
     $app, $manifest, $bucket, $url = locate $app
+    $manifest_path = resolve-path $(manifest_path $app $bucket) -ea silentlycontinue
+    if (!$manifest_path) {
+        return @()
+    }
+    $manifest_dir = split-path $manifest_path
+
+    pushd $manifest_dir
+    try {
+        # get commits containing $app
+        $commits = git rev-list --all -- ./$app.json
+
+        $manifests = $commits |% {
+            try {
+                git show $_`:./$app.json | convertfrom-json -ea silentlycontinue
+            }
+            catch {}
+        } | sort-object version -unique -descending
+    }
+    finally {
+        popd
+    }
+    $manifests
+}
+
+function install_app($app, $architecture, $global, $version) {
+    $app, $manifest, $bucket, $url = locate $app
+    if ($version) {
+        $history = app_history $app
+        $manifest = $history |? { $_.version -eq $version }
+
+        if (!$manifest) {
+            abort "couldn't find manifest for $app ($version)"
+        }
+    }
+
     $use_cache = $true
     $check_hash = $true
 
