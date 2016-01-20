@@ -204,12 +204,18 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
             # check manifest doesn't use deprecated install method
             $msi = msi $manifest $architecture
             if(!$msi) {
-                $extract_fn = 'extract_lessmsi'
-                if ($extract_dir) {
-                    $extract_dir = join-path SourceDir $extract_dir
+                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
+                if ($useLessMsi -eq $true) {
+                    $extract_fn = 'extract_lessmsi'
+                    if ($extract_dir) {
+                        $extract_dir = join-path SourceDir $extract_dir
+                    }
+                    else {
+                        $extract_dir = "SourceDir"
+                    }
                 }
                 else {
-                    $extract_dir = "SourceDir"
+                    $extract_fn = 'extract_msi'
                 }
             } else {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs"
