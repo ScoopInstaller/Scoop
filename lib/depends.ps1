@@ -47,6 +47,7 @@ function install_deps($manifest, $arch) {
     $deps = @()
 
     if(requires_7zip $manifest $arch) { $deps += "7zip" }
+    if(requires_lessmsi $manifest $arch) { $deps += "lessmsi" }
     if($manifest.innosetup) { $deps += "innounp" }
 
     $deps

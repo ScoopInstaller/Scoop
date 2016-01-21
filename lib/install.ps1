@@ -204,7 +204,13 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
             # check manifest doesn't use deprecated install method
             $msi = msi $manifest $architecture
             if(!$msi) {
-                $extract_fn = 'extract_msi'
+                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
+                if ($useLessMsi -eq $true) {
+                    $extract_fn, $extract_dir = lessmsi_config $extract_dir
+                }
+                else {
+                    $extract_fn = 'extract_msi'
+                }
             } else {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs"
             }
@@ -243,6 +249,18 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     }
 
     $fname # returns the last downloaded file
+}
+
+function lessmsi_config ($extract_dir) {
+    $extract_fn = 'extract_lessmsi'
+    if ($extract_dir) {
+        $extract_dir = join-path SourceDir $extract_dir
+    }
+    else {
+        $extract_dir = "SourceDir"
+    }
+
+    $extract_fn, $extract_dir
 }
 
 function cookie_header($cookies) {
@@ -406,6 +424,10 @@ function extract_msi($path, $to) {
     $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
     if(!$ok) { abort "failed to extract files from $path.`nlog file: $(friendly_path $logfile)" }
     if(test-path $logfile) { rm $logfile }
+}
+
+function extract_lessmsi($path, $to) {
+    iex "lessmsi x `"$path`" `"$to\`""
 }
 
 # deprecated
