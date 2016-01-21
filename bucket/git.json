@@ -16,5 +16,9 @@
     "post_install": [
         "git config --global credential.helper wincred"
     ],
-    "notes": "To get Git to recognise OpenSSH, you will need to run\n\nscoop install openssh\n[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')\n\nand then restart powershell."
+    "notes": "To get Git to recognise OpenSSH, you will need to run\n\nscoop install openssh\n[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')\n\nand then restart powershell.",
+    "checkver": {
+        "url": "http://git-scm.com/download/win",
+        "re": "\\<a href=\"https://github.com/git-for-windows/git/releases/download/v([^/]+)/"
+    }
 }
