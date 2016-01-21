@@ -2,7 +2,7 @@
     "homepage": "http://www.sqlite.org/",
     "version": "3.10.2",
     "license": "Public Domain",
-    "url": "http://sqlite.org/2016/sqlite-tools-win32-x86-3100200.zip",
+    "url": "https://sqlite.org/2016/sqlite-tools-win32-x86-3100200.zip",
     "hash": "b1ebfcbb0a6453022f90ee7ac37f05dfcd337e574c053b5a543963526424fae8",
     "bin": "sqlite3.exe",
     "checkver": "<h3>Current Status</h3>\\s*<p><ul>\\s*<li><a.*>Version ([0-9\\.]+)</a>"
