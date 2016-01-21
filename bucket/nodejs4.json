@@ -1,15 +1,15 @@
 {
     "homepage": "http://nodejs.org",
-    "version": "4.2.4",
+    "version": "4.2.5",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v4.2.4/node-v4.2.4-x64.msi",
-            "hash": "1b645f3c2ebefeba0ec21de94435878f5f4d885a41725d3b349da4c8d78cf4b8"
+            "url": "https://nodejs.org/dist/v4.2.5/node-v4.2.5-x64.msi",
+            "hash": "4d3a54e85e1d4f5b761be17c9a605d2e66a3a6b0979ec9aee657ed5e50a0f475"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v4.2.4/node-v4.2.4-x86.msi",
-            "hash": "c7c9ab4a1917add9289230805cc070c9daf383eecfe77540ee7ae31218bdbec3"
+            "url": "https://nodejs.org/dist/v4.2.5/node-v4.2.5-x86.msi",
+            "hash": "7425c143ee231961de530db4d8728bc2fae029ed230d25eac55dbc9b00b82294"
         }
     },
     "env_add_path": "nodejs",
@@ -17,5 +17,8 @@
 # Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
 rm $dir\\nodejs\\node_modules\\npm\\npmrc
 npm update -g",
-    "checkver": "<p class=\"home-version home-version-banner\">\\s*Current Version: v([0-9\\.]+)"
+    "checkver": {
+        "url": "https://nodejs.org/en/download/",
+        "re": "Current Version: <strong>v([0-9\\.]+)</strong>"
+    }
 }

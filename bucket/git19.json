@@ -7,9 +7,5 @@
     "bin": [ "cmd\\git.exe", "cmd\\gitk.cmd" ],
     "post_install": [
         "git config --global credential.helper wincred"
-    ],
-    "checkver": {
-        "url": "http://git-scm.com/download/win",
-        "re": "downloading version <strong>([^<]+)</strong>"
-    }
+    ]
 }

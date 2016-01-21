@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.python.org",
     "license": "http://docs.python.org/2/license.html",
-    "version": "2.7.10",
+    "version": "2.7.11",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/2.7.10/python-2.7.10.amd64.msi",
-            "hash": "md5:35f5c301beab341f6f6c9785939882ee"
+            "url": "https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi",
+            "hash": "296886c1fb5dcf2923edefef843801d90112b6e18f840e9fab42abd1cc2ddc1c"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi",
-            "hash": "md5:4ba2c79b103f6003bc4611c837a08208"
+            "url": "https://www.python.org/ftp/python/2.7.11/python-2.7.11.msi",
+            "hash": "9debc6445b81ad735b5e5767d5609ed56167cbcc52c62a55b66629fcbe23a188"
         }
     },
     "bin": [
