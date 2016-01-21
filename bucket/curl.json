@@ -1,17 +1,17 @@
 {
     "homepage": "http://curl.haxx.se/",
-    "version": "7.45.0",
+    "version": "7.46.0",
     "licence": "MIT",
     "architecture": {
         "64bit": {
-            "url": "http://www.confusedbycode.com/curl/curl-7.45.0-win64.zip",
-            "hash": "880ebdb790effa1b28e7fd2d26b18941efb9b167f336baa3d789bc226f0a05eb",
-            "extract_dir": "curl-7.45.0-win64"
+            "url": "http://www.confusedbycode.com/curl/curl-7.46.0-win64.zip",
+            "hash": "e2c817f82bb0f5eec8c33468945b7630d2350f79236f4389686162533b01374c",
+            "extract_dir": "curl-7.46.0-win64"
         },
         "32bit": {
-            "url": "http://www.confusedbycode.com/curl/curl-7.45.0-win32.zip",
-            "hash": "ae3e468a14bfdf28babc12aa605bf94f45c750fa5aa97b0aaccf05d5d8dae43e",
-            "extract_dir": "curl-7.45.0-win32"
+            "url": "http://www.confusedbycode.com/curl/curl-7.46.0-win32.zip",
+            "hash": "c75c8853c0f37c4eb95913ea1e341a4b1047cd9e097a7206fa26362d2a68fc9b",
+            "extract_dir": "curl-7.46.0-win32"
         }
     },
     "bin": "bin/curl.exe",
