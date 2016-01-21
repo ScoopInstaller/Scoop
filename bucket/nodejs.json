@@ -17,5 +17,8 @@
 # Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
 rm $dir\\nodejs\\node_modules\\npm\\npmrc
 npm update -g",
-    "checkver": "<p class=\"home-version home-version-banner\">\\s*Current Version: v([0-9\\.]+)"
+    "checkver": {
+        "url": "https://nodejs.org/en/download/stable/",
+        "re": "Current stable version: <strong>v([0-9\\.]+)</strong>"
+    }
 }
