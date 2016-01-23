@@ -14,6 +14,7 @@
 # Options:
 #   -a, --arch <32bit|64bit>  use the specified architecture, if the app supports it
 #   -g, --global              install the app globally
+#   -v, --version             install a specific version
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -41,9 +42,10 @@ function ensure_none_installed($apps, $global) {
     }
 }
 
-$opt, $apps, $err = getopt $args 'ga:' 'global', 'arch='
+$opt, $apps, $err = getopt $args 'ga:v:' 'global', 'arch=', 'version='
 if($err) { "scoop install: $err"; exit 1 }
 
+$version = $opt.v + $opt.version
 $global = $opt.g -or $opt.global
 $architecture = ensure_architecture $opt.a + $opt.arch
 
@@ -59,6 +61,6 @@ $apps = install_order $apps $architecture # adds dependencies
 ensure_none_failed $apps $global
 $apps = prune_installed $apps $global # removes dependencies that are already installed
 
-$apps | % { install_app $_ $architecture $global }
+$apps | % { install_app $_ $architecture $global $version }
 
 exit 0

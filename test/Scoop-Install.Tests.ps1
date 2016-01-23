@@ -1,6 +1,8 @@
 . "$psscriptroot\Scoop-TestLib.ps1"
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\buckets.ps1"
+. "$psscriptroot\..\lib\manifest.ps1"
 
 describe "travel_dir" {
     beforeall {
@@ -39,5 +41,13 @@ describe "travel_dir" {
 
     it 'common file remains unchanged in destination' {
         "$to\common_file.txt" | should contain "version 1.1"
+    }
+}
+
+describe "app history" {
+    it "gets all current and previous manifests of an app" {
+        $history = app_history python
+        $history | should not benullorempty
+        write-host $history
     }
 }
