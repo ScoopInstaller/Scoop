@@ -47,8 +47,58 @@ function search_bucket($bucket, $query) {
     $apps | % { $_.version = (latest_version $_.name $bucket); $_ }
 }
 
+function download_json($url) {
+    $progressPreference = 'silentlycontinue'
+    $result = invoke-webrequest $url | select -exp content | convertfrom-json
+    $progressPreference = 'continue'
+    $result
+}
+
+function github_ratelimit_reached {
+    $api_link = "https://api.github.com/rate_limit"
+    (download_json $api_link).rate.remaining -eq 0
+}
+
+function search_remote($bucket, $query) {
+    $repo = known_bucket_repo $bucket
+
+    $uri = [system.uri]($repo)
+    if ($uri.absolutepath -match '/([a-zA-Z0-9]*)/([a-zA-Z0-9-]*)(.git|/)?') {
+        $user = $matches[1]
+        $repo_name = $matches[2]
+        $api_link = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
+        $result = download_json $api_link | select -exp tree |? {
+            $_.path -match "(($query[a-zA-Z0-9-]*).json)"
+        } |% { $matches[2] }
+    }
+
+    $result
+}
+
+function search_remotes($query) {
+    $buckets = known_bucket_repos
+    $names = $buckets | get-member -m noteproperty | select -exp name
+
+    $results = $names |? { !(test-path $(bucketdir $_)) } |% {
+        @{"bucket" = $_; "results" = (search_remote $_ $query)}
+    } |? { $_.results }
+
+    if ($results.count -gt 0) {
+        "results from other known buckets..."
+        "add them using 'scoop bucket add <name>'"
+        ""
+    }
+
+    $results |% {
+        "$($_.bucket) bucket:"
+        $_.results |% { "  $_" }
+        ""
+    }
+}
+
 @($null) + @(buckets) | % { # $null is main bucket
     $res = search_bucket $_ $query
+    $local_results = $local_results -or $res
     if($res) {
         $name = "$_"
         if(!$_) { $name = "main" }
@@ -61,6 +111,10 @@ function search_bucket($bucket, $query) {
         }
         ""
     }
+}
+
+if (!$local_results -and !(github_ratelimit_reached)) {
+    search_remotes $query
 }
 
 exit 0
