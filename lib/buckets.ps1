@@ -6,10 +6,14 @@ function bucketdir($name) {
     "$bucketsdir\$name"
 }
 
-function known_bucket_repo($name) {
+function known_bucket_repos {
     $dir = versiondir 'scoop' 'current'
     $json = "$dir\buckets.json"
-    $buckets = gc $json -raw | convertfrom-json -ea stop
+    gc $json -raw | convertfrom-json -ea stop
+}
+
+function known_bucket_repo($name) {
+    $buckets = known_bucket_repos
     $buckets.$name
 }
 
