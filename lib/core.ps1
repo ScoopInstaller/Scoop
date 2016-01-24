@@ -256,3 +256,11 @@ function reset_aliases() {
     # set default aliases
     $default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
 }
+
+function app($app) {
+    $app = [string]$app
+    if ($app -match '([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)') {
+        return $matches[2], $matches[1]
+    }
+    $app, $null
+}
