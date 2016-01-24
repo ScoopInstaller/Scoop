@@ -191,3 +191,27 @@ describe 'sanitary_path' {
     $valid_path | should be "test.json"
   }
 }
+
+describe 'app' {
+    it 'parses the bucket name from an app query' {
+        $query = "test"
+        $app, $bucket = app $query
+        $app | should be "test"
+        $bucket | should be $null
+
+        $query = "extras/enso"
+        $app, $bucket = app $query
+        $app | should be "enso"
+        $bucket | should be "extras"
+
+        $query = "test-app"
+        $app, $bucket = app $query
+        $app | should be "test-app"
+        $bucket | should be $null
+
+        $query = "test-bucket/test-app"
+        $app, $bucket = app $query
+        $app | should be "test-app"
+        $bucket | should be "test-bucket"
+    }
+}

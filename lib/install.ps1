@@ -7,7 +7,8 @@ function nightly_version($date, $quiet = $false) {
 }
 
 function install_app($app, $architecture, $global) {
-    $app, $manifest, $bucket, $url = locate $app
+    $app, $bucket = app $app
+    $app, $manifest, $bucket, $url = locate $app $bucket
     $use_cache = $true
     $check_hash = $true
 
@@ -67,8 +68,8 @@ function appname_from_url($url) {
     (split-path $url -leaf) -replace '.json$', ''
 }
 
-function locate($app) {
-    $manifest, $bucket, $url = $null, $null, $null
+function locate($app, $bucket) {
+    $manifest, $url = $null, $null
 
     # check if app is a url
     if($app -match '^((ht)|f)tps?://') {
@@ -77,7 +78,7 @@ function locate($app) {
         $manifest = url_manifest $url
     } else {
         # check buckets
-        $manifest, $bucket = find_manifest $app
+        $manifest, $bucket = find_manifest $app $bucket
 
         if(!$manifest) {
             # couldn't find app in buckets: check if it's a local path
@@ -651,7 +652,10 @@ function show_notes($manifest) {
 }
 
 function all_installed($apps, $global) {
-    $apps | ? { installed $_ $global }
+    $apps | ? {
+        $app, $null = app $_
+        installed $app $global
+    }
 }
 
 function prune_installed($apps) {

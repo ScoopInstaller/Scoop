@@ -29,7 +29,13 @@ function buckets {
     $buckets
 }
 
-function find_manifest($app) {
+function find_manifest($app, $bucket) {
+    if ($bucket) {
+        $manifest = manifest $app $bucket
+        if ($manifest) { return $manifest, $bucket }
+        return $null
+    }
+
     $buckets = @($null) + @(buckets) # null for main bucket
     foreach($bucket in $buckets) {
         $manifest = manifest $app $bucket
