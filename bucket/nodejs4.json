@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://nodejs.org/dist/v4.2.6/node-v4.2.6-x64.msi",
-            "hash": "2fc5ae1c06201bfb5cb342b3e1bd9acd296ab2d3be7722e3f9d8b051b08be723"
+            "hash": "31556639d865e20fabe104dfe36ce148b4d046d00b35122a7261ff03ed5ded3a"
         },
         "32bit": {
             "url": "https://nodejs.org/dist/v4.2.6/node-v4.2.6-x86.msi",
-            "hash": "b631c71151f127311c2a81fc65a9b4fc403acf570810b5b2563300db49eb2d98"
+            "hash": "854cda9bc59eb44a8bb8486b201aa2873fe6ae2b802cbaced8b83e6b4ec3c170"
         }
     },
     "env_add_path": "nodejs",
