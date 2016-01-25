@@ -4,12 +4,12 @@
     "version": "6.9.3-1",
     "architecture": {
         "64bit": {
-            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.3-1-portable-Q16-x64.zip",
-            "hash": "05da70dc98343e743bccf0c8f0e91dd595a21382fe0d358f780a3cf8aa8778fa"
+            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.3-2-portable-Q16-x64.zip",
+            "hash": "7a7434ba0dae738db22e90eb96961737027850243cec92e9334dd6266041ca5e"
         },
         "32bit": {
-            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.3-1-portable-Q16-x86.zip",
-            "hash": "c0b9c353af775016aa58cfd5f697a3871121116e72803c1c70a0be8e12cd74c1"
+            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.3-2-portable-Q16-x86.zip",
+            "hash": "d5ec5a47c0def5c0a73e242ceccf127bc3159bbf0f5755f0eca790e259bae905"
         }
     },
     "env_add_path": ".",
