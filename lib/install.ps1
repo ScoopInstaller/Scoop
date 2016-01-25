@@ -7,7 +7,8 @@ function nightly_version($date, $quiet = $false) {
 }
 
 function install_app($app, $architecture, $global) {
-    $app, $manifest, $bucket, $url = locate $app
+    $app, $bucket = app $app
+    $app, $manifest, $bucket, $url = locate $app $bucket
     $use_cache = $true
     $check_hash = $true
 
@@ -67,8 +68,8 @@ function appname_from_url($url) {
     (split-path $url -leaf) -replace '.json$', ''
 }
 
-function locate($app) {
-    $manifest, $bucket, $url = $null, $null, $null
+function locate($app, $bucket) {
+    $manifest, $url = $null, $null
 
     # check if app is a url
     if($app -match '^((ht)|f)tps?://') {
@@ -77,7 +78,7 @@ function locate($app) {
         $manifest = url_manifest $url
     } else {
         # check buckets
-        $manifest, $bucket = find_manifest $app
+        $manifest, $bucket = find_manifest $app $bucket
 
         if(!$manifest) {
             # couldn't find app in buckets: check if it's a local path
@@ -204,7 +205,13 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
             # check manifest doesn't use deprecated install method
             $msi = msi $manifest $architecture
             if(!$msi) {
-                $extract_fn = 'extract_msi'
+                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
+                if ($useLessMsi -eq $true) {
+                    $extract_fn, $extract_dir = lessmsi_config $extract_dir
+                }
+                else {
+                    $extract_fn = 'extract_msi'
+                }
             } else {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs"
             }
@@ -243,6 +250,18 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     }
 
     $fname # returns the last downloaded file
+}
+
+function lessmsi_config ($extract_dir) {
+    $extract_fn = 'extract_lessmsi'
+    if ($extract_dir) {
+        $extract_dir = join-path SourceDir $extract_dir
+    }
+    else {
+        $extract_dir = "SourceDir"
+    }
+
+    $extract_fn, $extract_dir
 }
 
 function cookie_header($cookies) {
@@ -406,6 +425,10 @@ function extract_msi($path, $to) {
     $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
     if(!$ok) { abort "failed to extract files from $path.`nlog file: $(friendly_path $logfile)" }
     if(test-path $logfile) { rm $logfile }
+}
+
+function extract_lessmsi($path, $to) {
+    iex "lessmsi x `"$path`" `"$to\`""
 }
 
 # deprecated
@@ -629,7 +652,10 @@ function show_notes($manifest) {
 }
 
 function all_installed($apps, $global) {
-    $apps | ? { installed $_ $global }
+    $apps | ? {
+        $app, $null = app $_
+        installed $app $global
+    }
 }
 
 function prune_installed($apps) {

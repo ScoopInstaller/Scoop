@@ -1,0 +1,19 @@
+{
+    "homepage": "https://aria2.github.io/",
+    "license": "GPL2 or later",
+    "version": "1.19.3",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/tatsuhiro-t/aria2/releases/download/release-1.19.3/aria2-1.19.3-win-32bit-build1.zip",
+            "hash": "a8dfb6437c8db265fdd7f4637ade0f5e5939ce6a7466f7fcd843aa1872b7dd44",
+            "extract_dir": "aria2-1.19.3-win-32bit-build1"
+        },
+        "64bit": {
+            "url": "https://github.com/tatsuhiro-t/aria2/releases/download/release-1.19.3/aria2-1.19.3-win-64bit-build1.zip",
+            "hash": "da1050efb40d5f9bdb51eedbdc5dfe63eb062d0dfe5ead5fd0d631056e4720de",
+            "extract_dir": "aria2-1.19.3-win-64bit-build1"
+        }
+    },
+    "bin": "aria2c.exe",
+    "checkver": "<p>Download <a href=\"https://github.com/tatsuhiro-t/aria2/releases/tag/[^\"]+\">version ([^<]+)</a>"
+}

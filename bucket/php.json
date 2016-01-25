@@ -1,15 +1,15 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.0.1",
+    "version": "7.0.2",
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.0.1-Win32-VC14-x64.zip",
-            "hash": "sha1:0cf3e2c53d3d54a94044b993115e5f5cc425b511"
+            "url": "http://windows.php.net/downloads/releases/php-7.0.2-Win32-VC14-x64.zip",
+            "hash": "sha1:8546ad18e83553438ba71a0498169b64bf12d1c8"
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.0.1-Win32-VC14-x86.zip",
-            "hash": "sha1:9a6c8d44d658ef7710ea0b45028d501490ee94a1"
+            "url": "http://windows.php.net/downloads/releases/php-7.0.2-Win32-VC14-x86.zip",
+            "hash": "sha1:e8da25333b4bb2c1976496d0b1f5269a12c80c2a"
         }
     },
     "bin": "php.exe",

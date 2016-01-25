@@ -22,8 +22,10 @@ function deps($app, $arch) {
 function dep_resolve($app, $arch, $resolved, $unresolved) {
     $unresolved += $app
 
-    $null, $manifest, $null, $null = locate $app
-    if(!$manifest) { abort "couldn't find manifest for $app" }
+    $query = $app
+    $app, $bucket = app $query
+    $null, $manifest, $null, $null = locate $app $bucket
+    if(!$manifest) { abort "couldn't find manifest for $query" }
 
     $deps = @(install_deps $manifest $arch) + @(runtime_deps $manifest) | select -uniq
 
@@ -47,6 +49,7 @@ function install_deps($manifest, $arch) {
     $deps = @()
 
     if(requires_7zip $manifest $arch) { $deps += "7zip" }
+    if(requires_lessmsi $manifest $arch) { $deps += "lessmsi" }
     if($manifest.innosetup) { $deps += "innounp" }
 
     $deps
