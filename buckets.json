@@ -1,5 +1,5 @@
 {
-    "extras": "https://github.com/lukesampson/extras.git",
+    "extras": "https://github.com/lukesampson/scoop-extras.git",
     "versions": "https://github.com/scoopinstaller/versions",
     "nightlies": "https://github.com/scoopinstaller/nightlies",
     "nirsoft": "https://github.com/kodybrown/scoop-nirsoft"
