@@ -1,4 +1,4 @@
-$scoopdir = $env:SCOOP, "~\appdata\local\scoop" | select -first 1
+$scoopdir = $env:SCOOP, "$env:LOCALAPPDATA\scoop" | select -first 1
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
 $cachedir = "$scoopdir\cache" # always local
 
