@@ -2,8 +2,8 @@
     "homepage": "http://www.apachelounge.com",
     "version": "2.4.18",
     "license": "Apache 2.0",
-    "url": "https://www.apachelounge.com/download/VC11/binaries/httpd-2.4.18-win32-VC11.zip",
-    "hash": "EAE58A1499BEFD0BFC86F84767AC595633C62C8E7ACE093961AEB1DBE3966086",
+    "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.18-win32-VC14.zip",
+    "hash": "C356B5A68B97DB0F268033DEA5950961E58C00FA21E7C7C8D273EC36BAD2D08F",
     "extract_dir": "Apache24",
     "bin": [
         "bin\\ab.exe",
