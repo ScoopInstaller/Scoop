@@ -1,9 +1,9 @@
 {
-	"homepage": "http://phantomjs.org/",
-	"version": "2.1.1",
-	"license": "BSD",
-	"hash": "d9fb05623d6b26d3654d008eab3adafd1f6350433dfd16138c46161f42c7dcc8",
-	"url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip",
-	"extract_dir": "phantomjs-2.1.1-windows",
-	"bin": "bin\\phantomjs.exe"
+    "homepage": "http://phantomjs.org/",
+    "version": "2.1.1",
+    "license": "BSD",
+    "hash": "d9fb05623d6b26d3654d008eab3adafd1f6350433dfd16138c46161f42c7dcc8",
+    "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip",
+    "extract_dir": "phantomjs-2.1.1-windows",
+    "bin": "bin\\phantomjs.exe"
 }
