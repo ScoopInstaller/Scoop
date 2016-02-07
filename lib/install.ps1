@@ -552,7 +552,6 @@ function rm_shims($manifest, $global) {
 # Creates shortcut for the app in the start menu
 function create_startmenu_shortcuts($manifest, $dir, $global) {
     $manifest.shortcuts | ?{ $_ -ne $null } | % {
-        echo "varibale value $_"
         $target = $_.item(0)
         $name = $_.item(1)
         startmenuShortcut "$dir\$target" $name
