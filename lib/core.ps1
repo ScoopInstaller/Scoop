@@ -245,7 +245,7 @@ function reset_alias($name, $value) {
 
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = get-alias |? { $_.options -notmatch 'readonly' } |% { $_.name }
+    $aliases = get-alias |? { $_.options -notmatch 'readonly|allscope' } |% { $_.name }
     get-childitem function: | % {
         $fn = $_.name
         if($aliases -contains $fn) {
