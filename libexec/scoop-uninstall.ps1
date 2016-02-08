@@ -56,6 +56,7 @@ $architecture = $install.architecture
 
 run_uninstaller $manifest $architecture $dir
 rm_shims $manifest $global
+rm_startmenu_shortcuts $manifest $global
 env_rm_path $manifest $dir $global
 env_rm $manifest $global
 
