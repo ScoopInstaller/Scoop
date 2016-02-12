@@ -1,0 +1,9 @@
+{
+    "homepage": "http://fsprojects.github.io/Fix/",
+    "version": "0.5.0",
+    "url": "https://github.com/fsprojects/Fix/releases/download/0.5.0/fix.zip",
+    "hash": "md5:66316278C884B8C00D167DC78255528B",
+    "bin": [
+        "bin\\fix.exe"
+    ]
+}
