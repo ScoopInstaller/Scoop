@@ -1,0 +1,13 @@
+{
+    "homepage": "https://github.com/mozilla/mozjpeg",
+    "version": "3.1",
+    "license": "https://github.com/mozilla/mozjpeg/blob/master/LICENSE.txt",
+    "url": "http://mozjpeg.codelove.de/bin/mozjpeg_3.1_x86.zip",
+    "hash": "f8fd47f219823e7ee1fe6583bca8baca075d214081588f1fd66141f790cf0731",
+    "bin": [
+        "cjpeg.exe",
+        ["cjpeg.exe", "mozjpeg"],
+        "djpeg.exe",
+        "jpegtran.exe"
+    ]
+}
