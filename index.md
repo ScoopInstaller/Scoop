@@ -4,7 +4,10 @@ layout: default
 
 ### Scoop installs the tools you know and love
 
-    scoop install curl
+```shell
+scoop install curl
+```
+
 <br>
 
 ### Get comfortable on the Windows command line
@@ -25,13 +28,12 @@ Not sure whether you need 32-bit or 64-bit? Can&rsquo;t remember that command yo
 
 <br>
 
-
 # Demo
 
-<iframe width="854" height="480" src="//www.youtube.com/embed/a85QLUJ0Wbs?rel=0" frameborder="0" allowfullscreen="true">
+<div class='videoWrapper'>
+<iframe src='http://www.youtube.com/embed/a85QLUJ0Wbs?rel=0' frameborder='0' allowfullscreen>
 </iframe>
-
-<br>
+</div>
 
 <br>
 
@@ -40,7 +42,9 @@ Not sure whether you need 32-bit or 64-bit? Can&rsquo;t remember that command yo
 Make sure [Powershell 3](http://www.microsoft.com/en-us/download/details.aspx?id=34595)
 is installed, then run:
 
-    iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+```powershell
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+```
 
 **Note:** if you get an error you might need to change the execution policy
 (i.e. enable Powershell) with `set-executionpolicy unrestricted -s cu`
