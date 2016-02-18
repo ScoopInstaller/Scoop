@@ -3,7 +3,7 @@
     "version": "2.4.18",
     "license": "Apache 2.0",
     "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.18-win32-VC14.zip",
-    "hash": "C356B5A68B97DB0F268033DEA5950961E58C00FA21E7C7C8D273EC36BAD2D08F",
+    "hash": "C42E2D9B9DD58AB64890BA2D871CAC22FB043A3C3361644B2325CAFEFF5EDBE5",
     "extract_dir": "Apache24",
     "bin": [
         "bin\\ab.exe",
