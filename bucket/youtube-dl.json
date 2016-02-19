@@ -3,7 +3,7 @@
     "license": "Unlicense",
     "version": "2016.02.13",
     "url": "https://yt-dl.org/downloads/2016.02.13/youtube-dl.exe",
-    "hash": "d3566b25400e57fd0d3e68c29e404eea464750a84ffee62fca3666975624510d",
+    "hash": "db181ff70b0cc4d2ad8483da0f77497fa16224bfcd0eeea8f0bc2776198c7c79,
     "bin": "youtube-dl.exe",
     "depends": [
         "ffmpeg"
