@@ -2,8 +2,16 @@
     "homepage": "http://www.apachelounge.com",
     "version": "2.4.18",
     "license": "Apache 2.0",
-    "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.18-win32-VC14.zip",
-    "hash": "C42E2D9B9DD58AB64890BA2D871CAC22FB043A3C3361644B2325CAFEFF5EDBE5",
+    "architecture": {
+        "64bit": {
+            "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.18-win64-VC14.zip",
+            "hash": "DC71519467DBB49229FEE7C789118B809AC2FFC0ED5F8BADA6C956DF3A4AF337"
+        },
+        "32bit": {
+            "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.18-win32-VC14.zip",
+            "hash": "C42E2D9B9DD58AB64890BA2D871CAC22FB043A3C3361644B2325CAFEFF5EDBE5"
+        }
+    },
     "extract_dir": "Apache24",
     "bin": [
         "bin\\ab.exe",
