@@ -4,8 +4,8 @@
     "architecture": {
         "64bit": {
             "url": [
-                "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.4-x64-mingw32.7z",
-                "http://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe"
+                "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.4-x64-mingw32.7z?direct#/dl.7z",
+                "http://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
             ],
             "hash": [
                 "9e8c1eea5b7fd732efd3207210c17b7d0620858f33966652f0bb2566fe04c660",
@@ -15,8 +15,8 @@
         },
         "32bit": {
             "url": [
-                "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.4-i386-mingw32.7z",
-                "http://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe"
+                "http://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.4-i386-mingw32.7z?direct#/dl.7z",
+                "http://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
             ],
             "hash": [
                 "da8a3ec5ac4ac23f21037e5132ea1362d56c8846bcba2209a4125928f88a8015",
