@@ -1,0 +1,15 @@
+{
+    "homepage": "http://gnuwin32.sourceforge.net/packages/make.htm",
+    "version": "3.81",
+    "license": "GPL2",
+    "url": [
+        "http://ufpr.dl.sourceforge.net/project/gnuwin32/make/3.81/make-3.81-bin.zip",
+        "http://ufpr.dl.sourceforge.net/project/gnuwin32/make/3.81/make-3.81-dep.zip"
+    ],
+    "hash": [
+        "ca23bc1d9370102878d2a79a31ae70288a1cfa51928667653ffbdc28090f4123",
+        "15fca07f695c3a82b22d5470641c60d893d727afce47add9af4f0f7c47bab747"
+    ],
+    "bin": "bin\\make.exe"
+}
+

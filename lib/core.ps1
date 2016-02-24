@@ -1,4 +1,4 @@
-$scoopdir = $env:SCOOP, "~\appdata\local\scoop" | select -first 1
+$scoopdir = $env:SCOOP, "$env:LOCALAPPDATA\scoop" | select -first 1
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
 $cachedir = "$scoopdir\cache" # always local
 
@@ -255,7 +255,7 @@ function reset_alias($name, $value) {
 
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = get-alias |? { $_.options -notmatch 'readonly' } |% { $_.name }
+    $aliases = get-alias |? { $_.options -notmatch 'readonly|allscope' } |% { $_.name }
     get-childitem function: | % {
         $fn = $_.name
         if($aliases -contains $fn) {
@@ -265,4 +265,12 @@ function reset_aliases() {
 
     # set default aliases
     $default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
+}
+
+function app($app) {
+    $app = [string]$app
+    if ($app -match '([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)') {
+        return $matches[2], $matches[1]
+    }
+    $app, $null
 }

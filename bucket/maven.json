@@ -1,15 +1,15 @@
 {
     "homepage": "https://maven.apache.org/",
-    "version": "3.3.3",
+    "version": "3.3.9",
     "license": "Apache 2.0",
-    "url": "https://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.zip",
-    "hash": "9e031bc81acd92c1dd7cd00a9f8515d75b9cf2a550048dab109588eca4a4df45",
-    "extract_dir": "apache-maven-3.3.3",
+    "url": "https://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip",
+    "hash": "bb37146a67d067069754c775b9c9f03b52da953261981738de963057023cda3a",
+    "extract_dir": "apache-maven-3.3.9",
     "bin": [
         "bin\\mvn.cmd"
     ],
     "env_set": {
         "M2_HOME": "$dir"
     },
-    "depends": "openjdk"
+    "notes": "Maven requires a JDK such as OpenJDK 7 (scoop install openjdk) or Oracle's Java 8 (scoop install oraclejdk). The Oracle JDK requires the Scoop Extras bucket (scoop butcket add extras)."
 }

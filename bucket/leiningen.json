@@ -1,0 +1,10 @@
+{
+    "version": "2.6.1",
+    "license": "Eclipse Public License 1.0",
+    "url": "https://raw.githubusercontent.com/technomancy/leiningen/f9a464e008214941e93c046413004517325818bb/bin/lein.bat",
+    "homepage": "https://github.com/technomancy/leiningen",
+    "bin": "lein.bat",
+    "hash": "b1316ef41482e0fa10d2487fb5b0d9442db37b7035ed1640cdcb32b5edaf41b6",
+    "notes": "The command 'lein self-install' is required to complete the installation"
+}
+

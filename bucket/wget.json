@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": [
-                "https://eternallybored.org/misc/wget/wget-1.16.3-win64.zip",
+                "https://eternallybored.org/misc/wget/releases/wget-1.16.3-win64.zip",
                 "http://curl.haxx.se/ca/cacert.pem"
             ],
             "hash": [
@@ -15,7 +15,7 @@
         },
         "32bit": {
             "url": [
-                "https://eternallybored.org/misc/wget/wget-1.16.3-win32.zip",
+                "https://eternallybored.org/misc/wget/releases/wget-1.16.3-win32.zip",
                 "http://curl.haxx.se/ca/cacert.pem"
             ],
             "hash": [

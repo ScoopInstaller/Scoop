@@ -1,15 +1,17 @@
 {
     "homepage": "https://www.r-project.org",
-    "version": "3.2.2",
+    "version": "3.2.3",
     "license": "GPL2",
-    "url": "https://cran.rstudio.com/bin/windows/base/R-3.2.2-win.exe",
-    "hash": "aee512f5c4ed3099301721d8d0e8c779caf5232313f5fda44f3de800cd20266a",
+    "url": "https://cran.rstudio.com/bin/windows/base/R-3.2.3-win.exe",
+    "hash": "b88083895164a483c7583a69f16921cc93e07c327b016740a167607f335c0b3d",
     "innosetup": true,
+    "pre_install": "if ([intptr]::size -eq 8) { $r_arch = \"x64\" } else { $r_arch = \"i386\" }; copy-item -recurse $dir\\bin\\$r_arch $dir\\bin\\curr_arch;",
     "bin": [
-        "bin\\r.exe",
-        "bin\\rscript.exe"
+        "bin\\curr_arch\\r.exe",
+        "bin\\curr_arch\\rterm.exe",
+        "bin\\curr_arch\\rscript.exe"
     ],
-    "notes": "You'll need to type 'r.ps1' or 'r.cmd' to run R, because in Powershell 'r' runs the last command.
+    "notes": "You'll need to type 'r.ps1' or 'r.cmd' to run R, because in Powershell 'r' runs the last command. Alternatively 'rterm' can be used to start the interactive R terminal session.
 
 You can remove Powershell's 'r' command with:
     rm alias:\\r
@@ -17,6 +19,8 @@ You can remove Powershell's 'r' command with:
 ... but this only affects your current session: if you'd like to remove it for all future sessions you need to add the command above to your Powershell profile.
 
 Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--this has a plugin to remove some crazy aliases from Powershell, as well as many other improvements.
+
+If you are on a 64-bit machine then R comes in a 32-bit and a 64-bit version. Currently scoop sets the shims depending on your machine's architecture.
 ",
     "checkver": {
         "url": "https://cran.rstudio.com/bin/windows/base/",

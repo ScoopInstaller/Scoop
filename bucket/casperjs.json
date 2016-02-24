@@ -1,0 +1,12 @@
+{
+    "version":  "1.1-beta3",
+    "license":  "https://github.com/n1k0/casperjs/blob/master/LICENSE.md",
+    "url":  "https://github.com/n1k0/casperjs/archive/1.1-beta3.zip",
+    "hash":  "6461ac1d53e66649579dc3437713a35f80e8b57ab4b8525eac5a0b8f6bcde17e",
+    "homepage":  "http://casperjs.org/",
+    "extract_dir":  "casperjs-1.1-beta3",
+    "bin":  "bin\\casperjs.exe",
+    "notes":  "Requires an installation of phantomjs 1.x
+
+    phantom19 is available in the versions bucket (scoop bucket add versions)"
+}

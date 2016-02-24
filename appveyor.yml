@@ -6,7 +6,8 @@ branches:
 
 init:
   - ps: (get-psprovider 'FileSystem').Home = $(pwd)
-  - ps: choco install -y pester
+  - ps: "if($env:APPVEYOR_CHOCO_PESTER_OPTIONS -ne $null) { write-host -f yellow 'NOTE: customized `pester` installation is being used' }"
+  - ps: choco install -y pester $env:APPVEYOR_CHOCO_PESTER_OPTIONS
 
 build: off
 

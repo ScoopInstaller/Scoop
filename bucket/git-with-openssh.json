@@ -12,13 +12,20 @@
             "hash": "7bf8da2b46f40c98d18a5f9c36e5b90df258936f43a0d230d0f29e0d729e3283"
         }
     },
-    "bin": [ "cmd\\git.exe", "cmd\\gitk.exe", "cmd\\git-gui.exe" ],
+    "bin": [ "cmd\\git.exe",
+             "cmd\\gitk.exe",
+             "cmd\\git-gui.exe",
+             "usr\\bin\\ssh.exe",
+             "usr\\bin\\sshd.exe",
+             "usr\\bin\\scp.exe",
+             "usr\\bin\\sftp.exe",
+             "usr\\bin\\slogin.exe",
+             "usr\\bin\\ssh-add.exe",
+             "usr\\bin\\ssh-agent.exe",
+             "usr\\bin\\ssh-keygen.exe",
+             "usr\\bin\\ssh-keyscan.exe"
+    ],
     "post_install": [
         "git config --global credential.helper wincred"
-    ],
-    "notes": "To get Git to recognise OpenSSH, you will need to run\n\nscoop install openssh\n[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')\n\nand then restart powershell.",
-    "checkver": {
-        "url": "http://git-scm.com/download/win",
-        "re": "\\<a href=\"https://github.com/git-for-windows/git/releases/download/v([^/]+)/"
-    }
+    ]
 }

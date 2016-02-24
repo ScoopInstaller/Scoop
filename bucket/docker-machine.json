@@ -1,33 +1,19 @@
 {
     "homepage": "https://github.com/docker/machine",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "license": "Apache",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.5.0/docker-machine_windows-amd64.zip",
-            "hash": "fd236a3fea82e240d5a5daaeee5c1ed29c6ac1805c98ce23f2281240c6815b51"
+            "url": "https://github.com/docker/machine/releases/download/v0.6.0/docker-machine-Windows-x86_64.exe",
+            "hash": "9604fd5cf394bc51a802c621ba98795fc05cc0231a60961e1eabd657ff392a78"
         },
         "32bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.5.0/docker-machine_windows-386.zip",
-            "hash": "383213419f4a8fc13e32f946f91370855c71bf84cc9f93b1d172462fd2c396a6"
+            "url": "https://github.com/docker/machine/releases/download/v0.6.0/docker-machine-Windows-i386.exe",
+            "hash": "f06da55edce6f6121f842862eb20c9f7850a590ab0e16c245ae3d151162e5c2f"
         }
     },
+    "pre_install": "Rename-Item @(Get-ChildItem $dir\\docker-machine-*.exe)[0] $dir\\docker-machine.exe",
     "bin": [
-        "docker-machine.exe",
-        "docker-machine-driver-amazonec2.exe",
-        "docker-machine-driver-azure.exe",
-        "docker-machine-driver-digitalocean.exe",
-        "docker-machine-driver-exoscale.exe",
-        "docker-machine-driver-generic.exe",
-        "docker-machine-driver-google.exe",
-        "docker-machine-driver-hyperv.exe",
-        "docker-machine-driver-none.exe",
-        "docker-machine-driver-openstack.exe",
-        "docker-machine-driver-rackspace.exe",
-        "docker-machine-driver-softlayer.exe",
-        "docker-machine-driver-virtualbox.exe",
-        "docker-machine-driver-vmwarefusion.exe",
-        "docker-machine-driver-vmwarevcloudair.exe",
-        "docker-machine-driver-vmwarevsphere.exe"
+        ["docker-machine.exe", "docker-machine"]
     ]
 }

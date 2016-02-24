@@ -1,0 +1,9 @@
+{
+    "homepage": "http://optipng.sourceforge.net/",
+    "version": "0.7.5",
+    "license": "zlib",
+    "url": "http://downloads.sourceforge.net/project/optipng/OptiPNG/optipng-0.7.5/optipng-0.7.5-win32.zip",
+    "hash": "51c47db11c2c28b603e051408f56f7e599aabde6280bdcbee524a53e2fa40e4d",
+    "extract_dir": "optipng-0.7.5-win32",
+    "bin": "optipng.exe"
+}

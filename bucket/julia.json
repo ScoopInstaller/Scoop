@@ -1,15 +1,15 @@
 {
     "homepage": "http://julialang.org",
-    "version": "0.3.1",
+    "version": "0.4.3",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "http://s3.amazonaws.com/julialang/bin/winnt/x64/0.3/julia-0.3.1-win64.exe#/dl.7z",
-            "hash": "9281860af4939b48bb69d87b1c39777ee2e02a5b3d6a70b758b03a1c87bfe2ec"
+            "url": "http://s3.amazonaws.com/julialang/bin/winnt/x64/0.4/julia-0.4.3-win64.exe#/dl.7z",
+            "hash": "7a1031b450e39fff14a82ea2e2f7072d24a7293f8f97185741fe4983c32d5c1b"
         },
         "32bit": {
-            "url": "http://s3.amazonaws.com/julialang/bin/winnt/x86/0.3/julia-0.3.1-win32.exe#/dl.7z",
-            "hash": "214d2a57da9d12ba7e39ef9cb2a41478d0901e1f79943a6c8b54ffe6958e0936"
+            "url": "http://s3.amazonaws.com/julialang/bin/winnt/x86/0.4/julia-0.4.3-win32.exe#/dl.7z",
+            "hash": "23429406c2211fcabaef0f484c05c5674663acab313b92139213374f28f4b9fc"
         }
     },
     "installer": {

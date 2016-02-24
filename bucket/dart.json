@@ -1,23 +1,23 @@
 {
-    "version":  "1.12.2",
-    "license":  "BSD",
-    "homepage":  "https://www.dartlang.org/",
-    "extract_dir":  "dart-sdk",
-    "env_add_path":  [
-                         "bin"
-                     ],
-    "architecture":  {
-                         "64bit":  {
-                                       "url":  "https://storage.googleapis.com/dart-archive/channels/stable/release/1.12.2/sdk/dartsdk-windows-x64-release.zip",
-                                       "hash":  "6fba96dbdaa8169e2c6a6ed5ea0f490c1ef41509aa51f88d7ebd6d5a60ef7091"
-                                   },
-                         "32bit":  {
-                                       "url":  "https://storage.googleapis.com/dart-archive/channels/stable/release/1.12.2/sdk/dartsdk-windows-ia32-release.zip",
-                                       "hash":  "fc1ab8d53caf1eaa63273ca10e64e467ca0721bca91e97281f35cd3c4f6d1b9d"
-                                   }
-                     },
-    "checkver":  {
-                     "url":  "http://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
-                     "re":  "\\s*\"version\"\\s*:\\s*(\\d+\\.\\d+\\.\\d+.*)"
-                 }
+  "version": "1.14.2",
+  "license": "BSD",
+  "homepage": "https://www.dartlang.org/",
+  "extract_dir": "dart-sdk",
+  "env_add_path": [
+    "bin"
+  ],
+  "architecture": {
+    "64bit": {
+      "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/1.14.2/sdk/dartsdk-windows-x64-release.zip",
+      "hash": "992c3390817d175b3d402137d96bccf2cb20a604412be5a153f53e23e280df3f"
+    },
+    "32bit": {
+      "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/1.14.2/sdk/dartsdk-windows-ia32-release.zip",
+      "hash": "04b931334dc0fcb754a51ee9bb6576b123a261af530c82d2672c961bfff1bf85"
+    }
+  },
+  "checkver": {
+    "url": "http://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
+    "re": "\\s*\"version\"\\s*:\\s*(\\d+\\.\\d+\\.\\d+.*)"
+  }
 }

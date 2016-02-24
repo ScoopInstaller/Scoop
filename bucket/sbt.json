@@ -1,9 +1,9 @@
 {
     "homepage": "http://www.scala-sbt.org/",
-    "version": "0.13.0",
+    "version": "0.13.9",
     "license": "BSD",
-    "url": "http://repo.scala-sbt.org/scalasbt/sbt-native-packages/org/scala-sbt/sbt/0.13.0/sbt.zip",
-    "hash": "7e9b413736b9ad841f1588dd3116c848110a2fc37ba663461523a4383bb236ae",
+    "url": "https://dl.bintray.com/sbt/native-packages/sbt/0.13.9/sbt-0.13.9.zip",
+    "hash": "2e2deaf059d906026a0b63598df5a4cb679eb3ffd6b51ada02130d72730a039c",
     "extract_dir": "sbt",
     "bin": [
         "bin\\sbt.bat"

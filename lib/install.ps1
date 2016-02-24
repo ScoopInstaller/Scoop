@@ -7,7 +7,8 @@ function nightly_version($date, $quiet = $false) {
 }
 
 function install_app($app, $architecture, $global) {
-    $app, $manifest, $bucket, $url = locate $app
+    $app, $bucket = app $app
+    $app, $manifest, $bucket, $url = locate $app $bucket
     $use_cache = $true
     $check_hash = $true
 
@@ -37,6 +38,7 @@ function install_app($app, $architecture, $global) {
     run_installer $fname $manifest $architecture $dir
     ensure_install_dir_not_in_path $dir $global
     create_shims $manifest $dir $global
+    create_startmenu_shortcuts $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
@@ -67,8 +69,8 @@ function appname_from_url($url) {
     (split-path $url -leaf) -replace '.json$', ''
 }
 
-function locate($app) {
-    $manifest, $bucket, $url = $null, $null, $null
+function locate($app, $bucket) {
+    $manifest, $url = $null, $null
 
     # check if app is a url
     if($app -match '^((ht)|f)tps?://') {
@@ -77,7 +79,7 @@ function locate($app) {
         $manifest = url_manifest $url
     } else {
         # check buckets
-        $manifest, $bucket = find_manifest $app
+        $manifest, $bucket = find_manifest $app $bucket
 
         if(!$manifest) {
             # couldn't find app in buckets: check if it's a local path
@@ -204,7 +206,13 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
             # check manifest doesn't use deprecated install method
             $msi = msi $manifest $architecture
             if(!$msi) {
-                $extract_fn = 'extract_msi'
+                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
+                if ($useLessMsi -eq $true) {
+                    $extract_fn, $extract_dir = lessmsi_config $extract_dir
+                }
+                else {
+                    $extract_fn = 'extract_msi'
+                }
             } else {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs"
             }
@@ -243,6 +251,18 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     }
 
     $fname # returns the last downloaded file
+}
+
+function lessmsi_config ($extract_dir) {
+    $extract_fn = 'extract_lessmsi'
+    if ($extract_dir) {
+        $extract_dir = join-path SourceDir $extract_dir
+    }
+    else {
+        $extract_dir = "SourceDir"
+    }
+
+    $extract_fn, $extract_dir
 }
 
 function cookie_header($cookies) {
@@ -408,6 +428,10 @@ function extract_msi($path, $to) {
     if(test-path $logfile) { rm $logfile }
 }
 
+function extract_lessmsi($path, $to) {
+    iex "lessmsi x `"$path`" `"$to\`""
+}
+
 # deprecated
 # get-wmiobject win32_product is slow and checks integrity of each installed program,
 # so this uses the [wmi] type accelerator instead
@@ -525,6 +549,41 @@ function rm_shims($manifest, $global) {
     }
 }
 
+# Creates shortcut for the app in the start menu
+function create_startmenu_shortcuts($manifest, $dir, $global) {
+    $manifest.shortcuts | ?{ $_ -ne $null } | % {
+        $target = $_.item(0)
+        $name = $_.item(1)
+        startmenu_shortcut "$dir\$target" $name
+    }
+}
+
+function startmenu_shortcut($target, $shortcutName) {
+    if(!(Test-Path $target)) {
+        abort "Can't create the Startmenu shortcut for $(fname $target): couldn't find $target"
+    }
+    $scoop_startmenu_folder = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps"
+    if(!(Test-Path $scoop_startmenu_folder)) {
+        New-Item $scoop_startmenu_folder -type Directory
+    }
+    $wsShell = New-Object -ComObject WScript.Shell
+    $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
+    $wsShell.TargetPath = "$target"
+    $wsShell.Save()
+}
+
+# Removes the Startmenu shortcut if it exists
+function rm_startmenu_shortcuts($manifest, $global) {
+    $manifest.shortcuts | ?{ $_ -ne $null } | % {
+        $name = $_.item(1)
+        $shortcut = "$env:USERPROFILE\Start Menu\Programs\$name.lnk"
+        if(Test-Path -Path $shortcut) {
+             Remove-Item $shortcut
+             echo "Removed shortcut $shortcut"
+        }
+    }
+}
+
 # to undo after installers add to path so that scoop manifest can keep track of this instead
 function ensure_install_dir_not_in_path($dir, $global) {
     $path = (env 'path' $global)
@@ -629,7 +688,10 @@ function show_notes($manifest) {
 }
 
 function all_installed($apps, $global) {
-    $apps | ? { installed $_ $global }
+    $apps | ? {
+        $app, $null = app $_
+        installed $app $global
+    }
 }
 
 function prune_installed($apps) {

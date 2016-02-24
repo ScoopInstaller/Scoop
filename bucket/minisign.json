@@ -1,9 +1,9 @@
 {
     "homepage": "https://jedisct1.github.io/minisign/",
-    "version": "0.4",
+    "version": "0.6",
     "license": "https://github.com/jedisct1/minisign/blob/master/LICENSE",
-    "url": "https://github.com/jedisct1/minisign/releases/download/0.4/minisign-win32.zip",
-    "hash": "723522666c2b728149d53a0a144ffe9a14e7e6f098090c191804f1a9d567c1ee",
+    "url": "https://github.com/jedisct1/minisign/releases/download/0.6/minisign-win32.zip",
+    "hash": "a49f1cab83d9503336bf16c6e77a217996cee32fcf82f43b79d6d0cdab9524e5",
     "extract_dir": "minisign-win32",
     "bin": "minisign.exe"
 }
