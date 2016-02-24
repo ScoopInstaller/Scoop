@@ -1,15 +1,15 @@
 {
     "homepage": "http://rubyinstaller.org",
-    "version": "1.9.3-p448",
+    "version": "1.9.3-p551",
     "url": [
-        "http://dl.bintray.com/oneclick/rubyinstaller/ruby-1.9.3-p448-i386-mingw32.7z?direct#/dl.7z",
-        "https://github.com/downloads/oneclick/rubyinstaller/DevKit-tdm-32-4.5.2-20111229-1559-sfx.exe#/dl2.7z"
+        "http://dl.bintray.com/oneclick/rubyinstaller/ruby-1.9.3-p551-i386-mingw32.7z?direct#/dl.7z",
+        "http://dl.bintray.com/oneclick/rubyinstaller/DevKit-tdm-32-4.5.2-20111229-1559-sfx.exe#/dl2.7z"
     ],
     "hash": [
-        "72c7bff32665b9aa2c5f66e63679ca1b4a6a16725579681d98e971e593aca506",
+        "207fdb5b2f9436ad1ac27bf51918b913c14c443d1b83cd910cf5a59acaeab756",
         "6c3af5487dafda56808baf76edd262b2020b1b25ab86aabf972629f4a6a54491"
     ],
-    "extract_dir": "ruby-1.9.3-p448-i386-mingw32",
+    "extract_dir": "ruby-1.9.3-p551-i386-mingw32",
     "extract_to": [ "", "devkit" ],
     "env_add_path": "bin",
     "post_install": "pushd $dir\\devkit;ruby dk.rb init > $null;echo \"- $dir\" | out-file config.yml -a -enc default; ruby dk.rb install;popd;"
