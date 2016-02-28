@@ -40,7 +40,7 @@ function update_scoop() {
         # load config
         $repo = $(scoop config SCOOP_REPO)
         if(!$repo) {
-            $repo = "http://github.com/lukesampson/scoop"
+            $repo = "https://github.com/lukesampson/scoop"
             scoop config SCOOP_REPO "$repo"
         }
 
