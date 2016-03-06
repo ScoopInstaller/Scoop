@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.mongodb.org",
-    "version": "2.6.7",
+    "version": "3.2.3",
     "license": "http://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
@@ -31,6 +31,6 @@
     ],
     "checkver": {
         "url": "http://www.mongodb.org/downloads",
-        "re": "Production Release \\(([^<]+)\\)"
+        "re": "Current Stable Release \\(([\\d.]+)\\)"
     }
 }
