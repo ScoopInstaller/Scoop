@@ -115,6 +115,11 @@ function dl_progress($url, $to, $cookies) {
     $wc.headers.add('User-Agent', 'Scoop/1.0')
     $wc.headers.add('Cookie', (cookie_header $cookies))
 
+    # simplified until there's a workaround for threading problems below
+    $wc.downloadfile($url, $to)
+
+    # seems to be causing threading problems and crashes in Win10...
+    <#
     if([console]::isoutputredirected) {
         # can't set cursor position: just do simple download
         $wc.downloadfile($url, $to)
@@ -162,6 +167,7 @@ function dl_progress($url, $to, $cookies) {
         $wc.dispose()
     }
     [console]::setcursorposition($left, $top)
+    #>
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
