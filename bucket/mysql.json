@@ -26,8 +26,14 @@
 		"bin\\my_print_defaults.exe"
 		],
 	"post_install": "
-$dir/bin/mysqld --initialize-insecure
+#Initialize data directory (without generating root password)
+mysqld --initialize-insecure
+
+#Copy provided sample file to live file location
 cp $dir/my-default.ini $dir/my.ini
+
+#Output client configuration to my.ini file so no username is required when connecting
+echo \"\" >> $dir/my.ini
 echo \"[client]\" >> $dir/my.ini
 echo \"user=root\" >> $dir/my.ini
 "
