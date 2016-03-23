@@ -23,7 +23,6 @@
 		"bin\\mysqlimport.exe",
 		"bin\\mysqlshow.exe",
 		"bin\\mysqlslap.exe",
-		"bin\\mysqltest.exe",
 		"bin\\my_print_defaults.exe"
 		]
 }
