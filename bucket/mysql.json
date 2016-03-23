@@ -24,5 +24,11 @@
 		"bin\\mysqlshow.exe",
 		"bin\\mysqlslap.exe",
 		"bin\\my_print_defaults.exe"
-		]
+		],
+	"post_install": "
+$dir/bin/mysqld --initialize-insecure
+cp $dir/my-default.ini $dir/my.ini
+echo \"[client]\" >> $dir/my.ini
+echo \"user=root\" >> $dir/my.ini
+"
 }
