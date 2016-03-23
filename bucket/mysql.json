@@ -12,6 +12,7 @@
 			"hash": "md5:710b588c8df3134c87818f765118329a"
 		}
 	},
+	"extract_dir": "mysql-5.7.11-winx64",
 	"bin": [
 		"bin\\mysqld.exe",
 		"bin\\mysql.exe",
