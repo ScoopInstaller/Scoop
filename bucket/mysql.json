@@ -34,8 +34,8 @@ mysqld --initialize-insecure
 cp $dir/my-default.ini $dir/my.ini
 
 #Output client configuration to my.ini file so no username is required when connecting
-echo \"\" >> $dir/my.ini
-echo \"[client]\" >> $dir/my.ini
-echo \"user=root\" >> $dir/my.ini
+echo \"\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
+echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
+echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
 "
 }
