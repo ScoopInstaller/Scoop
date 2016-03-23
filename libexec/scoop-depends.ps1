@@ -17,7 +17,7 @@ $app = $apps[0]
 
 if(!$app) { "<app> missing"; my_usage; exit 1 }
 
-$architecture = ensure_architecture ($opt.a + $opt.architecture)
+$architecture = ensure_architecture ($opt.a + $opt.arch)
 
 $deps = @(deps $app $architecture)
 if($deps) {
