@@ -5,14 +5,15 @@
 	"architecture": {
 		"64bit": {
 			"url": "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.11-winx64.zip",
-			"hash": "md5:9805750100ab3e2411f4887eb5f4cb77"
+			"hash": "md5:9805750100ab3e2411f4887eb5f4cb77",
+			"extract_dir": "mysql-5.7.11-winx64"
 		},
 		"32bit": {
 			"url": "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.11-win32.zip",
-			"hash": "md5:710b588c8df3134c87818f765118329a"
+			"hash": "md5:710b588c8df3134c87818f765118329a",
+			"extract_dir": "mysql-5.7.11-win32"
 		}
 	},
-	"extract_dir": "mysql-5.7.11-winx64",
 	"bin": [
 		"bin\\mysqld.exe",
 		"bin\\mysql.exe",
