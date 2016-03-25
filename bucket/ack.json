@@ -1,0 +1,14 @@
+{
+  "homepage": "http://beyondgrep.com/",
+  "licence": "http://opensource.org/licenses/Artistic-2.0",
+  "version": "2.14",
+  "url": "http://beyondgrep.com/ack-2.14-single-file",
+  "hash": "1d203cfbc52ce8f49e3992be1cd3e4d7d5dfb7daa3739e8628aa9858ccc5b9df",
+  "bin": "ack.bat",
+  "depends": "perl",
+  "pre_install": "Set-Content -Value '@perl.exe %~dp0ack-2.14-single-file %*' -Path $dir\\ack.bat",
+  "checkver": {
+    "url": "http://beyondgrep.com/install/",
+    "re": "The current stable version of ack is version ([\\d.]+),"
+  }
+}

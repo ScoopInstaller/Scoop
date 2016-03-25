@@ -1,15 +1,15 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "5.6.15",
+    "version": "5.6.19",
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-5.6.15-nts-Win32-VC11-x64.zip",
-            "hash": "sha1:1108a921c993c0f767aa03262b0f02cab9a83f9b"
+            "url": "http://windows.php.net/downloads/releases/php-5.6.19-nts-Win32-VC11-x64.zip",
+            "hash": "sha1:fccca926b6d10489bc8e2043b2ff98749fbeb0d2"
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-5.6.15-nts-Win32-VC11-x86.zip",
-            "hash": "sha1:c9f0aefb6add0b0afa9dab1b640333d8a7789a66"
+            "url": "http://windows.php.net/downloads/releases/php-5.6.19-nts-Win32-VC11-x86.zip",
+            "hash": "sha1:18058dbed83edc108e5b3b20a0c00f380032d53a"
         }
     },
     "bin": "php.exe",
