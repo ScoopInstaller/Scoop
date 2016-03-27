@@ -355,7 +355,16 @@ function args($config, $dir) {
 function run($exe, $arg, $msg, $continue_exit_codes) {
     if($msg) { write-host $msg -nonewline }
     try {
-        $proc = start-process $exe -wait -ea stop -passthru -arg $arg
+        #Allow null/no arguments to be passed
+        $parameters = @{ }
+        if ($arg)
+        {
+            $parameters.arg = $arg;
+        }
+
+        $proc = start-process $exe -wait -ea stop -passthru @parameters
+
+
         if($proc.exitcode -ne 0) {
             if($continue_exit_codes -and ($continue_exit_codes.containskey($proc.exitcode))) {
                 warn $continue_exit_codes[$proc.exitcode]
@@ -466,7 +475,12 @@ function install_prog($fname, $dir, $installer) {
         if(!$installed) {
             abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
         }
-        rm $prog
+
+        #Don't remove installer if "keep" flag is set to true
+        if (!($installer.keep -eq "true"))
+        {
+            rm $prog
+        }
     }
 }
 
