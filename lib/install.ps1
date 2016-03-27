@@ -360,12 +360,12 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
         {
             $proc = start-process $exe -wait -ea stop -passthru -arg $arg
         }
-        
+
         else
         {
             $proc = start-process $exe -wait -ea stop -passthru
         }
-        
+
         if($proc.exitcode -ne 0) {
             if($continue_exit_codes -and ($continue_exit_codes.containskey($proc.exitcode))) {
                 warn $continue_exit_codes[$proc.exitcode]
@@ -476,7 +476,7 @@ function install_prog($fname, $dir, $installer) {
         if(!$installed) {
             abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
         }
-        
+
         #Don't remove installer if "keep" flag is set to true
         if (!($keepInstaller.keep -eq "true"))
         {
