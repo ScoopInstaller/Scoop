@@ -476,7 +476,12 @@ function install_prog($fname, $dir, $installer) {
         if(!$installed) {
             abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
         }
-        rm $prog
+        
+        #Don't remove installer if "keep" flag is set to true
+        if (!($keepInstaller.keep -eq "true"))
+        {
+            rm $prog
+        }
     }
 }
 
