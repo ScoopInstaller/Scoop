@@ -25,7 +25,7 @@
         "bin\\logresolve.exe",
         "bin\\rotatelogs.exe"
     ],
-    "depends": "visual-c-14",
+    "depends": "vc-redist14",
     "post_install": "
 # set directory in httpd.conf
 $conf = \"$dir/conf/httpd.conf\"
