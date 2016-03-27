@@ -13,6 +13,7 @@
         }
     },
     "bin": "php.exe",
+    "depends": "vc-redist14",
     "post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
     "checkver": {
         "url": "http://windows.php.net/download/",
