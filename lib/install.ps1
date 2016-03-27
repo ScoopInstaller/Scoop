@@ -361,7 +361,7 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
         {
             $parameters.arg = $arg;
         }
-        
+
         $proc = start-process $exe -wait -ea stop -passthru @parameters
 
 
