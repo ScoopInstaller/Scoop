@@ -4,16 +4,27 @@
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.0.4-Win32-VC14-x64.zip",
-            "hash": "sha1:52b0ce7ee7600672383694c65071966ff3a20b92"
+            "url": [
+                "http://windows.php.net/downloads/releases/php-7.0.4-Win32-VC14-x64.zip",
+               "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/64-bit/vcruntime140.dll"
+            ],
+            "hash": [
+                "sha1:52b0ce7ee7600672383694c65071966ff3a20b92",
+                "sha256:acf65e565021f2017815fc5ec8a3145cf6c15e75c132cf23a378cc943e68327c"
+            ]
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.0.4-Win32-VC14-x86.zip",
-            "hash": "sha1:60569b17d7883c710675d217f3521821f97b4a0d"
+            "url": [
+                "http://windows.php.net/downloads/releases/php-7.0.4-Win32-VC14-x86.zip",
+                "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/32-bit/vcruntime140.dll"
+            ],
+            "hash": [
+               "sha1:60569b17d7883c710675d217f3521821f97b4a0d",
+                "sha256:b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
+            ]
         }
     },
     "bin": "php.exe",
-    "depends": "vc-redist14",
     "post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
     "checkver": {
         "url": "http://windows.php.net/download/",
