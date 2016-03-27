@@ -264,6 +264,6 @@ function app($app) {
             return $matches[2], $matches[1]
         }
     }
-    
+
     $app, $null
 }
