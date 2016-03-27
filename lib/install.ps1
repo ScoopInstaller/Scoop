@@ -355,16 +355,15 @@ function args($config, $dir) {
 function run($exe, $arg, $msg, $continue_exit_codes) {
     if($msg) { write-host $msg -nonewline }
     try {
-        #Check if arguments were provided in the manifest, and pass them to the installer if present
+        #Allow null/no arguments to be passed
+        $parameters = @{ }
         if ($arg)
         {
-            $proc = start-process $exe -wait -ea stop -passthru -arg $arg
+            $parameters.arg = $arg;
         }
+        
+        $proc = start-process $exe -wait -ea stop -passthru @parameters
 
-        else
-        {
-            $proc = start-process $exe -wait -ea stop -passthru
-        }
 
         if($proc.exitcode -ne 0) {
             if($continue_exit_codes -and ($continue_exit_codes.containskey($proc.exitcode))) {
