@@ -478,7 +478,7 @@ function install_prog($fname, $dir, $installer) {
         }
 
         #Don't remove installer if "keep" flag is set to true
-        if (!($keepInstaller.keep -eq "true"))
+        if (!($installer.keep -eq "true"))
         {
             rm $prog
         }
