@@ -6,7 +6,7 @@
         "64bit": {
             "url": [
                 "http://windows.php.net/downloads/releases/php-7.0.4-Win32-VC14-x64.zip",
-               "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/64-bit/vcruntime140.dll"
+                "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/64-bit/vcruntime140.dll"
             ],
             "hash": [
                 "sha1:52b0ce7ee7600672383694c65071966ff3a20b92",
@@ -25,7 +25,13 @@
         }
     },
     "bin": "php.exe",
-    "post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
+    "post_install": "
+#Copy PHP configuration file to expected location
+cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
+
+#Enable extensions to be found in installation-relative folder (the default is to search C:/php)
+(gc \"$dir\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\php.ini\"
+",
     "checkver": {
         "url": "http://windows.php.net/download/",
         "re": "<h3 id=\"php-7.0\".*?>.*?\\(([0-9\\.]+)\\)</h3>"
