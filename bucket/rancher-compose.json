@@ -1,0 +1,23 @@
+{
+    "homepage": "https://rancher.com/",
+    "version": "0.7.3",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/rancher/rancher-compose/releases/download/v0.7.3/rancher-compose-windows-386-v0.7.3.zip",
+            "hash":"c24d8b4fff9a9ee65551cd3db046c566dec6da64e2cb37a93cc7850de88c987a"
+        },
+        "64bit": {
+            "url": "https://github.com/rancher/rancher-compose/releases/download/v0.7.3/rancher-compose-windows-amd64-v0.7.3.zip",
+            "hash": "d7891164e2aa29c2cbee6f12fb8b5c31d07ecf7f40e4226f1b2b7b2d6944fe8c"
+        }
+    },
+    "license": "Apache 2.0",
+    "extract_dir": "rancher-compose-v0.7.3",
+    "bin": [
+        "rancher-compose.exe"
+    ],
+    "checkver": {
+        "url": "https://github.com/rancher/rancher-compose/releases",
+        "re": "<span class=\"css-truncate-target\">v(\\d+\\.\\d+\\.\\d+)</span>"
+    }
+}
