@@ -596,7 +596,7 @@ function startmenu_shortcut($target, $shortcutName) {
 function rm_startmenu_shortcuts($manifest, $global) {
     $manifest.shortcuts | ?{ $_ -ne $null } | % {
         $name = $_.item(1)
-        $shortcut = "$env:USERPROFILE\Start Menu\Programs\$name.lnk"
+        $shortcut = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps\$name.lnk"
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
              echo "Removed shortcut $shortcut"
