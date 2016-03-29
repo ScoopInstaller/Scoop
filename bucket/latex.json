@@ -1,0 +1,11 @@
+{
+    "homepage": "http://miktex.org",
+    "version": "2.9.5719",
+    "license": "http://miktex.org/copying",
+    "url": "http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable-2.9.5719.exe#/dl.7z",
+    "hash": "41bee67c430dc4a3f65416bdb6ddcaf18a45d6e825b71d6f227094e3f00c18e6",
+    "bin": [
+        "miktex\\bin\\latex.exe",
+        "miktex\\bin\\pdflatex.exe"
+    ]
+}
