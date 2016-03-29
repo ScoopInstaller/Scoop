@@ -5,6 +5,7 @@
     "url": "http://download.geteventstore.com/binaries/EventStore-OSS-Win-v3.5.0.zip",
     "hash": "d88c78a3483e39c96d009447675f5a36fbe0a414e5640e1d6a749226f1e1b1da",
     "bin": [
+        ["EventStore.ClusterNode.exe", "eventstore" ],
         "EventStore.ClusterNode.exe",
         "EventStore.PAdmin.exe",
         "EventStore.Query.exe",
