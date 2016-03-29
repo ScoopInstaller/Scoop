@@ -1,0 +1,61 @@
+{
+    "homepage": "https://www.terraform.io",
+    "license": "Mozilla Public License 2.0",
+    "version": "0.6.14",
+    "architecture": {
+        "32bit": {
+            "url": "https://releases.hashicorp.com/terraform/0.6.14/terraform_0.6.14_windows_386.zip",
+            "hash": "46a2e0a28b862cdaf919ad5596dc85866c5616c2510b6de2a6a1c9f95a8c7979"
+        },
+        "64bit": {
+            "url": "https://releases.hashicorp.com/terraform/0.6.14/terraform_0.6.14_windows_amd64.zip",
+            "hash": "3cc26f06df35eff3c222665883720ee738bf766a9025c50f1e2e45c1973aa381"
+        }
+    },
+    "bin": [
+        "terraform-provider-atlas.exe",
+        "terraform-provider-aws.exe",
+        "terraform-provider-azure.exe",
+        "terraform-provider-azurerm.exe",
+        "terraform-provider-chef.exe",
+        "terraform-provider-clc.exe",
+        "terraform-provider-cloudflare.exe",
+        "terraform-provider-cloudstack.exe",
+        "terraform-provider-consul.exe",
+        "terraform-provider-datadog.exe",
+        "terraform-provider-digitalocean.exe",
+        "terraform-provider-dme.exe",
+        "terraform-provider-dnsimple.exe",
+        "terraform-provider-docker.exe",
+        "terraform-provider-dyn.exe",
+        "terraform-provider-github.exe",
+        "terraform-provider-google.exe",
+        "terraform-provider-heroku.exe",
+        "terraform-provider-influxdb.exe",
+        "terraform-provider-mailgun.exe",
+        "terraform-provider-mysql.exe",
+        "terraform-provider-null.exe",
+        "terraform-provider-openstack.exe",
+        "terraform-provider-packet.exe",
+        "terraform-provider-postgresql.exe",
+        "terraform-provider-powerdns.exe",
+        "terraform-provider-rundeck.exe",
+        "terraform-provider-statuscake.exe",
+        "terraform-provider-template.exe",
+        "terraform-provider-terraform.exe",
+        "terraform-provider-tls.exe",
+        "terraform-provider-triton.exe",
+        "terraform-provider-ultradns.exe",
+        "terraform-provider-vcd.exe",
+        "terraform-provider-vsphere.exe",
+        "terraform-provisioner-chef.exe",
+        "terraform-provisioner-file.exe",
+        "terraform-provisioner-local-exec.exe",
+        "terraform-provisioner-remote-exec.exe",
+        "terraform.exe"
+    ],
+    "checkver": {
+        "url": "https://releases.hashicorp.com/terraform/",
+        "re": "terraform_(\\d+\\.\\d+\\.\\d+)"
+    }
+}
