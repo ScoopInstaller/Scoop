@@ -1,17 +1,17 @@
 {
-    "version": "2016-03-10",
+    "version": "2016-03-30",
     "homepage": "http://ffmpeg.zeranoe.com/builds/",
     "license": "GPL3",
     "architecture": {
         "64bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20160310-git-689211d-win64-static.7z",
-            "hash": "d16234b600cb51c7d27f4380fa59936370e0d09948641abf551a86c01d90d877",
-            "extract_dir": "ffmpeg-20160310-git-689211d-win64-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20160330-git-be746ae-win64-static.7z",
+            "hash": "688888676af923d4eb0da328e6a98c06a4b3ddc6c3e6ab4078d42b99547390be",
+            "extract_dir": "ffmpeg-20160330-git-be746ae-win64-static"
         },
         "32bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-20160310-git-689211d-win32-static.7z",
-            "hash": "cca10e5281b70dd256cb1adaf71b783fde71ad06ed42a42d6d99ac114ca82913",
-            "extract_dir": "ffmpeg-20160213-git-689211d-win32-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-20160330-git-be746ae-win32-static.7z",
+            "hash": "e41945c1d1d09febaa4b4e5dd705f7b274d9cd7adc348812069a308729d21d69",
+            "extract_dir": "ffmpeg-20160330-git-be746ae-win32-static"
         }
     },
     "bin": [
