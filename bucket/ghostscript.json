@@ -1,0 +1,18 @@
+{
+    "homepage": "http://www.ghostscript.com",
+    "version": "9.18",
+    "license": "http://www.gnu.org/licenses/agpl-3.0.html",
+    "architecture": {
+        "64bit": {
+            "url": "http://downloads.ghostscript.com/public/gs918w64.exe#/dl.7z",
+            "hash": "a01e11e602b42bca29619bc18b7aea29431fe77cfbbb4eb6e4d04e5e9a0ffd1a"
+        },
+        "32bit": {
+            "url": "http://downloads.ghostscript.com/public/gs918w32.exe#/dl.7z",
+            "hash": "e4646c4ad0754a0848099a8606fb9bc6ca4cb882d29eba27dca96d12b477cb0d"
+        }
+    },
+    "bin": [
+        "bin\\gswin32c.exe"
+    ]
+}
