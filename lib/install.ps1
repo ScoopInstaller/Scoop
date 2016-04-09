@@ -190,6 +190,8 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
                     rm -r -force "$dir\_scoop_extract" -ea stop
                 } catch [system.io.pathtoolongexception] {
                     cmd /c "rmdir /s /q $dir\_scoop_extract"
+                } catch [system.unauthorizedaccessexception] {
+                    warn "couldn't remove $dir\_scoop_extract: unauthorized access"
                 }
             }
 
