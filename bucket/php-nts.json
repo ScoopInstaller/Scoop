@@ -12,7 +12,7 @@
             "hash": "sha1:d85ae6f6c7ff646969b5002ad4a8737d9241c8e5"
         }
     },
-    "bin": "php.exe",
+    "bin": ["php.exe", "php-cgi.exe"],
     "post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
     "checkver": {
         "url": "http://windows.php.net/download/",
