@@ -111,7 +111,63 @@ function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) 
 }
 
 function dl_progress($url, $to, $cookies) {
-    Invoke-WebRequest -Uri $url -OutFile $to -UserAgent 'Scoop/1.0' -Headers @{"Cookie"=(cookie_header $cookies)}
+    $wc = new-object net.webclient
+    $wc.headers.add('User-Agent', 'Scoop/1.0')
+    $wc.headers.add('Cookie', (cookie_header $cookies))
+
+    # simplified until there's a workaround for threading problems below
+    $wc.downloadfile($url, $to)
+
+    # seems to be causing threading problems and crashes in Win10...
+    <#
+    if([console]::isoutputredirected) {
+        # can't set cursor position: just do simple download
+        $wc.downloadfile($url, $to)
+        return
+    }
+
+    $left = [console]::cursorleft
+    $top = [console]::cursortop
+    register-objectevent $wc downloadprogresschanged progress | out-null
+    register-objectevent $wc downloadfilecompleted complete | out-null
+    try {
+        $wc.downloadfileasync($url, $to)
+
+        function is_complete {
+            try {
+                $complete = get-event complete -ea stop
+                $err = $complete.sourceeventargs.error
+                if($err) { abort "$($err.message)" }
+                $true
+            } catch {
+                $false
+            }
+        }
+
+        $last_p = -1
+        while(!(is_complete)) {
+            $e = wait-event progress -timeout 1
+            if(!$e) { continue } # avoid deadlock
+
+            remove-event progress
+            $p = $e.sourceeventargs.progresspercentage
+            if($p -ne $last_p) {
+                [console]::setcursorposition($left, $top)
+                write-host "$p%" -nonewline
+                $last_p = $p
+            }
+        }
+        remove-event complete
+    } finally {
+        remove-event *
+        unregister-event progress
+        unregister-event complete
+
+        $wc.cancelasync()
+        $wc.dispose()
+    }
+    [console]::setcursorposition($left, $top)
+    #>
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
