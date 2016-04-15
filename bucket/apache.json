@@ -1,25 +1,25 @@
 {
     "homepage": "http://www.apachelounge.com",
-    "version": "2.4.18",
+    "version": "2.4.20",
     "license": "Apache 2.0",
     "architecture": {
         "64bit": {
             "url": [
-                "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.18-win64-VC14.zip",
+                "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.20-win64-VC14.zip",
                 "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/64-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha256:543aff046b0ea2bf58be76d7d20fcd1fa16eec9ae836ca4639feb1c2a7e09cfa",
+                "sha256:4EC8A8B25F30809A1D8700FBE8CFAA6C1511E10DB3BBD44FC36B206F5C097200",
                 "sha256:acf65e565021f2017815fc5ec8a3145cf6c15e75c132cf23a378cc943e68327c"
             ]
         },
         "32bit": {
             "url": [
-                "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.18-win32-VC14.zip",
+                "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.20-win32-VC14.zip",
                 "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/32-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha256:2259bea85cbcb4e9e525bfff0863b4ae3eae5f91fddb153191fd310575a04f38",
+                "sha256:5EBC9F372E049C6B604A5D8A3EF621B269FBF603D76385578E992CE2856AD748",
                 "sha256:b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
             ]
         }
