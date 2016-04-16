@@ -127,13 +127,13 @@ function update($app, $global, $quiet = $false) {
 
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
-    pre_install $manifest
+    pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir
     ensure_install_dir_not_in_path $dir
     create_shims $manifest $dir $global
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
-    post_install $manifest
+    post_install $manifest $architecture
 
     success "$app was updated from $old_version to $version"
 
