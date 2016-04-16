@@ -34,7 +34,7 @@ function install_app($app, $architecture, $global) {
 
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
-    pre_install $manifest
+    pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir
     ensure_install_dir_not_in_path $dir $global
     create_shims $manifest $dir $global
@@ -42,8 +42,8 @@ function install_app($app, $architecture, $global) {
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
-    post_install $manifest
-
+    post_install $manifest $architecture
+ 
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
     save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
@@ -687,17 +687,19 @@ function env_rm($manifest, $global) {
     }
 }
 
-function pre_install($manifest) {
-    $manifest.pre_install | ? { $_ } | % {
+function pre_install($manifest, $arch) {
+    $pre_install = arch_specific 'pre_install' $manifest $arch
+    if($pre_install) {
         echo "running pre-install script..."
-        iex $_
+        iex $pre_install
     }
 }
 
-function post_install($manifest) {
-    $manifest.post_install | ? { $_ } | % {
+function post_install($manifest, $arch) {
+    $post_install = arch_specific 'post_install' $manifest $arch
+    if($post_install) {
         echo "running post-install script..."
-        iex $_
+        iex $post_install
     }
 }
 
