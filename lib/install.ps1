@@ -43,7 +43,7 @@ function install_app($app, $architecture, $global) {
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
     post_install $manifest $architecture
- 
+
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
     save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
