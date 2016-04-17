@@ -2,10 +2,19 @@
     "homepage": "https://www.r-project.org",
     "version": "3.2.4",
     "license": "GPL2",
-    "url": "https://cran.rstudio.com/bin/windows/base/R-3.2.4revised-win.exe",
-    "hash": "E0BCD1D3552670B6E7604AF54AC0B75E8538694D8FC5B38086BF8A81FDB6EF40",
+    "architecture": {
+        "64bit": {
+            "url": "https://cran.rstudio.com/bin/windows/base/R-3.2.4revised-win.exe",
+            "hash": "E0BCD1D3552670B6E7604AF54AC0B75E8538694D8FC5B38086BF8A81FDB6EF40",
+            "pre_install": "copy-item -recurse $dir\\bin\\x64 $dir\\bin\\curr_arch"
+        },
+        "32bit": {
+            "url": "https://cran.rstudio.com/bin/windows/base/R-3.2.4revised-win.exe",
+            "hash": "E0BCD1D3552670B6E7604AF54AC0B75E8538694D8FC5B38086BF8A81FDB6EF40",
+            "pre_install": "copy-item -recurse $dir\\bin\\i386 $dir\\bin\\curr_arch"
+        }
+    },
     "innosetup": true,
-    "pre_install": "if ([intptr]::size -eq 8) { $r_arch = \"x64\" } else { $r_arch = \"i386\" }; copy-item -recurse $dir\\bin\\$r_arch $dir\\bin\\curr_arch;",
     "bin": [
         "bin\\curr_arch\\r.exe",
         "bin\\curr_arch\\rterm.exe",
@@ -19,8 +28,6 @@ You can remove Powershell's 'r' command with:
 ... but this only affects your current session: if you'd like to remove it for all future sessions you need to add the command above to your Powershell profile.
 
 Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--this has a plugin to remove some crazy aliases from Powershell, as well as many other improvements.
-
-If you are on a 64-bit machine then R comes in a 32-bit and a 64-bit version. Currently scoop sets the shims depending on your machine's architecture.
 ",
     "checkver": {
         "url": "https://cran.rstudio.com/bin/windows/base/",
