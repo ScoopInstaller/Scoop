@@ -6,11 +6,11 @@
         "64bit": {
             "url": [
                 "http://windows.php.net/downloads/releases/php-7.0.5-Win32-VC14-x64.zip",
-                "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/64-bit/vcruntime140.dll"
+                "https://raw.githubusercontent.com/madbub/scoop-php/master/64-bit/vcruntime140.dll"
             ],
             "hash": [
                 "sha1:ef09d80e264a010d538cf88004acb68c52812a26",
-                "sha256:acf65e565021f2017815fc5ec8a3145cf6c15e75c132cf23a378cc943e68327c"
+                "md5:6c2c88ff1b3da84b44d23a253a06c01b"
             ]
         },
         "32bit": {
