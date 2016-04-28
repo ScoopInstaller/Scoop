@@ -11,7 +11,7 @@
             "url": "https://nodejs.org/dist/v6.0.0/node-v6.0.0-x86.msi",
             "hash": "614380711039b7cc23db8d8cbf42ed9f4a6f0501eb8a143490f7ece952037bc9"
         }
-    },,
+    },
     "env_add_path": "nodejs",
     "post_install": "
 # Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
