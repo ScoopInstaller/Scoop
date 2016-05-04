@@ -1,16 +1,16 @@
 {
     "homepage": "https://github.com/Masterminds",
     "license": "https://github.com/Masterminds/glide/blob/master/LICENSE",
-    "version": "0.9.1",
+    "version": "0.10.2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Masterminds/glide/releases/download/0.9.1/glide-0.9.1-windows-amd64.zip",
-            "hash": "923afeb134080a30aa03ab6463aba570f17a5ca31f02ae1ef33e4beee0221c37",
+            "url": "https://github.com/Masterminds/glide/releases/download/0.10.2/glide-0.10.2-windows-amd64.zip",
+            "hash": "6f172e1feb4ef3559318af32342ae3523e1a615b7838b96db5a467195b9a7fdc",
             "extract_dir": "windows-amd64"
         },
         "32bit": {
-            "url": "https://github.com/Masterminds/glide/releases/download/0.9.1/glide-0.9.1-windows-386.zip",
-            "hash": "86ed09cda3a56ecbb549cb0d50ce39bc3a8f01d323c582b52716b143955f53d0",
+            "url": "https://github.com/Masterminds/glide/releases/download/0.10.2/glide-0.10.2-windows-386.zip",
+            "hash": "0475e8f343aaa8193a5ef55ad581a0f4b08960ac230be3ac0c4972b3c11b7c8e",
             "extract_dir": "windows-386"
         }
     },
