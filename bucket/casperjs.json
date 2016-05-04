@@ -1,10 +1,10 @@
 {
-    "version":  "1.1-beta3",
+    "version":  "1.1.1",
     "license":  "https://github.com/n1k0/casperjs/blob/master/LICENSE.md",
-    "url":  "https://github.com/n1k0/casperjs/archive/1.1-beta3.zip",
-    "hash":  "6461ac1d53e66649579dc3437713a35f80e8b57ab4b8525eac5a0b8f6bcde17e",
+    "url":  "https://github.com/casperjs/casperjs/archive/1.1.1.zip",
+    "hash":  "1c94a3826d8bd9c8424d5f690b43b8d317538763ab0163f1afba9a0968810b91",
     "homepage":  "http://casperjs.org/",
-    "extract_dir":  "casperjs-1.1-beta3",
+    "extract_dir":  "casperjs-1.1.1",
     "bin":  "bin\\casperjs.exe",
     "notes":  "Requires an installation of phantomjs 1.x
 
