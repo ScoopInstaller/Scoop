@@ -1,10 +1,10 @@
 {
     "homepage": "http://www.cmake.org/",
-    "version": "3.5.1",
+    "version": "3.5.2",
     "license": "http://www.cmake.org/licensing/",
-    "url": "https://cmake.org/files/v3.5/cmake-3.5.1-win32-x86.zip",
-    "hash": "02cbd8e8bd105d2314170b6a2959b9a5d043a8d45a97f5cbe6e46413b26dcf6c",
-    "extract_dir": "cmake-3.5.1-win32-x86",
+    "url": "https://cmake.org/files/v3.5/cmake-3.5.2-win32-x86.zip",
+    "hash": "671073aee66b3480a564d0736792e40570a11e861bb34819bb7ae7858bbdfb80",
+    "extract_dir": "cmake-3.5.2-win32-x86",
     "bin": [
         "bin/cmake.exe",
         "bin/cmcldeps.exe",
