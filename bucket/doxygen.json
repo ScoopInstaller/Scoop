@@ -1,19 +1,20 @@
 {
     "homepage": "http://www.doxygen.nl/",
     "license": "GPL2",
-    "version": "1.8.8",
+    "version": "1.8.11",
     "architecture": {
         "64bit": {
-            "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.8.windows.x64.bin.zip",
-            "hash": "68f941ca2991c70100418785c773de07777adfe3cb4b0f49146f1d9a45f6d559"
+            "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.windows.x64.bin.zip",
+            "hash": "6ce7c259975fb3dc449313913de71b89665d15c49cf674db6952f304bb3dfaaa"
         },
         "32bit": {
-            "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.8.windows.bin.zip",
-            "hash": "d4bd6b3e4279a5533a53533a497e8cb1bd62e9c75007dce693b28d0aac9783f2"
+            "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.windows.bin.zip",
+            "hash": "f25964e0203739d77e79d74bafdbef212bd97748e20fdafad078a8e2d315a7ff"
         }
     },
     "bin": [
         "doxygen.exe",
-        "doxyindexer.exe"
+        "doxyindexer.exe",
+        "doxysearch.cgi.exe"
     ]
 }
