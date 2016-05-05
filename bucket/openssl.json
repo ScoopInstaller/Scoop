@@ -4,11 +4,11 @@
     "license": "https://www.openssl.org/source/license.html",
     "architecture": {
         "64bit": {
-            "url": "http://slproweb.com/download/Win64OpenSSL-1_0_2g.exe",
+            "url": "http://slproweb.com/download/Win64OpenSSL-1_0_2h.exe",
             "hash": "eed0d24e86e942a4c693e33c7797bfbdcca029348ed1e0b1e88bb51ed16ed650"
         },
         "32bit": {
-            "url": "http://slproweb.com/download/Win32OpenSSL-1_0_2g.exe",
+            "url": "http://slproweb.com/download/Win32OpenSSL-1_0_2h.exe",
             "hash": "453eac4277489af6a3e336d404d81fef3d953cb98c28e2d24ba6081bc541abff"
         }
     },
