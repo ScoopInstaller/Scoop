@@ -1,15 +1,15 @@
 {
     "homepage": "http://nodejs.org",
-    "version": "6.0.0",
+    "version": "6.1.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v6.0.0/node-v6.0.0-x64.msi",
-            "hash": "933a15791a67a2740cbd082a8d9aebc43162ec6d4db335abf62121a9561c57d4"
+            "url": "https://nodejs.org/dist/v6.1.0/node-v6.1.0-x64.msi",
+            "hash": "b32b1105da5c08023976717d9aaeb0e3ba93d09f170aa3d81ad8ddfb0abfbdd4"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v6.0.0/node-v6.0.0-x86.msi",
-            "hash": "614380711039b7cc23db8d8cbf42ed9f4a6f0501eb8a143490f7ece952037bc9"
+            "url": "https://nodejs.org/dist/v6.1.0/node-v6.1.0-x86.msi",
+            "hash": "26b762f6066feeae59107c064eeaf70019880cb113279d51e35dff46c6c81be2"
         }
     },
     "env_add_path": "nodejs",
