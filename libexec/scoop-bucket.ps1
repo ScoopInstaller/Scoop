@@ -19,6 +19,7 @@ param($cmd, $name, $repo)
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\help.ps1"
+. "$psscriptroot\..\lib\git.ps1"
 
 reset_aliases
 
@@ -43,15 +44,18 @@ function add_bucket($name, $repo) {
     }
 
     write-host 'checking repo...' -nonewline
-    git ls-remote $repo 2>&1 > $null
+    $out = git_ls_remote $repo 2>&1
     if($lastexitcode -ne 0) {
-        abort "'$repo' doesn't look like a valid git repository"
+        abort "'$repo' doesn't look like a valid git repository
+
+error given:
+$out"
     }
     write-host 'ok'
 
     ensure $bucketsdir > $null
     $dir = ensure $dir
-    git clone "$repo" "$dir"
+    git_clone "$repo" "$dir"
     success "$name bucket was added successfully"
 }
 
