@@ -19,6 +19,7 @@
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
+. "$psscriptroot\..\lib\git.ps1"
 
 reset_aliases
 
@@ -54,11 +55,11 @@ function update_scoop() {
         rm -r -force $currentdir -ea stop
 
         # get git scoop
-        git clone -q $repo --branch $branch --single-branch $currentdir
+        git_clone -q $repo --branch $branch --single-branch $currentdir
     }
     else {
         pushd $currentdir
-        git pull -q
+        git_pull -q
         popd
     }
 
@@ -68,7 +69,7 @@ function update_scoop() {
     @(buckets) | % {
         "updating $_ bucket..."
         pushd (bucketdir $_)
-        git pull -q
+        git_pull -q
         popd
     }
     success 'scoop was updated successfully!'
