@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.7-zip.org/",
     "license": "http://www.7-zip.org/license.txt",
-    "version": "15.14",
+    "version": "16.00",
     "architecture": {
         "64bit": {
             "url": "http://www.7-zip.org/a/7z1600-x64.msi",
