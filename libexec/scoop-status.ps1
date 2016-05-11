@@ -7,6 +7,7 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
+. "$psscriptroot\..\lib\git.ps1"
 
 reset_aliases
 
@@ -16,7 +17,7 @@ $needs_update = $false
 
 if(test-path "$currentdir\.git") {
     pushd $currentdir
-    git fetch -q origin
+    git_fetch -q origin
     $commits = $(git log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
     if($commits) { $needs_update = $true }
     popd

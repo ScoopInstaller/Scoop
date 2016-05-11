@@ -1,10 +1,10 @@
 {
     "homepage": "http://ant.apache.org/",
-    "version": "1.9.6",
+    "version": "1.9.7",
     "license": "Apache 2.0",
-    "url": "http://mirror.ventraip.net.au/apache//ant/binaries/apache-ant-1.9.6-bin.zip",
-    "hash": "9ff91e8babfc022b2101884b7981bfb4708390d56df57a7c25c9dc36e2606717",
-    "extract_dir": "apache-ant-1.9.6",
+    "url": "http://www-us.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.zip",
+    "hash": "b28c5ea0b5ea90bb4ad6bab229b6a56ac4461760a251a12567803a69259cd9de",
+    "extract_dir": "apache-ant-1.9.7",
     "env_add_path": "bin",
     "env_set": {
         "ANT_HOME": "$dir"

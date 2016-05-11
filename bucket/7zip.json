@@ -4,12 +4,12 @@
     "version": "15.14",
     "architecture": {
         "64bit": {
-            "url": "http://www.7-zip.org/a/7z1514-x64.msi",
-            "hash": "cefe1a9092d8a6be68468c33910d6206b40e934fb63cab686c5cccf369fbf712"
+            "url": "http://www.7-zip.org/a/7z1600-x64.msi",
+            "hash": "6b7061d9f4b54d78dab760c01a3290fd453783987366c4804ede7001337f1c79"
         },
         "32bit": {
-            "url": "http://www.7-zip.org/a/7z1514.msi",
-            "hash": "eaf58e29941d8ca95045946949d75d9b5455fac167df979a7f8e4a6bf2d39680"
+            "url": "http://www.7-zip.org/a/7z1600.msi",
+            "hash": "53056c647c6a0560f4d304d12a179a8b8aee84f0655afe641a332e5d71d74ae6"
         }
     },
     "extract_dir": "Files/7-Zip",

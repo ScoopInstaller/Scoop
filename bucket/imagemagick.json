@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.imagemagick.org/script/index.php",
     "license": "http://www.imagemagick.org/script/license.php",
-    "version": "6.9.3-7",
+    "version": "7.0.1-2",
     "architecture": {
         "64bit": {
-            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.3-7-portable-Q16-x64.zip",
-            "hash": "52c12e187dad5935ec6c4cb14df60bbc8a4b07630ccb556287694070916d3ed9"
+            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.1-2-portable-Q16-x64.zip",
+            "hash": "f70e26ec01d1457458ca8b186eb8fc46e45442cf9c5c585a8b18290dece2d582"
         },
         "32bit": {
-            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-6.9.3-7-portable-Q16-x86.zip",
-            "hash": "396556390ddeb8cdd52eaffe20d17eac04cf8a055316e5d6fe5430713f58686b"
+            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.1-2-portable-Q16-x86.zip",
+            "hash": "20dbce30b8137745cc519cbb09488cde5381dbb2a3f8668fb22cedb975704744"
         }
     },
     "env_add_path": ".",
@@ -23,6 +23,7 @@
         "hp2xx.exe",
         "identify.exe",
         "IMDisplay.exe",
+        "magick.exe",
         "mogrify.exe",
         "montage.exe",
         "stream.exe"
