@@ -21,5 +21,6 @@
     "post_install": "
 # Removes installation cruft
 rm -r $dir\\`$PLUGINSDIR
-rm -r $dir\\`$COMMONFILES"
+rm -r $dir\\`$COMMONFILES",
+    "env_add_path": "dist"
 }
