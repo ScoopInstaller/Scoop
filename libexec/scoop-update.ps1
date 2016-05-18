@@ -129,7 +129,7 @@ function update($app, $global, $quiet = $false) {
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
-    run_installer $fname $manifest $architecture $dir
+    run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir
     create_shims $manifest $dir $global
     env_add_path $manifest $dir $global

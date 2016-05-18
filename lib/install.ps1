@@ -35,7 +35,7 @@ function install_app($app, $architecture, $global) {
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
-    run_installer $fname $manifest $architecture $dir
+    run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
     create_shims $manifest $dir $global
     create_startmenu_shortcuts $manifest $dir $global
@@ -349,8 +349,8 @@ function cmd_available($cmd) {
 }
 
 # for dealing with installers
-function args($config, $dir) {
-    if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }
+function args($config, $dir, $global) {
+    if($config) { return $config | % { (format $_ @{'dir'=$dir;'global'=$global}) } }
     @()
 }
 
@@ -399,7 +399,7 @@ function unpack_inno($fname, $manifest, $dir) {
     write-host "done"
 }
 
-function run_installer($fname, $manifest, $architecture, $dir) {
+function run_installer($fname, $manifest, $architecture, $dir, $global) {
     # MSI or other installer
     $msi = msi $manifest $architecture
     $installer = installer $manifest $architecture
@@ -407,7 +407,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
     if($msi) {
         install_msi $fname $dir $msi
     } elseif($installer) {
-        install_prog $fname $dir $installer
+        install_prog $fname $dir $installer $global
     }
 }
 
@@ -463,12 +463,12 @@ function msi_installed($code) {
     try { $wmi = [wmi]"Win32_Product.$classkey"; $true } catch { $false }
 }
 
-function install_prog($fname, $dir, $installer) {
+function install_prog($fname, $dir, $installer, $global) {
     $prog = "$dir\$(coalesce $installer.file "$fname")"
     if(!(is_in_dir $dir $prog)) {
         abort "error in manifest: installer $prog is outside the app directory"
     }
-    $arg = @(args $installer.args $dir)
+    $arg = @(args $installer.args $dir $global)
 
     if($prog.endswith('.ps1')) {
         & $prog @arg

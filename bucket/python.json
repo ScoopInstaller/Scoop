@@ -16,11 +16,11 @@
     "installer": {
         "args": [
             "/quiet",
-            "InstallAllUsers=0",
+            "InstallAllUsers=$(@{$true=1;$false=0}[$global])",
             "TargetDir=$dir",
             "AssociateFiles=0",
             "Shortcuts=0",
-            "InstallLauncherAllUsers=0"
+            "InstallLauncherAllUsers=$(@{$true=1;$false=0}[$global])"
         ]
     },
     "uninstaller": {
