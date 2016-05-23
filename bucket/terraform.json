@@ -5,11 +5,11 @@
     "architecture": {
         "32bit": {
             "url": "https://releases.hashicorp.com/terraform/0.6.15/terraform_0.6.15_windows_386.zip",
-            "hash": "46a2e0a28b862cdaf919ad5596dc85866c5616c2510b6de2a6a1c9f95a8c7979"
+            "hash": "e8d0dd1ce202ac80467333bc45f0bf2d7168d138871737db39868d6dc834305f"
         },
         "64bit": {
             "url": "https://releases.hashicorp.com/terraform/0.6.15/terraform_0.6.15_windows_amd64.zip",
-            "hash": "3cc26f06df35eff3c222665883720ee738bf766a9025c50f1e2e45c1973aa381"
+            "hash": "03f3c74a3c4ca3dc2e77f333217bf6316e79581b9661d8567b5822cc715b22ba"
         }
     },
     "bin": [
@@ -21,6 +21,7 @@
         "terraform-provider-clc.exe",
         "terraform-provider-cloudflare.exe",
         "terraform-provider-cloudstack.exe",
+        "terraform-provider-cobbler.exe",
         "terraform-provider-consul.exe",
         "terraform-provider-datadog.exe",
         "terraform-provider-digitalocean.exe",
@@ -28,6 +29,7 @@
         "terraform-provider-dnsimple.exe",
         "terraform-provider-docker.exe",
         "terraform-provider-dyn.exe",
+        "terraform-provider-fastly.exe",
         "terraform-provider-github.exe",
         "terraform-provider-google.exe",
         "terraform-provider-heroku.exe",
