@@ -1,17 +1,17 @@
 {
     "homepage": "https://aria2.github.io/",
     "license": "GPL2 or later",
-    "version": "1.22.0",
+    "version": "1.23.0",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/aria2/aria2/releases/download/release-1.22.0/aria2-1.22.0-win-32bit-build1.zip",
-            "hash": "9059b59d5903a4e7f0e46cd858583625c41dd93ed7f90b73caad438253d334fc",
-            "extract_dir": "aria2-1.22.0-win-32bit-build1"
+            "url": "https://github.com/aria2/aria2/releases/download/release-1.23.0/aria2-1.23.0-win-32bit-build2.zip",
+            "hash": "72f7c79115046fa6e99601307df04575c2e4f044650be091c5a39df4fef3fe8d",
+            "extract_dir": "aria2-1.23.0-win-32bit-build2"
         },
         "64bit": {
-            "url": "https://github.com/aria2/aria2/releases/download/release-1.22.0/aria2-1.22.0-win-64bit-build1.zip",
-            "hash": "7ea1f891886d53a32e77d3592e6a9971ba548c4920aa314ddb2bf509229aeb38",
-            "extract_dir": "aria2-1.22.0-win-64bit-build1"
+            "url": "https://github.com/aria2/aria2/releases/download/release-1.23.0/aria2-1.23.0-win-64bit-build2.zip",
+            "hash": "fdfa3b2d837ca10d41c1c7a2858d2d948f6d8a922379f36fd9fbee33c314f04d",
+            "extract_dir": "aria2-1.23.0-win-64bit-build2"
         }
     },
     "bin": "aria2c.exe",
