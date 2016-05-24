@@ -17,5 +17,5 @@
         "Rust\\bin\\rustdoc.exe",
         "Rust\\bin\\cargo.exe"
     ],
-    "checkver": "<h2>Docs \\(([0-9\\.]+)\\)</h2>"
+    "checkver": "var rec_package_name = \"([0-9\\.]+)\";"
 }
