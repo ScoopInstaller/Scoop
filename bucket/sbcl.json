@@ -12,6 +12,6 @@
             "SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.2.6"
         },
     "bin": [ "PFiles\\Steel Bank Common Lisp\\1.2.6\\sbcl.exe"],
-    "checkver": "The most recent version is SBCL ([^\\ ]+)",
+    "checkver": "The most recent version is <a href=[^>]+>SBCL ([^\\ ]+)<\/a",
     "notes": "Please restart your command line for SBCL_HOME to take effect. Please consider installing http://www.quicklisp.org/"
 }

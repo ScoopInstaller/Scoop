@@ -18,6 +18,6 @@
   },
   "checkver": {
     "url": "http://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
-    "re": "\\s*\"version\"\\s*:\\s*(\\d+\\.\\d+\\.\\d+.*)"
+    "re": "\"version\":\\s*\"([0-9\\.]+)\""
   }
 }

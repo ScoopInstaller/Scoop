@@ -5,5 +5,5 @@
     "url": "http://www.nano-editor.org/dist/v2.2/NT/nano-2.2.6.zip",
     "hash": "87ae7984ab2ded388f5d30388483e8906aa46ac72ff4f2ea12063d0e8deffd62",
     "bin": "nano.exe",
-    "checkver": "Latest Version\\s+([0-9\\.]+) \\(stable\\)"
+    "checkver": "Latest Version\\s+([0-9\\.]+)"
 }

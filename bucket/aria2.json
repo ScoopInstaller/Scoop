@@ -15,5 +15,5 @@
         }
     },
     "bin": "aria2c.exe",
-    "checkver": "<p>Download <a href=\"https://github.com/aria2/aria2/tag[^\"]+\">version ([^<]+)</a>"
+    "checkver": "<p>Download <a href=\"https://github.com/aria2/aria2[^\"]+\">version ([^<]+)</a>"
 }

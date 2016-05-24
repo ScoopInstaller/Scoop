@@ -12,5 +12,5 @@
         "bin/ctest.exe",
         "bin/cmake-gui.exe"
     ],
-    "checkver": "Download CMake Version ([0-9\\.]+)"
+    "checkver": "<p>CMake version ([0-9\\.]+) is now available for download<\/p>"
 }

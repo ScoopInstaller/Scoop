@@ -27,6 +27,6 @@
     ],
     "checkver": {
         "url": "http://sliksvn.com/en/download/",
-        "re": "<a href=\"https://sliksvn.com/pub/Slik-Subversion-(.*)-win32.msi\" class=\"button default\">"
+        "re": "<a href=\"https:\\/\\/sliksvn\\.com\\/pub\\/Slik-Subversion-([0-9\\.]+)-x64\\.zip\"[^>]+>SVN[^6]+64 bit<\\/a>"
     }
 }
