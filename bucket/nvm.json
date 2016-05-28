@@ -9,7 +9,7 @@
         "NVM_SYMLINK": "$dir\\nodejs"
     },
     "hash": "20fb8f24c28ba2d603b03ac37701abc7c24d3f2abb467cf63fea2058bfbe5b1c",
-    "architecture": { 
+    "architecture": {
         "64bit": {
             "post_install": "\"root: $dir `r`narch: 64`r`nproxy: none `r`noriginalpath: `r`noriginalversion: `r`n\" | Out-File -encoding \"ASCII\" $dir\\settings.txt"
         },
