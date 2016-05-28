@@ -1,0 +1,21 @@
+{
+    "version": "1.1",
+    "url": "https://github.com/coreybutler/nvm-windows/releases/download/1.1.0/nvm-noinstall.zip",
+    "extract_dir": "\\",
+    "bin": ["nvm.exe", "elevate.cmd","elevate.vbs"],
+    "env_add_path":"nodejs",
+    "env_set": {
+        "NVM_HOME": "$dir",
+        "NVM_SYMLINK": "$dir\\nodejs"
+    },
+    "hash": "20fb8f24c28ba2d603b03ac37701abc7c24d3f2abb467cf63fea2058bfbe5b1c",
+    "architecture": {
+        "64bit": {
+            "post_install": "\"root: $dir `r`narch: 64`r`nproxy: none `r`noriginalpath: `r`noriginalversion: `r`n\" | Out-File -encoding \"ASCII\" $dir\\settings.txt"
+        },
+        "32bit": {
+            "post_install": "\"root: $dir `r`narch: 32 `r`nproxy: none `r`noriginalpath: `r`noriginalversion: `r`n\" | Out-File -encoding \"ASCII\" $dir\\settings.txt"
+        }
+    },
+    "notes":"You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly"
+}
