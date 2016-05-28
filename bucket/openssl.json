@@ -14,5 +14,6 @@
     },
     "innosetup": true,
     "bin": "bin\\openssl.exe",
-    "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^ ]+) Light</a>"
+    "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^ ]+) Light</a>",
+    "env_add_path": "bin"
 }
