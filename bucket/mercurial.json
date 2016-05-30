@@ -1,15 +1,15 @@
 {
     "homepage": "mercurial.selenic.com",
-    "version": "3.8.1",
+    "version": "3.8.2",
     "license": "http://www.gnu.org/licenses/gpl-2.0.txt",
     "architecture": {
         "64bit": {
-            "url": "http://mercurial.selenic.com/release/windows/Mercurial-3.8.1-x64.exe",
-            "hash": "89ab409f7818d8640ee45800254efbf051dbc7b6509d8f6c687274226c1c3cb6"
+            "url": "https://mercurial-scm.org/release/windows/Mercurial-3.8.2-x64.exe",
+            "hash": "a0d9a3377b5e9cac19de35743470a903c5783bef57c52a62aae442f58aab1ae9"
         },
         "32bit": {
-            "url": "http://mercurial.selenic.com/release/windows/Mercurial-3.8.1.exe",
-            "hash": "1629e8171461bd2fad09466f5c1beca7a7f3de3d55ebd8eca647a8a3e76c9c6e"
+            "url": "https://mercurial-scm.org/release/windows/Mercurial-3.8.2.exe",
+            "hash": "7b8d6b14db0f9b5a935724d0f3fc303a0a80166ff7e97c6861aa25351dd9f6be"
         }
     },
     "innosetup": true,
