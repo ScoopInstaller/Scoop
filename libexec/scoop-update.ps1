@@ -51,11 +51,14 @@ function update_scoop() {
             scoop config SCOOP_BRANCH "$branch"
         }
 
-        # remove non-git scoop
-        rm -r -force $currentdir -ea stop
+        $newdir = fullpath $(versiondir 'scoop' 'new')
 
         # get git scoop
-        git_clone -q $repo --branch $branch --single-branch $currentdir
+        git_clone -q $repo --branch $branch --single-branch $newdir
+
+        # replace non-git scoop with the git version
+        rm -r -force $currentdir -ea stop
+        mv $newdir $currentdir
     }
     else {
         pushd $currentdir
