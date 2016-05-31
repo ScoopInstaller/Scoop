@@ -4,9 +4,9 @@
     "license": "http://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.4.zip",
-            "hash": "f875b23d25a7cc23c8e2b469c8a75bb9cc892b00a77288230cb3991bcf336ede",
-            "extract_dir": "mongodb-win32-x86_64-2008plus-ssl-3.2.4"
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-3.2.4.zip",
+            "hash": "89a9f49a4fcc4ca9e5051ef33330cbeccca86c07d5ecbef4ea5cc3b7a43a9faa",
+            "extract_dir": "mongodb-win32-x86_64-3.2.4"
         },
         "32bit": {
             "url": "https://fastdl.mongodb.org/win32/mongodb-win32-i386-3.2.4.zip",
