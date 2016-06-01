@@ -103,77 +103,74 @@ function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) 
     if(!(test-path $cached) -or !$use_cache) {
         $null = ensure $cachedir
         write-host "downloading $url..." -nonewline
-        dl_progress $url "$cached.download" $cookies
+        do_dl $url "$cached.download" $cookies
         mv "$cached.download" $cached -force
         write-host "done"
     } else { write-host "loading $url from cache..."}
     cp $cached $to
 }
 
-function dl_progress($url, $to, $cookies) {
-    $wc = new-object net.webclient
-    $wc.headers.add('User-Agent', 'Scoop/1.0')
-    $wc.headers.add('Cookie', (cookie_header $cookies))
-
-    # simplified until there's a workaround for threading problems below
+function do_dl($url, $to, $cookies) {
     try {
-        $wc.downloadfile($url, $to)
+        if([console]::isoutputredirected) {
+            # can't set cursor position: just do simple download
+            dl_simple $url $to $cookies
+        } else {
+            dl_progress $url $to $cookies
+        }
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
         abort $e.message
     }
+}
 
-    # seems to be causing threading problems and crashes in Win10...
-    <#
-    if([console]::isoutputredirected) {
-        # can't set cursor position: just do simple download
-        $wc.downloadfile($url, $to)
-        return
-    }
+# simple download (for when the console doesn't support setting cursor position)
+function dl_simple($url, $to, $cookies) {
+    $wc = new-object net.webclient
+    $wc.headers.add('User-Agent', 'Scoop/1.0')
+    $wc.headers.add('Cookie', (cookie_header $cookies))
+    $wc.downloadfile($url, $to)
+}
 
-    $left = [console]::cursorleft
-    $top = [console]::cursortop
-    register-objectevent $wc downloadprogresschanged progress | out-null
-    register-objectevent $wc downloadfilecompleted complete | out-null
+# download with filesize and progress indicator
+function dl_progress($url, $to, $cookies) {
+    $wreq = [net.webrequest]::create($url)
+    $wreq.useragent = 'Scoop/1.0'
+    $wreq.headers.add('Cookie', (cookie_header $cookies))
+
+    $wres = $wreq.getresponse()
     try {
-        $wc.downloadfileasync($url, $to)
+        $total = $wres.contentlength
+        write-host "($(filesize $total)) " -nonewline
 
-        function is_complete {
+        $left = [console]::cursorleft
+        $top = [console]::cursortop
+
+        $s = $wres.getresponsestream()
+        try {
+            $fs = [io.file]::openwrite($to)
             try {
-                $complete = get-event complete -ea stop
-                $err = $complete.sourceeventargs.error
-                if($err) { abort "$($err.message)" }
-                $true
-            } catch {
-                $false
-            }
-        }
+                $buffer = new-object byte[] 2048
+                $totalread = 0
 
-        $last_p = -1
-        while(!(is_complete)) {
-            $e = wait-event progress -timeout 1
-            if(!$e) { continue } # avoid deadlock
-
-            remove-event progress
-            $p = $e.sourceeventargs.progresspercentage
-            if($p -ne $last_p) {
+                while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
+                    $fs.write($buffer, 0, $read)
+                    $totalread += $read
+                    $p = [math]::round($totalread / $total * 100, 0)
+                    [console]::setcursorposition($left, $top)
+                    write-host "$p%" -nonewline
+                }
                 [console]::setcursorposition($left, $top)
-                write-host "$p%" -nonewline
-                $last_p = $p
+            } finally {
+                $fs.close()
             }
+        } finally {
+            $s.close();
         }
-        remove-event complete
     } finally {
-        remove-event *
-        unregister-event progress
-        unregister-event complete
-
-        $wc.cancelasync()
-        $wc.dispose()
+        $wres.close()
     }
-    [console]::setcursorposition($left, $top)
-    #>
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
