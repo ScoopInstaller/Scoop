@@ -116,7 +116,13 @@ function dl_progress($url, $to, $cookies) {
     $wc.headers.add('Cookie', (cookie_header $cookies))
 
     # simplified until there's a workaround for threading problems below
-    $wc.downloadfile($url, $to)
+    try {
+        $wc.downloadfile($url, $to)
+    } catch {
+        $e = $_.exception
+        if($e.innerexception) { $e = $e.innerexception }
+        abort $e.message
+    }
 
     # seems to be causing threading problems and crashes in Win10...
     <#
