@@ -1,14 +1,14 @@
 {
-    "version":  "1.11.1",
+    "version":  "1.11.2",
     "license":  "https://github.com/docker/docker/blob/master/LICENSE",
     "architecture": {
       "64bit": {
-        "url":  "https://get.docker.com/builds/Windows/x86_64/docker-1.11.1.zip",
-        "hash": "83cdfbbb17bb0b06428795f169ca03462954e4f9336168adc1cf3acfdc068faa"
+        "url":  "https://get.docker.com/builds/Windows/x86_64/docker-1.11.2.zip",
+        "hash": "d572459b1a08896b8798495373c0d39e09cf5ef1cbbc653da0c029bad05fad5f"
       },
       "32bit": {
-        "url":  "https://get.docker.com/builds/Windows/i386/docker-1.11.1.zip",
-        "hash":  "09719eb0d4d1e7b6f76ca7c18df298c66fdc0051a527fba20ffda0ab6fb27571"
+        "url":  "https://get.docker.com/builds/Windows/i386/docker-1.11.2.zip",
+        "hash":  "09a954499858b8e7ad1334896e4c5f656895f88f63cccfcb89db5f5f79f12c7a"
       }
     },
     "homepage":  "https://docker.com",
