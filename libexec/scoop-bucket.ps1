@@ -1,4 +1,4 @@
-# Usage: scoop bucket add|list|rm [<args>]
+# Usage: scoop bucket add|list|known|rm [<args>]
 # Summary: Manage Scoop buckets
 # Help: Add, list or remove buckets.
 #
@@ -14,6 +14,9 @@
 #
 # Since the 'extras' bucket is known to Scoop, this can be shortened to:
 #     scoop bucket add extras
+#
+# To list all known buckets, use:
+#     scoop bucket known
 param($cmd, $name, $repo)
 
 . "$psscriptroot\..\lib\core.ps1"
@@ -70,9 +73,14 @@ function list_buckets {
     buckets
 }
 
+function known_buckets {
+    known_bucket_repos |% { $_.psobject.properties | select -expand 'name' }
+}
+
 switch($cmd) {
     "add" { add_bucket $name $repo }
     "rm" { rm_bucket $name }
     "list" { list_buckets }
+    "known" { known_buckets }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
