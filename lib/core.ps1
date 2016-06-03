@@ -132,28 +132,28 @@ function shim($path, $global, $name, $arg) {
     $relative_path = resolve-path -relative $path
     popd
 
-    echo "`$path = `"$path`"" | out-file $shim -encoding oem
+    echo "`$path = `"$path`"" | out-file $shim -encoding utf8
     if($arg) {
-        echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding oem -append
+        echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
     }
-    echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding oem -append
+    echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding utf8 -append
 
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
         $shim_exe = "$(strip_ext($shim)).shim"
         cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$(strip_ext($shim)).exe" -force
-        echo "path = $(resolve-path $path)" | out-file $shim_exe -encoding oem
+        echo "path = $(resolve-path $path)" | out-file $shim_exe -encoding utf8
         if($arg) {
-            echo "args = $arg" | out-file $shim_exe -encoding oem -append
+            echo "args = $arg" | out-file $shim_exe -encoding utf8 -append
         }
     } elseif($path -match '\.((bat)|(cmd))$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         $shim_cmd = "$(strip_ext($shim)).cmd"
-        "@`"$(resolve-path $path)`" $arg %*" | out-file $shim_cmd -encoding oem
+        "@`"$(resolve-path $path)`" $arg %*" | out-file $shim_cmd -encoding utf8
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
         $shim_cmd = "$(strip_ext($shim)).cmd"
-        "@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding oem
+        "@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding utf8
     }
 }
 

@@ -49,7 +49,7 @@ function add_alias($name, $command) {
 # Summary: $description
 $command
 "@
-  $script | out-file "$shimdir\$alias_file.ps1" -encoding oem
+  $script | out-file "$shimdir\$alias_file.ps1" -encoding utf8
 
   # add alias to config
   $aliases += @{ $name = $alias_file }
