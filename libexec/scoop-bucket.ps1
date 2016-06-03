@@ -80,6 +80,6 @@ switch($cmd) {
     "add" { add_bucket $name $repo }
     "rm" { rm_bucket $name }
     "list" { list_buckets }
-	"list-known" { buckets -known }
+    "list-known" { buckets -known }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }

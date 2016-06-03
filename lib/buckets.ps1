@@ -22,15 +22,15 @@ function apps_in_bucket($dir) {
 }
 
 function buckets([switch]$known) {
-	if ($known) {
-		known_bucket_repos | Get-Member | ? { $_.MemberType -eq 'NoteProperty' } | Select -Expand Name
-	} else {
-		$buckets = @()
-		if(test-path $bucketsdir) {
-			gci $bucketsdir | % { $buckets += $_.name }
-		}
-		$buckets
-	}
+    if ($known) {
+        known_bucket_repos | Get-Member | ? { $_.MemberType -eq 'NoteProperty' } | Select -Expand Name
+    } else {
+        $buckets = @()
+        if(test-path $bucketsdir) {
+            gci $bucketsdir | % { $buckets += $_.name }
+        }
+        $buckets
+    }
 }
 
 function find_manifest($app, $bucket) {
