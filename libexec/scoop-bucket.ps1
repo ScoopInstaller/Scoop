@@ -14,6 +14,9 @@
 #
 # Since the 'extras' bucket is known to Scoop, this can be shortened to:
 #     scoop bucket add extras
+#
+# To list all known buckets, use:
+#     scoop bucket list-known
 param($cmd, $name, $repo)
 
 . "$psscriptroot\..\lib\core.ps1"
@@ -77,5 +80,6 @@ switch($cmd) {
     "add" { add_bucket $name $repo }
     "rm" { rm_bucket $name }
     "list" { list_buckets }
+	"list-known" { buckets -known }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
