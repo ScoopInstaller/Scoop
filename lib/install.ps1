@@ -137,8 +137,10 @@ function dl_simple($url, $to, $cookies) {
 # download with filesize and progress indicator
 function dl_progress($url, $to, $cookies) {
     $wreq = [net.webrequest]::create($url)
-    $wreq.useragent = 'Scoop/1.0'
-    $wreq.headers.add('Cookie', (cookie_header $cookies))
+    if($wreq -is [net.httpwebrequest]) {
+        $wreq.useragent = 'Scoop/1.0'
+        $wreq.headers.add('Cookie', (cookie_header $cookies))
+    }
 
     $wres = $wreq.getresponse()
     try {
