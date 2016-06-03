@@ -42,6 +42,7 @@ function install_app($app, $architecture, $global) {
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
+    # env_ensure_home $manifest $global (see comment for env_ensure_home)
     post_install $manifest $architecture
 
     # save info for uninstall
@@ -686,6 +687,29 @@ function env_rm($manifest, $global) {
             $name = $_.name
             env $name $global $null
             if(test-path env:\$name) { rm env:\$name }
+        }
+    }
+}
+
+# UNNECESSARY? Re-evaluate after 3-Jun-2017
+# Supposedly some MSYS programs require %HOME% to be set, but I can't
+# find any examples.
+# Shims used to set %HOME% for the session, but this was removed.
+# This function remains in case we need to support this functionality again
+# (e.g. env_ensure_home in manifests). But if no problems arise by 3-Jun-2017,
+# it's probably safe to delete this, and the call to it install_app
+function env_ensure_home($manifest, $global) {
+    if($manifest.env_ensure_home -eq $true) {
+        if($global){
+            if(!(env 'home' $true)) {
+                env 'home' $true $env:ALLUSERSPROFILE
+                $env:home = $env:ALLUSERSPROFILE # current session
+            }
+        } else {
+            if(!(env 'home' $false)) {
+                env 'home' $false $env:USERPROFILE
+                $env:home = $env:USERPROFILE # current session
+            }
         }
     }
 }

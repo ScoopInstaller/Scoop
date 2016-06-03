@@ -132,10 +132,7 @@ function shim($path, $global, $name, $arg) {
     $relative_path = resolve-path -relative $path
     popd
 
-    echo '# ensure $HOME is set for MSYS programs' | out-file $shim -encoding oem
-    echo "if(!`$env:home) { `$env:home = `"`$home\`" }" | out-file $shim -encoding oem -append
-    echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' | out-file $shim -encoding oem -append
-    echo "`$path = `"$path`"" | out-file $shim -encoding oem -append
+    echo "`$path = `"$path`"" | out-file $shim -encoding oem
     if($arg) {
         echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding oem -append
     }
@@ -152,10 +149,7 @@ function shim($path, $global, $name, $arg) {
     } elseif($path -match '\.((bat)|(cmd))$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         $shim_cmd = "$(strip_ext($shim)).cmd"
-        ':: ensure $HOME is set for MSYS programs'           | out-file $shim_cmd -encoding oem
-        '@if "%home%"=="" set home=%homedrive%%homepath%\'   | out-file $shim_cmd -encoding oem -append
-        '@if "%home%"=="\" set home=%allusersprofile%\'      | out-file $shim_cmd -encoding oem -append
-        "@`"$(resolve-path $path)`" $arg %*"                 | out-file $shim_cmd -encoding oem -append
+        "@`"$(resolve-path $path)`" $arg %*" | out-file $shim_cmd -encoding oem
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
         $shim_cmd = "$(strip_ext($shim)).cmd"
