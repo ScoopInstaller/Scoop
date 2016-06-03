@@ -191,7 +191,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extracted = 0;
 
     foreach($url in $urls) {
-        $fname = split-path $url -leaf
+        $fname = (split-path $url -leaf).split('?')[0]
 
         dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
 
