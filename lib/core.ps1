@@ -129,10 +129,10 @@ function shim($path, $global, $name, $arg) {
 
     # convert to relative path
     pushd $abs_shimdir
-    $relative_path = resolve-path -relative $path
+    $relpath = resolve-path -relative $path
     popd
 
-    echo "`$path = `"$path`"" | out-file $shim -encoding utf8
+    echo "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
     if($arg) {
         echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
     }

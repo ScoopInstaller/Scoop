@@ -18,7 +18,8 @@ $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
 
 if($path -like "$usershims*" -or $path -like "$globalshims*") {
     $shimtext = gc $path
-    $exepath = [regex]::match($shimtext,'\$path = \"([^\"]+)\"').groups[1].value
+
+    $exepath = ($shimtext |? { $_.startswith('$path') }).split(' ') | select -Last 1 | iex
 
     if (![system.io.path]::ispathrooted($exepath)) {
         $exepath = resolve-path (join-path (split-path $path) $exepath)
