@@ -1,26 +1,20 @@
 {
     "homepage": "http://nim-lang.org/",
-    "version": "0.13.0",
+    "version": "0.14.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "http://nim-lang.org/download/nim-0.13.0_x64.exe#/dl.7z",
-            "hash": "b8ae30664e6c0c4be0f9cd3bb4e5f78d41e1571c208301d0cf6d8edec73d187b"
+            "url": "http://nim-lang.org/download/nim-0.14.0_x64.exe#/dl.7z",
+            "hash": "94e60ac31aaf64a3955c500a3f2eacee8adff2000c23a659d5be9049fd1e5c81"
         },
         "32bit": {
-            "url": "http://nim-lang.org/download/nim-0.13.0_x32.exe#/dl.7z",
-            "hash": "e05f470e77384a9ce68b1feabac176c7ba0806ab667a001f43980080610e2a96"
+            "url": "http://nim-lang.org/download/nim-0.14.0_x32.exe#/dl.7z",
+            "hash": "2c444c7e1454fbd52449686ae82f3079068f1de48c90140fcdbf8b6e1b3e1760"
         }
     },
-    "bin": [
-        "bin\\nimgrep.exe",
-        "bin\\nim.exe",
-        "bin\\nimble.exe"
-    ],
     "depends": "gcc",
     "post_install": "
 # Removes installation cruft
-rm -r $dir\\`$PLUGINSDIR
-rm -r $dir\\`$COMMONFILES",
-    "env_add_path": "dist"
+rm -r $dir\\`$PLUGINSDIR",
+    "env_add_path": "bin"
 }
