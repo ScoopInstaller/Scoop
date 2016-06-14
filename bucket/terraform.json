@@ -58,6 +58,6 @@
     ],
     "checkver": {
         "url": "https://releases.hashicorp.com/terraform/",
-        "re": "terraform_(\\d+\\.\\d+\\.\\d+)"
+        "re": "terraform_(\\d+\\.\\d+\\.\\d+)\\s*<"
     }
 }
