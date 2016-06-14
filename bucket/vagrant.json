@@ -1,9 +1,9 @@
 {
     "homepage": "http://www.vagrantup.com/",
-    "version": "1.8.1",
+    "version": "1.8.4",
     "license": "MIT",
-    "url": "https://releases.hashicorp.com/vagrant/1.8.1/vagrant_1.8.1.msi",
-    "hash": "6468cc140f6f236c3ac4bc0bbb1cc2177114249bc344e0aba8c826eae9cc6eb2",
+    "url": "https://releases.hashicorp.com/vagrant/1.8.4/vagrant_1.8.4.msi",
+    "hash": "0202c3ff87faad36e33bc2808c42ce15edf70187a375219fff92875da836371c",
     "extract_dir": "HashiCorp/Vagrant",
     "bin": "bin\\vagrant.exe",
     "checkver": {
