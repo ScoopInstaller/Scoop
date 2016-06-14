@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.terraform.io",
     "license": "Mozilla Public License 2.0",
-    "version": "0.6.15",
+    "version": "0.6.16",
     "architecture": {
         "32bit": {
-            "url": "https://releases.hashicorp.com/terraform/0.6.15/terraform_0.6.15_windows_386.zip",
-            "hash": "e8d0dd1ce202ac80467333bc45f0bf2d7168d138871737db39868d6dc834305f"
+            "url": "https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_windows_386.zip",
+            "hash": "4032ee9f298005ee525aeef5c8763787f6867ab377367597083a39bb33a06ad5"
         },
         "64bit": {
-            "url": "https://releases.hashicorp.com/terraform/0.6.15/terraform_0.6.15_windows_amd64.zip",
-            "hash": "03f3c74a3c4ca3dc2e77f333217bf6316e79581b9661d8567b5822cc715b22ba"
+            "url": "https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_windows_amd64.zip",
+            "hash": "6acbc7e7025104d265cbfee982e5e7af0427255fa70bafa5bcbc595b56c6cce7"
         }
     },
     "bin": [
@@ -34,6 +34,7 @@
         "terraform-provider-google.exe",
         "terraform-provider-heroku.exe",
         "terraform-provider-influxdb.exe",
+        "terraform-provider-librato.exe",
         "terraform-provider-mailgun.exe",
         "terraform-provider-mysql.exe",
         "terraform-provider-null.exe",
@@ -42,6 +43,7 @@
         "terraform-provider-postgresql.exe",
         "terraform-provider-powerdns.exe",
         "terraform-provider-rundeck.exe",
+        "terraform-provider-softlayer.exe",
         "terraform-provider-statuscake.exe",
         "terraform-provider-template.exe",
         "terraform-provider-terraform.exe",
@@ -58,6 +60,6 @@
     ],
     "checkver": {
         "url": "https://releases.hashicorp.com/terraform/",
-        "re": "terraform_(\\d+\\.\\d+\\.\\d+)"
+        "re": "terraform_(\\d+\\.\\d+\\.\\d+)\\s*<"
     }
 }
