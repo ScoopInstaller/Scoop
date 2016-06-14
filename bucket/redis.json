@@ -9,5 +9,9 @@
         "redis-check-dump.exe",
         "redis-cli.exe",
         "redis-server.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/MSOpenTech/redis/releases/",
+        "re": ">win-(\\d+\\.\\d+\\.\\d+)<"
+    }
 }
