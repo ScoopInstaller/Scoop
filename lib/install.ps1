@@ -139,7 +139,9 @@ function dl_progress($url, $to, $cookies) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = 'Scoop/1.0'
-        $wreq.headers.add('Cookie', (cookie_header $cookies))
+        if($cookies) {
+            $wreq.headers.add('Cookie', (cookie_header $cookies))
+        }
     }
 
     $wres = $wreq.getresponse()
