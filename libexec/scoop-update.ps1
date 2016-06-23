@@ -134,7 +134,7 @@ function update($app, $global, $quiet = $false) {
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir
-    create_shims $manifest $dir $global
+    create_shims $manifest $dir $global $architecture
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
     post_install $manifest $architecture

@@ -23,6 +23,9 @@ $version = current_version $app
 $dir = resolve-path (versiondir $app $version)
 $manifest = installed_manifest $app $version
 
-create_shims $manifest $dir $false
+$install = install_info $app $version
+$architecture = $install.architecture
+
+create_shims $manifest $dir $false $architecture
 env_add_path $manifest $dir
 env_set $manifest $dir

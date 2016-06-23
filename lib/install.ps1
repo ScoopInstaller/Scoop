@@ -37,7 +37,7 @@ function install_app($app, $architecture, $global) {
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
-    create_shims $manifest $dir $global
+    create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
@@ -538,7 +538,8 @@ function shim_def($item) {
     return $item, (strip_ext (fname $item)), $null
 }
 
-function create_shims($manifest, $dir, $global) {
+function create_shims($manifest, $dir, $global, $arch) {
+    $shims = arch_specific 'bin' $manifest $arch
     $manifest.bin | ?{ $_ -ne $null } | % {
         $target, $name, $arg = shim_def $_
         echo "creating shim for $name"
