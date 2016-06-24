@@ -1,12 +1,12 @@
 {
     "homepage": "http://miktex.org",
-    "version": "2.9.5857",
+    "version": "2.9.5987",
     "license": "http://miktex.org/copying",
-    "url": "http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable-2.9.5857.exe#/dl.7z",
-    "hash": "463acece6b0109baf8a53a4039e09739fb779c541f45c3567b028c46944728e6",
+    "url": "http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable-2.9.5987.exe#/dl.7z",
+    "hash": "b6773ba988007a88c361f63d27833e63fefdb8011238f0ca843135a3c4ffded9",
     "bin": [
-        "miktex\\bin\\latex.exe",
-        "miktex\\bin\\pdflatex.exe"
+        "texmfs\\install\\miktex\\bin\\latex.exe",
+        "texmfs\\install\\miktex\\bin\\pdflatex.exe"
     ],
     "checkver": {
         "url": "http://miktex.org/portable",
