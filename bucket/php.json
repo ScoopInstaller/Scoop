@@ -28,6 +28,9 @@
         "php.exe",
         "php-cgi.exe"
     ],
+    "env_set": {
+        "PHP_INI_SCAN_DIR": "$dir\\..\\conf"
+    },
     "post_install": "
 #Copy PHP configuration file to expected location
 cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
