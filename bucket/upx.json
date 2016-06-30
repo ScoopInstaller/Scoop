@@ -1,0 +1,8 @@
+{
+    "homepage": "http://upx.sourceforge.net",
+    "version": "3.91",
+    "url": "http://upx.sourceforge.net/download/upx391w.zip",
+    "hash": "d7d4817f46d2616c209c46fb8bce44e4bec93ab5adef5e4dfc93ee879527be1b",
+    "bin": "upx391w\\upx.exe",
+    "license": "GPL2"
+}
