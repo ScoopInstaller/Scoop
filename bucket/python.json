@@ -1,18 +1,18 @@
 {
     "homepage": "http://www.python.org",
     "license": "https://docs.python.org/3/license.html",
-    "version": "3.5.1",
+    "version": "3.5.2",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.5.1/python-3.5.1-amd64.exe#/py351.exe",
-            "hash": "md5:863782d22a521d8ea9f3cf41db1e484d"
+            "url": "https://www.python.org/ftp/python/3.5.2/python-3.5.2-amd64.exe#/py352.exe",
+            "hash": "2cfcdc77a0ba403acf72ba217898fb7c06ce778a5cb85f5220fd32127e40f263"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.5.1/python-3.5.1.exe#/py351.exe",
-            "hash": "md5:4d6fdb5c3630cf60d457c9825f69b4d7"
+            "url": "https://www.python.org/ftp/python/3.5.2/python-3.5.2.exe#/py352.exe",
+            "hash": "529c46b9fd3dcf83029b8bfc95034e640ea2c69835b1aa4b75edeec8de764193"
         }
     },
-    "pre_install": "copy-item $dir\\py351.exe $dir\\uninstall.exe",
+    "pre_install": "copy-item $dir\\py352.exe $dir\\uninstall.exe",
     "installer": {
         "args": [
             "/quiet",
