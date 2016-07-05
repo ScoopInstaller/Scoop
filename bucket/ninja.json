@@ -1,9 +1,9 @@
 {
-    "homepage": "http://martine.github.io/ninja/",
-    "version": "1.5.3",
+    "homepage": "https://ninja-build.org/",
+    "version": "1.7.1",
     "license": "Apache 2.0",
-    "url": "https://github.com/martine/ninja/releases/download/v1.5.3/ninja-win.zip",
-    "hash": "f4bb3802854e677b9e063506788f123de18a122c0743125b499075c12402bf97",
+    "url": "https://github.com/ninja-build/ninja/releases/download/v1.7.1/ninja-win.zip",
+    "hash": "4221b2cef768de64799077ba83ca9ca28e197415a34257ed8d54f93e899afc4e",
     "bin": [
         "ninja.exe"
     ]
