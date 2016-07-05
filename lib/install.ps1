@@ -149,7 +149,13 @@ function dl_progress($url, $to, $cookies) {
         $total = $wres.contentlength
         write-host "($(filesize $total)) " -nonewline
 
+        $width = [console]::bufferwidth
         $left = [console]::cursorleft
+        if(($left + 4) -gt $width) {
+            # not enough room to print progress on this line
+            write-host
+            $left = 0
+        }
         $top = [console]::cursortop
 
         $s = $wres.getresponsestream()
