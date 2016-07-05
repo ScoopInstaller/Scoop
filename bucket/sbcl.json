@@ -1,17 +1,21 @@
 {
     "homepage": "http://www.sbcl.org/",
-    "version": "1.2.6",
+    "version": "1.3.7",
     "license": "http://www.sbcl.org/history.html",
     "architecture": {
         "64bit": {
-            "url": "http://prdownloads.sourceforge.net/sbcl/sbcl-1.2.6-x86-64-windows-binary.msi",
-            "hash": "sha1:d65c059849e95eb436a3d51fa1e3552a0a2aff6f"
+            "url": "http://prdownloads.sourceforge.net/sbcl/sbcl-1.3.7-x86-64-windows-binary.msi",
+            "hash": "6182671e69ed53e32d3b0c80a222594bd69fbdb5f122f6fdeef0fb27c1ce42d5"
+        },
+        "32bit": {
+            "url": "http://prdownloads.sourceforge.net/sbcl/sbcl-1.3.7-x86-windows-binary.msi",
+            "hash": "d892f078e24021aba73d77208f2cc33279e762e5b45e52925409b961b9075dbf"
         }
     },
     "env_set": {
-            "SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.2.6"
+            "SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.3.7"
         },
-    "bin": [ "PFiles\\Steel Bank Common Lisp\\1.2.6\\sbcl.exe"],
+    "bin": [ "PFiles\\Steel Bank Common Lisp\\1.3.7\\sbcl.exe"],
     "checkver": "The most recent version is <a href=[^>]+>SBCL ([^\\ ]+)<\/a",
     "notes": "Please restart your command line for SBCL_HOME to take effect. Please consider installing http://www.quicklisp.org/"
 }
