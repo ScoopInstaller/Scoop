@@ -1,17 +1,17 @@
 {
     "homepage": "http://curl.haxx.se/",
-    "version": "7.48.0",
+    "version": "7.49.1",
     "licence": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.48.0-win64-mingw.7z",
-            "hash": "c551debf524811ee56c46110e0bad82897adc6880cb2a0d70e69f33bdfe6cbbb",
-            "extract_dir": "curl-7.48.0-win64-mingw"
+            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.49.1-win64-mingw.7z",
+            "hash": "bcf1b5bd97c462e2044177faa5d1d30bcf2a46a191001c752e5b69427e84ba61",
+            "extract_dir": "curl-7.49.1-win64-mingw"
         },
         "32bit": {
-            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.48.0-win32-mingw.7z",
-            "hash": "bc29ca8bb15a52000b61f786cbc35839392d03f40c0b597071c8f087efd28715",
-            "extract_dir": "curl-7.48.0-win32-mingw"
+            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.49.1-win32-mingw.7z",
+            "hash": "87132b3320f3c7ded8238dedfce939a465c5de56be9aff7414139f6d95be5fce",
+            "extract_dir": "curl-7.49.1-win32-mingw"
         }
     },
     "bin": "bin/curl.exe",
