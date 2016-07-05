@@ -7,8 +7,8 @@
         "http://ufpr.dl.sourceforge.net/project/gnuwin32/less/394/less-394-dep.zip"
     ],
     "hash": [
-        "md5:20f94bcc8a3347bd9a9ca32587d82eae",
-        "md5:539dce63be2b89a22af7b526d1022f72"
+        "cd8233cb3caee8ccbbed6883443f44f2002218eceb4d697d38a0c40c2d181896",
+        "4c3ae2878046ceb528956b2c7f995d6231087b99561e38c4c72c13d850159d2b"
     ],
     "bin": "bin\\less.exe"
 }
