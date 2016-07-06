@@ -1,21 +1,21 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "5.6.22",
+    "version": "7.0.8",
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-5.6.22-nts-Win32-VC11-x64.zip",
-            "hash": "sha1:a96a8956e1bbc41a210d1f843a1f54e787d4b777"
+            "url": "http://windows.php.net/downloads/releases/php-7.0.8-nts-Win32-VC14-x64.zip",
+            "hash": "59b83cdf7488b980356b61975a4c2055d60dd5f5fafad4aadacf942f2d748e7c"
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-5.6.22-nts-Win32-VC11-x86.zip",
-            "hash": "sha1:b941049b9090f87cb8f90f242cc2f1df6894f023"
+            "url": "http://windows.php.net/downloads/releases/php-7.0.8-nts-Win32-VC14-x86.zip",
+            "hash": "89744ab8687c57e5b6ade2ebe7c2118812becefb527a2524e4eb96e31677217d"
         }
     },
     "bin": ["php.exe", "php-cgi.exe"],
     "post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
     "checkver": {
         "url": "http://windows.php.net/download/",
-        "re": "<h3 id=\"php-5.6\".*?>.*?\\(([0-9\\.]+)\\)</h3>"
+        "re": "<h3 id=\"php-7.0\".*?>.*?\\(([0-9\\.]+)\\)</h3>"
     }
 }
