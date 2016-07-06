@@ -7,8 +7,8 @@
         "http://ufpr.dl.sourceforge.net/project/gnuwin32/grep/2.5.4/grep-2.5.4-dep.zip"
     ],
     "hash": [
-        "md5:c1733d1bc0def1e47f99bad83a0e3116",
-        "md5:cc990f643b460ce4ee37264cc00713c6"
+        "3fd98201561b5af3f54a7dacc4f88068f5b5edf19ccdfc981c3c9fc60ff73519",
+        "2150e12da6631899842c28881a75889794d67b2bbc108341a26052f9bcb27584"
     ],
     "bin": "bin\\grep.exe"
 }
