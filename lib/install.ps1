@@ -545,8 +545,8 @@ function shim_def($item) {
 }
 
 function create_shims($manifest, $dir, $global, $arch) {
-    $shims = arch_specific 'bin' $manifest $arch
-    $manifest.bin | ?{ $_ -ne $null } | % {
+    $shims = @(arch_specific 'bin' $manifest $arch)
+    $shims | ?{ $_ -ne $null } | % {
         $target, $name, $arg = shim_def $_
         echo "creating shim for $name"
 
