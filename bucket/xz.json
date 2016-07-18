@@ -1,7 +1,7 @@
 {
     "homepage": "http://tukaani.org/xz/",
     "version": "5.2.1",
-    "license": "http://tukaani.org/xz/",
+    "license": "http://tukaani.org/xz/#licensing",
     "url": "http://tukaani.org/xz/xz-5.2.1-windows.zip",
     "hash": "2447f5e70dd105900a2957d6c2fad2b5872a6482ba59c1fa0513d03e8b2d10f4",
     "architecture": {
