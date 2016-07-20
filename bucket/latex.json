@@ -4,10 +4,7 @@
     "license": "http://miktex.org/copying",
     "url": "http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable-2.9.5987.exe#/dl.7z",
     "hash": "b6773ba988007a88c361f63d27833e63fefdb8011238f0ca843135a3c4ffded9",
-    "bin": [
-        "texmfs\\install\\miktex\\bin\\latex.exe",
-        "texmfs\\install\\miktex\\bin\\pdflatex.exe"
-    ],
+    "env_add_path": "texmfs\\install\\miktex\\bin",
     "checkver": {
         "url": "http://miktex.org/portable",
         "re": "MiKTeX\\s+Portable\\s+(\\d+\\.\\d+\\.\\d+)"
