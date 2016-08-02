@@ -1,17 +1,17 @@
 {
     "homepage": "https://dev.mysql.com/downloads/mysql/",
-    "version": "5.7.13",
+    "version": "5.7.14",
     "license": "GPLv2",
     "architecture": {
         "64bit": {
-            "url": "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.13-winx64.zip",
-            "hash": "6a8e73289242c2135816af89ecd30bb07b840f437d79d19a5bc9f22c8a83e3ee",
-            "extract_dir": "mysql-5.7.13-winx64"
+            "url": "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.14-winx64.zip",
+            "hash": "md5:dac7a16845da1dd3f789ca27972cca65",
+            "extract_dir": "mysql-5.7.14-winx64"
         },
         "32bit": {
-            "url": "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.13-win32.zip",
-            "hash": "d5d0361a9e56091ea79216d091a032aa44bef222a3aeed44e8f27a3c808bb76c",
-            "extract_dir": "mysql-5.7.13-win32"
+            "url": "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.14-win32.zip",
+            "hash": "md5:5b88f3e3724122f1fbd2fac26f8a7bd8",
+            "extract_dir": "mysql-5.7.14-win32"
         }
     },
     "bin": [
