@@ -1,11 +1,10 @@
 {
-    "version":  "3.8.2-5",
-    "license":  "GNU GPL",
-    "extract_dir":  "octave-3.8.2",
-    "url":  "http://mxeoctave.osuv.de/octave-3.8.2-5-portable.7z",
-    "depends":  "7zip",
     "homepage":  "https://www.gnu.org/software/octave/",
-    "hash":  "md5:cc0c58770516c9c8d7659b65a2a4992c",
+    "version":  "4.0.3",
+    "license":  "GNU GPL",
+    "url":  "https://ftp.gnu.org/gnu/octave/windows/octave-4.0.3.zip",
+    "extract_dir":  "octave-4.0.3",
+    "hash":  "dd00d2b33b0b89cb5339de347b0e48c8cbc44d5cab2b23de8e3102fdb55c1286",
     "bin":  [
         "bin\\octave.exe",
         "bin\\octave-gui.exe",

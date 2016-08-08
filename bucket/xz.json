@@ -1,0 +1,25 @@
+{
+    "homepage": "http://tukaani.org/xz/",
+    "version": "5.2.1",
+    "license": "http://tukaani.org/xz/#licensing",
+    "url": "http://tukaani.org/xz/xz-5.2.1-windows.zip",
+    "hash": "2447f5e70dd105900a2957d6c2fad2b5872a6482ba59c1fa0513d03e8b2d10f4",
+    "architecture": {
+        "64bit": {
+            "bin": [
+                "bin_x86-64\\lzmadec.exe",
+                "bin_x86-64\\lzmainfo.exe",
+                "bin_x86-64\\xz.exe",
+                "bin_x86-64\\xzdec.exe"
+            ]
+        },
+        "32bit": {
+            "bin": [
+                "bin_i686\\lzmadec.exe",
+                "bin_i686\\lzmainfo.exe",
+                "bin_i686\\xz.exe",
+                "bin_i686\\xzdec.exe"
+            ]
+        }
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "homepage": "http://http://thrift.apache.org/",
+    "version": "0.9.3",
+    "licence": "Apache License v2.0",
+    "url": "http://www-us.apache.org/dist/thrift/0.9.3/thrift-0.9.3.exe",
+    "hash": "md5:d373614a4fac5cf0aff1340dfe630acb",
+    "bin": [["thrift-0.9.3.exe", "thrift"]],
+    "checkver": "<div class=\"span3 well center pull-right\"><p>Apache Thrift v([0-99\\.]+)</p></div>"
+}

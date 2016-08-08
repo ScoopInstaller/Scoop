@@ -19,6 +19,22 @@ function abort($msg) { write-host $msg -f darkred; exit 1 }
 function warn($msg) { write-host $msg -f darkyellow; }
 function success($msg) { write-host $msg -f darkgreen }
 
+function filesize($length) {
+    $gb = [math]::pow(2, 30)
+    $mb = [math]::pow(2, 20)
+    $kb = [math]::pow(2, 10)
+
+    if($length -gt $gb) {
+        "{0:n1} GB" -f ($length / $gb)
+    } elseif($length -gt $mb) {
+        "{0:n1} MB" -f ($length / $mb)
+    } elseif($length -gt $kb) {
+        "{0:n1} KB" -f ($length / $kb)
+    } else {
+        "$($length) B"
+    }
+}
+
 # dirs
 function basedir($global) { if($global) { return $globaldir } $scoopdir }
 function appsdir($global) { "$(basedir $global)\apps" }
@@ -50,6 +66,7 @@ function fullpath($path) { # should be ~ rooted
 function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
 function friendly_path($path) {
     $h = $home; if(!$h.endswith('\')) { $h += '\' }
+    if($h -eq '\') { return $path }
     return "$path" -replace ([regex]::escape($h)), "~\"
 }
 function is_local($path) {
@@ -113,37 +130,31 @@ function shim($path, $global, $name, $arg) {
 
     # convert to relative path
     pushd $abs_shimdir
-    $relative_path = resolve-path -relative $path
+    $relpath = resolve-path -relative $path
     popd
 
-    echo '# ensure $HOME is set for MSYS programs' | out-file $shim -encoding oem
-    echo "if(!`$env:home) { `$env:home = `"`$home\`" }" | out-file $shim -encoding oem -append
-    echo 'if($env:home -eq "\") { $env:home = $env:allusersprofile }' | out-file $shim -encoding oem -append
-    echo "`$path = `"$path`"" | out-file $shim -encoding oem -append
+    echo "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
     if($arg) {
-        echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding oem -append
+        echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
     }
-    echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding oem -append
+    echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding utf8 -append
 
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
         $shim_exe = "$(strip_ext($shim)).shim"
         cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$(strip_ext($shim)).exe" -force
-        echo "path = $(resolve-path $path)" | out-file $shim_exe -encoding oem
+        echo "path = $(resolve-path $path)" | out-file $shim_exe -encoding utf8
         if($arg) {
-            echo "args = $arg" | out-file $shim_exe -encoding oem -append
+            echo "args = $arg" | out-file $shim_exe -encoding utf8 -append
         }
     } elseif($path -match '\.((bat)|(cmd))$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         $shim_cmd = "$(strip_ext($shim)).cmd"
-        ':: ensure $HOME is set for MSYS programs'           | out-file $shim_cmd -encoding oem
-        '@if "%home%"=="" set home=%homedrive%%homepath%\'   | out-file $shim_cmd -encoding oem -append
-        '@if "%home%"=="\" set home=%allusersprofile%\'      | out-file $shim_cmd -encoding oem -append
-        "@`"$(resolve-path $path)`" $arg %*"                 | out-file $shim_cmd -encoding oem -append
+        "@`"$(resolve-path $path)`" $arg %*" | out-file $shim_cmd -encoding ascii
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
         $shim_cmd = "$(strip_ext($shim)).cmd"
-        "@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding oem
+        "@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
     }
 }
 

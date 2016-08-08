@@ -35,13 +35,14 @@ function install_app($app, $architecture, $global) {
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
-    run_installer $fname $manifest $architecture $dir
+    run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
-    create_shims $manifest $dir $global
+    create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
+    # env_ensure_home $manifest $global (see comment for env_ensure_home)
     post_install $manifest $architecture
 
     # save info for uninstall
@@ -103,71 +104,84 @@ function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) 
     if(!(test-path $cached) -or !$use_cache) {
         $null = ensure $cachedir
         write-host "downloading $url..." -nonewline
-        dl_progress $url "$cached.download" $cookies
+        do_dl $url "$cached.download" $cookies
         mv "$cached.download" $cached -force
         write-host "done"
     } else { write-host "loading $url from cache..."}
     cp $cached $to
 }
 
-function dl_progress($url, $to, $cookies) {
+function do_dl($url, $to, $cookies) {
+    try {
+        if([console]::isoutputredirected) {
+            # can't set cursor position: just do simple download
+            dl_simple $url $to $cookies
+        } else {
+            dl_progress $url $to $cookies
+        }
+    } catch {
+        $e = $_.exception
+        if($e.innerexception) { $e = $e.innerexception }
+        abort $e.message
+    }
+}
+
+# simple download (for when the console doesn't support setting cursor position)
+function dl_simple($url, $to, $cookies) {
     $wc = new-object net.webclient
     $wc.headers.add('User-Agent', 'Scoop/1.0')
     $wc.headers.add('Cookie', (cookie_header $cookies))
-
-    # simplified until there's a workaround for threading problems below
     $wc.downloadfile($url, $to)
+}
 
-    # seems to be causing threading problems and crashes in Win10...
-    <#
-    if([console]::isoutputredirected) {
-        # can't set cursor position: just do simple download
-        $wc.downloadfile($url, $to)
-        return
+# download with filesize and progress indicator
+function dl_progress($url, $to, $cookies) {
+    $wreq = [net.webrequest]::create($url)
+    if($wreq -is [net.httpwebrequest]) {
+        $wreq.useragent = 'Scoop/1.0'
+        if($cookies) {
+            $wreq.headers.add('Cookie', (cookie_header $cookies))
+        }
     }
 
-    $left = [console]::cursorleft
-    $top = [console]::cursortop
-    register-objectevent $wc downloadprogresschanged progress | out-null
-    register-objectevent $wc downloadfilecompleted complete | out-null
+    $wres = $wreq.getresponse()
     try {
-        $wc.downloadfileasync($url, $to)
+        $total = $wres.contentlength
+        write-host "($(filesize $total)) " -nonewline
 
-        function is_complete {
+        $width = [console]::bufferwidth
+        $left = [console]::cursorleft
+        if(($left + 4) -gt $width) {
+            # not enough room to print progress on this line
+            write-host
+            $left = 0
+        }
+        $top = [console]::cursortop
+
+        $s = $wres.getresponsestream()
+        try {
+            $fs = [io.file]::openwrite($to)
             try {
-                $complete = get-event complete -ea stop
-                $err = $complete.sourceeventargs.error
-                if($err) { abort "$($err.message)" }
-                $true
-            } catch {
-                $false
-            }
-        }
+                $buffer = new-object byte[] 2048
+                $totalread = 0
 
-        $last_p = -1
-        while(!(is_complete)) {
-            $e = wait-event progress -timeout 1
-            if(!$e) { continue } # avoid deadlock
-
-            remove-event progress
-            $p = $e.sourceeventargs.progresspercentage
-            if($p -ne $last_p) {
+                while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
+                    $fs.write($buffer, 0, $read)
+                    $totalread += $read
+                    $p = [math]::round($totalread / $total * 100, 0)
+                    [console]::setcursorposition($left, $top)
+                    write-host "$p%" -nonewline
+                }
                 [console]::setcursorposition($left, $top)
-                write-host "$p%" -nonewline
-                $last_p = $p
+            } finally {
+                $fs.close()
             }
+        } finally {
+            $s.close();
         }
-        remove-event complete
     } finally {
-        remove-event *
-        unregister-event progress
-        unregister-event complete
-
-        $wc.cancelasync()
-        $wc.dispose()
+        $wres.close()
     }
-    [console]::setcursorposition($left, $top)
-    #>
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
@@ -187,7 +201,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extracted = 0;
 
     foreach($url in $urls) {
-        $fname = split-path $url -leaf
+        $fname = (split-path $url -leaf).split('?')[0]
 
         dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
 
@@ -349,8 +363,8 @@ function cmd_available($cmd) {
 }
 
 # for dealing with installers
-function args($config, $dir) {
-    if($config) { return $config | % { (format $_ @{'dir'=$dir}) } }
+function args($config, $dir, $global) {
+    if($config) { return $config | % { (format $_ @{'dir'=$dir;'global'=$global}) } }
     @()
 }
 
@@ -399,7 +413,7 @@ function unpack_inno($fname, $manifest, $dir) {
     write-host "done"
 }
 
-function run_installer($fname, $manifest, $architecture, $dir) {
+function run_installer($fname, $manifest, $architecture, $dir, $global) {
     # MSI or other installer
     $msi = msi $manifest $architecture
     $installer = installer $manifest $architecture
@@ -407,7 +421,7 @@ function run_installer($fname, $manifest, $architecture, $dir) {
     if($msi) {
         install_msi $fname $dir $msi
     } elseif($installer) {
-        install_prog $fname $dir $installer
+        install_prog $fname $dir $installer $global
     }
 }
 
@@ -463,12 +477,12 @@ function msi_installed($code) {
     try { $wmi = [wmi]"Win32_Product.$classkey"; $true } catch { $false }
 }
 
-function install_prog($fname, $dir, $installer) {
+function install_prog($fname, $dir, $installer, $global) {
     $prog = "$dir\$(coalesce $installer.file "$fname")"
     if(!(is_in_dir $dir $prog)) {
         abort "error in manifest: installer $prog is outside the app directory"
     }
-    $arg = @(args $installer.args $dir)
+    $arg = @(args $installer.args $dir $global)
 
     if($prog.endswith('.ps1')) {
         & $prog @arg
@@ -530,8 +544,9 @@ function shim_def($item) {
     return $item, (strip_ext (fname $item)), $null
 }
 
-function create_shims($manifest, $dir, $global) {
-    $manifest.bin | ?{ $_ -ne $null } | % {
+function create_shims($manifest, $dir, $global, $arch) {
+    $shims = @(arch_specific 'bin' $manifest $arch)
+    $shims | ?{ $_ -ne $null } | % {
         $target, $name, $arg = shim_def $_
         echo "creating shim for $name"
 
@@ -683,6 +698,29 @@ function env_rm($manifest, $global) {
             $name = $_.name
             env $name $global $null
             if(test-path env:\$name) { rm env:\$name }
+        }
+    }
+}
+
+# UNNECESSARY? Re-evaluate after 3-Jun-2017
+# Supposedly some MSYS programs require %HOME% to be set, but I can't
+# find any examples.
+# Shims used to set %HOME% for the session, but this was removed.
+# This function remains in case we need to support this functionality again
+# (e.g. env_ensure_home in manifests). But if no problems arise by 3-Jun-2017,
+# it's probably safe to delete this, and the call to it install_app
+function env_ensure_home($manifest, $global) {
+    if($manifest.env_ensure_home -eq $true) {
+        if($global){
+            if(!(env 'home' $true)) {
+                env 'home' $true $env:ALLUSERSPROFILE
+                $env:home = $env:ALLUSERSPROFILE # current session
+            }
+        } else {
+            if(!(env 'home' $false)) {
+                env 'home' $false $env:USERPROFILE
+                $env:home = $env:USERPROFILE # current session
+            }
         }
     }
 }

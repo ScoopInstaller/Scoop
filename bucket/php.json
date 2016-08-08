@@ -1,26 +1,26 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.0.6",
+    "version": "7.0.9",
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
             "url": [
-                "http://windows.php.net/downloads/releases/php-7.0.6-Win32-VC14-x64.zip",
+                "http://windows.php.net/downloads/releases/php-7.0.9-Win32-VC14-x64.zip",
                 "https://raw.githubusercontent.com/madbub/scoop-php/master/64-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha1:607e510e60903ea58e2194fb2a87a07d3744cdca",
-                "md5:6c2c88ff1b3da84b44d23a253a06c01b"
+                "sha1:8d4629bbbd07f29e5ab1665f4ce1c59b34e3a8e0",
+                "acf65e565021f2017815fc5ec8a3145cf6c15e75c132cf23a378cc943e68327c"
             ]
         },
         "32bit": {
             "url": [
-                "http://windows.php.net/downloads/releases/php-7.0.6-Win32-VC14-x86.zip",
+                "http://windows.php.net/downloads/releases/php-7.0.9-Win32-VC14-x86.zip",
                 "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/32-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha1:e0c41a01c16b3633cfffceac9528cf5a44019778",
-                "sha256:b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
+                "sha1:7fc3b5e2ef75f7aa8cde22d6a775664bcc690f05",
+                "b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
             ]
         }
     },
@@ -28,6 +28,9 @@
         "php.exe",
         "php-cgi.exe"
     ],
+    "env_set": {
+        "PHP_INI_SCAN_DIR": "$dir\\..\\conf"
+    },
     "post_install": "
 #Copy PHP configuration file to expected location
 cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"

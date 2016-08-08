@@ -7,8 +7,8 @@
         "http://ufpr.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip"
     ],
     "hash": [
-        "md5:d94e045d98bcd3142bc3c665a5d82a84",
-        "md5:6b0997fa87158fff67457ec1eb96e332"
+        "ae1651ffb461d69a7c51c76867a859d8addf802b85678834c0ebb402ef79b3cd",
+        "53e2e84db3e6c5855fd8013e1b79ccbd53b6bae7e7e4d59c0d18bb1dd5d18961"
     ],
     "bin": "bin\\sed.exe"
 }

@@ -1,15 +1,15 @@
 {
-    "homepage": "http://www.postgresql.org/",
-    "version": "9.3.0",
-    "license": "http://www.postgresql.org/about/licence/",
+    "homepage": "https://www.postgresql.org/",
+    "version": "9.5.3",
+    "license": "https://www.postgresql.org/about/licence/",
     "architecture": {
         "64bit": {
-            "url": "http://get.enterprisedb.com/postgresql/postgresql-9.3.0-1-windows-x64-binaries.zip",
-            "hash": "e6467ab923b355942ae0ff7dd4365e4e292c29f0d14f0c94874623779351f952"
+            "url": "http://get.enterprisedb.com/postgresql/postgresql-9.5.3-1-windows-x64-binaries.zip",
+            "hash": "38c150d0fd0907b7f535a060420bb4d1233b24b78a291d4b9eb11ea0eff37b44"
         },
         "32bit": {
-            "url": "http://get.enterprisedb.com/postgresql/postgresql-9.3.0-1-windows-binaries.zip",
-            "hash": "391c7963edbfc036c6c4cf256930323286b0ca2384cf2c2e0ae8ad7a47778553"
+            "url": "http://get.enterprisedb.com/postgresql/postgresql-9.5.3-1-windows-binaries.zip",
+            "hash": "936d5fc139d5a5be30896c0dd506c4d06ee4ac133e2b7f151653ef700a39ada7"
         }
     },
     "extract_dir": "pgsql",
@@ -33,15 +33,18 @@
         "bin\\pg_dump.exe",
         "bin\\pg_dumpall.exe",
         "bin\\pg_isolation_regress.exe",
+        "bin\\pg_isready.exe",
         "bin\\pg_receivexlog.exe",
         "bin\\pg_regress.exe",
         "bin\\pg_regress_ecpg.exe",
         "bin\\pg_resetxlog.exe",
         "bin\\pg_restore.exe",
+        "bin\\pg_rewind.exe",
         "bin\\pg_standby.exe",
         "bin\\pg_test_fsync.exe",
         "bin\\pg_test_timing.exe",
         "bin\\pg_upgrade.exe",
+        "bin\\pg_xlogdump.exe",
         "bin\\pgAdmin3.exe",
         "bin\\pgbench.exe",
         "bin\\postgres.exe",

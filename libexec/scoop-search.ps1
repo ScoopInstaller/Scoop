@@ -49,7 +49,7 @@ function search_bucket($bucket, $query) {
 
 function download_json($url) {
     $progressPreference = 'silentlycontinue'
-    $result = invoke-webrequest $url | select -exp content | convertfrom-json
+    $result = invoke-webrequest $url -UseBasicParsing | select -exp content | convertfrom-json
     $progressPreference = 'continue'
     $result
 }

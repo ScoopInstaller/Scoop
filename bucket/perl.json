@@ -19,5 +19,5 @@
         [byte[]][char[]]((Get-Content -raw $dir\\portable.perl) -replace \"(?ms)^HomeDir:.*?^(?=\\S)\",\"\") | Set-Content $dir\\portable.perl -encoding byte
     ",
     "env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ],
-    "checkver": "<b>Recommended version:</b></p>\\s*<a[^>]*><b>Strawberry Perl ([0-9\\.]+) \\(32bit\\)</b>"
+    "checkver": "Recommended version:<\/b><\/p>\\s*<a href=\"\\/download\\/([^\\/]+)\\/strawberry-perl-[0-9\\.]+-64bit.msi"
 }

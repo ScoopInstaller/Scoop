@@ -1,0 +1,9 @@
+{
+    "version": "2016.1.2",
+    "homepage": "https://www.jetbrains.com/resharper/download/index.html#section=resharper-clt",
+    "license": "https://www.jetbrains.com/resharper/buy/command_line_license.html",
+    "url": "https://download-cf.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.2016.1.20160523.144749.zip",
+    "hash": "95e40e9f8d34690e4d1b47954a2b2a4e97eca6a8284c53d7b6d5f45718019ea2",
+    "bin": ["dupfinder.exe", "inspectcode.exe"],
+    "checkver": "<span data-release-version data-code=\"RSU\">([\\w+.*]+)</span>"
+}

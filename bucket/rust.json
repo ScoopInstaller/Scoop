@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.rust-lang.org",
-    "version": "1.8.0",
+    "version": "1.10.0",
     "license": "MIT/Apache 2.0",
     "architecture": {
         "32bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.8.0-i686-pc-windows-gnu.msi",
-            "hash": "4882b3706599cd558654e7c79dd484aef22cd2db1ae263d6b7255a1805abda06"
+            "url": "https://static.rust-lang.org/dist/rust-1.10.0-i686-pc-windows-gnu.msi",
+            "hash": "8d169833cbf91f91020d9af43b10e92e73af77b0d14a26ec922b93af69d5b71d"
         },
         "64bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.8.0-x86_64-pc-windows-gnu.msi",
-            "hash": "3ad131cb476a6c92e09ba0ebc95af4173ea6e9dcf72d9b4973b569ca7b0a6b20"
+            "url": "https://static.rust-lang.org/dist/rust-1.10.0-x86_64-pc-windows-gnu.msi",
+            "hash": "eaeb50170fd268dbe567f18b41f9215de118989ad2551a1b99b1fd9d5219b114"
         }
     },
     "bin": [
@@ -17,5 +17,5 @@
         "Rust\\bin\\rustdoc.exe",
         "Rust\\bin\\cargo.exe"
     ],
-    "checkver": "<h2>Docs \\(([0-9\\.]+)\\)</h2>"
+    "checkver": "var rec_package_name = \"([0-9\\.]+)\";"
 }

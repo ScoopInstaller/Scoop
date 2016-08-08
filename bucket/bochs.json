@@ -1,0 +1,23 @@
+{
+    "homepage": "http://bochs.sourceforge.net/",
+    "version": "2.6.8",
+    "license": "LGPL",
+    "architecture": {
+        "64bit": {
+            "url": "http://ufpr.dl.sourceforge.net/project/bochs/bochs/2.6.8/bochs-2.6.8-win64.zip",
+            "hash": "804d43af7b1b90db7c0d4ccd33c94f17269c7f2e8958308b7017e9760f8ead93",
+            "bin": [
+                "bochs-win64.exe",
+                "bochsdbg-win64.exe"
+            ]
+        },
+        "32bit": {
+            "url":  "http://ufpr.dl.sourceforge.net/project/bochs/bochs/2.6.8/bochs-p4-smp-2.6.8-win32.zip",
+            "hash": "3af653cf835e1f535682c80f11e2fd7542c2b898b585d1b28f3954bf3c3132cd",
+            "bin": [
+                "bochs-p4-smp.exe",
+                "bochsdbg-p4-smp.exe"
+            ]
+        }
+    }
+}

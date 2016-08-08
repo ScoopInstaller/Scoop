@@ -1,0 +1,18 @@
+{
+    "homepage": "https://geteventstore.com/",
+    "license": "BSD 3-Clause",
+    "version": "3.6.2",
+    "url": "http://download.geteventstore.com/binaries/EventStore-OSS-Win-v3.6.2.zip",
+    "hash": "795e7ec555ad9e46c00482a059bc204b4a9103bef1132c5a225b000eb962deed",
+    "bin": [
+        ["EventStore.ClusterNode.exe", "eventstore" ],
+        "EventStore.ClusterNode.exe",
+        "EventStore.PAdmin.exe",
+        "EventStore.Query.exe",
+        "EventStore.TestClient.exe"
+    ],
+    "checkver": {
+        "url": "https://geteventstore.com/downloads/",
+        "re": "Get\\s+Event\\s+Store\\s+(\\d+\\.\\d+\\.\\d+)\\s+for\\s+Windows"
+    }
+}

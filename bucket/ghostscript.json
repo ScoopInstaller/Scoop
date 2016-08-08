@@ -5,12 +5,14 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs919/gs919w64.exe#/dl.7z",
-            "hash": "272fbe49981935f9393b829045756b5cfd5946d7acc88753250ab678816a57fc"
+            "hash": "272fbe49981935f9393b829045756b5cfd5946d7acc88753250ab678816a57fc",
+            "bin": [ "bin\\gswin64.exe", "bin\\gswin64c.exe" ]
         },
         "32bit": {
             "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs919/gs919w32.exe#/dl.7z",
-            "hash": "36fd0d44cd8a978254bba597881313f31ddf4ea83470c10c7858ced00620c3e1"
+            "hash": "36fd0d44cd8a978254bba597881313f31ddf4ea83470c10c7858ced00620c3e1",
+            "bin": [ "bin\\gswin32.exe", "bin\\gswin32c.exe" ]
         }
     },
-    "env_add_path": "bin"
+    "env_add_path": [ "bin", "lib" ]
 }

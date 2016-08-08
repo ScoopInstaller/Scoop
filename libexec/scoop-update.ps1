@@ -51,11 +51,14 @@ function update_scoop() {
             scoop config SCOOP_BRANCH "$branch"
         }
 
-        # remove non-git scoop
-        rm -r -force $currentdir -ea stop
+        $newdir = fullpath $(versiondir 'scoop' 'new')
 
         # get git scoop
-        git_clone -q $repo --branch $branch --single-branch $currentdir
+        git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
+
+        # replace non-git scoop with the git version
+        rm -r -force $currentdir -ea stop
+        mv $newdir $currentdir
     }
     else {
         pushd $currentdir
@@ -129,9 +132,9 @@ function update($app, $global, $quiet = $false) {
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
-    run_installer $fname $manifest $architecture $dir
+    run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir
-    create_shims $manifest $dir $global
+    create_shims $manifest $dir $global $architecture
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
     post_install $manifest $architecture
