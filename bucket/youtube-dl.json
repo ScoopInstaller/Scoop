@@ -8,4 +8,8 @@
     "depends": [
         "ffmpeg"
         ]
+    "checkver": {
+        "url": "http://rg3.github.io/youtube-dl/download.html"
+        "re": "<a href=\"https://yt-dl.org/downloads/([0-9\\.]+)/youtube-dl.exe\">Windows exe"
+    }
 }
