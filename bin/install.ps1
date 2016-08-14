@@ -13,7 +13,7 @@ iex (new-object net.webclient).downloadstring($core_url)
 if(installed 'scoop') {
     write-host "scoop is already installed. run 'scoop update' to get the latest version." -f red
     # don't abort if invoked with iex——that would close the PS session
-    if($myinvocation.commandorigin -eq 'Internal') { return } else { exit 1 }
+    if($myinvocation.mycommand.commandtype -eq 'Script') { return } else { exit 1 }
 }
 $dir = ensure (versiondir 'scoop' 'current')
 
