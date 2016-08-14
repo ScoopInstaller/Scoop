@@ -1,17 +1,12 @@
 {
-    "homepage": "https://github.com/alexkasko/openjdk-unofficial-builds",
-    "version": "1.7.0-u80",
+    "homepage": "https://github.com/ojdkbuild/ojdkbuild",
+    "version": "1.8.0_102-1",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-windows-amd64-image.zip",
-            "hash": "1b835601f4ae689b9271040713b01d6bdd186c6a57bb4a7c47e1f7244d5ac928",
-            "extract_dir": "openjdk-1.7.0-u80-unofficial-windows-amd64-image"
-        },
-        "32bit": {
-            "url": "https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-windows-i586-image.zip",
-            "hash": "f3b715bc049b3c88bc47695278433c7dc4b2648e2b156f5e24346aecba343035",
-            "extract_dir": "openjdk-1.7.0-u80-unofficial-windows-i586-image"
+            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.102-1/java-1.8.0-openjdk-1.8.0.102-1-ojdkbuild.b14.windows.x86_64.zip",
+            "hash": "40178bdbee9f3f1accba3ac861025f74d9f51f5a3dd28700858843c5f8898c44",
+            "extract_dir": "java-1.8.0-openjdk-1.8.0.102-1-ojdkbuild.b14.windows.x86_64"
         }
     },
     "env_add_path": "bin",
