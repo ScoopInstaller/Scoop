@@ -1,18 +1,18 @@
 {
     "homepage": "https://rancher.com/",
-    "version": "0.7.3",
+    "version": "0.9.0",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/rancher/rancher-compose/releases/download/v0.7.3/rancher-compose-windows-386-v0.7.3.zip",
-            "hash":"c24d8b4fff9a9ee65551cd3db046c566dec6da64e2cb37a93cc7850de88c987a"
+            "url": "https://github.com/rancher/rancher-compose/releases/download/v0.9.0/rancher-compose-windows-386-v0.9.0.zip",
+            "hash":"5793B675B29BD0F8A8561B771CAEE65F899639EE4E2440F5B7B8299907EA883A"
         },
         "64bit": {
-            "url": "https://github.com/rancher/rancher-compose/releases/download/v0.7.3/rancher-compose-windows-amd64-v0.7.3.zip",
-            "hash": "d7891164e2aa29c2cbee6f12fb8b5c31d07ecf7f40e4226f1b2b7b2d6944fe8c"
+            "url": "https://github.com/rancher/rancher-compose/releases/download/v0.9.0/rancher-compose-windows-amd64-v0.9.0.zip",
+            "hash": "B400E73B7481317870A43E7DE9966F9A3437E76B7EDB263329CF07121BB7B27E"
         }
     },
     "license": "Apache 2.0",
-    "extract_dir": "rancher-compose-v0.7.3",
+    "extract_dir": "rancher-compose-v0.9.0",
     "bin": [
         "rancher-compose.exe"
     ],
