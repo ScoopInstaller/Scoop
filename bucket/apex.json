@@ -1,0 +1,22 @@
+{
+    "homepage": "http://apex.run/",
+    "license": "https://github.com/apex/apex/blob/master/LICENSE",
+    "version": "0.10.2",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/apex/apex/releases/download/v0.10.2/apex_windows_amd64.exe",
+            "hash": "2AB965D71628CA288A3ED63A8A60C0E79FC52FFACEF420C501A8ECEDAF7B66C8"
+        },
+        "32bit": {
+            "url": "https://github.com/apex/apex/releases/download/v0.10.2/apex_windows_386.exe",
+            "hash": "4E3F91F58437ED7E0EF56DF1E1A51437AE64E65484022A247B44C0864D18A348"
+        }
+    },
+    "extract_dir": "apex",
+    "pre_install": "Rename-Item @(Get-ChildItem $dir\\apex_*.exe)[0] $dir\\apex.exe",
+    "bin": [ "apex.exe" ],
+    "checkver": {
+        "url": "https://github.com/apex/apex/releases",
+        "re": "<span class=\"css-truncate-target\">v(\\d+\\.\\d+\\.\\d+)</span>"
+    }
+}
