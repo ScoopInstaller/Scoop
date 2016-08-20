@@ -536,7 +536,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
                 & $exe @arg
             } else {
                 $uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
-                if(!$uninstalled) { abort "uninstallation aborted." }   
+                if(!$uninstalled) { abort "uninstallation aborted." }
             }
         }
     }
