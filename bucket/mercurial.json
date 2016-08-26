@@ -1,21 +1,21 @@
 {
-    "homepage": "https://mercurial-scm.org/",
-    "version": "3.8.3",
+    "homepage": "https://www.mercurial-scm.org/",
+    "version": "3.9.0",
     "license": "http://www.gnu.org/licenses/gpl-2.0.txt",
     "architecture": {
         "64bit": {
-            "url": "https://mercurial-scm.org/release/windows/Mercurial-3.8.3-x64.exe",
-            "hash": "5c8a9035e80517d793237d2a598b6a691fb5d9ea87d40d35b29cf554a9b8c73b"
+            "url": "https://www.mercurial-scm.org/release/windows/mercurial-3.9.0-x64.msi",
+            "hash": "24AA08E8EC53CE7E87F046F623CA3D12CC30E7334FB8D450A2C885A15BDDAF69"
         },
         "32bit": {
-            "url": "https://mercurial-scm.org/release/windows/Mercurial-3.8.3.exe",
-            "hash": "fe22dab4b7560f53f48d1e7c22f1136a87c78272e10e2ad8367bfcf789ea7df6"
+            "url": "https://www.mercurial-scm.org/release/windows/mercurial-3.9.0-x86.msi",
+            "hash": "12E445D1353D93771DEB4F38838D88F5B1B24571CA0FC19BE6E17A211B11C471"
         }
     },
     "innosetup": true,
     "bin": "hg.exe",
     "checkver": {
-        "url": "https://mercurial-scm.org/downloads",
-        "re": "Mercurial ([0-9\\.]+) Inno Setup installer - x86 Windows - does not require admin rights"
+        "url": "https://www.mercurial-scm.org/downloads",
+        "re": "<em>Mercurial\\s+([0-9\\.]+)\\s+Inno\\s+Setup.*<\\/em>"
     }
 }
