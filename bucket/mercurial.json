@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.mercurial-scm.org/",
-    "version": "3.9.0",
+    "version": "3.9",
     "license": "http://www.gnu.org/licenses/gpl-2.0.txt",
     "architecture": {
         "64bit": {
@@ -15,7 +15,7 @@
     "innosetup": true,
     "bin": "hg.exe",
     "checkver": {
-        "url": "https://www.mercurial-scm.org/downloads",
-        "re": "<em>Mercurial\\s+([0-9\\.]+)\\s+Inno\\s+Setup.*<\\/em>"
+        "url": "https://www.mercurial-scm.org/wiki/WhatsNew",
+        "re": "Mercurial\\s+([0-9\\.]+)\\s+\\([0-9\\-]+\\)"
     }
 }

@@ -17,5 +17,8 @@
         "Rust\\bin\\rustdoc.exe",
         "Rust\\bin\\cargo.exe"
     ],
-    "checkver": "var rec_package_name = \"([0-9\\.]+)\";"
+    "checkver": {
+      "url": "https://github.com/rust-lang/rust/releases",
+      "re": "<span class=\"tag-name\">([0-9\\.]+)</span>"
+    }
 }
