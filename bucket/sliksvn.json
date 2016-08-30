@@ -26,7 +26,7 @@
         "bin\\svnversion.exe"
     ],
     "checkver": {
-        "url": "http://sliksvn.com/pub/",
-        "re": "<a>Slik-Subversion-([0-9\\.]+)-x64.zip<\\/a>"
+        "url": "https://sliksvn.com/download/",
+        "re": "<a href=\"https://sliksvn\\.com/pub/Slik\\-Subversion\\-([0-9\\.]+)\\-win32\\.zip\""
     }
 }
