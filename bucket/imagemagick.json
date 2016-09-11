@@ -4,11 +4,11 @@
     "version": "7.0.2-9",
     "architecture": {
         "64bit": {
-            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.2-9-portable-Q16-x64.zip",
+            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.3-0-portable-Q16-x64.zip",
             "hash": "d43764a0134bb4c4ede1ea55e561acfb0e246c55ddf2130440ba13b12c20954c"
         },
         "32bit": {
-            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.2-9-portable-Q16-x86.zip",
+            "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.3-0-portable-Q16-x86.zip",
             "hash": "ee28445b0a331c88d57744089dc2e1a202f41e0f84b41ae4054aff0397e5612a"
         }
     },
