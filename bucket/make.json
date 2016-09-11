@@ -1,15 +1,20 @@
 {
-    "homepage": "http://gnuwin32.sourceforge.net/packages/make.htm",
-    "version": "3.81",
-    "license": "GPL2",
-    "url": [
-        "http://ufpr.dl.sourceforge.net/project/gnuwin32/make/3.81/make-3.81-bin.zip",
-        "http://ufpr.dl.sourceforge.net/project/gnuwin32/make/3.81/make-3.81-dep.zip"
-    ],
-    "hash": [
-        "ca23bc1d9370102878d2a79a31ae70288a1cfa51928667653ffbdc28090f4123",
-        "15fca07f695c3a82b22d5470641c60d893d727afce47add9af4f0f7c47bab747"
-    ],
-    "bin": "bin\\make.exe"
+    "homepage": "https://www.gnu.org/software/make/",
+    "version": "4.1",
+    "license": "GPLv3",
+    "architecture": {
+      "64bit": {
+        "url": "ftp://ftp.equation.com/make/64/make.exe",
+        "hash": "4583831003A5245AF90B2D75300F39EB777DEC736CC62CF7131706C2BC4B89D2"
+      },
+      "32bit":{
+        "url": "ftp://ftp.equation.com/make/32/make.exe",
+        "hash": "4F01F7E63FE54F497B4FE3F4E525F56D9F1D2B0399FD8E6C5478580034C21EA4"
+      }
+    },
+    "bin": "make.exe",
+    "checkver": {
+      "url": "http://www.equation.com/servlet/equation.cmd?fa=make",
+      "re": "to download 32-bit binary of version ([0-9\\.]+)"
+    }
 }
-

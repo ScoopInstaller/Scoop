@@ -1,0 +1,11 @@
+{
+    "version":  "2.3.3",
+    "license":  "GNU",
+    "url":  "https://files.gpg4win.org/gpg4win-2.3.3.exe#dl.7z",
+    "hash":  "5675770b85d49cb05fd3e4bdee7528e19991be508760eef86157d1fa01f0f254",
+    "homepage":  "https://www.gpg4win.org",
+    "bin": [
+        ["gpg2.exe", "gpg", ""],
+        "gpg2.exe"
+    ]
+}

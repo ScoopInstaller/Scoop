@@ -1,15 +1,15 @@
 {
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL2",
-    "version": "2.9.0.windows.1",
+    "version": "2.10.0.windows.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.9.0.windows.1/PortableGit-2.9.0-64-bit.7z.exe#/dl.7z",
-            "hash": "566bf55d7a3ba18660e76034d4af3e0cdd985cbb6f73eb881f287aa23a0f6bbc"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.10.0.windows.1/PortableGit-2.10.0-64-bit.7z.exe#/dl.7z",
+            "hash": "d23b81e88949042d34e97bfd1e5b579d4b6aadec085c6ff6b05c4579da1d49e4"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.9.0.windows.1/PortableGit-2.9.0-32-bit.7z.exe#/dl.7z",
-            "hash": "ed7c648f58decbd70f27e124704e88ac1c9934e78bcc60516aaeddace2275581"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.10.0.windows.1/PortableGit-2.10.0-32-bit.7z.exe#/dl.7z",
+            "hash": "89940cca2a8e1b18b5ed6e3d46c97ea4fcfe1628cda3ae452cd2a8984a3c25c8"
         }
     },
     "bin": [

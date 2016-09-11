@@ -1,19 +1,22 @@
 {
     "homepage": "http://curl.haxx.se/",
-    "version": "7.49.1",
+    "version": "7.50.2",
     "licence": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.49.1-win64-mingw.7z",
-            "hash": "40b88b76c5a9c0e443dde0294449b4885f4160816abffe4f947b29d87661137b",
-            "extract_dir": "curl-7.49.1-win64-mingw"
+            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.50.2-win64-mingw.7z",
+            "hash": "ACBBA7A45860136FA4E1B212E5032F9EC40CA96477D0874167D986EA0F1AA8E4",
+            "extract_dir": "curl-7.50.2-win64-mingw"
         },
         "32bit": {
-            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.49.1-win32-mingw.7z",
-            "hash": "87132b3320f3c7ded8238dedfce939a465c5de56be9aff7414139f6d95be5fce",
-            "extract_dir": "curl-7.49.1-win32-mingw"
+            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.50.2-win32-mingw.7z",
+            "hash": "DD487B96B29B68EB3A35328ACBC391C4909768FD8FEF0BDCFF99FB48C1A5103E",
+            "extract_dir": "curl-7.50.2-win32-mingw"
         }
     },
     "bin": "bin/curl.exe",
-    "checkver": "The most recent stable version is\\s*<b>([0-99\\.]+)"
+    "checkver": {
+      "url": "https://curl.haxx.se/download.html",
+      "re": "<a href=\"https://bintray\\.com/artifact/download/vszakats/generic/curl-([0-9\\.]+)-win64-mingw\\.7z\">"
+    }
 }

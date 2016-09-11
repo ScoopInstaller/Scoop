@@ -532,8 +532,12 @@ function run_uninstaller($manifest, $architecture, $dir) {
         }
 
         if($exe) {
-            $uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
-            if(!$uninstalled) { abort "uninstallation aborted." }
+            if($exe.endswith('.ps1')) {
+                & $exe @arg
+            } else {
+                $uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
+                if(!$uninstalled) { abort "uninstallation aborted." }
+            }
         }
     }
 }

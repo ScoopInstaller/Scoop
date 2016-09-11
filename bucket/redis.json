@@ -1,12 +1,11 @@
 {
     "homepage": "http://redis.io",
-    "version": "2.8.2400",
-    "url": "https://github.com/MSOpenTech/redis/releases/download/win-2.8.2400/Redis-x64-2.8.2400.zip",
-    "hash": "052ef94440dcb3b3f7fdfd319baae256ffc93c97e049421748f411927398d261",
+    "version": "3.2.100",
+    "url": "https://github.com/MSOpenTech/redis/releases/download/win-3.2.100/Redis-x64-3.2.100.zip",
+    "hash": "73775183186ebd1917353a8ae62303a328cedfff58164c9bf46e2b46977a9475",
     "bin": [
         "redis-benchmark.exe",
         "redis-check-aof.exe",
-        "redis-check-dump.exe",
         "redis-cli.exe",
         "redis-server.exe"
     ],

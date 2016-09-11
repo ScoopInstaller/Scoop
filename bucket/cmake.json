@@ -1,17 +1,17 @@
 {
     "homepage": "http://www.cmake.org/",
-    "version": "3.6.0",
+    "version": "3.6.1",
     "license": "http://www.cmake.org/licensing/",
     "architecture": {
         "64bit": {
-            "url": "https://cmake.org/files/v3.6/cmake-3.6.0-win64-x64.zip",
-            "hash": "24c6fe91991ece9deae9a926bc925ec0b9d5702ffe174ed85062dc5a6fccf0f4",
-            "extract_dir": "cmake-3.6.0-win64-x64"
+            "url": "https://cmake.org/files/v3.6/cmake-3.6.1-win64-x64.zip",
+            "hash": "c5f7bc95c395a5edae5a3311b844a275ae39db5a5572ac50da49d7496156f5f3",
+            "extract_dir": "cmake-3.6.1-win64-x64"
         },
         "32bit": {
-            "url": "https://cmake.org/files/v3.6/cmake-3.6.0-win32-x86.zip",
-            "hash": "2ef3b4103ebc3a5d3e489f7ac77795387b5e6e080fee90549cdec31d9ef429f7",
-            "extract_dir": "cmake-3.6.0-win32-x86"
+            "url": "https://cmake.org/files/v3.6/cmake-3.6.1-win32-x86.zip",
+            "hash": "60089b4e05a997edda49f40d4b6db883e0ce5bbe9fdedb5106739dbfe58a8055",
+            "extract_dir": "cmake-3.6.1-win32-x86"
         }
     },
     "bin": [
@@ -21,5 +21,5 @@
         "bin/ctest.exe",
         "bin/cmake-gui.exe"
     ],
-    "checkver": "<p>CMake version ([0-9\\.]+) is now available for download<\/p>"
+    "checkver": "CMake\\s+([0-9\\.]+)\\s+available\\s+for\\s+download"
 }

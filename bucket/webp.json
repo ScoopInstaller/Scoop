@@ -1,0 +1,15 @@
+{
+    "homepage": "https://developers.google.com/speed/webp/",
+    "license": "BSD",
+    "version": "0.5.1",
+    "url": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-0.5.1-windows-x64.zip",
+    "hash": "c74a08a457580f250129bb6d8b46cd8718b055566277afadc00bb484e6ceefcc",
+    "bin": [
+        "libwebp-0.5.1-windows-x64\\bin\\anim_diff.exe",
+        "libwebp-0.5.1-windows-x64\\bin\\cwebp.exe",
+        "libwebp-0.5.1-windows-x64\\bin\\dwebp.exe",
+        "libwebp-0.5.1-windows-x64\\bin\\gif2webp.exe",
+        "libwebp-0.5.1-windows-x64\\bin\\vwebp.exe",
+        "libwebp-0.5.1-windows-x64\\bin\\webpmux.exe"
+    ]
+}
