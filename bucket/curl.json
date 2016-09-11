@@ -4,17 +4,15 @@
     "licence": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.50.2-win64-mingw.7z",
-            "hash": "D1D8047F5A41107090B65B9EA115DAEAF71503A4FC829A671A82468E749C8B40",
-            "extract_dir": "curl-7.50.2-win64-mingw"
+            "url": "http://winampplugins.co.uk/curl/curl_7_50_2_openssl_nghttp2_x64.7z",
+            "hash": "0d34cd99d95b1bc127cd1ca4f2800fd69e1688a142e8bb368e75031a979a8c10"
         },
         "32bit": {
-            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.50.2-win32-mingw.7z",
-            "hash": "B2CAD45AA17D35722A8829DF3A754CD077EBA620FBFC1E92CCC6ABAE990D3B06",
-            "extract_dir": "curl-7.50.2-win32-mingw"
+            "url": "http://winampplugins.co.uk/curl/curl_7_50_2_openssl_nghttp2_x86.7z",
+            "hash": "4206175db2b6b9c59a645bab5d8f1750391bbe0c46fbf2e6d29e8e3ece9fd247"
         }
     },
-    "bin": "bin/curl.exe",
+    "bin": "curl.exe",
     "checkver": {
       "url": "https://curl.haxx.se/download.html",
       "re": "<a href=\"https://bintray\\.com/artifact/download/vszakats/generic/curl-([0-9\\.]+)-win64-mingw\\.7z\">"
