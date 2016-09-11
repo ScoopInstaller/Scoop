@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.imagemagick.org/script/index.php",
     "license": "http://www.imagemagick.org/script/license.php",
-    "version": "7.0.2-9",
+    "version": "7.0.3-0",
     "architecture": {
         "64bit": {
             "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.3-0-portable-Q16-x64.zip",
