@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.3-0-portable-Q16-x64.zip",
-            "hash": "d43764a0134bb4c4ede1ea55e561acfb0e246c55ddf2130440ba13b12c20954c"
+            "hash": "4c266eb5786bc1b0ae604ffbd8993f648817b2b5ba2cfb1dd8df335980fcbffd"
         },
         "32bit": {
             "url": "http://www.imagemagick.org/download/binaries/ImageMagick-7.0.3-0-portable-Q16-x86.zip",
