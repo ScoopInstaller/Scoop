@@ -5,21 +5,21 @@
     "architecture": {
         "64bit": {
             "url": [
-                "http://windows.php.net/downloads/releases/php-7.0.10-Win32-VC14-x64.zip",
+                "http://windows.php.net/downloads/releases/php-7.0.11-Win32-VC14-x64.zip",
                 "https://raw.githubusercontent.com/madbub/scoop-php/master/64-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha1:fdf2b1350a656b897f75e9bc82da4f9b1c02ba35",
+                "sha1:8e7e991326204324a35645306f74ad4f7a49a0eb",
                 "acf65e565021f2017815fc5ec8a3145cf6c15e75c132cf23a378cc943e68327c"
             ]
         },
         "32bit": {
             "url": [
-                "http://windows.php.net/downloads/releases/php-7.0.10-Win32-VC14-x86.zip",
+                "http://windows.php.net/downloads/releases/php-7.0.11-Win32-VC14-x86.zip",
                 "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/32-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha1:04d0f30d3bb5f37cda58bc02d112e08ccb603572",
+                "sha1:6267367f2150a61ccbeaf102ee453bf659706899",
                 "b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
             ]
         }
