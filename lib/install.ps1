@@ -164,13 +164,17 @@ function dl_progress($url, $to, $cookies) {
             try {
                 $buffer = new-object byte[] 2048
                 $totalread = 0
+                $lastp = 0
 
                 while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
                     $fs.write($buffer, 0, $read)
                     $totalread += $read
                     $p = [math]::round($totalread / $total * 100, 0)
-                    [console]::setcursorposition($left, $top)
-                    write-host "$p%" -nonewline
+                    if($p -ne $lastp) {
+                        [console]::setcursorposition($left, $top)
+                        write-host "$p%" -nonewline
+                    }
+                    $lastp = $p
                 }
                 [console]::setcursorposition($left, $top)
             } finally {
