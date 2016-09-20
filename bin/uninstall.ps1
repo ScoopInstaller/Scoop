@@ -2,6 +2,7 @@ param($global)
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 

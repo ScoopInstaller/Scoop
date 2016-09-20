@@ -8,6 +8,7 @@
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 

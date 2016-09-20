@@ -12,6 +12,7 @@
 #   --quiet, -q     hide extraneous messages
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
