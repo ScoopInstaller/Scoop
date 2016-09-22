@@ -7,11 +7,15 @@ function create_startmenu_shortcuts($manifest, $dir, $global) {
     }
 }
 
+function shortcut_folder() {
+    "$([environment]::getfolderpath('startmenu'))\Programs\Scoop Apps"
+}
+
 function startmenu_shortcut($target, $shortcutName) {
     if(!(Test-Path $target)) {
         abort "Can't create the Startmenu shortcut for $(fname $target): couldn't find $target"
     }
-    $scoop_startmenu_folder = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps"
+    $scoop_startmenu_folder = shortcut_folder
     if(!(Test-Path $scoop_startmenu_folder)) {
         New-Item $scoop_startmenu_folder -type Directory
     }
@@ -25,7 +29,7 @@ function startmenu_shortcut($target, $shortcutName) {
 function rm_startmenu_shortcuts($manifest, $global) {
     $manifest.shortcuts | ?{ $_ -ne $null } | % {
         $name = $_.item(1)
-        $shortcut = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps\$name.lnk"
+        $shortcut = "$(shortcut_folder)\$name.lnk"
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
              echo "Removed shortcut $shortcut"
