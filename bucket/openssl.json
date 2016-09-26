@@ -1,15 +1,15 @@
 {
     "homepage": "http://slproweb.com/products/Win32OpenSSL.html",
-    "version": "1.1.0",
+    "version": "1.1.0b",
     "license": "https://www.openssl.org/source/license.html",
     "architecture": {
         "64bit": {
-            "url": "http://slproweb.com/download/Win64OpenSSL-1_1_0.exe",
-            "hash": "4E788AF11E850F81FB01A45C16CC7843D213337AD90B931AB45D3C1CC33BCB90"
+            "url": "http://slproweb.com/download/Win64OpenSSL-1_1_0b.exe",
+            "hash": "53f61ee3176495364df80c57ec928578136a743d8d460f6c6bae09c2a6eed1c6"
         },
         "32bit": {
-            "url": "http://slproweb.com/download/Win32OpenSSL-1_1_0.exe",
-            "hash": "2A9EFC90DEF79348AB7AD602357B312DC4305349C1ABF3CC1ECA251214DF18D8"
+            "url": "http://slproweb.com/download/Win32OpenSSL-1_1_0b.exe",
+            "hash": "979073311cd70be8ea7f95cd20adadb159462cba574ba69df36cbfbc8c1076c6"
         }
     },
     "innosetup": true,
