@@ -20,7 +20,6 @@
         "usr\\bin\\sshd.exe",
         "usr\\bin\\scp.exe",
         "usr\\bin\\sftp.exe",
-        "usr\\bin\\slogin.exe",
         "usr\\bin\\ssh-add.exe",
         "usr\\bin\\ssh-agent.exe",
         "usr\\bin\\ssh-keygen.exe",
