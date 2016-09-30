@@ -1,0 +1,18 @@
+{
+    "homepage": "https://www.dosbox.com/",
+    "version": "0.74",
+    "license": "GPL",
+    "url": "http://ufpr.dl.sourceforge.net/project/dosbox/dosbox/0.74/DOSBox0.74-win32-installer.exe",
+    "hash": "c149cb85f732beb95bf6564d72bdfdd9306f7050edfd9d2cd475420efe3b84fc",
+    "installer": {
+        "args": [
+            "/S",
+            "/D=$dir"
+        ]
+    },
+    "bin": [
+        "DOSBox.exe",
+        "SDL.dll",
+        "SDL_net.dll"
+    ]
+}
