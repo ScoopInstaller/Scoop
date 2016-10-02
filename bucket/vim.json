@@ -1,22 +1,22 @@
 {
     "url": "http://www.vim.org",
     "license": "http://vimdoc.sourceforge.net/htmldoc/uganda.html#license",
-    "version": "7.4",
+    "version": "8.0",
     "url": [
-        "http://ftp.vim.org/pub/vim/pc/vim74w32.zip",
-        "http://ftp.vim.org/pub/vim/pc/vim74rt.zip",
+        "http://ftp.vim.org/pub/vim/pc/vim80w32.zip",
+        "http://ftp.vim.org/pub/vim/pc/vim80rt.zip",
         "http://ufpr.dl.sourceforge.net/project/gettext/libiconv-win32/1.9.1/libiconv-1.9.1.bin.woe32.zip",
         "http://ufpr.dl.sourceforge.net/project/gettext/gettext-win32/0.13.1/gettext-runtime-0.13.1.bin.woe32.zip",
         "https://raw.github.com/lukesampson/psutils/3653063/vimtutor.ps1"
     ],
     "hash": [
-        "01ab3502a44ed66c590d5015c704af6bb84525d6c02073264e55760833cb00c0",
-        "a757ce062076d3b29686152da01594445830679f21ba9ceb4fd0b319a7e91e40",
+        "D60A7CCF83AA3EE20E52E66571049451D64B5F7A73262A49B46847ADC9B7187D",
+        "33B84CDAE8526216CCB80BC83253903FCA7885D4B60B217A3CC303844517DC66",
         "c0aa25c4c16f297a262dbcfcac7bed95d2cb2dc39603eac10e5d79be50a562a3",
         "68a49890f4469afebb24c28d2f1396f019607f3acc137963de0da789d93dc58f",
         "f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498"
     ],
-    "extract_dir": [ "vim\\vim74", "vim\\vim74", "bin", "bin" ],
+    "extract_dir": [ "vim\\vim80", "vim\\vim80", "bin", "bin" ],
     "bin": [ "vim.exe", "vimtutor.ps1" ],
     "post_install": "mv -force \"$dir\\intl.dll\" \"$dir\\libintl.dll\"
         if(!(test-path ~\\.vimrc)) {
