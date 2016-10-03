@@ -1,15 +1,15 @@
 {
     "homepage": "http://nim-lang.org/",
-    "version": "0.14.2",
+    "version": "0.15.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "http://nim-lang.org/download/nim-0.14.2_x64.exe#/dl.7z",
-            "hash": "1fec054d3a5f54c0a67a40db615bb9ecb1d56413b19e324244110713bd4337d1"
+            "url": "http://nim-lang.org/download/nim-0.15.0_x64.exe#/dl.7z",
+            "hash": "7bb9321cd9fb2860d36ee9b248e0202d7d4e36e2272a2f128fbce96fd4a9bfd6"
         },
         "32bit": {
-            "url": "http://nim-lang.org/download/nim-0.14.2_x32.exe#/dl.7z",
-            "hash": "ca2de37759006d95db98732083a6fab20151bb9819186af2fa29d41884df78c9"
+            "url": "http://nim-lang.org/download/nim-0.15.0_x32.exe#/dl.7z",
+            "hash": "0ca8931e3369735bbafdf93de98a8fd0f425870f1173845e7601922a5e00c3c2"
         }
     },
     "depends": "gcc",
