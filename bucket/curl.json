@@ -1,15 +1,15 @@
 {
     "homepage": "http://curl.haxx.se/",
-    "version": "7.50.2",
+    "version": "7.50.3",
     "licence": "MIT",
     "architecture": {
         "64bit": {
-            "url": "http://winampplugins.co.uk/curl/curl_7_50_2_openssl_nghttp2_x64.7z",
-            "hash": "0d34cd99d95b1bc127cd1ca4f2800fd69e1688a142e8bb368e75031a979a8c10"
+            "url": "http://winampplugins.co.uk/curl/curl_7_50_3_openssl_nghttp2_x64.7z",
+            "hash": "1ce3d052e26d268a521e7427d708f74fd5188ec74d26495f97eb892744aac802"
         },
         "32bit": {
-            "url": "http://winampplugins.co.uk/curl/curl_7_50_2_openssl_nghttp2_x86.7z",
-            "hash": "4206175db2b6b9c59a645bab5d8f1750391bbe0c46fbf2e6d29e8e3ece9fd247"
+            "url": "http://winampplugins.co.uk/curl/curl_7_50_3_openssl_nghttp2_x86.7z",
+            "hash": "5dbd9c2cc6dd0bc755435a711ef1950749973436dd31af717aace6449e02eb3c"
         }
     },
     "bin": "curl.exe",
