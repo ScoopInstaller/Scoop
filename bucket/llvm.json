@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.llvm.org",
-    "version": "3.8.0",
+    "version": "3.9.0",
     "license": "University of Illinois/NCSA Open Source License",
     "architecture": {
         "32bit": {
-            "url": "http://www.llvm.org/releases/3.8.0/LLVM-3.8.0-win32.exe",
-            "hash": "ebdb056ebc6efd57c0643733a099920d1d5760a4d570580243e6c63f4b52920f"
+            "url": "http://llvm.org/releases/3.9.0/LLVM-3.9.0-win32.exe",
+            "hash": "b4eaa1fa9872e2c76268f32fc597148cfa14c57b7d13e1edd9b9b6496cdf7de8"
         },
         "64bit": {
-            "url": "http://www.llvm.org/releases/3.8.0/LLVM-3.8.0-win64.exe",
-            "hash": "f9c3147157db32beab025314db9b82c600e182d82994880c1d844c70e29d76ef"
+            "url": "http://llvm.org/releases/3.9.0/LLVM-3.9.0-win64.exe",
+            "hash": "3e5b53a79266d3f7f1d5cb4d94283fe2bc61f9689e55f39e3939364f4076b0c9"
         }
     },
     "installer": {"args": "/S /D=$dir"},
