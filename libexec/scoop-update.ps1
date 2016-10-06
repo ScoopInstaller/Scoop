@@ -6,10 +6,11 @@
 # You can use '*' in place of <app> to update all apps.
 #
 # Options:
-#   --global, -g    update a globally installed app
-#   --force, -f     force update even when there isn't a newer version
-#   --no-cache, -k  don't use the download cache
-#   --quiet, -q     hide extraneous messages
+#   --global, -g       update a globally installed app
+#   --force, -f        force update even when there isn't a newer version
+#   --no-cache, -k     don't use the download cache
+#   --independent, -i  don't install dependencies automatically
+#   --quiet, -q        hide extraneous messages
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\shortcuts.ps1"
@@ -24,12 +25,13 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'gfkq' 'global','force', 'no-cache', 'quiet'
+$opt, $apps, $err = getopt $args 'gfkqi' 'global','force', 'no-cache', 'quiet', 'independent'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
+$independent = $opt.i -or $opt.independent
 
 function update_scoop() {
     # check for git
@@ -79,7 +81,7 @@ function update_scoop() {
     success 'scoop was updated successfully!'
 }
 
-function update($app, $global, $quiet = $false) {
+function update($app, $global, $quiet = $false, $independent) {
     $old_version = current_version $app $global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -90,9 +92,11 @@ function update($app, $global, $quiet = $false) {
     $bucket = $install.bucket
     $url = $install.url
 
-    # check dependencies
-    $deps = @(deps $app $architecture) | ? { !(installed $_) }
-    $deps | % { install_app $_ $architecture $global }
+    if(!$independent) {
+        # check dependencies
+        $deps = @(deps $app $architecture) | ? { !(installed $_) }
+        $deps | % { install_app $_ $architecture $global }
+    }
 
     $version = latest_version $app $bucket $url
     $is_nightly = $version -eq 'nightly'
@@ -188,7 +192,7 @@ if(!$apps) {
     }
 
     # $apps is now a list of ($app, $global) tuples
-    $apps | % { update @_ $quiet }
+    $apps | % { update @_ $quiet $independent }
 }
 
 exit 0
