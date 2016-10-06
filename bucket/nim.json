@@ -14,7 +14,13 @@
     },
     "depends": "gcc",
     "post_install": "
+# Copy Nimble package
+Copy-Item -Recurse $dir\\dist\\nimble\\src\\nimblepkg $dir\\bin
+# Download DLLs
+Invoke-WebRequest http://nim-lang.org/download/dlls.zip -OutFile $dir\\dlls.zip
+Expand-Archive $dir\\dlls.zip $dir\\bin
 # Removes installation cruft
-rm -r $dir\\`$PLUGINSDIR",
+rm -r $dir\\`$PLUGINSDIR
+rm $dir\\dlls.zip",
     "env_add_path": "bin"
 }
