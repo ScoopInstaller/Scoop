@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.7-zip.org/",
     "license": "http://www.7-zip.org/license.txt",
-    "version": "16.03",
+    "version": "16.04",
     "architecture": {
         "64bit": {
-            "url": "http://www.7-zip.org/a/7z1603-x64.msi",
-            "hash": "3A3EC409A302170710C7B7FE2AC795EBF433DB16B4616E6F2C2536E5E092102C"
+            "url": "http://7-zip.org/a/7z1604-x64.msi",
+            "hash": "b3885b2f090f1e9b5cf2b9f802b07fe88e472d70d60732db9f830209ac296067"
         },
         "32bit": {
-            "url": "http://www.7-zip.org/a/7z1603.msi",
-            "hash": "AC08E5DE0C6C4983C25C67C6B4C758F377F43A6EF7C3F02A41AD9826839B9802"
+            "url": "http://7-zip.org/a/7z1604.msi",
+            "hash": "d9b62c0ed0eb48d2df86d8b83394048414a2a4e1d64a50adb9abcff643471d20"
         }
     },
     "extract_dir": "Files/7-Zip",
