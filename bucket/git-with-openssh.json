@@ -1,4 +1,5 @@
 {
+    "_comment": "Maintainers: when updating this manifest to a new version, you might like to also update git.json",
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL2",
     "version": "2.10.1.windows.1",
