@@ -10,5 +10,5 @@
         "sqldiff.exe",
         "sqlite3_analyzer.exe"
     ],
-    "checkver": "<h3>Current Status</h3>\\s*<p><ul>\\s*<li><a.*>Version ([0-9\\.]+)</a>"
+    "checkver": "<a.*>Version ([0-9\\.]+)</a>"
 }
