@@ -20,5 +20,9 @@
             ]
         }
     },
-    "bin": "pt.exe"
+    "bin": "pt.exe",
+    "checkver": {
+        "url": "https://github.com/monochromegane/the_platinum_searcher/releases/latest",
+        "re": "\/monochromegane\/the_platinum_searcher\/releases\/tag\/v([0-9\\.]+)"
+    }
 }
