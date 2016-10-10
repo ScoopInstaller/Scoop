@@ -29,6 +29,7 @@ get-event | % {
 # start all downloads
 $queue | % {
     $wc = new-object net.webclient
+    $wc.Headers.Add("user-agent", "Scoop/1.0 (+http://scoop.sh/)")
     register-objectevent $wc downloadstringcompleted -ea stop | out-null
 
     $name, $json = $_
