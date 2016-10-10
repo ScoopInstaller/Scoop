@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": [
-                "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.1.4/pt_windows_amd64.zip",
+                "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.1.4/pt_windows_amd64.zip"
             ],
             "hash": [
                 "6b227dc5e7e8bea2a0f20ae6301aceda60d394c86fb327db0caa8450fe89c86c"
