@@ -29,6 +29,7 @@ get-event | % {
 # start all downloads
 $queue | % {
     $wc = new-object net.webclient
+    $wc.Headers.Add("user-agent", "Googlebot/2.1 (+http://www.google.com/bot.html)")
     register-objectevent $wc downloadstringcompleted -ea stop | out-null
 
     $name, $json = $_
