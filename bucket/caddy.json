@@ -7,14 +7,14 @@
             "url": "https://github.com/mholt/caddy/releases/download/v0.9.3/caddy_windows_amd64.zip",
             "hash": "19df428c8e16710b6376fef768b1a3be1d0297ccf0ec78ab1927d6ec41c1cc71",
             "bin": [
-				["caddy_windows_amd64.exe", "caddy"]
-			]
+                ["caddy_windows_amd64.exe", "caddy"]
+            ]
         },
         "32bit": {
             "url": "https://github.com/mholt/caddy/releases/download/v0.9.3/caddy_windows_386.zip",
             "hash": "96c1eb95eee45bf304b26d78e2a1315494f5bd2d1f809fbb11d898a30aefab4b",
             "bin": [
-				["caddy_windows_386.exe", "caddy"]
+                ["caddy_windows_386.exe", "caddy"]
             ]
         }
     }
