@@ -1,0 +1,12 @@
+{
+    "homepage": "https://yarnpkg.com/",
+    "licence": "BSD",
+    "version": "0.15.0",
+    "url": "https://github.com/yarnpkg/yarn/releases/download/v0.15.0/yarn-0.15.0.msi",
+    "hash": "ab878b8d188257e6d3b127873610aa80d37c51b3ff1e0a0dd321adbfacc738fe",
+    "bin": "Yarn\\bin\\yarn.cmd",
+    "checkver": {
+        "url": "https://github.com/yarnpkg/yarn/releases/latest",
+        "re": "\/releases\/tag\/v([0-9\\.]+)"
+    }
+}
