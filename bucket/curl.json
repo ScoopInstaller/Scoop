@@ -15,6 +15,6 @@
     "bin": "curl.exe",
     "checkver": {
       "url": "https://curl.haxx.se/download.html",
-      "re": "<a href=\"https://bintray\\.com/artifact/download/vszakats/generic/curl-([0-9\\.]+)-win64-mingw\\.7z\">"
+      "re": "<a href=\"https://bintray\\.com/artifact/download/vszakats/generic/curl-([\\d.]+)-win64-mingw\\.7z\">"
     }
 }

@@ -1,7 +1,7 @@
 {
     "version": "1.7.1",
-    "homepage": "http://golang.org",
-    "license": "http://golang.org/LICENSE",
+    "homepage": "https://golang.org",
+    "license": "https://golang.org/LICENSE",
     "architecture": {
         "64bit": {
             "url": "https://storage.googleapis.com/golang/go1.7.1.windows-amd64.zip",
@@ -17,5 +17,5 @@
     "env_set": {
         "GOROOT": "$dir"
     },
-    "checkver": "<div id=\"footer\">\\s*Build version go([0-9\\.]+)\\.<br>"
+    "checkver": "<div id=\"footer\">\\s*Build version go([\\d.]+)\\.<br>"
 }

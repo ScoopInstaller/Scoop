@@ -1,7 +1,7 @@
 {
     "homepage": "http://windows.php.net",
     "version": "7.0.10",
-    "license": "http://www.php.net/license/",
+    "license": "https://www.php.net/license/",
     "architecture": {
         "64bit": {
             "url": [
@@ -40,6 +40,6 @@ cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
 ",
     "checkver": {
         "url": "http://windows.php.net/download/",
-        "re": "<h3 id=\"php-7.0\".*?>.*?\\(([0-9\\.]+)\\)</h3>"
+        "re": "<h3 id=\"php-7.0\".*?>.*?\\(([\\d.]+)\\)</h3>"
     }
 }

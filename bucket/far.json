@@ -12,8 +12,8 @@
         }
     },
     "checkver": {
-        "url": "http://farmanager.com/download.php?p=64",
-        "re": "<b>Far Manager v([0-9\\.]+) build ([0-9][0-9][0-9][0-9]) x64</b>"
+        "url": "https://farmanager.com/download.php",
+        "re": "<b>Far Manager v([\\d.]+ build [0-9]+) x64</b>"
     },
     "bin": "far.exe"
 }

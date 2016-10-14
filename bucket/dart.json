@@ -17,7 +17,7 @@
     }
   },
   "checkver": {
-    "url": "http://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
-    "re": "\"version\":\\s*\"([0-9\\.]+)\""
+    "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
+    "re": "\"version\":\\s*\"([\\d.]+)\""
   }
 }

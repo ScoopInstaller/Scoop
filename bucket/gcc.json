@@ -3,12 +3,12 @@
     "version": "4.8.1",
     "architecture": {
         "64bit": {
-            "url": "http://ufpr.dl.sourceforge.net/project/mingwbuilds/host-windows/releases/4.8.1/64-bit/threads-posix/seh/x64-4.8.1-release-posix-seh-rev5.7z",
+            "url": "https://sourceforge.net/projects/mingwbuilds/files/host-windows/releases/4.8.1/64-bit/threads-posix/seh/x64-4.8.1-release-posix-seh-rev5.7z",
             "hash": "bb8bd0fe45da3ed9412acd5e432f28c8dccc3b559610e43980760314a283168f",
             "extract_dir": "mingw64"
         },
         "32bit": {
-            "url": "http://ufpr.dl.sourceforge.net/project/mingwbuilds/host-windows/releases/4.8.1/32-bit/threads-posix/sjlj/x32-4.8.1-release-posix-sjlj-rev5.7z",
+            "url": "https://sourceforge.net/projects/mingwbuilds/files/host-windows/releases/4.8.1/32-bit/threads-posix/sjlj/x32-4.8.1-release-posix-sjlj-rev5.7z",
             "hash": "e438ca54e1df9c45b16898d8e9ee941295ad8cde6f20330294e5be4794988582",
             "extract_dir": "mingw32"
         }

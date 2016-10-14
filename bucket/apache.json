@@ -1,5 +1,5 @@
 {
-    "homepage": "http://www.apachelounge.com",
+    "homepage": "https://www.apachelounge.com",
     "version": "2.4.23",
     "license": "Apache 2.0",
     "architecture": {
@@ -32,7 +32,7 @@ $root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\
 (gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf
 ",
     "checkver": {
-        "url": "http://www.apachelounge.com/download/",
-        "re": "Apache ([0-9\\.]+) Win32"
+        "url": "https://www.apachelounge.com/download/",
+        "re": "Apache ([\\d.]+) Win32"
     }
 }

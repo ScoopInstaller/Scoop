@@ -19,6 +19,6 @@ rm $dir\\nodejs\\node_modules\\npm\\npmrc
 npm update -g",
     "checkver": {
         "url": "https://nodejs.org/en/download/current/",
-        "re": "Current version: <strong>v([0-9\\.]+)</strong>"
+        "re": "Current version: <strong>v([\\d.]+)</strong>"
     }
 }

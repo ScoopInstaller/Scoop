@@ -3,8 +3,8 @@
     "version": "4.2.1",
     "license": "GPL2",
     "url": [
-        "http://ufpr.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip",
-        "http://ufpr.dl.sourceforge.net/project/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip"
+        "https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-bin.zip",
+        "https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-dep.zip"
     ],
     "hash": [
         "ae1651ffb461d69a7c51c76867a859d8addf802b85678834c0ebb402ef79b3cd",

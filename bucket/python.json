@@ -1,5 +1,5 @@
 {
-    "homepage": "http://www.python.org",
+    "homepage": "https://www.python.org/",
     "license": "https://docs.python.org/3/license.html",
     "version": "3.5.2",
     "architecture": {
@@ -33,6 +33,6 @@
         [ "python.exe", "python3" ]
     ],
     "env_add_path": [ "scripts" ],
-    "checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
+    "checkver": "<p>Latest: <a href=\".*\">Python ([\\d.]+)</a> - <a.*>.*</a></p>"
 }
 

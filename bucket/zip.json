@@ -3,8 +3,8 @@
     "version": "3.0",
     "license": "http://www.info-zip.org/doc/LICENSE",
     "url": [
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Extension/zip/zip-3.0-1/zip-3.0-1-msys-1.0.14-bin.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma"
+        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/zip/zip-3.0-1/zip-3.0-1-msys-1.0.14-bin.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma"
     ],
     "hash": [
         "ffe9b49d5302e00f8e5e6c6166e2f6e898c9459e696812284c8f37350f6fc45d",

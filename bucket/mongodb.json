@@ -1,7 +1,7 @@
 {
-    "homepage": "http://www.mongodb.org",
     "version": "3.2.7",
-    "license": "http://www.mongodb.org/about/licensing/",
+    "homepage": "https://www.mongodb.org",
+    "license": "https://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
             "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.7-signed.msi",
@@ -28,7 +28,7 @@
         "MongoDB\\Server\\3.2\\bin\\mongotop.exe"
     ],
     "checkver": {
-        "url": "http://www.mongodb.org/downloads",
+        "url": "https://www.mongodb.com/download-center",
         "re": "Current Stable Release \\(([\\d.]+)\\)"
     },
     "post_install": "

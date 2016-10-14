@@ -34,6 +34,6 @@
     ],
     "checkver": {
         "url": "http://julialang.org/downloads/",
-        "re": "<h1[^>]+>Current Release \\(v([0-9\\.]+)\\)<\/h1>"
+        "re": "<h1[^>]+>Current Release \\(v([\\d.]+)\\)<\/h1>"
     }
 }

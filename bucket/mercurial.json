@@ -16,6 +16,6 @@
     "bin": "hg.exe",
     "checkver": {
         "url": "https://www.mercurial-scm.org/wiki/WhatsNew",
-        "re": "Mercurial\\s+([0-9\\.]+)\\s+\\([0-9\\-]+\\)"
+        "re": "Mercurial\\s+([\\d.]+)\\s+\\([0-9\\-]+\\)"
     }
 }
