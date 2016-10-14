@@ -3,8 +3,8 @@
     "version": "2.5.4",
     "license": "GPL2",
     "url": [
-        "http://ufpr.dl.sourceforge.net/project/gnuwin32/grep/2.5.4/grep-2.5.4-bin.zip",
-        "http://ufpr.dl.sourceforge.net/project/gnuwin32/grep/2.5.4/grep-2.5.4-dep.zip"
+        "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-bin.zip",
+        "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-dep.zip"
     ],
     "hash": [
         "3fd98201561b5af3f54a7dacc4f88068f5b5edf19ccdfc981c3c9fc60ff73519",

@@ -30,7 +30,7 @@
         "git config --global credential.helper wincred"
     ],
     "checkver": {
-        "url": "http://git-scm.com/download/win",
-        "re": "\\<a href=\"https://github.com/git-for-windows/git/releases/download/v([^/]+)/"
+        "url": "https://github.com/git-for-windows/git/releases/latest",
+        "re": "\/releases\/tag\/v([\\d\\w.]+)"
     }
 }

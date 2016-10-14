@@ -1,8 +1,8 @@
 {
-    "homepage": "http://thrift.apache.org/",
+    "homepage": "https://thrift.apache.org/",
     "version": "0.9.3",
     "licence": "Apache License v2.0",
-    "url": "http://www-us.apache.org/dist/thrift/0.9.3/thrift-0.9.3.exe",
+    "url": "https://www-us.apache.org/dist/thrift/0.9.3/thrift-0.9.3.exe",
     "hash": "md5:d373614a4fac5cf0aff1340dfe630acb",
     "bin": [["thrift-0.9.3.exe", "thrift"]],
     "checkver": "Apache\\s+Thrift\\s+v([0-99\\.]+)"

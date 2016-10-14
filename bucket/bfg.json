@@ -1,7 +1,7 @@
 {
     "version":  "1.12.12",
     "license":  "GPL",
-    "url":  "http://repo1.maven.org/maven2/com/madgag/bfg/1.12.12/bfg-1.12.12.jar",
+    "url":  "https://repo1.maven.org/maven2/com/madgag/bfg/1.12.12/bfg-1.12.12.jar",
     "depends":  "openjdk",
     "homepage":  "https://rtyley.github.io/bfg-repo-cleaner/",
     "hash":  "03291c9cd9cdc664104f49b22b76bd39edc73052936cbfd72fc8d8595971fd9a",

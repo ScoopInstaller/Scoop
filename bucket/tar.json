@@ -4,11 +4,11 @@
     "license": "GPL2",
     "depends": "gzip",
     "url": [
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Base/tar/tar-1.23-1/tar-1.23-1-msys-1.0.13-bin.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Base/libiconv/libiconv-1.14-1/libiconv-1.14-1-msys-1.0.17-dll-2.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Base/gettext/gettext-0.18.1.1-1/libintl-0.18.1.1-1-msys-1.0.17-dll-8.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Base/regex/regex-1.20090805-2/libregex-1.20090805-2-msys-1.0.13-dll-1.tar.lzma"
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/tar/tar-1.23-1/tar-1.23-1-msys-1.0.13-bin.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/libiconv/libiconv-1.14-1/libiconv-1.14-1-msys-1.0.17-dll-2.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/gettext/gettext-0.18.1.1-1/libintl-0.18.1.1-1-msys-1.0.17-dll-8.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/regex/regex-1.20090805-2/libregex-1.20090805-2-msys-1.0.13-dll-1.tar.lzma"
     ],
     "hash": [
         "2fa09e5a9563a9608077a65b276891c9f89de416dbe4b4a9eb4e8f36250a2887",

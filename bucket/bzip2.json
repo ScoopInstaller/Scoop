@@ -1,7 +1,7 @@
 {
     "version": "1.0.5",
     "homepage": "http://gnuwin32.sourceforge.net/packages/bzip2.htm",
-    "url": "http://ufpr.dl.sourceforge.net/project/gnuwin32/bzip2/1.0.5/bzip2-1.0.5-bin.zip",
+    "url": "https://sourceforge.net/projects/gnuwin32/files/bzip2/1.0.5/bzip2-1.0.5-bin.zip",
     "hash": "97137e4b9ac9e116d0877f9d266927fea91ad117b011f80cf034fea4ef7a534e",
     "bin": [
         "bin\\bunzip2.exe",
