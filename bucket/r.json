@@ -31,6 +31,6 @@ Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--thi
 ",
     "checkver": {
         "url": "https://cran.rstudio.com/bin/windows/base/",
-        "re": "<h1>R-([0-9\\.]+)"
+        "re": "<h1>R-([\\d.]+)"
     }
 }

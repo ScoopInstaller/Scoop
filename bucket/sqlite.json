@@ -10,5 +10,5 @@
         "sqldiff.exe",
         "sqlite3_analyzer.exe"
     ],
-    "checkver": "<a.*>Version ([0-9\\.]+)</a>"
+    "checkver": "<a.*>Version ([\\d.]+)</a>"
 }

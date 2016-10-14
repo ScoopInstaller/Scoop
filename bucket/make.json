@@ -15,6 +15,6 @@
     "bin": "make.exe",
     "checkver": {
       "url": "http://www.equation.com/servlet/equation.cmd?fa=make",
-      "re": "to download 32-bit binary of version ([0-9\\.]+)"
+      "re": "to download 32-bit binary of version ([\\d.]+)"
     }
 }

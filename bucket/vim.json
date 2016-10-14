@@ -26,7 +26,7 @@
     } else { echo '~/.vimrc exists, skipping' }",
     "checkver": {
         "url": "http://www.vim.org/download.php",
-        "re": "Vim ([0-9\\.]+) is the latest stable version"
+        "re": "Vim ([\\d.]+) is the latest stable version"
     },
     "env_set": {
         "VIM": "$dir"

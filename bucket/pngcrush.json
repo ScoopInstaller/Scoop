@@ -17,5 +17,9 @@
                 ["pngcrush_1_8_7_w32.exe", "pngcrush"]
             ]
         }
+    },
+    "checkver": {
+        "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/",
+        "re": "title=\"([0-9\\.]+)\""
     }
 }

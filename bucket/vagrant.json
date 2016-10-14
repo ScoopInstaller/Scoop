@@ -7,7 +7,7 @@
     "extract_dir": "HashiCorp/Vagrant",
     "bin": "bin\\vagrant.exe",
     "checkver": {
-        "url": "http://www.vagrantup.com/downloads.html",
-        "re": "latest\\s+version\\s+of\\s+Vagrant\\s+\\(([^\\)]+)\\)"
+        "url": "https://www.vagrantup.com/downloads.html",
+        "re": "vagrant\/([\\d.]+)\/vagrant"
     }
 }

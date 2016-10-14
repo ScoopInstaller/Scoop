@@ -1,5 +1,5 @@
 {
-    "homepage": "http://rg3.github.io/youtube-dl/",
+    "homepage": "https://rg3.github.io/youtube-dl/",
     "license": "Public Domain",
     "version": "2016.09.27",
     "url": "https://yt-dl.org/downloads/2016.09.27/youtube-dl.exe",
@@ -9,7 +9,7 @@
         "ffmpeg"
         ],
     "checkver": {
-        "url": "http://rg3.github.io/youtube-dl/download.html",
-        "re": "<a href=\"https://yt-dl.org/downloads/([0-9\\.]+)/youtube-dl.exe\">Windows exe"
+        "url": "https://github.com/rg3/youtube-dl/releases/latest",
+        "re": "\/releases\/tag\/([\\d.]+)"
     }
 }

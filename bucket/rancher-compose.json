@@ -17,7 +17,7 @@
         "rancher-compose.exe"
     ],
     "checkver": {
-        "url": "https://github.com/rancher/rancher-compose/releases",
-        "re": "<span class=\"css-truncate-target\">v(\\d+\\.\\d+\\.\\d+)</span>"
+        "url": "https://github.com/rancher/rancher-compose/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
     }
 }

@@ -17,5 +17,5 @@
     "env_set": {
         "GOROOT": "$dir"
     },
-    "checkver": "<div id=\"footer\">\\s*Build version go([0-9\\.]+)\\.<br>"
+    "checkver": "<div id=\"footer\">\\s*Build version go([\\d.]+)\\.<br>"
 }

@@ -27,6 +27,6 @@
     ],
     "checkver": {
         "url": "https://sliksvn.com/download/",
-        "re": "<a.*>SVN ([0-9\\.]+), 64 bit</a>"
+        "re": "<a.*>SVN ([\\d.]+), 64 bit</a>"
     }
 }

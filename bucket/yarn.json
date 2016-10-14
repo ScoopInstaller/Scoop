@@ -7,6 +7,6 @@
     "bin": "Yarn\\bin\\yarn.cmd",
     "checkver": {
         "url": "https://github.com/yarnpkg/yarn/releases/latest",
-        "re": "\/releases\/tag\/v([0-9\\.]+)"
+        "re": "\/releases\/tag\/v([\\d.]+)"
     }
 }
