@@ -1,17 +1,17 @@
 {
-    "version": "2016-08-26",
-    "homepage": "http://ffmpeg.zeranoe.com/builds/",
+    "version": "20161015",
+    "homepage": "https://ffmpeg.zeranoe.com/builds/",
     "license": "GPL3",
     "architecture": {
         "64bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20160826-bcd1153-win64-static.zip",
-            "hash": "5EC8C40EFC74766A8383F265D5C5A3B3E2B698603D1B2C0781A22AF1E8CB9348",
-            "extract_dir": "ffmpeg-20160826-bcd1153-win64-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20161015-4599e11-win64-static.zip",
+            "hash": "a7b400e1c67a172c168f62ce68181ac84e4e65a3305fd3a0efe232c67bf235be",
+            "extract_dir": "ffmpeg-20161015-4599e11-win64-static"
         },
         "32bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-20160826-bcd1153-win32-static.zip",
-            "hash": "C98B85A7FEA9DA47D50871079510CD3B42222BD76C48B01A4A9813110503A0E7",
-            "extract_dir": "ffmpeg-20160826-bcd1153-win32-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-20161015-4599e11-win32-static.zip",
+            "hash": "5ae383cfa9d73327a5a60380e66b51ae6680288c20a8c89f5a882cedb496703c",
+            "extract_dir": "ffmpeg-20161015-4599e11-win32-static"
         }
     },
     "bin": [
@@ -19,5 +19,5 @@
         "bin\\ffplay.exe",
         "bin\\ffprobe.exe"
     ],
-    "checkver": "<h2 class=\"center-text\">Latest Zeranoe FFmpeg Build Version: \\w{7}\\s+\\((.*)\\)<\\/h2>"
+    "checkver": "value=\"([\\d]{8})-[\\d\\w]+\""
 }
