@@ -1,19 +1,19 @@
 {
     "homepage": "http://www.sbcl.org/",
-    "version": "1.3.7",
+    "version": "1.3.10",
     "license": "http://www.sbcl.org/history.html",
     "architecture": {
         "64bit": {
-            "url": "http://prdownloads.sourceforge.net/sbcl/sbcl-1.3.7-x86-64-windows-binary.msi",
-            "hash": "6182671e69ed53e32d3b0c80a222594bd69fbdb5f122f6fdeef0fb27c1ce42d5"
+            "url": "https://sourceforge.net/projects/sbcl/files/sbcl/1.3.10/sbcl-1.3.10-x86-64-windows-binary.msi",
+            "hash": "45b3ee2366b26a294bf0dcf95cca5cdcd0c27f97c28d0028ada496f5a822e499"
         },
         "32bit": {
-            "url": "http://prdownloads.sourceforge.net/sbcl/sbcl-1.3.7-x86-windows-binary.msi",
-            "hash": "d892f078e24021aba73d77208f2cc33279e762e5b45e52925409b961b9075dbf"
+            "url": "https://sourceforge.net/projects/sbcl/files/sbcl/1.3.10/sbcl-1.3.10-x86-windows-binary.msi",
+            "hash": "64a3bfa949df431182c173aa57df65ecd38bc0f1aa3c6c3accebd426f053ad69"
         }
     },
     "env_set": {
-            "SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.3.7"
+            "SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.3.10"
         },
     "bin": [ "PFiles\\Steel Bank Common Lisp\\1.3.10\\sbcl.exe"],
     "checkver": ">SBCL ([\\d.]+)<",
