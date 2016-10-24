@@ -9,7 +9,7 @@
         },
         "32bit": {
             "url": "http://nim-lang.org/download/nim-0.15.2_x32.zip",
-            "hash": ""
+            "hash": "0f1bfb74751f55e090140a361c08e9f39f1dd03f1f0c070c061f2d5049ab9f96s"
         }
     },
     "depends": "gcc",
