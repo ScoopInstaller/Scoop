@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.isc.org/",
     "license": "https://www.isc.org/downloads/software-support-policy/isc-license/",
-    "version": "9.10.4-P1",
+    "version": "9.11.0",
     "architecture": {
         "64bit": {
-            "url": "ftp://ftp.isc.org/isc/bind9/9.10.4-P1/BIND9.10.4-P1.x64.zip",
-            "hash": "0716ddad4d142f7dd7843377a7ebdf861a45bbee30471f5d57db7c51de1427a5"
+            "url": "ftp://ftp.isc.org/isc/bind9/9.11.0/BIND9.11.0.x64.zip",
+            "hash": "2cbc44127bbc9d17ed7a2a23c9c1cd5a055c90dcffd8c3384e7f8efe39ed790f"
         },
         "32bit": {
-            "url": "ftp://ftp.isc.org/isc/bind9/9.10.4-P1/BIND9.10.4-P1.x86.zip",
-            "hash": "3a1c23579c3fd022187c3119e629be22ebdae1a890f28ecafd44b19f46159eaf"
+            "url": "ftp://ftp.isc.org/isc/bind9/9.11.0/BIND9.11.0.x86.zip",
+            "hash": "7b92b9e3f9fe4cca69feeed73305151f4bdc09c9cbb5858671da2b7fd8a05fe2"
         }
     },
     "bin": "dig.exe"
