@@ -2,7 +2,7 @@
     "homepage": "https://miktex.org",
     "version": "2.9.5987",
     "license": "https://miktex.org/copying",
-    "url": "https://miktex.org/download/ctan/systems/win32/miktex/setup/miktex-portable-2.9.5987.exe#/dl.7z",
+    "url": "http://wbc.upm.edu.my/tex-archive/systems/win32/miktex/setup/miktex-portable-2.9.5987.exe#/dl.7z",
     "hash": "b6773ba988007a88c361f63d27833e63fefdb8011238f0ca843135a3c4ffded9",
     "env_add_path": "texmfs\\install\\miktex\\bin",
     "checkver": {
