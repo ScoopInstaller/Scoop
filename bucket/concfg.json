@@ -1,8 +1,8 @@
 {
     "homepage": "https://github.com/lukesampson/concfg",
-    "version": "0.2016.05.08",
-    "url": "https://github.com/lukesampson/concfg/archive/f46609e2b4e7cb8ae0efc5d50ec48c9523d0053b.zip",
-    "hash": "9c0e97c82b4700768164e4b5e1267e58025467cfe6a3c38ee12fad1e6b9e739a",
-    "extract_dir": "concfg-f46609e2b4e7cb8ae0efc5d50ec48c9523d0053b",
+    "version": "0.2016.11.01",
+    "url": "https://github.com/lukesampson/concfg/archive/cb27880092e629e1152c41b122ab591c7ca50332.zip",
+    "hash": "be624dc4e251ccab1a0479d2a55b27c2caac2beaa93bfafed10880f0eaacc4c1",
+    "extract_dir": "concfg-cb27880092e629e1152c41b122ab591c7ca50332",
     "bin": "bin\\concfg.ps1"
 }
