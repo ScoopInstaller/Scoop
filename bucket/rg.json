@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/BurntSushi/ripgrep",
     "licence": "MIT",
-    "version": "0.2.3",
+    "version": "0.2.5",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/BurntSushi/ripgrep/releases/download/0.2.3/ripgrep-0.2.3-x86_64-pc-windows-msvc.zip",
-            "hash": "840c7dc7e63913ce7a4b1a1856efd47257657d21258c91a4391b4713fc7df779"
+            "url": "https://github.com/BurntSushi/ripgrep/releases/download/0.2.5/ripgrep-0.2.5-x86_64-pc-windows-msvc.zip",
+            "hash": "e2963bf7737650acc8fb0ada3a5ee76aa7d0aa06abb9a2fbc1a7689002372e3c"
         },
         "32bit": {
-            "url": "https://github.com/BurntSushi/ripgrep/releases/download/0.2.3/ripgrep-0.2.3-i686-pc-windows-msvc.zip",
-            "hash": "72a1186c4b614576627317c631a8027f4ab485fb96192f7b273ec9f7c417815f"
+            "url": "https://github.com/BurntSushi/ripgrep/releases/download/0.2.5/ripgrep-0.2.5-i686-pc-windows-msvc.zip",
+            "hash": "cb76a0be9ded0225be46d9cbeb604f37b70073adb0c9058d91ca55b62c9c528b"
         }
     },
     "bin": "rg.exe"
