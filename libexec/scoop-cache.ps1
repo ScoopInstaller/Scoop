@@ -26,7 +26,7 @@ switch($cmd) {
     }
     'show' {
         $files = @(gci "$scoopdir\cache" | ? { $_.name -match "^$app" })
-        $total_length = ($files | measure length -sum).sum
+        $total_length = ($files | measure length -sum).sum -as [double]
 
         $f_app  = @{ expression={"$($_.app) ($($_.version))" }}
         $f_url  = @{ expression={$_.url};alignment='right'}
