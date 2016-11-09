@@ -1,17 +1,17 @@
 {
     "url": "http://www.vim.org",
     "license": "http://vimdoc.sourceforge.net/htmldoc/uganda.html#license",
-    "version": "8.0",
+    "version": "8.0.069",
     "url": [
-        "http://ftp.vim.org/pub/vim/pc/vim80w32.zip",
-        "http://ftp.vim.org/pub/vim/pc/vim80rt.zip",
+        "http://ftp.vim.org/pub/vim/pc/vim80-069w32.zip",
+        "http://ftp.vim.org/pub/vim/pc/vim80-069rt.zip",
         "https://sourceforge.net/projects/gettext/files/libiconv-win32/1.9.1/libiconv-1.9.1.bin.woe32.zip",
         "https://sourceforge.net/projects/gettext/files/gettext-win32/0.13.1/gettext-runtime-0.13.1.bin.woe32.zip",
         "https://raw.github.com/lukesampson/psutils/3653063/vimtutor.ps1"
     ],
     "hash": [
-        "D60A7CCF83AA3EE20E52E66571049451D64B5F7A73262A49B46847ADC9B7187D",
-        "33B84CDAE8526216CCB80BC83253903FCA7885D4B60B217A3CC303844517DC66",
+        "15D8CE633137822925056AF33E4BBB438E6C3603B6594897C51D3BE6542CAAB1",
+        "482B3AEF45C3731B205D7C5FE59E0CCA7542AAE9B447F46B4792B89F2F79E01E",
         "c0aa25c4c16f297a262dbcfcac7bed95d2cb2dc39603eac10e5d79be50a562a3",
         "68a49890f4469afebb24c28d2f1396f019607f3acc137963de0da789d93dc58f",
         "f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498"
@@ -26,7 +26,7 @@
     } else { echo '~/.vimrc exists, skipping' }",
     "checkver": {
         "url": "http://www.vim.org/download.php",
-        "re": "Vim ([\\d.]+) is the latest stable version"
+        "re": "latest version \\(currently ([\\d.]+)\\)"
     },
     "env_set": {
         "VIM": "$dir"
