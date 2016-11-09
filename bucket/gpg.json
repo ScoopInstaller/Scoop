@@ -7,5 +7,9 @@
     "bin": [
         ["gpg2.exe", "gpg", ""],
         "gpg2.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://www.gpg4win.org/get-gpg4win.html",
+        "re": "Download Gpg4win ([\\d.]+)"
+    }
 }

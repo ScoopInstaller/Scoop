@@ -11,5 +11,9 @@
         "libwebp-0.5.1-windows-x64\\bin\\gif2webp.exe",
         "libwebp-0.5.1-windows-x64\\bin\\vwebp.exe",
         "libwebp-0.5.1-windows-x64\\bin\\webpmux.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://developers.google.com/speed/webp/download",
+        "re": "\\/libwebp-([\\d].+)-windows-x86.zip"
+    }
 }

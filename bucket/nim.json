@@ -18,5 +18,9 @@
         # Copy Nimble package
         Copy-Item -Recurse $dir\\dist\\nimble\\src\\nimblepkg $dir\\bin
     ",
-    "env_add_path": "bin"
+    "env_add_path": "bin",
+    "checkver": {
+        "url": "http://nim-lang.org/download.html",
+        "re": "nim-([\\d.]+)_x64"
+    }
 }

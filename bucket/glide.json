@@ -14,5 +14,9 @@
             "extract_dir": "windows-386"
         }
     },
-    "bin": "glide.exe"
+    "bin": "glide.exe",
+    "checkver": {
+        "url": "https://github.com/Masterminds/glide/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

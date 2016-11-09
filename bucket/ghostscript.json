@@ -14,5 +14,9 @@
             "bin": [ "bin\\gswin32.exe", "bin\\gswin32c.exe" ]
         }
     },
-    "env_add_path": [ "bin", "lib" ]
+    "env_add_path": [ "bin", "lib" ],
+    "checkver": {
+        "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/latest",
+        "re": "Ghostscript\\/GhostPDL ([\\d.]+)"
+    }
 }

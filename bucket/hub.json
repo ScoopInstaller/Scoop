@@ -14,5 +14,9 @@
     },
     "bin": [
         "bin\\hub.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/github/hub/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

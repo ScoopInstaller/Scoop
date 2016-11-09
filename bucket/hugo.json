@@ -14,5 +14,9 @@
     "homepage": "http://gohugo.io",
     "bin": [
       ["hugo.exe", "hugo"]
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/spf13/hugo/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

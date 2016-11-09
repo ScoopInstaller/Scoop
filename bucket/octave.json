@@ -10,5 +10,9 @@
         "bin\\octave-gui.exe",
         "bin\\octave-cli.exe",
         "bin\\octave-config.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://www.gnu.org/software/octave/download.html",
+        "re": "GNU Octave ([\\d.]+)"
+    }
 }

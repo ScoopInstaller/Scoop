@@ -12,5 +12,9 @@
     "env_add_path": "bin",
     "env_set": {
         "JAVA_HOME": "$dir"
+    },
+    "checkver": {
+        "url": "https://github.com/ojdkbuild/ojdkbuild/releases/latest",
+        "re": "\/releases\/tag\/([\\d.\\-]+)"
     }
 }

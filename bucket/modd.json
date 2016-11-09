@@ -1,9 +1,13 @@
 {
-    "version":  "v0.3",
+    "version":  "0.3",
     "license":  "https://github.com/cortesi/modd/blob/master/LICENSE",
     "url":  "https://github.com/cortesi/modd/releases/download/v0.3/modd-0.3-windows64.zip",
     "homepage":  "https://corte.si/posts/modd/announce/index.html",
     "hash":  "91be7051e8fd7893192688ff4cc3daec887dc05fc6fa0a6565dd5b5bce374e44",
     "extract_dir":  "modd-0.3-windows64",
-    "bin":  "modd.exe"
+    "bin":  "modd.exe",
+    "checkver": {
+        "url": "https://github.com/cortesi/modd/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

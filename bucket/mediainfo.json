@@ -13,5 +13,6 @@
       }
     },
     "extract_dir": "",
-    "bin": "mediainfo.exe"
+    "bin": "mediainfo.exe",
+    "checkver": "version ([\\d.]+)"
 }

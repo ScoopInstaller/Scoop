@@ -19,5 +19,9 @@
     "shortcuts": [
         [ "GRacket.exe", "GRacket" ],
         [ "DrRacket.exe", "DrRacket" ]
-    ]
+    ],
+    "checkver": {
+        "url": "https://download.racket-lang.org/",
+        "re": "Version ([\\d.]+)"
+    }
 }

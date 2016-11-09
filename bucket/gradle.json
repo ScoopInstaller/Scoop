@@ -6,5 +6,9 @@
     "url": "https://services.gradle.org/distributions/gradle-2.14-bin.zip",
     "extract_dir": "gradle-2.14",
     "bin": "bin\\gradle.bat",
-    "depends": "openjdk"
+    "depends": "openjdk",
+    "checkver": {
+        "url": "https://gradle.org/gradle-download/",
+        "re": "Download Gradle ([\\d.]+)"
+    }
 }

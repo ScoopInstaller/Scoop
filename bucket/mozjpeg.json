@@ -9,5 +9,9 @@
         ["cjpeg.exe", "mozjpeg"],
         "djpeg.exe",
         "jpegtran.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://mozjpeg.codelove.de/binaries.html",
+        "re": "version ([\\d.]+)"
+    }
 }

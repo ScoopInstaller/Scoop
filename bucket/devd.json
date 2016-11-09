@@ -5,5 +5,9 @@
     "homepage":  "http://corte.si/posts/devd/intro/index.html",
     "hash":  "c8d2e728ecdb6b5c863a37527f1517b29c25aca4f5286be9bade2f81ee784e8c",
     "extract_dir":  "devd-0.5-windows64",
-    "bin":  "devd.exe"
+    "bin":  "devd.exe",
+    "checkver": {
+        "url": "https://github.com/cortesi/devd/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

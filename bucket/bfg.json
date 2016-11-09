@@ -10,5 +10,9 @@
     "pre_install": "
         $exe = 'java -jar $env:BFG_HOME\\bfg-1.12.12.jar $args'
         write-output $exe | out-file -filepath $dir\\bfg.ps1
-    "
+    ",
+    "checkver": {
+        "url": "https://search.maven.org/solrsearch/select/?q=g:\"com.madgag\"+AND+a:\"bfg\"&wt=json&json.wrf=?&indent=true",
+        "re": "\"latestVersion\":\"([\\d.]+)\""
+    }
 }

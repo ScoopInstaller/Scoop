@@ -12,5 +12,9 @@
             "hash": "cb76a0be9ded0225be46d9cbeb604f37b70073adb0c9058d91ca55b62c9c528b"
         }
     },
-    "bin": "rg.exe"
+    "bin": "rg.exe",
+    "checkver": {
+        "url": "https://github.com/BurntSushi/ripgrep/releases/latest",
+        "re": "\/releases\/tag\/([\\d.]+)"
+    }
 }

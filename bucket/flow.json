@@ -5,5 +5,9 @@
     "homepage":  "https://flowtype.org/",
     "hash":  "5bcd5cab59c8c4406273a59df187473e9fd56e0e6a3a8b3de76a48b34412caac",
     "bin":  "flow.exe",
-    "extract_dir":  "flow"
+    "extract_dir":  "flow",
+    "checkver": {
+        "url": "https://github.com/facebook/flow/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

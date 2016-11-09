@@ -17,5 +17,9 @@
             "post_install": "\"root: $dir `r`narch: 32 `r`nproxy: none `r`noriginalpath: `r`noriginalversion: `r`n\" | Out-File -encoding \"ASCII\" $dir\\settings.txt"
         }
     },
-    "notes":"You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly"
+    "notes":"You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly",
+    "checkver": {
+        "url": "https://github.com/coreybutler/nvm-windows/releases/latest",
+        "re": "\/releases\/tag\/([\\d.]+)"
+    }
 }

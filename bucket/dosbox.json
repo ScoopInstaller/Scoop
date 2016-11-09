@@ -14,5 +14,6 @@
         "DOSBox.exe",
         "SDL.dll",
         "SDL_net.dll"
-    ]
+    ],
+    "checkver": "Latest version:\\s+<a[^>]+>([\\d.]+)"
 }

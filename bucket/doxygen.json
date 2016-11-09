@@ -16,5 +16,9 @@
         "doxygen.exe",
         "doxyindexer.exe",
         "doxysearch.cgi.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "http://www.doxygen.nl/download.html",
+        "re": "The latest version of doxygen is ([\\d.]+)"
+    }
 }

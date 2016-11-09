@@ -5,6 +5,10 @@
     "homepage": "https://github.com/technomancy/leiningen",
     "bin": "lein.bat",
     "hash": "b1316ef41482e0fa10d2487fb5b0d9442db37b7035ed1640cdcb32b5edaf41b6",
-    "notes": "The command 'lein self-install' is required to complete the installation"
+    "notes": "The command 'lein self-install' is required to complete the installation",
+    "checkver": {
+        "url": "https://github.com/technomancy/leiningen/releases/latest",
+        "re": "\/releases\/tag\/([\\d.]+)"
+    }
 }
 

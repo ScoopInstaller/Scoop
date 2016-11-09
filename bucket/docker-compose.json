@@ -11,5 +11,9 @@
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\docker-compose-*.exe)[0] $dir\\docker-compose.exe",
     "bin": [
         ["docker-compose.exe", "docker-compose"]
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/docker/compose/releases/latest",
+        "re": "\/releases\/tag\/([\\d.]+)"
+    }
 }
