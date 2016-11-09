@@ -1,20 +1,20 @@
 {
     "homepage": "http://pmt.sourceforge.net/pngcrush/",
-    "version": "1.8.8",
+    "version": "1.8.10",
     "license": "libpng",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/1.8.8/pngcrush_1_8_8_w64.exe",
-            "hash": "87ed441fbd5939d1b75c8d66c3c77cf5a0d94d39ddfcf18f7010c4e0cf27ecbf",
+            "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/1.8.10/pngcrush_1_8_10_w64.exe",
+            "hash": "9BC5D5143B7BFED2C17B7488C1E7DFE5213E5B17A1054CE7CF943544AABC28A8",
             "bin": [
-                ["pngcrush_1_8_8_w64.exe", "pngcrush"]
+                ["pngcrush_1_8_10_w64.exe", "pngcrush"]
             ]
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/1.8.8/pngcrush_1_8_8_w32.exe",
-            "hash": "e32f1e56d8156b8e3f86d3e09e1317112b4a1f5144c60a041cf5d1a674d816c7",
+            "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/1.8.10/pngcrush_1_8_10_w32.exe",
+            "hash": "38ED3649B057C2463540FEB3834D96F38C6A0CE07F8DE30F7AFEF995D603108D",
             "bin": [
-                ["pngcrush_1_8_8_w32.exe", "pngcrush"]
+                ["pngcrush_1_8_10_w32.exe", "pngcrush"]
             ]
         }
     },
