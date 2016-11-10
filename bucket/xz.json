@@ -21,5 +21,6 @@
                 "bin_i686\\xzdec.exe"
             ]
         }
-    }
+    },
+    "checkver": "<h3>Stable<\\/h3>\\s+<p>\\s+([\\d.]+) was released"
 }

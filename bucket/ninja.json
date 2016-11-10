@@ -6,5 +6,9 @@
     "hash": "4221b2cef768de64799077ba83ca9ca28e197415a34257ed8d54f93e899afc4e",
     "bin": [
         "ninja.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/ninja-build/ninja/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

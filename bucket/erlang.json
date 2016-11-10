@@ -26,5 +26,9 @@
     "uninstaller": {
         "file" : "Uninstall.exe",
         "args" : ["/S"]
+    },
+    "checkver": {
+        "url": "http://www.erlang.org/downloads",
+        "re": "DOWNLOAD\\s+OTP ([\\d.]+)"
     }
 }

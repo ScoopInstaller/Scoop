@@ -14,5 +14,9 @@
     "set_env": {
         "KOTLIN_HOME": "$dir"
     },
-    "depends": "openjdk"
+    "depends": "openjdk",
+    "checkver": {
+        "url": "https://github.com/JetBrains/kotlin/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

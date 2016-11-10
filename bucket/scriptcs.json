@@ -5,5 +5,9 @@
     "url": "http://chocolatey.org/api/v2/package/ScriptCs/0.13.2?fn=/dl.zip",
     "hash": "b0e24268e5e5258cd2f26bacfccb75427884cb00435358b724fbf15d5fb38083",
     "extract_dir": "tools",
-    "bin": "scriptcs.exe"
+    "bin": "scriptcs.exe",
+    "checkver": {
+        "url": "https://github.com/scriptcs/scriptcs/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

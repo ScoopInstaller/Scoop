@@ -22,5 +22,9 @@
         "bin\\runghc.exe",
         "bin\\runhaskell.exe",
         "lib\\extralibs\\bin\\cabal.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://www.haskell.org/platform/windows.html",
+        "re": "The latest version of the Haskell Platform for Windows is\\s+<strong>([\\d.]+)<\\/strong>"
+    }
 }

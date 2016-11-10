@@ -8,5 +8,9 @@
     "bin": [
         "bin\\sy.bat",
         "bin\\syncany.bat"
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/syncany/syncany/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

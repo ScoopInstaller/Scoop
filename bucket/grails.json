@@ -11,5 +11,9 @@
     "set_env": {
         "GRAILS_HOME": "$dir"
     },
-    "depends": "openjdk"
+    "depends": "openjdk",
+    "checkver": {
+        "url": "https://github.com/grails/grails-core/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

@@ -15,5 +15,9 @@
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\docker-machine-*.exe)[0] $dir\\docker-machine.exe",
     "bin": [
         ["docker-machine.exe", "docker-machine"]
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/docker/machine/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

@@ -14,5 +14,6 @@
     },
     "installer": {"args": "/S /D=$dir"},
     "uninstaller": {"file": "Uninstall.exe", "args": "/S"},
-    "env_add_path": "bin"
+    "env_add_path": "bin",
+    "checkver": "\\/releases\\/download.html#([\\d.]+)"
 }

@@ -14,5 +14,9 @@
         }
         finally {
             popd
-        }"
+        }",
+    "checkver": {
+        "url": "https://github.com/msiemens/PyGitUp/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }

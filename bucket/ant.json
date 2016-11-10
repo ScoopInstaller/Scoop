@@ -9,5 +9,9 @@
     "env_set": {
         "ANT_HOME": "$dir"
     },
-    "depends": "openjdk"
+    "depends": "openjdk",
+    "checkver": {
+        "url": "https://ant.apache.org/bindownload.cgi",
+        "re": "Currently, Apache Ant ([\\d.]+) is the best"
+    }
 }

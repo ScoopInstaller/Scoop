@@ -96,5 +96,9 @@
         "bin\\xsp.bat",
         "bin\\xsp2.bat",
         "bin\\xsp4.bat"
-    ]
+    ],
+    "checkver": {
+        "url": "http://www.mono-project.com/download/",
+        "re": "The latest Mono release is:\\s+<strong>[^\\(]+\\(([\\d.]+)\\)"
+    }
 }

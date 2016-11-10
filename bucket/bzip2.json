@@ -8,5 +8,6 @@
         "bin\\bzcat.exe",
         "bin\\bzip2.exe",
         "bin\\bzip2recover.exe"
-    ]
+    ],
+    "checkver": "Version<\\/A><\\/h2>\\s+<p>([\\d.]+)"
 }

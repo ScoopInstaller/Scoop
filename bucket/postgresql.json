@@ -54,5 +54,9 @@
         "bin\\vacuumdb.exe",
         "bin\\vacuumlo.exe",
         "bin\\zic.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "http://www.enterprisedb.com/products-services-training/pgbindownload",
+        "re": "<b>Version ([\\d.]+)"
+    }
 }

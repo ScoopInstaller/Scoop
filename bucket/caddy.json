@@ -17,5 +17,9 @@
                 ["caddy_windows_386.exe", "caddy"]
             ]
         }
+    },
+    "checkver": {
+        "url": "https://github.com/mholt/caddy/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
     }
 }

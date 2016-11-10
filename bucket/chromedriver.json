@@ -3,5 +3,6 @@
     "homepage":  "https://sites.google.com/a/chromium.org/chromedriver/",
     "url":  "https://chromedriver.storage.googleapis.com/2.25/chromedriver_win32.zip",
     "hash":  "53e52b247bbed98c67f0057088b482b3aa03fe0f84d7f2bb71ea7527f3988a7c",
-    "bin":  "chromedriver.exe"
+    "bin":  "chromedriver.exe",
+    "checkver": "Latest Release: <a href=\"[^\"]+\">ChromeDriver ([\\d.]+)"
 }

@@ -5,5 +5,9 @@
     "hash": "791abc45980ef648d3e064d74417a09b93d93fbff32790d6ee7cf0c9f2167481",
     "bin": [
         "bin\\forge.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/fsharp-editing/Forge/releases/latest",
+        "re": "\/releases\/tag\/([\\d.]+)"
+    }
 }

@@ -9,5 +9,9 @@
         "bin\\elixirc.bat",
         "bin\\iex.bat",
         "bin\\mix.bat"
-    ]
+    ],
+    "checkver": {
+        "url": "https://github.com/elixir-lang/elixir/releases/latest",
+        "re": "\/releases\/tag\/v([\\d.]+)"
+    }
 }
