@@ -64,7 +64,7 @@ function update_scoop() {
             rm -r -force $currentdir -ea stop
             mv $newdir $currentdir
         } catch {
-            rm -r -force $currentdir -ea stop
+            rm -r -force $newdir -ea stop
             abort 'scoop update failed'
         }
     }
