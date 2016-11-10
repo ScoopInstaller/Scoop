@@ -85,7 +85,7 @@ function update_scoop() {
             git_pull -q -ea stop
         } catch {
             abort 'scoop bucket update failed'
-        } 
+        }
         popd
     }
     success 'scoop was updated successfully!'
