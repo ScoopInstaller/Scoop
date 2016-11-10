@@ -56,12 +56,17 @@ function update_scoop() {
 
         $newdir = fullpath $(versiondir 'scoop' 'new')
 
-        # get git scoop
-        git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
+        try {
+            # get git scoop
+            git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
 
-        # replace non-git scoop with the git version
-        rm -r -force $currentdir -ea stop
-        mv $newdir $currentdir
+            # replace non-git scoop with the git version
+            rm -r -force $currentdir -ea stop
+            mv $newdir $currentdir
+        } catch {
+            rm -r -force $currentdir -ea stop
+            abort 'scoop update failed'
+        }
     }
     else {
         pushd $currentdir
