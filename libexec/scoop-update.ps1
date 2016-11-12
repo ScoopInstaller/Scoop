@@ -58,7 +58,7 @@ function update_scoop() {
 
         try {
             # get git scoop
-            git_clone -q $repo --branch $branch --single-branch "`"$newdir`"" -ea stop
+            git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
 
             # replace non-git scoop with the git version
             rm -r -force $currentdir -ea stop
