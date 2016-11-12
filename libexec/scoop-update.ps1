@@ -80,9 +80,7 @@ function update_scoop() {
     @(buckets) | % {
         "updating $_ bucket..."
         pushd (bucketdir $_)
-
         git_pull -q
-
         popd
     }
     success 'scoop was updated successfully!'
