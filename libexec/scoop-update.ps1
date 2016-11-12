@@ -56,17 +56,17 @@ function update_scoop() {
 
         $newdir = fullpath $(versiondir 'scoop' 'new')
 
-        try {
-            # get git scoop
-            git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
+        # get git scoop
+        git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
 
-            # replace non-git scoop with the git version
-            rm -r -force $currentdir -ea stop
-            mv $newdir $currentdir
-        } catch {
-            rm -r -force $newdir -ea stop
+        # check if scoop was successful downloaded
+        if(!(test-path "$newdir")) {
             abort 'scoop update failed'
         }
+
+        # replace non-git scoop with the git version
+        rm -r -force $currentdir -ea stop
+        mv $newdir $currentdir
     }
     else {
         pushd $currentdir
@@ -81,11 +81,8 @@ function update_scoop() {
         "updating $_ bucket..."
         pushd (bucketdir $_)
 
-        try {
-            git_pull -q -ea stop
-        } catch {
-            abort 'scoop bucket update failed'
-        }
+        git_pull -q
+
         popd
     }
     success 'scoop was updated successfully!'
