@@ -59,6 +59,11 @@ function update_scoop() {
         # get git scoop
         git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
 
+        # check if scoop was successful downloaded
+        if(!(test-path "$newdir")) {
+            abort 'scoop update failed'
+        }
+
         # replace non-git scoop with the git version
         rm -r -force $currentdir -ea stop
         mv $newdir $currentdir
