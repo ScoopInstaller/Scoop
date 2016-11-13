@@ -71,6 +71,10 @@ function update_scoop() {
     else {
         pushd $currentdir
         git_pull -q
+        $res = $lastexitcode
+        if($res -ne 0) {
+            abort 'update failed'
+        }
         popd
     }
 
