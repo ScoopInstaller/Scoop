@@ -1,0 +1,24 @@
+{
+    "homepage": "http://nodejs.org",
+    "version": "6.9.1",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://nodejs.org/dist/v6.9.1/node-v6.9.1-x64.msi",
+            "hash": "148aa14ce1491b2cdc47230c90e862e48d1af32baf5cc415b29593b6113ea1cf"
+        },
+        "32bit": {
+            "url": "https://nodejs.org/dist/v6.9.1/node-v6.9.1-x86.msi",
+            "hash": "314eaf8b5b9e08a835cb5c005ea5f4299b9e9e4d8c97277c1617e511382c15dc"
+        }
+    },
+    "env_add_path": "nodejs",
+    "post_install": "
+# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
+rm $dir\\nodejs\\node_modules\\npm\\npmrc
+npm update -g",
+    "checkver": {
+        "url": "https://nodejs.org/en/download/",
+        "re": "LTS version: <strong>v([\\d.]+)</strong>"
+    }
+}
