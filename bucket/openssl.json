@@ -15,5 +15,8 @@
     "innosetup": true,
     "bin": "bin\\openssl.exe",
     "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^\\s]+)</a>",
-    "env_add_path": "bin"
+    "env_add_path": "bin",
+     "env_set": {
+        "OPENSSL_CONF": "$dir\\bin\\cnf\\openssl.cnf"
+    }
 }
