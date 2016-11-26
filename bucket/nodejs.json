@@ -1,24 +1,32 @@
 {
-    "homepage": "http://nodejs.org",
-    "version": "7.1.0",
-    "license": "MIT",
-    "architecture": {
-        "64bit": {
-            "url": "https://nodejs.org/dist/v7.1.0/node-v7.1.0-x64.msi",
-            "hash": "853936FE0AA946E16BBAB10D1C7E964BBF7A1820D12ADBFD748D7CF9F8059FA3"
-        },
-        "32bit": {
-            "url": "https://nodejs.org/dist/v7.1.0/node-v7.1.0-x86.msi",
-            "hash": "5D95A909788239B4ED97C5F79B2D16837EA577A1A68E34E014D0A45DE7F27B1D"
-        }
-    },
-    "env_add_path": "nodejs",
-    "post_install": "
-# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
-rm $dir\\nodejs\\node_modules\\npm\\npmrc
-npm update -g",
-    "checkver": {
-        "url": "https://nodejs.org/en/download/current/",
-        "re": "Current version: <strong>v([\\d.]+)</strong>"
-    }
+    "homepage":  "http://nodejs.org",
+    "version":  "7.2.0",
+    "license":  "MIT",
+    "architecture":  {
+                         "64bit":  {
+                                       "url":  "https://nodejs.org/dist/v7.2.0/node-v7.2.0-x64.msi",
+                                       "hash":  "728047841ee8ef46c0273b57dd1f7ed0fc97e89c0d970c1be5387bcf2be5eaa8"
+                                   },
+                         "32bit":  {
+                                       "url":  "https://nodejs.org/dist/v7.2.0/node-v7.2.0-x86.msi",
+                                       "hash":  "3518b031bed17dfe2334981fd4ed3f0c8b71315a42462e6ccd4e949de3e06bc0"
+                                   }
+                     },
+    "env_add_path":  "nodejs",
+    "post_install":  "\r\n# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm\r\nrm $dir\\nodejs\\node_modules\\npm\\npmrc\r\nnpm update -g",
+    "checkver":  {
+                     "url":  "https://nodejs.org/en/download/current/",
+                     "re":  "Current version: \u003cstrong\u003ev([\\d.]+)\u003c/strong\u003e"
+                 },
+    "autoupdate":  {
+                       "url":  {
+                                   "64bit":  "https://nodejs.org/dist/v$version/node-v$version-x64.msi",
+                                   "32bit":  "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+                               },
+                       "hash":  {
+                                    "mode":  "extract",
+                                    "url":  "https://nodejs.org/dist/v$version/SHASUMS256.txt.asc",
+                                    "find":  "([a-z0-9]{64})\\s+(?:$basename)"
+                                }
+                   }
 }

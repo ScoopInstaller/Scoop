@@ -1,10 +1,22 @@
 # checks websites for newer versions using an (optional) regular expression defined in the manifest
 # use $dir to specify a manifest directory to check from, otherwise ./bucket is used
-param($app, $dir)
+param(
+    [String]$app,
+    [String]$dir,
+    [Switch]$update = $false
+)
+
+if (!$app -and $update) {
+    # While developing the feature we only allow specific updates
+    Write-Host "[ERROR] AUTOUPDATE CAN ONLY BE USED WITH A APP SPECIFIED" -f DarkRed
+    exit
+}
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\config.ps1"
+. "$psscriptroot\..\lib\buckets.ps1"
+. "$psscriptroot\..\lib\autoupdate.ps1"
 
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir
@@ -79,6 +91,10 @@ while($in_progress -gt 0) {
             } else {
                 write-host "$ver" -f darkred -nonewline
                 write-host " (scoop version is $expected_ver)"
+
+                if($update -and $json.autoupdate) {
+                    autoupdate $app $json $ver
+                }
             }
 
         } else {
