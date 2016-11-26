@@ -39,7 +39,7 @@ function autoupdate([String] $app, $json, [String] $version)
         $template = $json.autoupdate.url.$architecture;
         $url = substitute $template @{'$version' = $version}
 
-        # check url 
+        # check url
         if (!(check_url $url)) {
             $valid = $false
             Write-Host -f DarkRed "URL $url is not valid"
@@ -85,7 +85,7 @@ function autoupdate([String] $app, $json, [String] $version)
 
         $path = manifest_path $app
         <#
-        TODO improve json formatting 
+        TODO improve json formatting
         #>
         $json | convertto-json | out-file -filepath $path -encoding utf8
     } else {
