@@ -20,7 +20,7 @@
         "zenmap.exe",
         "nping.exe"
     ],
-    "shortcuts" : [
-        [ "zenmap.exe" , "Zenmap"]
+    "shortcuts": [
+        ["zenmap.exe", "Zenmap"]
     ]
 }
