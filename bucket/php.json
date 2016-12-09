@@ -9,7 +9,7 @@
                 "https://raw.githubusercontent.com/madbub/scoop-php/master/64-bit/vcruntime140.dll"
             ],
             "hash": [
-                "E54130C0036B107E36A928CC2F0D5B46E8FD6D894128671995917E7A9FEA26DA",
+                "b56093735da62ca1435e732a00e5cd432ece60f466e45e490844eac03bd3a70d",
                 "acf65e565021f2017815fc5ec8a3145cf6c15e75c132cf23a378cc943e68327c"
             ]
         },
@@ -19,7 +19,7 @@
                 "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/32-bit/vcruntime140.dll"
             ],
             "hash": [
-                "62CB37344611F75F42718DCBDE0A1EF2B767D3E6AE2DC8C986CAED888811B1A7",
+                "cd4c0f156272de8cf58f77f2c954ca1f20d491cf564b8c8c3d78cf7e707f4db7",
                 "b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
             ]
         }
