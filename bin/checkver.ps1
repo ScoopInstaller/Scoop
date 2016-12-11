@@ -92,7 +92,13 @@ while($in_progress -gt 0) {
                 write-host "$ver" -f darkgreen
             } else {
                 write-host "$ver" -f darkred -nonewline
-                write-host " (scoop version is $expected_ver)"
+                write-host " (scoop version is $expected_ver)" -NoNewline
+
+                if ($json.autoupdate) {
+                    Write-Host " autoupdate available" -f Cyan
+                } else {
+                    Write-Host ""
+                }
 
                 if($update -and $json.autoupdate) {
                     autoupdate $app $json $ver
