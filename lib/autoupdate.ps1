@@ -14,6 +14,12 @@ function substitute([String] $str, [Hashtable] $params) {
 }
 
 function check_url([String] $url) {
+    if ($url.Contains("github.com")) {
+        # github does not allow HEAD requests
+        warn "Unable to check github url (assuming it is ok)"
+        return $true;
+    }
+
     $response = Invoke-WebRequest -Uri $url -Method HEAD
     if ($response.StatusCode.Equals(200)) { # redirects might be ok
         return $true
