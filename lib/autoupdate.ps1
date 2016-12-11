@@ -28,7 +28,7 @@ function autoupdate([String] $app, $json, [String] $version)
     $has_changes = $false
     $has_errors = $false
 
-     $json.architecture | Get-Member -MemberType NoteProperty | % {
+    $json.architecture | Get-Member -MemberType NoteProperty | % {
         [Bool]$valid = $true
         $architecture = $_.Name
 
@@ -75,8 +75,15 @@ function autoupdate([String] $app, $json, [String] $version)
         if ($valid) {
             $has_changes = $true
             $json.version = $version
-            $json.architecture.$architecture.url = $url
-            $json.architecture.$architecture.hash = $hash
+
+            # If there are multiple urls we replace the first one
+            if ($json.architecture.$architecture.url -is [System.Array]) {
+                $json.architecture.$architecture.url[0] = $url
+                $json.architecture.$architecture.hash[0] = $hash
+            } else {
+                $json.architecture.$architecture.url = $url
+                $json.architecture.$architecture.hash = $hash
+            }
         } else {
             $has_errors = $true
             Write-Host -f DarkRed "Could not update $app $architecture"
