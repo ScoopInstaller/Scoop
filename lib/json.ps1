@@ -9,7 +9,7 @@ Function ConvertToPrettyJson {
     )
 
     Process  {
-        [String]$json = $data | ConvertTo-Json -Compress
+        [String]$json = $data | ConvertTo-Json -Depth 8 -Compress
         [String]$output = ""
 
         # state
