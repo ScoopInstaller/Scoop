@@ -61,6 +61,10 @@ function autoupdate([String] $app, $json, [String] $version)
 
             if ($hashfile -match $regex) {
                 $hash = $matches[1]
+
+                if ($json.autoupdate.hash.type -eq "sha1") {
+                    $hash = "sha1:$hash"
+                }
             } else {
                 $valid = $false
                 Write-Error "could no find hash in hashfile"
