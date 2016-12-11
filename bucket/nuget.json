@@ -7,6 +7,6 @@
     "bin": "NuGet.exe",
     "checkver": {
         "url": "https://dist.nuget.org/index.json",
-        "re": "recommended latest\", \"version\": \"([\\d.]+)\""
+        "re": "latest\", \"version\": \"([\\d.]+)\""
     }
 }
