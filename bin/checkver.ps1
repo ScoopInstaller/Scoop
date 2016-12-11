@@ -17,6 +17,7 @@ if (!$app -and $update) {
 . "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\autoupdate.ps1"
+. "$psscriptroot\..\lib\json.ps1"
 
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir

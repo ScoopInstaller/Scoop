@@ -84,10 +84,9 @@ function autoupdate([String] $app, $json, [String] $version)
         Write-Host -f DarkGreen "Writing updated $app manifest"
 
         $path = manifest_path $app
-        <#
-        TODO improve json formatting
-        #>
-        $json | convertto-json | out-file -filepath $path -encoding utf8
+
+        $file_content = $json | ConvertToPrettyJson
+        [System.IO.File]::WriteAllLines($path, $file_content)
     } else {
         Write-Host -f DarkGray "No updates for $app"
     }
