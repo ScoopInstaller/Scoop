@@ -22,22 +22,87 @@ function check_url([String] $url) {
     return $false
 }
 
+function getHash([String] $app, $config, [String] $version, [String] $url)
+{
+    $hash = $null
+
+    <#
+    TODO implement more hashing types
+    `extract` Should be able to extract from origin page source (checkver)
+    `download` Last resort, download the real file and hash it
+    #>
+    $hashmode = $config.mode;
+    if ($hashmode -eq "extract") {
+        $hashfile_url = substitute $config.url @{'$version' = $version; '$url' = $url};
+        $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
+
+        $basename = fname($url)
+        $regex = substitute $config.find @{'$basename' = [regex]::Escape($basename)}
+
+        if ($hashfile -match $regex) {
+            $hash = $matches[1]
+
+            if ($config.type -eq "sha1") {
+                $hash = "sha1:$hash"
+            }
+        }
+    } elseif ($hashmode -eq "download") {
+        dl_with_cache $app $version $url $null $null $true
+        $file = fullpath (cache_path $app $version $url)
+        return compute_hash $file "sha256"
+    } else {
+        Write-Host "Unknown hashmode $hashmode"
+    }
+
+    return $hash
+}
+
+function updateJsonFileWithNewVersion($json, [String] $version, [String] $url, [String] $hash, $architecture = $null)
+{
+    $json.version = $version
+
+    if ($architecture -eq $null) {
+        if ($json.url -is [System.Array]) {
+            $json.url[0] = $url
+            $json.hash[0] = $hash
+        } else {
+            $json.url = $url
+            $json.hash = $hash
+        }
+    } else {
+        # If there are multiple urls we replace the first one
+        if ($json.architecture.$architecture.url -is [System.Array]) {
+            $json.architecture.$architecture.url[0] = $url
+            $json.architecture.$architecture.hash[0] = $hash
+        } else {
+            $json.architecture.$architecture.url = $url
+            $json.architecture.$architecture.hash = $hash
+        }
+    }
+
+    if ($json.extract_dir -and $json.autoupdate.extract_dir) {
+        $json.extract_dir = substitute $json.autoupdate.extract_dir @{'$version' = $version}
+    }
+}
+
+function prepareDownloadUrl([String] $template, [String] $version)
+{
+    <#
+    TODO There should be a second option to extract the url from the page
+    #>
+    return substitute $template @{'$version' = $version}
+}
+
 function autoupdate([String] $app, $json, [String] $version)
 {
     Write-Host -f DarkCyan "Autoupdating $app"
     $has_changes = $false
     $has_errors = $false
+    [Bool]$valid = $true
 
-    $json.architecture | Get-Member -MemberType NoteProperty | % {
-        [Bool]$valid = $true
-        $architecture = $_.Name
-
+    if ($json.url) {
         # create new url
-        <#
-        TODO There should be a second option to extract the url from the page
-        #>
-        $template = $json.autoupdate.url.$architecture;
-        $url = substitute $template @{'$version' = $version}
+        $url = prepareDownloadUrl $json.autoupdate.url $version
 
         # check url
         if (!(check_url $url)) {
@@ -46,47 +111,49 @@ function autoupdate([String] $app, $json, [String] $version)
         }
 
         # create hash
-        <#
-        TODO implement more hashing types
-        `extract` Should be able to extract from origin page source (checkver)
-        `download` Last resort, download the real file and hash it
-        #>
-        $hashmode = $json.autoupdate.hash.mode;
-        if ($hashmode -eq "extract") {
-            $hashfile_url = substitute $json.autoupdate.hash.url @{'$version' = $version; '$url' = $url};
-            $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
-
-            $basename = fname($url)
-            $regex = substitute $json.autoupdate.hash.find @{'$basename' = [regex]::Escape($basename)}
-
-            if ($hashfile -match $regex) {
-                $hash = $matches[1]
-
-                if ($json.autoupdate.hash.type -eq "sha1") {
-                    $hash = "sha1:$hash"
-                }
-            } else {
-                $valid = $false
-                Write-Error "could no find hash in hashfile"
-            }
+        $hash = getHash $app $json.autoupdate.hash $version $url
+        if ($hash -eq $null) {
+            $valid = $false
+            Write-Host -f DarkRed "Could not find hash!"
         }
 
         # write changes to the json object
         if ($valid) {
             $has_changes = $true
-            $json.version = $version
-
-            # If there are multiple urls we replace the first one
-            if ($json.architecture.$architecture.url -is [System.Array]) {
-                $json.architecture.$architecture.url[0] = $url
-                $json.architecture.$architecture.hash[0] = $hash
-            } else {
-                $json.architecture.$architecture.url = $url
-                $json.architecture.$architecture.hash = $hash
-            }
+            updateJsonFileWithNewVersion $json $version $url $hash
         } else {
             $has_errors = $true
-            Write-Host -f DarkRed "Could not update $app $architecture"
+            Write-Host -f DarkRed "Could not update $app"
+        }
+    } else {
+        $json.architecture | Get-Member -MemberType NoteProperty | % {
+            $valid = $true
+            $architecture = $_.Name
+
+            # create new url
+            $url = prepareDownloadUrl $json.autoupdate.url.$architecture $version
+
+            # check url
+            if (!(check_url $url)) {
+                $valid = $false
+                Write-Host -f DarkRed "URL $url is not valid"
+            }
+
+            # create hash
+            $hash = getHash $app $json.autoupdate.hash $version $url
+            if ($hash -eq $null) {
+                $valid = $false
+                Write-Host -f DarkRed "Could not find hash!"
+            }
+
+            # write changes to the json object
+            if ($valid) {
+                $has_changes = $true
+                updateJsonFileWithNewVersion $json $version $url $hash $architecture
+            } else {
+                $has_errors = $true
+                Write-Host -f DarkRed "Could not update $app $architecture"
+            }
         }
     }
 

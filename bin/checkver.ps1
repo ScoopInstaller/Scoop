@@ -18,6 +18,7 @@ if (!$app -and $update) {
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\autoupdate.ps1"
 . "$psscriptroot\..\lib\json.ps1"
+. "$psscriptroot\..\lib\install.ps1" # needed for hash generation
 
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir
