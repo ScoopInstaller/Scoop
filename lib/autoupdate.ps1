@@ -53,7 +53,7 @@ function autoupdate([String] $app, $json, [String] $version)
         #>
         $hashmode = $json.autoupdate.hash.mode;
         if ($hashmode -eq "extract") {
-            $hashfile_url = substitute $json.autoupdate.hash.url @{'$version' = $version};
+            $hashfile_url = substitute $json.autoupdate.hash.url @{'$version' = $version; '$url' = $url};
             $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
 
             $basename = fname($url)
