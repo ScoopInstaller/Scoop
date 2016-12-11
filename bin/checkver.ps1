@@ -17,6 +17,8 @@ if (!$app -and $update) {
 . "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\autoupdate.ps1"
+. "$psscriptroot\..\lib\json.ps1"
+. "$psscriptroot\..\lib\install.ps1" # needed for hash generation
 
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir
@@ -90,7 +92,13 @@ while($in_progress -gt 0) {
                 write-host "$ver" -f darkgreen
             } else {
                 write-host "$ver" -f darkred -nonewline
-                write-host " (scoop version is $expected_ver)"
+                write-host " (scoop version is $expected_ver)" -NoNewline
+
+                if ($json.autoupdate) {
+                    Write-Host " autoupdate available" -f Cyan
+                } else {
+                    Write-Host ""
+                }
 
                 if($update -and $json.autoupdate) {
                     autoupdate $app $json $ver

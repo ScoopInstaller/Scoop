@@ -12,7 +12,7 @@
         "bin\\octave-config.exe"
     ],
     "checkver": {
-        "url": "https://www.gnu.org/software/octave/download.html",
-        "re": "GNU Octave ([\\d.]+)"
+        "url": "http://wiki.octave.org/GNU_Octave_Wiki",
+        "re": "GNU Octave ([\\d.]+) is the current stable release"
     }
 }

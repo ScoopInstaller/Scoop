@@ -1,15 +1,15 @@
 {
     "homepage": "http://nodejs.org",
-    "version": "6.9.1",
+    "version": "6.9.2",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v6.9.1/node-v6.9.1-x64.msi",
-            "hash": "148aa14ce1491b2cdc47230c90e862e48d1af32baf5cc415b29593b6113ea1cf"
+            "url": "https://nodejs.org/dist/v6.9.2/node-v6.9.2-x64.msi",
+            "hash": "9b2fcdd0d81e69a9764c3ce5a33087e02e94e8e23ea2b8c9efceebe79d49936e"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v6.9.1/node-v6.9.1-x86.msi",
-            "hash": "314eaf8b5b9e08a835cb5c005ea5f4299b9e9e4d8c97277c1617e511382c15dc"
+            "url": "https://nodejs.org/dist/v6.9.2/node-v6.9.2-x86.msi",
+            "hash": "f8b911a249d45358464135c41e7b16fe4abef8d047efb6183f043bc965632aea"
         }
     },
     "env_add_path": "nodejs",
@@ -20,5 +20,16 @@ npm update -g",
     "checkver": {
         "url": "https://nodejs.org/en/download/",
         "re": "LTS version: <strong>v([\\d.]+)</strong>"
+    },
+    "autoupdate": {
+        "url": {
+            "64bit": "https://nodejs.org/dist/v$version/node-v$version-x64.msi",
+            "32bit": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://nodejs.org/dist/v$version/SHASUMS256.txt.asc",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
     }
 }
