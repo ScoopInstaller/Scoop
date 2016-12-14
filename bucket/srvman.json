@@ -9,7 +9,10 @@
       "url": "https://raw.githubusercontent.com/deepakSP/srvman/master/x86/srvman.exe"
     }
   },
-  "bin": [ "srvman.exe", [ "srvman.exe", "service" ] ],
+  "bin": [
+    "srvman.exe",
+    ["srvman.exe", "service"]
+  ],
   "checkver": "Current Release: Version ([0-9\\.]+)",
-  "notes" : "Always use sudo to start, stop or edit ig. [ sudo srvman start nginx or sudo service restart apache ]. \n Visit http://tools.sysprogs.org/srvman/ for more info"
+  "notes": "Always use sudo to start, stop or edit ig. [ sudo srvman start nginx or sudo service restart apache ]. \n Visit http://tools.sysprogs.org/srvman/ for more info"
 }
