@@ -1,28 +1,28 @@
 {
     "homepage": "http://rubyinstaller.org",
-    "version": "2.3.1",
+    "version": "2.3.3",
     "architecture": {
         "64bit": {
             "url": [
-                "https://dl.bintray.com/oneclick/rubyinstaller/ruby-2.3.1-x64-mingw32.7z?direct#/dl.7z",
+                "https://dl.bintray.com/oneclick/rubyinstaller/ruby-2.3.3-x64-mingw32.7z?direct#/dl.7z",
                 "https://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe#/dl2.7z"
             ],
             "hash": [
-                "d033e0343147d178a04752dbd0758311967189d37c16e9329828606b5a87be7d",
+                "92b97ac3eb380f3f1b7b655a328668cf02b2846ad3c20135bd51f45f4c1cbfc8",
                 "2ada04c7234199126c0f34f6ea7163a8f8dccb1e15814af175a189f6ac48b8ac"
             ],
-            "extract_dir": "ruby-2.3.1-x64-mingw32"
+            "extract_dir": "ruby-2.3.3-x64-mingw32"
         },
         "32bit": {
             "url": [
-                "https://dl.bintray.com/oneclick/rubyinstaller/ruby-2.3.1-i386-mingw32.7z?direct#/dl.7z",
+                "https://dl.bintray.com/oneclick/rubyinstaller/ruby-2.3.3-i386-mingw32.7z?direct#/dl.7z",
                 "https://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-32-4.7.2-20130224-1151-sfx.exe#/dl2.7z"
             ],
             "hash": [
-                "24eddf097265dd8010e1118ef88428de0d182adfec6a6adb8073ca3dfcdec321",
+                "5022ef928f0296abede90f1cf4346250d69f6298c648cad6279938f64eca29fa",
                 "61a06b5da06dd94343e591163ac0d43c544e9cd4df770f01275645b268b44dc7"
             ],
-            "extract_dir": "ruby-2.3.1-i386-mingw32"
+            "extract_dir": "ruby-2.3.3-i386-mingw32"
         }
     },
     "extract_to": [ "", "devkit" ],
