@@ -1,0 +1,19 @@
+{
+  "homepage": "https://nssm.cc",
+  "version": "2.24",
+  "url": "https://nssm.cc/release/nssm-2.24.zip",
+  "architecture": {
+    "64bit": {
+      "extract_dir": "nssm-2.24/win64"
+    },
+    "32bit": {
+      "extract_dir": "nssm-2.24/win32"
+    }
+  },
+  "bin": [
+    "nssm.exe",
+    ["nssm.exe", "service"]
+  ],
+  "checkver": "The latest version[^<]+<a href=\"[^\"]+nssm-([\\d.]+)\\.zip\"",
+  "notes": "Manage Services with NSSM (GUI based) (e.g., 'nssm install nginx' to install nginx as service gui will popup or 'nssm start/status/stop apache').\nVisit https://nssm.cc/commands for more info"
+}

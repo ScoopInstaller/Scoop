@@ -108,7 +108,10 @@ function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) 
         mv "$cached.download" $cached -force
         write-host "done"
     } else { write-host "loading $url from cache..."}
-    cp $cached $to
+
+    if (!($to -eq $null)) {
+        cp $cached $to
+    }
 }
 
 function do_dl($url, $to, $cookies) {
