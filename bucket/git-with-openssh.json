@@ -17,6 +17,7 @@
         "cmd\\git.exe",
         "cmd\\gitk.exe",
         "cmd\\git-gui.exe",
+        "git-bash.exe",
         "usr\\bin\\ssh.exe",
         "usr\\bin\\sshd.exe",
         "usr\\bin\\scp.exe",
