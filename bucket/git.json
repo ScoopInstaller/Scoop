@@ -16,7 +16,8 @@
     "bin": [
         "cmd\\git.exe",
         "cmd\\gitk.exe",
-        "cmd\\git-gui.exe"
+        "cmd\\git-gui.exe",
+        "git-bash.exe"
     ],
     "post_install": [
         "git config --global credential.helper wincred"
