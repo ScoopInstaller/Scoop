@@ -1,18 +1,18 @@
 {
     "homepage": "https://www.python.org/",
     "license": "https://docs.python.org/3/license.html",
-    "version": "3.5.2",
+    "version": "3.6.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.5.2/python-3.5.2-amd64.exe#/py352.exe",
-            "hash": "2cfcdc77a0ba403acf72ba217898fb7c06ce778a5cb85f5220fd32127e40f263"
+            "url": "https://www.python.org/ftp/python/3.6.0/python-3.6.0-amd64.exe#/py360.exe",
+            "hash": "md5:71c9d30c1110abf7f80a428970ab8ec2"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.5.2/python-3.5.2.exe#/py352.exe",
-            "hash": "529c46b9fd3dcf83029b8bfc95034e640ea2c69835b1aa4b75edeec8de764193"
+            "url": "https://www.python.org/ftp/python/3.6.0/python-3.6.0.exe#/py360.exe",
+            "hash": "md5:38d9b036b25725f6acb553d4aece4db4"
         }
     },
-    "pre_install": "copy-item $dir\\py352.exe $dir\\uninstall.exe",
+    "pre_install": "copy-item $dir\\py360.exe $dir\\uninstall.exe",
     "installer": {
         "args": [
             "/quiet",
