@@ -1,17 +1,33 @@
 {
     "homepage": "https://developers.google.com/speed/webp/",
     "license": "BSD",
-    "version": "0.5.1",
-    "url": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-0.5.1-windows-x64.zip",
-    "hash": "c74a08a457580f250129bb6d8b46cd8718b055566277afadc00bb484e6ceefcc",
-    "bin": [
-        "libwebp-0.5.1-windows-x64\\bin\\anim_diff.exe",
-        "libwebp-0.5.1-windows-x64\\bin\\cwebp.exe",
-        "libwebp-0.5.1-windows-x64\\bin\\dwebp.exe",
-        "libwebp-0.5.1-windows-x64\\bin\\gif2webp.exe",
-        "libwebp-0.5.1-windows-x64\\bin\\vwebp.exe",
-        "libwebp-0.5.1-windows-x64\\bin\\webpmux.exe"
-    ],
+    "version": "0.5.2",
+    "architecture": {
+        "64bit": {
+            "url": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-0.5.2-windows-x64.zip",
+            "hash": "973c00cb1539a9b07ef9bf2293b188000ed33c3b58a28421eb32523bd82a9b29",
+            "bin": [
+                "libwebp-0.5.2-windows-x64\\bin\\anim_diff.exe",
+                "libwebp-0.5.2-windows-x64\\bin\\cwebp.exe",
+                "libwebp-0.5.2-windows-x64\\bin\\dwebp.exe",
+                "libwebp-0.5.2-windows-x64\\bin\\gif2webp.exe",
+                "libwebp-0.5.2-windows-x64\\bin\\vwebp.exe",
+                "libwebp-0.5.2-windows-x64\\bin\\webpmux.exe"
+            ]
+        },
+        "32bit": {
+            "url": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-0.5.2-windows-x86.zip",
+            "hash": "1897cd5ae27c6decec40d9b5e6694a17bf22956662a347bc5aecfe98c898c1cb",
+            "bin": [
+                "libwebp-0.5.2-windows-x86\\bin\\anim_diff.exe",
+                "libwebp-0.5.2-windows-x86\\bin\\cwebp.exe",
+                "libwebp-0.5.2-windows-x86\\bin\\dwebp.exe",
+                "libwebp-0.5.2-windows-x86\\bin\\gif2webp.exe",
+                "libwebp-0.5.2-windows-x86\\bin\\vwebp.exe",
+                "libwebp-0.5.2-windows-x86\\bin\\webpmux.exe"
+            ]
+        }
+    },
     "checkver": {
         "url": "https://developers.google.com/speed/webp/download",
         "re": "\\/libwebp-([\\d].+)-windows-x86.zip"
