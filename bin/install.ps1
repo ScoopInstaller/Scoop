@@ -4,6 +4,15 @@
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 $erroractionpreference='stop' # quit if anything goes wrong
 
+# set correct execution policy automatically if not set already:
+$ep = get-executionpolicy cu; 
+if ($ep -ne "unrestricted") {
+    # Set execution policy on the process to hide error message
+    # that will otherwise show first time this script is run
+    set-executionpolicy unrestricted p
+    set-executionPolicy unrestricted cu 
+}
+
 # get core functions
 $core_url = 'https://raw.github.com/lukesampson/scoop/master/lib/core.ps1'
 echo 'initializing...'
