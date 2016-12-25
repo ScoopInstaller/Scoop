@@ -5,12 +5,12 @@
 $erroractionpreference='stop' # quit if anything goes wrong
 
 # set correct execution policy automatically if not set already:
-$ep = get-executionpolicy cu; 
+$ep = get-executionpolicy cu;
 if ($ep -ne "unrestricted") {
     # Set execution policy on the process to hide error message
     # that will otherwise show first time this script is run
     set-executionpolicy unrestricted p
-    set-executionPolicy unrestricted cu 
+    set-executionPolicy unrestricted cu
 }
 
 # get core functions
