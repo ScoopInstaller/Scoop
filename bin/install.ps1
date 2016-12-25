@@ -7,10 +7,21 @@ $erroractionpreference='stop' # quit if anything goes wrong
 # set correct execution policy automatically if not set already:
 $ep = get-executionpolicy cu;
 if ($ep -ne "unrestricted") {
+    "in order to be able to install programs scoop needs to update"
+    "powershell execution policy for current user to be unrestricted."
+    "(alternatively you can make this change manually by running: set-executionPolicy unrestricted cu)"
+    $yn = read-host 'would you like to make this change? (yN)'
+    if ($yn -notlike 'y*') {
+        "installation stopped, cannot continue without correct execution policy."
+        break
+    }
     # Set execution policy on the process to hide error message
     # that will otherwise show first time this script is run
     set-executionpolicy unrestricted p
     set-executionPolicy unrestricted cu
+    $ep = get-executionpolicy cu;
+    "execution policy is set to unrestricted"
+    "continuing installation..."
 }
 
 # get core functions
