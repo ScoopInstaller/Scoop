@@ -7,8 +7,8 @@ $erroractionpreference='stop' # quit if anything goes wrong
 # show notification to change execution policy:
 $ep = get-executionpolicy cu;
 if ($ep -ne "unrestricted") {
-    "in order to be able to install programs scoop needs powershell execution policy for current user to be set to unrestricted."
-    "to make this change, please run 'set-executionPolicy unrestricted -s cu'"
+    "scoop needs powershell execution policy to be set to 'unrestricted' in order to install programs."
+    "to make this change please run 'set-executionPolicy unrestricted -s cu'"
     break
 }
 
