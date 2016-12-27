@@ -1,5 +1,5 @@
 {
-    "version": "1.1",
+    "version": "1.0.0-preview2-1-003177",
     "homepage": "https://www.microsoft.com/net/core#windows",
     "architecture": {
         "64bit": {
