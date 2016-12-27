@@ -1,20 +1,19 @@
 {
-    "version":  "0.16",
+    "version":  "0.18",
     "license":  "https://github.com/spf13/hugo/blob/master/LICENSE.md",
     "architecture": {
       "64bit": {
-        "url":  "https://github.com/spf13/hugo/releases/download/v0.16/hugo_0.16_windows-64bit.zip",
-        "hash": "a3fda0bd30592e4eb3bdde85c8a8ce23a7433073536466d16fd0e97bf7794067"
+        "url":  "https://github.com/spf13/hugo/releases/download/v0.18/hugo_0.18_windows-64bit.zip",
+        "hash": "9C6094196524A9F8CBB2A3FD83A309C7FF42E62CE24DECF10222FA9D0B0EAA16",
+        "bin": [ "hugo_0.18_windows_amd64.exe" ]
       },
       "32bit": {
-        "url":  "https://github.com/spf13/hugo/releases/download/v0.16/hugo_0.16_windows-32bit.zip",
-        "hash":  "1c72d06843fe02cb62348660d87a523c885ed684a683271fc8762e7234c4210b"
+        "url":  "https://github.com/spf13/hugo/releases/download/v0.18/hugo_0.18_windows-32bit.zip",
+        "hash":  "12FAB36D0492E90B1004227D6FC62683682C3D19369C3A8166D0158A89D9DFFA",
+        "bin": [ "hugo_0.18_windows_386.exe" ]
       }
     },
     "homepage": "http://gohugo.io",
-    "bin": [
-      ["hugo.exe", "hugo"]
-    ],
     "checkver": {
         "url": "https://github.com/spf13/hugo/releases/latest",
         "re": "\/releases\/tag\/v([\\d.]+)"
