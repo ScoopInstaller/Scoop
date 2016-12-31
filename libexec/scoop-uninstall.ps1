@@ -11,6 +11,7 @@
 . "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 
@@ -61,7 +62,13 @@ foreach($app in $apps) {
     run_uninstaller $manifest $architecture $dir
     rm_shims $manifest $global
     rm_startmenu_shortcuts $manifest $global
-    env_rm_path $manifest $dir $global
+
+    # If a junction was used during install, that will have been used
+    # as the reference directory. Othewise it will just be the version
+    # directory.
+    $refdir = unlink_current $dir
+
+    env_rm_path $manifest $refdir $global
     env_rm $manifest $global
 
     try { rm -r $dir -ea stop -force }

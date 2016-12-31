@@ -37,6 +37,7 @@ function install_app($app, $architecture, $global) {
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
+    $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
@@ -595,6 +596,59 @@ function rm_shims($manifest, $global) {
 
         rm_shim $name $shimdir
     }
+}
+
+# Gets the path for the 'current' directory junction for
+# the specified version directory.
+function current_dir($versiondir) {
+    $parent = split-path $versiondir
+    return "$parent\current"
+}
+
+
+# Creates or updates the directory junction for [app]/current,
+# pointing to the specified version directory for the app.
+#
+# Returns the 'current' junction directory if in use, otherwise
+# the version directory.
+function link_current($versiondir) {
+    if(!(get_config USE_JUNCTIONS)) { return $versiondir }
+
+    $currentdir = current_dir $versiondir
+
+    write-host "linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
+
+    if($currentdir -eq $versiondir) {
+        abort "error: version 'current' is not allowed!"
+    }
+
+    if(test-path $currentdir) {
+        # remove the junction
+        cmd /c rmdir $currentdir
+    }
+
+    cmd /c mklink /j $currentdir $versiondir | out-null
+    return $currentdir
+}
+
+# Removes the directory junction for [app]/current which
+# points to the current version directory for the app.
+#
+# Returns the 'current' junction directory (if it exists),
+# otherwise the normal version directory.
+function unlink_current($versiondir) {
+    if(!(get_config USE_JUNCTIONS)) { return $versiondir }
+
+    $currentdir = current_dir $versiondir
+
+    if(test-path $currentdir) {
+        write-host "unlinking $(friendly_path $currentdir)"
+
+        # remove the junction
+        cmd /c rmdir $currentdir
+        return $currentdir
+    }
+    return $appdir
 }
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead

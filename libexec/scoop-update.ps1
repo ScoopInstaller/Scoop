@@ -148,6 +148,7 @@ function update($app, $global, $quiet = $false, $independent) {
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir
+    $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
