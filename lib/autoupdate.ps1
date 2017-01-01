@@ -57,13 +57,17 @@ function getHash([String] $app, $config, [String] $version, [String] $url)
         $hashfile_url = substitute $config.url @{'$version' = $version; '$url' = $url};
         $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
 
-        $regex = substitute $config.find @{'$basename' = [regex]::Escape($basename)}
+        $regex = $config.find
+        if ($regex -eq $null) {
+            $regex = "([a-z0-9]+)"
+        }
+        $regex = substitute $regex @{'$basename' = [regex]::Escape($basename)}
 
         if ($hashfile -match $regex) {
             $hash = $matches[1]
 
-            if ($config.type -eq "sha1") {
-                $hash = "sha1:$hash"
+            if ($config.type -and !($config.type -eq "sha256")) {
+                $hash = $config.type + ":$hash"
             }
         }
     } elseif ($hashmode -eq "download") {
