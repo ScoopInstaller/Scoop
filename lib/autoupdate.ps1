@@ -116,7 +116,7 @@ function prepareDownloadUrl([String] $template, [String] $version)
     <#
     TODO There should be a second option to extract the url from the page
     #>
-    return substitute $template @{'$version' = $version}
+    return substitute $template @{'$version' = $version; '$underscoreVersion' = ($version -replace "\.", "_")}
 }
 
 function autoupdate([String] $app, $json, [String] $version)
