@@ -3,7 +3,8 @@
 param(
     [String]$app,
     [String]$dir,
-    [Switch]$update = $false
+    [Switch]$update = $false,
+    [Switch]$forceUpdate = $false
 )
 
 if (!$app -and $update) {
@@ -90,6 +91,11 @@ while($in_progress -gt 0) {
             $ver = $matches[1]
             if($ver -eq $expected_ver) {
                 write-host "$ver" -f darkgreen
+
+                if ($forceUpdate -and $json.autoupdate) {
+                    Write-Host "Forcing autoupdate!" -f DarkMagenta
+                    autoupdate $app $json $ver
+                }
             } else {
                 write-host "$ver" -f darkred -nonewline
                 write-host " (scoop version is $expected_ver)" -NoNewline
