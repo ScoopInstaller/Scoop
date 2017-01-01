@@ -106,9 +106,22 @@ function update_manifest_with_new_version($json, [String] $version, [String] $ur
             $json.architecture.$architecture.hash = $hash
         }
     }
+}
 
-    if ($json.extract_dir -and $json.autoupdate.extract_dir) {
-        $json.extract_dir = substitute $json.autoupdate.extract_dir @{'$version' = $version}
+function update_manifest_prop([String] $prop, $json)
+{
+    # first try the global property
+    if ($json.$prop -and $json.autoupdate.$prop) {
+        $json.$prop = substitute $json.autoupdate.$prop @{'$version' = $json.version}
+    }
+
+    # check if there are architecture specific variants
+    $json.architecture | Get-Member -MemberType NoteProperty | % {
+        $architecture = $_.Name
+
+        if ($json.architecture.$architecture.$prop) {
+            $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) @{'$version' = $json.version}
+        }
     }
 }
 
@@ -158,7 +171,7 @@ function autoupdate([String] $app, $json, [String] $version)
             $architecture = $_.Name
 
             # create new url
-            $url = prepare_download_url $json.autoupdate.url.$architecture $version
+            $url = prepare_download_url (arch_specific "url" $json.autoupdate $architecture) $version
 
             # check url
             if (!(check_url $url)) {
@@ -167,7 +180,7 @@ function autoupdate([String] $app, $json, [String] $version)
             }
 
             # create hash
-            $hash = get_hash_for_app $app $json.autoupdate.hash $version $url
+            $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url
             if ($hash -eq $null) {
                 $valid = $false
                 Write-Host -f DarkRed "Could not find hash!"
@@ -183,6 +196,9 @@ function autoupdate([String] $app, $json, [String] $version)
             }
         }
     }
+
+    # update properties
+    update_manifest_prop "extract_dir" $json
 
     if ($has_changes -and !$has_errors) {
         # write file

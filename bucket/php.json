@@ -43,9 +43,13 @@ cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
         "re": "<h3 id=\"php-7.1\".*?>.*?\\(([\\d.]+)\\)</h3>"
     },
     "autoupdate": {
-        "url": {
-            "64bit": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x64.zip",
-            "32bit": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x86.zip"
+        "architecture": {
+            "64bit": {
+                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x64.zip"
+            },
+            "32bit": {
+                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x86.zip"
+            }
         },
         "hash": {
             "mode": "extract",

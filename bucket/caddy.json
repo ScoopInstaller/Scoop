@@ -29,9 +29,13 @@
         "re": "/releases/tag/v([\\d.]+)"
     },
     "autoupdate": {
-        "url": {
-            "64bit": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_amd64.zip",
-            "32bit": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_386.zip"
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_386.zip"
+            }
         },
         "hash": {
             "mode": "download"

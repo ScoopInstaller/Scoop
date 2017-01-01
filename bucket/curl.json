@@ -14,13 +14,17 @@
     },
     "bin": "curl.exe",
     "checkver": {
-      "url": "https://curl.haxx.se/download.html",
-      "re": "curl ([\\d.]+)"
+        "url": "https://curl.haxx.se/download.html",
+        "re": "curl ([\\d.]+)"
     },
     "autoupdate": {
-        "url": {
-            "64bit": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x64.7z",
-            "32bit": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x86.7z"
+        "architecture": {
+            "64bit": {
+                "url": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x64.7z"
+            },
+            "32bit": {
+                "url": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x86.7z"
+            }
         },
         "hash": {
             "mode": "download"

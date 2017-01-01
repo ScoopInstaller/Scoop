@@ -30,9 +30,13 @@
     ],
     "checkver": "The current release is ImageMagick <a.*?>([0-9\\.p-]+)</a>",
     "autoupdate": {
-        "url": {
-            "64bit": "https://www.imagemagick.org/download/binaries/ImageMagick-$version-portable-Q16-x64.zip",
-            "32bit": "https://www.imagemagick.org/download/binaries/ImageMagick-$version-portable-Q16-x86.zip"
+        "architecture": {
+            "64bit": {
+                "url": "https://www.imagemagick.org/download/binaries/ImageMagick-$version-portable-Q16-x64.zip"
+            },
+            "32bit": {
+                "url": "https://www.imagemagick.org/download/binaries/ImageMagick-$version-portable-Q16-x86.zip"
+            }
         },
         "hash": {
             "mode": "rdf",

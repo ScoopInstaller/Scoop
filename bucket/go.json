@@ -19,9 +19,13 @@
     },
     "checkver": "Build version go([\\d\\.]+)\\.",
     "autoupdate": {
-        "url": {
-            "64bit": "https://storage.googleapis.com/golang/go$version.windows-amd64.zip",
-            "32bit": "https://storage.googleapis.com/golang/go$version.windows-386.zip"
+        "architecture": {
+            "64bit": {
+                "url": "https://storage.googleapis.com/golang/go$version.windows-amd64.zip"
+            },
+            "32bit": {
+                "url": "https://storage.googleapis.com/golang/go$version.windows-386.zip"
+            }
         },
         "hash": {
             "mode": "extract",
