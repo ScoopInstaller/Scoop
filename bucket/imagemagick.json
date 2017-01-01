@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.imagemagick.org/script/index.php",
     "license": "https://www.imagemagick.org/script/license.php",
-    "version": "7.0.4-0",
+    "version": "7.0.4-1",
     "architecture": {
         "64bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-0-portable-Q16-x64.zip",
-            "hash": "f44f0f85c49cb844c171788328dfd02415315470c8ce498e890aeef163a8697f"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-1-portable-Q16-x64.zip",
+            "hash": "556c15330c27cae52dacc10eda1f034838e68c887524a040b6a1de49a7869eeb"
         },
         "32bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-0-portable-Q16-x86.zip",
-            "hash": "11e75283a12d99cd270f6af03b2b197caf4b43b17e557e6c2cd73e0c6062f638"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-1-portable-Q16-x86.zip",
+            "hash": "af30404e58c97bda5d4e1cceda5d06939878c0b8e8cc43ce58acbd98b6f9f601"
         }
     },
     "env_add_path": ".",
@@ -28,5 +28,15 @@
         "montage.exe",
         "stream.exe"
     ],
-    "checkver": "The current release is ImageMagick <a.*?>([0-9\\.p-]+)</a>"
+    "checkver": "The current release is ImageMagick <a.*?>([0-9\\.p-]+)</a>",
+    "autoupdate": {
+        "url": {
+            "64bit": "https://www.imagemagick.org/download/binaries/ImageMagick-$version-portable-Q16-x64.zip",
+            "32bit": "https://www.imagemagick.org/download/binaries/ImageMagick-$version-portable-Q16-x86.zip"
+        },
+        "hash": {
+            "mode": "rdf",
+            "url": "https://www.imagemagick.org/download/binaries/digest.rdf"
+        }
+    }
 }
