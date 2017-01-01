@@ -7,7 +7,7 @@ TODO
 
 function substitute([String] $str, [Hashtable] $params) {
     $params.GetEnumerator() | % {
-        $str = $str.Replace($_.Name, $_.Value);
+        $str = $str.Replace($_.Name, $_.Value)
     }
 
     return $str
@@ -17,7 +17,7 @@ function check_url([String] $url) {
     if ($url.Contains("github.com")) {
         # github does not allow HEAD requests
         warn "Unable to check github url (assuming it is ok)"
-        return $true;
+        return $true
     }
 
     $response = Invoke-WebRequest -Uri $url -Method HEAD
@@ -42,7 +42,7 @@ function find_hash_in_rdf([String] $url, [String] $filename)
     return $digest.sha256
 }
 
-function getHash([String] $app, $config, [String] $version, [String] $url)
+function get_hash_for_app([String] $app, $config, [String] $version, [String] $url)
 {
     $hash = $null
 
@@ -55,7 +55,7 @@ function getHash([String] $app, $config, [String] $version, [String] $url)
     $hashmode = $config.mode
     $basename = fname($url)
     if ($hashmode -eq "extract") {
-        $hashfile_url = substitute $config.url @{'$version' = $version; '$url' = $url};
+        $hashfile_url = substitute $config.url @{'$version' = $version; '$url' = $url}
         $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
 
         $regex = $config.find
@@ -84,7 +84,7 @@ function getHash([String] $app, $config, [String] $version, [String] $url)
     return $hash
 }
 
-function updateJsonFileWithNewVersion($json, [String] $version, [String] $url, [String] $hash, $architecture = $null)
+function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null)
 {
     $json.version = $version
 
@@ -112,7 +112,7 @@ function updateJsonFileWithNewVersion($json, [String] $version, [String] $url, [
     }
 }
 
-function prepareDownloadUrl([String] $template, [String] $version)
+function prepare_download_url([String] $template, [String] $version)
 {
     <#
     TODO There should be a second option to extract the url from the page
@@ -129,7 +129,7 @@ function autoupdate([String] $app, $json, [String] $version)
 
     if ($json.url) {
         # create new url
-        $url = prepareDownloadUrl $json.autoupdate.url $version
+        $url = prepare_download_url $json.autoupdate.url $version
 
         # check url
         if (!(check_url $url)) {
@@ -138,7 +138,7 @@ function autoupdate([String] $app, $json, [String] $version)
         }
 
         # create hash
-        $hash = getHash $app $json.autoupdate.hash $version $url
+        $hash = get_hash_for_app $app $json.autoupdate.hash $version $url
         if ($hash -eq $null) {
             $valid = $false
             Write-Host -f DarkRed "Could not find hash!"
@@ -147,7 +147,7 @@ function autoupdate([String] $app, $json, [String] $version)
         # write changes to the json object
         if ($valid) {
             $has_changes = $true
-            updateJsonFileWithNewVersion $json $version $url $hash
+            update_manifest_with_new_version $json $version $url $hash
         } else {
             $has_errors = $true
             Write-Host -f DarkRed "Could not update $app"
@@ -158,7 +158,7 @@ function autoupdate([String] $app, $json, [String] $version)
             $architecture = $_.Name
 
             # create new url
-            $url = prepareDownloadUrl $json.autoupdate.url.$architecture $version
+            $url = prepare_download_url $json.autoupdate.url.$architecture $version
 
             # check url
             if (!(check_url $url)) {
@@ -167,7 +167,7 @@ function autoupdate([String] $app, $json, [String] $version)
             }
 
             # create hash
-            $hash = getHash $app $json.autoupdate.hash $version $url
+            $hash = get_hash_for_app $app $json.autoupdate.hash $version $url
             if ($hash -eq $null) {
                 $valid = $false
                 Write-Host -f DarkRed "Could not find hash!"
@@ -176,7 +176,7 @@ function autoupdate([String] $app, $json, [String] $version)
             # write changes to the json object
             if ($valid) {
                 $has_changes = $true
-                updateJsonFileWithNewVersion $json $version $url $hash $architecture
+                update_manifest_with_new_version $json $version $url $hash $architecture
             } else {
                 $has_errors = $true
                 Write-Host -f DarkRed "Could not update $app $architecture"
