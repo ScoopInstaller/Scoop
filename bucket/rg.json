@@ -13,8 +13,5 @@
         }
     },
     "bin": "rg.exe",
-    "checkver": {
-        "url": "https://github.com/BurntSushi/ripgrep/releases/latest",
-        "re": "\/releases\/tag\/([\\d.]+)"
-    }
+    "checkver": "github"
 }

@@ -25,8 +25,7 @@
         }
     },
     "checkver": {
-        "url": "https://github.com/mholt/caddy/releases/latest",
-        "re": "/releases/tag/v([\\d.]+)"
+        "github": "https://github.com/mholt/caddy"
     },
     "autoupdate": {
         "architecture": {

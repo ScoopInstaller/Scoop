@@ -7,7 +7,6 @@
     "extract_dir":  "modd-0.3-windows64",
     "bin":  "modd.exe",
     "checkver": {
-        "url": "https://github.com/cortesi/modd/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/cortesi/modd"
     }
 }

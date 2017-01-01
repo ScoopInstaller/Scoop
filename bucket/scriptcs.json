@@ -7,7 +7,6 @@
     "extract_dir": "tools",
     "bin": "scriptcs.exe",
     "checkver": {
-        "url": "https://github.com/scriptcs/scriptcs/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/scriptcs/scriptcs"
     }
 }

@@ -9,7 +9,6 @@
         "ffmpeg"
     ],
     "checkver": {
-        "url": "https://github.com/rg3/youtube-dl/releases/latest",
-        "re": "\/releases\/tag\/([\\d.]+)"
+        "github": "https://github.com/rg3/youtube-dl"
     }
 }

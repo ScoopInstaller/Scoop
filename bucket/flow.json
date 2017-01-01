@@ -7,7 +7,6 @@
     "bin":  "flow.exe",
     "extract_dir":  "flow",
     "checkver": {
-        "url": "https://github.com/facebook/flow/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/facebook/flow"
     }
 }

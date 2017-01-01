@@ -8,7 +8,6 @@
         "ninja.exe"
     ],
     "checkver": {
-        "url": "https://github.com/ninja-build/ninja/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/ninja-build/ninja"
     }
 }

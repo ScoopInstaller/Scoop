@@ -16,8 +16,5 @@
     "bin": [
         ["docker-machine.exe", "docker-machine"]
     ],
-    "checkver": {
-        "url": "https://github.com/docker/machine/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
-    }
+    "checkver": "github"
 }

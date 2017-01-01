@@ -49,12 +49,35 @@ $queue | % {
 
     $name, $json = $_
 
-    $url = $json.checkver.url
-    if(!$url) { $url = $json.homepage }
+    $githubRegex = "\/releases\/tag\/(?:v)?([\d.]+)"
+    if ($json.checkver -is [String]) {
+        if ($json.checkver -eq "github") {
+            if (!$json.homepage.StartsWith("https://github.com/")) {
+                write-host "ERROR: $name checkver expects the homepage to be a github repository" -f DarkYellow
+            }
+
+            $url = $json.homepage + "/releases/latest"
+            $regex = $githubRegex
+        } else {
+            $url = $json.homepage
+            $regex = $json.checkver
+        }
+    } else {
+        if ($json.checkver.github) {
+            $url = $json.checkver.github + "/releases/latest"
+            $regex = $githubRegex
+        } else {
+            $url = $json.checkver.url
+            if(!$url) { $url = $json.homepage }
+
+            $regex = $json.checkver.re
+        }
+    }
 
     $state = new-object psobject @{
         app = (strip_ext $name);
         url = $url;
+        regex = $regex;
         json = $json;
     }
 
@@ -73,14 +96,10 @@ while($in_progress -gt 0) {
     $json = $state.json
     $url = $state.url
     $expected_ver = $json.version
+    $regexp = $state.regex
 
     $err = $ev.sourceeventargs.error
     $page = $ev.sourceeventargs.result
-
-    $regexp = $json.checkver.re
-    if(!$regexp) { $regexp = $json.checkver }
-
-    $regexp = "(?s)$regexp"
 
     write-host "$app`: " -nonewline
 
