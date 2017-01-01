@@ -28,6 +28,20 @@ function check_url([String] $url) {
     return $false
 }
 
+function find_hash_in_rdf([String] $url, [String] $filename)
+{
+    Write-Host -f DarkYellow "RDF URL: $url"
+    Write-Host -f DarkYellow "File: $filename"
+
+    # Download and parse RDF XML file
+    [xml]$data = (new-object net.webclient).downloadstring($url)
+
+    # Find file content
+    $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
+
+    return $digest.sha256
+}
+
 function getHash([String] $app, $config, [String] $version, [String] $url)
 {
     $hash = $null
@@ -37,12 +51,12 @@ function getHash([String] $app, $config, [String] $version, [String] $url)
     `extract` Should be able to extract from origin page source (checkver)
     `download` Last resort, download the real file and hash it
     #>
-    $hashmode = $config.mode;
+    $hashmode = $config.mode
+    $basename = fname($url)
     if ($hashmode -eq "extract") {
         $hashfile_url = substitute $config.url @{'$version' = $version; '$url' = $url};
         $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
 
-        $basename = fname($url)
         $regex = substitute $config.find @{'$basename' = [regex]::Escape($basename)}
 
         if ($hashfile -match $regex) {
@@ -56,6 +70,8 @@ function getHash([String] $app, $config, [String] $version, [String] $url)
         dl_with_cache $app $version $url $null $null $true
         $file = fullpath (cache_path $app $version $url)
         return compute_hash $file "sha256"
+    } elseif ($hashmode -eq "rdf") {
+        return find_hash_in_rdf $config.url $basename
     } else {
         Write-Host "Unknown hashmode $hashmode"
     }
