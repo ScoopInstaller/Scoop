@@ -28,6 +28,20 @@ function check_url([String] $url) {
     return $false
 }
 
+function find_hash_in_rdf([String] $url, [String] $filename)
+{
+    Write-Host -f DarkYellow "RDF URL: $url"
+    Write-Host -f DarkYellow "File: $filename"
+
+    # Download and parse RDF XML file
+    [xml]$data = (new-object net.webclient).downloadstring($url)
+
+    # Find file content
+    $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
+
+    return $digest.sha256
+}
+
 function getHash([String] $app, $config, [String] $version, [String] $url)
 {
     $hash = $null
@@ -35,23 +49,30 @@ function getHash([String] $app, $config, [String] $version, [String] $url)
     <#
     TODO implement more hashing types
     `extract` Should be able to extract from origin page source (checkver)
+    `rdf` Find hash from a RDF Xml file
     `download` Last resort, download the real file and hash it
     #>
-    $hashmode = $config.mode;
+    $hashmode = $config.mode
+    $basename = fname($url)
     if ($hashmode -eq "extract") {
         $hashfile_url = substitute $config.url @{'$version' = $version; '$url' = $url};
         $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
 
-        $basename = fname($url)
-        $regex = substitute $config.find @{'$basename' = [regex]::Escape($basename)}
+        $regex = $config.find
+        if ($regex -eq $null) {
+            $regex = "([a-z0-9]+)"
+        }
+        $regex = substitute $regex @{'$basename' = [regex]::Escape($basename)}
 
         if ($hashfile -match $regex) {
             $hash = $matches[1]
 
-            if ($config.type -eq "sha1") {
-                $hash = "sha1:$hash"
+            if ($config.type -and !($config.type -eq "sha256")) {
+                $hash = $config.type + ":$hash"
             }
         }
+    } elseif ($hashmode -eq "rdf") {
+        return find_hash_in_rdf $config.url $basename
     } elseif ($hashmode -eq "download") {
         dl_with_cache $app $version $url $null $null $true
         $file = fullpath (cache_path $app $version $url)
@@ -96,7 +117,7 @@ function prepareDownloadUrl([String] $template, [String] $version)
     <#
     TODO There should be a second option to extract the url from the page
     #>
-    return substitute $template @{'$version' = $version}
+    return substitute $template @{'$version' = $version; '$underscoreVersion' = ($version -replace "\.", "_")}
 }
 
 function autoupdate([String] $app, $json, [String] $version)

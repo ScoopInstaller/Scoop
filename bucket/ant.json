@@ -1,10 +1,10 @@
 {
     "homepage": "http://ant.apache.org/",
-    "version": "1.9.7",
+    "version": "1.10.0",
     "license": "Apache 2.0",
-    "url": "http://www-us.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.zip",
-    "hash": "b28c5ea0b5ea90bb4ad6bab229b6a56ac4461760a251a12567803a69259cd9de",
-    "extract_dir": "apache-ant-1.9.7",
+    "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-1.10.0-bin.zip",
+    "hash": "sha512:6c2de8f8223fa852817155be0e7cd2057bfc7eb2c1b2a58c0f9c88172ea4b8c23167812bd32b9ec3ff423556e4e88ff1e85720d2515f62d0349b66cbc03aa5ee",
+    "extract_dir": "apache-ant-1.10.0",
     "env_add_path": "bin",
     "env_set": {
         "ANT_HOME": "$dir"
@@ -12,6 +12,15 @@
     "depends": "openjdk",
     "checkver": {
         "url": "https://ant.apache.org/bindownload.cgi",
-        "re": "Currently, Apache Ant ([\\d.]+) is the best"
+        "re": "Currently, Apache Ant (?:[\\d.]+ and )?([\\d.]+) (?:is|are) the best"
+    },
+    "autoupdate": {
+        "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip",
+        "extract_dir": "apache-ant-$version",
+        "hash": {
+            "mode": "extract",
+            "type": "sha512",
+            "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip.sha512"
+        }
     }
 }
