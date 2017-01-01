@@ -49,6 +49,7 @@ function getHash([String] $app, $config, [String] $version, [String] $url)
     <#
     TODO implement more hashing types
     `extract` Should be able to extract from origin page source (checkver)
+    `rdf` Find hash from a RDF Xml file
     `download` Last resort, download the real file and hash it
     #>
     $hashmode = $config.mode
@@ -70,12 +71,12 @@ function getHash([String] $app, $config, [String] $version, [String] $url)
                 $hash = $config.type + ":$hash"
             }
         }
+    } elseif ($hashmode -eq "rdf") {
+        return find_hash_in_rdf $config.url $basename
     } elseif ($hashmode -eq "download") {
         dl_with_cache $app $version $url $null $null $true
         $file = fullpath (cache_path $app $version $url)
         return compute_hash $file "sha256"
-    } elseif ($hashmode -eq "rdf") {
-        return find_hash_in_rdf $config.url $basename
     } else {
         Write-Host "Unknown hashmode $hashmode"
     }
