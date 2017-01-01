@@ -61,9 +61,6 @@
                 "url": "https://downloads.mariadb.org/f/mariadb-$version/win32-packages/mariadb-$version-win32.zip",
                 "extract_dir": "mariadb-$version-win32"
             }
-        },
-        "hash": {
-            "mode": "download"
         }
     }
 }

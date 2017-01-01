@@ -25,9 +25,6 @@
             "32bit": {
                 "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v$version/pt_windows_386.zip"
             }
-        },
-        "hash": {
-            "mode": "download"
         }
     }
 }

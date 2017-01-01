@@ -12,9 +12,6 @@
     },
     "autoupdate": {
         "url": "http://nginx.org/download/nginx-$version.zip",
-        "hash": {
-            "mode": "download"
-        },
         "extract_dir": "nginx-$version"
     }
 }

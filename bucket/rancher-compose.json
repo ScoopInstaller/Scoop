@@ -28,9 +28,6 @@
                 "url": "https://github.com/rancher/rancher-compose/releases/download/v$version/rancher-compose-windows-amd64-v$version.zip"
             }
         },
-        "hash": {
-            "mode": "download"
-        },
         "extract_dir": "rancher-compose-v$version"
     }
 }

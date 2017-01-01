@@ -11,9 +11,6 @@
         "re": "/releases/tag/v([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://github.com/yarnpkg/yarn/releases/download/v$version/yarn-$version.msi",
-        "hash": {
-            "mode": "download"
-        }
+        "url": "https://github.com/yarnpkg/yarn/releases/download/v$version/yarn-$version.msi"
     }
 }

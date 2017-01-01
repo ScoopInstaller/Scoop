@@ -73,15 +73,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         }
     } elseif ($hashmode -eq "rdf") {
         return find_hash_in_rdf $config.url $basename
-    } elseif ($hashmode -eq "download") {
+    } else {
+        Write-Host "Download files to compute hashes!" -f DarkYellow
         dl_with_cache $app $version $url $null $null $true
         $file = fullpath (cache_path $app $version $url)
         return compute_hash $file "sha256"
-    } else {
-        Write-Host "Unknown hashmode $hashmode"
     }
-
-    return $hash
 }
 
 function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null)

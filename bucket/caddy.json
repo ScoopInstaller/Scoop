@@ -35,9 +35,6 @@
             "32bit": {
                 "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_386.zip"
             }
-        },
-        "hash": {
-            "mode": "download"
         }
     }
 }

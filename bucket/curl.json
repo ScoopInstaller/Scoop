@@ -25,9 +25,6 @@
             "32bit": {
                 "url": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x86.7z"
             }
-        },
-        "hash": {
-            "mode": "download"
         }
     }
 }
