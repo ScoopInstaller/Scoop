@@ -10,7 +10,6 @@
         "bin\\syncany.bat"
     ],
     "checkver": {
-        "url": "https://github.com/syncany/syncany/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/syncany/syncany"
     }
 }

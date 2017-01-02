@@ -22,9 +22,13 @@ npm update -g",
         "re": "LTS version: <strong>v([\\d.]+)</strong>"
     },
     "autoupdate": {
-        "url": {
-            "64bit": "https://nodejs.org/dist/v$version/node-v$version-x64.msi",
-            "32bit": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+        "architecture": {
+            "64bit": {
+                "url": "https://nodejs.org/dist/v$version/node-v$version-x64.msi"
+            },
+            "32bit": {
+                "url": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+            }
         },
         "hash": {
             "mode": "extract",

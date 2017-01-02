@@ -11,9 +11,6 @@
         "re": "vagrant_([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version.msi",
-        "hash": {
-            "mode": "download"
-        }
+        "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version.msi"
     }
 }

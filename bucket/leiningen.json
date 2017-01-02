@@ -6,9 +6,5 @@
     "bin": "lein.bat",
     "hash": "32385e54b54ec99ac8a37792347ca4f1a3c7feb792066d7ffc8f1e4c5b7c7ad1",
     "notes": "The command 'lein self-install' is required to complete the installation",
-    "checkver": {
-        "url": "https://github.com/technomancy/leiningen/releases/latest",
-        "re": "\/releases\/tag\/([\\d.]+)"
-    }
+    "checkver": "github"
 }
-

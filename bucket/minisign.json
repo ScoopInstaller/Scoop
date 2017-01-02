@@ -7,7 +7,6 @@
     "extract_dir": "minisign-win32",
     "bin": "minisign.exe",
     "checkver": {
-        "url": "https://github.com/jedisct1/minisign/releases/latest",
-        "re": "\/releases\/tag\/([\\d.]+)"
+        "github": "https://github.com/jedisct1/minisign"
     }
 }

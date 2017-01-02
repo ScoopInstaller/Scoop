@@ -7,7 +7,6 @@
         "bin\\forge.exe"
     ],
     "checkver": {
-        "url": "https://github.com/fsharp-editing/Forge/releases/latest",
-        "re": "\/releases\/tag\/([\\d.]+)"
+        "github": "https://github.com/fsharp-editing/Forge"
     }
 }

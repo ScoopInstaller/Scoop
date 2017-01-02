@@ -340,7 +340,7 @@ function check_hash($file, $url, $manifest, $arch) {
         $type, $expected = 'sha256', $type
     }
 
-    if(@('md5','sha1','sha256') -notcontains $type) {
+    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
         return $false, "hash type $type isn't supported"
     }
 

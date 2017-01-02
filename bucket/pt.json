@@ -1,28 +1,30 @@
 {
     "homepage": "https://github.com/monochromegane/the_platinum_searcher",
     "licence": "MIT",
-    "version": "2.1.4",
+    "version": "2.1.5",
     "architecture": {
         "64bit": {
-            "url": [
-                "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.1.4/pt_windows_amd64.zip"
-            ],
-            "hash": [
-                "6b227dc5e7e8bea2a0f20ae6301aceda60d394c86fb327db0caa8450fe89c86c"
-            ]
+            "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.1.5/pt_windows_amd64.zip",
+            "hash": "0f02db8eba977bc50b743ed18b4ba8efb769b7ade5f8a5c84e869d44117924bb"
         },
         "32bit": {
-            "url": [
-                "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.1.4/pt_windows_386.zip"
-            ],
-            "hash": [
-                "0c473879071a7e4d4e0cd47a59db973f296fe7d753a838c9811eac51dd4b8414"
-            ]
+            "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.1.5/pt_windows_386.zip",
+            "hash": "5756ebf64d3d65aa4ef7bb176f5170ea8abfd5e23bf349d7c64a408b2201732b"
         }
     },
     "bin": "pt.exe",
     "checkver": {
         "url": "https://github.com/monochromegane/the_platinum_searcher/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "re": "/releases/tag/v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v$version/pt_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v$version/pt_windows_386.zip"
+            }
+        }
     }
 }

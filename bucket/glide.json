@@ -1,5 +1,5 @@
 {
-    "homepage": "https://github.com/Masterminds",
+    "homepage": "https://glide.sh/",
     "license": "https://github.com/Masterminds/glide/blob/master/LICENSE",
     "version": "0.12.3",
     "architecture": {
@@ -16,7 +16,6 @@
     },
     "bin": "glide.exe",
     "checkver": {
-        "url": "https://github.com/Masterminds/glide/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/Masterminds/glide"
     }
 }

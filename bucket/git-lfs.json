@@ -17,7 +17,6 @@
     "homepage": "https://git-lfs.github.com/",
     "bin": "git-lfs.exe",
     "checkver": {
-        "url": "https://github.com/github/git-lfs/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/github/git-lfs"
     }
 }

@@ -12,8 +12,5 @@
     "bin": [
         ["docker-compose.exe", "docker-compose"]
     ],
-    "checkver": {
-        "url": "https://github.com/docker/compose/releases/latest",
-        "re": "\/releases\/tag\/([\\d.]+)"
-    }
+    "checkver": "github"
 }

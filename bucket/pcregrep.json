@@ -19,7 +19,6 @@
        ,[ "pcre2test.exe", "pcretest" ]
     ],
     "checkver": {
-        "url": "https://github.com/rivy/PCRE/releases/latest",
-        "re": "\/releases\/tag\/([\\d.]+)"
+        "github": "https://github.com/rivy/PCRE"
     }
 }

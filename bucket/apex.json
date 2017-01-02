@@ -16,7 +16,6 @@
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\apex_*.exe)[0] $dir\\apex.exe",
     "bin": [ "apex.exe" ],
     "checkver": {
-        "url": "https://github.com/apex/apex/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/apex/apex"
     }
 }

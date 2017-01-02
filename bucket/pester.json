@@ -29,8 +29,5 @@
         'importing pester for current session...'
         iex \"$import\"
     ",
-    "checkver": {
-        "url": "https://github.com/pester/pester/releases/latest",
-        "re": "\/releases\/tag\/([\\d.]+)"
-    }
+    "checkver": "github"
 }

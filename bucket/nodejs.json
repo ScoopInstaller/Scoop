@@ -1,15 +1,15 @@
 {
     "homepage": "http://nodejs.org",
-    "version": "7.2.1",
+    "version": "7.3.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v7.2.1/node-v7.2.1-x64.msi",
-            "hash": "789af29eba3a43213dfab7a71ada7e2c513a9fa023f0987b2076b10754da907e"
+            "url": "https://nodejs.org/dist/v7.3.0/node-v7.3.0-x64.msi",
+            "hash": "4a08a27f816140f31cd826d14c31c84634e3c4e05f3cf71143496dbe96c241a9"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v7.2.1/node-v7.2.1-x86.msi",
-            "hash": "8302c95d26d343c131f403c088f8812540f4bebc5a01a98972599c03658e547b"
+            "url": "https://nodejs.org/dist/v7.3.0/node-v7.3.0-x86.msi",
+            "hash": "0451c0350a6d8feb78e8e81ca3dcb37183a3fd30c790055a8d1932b1eab0c5e4"
         }
     },
     "env_add_path": "nodejs",
@@ -22,9 +22,13 @@ npm update -g",
         "re": "Current version: <strong>v([\\d.]+)</strong>"
     },
     "autoupdate": {
-        "url": {
-            "64bit": "https://nodejs.org/dist/v$version/node-v$version-x64.msi",
-            "32bit": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+        "architecture": {
+            "64bit": {
+                "url": "https://nodejs.org/dist/v$version/node-v$version-x64.msi"
+            },
+            "32bit": {
+                "url": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+            }
         },
         "hash": {
             "mode": "extract",

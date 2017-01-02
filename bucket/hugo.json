@@ -15,7 +15,6 @@
     },
     "homepage": "http://gohugo.io",
     "checkver": {
-        "url": "https://github.com/spf13/hugo/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/spf13/hugo"
     }
 }

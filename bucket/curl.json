@@ -1,6 +1,6 @@
 {
     "homepage": "http://curl.haxx.se/",
-    "version": "7.52.0",
+    "version": "7.52.1",
     "licence": "MIT",
     "architecture": {
         "64bit": {
@@ -14,7 +14,17 @@
     },
     "bin": "curl.exe",
     "checkver": {
-      "url": "https://curl.haxx.se/download.html",
-      "re": "<a href=\"https://bintray\\.com/artifact/download/vszakats/generic/curl-([\\d.]+)-win64-mingw\\.7z\">"
+        "url": "https://curl.haxx.se/download.html",
+        "re": "curl ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x64.7z"
+            },
+            "32bit": {
+                "url": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x86.7z"
+            }
+        }
     }
 }

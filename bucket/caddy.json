@@ -1,25 +1,40 @@
 {
-    "version": "0.9.3",
+    "version": "0.9.4",
     "homepage": "http://caddyserver.com",
     "license": "https://github.com/mholt/caddy/blob/master/LICENSE.txt",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/mholt/caddy/releases/download/v0.9.3/caddy_windows_amd64.zip",
-            "hash": "19df428c8e16710b6376fef768b1a3be1d0297ccf0ec78ab1927d6ec41c1cc71",
+            "url": "https://github.com/mholt/caddy/releases/download/v0.9.4/caddy_windows_amd64.zip",
+            "hash": "8a73143fe859e0ba3b854fdc6ac4a81c7a69f32472fb6dc793fbf0c9a7ad3abc",
             "bin": [
-                ["caddy_windows_amd64.exe", "caddy"]
+                [
+                    "caddy_windows_amd64.exe",
+                    "caddy"
+                ]
             ]
         },
         "32bit": {
-            "url": "https://github.com/mholt/caddy/releases/download/v0.9.3/caddy_windows_386.zip",
-            "hash": "96c1eb95eee45bf304b26d78e2a1315494f5bd2d1f809fbb11d898a30aefab4b",
+            "url": "https://github.com/mholt/caddy/releases/download/v0.9.4/caddy_windows_386.zip",
+            "hash": "0cda4857e4a8a9f237b233e8755838e3e0bac05556e7fea8f035e6636232ad84",
             "bin": [
-                ["caddy_windows_386.exe", "caddy"]
+                [
+                    "caddy_windows_386.exe",
+                    "caddy"
+                ]
             ]
         }
     },
     "checkver": {
-        "url": "https://github.com/mholt/caddy/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/mholt/caddy"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_386.zip"
+            }
+        }
     }
 }

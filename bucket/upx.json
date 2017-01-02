@@ -6,7 +6,6 @@
     "bin": "upx392w\\upx.exe",
     "license": "GPL2",
     "checkver": {
-        "url": "https://github.com/upx/upx/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/upx/upx"
     }
 }

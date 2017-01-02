@@ -16,7 +16,6 @@
     },
     "depends": "openjdk",
     "checkver": {
-        "url": "https://github.com/JetBrains/kotlin/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/JetBrains/kotlin"
     }
 }

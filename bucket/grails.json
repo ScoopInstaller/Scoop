@@ -13,7 +13,6 @@
     },
     "depends": "openjdk",
     "checkver": {
-        "url": "https://github.com/grails/grails-core/releases/latest",
-        "re": "\/releases\/tag\/v([\\d.]+)"
+        "github": "https://github.com/grails/grails-core"
     }
 }
