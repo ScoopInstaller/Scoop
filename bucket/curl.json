@@ -1,14 +1,14 @@
 {
-    "homepage": "http://curl.haxx.se/",
+    "homepage": "https://curl.haxx.se/",
     "version": "7.52.1",
     "licence": "MIT",
     "architecture": {
         "64bit": {
-            "url": "http://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x64.7z",
+            "url": "https://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x64.7z",
             "hash": "aeaba94333c65817760299f3ddb13992f0ba79a71e19fc81504462788ebc705d"
         },
         "32bit": {
-            "url": "http://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x86.7z",
+            "url": "https://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x86.7z",
             "hash": "e93d07bc54a7909af7533d829605668c98667153646fe5109222b69a0dd050fc"
         }
     },
@@ -20,10 +20,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x64.7z"
+                "url": "https://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x64.7z"
             },
             "32bit": {
-                "url": "http://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x86.7z"
+                "url": "https://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x86.7z"
             }
         }
     }
