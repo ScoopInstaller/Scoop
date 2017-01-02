@@ -28,7 +28,7 @@
         "usr\\bin\\ssh-keyscan.exe"
     ],
     "post_install": [
-        "git config --global credential.helper wincred"
+        "git config --global credential.helper manager"
     ],
     "checkver": {
         "url": "https://github.com/git-for-windows/git/releases/latest",
