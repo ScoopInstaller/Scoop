@@ -21,5 +21,8 @@
         "bin/ctest.exe",
         "bin/cmake-gui.exe"
     ],
-    "checkver": "CMake\\s+([\\d.]+)\\s+available\\s+for\\s+download"
+    "checkver": {
+        "re": "Latest\\s+Release\\s+\\(([\\d+.]+)\\)",
+        "url": "https://cmake.org/download/"
+    }
 }
