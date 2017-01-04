@@ -589,8 +589,10 @@ function rm_shim($name, $shimdir) {
     }
 }
 
-function rm_shims($manifest, $global) {
-    $manifest.bin | ?{ $_ -ne $null } | % {
+function rm_shims($manifest, $global, $arch) {
+    $shims = @(arch_specific 'bin' $manifest $arch)
+
+    $shims | ?{ $_ -ne $null } | % {
         $target, $name, $null = shim_def $_
         $shimdir = shimdir $global
 

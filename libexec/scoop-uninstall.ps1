@@ -60,7 +60,7 @@ foreach($app in $apps) {
     $architecture = $install.architecture
 
     run_uninstaller $manifest $architecture $dir
-    rm_shims $manifest $global
+    rm_shims $manifest $global $architecture
     rm_startmenu_shortcuts $manifest $global
 
     # If a junction was used during install, that will have been used
