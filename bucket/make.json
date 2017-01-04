@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.gnu.org/software/make/",
-    "version": "4.1",
+    "version": "4.2",
     "license": "GPLv3",
     "architecture": {
       "64bit": {
         "url": "ftp://ftp.equation.com/make/64/make.exe",
-        "hash": "4583831003A5245AF90B2D75300F39EB777DEC736CC62CF7131706C2BC4B89D2"
+        "hash": "9a9a1bc6276739478bd62678099b00e07275bb3562d19d14991b72c6876cdfcc"
       },
       "32bit":{
         "url": "ftp://ftp.equation.com/make/32/make.exe",
-        "hash": "4F01F7E63FE54F497B4FE3F4E525F56D9F1D2B0399FD8E6C5478580034C21EA4"
+        "hash": "9a9a1bc6276739478bd62678099b00e07275bb3562d19d14991b72c6876cdfcc"
       }
     },
     "bin": "make.exe",
