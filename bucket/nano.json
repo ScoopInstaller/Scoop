@@ -1,9 +1,9 @@
 {
-    "homepage": "http://www.nano-editor.org/",
-    "version": "2.2.6",
+    "homepage": "https://www.nano-editor.org/",
+    "version": "2.5.3",
     "license": "GPL",
-    "url": "http://www.nano-editor.org/dist/v2.2/NT/nano-2.2.6.zip",
-    "hash": "87ae7984ab2ded388f5d30388483e8906aa46ac72ff4f2ea12063d0e8deffd62",
-    "bin": "nano.exe",
-    "checkver": "Latest Version\\s+([0-9\\.]+)"
+    "url": "https://www.nano-editor.org/dist/v2.5/NT/nano-2.5.3.zip",
+    "hash": "c012456b9f29e488b0e9a688aa43a34326dd573f9e99765cbdac2b81a4bc1060",
+    "bin": "nano-2.5.3-win32\\nano.exe",
+    "checkver": "Latest Version\\s+([\\d.]+)"
 }

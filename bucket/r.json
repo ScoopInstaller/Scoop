@@ -1,16 +1,16 @@
 {
     "homepage": "https://www.r-project.org",
-    "version": "3.3.0",
+    "version": "3.3.2",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://cran.rstudio.com/bin/windows/base/R-3.3.0-win.exe",
-            "hash": "5D1A6E6FB757F4CAC916C96651A4446BA4756507707C413EA02DD067770314BA",
+            "url": "https://cran.rstudio.com/bin/windows/base/R-3.3.2-win.exe",
+            "hash": "2E16180226268B9B07FA8668A3AC80F9BEA25EC82A2275150B2F3E2CA1C1FC14",
             "pre_install": "copy-item -recurse $dir\\bin\\x64 $dir\\bin\\curr_arch"
         },
         "32bit": {
-            "url": "https://cran.rstudio.com/bin/windows/base/R-3.3.0-win.exe",
-            "hash": "5D1A6E6FB757F4CAC916C96651A4446BA4756507707C413EA02DD067770314BA",
+            "url": "https://cran.rstudio.com/bin/windows/base/R-3.3.2-win.exe",
+            "hash": "2E16180226268B9B07FA8668A3AC80F9BEA25EC82A2275150B2F3E2CA1C1FC14",
             "pre_install": "copy-item -recurse $dir\\bin\\i386 $dir\\bin\\curr_arch"
         }
     },
@@ -31,6 +31,6 @@ Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--thi
 ",
     "checkver": {
         "url": "https://cran.rstudio.com/bin/windows/base/",
-        "re": "<h1>R-([0-9\\.]+)"
+        "re": "<h1>R-([\\d.]+)"
     }
 }

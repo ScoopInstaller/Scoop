@@ -12,5 +12,9 @@
     "env_set": {
         "HAXEPATH": "$dir"
     },
-    "depends": "neko"
+    "depends": "neko",
+    "checkver": {
+        "url": "http://haxe.org/download/list/",
+        "re": "The current stable version is <a [^>]+>([\\d.\\-rc]+)"
+    }
 }

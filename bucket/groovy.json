@@ -1,5 +1,5 @@
 {
-    "homepage": "http://groovy.codehaus.org/",
+    "homepage": "http://www.groovy-lang.org/",
     "version": "2.4.6",
     "license": "Apache 2.0",
     "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.4.6.zip",
@@ -18,5 +18,9 @@
     "set_env": {
         "GROOVY_HOME": "$dir"
     },
-    "depends": "openjdk"
+    "depends": "openjdk",
+    "checkver": {
+        "url": "http://www.groovy-lang.org/download.html",
+        "re": "([\\d.]+) distributions"
+    }
 }

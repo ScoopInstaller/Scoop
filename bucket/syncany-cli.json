@@ -8,5 +8,8 @@
     "bin": [
         "bin\\sy.bat",
         "bin\\syncany.bat"
-    ]
+    ],
+    "checkver": {
+        "github": "https://github.com/syncany/syncany"
+    }
 }

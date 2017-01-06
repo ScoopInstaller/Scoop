@@ -7,5 +7,9 @@
     "extract_dir": "sbt",
     "bin": [
         "bin\\sbt.bat"
-    ]
+    ],
+    "checkver": {
+        "url": "http://www.scala-sbt.org/download.html",
+        "re": "\\/sbt/([\\d.]+)\\/"
+    }
 }

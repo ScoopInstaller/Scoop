@@ -1,19 +1,19 @@
 {
-    "homepage": "http://farmanager.com/",
-    "version": "3.0.4545",
+    "homepage": "https://farmanager.com/",
+    "version": "3.0build4774",
     "architecture": {
         "64bit": {
-            "url": "http://farmanager.com/files/Far30b4545.x64.20160210.7z",
-            "hash": "cc77f5042060a83d2875d9ee48d7604b41208ff45953c6f334edb6b201b79990"
+            "url": "https://farmanager.com/files/Far30b4774.x64.20160902.7z",
+            "hash": "de3208a111ca824673af2da206c5286df5e9300ce270bee1f99aaadb01a27950"
         },
         "32bit": {
-            "url": "http://farmanager.com/files/Far30b4545.x86.20160210.7z",
-            "hash": "66928b4da3fd342166462e4adcf7dc044bc4629f964c7c4b57efa797612ed26f"
+            "url": "https://farmanager.com/files/Far30b4774.x86.20160902.7z",
+            "hash": "b86ff3e506f9704c951c8cde6fb49dbdcdc52b4a19a71031fb2c7b18cd0d906d"
         }
     },
     "checkver": {
-        "url": "http://farmanager.com/download.php?p=64",
-        "re": "<b>Far Manager v([0-9\\.]+) build ([0-9][0-9][0-9][0-9]) x64</b>"
+        "url": "https://farmanager.com/download.php",
+        "re": "<b>Far Manager v([\\d.]+ build [0-9]+) x64</b>"
     },
     "bin": "far.exe"
 }

@@ -5,5 +5,9 @@
     "url": "http://nekovm.org/_media/neko-2.0.0-win.zip",
     "hash": "66d3a332b670e5890a451c85eb104db4049aa1ea80fc838be493dd13f4869212",
     "extract_dir": "neko-2.0.0-win",
-    "env_add_path": "./"
+    "env_add_path": "./",
+    "checkver": {
+        "url": "http://nekovm.org/download",
+        "re": "Neko ([\\d.]+)"
+    }
 }

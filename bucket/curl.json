@@ -1,19 +1,30 @@
 {
-    "homepage": "http://curl.haxx.se/",
-    "version": "7.48.0",
+    "homepage": "https://curl.haxx.se/",
+    "version": "7.52.1",
     "licence": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.48.0-win64-mingw.7z",
-            "hash": "c551debf524811ee56c46110e0bad82897adc6880cb2a0d70e69f33bdfe6cbbb",
-            "extract_dir": "curl-7.48.0-win64-mingw"
+            "url": "https://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x64.7z",
+            "hash": "aeaba94333c65817760299f3ddb13992f0ba79a71e19fc81504462788ebc705d"
         },
         "32bit": {
-            "url": "https://bintray.com/artifact/download/vszakats/generic/curl-7.48.0-win32-mingw.7z",
-            "hash": "bc29ca8bb15a52000b61f786cbc35839392d03f40c0b597071c8f087efd28715",
-            "extract_dir": "curl-7.48.0-win32-mingw"
+            "url": "https://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x86.7z",
+            "hash": "e93d07bc54a7909af7533d829605668c98667153646fe5109222b69a0dd050fc"
         }
     },
-    "bin": "bin/curl.exe",
-    "checkver": "The most recent stable version is\\s*<b>([0-99\\.]+)"
+    "bin": "curl.exe",
+    "checkver": {
+        "url": "https://curl.haxx.se/download.html",
+        "re": "curl ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x64.7z"
+            },
+            "32bit": {
+                "url": "https://winampplugins.co.uk/curl/curl_$underscoreVersion_openssl_nghttp2_x86.7z"
+            }
+        }
+    }
 }

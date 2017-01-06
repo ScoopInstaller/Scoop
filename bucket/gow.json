@@ -6,7 +6,7 @@
     "extract_dir": "",
     "checkver": {
         "url": "https://github.com/bmatzelle/gow/releases",
-        "re": "<a.*?>Gow ([0-9\\.]+)</a>"
+        "re": "<a.*?>Gow ([\\d.]+)</a>"
     },
     "pre_install": "
         \"@cscript //NoLogo \"\"$dir\\bin\\gow.vbs\"\" %1\" | Set-Content -force \"$dir\\bin\\gow.bat\"

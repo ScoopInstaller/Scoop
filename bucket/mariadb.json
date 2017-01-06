@@ -1,17 +1,17 @@
 {
     "homepage": "http://mariadb.org",
-    "version": "10.0.25",
+    "version": "10.1.20",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.0.25/winx64-packages/mariadb-10.0.25-winx64.zip",
-            "hash": "md5:5474522e9987985b4eb3122bf8b9c2aa",
-            "extract_dir": "mariadb-10.0.25-winx64"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.1.20/winx64-packages/mariadb-10.1.20-winx64.zip",
+            "hash": "21e411b8c33c677bec954cea7b58f5bbd98037bba758a8b7fd8d8d9d861bf3ac",
+            "extract_dir": "mariadb-10.1.20-winx64"
         },
         "32bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.0.21/win32-packages/mariadb-10.0.21-win32.zip",
-            "hash": "md5:578a87c3a081653f32433f411d62cc27",
-            "extract_dir": "mariadb-10.0.25-win32"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.1.20/win32-packages/mariadb-10.1.20-win32.zip",
+            "hash": "0e16c27c3e64f53f7e8d5b0e979ad2a30d00bcbab70a9d444d1d5e8e6c381de6",
+            "extract_dir": "mariadb-10.1.20-win32"
         }
     },
     "bin": [
@@ -20,6 +20,7 @@
         "bin\\aria_ftdump.exe",
         "bin\\aria_pack.exe",
         "bin\\aria_read_log.exe",
+        "bin\\innochecksum.exe",
         "bin\\myisamchk.exe",
         "bin\\myisamlog.exe",
         "bin\\myisampack.exe",
@@ -45,5 +46,21 @@
         "bin\\mysql_upgrade_service.exe",
         "bin\\mysql_upgrade_wizard.exe",
         "bin\\my_print_defaults.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://downloads.mariadb.org/",
+        "re": "Download ([\\d.]+) Stable"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.mariadb.org/f/mariadb-$version/winx64-packages/mariadb-$version-winx64.zip",
+                "extract_dir": "mariadb-$version-winx64"
+            },
+            "32bit": {
+                "url": "https://downloads.mariadb.org/f/mariadb-$version/win32-packages/mariadb-$version-win32.zip",
+                "extract_dir": "mariadb-$version-win32"
+            }
+        }
+    }
 }

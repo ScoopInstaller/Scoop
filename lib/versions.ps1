@@ -9,7 +9,7 @@ function versions($app, $global) {
     $appdir = appdir $app $global
     if(!(test-path $appdir)) { return @() }
 
-    sort_versions (gci $appdir -dir | % { $_.name })
+    sort_versions (gci $appdir -dir -attr !reparsePoint | % { $_.name })
 }
 
 function version($ver) {

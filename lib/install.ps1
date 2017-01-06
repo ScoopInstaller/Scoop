@@ -37,6 +37,7 @@ function install_app($app, $architecture, $global) {
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
+    $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
@@ -108,7 +109,10 @@ function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) 
         mv "$cached.download" $cached -force
         write-host "done"
     } else { write-host "loading $url from cache..."}
-    cp $cached $to
+
+    if (!($to -eq $null)) {
+        cp $cached $to
+    }
 }
 
 function do_dl($url, $to, $cookies) {
@@ -149,7 +153,13 @@ function dl_progress($url, $to, $cookies) {
         $total = $wres.contentlength
         write-host "($(filesize $total)) " -nonewline
 
+        $width = [console]::bufferwidth
         $left = [console]::cursorleft
+        if(($left + 4) -gt $width) {
+            # not enough room to print progress on this line
+            write-host
+            $left = 0
+        }
         $top = [console]::cursortop
 
         $s = $wres.getresponsestream()
@@ -158,13 +168,17 @@ function dl_progress($url, $to, $cookies) {
             try {
                 $buffer = new-object byte[] 2048
                 $totalread = 0
+                $lastp = 0
 
                 while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
                     $fs.write($buffer, 0, $read)
                     $totalread += $read
                     $p = [math]::round($totalread / $total * 100, 0)
-                    [console]::setcursorposition($left, $top)
-                    write-host "$p%" -nonewline
+                    if($p -ne $lastp) {
+                        [console]::setcursorposition($left, $top)
+                        write-host "$p%" -nonewline
+                    }
+                    $lastp = $p
                 }
                 [console]::setcursorposition($left, $top)
             } finally {
@@ -326,7 +340,7 @@ function check_hash($file, $url, $manifest, $arch) {
         $type, $expected = 'sha256', $type
     }
 
-    if(@('md5','sha1','sha256') -notcontains $type) {
+    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
         return $false, "hash type $type isn't supported"
     }
 
@@ -526,8 +540,12 @@ function run_uninstaller($manifest, $architecture, $dir) {
         }
 
         if($exe) {
-            $uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
-            if(!$uninstalled) { abort "uninstallation aborted." }
+            if($exe.endswith('.ps1')) {
+                & $exe @arg
+            } else {
+                $uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
+                if(!$uninstalled) { abort "uninstallation aborted." }
+            }
         }
     }
 }
@@ -539,8 +557,8 @@ function shim_def($item) {
 }
 
 function create_shims($manifest, $dir, $global, $arch) {
-    $shims = arch_specific 'bin' $manifest $arch
-    $manifest.bin | ?{ $_ -ne $null } | % {
+    $shims = @(arch_specific 'bin' $manifest $arch)
+    $shims | ?{ $_ -ne $null } | % {
         $target, $name, $arg = shim_def $_
         echo "creating shim for $name"
 
@@ -571,8 +589,10 @@ function rm_shim($name, $shimdir) {
     }
 }
 
-function rm_shims($manifest, $global) {
-    $manifest.bin | ?{ $_ -ne $null } | % {
+function rm_shims($manifest, $global, $arch) {
+    $shims = @(arch_specific 'bin' $manifest $arch)
+
+    $shims | ?{ $_ -ne $null } | % {
         $target, $name, $null = shim_def $_
         $shimdir = shimdir $global
 
@@ -580,39 +600,53 @@ function rm_shims($manifest, $global) {
     }
 }
 
-# Creates shortcut for the app in the start menu
-function create_startmenu_shortcuts($manifest, $dir, $global) {
-    $manifest.shortcuts | ?{ $_ -ne $null } | % {
-        $target = $_.item(0)
-        $name = $_.item(1)
-        startmenu_shortcut "$dir\$target" $name
-    }
+# Gets the path for the 'current' directory junction for
+# the specified version directory.
+function current_dir($versiondir) {
+    $parent = split-path $versiondir
+    return "$parent\current"
 }
 
-function startmenu_shortcut($target, $shortcutName) {
-    if(!(Test-Path $target)) {
-        abort "Can't create the Startmenu shortcut for $(fname $target): couldn't find $target"
+
+# Creates or updates the directory junction for [app]/current,
+# pointing to the specified version directory for the app.
+#
+# Returns the 'current' junction directory if in use, otherwise
+# the version directory.
+function link_current($versiondir) {
+    $currentdir = current_dir $versiondir
+
+    write-host "linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
+
+    if($currentdir -eq $versiondir) {
+        abort "error: version 'current' is not allowed!"
     }
-    $scoop_startmenu_folder = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps"
-    if(!(Test-Path $scoop_startmenu_folder)) {
-        New-Item $scoop_startmenu_folder -type Directory
+
+    if(test-path $currentdir) {
+        # remove the junction
+        cmd /c rmdir $currentdir
     }
-    $wsShell = New-Object -ComObject WScript.Shell
-    $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
-    $wsShell.TargetPath = "$target"
-    $wsShell.Save()
+
+    cmd /c mklink /j $currentdir $versiondir | out-null
+    return $currentdir
 }
 
-# Removes the Startmenu shortcut if it exists
-function rm_startmenu_shortcuts($manifest, $global) {
-    $manifest.shortcuts | ?{ $_ -ne $null } | % {
-        $name = $_.item(1)
-        $shortcut = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps\$name.lnk"
-        if(Test-Path -Path $shortcut) {
-             Remove-Item $shortcut
-             echo "Removed shortcut $shortcut"
-        }
+# Removes the directory junction for [app]/current which
+# points to the current version directory for the app.
+#
+# Returns the 'current' junction directory (if it exists),
+# otherwise the normal version directory.
+function unlink_current($versiondir) {
+    $currentdir = current_dir $versiondir
+
+    if(test-path $currentdir) {
+        write-host "unlinking $(friendly_path $currentdir)"
+
+        # remove the junction
+        cmd /c rmdir $currentdir
+        return $currentdir
     }
+    return $appdir
 }
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead

@@ -1,11 +1,11 @@
-Scoop [![Build status](https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true)](https://ci.appveyor.com/project/lukesampson/scoop)
+Scoop [![Build status](https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true)](https://ci.appveyor.com/project/lukesampson/scoop) [![Gitter chat](https://badges.gitter.im/lukesampson/scoop.png)](https://gitter.im/lukesampson/scoop)
 =====
 
 Scoop is a command-line installer for Windows.
 
 Requirements:
 
-* [PowerShell 3](http://www.microsoft.com/en-us/download/details.aspx?id=34595)
+* [PowerShell 3](https://www.microsoft.com/en-us/download/details.aspx?id=34595)
 * PowerShell must be enabled for your user account e.g. `set-executionpolicy unrestricted -s cu`
 
 To install:

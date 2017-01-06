@@ -1,15 +1,15 @@
 {
-    "homepage": "http://www.mongodb.org",
-    "version": "3.2.6",
-    "license": "http://www.mongodb.org/about/licensing/",
+    "homepage": "https://www.mongodb.org",
+    "version": "3.2.10",
+    "license": "https://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
-            "url": "http://downloads.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.6-signed.msi",
-            "hash": "4a90adce7801e9ffec17598805ff326b084b74050bce227634e8296bc1a51115"
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.10-signed.msi",
+            "hash": "630b614df367d8ca98f7d57e3937cae7c3915e1fb8da100f316c680da8d7f4ef"
         },
         "32bit": {
-            "url": "http://downloads.mongodb.org/win32/mongodb-win32-i386-3.2.6-signed.msi",
-            "hash": "4b8f487e14bf4b3b3c3f789a4ffbafbf77e356ca5944597ce696feb9788c5ca5"
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-i386-3.2.10-signed.msi",
+            "hash": "da330528bd7b284a1cfb649b377ce175a07680a5a8ba946801cdb87682f18f3c"
         }
     },
     "bin": [
@@ -28,7 +28,12 @@
         "MongoDB\\Server\\3.2\\bin\\mongotop.exe"
     ],
     "checkver": {
-        "url": "http://www.mongodb.org/downloads",
+        "url": "https://www.mongodb.com/download-center",
         "re": "Current Stable Release \\(([\\d.]+)\\)"
-    }
+    },
+    "post_install": "
+        # create initial directories
+        mkdir C:\\data
+        mkdir C:\\data\\db
+    "
 }

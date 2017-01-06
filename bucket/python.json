@@ -1,18 +1,18 @@
 {
-    "homepage": "http://www.python.org",
+    "homepage": "https://www.python.org/",
     "license": "https://docs.python.org/3/license.html",
-    "version": "3.5.1",
+    "version": "3.6.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.5.1/python-3.5.1-amd64.exe#/py351.exe",
-            "hash": "md5:863782d22a521d8ea9f3cf41db1e484d"
+            "url": "https://www.python.org/ftp/python/3.6.0/python-3.6.0-amd64.exe#/py360.exe",
+            "hash": "md5:71c9d30c1110abf7f80a428970ab8ec2"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.5.1/python-3.5.1.exe#/py351.exe",
-            "hash": "md5:4d6fdb5c3630cf60d457c9825f69b4d7"
+            "url": "https://www.python.org/ftp/python/3.6.0/python-3.6.0.exe#/py360.exe",
+            "hash": "md5:38d9b036b25725f6acb553d4aece4db4"
         }
     },
-    "pre_install": "copy-item $dir\\py351.exe $dir\\uninstall.exe",
+    "pre_install": "copy-item $dir\\py360.exe $dir\\uninstall.exe",
     "installer": {
         "args": [
             "/quiet",
@@ -33,6 +33,6 @@
         [ "python.exe", "python3" ]
     ],
     "env_add_path": [ "scripts" ],
-    "checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
+    "checkver": "<p>Latest: <a href=\".*\">Python ([\\d.]+)</a> - <a.*>.*</a></p>"
 }
 

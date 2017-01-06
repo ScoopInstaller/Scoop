@@ -1,0 +1,15 @@
+{
+    "version": "1.0.0-preview2-1-003177",
+    "homepage": "https://www.microsoft.com/net/core#windows",
+    "architecture": {
+        "64bit": {
+            "url": "https://go.microsoft.com/fwlink/?LinkID=834991#/dl.zip",
+            "hash": "D4056A91F83699894C9F9FBAC1B8965597DED079B0D8848DACC7505F372F85A0"
+        },
+        "32bit": {
+            "url": "https://go.microsoft.com/fwlink/?LinkID=834993#/dl.zip",
+            "hash": "38A451069F6BC1D2E226218F260B19FC1A2ACA775FBD88C083B2D23D5A3AF737"
+        }
+    },
+    "bin": "dotnet.exe"
+}

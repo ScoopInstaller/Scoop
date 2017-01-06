@@ -13,6 +13,7 @@
 #
 # Options:
 #   -a, --arch <32bit|64bit>  use the specified architecture, if the app supports it
+#   -i, --independent         don't install dependencies automatically
 #   -g, --global              install the app globally
 
 . "$psscriptroot\..\lib\core.ps1"
@@ -20,6 +21,7 @@
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
@@ -41,10 +43,11 @@ function ensure_none_installed($apps, $global) {
     }
 }
 
-$opt, $apps, $err = getopt $args 'ga:' 'global', 'arch='
+$opt, $apps, $err = getopt $args 'gia:' 'global', 'independent', 'arch='
 if($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
+$independent = $opt.i -or $opt.independent
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
@@ -55,7 +58,9 @@ if($global -and !(is_admin)) {
 
 ensure_none_installed $apps $global
 
-$apps = install_order $apps $architecture # adds dependencies
+if(!$independent) {
+    $apps = install_order $apps $architecture # adds dependencies
+}
 ensure_none_failed $apps $global
 $apps = prune_installed $apps $global # removes dependencies that are already installed
 

@@ -11,5 +11,9 @@
     },
     "homepage":  "http://stedolan.github.io/jq/",
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\jq-*.exe)[0] $dir\\jq.exe",
-    "bin":  "jq.exe"
+    "bin":  "jq.exe",
+    "checkver": {
+        "url": "https://github.com/stedolan/jq/releases/latest",
+        "re": "\/releases\/tag\/jq-([\\d.]+)"
+    }
 }

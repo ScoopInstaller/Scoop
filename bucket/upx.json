@@ -1,0 +1,11 @@
+{
+    "homepage": "https://upx.github.io/",
+    "version": "3.92",
+    "url": "https://github.com/upx/upx/releases/download/v3.92/upx392w.zip",
+    "hash": "041f9fe5c749a5491db1c902db16b55a6d343030103cb1add2fcc5bb63c6143d",
+    "bin": "upx392w\\upx.exe",
+    "license": "GPL2",
+    "checkver": {
+        "github": "https://github.com/upx/upx"
+    }
+}

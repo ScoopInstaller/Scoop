@@ -1,0 +1,12 @@
+{
+    "version":  "v0.33.0",
+    "license":  "BSD",
+    "url":  "https://github.com/facebook/flow/releases/download/v0.33.0/flow-win64-v0.33.0.zip",
+    "homepage":  "https://flowtype.org/",
+    "hash":  "5bcd5cab59c8c4406273a59df187473e9fd56e0e6a3a8b3de76a48b34412caac",
+    "bin":  "flow.exe",
+    "extract_dir":  "flow",
+    "checkver": {
+        "github": "https://github.com/facebook/flow"
+    }
+}

@@ -1,26 +1,26 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.0.8",
-    "license": "http://www.php.net/license/",
+    "version": "7.1.0",
+    "license": "https://www.php.net/license/",
     "architecture": {
         "64bit": {
             "url": [
-                "http://windows.php.net/downloads/releases/php-7.0.8-Win32-VC14-x64.zip",
+                "http://windows.php.net/downloads/releases/php-7.1.0-Win32-VC14-x64.zip",
                 "https://raw.githubusercontent.com/madbub/scoop-php/master/64-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha1:13de6d1637865eea590963e39e6b375beb63fdbf",
-                "md5:6c2c88ff1b3da84b44d23a253a06c01b"
+                "sha1:48b99e4aae06b6ca4933689277bd3ff836398eb8",
+                "acf65e565021f2017815fc5ec8a3145cf6c15e75c132cf23a378cc943e68327c"
             ]
         },
         "32bit": {
             "url": [
-                "http://windows.php.net/downloads/releases/php-7.0.8-Win32-VC14-x86.zip",
+                "http://windows.php.net/downloads/releases/php-7.1.0-Win32-VC14-x86.zip",
                 "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/32-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha1:12c86a395ec0ae7c1864da30fd7a95562420ef20",
-                "sha256:b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
+                "sha1:afb042692d01848016c64246672601a28efffead",
+                "b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
             ]
         }
     },
@@ -40,6 +40,22 @@ cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
 ",
     "checkver": {
         "url": "http://windows.php.net/download/",
-        "re": "<h3 id=\"php-7.0\".*?>.*?\\(([0-9\\.]+)\\)</h3>"
+        "re": "<h3 id=\"php-7.1\".*?>.*?\\(([\\d.]+)\\)</h3>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x64.zip"
+            },
+            "32bit": {
+                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x86.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "type": "sha1",
+            "url": "http://windows.php.net/downloads/releases/sha1sum.txt",
+            "find": "([a-z0-9]{40})\\s+(?:$basename)"
+        }
     }
 }

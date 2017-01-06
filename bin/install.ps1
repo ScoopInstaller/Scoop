@@ -4,6 +4,14 @@
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 $erroractionpreference='stop' # quit if anything goes wrong
 
+# show notification to change execution policy:
+$ep = get-executionpolicy cu;
+if ($ep -ne "unrestricted") {
+    "scoop needs powershell execution policy to be set to 'unrestricted' in order to install programs."
+    "to make this change please run 'set-executionPolicy unrestricted -s cu'"
+    break
+}
+
 # get core functions
 $core_url = 'https://raw.github.com/lukesampson/scoop/master/lib/core.ps1'
 echo 'initializing...'
@@ -13,7 +21,7 @@ iex (new-object net.webclient).downloadstring($core_url)
 if(installed 'scoop') {
     write-host "scoop is already installed. run 'scoop update' to get the latest version." -f red
     # don't abort if invoked with iex——that would close the PS session
-    if($myinvocation.commandorigin -eq 'Internal') { return } else { exit 1 }
+    if($myinvocation.mycommand.commandtype -eq 'Script') { return } else { exit 1 }
 }
 $dir = ensure (versiondir 'scoop' 'current')
 

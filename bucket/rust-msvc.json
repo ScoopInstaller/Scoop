@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.rust-lang.org",
-    "version": "1.9.0",
+    "version": "1.14.0",
     "license": "MIT/Apache 2.0",
     "architecture": {
         "32bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.9.0-i686-pc-windows-msvc.msi",
-            "hash": "3aad7610d6f03e0153473980580c6827d9464f307abe17fbbb41c2a5386234bb"
+            "url": "https://static.rust-lang.org/dist/rust-1.14.0-i686-pc-windows-msvc.msi",
+            "hash": "ede76354e87b383594754024c38de7e6a6884ee10468cfa627709a9994d2088f"
         },
         "64bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.9.0-x86_64-pc-windows-msvc.msi",
-            "hash": "f55dbc9a5f5cd7bef1b94304aca0be97b95a70d3b720be5f6972ccfb64fa1fbb"
+            "url": "https://static.rust-lang.org/dist/rust-1.14.0-x86_64-pc-windows-msvc.msi",
+            "hash": "af9d1e2d7804f5c75b694bc87f924d75d7e3b34776755eba277793a070ea3799"
         }
     },
     "bin": [
@@ -17,5 +17,8 @@
         "Rust\\bin\\rustdoc.exe",
         "Rust\\bin\\cargo.exe"
     ],
-    "checkver": "var rec_package_name = \"([0-9\\.]+)\";"
+    "checkver": {
+      "url": "https://github.com/rust-lang/rust/releases",
+      "re": "<span class=\"tag-name\">([\\d.]+)</span>"
+    }
 }

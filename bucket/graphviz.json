@@ -43,5 +43,9 @@
         "bin/tred.exe",
         "bin/twopi.exe",
         "bin/unflatten.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "http://www.graphviz.org/Download_windows.php",
+        "re": "graphviz-([\\d.]+).msi"
+    }
 }

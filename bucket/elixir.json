@@ -9,5 +9,8 @@
         "bin\\elixirc.bat",
         "bin\\iex.bat",
         "bin\\mix.bat"
-    ]
+    ],
+    "checkver": {
+        "github": "https://github.com/elixir-lang/elixir"
+    }
 }

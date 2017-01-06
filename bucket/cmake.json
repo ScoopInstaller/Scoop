@@ -1,10 +1,19 @@
 {
-    "homepage": "http://www.cmake.org/",
-    "version": "3.5.2",
-    "license": "http://www.cmake.org/licensing/",
-    "url": "https://cmake.org/files/v3.5/cmake-3.5.2-win32-x86.zip",
-    "hash": "671073aee66b3480a564d0736792e40570a11e861bb34819bb7ae7858bbdfb80",
-    "extract_dir": "cmake-3.5.2-win32-x86",
+    "homepage": "https://cmake.org/",
+    "version": "3.7.1",
+    "license": "https://cmake.org/licensing/",
+    "architecture": {
+        "64bit": {
+            "url": "https://cmake.org/files/v3.7/cmake-3.7.1-win64-x64.zip",
+            "hash": "659ecb8207e1266786188c7eaf45308458ba5f719c985970f6f55ec0b5a96746",
+            "extract_dir": "cmake-3.7.1-win64-x64"
+        },
+        "32bit": {
+            "url": "https://cmake.org/files/v3.7/cmake-3.7.1-win32-x86.zip",
+            "hash": "d2ec53ba3e3a12f734ed7127704ff9a83361e7cc6f9a0f0b3e2b56d9868a76b9",
+            "extract_dir": "cmake-3.7.1-win32-x86"
+        }
+    },
     "bin": [
         "bin/cmake.exe",
         "bin/cmcldeps.exe",
@@ -12,5 +21,8 @@
         "bin/ctest.exe",
         "bin/cmake-gui.exe"
     ],
-    "checkver": "<p>CMake version ([0-9\\.]+) is now available for download<\/p>"
+    "checkver": {
+        "re": "Latest\\s+Release\\s+\\(([\\d+.]+)\\)",
+        "url": "https://cmake.org/download/"
+    }
 }

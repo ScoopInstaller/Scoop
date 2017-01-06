@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.packer.io",
     "license": "Mozilla Public License 2.0",
-    "version": "0.10.1",
+    "version": "0.12.1",
     "architecture": {
         "32bit": {
-            "url": "https://releases.hashicorp.com/packer/0.10.1/packer_0.10.1_windows_386.zip",
-            "hash": "9c3c3483a8b6dd6d116747bfcccbf6f530ffab9bb46b47d9a49bdcb92c145914"
+            "url": "https://releases.hashicorp.com/packer/0.12.1/packer_0.12.1_windows_386.zip",
+            "hash": "31548ff65ce8a2c8aa82ed798f993cdd0f2616920ebda7f275c030dd36256ded"
         },
         "64bit": {
-            "url": "https://releases.hashicorp.com/packer/0.10.1/packer_0.10.1_windows_amd64.zip",
-            "hash": "623013056dc662f29817dce6bd31e6fb669883a35ea9311951bbcea4eb9c59f7"
+            "url": "https://releases.hashicorp.com/packer/0.12.1/packer_0.12.1_windows_amd64.zip",
+            "hash": "d6efb1f4dd5bce2bad30f5e767648e27c0591f2978d322a9f2d7055a46ecea0b"
         }
     },
     "bin": [
@@ -17,6 +17,6 @@
     ],
     "checkver": {
         "url": "https://www.packer.io/downloads.html",
-        "re": "Latest version: (\\d+\\.\\d+\\.\\d+)"
+        "re": "Latest version: ([\\d.]+)"
     }
 }

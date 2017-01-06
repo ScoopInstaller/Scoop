@@ -1,14 +1,14 @@
 {
-    "homepage": "http://www.sqlite.org/",
-    "version": "3.10.2",
+    "homepage": "https://www.sqlite.org/",
+    "version": "3.15.1",
     "license": "Public Domain",
-    "url": "https://sqlite.org/2016/sqlite-tools-win32-x86-3100200.zip",
-    "hash": "b1ebfcbb0a6453022f90ee7ac37f05dfcd337e574c053b5a543963526424fae8",
-    "extract_dir": "sqlite-tools-win32-x86-3100200",
+    "url": "https://www.sqlite.org/2016/sqlite-tools-win32-x86-3150100.zip",
+    "hash": "sha1:6f6a93dd3a79aae994109bcf07e8e9706a33956c",
+    "extract_dir": "sqlite-tools-win32-x86-3150100",
     "bin": [
         "sqlite3.exe",
         "sqldiff.exe",
         "sqlite3_analyzer.exe"
     ],
-    "checkver": "<h3>Current Status</h3>\\s*<p><ul>\\s*<li><a.*>Version ([0-9\\.]+)</a>"
+    "checkver": "<a.*>Version ([\\d.]+)</a>"
 }

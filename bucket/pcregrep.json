@@ -17,5 +17,8 @@
        ,"pcre2test.exe"
        ,[ "pcre2grep.exe", "pcregrep" ]
        ,[ "pcre2test.exe", "pcretest" ]
-        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/rivy/PCRE"
+    }
 }

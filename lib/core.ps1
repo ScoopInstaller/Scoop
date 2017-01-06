@@ -1,4 +1,15 @@
-$scoopdir = $env:SCOOP, "$env:LOCALAPPDATA\scoop" | select -first 1
+# Note: The default directory changed from ~/AppData/Local/scoop to ~/scoop
+#       on 1 Nov, 2016 to work around long paths used by NodeJS.
+#       Old installations should continue to work using the old path.
+#       There is currently no automatic migration path to deal
+#       with updating old installations to the new path.
+$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | select -first 1
+
+$oldscoopdir = "$env:LOCALAPPDATA\scoop"
+if((test-path $oldscoopdir) -and !$env:SCOOP) {
+    $scoopdir = $oldscoopdir
+}
+
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
 $cachedir = "$scoopdir\cache" # always local
 

@@ -14,5 +14,6 @@
         }
         finally {
             popd
-        }"
+        }",
+    "checkver": "github"
 }

@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "0.2014.08.01",
-    "url": "https://raw.githubusercontent.com/lukesampson/psutils/master/gitignore.ps1",
-    "hash": "6504170f3822ac1d7c4d00ba2f6b1a3de42ca6af206adacd85df04028c0c9429",
+    "version": "0.2015.08.26",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/3c67dbf56a0e541bf928b9a8811dc4c627d8230c/gitignore.ps1",
+    "hash": "9a08d37386219add0bf79fe6293ab02f5dfdce6ece95173c003bdb96a8016533",
     "bin": "gitignore.ps1"
 }

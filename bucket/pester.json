@@ -28,5 +28,6 @@
 
         'importing pester for current session...'
         iex \"$import\"
-    "
+    ",
+    "checkver": "github"
 }

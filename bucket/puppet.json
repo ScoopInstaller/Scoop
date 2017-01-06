@@ -1,15 +1,23 @@
 {
     "homepage": "http://puppetlabs.com",
-    "version": "3.7.1",
-    "url": "https://downloads.puppetlabs.com/windows/puppet-3.7.1.msi",
-    "hash": "fb8335694753f14b1b407dc393141fda25aa05a388fffae3aa003f73034f459c",
+    "version": "3.8.7",
+    "architecture": {
+        "64bit": {
+            "url": "https://downloads.puppetlabs.com/windows/puppet-3.8.7-x64.msi",
+            "hash": "87b7fd29fb2e63fcc47352e8a662835b0329448fe017eb25be4329ef84f1914e"
+        },
+        "32bit": {
+            "url": "https://downloads.puppetlabs.com/windows/puppet-3.8.7.msi",
+            "hash": "6cddbc4341d285766d4b2ab9c1d5008036c5ea702146bc94423ca945160bc9ce"
+        }
+    },
     "bin": [
             "Puppet Labs/Puppet/bin\\facter.bat",
             "Puppet Labs/Puppet/bin\\hiera.bat",
             "Puppet Labs/Puppet/bin\\puppet.bat"
     ],
     "checkver": {
-        "url": "https://raw.githubusercontent.com/puppetlabs/puppet/master/lib/puppet/version.rb",
-        "re": "PUPPETVERSION = '([0-9\\.]+)'"
+        "url": "https://downloads.puppetlabs.com/windows/?C=N;O=D",
+        "re": "puppet-([\\d.]+)-x64.msi</a>"
     }
 }

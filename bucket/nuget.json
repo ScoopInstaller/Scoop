@@ -1,8 +1,12 @@
 {
-    "homepage": "https://github.com/nuget",
-    "version": "3.4.3",
+    "homepage": "https://www.nuget.org/",
+    "version": "3.5.0",
     "license": "Apache 2.0",
-    "url": "https://dist.nuget.org/win-x86-commandline/v3.4.3/nuget.exe",
-    "hash": "3b1ea72943968d7af6bacdb4f2f3a048a25afd14564ef1d8b1c041fdb09ebb0a",
-    "bin": "nuget.exe"
+    "url": "https://dist.nuget.org/win-x86-commandline/v3.5.0/NuGet.exe",
+    "hash": "399EC24C26ED54D6887CDE61994BB3D1CADA7956C1B19FF880F06F060C039918",
+    "bin": "NuGet.exe",
+    "checkver": {
+        "url": "https://dist.nuget.org/index.json",
+        "re": "latest\", \"version\": \"([\\d.]+)\""
+    }
 }

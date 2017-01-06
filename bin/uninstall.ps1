@@ -2,6 +2,7 @@ param($global)
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 
@@ -23,8 +24,14 @@ function do_uninstall($app, $global) {
 
     echo "uninstalling $app"
     run_uninstaller $manifest $architecture $dir
-    rm_shims $manifest $global
-    env_rm_path $manifest $dir $global
+    rm_shims $manifest $global $architecture
+
+    # If a junction was used during install, that will have been used
+    # as the reference directory. Othewise it will just be the version
+    # directory.
+    $refdir = unlink_current (appdir $app $global)
+
+    env_rm_path $manifest $refdir $global
     env_rm $manifest $global
 
     $appdir = appdir $app $global
