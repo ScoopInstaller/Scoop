@@ -1,9 +1,9 @@
 {
     "homepage": "http://kotlinlang.org/",
-    "version": "1.0.3",
+    "version": "1.0.6",
     "license": "Apache 2.0",
-    "url": "https://github.com/JetBrains/kotlin/releases/download/v1.0.3/kotlin-compiler-1.0.3.zip",
-    "hash": "37615f1d63e8500cd33c7f3e60b715263f65189d6d8f25defba78968c896dc97",
+    "url": "https://github.com/JetBrains/kotlin/releases/download/v1.0.6/kotlin-compiler-1.0.6.zip",
+    "hash": "42a20b72d1e90f9efa9d13aab97559f478cc32b7c2e6da8569cdc3741a8e14b6",
     "extract_dir": "kotlinc",
     "bin": [
         "bin\\kotlin.bat",
@@ -17,5 +17,8 @@
     "depends": "openjdk",
     "checkver": {
         "github": "https://github.com/JetBrains/kotlin"
+    },
+    "autoupdate": {
+        "url": "https://github.com/JetBrains/kotlin/releases/download/v$version/kotlin-compiler-$version.zip"
     }
 }
