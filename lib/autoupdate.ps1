@@ -14,9 +14,9 @@ function substitute([String] $str, [Hashtable] $params) {
 }
 
 function check_url([String] $url) {
-    if ($url.Contains("github.com")) {
+    if ($url.Contains("github.com") -or $url.Contains("chocolatey.org")) {
         # github does not allow HEAD requests
-        warn "Unable to check github url (assuming it is ok)"
+        warn "Unable to check github/chocolatey url (assuming it is ok)"
         return $true
     }
 
@@ -70,6 +70,8 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             if ($config.type -and !($config.type -eq "sha256")) {
                 $hash = $config.type + ":$hash"
             }
+
+            return $hash
         }
     } elseif ($hashmode -eq "rdf") {
         return find_hash_in_rdf $config.url $basename
@@ -113,11 +115,13 @@ function update_manifest_prop([String] $prop, $json)
     }
 
     # check if there are architecture specific variants
-    $json.architecture | Get-Member -MemberType NoteProperty | % {
-        $architecture = $_.Name
+    if ($json.architecture) {
+        $json.architecture | Get-Member -MemberType NoteProperty | % {
+            $architecture = $_.Name
 
-        if ($json.architecture.$architecture.$prop) {
-            $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) @{'$version' = $json.version}
+            if ($json.architecture.$architecture.$prop) {
+                $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) @{'$version' = $json.version}
+            }
         }
     }
 }
@@ -205,6 +209,12 @@ function autoupdate([String] $app, $json, [String] $version)
 
         $file_content = $json | ConvertToPrettyJson
         [System.IO.File]::WriteAllLines($path, $file_content)
+
+        # notes
+        if ($json.autoupdate.note) {
+            Write-Host ""
+            Write-Host -f DarkYellow $json.autoupdate.note
+        }
     } else {
         Write-Host -f DarkGray "No updates for $app"
     }
