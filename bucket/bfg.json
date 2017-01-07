@@ -1,18 +1,23 @@
 {
-    "version":  "1.12.12",
-    "license":  "GPL",
-    "url":  "https://repo1.maven.org/maven2/com/madgag/bfg/1.12.12/bfg-1.12.12.jar",
-    "depends":  "openjdk",
-    "homepage":  "https://rtyley.github.io/bfg-repo-cleaner/",
-    "hash":  "03291c9cd9cdc664104f49b22b76bd39edc73052936cbfd72fc8d8595971fd9a",
-    "bin":  "bfg.ps1",
-    "env_set": { "BFG_HOME": "$dir" },
+    "homepage": "https://rtyley.github.io/bfg-repo-cleaner/",
+    "license": "GPL",
+    "version": "1.12.14",
+    "url": "https://repo1.maven.org/maven2/com/madgag/bfg/1.12.14/bfg-1.12.14.jar",
+    "hash": "7a44d53ef626a4282c34cc363166e678c5d9e91e4c6815e8e069036edd9fab64",
+    "depends": "openjdk",
+    "bin": "bfg.ps1",
+    "env_set": {
+        "BFG_HOME": "$dir"
+    },
     "pre_install": "
-        $exe = 'java -jar $env:BFG_HOME\\bfg-1.12.12.jar $args'
+        $exe = 'java -jar $env:BFG_HOME\\bfg-$version.jar $args'
         write-output $exe | out-file -filepath $dir\\bfg.ps1
     ",
     "checkver": {
         "url": "https://search.maven.org/solrsearch/select/?q=g:\"com.madgag\"+AND+a:\"bfg\"&wt=json&json.wrf=?&indent=true",
         "re": "\"latestVersion\":\"([\\d.]+)\""
+    },
+    "autoupdate": {
+        "url": "https://repo1.maven.org/maven2/com/madgag/bfg/$version/bfg-$version.jar"
     }
 }
