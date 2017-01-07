@@ -207,6 +207,12 @@ function autoupdate([String] $app, $json, [String] $version)
 
         $file_content = $json | ConvertToPrettyJson
         [System.IO.File]::WriteAllLines($path, $file_content)
+
+        # notes
+        if ($json.autoupdate.note) {
+            Write-Host ""
+            Write-Host -f DarkYellow $json.autoupdate.note
+        }
     } else {
         Write-Host -f DarkGray "No updates for $app"
     }
