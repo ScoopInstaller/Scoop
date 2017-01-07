@@ -115,11 +115,13 @@ function update_manifest_prop([String] $prop, $json)
     }
 
     # check if there are architecture specific variants
-    $json.architecture | Get-Member -MemberType NoteProperty | % {
-        $architecture = $_.Name
+    if ($json.architecture) {
+        $json.architecture | Get-Member -MemberType NoteProperty | % {
+            $architecture = $_.Name
 
-        if ($json.architecture.$architecture.$prop) {
-            $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) @{'$version' = $json.version}
+            if ($json.architecture.$architecture.$prop) {
+                $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) @{'$version' = $json.version}
+            }
         }
     }
 }
