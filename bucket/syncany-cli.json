@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.syncany.org/",
     "license": "https://raw.githubusercontent.com/syncany/syncany/develop/LICENSE.md",
-    "version": "0.4.0",
-    "url": "https://www.syncany.org/dist/releases/syncany-cli-0.4.0-alpha.exe",
-    "hash": "386365f99ea985a9abedab58439980500b3b62592531cd44af32e30f63df232d",
+    "version": "0.4.7",
+    "url": "https://www.syncany.org/dist/releases/syncany-cli-0.4.7-alpha.exe",
+    "hash": "2db6e8f77d39fb0094c48e7b5e434ba2014c4bf67f0632f2f065998e23e6fd23",
     "innosetup": true,
     "bin": [
         "bin\\sy.bat",
@@ -11,5 +11,8 @@
     ],
     "checkver": {
         "github": "https://github.com/syncany/syncany"
+    },
+    "autoupdate": {
+        "url": "https://www.syncany.org/dist/releases/syncany-cli-$version-alpha.exe"
     }
 }
