@@ -70,6 +70,8 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             if ($config.type -and !($config.type -eq "sha256")) {
                 $hash = $config.type + ":$hash"
             }
+
+            return $hash
         }
     } elseif ($hashmode -eq "rdf") {
         return find_hash_in_rdf $config.url $basename
