@@ -1,12 +1,12 @@
 {
     "homepage": "https://github.com/ojdkbuild/ojdkbuild",
-    "version": "1.8.0_102-2",
+    "version": "1.8.0.111-3",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.102-2/java-1.8.0-openjdk-1.8.0.102-2.b14.ojdkbuild.windows.x86_64.zip",
-            "hash": "8103db54f94d7379e8866a9b2eaec17d38f9164ee1159806e826a61be4905cc2",
-            "extract_dir": "java-1.8.0-openjdk-1.8.0.102-2.b14.ojdkbuild.windows.x86_64"
+            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.111-3/java-1.8.0-openjdk-1.8.0.111-3.b15.ojdkbuild.windows.x86_64.zip",
+            "hash": "e080371bf57536668416157660e05d95fe04db15da36234d32bda8e301bb0454",
+            "extract_dir": "java-1.8.0-openjdk-1.8.0.111-3.b15.ojdkbuild.windows.x86_64"
         }
     },
     "env_add_path": "bin",
@@ -15,6 +15,15 @@
     },
     "checkver": {
         "url": "https://github.com/ojdkbuild/ojdkbuild/releases/latest",
-        "re": "\/releases\/tag\/([\\d.\\-]+)"
+        "re": "/releases/tag/([\\d.\\-]+)"
+    },
+    "autoupdate": {
+        "note": "Please check if the generated URL is correct. Sometime the b15 after the version can change too!",
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-1.8.0-openjdk-$version.b15.ojdkbuild.windows.x86_64.zip",
+                "extract_dir": "java-1.8.0-openjdk-$version.b15.ojdkbuild.windows.x86_64"
+            }
+        }
     }
 }
