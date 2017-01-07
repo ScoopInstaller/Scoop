@@ -12,6 +12,7 @@
             "hash": "30fd5bbb2ae0897eb015e37075b89d79c031a98bc2b41d929a66555c8b9606ea"
         }
     },
+    "depends": ["ffmpeg"],
     "env_add_path": ".",
     "bin": [
         "compare.exe",
@@ -19,10 +20,6 @@
         "conjure.exe",
         "convert.exe",
         "dcraw.exe",
-        [
-            "ffmpeg.exe",
-            "iffmpeg"
-        ],
         "hp2xx.exe",
         "identify.exe",
         "IMDisplay.exe",
