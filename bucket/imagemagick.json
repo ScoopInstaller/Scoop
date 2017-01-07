@@ -1,18 +1,15 @@
 {
     "homepage": "https://www.imagemagick.org/script/index.php",
     "license": "https://www.imagemagick.org/script/license.php",
-    "version": "7.0.4-2",
+    "version": "7.0.4-3",
     "architecture": {
         "64bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-2-portable-Q16-x64.zip",
-            "hash": "8d0115f4faf11565aaa618c37e995b7c01ee5bf29acb1353c88aa56835d2660b"
-
-
-
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-3-portable-Q16-x64.zip",
+            "hash": "a3cec661f432a62dcf64ab7037b7464e04ea9c67c6da24e608e3b50a00c09dc0"
         },
         "32bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-2-portable-Q16-x86.zip",
-            "hash": "d04bd324ce72d028f234cea4ed82547507d2f1fdbceddb647fccabd494dece73"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-3-portable-Q16-x86.zip",
+            "hash": "30fd5bbb2ae0897eb015e37075b89d79c031a98bc2b41d929a66555c8b9606ea"
         }
     },
     "env_add_path": ".",
@@ -22,7 +19,10 @@
         "conjure.exe",
         "convert.exe",
         "dcraw.exe",
-        ["ffmpeg.exe", "iffmpeg"],
+        [
+            "ffmpeg.exe",
+            "iffmpeg"
+        ],
         "hp2xx.exe",
         "identify.exe",
         "IMDisplay.exe",
