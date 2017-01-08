@@ -1,21 +1,26 @@
 {
     "homepage": "http://apex.run/",
     "license": "https://github.com/apex/apex/blob/master/LICENSE",
-    "version": "0.10.3",
+    "version": "0.12.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/apex/apex/releases/download/v0.10.3/apex_windows_amd64.exe",
-            "hash": "acb078c65cca10acc55aacac5206466b8f3f56e20d1e4fae93aa3f7984e7648b"
-        },
-        "32bit": {
-            "url": "https://github.com/apex/apex/releases/download/v0.10.3/apex_windows_386.exe",
-            "hash": "92c0f7b627be1bd1e465fba32fda13e95b1562ce8bd3b7fa0ea9d324b1570554"
+            "url": "https://github.com/apex/apex/releases/download/v0.12.0/apex_windows_amd64.exe",
+            "hash": "f9169347210fc1292c7e281f7898c2830be0d3c6458bf68db3528a64a5e2787d"
         }
     },
     "extract_dir": "apex",
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\apex_*.exe)[0] $dir\\apex.exe",
-    "bin": [ "apex.exe" ],
+    "bin": [
+        "apex.exe"
+    ],
     "checkver": {
         "github": "https://github.com/apex/apex"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/apex/apex/releases/download/v$version/apex_windows_amd64.exe"
+            }
+        }
     }
 }

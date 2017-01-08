@@ -1,14 +1,14 @@
 {
     "homepage": "http://sliksvn.com/",
-    "version": "1.9.4",
+    "version": "1.9.5",
     "architecture": {
         "64bit": {
-            "url": "https://sliksvn.com/pub/Slik-Subversion-1.9.4-x64.msi",
-            "hash": "90D752D3673DAD7A461CD40EF06B940C6E41B28D66C0BF56C4EE87091032E171"
+            "url": "https://sliksvn.com/pub/Slik-Subversion-1.9.5-x64.msi",
+            "hash": "88761da80eb5e97d6b2c3eb7caf2f68c2ecb275b363ede10d816c3d789b1ceac"
         },
         "32bit": {
-            "url": "https://sliksvn.com/pub/Slik-Subversion-1.9.4-win32.msi",
-            "hash": "A9A658D30041ED8A0AB0D6C44D8A5DB1401552508016F12E13C913AE4B4F8D27"
+            "url": "https://sliksvn.com/pub/Slik-Subversion-1.9.5-win32.msi",
+            "hash": "a04c48ad09c987fd729ab96edcbe02342dcc8c9aeb9ed2e3108ad8cc104daa3b"
         }
     },
     "extract_dir": "SlikSvn",
@@ -28,5 +28,15 @@
     "checkver": {
         "url": "https://sliksvn.com/download/",
         "re": "<a.*>SVN ([\\d.]+), 64 bit</a>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sliksvn.com/pub/Slik-Subversion-$version-x64.msi"
+            },
+            "32bit": {
+                "url": "https://sliksvn.com/pub/Slik-Subversion-$version-win32.msi"
+            }
+        }
     }
 }
