@@ -614,6 +614,8 @@ function current_dir($versiondir) {
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
+    if(get_config NO_JUNCTIONS) { return $versiondir }
+
     $currentdir = current_dir $versiondir
 
     write-host "linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
@@ -637,6 +639,7 @@ function link_current($versiondir) {
 # Returns the 'current' junction directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
+    if(get_config NO_JUNCTIONS) { return $versiondir }
     $currentdir = current_dir $versiondir
 
     if(test-path $currentdir) {
