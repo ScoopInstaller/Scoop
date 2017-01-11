@@ -1,15 +1,19 @@
 {
     "homepage": "http://www.scala-sbt.org/",
-    "version": "0.13.9",
+    "version": "0.13.13",
     "license": "BSD",
-    "url": "https://dl.bintray.com/sbt/native-packages/sbt/0.13.9/sbt-0.13.9.zip",
-    "hash": "2e2deaf059d906026a0b63598df5a4cb679eb3ffd6b51ada02130d72730a039c",
-    "extract_dir": "sbt",
+    "url": "https://dl.bintray.com/sbt/native-packages/sbt/0.13.13/sbt-0.13.13.zip",
+    "hash": "701ac8873b9f91c591c86cbd74b2b7057f9cfeeee374cc9bc07303243b6fb5e7",
+    "extract_dir": "sbt-launcher-packaging-0.13.13",
     "bin": [
         "bin\\sbt.bat"
     ],
     "checkver": {
         "url": "http://www.scala-sbt.org/download.html",
-        "re": "\\/sbt/([\\d.]+)\\/"
+        "re": "/sbt-([\\d.]+).zip"
+    },
+    "autoupdate": {
+        "url": "https://dl.bintray.com/sbt/native-packages/sbt/$version/sbt-$version.zip",
+        "extract_dir": "sbt-launcher-packaging-$version"
     }
 }

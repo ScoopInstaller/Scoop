@@ -3,13 +3,13 @@
     "version": "1.14.0",
     "license": "MIT/Apache 2.0",
     "architecture": {
-        "32bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.14.0-i686-pc-windows-gnu.msi",
-            "hash": "29670cbcbadf95abc98183d75988b57532dba177db5ae3faf27344af182f0441"
-        },
         "64bit": {
             "url": "https://static.rust-lang.org/dist/rust-1.14.0-x86_64-pc-windows-gnu.msi",
             "hash": "cde3e673288ee65f92b287994b83c64f69d9fb0fdd0c52b16c0f45e253afc96a"
+        },
+        "32bit": {
+            "url": "https://static.rust-lang.org/dist/rust-1.14.0-i686-pc-windows-gnu.msi",
+            "hash": "29670cbcbadf95abc98183d75988b57532dba177db5ae3faf27344af182f0441"
         }
     },
     "bin": [
@@ -18,7 +18,17 @@
         "Rust\\bin\\cargo.exe"
     ],
     "checkver": {
-      "url": "https://github.com/rust-lang/rust/releases",
-      "re": "<span class=\"tag-name\">([\\d.]+)</span>"
+        "url": "https://github.com/rust-lang/rust/releases",
+        "re": "<span class=\"tag-name\">([\\d.]+)</span>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://static.rust-lang.org/dist/rust-$version-x86_64-pc-windows-gnu.msi"
+            },
+            "32bit": {
+                "url": "https://static.rust-lang.org/dist/rust-$version-i686-pc-windows-gnu.msi"
+            }
+        }
     }
 }

@@ -1,20 +1,30 @@
 {
-    "version":  "0.18",
-    "license":  "https://github.com/spf13/hugo/blob/master/LICENSE.md",
+    "version": "0.18.1",
+    "license": "https://github.com/spf13/hugo/blob/master/LICENSE.md",
     "architecture": {
-      "64bit": {
-        "url":  "https://github.com/spf13/hugo/releases/download/v0.18/hugo_0.18_windows-64bit.zip",
-        "hash": "9C6094196524A9F8CBB2A3FD83A309C7FF42E62CE24DECF10222FA9D0B0EAA16",
-        "bin": [ "hugo_0.18_windows_amd64.exe" ]
-      },
-      "32bit": {
-        "url":  "https://github.com/spf13/hugo/releases/download/v0.18/hugo_0.18_windows-32bit.zip",
-        "hash":  "12FAB36D0492E90B1004227D6FC62683682C3D19369C3A8166D0158A89D9DFFA",
-        "bin": [ "hugo_0.18_windows_386.exe" ]
-      }
+        "64bit": {
+            "url": "https://github.com/spf13/hugo/releases/download/v0.18.1/hugo_0.18.1_windows-64bit.zip",
+            "hash": "8269b0fbd54a8548692fe994625ed99bada53807d172f29f00b8c66be676a922"
+        },
+        "32bit": {
+            "url": "https://github.com/spf13/hugo/releases/download/v0.18.1/hugo_0.18.1_windows-32bit.zip",
+            "hash": "2703ac22f0421031d2008f1cf85836280e2e5fa01a41efb06e72b202f8f4ac5f"
+        }
     },
-    "homepage": "http://gohugo.io",
+    "bin": "hugo.exe",
+    "pre_install": "Rename-Item @(Get-ChildItem $dir\\hugo_*.exe)[0] $dir\\hugo.exe",
+    "homepage": "https://gohugo.io",
     "checkver": {
         "github": "https://github.com/spf13/hugo"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/spf13/hugo/releases/download/v$version/hugo_$version_windows-64bit.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/spf13/hugo/releases/download/v$version/hugo_$version_windows-32bit.zip"
+            }
+        }
     }
 }

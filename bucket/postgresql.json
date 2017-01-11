@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.postgresql.org/",
-    "version": "9.5.3",
+    "version": "9.6.1",
     "license": "https://www.postgresql.org/about/licence/",
     "architecture": {
         "64bit": {
-            "url": "http://get.enterprisedb.com/postgresql/postgresql-9.5.3-1-windows-x64-binaries.zip",
-            "hash": "38c150d0fd0907b7f535a060420bb4d1233b24b78a291d4b9eb11ea0eff37b44"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.1-1-windows-x64-binaries.zip",
+            "hash": "8362c5c445370b67ec7684a9312776793e165011362619af0197729fd50b997a"
         },
         "32bit": {
-            "url": "http://get.enterprisedb.com/postgresql/postgresql-9.5.3-1-windows-binaries.zip",
-            "hash": "936d5fc139d5a5be30896c0dd506c4d06ee4ac133e2b7f151653ef700a39ada7"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.1-1-windows-binaries.zip",
+            "hash": "ad5364ce2c0fa9a489dd907516f9116243c278d7b887fb7d5f469b0d060ba4a9"
         }
     },
     "extract_dir": "pgsql",
@@ -56,7 +56,17 @@
         "bin\\zic.exe"
     ],
     "checkver": {
-        "url": "http://www.enterprisedb.com/products-services-training/pgbindownload",
+        "url": "https://www.enterprisedb.com/products-services-training/pgbindownload",
         "re": "<b>Version ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://get.enterprisedb.com/postgresql/postgresql-$version-1-windows-x64-binaries.zip"
+            },
+            "32bit": {
+                "url": "https://get.enterprisedb.com/postgresql/postgresql-$version-1-windows-binaries.zip"
+            }
+        }
     }
 }

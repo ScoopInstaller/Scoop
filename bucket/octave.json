@@ -1,11 +1,20 @@
 {
-    "homepage":  "https://www.gnu.org/software/octave/",
-    "version":  "4.0.3",
-    "license":  "GNU GPL",
-    "url":  "https://ftp.gnu.org/gnu/octave/windows/octave-4.0.3.zip",
-    "extract_dir":  "octave-4.0.3",
-    "hash":  "dd00d2b33b0b89cb5339de347b0e48c8cbc44d5cab2b23de8e3102fdb55c1286",
-    "bin":  [
+    "homepage": "https://www.gnu.org/software/octave/",
+    "version": "4.2.0",
+    "license": "GNU GPL",
+    "architecture": {
+        "64bit": {
+            "url": "https://ftp.gnu.org/gnu/octave/windows/octave-4.2.0-w64.zip",
+            "hash": "58ac8da90984bfb241dbab68b9857776ceee32b01176085bd6e4f01ca5a3d91f",
+            "extract_dir": "octave-4.2.0-w64"
+        },
+        "32bit": {
+            "url": "https://ftp.gnu.org/gnu/octave/windows/octave-4.2.0-w32.zip",
+            "hash": "c2162d330232f14060d539014e5b7b785dec0c4501af0f3a9d690ef0ea4c9f6d",
+            "extract_dir": "octave-4.2.0-w32"
+        }
+    },
+    "bin": [
         "bin\\octave.exe",
         "bin\\octave-gui.exe",
         "bin\\octave-cli.exe",
@@ -14,5 +23,17 @@
     "checkver": {
         "url": "http://wiki.octave.org/GNU_Octave_Wiki",
         "re": "GNU Octave ([\\d.]+) is the current stable release"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://ftp.gnu.org/gnu/octave/windows/octave-$version-w64.zip",
+                "extract_dir": "octave-$version-w64"
+            },
+            "32bit": {
+                "url": "https://ftp.gnu.org/gnu/octave/windows/octave-$version-w32.zip",
+                "extract_dir": "octave-$version-w32"
+            }
+        }
     }
 }

@@ -12,12 +12,22 @@
         }
     },
     "bin": [
-            "Puppet Labs/Puppet/bin\\facter.bat",
-            "Puppet Labs/Puppet/bin\\hiera.bat",
-            "Puppet Labs/Puppet/bin\\puppet.bat"
+        "Puppet Labs/Puppet/bin\\facter.bat",
+        "Puppet Labs/Puppet/bin\\hiera.bat",
+        "Puppet Labs/Puppet/bin\\puppet.bat"
     ],
     "checkver": {
         "url": "https://downloads.puppetlabs.com/windows/?C=N;O=D",
         "re": "puppet-([\\d.]+)-x64.msi</a>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.puppetlabs.com/windows/puppet-$version-x64.msi"
+            },
+            "32bit": {
+                "url": "https://downloads.puppetlabs.com/windows/puppet-$version.msi"
+            }
+        }
     }
 }

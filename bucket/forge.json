@@ -8,5 +8,8 @@
     ],
     "checkver": {
         "github": "https://github.com/fsharp-editing/Forge"
+    },
+    "autoupdate": {
+        "url": "https://github.com/fsharp-editing/Forge/releases/download/$version/forge.zip"
     }
 }

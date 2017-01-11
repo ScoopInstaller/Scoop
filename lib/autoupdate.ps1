@@ -131,7 +131,14 @@ function prepare_download_url([String] $template, [String] $version)
     <#
     TODO There should be a second option to extract the url from the page
     #>
-    return substitute $template @{'$version' = $version; '$underscoreVersion' = ($version -replace "\.", "_")}
+    return substitute $template @{
+        '$version' = $version;
+        '$underscoreVersion' = ($version -replace "\.", "_");
+        '$cleanVersion' = ($version -replace "\.", "");
+        '$majorVersion' = ($version.Split('.') | Select-Object -first 1) -join('.');
+        '$minorVersion' = ($version.Split('.') | Select-Object -first 2) -join('.');
+        '$patchVersion' = ($version.Split('.') | Select-Object -first 3) -join('.')
+    }
 }
 
 function autoupdate([String] $app, $json, [String] $version)
