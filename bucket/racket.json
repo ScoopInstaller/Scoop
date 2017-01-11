@@ -1,15 +1,15 @@
 {
-    "version": "6.6",
+    "version": "6.7",
     "homepage": "https://racket-lang.org",
     "license": "LGPL",
     "architecture": {
         "64bit": {
-            "url": "https://mirror.racket-lang.org/installers/6.6/racket-6.6-x86_64-win32.exe#/dl.7z",
-            "hash": "ce1c4e3db1c43b3a13c9db30a1ed787d403a0cff6cd5210d8c3a4a7d36887656"
+            "url": "https://mirror.racket-lang.org/installers/6.7/racket-6.7-x86_64-win32.exe#/dl.7z",
+            "hash": "43454d88b8ec6bd341c8fb6c983c61c7fa5cd4d3cb122fe4f8537e46606d3579"
         },
         "32bit": {
-            "url": "https://mirror.racket-lang.org/installers/6.6/racket-6.6-i386-win32.exe#/dl.7z",
-            "hash": "cde3c64349624ac483ecb757814884275171e144b31670ef8bc018b90c6c1f70"
+            "url": "https://mirror.racket-lang.org/installers/6.7/racket-6.7-i386-win32.exe#/dl.7z",
+            "hash": "fb20224cbe1756ae64752dc70806b0b8dccd5f5b0c14666b056dfe74feaa5bb5"
         }
     },
     "bin": [
@@ -17,11 +17,27 @@
         "raco.exe"
     ],
     "shortcuts": [
-        [ "GRacket.exe", "GRacket" ],
-        [ "DrRacket.exe", "DrRacket" ]
+        [
+            "GRacket.exe",
+            "GRacket"
+        ],
+        [
+            "DrRacket.exe",
+            "DrRacket"
+        ]
     ],
     "checkver": {
         "url": "https://download.racket-lang.org/",
         "re": "Version ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://mirror.racket-lang.org/installers/$version/racket-$version-x86_64-win32.exe#/dl.7z"
+            },
+            "32bit": {
+                "url": "https://mirror.racket-lang.org/installers/$version/racket-$version-i386-win32.exe#/dl.7z"
+            }
+        }
     }
 }

@@ -9,5 +9,8 @@
     "checkver": {
         "url": "http://phantomjs.org/download.html",
         "re": "phantomjs-([\\d.]+)-windows.zip"
+    },
+    "autoupdate": {
+        "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-$version-windows.zip"
     }
 }

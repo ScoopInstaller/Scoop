@@ -5,12 +5,15 @@
     "architecture": {
         "64bit": {
             "url": "https://download.rethinkdb.com/windows/rethinkdb-2.3.5.zip",
-            "hash": "AFC431C0AAA6D8B05090F4C33BC527BAB6D889555A9817789F155AC45BC51573"
+            "hash": "afc431c0aaa6d8b05090f4c33bc527bab6d889555a9817789f155ac45bc51573"
         }
     },
     "bin": "rethinkdb.exe",
     "checkver": {
-      "url": "https://rethinkdb.com/docs/install/windows/",
-      "re": "<a href=\"https://download\\.rethinkdb\\.com/windows/rethinkdb-([\\d.]+)\\.zip\">"
+        "url": "https://rethinkdb.com/docs/install/windows/",
+        "re": "<a href=\"https://download\\.rethinkdb\\.com/windows/rethinkdb-([\\d.]+)\\.zip\">"
+    },
+    "autoupdate": {
+        "url": "https://download.rethinkdb.com/windows/rethinkdb-$version.zip"
     }
 }

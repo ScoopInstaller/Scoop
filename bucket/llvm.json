@@ -1,19 +1,34 @@
 {
     "homepage": "http://www.llvm.org",
-    "version": "3.9.0",
+    "version": "3.9.1",
     "license": "University of Illinois/NCSA Open Source License",
     "architecture": {
         "32bit": {
-            "url": "http://llvm.org/releases/3.9.0/LLVM-3.9.0-win32.exe",
-            "hash": "b4eaa1fa9872e2c76268f32fc597148cfa14c57b7d13e1edd9b9b6496cdf7de8"
+            "url": "http://releases.llvm.org/3.9.1/LLVM-3.9.1-win32.exe",
+            "hash": "f5cdf134e27a215a18515e2dcd100902dcf539f487c2028a817ffe7d3091f32a"
         },
         "64bit": {
-            "url": "http://llvm.org/releases/3.9.0/LLVM-3.9.0-win64.exe",
-            "hash": "3e5b53a79266d3f7f1d5cb4d94283fe2bc61f9689e55f39e3939364f4076b0c9"
+            "url": "http://releases.llvm.org/3.9.1/LLVM-3.9.1-win64.exe",
+            "hash": "7ea2b7bc0de6b96a6ce11e6cfece7b84a31fb0c86c977f42ee178cba41517606"
         }
     },
-    "installer": {"args": "/S /D=$dir"},
-    "uninstaller": {"file": "Uninstall.exe", "args": "/S"},
+    "installer": {
+        "args": "/S /D=$dir"
+    },
+    "uninstaller": {
+        "file": "Uninstall.exe",
+        "args": "/S"
+    },
     "env_add_path": "bin",
-    "checkver": "\\/releases\\/download.html#([\\d.]+)"
+    "checkver": "\\/releases\\/download.html#([\\d.]+)",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://releases.llvm.org/$version/LLVM-$version-win64.exe"
+            },
+            "32bit": {
+                "url": "http://releases.llvm.org/$version/LLVM-$version-win32.exe"
+            }
+        }
+    }
 }

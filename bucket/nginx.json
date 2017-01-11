@@ -1,8 +1,8 @@
 {
-    "homepage": "http://nginx.org",
+    "homepage": "https://nginx.org",
     "version": "1.11.8",
     "license": "BSD",
-    "url": "http://nginx.org/download/nginx-1.11.8.zip",
+    "url": "https://nginx.org/download/nginx-1.11.8.zip",
     "hash": "0f06c91e86322a7658fcd4c210e1af69512ae9ff974df5e2beb4e4952e678016",
     "extract_dir": "nginx-1.11.8",
     "bin": "nginx.exe",
@@ -11,7 +11,7 @@
         "re": "Changes with nginx ([\\d.]+)"
     },
     "autoupdate": {
-        "url": "http://nginx.org/download/nginx-$version.zip",
+        "url": "https://nginx.org/download/nginx-$version.zip",
         "extract_dir": "nginx-$version"
     }
 }
