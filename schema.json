@@ -10,23 +10,23 @@
                     "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
                 },
                 "extract_dir": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                    "$ref": "#/definitions/stringOrArrayOfOneOrMoreStrings"
                 },
                 "hash": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                    "$ref": "#/definitions/stringOrArrayOfOneOrMoreStrings"
                 },
                 "installer": {
                     "$ref": "#/definitions/installer"
                 },
                 "msi": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsMin1",
+                    "$ref": "#/definitions/stringOrArrayOfOneOrMoreStrings",
                     "description": "Deprecated"
                 },
                 "post_install": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                    "$ref": "#/definitions/stringOrArrayOfOneOrMoreStrings"
                 },
                 "pre_install": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                    "$ref": "#/definitions/stringOrArrayOfOneOrMoreStrings"
                 },
                 "uninstaller": {
                     "$ref": "#/definitions/uninstaller"
@@ -82,7 +82,7 @@
                     "type": "object"
                 },
                 "extract_dir": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                    "$ref": "#/definitions/stringOrArrayOfOneOrMoreStrings"
                 },
                 "hash": {
                     "additionalProperties": false,
@@ -152,7 +152,7 @@
             "additionalProperties": false,
             "properties": {
                 "_comment": {
-                    "description": "Undocumented",
+                    "description": "Undocumented: only used in scoop-extras/oraclejdk* and scoop-extras/appengine-go",
                     "type": "string"
                 },
                 "args": {
@@ -180,7 +180,7 @@
                 }
             ]
         },
-        "stringOrArrayOfStringsMin1": {
+        "stringOrArrayOfOneOrMoreStrings": {
             "anyOf": [
                 {
                     "type": "string"
@@ -220,10 +220,6 @@
         },
         "uninstaller": {
             "properties": {
-                "_comment": {
-                    "description": "Undocumented",
-                    "type": "string"
-                },
                 "args": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
@@ -256,7 +252,7 @@
     },
     "properties": {
         "_comment": {
-            "description": "Undocumented",
+            "description": "Undocumented: only found in scoop/git* and 6 manifests in scoop-extras",
             "type": "string"
         },
         "architecture": {
@@ -349,13 +345,14 @@
             "$ref": "#/definitions/checkver"
         },
         "cookie": {
-            "description": "Undocumented: only found in https://github.com/lukesampson/scoop-extras/blob/master/oraclejdk*.json",
+            "description": "Undocumented: only found in scoop-extras/oraclejdk*",
             "type": "object"
         },
         "depends": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "description": {
+            "description": "Undocumented: only found in scoop/gibo",
             "type": "string"
         },
         "env_add_path": {
@@ -369,7 +366,7 @@
         },
         "extract_to": {
             "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "Undocumented: only found in https://github.com/lukesampson/scoop/blob/master/bucket/ruby*.json"
+            "description": "Undocumented: only found in scoop/ruby*"
         },
         "hash": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -379,7 +376,7 @@
             "type": "string"
         },
         "innosetup": {
-            "description": "Undocumented: found in 6 manifests in https://github.com/lukesampson/scoop/blob/master/bucket",
+            "description": "Undocumented: only found in 6 manifests in scoop",
             "type": "boolean"
         },
         "installer": {
@@ -406,7 +403,7 @@
         },
         "travel_dirs": {
             "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "Undocumented: only found in https://github.com/lukesampson/scoop-extras/blob/master/kibana.json"
+            "description": "Undocumented: only found in scoop-extras/kibana"
         },
         "uninstaller": {
             "$ref": "#/definitions/uninstaller"
