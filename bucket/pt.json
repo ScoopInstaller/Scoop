@@ -1,6 +1,6 @@
 {
     "homepage": "https://github.com/monochromegane/the_platinum_searcher",
-    "licence": "MIT",
+    "license": "MIT",
     "version": "2.1.5",
     "architecture": {
         "64bit": {

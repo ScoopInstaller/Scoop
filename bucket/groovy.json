@@ -15,7 +15,7 @@
         "bin\\java2groovy.bat",
         "bin\\startGroovy.bat"
     ],
-    "set_env": {
+    "env_set": {
         "GROOVY_HOME": "$dir"
     },
     "depends": "openjdk",

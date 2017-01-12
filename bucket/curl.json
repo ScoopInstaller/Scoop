@@ -1,7 +1,7 @@
 {
     "homepage": "https://curl.haxx.se/",
     "version": "7.52.1",
-    "licence": "MIT",
+    "license": "MIT",
     "architecture": {
         "64bit": {
             "url": "https://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x64.7z",
