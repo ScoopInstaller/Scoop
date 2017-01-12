@@ -1,6 +1,7 @@
 {
     "$id": "http://scoop.sh/draft/schema#",
     "$schema": "http://scoop.sh/draft/schema#",
+    "additionalProperties": false,
     "definitions": {
         "architecture": {
             "additionalProperties": false,
@@ -18,7 +19,8 @@
                     "$ref": "#/definitions/installer"
                 },
                 "msi": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                    "$ref": "#/definitions/stringOrArrayOfStringsMin1",
+                    "description": "Deprecated"
                 },
                 "post_install": {
                     "$ref": "#/definitions/stringOrArrayOfStringsMin1"
@@ -86,13 +88,22 @@
                     "additionalProperties": false,
                     "properties": {
                         "find": {
+                            "format": "regex",
                             "type": "string"
                         },
                         "mode": {
-                            "type": "string"
+                            "enum": [
+                                "download",
+                                "extract",
+                                "rdf"
+                            ]
                         },
                         "type": {
-                            "type": "string"
+                            "enum": [
+                                "sha1",
+                                "sha256",
+                                "sha512"
+                            ]
                         },
                         "url": {
                             "format": "uri",
@@ -114,6 +125,7 @@
         "checkver": {
             "anyOf": [
                 {
+                    "format": "regex",
                     "type": "string"
                 },
                 {
@@ -140,6 +152,7 @@
             "additionalProperties": false,
             "properties": {
                 "_comment": {
+                    "description": "Undocumented",
                     "type": "string"
                 },
                 "args": {
@@ -208,6 +221,7 @@
         "uninstaller": {
             "properties": {
                 "_comment": {
+                    "description": "Undocumented",
                     "type": "string"
                 },
                 "args": {
@@ -217,6 +231,9 @@
                     "type": "string"
                 }
             },
+            "required": [
+                "file"
+            ],
             "type": "object"
         },
         "uriOrArrayOfUris": {
@@ -237,9 +254,9 @@
             ]
         }
     },
-    "additionalProperties": false,
     "properties": {
         "_comment": {
+            "description": "Undocumented",
             "type": "string"
         },
         "architecture": {
@@ -264,7 +281,8 @@
                             "$ref": "#/definitions/installer"
                         },
                         "msi": {
-                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                            "$ref": "#/definitions/stringOrArrayOfStrings",
+                            "description": "Deprecated"
                         },
                         "post_install": {
                             "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -300,7 +318,8 @@
                             "$ref": "#/definitions/installer"
                         },
                         "msi": {
-                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                            "$ref": "#/definitions/stringOrArrayOfStrings",
+                            "description": "Deprecated"
                         },
                         "post_install": {
                             "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -330,6 +349,7 @@
             "$ref": "#/definitions/checkver"
         },
         "cookie": {
+            "description": "Undocumented: only found in https://github.com/lukesampson/scoop-extras/blob/master/oraclejdk*.json",
             "type": "object"
         },
         "depends": {
@@ -348,15 +368,18 @@
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "extract_to": {
-            "$ref": "#/definitions/stringOrArrayOfStrings"
+            "$ref": "#/definitions/stringOrArrayOfStrings",
+            "description": "Undocumented: only found in https://github.com/lukesampson/scoop/blob/master/bucket/ruby*.json"
         },
         "hash": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "homepage": {
+            "format": "uri",
             "type": "string"
         },
         "innosetup": {
+            "description": "Undocumented: found in 6 manifests in https://github.com/lukesampson/scoop/blob/master/bucket",
             "type": "boolean"
         },
         "installer": {
@@ -366,7 +389,8 @@
             "type": "string"
         },
         "msi": {
-            "$ref": "#/definitions/stringOrArrayOfStrings"
+            "$ref": "#/definitions/stringOrArrayOfStrings",
+            "description": "Deprecated"
         },
         "notes": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -381,7 +405,8 @@
             "$ref": "#/definitions/arrayOfArrayOfStrings"
         },
         "travel_dirs": {
-            "$ref": "#/definitions/stringOrArrayOfStrings"
+            "$ref": "#/definitions/stringOrArrayOfStrings",
+            "description": "Undocumented: only found in https://github.com/lukesampson/scoop-extras/blob/master/kibana.json"
         },
         "uninstaller": {
             "$ref": "#/definitions/uninstaller"
