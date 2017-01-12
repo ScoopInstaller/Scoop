@@ -1,0 +1,398 @@
+{
+    "$id": "http://scoop.sh/draft/schema#",
+    "$schema": "http://scoop.sh/draft/schema#",
+    "definitions": {
+        "architecture": {
+            "additionalProperties": false,
+            "properties": {
+                "bin": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "extract_dir": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                },
+                "hash": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                },
+                "installer": {
+                    "$ref": "#/definitions/installer"
+                },
+                "msi": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                },
+                "post_install": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                },
+                "pre_install": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                },
+                "uninstaller": {
+                    "$ref": "#/definitions/uninstaller"
+                },
+                "url": {
+                    "$ref": "#/definitions/uriOrArrayOfUris"
+                }
+            },
+            "type": "object"
+        },
+        "arrayOfArrayOfStrings": {
+            "items": {
+                "items": {
+                    "type": "string"
+                },
+                "type": "array"
+            },
+            "type": "array"
+        },
+        "autoupdate": {
+            "additionalProperties": false,
+            "properties": {
+                "architecture": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "32bit": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "extract_dir": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "format": "uri",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "64bit": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "extract_dir": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "format": "uri",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                "extract_dir": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsMin1"
+                },
+                "hash": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "find": {
+                            "type": "string"
+                        },
+                        "mode": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "url": {
+                            "format": "uri",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "note": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "url": {
+                    "format": "uri",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "checkver": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "github": {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        "re": {
+                            "format": "regex",
+                            "type": "string"
+                        },
+                        "url": {
+                            "format": "uri",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "installer": {
+            "additionalProperties": false,
+            "properties": {
+                "_comment": {
+                    "type": "string"
+                },
+                "args": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "keep": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "stringOrArrayOfStrings": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            ]
+        },
+        "stringOrArrayOfStringsMin1": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                }
+            ]
+        },
+        "stringOrArrayOfStringsOrAnArrayOfArrayOfStrings": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "items": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            }
+                        ]
+                    },
+                    "type": "array"
+                }
+            ]
+        },
+        "uninstaller": {
+            "properties": {
+                "_comment": {
+                    "type": "string"
+                },
+                "args": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "file": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "uriOrArrayOfUris": {
+            "anyOf": [
+                {
+                    "format": "uri",
+                    "type": "string"
+                },
+                {
+                    "items": {
+                        "format": "uri",
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                }
+            ]
+        }
+    },
+    "additionalProperties": false,
+    "properties": {
+        "_comment": {
+            "type": "string"
+        },
+        "architecture": {
+            "additionalProperties": false,
+            "properties": {
+                "32bit": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "bin": {
+                            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                        },
+                        "checkver": {
+                            "$ref": "#/definitions/checkver"
+                        },
+                        "extract_dir": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "hash": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "installer": {
+                            "$ref": "#/definitions/installer"
+                        },
+                        "msi": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "post_install": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "pre_install": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "uninstaller": {
+                            "$ref": "#/definitions/uninstaller"
+                        },
+                        "url": {
+                            "$ref": "#/definitions/uriOrArrayOfUris"
+                        }
+                    },
+                    "type": "object"
+                },
+                "64bit": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "bin": {
+                            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                        },
+                        "checkver": {
+                            "$ref": "#/definitions/checkver"
+                        },
+                        "extract_dir": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "hash": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "installer": {
+                            "$ref": "#/definitions/installer"
+                        },
+                        "msi": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "post_install": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "pre_install": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "uninstaller": {
+                            "$ref": "#/definitions/uninstaller"
+                        },
+                        "url": {
+                            "$ref": "#/definitions/uriOrArrayOfUris"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "autoupdate": {
+            "$ref": "#/definitions/autoupdate"
+        },
+        "bin": {
+            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+        },
+        "checkver": {
+            "$ref": "#/definitions/checkver"
+        },
+        "cookie": {
+            "type": "object"
+        },
+        "depends": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "description": {
+            "type": "string"
+        },
+        "env_add_path": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "env_set": {
+            "type": "object"
+        },
+        "extract_dir": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "extract_to": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "hash": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "homepage": {
+            "type": "string"
+        },
+        "innosetup": {
+            "type": "boolean"
+        },
+        "installer": {
+            "$ref": "#/definitions/installer"
+        },
+        "license": {
+            "type": "string"
+        },
+        "msi": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "notes": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "post_install": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "pre_install": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "shortcuts": {
+            "$ref": "#/definitions/arrayOfArrayOfStrings"
+        },
+        "travel_dirs": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "uninstaller": {
+            "$ref": "#/definitions/uninstaller"
+        },
+        "url": {
+            "$ref": "#/definitions/uriOrArrayOfUris"
+        },
+        "version": {
+            "type": "string"
+        }
+    },
+    "title": "scoop app manifest schema",
+    "type": "object"
+}
