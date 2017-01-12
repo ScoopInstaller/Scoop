@@ -1,6 +1,6 @@
 {
     "homepage": "https://yarnpkg.com/",
-    "licence": "BSD",
+    "license": "BSD",
     "version": "0.18.1",
     "depends": "nodejs",
     "url": "https://github.com/yarnpkg/yarn/releases/download/v0.18.1/yarn-0.18.1.msi",

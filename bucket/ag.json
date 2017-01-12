@@ -1,6 +1,6 @@
 {
     "homepage": "http://geoff.greer.fm/ag/",
-    "licence": "Apache 2.0",
+    "license": "Apache 2.0",
     "version": "0.29.1",
     "url": "https://kjkpub.s3.amazonaws.com/software/the_silver_searcher/rel/0.29.1-1641/ag.zip",
     "hash": "0f2643b925df66a56df82d419262c88c076ba257ab3a57c77291fce7b4479530",

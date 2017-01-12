@@ -1,6 +1,6 @@
 {
     "homepage": "https://github.com/BurntSushi/ripgrep",
-    "licence": "MIT",
+    "license": "MIT",
     "version": "0.3.2",
     "architecture": {
         "64bit": {
