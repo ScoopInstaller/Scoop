@@ -8,7 +8,7 @@
     "bin": [
         "bin\\grails.bat"
     ],
-    "set_env": {
+    "env_set": {
         "GRAILS_HOME": "$dir"
     },
     "depends": "openjdk",

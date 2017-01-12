@@ -11,7 +11,7 @@
         "bin\\kotlinc-js.bat",
         "bin\\kotlinc-jvm.bat"
     ],
-    "set_env": {
+    "env_set": {
         "KOTLIN_HOME": "$dir"
     },
     "depends": "openjdk",
