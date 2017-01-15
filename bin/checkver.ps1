@@ -108,12 +108,15 @@ while($in_progress -gt 0) {
     } else {
         if($page -match $regexp) {
             $ver = $matches[1]
+            if(!$ver) {
+                $ver = $matches['version']
+            }
             if($ver -eq $expected_ver) {
                 write-host "$ver" -f darkgreen
 
                 if ($forceUpdate -and $json.autoupdate) {
                     Write-Host "Forcing autoupdate!" -f DarkMagenta
-                    autoupdate $app $json $ver
+                    autoupdate $app $json $ver $matches
                 }
             } else {
                 write-host "$ver" -f darkred -nonewline
@@ -126,7 +129,7 @@ while($in_progress -gt 0) {
                 }
 
                 if($update -and $json.autoupdate) {
-                    autoupdate $app $json $ver
+                    autoupdate $app $json $ver $matches
                 }
             }
 
