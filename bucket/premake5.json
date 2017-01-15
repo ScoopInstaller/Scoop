@@ -1,14 +1,17 @@
 {
     "homepage": "https://premake.github.io/",
-    "version": "5.0.0-alpha10",
+    "version": "5.0.0-alpha11",
     "license": "BSD 3-Clause",
-    "url": "https://github.com/premake/premake-core/releases/download/v5.0.0-alpha10/premake-5.0.0-alpha10-windows.zip",
-    "hash": "681f47c00a469bf9e5ffa85b8a0d5cb234bf4c93be4c9ae15d84046c0723018e",
+    "url": "https://github.com/premake/premake-core/releases/download/v5.0.0-alpha11/premake-5.0.0-alpha11-windows.zip",
+    "hash": "f37b9c86edf6cb790ea9ada87be9951638705be5a8594c5426d4de14986d2440",
     "bin": [
         "premake5.exe"
     ],
     "checkver": {
         "url": "https://github.com/premake/premake-core/releases/latest",
-        "re": "\/releases\/tag\/v(5[0-9.]+-?(alpha|beta)?([0-9.]+)?)"
+        "re": "/releases/tag/v(5[0-9.]+-?(alpha|beta)?([0-9.]+)?)"
+    },
+    "autoupdate": {
+        "url": "https://github.com/premake/premake-core/releases/download/v$version/premake-$version-windows.zip"
     }
 }

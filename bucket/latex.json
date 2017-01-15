@@ -1,9 +1,9 @@
 {
     "homepage": "https://miktex.org",
-    "version": "2.9.6161",
+    "version": "2.9.6221",
     "license": "https://miktex.org/copying",
-    "url": "https://miktex.org/download/ctan/systems/win32/miktex/setup/miktex-portable-2.9.6161.exe#/dl.7z",
-    "hash": "cc7d67f481e009e5eece8b531b9a86c1f47c7dd107cf8bc36b7ee1689c5b3811",
+    "url": "https://miktex.org/download/ctan/systems/win32/miktex/setup/miktex-portable-2.9.6221.exe#/dl.7z",
+    "hash": "813de2e4c9abaafdc96dc69d8be5e7d30f2fd5db393e16db6c9dc31c353e533d",
     "env_add_path": "texmfs\\install\\miktex\\bin",
     "checkver": {
         "url": "https://miktex.org/portable",
