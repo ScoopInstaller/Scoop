@@ -126,25 +126,30 @@ function update_manifest_prop([String] $prop, $json)
     }
 }
 
-function prepare_download_url([String] $template, [String] $version)
+function prepare_download_url([String] $template, [String] $version, [Hashtable] $matches)
 {
     <#
     TODO There should be a second option to extract the url from the page
     #>
     $firstPart = $version.Split('-') | Select-Object -first 1
     $lastPart = $version.Split('-') | Select-Object -last 1
-    return substitute $template @{
+    $versionVariables = @{
         '$version' = $version;
         '$underscoreVersion' = ($version -replace "\.", "_");
         '$cleanVersion' = ($version -replace "\.", "");
-        '$majorVersion' = $firstPart.Split('.') | Select-Object -first 1
-        '$minorVersion' = $firstPart.Split('.') | Select-Object -skip 1 -first 1
-        '$patchVersion' = $firstPart.Split('.') | Select-Object -skip 2 -first 1
-        '$preReleaseVersion' = $lastPart
+        '$majorVersion' = $firstPart.Split('.') | Select-Object -first 1;
+        '$minorVersion' = $firstPart.Split('.') | Select-Object -skip 1 -first 1;
+        '$patchVersion' = $firstPart.Split('.') | Select-Object -skip 2 -first 1;
+        '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
+        '$preReleaseVersion' = $lastPart;
     }
+    $matches.GetEnumerator() | Select -SkipLast 1 | % {
+        $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+    }
+    return substitute $template $versionVariables
 }
 
-function autoupdate([String] $app, $json, [String] $version)
+function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matches)
 {
     Write-Host -f DarkCyan "Autoupdating $app"
     $has_changes = $false
@@ -153,7 +158,7 @@ function autoupdate([String] $app, $json, [String] $version)
 
     if ($json.url) {
         # create new url
-        $url = prepare_download_url $json.autoupdate.url $version
+        $url = prepare_download_url $json.autoupdate.url $version $matches
 
         # check url
         if (!(check_url $url)) {
@@ -182,7 +187,7 @@ function autoupdate([String] $app, $json, [String] $version)
             $architecture = $_.Name
 
             # create new url
-            $url = prepare_download_url (arch_specific "url" $json.autoupdate $architecture) $version
+            $url = prepare_download_url (arch_specific "url" $json.autoupdate $architecture) $version $matches
 
             # check url
             if (!(check_url $url)) {
