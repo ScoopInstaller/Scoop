@@ -115,7 +115,25 @@ function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) 
     }
 }
 
+function use_any_https_protocol() {
+    $original = "$([System.Net.ServicePointManager]::SecurityProtocol)"
+    $available = [string]::join(', ', `
+        [Enum]::GetNames([System.Net.SecurityProtocolType]))
+
+    # use whatever protocols are available that the server supports
+    set_https_protocols $available
+
+    return $original
+}
+
+function set_https_protocols($protocols) {
+    [System.Net.ServicePointManager]::SecurityProtocol = `
+        [System.Net.SecurityProtocolType] $protocols
+}
+
 function do_dl($url, $to, $cookies) {
+    $original_protocols = use_any_https_protocol
+
     try {
         if([console]::isoutputredirected) {
             # can't set cursor position: just do simple download
@@ -127,6 +145,8 @@ function do_dl($url, $to, $cookies) {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
         abort $e.message
+    } finally {
+        set_https_protocols $original_protocols
     }
 }
 
