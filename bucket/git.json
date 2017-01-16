@@ -5,12 +5,12 @@
     "version": "2.11.0.windows.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.11.0.windows.1/PortableGit-2.11.0-64-bit.7z.exe#/dl.7z",
-            "hash": "a86cc4babfe204cc91408053b517827b4a93e6c659b85ab30910eda0e38bfc19"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.11.0.windows.3/PortableGit-2.11.0.3-64-bit.7z.exe#/dl.7z",
+            "hash": "41a4ab3a1f0c88a3254b5a30d49c0c6e4ef06c204ddce53e23fc15d6e56f8d24"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.11.0.windows.1/PortableGit-2.11.0-32-bit.7z.exe#/dl.7z",
-            "hash": "fccec9350c1cb58a5e6d84d307d4f9f43ab9d58d93c8de67056416539d199002"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.11.0.windows.3/PortableGit-2.11.0.3-32-bit.7z.exe#/dl.7z",
+            "hash": "8bf3769c37945e991903dd1b988c6b1d97bbf0f3afc9851508974f38bf94dc01"
         }
     },
     "bin": [
@@ -22,9 +22,24 @@
     "post_install": [
         "git config --global credential.helper manager"
     ],
-    "notes": "To get Git to recognise OpenSSH, you will need to run\n\nscoop install openssh\n[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')\n\nand then restart powershell.",
+    "notes": "To get Git to recognise OpenSSH, you will need to run
+
+scoop install openssh
+[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')
+
+and then restart powershell.",
     "checkver": {
         "url": "https://github.com/git-for-windows/git/releases/latest",
-        "re": "\/releases\/tag\/v([\\d\\w.]+)"
+        "re": "v(?<version>[\\d\\w.]+)/PortableGit-(?<short>[\\d.]+).*\\.exe"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/git-for-windows/git/releases/download/v$matchVersion/PortableGit-$matchShort-64-bit.7z.exe#/dl.7z"
+            },
+            "32bit": {
+                "url": "https://github.com/git-for-windows/git/releases/download/v$matchVersion/PortableGit-$matchShort-32-bit.7z.exe#/dl.7z"
+            }
+        }
     }
 }
