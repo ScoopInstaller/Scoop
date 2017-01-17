@@ -15,15 +15,19 @@
     },
     "checkver": {
         "url": "https://github.com/ojdkbuild/ojdkbuild/releases/latest",
-        "re": "/releases/tag/([\\d.\\-]+)"
+        "re": "java-(?<short>[\\d.]+)-openjdk-(?<version>[\\d.]+-[\\d]+)(?<tail>.*).x86_64.zip"
     },
     "autoupdate": {
-        "note": "Please check if the generated URL is correct. Sometime the b15 after the version can change too!",
         "architecture": {
             "64bit": {
-                "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-1.8.0-openjdk-$version.b15.ojdkbuild.windows.x86_64.zip",
-                "extract_dir": "java-1.8.0-openjdk-$version.b15.ojdkbuild.windows.x86_64"
+                "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-$matchShort-openjdk-$version$matchTail.x86_64.zip",
+                "extract_dir": "java-$matchShort-openjdk-$version$matchTail.x86_64"
             }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "$url.sha256",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
         }
     }
 }
