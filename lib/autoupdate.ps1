@@ -42,7 +42,7 @@ function find_hash_in_rdf([String] $url, [String] $filename)
     return $digest.sha256
 }
 
-function get_hash_for_app([String] $app, $config, [String] $version, [String] $url)
+function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions)
 {
     $hash = $null
 
@@ -55,7 +55,8 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hashmode = $config.mode
     $basename = fname($url)
     if ($hashmode -eq "extract") {
-        $hashfile_url = substitute $config.url @{'$version' = $version; '$url' = $url}
+        $hashfile_url = substitute $config.url @{'$url' = $url}
+        $hashfile_url = substitute $hashfile_url $substitutions
         $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
 
         $regex = $config.find
@@ -107,11 +108,11 @@ function update_manifest_with_new_version($json, [String] $version, [String] $ur
     }
 }
 
-function update_manifest_prop([String] $prop, $json)
+function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
 {
     # first try the global property
     if ($json.$prop -and $json.autoupdate.$prop) {
-        $json.$prop = substitute $json.autoupdate.$prop @{'$version' = $json.version}
+        $json.$prop = substitute $json.autoupdate.$prop $substitutions
     }
 
     # check if there are architecture specific variants
@@ -120,17 +121,14 @@ function update_manifest_prop([String] $prop, $json)
             $architecture = $_.Name
 
             if ($json.architecture.$architecture.$prop) {
-                $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) @{'$version' = $json.version}
+                $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) $substitutions
             }
         }
     }
 }
 
-function prepare_download_url([String] $template, [String] $version, [Hashtable] $matches)
+function get_version_substitutions([String] $version, [Hashtable] $matches)
 {
-    <#
-    TODO There should be a second option to extract the url from the page
-    #>
     $firstPart = $version.Split('-') | Select-Object -first 1
     $lastPart = $version.Split('-') | Select-Object -last 1
     $versionVariables = @{
@@ -146,7 +144,7 @@ function prepare_download_url([String] $template, [String] $version, [Hashtable]
     $matches.GetEnumerator() | Select -SkipLast 1 | % {
         $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
     }
-    return substitute $template $versionVariables
+    return $versionVariables
 }
 
 function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matches)
@@ -155,10 +153,11 @@ function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matche
     $has_changes = $false
     $has_errors = $false
     [Bool]$valid = $true
+    $substitutions = get_version_substitutions $version $matches
 
     if ($json.url) {
         # create new url
-        $url = prepare_download_url $json.autoupdate.url $version $matches
+        $url = substitute $json.autoupdate.url $substitutions
 
         # check url
         if (!(check_url $url)) {
@@ -167,7 +166,7 @@ function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matche
         }
 
         # create hash
-        $hash = get_hash_for_app $app $json.autoupdate.hash $version $url
+        $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
         if ($hash -eq $null) {
             $valid = $false
             Write-Host -f DarkRed "Could not find hash!"
@@ -187,7 +186,7 @@ function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matche
             $architecture = $_.Name
 
             # create new url
-            $url = prepare_download_url (arch_specific "url" $json.autoupdate $architecture) $version $matches
+            $url = substitute (arch_specific "url" $json.autoupdate $architecture) $substitutions
 
             # check url
             if (!(check_url $url)) {
@@ -196,7 +195,7 @@ function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matche
             }
 
             # create hash
-            $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url
+            $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url $substitutions
             if ($hash -eq $null) {
                 $valid = $false
                 Write-Host -f DarkRed "Could not find hash!"
@@ -214,7 +213,7 @@ function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matche
     }
 
     # update properties
-    update_manifest_prop "extract_dir" $json
+    update_manifest_prop "extract_dir" $json $substitutions
 
     if ($has_changes -and !$has_errors) {
         # write file
