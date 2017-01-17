@@ -3,13 +3,13 @@
     "license": "Mozilla Public License 2.0",
     "version": "0.6.4",
     "architecture": {
-        "32bit": {
-            "url": "https://releases.hashicorp.com/vault/0.6.4/vault_0.6.4_windows_386.zip",
-            "hash": "1a1d2c6eccc9ce2b9e71c83b222cecbaed71036068e5a7744708821eedefa024"
-        },
         "64bit": {
             "url": "https://releases.hashicorp.com/vault/0.6.4/vault_0.6.4_windows_amd64.zip",
             "hash": "83db81056e7146513d7a2707ce1b6cf73ae8aa69f942f8cd92da49e1a7de86ca"
+        },
+        "32bit": {
+            "url": "https://releases.hashicorp.com/vault/0.6.4/vault_0.6.4_windows_386.zip",
+            "hash": "1a1d2c6eccc9ce2b9e71c83b222cecbaed71036068e5a7744708821eedefa024"
         }
     },
     "bin": [
@@ -18,5 +18,20 @@
     "checkver": {
         "url": "https://releases.hashicorp.com/vault/",
         "re": "vault_([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://releases.hashicorp.com/vault/$version/vault_$version_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://releases.hashicorp.com/vault/$version/vault_$version_windows_386.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://releases.hashicorp.com/vault/$version/vault_$version_SHA256SUMS",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
     }
 }
