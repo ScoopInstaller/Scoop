@@ -240,6 +240,7 @@ $default_aliases = @{
     'gc' = 'get-content'
     'gci' = 'get-childitem'
     'gcm' = 'get-command'
+    'gm' = 'get-member'
     'iex' = 'invoke-expression'
     'ls' = 'get-childitem'
     'mkdir' = { new-item -type directory @args }
