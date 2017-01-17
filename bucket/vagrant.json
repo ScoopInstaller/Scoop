@@ -11,6 +11,11 @@
         "re": "vagrant_([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version.msi"
+        "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version.msi",
+        "hash": {
+            "mode": "extract",
+            "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version_SHA256SUMS",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
     }
 }
