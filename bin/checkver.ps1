@@ -41,6 +41,8 @@ get-event | % {
     remove-event $_.sourceidentifier
 }
 
+$original = use_any_https_protocol
+
 # start all downloads
 $queue | % {
     $wc = new-object net.webclient
@@ -138,6 +140,8 @@ while($in_progress -gt 0) {
         }
     }
 }
+
+set_https_protocols $original
 
 <#
 write-host "checking $(strip_ext (fname $_))..." -nonewline
