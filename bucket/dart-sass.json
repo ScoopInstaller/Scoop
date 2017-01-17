@@ -1,0 +1,22 @@
+{
+  "homepage": "https://github.com/sass/dart-sass",
+  "version": "1.0.0-alpha.8",
+  "license": "https://raw.githubusercontent.com/sass/dart-sass/master/LICENSE",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-alpha.8/dart-sass-1.0.0-alpha.8-windows-x64.zip",
+      "hash": "a451a182ac03dc9b15ce59f04abc2033df93e6772436614840b3f0ada637c774"
+    },
+    "32bit": {
+      "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-alpha.8/dart-sass-1.0.0-alpha.8-windows-ia32.zip",
+      "hash": "b6abd66aa05169e2e4e35cd79e8e411a36687b4a75dbaed1b35d65a2bfc4a98d"
+    }
+  },
+  "extract_dir": "dart-sass",
+  "bin": [
+    "dart-sass.bat"
+  ],
+  "checkver": {
+    "github": "https://github.com/sass/dart-sass"
+  }
+}
