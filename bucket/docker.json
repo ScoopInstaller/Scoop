@@ -16,6 +16,19 @@
     "bin": [
       "docker.exe"
     ],
+    "checkver": {
+      "github": "https://github.com/docker/docker"
+    },
+    "autoupdate": {
+      "architecture": {
+        "64bit": {
+          "url": "https://get.docker.com/builds/Windows/x86_64/docker-$version.zip"
+        },
+        "32bit": {
+          "url": "https://get.docker.com/builds/Windows/i386/docker-$version.zip"
+        }
+      }
+    },
     "notes": [
       "This is the docker client only. Until the docker daemon can run natively",
       "on Windows you will need a Virtual Machine such as Boot2Docker or",
