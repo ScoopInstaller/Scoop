@@ -14,7 +14,25 @@
     },
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\docker-machine-*.exe)[0] $dir\\docker-machine.exe",
     "bin": [
-        ["docker-machine.exe", "docker-machine"]
+        [
+            "docker-machine.exe",
+            "docker-machine"
+        ]
     ],
-    "checkver": "github"
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/docker/machine/releases/download/v$version/docker-machine-Windows-x86_64.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/docker/machine/releases/download/v$version/docker-machine-Windows-i386.exe"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://github.com/docker/machine/releases/download/v$version/sha256sum.txt",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
+    }
 }
