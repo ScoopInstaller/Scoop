@@ -30,7 +30,7 @@ hub diff --name-only | % {
                     Write-Host -f DarkRed "Push failed! (hub push origin $branch)"
                 } else {
                     Write-Host -f DarkCyan "Pull-Request update $app ($version) ..."
-                    hub pull-request -m "Update $app to version $version 🚀`n`nHello lovely humans,`n
+                    hub pull-request -m "Update $app to version $version`n`nHello lovely humans,`n
 a new version of [$app]($homepage) is available.
 <table>
 <tr><th align=left>State</th><td>Update :rocket:</td></tr>
