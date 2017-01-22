@@ -5,7 +5,7 @@
 $erroractionpreference='stop' # quit if anything goes wrong
 
 # show notification to change execution policy:
-if((get-executionpolicy -s cu) -gt 'RemoteSigned') {
+if((get-executionpolicy) -gt 'RemoteSigned') {
     "PowerShell requires an execution policy of 'RemoteSigned' to run Scoop."
     "To make this change please run:"
     "'Set-ExecutionPolicy RemoteSigned -scope CurrentUser'"
