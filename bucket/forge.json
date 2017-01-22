@@ -1,8 +1,8 @@
 {
     "homepage": "http://forge.run",
-    "version": "1.3.3",
-    "url": "https://github.com/fsharp-editing/Forge/releases/download/1.3.3/forge.zip",
-    "hash": "0988db5d1079591dd653226edd11ea95227ddc828367fe38f1b8a766e1ebe70b",
+    "version": "1.4.0",
+    "url": "https://github.com/fsharp-editing/Forge/releases/download/1.4.0/forge.zip",
+    "hash": "439108f05afaf49d250167de746901e5135d7180cfc6ab5fd7ff0350e01b9c79",
     "bin": [
         "bin\\forge.exe"
     ],
