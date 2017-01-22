@@ -47,4 +47,4 @@ iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 ```
 
 **Note:** if you get an error you might need to change the execution policy
-(i.e. enable Powershell) with `set-executionpolicy unrestricted -s cu`
+(i.e. enable Powershell) with `set-executionpolicy remotesigned -s cu`
