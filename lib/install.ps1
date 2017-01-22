@@ -40,6 +40,7 @@ function install_app($app, $architecture, $global) {
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global
+    install_psmodule $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
