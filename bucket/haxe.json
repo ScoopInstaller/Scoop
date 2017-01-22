@@ -15,10 +15,10 @@
     "depends": "neko",
     "checkver": {
         "url": "https://haxe.org/download/list/",
-        "re": "The current stable version is <a [^>]+>([\\d.\\-rc]+)"
+        "re": "The current stable version is <a [^>]+>(([\\d\\.]+)(-rc)?\\.?([\\d]+)?)"
     },
     "autoupdate": {
         "url": "https://haxe.org/website-content/downloads/$version/downloads/haxe-$version-win.zip",
-        "extract_dir": "haxe-$version"
+        "extract_dir": "haxe-$match2$match3$match4"
     }
 }
