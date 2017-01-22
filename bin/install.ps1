@@ -5,10 +5,10 @@
 $erroractionpreference='stop' # quit if anything goes wrong
 
 # show notification to change execution policy:
-$ep = get-executionpolicy cu;
-if ($ep -ne "unrestricted") {
-    "scoop needs powershell execution policy to be set to 'unrestricted' in order to install programs."
-    "to make this change please run 'set-executionPolicy unrestricted -s cu'"
+if((get-executionpolicy -s cu) -gt 'RemoteSigned') {
+    "PowerShell requires an execution policy of 'RemoteSigned' to run Scoop."
+    "To make this change please run:"
+    "'Set-ExecutionPolicy RemoteSigned -scope CurrentUser'"
     break
 }
 
