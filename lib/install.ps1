@@ -808,9 +808,13 @@ function all_installed($apps, $global) {
     }
 }
 
-function prune_installed($apps) {
-    $installed = @(all_installed $apps $true) + @(all_installed $apps $false)
-    $apps | ? { $installed -notcontains $_ }
+# returns (uninstalled, installed)
+function prune_installed($apps, $global) {
+    $installed = @(all_installed $apps $global)
+
+    $uninstalled = $apps | ? { $installed -notcontains $_ }
+
+    return @(,$uninstalled, $installed)
 }
 
 # check whether the app failed to install

@@ -31,10 +31,10 @@
 
 reset_aliases
 
-function ensure_none_installed($apps, $global) {
-    $app = @(all_installed $apps $global)[0] # might return more than one; just get the first
-    if($app) {
-        $global_flag = $null; if($global){$global_flag = ' --global'}
+function ensure_not_installed($app, $global) {
+    if(installed $app $global) {
+        $global_flag = $null;
+        if($global){ $global_flag = ' --global' }
 
         $version = @(versions $app $global)[-1]
         if(!(install_info $app $version $global)) {
@@ -57,13 +57,22 @@ if($global -and !(is_admin)) {
     'ERROR: you need admin rights to install global apps'; exit 1
 }
 
-ensure_none_installed $apps $global
+if($apps.length -eq 1) {
+    ensure_not_installed $apps $global
+}
+
+# remember which were explictly requested so that we can
+# differentiate after dependencies are added
+$explicit_apps = $apps 
 
 if(!$independent) {
     $apps = install_order $apps $architecture # adds dependencies
 }
 ensure_none_failed $apps $global
-$apps = prune_installed $apps $global # removes dependencies that are already installed
+
+$apps, $skip = prune_installed $apps $global
+
+$skip | ? { $explicit_apps -contains $_} | % { warn "$_ is already installed, skipping" }
 
 $apps | % { install_app $_ $architecture $global }
 
