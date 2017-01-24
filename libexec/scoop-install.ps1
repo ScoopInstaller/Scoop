@@ -63,7 +63,7 @@ if($apps.length -eq 1) {
 
 # remember which were explictly requested so that we can
 # differentiate after dependencies are added
-$explicit_apps = $apps 
+$explicit_apps = $apps
 
 if(!$independent) {
     $apps = install_order $apps $architecture # adds dependencies
