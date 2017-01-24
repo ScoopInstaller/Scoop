@@ -814,7 +814,7 @@ function prune_installed($apps, $global) {
 
     $uninstalled = $apps | ? { $installed -notcontains $_ }
 
-    return (,($uninstalled), ($installed))
+    return @($uninstalled), @($installed)
 }
 
 # check whether the app failed to install
