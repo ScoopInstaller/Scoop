@@ -10,5 +10,9 @@
     "checkver": {
         "url": "https://gradle.org/gradle-download/",
         "re": "Download Gradle ([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "https://services.gradle.org/distributions/gradle-$version-bin.zip",
+        "extract_dir": "gradle-$version"
     }
 }
