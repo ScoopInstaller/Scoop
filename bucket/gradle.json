@@ -1,14 +1,18 @@
 {
     "homepage": "http://www.gradle.org",
-    "version": "2.14",
+    "version": "3.3",
     "license": "Apache 2.0",
-    "hash": "993B4F33B652C689E9721917D8E021CAB6BBD3EAE81B39AB2FD46FDB19A928D5",
-    "url": "https://services.gradle.org/distributions/gradle-2.14-bin.zip",
-    "extract_dir": "gradle-2.14",
+    "hash": "c58650c278d8cf0696cab65108ae3c8d95eea9c1938e0eb8b997095d5ca9a292",
+    "url": "https://services.gradle.org/distributions/gradle-3.3-bin.zip",
+    "extract_dir": "gradle-3.3",
     "bin": "bin\\gradle.bat",
     "depends": "openjdk",
     "checkver": {
         "url": "https://gradle.org/gradle-download/",
         "re": "Download Gradle ([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "https://services.gradle.org/distributions/gradle-$version-bin.zip",
+        "extract_dir": "gradle-$version"
     }
 }
