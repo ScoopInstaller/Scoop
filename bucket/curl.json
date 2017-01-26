@@ -4,12 +4,12 @@
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x64.7z",
-            "hash": "aeaba94333c65817760299f3ddb13992f0ba79a71e19fc81504462788ebc705d"
+            "url": "https://winampplugins.co.uk/curl/curl_7_52_1_openssl_nghttp2_x64.7z",
+            "hash": "4d3f35d71cfde1e10c9f3953af6d6b82e8ac8cfa5a602d97b15bf66d343192a6"
         },
         "32bit": {
-            "url": "https://winampplugins.co.uk/curl/curl_7_52_0_openssl_nghttp2_x86.7z",
-            "hash": "e93d07bc54a7909af7533d829605668c98667153646fe5109222b69a0dd050fc"
+            "url": "https://winampplugins.co.uk/curl/curl_7_52_1_openssl_nghttp2_x86.7z",
+            "hash": "4aa098fa752a26a0552df8801ba76ea0a058c095d97a601b54c61d5066a4f22a"
         }
     },
     "bin": "curl.exe",
