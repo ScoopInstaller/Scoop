@@ -21,6 +21,7 @@
         "composite.exe",
         "conjure.exe",
         "convert.exe",
+        ["convert.exe", "imconvert"],
         "dcraw.exe",
         "hp2xx.exe",
         "identify.exe",
