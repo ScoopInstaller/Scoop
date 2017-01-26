@@ -1,10 +1,10 @@
 {
     "homepage": "https://nginx.org",
-    "version": "1.11.8",
+    "version": "1.11.9",
     "license": "BSD",
-    "url": "https://nginx.org/download/nginx-1.11.8.zip",
-    "hash": "0f06c91e86322a7658fcd4c210e1af69512ae9ff974df5e2beb4e4952e678016",
-    "extract_dir": "nginx-1.11.8",
+    "url": "https://nginx.org/download/nginx-1.11.9.zip",
+    "hash": "407d692e2fb38a22f4d22d43364d476cb5917756a3691b88b4e6c07d1c8a3161",
+    "extract_dir": "nginx-1.11.9",
     "bin": "nginx.exe",
     "checkver": {
         "url": "https://nginx.org/en/CHANGES",
