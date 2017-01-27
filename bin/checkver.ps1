@@ -118,7 +118,7 @@ while($in_progress -gt 0) {
 
                 if ($forceUpdate -and $json.autoupdate) {
                     Write-Host "Forcing autoupdate!" -f DarkMagenta
-                    autoupdate $app $json $ver $matches
+                    autoupdate $app $dir $json $ver $matches
                 }
             } else {
                 write-host "$ver" -f darkred -nonewline
@@ -131,7 +131,7 @@ while($in_progress -gt 0) {
                 }
 
                 if($update -and $json.autoupdate) {
-                    autoupdate $app $json $ver $matches
+                    autoupdate $app $dir $json $ver $matches
                 }
             }
 

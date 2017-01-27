@@ -147,7 +147,7 @@ function get_version_substitutions([String] $version, [Hashtable] $matches)
     return $versionVariables
 }
 
-function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matches)
+function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $matches)
 {
     Write-Host -f DarkCyan "Autoupdating $app"
     $has_changes = $false
@@ -219,7 +219,7 @@ function autoupdate([String] $app, $json, [String] $version, [Hashtable] $matche
         # write file
         Write-Host -f DarkGreen "Writing updated $app manifest"
 
-        $path = manifest_path $app
+        $path = "$dir\$app.json"
 
         $file_content = $json | ConvertToPrettyJson
         [System.IO.File]::WriteAllLines($path, $file_content)
