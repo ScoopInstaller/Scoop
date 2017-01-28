@@ -25,6 +25,9 @@
         "re": "Latest\\s+Release\\s+\\(([\\d+.]+)\\)",
         "url": "https://cmake.org/download/"
     },
+    "shortcuts": [
+        [ "bin/cmake-gui.exe", "cmake-gui" ]
+    ],
     "autoupdate": {
         "architecture": {
             "64bit": {
