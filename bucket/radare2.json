@@ -1,0 +1,18 @@
+{
+    "version":  "1.1.0",
+    "license": "GPL2",
+    "url":  "http://cloud.radare.org/get/1.1.0/radare2-w32-1.1.0.zip",
+    "homepage": "http://www.radare.org/r/",
+    "extract_dir":  "radare2-w32-1.1.0",
+    "bin": [
+        "rabin2.exe",
+        "radare2.exe",
+        "radiff2.exe",
+        "rafind2.exe",
+        "ragg2.exe",
+        "rahash2.exe",
+        "rarun2.exe",
+        "rasm2.exe",
+        "rax2.exe"
+    ]
+}
