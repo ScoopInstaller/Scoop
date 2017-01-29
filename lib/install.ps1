@@ -277,6 +277,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
             write-host "extracting..." -nonewline
             $null = mkdir "$dir\_scoop_extract"
             & $extract_fn "$dir\$fname" "$dir\_scoop_extract"
+            rm "$dir\$fname"
             if ($extract_to) {
                 $null = mkdir "$dir\$extract_to" -force
             }
@@ -294,7 +295,6 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
                 }
             }
 
-            rm "$dir\$fname"
             write-host "done"
 
             $extracted++
