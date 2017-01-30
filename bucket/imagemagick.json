@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.imagemagick.org/script/index.php",
     "license": "https://www.imagemagick.org/script/license.php",
-    "version": "7.0.4-5",
+    "version": "7.0.4-6",
     "architecture": {
         "64bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-5-portable-Q16-x64.zip",
-            "hash": "edc13ebb1902de5ce3489c11d15e389fee2d740430151d96bfb191fd1532de67"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-6-portable-Q16-x64.zip",
+            "hash": "7df715ec020b3b6bdc71fba3024bf63a163ea47bdd14992b9aa7145e20a8e512"
         },
         "32bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-5-portable-Q16-x86.zip",
-            "hash": "65b2550b71e46f9964d3aff66b4d88a033e0de247ba8b93637dedf440331f82e"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.4-6-portable-Q16-x86.zip",
+            "hash": "37f575050255a02f919adde91caff0879bf748844f62573309b89002191b762a"
         }
     },
     "depends": [
@@ -21,7 +21,10 @@
         "composite.exe",
         "conjure.exe",
         "convert.exe",
-        ["convert.exe", "imconvert"],
+        [
+            "convert.exe",
+            "imconvert"
+        ],
         "dcraw.exe",
         "hp2xx.exe",
         "identify.exe",
