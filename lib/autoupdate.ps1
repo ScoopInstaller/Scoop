@@ -141,7 +141,7 @@ function get_version_substitutions([String] $version, [Hashtable] $matches)
         '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
         '$preReleaseVersion' = $lastPart;
     }
-    $matches.GetEnumerator() | Select -SkipLast 1 | % {
+    $matches.GetEnumerator() | Select -First ($matches.Count - 1) | % {
         $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
     }
     return $versionVariables
