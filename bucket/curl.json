@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://winampplugins.co.uk/curl/curl_7_52_1_openssl_nghttp2_x64.7z",
-            "hash": "4d3f35d71cfde1e10c9f3953af6d6b82e8ac8cfa5a602d97b15bf66d343192a6"
+            "hash": "06178b6ae4e0b02b46b393db7bda647fb5b467cb8f0e3152dd5b20285858ac2d"
         },
         "32bit": {
             "url": "https://winampplugins.co.uk/curl/curl_7_52_1_openssl_nghttp2_x86.7z",
-            "hash": "4aa098fa752a26a0552df8801ba76ea0a058c095d97a601b54c61d5066a4f22a"
+            "hash": "9b06df82d3d507ad41e95c4a62d1494a6e73e88979a8d47a742273e64ec4a9f9"
         }
     },
     "bin": "curl.exe",
