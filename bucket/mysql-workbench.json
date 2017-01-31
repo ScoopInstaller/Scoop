@@ -1,0 +1,41 @@
+{
+    "version": "6.3.8",
+    "license": "GPL",
+    "homepage": "https://dev.mysql.com/downloads/workbench/",
+    "architecture": {
+        "32bit": {
+            "url": "http://mysql.mirror.ac.za/Downloads/MySQLGUITools/mysql-workbench-community-6.3.8-win32-noinstall.zip",
+            "hash": "md5:e1146205cf24df254be204e95d989710",
+            "extract_dir": "MySQL Workbench 6.3.8 CE (win32)"
+        },
+        "64bit": {
+            "url": "http://mysql.mirror.ac.za/Downloads/MySQLGUITools/mysql-workbench-community-6.3.8-winx64-noinstall.zip",
+            "hash": "md5:f36309fb46a06b920a50fe3c91a798ab",
+            "extract_dir": "MySQL Workbench 6.3.8 CE (winx64)"
+        }
+    },
+    "checkver": "MySQL Workbench ([\\d.]+)",
+    "autoupdate": {
+        "architecture": {
+            "32bit": {
+                "url": "http://mysql.mirror.ac.za/Downloads/MySQLGUITools/mysql-workbench-community-$version-win32-noinstall.zip",
+                "extract_dir": "MySQL Workbench $version CE (win32)"
+            },
+            "64bit": {
+                "url": "http://mysql.mirror.ac.za/Downloads/MySQLGUITools/mysql-workbench-community-$version-winx64-noinstall.zip",
+                "extract_dir": "MySQL Workbench $version CE (winx64)"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "$url.md5",
+            "type": "md5",
+            "find": "([a-z0-9]{32})\\s+(?:$basename)"
+        }
+    },
+    "bin": [
+        "MySQLWorkbench.exe",
+        "mysql.exe",
+        "mysqldump.exe"
+    ]
+}
