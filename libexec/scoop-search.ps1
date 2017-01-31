@@ -114,7 +114,9 @@ function search_remotes($query) {
 }
 
 if (!$local_results -and !(github_ratelimit_reached)) {
-    search_remotes $query
+    $remote_results = search_remotes $query
+    if(!$remote_results) { [console]::error.writeline("no matches found"); exit 1 }
+    $remote_results
 }
 
 exit 0
