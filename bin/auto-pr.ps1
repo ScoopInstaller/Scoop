@@ -16,7 +16,7 @@ hub diff --name-only | % {
         if($json.version) {
             $version = $json.version
             $homepage = $json.homepage
-            $branch = "$app-$version"
+            $branch = "manifest/$app-$version"
             hub checkout master *> $null
             hub rev-parse --verify $branch *> $null
             if($LASTEXITCODE -gt 0) {
