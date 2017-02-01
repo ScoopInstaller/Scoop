@@ -14,8 +14,8 @@
         "JAVA_HOME": "$dir"
     },
     "checkver": {
-        "url": "https://github.com/ojdkbuild/ojdkbuild/releases/latest",
-        "re": "java-(?<short>[\\d.]+)-openjdk-(?<version>[\\d.]+-[\\d]+)(?<tail>.*).x86_64.zip"
+        "url": "https://raw.githubusercontent.com/ojdkbuild/ojdkbuild/master/README.md",
+        "re": "download/.*/java-(?<short>[\\d.]+)-openjdk-(?<version>[\\d.]+-[\\d]+)(?<tail>.*).x86_64.zip\\)"
     },
     "autoupdate": {
         "architecture": {
