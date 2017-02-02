@@ -1,10 +1,10 @@
 {
     "homepage": "https://yarnpkg.com/",
     "license": "BSD",
-    "version": "0.20.0",
+    "version": "0.19.1",
     "depends": "nodejs",
-    "url": "https://github.com/yarnpkg/yarn/releases/download/v0.20.0/yarn-0.20.0.msi",
-    "hash": "4ebd23072f266bcd5e4dbee34d70d68b743949bb4504a7aad1c0ecdbf994b7d5",
+    "url": "https://github.com/yarnpkg/yarn/releases/download/v0.19.1/yarn-0.19.1.msi",
+    "hash": "2d08c4e4e7a6086585ef47307333187a235aa926a211628d3f8c02093fd6fb71",
     "bin": "Yarn\\bin\\yarn.cmd",
     "checkver": {
         "url": "https://github.com/yarnpkg/yarn/releases/latest",
