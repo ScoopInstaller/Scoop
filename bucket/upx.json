@@ -1,11 +1,16 @@
 {
     "homepage": "https://upx.github.io/",
-    "version": "3.92",
-    "url": "https://github.com/upx/upx/releases/download/v3.92/upx392w.zip",
-    "hash": "041f9fe5c749a5491db1c902db16b55a6d343030103cb1add2fcc5bb63c6143d",
-    "bin": "upx392w\\upx.exe",
+    "version": "3.93",
+    "url": "https://github.com/upx/upx/releases/download/v3.93/upx393w.zip",
+    "hash": "e1f21726740b466379c8109daaecb83b7ec7588b698aa958c977235aae50fe56",
+    "extract_dir": "upx393w",
+    "bin": "upx.exe",
     "license": "GPL2",
     "checkver": {
         "github": "https://github.com/upx/upx"
+    },
+    "autoupdate": {
+        "url": "https://github.com/upx/upx/releases/download/v$version/upx$cleanVersionw.zip",
+        "extract_dir": "upx$cleanVersionw"
     }
 }
