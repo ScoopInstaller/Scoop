@@ -1,9 +1,9 @@
 {
     "homepage": "https://rtyley.github.io/bfg-repo-cleaner/",
     "license": "GPL",
-    "version": "1.12.14",
-    "url": "https://repo1.maven.org/maven2/com/madgag/bfg/1.12.14/bfg-1.12.14.jar",
-    "hash": "7a44d53ef626a4282c34cc363166e678c5d9e91e4c6815e8e069036edd9fab64",
+    "version": "1.12.15",
+    "url": "https://repo1.maven.org/maven2/com/madgag/bfg/1.12.15/bfg-1.12.15.jar",
+    "hash": "330af214a0fed320c591afc1046b0f31e8a438f290da09672973aeaa6411b09d",
     "depends": "openjdk",
     "bin": "bfg.ps1",
     "env_set": {
