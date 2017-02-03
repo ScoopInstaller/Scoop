@@ -1,0 +1,39 @@
+{
+    "homepage": "https://kubernetes.io/docs/user-guide/kubectl-overview/",
+    "license": "https://github.com/kubernetes/kubernetes/blob/master/LICENSE",
+    "version": "1.5.2",
+    "architecture": {
+        "64bit": {
+            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.5.2/kubernetes-client-windows-amd64.tar.gz",
+            "hash": "sha1:e5ea96e37208529a148e80486ca5bdfae86a2948"
+        },
+        "32bit": {
+            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.5.2/kubernetes-client-windows-386.tar.gz",
+            "hash": "sha1:b13df7c4d99e4ab335c2b85edcf657163c28490b"
+        }
+    },
+    "extract_dir": "kubernetes\\client",
+    "bin": [
+        "bin\\kubectl.exe",
+        "bin\\kubefed.exe"
+    ],
+    "checkver": {
+        "url": "https://storage.googleapis.com/kubernetes-release/release/stable.txt",
+        "re": "v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://storage.googleapis.com/kubernetes-release/release/v1.5.2/kubernetes-client-windows-amd64.tar.gz"
+            },
+            "32bit": {
+                "url": "https://storage.googleapis.com/kubernetes-release/release/v1.5.2/kubernetes-client-windows-386.tar.gz"
+            }
+        },
+        "hash": {
+            "type": "sha1",
+            "mode": "extract",
+            "url": "$url.sha1"
+        }
+    }
+}
