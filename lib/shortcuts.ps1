@@ -3,7 +3,13 @@ function create_startmenu_shortcuts($manifest, $dir, $global) {
     $manifest.shortcuts | ?{ $_ -ne $null } | % {
         $target = $_.item(0)
         $name = $_.item(1)
-        startmenu_shortcut "$dir\$target" $name
+        $props = $null
+        if ($_.length -gt 2) {
+            # third item is optional object which are properties for the shortcut such as WorkingDirectory, see https://msdn.microsoft.com/en-us/library/f5y78918(v=vs.84).aspx
+            $props = $_.item(2)
+        }
+
+        startmenu_shortcut "$dir\$target" $name $props
     }
 }
 
@@ -11,7 +17,7 @@ function shortcut_folder() {
     "$([environment]::getfolderpath('startmenu'))\Programs\Scoop Apps"
 }
 
-function startmenu_shortcut($target, $shortcutName) {
+function startmenu_shortcut($target, $shortcutName, $props) {
     if(!(Test-Path $target)) {
         abort "Can't create the Startmenu shortcut for $(fname $target): couldn't find $target"
     }
@@ -22,6 +28,13 @@ function startmenu_shortcut($target, $shortcutName) {
     $wsShell = New-Object -ComObject WScript.Shell
     $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
     $wsShell.TargetPath = "$target"
+    if ($props) {
+        $props.psobject.properties | % {
+            $propname = $_.name
+            $propvalue = $_.value
+            $wsShell.$propname = iex $propvalue # to ensure variables such as $dir are replaced
+        }
+    }
     $wsShell.Save()
 }
 
