@@ -130,10 +130,10 @@ hub diff --name-only | % {
 }
 
 if($push -eq $true) {
-    Write-Host -f DarkCyan "Pushing update $app ($version) ..."
+    Write-Host -f DarkCyan "Pushing updates ..."
     execute "hub push origin master"
 } else {
-    Write-Host -f DarkCyan "returning to master branch and removing unstaged files ..."
+    Write-Host -f DarkCyan "Returning to master branch and removing unstaged files ..."
     execute "hub checkout -f master"
 }
 
