@@ -134,6 +134,6 @@ if($push -eq $true) {
     execute "hub push origin master"
 } else {
     Write-Host -f DarkCyan "returning to master branch and removing unstaged files ..."
-    # execute "hub checkout -f master"
+    execute "hub checkout -f master"
 }
 
