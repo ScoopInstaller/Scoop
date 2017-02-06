@@ -1,13 +1,22 @@
 {
-    "version": "1.0.5",
-    "homepage": "http://gnuwin32.sourceforge.net/packages/bzip2.htm",
-    "url": "https://sourceforge.net/projects/gnuwin32/files/bzip2/1.0.5/bzip2-1.0.5-bin.zip",
-    "hash": "97137e4b9ac9e116d0877f9d266927fea91ad117b011f80cf034fea4ef7a534e",
+    "version": "1.0.6",
+    "homepage": "http://www.bzip.org/",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/philr/bzip2-windows/releases/download/v1.0.6/bzip2-1.0.6-win-x86.zip",
+            "hash": "e9a6d5908e219def07ae6be73383112c5a571b74fbde9bed42ee7eb1523fd727"
+        },
+        "64bit": {
+            "url": "https://github.com/philr/bzip2-windows/releases/download/v1.0.6/bzip2-1.0.6-win-x64.zip",
+            "hash": "f5feefa49e7d3e87ba0ba731ed22b4b0e269f635bec2839827127a98d0a2e192"
+        }
+    },
     "bin": [
-        "bin\\bunzip2.exe",
-        "bin\\bzcat.exe",
-        "bin\\bzip2.exe",
-        "bin\\bzip2recover.exe"
+        "bunzip2.exe",
+        "bzcat.exe",
+        "bzip2.exe",
+        "bzip2recover.exe"
     ],
-    "checkver": "Version<\\/A><\\/h2>\\s+<p>([\\d.]+)"
+    "pre_install": "cp $dir\\bzip2.exe $dir\\bunzip2.exe; cp $dir\\bzip2.exe $dir\\bzcat.exe",
+    "checkver": "The current version is <b>([\\d.]+)"
 }
