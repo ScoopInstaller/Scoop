@@ -24,10 +24,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://storage.googleapis.com/kubernetes-release/release/v1.5.2/kubernetes-client-windows-amd64.tar.gz"
+                "url": "https://storage.googleapis.com/kubernetes-release/release/v$version/kubernetes-client-windows-amd64.tar.gz"
             },
             "32bit": {
-                "url": "https://storage.googleapis.com/kubernetes-release/release/v1.5.2/kubernetes-client-windows-386.tar.gz"
+                "url": "https://storage.googleapis.com/kubernetes-release/release/v$version/kubernetes-client-windows-386.tar.gz"
             }
         },
         "hash": {
