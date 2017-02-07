@@ -9,7 +9,7 @@
     "depends": "openjdk",
     "checkver": {
         "url": "https://gradle.org/gradle-download/",
-        "re": "Download Gradle ([\\d.]+)"
+        "re": "The current Gradle release is version ([\\d.]+)"
     },
     "autoupdate": {
         "url": "https://services.gradle.org/distributions/gradle-$version-bin.zip",
