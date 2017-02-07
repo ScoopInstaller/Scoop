@@ -10,10 +10,14 @@
 
 param(
     [String]$upstream = "lukesampson/scoop:master",
+    [String]$dir,
     [Switch]$push = $false,
     [Switch]$request = $false,
     [Switch]$help = $false
 )
+
+if(!$dir) { $dir = "$psscriptroot\.." }
+$dir = resolve-path $dir
 
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\json.ps1"
@@ -104,7 +108,7 @@ if($push -eq $true) {
     execute("hub push origin master")
 }
 
-. "$psscriptroot\checkver.ps1" * -u
+. "$dir\bin\checkver.ps1" * -update
 
 hub diff --name-only | % {
     $manifest = $_
