@@ -201,22 +201,40 @@ function dl($url, $to, $cookies, $progress) {
 }
 
 function dl_progress_output($url, $read, $total, $console) {
+    # get filename from url using regex
     $filename = $url.split('/') | Select-Object -Last 1
-    $p = [math]::round($read / $total * 100, 0)
 
-    $left  = "$filename"
-    $right = "($(filesize $total)) $([string]::Format("{0,3}", $p))%"
+    # calculate current percentage done
+    $p = [math]::Round($read / $total * 100, 0)
 
+    # pre-generate LHS and RHS of progress string
+    # so we know how much space we have
+    $left  = $filename
+    $right = [string]::Format("({0}) {1,3}%", (filesize $total), $p)
+
+    # calculate remaining width for progress bar
     $midwidth  = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
-    $completed = [math]::Round(($p / 100) * $midwidth, 0)
 
-    $dashes = [string]::join("", ((1..$completed) | ForEach-Object {"="}))
-    if ($p -eq 100) {
-        $dashes += "="
-        $space = ""
-    } else {
-        $spaces = [string]::join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object {" "}))
-        $dashes += ">"
+    # calculate how many characters are completed
+    $completed = [math]::Abs([math]::Round(($p / 100) * $midwidth, 0) - 1)
+
+    # generate dashes to symbolise completed
+    if ($completed -gt 1) {
+        $dashes = [string]::Join("", ((1..$completed) | ForEach-Object {"="}))
+    }
+
+    # this is why we calculate $completed - 1 above
+    $dashes += switch($p) {
+        100 {"="}
+        default {">"}
+    }
+
+    # the remaining characters are filled with spaces
+    $spaces = switch($p) {
+        100 {[string]::Empty}
+        default {
+            [string]::Join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object {" "}))
+        }
     }
 
     "$left [$dashes$spaces] $right"
