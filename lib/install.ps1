@@ -99,7 +99,7 @@ function locate($app, $bucket) {
     return $app, $manifest, $bucket, $url
 }
 
-function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) {
+function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
     if(!$use_cache) { warn "cache is being ignored" }
 
@@ -200,7 +200,7 @@ function dl($url, $to, $cookies, $progress) {
 }
 
 function url_filename($url) {
-    $url.split('/') | Select-Object -Last 1
+    (split-path $url -leaf).split('?') | Select-Object -First 1
 }
 
 function dl_progress_output($url, $read, $total, $console) {
@@ -280,7 +280,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extracted = 0;
 
     foreach($url in $urls) {
-        $fname = (split-path $url -leaf).split('?')[0]
+        $fname = url_filename $url
 
         dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
 
