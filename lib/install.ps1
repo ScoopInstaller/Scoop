@@ -280,15 +280,20 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
+    $data = @{}
+
     # download first
     foreach($url in $urls) {
-        $fname = url_filename $url
+        $data.$url = @{
+            "fname" = url_filename $url
+        }
+        $fname = $data.$url.fname
 
         dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
     }
 
     foreach($url in $urls) {
-        $fname = url_filename $url
+        $fname = $data.$url.fname
 
         if($check_hash) {
             $ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
