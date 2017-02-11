@@ -159,25 +159,37 @@ function dl($url, $to, $cookies, $progress) {
 
     $wres = $wreq.getresponse()
     $total = $wres.ContentLength
-    write-host "($(filesize $total)) " -nonewline
+
+    if ($progress) {
+        [console]::CursorVisible = $false
+        $pd = $null
+        function dl_onProgress($read) {
+            $pd = dl_progress $read $total
+        }
+    } else {
+        write-host "($(filesize $total))" -nonewline
+        function dl_onProgress($read) {
+            #no op
+        }
+    }
 
     try {
         $s = $wres.getresponsestream()
         $fs = [io.file]::openwrite($to)
         $buffer = new-object byte[] 2048
+        $totalRead = 0
 
+        dl_onProgress $totalRead
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
+            $totalRead += $read
 
-            if ($progress -eq $true) {
-                $pd = dl_progress $pd $read $total
-            }
-        }
-
-        if ($progress) {
-            [console]::setcursorposition($pd.left, $pd.top)
+            dl_onProgress $totalRead
         }
     } finally {
+        if ($progress) {
+            [console]::CursorVisible = $true
+        }
         if ($fs) {
             $fs.close()
         }
@@ -188,34 +200,30 @@ function dl($url, $to, $cookies, $progress) {
     }
 }
 
-function dl_progress($pd, $read, $total) {
-    if ($pd -eq $null) {
-        $pd = @{
-            "left"    = [console]::CursorLeft;
-            "top"     = [console]::CursorTop;
-            "width"   = [console]::BufferWidth;
+function dl_progress_output($total, $p) {
+    "($(filesize $total)) $p%"
+}
 
-            "current" = 0;
-            "read"    = 0;
-            "total"   = $total;
-        }
+function dl_progress($read, $total) {
+    $left  = [console]::CursorLeft;
+    $top   = [console]::CursorTop;
+    $width = [console]::BufferWidth;
 
-        if(($pd.left + 4) -gt $pd.width) {
+    if($read -eq 0) {
+        $maxOutputLength = $(dl_progress_output $total 100).length
+        if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
+            # print on new line
             write-host
-            $pd.left = 0
+            $left = 0
+            $top  = $top + 1
         }
     }
 
-    $pd.read += $read
-    $p = [math]::round($pd.read / $pd.total * 100, 0)
-    if($p -ne $pd.current) {
-        [console]::setcursorposition($pd.left, $pd.top)
-        write-host "$p%" -nonewline
-    }
-    $pd.current = $p
+    $p = [math]::round($read / $total * 100, 0)
+    write-host $(dl_progress_output $total $p) -nonewline
 
-    $pd
+    [console]::SetCursorPosition($left, $top)
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
