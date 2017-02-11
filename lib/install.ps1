@@ -161,9 +161,8 @@ function dl($url, $to, $cookies, $progress) {
 
     if ($progress) {
         [console]::CursorVisible = $false
-        $pd = $null
         function dl_onProgress($read) {
-            $pd = dl_progress $read $total $url
+            dl_progress $read $total $url
         }
     } else {
         write-host "downloading $url...($(filesize $total))"
@@ -200,9 +199,12 @@ function dl($url, $to, $cookies, $progress) {
     }
 }
 
+function url_filename($url) {
+    $url.split('/') | Select-Object -Last 1
+}
+
 function dl_progress_output($url, $read, $total, $console) {
-    # get filename from url using regex
-    $filename = $url.split('/') | Select-Object -Last 1
+    $filename = url_filename $url
 
     # calculate current percentage done
     $p = [math]::Round($read / $total * 100, 0)
