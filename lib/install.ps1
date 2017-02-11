@@ -166,7 +166,7 @@ function dl($url, $to, $cookies, $progress) {
             $pd = dl_progress $read $total $url
         }
     } else {
-        write-host "downloading $url...($(filesize $total))" -nonewline
+        write-host "downloading $url...($(filesize $total))"
         function dl_onProgress {
             #no op
         }
