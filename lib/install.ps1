@@ -230,8 +230,8 @@ function dl_progress_output($url, $read, $total, $console) {
     }
 
     # the remaining characters are filled with spaces
-    $spaces = switch($p) {
-        100 {[string]::Empty}
+    $spaces = switch($dashes.Length) {
+        $midwidth {[string]::Empty}
         default {
             [string]::Join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object {" "}))
         }
