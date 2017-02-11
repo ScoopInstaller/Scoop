@@ -137,7 +137,6 @@ function do_dl($url, $to, $cookies) {
     $progress = [console]::isoutputredirected -eq $false
 
     try {
-        # can't set cursor position: just do simple download
         dl $url $to $cookies $progress
     } catch {
         $e = $_.exception
