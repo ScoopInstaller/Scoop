@@ -101,17 +101,15 @@ function locate($app, $bucket) {
 
 function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
-    if(!$use_cache) { warn "cache is being ignored" }
 
     if(!(test-path $cached) -or !$use_cache) {
         $null = ensure $cachedir
         do_dl $url "$cached.download" $cookies
-        mv "$cached.download" $cached -force
-        write-host "done"
+        Move-Item "$cached.download" $cached -force
     } else { write-host "loading $url from cache..."}
 
     if (!($to -eq $null)) {
-        cp $cached $to
+        Copy-Item $cached $to
     }
 }
 
@@ -211,8 +209,8 @@ function dl_progress_output($url, $read, $total, $console) {
 
     # pre-generate LHS and RHS of progress string
     # so we know how much space we have
-    $left  = $filename
-    $right = [string]::Format("({0}) {1,3}%", (filesize $total), $p)
+    $left  = "$filename ($(filesize $total))"
+    $right = [string]::Format("{0,3}%", $p)
 
     # calculate remaining width for progress bar
     $midwidth  = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
@@ -264,6 +262,9 @@ function dl_progress($read, $total, $url) {
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+    # we only want to show this warning once
+    if(!$use_cache) { warn "cache is being ignored" }
+
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
     $urls = @(url $manifest $architecture)
@@ -279,10 +280,15 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
+    # download first
     foreach($url in $urls) {
         $fname = url_filename $url
 
         dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+    }
+
+    foreach($url in $urls) {
+        $fname = url_filename $url
 
         if($check_hash) {
             $ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
@@ -404,7 +410,7 @@ function check_hash($file, $url, $manifest, $arch) {
         return $true
     }
 
-    write-host "checking hash..." -nonewline
+    write-host "checking hash of $(url_filename $url)..." -nonewline
     $type, $expected = $hash.split(':')
     if(!$expected) {
         # no type specified, assume sha256
