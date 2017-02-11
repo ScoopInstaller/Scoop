@@ -134,14 +134,11 @@ function set_https_protocols($protocols) {
 
 function do_dl($url, $to, $cookies) {
     $original_protocols = use_any_https_protocol
+    $progress = [console]::isoutputredirected -eq $false
 
     try {
-        if([console]::isoutputredirected) {
-            # can't set cursor position: just do simple download
-            dl_simple $url $to $cookies
-        } else {
-            dl_progress $url $to $cookies
-        }
+        # can't set cursor position: just do simple download
+        dl $url $to $cookies $progress
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
@@ -151,16 +148,8 @@ function do_dl($url, $to, $cookies) {
     }
 }
 
-# simple download (for when the console doesn't support setting cursor position)
-function dl_simple($url, $to, $cookies) {
-    $wc = new-object net.webclient
-    $wc.headers.add('User-Agent', 'Scoop/1.0')
-    $wc.headers.add('Cookie', (cookie_header $cookies))
-    $wc.downloadfile($url, $to)
-}
-
 # download with filesize and progress indicator
-function dl_progress($url, $to, $cookies) {
+function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = 'Scoop/1.0'
@@ -170,36 +159,24 @@ function dl_progress($url, $to, $cookies) {
     }
 
     $wres = $wreq.getresponse()
+    write-host "($(filesize $wres.ContentLength)) " -nonewline
+
     try {
-        $total = $wres.contentlength
-        write-host "($(filesize $total)) " -nonewline
-
-        $width = [console]::bufferwidth
-        $left = [console]::cursorleft
-        if(($left + 4) -gt $width) {
-            # not enough room to print progress on this line
-            write-host
-            $left = 0
-        }
-        $top = [console]::cursortop
-
         $s = $wres.getresponsestream()
         $fs = [io.file]::openwrite($to)
         $buffer = new-object byte[] 2048
-        $totalread = 0
-        $lastp = 0
 
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
-            $totalread += $read
-            $p = [math]::round($totalread / $total * 100, 0)
-            if($p -ne $lastp) {
-                [console]::setcursorposition($left, $top)
-                write-host "$p%" -nonewline
+
+            if ($progress -eq $true) {
+                $pd = dl_progress $pd $read
             }
-            $lastp = $p
         }
-        [console]::setcursorposition($left, $top)
+
+        if ($progress) {
+            [console]::setcursorposition($pd.left, $pd.top)
+        }
     } finally {
         if ($fs) {
             $fs.close()
@@ -209,6 +186,36 @@ function dl_progress($url, $to, $cookies) {
         }
         $wres.close()
     }
+}
+
+function dl_progress($pd, $read) {
+    if ($pd -eq $null) {
+        $pd = @{
+            "left"    = [console]::CursorLeft;
+            "top"     = [console]::CursorTop;
+            "width"   = [console]::BufferWidth;
+
+            "current" = 0;
+            "read"    = 0;
+            "total"   = $wres.ContentLength;
+        }
+
+        if(($pd.left + 4) -gt $pd.width) {
+            # not enough room to print progress on this line
+            write-host
+            $pd.left = 0
+        }
+    }
+
+    $pd.read += $read
+    $p = [math]::round($pd.read / $pd.total * 100, 0)
+    if($p -ne $pd.current) {
+        [console]::setcursorposition($pd.left, $pd.top)
+        write-host "$p%" -nonewline
+    }
+    $pd.current = $p
+
+    $pd
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
