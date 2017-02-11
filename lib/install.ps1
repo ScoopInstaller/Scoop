@@ -184,31 +184,29 @@ function dl_progress($url, $to, $cookies) {
         $top = [console]::cursortop
 
         $s = $wres.getresponsestream()
-        try {
-            $fs = [io.file]::openwrite($to)
-            try {
-                $buffer = new-object byte[] 2048
-                $totalread = 0
-                $lastp = 0
+        $fs = [io.file]::openwrite($to)
+        $buffer = new-object byte[] 2048
+        $totalread = 0
+        $lastp = 0
 
-                while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
-                    $fs.write($buffer, 0, $read)
-                    $totalread += $read
-                    $p = [math]::round($totalread / $total * 100, 0)
-                    if($p -ne $lastp) {
-                        [console]::setcursorposition($left, $top)
-                        write-host "$p%" -nonewline
-                    }
-                    $lastp = $p
-                }
+        while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
+            $fs.write($buffer, 0, $read)
+            $totalread += $read
+            $p = [math]::round($totalread / $total * 100, 0)
+            if($p -ne $lastp) {
                 [console]::setcursorposition($left, $top)
-            } finally {
-                $fs.close()
+                write-host "$p%" -nonewline
             }
-        } finally {
+            $lastp = $p
+        }
+        [console]::setcursorposition($left, $top)
+    } finally {
+        if ($fs) {
+            $fs.close()
+        }
+        if ($s) {
             $s.close();
         }
-    } finally {
         $wres.close()
     }
 }
