@@ -158,7 +158,8 @@ function dl($url, $to, $cookies, $progress) {
     }
 
     $wres = $wreq.getresponse()
-    write-host "($(filesize $wres.ContentLength)) " -nonewline
+    $total = $wres.ContentLength
+    write-host "($(filesize $total)) " -nonewline
 
     try {
         $s = $wres.getresponsestream()
@@ -169,7 +170,7 @@ function dl($url, $to, $cookies, $progress) {
             $fs.write($buffer, 0, $read)
 
             if ($progress -eq $true) {
-                $pd = dl_progress $pd $read
+                $pd = dl_progress $pd $read $total
             }
         }
 
@@ -187,7 +188,7 @@ function dl($url, $to, $cookies, $progress) {
     }
 }
 
-function dl_progress($pd, $read) {
+function dl_progress($pd, $read, $total) {
     if ($pd -eq $null) {
         $pd = @{
             "left"    = [console]::CursorLeft;
@@ -196,7 +197,7 @@ function dl_progress($pd, $read) {
 
             "current" = 0;
             "read"    = 0;
-            "total"   = $wres.ContentLength;
+            "total"   = $total;
         }
 
         if(($pd.left + 4) -gt $pd.width) {
