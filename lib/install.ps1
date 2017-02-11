@@ -105,7 +105,6 @@ function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) 
 
     if(!(test-path $cached) -or !$use_cache) {
         $null = ensure $cachedir
-        write-host "downloading $url..." -nonewline
         do_dl $url "$cached.download" $cookies
         mv "$cached.download" $cached -force
         write-host "done"
@@ -163,12 +162,12 @@ function dl($url, $to, $cookies, $progress) {
     if ($progress) {
         [console]::CursorVisible = $false
         $pd = $null
-        function dl_onProgress($read) {
-            $pd = dl_progress $read $total
+        function dl_onProgress($url, $read) {
+            $pd = dl_progress $read $total $url
         }
     } else {
-        write-host "($(filesize $total))" -nonewline
-        function dl_onProgress($read) {
+        write-host "downloading $url...($(filesize $total))" -nonewline
+        function dl_onProgress {
             #no op
         }
     }
@@ -184,7 +183,7 @@ function dl($url, $to, $cookies, $progress) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
 
-            dl_onProgress $totalRead
+            dl_onProgress $url $totalRead
         }
     } finally {
         if ($progress) {
@@ -200,17 +199,17 @@ function dl($url, $to, $cookies, $progress) {
     }
 }
 
-function dl_progress_output($total, $p) {
-    "($(filesize $total)) $p%"
+function dl_progress_output($url, $p, $total) {
+    "downloading $url...($(filesize $total)) $p%"
 }
 
-function dl_progress($read, $total) {
+function dl_progress($read, $total, $url) {
     $left  = [console]::CursorLeft;
     $top   = [console]::CursorTop;
     $width = [console]::BufferWidth;
 
     if($read -eq 0) {
-        $maxOutputLength = $(dl_progress_output $total 100).length
+        $maxOutputLength = $(dl_progress_output $url 100 $total).length
         if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
             # print on new line
@@ -221,7 +220,7 @@ function dl_progress($read, $total) {
     }
 
     $p = [math]::round($read / $total * 100, 0)
-    write-host $(dl_progress_output $total $p) -nonewline
+    write-host $(dl_progress_output $url $p $total) -nonewline
 
     [console]::SetCursorPosition($left, $top)
 }
