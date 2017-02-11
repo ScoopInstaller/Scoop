@@ -178,7 +178,7 @@ function dl($url, $to, $cookies, $progress) {
         $buffer = new-object byte[] 2048
         $totalRead = 0
 
-        dl_onProgress $totalRead
+        dl_onProgress $url $totalRead
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
@@ -188,6 +188,7 @@ function dl($url, $to, $cookies, $progress) {
     } finally {
         if ($progress) {
             [console]::CursorVisible = $true
+            write-host
         }
         if ($fs) {
             $fs.close()
@@ -199,17 +200,36 @@ function dl($url, $to, $cookies, $progress) {
     }
 }
 
-function dl_progress_output($url, $p, $total) {
-    "downloading $url...($(filesize $total)) $p%"
+function dl_progress_output($url, $read, $total, $console) {
+    $filename = $url.split('/') | Select-Object -Last 1
+    $p = [math]::round($read / $total * 100, 0)
+
+    $left  = "$filename"
+    $right = "($(filesize $total)) $([string]::Format("{0,3}", $p))%"
+
+    $midwidth  = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
+    $completed = [math]::Round(($p / 100) * $midwidth, 0)
+
+    $dashes = [string]::join("", ((1..$completed) | ForEach-Object {"="}))
+    if ($p -eq 100) {
+        $dashes += "="
+        $space = ""
+    } else {
+        $spaces = [string]::join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object {" "}))
+        $dashes += ">"
+    }
+
+    "$left [$dashes$spaces] $right"
 }
 
 function dl_progress($read, $total, $url) {
-    $left  = [console]::CursorLeft;
-    $top   = [console]::CursorTop;
-    $width = [console]::BufferWidth;
+    $console = $host.UI.RawUI;
+    $left  = $console.CursorPosition.X;
+    $top   = $console.CursorPosition.Y;
+    $width = $console.BufferSize.Width;
 
     if($read -eq 0) {
-        $maxOutputLength = $(dl_progress_output $url 100 $total).length
+        $maxOutputLength = $(dl_progress_output $url 100 $total $console).length
         if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
             # print on new line
@@ -219,9 +239,7 @@ function dl_progress($read, $total, $url) {
         }
     }
 
-    $p = [math]::round($read / $total * 100, 0)
-    write-host $(dl_progress_output $url $p $total) -nonewline
-
+    write-host $(dl_progress_output $url $read $total $console) -nonewline
     [console]::SetCursorPosition($left, $top)
 }
 
