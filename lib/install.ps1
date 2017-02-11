@@ -162,7 +162,7 @@ function dl($url, $to, $cookies, $progress) {
     if ($progress) {
         [console]::CursorVisible = $false
         $pd = $null
-        function dl_onProgress($url, $read) {
+        function dl_onProgress($read) {
             $pd = dl_progress $read $total $url
         }
     } else {
@@ -178,12 +178,12 @@ function dl($url, $to, $cookies, $progress) {
         $buffer = new-object byte[] 2048
         $totalRead = 0
 
-        dl_onProgress $url $totalRead
+        dl_onProgress $totalRead
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
 
-            dl_onProgress $url $totalRead
+            dl_onProgress $totalRead
         }
     } finally {
         if ($progress) {
