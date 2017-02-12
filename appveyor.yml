@@ -8,8 +8,8 @@ init:
   - ps: (get-psprovider 'FileSystem').Home = $(pwd)
   - ps: "if($env:APPVEYOR_CHOCO_PESTER_OPTIONS -ne $null) { write-host -f yellow 'NOTE: customized `pester` installation is being used' }"
   - ps: choco install -y pester $env:APPVEYOR_CHOCO_PESTER_OPTIONS
-  - ps: nuget install newtonsoft.json -outputdirectory $(join-path $(pwd) "..") -excludeversion
-  - ps: nuget install newtonsoft.json.schema -outputdirectory $(join-path $(pwd) "..") -excludeversion
+  - ps: nuget install newtonsoft.json -version 9.0.1 -outputdirectory $(join-path $(pwd) "..") -excludeversion
+  - ps: nuget install newtonsoft.json.schema -version 2.0.8 -outputdirectory $(join-path $(pwd) "..") -excludeversion
 
 build: off
 
