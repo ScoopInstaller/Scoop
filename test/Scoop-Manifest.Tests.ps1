@@ -39,10 +39,12 @@ describe "manifest-validation" {
             { [Newtonsoft.Json.Linq.JToken]::Parse($json) } | should throw
         }
         it "fails with invalid manifest" {
-            $json = gc "$working_dir\invalid_wget.json" -raw -Encoding UTF8
-            $manifest = [Newtonsoft.Json.Linq.JToken]::Parse($json)
-            $schema = [Newtonsoft.Json.Schema.JSchema]::Parse($schema_json)
-            [Newtonsoft.Json.Schema.SchemaExtensions]::IsValid($manifest, $schema, [ref]$validationErrors)
+            {
+                $json = gc "$working_dir\invalid_wget.json" -raw -Encoding UTF8
+                $manifest = [Newtonsoft.Json.Linq.JToken]::Parse($json)
+                $schema = [Newtonsoft.Json.Schema.JSchema]::Parse($schema_json)
+                [Newtonsoft.Json.Schema.SchemaExtensions]::IsValid($manifest, $schema, [ref]$validationErrors)
+            } | should not throw
             $validationErrors.Count | should be 4
         }
     }
