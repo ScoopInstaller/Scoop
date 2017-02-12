@@ -1,0 +1,11 @@
+{
+    "$id": "http://scoop.sh/draft/schema#",
+    "$schema": "http://scoop.sh/draft/schema#",
+    "title": "scoop app manifest schema",
+    "type": "object"
+    "properties": {
+      "version": {
+        "type": "string"
+      }
+    }
+}
