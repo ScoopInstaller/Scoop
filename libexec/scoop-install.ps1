@@ -74,6 +74,9 @@ $apps, $skip = prune_installed $apps $global
 
 $skip | ? { $explicit_apps -contains $_} | % { warn "$_ is already installed, skipping" }
 
-$apps | % { install_app $_ $architecture $global }
+$suggested = @{};
+$apps | % { install_app $_ $architecture $global $suggested }
+
+show_suggestions $suggested
 
 exit 0

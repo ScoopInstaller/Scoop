@@ -6,7 +6,7 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global) {
+function install_app($app, $architecture, $global, $suggested) {
     $app, $bucket = app $app
     $app, $manifest, $bucket, $url = locate $app $bucket
     $use_cache = $true
@@ -50,6 +50,10 @@ function install_app($app, $architecture, $global) {
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
     save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
+
+    if($manifest.suggest) {
+        $suggested[$app] = $manifest.suggest
+    }
 
     success "$app ($version) was installed successfully!"
 
@@ -891,6 +895,31 @@ function ensure_none_failed($apps, $global) {
     foreach($app in $apps) {
         if(failed $app $global) {
             abort "$app install failed previously. please uninstall it and try again."
+        }
+    }
+}
+
+function show_suggestions($suggested) {
+    $installed_apps = (installed_apps $true) + (installed_apps $false)
+
+    foreach($app in $suggested.keys) {
+        $features = $suggested[$app] | get-member -type noteproperty |% { $_.name }
+        foreach($feature in $features) {
+            $feature_suggestions = $suggested[$app].$feature
+
+            $fulfilled = $false
+            foreach($suggestion in $feature_suggestions) {
+                $suggested_app, $bucket = app $suggestion
+
+                if($installed_apps -contains $suggested_app) {
+                    $fulfilled = $true;
+                    break;
+                }
+            }
+
+            if(!$fulfilled) {
+                write-host "$app suggests installing $([string]::join(' or ', $feature_suggestions))"
+            }
         }
     }
 }

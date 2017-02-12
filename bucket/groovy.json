@@ -18,7 +18,9 @@
     "env_set": {
         "GROOVY_HOME": "$dir"
     },
-    "depends": "openjdk",
+    "suggest": {
+        "JDK": [ "extras/oraclejdk", "openjdk" ]
+    },
     "checkver": {
         "url": "http://www.groovy-lang.org/download.html",
         "re": "([\\d.]+) distributions"

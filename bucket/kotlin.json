@@ -14,7 +14,9 @@
     "env_set": {
         "KOTLIN_HOME": "$dir"
     },
-    "depends": "openjdk",
+    "suggest": {
+        "JDK": [ "extras/oraclejdk", "openjdk" ]
+    },
     "checkver": {
         "github": "https://github.com/JetBrains/kotlin"
     },

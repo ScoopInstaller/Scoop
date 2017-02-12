@@ -11,7 +11,9 @@
     "env_set": {
         "GRAILS_HOME": "$dir"
     },
-    "depends": "openjdk",
+    "suggest": {
+        "JDK": [ "extras/oraclejdk", "openjdk" ]
+    },
     "checkver": {
         "github": "https://github.com/grails/grails-core"
     },

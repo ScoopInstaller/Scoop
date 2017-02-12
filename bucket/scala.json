@@ -15,7 +15,9 @@
     "env_set": {
         "SCALA_HOME": "$dir"
     },
-    "depends": "openjdk",
+    "suggest": {
+        "JDK": [ "extras/oraclejdk", "openjdk" ]
+    },
     "checkver": {
         "url": "https://www.scala-lang.org/download/",
         "re": "Download Scala ([\\d.]+)"

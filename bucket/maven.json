@@ -11,7 +11,9 @@
     "env_set": {
         "M2_HOME": "$dir"
     },
-    "notes": "Maven requires a JDK such as OpenJDK 7 (scoop install openjdk) or Oracle's Java 8 (scoop install oraclejdk). The Oracle JDK requires the Scoop Extras bucket (scoop butcket add extras).",
+    "suggest": {
+        "JDK": [ "extras/oraclejdk", "openjdk" ]
+    },
     "checkver": {
         "url": "https://maven.apache.org/download.cgi",
         "re": "Apache Maven ([\\d.]+) is the latest release"

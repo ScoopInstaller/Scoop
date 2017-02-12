@@ -2,7 +2,9 @@
     "homepage": "https://yarnpkg.com/",
     "license": "BSD",
     "version": "0.19.1",
-    "depends": "nodejs",
+    "suggest": {
+        "Node.js": [ "nodejs" ]
+    },
     "url": "https://github.com/yarnpkg/yarn/releases/download/v0.19.1/yarn-0.19.1.msi",
     "hash": "2d08c4e4e7a6086585ef47307333187a235aa926a211628d3f8c02093fd6fb71",
     "bin": "Yarn\\bin\\yarn.cmd",
