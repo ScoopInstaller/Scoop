@@ -16,7 +16,7 @@
         write-output $exe | out-file -filepath $dir\\bfg.ps1
     ",
     "checkver": {
-        "url": "https://search.maven.org/solrsearch/select/?q=g:\"com.madgag\"+AND+a:\"bfg\"&wt=json&json.wrf=?&indent=true",
+        "url": "https://search.maven.org/solrsearch/select/?q=g:com.madgag+AND+a:bfg",
         "re": "\"latestVersion\":\"([\\d.]+)\""
     },
     "autoupdate": {

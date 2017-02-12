@@ -17,13 +17,15 @@
     "bin": "aria2c.exe",
     "checkver": "<p>Download <a href=\"https://github.com/aria2/aria2[^\"]+\">version ([^<]+)</a>",
     "autoupdate": {
-        "32bit": {
-            "url": "https://github.com/aria2/aria2/releases/download/release-$version/aria2-$version-win-32bit-build1.zip",
-            "extract_dir": "aria2-$version-win-32bit-build1"
-        },
-        "64bit": {
-            "url": "https://github.com/aria2/aria2/releases/download/release-$version/aria2-$version-win-64bit-build1.zip",
-            "extract_dir": "aria2-$version-win-64bit-build1"
+        "architecture": {
+            "32bit": {
+                "url": "https://github.com/aria2/aria2/releases/download/release-$version/aria2-$version-win-32bit-build1.zip",
+                "extract_dir": "aria2-$version-win-32bit-build1"
+            },
+            "64bit": {
+                "url": "https://github.com/aria2/aria2/releases/download/release-$version/aria2-$version-win-64bit-build1.zip",
+                "extract_dir": "aria2-$version-win-64bit-build1"
+            }
         }
     }
 }
