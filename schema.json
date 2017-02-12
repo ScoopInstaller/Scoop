@@ -412,7 +412,26 @@
             "$ref": "#/definitions/uriOrArrayOfUris"
         },
         "version": {
-            "type": "string"
+            "type": "string",
+            "required": true
+        },
+        "suggest": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "^(.*)$": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                }
+            },
+            "type": "object"
+        },
+        "psmodule": {
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
         }
     },
     "title": "scoop app manifest schema",
