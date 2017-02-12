@@ -57,4 +57,4 @@ Scoop is also great at handling single-file programs and Powershell scripts. The
 Support this project
 --------------------
 
-If you would like to financially support the ongoing development and maintainence of Scoop, please see [scoop.sh/donate](https://scoop.sh/donate).
+If you would like to financially support the ongoing development and maintainence of Scoop, please see [scoop.sh/donate](http://scoop.sh/donate).
