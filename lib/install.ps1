@@ -99,20 +99,17 @@ function locate($app, $bucket) {
     return $app, $manifest, $bucket, $url
 }
 
-function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) {
+function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
-    if(!$use_cache) { warn "cache is being ignored" }
 
     if(!(test-path $cached) -or !$use_cache) {
         $null = ensure $cachedir
-        write-host "downloading $url..." -nonewline
         do_dl $url "$cached.download" $cookies
-        mv "$cached.download" $cached -force
-        write-host "done"
+        Move-Item "$cached.download" $cached -force
     } else { write-host "loading $url from cache..."}
 
     if (!($to -eq $null)) {
-        cp $cached $to
+        Copy-Item $cached $to
     }
 }
 
@@ -134,14 +131,10 @@ function set_https_protocols($protocols) {
 
 function do_dl($url, $to, $cookies) {
     $original_protocols = use_any_https_protocol
+    $progress = [console]::isoutputredirected -eq $false
 
     try {
-        if([console]::isoutputredirected) {
-            # can't set cursor position: just do simple download
-            dl_simple $url $to $cookies
-        } else {
-            dl_progress $url $to $cookies
-        }
+        dl $url $to $cookies $progress
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
@@ -151,16 +144,8 @@ function do_dl($url, $to, $cookies) {
     }
 }
 
-# simple download (for when the console doesn't support setting cursor position)
-function dl_simple($url, $to, $cookies) {
-    $wc = new-object net.webclient
-    $wc.headers.add('User-Agent', 'Scoop/1.0')
-    $wc.headers.add('Cookie', (cookie_header $cookies))
-    $wc.downloadfile($url, $to)
-}
-
 # download with filesize and progress indicator
-function dl_progress($url, $to, $cookies) {
+function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = 'Scoop/1.0'
@@ -170,50 +155,116 @@ function dl_progress($url, $to, $cookies) {
     }
 
     $wres = $wreq.getresponse()
-    try {
-        $total = $wres.contentlength
-        write-host "($(filesize $total)) " -nonewline
+    $total = $wres.ContentLength
 
-        $width = [console]::bufferwidth
-        $left = [console]::cursorleft
-        if(($left + 4) -gt $width) {
-            # not enough room to print progress on this line
-            write-host
-            $left = 0
+    if ($progress) {
+        [console]::CursorVisible = $false
+        function dl_onProgress($read) {
+            dl_progress $read $total $url
         }
-        $top = [console]::cursortop
+    } else {
+        write-host "downloading $url...($(filesize $total))"
+        function dl_onProgress {
+            #no op
+        }
+    }
 
+    try {
         $s = $wres.getresponsestream()
-        try {
-            $fs = [io.file]::openwrite($to)
-            try {
-                $buffer = new-object byte[] 2048
-                $totalread = 0
-                $lastp = 0
+        $fs = [io.file]::openwrite($to)
+        $buffer = new-object byte[] 2048
+        $totalRead = 0
 
-                while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
-                    $fs.write($buffer, 0, $read)
-                    $totalread += $read
-                    $p = [math]::round($totalread / $total * 100, 0)
-                    if($p -ne $lastp) {
-                        [console]::setcursorposition($left, $top)
-                        write-host "$p%" -nonewline
-                    }
-                    $lastp = $p
-                }
-                [console]::setcursorposition($left, $top)
-            } finally {
-                $fs.close()
-            }
-        } finally {
-            $s.close();
+        dl_onProgress $totalRead
+        while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
+            $fs.write($buffer, 0, $read)
+            $totalRead += $read
+
+            dl_onProgress $totalRead
         }
     } finally {
+        if ($progress) {
+            [console]::CursorVisible = $true
+            write-host
+        }
+        if ($fs) {
+            $fs.close()
+        }
+        if ($s) {
+            $s.close();
+        }
         $wres.close()
     }
 }
 
+function url_filename($url) {
+    (split-path $url -leaf).split('?') | Select-Object -First 1
+}
+
+function dl_progress_output($url, $read, $total, $console) {
+    $filename = url_filename $url
+
+    # calculate current percentage done
+    $p = [math]::Round($read / $total * 100, 0)
+
+    # pre-generate LHS and RHS of progress string
+    # so we know how much space we have
+    $left  = "$filename ($(filesize $total))"
+    $right = [string]::Format("{0,3}%", $p)
+
+    # calculate remaining width for progress bar
+    $midwidth  = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
+
+    # calculate how many characters are completed
+    $completed = [math]::Abs([math]::Round(($p / 100) * $midwidth, 0) - 1)
+
+    # generate dashes to symbolise completed
+    if ($completed -gt 1) {
+        $dashes = [string]::Join("", ((1..$completed) | ForEach-Object {"="}))
+    }
+
+    # this is why we calculate $completed - 1 above
+    $dashes += switch($p) {
+        100 {"="}
+        default {">"}
+    }
+
+    # the remaining characters are filled with spaces
+    $spaces = switch($dashes.Length) {
+        $midwidth {[string]::Empty}
+        default {
+            [string]::Join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object {" "}))
+        }
+    }
+
+    "$left [$dashes$spaces] $right"
+}
+
+function dl_progress($read, $total, $url) {
+    $console = $host.UI.RawUI;
+    $left  = $console.CursorPosition.X;
+    $top   = $console.CursorPosition.Y;
+    $width = $console.BufferSize.Width;
+
+    if($read -eq 0) {
+        $maxOutputLength = $(dl_progress_output $url 100 $total $console).length
+        if (($left + $maxOutputLength) -gt $width) {
+            # not enough room to print progress on this line
+            # print on new line
+            write-host
+            $left = 0
+            $top  = $top + 1
+        }
+    }
+
+    write-host $(dl_progress_output $url $read $total $console) -nonewline
+    [console]::SetCursorPosition($left, $top)
+}
+
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+    # we only want to show this warning once
+    if(!$use_cache) { warn "cache is being ignored" }
+
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
     $urls = @(url $manifest $architecture)
@@ -229,10 +280,20 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
+    $data = @{}
+
+    # download first
     foreach($url in $urls) {
-        $fname = (split-path $url -leaf).split('?')[0]
+        $data.$url = @{
+            "fname" = url_filename $url
+        }
+        $fname = $data.$url.fname
 
         dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+    }
+
+    foreach($url in $urls) {
+        $fname = $data.$url.fname
 
         if($check_hash) {
             $ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
@@ -354,7 +415,7 @@ function check_hash($file, $url, $manifest, $arch) {
         return $true
     }
 
-    write-host "checking hash..." -nonewline
+    write-host "checking hash of $(url_filename $url)..." -nonewline
     $type, $expected = $hash.split(':')
     if(!$expected) {
         # no type specified, assume sha256
