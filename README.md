@@ -54,6 +54,7 @@ Since installers are common, Scoop supports them too (and their uninstallers).
 Scoop is also great at handling single-file programs and Powershell scripts. These don't even need to be compressed. See the [runat](https://github.com/lukesampson/scoop/blob/master/bucket/runat.json) package for an example: it's really just a GitHub gist.
 
 
-### Support this project
+Support this project
+--------------------
 
-If you would like to financially support the ongoing development and maintainence of Scoop, please see [scoop.sh/donate](https://scoop.sh/donate). 
+If you would like to financially support the ongoing development and maintainence of Scoop, please see [scoop.sh/donate](https://scoop.sh/donate).
