@@ -5,22 +5,12 @@
 describe "manifest-validation" {
     beforeall {
         $working_dir = setup_working "manifest"
-        $schema_json = gc "$psscriptroot\..\schema.json" -raw -Encoding UTF8
-        Add-Type -Path "$psscriptroot\..\..\Newtonsoft.Json\lib\net45\Newtonsoft.Json.dll"
-        Add-Type -Path "$psscriptroot\..\..\Newtonsoft.Json.Schema\lib\net45\Newtonsoft.Json.Schema.dll"
-        [System.Collections.Generic.IList[System.String]]$validationErrors = new-object System.Collections.Generic.List[System.String]
+        $schema = "$psscriptroot\..\schema.json"
+        Add-Type -Path "$psscriptroot\..\supporting\validator\Scoop.Validator.dll"
     }
 
-    context "Newtonsoft.Json" {
-        it "Newtonsoft.Json.Linq.JToken is available" {
-            ([System.Management.Automation.PSTypeName]'Newtonsoft.Json.Linq.JToken').Type | should be 'Newtonsoft.Json.Linq.JToken'
-        }
-        it "Newtonsoft.Json.Schema.JSchema is available" {
-            ([System.Management.Automation.PSTypeName]'Newtonsoft.Json.Schema.JSchema').Type | should be 'Newtonsoft.Json.Schema.JSchema'
-        }
-        it "Newtonsoft.Json.Schema.SchemaExtensions is available" {
-            ([System.Management.Automation.PSTypeName]'Newtonsoft.Json.Schema.SchemaExtensions').Type | should be 'Newtonsoft.Json.Schema.SchemaExtensions'
-        }
+    it "Scoop.Validator is available" {
+        ([System.Management.Automation.PSTypeName]'Scoop.Validator').Type | should be 'Scoop.Validator'
     }
 
     context "parse_json function" {
@@ -31,21 +21,23 @@ describe "manifest-validation" {
 
     context "schema validation" {
         it "fails with broken schema" {
-            $json = gc "$working_dir\broken_schema.json" -raw -Encoding UTF8
-            { [Newtonsoft.Json.Schema.JSchema]::Parse($json) } | should throw
+            $validator = new-object Scoop.Validator("$working_dir\broken_schema.json", $true)
+            $validator.Validate("$working_dir\wget.json") | should be $false
+            $validator.Errors.Count | should be 1
+            $validator.Errors | select-object -First 1 | should belikeexactly "*broken_schema.json*Path 'type', line 6, position 4."
         }
         it "fails with broken manifest" {
-            $json = gc "$working_dir\broken_wget.json" -raw -Encoding UTF8
-            { [Newtonsoft.Json.Linq.JToken]::Parse($json) } | should throw
+            $validator = new-object Scoop.Validator($schema, $true)
+            $validator.Validate("$working_dir\broken_wget.json") | should be $false
+            $validator.Errors.Count | should be 1
+            $validator.Errors | select-object -First 1 | should belikeexactly "*broken_wget.json*Path 'version', line 5, position 4."
         }
         it "fails with invalid manifest" {
-            {
-                $json = gc "$working_dir\invalid_wget.json" -raw -Encoding UTF8
-                $manifest = [Newtonsoft.Json.Linq.JToken]::Parse($json)
-                $schema = [Newtonsoft.Json.Schema.JSchema]::Parse($schema_json)
-                [Newtonsoft.Json.Schema.SchemaExtensions]::IsValid($manifest, $schema, [ref]$validationErrors)
-            } | should not throw
-            $validationErrors.Count | should be 4
+            $validator = new-object Scoop.Validator($schema, $true)
+            $validator.Validate("$working_dir\invalid_wget.json") | should be $false
+            $validator.Errors.Count | should be 10
+            $validator.Errors | select-object -First 1 | should belikeexactly "*invalid_wget.json*randomproperty*"
+            $validator.Errors | select-object -Last 1 | should belikeexactly "*invalid_wget.json*version."
         }
     }
 
@@ -53,18 +45,15 @@ describe "manifest-validation" {
         beforeall {
             $bucketdir = "$psscriptroot\..\bucket\"
             $manifest_files = gci $bucketdir *.json
-            $schema = [Newtonsoft.Json.Schema.JSchema]::Parse($schema_json)
-        }
-        beforeeach {
+            $validator = new-object Scoop.Validator($schema, $true)
         }
         $manifest_files | % {
             it "$_" {
-                {
-                    $json = gc $_.fullname -raw -Encoding UTF8
-                    $manifest = [Newtonsoft.Json.Linq.JToken]::Parse($json)
-                    [Newtonsoft.Json.Schema.SchemaExtensions]::IsValid($manifest, $schema, [ref]$validationErrors)
-                } | should not throw
-                $validationErrors.Count | should be 0
+                $validator.Validate($_.fullname)
+                if ($validator.Errors.Count -gt 0) {
+                    write-host -f yellow $validator.ErrorsAsString
+                }
+                $validator.Errors.Count | should be 0
 
                 $manifest = parse_json $_.fullname
                 $url = arch_specific "url" $manifest "32bit"
@@ -73,12 +62,6 @@ describe "manifest-validation" {
                     $url = $url64
                 }
                 $url | should not benullorempty
-            }
-        }
-        aftereach {
-            if ($validationErrors.Count -gt 0) {
-                write-host -f yellow "    [*] $_ " -nonewline
-                write-host -f yellow $([string]::join("`n    [*] $_ ", $validationErrors))
             }
         }
     }
