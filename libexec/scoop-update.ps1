@@ -159,7 +159,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     env_set $manifest $dir $global
     post_install $manifest $architecture
 
-    success "$app was updated from $old_version to $version"
+    success "'$app' was updated from $old_version to $version"
 
     show_notes $manifest
 }
@@ -169,11 +169,11 @@ function ensure_all_installed($apps, $global) {
     if($app) {
         if(installed $app (!$global)) {
             function wh($g) { if($g) { "globally" } else { "for your account" } }
-            write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))." -f darkred
+            write-host "'$app' isn't installed $(wh $global), but it is installed $(wh (!$global))." -f darkred
             "Try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead."
             exit 1
         } else {
-            abort "$app isn't installed."
+            abort "'$app' isn't installed."
         }
     }
 }

@@ -39,7 +39,7 @@ if(!($cmd)) {
 
 Some useful commands are:"
     print_summaries
-    "Type 'scoop help <command>' to get help for a specific command"
+    "Type 'scoop help <command>' to get help for a specific command."
 } elseif($commands -contains $cmd) {
     print_help $cmd
 } else {

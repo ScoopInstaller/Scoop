@@ -55,7 +55,7 @@ function install_app($app, $architecture, $global, $suggested) {
         $suggested[$app] = $manifest.suggest
     }
 
-    success "$app ($version) was installed successfully!"
+    success "'$app' ($version) was installed successfully!"
 
     show_notes $manifest
 }
@@ -893,7 +893,7 @@ function failed($app, $global) {
 function ensure_none_failed($apps, $global) {
     foreach($app in $apps) {
         if(failed $app $global) {
-            abort "$app install failed previously. Please uninstall it and try again."
+            abort "'$app' install failed previously. Please uninstall it and try again."
         }
     }
 }
@@ -917,7 +917,7 @@ function show_suggestions($suggested) {
             }
 
             if(!$fulfilled) {
-                write-host "$app suggests installing $([string]::join(' or ', $feature_suggestions))"
+                write-host "'$app' suggests installing $([string]::join(' or ', $feature_suggestions))"
             }
         }
     }
