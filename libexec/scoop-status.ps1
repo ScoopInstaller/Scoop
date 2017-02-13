@@ -94,7 +94,7 @@ if($missing_deps) {
     "Missing runtime dependencies:"
     $missing_deps | % {
         $app, $deps = $_
-        "    $app requires $([string]::join(',', $deps))"
+        "    '$app' requires '$([string]::join("', '", $deps))'"
     }
 }
 

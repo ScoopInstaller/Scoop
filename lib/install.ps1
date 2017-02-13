@@ -917,7 +917,7 @@ function show_suggestions($suggested) {
             }
 
             if(!$fulfilled) {
-                write-host "'$app' suggests installing $([string]::join(' or ', $feature_suggestions))"
+                write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'"
             }
         }
     }
