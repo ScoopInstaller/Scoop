@@ -14,9 +14,12 @@ function substitute([String] $str, [Hashtable] $params) {
 }
 
 function check_url([String] $url) {
-    if ($url.Contains("github.com") -or $url.Contains("nuget.org") -or $url.Contains("chocolatey.org")) {
+    if ($url.Contains("github.com") -or
+        $url.Contains("nuget.org") -or
+        $url.Contains("chocolatey.org") -or
+        $url.Contains("bitbucket.org")) {
         # github does not allow HEAD requests
-        warn "Unable to check github/nuget/chocolatey url (assuming it is ok)"
+        warn "Unable to check github/nuget/chocolatey/bitbucket url (assuming it is ok)"
         return $true
     }
 
