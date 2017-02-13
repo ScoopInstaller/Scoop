@@ -37,7 +37,7 @@ $independent = $opt.i -or $opt.independent
 function update_scoop() {
     # check for git
     $git = try { gcm git -ea stop } catch { $null }
-    if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git'." }
+    if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
@@ -83,7 +83,7 @@ function update_scoop() {
     shim "$currentdir\bin\scoop.ps1" $false
 
     @(buckets) | % {
-        "Updating $_ bucket..."
+        "Updating '$_' bucket..."
         pushd (bucketdir $_)
         git_pull -q
         popd
@@ -117,27 +117,27 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
 
     if(!$force -and ($old_version -eq $version)) {
         if (!$quiet) {
-            warn "The latest version of $app ($version) is already installed."
+            warn "The latest version of '$app' ($version) is already installed."
             "Run 'scoop update' to check for new versions."
         }
         return
     }
-    if(!$version) { abort "No manifest available for $app" } # installed from a custom bucket/no longer supported
+    if(!$version) { abort "No manifest available for '$app'." } # installed from a custom bucket/no longer supported
 
     $manifest = manifest $app $bucket $url
 
-    "Updating $app ($old_version -> $version)"
+    "Updating '$app' ($old_version -> $version)"
 
     $dir = versiondir $app $old_version $global
 
-    "Uninstalling $app ($old_version)"
+    "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
     env_rm_path $old_manifest $dir $global
     env_rm $old_manifest $global
     # note: keep the old dir in case it contains user files
 
-    "Installing $app ($version)"
+    "Installing '$app' ($version)"
     $dir = ensure (versiondir $app $version $global)
 
     # save info for uninstall
@@ -159,7 +159,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     env_set $manifest $dir $global
     post_install $manifest $architecture
 
-    success "'$app' was updated from $old_version to $version"
+    success "'$app' was updated from $old_version to $version."
 
     show_notes $manifest
 }
