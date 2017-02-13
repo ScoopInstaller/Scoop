@@ -40,7 +40,7 @@ function ensure_not_installed($app, $global) {
         if(!(install_info $app $version $global)) {
             abort "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$global_flag' before retrying the install."
         }
-        abort "$app ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
+        abort "'$app' ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
     }
 }
 
