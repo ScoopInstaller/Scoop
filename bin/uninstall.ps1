@@ -22,7 +22,7 @@ function do_uninstall($app, $global) {
     $install = install_info $app $version $global
     $architecture = $install.architecture
 
-    echo "Uninstalling $app"
+    echo "Uninstalling '$app'"
     run_uninstaller $manifest $architecture $dir
     rm_shims $manifest $global $architecture
 

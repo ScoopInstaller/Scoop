@@ -21,7 +21,7 @@ function file_requires_7zip($fname) {
 
 function extract_7zip($path, $to, $recurse) {
     $output = 7z x "$path" -o"$to" -y
-    if($lastexitcode -ne 0) { abort "Exit code was $lastexitcode" }
+    if($lastexitcode -ne 0) { abort "Exit code was $lastexitcode." }
 
     # check for tar
     $tar = (split-path $path -leaf) -replace '\.[^\.]*$', ''

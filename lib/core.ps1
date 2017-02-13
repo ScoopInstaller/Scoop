@@ -133,7 +133,7 @@ function movedir($from, $to) {
 }
 
 function shim($path, $global, $name, $arg) {
-    if(!(test-path $path)) { abort "Can't shim $(fname $path): couldn't find $path" }
+    if(!(test-path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
     if(!$name) { $name = strip_ext (fname $path) }
 

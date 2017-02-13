@@ -90,8 +90,8 @@ function search_remotes($query) {
     }
 
     $results |% {
-        "$($_.bucket) bucket:"
-        $_.results |% { "  $_" }
+        "'$($_.bucket)'' bucket:"
+        $_.results |% { "    $_" }
         ""
     }
 }
@@ -103,9 +103,9 @@ function search_remotes($query) {
         $name = "$_"
         if(!$_) { $name = "main" }
 
-        "$name bucket:"
+        "'$name' bucket:"
         $res | % {
-            $item = "  $($_.name) ($($_.version))"
+            $item = "    $($_.name) ($($_.version))"
             if($_.bin) { $item += " --> includes '$($_.bin)'" }
             $item
         }

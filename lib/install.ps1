@@ -13,7 +13,7 @@ function install_app($app, $architecture, $global, $suggested) {
     $check_hash = $true
 
     if(!$manifest) {
-        abort "Couldn't find manifest for $app$(if($url) { " at the URL $url" })"
+        abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
     }
 
     $version = $manifest.version
@@ -28,7 +28,7 @@ function install_app($app, $architecture, $global, $suggested) {
         $check_hash = $false
     }
 
-    echo "Installing $app ($version)"
+    echo "Installing '$app' ($version)."
 
     $dir = ensure (versiondir $app $version $global)
 
@@ -64,7 +64,7 @@ function ensure_architecture($architecture_opt) {
     switch($architecture_opt) {
         '' { return default_architecture }
         { @('32bit','64bit') -contains $_ } { return $_ }
-        default { abort "invalid architecture: '$architecture'"}
+        default { abort "Invalid architecture: '$architecture'."}
     }
 }
 
@@ -406,7 +406,7 @@ function hash_for_url($manifest, $url, $arch) {
     $urls = @(url $manifest $arch)
 
     $index = [array]::indexof($urls, $url)
-    if($index -eq -1) { abort "Couldn't find hash in manifest for $url" }
+    if($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
 
     @($hashes)[$index]
 }
@@ -415,7 +415,7 @@ function hash_for_url($manifest, $url, $arch) {
 function check_hash($file, $url, $manifest, $arch) {
     $hash = hash_for_url $manifest $url $arch
     if(!$hash) {
-        warn "Warning: No hash in manifest. SHA256 is:`n$(compute_hash (fullpath $file) 'sha256')"
+        warn "Warning: No hash in manifest. SHA256 is:`n    $(compute_hash (fullpath $file) 'sha256')"
         return $true
     }
 
@@ -427,13 +427,13 @@ function check_hash($file, $url, $manifest, $arch) {
     }
 
     if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
-        return $false, "Hash type $type isn't supported."
+        return $false, "Hash type '$type' isn't supported."
     }
 
     $actual = compute_hash (fullpath $file) $type
 
     if($actual -ne $expected) {
-        return $false, "Hash check failed for $url.`nExpected:`n  $($expected)`nActual:`n  $($actual)"
+        return $false, "Hash check failed for '$url'.`nExpected:`n    $($expected)`nActual:`n    $($actual)"
     }
     write-host "ok."
     return $true
@@ -480,7 +480,7 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
                 warn $continue_exit_codes[$proc.exitcode]
                 return $true
             }
-            write-host "Exit code was $($proc.exitcode)"; return $false
+            write-host "Exit code was $($proc.exitcode)."; return $false
         }
     } catch {
         write-host -f darkred $_.exception.tostring()
@@ -645,14 +645,14 @@ function create_shims($manifest, $dir, $global, $arch) {
     $shims = @(arch_specific 'bin' $manifest $arch)
     $shims | ?{ $_ -ne $null } | % {
         $target, $name, $arg = shim_def $_
-        echo "Creating shim for $name"
+        echo "Creating shim for '$name'."
 
         # check valid bin
         $bin = "$dir\$target"
         if(!(is_in_dir $dir $bin)) {
             abort "Error in manifest: bin '$target' is outside the app directory."
         }
-        if(!(test-path $bin)) { abort "Can't shim $target`: File doesn't exist."}
+        if(!(test-path $bin)) { abort "Can't shim '$target': File doesn't exist."}
 
         shim "$dir\$target" $global $name $arg
     }
@@ -662,9 +662,9 @@ function rm_shim($name, $shimdir) {
     $shim = "$shimdir\$name.ps1"
 
     if(!(test-path $shim)) { # handle no shim from failed install
-        warn "Shim for $name is missing. Skipping."
+        warn "Shim for '$name' is missing. Skipping."
     } else {
-        echo "Removing shim for $name"
+        echo "Removing shim for '$name'."
         rm $shim
     }
 
@@ -703,7 +703,7 @@ function link_current($versiondir) {
 
     $currentdir = current_dir $versiondir
 
-    write-host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
+    write-host "Linking '$(friendly_path $currentdir)' => '$(friendly_path $versiondir)'."
 
     if($currentdir -eq $versiondir) {
         abort "Error: Version 'current' is not allowed!"
@@ -728,7 +728,7 @@ function unlink_current($versiondir) {
     $currentdir = current_dir $versiondir
 
     if(test-path $currentdir) {
-        write-host "Unlinking $(friendly_path $currentdir)"
+        write-host "Unlinking '$(friendly_path $currentdir)'."
 
         # remove the junction
         cmd /c rmdir $currentdir
@@ -743,14 +743,14 @@ function ensure_install_dir_not_in_path($dir, $global) {
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if($removed) {
-        $removed | % { "Installer added $(friendly_path $_) to path. Removing."}
+        $removed | % { "Installer added '$(friendly_path $_)' to path. Removing."}
         env 'path' $global $fixed
     }
 
     if(!$global) {
         $fixed, $removed = find_dir_or_subdir (env 'path' $true) "$dir"
         if($removed) {
-            $removed | % { warn "Installer added $_ to system path. You might want to remove this manually (requires admin permission)."}
+            $removed | % { warn "Installer added '$_' to system path. You might want to remove this manually (requires admin permission)."}
         }
     }
 }

@@ -47,7 +47,7 @@ foreach($app in $apps) {
     }
 
     $version = current_version $app $global
-    "Uninstalling $app ($version)."
+    "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
     try {
@@ -75,15 +75,15 @@ foreach($app in $apps) {
     env_rm $manifest $global
 
     try { rm -r $dir -ea stop -force }
-    catch { abort "Couldn't remove $(friendly_path $dir); it may be in use." }
+    catch { abort "Couldn't remove '$(friendly_path $dir)'; it may be in use." }
 
     # remove older versions
     $old = @(versions $app $global)
     foreach($oldver in $old) {
-        "Removing older version, $oldver"
+        "Removing older version ($oldver)."
         $dir = versiondir $app $oldver $global
         try { rm -r -force -ea stop $dir }
-        catch { abort "Couldn't remove $(friendly_path $dir); it may be in use." }
+        catch { abort "Couldn't remove '$(friendly_path $dir)'; it may be in use." }
     }
 
     if(@(versions $app).length -eq 0) {
