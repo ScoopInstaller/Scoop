@@ -5,6 +5,9 @@ TODO
  - clean up
 #>
 
+. "$psscriptroot/core.ps1"
+. "$psscriptroot/json.ps1"
+
 function substitute([String] $str, [Hashtable] $params) {
     $params.GetEnumerator() | % {
         $str = $str.Replace($_.Name, $_.Value)

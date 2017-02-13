@@ -61,6 +61,20 @@ if($apps.length -eq 1) {
     ensure_not_installed $apps $global
 }
 
+# get any specific versions that we need to handle first
+$specific_version_regex = '^([\w\-]+)@(.+)$'
+$specific_versions = $apps | Where-Object { $_ -match $specific_version_regex }
+$difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
+$specific_versions_paths = $specific_versions | ForEach-Object {
+    $_ -match $specific_version_regex | Out-Null
+    $app, $version = $matches[1], $matches[2]
+
+    # this returns an array for some reason
+    # someone tell me why because it was driving me nuts
+    $(generate_user_manifest $app $version)[1]
+}
+$apps = $specific_versions_paths + $difference
+
 # remember which were explictly requested so that we can
 # differentiate after dependencies are added
 $explicit_apps = $apps
