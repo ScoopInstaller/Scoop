@@ -35,11 +35,11 @@ function print_summaries {
 $commands = commands
 
 if(!($cmd)) {
-    "usage: scoop <command> [<args>]
+    "Usage: scoop <command> [<args>]
 
 Some useful commands are:"
     print_summaries
-    "type 'scoop help <command>' to get help for a specific command"
+    "Type 'scoop help <command>' to get help for a specific command"
 } elseif($commands -contains $cmd) {
     print_help $cmd
 } else {

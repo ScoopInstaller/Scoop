@@ -13,7 +13,7 @@ function shortcut_folder() {
 
 function startmenu_shortcut($target, $shortcutName) {
     if(!(Test-Path $target)) {
-        abort "Can't create the Startmenu shortcut for $(fname $target): couldn't find $target"
+        abort "Can't create the Startmenu shortcut for $(fname $target): Couldn't find $target"
     }
     $scoop_startmenu_folder = shortcut_folder
     if(!(Test-Path $scoop_startmenu_folder)) {

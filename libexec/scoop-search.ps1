@@ -33,7 +33,7 @@ function search_bucket($bucket, $query) {
         try {
             $query = new-object regex $query, 'IgnoreCase'
         } catch {
-            abort "invalid regular expression: $($_.exception.innerexception.message)"
+            abort "Invalid regular expression: $($_.exception.innerexception.message)"
         }
 
         $apps = $apps | ? {
@@ -84,8 +84,8 @@ function search_remotes($query) {
     } |? { $_.results }
 
     if ($results.count -gt 0) {
-        "results from other known buckets..."
-        "add them using 'scoop bucket add <name>'"
+        "Results from other known buckets..."
+        "(add them using 'scoop bucket add <name>')"
         ""
     }
 
@@ -115,7 +115,7 @@ function search_remotes($query) {
 
 if (!$local_results -and !(github_ratelimit_reached)) {
     $remote_results = search_remotes $query
-    if(!$remote_results) { [console]::error.writeline("no matches found"); exit 1 }
+    if(!$remote_results) { [console]::error.writeline("No matches found."); exit 1 }
     $remote_results
 }
 

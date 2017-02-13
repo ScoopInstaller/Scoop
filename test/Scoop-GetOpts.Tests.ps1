@@ -4,28 +4,28 @@
 describe "getopt" {
     it 'handle short option with required argument missing' {
         $null, $null, $err = getopt '-x' 'x:' ''
-        $err | should be 'option -x requires an argument'
+        $err | should be 'Option -x requires an argument.'
 
         $null, $null, $err = getopt '-xy' 'x:y' ''
-        $err | should be 'option -x requires an argument'
+        $err | should be 'Option -x requires an argument.'
     }
 
     it 'handle long option with required argument missing' {
         $null, $null, $err = getopt '--arb' '' 'arb='
-        $err | should be 'option --arb requires an argument'
+        $err | should be 'Option --arb requires an argument.'
     }
 
     it 'handle unrecognized short option' {
         $null, $null, $err = getopt '-az' 'a' ''
-        $err | should be 'option -z not recognized'
+        $err | should be 'Option -z not recognized.'
     }
 
     it 'handle unrecognized long option' {
         $null, $null, $err = getopt '--non-exist' '' ''
-        $err | should be 'option --non-exist not recognized'
+        $err | should be 'Option --non-exist not recognized.'
 
         $null, $null, $err = getopt '--global','--another' 'abc:de:' 'global','one'
-        $err | should be 'option --another not recognized'
+        $err | should be 'Option --another not recognized.'
     }
 
     it 'remaining args returned' {

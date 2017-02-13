@@ -12,9 +12,9 @@
 # When installing from your computer, you can leave the .json extension off if you like.
 #
 # Options:
-#   -a, --arch <32bit|64bit>  use the specified architecture, if the app supports it
-#   -i, --independent         don't install dependencies automatically
-#   -g, --global              install the app globally
+#   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
+#   -i, --independent         Don't install dependencies automatically
+#   -g, --global              Install the app globally
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -38,9 +38,9 @@ function ensure_not_installed($app, $global) {
 
         $version = @(versions $app $global)[-1]
         if(!(install_info $app $version $global)) {
-            abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app$global_flag' before retrying the install."
+            abort "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$global_flag' before retrying the install."
         }
-        abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
+        abort "$app ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
     }
 }
 
@@ -72,7 +72,7 @@ ensure_none_failed $apps $global
 
 $apps, $skip = prune_installed $apps $global
 
-$skip | ? { $explicit_apps -contains $_} | % { warn "$_ is already installed, skipping" }
+$skip | ? { $explicit_apps -contains $_} | % { warn "$_ is already installed. Skipping." }
 
 $suggested = @{};
 $apps | % { install_app $_ $architecture $global $suggested }

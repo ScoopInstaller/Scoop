@@ -31,13 +31,13 @@ function init_alias_config {
 
 function add_alias($name, $command) {
   if(!$command) {
-    abort "can't create an empty alias"
+    abort "Can't create an empty alias."
   }
 
   # get current aliases from config
   $aliases = init_alias_config
   if($aliases.containskey($name)) {
-    abort "alias $name already exists"
+    abort "Alias $name already exists."
   }
 
   $alias_file = "scoop-$name"
@@ -60,14 +60,14 @@ function rm_alias($name) {
   $aliases = get_config $script:config_alias
 
   if($aliases.containskey($name)) {
-    "removing alias $name..."
+    "Removing alias $name..."
 
     rm_shim $aliases.get_item($name) (shimdir $false)
 
     $aliases.remove($name)
     set_config $script:config_alias $aliases
   }
-  else { abort "alias $name doesn't exist" }
+  else { abort "Alias $name doesn't exist" }
 }
 
 function list_aliases {

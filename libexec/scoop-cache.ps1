@@ -38,7 +38,7 @@ switch($cmd) {
 
         $files | % { cacheinfo $_ } | ft $f_size, $f_app, $f_url -auto -hide
 
-        "total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
+        "Total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
     }
     default {
         "cache '$cmd' not supported"; my_usage; exit 1

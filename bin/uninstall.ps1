@@ -7,11 +7,11 @@ param($global)
 . "$psscriptroot\..\lib\manifest.ps1"
 
 if($global -and !(is_admin)) {
-    "ERROR: you need admin rights to uninstall globally"; exit 1
+    "ERROR: You need admin rights to uninstall globally."; exit 1
 }
 
-warn 'this will uninstall scoop and all the programs that have been installed with scoop!'
-$yn = read-host 'are you sure? (yN)'
+warn 'This will uninstall Scoop and all the programs that have been installed with Scoop!'
+$yn = read-host 'Are you sure? (yN)'
 if($yn -notlike 'y*') { exit }
 
 $errors = $false
@@ -22,7 +22,7 @@ function do_uninstall($app, $global) {
     $install = install_info $app $version $global
     $architecture = $install.architecture
 
-    echo "uninstalling $app"
+    echo "Uninstalling $app"
     run_uninstaller $manifest $architecture $dir
     rm_shims $manifest $global $architecture
 
@@ -39,14 +39,14 @@ function do_uninstall($app, $global) {
         rm -r -force $appdir -ea stop
     } catch {
         $errors = $true
-        warn "couldn't remove $(friendly_path $appdir): $_.exception"
+        warn "Couldn't remove $(friendly_path $appdir): $_.exception"
     }
 }
 function rm_dir($dir) {
     try {
         rm -r -force $dir -ea stop
     } catch {
-        abort "couldn't remove $(friendly_path $dir): $_"
+        abort "Couldn't remove $(friendly_path $dir): $_"
     }
 }
 
@@ -62,7 +62,7 @@ installed_apps $false | % { # local apps
 }
 
 if($errors) {
-    abort "not all apps could be deleted. try again or restart"
+    abort "Not all apps could be deleted. Try again or restart."
 }
 
 rm_dir $scoopdir
@@ -71,4 +71,4 @@ if($global) { rm_dir $globaldir }
 remove_from_path (shimdir $false)
 if($global) { remove_from_path (shimdir $true) }
 
-success "scoop has been uninstalled"
+success "Scoop has been uninstalled."

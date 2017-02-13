@@ -29,6 +29,6 @@ if($apps) {
     ""
     exit 0
 } else {
-    "there aren't any apps installed"
+    "There aren't any apps installed."
     exit 1
 }

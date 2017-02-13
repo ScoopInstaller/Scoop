@@ -6,11 +6,11 @@
 # You can use '*' in place of <app> to update all apps.
 #
 # Options:
-#   --global, -g       update a globally installed app
-#   --force, -f        force update even when there isn't a newer version
-#   --no-cache, -k     don't use the download cache
-#   --independent, -i  don't install dependencies automatically
-#   --quiet, -q        hide extraneous messages
+#   --global, -g       Update a globally installed app
+#   --force, -f        Force update even when there isn't a newer version
+#   --no-cache, -k     Don't use the download cache
+#   --independent, -i  Don't install dependencies automatically
+#   --quiet, -q        Hide extraneous messages
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\shortcuts.ps1"
@@ -37,9 +37,9 @@ $independent = $opt.i -or $opt.independent
 function update_scoop() {
     # check for git
     $git = try { gcm git -ea stop } catch { $null }
-    if(!$git) { abort "scoop uses git to update itself. run 'scoop install git'." }
+    if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git'." }
 
-    "updating scoop..."
+    "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
         # load config
@@ -62,7 +62,7 @@ function update_scoop() {
 
         # check if scoop was successful downloaded
         if(!(test-path "$newdir")) {
-            abort 'scoop update failed'
+            abort 'Scoop update failed.'
         }
 
         # replace non-git scoop with the git version
@@ -74,7 +74,7 @@ function update_scoop() {
         git_pull -q
         $res = $lastexitcode
         if($res -ne 0) {
-            abort 'update failed'
+            abort 'Update failed.'
         }
         popd
     }
@@ -83,12 +83,12 @@ function update_scoop() {
     shim "$currentdir\bin\scoop.ps1" $false
 
     @(buckets) | % {
-        "updating $_ bucket..."
+        "Updating $_ bucket..."
         pushd (bucketdir $_)
         git_pull -q
         popd
     }
-    success 'scoop was updated successfully!'
+    success 'Scoop was updated successfully!'
 }
 
 function update($app, $global, $quiet = $false, $independent, $suggested) {
@@ -117,27 +117,27 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
 
     if(!$force -and ($old_version -eq $version)) {
         if (!$quiet) {
-            warn "the latest version of $app ($version) is already installed."
-            "run 'scoop update' to check for new versions."
+            warn "The latest version of $app ($version) is already installed."
+            "Run 'scoop update' to check for new versions."
         }
         return
     }
-    if(!$version) { abort "no manifest available for $app" } # installed from a custom bucket/no longer supported
+    if(!$version) { abort "No manifest available for $app" } # installed from a custom bucket/no longer supported
 
     $manifest = manifest $app $bucket $url
 
-    "updating $app ($old_version -> $version)"
+    "Updating $app ($old_version -> $version)"
 
     $dir = versiondir $app $old_version $global
 
-    "uninstalling $app ($old_version)"
+    "Uninstalling $app ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
     env_rm_path $old_manifest $dir $global
     env_rm $old_manifest $global
     # note: keep the old dir in case it contains user files
 
-    "installing $app ($version)"
+    "Installing $app ($version)"
     $dir = ensure (versiondir $app $version $global)
 
     # save info for uninstall
@@ -169,11 +169,11 @@ function ensure_all_installed($apps, $global) {
     if($app) {
         if(installed $app (!$global)) {
             function wh($g) { if($g) { "globally" } else { "for your account" } }
-            write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))" -f darkred
-            "try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
+            write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))." -f darkred
+            "Try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead."
             exit 1
         } else {
-            abort "$app isn't installed"
+            abort "$app isn't installed."
         }
     }
 }
@@ -185,15 +185,15 @@ function applist($apps, $global) {
 
 if(!$apps) {
     if($global) {
-        "scoop update: --global is invalid when <app> not specified"; exit 1
+        "scoop update: --global is invalid when <app> is not specified."; exit 1
     }
     if (!$use_cache) {
-        "scoop update: --no-cache is invalid when <app> not specified"; exit 1
+        "scoop update: --no-cache is invalid when <app> is not specified."; exit 1
     }
     update_scoop
 } else {
     if($global -and !(is_admin)) {
-        'ERROR: you need admin rights to update global apps'; exit 1
+        'ERROR: You need admin rights to update global apps.'; exit 1
     }
 
     if($apps -eq '*') {
