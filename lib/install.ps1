@@ -161,7 +161,7 @@ function dl($url, $to, $cookies, $progress) {
     $wres = $wreq.getresponse()
     $total = $wres.ContentLength
 
-    if ($progress) {
+    if ($progress -and ($total -gt 0)) {
         [console]::CursorVisible = $false
         function dl_onProgress($read) {
             dl_progress $read $total $url
