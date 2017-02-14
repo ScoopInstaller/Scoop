@@ -110,7 +110,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
         $null = ensure $cachedir
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
-    } else { write-host "Loading $url from cache..."}
+    } else { write-host "Loading $(url_filename $url) from cache..."}
 
     if (!($to -eq $null)) {
         Copy-Item $cached $to
@@ -917,7 +917,7 @@ function show_suggestions($suggested) {
             }
 
             if(!$fulfilled) {
-                write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'"
+                write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
             }
         }
     }
