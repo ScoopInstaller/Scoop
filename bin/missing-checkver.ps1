@@ -7,10 +7,22 @@ param($dir)
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir
 
-# output app names without checkver
+write-host "[" -nonewline
+write-host -f green "C" -nonewline
+write-host "]heckver"
+write-host " | [" -nonewline
+write-host -f cyan "A" -nonewline
+write-host "]utoupdate"
+write-host " |  |"
+
 gci $dir "*.json" | % {
     $json = parse_json "$dir\$_"
-    if(!$json.checkver) {
-        write-host (strip_ext $_)
-    }
+    write-host "[" -nonewline
+    write-host -f green -nonewline $( If ($json.checkver) {"C"} Else {" "} )
+    write-host "]" -nonewline
+
+    write-host "[" -nonewline
+    write-host -f cyan -nonewline $( If ($json.autoupdate) {"A"} Else {" "} )
+    write-host "] " -nonewline
+    write-host (strip_ext $_)
 }
