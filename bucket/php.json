@@ -1,25 +1,25 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.1.1",
+    "version": "7.1.2",
     "license": "https://www.php.net/license/",
     "architecture": {
         "64bit": {
             "url": [
-                "http://windows.php.net/downloads/releases/php-7.1.1-Win32-VC14-x64.zip",
+                "http://windows.php.net/downloads/releases/php-7.1.2-Win32-VC14-x64.zip",
                 "https://raw.githubusercontent.com/madbub/scoop-php/master/64-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha1:84aefb5b1f4148a1895e8ae88726279a57850629",
+                "sha1:e5909b1bf6689401d1517d07572594229341cb97",
                 "acf65e565021f2017815fc5ec8a3145cf6c15e75c132cf23a378cc943e68327c"
             ]
         },
         "32bit": {
             "url": [
-                "http://windows.php.net/downloads/releases/php-7.1.1-Win32-VC14-x86.zip",
+                "http://windows.php.net/downloads/releases/php-7.1.2-Win32-VC14-x86.zip",
                 "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/32-bit/vcruntime140.dll"
             ],
             "hash": [
-                "sha1:5f80a93f4fcdc3caa2faae182e39a0b69be3397f",
+                "sha1:aa7a737709d5c4afd755b0ed9f7d441d68fe0e5b",
                 "b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
             ]
         }
