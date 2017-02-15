@@ -1,11 +1,11 @@
 {
     "homepage": "http://apex.run/",
     "license": "https://github.com/apex/apex/blob/master/LICENSE",
-    "version": "0.12.0",
+    "version": "0.13.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/apex/apex/releases/download/v0.12.0/apex_windows_amd64.exe",
-            "hash": "f9169347210fc1292c7e281f7898c2830be0d3c6458bf68db3528a64a5e2787d"
+            "url": "https://github.com/apex/apex/releases/download/v0.13.0/apex_windows_amd64.exe",
+            "hash": "8e667470e644b025c237d988f70ede9d794420915f808a9e08f9b070f0241cde"
         }
     },
     "extract_dir": "apex",
