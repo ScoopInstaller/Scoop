@@ -82,6 +82,7 @@ function pull_requests($json, [String]$app, [String]$upstream)
 
     if($LASTEXITCODE -gt 0) {
         Write-Host -f DarkRed "Push failed! (hub push origin $branch)"
+        execute "hub reset"
         return
     }
 
@@ -95,6 +96,7 @@ a new version of [$app]($homepage) is available.
 </table>" -b '$upstream' -h $branch
     if($LASTEXITCODE -gt 0) {
         Write-Host -f DarkRed "Pull Request failed! (hub pull-request -m 'update $app to version $version' -b '$upstream' -h $branch)"
+        execute "hub reset"
         exit 1
     }
 }
@@ -141,3 +143,4 @@ if($push -eq $true) {
     execute "hub checkout -f master"
 }
 
+execute "hub reset"
