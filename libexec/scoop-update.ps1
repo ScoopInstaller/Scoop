@@ -12,7 +12,6 @@
 #   --independent, -i  Don't install dependencies automatically
 #   --quiet, -q        Hide extraneous messages
 . "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\psmodules.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
@@ -23,6 +22,7 @@
 . "$psscriptroot\..\lib\depends.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\git.ps1"
+. "$psscriptroot\..\lib\install.ps1"
 
 reset_aliases
 
