@@ -8,7 +8,7 @@
     "bin": "bin\\vagrant.exe",
     "checkver": {
         "url": "https://releases.hashicorp.com/vagrant/",
-        "re": "vagrant_([\\d.]+)"
+        "re": "vagrant_([\\d.]+)<\/a>"
     },
     "autoupdate": {
         "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version.msi",

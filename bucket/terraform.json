@@ -17,7 +17,7 @@
     ],
     "checkver": {
         "url": "https://releases.hashicorp.com/terraform/",
-        "re": "terraform_([\\d.]+)"
+        "re": "terraform_([\\d.]+)<\/a>"
     },
     "autoupdate": {
         "architecture": {

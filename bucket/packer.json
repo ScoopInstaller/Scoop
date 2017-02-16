@@ -17,7 +17,7 @@
     ],
     "checkver": {
         "url": "https://releases.hashicorp.com/packer/",
-        "re": "packer_([\\d.]+)"
+        "re": "packer_([\\d.]+)<\/a>"
     },
     "autoupdate": {
         "architecture": {

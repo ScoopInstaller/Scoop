@@ -17,7 +17,7 @@
     ],
     "checkver": {
         "url": "https://releases.hashicorp.com/vault/",
-        "re": "vault_([\\d.]+)"
+        "re": "vault_([\\d.]+)<\/a>"
     },
     "autoupdate": {
         "architecture": {
