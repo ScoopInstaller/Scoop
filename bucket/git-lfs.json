@@ -1,17 +1,17 @@
 {
     "homepage": "https://git-lfs.github.com/",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/github/git-lfs/releases/download/v1.5.5/git-lfs-windows-386-1.5.5.zip",
-            "hash": "4e364f02dc4680519d76b6847e5f31a8d3d6e67fc68e905afe7b0a7e5716cb2c",
-            "extract_dir": "git-lfs-windows-386-1.5.5"
+            "url": "https://github.com/github/git-lfs/releases/download/v1.5.6/git-lfs-windows-386-1.5.6.zip",
+            "hash": "70558921e7a405ede45e9441d247af741c5e82030f60bfdea9fe974f473ebc59",
+            "extract_dir": "git-lfs-windows-386-1.5.6"
         },
         "64bit": {
-            "url": "https://github.com/github/git-lfs/releases/download/v1.5.5/git-lfs-windows-amd64-1.5.5.zip",
-            "hash": "7c23635f34b0b4eed55621231148ef3e0de9a46e2d629b4bba7f706a96ae77ea",
-            "extract_dir": "git-lfs-windows-amd64-1.5.5"
+            "url": "https://github.com/github/git-lfs/releases/download/v1.5.6/git-lfs-windows-amd64-1.5.6.zip",
+            "hash": "cc72164f5ba54fad85c67c19e507cb4da001039d84132d101a7c8eab98b28aa2",
+            "extract_dir": "git-lfs-windows-amd64-1.5.6"
         }
     },
     "depends": "git",
