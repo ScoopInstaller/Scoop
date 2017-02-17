@@ -2,3 +2,4 @@
 * text eol=crlf
 *.exe -text
 *.zip -text
+*.dll -text

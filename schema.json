@@ -100,14 +100,23 @@
                         },
                         "type": {
                             "enum": [
+                                "md5",
                                 "sha1",
                                 "sha256",
                                 "sha512"
                             ]
                         },
                         "url": {
-                            "format": "uri",
-                            "type": "string"
+                            "anyOf": [
+                                {
+                                    "format": "uri",
+                                    "type": "string"
+                                },
+                                {
+                                    "pattern": "^\\$url.[\\w\\d]+$",
+                                    "type": "string"
+                                }
+                            ]
                         }
                     },
                     "type": "object"
@@ -190,8 +199,7 @@
                         "type": "string"
                     },
                     "minItems": 1,
-                    "type": "array",
-                    "uniqueItems": true
+                    "type": "array"
                 }
             ]
         },
@@ -236,16 +244,21 @@
             "anyOf": [
                 {
                     "format": "uri",
-                    "type": "string"
+                    "type": "string",
+                    "not": {
+                        "pattern": "(\\$)"
+                    }
                 },
                 {
                     "items": {
                         "format": "uri",
-                        "type": "string"
+                        "type": "string",
+                        "not": {
+                            "pattern": "(\\$)"
+                        }
                     },
                     "minItems": 1,
-                    "type": "array",
-                    "uniqueItems": true
+                    "type": "array"
                 }
             ]
         }
@@ -413,8 +426,29 @@
         },
         "version": {
             "type": "string"
+        },
+        "suggest": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "^(.*)$": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                }
+            },
+            "type": "object"
+        },
+        "psmodule": {
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
         }
     },
     "title": "scoop app manifest schema",
-    "type": "object"
+    "type": "object",
+    "required": [
+        "version"
+    ]
 }
