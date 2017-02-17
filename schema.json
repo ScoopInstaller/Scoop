@@ -199,8 +199,7 @@
                         "type": "string"
                     },
                     "minItems": 1,
-                    "type": "array",
-                    "uniqueItems": true
+                    "type": "array"
                 }
             ]
         },
@@ -256,11 +255,10 @@
                         "type": "string",
                         "not": {
                             "pattern": "(\\$)"
-                        },
+                        }
                     },
                     "minItems": 1,
-                    "type": "array",
-                    "uniqueItems": true
+                    "type": "array"
                 }
             ]
         }
@@ -427,8 +425,7 @@
             "$ref": "#/definitions/uriOrArrayOfUris"
         },
         "version": {
-            "type": "string",
-            "required": true
+            "type": "string"
         },
         "suggest": {
             "additionalProperties": false,
@@ -450,5 +447,8 @@
         }
     },
     "title": "scoop app manifest schema",
-    "type": "object"
+    "type": "object",
+    "required": [
+        "version"
+    ]
 }
