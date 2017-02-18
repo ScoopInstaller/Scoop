@@ -1,6 +1,6 @@
 {
     "homepage": "https://farmanager.com/",
-    "version": "3.0 build 4774",
+    "version": "30b4774",
     "architecture": {
         "64bit": {
             "url": "https://farmanager.com/files/Far30b4774.x64.20160902.7z",
@@ -13,7 +13,17 @@
     },
     "checkver": {
         "url": "https://farmanager.com/download.php",
-        "re": "<b>Far Manager v([\\d.]+ build [0-9]+) x64</b>"
+        "re": "files/Far(?<version>[b\\d]+).x64.(?<date>\\d+).7z"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://farmanager.com/files/Far$version.x64.$matchDate.7z"
+            },
+            "32bit": {
+                "url": "https://farmanager.com/files/Far$version.x86.$matchDate.7z"
+            }
+        }
     },
     "bin": "far.exe"
 }
