@@ -1,13 +1,16 @@
 {
     "homepage": "http://www.gradle.org",
-    "version": "3.3",
+    "version": "3.4",
     "license": "Apache 2.0",
-    "hash": "c58650c278d8cf0696cab65108ae3c8d95eea9c1938e0eb8b997095d5ca9a292",
-    "url": "https://services.gradle.org/distributions/gradle-3.3-bin.zip",
-    "extract_dir": "gradle-3.3",
+    "hash": "72d0cd4dcdd5e3be165eb7cd7bbd25cf8968baf400323d9ab1bba622c3f72205",
+    "url": "https://services.gradle.org/distributions/gradle-3.4-bin.zip",
+    "extract_dir": "gradle-3.4",
     "bin": "bin\\gradle.bat",
     "suggest": {
-        "JDK": [ "extras/oraclejdk", "openjdk" ]
+        "JDK": [
+            "extras/oraclejdk",
+            "openjdk"
+        ]
     },
     "checkver": {
         "url": "https://gradle.org/gradle-download/",
