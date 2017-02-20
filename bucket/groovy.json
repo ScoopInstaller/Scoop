@@ -26,6 +26,7 @@
         "re": "([\\d.]+) distributions"
     },
     "autoupdate": {
-        "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-$version.zip"
+        "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-$version.zip",
+        "extract_dir": "groovy-$version"
     }
 }
