@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/coreybutler/nvm-windows",
-    "version": "1.1.1",
-    "url": "https://github.com/coreybutler/nvm-windows/releases/download/1.1.1/nvm-noinstall.zip",
+    "version": "1.1.2",
+    "url": "https://github.com/coreybutler/nvm-windows/releases/download/1.1.2/nvm-noinstall.zip",
     "extract_dir": "\\",
     "bin": [
         "nvm.exe",
@@ -13,7 +13,7 @@
         "NVM_HOME": "$dir",
         "NVM_SYMLINK": "$dir\\nodejs"
     },
-    "hash": "ca733ab612709080cea2f46a9baabbd475014c49a95ee7dc60c0575201852bce",
+    "hash": "f3860c9cecdc7dbd2eff14d98fa4d4d8318fd55cd3e1af003edac2627d8af114",
     "architecture": {
         "64bit": {
             "post_install": "\"root: $dir `r`narch: 64 `r`nproxy: none `r`noriginalpath: `r`noriginalversion: `r`n\" | Out-File -encoding \"ASCII\" $dir\\settings.txt"
