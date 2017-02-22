@@ -1,5 +1,5 @@
 function usage($text) {
-    $text | sls '(?m)^# Usage: ([^\n]*)$' | % { "usage: " + $_.matches[0].groups[1].value }
+    $text | sls '(?m)^# Usage: ([^\n]*)$' | % { "Usage: " + $_.matches[0].groups[1].value }
 }
 
 function summary($text) {

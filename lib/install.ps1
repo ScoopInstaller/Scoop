@@ -1,25 +1,25 @@
 function nightly_version($date, $quiet = $false) {
     $date_str = $date.tostring("yyyyMMdd")
     if (!$quiet) {
-        warn "this is a nightly version: downloaded files won't be verified"
+        warn "This is a nightly version. Downloaded files won't be verified."
     }
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global) {
+function install_app($app, $architecture, $global, $suggested) {
     $app, $bucket = app $app
     $app, $manifest, $bucket, $url = locate $app $bucket
     $use_cache = $true
     $check_hash = $true
 
     if(!$manifest) {
-        abort "couldn't find manifest for $app$(if($url) { " at the URL $url" })"
+        abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
     }
 
     $version = $manifest.version
-    if(!$version) { abort "manifest doesn't specify a version" }
+    if(!$version) { abort "Manifest doesn't specify a version." }
     if($version -match '[^\w\.\-_]') {
-        abort "manifest version has unsupported character '$($matches[0])'"
+        abort "Manifest version has unsupported character '$($matches[0])'."
     }
 
     $is_nightly = $version -eq 'nightly'
@@ -28,7 +28,7 @@ function install_app($app, $architecture, $global) {
         $check_hash = $false
     }
 
-    echo "installing $app ($version)"
+    echo "Installing '$app' ($version)."
 
     $dir = ensure (versiondir $app $version $global)
 
@@ -37,8 +37,10 @@ function install_app($app, $architecture, $global) {
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
+    $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global
+    install_psmodule $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
@@ -49,7 +51,11 @@ function install_app($app, $architecture, $global) {
     save_installed_manifest $app $bucket $dir $url
     save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
-    success "$app ($version) was installed successfully!"
+    if($manifest.suggest) {
+        $suggested[$app] = $manifest.suggest
+    }
+
+    success "'$app' ($version) was installed successfully!"
 
     show_notes $manifest
 }
@@ -58,7 +64,7 @@ function ensure_architecture($architecture_opt) {
     switch($architecture_opt) {
         '' { return default_architecture }
         { @('32bit','64bit') -contains $_ } { return $_ }
-        default { abort "invalid architecture: '$architecture'"}
+        default { abort "Invalid architecture: '$architecture'."}
     }
 }
 
@@ -97,45 +103,53 @@ function locate($app, $bucket) {
     return $app, $manifest, $bucket, $url
 }
 
-function dl_with_cache($app, $version, $url, $to, $cookies, $use_cache = $true) {
+function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
-    if(!$use_cache) { warn "cache is being ignored" }
 
     if(!(test-path $cached) -or !$use_cache) {
         $null = ensure $cachedir
-        write-host "downloading $url..." -nonewline
         do_dl $url "$cached.download" $cookies
-        mv "$cached.download" $cached -force
-        write-host "done"
-    } else { write-host "loading $url from cache..."}
-    cp $cached $to
+        Move-Item "$cached.download" $cached -force
+    } else { write-host "Loading $(url_filename $url) from cache..."}
+
+    if (!($to -eq $null)) {
+        Copy-Item $cached $to
+    }
+}
+
+function use_any_https_protocol() {
+    $original = "$([System.Net.ServicePointManager]::SecurityProtocol)"
+    $available = [string]::join(', ', `
+        [Enum]::GetNames([System.Net.SecurityProtocolType]))
+
+    # use whatever protocols are available that the server supports
+    set_https_protocols $available
+
+    return $original
+}
+
+function set_https_protocols($protocols) {
+    [System.Net.ServicePointManager]::SecurityProtocol = `
+        [System.Net.SecurityProtocolType] $protocols
 }
 
 function do_dl($url, $to, $cookies) {
+    $original_protocols = use_any_https_protocol
+    $progress = [console]::isoutputredirected -eq $false
+
     try {
-        if([console]::isoutputredirected) {
-            # can't set cursor position: just do simple download
-            dl_simple $url $to $cookies
-        } else {
-            dl_progress $url $to $cookies
-        }
+        dl $url $to $cookies $progress
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
         abort $e.message
+    } finally {
+        set_https_protocols $original_protocols
     }
 }
 
-# simple download (for when the console doesn't support setting cursor position)
-function dl_simple($url, $to, $cookies) {
-    $wc = new-object net.webclient
-    $wc.headers.add('User-Agent', 'Scoop/1.0')
-    $wc.headers.add('Cookie', (cookie_header $cookies))
-    $wc.downloadfile($url, $to)
-}
-
 # download with filesize and progress indicator
-function dl_progress($url, $to, $cookies) {
+function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = 'Scoop/1.0'
@@ -145,46 +159,116 @@ function dl_progress($url, $to, $cookies) {
     }
 
     $wres = $wreq.getresponse()
-    try {
-        $total = $wres.contentlength
-        write-host "($(filesize $total)) " -nonewline
+    $total = $wres.ContentLength
 
-        $width = [console]::bufferwidth
-        $left = [console]::cursorleft
-        if(($left + 4) -gt $width) {
-            # not enough room to print progress on this line
-            write-host
-            $left = 0
+    if ($progress -and ($total -gt 0)) {
+        [console]::CursorVisible = $false
+        function dl_onProgress($read) {
+            dl_progress $read $total $url
         }
-        $top = [console]::cursortop
+    } else {
+        write-host "Downloading $url ($(filesize $total))..."
+        function dl_onProgress {
+            #no op
+        }
+    }
 
+    try {
         $s = $wres.getresponsestream()
-        try {
-            $fs = [io.file]::openwrite($to)
-            try {
-                $buffer = new-object byte[] 2048
-                $totalread = 0
+        $fs = [io.file]::openwrite($to)
+        $buffer = new-object byte[] 2048
+        $totalRead = 0
 
-                while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
-                    $fs.write($buffer, 0, $read)
-                    $totalread += $read
-                    $p = [math]::round($totalread / $total * 100, 0)
-                    [console]::setcursorposition($left, $top)
-                    write-host "$p%" -nonewline
-                }
-                [console]::setcursorposition($left, $top)
-            } finally {
-                $fs.close()
-            }
-        } finally {
-            $s.close();
+        dl_onProgress $totalRead
+        while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
+            $fs.write($buffer, 0, $read)
+            $totalRead += $read
+
+            dl_onProgress $totalRead
         }
     } finally {
+        if ($progress) {
+            [console]::CursorVisible = $true
+            write-host
+        }
+        if ($fs) {
+            $fs.close()
+        }
+        if ($s) {
+            $s.close();
+        }
         $wres.close()
     }
 }
 
+function url_filename($url) {
+    (split-path $url -leaf).split('?') | Select-Object -First 1
+}
+
+function dl_progress_output($url, $read, $total, $console) {
+    $filename = url_filename $url
+
+    # calculate current percentage done
+    $p = [math]::Round($read / $total * 100, 0)
+
+    # pre-generate LHS and RHS of progress string
+    # so we know how much space we have
+    $left  = "$filename ($(filesize $total))"
+    $right = [string]::Format("{0,3}%", $p)
+
+    # calculate remaining width for progress bar
+    $midwidth  = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
+
+    # calculate how many characters are completed
+    $completed = [math]::Abs([math]::Round(($p / 100) * $midwidth, 0) - 1)
+
+    # generate dashes to symbolise completed
+    if ($completed -gt 1) {
+        $dashes = [string]::Join("", ((1..$completed) | ForEach-Object {"="}))
+    }
+
+    # this is why we calculate $completed - 1 above
+    $dashes += switch($p) {
+        100 {"="}
+        default {">"}
+    }
+
+    # the remaining characters are filled with spaces
+    $spaces = switch($dashes.Length) {
+        $midwidth {[string]::Empty}
+        default {
+            [string]::Join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object {" "}))
+        }
+    }
+
+    "$left [$dashes$spaces] $right"
+}
+
+function dl_progress($read, $total, $url) {
+    $console = $host.UI.RawUI;
+    $left  = $console.CursorPosition.X;
+    $top   = $console.CursorPosition.Y;
+    $width = $console.BufferSize.Width;
+
+    if($read -eq 0) {
+        $maxOutputLength = $(dl_progress_output $url 100 $total $console).length
+        if (($left + $maxOutputLength) -gt $width) {
+            # not enough room to print progress on this line
+            # print on new line
+            write-host
+            $left = 0
+            $top  = $top + 1
+        }
+    }
+
+    write-host $(dl_progress_output $url $read $total $console) -nonewline
+    [console]::SetCursorPosition($left, $top)
+}
+
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+    # we only want to show this warning once
+    if(!$use_cache) { warn "Cache is being ignored." }
+
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
     $urls = @(url $manifest $architecture)
@@ -200,10 +284,20 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
+    $data = @{}
+
+    # download first
     foreach($url in $urls) {
-        $fname = (split-path $url -leaf).split('?')[0]
+        $data.$url = @{
+            "fname" = url_filename $url
+        }
+        $fname = $data.$url.fname
 
         dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+    }
+
+    foreach($url in $urls) {
+        $fname = $data.$url.fname
 
         if($check_hash) {
             $ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
@@ -234,20 +328,21 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
                     $extract_fn = 'extract_msi'
                 }
             } else {
-                warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs"
+                warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
             }
         } elseif(file_requires_7zip $fname) { # 7zip
             if(!(7zip_installed)) {
-                warn "aborting: you'll need to run 'scoop uninstall $app' to clean up"
-                abort "7-zip is required. you can install it with 'scoop install 7zip'"
+                warn "Aborting. You'll need to run 'scoop uninstall $app' to clean up."
+                abort "7-zip is required. You can install it with 'scoop install 7zip'."
             }
             $extract_fn = 'extract_7zip'
         }
 
         if($extract_fn) {
-            write-host "extracting..." -nonewline
+            write-host "Extracting... " -nonewline
             $null = mkdir "$dir\_scoop_extract"
             & $extract_fn "$dir\$fname" "$dir\_scoop_extract"
+            rm "$dir\$fname"
             if ($extract_to) {
                 $null = mkdir "$dir\$extract_to" -force
             }
@@ -261,12 +356,11 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
                 } catch [system.io.pathtoolongexception] {
                     cmd /c "rmdir /s /q $dir\_scoop_extract"
                 } catch [system.unauthorizedaccessexception] {
-                    warn "couldn't remove $dir\_scoop_extract: unauthorized access"
+                    warn "Couldn't remove $dir\_scoop_extract: unauthorized access."
                 }
             }
 
-            rm "$dir\$fname"
-            write-host "done"
+            write-host "done."
 
             $extracted++
         }
@@ -312,7 +406,7 @@ function hash_for_url($manifest, $url, $arch) {
     $urls = @(url $manifest $arch)
 
     $index = [array]::indexof($urls, $url)
-    if($index -eq -1) { abort "couldn't find hash in manifest for $url" }
+    if($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
 
     @($hashes)[$index]
 }
@@ -321,27 +415,27 @@ function hash_for_url($manifest, $url, $arch) {
 function check_hash($file, $url, $manifest, $arch) {
     $hash = hash_for_url $manifest $url $arch
     if(!$hash) {
-        warn "warning: no hash in manifest. sha256 is:`n$(compute_hash (fullpath $file) 'sha256')"
+        warn "Warning: No hash in manifest. SHA256 is:`n    $(compute_hash (fullpath $file) 'sha256')"
         return $true
     }
 
-    write-host "checking hash..." -nonewline
+    write-host "Checking hash of $(url_filename $url)... " -nonewline
     $type, $expected = $hash.split(':')
     if(!$expected) {
         # no type specified, assume sha256
         $type, $expected = 'sha256', $type
     }
 
-    if(@('md5','sha1','sha256') -notcontains $type) {
-        return $false, "hash type $type isn't supported"
+    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
+        return $false, "Hash type '$type' isn't supported."
     }
 
     $actual = compute_hash (fullpath $file) $type
 
     if($actual -ne $expected) {
-        return $false, "hash check failed for $url. expected: $($expected), actual: $($actual)!"
+        return $false, "Hash check failed for '$url'.`nExpected:`n    $($expected)`nActual:`n    $($actual)"
     }
-    write-host "ok"
+    write-host "ok."
     return $true
 }
 
@@ -369,7 +463,7 @@ function args($config, $dir, $global) {
 }
 
 function run($exe, $arg, $msg, $continue_exit_codes) {
-    if($msg) { write-host $msg -nonewline }
+    if($msg) { write-host "$msg " -nonewline }
     try {
         #Allow null/no arguments to be passed
         $parameters = @{ }
@@ -386,23 +480,23 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
                 warn $continue_exit_codes[$proc.exitcode]
                 return $true
             }
-            write-host "exit code was $($proc.exitcode)"; return $false
+            write-host "Exit code was $($proc.exitcode)."; return $false
         }
     } catch {
         write-host -f darkred $_.exception.tostring()
         return $false
     }
-    if($msg) { write-host "done" }
+    if($msg) { write-host "done." }
     return $true
 }
 
 function unpack_inno($fname, $manifest, $dir) {
     if(!$manifest.innosetup) { return }
 
-    write-host "unpacking innosetup..." -nonewline
+    write-host "Unpacking innosetup... " -nonewline
     innounp -x -d"$dir\_scoop_unpack" "$dir\$fname" > "$dir\innounp.log"
     if($lastexitcode -ne 0) {
-        abort "failed to unpack innosetup file. see $dir\innounp.log"
+        abort "Failed to unpack innosetup file. See $dir\innounp.log"
     }
 
     gci "$dir\_scoop_unpack\{app}" -r | mv -dest "$dir" -force
@@ -410,7 +504,7 @@ function unpack_inno($fname, $manifest, $dir) {
     rmdir -r -force "$dir\_scoop_unpack"
 
     rm "$dir\$fname"
-    write-host "done"
+    write-host "done."
 }
 
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
@@ -429,10 +523,10 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
 function install_msi($fname, $dir, $msi) {
     $msifile = "$dir\$(coalesce $msi.file "$fname")"
     if(!(is_in_dir $dir $msifile)) {
-        abort "error in manifest: MSI file $msifile is outside the app directory"
+        abort "Error in manifest: MSI file $msifile is outside the app directory."
     }
-    if(!($msi.code)) { abort "error in manifest: couldn't find MSI code"}
-    if(msi_installed $msi.code) { abort "the MSI package is already installed on this system" }
+    if(!($msi.code)) { abort "Error in manifest: Couldn't find MSI code."}
+    if(msi_installed $msi.code) { abort "The MSI package is already installed on this system." }
 
     $logfile = "$dir\install.log"
 
@@ -444,9 +538,9 @@ function install_msi($fname, $dir, $msi) {
 
     $continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
 
-    $installed = run 'msiexec' $arg "running installer..." $continue_exit_codes
+    $installed = run 'msiexec' $arg "Running installer..." $continue_exit_codes
     if(!$installed) {
-        abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
+        abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
     }
     rm $logfile
     rm $msifile
@@ -455,7 +549,7 @@ function install_msi($fname, $dir, $msi) {
 function extract_msi($path, $to) {
     $logfile = "$(split-path $path)\msi.log"
     $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
-    if(!$ok) { abort "failed to extract files from $path.`nlog file: $(friendly_path $logfile)" }
+    if(!$ok) { abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)" }
     if(test-path $logfile) { rm $logfile }
 }
 
@@ -480,21 +574,20 @@ function msi_installed($code) {
 function install_prog($fname, $dir, $installer, $global) {
     $prog = "$dir\$(coalesce $installer.file "$fname")"
     if(!(is_in_dir $dir $prog)) {
-        abort "error in manifest: installer $prog is outside the app directory"
+        abort "Error in manifest: Installer $prog is outside the app directory."
     }
     $arg = @(args $installer.args $dir $global)
 
     if($prog.endswith('.ps1')) {
         & $prog @arg
     } else {
-        $installed = run $prog $arg "running installer..."
+        $installed = run $prog $arg "Running installer..."
         if(!$installed) {
-            abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
+            abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
         }
 
-        #Don't remove installer if "keep" flag is set to true
-        if (!($installer.keep -eq "true"))
-        {
+        # Don't remove installer if "keep" flag is set to true
+        if(!($installer.keep -eq "true")) {
             rm $prog
         }
     }
@@ -523,10 +616,10 @@ function run_uninstaller($manifest, $architecture, $dir) {
             $exe = "$dir\$($uninstaller.file)"
             $arg = args $uninstaller.args
             if(!(is_in_dir $dir $exe)) {
-                warn "error in manifest: installer $exe is outside the app directory, skipping"
+                warn "Error in manifest: Installer $exe is outside the app directory, skipping."
                 $exe = $null;
             } elseif(!(test-path $exe)) {
-                warn "uninstaller $exe is missing, skipping"
+                warn "Uninstaller $exe is missing, skipping."
                 $exe = $null;
             }
         }
@@ -535,8 +628,8 @@ function run_uninstaller($manifest, $architecture, $dir) {
             if($exe.endswith('.ps1')) {
                 & $exe @arg
             } else {
-                $uninstalled = run $exe $arg "running uninstaller..." $continue_exit_codes
-                if(!$uninstalled) { abort "uninstallation aborted." }
+                $uninstalled = run $exe $arg "Running uninstaller..." $continue_exit_codes
+                if(!$uninstalled) { abort "Uninstallation aborted." }
             }
         }
     }
@@ -552,14 +645,14 @@ function create_shims($manifest, $dir, $global, $arch) {
     $shims = @(arch_specific 'bin' $manifest $arch)
     $shims | ?{ $_ -ne $null } | % {
         $target, $name, $arg = shim_def $_
-        echo "creating shim for $name"
+        echo "Creating shim for '$name'."
 
         # check valid bin
         $bin = "$dir\$target"
         if(!(is_in_dir $dir $bin)) {
-            abort "error in manifest: bin '$target' is outside the app directory"
+            abort "Error in manifest: bin '$target' is outside the app directory."
         }
-        if(!(test-path $bin)) { abort "can't shim $target`: file doesn't exist"}
+        if(!(test-path $bin)) { abort "Can't shim '$target': File doesn't exist."}
 
         shim "$dir\$target" $global $name $arg
     }
@@ -569,9 +662,9 @@ function rm_shim($name, $shimdir) {
     $shim = "$shimdir\$name.ps1"
 
     if(!(test-path $shim)) { # handle no shim from failed install
-        warn "shim for $name is missing, skipping"
+        warn "Shim for '$name' is missing. Skipping."
     } else {
-        echo "removing shim for $name"
+        echo "Removing shim for '$name'."
         rm $shim
     }
 
@@ -581,8 +674,10 @@ function rm_shim($name, $shimdir) {
     }
 }
 
-function rm_shims($manifest, $global) {
-    $manifest.bin | ?{ $_ -ne $null } | % {
+function rm_shims($manifest, $global, $arch) {
+    $shims = @(arch_specific 'bin' $manifest $arch)
+
+    $shims | ?{ $_ -ne $null } | % {
         $target, $name, $null = shim_def $_
         $shimdir = shimdir $global
 
@@ -590,39 +685,56 @@ function rm_shims($manifest, $global) {
     }
 }
 
-# Creates shortcut for the app in the start menu
-function create_startmenu_shortcuts($manifest, $dir, $global) {
-    $manifest.shortcuts | ?{ $_ -ne $null } | % {
-        $target = $_.item(0)
-        $name = $_.item(1)
-        startmenu_shortcut "$dir\$target" $name
-    }
+# Gets the path for the 'current' directory junction for
+# the specified version directory.
+function current_dir($versiondir) {
+    $parent = split-path $versiondir
+    return "$parent\current"
 }
 
-function startmenu_shortcut($target, $shortcutName) {
-    if(!(Test-Path $target)) {
-        abort "Can't create the Startmenu shortcut for $(fname $target): couldn't find $target"
+
+# Creates or updates the directory junction for [app]/current,
+# pointing to the specified version directory for the app.
+#
+# Returns the 'current' junction directory if in use, otherwise
+# the version directory.
+function link_current($versiondir) {
+    if(get_config NO_JUNCTIONS) { return $versiondir }
+
+    $currentdir = current_dir $versiondir
+
+    write-host "Linking '$(friendly_path $currentdir)' => '$(friendly_path $versiondir)'."
+
+    if($currentdir -eq $versiondir) {
+        abort "Error: Version 'current' is not allowed!"
     }
-    $scoop_startmenu_folder = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps"
-    if(!(Test-Path $scoop_startmenu_folder)) {
-        New-Item $scoop_startmenu_folder -type Directory
+
+    if(test-path $currentdir) {
+        # remove the junction
+        cmd /c rmdir $currentdir
     }
-    $wsShell = New-Object -ComObject WScript.Shell
-    $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
-    $wsShell.TargetPath = "$target"
-    $wsShell.Save()
+
+    cmd /c mklink /j $currentdir $versiondir | out-null
+    return $currentdir
 }
 
-# Removes the Startmenu shortcut if it exists
-function rm_startmenu_shortcuts($manifest, $global) {
-    $manifest.shortcuts | ?{ $_ -ne $null } | % {
-        $name = $_.item(1)
-        $shortcut = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps\$name.lnk"
-        if(Test-Path -Path $shortcut) {
-             Remove-Item $shortcut
-             echo "Removed shortcut $shortcut"
-        }
+# Removes the directory junction for [app]/current which
+# points to the current version directory for the app.
+#
+# Returns the 'current' junction directory (if it exists),
+# otherwise the normal version directory.
+function unlink_current($versiondir) {
+    if(get_config NO_JUNCTIONS) { return $versiondir }
+    $currentdir = current_dir $versiondir
+
+    if(test-path $currentdir) {
+        write-host "Unlinking '$(friendly_path $currentdir)'."
+
+        # remove the junction
+        cmd /c rmdir $currentdir
+        return $currentdir
     }
+    return $appdir
 }
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead
@@ -631,14 +743,14 @@ function ensure_install_dir_not_in_path($dir, $global) {
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if($removed) {
-        $removed | % { "installer added $(friendly_path $_) to path, removing"}
+        $removed | % { "Installer added '$(friendly_path $_)' to path. Removing."}
         env 'path' $global $fixed
     }
 
     if(!$global) {
         $fixed, $removed = find_dir_or_subdir (env 'path' $true) "$dir"
         if($removed) {
-            $removed | % { warn "installer added $_ to system path: you might want to remove this manually (requires admin permission)"}
+            $removed | % { warn "Installer added '$_' to system path. You might want to remove this manually (requires admin permission)."}
         }
     }
 }
@@ -660,7 +772,7 @@ function env_add_path($manifest, $dir, $global) {
     $manifest.env_add_path | ? { $_ } | % {
         $path_dir = "$dir\$($_)"
         if(!(is_in_dir $dir $path_dir)) {
-            abort "error in manifest: env_add_path '$_' is outside the app directory"
+            abort "Error in manifest: env_add_path '$_' is outside the app directory."
         }
         add_first_in_path $path_dir $global
     }
@@ -732,7 +844,7 @@ function env_ensure_home($manifest, $global) {
 function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
     if($pre_install) {
-        echo "running pre-install script..."
+        echo "Running pre-install script..."
         iex $pre_install
     }
 }
@@ -740,7 +852,7 @@ function pre_install($manifest, $arch) {
 function post_install($manifest, $arch) {
     $post_install = arch_specific 'post_install' $manifest $arch
     if($post_install) {
-        echo "running post-install script..."
+        echo "Running post-install script..."
         iex $post_install
     }
 }
@@ -760,9 +872,13 @@ function all_installed($apps, $global) {
     }
 }
 
-function prune_installed($apps) {
-    $installed = @(all_installed $apps $true) + @(all_installed $apps $false)
-    $apps | ? { $installed -notcontains $_ }
+# returns (uninstalled, installed)
+function prune_installed($apps, $global) {
+    $installed = @(all_installed $apps $global)
+
+    $uninstalled = $apps | ? { $installed -notcontains $_ }
+
+    return @($uninstalled), @($installed)
 }
 
 # check whether the app failed to install
@@ -777,7 +893,32 @@ function failed($app, $global) {
 function ensure_none_failed($apps, $global) {
     foreach($app in $apps) {
         if(failed $app $global) {
-            abort "$app install failed previously. please uninstall it and try again."
+            abort "'$app' install failed previously. Please uninstall it and try again."
+        }
+    }
+}
+
+function show_suggestions($suggested) {
+    $installed_apps = (installed_apps $true) + (installed_apps $false)
+
+    foreach($app in $suggested.keys) {
+        $features = $suggested[$app] | get-member -type noteproperty |% { $_.name }
+        foreach($feature in $features) {
+            $feature_suggestions = $suggested[$app].$feature
+
+            $fulfilled = $false
+            foreach($suggestion in $feature_suggestions) {
+                $suggested_app, $bucket = app $suggestion
+
+                if($installed_apps -contains $suggested_app) {
+                    $fulfilled = $true;
+                    break;
+                }
+            }
+
+            if(!$fulfilled) {
+                write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
+            }
         }
     }
 }

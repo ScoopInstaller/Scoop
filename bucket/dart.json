@@ -1,23 +1,38 @@
 {
-  "version": "1.19.1",
-  "license": "BSD",
-  "homepage": "https://www.dartlang.org/",
-  "extract_dir": "dart-sdk",
-  "env_add_path": [
-    "bin"
-  ],
-  "architecture": {
-    "64bit": {
-      "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/1.19.1/sdk/dartsdk-windows-x64-release.zip",
-      "hash": "e79352837dcaad2f751aa67b494cde05c6d57472d78ee3d7c1727495e7245f04"
+    "version": "1.22.1",
+    "license": "BSD",
+    "homepage": "https://www.dartlang.org/",
+    "extract_dir": "dart-sdk",
+    "env_add_path": [
+        "bin"
+    ],
+    "architecture": {
+        "64bit": {
+            "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/1.22.1/sdk/dartsdk-windows-x64-release.zip",
+            "hash": "7406910edb00d139cb545cb0baa6574297a600de6d4ac21043817304359635c0"
+        },
+        "32bit": {
+            "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/1.22.1/sdk/dartsdk-windows-ia32-release.zip",
+            "hash": "9d0f0ad1c13c12a2a8933c76b290155f43d1765c04a84b88886d59cf66ca16f0"
+        }
     },
-    "32bit": {
-      "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/1.19.1/sdk/dartsdk-windows-ia32-release.zip",
-      "hash": "d6854ac2a554d957046c7dca86ec7dbea6ad2f4c5c97935b4d3ceeddf6d28bbd"
+    "checkver": {
+        "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
+        "re": "\"version\":\\s*\"(.*)\","
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/$version/sdk/dartsdk-windows-x64-release.zip"
+            },
+            "32bit": {
+                "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/$version/sdk/dartsdk-windows-ia32-release.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "type": "sha256",
+            "url": "$url.sha256sum"
+        }
     }
-  },
-  "checkver": {
-    "url": "http://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
-    "re": "\"version\":\\s*\"([0-9\\.]+)\""
-  }
 }

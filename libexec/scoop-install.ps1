@@ -12,15 +12,17 @@
 # When installing from your computer, you can leave the .json extension off if you like.
 #
 # Options:
-#   -a, --arch <32bit|64bit>  use the specified architecture, if the app supports it
-#   -i, --independent         don't install dependencies automatically
-#   -g, --global              install the app globally
+#   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
+#   -i, --independent         Don't install dependencies automatically
+#   -g, --global              Install the app globally
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\shortcuts.ps1"
+. "$psscriptroot\..\lib\psmodules.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
@@ -29,16 +31,16 @@
 
 reset_aliases
 
-function ensure_none_installed($apps, $global) {
-    $app = @(all_installed $apps $global)[0] # might return more than one; just get the first
-    if($app) {
-        $global_flag = $null; if($global){$global_flag = ' --global'}
+function ensure_not_installed($app, $global) {
+    if(installed $app $global) {
+        $global_flag = $null;
+        if($global){ $global_flag = ' --global' }
 
         $version = @(versions $app $global)[-1]
         if(!(install_info $app $version $global)) {
-            abort "it looks like a previous installation of $app failed.`nrun 'scoop uninstall $app$global_flag' before retrying the install."
+            abort "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$global_flag' before retrying the install."
         }
-        abort "$app ($version) is already installed.`nuse 'scoop update $app$global_flag' to install a new version."
+        abort "'$app' ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
     }
 }
 
@@ -55,14 +57,26 @@ if($global -and !(is_admin)) {
     'ERROR: you need admin rights to install global apps'; exit 1
 }
 
-ensure_none_installed $apps $global
+if($apps.length -eq 1) {
+    ensure_not_installed $apps $global
+}
+
+# remember which were explictly requested so that we can
+# differentiate after dependencies are added
+$explicit_apps = $apps
 
 if(!$independent) {
     $apps = install_order $apps $architecture # adds dependencies
 }
 ensure_none_failed $apps $global
-$apps = prune_installed $apps $global # removes dependencies that are already installed
 
-$apps | % { install_app $_ $architecture $global }
+$apps, $skip = prune_installed $apps $global
+
+$skip | ? { $explicit_apps -contains $_} | % { warn "$_ is already installed. Skipping." }
+
+$suggested = @{};
+$apps | % { install_app $_ $architecture $global $suggested }
+
+show_suggestions $suggested
 
 exit 0

@@ -33,37 +33,37 @@ function add_bucket($name, $repo) {
     if(!$name) { "<name> missing"; $usage_add; exit 1 }
     if(!$repo) {
         $repo = known_bucket_repo $name
-        if(!$repo) { "unknown bucket '$name': try specifying <repo>"; $usage_add; exit 1 }
+        if(!$repo) { "Unknown bucket '$name'. Try specifying <repo>."; $usage_add; exit 1 }
     }
 
     $git = try { gcm 'git' -ea stop } catch { $null }
     if(!$git) {
-        abort "git is required for buckets. run 'scoop install git'."
+        abort "Git is required for buckets. Run 'scoop install git'."
     }
 
     $dir = bucketdir $name
     if(test-path $dir) {
-        abort "'$name' bucket already exists. use 'scoop bucket rm $name' to remove it."
+        abort "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
     }
 
-    write-host 'checking repo...' -nonewline
+    write-host 'Checking repo... ' -nonewline
     $out = git_ls_remote $repo 2>&1
     if($lastexitcode -ne 0) {
-        abort "'$repo' doesn't look like a valid git repository`n`nerror given:`n$out"
+        abort "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
     }
     write-host 'ok'
 
     ensure $bucketsdir > $null
     $dir = ensure $dir
     git_clone "$repo" "`"$dir`""
-    success "$name bucket was added successfully"
+    success "The $name bucket was added successfully."
 }
 
 function rm_bucket($name) {
     if(!$name) { "<name> missing"; $usage_rm; exit 1 }
     $dir = bucketdir $name
     if(!(test-path $dir)) {
-        abort "'$name' bucket not found"
+        abort "'$name' bucket not found."
     }
 
     rm $dir -r -force -ea stop

@@ -1,14 +1,14 @@
 {
-    "version":  "1.12.1",
+    "version":  "1.13.1",
     "license":  "https://github.com/docker/docker/blob/master/LICENSE",
     "architecture": {
       "64bit": {
-        "url":  "https://get.docker.com/builds/Windows/x86_64/docker-1.12.1.zip",
-        "hash": "bf1aff8bc319b1df4704f326825be3b96dd4a21e6e9691af99ba2cf6391d5008"
+        "url":  "https://get.docker.com/builds/Windows/x86_64/docker-1.13.1.zip",
+        "hash": "850deeac9e05a2426be335b7bf4b31757c98639eb35e0fe8d9c4b1dc8cc06c38"
       },
       "32bit": {
-        "url":  "https://get.docker.com/builds/Windows/i386/docker-1.12.1.zip",
-        "hash":  "d27cfb856e56a266981311c9235c4c4264a7c2b3d9681ddc0b20a1cb7f033e45"
+        "url":  "https://get.docker.com/builds/Windows/i386/docker-1.13.1.zip",
+        "hash":  "3e31c57b0e592c5a9a489cd779c5564413c8510cfdc0b9404269623a7f6cba44"
       }
     },
     "homepage":  "https://docker.com",
@@ -16,6 +16,19 @@
     "bin": [
       "docker.exe"
     ],
+    "checkver": {
+      "github": "https://github.com/docker/docker"
+    },
+    "autoupdate": {
+      "architecture": {
+        "64bit": {
+          "url": "https://get.docker.com/builds/Windows/x86_64/docker-$version.zip"
+        },
+        "32bit": {
+          "url": "https://get.docker.com/builds/Windows/i386/docker-$version.zip"
+        }
+      }
+    },
     "notes": [
       "This is the docker client only. Until the docker daemon can run natively",
       "on Windows you will need a Virtual Machine such as Boot2Docker or",

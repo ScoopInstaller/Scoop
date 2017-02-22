@@ -81,6 +81,6 @@ if($p) {
             [net.webrequest]::defaultwebproxy.credentials = new-object net.networkcredential($user, $pass)
         }
     } catch {
-        warn "failed to use proxy '$p': $($_.exception.message)"
+        warn "Failed to use proxy '$p': $($_.exception.message)"
     }
 }

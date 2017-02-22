@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.rust-lang.org",
-    "version": "1.11.0",
+    "version": "1.15.1",
     "license": "MIT/Apache 2.0",
     "architecture": {
-        "32bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.11.0-i686-pc-windows-msvc.msi",
-            "hash": "a8f93aad272f7d69014830ecb761abec60fea85ae19a36ff47c428dad0176a72"
-        },
         "64bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.11.0-x86_64-pc-windows-msvc.msi",
-            "hash": "41c071ccd28cb81555623e8584fd071fd6e950840160da60c3fc1c483f830af9"
+            "url": "https://static.rust-lang.org/dist/rust-1.15.1-x86_64-pc-windows-msvc.msi",
+            "hash": "2febd69fc10095170c8784309d0118cb3f0c3e57c88ef3029aaa616ab8e4e1ed"
+        },
+        "32bit": {
+            "url": "https://static.rust-lang.org/dist/rust-1.15.1-i686-pc-windows-msvc.msi",
+            "hash": "ac1cc558b0c26e24bdcca1edfa3991bb5ed6226d432e77703be9591ee6af88b5"
         }
     },
     "bin": [
@@ -18,7 +18,17 @@
         "Rust\\bin\\cargo.exe"
     ],
     "checkver": {
-      "url": "https://github.com/rust-lang/rust/releases",
-      "re": "<span class=\"tag-name\">([0-9\\.]+)</span>"
+        "url": "https://github.com/rust-lang/rust/releases",
+        "re": "<span class=\"tag-name\">([\\d.]+)</span>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://static.rust-lang.org/dist/rust-$version-x86_64-pc-windows-msvc.msi"
+            },
+            "32bit": {
+                "url": "https://static.rust-lang.org/dist/rust-$version-i686-pc-windows-msvc.msi"
+            }
+        }
     }
 }

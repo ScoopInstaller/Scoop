@@ -27,9 +27,9 @@ else {
 }
 
 if($needs_update) {
-    "scoop is out of date. run scoop update to get the latest changes."
+    "Scoop is out of date. Run 'scoop update' to get the latest changes."
 }
-else { "scoop is up-to-date."}
+else { "Scoop is up to date."}
 
 $failed = @()
 $old = @()
@@ -69,7 +69,7 @@ $true, $false | % { # local and global apps
 
 
 if($old) {
-    "updates are available for:"
+    "Updates are available for:"
     $old.keys | % {
         $versions = $old.$_
         "    $_`: $($versions[0]) -> $($versions[1])"
@@ -77,29 +77,29 @@ if($old) {
 }
 
 if($removed) {
-    "these app manifests have been removed:"
+    "These app manifests have been removed:"
     $removed.keys | % {
         "    $_"
     }
 }
 
 if($failed) {
-    "these apps failed to install:"
+    "These apps failed to install:"
     $failed.keys | % {
         "    $_"
     }
 }
 
 if($missing_deps) {
-    "missing runtime dependencies:"
+    "Missing runtime dependencies:"
     $missing_deps | % {
         $app, $deps = $_
-        "    $app requires $([string]::join(',', $deps))"
+        "    '$app' requires '$([string]::join("', '", $deps))'"
     }
 }
 
 if(!$old -and !$removed -and !$failed -and !$missing_deps) {
-    success "everything is ok!"
+    success "Everything is ok!"
 }
 
 exit 0

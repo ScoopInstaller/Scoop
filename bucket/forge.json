@@ -1,9 +1,15 @@
 {
-    "homepage": "http://fsprojects.github.io/Forge/",
-    "version": "0.7.0",
-    "url": "https://github.com/fsprojects/Forge/releases/download/0.7.0/forge.zip",
-    "hash": "6e6701fb88a5781e9277ee315902b450fbac79303ab6ee4fd72f4d83bc897f7a",
+    "homepage": "http://forge.run",
+    "version": "1.4.0",
+    "url": "https://github.com/fsharp-editing/Forge/releases/download/1.4.0/forge.zip",
+    "hash": "439108f05afaf49d250167de746901e5135d7180cfc6ab5fd7ff0350e01b9c79",
     "bin": [
         "bin\\forge.exe"
-    ]
+    ],
+    "checkver": {
+        "github": "https://github.com/fsharp-editing/Forge"
+    },
+    "autoupdate": {
+        "url": "https://github.com/fsharp-editing/Forge/releases/download/$version/forge.zip"
+    }
 }

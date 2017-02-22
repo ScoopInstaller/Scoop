@@ -37,14 +37,14 @@ function getopt($argv, $shortopts, $longopts) {
             if($longopt) {
                 if($longopt.endswith('=')) { # requires arg
                     if($i -eq $argv.length - 1) {
-                        return err "option --$name requires an argument"
+                        return err "Option --$name requires an argument."
                     }
                     $opts.$name = $argv[++$i]
                 } else {
                     $opts.$name = $true
                 }
             } else {
-                return err "option --$name not recognized"
+                return err "Option --$name not recognized."
             }
         } elseif($arg.startswith('-') -and $arg -ne '-') {
             for($j = 1; $j -lt $arg.length; $j++) {
@@ -54,14 +54,14 @@ function getopt($argv, $shortopts, $longopts) {
                     $shortopt = $matches[0]
                     if($shortopt[1] -eq ':') {
                         if($j -ne $arg.length -1 -or $i -eq $argv.length - 1) {
-                            return err "option -$letter requires an argument"
+                            return err "Option -$letter requires an argument."
                         }
                         $opts.$letter = $argv[++$i]
                     } else {
                         $opts.$letter = $true
                     }
                 } else {
-                    return err "option -$letter not recognized"
+                    return err "Option -$letter not recognized."
                 }
             }
         } else {

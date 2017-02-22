@@ -1,19 +1,38 @@
 {
     "homepage": "https://github.com/docker/machine",
-    "version": "0.8.1",
+    "version": "0.9.0",
     "license": "Apache",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.8.1/docker-machine-Windows-x86_64.exe",
-            "hash": "88effdc0ced213302e1887284eaaaabca76ef515aee1e051a217d8978dcbceb9"
+            "url": "https://github.com/docker/machine/releases/download/v0.9.0/docker-machine-Windows-x86_64.exe",
+            "hash": "049fb7b8725d176d3a7d4c7a72139ae45e7aecd824d6adea78615e0f582d2726"
         },
         "32bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.8.1/docker-machine-Windows-i386.exe",
-            "hash": "8b8ff258b1cec7b94f28281525e191a5668deee9a9a7996814a7ed2e6c50fc67"
+            "url": "https://github.com/docker/machine/releases/download/v0.9.0/docker-machine-Windows-i386.exe",
+            "hash": "273b8b4a336f61c57e263e81d31a1d874cc823d56e80b5383ba4ba4da70c246b"
         }
     },
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\docker-machine-*.exe)[0] $dir\\docker-machine.exe",
     "bin": [
-        ["docker-machine.exe", "docker-machine"]
-    ]
+        [
+            "docker-machine.exe",
+            "docker-machine"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/docker/machine/releases/download/v$version/docker-machine-Windows-x86_64.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/docker/machine/releases/download/v$version/docker-machine-Windows-i386.exe"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://github.com/docker/machine/releases/download/v$version/sha256sum.txt",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
+    }
 }

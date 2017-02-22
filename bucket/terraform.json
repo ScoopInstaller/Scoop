@@ -1,65 +1,37 @@
 {
     "homepage": "https://www.terraform.io",
     "license": "Mozilla Public License 2.0",
-    "version": "0.6.16",
+    "version": "0.8.7",
     "architecture": {
-        "32bit": {
-            "url": "https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_windows_386.zip",
-            "hash": "4032ee9f298005ee525aeef5c8763787f6867ab377367597083a39bb33a06ad5"
-        },
         "64bit": {
-            "url": "https://releases.hashicorp.com/terraform/0.6.16/terraform_0.6.16_windows_amd64.zip",
-            "hash": "6acbc7e7025104d265cbfee982e5e7af0427255fa70bafa5bcbc595b56c6cce7"
+            "url": "https://releases.hashicorp.com/terraform/0.8.7/terraform_0.8.7_windows_amd64.zip",
+            "hash": "dcd2cacfec4f9d6e9834d9c2cfef9b7b868e191001d88607f088dc93406054bd"
+        },
+        "32bit": {
+            "url": "https://releases.hashicorp.com/terraform/0.8.7/terraform_0.8.7_windows_386.zip",
+            "hash": "4e7f89322434cfb91aa6c9448f12b189b18e3d4f631dda2acc11a2fcc0db1a95"
         }
     },
     "bin": [
-        "terraform-provider-atlas.exe",
-        "terraform-provider-aws.exe",
-        "terraform-provider-azure.exe",
-        "terraform-provider-azurerm.exe",
-        "terraform-provider-chef.exe",
-        "terraform-provider-clc.exe",
-        "terraform-provider-cloudflare.exe",
-        "terraform-provider-cloudstack.exe",
-        "terraform-provider-cobbler.exe",
-        "terraform-provider-consul.exe",
-        "terraform-provider-datadog.exe",
-        "terraform-provider-digitalocean.exe",
-        "terraform-provider-dme.exe",
-        "terraform-provider-dnsimple.exe",
-        "terraform-provider-docker.exe",
-        "terraform-provider-dyn.exe",
-        "terraform-provider-fastly.exe",
-        "terraform-provider-github.exe",
-        "terraform-provider-google.exe",
-        "terraform-provider-heroku.exe",
-        "terraform-provider-influxdb.exe",
-        "terraform-provider-librato.exe",
-        "terraform-provider-mailgun.exe",
-        "terraform-provider-mysql.exe",
-        "terraform-provider-null.exe",
-        "terraform-provider-openstack.exe",
-        "terraform-provider-packet.exe",
-        "terraform-provider-postgresql.exe",
-        "terraform-provider-powerdns.exe",
-        "terraform-provider-rundeck.exe",
-        "terraform-provider-softlayer.exe",
-        "terraform-provider-statuscake.exe",
-        "terraform-provider-template.exe",
-        "terraform-provider-terraform.exe",
-        "terraform-provider-tls.exe",
-        "terraform-provider-triton.exe",
-        "terraform-provider-ultradns.exe",
-        "terraform-provider-vcd.exe",
-        "terraform-provider-vsphere.exe",
-        "terraform-provisioner-chef.exe",
-        "terraform-provisioner-file.exe",
-        "terraform-provisioner-local-exec.exe",
-        "terraform-provisioner-remote-exec.exe",
         "terraform.exe"
     ],
     "checkver": {
         "url": "https://releases.hashicorp.com/terraform/",
-        "re": "terraform_(\\d+\\.\\d+\\.\\d+)\\s*<"
+        "re": "terraform_([\\d.]+)<\/a>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://releases.hashicorp.com/terraform/$version/terraform_$version_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://releases.hashicorp.com/terraform/$version/terraform_$version_windows_386.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://releases.hashicorp.com/terraform/$version/terraform_$version_SHA256SUMS",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
     }
 }

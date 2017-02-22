@@ -28,7 +28,7 @@ function create_manifest($url) {
 
     $manifest | convertto-json | out-file -filepath "$name.json" -encoding utf8
     $manifest_path = join-path $pwd "$name.json"
-    write-host "Created $manifest_path"
+    write-host "Created '$manifest_path'."
 }
 
 function new_manifest() {

@@ -1,10 +1,10 @@
 {
-    "version":  "3.3.6",
-    "license":  "https://raw.githubusercontent.com/pester/Pester/master/LICENSE",
-    "url":  "https://github.com/pester/pester/archive/3.3.6.tar.gz",
-    "homepage":  "https://github.com/pester/Pester",
-    "hash":  "38a9ae3c829b02fe90fb8acbed564ffb883fb0175a6a00b501ac3663f03d6b9a",
-    "extract_dir": "pester-3.3.6",
+    "version": "3.4.3",
+    "license": "https://raw.githubusercontent.com/pester/Pester/master/LICENSE",
+    "url": "https://github.com/pester/pester/archive/3.4.3.tar.gz",
+    "homepage": "https://github.com/pester/Pester",
+    "hash": "8690283baf3e03e6e9e9188008e3d219c3db5dc6da866a26bae11f5a9016826d",
+    "extract_dir": "pester-3.4.3",
     "bin": "bin\\pester.bat",
     "post_install": "
         $import = \"try { `$null = gcm pester -ea stop; import-module `\"$dir\\pester.psm1`\" } catch { }\"
@@ -28,5 +28,10 @@
 
         'importing pester for current session...'
         iex \"$import\"
-    "
+    ",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/pester/pester/archive/$version.tar.gz",
+        "extract_dir": "pester-$version"
+    }
 }

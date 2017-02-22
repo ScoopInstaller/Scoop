@@ -1,12 +1,12 @@
-Scoop [![Build status](https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true)](https://ci.appveyor.com/project/lukesampson/scoop)
+Scoop [![Build status](https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true)](https://ci.appveyor.com/project/lukesampson/scoop) [![Gitter chat](https://badges.gitter.im/lukesampson/scoop.png)](https://gitter.im/lukesampson/scoop)
 =====
 
 Scoop is a command-line installer for Windows.
 
 Requirements:
 
-* [PowerShell 3](http://www.microsoft.com/en-us/download/details.aspx?id=34595)
-* PowerShell must be enabled for your user account e.g. `set-executionpolicy unrestricted -s cu`
+* [PowerShell 3](https://www.microsoft.com/en-us/download/details.aspx?id=34595)
+* PowerShell must be enabled for your user account e.g. `set-executionpolicy remotesigned -s cu`
 
 To install:
 
@@ -52,3 +52,14 @@ The apps that install best with Scoop are commonly called "portable" apps: i.e. 
 Since installers are common, Scoop supports them too (and their uninstallers).
 
 Scoop is also great at handling single-file programs and Powershell scripts. These don't even need to be compressed. See the [runat](https://github.com/lukesampson/scoop/blob/master/bucket/runat.json) package for an example: it's really just a GitHub gist.
+
+
+Support this project
+--------------------
+
+If you find Scoop useful and would like to support ongoing development and maintenance, here's how:
+
+* [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DM2SUH9EUXSKJ) (one-time donation)
+* [Gratipay](https://gratipay.com/~lukesampson) (ongoing donations)
+
+[![](http://img.shields.io/gratipay/user/lukesampson.svg)]()

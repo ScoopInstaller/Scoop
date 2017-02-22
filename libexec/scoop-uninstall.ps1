@@ -3,13 +3,16 @@
 # Help: e.g. scoop uninstall git
 #
 # Options:
-#   -g, --global   uninstall a globally installed app
+#   -g, --global   Uninstall a globally installed app
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\shortcuts.ps1"
+. "$psscriptroot\..\lib\psmodules.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 
@@ -21,7 +24,7 @@ $global = $opt.g -or $opt.global
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if($global -and !(is_admin)) {
-    'ERROR: you need admin rights to uninstall global apps'; exit 1
+    'ERROR: You need admin rights to uninstall global apps.'; exit 1
 }
 
 foreach($app in $apps) {
@@ -30,11 +33,11 @@ foreach($app in $apps) {
         if($app -ne 'scoop') {
             if(installed $app (!$global)) {
                 function wh($g) { if($g) { "globally" } else { "for your account" } }
-                write-host "$app isn't installed $(wh $global), but it is installed $(wh (!$global))" -f darkred
-                "try uninstalling $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead"
+                write-host "'$app' isn't installed $(wh $global), but it is installed $(wh (!$global))." -f darkred
+                "Try uninstalling $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead."
                 exit 1
             } else {
-                abort "$app isn't installed"
+                abort "'$app' isn't installed."
             }
         }
     }
@@ -44,13 +47,13 @@ foreach($app in $apps) {
     }
 
     $version = current_version $app $global
-    "uninstalling $app ($version)"
+    "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
     try {
         test-path $dir -ea stop | out-null
     } catch [unauthorizedaccessexception] {
-        abort "access denied: $dir. you might need to restart"
+        abort "Access denied: $dir. You might need to restart."
     }
 
     $manifest = installed_manifest $app $version $global
@@ -58,21 +61,29 @@ foreach($app in $apps) {
     $architecture = $install.architecture
 
     run_uninstaller $manifest $architecture $dir
-    rm_shims $manifest $global
+    rm_shims $manifest $global $architecture
     rm_startmenu_shortcuts $manifest $global
-    env_rm_path $manifest $dir $global
+
+    # If a junction was used during install, that will have been used
+    # as the reference directory. Otherwise it will just be the version
+    # directory.
+    $refdir = unlink_current $dir
+
+    uninstall_psmodule $manifest $refdir $global
+
+    env_rm_path $manifest $refdir $global
     env_rm $manifest $global
 
     try { rm -r $dir -ea stop -force }
-    catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }
+    catch { abort "Couldn't remove '$(friendly_path $dir)'; it may be in use." }
 
     # remove older versions
     $old = @(versions $app $global)
     foreach($oldver in $old) {
-        "removing older version, $oldver"
+        "Removing older version ($oldver)."
         $dir = versiondir $app $oldver $global
         try { rm -r -force -ea stop $dir }
-        catch { abort "couldn't remove $(friendly_path $dir): it may be in use" }
+        catch { abort "Couldn't remove '$(friendly_path $dir)'; it may be in use." }
     }
 
     if(@(versions $app).length -eq 0) {
@@ -86,6 +97,6 @@ foreach($app in $apps) {
         }
     }
 
-    success "$app was uninstalled"
+    success "'$app' was uninstalled."
 }
 exit 0

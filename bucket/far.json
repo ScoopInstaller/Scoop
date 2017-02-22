@@ -1,19 +1,29 @@
 {
-    "homepage": "http://farmanager.com/",
-    "version": "3.0.4545",
+    "homepage": "https://farmanager.com/",
+    "version": "30b4900",
     "architecture": {
         "64bit": {
-            "url": "http://farmanager.com/files/Far30b4545.x64.20160210.7z",
-            "hash": "cc77f5042060a83d2875d9ee48d7604b41208ff45953c6f334edb6b201b79990"
+            "url": "https://farmanager.com/files/Far30b4900.x64.20170221.7z",
+            "hash": "161ec4a51615a7c8b2a8931d38b28d109e3f837e94af0d78f813738a363cae84"
         },
         "32bit": {
-            "url": "http://farmanager.com/files/Far30b4545.x86.20160210.7z",
-            "hash": "66928b4da3fd342166462e4adcf7dc044bc4629f964c7c4b57efa797612ed26f"
+            "url": "https://farmanager.com/files/Far30b4900.x86.20170221.7z",
+            "hash": "341c9765982deb12204785ccc42b718413b3119ef2d0023e540e41efc6d3192d"
         }
     },
     "checkver": {
-        "url": "http://farmanager.com/download.php?p=64",
-        "re": "<b>Far Manager v([0-9\\.]+) build ([0-9][0-9][0-9][0-9]) x64</b>"
+        "url": "https://farmanager.com/download.php",
+        "re": "files/Far(?<version>[b\\d]+).x64.(?<date>\\d+).7z"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://farmanager.com/files/Far$version.x64.$matchDate.7z"
+            },
+            "32bit": {
+                "url": "https://farmanager.com/files/Far$version.x86.$matchDate.7z"
+            }
+        }
     },
     "bin": "far.exe"
 }

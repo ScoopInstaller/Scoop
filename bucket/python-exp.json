@@ -1,5 +1,5 @@
 {
-    "homepage": "http://www.python.org",
+    "homepage": "https://www.python.org/",
     "license": "https://docs.python.org/3/license.html",
     "version": "3.5.2",
     "architecture": {
@@ -111,5 +111,5 @@
         $create_reg.Invoke(\"Python\\PythonCore\\3.5\\InstallPath\", \"$dir\")
         $create_reg.Invoke(\"Python\\PythonCore\\3.5\\PythonPath\", \"$dir;$dir\\Lib\\;$dir\\DLLs\\\")",
     "env_add_path": [ "scripts" ],
-    "checkver": "<p>Latest: <a href=\".*\">Python ([0-9\\.]+)</a> - <a.*>.*</a></p>"
+    "checkver": "<p>Latest: <a href=\".*\">Python ([\\d.]+)</a> - <a.*>.*</a></p>"
 }

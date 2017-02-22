@@ -3,8 +3,8 @@
     "version": "6.0",
     "license": "GPL2",
     "url": [
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Extension/unzip/unzip-6.0-1/unzip-6.0-1-msys-1.0.13-bin.tar.lzma",
-        "http://ufpr.dl.sourceforge.net/project/mingw/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma"
+        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/unzip/unzip-6.0-1/unzip-6.0-1-msys-1.0.13-bin.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma"
     ],
     "hash": [
         "ecb6749234f83389b34723db52a36326421e9bb1aa41f0ce575aa802ca390c79",

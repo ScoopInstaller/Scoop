@@ -3,8 +3,8 @@
     "version": "5.03",
     "license": "GPL2",
     "url": [
-        "http://ufpr.dl.sourceforge.net/project/gnuwin32/file/5.03/file-5.03-bin.zip",
-        "http://ufpr.dl.sourceforge.net/project/gnuwin32/file/5.03/file-5.03-dep.zip"
+        "https://sourceforge.net/projects/gnuwin32/files/file/5.03/file-5.03-bin.zip",
+        "https://sourceforge.net/projects/gnuwin32/files/file/5.03/file-5.03-dep.zip"
     ],
     "hash": [
         "dbd28e191c1bf7e3db08b983e603e79959295717f6fc1032ba97e7a8680c8cf9",

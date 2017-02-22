@@ -1,15 +1,15 @@
 {
-    "version": "1.7.1",
-    "homepage": "http://golang.org",
-    "license": "http://golang.org/LICENSE",
+    "version": "1.8",
+    "homepage": "https://golang.org",
+    "license": "https://golang.org/LICENSE",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/golang/go1.7.1.windows-amd64.zip",
-            "hash": "af2b836bb894672cf4c28df32a2ee3ff560e2b463e1ab44bb99833064ba09e5f"
+            "url": "https://storage.googleapis.com/golang/go1.8.windows-amd64.zip",
+            "hash": "cb27fe210f3a9d10329d48514895d2a1e3651125a7c3c758f0358a5bfc0e3060"
         },
         "32bit": {
-            "url": "https://storage.googleapis.com/golang/go1.7.1.windows-386.zip",
-            "hash": "312fcbb84c0b4268e6e0351dccf0d6e9bb226c9934b5ee81bd7865a693a68aaa"
+            "url": "https://storage.googleapis.com/golang/go1.8.windows-386.zip",
+            "hash": "b8199a4af9327807803d2892268dfbffb615f98d717cd824833a97e77f981f46"
         }
     },
     "extract_dir": "go",
@@ -17,5 +17,20 @@
     "env_set": {
         "GOROOT": "$dir"
     },
-    "checkver": "<div id=\"footer\">\\s*Build version go([0-9\\.]+)\\.<br>"
+    "checkver": "Build version go([\\d\\.]+)\\.",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://storage.googleapis.com/golang/go$version.windows-amd64.zip"
+            },
+            "32bit": {
+                "url": "https://storage.googleapis.com/golang/go$version.windows-386.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "$url.sha256",
+            "find": "([a-z0-9]{64})"
+        }
+    }
 }

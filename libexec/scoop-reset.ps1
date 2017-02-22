@@ -10,15 +10,16 @@ param($app)
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
-if(!(installed $app)) { abort "$app isn't installed" }
+if(!(installed $app)) { abort "'$app' isn't installed" }
 
 $version = current_version $app
-"resetting $app ($version)"
+"Resetting $app ($version)."
 
 $dir = resolve-path (versiondir $app $version)
 $manifest = installed_manifest $app $version
@@ -26,6 +27,7 @@ $manifest = installed_manifest $app $version
 $install = install_info $app $version
 $architecture = $install.architecture
 
+$dir = link_current $dir
 create_shims $manifest $dir $false $architecture
 env_add_path $manifest $dir
 env_set $manifest $dir

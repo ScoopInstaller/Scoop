@@ -4,7 +4,8 @@ $repo_files = @( Get-ChildItem $repo_dir -file -recurse -force )
 
 $project_file_exclusions = @(
     $([regex]::Escape($repo_dir.fullname)+'\\.git\\.*$'),
-    '.sublime-workspace$'
+    '.sublime-workspace$',
+    'supporting\\validator\\packages\\*'
 )
 
 describe 'Project code' {
@@ -78,7 +79,7 @@ describe 'Style constraints for non-binary project files' {
         # gather all files except '*.exe', '*.zip', or any .git repository files
         $repo_files |
             where-object { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
-            where-object { $_.fullname -inotmatch '(.exe|.zip)$' }
+            where-object { $_.fullname -inotmatch '(.exe|.zip|.dll)$' }
     )
 
     $files_exist = ($files.Count -gt 0)

@@ -1,4 +1,15 @@
-$scoopdir = $env:SCOOP, "$env:LOCALAPPDATA\scoop" | select -first 1
+# Note: The default directory changed from ~/AppData/Local/scoop to ~/scoop
+#       on 1 Nov, 2016 to work around long paths used by NodeJS.
+#       Old installations should continue to work using the old path.
+#       There is currently no automatic migration path to deal
+#       with updating old installations to the new path.
+$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | select -first 1
+
+$oldscoopdir = "$env:LOCALAPPDATA\scoop"
+if((test-path $oldscoopdir) -and !$env:SCOOP) {
+    $scoopdir = $oldscoopdir
+}
+
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
 $cachedir = "$scoopdir\cache" # always local
 
@@ -97,10 +108,10 @@ function unzip($path,$to) {
             extract_7zip $path $to $false
             return
         } else {
-            abort "unzip failed: Windows can't handle the long paths in this zip file.`nrun 'scoop install 7zip' and try again."
+            abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
         }
     } catch {
-        abort "unzip failed: $_"
+        abort "Unzip failed: $_"
     }
 }
 function unzip_old($path,$to) {
@@ -117,12 +128,12 @@ function movedir($from, $to) {
 
     $out = robocopy "$from" "$to" /e /move
     if($lastexitcode -ge 8) {
-        throw "error moving directory: `n$out"
+        throw "Error moving directory: `n$out"
     }
 }
 
 function shim($path, $global, $name, $arg) {
-    if(!(test-path $path)) { abort "can't shim $(fname $path): couldn't find $path" }
+    if(!(test-path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
     if(!$name) { $name = strip_ext (fname $path) }
 
@@ -162,7 +173,7 @@ function ensure_in_path($dir, $global) {
     $path = env 'path' $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
-        echo "adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path"
+        echo "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
 
         env 'path' $global "$dir;$path" # for future sessions...
         $env:path = "$dir;$env:path" # for this session
@@ -180,7 +191,7 @@ function remove_from_path($dir,$global) {
     # future sessions
     $was_in_path, $newpath = strip_path (env 'path' $global) $dir
     if($was_in_path) {
-        echo "removing $(friendly_path $dir) from your path"
+        echo "Removing $(friendly_path $dir) from your path."
         env 'path' $global $newpath
     }
 
@@ -229,6 +240,7 @@ $default_aliases = @{
     'gc' = 'get-content'
     'gci' = 'get-childitem'
     'gcm' = 'get-command'
+    'gm' = 'get-member'
     'iex' = 'invoke-expression'
     'ls' = 'get-childitem'
     'mkdir' = { new-item -type directory @args }
@@ -242,7 +254,7 @@ $default_aliases = @{
 function reset_alias($name, $value) {
     if($existing = get-alias $name -ea ignore |? { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
-            write-host "alias $name is read-only; can't reset it" -f darkyellow
+            write-host "Alias $name is read-only; can't reset it." -f darkyellow
         }
         return # already set
     }

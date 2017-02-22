@@ -7,6 +7,9 @@
 #     scoop cache show
 # to see what's in the cache, and
 #     scoop cache rm <app> to remove downloads for a specific app.
+#
+# To clear everything in your cache, use:
+#     scoop cache rm *
 param($cmd, $app)
 
 . "$psscriptroot\..\lib\help.ps1"
@@ -26,7 +29,7 @@ switch($cmd) {
     }
     'show' {
         $files = @(gci "$scoopdir\cache" | ? { $_.name -match "^$app" })
-        $total_length = ($files | measure length -sum).sum
+        $total_length = ($files | measure length -sum).sum -as [double]
 
         $f_app  = @{ expression={"$($_.app) ($($_.version))" }}
         $f_url  = @{ expression={$_.url};alignment='right'}
@@ -35,7 +38,7 @@ switch($cmd) {
 
         $files | % { cacheinfo $_ } | ft $f_size, $f_app, $f_url -auto -hide
 
-        "total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
+        "Total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
     }
     default {
         "cache '$cmd' not supported"; my_usage; exit 1

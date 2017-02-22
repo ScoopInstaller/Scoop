@@ -1,14 +1,14 @@
 {
-    "version": "1.0.0-preview2",
+    "version": "1.0.0-preview2-1-003177",
     "homepage": "https://www.microsoft.com/net/core#windows",
     "architecture": {
         "64bit": {
-            "url": "https://go.microsoft.com/fwlink/?LinkID=809126#/dl.zip",
-            "hash": "a7ab3ad9c28c9952a9f6e1fee158c337b82aac3ba502e742a92d23bab258e621"
+            "url": "https://go.microsoft.com/fwlink/?LinkID=834991#/dl.zip",
+            "hash": "D4056A91F83699894C9F9FBAC1B8965597DED079B0D8848DACC7505F372F85A0"
         },
         "32bit": {
-            "url": "https://go.microsoft.com/fwlink/?LinkID=809127#/dl.zip",
-            "hash": "107a27f5c1dec01932f26bcbd2640ae2d098266f05fafe1ab6c6ada7a5f43a27"
+            "url": "https://go.microsoft.com/fwlink/?LinkID=834993#/dl.zip",
+            "hash": "38A451069F6BC1D2E226218F260B19FC1A2ACA775FBD88C083B2D23D5A3AF737"
         }
     },
     "bin": "dotnet.exe"

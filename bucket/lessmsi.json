@@ -1,8 +1,14 @@
 {
     "homepage": "https://github.com/activescott/lessmsi/",
-    "version": "1.4",
+    "version": "1.5.1",
     "license": "https://github.com/activescott/lessmsi/raw/master/LICENSE",
-    "hash": "ea16da35477aff1ab63d71e0f1c08ca697cad6f7211ccdf7fb8fa2c7206a1ffa",
-    "url": "https://github.com/activescott/lessmsi/releases/download/v1.4/lessmsi-v1.4.zip",
-    "bin": "lessmsi.exe"
+    "hash": "478564a8430cc74c3fb727175e4bbb46ce6d9c8874e7c1555f719dcff9ee91af",
+    "url": "https://github.com/activescott/lessmsi/releases/download/v1.5.1/lessmsi-v1.5.1.zip",
+    "bin": "lessmsi.exe",
+    "checkver": {
+        "github": "https://github.com/activescott/lessmsi"
+    },
+    "autoupdate": {
+        "url": "https://github.com/activescott/lessmsi/releases/download/v$version/lessmsi-v$version.zip"
+    }
 }

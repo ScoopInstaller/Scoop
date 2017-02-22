@@ -1,20 +1,34 @@
 {
     "homepage": "http://www.doxygen.nl/",
     "license": "GPL2",
-    "version": "1.8.11",
+    "version": "1.8.13",
     "architecture": {
         "64bit": {
-            "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.windows.x64.bin.zip",
-            "hash": "6ce7c259975fb3dc449313913de71b89665d15c49cf674db6952f304bb3dfaaa"
+            "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.windows.x64.bin.zip",
+            "hash": "c59e92ab9f82e156723dd3efb9433948dcb84facc21d6efb50f4d6c2d7aa6c5c"
         },
         "32bit": {
-            "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.11.windows.bin.zip",
-            "hash": "f25964e0203739d77e79d74bafdbef212bd97748e20fdafad078a8e2d315a7ff"
+            "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.windows.bin.zip",
+            "hash": "215800d19d0e77fa400694af74685bbd3000463f0d7f18b6c7b743d2d6a1422f"
         }
     },
     "bin": [
         "doxygen.exe",
         "doxyindexer.exe",
         "doxysearch.cgi.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "http://www.doxygen.nl/download.html",
+        "re": "The latest version of doxygen is ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-$version.windows.x64.bin.zip"
+            },
+            "32bit": {
+                "url": "http://ftp.stack.nl/pub/users/dimitri/doxygen-$version.windows.bin.zip"
+            }
+        }
+    }
 }
