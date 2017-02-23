@@ -13,7 +13,7 @@
         "NVM_HOME": "$dir",
         "NVM_SYMLINK": "$dir\\nodejs"
     },
-    "hash": "f3860c9cecdc7dbd2eff14d98fa4d4d8318fd55cd3e1af003edac2627d8af114",
+    "hash": "b055a54c37f4f3b214245ace8622ae4964f13d9f11c9efb96d625ef524c514a8",
     "architecture": {
         "64bit": {
             "post_install": "\"root: $dir `r`narch: 64 `r`nproxy: none `r`noriginalpath: `r`noriginalversion: `r`n\" | Out-File -encoding \"ASCII\" $dir\\settings.txt"
