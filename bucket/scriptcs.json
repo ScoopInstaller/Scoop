@@ -1,9 +1,9 @@
 {
     "homepage": "http://scriptcs.net/",
-    "version": "0.17.0",
+    "version": "0.17.1",
     "license": "Apache 2.0",
-    "url": "http://chocolatey.org/api/v2/package/ScriptCs/0.17.0?fn=/dl.zip",
-    "hash": "b6af778b85cee98547dc9a471d2284cd0e5303044876c9c78df71de17b9dcfab",
+    "url": "http://chocolatey.org/api/v2/package/ScriptCs/0.17.1?fn=/dl.zip",
+    "hash": "4b6de155f6c5811311df060b626098a771e8534d2d6e3ce51ea99da5e2ec0783",
     "extract_dir": "tools",
     "bin": "scriptcs.exe",
     "checkver": {
