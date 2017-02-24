@@ -110,7 +110,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
         $null = ensure $cachedir
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
-    } else { write-host "Loading $(url_filename $url) from cache..."}
+    } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
     if (!($to -eq $null)) {
         Copy-Item $cached $to
@@ -205,8 +205,15 @@ function url_filename($url) {
     (split-path $url -leaf).split('?') | Select-Object -First 1
 }
 
+# Unlike url_filename which can be tricked by appending a
+# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
+# this function extracts the original filename from the URL.
+function url_remote_filename($url) {
+    split-path (new-object uri $url).absolutePath -leaf
+}
+
 function dl_progress_output($url, $read, $total, $console) {
-    $filename = url_filename $url
+    $filename = url_remote_filename $url
 
     # calculate current percentage done
     $p = [math]::Round($read / $total * 100, 0)
@@ -419,7 +426,7 @@ function check_hash($file, $url, $manifest, $arch) {
         return $true
     }
 
-    write-host "Checking hash of $(url_filename $url)... " -nonewline
+    write-host "Checking hash of $(url_remote_filename $url)... " -nonewline
     $type, $expected = $hash.split(':')
     if(!$expected) {
         # no type specified, assume sha256
@@ -703,7 +710,7 @@ function link_current($versiondir) {
 
     $currentdir = current_dir $versiondir
 
-    write-host "Linking '$(friendly_path $currentdir)' => '$(friendly_path $versiondir)'."
+    write-host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
 
     if($currentdir -eq $versiondir) {
         abort "Error: Version 'current' is not allowed!"
@@ -728,7 +735,7 @@ function unlink_current($versiondir) {
     $currentdir = current_dir $versiondir
 
     if(test-path $currentdir) {
-        write-host "Unlinking '$(friendly_path $currentdir)'."
+        write-host "Unlinking $(friendly_path $currentdir)"
 
         # remove the junction
         cmd /c rmdir $currentdir
