@@ -38,7 +38,10 @@ echo \"\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
 echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
 echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
 ",
-    "checkver": "<h1>MySQL Community Server ([\\d.]+)",
+    "checkver": {
+        "url": "https://dev.mysql.com/downloads/mysql/",
+        "re": "<h1>MySQL Community Server ([\\d.]+)"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
