@@ -2,15 +2,15 @@
     "_comment": "Maintainers: when updating this manifest to a new version, you might like to also update git.json",
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL2",
-    "version": "2.11.1.windows.1",
+    "version": "2.12.0.windows.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.11.1.windows.1/PortableGit-2.11.1-64-bit.7z.exe#/dl.7z",
-            "hash": "47058bbfb815ec3e9247b96aedcaea21df58db59c3a73594ffcbd4171ac2cb11"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.12.0.windows.1/PortableGit-2.12.0-64-bit.7z.exe#/dl.7z",
+            "hash": "5bebd0ee21e5cf3976bc71826a28b2663c7a0c9b5c98f4ab46ff03c3c0d3556f"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.11.1.windows.1/PortableGit-2.11.1-32-bit.7z.exe#/dl.7z",
-            "hash": "2f76bed9b649d990cf6999674e11e6cf5d502d25b89072b34c984f6aa86dafbb"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.12.0.windows.1/PortableGit-2.12.0-32-bit.7z.exe#/dl.7z",
+            "hash": "0375ba0a05f9cd501cc8089b9af6f2adf8904a5efb1e5b9421e6561bd9f8c817"
         }
     },
     "bin": [
