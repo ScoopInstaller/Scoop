@@ -12,6 +12,11 @@
         "github": "https://github.com/rg3/youtube-dl"
     },
     "autoupdate": {
-        "url": "https://github.com/rg3/youtube-dl/releases/download/$version/youtube-dl.exe"
+        "url": "https://github.com/rg3/youtube-dl/releases/download/$version/youtube-dl.exe",
+        "hash": {
+            "mode": "extract",
+            "url": "https://github.com/rg3/youtube-dl/releases/download/$version/SHA2-256SUMS",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
     }
 }
