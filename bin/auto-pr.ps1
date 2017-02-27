@@ -59,7 +59,7 @@ function execute($cmd) {
     return $output
 }
 
-function pull_requests($json, [String]$app, [String]$upstream)
+function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest)
 {
     $version = $json.version
     $homepage = $json.homepage
@@ -131,7 +131,7 @@ hub diff --name-only | % {
         execute "hub add $manifest"
         execute "hub commit -m 'Update $app to version $version'"
     } else {
-        pull_requests $json $app $upstream
+        pull_requests $json $app $upstream $manifest
     }
 }
 
