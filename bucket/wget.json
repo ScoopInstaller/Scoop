@@ -5,29 +5,25 @@
     "architecture": {
         "64bit": {
             "url": [
-                "https://eternallybored.org/misc/wget/releases/wget-1.19.1-win64.zip",
-                "https://curl.haxx.se/ca/cacert.pem"
+                "https://eternallybored.org/misc/wget/releases/wget-1.19.1-win64.zip"
             ],
             "hash": [
-                "61320a3a2f123dd8fd4a8baf65db4063a97622448dc1bf3fcf1284eebe449a1d",
-                ""
+                "61320a3a2f123dd8fd4a8baf65db4063a97622448dc1bf3fcf1284eebe449a1d"
             ]
         },
         "32bit": {
             "url": [
-                "https://eternallybored.org/misc/wget/releases/wget-1.19.1-win32.zip",
-                "https://curl.haxx.se/ca/cacert.pem"
+                "https://eternallybored.org/misc/wget/releases/wget-1.19.1-win32.zip"
             ],
             "hash": [
-                "745801b57fee4514c131b142346a4332351e90fbc7f696f6a3e02c361cccc27f",
-                ""
+                "745801b57fee4514c131b142346a4332351e90fbc7f696f6a3e02c361cccc27f"
             ]
         }
     },
     "bin": "wget.exe",
-    "post_install": "\"ca_certificate=$dir\\cacert.pem\" | out-file $dir\\wget.ini -encoding default",
+    "depends":  "cacert",
+    "post_install": "\"ca_certificate=$(resolve-path $dir\\..\\..\\cacert\\current\\cacert.pem)\" | out-file $dir\\wget.ini -encoding default",
     "checkver": "<title>GNU Wget ([\\d.]+) for Windows",
-    "notes": "Hash for the 17-Jan-2017 cacert.pem is\ne62a07e61e5870effa81b430e1900778943c228bd7da1259dd6a955ee2262b47",
     "autoupdate": {
         "architecture": {
             "64bit": {
