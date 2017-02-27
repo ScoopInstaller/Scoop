@@ -1,0 +1,8 @@
+{
+    "homepage": "https://www.fossil-scm.org/",
+    "version": "1.37",
+    "license": "https://www.fossil-scm.org/index.html/doc/trunk/COPYRIGHT-BSD2.txt",
+    "hash": "3144141bd74c047cd168f5d58940609eff8e1feb5d3a820fc78b98e090b29f47",
+    "url": "https://www.fossil-scm.org/index.html/uv/download/fossil-w32-1.37.zip",
+    "bin": "fossil.exe"
+}
