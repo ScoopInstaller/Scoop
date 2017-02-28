@@ -19,9 +19,11 @@
         "url": "https://curl.haxx.se/download.html",
         "re": "curl ([\\d.]+)"
     },
-    "suggest": [
-        "cacert"
-    ],
+    "suggest": {
+        "cacert": [
+            "cacert"
+        ]
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
