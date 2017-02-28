@@ -4,12 +4,12 @@
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-7.53.1-win64-mingw.7z#/curl-7.53.1-win64-mingw.7z",
+            "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-7.53.1-win64-mingw.7z#/dl.7z",
             "hash": "f204fe863291ee840517cf57a40f21aaec877d04f0662011cf52121392a448df",
             "extract_dir": "curl-7.53.1-win64-mingw"
         },
         "32bit": {
-            "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-7.53.1-win32-mingw.7z#/curl-7.53.1-win32-mingw.7z",
+            "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-7.53.1-win32-mingw.7z#/dl.7z",
             "hash": "587b9998a89c3aa799e97c1e64b47375c6ed72b3b57047061576d273be396b37",
             "extract_dir": "curl-7.53.1-win32-mingw"
         }
@@ -19,14 +19,19 @@
         "url": "https://curl.haxx.se/download.html",
         "re": "curl ([\\d.]+)"
     },
+    "suggest": {
+        "cacert": [
+            "cacert"
+        ]
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-$version-win64-mingw.7z#/curl-$version-win64-mingw.7z",
+                "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-$version-win64-mingw.7z#/dl.7z",
                 "extract_dir": "curl-$version-win64-mingw"
             },
             "32bit": {
-                "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-$version-win32-mingw.7z#/curl-$version-win32-mingw.7z",
+                "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-$version-win32-mingw.7z#/dl.7z",
                 "extract_dir": "curl-$version-win32-mingw"
             }
         }
