@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.25-win64-VC14.zip",
-            "hash": "C4625C3ABD688941FC80548B8C8314E1C5278804A019C14BFFC92DC49A087905"
+            "hash": "E03A43B53F00320DE27D9B7046F5E317D06268795592EF32353CE857D7AA4D76"
         },
         "32bit": {
             "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.25-win32-VC14.zip",
-            "hash": "D41705CC6FAFDF122B0B5B6EBA90E0D4A2B3208A3431B7972ADF718E274CCA33"
+            "hash": "7773F8B02E367D4F7853292DC2B4FCB4085F509C85D9851030CC1F3C453FD4D2"
         }
     },
     "extract_dir": "Apache24",
@@ -34,5 +34,20 @@ $root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\
     "checkver": {
         "url": "https://www.apachelounge.com/download/",
         "re": "Apache ([\\d.]+) Win32"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-$version-win64-VC14.zip"
+            },
+            "32bit": {
+                "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-$version-win32-VC14.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "$url.txt",
+            "find": "SHA256-Checksum for: (?:$basename):\\s+([a-zA-Z0-9]{64})"
+        }
     }
 }
