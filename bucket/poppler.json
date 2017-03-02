@@ -1,4 +1,7 @@
 {
+    "autoupdate": {
+        "url": "http://blog.alivate.com.au/wp-content/uploads/2017/03/poppler-$version_x86.7z"
+    },
     "bin": [
         "bin/pdfdetach.exe",
         "bin/pdffonts.exe",
