@@ -23,9 +23,12 @@ function check_url([String] $url) {
         return $true
     }
 
-    $response = Invoke-WebRequest -Uri $url -Method HEAD
-    if ($response.StatusCode.Equals(200)) { # redirects might be ok
-        return $true
+    try {
+        $response = Invoke-WebRequest -Uri $url -Method HEAD
+        return ($response -and $response.StatusCode.Equals(200)) # redirects might be ok
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
     }
 
     return $false
@@ -36,8 +39,15 @@ function find_hash_in_rdf([String] $url, [String] $filename)
     Write-Host -f DarkYellow "RDF URL: $url"
     Write-Host -f DarkYellow "File: $filename"
 
-    # Download and parse RDF XML file
-    [xml]$data = (new-object net.webclient).downloadstring($url)
+    $data = ""
+    try {
+        # Download and parse RDF XML file
+        [xml]$data = (new-object net.webclient).downloadstring($url)
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return $null
+    }
 
     # Find file content
     $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
@@ -60,7 +70,15 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     if ($hashmode -eq "extract") {
         $hashfile_url = substitute $config.url @{'$url' = $url}
         $hashfile_url = substitute $hashfile_url $substitutions
-        $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
+        $hashfile = $null
+
+        try {
+            $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
+        } catch [system.net.webexception] {
+            write-host -f darkred $_
+            write-host -f darkred "URL $hashfile_url is not valid"
+            return $null
+        }
 
         $regex = $config.find
         if ($regex -eq $null) {
@@ -81,7 +99,13 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         return find_hash_in_rdf $config.url $basename
     } else {
         Write-Host "Download files to compute hashes!" -f DarkYellow
-        dl_with_cache $app $version $url $null $null $true
+        try {
+            dl_with_cache $app $version $url $null $null $true
+        } catch [system.net.webexception] {
+            write-host -f darkred $_
+            write-host -f darkred "URL $url is not valid"
+            return $null
+        }
         $file = fullpath (cache_path $app $version $url)
         return compute_hash $file "sha256"
     }
@@ -164,16 +188,15 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
         $url = substitute $json.autoupdate.url $substitutions
 
         # check url
-        if (!(check_url $url)) {
-            $valid = $false
-            Write-Host -f DarkRed "URL $url is not valid"
-        }
+        $valid = check_url $url
 
-        # create hash
-        $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
-        if ($hash -eq $null) {
-            $valid = $false
-            Write-Host -f DarkRed "Could not find hash!"
+        if($valid) {
+            # create hash
+            $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
+            if ($hash -eq $null) {
+                $valid = $false
+                Write-Host -f DarkRed "Could not find hash!"
+            }
         }
 
         # write changes to the json object
@@ -193,16 +216,15 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             $url = substitute (arch_specific "url" $json.autoupdate $architecture) $substitutions
 
             # check url
-            if (!(check_url $url)) {
-                $valid = $false
-                Write-Host -f DarkRed "URL $url is not valid"
-            }
+            $valid = check_url $url
 
-            # create hash
-            $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url $substitutions
-            if ($hash -eq $null) {
-                $valid = $false
-                Write-Host -f DarkRed "Could not find hash!"
+            if($valid) {
+                # create hash
+                $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url $substitutions
+                if ($hash -eq $null) {
+                    $valid = $false
+                    Write-Host -f DarkRed "Could not find hash!"
+                }
             }
 
             # write changes to the json object

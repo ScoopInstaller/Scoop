@@ -142,7 +142,7 @@ function do_dl($url, $to, $cookies) {
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
-        abort $e.message
+        throw $e
     } finally {
         set_https_protocols $original_protocols
     }
@@ -300,7 +300,12 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
         }
         $fname = $data.$url.fname
 
-        dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+        try {
+            dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+        } catch {
+            write-host -f darkred $_
+            abort "URL $url is not valid"
+        }
     }
 
     foreach($url in $urls) {
