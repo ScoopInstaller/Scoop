@@ -1,0 +1,24 @@
+{
+    "autoupdate": {
+        "url": "http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-$versiondev.exe"
+    },
+    "checkver": {
+        "re": "The latest installer can be downloaded here:\n<a href=\"http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-([\\d.]+)",
+        "url": "https://github.com/UB-Mannheim/tesseract/wiki"
+    },
+    "description": "OCR engine developed by Google",
+    "hash": "771912fa3a027925fd8d99ed99e23b03f170418f03cb5f147211d2c97dd174f8",
+    "homepage": "https://github.com/UB-Mannheim/tesseract/wiki",
+    "installer": {
+        "_comment": "/D option is ignored",
+        "args": [
+            "/S",
+            "/D=$dir"
+        ]
+    },
+    "license": "Apache-2.0",
+    "notes": "Tesseract installs in C:\\Program Files (x86)\\Tesseract-OCR\nTo uninstall, please run manually:\n  \"C:\\Program Files (x86)\\Tesseract-OCR\\tesseract-uninstall.exe\" /S",
+    "post_install": "[Environment]::SetEnvironmentVariable(\"Path\", $env:Path + \";C:\\Program Files (x86)\\Tesseract-OCR\", [EnvironmentVariableTarget]::Machine)",
+    "url": "http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.00dev.exe",
+    "version": "3.05.00"
+}

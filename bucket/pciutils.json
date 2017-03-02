@@ -1,0 +1,35 @@
+{
+    "architecture": {
+        "32bit": {
+            "extract_dir": "pciutils-3.4.0-win32",
+            "hash": "baba72451033904ff19072b091392caee1da75a4338cb5aff10c19e65621e",
+            "url": "https://eternallybored.org/misc/pciutils/releases/pciutils-3.4.0-win32.zip"
+        },
+        "64bit": {
+            "extract_dir": "pciutils-3.4.0-win64",
+            "hash": "d5a5201110643160ebd3cbe97461a5a978040806bed75172344860dbe9f2fbcb",
+            "url": "https://eternallybored.org/misc/pciutils/releases/pciutils-3.4.0-win64.zip"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "32bit": {
+                "extract_dir": "pciutils-$version-win32",
+                "url": "https://eternallybored.org/misc/pciutils/releases/pciutils-$version-win32.zip"
+            },
+            "64bit": {
+                "extract_dir": "pciutils-$version-win64",
+                "url": "https://eternallybored.org/misc/pciutils/releases/pciutils-$version-win64.zip"
+            }
+        }
+    },
+    "bin": [
+        "lspci.exe",
+        "setpci.exe"
+    ],
+    "checkver": "href=\"releases/pciutils-([\\d.]+)",
+    "description": "Inspect and manipulate configuration of PCI devices",
+    "homepage": "https://eternallybored.org/misc/pciutils/",
+    "license": "GPL-2.0",
+    "version": "3.4.0"
+}

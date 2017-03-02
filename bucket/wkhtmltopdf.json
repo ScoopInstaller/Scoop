@@ -1,0 +1,42 @@
+{
+    "architecture": {
+        "32bit": {
+            "hash": "",
+            "installer": {
+                "args": [
+                    "/S",
+                    "/D=$dir"
+                ]
+            },
+            "url": "http://download.gna.org/wkhtmltopdf/0.12/0.12.4/wkhtmltox-0.12.4_msvc2015-win32.exe"
+        },
+        "64bit": {
+            "hash": "14a5996adc77dc606944dbc0dc682bff104cd38cc1bec19253444cb87f259797",
+            "installer": {
+                "args": [
+                    "/S",
+                    "/D=$dir"
+                ]
+            },
+            "url": "http://download.gna.org/wkhtmltopdf/0.12/0.12.4/wkhtmltox-0.12.4_msvc2015-win64.exe"
+        }
+    },
+    "bin": [
+        "bin\\wkhtmltoimage.exe",
+        "bin\\wkhtmltopdf.exe"
+    ],
+    "checkver": {
+        "re": "The\\s+current\\s+stable\\s+series\\s+is\\s+<strong>([\\d.]+)",
+        "url": "http://wkhtmltopdf.org/downloads.html"
+    },
+    "description": "Render HTML into PDF",
+    "homepage": "http://wkhtmltopdf.org/",
+    "license": "LGPL-3.0",
+    "uninstaller": {
+        "args": [
+            "/S"
+        ],
+        "file": "Uninstall.exe"
+    },
+    "version": "0.12.4"
+}
