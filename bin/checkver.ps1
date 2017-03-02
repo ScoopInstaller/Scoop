@@ -106,7 +106,8 @@ while($in_progress -gt 0) {
     write-host "$app`: " -nonewline
 
     if($err) {
-        write-host "ERROR: $err" -f darkyellow
+        write-host -f darkred $err.message
+        write-host -f darkred "URL $url is not valid"
     } else {
         if($page -match $regexp) {
             $ver = $matches[1]
