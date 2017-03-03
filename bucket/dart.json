@@ -18,7 +18,7 @@
     },
     "checkver": {
         "url": "https://storage.googleapis.com/dart-archive/channels/stable/release/latest/VERSION",
-        "re": "\"version\":\\s*\"(.*)\","
+        "jp": "$.version"
     },
     "autoupdate": {
         "architecture": {

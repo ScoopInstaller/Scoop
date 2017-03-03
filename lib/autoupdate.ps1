@@ -4,6 +4,7 @@ TODO
  - tests (single arch, without hashes etc.)
  - clean up
 #>
+. "$psscriptroot\..\lib\json.ps1"
 
 function substitute([String] $str, [Hashtable] $params) {
     $params.GetEnumerator() | % {
@@ -55,8 +56,48 @@ function find_hash_in_rdf([String] $url, [String] $filename)
     return $digest.sha256
 }
 
-function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions)
-{
+function find_hash_in_textfile([String] $url, [String] $basename, [String] $type, [String] $regex) {
+    $hashfile = $null
+
+    try {
+        $hashfile = (new-object net.webclient).downloadstring($url)
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return
+    }
+
+    if ($regex -eq $null) {
+        $regex = "([a-z0-9]+)"
+    }
+    $regex = substitute $regex @{'$basename' = [regex]::Escape($basename)}
+
+    if ($hashfile -match $regex) {
+        $hash = $matches[1]
+
+        if ($type -and !($type -eq "sha256")) {
+            $hash = $type + ":$hash"
+        }
+
+        return $hash
+    }
+}
+
+function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath) {
+    $json = $null
+
+    try {
+        $json = (new-object net.webclient).downloadstring($url) | convertfrom-json -ea stop
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return
+    }
+
+    return json_path $json $jsonpath $basename
+}
+
+function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
     $hash = $null
 
     <#
@@ -67,48 +108,32 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     #>
     $hashmode = $config.mode
     $basename = fname($url)
+
+    $hashfile_url = substitute $config.url @{'$url' = $url}
+    $hashfile_url = substitute $hashfile_url $substitutions
+
     if ($hashmode -eq "extract") {
-        $hashfile_url = substitute $config.url @{'$url' = $url}
-        $hashfile_url = substitute $hashfile_url $substitutions
-        $hashfile = $null
-
-        try {
-            $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
-        } catch [system.net.webexception] {
-            write-host -f darkred $_
-            write-host -f darkred "URL $hashfile_url is not valid"
-            return $null
-        }
-
-        $regex = $config.find
-        if ($regex -eq $null) {
-            $regex = "([a-z0-9]+)"
-        }
-        $regex = substitute $regex @{'$basename' = [regex]::Escape($basename)}
-
-        if ($hashfile -match $regex) {
-            $hash = $matches[1]
-
-            if ($config.type -and !($config.type -eq "sha256")) {
-                $hash = $config.type + ":$hash"
-            }
-
-            return $hash
-        }
-    } elseif ($hashmode -eq "rdf") {
-        return find_hash_in_rdf $config.url $basename
-    } else {
-        Write-Host "Download files to compute hashes!" -f DarkYellow
-        try {
-            dl_with_cache $app $version $url $null $null $true
-        } catch [system.net.webexception] {
-            write-host -f darkred $_
-            write-host -f darkred "URL $url is not valid"
-            return $null
-        }
-        $file = fullpath (cache_path $app $version $url)
-        return compute_hash $file "sha256"
+        return find_hash_in_textfile $hashfile_url $basename $config.type $config.find
     }
+
+    if ($hashmode -eq "json") {
+        return find_hash_in_json $hashfile_url $basename $config.jp
+    }
+
+    if ($hashmode -eq "rdf") {
+        return find_hash_in_rdf $hashfile_url $basename
+    }
+
+    Write-Host "Download files to compute hashes!" -f DarkYellow
+    try {
+        dl_with_cache $app $version $url $null $null $true
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return $null
+    }
+    $file = fullpath (cache_path $app $version $url)
+    return compute_hash $file "sha256"
 }
 
 function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null)
@@ -168,9 +193,11 @@ function get_version_substitutions([String] $version, [Hashtable] $matches)
         '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
         '$preReleaseVersion' = $lastPart;
     }
-    $matches.Remove(0)
-    $matches.GetEnumerator() | % {
-        $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+    if($matches) {
+        $matches.Remove(0)
+        $matches.GetEnumerator() | % {
+            $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+        }
     }
     return $versionVariables
 }

@@ -52,28 +52,37 @@ $queue | % {
     $name, $json = $_
 
     $githubRegex = "\/releases\/tag\/(?:v)?([\d.]+)"
-    if ($json.checkver -is [String]) {
-        if ($json.checkver -eq "github") {
-            if (!$json.homepage.StartsWith("https://github.com/")) {
-                write-host "ERROR: $name checkver expects the homepage to be a github repository" -f DarkYellow
-            }
 
-            $url = $json.homepage + "/releases/latest"
-            $regex = $githubRegex
-        } else {
-            $url = $json.homepage
-            $regex = $json.checkver
-        }
-    } else {
-        if ($json.checkver.github) {
-            $url = $json.checkver.github + "/releases/latest"
-            $regex = $githubRegex
-        } else {
-            $url = $json.checkver.url
-            if(!$url) { $url = $json.homepage }
+    $url = $json.homepage
+    if($json.checkver.url) {
+        $url = $json.checkver.url
+    }
+    $regex = ""
+    $jsonpath = ""
 
-            $regex = $json.checkver.re
+    if ($json.checkver -eq "github") {
+        if (!$json.homepage.StartsWith("https://github.com/")) {
+            write-host "ERROR: $name checkver expects the homepage to be a github repository" -f DarkYellow
         }
+        $url = $json.homepage + "/releases/latest"
+        $regex = $githubRegex
+    }
+
+    if ($json.checkver.github) {
+        $url = $json.checkver.github + "/releases/latest"
+        $regex = $githubRegex
+    }
+
+    if($json.checkver.re) {
+        $regex = $json.checkver.re
+    }
+
+    if($json.checkver.jp) {
+        $jsonpath = $json.checkver.jp
+    }
+
+    if(!$jsonpath -and !$regex) {
+        $regex = $json.checkver
     }
 
     $state = new-object psobject @{
@@ -81,6 +90,7 @@ $queue | % {
         url = $url;
         regex = $regex;
         json = $json;
+        jsonpath = $jsonpath;
     }
 
     $wc.downloadstringasync($url, $state)
@@ -99,6 +109,8 @@ while($in_progress -gt 0) {
     $url = $state.url
     $expected_ver = $json.version
     $regexp = $state.regex
+    $jsonpath = $state.jsonpath
+    $ver = ""
 
     $err = $ev.sourceeventargs.error
     $page = $ev.sourceeventargs.result
@@ -108,36 +120,58 @@ while($in_progress -gt 0) {
     if($err) {
         write-host -f darkred $err.message
         write-host -f darkred "URL $url is not valid"
-    } else {
+        continue
+    }
+
+    if($jsonpath -and $regexp) {
+        write-host -f darkred "'jp' and 're' shouldn't be used together"
+        continue
+    }
+
+    if($jsonpath) {
+        $ver = json_path ($page | ConvertFrom-Json -ea stop) $jsonpath
+        if(!$ver) {
+            write-host -f darkred "couldn't find '$jsonpath' in $url"
+            continue
+        }
+    }
+
+    if($regexp) {
         if($page -match $regexp) {
             $ver = $matches[1]
             if(!$ver) {
                 $ver = $matches['version']
             }
-            if($ver -eq $expected_ver) {
-                write-host "$ver" -f darkgreen
-
-                if ($forceUpdate -and $json.autoupdate) {
-                    Write-Host "Forcing autoupdate!" -f DarkMagenta
-                    autoupdate $app $dir $json $ver $matches
-                }
-            } else {
-                write-host "$ver" -f darkred -nonewline
-                write-host " (scoop version is $expected_ver)" -NoNewline
-
-                if ($json.autoupdate) {
-                    Write-Host " autoupdate available" -f Cyan
-                } else {
-                    Write-Host ""
-                }
-
-                if($update -and $json.autoupdate) {
-                    autoupdate $app $dir $json $ver $matches
-                }
-            }
-
         } else {
-            write-host "couldn't match '$regexp' in $url" -f darkred
+            write-host -f darkred "couldn't match '$regexp' in $url"
+            continue
+        }
+    }
+
+    if(!$ver) {
+        write-host -f darkred "couldn't find new version in $url"
+        continue
+    }
+
+    if($ver -eq $expected_ver) {
+        write-host "$ver" -f darkgreen
+
+        if ($forceUpdate -and $json.autoupdate) {
+            Write-Host "Forcing autoupdate!" -f DarkMagenta
+            autoupdate $app $dir $json $ver $matches
+        }
+    } else {
+        write-host "$ver" -f darkred -nonewline
+        write-host " (scoop version is $expected_ver)" -NoNewline
+
+        if ($json.autoupdate) {
+            Write-Host " autoupdate available" -f Cyan
+        } else {
+            Write-Host ""
+        }
+
+        if($update -and $json.autoupdate) {
+            autoupdate $app $dir $json $ver $matches
         }
     }
 }
