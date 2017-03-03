@@ -29,8 +29,8 @@
             }
         },
         "hash": {
-            "mode": "extract",
-            "find": "$basename.*\\s.*\\s.*\\s.*\\s.*\"([\\da-f]{64})\"",
+            "mode": "json",
+            "jp": "$.files.$basename.sha256",
             "url": "https://slproweb.com/download/win32_openssl_hashes.json"
         }
     }

@@ -96,10 +96,15 @@
                             "format": "regex",
                             "type": "string"
                         },
+                        "jp": {
+                            "pattern": "^\\$\\..*$",
+                            "type": "string"
+                        },
                         "mode": {
                             "enum": [
                                 "download",
                                 "extract",
+                                "json",
                                 "rdf"
                             ]
                         },
@@ -155,6 +160,10 @@
                         },
                         "url": {
                             "format": "uri",
+                            "type": "string"
+                        },
+                        "jp": {
+                            "pattern": "^\\$\\..*$",
                             "type": "string"
                         }
                     },
