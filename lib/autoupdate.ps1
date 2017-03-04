@@ -35,8 +35,7 @@ function check_url([String] $url) {
     return $false
 }
 
-function find_hash_in_rdf([String] $url, [String] $filename)
-{
+function find_hash_in_rdf([String] $url, [String] $filename) {
     Write-Host -f DarkYellow "RDF URL: $url"
     Write-Host -f DarkYellow "File: $filename"
 
@@ -141,8 +140,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     return compute_hash $file "sha256"
 }
 
-function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null)
-{
+function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
     $json.version = $version
 
     if ($architecture -eq $null) {
@@ -165,8 +163,7 @@ function update_manifest_with_new_version($json, [String] $version, [String] $ur
     }
 }
 
-function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
-{
+function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions) {
     # first try the global property
     if ($json.$prop -and $json.autoupdate.$prop) {
         $json.$prop = substitute $json.autoupdate.$prop $substitutions
@@ -184,8 +181,7 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 }
 
-function get_version_substitutions([String] $version, [Hashtable] $matches)
-{
+function get_version_substitutions([String] $version, [Hashtable] $matches) {
     $firstPart = $version.Split('-') | Select-Object -first 1
     $lastPart = $version.Split('-') | Select-Object -last 1
     $versionVariables = @{
@@ -207,8 +203,7 @@ function get_version_substitutions([String] $version, [Hashtable] $matches)
     return $versionVariables
 }
 
-function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $matches)
-{
+function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $matches) {
     Write-Host -f DarkCyan "Autoupdating $app"
     $has_changes = $false
     $has_errors = $false
