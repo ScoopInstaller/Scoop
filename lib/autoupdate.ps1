@@ -113,15 +113,20 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hashfile_url = substitute $hashfile_url $substitutions
 
     if ($hashmode -eq "extract") {
-        return find_hash_in_textfile $hashfile_url $basename $config.type $config.find
+        $hash = find_hash_in_textfile $hashfile_url $basename $config.type $config.find
     }
 
     if ($hashmode -eq "json") {
-        return find_hash_in_json $hashfile_url $basename $config.jp
+        $hash = find_hash_in_json $hashfile_url $basename $config.jp
     }
 
     if ($hashmode -eq "rdf") {
-        return find_hash_in_rdf $hashfile_url $basename
+        $hash = find_hash_in_rdf $hashfile_url $basename
+    }
+
+    if($hash) {
+        # got one!
+        return $hash
     }
 
     Write-Host "Download files to compute hashes!" -f DarkYellow
