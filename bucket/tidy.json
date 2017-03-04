@@ -1,23 +1,21 @@
 {
     "architecture": {
         "32bit": {
-            "extract_dir": "tidy-5.2.0-win32/bin",
-            "hash": "94d653498b4f93b14f12a55ca06154e19c540c9b276e5d163f1cf84fa078f97a",
-            "url": "http://binaries.html-tidy.org/binaries/tidy-5.2.0/tidy-5.2.0-win32.zip"
+            "hash": "3a4d634113ebf41c13a397cd201b5b84ccf41f9d34829eb57114fd098f1a47a4",
+            "url": "https://github.com/htacg/tidy-html5/releases/download/5.4.0/tidy-5.4.0-win32.zip"
         },
         "64bit": {
-            "extract_dir": "tidy-5.2.0-win64/bin",
-            "hash": "dd9fd814cc44bc2ffa9b9e547b1a6cbb42b6be7b9358542d3ee7f6e10b676423",
-            "url": "http://binaries.html-tidy.org/binaries/tidy-5.2.0/tidy-5.2.0-win64.zip"
+            "hash": "b01d8382ef6da124298e797a4dcc0ca24060aa29fb5fd1b384b598600a1d78fe",
+            "url": "https://github.com/htacg/tidy-html5/releases/download/5.4.0/tidy-5.4.0-win64.zip"
         }
     },
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "http://binaries.html-tidy.org/binaries/tidy-$version/tidy-$version-win32.zip"
+                "url": "https://github.com/htacg/tidy-html5/releases/download/$version/tidy-$version-win32.zip"
             },
             "64bit": {
-                "url": "http://binaries.html-tidy.org/binaries/tidy-$version/tidy-$version-win64.zip"
+                "url": "https://github.com/htacg/tidy-html5/releases/download/$version/tidy-$version-win64.zip"
             }
         }
     },
@@ -26,7 +24,8 @@
         "github": "https://github.com/htacg/tidy-html5"
     },
     "description": "Tidy HTML and XML files",
+    "extract_dir": "bin",
     "homepage": "http://www.html-tidy.org/",
     "license": "http://www.html-tidy.org/documentation/#license",
-    "version": "5.2.0"
+    "version": "5.4.0"
 }
