@@ -1,19 +1,23 @@
 {
-    "homepage": "http://mingw.org/wiki/MSYS",
-    "version": "3.0",
-    "license": "http://www.info-zip.org/doc/LICENSE",
-    "url": [
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/zip/zip-3.0-1/zip-3.0-1-msys-1.0.14-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma"
-    ],
-    "hash": [
-        "ffe9b49d5302e00f8e5e6c6166e2f6e898c9459e696812284c8f37350f6fc45d",
-        "4e262a414f238773b311c8bb55a52e62743c06e0e55b319ca5b47e3e306464d5"
-    ],
+    "architecture": {
+        "32bit": {
+            "hash": "f8bbc1821d50400245107ce8cfa4a6c7b524387b58bbd6cbe9c20094e82c3bb5",
+            "url": "ftp://ftp.info-zip.org/pub/infozip/win32/zip300xn.zip"
+        },
+        "64bit": {
+            "hash": "ed29893fcd7f8b2afb2ead0461663584b740b5d064d4e1c87084107941197a7b",
+            "url": "ftp://ftp.info-zip.org/pub/infozip/win32/zip300xn-x64.zip"
+        }
+    },
     "bin": [
-        "bin/zip.exe",
-        "bin/zipcloak.exe",
-        "bin/zipnote.exe",
-        "bin/zipsplit.exe"
-    ]
+        "zip.exe",
+        "zipcloak.exe",
+        "zipnote.exe",
+        "zipsplit.exe"
+    ],
+    "description": "Zip compression utilities",
+    "homepage": "http://www.info-zip.org/",
+    "license": "http://www.info-zip.org/pub/infozip/license.html",
+    "pre_install": "Add-Type -assembly 'system.io.compression.filesystem'; [io.compression.zipfile]::ExtractToDirectory(\"$dir\\$fname\", \"$dir\")",
+    "version": "3.0"
 }

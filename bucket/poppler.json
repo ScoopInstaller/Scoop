@@ -1,0 +1,26 @@
+{
+    "autoupdate": {
+        "url": "http://blog.alivate.com.au/wp-content/uploads/$matchDate/poppler-$version_x86.7z"
+    },
+    "bin": [
+        "bin/pdfdetach.exe",
+        "bin/pdffonts.exe",
+        "bin/pdfimages.exe",
+        "bin/pdfinfo.exe",
+        "bin/pdfseparate.exe",
+        "bin/pdftocairo.exe",
+        "bin/pdftohtml.exe",
+        "bin/pdftoppm.exe",
+        "bin/pdftops.exe",
+        "bin/pdftotext.exe",
+        "bin/pdfunite.exe"
+    ],
+    "checkver": "Latest.*uploads/(?<date>\\d{4}/\\d{2})/poppler-(?<version>[\\d.]+)_x86.7z",
+    "description": "PDF rendering library",
+    "extract_dir": "poppler-0.51",
+    "hash": "8c027037355f11d16fde2fe34823006c142c7460bd64a37da7b6b23327a15f13",
+    "homepage": "http://blog.alivate.com.au/poppler-windows/",
+    "license": "GPL-3.0",
+    "url": "http://blog.alivate.com.au/wp-content/uploads/2017/01/poppler-0.51_x86.7z",
+    "version": "0.51"
+}

@@ -1,0 +1,19 @@
+{
+    "bin": "UnRAR.exe",
+    "checkver": {
+        "re": "<b>WinRAR\\s+x86\\s+\\(32\\s+bit\\)\\s+([\\d.]+)<",
+        "url": "http://www.rarlab.com/download.htm"
+    },
+    "description": "Uncompress RAR files",
+    "hash": "27293c101577320fafefc691af98d762361c23e62817ca340ce04a7bba892173",
+    "homepage": "http://www.rarlab.com/",
+    "installer": {
+        "args": [
+            "-s",
+            "-d$dir"
+        ]
+    },
+    "license": "Freeware",
+    "url": "http://www.rarlab.com/rar/unrarw32.exe",
+    "version": "5.40"
+}

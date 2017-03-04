@@ -1,0 +1,26 @@
+{
+    "bin": [
+        "bin/runcmdu.exe",
+        "bin/smartctl.exe",
+        "bin/smartctl-nc.exe",
+        "bin/smartd.exe",
+        "bin/update-smart-drivedb.exe",
+        "bin/wtssendmsg.exe"
+    ],
+    "checkver": {
+        "re": ">Download\\s+smartmontools-([\\d.\\-]+)\\.",
+        "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/"
+    },
+    "description": "Read SMART data from disks",
+    "hash": "564ff79214af60c4ab0d222ae61781624ca56278bc777963ebe0f19f87f04e3f",
+    "homepage": "https://www.smartmontools.org/",
+    "installer": {
+        "args": [
+            "/S",
+            "/D=$dir"
+        ]
+    },
+    "license": "GPL-2.0",
+    "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/6.5/smartmontools-6.5-1.win32-setup.exe",
+    "version": "6.5-1"
+}
