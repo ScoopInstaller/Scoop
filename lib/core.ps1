@@ -11,10 +11,15 @@ if((test-path $oldscoopdir) -and !$env:SCOOP) {
 }
 
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
-$cachedir = "$scoopdir\cache" # always local
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
+
+# experimental: use optional environment variable to override the default cache dir,
+# note this may cause concurrent issue when multiple users using the same cache dir
+# try to install a new app at the same time if it was not cached previously.
+$cachedir = coalesce $env:SCOOP_CACHE "$scoopdir\cache"
+
 function format($str, $hash) {
     $hash.keys | % { set-variable $_ $hash[$_] }
     $executionContext.invokeCommand.expandString($str)
