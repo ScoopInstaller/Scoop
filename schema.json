@@ -3,6 +3,25 @@
     "$schema": "http://scoop.sh/draft/schema#",
     "additionalProperties": false,
     "definitions": {
+        "hashPattern": {
+            "pattern": "^([a-fA-F0-9]{64}|(sha1|sha256|sha512|md5):([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{128}))$",
+            "type": "string"
+        },
+        "hash": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/hashPattern"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/hashPattern"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                }
+            ]
+        },
         "architecture": {
             "additionalProperties": false,
             "properties": {
@@ -16,7 +35,7 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "hash": {
-                    "$ref": "#/definitions/stringOrArrayOfUniqueStrings"
+                    "$ref": "#/definitions/hash"
                 },
                 "installer": {
                     "$ref": "#/definitions/installer"
@@ -218,21 +237,6 @@
                 }
             ]
         },
-        "stringOrArrayOfUniqueStrings": {
-            "anyOf": [
-                {
-                    "type": "string"
-                },
-                {
-                    "items": {
-                        "type": "string"
-                    },
-                    "minItems": 1,
-                    "type": "array",
-                    "uniqueItems": true
-                }
-            ]
-        },
         "uninstaller": {
             "properties": {
                 "args": {
@@ -322,7 +326,7 @@
             "description": "Undocumented: only found in scoop/ruby*"
         },
         "hash": {
-            "$ref": "#/definitions/stringOrArrayOfUniqueStrings"
+            "$ref": "#/definitions/hash"
         },
         "homepage": {
             "format": "uri",

@@ -37,7 +37,7 @@ describe "manifest-validation" {
         it "fails with invalid manifest" {
             $validator = new-object Scoop.Validator($schema, $true)
             $validator.Validate("$working_dir\invalid_wget.json") | should be $false
-            $validator.Errors.Count | should be 10
+            $validator.Errors.Count | should be 16
             $validator.Errors | select-object -First 1 | should belikeexactly "*invalid_wget.json*randomproperty*"
             $validator.Errors | select-object -Last 1 | should belikeexactly "*invalid_wget.json*version."
         }

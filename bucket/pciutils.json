@@ -2,7 +2,7 @@
     "architecture": {
         "32bit": {
             "extract_dir": "pciutils-3.4.0-win32",
-            "hash": "baba72451033904ff19072b091392caee1da75a4338cb5aff10c19e65621e",
+            "hash": "baba72451033904ff19072b091392caee1da75a4338cb5aff10c19e65621e340",
             "url": "https://eternallybored.org/misc/pciutils/releases/pciutils-3.4.0-win32.zip"
         },
         "64bit": {

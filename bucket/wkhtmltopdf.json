@@ -1,7 +1,7 @@
 {
     "architecture": {
         "32bit": {
-            "hash": "",
+            "hash": "6883d1456201bc9d421cb7dd32a99458be3d56631ea4f292e51b3c1aecbe2723",
             "installer": {
                 "args": [
                     "/S",
