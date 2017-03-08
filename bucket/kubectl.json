@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://storage.googleapis.com/kubernetes-release/release/v1.5.4/kubernetes-client-windows-amd64.tar.gz",
-            "hash": "sha1:"
+            "hash": "sha1:51f686d0dd871ec8d786ab04900da873f251fd80"
         },
         "32bit": {
             "url": "https://storage.googleapis.com/kubernetes-release/release/v1.5.4/kubernetes-client-windows-386.tar.gz",
-            "hash": "sha1:"
+            "hash": "sha1:e4f7a289fd0bcd109d2c87fef3c80ff967b9016a"
         }
     },
     "extract_dir": "kubernetes\\client",
@@ -33,6 +33,7 @@
         "hash": {
             "type": "sha1",
             "mode": "extract",
+            "find": "^([a-f0-9]{40})$",
             "url": "$url.sha1"
         }
     }
