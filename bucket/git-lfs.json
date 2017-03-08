@@ -5,11 +5,13 @@
     "architecture": {
         "32bit": {
             "url": "https://github.com/github/git-lfs/releases/download/v2.0.1/git-lfs-windows-386-2.0.1.zip",
-            "hash": "c5094dadfbc412c9ef325e3bfc93940768e8031653b30e3aa7ed3a13040cfdec"
+            "hash": "c5094dadfbc412c9ef325e3bfc93940768e8031653b30e3aa7ed3a13040cfdec",
+            "extract_dir": "git-lfs-windows-386-2.0.1"
         },
         "64bit": {
             "url": "https://github.com/github/git-lfs/releases/download/v2.0.1/git-lfs-windows-amd64-2.0.1.zip",
-            "hash": "83d9283250b96034628e380271f0e6360aa6cabdb637acb145fb4c360aafe53a"
+            "hash": "83d9283250b96034628e380271f0e6360aa6cabdb637acb145fb4c360aafe53a",
+            "extract_dir": "git-lfs-windows-amd64-2.0.1"
         }
     },
     "depends": "git",
@@ -20,10 +22,12 @@
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "https://github.com/github/git-lfs/releases/download/v$version/git-lfs-windows-386-$version.zip"
+                "url": "https://github.com/github/git-lfs/releases/download/v$version/git-lfs-windows-386-$version.zip",
+                "extract_dir": "git-lfs-windows-386-$version"
             },
             "64bit": {
-                "url": "https://github.com/github/git-lfs/releases/download/v$version/git-lfs-windows-amd64-$version.zip"
+                "url": "https://github.com/github/git-lfs/releases/download/v$version/git-lfs-windows-amd64-$version.zip",
+                "extract_dir": "git-lfs-windows-amd64-$version"
             }
         }
     }
