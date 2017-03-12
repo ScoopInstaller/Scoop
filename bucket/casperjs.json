@@ -11,5 +11,9 @@
     phantom19 is available in the versions bucket (scoop bucket add versions)",
     "checkver": {
         "github": "https://github.com/n1k0/casperjs"
+    },
+    "autoupdate": {
+        "url": "https://github.com/casperjs/casperjs/archive/$version.zip",
+        "extract_dir": "casperjs-$version"
     }
 }
