@@ -1,21 +1,21 @@
 {
     "homepage": "http://www.sbcl.org/",
-    "version": "1.3.11",
+    "version": "1.3.15",
     "license": "http://www.sbcl.org/history.html",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/sbcl/files/sbcl/1.3.11/sbcl-1.3.11-x86-64-windows-binary.msi",
-            "hash": "29558087EEDFFDBA0EDB0DFE6739FE6142762624F8A7CE90A3E63BE3D5A39FB3"
+            "url": "https://sourceforge.net/projects/sbcl/files/sbcl/1.3.15/sbcl-1.3.15-x86-64-windows-binary.msi",
+            "hash": "33BFFC8BCC5E0846A262F4BA3D635A23B47E0BC9180E5FCE6E03FEBD3BA65010"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/sbcl/files/sbcl/1.3.11/sbcl-1.3.11-x86-windows-binary.msi",
-            "hash": "1ADB4BFBB51D54435FBCA94706BD99730962FE7E5342BC2569EC4BC40D624AAD"
+            "url": "https://sourceforge.net/projects/sbcl/files/sbcl/1.3.15/sbcl-1.3.15-x86-windows-binary.msi",
+            "hash": "D6984C2C0F3B57402A0F22D8399C9891F8E7F194655B7950CD37B6032BDBDC43"
         }
     },
     "env_set": {
-            "SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.3.11"
-        },
-    "bin": [ "PFiles\\Steel Bank Common Lisp\\1.3.11\\sbcl.exe"],
+        "SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.3.15"
+    },
+    "bin": [ "PFiles\\Steel Bank Common Lisp\\1.3.15\\sbcl.exe"],
     "checkver": ">SBCL ([\\d.]+)<",
     "notes": "Please restart your command line for SBCL_HOME to take effect. Please consider installing http://www.quicklisp.org/"
 }
