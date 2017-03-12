@@ -1,31 +1,27 @@
 {
     "homepage": "https://www.mongodb.org",
-    "version": "3.2.10",
+    "version": "3.4.2",
     "license": "https://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.10-signed.msi",
-            "hash": "630b614df367d8ca98f7d57e3937cae7c3915e1fb8da100f316c680da8d7f4ef"
-        },
-        "32bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-i386-3.2.10-signed.msi",
-            "hash": "da330528bd7b284a1cfb649b377ce175a07680a5a8ba946801cdb87682f18f3c"
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.4.2-signed.msi",
+            "hash": "ff8a4226de8a8d766ae0713dd94663e965cc0505540026e2483cb6351a55eb23"
         }
     },
     "bin": [
-        "MongoDB\\Server\\3.2\\bin\\bsondump.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongo.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongod.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongodump.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongoexport.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongofiles.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongoimport.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongooplog.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongoperf.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongorestore.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongos.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongostat.exe",
-        "MongoDB\\Server\\3.2\\bin\\mongotop.exe"
+        "MongoDB\\Server\\3.4\\bin\\bsondump.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongo.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongod.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongodump.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongoexport.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongofiles.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongoimport.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongooplog.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongoperf.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongorestore.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongos.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongostat.exe",
+        "MongoDB\\Server\\3.4\\bin\\mongotop.exe"
     ],
     "checkver": {
         "url": "https://www.mongodb.com/download-center",
