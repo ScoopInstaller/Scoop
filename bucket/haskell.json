@@ -1,15 +1,22 @@
 {
     "homepage": "https://www.haskell.org",
-    "version": "7.10.2-a",
+    "version": "8.0.2",
     "architecture": {
         "64bit": {
-            "url": "https://haskell.org/platform/download/7.10.2/HaskellPlatform-7.10.2-a-x86_64-setup.exe#/dl.7z",
-            "hash": "acfd8144a090c1fa17dc5d9e564355ffdb159012ab0550a012abaacb4a1d58fa"
+            "url": "https://haskell.org/platform/download/8.0.2/HaskellPlatform-8.0.2-minimal-x86_64-setup.exe",
+            "hash": "5901fddb219a4d864ee3e21dc73434de0eeb98cbd27a50845b8a687e1c1cb8fa"
         },
         "32bit": {
-            "url": "https://haskell.org/platform/download/7.10.2/HaskellPlatform-7.10.2-a-i386-setup.exe#/dl.7z",
-            "hash": "8c1a2e116e3a3b00857901bfd4f98b47c1ed07b562c438428d0e75a480b8d2f5"
+            "url": "https://haskell.org/platform/download/8.0.2/HaskellPlatform-8.0.2-minimal-i386-setup.exe",
+            "hash": "5be3feaf90977bbe769753c8295cafef40591c8f247808cf6b662ebab2839738"
         }
+    },
+    "installer": {
+        "args": "/S /D=$dir"
+    },
+    "uninstaller": {
+        "file": "Uninstall.exe",
+        "args": "/S"
     },
     "bin": [
         "bin\\ghc.exe",
@@ -26,5 +33,15 @@
     "checkver": {
         "url": "https://www.haskell.org/platform/windows.html",
         "re": "The latest version of the Haskell Platform for Windows is\\s+<strong>([\\d.]+)<\\/strong>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-minimal-x86_64-setup.exe"
+            },
+            "32bit": {
+                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-minimal-i386-setup.exe"
+            }
+        }
     }
 }
