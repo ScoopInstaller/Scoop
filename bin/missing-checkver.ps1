@@ -1,5 +1,8 @@
 # list manifests which do not specify a checkver regex
-param($dir)
+param(
+    [String]$dir,
+    [Switch]$skipSupported = $false
+)
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -17,6 +20,11 @@ write-host " |  |"
 
 gci $dir "*.json" | % {
     $json = parse_json "$dir\$_"
+
+    if ($skipSupported -and $json.checkver -and $json.autoupdate) {
+        return
+    }
+
     write-host "[" -nonewline
     write-host -f green -nonewline $( If ($json.checkver) {"C"} Else {" "} )
     write-host "]" -nonewline
