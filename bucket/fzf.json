@@ -14,7 +14,7 @@
     },
     "bin":  "fzf.exe",
     "checkver": {
-        "github": "$homepage"
+        "github": "https://github.com/junegunn/fzf"
     },
     "autoupdate": {
         "64bit": {
