@@ -17,11 +17,13 @@
         "github": "https://github.com/junegunn/fzf"
     },
     "autoupdate": {
-        "64bit": {
-            "url":  "https://github.com/junegunn/fzf-bin/releases/download/$version/fzf-$version-windows_amd64.zip"
-        },
-        "32bit": {
-            "url": "https://github.com/junegunn/fzf-bin/releases/download/$version/fzf-$version-windows_386.zip"
+        "architecture": {
+            "64bit": {
+                "url":  "https://github.com/junegunn/fzf-bin/releases/download/$version/fzf-$version-windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/junegunn/fzf-bin/releases/download/$version/fzf-$version-windows_386.zip"
+            }
         }
     }
 }
