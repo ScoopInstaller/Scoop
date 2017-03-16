@@ -1,0 +1,10 @@
+{
+    "homepage":  "http://www.sno.phy.queensu.ca/~phil/exiftool/index.html",
+    "version":  "10.46",
+    "license":  "http://dev.perl.org/licenses/",
+    "url":  "https://downloads.sourceforge.net/project/exiftool/exiftool-10.46.zip",
+    "hash":  "1258490d42368887d92654fe2ed2475fe99acf684827fb3e73cda4f0d2c3ef09",
+    "bin":  [
+        ["exiftool(-k).exe", "exiftool"]
+    ]
+}
