@@ -10,15 +10,18 @@
         "32bit": {
             "url": "https://github.com/junegunn/fzf-bin/releases/download/0.16.6/fzf-0.16.6-windows_386.zip",
             "hash": "406d81364a070b39823c9d4af70e01ea2e43ef8b979e2c6d5e894acb52216247"
-	}
+        }
     },
     "bin":  "fzf.exe",
+    "checkver": {
+        "github": "$homepage"
+    },
     "autoupdate": {
         "64bit": {
             "url":  "https://github.com/junegunn/fzf-bin/releases/download/$version/fzf-$version-windows_amd64.zip"
         },
         "32bit": {
             "url": "https://github.com/junegunn/fzf-bin/releases/download/$version/fzf-$version-windows_386.zip"
-	}
+        }
     }
 }
