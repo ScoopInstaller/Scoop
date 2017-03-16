@@ -135,6 +135,9 @@ describe 'Style constraints for non-binary project files' {
             foreach ($file in $files)
             {
                 $content = Get-Content -raw $file.FullName
+                if(!$content) {
+                    throw "File contents are null: $($file.FullName)"
+                }
                 $lines = [regex]::split($content, '\r\n')
                 $lineCount = $lines.Count
 
