@@ -1,10 +1,9 @@
 {
     "homepage": "https://haxe.org/",
-    "version": "3.4.0",
+    "version": "3.4.1",
     "license": "https://haxe.org/foundation/open-source.html",
-    "url": "https://haxe.org/website-content/downloads/3.4.0/downloads/haxe-3.4.0-win.zip",
-    "hash": "9e9963ff3d166593efd736d3045863098391d94406ddb40898cc79307f1a06d4",
-    "extract_dir": "haxe-3.4.0",
+    "url": "https://github.com/HaxeFoundation/haxe/releases/download/3.4.1/haxe-3.4.1-win.zip",
+    "hash": "617d8262f55aedd3e7de2b1c5126ad7aa6b2de7e548051d2eb9c7dd9490d018e",
     "bin": [
         "haxe.exe",
         "haxelib.exe"
@@ -14,11 +13,9 @@
     },
     "depends": "neko",
     "checkver": {
-        "url": "https://haxe.org/download/list/",
-        "re": "The current stable version is <a [^>]+>((?<version>[\\d.]+)(?<rc>-rc|())?\\.?(?<build>[\\d]+|())?)"
+        "github": "https://github.com/HaxeFoundation/haxe"
     },
     "autoupdate": {
-        "url": "https://haxe.org/website-content/downloads/$version/downloads/haxe-$version-win.zip",
-        "extract_dir": "haxe-$version$matchRc$matchBuild"
+        "url": "https://github.com/HaxeFoundation/haxe/releases/download/$version/haxe-$version-win.zip"
     }
 }
