@@ -135,6 +135,8 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     if($hash) {
         # got one!
         return $hash
+    } else {
+        write-host -f DarkYellow "Could not find hash in $hashfile_url"
     }
 
     Write-Host "Download files to compute hashes!" -f DarkYellow
