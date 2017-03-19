@@ -94,6 +94,7 @@ function is_local($path) {
 function dl($url,$to) {
     $wc = new-object system.net.webClient
     $wc.headers.add('User-Agent', 'Scoop/1.0')
+    $wc.headers.add('Referer', $url)
     $wc.downloadFile($url,$to)
 
 }

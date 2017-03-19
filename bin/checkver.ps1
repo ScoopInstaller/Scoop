@@ -94,6 +94,7 @@ $queue | % {
         jsonpath = $jsonpath;
     }
 
+    $wc.headers.add('Referer', $url)
     $wc.downloadstringasync($url, $state)
 }
 
