@@ -35,6 +35,7 @@
             "32bit": {
                 "url":  "http://www.nasm.us/pub/nasm/releasebuilds/$version/win32/nasm-$version-win32.zip"
             }
-        }
+        },
+        "extract_dir":  "nasm-$version"
     }
 }
