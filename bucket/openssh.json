@@ -26,6 +26,5 @@
         "bin\\ssh-keygen.exe",
         "bin\\ssh-keyscan.exe",
         "bin\\ssh.exe"
-    ],
-    "env_set": { "home": "$home" }
+    ]
 }
