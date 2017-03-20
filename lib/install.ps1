@@ -31,6 +31,8 @@ function install_app($app, $architecture, $global, $suggested) {
     echo "Installing '$app' ($version)."
 
     $dir = ensure (versiondir $app $version $global)
+    $original_dir = $dir # keep reference to real (not linked) directory
+    $data_dir = ensure (appdatadir $app)
 
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
@@ -44,6 +46,10 @@ function install_app($app, $architecture, $global, $suggested) {
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
+
+    # persist data
+    persist_data $manifest
+
     # env_ensure_home $manifest $global (see comment for env_ensure_home)
     post_install $manifest $architecture
 
@@ -937,6 +943,39 @@ function show_suggestions($suggested) {
             if(!$fulfilled) {
                 write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
             }
+        }
+    }
+}
+
+# Persistent data
+function persist_data($manifest) {
+    $persist = $manifest.persist
+    if($persist) {
+        if ($persist -is [String]) {
+            $persist = @($persist);
+        }
+
+        write-host "Persisting data..."
+        $persist | % {
+            # TODO implement [from, to]
+            $source_name = $_
+            $target_name = fname($_)
+
+            Write-Host -ForegroundColor Red $source_name $target_name
+
+            $source = "$original_dir\$source_name"
+            $target = "$data_dir\$target_name"
+            if (!(test-path $target)) {
+                # If we do not have data in the store we move the original
+                movedir $source $target # TODO check if file work too
+            } else {
+                # move original (keep a copy)
+                movedir $source "$source.original"
+            }
+
+            # create link
+            # TODO use /h for files
+            cmd /c "mklink /j $source $target" | out-null
         }
     }
 }
