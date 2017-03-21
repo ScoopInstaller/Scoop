@@ -25,7 +25,7 @@ function check_url([String] $url) {
     }
 
     try {
-        $response = Invoke-WebRequest -Uri $url -Method HEAD -Headers @{'Referer' = $url}
+        $response = Invoke-WebRequest -Uri $url -Method HEAD -Headers @{'Referer' = strip_filename $url}
         return ($response -and $response.StatusCode.Equals(200)) # redirects might be ok
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -43,7 +43,7 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     try {
         # Download and parse RDF XML file
         $wc = new-object net.webclient
-        $wc.headers.add('Referer', $url)
+        $wc.headers.add('Referer', (strip_filename $url))
         [xml]$data = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -62,7 +62,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $type
 
     try {
         $wc = new-object net.webclient
-        $wc.headers.add('Referer', $url)
+        $wc.headers.add('Referer', (strip_filename $url))
         $hashfile = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -91,7 +91,7 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
 
     try {
         $wc = new-object net.webclient
-        $wc.headers.add('Referer', $url)
+        $wc.headers.add('Referer', (strip_filename $url))
         $json = $wc.downloadstring($url) | convertfrom-json -ea stop
     } catch [system.net.webexception] {
         write-host -f darkred $_
