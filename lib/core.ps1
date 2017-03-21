@@ -75,6 +75,7 @@ function installed_apps($global) {
 # paths
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
+function strip_filename($path) { $path -replace (fname $path) }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
@@ -94,6 +95,7 @@ function is_local($path) {
 function dl($url,$to) {
     $wc = new-object system.net.webClient
     $wc.headers.add('User-Agent', 'Scoop/1.0')
+    $wc.headers.add('Referer', (strip_filename $url))
     $wc.downloadFile($url,$to)
 
 }

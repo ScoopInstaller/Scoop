@@ -25,7 +25,7 @@ function check_url([String] $url) {
     }
 
     try {
-        $response = Invoke-WebRequest -Uri $url -Method HEAD
+        $response = Invoke-WebRequest -Uri $url -Method HEAD -Headers @{'Referer' = strip_filename $url}
         return ($response -and $response.StatusCode.Equals(200)) # redirects might be ok
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -42,7 +42,9 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     $data = ""
     try {
         # Download and parse RDF XML file
-        [xml]$data = (new-object net.webclient).downloadstring($url)
+        $wc = new-object net.webclient
+        $wc.headers.add('Referer', (strip_filename $url))
+        [xml]$data = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -59,7 +61,9 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $type
     $hashfile = $null
 
     try {
-        $hashfile = (new-object net.webclient).downloadstring($url)
+        $wc = new-object net.webclient
+        $wc.headers.add('Referer', (strip_filename $url))
+        $hashfile = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -86,7 +90,9 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
     $json = $null
 
     try {
-        $json = (new-object net.webclient).downloadstring($url) | convertfrom-json -ea stop
+        $wc = new-object net.webclient
+        $wc.headers.add('Referer', (strip_filename $url))
+        $json = $wc.downloadstring($url) | convertfrom-json -ea stop
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
