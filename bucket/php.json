@@ -29,9 +29,15 @@
         "php-cgi.exe"
     ],
     "env_set": {
-        "PHP_INI_SCAN_DIR": "$dir\\..\\conf"
+        "PHP_INI_SCAN_DIR": "$data_dir\\conf"
     },
     "post_install": "
+#Copy ini scan dir from old location before persistant update
+if ((Test-Path \"$dir\\..\\conf\") -and !(Test-Path \"$data_dir\\conf\")) {
+    Write-Host 'We are moving your php configuration to scoop/data/php/conf'
+    mv \"$dir\\..\\conf\" \"$data_dir\\conf\"
+}
+
 #Copy PHP configuration file to expected location
 cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
 
