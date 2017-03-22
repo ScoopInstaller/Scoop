@@ -979,13 +979,3 @@ function persist_data($manifest) {
         }
     }
 }
-
-# travelling directories have their contents moved from
-# $from to $to when the app is updated.
-# any files or directories that already exist in $to are skipped
-function travel_dir($from, $to) {
-    $skip_dirs = ls $to -dir | % { "`"$from\$_`"" }
-    $skip_files = ls $to -file | % { "`"$from\$_`"" }
-
-    robocopy $from $to /s /move /xd $skip_dirs /xf $skip_files > $null
-}

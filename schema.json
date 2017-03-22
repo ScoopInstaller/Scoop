@@ -376,10 +376,6 @@
             },
             "type": "object"
         },
-        "travel_dirs": {
-            "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "Undocumented: only found in scoop-extras/kibana"
-        },
         "uninstaller": {
             "$ref": "#/definitions/uninstaller"
         },
