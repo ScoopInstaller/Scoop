@@ -32,7 +32,7 @@ function install_app($app, $architecture, $global, $suggested) {
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
-    $data_dir = ensure (appdatadir $app)
+    $data_dir = appdatadir $app
 
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
@@ -966,6 +966,8 @@ function persist_def($persist) {
 function persist_data($manifest) {
     $persist = $manifest.persist
     if($persist) {
+        ensure $data_dir
+
         if ($persist -is [String]) {
             $persist = @($persist);
         }
