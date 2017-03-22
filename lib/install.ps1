@@ -980,11 +980,17 @@ function persist_data($manifest) {
             $source = "$original_dir\$source"
             $target = "$data_dir\$target"
 
+            # TODO test with files
             if (!(test-path $target)) {
                 # If we do not have data in the store we move the original
-                movedir $source $target # TODO check if file work too
-            } else {
-                # move original (keep a copy)
+                if (test-path $source) {
+                    movedir $source $target
+                } else {
+                    # if there is no source we create an empty directory
+                    ensure $target
+                }
+            } elseif (test-path $source) {
+                # (re)move original (keep a copy)
                 movedir $source "$source.original"
             }
 
