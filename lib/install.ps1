@@ -948,6 +948,21 @@ function show_suggestions($suggested) {
 }
 
 # Persistent data
+function persist_def($persist) {
+    if ($persist -is [Array]) {
+        $source = $persist[0]
+        $target = $persist[1]
+    } else {
+        $source = $persist
+    }
+
+    if (!$target) {
+        $target = fname($source)
+    }
+
+    return $source, $target
+}
+
 function persist_data($manifest) {
     $persist = $manifest.persist
     if($persist) {
@@ -957,14 +972,12 @@ function persist_data($manifest) {
 
         write-host "Persisting data..."
         $persist | % {
-            # TODO implement [from, to]
-            $source_name = $_
-            $target_name = fname($_)
+            $source, $target = persist_def $_
 
-            Write-Host -ForegroundColor Red $source_name $target_name
+            # add base paths
+            $source = "$original_dir\$source"
+            $target = "$data_dir\$target"
 
-            $source = "$original_dir\$source_name"
-            $target = "$data_dir\$target_name"
             if (!(test-path $target)) {
                 # If we do not have data in the store we move the original
                 movedir $source $target # TODO check if file work too

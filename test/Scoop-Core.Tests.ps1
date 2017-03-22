@@ -215,3 +215,34 @@ describe 'app' {
         $bucket | should be "test-bucket"
     }
 }
+
+describe 'persist_def' {
+    it 'parses string correctly' {
+        $source, $target = persist_def "test"
+        $source | Should be "test"
+        $target | Should be "test"
+    }
+
+    it 'should strip directories of source for target' {
+        $source, $target = persist_def "foo/bar"
+        $source | Should be "foo/bar"
+        $target | Should be "bar"
+    }
+
+    it 'should handle arrays' {
+        # both specified
+        $source, $target = persist_def @("foo", "bar")
+        $source | Should be "foo"
+        $target | Should be "bar"
+
+        # only first specified
+        $source, $target = persist_def @("foo")
+        $source | Should be "foo"
+        $target | Should be "foo"
+
+        # null value specified
+        $source, $target = persist_def @("foo", $null)
+        $source | Should be "foo"
+        $target | Should be "foo"
+    }
+}
