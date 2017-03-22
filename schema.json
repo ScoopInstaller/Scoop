@@ -298,6 +298,9 @@
         "bin": {
             "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
         },
+        "persist": {
+            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+        },
         "checkver": {
             "$ref": "#/definitions/checkver"
         },
