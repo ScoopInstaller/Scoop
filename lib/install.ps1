@@ -164,20 +164,8 @@ function dl($url, $to, $cookies, $progress) {
 
     if ($progress -and ($total -gt 0)) {
         [console]::CursorVisible = $false
-        function dl_onProgress($read, $last) {
-            # get datetime now
-            $now = [System.DateTime]::Now;
-            # subtract from last datetime
-            $delta = $now - $last;
-
-            # output progress only every 100ms
-            if ($delta.TotalMilliseconds -gt 100) {
-                dl_progress $read $total $url
-
-                return $now;
-            }
-
-            return $last;
+        function dl_onProgress($read) {
+            dl_progress $read $total $url
         }
     } else {
         write-host "Downloading $url ($(filesize $total))..."
@@ -191,17 +179,19 @@ function dl($url, $to, $cookies, $progress) {
         $fs = [io.file]::openwrite($to)
         $buffer = new-object byte[] 2048
         $totalRead = 0
+        $sw = [diagnostics.stopwatch]::StartNew()
 
-        # print starting progress
-        $last = dl_onProgress $totalRead ([DateTime]::MinValue)
+        dl_onProgress $totalRead
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
-
-            $last = dl_onProgress $totalRead $last
+            if ($sw.elapsedmilliseconds -gt 100) {
+                $sw.restart()
+                dl_onProgress $totalRead
+            }
         }
-        # make sure we print ending progress
-        dl_onProgress $totalRead ([DateTime]::MinValue)
+        $sw.stop()
+        dl_onProgress $totalRead
     } finally {
         if ($progress) {
             [console]::CursorVisible = $true
@@ -269,9 +259,9 @@ function dl_progress_output($url, $read, $total, $console) {
 
 function dl_progress($read, $total, $url) {
     $console = $host.UI.RawUI;
-    $left    = $console.CursorPosition.X;
-    $top     = $console.CursorPosition.Y;
-    $width   = $console.BufferSize.Width;
+    $left  = $console.CursorPosition.X;
+    $top   = $console.CursorPosition.Y;
+    $width = $console.BufferSize.Width;
 
     if($read -eq 0) {
         $maxOutputLength = $(dl_progress_output $url 100 $total $console).length
