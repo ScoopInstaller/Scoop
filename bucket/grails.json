@@ -1,10 +1,10 @@
 {
     "homepage": "https://grails.org/",
-    "version": "3.2.7",
+    "version": "3.2.8",
     "license": "Apache 2.0",
-    "url": "https://github.com/grails/grails-core/releases/download/v3.2.7/grails-3.2.7.zip",
-    "hash": "781f19ab03578c5b045f40b0a37a225c9ab82445fad8e08f5e304789311cb5b3",
-    "extract_dir": "grails-3.2.7",
+    "url": "https://github.com/grails/grails-core/releases/download/v3.2.8/grails-3.2.8.zip",
+    "hash": "8412963af6b423e37ab075ad63db5f80d7da3191f4972db0bfc01d4937c70b65",
+    "extract_dir": "grails-3.2.8",
     "bin": [
         "bin\\grails.bat"
     ],
