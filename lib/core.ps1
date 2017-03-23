@@ -75,7 +75,7 @@ function installed_apps($global) {
 # paths
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
-function strip_filename($path) { $path -replace (fname $path) }
+function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
