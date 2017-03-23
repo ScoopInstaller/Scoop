@@ -179,14 +179,19 @@ function dl($url, $to, $cookies, $progress) {
         $fs = [io.file]::openwrite($to)
         $buffer = new-object byte[] 2048
         $totalRead = 0
+        $sw = [diagnostics.stopwatch]::StartNew()
 
         dl_onProgress $totalRead
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
-
-            dl_onProgress $totalRead
+            if ($sw.elapsedmilliseconds -gt 100) {
+                $sw.restart()
+                dl_onProgress $totalRead
+            }
         }
+        $sw.stop()
+        dl_onProgress $totalRead
     } finally {
         if ($progress) {
             [console]::CursorVisible = $true
