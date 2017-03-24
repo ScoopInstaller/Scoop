@@ -152,7 +152,13 @@ function shim($path, $global, $name, $arg) {
     $relpath = resolve-path -relative $path
     popd
 
-    echo "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
+    # if $path points to another drive resolve-path prepends .\ which could break shims
+    if($relpath -match "^(.\\[\w]:).*$") {
+        echo "`$path = `"$path`"" | out-file $shim -encoding utf8
+    } else {
+        echo "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
+    }
+
     if($arg) {
         echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
     }
