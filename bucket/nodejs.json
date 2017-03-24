@@ -13,9 +13,10 @@
         }
     },
     "env_add_path": "nodejs",
+    "persist": "nodejs/node_modules",
     "post_install": "
 # Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
-rm $dir\\nodejs\\node_modules\\npm\\npmrc
+if(test-path $dir\\nodejs\\node_modules\\npm\\npmrc) { rm $dir\\nodejs\\node_modules\\npm\\npmrc }
 npm update -g",
     "checkver": {
         "url": "https://nodejs.org/en/download/current/",

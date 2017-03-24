@@ -966,19 +966,19 @@ function persist_def($persist) {
 function persist_data($manifest) {
     $persist = $manifest.persist
     if($persist) {
-        ensure $data_dir
+        $data_dir = ensure $data_dir
 
         if ($persist -is [String]) {
             $persist = @($persist);
         }
 
-        write-host "Persisting data..."
+        write-host "Persisting $persist"
         $persist | % {
             $source, $target = persist_def $_
 
             # add base paths
-            $source = "$original_dir\$source"
-            $target = "$data_dir\$target"
+            $source = "$(resolve-path $original_dir\$source)"
+            $target = fullpath "$data_dir\$target"
 
             # TODO test with files
             if (!(test-path $target)) {
@@ -997,6 +997,7 @@ function persist_data($manifest) {
             # create link
             # TODO use /h for files
             cmd /c "mklink /j $source $target" | out-null
+            attrib $source +R /L #
         }
     }
 }
