@@ -1,9 +1,9 @@
 {
     "homepage": "http://beyondgrep.com/",
     "license": "http://opensource.org/licenses/Artistic-2.0",
-    "version": "2.16",
-    "url": "http://beyondgrep.com/ack-2.16-single-file#/ack-single-file",
-    "hash": "7f39f08ebb78ed160a41293d7f42ff1bdcdaf57aee859bc4c4888bdf4abee7f2",
+    "version": "2.18",
+    "url": "http://beyondgrep.com/ack-2.18-single-file#/ack-single-file",
+    "hash": "6e41057c8f50f661d800099471f769209480efa53b8a886969d7ec6db60a2208",
     "bin": "ack.bat",
     "depends": "perl",
     "pre_install": "Set-Content -Value '@perl.exe %~dp0ack-single-file %*' -Path $dir\\ack.bat",
