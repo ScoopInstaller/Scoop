@@ -966,6 +966,7 @@ function persist_def($persist) {
         $target = $persist[1]
     } else {
         $source = $persist
+        $target = $null
     }
 
     if (!$target) {
