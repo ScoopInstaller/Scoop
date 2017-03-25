@@ -137,6 +137,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     env_rm $old_manifest $global
     # note: keep the old dir in case it contains user files
 
+    install_app $app $architecture $global $suggested
+<#
     "Installing '$app' ($version)"
     $dir = ensure (versiondir $app $version $global)
 
@@ -162,6 +164,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     success "'$app' was updated from $old_version to $version."
 
     show_notes $manifest
+#>
 }
 
 function ensure_all_installed($apps, $global) {
