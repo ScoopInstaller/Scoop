@@ -103,8 +103,10 @@ foreach($app in $apps) {
     if ($purge) {
         $data_dir = appdatadir $app
 
-        try { rm -r $data_dir -ea stop -force }
-        catch { abort "Couldn't remove '$(friendly_path $data_dir)'; it may be in use." }
+        if (Test-Path $data_dir) {
+            try { rm -r $data_dir -ea stop -force }
+            catch { abort "Couldn't remove '$(friendly_path $data_dir)'; it may be in use." }
+        }
     }
 
     success "'$app' was uninstalled."
