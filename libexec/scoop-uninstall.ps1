@@ -52,6 +52,8 @@ foreach($app in $apps) {
     "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
+    $data_dir = appdatadir $app
+
     try {
         test-path $dir -ea stop | out-null
     } catch [unauthorizedaccessexception] {

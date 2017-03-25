@@ -792,10 +792,21 @@ function find_dir_or_subdir($path, $dir) {
     return [string]::join(';', $fixed), $removed
 }
 
+function prepare_env_path ($path) {
+    if ($path -like '*$*') {
+        $path_dir = format $path @{ "dir" = $dir; "data_dir" = $data_dir }
+    } else {
+        $path_dir = "$dir\$($path)"
+    }
+
+    return $path_dir
+}
+
 function env_add_path($manifest, $dir, $global) {
     $manifest.env_add_path | ? { $_ } | % {
-        $path_dir = "$dir\$($_)"
-        if(!(is_in_dir $dir $path_dir)) {
+        $path_dir = prepare_env_path $_
+
+        if(!(is_in_dir $dir $path_dir) -and !(is_in_dir $data_dir $path_dir)) {
             abort "Error in manifest: env_add_path '$_' is outside the app directory."
         }
         add_first_in_path $path_dir $global
@@ -817,7 +828,8 @@ function add_first_in_path($dir, $global) {
 function env_rm_path($manifest, $dir, $global) {
     # remove from path
     $manifest.env_add_path | ? { $_ } | % {
-        $path_dir = "$dir\$($_)"
+        $path_dir = prepare_env_path $_
+
         remove_from_path $path_dir $global
     }
 }
@@ -826,7 +838,7 @@ function env_set($manifest, $dir, $global) {
     if($manifest.env_set) {
         $manifest.env_set | gm -member noteproperty | % {
             $name = $_.name;
-            $val = format $manifest.env_set.$($_.name) @{ "dir" = $dir }
+            $val = format $manifest.env_set.$($_.name) @{ "dir" = $dir; "data_dir" = $data_dir }
             env $name $global $val
             sc env:\$name $val
         }

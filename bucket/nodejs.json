@@ -12,11 +12,11 @@
             "hash": "2888f2303bcaa35f05b3dce7cbfee58af77dcea6bed4b9ff549b181c65eb4565"
         }
     },
-    "env_add_path": "nodejs",
+    "env_add_path": ["nodejs", "$data_dir"],
     "persist": "nodejs/node_modules",
     "post_install": "
-# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
-if(test-path $dir\\nodejs\\node_modules\\npm\\npmrc) { rm $dir\\nodejs\\node_modules\\npm\\npmrc }
+# Set npm prefix to install module inside $data_dir
+Set-Content -Value \"prefix=$data_dir\" -Path $data_dir\\node_modules\\npm\\npmrc
 npm update -g",
     "checkver": {
         "url": "https://nodejs.org/en/download/current/",
