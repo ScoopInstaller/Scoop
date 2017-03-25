@@ -132,6 +132,10 @@ function unzip_old($path,$to) {
     $shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
+function is_directory([String] $path) {
+    return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
+}
+
 function movedir($from, $to) {
     $from = $from.trimend('\')
     $to = $to.trimend('\')

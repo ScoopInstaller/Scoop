@@ -993,24 +993,26 @@ function persist_data($manifest) {
             $source = "$(resolve-path $original_dir\$source)"
             $target = fullpath "$data_dir\$target"
 
-            # TODO test with files
             if (!(test-path $target)) {
                 # If we do not have data in the store we move the original
                 if (test-path $source) {
-                    movedir $source $target
+                    Move-Item $source $target
                 } else {
                     # if there is no source we create an empty directory
                     ensure $target
                 }
             } elseif (test-path $source) {
                 # (re)move original (keep a copy)
-                movedir $source "$source.original"
+                Move-Item $source "$source.original"
             }
 
             # create link
-            # TODO use /h for files
-            cmd /c "mklink /j $source $target" | out-null
-            attrib $source +R /L #
+            if (is_directory $target) {
+                cmd /c "mklink /j $source $target" | out-null
+                attrib $source +R /L #
+            } else {
+                cmd /c "mklink /h $source $target" | out-null
+            }
         }
     }
 }

@@ -4,6 +4,23 @@
 
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 
+describe "is_directory" {
+    beforeall {
+        $working_dir = setup_working "is_directory"
+    }
+
+    it "is_directory recognize directories" {
+        is_directory "$working_dir\i_am_a_directory" | Should be $true
+    }
+    it "is_directory recognize files" {
+        is_directory "$working_dir\i_am_a_file.txt" | Should be $false
+    }
+
+    it "is_directory is falsey on unknown path" {
+        is_directory "$working_dir\i_do_not_exist" | Should be $false
+    }
+}
+
 describe "movedir" {
     $extract_dir = "subdir"
     $extract_to = $null
