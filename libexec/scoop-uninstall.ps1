@@ -52,7 +52,7 @@ foreach($app in $apps) {
     "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
-    $data_dir = appdatadir $app
+    $data_dir = appdatadir $app $global
 
     try {
         test-path $dir -ea stop | out-null
@@ -103,7 +103,7 @@ foreach($app in $apps) {
 
     # purge persistant data
     if ($purge) {
-        $data_dir = appdatadir $app
+        $data_dir = appdatadir $app $global
 
         if (Test-Path $data_dir) {
             try { rm -r $data_dir -ea stop -force }

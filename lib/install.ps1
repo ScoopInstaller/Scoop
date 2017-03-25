@@ -32,7 +32,7 @@ function install_app($app, $architecture, $global, $suggested) {
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
-    $data_dir = appdatadir $app
+    $data_dir = appdatadir $app $global
 
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
