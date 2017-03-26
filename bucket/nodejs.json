@@ -12,11 +12,11 @@
             "hash": "2888f2303bcaa35f05b3dce7cbfee58af77dcea6bed4b9ff549b181c65eb4565"
         }
     },
-    "env_add_path": ["nodejs", "$data_dir"],
+    "env_add_path": ["nodejs", "$persist_dir"],
     "persist": "nodejs/node_modules",
     "post_install": "
-# Set npm prefix to install module inside $data_dir
-Set-Content -Value \"prefix=$data_dir\" -Path $data_dir\\node_modules\\npm\\npmrc
+# Set npm prefix to install module inside $persist_dir
+Set-Content -Value \"prefix=$persist_dir\" -Path $persist_dir\\node_modules\\npm\\npmrc
 npm update -g",
     "checkver": {
         "url": "https://nodejs.org/en/download/current/",

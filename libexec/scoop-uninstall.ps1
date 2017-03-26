@@ -52,7 +52,7 @@ foreach($app in $apps) {
     "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
-    $data_dir = appdatadir $app $global
+    $persist_dir = persistdir $app $global
 
     try {
         test-path $dir -ea stop | out-null
@@ -103,11 +103,11 @@ foreach($app in $apps) {
 
     # purge persistant data
     if ($purge) {
-        $data_dir = appdatadir $app $global
+        $persist_dir = persistdir $app $global
 
-        if (Test-Path $data_dir) {
-            try { rm -r $data_dir -ea stop -force }
-            catch { abort "Couldn't remove '$(friendly_path $data_dir)'; it may be in use." }
+        if (Test-Path $persist_dir) {
+            try { rm -r $persist_dir -ea stop -force }
+            catch { abort "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use." }
         }
     }
 

@@ -29,7 +29,7 @@
         "php-cgi.exe"
     ],
     "env_set": {
-        "PHP_INI_SCAN_DIR": "$data_dir\\conf"
+        "PHP_INI_SCAN_DIR": "$persist_dir\\conf"
     },
     "post_install": "
 #Copy PHP configuration file to expected location

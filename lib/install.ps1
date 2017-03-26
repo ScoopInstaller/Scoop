@@ -32,7 +32,7 @@ function install_app($app, $architecture, $global, $suggested) {
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
-    $data_dir = appdatadir $app $global
+    $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
@@ -794,7 +794,7 @@ function find_dir_or_subdir($path, $dir) {
 
 function prepare_env_path ($path) {
     if ($path -like '*$*') {
-        $path_dir = format $path @{ "dir" = $dir; "data_dir" = $data_dir }
+        $path_dir = format $path @{ "dir" = $dir; "persist_dir" = $persist_dir }
     } else {
         $path_dir = "$dir\$($path)"
     }
@@ -806,7 +806,7 @@ function env_add_path($manifest, $dir, $global) {
     $manifest.env_add_path | ? { $_ } | % {
         $path_dir = prepare_env_path $_
 
-        if(!(is_in_dir $dir $path_dir) -and !(is_in_dir $data_dir $path_dir)) {
+        if(!(is_in_dir $dir $path_dir) -and !(is_in_dir $persist_dir $path_dir)) {
             abort "Error in manifest: env_add_path '$_' is outside the app directory."
         }
         add_first_in_path $path_dir $global
@@ -838,7 +838,7 @@ function env_set($manifest, $dir, $global) {
     if($manifest.env_set) {
         $manifest.env_set | gm -member noteproperty | % {
             $name = $_.name;
-            $val = format $manifest.env_set.$($_.name) @{ "dir" = $dir; "data_dir" = $data_dir }
+            $val = format $manifest.env_set.$($_.name) @{ "dir" = $dir; "persist_dir" = $persist_dir }
             env $name $global $val
             sc env:\$name $val
         }
@@ -979,7 +979,7 @@ function persist_def($persist) {
 function persist_data($manifest) {
     $persist = $manifest.persist
     if($persist) {
-        $data_dir = ensure $data_dir
+        $persist_dir = ensure $persist_dir
 
         if ($persist -is [String]) {
             $persist = @($persist);
@@ -991,7 +991,7 @@ function persist_data($manifest) {
 
             # add base paths
             $source = "$(resolve-path $original_dir\$source)"
-            $target = fullpath "$data_dir\$target"
+            $target = fullpath "$persist_dir\$target"
 
             if (!(test-path $target)) {
                 # If we do not have data in the store we move the original
