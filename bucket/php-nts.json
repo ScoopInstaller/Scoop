@@ -4,19 +4,40 @@
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.1.3-Win32-VC14-x64.zip",
-            "hash": "sha1:383c79286a3ab143388d12ba89a9e3418796fa4f"
+            "url": [
+                "http://windows.php.net/downloads/releases/php-7.1.3-nts-Win32-VC14-x64.zip",
+                "https://r15ch13.keybase.pub/vcredist/2017/x64/vcruntime140.dll"
+            ],
+            "hash": [
+                "sha1:4000132114cecdec82c83b09aed6a962ed928e0b",
+                "56de253172b2ff70ba89cc0544e09c6dd34d6793231c09aa6dfaac755535f45f"
+            ]
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.1.3-Win32-VC14-x86.zip",
-            "hash": "sha1:eb751a2341dd2f7fea6e658368c86f7689c3a716"
+            "url": [
+                "http://windows.php.net/downloads/releases/php-7.1.3-nts-Win32-VC14-x86.zip",
+                "https://r15ch13.keybase.pub/vcredist/2017/x86/vcruntime140.dll"
+            ],
+            "hash": [
+                "sha1:d7089c0d342a663ffea1a4e5973ef55b3b4b8ba8",
+                "cdc006fc80c4437d009b8c72008a443a9ee5bce383d8b3dc16aeec0e081cfe32"
+            ]
         }
     },
     "bin": [
         "php.exe",
         "php-cgi.exe"
     ],
-    "post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
+    "env_set": {
+        "PHP_INI_SCAN_DIR": "$dir\\..\\conf"
+    },
+    "post_install": "
+#Copy PHP configuration file to expected location
+cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
+
+#Enable extensions to be found in installation-relative folder (the default is to search C:/php)
+(gc \"$dir\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\php.ini\"
+",
     "checkver": {
         "url": "http://windows.php.net/download/",
         "re": "<h3 id=\"php-7.1\".*?>.*?\\(([\\d.]+)\\)</h3>"
@@ -24,10 +45,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x64.zip"
+                "url": "http://windows.php.net/downloads/releases/php-$version-nts-Win32-VC14-x64.zip"
             },
             "32bit": {
-                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x86.zip"
+                "url": "http://windows.php.net/downloads/releases/php-$version-nts-Win32-VC14-x86.zip"
             }
         },
         "hash": {
