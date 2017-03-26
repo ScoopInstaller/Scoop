@@ -32,6 +32,12 @@
         "PHP_INI_SCAN_DIR": "$persist_dir\\conf"
     },
     "post_install": "
+#Copy ini scan dir from old location before persistant update
+if ((Test-Path \"$dir\\..\\conf\") -and !(Test-Path \"$persist_dir\\conf\")) {
+    Write-Host -ForegroundColor Cyan 'We are moving your php configuration to scoop/persist/php/conf'
+    Move-Item \"$dir\\..\\conf\" \"$persist_dir\\conf\"
+}
+
 #Copy PHP configuration file to expected location
 cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
 
