@@ -6,6 +6,8 @@ TODO
 #>
 . "$psscriptroot\..\lib\json.ps1"
 
+$Enumerable = [System.Linq.Enumerable]
+
 function substitute([String] $str, [Hashtable] $params) {
     $params.GetEnumerator() | % {
         $str = $str.Replace($_.Name, $_.Value)
@@ -15,12 +17,15 @@ function substitute([String] $str, [Hashtable] $params) {
 }
 
 function check_url([String] $url) {
-    if ($url.Contains("github.com") -or
-        $url.Contains("nuget.org") -or
-        $url.Contains("chocolatey.org") -or
-        $url.Contains("bitbucket.org")) {
+    $blacklist   = [string[]]@("github.com", "nuget.org", "chocolately.org", "bitbucket.org", "yarnpkg.com")
+    $blacklisted = $Enumerable::Any(
+        $blacklist,
+        [Func[string, bool]]{ Param($h) $url.Contains($h) }
+    )
+
+    if ($blacklisted) {
         # github does not allow HEAD requests
-        warn "Unable to check github/nuget/chocolatey/bitbucket url (assuming it is ok)"
+        warn "Unable to check $(($blacklist | ForEach-Object { ($_ -split '\.')[0] }) -join '/') url (assuming it is ok)"
         return $true
     }
 
