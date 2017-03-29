@@ -739,6 +739,7 @@ function link_current($versiondir) {
     }
 
     cmd /c mklink /j $currentdir $versiondir | out-null
+    attrib $currentdir +R /L
     return $currentdir
 }
 
@@ -754,11 +755,14 @@ function unlink_current($versiondir) {
     if(test-path $currentdir) {
         write-host "Unlinking $(friendly_path $currentdir)"
 
+        # remove read-only attribute on link
+        attrib $currentdir -R /L
+
         # remove the junction
         cmd /c rmdir $currentdir
         return $currentdir
     }
-    return $appdir
+    return $versiondir
 }
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead
@@ -985,12 +989,13 @@ function persist_data($manifest) {
             $persist = @($persist);
         }
 
-        write-host "Persisting $persist"
         $persist | % {
             $source, $target = persist_def $_
 
+            write-host "Persisting $source"
+
             # add base paths
-            $source = "$(resolve-path $original_dir\$source)"
+            $source = fullpath "$dir\$source"
             $target = fullpath "$persist_dir\$target"
 
             if (!(test-path $target)) {
@@ -999,7 +1004,7 @@ function persist_data($manifest) {
                     Move-Item $source $target
                 } else {
                     # if there is no source we create an empty directory
-                    ensure $target
+                    $target = ensure $target
                 }
             } elseif (test-path $source) {
                 # (re)move original (keep a copy)
@@ -1009,7 +1014,7 @@ function persist_data($manifest) {
             # create link
             if (is_directory $target) {
                 cmd /c "mklink /j $source $target" | out-null
-                attrib $source +R /L #
+                attrib $source +R /L
             } else {
                 cmd /c "mklink /h $source $target" | out-null
             }
