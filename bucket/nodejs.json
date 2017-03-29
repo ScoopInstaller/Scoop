@@ -1,15 +1,15 @@
 {
     "homepage": "http://nodejs.org",
-    "version": "7.7.4",
+    "version": "7.8.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v7.7.4/node-v7.7.4-x64.msi",
-            "hash": "55738bb03d48318fe505847eb4675debe8bf90adb1a572ad018b10702ea40819"
+            "url": "https://nodejs.org/dist/v7.8.0/node-v7.8.0-x64.msi",
+            "hash": "f66a1774086f31e6e9480f6dd67e31f1853a58d26970a19672b40ba0b318a442"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v7.7.4/node-v7.7.4-x86.msi",
-            "hash": "2888f2303bcaa35f05b3dce7cbfee58af77dcea6bed4b9ff549b181c65eb4565"
+            "url": "https://nodejs.org/dist/v7.8.0/node-v7.8.0-x86.msi",
+            "hash": "0eda7b5dabd72865f96985d5ef0ad7048df87a79ff52a77b352ca293f52e2930"
         }
     },
     "extract_dir": "nodejs",

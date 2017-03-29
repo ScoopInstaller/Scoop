@@ -1,11 +1,11 @@
 {
     "homepage": "https://www.mongodb.org",
-    "version": "3.4.2",
+    "version": "3.4.3",
     "license": "https://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.4.2-signed.msi",
-            "hash": "ff8a4226de8a8d766ae0713dd94663e965cc0505540026e2483cb6351a55eb23"
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.4.3-signed.msi",
+            "hash": "b7c181e12b8261c1df341458efcda905ed95c962165fdd2ebd0eb32f0baa1328"
         }
     },
     "bin": [
@@ -23,13 +23,20 @@
         "MongoDB\\Server\\3.4\\bin\\mongostat.exe",
         "MongoDB\\Server\\3.4\\bin\\mongotop.exe"
     ],
-    "checkver": {
-        "url": "https://www.mongodb.com/download-center",
-        "re": "Current Stable Release \\(([\\d.]+)\\)"
-    },
     "post_install": "
         # create initial directories
         mkdir C:\\data
         mkdir C:\\data\\db
-    "
+    ",
+    "checkver": {
+        "url": "https://www.mongodb.com/download-center",
+        "re": "Current Stable Release \\(([\\d.]+)\\)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-$version-signed.msi"
+            }
+        }
+    }
 }
