@@ -39,8 +39,14 @@
         "PHP_INI_SCAN_DIR": "$dir\\cli;$dir\\cli\\conf.d;"
     },
     "post_install": "
+# Copy ini scan dir from old location before persistent update
+if ((Test-Path \"$dir\\..\\conf\") -and !(Test-Path \"$dir\\cli\\conf.d\")) {
+    Write-Host -ForegroundColor Cyan \"We are moving your php configuration to $dir\\cli\\conf.d\"
+    Move-Item \"$dir\\..\\conf\" \"$dir\\cli\\conf.d\"
+}
+
 # Create directory for custom PHP configuration
-if(!(Test-Path \"$dir\\cli\\conf.d\")) {
+if (!(Test-Path \"$dir\\cli\\conf.d\")) {
     (New-Item -Type directory \"$dir\\cli\\conf.d\") | Out-Null
 }
 
