@@ -48,7 +48,7 @@ function install_app($app, $architecture, $global, $suggested) {
     env_set $manifest $dir $global
 
     # persist data
-    persist_data $manifest
+    persist_data $manifest $original_dir $persist_dir
 
     # env_ensure_home $manifest $global (see comment for env_ensure_home)
     post_install $manifest $architecture
@@ -980,7 +980,7 @@ function persist_def($persist) {
     return $source, $target
 }
 
-function persist_data($manifest) {
+function persist_data($manifest, $original_dir, $persist_dir) {
     $persist = $manifest.persist
     if($persist) {
         $persist_dir = ensure $persist_dir
