@@ -135,8 +135,16 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     rm_shims $old_manifest $global $architecture
     env_rm_path $old_manifest $dir $global
     env_rm $old_manifest $global
+
+    # If a junction was used during install, that will have been used
+    # as the reference directory. Otherwise it will just be the version
+    # directory.
+    $refdir = unlink_current $dir
+
     # note: keep the old dir in case it contains user files
 
+    install_app $app $architecture $global $suggested
+<#
     "Installing '$app' ($version)"
     $dir = ensure (versiondir $app $version $global)
 
@@ -162,6 +170,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     success "'$app' was updated from $old_version to $version."
 
     show_notes $manifest
+#>
 }
 
 function ensure_all_installed($apps, $global) {

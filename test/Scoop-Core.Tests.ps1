@@ -4,6 +4,23 @@
 
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 
+describe "is_directory" {
+    beforeall {
+        $working_dir = setup_working "is_directory"
+    }
+
+    it "is_directory recognize directories" {
+        is_directory "$working_dir\i_am_a_directory" | Should be $true
+    }
+    it "is_directory recognize files" {
+        is_directory "$working_dir\i_am_a_file.txt" | Should be $false
+    }
+
+    it "is_directory is falsey on unknown path" {
+        is_directory "$working_dir\i_do_not_exist" | Should be $false
+    }
+}
+
 describe "movedir" {
     $extract_dir = "subdir"
     $extract_to = $null
@@ -213,5 +230,36 @@ describe 'app' {
         $app, $bucket = app $query
         $app | should be "test-app"
         $bucket | should be "test-bucket"
+    }
+}
+
+describe 'persist_def' {
+    it 'parses string correctly' {
+        $source, $target = persist_def "test"
+        $source | Should be "test"
+        $target | Should be "test"
+    }
+
+    it 'should strip directories of source for target' {
+        $source, $target = persist_def "foo/bar"
+        $source | Should be "foo/bar"
+        $target | Should be "bar"
+    }
+
+    it 'should handle arrays' {
+        # both specified
+        $source, $target = persist_def @("foo", "bar")
+        $source | Should be "foo"
+        $target | Should be "bar"
+
+        # only first specified
+        $source, $target = persist_def @("foo")
+        $source | Should be "foo"
+        $target | Should be "foo"
+
+        # null value specified
+        $source, $target = persist_def @("foo", $null)
+        $source | Should be "foo"
+        $target | Should be "foo"
     }
 }
