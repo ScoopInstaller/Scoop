@@ -28,15 +28,19 @@
         "php.exe",
         "php-cgi.exe"
     ],
+    "persist": [
+        "conf",
+        [
+            "php.ini-production",
+            "conf\\php.ini"
+        ]
+    ],
     "env_set": {
-        "PHP_INI_SCAN_DIR": "$dir\\..\\conf"
+        "PHP_INI_SCAN_DIR": "$dir\\conf"
     },
     "post_install": "
-#Copy PHP configuration file to expected location
-cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
-
-#Enable extensions to be found in installation-relative folder (the default is to search C:/php)
-(gc \"$dir\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\php.ini\"
+# Enable extensions to be found in installation-relative folder (the default is to search C:/php)
+(gc \"$dir\\conf\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\conf\\php.ini\"
 ",
     "checkver": {
         "url": "http://windows.php.net/download/",
