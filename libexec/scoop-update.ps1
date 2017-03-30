@@ -98,7 +98,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     $check_hash = $true
 
     # re-use architecture, bucket and url from first install
-    $architecture = $install.architecture
+    $architecture = ensure_architecture $install.architecture
     $bucket = $install.bucket
     $url = $install.url
 
