@@ -62,18 +62,24 @@ if($apps.length -eq 1) {
 }
 
 # get any specific versions that we need to handle first
-$specific_version_regex = '^([\w\-]+)@(.+)$'
-$specific_versions = $apps | Where-Object { $_ -match $specific_version_regex }
-$difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
+$specific_versions = $apps | Where-Object { is_app_with_specific_version $_ }
+if ($specific_versions.length -gt 0) {
+    $difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
+} else {
+    $difference = $apps
+}
+
 $specific_versions_paths = $specific_versions | ForEach-Object {
-    $_ -match $specific_version_regex | Out-Null
-    $app, $version = $matches[1], $matches[2]
+    $appWithVersion = get_app_with_version $_
+    $name           = $appWithVersion.app
+    $version        = $appWithVersion.version
 
     # this returns an array for some reason
     # someone tell me why because it was driving me nuts
-    $(generate_user_manifest $app $version)[1]
+    $path = generate_user_manifest $name $version
+    if ($path[1]) { $path[1] } else { $path }
 }
-$apps = $specific_versions_paths + $difference
+$apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-Object -Unique)
 
 # remember which were explictly requested so that we can
 # differentiate after dependencies are added

@@ -17,13 +17,27 @@ reset_aliases
 
 if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
+$appWithVersion = get_app_with_version $app
+$app            = $appWithVersion.app;
+$version        = $appWithVersion.version;
+
+
 if(!(installed $app)) { abort "'$app' isn't installed" }
 
-$version = current_version $app
+if ($version -eq 'latest') {
+    $version = current_version $app
+}
+
+$manifest = installed_manifest $app $version
+# if this is null we know the version they're resetting to
+# is not installed
+if ($manifest -eq $null) {
+    abort "'$app ($version)' isn't installed"
+}
+
 "Resetting $app ($version)."
 
 $dir = resolve-path (versiondir $app $version)
-$manifest = installed_manifest $app $version
 
 $install = install_info $app $version
 $architecture = $install.architecture

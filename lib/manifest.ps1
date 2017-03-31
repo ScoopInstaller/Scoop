@@ -67,7 +67,7 @@ function arch_specific($prop, $manifest, $architecture) {
 function generate_user_manifest($app, $version) {
     $path = $null
 
-    $null, $manifest, $null, $null = locate $app
+    $null, $manifest, $bucket, $null = locate $app
     if (!("$($manifest.version)" -eq "$version")) {
         warn "Given version ($version) does not match manifest ($($manifest.version))"
         warn "Attempting to generate manifest for '$app' ($version)"
@@ -80,6 +80,8 @@ function generate_user_manifest($app, $version) {
         autoupdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(New-Object HashTable)
 
         $path = "$(resolve-path $(usermanifest $app))"
+    } else {
+        manifest_path $app $bucket
     }
 
     $path
