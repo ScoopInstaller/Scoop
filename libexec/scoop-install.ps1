@@ -63,6 +63,8 @@ if($apps.length -eq 1) {
 
 # get any specific versions that we need to handle first
 $specific_versions = $apps | Where-Object { is_app_with_specific_version $_ }
+
+# compare object does not like nulls
 if ($specific_versions.length -gt 0) {
     $difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
 } else {
@@ -73,6 +75,10 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
     $appWithVersion = get_app_with_version $_
     $name           = $appWithVersion.app
     $version        = $appWithVersion.version
+
+    if (installed_manifest $name $version) {
+        abort "'$name' ($version) is already installed.`nUse 'scoop update $name$global_flag' to install a new version."
+    }
 
     # this returns an array for some reason
     # someone tell me why because it was driving me nuts
