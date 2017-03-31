@@ -1,5 +1,5 @@
 {
-    "homepage": "http://www.gradle.org",
+    "homepage": "https://gradle.org",
     "version": "3.4.1",
     "license": "Apache 2.0",
     "hash": "db1db193d479cc1202be843f17e4526660cfb0b21b57d62f3a87f88c878af9b2",
@@ -13,7 +13,7 @@
         ]
     },
     "checkver": {
-        "url": "https://gradle.org/gradle-download/",
+        "url": "https://gradle.org/install",
         "re": "The current Gradle release is version ([\\d.]+)"
     },
     "autoupdate": {
