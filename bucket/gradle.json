@@ -1,10 +1,10 @@
 {
     "homepage": "https://gradle.org",
-    "version": "3.4.1",
+    "version": "3.5",
     "license": "Apache 2.0",
     "hash": "db1db193d479cc1202be843f17e4526660cfb0b21b57d62f3a87f88c878af9b2",
-    "url": "https://services.gradle.org/distributions/gradle-3.4.1-bin.zip",
-    "extract_dir": "gradle-3.4.1",
+    "url": "https://services.gradle.org/distributions/gradle-3.5-bin.zip",
+    "extract_dir": "gradle-3.5",
     "bin": "bin\\gradle.bat",
     "suggest": {
         "JDK": [
