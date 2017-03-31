@@ -14,27 +14,6 @@ function substitute([String] $str, [Hashtable] $params) {
     return $str
 }
 
-function check_url([String] $url) {
-    if ($url.Contains("github.com") -or
-        $url.Contains("nuget.org") -or
-        $url.Contains("chocolatey.org") -or
-        $url.Contains("bitbucket.org")) {
-        # github does not allow HEAD requests
-        warn "Unable to check github/nuget/chocolatey/bitbucket url (assuming it is ok)"
-        return $true
-    }
-
-    try {
-        $response = Invoke-WebRequest -Uri $url -Method HEAD -Headers @{'Referer' = strip_filename $url}
-        return ($response -and $response.StatusCode.Equals(200)) # redirects might be ok
-    } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
-    }
-
-    return $false
-}
-
 function find_hash_in_rdf([String] $url, [String] $filename) {
     Write-Host -f DarkYellow "RDF URL: $url"
     Write-Host -f DarkYellow "File: $filename"
@@ -229,10 +208,8 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
 
     if ($json.url) {
         # create new url
-        $url = substitute $json.autoupdate.url $substitutions
-
-        # check url
-        $valid = check_url $url
+        $url   = substitute $json.autoupdate.url $substitutions
+        $valid = $true
 
         if($valid) {
             # create hash
@@ -257,10 +234,8 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             $architecture = $_.Name
 
             # create new url
-            $url = substitute (arch_specific "url" $json.autoupdate $architecture) $substitutions
-
-            # check url
-            $valid = check_url $url
+            $url   = substitute (arch_specific "url" $json.autoupdate $architecture) $substitutions
+            $valid = $true
 
             if($valid) {
                 # create hash
