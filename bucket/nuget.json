@@ -7,7 +7,7 @@
     "bin": "NuGet.exe",
     "checkver": {
         "url": "https://dist.nuget.org/index.json",
-        "re": "latest\", \"version\": \"([\\d.]+)\""
+        "jp": "$.artifacts[0].versions[0].version"
     },
     "autoupdate": {
         "url": "https://dist.nuget.org/win-x86-commandline/v$version/NuGet.exe"

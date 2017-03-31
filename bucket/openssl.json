@@ -1,23 +1,37 @@
 {
-    "homepage": "http://slproweb.com/products/Win32OpenSSL.html",
-    "version": "1.1.0d",
+    "homepage": "https://slproweb.com/products/Win32OpenSSL.html",
+    "version": "1.1.0e",
     "license": "https://www.openssl.org/source/license.html",
-    "_comment": "Hashes at https://slproweb.com/download/win32_openssl_hashes.json",
     "architecture": {
         "64bit": {
-            "url": "https://slproweb.com/download/Win64OpenSSL-1_1_0d.exe",
-            "hash": "71b4a8c2debfb91b13c9cb602af259eba07396e7b950962690a7af527b2cb3a3"
+            "url": "https://slproweb.com/download/Win64OpenSSL-1_1_0e.exe",
+            "hash": "c9359a2954555a1e8c5dd285a52e975857e72ab871e6fcba075744eb6840dde8"
         },
         "32bit": {
-            "url": "https://slproweb.com/download/Win32OpenSSL-1_1_0d.exe",
-            "hash": "18646d225c37d1f7b18d4b58a9a3337749b51955259e0ce162fe94aab208f311"
+            "url": "https://slproweb.com/download/Win32OpenSSL-1_1_0e.exe",
+            "hash": "fbeec08d6f642faa518ff22db854da7572586ea51bd094b86b61d21c69f3531a"
         }
     },
     "innosetup": true,
     "bin": "bin\\openssl.exe",
-    "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^\\s]+)</a>",
     "env_add_path": "bin",
-     "env_set": {
+    "env_set": {
         "OPENSSL_CONF": "$dir\\bin\\cnf\\openssl.cnf"
+    },
+    "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^\\s]+)</a>",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://slproweb.com/download/Win64OpenSSL-$underscoreVersion.exe"
+            },
+            "32bit": {
+                "url": "https://slproweb.com/download/Win32OpenSSL-$underscoreVersion.exe"
+            }
+        },
+        "hash": {
+            "mode": "json",
+            "jp": "$.files.$basename.sha256",
+            "url": "https://slproweb.com/download/win32_openssl_hashes.json"
+        }
     }
 }

@@ -9,19 +9,20 @@ reset_aliases
 
 if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 
-try { $gcm = gcm "$command.ps1" -ea stop } catch { }
+try { $gcm = gcm "$command" -ea stop } catch { } #
 if(!$gcm) { [console]::error.writeline("'$command' not found"); exit 3 }
 
 $path = "$($gcm.path)"
 $usershims = "$(resolve-path $(shimdir $false))"
 $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
 
-if($path -like "$usershims*" -or $path -like "$globalshims*") {
+if($path.endswith(".ps1") -and ($path -like "$usershims*" -or $path -like "$globalshims*")) {
     $shimtext = gc $path
 
     $exepath = ($shimtext |? { $_.startswith('$path') }).split(' ') | select -Last 1 | iex
 
-    if (![system.io.path]::ispathrooted($exepath)) {
+    if(![system.io.path]::ispathrooted($exepath)) {
+        # Expand relative path
         $exepath = resolve-path (join-path (split-path $path) $exepath)
     }
 

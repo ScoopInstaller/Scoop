@@ -113,7 +113,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
         $null = ensure $cachedir
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
-    } else { write-host "Loading $url from cache..."}
+    } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
     if (!($to -eq $null)) {
         Copy-Item $cached $to
@@ -145,7 +145,7 @@ function do_dl($url, $to, $cookies) {
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
-        abort $e.message
+        throw $e
     } finally {
         set_https_protocols $original_protocols
     }
@@ -156,6 +156,7 @@ function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = 'Scoop/1.0'
+        $wreq.referer = strip_filename $url
         if($cookies) {
             $wreq.headers.add('Cookie', (cookie_header $cookies))
         }
@@ -164,7 +165,7 @@ function dl($url, $to, $cookies, $progress) {
     $wres = $wreq.getresponse()
     $total = $wres.ContentLength
 
-    if ($progress) {
+    if ($progress -and ($total -gt 0)) {
         [console]::CursorVisible = $false
         function dl_onProgress($read) {
             dl_progress $read $total $url
@@ -181,14 +182,19 @@ function dl($url, $to, $cookies, $progress) {
         $fs = [io.file]::openwrite($to)
         $buffer = new-object byte[] 2048
         $totalRead = 0
+        $sw = [diagnostics.stopwatch]::StartNew()
 
         dl_onProgress $totalRead
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
-
-            dl_onProgress $totalRead
+            if ($sw.elapsedmilliseconds -gt 100) {
+                $sw.restart()
+                dl_onProgress $totalRead
+            }
         }
+        $sw.stop()
+        dl_onProgress $totalRead
     } finally {
         if ($progress) {
             [console]::CursorVisible = $true
@@ -208,8 +214,15 @@ function url_filename($url) {
     (split-path $url -leaf).split('?') | Select-Object -First 1
 }
 
+# Unlike url_filename which can be tricked by appending a
+# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
+# this function extracts the original filename from the URL.
+function url_remote_filename($url) {
+    split-path (new-object uri $url).absolutePath -leaf
+}
+
 function dl_progress_output($url, $read, $total, $console) {
-    $filename = url_filename $url
+    $filename = url_remote_filename $url
 
     # calculate current percentage done
     $p = [math]::Round($read / $total * 100, 0)
@@ -296,7 +309,12 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
         }
         $fname = $data.$url.fname
 
-        dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+        try {
+            dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+        } catch {
+            write-host -f darkred $_
+            abort "URL $url is not valid"
+        }
     }
 
     foreach($url in $urls) {
@@ -422,7 +440,7 @@ function check_hash($file, $url, $manifest, $arch) {
         return $true
     }
 
-    write-host "Checking hash of $(url_filename $url)... " -nonewline
+    write-host "Checking hash of $(url_remote_filename $url)... " -nonewline
     $type, $expected = $hash.split(':')
     if(!$expected) {
         # no type specified, assume sha256
@@ -706,7 +724,7 @@ function link_current($versiondir) {
 
     $currentdir = current_dir $versiondir
 
-    write-host "Linking '$(friendly_path $currentdir)' => '$(friendly_path $versiondir)'."
+    write-host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
 
     if($currentdir -eq $versiondir) {
         abort "Error: Version 'current' is not allowed!"
@@ -731,7 +749,7 @@ function unlink_current($versiondir) {
     $currentdir = current_dir $versiondir
 
     if(test-path $currentdir) {
-        write-host "Unlinking '$(friendly_path $currentdir)'."
+        write-host "Unlinking $(friendly_path $currentdir)"
 
         # remove the junction
         cmd /c rmdir $currentdir
@@ -920,7 +938,7 @@ function show_suggestions($suggested) {
             }
 
             if(!$fulfilled) {
-                write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'"
+                write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
             }
         }
     }

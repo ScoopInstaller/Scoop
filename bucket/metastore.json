@@ -1,0 +1,13 @@
+{
+    "bin": "metastore.exe",
+    "checkver": {
+        "re": "/releases/tag/([a-f0-9]+)\"",
+        "url": "https://github.com/rasa/metastore/releases/latest"
+    },
+    "description": "Store and restore metadata from a filesystem",
+    "hash": "93394fa2c43f60155f811cfa7c718d85aa4d0b61a9ce3267075ded716fdc7025",
+    "homepage": "https://github.com/rasa/metastore",
+    "license": "GPL-2.0",
+    "url": "https://github.com/rasa/metastore/releases/download/95d4e2d/metastore.exe",
+    "version": "95d4e2d"
+}

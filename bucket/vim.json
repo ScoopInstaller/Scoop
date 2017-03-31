@@ -1,34 +1,46 @@
 {
-    "url": "http://www.vim.org",
+    "homepage": "http://www.vim.org",
     "license": "http://vimdoc.sourceforge.net/htmldoc/uganda.html#license",
-    "version": "8.0.069",
-    "url": [
-        "http://ftp.vim.org/pub/vim/pc/vim80-069w32.zip",
-        "http://ftp.vim.org/pub/vim/pc/vim80-069rt.zip",
-        "https://sourceforge.net/projects/gettext/files/libiconv-win32/1.9.1/libiconv-1.9.1.bin.woe32.zip",
-        "https://sourceforge.net/projects/gettext/files/gettext-win32/0.13.1/gettext-runtime-0.13.1.bin.woe32.zip",
-        "https://raw.github.com/lukesampson/psutils/3653063/vimtutor.ps1"
+    "version": "8.0.0529",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.0.0529/gvim_8.0.0529_x86.zip",
+            "hash": "42a0c4de4769c50cb611f3ba02cf30ccdea45835a025ea2c96fd96ab5d4ecda8"
+        },
+        "64bit": {
+            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.0.0529/gvim_8.0.0529_x64.zip",
+            "hash": "72744e9c223a4dc2ccb35da9ddf2570f56a97f7fb27fb630335b1e359fb21c8a"
+        }
+    },
+    "extract_dir": "vim\\vim80",
+    "bin": [
+        "vim.exe",
+        "gvim.exe"
     ],
-    "hash": [
-        "15D8CE633137822925056AF33E4BBB438E6C3603B6594897C51D3BE6542CAAB1",
-        "482B3AEF45C3731B205D7C5FE59E0CCA7542AAE9B447F46B4792B89F2F79E01E",
-        "c0aa25c4c16f297a262dbcfcac7bed95d2cb2dc39603eac10e5d79be50a562a3",
-        "68a49890f4469afebb24c28d2f1396f019607f3acc137963de0da789d93dc58f",
-        "f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498"
-    ],
-    "extract_dir": [ "vim\\vim80", "vim\\vim80", "bin", "bin" ],
-    "bin": [ "vim.exe", "vimtutor.ps1" ],
-    "post_install": "mv -force \"$dir\\intl.dll\" \"$dir\\libintl.dll\"
-        if(!(test-path ~\\.vimrc)) {
+    "post_install": "if(!(test-path ~\\.vimrc)) {
         cp \"$dir\\vimrc_example.vim\" ~\\.vimrc
         \"set shell=$((gcm powershell).path)\\ -executionpolicy\\ bypass\" | out-file  ~\\.vimrc -append -encoding ascii
         echo '~/.vimrc was created with your shell set to Powershell.'
     } else { echo '~/.vimrc exists, skipping' }",
     "checkver": {
-        "url": "http://www.vim.org/download.php",
-        "re": "latest version \\(currently ([\\d.]+)\\)"
+        "github": "https://github.com/vim/vim-win32-installer"
     },
     "env_set": {
         "VIM": "$dir"
+    },
+    "autoupdate": {
+        "architecture": {
+            "32bit": {
+                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x86.zip",
+                "extract_dir": "vim\\vim$majorVersion$minorVersion"
+            },
+            "64bit": {
+                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x64.zip",
+                "extract_dir": "vim\\vim$majorVersion$minorVersion"
+            }
+        }
+    },
+    "suggest": {
+        "vimtutor": "vimtutor"
     }
 }

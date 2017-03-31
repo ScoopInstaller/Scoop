@@ -1,14 +1,14 @@
 {
     "homepage": "https://www.vagrantup.com/",
-    "version": "1.9.1",
+    "version": "1.9.3",
     "license": "MIT",
-    "url": "https://releases.hashicorp.com/vagrant/1.9.1/vagrant_1.9.1.msi",
-    "hash": "db1fef59dd15ac90b6f5cfad20af7e15eccd814556a81f46e5422386166789a6",
+    "url": "https://releases.hashicorp.com/vagrant/1.9.3/vagrant_1.9.3.msi",
+    "hash": "3214881d4f27d716edfd59b09a7fb39c03b9bfebc3ec07d80c196ca5e488096c",
     "extract_dir": "HashiCorp/Vagrant",
     "bin": "bin\\vagrant.exe",
     "checkver": {
         "url": "https://releases.hashicorp.com/vagrant/",
-        "re": "vagrant_([\\d.]+)"
+        "re": "vagrant_([\\d.]+)</a>"
     },
     "autoupdate": {
         "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version.msi",

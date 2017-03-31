@@ -11,10 +11,16 @@ if((test-path $oldscoopdir) -and !$env:SCOOP) {
 }
 
 $globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
-$cachedir = "$scoopdir\cache" # always local
+
+# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
+#       is experimental and untested. There may be concurrency issues when
+#       multiple users write and access cached files at the same time.
+#       Use at your own risk.
+$cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | select -first 1
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
+
 function format($str, $hash) {
     $hash.keys | % { set-variable $_ $hash[$_] }
     $executionContext.invokeCommand.expandString($str)
@@ -71,6 +77,7 @@ function installed_apps($global) {
 # paths
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
+function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
@@ -90,6 +97,7 @@ function is_local($path) {
 function dl($url,$to) {
     $wc = new-object system.net.webClient
     $wc.headers.add('User-Agent', 'Scoop/1.0')
+    $wc.headers.add('Referer', (strip_filename $url))
     $wc.downloadFile($url,$to)
 
 }
@@ -146,7 +154,13 @@ function shim($path, $global, $name, $arg) {
     $relpath = resolve-path -relative $path
     popd
 
-    echo "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
+    # if $path points to another drive resolve-path prepends .\ which could break shims
+    if($relpath -match "^(.\\[\w]:).*$") {
+        echo "`$path = `"$path`"" | out-file $shim -encoding utf8
+    } else {
+        echo "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
+    }
+
     if($arg) {
         echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
     }

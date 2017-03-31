@@ -13,7 +13,7 @@ function versions($app, $global) {
 }
 
 function version($ver) {
-    $ver.split('.') | % {
+    $ver.split('.-') | % {
         $num = $_ -as [int]
         if($num) { $num } else { $_ }
     }

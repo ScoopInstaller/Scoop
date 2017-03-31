@@ -1,8 +1,24 @@
 {
-    "homepage": "http://www.rodneybeede.com/Compile_Netcat_on_Windows_using_MinGW.html",
-    "version": "1.11",
-    "url": "http://www.rodneybeede.com/downloads/nc111nt_rodneybeede.zip",
-    "hash": "cf46a1a2bd75260638598908075ebfa37ac0a5073e9555025895e506fe8a0807",
-    "extract_dir": "nc111nt_rodneybeede",
-    "bin": "nc.exe"
+    "architecture": {
+        "32bit": {
+            "bin": "nc.exe"
+        },
+        "64bit": {
+            "bin": [
+                [
+                    "nc64.exe",
+                    "nc"
+                ]
+            ]
+        }
+    },
+    "autoupdate": {
+        "url": "https://eternallybored.org/misc/netcat/netcat-win32-$version.zip"
+    },
+    "description": "Read and write from/to network connections",
+    "hash": "413f85a1dbac60ab5516742d76beff4f4da22b8ef1a424f10f36ec77e6d274b1",
+    "homepage": "https://eternallybored.org/misc/netcat/",
+    "license": "GPL-2.0",
+    "url": "https://eternallybored.org/misc/netcat/netcat-win32-1.12.zip",
+    "version": "1.12"
 }

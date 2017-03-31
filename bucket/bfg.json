@@ -5,7 +5,10 @@
     "url": "https://repo1.maven.org/maven2/com/madgag/bfg/1.12.15/bfg-1.12.15.jar",
     "hash": "330af214a0fed320c591afc1046b0f31e8a438f290da09672973aeaa6411b09d",
     "suggest": {
-        "JDK": [ "extras/oraclejdk", "openjdk" ]
+        "JDK": [
+            "extras/oraclejdk",
+            "openjdk"
+        ]
     },
     "bin": "bfg.ps1",
     "env_set": {
@@ -17,7 +20,7 @@
     ",
     "checkver": {
         "url": "https://search.maven.org/solrsearch/select/?q=g:com.madgag+AND+a:bfg",
-        "re": "\"latestVersion\":\"([\\d.]+)\""
+        "jp": "$.response.docs[0].latestVersion"
     },
     "autoupdate": {
         "url": "https://repo1.maven.org/maven2/com/madgag/bfg/$version/bfg-$version.jar"

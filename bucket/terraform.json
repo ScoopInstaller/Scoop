@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.terraform.io",
     "license": "Mozilla Public License 2.0",
-    "version": "0.8.6",
+    "version": "0.9.2",
     "architecture": {
         "64bit": {
-            "url": "https://releases.hashicorp.com/terraform/0.8.6/terraform_0.8.6_windows_amd64.zip",
-            "hash": "1056a8d8644c1787b2be29f2e12619123040cacd66b9acef43473702eb5ba7d8"
+            "url": "https://releases.hashicorp.com/terraform/0.9.2/terraform_0.9.2_windows_amd64.zip",
+            "hash": "17cccc1dec8a0d8a8684a1533b1ce200202bb7176f78fcb1ca9d82d4ead53f03"
         },
         "32bit": {
-            "url": "https://releases.hashicorp.com/terraform/0.8.6/terraform_0.8.6_windows_386.zip",
-            "hash": "27998b13ca5572e79382dc00f67dfba1625d0933103678bcd429d1e0c50ee129"
+            "url": "https://releases.hashicorp.com/terraform/0.9.2/terraform_0.9.2_windows_386.zip",
+            "hash": "c42f6b4499ac2372c11710a001bd4935e1ee6bd83b7bfe2f728b849d52441610"
         }
     },
     "bin": [
@@ -17,7 +17,7 @@
     ],
     "checkver": {
         "url": "https://releases.hashicorp.com/terraform/",
-        "re": "terraform_([\\d.]+)"
+        "re": "terraform_([\\d.]+)</a>"
     },
     "autoupdate": {
         "architecture": {

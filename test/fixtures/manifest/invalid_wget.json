@@ -1,0 +1,29 @@
+{
+    "homepage": "https://eternallybored.org/misc/wget/",
+    "randomproperty": "should fail",
+    "license": "GPL3",
+    "architecture": {
+        "64bit": {
+            "url": [
+                "https://eternallybored.org/misc/wget/wget-$version-win64.zip",
+                "http://curl.haxx.se/ca/cacert.pem"
+            ],
+            "hash": [
+                "85e5393ffd473f7bec40b57637fd09b6808df86c06f846b6885b261a8acac8c5",
+                ""
+            ]
+        },
+        "32bit": {
+            "url": [
+                "https://eternallybored.org/misc/wget/wget-$version-win32.zip",
+                "http://curl.haxx.se/ca/cacert.pem"
+            ],
+            "hash": [
+                "2ef82af3070abfdaf3862baff0bffdcb3c91c8d75e2f02c8720d90adb9d7a8f7",
+                ""
+            ]
+        }
+    },
+    "bin": "wget.exe",
+    "post_install": "\"ca_certificate=$dir\\cacert.pem\" | out-file $dir\\wget.ini -encoding default"
+}

@@ -1,22 +1,33 @@
 {
-  "homepage": "https://github.com/sass/dart-sass",
-  "version": "1.0.0-alpha.8",
-  "license": "https://raw.githubusercontent.com/sass/dart-sass/master/LICENSE",
-  "architecture": {
-    "64bit": {
-      "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-alpha.8/dart-sass-1.0.0-alpha.8-windows-x64.zip",
-      "hash": "a451a182ac03dc9b15ce59f04abc2033df93e6772436614840b3f0ada637c774"
+    "homepage": "https://github.com/sass/dart-sass",
+    "version": "1.0.0-alpha.9",
+    "license": "https://raw.githubusercontent.com/sass/dart-sass/master/LICENSE",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-alpha.9/dart-sass-1.0.0-alpha.9-windows-x64.zip",
+            "hash": "b7ce20f663b47ccad95a23525b8a2586d204a55dcece2ea41f22414ad47d2e7d"
+        },
+        "32bit": {
+            "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-alpha.9/dart-sass-1.0.0-alpha.9-windows-ia32.zip",
+            "hash": "0380cb99b29f0526a834bb6740f7fb0bd410c5fb486ef933321a8d74e2469b6f"
+        }
     },
-    "32bit": {
-      "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-alpha.8/dart-sass-1.0.0-alpha.8-windows-ia32.zip",
-      "hash": "b6abd66aa05169e2e4e35cd79e8e411a36687b4a75dbaed1b35d65a2bfc4a98d"
+    "extract_dir": "dart-sass",
+    "bin": [
+        "dart-sass.bat"
+    ],
+    "checkver": {
+        "url": "https://github.com/sass/dart-sass/releases/latest",
+        "re": "/releases/tag/(?:v)?([\\d\\w.-]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/sass/dart-sass/releases/download/$version/dart-sass-$version-windows-x64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/sass/dart-sass/releases/download/$version/dart-sass-$version-windows-ia32.zip"
+            }
+        }
     }
-  },
-  "extract_dir": "dart-sass",
-  "bin": [
-    "dart-sass.bat"
-  ],
-  "checkver": {
-    "github": "https://github.com/sass/dart-sass"
-  }
 }

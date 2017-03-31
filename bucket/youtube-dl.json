@@ -1,9 +1,9 @@
 {
     "homepage": "https://rg3.github.io/youtube-dl/",
     "license": "Public Domain",
-    "version": "2017.02.11",
-    "url": "https://github.com/rg3/youtube-dl/releases/download/2017.02.11/youtube-dl.exe",
-    "hash": "349cf0d5627f95e7694312c41bea290d19437f0afd732d9f743e2e9bab4e3a70",
+    "version": "2017.03.26",
+    "url": "https://github.com/rg3/youtube-dl/releases/download/2017.03.26/youtube-dl.exe",
+    "hash": "22fad4d6bacf73cea24663e2f11a47ab20c5566ef97fbce5bd48143ac64e2ac2",
     "bin": "youtube-dl.exe",
     "depends": [
         "ffmpeg"
@@ -12,6 +12,11 @@
         "github": "https://github.com/rg3/youtube-dl"
     },
     "autoupdate": {
-        "url": "https://github.com/rg3/youtube-dl/releases/download/$version/youtube-dl.exe"
+        "url": "https://github.com/rg3/youtube-dl/releases/download/$version/youtube-dl.exe",
+        "hash": {
+            "mode": "extract",
+            "url": "https://github.com/rg3/youtube-dl/releases/download/$version/SHA2-256SUMS",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
     }
 }

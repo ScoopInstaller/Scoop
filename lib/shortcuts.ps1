@@ -30,9 +30,9 @@ function rm_startmenu_shortcuts($manifest, $global) {
     $manifest.shortcuts | ?{ $_ -ne $null } | % {
         $name = $_.item(1)
         $shortcut = "$(shortcut_folder)\$name.lnk"
+        write-host "Removing shortcut $(friendly_path $shortcut)"
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
-             echo "Removed shortcut $shortcut"
         }
     }
 }

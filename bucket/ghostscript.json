@@ -1,22 +1,46 @@
 {
     "homepage": "http://www.ghostscript.com",
-    "version": "9.20",
+    "version": "9.21",
     "license": "http://www.gnu.org/licenses/agpl-3.0.html",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs920/gs920w64.exe#/dl.7z",
-            "hash": "1ecfa992669c2368caeb4c999d48bf8971ba16e1cc5d0886f6a0d74005c1e4bb",
-            "bin": [ "bin\\gswin64.exe", "bin\\gswin64c.exe" ]
+            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs921/gs921w64.exe#/dl.7z",
+            "hash": "41bf242d0e4303f329f4b67fc0c556885fe0a5d4012cf5c1e7ddc62a5d25aba9",
+            "bin": [
+                "bin\\gswin64.exe",
+                "bin\\gswin64c.exe"
+            ]
         },
         "32bit": {
-            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs920/gs920w32.exe#/dl.7z",
-            "hash": "dfa0ed51c6b1d4002035966af50fde9389e83d8cde644a560b2cdb8b8ae94b5f",
-            "bin": [ "bin\\gswin32.exe", "bin\\gswin32c.exe" ]
+            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs921/gs921w32.exe#/dl.7z",
+            "hash": "75f5983ac23fbc26760f1033062ec914e7dbafcb029e47e54e77a762ee934089",
+            "bin": [
+                "bin\\gswin32.exe",
+                "bin\\gswin32c.exe"
+            ]
         }
     },
-    "env_add_path": [ "bin", "lib" ],
+    "env_add_path": [
+        "bin",
+        "lib"
+    ],
     "checkver": {
         "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/latest",
         "re": "Ghostscript\\/GhostPDL ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$cleanVersion/gs$cleanVersionw64.exe#/dl.7z"
+            },
+            "32bit": {
+                "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$cleanVersion/gs$cleanVersionw32.exe#/dl.7z"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$cleanVersion/SHA256SUMS",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
     }
 }

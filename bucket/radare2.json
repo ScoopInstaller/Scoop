@@ -1,9 +1,19 @@
 {
-    "version":  "1.1.0",
+    "version": "1.3.0",
     "license": "GPL2",
-    "url":  "http://cloud.radare.org/get/1.1.0/radare2-w32-1.1.0.zip",
-    "homepage": "http://www.radare.org/r/",
-    "extract_dir":  "radare2-w32-1.1.0",
+    "homepage": "https://www.radare.org/r/",
+    "architecture": {
+        "64bit": {
+            "url": "http://cloud.radare.org/get/1.3.0/radare2-w64-1.3.0.zip",
+            "hash": "11ccc1ad7b4953328d2777ad49550f3ddbdf3cf51084d206dbbe7b782b75cfc6",
+            "extract_dir": "radare2-w64-1.3.0"
+        },
+        "32bit": {
+            "url": "http://cloud.radare.org/get/1.3.0/radare2-w32-1.3.0.zip",
+            "hash": "c9f28aba175174a5168bdb1684c9640ff8349090dc5485a999abd7980d002916",
+            "extract_dir": "radare2-w32-1.3.0"
+        }
+    },
     "bin": [
         "rabin2.exe",
         "radare2.exe",
@@ -14,5 +24,20 @@
         "rarun2.exe",
         "rasm2.exe",
         "rax2.exe"
-    ]
+    ],
+    "checkver": {
+        "github": "https://github.com/radare/radare2"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://cloud.radare.org/get/$version/radare2-w64-$version.zip",
+                "extract_dir": "radare2-w64-$version"
+            },
+            "32bit": {
+                "url": "http://cloud.radare.org/get/$version/radare2-w32-$version.zip",
+                "extract_dir": "radare2-w32-$version"
+            }
+        }
+    }
 }

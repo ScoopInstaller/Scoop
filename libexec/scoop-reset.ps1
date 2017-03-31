@@ -11,6 +11,7 @@ param($app)
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\config.ps1"
+. "$psscriptroot\..\lib\shortcuts.ps1"
 
 reset_aliases
 
@@ -29,5 +30,6 @@ $architecture = $install.architecture
 
 $dir = link_current $dir
 create_shims $manifest $dir $false $architecture
+create_startmenu_shortcuts $manifest $dir $false
 env_add_path $manifest $dir
 env_set $manifest $dir

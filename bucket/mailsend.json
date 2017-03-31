@@ -1,0 +1,18 @@
+{
+    "version": "1.19",
+    "license": "",
+    "extract_dir": "",
+    "url": "https://github.com/muquit/mailsend/releases/download/1.19/mailsend1.19.exe.zip",
+    "depends": "",
+    "homepage": "https://github.com/muquit/mailsend",
+    "checkver": {
+        "github": "https://github.com/muquit/mailsend"
+    },
+    "autoupdate": {
+        "url": "https://github.com/muquit/mailsend/releases/download/$version/mailsend$version.exe.zip"
+    },
+    "hash": "87db23b8c9588353d12e19e953dddb17ed04b422f41bcfbaa8ad4e27057245b4",
+    "bin": [
+        ["mailsend1.19.exe", "mailsend"]
+    ]
+}

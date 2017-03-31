@@ -1,0 +1,41 @@
+{
+    "homepage":  "http://www.nasm.us",
+    "license":  "BSD",
+    "version":  "2.12.02",
+    "extract_dir":  "nasm-2.12.02",
+    "architecture": {
+        "64bit": {
+            "url":  "http://www.nasm.us/pub/nasm/releasebuilds/2.12.02/win64/nasm-2.12.02-win64.zip",
+            "hash":  "6dc3a56979b2618f6bf9cc4e148f7dc99334b2e2c1aea0a9f2094128c950ca26"
+        },
+        "32bit": {
+            "url":  "http://www.nasm.us/pub/nasm/releasebuilds/2.12.02/win32/nasm-2.12.02-win32.zip",
+            "hash": "91b9f784b1286e3de73dabfdc7466c198b96fef7080e00710411119959935809"
+        }
+    },
+    "bin":  [
+        "nasm.exe",
+        "ndisasm.exe",
+        "rdoff/ldrdf.exe",
+        "rdoff/rdf2bin.exe",
+        "rdoff/rdf2com.exe",
+        "rdoff/rdf2ihx.exe",
+        "rdoff/rdf2ith.exe",
+        "rdoff/rdf2srec.exe",
+        "rdoff/rdfdump.exe",
+        "rdoff/rdflib.exe",
+        "rdoff/rdx.exe"
+    ],
+    "checkver": "The latest stable version of NASM is\\s+.+\\/(?<version>[\\d\\.]+)",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url":  "http://www.nasm.us/pub/nasm/releasebuilds/$version/win64/nasm-$version-win64.zip"
+            },
+            "32bit": {
+                "url":  "http://www.nasm.us/pub/nasm/releasebuilds/$version/win32/nasm-$version-win32.zip"
+            }
+        },
+        "extract_dir":  "nasm-$version"
+    }
+}
