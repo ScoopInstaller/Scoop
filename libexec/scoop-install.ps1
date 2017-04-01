@@ -80,10 +80,7 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
         abort "'$name' ($version) is already installed.`nUse 'scoop update $name$global_flag' to install a new version."
     }
 
-    # this returns an array for some reason
-    # someone tell me why because it was driving me nuts
-    $path = generate_user_manifest $name $version
-    if ($path[1]) { $path[1] } else { $path }
+    generate_user_manifest $name $version
 }
 $apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-Object -Unique)
 
