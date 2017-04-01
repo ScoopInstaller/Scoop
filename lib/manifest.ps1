@@ -76,7 +76,7 @@ function generate_user_manifest($app, $version) {
             abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
         }
 
-        ensure $(usermanifestsdir)
+        ensure $(usermanifestsdir) | out-null
         autoupdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(New-Object HashTable)
 
         $path = "$(resolve-path $(usermanifest $app))"

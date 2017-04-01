@@ -288,6 +288,10 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
     # update properties
     update_manifest_prop "extract_dir" $json $substitutions
 
+    if ($has_errors) {
+        abort "Could not autoupdate '$app'. Aborting..."
+    }
+
     if ($has_changes -and !$has_errors) {
         # write file
         Write-Host -f DarkGreen "Writing updated $app manifest"
