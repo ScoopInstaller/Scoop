@@ -4,24 +4,12 @@
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
-            "url": [
-                "http://windows.php.net/downloads/releases/php-7.1.3-nts-Win32-VC14-x64.zip",
-                "https://r15ch13.keybase.pub/vcredist/2017/x64/vcruntime140.dll"
-            ],
-            "hash": [
-                "sha1:4000132114cecdec82c83b09aed6a962ed928e0b",
-                "56de253172b2ff70ba89cc0544e09c6dd34d6793231c09aa6dfaac755535f45f"
-            ]
+            "url": "http://windows.php.net/downloads/releases/php-7.1.3-nts-Win32-VC14-x64.zip",
+            "hash": "sha1:4000132114cecdec82c83b09aed6a962ed928e0b"
         },
         "32bit": {
-            "url": [
-                "http://windows.php.net/downloads/releases/php-7.1.3-nts-Win32-VC14-x86.zip",
-                "https://r15ch13.keybase.pub/vcredist/2017/x86/vcruntime140.dll"
-            ],
-            "hash": [
-                "sha1:d7089c0d342a663ffea1a4e5973ef55b3b4b8ba8",
-                "cdc006fc80c4437d009b8c72008a443a9ee5bce383d8b3dc16aeec0e081cfe32"
-            ]
+            "url": "http://windows.php.net/downloads/releases/php-7.1.3-nts-Win32-VC14-x86.zip",
+            "hash": "sha1:d7089c0d342a663ffea1a4e5973ef55b3b4b8ba8"
         }
     },
     "bin": [
@@ -72,5 +60,10 @@ if (!(Test-Path \"$dir\\cli\\conf.d\")) {
             "url": "http://windows.php.net/downloads/releases/sha1sum.txt",
             "find": "([a-z0-9]{40})\\s+(?:$basename)"
         }
+    },
+    "suggest": {
+        "vcredist": [
+            "extras/vcredist2017"
+        ]
     }
 }

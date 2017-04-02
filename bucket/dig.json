@@ -12,5 +12,10 @@
             "hash": "7b92b9e3f9fe4cca69feeed73305151f4bdc09c9cbb5858671da2b7fd8a05fe2"
         }
     },
-    "bin": "dig.exe"
+    "bin": "dig.exe",
+    "suggest": {
+        "vcredist": [
+            "extras/vcredist2012"
+        ]
+    }
 }
