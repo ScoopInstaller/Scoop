@@ -58,7 +58,7 @@ function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
 function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
-function usermanifestsdir { "$(basedir)\usermanifests" }
+function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 
 # apps
