@@ -12,11 +12,12 @@
             "hash": "868a96e012222ce95c732d4e2c97d0349f8fefbd889af690cf6d2278d6844932"
         }
     },
-    "env_add_path": "nodejs",
+    "extract_dir": "nodejs",
+    "persist": [ "bin" ],
+    "env_add_path": [ ".", "bin" ],
     "post_install": "
-# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
-rm $dir\\nodejs\\node_modules\\npm\\npmrc
-npm update -g",
+# Set npm prefix to install modules inside bin
+Set-Content -Value \"prefix=$dir\\bin\" -Path $dir\\node_modules\\npm\\npmrc",
     "checkver": {
         "url": "https://nodejs.org/en/download/",
         "re": "LTS version: <strong>v([\\d.]+)</strong>"

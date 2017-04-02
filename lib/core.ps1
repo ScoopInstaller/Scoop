@@ -58,6 +58,7 @@ function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
 function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
+function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
@@ -128,6 +129,10 @@ function unzip_old($path,$to) {
     $zipfiles = $shell.namespace("$path").items()
     $to = ensure $to
     $shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
+}
+
+function is_directory([String] $path) {
+    return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
 }
 
 function movedir($from, $to) {

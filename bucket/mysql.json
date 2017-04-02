@@ -26,9 +26,14 @@
         "bin\\mysqlslap.exe",
         "bin\\my_print_defaults.exe"
     ],
+    "persist": [
+        "data"
+    ],
     "post_install": "
 #Initialize data directory (without generating root password)
-mysqld --initialize-insecure
+if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
+    mysqld --initialize-insecure
+}
 
 #Copy provided sample file to live file location
 cp $dir/my-default.ini $dir/my.ini

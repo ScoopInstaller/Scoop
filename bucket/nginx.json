@@ -6,6 +6,11 @@
     "hash": "53ca945ffd3ceaa40c2c60e01218a3b7ac64e61d3907484461794ee13757cce9",
     "extract_dir": "nginx-1.11.12",
     "bin": "nginx.exe",
+    "env_set": {
+        "NGINX_HOME": "$dir"
+    },
+    "persist": ["conf", "html", "logs", "temp"],
+    "notes": "To use the correct configuration run 'nginx -p \"$env:NGINX_HOME\"' or 'nginx -p \"%NGINX_HOME%\"'",
     "checkver": {
         "url": "https://nginx.org/en/CHANGES",
         "re": "Changes with nginx ([\\d.]+)"

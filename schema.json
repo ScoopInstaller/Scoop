@@ -1,6 +1,6 @@
 {
     "$id": "http://scoop.sh/draft/schema#",
-    "$schema": "http://scoop.sh/draft/schema#",
+    "$schema": "http://json-schema.org/draft-04/schema#",
     "additionalProperties": false,
     "definitions": {
         "hashPattern": {
@@ -298,6 +298,9 @@
         "bin": {
             "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
         },
+        "persist": {
+            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+        },
         "checkver": {
             "$ref": "#/definitions/checkver"
         },
@@ -375,10 +378,6 @@
                 }
             },
             "type": "object"
-        },
-        "travel_dirs": {
-            "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "Undocumented: only found in scoop-extras/kibana"
         },
         "uninstaller": {
             "$ref": "#/definitions/uninstaller"
