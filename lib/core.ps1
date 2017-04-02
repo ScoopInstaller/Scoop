@@ -58,6 +58,7 @@ function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
 function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
+function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 
@@ -130,6 +131,10 @@ function unzip_old($path,$to) {
     $zipfiles = $shell.namespace("$path").items()
     $to = ensure $to
     $shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
+}
+
+function is_directory([String] $path) {
+    return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
 }
 
 function movedir($from, $to) {

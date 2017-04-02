@@ -4,6 +4,7 @@
 #
 # Options:
 #   -g, --global   Uninstall a globally installed app
+#   -p, --purge    Remove all persistent data
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\help.ps1"
@@ -17,9 +18,10 @@
 reset_aliases
 
 # options
-$opt, $apps, $err = getopt $args 'g' 'global'
+$opt, $apps, $err = getopt $args 'gp' 'global', 'purge'
 if($err) { "scoop uninstall: $err"; exit 1 }
 $global = $opt.g -or $opt.global
+$purge = $opt.p -or $opt.purge
 
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
@@ -50,6 +52,8 @@ foreach($app in $apps) {
     "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
+    $persist_dir = persistdir $app $global
+
     try {
         test-path $dir -ea stop | out-null
     } catch [unauthorizedaccessexception] {
@@ -94,6 +98,16 @@ foreach($app in $apps) {
             rm -r $appdir -ea stop -force
         } catch {
             if((test-path $appdir)) { throw } # only throw if the dir still exists
+        }
+    }
+
+    # purge persistant data
+    if ($purge) {
+        $persist_dir = persistdir $app $global
+
+        if (Test-Path $persist_dir) {
+            try { rm -r $persist_dir -ea stop -force }
+            catch { abort "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use." }
         }
     }
 

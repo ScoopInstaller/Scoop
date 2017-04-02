@@ -34,6 +34,8 @@ function install_app($app, $architecture, $global, $suggested) {
     echo "Installing '$app' ($version)."
 
     $dir = ensure (versiondir $app $version $global)
+    $original_dir = $dir # keep reference to real (not linked) directory
+    $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
@@ -47,6 +49,10 @@ function install_app($app, $architecture, $global, $suggested) {
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
+
+    # persist data
+    persist_data $manifest $original_dir $persist_dir
+
     # env_ensure_home $manifest $global (see comment for env_ensure_home)
     post_install $manifest $architecture
 
@@ -736,6 +742,7 @@ function link_current($versiondir) {
     }
 
     cmd /c mklink /j $currentdir $versiondir | out-null
+    attrib $currentdir +R /L
     return $currentdir
 }
 
@@ -751,11 +758,14 @@ function unlink_current($versiondir) {
     if(test-path $currentdir) {
         write-host "Unlinking $(friendly_path $currentdir)"
 
+        # remove read-only attribute on link
+        attrib $currentdir -R /L
+
         # remove the junction
         cmd /c rmdir $currentdir
         return $currentdir
     }
-    return $appdir
+    return $versiondir
 }
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead
@@ -791,7 +801,8 @@ function find_dir_or_subdir($path, $dir) {
 
 function env_add_path($manifest, $dir, $global) {
     $manifest.env_add_path | ? { $_ } | % {
-        $path_dir = "$dir\$($_)"
+        $path_dir = "$dir\$($path)"
+
         if(!(is_in_dir $dir $path_dir)) {
             abort "Error in manifest: env_add_path '$_' is outside the app directory."
         }
@@ -814,7 +825,8 @@ function add_first_in_path($dir, $global) {
 function env_rm_path($manifest, $dir, $global) {
     # remove from path
     $manifest.env_add_path | ? { $_ } | % {
-        $path_dir = "$dir\$($_)"
+        $path_dir = "$dir\$($path)"
+
         remove_from_path $path_dir $global
     }
 }
@@ -944,12 +956,61 @@ function show_suggestions($suggested) {
     }
 }
 
-# travelling directories have their contents moved from
-# $from to $to when the app is updated.
-# any files or directories that already exist in $to are skipped
-function travel_dir($from, $to) {
-    $skip_dirs = ls $to -dir | % { "`"$from\$_`"" }
-    $skip_files = ls $to -file | % { "`"$from\$_`"" }
+# Persistent data
+function persist_def($persist) {
+    if ($persist -is [Array]) {
+        $source = $persist[0]
+        $target = $persist[1]
+    } else {
+        $source = $persist
+        $target = $null
+    }
 
-    robocopy $from $to /s /move /xd $skip_dirs /xf $skip_files > $null
+    if (!$target) {
+        $target = fname($source)
+    }
+
+    return $source, $target
+}
+
+function persist_data($manifest, $original_dir, $persist_dir) {
+    $persist = $manifest.persist
+    if($persist) {
+        $persist_dir = ensure $persist_dir
+
+        if ($persist -is [String]) {
+            $persist = @($persist);
+        }
+
+        $persist | % {
+            $source, $target = persist_def $_
+
+            write-host "Persisting $source"
+
+            # add base paths
+            $source = fullpath "$dir\$source"
+            $target = fullpath "$persist_dir\$target"
+
+            if (!(test-path $target)) {
+                # If we do not have data in the store we move the original
+                if (test-path $source) {
+                    Move-Item $source $target
+                } else {
+                    # if there is no source we create an empty directory
+                    $target = ensure $target
+                }
+            } elseif (test-path $source) {
+                # (re)move original (keep a copy)
+                Move-Item $source "$source.original"
+            }
+
+            # create link
+            if (is_directory $target) {
+                cmd /c "mklink /j $source $target" | out-null
+                attrib $source +R /L
+            } else {
+                cmd /c "mklink /h $source $target" | out-null
+            }
+        }
+    }
 }

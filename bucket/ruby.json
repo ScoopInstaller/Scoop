@@ -26,7 +26,12 @@
         }
     },
     "extract_to": [ "", "devkit" ],
-    "env_add_path": "bin",
+    "persist": "gems",
+    "env_add_path": [ "bin", "gems\\bin" ],
+    "env_set": {
+        "GEM_HOME": "$dir\\gems",
+        "GEM_PATH": "$dir\\gems"
+    },
     "post_install": "pushd $dir\\devkit;echo \"---`n- $dir\" | out-file config.yml -enc default; ruby dk.rb install;popd;",
     "checkver": {
         "url": "http://rubyinstaller.org/downloads/",

@@ -47,6 +47,9 @@
         "bin\\mysql_upgrade_wizard.exe",
         "bin\\my_print_defaults.exe"
     ],
+    "persist": [
+        "data"
+    ],
     "checkver": {
         "url": "https://downloads.mariadb.org/",
         "re": "Download ([\\d.]+) Stable"
