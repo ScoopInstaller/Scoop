@@ -64,7 +64,7 @@ function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global=$null) {
     if($global -eq $null) { return (installed $app $true) -or (installed $app $false) }
-    return test-path (appdir $app $global)
+    return is_directory (appdir $app $global)
 }
 function installed_apps($global) {
     $dir = appsdir $global
