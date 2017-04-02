@@ -144,6 +144,10 @@
                                 {
                                     "pattern": "^\\$url.[\\w\\d]+$",
                                     "type": "string"
+                                },
+                                {
+                                    "pattern": "^.*\\$url.*$",
+                                    "type": "string"
                                 }
                             ]
                         }
