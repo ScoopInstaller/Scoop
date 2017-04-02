@@ -289,7 +289,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
     update_manifest_prop "extract_dir" $json $substitutions
 
     if ($has_errors) {
-        abort "Could not autoupdate '$app'. Aborting..."
+        throw "Error: Could not autoupdate '$app'."
     }
 
     if ($has_changes -and !$has_errors) {
