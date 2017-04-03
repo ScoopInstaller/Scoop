@@ -86,6 +86,27 @@ describe "env add and remove path" {
     }
 }
 
+describe "shim_def" {
+    it "should use strings correctly" {
+        $target, $name, $shimArgs = shim_def "command.exe"
+        $target | Should be "command.exe"
+        $name | Should be "command"
+        $shimArgs | Should be $null
+    }
+
+    it "should expand the array correctly" {
+        $target, $name, $shimArgs = shim_def @("foo.exe", "bar")
+        $target | Should be "foo.exe"
+        $name | Should be "bar"
+        $shimArgs | Should be $null
+
+        $target, $name, $shimArgs = shim_def @("foo.exe", "bar", "--test")
+        $target | Should be "foo.exe"
+        $name | Should be "bar"
+        $shimArgs | Should be "--test"
+    }
+}
+
 describe 'persist_def' {
     it 'parses string correctly' {
         $source, $target = persist_def "test"
