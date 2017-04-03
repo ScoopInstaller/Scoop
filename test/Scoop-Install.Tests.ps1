@@ -22,6 +22,34 @@ describe "ensure_architecture" {
     }
 }
 
+describe "appname_from_url" {
+    it "should extract the correct name" {
+        appname_from_url "https://example.org/directory/foobar.json" | Should be "foobar"
+    }
+}
+
+describe "url_filename" {
+    it "should extract the real filename from an url" {
+        url_filename "http://example.org/foo.txt" | Should be "foo.txt"
+        url_filename "http://example.org/foo.txt?var=123" | Should be "foo.txt"
+    }
+
+    it "can be tricked with a hash to override the real filename" {
+        url_filename "http://example.org/foo-v2.zip#/foo.zip" | Should be "foo.zip"
+    }
+}
+
+describe "url_remote_filename" {
+    it "should extract the real filename from an url" {
+        url_remote_filename "http://example.org/foo.txt" | Should be "foo.txt"
+        url_remote_filename "http://example.org/foo.txt?var=123" | Should be "foo.txt"
+    }
+
+    it "can not be tricked with a hash to override the real filename" {
+        url_remote_filename "http://example.org/foo-v2.zip#/foo.zip" | Should be "foo-v2.zip"
+    }
+}
+
 describe "env add and remove path" {
     # test data
     $manifest = @{
