@@ -50,6 +50,16 @@ describe "url_remote_filename" {
     }
 }
 
+describe "is_in_dir" {
+    it "should work correctly" {
+        is_in_dir "C:\test" "C:\foo" | Should be $false
+        is_in_dir "C:\test" "C:\test\foo\baz.zip" | Should be $true
+
+        is_in_dir "test" "$psscriptroot" | Should be $true
+        is_in_dir "$psscriptroot\..\" "$psscriptroot" | Should be $false
+    }
+}
+
 describe "env add and remove path" {
     # test data
     $manifest = @{
