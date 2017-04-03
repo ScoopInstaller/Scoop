@@ -33,7 +33,8 @@ function is_admin {
 
 # messages
 function abort($msg) { write-host $msg -f darkred; exit 1 }
-function warn($msg) { write-host $msg -f darkyellow; }
+function error($msg) { write-host $msg -f darkred }
+function warn($msg) { write-host $msg -f darkyellow }
 function success($msg) { write-host $msg -f darkgreen }
 
 function filesize($length) {

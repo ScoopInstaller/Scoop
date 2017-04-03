@@ -39,7 +39,8 @@ foreach($app in $apps) {
                 "Try uninstalling $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead."
                 exit 1
             } else {
-                abort "'$app' isn't installed."
+                error "'$app' isn't installed."
+                continue
             }
         }
     }
@@ -57,7 +58,8 @@ foreach($app in $apps) {
     try {
         test-path $dir -ea stop | out-null
     } catch [unauthorizedaccessexception] {
-        abort "Access denied: $dir. You might need to restart."
+        error "Access denied: $dir. You might need to restart."
+        continue
     }
 
     $manifest = installed_manifest $app $version $global
@@ -78,16 +80,24 @@ foreach($app in $apps) {
     env_rm_path $manifest $refdir $global
     env_rm $manifest $global
 
-    try { rm -r $dir -ea stop -force }
-    catch { abort "Couldn't remove '$(friendly_path $dir)'; it may be in use." }
+    try {
+        rm -r $dir -ea stop -force
+    } catch {
+        error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+        continue
+    }
 
     # remove older versions
     $old = @(versions $app $global)
     foreach($oldver in $old) {
-        "Removing older version ($oldver)."
+        write-host "Removing older version ($oldver)."
         $dir = versiondir $app $oldver $global
-        try { rm -r -force -ea stop $dir }
-        catch { abort "Couldn't remove '$(friendly_path $dir)'; it may be in use." }
+        try {
+            rm -r -force -ea stop $dir
+        } catch {
+            error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+            continue
+        }
     }
 
     if(@(versions $app).length -eq 0) {
@@ -106,8 +116,12 @@ foreach($app in $apps) {
         $persist_dir = persistdir $app $global
 
         if (Test-Path $persist_dir) {
-            try { rm -r $persist_dir -ea stop -force }
-            catch { abort "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use." }
+            try {
+                rm -r $persist_dir -ea stop -force
+            } catch {
+                error "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use."
+                continue
+            }
         }
     }
 
