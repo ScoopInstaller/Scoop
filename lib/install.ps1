@@ -798,7 +798,7 @@ function find_dir_or_subdir($path, $dir) {
 
 function env_add_path($manifest, $dir, $global) {
     $manifest.env_add_path | ? { $_ } | % {
-        $path_dir = "$dir\$($path)"
+        $path_dir = "$dir\$($_)"
 
         if(!(is_in_dir $dir $path_dir)) {
             abort "Error in manifest: env_add_path '$_' is outside the app directory."
@@ -822,7 +822,7 @@ function add_first_in_path($dir, $global) {
 function env_rm_path($manifest, $dir, $global) {
     # remove from path
     $manifest.env_add_path | ? { $_ } | % {
-        $path_dir = "$dir\$($path)"
+        $path_dir = "$dir\$($_)"
 
         remove_from_path $path_dir $global
     }
