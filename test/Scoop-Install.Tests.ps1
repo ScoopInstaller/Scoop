@@ -1,6 +1,26 @@
 . "$psscriptroot\..\lib\core.ps1"
+. "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\Scoop-TestLib.ps1"
+
+describe "ensure_architecture" {
+    it "should keep correct architectures" {
+        ensure_architecture "32bit" | Should be "32bit"
+        ensure_architecture "64bit" | Should be "64bit"
+    }
+
+    it "should fallback to the default architecture on empty input" {
+        ensure_architecture "" | Should be $(default_architecture)
+        ensure_architecture $null | Should be $(default_architecture)
+    }
+
+    it "should show an error with an invalid architecture" {
+        Mock abort
+
+        ensure_architecture "PPC" | Should be $null
+        Assert-MockCalled abort -Times 1
+    }
+}
 
 describe "env add and remove path" {
     # test data
