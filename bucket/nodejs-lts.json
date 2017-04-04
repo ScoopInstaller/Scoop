@@ -1,20 +1,25 @@
 {
     "homepage": "http://nodejs.org",
-    "version": "6.10.1",
+    "version": "6.10.2",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v6.10.1/node-v6.10.1-x64.msi",
-            "hash": "e9fd4ff49700ece923e6e0d9b9013abc1ce65c3ed3a5810d166a0e05a911c2d4"
+            "url": "https://nodejs.org/dist/v6.10.2/node-v6.10.2-x64.msi",
+            "hash": "4d0a8b82649dc38f606b400006a2ab2d3585b65c44b4f5b71621444b3c3f7754"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v6.10.1/node-v6.10.1-x86.msi",
-            "hash": "868a96e012222ce95c732d4e2c97d0349f8fefbd889af690cf6d2278d6844932"
+            "url": "https://nodejs.org/dist/v6.10.2/node-v6.10.2-x86.msi",
+            "hash": "bc1febcfd2e8fbaf6bdcd06c1eeee5d33ae61ae37f74e84392ea3b46da5ea550"
         }
     },
     "extract_dir": "nodejs",
-    "persist": [ "bin" ],
-    "env_add_path": [ ".", "bin" ],
+    "persist": [
+        "bin"
+    ],
+    "env_add_path": [
+        ".",
+        "bin"
+    ],
     "post_install": "
 # Set npm prefix to install modules inside bin
 Set-Content -Value \"prefix=$dir\\bin\" -Path $dir\\node_modules\\npm\\npmrc",
