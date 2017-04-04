@@ -1,15 +1,20 @@
 {
     "homepage": "https://nginx.org",
-    "version": "1.11.12",
+    "version": "1.11.13",
     "license": "BSD",
-    "url": "https://nginx.org/download/nginx-1.11.12.zip",
-    "hash": "53ca945ffd3ceaa40c2c60e01218a3b7ac64e61d3907484461794ee13757cce9",
-    "extract_dir": "nginx-1.11.12",
+    "url": "https://nginx.org/download/nginx-1.11.13.zip",
+    "hash": "4d1425cac2faf50cd48abfa474334af0ba761e90d44910742e5d5e11120782d2",
+    "extract_dir": "nginx-1.11.13",
     "bin": "nginx.exe",
     "env_set": {
         "NGINX_HOME": "$dir"
     },
-    "persist": ["conf", "html", "logs", "temp"],
+    "persist": [
+        "conf",
+        "html",
+        "logs",
+        "temp"
+    ],
     "notes": "To use the correct configuration run 'nginx -p \"$env:NGINX_HOME\"' or 'nginx -p \"%NGINX_HOME%\"'",
     "checkver": {
         "url": "https://nginx.org/en/CHANGES",
