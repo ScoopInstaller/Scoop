@@ -1,0 +1,29 @@
+{
+    "homepage": "https://github.com/BurntSushi/xsv",
+    "license": "Unlicense",
+    "version": "0.11.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/BurntSushi/xsv/releases/download/0.11.0/xsv-0.11.0-x86_64-pc-windows-msvc.zip",
+            "hash": "c6626caa8aee3d05b58bf68a768d8d79e0d198149346aa25dce864342b80360e"
+        },
+        "32bit": {
+            "url": "https://github.com/BurntSushi/xsv/releases/download/0.11.0/xsv-0.11.0-i686-pc-windows-msvc.zip",
+            "hash": "fe14d942211cb052b43c32d6279b18f7c994825654278ec6fa5a2f43cd23d81e"
+        }
+    },
+    "bin": "xsv.exe",
+    "checkver": {
+        "github": "https://github.com/BurntSushi/xsv"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/BurntSushi/xsv/releases/download/$version/xsv-$version-x86_64-pc-windows-msvc.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/BurntSushi/xsv/releases/download/$version/xsv-$version-i686-pc-windows-msvc.zip"
+            }
+        }
+    }
+}
