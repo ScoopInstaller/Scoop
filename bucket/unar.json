@@ -1,0 +1,9 @@
+{
+    "homepage": "https://unarchiver.c3.cx/commandline",
+    "license": "GPL2.1",
+    "version": "1.8.1",
+    "url": ["http://unarchiver.c3.cx/downloads/unar1.8.1_win.zip"],
+    "hash":["2fa1ea5ddc2b2615b94b2d00cd19fcbf9165cffb5346e83d3b2643e7a55c1e95"],
+    "extract_dir": ".",
+    "bin": ["lsar.exe", "unar.exe"]
+}

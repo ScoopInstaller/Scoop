@@ -1,0 +1,9 @@
+{
+    "homepage": "https://www.nano-editor.org/",
+    "version": "2.5.3",
+    "license": "GPL",
+    "url": "https://www.nano-editor.org/dist/v2.5/NT/nano-2.5.3.zip",
+    "hash": "c012456b9f29e488b0e9a688aa43a34326dd573f9e99765cbdac2b81a4bc1060",
+    "bin": "nano-2.5.3-win32\\nano.exe",
+    "checkver": "Latest Version\\s+([\\d.]+)"
+}

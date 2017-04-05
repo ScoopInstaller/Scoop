@@ -1,0 +1,21 @@
+{
+    "homepage": "https://haxe.org/",
+    "version": "3.4.1",
+    "license": "https://haxe.org/foundation/open-source.html",
+    "url": "https://github.com/HaxeFoundation/haxe/releases/download/3.4.1/haxe-3.4.1-win.zip",
+    "hash": "617d8262f55aedd3e7de2b1c5126ad7aa6b2de7e548051d2eb9c7dd9490d018e",
+    "bin": [
+        "haxe.exe",
+        "haxelib.exe"
+    ],
+    "env_set": {
+        "HAXEPATH": "$dir"
+    },
+    "depends": "neko",
+    "checkver": {
+        "github": "https://github.com/HaxeFoundation/haxe"
+    },
+    "autoupdate": {
+        "url": "https://github.com/HaxeFoundation/haxe/releases/download/$version/haxe-$version-win.zip"
+    }
+}

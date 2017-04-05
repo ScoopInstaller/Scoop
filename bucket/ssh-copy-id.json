@@ -1,0 +1,12 @@
+{
+    "version":  "2015-03-22",
+    "license":  "GNU GPL",
+    "url":  "https://raw.githubusercontent.com/deevus/ssh-copy-id-posh/a75f94aca42aa6c18f631957f3d1ef6b606d0d43/ssh-copy-id/ssh-copy-id.ps1",
+    "depends":  [
+        "gow",
+        "openssh"
+    ],
+    "homepage":  "https://github.com/VijayS1/Scripts/blob/master/ssh-copy-id/README.md",
+    "hash":  "ebaaaa16e89926b69c324a25e4525de745af2bcc46f99338a85ab6495109f39d",
+    "bin":  "ssh-copy-id.ps1"
+}

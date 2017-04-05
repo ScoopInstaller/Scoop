@@ -1,0 +1,6 @@
+.DS_Store
+._.DS_Store
+scoop.sublime-workspace
+test/installer/tmp/*
+test/tmp/*
+*~

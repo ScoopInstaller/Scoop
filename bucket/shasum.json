@@ -1,0 +1,13 @@
+{
+    "homepage": "https://github.com/lukesampson/psutils",
+    "version": "0.2013.09.29",
+    "url": [
+        "https://raw.github.com/lukesampson/psutils/4fa05b1c9b/shasum.ps1",
+        "https://raw.github.com/lukesampson/psutils/4fa05b1c9b/getopt.ps1"
+    ],
+    "hash": [
+        "002ed0928a9d80f2d603e8de12bcd922fcdff5acfc4c6f6c67c2e2ace8728b08",
+        "452e61d92dd0eb4e4d6fe5fcd70f30b8c4f36cc9e3b618a7816ec45768d21262"
+    ],
+    "bin": "shasum.ps1"
+}

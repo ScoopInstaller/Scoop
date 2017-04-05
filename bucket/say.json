@@ -1,0 +1,13 @@
+{
+    "homepage": "https://github.com/lukesampson/psutils",
+    "version": "0.2013.09.08",
+    "url": [
+        "https://raw.github.com/lukesampson/psutils/3554f2db73/say.ps1",
+        "https://raw.github.com/lukesampson/psutils/2938900e58/getopt.ps1"
+    ],
+    "hash": [
+        "75e0013ed0a60b47646f6190b523fc6986177f7360e5352a22806d7e6143bb62",
+        "452e61d92dd0eb4e4d6fe5fcd70f30b8c4f36cc9e3b618a7816ec45768d21262"
+    ],
+    "bin": "say.ps1"
+}

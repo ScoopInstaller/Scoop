@@ -1,0 +1,42 @@
+{
+    "homepage": "http://sliksvn.com/",
+    "version": "1.9.5",
+    "architecture": {
+        "64bit": {
+            "url": "https://sliksvn.com/pub/Slik-Subversion-1.9.5-x64.msi",
+            "hash": "88761da80eb5e97d6b2c3eb7caf2f68c2ecb275b363ede10d816c3d789b1ceac"
+        },
+        "32bit": {
+            "url": "https://sliksvn.com/pub/Slik-Subversion-1.9.5-win32.msi",
+            "hash": "a04c48ad09c987fd729ab96edcbe02342dcc8c9aeb9ed2e3108ad8cc104daa3b"
+        }
+    },
+    "extract_dir": "SlikSvn",
+    "bin": [
+        "bin\\svn.exe",
+        "bin\\svnadmin.exe",
+        "bin\\svnauthz-validate.exe",
+        "bin\\svndumpfilter.exe",
+        "bin\\svnlook.exe",
+        "bin\\svnmucc.exe",
+        "bin\\svn-populate-node-origins-index.exe",
+        "bin\\svnrdump.exe",
+        "bin\\svnserve.exe",
+        "bin\\svnsync.exe",
+        "bin\\svnversion.exe"
+    ],
+    "checkver": {
+        "url": "https://sliksvn.com/download/",
+        "re": "<a.*>SVN ([\\d.]+), 64 bit</a>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sliksvn.com/pub/Slik-Subversion-$version-x64.msi"
+            },
+            "32bit": {
+                "url": "https://sliksvn.com/pub/Slik-Subversion-$version-win32.msi"
+            }
+        }
+    }
+}

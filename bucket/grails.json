@@ -1,0 +1,27 @@
+{
+    "homepage": "https://grails.org/",
+    "version": "3.2.7",
+    "license": "Apache 2.0",
+    "url": "https://github.com/grails/grails-core/releases/download/v3.2.7/grails-3.2.7.zip",
+    "hash": "781f19ab03578c5b045f40b0a37a225c9ab82445fad8e08f5e304789311cb5b3",
+    "extract_dir": "grails-3.2.7",
+    "bin": [
+        "bin\\grails.bat"
+    ],
+    "env_set": {
+        "GRAILS_HOME": "$dir"
+    },
+    "suggest": {
+        "JDK": [
+            "extras/oraclejdk",
+            "openjdk"
+        ]
+    },
+    "checkver": {
+        "github": "https://github.com/grails/grails-core"
+    },
+    "autoupdate": {
+        "url": "https://github.com/grails/grails-core/releases/download/v$version/grails-$version.zip",
+        "extract_dir": "grails-$version"
+    }
+}

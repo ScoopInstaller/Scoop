@@ -1,0 +1,7 @@
+{
+    "homepage": "https://github.com/lukesampson/psutils",
+    "version": "0.2013.06.29",
+    "url": "https://raw.github.com/lukesampson/psutils/master/runat.ps1",
+    "hash": "60ed4586db46ab6859e6786a3cbe896f64eb42b4a557e3e836984e2c379a328a",
+    "bin": "runat.ps1"
+}

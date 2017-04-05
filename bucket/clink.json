@@ -1,0 +1,12 @@
+{
+    "homepage": "https://mridgers.github.io/clink/",
+    "url": "https://github.com/mridgers/clink/releases/download/0.4.8/clink_0.4.8.zip",
+    "version": "0.4.8",
+    "hash": "cc1e07c1000e95ebbe1c6480df53487261e6457a733b925e13665740c14e15aa",
+    "extract_dir": "clink_0.4.8",
+    "bin": [ "clink.bat" ],
+    "notes": [
+        "Run 'clink inject' to start clink on the current cmd",
+        "Run 'clink autorun' to auto start clink"
+    ]
+}

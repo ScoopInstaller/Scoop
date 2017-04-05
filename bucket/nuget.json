@@ -1,0 +1,15 @@
+{
+    "homepage": "https://www.nuget.org/",
+    "version": "3.5.0",
+    "license": "Apache 2.0",
+    "url": "https://dist.nuget.org/win-x86-commandline/v3.5.0/NuGet.exe",
+    "hash": "399ec24c26ed54d6887cde61994bb3d1cada7956c1b19ff880f06f060c039918",
+    "bin": "NuGet.exe",
+    "checkver": {
+        "url": "https://dist.nuget.org/index.json",
+        "jp": "$.artifacts[0].versions[0].version"
+    },
+    "autoupdate": {
+        "url": "https://dist.nuget.org/win-x86-commandline/v$version/NuGet.exe"
+    }
+}

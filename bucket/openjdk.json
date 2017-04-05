@@ -1,0 +1,33 @@
+{
+    "homepage": "https://github.com/ojdkbuild/ojdkbuild",
+    "version": "1.8.0.121-1",
+    "license": "GPL2",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.121-1/java-1.8.0-openjdk-1.8.0.121-1.b13.ojdkbuild.windows.x86_64.zip",
+            "hash": "68476588b135a2ad9030567ab90368c36f5eb1f20bedffac9619bbcda5e3575b",
+            "extract_dir": "java-1.8.0-openjdk-1.8.0.121-1.b13.ojdkbuild.windows.x86_64"
+        }
+    },
+    "env_add_path": "bin",
+    "env_set": {
+        "JAVA_HOME": "$dir"
+    },
+    "checkver": {
+        "url": "https://raw.githubusercontent.com/ojdkbuild/ojdkbuild/master/README.md",
+        "re": "download/.*/java-(?<short>[\\d.]+)-openjdk-(?<version>[\\d.]+-[\\d]+)(?<tail>.*).x86_64.zip\\)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-$matchShort-openjdk-$version$matchTail.x86_64.zip",
+                "extract_dir": "java-$matchShort-openjdk-$version$matchTail.x86_64"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "$url.sha256",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
+    }
+}

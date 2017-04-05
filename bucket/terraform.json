@@ -1,0 +1,37 @@
+{
+    "homepage": "https://www.terraform.io",
+    "license": "Mozilla Public License 2.0",
+    "version": "0.9.1",
+    "architecture": {
+        "64bit": {
+            "url": "https://releases.hashicorp.com/terraform/0.9.1/terraform_0.9.1_windows_amd64.zip",
+            "hash": "12508576ffd0c01901794d16adb7fc9389be6a2911cbdfa6c5611576b1352843"
+        },
+        "32bit": {
+            "url": "https://releases.hashicorp.com/terraform/0.9.1/terraform_0.9.1_windows_386.zip",
+            "hash": "08949e4736852fd5e71bdda35d0e4a053ed8827fb6d20409d117f79cf68d3267"
+        }
+    },
+    "bin": [
+        "terraform.exe"
+    ],
+    "checkver": {
+        "url": "https://releases.hashicorp.com/terraform/",
+        "re": "terraform_([\\d.]+)</a>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://releases.hashicorp.com/terraform/$version/terraform_$version_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://releases.hashicorp.com/terraform/$version/terraform_$version_windows_386.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://releases.hashicorp.com/terraform/$version/terraform_$version_SHA256SUMS",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
+    }
+}

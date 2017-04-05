@@ -1,0 +1,22 @@
+{
+    "homepage": "http://www.mingw.org/wiki/msys",
+    "license": "GPL2",
+    "version": "msys-inetutils-1.7-1",
+    "url": [
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Base/termcap/termcap-0.20050421_1-2/termcap-0.20050421_1-2-msys-1.0.13-bin.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/minires/minires-1.02_1-2/libminires-1.02_1-2-msys-1.0.13-dll.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/bison/bison-2.4.2-1/bison-2.4.2-1-msys-1.0.13-rtm.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/inetutils/inetutils-1.7-1/inetutils-1.7-1-msys-1.0.13-bin.tar.lzma",
+        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/inetutils/inetutils-1.7-1/inetutils-1.7-1-msys.RELEASE_NOTES.txt"
+    ],
+    "hash": [
+        "41c7d5561662e41da74951f373a08a95db40b27b1246227bbbc13abc44976ea7",
+        "906e756332b5fd6c10eeb4b6362f5957dd8cafa5679f89d9adbae59dff7f2ff2",
+        "e42fbdcff71404a76306f3b8f0024f453aafa7fe7dd9dac43c82b2e8d33e23f1",
+        "81cd516f5c8071edfb6004fb70424226245dca48651d20b7055d713085490263",
+        "cd2b56b9c8e424d8c3c86e2101069d4083ce1bb2f929591a70bdc4fb604ddb46",
+        "7d629340d7b7ddeccae662fbafdafb779dfb8013b27d8d2a7a75a5bf7529c5b7"
+    ],
+    "bin": "bin\\telnet.exe"
+}

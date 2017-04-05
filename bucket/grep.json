@@ -1,0 +1,14 @@
+{
+    "homepage": "http://gnuwin32.sourceforge.net/packages/grep.htm",
+    "version": "2.5.4",
+    "license": "GPL2",
+    "url": [
+        "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-bin.zip",
+        "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-dep.zip"
+    ],
+    "hash": [
+        "3fd98201561b5af3f54a7dacc4f88068f5b5edf19ccdfc981c3c9fc60ff73519",
+        "2150e12da6631899842c28881a75889794d67b2bbc108341a26052f9bcb27584"
+    ],
+    "bin": "bin\\grep.exe"
+}

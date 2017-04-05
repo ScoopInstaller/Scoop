@@ -1,0 +1,37 @@
+{
+    "homepage": "https://eternallybored.org/misc/wget/",
+    "license": "GPL3",
+    "version": "1.19.1",
+    "architecture": {
+        "64bit": {
+            "url": [
+                "https://eternallybored.org/misc/wget/releases/wget-1.19.1-win64.zip"
+            ],
+            "hash": [
+                "61320a3a2f123dd8fd4a8baf65db4063a97622448dc1bf3fcf1284eebe449a1d"
+            ]
+        },
+        "32bit": {
+            "url": [
+                "https://eternallybored.org/misc/wget/releases/wget-1.19.1-win32.zip"
+            ],
+            "hash": [
+                "745801b57fee4514c131b142346a4332351e90fbc7f696f6a3e02c361cccc27f"
+            ]
+        }
+    },
+    "bin": "wget.exe",
+    "depends":  "cacert",
+    "post_install": "\"ca_certificate=$(appdir cacert)\\current\\cacert.pem\" | out-file $dir\\wget.ini -encoding default",
+    "checkver": "<title>GNU Wget ([\\d.]+) for Windows",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://eternallybored.org/misc/wget/releases/wget-$version-win64.zip"
+            },
+            "32bit": {
+                "url": "https://eternallybored.org/misc/wget/releases/wget-$version-win32.zip"
+            }
+        }
+    }
+}

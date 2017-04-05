@@ -1,0 +1,36 @@
+{
+    "version": "2.92",
+    "homepage": "https://transmissionbt.com/",
+    "license": "https://github.com/transmission/transmission/blob/master/COPYING",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/transmission/transmission/releases/download/2.92/transmission-2.92-x64.msi",
+            "hash": "8cee6436e79d48409d76a85bbb1bb506c8c76c8f686551b9e7e13b9a2ca2299d"
+        },
+        "32bit": {
+            "url": "https://github.com/transmission/transmission/releases/download/2.92/transmission-2.92-x86.msi",
+            "hash": "f8bfaba603036d35f74bbd5d27ea5bc51fe58d991af48228c290323e406bef00"
+        }
+    },
+    "extract_dir": "PFiles\\Transmission",
+    "bin": [
+        "transmission-create.exe",
+        "transmission-daemon.exe",
+        "transmission-edit.exe",
+        "transmission-remote.exe",
+        "transmission-show.exe"
+    ],
+    "checkver": {
+        "github": "https://github.com/transmission/transmission"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/transmission/transmission/releases/download/$version/transmission-$version-x64.msi"
+            },
+            "32bit": {
+                "url": "https://github.com/transmission/transmission/releases/download/$version/transmission-$version-x86.msi"
+            }
+        }
+    }
+}

@@ -1,0 +1,399 @@
+{
+    "$id": "http://scoop.sh/draft/schema#",
+    "$schema": "http://scoop.sh/draft/schema#",
+    "additionalProperties": false,
+    "definitions": {
+        "hashPattern": {
+            "pattern": "^([a-fA-F0-9]{64}|(sha1|sha256|sha512|md5):([a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{128}))$",
+            "type": "string"
+        },
+        "hash": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/hashPattern"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/hashPattern"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                }
+            ]
+        },
+        "architecture": {
+            "additionalProperties": false,
+            "properties": {
+                "bin": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "checkver": {
+                    "$ref": "#/definitions/checkver"
+                },
+                "extract_dir": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "hash": {
+                    "$ref": "#/definitions/hash"
+                },
+                "installer": {
+                    "$ref": "#/definitions/installer"
+                },
+                "msi": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings",
+                    "description": "Deprecated"
+                },
+                "post_install": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "pre_install": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "uninstaller": {
+                    "$ref": "#/definitions/uninstaller"
+                },
+                "url": {
+                    "$ref": "#/definitions/uriOrArrayOfUris"
+                }
+            },
+            "type": "object"
+        },
+        "arrayOfArrayOfStrings": {
+            "items": {
+                "items": {
+                    "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+            },
+            "minItems": 1,
+            "type": "array"
+        },
+        "autoupdate": {
+            "additionalProperties": false,
+            "properties": {
+                "architecture": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "32bit": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "extract_dir": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "format": "uri",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        },
+                        "64bit": {
+                            "additionalProperties": false,
+                            "properties": {
+                                "extract_dir": {
+                                    "type": "string"
+                                },
+                                "url": {
+                                    "format": "uri",
+                                    "type": "string"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                },
+                "extract_dir": {
+                    "type": "string"
+                },
+                "hash": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "find": {
+                            "format": "regex",
+                            "type": "string"
+                        },
+                        "jp": {
+                            "pattern": "^\\$\\..*$",
+                            "type": "string"
+                        },
+                        "mode": {
+                            "enum": [
+                                "download",
+                                "extract",
+                                "json",
+                                "rdf"
+                            ]
+                        },
+                        "type": {
+                            "enum": [
+                                "md5",
+                                "sha1",
+                                "sha256",
+                                "sha512"
+                            ]
+                        },
+                        "url": {
+                            "anyOf": [
+                                {
+                                    "format": "uri",
+                                    "type": "string"
+                                },
+                                {
+                                    "pattern": "^\\$url.[\\w\\d]+$",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    },
+                    "type": "object"
+                },
+                "note": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "url": {
+                    "format": "uri",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "checkver": {
+            "anyOf": [
+                {
+                    "format": "regex",
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "github": {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        "re": {
+                            "format": "regex",
+                            "type": "string"
+                        },
+                        "url": {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        "jp": {
+                            "pattern": "^\\$\\..*$",
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "installer": {
+            "additionalProperties": false,
+            "properties": {
+                "_comment": {
+                    "description": "Undocumented: only used in scoop-extras/oraclejdk* and scoop-extras/appengine-go",
+                    "type": "string"
+                },
+                "args": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "keep": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "stringOrArrayOfStrings": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                }
+            ]
+        },
+        "stringOrArrayOfStringsOrAnArrayOfArrayOfStrings": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/stringOrArrayOfStrings"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                }
+            ]
+        },
+        "uninstaller": {
+            "properties": {
+                "args": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "file": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "file"
+            ],
+            "type": "object"
+        },
+        "uriOrArrayOfUris": {
+            "anyOf": [
+                {
+                    "format": "uri",
+                    "not": {
+                        "pattern": "(\\$)"
+                    },
+                    "type": "string"
+                },
+                {
+                    "items": {
+                        "format": "uri",
+                        "not": {
+                            "pattern": "(\\$)"
+                        },
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                }
+            ]
+        }
+    },
+    "properties": {
+        "_comment": {
+            "description": "Undocumented: only found in scoop/git* and 6 manifests in scoop-extras",
+            "type": "string"
+        },
+        "architecture": {
+            "additionalProperties": false,
+            "properties": {
+                "32bit": {
+                    "$ref": "#/definitions/architecture"
+                },
+                "64bit": {
+                    "$ref": "#/definitions/architecture"
+                }
+            },
+            "type": "object"
+        },
+        "autoupdate": {
+            "$ref": "#/definitions/autoupdate"
+        },
+        "bin": {
+            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+        },
+        "checkver": {
+            "$ref": "#/definitions/checkver"
+        },
+        "cookie": {
+            "description": "Undocumented: only found in scoop-extras/oraclejdk*",
+            "type": "object"
+        },
+        "depends": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "description": {
+            "description": "Undocumented: only found in scoop/gibo",
+            "type": "string"
+        },
+        "env_add_path": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "env_set": {
+            "type": "object"
+        },
+        "extract_dir": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "extract_to": {
+            "$ref": "#/definitions/stringOrArrayOfStrings",
+            "description": "Undocumented: only found in scoop/ruby*"
+        },
+        "hash": {
+            "$ref": "#/definitions/hash"
+        },
+        "homepage": {
+            "format": "uri",
+            "type": "string"
+        },
+        "innosetup": {
+            "description": "Undocumented: only found in 6 manifests in scoop",
+            "type": "boolean"
+        },
+        "installer": {
+            "$ref": "#/definitions/installer"
+        },
+        "license": {
+            "type": "string"
+        },
+        "msi": {
+            "$ref": "#/definitions/stringOrArrayOfStrings",
+            "description": "Deprecated"
+        },
+        "notes": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "post_install": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "pre_install": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "psmodule": {
+            "additionalProperties": false,
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "shortcuts": {
+            "$ref": "#/definitions/arrayOfArrayOfStrings"
+        },
+        "suggest": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "^(.*)$": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                }
+            },
+            "type": "object"
+        },
+        "travel_dirs": {
+            "$ref": "#/definitions/stringOrArrayOfStrings",
+            "description": "Undocumented: only found in scoop-extras/kibana"
+        },
+        "uninstaller": {
+            "$ref": "#/definitions/uninstaller"
+        },
+        "url": {
+            "$ref": "#/definitions/uriOrArrayOfUris"
+        },
+        "version": {
+            "pattern": "^[\\w\\.\\-_]+$",
+            "type": "string"
+        }
+    },
+    "required": [
+        "version"
+    ],
+    "title": "scoop app manifest schema",
+    "type": "object"
+}

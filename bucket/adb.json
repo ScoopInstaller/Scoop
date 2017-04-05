@@ -1,0 +1,17 @@
+{
+    "version": "25.0.4",
+    "homepage": "https://developer.android.com/studio/releases/platform-tools.html",
+    "url": "https://dl.google.com/android/repository/platform-tools_r25.0.4-windows.zip",
+    "hash": "d2b9c7decacd9fc2dc8537fd2ce95f8afda81b8fafa0620b8c937b01761d2a00",
+    "bin": [
+        "platform-tools\\adb.exe",
+        "platform-tools\\dmtracedump.exe",
+        "platform-tools\\etc1tool.exe",
+        "platform-tools\\fastboot.exe",
+        "platform-tools\\hprof-conv.exe"
+    ],
+    "checkver": "<h4.*>([\\d.]+) \\(.*\\)</h4>",
+    "autoupdate": {
+        "url": "https://dl.google.com/android/repository/platform-tools_r$version-windows.zip"
+    }
+}

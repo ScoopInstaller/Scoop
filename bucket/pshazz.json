@@ -1,0 +1,8 @@
+{
+    "version": "0.2016.10.16",
+    "url": "https://github.com/lukesampson/pshazz/archive/e6ce00168cdf982cc05327b8d5ac5fc740bff4c8.zip",
+    "extract_dir": "pshazz-e6ce00168cdf982cc05327b8d5ac5fc740bff4c8",
+    "hash": "4a0bdf437b0d8759e1f728f911810a0d2ca4cb35b50b19ad5f58d4664214d814",
+    "bin": [ "bin\\pshazz.ps1", "libexec\\askpass.exe" ],
+    "installer": { "file": "bin\\install.ps1" }
+}

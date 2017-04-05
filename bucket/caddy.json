@@ -1,0 +1,40 @@
+{
+    "version": "0.9.5",
+    "homepage": "http://caddyserver.com",
+    "license": "https://github.com/mholt/caddy/blob/master/LICENSE.txt",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/mholt/caddy/releases/download/v0.9.5/caddy_windows_amd64.zip",
+            "hash": "62c6a6501f02aa1e1cc56f2b8803e4cfa90f839ca6016c17f30a3b62ef68189f",
+            "bin": [
+                [
+                    "caddy_windows_amd64.exe",
+                    "caddy"
+                ]
+            ]
+        },
+        "32bit": {
+            "url": "https://github.com/mholt/caddy/releases/download/v0.9.5/caddy_windows_386.zip",
+            "hash": "376d1e45fc8348edc31051baede4334f120bb9e3630b6b2830777347f782bb3d",
+            "bin": [
+                [
+                    "caddy_windows_386.exe",
+                    "caddy"
+                ]
+            ]
+        }
+    },
+    "checkver": {
+        "github": "https://github.com/mholt/caddy"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_386.zip"
+            }
+        }
+    }
+}

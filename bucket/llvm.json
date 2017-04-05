@@ -1,0 +1,34 @@
+{
+    "homepage": "http://www.llvm.org",
+    "version": "4.0.0",
+    "license": "University of Illinois/NCSA Open Source License",
+    "architecture": {
+        "32bit": {
+            "url": "http://releases.llvm.org/4.0.0/LLVM-4.0.0-win32.exe",
+            "hash": "aabe2a31182d9adce8146c86fe92e19d911b7cc1cb240cdb790f314c819c92e2"
+        },
+        "64bit": {
+            "url": "http://releases.llvm.org/4.0.0/LLVM-4.0.0-win64.exe",
+            "hash": "9bb800e42a4568c7a6e217dac1b613741ee9811eea2fa65ca8c20702728003e9"
+        }
+    },
+    "installer": {
+        "args": "/S /D=$dir"
+    },
+    "uninstaller": {
+        "file": "Uninstall.exe",
+        "args": "/S"
+    },
+    "env_add_path": "bin",
+    "checkver": "\\/releases\\/download.html#([\\d.]+)",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://releases.llvm.org/$version/LLVM-$version-win64.exe"
+            },
+            "32bit": {
+                "url": "http://releases.llvm.org/$version/LLVM-$version-win32.exe"
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "homepage": "http://nodejs.org",
+    "version": "6.10.0",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://nodejs.org/dist/v6.10.0/node-v6.10.0-x64.msi",
+            "hash": "0fd99472edd0ef518ac557c24c037f83f4c82341348a2b397d51410550b6217c"
+        },
+        "32bit": {
+            "url": "https://nodejs.org/dist/v6.10.0/node-v6.10.0-x86.msi",
+            "hash": "65add5aebb209705dacc8462a5376dcb612e19b3f2af1ce1e8a0c7e1c95e3e81"
+        }
+    },
+    "env_add_path": "nodejs",
+    "post_install": "
+# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
+rm $dir\\nodejs\\node_modules\\npm\\npmrc
+npm update -g",
+    "checkver": {
+        "url": "https://nodejs.org/en/download/",
+        "re": "LTS version: <strong>v([\\d.]+)</strong>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://nodejs.org/dist/v$version/node-v$version-x64.msi"
+            },
+            "32bit": {
+                "url": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://nodejs.org/dist/v$version/SHASUMS256.txt.asc",
+            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+        }
+    }
+}

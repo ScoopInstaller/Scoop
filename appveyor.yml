@@ -1,0 +1,17 @@
+version: "{build}-{branch}"
+
+branches:
+  except:
+    - gh-pages
+
+init:
+  - ps: (get-psprovider 'FileSystem').Home = $(pwd)
+  - ps: "if($env:APPVEYOR_CHOCO_PESTER_OPTIONS -ne $null) { write-host -f yellow 'NOTE: customized `pester` installation is being used' }"
+  - ps: choco install -y pester $env:APPVEYOR_CHOCO_PESTER_OPTIONS
+
+build: off
+
+test_script:
+  - ps: $result = invoke-pester -path test/ -outputfile TestResults.xml -outputformat NUnitXML -passthru; $env:failedcount = $result.failedcount
+  - ps: (new-object net.webclient).uploadfile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (resolve-path ./TestResults.xml))
+  - ps: if($env:failedcount -gt 0) { exit $env:failedcount }

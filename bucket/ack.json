@@ -1,0 +1,17 @@
+{
+    "homepage": "http://beyondgrep.com/",
+    "license": "http://opensource.org/licenses/Artistic-2.0",
+    "version": "2.16",
+    "url": "http://beyondgrep.com/ack-2.16-single-file#/ack-single-file",
+    "hash": "7f39f08ebb78ed160a41293d7f42ff1bdcdaf57aee859bc4c4888bdf4abee7f2",
+    "bin": "ack.bat",
+    "depends": "perl",
+    "pre_install": "Set-Content -Value '@perl.exe %~dp0ack-single-file %*' -Path $dir\\ack.bat",
+    "checkver": {
+        "url": "http://beyondgrep.com/install/",
+        "re": "The current stable version of ack is version ([\\d.]+),"
+    },
+    "autoupdate": {
+        "url": "http://beyondgrep.com/ack-$version-single-file#/ack-single-file"
+    }
+}

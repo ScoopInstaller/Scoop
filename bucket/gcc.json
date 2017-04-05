@@ -1,0 +1,20 @@
+{
+    "homepage": "http://mingw-w64.org",
+    "version": "6.3.0",
+    "LICENSE": "GPL3",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win64/Personal Builds/mingw-builds/6.3.0/threads-posix/seh/x86_64-6.3.0-release-posix-seh-rt_v5-rev1.7z",
+            "hash": "2d0e72340ffa14916d4469db25c37889e477f8f1f49ba4f77155830ddc1dca89",
+            "extract_dir": "mingw64"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/mingw-w64/files/Toolchains targetting Win32/Personal Builds/mingw-builds/6.3.0/threads-posix/dwarf/i686-6.3.0-release-posix-dwarf-rt_v5-rev1.7z",
+            "hash": "8f7381e8ed61c438d36d33ae2f514a7ca8065c44dcf6801847fd425f71a9ee1d",
+            "extract_dir": "mingw32"
+        }
+    },
+    "env_add_path": "bin",
+    "notes": "The 64bit version is built with Structured Exception Handling (SEH), the 32bit is built with DWARF.
+Both 64bit and 32bit support Posix threading model"
+}
