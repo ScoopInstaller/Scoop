@@ -61,6 +61,29 @@ if($apps.length -eq 1) {
     ensure_not_installed $apps $global
 }
 
+# get any specific versions that we need to handle first
+$specific_versions = $apps | Where-Object { is_app_with_specific_version $_ }
+
+# compare object does not like nulls
+if ($specific_versions.length -gt 0) {
+    $difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
+} else {
+    $difference = $apps
+}
+
+$specific_versions_paths = $specific_versions | ForEach-Object {
+    $appWithVersion = get_app_with_version $_
+    $name           = $appWithVersion.app
+    $version        = $appWithVersion.version
+
+    if (installed_manifest $name $version) {
+        abort "'$name' ($version) is already installed.`nUse 'scoop update $name$global_flag' to install a new version."
+    }
+
+    generate_user_manifest $name $version
+}
+$apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-Object -Unique)
+
 # remember which were explictly requested so that we can
 # differentiate after dependencies are added
 $explicit_apps = $apps

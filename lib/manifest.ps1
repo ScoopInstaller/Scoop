@@ -1,7 +1,7 @@
 . "$psscriptroot/core.ps1"
+. "$psscriptroot/autoupdate.ps1"
 
 function manifest_path($app, $bucket) {
-
     "$(bucketdir $bucket)\$(sanitary_path $app).json"
 }
 
@@ -62,6 +62,29 @@ function arch_specific($prop, $manifest, $architecture) {
     }
 
     if($manifest.$prop) { return $manifest.$prop }
+}
+
+function generate_user_manifest($app, $version) {
+    $path = $null
+
+    $null, $manifest, $bucket, $null = locate $app
+    if (!("$($manifest.version)" -eq "$version")) {
+        warn "Given version ($version) does not match manifest ($($manifest.version))"
+        warn "Attempting to generate manifest for '$app' ($version)"
+
+        if (!($manifest.autoupdate)) {
+            abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
+        }
+
+        ensure $(usermanifestsdir) | out-null
+        autoupdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(New-Object HashTable)
+
+        $path = "$(resolve-path $(usermanifest $app))"
+    } else {
+        manifest_path $app $bucket
+    }
+
+    $path
 }
 
 function url($manifest, $arch) { arch_specific 'url' $manifest $arch }

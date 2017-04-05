@@ -60,6 +60,8 @@ function shimdir($global) { "$(basedir $global)\shims" }
 function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
+function usermanifestsdir { "$(basedir)\workspace" }
+function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
@@ -309,4 +311,20 @@ function app($app) {
     }
 
     $app, $null
+}
+
+function is_app_with_specific_version([String] $app) {
+    $appWithVersion = get_app_with_version $app
+    $appWithVersion.version -ne 'latest'
+}
+
+function get_app_with_version([String] $app) {
+    $segments = $app -split '@'
+    $name     = $segments[0]
+    $version  = $segments[1];
+
+    return @{
+        "app" = $name;
+        "version" = if ($version) { $version } else { 'latest' }
+    }
 }

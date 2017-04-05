@@ -6,6 +6,9 @@ TODO
 #>
 . "$psscriptroot\..\lib\json.ps1"
 
+. "$psscriptroot/core.ps1"
+. "$psscriptroot/json.ps1"
+
 function substitute([String] $str, [Hashtable] $params) {
     $params.GetEnumerator() | % {
         $str = $str.Replace($_.Name, $_.Value)
@@ -259,6 +262,10 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
 
     # update properties
     update_manifest_prop "extract_dir" $json $substitutions
+
+    if ($has_errors) {
+        throw "Error: Could not autoupdate '$app'."
+    }
 
     if ($has_changes -and !$has_errors) {
         # write file
