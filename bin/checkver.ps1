@@ -160,7 +160,11 @@ while($in_progress -gt 0) {
 
         if ($forceUpdate -and $json.autoupdate) {
             Write-Host "Forcing autoupdate!" -f DarkMagenta
-            autoupdate $app $dir $json $ver $matches
+            try {
+                autoupdate $app $dir $json $ver $matches
+            } catch {
+                write-host -f darkred $_.exception.message
+            }
         }
     } else {
         write-host "$ver" -f darkred -nonewline
@@ -174,7 +178,11 @@ while($in_progress -gt 0) {
         }
 
         if ($update -and $update_available -and $json.autoupdate) {
-            autoupdate $app $dir $json $ver $matches
+            try {
+                autoupdate $app $dir $json $ver $matches
+            } catch {
+                write-host -f darkred $_.exception.message
+            }
         }
     }
 }

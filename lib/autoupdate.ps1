@@ -229,7 +229,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             update_manifest_with_new_version $json $version $url $hash
         } else {
             $has_errors = $true
-            Write-Host -f DarkRed "Could not update $app"
+            throw "Could not update $app"
         }
     } else {
         $json.architecture | Get-Member -MemberType NoteProperty | % {
@@ -255,17 +255,13 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
                 update_manifest_with_new_version $json $version $url $hash $architecture
             } else {
                 $has_errors = $true
-                Write-Host -f DarkRed "Could not update $app $architecture"
+                throw "Could not update $app $architecture"
             }
         }
     }
 
     # update properties
     update_manifest_prop "extract_dir" $json $substitutions
-
-    if ($has_errors) {
-        throw "Error: Could not autoupdate '$app'."
-    }
 
     if ($has_changes -and !$has_errors) {
         # write file
