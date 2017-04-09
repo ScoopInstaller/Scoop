@@ -1,12 +1,12 @@
 {
     "architecture": {
         "32bit": {
-            "hash": "44df91708721dd131a504bd4b23f6b4f0ab582e88f6d91f87a28b260c27b8d18",
-            "url": "https://handbrake.fr/rotation.php?file=HandBrakeCLI-1.0.3-win-i686.zip#/dl.zip"
+            "hash": "152046b12d17c576d68eedecf5231001fafbc660c27ce52075b7a48d8ca91c8a",
+            "url": "https://handbrake.fr/rotation.php?file=HandBrakeCLI-1.0.7-win-i686.zip#/dl.zip"
         },
         "64bit": {
-            "hash": "64cf72ce281a1abaf52924f5f531f4037311e6ed4dabc0ba8e7130f08f8c00fa",
-            "url": "https://handbrake.fr/rotation.php?file=HandBrakeCLI-1.0.3-win-x86_64.zip#/dl.zip"
+            "hash": "b00c00520705e05bfb42701b4121de8e56c9c283af2b30d42ce10b24823519e0",
+            "url": "https://handbrake.fr/rotation.php?file=HandBrakeCLI-1.0.7-win-x86_64.zip#/dl.zip"
         }
     },
     "autoupdate": {
@@ -29,5 +29,5 @@
     "description": "Convert videos with CLI program",
     "homepage": "https://handbrake.fr/",
     "license": "GPL-2.0",
-    "version": "1.0.3"
+    "version": "1.0.7"
 }
