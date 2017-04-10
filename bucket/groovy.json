@@ -26,7 +26,7 @@
     },
     "checkver": {
         "url": "http://www.groovy-lang.org/download.html",
-        "re": "([\\d.]+) distributions"
+        "re": "apache-groovy-binary-([\\d.]+).zip"
     },
     "autoupdate": {
         "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-$version.zip",
