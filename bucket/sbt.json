@@ -1,10 +1,10 @@
 {
     "homepage": "http://www.scala-sbt.org/",
-    "version": "0.13.13",
+    "version": "0.13.15",
     "license": "BSD",
-    "url": "https://dl.bintray.com/sbt/native-packages/sbt/0.13.13/sbt-0.13.13.zip",
-    "hash": "701ac8873b9f91c591c86cbd74b2b7057f9cfeeee374cc9bc07303243b6fb5e7",
-    "extract_dir": "sbt-launcher-packaging-0.13.13",
+    "url": "https://dl.bintray.com/sbt/native-packages/sbt/0.13.15/sbt-0.13.15.zip",
+    "hash": "18b106d09b2874f2a538c6e1f6b20c565885b2a8051428bd6d630fb92c1c0f96",
+    "extract_dir": "sbt-launcher-packaging-0.13.15",
     "bin": [
         "bin\\sbt.bat"
     ],
