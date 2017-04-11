@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.nuget.org/",
-    "version": "3.5.0",
+    "version": "4.1.0",
     "license": "Apache 2.0",
-    "url": "https://dist.nuget.org/win-x86-commandline/v3.5.0/NuGet.exe",
-    "hash": "399ec24c26ed54d6887cde61994bb3d1cada7956c1b19ff880f06f060c039918",
+    "url": "https://dist.nuget.org/win-x86-commandline/v4.1.0/nuget.exe",
+    "hash": "4c1de9b026e0c4ab087302ff75240885742c0faa62bd2554f913bbe1f6cb63a0",
     "bin": "NuGet.exe",
     "checkver": {
         "url": "https://dist.nuget.org/index.json",
