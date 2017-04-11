@@ -2,7 +2,7 @@
     "homepage": "https://gradle.org",
     "version": "3.5",
     "license": "Apache 2.0",
-    "hash": "db1db193d479cc1202be843f17e4526660cfb0b21b57d62f3a87f88c878af9b2",
+    "hash": "0b7450798c190ff76b9f9a3d02e18b33d94553f708ebc08ebe09bdf99111d110",
     "url": "https://services.gradle.org/distributions/gradle-3.5-bin.zip",
     "extract_dir": "gradle-3.5",
     "bin": "bin\\gradle.bat",
