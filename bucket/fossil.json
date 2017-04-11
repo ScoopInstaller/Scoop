@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.fossil-scm.org/",
-    "version": "2.1",
+    "version": "2.2",
     "license": "https://www.fossil-scm.org/index.html/doc/trunk/COPYRIGHT-BSD2.txt",
-    "hash": "747a7ae4ece0b0cf02f80b8991fb3f7bf58c45eb20d6599b1f55fa2b1f87e244",
-    "url": "https://www.fossil-scm.org/index.html/uv/fossil-w32-2.1.zip",
+    "hash": "507b08fa84d944b08aa30aa1aadc23efea9b049e2848341f6c66e62baa753d05",
+    "url": "https://www.fossil-scm.org/index.html/uv/fossil-w32-2.2.zip",
     "bin": "fossil.exe",
     "checkver": {
         "url": "https://www.fossil-scm.org/index.html/uv/download.html",
