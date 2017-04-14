@@ -66,7 +66,9 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     $branch = "manifest/$app-$version"
 
     execute "hub checkout master"
-    execute "hub rev-parse --verify $branch"
+    Write-Host -f Green "hub rev-parse --verify $branch"
+    # don't use execute function, this command should not exit the program
+    iex "hub rev-parse --verify $branch"
 
     if($LASTEXITCODE -eq 0) {
         Write-Host -f Yellow "Skipping update $app ($version) ..."
