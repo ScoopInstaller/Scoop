@@ -24,7 +24,6 @@
             }
         },
         "hash": {
-            "mode": "extract",
             "url": "$url.sha256"
         }
     }

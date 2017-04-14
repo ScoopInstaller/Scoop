@@ -55,10 +55,7 @@ if (!(Test-Path \"$dir\\cli\\conf.d\")) {
             }
         },
         "hash": {
-            "mode": "extract",
-            "type": "sha1",
-            "url": "http://windows.php.net/downloads/releases/sha1sum.txt",
-            "find": "([a-z0-9]{40})\\s+(?:$basename)"
+            "url": "http://windows.php.net/downloads/releases/sha1sum.txt"
         }
     },
     "suggest": {

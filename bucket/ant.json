@@ -10,7 +10,10 @@
         "ANT_HOME": "$dir"
     },
     "suggest": {
-        "JDK": [ "extras/oraclejdk", "openjdk" ]
+        "JDK": [
+            "extras/oraclejdk",
+            "openjdk"
+        ]
     },
     "checkver": {
         "url": "https://ant.apache.org/bindownload.cgi",
@@ -20,8 +23,6 @@
         "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip",
         "extract_dir": "apache-ant-$version",
         "hash": {
-            "mode": "extract",
-            "type": "sha512",
             "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip.sha512"
         }
     }

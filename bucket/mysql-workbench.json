@@ -18,10 +18,7 @@
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "$url.md5",
-            "type": "md5",
-            "find": "([a-z0-9]{32})\\s+(?:$basename)"
+            "url": "$url.md5"
         }
     },
     "bin": [

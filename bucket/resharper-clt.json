@@ -15,9 +15,6 @@
     "autoupdate": {
         "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.$version.zip",
         "hash": {
-            "mode": "extract",
-            "type": "sha256",
-            "find": "([a-fA-F0-9]{64})\\s+\\*(?:$basename)",
             "url": "$url.sha256"
         }
     }

@@ -31,9 +31,6 @@
             }
         },
         "hash": {
-            "type": "sha1",
-            "mode": "extract",
-            "find": "^([a-f0-9]{40})$",
             "url": "$url.sha1"
         }
     }

@@ -37,9 +37,7 @@ Set-Content -Value \"prefix=$dir\\bin\" -Path $dir\\node_modules\\npm\\npmrc",
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "https://nodejs.org/dist/v$version/SHASUMS256.txt.asc",
-            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+            "url": "https://nodejs.org/dist/v$version/SHASUMS256.txt.asc"
         }
     }
 }

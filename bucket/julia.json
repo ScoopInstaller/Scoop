@@ -49,9 +49,7 @@
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "https://s3.amazonaws.com/julialang/bin/checksums/julia-$version.sha256",
-            "find": "([a-z0-9]{64})\\s+\\*(?:$basename)"
+            "url": "https://s3.amazonaws.com/julialang/bin/checksums/julia-$version.sha256"
         }
     }
 }
