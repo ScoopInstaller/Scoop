@@ -39,7 +39,7 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     return $digest.sha256
 }
 
-function find_hash_in_textfile([String] $url, [String] $basename, [String] $type, [String] $regex) {
+function find_hash_in_textfile([String] $url, [String] $basename, [String] $regex) {
     $hashfile = $null
 
     try {
@@ -52,20 +52,36 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $type
         return
     }
 
-    if ($regex -eq $null) {
-        $regex = "([a-z0-9]+)"
+    # find single line hash in $hashfile (will be overridden by $regex)
+    if ($regex.Length -eq 0) {
+        $normalRegex = "^([a-fA-F0-9]+)$"
+    } else {
+        $normalRegex = $regex
     }
-    $regex = substitute $regex @{'$basename' = [regex]::Escape($basename)}
 
-    if ($hashfile -match $regex) {
+    $normalRegex = substitute $normalRegex @{'$basename' = [regex]::Escape($basename)}
+    if ($hashfile -match $normalRegex) {
         $hash = $matches[1]
-
-        if ($type -and !($type -eq "sha256")) {
-            $hash = $type + ":$hash"
-        }
-
-        return $hash
     }
+
+    # find hash with filename in $hashfile (will be overridden by $regex)
+    if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
+        $filenameRegex = "([a-fA-F0-9]+)\s+\*?(?:`$basename)"
+        $filenameRegex = substitute $filenameRegex @{'$basename' = [regex]::Escape($basename)}
+        if ($hashfile -match $filenameRegex) {
+            $hash = $matches[1]
+        }
+    }
+
+    switch ($hash.Length)
+    {
+        32 { $hash = "md5:$hash" } # md5
+        40 { $hash = "sha1:$hash" } # sha1
+        64 { $hash = $hash } # sha256
+        128 { $hash = "sha512:$hash" } # sha512
+        default { $hash = $null }
+    }
+    return $hash
 }
 
 function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath) {
@@ -108,8 +124,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hashfile_url = substitute $config.url @{'$url' = $url}
     $hashfile_url = substitute $hashfile_url $substitutions
 
+    if($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
+        $hashmode = "extract"
+    }
+
     if ($hashmode -eq "extract") {
-        $hash = find_hash_in_textfile $hashfile_url $basename $config.type $config.find
+        $hash = find_hash_in_textfile $hashfile_url $basename $config.find
     }
 
     if ($hashmode -eq "json") {
