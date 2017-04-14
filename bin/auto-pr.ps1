@@ -67,8 +67,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
 
     execute "hub checkout master"
     Write-Host -f Green "hub rev-parse --verify $branch"
-    # don't use execute function, this command should not exit the program
-    iex "hub rev-parse --verify $branch"
+    hub rev-parse --verify $branch
 
     if($LASTEXITCODE -eq 0) {
         Write-Host -f Yellow "Skipping update $app ($version) ..."
@@ -87,17 +86,19 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
         execute "hub reset"
         return
     }
-
+    Start-Sleep 1
     Write-Host -f DarkCyan "Pull-Request update $app ($version) ..."
-    Write-Host -f green "hub pull-request -m '<msg>' -b '$upstream' -h $branch"
-    hub pull-request -m "Update $app to version $version`n`nHello lovely humans,`n
-a new version of [$app]($homepage) is available.
-<table>
-<tr><th align=left>State</th><td>Update :rocket:</td></tr>
-<tr><th align=left>New version</td><td>$version</td></tr>
-</table>" -b '$upstream' -h $branch
+    Write-Host -f green "hub pull-request -m '<msg>' -b '$upstream' -h '$branch'"
+    $msg = "Update $app to version $version"
+    $msg += "`nHello lovely humans,`n"
+    $msg += "a new version of [$app]($homepage) is available.`n"
+    $msg += "<table>"
+    $msg += "<tr><th align=left>State</th><td>Update :rocket:</td></tr>"
+    $msg += "<tr><th align=left>New version</td><td>$version</td></tr>"
+    $msg += "</table>"
+    hub pull-request -m $msg -b '$upstream' -h '$branch'
     if($LASTEXITCODE -gt 0) {
-        Write-Host -f DarkRed "Pull Request failed! (hub pull-request -m 'update $app to version $version' -b '$upstream' -h $branch)"
+        Write-Host -f DarkRed "Pull Request failed! (hub pull-request -m 'Update $app to version $version' -b '$upstream' -h '$branch')"
         execute "hub reset"
         exit 1
     }
