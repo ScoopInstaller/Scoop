@@ -45,9 +45,8 @@ $root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\
             }
         },
         "hash": {
-            "mode": "extract",
             "url": "$url.txt",
-            "find": "SHA256-Checksum for: (?:$basename):\\s+([a-zA-Z0-9]{64})"
+            "find": "SHA256-Checksum for: (?:$basename):\\s+([a-fA-F0-9]{64})"
         }
     }
 }

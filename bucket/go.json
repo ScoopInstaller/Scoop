@@ -28,9 +28,7 @@
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "$url.sha256",
-            "find": "([a-z0-9]{64})"
+            "url": "$url.sha256"
         }
     }
 }

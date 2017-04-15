@@ -30,8 +30,6 @@
             }
         },
         "hash": {
-            "mode": "extract",
-            "type": "sha256",
             "url": "$url.sha256sum"
         }
     }

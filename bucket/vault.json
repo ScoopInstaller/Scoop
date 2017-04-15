@@ -29,9 +29,7 @@
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "https://releases.hashicorp.com/vault/$version/vault_$version_SHA256SUMS",
-            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+            "url": "https://releases.hashicorp.com/vault/$version/vault_$version_SHA256SUMS"
         }
     }
 }

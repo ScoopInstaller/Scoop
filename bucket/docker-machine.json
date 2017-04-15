@@ -30,9 +30,7 @@
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "https://github.com/docker/machine/releases/download/v$version/sha256sum.txt",
-            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+            "url": "https://github.com/docker/machine/releases/download/v$version/sha256sum.txt"
         }
     }
 }
