@@ -170,6 +170,9 @@ function dl($url, $to, $cookies, $progress) {
 
     $wres = $wreq.getresponse()
     $total = $wres.ContentLength
+    if($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
+        $total = ftp_file_size($url)
+    }
 
     if ($progress -and ($total -gt 0)) {
         [console]::CursorVisible = $false
@@ -422,6 +425,12 @@ function is_in_dir($dir, $check) {
     $check = "$(fullpath $check)"
     $dir = "$(fullpath $dir)"
     $check -match "^$([regex]::escape("$dir"))(\\|`$)"
+}
+
+function ftp_file_size($url) {
+    $request = [net.ftpwebrequest]::create($url)
+    $request.method = [net.webrequestmethods+ftp]::getfilesize
+    $request.getresponse().contentlength
 }
 
 # hashes
