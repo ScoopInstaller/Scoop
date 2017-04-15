@@ -22,6 +22,52 @@
                 }
             ]
         },
+        "hashExtraction": {
+            "additionalProperties": false,
+            "properties": {
+                "find": {
+                    "format": "regex",
+                    "type": "string"
+                },
+                "jp": {
+                    "pattern": "^\\$\\..*$",
+                    "type": "string"
+                },
+                "mode": {
+                    "enum": [
+                        "download",
+                        "extract",
+                        "json",
+                        "rdf"
+                    ]
+                },
+                "type": {
+                    "enum": [
+                        "md5",
+                        "sha1",
+                        "sha256",
+                        "sha512"
+                    ]
+                },
+                "url": {
+                    "anyOf": [
+                        {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        {
+                            "pattern": "^\\$url.[\\w\\d]+$",
+                            "type": "string"
+                        },
+                        {
+                            "pattern": "^.*\\$url.*$",
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "type": "object"
+        },
         "architecture": {
             "additionalProperties": false,
             "properties": {
@@ -85,6 +131,9 @@
                                 "url": {
                                     "format": "uri",
                                     "type": "string"
+                                },
+                                "hash": {
+                                    "$ref": "#/definitions/hashExtraction"
                                 }
                             },
                             "type": "object"
@@ -98,6 +147,9 @@
                                 "url": {
                                     "format": "uri",
                                     "type": "string"
+                                },
+                                "hash": {
+                                    "$ref": "#/definitions/hashExtraction"
                                 }
                             },
                             "type": "object"
@@ -109,42 +161,7 @@
                     "type": "string"
                 },
                 "hash": {
-                    "additionalProperties": false,
-                    "properties": {
-                        "find": {
-                            "format": "regex",
-                            "type": "string"
-                        },
-                        "jp": {
-                            "pattern": "^\\$\\..*$",
-                            "type": "string"
-                        },
-                        "mode": {
-                            "enum": [
-                                "download",
-                                "extract",
-                                "json",
-                                "rdf"
-                            ]
-                        },
-                        "url": {
-                            "anyOf": [
-                                {
-                                    "format": "uri",
-                                    "type": "string"
-                                },
-                                {
-                                    "pattern": "^\\$url.[\\w\\d]+$",
-                                    "type": "string"
-                                },
-                                {
-                                    "pattern": "^.*\\$url.*$",
-                                    "type": "string"
-                                }
-                            ]
-                        }
-                    },
-                    "type": "object"
+                    "$ref": "#/definitions/hashExtraction"
                 },
                 "note": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
