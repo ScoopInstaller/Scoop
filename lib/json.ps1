@@ -94,7 +94,7 @@ function json_path([Object] $json, [String] $jsonpath, [String] $basename) {
         $el = $_
 
         # substitute the base filename into the jsonpath
-        if($el.StartsWith("`$basename")) {
+        if($el.Contains("`$basename")) {
             $el = $el.Replace("`$basename", $basename)
         }
 
