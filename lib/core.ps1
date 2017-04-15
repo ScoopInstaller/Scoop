@@ -328,3 +328,15 @@ function get_app_with_version([String] $app) {
         "version" = if ($version) { $version } else { 'latest' }
     }
 }
+
+function format_hash([String] $hash) {
+    switch ($hash.Length)
+    {
+        32 { $hash = "md5:$hash" } # md5
+        40 { $hash = "sha1:$hash" } # sha1
+        64 { $hash = $hash } # sha256
+        128 { $hash = "sha512:$hash" } # sha512
+        default { $hash = $null }
+    }
+    return $hash
+}

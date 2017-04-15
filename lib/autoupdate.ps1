@@ -36,7 +36,7 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     # Find file content
     $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
 
-    return $digest.sha256
+    return format_hash $digest.sha256
 }
 
 function find_hash_in_textfile([String] $url, [String] $basename, [String] $regex) {
@@ -73,15 +73,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
         }
     }
 
-    switch ($hash.Length)
-    {
-        32 { $hash = "md5:$hash" } # md5
-        40 { $hash = "sha1:$hash" } # sha1
-        64 { $hash = $hash } # sha256
-        128 { $hash = "sha512:$hash" } # sha512
-        default { $hash = $null }
-    }
-    return $hash
+    return format_hash $hash
 }
 
 function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath) {
@@ -97,7 +89,8 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
         return
     }
 
-    return json_path $json $jsonpath $basename
+    $hash = json_path $json $jsonpath $basename
+    return format_hash $hash
 }
 
 function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
