@@ -1,13 +1,14 @@
 {
     "homepage": "https://maven.apache.org/",
-    "version": "3.3.9",
+    "version": "3.5.0",
     "license": "Apache 2.0",
-    "url": "https://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip",
-    "hash": "bb37146a67d067069754c775b9c9f03b52da953261981738de963057023cda3a",
-    "extract_dir": "apache-maven-3.3.9",
+    "url": "http://apache.mirror.cdnetworks.com/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.zip",
+    "hash": "a6866b0a0dd5abe3a51124a758a0a842a24edd0bea42ebc74dbf93ad44eb1960",
+    "extract_dir": "apache-maven-3.5.0",
     "bin": [
         "bin\\mvn.cmd"
     ],
+    "env_add_path": "bin",
     "env_set": {
         "M2_HOME": "$dir"
     },
