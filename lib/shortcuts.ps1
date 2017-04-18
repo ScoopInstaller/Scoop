@@ -13,7 +13,7 @@ function shortcut_folder() {
 
 function startmenu_shortcut($target, $shortcutName) {
     if(!(Test-Path $target)) {
-        Write-Host -f DarkRed "Can't create a Startmenu shortcut for $(fname $target): Couldn't find $target"
+        Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find $target"
         return
     }
     $scoop_startmenu_folder = shortcut_folder
@@ -24,7 +24,7 @@ function startmenu_shortcut($target, $shortcutName) {
     $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
     $wsShell.TargetPath = "$target"
     $wsShell.Save()
-    success "Created a Startmenu shortcut for $(fname $target)"
+    write-host "Creating shortcut for $shortcutName ($(fname $target))"
 }
 
 # Removes the Startmenu shortcut if it exists
