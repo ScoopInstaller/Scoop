@@ -488,7 +488,7 @@ function compute_hash($file, $algname) {
 }
 
 function cmd_available($cmd) {
-    try { gcm $cmd -ea stop } catch { return $false }
+    try { gcm $cmd -ea stop | out-null } catch { return $false }
     $true
 }
 
