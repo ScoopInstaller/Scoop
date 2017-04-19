@@ -1,14 +1,14 @@
 {
-    "homepage": "http://nim-lang.org/",
+    "homepage": "https://nim-lang.org/",
     "version": "0.16.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "http://nim-lang.org/download/nim-0.16.0_x64.zip",
+            "url": "https://nim-lang.org/download/nim-0.16.0_x64.zip",
             "hash": "e667cdad1ae8e9429147aea5031fa8a80c4ccef6d274cec0e9480252d9c3168c"
         },
         "32bit": {
-            "url": "http://nim-lang.org/download/nim-0.16.0_x32.zip",
+            "url": "https://nim-lang.org/download/nim-0.16.0_x32.zip",
             "hash": "69af94a6875a02543c1bf0fa03c665f126f8500a2c0e226c32571e64c6842e57"
         }
     },
@@ -20,7 +20,21 @@
     ",
     "env_add_path": "bin",
     "checkver": {
-        "url": "http://nim-lang.org/download.html",
+        "url": "https://nim-lang.org/install_windows.html",
         "re": "nim-([\\d.]+)_x64"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://nim-lang.org/download/nim-$version_x64.zip"
+            },
+            "32bit": {
+                "url": "https://nim-lang.org/download/nim-$version_x32.zip"
+            }
+        },
+        "extract_dir": "nim-$version",
+        "hash": {
+            "url": "$url.sha256"
+        }
     }
 }
