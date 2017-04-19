@@ -1,19 +1,19 @@
 {
     "homepage": "http://bochs.sourceforge.net/",
-    "version": "2.6.8",
+    "version": "2.6.9",
     "license": "LGPL",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/bochs/files/bochs/2.6.8/bochs-2.6.8-win64.zip",
-            "hash": "804d43af7b1b90db7c0d4ccd33c94f17269c7f2e8958308b7017e9760f8ead93",
+            "url": "https://sourceforge.net/projects/bochs/files/bochs/2.6.9/bochs-2.6.9-win64.zip",
+            "hash": "01f185885794f7c6b4dab920d6c51685a44ed7c7e5205a806e54df4a61ae2cf9",
             "bin": [
                 "bochs-win64.exe",
                 "bochsdbg-win64.exe"
             ]
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/bochs/files/bochs/2.6.8/bochs-p4-smp-2.6.8-win32.zip",
-            "hash": "3af653cf835e1f535682c80f11e2fd7542c2b898b585d1b28f3954bf3c3132cd",
+            "url": "https://sourceforge.net/projects/bochs/files/bochs/2.6.9/bochs-p4-smp-2.6.9-win32.zip",
+            "hash": "2c01495d55cc788105165c3f9f1d68699a884fdbbf7ecbb1d0df9b9641c0c5e9",
             "bin": [
                 "bochs-p4-smp.exe",
                 "bochsdbg-p4-smp.exe"
@@ -23,5 +23,15 @@
     "checkver": {
         "url": "http://bochs.sourceforge.net/getcurrent.html",
         "re": "<b>Latest release:<\\/b> Bochs ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/bochs/files/bochs/$version/bochs-$version-win64.zip"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/bochs/files/bochs/$version/bochs-p4-smp-$version-win32.zip"
+            }
+        }
     }
 }
