@@ -87,7 +87,8 @@ function fullpath($path) { # should be ~ rooted
 }
 function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
 function friendly_path($path) {
-    $h = $home; if(!$h.endswith('\')) { $h += '\' }
+    $h = $home.ToString()
+    if(!$h.endswith('\')) { $h += '\' }
     if($h -eq '\') { return $path }
     return "$path" -replace ([regex]::escape($h)), "~\"
 }
