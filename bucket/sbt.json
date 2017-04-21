@@ -4,7 +4,7 @@
     "license": "BSD",
     "url": "https://dl.bintray.com/sbt/native-packages/sbt/0.13.15/sbt-0.13.15.zip",
     "hash": "18b106d09b2874f2a538c6e1f6b20c565885b2a8051428bd6d630fb92c1c0f96",
-    "extract_dir": "sbt-launcher-packaging-0.13.15",
+    "extract_dir": "sbt",
     "bin": [
         "bin\\sbt.bat"
     ],
@@ -14,6 +14,6 @@
     },
     "autoupdate": {
         "url": "https://dl.bintray.com/sbt/native-packages/sbt/$version/sbt-$version.zip",
-        "extract_dir": "sbt-launcher-packaging-$version"
+        "extract_dir": "sbt"
     }
 }
