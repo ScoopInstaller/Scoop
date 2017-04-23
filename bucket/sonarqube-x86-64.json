@@ -1,0 +1,16 @@
+{
+    "homepage": "https://www.sonarqube.org",
+    "version": "6.3.1",
+    "license": "GNU Lesser GPL License, Version 3",
+    "url": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-6.3.1.zip",
+    "hash": "f160cb4cc7e748761fe89685336d0b7f6e2d00689c3e4ecfcf567460a7106505",
+    "bin": [
+        "sonarqube-6.3.1\\bin\\windows-x86-64\\StartSonar.bat"
+    ],
+    "suggest": {
+        "JDK": [
+            "extras/oraclejdk",
+            "openjdk"
+        ]
+    }
+}
