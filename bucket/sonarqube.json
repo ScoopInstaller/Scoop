@@ -5,12 +5,20 @@
     "url": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-6.3.1.zip",
     "hash": "f160cb4cc7e748761fe89685336d0b7f6e2d00689c3e4ecfcf567460a7106505",
     "bin": [
-        "sonarqube-6.3.1\\bin\\windows-x86-64\\StartSonar.bat"
+        "bin\\windows-x86-64\\StartSonar.bat"
     ],
+    "extract_dir": "sonarqube-6.3.1",
     "suggest": {
         "JDK": [
             "extras/oraclejdk",
             "openjdk"
         ]
+    },
+    "checkver": {
+        "re": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-([\\d\\.]+).zip"
+    },
+    "autoupdate": {
+        "url": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-$version.zip",
+        "extract_dir": "sonarqube-$version"
     }
 }
