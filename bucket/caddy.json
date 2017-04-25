@@ -1,39 +1,28 @@
 {
-    "version": "0.9.5",
+    "version": "0.10.0",
     "homepage": "http://caddyserver.com",
     "license": "https://github.com/mholt/caddy/blob/master/LICENSE.txt",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/mholt/caddy/releases/download/v0.9.5/caddy_windows_amd64.zip",
-            "hash": "62c6a6501f02aa1e1cc56f2b8803e4cfa90f839ca6016c17f30a3b62ef68189f",
-            "bin": [
-                [
-                    "caddy_windows_amd64.exe",
-                    "caddy"
-                ]
-            ]
+            "url": "https://github.com/mholt/caddy/releases/download/v0.10.0/caddy_v0.10.0_windows_amd64.zip",
+            "hash": "363d74ee1fe028ee88d0892f798494f609f6cf700d656d11a3e5120f857b3e25"
         },
         "32bit": {
-            "url": "https://github.com/mholt/caddy/releases/download/v0.9.5/caddy_windows_386.zip",
-            "hash": "376d1e45fc8348edc31051baede4334f120bb9e3630b6b2830777347f782bb3d",
-            "bin": [
-                [
-                    "caddy_windows_386.exe",
-                    "caddy"
-                ]
-            ]
+            "url": "https://github.com/mholt/caddy/releases/download/v0.10.0/caddy_v0.10.0_windows_386.zip",
+            "hash": "4b4a9fe632ad542d2b327f44572220f79de4337be3f0bf69f46eb3c5ef0bbe98"
         }
     },
+    "bin": "caddy.exe",
     "checkver": {
         "github": "https://github.com/mholt/caddy"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_amd64.zip"
+                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_v$version_windows_amd64.zip"
             },
             "32bit": {
-                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_windows_386.zip"
+                "url": "https://github.com/mholt/caddy/releases/download/v$version/caddy_v$version_windows_386.zip"
             }
         }
     }
