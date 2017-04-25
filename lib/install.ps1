@@ -66,7 +66,7 @@ function install_app($app, $architecture, $global, $suggested) {
 
     success "'$app' ($version) was installed successfully!"
 
-    show_notes $manifest
+    show_notes $manifest $dir $original_dir $persist_dir
 }
 
 function ensure_architecture($architecture_opt) {
@@ -899,11 +899,11 @@ function post_install($manifest, $arch) {
     }
 }
 
-function show_notes($manifest) {
+function show_notes($manifest, $dir, $original_dir, $persist_dir) {
     if($manifest.notes) {
         echo "Notes"
         echo "-----"
-        echo (wraptext $manifest.notes)
+        echo (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}))
     }
 }
 
