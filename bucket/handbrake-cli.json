@@ -1,0 +1,36 @@
+{
+    "homepage": "https://handbrake.fr/",
+    "license": "GPL-2.0",
+    "version": "1.0.7",
+    "architecture": {
+        "64bit": {
+            "hash": "152046b12d17c576d68eedecf5231001fafbc660c27ce52075b7a48d8ca91c8a",
+            "url": "https://download.handbrake.fr/handbrake/releases/1.0.7/HandBrakeCLI-1.0.7-win-i686.zip"
+        },
+        "32bit": {
+            "hash": "b00c00520705e05bfb42701b4121de8e56c9c283af2b30d42ce10b24823519e0",
+            "url": "https://download.handbrake.fr/handbrake/releases/1.0.7/HandBrakeCLI-1.0.7-win-x86_64.zip"
+        }
+    },
+    "bin": [
+        "HandBrakeCLI.exe"
+    ],
+    "checkver": {
+        "re": "Current\\s+Version:\\s+([\\d.]+)",
+        "url": "https://handbrake.fr/downloads2.php"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://download.handbrake.fr/handbrake/releases/$version/HandBrakeCLI-$version-win-i686.zip"
+            },
+            "32bit": {
+                "url": "https://download.handbrake.fr/handbrake/releases/$version/HandBrakeCLI-$version-win-x86_64.zip"
+            }
+        },
+        "hash": {
+            "find": "<td>$basename</td>.*\\s+.*\\s+.*<br />([a-fA-F0-9]{64})</td>",
+            "url": "https://handbrake.fr/checksums.php"
+        }
+    }
+}
