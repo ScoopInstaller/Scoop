@@ -12,7 +12,6 @@
         }
     },
     "bin": "hugo.exe",
-    "pre_install": "Rename-Item @(Get-ChildItem $dir\\hugo_*.exe)[0] $dir\\hugo.exe",
     "homepage": "https://gohugo.io",
     "checkver": {
         "github": "https://github.com/spf13/hugo"
