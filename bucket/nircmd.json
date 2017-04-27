@@ -1,0 +1,16 @@
+{
+    "version": "2.81",
+    "homepage": "http://www.nirsoft.net/utils/nircmd.html",
+     "architecture": {
+        "64bit": {
+            "url": "http://www.nirsoft.net/utils/nircmd.zip",
+            "hash": "f56a6166f8956c507cc2bfec71339f3c467c0421fe6d16fbe4c52a36d79ce0ea"
+        },
+        "32bit": {
+            "url": "http://www.nirsoft.net/utils/nircmd-x64.zip",
+            "hash": "37445b39e2fc437688164866c495bd28890ded5d0dbf71615bf92776e57c5189"
+        }
+    },
+    "extract_dir": ".",
+    "bin": "nircmdc.exe"
+}
