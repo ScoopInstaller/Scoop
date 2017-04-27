@@ -13,6 +13,5 @@
             "extract_dir": "."
         }
     },
-    "extract_dir": "",
     "bin": "nircmdc.exe"
 }
