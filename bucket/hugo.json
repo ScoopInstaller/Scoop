@@ -1,14 +1,14 @@
 {
-    "version": "0.20.5",
+    "version": "0.20.6",
     "license": "https://github.com/spf13/hugo/blob/master/LICENSE.md",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/spf13/hugo/releases/download/v0.20.5/hugo_0.20.5_windows-64bit.zip",
-            "hash": "194af4d59d76d5a4bb1e3f2e594090d47f9e1cfd4c7790fc0d0b6d6a7e153efb"
+            "url": "https://github.com/spf13/hugo/releases/download/v0.20.6/hugo_0.20.6_windows-64bit.zip",
+            "hash": "5793cb3b013cd431ad1eb26c206a254ae3b7855abe0801a1342017f72e09f50f"
         },
         "32bit": {
-            "url": "https://github.com/spf13/hugo/releases/download/v0.20.5/hugo_0.20.5_windows-32bit.zip",
-            "hash": "9237b0281ff97eebb29ffcb6a73dd712f7f5eaccd9357e2593d8d2f418dcf979"
+            "url": "https://github.com/spf13/hugo/releases/download/v0.20.6/hugo_0.20.6_windows-32bit.zip",
+            "hash": "62b4c5676cb1beb8111df4d66bd3fcb0b1eaf8f7f2e825412a0c66db9c6e95ab"
         }
     },
     "bin": "hugo.exe",
