@@ -1,19 +1,19 @@
 {
-    "homepage":  "http://www.nasm.us",
-    "license":  "BSD",
-    "version":  "2.12.02",
-    "extract_dir":  "nasm-2.12.02",
+    "homepage": "http://www.nasm.us",
+    "license": "BSD",
+    "version": "2.13",
+    "extract_dir": "nasm-2.13",
     "architecture": {
         "64bit": {
-            "url":  "http://www.nasm.us/pub/nasm/releasebuilds/2.12.02/win64/nasm-2.12.02-win64.zip",
-            "hash":  "6dc3a56979b2618f6bf9cc4e148f7dc99334b2e2c1aea0a9f2094128c950ca26"
+            "url": "http://www.nasm.us/pub/nasm/releasebuilds/2.13/win64/nasm-2.13-win64.zip",
+            "hash": "2ac999f3d0fafd5f1cac0aa5ccbea7bfc8c4aee8ad51ebb3a0360afccd6f8af2"
         },
         "32bit": {
-            "url":  "http://www.nasm.us/pub/nasm/releasebuilds/2.12.02/win32/nasm-2.12.02-win32.zip",
-            "hash": "91b9f784b1286e3de73dabfdc7466c198b96fef7080e00710411119959935809"
+            "url": "http://www.nasm.us/pub/nasm/releasebuilds/2.13/win32/nasm-2.13-win32.zip",
+            "hash": "8058831e3f251fa1f7b59ad38597687aee837972f97186bc579bfc7828b3e295"
         }
     },
-    "bin":  [
+    "bin": [
         "nasm.exe",
         "ndisasm.exe",
         "rdoff/ldrdf.exe",
@@ -30,12 +30,12 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url":  "http://www.nasm.us/pub/nasm/releasebuilds/$version/win64/nasm-$version-win64.zip"
+                "url": "http://www.nasm.us/pub/nasm/releasebuilds/$version/win64/nasm-$version-win64.zip"
             },
             "32bit": {
-                "url":  "http://www.nasm.us/pub/nasm/releasebuilds/$version/win32/nasm-$version-win32.zip"
+                "url": "http://www.nasm.us/pub/nasm/releasebuilds/$version/win32/nasm-$version-win32.zip"
             }
         },
-        "extract_dir":  "nasm-$version"
+        "extract_dir": "nasm-$version"
     }
 }
