@@ -1,11 +1,11 @@
 {
     "homepage": "https://github.com/docker/compose",
-    "version": "1.12.0",
+    "version": "1.13.0",
     "license": "Apache",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/docker/compose/releases/download/1.12.0/docker-compose-Windows-x86_64.exe",
-            "hash": "a29e4bd3050a4318a90fe0db16c05d342b89535a41a4dc37db08946eb48a9439"
+            "url": "https://github.com/docker/compose/releases/download/1.13.0/docker-compose-Windows-x86_64.exe",
+            "hash": "b933e653cd77f1d990d4dda598f1cc8fe8f128d66485569e828c0976602a8d5e"
         }
     },
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\docker-compose-*.exe)[0] $dir\\docker-compose.exe",
