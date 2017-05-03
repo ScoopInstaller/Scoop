@@ -1015,10 +1015,10 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             # create link
             if (is_directory $target) {
-                cmd /c "mklink /j $source $target" | out-null
-                attrib $source +R /L
+                cmd /c "mklink /j `"$source`" `"$target`"" | out-null
+                attrib "$source" +R /L
             } else {
-                cmd /c "mklink /h $source $target" | out-null
+                cmd /c "mklink /h `"$source`" `"$target`"" | out-null
             }
         }
     }
