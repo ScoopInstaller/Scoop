@@ -26,4 +26,12 @@ describe "versions" {
 
         $res | should be -1
     }
+
+    it 'handles comparsion against en empty string' {
+        compare_versions '7.0.4-9' '' | should be 1
+    }
+
+    it 'handles equal versions' {
+        compare_versions '12.0' '12.0' | should be 0
+    }
 }
