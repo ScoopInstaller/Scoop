@@ -1,0 +1,40 @@
+{
+    "version": "1.19.2.0",
+    "homepage": "https://vcxsrv.sourceforge.io/",
+    "license": "https://sourceforge.net/directory/license:gplv3/",
+    "description": "Open Source Windows X-server based on the xorg git sources (like xming or cygwin's xwin)",
+    "architecture": {
+        "64bit": {
+            "url": "https://downloads.sourceforge.net/project/vcxsrv/vcxsrv/1.19.2.0/vcxsrv-64.1.19.2.0.installer.exe?r=scoop#/vcxsrv-64-1.19.2.0.7z",
+            "hash": "8a4eb5ebcda927c8c9693b7fbec554bffbc5999af7254fc45d027e41f914f464"
+        },
+        "32bit": {
+            "url": "https://downloads.sourceforge.net/project/vcxsrv/vcxsrv/1.19.2.0/vcxsrv.1.19.2.0.installer.exe?r=scoop#/vcxsrv-1.19.2.0.7z",
+            "hash": "e53846ca1fb3c67a274cfe122f23ea9e7c1bf5d2fa0665bf57200b02376a8b60"
+        }
+    },
+    "shortcuts": [
+        [
+            "vcxsrv.exe",
+            "VcXsrv"
+        ],
+        [
+            "xlauncher.exe",
+            "XLauncher"
+        ]
+    ],
+    "checkver": {
+        "url": "https://vcxsrv.sourceforge.io/",
+        "re": "title=\"Download /vcxsrv/([\\d.]+[\\d]+)/vcxsrv"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.sourceforge.net/project/vcxsrv/vcxsrv/$version/vcxsrv-64.$version.installer.exe?r=scoop#/vcxsrv-64-$version.7z"
+            },
+            "32bit": {
+                "url": "https://downloads.sourceforge.net/project/vcxsrv/vcxsrv/$version/vcxsrv.$version.installer.exe?r=scoop#/vcxsrv-$version.7z"
+            }
+        }
+    }
+}
