@@ -1,0 +1,10 @@
+{
+    "homepage": "https://www.gnu.org/software/emacs/",
+    "license": "GPL3",
+    "version": "25.1",
+    "url": "http://ftp.gnu.org/gnu/emacs/windows/emacs-25.1-x86_64-w64-mingw32.zip",
+    "hash": "dd64f517c58226ccc385b6d06124a581337a4420b7e519664ed93fbbc505f2f9",
+    "bin": [
+        "bin\\runemacs.exe"
+    ]
+}
