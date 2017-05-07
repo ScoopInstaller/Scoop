@@ -1,0 +1,31 @@
+{
+    "homepage": "https://www.haskellstack.org",
+    "license": "BSD 3-Clause",
+    "version": "1.4.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.4.0/stack-1.4.0-windows-x86_64.zip",
+            "hash": "f05e7c2108a10750a5be240170202e7c3e10fee1e196068c5539f85750bc7e2b"
+        },
+        "32bit": {
+            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.4.0/stack-1.4.0-windows-i386.zip",
+            "hash": "91b87b17a2a7dcaff951b0d5994b75024d5d34ef72d06b50c21f985ce280c7be"
+        }
+    },
+    "bin": [
+        "stack.exe"
+    ],
+    "checkver": {
+        "github": "https://github.com/commercialhaskell/stack"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/commercialhaskell/stack/releases/download/v$version/stack-$version-windows-x86_64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/commercialhaskell/stack/releases/download/v$version/stack-$version-windows-i386.zip"
+            }
+        }
+    }
+}
