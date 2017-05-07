@@ -46,7 +46,10 @@
         "bin\\pg_upgrade.exe",
         "bin\\pg_xlogdump.exe",
         "pgAdmin 4\\bin\\pgAdmin4.exe",
-        ["pgAdmin 4\\bin\\pgAdmin4.exe", "pgadmin"],
+        [
+            "pgAdmin 4\\bin\\pgAdmin4.exe",
+            "pgadmin"
+        ],
         "bin\\pgbench.exe",
         "bin\\postgres.exe",
         "bin\\psql.exe",

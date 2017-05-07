@@ -21,7 +21,7 @@
         }
     },
     "bin": "wget.exe",
-    "depends":  "cacert",
+    "depends": "cacert",
     "post_install": "\"ca_certificate=$(appdir cacert)\\current\\cacert.pem\" | out-file $dir\\wget.ini -encoding default",
     "checkver": "<title>GNU Wget ([\\d.]+) for Windows",
     "autoupdate": {

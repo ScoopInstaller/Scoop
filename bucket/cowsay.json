@@ -3,5 +3,8 @@
     "homepage": "https://github.com/lukesampson/cowsay-psh",
     "url": "https://github.com/lukesampson/cowsay-psh/archive/master.zip",
     "extract_dir": "cowsay-psh-master",
-    "bin": ["cowsay.ps1","cowthink.ps1"]
+    "bin": [
+        "cowsay.ps1",
+        "cowthink.ps1"
+    ]
 }

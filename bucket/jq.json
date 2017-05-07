@@ -1,19 +1,19 @@
 {
-    "version":  "1.5",
-    "license":  "http://creativecommons.org/licenses/by/3.0/",
+    "version": "1.5",
+    "license": "http://creativecommons.org/licenses/by/3.0/",
     "architecture": {
         "32bit": {
-            "url":  "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win32.exe"
+            "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win32.exe"
         },
         "64bit": {
-            "url":  "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe"
+            "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe"
         }
     },
-    "homepage":  "http://stedolan.github.io/jq/",
+    "homepage": "http://stedolan.github.io/jq/",
     "pre_install": "Rename-Item @(Get-ChildItem $dir\\jq-*.exe)[0] $dir\\jq.exe",
-    "bin":  "jq.exe",
+    "bin": "jq.exe",
     "checkver": {
         "url": "https://github.com/stedolan/jq/releases/latest",
-        "re": "\/releases\/tag\/jq-([\\d.]+)"
+        "re": "/releases/tag/jq-([\\d.]+)"
     }
 }

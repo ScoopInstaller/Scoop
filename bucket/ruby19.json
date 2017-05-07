@@ -10,11 +10,14 @@
         "6c3af5487dafda56808baf76edd262b2020b1b25ab86aabf972629f4a6a54491"
     ],
     "extract_dir": "ruby-1.9.3-p551-i386-mingw32",
-    "extract_to": [ "", "devkit" ],
+    "extract_to": [
+        "",
+        "devkit"
+    ],
     "env_add_path": "bin",
     "post_install": "pushd $dir\\devkit;ruby dk.rb init > $null;echo \"- $dir\" | out-file config.yml -a -enc default; ruby dk.rb install;popd;",
     "checkver": {
         "url": "https://bintray.com/package/generalTab?pkgPath=/oneclick/rubyinstaller/rubyinstaller",
-        "re": "rubyinstaller\/(1.9[\\d.]+-p[\\d]+)"
+        "re": "rubyinstaller/(1.9[\\d.]+-p[\\d]+)"
     }
 }

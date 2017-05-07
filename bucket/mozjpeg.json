@@ -6,7 +6,10 @@
     "hash": "f8fd47f219823e7ee1fe6583bca8baca075d214081588f1fd66141f790cf0731",
     "bin": [
         "cjpeg.exe",
-        ["cjpeg.exe", "mozjpeg"],
+        [
+            "cjpeg.exe",
+            "mozjpeg"
+        ],
         "djpeg.exe",
         "jpegtran.exe"
     ],

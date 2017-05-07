@@ -1,20 +1,24 @@
 {
-  "homepage": "http://tools.sysprogs.org/srvman/",
-  "version": "1.0",
-  "url": "http://sysprogs.com/files/srvman/srvman-1.0.zip",
-  "hash": "7f0075c5b544af189416845077a45edeedd1d48e37e702abb22b41b120e80bcd",
-  "architecture": {
-    "64bit": {
-      "extract_dir": "x64"
+    "homepage": "http://tools.sysprogs.org/srvman/",
+    "version": "1.0",
+    "url": "http://sysprogs.com/files/srvman/srvman-1.0.zip",
+    "hash": "7f0075c5b544af189416845077a45edeedd1d48e37e702abb22b41b120e80bcd",
+    "architecture": {
+        "64bit": {
+            "extract_dir": "x64"
+        },
+        "32bit": {
+            "extract_dir": "x86"
+        }
     },
-    "32bit": {
-      "extract_dir": "x86"
-    }
-  },
-  "bin": [
-    "srvman.exe",
-    ["srvman.exe", "service"]
-  ],
-  "checkver": "The latest version[^<]+<a href=\"[^\"]+srvman-([\\d.]+)\\.zip\"",
-  "notes": "Always use sudo to start, stop or edit (e.g., 'sudo srvman start nginx' or 'sudo service restart apache').\nVisit http://tools.sysprogs.org/srvman/ for more info"
+    "bin": [
+        "srvman.exe",
+        [
+            "srvman.exe",
+            "service"
+        ]
+    ],
+    "checkver": "The latest version[^<]+<a href=\"[^\"]+srvman-([\\d.]+)\\.zip\"",
+    "notes": "Always use sudo to start, stop or edit (e.g., 'sudo srvman start nginx' or 'sudo service restart apache').
+Visit http://tools.sysprogs.org/srvman/ for more info"
 }

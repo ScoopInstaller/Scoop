@@ -4,7 +4,11 @@
         "unzipsfx.exe",
         "unzip.exe",
         "funzip.exe",
-        [ "unzip.exe", "zipinfo", "-Z" ]
+        [
+            "unzip.exe",
+            "zipinfo",
+            "-Z"
+        ]
     ],
     "description": "Unzip compression utility",
     "hash": "7869ee36346b47701ef01efd0bc2889f970266b66c80b30f74303d50bf7fa33d",

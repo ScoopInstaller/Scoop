@@ -6,7 +6,10 @@
     "hash": "477fb784b7b3f382f7de9cd40a4d46a86dc2286b8036e68ad188abebbaea4ad6",
     "bin": "Cmder.exe",
     "shortcuts": [
-        [ "Cmder.exe", "Cmder" ]
+        [
+            "Cmder.exe",
+            "Cmder"
+        ]
     ],
     "checkver": {
         "github": "https://github.com/cmderdev/cmder"

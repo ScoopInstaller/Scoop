@@ -5,6 +5,9 @@
     "hash": "66f8e31d76d0c1e8bf89bd5f73f6404c384ddcf0bd2069c5a40c331fbca4a63b",
     "bin": [
         "time.ps1",
-        [ "time.ps1", "timecmd" ]
+        [
+            "time.ps1",
+            "timecmd"
+        ]
     ]
 }

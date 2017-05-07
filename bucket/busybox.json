@@ -6,132 +6,637 @@
     "hash": "260c6e2ac8a71a12aca2decfb9475a05a64cbbd734406fa964b5ff2528d7cc85",
     "bin": [
         "busybox.exe",
-        [ "busybox.exe", "ar", "ar" ],
-        [ "busybox.exe", "ash", "ash" ],
-        [ "busybox.exe", "awk", "awk" ],
-        [ "busybox.exe", "base64", "base64" ],
-        [ "busybox.exe", "basename", "basename" ],
-        [ "busybox.exe", "bash", "bash", "-l" ],
-        [ "busybox.exe", "bunzip2", "bunzip2" ],
-        [ "busybox.exe", "bzcat", "bzcat" ],
-        [ "busybox.exe", "bzip2", "bzip2" ],
-        [ "busybox.exe", "cal", "cal" ],
-        [ "busybox.exe", "cat", "cat" ],
-        [ "busybox.exe", "catv", "catv" ],
-        [ "busybox.exe", "chmod", "chmod" ],
-        [ "busybox.exe", "cksum", "cksum" ],
-        [ "busybox.exe", "clear", "clear" ],
-        [ "busybox.exe", "cmp", "cmp" ],
-        [ "busybox.exe", "comm", "comm" ],
-        [ "busybox.exe", "cp", "cp" ],
-        [ "busybox.exe", "cpio", "cpio" ],
-        [ "busybox.exe", "cut", "cut" ],
-        [ "busybox.exe", "date", "date" ],
-        [ "busybox.exe", "dc", "dc" ],
-        [ "busybox.exe", "dd", "dd" ],
-        [ "busybox.exe", "df", "df" ],
-        [ "busybox.exe", "diff", "diff" ],
-        [ "busybox.exe", "dirname", "dirname" ],
-        [ "busybox.exe", "dos2unix", "dos2unix" ],
-        [ "busybox.exe", "dpkg-deb", "dpkg-deb" ],
-        [ "busybox.exe", "du", "du" ],
-        [ "busybox.exe", "echo", "echo" ],
-        [ "busybox.exe", "ed", "ed" ],
-        [ "busybox.exe", "egrep", "egrep" ],
-        [ "busybox.exe", "env", "env" ],
-        [ "busybox.exe", "expand", "expand" ],
-        [ "busybox.exe", "expr", "expr" ],
-        [ "busybox.exe", "false", "false" ],
-        [ "busybox.exe", "fgrep", "fgrep" ],
-        [ "busybox.exe", "find", "find" ],
-        [ "busybox.exe", "fold", "fold" ],
-        [ "busybox.exe", "ftpget", "ftpget" ],
-        [ "busybox.exe", "ftpput", "ftpput" ],
-        [ "busybox.exe", "getopt", "getopt" ],
-        [ "busybox.exe", "grep", "grep" ],
-        [ "busybox.exe", "groups", "groups" ],
-        [ "busybox.exe", "gunzip", "gunzip" ],
-        [ "busybox.exe", "gzip", "gzip" ],
-        [ "busybox.exe", "hd", "hd" ],
-        [ "busybox.exe", "head", "head" ],
-        [ "busybox.exe", "hexdump", "hexdump" ],
-        [ "busybox.exe", "id", "id" ],
-        [ "busybox.exe", "ipcalc", "ipcalc" ],
-        [ "busybox.exe", "kill", "kill" ],
-        [ "busybox.exe", "killall", "killall" ],
-        [ "busybox.exe", "less", "less" ],
-        [ "busybox.exe", "ln", "ln" ],
-        [ "busybox.exe", "logname", "logname" ],
-        [ "busybox.exe", "ls", "ls" ],
-        [ "busybox.exe", "lzcat", "lzcat" ],
-        [ "busybox.exe", "lzma", "lzma" ],
-        [ "busybox.exe", "lzop", "lzop" ],
-        [ "busybox.exe", "lzopcat", "lzopcat" ],
-        [ "busybox.exe", "man", "man" ],
-        [ "busybox.exe", "md5sum", "md5sum" ],
-        [ "busybox.exe", "mkdir", "mkdir" ],
-        [ "busybox.exe", "mktemp", "mktemp" ],
-        [ "busybox.exe", "mv", "mv" ],
-        [ "busybox.exe", "nc", "nc" ],
-        [ "busybox.exe", "od", "od" ],
-        [ "busybox.exe", "patch", "patch" ],
-        [ "busybox.exe", "pgrep", "pgrep" ],
-        [ "busybox.exe", "pidof", "pidof" ],
-        [ "busybox.exe", "printenv", "printenv" ],
-        [ "busybox.exe", "printf", "printf" ],
-        [ "busybox.exe", "ps", "ps" ],
-        [ "busybox.exe", "pwd", "pwd" ],
-        [ "busybox.exe", "rev", "rev" ],
-        [ "busybox.exe", "rm", "rm" ],
-        [ "busybox.exe", "rmdir", "rmdir" ],
-        [ "busybox.exe", "rpm2cpio", "rpm2cpio" ],
-        [ "busybox.exe", "sed", "sed" ],
-        [ "busybox.exe", "seq", "seq" ],
-        [ "busybox.exe", "sh", "sh" ],
-        [ "busybox.exe", "sha1sum", "sha1sum" ],
-        [ "busybox.exe", "sha256sum", "sha256sum" ],
-        [ "busybox.exe", "sha3sum", "sha3sum" ],
-        [ "busybox.exe", "sha512sum", "sha512sum" ],
-        [ "busybox.exe", "shuf", "shuf" ],
-        [ "busybox.exe", "sleep", "sleep" ],
-        [ "busybox.exe", "sort", "sort" ],
-        [ "busybox.exe", "split", "split" ],
-        [ "busybox.exe", "stat", "stat" ],
-        [ "busybox.exe", "strings", "strings" ],
-        [ "busybox.exe", "sum", "sum" ],
-        [ "busybox.exe", "tac", "tac" ],
-        [ "busybox.exe", "tail", "tail" ],
-        [ "busybox.exe", "tar", "tar" ],
-        [ "busybox.exe", "tee", "tee" ],
-        [ "busybox.exe", "test", "test" ],
-        [ "busybox.exe", "touch", "touch" ],
-        [ "busybox.exe", "tr", "tr" ],
-        [ "busybox.exe", "true", "true" ],
-        [ "busybox.exe", "truncate", "truncate" ],
-        [ "busybox.exe", "uname", "uname" ],
-        [ "busybox.exe", "uncompress", "uncompress" ],
-        [ "busybox.exe", "unexpand", "unexpand" ],
-        [ "busybox.exe", "uniq", "uniq" ],
-        [ "busybox.exe", "unix2dos", "unix2dos" ],
-        [ "busybox.exe", "unlink", "unlink" ],
-        [ "busybox.exe", "unlzma", "unlzma" ],
-        [ "busybox.exe", "unlzop", "unlzop" ],
-        [ "busybox.exe", "unxz", "unxz" ],
-        [ "busybox.exe", "unzip", "unzip" ],
-        [ "busybox.exe", "usleep", "usleep" ],
-        [ "busybox.exe", "uudecode", "uudecode" ],
-        [ "busybox.exe", "uuencode", "uuencode" ],
-        [ "busybox.exe", "vi", "vi" ],
-        [ "busybox.exe", "wc", "wc" ],
-        [ "busybox.exe", "wget", "wget" ],
-        [ "busybox.exe", "which", "which" ],
-        [ "busybox.exe", "whoami", "whoami" ],
-        [ "busybox.exe", "whois", "whois" ],
-        [ "busybox.exe", "xargs", "xargs" ],
-        [ "busybox.exe", "xz", "xz" ],
-        [ "busybox.exe", "xzcat", "xzcat" ],
-        [ "busybox.exe", "yes", "yes" ],
-        [ "busybox.exe", "zcat", "zcat" ]
+        [
+            "busybox.exe",
+            "ar",
+            "ar"
+        ],
+        [
+            "busybox.exe",
+            "ash",
+            "ash"
+        ],
+        [
+            "busybox.exe",
+            "awk",
+            "awk"
+        ],
+        [
+            "busybox.exe",
+            "base64",
+            "base64"
+        ],
+        [
+            "busybox.exe",
+            "basename",
+            "basename"
+        ],
+        [
+            "busybox.exe",
+            "bash",
+            "bash",
+            "-l"
+        ],
+        [
+            "busybox.exe",
+            "bunzip2",
+            "bunzip2"
+        ],
+        [
+            "busybox.exe",
+            "bzcat",
+            "bzcat"
+        ],
+        [
+            "busybox.exe",
+            "bzip2",
+            "bzip2"
+        ],
+        [
+            "busybox.exe",
+            "cal",
+            "cal"
+        ],
+        [
+            "busybox.exe",
+            "cat",
+            "cat"
+        ],
+        [
+            "busybox.exe",
+            "catv",
+            "catv"
+        ],
+        [
+            "busybox.exe",
+            "chmod",
+            "chmod"
+        ],
+        [
+            "busybox.exe",
+            "cksum",
+            "cksum"
+        ],
+        [
+            "busybox.exe",
+            "clear",
+            "clear"
+        ],
+        [
+            "busybox.exe",
+            "cmp",
+            "cmp"
+        ],
+        [
+            "busybox.exe",
+            "comm",
+            "comm"
+        ],
+        [
+            "busybox.exe",
+            "cp",
+            "cp"
+        ],
+        [
+            "busybox.exe",
+            "cpio",
+            "cpio"
+        ],
+        [
+            "busybox.exe",
+            "cut",
+            "cut"
+        ],
+        [
+            "busybox.exe",
+            "date",
+            "date"
+        ],
+        [
+            "busybox.exe",
+            "dc",
+            "dc"
+        ],
+        [
+            "busybox.exe",
+            "dd",
+            "dd"
+        ],
+        [
+            "busybox.exe",
+            "df",
+            "df"
+        ],
+        [
+            "busybox.exe",
+            "diff",
+            "diff"
+        ],
+        [
+            "busybox.exe",
+            "dirname",
+            "dirname"
+        ],
+        [
+            "busybox.exe",
+            "dos2unix",
+            "dos2unix"
+        ],
+        [
+            "busybox.exe",
+            "dpkg-deb",
+            "dpkg-deb"
+        ],
+        [
+            "busybox.exe",
+            "du",
+            "du"
+        ],
+        [
+            "busybox.exe",
+            "echo",
+            "echo"
+        ],
+        [
+            "busybox.exe",
+            "ed",
+            "ed"
+        ],
+        [
+            "busybox.exe",
+            "egrep",
+            "egrep"
+        ],
+        [
+            "busybox.exe",
+            "env",
+            "env"
+        ],
+        [
+            "busybox.exe",
+            "expand",
+            "expand"
+        ],
+        [
+            "busybox.exe",
+            "expr",
+            "expr"
+        ],
+        [
+            "busybox.exe",
+            "false",
+            "false"
+        ],
+        [
+            "busybox.exe",
+            "fgrep",
+            "fgrep"
+        ],
+        [
+            "busybox.exe",
+            "find",
+            "find"
+        ],
+        [
+            "busybox.exe",
+            "fold",
+            "fold"
+        ],
+        [
+            "busybox.exe",
+            "ftpget",
+            "ftpget"
+        ],
+        [
+            "busybox.exe",
+            "ftpput",
+            "ftpput"
+        ],
+        [
+            "busybox.exe",
+            "getopt",
+            "getopt"
+        ],
+        [
+            "busybox.exe",
+            "grep",
+            "grep"
+        ],
+        [
+            "busybox.exe",
+            "groups",
+            "groups"
+        ],
+        [
+            "busybox.exe",
+            "gunzip",
+            "gunzip"
+        ],
+        [
+            "busybox.exe",
+            "gzip",
+            "gzip"
+        ],
+        [
+            "busybox.exe",
+            "hd",
+            "hd"
+        ],
+        [
+            "busybox.exe",
+            "head",
+            "head"
+        ],
+        [
+            "busybox.exe",
+            "hexdump",
+            "hexdump"
+        ],
+        [
+            "busybox.exe",
+            "id",
+            "id"
+        ],
+        [
+            "busybox.exe",
+            "ipcalc",
+            "ipcalc"
+        ],
+        [
+            "busybox.exe",
+            "kill",
+            "kill"
+        ],
+        [
+            "busybox.exe",
+            "killall",
+            "killall"
+        ],
+        [
+            "busybox.exe",
+            "less",
+            "less"
+        ],
+        [
+            "busybox.exe",
+            "ln",
+            "ln"
+        ],
+        [
+            "busybox.exe",
+            "logname",
+            "logname"
+        ],
+        [
+            "busybox.exe",
+            "ls",
+            "ls"
+        ],
+        [
+            "busybox.exe",
+            "lzcat",
+            "lzcat"
+        ],
+        [
+            "busybox.exe",
+            "lzma",
+            "lzma"
+        ],
+        [
+            "busybox.exe",
+            "lzop",
+            "lzop"
+        ],
+        [
+            "busybox.exe",
+            "lzopcat",
+            "lzopcat"
+        ],
+        [
+            "busybox.exe",
+            "man",
+            "man"
+        ],
+        [
+            "busybox.exe",
+            "md5sum",
+            "md5sum"
+        ],
+        [
+            "busybox.exe",
+            "mkdir",
+            "mkdir"
+        ],
+        [
+            "busybox.exe",
+            "mktemp",
+            "mktemp"
+        ],
+        [
+            "busybox.exe",
+            "mv",
+            "mv"
+        ],
+        [
+            "busybox.exe",
+            "nc",
+            "nc"
+        ],
+        [
+            "busybox.exe",
+            "od",
+            "od"
+        ],
+        [
+            "busybox.exe",
+            "patch",
+            "patch"
+        ],
+        [
+            "busybox.exe",
+            "pgrep",
+            "pgrep"
+        ],
+        [
+            "busybox.exe",
+            "pidof",
+            "pidof"
+        ],
+        [
+            "busybox.exe",
+            "printenv",
+            "printenv"
+        ],
+        [
+            "busybox.exe",
+            "printf",
+            "printf"
+        ],
+        [
+            "busybox.exe",
+            "ps",
+            "ps"
+        ],
+        [
+            "busybox.exe",
+            "pwd",
+            "pwd"
+        ],
+        [
+            "busybox.exe",
+            "rev",
+            "rev"
+        ],
+        [
+            "busybox.exe",
+            "rm",
+            "rm"
+        ],
+        [
+            "busybox.exe",
+            "rmdir",
+            "rmdir"
+        ],
+        [
+            "busybox.exe",
+            "rpm2cpio",
+            "rpm2cpio"
+        ],
+        [
+            "busybox.exe",
+            "sed",
+            "sed"
+        ],
+        [
+            "busybox.exe",
+            "seq",
+            "seq"
+        ],
+        [
+            "busybox.exe",
+            "sh",
+            "sh"
+        ],
+        [
+            "busybox.exe",
+            "sha1sum",
+            "sha1sum"
+        ],
+        [
+            "busybox.exe",
+            "sha256sum",
+            "sha256sum"
+        ],
+        [
+            "busybox.exe",
+            "sha3sum",
+            "sha3sum"
+        ],
+        [
+            "busybox.exe",
+            "sha512sum",
+            "sha512sum"
+        ],
+        [
+            "busybox.exe",
+            "shuf",
+            "shuf"
+        ],
+        [
+            "busybox.exe",
+            "sleep",
+            "sleep"
+        ],
+        [
+            "busybox.exe",
+            "sort",
+            "sort"
+        ],
+        [
+            "busybox.exe",
+            "split",
+            "split"
+        ],
+        [
+            "busybox.exe",
+            "stat",
+            "stat"
+        ],
+        [
+            "busybox.exe",
+            "strings",
+            "strings"
+        ],
+        [
+            "busybox.exe",
+            "sum",
+            "sum"
+        ],
+        [
+            "busybox.exe",
+            "tac",
+            "tac"
+        ],
+        [
+            "busybox.exe",
+            "tail",
+            "tail"
+        ],
+        [
+            "busybox.exe",
+            "tar",
+            "tar"
+        ],
+        [
+            "busybox.exe",
+            "tee",
+            "tee"
+        ],
+        [
+            "busybox.exe",
+            "test",
+            "test"
+        ],
+        [
+            "busybox.exe",
+            "touch",
+            "touch"
+        ],
+        [
+            "busybox.exe",
+            "tr",
+            "tr"
+        ],
+        [
+            "busybox.exe",
+            "true",
+            "true"
+        ],
+        [
+            "busybox.exe",
+            "truncate",
+            "truncate"
+        ],
+        [
+            "busybox.exe",
+            "uname",
+            "uname"
+        ],
+        [
+            "busybox.exe",
+            "uncompress",
+            "uncompress"
+        ],
+        [
+            "busybox.exe",
+            "unexpand",
+            "unexpand"
+        ],
+        [
+            "busybox.exe",
+            "uniq",
+            "uniq"
+        ],
+        [
+            "busybox.exe",
+            "unix2dos",
+            "unix2dos"
+        ],
+        [
+            "busybox.exe",
+            "unlink",
+            "unlink"
+        ],
+        [
+            "busybox.exe",
+            "unlzma",
+            "unlzma"
+        ],
+        [
+            "busybox.exe",
+            "unlzop",
+            "unlzop"
+        ],
+        [
+            "busybox.exe",
+            "unxz",
+            "unxz"
+        ],
+        [
+            "busybox.exe",
+            "unzip",
+            "unzip"
+        ],
+        [
+            "busybox.exe",
+            "usleep",
+            "usleep"
+        ],
+        [
+            "busybox.exe",
+            "uudecode",
+            "uudecode"
+        ],
+        [
+            "busybox.exe",
+            "uuencode",
+            "uuencode"
+        ],
+        [
+            "busybox.exe",
+            "vi",
+            "vi"
+        ],
+        [
+            "busybox.exe",
+            "wc",
+            "wc"
+        ],
+        [
+            "busybox.exe",
+            "wget",
+            "wget"
+        ],
+        [
+            "busybox.exe",
+            "which",
+            "which"
+        ],
+        [
+            "busybox.exe",
+            "whoami",
+            "whoami"
+        ],
+        [
+            "busybox.exe",
+            "whois",
+            "whois"
+        ],
+        [
+            "busybox.exe",
+            "xargs",
+            "xargs"
+        ],
+        [
+            "busybox.exe",
+            "xz",
+            "xz"
+        ],
+        [
+            "busybox.exe",
+            "xzcat",
+            "xzcat"
+        ],
+        [
+            "busybox.exe",
+            "yes",
+            "yes"
+        ],
+        [
+            "busybox.exe",
+            "zcat",
+            "zcat"
+        ]
     ],
     "post_install": "
         if(!(test-path ~/.profile)) {

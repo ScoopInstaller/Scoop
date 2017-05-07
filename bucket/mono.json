@@ -1,11 +1,11 @@
 {
-    "version":  "4.8.0.495",
-    "homepage":  "http://www.mono-project.com/",
-    "license":  "https://raw.githubusercontent.com/mono/mono/master/LICENSE",
-    "url":  "https://download.mono-project.com/archive/4.8.0/windows-installer/mono-4.8.0.495-gtksharp-2.12.42-win32-1.msi",
-    "hash":  "7B30232DE859E87A05CAB1BDE3B2C4681225AA4C48B6ADFC740E642CBDD3A5A7",
-    "extract_dir":  "Mono",
-    "bin":  [
+    "version": "4.8.0.495",
+    "homepage": "http://www.mono-project.com/",
+    "license": "https://raw.githubusercontent.com/mono/mono/master/LICENSE",
+    "url": "https://download.mono-project.com/archive/4.8.0/windows-installer/mono-4.8.0.495-gtksharp-2.12.42-win32-1.msi",
+    "hash": "7B30232DE859E87A05CAB1BDE3B2C4681225AA4C48B6ADFC740E642CBDD3A5A7",
+    "extract_dir": "Mono",
+    "bin": [
         "bin\\gdk-pixbuf-query-loaders.exe",
         "bin\\gspawn-win32-helper-console.exe",
         "bin\\gspawn-win32-helper.exe",
