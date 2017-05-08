@@ -104,9 +104,13 @@ function json_path([Object] $json, [String] $jsonpath, [String] $basename) {
         }
 
         # array detection
-        if($el -match "^(?<property>\w+)\[(?<index>\d+)\]$") {
+        if($el -match "^(?<property>\w+)?\[(?<index>\d+)\]$") {
             $property = $matches['property']
-            $result = $result.$property[$matches['index']]
+            if($property) {
+                $result = $result.$property[$matches['index']]
+            } else {
+                $result = $result[$matches['index']]
+            }
             return
         }
 
