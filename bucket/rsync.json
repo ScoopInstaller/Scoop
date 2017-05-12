@@ -12,6 +12,10 @@
     },
     "autoupdate": {
         "url": "https://www.itefix.net/dl/cwRsync_$version_x86_Free.zip",
-        "extract_dir": "cwRsync_$version_x86_Free"
+        "extract_dir": "cwRsync_$version_x86_Free",
+        "hash": {
+            "find": "SHA256:\\s+([a-fA-F0-9]{64})",
+            "url": "https://www.itefix.net/content/cwrsync-free-edition"
+        }
     }
 }
