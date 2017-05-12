@@ -13,6 +13,9 @@
             "hash": "bc3911a985dd0c56c6f95fb9ffad04eea4736c4e3a8e054993006a9ebd66fcc2"
         }
     },
+    "suggest": {
+        "minio-client": "minio-client"
+    },
     "checkver": {
         "github": "https://github.com/minio/minio",
         "re": "releases/tag/RELEASE.([\\d-]+T[\\d-]+Z)"

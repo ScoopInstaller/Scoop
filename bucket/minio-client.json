@@ -13,6 +13,9 @@
             "hash": "sha1:a36164d2bc280d719e7c51e763c2535ad5aa89d9"
         }
     },
+    "suggest": {
+        "minio": "minio"
+    },
     "checkver": {
         "github": "https://github.com/minio/mc",
         "re": "releases/tag/RELEASE.([\\d-]+T[\\d-]+Z)"
