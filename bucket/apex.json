@@ -4,22 +4,26 @@
     "version": "0.13.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/apex/apex/releases/download/v0.13.1/apex_windows_amd64.exe",
+            "url": "https://github.com/apex/apex/releases/download/v0.13.1/apex_windows_amd64.exe#/apex.exe",
             "hash": "b7274c8eec1f367604c92204b4ddafa93b06b71561b1421c3b5086c7bea1b1b7"
+        },
+        "32bit": {
+            "url": "https://github.com/apex/apex/releases/download/v0.13.1/apex_windows_386.exe#/apex.exe",
+            "hash": "b7f866b5056cd6505a757af15e2004ff119d0e908fe1e88f64ccf2ec19ac0266"
         }
     },
     "extract_dir": "apex",
-    "pre_install": "Rename-Item @(Get-ChildItem $dir\\apex_*.exe)[0] $dir\\apex.exe",
-    "bin": [
-        "apex.exe"
-    ],
+    "bin": "apex.exe",
     "checkver": {
         "github": "https://github.com/apex/apex"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/apex/apex/releases/download/v$version/apex_windows_amd64.exe"
+                "url": "https://github.com/apex/apex/releases/download/v$version/apex_windows_amd64.exe#/apex.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/apex/apex/releases/download/v$version/apex_windows_386.exe#/apex.exe"
             }
         }
     }

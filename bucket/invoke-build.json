@@ -2,7 +2,7 @@
     "version": "3.3.7",
     "license": "Apache 2.0",
     "extract_dir": "tools",
-    "url": "http://nuget.org/api/v2/package/Invoke-Build/3.3.7#.zip",
+    "url": "http://nuget.org/api/v2/package/Invoke-Build/3.3.7#/dl.7z",
     "homepage": "https://github.com/nightroman/Invoke-Build",
     "hash": "a837cded0bdde2eed544a8a94f84c786db7bd7aaa3adac66b0bb487ce3b7fdac",
     "env_add_path": ".",
@@ -11,6 +11,6 @@
         "re": "releases/tag/v([\\d.]+)"
     },
     "autoupdate": {
-        "url": "http://nuget.org/api/v2/package/Invoke-Build/$version#.zip"
+        "url": "http://nuget.org/api/v2/package/Invoke-Build/$version#/dl.7z"
     }
 }
