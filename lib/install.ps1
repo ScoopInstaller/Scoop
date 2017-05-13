@@ -142,11 +142,26 @@ function set_https_protocols($protocols) {
         [System.Net.SecurityProtocolType] $protocols
 }
 
+function handle_special_urls($url)
+{
+    # FossHub.com
+    if($url -match "^(.*fosshub.com\/)(?<name>.*)\/(?<filename>.*)$") {
+        # create an url to request to request the expiring url
+        $name = $matches['name'] -replace '.html',''
+        $filename = $matches['filename']
+        # the key is a random 24 chars long hex string, so lets use ' SCOOPSCOOP ' :)
+        $url = "https://www.fosshub.com/gensLink/$name/$filename/2053434f4f5053434f4f5020"
+        $url = (Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content)
+    }
+    return $url
+}
+
 function do_dl($url, $to, $cookies) {
     $original_protocols = use_any_https_protocol
     $progress = [console]::isoutputredirected -eq $false
 
     try {
+        $url = handle_special_urls $url
         dl $url $to $cookies $progress
     } catch {
         $e = $_.exception
