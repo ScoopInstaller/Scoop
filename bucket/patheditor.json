@@ -1,0 +1,41 @@
+{
+    "homepage": "https://patheditor2.codeplex.com/",
+    "license": "BSD",
+    "version": "1.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Alorel/patheditor2-mirror/releases/download/1.0/PathEditor-1.0-64bit.exe#/PathEditor.exe",
+            "hash": "sha512:12614196fcda4e4fafab0f6dfd0ac95339e1a22c1217ba7ba22a82802623a90ea0fa18e96989378d540030856bd06c950eb8911ca454c731a848ce1fc8e377c6"
+        },
+        "32bit": {
+            "url": "https://github.com/Alorel/patheditor2-mirror/releases/download/1.0/PathEditor-1.0-32bit.exe#/PathEditor.exe",
+            "hash": "sha512:4d8a5d287043e1afa6ca6be053a758f9d24ea535db4a4ac9253f5b1ea2fc5adf4b694062b7e3e4286655236c250a57f02ccb19e2f151bf86a2b93a8c748e4a42"
+        }
+    },
+    "bin": "PathEditor.exe",
+    "checkver": {
+        "github": "https://github.com/Alorel/patheditor2-mirror"
+    },
+    "shortcuts": [
+        [
+            "PathEditor.exe",
+            "PathEditor"
+        ]
+    ],
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/Alorel/patheditor2-mirror/releases/download/$version/PathEditor-$version-64bit.exe#/PathEditor.exe",
+                "hash": {
+                    "url": "https://github.com/Alorel/patheditor2-mirror/releases/download/$version/PathEditor-$version-64bit.exe.sha512"
+                }
+            },
+            "32bit": {
+                "url": "https://github.com/Alorel/patheditor2-mirror/releases/download/$version/PathEditor-$version-32bit.exe#/PathEditor.exe",
+                "hash": {
+                    "url": "https://github.com/Alorel/patheditor2-mirror/releases/download/$version/PathEditor-$version-32bit.exe.sha512"
+                }
+            }
+        }
+    }
+}
