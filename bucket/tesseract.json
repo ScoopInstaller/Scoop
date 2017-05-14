@@ -1,27 +1,31 @@
 {
-    "autoupdate": {
-        "url": "http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-$versiondev.exe"
-    },
+    "homepage": "https://github.com/UB-Mannheim/tesseract/wiki",
+    "license": "Apache-2.0",
+    "version": "3.05.00",
+    "url": "http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.00dev.exe#/dl.7z",
+    "hash": "ff0137d5cc0cee26167b77ccecbfe441200140163e17ab594a75c2369d7e97cb",
+    "bin": [
+        "ambiguous_words.exe",
+        "classifier_tester.exe",
+        "cntraining.exe",
+        "combine_tessdata.exe",
+        "dawg2wordlist.exe",
+        "mftraining.exe",
+        "set_unicharset_properties.exe",
+        "shapeclustering.exe",
+        "tesseract.exe",
+        "text2image.exe",
+        "unicharset_extractor.exe",
+        "wordlist2dawg.exe"
+    ],
+    "persist": [
+        "tessdata"
+    ],
     "checkver": {
-        "re": "The latest installer can be downloaded here:
-<a href=\"http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-([\\d.]+)",
+        "re": "tesseract-ocr-setup-([\\d.]+)",
         "url": "https://github.com/UB-Mannheim/tesseract/wiki"
     },
-    "description": "OCR engine developed by Google",
-    "hash": "771912fa3a027925fd8d99ed99e23b03f170418f03cb5f147211d2c97dd174f8",
-    "homepage": "https://github.com/UB-Mannheim/tesseract/wiki",
-    "installer": {
-        "_comment": "/D option is ignored",
-        "args": [
-            "/S",
-            "/D=$dir"
-        ]
-    },
-    "license": "Apache-2.0",
-    "notes": "Tesseract installs in C:\\Program Files (x86)\\Tesseract-OCR
-To uninstall, please run manually:
-  \"C:\\Program Files (x86)\\Tesseract-OCR\\tesseract-uninstall.exe\" /S",
-    "post_install": "[Environment]::SetEnvironmentVariable(\"Path\", $env:Path + \";C:\\Program Files (x86)\\Tesseract-OCR\", [EnvironmentVariableTarget]::Machine)",
-    "url": "http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.00dev.exe",
-    "version": "3.05.00"
+    "autoupdate": {
+        "url": "http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-$versiondev.exe#/dl.7z"
+    }
 }
