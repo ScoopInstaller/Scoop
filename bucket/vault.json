@@ -29,7 +29,7 @@
             }
         },
         "hash": {
-            "url": "https://releases.hashicorp.com/vault/$version/vault_$version_SHA256SUMS"
+            "url": "$baseurl/vault_$version_SHA256SUMS"
         }
     }
 }

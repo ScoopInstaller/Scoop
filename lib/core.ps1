@@ -84,6 +84,7 @@ function appname_from_url($url) {
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
+function strip_fragment($url) { $url -replace (new-object uri $url).fragment }
 
 function url_filename($url) {
     (split-path $url -leaf).split('?') | Select-Object -First 1

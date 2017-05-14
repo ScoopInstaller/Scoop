@@ -31,7 +31,7 @@
         "hash": {
             "mode": "json",
             "jp": "$.files.$basename.sha512",
-            "url": "https://slproweb.com/download/win32_openssl_hashes.json"
+            "url": "$baseurl/win32_openssl_hashes.json"
         }
     }
 }

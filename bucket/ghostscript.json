@@ -38,7 +38,7 @@
             }
         },
         "hash": {
-            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$cleanVersion/SHA256SUMS"
+            "url": "$baseurl/SHA256SUMS"
         }
     }
 }

@@ -23,7 +23,7 @@
         "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip",
         "extract_dir": "apache-ant-$version",
         "hash": {
-            "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip.sha512"
+            "url": "$url.sha512"
         }
     }
 }

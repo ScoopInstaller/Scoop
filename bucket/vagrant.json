@@ -13,7 +13,7 @@
     "autoupdate": {
         "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version.msi",
         "hash": {
-            "url": "https://releases.hashicorp.com/vagrant/$version/vagrant_$version_SHA256SUMS"
+            "url": "$baseurl/vagrant_$version_SHA256SUMS"
         }
     }
 }

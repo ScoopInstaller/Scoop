@@ -25,13 +25,13 @@
             "64bit": {
                 "url": "https://dl.minio.io/server/minio/release/windows-amd64/archive/minio.RELEASE.$version#/minio.exe",
                 "hash": {
-                    "url": "https://dl.minio.io/server/minio/release/windows-amd64/archive/minio.RELEASE.$version.sha256sum"
+                    "url": "$baseurl/minio.RELEASE.$version.sha256sum"
                 }
             },
             "32bit": {
                 "url": "https://dl.minio.io/server/minio/release/windows-386/archive/minio.RELEASE.$version#/minio.exe",
                 "hash": {
-                    "url": "https://dl.minio.io/server/minio/release/windows-386/archive/minio.RELEASE.$version.sha256sum"
+                    "url": "$baseurl/minio.RELEASE.$version.sha256sum"
                 }
             }
         }

@@ -29,7 +29,7 @@
             }
         },
         "hash": {
-            "url": "https://github.com/docker/machine/releases/download/v$version/sha256sum.txt"
+            "url": "$baseurl/sha256sum.txt"
         }
     }
 }

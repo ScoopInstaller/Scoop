@@ -55,7 +55,7 @@ if (!(Test-Path \"$dir\\cli\\conf.d\")) {
             }
         },
         "hash": {
-            "url": "http://windows.php.net/downloads/releases/sha1sum.txt"
+            "url": "$baseurl/sha1sum.txt"
         }
     },
     "suggest": {

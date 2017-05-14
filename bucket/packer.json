@@ -29,7 +29,7 @@
             }
         },
         "hash": {
-            "url": "https://releases.hashicorp.com/packer/$version/packer_$version_SHA256SUMS"
+            "url": "$baseurl/packer_$version_SHA256SUMS"
         }
     }
 }

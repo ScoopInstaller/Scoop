@@ -97,8 +97,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hashmode = $config.mode
     $basename = url_remote_filename($url)
 
-    $hashfile_url = substitute $config.url @{'$url' = $url}
+    $hashfile_url = substitute $config.url @{
+        '$url' = (strip_fragment $url);
+        '$baseurl' = (strip_filename (strip_fragment $url)).TrimEnd('/')
+    }
     $hashfile_url = substitute $hashfile_url $substitutions
+    write-host -f yellow $hashfile_url
 
     if($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
         $hashmode = "extract"

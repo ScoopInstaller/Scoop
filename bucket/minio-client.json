@@ -25,13 +25,13 @@
             "64bit": {
                 "url": "https://dl.minio.io/client/mc/release/windows-amd64/mc.RELEASE.$version#/mc.exe",
                 "hash": {
-                    "url": "https://dl.minio.io/client/mc/release/windows-amd64/mc.shasum"
+                    "url": "$baseurl/mc.shasum"
                 }
             },
             "32bit": {
                 "url": "https://dl.minio.io/client/mc/release/windows-386/mc.RELEASE.$version#/mc.exe",
                 "hash": {
-                    "url": "https://dl.minio.io/client/mc/release/windows-386/mc.shasum"
+                    "url": "$baseurl/mc.shasum"
                 }
             }
         }

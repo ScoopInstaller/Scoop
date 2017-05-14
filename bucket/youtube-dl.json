@@ -14,7 +14,7 @@
     "autoupdate": {
         "url": "https://github.com/rg3/youtube-dl/releases/download/$version/youtube-dl.exe",
         "hash": {
-            "url": "https://github.com/rg3/youtube-dl/releases/download/$version/SHA2-256SUMS"
+            "url": "$baseurl/SHA2-256SUMS"
         }
     }
 }
