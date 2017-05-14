@@ -21,6 +21,7 @@
     "persist": [
         "tessdata"
     ],
+    "notes": "Language data files can be downloaded from https://github.com/tesseract-ocr/tessdata",
     "checkver": {
         "re": "tesseract-ocr-setup-([\\d.]+)",
         "url": "https://github.com/UB-Mannheim/tesseract/wiki"
