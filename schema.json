@@ -47,7 +47,8 @@
                         "sha1",
                         "sha256",
                         "sha512"
-                    ]
+                    ],
+                    "description": "Deprecated, hash type is determined automatically"
                 },
                 "url": {
                     "anyOf": [
