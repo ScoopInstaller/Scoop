@@ -69,22 +69,6 @@ function install_app($app, $architecture, $global, $suggested) {
     show_notes $manifest $dir $original_dir $persist_dir
 }
 
-function ensure_architecture($architecture_opt) {
-    switch($architecture_opt) {
-        '' { return default_architecture }
-        { @('32bit','64bit') -contains $_ } { return $_ }
-        default { abort "Invalid architecture: '$architecture'."}
-    }
-}
-
-function cache_path($app, $version, $url) {
-    "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')"
-}
-
-function appname_from_url($url) {
-    (split-path $url -leaf) -replace '.json$', ''
-}
-
 function locate($app, $bucket) {
     $manifest, $url = $null, $null
 
@@ -140,20 +124,6 @@ function use_any_https_protocol() {
 function set_https_protocols($protocols) {
     [System.Net.ServicePointManager]::SecurityProtocol = `
         [System.Net.SecurityProtocolType] $protocols
-}
-
-function handle_special_urls($url)
-{
-    # FossHub.com
-    if($url -match "^(.*fosshub.com\/)(?<name>.*)\/(?<filename>.*)$") {
-        # create an url to request to request the expiring url
-        $name = $matches['name'] -replace '.html',''
-        $filename = $matches['filename']
-        # the key is a random 24 chars long hex string, so lets use ' SCOOPSCOOP ' :)
-        $url = "https://www.fosshub.com/gensLink/$name/$filename/2053434f4f5053434f4f5020"
-        $url = (Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content)
-    }
-    return $url
 }
 
 function do_dl($url, $to, $cookies) {
@@ -232,17 +202,6 @@ function dl($url, $to, $cookies, $progress) {
         }
         $wres.close()
     }
-}
-
-function url_filename($url) {
-    (split-path $url -leaf).split('?') | Select-Object -First 1
-}
-
-# Unlike url_filename which can be tricked by appending a
-# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
-# this function extracts the original filename from the URL.
-function url_remote_filename($url) {
-    split-path (new-object uri $url).absolutePath -leaf
 }
 
 function dl_progress_output($url, $read, $total, $console) {

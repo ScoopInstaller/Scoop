@@ -62,6 +62,7 @@ function versiondir($app, $version, $global) { "$(appdir $app $global)\$version"
 function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
+function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
@@ -75,11 +76,24 @@ function installed_apps($global) {
         gci $dir | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
     }
 }
+function appname_from_url($url) {
+    (split-path $url -leaf) -replace '.json$', ''
+}
 
 # paths
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
+
+function url_filename($url) {
+    (split-path $url -leaf).split('?') | Select-Object -First 1
+}
+# Unlike url_filename which can be tricked by appending a
+# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
+# this function extracts the original filename from the URL.
+function url_remote_filename($url) {
+    split-path (new-object uri $url).absolutePath -leaf
+}
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
@@ -101,13 +115,14 @@ function dl($url,$to) {
     $wc.headers.add('User-Agent', 'Scoop/1.0')
     $wc.headers.add('Referer', (strip_filename $url))
     $wc.downloadFile($url,$to)
-
 }
+
 function env($name,$global,$val='__get') {
     $target = 'User'; if($global) {$target = 'Machine'}
     if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
     else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
+
 function unzip($path,$to) {
     if(!(test-path $path)) { abort "can't find $path to unzip"}
     try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
@@ -126,6 +141,7 @@ function unzip($path,$to) {
         abort "Unzip failed: $_"
     }
 }
+
 function unzip_old($path,$to) {
     # fallback for .net earlier than 4.5
     $shell = (new-object -com shell.application -strict)
@@ -199,6 +215,14 @@ function ensure_in_path($dir, $global) {
 
         env 'path' $global "$dir;$path" # for future sessions...
         $env:path = "$dir;$env:path" # for this session
+    }
+}
+
+function ensure_architecture($architecture_opt) {
+    switch($architecture_opt) {
+        '' { return default_architecture }
+        { @('32bit','64bit') -contains $_ } { return $_ }
+        default { abort "Invalid architecture: '$architecture'."}
     }
 }
 
@@ -339,4 +363,18 @@ function format_hash([String] $hash) {
         default { $hash = $null }
     }
     return $hash
+}
+
+function handle_special_urls($url)
+{
+    # FossHub.com
+    if($url -match "^(.*fosshub.com\/)(?<name>.*)\/(?<filename>.*)$") {
+        # create an url to request to request the expiring url
+        $name = $matches['name'] -replace '.html',''
+        $filename = $matches['filename']
+        # the key is a random 24 chars long hex string, so lets use ' SCOOPSCOOP ' :)
+        $url = "https://www.fosshub.com/gensLink/$name/$filename/2053434f4f5053434f4f5020"
+        $url = (Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content)
+    }
+    return $url
 }

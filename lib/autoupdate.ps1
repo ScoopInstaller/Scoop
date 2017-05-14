@@ -9,14 +9,6 @@ TODO
 . "$psscriptroot/core.ps1"
 . "$psscriptroot/json.ps1"
 
-function substitute([String] $str, [Hashtable] $params) {
-    $params.GetEnumerator() | % {
-        $str = $str.Replace($_.Name, $_.Value)
-    }
-
-    return $str
-}
-
 function find_hash_in_rdf([String] $url, [String] $filename) {
     Write-Host -f DarkYellow "RDF URL: $url"
     Write-Host -f DarkYellow "File: $filename"
