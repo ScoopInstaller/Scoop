@@ -95,16 +95,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     `download` Last resort, download the real file and hash it
     #>
     $hashmode = $config.mode
-    if ($url.Contains("#")) {
-        <#
-        The download url can end with a hash to specify the local download name.
-        We need to original filename to extract the hash from the file
-        Example: julia.json
-        #>
-        $basename = fname($url.Substring(0, $url.IndexOf("#")))
-    } else {
-        $basename = fname($url)
-    }
+    $basename = url_remote_filename($url)
 
     $hashfile_url = substitute $config.url @{'$url' = $url}
     $hashfile_url = substitute $hashfile_url $substitutions
