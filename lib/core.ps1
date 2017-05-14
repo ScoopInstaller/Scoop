@@ -353,6 +353,13 @@ function get_app_with_version([String] $app) {
     }
 }
 
+function substitute([String] $str, [Hashtable] $params) {
+    $params.GetEnumerator() | % {
+        $str = $str.Replace($_.Name, $_.Value)
+    }
+    return $str
+}
+
 function format_hash([String] $hash) {
     switch ($hash.Length)
     {
