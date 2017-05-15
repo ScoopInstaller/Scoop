@@ -57,11 +57,11 @@
                             "type": "string"
                         },
                         {
-                            "pattern": "^\\$url.[\\w\\d]+$",
+                            "pattern": "^(\\$url|\\$baseurl).[\\w\\d]+$",
                             "type": "string"
                         },
                         {
-                            "pattern": "^.*\\$url.*$",
+                            "pattern": "^.*(\\$url|\\$baseurl).*$",
                             "type": "string"
                         }
                     ]
