@@ -7,15 +7,15 @@
     "extract_dir": "allure-2.0.1",
     "bin": "bin\\allure.bat",
     "env_set": {
-	    "ALLURE_HOME": "$dir"
+        "ALLURE_HOME": "$dir"
     },
     "checkver": "github",
     "autoupdate": {
-	    "url": "https://dl.bintray.com/qameta/generic/io/qameta/allure/allure/$version/allure-$version.zip",
-	    "extract_dir": "allure-$version",
-	    "hash": {
-		    "mode": "extract",
-		    "url": "$url.sha256"
-	    }
+        "url": "https://dl.bintray.com/qameta/generic/io/qameta/allure/allure/$version/allure-$version.zip",
+        "extract_dir": "allure-$version",
+        "hash": {
+            "mode": "extract",
+            "url": "$url.sha256"
+        }
     }
 }
