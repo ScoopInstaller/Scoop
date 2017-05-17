@@ -1,19 +1,19 @@
 {
     "homepage": "https://nim-lang.org/",
-    "version": "0.16.0",
+    "version": "0.17.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nim-lang.org/download/nim-0.16.0_x64.zip",
-            "hash": "e667cdad1ae8e9429147aea5031fa8a80c4ccef6d274cec0e9480252d9c3168c"
+            "url": "https://nim-lang.org/download/nim-0.17.0_x64.zip",
+            "hash": "e52d59f41216aed3bfa5eb44fa935258543cd2a6b4c4e52b571bcf7b7869a770"
         },
         "32bit": {
-            "url": "https://nim-lang.org/download/nim-0.16.0_x32.zip",
-            "hash": "69af94a6875a02543c1bf0fa03c665f126f8500a2c0e226c32571e64c6842e57"
+            "url": "https://nim-lang.org/download/nim-0.17.0_x32.zip",
+            "hash": "21371737d7123709ed10d68bc1c84030d1f0f35e85314ff5bce9b6ff4f28bf23"
         }
     },
     "depends": "gcc",
-    "extract_dir": "nim-0.16.0",
+    "extract_dir": "nim-0.17.0",
     "post_install": "
         # Copy Nimble package
         Copy-Item -Recurse $dir\\dist\\nimble\\src\\nimblepkg $dir\\bin
