@@ -1,8 +1,8 @@
 {
     "homepage": "https://getcomposer.org/",
     "license": "https://github.com/composer/composer/blob/master/LICENSE",
-    "version": "1.4.1",
-    "url": "https://getcomposer.org/download/1.4.1/composer.phar",
+    "version": "1.4.2",
+    "url": "https://getcomposer.org/download/1.4.2/composer.phar",
     "bin": "composer.ps1",
     "pre_install": "
         echo 'if($args -eq \"selfupdate\" -or $args -eq \"self-update\") { & scoop update composer }' | out-file $dir\\composer.ps1
@@ -17,7 +17,7 @@
     "notes": [
         "'composer selfupdate' is aliased to 'scoop update composer'"
     ],
-    "hash": "abd277cc3453be980bb48cbffe9d1f7422ca1ef4bc0b7d035fda87cea4d55cbc",
+    "hash": "6b1945c3ee477f12be508a5bb41a5025d57de5510bcf94855ae6a4d59f3d86f4",
     "checkver": {
         "github": "https://github.com/composer/composer"
     },
