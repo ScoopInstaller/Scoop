@@ -32,6 +32,9 @@ and then restart powershell.",
         "url": "https://github.com/git-for-windows/git/releases/latest",
         "re": "v(?<version>[\\d\\w.]+)/PortableGit-(?<short>[\\d.]+).*\\.exe"
     },
+    "env_set": {
+        "GIT_INSTALL_ROOT": "$dir"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
