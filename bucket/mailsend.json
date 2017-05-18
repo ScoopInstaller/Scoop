@@ -1,9 +1,7 @@
 {
     "version": "1.19",
-    "license": "",
-    "extract_dir": "",
+    "license": "https://github.com/muquit/mailsend/blob/master/COPYRIGHT",
     "url": "https://github.com/muquit/mailsend/releases/download/1.19/mailsend1.19.exe.zip",
-    "depends": "",
     "homepage": "https://github.com/muquit/mailsend",
     "checkver": {
         "github": "https://github.com/muquit/mailsend"

@@ -12,7 +12,6 @@
             "hash": "aaf6e6daafcb52591d950567f03f87b87b9020f83b460532db8e5deae97f87cc"
         }
     },
-    "extract_dir": "",
     "bin": "mediainfo.exe",
     "checkver": "version ([\\d.]+)",
     "autoupdate": {

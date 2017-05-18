@@ -3,7 +3,6 @@
     "license": "Apache2",
     "version": "1.6.0",
     "url": "https://github.com/google/flatbuffers/releases/download/v1.6.0/flatc_windows_exe.zip",
-    "extract_dir": "",
     "bin": "flatc.exe",
     "hash": "e4ac8cdfa5e90c92e77715e998b9210fa86128b84a38a0fe9fec04c5b5f941c9",
     "checkver": {
