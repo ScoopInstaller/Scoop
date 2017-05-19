@@ -1,15 +1,15 @@
 {
     "homepage": "https://kubernetes.io/docs/user-guide/kubectl-overview/",
     "license": "https://github.com/kubernetes/kubernetes/blob/master/LICENSE",
-    "version": "1.6.3",
+    "version": "1.6.4",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.6.3/kubernetes-client-windows-amd64.tar.gz",
-            "hash": "sha1:f6481ddce12f82465f0e2613271abfa6c5d689a0"
+            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.6.4/kubernetes-client-windows-amd64.tar.gz",
+            "hash": "sha1:025e840064dda24972e6598e8587cb36f43c63df"
         },
         "32bit": {
-            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.6.3/kubernetes-client-windows-386.tar.gz",
-            "hash": "sha1:568b56cd691aca8ca6627a800f404227684f5d74"
+            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.6.4/kubernetes-client-windows-386.tar.gz",
+            "hash": "sha1:89c503298a4ccd96d5dc5315100603fe41357646"
         }
     },
     "extract_dir": "kubernetes\\client",
