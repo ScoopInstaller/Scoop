@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://nim-lang.org/download/nim-0.17.0_x64.zip",
-            "hash": "e52d59f41216aed3bfa5eb44fa935258543cd2a6b4c4e52b571bcf7b7869a770"
+            "hash": "0e0aea31338b433e75f9c197a6ec37a42f68aee4be6c91d813f3e053fef5a05c"
         },
         "32bit": {
             "url": "https://nim-lang.org/download/nim-0.17.0_x32.zip",
-            "hash": "21371737d7123709ed10d68bc1c84030d1f0f35e85314ff5bce9b6ff4f28bf23"
+            "hash": "8fe344f6fb6242b4555878f4243844ea78edb22acf9cb23a91399ea543a5036b"
         }
     },
     "depends": "gcc",
