@@ -1,0 +1,16 @@
+{
+    "version": "6",
+    "homepage": "https://gist.github.com/se35710/43693e679701387d722206eff1e85f5f",
+    "description": "PowerShell script to locate Java on Windows, optionally sets JAVA_HOME and JRE_HOME",
+    "url": "https://gist.githubusercontent.com/se35710/43693e679701387d722206eff1e85f5f/raw/0b00695e93c40d423c722fb544e468a85aae3dac/find-java.ps1",
+    "hash": "3f7f7275e24925334b8517831e06140b5271392f2de816a2f26739697e0a8b92",
+    "bin": [
+        "find-java.ps1"
+    ],
+    "checkver": {
+        "re": "(?smi)<span class=\"Counter\">([\\d]+)</span>(.*)/se35710/43693e679701387d722206eff1e85f5f/raw/(?<hash>[a-fA-F0-9]{40})/find-java.ps1"
+    },
+    "autoupdate": {
+        "url": "https://gist.githubusercontent.com/se35710/43693e679701387d722206eff1e85f5f/raw/$matchHash/find-java.ps1"
+    }
+}
