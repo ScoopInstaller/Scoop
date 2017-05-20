@@ -41,6 +41,6 @@
     "post_install": "pushd $dir\\devkit;echo \"---`n- $dir\" | out-file config.yml -enc default; ruby dk.rb install;popd;",
     "checkver": {
         "url": "http://rubyinstaller.org/downloads/",
-        "re": "<li class=\"exe\"><a.*?>Ruby ([0-9\\.p-]+)</a></li>"
+        "re": "ruby-([\\d.]+)-x64-mingw32.7z"
     }
 }
