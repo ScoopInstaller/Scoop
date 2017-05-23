@@ -204,7 +204,11 @@ function shim($path, $global, $name, $arg) {
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
         $shim_cmd = "$(strip_ext($shim)).cmd"
-        "@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
+        "@echo off" | out-file $shim_cmd -encoding ascii
+        "set args=%*" | out-file $shim_cmd -encoding ascii -append
+        # replace double quotes in args with single quotes
+        "set args=%args:`"='%" | out-file $shim_cmd -encoding ascii -append
+        "powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii -append
     }
 }
 
