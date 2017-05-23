@@ -4,7 +4,7 @@
     "version": "1.4.2",
     "url": "https://getcomposer.org/download/1.4.2/composer.phar",
     "bin": "composer.ps1",
-    "persist": [],
+    "persist": "",
     "env_set": {
         "COMPOSER_HOME": "$persist_dir"
     },
