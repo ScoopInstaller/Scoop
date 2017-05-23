@@ -2,5 +2,6 @@
     "extras": "https://github.com/lukesampson/scoop-extras.git",
     "versions": "https://github.com/scoopinstaller/versions",
     "nightlies": "https://github.com/scoopinstaller/nightlies",
-    "nirsoft": "https://github.com/kodybrown/scoop-nirsoft"
+    "nirsoft": "https://github.com/kodybrown/scoop-nirsoft",
+    "php": "https://github.com/nueko/scoop-php.git"
 }
