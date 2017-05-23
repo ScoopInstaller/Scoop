@@ -1,6 +1,7 @@
 # Creates shortcut for the app in the start menu
-function create_startmenu_shortcuts($manifest, $dir, $global) {
-    $manifest.shortcuts | ?{ $_ -ne $null } | % {
+function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
+    $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
+    $shortcuts | ?{ $_ -ne $null } | % {
         $target = $_.item(0)
         $name = $_.item(1)
         startmenu_shortcut "$dir\$target" $name
@@ -28,8 +29,9 @@ function startmenu_shortcut($target, $shortcutName) {
 }
 
 # Removes the Startmenu shortcut if it exists
-function rm_startmenu_shortcuts($manifest, $global) {
-    $manifest.shortcuts | ?{ $_ -ne $null } | % {
+function rm_startmenu_shortcuts($manifest, $global, $arch) {
+    $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
+    $shortcuts | ?{ $_ -ne $null } | % {
         $name = $_.item(1)
         $shortcut = "$(shortcut_folder)\$name.lnk"
         write-host "Removing shortcut $(friendly_path $shortcut)"

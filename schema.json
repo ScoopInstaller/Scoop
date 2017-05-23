@@ -97,6 +97,9 @@
                 "pre_install": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
+                "shortcuts": {
+                    "$ref": "#/definitions/arrayOfArrayOfStrings"
+                },
                 "uninstaller": {
                     "$ref": "#/definitions/uninstaller"
                 },

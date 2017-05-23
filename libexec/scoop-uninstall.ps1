@@ -68,7 +68,7 @@ foreach($app in $apps) {
 
     run_uninstaller $manifest $architecture $dir
     rm_shims $manifest $global $architecture
-    rm_startmenu_shortcuts $manifest $global
+    rm_startmenu_shortcuts $manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
