@@ -10,7 +10,7 @@ if((test-path $oldscoopdir) -and !$env:SCOOP) {
     $scoopdir = $oldscoopdir
 }
 
-$globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
+$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
 
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when

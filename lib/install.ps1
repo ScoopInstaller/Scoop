@@ -112,8 +112,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
 
 function use_any_https_protocol() {
     $original = "$([System.Net.ServicePointManager]::SecurityProtocol)"
-    $available = [string]::join(', ', `
-        [Enum]::GetNames([System.Net.SecurityProtocolType]))
+    $available = [string]::join(', ', [Enum]::GetNames([System.Net.SecurityProtocolType]))
 
     # use whatever protocols are available that the server supports
     set_https_protocols $available
@@ -122,8 +121,11 @@ function use_any_https_protocol() {
 }
 
 function set_https_protocols($protocols) {
-    [System.Net.ServicePointManager]::SecurityProtocol = `
-        [System.Net.SecurityProtocolType] $protocols
+    try {
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType] $available
+    } catch {
+        [System.Net.ServicePointManager]::SecurityProtocol = "Tls,Tls11,Tls12"
+    }
 }
 
 function do_dl($url, $to, $cookies) {
