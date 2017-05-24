@@ -14,11 +14,11 @@
         echo 'else { & php (join-path \"$psscriptroot\" \"composer.phar\") @args }' | out-file $dir\\composer.ps1 -append
     ",
     "post_install": "
-        $och = \"$Env:APPDATA\\Composer\"
+        $och = \"$env:APPDATA\\Composer\"
         if(Test-Path $och) {
-            cp -r -force $och\\* $persist_dir\\home\\
-            rd -r -force $och
-            Write-Host -F yellow \"Old 'COMPOSER_HOME' has been moved to '$persist_dir\\home'\"
+            Write-Host -F yellow \"Moving old 'COMPOSER_HOME' to '$persist_dir\\home'\"
+            Move-Item -Force \"$och\\*\" \"$persist_dir\\home\"
+            Remove-Item -Force \"$och\"
         }
     ",
     "suggest": {
