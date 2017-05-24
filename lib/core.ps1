@@ -209,8 +209,8 @@ function shim($path, $global, $name, $arg) {
 set args=%*
 :: replace problem characters in arguments
 set args=%args:`"='%
-set args=%args:(=`(%
-set args=%args:)=`)%
+set args=%args:(=``(%
+set args=%args:)=``)%
 
 powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
     }
