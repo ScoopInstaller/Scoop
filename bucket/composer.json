@@ -13,6 +13,14 @@
         echo 'if($args -eq \"selfupdate\" -or $args -eq \"self-update\") { & scoop update composer }' | out-file $dir\\composer.ps1
         echo 'else { & php (join-path \"$psscriptroot\" \"composer.phar\") @args }' | out-file $dir\\composer.ps1 -append
     ",
+    "post_install": "
+        $och = \"$Env:APPDATA\\Composer\"
+        if(Test-Path $och) {
+            cp -r -force $och\\* $persist_dir\\home\\
+            rd -r -force $och
+            Write-Host -F yellow \"Old 'COMPOSER_HOME' has been moved to '$persist_dir\\home'\"
+        }
+    ",
     "suggest": {
         "PHP": [
             "php",
