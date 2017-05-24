@@ -270,7 +270,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
         # write file
         Write-Host -f DarkGreen "Writing updated $app manifest"
 
-        $path = "$dir\$app.json"
+        $path = join-path $dir "$app.json"
 
         $file_content = $json | ConvertToPrettyJson
         [System.IO.File]::WriteAllLines($path, $file_content)
