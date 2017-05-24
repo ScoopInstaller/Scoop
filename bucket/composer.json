@@ -4,11 +4,11 @@
     "version": "1.4.2",
     "url": "https://getcomposer.org/download/1.4.2/composer.phar",
     "bin": "composer.ps1",
-    "persist": "",
+    "persist": "home",
     "env_set": {
-        "COMPOSER_HOME": "$persist_dir"
+        "COMPOSER_HOME": "$persist_dir\\home"
     },
-    "env_add_path": "$persist_dir\\vendor\\bin",
+    "env_add_path": "home\\vendor\\bin",
     "pre_install": "
         echo 'if($args -eq \"selfupdate\" -or $args -eq \"self-update\") { & scoop update composer }' | out-file $dir\\composer.ps1
         echo 'else { & php (join-path \"$psscriptroot\" \"composer.phar\") @args }' | out-file $dir\\composer.ps1 -append
