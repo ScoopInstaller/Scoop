@@ -18,6 +18,13 @@ $globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | select -first 1
 
+# Overwrite $scoopdir, $globaldir and $cachedir on unix systems
+if([environment]::OSVersion.Platform -eq "Unix") {
+    $scoopdir = $env:SCOOP, (Join-Path $env:HOME "scoop") | select -first 1
+    $globaldir = $env:SCOOP_GLOBAL, "/usr/local/scoop" | select -first 1
+    $cachedir = $env:SCOOP_CACHE, (Join-Path $scoopdir "cache") | select -first 1
+}
+
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 
