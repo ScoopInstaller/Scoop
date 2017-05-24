@@ -103,7 +103,16 @@ function url_remote_filename($url) {
     split-path (new-object uri $url).absolutePath -leaf
 }
 
-function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
+function ensure($dir) {
+    if([environment]::OSVersion.Platform -eq "Unix") {
+        mkdir -p $dir > $null
+    } else {
+        if(!(test-path $dir)) {
+            mkdir $dir > $null
+        }
+    }
+    return resolve-path $dir
+}
 function fullpath($path) { # should be ~ rooted
     $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }
