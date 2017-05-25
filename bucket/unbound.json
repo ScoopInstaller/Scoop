@@ -12,12 +12,13 @@
             "hash": "46cef0c2d47b4d622f4a83456f677ddb124498a69011d14c97e2c8251e00be7d"
         }
     },
-    "bin": "unbound.ps1",
-    "persist": "service.conf",
-    "suggest": [
-        "openssl",
-        "openssl10x"
+    "bin": [
+        "unbound.ps1"
     ],
+    "persist": "service.conf",
+    "suggest": {
+        "openssl": ["openssl", "openssl10x"]
+    },
     "checkver": {
         "url": "http://unbound.net/download.html",
         "re": "\\(currently ([\\d.]+)\\)"
@@ -35,6 +36,6 @@
             "url": "$url.sha256"
         }
     },
-    "pre_install": "echo \"if (`$args.count -eq 0) {`n `t`Start-Process -WorkingDirectory `\"`$psscriptroot`\" -f unbound.exe  -a '-c service.conf'-WindowStyle Hidden`n`tWrite-Host -F Green `\"Unbound started in background.``nRun 'ps -n unbound' to show the processes``nRun 'kill -n unbound' to stop the processes`\"`n} else {`n`t& `$psscriptroot @args `n}\" | out-file $dir\\unbound.ps1 -append",
+    "pre_install": "echo \"if (`$args.count -eq 0) {`n `t`Start-Process -WorkingDirectory `\"`$psscriptroot`\" -f unbound.exe  -a '-c service.conf'-WindowStyle Hidden`n`tWrite-Host -F Green `\"Unbound started in background.``nRun 'ps -n unbound' to show the processes``nRun 'kill -n unbound' to stop the processes`\"`n} else {`n`t& `$psscriptroot @args `n}\" | out-file $dir\\unbound.ps1",
     "post_install": "(gc \"$dir\\create_unbound_ad_servers.cmd\").Replace('C:\\Program Files (x86)', $pwd) | sc \"$dir\\create_unbound_ad_servers.cmd\""
 }
