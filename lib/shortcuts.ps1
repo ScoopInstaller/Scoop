@@ -47,7 +47,7 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
             $shortcut = "$(shortcut_folder $false)\$name.lnk"
             if(Test-Path -Path $shortcut) {
                  Remove-Item $shortcut
-            }            
+            }
         }
     }
 }
