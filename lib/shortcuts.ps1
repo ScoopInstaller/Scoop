@@ -42,5 +42,12 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
         }
+        # Before issue 1514 Startmenu shortcut removal
+        if($global) {
+            $shortcut = "$(shortcut_folder $false)\$name.lnk"
+            if(Test-Path -Path $shortcut) {
+                 Remove-Item $shortcut
+            }            
+        }
     }
 }
