@@ -1,14 +1,14 @@
 {
-    "homepage": "http://unbound.net/",
+    "homepage": "https://unbound.net/",
     "version": "1.6.2",
     "license": "BSD",
     "architecture": {
         "64bit": {
-            "url": "http://unbound.net/downloads/unbound-1.6.2.zip",
+            "url": "https://unbound.net/downloads/unbound-1.6.2.zip",
             "hash": "f109ee38b2f7f34043555dda54f3af017c5164c47a12d977594ee56557b059f8"
         },
         "32bit": {
-            "url": "http://unbound.net/downloads/unbound-1.6.2-w32.zip",
+            "url": "https://unbound.net/downloads/unbound-1.6.2-w32.zip",
             "hash": "46cef0c2d47b4d622f4a83456f677ddb124498a69011d14c97e2c8251e00be7d"
         }
     },
@@ -20,16 +20,16 @@
         "openssl": ["openssl", "openssl10x"]
     },
     "checkver": {
-        "url": "http://unbound.net/download.html",
+        "url": "https://unbound.net/download.html",
         "re": "\\(currently ([\\d.]+)\\)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "http://unbound.net/downloads/unbound-$version.zip"
+                "url": "https://unbound.net/downloads/unbound-$version.zip"
             },
             "32bit": {
-                "url": "http://unbound.net/downloads/unbound-$version-w32.zip"
+                "url": "https://unbound.net/downloads/unbound-$version-w32.zip"
             }
         },
         "hash": {
