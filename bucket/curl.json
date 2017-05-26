@@ -4,13 +4,13 @@
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-7.54.0-win64-mingw.7z#/dl.7z",
-            "hash": "6888c286231a717f95ec236fc9fb934efbd45999d79874398b988c29325a7fe6",
+            "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.0-win64-mingw.7z",
+            "hash": "127782b5db3c7cf48ba16a2516e707282babf9b874e81e8ff86786f380b4fca6",
             "extract_dir": "curl-7.54.0-win64-mingw"
         },
         "32bit": {
-            "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-7.54.0-win32-mingw.7z#/dl.7z",
-            "hash": "dc2f7bb9b54abde58f8157fc560ed41f13366d2a66e9fa941d59a54797cc7cea",
+            "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.0-win32-mingw.7z",
+            "hash": "de47fcc8575de10e6847785f011cd02452b4bbcef99083e9feaad46d32f50a50",
             "extract_dir": "curl-7.54.0-win32-mingw"
         }
     },
@@ -27,13 +27,18 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-$version-win64-mingw.7z#/dl.7z",
+                "url": "https://dl.bintray.com/vszakats/generic/curl-$version-win64-mingw.7z",
                 "extract_dir": "curl-$version-win64-mingw"
             },
             "32bit": {
-                "url": "https://bintray.com/vszakats/generic/download_file?file_path=curl-$version-win32-mingw.7z#/dl.7z",
+                "url": "https://dl.bintray.com/vszakats/generic/curl-$version-win32-mingw.7z",
                 "extract_dir": "curl-$version-win32-mingw"
             }
+        },
+        "hash": {
+            "url": "https://api.bintray.com/search/file?subject=vszakats&repo=generic&name=$basename",
+            "mode": "json",
+            "jp": "$.[0].sha256"
         }
     }
 }
