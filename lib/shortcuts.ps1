@@ -47,7 +47,7 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
         # Shortcuts that should have been installed globally would
         # have been installed locally up until 27 June 2017.
         #
-        # TODO: Fairly safe to remove this 'if' block and comment after
+        # TODO: Remove this 'if' block and comment after
         #       27 June 2018.
         if($global) {
             $shortcut = "$(shortcut_folder $false)\$name.lnk"
