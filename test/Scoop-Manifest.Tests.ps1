@@ -49,15 +49,32 @@ describe "manifest-validation" {
             $manifest_files = gci $bucketdir *.json
             $validator = new-object Scoop.Validator($schema, $true)
         }
+
+        $global:quota_exceeded = $false
+
         $manifest_files | % {
             it "$_" {
-                $validator.Validate($_.fullname)
-                if ($validator.Errors.Count -gt 0) {
-                    write-host -f yellow $validator.ErrorsAsString
-                }
-                $validator.Errors.Count | should be 0
+                $file = $_ # exception handling may overwrite $_
 
-                $manifest = parse_json $_.fullname
+                if(!($global:quota_exceeded)) {
+                    try {
+                        $validator.Validate($file.fullname)
+
+                        if ($validator.Errors.Count -gt 0) {
+                            write-host -f yellow $validator.ErrorsAsString
+                        }
+                        $validator.Errors.Count | should be 0
+                    } catch {
+                        if($_.exception.message -like '*The free-quota limit of 1000 schema validations per hour has been reached.*') {
+                            $global:quota_exceeded = $true
+                            write-host -f darkyellow 'Schema validation limit exceeded. Will skip further validations.'
+                        } else {
+                            throw
+                        }
+                    }
+                }
+
+                $manifest = parse_json $file.fullname
                 $url = arch_specific "url" $manifest "32bit"
                 $url64 = arch_specific "url" $manifest "64bit"
                 if(!$url) {
