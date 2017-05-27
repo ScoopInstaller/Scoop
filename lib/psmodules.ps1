@@ -49,7 +49,7 @@ function ensure_in_psmodulepath($dir, $global) {
     $path = env 'psmodulepath' $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
-        echo "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) PowerShell module path."
+        write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) PowerShell module path."
 
         env 'psmodulepath' $global "$dir;$path" # for future sessions...
         $env:psmodulepath = "$dir;$env:psmodulepath" # for this session

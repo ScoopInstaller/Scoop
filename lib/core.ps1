@@ -195,23 +195,23 @@ function shim($path, $global, $name, $arg) {
 
     # if $path points to another drive resolve-path prepends .\ which could break shims
     if($relpath -match "^(.\\[\w]:).*$") {
-        echo "`$path = `"$path`"" | out-file $shim -encoding utf8
+        write-output "`$path = `"$path`"" | out-file $shim -encoding utf8
     } else {
-        echo "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
+        write-output "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
     }
 
     if($arg) {
-        echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
+        write-output "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
     }
-    echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding utf8 -append
+    write-output 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding utf8 -append
 
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
         $shim_exe = "$(strip_ext($shim)).shim"
         cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$(strip_ext($shim)).exe" -force
-        echo "path = $(resolve-path $path)" | out-file $shim_exe -encoding utf8
+        write-output "path = $(resolve-path $path)" | out-file $shim_exe -encoding utf8
         if($arg) {
-            echo "args = $arg" | out-file $shim_exe -encoding utf8 -append
+            write-output "args = $arg" | out-file $shim_exe -encoding utf8 -append
         }
     } elseif($path -match '\.((bat)|(cmd))$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
@@ -232,7 +232,7 @@ function ensure_in_path($dir, $global) {
     $path = env 'path' $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
-        echo "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
+        write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
 
         env 'path' $global "$dir;$path" # for future sessions...
         $env:path = "$dir;$env:path" # for this session
@@ -258,7 +258,7 @@ function remove_from_path($dir,$global) {
     # future sessions
     $was_in_path, $newpath = strip_path (env 'path' $global) $dir
     if($was_in_path) {
-        echo "Removing $(friendly_path $dir) from your path."
+        write-output "Removing $(friendly_path $dir) from your path."
         env 'path' $global $newpath
     }
 
