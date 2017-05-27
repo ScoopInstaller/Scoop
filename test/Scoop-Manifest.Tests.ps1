@@ -26,20 +26,20 @@ describe "manifest-validation" {
             $validator = new-object Scoop.Validator("$working_dir\broken_schema.json", $true)
             $validator.Validate("$working_dir\wget.json") | should be $false
             $validator.Errors.Count | should be 1
-            $validator.Errors | select-object -First 1 | should belikeexactly "*broken_schema.json*Path 'type', line 6, position 4."
+            $validator.Errors | select-object -First 1 | should match "broken_schema.*(line 6).*(position 4)"
         }
         it "fails with broken manifest" {
             $validator = new-object Scoop.Validator($schema, $true)
             $validator.Validate("$working_dir\broken_wget.json") | should be $false
             $validator.Errors.Count | should be 1
-            $validator.Errors | select-object -First 1 | should belikeexactly "*broken_wget.json*Path 'version', line 5, position 4."
+            $validator.Errors | select-object -First 1 | should match "broken_wget.*(line 5).*(position 4)"
         }
         it "fails with invalid manifest" {
             $validator = new-object Scoop.Validator($schema, $true)
             $validator.Validate("$working_dir\invalid_wget.json") | should be $false
             $validator.Errors.Count | should be 16
-            $validator.Errors | select-object -First 1 | should belikeexactly "*invalid_wget.json*randomproperty*"
-            $validator.Errors | select-object -Last 1 | should belikeexactly "*invalid_wget.json*version."
+            $validator.Errors | select-object -First 1 | should match "invalid_wget.*randomproperty.*properties\.$"
+            $validator.Errors | select-object -Last 1 | should match "invalid_wget.*version\.$"
         }
     }
 
