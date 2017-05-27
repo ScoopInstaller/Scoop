@@ -22,7 +22,7 @@ $dir = resolve-path $dir
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\json.ps1"
 
-if([environment]::OSVersion.Platform -eq "Unix") {
+if(isUnix) {
     if (!(which hub)) {
         Write-Host -f yellow "Please install hub ('brew install hub' or visit: https://hub.github.com/)"
         exit 1

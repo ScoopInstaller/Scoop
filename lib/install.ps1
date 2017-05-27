@@ -452,7 +452,6 @@ function check_hash($file, $url, $manifest, $arch) {
 }
 
 function compute_hash($file, $algname) {
-    if([environment]::OSVersion.Platform -eq "Unix") {
         switch ($algname)
         {
             "md5" { $result = (md5sum -b $file) }
@@ -460,6 +459,7 @@ function compute_hash($file, $algname) {
             "sha256" { $result = (sha256sum -b $file) }
             "sha512" { $result = (sha512sum -b $file) }
             default { $result = (sha256sum -b $file) }
+    if(isUnix) {
         }
         return $result.split(" ") | select -first 1
     }

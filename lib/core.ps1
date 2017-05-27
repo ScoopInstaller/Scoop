@@ -18,8 +18,12 @@ $globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | select -first 1
 
+function isUnix() { $PSVersionTable.Platform -eq 'Unix' }
+function isMacOS() { $PSVersionTable.OS.ToLower().StartsWith('darwin') }
+function isLinux() { $PSVersionTable.OS.ToLower().StartsWith('linux') }
+
 # Overwrite $scoopdir, $globaldir and $cachedir on unix systems
-if([environment]::OSVersion.Platform -eq "Unix") {
+if(isUnix) {
     $scoopdir = $env:SCOOP, (Join-Path $env:HOME "scoop") | select -first 1
     $globaldir = $env:SCOOP_GLOBAL, "/usr/local/scoop" | select -first 1
     $cachedir = $env:SCOOP_CACHE, (Join-Path $scoopdir "cache") | select -first 1
@@ -104,7 +108,7 @@ function url_remote_filename($url) {
 }
 
 function ensure($dir) {
-    if([environment]::OSVersion.Platform -eq "Unix") {
+    if(isUnix) {
         mkdir -p $dir > $null
     } else {
         if(!(test-path $dir)) {
