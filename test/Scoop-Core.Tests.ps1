@@ -3,6 +3,7 @@
 . "$psscriptroot\Scoop-TestLib.ps1"
 
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
+$isUnix = isUnix
 
 describe "is_directory" {
     beforeall {
@@ -29,7 +30,7 @@ describe "movedir" {
         $working_dir = setup_working "movedir"
     }
 
-    it "moves directories with no spaces in path" {
+    it "moves directories with no spaces in path" -skip:$isUnix {
         $dir = "$working_dir\user"
         movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
 
@@ -37,7 +38,7 @@ describe "movedir" {
         "$dir\_scoop_extract\$extract_dir" | should not exist
     }
 
-    it "moves directories with spaces in path" {
+    it "moves directories with spaces in path" -skip:$isUnix {
         $dir = "$working_dir\user with space"
         movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
 
@@ -50,7 +51,7 @@ describe "movedir" {
         "$dir\_scoop_extract" | should not exist
     }
 
-    it "moves directories with quotes in path" {
+    it "moves directories with quotes in path" -skip:$isUnix {
         $dir = "$working_dir\user with 'quote"
         movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
 
@@ -76,7 +77,7 @@ describe "unzip_old" {
         $zerobyte = "$working_dir\zerobyte.zip"
         $zerobyte | should exist
 
-        it "unzips file with zero bytes without error" {
+        it "unzips file with zero bytes without error" -skip:$isUnix {
             # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
             # `$to = test-unzip $zerobyte` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
             $to = ([string](test-unzip $zerobyte)).trimStart()
@@ -94,7 +95,7 @@ describe "unzip_old" {
         $small = "$working_dir\small.zip"
         $small | should exist
 
-        it "unzips file which is small in size" {
+        it "unzips file which is small in size" -skip:$isUnix {
             # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
             # `$to = test-unzip $small` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
             $to = ([string](test-unzip $small)).trimStart()
@@ -118,7 +119,7 @@ describe "shim" {
         $(ensure_in_path $shimdir) | out-null
     }
 
-    it "links a file onto the user's path" {
+    it "links a file onto the user's path" -skip:$isUnix {
         { get-command "shim-test" -ea stop } | should throw
         { get-command "shim-test.ps1" -ea stop } | should throw
         { get-command "shim-test.cmd" -ea stop } | should throw
@@ -132,7 +133,7 @@ describe "shim" {
     }
 
     context "user with quote" {
-        it "shims a file with quote in path" {
+        it "shims a file with quote in path" -skip:$isUnix {
             { get-command "shim-test" -ea stop } | should throw
             { shim-test } | should throw
 
@@ -154,7 +155,7 @@ describe "rm_shim" {
         $(ensure_in_path $shimdir) | out-null
     }
 
-    it "removes shim from path" {
+    it "removes shim from path" -skip:$isUnix {
         shim "$working_dir\shim-test.ps1" $false "shim-test"
 
         rm_shim "shim-test" $shimdir
@@ -175,7 +176,7 @@ describe "ensure_robocopy_in_path" {
     }
 
     context "robocopy is not in path" {
-        it "shims robocopy when not on path" {
+        it "shims robocopy when not on path" -skip:$isUnix {
             mock gcm { $false }
             gcm robocopy | should be $false
 
@@ -190,7 +191,7 @@ describe "ensure_robocopy_in_path" {
     }
 
     context "robocopy is in path" {
-        it "does not shim robocopy when it is in path" {
+        it "does not shim robocopy when it is in path" -skip:$isUnix {
             mock gcm { $true }
             ensure_robocopy_in_path
 

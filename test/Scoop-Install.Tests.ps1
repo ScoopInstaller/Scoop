@@ -3,6 +3,8 @@
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\Scoop-TestLib.ps1"
 
+$isUnix = isUnix
+
 describe "ensure_architecture" {
     it "should keep correct architectures" {
         ensure_architecture "32bit" | Should be "32bit"
@@ -51,7 +53,7 @@ describe "url_remote_filename" {
 }
 
 describe "is_in_dir" {
-    it "should work correctly" {
+    it "should work correctly" -skip:$isUnix {
         is_in_dir "C:\test" "C:\foo" | Should be $false
         is_in_dir "C:\test" "C:\test\foo\baz.zip" | Should be $true
 
@@ -71,7 +73,7 @@ describe "env add and remove path" {
     # store the original path to prevent leakage of tests
     $origPath = $env:PATH
 
-    it "should concat the correct path" {
+    it "should concat the correct path" -skip:$isUnix {
         mock add_first_in_path {}
         mock remove_from_path {}
 
