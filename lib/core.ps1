@@ -27,6 +27,7 @@ if(isUnix) {
     $scoopdir = $env:SCOOP, (Join-Path $env:HOME "scoop") | select -first 1
     $globaldir = $env:SCOOP_GLOBAL, "/usr/local/scoop" | select -first 1
     $cachedir = $env:SCOOP_CACHE, (Join-Path $scoopdir "cache") | select -first 1
+    $env:TEMP = "/tmp"
 }
 
 # helper functions
