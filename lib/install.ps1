@@ -122,7 +122,7 @@ function use_any_https_protocol() {
 
 function set_https_protocols($protocols) {
     try {
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType] $available
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType] $protocols
     } catch {
         [System.Net.ServicePointManager]::SecurityProtocol = "Tls,Tls11,Tls12"
     }
