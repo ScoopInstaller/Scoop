@@ -18,19 +18,11 @@ $globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | select -first 1
 
-function isUnix() { $PSVersionTable.Platform -eq 'Unix' }
-function isMacOS() { $PSVersionTable.OS.ToLower().StartsWith('darwin') }
-function isLinux() { $PSVersionTable.OS.ToLower().StartsWith('linux') }
-
-# Overwrite $scoopdir, $globaldir and $cachedir on unix systems
-if(isUnix) {
-    $scoopdir = $env:SCOOP, (Join-Path $env:HOME "scoop") | select -first 1
-    $globaldir = $env:SCOOP_GLOBAL, "/usr/local/scoop" | select -first 1
-    $cachedir = $env:SCOOP_CACHE, (Join-Path $scoopdir "cache") | select -first 1
-    $env:TEMP = "/tmp"
-}
-
 # helper functions
+function is_unix() { $PSVersionTable.Platform -eq 'Unix' }
+function is_mac() { $PSVersionTable.OS.ToLower().StartsWith('darwin') }
+function is_linux() { $PSVersionTable.OS.ToLower().StartsWith('linux') }
+
 function coalesce($a, $b) { if($a) { return $a } $b }
 
 function format($str, $hash) {
@@ -108,16 +100,7 @@ function url_remote_filename($url) {
     split-path (new-object uri $url).absolutePath -leaf
 }
 
-function ensure($dir) {
-    if(isUnix) {
-        mkdir -p $dir > $null
-    } else {
-        if(!(test-path $dir)) {
-            mkdir $dir > $null
-        }
-    }
-    return resolve-path $dir
-}
+function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
     $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }

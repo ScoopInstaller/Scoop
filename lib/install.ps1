@@ -452,28 +452,6 @@ function check_hash($file, $url, $manifest, $arch) {
 }
 
 function compute_hash($file, $algname) {
-    if(isUnix) {
-        if(isMacOS) {
-            switch ($algname)
-            {
-                "md5" { $result = (md5 -q $file) }
-                "sha1" { $result = (shasum -ba 1 $file) }
-                "sha256" { $result = (shasum -ba 256 $file) }
-                "sha512" { $result = (shasum -ba 512 $file) }
-                default { $result = (shasum -ba 256 $file) }
-            }
-        } else {
-            switch ($algname)
-            {
-                "md5" { $result = (md5sum -b $file) }
-                "sha1" { $result = (sha1sum -b $file) }
-                "sha256" { $result = (sha256sum -b $file) }
-                "sha512" { $result = (sha512sum -b $file) }
-                default { $result = (sha256sum -b $file) }
-            }
-        }
-        return $result.split(' ') | select -first 1
-    }
     $alg = [system.security.cryptography.hashalgorithm]::create($algname)
     $fs = [system.io.file]::openread($file)
     try {
