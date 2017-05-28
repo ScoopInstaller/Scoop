@@ -19,10 +19,6 @@ $globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
 $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | select -first 1
 
 # helper functions
-function is_unix() { $PSVersionTable.Platform -eq 'Unix' }
-function is_mac() { $PSVersionTable.OS.ToLower().StartsWith('darwin') }
-function is_linux() { $PSVersionTable.OS.ToLower().StartsWith('linux') }
-
 function coalesce($a, $b) { if($a) { return $a } $b }
 
 function format($str, $hash) {

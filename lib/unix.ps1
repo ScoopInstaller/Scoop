@@ -1,6 +1,9 @@
-# Note: This fill should only be included after core.ps1 and install.ps1
-#       It will overwrite some global variables and functions to make
-#       them unix compatible.
+# Note: This file is for overwriting global variables and functions to make
+#       them unix compatible. It has to be imported after everything else!
+
+function is_unix() { $PSVersionTable.Platform -eq 'Unix' }
+function is_mac() { $PSVersionTable.OS.ToLower().StartsWith('darwin') }
+function is_linux() { $PSVersionTable.OS.ToLower().StartsWith('linux') }
 
 if(!(is_unix)) {
     return # get the hell outta here
