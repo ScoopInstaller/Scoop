@@ -344,23 +344,23 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
 
         if($extract_fn) {
             write-host "Extracting... " -nonewline
-            $null = mkdir "$dir\_scoop_extract"
-            & $extract_fn "$dir\$fname" "$dir\_scoop_extract"
+            $null = mkdir "$dir\_tmp"
+            & $extract_fn "$dir\$fname" "$dir\_tmp"
             rm "$dir\$fname"
             if ($extract_to) {
                 $null = mkdir "$dir\$extract_to" -force
             }
             # fails if zip contains long paths (e.g. atom.json)
-            #cp "$dir\_scoop_extract\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
+            #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
+            movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
-            if(test-path "$dir\_scoop_extract") { # might have been moved by movedir
+            if(test-path "$dir\_tmp") { # might have been moved by movedir
                 try {
-                    rm -r -force "$dir\_scoop_extract" -ea stop
+                    rm -r -force "$dir\_tmp" -ea stop
                 } catch [system.io.pathtoolongexception] {
-                    cmd /c "rmdir /s /q $dir\_scoop_extract"
+                    cmd /c "rmdir /s /q $dir\_tmp"
                 } catch [system.unauthorizedaccessexception] {
-                    warn "Couldn't remove $dir\_scoop_extract: unauthorized access."
+                    warn "Couldn't remove $dir\_tmp: unauthorized access."
                 }
             }
 
