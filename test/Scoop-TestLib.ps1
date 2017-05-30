@@ -66,14 +66,14 @@ function script:fmt($var) {
 
 # copies fixtures to a working directory
 function setup_working($name) {
-    $fixtures = "$psscriptroot\fixtures\$name"
+    $fixtures = "$psscriptroot/fixtures/$name"
     if(!(test-path $fixtures)) {
         write-host "couldn't find fixtures for $name at $fixtures" -f red
         exit 1
     }
 
     # reset working dir
-    $working_dir = "$env:TEMP\ScoopTestFixtures\$name"
+    $working_dir = "$env:TEMP/ScoopTestFixtures/$name"
     if(test-path $working_dir) {
         Remove-Item -Recurse -Force $working_dir
     }
