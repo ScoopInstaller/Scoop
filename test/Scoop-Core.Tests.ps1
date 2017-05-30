@@ -69,7 +69,11 @@ describe "unzip_old" {
     function test-unzip($from) {
         $to = strip_ext $from
 
-        unzip_old $from $to
+        if(is_unix) {
+            unzip_old ($from -replace '\\','/') ($to -replace '\\','/')
+        } else {
+            unzip_old ($from -replace '/','\') ($to -replace '/','\')
+        }
 
         $to
     }
