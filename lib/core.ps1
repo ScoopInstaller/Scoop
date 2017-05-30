@@ -217,13 +217,13 @@ powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `
 }
 
 function ensure_in_path($dir, $global) {
-    $path = env 'path' $global
+    $path = env 'PATH' $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
         write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
 
-        env 'path' $global "$dir;$path" # for future sessions...
-        $env:path = "$dir;$env:path" # for this session
+        env 'PATH' $global "$dir;$path" # for future sessions...
+        $env:PATH = "$dir;$env:PATH" # for this session
     }
 }
 
@@ -251,8 +251,8 @@ function remove_from_path($dir,$global) {
     }
 
     # current session
-    $was_in_path, $newpath = strip_path $env:path $dir
-    if($was_in_path) { $env:path = $newpath }
+    $was_in_path, $newpath = strip_path $env:PATH $dir
+    if($was_in_path) { $env:PATH = $newpath }
 }
 
 function ensure_scoop_in_path($global) {

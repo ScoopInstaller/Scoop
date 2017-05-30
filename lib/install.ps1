@@ -803,8 +803,8 @@ function add_first_in_path($dir, $global) {
     env 'path' $global "$dir;$currpath"
 
     # this session
-    $null, $env:path = strip_path $env:path $dir
-    $env:path = "$dir;$env:path"
+    $null, $env:PATH = strip_path $env:PATH $dir
+    $env:PATH = "$dir;$env:PATH"
 }
 
 function env_rm_path($manifest, $dir, $global) {
@@ -846,14 +846,14 @@ function env_rm($manifest, $global) {
 function env_ensure_home($manifest, $global) {
     if($manifest.env_ensure_home -eq $true) {
         if($global){
-            if(!(env 'home' $true)) {
-                env 'home' $true $env:ALLUSERSPROFILE
-                $env:home = $env:ALLUSERSPROFILE # current session
+            if(!(env 'HOME' $true)) {
+                env 'HOME' $true $env:ALLUSERSPROFILE
+                $env:HOME = $env:ALLUSERSPROFILE # current session
             }
         } else {
-            if(!(env 'home' $false)) {
-                env 'home' $false $env:USERPROFILE
-                $env:home = $env:USERPROFILE # current session
+            if(!(env 'HOME' $false)) {
+                env 'HOME' $false $env:USERPROFILE
+                $env:HOME = $env:USERPROFILE # current session
             }
         }
     }
