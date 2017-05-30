@@ -16,7 +16,7 @@ param(
     [Switch]$help = $false
 )
 
-if(!$dir) { $dir = "$psscriptroot\.." }
+if(!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir
 
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -121,7 +121,7 @@ if($push -eq $true) {
     execute("hub push origin master")
 }
 
-. "$dir\bin\checkver.ps1" * -update
+. "$psscriptroot\checkver.ps1" * -update -dir $dir
 
 hub diff --name-only | % {
     $manifest = $_
