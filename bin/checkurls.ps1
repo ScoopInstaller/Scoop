@@ -48,17 +48,18 @@ function test_dl($url, $cookies) {
             $wreq.headers.add('Cookie', (cookie_header $cookies))
         }
     }
+    $wres = $null
     try {
         $wres = $wreq.getresponse()
-        if($wres -isnot [net.ftpwebresponse]) {
-            $wres.close()
-        }
         return $url, $wres.statuscode, $null
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
         return $url, "Error", $e.message
     } finally {
+        if($wres -ne $null -and $wres -isnot [net.ftpwebresponse]) {
+            $wres.close()
+        }
     }
 }
 

@@ -73,13 +73,13 @@ function setup_working($name) {
     }
 
     # reset working dir
-    $working_dir = "$env:temp\ScoopTestFixtures\$name"
+    $working_dir = "$env:TEMP\ScoopTestFixtures\$name"
     if(test-path $working_dir) {
-        rm -r -force $working_dir
+        Remove-Item -Recurse -Force $working_dir
     }
 
     # set up
-    cp $fixtures $working_dir -r
+    Copy-Item $fixtures -Destination $working_dir -Recurse
 
     return $working_dir
 }

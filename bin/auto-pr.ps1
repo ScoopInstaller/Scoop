@@ -21,10 +21,18 @@ $dir = resolve-path $dir
 
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\json.ps1"
+. "$psscriptroot\..\lib\unix.ps1"
 
-if (!(scoop which hub)) {
-    Write-Host -f yellow "Please install hub (scoop install hub)"
-    exit 1
+if(is_unix) {
+    if (!(which hub)) {
+        Write-Host -f yellow "Please install hub ('brew install hub' or visit: https://hub.github.com/)"
+        exit 1
+    }
+} else {
+    if (!(scoop which hub)) {
+        Write-Host -f yellow "Please install hub 'scoop install hub'"
+        exit 1
+    }
 }
 
 if ((!$push -and !$request) -or $help) {

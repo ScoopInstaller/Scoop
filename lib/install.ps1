@@ -31,7 +31,7 @@ function install_app($app, $architecture, $global, $suggested) {
         $check_hash = $false
     }
 
-    echo "Installing '$app' ($version)."
+    write-output "Installing '$app' ($version)."
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
@@ -112,8 +112,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
 
 function use_any_https_protocol() {
     $original = "$([System.Net.ServicePointManager]::SecurityProtocol)"
-    $available = [string]::join(', ', `
-        [Enum]::GetNames([System.Net.SecurityProtocolType]))
+    $available = [string]::join(', ', [Enum]::GetNames([System.Net.SecurityProtocolType]))
 
     # use whatever protocols are available that the server supports
     set_https_protocols $available
@@ -122,8 +121,11 @@ function use_any_https_protocol() {
 }
 
 function set_https_protocols($protocols) {
-    [System.Net.ServicePointManager]::SecurityProtocol = `
-        [System.Net.SecurityProtocolType] $protocols
+    try {
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType] $protocols
+    } catch {
+        [System.Net.ServicePointManager]::SecurityProtocol = "Tls,Tls11,Tls12"
+    }
 }
 
 function do_dl($url, $to, $cookies) {
@@ -655,7 +657,7 @@ function create_shims($manifest, $dir, $global, $arch) {
     $shims = @(arch_specific 'bin' $manifest $arch)
     $shims | ?{ $_ -ne $null } | % {
         $target, $name, $arg = shim_def $_
-        echo "Creating shim for '$name'."
+        write-output "Creating shim for '$name'."
 
         # check valid bin
         $bin = "$dir\$target"
@@ -674,7 +676,7 @@ function rm_shim($name, $shimdir) {
     if(!(test-path $shim)) { # handle no shim from failed install
         warn "Shim for '$name' is missing. Skipping."
     } else {
-        echo "Removing shim for '$name'."
+        write-output "Removing shim for '$name'."
         rm $shim
     }
 
@@ -860,7 +862,7 @@ function env_ensure_home($manifest, $global) {
 function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
     if($pre_install) {
-        echo "Running pre-install script..."
+        write-output "Running pre-install script..."
         iex $pre_install
     }
 }
@@ -868,16 +870,16 @@ function pre_install($manifest, $arch) {
 function post_install($manifest, $arch) {
     $post_install = arch_specific 'post_install' $manifest $arch
     if($post_install) {
-        echo "Running post-install script..."
+        write-output "Running post-install script..."
         iex $post_install
     }
 }
 
 function show_notes($manifest, $dir, $original_dir, $persist_dir) {
     if($manifest.notes) {
-        echo "Notes"
-        echo "-----"
-        echo (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}))
+        write-output "Notes"
+        write-output "-----"
+        write-output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}))
     }
 }
 
