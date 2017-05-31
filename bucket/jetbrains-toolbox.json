@@ -16,12 +16,6 @@
     "bin": [
         "jetbrains-toolbox.exe"
     ],
-    "shortcuts": [
-        [
-            "jetbrains-toolbox.exe",
-            "JetBrains Toolbox"
-        ]
-    ],
     "persist": "apps",
     "checkver": {
         "url": "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release",
