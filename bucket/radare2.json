@@ -1,12 +1,12 @@
 {
-    "version": "1.4.0",
+    "version": "1.5.0",
     "license": "GPL2",
     "homepage": "https://www.radare.org/r/",
     "architecture": {
         "64bit": {
-            "url": "http://cloud.radare.org/get/1.4.0/radare2-w64-1.4.0.zip",
-            "hash": "a84d1bfe883f332dfe3b32f9893a20586162a5809d471502719b0be8dce04151",
-            "extract_dir": "radare2-w64-1.4.0"
+            "url": "http://cloud.radare.org/get/1.5.0/radare2-w64-1.5.0.zip",
+            "hash": "5f2baec31d94ae216730c2dd6269607caad08ccb5812cafd5ee346cd6439e492",
+            "extract_dir": "radare2-w64-1.5.0"
         }
     },
     "bin": [
