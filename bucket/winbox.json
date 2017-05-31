@@ -1,0 +1,22 @@
+{
+    "homepage": "https://mikrotik.com/",
+    "version": "3.11",
+    "url": "https://download2.mikrotik.com/routeros/winbox/3.11/winbox.exe",
+    "hash": "4434766384a7aab1f19af7c2de9d24d3dade1c110072fe0dcc1c5f0041d62be0",
+    "bin": [
+        "winbox.exe"
+    ],
+    "shortcuts": [
+        [
+            "winbox.exe",
+            "RouterOS Winbox"
+        ]
+    ],
+    "checkver": {
+        "url": "https://mikrotik.com/download/",
+        "re": "routeros/winbox/([\\d.]+)/winbox.exe"
+    },
+    "autoupdate": {
+        "url": "https://download2.mikrotik.com/routeros/winbox/$version/winbox.exe"
+    }
+}
