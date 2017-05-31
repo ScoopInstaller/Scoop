@@ -14,15 +14,16 @@
     },
     "extract_dir": "nodejs",
     "persist": [
-        "bin"
+        "bin",
+        "cache"
     ],
     "env_add_path": [
         ".",
         "bin"
     ],
     "post_install": "
-# Set npm prefix to install modules inside bin
-Set-Content -Value \"prefix=$dir\\bin\" -Path $dir\\node_modules\\npm\\npmrc",
+# Set npm prefix to install modules inside bin and npm cache so they persist
+Set-Content -Value \"prefix=$dir\\bin`ncache=$dir\\cache\" -Path $dir\\node_modules\\npm\\npmrc",
     "checkver": {
         "url": "https://nodejs.org/en/download/current/",
         "re": "Current version: <strong>v([\\d.]+)</strong>"
