@@ -27,6 +27,6 @@
             "url": "$url.sha256"
         }
     },
-    "post_install": "$las=\"$Env:LOCALAPPDATA\\Jetbrains\\Toolbox\\.settings.json\"; if(Test-Path \"$las\") {(gc \"$las\") -join \"`n\"| ConvertFrom-Json | Add-Member -Force @{install_location=\"$dir\";intellij_platform=($architecture -eq '64bit')} -P | ConvertTo-Json -D 6| sc \"$las\"}",
+    "post_install": "$las=\"$Env:LOCALAPPDATA\\Jetbrains\\Toolbox\\.settings.json\"; if(Test-Path \"$las\") {(gc \"$las\") -join \"`n\"| ConvertFrom-Json | Add-Member -Force @{install_location=\"$dir\";intellij_platform=($architecture -eq '64bit')} -P | ConvertToPrettyJson | sc \"$las\"}",
     "notes": "Set 'Install Location' to $dir to persist the installed apps"
 }
