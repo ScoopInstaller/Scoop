@@ -13,6 +13,10 @@
         }
     },
     "extract_dir": "Apache24",
+    "persist": [
+        "htdocs",
+        "conf"
+    ],
     "bin": [
         "bin\\ab.exe",
         "bin\\abs.exe",
