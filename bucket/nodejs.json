@@ -22,8 +22,9 @@
         "bin"
     ],
     "post_install": "
-# Set npm prefix to install modules inside bin and npm cache so they persist
-Set-Content -Value \"prefix=$dir\\bin`ncache=$dir\\cache\" -Path $dir\\node_modules\\npm\\npmrc",
+        npm config set cache \"$persist_dir\\cache\"
+        npm config set prefix \"$persist_dir\\bin\"
+    ",
     "checkver": {
         "url": "https://nodejs.org/en/download/current/",
         "re": "Current version: <strong>v([\\d.]+)</strong>"
