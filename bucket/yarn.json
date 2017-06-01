@@ -13,7 +13,18 @@
     },
     "url": "https://yarnpkg.com/downloads/0.24.6/yarn-0.24.6.msi",
     "hash": "00f1aab358abe90eaaeb66c31fdf7342822dfba96a781e6995ffb0d4c68ad330",
-    "env_add_path": "Yarn\\bin",
+    "persist": [
+        "cache",
+        "bin"
+    ],
+    "post_install": "
+        yarn config set cache \"$persist_dir\\cache\"
+        yarn config set prefix \"$persist_dir\\bin\"
+    ",
+    "env_add_path": [
+        "bin",
+        "Yarn\\bin"
+    ],
     "checkver": {
         "url": "https://yarnpkg.com/latest-version",
         "re": "([\\d.]+)"
