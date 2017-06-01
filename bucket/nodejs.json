@@ -4,15 +4,16 @@
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v8.0.0/node-v8.0.0-x64.msi",
-            "hash": "a6b7306302ce23b232467f19f766dda8b9684168976b24c8e6c55ea92d085176"
+            "url": "https://nodejs.org/dist/v8.0.0/node-v8.0.0-win-x64.7z",
+            "hash": "9bc84644228ab1e96dfb78eea4144c7c9732ccd33b44a4b8994fd232fafa19b5",
+            "extract_dir": "node-v8.0.0-win-x64"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v8.0.0/node-v8.0.0-x86.msi",
-            "hash": "715d1834a7b2741ae0a4401902ef91cc9f95dfe04c4a100bd3490e95ad5bf449"
+            "url": "https://nodejs.org/dist/v8.0.0/node-v8.0.0-win-x86.7z",
+            "hash": "4c4d1c21a56ab4da6a24543ee27bd2d22fbbf5fcae9ccc3422869ad45754809c",
+            "extract_dir": "node-v8.0.0-win-x86"
         }
     },
-    "extract_dir": "nodejs",
     "persist": [
         "bin",
         "cache"
@@ -32,10 +33,12 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://nodejs.org/dist/v$version/node-v$version-x64.msi"
+                "url": "https://nodejs.org/dist/v$version/node-v$version-win-x64.7z",
+                "extract_dir": "node-v$version-win-x64"
             },
             "32bit": {
-                "url": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+                "url": "https://nodejs.org/dist/v$version/node-v$version-win-x86.7z",
+                "extract_dir": "node-v$version-win-x86"
             }
         },
         "hash": {
