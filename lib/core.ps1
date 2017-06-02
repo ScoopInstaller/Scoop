@@ -206,12 +206,14 @@ function shim($path, $global, $name, $arg) {
         $shim_cmd = "$(strip_ext($shim)).cmd"
 
 "@echo off
+setlocal enabledelayedexpansion
 set args=%*
 :: replace problem characters in arguments
 set args=%args:`"='%
 set args=%args:(=``(%
 set args=%args:)=``)%
-
+set invalid=`"='
+if !args! == !invalid! ( set args= )
 powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
     }
 }
