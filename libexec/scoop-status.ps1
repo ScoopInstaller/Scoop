@@ -48,7 +48,7 @@ $true, $false | % { # local and global apps
             $install_info = install_info $app $version $global
         }
 
-        if(!$install_info) {
+        if(!$install_info -or !$version) {
             $failed += @{ $app = $version }; return
         }
 
