@@ -6,10 +6,22 @@
     "extract_dir": "hashcat-3.5.0",
     "architecture": {
         "64bit": {
-            "bin": [ [ "hashcat64.exe", "hashcat", "" ] ]
+            "bin": [
+                [
+                    "hashcat64.exe",
+                    "hashcat",
+                    ""
+                ]
+            ]
         },
         "32bit": {
-            "bin": [ [ "hashcat32.exe", "hashcat", "" ] ]
+            "bin": [
+                [
+                    "hashcat32.exe",
+                    "hashcat",
+                    ""
+                ]
+            ]
         }
     },
     "hash": "0f3f1338325e1f46c1a622b30e9b90c4b54216d89e00b74816562e2659b2fc2a",
@@ -18,14 +30,6 @@
     },
     "autoupdate": {
         "url": "https://hashcat.net/files/hashcat-$version.7z",
-        "extract_dir": "hashcat-$version",
-        "architecture": {
-            "64bit": {
-                "bin": [ [ "hashcat-$version/hashcat64.exe", "hashcat", "" ] ]
-            },
-            "32bit": {
-                "bin": [ [ "hashcat-$version/hashcat32.exe", "hashcat", "" ] ]
-            }
-        }
+        "extract_dir": "hashcat-$version"
     }
 }
