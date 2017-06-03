@@ -11,7 +11,7 @@ function command_files {
         $files = gci ($bucketcmd)
     }
     else {
-        $files = (gci (relpath '..\libexec')) + (gci "$scoopdir\shims")        
+        $files = (gci (relpath '..\libexec')) + (gci "$scoopdir\shims")
     }
 
     $files | where { $_.name -match 'scoop-.*?\.ps1$' }
@@ -30,7 +30,7 @@ function command_path($cmd) {
         $cmd_path = "$bucketcmd\scoop-$cmd.ps1"
     }
     else {
-        $cmd_path = relpath "..\libexec\scoop-$cmd.ps1"        
+        $cmd_path = relpath "..\libexec\scoop-$cmd.ps1"
     }
 
     # built in commands
