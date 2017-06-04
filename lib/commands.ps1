@@ -1,6 +1,6 @@
 . "$psscriptroot\buckets.ps1"
 
-if ($cmd.Contains('/')) {
+if ($cmd -and $cmd.Contains('/')) {
     $bucket, $cmd = $cmd -split ('/');
     $bucketcmd = "$bucketsdir\$bucket\commands"
     $bucketcmd_exists = Test-Path $bucketcmd
