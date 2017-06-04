@@ -1,0 +1,6 @@
+{
+    "version": "2017.1",
+    "url": "https://download-cf.jetbrains.com/idea/ideaIU-2017.1.win.zip",
+    "hash": "18496f8fcecad11e451136c02054f44f74e3bad753dc8c45174779e017743330",
+    "env_add_path": "bin"
+}
