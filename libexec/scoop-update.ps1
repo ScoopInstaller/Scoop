@@ -89,6 +89,7 @@ function update_scoop() {
         popd
     }
     success 'Scoop was updated successfully!'
+    "Run 'scoop status' to check for updates to installed apps."
 }
 
 function update($app, $global, $quiet = $false, $independent, $suggested) {
