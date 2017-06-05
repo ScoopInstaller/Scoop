@@ -1,15 +1,15 @@
 {
     "homepage": "https://miktex.org",
-    "version": "2.9.6326",
+    "version": "2.9.6361",
     "license": "https://miktex.org/copying",
-    "url": "https://miktex.org/download/ctan/systems/win32/miktex/setup/miktex-portable-2.9.6326.exe#/dl.7z",
-    "hash": "c6337c1f46010f747b13d741f7b22554aeb10ad468cc37af6c7ecbebdd0db26c",
+    "url": "http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable-2.9.6361.exe#/dl.7z",
+    "hash": "745a6fa16593cda188bda10dc0915d2343301b5b0e5ca5a4800cf02385ae48b3",
     "env_add_path": "texmfs\\install\\miktex\\bin",
     "checkver": {
         "url": "https://miktex.org/portable",
         "re": "miktex-portable-([\\d.]+).exe"
     },
     "autoupdate": {
-        "url": "https://miktex.org/download/ctan/systems/win32/miktex/setup/miktex-portable-$version.exe#/dl.7z"
+        "url": "http://mirrors.ctan.org/systems/win32/miktex/setup/miktex-portable-$version.exe#/dl.7z"
     }
 }
