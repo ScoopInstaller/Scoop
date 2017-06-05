@@ -215,6 +215,9 @@ set args=%args:)=``)%
 set invalid=`"='
 if !args! == !invalid! ( set args= )
 powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
+    } else {
+        $shim_cmd = $(strip_ext($shim))
+        "#!/bin/sh`n`"$(resolve-path $path)`" `"$@`"" | out-file $shim_cmd -encoding ascii
     }
 }
 
