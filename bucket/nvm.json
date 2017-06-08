@@ -8,24 +8,25 @@
         "elevate.vbs"
     ],
     "persist": [
-        "nodejs",
-        "settings.txt"
+        "settings.txt",
+        "elevate.cmd",
+        "elevate.vbs"
     ],
     "env_add_path": "nodejs",
     "env_set": {
-        "NVM_HOME": "$dir",
-        "NVM_SYMLINK": "$persist_dir\\nodejs"
+        "NVM_HOME": "$persist_dir",
+        "NVM_SYMLINK": "$dir\\nodejs"
     },
     "hash": "cbe1b6d71cc420f2d4428e4b7d41b8eb409232706385b2e97f2b749228e370bc",
     "architecture": {
         "64bit": {
             "pre_install": "if(!(test-path \"$dir\\settings.txt\")) {
-                write-output \"root: $persist_dir\\nodejs`r`narch: 64`r`nproxy: none\" | Out-File -encoding \"ASCII\" $dir\\settings.txt
+                write-output \"root: $persist_dir`r`narch: 64`r`nproxy: none\" | Out-File -encoding \"ASCII\" $dir\\settings.txt
             }"
         },
         "32bit": {
             "pre_install": "if(!(test-path \"$dir\\settings.txt\")) {
-                write-output \"root: $persist_dir\\nodejs`r`narch: 32`r`nproxy: none\" | Out-File -encoding \"ASCII\" $dir\\settings.txt
+                write-output \"root: $persist_dir`r`narch: 32`r`nproxy: none\" | Out-File -encoding \"ASCII\" $dir\\settings.txt
             }"
         }
     },
