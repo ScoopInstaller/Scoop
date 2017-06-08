@@ -1,0 +1,37 @@
+{
+    "homepage": "https://www.python.org/",
+    "license": "https://docs.python.org/2/license.html",
+    "version": "2.7.13",
+    "architecture": {
+        "64bit": {
+            "url": "https://www.python.org/ftp/python/2.7.13/python-2.7.13.amd64.msi#/py2.msi",
+            "hash": "md5:268fd335aad649df7474adb13b6cf394"
+        },
+        "32bit": {
+            "url": "https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi#/py2.msi",
+            "hash": "md5:0f057ab4490e63e528eaa4a70df711d9"
+        }
+    },
+    "bin": [
+        "python.exe",
+        "pythonw.exe",
+        [
+            "python.exe",
+            "python2"
+        ]
+    ],
+    "env_add_path": [
+        "scripts"
+    ],
+    "checkver": "<p>Latest: <a.*>.*</a> - <a href=\".*\">Python ([\\d.]+)</a></p>",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://www.python.org/ftp/python/$version/python-$version-amd64.msi#/py2.msi"
+            },
+            "32bit": {
+                "url": "https://www.python.org/ftp/python/$version/python-$version.msi#/py2.msi"
+            }
+        }
+    }
+}
