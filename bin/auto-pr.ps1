@@ -13,7 +13,8 @@ param(
     [String]$dir,
     [Switch]$push = $false,
     [Switch]$request = $false,
-    [Switch]$help = $false
+    [Switch]$help = $false,
+    [string[]]$specialSnowflakes
 )
 
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
@@ -122,6 +123,11 @@ if($push -eq $true) {
 }
 
 . "$psscriptroot\checkver.ps1" * -update -dir $dir
+if($specialSnowflakes) {
+    $specialSnowflakes | % {
+        . "$psscriptroot\checkver.ps1" $_ -update -forceUpdate -dir $dir
+    }
+}
 
 hub diff --name-only | % {
     $manifest = $_
