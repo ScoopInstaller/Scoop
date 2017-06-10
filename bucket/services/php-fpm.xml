@@ -1,0 +1,13 @@
+<service>
+  <id>scoop-$name</id>
+  <name>Scoop $name</name>
+  <description>Scoop $name Service</description>
+  <executable>$dir\php-cgi.exe</executable>
+  <env name="HOME" value="$persist_dir" />
+  <env name="USERPROFILE" value="$persist_dir" />
+  <env name="PHP_INI_SCAN_DIR" value="$persist_dir\cli;$persist_dir\cli\conf.d;" />
+  <arguments>-b 127.0.0.1:9000</arguments>
+  <log mode="roll-by-size" />
+  <logpath>$service_dir\logs</logpath>
+  <onfailure action="restart" delay="10 sec"/>
+</service>

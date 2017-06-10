@@ -12,7 +12,9 @@
             "hash": "51d2de0ebebfa3519062772f144632de4b6d0348fcb3a394ed5a98e04ab24031"
         }
     },
+    "service": "caddy",
     "bin": "caddy.exe",
+    "post_install": "if(!(test-path \"$persist_dir\\Caddyfile\")) { \"localhost:2015\" | Out-File -encoding \"ASCII\" \"$persist_dir\\Caddyfile\" }",
     "checkver": {
         "github": "https://github.com/mholt/caddy"
     },

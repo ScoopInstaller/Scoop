@@ -12,6 +12,7 @@
             "hash": "sha1:5408393a7527463701aa2576faab68396c4aab92"
         }
     },
+    "service": "php-fpm",
     "bin": [
         "php.exe",
         "php-cgi.exe"
