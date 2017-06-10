@@ -1,0 +1,29 @@
+{
+    "version": "4VmDzA7iaHb",
+    "homepage": "https://ngrok.com/",
+    "architecture": {
+        "64bit": {
+            "url": "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip",
+            "hash": "81b1a591837b1dbb9b2001b761e89a76ee121e09b630c7844d8f7e52bf6f1242"
+        },
+        "32bit": {
+            "url": "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-386.zip",
+            "hash": "71b4db12b03431c199be523103fe86e46b53cd3c0aa29170bed99365a9c804d7"
+        }
+    },
+    "bin": "ngrok.exe",
+    "checkver": {
+        "url": "https://dl.equinox.io/ngrok/ngrok/stable",
+        "re": "/c/(.*)/ngrok-stable-windows-amd64.zip"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://bin.equinox.io/c/$version/ngrok-stable-windows-amd64.zip"
+            },
+            "32bit": {
+                "url": "https://bin.equinox.io/c/$version/ngrok-stable-windows-386.zip"
+            }
+        }
+    }
+}
