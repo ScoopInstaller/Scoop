@@ -103,7 +103,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         '$basename' = $basename
     }
     $hashfile_url = substitute $hashfile_url $substitutions
-    write-host -f yellow $hashfile_url
+    if($hashfile_url) { write-host -f yellow $hashfile_url }
 
     if($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
         $hashmode = "extract"

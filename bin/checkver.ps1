@@ -156,34 +156,36 @@ while($in_progress -gt 0) {
         continue
     }
 
-    if($ver -eq $expected_ver) {
+    if($ver -eq $expected_ver -and $forceUpdate -eq $false) {
+        # version hasn't changed (step over if forced update)
         write-host "$ver" -f darkgreen
+        continue
+    }
 
-        if ($forceUpdate -and $json.autoupdate) {
-            Write-Host "Forcing autoupdate!" -f DarkMagenta
-            try {
-                autoupdate $app $dir $json $ver $matches
-            } catch {
-                write-host -f darkred $_.exception.message
-            }
-        }
+    write-host "$ver" -f darkred -nonewline
+    write-host " (scoop version is $expected_ver)" -NoNewline
+    $update_available = (compare_versions $expected_ver $ver) -eq -1
+
+    if ($json.autoupdate -and $update_available) {
+        Write-Host " autoupdate available" -f Cyan
     } else {
-        write-host "$ver" -f darkred -nonewline
-        write-host " (scoop version is $expected_ver)" -NoNewline
-        $update_available = (compare_versions $expected_ver $ver) -eq -1
+        Write-Host ""
+        continue
+    }
 
-        if ($json.autoupdate -and $update_available) {
-            Write-Host " autoupdate available" -f Cyan
-        } else {
-            Write-Host ""
+    if($forceUpdate) {
+        # forcing an update implies updating, right?
+        $update = $true
+    }
+
+    if($update -and $json.autoupdate) {
+        if($forceUpdate) {
+            Write-Host "Forcing autoupdate!" -f DarkMagenta
         }
-
-        if ($update -and $update_available -and $json.autoupdate) {
-            try {
-                autoupdate $app $dir $json $ver $matches
-            } catch {
-                write-host -f darkred $_.exception.message
-            }
+        try {
+            autoupdate $app $dir $json $ver $matches
+        } catch {
+            error $_.exception.message
         }
     }
 }
