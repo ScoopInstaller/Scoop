@@ -170,7 +170,6 @@ while($in_progress -gt 0) {
         Write-Host " autoupdate available" -f Cyan
     } else {
         Write-Host ""
-        continue
     }
 
     if($forceUpdate) {
