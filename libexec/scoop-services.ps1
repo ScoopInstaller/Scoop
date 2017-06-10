@@ -273,20 +273,6 @@ function is_installed($app) {
     return ($status -ne 'nonexistent')
 }
 
-function get_app_services($app) {
-    $version = current_version $app $global
-    $manifest = installed_manifest $app $version $global
-    $install = install_info $app $version $global
-
-    $bucket = bucketdir $install.bucket
-
-    if([string]::isnullorempty($manifest.services)) {
-        throw "Could not find services in manifest for '$app'."
-    }
-
-    return $manifest.services, $bucket
-}
-
 if(!(installed 'sudo') -or !(installed 'winsw')) {
     warn "Scoop services requires sudo and WinSW to be installed!";
     "Usage: scoop install sudo winsw"; exit 1
