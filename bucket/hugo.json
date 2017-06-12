@@ -24,6 +24,9 @@
             "32bit": {
                 "url": "https://github.com/spf13/hugo/releases/download/v$version/hugo_$version_windows-32bit.zip"
             }
+        },
+        "hash": {
+            "url": "https://github.com/spf13/hugo/releases/download/v$version/hugo_checksums.txt"
         }
     }
 }
