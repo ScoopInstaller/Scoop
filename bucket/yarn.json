@@ -18,7 +18,8 @@
         "bin"
     ],
     "post_install": "
-        yarn config set cache \"$persist_dir\\cache\"
+        yarn config delete cache # 0.24.6 | remove wrong configuration value | delete after two updates
+        yarn config set cache-folder \"$persist_dir\\cache\"
         yarn config set prefix \"$persist_dir\\bin\"
     ",
     "env_add_path": [
