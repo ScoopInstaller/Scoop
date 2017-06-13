@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.vim.org",
     "license": "http://vimdoc.sourceforge.net/htmldoc/uganda.html#license",
-    "version": "8.0.0636",
+    "version": "8.0.0642",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.0.0636/gvim_8.0.0636_x86.zip",
-            "hash": "8f031e75b4021e9174f181c837b87996c51b71fac699485ed8c38ee8d4b5b1b9"
+            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.0.0642/gvim_8.0.0642_x86.zip",
+            "hash": "61861e66811acd0000d50aef07fcc1cb5729db7a0b37511163320c65233c4e53"
         },
         "64bit": {
-            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.0.0636/gvim_8.0.0636_x64.zip",
-            "hash": "ecc3c43770f6bc264b56a81c163f6e2820cda45c9832730449a20d08a30782ed"
+            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.0.0642/gvim_8.0.0642_x64.zip",
+            "hash": "b6208d033ae49fd322dd2cbead65134a885984319036dd045b32087c14bcbcc8"
         }
     },
     "extract_dir": "vim\\vim80",
