@@ -1,17 +1,17 @@
 {
     "homepage": "https://curl.haxx.se/",
-    "version": "7.54.0",
+    "version": "7.54.1",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.0-win64-mingw.7z",
+            "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.1-win64-mingw.7z",
             "hash": "f7d3fd25979489614f8804f9df3b318b369b6b0e1a6860316b86e1386ad2ec8b",
-            "extract_dir": "curl-7.54.0-win64-mingw"
+            "extract_dir": "curl-7.54.1-win64-mingw"
         },
         "32bit": {
-            "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.0-win32-mingw.7z",
-            "hash": "4ef9977ace6a3dfaad87eb4047c0cc0602cf78d70bcf7300671f80d15dfa3b7f",
-            "extract_dir": "curl-7.54.0-win32-mingw"
+            "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.1-win32-mingw.7z",
+            "hash": "5c80c85c2b9c338827145e7890c275b63991512d11901dea4ddbc1d1074a3b1b",
+            "extract_dir": "curl-7.54.1-win32-mingw"
         }
     },
     "bin": "bin\\curl.exe",
