@@ -2,11 +2,11 @@
     "architecture": {
         "32bit": {
             "hash": "3849129365adf956f47a35eef2ba5615a9d00040362397f94e13e69da0407fc0",
-            "url": "http://download.videolan.org/pub/x264/binaries/win32/x264-r2833-df79067.exe"
+            "url": "https://download.videolan.org/pub/x264/binaries/win32/x264-r2833-df79067.exe"
         },
         "64bit": {
             "hash": "2834b1bf50fffffb0d9b7cc03db9a95b7f51e288338494a1311de1e7bfb3f3c4",
-            "url": "http://download.videolan.org/pub/x264/binaries/win64/x264-r2833-df79067.exe"
+            "url": "https://download.videolan.org/pub/x264/binaries/win64/x264-r2833-df79067.exe"
         }
     },
     "bin": [
