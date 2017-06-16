@@ -1,23 +1,23 @@
 {
     "architecture": {
         "32bit": {
-            "hash": "c7fdf90a677b6934a26de868c97b53c49a5c26bd32532fff168264611c1bb687",
-            "url": "http://download.videolan.org/pub/x264/binaries/win32/x264-10b-r2762-90a61ec.exe"
+            "hash": "5f3b00b570f386d53d4b8595de2691c26bb0100c0f84b5629e72576185578b6a",
+            "url": "https://download.videolan.org/pub/x264/binaries/win32/x264-10b-r2833-df79067.exe"
         },
         "64bit": {
-            "hash": "077c1ea1cf96591b20846067e787aecaba626dad6ca7252442c736d9877efdc8",
-            "url": "http://download.videolan.org/pub/x264/binaries/win64/x264-10b-r2762-90a61ec.exe"
+            "hash": "f84e50446971f449fa9e67d5bf73a7c23b68e53d957586e3a369ef21a043889e",
+            "url": "https://download.videolan.org/pub/x264/binaries/win64/x264-10b-r2833-df79067.exe"
         }
     },
     "bin": [
         [
-            "x264-10b-r2762-90a61ec.exe",
+            "x264-10b-r2833-df79067.exe",
             "x264-10b"
         ]
     ],
     "description": "H.264/MPEG-4 AVC video encoder (10 bit)",
     "homepage": "https://www.videolan.org/developers/x264.html",
     "license": "GPL-2.0",
-    "notes": "Version 0.148.2762 (90a61ec) was released on 2017-01-30",
-    "version": "17.01.30"
+    "notes": "Version 0.150.2833 (df79067) was released on 2017-05-30",
+    "version": "17.05.30"
 }
