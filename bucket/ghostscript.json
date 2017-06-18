@@ -1,7 +1,7 @@
 {
-    "homepage": "http://www.ghostscript.com",
+    "homepage": "https://www.ghostscript.com",
     "version": "9.21",
-    "license": "http://www.gnu.org/licenses/agpl-3.0.html",
+    "license": "https://www.gnu.org/licenses/agpl-3.0.html",
     "architecture": {
         "64bit": {
             "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs921/gs921w64.exe#/dl.7z",

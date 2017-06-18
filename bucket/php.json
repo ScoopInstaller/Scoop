@@ -1,7 +1,7 @@
 {
     "homepage": "http://windows.php.net",
     "version": "7.1.6",
-    "license": "http://www.php.net/license/",
+    "license": "https://www.php.net/license/",
     "architecture": {
         "64bit": {
             "url": "http://windows.php.net/downloads/releases/php-7.1.6-Win32-VC14-x64.zip",

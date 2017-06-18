@@ -21,7 +21,7 @@
         "bin\\octave-config.exe"
     ],
     "checkver": {
-        "url": "http://wiki.octave.org/GNU_Octave_Wiki",
+        "url": "https://wiki.octave.org/GNU_Octave_Wiki",
         "re": "GNU Octave ([\\d.]+) is the current stable release"
     },
     "autoupdate": {

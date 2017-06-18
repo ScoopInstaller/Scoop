@@ -1,8 +1,8 @@
 {
-    "homepage": "http://ant.apache.org/",
+    "homepage": "https://ant.apache.org/",
     "version": "1.10.1",
     "license": "Apache 2.0",
-    "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.zip",
+    "url": "https://www-us.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.zip",
     "hash": "sha512:cf85d2b52ac379eaf83ae98544fd0317833a57811764cb1f5082f1ef046ba4f069bddf980f594ca00a93e1b37b4e646fdc8885a37651c5c9e8fc5d2b595256f6",
     "extract_dir": "apache-ant-1.10.1",
     "env_add_path": "bin",
@@ -20,7 +20,7 @@
         "re": "Currently, Apache Ant (?:[\\d.]+ and )?([\\d.]+) (?:is|are) the best"
     },
     "autoupdate": {
-        "url": "http://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip",
+        "url": "https://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip",
         "extract_dir": "apache-ant-$version",
         "hash": {
             "url": "$url.sha512"

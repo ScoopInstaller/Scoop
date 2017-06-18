@@ -1,6 +1,6 @@
 {
     "version": "1.5",
-    "license": "http://creativecommons.org/licenses/by/3.0/",
+    "license": "https://creativecommons.org/licenses/by/3.0/",
     "architecture": {
         "32bit": {
             "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win32.exe#/jq.exe"
@@ -9,7 +9,7 @@
             "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe#/jq.exe"
         }
     },
-    "homepage": "http://stedolan.github.io/jq/",
+    "homepage": "https://stedolan.github.io/jq/",
     "bin": "jq.exe",
     "checkver": {
         "url": "https://github.com/stedolan/jq/releases/latest",

@@ -1,5 +1,5 @@
 {
-    "homepage": "http://redis.io",
+    "homepage": "https://redis.io",
     "version": "3.2.100",
     "url": "https://github.com/MSOpenTech/redis/releases/download/win-3.2.100/Redis-x64-3.2.100.zip",
     "hash": "73775183186ebd1917353a8ae62303a328cedfff58164c9bf46e2b46977a9475",

@@ -1,5 +1,5 @@
 {
-    "homepage": "http://rubyinstaller.org",
+    "homepage": "https://rubyinstaller.org",
     "version": "2.3.3",
     "architecture": {
         "64bit": {
@@ -40,7 +40,7 @@
     },
     "post_install": "pushd $dir\\devkit;echo \"---`n- $dir\" | out-file config.yml -enc default; ruby dk.rb install;popd;",
     "checkver": {
-        "url": "http://rubyinstaller.org/downloads/",
+        "url": "https://rubyinstaller.org/downloads/",
         "re": "ruby-([\\d.]+)-x64-mingw32.7z"
     }
 }
