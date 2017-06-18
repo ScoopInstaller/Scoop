@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://mirror.racket-lang.org/installers/6.9/racket-6.9-x86_64-win32.exe#/dl.7z",
-            "hash": "023c6fe241657ab62bc02137284552cad39a6197bb6b47eb615d3cb9534436d9"
+            "hash": "376c92fb7496fa34fb21800782da72f82d88510c2cc3298e8232b173421c1a10"
         },
         "32bit": {
             "url": "https://mirror.racket-lang.org/installers/6.9/racket-6.9-i386-win32.exe#/dl.7z",
-            "hash": "3af77dab2746150cfca9ac98cd0c049fe978f6a105c7b1a6380dd69fe7097c84"
+            "hash": "2fd714336125534b191119915bee1bde980344a8a0552c0f65700ca83c19f90a"
         }
     },
     "bin": [
