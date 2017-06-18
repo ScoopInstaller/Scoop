@@ -2,7 +2,7 @@
     "homepage": "https://github.com/UB-Mannheim/tesseract/wiki",
     "license": "Apache-2.0",
     "version": "3.05.01",
-    "url": "http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.01.exe#/dl.7z",
+    "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.01.exe#/dl.7z",
     "hash": "d4c9d3613ee9531cd093692636b58bc87f87a29a188783dbeb03b127e66fa6ba",
     "bin": [
         "ambiguous_words.exe",
@@ -27,6 +27,6 @@
         "url": "https://github.com/UB-Mannheim/tesseract/wiki"
     },
     "autoupdate": {
-        "url": "http://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-$version.exe#/dl.7z"
+        "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-$version.exe#/dl.7z"
     }
 }

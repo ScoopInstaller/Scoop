@@ -27,10 +27,10 @@
     ],
     "checkver": {
         "re": "The\\s+current\\s+stable\\s+series\\s+is\\s+<strong>([\\d.]+)",
-        "url": "http://wkhtmltopdf.org/downloads.html"
+        "url": "https://wkhtmltopdf.org/downloads.html"
     },
     "description": "Render HTML into PDF",
-    "homepage": "http://wkhtmltopdf.org/",
+    "homepage": "https://wkhtmltopdf.org/",
     "license": "LGPL-3.0",
     "uninstaller": {
         "args": [

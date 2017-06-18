@@ -1,6 +1,6 @@
 {
     "version": "0.10.3",
-    "homepage": "http://caddyserver.com",
+    "homepage": "https://caddyserver.com",
     "license": "https://github.com/mholt/caddy/blob/master/LICENSE.txt",
     "architecture": {
         "64bit": {

@@ -1,5 +1,5 @@
 {
-    "homepage": "http://elixir-lang.org/",
+    "homepage": "https://elixir-lang.org/",
     "version": "1.4.4",
     "depends": "erlang",
     "url": "https://github.com/elixir-lang/elixir/releases/download/v1.4.4/Precompiled.zip",

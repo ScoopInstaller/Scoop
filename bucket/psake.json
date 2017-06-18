@@ -1,6 +1,6 @@
 {
     "version": "4.6.0",
-    "url": "http://nuget.org/api/v2/package/psake/4.6.0#/dl.7z",
+    "url": "https://nuget.org/api/v2/package/psake/4.6.0#/dl.7z",
     "homepage": "https://github.com/psake/psake",
     "hash": "7086265CAC31078542D41F128AEA7E0F734CBD56511A322DD1A183B96849AD93",
     "bin": "psake.ps1",
