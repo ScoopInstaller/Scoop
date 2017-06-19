@@ -16,8 +16,8 @@
     },
     "bin": "bin\\curl.exe",
     "checkver": {
-        "url": "https://curl.haxx.se/download.html",
-        "re": "curl ([\\d.]+)"
+        "url": "https://api.bintray.com/packages/vszakats/generic/curl",
+        "jp": "$.latest_version"
     },
     "suggest": {
         "cacert": [
@@ -36,9 +36,7 @@
             }
         },
         "hash": {
-            "url": "https://api.bintray.com/search/file?subject=vszakats&repo=generic&name=$basename",
-            "mode": "json",
-            "jp": "$.[0].sha256"
+            "url": "$url.sha256"
         }
     }
 }
