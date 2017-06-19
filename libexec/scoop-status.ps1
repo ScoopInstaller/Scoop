@@ -102,8 +102,4 @@ if(!$old -and !$removed -and !$failed -and !$missing_deps -and !$needs_update) {
     success "Everything is ok!"
 }
 
-if ($needs_update) {
-    warn "Cannot check for app updates while Scoop is out of date."
-}
-
 exit 0
