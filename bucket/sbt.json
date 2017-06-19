@@ -1,5 +1,5 @@
 {
-    "homepage": "https://www.scala-sbt.org/",
+    "homepage": "http://www.scala-sbt.org/",
     "version": "0.13.15",
     "license": "BSD",
     "url": "https://dl.bintray.com/sbt/native-packages/sbt/0.13.15/sbt-0.13.15.zip",
@@ -9,7 +9,7 @@
         "bin\\sbt.bat"
     ],
     "checkver": {
-        "url": "https://www.scala-sbt.org/download.html",
+        "url": "http://www.scala-sbt.org/download.html",
         "re": "/sbt-([\\d.]+).zip"
     },
     "autoupdate": {

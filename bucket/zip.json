@@ -16,8 +16,8 @@
         "zipsplit.exe"
     ],
     "description": "Zip compression utilities",
-    "homepage": "https://www.info-zip.org/",
-    "license": "https://www.info-zip.org/pub/infozip/license.html",
+    "homepage": "http://www.info-zip.org/",
+    "license": "http://www.info-zip.org/pub/infozip/license.html",
     "pre_install": "Add-Type -assembly 'system.io.compression.filesystem'; [io.compression.zipfile]::ExtractToDirectory(\"$dir\\$fname\", \"$dir\")",
     "version": "3.0"
 }
