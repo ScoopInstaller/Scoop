@@ -30,6 +30,9 @@
     },
     "autoupdate": {
         "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-$version.zip",
-        "extract_dir": "groovy-$version"
+        "extract_dir": "groovy-$version",
+        "hash": {
+            "url": "$url.sha256"
+        }
     }
 }
