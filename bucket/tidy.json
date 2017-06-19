@@ -25,7 +25,7 @@
     },
     "description": "Tidy HTML and XML files",
     "extract_dir": "bin",
-    "homepage": "http://www.html-tidy.org/",
-    "license": "http://www.html-tidy.org/documentation/#license",
+    "homepage": "https://www.html-tidy.org/",
+    "license": "https://www.html-tidy.org/documentation/#license",
     "version": "5.4.0"
 }

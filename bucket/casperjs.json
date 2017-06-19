@@ -3,7 +3,7 @@
     "license": "https://github.com/n1k0/casperjs/blob/master/LICENSE.md",
     "url": "https://github.com/casperjs/casperjs/archive/1.1.4.zip",
     "hash": "2d98eecf417f6034394c0ec2dcefb25f47e49342801b2ed21e85b21a4dd0eddc",
-    "homepage": "http://casperjs.org/",
+    "homepage": "https://casperjs.org/",
     "extract_dir": "casperjs-1.1.4",
     "bin": "bin\\casperjs.exe",
     "notes": "Requires an installation of phantomjs 1.x

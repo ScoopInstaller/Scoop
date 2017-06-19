@@ -1,5 +1,5 @@
 {
-    "homepage": "http://www.erlang.org",
+    "homepage": "https://www.erlang.org",
     "version": "19.3",
     "license": "https://www.apache.org/licenses/LICENSE-2.0",
     "architecture": {
@@ -33,7 +33,7 @@
         ]
     },
     "checkver": {
-        "url": "http://www.erlang.org/downloads",
+        "url": "https://www.erlang.org/downloads",
         "re": "DOWNLOAD\\s+OTP ([\\d.]+)"
     },
     "autoupdate": {
