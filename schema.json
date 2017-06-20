@@ -297,6 +297,10 @@
             "description": "Undocumented: only found in scoop/git* and 6 manifests in scoop-extras",
             "type": "string"
         },
+        "##": {
+            "description": "A comment.",
+            "type": "string"
+        },
         "architecture": {
             "additionalProperties": false,
             "properties": {
