@@ -1,7 +1,7 @@
 {
     "version": "1.5.0",
     "license": "GPL2",
-    "homepage": "http://www.radare.org/r/",
+    "homepage": "https://www.radare.org/r/",
     "architecture": {
         "64bit": {
             "url": "http://cloud.radare.org/get/1.5.0/radare2-w64-1.5.0.zip",
