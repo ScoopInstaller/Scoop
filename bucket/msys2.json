@@ -1,6 +1,6 @@
 {
     "homepage": "http://msys2.github.io",
-    "##": "64-bit version (able to build both 32-bit and 64-bit packages)",
+    "##": "64-bit version is able to build both 32-bit and 64-bit packages",
     "version": "20161025",
     "architecture": {
         "64bit": {
