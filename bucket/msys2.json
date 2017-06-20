@@ -1,0 +1,8 @@
+﻿{
+    "homepage": "http://msys2.github.io",
+    "##":"64-bit version (able to build both 32-bit and 64-bit packages)",
+    "version": "2016.10.25",
+    "url": "https://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-20161025.tar.xz",
+    "extract_dir": "msys64",
+    "bin": [["msys2_shell.cmd", "msys2"]]
+}
