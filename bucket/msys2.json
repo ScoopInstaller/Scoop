@@ -14,15 +14,24 @@
             "hash": "8bafd3d52f5a51528a8671c1cae5591b36086d6ea5b1e76e17e390965cf6768f"
         }
     },
-    "bin": [["msys2_shell.cmd", "msys2"]],
+    "bin": [
+        [
+            "msys2_shell.cmd",
+            "msys2"
+        ]
+    ],
     "checkver": {
-        "re": "http://repo.msys2.org/distrib/x86_64/msys2-x86_64-(\\d+).exe",
+        "re": "http://repo.msys2.org/distrib/x86_64/msys2-x86_64-(\\d+).exe"
+    },
+    "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-$version.tar.xz"
+                "url": "https://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-$version.tar.xz",
+                "extract_dir": "msys64"
             },
             "32bit": {
-                "url": "https://sourceforge.net/projects/msys2/files/Base/i686/msys2-base-i686-$version.tar.xz"
+                "url": "https://sourceforge.net/projects/msys2/files/Base/i686/msys2-base-i686-$version.tar.xz",
+                "extract_dir": "msys32"
             }
         }
     }
