@@ -1,8 +1,8 @@
 {
-    "homepage": "http://geteventstore.com/",
+    "homepage": "https://geteventstore.com/",
     "license": "BSD 3-Clause",
     "version": "4.0.1",
-    "url": "https://download.geteventstore.com/binaries/EventStore-OSS-Win-v4.0.1.zip",
+    "url": "http://download.geteventstore.com/binaries/EventStore-OSS-Win-v4.0.1.zip",
     "hash": "b341e3a7939316a06040e3910c76d01c32f2162781ab81a1bbe28da84bf007cc",
     "bin": [
         [
