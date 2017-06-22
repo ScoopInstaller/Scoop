@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://storage.googleapis.com/minikube/releases/v0.20.0/minikube-windows-amd64.exe",
-            "hash": "f43deb5a63ca3402a9bdd7032cf050629cb0128a78e4e6a93637cffbbdf81203"
+            "hash": "d4be02e5e7075943d6b4efca44c0ff56286f72236e2640d82010b944646612b7"
         }
     },
     "bin": [
