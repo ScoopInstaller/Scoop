@@ -22,5 +22,20 @@
     },
     "checkver": {
         "github": "https://github.com/syncthing/syncthing"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/syncthing/syncthing/releases/download/v$version/syncthing-windows-amd64-v$version.zip",
+                "extract_dir": "syncthing-windows-amd64-v$version"
+            },
+            "32bit": {
+                "url": "https://github.com/syncthing/syncthing/releases/download/v$version/syncthing-windows-386-v$version.zip",
+                "extract_dir": "syncthing-windows-386-v$version"
+            }
+        },
+        "hash": {
+            "url": "https://github.com/syncthing/syncthing/releases/download/v$version/sha256sum.txt.asc"
+        }
     }
 }
