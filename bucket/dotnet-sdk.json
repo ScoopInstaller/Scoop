@@ -1,0 +1,15 @@
+{
+    "version": "1.0.4",
+    "homepage": "https://www.microsoft.com/net/core#windows",
+    "architecture": {
+        "64bit": {
+            "url": "https://download.microsoft.com/download/E/7/8/E782433E-7737-4E6C-BFBF-290A0A81C3D7/dotnet-dev-win-x64.1.0.4.zip",
+            "hash": "82869baef9e010415583174b0b0be95a2cb326dfd36bb32ec270803a9c8196ec"
+        },
+        "32bit": {
+            "url": "https://download.microsoft.com/download/E/7/8/E782433E-7737-4E6C-BFBF-290A0A81C3D7/dotnet-dev-win-x86.1.0.4.zip",
+            "hash": "648f74ec818f5969035afec3cd4c2a0d9579539710dd4ccdfec806727cf0f8a4"
+        }
+    },
+    "bin": "dotnet.exe"
+}
