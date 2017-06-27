@@ -11,5 +11,8 @@
             "hash": "3a8d7316dd774d54e27a332c5d1e73d7813fecd10b670249f480ae917226e444"
         }
     },
-    "bin": "dotnet.exe"
+    "bin": "dotnet.exe",
+    "notes": [
+        "This app is deprecated. Install `dotnet-sdk` instead."
+    ]
 }
