@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "http://windows.php.net/downloads/releases/php-7.1.6-Win32-VC14-x64.zip",
-            "hash": "sha1:80fa1eb346c8c72a0b1d7690d676229fec385fcb"
+            "hash": "db8d82c066c60a9588e96661a073a3fe5c0d574990d58f1aedbbb1de8c27cda1"
         },
         "32bit": {
             "url": "http://windows.php.net/downloads/releases/php-7.1.6-Win32-VC14-x86.zip",
-            "hash": "sha1:5408393a7527463701aa2576faab68396c4aab92"
+            "hash": "d0a51dd11221f1729a6d11d32f95db1ae571cfeab71dee55e2048571f51f6a81"
         }
     },
     "bin": [
@@ -55,7 +55,7 @@ if (!(Test-Path \"$dir\\cli\\conf.d\")) {
             }
         },
         "hash": {
-            "url": "$baseurl/sha1sum.txt"
+            "url": "$baseurl/sha256sum.txt"
         }
     },
     "suggest": {
