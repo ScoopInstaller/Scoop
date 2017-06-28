@@ -1,14 +1,14 @@
 {
     "homepage": "https://puppetlabs.com",
-    "version": "3.8.7",
+    "version": "3.7.0",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.puppetlabs.com/windows/puppet-3.8.7-x64.msi",
-            "hash": "87b7fd29fb2e63fcc47352e8a662835b0329448fe017eb25be4329ef84f1914e"
+            "url": "https://downloads.puppetlabs.com/windows/puppet-3.7.0-x64.msi",
+            "hash": "56e7be8e94e6e4feec628fd956d64831a4d7e0aa78d9a3b3833877a97f8bbec5"
         },
         "32bit": {
-            "url": "https://downloads.puppetlabs.com/windows/puppet-3.8.7.msi",
-            "hash": "6cddbc4341d285766d4b2ab9c1d5008036c5ea702146bc94423ca945160bc9ce"
+            "url": "https://downloads.puppetlabs.com/windows/puppet-3.7.0.msi",
+            "hash": "df22934cd64e271d9034874011c98378db4e4a6767436faa4576f04ef6fc4cce"
         }
     },
     "bin": [
