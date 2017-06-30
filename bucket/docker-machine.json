@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/docker/machine",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "license": "Apache",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.12.0/docker-machine-Windows-x86_64.exe#/docker-machine.exe",
-            "hash": "ba2eeee57aa1774e9841ebcb918212ea559e08587e13b152f3f2ca7d9c6f7a25"
+            "url": "https://github.com/docker/machine/releases/download/v0.12.1/docker-machine-Windows-x86_64.exe#/docker-machine.exe",
+            "hash": "492d7317432283eca96028319205b112db8b519b5ba4d5b2d33e54c1c8fc3c66"
         },
         "32bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.12.0/docker-machine-Windows-i386.exe#/docker-machine.exe",
-            "hash": "253e63571ce613d4ab835c4199ffffaa1daf1dbc8bcf284995bc60de1fa67d8c"
+            "url": "https://github.com/docker/machine/releases/download/v0.12.1/docker-machine-Windows-i386.exe#/docker-machine.exe",
+            "hash": "c349b6389c369fc5ecf2632fd4f4975fbbaeffb617f3f0f0612556bebd515f54"
         }
     },
     "bin": [
