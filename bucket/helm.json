@@ -13,8 +13,7 @@
         "helm.exe"
     ],
     "checkver": {
-        "url": "https://github.com/kuberenetes/helm/releases/latest",
-        "re": "v(?<version>[\\d.]+)"
+        "github": "https://github.com/kubernetes/helm"
     },
     "autoupdate": {
         "architecture": {
