@@ -1,0 +1,28 @@
+{
+    "homepage": "https://github.com/Azure/draft",
+    "license": "https://github.com/Azure/draft/blob/master/LICENSE",
+    "version": "0.5.1",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Azure/draft/releases/download/v0.5.1/draft-v0.5.1-windows-amd64.tar.gz",
+            "hash": "138878137d0efa3a5b2267eeea8cbb125c46a69690f130003ecd4166cc3b7ea5"
+        }
+    },
+    "extract_dir": "windows-amd64",
+    "bin": [
+        "draft.exe"
+    ],
+    "checkver": {
+        "github": "https://github.com/Azure/draft"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/Azure/draft/releases/download/v$version/draft-v$version-windows-amd64.tar.gz"
+            }
+        },
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}
