@@ -13,8 +13,7 @@
         "draft.exe"
     ],
     "checkver": {
-        "url": "https://github.com/Azure/draft/releases/latest",
-        "re": "v(?<version>[\\d.]+)"
+        "github": "https://github.com/Azure/draft"
     },
     "autoupdate": {
         "architecture": {
