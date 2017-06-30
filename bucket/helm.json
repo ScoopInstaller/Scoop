@@ -1,0 +1,28 @@
+{
+    "homepage": "https://helm.sh/",
+    "license": "https://github.com/kubernetes/helm/blob/master/LICENSE",
+    "version": "2.5.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://storage.googleapis.com/kubernetes-helm/helm-v2.5.0-windows-amd64.zip",
+            "hash": "c616826416e349a22f0c8c694a82e04035c700d0bbc0130debb5f739d875acac"
+        }
+    },
+    "extract_dir": "windows-amd64",
+    "bin": [
+        "helm.exe"
+    ],
+    "checkver": {
+        "github": "https://github.com/kubernetes/helm"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://storage.googleapis.com/kubernetes-helm/helm-v$version-windows-amd64.zip"
+            }
+        },
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}
