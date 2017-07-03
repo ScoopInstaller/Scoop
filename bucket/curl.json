@@ -5,12 +5,12 @@
     "architecture": {
         "64bit": {
             "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.1-win64-mingw.7z",
-            "hash": "d5789157b6618809121530ef858d5764b0f8a37cdb9f30afe2a9ad4b07269911",
+            "hash": "15ed07d45d251d76b44a60c2efb75cc5dd19f082c11b3f80c6abdd50ddb8e235",
             "extract_dir": "curl-7.54.1-win64-mingw"
         },
         "32bit": {
             "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.1-win32-mingw.7z",
-            "hash": "d441dea0381b48a3cdf42d4533c444dc341bbe9511f91394ce06b3ef633f73e9",
+            "hash": "85dd67f72ef259597ac6f2220d26c5a73442fd2786790ff19f93d66b2f22607a",
             "extract_dir": "curl-7.54.1-win32-mingw"
         }
     },
