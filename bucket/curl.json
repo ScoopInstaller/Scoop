@@ -10,7 +10,7 @@
         },
         "32bit": {
             "url": "https://dl.bintray.com/vszakats/generic/curl-7.54.1-win32-mingw.7z",
-            "hash": "85dd67f72ef259597ac6f2220d26c5a73442fd2786790ff19f93d66b2f22607a",
+            "hash": "6a2fffd8e72fa62e37d1ac171a7f58e7ae6c4b4d895f1015c5297a3d9707d5e0",
             "extract_dir": "curl-7.54.1-win32-mingw"
         }
     },
