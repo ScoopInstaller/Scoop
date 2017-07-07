@@ -24,5 +24,11 @@
                 "url": "http://7-zip.org/a/7z$cleanVersion.msi"
             }
         }
-    }
+    },
+    "shortcuts": [
+        [
+            "7zFM.exe",
+            "7zip"
+        ]
+    ]
 }
