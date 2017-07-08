@@ -1,0 +1,57 @@
+ {
+    "version": "2.8.1",
+    "homepage": "https://cygwin.com/",
+    "architecture": {
+        "64bit": {
+            "url": "https://cygwin.com/setup-x86_64.exe",
+            "hash": "062ab45437fed70071dd4cf1c9d6c584f3efbb3d64d60e4cfc4e74fd6b6de214"
+        },
+        "32bit": {
+            "url": "https://cygwin.com/setup-x86.exe",
+            "hash": "10b368dc6d6cc6ed662ecb2822445ddeac7939d6bc80d152eee6cc6301a444cf"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://cygwin.com/setup-x86_64.exe"
+            },
+            "32bit": {
+                "url": "https://cygwin.com/setup-x86.exe"
+            }
+        }
+    },
+    "bin": [
+        [
+            "root\\bin\\bash.exe",
+            "cygwin",
+            "--login -i"
+        ]
+    ],
+    "checkver": {
+        "re": "The most recent version of the Cygwin DLL is[^>]*([\\d\\.]+)"
+    },
+    "installer": {
+        "args": [
+                "--no-admin",
+                "--no-desktop",
+                "--local-package-dir $dir\\packages",
+                "--packages default",
+                "--quiet-mode",
+                "--root $dir\\root",
+                "--site http://mirrors.kernel.org/sourceware/cygwin/"
+        ]
+    },
+    "notes": "To start a Cygwin shell, type \"cygwin\"",
+    "persist": [
+        "packages",
+        "root"
+    ],
+    "pre_install": "new-item -itemtype directory \"$dir\\root\"; new-item -itemtype directory \"$dir\\packages\"",
+    "shortcuts": [
+        [
+            "root\\Cygwin.bat",
+            "Cygwin"
+        ]
+    ]
+}
