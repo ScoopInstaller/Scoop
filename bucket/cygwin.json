@@ -20,7 +20,7 @@
                 "url": "https://cygwin.com/setup-x86.exe"
             }
         }
-    },    
+    },
     "bin": [
         [
             "root\\bin\\bash.exe",
@@ -49,9 +49,9 @@
     ],
     "pre_install": "new-item -itemtype directory \"$dir\\root\"; new-item -itemtype directory \"$dir\\packages\"",
     "shortcuts": [
-        [ 
-            "root\\Cygwin.bat", 
-            "Cygwin" 
+        [
+            "root\\Cygwin.bat",
+            "Cygwin"
         ]
     ]
 }
