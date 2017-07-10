@@ -122,7 +122,11 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
         }
         return
     }
-    if(!$version) { abort "No manifest available for '$app'." } # installed from a custom bucket/no longer supported
+    if(!$version) {
+        # installed from a custom bucket/no longer supported
+        error "No manifest available for '$app'."
+        return
+    }
 
     $manifest = manifest $app $bucket $url
 
