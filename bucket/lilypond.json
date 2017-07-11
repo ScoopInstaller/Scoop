@@ -1,0 +1,17 @@
+{
+    "version": "2.18.2",
+    "homepage": "http://lilypond.org",
+    "url": "http://download.linuxaudio.org/lilypond/binaries/mingw/lilypond-2.18.2-1.mingw.exe#/lilypond.7z",
+    "hash": "606413b751506830a86efbd8a18225a8862b628e7a49daf1a9c9cb953e1956ab",
+    "bin": "usr/bin/lilypond.exe",
+    "checkver": {
+        "url": "http://lilypond.org/download.html",
+        "re": "Downloads for LilyPond ([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "http://download.linuxaudio.org/lilypond/binaries/mingw/lilypond-$version-1.mingw.exe#/lilypond.7z",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}

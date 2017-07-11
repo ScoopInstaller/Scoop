@@ -1,5 +1,5 @@
- {
-    "version": "2.8.1",
+{
+    "version": ".",
     "homepage": "https://cygwin.com/",
     "architecture": {
         "64bit": {
@@ -33,13 +33,13 @@
     },
     "installer": {
         "args": [
-                "--no-admin",
-                "--no-desktop",
-                "--local-package-dir $dir\\packages",
-                "--packages default",
-                "--quiet-mode",
-                "--root $dir\\root",
-                "--site http://mirrors.kernel.org/sourceware/cygwin/"
+            "--no-admin",
+            "--no-desktop",
+            "--local-package-dir $dir\\packages",
+            "--packages default",
+            "--quiet-mode",
+            "--root $dir\\root",
+            "--site http://mirrors.kernel.org/sourceware/cygwin/"
         ]
     },
     "notes": "To start a Cygwin shell, type \"cygwin\"",
