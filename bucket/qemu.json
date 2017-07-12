@@ -1,0 +1,22 @@
+{
+    "homepage": "http://qemu.weilnetz.de/",
+    "license": "GPL-2.0",
+    "version": "2.9.0",
+    "architecture": {
+        "64bit": {
+            "url": "http://qemu.weilnetz.de/w64/qemu-w64-setup-20170420.exe#/dl.7z",
+            "hash": "30a2bb49c828bfe85bfecce52638c93376b7882ac85e9ece2b5f7162b1c02da1"
+        },
+        "32bit": {
+            "url": "http://qemu.weilnetz.de/w32/qemu-w32-setup-20170420.exe#/dl.7z",
+            "hash": "078720a323245e6e8604f21569116e430eff06ee3337e1940671d8d45624c13c"
+        }
+    },
+    "bin": [
+        "qemu-img.exe",
+        "qemu-io.exe"
+    ],
+    "checkver": {
+        "re": "</strong>: New QEMU installers ([\\d.]+)"
+    }
+}
