@@ -17,16 +17,16 @@
     "depends": "git",
     "bin": "git-lfs.exe",
     "checkver": {
-        "github": "https://github.com/github/git-lfs"
+        "github": "https://github.com/git-lfs/git-lfs"
     },
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "https://github.com/github/git-lfs/releases/download/v$version/git-lfs-windows-386-$version.zip",
+                "url": "https://github.com/git-lfs/git-lfs/releases/download/v$version/git-lfs-windows-386-$version.zip",
                 "extract_dir": "git-lfs-windows-386-$version"
             },
             "64bit": {
-                "url": "https://github.com/github/git-lfs/releases/download/v$version/git-lfs-windows-amd64-$version.zip",
+                "url": "https://github.com/git-lfs/git-lfs/releases/download/v$version/git-lfs-windows-amd64-$version.zip",
                 "extract_dir": "git-lfs-windows-amd64-$version"
             }
         }
