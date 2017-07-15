@@ -4,11 +4,11 @@
     "architecture": {
         "64bit": {
             "url": "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip",
-            "hash": "72112b04ff4a7854e800a6633298906f87e6744339a19dcae3ec299046fb55e5"
+            "hash": "61fd371eeae78bb24a25a26eb4b020188b38250dd4fc56e680eec31981fc522f"
         },
         "32bit": {
             "url": "https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-386.zip",
-            "hash": "11447896de7c0af07af43bd8d0b2aec97ce1ee36baad786c58b49d0eac5d633a"
+            "hash": "9d6fac100763f5afc96e65cd8842f30670e2e244d3dac0cda2ae74747f6360f7"
         }
     },
     "bin": "ngrok.exe",
