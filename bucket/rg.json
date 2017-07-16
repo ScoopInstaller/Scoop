@@ -23,5 +23,10 @@
                 "url": "https://github.com/BurntSushi/ripgrep/releases/download/$version/ripgrep-$version-i686-pc-windows-msvc.zip"
             }
         }
+    },
+    "suggest": {
+        "vcredist": [
+            "extras/vcredist2015"
+        ]
     }
 }
