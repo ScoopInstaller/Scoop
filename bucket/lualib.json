@@ -1,0 +1,29 @@
+{
+    "version": "5.3.4",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/luabinaries/files/5.3.4/Windows%20Libraries/Static/lua-5.3.4_Win64_vc14_lib.zip",
+            "hash": "b67c0f12a172be563fd0e8dad260428aa94f01c14c2649e0def6b02fa8235ef2"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/luabinaries/files/5.3.4/Windows%20Libraries/Static/lua-5.3.4_Win32_vc14_lib.zip",
+            "hash": "3e91d9efd0a5e1bf25e3c39fc6e43ec214a023884c971060ef6d762db0c92edf"
+        }
+    },
+    "env_add_path": ".",
+    "checkver": {
+        "url": "https://sourceforge.net/projects/luabinaries/rss",
+        "re": "lua-([\\d.]+)_Win64_vc14_lib.zip"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/luabinaries/files/$version/Windows%20Libraries/Static/lua-$version_Win64_vc14_lib.zip"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/luabinaries/files/$version/Windows%20Libraries/Static/lua-$version_Win32_vc14_lib.zip"
+            }
+        }
+    }
+}

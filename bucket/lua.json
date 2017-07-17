@@ -1,18 +1,44 @@
 {
-    "version": "5.1.5-51",
-    "url": "https://github.com/rjpcomputing/luaforwindows/releases/download/v5.1.5-51/LuaForWindows_v5.1.5-51.exe",
-    "homepage": "https://github.com/rjpcomputing/luaforwindows",
-    "hash": "f56df460eb9717702297a29373334fe9b01bedc5cd24d1380bc29c352ade090b",
-    "innosetup": true,
+    "version": "5.3.4",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/luabinaries/files/5.3.4/Tools%20Executables/lua-5.3.4_Win64_bin.zip",
+            "hash": "da3ca89ee282745809ec05cd41b4bc656127e12759ad2df24ec85c90c2dccc38"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/luabinaries/files/5.3.4/Tools%20Executables/lua-5.3.4_Win32_bin.zip",
+            "hash": "1c430acbff4fc5712ec2c9df986ff4e4177fd9b7648bdd20be71c669deaffede"
+        }
+    },
+    "depends": "lualib",
+    "env_add_path": ".",
     "bin": [
-        "lua.exe",
-        "luac.exe"
-    ],
-    "depends": [
-        "innounp"
+        [
+            "lua53.exe",
+            "lua"
+        ],
+        [
+            "lua53.exe",
+            "luac"
+        ],
+        [
+            "lua53.exe",
+            "wlua"
+        ]
     ],
     "checkver": {
-        "url": "https://github.com/rjpcomputing/luaforwindows/releases/latest",
-        "re": "/releases/tag/v([\\d.\\-]+)"
+        "url": "https://sourceforge.net/projects/luabinaries/rss",
+        "re": "lua-([\\d.]+)_Win64_bin.zip"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/luabinaries/files/$version/Tools%20Executables/lua-$version_Win64_bin.zip"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/luabinaries/files/$version/Tools%20Executables/lua-$version_Win32_bin.zip"
+            }
+        }
     }
 }
