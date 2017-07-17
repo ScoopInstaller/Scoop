@@ -1,11 +1,11 @@
 {
     "homepage": "https://www.rethinkdb.com/",
     "license": "https://www.gnu.org/licenses/agpl-3.0.html",
-    "version": "2.3.5",
+    "version": "2.3.6",
     "architecture": {
         "64bit": {
-            "url": "https://download.rethinkdb.com/windows/rethinkdb-2.3.5.zip",
-            "hash": "afc431c0aaa6d8b05090f4c33bc527bab6d889555a9817789f155ac45bc51573"
+            "url": "https://download.rethinkdb.com/windows/rethinkdb-2.3.6.zip",
+            "hash": "691993516f62d3495d02fa853e49d920b2ee63f8b7e86c73592c8036f0bfa328"
         }
     },
     "bin": "rethinkdb.exe",
