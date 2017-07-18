@@ -1,6 +1,6 @@
 {
     "homepage": "https://mingw-w64.org",
-    "version": "6.3.0",
+    "version": "7.1.0",
     "license": "GPL3",
     "architecture": {
         "64bit": {
