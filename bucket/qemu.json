@@ -17,6 +17,6 @@
         "qemu-io.exe"
     ],
     "checkver": {
-        "re": "</strong>: New QEMU installers ([\\d.]+)"
+        "re": "New QEMU installers \\(([\\d.]+)\\)"
     }
 }
