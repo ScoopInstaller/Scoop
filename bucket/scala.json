@@ -23,7 +23,7 @@
     },
     "checkver": {
         "url": "https://www.scala-lang.org/download/",
-        "re": "Download Scala ([\\d.]+)"
+        "re": "scala-([\\d.]+).zip"
     },
     "autoupdate": {
         "url": "https://downloads.typesafe.com/scala/$version/scala-$version.zip",
