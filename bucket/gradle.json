@@ -13,7 +13,7 @@
         ]
     },
     "checkver": {
-        "url": "https://gradle.org/install",
+        "url": "https://gradle.org/install/",
         "re": "The current Gradle release is version ([\\d.]+)"
     },
     "autoupdate": {
