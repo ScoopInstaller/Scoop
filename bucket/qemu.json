@@ -1,15 +1,15 @@
 {
-    "homepage": "http://qemu.weilnetz.de/",
+    "homepage": "https://qemu.weilnetz.de/",
     "license": "GPL-2.0",
     "version": "2.9.0",
     "architecture": {
         "64bit": {
-            "url": "http://qemu.weilnetz.de/w64/qemu-w64-setup-20170420.exe#/dl.7z",
-            "hash": "30a2bb49c828bfe85bfecce52638c93376b7882ac85e9ece2b5f7162b1c02da1"
+            "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20170420.exe#/dl.7z",
+            "hash": "sha512:473071a005528a139dcfe8cf7e097004164c2c20f331702e535ef4a1c0452400b0913d0a4919dd5b8b499dd7024caf2f99b7ba4ee01f3b70eb530ab873d5f809"
         },
         "32bit": {
-            "url": "http://qemu.weilnetz.de/w32/qemu-w32-setup-20170420.exe#/dl.7z",
-            "hash": "078720a323245e6e8604f21569116e430eff06ee3337e1940671d8d45624c13c"
+            "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-20170420.exe#/dl.7z",
+            "hash": "sha512:594991f3de4ca950fd62b086c08064a64c61d2eb5d215baa7008ab0a53b7551b17be4ab3453de53d6de4610ca371bf8fc0841164358036826f9179bcad807da2"
         }
     },
     "bin": [
@@ -75,6 +75,22 @@
         "qemu-system-xtensaw.exe"
     ],
     "checkver": {
-        "re": "New QEMU installers \\(([\\d.]+)\\)"
+        "re": "<strong>(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})</strong>: New QEMU installers \\((?<version>[\\d.]+)\\)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-$matchYear$matchMonth$matchDay.exe#/dl.7z",
+                "hash": {
+                    "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-$matchYear$matchMonth$matchDay.sha512"
+                }
+            },
+            "32bit": {
+                "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-$matchYear$matchMonth$matchDay.exe#/dl.7z",
+                "hash": {
+                    "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-$matchYear$matchMonth$matchDay.sha512"
+                }
+            }
+        }
     }
 }
