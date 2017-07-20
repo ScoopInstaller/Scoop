@@ -9,11 +9,13 @@
         }
     },
     "bin": "rethinkdb.exe",
+    "extract_dir": "rethinkdb-2.3.6",
     "checkver": {
         "url": "https://rethinkdb.com/docs/install/windows/",
         "re": "<a href=\"https://download\\.rethinkdb\\.com/windows/rethinkdb-([\\d.]+)\\.zip\">"
     },
     "autoupdate": {
-        "url": "https://download.rethinkdb.com/windows/rethinkdb-$version.zip"
+        "url": "https://download.rethinkdb.com/windows/rethinkdb-$version.zip",
+        "extract_dir": "rethinkdb-$version"
     }
 }
