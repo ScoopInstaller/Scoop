@@ -1,14 +1,31 @@
 {
-    "homepage": "http://gnuwin32.sourceforge.net/packages/file.htm",
-    "version": "5.03",
-    "license": "GPL2",
-    "url": [
-        "https://sourceforge.net/projects/gnuwin32/files/file/5.03/file-5.03-bin.zip",
-        "https://sourceforge.net/projects/gnuwin32/files/file/5.03/file-5.03-dep.zip"
-    ],
-    "hash": [
-        "dbd28e191c1bf7e3db08b983e603e79959295717f6fc1032ba97e7a8680c8cf9",
-        "2dbf891e42c642e372e5b21b0528bb5ba3c5b6eeb9fb01fb1e9cc77f2f44a091"
-    ],
-    "bin": "bin\\file.exe"
+    "homepage": "https://darwinsys.com/file/",
+    "version": "5.30-1",
+    "license": "GPL-2.0",
+    "bin": "bin\\file.exe",
+    "checkver": {
+        "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/",
+        "re": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/file-([\\d.-]+)-x86_64"
+    },
+    "extract_dir": "usr",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/file-5.30-1-x86_64.pkg.tar.xz",
+            "hash": "10c51ed59cefc48e2570e82e33828f6b7aa273d4aa56909bd2f8ae94da2ca7b0"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/i686/file-5.30-1-i686.pkg.tar.xz",
+            "hash": "eb025168c362f25c9ae268daf6a176e8160fde4e245bb28a9f24d4fa04a3b2aa"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/file-$version-x86_64.pkg.tar.xz"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/i686/file-$version-i686.pkg.tar.xz"
+            }
+        }
+    }
 }
