@@ -1,12 +1,31 @@
 {
-    "homepage": "http://gnuwin32.sourceforge.net/packages/which.htm",
-    "version": "2.20",
-    "license": "GPL2",
-    "url": [
-        "https://sourceforge.net/projects/gnuwin32/files/which/2.20/which-2.20-bin.zip"
-    ],
-    "hash": [
-        "035ec15541649f75459fb81f02406c72e1129fc9041b308160938ae712a603a4"
-    ],
-    "bin": "bin\\which.exe"
+    "homepage": "https://savannah.gnu.org/projects/which/",
+    "version": "2.21-2",
+    "license": "GPL-2.0",
+    "bin": "bin\\which.exe",
+    "checkver": {
+        "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/",
+        "re": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/which-([\\d.-]+)-x86_64"
+    },
+    "extract_dir": "usr",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/which-2.21-2-x86_64.pkg.tar.xz",
+            "hash": "5514e35834316cfc80e6547de7e570930d0198a633c8b94f45935b231547296d"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/i686/which-2.21-2-i686.pkg.tar.xz",
+            "hash": "552fe6c98ff66d1e25625d973ea9cb2de651b714337cf3de8d2bb72d5fe9a6ad"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/which-$version-x86_64.pkg.tar.xz"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/i686/which-$version-i686.pkg.tar.xz"
+            }
+        }
+    }
 }
