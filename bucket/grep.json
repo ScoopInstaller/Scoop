@@ -1,14 +1,31 @@
 {
-    "homepage": "http://gnuwin32.sourceforge.net/packages/grep.htm",
-    "version": "2.5.4",
-    "license": "GPL2",
-    "url": [
-        "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-bin.zip",
-        "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-dep.zip"
-    ],
-    "hash": [
-        "3fd98201561b5af3f54a7dacc4f88068f5b5edf19ccdfc981c3c9fc60ff73519",
-        "2150e12da6631899842c28881a75889794d67b2bbc108341a26052f9bcb27584"
-    ],
-    "bin": "bin\\grep.exe"
+    "homepage": "https://www.gnu.org/software/grep/grep.html",
+    "version": "3.0-1",
+    "license": "GPL-3.0",
+    "bin": "bin\\grep.exe",
+    "checkver": {
+        "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/",
+        "re": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/grep-([\\d.-]+)-x86_64"
+    },
+    "extract_dir": "usr",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/grep-3.0-1-x86_64.pkg.tar.xz",
+            "hash": "6649e99d0a306f7c847e63976533756ac24bfaa3c2c731fa92201b6a6fa8409c"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/i686/grep-3.0-1-i686.pkg.tar.xz",
+            "hash": "4d2250ef1ba539b0037e8d670185ad05b63f4bde6c54c1f10e0bf07d4d6c580a"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/grep-$version-x86_64.pkg.tar.xz"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/i686/grep-$version-i686.pkg.tar.xz"
+            }
+        }
+    }
 }
