@@ -1,12 +1,12 @@
 {
     "homepage": "https://github.com/ojdkbuild/ojdkbuild",
-    "version": "1.8.0.131-1",
+    "version": "1.8.0.141-1",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.131-1/java-1.8.0-openjdk-1.8.0.131-1.b11.ojdkbuild.windows.x86_64.zip",
-            "hash": "7e7384636054001499ba96d55c90fc39cbb0441281254a1e9ac8510b527a7a46",
-            "extract_dir": "java-1.8.0-openjdk-1.8.0.131-1.b11.ojdkbuild.windows.x86_64"
+            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.141-1/java-1.8.0-openjdk-1.8.0.141-1.b16.ojdkbuild.windows.x86_64.zip",
+            "hash": "2911ccece06500cc5bd37cb76028d4bd2b6261cb7f77e39404895e18d430d383",
+            "extract_dir": "java-1.8.0-openjdk-1.8.0.141-1.b16.ojdkbuild.windows.x86_64"
         }
     },
     "env_add_path": "bin",
