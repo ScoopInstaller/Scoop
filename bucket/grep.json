@@ -2,7 +2,19 @@
     "homepage": "https://www.gnu.org/software/grep/grep.html",
     "version": "3.0-1",
     "license": "GPL-3.0",
-    "bin": "bin\\grep.exe",
+    "bin": [
+        "bin\\grep.exe",
+        [
+            "bin\\grep.exe",
+            "egrep",
+            "-E"
+        ],
+        [
+            "bin\\grep.exe",
+            "fgrep",
+            "-F"
+        ]
+    ],
     "checkver": {
         "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/",
         "re": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/grep-([\\d.-]+)-x86_64"
