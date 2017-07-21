@@ -1,14 +1,31 @@
 {
-    "homepage": "http://gnuwin32.sourceforge.net/packages/sed.htm",
-    "version": "4.2.1",
-    "license": "GPL2",
-    "url": [
-        "https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-bin.zip",
-        "https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-dep.zip"
-    ],
-    "hash": [
-        "ae1651ffb461d69a7c51c76867a859d8addf802b85678834c0ebb402ef79b3cd",
-        "53e2e84db3e6c5855fd8013e1b79ccbd53b6bae7e7e4d59c0d18bb1dd5d18961"
-    ],
-    "bin": "bin\\sed.exe"
+    "homepage": "https://www.gnu.org/software/sed/sed.html",
+    "version": "4.4-2",
+    "license": "GPL-3.0",
+    "bin": "bin\\sed.exe",
+    "checkver": {
+        "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/",
+        "re": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/sed-([\\d.-]+)-x86_64"
+    },
+    "extract_dir": "usr",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/sed-4.4-2-x86_64.pkg.tar.xz",
+            "hash": "46dbccaee1d40523d6a38db7b61d482b57b819ade359b2864120d2eb00ed18b5"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/i686/sed-4.4-2-i686.pkg.tar.xz",
+            "hash": "9a710f9837ffc00d7a20b2011c8422b93b89b683e9a167faf2e33ab8df77d5c1"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/x86_64/sed-$version-x86_64.pkg.tar.xz"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/REPOS/MSYS2/i686/sed-$version-i686.pkg.tar.xz"
+            }
+        }
+    }
 }
