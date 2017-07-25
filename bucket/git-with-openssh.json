@@ -1,31 +1,36 @@
 {
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL2",
-    "version": "2.7.1.windows.2",
+    "version": "2.8.1.windows.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.7.1.windows.2/PortableGit-2.7.1.2-64-bit.7z.exe#/dl.7z",
-            "hash": "92310dec60b0210acbfb31a0165f2628757b8413efcbcea1cfc95b2984a974dd"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.8.1.windows.1/PortableGit-2.8.1-64-bit.7z.exe#/dl.7z",
+            "hash": "dc9d971156cf3b6853bc0c1ad0ca76f1d2c24478cca80036919f12fe46acd64e"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.7.1.windows.2/PortableGit-2.7.1.2-32-bit.7z.exe#/dl.7z",
-            "hash": "7bf8da2b46f40c98d18a5f9c36e5b90df258936f43a0d230d0f29e0d729e3283"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.8.1.windows.1/PortableGit-2.8.1-32-bit.7z.exe#/dl.7z",
+            "hash": "0b6efaaeb4b127edb3a534261b2c9175bd86ee8683dff6e12ccb194e6abb990e"
         }
     },
-    "bin": [ "cmd\\git.exe",
-             "cmd\\gitk.exe",
-             "cmd\\git-gui.exe",
-             "usr\\bin\\ssh.exe",
-             "usr\\bin\\sshd.exe",
-             "usr\\bin\\scp.exe",
-             "usr\\bin\\sftp.exe",
-             "usr\\bin\\slogin.exe",
-             "usr\\bin\\ssh-add.exe",
-             "usr\\bin\\ssh-agent.exe",
-             "usr\\bin\\ssh-keygen.exe",
-             "usr\\bin\\ssh-keyscan.exe"
+    "bin": [
+        "cmd\\git.exe",
+        "cmd\\gitk.exe",
+        "cmd\\git-gui.exe",
+        "usr\\bin\\ssh.exe",
+        "usr\\bin\\sshd.exe",
+        "usr\\bin\\scp.exe",
+        "usr\\bin\\sftp.exe",
+        "usr\\bin\\slogin.exe",
+        "usr\\bin\\ssh-add.exe",
+        "usr\\bin\\ssh-agent.exe",
+        "usr\\bin\\ssh-keygen.exe",
+        "usr\\bin\\ssh-keyscan.exe"
     ],
     "post_install": [
         "git config --global credential.helper wincred"
-    ]
+    ],
+    "checkver": {
+        "url": "http://git-scm.com/download/win",
+        "re": "\\<a href=\"https://github.com/git-for-windows/git/releases/download/v([^/]+)/"
+    }
 }

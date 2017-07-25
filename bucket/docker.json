@@ -1,19 +1,20 @@
 {
-    "version":  "1.10.2",
+    "version":  "1.11.0",
     "license":  "https://github.com/docker/docker/blob/master/LICENSE",
     "architecture": {
       "64bit": {
-        "url":  "https://get.docker.com/builds/Windows/x86_64/docker-1.10.2.exe",
-        "hash": "cefc703d38d9d4ae2c91318556b295b78bb9750196ce99dd5b7f0764053c3036"
+        "url":  "https://get.docker.com/builds/Windows/x86_64/docker-1.11.0.zip",
+        "hash": "d87ae31708b94b92e335702baed153fb80fed6c15f7161268ae61a939c448dfc"
       },
       "32bit": {
-        "url":  "https://get.docker.com/builds/Windows/i386/docker-1.10.2.exe",
-        "hash":  "e6a3230d9fef08ec6ecde06d3a6a661177b2a4b505385a004aeb135280988755"
+        "url":  "https://get.docker.com/builds/Windows/i386/docker-1.11.0.zip",
+        "hash":  "3d1d6742f4ff41ac3f3bdbd6f112af3fce6faebc18b4726d5f41278600bcc574"
       }
     },
     "homepage":  "https://docker.com",
+    "extract_dir": "docker",
     "bin": [
-      ["docker-1.10.2.exe", "docker"]
+      "docker.exe"
     ],
     "notes": [
       "This is the docker client only. Until the docker daemon can run natively",

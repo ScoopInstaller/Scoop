@@ -1,0 +1,41 @@
+{
+    "homepage": "https://dev.mysql.com/downloads/mysql/",
+    "version": "5.7.11",
+    "license": "GPLv2",
+    "architecture": {
+        "64bit": {
+            "url": "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.11-winx64.zip",
+            "hash": "md5:9805750100ab3e2411f4887eb5f4cb77",
+            "extract_dir": "mysql-5.7.11-winx64"
+        },
+        "32bit": {
+            "url": "https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.11-win32.zip",
+            "hash": "md5:710b588c8df3134c87818f765118329a",
+            "extract_dir": "mysql-5.7.11-win32"
+        }
+    },
+    "bin": [
+        "bin\\mysqld.exe",
+        "bin\\mysql.exe",
+        "bin\\mysqldump.exe",
+        "bin\\mysqladmin.exe",
+        "bin\\mysqlbinlog.exe",
+        "bin\\mysqlcheck.exe",
+        "bin\\mysqlimport.exe",
+        "bin\\mysqlshow.exe",
+        "bin\\mysqlslap.exe",
+        "bin\\my_print_defaults.exe"
+        ],
+    "post_install": "
+#Initialize data directory (without generating root password)
+mysqld --initialize-insecure
+
+#Copy provided sample file to live file location
+cp $dir/my-default.ini $dir/my.ini
+
+#Output client configuration to my.ini file so no username is required when connecting
+echo \"\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
+echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
+echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
+"
+}

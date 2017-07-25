@@ -1,17 +1,17 @@
 {
     "homepage": "http://www.mongodb.org",
-    "version": "2.6.7",
+    "version": "3.2.4",
     "license": "http://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.3.zip",
-            "hash": "727a36cf0b3efcc2a3f457f4e5cd4ab575602e0bc2a52596057a952c1a29fd66",
-            "extract_dir": "mongodb-win32-x86_64-2008plus-ssl-3.2.3"
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.4.zip",
+            "hash": "f875b23d25a7cc23c8e2b469c8a75bb9cc892b00a77288230cb3991bcf336ede",
+            "extract_dir": "mongodb-win32-x86_64-2008plus-ssl-3.2.4"
         },
         "32bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-i386-3.2.3.zip",
-            "hash": "3fbb925d816e4fb21796704359a5b48ea64f930695f41ee2c5b1dad13e2d7593",
-            "extract_dir": "mongodb-win32-i386-3.2.3"
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-i386-3.2.4.zip",
+            "hash": "ff6551648a4186b27f569bdc9f58cbd33079044e2352e5289cc7933c64b50099",
+            "extract_dir": "mongodb-win32-i386-3.2.4"
         }
     },
     "bin": [
@@ -31,6 +31,6 @@
     ],
     "checkver": {
         "url": "http://www.mongodb.org/downloads",
-        "re": "Production Release \\(([^<]+)\\)"
+        "re": "Current Stable Release \\(([\\d.]+)\\)"
     }
 }

@@ -1,15 +1,15 @@
 {
         "homepage": "mercurial.selenic.com",
-        "version": "3.6",
-        "license": "GPL2",
+        "version": "3.7.2",
+        "license": "http://www.gnu.org/licenses/gpl-2.0.txt",
         "architecture": {
                 "64bit": {
-                        "url": "https://mercurial-scm.org/release/windows/Mercurial-3.6-x64.exe",
-                        "hash": "f449a89cafd637ca0f7e7db506ccd6936b2f28aedcff2013bbb9df8b156329a2"
+                        "url": "https://mercurial-scm.org/release/windows/Mercurial-3.7.2-x64.exe",
+                        "hash": "28935fa44a639b59067d5d987492cf7f7ee812914c6c458202c01d868e45da65"
                 },
                 "32bit": {
-                        "url": "https://mercurial-scm.org/release/windows/Mercurial-3.6.exe",
-                        "hash": "e90b3f5ed6b2bf14ce720bffdf292485c10e130dce2b618f587b440bdc2b6a0f"
+                        "url": "https://mercurial-scm.org/release/windows/Mercurial-3.7.2.exe",
+                        "hash": "ff8628ad62a0290a16bffec3bae0f2fcf829fd26a2baf8b4a164698e42d667b3"
                 }
         },
         "innosetup": true,

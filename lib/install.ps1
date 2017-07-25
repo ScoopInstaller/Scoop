@@ -34,7 +34,7 @@ function install_app($app, $architecture, $global) {
 
     $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
-    pre_install $manifest
+    pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir
     ensure_install_dir_not_in_path $dir $global
     create_shims $manifest $dir $global
@@ -42,7 +42,7 @@ function install_app($app, $architecture, $global) {
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
-    post_install $manifest
+    post_install $manifest $architecture
 
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
@@ -115,6 +115,11 @@ function dl_progress($url, $to, $cookies) {
     $wc.headers.add('User-Agent', 'Scoop/1.0')
     $wc.headers.add('Cookie', (cookie_header $cookies))
 
+    # simplified until there's a workaround for threading problems below
+    $wc.downloadfile($url, $to)
+
+    # seems to be causing threading problems and crashes in Win10...
+    <#
     if([console]::isoutputredirected) {
         # can't set cursor position: just do simple download
         $wc.downloadfile($url, $to)
@@ -162,6 +167,7 @@ function dl_progress($url, $to, $cookies) {
         $wc.dispose()
     }
     [console]::setcursorposition($left, $top)
+    #>
 }
 
 function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
@@ -240,6 +246,8 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
                     rm -r -force "$dir\_scoop_extract" -ea stop
                 } catch [system.io.pathtoolongexception] {
                     cmd /c "rmdir /s /q $dir\_scoop_extract"
+                } catch [system.unauthorizedaccessexception] {
+                    warn "couldn't remove $dir\_scoop_extract: unauthorized access"
                 }
             }
 
@@ -349,7 +357,16 @@ function args($config, $dir) {
 function run($exe, $arg, $msg, $continue_exit_codes) {
     if($msg) { write-host $msg -nonewline }
     try {
-        $proc = start-process $exe -wait -ea stop -passthru -arg $arg
+        #Allow null/no arguments to be passed
+        $parameters = @{ }
+        if ($arg)
+        {
+            $parameters.arg = $arg;
+        }
+
+        $proc = start-process $exe -wait -ea stop -passthru @parameters
+
+
         if($proc.exitcode -ne 0) {
             if($continue_exit_codes -and ($continue_exit_codes.containskey($proc.exitcode))) {
                 warn $continue_exit_codes[$proc.exitcode]
@@ -460,7 +477,12 @@ function install_prog($fname, $dir, $installer) {
         if(!$installed) {
             abort "installation aborted. you might need to run 'scoop uninstall $app' before trying again."
         }
-        rm $prog
+
+        #Don't remove installer if "keep" flag is set to true
+        if (!($installer.keep -eq "true"))
+        {
+            rm $prog
+        }
     }
 }
 
@@ -576,7 +598,7 @@ function startmenu_shortcut($target, $shortcutName) {
 function rm_startmenu_shortcuts($manifest, $global) {
     $manifest.shortcuts | ?{ $_ -ne $null } | % {
         $name = $_.item(1)
-        $shortcut = "$env:USERPROFILE\Start Menu\Programs\$name.lnk"
+        $shortcut = "$env:USERPROFILE\Start Menu\Programs\Scoop Apps\$name.lnk"
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
              echo "Removed shortcut $shortcut"
@@ -665,17 +687,19 @@ function env_rm($manifest, $global) {
     }
 }
 
-function pre_install($manifest) {
-    $manifest.pre_install | ? { $_ } | % {
+function pre_install($manifest, $arch) {
+    $pre_install = arch_specific 'pre_install' $manifest $arch
+    if($pre_install) {
         echo "running pre-install script..."
-        iex $_
+        iex $pre_install
     }
 }
 
-function post_install($manifest) {
-    $manifest.post_install | ? { $_ } | % {
+function post_install($manifest, $arch) {
+    $post_install = arch_specific 'post_install' $manifest $arch
+    if($post_install) {
         echo "running post-install script..."
-        iex $_
+        iex $post_install
     }
 }
 

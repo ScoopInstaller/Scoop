@@ -1,19 +1,37 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.0.3",
+    "version": "7.0.5",
     "license": "http://www.php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.0.3-Win32-VC14-x64.zip",
-            "hash": "sha1:e0d81cd765f741cc05e261cb04ad2560bf64e54e"
+            "url": [
+                "http://windows.php.net/downloads/releases/php-7.0.5-Win32-VC14-x64.zip",
+                "https://raw.githubusercontent.com/madbub/scoop-php/master/64-bit/vcruntime140.dll"
+            ],
+            "hash": [
+                "sha1:ef09d80e264a010d538cf88004acb68c52812a26",
+                "md5:6c2c88ff1b3da84b44d23a253a06c01b"
+            ]
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.0.3-Win32-VC14-x86.zip",
-            "hash": "sha1:1bbe9c6422f8b7c377fc9ad4d073ea12a6489e11"
+            "url": [
+                "http://windows.php.net/downloads/releases/php-7.0.5-Win32-VC14-x86.zip",
+                "https://raw.githubusercontent.com/MPLew-is/scoop-wamp/master/visual-c-redistributables/14/32-bit/vcruntime140.dll"
+            ],
+            "hash": [
+               "sha1:335c24c5b056246c384591c39b462d7ef3005b5c",
+                "sha256:b7c13f8519340257ba6ae3129afce961f137e394dde3e4e41971b9f912355f5e"
+            ]
         }
     },
     "bin": "php.exe",
-    "post_install": "cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"",
+    "post_install": "
+#Copy PHP configuration file to expected location
+cp \"$dir\\php.ini-production\" \"$dir\\php.ini\"
+
+#Enable extensions to be found in installation-relative folder (the default is to search C:/php)
+(gc \"$dir\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\php.ini\"
+",
     "checkver": {
         "url": "http://windows.php.net/download/",
         "re": "<h3 id=\"php-7.0\".*?>.*?\\(([0-9\\.]+)\\)</h3>"

@@ -1,0 +1,11 @@
+{
+    "version":  "v2.8.3",
+    "extract_dir":  "lynx_w32",
+    "url":  "http://www.vordweb.co.uk/standards/lynx_v283.zip",
+    "homepage":  "http://www.vordweb.co.uk/standards/download_lynx.htm",
+    "hash":  "552bc68afd2ff9a5de88f26d76f55dd8697cf6082c6afb01b3d1a9942f4d3ee0",
+    "bin":  "lynx.ps1",
+    "pre_install":  "
+        \"$dir\\lynx.exe --cfg=$dir\\lynx.cfg\" | out-file -enc oem $dir\\lynx.ps1
+    "
+}
