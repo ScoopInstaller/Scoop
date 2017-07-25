@@ -1,9 +1,9 @@
 {
     "homepage": "https://elixir-lang.org/",
-    "version": "1.4.5",
+    "version": "1.5.0",
     "depends": "erlang",
-    "url": "https://github.com/elixir-lang/elixir/releases/download/v1.4.5/Precompiled.zip",
-    "hash": "a740e634e3c68b1477e16d75a0fd400237a46c62ceb5d04551dbc46093a03f98",
+    "url": "https://github.com/elixir-lang/elixir/releases/download/v1.5.0/Precompiled.zip",
+    "hash": "01841d8f973e10ea2e8e29342193063efb5ebe2c598c21dc8a3b93ec8428466a",
     "bin": [
         "bin\\elixir.bat",
         "bin\\elixirc.bat",
