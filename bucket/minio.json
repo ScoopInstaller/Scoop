@@ -1,16 +1,16 @@
 {
     "homepage": "https://minio.io/",
     "license": "https://github.com/minio/minio/blob/master/LICENSE",
-    "version": "2017-06-13T19-01-01Z",
+    "version": "2017-07-24T18-27-35Z",
     "bin": "minio.exe",
     "architecture": {
         "64bit": {
-            "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.2017-06-13T19-01-01Z#/minio.exe",
-            "hash": "98cbda8b6674e6cf1d1ac49d55f43077d2538d53eea2e7f2f3c7fa7ab6101fca"
+            "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.2017-07-24T18-27-35Z#/minio.exe",
+            "hash": "459f0211e6029ca128d04bf797f735cfcaed0eef9185b182ff473853cca2644e"
         },
         "32bit": {
-            "url": "https://dl.minio.io/server/minio/release/windows-386/minio.RELEASE.2017-06-13T19-01-01Z#/minio.exe",
-            "hash": "333b2c51475ede6111d82c1fffd29dd7253d6a4978ae88b283f169396a84af66"
+            "url": "https://dl.minio.io/server/minio/release/windows-386/minio.RELEASE.2017-07-24T18-27-35Z#/minio.exe",
+            "hash": "18b1d640a166add35ba5d8b6f65dc83d058c326cea5bd2cb2fa16ea00fa7666e"
         }
     },
     "suggest": {
@@ -23,13 +23,13 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://dl.minio.io/server/minio/release/windows-amd64/archive/minio.RELEASE.$version#/minio.exe",
+                "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.$version#/minio.exe",
                 "hash": {
                     "url": "$baseurl/minio.RELEASE.$version.sha256sum"
                 }
             },
             "32bit": {
-                "url": "https://dl.minio.io/server/minio/release/windows-386/archive/minio.RELEASE.$version#/minio.exe",
+                "url": "https://dl.minio.io/server/minio/release/windows-386/minio.RELEASE.$version#/minio.exe",
                 "hash": {
                     "url": "$baseurl/minio.RELEASE.$version.sha256sum"
                 }
