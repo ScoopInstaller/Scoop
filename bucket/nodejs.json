@@ -28,7 +28,7 @@
     ",
     "checkver": {
         "url": "https://nodejs.org/en/download/current/",
-        "re": "Current version: <strong>v([\\d.]+)</strong>"
+        "re": "Current Version: <strong>v([\\d.]+)</strong>"
     },
     "autoupdate": {
         "architecture": {
