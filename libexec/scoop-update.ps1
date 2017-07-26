@@ -147,7 +147,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
 
     # note: keep the old dir in case it contains user files
 
-    install_app $app $architecture $global $suggested
+    install_app $app $architecture $global $suggested $use_cache
 <#
     "Installing '$app' ($version)"
     $dir = ensure (versiondir $app $version $global)
