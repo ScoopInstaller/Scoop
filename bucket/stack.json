@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/commercialhaskell/stack/releases/download/v1.5.0/stack-1.5.0-windows-x86_64.zip",
-            "hash": "ded27bc5de5b762454709cb1ebcde46d6723e979656d7ded056c99c5b313e220"
+            "hash": "69e9dc289e1fb8a8ccfb20fcc0d5df7f4037eeef2737b0c2a527ab3c81d8afe4"
         },
         "32bit": {
             "url": "https://github.com/commercialhaskell/stack/releases/download/v1.5.0/stack-1.5.0-windows-i386.zip",
-            "hash": "4a2d2d7dcc43df0184b7fa2a8018e10cd9a531c66e7421268acea71f7d8d7df9"
+            "hash": "afb056535477907c0a38503b131f6fd213d357fee9ad80758370574185f86ce4"
         }
     },
     "bin": [
