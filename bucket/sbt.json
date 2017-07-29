@@ -10,7 +10,7 @@
     ],
     "checkver": {
         "url": "http://www.scala-sbt.org/download.html",
-        "re": "/sbt-([\\d.]+).zip"
+        "re": "sbt-([\\d.]+).zip"
     },
     "autoupdate": {
         "url": "https://dl.bintray.com/sbt/native-packages/sbt/$version/sbt-$version.zip",
