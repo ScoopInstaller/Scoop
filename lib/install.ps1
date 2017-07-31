@@ -723,6 +723,7 @@ function link_current($versiondir) {
 
     if(test-path $currentdir) {
         # remove the junction
+        attrib -R /L $currentdir
         cmd /c rmdir $currentdir
     }
 
