@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/junegunn/fzf",
-    "version": "0.16.10",
+    "version": "0.16.11",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/junegunn/fzf-bin/releases/download/0.16.10/fzf-0.16.10-windows_amd64.zip",
-            "hash": "4ec6792492b977feff256274257b9e255f8ab3043bc2001e13862a9b7acb90a9"
+            "url": "https://github.com/junegunn/fzf-bin/releases/download/0.16.11/fzf-0.16.11-windows_amd64.zip",
+            "hash": "8b4ff9ec3818c0f7e2a5eab3400238aa3796f357671f284898d6ef4139db4039"
         },
         "32bit": {
-            "url": "https://github.com/junegunn/fzf-bin/releases/download/0.16.10/fzf-0.16.10-windows_386.zip",
-            "hash": "9b795fa47a3b69a9474e2674f38787e169f755f0590554b62d54101f70a534eb"
+            "url": "https://github.com/junegunn/fzf-bin/releases/download/0.16.11/fzf-0.16.11-windows_386.zip",
+            "hash": "24b2b6c09f6d361e1233e18a53e975dbafe9b77813ee59a6825a3c4c2359f431"
         }
     },
     "bin": "fzf.exe",
