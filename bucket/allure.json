@@ -1,10 +1,10 @@
 {
     "homepage": "https://github.com/allure-framework/allure2",
-    "version": "2.3",
+    "version": "2.3.1",
     "license": "https://github.com/allure-framework/allure2/blob/master/LICENSE",
-    "url": "https://dl.bintray.com/qameta/generic/io/qameta/allure/allure/2.3/allure-2.3.zip",
-    "hash": "3c13eaeba5d936c11ec824c2b93958c06ba3c85acf28b5fd19ac3ee63e4ca7bd",
-    "extract_dir": "allure-2.3",
+    "url": "https://dl.bintray.com/qameta/generic/io/qameta/allure/allure/2.3.1/allure-2.3.1.zip",
+    "hash": "66e3eafd069448f2db2b63f3b0203fbe78fc48a0a34a2cac12b4b1069276ed8b",
+    "extract_dir": "allure-2.3.1",
     "bin": "bin\\allure.bat",
     "env_set": {
         "ALLURE_HOME": "$dir"
