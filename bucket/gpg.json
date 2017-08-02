@@ -1,8 +1,8 @@
 {
-    "version": "2.3.3",
+    "version": "2.3.4",
     "license": "GNU",
-    "url": "https://files.gpg4win.org/gpg4win-2.3.3.exe#/dl.7z",
-    "hash": "5675770b85d49cb05fd3e4bdee7528e19991be508760eef86157d1fa01f0f254",
+    "url": "https://files.gpg4win.org/gpg4win-2.3.4.exe#/dl.7z",
+    "hash": "9342019e69d14a360ba6d01e66733578bcfa1e00151d7ccfeba4cdc177ed224b",
     "homepage": "https://www.gpg4win.org",
     "bin": [
         [
@@ -15,5 +15,8 @@
     "checkver": {
         "url": "https://www.gpg4win.org/get-gpg4win.html",
         "re": "Download Gpg4win ([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "https://files.gpg4win.org/gpg4win-$version.exe#/dl.7z"
     }
 }
