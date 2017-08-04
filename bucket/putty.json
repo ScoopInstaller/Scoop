@@ -1,0 +1,13 @@
+{
+"homepage": "http://www.putty.org/",
+"version": "0.70",
+"architecture": {
+"64bit": {
+"url": "putty.000webhostapp.com/putty/putty64.zip"
+"32bit": {
+"url": "putty.000webhostapp.com/putty/putty32.zip"
+}
+}
+"bin": ["putty.exe","pscp.exe","psftp.exe","plink.exe","puttygen.exe","puttytel.exe","pageant.exe"]
+"extract_dir": "putty"
+}
