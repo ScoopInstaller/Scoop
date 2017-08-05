@@ -1,16 +1,16 @@
 {
     "homepage": "https://minio.io/",
     "license": "https://github.com/minio/minio/blob/master/LICENSE",
-    "version": "2017-07-24T18-27-35Z",
+    "version": "2017-08-05T00-00-53Z",
     "bin": "minio.exe",
     "architecture": {
         "64bit": {
-            "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.2017-07-24T18-27-35Z#/minio.exe",
-            "hash": "459f0211e6029ca128d04bf797f735cfcaed0eef9185b182ff473853cca2644e"
+            "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.2017-08-05T00-00-53Z#/minio.exe",
+            "hash": "316e5c5864edc29d16ce5c20ae758a6c152faf7cd4ebd312c7acaadcd9dcb7dd"
         },
         "32bit": {
-            "url": "https://dl.minio.io/server/minio/release/windows-386/minio.RELEASE.2017-07-24T18-27-35Z#/minio.exe",
-            "hash": "18b1d640a166add35ba5d8b6f65dc83d058c326cea5bd2cb2fa16ea00fa7666e"
+            "url": "https://dl.minio.io/server/minio/release/windows-386/minio.RELEASE.2017-08-05T00-00-53Z#/minio.exe",
+            "hash": "4ab74f1094dd315c316315c3c121ca03a10bca1f9e76f0058651cbd831665b17"
         }
     },
     "suggest": {
