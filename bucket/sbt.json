@@ -2,7 +2,7 @@
     "homepage": "http://www.scala-sbt.org/",
     "version": "0.13.16",
     "license": "BSD",
-    "url": "https://cocl.us/sbt01316zip",
+    "url": "https://cocl.us/sbt01316zip#/dl.zip",
     "hash": "e94d95ff2d64247b754782ea85e99187ea890dc4c918a7ba7dcb6091fdb5968c",
     "extract_dir": "sbt",
     "bin": [
@@ -13,7 +13,7 @@
         "re": "sbt-([\\d.]+).zip"
     },
     "autoupdate": {
-        "url": "https://cocl.us/sbt$cleanVersionzip",
+        "url": "https://cocl.us/sbt$cleanVersionzip#/dl.zip",
         "extract_dir": "sbt"
     }
 }
