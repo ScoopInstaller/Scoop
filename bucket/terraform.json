@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://releases.hashicorp.com/terraform/0.10.0/terraform_0.10.0_windows_amd64.zip",
-            "hash": "10e3c12e9a77ea1324c5dfe1d7cc9f66db469afb606c0b42fa73038ed8a9e00c"
+            "hash": "d9697b0153bed48af4b077c711197f8fca1163e94d5a1c067b077a02201be25f"
         },
         "32bit": {
             "url": "https://releases.hashicorp.com/terraform/0.10.0/terraform_0.10.0_windows_386.zip",
-            "hash": "3f8594b5446cc3c7e8413fde5b17e47c1f25ba65af79cd0f014c5a6a3c6cecc0"
+            "hash": "a118202c72a8404d406e8250e2163dcf218dd31fe16f846ac3996854fa3c7613"
         }
     },
     "bin": [
