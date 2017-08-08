@@ -1,19 +1,19 @@
 {
     "homepage": "https://micro-editor.github.io/",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "license": "MIT Expat License",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/zyedidia/micro/releases/download/v1.3.0/micro-1.3.0-win64.zip",
-            "hash": "2e0ed8c7769bb4d4b477abe71195112f0f9bc3edebbcaf8c89963a50e8f1ecfd"
+            "url": "https://github.com/zyedidia/micro/releases/download/v1.3.1/micro-1.3.1-win64.zip",
+            "hash": "1aa3edc5b22cbdfebf8fd5f8f205576a9f898abb72a84aaadd9f647a6a106e90"
         },
         "32bit": {
-            "url": "https://github.com/zyedidia/micro/releases/download/v1.3.0/micro-1.3.0-win32.zip",
-            "hash": "d3e6591eff4cd35c386e2dcf335dbe73df76299c21b277c0e33857601dfe6287"
+            "url": "https://github.com/zyedidia/micro/releases/download/v1.3.1/micro-1.3.1-win32.zip",
+            "hash": "9f02521c5ec44e71c323e1479a016c761a995f1aacc94e07bc1e79c28f432f9a"
         }
     },
     "bin": "micro.exe",
-    "extract_dir": "micro-1.3.0",
+    "extract_dir": "micro-1.3.1",
     "checkver": {
         "github": "https://github.com/zyedidia/micro"
     },
