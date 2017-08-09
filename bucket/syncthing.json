@@ -18,6 +18,7 @@
     "checkver": {
         "github": "https://github.com/syncthing/syncthing"
     },
+    "notes": "To start syncthing automatically, use a method described at https://github.com/syncthing/docs/blob/master/users/autostart.rst#windows",
     "autoupdate": {
         "architecture": {
             "64bit": {
