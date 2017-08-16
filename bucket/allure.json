@@ -9,10 +9,6 @@
     "env_set": {
         "ALLURE_HOME": "$dir"
     },
-    "persist": [
-        "config",
-        "plugins"
-    ],
     "checkver": "github",
     "autoupdate": {
         "url": "https://dl.bintray.com/qameta/generic/io/qameta/allure/allure/$version/allure-$version.zip",
