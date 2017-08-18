@@ -1,9 +1,9 @@
 {
     "homepage": "https://geteventstore.com/",
     "license": "BSD 3-Clause",
-    "version": "4.0.1-hotfix4",
-    "url": "http://download.geteventstore.com/binaries/EventStore-OSS-Win-v4.0.1-hotfix4.zip",
-    "hash": "3360f271c9fe3032f8ab63aa1f343e0909b9b270a6ad3ac8c2383ccb5dccc23b",
+    "version": "4.0.2",
+    "url": "http://download.geteventstore.com/binaries/EventStore-OSS-Win-v4.0.2.zip",
+    "hash": "eeaeb31c403d2614cb9c711f3d504cfc84fe386dd3cb40292af97b9248c35ff5",
     "bin": [
         [
             "EventStore.ClusterNode.exe",
