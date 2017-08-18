@@ -14,7 +14,12 @@
             "extract_dir": "git-lfs-windows-amd64-2.2.1"
         }
     },
-    "depends": "git",
+    "suggest": {
+        "Git": [
+            "git",
+            "git-with-openssh"
+        ]
+    },
     "bin": "git-lfs.exe",
     "checkver": {
         "github": "https://github.com/git-lfs/git-lfs"
