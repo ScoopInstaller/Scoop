@@ -1,0 +1,71 @@
+{
+    "version":  "1.3.0",
+    "license":  "MIT",
+    "url":  "https://win.rustup.rs/?version=1.3.0#/rustup-init.exe",
+    "hash":  "849123cd17092be5bd709cdd61d435ccade181f6df54fa40b18837b41466f559",
+    "depends":  "vcredist2015",
+    "homepage":  "https://github.com/rust-lang-nursery/rustup.rs",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://win.rustup.rs/?version=$version#/rustup-init.exe"
+    },
+    "persist": [
+        ".cargo",
+        ".rustup"
+    ],
+    "pre_install": "
+        # Create the installation script
+        echo '& \"$dir\\rustup-init.exe\" -y --no-modify-path' | out-file $dir\\install-rustup.ps1
+
+        # Create the uninstallation script to remove the environment variables that were set
+        echo '[Environment]::SetEnvironmentVariable(\"RUSTUP_HOME\",$null,\"User\")' | out-file $dir\\uninstall-rustup.ps1
+        echo '[Environment]::SetEnvironmentVariable(\"CARGO_HOME\",$null,\"User\")' | out-file $dir\\uninstall-rustup.ps1 -append
+    ",
+    "post_install": "
+        # Copy the installed cargo directory to the rustup persistent data directory
+        $cargoFolder = \"$env:USERPROFILE\\.cargo\"
+        $cargoFolderDestination = \"$persist_dir\\.cargo\"
+        if(Test-Path $cargoFolder)
+        {
+            if(Test-Path $cargoFolderDestination)
+            {
+                Write-Host -F yellow \"Removing existing .cargo folder from scoop's persistent rustup data directory.\"
+                Remove-Item -Recurse $cargoFolderDestination
+            }
+            Write-Host -F yellow \"Moving '$cargoFolder' to '$persist_dir'\"
+            Move-Item -Force \"$cargoFolder\" \"$persist_dir\"
+        }
+
+        # Copy the installed rustup directory to the rustup persistent data directory
+        $rustupFolder = \"$env:USERPROFILE\\.rustup\"
+        $rustupFolderDestination = \"$persist_dir\\.rustup\"
+        $multirustShortcut = \"$env:USERPROFILE\\.multirust\"
+        if(Test-Path $rustupFolder)
+        {
+            if(Test-Path $rustupFolderDestination)
+            {
+                Write-Host -F yellow \"Removing existing .rustup folder from scoop's persistent rustup data directory.\"
+                Remove-Item -Recurse $rustupFolderDestination
+            }
+            Write-Host -F yellow \"Moving '$rustupFolder' to '$persist_dir'\"
+            Move-Item -Force \"$rustupFolder\" \"$persist_dir\"
+            if(Test-Path $multirustShortcut)
+            {
+                Write-Host -F yellow \"Removing old multirust junction.\"
+                Remove-Item -Force $multirustShortcut
+            }
+        }
+    ",
+    "env_add_path": ".cargo\\bin",
+    "env_set": {
+        "CARGO_HOME": "$persist_dir\\.cargo",
+        "RUSTUP_HOME": "$persist_dir\\.rustup"
+    },
+    "notes": "You'll need to restart powershell/cmd to have it reload the environment variables so rustup will work correctly",
+    "installer": {
+        "file": "install-rustup.ps1"
+    },
+    "uninstaller": {
+        "file": "uninstall-rustup.ps1"
+    }
+}
