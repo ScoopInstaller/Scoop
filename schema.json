@@ -220,6 +220,9 @@
                 "file": {
                     "type": "string"
                 },
+                "script": {
+                    "type": "string"
+                },
                 "keep": {
                     "type": "string"
                 }
@@ -260,6 +263,9 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "file": {
+                    "type": "string"
+                },
+                "script": {
                     "type": "string"
                 }
             },
