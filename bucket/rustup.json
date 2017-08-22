@@ -13,14 +13,6 @@
         ".cargo",
         ".rustup"
     ],
-    "pre_install": "
-        # Create the installation script
-        echo '& \"$dir\\rustup-init.exe\" -y --no-modify-path' | out-file $dir\\install-rustup.ps1
-
-        # Create the uninstallation script to remove the environment variables that were set
-        echo '[Environment]::SetEnvironmentVariable(\"RUSTUP_HOME\",$null,\"User\")' | out-file $dir\\uninstall-rustup.ps1
-        echo '[Environment]::SetEnvironmentVariable(\"CARGO_HOME\",$null,\"User\")' | out-file $dir\\uninstall-rustup.ps1 -append
-    ",
     "post_install": "
         # Copy the installed cargo directory to the rustup persistent data directory
         $cargoFolder = \"$env:USERPROFILE\\.cargo\"
@@ -45,14 +37,15 @@
             if(Test-Path $rustupFolderDestination)
             {
                 Write-Host -F yellow \"Removing existing .rustup folder from scoop's persistent rustup data directory.\"
-                Remove-Item -Recurse $rustupFolderDestination
+                [System.IO.Directory]::Delete($rustupFolderDestination,$true)
+
             }
             Write-Host -F yellow \"Moving '$rustupFolder' to '$persist_dir'\"
             Move-Item -Force \"$rustupFolder\" \"$persist_dir\"
             if(Test-Path $multirustShortcut)
             {
                 Write-Host -F yellow \"Removing old multirust junction.\"
-                Remove-Item -Force $multirustShortcut
+                [System.IO.Directory]::Delete($multirustShortcut,$true)
             }
         }
     ",
@@ -63,9 +56,14 @@
     },
     "notes": "You'll need to restart powershell/cmd to have it reload the environment variables so rustup will work correctly",
     "installer": {
-        "file": "install-rustup.ps1"
+        "script": "
+            & \"$dir\\rustup-init.exe\" -y --no-modify-path
+        "
     },
     "uninstaller": {
-        "file": "uninstall-rustup.ps1"
+        "script": "
+            [Environment]::SetEnvironmentVariable('RUSTUP_HOME',$null,'User')
+            [Environment]::SetEnvironmentVariable('CARGO_HOME',$null,'User')
+        "
     }
 }
