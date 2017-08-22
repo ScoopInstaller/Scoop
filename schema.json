@@ -269,8 +269,17 @@
                     "type": "string"
                 }
             },
-            "required": [
-                "file"
+            "oneOf": [
+                {
+                    "required": [
+                        "file"
+                    ]
+                },
+                {
+                    "required": [
+                        "script"
+                    ]
+                }
             ],
             "type": "object"
         },
