@@ -1,10 +1,10 @@
 {
     "homepage": "https://www.sqlite.org/",
-    "version": "3200000",
+    "version": "3200100",
     "license": "Public Domain",
-    "url": "https://www.sqlite.org/2017/sqlite-tools-win32-x86-3200000.zip",
-    "hash": "4aec6a3593a62bed3de72a125e8d14d516dcf4c32abc72cba2ed1ae0ab8bec2a",
-    "extract_dir": "sqlite-tools-win32-x86-3200000",
+    "url": "https://www.sqlite.org/2017/sqlite-tools-win32-x86-3200100.zip",
+    "hash": "3f7e37d1ac622455c0ce15f728ca36759afffe4c83449dab76c52315536672a8",
+    "extract_dir": "sqlite-tools-win32-x86-3200100",
     "bin": [
         "sqlite3.exe",
         "sqldiff.exe",
