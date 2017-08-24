@@ -22,7 +22,7 @@
             if(Test-Path $cargoFolderDestination)
             {
                 Write-Host -F yellow \"Removing existing .cargo folder from scoop's persistent rustup data directory.\"
-                Remove-Item -Recurse $cargoFolderDestination
+                [System.IO.Directory]::Delete($cargoFolderDestination,$true)
             }
             Write-Host -F yellow \"Moving '$cargoFolder' to '$persist_dir'\"
             Move-Item -Force \"$cargoFolder\" \"$persist_dir\"
