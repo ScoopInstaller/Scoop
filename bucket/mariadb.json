@@ -1,17 +1,17 @@
 {
     "homepage": "https://mariadb.org",
-    "version": "10.2.7",
+    "version": "10.2.8",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.2.7/winx64-packages/mariadb-10.2.7-winx64.zip",
-            "hash": "6dd9dc38017b34909c4f8f7aa54ef5f15e9acd77325a6146a00619cec5f8743d",
-            "extract_dir": "mariadb-10.2.7-winx64"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.2.8/winx64-packages/mariadb-10.2.8-winx64.zip",
+            "hash": "c641900a843aae86349268465e42cec83ac7b603396299f49c205a2ea405e929",
+            "extract_dir": "mariadb-10.2.8-winx64"
         },
         "32bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.2.7/win32-packages/mariadb-10.2.7-win32.zip",
-            "hash": "bb7dbf658f654d5c8ee8288dd234c79d34f4d33cdc2cc456279717e0615cddc9",
-            "extract_dir": "mariadb-10.2.7-win32"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.2.8/win32-packages/mariadb-10.2.8-win32.zip",
+            "hash": "9958445d6e86ffb17695cff68ebcad41623e97af0feada1c7809cd840d13464b",
+            "extract_dir": "mariadb-10.2.8-win32"
         }
     },
     "bin": [
@@ -58,11 +58,17 @@
         "architecture": {
             "64bit": {
                 "url": "https://downloads.mariadb.org/f/mariadb-$version/winx64-packages/mariadb-$version-winx64.zip",
-                "extract_dir": "mariadb-$version-winx64"
+                "extract_dir": "mariadb-$version-winx64",
+                "hash": {
+                    "url": "http://mirror2.hs-esslingen.de/mariadb/mariadb-$version/winx64-packages/sha256sums.txt"
+                }
             },
             "32bit": {
                 "url": "https://downloads.mariadb.org/f/mariadb-$version/win32-packages/mariadb-$version-win32.zip",
-                "extract_dir": "mariadb-$version-win32"
+                "extract_dir": "mariadb-$version-win32",
+                "hash": {
+                    "url": "http://mirror2.hs-esslingen.de/mariadb/mariadb-$version/win32-packages/sha256sums.txt"
+                }
             }
         }
     }
