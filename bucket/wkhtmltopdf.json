@@ -1,42 +1,48 @@
 {
+    "homepage": "https://wkhtmltopdf.org/",
+    "version": "0.12.4",
+    "description": "Render HTML into PDF",
+    "license": "LGPL-3.0",
     "architecture": {
-        "32bit": {
-            "hash": "6883d1456201bc9d421cb7dd32a99458be3d56631ea4f292e51b3c1aecbe2723",
-            "installer": {
-                "args": [
-                    "/S",
-                    "/D=$dir"
-                ]
-            },
-            "url": "http://download.gna.org/wkhtmltopdf/0.12/0.12.4/wkhtmltox-0.12.4_msvc2015-win32.exe"
-        },
         "64bit": {
-            "hash": "14a5996adc77dc606944dbc0dc682bff104cd38cc1bec19253444cb87f259797",
-            "installer": {
-                "args": [
-                    "/S",
-                    "/D=$dir"
-                ]
-            },
-            "url": "http://download.gna.org/wkhtmltopdf/0.12/0.12.4/wkhtmltox-0.12.4_msvc2015-win64.exe"
+            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_msvc2015-win64.exe",
+            "hash": "14a5996adc77dc606944dbc0dc682bff104cd38cc1bec19253444cb87f259797"
+        },
+        "32bit": {
+            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_msvc2015-win32.exe",
+            "hash": "6883d1456201bc9d421cb7dd32a99458be3d56631ea4f292e51b3c1aecbe2723"
         }
     },
     "bin": [
         "bin\\wkhtmltoimage.exe",
         "bin\\wkhtmltopdf.exe"
     ],
-    "checkver": {
-        "re": "The\\s+current\\s+stable\\s+series\\s+is\\s+<strong>([\\d.]+)",
-        "url": "https://wkhtmltopdf.org/downloads.html"
+    "installer": {
+        "args": [
+            "/S",
+            "/D=$dir"
+        ]
     },
-    "description": "Render HTML into PDF",
-    "homepage": "https://wkhtmltopdf.org/",
-    "license": "LGPL-3.0",
     "uninstaller": {
         "args": [
             "/S"
         ],
         "file": "Uninstall.exe"
     },
-    "version": "0.12.4"
+    "checkver": {
+        "github": "https://github.com/wkhtmltopdf/wkhtmltopdf"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version_msvc2015-win64.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version_msvc2015-win32.exe"
+            }
+        },
+        "hash": {
+            "url": "$baseurl/SHA256SUMS"
+        }
+    }
 }
