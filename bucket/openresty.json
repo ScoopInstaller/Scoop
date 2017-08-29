@@ -1,0 +1,20 @@
+{
+  "homepage": "https://github.com/openresty/openresty/blob/master/doc/README-win32.md#readme",
+  "version": "1.11.2.3",
+  "url": "https://openresty.org/download/openresty-1.11.2.3-win32.zip",
+  "hash": "0258124001fb5a5ef133cbee075829d331dffcb18a9791ccb64c7a75ed52c67e",
+  "extract_dir": "openresty-1.11.2.3-win32",
+  "bin": [
+    ["nginx.exe", "openresty"]
+  ],
+  "notes": "Use '-p $PWD' to specify current directory when running OpenResty.\n(Alternately, see documentation by running 'scoop home openresty'.)",
+  "license": "BSD",
+  "checkver": {
+    "url": "https://openresty.org/en/download.html",
+    "re": "openresty-([\\d.]+)-win32\\.zip"
+  },
+  "autoupdate": {
+    "url": "https://openresty.org/download/openresty-$version-win32.zip",
+    "extract_dir": "openresty-$version-win32"
+  }
+}
