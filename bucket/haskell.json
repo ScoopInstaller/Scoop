@@ -1,14 +1,10 @@
 {
     "homepage": "https://www.haskell.org",
-    "version": "8.0.2",
+    "version": "8.2.1",
     "architecture": {
         "64bit": {
-            "url": "https://haskell.org/platform/download/8.0.2/HaskellPlatform-8.0.2-minimal-x86_64-setup.exe",
-            "hash": "5901fddb219a4d864ee3e21dc73434de0eeb98cbd27a50845b8a687e1c1cb8fa"
-        },
-        "32bit": {
-            "url": "https://haskell.org/platform/download/8.0.2/HaskellPlatform-8.0.2-minimal-i386-setup.exe",
-            "hash": "5be3feaf90977bbe769753c8295cafef40591c8f247808cf6b662ebab2839738"
+            "url": "https://haskell.org/platform/download/8.2.1/HaskellPlatform-8.2.1-core-x86_64-setup.exe",
+            "hash": "81aa5b8476b84c732e4d9e5167a5f1a33ff5ae30d14e5aa4f1902001e4fdb8f8"
         }
     },
     "installer": {
@@ -37,10 +33,7 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-minimal-x86_64-setup.exe"
-            },
-            "32bit": {
-                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-minimal-i386-setup.exe"
+                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-core-x86_64-setup.exe"
             }
         }
     }
