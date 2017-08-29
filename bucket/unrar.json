@@ -5,7 +5,7 @@
         "url": "http://www.rarlab.com/download.htm"
     },
     "description": "Uncompress RAR files",
-    "hash": "27293c101577320fafefc691af98d762361c23e62817ca340ce04a7bba892173",
+    "hash": "bdd354b9b677a5dda154b56627398aef13b1445ae235406799acd6fbb6c72989",
     "homepage": "http://www.rarlab.com/",
     "installer": {
         "args": [
@@ -15,5 +15,5 @@
     },
     "license": "Freeware",
     "url": "http://www.rarlab.com/rar/unrarw32.exe",
-    "version": "5.40"
+    "version": "5.50"
 }
