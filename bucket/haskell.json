@@ -34,9 +34,6 @@
         "architecture": {
             "64bit": {
                 "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-core-x86_64-setup.exe"
-            },
-            "COMMENTED_OUT_UNTIL_32BIT_SUPPORT_IS_ADDED_AGAIN_32bit": {
-                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-core-i386-setup.exe"
             }
         }
     }
