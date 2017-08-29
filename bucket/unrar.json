@@ -15,5 +15,8 @@
     },
     "license": "Freeware",
     "url": "http://www.rarlab.com/rar/unrarw32.exe",
-    "version": "5.50"
+    "version": "5.50",
+    "autoupdate": {
+        "url": "http://www.rarlab.com/rar/unrarw32.exe"
+    }
 }
