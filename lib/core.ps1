@@ -76,6 +76,37 @@ function installed_apps($global) {
         gci $dir | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
     }
 }
+
+function app_status($app, $global) {
+    $status = @{}
+    $status.installed = (installed $app $global)
+    $status.version = current_version $app $global
+    $status.latest_version = $status.version
+
+    $install_info = install_info $app $status.version $global
+
+    $status.failed = (!$install_info -or !$status.version)
+
+    $manifest = manifest $app $install_info.bucket $install_info.url
+    $status.removed = (!$manifest)
+    if($manifest.version) {
+        $status.latest_version = $manifest.version
+    }
+
+    $status.outdated = $false
+    if($status.version -and $status.latest_version) {
+        $status.outdated = ((compare_versions $status.latest_version $status.version) -gt 0)
+    }
+
+    $status.missing_deps = @()
+    $deps = @(runtime_deps $manifest) | ? { !(installed $_) }
+    if($deps) {
+        $status.missing_deps += ,$deps
+    }
+
+    return $status
+}
+
 function appname_from_url($url) {
     (split-path $url -leaf) -replace '.json$', ''
 }
