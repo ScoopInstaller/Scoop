@@ -177,20 +177,6 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
 #>
 }
 
-function ensure_all_installed($apps, $global) {
-    $app = $apps | ? { !(installed $_ $global) } | select -first 1 # just get the first one that's not installed
-    if($app) {
-        if(installed $app (!$global)) {
-            function wh($g) { if($g) { "globally" } else { "for your account" } }
-            write-host "'$app' isn't installed $(wh $global), but it is installed $(wh (!$global))." -f darkred
-            "Try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead."
-            exit 1
-        } else {
-            abort "'$app' isn't installed."
-        }
-    }
-}
-
 if(!$apps) {
     if($global) {
         "scoop update: --global is invalid when <app> is not specified."; exit 1
@@ -210,7 +196,7 @@ if(!$apps) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        ensure_all_installed $apps $global
+        $apps = ensure_all_installed $apps $global
         $apps = applist $apps $global
     }
 

@@ -48,21 +48,6 @@ function cleanup($app, $global) {
     }
 }
 
-function ensure_all_installed($apps, $global) {
-    $app = $apps | Where-Object { !(installed $_ $global) } | Select-Object -first 1 # just get the first one that's not installed
-    if ($app) {
-        if (installed $app (!$global)) {
-            function wh($g) { if ($g) { "globally" } else { "for your account" } }
-            write-host "'$app' isn't installed $(wh $global), but it is installed $(wh (!$global))." -f darkred
-            "Try cleaning $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead."
-            exit 1
-        }
-        else {
-            abort "'$app' isn't installed."
-        }
-    }
-}
-
 if($apps) {
     if ($apps -eq '*') {
         $apps = applist (installed_apps $false) $false
@@ -71,7 +56,7 @@ if($apps) {
         }
     }
     else {
-        ensure_all_installed $apps $global
+        $apps = ensure_all_installed $apps $global
         $apps = applist $apps $global
     }
 

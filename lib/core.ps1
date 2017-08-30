@@ -237,6 +237,25 @@ function ensure_architecture($architecture_opt) {
     }
 }
 
+function ensure_all_installed($apps, $global) {
+    $installed = @()
+    $showWarning = $false
+    function wh($g) { if ($g) { "globally" } else { "for your account" } }
+    $apps | Select-Object -Unique | % {
+        $app = $_
+        if(installed $app $global) {
+            $installed += $app
+        } elseif (installed $app (!$global)) {
+            error "'$app' isn't installed $(wh $global), but it is installed $(wh (!$global))."
+            $showWarning = $true
+        } else {
+            error "'$app' isn't installed."
+        }
+    }
+    if($showWarning) { warn "Try again $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead." }
+    return $installed
+}
+
 function strip_path($orig_path, $dir) {
     $stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
     return ($stripped -ne $orig_path), $stripped
