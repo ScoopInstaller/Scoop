@@ -335,7 +335,9 @@ function reset_alias($name, $value) {
         return # already set
     }
     if($value -is [scriptblock]) {
-        new-item -path function: -name "script:$name" -value $value | out-null
+        if(!(test-path -path "function:script:$name")) {
+            new-item -path function: -name "script:$name" -value $value | out-null
+        }
         return
     }
 
