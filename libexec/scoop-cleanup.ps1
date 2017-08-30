@@ -26,30 +26,34 @@ if($global -and !(is_admin)) {
     'ERROR: you need admin rights to cleanup global apps'; exit 1
 }
 
-function cleanup($app, $global) {
+function cleanup($app, $global, $verbose) {
     $current_version  = current_version $app $global
-    $installedappdir  = appdir $app $global
-    write-host 'Cleaning up ' -nonewline
-    write-host -f yellow $app
-    foreach($versionDir in (Get-ChildItem $installedappdir))
-    {
-        if(($versionDir.Name -ne $current_version) -and ($versionDir.Name -ne 'current'))
-        {
-            foreach($file in (Get-ChildItem $installedappdir/$versionDir))
-            {
-                if($file.LinkType -ne $null)
-                {
-                    fsutil.exe reparsepoint delete $file.FullName
-                }
-            }
-            write-host "- $versionDir"
-            Remove-Item $versionDir.FullName -Recurse -Force
-        }
+    $versions = versions $app $global | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
+    if(!$versions) {
+        if($verbose) { write-host -f green "$app is clean" }
+        return
     }
+
+    write-host -f yellow "removing $app`:" -nonewline
+    $versions | % {
+        $version = $_
+        write-host " $version" -nonewline
+        $dir = versiondir $app $version
+        gci $dir | % {
+            $file = $_
+            if($file.LinkType -ne $null) {
+                fsutil.exe reparsepoint delete $file.FullName | out-null
+            }
+        }
+        Remove-Item $dir -Recurse -Force
+    }
+    write-host ''
 }
 
 if($apps) {
+    $verbose = $true
     if ($apps -eq '*') {
+        $verbose = $false
         $apps = applist (installed_apps $false) $false
         if ($global) {
             $apps += applist (installed_apps $true) $true
@@ -57,11 +61,10 @@ if($apps) {
     }
     else {
         $apps = ensure_all_installed $apps $global
-        $apps = applist $apps $global
     }
 
     # $apps is now a list of ($app, $global) tuples
-    $apps | ForEach-Object { cleanup @_ }
+    $apps | ForEach-Object { cleanup @_ $verbose }
 }
 
 exit 0
