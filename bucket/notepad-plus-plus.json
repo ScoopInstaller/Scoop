@@ -1,0 +1,24 @@
+{
+    "homepage": "https://notepad-plus-plus.org/",
+    "license": "https://raw.githubusercontent.com/notepad-plus-plus/notepad-plus-plus/master/LICENSE",
+    "version": "7.5.1",
+    "architecture": {
+        "64bit": {
+            "url": "https://notepad-plus-plus.org/repository/7.x/7.5.1/npp.7.5.1.bin.minimalist.x64.7z",
+            "hash": "0958ABB9FBFDE0CAC0DF9A5CDE2B1425B61A9932FEA0AA9955EF0E4978553F7B"
+        },
+        "32bit": {
+            "url": "https://notepad-plus-plus.org/repository/7.x/7.5.1/npp.7.5.1.bin.minimalist.7z",
+            "hash": "9B69F25DF5919C13635BA17E240663350BD7F9527FEF20EFD9CA996C7DD01FE4"
+        }
+    },
+    "extract_dir": "Files/Notepad++",
+    "bin": "notepad++",
+    "checkver": "Download 7-Zip ([\\d.]+)",
+    "shortcuts": [
+        [
+            "notepad++.exe",
+            "notepad++"
+        ]
+    ]
+}
