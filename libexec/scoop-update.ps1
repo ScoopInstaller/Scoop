@@ -167,21 +167,37 @@ if(!$apps) {
     if(is_scoop_outdated) {
         update_scoop
     }
+    $outdated = @()
+    $apps_param = $apps
 
-    if($apps -eq '*') {
+    if($apps_param -eq '*') {
         $apps = applist (installed_apps $false) $false
         if($global) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        $apps = ensure_all_installed $apps $global
-        $apps = applist $apps $global
+        $apps = ensure_all_installed $apps_param $global
+    }
+    if($apps) {
+        $apps | % {
+            ($app, $global) = $_
+            $status = app_status $app $global
+            if($status.outdated) {
+                $outdated += applist $app $global
+                write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
+            } elseif($apps_param -ne '*') {
+                write-host -f green "$app`: $($status.version) (latest version)"
+            }
+        }
+
+        if($outdated.Length -gt 1) { write-host -f DarkCyan "Updating $($outdated.Length) outdated apps:" }
+        elseif($outdated.Length -eq 0) { write-host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'" }
+        else { write-host -f DarkCyan "Updating one outdated app:" }
     }
 
     $suggested = @{};
-
-    # $apps is now a list of ($app, $global) tuples
-    $apps | % { update @_ $quiet $independent $suggested }
+    # # $outdated is a list of ($app, $global) tuples
+    $outdated | % { update @_ $quiet $independent $suggested }
 }
 
 exit 0
