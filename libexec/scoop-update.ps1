@@ -148,33 +148,6 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     # note: keep the old dir in case it contains user files
 
     install_app $app $architecture $global $suggested
-<#
-    "Installing '$app' ($version)"
-    $dir = ensure (versiondir $app $version $global)
-
-    # save info for uninstall
-    save_installed_manifest $app $bucket $dir $url
-    save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
-
-    if($manifest.suggest) {
-        $suggested[$app] = $manifest.suggest
-    }
-
-    $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
-    unpack_inno $fname $manifest $dir
-    pre_install $manifest $architecture
-    run_installer $fname $manifest $architecture $dir $global
-    ensure_install_dir_not_in_path $dir
-    $dir = link_current $dir
-    create_shims $manifest $dir $global $architecture
-    env_add_path $manifest $dir $global
-    env_set $manifest $dir $global
-    post_install $manifest $architecture
-
-    success "'$app' was updated from $old_version to $version."
-
-    show_notes $manifest
-#>
 }
 
 if(!$apps) {
