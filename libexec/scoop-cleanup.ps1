@@ -30,11 +30,11 @@ function cleanup($app, $global, $verbose) {
     $current_version  = current_version $app $global
     $versions = versions $app $global | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
     if(!$versions) {
-        if($verbose) { write-host -f green "$app is clean" }
+        if($verbose) { success "$app is already clean" }
         return
     }
 
-    write-host -f yellow "removing $app`:" -nonewline
+    write-host -f yellow "Removing $app`:" -nonewline
     $versions | % {
         $version = $_
         write-host " $version" -nonewline
@@ -65,6 +65,10 @@ if($apps) {
 
     # $apps is now a list of ($app, $global) tuples
     $apps | ForEach-Object { cleanup @_ $verbose }
+
+    if(!$verbose) {
+        success 'Everything is shiny now!'
+    }
 }
 
 exit 0
