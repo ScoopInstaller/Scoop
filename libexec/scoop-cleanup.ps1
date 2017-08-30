@@ -1,5 +1,5 @@
 # Usage: scoop cleanup <app> [options]
-# Summary: Update apps, or Scoop itself
+# Summary: Cleanup apps by removing old versions
 # Help: 'scoop cleanup' cleans Scoop apps by removing old versions.
 # 'scoop cleanup <app>' cleans up the old versions of that app if said versions exist.
 #
@@ -12,12 +12,15 @@
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
+. "$psscriptroot\..\lib\help.ps1"
 
 reset_aliases
 
 $opt, $apps, $err = getopt $args 'g' 'global'
 if ($err) { "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
+
+if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 function cleanup($app, $global) {
     $current_version  = current_version $app $global
