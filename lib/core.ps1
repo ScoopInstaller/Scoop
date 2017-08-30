@@ -270,21 +270,22 @@ function ensure_architecture($architecture_opt) {
 
 function ensure_all_installed($apps, $global) {
     $installed = @()
-    $showWarning = $false
-    function wh($g) { if ($g) { "globally" } else { "for your account" } }
-    $apps | Select-Object -Unique | % {
+    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | % {
         $app = $_
-        if(installed $app $global) {
-            $installed += $app
-        } elseif (installed $app (!$global)) {
-            error "'$app' isn't installed $(wh $global), but it is installed $(wh (!$global))."
-            $showWarning = $true
+        if(installed $app $false) {
+            $installed += ,@($app, $false)
+        } elseif (installed $app $true) {
+            if($global) {
+                $installed += ,@($app, $true)
+            } else {
+                error "'$app' isn't installed for your account, but it is installed globally."
+                warn "Try again with the --global (or -g) flag instead."
+            }
         } else {
             error "'$app' isn't installed."
         }
     }
-    if($showWarning) { warn "Try again $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead." }
-    return $installed
+    return ,$installed
 }
 
 function strip_path($orig_path, $dir) {
@@ -391,6 +392,7 @@ function reset_aliases() {
 
 # convert list of apps to list of ($app, $global) tuples
 function applist($apps, $global) {
+    if(!$apps) { return @() }
     return ,@($apps |% { ,@($_, $global) })
 }
 
