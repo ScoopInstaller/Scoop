@@ -389,6 +389,17 @@ function get_app_with_version([String] $app) {
         "version" = if ($version) { $version } else { 'latest' }
     }
 }
+function is_scoop_outdated() {
+    $now = Get-Date
+    try {
+        $last_update = (Get-Date (get_config 'lastupdate')).ToLocalTime().AddHours(3)
+    } catch {
+        set_config 'lastupdate' $now
+        # remove 1 minute to force an update for the first time
+        $last_update = $now.AddMinutes(-1)
+    }
+    return $last_update -lt  $now.ToLocalTime()
+}
 
 function substitute([String] $str, [Hashtable] $params) {
     $params.GetEnumerator() | % {

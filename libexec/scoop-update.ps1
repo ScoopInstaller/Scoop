@@ -88,6 +88,8 @@ function update_scoop() {
         git_pull -q
         popd
     }
+
+    set_config 'lastupdate' (get-date)
     success 'Scoop was updated successfully!'
 }
 
@@ -118,7 +120,6 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     if(!$force -and ($old_version -eq $version)) {
         if (!$quiet) {
             warn "The latest version of '$app' ($version) is already installed."
-            "Run 'scoop update' to check for new versions."
         }
         return
     }
@@ -161,6 +162,10 @@ if(!$apps) {
 } else {
     if($global -and !(is_admin)) {
         'ERROR: You need admin rights to update global apps.'; exit 1
+    }
+
+    if(is_scoop_outdated) {
+        update_scoop
     }
 
     if($apps -eq '*') {
