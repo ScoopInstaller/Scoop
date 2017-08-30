@@ -22,12 +22,18 @@ $global = $opt.g -or $opt.global
 
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
+if($global -and !(is_admin)) {
+    'ERROR: you need admin rights to cleanup global apps'; exit 1
+}
+
 function cleanup($app, $global) {
     $current_version  = current_version $app $global
     $installedappdir  = appdir $app $global
+    write-host 'Cleaning up ' -nonewline
+    write-host -f yellow $app
     foreach($versionDir in (Get-ChildItem $installedappdir))
     {
-        if(($versionDir.Name -ne $current_version) -and ($versionDir.Name -ne "current"))
+        if(($versionDir.Name -ne $current_version) -and ($versionDir.Name -ne 'current'))
         {
             foreach($file in (Get-ChildItem $installedappdir/$versionDir))
             {
@@ -36,6 +42,7 @@ function cleanup($app, $global) {
                     fsutil.exe reparsepoint delete $file.FullName
                 }
             }
+            write-host "- $versionDir"
             Remove-Item $versionDir.FullName -Recurse -Force
         }
     }
@@ -61,10 +68,6 @@ function applist($apps, $global) {
     return , @($apps | % { , @($_, $global) })
 }
 if($apps) {
-    if ($global -and !(is_admin)) {
-        'ERROR: You need admin rights to update global apps.'; exit 1
-    }
-
     if ($apps -eq '*') {
         $apps = applist (installed_apps $false) $false
         if ($global) {
