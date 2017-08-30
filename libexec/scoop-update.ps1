@@ -39,7 +39,7 @@ function update_scoop() {
     $git = try { gcm git -ea stop } catch { $null }
     if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    "Updating Scoop..."
+    write-host "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
         # load config
@@ -83,7 +83,7 @@ function update_scoop() {
     shim "$currentdir\bin\scoop.ps1" $false
 
     @(buckets) | % {
-        "Updating '$_' bucket..."
+        write-host "Updating '$_' bucket..."
         pushd (bucketdir $_)
         git_pull -q
         popd
@@ -130,11 +130,11 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
 
     $manifest = manifest $app $bucket $url
 
-    "Updating '$app' ($old_version -> $version)"
+    write-host "Updating '$app' ($old_version -> $version)"
 
     $dir = versiondir $app $old_version $global
 
-    "Uninstalling '$app' ($old_version)"
+    write-host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
     env_rm_path $old_manifest $dir $global
