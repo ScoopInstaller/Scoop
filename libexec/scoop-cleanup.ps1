@@ -63,10 +63,6 @@ function ensure_all_installed($apps, $global) {
     }
 }
 
-# convert list of apps to list of ($app, $global) tuples
-function applist($apps, $global) {
-    return , @($apps | % { , @($_, $global) })
-}
 if($apps) {
     if ($apps -eq '*') {
         $apps = applist (installed_apps $false) $false

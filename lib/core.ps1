@@ -337,6 +337,11 @@ function reset_aliases() {
     $default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
 }
 
+# convert list of apps to list of ($app, $global) tuples
+function applist($apps, $global) {
+    return ,@($apps |% { ,@($_, $global) })
+}
+
 function app($app) {
     $app = [string]$app
     if($app -notmatch '^((ht)|f)tps?://') {
