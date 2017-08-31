@@ -6,11 +6,18 @@
         "url": "https://repo.continuum.io/miniconda",
         "re": "Miniconda3-([\\d.]+)-Windows"
     },
+    "bin": [
+        [
+            "python.exe",
+            "python3"
+        ]
+    ],
     "installer": {
         "file": "miniconda3-installer.exe",
         "args": [
              "/S",
              "/InstallationType=JustMe",
+             "/RegisterPython=1",
              "/AddToPath=0",
              "/D=$dir"
         ]
