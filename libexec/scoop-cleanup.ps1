@@ -38,7 +38,7 @@ function cleanup($app, $global, $verbose) {
     $versions | % {
         $version = $_
         write-host " $version" -nonewline
-        $dir = versiondir $app $version
+        $dir = versiondir $app $version $global
         gci $dir | % {
             $file = $_
             if($file.LinkType -ne $null) {
