@@ -14,6 +14,7 @@
 # Options:
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 #   -i, --independent         Don't install dependencies automatically
+#   -k, --no-cache            Don't use the download cache
 #   -g, --global              Install the app globally
 
 . "$psscriptroot\..\lib\core.ps1"
@@ -44,11 +45,12 @@ function ensure_not_installed($app, $global) {
     }
 }
 
-$opt, $apps, $err = getopt $args 'gia:' 'global', 'independent', 'arch='
+$opt, $apps, $err = getopt $args 'gika:' 'global', 'independent', 'no-cache', 'arch='
 if($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 $independent = $opt.i -or $opt.independent
+$use_cache = !($opt.k -or $opt.'no-cache')
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
@@ -102,7 +104,7 @@ $apps, $skip = prune_installed $apps $global
 $skip | ? { $explicit_apps -contains $_} | % { warn "$_ is already installed. Skipping." }
 
 $suggested = @{};
-$apps | % { install_app $_ $architecture $global $suggested }
+$apps | % { install_app $_ $architecture $global $suggested $use_cache }
 
 show_suggestions $suggested
 

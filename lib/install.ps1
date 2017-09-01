@@ -9,10 +9,9 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global, $suggested) {
+function install_app($app, $architecture, $global, $suggested, $use_cache = $true) {
     $app, $bucket = app $app
     $app, $manifest, $bucket, $url = locate $app $bucket
-    $use_cache = $true
     $check_hash = $true
 
     if(!$manifest) {
