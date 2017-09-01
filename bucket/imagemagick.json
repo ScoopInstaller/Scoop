@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.imagemagick.org/script/index.php",
     "license": "https://www.imagemagick.org/script/license.php",
-    "version": "7.0.6-3",
+    "version": "7.0.6-10",
     "architecture": {
         "64bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.6-3-portable-Q16-x64.zip",
-            "hash": "aa004586eeb35a1859ba814b7e049afc98720563a923ab8c2ae81a5f180e9090"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.6-10-portable-Q16-x64.zip",
+            "hash": "6bc7cdb016fb0795325b5a6c6e3d40d54bc46480465b290fb23cb4b7cda51aaa"
         },
         "32bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.6-3-portable-Q16-x86.zip",
-            "hash": "0f557801b99d3435df7d3ab02467b3a9a724c4cf7f7a63a4a6234db848e9f6fd"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.6-10-portable-Q16-x86.zip",
+            "hash": "6838568074db6ab2e6ca4acff6d2978bd77a84a4f7ee262a049bb98641ce582e"
         }
     },
     "depends": [

@@ -220,6 +220,9 @@
                 "file": {
                     "type": "string"
                 },
+                "script": {
+                    "type": "string"
+                },
                 "keep": {
                     "type": "string"
                 }
@@ -261,10 +264,22 @@
                 },
                 "file": {
                     "type": "string"
+                },
+                "script": {
+                    "type": "string"
                 }
             },
-            "required": [
-                "file"
+            "oneOf": [
+                {
+                    "required": [
+                        "file"
+                    ]
+                },
+                {
+                    "required": [
+                        "script"
+                    ]
+                }
             ],
             "type": "object"
         },

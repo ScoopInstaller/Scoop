@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.haskellstack.org",
     "license": "BSD 3-Clause",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.5.0/stack-1.5.0-windows-x86_64.zip",
-            "hash": "ded27bc5de5b762454709cb1ebcde46d6723e979656d7ded056c99c5b313e220"
+            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.5.1/stack-1.5.1-windows-x86_64.zip",
+            "hash": "cb6066c5620270120c6580c2331a26e840acad46acc34b44d224d66178564af6"
         },
         "32bit": {
-            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.5.0/stack-1.5.0-windows-i386.zip",
-            "hash": "4a2d2d7dcc43df0184b7fa2a8018e10cd9a531c66e7421268acea71f7d8d7df9"
+            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.5.1/stack-1.5.1-windows-i386.zip",
+            "hash": "05f91c22ea445fe07a354d39e9f1a239b6f59e652dfafdc883b368b95b88dfdd"
         }
     },
     "bin": [

@@ -1,18 +1,48 @@
 {
     "homepage": "http://www.andre-simon.de/doku/highlight/en/highlight.php",
-    "version": "3.35",
+    "version": "3.39",
     "license": "GPL3",
     "architecture": {
         "64bit": {
-            "url": "http://www.andre-simon.de/zip/highlight-3.35-x64.zip",
-            "hash": "b63a88a3f3ea81965f46086df606eeedeffa20608107c7217f3d699ea5610957",
-            "extract_dir": "highlight-3.35-x64"
+            "url": "http://www.andre-simon.de/zip/highlight-3.39-x64.zip",
+            "hash": "d356bd97a3c305961d9e54402aa0f50a1d1f6d95bd90f5357658ceb9b0fbfbd4",
+            "extract_dir": "highlight-3.39-x64"
         },
         "32bit": {
-            "url": "http://www.andre-simon.de/zip/highlight-3.35.zip",
-            "hash": "ea4c81ff647eeb0d19ebf07f576b4b5366dcd34c9a50d397555cae3dfc82c6ee",
-            "extract_dir": "highlight-3.35"
+            "url": "http://www.andre-simon.de/zip/highlight-3.39.zip",
+            "hash": "bbc0b6913b0d4f090afd23c17ced0863dfb42a65f998ec9bdfa22467e896170c",
+            "extract_dir": "highlight-3.39"
         }
     },
-    "bin": "highlight.exe"
+    "bin": "highlight.exe",
+    "shortcuts": [
+        [
+            "highlight-gui.exe",
+            "Highlight"
+        ]
+    ],
+    "notes": "You need to set the working directory of the shortcut to '$dir'",
+    "checkver": {
+        "github": "https://github.com/andre-simon/highlight"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://www.andre-simon.de/zip/highlight-$version-x64.zip",
+                "extract_dir": "highlight-$version-x64",
+                "hash": {
+                    "find": "<code>([a-fA-F0-9]{64})</code>\\s+\\|\\s+<a href=\"highlight-(?:[\\d.]+)-x64.zip.asc\">",
+                    "url": "http://www.andre-simon.de/zip/download.php"
+                }
+            },
+            "32bit": {
+                "url": "http://www.andre-simon.de/zip/highlight-$version.zip",
+                "extract_dir": "highlight-$version",
+                "hash": {
+                    "find": "<code>([a-fA-F0-9]{64})</code>\\s+\\|\\s+<a href=\"highlight-(?:[\\d.]+).zip.asc\">",
+                    "url": "http://www.andre-simon.de/zip/download.php"
+                }
+            }
+        }
+    }
 }

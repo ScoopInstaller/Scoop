@@ -14,7 +14,7 @@
     },
     "extract_dir": "Files/7-Zip",
     "bin": "7z.exe",
-    "checkver": "Download 7-zip ([^\\ ]+)",
+    "checkver": "Download 7-Zip ([\\d.]+)",
     "autoupdate": {
         "architecture": {
             "64bit": {

@@ -1,11 +1,11 @@
 {
     "homepage": "https://github.com/docker/compose",
-    "version": "1.14.0",
+    "version": "1.16.0",
     "license": "Apache",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/docker/compose/releases/download/1.14.0/docker-compose-Windows-x86_64.exe#/docker-compose.exe",
-            "hash": "bfb8058aac1bf6f8b0e44b70e69dc89d89e4493a3ba43d3ec46b3aad54512da8"
+            "url": "https://github.com/docker/compose/releases/download/1.16.0/docker-compose-Windows-x86_64.exe#/docker-compose.exe",
+            "hash": "fbdcb99d6d69819ed13b917b31aaec06b50156a3835bbbb53903e8af04c9a79c"
         }
     },
     "bin": [

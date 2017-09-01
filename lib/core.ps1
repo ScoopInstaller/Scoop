@@ -76,6 +76,37 @@ function installed_apps($global) {
         gci $dir | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
     }
 }
+
+function app_status($app, $global) {
+    $status = @{}
+    $status.installed = (installed $app $global)
+    $status.version = current_version $app $global
+    $status.latest_version = $status.version
+
+    $install_info = install_info $app $status.version $global
+
+    $status.failed = (!$install_info -or !$status.version)
+
+    $manifest = manifest $app $install_info.bucket $install_info.url
+    $status.removed = (!$manifest)
+    if($manifest.version) {
+        $status.latest_version = $manifest.version
+    }
+
+    $status.outdated = $false
+    if($status.version -and $status.latest_version) {
+        $status.outdated = ((compare_versions $status.latest_version $status.version) -gt 0)
+    }
+
+    $status.missing_deps = @()
+    $deps = @(runtime_deps $manifest) | ? { !(installed $_) }
+    if($deps) {
+        $status.missing_deps += ,$deps
+    }
+
+    return $status
+}
+
 function appname_from_url($url) {
     (split-path $url -leaf) -replace '.json$', ''
 }
@@ -237,6 +268,26 @@ function ensure_architecture($architecture_opt) {
     }
 }
 
+function ensure_all_installed($apps, $global) {
+    $installed = @()
+    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | % {
+        $app = $_
+        if(installed $app $false) {
+            $installed += ,@($app, $false)
+        } elseif (installed $app $true) {
+            if($global) {
+                $installed += ,@($app, $true)
+            } else {
+                error "'$app' isn't installed for your account, but it is installed globally."
+                warn "Try again with the --global (or -g) flag instead."
+            }
+        } else {
+            error "'$app' isn't installed."
+        }
+    }
+    return ,$installed
+}
+
 function strip_path($orig_path, $dir) {
     $stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
     return ($stripped -ne $orig_path), $stripped
@@ -316,7 +367,9 @@ function reset_alias($name, $value) {
         return # already set
     }
     if($value -is [scriptblock]) {
-        new-item -path function: -name "script:$name" -value $value | out-null
+        if(!(test-path -path "function:script:$name")) {
+            new-item -path function: -name "script:$name" -value $value | out-null
+        }
         return
     }
 
@@ -335,6 +388,12 @@ function reset_aliases() {
 
     # set default aliases
     $default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
+}
+
+# convert list of apps to list of ($app, $global) tuples
+function applist($apps, $global) {
+    if(!$apps) { return @() }
+    return ,@($apps |% { ,@($_, $global) })
 }
 
 function app($app) {
@@ -362,6 +421,17 @@ function get_app_with_version([String] $app) {
         "app" = $name;
         "version" = if ($version) { $version } else { 'latest' }
     }
+}
+function is_scoop_outdated() {
+    $now = Get-Date
+    try {
+        $last_update = (Get-Date (get_config 'lastupdate')).ToLocalTime().AddHours(3)
+    } catch {
+        set_config 'lastupdate' $now
+        # remove 1 minute to force an update for the first time
+        $last_update = $now.AddMinutes(-1)
+    }
+    return $last_update -lt  $now.ToLocalTime()
 }
 
 function substitute([String] $str, [Hashtable] $params) {

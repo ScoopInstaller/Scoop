@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.postgresql.org/",
-    "version": "9.6.3",
+    "version": "9.6.5",
     "license": "https://www.postgresql.org/about/licence/",
     "architecture": {
         "64bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.3-1-windows-x64-binaries.zip",
-            "hash": "18b23b5811ed94e5653c1dc311d49e2ce8e93b9d45e33f4318d4b744fb758ee3"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.5-1-windows-x64-binaries.zip",
+            "hash": "42f40bfb1955a0823c0f42976e22cc2eec9215474308ef12dfaf8d19eac1c82b"
         },
         "32bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.3-1-windows-binaries.zip",
-            "hash": "675e360c78c96e498b3415258791ba2c8e3eb8d157f10b0f8189f20d0749417a"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.5-1-windows-binaries.zip",
+            "hash": "5af5bd716abaa29a7c513c7f69cb8b8c2b7de0173d71ae9fcba1d1e6c29c2da1"
         }
     },
     "extract_dir": "pgsql",

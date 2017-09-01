@@ -1,0 +1,50 @@
+{
+    "version": "4.3.21",
+    "license": "BSD",
+    "homepage": "https://conda.io/miniconda.html",
+    "checkver": {
+        "url": "https://repo.continuum.io/miniconda",
+        "re": "Miniconda3-([\\d.]+)-Windows"
+    },
+    "bin": [
+        [
+            "python.exe",
+            "python3"
+        ]
+    ],
+    "installer": {
+        "file": "miniconda3-installer.exe",
+        "args": [
+            "/S",
+            "/InstallationType=JustMe",
+            "/RegisterPython=1",
+            "/AddToPath=0",
+            "/D=$dir"
+        ]
+    },
+    "env_add_path": "Scripts",
+    "architecture": {
+        "64bit": {
+            "url": "https://repo.continuum.io/miniconda/Miniconda3-4.3.21-Windows-x86_64.exe#/miniconda3-installer.exe",
+            "hash": "md5:29000c7082bad516c5c5b92c180b6793"
+        },
+        "32bit": {
+            "url": "https://repo.continuum.io/miniconda/Miniconda3-4.3.21-Windows-x86.exe#/miniconda3-installer.exe",
+            "hash": "md5:4960b46179b69d2051c86eeeaafcfede"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://repo.continuum.io/miniconda/Miniconda3-$version-Windows-x86_64.exe#/miniconda3-installer.exe"
+            },
+            "32bit": {
+                "url": "https://repo.continuum.io/miniconda/Miniconda3-$version-Windows-x86.exe#/miniconda3-installer.exe"
+            }
+        },
+        "hash": {
+            "url": "$baseurl",
+            "find": "$basename<.*\\s+<.*\\s+<.*\\s+<td>([a-fA-F0-9]{32})</td>"
+        }
+    }
+}

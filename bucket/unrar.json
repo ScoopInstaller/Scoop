@@ -1,19 +1,21 @@
 {
-    "bin": "UnRAR.exe",
-    "checkver": {
-        "re": "<b>WinRAR\\s+x86\\s+\\(32\\s+bit\\)\\s+([\\d.]+)<",
-        "url": "http://www.rarlab.com/download.htm"
-    },
-    "description": "Uncompress RAR files",
-    "hash": "27293c101577320fafefc691af98d762361c23e62817ca340ce04a7bba892173",
     "homepage": "http://www.rarlab.com/",
+    "version": "5.50",
+    "license": "Freeware",
+    "url": "http://www.rarlab.com/rar/unrarw32.exe",
+    "hash": "bdd354b9b677a5dda154b56627398aef13b1445ae235406799acd6fbb6c72989",
+    "bin": "UnRAR.exe",
     "installer": {
         "args": [
             "-s",
             "-d$dir"
         ]
     },
-    "license": "Freeware",
-    "url": "http://www.rarlab.com/rar/unrarw32.exe",
-    "version": "5.40"
+    "checkver": {
+        "re": "<b>WinRAR\\s+x86\\s+\\(32\\s+bit\\)\\s+([\\d.]+)<",
+        "url": "http://www.rarlab.com/download.htm"
+    },
+    "autoupdate": {
+        "url": "http://www.rarlab.com/rar/unrarw32.exe"
+    }
 }
