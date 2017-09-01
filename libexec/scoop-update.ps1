@@ -93,7 +93,7 @@ function update_scoop() {
     success 'Scoop was updated successfully!'
 }
 
-function update($app, $global, $quiet = $false, $independent, $suggested) {
+function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true) {
     $old_version = current_version $app $global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -107,7 +107,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     if(!$independent) {
         # check dependencies
         $deps = @(deps $app $architecture) | ? { !(installed $_) }
-        $deps | % { install_app $_ $architecture $global $suggested }
+        $deps | % { install_app $_ $architecture $global $suggested $use_cache }
     }
 
     $version = latest_version $app $bucket $url
@@ -197,7 +197,7 @@ if(!$apps) {
 
     $suggested = @{};
     # # $outdated is a list of ($app, $global) tuples
-    $outdated | % { update @_ $quiet $independent $suggested }
+    $outdated | % { update @_ $quiet $independent $suggested $use_cache }
 }
 
 exit 0
