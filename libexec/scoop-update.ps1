@@ -132,7 +132,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     $manifest = manifest $app $bucket $url
 
     write-host "Updating '$app' ($old_version -> $version)"
-update
+
     $dir = versiondir $app $old_version $global
 
     write-host "Uninstalling '$app' ($old_version)"
