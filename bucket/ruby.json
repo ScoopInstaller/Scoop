@@ -24,7 +24,19 @@
     },
     "post_install": "cd $dir\\bin; ridk install",
     "checkver": {
-        "url": "https://rubyinstaller.org/downloads/",
-        "re": "ruby-([\\d.]+)-x64-mingw32.7z"
+        "github": "https://github.com/oneclick/rubyinstaller2",
+        "re": "/releases/tag/(?:v)?([\\d.]+(?:-[\\d])?)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/$version/rubyinstaller-$version-x64.7z",
+                "extract_dir": "rubyinstaller-$version-x64"
+            },
+            "32bit": {
+                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/$version/rubyinstaller-$version-x86.7z",
+                "extract_dir": "rubyinstaller-$version-x86"
+            }
+        }
     }
 }
