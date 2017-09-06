@@ -6,6 +6,9 @@
     "url": "https://services.gradle.org/distributions/gradle-4.1-bin.zip",
     "extract_dir": "gradle-4.1",
     "bin": "bin\\gradle.bat",
+    "env_set": {
+        "GRADLE_HOME": "$dir"
+    },
     "suggest": {
         "JDK": [
             "extras/oraclejdk",
