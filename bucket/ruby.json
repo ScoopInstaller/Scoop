@@ -22,7 +22,13 @@
         "GEM_HOME": "$dir\\gems",
         "GEM_PATH": "$dir\\gems"
     },
-    "post_install": "cd $dir\\bin; ridk install",
+    "suggest": {
+        "MSYS2": [
+            "msys2"
+        ]
+    },
+    "post_install": "gem install rake",
+    "notes": "Install MSYS2 via 'scoop install msys2' and then run 'ridk install' to install the toolchain!",
     "checkver": {
         "github": "https://github.com/oneclick/rubyinstaller2",
         "re": "/releases/tag/(?:v)?([\\d.]+(?:-[\\d])?)"
