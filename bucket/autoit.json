@@ -1,0 +1,33 @@
+{
+    "homepage": "https://www.autoitscript.com/site/autoit/",
+    "license": "https://www.autoitscript.com/autoit3/docs/license.htm",
+    "version": "3.3.14.2",
+    "url": "https://www.autoitscript.com/files/autoit3/autoit-v3.zip",
+    "hash": "44a2ba6b723cbc5eec389ea07ac43d696aeff01f0f1a62788aed1d1ce992a886",
+    "extract_dir": "install",
+    "architecture": {
+        "64bit": {
+            "bin": [
+                [
+                    "AutoIt3_x64.exe",
+                    "autoit"
+                ]
+            ]
+        },
+        "32bit": {
+            "bin": [
+                [
+                    "AutoIt3.exe",
+                    "autoit"
+                ]
+            ]
+        }
+    },
+    "checkver": {
+        "url": "https://www.autoitscript.com/site/autoit/downloads/",
+        "re": "Latest version:</strong> v([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "https://www.autoitscript.com/files/autoit3/autoit-v3.zip"
+    }
+}

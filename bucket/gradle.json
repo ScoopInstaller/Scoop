@@ -1,11 +1,14 @@
 {
-    "homepage": "http://www.gradle.org",
-    "version": "3.4",
+    "homepage": "https://gradle.org",
+    "version": "4.1",
     "license": "Apache 2.0",
-    "hash": "72d0cd4dcdd5e3be165eb7cd7bbd25cf8968baf400323d9ab1bba622c3f72205",
-    "url": "https://services.gradle.org/distributions/gradle-3.4-bin.zip",
-    "extract_dir": "gradle-3.4",
+    "hash": "d55dfa9cfb5a3da86a1c9e75bb0b9507f9a8c8c100793ccec7beb6e259f9ed43",
+    "url": "https://services.gradle.org/distributions/gradle-4.1-bin.zip",
+    "extract_dir": "gradle-4.1",
     "bin": "bin\\gradle.bat",
+    "env_set": {
+        "GRADLE_HOME": "$dir"
+    },
     "suggest": {
         "JDK": [
             "extras/oraclejdk",
@@ -13,7 +16,7 @@
         ]
     },
     "checkver": {
-        "url": "https://gradle.org/gradle-download/",
+        "url": "https://gradle.org/install/",
         "re": "The current Gradle release is version ([\\d.]+)"
     },
     "autoupdate": {

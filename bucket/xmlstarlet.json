@@ -1,0 +1,18 @@
+{
+    "autoupdate": {
+        "extract_dir": "xmlstarlet-$version",
+        "url": "https://sourceforge.net/projects/xmlstar/files/xmlstarlet/$version/xmlstarlet-$version-win32.zip"
+    },
+    "bin": "xml.exe",
+    "checkver": {
+        "re": "/files/latest/download\\?source=files\"\\s+title=\"/xmlstarlet/([\\d.]+)",
+        "url": "https://sourceforge.net/projects/xmlstar/files/"
+    },
+    "description": "Transform, query, validate, and edit XML files",
+    "extract_dir": "xmlstarlet-1.6.1",
+    "hash": "4ee3d767d9126308d6bcf7b7290e85614a83fe51a9d84e765b9b7f4359f79fce",
+    "homepage": "http://xmlstar.sourceforge.net/",
+    "license": "MIT",
+    "url": "https://sourceforge.net/projects/xmlstar/files/xmlstarlet/1.6.1/xmlstarlet-1.6.1-win32.zip",
+    "version": "1.6.1"
+}

@@ -13,18 +13,27 @@ param(
     [String]$dir,
     [Switch]$push = $false,
     [Switch]$request = $false,
-    [Switch]$help = $false
+    [Switch]$help = $false,
+    [string[]]$specialSnowflakes
 )
 
-if(!$dir) { $dir = "$psscriptroot\.." }
+if(!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir
 
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\json.ps1"
+. "$psscriptroot\..\lib\unix.ps1"
 
-if (!(scoop which hub)) {
-    Write-Host -f yellow "Please install hub (scoop install hub)"
-    exit 1
+if(is_unix) {
+    if (!(which hub)) {
+        Write-Host -f yellow "Please install hub ('brew install hub' or visit: https://hub.github.com/)"
+        exit 1
+    }
+} else {
+    if (!(scoop which hub)) {
+        Write-Host -f yellow "Please install hub 'scoop install hub'"
+        exit 1
+    }
 }
 
 if ((!$push -and !$request) -or $help) {
@@ -59,14 +68,15 @@ function execute($cmd) {
     return $output
 }
 
-function pull_requests($json, [String]$app, [String]$upstream)
+function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest)
 {
     $version = $json.version
     $homepage = $json.homepage
     $branch = "manifest/$app-$version"
 
     execute "hub checkout master"
-    execute "hub rev-parse --verify $branch"
+    Write-Host -f Green "hub rev-parse --verify $branch"
+    hub rev-parse --verify $branch
 
     if($LASTEXITCODE -eq 0) {
         Write-Host -f Yellow "Skipping update $app ($version) ..."
@@ -85,17 +95,19 @@ function pull_requests($json, [String]$app, [String]$upstream)
         execute "hub reset"
         return
     }
-
+    Start-Sleep 1
     Write-Host -f DarkCyan "Pull-Request update $app ($version) ..."
-    Write-Host -f green "hub pull-request -m '<msg>' -b '$upstream' -h $branch"
-    hub pull-request -m "Update $app to version $version`n`nHello lovely humans,`n
-a new version of [$app]($homepage) is available.
-<table>
-<tr><th align=left>State</th><td>Update :rocket:</td></tr>
-<tr><th align=left>New version</td><td>$version</td></tr>
-</table>" -b '$upstream' -h $branch
+    Write-Host -f green "hub pull-request -m '<msg>' -b '$upstream' -h '$branch'"
+    $msg = "Update $app to version $version`n`n"
+    $msg += "Hello lovely humans,`n"
+    $msg += "a new version of [$app]($homepage) is available.`n"
+    $msg += "<table>"
+    $msg += "<tr><th align=left>State</th><td>Update :rocket:</td></tr>"
+    $msg += "<tr><th align=left>New version</td><td>$version</td></tr>"
+    $msg += "</table>"
+    hub pull-request -m "$msg" -b '$upstream' -h '$branch'
     if($LASTEXITCODE -gt 0) {
-        Write-Host -f DarkRed "Pull Request failed! (hub pull-request -m 'update $app to version $version' -b '$upstream' -h $branch)"
+        Write-Host -f DarkRed "Pull Request failed! (hub pull-request -m 'Update $app to version $version' -b '$upstream' -h '$branch')"
         execute "hub reset"
         exit 1
     }
@@ -110,7 +122,13 @@ if($push -eq $true) {
     execute("hub push origin master")
 }
 
-. "$dir\bin\checkver.ps1" * -update
+. "$psscriptroot\checkver.ps1" * -update -dir $dir
+if($specialSnowflakes) {
+    write-host -f DarkCyan "Forcing update on our special snowflakes: $($specialSnowflakes -join ',')"
+    $specialSnowflakes -split ',' | % {
+        . "$psscriptroot\checkver.ps1" $_ -update -forceUpdate -dir $dir
+    }
+}
 
 hub diff --name-only | % {
     $manifest = $_
@@ -129,9 +147,17 @@ hub diff --name-only | % {
     if($push -eq $true) {
         Write-Host -f DarkCyan "Creating update $app ($version) ..."
         execute "hub add $manifest"
-        execute "hub commit -m 'Update $app to version $version'"
+
+        # detect if file was staged, because it's not when only LF or CRLF have changed
+        $status = iex "hub status --porcelain -uno"
+        $status = $status | select-object -first 1
+        if($status -and $status.StartsWith('M  ') -and $status.EndsWith("$app.json")) {
+            execute "hub commit -m 'Update $app to version $version'"
+        } else {
+            Write-Host -f Yellow "Skipping $app because only LF/CRLF changes were detected ..."
+        }
     } else {
-        pull_requests $json $app $upstream
+        pull_requests $json $app $upstream $manifest
     }
 }
 

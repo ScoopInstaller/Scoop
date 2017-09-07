@@ -1,6 +1,9 @@
 function git_proxy_cmd {
     $proxy = $(scoop config proxy)
-    $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&git $($args |% { "$_ " })"
+    $cmd = "git $($args |% { "$_ " })"
+    if($proxy) {
+        $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
+    }
     cmd /c $cmd
 }
 

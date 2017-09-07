@@ -1,0 +1,31 @@
+{
+    "architecture": {
+        "32bit": {
+            "hash": "3a4d634113ebf41c13a397cd201b5b84ccf41f9d34829eb57114fd098f1a47a4",
+            "url": "https://github.com/htacg/tidy-html5/releases/download/5.4.0/tidy-5.4.0-win32.zip"
+        },
+        "64bit": {
+            "hash": "b01d8382ef6da124298e797a4dcc0ca24060aa29fb5fd1b384b598600a1d78fe",
+            "url": "https://github.com/htacg/tidy-html5/releases/download/5.4.0/tidy-5.4.0-win64.zip"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "32bit": {
+                "url": "https://github.com/htacg/tidy-html5/releases/download/$version/tidy-$version-win32.zip"
+            },
+            "64bit": {
+                "url": "https://github.com/htacg/tidy-html5/releases/download/$version/tidy-$version-win64.zip"
+            }
+        }
+    },
+    "bin": "tidy.exe",
+    "checkver": {
+        "github": "https://github.com/htacg/tidy-html5"
+    },
+    "description": "Tidy HTML and XML files",
+    "extract_dir": "bin",
+    "homepage": "http://www.html-tidy.org/",
+    "license": "http://www.html-tidy.org/documentation/#license",
+    "version": "5.4.0"
+}

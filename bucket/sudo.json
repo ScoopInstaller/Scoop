@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "0.2014.07.18",
-    "url": "https://raw.githubusercontent.com/lukesampson/psutils/efcd212cf7/sudo.ps1",
-    "hash": "75fb610d079d6cd709f3fc103e58b582513e583638c467a539c820c2ed760ced",
+    "version": "0.2017.03.24",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/593af41c3c40153112cf9d428e8042ad1fec5dbc/sudo.ps1",
+    "hash": "c4baeeca6146c0ecef33842552e7f85c8c93fd51ae33f6a336d8345e35fa7b2e",
     "bin": "sudo.ps1"
 }

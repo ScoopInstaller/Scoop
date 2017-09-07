@@ -9,5 +9,9 @@
     "checkver": {
         "url": "http://nekovm.org/download",
         "re": "Neko ([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "http://nekovm.org/media/neko-$version-win.zip",
+        "extract_dir": "neko-$version-win"
     }
 }

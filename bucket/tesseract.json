@@ -1,0 +1,32 @@
+{
+    "homepage": "https://github.com/UB-Mannheim/tesseract/wiki",
+    "license": "Apache-2.0",
+    "version": "3.05.01",
+    "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.01.exe#/dl.7z",
+    "hash": "d4c9d3613ee9531cd093692636b58bc87f87a29a188783dbeb03b127e66fa6ba",
+    "bin": [
+        "ambiguous_words.exe",
+        "classifier_tester.exe",
+        "cntraining.exe",
+        "combine_tessdata.exe",
+        "dawg2wordlist.exe",
+        "mftraining.exe",
+        "set_unicharset_properties.exe",
+        "shapeclustering.exe",
+        "tesseract.exe",
+        "text2image.exe",
+        "unicharset_extractor.exe",
+        "wordlist2dawg.exe"
+    ],
+    "persist": [
+        "tessdata"
+    ],
+    "notes": "Language data files can be downloaded from https://github.com/tesseract-ocr/tessdata",
+    "checkver": {
+        "re": "tesseract-ocr-setup-(?<version>3.[\\d\\w.-]+).exe",
+        "url": "https://github.com/UB-Mannheim/tesseract/wiki"
+    },
+    "autoupdate": {
+        "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-$version.exe#/dl.7z"
+    }
+}

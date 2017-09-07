@@ -3,9 +3,10 @@ $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 $repo_files = @( Get-ChildItem $repo_dir -file -recurse -force )
 
 $project_file_exclusions = @(
-    $([regex]::Escape($repo_dir.fullname)+'\\.git\\.*$'),
+    $([regex]::Escape($repo_dir)+'(\\|/).git(\\|/).*$'),
     '.sublime-workspace$',
-    'supporting\\validator\\packages\\*'
+    '.DS_Store$',
+    'supporting(\\|/)validator(\\|/)packages(\\|/)*'
 )
 
 describe 'Project code' {
@@ -135,6 +136,9 @@ describe 'Style constraints for non-binary project files' {
             foreach ($file in $files)
             {
                 $content = Get-Content -raw $file.FullName
+                if(!$content) {
+                    throw "File contents are null: $($file.FullName)"
+                }
                 $lines = [regex]::split($content, '\r\n')
                 $lineCount = $lines.Count
 

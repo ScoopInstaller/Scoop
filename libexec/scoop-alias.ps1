@@ -57,7 +57,10 @@ $command
 }
 
 function rm_alias($name) {
-  $aliases = get_config $script:config_alias
+  $aliases = init_alias_config
+  if(!$name) {
+    abort "Which alias should be removed?"
+  }
 
   if($aliases.containskey($name)) {
     "Removing alias $name..."
@@ -67,15 +70,20 @@ function rm_alias($name) {
     $aliases.remove($name)
     set_config $script:config_alias $aliases
   }
-  else { abort "Alias $name doesn't exist" }
+  else { abort "Alias $name doesn't exist." }
 }
 
 function list_aliases {
   $aliases = @{}
-  (get_config $script:config_alias).getenumerator() |% {
+
+  (init_alias_config).getenumerator() |% {
     $summary = summary (gc (command_path $_.name) -raw)
     if(!($summary)) { $summary = '' }
     $aliases.add("$($_.name) ", $summary)
+  }
+
+  if(!$aliases.count) {
+    warn "No aliases founds."
   }
 
   $aliases.getenumerator() | sort name | ft -hidetablehead -autosize -wrap

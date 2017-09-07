@@ -1,23 +1,37 @@
 {
-    "homepage": "http://slproweb.com/products/Win32OpenSSL.html",
-    "version": "1.1.0d",
+    "homepage": "https://slproweb.com/products/Win32OpenSSL.html",
+    "version": "1.1.0f",
     "license": "https://www.openssl.org/source/license.html",
-    "_comment": "Hashes at https://slproweb.com/download/win32_openssl_hashes.json",
     "architecture": {
         "64bit": {
-            "url": "https://slproweb.com/download/Win64OpenSSL-1_1_0d.exe",
-            "hash": "71b4a8c2debfb91b13c9cb602af259eba07396e7b950962690a7af527b2cb3a3"
+            "url": "https://slproweb.com/download/Win64OpenSSL-1_1_0f.exe",
+            "hash": "sha512:fc91de3ee75f0aef586b7583080ec981f02d62be7bfbbdbd5abdd058df0f6264dff9587670e3266b6077761ab48166720bbe6560595f95830819655d0d615f8b"
         },
         "32bit": {
-            "url": "https://slproweb.com/download/Win32OpenSSL-1_1_0d.exe",
-            "hash": "18646d225c37d1f7b18d4b58a9a3337749b51955259e0ce162fe94aab208f311"
+            "url": "https://slproweb.com/download/Win32OpenSSL-1_1_0f.exe",
+            "hash": "sha512:c26a3f3947de5453459098bd042e74661999435060991d49ab207a62c10c7d0b9d26576532aeae943181c5d12c261df16a91bdfa341e5b8ffdcd2741d807ca88"
         }
     },
     "innosetup": true,
     "bin": "bin\\openssl.exe",
-    "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^\\s]+)</a>",
     "env_add_path": "bin",
-     "env_set": {
+    "env_set": {
         "OPENSSL_CONF": "$dir\\bin\\cnf\\openssl.cnf"
+    },
+    "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^\\s]+)</a>",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://slproweb.com/download/Win64OpenSSL-$underscoreVersion.exe"
+            },
+            "32bit": {
+                "url": "https://slproweb.com/download/Win32OpenSSL-$underscoreVersion.exe"
+            }
+        },
+        "hash": {
+            "mode": "json",
+            "jp": "$.files.$basename.sha512",
+            "url": "$baseurl/win32_openssl_hashes.json"
+        }
     }
 }

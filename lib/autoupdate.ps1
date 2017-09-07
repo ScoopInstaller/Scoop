@@ -4,49 +4,88 @@ TODO
  - tests (single arch, without hashes etc.)
  - clean up
 #>
+. "$psscriptroot\..\lib\json.ps1"
 
-function substitute([String] $str, [Hashtable] $params) {
-    $params.GetEnumerator() | % {
-        $str = $str.Replace($_.Name, $_.Value)
-    }
+. "$psscriptroot/core.ps1"
+. "$psscriptroot/json.ps1"
 
-    return $str
-}
-
-function check_url([String] $url) {
-    if ($url.Contains("github.com") -or
-        $url.Contains("nuget.org") -or
-        $url.Contains("chocolatey.org") -or
-        $url.Contains("bitbucket.org")) {
-        # github does not allow HEAD requests
-        warn "Unable to check github/nuget/chocolatey/bitbucket url (assuming it is ok)"
-        return $true
-    }
-
-    $response = Invoke-WebRequest -Uri $url -Method HEAD
-    if ($response.StatusCode.Equals(200)) { # redirects might be ok
-        return $true
-    }
-
-    return $false
-}
-
-function find_hash_in_rdf([String] $url, [String] $filename)
-{
+function find_hash_in_rdf([String] $url, [String] $filename) {
     Write-Host -f DarkYellow "RDF URL: $url"
     Write-Host -f DarkYellow "File: $filename"
 
-    # Download and parse RDF XML file
-    [xml]$data = (new-object net.webclient).downloadstring($url)
+    $data = ""
+    try {
+        # Download and parse RDF XML file
+        $wc = new-object net.webclient
+        $wc.headers.add('Referer', (strip_filename $url))
+        [xml]$data = $wc.downloadstring($url)
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return $null
+    }
 
     # Find file content
     $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
 
-    return $digest.sha256
+    return format_hash $digest.sha256
 }
 
-function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions)
-{
+function find_hash_in_textfile([String] $url, [String] $basename, [String] $regex) {
+    $hashfile = $null
+
+    try {
+        $wc = new-object net.webclient
+        $wc.headers.add('Referer', (strip_filename $url))
+        $hashfile = $wc.downloadstring($url)
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return
+    }
+
+    # find single line hash in $hashfile (will be overridden by $regex)
+    if ($regex.Length -eq 0) {
+        $normalRegex = "^([a-fA-F0-9]+)$"
+    } else {
+        $normalRegex = $regex
+    }
+
+    $normalRegex = substitute $normalRegex @{'$basename' = [regex]::Escape($basename)}
+    if ($hashfile -match $normalRegex) {
+        $hash = $matches[1]
+    }
+
+    # find hash with filename in $hashfile (will be overridden by $regex)
+    if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
+        $filenameRegex = "([a-fA-F0-9]+)\s+(?:\.\/|\*)?(?:`$basename)"
+        $filenameRegex = substitute $filenameRegex @{'$basename' = [regex]::Escape($basename)}
+        if ($hashfile -match $filenameRegex) {
+            $hash = $matches[1]
+        }
+    }
+
+    return format_hash $hash
+}
+
+function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath) {
+    $json = $null
+
+    try {
+        $wc = new-object net.webclient
+        $wc.headers.add('Referer', (strip_filename $url))
+        $json = $wc.downloadstring($url) | convertfrom-json -ea stop
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return
+    }
+
+    $hash = json_path $json $jsonpath $basename
+    return format_hash $hash
+}
+
+function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
     $hash = $null
 
     <#
@@ -56,39 +95,52 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     `download` Last resort, download the real file and hash it
     #>
     $hashmode = $config.mode
-    $basename = fname($url)
-    if ($hashmode -eq "extract") {
-        $hashfile_url = substitute $config.url @{'$url' = $url}
-        $hashfile_url = substitute $hashfile_url $substitutions
-        $hashfile = (new-object net.webclient).downloadstring($hashfile_url)
+    $basename = url_remote_filename($url)
 
-        $regex = $config.find
-        if ($regex -eq $null) {
-            $regex = "([a-z0-9]+)"
-        }
-        $regex = substitute $regex @{'$basename' = [regex]::Escape($basename)}
-
-        if ($hashfile -match $regex) {
-            $hash = $matches[1]
-
-            if ($config.type -and !($config.type -eq "sha256")) {
-                $hash = $config.type + ":$hash"
-            }
-
-            return $hash
-        }
-    } elseif ($hashmode -eq "rdf") {
-        return find_hash_in_rdf $config.url $basename
-    } else {
-        Write-Host "Download files to compute hashes!" -f DarkYellow
-        dl_with_cache $app $version $url $null $null $true
-        $file = fullpath (cache_path $app $version $url)
-        return compute_hash $file "sha256"
+    $hashfile_url = substitute $config.url @{
+        '$url' = (strip_fragment $url);
+        '$baseurl' = (strip_filename (strip_fragment $url)).TrimEnd('/')
+        '$basename' = $basename
     }
+    $hashfile_url = substitute $hashfile_url $substitutions
+    if($hashfile_url) { write-host -f yellow $hashfile_url }
+
+    if($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
+        $hashmode = "extract"
+    }
+
+    if ($hashmode -eq "extract") {
+        $hash = find_hash_in_textfile $hashfile_url $basename $config.find
+    }
+
+    if ($hashmode -eq "json") {
+        $hash = find_hash_in_json $hashfile_url $basename $config.jp
+    }
+
+    if ($hashmode -eq "rdf") {
+        $hash = find_hash_in_rdf $hashfile_url $basename
+    }
+
+    if($hash) {
+        # got one!
+        return $hash
+    } elseif($hashfile_url) {
+        write-host -f DarkYellow "Could not find hash in $hashfile_url"
+    }
+
+    Write-Host "Download files to compute hashes!" -f DarkYellow
+    try {
+        dl_with_cache $app $version $url $null $null $true
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return $null
+    }
+    $file = fullpath (cache_path $app $version $url)
+    return compute_hash $file "sha256"
 }
 
-function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null)
-{
+function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
     $json.version = $version
 
     if ($architecture -eq $null) {
@@ -111,8 +163,7 @@ function update_manifest_with_new_version($json, [String] $version, [String] $ur
     }
 }
 
-function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
-{
+function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions) {
     # first try the global property
     if ($json.$prop -and $json.autoupdate.$prop) {
         $json.$prop = substitute $json.autoupdate.$prop $substitutions
@@ -130,8 +181,7 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 }
 
-function get_version_substitutions([String] $version, [Hashtable] $matches)
-{
+function get_version_substitutions([String] $version, [Hashtable] $matches) {
     $firstPart = $version.Split('-') | Select-Object -first 1
     $lastPart = $version.Split('-') | Select-Object -last 1
     $versionVariables = @{
@@ -144,15 +194,16 @@ function get_version_substitutions([String] $version, [Hashtable] $matches)
         '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
         '$preReleaseVersion' = $lastPart;
     }
-    $matches.Remove(0)
-    $matches.GetEnumerator() | % {
-        $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+    if($matches) {
+        $matches.Remove(0)
+        $matches.GetEnumerator() | % {
+            $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+        }
     }
     return $versionVariables
 }
 
-function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $matches)
-{
+function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $matches) {
     Write-Host -f DarkCyan "Autoupdating $app"
     $has_changes = $false
     $has_errors = $false
@@ -161,19 +212,16 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
 
     if ($json.url) {
         # create new url
-        $url = substitute $json.autoupdate.url $substitutions
+        $url   = substitute $json.autoupdate.url $substitutions
+        $valid = $true
 
-        # check url
-        if (!(check_url $url)) {
-            $valid = $false
-            Write-Host -f DarkRed "URL $url is not valid"
-        }
-
-        # create hash
-        $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
-        if ($hash -eq $null) {
-            $valid = $false
-            Write-Host -f DarkRed "Could not find hash!"
+        if($valid) {
+            # create hash
+            $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
+            if ($hash -eq $null) {
+                $valid = $false
+                Write-Host -f DarkRed "Could not find hash!"
+            }
         }
 
         # write changes to the json object
@@ -182,7 +230,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             update_manifest_with_new_version $json $version $url $hash
         } else {
             $has_errors = $true
-            Write-Host -f DarkRed "Could not update $app"
+            throw "Could not update $app"
         }
     } else {
         $json.architecture | Get-Member -MemberType NoteProperty | % {
@@ -190,19 +238,16 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             $architecture = $_.Name
 
             # create new url
-            $url = substitute (arch_specific "url" $json.autoupdate $architecture) $substitutions
+            $url   = substitute (arch_specific "url" $json.autoupdate $architecture) $substitutions
+            $valid = $true
 
-            # check url
-            if (!(check_url $url)) {
-                $valid = $false
-                Write-Host -f DarkRed "URL $url is not valid"
-            }
-
-            # create hash
-            $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url $substitutions
-            if ($hash -eq $null) {
-                $valid = $false
-                Write-Host -f DarkRed "Could not find hash!"
+            if($valid) {
+                # create hash
+                $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url $substitutions
+                if ($hash -eq $null) {
+                    $valid = $false
+                    Write-Host -f DarkRed "Could not find hash!"
+                }
             }
 
             # write changes to the json object
@@ -211,7 +256,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
                 update_manifest_with_new_version $json $version $url $hash $architecture
             } else {
                 $has_errors = $true
-                Write-Host -f DarkRed "Could not update $app $architecture"
+                throw "Could not update $app $architecture"
             }
         }
     }
@@ -219,11 +264,14 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
     # update properties
     update_manifest_prop "extract_dir" $json $substitutions
 
+    # update license
+    update_manifest_prop "license" $json $substitutions
+
     if ($has_changes -and !$has_errors) {
         # write file
         Write-Host -f DarkGreen "Writing updated $app manifest"
 
-        $path = "$dir\$app.json"
+        $path = join-path $dir "$app.json"
 
         $file_content = $json | ConvertToPrettyJson
         [System.IO.File]::WriteAllLines($path, $file_content)

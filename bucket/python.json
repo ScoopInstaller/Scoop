@@ -1,18 +1,18 @@
 {
     "homepage": "https://www.python.org/",
     "license": "https://docs.python.org/3/license.html",
-    "version": "3.6.0",
+    "version": "3.6.2",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.6.0/python-3.6.0-amd64.exe#/py360.exe",
-            "hash": "md5:71c9d30c1110abf7f80a428970ab8ec2"
+            "url": "https://www.python.org/ftp/python/3.6.2/python-3.6.2-amd64.exe#/py3.exe",
+            "hash": "0322992c443889dd7435b67a1d9519511f0ec06b5ebbc64c15223922ae966d2e"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.6.0/python-3.6.0.exe#/py360.exe",
-            "hash": "md5:38d9b036b25725f6acb553d4aece4db4"
+            "url": "https://www.python.org/ftp/python/3.6.2/python-3.6.2.exe#/py3.exe",
+            "hash": "13725db4df084dcc1600716cb8cd150300f4420aaf48a2f21ce14b7aad0a2c13"
         }
     },
-    "pre_install": "copy-item $dir\\py360.exe $dir\\uninstall.exe",
+    "pre_install": "copy-item $dir\\py3.exe $dir\\uninstall.exe",
     "installer": {
         "args": [
             "/quiet",
@@ -25,14 +25,32 @@
     },
     "uninstaller": {
         "file": "uninstall.exe",
-        "args": [ "/uninstall", "/quiet", "InstallAllUsers=0"]
+        "args": [
+            "/uninstall",
+            "/quiet",
+            "InstallAllUsers=0"
+        ]
     },
     "bin": [
         "python.exe",
         "pythonw.exe",
-        [ "python.exe", "python3" ]
+        [
+            "python.exe",
+            "python3"
+        ]
     ],
-    "env_add_path": [ "scripts" ],
-    "checkver": "<p>Latest: <a href=\".*\">Python ([\\d.]+)</a> - <a.*>.*</a></p>"
+    "env_add_path": [
+        "scripts"
+    ],
+    "checkver": "<p>Latest: <a href=\".*\">Python ([\\d.]+)</a> - <a.*>.*</a></p>",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://www.python.org/ftp/python/$version/python-$version-amd64.exe#/py3.exe"
+            },
+            "32bit": {
+                "url": "https://www.python.org/ftp/python/$version/python-$version.exe#/py3.exe"
+            }
+        }
+    }
 }
-

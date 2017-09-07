@@ -1,43 +1,142 @@
-. "$psscriptroot\Scoop-TestLib.ps1"
 . "$psscriptroot\..\lib\core.ps1"
+. "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\unix.ps1"
+. "$psscriptroot\Scoop-TestLib.ps1"
 
-describe "travel_dir" {
-    beforeall {
-        $working_dir = setup_working "packages"
+$isUnix = is_unix
 
-        # copy packages from 1.0 to 1.1
-        $from = "$working_dir\1.0"
-        $to = "$working_dir\1.1"
-
-        travel_dir $from $to
+describe "ensure_architecture" {
+    it "should keep correct architectures" {
+        ensure_architecture "32bit" | Should be "32bit"
+        ensure_architecture "64bit" | Should be "64bit"
     }
 
-    it 'common directory remains unchanged in destination' {
-        "$to\common\version.txt" | should contain "version 1.1"
-        "$to\common with spaces\version.txt" | should contain "version 1.1"
+    it "should fallback to the default architecture on empty input" {
+        ensure_architecture "" | Should be $(default_architecture)
+        ensure_architecture $null | Should be $(default_architecture)
     }
 
-    it 'common directory remains unchanged in source' {
-        "$from\common" | should exist
-        "$from\common with spaces" | should exist
-        "$from\common\version.txt" | should contain "version 1.0"
-        "$from\common with spaces\version.txt" | should contain "version 1.0"
+    it "should show an error with an invalid architecture" {
+        Mock abort
+
+        ensure_architecture "PPC" | Should be $null
+        Assert-MockCalled abort -Times 1
+    }
+}
+
+describe "appname_from_url" {
+    it "should extract the correct name" {
+        appname_from_url "https://example.org/directory/foobar.json" | Should be "foobar"
+    }
+}
+
+describe "url_filename" {
+    it "should extract the real filename from an url" {
+        url_filename "http://example.org/foo.txt" | Should be "foo.txt"
+        url_filename "http://example.org/foo.txt?var=123" | Should be "foo.txt"
     }
 
-    it 'old package present in new' {
-        "$to\package_a" | should exist
+    it "can be tricked with a hash to override the real filename" {
+        url_filename "http://example.org/foo-v2.zip#/foo.zip" | Should be "foo.zip"
+    }
+}
+
+describe "url_remote_filename" {
+    it "should extract the real filename from an url" {
+        url_remote_filename "http://example.org/foo.txt" | Should be "foo.txt"
+        url_remote_filename "http://example.org/foo.txt?var=123" | Should be "foo.txt"
     }
 
-    it 'old package doesn''t remain in old' {
-        "$from\package_a" | should not exist
+    it "can not be tricked with a hash to override the real filename" {
+        url_remote_filename "http://example.org/foo-v2.zip#/foo.zip" | Should be "foo-v2.zip"
+    }
+}
+
+describe "is_in_dir" {
+    it "should work correctly" -skip:$isUnix {
+        is_in_dir "C:\test" "C:\foo" | Should be $false
+        is_in_dir "C:\test" "C:\test\foo\baz.zip" | Should be $true
+
+        is_in_dir "test" "$psscriptroot" | Should be $true
+        is_in_dir "$psscriptroot\..\" "$psscriptroot" | Should be $false
+    }
+}
+
+describe "env add and remove path" {
+    # test data
+    $manifest = @{
+        "env_add_path" = @("foo", "bar")
+    }
+    $testdir = join-path $psscriptroot "path-test-directory"
+    $global = $false
+
+    # store the original path to prevent leakage of tests
+    $origPath = $env:PATH
+
+    it "should concat the correct path" -skip:$isUnix {
+        mock add_first_in_path {}
+        mock remove_from_path {}
+
+        # adding
+        env_add_path $manifest $testdir $global
+        Assert-MockCalled add_first_in_path -Times 1 -ParameterFilter {$dir -like "$testdir\foo"}
+        Assert-MockCalled add_first_in_path -Times 1 -ParameterFilter {$dir -like "$testdir\bar"}
+
+        env_rm_path $manifest $testdir $global
+        Assert-MockCalled remove_from_path -Times 1 -ParameterFilter {$dir -like "$testdir\foo"}
+        Assert-MockCalled remove_from_path -Times 1 -ParameterFilter {$dir -like "$testdir\bar"}
+    }
+}
+
+describe "shim_def" {
+    it "should use strings correctly" {
+        $target, $name, $shimArgs = shim_def "command.exe"
+        $target | Should be "command.exe"
+        $name | Should be "command"
+        $shimArgs | Should be $null
     }
 
-    it 'old subdir in common dir not copied' {
-        "$to\common\subdir" | should not exist
+    it "should expand the array correctly" {
+        $target, $name, $shimArgs = shim_def @("foo.exe", "bar")
+        $target | Should be "foo.exe"
+        $name | Should be "bar"
+        $shimArgs | Should be $null
+
+        $target, $name, $shimArgs = shim_def @("foo.exe", "bar", "--test")
+        $target | Should be "foo.exe"
+        $name | Should be "bar"
+        $shimArgs | Should be "--test"
+    }
+}
+
+describe 'persist_def' {
+    it 'parses string correctly' {
+        $source, $target = persist_def "test"
+        $source | Should be "test"
+        $target | Should be "test"
     }
 
-    it 'common file remains unchanged in destination' {
-        "$to\common_file.txt" | should contain "version 1.1"
+    it 'should strip directories of source for target' {
+        $source, $target = persist_def "foo/bar"
+        $source | Should be "foo/bar"
+        $target | Should be "bar"
+    }
+
+    it 'should handle arrays' {
+        # both specified
+        $source, $target = persist_def @("foo", "bar")
+        $source | Should be "foo"
+        $target | Should be "bar"
+
+        # only first specified
+        $source, $target = persist_def @("foo")
+        $source | Should be "foo"
+        $target | Should be "foo"
+
+        # null value specified
+        $source, $target = persist_def @("foo", $null)
+        $source | Should be "foo"
+        $target | Should be "foo"
     }
 }

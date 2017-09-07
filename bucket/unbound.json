@@ -1,0 +1,54 @@
+{
+    "homepage": "https://unbound.net/",
+    "version": "1.6.5",
+    "license": "BSD",
+    "architecture": {
+        "64bit": {
+            "url": "https://unbound.net/downloads/unbound-1.6.5.zip",
+            "hash": "f035f2f6add79d46c59aba3e9a0eea817ae1473bc6aac2838f0aabec7ebc2c81"
+        },
+        "32bit": {
+            "url": "https://unbound.net/downloads/unbound-1.6.5-w32.zip",
+            "hash": "96b783745d84a6f385365b4fa2b404f47afc9c8d0d3d0a068ad88cfe9c0e5f38"
+        }
+    },
+    "bin": [
+        "unbound.ps1",
+        "create_unbound_ad_servers.cmd",
+        "unbound_cache.cmd",
+        "unbound-control-setup.cmd"
+    ],
+    "persist": "service.conf",
+    "suggest": {
+        "openssl": [
+            "openssl",
+            "openssl10x"
+        ],
+        "wget": [
+            "wget"
+        ]
+    },
+    "checkver": {
+        "url": "https://unbound.net/download.html",
+        "re": "\\(currently ([\\d.]+)\\)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://unbound.net/downloads/unbound-$version.zip"
+            },
+            "32bit": {
+                "url": "https://unbound.net/downloads/unbound-$version-w32.zip"
+            }
+        },
+        "hash": {
+            "url": "$url.sha256"
+        }
+    },
+    "pre_install": "echo \"if (`$args.count -eq 0) {`n `t`Start-Process -WorkingDirectory `\"`$psscriptroot`\" -f unbound.exe  -a '-c service.conf'-WindowStyle Hidden`n`tWrite-Host -F Green `\"Unbound started in background.``nRun 'ps -n unbound' to show the processes``nRun 'kill -n unbound' to stop the processes`\"`n} else {`n`t& `$psscriptroot @args `n}\" | out-file $dir\\unbound.ps1",
+    "post_install": "
+        (gc \"$dir\\create_unbound_ad_servers.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\create_unbound_ad_servers.cmd\"
+        (gc \"$dir\\unbound_cache.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound_cache.cmd\"
+        (gc \"$dir\\unbound-control-setup.cmd\").Replace('C:\\Program Files', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound-control-setup.cmd\"
+    "
+}

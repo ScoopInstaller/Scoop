@@ -1,0 +1,38 @@
+{
+    "homepage": "http://msys2.github.io",
+    "##": "64-bit version is able to build both 32-bit and 64-bit packages",
+    "version": "20161025",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-20161025.tar.xz",
+            "extract_dir": "msys64",
+            "hash": "bb1f1a0b35b3d96bf9c15092da8ce969a84a134f7b08811292fbc9d84d48c65d"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/msys2/files/Base/i686/msys2-base-i686-20161025.tar.xz",
+            "extract_dir": "msys32",
+            "hash": "8bafd3d52f5a51528a8671c1cae5591b36086d6ea5b1e76e17e390965cf6768f"
+        }
+    },
+    "bin": [
+        [
+            "msys2_shell.cmd",
+            "msys2"
+        ]
+    ],
+    "checkver": {
+        "re": "http://repo.msys2.org/distrib/x86_64/msys2-x86_64-(\\d+).exe"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-$version.tar.xz",
+                "extract_dir": "msys64"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/msys2/files/Base/i686/msys2-base-i686-$version.tar.xz",
+                "extract_dir": "msys32"
+            }
+        }
+    }
+}

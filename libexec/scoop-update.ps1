@@ -39,7 +39,7 @@ function update_scoop() {
     $git = try { gcm git -ea stop } catch { $null }
     if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    "Updating Scoop..."
+    write-host "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
         # load config
@@ -83,29 +83,31 @@ function update_scoop() {
     shim "$currentdir\bin\scoop.ps1" $false
 
     @(buckets) | % {
-        "Updating '$_' bucket..."
+        write-host "Updating '$_' bucket..."
         pushd (bucketdir $_)
         git_pull -q
         popd
     }
+
+    set_config 'lastupdate' (get-date)
     success 'Scoop was updated successfully!'
 }
 
-function update($app, $global, $quiet = $false, $independent, $suggested) {
+function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true) {
     $old_version = current_version $app $global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
     $check_hash = $true
 
     # re-use architecture, bucket and url from first install
-    $architecture = $install.architecture
+    $architecture = ensure_architecture $install.architecture
     $bucket = $install.bucket
     $url = $install.url
 
     if(!$independent) {
         # check dependencies
         $deps = @(deps $app $architecture) | ? { !(installed $_) }
-        $deps | % { install_app $_ $architecture $global $suggested }
+        $deps | % { install_app $_ $architecture $global $suggested $use_cache }
     }
 
     $version = latest_version $app $bucket $url
@@ -118,69 +120,35 @@ function update($app, $global, $quiet = $false, $independent, $suggested) {
     if(!$force -and ($old_version -eq $version)) {
         if (!$quiet) {
             warn "The latest version of '$app' ($version) is already installed."
-            "Run 'scoop update' to check for new versions."
         }
         return
     }
-    if(!$version) { abort "No manifest available for '$app'." } # installed from a custom bucket/no longer supported
+    if(!$version) {
+        # installed from a custom bucket/no longer supported
+        error "No manifest available for '$app'."
+        return
+    }
 
     $manifest = manifest $app $bucket $url
 
-    "Updating '$app' ($old_version -> $version)"
+    write-host "Updating '$app' ($old_version -> $version)"
 
     $dir = versiondir $app $old_version $global
 
-    "Uninstalling '$app' ($old_version)"
+    write-host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
     env_rm_path $old_manifest $dir $global
     env_rm $old_manifest $global
+
+    # If a junction was used during install, that will have been used
+    # as the reference directory. Otherwise it will just be the version
+    # directory.
+    $refdir = unlink_current $dir
+
     # note: keep the old dir in case it contains user files
 
-    "Installing '$app' ($version)"
-    $dir = ensure (versiondir $app $version $global)
-
-    # save info for uninstall
-    save_installed_manifest $app $bucket $dir $url
-    save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
-
-    if($manifest.suggest) {
-        $suggested[$app] = $manifest.suggest
-    }
-
-    $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
-    unpack_inno $fname $manifest $dir
-    pre_install $manifest $architecture
-    run_installer $fname $manifest $architecture $dir $global
-    ensure_install_dir_not_in_path $dir
-    $dir = link_current $dir
-    create_shims $manifest $dir $global $architecture
-    env_add_path $manifest $dir $global
-    env_set $manifest $dir $global
-    post_install $manifest $architecture
-
-    success "'$app' was updated from $old_version to $version."
-
-    show_notes $manifest
-}
-
-function ensure_all_installed($apps, $global) {
-    $app = $apps | ? { !(installed $_ $global) } | select -first 1 # just get the first one that's not installed
-    if($app) {
-        if(installed $app (!$global)) {
-            function wh($g) { if($g) { "globally" } else { "for your account" } }
-            write-host "'$app' isn't installed $(wh $global), but it is installed $(wh (!$global))." -f darkred
-            "Try updating $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead."
-            exit 1
-        } else {
-            abort "'$app' isn't installed."
-        }
-    }
-}
-
-# convert list of apps to list of ($app, $global) tuples
-function applist($apps, $global) {
-    return ,@($apps |% { ,@($_, $global) })
+    install_app $app $architecture $global $suggested $use_cache
 }
 
 if(!$apps) {
@@ -196,20 +164,40 @@ if(!$apps) {
         'ERROR: You need admin rights to update global apps.'; exit 1
     }
 
-    if($apps -eq '*') {
+    if(is_scoop_outdated) {
+        update_scoop
+    }
+    $outdated = @()
+    $apps_param = $apps
+
+    if($apps_param -eq '*') {
         $apps = applist (installed_apps $false) $false
         if($global) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        ensure_all_installed $apps $global
-        $apps = applist $apps $global
+        $apps = ensure_all_installed $apps_param $global
+    }
+    if($apps) {
+        $apps | % {
+            ($app, $global) = $_
+            $status = app_status $app $global
+            if($status.outdated) {
+                $outdated += applist $app $global
+                write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
+            } elseif($apps_param -ne '*') {
+                write-host -f green "$app`: $($status.version) (latest version)"
+            }
+        }
+
+        if($outdated.Length -gt 1) { write-host -f DarkCyan "Updating $($outdated.Length) outdated apps:" }
+        elseif($outdated.Length -eq 0) { write-host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'" }
+        else { write-host -f DarkCyan "Updating one outdated app:" }
     }
 
     $suggested = @{};
-
-    # $apps is now a list of ($app, $global) tuples
-    $apps | % { update @_ $quiet $independent $suggested }
+    # # $outdated is a list of ($app, $global) tuples
+    $outdated | % { update @_ $quiet $independent $suggested $use_cache }
 }
 
 exit 0

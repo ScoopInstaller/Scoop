@@ -32,9 +32,9 @@ echo 'Downloading...'
 dl $zipurl $zipfile
 
 'Extracting...'
-unzip $zipfile "$dir\_scoop_extract"
-cp "$dir\_scoop_extract\scoop-master\*" $dir -r -force
-rm "$dir\_scoop_extract" -r -force
+unzip $zipfile "$dir\_tmp"
+cp "$dir\_tmp\scoop-master\*" $dir -r -force
+rm "$dir\_tmp" -r -force
 rm $zipfile
 
 echo 'Creating shim...'

@@ -1,0 +1,31 @@
+{
+    "version": "1.3.0",
+    "license": "MIT",
+    "url": "https://win.rustup.rs/?version=1.3.0#/rustup-init.exe",
+    "hash": "9df0222a746c8c0dee9941536ae5b51f12d70e639d79ca15f788c6f01c09a367",
+    "depends": "vcredist2015",
+    "homepage": "https://github.com/rust-lang-nursery/rustup.rs",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://win.rustup.rs/?version=$version#/rustup-init.exe"
+    },
+    "persist": [
+        ".cargo",
+        ".rustup"
+    ],
+    "env_add_path": ".cargo\\bin",
+    "env_set": {
+        "CARGO_HOME": "$persist_dir\\.cargo",
+        "RUSTUP_HOME": "$persist_dir\\.rustup"
+    },
+    "installer": {
+        "script": "
+            # Create environment variables for this process
+            [Environment]::SetEnvironmentVariable('CARGO_HOME', \"$persist_dir\\.cargo\", 'Process')
+            [Environment]::SetEnvironmentVariable('RUSTUP_HOME', \"$persist_dir\\.rustup\", 'Process')
+
+            # Install Rustup
+            & \"$dir\\rustup-init.exe\" -y --no-modify-path
+        "
+    }
+}

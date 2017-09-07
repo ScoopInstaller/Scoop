@@ -4,6 +4,9 @@
     "url": "http://files.genshin.org/apngasm/apngasm-cli.7z",
     "hash": "cebb7eab13d56b5ade45ef50abd16bae4b63a5505192f032593ad67c1d1f2e2c",
     "bin": [
-        [ "apngasm-cli.exe", "apngasm" ]
+        [
+            "apngasm-cli.exe",
+            "apngasm"
+        ]
     ]
 }

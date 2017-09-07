@@ -1,0 +1,35 @@
+{
+    "homepage": "https://jetbrains.com/",
+    "version": "1.4.2492",
+    "license": "https://www.jetbrains.com/store/license.html",
+    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.4.2492.exe",
+    "hash": "d5c1673a2a259e73020076ab46cb238932c53bd376562ca670c7145ffb0206a7",
+    "installer": {
+        "args": [
+            "/S",
+            "/D=$dir"
+        ]
+    },
+    "uninstaller": {
+        "file": "Uninstall.exe",
+        "args": [
+            "/S"
+        ]
+    },
+    "bin": [
+        "jetbrains-toolbox.exe"
+    ],
+    "persist": "apps",
+    "checkver": {
+        "url": "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release",
+        "re": "jetbrains-toolbox-([\\d.]+).exe"
+    },
+    "autoupdate": {
+        "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-$version.exe",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    },
+    "post_install": "$las=\"$Env:LOCALAPPDATA\\Jetbrains\\Toolbox\\.settings.json\"; if(Test-Path \"$las\") {(gc \"$las\") -join \"`n\"| ConvertFrom-Json | Add-Member -Force @{install_location=\"$dir\";intellij_platform=($architecture -eq '64bit')} -P | ConvertToPrettyJson | sc \"$las\"}",
+    "notes": "Set 'Install Location' to $dir to persist the installed apps"
+}

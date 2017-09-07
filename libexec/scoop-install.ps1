@@ -14,6 +14,7 @@
 # Options:
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 #   -i, --independent         Don't install dependencies automatically
+#   -k, --no-cache            Don't use the download cache
 #   -g, --global              Install the app globally
 
 . "$psscriptroot\..\lib\core.ps1"
@@ -44,11 +45,12 @@ function ensure_not_installed($app, $global) {
     }
 }
 
-$opt, $apps, $err = getopt $args 'gia:' 'global', 'independent', 'arch='
+$opt, $apps, $err = getopt $args 'gika:' 'global', 'independent', 'no-cache', 'arch='
 if($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 $independent = $opt.i -or $opt.independent
+$use_cache = !($opt.k -or $opt.'no-cache')
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
 if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
@@ -57,9 +59,36 @@ if($global -and !(is_admin)) {
     'ERROR: you need admin rights to install global apps'; exit 1
 }
 
+if(is_scoop_outdated) {
+    scoop update
+}
+
 if($apps.length -eq 1) {
     ensure_not_installed $apps $global
 }
+
+# get any specific versions that we need to handle first
+$specific_versions = $apps | Where-Object { is_app_with_specific_version $_ }
+
+# compare object does not like nulls
+if ($specific_versions.length -gt 0) {
+    $difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
+} else {
+    $difference = $apps
+}
+
+$specific_versions_paths = $specific_versions | ForEach-Object {
+    $appWithVersion = get_app_with_version $_
+    $name           = $appWithVersion.app
+    $version        = $appWithVersion.version
+
+    if (installed_manifest $name $version) {
+        abort "'$name' ($version) is already installed.`nUse 'scoop update $name$global_flag' to install a new version."
+    }
+
+    generate_user_manifest $name $version
+}
+$apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-Object -Unique)
 
 # remember which were explictly requested so that we can
 # differentiate after dependencies are added
@@ -75,7 +104,7 @@ $apps, $skip = prune_installed $apps $global
 $skip | ? { $explicit_apps -contains $_} | % { warn "$_ is already installed. Skipping." }
 
 $suggested = @{};
-$apps | % { install_app $_ $architecture $global $suggested }
+$apps | % { install_app $_ $architecture $global $suggested $use_cache }
 
 show_suggestions $suggested
 

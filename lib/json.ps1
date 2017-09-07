@@ -86,3 +86,35 @@ Function ConvertToPrettyJson {
         $output
     }
 }
+
+function json_path([Object] $json, [String] $jsonpath, [String] $basename) {
+    $result = $json
+    $isJsonPath = $jsonpath.StartsWith("`$")
+    $jsonpath.split(".") | ForEach-Object {
+        $el = $_
+
+        # substitute the base filename into the jsonpath
+        if($el.Contains("`$basename")) {
+            $el = $el.Replace("`$basename", $basename)
+        }
+
+        # skip $ if it's jsonpath format
+        if($el -eq "`$" -and $isJsonPath) {
+            return
+        }
+
+        # array detection
+        if($el -match "^(?<property>\w+)?\[(?<index>\d+)\]$") {
+            $property = $matches['property']
+            if($property) {
+                $result = $result.$property[$matches['index']]
+            } else {
+                $result = $result[$matches['index']]
+            }
+            return
+        }
+
+        $result = $result.$el
+    }
+    return $result
+}

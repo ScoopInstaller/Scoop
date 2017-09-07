@@ -1,8 +1,27 @@
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\unix.ps1"
 . "$psscriptroot\Scoop-TestLib.ps1"
 
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
+$isUnix = is_unix
+
+describe "is_directory" {
+    beforeall {
+        $working_dir = setup_working "is_directory"
+    }
+
+    it "is_directory recognize directories" {
+        is_directory "$working_dir\i_am_a_directory" | Should be $true
+    }
+    it "is_directory recognize files" {
+        is_directory "$working_dir\i_am_a_file.txt" | Should be $false
+    }
+
+    it "is_directory is falsey on unknown path" {
+        is_directory "$working_dir\i_do_not_exist" | Should be $false
+    }
+}
 
 describe "movedir" {
     $extract_dir = "subdir"
@@ -12,33 +31,33 @@ describe "movedir" {
         $working_dir = setup_working "movedir"
     }
 
-    it "moves directories with no spaces in path" {
+    it "moves directories with no spaces in path" -skip:$isUnix {
         $dir = "$working_dir\user"
-        movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
+        movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
         "$dir\test.txt" | should contain "this is the one"
-        "$dir\_scoop_extract\$extract_dir" | should not exist
+        "$dir\_tmp\$extract_dir" | should not exist
     }
 
-    it "moves directories with spaces in path" {
+    it "moves directories with spaces in path" -skip:$isUnix {
         $dir = "$working_dir\user with space"
-        movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
+        movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
         "$dir\test.txt" | should contain "this is the one"
-        "$dir\_scoop_extract\$extract_dir" | should not exist
+        "$dir\_tmp\$extract_dir" | should not exist
 
         # test trailing \ in from dir
-        movedir "$dir\_scoop_extract\$null" "$dir\another"
+        movedir "$dir\_tmp\$null" "$dir\another"
         "$dir\another\test.txt" | should contain "testing"
-        "$dir\_scoop_extract" | should not exist
+        "$dir\_tmp" | should not exist
     }
 
-    it "moves directories with quotes in path" {
+    it "moves directories with quotes in path" -skip:$isUnix {
         $dir = "$working_dir\user with 'quote"
-        movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
+        movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
         "$dir\test.txt" | should contain "this is the one"
-        "$dir\_scoop_extract\$extract_dir" | should not exist
+        "$dir\_tmp\$extract_dir" | should not exist
     }
 }
 
@@ -50,7 +69,11 @@ describe "unzip_old" {
     function test-unzip($from) {
         $to = strip_ext $from
 
-        unzip_old $from $to
+        if(is_unix) {
+            unzip_old ($from -replace '\\','/') ($to -replace '\\','/')
+        } else {
+            unzip_old ($from -replace '/','\') ($to -replace '/','\')
+        }
 
         $to
     }
@@ -59,7 +82,7 @@ describe "unzip_old" {
         $zerobyte = "$working_dir\zerobyte.zip"
         $zerobyte | should exist
 
-        it "unzips file with zero bytes without error" {
+        it "unzips file with zero bytes without error" -skip:$isUnix {
             # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
             # `$to = test-unzip $zerobyte` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
             $to = ([string](test-unzip $zerobyte)).trimStart()
@@ -77,7 +100,7 @@ describe "unzip_old" {
         $small = "$working_dir\small.zip"
         $small | should exist
 
-        it "unzips file which is small in size" {
+        it "unzips file which is small in size" -skip:$isUnix {
             # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
             # `$to = test-unzip $small` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
             $to = ([string](test-unzip $small)).trimStart()
@@ -101,7 +124,7 @@ describe "shim" {
         $(ensure_in_path $shimdir) | out-null
     }
 
-    it "links a file onto the user's path" {
+    it "links a file onto the user's path" -skip:$isUnix {
         { get-command "shim-test" -ea stop } | should throw
         { get-command "shim-test.ps1" -ea stop } | should throw
         { get-command "shim-test.cmd" -ea stop } | should throw
@@ -115,7 +138,7 @@ describe "shim" {
     }
 
     context "user with quote" {
-        it "shims a file with quote in path" {
+        it "shims a file with quote in path" -skip:$isUnix {
             { get-command "shim-test" -ea stop } | should throw
             { shim-test } | should throw
 
@@ -137,7 +160,7 @@ describe "rm_shim" {
         $(ensure_in_path $shimdir) | out-null
     }
 
-    it "removes shim from path" {
+    it "removes shim from path" -skip:$isUnix {
         shim "$working_dir\shim-test.ps1" $false "shim-test"
 
         rm_shim "shim-test" $shimdir
@@ -158,7 +181,7 @@ describe "ensure_robocopy_in_path" {
     }
 
     context "robocopy is not in path" {
-        it "shims robocopy when not on path" {
+        it "shims robocopy when not on path" -skip:$isUnix {
             mock gcm { $false }
             gcm robocopy | should be $false
 
@@ -173,7 +196,7 @@ describe "ensure_robocopy_in_path" {
     }
 
     context "robocopy is in path" {
-        it "does not shim robocopy when it is in path" {
+        it "does not shim robocopy when it is in path" -skip:$isUnix {
             mock gcm { $true }
             ensure_robocopy_in_path
 

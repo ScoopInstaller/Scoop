@@ -1,12 +1,21 @@
 {
-    "version": "2016.3",
+    "version": "2017.2.0",
     "homepage": "https://www.jetbrains.com/resharper/download/index.html#section=resharper-clt",
     "license": "https://www.jetbrains.com/resharper/buy/command_line_license.html",
-    "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.2016.3.20161223.160402.zip",
-    "hash": "280a785fa07b37c5b2acfc6a4fcb7e9d02a531649e65cc02c246f181ed015804",
-    "bin": ["dupfinder.exe", "inspectcode.exe"],
+    "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.2017.2.0.zip",
+    "hash": "dc88f680eba4a4e3d72737000ab8f47e8f6c94f11d74b5913a4c5ab11b34ed3c",
+    "bin": [
+        "dupfinder.exe",
+        "inspectcode.exe"
+    ],
     "checkver": {
-      "url": "https://www.jetbrains.com/help/resharper/Introduction__Whats_New.html",
-      "re": "<h2>ReSharper/ReSharper\\s+C\\+\\+\\s+((\\d+\\.*)+)</h2>"
+        "url": "https://data.services.jetbrains.com/products/releases?code=RSCLT&latest=true&type=release",
+        "re": "JetBrains.ReSharper.CommandLineTools.([\\d.]+).zip"
+    },
+    "autoupdate": {
+        "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.$version.zip",
+        "hash": {
+            "url": "$url.sha256"
+        }
     }
 }

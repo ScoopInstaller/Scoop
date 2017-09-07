@@ -1,10 +1,10 @@
 {
     "homepage": "https://www.scala-lang.org/",
-    "version": "2.12.1",
+    "version": "2.12.3",
     "license": "BSD 3-Clause",
-    "url": "https://downloads.typesafe.com/scala/2.12.1/scala-2.12.1.zip",
-    "hash": "bc71d2b6650c5617d248f3ffbbea54aef25e2899b96408bd3a043854e54f0a36",
-    "extract_dir": "scala-2.12.1",
+    "url": "https://downloads.typesafe.com/scala/2.12.3/scala-2.12.3.zip",
+    "hash": "41b9cfb0c03fd4fa3950b6a82c95c15cf51b1c481d1a8465423d40bfe14246e9",
+    "extract_dir": "scala-2.12.3",
     "bin": [
         "bin\\fsc.bat",
         "bin\\scala.bat",
@@ -16,11 +16,14 @@
         "SCALA_HOME": "$dir"
     },
     "suggest": {
-        "JDK": [ "extras/oraclejdk", "openjdk" ]
+        "JDK": [
+            "extras/oraclejdk",
+            "openjdk"
+        ]
     },
     "checkver": {
         "url": "https://www.scala-lang.org/download/",
-        "re": "Download Scala ([\\d.]+)"
+        "re": "scala-([\\d.]+).zip"
     },
     "autoupdate": {
         "url": "https://downloads.typesafe.com/scala/$version/scala-$version.zip",

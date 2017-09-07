@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.postgresql.org/",
-    "version": "9.6.2",
+    "version": "9.6.5",
     "license": "https://www.postgresql.org/about/licence/",
     "architecture": {
         "64bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.2-1-windows-x64-binaries.zip",
-            "hash": "4eb6e22384505f8d71caad1e21830e2ddde7ae8b7ccfcb245e978df1ad435b1a"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.5-1-windows-x64-binaries.zip",
+            "hash": "42f40bfb1955a0823c0f42976e22cc2eec9215474308ef12dfaf8d19eac1c82b"
         },
         "32bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.2-1-windows-binaries.zip",
-            "hash": "1b508e509e5e94bc7560b202ba41bfe09c66e094825da3318a3ca5540387f8c8"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.5-1-windows-binaries.zip",
+            "hash": "5af5bd716abaa29a7c513c7f69cb8b8c2b7de0173d71ae9fcba1d1e6c29c2da1"
         }
     },
     "extract_dir": "pgsql",
@@ -46,7 +46,10 @@
         "bin\\pg_upgrade.exe",
         "bin\\pg_xlogdump.exe",
         "pgAdmin 4\\bin\\pgAdmin4.exe",
-        ["pgAdmin 4\\bin\\pgAdmin4.exe", "pgadmin"],
+        [
+            "pgAdmin 4\\bin\\pgAdmin4.exe",
+            "pgadmin"
+        ],
         "bin\\pgbench.exe",
         "bin\\postgres.exe",
         "bin\\psql.exe",

@@ -1,39 +1,48 @@
 {
-    "homepage": "http://nodejs.org",
-    "version": "6.10.0",
+    "homepage": "https://nodejs.org",
+    "version": "6.11.3",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v6.10.0/node-v6.10.0-x64.msi",
-            "hash": "0fd99472edd0ef518ac557c24c037f83f4c82341348a2b397d51410550b6217c"
+            "url": "https://nodejs.org/dist/v6.11.3/node-v6.11.3-win-x64.7z",
+            "hash": "a767bca7033cbbde3294080728b564145ac4fbf13f408a9070d9b5acc5c56068",
+            "extract_dir": "node-v6.11.3-win-x64"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v6.10.0/node-v6.10.0-x86.msi",
-            "hash": "65add5aebb209705dacc8462a5376dcb612e19b3f2af1ce1e8a0c7e1c95e3e81"
+            "url": "https://nodejs.org/dist/v6.11.3/node-v6.11.3-win-x86.7z",
+            "hash": "59e1dd9dbd312cb16a3a2c1a549625c8d5352d1465d91f47889818beeafa625b",
+            "extract_dir": "node-v6.11.3-win-x86"
         }
     },
-    "env_add_path": "nodejs",
+    "persist": [
+        "bin",
+        "cache"
+    ],
+    "env_add_path": [
+        ".",
+        "bin"
+    ],
     "post_install": "
-# Remove npmrc that makes global modules get installed in AppData\\Roaming\\npm
-rm $dir\\nodejs\\node_modules\\npm\\npmrc
-npm update -g",
+        # Set npm prefix to install modules inside bin and npm cache so they persist
+        Set-Content -Value \"prefix=$persist_dir\\bin`ncache=$persist_dir\\cache\" -Path $dir\\node_modules\\npm\\npmrc
+    ",
     "checkver": {
         "url": "https://nodejs.org/en/download/",
-        "re": "LTS version: <strong>v([\\d.]+)</strong>"
+        "re": "LTS Version: <strong>v([\\d.]+)</strong>"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://nodejs.org/dist/v$version/node-v$version-x64.msi"
+                "url": "https://nodejs.org/dist/v$version/node-v$version-win-x64.7z",
+                "extract_dir": "node-v$version-win-x64"
             },
             "32bit": {
-                "url": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+                "url": "https://nodejs.org/dist/v$version/node-v$version-win-x86.7z",
+                "extract_dir": "node-v$version-win-x86"
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "https://nodejs.org/dist/v$version/SHASUMS256.txt.asc",
-            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+            "url": "$baseurl/SHASUMS256.txt.asc"
         }
     }
 }

@@ -1,21 +1,29 @@
 {
     "homepage": "https://maven.apache.org/",
-    "version": "3.3.9",
+    "version": "3.5.0",
     "license": "Apache 2.0",
-    "url": "https://archive.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip",
-    "hash": "bb37146a67d067069754c775b9c9f03b52da953261981738de963057023cda3a",
-    "extract_dir": "apache-maven-3.3.9",
-    "bin": [
-        "bin\\mvn.cmd"
-    ],
+    "url": "https://archive.apache.org/dist/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.zip",
+    "hash": "sha1:886393e7031d42c412a077c240af73d75e671d62",
+    "extract_dir": "apache-maven-3.5.0",
+    "env_add_path": "bin",
     "env_set": {
         "M2_HOME": "$dir"
     },
     "suggest": {
-        "JDK": [ "extras/oraclejdk", "openjdk" ]
+        "JDK": [
+            "extras/oraclejdk",
+            "openjdk"
+        ]
     },
     "checkver": {
         "url": "https://maven.apache.org/download.cgi",
         "re": "Apache Maven ([\\d.]+) is the latest release"
+    },
+    "autoupdate": {
+        "url": "https://archive.apache.org/dist/maven/maven-$majorVersion/$version/binaries/apache-maven-$version-bin.zip",
+        "extract_dir": "apache-maven-$version",
+        "hash": {
+            "url": "$url.sha1"
+        }
     }
 }

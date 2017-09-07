@@ -1,0 +1,27 @@
+{
+    "homepage": "https://github.com/asciimoo/wuzz",
+    "version": "0.4.0",
+    "license": "AGPL-3.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/asciimoo/wuzz/releases/download/v0.4.0/wuzz_windows_amd64.exe#/wuzz.exe",
+            "hash": "d9b060a8ca5e7b6328e7d479bd2701ebb7cb32de0cfbcf2ee167b12a6f20536e"
+        },
+        "32bit": {
+            "url": "https://github.com/asciimoo/wuzz/releases/download/v0.4.0/wuzz_windows_386.exe#/wuzz.exe",
+            "hash": "fb8d7d0ad77b7f3d6a5de02ddd905bb66e302b7b4301fdbf002c8f5536899db6"
+        }
+    },
+    "bin": "wuzz.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/asciimoo/wuzz/releases/download/v$version/wuzz_windows_amd64.exe#/wuzz.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/asciimoo/wuzz/releases/download/v$version/wuzz_windows_386.exe#/wuzz.exe"
+            }
+        }
+    }
+}

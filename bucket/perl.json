@@ -1,23 +1,37 @@
 {
     "homepage": "http://strawberryperl.com",
-    "version": "5.24.0.1",
+    "version": "5.26.0.2",
     "license": "GPL",
     "architecture": {
         "32bit": {
-            "url": "http://strawberryperl.com/download/5.24.0.1/strawberry-perl-5.24.0.1-32bit-portable.zip",
-            "hash": "29CECD3CF448799C9BFF5D3647ED703729C42332931C093525582BA053CD6543"
+            "url": "http://strawberryperl.com/download/5.26.0.2/strawberry-perl-5.26.0.2-32bit-portable.zip",
+            "hash": "5ec5fb173221b40fcc6311db60d478f4f363b606168d0356b28c6033f2740ead"
         },
         "64bit": {
-            "url": "http://strawberryperl.com/download/5.24.0.1/strawberry-perl-5.24.0.1-64bit-portable.zip",
-            "hash": "98330F799134F1693BAA3C20CF4092DEC957DF89F7A26C7D0AF3232B0141B388"
+            "url": "http://strawberryperl.com/download/5.26.0.2/strawberry-perl-5.26.0.2-64bit-portable.zip",
+            "hash": "588ca52f8a95f4f953c0d78379ba565de229be8a48000dc477c2450d0a066eae"
         }
     },
-    "post_install":"
+    "post_install": "
         # enable standard idiomatic access to user's home directory
         ## remove HomeDir section from portable.perl (disables Portable.pm override of File::HomeDir)
         ## NOTE: conversion to byte[] avoids adding an extra trailing newline to the output file
         [byte[]][char[]]((Get-Content -raw $dir\\portable.perl) -replace \"(?ms)^HomeDir:.*?^(?=\\S)\",\"\") | Set-Content $dir\\portable.perl -encoding byte
     ",
-    "env_add_path": [ "perl\\site\\bin", "perl\\bin", "c\\bin" ],
-    "checkver": "Recommended version:<\/b><\/p>\\s*<a href=\"\\/download\\/([^\\/]+)\\/strawberry-perl-[\\d.]+-64bit.msi"
+    "env_add_path": [
+        "perl\\site\\bin",
+        "perl\\bin",
+        "c\\bin"
+    ],
+    "checkver": "Recommended version:</b></p>\\s*<a href=\"\\/download\\/([^\\/]+)\\/strawberry-perl-[\\d.]+-64bit.msi",
+    "autoupdate": {
+        "architecture": {
+            "32bit": {
+                "url": "http://strawberryperl.com/download/$version/strawberry-perl-$version-32bit-portable.zip"
+            },
+            "64bit": {
+                "url": "http://strawberryperl.com/download/$version/strawberry-perl-$version-64bit-portable.zip"
+            }
+        }
+    }
 }

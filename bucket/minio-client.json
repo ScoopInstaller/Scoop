@@ -1,0 +1,39 @@
+{
+    "homepage": "https://minio.io/",
+    "license": "https://github.com/minio/mc/blob/master/LICENSE",
+    "version": "2017-06-15T03-38-43Z",
+    "bin": "mc.exe",
+    "architecture": {
+        "64bit": {
+            "url": "https://dl.minio.io/client/mc/release/windows-amd64/mc.RELEASE.2017-06-15T03-38-43Z#/mc.exe",
+            "hash": "sha1:06df9c6d3bc5fc69329428b6d3b80f1fa7615e4c"
+        },
+        "32bit": {
+            "url": "https://dl.minio.io/client/mc/release/windows-386/mc.RELEASE.2017-06-15T03-38-43Z#/mc.exe",
+            "hash": "sha1:5c13e9017304c2525251197a71eeec69a591801f"
+        }
+    },
+    "suggest": {
+        "minio": "minio"
+    },
+    "checkver": {
+        "github": "https://github.com/minio/mc",
+        "re": "releases/tag/RELEASE.([\\d-]+T[\\d-]+Z)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://dl.minio.io/client/mc/release/windows-amd64/mc.RELEASE.$version#/mc.exe",
+                "hash": {
+                    "url": "$baseurl/mc.shasum"
+                }
+            },
+            "32bit": {
+                "url": "https://dl.minio.io/client/mc/release/windows-386/mc.RELEASE.$version#/mc.exe",
+                "hash": {
+                    "url": "$baseurl/mc.shasum"
+                }
+            }
+        }
+    }
+}
