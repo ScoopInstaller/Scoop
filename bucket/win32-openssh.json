@@ -2,7 +2,7 @@
     "homepage": "https://github.com/PowerShell/Win32-OpenSSH",
     "version": "0.0.20.0",
     "license": "https://raw.githubusercontent.com/PowerShell/Win32-OpenSSH/L1-Prod/LICENCE",
-    "hash": "40D389036432AE06CFBA2A3992E545FD24108E458792A1FBAB2E94D3A647C0C6",
+    "hash": "40d389036432ae06cfba2a3992e545fd24108e458792a1fbab2e94d3a647c0c6",
     "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v0.0.20.0/OpenSSH-Win32.zip",
     "extract_dir": "OpenSSH-Win32",
     "bin": [
@@ -17,6 +17,7 @@
         "ssh.exe",
         "sshd.exe"
     ],
+    "notes": "This is a pre-release (non-production ready)",
     "checkver": {
         "github": "https://github.com/PowerShell/Win32-OpenSSH"
     },
