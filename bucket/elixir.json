@@ -4,11 +4,8 @@
     "depends": "erlang",
     "url": "https://github.com/elixir-lang/elixir/releases/download/v1.5.1/Precompiled.zip",
     "hash": "84af6eb4cb68d0f60b3edf4e275eb024f8eb8cccae91b18c2bbbc4b70a88934f",
-    "bin": [
-        "bin\\elixir.bat",
-        "bin\\elixirc.bat",
-        "bin\\iex.bat",
-        "bin\\mix.bat"
+    "env_add_path": [
+        "bin"
     ],
     "checkver": {
         "github": "https://github.com/elixir-lang/elixir"
