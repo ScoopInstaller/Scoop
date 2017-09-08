@@ -1,15 +1,15 @@
 {
     "homepage": "https://geoff.greer.fm/ag/",
     "license": "Apache 2.0",
-    "version": "2.1.0",
+    "version": "2.1.0-1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-08-26%2F2.1.0/ag-2017-08-26_2.1.0-x64.zip",
-            "hash": "d0809d23e975cff53739e21fef3f4fdf4b4bb044903cc1b7cb7473cc16a88472"
+            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-08-31%2F2.1.0-1/ag-2017-08-31_2.1.0-1-x64.zip",
+            "hash": "2f0b83e705d6224df82be92014726875bec925c6b56ef84170d1f19eddfaa439"
         },
         "32bit": {
-            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-08-26%2F2.1.0/ag-2017-08-26_2.1.0-x86.zip",
-            "hash": "a4f518526b51e48d36d11136067d04e6904556fa07bf55292aae215d14f7ce9c"
+            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-08-31%2F2.1.0-1/ag-2017-08-31_2.1.0-1-x86.zip",
+            "hash": "28456a424a30b12be3be2b9d427bc67031bc436f87f1100607cfa9a44c1af95d"
         }
     },
     "bin": "ag.exe",
