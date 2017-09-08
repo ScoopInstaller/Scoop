@@ -20,6 +20,8 @@
             "msys2"
         ]
     ],
+    "env_add_path": ".",
+    "notes": "Please run 'msys2' now for the MSYS2 setup to complete!",
     "checkver": {
         "re": "http://repo.msys2.org/distrib/x86_64/msys2-x86_64-(\\d+).exe"
     },
