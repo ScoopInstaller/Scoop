@@ -13,5 +13,18 @@
         }
     },
     "bin": "ag.exe",
-    "checkver": "the_silver_searcher-([\\d.]+).tar.gz"
+    "checkver": {
+        "url": "https://github.com/k-takata/the_silver_searcher-win32/releases",
+        "re": "/releases/tag/(?<date>[\\d-]+)%2F(?<version>[\\d.-]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/$matchDate%2F$version/ag-$matchDate_$version-x64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/$matchDate%2F$version/ag-$matchDate_$version-x86.zip"
+            }
+        }
+    }
 }
