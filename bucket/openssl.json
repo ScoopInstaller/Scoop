@@ -30,7 +30,7 @@
         },
         "hash": {
             "mode": "json",
-            "jp": "$.files.$basename.sha512",
+            "jp": "$.files.['$basename'].sha512",
             "url": "$baseurl/win32_openssl_hashes.json"
         }
     }
