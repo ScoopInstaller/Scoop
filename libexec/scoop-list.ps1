@@ -17,8 +17,7 @@ $global = installed_apps $true | % { @{ name = $_; global = $true } }
 $apps = @($local) + @($global)
 
 if($apps) {
-    echo "Installed apps$(if($query) { `" matching '$query'`"}):
-"
+    write-host "Installed apps$(if($query) { `" matching '$query'`"}): `n"
     $apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
         $app = $_.name
         $global = $_.global
@@ -37,11 +36,11 @@ if($apps) {
         } else {
             $arch = ''
         }
-        "  $app ($ver)$global_display$bucket$arch"
+        write-host "  $app ($ver)$global_display$bucket$arch"
     }
-    ""
+    write-host ''
     exit 0
 } else {
-    "There aren't any apps installed."
+    write-host "There aren't any apps installed."
     exit 1
 }
