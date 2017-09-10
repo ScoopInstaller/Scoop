@@ -34,6 +34,19 @@ $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
 
+# load config
+$repo = $(scoop config SCOOP_REPO)
+if(!$repo) {
+    $repo = "https://github.com/lukesampson/scoop"
+    scoop config SCOOP_REPO "$repo"
+}
+
+$branch = $(scoop config SCOOP_BRANCH)
+if(!$branch) {
+    $branch = "master"
+    scoop config SCOOP_BRANCH "$branch"
+}
+
 function update_scoop() {
     # check for git
     $git = try { gcm git -ea stop } catch { $null }
@@ -42,19 +55,6 @@ function update_scoop() {
     write-host "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
-        # load config
-        $repo = $(scoop config SCOOP_REPO)
-        if(!$repo) {
-            $repo = "https://github.com/lukesampson/scoop"
-            scoop config SCOOP_REPO "$repo"
-        }
-
-        $branch = $(scoop config SCOOP_BRANCH)
-        if(!$branch) {
-            $branch = "master"
-            scoop config SCOOP_BRANCH "$branch"
-        }
-
         $newdir = fullpath $(versiondir 'scoop' 'new')
 
         # get git scoop
@@ -89,7 +89,7 @@ function update_scoop() {
         popd
     }
 
-    set_config 'lastupdate' (get-date)
+    scoop config lastupdate (get-date)
     success 'Scoop was updated successfully!'
 }
 
