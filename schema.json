@@ -201,6 +201,10 @@
                         "jp": {
                             "pattern": "^\\$\\..*$",
                             "type": "string"
+                        },
+                        "reverse": {
+                            "description": "Reverse the order of regex matches",
+                            "type": "boolean"
                         }
                     },
                     "type": "object"

@@ -195,9 +195,10 @@ function get_version_substitutions([String] $version, [Hashtable] $matches) {
         '$preReleaseVersion' = $lastPart;
     }
     if($matches) {
-        $matches.Remove(0)
         $matches.GetEnumerator() | % {
-            $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+            if($_.Name -ne "0") {
+                $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+            }
         }
     }
     return $versionVariables
