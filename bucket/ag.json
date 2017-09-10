@@ -4,11 +4,11 @@
     "version": "2.1.0-1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-08-31%2F2.1.0-1/ag-2017-08-31_2.1.0-1-x64.zip",
+            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-08-31/2.1.0-1/ag-2017-08-31_2.1.0-1-x64.zip",
             "hash": "2f0b83e705d6224df82be92014726875bec925c6b56ef84170d1f19eddfaa439"
         },
         "32bit": {
-            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-08-31%2F2.1.0-1/ag-2017-08-31_2.1.0-1-x86.zip",
+            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-08-31/2.1.0-1/ag-2017-08-31_2.1.0-1-x86.zip",
             "hash": "28456a424a30b12be3be2b9d427bc67031bc436f87f1100607cfa9a44c1af95d"
         }
     },
@@ -20,10 +20,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/$matchDate%2F$version/ag-$matchDate_$version-x64.zip"
+                "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/$matchDate/$version/ag-$matchDate_$version-x64.zip"
             },
             "32bit": {
-                "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/$matchDate%2F$version/ag-$matchDate_$version-x86.zip"
+                "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/$matchDate/$version/ag-$matchDate_$version-x86.zip"
             }
         }
     }
