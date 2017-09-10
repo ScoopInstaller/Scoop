@@ -10,10 +10,7 @@ TODO
 . "$psscriptroot/json.ps1"
 
 function find_hash_in_rdf([String] $url, [String] $filename) {
-    Write-Host -f DarkYellow "RDF URL: $url"
-    Write-Host -f DarkYellow "File: $filename"
-
-    $data = ""
+    $data = $null
     try {
         # Download and parse RDF XML file
         $wc = new-object net.webclient
@@ -103,32 +100,46 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         '$basename' = $basename
     }
     $hashfile_url = substitute $hashfile_url $substitutions
-    if($hashfile_url) { write-host -f yellow $hashfile_url }
+    if($hashfile_url) {
+        write-host -f DarkYellow 'Searching hash for ' -NoNewline
+        write-host -f Green $(url_remote_filename $url) -NoNewline
+        write-host -f DarkYellow ' in ' -NoNewline
+        write-host -f Green $hashfile_url
+    }
 
     if($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
-        $hashmode = "extract"
+        $hashmode = 'extract'
     }
 
-    if ($hashmode -eq "extract") {
+    if ($config.jp.Length -gt 0) {
+        $hashmode = 'json'
+    }
+
+    if ($hashmode -eq 'extract') {
         $hash = find_hash_in_textfile $hashfile_url $basename $config.find
     }
-
-    if ($hashmode -eq "json") {
+    if ($hashmode -eq 'json') {
         $hash = find_hash_in_json $hashfile_url $basename $config.jp
     }
 
-    if ($hashmode -eq "rdf") {
+    if ($hashmode -eq 'rdf') {
         $hash = find_hash_in_rdf $hashfile_url $basename
     }
 
     if($hash) {
         # got one!
+        write-host -f DarkYellow 'Found: ' -NoNewline
+        write-host -f Green $hash -NoNewline
+        write-host -f DarkYellow ' using ' -NoNewline
+        write-host -f Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
         return $hash
     } elseif($hashfile_url) {
         write-host -f DarkYellow "Could not find hash in $hashfile_url"
     }
 
-    Write-Host "Download files to compute hashes!" -f DarkYellow
+    write-host -f DarkYellow 'Downloading ' -NoNewline
+    write-host -f Green $(url_remote_filename $url) -NoNewline
+    write-host -f DarkYellow ' to compute hashes!'
     try {
         dl_with_cache $app $version $url $null $null $true
     } catch [system.net.webexception] {
@@ -137,7 +148,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         return $null
     }
     $file = fullpath (cache_path $app $version $url)
-    return compute_hash $file "sha256"
+    $hash = compute_hash $file 'sha256'
+    write-host -f DarkYellow 'Computed hash: ' -NoNewline
+    write-host -f Green $hash
+    return $hash
 }
 
 function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
