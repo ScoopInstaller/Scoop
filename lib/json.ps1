@@ -87,8 +87,23 @@ Function ConvertToPrettyJson {
     }
 }
 
-function json_path([Object] $json, [String] $jsonpath, [String] $basename) {
-    $result = $json
+Add-Type -Path "$psscriptroot\..\supporting\validator\Newtonsoft.Json.dll"
+
+function json_path([String] $json, [String] $jsonpath, [String] $basename) {
+    $jsonpath = $jsonpath.Replace("`$basename", $basename)
+    $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)
+    $result = $null
+    try {
+        $result = $obj.SelectToken($jsonpath, $true)
+    } catch [System.Management.Automation.MethodInvocationException] {
+        write-host -f DarkRed $_
+        return $null
+    }
+    return $result.ToString()
+}
+
+function json_path_legacy([String] $json, [String] $jsonpath, [String] $basename) {
+    $result = $json | ConvertFrom-Json -ea stop
     $isJsonPath = $jsonpath.StartsWith("`$")
     $jsonpath.split(".") | ForEach-Object {
         $el = $_

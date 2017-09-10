@@ -136,7 +136,10 @@ while($in_progress -gt 0) {
     }
 
     if($jsonpath) {
-        $ver = json_path ($page | ConvertFrom-Json -ea stop) $jsonpath
+        $ver = json_path $page $jsonpath
+        if(!$ver) {
+            $ver = json_path_legacy $page $jsonpath
+        }
         if(!$ver) {
             write-host -f darkred "couldn't find '$jsonpath' in $url"
             continue

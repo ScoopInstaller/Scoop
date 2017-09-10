@@ -71,14 +71,16 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
     try {
         $wc = new-object net.webclient
         $wc.headers.add('Referer', (strip_filename $url))
-        $json = $wc.downloadstring($url) | convertfrom-json -ea stop
+        $json = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
         return
     }
-
     $hash = json_path $json $jsonpath $basename
+    if(!$hash) {
+        $hash = json_path_legacy $json $jsonpath $basename
+    }
     return format_hash $hash
 }
 
