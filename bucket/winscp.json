@@ -1,0 +1,30 @@
+{
+    "homepage": "http://winscp.net/",
+    "license": "http://winscp.net/eng/docs/license",
+    "version": "5.11.1",
+    "url": "https://sourceforge.net/projects/winscp/files/WinSCP/5.11.1/WinSCP-5.11.1-Portable.zip",
+    "hash": "cf2cb0fda0d6e8473e5d50717e130b3cbd8efe2bced404ce35eb00503e7296a3",
+    "bin": [
+        "WinSCP.exe"
+    ],
+    "persist": "winscp.ini",
+    "pre_install": "
+if (!(Test-Path \"$persist_dir\\winscp.ini\")) {
+    New-Item $dir\\winscp.ini -type file
+    write-output \"[Configuration\\Interface]`r`nRandomSeedFile=.\\winscp.rnd\" | Out-File -encoding \"ASCII\" $dir\\winscp.ini
+}
+    ",
+    "checkver": {
+        "url": "http://winscp.net/eng/download.php",
+        "re": "<h3>WinSCP\\s+([\\d.]+(?:-[\\d])?)</h3>"
+    },
+    "autoupdate": {
+        "url": "http://winscp.net/download/WinSCP-$version-Portable.zip"
+    },
+    "shortcuts": [
+        [
+            "WinSCP.exe",
+            "WinSCP"
+        ]
+    ]
+}
