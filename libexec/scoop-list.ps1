@@ -22,21 +22,22 @@ if($apps) {
         $app = $_.name
         $global = $_.global
         $ver = current_version $app $global
-        $global_display = $null; if($global) { $global_display = ' *global*'}
 
         $install_info = install_info $app $ver $global
-        $bucket = ''
+        write-host "  $app " -NoNewline
+        write-host -f DarkCyan $ver -NoNewline
+        if($global) {
+            write-host -f DarkRed ' *global*' -NoNewline
+        }
         if ($install_info.bucket) {
-            $bucket = ' [' + $install_info.bucket + ']'
+            write-host -f Yellow " [$($install_info.bucket)]" -NoNewline
         } elseif ($install_info.url) {
-            $bucket = ' [' + $install_info.url + ']'
+            write-host -f Yellow " [$($install_info.url)]" -NoNewline
         }
         if ($install_info.architecture -and $def_arch -ne $install_info.architecture) {
-            $arch = ' {' + $install_info.architecture + '}'
-        } else {
-            $arch = ''
+            write-host -f DarkRed " {$($install_info.architecture)}" -NoNewline
         }
-        write-host "  $app ($ver)$global_display$bucket$arch"
+        write-host ''
     }
     write-host ''
     exit 0
