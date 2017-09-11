@@ -182,7 +182,7 @@ if(!$apps) {
         $apps | % {
             ($app, $global) = $_
             $status = app_status $app $global
-            if($status.outdated) {
+            if($force -or $status.outdated) {
                 $outdated += applist $app $global
                 write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
             } elseif($apps_param -ne '*') {
