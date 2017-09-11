@@ -87,9 +87,8 @@ Function ConvertToPrettyJson {
     }
 }
 
-Add-Type -Path "$psscriptroot\..\supporting\validator\Newtonsoft.Json.dll"
-
 function json_path([String] $json, [String] $jsonpath, [String] $basename) {
+    Add-Type -Path "$psscriptroot\..\supporting\validator\Newtonsoft.Json.dll"
     $jsonpath = $jsonpath.Replace("`$basename", $basename)
     $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)
     $result = $null
