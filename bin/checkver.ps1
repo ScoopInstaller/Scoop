@@ -153,7 +153,7 @@ while($in_progress -gt 0) {
             $match = [regex]::matches($page, $regexp) | select-object -first 1
         }
 
-        if($match.Success) {
+        if($match -and $match.Success) {
             $matchesHashtable = @{}
             $match.Groups | % { $matchesHashtable.Add($_.Name, $_.Value) }
             $ver = $matchesHashtable['1']
