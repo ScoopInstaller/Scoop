@@ -1,9 +1,9 @@
 {
     "homepage": "https://haxe.org/",
-    "version": "3.4.2",
+    "version": "3.4.3",
     "license": "https://haxe.org/foundation/open-source.html",
-    "url": "https://github.com/HaxeFoundation/haxe/releases/download/3.4.2/haxe-3.4.2-win.zip",
-    "hash": "cd915176d5785bcddab7d703f9a84adefa0a9d6883cbed11faf5538328a7d995",
+    "url": "https://github.com/HaxeFoundation/haxe/releases/download/3.4.3/haxe-3.4.3-win.zip",
+    "hash": "0ac0b4115ff2a551c8784bdc415f2355a392e866aff61f17cb116539fcf55f93",
     "bin": [
         "haxe.exe",
         "haxelib.exe"
