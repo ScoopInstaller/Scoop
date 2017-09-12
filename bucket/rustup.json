@@ -3,7 +3,7 @@
     "license": "MIT",
     "url": "https://win.rustup.rs/?version=1.3.0#/rustup-init.exe",
     "hash": "9df0222a746c8c0dee9941536ae5b51f12d70e639d79ca15f788c6f01c09a367",
-    "depends": "vcredist2015",
+    "depends": "extras/vcredist2015",
     "homepage": "https://github.com/rust-lang-nursery/rustup.rs",
     "checkver": "github",
     "autoupdate": {
