@@ -148,14 +148,14 @@ while($in_progress -gt 0) {
 
     if($regexp) {
         if($reverse) {
-            $matches = [regex]::matches($page, $regexp) | select-object -last 1
+            $match = [regex]::matches($page, $regexp) | select-object -last 1
         } else {
-            $matches = [regex]::matches($page, $regexp) | select-object -first 1
+            $match = [regex]::matches($page, $regexp) | select-object -first 1
         }
 
-        if($matches.Success) {
+        if($match.Success) {
             $matchesHashtable = @{}
-            $matches.groups | % { $matchesHashtable.Add($_.Name, $_.Value) }
+            $match.Groups | % { $matchesHashtable.Add($_.Name, $_.Value) }
             $ver = $matchesHashtable['1']
             if(!$ver) {
                 $ver = $matchesHashtable['version']
