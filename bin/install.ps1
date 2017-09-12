@@ -4,12 +4,18 @@
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 $erroractionpreference='stop' # quit if anything goes wrong
 
+if(($PSVersionTable.PSVersion.Major) -lt 3) {
+    Write-Output "PowerShell 3 or greater is required to run Scoop."
+    Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
+    exit 1
+}
+
 # show notification to change execution policy:
 if((get-executionpolicy) -gt 'RemoteSigned') {
     "PowerShell requires an execution policy of 'RemoteSigned' to run Scoop."
     "To make this change please run:"
     "'Set-ExecutionPolicy RemoteSigned -scope CurrentUser'"
-    break
+    exit 1
 }
 
 # get core functions
@@ -44,3 +50,4 @@ ensure_robocopy_in_path
 ensure_scoop_in_path
 success 'Scoop was installed successfully!'
 echo "Type 'scoop help' for instructions."
+exit 0
