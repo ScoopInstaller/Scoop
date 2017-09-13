@@ -1,7 +1,7 @@
 {
     "homepage": "https://yarnpkg.com/",
     "license": "BSD",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "suggest": {
         "Node.js": [
             "nodejs",
@@ -11,8 +11,8 @@
             "nvm"
         ]
     },
-    "url": "https://yarnpkg.com/downloads/1.0.1/yarn-1.0.1.msi",
-    "hash": "325411d8532d8bc1fd57f7dd196dd27e50f1b687d315240401c970d1dc32b172",
+    "url": "https://yarnpkg.com/downloads/1.0.2/yarn-1.0.2.msi",
+    "hash": "da2461d6596a61df634de8b45914030fcb6b4c37a43a1dda469cdef55eeaadb9",
     "persist": [
         "cache",
         "bin"
