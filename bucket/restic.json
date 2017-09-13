@@ -1,15 +1,15 @@
 {
     "homepage": "https://restic.github.io/",
-    "version": "0.7.1",
+    "version": "0.7.2",
     "license": "https://github.com/restic/restic/blob/master/LICENSE",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/restic/restic/releases/download/v0.7.1/restic_0.7.1_windows_amd64.zip",
-            "hash": "c4d482a820b74e2788c333002d3096db0dfef028613ab17a09f5ab890c6bf139"
+            "url": "https://github.com/restic/restic/releases/download/v0.7.2/restic_0.7.2_windows_amd64.zip",
+            "hash": "e0dca6ebd175563726b1a7f83614b53194a8945421241b3b2fba18784bc4db7a"
         },
         "32bit": {
-            "url": "https://github.com/restic/restic/releases/download/v0.7.1/restic_0.7.1_windows_386.zip",
-            "hash": "1168ce177424cc161a8d74f572ac2103104a92b1d2a46adabb79e00ec0a3f2b2"
+            "url": "https://github.com/restic/restic/releases/download/v0.7.2/restic_0.7.2_windows_386.zip",
+            "hash": "b17778908c7e0b879b79b4aadf2dc28e9361e555fb68b35243c325b390628eed"
         }
     },
     "bin": "restic.exe",
