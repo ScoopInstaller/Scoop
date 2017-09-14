@@ -149,9 +149,9 @@ while($in_progress -gt 0) {
     if($regexp) {
         $regex = new-object System.Text.RegularExpressions.Regex($regexp)
         if($reverse) {
-            $match = $regex::matches($page, $regexp) | select-object -last 1
+            $match = $regex.matches($page) | select-object -last 1
         } else {
-            $match = $regex::matches($page, $regexp) | select-object -first 1
+            $match = $regex.matches($page) | select-object -first 1
         }
 
         if($match -and $match.Success) {
