@@ -84,7 +84,7 @@ $queue | % {
         $jsonpath = $json.checkver.jp
     }
 
-    if ($json.checkver.replace) {
+    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
         $replace = $json.checkver.replace
     }
 
