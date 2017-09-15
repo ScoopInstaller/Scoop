@@ -27,7 +27,7 @@ describe "add_alias" {
       $alias_file | should exist
 
       add_alias "rm" "test"
-      $alias_file | should contain ""
+      $alias_file | should FileContentMatch ""
     }
   }
 }
