@@ -173,7 +173,7 @@ while($in_progress -gt 0) {
             if ($replace) {
                 $ver = $regex.replace($match.Value, $replace)
             }
-            if (!$ver) {
+            if(!$ver) {
                 $ver = $matchesHashtable['version']
             }
         } else {
