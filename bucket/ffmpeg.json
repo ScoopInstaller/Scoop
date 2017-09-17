@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20170915-6743351-win64-static.zip",
-            "hash": "0307d094e70e7811937c3f075602e9cba2cbf38dbb4c63a09c8800360ee21432",
+            "hash": "142cd2e39d2794b5ef783d3a9ec673a9f88e129e84ff32cad2d98258f7809d07",
             "extract_dir": "ffmpeg-20170915-6743351-win64-static"
         },
         "32bit": {
