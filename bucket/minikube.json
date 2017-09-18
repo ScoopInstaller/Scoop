@@ -1,11 +1,11 @@
 {
     "homepage": "https://kubernetes.io/docs/getting-started-guides/minikube/",
     "license": "https://github.com/kubernetes/minikube/blob/master/LICENSE",
-    "version": "0.22.1",
+    "version": "0.22.2",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/minikube/releases/v0.22.1/minikube-windows-amd64.exe",
-            "hash": "fc86f53768b6f77b425bcb330de7f5b6fe541ff96796228a4567b183b04793af"
+            "url": "https://storage.googleapis.com/minikube/releases/v0.22.2/minikube-windows-amd64.exe",
+            "hash": "fffa980120ab40716fc83f525bc230574cd636581126b9473bd50ea9a40c89e4"
         }
     },
     "bin": [
