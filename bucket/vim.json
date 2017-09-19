@@ -25,9 +25,6 @@
     "checkver": {
         "github": "https://github.com/vim/vim-win32-installer"
     },
-    "env_set": {
-        "VIM": "$dir"
-    },
     "autoupdate": {
         "architecture": {
             "32bit": {
