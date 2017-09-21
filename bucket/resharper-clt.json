@@ -1,9 +1,9 @@
 {
-    "version": "2017.2.0",
+    "version": "2017.2.1",
     "homepage": "https://www.jetbrains.com/resharper/download/index.html#section=resharper-clt",
     "license": "https://www.jetbrains.com/resharper/buy/command_line_license.html",
-    "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.2017.2.0.zip",
-    "hash": "dc88f680eba4a4e3d72737000ab8f47e8f6c94f11d74b5913a4c5ab11b34ed3c",
+    "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.2017.2.1.zip",
+    "hash": "3615b543c239d0455b477b6596849263aad3c93d88a9d6ef93227330bcee8c48",
     "bin": [
         "dupfinder.exe",
         "inspectcode.exe"
