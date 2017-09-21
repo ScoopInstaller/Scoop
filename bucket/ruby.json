@@ -31,7 +31,7 @@
     "notes": "Install MSYS2 via 'scoop install msys2' and then run 'ridk install' to install the toolchain!",
     "checkver": {
         "github": "https://github.com/oneclick/rubyinstaller2",
-        "re": "/releases/tag/(?:v)?([\\d.]+(?:-[\\d])?)"
+        "re": "/releases/tag/(?:v|rubyinstaller-)?([\\d.]+(?:-[\\d])?)"
     },
     "autoupdate": {
         "architecture": {
