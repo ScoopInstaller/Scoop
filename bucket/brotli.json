@@ -1,0 +1,19 @@
+{
+    "version": "1.0.0",
+    "homepage": "https://brotli.org/",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/google/brotli/releases/download/v1.0.0/brotli-win-i686-v1.0.0.zip",
+            "hash": "dbbf3fffa2926677a6633d92ba1d990f928ec6926514915b03e492d8b11b059f"
+        },
+        "64bit": {
+            "url": "https://github.com/google/brotli/releases/download/v1.0.0/brotli-win-x86_64-v1.0.0.zip",
+            "hash": "b1475fb8e248415fecf511e2e1bd34d5e3bcf3f1e4edd214ea6e754055de1667"
+        }
+    },
+    "bin": [
+        "brotli.exe",
+        "unbrotli.exe"
+    ],
+    "pre_install": "cp $dir\\brotli.exe $dir\\unbrotli.exe"
+}
