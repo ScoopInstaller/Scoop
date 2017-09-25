@@ -4,7 +4,10 @@
     "url": "https://chromedriver.storage.googleapis.com/2.32/chromedriver_win32.zip",
     "hash": "145c9003d9d4d098e87349a8a628a03d1d8735ff0db39eec4b6c6770ec154214",
     "bin": "chromedriver.exe",
-    "checkver": "Latest Release: <a href=\"[^\"]+\">ChromeDriver ([\\d.]+)",
+    "checkver": {
+        "url": "https://chromedriver.storage.googleapis.com/LATEST_RELEASE",
+        "re": "([\\d.]+)"
+    },
     "autoupdate": {
         "url": "https://chromedriver.storage.googleapis.com/$version/chromedriver_win32.zip"
     }
