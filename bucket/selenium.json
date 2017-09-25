@@ -1,0 +1,15 @@
+{
+    "version": "3.5.3",
+    "homepage": "http://www.seleniumhq.org/",
+    "url": "https://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar#/selenium.jar",
+    "hash": "66c137224997e631573aa2354c13db4f467dccb08a5345aea15ea70b69728f2f",
+    "bin": "selenium.cmd",
+    "pre_install": "\"@java -jar \"\"$dir\\selenium.jar\"\" %*\" | out-file -en oem \"$dir\\selenium.cmd\"",
+    "checkver": {
+        "url": "http://www.seleniumhq.org/download/",
+        "re": "Download version\\s+<a href=\".*\">(?<version>(?<short>[\\d.]+).[\\d.]+)</"
+    },
+    "autoupdate": {
+        "url": "https://selenium-release.storage.googleapis.com/$matchShort/selenium-server-standalone-$version.jar#/selenium.jar"
+    }
+}
