@@ -21,6 +21,9 @@
     },
     "autoupdate": {
         "url": "https://services.gradle.org/distributions/gradle-$version-bin.zip",
-        "extract_dir": "gradle-$version"
+        "extract_dir": "gradle-$version",
+        "hash": {
+            "url": "$url.sha256"
+        }
     }
 }
