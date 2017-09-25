@@ -1,0 +1,11 @@
+{
+    "version": "0.19.0",
+    "homepage": "https://github.com/mozilla/geckodriver",
+    "url": "https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-win64.zip",
+    "hash": "701099db0ecc6135d3c15623f2312475b0b7accdae4adef18721a07f9b54d52e",
+    "bin": "geckodriver.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/mozilla/geckodriver/releases/download/v$version/geckodriver-v$version-win64.zip"
+    }
+}
