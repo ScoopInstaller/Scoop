@@ -1,12 +1,12 @@
 {
-    "homepage": "https://github.com/ojdkbuild/ojdkbuild",
-    "version": "1.8.0.141-1",
+    "homepage": "https://adoptopenjdk.net/",
+    "version": "9+181",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.141-1/java-1.8.0-openjdk-1.8.0.141-1.b16.ojdkbuild.windows.x86_64.zip",
-            "hash": "2911ccece06500cc5bd37cb76028d4bd2b6261cb7f77e39404895e18d430d383",
-            "extract_dir": "java-1.8.0-openjdk-1.8.0.141-1.b16.ojdkbuild.windows.x86_64"
+            "url": "https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-9+181/OpenJDK9_x64_Win_jdk-9.181.zip",
+            "hash": "68fa2183288caa5b2be239b597a42917d9fce008ef44504a9eb85ddbc8a6d028",
+            "extract_dir": "jdk-9+181"
         }
     },
     "env_add_path": "bin",
@@ -14,18 +14,19 @@
         "JAVA_HOME": "$dir"
     },
     "checkver": {
-        "url": "https://raw.githubusercontent.com/ojdkbuild/ojdkbuild/master/README.md",
-        "re": "download/.*/java-(?<short>[\\d.]+)-openjdk-(?<version>[\\d.]+-[\\d]+)(?<tail>.*).x86_64.zip\\)"
+        "url": "https://raw.githubusercontent.com/AdoptOpenJDK/openjdk9-releases/master/latest_release.json",
+        "re": "\\\"tag_name\\\": \\\"jdk-(?<version>(?<vnum>[\\d.]+)\\+(?<build>[\\d]+))\\\""
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-$matchShort-openjdk-$version$matchTail.x86_64.zip",
-                "extract_dir": "java-$matchShort-openjdk-$version$matchTail.x86_64"
+                "url": "https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-$version/OpenJDK9_x64_Win_jdk-$matchVnum.$matchBuild.zip",
+                "extract_dir": "jdk-$version"
             }
         },
         "hash": {
-            "url": "$url.sha256"
+            "url": "https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-$version/OpenJDK9_x64_Win_jdk-$matchVnum.$matchBuild.sha256.txt",
+            "find": "([a-fA-F0-9]{64})"
         }
     }
 }
