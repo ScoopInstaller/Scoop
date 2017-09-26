@@ -1,11 +1,11 @@
 {
     "homepage": "https://adoptopenjdk.net/",
-    "version": "9+181",
+    "version": "9.181",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-9+181/OpenJDK9_x64_Win_jdk-9.181.zip",
-            "hash": "68fa2183288caa5b2be239b597a42917d9fce008ef44504a9eb85ddbc8a6d028",
+            "url": "https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-9%2B181/OpenJDK9_x64_Win_jdk-9.181.zip",
+            "hash": "223f646726a9bc0dfae5655a40ed11bf1db16b510b45d73c03e34e1102455ff7",
             "extract_dir": "jdk-9+181"
         }
     },
@@ -14,18 +14,18 @@
         "JAVA_HOME": "$dir"
     },
     "checkver": {
-        "url": "https://raw.githubusercontent.com/AdoptOpenJDK/openjdk9-releases/master/latest_release.json",
-        "re": "\\\"tag_name\\\": \\\"jdk-(?<version>(?<vnum>[\\d.]+)\\+(?<build>[\\d]+))\\\""
+        "url": "https://api.adoptopenjdk.net/openjdk9/releases/x64_win/latest",
+        "re": "OpenJDK9_x64_Win_jdk-(?<version>(?<vnum>[\\d.]+)\\.(?<build>[\\d]+)).zip"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-$version/OpenJDK9_x64_Win_jdk-$matchVnum.$matchBuild.zip",
-                "extract_dir": "jdk-$version"
+                "url": "https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-$matchVnum%2B$matchBuild/OpenJDK9_x64_Win_jdk-$matchVnum.$matchBuild.zip",
+                "extract_dir": "jdk-$matchVnum+$matchBuild"
             }
         },
         "hash": {
-            "url": "https://github.com/AdoptOpenJDK/openjdk9-releases/releases/download/jdk-$version/OpenJDK9_x64_Win_jdk-$matchVnum.$matchBuild.sha256.txt",
+            "url": "$baseurl/OpenJDK9_x64_Win_jdk-$matchVnum.$matchBuild.sha256.txt",
             "find": "([a-fA-F0-9]{64})"
         }
     }
