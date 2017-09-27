@@ -1,15 +1,33 @@
 {
     "version": "3.0.0",
     "license": "GNU",
-    "url": "https://files.gpg4win.org/gpg4win-3.0.0.exe#/dl.7z",
+    "url": "https://files.gpg4win.org/gpg4win-3.0.0.exe",
     "hash": "2565bf6faf8defb8fa61b0b1a30f0e68e2ca5ceb3177d08516e00ca1620252bf",
     "homepage": "https://www.gpg4win.org",
-    "bin": "gpg.exe",
+    "env_add_path": [
+        "GnuPG\\bin",
+        "Gpg4win\\bin"
+    ],
     "checkver": {
         "url": "https://www.gpg4win.org/get-gpg4win.html",
         "re": "Download Gpg4win ([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://files.gpg4win.org/gpg4win-$version.exe#/dl.7z"
+        "url": "https://files.gpg4win.org/gpg4win-$version.exe",
+        "hash": {
+            "url": "https://gpg4win.org/package-integrity.html"
+        }
+    },
+    "installer": {
+        "args": [
+            "/S",
+            "/D=$dir\\Gpg4win"
+        ]
+    },
+    "uninstaller": {
+        "file": "Gpg4win\\gpg4win-uninstall.exe",
+        "args": [
+            "/S"
+        ]
     }
 }
