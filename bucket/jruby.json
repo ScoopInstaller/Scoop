@@ -23,5 +23,7 @@
         "url": "http://jruby.org/download",
         "re": "Current Release:.JRuby.([\\d.]+)"
     },
-    "autoupdate": "https://s3.amazonaws.com/jruby.org/downloads/$version/jruby-bin-$version.zip"
+    "autoupdate": {
+        "url": "https://s3.amazonaws.com/jruby.org/downloads/$version/jruby-bin-$version.zip"
+    }
 }
