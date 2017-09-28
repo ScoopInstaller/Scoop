@@ -153,7 +153,9 @@ function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = 'Scoop/1.0'
-        $wreq.referer = strip_filename $url
+        if (-not ($url -imatch "https?://downloads.sourceforge.net/")) {
+            $wreq.referer = strip_filename $url
+        }
         if($cookies) {
             $wreq.headers.add('Cookie', (cookie_header $cookies))
         }
