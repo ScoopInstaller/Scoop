@@ -186,11 +186,10 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 
     # check if there are architecture specific variants
-    if ($json.architecture) {
+    if ($json.architecture -and $json.autoupdate.architecture) {
         $json.architecture | Get-Member -MemberType NoteProperty | % {
             $architecture = $_.Name
-
-            if ($json.architecture.$architecture.$prop) {
+            if ($json.architecture.$architecture.$prop -and $json.autoupdate.architecture.$architecture.$prop) {
                 $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) $substitutions
             }
         }
