@@ -205,6 +205,10 @@
                         "reverse": {
                             "description": "Reverse the order of regex matches",
                             "type": "boolean"
+                        },
+                        "replace": {
+                            "description": "Allows rearrange the regexp matches",
+                            "type": "string"
                         }
                     },
                     "type": "object"
