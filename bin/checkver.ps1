@@ -61,6 +61,7 @@ $queue | % {
     }
     $regex = ""
     $jsonpath = ""
+    $replace = ""
 
     if ($json.checkver -eq "github") {
         if (!$json.homepage.StartsWith("https://github.com/")) {
@@ -83,6 +84,10 @@ $queue | % {
         $jsonpath = $json.checkver.jp
     }
 
+    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
+        $replace = $json.checkver.replace
+    }
+
     if(!$jsonpath -and !$regex) {
         $regex = $json.checkver
     }
@@ -96,6 +101,7 @@ $queue | % {
         json = $json;
         jsonpath = $jsonpath;
         reverse = $reverse;
+        replace = $replace;
     }
 
     $wc.headers.add('Referer', (strip_filename $url))
@@ -117,6 +123,7 @@ while($in_progress -gt 0) {
     $regexp = $state.regex
     $jsonpath = $state.jsonpath
     $reverse = $state.reverse
+    $replace = $state.replace
     $ver = ""
 
     $err = $ev.sourceeventargs.error
@@ -130,8 +137,8 @@ while($in_progress -gt 0) {
         continue
     }
 
-    if($jsonpath -and $regexp) {
-        write-host -f darkred "'jp' and 're' shouldn't be used together"
+    if(!$regex -and $replace) {
+        write-host -f darkred "'replace' requires 're'"
         continue
     }
 
@@ -146,6 +153,11 @@ while($in_progress -gt 0) {
         }
     }
 
+    if($jsonpath -and $regexp) {
+        $page = $ver
+        $ver = ""
+    }
+
     if($regexp) {
         $regex = new-object System.Text.RegularExpressions.Regex($regexp)
         if($reverse) {
@@ -158,6 +170,9 @@ while($in_progress -gt 0) {
             $matchesHashtable = @{}
             $regex.GetGroupNames() | % { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
             $ver = $matchesHashtable['1']
+            if ($replace) {
+                $ver = $regex.replace($match.Value, $replace)
+            }
             if(!$ver) {
                 $ver = $matchesHashtable['version']
             }
