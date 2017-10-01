@@ -3,7 +3,7 @@
     "version": "1.5.2",
     "depends": "erlang",
     "url": "https://github.com/elixir-lang/elixir/releases/download/v1.5.2/Precompiled.zip",
-    "hash": "6d58a9ef5496e7d780b7bb4ad8835017e30f526ae81f1ae392e2d96488f8a5d8",
+    "hash": "4ba8dd46998bee6cbcc2d9937776e241be82bc62d2b62b6235c310a44c87467e",
     "env_add_path": [
         "bin"
     ],
