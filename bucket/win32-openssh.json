@@ -1,9 +1,9 @@
 {
     "homepage": "https://github.com/PowerShell/Win32-OpenSSH",
-    "version": "0.0.20.0",
+    "version": "0.0.21.0",
     "license": "https://raw.githubusercontent.com/PowerShell/Win32-OpenSSH/L1-Prod/LICENCE",
-    "hash": "40d389036432ae06cfba2a3992e545fd24108e458792a1fbab2e94d3a647c0c6",
-    "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v0.0.20.0/OpenSSH-Win32.zip",
+    "hash": "1a828e6bc9134f22d925e52faa545a85c4c354d2a385c8148ccfefbe3a26453c",
+    "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v0.0.21.0/OpenSSH-Win32.zip",
     "extract_dir": "OpenSSH-Win32",
     "bin": [
         "scp.exe",
