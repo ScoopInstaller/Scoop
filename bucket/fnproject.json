@@ -1,0 +1,21 @@
+{
+    "homepage": "http://fnproject.io/",
+    "license": "https://github.com/fnproject/cli/blob/master/LICENSE",
+    "version": "0.4.7",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/fnproject/cli/releases/download/0.4.7/fn.exe"
+        }
+    },
+    "bin": "fn.exe",
+    "checkver": {
+        "github": "https://github.com/fnproject/cli"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/fnproject/cli/releases/download/$version/fn.exe"
+            }
+        }
+    }
+}
