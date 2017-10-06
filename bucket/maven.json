@@ -25,5 +25,8 @@
         "hash": {
             "url": "$url.sha1"
         }
-    }
+    },
+    "persist": [
+        "conf"
+    ]
 }
