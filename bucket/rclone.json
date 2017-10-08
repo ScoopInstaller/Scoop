@@ -1,5 +1,6 @@
 {
-    "version": "v1.38",
+    "homepage": "https://rclone.org",
+    "version": "1.38",
     "license": "https://github.com/ncw/rclone/blob/master/COPYING",
     "architecture": {
         "64bit": {
@@ -13,23 +14,19 @@
             "extract_dir": "rclone-v1.38-windows-386"
         }
     },
-    "homepage": "https://rclone.org",
-    "bin": [
-        "rclone.exe"
-    ],
+    "bin": "rclone.exe",
     "checkver": {
-        "url": "https://github.com/ncw/rclone/releases/latest",
-        "re": "/releases/tag/(?:v)?([\\d\\w.-]+)"
+        "github": "https://github.com/ncw/rclone"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/ncw/rclone/releases/download/$version/rclone-$version-windows-amd64.zip",
-                "extract_dir": "rclone-$version-windows-amd64"
+                "url": "https://github.com/ncw/rclone/releases/download/v$version/rclone-v$version-windows-amd64.zip",
+                "extract_dir": "rclone-v$version-windows-amd64"
             },
             "32bit": {
-                "url": "https://github.com/ncw/rclone/releases/download/$version/rclone-$version-windows-386.zip",
-                "extract_dir": "rclone-$version-windows-386"
+                "url": "https://github.com/ncw/rclone/releases/download/v$version/rclone-v$version-windows-386.zip",
+                "extract_dir": "rclone-v$version-windows-386"
             }
         }
     }
