@@ -1,0 +1,33 @@
+{
+    "homepage": "https://rclone.org",
+    "version": "1.38",
+    "license": "https://github.com/ncw/rclone/blob/master/COPYING",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/ncw/rclone/releases/download/v1.38/rclone-v1.38-windows-amd64.zip",
+            "hash": "2be955fbce650a0b93e7c907f2b8c56a8af95bb5e341be3f90623d822abd083f",
+            "extract_dir": "rclone-v1.38-windows-amd64"
+        },
+        "32bit": {
+            "url": "https://github.com/ncw/rclone/releases/download/v1.38/rclone-v1.38-windows-386.zip",
+            "hash": "243048b24b05fbc7efbf00ea6b66bca43c3d7e2a8600bc7585a6ef0cf877fe2c",
+            "extract_dir": "rclone-v1.38-windows-386"
+        }
+    },
+    "bin": "rclone.exe",
+    "checkver": {
+        "github": "https://github.com/ncw/rclone"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/ncw/rclone/releases/download/v$version/rclone-v$version-windows-amd64.zip",
+                "extract_dir": "rclone-v$version-windows-amd64"
+            },
+            "32bit": {
+                "url": "https://github.com/ncw/rclone/releases/download/v$version/rclone-v$version-windows-386.zip",
+                "extract_dir": "rclone-v$version-windows-386"
+            }
+        }
+    }
+}
