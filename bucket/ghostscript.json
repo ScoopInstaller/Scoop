@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs922/gs922w64.exe#/dl.7z",
-            "hash": "6b84f80a1e68b11151fc277837489d5cdfcd030839e09f78522405373c9e6762",
+            "hash": "796cd308d3134d021356c0db1831c089db73d03aac07d28cbe77958163c79d57",
             "bin": [
                 "bin\\gswin64.exe",
                 "bin\\gswin64c.exe"
@@ -13,7 +13,7 @@
         },
         "32bit": {
             "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs922/gs922w32.exe#/dl.7z",
-            "hash": "77777cfca8d11976fbb4681021fdc2241c82487754bc54de33f31699c2b0cea4",
+            "hash": "c01b36529c618f9218c39c84bf7168fc2e466a78406f273609f736a5f0cd965a",
             "bin": [
                 "bin\\gswin32.exe",
                 "bin\\gswin32c.exe"
