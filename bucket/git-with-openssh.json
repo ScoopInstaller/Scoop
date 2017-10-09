@@ -25,7 +25,8 @@
         "usr\\bin\\ssh-add.exe",
         "usr\\bin\\ssh-agent.exe",
         "usr\\bin\\ssh-keygen.exe",
-        "usr\\bin\\ssh-keyscan.exe"
+        "usr\\bin\\ssh-keyscan.exe",
+        "usr\\bin\\tig.exe"
     ],
     "post_install": [
         "git config --global credential.helper manager"
