@@ -4,7 +4,7 @@
     "license": "https://haxe.org/foundation/open-source.html",
     "url": "https://github.com/HaxeFoundation/haxe/releases/download/3.4.4/haxe-3.4.4-win.zip",
     "hash": "b06fe00689490688c94e3152823786ce473c5b1112ca0b81be3e3cca4c9cc6e9",
-    "extract_dir": "haxe_20170912140014_e24c990d5",
+    "extract_dir": "haxe_20171008124705_683d0c5ae",
     "bin": [
         "haxe.exe",
         "haxelib.exe"
