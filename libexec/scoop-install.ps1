@@ -32,17 +32,18 @@
 
 reset_aliases
 
-function ensure_not_installed($app, $global) {
+function is_installed($app, $global) {
     if(installed $app $global) {
-        $global_flag = $null;
-        if($global){ $global_flag = ' --global' }
+        function gf($g) { if($g) { ' --global' } }
 
         $version = @(versions $app $global)[-1]
         if(!(install_info $app $version $global)) {
-            abort "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$global_flag' before retrying the install."
+            error "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$(gf $global)' before retrying the install."
         }
-        abort "'$app' ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
+        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(gf $global)' to install a new version."
+        return $true
     }
+    return $false
 }
 
 $opt, $apps, $err = getopt $args 'gika:' 'global', 'independent', 'no-cache', 'arch='
@@ -64,7 +65,9 @@ if(is_scoop_outdated) {
 }
 
 if($apps.length -eq 1) {
-    ensure_not_installed $apps $global
+    if(is_installed $apps $global) {
+        return
+    }
 }
 
 # get any specific versions that we need to handle first
@@ -101,7 +104,10 @@ ensure_none_failed $apps $global
 
 $apps, $skip = prune_installed $apps $global
 
-$skip | ? { $explicit_apps -contains $_} | % { warn "$_ is already installed. Skipping." }
+$skip | ? { $explicit_apps -contains $_} | % {
+    $version = @(versions $_ $global)[-1]
+    warn "'$_' ($version) is already installed. Skipping."
+}
 
 $suggested = @{};
 $apps | % { install_app $_ $architecture $global $suggested $use_cache }
