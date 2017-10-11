@@ -11,8 +11,12 @@
         "url": "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/$version/flyway-commandline-$version-windows-x64.zip",
         "extract_dir": "flyway-$version",
         "hash": {
-            "mode": "extract",
             "url": "$url.sha1"
         }
-    }
+    },
+    "perist": [
+      "conf",
+      "sql",
+      "jars"
+    ]
 }
