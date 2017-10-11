@@ -14,7 +14,7 @@
             "url": "$url.sha1"
         }
     },
-    "perist": [
+    "persist": [
       "conf",
       "sql",
       "jars"
