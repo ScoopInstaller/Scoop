@@ -28,7 +28,7 @@
     ",
     "checkver": {
         "url": "https://nodejs.org/en/download/",
-        "re": "LTS Version: <strong>v([\\d.]+)</strong>"
+        "re": "LTS Version: <strong>([\\d.]+)</strong>"
     },
     "autoupdate": {
         "architecture": {

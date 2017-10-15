@@ -27,8 +27,8 @@
         Set-Content -Value \"prefix=$persist_dir\\bin`ncache=$persist_dir\\cache\" -Path $dir\\node_modules\\npm\\npmrc
     ",
     "checkver": {
-        "url": "https://nodejs.org/en/download/current/",
-        "re": "Current Version: <strong>v([\\d.]+)</strong>"
+        "url": "https://nodejs.org/dist/latest/",
+        "re": "node-v([\\d.]+)-x86.msi"
     },
     "autoupdate": {
         "architecture": {
