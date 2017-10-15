@@ -1,14 +1,15 @@
 {
-    "version": "0.42",
-    "license": "GPL",
-    "url": "https://github.com/acaudwell/Gource/releases/download/gource-0.42/gource-0.42.win32.zip",
-    "homepage": "http://gource.io",
+    "homepage": "http://gource.io/",
+    "version": "0.47",
+    "license": "GPL3",
+    "url": "https://github.com/acaudwell/Gource/releases/download/gource-0.47/gource-0.47.win64.zip",
     "checkver": {
-        "re": "([\\d\\.]+).win32.zip"
+        "url": "https://github.com/acaudwell/Gource/releases/latest",
+        "re": "gource-([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://github.com/acaudwell/Gource/releases/download/gource-$version/gource-$version.win32.zip"
+        "url": "https://github.com/acaudwell/Gource/releases/download/gource-$version/gource-$version.win64.zip"
     },
-    "hash": "865e43418ae826ff69eea97246e95ec7c2b005ba070b1a7f5834ceb5fc0c6093",
+    "hash": "4dd9726ad1a4bceecaeeb042494f213ed8ce70ea42aaffbae451a4a5707dbd03",
     "bin": "gource.exe"
 }
