@@ -1,9 +1,9 @@
 {
-    "version": "5.2.0.224",
+    "version": "5.4.0.201",
     "homepage": "http://www.mono-project.com/",
     "license": "https://raw.githubusercontent.com/mono/mono/master/LICENSE",
-    "url": "https://download.mono-project.com/archive/5.2.0/windows-installer/mono-5.2.0.224-gtksharp-2.12.45-win32-0.msi",
-    "hash": "a9dc6360dad6fe47d596ae73a34750dd2dcd34210c84cef5e3109074c3673bb8",
+    "url": "https://download.mono-project.com/archive/5.4.0/windows-installer/mono-5.4.0.201-gtksharp-2.12.45-win32-0.msi",
+    "hash": "e0d81d5b5043fbbbc0c08f4e5c228983ef7d404952ddaa8d02eb5458aad029f8",
     "extract_dir": "Mono",
     "env_add_path": "bin",
     "checkver": {
