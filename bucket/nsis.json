@@ -17,7 +17,7 @@
         "url": "https://sourceforge.net/projects/nsis/files/NSIS 3/$version/nsis-$version.zip",
         "extract_dir": "nsis-$version"
     },
-    "presist": [
+    "persist": [
         "nsisconf.nsh"
     ]
 }
