@@ -11,12 +11,7 @@
     },
     "autoupdate": {
         "url": "https://sourceforge.net/projects/nsis/files/NSIS 3/$version/nsis-$version.zip",
-        "extract_dir": "flyway-$version",
-        "hash": {
-            "mode": "extract",
-            "url": "$baseurl",
-            "find": "\"sha1\":\\s?\"([\\w]+)\",\\s?\"name\":\\s?\"nsis-$version.zip\""
-        }
+        "extract_dir": "flyway-$version"
     },
     "presist": [
         "nsisconf.nsh"
