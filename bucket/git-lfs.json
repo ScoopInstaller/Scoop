@@ -1,15 +1,15 @@
 {
     "homepage": "https://git-lfs.github.com/",
-    "version": "2.3.3",
+    "version": "2.3.4",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.3.3/git-lfs-windows-386-2.3.3.zip",
-            "hash": "ea1125ed47505482d2a9203f21f5dacc94f0cb329ec3b26f66c21c19a81c4fed"
+            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-windows-386-2.3.4.zip",
+            "hash": "b0738656064c79f878c17c62d2c4f6f3015fad7dc69d4a3c841ed1f7c93ec83d"
         },
         "64bit": {
-            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.3.3/git-lfs-windows-amd64-2.3.3.zip",
-            "hash": "b6e35d48570bfa25b81433b216ac942f819d171af31975cfe33748c95896ea1e"
+            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-windows-amd64-2.3.4.zip",
+            "hash": "18c47fd2806659e81a40fbd6f6b0598ea1802635ce04fb2317d75973450a3fe5"
         }
     },
     "suggest": {

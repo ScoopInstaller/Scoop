@@ -1,0 +1,43 @@
+{
+    "version": "2.64",
+    "license": "Public Domain",
+    "homepage": "http://sites.google.com/site/qaacpage/",
+    "url": "https://github.com/nu774/qaac/releases/download/v2.64/qaac_2.64.zip",
+    "hash": "7429253d6d97a5e20fe1716f07d1c2c8645685baedfcb0c8cc54a9fb317015bf",
+    "architecture": {
+        "64bit": {
+            "extract_dir": "qaac_2.64\\x64",
+            "bin": [
+                [
+                    "qaac64.exe",
+                    "qaac"
+                ],
+                [
+                    "refalac64.exe",
+                    "refalac"
+                ]
+            ]
+        },
+        "32bit": {
+            "extract_dir": "qaac_2.64\\x86",
+            "bin": [
+                "qaac.exe",
+                "refalac.exe"
+            ]
+        }
+    },
+    "checkver": {
+        "github": "https://github.com/nu774/qaac"
+    },
+    "autoupdate": {
+        "url": "https://github.com/nu774/qaac/releases/download/v$version/qaac_$version.zip",
+        "architecture": {
+            "64bit": {
+                "extract_dir": "qaac_$version\\x64"
+            },
+            "32bit": {
+                "extract_dir": "qaac_$version\\x86"
+            }
+        }
+    }
+}
