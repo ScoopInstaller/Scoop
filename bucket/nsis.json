@@ -2,7 +2,7 @@
     "homepage": "http://nsis.sourceforge.net/",
     "license": "http://nsis.sourceforge.net/License",
     "version": "3.02.1",
-    "url": "https://sourceforge.net/projects/nsis/files/NSIS 3/3.02.1/nsis-3.02.1.zip",
+    "url": "https://sourceforge.net/projects/nsis/files/NSIS%203/3.02.1/nsis-3.02.1.zip",
     "bin": [
         "makensis.exe",
         "nsis.exe"
@@ -14,7 +14,7 @@
         "re": "\\/rn\\/v([\\d.]+)\""
     },
     "autoupdate": {
-        "url": "https://sourceforge.net/projects/nsis/files/NSIS 3/$version/nsis-$version.zip",
+        "url": "https://sourceforge.net/projects/nsis/files/NSIS%203/$version/nsis-$version.zip",
         "extract_dir": "nsis-$version"
     },
     "persist": [
