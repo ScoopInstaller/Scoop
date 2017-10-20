@@ -2,6 +2,16 @@
     "version": "1.9.1",
     "homepage": "https://golang.org",
     "license": "https://golang.org/LICENSE",
+    "persist": "go",
+    "extract_dir": "go",
+    "env_set": {
+        "GOROOT": "$dir",
+        "GOPATH": "$persist_dir\\go"
+    },
+    "env_add_path": [
+        "bin",
+        "go\\bin"
+    ],
     "architecture": {
         "64bit": {
             "url": "https://storage.googleapis.com/golang/go1.9.1.windows-amd64.zip",
@@ -11,11 +21,6 @@
             "url": "https://storage.googleapis.com/golang/go1.9.1.windows-386.zip",
             "hash": "ea9c79c9e6214c9a78a107ef5a7bff775a281bffe8c2d50afa66d2d33998078a"
         }
-    },
-    "extract_dir": "go",
-    "env_add_path": "bin",
-    "env_set": {
-        "GOROOT": "$dir"
     },
     "checkver": "Build version go([\\d\\.]+)\\.",
     "autoupdate": {
@@ -30,5 +35,10 @@
         "hash": {
             "url": "$url.sha256"
         }
-    }
+    },
+    "notes": "
+        Your GOROOT has been set to: $dir
+        Your GOPATH has been set to: $persist_dir\\go
+        You can run 'go env GOPATH' or 'go env GOROOT' to view these at any time.
+    "
 }
