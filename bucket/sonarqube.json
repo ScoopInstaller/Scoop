@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.sonarqube.org",
-    "version": "6.5",
+    "version": "6.6",
     "license": "GNU Lesser GPL License, Version 3",
-    "url": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-6.5.zip",
-    "hash": "sha1:266051af830e1462f3455802326a52ba6f86efd9",
+    "url": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-6.6.zip",
+    "hash": "sha1:79ccba38c2228c218bca59f9c5cd39b6bee48dc8",
     "architecture": {
         "64bit": {
             "bin": "bin\\windows-x86-64\\StartSonar.bat"
@@ -19,7 +19,7 @@
         "logs",
         "temp"
     ],
-    "extract_dir": "sonarqube-6.5",
+    "extract_dir": "sonarqube-6.6",
     "suggest": {
         "JDK": [
             "extras/oraclejdk",
