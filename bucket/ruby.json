@@ -1,16 +1,16 @@
 {
     "homepage": "https://rubyinstaller.org",
-    "version": "2.4.1-2",
+    "version": "2.4.2-2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/oneclick/rubyinstaller2/releases/download/2.4.1-2/rubyinstaller-2.4.1-2-x64.7z",
-            "hash": "2ad3c7f68404ba0805cf91e682ecf2d85b75c42a5809e73e54898f24a1e014bb",
-            "extract_dir": "rubyinstaller-2.4.1-2-x64"
+            "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-2.4.2-2/rubyinstaller-2.4.2-2-x64.7z",
+            "hash": "4d2c57bf82fcd0b9634ac7d3ddb4015b38c745b49ecc447e8c13b1008c4d26d6",
+            "extract_dir": "rubyinstaller-2.4.2-2-x64"
         },
         "32bit": {
-            "url": "https://github.com/oneclick/rubyinstaller2/releases/download/2.4.1-2/rubyinstaller-2.4.1-2-x86.7z",
-            "hash": "8c5e6fa26442384eb737a783fdea494454cf5975ab32e141ffe6b94724b7ec49",
-            "extract_dir": "rubyinstaller-2.4.1-2-x86"
+            "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-2.4.2-2/rubyinstaller-2.4.2-2-x86.7z",
+            "hash": "68655d8542b5ebb077aa6fcac46189d7b7d182961468c4d8b4f2e4de862f7e2c",
+            "extract_dir": "rubyinstaller-2.4.2-2-x86"
         }
     },
     "persist": "gems",
@@ -36,11 +36,11 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/$version/rubyinstaller-$version-x64.7z",
+                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-$version/rubyinstaller-$version-x64.7z",
                 "extract_dir": "rubyinstaller-$version-x64"
             },
             "32bit": {
-                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/$version/rubyinstaller-$version-x86.7z",
+                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-$version/rubyinstaller-$version-x86.7z",
                 "extract_dir": "rubyinstaller-$version-x86"
             }
         }
