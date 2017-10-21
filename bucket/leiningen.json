@@ -4,8 +4,8 @@
     "url": "https://raw.githubusercontent.com/technomancy/leiningen/2.8.0/bin/lein.bat",
     "homepage": "https://github.com/technomancy/leiningen",
     "bin": "lein.bat",
-    "notes": "The command 'lein self-install' is required to complete the installation",
     "hash": "733d1b6f782c23b2182054f0cd83dc965a4d294a168ebf08b3a70a5c67e230b5",
+    "post_install": "lein self-install",
     "checkver": {
         "github": "https://github.com/technomancy/leiningen"
     },
