@@ -21,5 +21,12 @@
         "ThmViewer.exe",
         "torch.exe",
         "WixCop.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "http://wixtoolset.org/releases/",
+        "re": "releases/v([\\d.]+)/stable"
+    },
+    "autoupdate": {
+        "url": "https://github.com/wixtoolset/wix3/releases/download/wix$cleanVersionrtm/wix$cleanVersion-binaries.zip"
+    }
 }
