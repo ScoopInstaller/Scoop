@@ -1,11 +1,11 @@
 {
     "homepage": "https://www.mongodb.org",
-    "version": "3.4.9",
+    "version": "3.4.10",
     "license": "https://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.4.9-signed.msi",
-            "hash": "68e911de302ddd42e6fe4dda71193c8873f469c59c790fffdd645660e8a5b49a"
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.4.10-signed.msi",
+            "hash": "6b650bdf62792fb44445edfee2100b9a8d861710348c8bbd3b93f56d11d5e7ea"
         }
     },
     "bin": [
