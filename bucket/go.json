@@ -5,8 +5,7 @@
     "persist": "go",
     "extract_dir": "go",
     "env_set": {
-        "GOROOT": "$dir",
-        "GOPATH": "$persist_dir\\go"
+        "GOROOT": "$dir"
     },
     "env_add_path": [
         "bin",
@@ -38,7 +37,6 @@
     },
     "notes": "
         Your GOROOT has been set to: $dir
-        Your GOPATH has been set to: $persist_dir\\go
-        You can run 'go env GOPATH' or 'go env GOROOT' to view these at any time.
+        You can run 'go env GOROOT' to view this at any time.
     "
 }
