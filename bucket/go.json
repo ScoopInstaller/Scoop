@@ -2,7 +2,6 @@
     "version": "1.9.2",
     "homepage": "https://golang.org",
     "license": "https://golang.org/LICENSE",
-    "persist": "go",
     "extract_dir": "go",
     "env_set": {
         "GOROOT": "$dir"
