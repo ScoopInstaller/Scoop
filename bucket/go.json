@@ -7,10 +7,13 @@
     "env_set": {
         "GOROOT": "$dir"
     },
-    "env_add_path": [
-        "bin",
-        "go\\bin"
-    ],
+    "env_add_path": "bin",
+    "installer": {
+        "script": "add_first_in_path \"$env:USERPROFILE\\go\\bin\" $global"
+    },
+    "uninstaller": {
+        "script": "remove_from_path \"$env:USERPROFILE\\go\\bin\" $global"
+    },
     "architecture": {
         "64bit": {
             "url": "https://storage.googleapis.com/golang/go1.9.2.windows-amd64.zip",
@@ -38,5 +41,6 @@
     "notes": "
         Your GOROOT has been set to: $dir
         You can run 'go env GOROOT' to view this at any time.
+        \"$env:USERPROFILE\\go\\bin)\" has been added to your PATH.
     "
 }
