@@ -124,7 +124,8 @@ if($push -eq $true) {
 
 . "$psscriptroot\checkver.ps1" * -update -dir $dir
 if($specialSnowflakes) {
-    $specialSnowflakes | % {
+    write-host -f DarkCyan "Forcing update on our special snowflakes: $($specialSnowflakes -join ',')"
+    $specialSnowflakes -split ',' | % {
         . "$psscriptroot\checkver.ps1" $_ -update -forceUpdate -dir $dir
     }
 }

@@ -1,11 +1,14 @@
 {
     "homepage": "https://gradle.org",
-    "version": "4.0.2",
+    "version": "4.2.1",
     "license": "Apache 2.0",
-    "hash": "79ac421342bd11f6a4f404e0988baa9c1f5fabf07e3c6fa65b0c15c1c31dda22",
-    "url": "https://services.gradle.org/distributions/gradle-4.0.2-bin.zip",
-    "extract_dir": "gradle-4.0.2",
+    "hash": "b551cc04f2ca51c78dd14edb060621f0e5439bdfafa6fd167032a09ac708fbc0",
+    "url": "https://services.gradle.org/distributions/gradle-4.2.1-bin.zip",
+    "extract_dir": "gradle-4.2.1",
     "bin": "bin\\gradle.bat",
+    "env_set": {
+        "GRADLE_HOME": "$dir"
+    },
     "suggest": {
         "JDK": [
             "extras/oraclejdk",
@@ -18,6 +21,9 @@
     },
     "autoupdate": {
         "url": "https://services.gradle.org/distributions/gradle-$version-bin.zip",
-        "extract_dir": "gradle-$version"
+        "extract_dir": "gradle-$version",
+        "hash": {
+            "url": "$url.sha256"
+        }
     }
 }

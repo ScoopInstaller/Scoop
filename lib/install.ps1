@@ -9,10 +9,9 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global, $suggested) {
+function install_app($app, $architecture, $global, $suggested, $use_cache = $true) {
     $app, $bucket = app $app
     $app, $manifest, $bucket, $url = locate $app $bucket
-    $use_cache = $true
     $check_hash = $true
 
     if(!$manifest) {
@@ -523,6 +522,11 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
     # MSI or other installer
     $msi = msi $manifest $architecture
     $installer = installer $manifest $architecture
+    if($installer.script) {
+        write-output "Running installer script..."
+        iex $installer.script
+        return
+    }
 
     if($msi) {
         install_msi $fname $dir $msi
@@ -608,6 +612,11 @@ function install_prog($fname, $dir, $installer, $global) {
 function run_uninstaller($manifest, $architecture, $dir) {
     $msi = msi $manifest $architecture
     $uninstaller = uninstaller $manifest $architecture
+    if($uninstaller.script) {
+        write-output "Running uninstaller script..."
+        iex $uninstaller.script
+        return
+    }
 
     if($msi -or $uninstaller) {
         $exe = $null; $arg = $null; $continue_exit_codes = @{}
@@ -974,18 +983,24 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             write-host "Persisting $source"
 
             # add base paths
-            $source = fullpath "$dir\$source"
-            $target = fullpath "$persist_dir\$target"
+            $source = New-Object System.IO.FileInfo(fullpath "$dir\$source")
+            if(!$source.Extension) {
+                $source = New-Object System.IO.DirectoryInfo($source.FullName)
+            }
+            $target = New-Object System.IO.FileInfo(fullpath "$persist_dir\$target")
+            if(!$target.Extension) {
+                $target = New-Object System.IO.DirectoryInfo($target.FullName)
+            }
 
-            if (!(test-path $target)) {
+            if (!$target.Exists) {
                 # If we do not have data in the store we move the original
-                if (test-path $source) {
+                if ($source.Exists) {
                     Move-Item $source $target
-                } else {
-                    # if there is no source we create an empty directory
-                    $target = ensure $target
+                } elseif($target.GetType() -eq [System.IO.DirectoryInfo]) {
+                    # if there is no source and it's a directory we create an empty directory
+                    ensure $target.FullName
                 }
-            } elseif (test-path $source) {
+            } elseif ($source.Exists) {
                 # (re)move original (keep a copy)
                 Move-Item $source "$source.original"
             }
@@ -993,7 +1008,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # create link
             if (is_directory $target) {
                 cmd /c "mklink /j `"$source`" `"$target`"" | out-null
-                attrib "$source" +R /L
+                attrib $source.FullName +R /L
             } else {
                 cmd /c "mklink /h `"$source`" `"$target`"" | out-null
             }

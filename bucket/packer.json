@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.packer.io",
     "license": "Mozilla Public License 2.0",
-    "version": "1.0.3",
+    "version": "1.1.1",
     "architecture": {
         "64bit": {
-            "url": "https://releases.hashicorp.com/packer/1.0.3/packer_1.0.3_windows_amd64.zip",
-            "hash": "774699160352e65891483be0c60aff557db32761d907ac5748cf65aeb9489fb1"
+            "url": "https://releases.hashicorp.com/packer/1.1.1/packer_1.1.1_windows_amd64.zip",
+            "hash": "ccfdba603d7ba225e99beb753f71c0cfba58fc9ac24250356e77eac5a7464cc5"
         },
         "32bit": {
-            "url": "https://releases.hashicorp.com/packer/1.0.3/packer_1.0.3_windows_386.zip",
-            "hash": "3ab1c214ff7ed20df60a22dc79a2cacf3ef7bc4900ab68074a1c61a34bfb5962"
+            "url": "https://releases.hashicorp.com/packer/1.1.1/packer_1.1.1_windows_386.zip",
+            "hash": "64b19d3fbb7721cfc05f589f5e7807a2ed10cec38450a73a54602c93627abcba"
         }
     },
     "bin": [

@@ -201,6 +201,14 @@
                         "jp": {
                             "pattern": "^\\$\\..*$",
                             "type": "string"
+                        },
+                        "reverse": {
+                            "description": "Reverse the order of regex matches",
+                            "type": "boolean"
+                        },
+                        "replace": {
+                            "description": "Allows rearrange the regexp matches",
+                            "type": "string"
                         }
                     },
                     "type": "object"
@@ -218,6 +226,9 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "file": {
+                    "type": "string"
+                },
+                "script": {
                     "type": "string"
                 },
                 "keep": {
@@ -261,10 +272,22 @@
                 },
                 "file": {
                     "type": "string"
+                },
+                "script": {
+                    "type": "string"
                 }
             },
-            "required": [
-                "file"
+            "oneOf": [
+                {
+                    "required": [
+                        "file"
+                    ]
+                },
+                {
+                    "required": [
+                        "script"
+                    ]
+                }
             ],
             "type": "object"
         },

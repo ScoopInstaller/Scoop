@@ -1,63 +1,24 @@
 {
     "homepage": "https://www.postgresql.org/",
-    "version": "9.6.3",
+    "version": "10.0",
     "license": "https://www.postgresql.org/about/licence/",
     "architecture": {
         "64bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.3-1-windows-x64-binaries.zip",
-            "hash": "18b23b5811ed94e5653c1dc311d49e2ce8e93b9d45e33f4318d4b744fb758ee3"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-10.0-1-windows-x64-binaries.zip",
+            "hash": "0f788762993091e43a32ed1c20265acca98baeb3beeaad19ecb8329c771dcfce"
         },
         "32bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-9.6.3-1-windows-binaries.zip",
-            "hash": "675e360c78c96e498b3415258791ba2c8e3eb8d157f10b0f8189f20d0749417a"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-10.0-1-windows-binaries.zip",
+            "hash": "20a716be5b6a89ca610c2c32fb1872eeece954f48cb7b5cf398f6aa9c44b64ba"
         }
     },
     "extract_dir": "pgsql",
-    "bin": [
-        "bin\\clusterdb.exe",
-        "bin\\createdb.exe",
-        "bin\\createlang.exe",
-        "bin\\createuser.exe",
-        "bin\\dropdb.exe",
-        "bin\\droplang.exe",
-        "bin\\dropuser.exe",
-        "bin\\ecpg.exe",
-        "bin\\initdb.exe",
-        "bin\\isolationtester.exe",
-        "bin\\oid2name.exe",
-        "bin\\pg_archivecleanup.exe",
-        "bin\\pg_basebackup.exe",
-        "bin\\pg_config.exe",
-        "bin\\pg_controldata.exe",
-        "bin\\pg_ctl.exe",
-        "bin\\pg_dump.exe",
-        "bin\\pg_dumpall.exe",
-        "bin\\pg_isolation_regress.exe",
-        "bin\\pg_isready.exe",
-        "bin\\pg_receivexlog.exe",
-        "bin\\pg_regress.exe",
-        "bin\\pg_regress_ecpg.exe",
-        "bin\\pg_resetxlog.exe",
-        "bin\\pg_restore.exe",
-        "bin\\pg_rewind.exe",
-        "bin\\pg_standby.exe",
-        "bin\\pg_test_fsync.exe",
-        "bin\\pg_test_timing.exe",
-        "bin\\pg_upgrade.exe",
-        "bin\\pg_xlogdump.exe",
-        "pgAdmin 4\\bin\\pgAdmin4.exe",
+    "env_add_path": "bin",
+    "shortcuts": [
         [
             "pgAdmin 4\\bin\\pgAdmin4.exe",
-            "pgadmin"
-        ],
-        "bin\\pgbench.exe",
-        "bin\\postgres.exe",
-        "bin\\psql.exe",
-        "bin\\reindexdb.exe",
-        "bin\\stackbuilder.exe",
-        "bin\\vacuumdb.exe",
-        "bin\\vacuumlo.exe",
-        "bin\\zic.exe"
+            "pgAdmin 4"
+        ]
     ],
     "checkver": {
         "url": "https://www.enterprisedb.com/products-services-training/pgbindownload",

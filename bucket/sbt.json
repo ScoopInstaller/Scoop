@@ -1,19 +1,18 @@
 {
     "homepage": "http://www.scala-sbt.org/",
-    "version": "0.13.16",
+    "version": "1.0.2",
     "license": "BSD",
-    "url": "https://cocl.us/sbt01316zip",
-    "hash": "e94d95ff2d64247b754782ea85e99187ea890dc4c918a7ba7dcb6091fdb5968c",
+    "url": "https://github.com/sbt/sbt/releases/download/v1.0.2/sbt-1.0.2.zip",
+    "hash": "858862c4b525ea7d10da3defd8ebd88200be7b415d096e4c39389566d8683f90",
     "extract_dir": "sbt",
     "bin": [
         "bin\\sbt.bat"
     ],
     "checkver": {
-        "url": "http://www.scala-sbt.org/download.html",
-        "re": "sbt-([\\d.]+).zip"
+        "github": "https://github.com/sbt/sbt"
     },
     "autoupdate": {
-        "url": "https://cocl.us/sbt$cleanVersionzip",
+        "url": "https://github.com/sbt/sbt/releases/download/v$version/sbt-$version.zip",
         "extract_dir": "sbt"
     }
 }

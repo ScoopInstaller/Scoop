@@ -1,17 +1,17 @@
 {
     "homepage": "https://nodejs.org",
-    "version": "8.2.1",
+    "version": "8.8.1",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v8.2.1/node-v8.2.1-win-x64.7z",
-            "hash": "1d4709a568ce470f968bef7da4141e071a141474306da55ed00e129d68ef2b39",
-            "extract_dir": "node-v8.2.1-win-x64"
+            "url": "https://nodejs.org/dist/v8.8.1/node-v8.8.1-win-x64.7z",
+            "hash": "e719657803800ed3176a2147384fbfc6ba092cfec6a2d3c202aa8184af8222b6",
+            "extract_dir": "node-v8.8.1-win-x64"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v8.2.1/node-v8.2.1-win-x86.7z",
-            "hash": "91494c1f4c514770113ccae9069077d567579d0ad7d65547ba32a5682d1d7ffb",
-            "extract_dir": "node-v8.2.1-win-x86"
+            "url": "https://nodejs.org/dist/v8.8.1/node-v8.8.1-win-x86.7z",
+            "hash": "bac81bae523ae68b32594f8af68401fb5bd95a0069c98572de056b95f581769c",
+            "extract_dir": "node-v8.8.1-win-x86"
         }
     },
     "persist": [
@@ -27,8 +27,8 @@
         Set-Content -Value \"prefix=$persist_dir\\bin`ncache=$persist_dir\\cache\" -Path $dir\\node_modules\\npm\\npmrc
     ",
     "checkver": {
-        "url": "https://nodejs.org/en/download/current/",
-        "re": "Current Version: <strong>v([\\d.]+)</strong>"
+        "url": "https://nodejs.org/dist/latest/",
+        "re": "node-v([\\d.]+)-x86.msi"
     },
     "autoupdate": {
         "architecture": {

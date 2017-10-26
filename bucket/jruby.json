@@ -1,0 +1,35 @@
+{
+    "homepage": "http://jruby.org/",
+    "version": "9.1.13.0",
+    "url": "https://s3.amazonaws.com/jruby.org/downloads/9.1.13.0/jruby-bin-9.1.13.0.zip",
+    "hash": "e43c63ad3f832a2333b59479654a97a5f98e609ad79759fd917b5d99ddc6671c",
+    "extract_dir": "jruby-9.1.13.0",
+    "persist": "gems",
+    "env_add_path": [
+        "bin",
+        "gems\\bin"
+    ],
+    "env_set": {
+        "JRUBY_HOME": "$dir",
+        "GEM_HOME": "$dir\\gems",
+        "GEM_PATH": "$dir\\gems"
+    },
+    "suggest": {
+        "OpenJDK": [
+            "openjdk"
+        ]
+    },
+    "notes": "Install a JDK and set JAVA_HOME if you don't already have. JRuby won't work without it.
+Also note that this installation overrides GEM_HOME and GEM_PATH from any previous Ruby or JRuby installation.",
+    "checkver": {
+        "url": "http://jruby.org/download",
+        "re": "Current Release:\\s+JRuby\\s+([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "https://s3.amazonaws.com/jruby.org/downloads/$version/jruby-bin-$version.zip",
+        "extract_dir": "jruby-$version",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}

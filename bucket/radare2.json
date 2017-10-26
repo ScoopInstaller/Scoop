@@ -10,7 +10,7 @@
         },
         "32bit": {
             "url": "https://radare.mikelloc.com/get/1.6.0/radare2-w32-1.6.0.zip",
-            "hash": "012e117023bea3cfbbf448da8da0261996e59fcc08b3401077920c31216bc965",
+            "hash": "d056007fdf1f04def12e9e5f5747d2cd12f23ef3a15aff7a889e3e0f1ed91038",
             "extract_dir": "radare2-w32-1.6.0"
         }
     },

@@ -29,28 +29,18 @@ if($global -and !(is_admin)) {
     'ERROR: You need admin rights to uninstall global apps.'; exit 1
 }
 
-foreach($app in $apps) {
+if($apps -eq 'scoop') {
+    & "$psscriptroot\..\bin\uninstall.ps1" $global; exit
+}
 
-    if(!(installed $app $global)) {
-        if($app -ne 'scoop') {
-            if(installed $app (!$global)) {
-                function wh($g) { if($g) { "globally" } else { "for your account" } }
-                write-host "'$app' isn't installed $(wh $global), but it is installed $(wh (!$global))." -f darkred
-                "Try uninstalling $(if($global) { 'without' } else { 'with' }) the --global (or -g) flag instead."
-                exit 1
-            } else {
-                error "'$app' isn't installed."
-                continue
-            }
-        }
-    }
+$apps = ensure_all_installed $apps $global
+if(!$apps) { exit 0 }
 
-    if($app -eq 'scoop') {
-        & "$psscriptroot\..\bin\uninstall.ps1" $global; exit
-    }
+$apps | % {
+    ($app, $global) = $_
 
     $version = current_version $app $global
-    "Uninstalling '$app' ($version)."
+    write-host "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
     $persist_dir = persistdir $app $global

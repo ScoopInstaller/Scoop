@@ -1,9 +1,30 @@
 {
     "homepage": "https://geoff.greer.fm/ag/",
     "license": "Apache 2.0",
-    "version": "0.29.1",
-    "url": "https://kjkpub.s3.amazonaws.com/software/the_silver_searcher/rel/0.29.1-1641/ag.zip",
-    "hash": "0f2643b925df66a56df82d419262c88c076ba257ab3a57c77291fce7b4479530",
+    "version": "2.1.0-5-g1791664",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-10-23/2.1.0-5-g1791664/ag-2017-10-23_2.1.0-5-g1791664-x64.zip",
+            "hash": "5580e4321584377247600a8ca56b4e130c17dfb980640170079dfb38dc4a9f7b"
+        },
+        "32bit": {
+            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2017-10-23/2.1.0-5-g1791664/ag-2017-10-23_2.1.0-5-g1791664-x86.zip",
+            "hash": "92dd6ec36f260632f788aa6b570194b874a8fe3740f9d8b2e0f02ba444e9dd3f"
+        }
+    },
     "bin": "ag.exe",
-    "checkver": "the_silver_searcher-([\\d.]+).tar.gz"
+    "checkver": {
+        "url": "https://github.com/k-takata/the_silver_searcher-win32/releases",
+        "re": "/releases/tag/(?<date>[\\d-]+)%2F(?<version>[\\w.-]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/$matchDate/$version/ag-$matchDate_$version-x64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/$matchDate/$version/ag-$matchDate_$version-x86.zip"
+            }
+        }
+    }
 }

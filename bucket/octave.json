@@ -6,12 +6,12 @@
         "64bit": {
             "url": "https://ftp.gnu.org/gnu/octave/windows/octave-4.2.1-w64.zip",
             "hash": "a60254e85da78105c2aa35474c1eff35d14f22fd1832b9daa339446d46752b5b",
-            "extract_dir": "octave-4.2.1-w64"
+            "extract_dir": "octave-4.2.1"
         },
         "32bit": {
             "url": "https://ftp.gnu.org/gnu/octave/windows/octave-4.2.1-w32.zip",
             "hash": "4be2c451a2757b80f21bfc06d48a59a49e5ed00b0461471da9bce565efac79fa",
-            "extract_dir": "octave-4.2.1-w32"
+            "extract_dir": "octave-4.2.1"
         }
     },
     "bin": [
@@ -28,11 +28,11 @@
         "architecture": {
             "64bit": {
                 "url": "https://ftp.gnu.org/gnu/octave/windows/octave-$version-w64.zip",
-                "extract_dir": "octave-$version-w64"
+                "extract_dir": "octave-$version"
             },
             "32bit": {
                 "url": "https://ftp.gnu.org/gnu/octave/windows/octave-$version-w32.zip",
-                "extract_dir": "octave-$version-w32"
+                "extract_dir": "octave-$version"
             }
         }
     }

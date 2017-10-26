@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.erlang.org",
-    "version": "20.0",
+    "version": "20.1",
     "license": "https://www.apache.org/licenses/LICENSE-2.0",
     "architecture": {
         "64bit": {
-            "url": "http://erlang.org/download/otp_win64_20.0.exe",
-            "hash": "6e39854cc00941bf68d8098846d91db6a48c1835a5ebab89728214275d2ac70c"
+            "url": "http://erlang.org/download/otp_win64_20.1.exe",
+            "hash": "89a3853c8610f89e5a394610be56e59823b9b10b0fd93ba6aa65f3b659a6636b"
         },
         "32bit": {
-            "url": "http://erlang.org/download/otp_win32_20.0.exe",
-            "hash": "b92f326d8988b0a98c654ffe9bceccf5b7d0baffe6ec224bc8e4cfdc0e53fd8f"
+            "url": "http://erlang.org/download/otp_win32_20.1.exe",
+            "hash": "59b9b3de03b7f51c7eadd7ed3a4641b926353e4026f2fb8650e3064786de2d00"
         }
     },
     "bin": [

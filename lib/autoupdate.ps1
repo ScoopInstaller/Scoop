@@ -10,10 +10,7 @@ TODO
 . "$psscriptroot/json.ps1"
 
 function find_hash_in_rdf([String] $url, [String] $filename) {
-    Write-Host -f DarkYellow "RDF URL: $url"
-    Write-Host -f DarkYellow "File: $filename"
-
-    $data = ""
+    $data = $null
     try {
         # Download and parse RDF XML file
         $wc = new-object net.webclient
@@ -58,7 +55,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
 
     # find hash with filename in $hashfile (will be overridden by $regex)
     if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
-        $filenameRegex = "([a-fA-F0-9]+)\s+\*?(?:`$basename)"
+        $filenameRegex = "([a-fA-F0-9]+)\s+(?:\.\/|\*)?(?:`$basename)"
         $filenameRegex = substitute $filenameRegex @{'$basename' = [regex]::Escape($basename)}
         if ($hashfile -match $filenameRegex) {
             $hash = $matches[1]
@@ -74,14 +71,16 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
     try {
         $wc = new-object net.webclient
         $wc.headers.add('Referer', (strip_filename $url))
-        $json = $wc.downloadstring($url) | convertfrom-json -ea stop
+        $json = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
         return
     }
-
     $hash = json_path $json $jsonpath $basename
+    if(!$hash) {
+        $hash = json_path_legacy $json $jsonpath $basename
+    }
     return format_hash $hash
 }
 
@@ -103,32 +102,46 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         '$basename' = $basename
     }
     $hashfile_url = substitute $hashfile_url $substitutions
-    if($hashfile_url) { write-host -f yellow $hashfile_url }
+    if($hashfile_url) {
+        write-host -f DarkYellow 'Searching hash for ' -NoNewline
+        write-host -f Green $(url_remote_filename $url) -NoNewline
+        write-host -f DarkYellow ' in ' -NoNewline
+        write-host -f Green $hashfile_url
+    }
 
     if($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
-        $hashmode = "extract"
+        $hashmode = 'extract'
     }
 
-    if ($hashmode -eq "extract") {
+    if ($config.jp.Length -gt 0) {
+        $hashmode = 'json'
+    }
+
+    if ($hashmode -eq 'extract') {
         $hash = find_hash_in_textfile $hashfile_url $basename $config.find
     }
-
-    if ($hashmode -eq "json") {
+    if ($hashmode -eq 'json') {
         $hash = find_hash_in_json $hashfile_url $basename $config.jp
     }
 
-    if ($hashmode -eq "rdf") {
+    if ($hashmode -eq 'rdf') {
         $hash = find_hash_in_rdf $hashfile_url $basename
     }
 
     if($hash) {
         # got one!
+        write-host -f DarkYellow 'Found: ' -NoNewline
+        write-host -f Green $hash -NoNewline
+        write-host -f DarkYellow ' using ' -NoNewline
+        write-host -f Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
         return $hash
     } elseif($hashfile_url) {
         write-host -f DarkYellow "Could not find hash in $hashfile_url"
     }
 
-    Write-Host "Download files to compute hashes!" -f DarkYellow
+    write-host -f DarkYellow 'Downloading ' -NoNewline
+    write-host -f Green $(url_remote_filename $url) -NoNewline
+    write-host -f DarkYellow ' to compute hashes!'
     try {
         dl_with_cache $app $version $url $null $null $true
     } catch [system.net.webexception] {
@@ -137,7 +150,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         return $null
     }
     $file = fullpath (cache_path $app $version $url)
-    return compute_hash $file "sha256"
+    $hash = compute_hash $file 'sha256'
+    write-host -f DarkYellow 'Computed hash: ' -NoNewline
+    write-host -f Green $hash
+    return $hash
 }
 
 function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
@@ -170,11 +186,10 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 
     # check if there are architecture specific variants
-    if ($json.architecture) {
+    if ($json.architecture -and $json.autoupdate.architecture) {
         $json.architecture | Get-Member -MemberType NoteProperty | % {
             $architecture = $_.Name
-
-            if ($json.architecture.$architecture.$prop) {
+            if ($json.architecture.$architecture.$prop -and $json.autoupdate.architecture.$architecture.$prop) {
                 $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) $substitutions
             }
         }
@@ -195,9 +210,10 @@ function get_version_substitutions([String] $version, [Hashtable] $matches) {
         '$preReleaseVersion' = $lastPart;
     }
     if($matches) {
-        $matches.Remove(0)
         $matches.GetEnumerator() | % {
-            $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+            if($_.Name -ne "0") {
+                $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+            }
         }
     }
     return $versionVariables
