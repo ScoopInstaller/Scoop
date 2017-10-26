@@ -1,17 +1,17 @@
 {
-    "version": "1.6.0",
+    "version": "2.0.1",
     "license": "GPL2",
     "homepage": "https://www.radare.org/r/",
     "architecture": {
         "64bit": {
-            "url": "https://radare.mikelloc.com/get/1.6.0/radare2-w64-1.6.0.zip",
-            "hash": "sha1:d5bf5f841ba62a7aacc095bd92cf7e9adb705a3e",
-            "extract_dir": "radare2-w64-1.6.0"
+            "url": "https://radare.mikelloc.com/get/2.0.1/radare2-w64-2.0.1.zip",
+            "hash": "sha1:0d10db6a27c7bb4ef329f25ffde395b94d77f94e",
+            "extract_dir": "radare2-w64-2.0.1"
         },
         "32bit": {
-            "url": "https://radare.mikelloc.com/get/1.6.0/radare2-w32-1.6.0.zip",
-            "hash": "d056007fdf1f04def12e9e5f5747d2cd12f23ef3a15aff7a889e3e0f1ed91038",
-            "extract_dir": "radare2-w32-1.6.0"
+            "url": "https://radare.mikelloc.com/get/2.0.1/radare2-w32-2.0.1.zip",
+            "hash": "sha1:c8a25f003ec82e84394c1e646553065055cf0cec",
+            "extract_dir": "radare2-w32-2.0.1"
         }
     },
     "bin": [
@@ -27,7 +27,8 @@
         "rax2.exe"
     ],
     "checkver": {
-        "github": "https://github.com/radare/radare2"
+        "url": "http://www.radare.org/r/down.html",
+        "re": "last release is ([\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
