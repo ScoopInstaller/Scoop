@@ -1,15 +1,15 @@
 {
     "homepage": "https://julialang.org",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://s3.amazonaws.com/julialang/bin/winnt/x64/0.6/julia-0.6.0-win64.exe#/dl.7z",
-            "hash": "fff2208555e0c9fb93a1aad95e16ddab9f4983d5c37179edcd721203d6278067"
+            "url": "https://julialang-s3.julialang.org/bin/winnt/x64/0.6/julia-0.6.1-win64.exe#/dl.7z",
+            "hash": "776687fc2023b67fd5ee33a4a61417460e88477ef5bed1afcf3007cdd5b9e5bc"
         },
         "32bit": {
-            "url": "https://s3.amazonaws.com/julialang/bin/winnt/x86/0.6/julia-0.6.0-win32.exe#/dl.7z",
-            "hash": "8338d599a39701ce2710d077519f9a4e4d17960d6c7aa4115ad15ede248d5bd6"
+            "url": "https://julialang-s3.julialang.org/bin/winnt/x86/0.6/julia-0.6.1-win32.exe#/dl.7z",
+            "hash": "ff97fc4d24ac554d58129fd3d1fb48897f45fe6814118c83b507b7166e59c157"
         }
     },
     "installer": {
@@ -42,14 +42,14 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://s3.amazonaws.com/julialang/bin/winnt/x64/$majorVersion.$minorVersion/julia-$version-win64.exe#/dl.7z"
+                "url": "https://julialang-s3.julialang.org/bin/winnt/x64/$majorVersion.$minorVersion/julia-$version-win64.exe#/dl.7z"
             },
             "32bit": {
-                "url": "https://s3.amazonaws.com/julialang/bin/winnt/x86/$majorVersion.$minorVersion/julia-$version-win32.exe#/dl.7z"
+                "url": "https://julialang-s3.julialang.org/bin/winnt/x86/$majorVersion.$minorVersion/julia-$version-win32.exe#/dl.7z"
             }
         },
         "hash": {
-            "url": "https://s3.amazonaws.com/julialang/bin/checksums/julia-$version.sha256"
+            "url": "https://julialang-s3.julialang.org/bin/checksums/julia-$version.sha256"
         }
     }
 }
