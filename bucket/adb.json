@@ -1,8 +1,8 @@
 {
-    "version": "26.0.1",
+    "version": "26.0.2",
     "homepage": "https://developer.android.com/studio/releases/platform-tools.html",
-    "url": "https://dl.google.com/android/repository/platform-tools_r26.0.1-windows.zip",
-    "hash": "033a5ea4c75af3e4fb30e936fb23e0990b96f9fc712866ebe815b812aab8c22f",
+    "url": "https://dl.google.com/android/repository/platform-tools_r26.0.2-windows.zip",
+    "hash": "4850c695724ad0328d9100cc3b4475dcd1af1bec904675362259595a3e03ae2e",
     "bin": [
         "platform-tools\\adb.exe",
         "platform-tools\\dmtracedump.exe",
