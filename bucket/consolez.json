@@ -1,0 +1,30 @@
+{
+    "homepage": "https://github.com/cbucher/console",
+    "version": "1.18.2.17272",
+    "license": "GPL-2.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/cbucher/console/releases/download/1.18.2/ConsoleZ.x64.1.18.2.17272.zip",
+            "hash": "50d612c3dea96f07562f25d1c4a69d7bb988b550b7627f31c48bd89dcb106545"
+        },
+        "32bit": {
+            "url": "https://github.com/cbucher/console/releases/download/1.18.2/ConsoleZ.x86.1.18.2.17272.zip",
+            "hash": "6fe3f3dab3e0f1110b9633e63fedd7ed13a1da028a8b7e2df233125c91f5cad4"
+        }
+    },
+    "bin": "console.exe",
+    "checkver": {
+        "github": "https://github.com/cbucher/console",
+        "re": "/releases/download/(?:[\\d.]+)/ConsoleZ\\.([\\d.]+)\\.7z"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/cbucher/console/releases/download/$majorVersion.$minorVersion.$patchVersion/ConsoleZ.x64.$version.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/cbucher/console/releases/download/$majorVersion.$minorVersion.$patchVersion/ConsoleZ.x86.$version.zip"
+            }
+        }
+    }
+}
