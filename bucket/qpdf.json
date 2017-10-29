@@ -1,0 +1,34 @@
+{
+    "homepage": "http://qpdf.sourceforge.net/",
+    "version": "7.0.0",
+    "license": "Apache-2.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://sourceforge.net/projects/qpdf/files/qpdf/7.0.0/qpdf-7.0.0-bin-mingw64.zip",
+            "hash": "sha1:5d084306dbbdd35de27d430d269e4c683b3f04c9"
+        },
+        "32bit": {
+            "url": "https://sourceforge.net/projects/qpdf/files/qpdf/7.0.0/qpdf-7.0.0-bin-mingw32.zip",
+            "hash": "sha1:887eb47ab26b2a69786a4c4fbf815f380b6d889c"
+        }
+    },
+    "bin": "qpdf-7.0.0\\bin\\qpdf.exe",
+    "checkver": {
+        "github": "https://github.com/qpdf/qpdf",
+        "re": "/releases/tag/release-qpdf-([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://sourceforge.net/projects/qpdf/files/qpdf/$version/qpdf-$version-bin-mingw64.zip"
+            },
+            "32bit": {
+                "url": "https://sourceforge.net/projects/qpdf/files/qpdf/$version/qpdf-$version-bin-mingw32.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "https://sourceforge.net/projects/qpdf/files/qpdf/$version/qpdf-$version.sha1"
+        }
+    }
+}
