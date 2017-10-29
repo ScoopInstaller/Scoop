@@ -8,6 +8,11 @@
     "depends": [
         "ffmpeg"
     ],
+    "suggest": {
+        "vcredist": [
+            "extras/vcredist2010"
+        ]
+    },
     "checkver": {
         "github": "https://github.com/rg3/youtube-dl"
     },
