@@ -3,7 +3,7 @@
     "version": "10.64",
     "license": "https://dev.perl.org/licenses/",
     "url": "https://downloads.sourceforge.net/project/exiftool/exiftool-10.64.zip",
-    "hash": "3d9018d0733b69d98ca109d7ca788a07dec7aa80a4adcb1f6bff6a2ed072b2de",
+    "hash": "5f818e4abbdb36b88987218d72366470283796b8c91a475a13535167bd9fb48a",
     "bin": [
         [
             "exiftool(-k).exe",
