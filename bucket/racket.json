@@ -1,15 +1,15 @@
 {
-    "version": "6.10.1",
+    "version": "6.11",
     "homepage": "https://racket-lang.org",
     "license": "LGPL",
     "architecture": {
         "64bit": {
-            "url": "https://mirror.racket-lang.org/installers/6.10.1/racket-6.10.1-x86_64-win32.exe#/dl.7z",
-            "hash": "5875d9f5c88f37a323bff1094ff39a1c803d67648659c0a305a46d7e290ab67a"
+            "url": "https://mirror.racket-lang.org/installers/6.11/racket-6.11-x86_64-win32.exe#/dl.7z",
+            "hash": "db0ff7e3a731fe5e4963ce45b51a9b8f02459191dc0b069a424cbf5c3884e543"
         },
         "32bit": {
-            "url": "https://mirror.racket-lang.org/installers/6.10.1/racket-6.10.1-i386-win32.exe#/dl.7z",
-            "hash": "b1bd0ea79f1e02205e01590cba58348fddc5cfdfc17319a238b5865c1c45b61e"
+            "url": "https://mirror.racket-lang.org/installers/6.11/racket-6.11-i386-win32.exe#/dl.7z",
+            "hash": "223d48a6650719d39a6a4cafdfbc7f01cf782abc09d4dec6830271364113d4a1"
         }
     },
     "bin": [
