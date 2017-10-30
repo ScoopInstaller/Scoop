@@ -1,16 +1,12 @@
 {
     "homepage": "https://minio.io/",
     "license": "https://github.com/minio/minio/blob/master/LICENSE",
-    "version": "2017-08-05T00-00-53Z",
+    "version": "2017-10-27T18-59-02Z",
     "bin": "minio.exe",
     "architecture": {
         "64bit": {
-            "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.2017-08-05T00-00-53Z#/minio.exe",
-            "hash": "316e5c5864edc29d16ce5c20ae758a6c152faf7cd4ebd312c7acaadcd9dcb7dd"
-        },
-        "32bit": {
-            "url": "https://dl.minio.io/server/minio/release/windows-386/minio.RELEASE.2017-08-05T00-00-53Z#/minio.exe",
-            "hash": "4ab74f1094dd315c316315c3c121ca03a10bca1f9e76f0058651cbd831665b17"
+            "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.2017-10-27T18-59-02Z#/minio.exe",
+            "hash": "c21e988e5977d2c5df9817354e29088125508e5561575cb6eb32f1fb1eeae947"
         }
     },
     "suggest": {
@@ -24,12 +20,6 @@
         "architecture": {
             "64bit": {
                 "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.$version#/minio.exe",
-                "hash": {
-                    "url": "$baseurl/minio.RELEASE.$version.sha256sum"
-                }
-            },
-            "32bit": {
-                "url": "https://dl.minio.io/server/minio/release/windows-386/minio.RELEASE.$version#/minio.exe",
                 "hash": {
                     "url": "$baseurl/minio.RELEASE.$version.sha256sum"
                 }
