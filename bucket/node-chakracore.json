@@ -1,0 +1,48 @@
+{
+    "homepage":  "https://github.com/nodejs/node-chakracore",
+    "version":  "8.6.0",
+    "license":  "MIT",
+    "architecture": {
+        "32bit": {
+            "url": "https://nodejs.org/download/chakracore-release/v8.6.0/node-v8.6.0-win-x86.7z",
+            "hash": "f01d7f645d7441d4ae89ac8f12c1d269e6ff920755274f86e47fccf46bf1a5fb",
+            "extract_dir": "node-v8.6.0-win-x86"
+        },
+        "64bit": {
+            "url": "https://nodejs.org/download/chakracore-release/v8.6.0/node-v8.6.0-win-x64.7z",
+            "hash": "6b60f47773a57eec1603ae43ef7a75622498596aff98a71b3673ee8a9126deb2",
+            "extract_dir": "node-v8.6.0-win-x64"
+        }
+    },
+    "persist": [
+        "bin",
+        "cache"
+    ],
+    "env_add_path": [
+        ".",
+        "bin"
+    ],
+    "post_install": "
+        # Set npm prefix to install modules inside bin and npm cache so they persist
+        Set-Content -Value \"prefix=$persist_dir\\bin`ncache=$persist_dir\\cache\" -Path $dir\\node_modules\\npm\\npmrc
+    ",
+    "checkver": {
+        "url": "https://nodejs.org/download/chakracore-release/index.json",
+        "re": "v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "32bit": {
+                "url": "https://nodejs.org/download/chakracore-release/v$version/node-v$version-win-x86.7z",
+                "extract_dir": "node-v$version-win-x86"
+            },
+            "64bit": {
+                "url": "https://nodejs.org/download/chakracore-release/v$version/node-v$version-win-x64.7z",
+                "extract_dir": "node-v$version-win-x64"
+            }
+        },
+        "hash": {
+            "url": "https://nodejs.org/download/chakracore-release/v$version/SHASUMS256.txt"
+        }
+    }
+}
