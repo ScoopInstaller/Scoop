@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.getgutenberg.io/",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "license": "MIT",
-    "url": "https://github.com/Keats/gutenberg/releases/download/v0.2.1/gutenberg-v0.2.1-x86_64-pc-windows-msvc.zip",
-    "hash": "938ffb8afab0af579212f366aacb73901708a1c1015c53d0d90a7d8ba74fe23f",
+    "url": "https://github.com/Keats/gutenberg/releases/download/v0.2.2/gutenberg-v0.2.2-x86_64-pc-windows-msvc.zip",
+    "hash": "791a6632c4cb1f38f84ee522c57ad0d2e0f7814eebc5771064ce90f025161146",
     "bin": "gutenberg.exe",
     "checkver": {
         "github": "https://github.com/Keats/gutenberg"
