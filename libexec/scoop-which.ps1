@@ -1,6 +1,6 @@
 # Usage: scoop which <command>
-# Summary: Locate a program path
-# Help: Finds the path to a program that was installed with Scoop
+# Summary: Locate a shim/executable (similar to 'which' on Linux)
+# Help: Locate the path to a shim/executable that was installed with Scoop (similar to 'which' on Linux)
 param($command)
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
