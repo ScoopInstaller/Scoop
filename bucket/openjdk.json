@@ -7,6 +7,11 @@
             "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.151-1/java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86_64.zip",
             "hash": "1905ea74b79d6d1d2ea2b2b6887c14770f090fbb8b46e7e1bfb56e92845e9cf2",
             "extract_dir": "java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86_64"
+        },
+        "32bit": {
+            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.151-1/java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86.zip",
+            "hash": "4586478efec0bae5f8c7846accbbc90f06012bcc9079c725f4588fd3484e8624",
+            "extract_dir": "java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86"
         }
     },
     "env_add_path": "bin",
@@ -22,6 +27,10 @@
             "64bit": {
                 "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-$matchShort-openjdk-$version$matchTail.x86_64.zip",
                 "extract_dir": "java-$matchShort-openjdk-$version$matchTail.x86_64"
+            },
+            "32bit": {
+                "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-$matchShort-openjdk-$version$matchTail.x86.zip",
+                "extract_dir": "java-$matchShort-openjdk-$version$matchTail.x86"
             }
         },
         "hash": {
