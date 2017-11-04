@@ -1,0 +1,34 @@
+{
+    "homepage": "https://gogs.io/",
+    "version": "0.11.29",
+    "license": "MIT",
+    "description": "Self-hosted Git service",
+    "architecture": {
+        "64bit": {
+            "url": "https://dl.gogs.io/0.11.29/windows_amd64.zip",
+            "hash": "527bca6c61af899a9e1bd4090b1376826e45c6f702b961bf7a418ab64b7db0c1"
+        },
+        "32bit": {
+            "url": "https://dl.gogs.io/0.11.29/windows_386.zip",
+            "hash": "ba6660c3071af644dabef2f5d9210db84a2b7080e1a4765c2c86b0115dd5dff4"
+        }
+    },
+    "checkver": {
+        "github": "https://github.com/gogits/gogs"
+    },
+    "bin": "gogs/gogs.exe",
+    "persist": [
+        "custom",
+        "logs"
+    ],
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://dl.gogs.io/$version/windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://dl.gogs.io/$version/windows_386.zip"
+            }
+        }
+    }
+}
