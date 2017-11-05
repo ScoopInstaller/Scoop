@@ -202,6 +202,7 @@ function get_version_substitutions([String] $version, [Hashtable] $matches) {
     $versionVariables = @{
         '$version' = $version;
         '$underscoreVersion' = ($version -replace "\.", "_");
+        '$dashVersion' = ($version -replace "\.", "-");
         '$cleanVersion' = ($version -replace "\.", "");
         '$majorVersion' = $firstPart.Split('.') | Select-Object -first 1;
         '$minorVersion' = $firstPart.Split('.') | Select-Object -skip 1 -first 1;
