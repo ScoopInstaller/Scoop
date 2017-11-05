@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.29-win64-VC15.zip",
-            "hash": "CFD930043C2433D641C3C6837C899EB0943D1D31FF31840B4C4BC1E65DECFEDE"
+            "hash": "2F686F7CF56232E50F5E226D0C11C6B2E6CA241F77A966CC1282E1C940995950"
         },
         "32bit": {
             "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.29-win32-VC15.zip",
-            "hash": "5F48C3EC2616EE6A0294E54C5F00617E29D0BE5EB843F6A9E8E18B5528A3E74F"
+            "hash": "4F7BA52D7B0A0991CAD581D2118910FAEB90652A2819D5355102589087BEEBE2"
         }
     },
     "extract_dir": "Apache24",
