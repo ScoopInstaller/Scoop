@@ -55,7 +55,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
 
     # find hash with filename in $hashfile (will be overridden by $regex)
     if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
-        $filenameRegex = "([a-fA-F0-9]+)\s+(?:\.\/|\*)?(?:`$basename)"
+        $filenameRegex = "([a-fA-F0-9]+)\s+(?:\.\/|\*)?(?:`$basename)(\s[\d]+)?"
         $filenameRegex = substitute $filenameRegex @{'$basename' = [regex]::Escape($basename)}
         if ($hashfile -match $filenameRegex) {
             $hash = $matches[1]
