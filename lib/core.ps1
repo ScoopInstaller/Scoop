@@ -184,9 +184,8 @@ function unzip($path, $to) {
         if ($retries -eq 10) {
             if (7zip_installed) {
                 extract_7zip $path $to $false
-            return
-            }
-            else {
+                return
+            } else {
                 abort "Unzip failed: Windows can't unzip because a process is locking the file.`nRun 'scoop install 7zip' and try again."
             }
         }
@@ -194,25 +193,22 @@ function unzip($path, $to) {
             write-host "Waiting for $path to be unlocked by another process... ($retries/10)"
             $retries++
             Start-Sleep -s 2
-        }
-        else {
+        } else {
             break
         }
     }
+
     try {
-        [io.compression.zipfile]::extracttodirectory($path, $to)
-    }
-    catch [system.io.pathtoolongexception] {
+        [io.compression.zipfile]::extracttodirectory($path,$to)
+    } catch [system.io.pathtoolongexception] {
         # try to fall back to 7zip if path is too long
-        if (7zip_installed) {
+        if(7zip_installed) {
             extract_7zip $path $to $false
             return
-        }
-        else {
+        } else {
             abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
         }
-    }
-    catch {
+    } catch {
         abort "Unzip failed: $_"
     }
 }
