@@ -169,6 +169,37 @@ function unzip($path,$to) {
         } else {
             abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
         }
+     } catch [system.io.ioexception] {
+        # First sleep for 5 s
+        # if AV was locking the file, we want the script to try again a few times after short sleeps
+        Start-Sleep -s 5
+        try {
+            [io.compression.zipfile]::extracttodirectory($path,$to)
+        } catch [system.io.pathtoolongexception] {
+            # try to fall back to 7zip if path is too long
+            if(7zip_installed) {
+                extract_7zip $path $to $false
+                return
+            } else {
+                abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
+            }
+        } catch [system.io.ioexception] {
+            # Second sleep for 3s
+            # if AV was locking the file, we want the script to try again a few times after short sleeps
+            Start-Sleep -s 3
+            try {
+                [io.compression.zipfile]::extracttodirectory($path,$to)
+            } catch [system.io.pathtoolongexception] {
+                # try to fall back to 7zip if path is too long
+                if(7zip_installed) {
+                    extract_7zip $path $to $false
+                    return
+                } else {
+                    abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
+                }
+            }
+        }
+    
     } catch {
         abort "Unzip failed: $_"
     }
