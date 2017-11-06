@@ -188,8 +188,7 @@ function unzip($path, $to) {
             }
             else {
                 abort "Unzip failed: Windows can't unzip because a process is locking the file.`nRun 'scoop install 7zip' and try again."
-        }
-            abort "Unzip failed: Too many retries!"
+            }
         }
         if (isFileLocked $path) {
             write-host "Waiting for $path to be unlocked by another process... ($retries/10)"
