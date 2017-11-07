@@ -1,8 +1,8 @@
 {
-    "version": "3.7.0",
+    "version": "3.7.1",
     "homepage": "http://www.seleniumhq.org/",
-    "url": "https://selenium-release.storage.googleapis.com/3.7/selenium-server-standalone-3.7.0.jar#/selenium.jar",
-    "hash": "855c3a0c81d464e1431fa8e98a8e2d430d72ca8d48d89958cef3e76446281f42",
+    "url": "https://selenium-release.storage.googleapis.com/3.7/selenium-server-standalone-3.7.1.jar#/selenium.jar",
+    "hash": "b4a581ab35f2697618aa9c94721d7b2ca421c0a97dd96f974e341347263f09b6",
     "bin": "selenium.cmd",
     "pre_install": "\"@java -jar \"\"$dir\\selenium.jar\"\" %*\" | out-file -en oem \"$dir\\selenium.cmd\"",
     "checkver": {
