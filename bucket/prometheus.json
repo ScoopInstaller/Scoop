@@ -1,17 +1,17 @@
 {
     "homepage": "https://prometheus.io/",
     "license": "Apache-2.0",
-    "version": "1.8.1",
+    "version": "1.8.2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/prometheus/prometheus/releases/download/v1.8.1/prometheus-1.8.1.windows-amd64.tar.gz",
-            "hash": "25e73e0c3a9f18228e42d4cdb8652b46fd92d1b0691738635ce09e60b03429ae",
-            "extract_dir": "prometheus-1.8.1.windows-amd64"
+            "url": "https://github.com/prometheus/prometheus/releases/download/v1.8.2/prometheus-1.8.2.windows-amd64.tar.gz",
+            "hash": "e78d3fe95db2911d16df9d3388d9ae2d7a871cedb7e8b80ad582f369bee93097",
+            "extract_dir": "prometheus-1.8.2.windows-amd64"
         },
         "32bit": {
-            "url": "https://github.com/prometheus/prometheus/releases/download/v1.8.1/prometheus-1.8.1.windows-386.tar.gz",
-            "hash": "73a95dce1fad43e1943cdeef5d3aef8a94f8c13dab65c78974b4f8879f14b14d",
-            "extract_dir": "prometheus-1.8.1.windows-386"
+            "url": "https://github.com/prometheus/prometheus/releases/download/v1.8.2/prometheus-1.8.2.windows-386.tar.gz",
+            "hash": "e72396ed39e090d464d8d0e05d49605783587e1338785c3c6148359bc2c25569",
+            "extract_dir": "prometheus-1.8.2.windows-386"
         }
     },
     "bin": "prometheus.exe",
