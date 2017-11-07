@@ -1,17 +1,17 @@
 {
-    "version": "1.0.0",
+    "version": "1.0.1",
     "homepage": "https://github.com/vitiral/artifact",
     "license": "LGPL",
     "bin": "art.exe",
     "checkver": "github",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/vitiral/artifact/releases/download/1.0.0/artifact-app-1.0.0-x86_64-pc-windows-gnu.zip",
-            "hash": "482d0500b87eefa746129de7c692d0afa00199122c25a7c099cc04cd4d786b4b"
+            "url": "https://github.com/vitiral/artifact/releases/download/1.0.1/artifact-app-1.0.1-x86_64-pc-windows-gnu.zip",
+            "hash": "f377c360b53528f4599b729dfb33aed788f06bdc782ef190063d786f09799e1b"
         },
         "32bit": {
-            "url": "https://github.com/vitiral/artifact/releases/download/1.0.0/artifact-app-1.0.0-i686-pc-windows-gnu.zip",
-            "hash": "6e7020cc38c7ede8fb63bdf0597446f948e15da6013bd133e5a5fbed9e460e9f"
+            "url": "https://github.com/vitiral/artifact/releases/download/1.0.1/artifact-app-1.0.1-i686-pc-windows-gnu.zip",
+            "hash": "1a7176b7c132ff4789b38545c745819a438dfd06f2013b8f8e66fdc99863bc5c"
         }
     },
     "autoupdate": {
