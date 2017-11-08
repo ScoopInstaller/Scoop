@@ -6,7 +6,6 @@
     "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/6.6/smartmontools-6.6-1.win32-setup.exe",
     "hash": "md5:f3abb6e80c758594d66b58939b751dd1",
     "bin": [
-        "bin/runcmda.exe",
         "bin/runcmdu.exe",
         "bin/smartctl.exe",
         "bin/smartctl-nc.exe",
