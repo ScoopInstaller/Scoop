@@ -1,10 +1,10 @@
 {
     "homepage": "https://gradle.org",
-    "version": "4.3",
+    "version": "4.3.1",
     "license": "Apache 2.0",
-    "hash": "8dcbf44eef92575b475dcb1ce12b5f19d38dc79e84c662670248dc8b8247654c",
-    "url": "https://services.gradle.org/distributions/gradle-4.3-bin.zip",
-    "extract_dir": "gradle-4.3",
+    "hash": "15ebe098ce0392a2d06d252bff24143cc88c4e963346582c8d88814758d93ac7",
+    "url": "https://services.gradle.org/distributions/gradle-4.3.1-bin.zip",
+    "extract_dir": "gradle-4.3.1",
     "bin": "bin\\gradle.bat",
     "env_set": {
         "GRADLE_HOME": "$dir"
