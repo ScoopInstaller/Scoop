@@ -3,8 +3,8 @@
     "description": "Read SMART data from disks",
     "license": "GPL-2.0",
     "version": "6.6-1",
-    "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/6.5/smartmontools-6.5-1.win32-setup.exe",
-    "hash": "md5:8445f34e7746b5f0b4474bc46b29d5a9",
+    "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/6.6/smartmontools-6.6-1.win32-setup.exe",
+    "hash": "md5:f3abb6e80c758594d66b58939b751dd1",
     "bin": [
         "bin/runcmda.exe",
         "bin/runcmdu.exe",
@@ -22,11 +22,11 @@
         ]
     },
     "checkver": {
-        "re": ">Download\\s+smartmontools-([\\d.\\-]+)\\.",
+        "re": "Download\\s+smartmontools-(?<version>(?<short>[\\d.]+)-[\\d]+)\\.",
         "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/"
     },
     "autoupdate": {
-        "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/6.5/smartmontools-6.5-1.win32-setup.exe",
+        "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/$matchShort/smartmontools-$version.win32-setup.exe",
         "hash": {
             "url": "$url.md5"
         }
