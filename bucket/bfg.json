@@ -15,7 +15,7 @@
         "BFG_HOME": "$dir"
     },
     "pre_install": "
-        $exe = 'java -jar $env:BFG_HOME\\bfg-$version.jar $args'
+        $exe = \"java -jar `$env:BFG_HOME\\bfg-$version.jar `$args\"
         write-output $exe | out-file -filepath $dir\\bfg.ps1
     ",
     "checkver": {
