@@ -1,13 +1,15 @@
 {
-    "version": "1.3.0",
+    "version": "1.7.0",
     "license": "MIT",
-    "url": "https://win.rustup.rs/?version=1.3.0#/rustup-init.exe",
-    "hash": "9df0222a746c8c0dee9941536ae5b51f12d70e639d79ca15f788c6f01c09a367",
-    "depends": "extras/vcredist2015",
+    "hash": "016519a9e975a752bd240c49155b34e652f60193c951eacf0c2d17805839819d",
     "homepage": "https://github.com/rust-lang-nursery/rustup.rs",
-    "checkver": "github",
+    "checkver": {
+        "url": "https://raw.githubusercontent.com/rust-lang-nursery/rustup.rs/master/Cargo.toml",
+        "re": "version = \"(\\d+\\.\\d+\\.\\d+)\""
+    },
+    "url": "https://win.rustup.rs/#/rustup-init.exe",
     "autoupdate": {
-        "url": "https://win.rustup.rs/?version=$version#/rustup-init.exe"
+        "url": "https://win.rustup.rs/#/rustup-init.exe"
     },
     "persist": [
         ".cargo",
@@ -25,7 +27,8 @@
             [Environment]::SetEnvironmentVariable('RUSTUP_HOME', \"$persist_dir\\.rustup\", 'Process')
 
             # Install Rustup
-            & \"$dir\\rustup-init.exe\" -y --no-modify-path
+            & \"$dir\\rustup-init.exe\" -y --no-modify-path --default-toolchain stable-gnu
         "
-    }
+    },
+    "notes": "To use the MSVC ABI without Visual Studio 2015 (or higher) installed, you will need the Visual Studio 2017 Build Tools: https://www.visualstudio.com/downloads/#build-tools-for-visual-studio-2017"
 }
