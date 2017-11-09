@@ -30,7 +30,6 @@
         }
     },
     "notes": "You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly",
-    "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/coreybutler/nvm-windows/releases/download/$version/nvm-noinstall.zip"
     }
