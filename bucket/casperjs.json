@@ -1,17 +1,20 @@
 {
-    "version": "1.1.4",
-    "license": "https://github.com/n1k0/casperjs/blob/master/LICENSE.md",
-    "url": "https://github.com/casperjs/casperjs/archive/1.1.4.zip",
-    "hash": "2d98eecf417f6034394c0ec2dcefb25f47e49342801b2ed21e85b21a4dd0eddc",
+    "version": "1.1.4-1",
     "homepage": "http://casperjs.org/",
-    "extract_dir": "casperjs-1.1.4",
+    "license": "MIT",
+    "url": "https://github.com/casperjs/casperjs/archive/1.1.4-1.zip",
+    "hash": "9e2e74bb77466227d38facc442f76a69404e78bca02238b57c66b24094adf78c",
+    "extract_dir": "casperjs-1.1.4-1",
     "bin": "bin\\casperjs.exe",
-    "notes": "Requires an installation of phantomjs 1.x
-
-    phantom19 is available in the versions bucket (scoop bucket add versions)",
-    "checkver": {
-        "github": "https://github.com/n1k0/casperjs"
+    "suggest": {
+        "phantomjs": [
+            "phantomjs"
+        ],
+        "python": [
+            "python"
+        ]
     },
+    "checkver": "archive/([\\d.-]+).zip",
     "autoupdate": {
         "url": "https://github.com/casperjs/casperjs/archive/$version.zip",
         "extract_dir": "casperjs-$version"
