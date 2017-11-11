@@ -1,15 +1,19 @@
 {
-    "version": "2.0.0",
+    "version": "2.0.2",
     "homepage": "https://www.microsoft.com/net/core#windows",
     "architecture": {
         "64bit": {
-            "url": "https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-win-x64.zip",
-            "hash": "541d4dd17023aff14a0aeb6505b200ccabffffc34ab2f629caeb994cedf8afd9"
+            "url": "https://download.microsoft.com/download/7/3/A/73A3E4DC-F019-47D1-9951-0453676E059B/dotnet-sdk-2.0.2-win-x64.zip",
+            "hash": "sha512:4864a36d3be9d460a17d0ebe9d03b17ce224ec18880bcdbc087889f32ddfc2cf3753a1ab7d0414b1e73e863e0d10f5a8381e80effc7f7c0a50600dd82a1f0048"
         },
         "32bit": {
-            "url": "https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-win-x86.zip",
-            "hash": "5eaa475a12843cfff9a97f4b7d3b205eb169fd372ddfc9ddde92225e9e4c1c7c"
+            "url": "https://download.microsoft.com/download/7/3/A/73A3E4DC-F019-47D1-9951-0453676E059B/dotnet-sdk-2.0.2-win-x86.zip",
+            "hash": "sha512:137ed3809bd13f68931b2ce6e7e58f01c49ae4b72c878a8445a141818585432a966dc1e7a17cf8ea85e9074d6a55d43c51fee1958cc9709aaf3c1aa280f1b6e8"
         }
     },
-    "bin": "dotnet.exe"
+    "bin": "dotnet.exe",
+    "checkver": {
+        "url": "https://www.microsoft.com/net/download/windows",
+        "re": "Download .NET Core ([\\d.]+) SDK"
+    }
 }
