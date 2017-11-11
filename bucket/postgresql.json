@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.postgresql.org/",
-    "version": "10.0",
+    "version": "10.1",
     "license": "https://www.postgresql.org/about/licence/",
     "architecture": {
         "64bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-10.0-1-windows-x64-binaries.zip",
-            "hash": "0f788762993091e43a32ed1c20265acca98baeb3beeaad19ecb8329c771dcfce"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-10.1-2-windows-x64-binaries.zip",
+            "hash": "ff35a92a07784dc845e498efb160f858d87222d88c93fb0c8ff4a563ba09a8c1"
         },
         "32bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-10.0-1-windows-binaries.zip",
-            "hash": "20a716be5b6a89ca610c2c32fb1872eeece954f48cb7b5cf398f6aa9c44b64ba"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-10.1-1-windows-binaries.zip",
+            "hash": "84ccc56190d4e123f98e4adc182db1573c027247ad8b1da1bd28cf0936c51698"
         }
     },
     "extract_dir": "pgsql",
@@ -27,7 +27,7 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://get.enterprisedb.com/postgresql/postgresql-$version-1-windows-x64-binaries.zip"
+                "url": "https://get.enterprisedb.com/postgresql/postgresql-$version-2-windows-x64-binaries.zip"
             },
             "32bit": {
                 "url": "https://get.enterprisedb.com/postgresql/postgresql-$version-1-windows-binaries.zip"
