@@ -164,7 +164,7 @@ fi
             "busybox.exe",
             "diff",
             "diff"
-        ],        
+        ],
         [
             "busybox.exe",
             "dirname",
@@ -384,7 +384,7 @@ fi
             "busybox.exe",
             "nl",
             "nl"
-        ],        
+        ],
         [
             "busybox.exe",
             "od",
@@ -449,7 +449,7 @@ fi
             "busybox.exe",
             "rpm",
             "rpm"
-        ],        
+        ],
         [
             "busybox.exe",
             "rpm2cpio",
@@ -554,7 +554,7 @@ fi
             "busybox.exe",
             "timeout",
             "timeout"
-        ],        
+        ],
         [
             "busybox.exe",
             "touch",
@@ -654,7 +654,7 @@ fi
             "busybox.exe",
             "watch",
             "watch"
-        ],        
+        ],
         [
             "busybox.exe",
             "wget",
@@ -684,7 +684,7 @@ fi
             "busybox.exe",
             "xxd",
             "xxd"
-        ],        
+        ],
         [
             "busybox.exe",
             "xz",
