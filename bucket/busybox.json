@@ -394,7 +394,7 @@ fi
             "busybox.exe",
             "paste",
             "paste"
-        ],        
+        ],
         [
             "busybox.exe",
             "patch",
