@@ -44,11 +44,11 @@ fi
             "ar",
             "ar"
         ],
-		[
-			"busybox.exe",
-			"arch",
-			"arch"
-		],
+        [
+            "busybox.exe",
+            "arch",
+            "arch"
+        ],
         [
             "busybox.exe",
             "ash",
@@ -220,11 +220,11 @@ fi
             "false",
             "false"
         ],
-		[
-			"busybox.exe",
-			"factor",
-			"factor"
-		],
+        [
+            "busybox.exe",
+            "factor",
+            "factor"
+        ],
         [
             "busybox.exe",
             "fgrep",
@@ -380,21 +380,21 @@ fi
             "nc",
             "nc"
         ],
-		[
-			"busybox.exe",
-			"nl",
-			"nl"
-		],        
+        [
+            "busybox.exe",
+            "nl",
+            "nl"
+        ],        
         [
             "busybox.exe",
             "od",
             "od"
         ],
-		[
-			"busybox.exe",
-			"paste",
-			"paste"
-		],        
+        [
+            "busybox.exe",
+            "paste",
+            "paste"
+        ],        
         [
             "busybox.exe",
             "patch",
@@ -445,11 +445,11 @@ fi
             "rmdir",
             "rmdir"
         ],
-		[
-			"busybox.exe",
-			"rpm",
-			"rpm"
-		],        
+        [
+            "busybox.exe",
+            "rpm",
+            "rpm"
+        ],        
         [
             "busybox.exe",
             "rpm2cpio",
@@ -550,11 +550,11 @@ fi
             "test",
             "test"
         ],
-		[
-			"busybox.exe",
-			"timeout",
-			"timeout"
-		],        
+        [
+            "busybox.exe",
+            "timeout",
+            "timeout"
+        ],        
         [
             "busybox.exe",
             "touch",
@@ -650,11 +650,11 @@ fi
             "wc",
             "wc"
         ],
-		[
-			"busybox.exe",
-			"watch",
-			"watch"
-		],        
+        [
+            "busybox.exe",
+            "watch",
+            "watch"
+        ],        
         [
             "busybox.exe",
             "wget",
@@ -680,11 +680,11 @@ fi
             "xargs",
             "xargs"
         ],
-		[
-			"busybox.exe",
-			"xxd",
-			"xxd"
-		],        
+        [
+            "busybox.exe",
+            "xxd",
+            "xxd"
+        ],        
         [
             "busybox.exe",
             "xz",
