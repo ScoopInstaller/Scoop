@@ -11,12 +11,8 @@
         ]
     },
     "bin": "bfg.ps1",
-    "env_set": {
-        "BFG_HOME": "$dir"
-    },
     "pre_install": "
-        $exe = \"java -jar `$env:BFG_HOME\\bfg-$version.jar `$args\"
-        write-output $exe | out-file -filepath $dir\\bfg.ps1
+        write-output ('java -jar {0}\\bfg-{1}.jar $args' -f \"$dir\", \"$version\") | out-file -filepath $dir\\bfg.ps1
     ",
     "checkver": {
         "url": "https://search.maven.org/solrsearch/select/?q=g:com.madgag+AND+a:bfg",
