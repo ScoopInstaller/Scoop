@@ -4,6 +4,9 @@
     "version": "0.4.8",
     "hash": "cc1e07c1000e95ebbe1c6480df53487261e6457a733b925e13665740c14e15aa",
     "extract_dir": "clink_0.4.8",
+    "checkver": {
+        "github": "https://github.com/mridgers/clink/"
+    },
     "bin": [
         "clink.bat"
     ],
