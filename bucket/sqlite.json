@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.sqlite.org/",
-    "version": "3210000",
+    "version": "3.21.0",
     "license": "Public Domain",
     "url": "https://www.sqlite.org/2017/sqlite-tools-win32-x86-3210000.zip",
-    "hash": "bee05e6e3d6c15a4b149cf879596e602a025c0c622b862bc2a2a056003d2a64b",
+    "hash": "515b0230860e3557cafc9b1e1207349c10a8a823f82af6d769d86fee99df4681",
     "extract_dir": "sqlite-tools-win32-x86-3210000",
     "bin": [
         "sqlite3.exe",
@@ -12,10 +12,10 @@
     ],
     "checkver": {
         "url": "https://www.sqlite.org/download.html",
-        "re": "sqlite-tools-win32-x86-(\\d+).zip"
+        "re": "sqlite-tools-win32-x86-(?<number>[\\d]+).zip[\\s\\S]+for SQLite version (?<version>[\\d.]+)\\."
     },
     "autoupdate": {
-        "url": "https://www.sqlite.org/2017/sqlite-tools-win32-x86-$version.zip",
-        "extract_dir": "sqlite-tools-win32-x86-$version"
+        "url": "https://www.sqlite.org/2017/sqlite-tools-win32-x86-$matchNumber.zip",
+        "extract_dir": "sqlite-tools-win32-x86-$matchNumber"
     }
 }
