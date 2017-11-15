@@ -3,10 +3,12 @@
     "license": "https://creativecommons.org/licenses/by/3.0/",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win32.exe#/jq.exe"
+            "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win32.exe#/jq.exe",
+            "hash": "1860c77bc2816b74f91705b84c7fa0dad3a062b355f021aa8c8e427e388e23fc"
         },
         "64bit": {
-            "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe#/jq.exe"
+            "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win64.exe#/jq.exe",
+            "hash": "ebecd840ba47efbf66822868178cc721a151060937f7ac406e3d31bd015bde94"
         }
     },
     "homepage": "https://stedolan.github.io/jq/",
