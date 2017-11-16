@@ -1,15 +1,15 @@
 {
     "homepage": "https://qemu.weilnetz.de/",
     "license": "GPL-2.0",
-    "version": "2.11.0-rc0",
+    "version": "2.11.0-rc1",
     "architecture": {
         "64bit": {
-            "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20171108.exe#/dl.7z",
-            "hash": "sha512:5060239f33256245153ec4fc4ef0e8e8f1de6b461bf85a8479c42b41050634218e45f3fe3575744e172d9407a4ef2a2f6bf5965848c54b9640f0132a44b77530"
+            "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20171116.exe#/dl.7z",
+            "hash": "sha512:bed0574f37b18d1e882fb18f05e653d983dc9080296bff9499cdfe5fa1d22f57f43cd7fe5577afa978b91faeda9e832ea0926718bdc423d70a57e2f32f732bcf"
         },
         "32bit": {
-            "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-20171108.exe#/dl.7z",
-            "hash": "sha512:2c1e1a4a0cb1a0d851b02bae2871d3f750d6958c88b2872f43ee48eecb88904559bc88de38987863f435e177f9dd7a2fa1014afb3010eb7ba68c4cd1a0e77fd1"
+            "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-20171116.exe#/dl.7z",
+            "hash": "sha512:72d65320381edf289390e303ea019111a831cc2eb74f7966b6116c371d04bf8a8db6e1dd08f1ed8d165e5713bcfee5289f1015e63149760537c77004e840c216"
         }
     },
     "bin": [
