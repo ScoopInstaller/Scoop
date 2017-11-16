@@ -3,7 +3,7 @@
     "version": "10.67",
     "license": "https://dev.perl.org/licenses/",
     "url": "https://downloads.sourceforge.net/project/exiftool/exiftool-10.67.zip",
-    "hash": "cedf6fcfb2a20dbdbb45cdf3c526e4f7f548ac021d32ce9f7241e59eadac2021",
+    "hash": "sha1:ae737fe96e654a80b25b3bf433607beb4e89643b",
     "bin": [
         [
             "exiftool(-k).exe",
@@ -12,6 +12,10 @@
     ],
     "checkver": "exiftool-([\\d.]+).zip",
     "autoupdate": {
-        "url": "https://downloads.sourceforge.net/project/exiftool/exiftool-$version.zip"
+        "url": "https://downloads.sourceforge.net/project/exiftool/exiftool-$version.zip",
+        "hash": {
+            "url": "https://sourceforge.net/projects/exiftool/files",
+            "find": "\"$basename\": .*?\"sha1\": \"([^\"]{40})\""
+        }
     }
 }
