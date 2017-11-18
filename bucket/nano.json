@@ -8,7 +8,7 @@
     "env_set": {
         "HOME": "$env:USERPROFILE"
     },
-    "post_install": "(-Not (Test-Path ~/nano.rc)) -and (Copy-Item $dir/nano-2.5.3-win32/nano.rc ~/nano.rc)",
+    "post_install": "(-not (Test-Path ~/nano.rc)) -and (Copy-Item $dir/nano-2.5.3-win32/nano.rc ~/nano.rc)",
     "checkver": "Latest Version\\s+([\\d.]+)",
     "notes": "
         You can configure nano editor by editing the configuration file nano.rc
