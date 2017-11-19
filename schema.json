@@ -365,6 +365,9 @@
         "env_set": {
             "type": "object"
         },
+        "env_ensure_home": {
+            "type": "boolean"
+        },
         "extract_dir": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
