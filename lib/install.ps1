@@ -52,7 +52,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     # persist data
     persist_data $manifest $original_dir $persist_dir
 
-    # env_ensure_home $manifest $global (see comment for env_ensure_home)
+    env_ensure_home $manifest $global #(see comment for env_ensure_home)
     post_install $manifest $architecture
 
     # save info for uninstall
