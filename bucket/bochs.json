@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://sourceforge.net/projects/bochs/files/bochs/2.6.9/bochs-2.6.9-win64.zip",
-            "hash": "01f185885794f7c6b4dab920d6c51685a44ed7c7e5205a806e54df4a61ae2cf9",
+            "hash": "sha1:35a590b30c13add8ff6d3271c6aadd293ee4d923",
             "bin": [
                 "bochs-win64.exe",
                 "bochsdbg-win64.exe"
@@ -13,7 +13,7 @@
         },
         "32bit": {
             "url": "https://sourceforge.net/projects/bochs/files/bochs/2.6.9/bochs-p4-smp-2.6.9-win32.zip",
-            "hash": "2c01495d55cc788105165c3f9f1d68699a884fdbbf7ecbb1d0df9b9641c0c5e9",
+            "hash": "sha1:bc2aa106890c649ca2a94e1c073151b1f42ef2bb",
             "bin": [
                 "bochs-p4-smp.exe",
                 "bochsdbg-p4-smp.exe"

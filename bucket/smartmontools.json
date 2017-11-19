@@ -4,7 +4,7 @@
     "license": "GPL-2.0",
     "version": "6.6-1",
     "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/6.6/smartmontools-6.6-1.win32-setup.exe",
-    "hash": "md5:f3abb6e80c758594d66b58939b751dd1",
+    "hash": "sha1:bd6df66831ee9dd738fbe9bcd779ecba62673231",
     "bin": [
         "bin/runcmdu.exe",
         "bin/smartctl.exe",
@@ -25,9 +25,6 @@
         "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/"
     },
     "autoupdate": {
-        "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/$matchShort/smartmontools-$version.win32-setup.exe",
-        "hash": {
-            "url": "$url.md5"
-        }
+        "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/$matchShort/smartmontools-$version.win32-setup.exe"
     }
 }
