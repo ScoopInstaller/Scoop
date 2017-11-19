@@ -117,9 +117,17 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'json'
     }
 
+    if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
+        $hashmode = 'sourceforge'
+        # change the URL because downloads.sourceforge.net doesn't have checksums
+        $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
+        $hash = find_hash_in_textfile $hashfile_url $basename '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
+    }
+
     if ($hashmode -eq 'extract') {
         $hash = find_hash_in_textfile $hashfile_url $basename $config.find
     }
+
     if ($hashmode -eq 'json') {
         $hash = find_hash_in_json $hashfile_url $basename $config.jp
     }
