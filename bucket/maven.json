@@ -5,7 +5,10 @@
     "url": "https://archive.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.zip",
     "hash": "90e9f0d700743516d1f610fcd63a5d49751d0743db713909f9ef933747a38b8a",
     "extract_dir": "apache-maven-3.5.2",
-    "env_add_path": "bin",
+    "bin": [
+        "bin\\mvn.cmd",
+        "bin\\mvnDebug.cmd"
+    ],
     "suggest": {
         "JDK": [
             "extras/oraclejdk",
