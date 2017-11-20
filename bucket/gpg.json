@@ -1,22 +1,18 @@
 {
-    "version": "3.0.0",
-    "license": "GNU",
-    "url": "https://files.gpg4win.org/gpg4win-3.0.0.exe#/dl.7z",
-    "hash": "2565bf6faf8defb8fa61b0b1a30f0e68e2ca5ceb3177d08516e00ca1620252bf",
-    "homepage": "https://www.gpg4win.org",
-    "bin": [
-        [
-            "gpg2.exe",
-            "gpg",
-            ""
-        ],
-        "gpg2.exe"
-    ],
+    "homepage": "https://www.gnupg.org/",
+    "version": "2.2.3",
+    "license": "GPLv3",
+    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.3_20171120.exe#/dl.7z",
+    "hash": "sha1:9914e93d5ac50b4e542b4320e1e130dc1552e24b",
+    "env_add_path": "bin",
     "checkver": {
-        "url": "https://www.gpg4win.org/get-gpg4win.html",
-        "re": "Download Gpg4win ([\\d.]+)"
+        "url": "https://www.gnupg.org/download/integrity_check.html",
+        "re": "gnupg-w32-(?<version>[\\d.]+)_(?<date>[\\d]{8}).exe"
     },
     "autoupdate": {
-        "url": "https://files.gpg4win.org/gpg4win-$version.exe#/dl.7z"
+        "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-$version_$matchDate.exe#/dl.7z",
+        "hash": {
+            "url": "https://www.gnupg.org/download/integrity_check.html"
+        }
     }
 }
