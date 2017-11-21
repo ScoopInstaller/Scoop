@@ -1,5 +1,5 @@
 {
-    "version": "4.3.30",
+    "version": "4.3.30.2",
     "license": "BSD",
     "homepage": "https://conda.io/miniconda.html",
     "checkver": {
@@ -25,12 +25,12 @@
     "env_add_path": "Scripts",
     "architecture": {
         "64bit": {
-            "url": "https://repo.continuum.io/miniconda/Miniconda3-4.3.30-Windows-x86_64.exe#/miniconda3-installer.exe",
-            "hash": "md5:790a7a99a4f38ec221c9747c4ee3bbfc"
+            "url": "https://repo.continuum.io/miniconda/Miniconda3-4.3.30.2-Windows-x86_64.exe#/miniconda3-installer.exe",
+            "hash": "md5:0cf836e1869e6abb033e69f915eb7dd6"
         },
         "32bit": {
-            "url": "https://repo.continuum.io/miniconda/Miniconda3-4.3.30-Windows-x86.exe#/miniconda3-installer.exe",
-            "hash": "md5:a3c414a0aa5d6915d24f1e315cf3f717"
+            "url": "https://repo.continuum.io/miniconda/Miniconda3-4.3.30.2-Windows-x86.exe#/miniconda3-installer.exe",
+            "hash": "md5:75173293abe3714cb47b5d28490e1a0e"
         }
     },
     "autoupdate": {
