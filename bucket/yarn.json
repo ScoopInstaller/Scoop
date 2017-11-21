@@ -13,16 +13,13 @@
     },
     "url": "https://yarnpkg.com/downloads/1.3.2/yarn-1.3.2.msi",
     "hash": "d2a4f6887381df152b0595fcf3b5590c6a7bc7b380ed364ad9f11595d099664d",
-    "persist": [
-        "cache",
-        "bin"
-    ],
-    "post_install": "
-        yarn config set cache-folder \"$dir\\cache\"
-        yarn config set prefix \"$dir\"
-    ",
+    "installer": {
+        "script": "add_first_in_path \"$env:LOCALAPPDATA\\Yarn\\bin\" $global"
+    },
+    "uninstaller": {
+        "script": "remove_from_path \"$env:LOCALAPPDATA\\Yarn\\bin\" $global"
+    },
     "env_add_path": [
-        "bin",
         "Yarn\\bin"
     ],
     "checkver": {
