@@ -1,0 +1,8 @@
+{
+    "homepage": "https://docs.microsoft.com/en-us/sysinternals/downloads/du",
+    "license": "https://docs.microsoft.com/en-us/sysinternals/downloads/du",
+    "description": "Allows Disk Usage",
+    "version": "1.0",
+    "url": "https://download.sysinternals.com/files/DU.zip",
+    "bin": "du64.exe"
+}
