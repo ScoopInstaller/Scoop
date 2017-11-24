@@ -1,0 +1,21 @@
+{
+    "homepage": "https://docs.microsoft.com/en-us/sysinternals/downloads/du",
+    "license": "https://docs.microsoft.com/en-us/sysinternals/downloads/du",
+    "description": "Shows Disk Usage",
+    "version": "1.6",
+    "url": "https://download.sysinternals.com/files/DU.zip",
+    "hash":"a3757d8b646bcd2feac05af2d30eb6e8b7da8c79a896f57ff67036996e46b4a9",
+    "architecture": {
+        "64bit": {
+            "bin": [
+                [
+                    "du64.exe",
+                    "du"
+                ]
+            ]
+        },
+        "32bit": {
+            "bin": "du.exe"
+        }
+    }
+}
