@@ -6,7 +6,7 @@ branches:
 
 init:
   - ps: (get-psprovider 'FileSystem').Home = $(pwd)
-  - ps: choco install -y pester
+  - ps: Install-Module -Name Pester -Force
 
 build: off
 
