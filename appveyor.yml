@@ -6,7 +6,7 @@ branches:
 
 init:
   - ps: (get-psprovider 'FileSystem').Home = $(pwd)
-  - ps: Install-Module -Name Pester -Force
+  - ps: Install-Module -Name Pester -Repository PSGallery -Force
 
 build: off
 
