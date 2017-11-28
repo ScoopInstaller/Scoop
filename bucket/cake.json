@@ -11,8 +11,7 @@
         ]
     },
     "checkver": {
-        "url": "https://github.com/cake-build/cake/releases",
-        "re": "tag/v([\\d.]+)"
+        "github": "https://github.com/cake-build/cake"
     },
     "autoupdate": {
         "url": "https://github.com/cake-build/cake/releases/download/v$version/Cake-bin-net461-v$version.zip"
