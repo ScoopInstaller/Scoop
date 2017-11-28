@@ -7,7 +7,7 @@
     "bin": "cake.exe",
     "checkver": {
         "url": "https://github.com/cake-build/cake/releases",
-        "re": "v([\\d.]+)"
+        "re": "tag/v([\\d.]+)"
     },
     "autoupdate": {
         "url": "https://github.com/cake-build/cake/releases/download/v$version/Cake-bin-net461-v$version.zip"
