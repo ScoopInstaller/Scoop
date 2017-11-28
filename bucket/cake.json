@@ -10,6 +10,6 @@
         "re": "v([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://github.com/cake-build/cake/releases/download/v0.23.0/Cake-bin-net461-v$version.zip"
+        "url": "https://github.com/cake-build/cake/releases/download/v$version/Cake-bin-net461-v$version.zip"
     }
 }
