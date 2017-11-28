@@ -1,17 +1,17 @@
 {
     "homepage": "http://www.andre-simon.de/doku/highlight/en/highlight.php",
-    "version": "3.40",
+    "version": "3.41",
     "license": "GPL3",
     "architecture": {
         "64bit": {
-            "url": "http://www.andre-simon.de/zip/highlight-3.40-x64.zip",
-            "hash": "43951343789f4540428274c17bfc2bb000f5c694c0786cd11a4bd3c8e0c8bd72",
-            "extract_dir": "highlight-3.40-x64"
+            "url": "http://www.andre-simon.de/zip/highlight-3.41-x64.zip",
+            "hash": "f1489026cbaaf7a733f67e063258016ad98adfd5470c0e6f809f5335a1bce753",
+            "extract_dir": "highlight-3.41-x64"
         },
         "32bit": {
-            "url": "http://www.andre-simon.de/zip/highlight-3.40.zip",
-            "hash": "28a0d8194e3199db7ade0e4657918d4dc4b698302a1b5c4b6460a6cf29800d53",
-            "extract_dir": "highlight-3.40"
+            "url": "http://www.andre-simon.de/zip/highlight-3.41.zip",
+            "hash": "54992d96ddeb4e9a1100ae5bc518feda2d6dee79a1c674218496178948e7d531",
+            "extract_dir": "highlight-3.41"
         }
     },
     "bin": "highlight.exe",
