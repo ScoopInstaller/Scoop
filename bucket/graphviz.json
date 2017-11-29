@@ -2,7 +2,7 @@
     "homepage": "https://www.graphviz.org/",
     "version": "2.38",
     "license": "EPL",
-    "url": "https://www.graphviz.org/pub/graphviz/stable/windows/graphviz-2.38.msi",
+    "url": "https://graphviz.gitlab.io/_pages/Download/windows/graphviz-2.38.msi",
     "hash": "c794ea03bc2631fff468f4d97fa6726c536fc98ee579529779aa6f45e94e4f6d",
     "bin": [
         "bin/acyclic.exe",
@@ -45,10 +45,10 @@
         "bin/unflatten.exe"
     ],
     "checkver": {
-        "url": "https://www.graphviz.org/Download_windows.php",
-        "re": "graphviz-([\\d.]+).msi"
+        "url": "https://graphviz.gitlab.io/_pages/Download/Download_windows.html",
+        "re": "([\\d.]+) Stable Release"
     },
     "autoupdate": {
-        "url": "https://www.graphviz.org/pub/graphviz/stable/windows/graphviz-$version.msi"
+        "url": "https://graphviz.gitlab.io/_pages/Download/windows/graphviz-$version.msi"
     }
 }
