@@ -3,7 +3,7 @@
     "version": "1.2.0",
     "license": "Apache 2.0",
     "url": "https://github.com/JetBrains/kotlin/releases/download/v1.2.0/kotlin-compiler-1.2.0.zip",
-    "hash": "d1e04a6e5977ad495a5d0eb4e072cf71a25afd8ecad2b1d5474671c2012cd7a1",
+    "hash": "895d0f8286db3e4f43d67cd5e09b600af6e0a5017cb74072d1b09c78b697775a",
     "extract_dir": "kotlinc",
     "bin": [
         "bin\\kotlin.bat",
