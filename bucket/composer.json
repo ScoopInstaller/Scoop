@@ -1,8 +1,8 @@
 {
     "homepage": "https://getcomposer.org/",
     "license": "https://github.com/composer/composer/blob/master/LICENSE",
-    "version": "1.5.3",
-    "url": "https://getcomposer.org/download/1.5.3/composer.phar",
+    "version": "1.5.4",
+    "url": "https://getcomposer.org/download/1.5.4/composer.phar",
     "bin": "composer.ps1",
     "persist": "home",
     "env_set": {
@@ -30,7 +30,7 @@
     "notes": [
         "'composer selfupdate' is aliased to 'scoop update composer'"
     ],
-    "hash": "f50e3b1d7daa6afc532341e52735db32819310cb2f63cb166f69dc7e074a657e",
+    "hash": "b85461bb94c1abf1ccaa6832a7992c08d2d851f844c575626766554bd96de8c3",
     "checkver": {
         "github": "https://github.com/composer/composer"
     },
