@@ -1,8 +1,8 @@
 {
-    "version": "3.8.0",
+    "version": "3.8.1",
     "homepage": "http://www.seleniumhq.org/",
-    "url": "https://selenium-release.storage.googleapis.com/3.8/selenium-server-standalone-3.8.0.jar#/selenium.jar",
-    "hash": "bc851b7c69b83e7b873899b407f1accfc834b10be9196df3fe71a0a557340171",
+    "url": "https://selenium-release.storage.googleapis.com/3.8/selenium-server-standalone-3.8.1.jar#/selenium.jar",
+    "hash": "2ca30da4a482688263b0eed5c73d1a4bbf3116316a1f2ffb96310a1643dbe663",
     "bin": "selenium.cmd",
     "pre_install": "\"@java -jar \"\"$dir\\selenium.jar\"\" %*\" | out-file -en oem \"$dir\\selenium.cmd\"",
     "checkver": {
