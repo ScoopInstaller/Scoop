@@ -5,28 +5,28 @@
     "architecture": {
         "64bit": {
             "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.6.0-signed.msi",
-            "hash": "51ba9160f887c7f5cf0786fec9a40b8e74c38b7f9fe12923b0efae3bdfd34064"
+            "hash": "51ba9160f887c7f5cf0786fec9a40b8e74c38b7f9fe12923b0efae3bdfd34064",
+            "extract_dir": "MongoDB\\Server\\3.6"
         }
     },
     "bin": [
-        "MongoDB\\Server\\3.4\\bin\\bsondump.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongo.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongod.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongodump.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongoexport.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongofiles.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongoimport.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongooplog.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongoperf.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongorestore.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongos.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongostat.exe",
-        "MongoDB\\Server\\3.4\\bin\\mongotop.exe"
+        "bin\\bsondump.exe",
+        "bin\\mongo.exe",
+        "bin\\mongod.exe",
+        "bin\\mongodump.exe",
+        "bin\\mongoexport.exe",
+        "bin\\mongofiles.exe",
+        "bin\\mongoimport.exe",
+        "bin\\mongoperf.exe",
+        "bin\\mongorestore.exe",
+        "bin\\mongos.exe",
+        "bin\\mongostat.exe",
+        "bin\\mongotop.exe"
     ],
     "post_install": "
         # create initial directories
-        mkdir C:\\data
-        mkdir C:\\data\\db
+        if(!(test-path 'C:\\data')) { mkdir 'C:\\data' > $null }
+        if(!(test-path 'C:\\data\\db')) { mkdir 'C:\\data\\db' > $null }
     ",
     "checkver": {
         "url": "https://www.mongodb.com/download-center",
@@ -35,7 +35,8 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-$version-signed.msi"
+                "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-$version-signed.msi",
+                "extract_dir": "MongoDB\\Server\\$majorVersion.$minorVersion"
             }
         }
     }
