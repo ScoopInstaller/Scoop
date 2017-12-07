@@ -1,11 +1,11 @@
 {
     "homepage": "https://flywaydb.org/",
     "license": "https://github.com/flyway/flyway/blob/master/LICENSE",
-    "version": "4.2.0",
-    "url": "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/4.2.0/flyway-commandline-4.2.0-windows-x64.zip",
-    "extract_dir": "flyway-4.2.0",
+    "version": "5.0.1",
+    "url": "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/5.0.1/flyway-commandline-5.0.1-windows-x64.zip",
+    "extract_dir": "flyway-5.0.1",
     "bin": "flyway.cmd",
-    "hash": "sha1:2077d930e8f06aeb5714a964b2c2348308cd54ad",
+    "hash": "sha1:d3d48a090d10df1a2c25a8f6f9537a38af7992ad",
     "checkver": "Get Started with Flyway\\s+([\\d.]+)",
     "autoupdate": {
         "url": "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/$version/flyway-commandline-$version-windows-x64.zip",
@@ -15,8 +15,8 @@
         }
     },
     "persist": [
-      "conf",
-      "sql",
-      "jars"
+        "conf",
+        "sql",
+        "jars"
     ]
 }
