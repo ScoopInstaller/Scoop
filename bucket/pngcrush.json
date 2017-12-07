@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/1.8.11/pngcrush_1_8_11_w64.exe#/pngcrush.exe",
-            "hash": "196f868188f2393dbea39d331402c7b0debc5192e30cd0185fd32c0739bfdb65"
+            "hash": "sha1:8980ee9b18c0545f61fc8b1156546b24ffa90db8"
         },
         "32bit": {
             "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/1.8.11/pngcrush_1_8_11_w32.exe#/pngcrush.exe",
-            "hash": "5fc06c1ba24aca793e7ef648b6dd3c5b2572e235e1ff13c64c23810adfdc2f50"
+            "hash": "sha1:ce02f50fa3d82f0d5464f28ac78d3ecee10c5f58"
         }
     },
     "bin": [

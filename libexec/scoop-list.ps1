@@ -9,6 +9,7 @@ param($query)
 . "$psscriptroot\..\lib\buckets.ps1"
 
 reset_aliases
+$def_arch = default_architecture
 
 $local = installed_apps $false | % { @{ name = $_ } }
 $global = installed_apps $true | % { @{ name = $_; global = $true } }
@@ -16,19 +17,31 @@ $global = installed_apps $true | % { @{ name = $_; global = $true } }
 $apps = @($local) + @($global)
 
 if($apps) {
-    echo "Installed apps$(if($query) { `" matching '$query'`"}):
-"
+    write-host "Installed apps$(if($query) { `" matching '$query'`"}): `n"
     $apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
         $app = $_.name
         $global = $_.global
         $ver = current_version $app $global
-        $global_display = $null; if($global) { $global_display = '*global*'}
 
-        "  $app ($ver) $global_display"
+        $install_info = install_info $app $ver $global
+        write-host "  $app " -NoNewline
+        write-host -f DarkCyan $ver -NoNewline
+        if($global) {
+            write-host -f DarkRed ' *global*' -NoNewline
+        }
+        if ($install_info.bucket) {
+            write-host -f Yellow " [$($install_info.bucket)]" -NoNewline
+        } elseif ($install_info.url) {
+            write-host -f Yellow " [$($install_info.url)]" -NoNewline
+        }
+        if ($install_info.architecture -and $def_arch -ne $install_info.architecture) {
+            write-host -f DarkRed " {$($install_info.architecture)}" -NoNewline
+        }
+        write-host ''
     }
-    ""
+    write-host ''
     exit 0
 } else {
-    "There aren't any apps installed."
+    write-host "There aren't any apps installed."
     exit 1
 }

@@ -3,7 +3,7 @@
     "extract_dir": "editorconfig-0.12.1-Windows-x86",
     "url": "https://excellmedia.dl.sourceforge.net/project/editorconfig/EditorConfig-C-Core/0.12.1/binary-Windows/editorconfig-0.12.1-Windows-x86.zip",
     "homepage": "http://editorconfig.org/",
-    "hash": "aaf8977253dd72dd12aec2986c822498c1fa1fa96bf8a404b9facfbf9757ff3b",
+    "hash": "sha1:7c44b819690baec3de22edc0c9f7eb21dc0a7850",
     "bin": "bin/editorconfig.exe",
     "checkver": {
         "github": "https://github.com/editorconfig/editorconfig-core-c"

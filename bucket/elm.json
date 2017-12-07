@@ -1,0 +1,23 @@
+{
+    "homepage": "http://elm-lang.org",
+    "license": "BSD 3-Clause",
+    "version": "0.18",
+    "url": "http://install.elm-lang.org/Elm-Platform-0.18.exe#dl.7z",
+    "hash": "e4b392e2cb8deb0bcf6c4d0b5f69f4df187416ea815d4ab09bafa5c036640967",
+    "extract_dir": "bin",
+    "bin": [
+        "elm-make.exe",
+        "elm-package.exe",
+        "elm-reactor.exe",
+        "elm-repl.exe",
+        "elm.exe"
+    ],
+    "depends": "nodejs",
+    "checkver": {
+        "url": "https://guide.elm-lang.org/install.html",
+        "re": "Elm-Platform-([\\d.]+)\\."
+    },
+    "autoupdate": {
+        "url": "http://install.elm-lang.org/Elm-Platform-$version.exe#dl.7z"
+    }
+}

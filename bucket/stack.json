@@ -15,6 +15,12 @@
     "bin": [
         "stack.exe"
     ],
+    "installer": {
+        "script": "add_first_in_path \"$env:APPDATA\\local\\bin\" $global"
+    },
+    "uninstaller": {
+        "script": "remove_from_path \"$env:APPDATA\\local\\bin\" $global"
+    },
     "checkver": {
         "github": "https://github.com/commercialhaskell/stack"
     },

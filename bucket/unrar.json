@@ -2,7 +2,7 @@
     "homepage": "http://www.rarlab.com/",
     "version": "5.50",
     "license": "Freeware",
-    "url": "http://www.rarlab.com/rar/unrarw32.exe",
+    "url": "https://www.rarlab.com/rar/unrarw32.exe",
     "hash": "bdd354b9b677a5dda154b56627398aef13b1445ae235406799acd6fbb6c72989",
     "bin": "UnRAR.exe",
     "installer": {
@@ -16,6 +16,6 @@
         "url": "http://www.rarlab.com/download.htm"
     },
     "autoupdate": {
-        "url": "http://www.rarlab.com/rar/unrarw32.exe"
+        "url": "https://www.rarlab.com/rar/unrarw32.exe"
     }
 }

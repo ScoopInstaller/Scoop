@@ -1,9 +1,9 @@
 {
     "homepage": "https://jetbrains.com/",
-    "version": "1.4.2492",
+    "version": "1.6.2914",
     "license": "https://www.jetbrains.com/store/license.html",
-    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.4.2492.exe",
-    "hash": "d5c1673a2a259e73020076ab46cb238932c53bd376562ca670c7145ffb0206a7",
+    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.6.2914.exe",
+    "hash": "839418d0d61aa92aabe58e6e6a7faed3a2486e5b591cee77aafba78b2eceec8f",
     "installer": {
         "args": [
             "/S",

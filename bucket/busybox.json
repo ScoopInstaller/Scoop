@@ -1,15 +1,53 @@
 {
     "homepage": "https://frippery.org/busybox",
-    "version": "1.26.0-FRP-756",
+    "version": "1709-g65e9c0ad9",
     "license": "GPL2",
-    "url": "https://frippery.org/files/busybox/busybox-w32-FRP-756-g9fa1e49.exe#/busybox.exe",
-    "hash": "260c6e2ac8a71a12aca2decfb9475a05a64cbbd734406fa964b5ff2528d7cc85",
+    "architecture": {
+        "32bit": {
+            "url": "https://frippery.org/files/busybox/busybox-w32-FRP-1709-g65e9c0ad9.exe#/busybox.exe",
+            "hash": "0971ba4b29e1dfee282878ce9c8afb90b55d14872096dd9ed90f964e859056a7"
+        },
+        "64bit": {
+            "url": "https://frippery.org/files/busybox/busybox-w64-FRP-1709-g65e9c0ad9.exe#/busybox.exe",
+            "hash": "664dd9ec492953f523b7e60406d93f37c4875b8c29f6df5b056916405e6d3c04"
+        }
+    },
+    "checkver": {
+        "url": "https://frippery.org/busybox/",
+        "re": ">busybox-w32-FRP-([\\w-]+)\\."
+    },
+    "autoupdate": {
+        "architecture": {
+            "32bit": {
+                "url": "https://frippery.org/files/busybox/busybox-w32-FRP-$version.exe#/busybox.exe"
+            },
+            "64bit": {
+                "url": "https://frippery.org/files/busybox/busybox-w64-FRP-$version.exe#/busybox.exe"
+            }
+        }
+    },
+    "post_install": "
+        if(!(test-path ~/.profile)) {
+            'creating ~/.profile'
+@\"
+if [ -e ~/.bashrc ]
+then
+    source ~/.bashrc
+fi
+\"@ | out-file -en oem ~/.profile
+        }
+    ",
     "bin": [
         "busybox.exe",
         [
             "busybox.exe",
             "ar",
             "ar"
+        ],
+        [
+            "busybox.exe",
+            "arch",
+            "arch"
         ],
         [
             "busybox.exe",
@@ -61,11 +99,6 @@
             "busybox.exe",
             "cat",
             "cat"
-        ],
-        [
-            "busybox.exe",
-            "catv",
-            "catv"
         ],
         [
             "busybox.exe",
@@ -186,6 +219,11 @@
             "busybox.exe",
             "false",
             "false"
+        ],
+        [
+            "busybox.exe",
+            "factor",
+            "factor"
         ],
         [
             "busybox.exe",
@@ -344,8 +382,18 @@
         ],
         [
             "busybox.exe",
+            "nl",
+            "nl"
+        ],
+        [
+            "busybox.exe",
             "od",
             "od"
+        ],
+        [
+            "busybox.exe",
+            "paste",
+            "paste"
         ],
         [
             "busybox.exe",
@@ -396,6 +444,11 @@
             "busybox.exe",
             "rmdir",
             "rmdir"
+        ],
+        [
+            "busybox.exe",
+            "rpm",
+            "rpm"
         ],
         [
             "busybox.exe",
@@ -499,6 +552,11 @@
         ],
         [
             "busybox.exe",
+            "timeout",
+            "timeout"
+        ],
+        [
+            "busybox.exe",
             "touch",
             "touch"
         ],
@@ -594,6 +652,11 @@
         ],
         [
             "busybox.exe",
+            "watch",
+            "watch"
+        ],
+        [
+            "busybox.exe",
             "wget",
             "wget"
         ],
@@ -619,6 +682,11 @@
         ],
         [
             "busybox.exe",
+            "xxd",
+            "xxd"
+        ],
+        [
+            "busybox.exe",
             "xz",
             "xz"
         ],
@@ -637,16 +705,5 @@
             "zcat",
             "zcat"
         ]
-    ],
-    "post_install": "
-        if(!(test-path ~/.profile)) {
-            'creating ~/.profile'
-@\"
-if [ -e ~/.bashrc ]
-then
-    source ~/.bashrc
-fi
-\"@ | out-file -en oem ~/.profile
-        }
-    "
+    ]
 }

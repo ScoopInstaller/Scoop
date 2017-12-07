@@ -43,7 +43,8 @@ function add_bucket($name, $repo) {
 
     $dir = bucketdir $name
     if(test-path $dir) {
-        abort "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
+        warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
+        exit 0
     }
 
     write-host 'Checking repo... ' -nonewline

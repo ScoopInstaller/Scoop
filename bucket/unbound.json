@@ -1,15 +1,15 @@
 {
     "homepage": "https://unbound.net/",
-    "version": "1.6.5",
+    "version": "1.6.7",
     "license": "BSD",
     "architecture": {
         "64bit": {
-            "url": "https://unbound.net/downloads/unbound-1.6.5.zip",
-            "hash": "f035f2f6add79d46c59aba3e9a0eea817ae1473bc6aac2838f0aabec7ebc2c81"
+            "url": "https://unbound.net/downloads/unbound-1.6.7.zip",
+            "hash": "8b0589a0b0f94bcd46ed8342b0d3da62c811941629f953a65a0862313a5fa9e8"
         },
         "32bit": {
-            "url": "https://unbound.net/downloads/unbound-1.6.5-w32.zip",
-            "hash": "96b783745d84a6f385365b4fa2b404f47afc9c8d0d3d0a068ad88cfe9c0e5f38"
+            "url": "https://unbound.net/downloads/unbound-1.6.7-w32.zip",
+            "hash": "2312fce00c357bc7486d32f52ceb60523cdb9ffa4c53872bcea16fca4e4877cc"
         }
     },
     "bin": [

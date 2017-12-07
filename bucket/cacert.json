@@ -1,9 +1,9 @@
 {
-    "version": "2017-06-07",
+    "version": "2017-09-20",
     "homepage": "https://curl.haxx.se/docs/caextract.html",
     "license": "MPL 2.0",
-    "url": "https://curl.haxx.se/ca/cacert-2017-06-07.pem#/cacert.pem",
-    "hash": "e78c8ab7b4432bd466e64bb942d988f6c0ac91cd785017e465bdc96d42fe9dd0",
+    "url": "https://curl.haxx.se/ca/cacert-2017-09-20.pem#/cacert.pem",
+    "hash": "435ac8e816f5c10eaaf228d618445811c16a5e842e461cb087642b6265a36856",
     "checkver": {
         "url": "https://curl.haxx.se/docs/caextract.html",
         "re": "cacert-([\\d-]{10}).pem"

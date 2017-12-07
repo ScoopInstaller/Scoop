@@ -61,6 +61,7 @@ $queue | % {
     }
     $regex = ""
     $jsonpath = ""
+    $replace = ""
 
     if ($json.checkver -eq "github") {
         if (!$json.homepage.StartsWith("https://github.com/")) {
@@ -83,9 +84,15 @@ $queue | % {
         $jsonpath = $json.checkver.jp
     }
 
+    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
+        $replace = $json.checkver.replace
+    }
+
     if(!$jsonpath -and !$regex) {
         $regex = $json.checkver
     }
+
+    $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq "true"
 
     $state = new-object psobject @{
         app = (strip_ext $name);
@@ -93,6 +100,8 @@ $queue | % {
         regex = $regex;
         json = $json;
         jsonpath = $jsonpath;
+        reverse = $reverse;
+        replace = $replace;
     }
 
     $wc.headers.add('Referer', (strip_filename $url))
@@ -113,6 +122,8 @@ while($in_progress -gt 0) {
     $expected_ver = $json.version
     $regexp = $state.regex
     $jsonpath = $state.jsonpath
+    $reverse = $state.reverse
+    $replace = $state.replace
     $ver = ""
 
     $err = $ev.sourceeventargs.error
@@ -126,24 +137,44 @@ while($in_progress -gt 0) {
         continue
     }
 
-    if($jsonpath -and $regexp) {
-        write-host -f darkred "'jp' and 're' shouldn't be used together"
+    if(!$regex -and $replace) {
+        write-host -f darkred "'replace' requires 're'"
         continue
     }
 
     if($jsonpath) {
-        $ver = json_path ($page | ConvertFrom-Json -ea stop) $jsonpath
+        $ver = json_path $page $jsonpath
+        if(!$ver) {
+            $ver = json_path_legacy $page $jsonpath
+        }
         if(!$ver) {
             write-host -f darkred "couldn't find '$jsonpath' in $url"
             continue
         }
     }
 
+    if($jsonpath -and $regexp) {
+        $page = $ver
+        $ver = ""
+    }
+
     if($regexp) {
-        if($page -match $regexp) {
-            $ver = $matches[1]
+        $regex = new-object System.Text.RegularExpressions.Regex($regexp)
+        if($reverse) {
+            $match = $regex.matches($page) | select-object -last 1
+        } else {
+            $match = $regex.matches($page) | select-object -first 1
+        }
+
+        if($match -and $match.Success) {
+            $matchesHashtable = @{}
+            $regex.GetGroupNames() | % { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
+            $ver = $matchesHashtable['1']
+            if ($replace) {
+                $ver = $regex.replace($match.Value, $replace)
+            }
             if(!$ver) {
-                $ver = $matches['version']
+                $ver = $matchesHashtable['version']
             }
         } else {
             write-host -f darkred "couldn't match '$regexp' in $url"
@@ -182,7 +213,7 @@ while($in_progress -gt 0) {
             Write-Host "Forcing autoupdate!" -f DarkMagenta
         }
         try {
-            autoupdate $app $dir $json $ver $matches
+            autoupdate $app $dir $json $ver $matchesHashtable
         } catch {
             error $_.exception.message
         }

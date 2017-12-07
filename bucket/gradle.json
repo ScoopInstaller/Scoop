@@ -1,10 +1,10 @@
 {
     "homepage": "https://gradle.org",
-    "version": "4.1",
+    "version": "4.4",
     "license": "Apache 2.0",
-    "hash": "d55dfa9cfb5a3da86a1c9e75bb0b9507f9a8c8c100793ccec7beb6e259f9ed43",
-    "url": "https://services.gradle.org/distributions/gradle-4.1-bin.zip",
-    "extract_dir": "gradle-4.1",
+    "hash": "fa4873ae2c7f5e8c02ec6948ba95848cedced6134772a0169718eadcb39e0a2f",
+    "url": "https://services.gradle.org/distributions/gradle-4.4-bin.zip",
+    "extract_dir": "gradle-4.4",
     "bin": "bin\\gradle.bat",
     "env_set": {
         "GRADLE_HOME": "$dir"
@@ -21,6 +21,9 @@
     },
     "autoupdate": {
         "url": "https://services.gradle.org/distributions/gradle-$version-bin.zip",
-        "extract_dir": "gradle-$version"
+        "extract_dir": "gradle-$version",
+        "hash": {
+            "url": "$url.sha256"
+        }
     }
 }

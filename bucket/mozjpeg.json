@@ -1,9 +1,9 @@
 {
     "homepage": "https://github.com/mozilla/mozjpeg",
-    "version": "3.1",
+    "version": "3.2",
     "license": "https://raw.githubusercontent.com/mozilla/mozjpeg/master/LICENSE.md",
-    "url": "https://mozjpeg.codelove.de/bin/mozjpeg_3.1_x86.zip",
-    "hash": "f8fd47f219823e7ee1fe6583bca8baca075d214081588f1fd66141f790cf0731",
+    "url": "https://mozjpeg.codelove.de/bin/mozjpeg_3.2_x86.zip",
+    "hash": "b7574d233bbc3310fdd8627a5224606fd87ac7be5a5b15a05f33a8d74b1a0c6a",
     "bin": [
         "cjpeg.exe",
         [
@@ -16,5 +16,8 @@
     "checkver": {
         "url": "https://mozjpeg.codelove.de/binaries.html",
         "re": "version ([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "https://mozjpeg.codelove.de/bin/mozjpeg_$version_x86.zip"
     }
 }
