@@ -1,9 +1,9 @@
 {
-    "version": "0.60.1",
+    "version": "0.61.0",
     "license": "MIT",
-    "url": "https://github.com/facebook/flow/releases/download/v0.60.1/flow-win64-v0.60.1.zip",
+    "url": "https://github.com/facebook/flow/releases/download/v0.61.0/flow-win64-v0.61.0.zip",
     "homepage": "https://flowtype.org/",
-    "hash": "15b925c505d6b293df9e8436ecee2338c2a662b9870469eb2ea91ab601911ef0",
+    "hash": "1ef5218c24b060971a3e5d603585f310d46f0433814c63e7585cf2ea26097b8c",
     "bin": "flow.exe",
     "extract_dir": "flow",
     "checkver": {
