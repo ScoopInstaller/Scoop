@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/sharkdp/fd/releases/download/v6.1.0/fd-v6.1.0-x86_64-pc-windows-msvc.zip",
-            "hash": "72200dfd7b1524bfd2911a80de4186828b5af0cba30d181ae0f46f11ceca4bce"
+            "hash": "f8c2add2e074384540cd2cf81b2b99defca0d775c1f9d4b916bb2de94863ccf1"
         },
         "32bit": {
             "url": "https://github.com/sharkdp/fd/releases/download/v6.1.0/fd-v6.1.0-i686-pc-windows-msvc.zip",
-            "hash": "d6e31cd8d9e2fd1cbf94962745d9b8fd3152b540b6b02374e8f9e0c022d92920"
+            "hash": "d3bc15f8ceab70ec7d8abdc5b781b3375359cb540875cd3036a46ccf5f4c9fa8"
         }
     },
     "bin": "fd.exe",
