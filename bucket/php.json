@@ -1,15 +1,15 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.1.12",
+    "version": "7.2.0",
     "license": "https://php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.1.12-Win32-VC14-x64.zip",
-            "hash": "2cb22645e8e45ef791c50afc07e1134c5dcd6ad513e54308845f0cd7517d809f"
+            "url": "http://windows.php.net/downloads/releases/php-7.2.0-Win32-VC15-x64.zip",
+            "hash": "275c58e86e0490146684e4f731917484306a3f269dc6f6f55f31aabb808743d0"
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.1.12-Win32-VC14-x86.zip",
-            "hash": "50da3d7d9f8eda0d1a704a679bdc49c295028ca8d713289eea1f0692797c46ac"
+            "url": "http://windows.php.net/downloads/releases/php-7.2.0-Win32-VC15-x86.zip",
+            "hash": "28bd43ba9148549f8b70b28ae33415b3103e3b3cbaabcd4619fdac47a1739f7f"
         }
     },
     "bin": [
@@ -43,15 +43,15 @@ if (!(Test-Path \"$dir\\cli\\conf.d\")) {
 ",
     "checkver": {
         "url": "http://windows.php.net/download/",
-        "re": "<h3 id=\"php-7.1\".*?>.*?\\(([\\d.]+)\\)</h3>"
+        "re": "<h3 id=\"php-7.2\".*?>.*?\\(([\\d.]+)\\)</h3>"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x64.zip"
+                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC15-x64.zip"
             },
             "32bit": {
-                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC14-x86.zip"
+                "url": "http://windows.php.net/downloads/releases/php-$version-Win32-VC15-x86.zip"
             }
         },
         "hash": {
