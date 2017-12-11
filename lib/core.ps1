@@ -289,6 +289,7 @@ function ensure_all_installed($apps, $global) {
 }
 
 function strip_path($orig_path, $dir) {
+    if($orig_path -eq $null) { $orig_path = '' }
     $stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
     return ($stripped -ne $orig_path), $stripped
 }
