@@ -34,14 +34,10 @@
 if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
     mysqld --initialize-insecure
 }
-
-#Copy provided sample file to live file location
-cp $dir/my-default.ini $dir/my.ini
-
 #Output client configuration to my.ini file so no username is required when connecting
-echo \"\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
-echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
-echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
+echo \"\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
+echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
+echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
 ",
     "checkver": {
         "url": "https://dev.mysql.com/downloads/mysql/",
