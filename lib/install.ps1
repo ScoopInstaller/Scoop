@@ -451,14 +451,20 @@ function check_hash($file, $url, $manifest, $arch) {
 }
 
 function compute_hash($file, $algname) {
-    $alg = [system.security.cryptography.hashalgorithm]::create($algname)
-    $fs = [system.io.file]::openread($file)
     try {
-        $hexbytes = $alg.computehash($fs) | % { $_.tostring('x2') }
-        [string]::join('', $hexbytes)
+        $fs = [system.io.file]::openread($file)
+        if([bool](Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) -eq $true) {
+            return (Get-FileHash -InputStream $fs -Algorithm $algname).Hash.ToLower()
+        } else {
+            $alg = [system.security.cryptography.hashalgorithm]::create($algname)
+            $hexbytes = $alg.computehash($fs) | % { $_.tostring('x2') }
+            return [string]::join('', $hexbytes)
+        }
+    } catch {
+        error $_.exception.message
     } finally {
-        $fs.dispose()
-        $alg.dispose()
+        if($fs) { $fs.dispose() }
+        if($alg) { $alg.dispose() }
     }
 }
 
