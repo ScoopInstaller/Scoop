@@ -1,0 +1,21 @@
+{
+    "version": "0.17.3",
+    "license": "Apache License 2.0",
+    "url": "https://github.com/docker/kitematic/releases/download/v0.17.3/Kitematic-0.17.3-Windows.zip",
+    "depends": "",
+    "homepage": "https://github.com/docker/kitematic",
+    "hash": "3dfd72dab0dc715f6c6950988fbaf6139bccd75870d278de9bbbe02734866ced",
+    "bin": "Kitematic.exe",
+    "shortcuts": [
+        [
+            "Kitematic.exe",
+            "Kitematic"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/docker/kitematic"
+    },
+    "autoupdate": {
+        "url": "https://github.com/docker/kitematic/releases/download/v$version/Kitematic-$version-Windows.zip"
+    }
+}
