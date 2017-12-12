@@ -21,19 +21,26 @@ $opt, $apps, $err = getopt $args 'a:' 'arch='
 if($err) { "scoop virustotal: $err"; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
+Function Start-VirusTotal ($h, $app) {
+    if ($h -match "(?<algo>[sm][hda]*[125]):.*") {
+        write-host -f darkred "$app uses a $($matches['algo']) hash and VirusTotal only supports SHA256"
+    }
+    else {
+        start "https://www.virustotal.com/#/file/$_/detection"
+    }
+}
+
 if($apps) {
     $apps | % {
-        $manifest, $bucket = find_manifest $_
+        $app = $_
+        $manifest, $bucket = find_manifest $app
         if($manifest) {
-            if([string]::isnullorempty($manifest.homepage)) {
-                abort "Could not find homepage in manifest for '$_'."
-            }
             $h = hash $manifest $architecture
             if ($h) {
-                $h | % { start "https://www.virustotal.com/#/file/$_/detection" }
+                $h | % { Start-VirusTotal $_ $app }
             }
             else {
-                write-host -f darkred "No hash information for $_"
+                write-host -f darkred "No hash information for $app"
             }
         }
         else {
