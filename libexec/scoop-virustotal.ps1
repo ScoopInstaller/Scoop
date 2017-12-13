@@ -14,6 +14,7 @@
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
+. "$psscriptroot\..\lib\json.ps1"
 
 reset_aliases
 
@@ -21,22 +22,34 @@ $opt, $apps, $err = getopt $args 'a:' 'arch='
 if($err) { "scoop virustotal: $err"; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
-Function Navigate-ToHash($hash) {
-    start "https://www.virustotal.com/#/file/$($hash.ToLower())/detection"
+Function Navigate-ToHash($hash, $app) {
+    $hash = $hash.ToLower()
+    $result = (new-object net.webclient).downloadstring("https://www.virustotal.com/ui/files/$hash")
+    $stats = json_path $result '$.data.attributes.last_analysis_stats'
+    $malicious = json_path $stats '$.malicious'
+    $suspicious = json_path $stats '$.suspicious'
+    $undetected = json_path $stats '$.undetected'
+    $unsafe = [int]$malicious + [int]$suspicious
+    $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
+    if($unsafe -gt 0) {
+        write-host -f red "$app`: $unsafe/$undetected, $see_url"
+    } else {
+        write-host -f green "$app`: $unsafe/$undetected, $see_url"
+    }
 }
 
 Function Start-VirusTotal ($h, $app) {
     if ($h -match "(?<algo>[^:]+):(?<hash>.*)") {
         $hash = $matches["hash"]
         if ($matches["algo"] -match "(md5|sha1|sha256)") {
-            Navigate-ToHash $hash
+            Navigate-ToHash $hash $app
         }
         else {
             write-host -f darkred "$app uses $($matches['algo']) hash and VirusTotal only supports md5, sha1 or sha256"
         }
     }
     else {
-        Navigate-ToHash $h
+        Navigate-ToHash $h $app
     }
 }
 
