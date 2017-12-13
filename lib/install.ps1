@@ -452,10 +452,10 @@ function check_hash($file, $url, $manifest, $arch) {
 
 function compute_hash($file, $algname) {
     try {
-        $fs = [system.io.file]::openread($file)
         if([bool](Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) -eq $true) {
-            return (Get-FileHash -InputStream $fs -Algorithm $algname).Hash.ToLower()
+            return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
+            $fs = [system.io.file]::openread($file)
             $alg = [system.security.cryptography.hashalgorithm]::create($algname)
             $hexbytes = $alg.computehash($fs) | % { $_.tostring('x2') }
             return [string]::join('', $hexbytes)
