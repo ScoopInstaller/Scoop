@@ -26,8 +26,14 @@ Function Navigate-ToHash($hash) {
 }
 
 Function Start-VirusTotal ($h, $app) {
-    if ($h -match "(?<algo>[sm][hda]*[125]):.*") {
-        write-host -f darkred "$app uses a $($matches['algo']) hash and VirusTotal only supports SHA256"
+    if ($h -match "(?<algo>[^:]+):(?<hash>.*)") {
+        $hash = $matches["hash"]
+        if ($matches["algo"] -match "(md5|sha1|sha256)") {
+            Navigate-ToHash $hash
+        }
+        else {
+            write-host -f darkred "$app uses $($matches['algo']) hash and VirusTotal only supports md5, sha1 or sha256"
+        }
     }
     else {
         Navigate-ToHash $h
