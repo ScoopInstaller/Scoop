@@ -146,8 +146,10 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # directory.
     $refdir = unlink_current $dir
 
-    # note: keep the old dir in case it contains user files
-
+    if($bucket) {
+        # add bucket name it was installed from
+        $app = "$bucket/$app"
+    }
     install_app $app $architecture $global $suggested $use_cache
 }
 
