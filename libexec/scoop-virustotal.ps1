@@ -21,12 +21,16 @@ $opt, $apps, $err = getopt $args 'a:' 'arch='
 if($err) { "scoop virustotal: $err"; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
+Function Navigate-ToHash($hash) {
+    start "https://www.virustotal.com/#/file/$($hash.ToLower())/detection"
+}
+
 Function Start-VirusTotal ($h, $app) {
     if ($h -match "(?<algo>[sm][hda]*[125]):.*") {
         write-host -f darkred "$app uses a $($matches['algo']) hash and VirusTotal only supports SHA256"
     }
     else {
-        start "https://www.virustotal.com/#/file/$_/detection"
+        Navigate-ToHash $h
     }
 }
 
