@@ -47,6 +47,16 @@
     "persist": [
         "data"
     ],
+    "post_install": [
+        "#Initialize data directory (without generating root password)
+        if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
+            mysqld --initialize-insecure
+        }"
+	],
+	"notes": "To create service, you will need run following command as an administrator.
+
+mysqld --install [Service Name(default: MySQL)]
+",
     "checkver": {
         "url": "https://downloads.mariadb.org/",
         "re": "Download ([\\d.]+) Stable"
