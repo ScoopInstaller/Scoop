@@ -117,4 +117,5 @@ $apps | % {
 
     success "'$app' was uninstalled."
 }
+
 exit 0

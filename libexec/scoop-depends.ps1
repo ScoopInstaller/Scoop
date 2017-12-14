@@ -23,3 +23,5 @@ $deps = @(deps $app $architecture)
 if($deps) {
     $deps[($deps.length - 1)..0]
 }
+
+exit 0

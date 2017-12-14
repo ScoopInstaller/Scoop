@@ -17,3 +17,4 @@ if($issues) {
     success "No problems identified!"
 }
 
+exit 0

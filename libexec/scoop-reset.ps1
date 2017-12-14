@@ -47,3 +47,5 @@ create_shims $manifest $dir $false $architecture
 create_startmenu_shortcuts $manifest $dir $false
 env_add_path $manifest $dir
 env_set $manifest $dir
+
+exit 0

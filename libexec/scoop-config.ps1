@@ -42,3 +42,5 @@ if($name -like 'rm') {
 } else {
     get_config $name $value
 }
+
+exit 0
