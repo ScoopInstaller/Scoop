@@ -85,3 +85,5 @@ switch($cmd) {
     "known" { known_buckets }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
+
+exit 0

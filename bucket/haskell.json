@@ -1,10 +1,10 @@
 {
     "homepage": "https://www.haskell.org",
-    "version": "8.2.1",
+    "version": "8.2.2",
     "architecture": {
         "64bit": {
-            "url": "https://haskell.org/platform/download/8.2.1/HaskellPlatform-8.2.1-core-x86_64-setup.exe",
-            "hash": "81aa5b8476b84c732e4d9e5167a5f1a33ff5ae30d14e5aa4f1902001e4fdb8f8"
+            "url": "https://haskell.org/platform/download/8.2.2/HaskellPlatform-8.2.2-core-x86_64-setup.exe",
+            "hash": "a33fd0c9b017d089f24db7cf52cd6642319e1a21f1f07e9f6ddae32dff8c6264"
         }
     },
     "installer": {

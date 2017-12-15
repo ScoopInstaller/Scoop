@@ -47,6 +47,14 @@
     "persist": [
         "data"
     ],
+    "post_install": "#Initialize data directory (without generating root password)
+    if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
+        mysqld --initialize-insecure
+    }",
+    "notes": "Run following command as administrator to run MariaDB as a service.
+
+mysqld --install \"[Service Name(default:MySQL)]\"
+",
     "checkver": {
         "url": "https://downloads.mariadb.org/",
         "re": "Download ([\\d.]+) Stable"
