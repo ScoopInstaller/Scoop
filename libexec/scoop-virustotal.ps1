@@ -81,18 +81,30 @@ if($apps) {
         if($manifest) {
             $h = hash $manifest $architecture
             if ($h) {
-                $h | % {
+                # Hacky way to see if $h is an array (i.e. there was a
+                # list of hashes in the manifest) or a string
+                # (i.e. there was 1! hash in the manifest).
+                if ($h[0].Length -eq 1) {
+                    # Wrap download URL in array to traverse it in
+                    # lockstep with the loop over the hash.
+                    $u = @(url $manifest $architecture)
+                }
+                else {
+                    $u = url $manifest $architecture
+                }
+                $h | % { $i = 0 } {
                     try {
                         $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
                     } catch [Exception] {
                         $exit_code = $exit_code -bor $_ERR_EXCEPTION
                         if ($_.Exception.Message -like "*(404)*") {
-                            write-host -f darkred "$app`: unknown, submit $(url $manifest $architecture) to https`://www.virustotal.com/#/home/url"
+                            write-host -f darkred "$app`: unknown, submit $($u[$i]) to https`://www.virustotal.com/#/home/url"
                         }
                         else {
                             write-host -f darkred "$app`: error fetching information`: $($_.Exception.Message)"
                         }
                     }
+                    $i = $i + 1
                 }
             }
             else {
