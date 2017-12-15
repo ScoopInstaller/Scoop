@@ -11,7 +11,7 @@ set-strictmode -off
 reset_aliases
 
 $commands = commands
-if (@('-v', '--version') -contains $args) {
+if ('--version' -contains $cmd -or '-v' -contains $args ) {
     pushd $(versiondir 'scoop' 'current')
     write-host "Current Scoop version:"
     git_log --oneline HEAD -n 1
@@ -28,6 +28,6 @@ if (@('-v', '--version') -contains $args) {
         popd
     }
 }
-elseif (@($null, '-h', '--help', '/?') -contains $cmd) { exec 'help' $args }
+elseif (@($null, '--help', '/?') -contains $cmd -or $args -contains '-h') { exec 'help' $args }
 elseif ($commands -contains $cmd) { exec $cmd $args }
 else { "scoop: '$cmd' isn't a scoop command. See 'scoop help'."; exit 1 }
