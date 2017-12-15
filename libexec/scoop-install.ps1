@@ -52,12 +52,17 @@ if($err) { "scoop install: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $independent = $opt.i -or $opt.independent
 $use_cache = !($opt.k -or $opt.'no-cache')
-$architecture = ensure_architecture ($opt.a + $opt.arch)
+$architecture = default_architecture
+try {
+    $architecture = ensure_architecture ($opt.a + $opt.arch)
+} catch {
+    error "ERROR: $_"; exit 1
+}
 
-if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
+if(!$apps) { error 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if($global -and !(is_admin)) {
-    'ERROR: you need admin rights to install global apps'; exit 1
+    error 'ERROR: you need admin rights to install global apps'; exit 1
 }
 
 if(is_scoop_outdated) {
