@@ -30,7 +30,12 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         $check_hash = $false
     }
 
-    write-output "Installing '$app' ($version)."
+    if(!(supports_architecture $manifest $architecture)) {
+        write-host -f DarkRed "'$app' doesn't support $architecture architecture!"
+        return
+    }
+
+    write-output "Installing '$app' ($version) [$architecture]"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory

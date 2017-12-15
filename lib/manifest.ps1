@@ -64,6 +64,10 @@ function arch_specific($prop, $manifest, $architecture) {
     if($manifest.$prop) { return $manifest.$prop }
 }
 
+function supports_architecture($manifest, $architecture) {
+    return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
+}
+
 function generate_user_manifest($app, $version) {
 
     $null, $manifest, $bucket, $null = locate $app
