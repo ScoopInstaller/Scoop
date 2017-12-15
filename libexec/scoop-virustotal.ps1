@@ -1,6 +1,6 @@
 # Usage: scoop virustotal <app> [options]
-# Summary: Look for app's SHA256 on virustotal.com
-# Help: Look for app's SHA256 on virustotal.com
+# Summary: Look for app's hash on virustotal.com
+# Help: Look for app's hash (MD5, SHA1 or SHA256) on virustotal.com
 #
 # The download's hash is also a key to access VirusTotal's scan results.
 # This allows to check the safety of the files without even downloading
