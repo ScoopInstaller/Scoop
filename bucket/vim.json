@@ -15,6 +15,10 @@
     "extract_dir": "vim\\vim80",
     "bin": [
         "vim.exe",
+        [
+            "vim.exe",
+            "vi"
+        ],
         "gvim.exe"
     ],
     "post_install": "if( !(test-path ~\\.vimrc) -and !(test-path ~\\_vimrc) -and !(test-path ~\\vimfiles\\vimrc) -and !(test-path $env:VIM\\_vimrc) ) {
