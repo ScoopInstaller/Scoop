@@ -20,6 +20,8 @@
 #
 # Options:
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
+#   -s, --scan For packages where VirusTotal has no information, send download URL
+#              for analysis (and future retrieval)
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
@@ -30,7 +32,7 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'a:' 'arch='
+$opt, $apps, $err = getopt $args 'sa:' @('arch=', 'scan')
 if($err) { "scoop virustotal: $err"; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
@@ -74,6 +76,56 @@ Function Start-VirusTotal ($h, $app) {
     }
 }
 
+Function Get-RedirectedUrl {
+    # Follow up to one level of HTTP redirection
+    #
+    # Copied from http://www.powershellmagazine.com/2013/01/29/pstip-retrieve-a-redirected-url/
+    # Adapted according to Roy's response (January 23, 2014 at 11:59 am)
+    # Adapted to always return an URL
+    Param (
+        [Parameter(Mandatory=$true)]
+        [String]$URL
+    )
+    $request = [System.Net.WebRequest]::Create($url)
+    $request.AllowAutoRedirect=$false
+    $response=$request.GetResponse()
+    if ($response.StatusCode -eq "Found") {
+        $redir = $response.GetResponseHeader("Location")
+    }
+    else {
+        $redir = $URL
+    }
+    $response.Close()
+    return $redir
+}
+
+Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
+    if ($do_scan) {
+        try {
+            # Follow redirections (for e.g. sourceforge URLs) because
+            # VirusTotal analyzes only "direct" download links
+            $new_redir = $url
+            do {
+                $orig_redir = $new_redir
+                $new_redir = Get-RedirectedUrl $orig_redir
+            } while ($orig_redir -ne $new_redir)
+            Invoke-RestMethod -Method POST -Uri "https://www.virustotal.com/ui/urls?url=$new_redir" | Out-Null
+            $submitted = $True
+        } catch [Exception] {
+            $submitted = $False
+        }
+    }
+    else {
+        $submitted = $False
+    }
+    if ($submitted) {
+        write-host -f darkred "$app`: $url unknown but submitted to VirusTotal"
+    }
+    else {
+        write-host -f darkred "$app`: unknown, download $url & submit to https`://www.virustotal.com/"
+    }
+}
+
 if($apps) {
     $apps | % {
         $app = $_
@@ -98,7 +150,7 @@ if($apps) {
                     } catch [Exception] {
                         $exit_code = $exit_code -bor $_ERR_EXCEPTION
                         if ($_.Exception.Message -like "*(404)*") {
-                            write-host -f darkred "$app`: unknown, submit $($u[$i]) to https`://www.virustotal.com/#/home/url"
+                            SubmitMaybe-ToVirusTotal $u[$i] $app ($opt.scan -or $opt.s)
                         }
                         else {
                             write-host -f darkred "$app`: error fetching information`: $($_.Exception.Message)"
