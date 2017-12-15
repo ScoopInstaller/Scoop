@@ -7,6 +7,17 @@
 # them in many cases.  If the hash is unknown to VirusTotal, the
 # download link is printed to submit it to VirusTotal.
 #
+# Exit codes:
+# 0 -> success
+# 1 -> problem parsing arguments
+# 2 -> at least one package was marked unsafe by VirusTotal
+# 4 -> at least one exception was raised while looking for info
+# 8 -> at least one package couldn't be queried because its hash type
+#      isn't supported by VirusTotal, the manifest couldn't be found
+#      or didn't contain a hash
+# Note: the exit codes (2, 4 & 8) may be combined, e.g. 6 -> exit codes
+#       2 & 4 combined
+#
 # Options:
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
@@ -23,6 +34,12 @@ $opt, $apps, $err = getopt $args 'a:' 'arch='
 if($err) { "scoop virustotal: $err"; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
+$_ERR_UNSAFE = 2
+$_ERR_EXCEPTION = 4
+$_ERR_NO_INFO = 8
+
+$exit_code = 0
+
 Function Navigate-ToHash($hash, $app) {
     $hash = $hash.ToLower()
     $result = (new-object net.webclient).downloadstring("https://www.virustotal.com/ui/files/$hash")
@@ -34,8 +51,10 @@ Function Navigate-ToHash($hash, $app) {
     $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
     if($unsafe -gt 0) {
         write-host -f red "$app`: $unsafe/$undetected, $see_url"
+        return $_ERR_UNSAFE
     } else {
         write-host -f green "$app`: $unsafe/$undetected, $see_url"
+        return 0
     }
 }
 
@@ -43,14 +62,15 @@ Function Start-VirusTotal ($h, $app) {
     if ($h -match "(?<algo>[^:]+):(?<hash>.*)") {
         $hash = $matches["hash"]
         if ($matches["algo"] -match "(md5|sha1|sha256)") {
-            Navigate-ToHash $hash $app
+            return Navigate-ToHash $hash $app
         }
         else {
             write-host -f darkred "$app uses $($matches['algo']) hash and VirusTotal only supports md5, sha1 or sha256"
+            return $_ERR_NO_INFO
         }
     }
     else {
-        Navigate-ToHash $h $app
+        return Navigate-ToHash $h $app
     }
 }
 
@@ -63,8 +83,9 @@ if($apps) {
             if ($h) {
                 $h | % {
                     try {
-                        Start-VirusTotal $_ $app
+                        $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
                     } catch [Exception] {
+                        $exit_code = $exit_code -bor $_ERR_EXCEPTION
                         if ($_.Exception.Message -like "*(404)*") {
                             write-host -f darkred "$app`: unknown, submit $(url $manifest $architecture) to https`://www.virustotal.com/#/home/url"
                         }
@@ -75,13 +96,15 @@ if($apps) {
                 }
             }
             else {
+                $exit_code = $exit_code -bor $_ERR_NO_INFO
                 write-host -f darkred "No hash information for $app"
             }
         }
         else {
-            abort "Could not find manifest for '$app'."
+            $exit_code = $exit_code -bor $_ERR_NO_INFO
+            write-host -f darkred "Could not find manifest for '$app'"
         }
     }
-} else { my_usage }
+} else { my_usage; exit 1 }
 
-exit 0
+exit $exit_code
