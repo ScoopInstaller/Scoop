@@ -4,7 +4,8 @@
 #
 # The download's hash is also a key to access VirusTotal's scan results.
 # This allows to check the safety of the files without even downloading
-# them in many cases.
+# them in many cases.  If the hash is unknown to VirusTotal, the
+# download link is printed to submit it to VirusTotal.
 #
 # Options:
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
@@ -60,7 +61,18 @@ if($apps) {
         if($manifest) {
             $h = hash $manifest $architecture
             if ($h) {
-                $h | % { Start-VirusTotal $_ $app }
+                $h | % {
+                    try {
+                        Start-VirusTotal $_ $app
+                    } catch [Exception] {
+                        if ($_.Exception.Message -like "*(404)*") {
+                            write-host -f darkred "$app`: unknown, submit $(url $manifest $architecture) to https`://www.virustotal.com/#/home/url"
+                        }
+                        else {
+                            write-host -f darkred "$app`: error fetching information`: $($_.Exception.Message)"
+                        }
+                    }
+                }
             }
             else {
                 write-host -f darkred "No hash information for $app"
