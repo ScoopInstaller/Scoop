@@ -14,8 +14,7 @@
     },
     "extract_dir": "kubernetes\\client",
     "bin": [
-        "bin\\kubectl.exe",
-        "bin\\kubefed.exe"
+        "bin\\kubectl.exe"
     ],
     "checkver": {
         "url": "https://storage.googleapis.com/kubernetes-release/release/stable.txt",
