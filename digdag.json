@@ -1,0 +1,10 @@
+﻿{
+    "version": "0.9.21",
+    "license": "Apache 2.0",
+    "extract_dir": "",
+    "url": "https://dl.digdag.io/digdag-latest#/digdag.bat",
+    "depends": "",
+    "homepage": "https://www.digdag.io/",
+    "hash": "sha256:8a615ce9c3f6b0de71e9ba1d727a5eb721897e1146b541978e525d73b28f6806",
+    "bin": "digdag.bat"
+}
