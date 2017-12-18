@@ -25,5 +25,11 @@
         "MySQLWorkbench.exe",
         "mysql.exe",
         "mysqldump.exe"
+    ],
+    "shortcuts": [
+        [
+            "MySQLWorkbench.exe",
+            "MySQLWorkbench"
+        ]
     ]
 }
