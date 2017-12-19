@@ -1,15 +1,15 @@
 {
-    "version": "2.1.2",
+    "version": "2.1.3",
     "homepage": "https://www.microsoft.com/net/",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/2.1.2/dotnet-sdk-2.1.2-win-x64.zip",
-            "hash": "sha512:1b0988b048cc0d4aa7f6335a35e873d343546d1f11e2c19e323138205cdeefa8e0961390fb9477e750a46ec244ef9886ac83b6127ddcdfd77a75550d4aeeab27"
+            "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/2.1.3/dotnet-sdk-2.1.3-win-x64.zip",
+            "hash": "sha512:5d5be9568ce48b173aacd8807bb3a8085386bf0e00d1a055550a514248c88f52399818f2f5c7d998701dc6cf311395cdb4e1689173344edc207f27abe7fb36ce"
         },
         "32bit": {
-            "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/2.1.2/dotnet-sdk-2.1.2-win-x86.zip",
-            "hash": "sha512:db638b7dff1f384f136da9358a57393b2a5f0365a663beda08130a3fd5694ac8660f8a02823f39490b435d9c96e45a475e848448fffef0b52824f7e54d08cf76"
+            "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/2.1.3/dotnet-sdk-2.1.3-win-x86.zip",
+            "hash": "sha512:9adc65a0708d7ae8300ae13db509313083ecece3901576c98c69413608ccffe7e73f35547583760c4ee08f01a9e9b6e89098788344027827602053ee4106af38"
         }
     },
     "bin": "dotnet.exe",

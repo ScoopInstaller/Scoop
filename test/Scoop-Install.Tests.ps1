@@ -9,7 +9,21 @@ $isUnix = is_unix
 describe "ensure_architecture" {
     it "should keep correct architectures" {
         ensure_architecture "32bit" | Should be "32bit"
+        ensure_architecture "32" | Should be "32bit"
+        ensure_architecture "x86" | Should be "32bit"
+        ensure_architecture "X86" | Should be "32bit"
+        ensure_architecture "i386" | Should be "32bit"
+        ensure_architecture "386" | Should be "32bit"
+        ensure_architecture "i686" | Should be "32bit"
+
         ensure_architecture "64bit" | Should be "64bit"
+        ensure_architecture "64" | Should be "64bit"
+        ensure_architecture "x64" | Should be "64bit"
+        ensure_architecture "X64" | Should be "64bit"
+        ensure_architecture "amd64" | Should be "64bit"
+        ensure_architecture "AMD64" | Should be "64bit"
+        ensure_architecture "x86_64" | Should be "64bit"
+        ensure_architecture "x86-64" | Should be "64bit"
     }
 
     it "should fallback to the default architecture on empty input" {
@@ -18,10 +32,8 @@ describe "ensure_architecture" {
     }
 
     it "should show an error with an invalid architecture" {
-        Mock abort
-
-        ensure_architecture "PPC" | Should be $null
-        Assert-MockCalled abort -Times 1
+        { ensure_architecture "PPC" } | Should -Throw
+        { ensure_architecture "PPC" } | Should -Throw "Invalid architecture: 'ppc'"
     }
 }
 
