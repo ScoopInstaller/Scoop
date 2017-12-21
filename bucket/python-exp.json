@@ -95,7 +95,10 @@
     "bin": [
         "python.exe",
         "pythonw.exe",
-        [ "python.exe", "python3" ]
+        [
+            "python.exe",
+            "python3"
+        ]
     ],
     "post_install": "
         python -m ensurepip; cp (gcm pip3).path \"$(split-path (gcm pip3).path)/pip.exe\"
@@ -110,6 +113,8 @@
         $create_reg.Invoke(\"Classes\\.py\", \"Python.File\")
         $create_reg.Invoke(\"Python\\PythonCore\\3.5\\InstallPath\", \"$dir\")
         $create_reg.Invoke(\"Python\\PythonCore\\3.5\\PythonPath\", \"$dir;$dir\\Lib\\;$dir\\DLLs\\\")",
-    "env_add_path": [ "scripts" ],
+    "env_add_path": [
+        "scripts"
+    ],
     "checkver": "<p>Latest: <a href=\".*\">Python ([\\d.]+)</a> - <a.*>.*</a></p>"
 }

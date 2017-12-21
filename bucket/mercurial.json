@@ -1,22 +1,22 @@
 {
     "homepage": "https://www.mercurial-scm.org/",
-    "version": "4.1.2",
-    "license": "http://www.gnu.org/licenses/gpl-2.0.txt",
+    "version": "4.4.2",
+    "license": "https://www.gnu.org/licenses/gpl-2.0.txt",
     "architecture": {
         "64bit": {
-            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.1.2-x64.exe",
-            "hash": "518e17c004ec91d3de8098ceea2fdc68555f64d28388dc4aeecf80b61355c262"
+            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.4.2-x64.exe",
+            "hash": "c5aebde645e346c8b5507813beadb47247aa10652bb143046731ea365edb48fc"
         },
         "32bit": {
-            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.1.2.exe",
-            "hash": "68e797a2d0440f6ca6c67972dd4b85ab93d267e011c177b7ed3199c00a4a8c12"
+            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.4.2.exe",
+            "hash": "3ec92f184d68e9b218e38ae635bc24387e92681a42687e19aa2b2c3d90f73101"
         }
     },
     "innosetup": true,
     "bin": "hg.exe",
     "checkver": {
-        "url": "https://www.mercurial-scm.org/wiki/WhatsNew",
-        "re": "Mercurial\\s+([\\d.]+)\\s+\\([0-9\\-]+\\)"
+        "url": "https://www.mercurial-scm.org/release/windows/latest.dat",
+        "re": "Mercurial-([\\d.]+).exe"
     },
     "autoupdate": {
         "architecture": {

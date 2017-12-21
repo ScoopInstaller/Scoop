@@ -14,7 +14,7 @@
     },
     "extract_dir": "Files/7-Zip",
     "bin": "7z.exe",
-    "checkver": "Download 7-zip ([^\\ ]+)",
+    "checkver": "Download 7-Zip ([\\d.]+)",
     "autoupdate": {
         "architecture": {
             "64bit": {
@@ -24,5 +24,11 @@
                 "url": "http://7-zip.org/a/7z$cleanVersion.msi"
             }
         }
-    }
+    },
+    "shortcuts": [
+        [
+            "7zFM.exe",
+            "7zip"
+        ]
+    ]
 }

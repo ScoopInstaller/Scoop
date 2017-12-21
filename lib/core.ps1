@@ -10,7 +10,7 @@ if((test-path $oldscoopdir) -and !$env:SCOOP) {
     $scoopdir = $oldscoopdir
 }
 
-$globaldir = $env:SCOOP_GLOBAL, "$($env:programdata.tolower())\scoop" | select -first 1
+$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
 
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
@@ -62,6 +62,7 @@ function versiondir($app, $version, $global) { "$(appdir $app $global)\$version"
 function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
+function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
@@ -76,10 +77,55 @@ function installed_apps($global) {
     }
 }
 
+function app_status($app, $global) {
+    $status = @{}
+    $status.installed = (installed $app $global)
+    $status.version = current_version $app $global
+    $status.latest_version = $status.version
+
+    $install_info = install_info $app $status.version $global
+
+    $status.failed = (!$install_info -or !$status.version)
+
+    $manifest = manifest $app $install_info.bucket $install_info.url
+    $status.removed = (!$manifest)
+    if($manifest.version) {
+        $status.latest_version = $manifest.version
+    }
+
+    $status.outdated = $false
+    if($status.version -and $status.latest_version) {
+        $status.outdated = ((compare_versions $status.latest_version $status.version) -gt 0)
+    }
+
+    $status.missing_deps = @()
+    $deps = @(runtime_deps $manifest) | ? { !(installed $_) }
+    if($deps) {
+        $status.missing_deps += ,$deps
+    }
+
+    return $status
+}
+
+function appname_from_url($url) {
+    (split-path $url -leaf) -replace '.json$', ''
+}
+
 # paths
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
+function strip_fragment($url) { $url -replace (new-object uri $url).fragment }
+
+function url_filename($url) {
+    (split-path $url -leaf).split('?') | Select-Object -First 1
+}
+# Unlike url_filename which can be tricked by appending a
+# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
+# this function extracts the original filename from the URL.
+function url_remote_filename($url) {
+    split-path (new-object uri $url).absolutePath -leaf
+}
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
@@ -87,7 +133,7 @@ function fullpath($path) { # should be ~ rooted
 }
 function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
 function friendly_path($path) {
-    $h = $home; if(!$h.endswith('\')) { $h += '\' }
+    $h = (Get-PsProvider 'FileSystem').home; if(!$h.endswith('\')) { $h += '\' }
     if($h -eq '\') { return $path }
     return "$path" -replace ([regex]::escape($h)), "~\"
 }
@@ -101,13 +147,14 @@ function dl($url,$to) {
     $wc.headers.add('User-Agent', 'Scoop/1.0')
     $wc.headers.add('Referer', (strip_filename $url))
     $wc.downloadFile($url,$to)
-
 }
+
 function env($name,$global,$val='__get') {
     $target = 'User'; if($global) {$target = 'Machine'}
     if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
     else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
+
 function unzip($path,$to) {
     if(!(test-path $path)) { abort "can't find $path to unzip"}
     try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
@@ -126,6 +173,7 @@ function unzip($path,$to) {
         abort "Unzip failed: $_"
     }
 }
+
 function unzip_old($path,$to) {
     # fallback for .net earlier than 4.5
     $shell = (new-object -com shell.application -strict)
@@ -162,23 +210,23 @@ function shim($path, $global, $name, $arg) {
 
     # if $path points to another drive resolve-path prepends .\ which could break shims
     if($relpath -match "^(.\\[\w]:).*$") {
-        echo "`$path = `"$path`"" | out-file $shim -encoding utf8
+        write-output "`$path = `"$path`"" | out-file $shim -encoding utf8
     } else {
-        echo "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
+        write-output "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
     }
 
     if($arg) {
-        echo "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
+        write-output "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
     }
-    echo 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding utf8 -append
+    write-output 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding utf8 -append
 
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
         $shim_exe = "$(strip_ext($shim)).shim"
         cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$(strip_ext($shim)).exe" -force
-        echo "path = $(resolve-path $path)" | out-file $shim_exe -encoding utf8
+        write-output "path = $(resolve-path $path)" | out-file $shim_exe -encoding utf8
         if($arg) {
-            echo "args = $arg" | out-file $shim_exe -encoding utf8 -append
+            write-output "args = $arg" | out-file $shim_exe -encoding utf8 -append
         }
     } elseif($path -match '\.((bat)|(cmd))$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
@@ -187,22 +235,65 @@ function shim($path, $global, $name, $arg) {
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
         $shim_cmd = "$(strip_ext($shim)).cmd"
-        "@powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %*;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
+
+"@echo off
+setlocal enabledelayedexpansion
+set args=%*
+:: replace problem characters in arguments
+set args=%args:`"='%
+set args=%args:(=``(%
+set args=%args:)=``)%
+set invalid=`"='
+if !args! == !invalid! ( set args= )
+powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
     }
 }
 
 function ensure_in_path($dir, $global) {
-    $path = env 'path' $global
+    $path = env 'PATH' $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
-        echo "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
+        write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
 
-        env 'path' $global "$dir;$path" # for future sessions...
-        $env:path = "$dir;$env:path" # for this session
+        env 'PATH' $global "$dir;$path" # for future sessions...
+        $env:PATH = "$dir;$env:PATH" # for this session
     }
 }
 
+function ensure_architecture($architecture_opt) {
+    if(!$architecture_opt) {
+        return default_architecture
+    }
+    $architecture_opt = $architecture_opt.ToString().ToLower()
+    switch($architecture_opt) {
+        { @('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64')  -contains $_ } { return '64bit' }
+        { @('32bit', '32', 'x86', 'i386', '386', 'i686')  -contains $_ } { return '32bit' }
+        default { throw [System.ArgumentException] "Invalid architecture: '$architecture_opt'"}
+    }
+}
+
+function ensure_all_installed($apps, $global) {
+    $installed = @()
+    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | % {
+        $app = $_
+        if(installed $app $false) {
+            $installed += ,@($app, $false)
+        } elseif (installed $app $true) {
+            if($global) {
+                $installed += ,@($app, $true)
+            } else {
+                error "'$app' isn't installed for your account, but it is installed globally."
+                warn "Try again with the --global (or -g) flag instead."
+            }
+        } else {
+            error "'$app' isn't installed."
+        }
+    }
+    return ,$installed
+}
+
 function strip_path($orig_path, $dir) {
+    if($orig_path -eq $null) { $orig_path = '' }
     $stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
     return ($stripped -ne $orig_path), $stripped
 }
@@ -213,13 +304,13 @@ function remove_from_path($dir,$global) {
     # future sessions
     $was_in_path, $newpath = strip_path (env 'path' $global) $dir
     if($was_in_path) {
-        echo "Removing $(friendly_path $dir) from your path."
+        write-output "Removing $(friendly_path $dir) from your path."
         env 'path' $global $newpath
     }
 
     # current session
-    $was_in_path, $newpath = strip_path $env:path $dir
-    if($was_in_path) { $env:path = $newpath }
+    $was_in_path, $newpath = strip_path $env:PATH $dir
+    if($was_in_path) { $env:PATH = $newpath }
 }
 
 function ensure_scoop_in_path($global) {
@@ -281,7 +372,9 @@ function reset_alias($name, $value) {
         return # already set
     }
     if($value -is [scriptblock]) {
-        new-item -path function: -name "script:$name" -value $value | out-null
+        if(!(test-path -path "function:script:$name")) {
+            new-item -path function: -name "script:$name" -value $value | out-null
+        }
         return
     }
 
@@ -300,6 +393,12 @@ function reset_aliases() {
 
     # set default aliases
     $default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
+}
+
+# convert list of apps to list of ($app, $global) tuples
+function applist($apps, $global) {
+    if(!$apps) { return @() }
+    return ,@($apps |% { ,@($_, $global) })
 }
 
 function app($app) {
@@ -327,4 +426,48 @@ function get_app_with_version([String] $app) {
         "app" = $name;
         "version" = if ($version) { $version } else { 'latest' }
     }
+}
+function is_scoop_outdated() {
+    $now = Get-Date
+    try {
+        $last_update = (Get-Date $(scoop config lastupdate)).ToLocalTime().AddHours(3)
+    } catch {
+        scoop config lastupdate $now
+        # remove 1 minute to force an update for the first time
+        $last_update = $now.AddMinutes(-1)
+    }
+    return $last_update -lt  $now.ToLocalTime()
+}
+
+function substitute([String] $str, [Hashtable] $params) {
+    $params.GetEnumerator() | % {
+        $str = $str.Replace($_.Name, $_.Value)
+    }
+    return $str
+}
+
+function format_hash([String] $hash) {
+    switch ($hash.Length)
+    {
+        32 { $hash = "md5:$hash" } # md5
+        40 { $hash = "sha1:$hash" } # sha1
+        64 { $hash = $hash } # sha256
+        128 { $hash = "sha512:$hash" } # sha512
+        default { $hash = $null }
+    }
+    return $hash
+}
+
+function handle_special_urls($url)
+{
+    # FossHub.com
+    if($url -match "^(.*fosshub.com\/)(?<name>.*)\/(?<filename>.*)$") {
+        # create an url to request to request the expiring url
+        $name = $matches['name'] -replace '.html',''
+        $filename = $matches['filename']
+        # the key is a random 24 chars long hex string, so lets use ' SCOOPSCOOP ' :)
+        $url = "https://www.fosshub.com/gensLink/$name/$filename/2053434f4f5053434f4f5020"
+        $url = (Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content)
+    }
+    return $url
 }

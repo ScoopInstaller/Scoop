@@ -1,0 +1,15 @@
+{
+    "homepage": "https://github.com/susam/uncap",
+    "license": "MIT",
+    "version": "0.2.2",
+    "url": "https://github.com/susam/uncap/releases/download/0.2.2/uncap.exe",
+    "hash": "sha1:188311c52d07fad5df0071f3f25b8d6ca537451b",
+    "bin": "uncap.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/susam/uncap/releases/download/$version/uncap.exe",
+        "hash": {
+            "url": "$baseurl/uncap.sha1"
+        }
+    }
+}

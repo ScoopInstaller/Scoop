@@ -22,6 +22,53 @@
                 }
             ]
         },
+        "hashExtraction": {
+            "additionalProperties": false,
+            "properties": {
+                "find": {
+                    "format": "regex",
+                    "type": "string"
+                },
+                "jp": {
+                    "pattern": "^\\$\\..*$",
+                    "type": "string"
+                },
+                "mode": {
+                    "enum": [
+                        "download",
+                        "extract",
+                        "json",
+                        "rdf"
+                    ]
+                },
+                "type": {
+                    "enum": [
+                        "md5",
+                        "sha1",
+                        "sha256",
+                        "sha512"
+                    ],
+                    "description": "Deprecated, hash type is determined automatically"
+                },
+                "url": {
+                    "anyOf": [
+                        {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        {
+                            "pattern": "^(\\$url|\\$baseurl).[\\w\\d]+$",
+                            "type": "string"
+                        },
+                        {
+                            "pattern": "^.*(\\$url|\\$baseurl).*$",
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "type": "object"
+        },
         "architecture": {
             "additionalProperties": false,
             "properties": {
@@ -49,6 +96,9 @@
                 },
                 "pre_install": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "shortcuts": {
+                    "$ref": "#/definitions/arrayOfArrayOfStrings"
                 },
                 "uninstaller": {
                     "$ref": "#/definitions/uninstaller"
@@ -85,6 +135,9 @@
                                 "url": {
                                     "format": "uri",
                                     "type": "string"
+                                },
+                                "hash": {
+                                    "$ref": "#/definitions/hashExtraction"
                                 }
                             },
                             "type": "object"
@@ -98,6 +151,9 @@
                                 "url": {
                                     "format": "uri",
                                     "type": "string"
+                                },
+                                "hash": {
+                                    "$ref": "#/definitions/hashExtraction"
                                 }
                             },
                             "type": "object"
@@ -109,50 +165,7 @@
                     "type": "string"
                 },
                 "hash": {
-                    "additionalProperties": false,
-                    "properties": {
-                        "find": {
-                            "format": "regex",
-                            "type": "string"
-                        },
-                        "jp": {
-                            "pattern": "^\\$\\..*$",
-                            "type": "string"
-                        },
-                        "mode": {
-                            "enum": [
-                                "download",
-                                "extract",
-                                "json",
-                                "rdf"
-                            ]
-                        },
-                        "type": {
-                            "enum": [
-                                "md5",
-                                "sha1",
-                                "sha256",
-                                "sha512"
-                            ]
-                        },
-                        "url": {
-                            "anyOf": [
-                                {
-                                    "format": "uri",
-                                    "type": "string"
-                                },
-                                {
-                                    "pattern": "^\\$url.[\\w\\d]+$",
-                                    "type": "string"
-                                },
-                                {
-                                    "pattern": "^.*\\$url.*$",
-                                    "type": "string"
-                                }
-                            ]
-                        }
-                    },
-                    "type": "object"
+                    "$ref": "#/definitions/hashExtraction"
                 },
                 "note": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -188,6 +201,14 @@
                         "jp": {
                             "pattern": "^\\$\\..*$",
                             "type": "string"
+                        },
+                        "reverse": {
+                            "description": "Reverse the order of regex matches",
+                            "type": "boolean"
+                        },
+                        "replace": {
+                            "description": "Allows rearrange the regexp matches",
+                            "type": "string"
                         }
                     },
                     "type": "object"
@@ -205,6 +226,9 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "file": {
+                    "type": "string"
+                },
+                "script": {
                     "type": "string"
                 },
                 "keep": {
@@ -248,10 +272,22 @@
                 },
                 "file": {
                     "type": "string"
+                },
+                "script": {
+                    "type": "string"
                 }
             },
-            "required": [
-                "file"
+            "oneOf": [
+                {
+                    "required": [
+                        "file"
+                    ]
+                },
+                {
+                    "required": [
+                        "script"
+                    ]
+                }
             ],
             "type": "object"
         },
@@ -282,6 +318,10 @@
     "properties": {
         "_comment": {
             "description": "Undocumented: only found in scoop/git* and 6 manifests in scoop-extras",
+            "type": "string"
+        },
+        "##": {
+            "description": "A comment.",
             "type": "string"
         },
         "architecture": {

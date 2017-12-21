@@ -87,14 +87,28 @@ Function ConvertToPrettyJson {
     }
 }
 
-function json_path([Object] $json, [String] $jsonpath, [String] $basename) {
-    $result = $json
+function json_path([String] $json, [String] $jsonpath, [String] $basename) {
+    Add-Type -Path "$psscriptroot\..\supporting\validator\Newtonsoft.Json.dll"
+    $jsonpath = $jsonpath.Replace("`$basename", $basename)
+    $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)
+    $result = $null
+    try {
+        $result = $obj.SelectToken($jsonpath, $true)
+    } catch [System.Management.Automation.MethodInvocationException] {
+        write-host -f DarkRed $_
+        return $null
+    }
+    return $result.ToString()
+}
+
+function json_path_legacy([String] $json, [String] $jsonpath, [String] $basename) {
+    $result = $json | ConvertFrom-Json -ea stop
     $isJsonPath = $jsonpath.StartsWith("`$")
     $jsonpath.split(".") | ForEach-Object {
         $el = $_
 
         # substitute the base filename into the jsonpath
-        if($el.StartsWith("`$basename")) {
+        if($el.Contains("`$basename")) {
             $el = $el.Replace("`$basename", $basename)
         }
 
@@ -103,9 +117,14 @@ function json_path([Object] $json, [String] $jsonpath, [String] $basename) {
             return
         }
 
-        if($el -match "^(?<property>\w+)\[(?<index>\d+)\]$") {
+        # array detection
+        if($el -match "^(?<property>\w+)?\[(?<index>\d+)\]$") {
             $property = $matches['property']
-            $result = $result.$property[$matches['index']]
+            if($property) {
+                $result = $result.$property[$matches['index']]
+            } else {
+                $result = $result[$matches['index']]
+            }
             return
         }
 

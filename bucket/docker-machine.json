@@ -1,18 +1,17 @@
 {
     "homepage": "https://github.com/docker/machine",
-    "version": "0.10.0",
+    "version": "0.13.0",
     "license": "Apache",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.10.0/docker-machine-Windows-x86_64.exe",
-            "hash": "d923120bd029fb8a79025288fbc33ad65f7c7c072272aa95ad7d5d5bef0f1434"
+            "url": "https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-Windows-x86_64.exe#/docker-machine.exe",
+            "hash": "ec304126dac48873e5f52c0df0d8333be4bd653a37ba1cf78793da0e858db9e3"
         },
         "32bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.10.0/docker-machine-Windows-i386.exe",
-            "hash": "428def25cc6bb60c6d1b341ced0200aa3281794d661dd8c57a8d54357a532541"
+            "url": "https://github.com/docker/machine/releases/download/v0.13.0/docker-machine-Windows-i386.exe#/docker-machine.exe",
+            "hash": "564c57e251ffa61fb6d03157f67a8c3cc10ecaaf592e589aca9307b6357561fc"
         }
     },
-    "pre_install": "Rename-Item @(Get-ChildItem $dir\\docker-machine-*.exe)[0] $dir\\docker-machine.exe",
     "bin": [
         [
             "docker-machine.exe",
@@ -23,16 +22,14 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/docker/machine/releases/download/v$version/docker-machine-Windows-x86_64.exe"
+                "url": "https://github.com/docker/machine/releases/download/v$version/docker-machine-Windows-x86_64.exe#/docker-machine.exe"
             },
             "32bit": {
-                "url": "https://github.com/docker/machine/releases/download/v$version/docker-machine-Windows-i386.exe"
+                "url": "https://github.com/docker/machine/releases/download/v$version/docker-machine-Windows-i386.exe#/docker-machine.exe"
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "https://github.com/docker/machine/releases/download/v$version/sha256sum.txt",
-            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+            "url": "$baseurl/sha256sum.txt"
         }
     }
 }

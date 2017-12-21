@@ -21,6 +21,11 @@ if ($type -is [System.IO.DirectoryInfo]) {
 }
 
 $files | % {
+    # beautify
     $json = parse_json "$dir$_" | ConvertToPrettyJson
+
+    # convert to 4 spaces
+    $json = $json -replace "`t",'    '
+
     [System.IO.File]::WriteAllLines("$dir$_", $json)
 }

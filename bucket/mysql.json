@@ -1,17 +1,17 @@
 {
     "homepage": "https://dev.mysql.com/downloads/mysql/",
-    "version": "5.7.18",
+    "version": "5.7.20",
     "license": "GPLv2",
     "architecture": {
         "64bit": {
-            "url": "https://dev.mysql.com/get/mysql-5.7.18-winx64.zip",
-            "hash": "6a3b2d070200ae4e29f8a08aceb1c76cca9beccb037de4f5ab120d657e781353",
-            "extract_dir": "mysql-5.7.18-winx64"
+            "url": "https://dev.mysql.com/get/mysql-5.7.20-winx64.zip",
+            "hash": "2f7fbebac1d679a5e154b7dcb2a91970c9450ba52fe39df90df1e7dbfdcc339c",
+            "extract_dir": "mysql-5.7.20-winx64"
         },
         "32bit": {
-            "url": "https://dev.mysql.com/get/mysql-5.7.18-win32.zip",
-            "hash": "a4313a35827477264479112040f029d34798ccf010b40ceb85c060aacc925039",
-            "extract_dir": "mysql-5.7.18-win32"
+            "url": "https://dev.mysql.com/get/mysql-5.7.20-win32.zip",
+            "hash": "f9db20a65f1a81a3c0e1828d29fe5cb364473a0969249492596b7bc0b617870d",
+            "extract_dir": "mysql-5.7.20-win32"
         }
     },
     "bin": [
@@ -34,14 +34,10 @@
 if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
     mysqld --initialize-insecure
 }
-
-#Copy provided sample file to live file location
-cp $dir/my-default.ini $dir/my.ini
-
 #Output client configuration to my.ini file so no username is required when connecting
-echo \"\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
-echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
-echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding UTF8 -Append
+echo \"\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
+echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
+echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
 ",
     "checkver": {
         "url": "https://dev.mysql.com/downloads/mysql/",

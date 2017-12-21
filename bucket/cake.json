@@ -1,0 +1,19 @@
+{
+    "homepage": "https://cakebuild.net/",
+    "version": "0.23.0",
+    "license": "MIT",
+    "url": "https://github.com/cake-build/cake/releases/download/v0.23.0/Cake-bin-net461-v0.23.0.zip",
+    "hash": "1ad334de4188e6dd320a8501dd0d76f5efc8f2f4e83a562fb3f309a298f39a4a",
+    "bin": "cake.exe",
+    "suggest": {
+        "NuGet": [
+            "nuget"
+        ]
+    },
+    "checkver": {
+        "github": "https://github.com/cake-build/cake"
+    },
+    "autoupdate": {
+        "url": "https://github.com/cake-build/cake/releases/download/v$version/Cake-bin-net461-v$version.zip"
+    }
+}

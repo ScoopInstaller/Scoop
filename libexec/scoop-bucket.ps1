@@ -43,7 +43,8 @@ function add_bucket($name, $repo) {
 
     $dir = bucketdir $name
     if(test-path $dir) {
-        abort "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
+        warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
+        exit 0
     }
 
     write-host 'Checking repo... ' -nonewline
@@ -55,7 +56,7 @@ function add_bucket($name, $repo) {
 
     ensure $bucketsdir > $null
     $dir = ensure $dir
-    git_clone "$repo" "`"$dir`""
+    git_clone "$repo" "`"$dir`"" -q
     success "The $name bucket was added successfully."
 }
 
@@ -84,3 +85,5 @@ switch($cmd) {
     "known" { known_buckets }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
+
+exit 0

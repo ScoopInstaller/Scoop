@@ -1,0 +1,96 @@
+{
+    "homepage": "https://qemu.weilnetz.de/",
+    "license": "GPL-2.0",
+    "version": "2.11.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20171217.exe#/dl.7z",
+            "hash": "sha512:49114fb0804025fe280de7bae339deb611d9ff5973d17d2b97bd51ee08bfd416ab81a24436a89d40e1df14a3087b19209f47171cd588dd490bf687c88c3d84c3"
+        },
+        "32bit": {
+            "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-20171217.exe#/dl.7z",
+            "hash": "sha512:38ed3b94100eed64274f9e106e20291cb4bab0fb2354602be87fd2dbcb93fb3ba7e39f7412eb94e63174862ff8302cd3df8720dd7f2e3e0bfa4ad01f2ce865c8"
+        }
+    },
+    "bin": [
+        "qemu-img.exe",
+        "qemu-io.exe",
+        "qemu-system-aarch64.exe",
+        "qemu-system-aarch64w.exe",
+        "qemu-system-alpha.exe",
+        "qemu-system-alphaw.exe",
+        "qemu-system-arm.exe",
+        "qemu-system-armw.exe",
+        "qemu-system-cris.exe",
+        "qemu-system-crisw.exe",
+        "qemu-system-i386.exe",
+        "qemu-system-i386w.exe",
+        "qemu-system-lm32.exe",
+        "qemu-system-lm32w.exe",
+        "qemu-system-m68k.exe",
+        "qemu-system-m68kw.exe",
+        "qemu-system-microblaze.exe",
+        "qemu-system-microblazeel.exe",
+        "qemu-system-microblazeelw.exe",
+        "qemu-system-microblazew.exe",
+        "qemu-system-mips.exe",
+        "qemu-system-mips64.exe",
+        "qemu-system-mips64el.exe",
+        "qemu-system-mips64elw.exe",
+        "qemu-system-mips64w.exe",
+        "qemu-system-mipsel.exe",
+        "qemu-system-mipselw.exe",
+        "qemu-system-mipsw.exe",
+        "qemu-system-moxie.exe",
+        "qemu-system-moxiew.exe",
+        "qemu-system-nios2.exe",
+        "qemu-system-nios2w.exe",
+        "qemu-system-or1k.exe",
+        "qemu-system-or1kw.exe",
+        "qemu-system-ppc.exe",
+        "qemu-system-ppc64.exe",
+        "qemu-system-ppc64w.exe",
+        "qemu-system-ppcemb.exe",
+        "qemu-system-ppcembw.exe",
+        "qemu-system-ppcw.exe",
+        "qemu-system-s390x.exe",
+        "qemu-system-s390xw.exe",
+        "qemu-system-sh4.exe",
+        "qemu-system-sh4eb.exe",
+        "qemu-system-sh4ebw.exe",
+        "qemu-system-sh4w.exe",
+        "qemu-system-sparc.exe",
+        "qemu-system-sparc64.exe",
+        "qemu-system-sparc64w.exe",
+        "qemu-system-sparcw.exe",
+        "qemu-system-tricore.exe",
+        "qemu-system-tricorew.exe",
+        "qemu-system-unicore32.exe",
+        "qemu-system-unicore32w.exe",
+        "qemu-system-x86_64.exe",
+        "qemu-system-x86_64w.exe",
+        "qemu-system-xtensa.exe",
+        "qemu-system-xtensaeb.exe",
+        "qemu-system-xtensaebw.exe",
+        "qemu-system-xtensaw.exe"
+    ],
+    "checkver": {
+        "re": "<strong>(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})</strong>: New QEMU installers \\((?<version>[\\d.a-z\\-]+)\\)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-$matchYear$matchMonth$matchDay.exe#/dl.7z",
+                "hash": {
+                    "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-$matchYear$matchMonth$matchDay.sha512"
+                }
+            },
+            "32bit": {
+                "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-$matchYear$matchMonth$matchDay.exe#/dl.7z",
+                "hash": {
+                    "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-$matchYear$matchMonth$matchDay.sha512"
+                }
+            }
+        }
+    }
+}

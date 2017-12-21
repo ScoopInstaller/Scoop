@@ -9,19 +9,8 @@ TODO
 . "$psscriptroot/core.ps1"
 . "$psscriptroot/json.ps1"
 
-function substitute([String] $str, [Hashtable] $params) {
-    $params.GetEnumerator() | % {
-        $str = $str.Replace($_.Name, $_.Value)
-    }
-
-    return $str
-}
-
 function find_hash_in_rdf([String] $url, [String] $filename) {
-    Write-Host -f DarkYellow "RDF URL: $url"
-    Write-Host -f DarkYellow "File: $filename"
-
-    $data = ""
+    $data = $null
     try {
         # Download and parse RDF XML file
         $wc = new-object net.webclient
@@ -36,10 +25,10 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     # Find file content
     $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
 
-    return $digest.sha256
+    return format_hash $digest.sha256
 }
 
-function find_hash_in_textfile([String] $url, [String] $basename, [String] $type, [String] $regex) {
+function find_hash_in_textfile([String] $url, [String] $basename, [String] $regex) {
     $hashfile = $null
 
     try {
@@ -52,20 +41,28 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $type
         return
     }
 
-    if ($regex -eq $null) {
-        $regex = "([a-z0-9]+)"
+    # find single line hash in $hashfile (will be overridden by $regex)
+    if ($regex.Length -eq 0) {
+        $normalRegex = "^([a-fA-F0-9]+)$"
+    } else {
+        $normalRegex = $regex
     }
-    $regex = substitute $regex @{'$basename' = [regex]::Escape($basename)}
 
-    if ($hashfile -match $regex) {
+    $normalRegex = substitute $normalRegex @{'$basename' = [regex]::Escape($basename)}
+    if ($hashfile -match $normalRegex) {
         $hash = $matches[1]
-
-        if ($type -and !($type -eq "sha256")) {
-            $hash = $type + ":$hash"
-        }
-
-        return $hash
     }
+
+    # find hash with filename in $hashfile (will be overridden by $regex)
+    if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
+        $filenameRegex = "([a-fA-F0-9]+)\s+(?:\.\/|\*)?(?:`$basename)(\s[\d]+)?"
+        $filenameRegex = substitute $filenameRegex @{'$basename' = [regex]::Escape($basename)}
+        if ($hashfile -match $filenameRegex) {
+            $hash = $matches[1]
+        }
+    }
+
+    return format_hash $hash
 }
 
 function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath) {
@@ -74,14 +71,17 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
     try {
         $wc = new-object net.webclient
         $wc.headers.add('Referer', (strip_filename $url))
-        $json = $wc.downloadstring($url) | convertfrom-json -ea stop
+        $json = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
         return
     }
-
-    return json_path $json $jsonpath $basename
+    $hash = json_path $json $jsonpath $basename
+    if(!$hash) {
+        $hash = json_path_legacy $json $jsonpath $basename
+    }
+    return format_hash $hash
 }
 
 function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
@@ -94,40 +94,62 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     `download` Last resort, download the real file and hash it
     #>
     $hashmode = $config.mode
-    if ($url.Contains("#")) {
-        <#
-        The download url can end with a hash to specify the local download name.
-        We need to original filename to extract the hash from the file
-        Example: julia.json
-        #>
-        $basename = fname($url.Substring(0, $url.IndexOf("#")))
-    } else {
-        $basename = fname($url)
-    }
+    $basename = url_remote_filename($url)
 
-    $hashfile_url = substitute $config.url @{'$url' = $url}
+    $hashfile_url = substitute $config.url @{
+        '$url' = (strip_fragment $url);
+        '$baseurl' = (strip_filename (strip_fragment $url)).TrimEnd('/')
+        '$basename' = $basename
+    }
     $hashfile_url = substitute $hashfile_url $substitutions
-
-    if ($hashmode -eq "extract") {
-        $hash = find_hash_in_textfile $hashfile_url $basename $config.type $config.find
+    if($hashfile_url) {
+        write-host -f DarkYellow 'Searching hash for ' -NoNewline
+        write-host -f Green $(url_remote_filename $url) -NoNewline
+        write-host -f DarkYellow ' in ' -NoNewline
+        write-host -f Green $hashfile_url
     }
 
-    if ($hashmode -eq "json") {
+    if($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
+        $hashmode = 'extract'
+    }
+
+    if ($config.jp.Length -gt 0) {
+        $hashmode = 'json'
+    }
+
+    if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
+        $hashmode = 'sourceforge'
+        # change the URL because downloads.sourceforge.net doesn't have checksums
+        $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
+        $hash = find_hash_in_textfile $hashfile_url $basename '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
+    }
+
+    if ($hashmode -eq 'extract') {
+        $hash = find_hash_in_textfile $hashfile_url $basename $config.find
+    }
+
+    if ($hashmode -eq 'json') {
         $hash = find_hash_in_json $hashfile_url $basename $config.jp
     }
 
-    if ($hashmode -eq "rdf") {
+    if ($hashmode -eq 'rdf') {
         $hash = find_hash_in_rdf $hashfile_url $basename
     }
 
     if($hash) {
         # got one!
+        write-host -f DarkYellow 'Found: ' -NoNewline
+        write-host -f Green $hash -NoNewline
+        write-host -f DarkYellow ' using ' -NoNewline
+        write-host -f Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
         return $hash
     } elseif($hashfile_url) {
         write-host -f DarkYellow "Could not find hash in $hashfile_url"
     }
 
-    Write-Host "Download files to compute hashes!" -f DarkYellow
+    write-host -f DarkYellow 'Downloading ' -NoNewline
+    write-host -f Green $(url_remote_filename $url) -NoNewline
+    write-host -f DarkYellow ' to compute hashes!'
     try {
         dl_with_cache $app $version $url $null $null $true
     } catch [system.net.webexception] {
@@ -136,7 +158,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         return $null
     }
     $file = fullpath (cache_path $app $version $url)
-    return compute_hash $file "sha256"
+    $hash = compute_hash $file 'sha256'
+    write-host -f DarkYellow 'Computed hash: ' -NoNewline
+    write-host -f Green $hash
+    return $hash
 }
 
 function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
@@ -169,11 +194,10 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 
     # check if there are architecture specific variants
-    if ($json.architecture) {
+    if ($json.architecture -and $json.autoupdate.architecture) {
         $json.architecture | Get-Member -MemberType NoteProperty | % {
             $architecture = $_.Name
-
-            if ($json.architecture.$architecture.$prop) {
+            if ($json.architecture.$architecture.$prop -and $json.autoupdate.architecture.$architecture.$prop) {
                 $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) $substitutions
             }
         }
@@ -186,6 +210,7 @@ function get_version_substitutions([String] $version, [Hashtable] $matches) {
     $versionVariables = @{
         '$version' = $version;
         '$underscoreVersion' = ($version -replace "\.", "_");
+        '$dashVersion' = ($version -replace "\.", "-");
         '$cleanVersion' = ($version -replace "\.", "");
         '$majorVersion' = $firstPart.Split('.') | Select-Object -first 1;
         '$minorVersion' = $firstPart.Split('.') | Select-Object -skip 1 -first 1;
@@ -194,9 +219,10 @@ function get_version_substitutions([String] $version, [Hashtable] $matches) {
         '$preReleaseVersion' = $lastPart;
     }
     if($matches) {
-        $matches.Remove(0)
         $matches.GetEnumerator() | % {
-            $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+            if($_.Name -ne "0") {
+                $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+            }
         }
     }
     return $versionVariables
@@ -263,11 +289,14 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
     # update properties
     update_manifest_prop "extract_dir" $json $substitutions
 
+    # update license
+    update_manifest_prop "license" $json $substitutions
+
     if ($has_changes -and !$has_errors) {
         # write file
         Write-Host -f DarkGreen "Writing updated $app manifest"
 
-        $path = "$dir\$app.json"
+        $path = join-path $dir "$app.json"
 
         $file_content = $json | ConvertToPrettyJson
         [System.IO.File]::WriteAllLines($path, $file_content)

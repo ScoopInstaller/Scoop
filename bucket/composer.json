@@ -1,12 +1,25 @@
 {
     "homepage": "https://getcomposer.org/",
     "license": "https://github.com/composer/composer/blob/master/LICENSE",
-    "version": "1.4.1",
-    "url": "https://getcomposer.org/download/1.4.1/composer.phar",
+    "version": "1.5.6",
+    "url": "https://getcomposer.org/download/1.5.6/composer.phar",
     "bin": "composer.ps1",
+    "persist": "home",
+    "env_set": {
+        "COMPOSER_HOME": "$persist_dir\\home"
+    },
+    "env_add_path": "home\\vendor\\bin",
     "pre_install": "
         echo 'if($args -eq \"selfupdate\" -or $args -eq \"self-update\") { & scoop update composer }' | out-file $dir\\composer.ps1
         echo 'else { & php (join-path \"$psscriptroot\" \"composer.phar\") @args }' | out-file $dir\\composer.ps1 -append
+    ",
+    "post_install": "
+        $och = \"$env:APPDATA\\Composer\"
+        if(Test-Path $och) {
+            Write-Host -F yellow \"Moving old 'COMPOSER_HOME' to '$persist_dir\\home'\"
+            Move-Item -Force \"$och\\*\" \"$persist_dir\\home\"
+            Remove-Item -Force \"$och\"
+        }
     ",
     "suggest": {
         "PHP": [
@@ -17,7 +30,7 @@
     "notes": [
         "'composer selfupdate' is aliased to 'scoop update composer'"
     ],
-    "hash": "abd277cc3453be980bb48cbffe9d1f7422ca1ef4bc0b7d035fda87cea4d55cbc",
+    "hash": "25e75d72818c4f1d46b3ae47a8deaaf4ef25c87198329d4a6ee53601b00459e5",
     "checkver": {
         "github": "https://github.com/composer/composer"
     },

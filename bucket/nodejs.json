@@ -1,40 +1,48 @@
 {
-    "homepage": "http://nodejs.org",
-    "version": "7.8.0",
+    "homepage": "https://nodejs.org",
+    "version": "9.3.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v7.8.0/node-v7.8.0-x64.msi",
-            "hash": "f66a1774086f31e6e9480f6dd67e31f1853a58d26970a19672b40ba0b318a442"
+            "url": "https://nodejs.org/dist/v9.3.0/node-v9.3.0-win-x64.7z",
+            "hash": "e82bb00c604d01d9512a9a3e501b79c6f21aac1142c61c209b054883a37c8e67",
+            "extract_dir": "node-v9.3.0-win-x64"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v7.8.0/node-v7.8.0-x86.msi",
-            "hash": "0eda7b5dabd72865f96985d5ef0ad7048df87a79ff52a77b352ca293f52e2930"
+            "url": "https://nodejs.org/dist/v9.3.0/node-v9.3.0-win-x86.7z",
+            "hash": "6e986688ad44538f0ab0253f393d20a978dd752586162fd6a036e0a5c45daaae",
+            "extract_dir": "node-v9.3.0-win-x86"
         }
     },
-    "extract_dir": "nodejs",
-    "persist": [ "bin" ],
-    "env_add_path": [ ".", "bin" ],
+    "persist": [
+        "bin",
+        "cache"
+    ],
+    "env_add_path": [
+        ".",
+        "bin"
+    ],
     "post_install": "
-# Set npm prefix to install modules inside bin
-Set-Content -Value \"prefix=$dir\\bin\" -Path $dir\\node_modules\\npm\\npmrc",
+        # Set npm prefix to install modules inside bin and npm cache so they persist
+        Set-Content -Value \"prefix=$persist_dir\\bin`ncache=$persist_dir\\cache\" -Path $dir\\node_modules\\npm\\npmrc
+    ",
     "checkver": {
-        "url": "https://nodejs.org/en/download/current/",
-        "re": "Current version: <strong>v([\\d.]+)</strong>"
+        "url": "https://nodejs.org/dist/latest/",
+        "re": "node-v([\\d.]+)-x86.msi"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://nodejs.org/dist/v$version/node-v$version-x64.msi"
+                "url": "https://nodejs.org/dist/v$version/node-v$version-win-x64.7z",
+                "extract_dir": "node-v$version-win-x64"
             },
             "32bit": {
-                "url": "https://nodejs.org/dist/v$version/node-v$version-x86.msi"
+                "url": "https://nodejs.org/dist/v$version/node-v$version-win-x86.7z",
+                "extract_dir": "node-v$version-win-x86"
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "https://nodejs.org/dist/v$version/SHASUMS256.txt.asc",
-            "find": "([a-z0-9]{64})\\s+(?:$basename)"
+            "url": "$baseurl/SHASUMS256.txt.asc"
         }
     }
 }

@@ -1,10 +1,10 @@
 {
     "homepage": "https://gradle.org",
-    "version": "3.5",
+    "version": "4.4.1",
     "license": "Apache 2.0",
-    "hash": "0b7450798c190ff76b9f9a3d02e18b33d94553f708ebc08ebe09bdf99111d110",
-    "url": "https://services.gradle.org/distributions/gradle-3.5-bin.zip",
-    "extract_dir": "gradle-3.5",
+    "hash": "e7cf7d1853dfc30c1c44f571d3919eeeedef002823b66b6a988d27e919686389",
+    "url": "https://services.gradle.org/distributions/gradle-4.4.1-bin.zip",
+    "extract_dir": "gradle-4.4.1",
     "bin": "bin\\gradle.bat",
     "suggest": {
         "JDK": [
@@ -13,11 +13,14 @@
         ]
     },
     "checkver": {
-        "url": "https://gradle.org/install",
+        "url": "https://gradle.org/install/",
         "re": "The current Gradle release is version ([\\d.]+)"
     },
     "autoupdate": {
         "url": "https://services.gradle.org/distributions/gradle-$version-bin.zip",
-        "extract_dir": "gradle-$version"
+        "extract_dir": "gradle-$version",
+        "hash": {
+            "url": "$url.sha256"
+        }
     }
 }

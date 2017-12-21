@@ -1,0 +1,7 @@
+{
+    "homepage": "https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/",
+    "version": "Overload400-PrecQual.1817",
+    "url": "https://cvs.khronos.org/svn/repos/ogl/trunk/ecosystem/public/sdk/tools/glslang/Install/Windows/glslangValidator.exe",
+    "hash": "6d7c6b88472aaa904f07367dbb54fdcb89d4c95e4d22ec8a9a8069aa138c0077",
+    "bin": "glslangValidator.exe"
+}

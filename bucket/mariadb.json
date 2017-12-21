@@ -1,17 +1,17 @@
 {
-    "homepage": "http://mariadb.org",
-    "version": "10.1.22",
+    "homepage": "https://mariadb.org",
+    "version": "10.2.11",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.1.22/winx64-packages/mariadb-10.1.22-winx64.zip",
-            "hash": "55adcf7ae09ca42f6cd16327c7e552c5be3ff9586e788e7fe0f627e271be2f15",
-            "extract_dir": "mariadb-10.1.22-winx64"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.2.11/winx64-packages/mariadb-10.2.11-winx64.zip",
+            "hash": "d32495397845c62a0912e0cababe1b41dfd68b58994d3c2853385cb175110b6a",
+            "extract_dir": "mariadb-10.2.11-winx64"
         },
         "32bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.1.22/win32-packages/mariadb-10.1.22-win32.zip",
-            "hash": "0224922d50d16cfc5b81ee9211df50da4bc2279319615349741b7255ace59383",
-            "extract_dir": "mariadb-10.1.22-win32"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.2.11/win32-packages/mariadb-10.2.11-win32.zip",
+            "hash": "171c6adc2dd6ab5a281bb17ae21e3263269951544c64fa94ccc2b6289b6a36ab",
+            "extract_dir": "mariadb-10.2.11-win32"
         }
     },
     "bin": [
@@ -35,10 +35,7 @@
         "bin\\mysqlshow.exe",
         "bin\\mysqlslap.exe",
         "bin\\mysqltest.exe",
-        "bin\\mysqltest_embedded.exe",
         "bin\\mysql_client_test.exe",
-        "bin\\mysql_client_test_embedded.exe",
-        "bin\\mysql_embedded.exe",
         "bin\\mysql_install_db.exe",
         "bin\\mysql_plugin.exe",
         "bin\\mysql_tzinfo_to_sql.exe",
@@ -50,6 +47,14 @@
     "persist": [
         "data"
     ],
+    "post_install": "#Initialize data directory (without generating root password)
+    if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
+        mysqld --initialize-insecure
+    }",
+    "notes": "Run following command as administrator to run MariaDB as a service.
+
+mysqld --install \"[Service Name(default:MySQL)]\"
+",
     "checkver": {
         "url": "https://downloads.mariadb.org/",
         "re": "Download ([\\d.]+) Stable"
@@ -58,11 +63,17 @@
         "architecture": {
             "64bit": {
                 "url": "https://downloads.mariadb.org/f/mariadb-$version/winx64-packages/mariadb-$version-winx64.zip",
-                "extract_dir": "mariadb-$version-winx64"
+                "extract_dir": "mariadb-$version-winx64",
+                "hash": {
+                    "url": "http://mirror2.hs-esslingen.de/mariadb/mariadb-$version/winx64-packages/sha256sums.txt"
+                }
             },
             "32bit": {
                 "url": "https://downloads.mariadb.org/f/mariadb-$version/win32-packages/mariadb-$version-win32.zip",
-                "extract_dir": "mariadb-$version-win32"
+                "extract_dir": "mariadb-$version-win32",
+                "hash": {
+                    "url": "http://mirror2.hs-esslingen.de/mariadb/mariadb-$version/win32-packages/sha256sums.txt"
+                }
             }
         }
     }

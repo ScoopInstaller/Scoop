@@ -1,15 +1,15 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.1.3",
-    "license": "http://www.php.net/license/",
+    "version": "7.2.0",
+    "license": "https://php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.1.3-nts-Win32-VC14-x64.zip",
-            "hash": "sha1:4000132114cecdec82c83b09aed6a962ed928e0b"
+            "url": "http://windows.php.net/downloads/releases/php-7.2.0-nts-Win32-VC15-x64.zip",
+            "hash": "85a325601d0442dcefbd02fd859f3c6cc1580349857c2d21c8be58cd1e4d8f23"
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.1.3-nts-Win32-VC14-x86.zip",
-            "hash": "sha1:d7089c0d342a663ffea1a4e5973ef55b3b4b8ba8"
+            "url": "http://windows.php.net/downloads/releases/php-7.2.0-nts-Win32-VC15-x86.zip",
+            "hash": "f5c1317e557ec814377a18af3ad325a59da8a9d127660ab1a03562b14824f686"
         }
     },
     "bin": [
@@ -43,22 +43,19 @@ if (!(Test-Path \"$dir\\cli\\conf.d\")) {
 ",
     "checkver": {
         "url": "http://windows.php.net/download/",
-        "re": "<h3 id=\"php-7.1\".*?>.*?\\(([\\d.]+)\\)</h3>"
+        "re": "<h3 id=\"php-7.2\".*?>.*?\\(([\\d.]+)\\)</h3>"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "http://windows.php.net/downloads/releases/php-$version-nts-Win32-VC14-x64.zip"
+                "url": "http://windows.php.net/downloads/releases/php-$version-nts-Win32-VC15-x64.zip"
             },
             "32bit": {
-                "url": "http://windows.php.net/downloads/releases/php-$version-nts-Win32-VC14-x86.zip"
+                "url": "http://windows.php.net/downloads/releases/php-$version-nts-Win32-VC15-x86.zip"
             }
         },
         "hash": {
-            "mode": "extract",
-            "type": "sha1",
-            "url": "http://windows.php.net/downloads/releases/sha1sum.txt",
-            "find": "([a-z0-9]{40})\\s+(?:$basename)"
+            "url": "$baseurl/sha256sum.txt"
         }
     },
     "suggest": {

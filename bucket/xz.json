@@ -1,8 +1,8 @@
 {
-    "homepage": "http://tukaani.org/xz/",
-    "license": "http://tukaani.org/xz/#licensing",
+    "homepage": "https://tukaani.org/xz/",
+    "license": "https://tukaani.org/xz/#licensing",
     "version": "5.2.3",
-    "url": "http://tukaani.org/xz/xz-5.2.3-windows.zip",
+    "url": "https://tukaani.org/xz/xz-5.2.3-windows.zip",
     "hash": "afe73c260e38fdebdd14c9eaab71c19b206ff74cebbdc744b0fa35b77b243220",
     "architecture": {
         "64bit": {
@@ -24,6 +24,6 @@
     },
     "checkver": "<h3>Stable<\\/h3>\\s+<p>\\s+([\\d.]+) was released",
     "autoupdate": {
-        "url": "http://tukaani.org/xz/xz-$version-windows.zip"
+        "url": "https://tukaani.org/xz/xz-$version-windows.zip"
     }
 }

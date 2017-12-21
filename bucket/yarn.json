@@ -1,7 +1,7 @@
 {
     "homepage": "https://yarnpkg.com/",
     "license": "BSD",
-    "version": "0.22.0",
+    "version": "1.3.2",
     "suggest": {
         "Node.js": [
             "nodejs",
@@ -11,9 +11,20 @@
             "nvm"
         ]
     },
-    "url": "https://yarnpkg.com/downloads/0.22.0/yarn-0.22.0.msi",
-    "hash": "0daaddf5f81f2c6b2b35b9f013e2d28c8e63fd2d4c227a4af95a6fdbfdd7cc6c",
-    "bin": "Yarn\\bin\\yarn.cmd",
+    "url": "https://yarnpkg.com/downloads/1.3.2/yarn-1.3.2.msi",
+    "hash": "d2a4f6887381df152b0595fcf3b5590c6a7bc7b380ed364ad9f11595d099664d",
+    "persist": [
+        "cache",
+        "bin"
+    ],
+    "post_install": "
+        yarn config set cache-folder \"$dir\\cache\"
+        yarn config set prefix \"$dir\"
+    ",
+    "env_add_path": [
+        "bin",
+        "Yarn\\bin"
+    ],
     "checkver": {
         "url": "https://yarnpkg.com/latest-version",
         "re": "([\\d.]+)"

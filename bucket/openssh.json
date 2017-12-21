@@ -1,6 +1,6 @@
 {
     "version": "5.4p1-1",
-    "license": "http://www.openbsd.org/cgi-bin/cvsweb/src/usr.bin/ssh/LICENCE?rev=HEAD",
+    "license": "https://www.openbsd.org/cgi-bin/cvsweb/src/usr.bin/ssh/LICENCE?rev=HEAD",
     "url": [
         "https://sourceforge.net/projects/mingw/files/MSYS/Extension/openssh/openssh-5.4p1-1/openssh-5.4p1-1-msys-1.0.13-bin.tar.lzma",
         "https://sourceforge.net/projects/mingw/files/MSYS/Extension/openssh/openssh-5.4p1-1/openssh-5.4p1-1-msys-1.0.13-lic.tar.lzma",

@@ -1,9 +1,9 @@
 {
-    "homepage": "https://geteventstore.com/",
+    "homepage": "https://eventstore.org/",
     "license": "BSD 3-Clause",
-    "version": "4.0.0",
-    "url": "http://download.geteventstore.com/binaries/EventStore-OSS-Win-v4.0.0.zip",
-    "hash": "b77fd030dd3e7ad62aa5362efc6bb1fa7c3c09546164edb79ce2a51d780dd2d8",
+    "version": "4.0.3-hotfix1",
+    "url": "https://eventstore.org/downloads/EventStore-OSS-Win-v4.0.3-hotfix1.zip",
+    "hash": "619216fbb2c3b39d556bc255cfc463829c8d04d959e4b874af3b4f968a9e180d",
     "bin": [
         [
             "EventStore.ClusterNode.exe",
@@ -15,10 +15,10 @@
         "EventStore.TestClient.exe"
     ],
     "checkver": {
-        "url": "https://geteventstore.com/downloads/",
-        "re": "Get\\s+Event\\s+Store\\s+(\\d+\\.\\d+\\.\\d+)\\s+for\\s+Windows"
+        "url": "https://eventstore.org/downloads",
+        "re": "EventStore-OSS-Win-v([\\d.]+(-[\\w\\d]+)?).zip"
     },
     "autoupdate": {
-        "url": "http://download.geteventstore.com/binaries/EventStore-OSS-Win-v$version.zip"
+        "url": "https://eventstore.org/downloads/EventStore-OSS-Win-v$version.zip"
     }
 }

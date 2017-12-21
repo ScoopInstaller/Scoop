@@ -1,0 +1,32 @@
+{
+    "homepage": "http://wixtoolset.org/",
+    "license": "https://github.com/wixtoolset/wix3/blob/develop/LICENSE.TXT",
+    "version": "3.11",
+    "url": "https://github.com/wixtoolset/wix3/releases/download/wix311rtm/wix311-binaries.zip",
+    "hash": "da034c489bd1dd6d8e1623675bf5e899f32d74d6d8312f8dd125a084543193de",
+    "bin": [
+        "candle.exe",
+        "dark.exe",
+        "heat.exe",
+        "insignia.exe",
+        "light.exe",
+        "lit.exe",
+        "lux.exe",
+        "melt.exe",
+        "nit.exe",
+        "pyro.exe",
+        "retina.exe",
+        "shine.exe",
+        "smoke.exe",
+        "ThmViewer.exe",
+        "torch.exe",
+        "WixCop.exe"
+    ],
+    "checkver": {
+        "url": "http://wixtoolset.org/releases/",
+        "re": "releases/v([\\d.]+)/stable"
+    },
+    "autoupdate": {
+        "url": "https://github.com/wixtoolset/wix3/releases/download/wix$cleanVersionrtm/wix$cleanVersion-binaries.zip"
+    }
+}

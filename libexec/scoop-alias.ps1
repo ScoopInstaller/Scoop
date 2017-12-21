@@ -95,3 +95,5 @@ switch($opt) {
   "list" { list_aliases }
   default { my_usage; exit 1 }
 }
+
+exit 0

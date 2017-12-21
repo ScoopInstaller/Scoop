@@ -1,0 +1,9 @@
+{
+    "homepage": "http://www.chrysocome.net/dd",
+    "license": "http://www.chrysocome.net/gpl",
+    "description": "Allows the flexible copying of data in a win32 environment",
+    "version": "0.6beta3",
+    "url": "http://www.chrysocome.net/downloads/dd-0.6beta3.zip",
+    "hash": "c7a6a4cc4a107030b072fb479173d66e6d1d1098cf740c6da4e9378c16b81c17",
+    "bin": "dd.exe"
+}

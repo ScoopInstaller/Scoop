@@ -1,18 +1,22 @@
 {
     "homepage": "https://www.apachelounge.com",
-    "version": "2.4.25",
+    "version": "2.4.29",
     "license": "Apache 2.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.25-win64-VC14.zip",
-            "hash": "E03A43B53F00320DE27D9B7046F5E317D06268795592EF32353CE857D7AA4D76"
+            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.29-win64-VC15.zip",
+            "hash": "2F686F7CF56232E50F5E226D0C11C6B2E6CA241F77A966CC1282E1C940995950"
         },
         "32bit": {
-            "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-2.4.25-win32-VC14.zip",
-            "hash": "7773F8B02E367D4F7853292DC2B4FCB4085F509C85D9851030CC1F3C453FD4D2"
+            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.29-win32-VC15.zip",
+            "hash": "4F7BA52D7B0A0991CAD581D2118910FAEB90652A2819D5355102589087BEEBE2"
         }
     },
     "extract_dir": "Apache24",
+    "persist": [
+        "htdocs",
+        "conf"
+    ],
     "bin": [
         "bin\\ab.exe",
         "bin\\abs.exe",
@@ -38,16 +42,15 @@ $root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-$version-win64-VC14.zip"
+                "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-$version-win64-VC15.zip"
             },
             "32bit": {
-                "url": "https://www.apachelounge.com/download/VC14/binaries/httpd-$version-win32-VC14.zip"
+                "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-$version-win32-VC15.zip"
             }
         },
         "hash": {
-            "mode": "extract",
             "url": "$url.txt",
-            "find": "SHA256-Checksum for: (?:$basename):\\s+([a-zA-Z0-9]{64})"
+            "find": "SHA256-Checksum for: (?:$basename):\\s+([a-fA-F0-9]{64})"
         }
     }
 }

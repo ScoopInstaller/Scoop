@@ -65,3 +65,5 @@ if (!$url) {
 else {
     create_manifest $url
 }
+
+exit 0

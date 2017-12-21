@@ -1,34 +1,39 @@
 {
     "homepage": "https://git-lfs.github.com/",
-    "version": "2.0.2",
+    "version": "2.3.4",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/github/git-lfs/releases/download/v2.0.2/git-lfs-windows-386-2.0.2.zip",
-            "hash": "f97f4b107cb46cbdca3be4fb0fc5fd8590ce0364a235101a227b2c0ea153aca3",
-            "extract_dir": "git-lfs-windows-386-2.0.2"
+            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-windows-386-2.3.4.zip",
+            "hash": "b0738656064c79f878c17c62d2c4f6f3015fad7dc69d4a3c841ed1f7c93ec83d"
         },
         "64bit": {
-            "url": "https://github.com/github/git-lfs/releases/download/v2.0.2/git-lfs-windows-amd64-2.0.2.zip",
-            "hash": "1b33c8cb6e2e3238b48c639738d22d755a98f7cb62a994d026bb73c158508689",
-            "extract_dir": "git-lfs-windows-amd64-2.0.2"
+            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.3.4/git-lfs-windows-amd64-2.3.4.zip",
+            "hash": "18c47fd2806659e81a40fbd6f6b0598ea1802635ce04fb2317d75973450a3fe5"
         }
     },
-    "depends": "git",
+    "suggest": {
+        "Git": [
+            "git",
+            "git-with-openssh"
+        ]
+    },
     "bin": "git-lfs.exe",
     "checkver": {
-        "github": "https://github.com/github/git-lfs"
+        "github": "https://github.com/git-lfs/git-lfs"
     },
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "https://github.com/github/git-lfs/releases/download/v$version/git-lfs-windows-386-$version.zip",
-                "extract_dir": "git-lfs-windows-386-$version"
+                "url": "https://github.com/git-lfs/git-lfs/releases/download/v$version/git-lfs-windows-386-$version.zip"
             },
             "64bit": {
-                "url": "https://github.com/github/git-lfs/releases/download/v$version/git-lfs-windows-amd64-$version.zip",
-                "extract_dir": "git-lfs-windows-amd64-$version"
+                "url": "https://github.com/git-lfs/git-lfs/releases/download/v$version/git-lfs-windows-amd64-$version.zip"
             }
+        },
+        "hash": {
+            "url": "https://github.com/git-lfs/git-lfs/releases/tag/v$version",
+            "find": "<strong>$basename</strong><br>\\s+([a-fA-F0-9]{64})</p>"
         }
     }
 }

@@ -1,0 +1,29 @@
+{
+    "homepage": "https://github.com/AlDanial/cloc",
+    "version": "1.74",
+    "license": "GPL-2.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/AlDanial/cloc/releases/download/1.74/cloc-1.74.exe#/cloc.exe",
+            "hash": "f05a502c88852f643205c3c324fa8fa41d22c3bb95874828e02909ebdaa4472a"
+        },
+        "32bit": {
+            "url": "https://github.com/AlDanial/cloc/releases/download/1.74/cloc-1.74_x86.exe#/cloc.exe",
+            "hash": "b73dece71f6d3199d90d55db53a588e1393c8dbf84231a7e1be2ce3c5a0ec75b"
+        }
+    },
+    "bin": "cloc.exe",
+    "checkver": {
+        "github": "https://github.com/AlDanial/cloc"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/AlDanial/cloc/releases/download/$version/cloc-$version.exe#/cloc.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/AlDanial/cloc/releases/download/$version/cloc-$version_x86.exe#/cloc.exe"
+            }
+        }
+    }
+}

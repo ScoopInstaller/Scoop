@@ -1,0 +1,37 @@
+{
+    "homepage": "https://syncthing.net/",
+    "license": "MPL-2.0",
+    "version": "0.14.41",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/syncthing/syncthing/releases/download/v0.14.41/syncthing-windows-amd64-v0.14.41.zip",
+            "hash": "fbdd3ec05ceff3f519249c100389f10c82228d82c5d3df939cf49969a08a97c0",
+            "extract_dir": "syncthing-windows-amd64-v0.14.41"
+        },
+        "32bit": {
+            "url": "https://github.com/syncthing/syncthing/releases/download/v0.14.41/syncthing-windows-386-v0.14.41.zip",
+            "hash": "567186e3f5c70e389a13c2da4e9605321fa9110ede6dee91a3e72f0515525dfe",
+            "extract_dir": "syncthing-windows-386-v0.14.41"
+        }
+    },
+    "bin": "syncthing.exe",
+    "checkver": {
+        "github": "https://github.com/syncthing/syncthing"
+    },
+    "notes": "To start syncthing automatically, use a method described at https://github.com/syncthing/docs/blob/master/users/autostart.rst#windows",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/syncthing/syncthing/releases/download/v$version/syncthing-windows-amd64-v$version.zip",
+                "extract_dir": "syncthing-windows-amd64-v$version"
+            },
+            "32bit": {
+                "url": "https://github.com/syncthing/syncthing/releases/download/v$version/syncthing-windows-386-v$version.zip",
+                "extract_dir": "syncthing-windows-386-v$version"
+            }
+        },
+        "hash": {
+            "url": "https://github.com/syncthing/syncthing/releases/download/v$version/sha256sum.txt.asc"
+        }
+    }
+}

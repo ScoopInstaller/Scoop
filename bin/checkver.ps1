@@ -21,6 +21,7 @@ if (!$app -and $update) {
 . "$psscriptroot\..\lib\json.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\install.ps1" # needed for hash generation
+. "$psscriptroot\..\lib\unix.ps1"
 
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir
@@ -60,6 +61,7 @@ $queue | % {
     }
     $regex = ""
     $jsonpath = ""
+    $replace = ""
 
     if ($json.checkver -eq "github") {
         if (!$json.homepage.StartsWith("https://github.com/")) {
@@ -82,9 +84,15 @@ $queue | % {
         $jsonpath = $json.checkver.jp
     }
 
+    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
+        $replace = $json.checkver.replace
+    }
+
     if(!$jsonpath -and !$regex) {
         $regex = $json.checkver
     }
+
+    $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq "true"
 
     $state = new-object psobject @{
         app = (strip_ext $name);
@@ -92,6 +100,8 @@ $queue | % {
         regex = $regex;
         json = $json;
         jsonpath = $jsonpath;
+        reverse = $reverse;
+        replace = $replace;
     }
 
     $wc.headers.add('Referer', (strip_filename $url))
@@ -112,6 +122,8 @@ while($in_progress -gt 0) {
     $expected_ver = $json.version
     $regexp = $state.regex
     $jsonpath = $state.jsonpath
+    $reverse = $state.reverse
+    $replace = $state.replace
     $ver = ""
 
     $err = $ev.sourceeventargs.error
@@ -125,24 +137,44 @@ while($in_progress -gt 0) {
         continue
     }
 
-    if($jsonpath -and $regexp) {
-        write-host -f darkred "'jp' and 're' shouldn't be used together"
+    if(!$regex -and $replace) {
+        write-host -f darkred "'replace' requires 're'"
         continue
     }
 
     if($jsonpath) {
-        $ver = json_path ($page | ConvertFrom-Json -ea stop) $jsonpath
+        $ver = json_path $page $jsonpath
+        if(!$ver) {
+            $ver = json_path_legacy $page $jsonpath
+        }
         if(!$ver) {
             write-host -f darkred "couldn't find '$jsonpath' in $url"
             continue
         }
     }
 
+    if($jsonpath -and $regexp) {
+        $page = $ver
+        $ver = ""
+    }
+
     if($regexp) {
-        if($page -match $regexp) {
-            $ver = $matches[1]
+        $regex = new-object System.Text.RegularExpressions.Regex($regexp)
+        if($reverse) {
+            $match = $regex.matches($page) | select-object -last 1
+        } else {
+            $match = $regex.matches($page) | select-object -first 1
+        }
+
+        if($match -and $match.Success) {
+            $matchesHashtable = @{}
+            $regex.GetGroupNames() | % { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
+            $ver = $matchesHashtable['1']
+            if ($replace) {
+                $ver = $regex.replace($match.Value, $replace)
+            }
             if(!$ver) {
-                $ver = $matches['version']
+                $ver = $matchesHashtable['version']
             }
         } else {
             write-host -f darkred "couldn't match '$regexp' in $url"
@@ -155,34 +187,35 @@ while($in_progress -gt 0) {
         continue
     }
 
-    if($ver -eq $expected_ver) {
+    if($ver -eq $expected_ver -and $forceUpdate -eq $false) {
+        # version hasn't changed (step over if forced update)
         write-host "$ver" -f darkgreen
+        continue
+    }
 
-        if ($forceUpdate -and $json.autoupdate) {
-            Write-Host "Forcing autoupdate!" -f DarkMagenta
-            try {
-                autoupdate $app $dir $json $ver $matches
-            } catch {
-                write-host -f darkred $_.exception.message
-            }
-        }
+    write-host "$ver" -f darkred -nonewline
+    write-host " (scoop version is $expected_ver)" -NoNewline
+    $update_available = (compare_versions $expected_ver $ver) -eq -1
+
+    if ($json.autoupdate -and $update_available) {
+        Write-Host " autoupdate available" -f Cyan
     } else {
-        write-host "$ver" -f darkred -nonewline
-        write-host " (scoop version is $expected_ver)" -NoNewline
-        $update_available = (compare_versions $expected_ver $ver) -eq -1
+        Write-Host ""
+    }
 
-        if ($json.autoupdate -and $update_available) {
-            Write-Host " autoupdate available" -f Cyan
-        } else {
-            Write-Host ""
+    if($forceUpdate) {
+        # forcing an update implies updating, right?
+        $update = $true
+    }
+
+    if($update -and $json.autoupdate) {
+        if($forceUpdate) {
+            Write-Host "Forcing autoupdate!" -f DarkMagenta
         }
-
-        if ($update -and $update_available -and $json.autoupdate) {
-            try {
-                autoupdate $app $dir $json $ver $matches
-            } catch {
-                write-host -f darkred $_.exception.message
-            }
+        try {
+            autoupdate $app $dir $json $ver $matchesHashtable
+        } catch {
+            error $_.exception.message
         }
     }
 }

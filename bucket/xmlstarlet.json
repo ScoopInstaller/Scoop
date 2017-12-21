@@ -10,7 +10,7 @@
     },
     "description": "Transform, query, validate, and edit XML files",
     "extract_dir": "xmlstarlet-1.6.1",
-    "hash": "4ee3d767d9126308d6bcf7b7290e85614a83fe51a9d84e765b9b7f4359f79fce",
+    "hash": "sha1:cc5f5cd17a1f81740e5185a70408ffd6fa2f862d",
     "homepage": "http://xmlstar.sourceforge.net/",
     "license": "MIT",
     "url": "https://sourceforge.net/projects/xmlstar/files/xmlstarlet/1.6.1/xmlstarlet-1.6.1-win32.zip",

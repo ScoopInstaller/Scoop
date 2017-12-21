@@ -9,10 +9,9 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global, $suggested) {
+function install_app($app, $architecture, $global, $suggested, $use_cache = $true) {
     $app, $bucket = app $app
     $app, $manifest, $bucket, $url = locate $app $bucket
-    $use_cache = $true
     $check_hash = $true
 
     if(!$manifest) {
@@ -31,7 +30,12 @@ function install_app($app, $architecture, $global, $suggested) {
         $check_hash = $false
     }
 
-    echo "Installing '$app' ($version)."
+    if(!(supports_architecture $manifest $architecture)) {
+        write-host -f DarkRed "'$app' doesn't support $architecture architecture!"
+        return
+    }
+
+    write-output "Installing '$app' ($version) [$architecture]"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
@@ -44,7 +48,7 @@ function install_app($app, $architecture, $global, $suggested) {
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global
+    create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
@@ -66,23 +70,7 @@ function install_app($app, $architecture, $global, $suggested) {
 
     success "'$app' ($version) was installed successfully!"
 
-    show_notes $manifest
-}
-
-function ensure_architecture($architecture_opt) {
-    switch($architecture_opt) {
-        '' { return default_architecture }
-        { @('32bit','64bit') -contains $_ } { return $_ }
-        default { abort "Invalid architecture: '$architecture'."}
-    }
-}
-
-function cache_path($app, $version, $url) {
-    "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')"
-}
-
-function appname_from_url($url) {
-    (split-path $url -leaf) -replace '.json$', ''
+    show_notes $manifest $dir $original_dir $persist_dir
 }
 
 function locate($app, $bucket) {
@@ -128,8 +116,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
 
 function use_any_https_protocol() {
     $original = "$([System.Net.ServicePointManager]::SecurityProtocol)"
-    $available = [string]::join(', ', `
-        [Enum]::GetNames([System.Net.SecurityProtocolType]))
+    $available = [string]::join(', ', [Enum]::GetNames([System.Net.SecurityProtocolType]))
 
     # use whatever protocols are available that the server supports
     set_https_protocols $available
@@ -138,8 +125,11 @@ function use_any_https_protocol() {
 }
 
 function set_https_protocols($protocols) {
-    [System.Net.ServicePointManager]::SecurityProtocol = `
-        [System.Net.SecurityProtocolType] $protocols
+    try {
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType] $protocols
+    } catch {
+        [System.Net.ServicePointManager]::SecurityProtocol = "Tls,Tls11,Tls12"
+    }
 }
 
 function do_dl($url, $to, $cookies) {
@@ -147,6 +137,7 @@ function do_dl($url, $to, $cookies) {
     $progress = [console]::isoutputredirected -eq $false
 
     try {
+        $url = handle_special_urls $url
         dl $url $to $cookies $progress
     } catch {
         $e = $_.exception
@@ -170,6 +161,9 @@ function dl($url, $to, $cookies, $progress) {
 
     $wres = $wreq.getresponse()
     $total = $wres.ContentLength
+    if($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
+        $total = ftp_file_size($url)
+    }
 
     if ($progress -and ($total -gt 0)) {
         [console]::CursorVisible = $false
@@ -214,17 +208,6 @@ function dl($url, $to, $cookies, $progress) {
         }
         $wres.close()
     }
-}
-
-function url_filename($url) {
-    (split-path $url -leaf).split('?') | Select-Object -First 1
-}
-
-# Unlike url_filename which can be tricked by appending a
-# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
-# this function extracts the original filename from the URL.
-function url_remote_filename($url) {
-    split-path (new-object uri $url).absolutePath -leaf
 }
 
 function dl_progress_output($url, $read, $total, $console) {
@@ -367,23 +350,23 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
 
         if($extract_fn) {
             write-host "Extracting... " -nonewline
-            $null = mkdir "$dir\_scoop_extract"
-            & $extract_fn "$dir\$fname" "$dir\_scoop_extract"
+            $null = mkdir "$dir\_tmp"
+            & $extract_fn "$dir\$fname" "$dir\_tmp"
             rm "$dir\$fname"
             if ($extract_to) {
                 $null = mkdir "$dir\$extract_to" -force
             }
             # fails if zip contains long paths (e.g. atom.json)
-            #cp "$dir\_scoop_extract\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            movedir "$dir\_scoop_extract\$extract_dir" "$dir\$extract_to"
+            #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
+            movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
-            if(test-path "$dir\_scoop_extract") { # might have been moved by movedir
+            if(test-path "$dir\_tmp") { # might have been moved by movedir
                 try {
-                    rm -r -force "$dir\_scoop_extract" -ea stop
+                    rm -r -force "$dir\_tmp" -ea stop
                 } catch [system.io.pathtoolongexception] {
-                    cmd /c "rmdir /s /q $dir\_scoop_extract"
+                    cmd /c "rmdir /s /q $dir\_tmp"
                 } catch [system.unauthorizedaccessexception] {
-                    warn "Couldn't remove $dir\_scoop_extract: unauthorized access."
+                    warn "Couldn't remove $dir\_tmp: unauthorized access."
                 }
             }
 
@@ -422,6 +405,12 @@ function is_in_dir($dir, $check) {
     $check = "$(fullpath $check)"
     $dir = "$(fullpath $dir)"
     $check -match "^$([regex]::escape("$dir"))(\\|`$)"
+}
+
+function ftp_file_size($url) {
+    $request = [net.ftpwebrequest]::create($url)
+    $request.method = [net.webrequestmethods+ftp]::getfilesize
+    $request.getresponse().contentlength
 }
 
 # hashes
@@ -467,19 +456,25 @@ function check_hash($file, $url, $manifest, $arch) {
 }
 
 function compute_hash($file, $algname) {
-    $alg = [system.security.cryptography.hashalgorithm]::create($algname)
-    $fs = [system.io.file]::openread($file)
     try {
-        $hexbytes = $alg.computehash($fs) | % { $_.tostring('x2') }
-        [string]::join('', $hexbytes)
+        if([bool](Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) -eq $true) {
+            return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
+        } else {
+            $fs = [system.io.file]::openread($file)
+            $alg = [system.security.cryptography.hashalgorithm]::create($algname)
+            $hexbytes = $alg.computehash($fs) | % { $_.tostring('x2') }
+            return [string]::join('', $hexbytes)
+        }
+    } catch {
+        error $_.exception.message
     } finally {
-        $fs.dispose()
-        $alg.dispose()
+        if($fs) { $fs.dispose() }
+        if($alg) { $alg.dispose() }
     }
 }
 
 function cmd_available($cmd) {
-    try { gcm $cmd -ea stop } catch { return $false }
+    try { gcm $cmd -ea stop | out-null } catch { return $false }
     $true
 }
 
@@ -538,6 +533,11 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
     # MSI or other installer
     $msi = msi $manifest $architecture
     $installer = installer $manifest $architecture
+    if($installer.script) {
+        write-output "Running installer script..."
+        iex $installer.script
+        return
+    }
 
     if($msi) {
         install_msi $fname $dir $msi
@@ -623,6 +623,11 @@ function install_prog($fname, $dir, $installer, $global) {
 function run_uninstaller($manifest, $architecture, $dir) {
     $msi = msi $manifest $architecture
     $uninstaller = uninstaller $manifest $architecture
+    if($uninstaller.script) {
+        write-output "Running uninstaller script..."
+        iex $uninstaller.script
+        return
+    }
 
     if($msi -or $uninstaller) {
         $exe = $null; $arg = $null; $continue_exit_codes = @{}
@@ -672,7 +677,7 @@ function create_shims($manifest, $dir, $global, $arch) {
     $shims = @(arch_specific 'bin' $manifest $arch)
     $shims | ?{ $_ -ne $null } | % {
         $target, $name, $arg = shim_def $_
-        echo "Creating shim for '$name'."
+        write-output "Creating shim for '$name'."
 
         # check valid bin
         $bin = "$dir\$target"
@@ -691,7 +696,7 @@ function rm_shim($name, $shimdir) {
     if(!(test-path $shim)) { # handle no shim from failed install
         warn "Shim for '$name' is missing. Skipping."
     } else {
-        echo "Removing shim for '$name'."
+        write-output "Removing shim for '$name'."
         rm $shim
     }
 
@@ -738,6 +743,7 @@ function link_current($versiondir) {
 
     if(test-path $currentdir) {
         # remove the junction
+        attrib -R /L $currentdir
         cmd /c rmdir $currentdir
     }
 
@@ -801,7 +807,7 @@ function find_dir_or_subdir($path, $dir) {
 
 function env_add_path($manifest, $dir, $global) {
     $manifest.env_add_path | ? { $_ } | % {
-        $path_dir = "$dir\$($_)"
+        $path_dir = join-path $dir $_
 
         if(!(is_in_dir $dir $path_dir)) {
             abort "Error in manifest: env_add_path '$_' is outside the app directory."
@@ -818,14 +824,14 @@ function add_first_in_path($dir, $global) {
     env 'path' $global "$dir;$currpath"
 
     # this session
-    $null, $env:path = strip_path $env:path $dir
-    $env:path = "$dir;$env:path"
+    $null, $env:PATH = strip_path $env:PATH $dir
+    $env:PATH = "$dir;$env:PATH"
 }
 
 function env_rm_path($manifest, $dir, $global) {
     # remove from path
     $manifest.env_add_path | ? { $_ } | % {
-        $path_dir = "$dir\$($_)"
+        $path_dir = join-path $dir $_
 
         remove_from_path $path_dir $global
     }
@@ -861,14 +867,14 @@ function env_rm($manifest, $global) {
 function env_ensure_home($manifest, $global) {
     if($manifest.env_ensure_home -eq $true) {
         if($global){
-            if(!(env 'home' $true)) {
-                env 'home' $true $env:ALLUSERSPROFILE
-                $env:home = $env:ALLUSERSPROFILE # current session
+            if(!(env 'HOME' $true)) {
+                env 'HOME' $true $env:ALLUSERSPROFILE
+                $env:HOME = $env:ALLUSERSPROFILE # current session
             }
         } else {
-            if(!(env 'home' $false)) {
-                env 'home' $false $env:USERPROFILE
-                $env:home = $env:USERPROFILE # current session
+            if(!(env 'HOME' $false)) {
+                env 'HOME' $false $env:USERPROFILE
+                $env:HOME = $env:USERPROFILE # current session
             }
         }
     }
@@ -877,7 +883,7 @@ function env_ensure_home($manifest, $global) {
 function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
     if($pre_install) {
-        echo "Running pre-install script..."
+        write-output "Running pre-install script..."
         iex $pre_install
     }
 }
@@ -885,16 +891,16 @@ function pre_install($manifest, $arch) {
 function post_install($manifest, $arch) {
     $post_install = arch_specific 'post_install' $manifest $arch
     if($post_install) {
-        echo "Running post-install script..."
+        write-output "Running post-install script..."
         iex $post_install
     }
 }
 
-function show_notes($manifest) {
+function show_notes($manifest, $dir, $original_dir, $persist_dir) {
     if($manifest.notes) {
-        echo "Notes"
-        echo "-----"
-        echo (wraptext $manifest.notes)
+        write-output "Notes"
+        write-output "-----"
+        write-output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}))
     }
 }
 
@@ -988,28 +994,34 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             write-host "Persisting $source"
 
             # add base paths
-            $source = fullpath "$dir\$source"
-            $target = fullpath "$persist_dir\$target"
+            $source = New-Object System.IO.FileInfo(fullpath "$dir\$source")
+            if(!$source.Extension) {
+                $source = New-Object System.IO.DirectoryInfo($source.FullName)
+            }
+            $target = New-Object System.IO.FileInfo(fullpath "$persist_dir\$target")
+            if(!$target.Extension) {
+                $target = New-Object System.IO.DirectoryInfo($target.FullName)
+            }
 
-            if (!(test-path $target)) {
+            if (!$target.Exists) {
                 # If we do not have data in the store we move the original
-                if (test-path $source) {
+                if ($source.Exists) {
                     Move-Item $source $target
-                } else {
-                    # if there is no source we create an empty directory
-                    $target = ensure $target
+                } elseif($target.GetType() -eq [System.IO.DirectoryInfo]) {
+                    # if there is no source and it's a directory we create an empty directory
+                    ensure $target.FullName
                 }
-            } elseif (test-path $source) {
+            } elseif ($source.Exists) {
                 # (re)move original (keep a copy)
                 Move-Item $source "$source.original"
             }
 
             # create link
             if (is_directory $target) {
-                cmd /c "mklink /j $source $target" | out-null
-                attrib $source +R /L
+                cmd /c "mklink /j `"$source`" `"$target`"" | out-null
+                attrib $source.FullName +R /L
             } else {
-                cmd /c "mklink /h $source $target" | out-null
+                cmd /c "mklink /h `"$source`" `"$target`"" | out-null
             }
         }
     }

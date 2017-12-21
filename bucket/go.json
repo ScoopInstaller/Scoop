@@ -1,21 +1,27 @@
 {
-    "version": "1.8.1",
+    "version": "1.9.2",
     "homepage": "https://golang.org",
     "license": "https://golang.org/LICENSE",
-    "architecture": {
-        "64bit": {
-            "url": "https://storage.googleapis.com/golang/go1.8.1.windows-amd64.zip",
-            "hash": "bb6f0fbef8b80c382455af8699bfbb7fe89256d4baf06d927feaeceb7342e4ee"
-        },
-        "32bit": {
-            "url": "https://storage.googleapis.com/golang/go1.8.1.windows-386.zip",
-            "hash": "9738365e64d4d80ea54487915c9bfc0c3bbaa7d68ec78487988f80ebe8129c57"
-        }
-    },
     "extract_dir": "go",
-    "env_add_path": "bin",
     "env_set": {
         "GOROOT": "$dir"
+    },
+    "bin": ["bin/go.exe","bin/gofmt.exe","bin/godoc.exe"],
+    "installer": {
+        "script": "add_first_in_path \"$env:USERPROFILE\\go\\bin\" $global"
+    },
+    "uninstaller": {
+        "script": "remove_from_path \"$env:USERPROFILE\\go\\bin\" $global"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://storage.googleapis.com/golang/go1.9.2.windows-amd64.zip",
+            "hash": "682ec3626a9c45b657c2456e35cadad119057408d37f334c6c24d88389c2164c"
+        },
+        "32bit": {
+            "url": "https://storage.googleapis.com/golang/go1.9.2.windows-386.zip",
+            "hash": "35d3be5d7b97c6d11ffb76c1b19e20a824e427805ee918e82c08a2e5793eda20"
+        }
     },
     "checkver": "Build version go([\\d\\.]+)\\.",
     "autoupdate": {
@@ -28,9 +34,12 @@
             }
         },
         "hash": {
-            "mode": "extract",
-            "url": "$url.sha256",
-            "find": "([a-z0-9]{64})"
+            "url": "$url.sha256"
         }
-    }
+    },
+    "notes": "
+        Your GOROOT has been set to: $dir
+        You can run 'go env GOROOT' to view this at any time.
+        \"$env:USERPROFILE\\go\\bin)\" has been added to your PATH.
+    "
 }

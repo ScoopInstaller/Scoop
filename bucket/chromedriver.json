@@ -1,10 +1,13 @@
 {
-    "version": "2.29",
+    "version": "2.34",
     "homepage": "https://sites.google.com/a/chromium.org/chromedriver/",
-    "url": "https://chromedriver.storage.googleapis.com/2.29/chromedriver_win32.zip",
-    "hash": "d04084021ddd87400e9eddbee8648c97d429f038f54fe06b279584eee441a4b1",
+    "url": "https://chromedriver.storage.googleapis.com/2.34/chromedriver_win32.zip",
+    "hash": "24ee270d6802dc885fca938483673a57a54ec7ba5bc1fd50c42d75712a22d266",
     "bin": "chromedriver.exe",
-    "checkver": "Latest Release: <a href=\"[^\"]+\">ChromeDriver ([\\d.]+)",
+    "checkver": {
+        "url": "https://chromedriver.storage.googleapis.com/LATEST_RELEASE",
+        "re": "([\\d.]+)"
+    },
     "autoupdate": {
         "url": "https://chromedriver.storage.googleapis.com/$version/chromedriver_win32.zip"
     }

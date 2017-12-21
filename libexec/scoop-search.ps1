@@ -1,4 +1,4 @@
-# Usage: scoop search [query]
+# Usage: scoop search <query>
 # Summary: Search available apps
 # Help: Searches for apps that are available to install.
 #
@@ -68,7 +68,7 @@ function search_remote($bucket, $query) {
         $repo_name = $matches[2]
         $api_link = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
         $result = download_json $api_link | select -exp tree |? {
-            $_.path -match "(($query[a-zA-Z0-9-]*).json)"
+            $_.path -match "(^(.*$query.*).json$)"
         } |% { $matches[2] }
     }
 
@@ -90,7 +90,7 @@ function search_remotes($query) {
     }
 
     $results |% {
-        "'$($_.bucket)'' bucket:"
+        "'$($_.bucket)' bucket:"
         $_.results |% { "    $_" }
         ""
     }
