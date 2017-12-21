@@ -126,49 +126,51 @@ Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
     }
 }
 
-if($apps) {
-    $apps | % {
-        $app = $_
-        $manifest, $bucket = find_manifest $app
-        if($manifest) {
-            $h = hash $manifest $architecture
-            if ($h) {
-                # Hacky way to see if $h is an array (i.e. there was a
-                # list of hashes in the manifest) or a string
-                # (i.e. there was 1! hash in the manifest).
-                if ($h[0].Length -eq 1) {
-                    # Wrap download URL in array to traverse it in
-                    # lockstep with the loop over the hash.
-                    $u = @(url $manifest $architecture)
-                }
-                else {
-                    $u = url $manifest $architecture
-                }
-                $h | % { $i = 0 } {
-                    try {
-                        $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
-                    } catch [Exception] {
-                        $exit_code = $exit_code -bor $_ERR_EXCEPTION
-                        if ($_.Exception.Message -like "*(404)*") {
-                            SubmitMaybe-ToVirusTotal $u[$i] $app ($opt.scan -or $opt.s)
-                        }
-                        else {
-                            write-host -f darkred "$app`: error fetching information`: $($_.Exception.Message)"
-                        }
-                    }
-                    $i = $i + 1
-                }
+if(!$apps) {
+    my_usage; exit 1
+}
+
+$apps | % {
+    $app = $_
+    $manifest, $bucket = find_manifest $app
+    if(!$manifest) {
+        $exit_code = $exit_code -bor $_ERR_NO_INFO
+        write-host -f darkred "Could not find manifest for '$app'"
+        return
+    }
+
+    $hash = hash $manifest $architecture
+    if (!$hash) {
+        $exit_code = $exit_code -bor $_ERR_NO_INFO
+        write-host -f darkred "No hash information for $app"
+        return
+    }
+
+    $url = url $manifest $architecture
+
+    # Hacky way to see if $hash is an array (i.e. there was a list of
+    # hashes in the manifest) or a string (i.e. there was 1! hash in
+    # the manifest).
+    if ($hash[0].Length -eq 1) {
+        # Wrap download URL in array to traverse it in lockstep with
+        # the loop over the hash.
+        $url = @($url)
+    }
+
+    $hash | % { $i = 0 } {
+        try {
+            $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
+        } catch [Exception] {
+            $exit_code = $exit_code -bor $_ERR_EXCEPTION
+            if ($_.Exception.Message -like "*(404)*") {
+                SubmitMaybe-ToVirusTotal $url[$i] $app ($opt.scan -or $opt.s)
             }
             else {
-                $exit_code = $exit_code -bor $_ERR_NO_INFO
-                write-host -f darkred "No hash information for $app"
+                write-host -f darkred "$app`: error fetching information`: $($_.Exception.Message)"
             }
         }
-        else {
-            $exit_code = $exit_code -bor $_ERR_NO_INFO
-            write-host -f darkred "Could not find manifest for '$app'"
-        }
+        $i = $i + 1
     }
-} else { my_usage; exit 1 }
+}
 
 exit $exit_code
