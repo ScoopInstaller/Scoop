@@ -1,0 +1,18 @@
+{
+    "homepage": "https://shellcheck.net/",
+    "version": "0.4.7",
+    "description": "Static analysis tool for shell scripts",
+    "license": "GPL-3.0",
+    "url": "https://shellcheck.storage.googleapis.com/shellcheck-v0.4.7.zip",
+    "hash": "bbc260e15b42efdce628222d5649c0fa4cb3adaf2f71c958580b8928fe039e06",
+    "bin": "shellcheck.exe",
+    "pre_install": "Get-ChildItem \"$dir\\shellcheck-*.exe\" | Rename-Item -NewName \"$dir\\shellcheck.exe\"",
+    "checkver": {
+        "url": "https://shellcheck.storage.googleapis.com/",
+        "re": "<Key>shellcheck-v([\\d.]+)\\.zip</Key>",
+        "reverse": true
+    },
+    "autoupdate": {
+        "url": "https://shellcheck.storage.googleapis.com/shellcheck-v$version.zip"
+    }
+}
