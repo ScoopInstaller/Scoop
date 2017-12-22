@@ -1,8 +1,8 @@
 {
-    "version": "27.0.0",
+    "version": "27.0.1",
     "homepage": "https://developer.android.com/studio/releases/platform-tools.html",
-    "url": "https://dl.google.com/android/repository/platform-tools_r27.0.0-windows.zip",
-    "hash": "2ce00097d048c93966aa348131ca13705de86d0ae3e19412ba62162aa05eae0e",
+    "url": "https://dl.google.com/android/repository/platform-tools_r27.0.1-windows.zip",
+    "hash": "880662adfb0d6911ff250b9e13930ae1a4110fc36d5866afd4f8f56d935f7939",
     "bin": [
         "platform-tools\\adb.exe",
         "platform-tools\\dmtracedump.exe",
