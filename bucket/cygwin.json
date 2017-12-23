@@ -1,5 +1,5 @@
 {
-    "version": "2017.12.11",
+    "version": "2.883",
     "homepage": "https://cygwin.com/",
     "architecture": {
         "64bit": {
@@ -10,6 +10,20 @@
             "url": "https://cygwin.com/setup-x86.exe",
             "hash": "bb1091a79fe4d9826d818e7a3bc4b63f05c3c9fbfcdaf8e3c28310c8f4ecd4ce"
         }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://cygwin.com/setup-x86_64.exe"
+            },
+            "32bit": {
+                "url": "https://cygwin.com/setup-x86.exe"
+            }
+        }
+    },
+    "checkver": {
+        "re": "<a.*href=\"/git/\\?p=cygwin-apps/setup\\.git;a=tag.*\">([\\d.]+)</a>",
+        "url": "https://cygwin.com/git/?p=cygwin-apps/setup.git;a=tags"
     },
     "bin": [
         [
