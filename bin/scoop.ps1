@@ -11,7 +11,7 @@ set-strictmode -off
 reset_aliases
 
 $commands = commands
-if ('--version' -contains $cmd -or '-v' -contains $args ) {
+if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
     pushd $(versiondir 'scoop' 'current')
     write-host "Current Scoop version:"
     git_log --oneline HEAD -n 1
