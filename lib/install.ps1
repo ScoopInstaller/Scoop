@@ -364,7 +364,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
                 try {
                     rm -r -force "$dir\_tmp" -ea stop
                 } catch [system.io.pathtoolongexception] {
-                    cmd /c "rmdir /s /q $dir\_tmp"
+                    & "$env:COMSPEC" /c "rmdir /s /q $dir\_tmp"
                 } catch [system.unauthorizedaccessexception] {
                     warn "Couldn't remove $dir\_tmp: unauthorized access."
                 }
@@ -744,10 +744,10 @@ function link_current($versiondir) {
     if(test-path $currentdir) {
         # remove the junction
         attrib -R /L $currentdir
-        cmd /c rmdir $currentdir
+        & "$env:COMSPEC" /c rmdir $currentdir
     }
 
-    cmd /c mklink /j $currentdir $versiondir | out-null
+    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
     attrib $currentdir +R /L
     return $currentdir
 }
@@ -768,7 +768,7 @@ function unlink_current($versiondir) {
         attrib $currentdir -R /L
 
         # remove the junction
-        cmd /c rmdir $currentdir
+        & "$env:COMSPEC" /c "rmdir $currentdir"
         return $currentdir
     }
     return $versiondir
@@ -1018,10 +1018,10 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             # create link
             if (is_directory $target) {
-                cmd /c "mklink /j `"$source`" `"$target`"" | out-null
+                & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
                 attrib $source.FullName +R /L
             } else {
-                cmd /c "mklink /h `"$source`" `"$target`"" | out-null
+                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
             }
         }
     }
