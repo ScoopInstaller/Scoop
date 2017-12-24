@@ -20,7 +20,6 @@
 #
 # Options:
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
-#   -g, --global Scan globally installed apps too
 #   -s, --scan For packages where VirusTotal has no information, send download URL
 #              for analysis (and future retrieval)
 
@@ -34,28 +33,15 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'a:gs' @('arch=', 'global', 'scan')
+$opt, $apps, $err = getopt $args 'a:s' @('arch=', 'scan')
 if($err) { "scoop virustotal: $err"; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
-$global = $opt.g -or $opt.global
 
 $_ERR_UNSAFE = 2
 $_ERR_EXCEPTION = 4
 $_ERR_NO_INFO = 8
 
 $exit_code = 0
-
-Function Info($msg) {
-    Write-Host -foreground 'DarkGray' "INFO: $msg"
-}
-
-Function Warn($msg) {
-    Write-Host -foreground 'DarkCyan' "WARN: $msg"
-}
-
-Function Error($msg) {
-    Write-Host -foreground 'DarkRed' "ERROR: $msg"
-}
 
 Function Navigate-ToHash($hash, $app) {
     $hash = $hash.ToLower()
@@ -91,7 +77,7 @@ Function Start-VirusTotal ($h, $app) {
             return Navigate-ToHash $hash $app
         }
         else {
-            Warn("$app`: Unsupported hash $($matches['algo']). VirusTotal needs md5, sha1 or sha256.")
+            warn("$app`: Unsupported hash $($matches['algo']). VirusTotal needs md5, sha1 or sha256.")
             return $_ERR_NO_INFO
         }
     }
@@ -142,7 +128,7 @@ Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
             Invoke-RestMethod -Method POST -Uri $uri | Out-Null
             $submitted = $True
         } catch [Exception] {
-            Warn("$app`: VirusTotal submission failed`: $($_.Exception.Message)")
+            warn("$app`: VirusTotal submission failed`: $($_.Exception.Message)")
             $submitted = $False
             return
         }
@@ -151,10 +137,10 @@ Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
         $submitted = $False
     }
     if ($submitted) {
-        Warn("$app`: not found`: submitted $url")
+        warn("$app`: not found`: submitted $url")
     }
     else {
-        Warn("$app`: not found`: manually submit $url")
+        warn("$app`: not found`: manually submit $url")
     }
 }
 
@@ -162,24 +148,16 @@ if(!$apps) {
     my_usage; exit 1
 }
 
-if($global -and !(is_admin)) {
-    Error('You need admin rights to update global apps.')
-    exit 1
-}
-
 if(is_scoop_outdated) {
-    update_scoop
+    scoop update
 }
 
 $apps_param = $apps
 
 if($apps_param -eq '*') {
     $apps = applist (installed_apps $false) $false
-    if($global) {
-        $apps += applist (installed_apps $true) $true
-    }
 } else {
-    $apps = ensure_all_installed $apps_param $global
+    $apps = ensure_all_installed $apps_param
 }
 
 $requests = 0
@@ -189,14 +167,14 @@ $apps | % {
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
-        Warn("$app`: manifest not found")
+        warn("$app`: manifest not found")
         return
     }
 
     $hash = hash $manifest $architecture
     if (!$hash) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
-        Warn("$app`: hash not found in manifest")
+        warn("$app`: hash not found in manifest")
         return
     }
 
@@ -214,7 +192,7 @@ $apps | % {
     $hash | % { $i = 0 } {
         $requests += 1
         if ($requests -eq 5) {
-            Info("Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit")
+            info("Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit")
         }
         if ($requests -gt 4) {
             Start-Sleep -s (50 + ($requests * 2))
@@ -228,10 +206,9 @@ $apps | % {
             }
             else {
                 if ($_.Exception.Message -match "\(204|429\)") {
-                    Error("$app`: VirusTotal request failed`: $($_.Exception.Message)")
-                    exit $exit_code
+                    abort("$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code)
                 }
-                Warn("$app`: VirusTotal request failed`: $($_.Exception.Message)")
+                warn("$app`: VirusTotal request failed`: $($_.Exception.Message)")
             }
         }
         $i = $i + 1
