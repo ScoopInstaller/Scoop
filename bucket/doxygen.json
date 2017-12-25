@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.doxygen.nl/",
     "license": "GPL2",
-    "version": "1.8.13",
+    "version": "1.8.14",
     "architecture": {
         "64bit": {
-            "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.windows.x64.bin.zip",
-            "hash": "c59e92ab9f82e156723dd3efb9433948dcb84facc21d6efb50f4d6c2d7aa6c5c"
+            "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.windows.x64.bin.zip",
+            "hash": "742f77a3a55ae438076958e7103e95864fd8ed62ee86ce203e092a6792618f9c"
         },
         "32bit": {
-            "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.13.windows.bin.zip",
-            "hash": "215800d19d0e77fa400694af74685bbd3000463f0d7f18b6c7b743d2d6a1422f"
+            "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.windows.bin.zip",
+            "hash": "c88e2ff9b5a27a255e8d4c655cd63f5a6c3786e016ce7c88fc585cc58f2c8704"
         }
     },
     "bin": [
