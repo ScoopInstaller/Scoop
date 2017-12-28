@@ -3,11 +3,11 @@
     "version": "2.2.0",
     "license": "https://github.com/HaxeFoundation/neko/blob/master/LICENSE",
     "url": "https://nekovm.org/media/neko-2.2.0-win.zip",
-    "hash": "037359445accb5a793d0db38a577bf883b736f5241e6fdc4aa80201d3c9be4fb",
+    "hash": "93d7ca96698a6825f38ca8eea49e2e6b691c0849270174f6c1bd531290db8d69",
     "extract_dir": "neko-2.2.0-win",
     "env_add_path": "./",
     "checkver": {
-        "url": "http://nekovm.org/download",
+        "url": "https://nekovm.org/download/",
         "re": "Neko ([\\d.]+)"
     },
     "autoupdate": {
