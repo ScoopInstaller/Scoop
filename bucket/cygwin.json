@@ -1,14 +1,14 @@
 {
-    "version": "2.9.0",
+    "version": "2.883",
     "homepage": "https://cygwin.com/",
     "architecture": {
         "64bit": {
             "url": "https://cygwin.com/setup-x86_64.exe",
-            "hash": "56f41491671bef8de546e2c9221e6a7ec51a2168a9ba28a0d10c25d15be60ab2"
+            "hash": "dbadd1f5f57ba68f9e0e224c8e71331f88234cf39b019a04958006a99fd6604b"
         },
         "32bit": {
             "url": "https://cygwin.com/setup-x86.exe",
-            "hash": "8bc0d306226a12628a73a2e15e324daf96b24099df0cc4e2a7199d176215fded"
+            "hash": "bb1091a79fe4d9826d818e7a3bc4b63f05c3c9fbfcdaf8e3c28310c8f4ecd4ce"
         }
     },
     "autoupdate": {
@@ -21,6 +21,10 @@
             }
         }
     },
+    "checkver": {
+        "re": "<a.*href=\"/git/\\?p=cygwin-apps/setup\\.git;a=tag.*\">([\\d.]+)</a>",
+        "url": "https://cygwin.com/git/?p=cygwin-apps/setup.git;a=tags"
+    },
     "bin": [
         [
             "root\\bin\\bash.exe",
@@ -28,9 +32,6 @@
             "--login -i"
         ]
     ],
-    "checkver": {
-        "re": "The most recent version of the Cygwin DLL is[^>]*>([\\d\\.]+)<"
-    },
     "installer": {
         "args": [
             "--no-admin",
