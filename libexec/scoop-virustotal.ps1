@@ -29,10 +29,11 @@
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\json.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'sa:' @('arch=', 'scan')
+$opt, $apps, $err = getopt $args 'a:s' @('arch=', 'scan')
 if($err) { "scoop virustotal: $err"; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
@@ -44,20 +45,29 @@ $exit_code = 0
 
 Function Navigate-ToHash($hash, $app) {
     $hash = $hash.ToLower()
-    $result = (new-object net.webclient).downloadstring("https://www.virustotal.com/ui/files/$hash")
+    $url = "https://www.virustotal.com/ui/files/$hash"
+    $api_key = get_config("virustotal_api_key")
+    if ($api_key) {
+        $url += '?apikey=' + $api_key
+    }
+    $result = (new-object net.webclient).downloadstring($url)
     $stats = json_path $result '$.data.attributes.last_analysis_stats'
     $malicious = json_path $stats '$.malicious'
     $suspicious = json_path $stats '$.suspicious'
     $undetected = json_path $stats '$.undetected'
     $unsafe = [int]$malicious + [int]$suspicious
     $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
-    if($unsafe -gt 0) {
-        write-host -f red "$app`: $unsafe/$undetected, $see_url"
-        return $_ERR_UNSAFE
-    } else {
-        write-host -f green "$app`: $unsafe/$undetected, $see_url"
-        return 0
+    switch ($unsafe) {
+        0 {$fg = "DarkGreen"}
+        1 {$fg = "DarkYellow"}
+        2 {$fg = "Yellow"}
+        default {$fg = "Red"}
     }
+    write-host -f $fg "$app`: $unsafe/$undetected, $see_url"
+    if($unsafe -gt 0) {
+        return $_ERR_UNSAFE
+    }
+    return 0
 }
 
 Function Start-VirusTotal ($h, $app) {
@@ -67,7 +77,7 @@ Function Start-VirusTotal ($h, $app) {
             return Navigate-ToHash $hash $app
         }
         else {
-            write-host -f darkred "$app uses $($matches['algo']) hash and VirusTotal only supports md5, sha1 or sha256"
+            warn("$app`: Unsupported hash $($matches['algo']). VirusTotal needs md5, sha1 or sha256.")
             return $_ERR_NO_INFO
         }
     }
@@ -104,25 +114,33 @@ Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
         try {
             # Follow redirections (for e.g. sourceforge URLs) because
             # VirusTotal analyzes only "direct" download links
+            $url = $url.Split("#").GetValue(0)
             $new_redir = $url
             do {
                 $orig_redir = $new_redir
                 $new_redir = Get-RedirectedUrl $orig_redir
             } while ($orig_redir -ne $new_redir)
-            Invoke-RestMethod -Method POST -Uri "https://www.virustotal.com/ui/urls?url=$new_redir" | Out-Null
+            $uri = "https://www.virustotal.com/ui/urls?url=$new_redir"
+            $api_key = get_config("virustotal_api_key")
+            if ($api_key) {
+                $url += '&apikey=' + $api_key
+            }
+            Invoke-RestMethod -Method POST -Uri $uri | Out-Null
             $submitted = $True
         } catch [Exception] {
+            warn("$app`: VirusTotal submission failed`: $($_.Exception.Message)")
             $submitted = $False
+            return
         }
     }
     else {
         $submitted = $False
     }
     if ($submitted) {
-        write-host -f darkred "$app`: $url unknown but submitted to VirusTotal"
+        warn("$app`: not found`: submitted $url")
     }
     else {
-        write-host -f darkred "$app`: unknown, download $url & submit to https`://www.virustotal.com/"
+        warn("$app`: not found`: manually submit $url")
     }
 }
 
@@ -130,19 +148,33 @@ if(!$apps) {
     my_usage; exit 1
 }
 
+if(is_scoop_outdated) {
+    scoop update
+}
+
+$apps_param = $apps
+
+if($apps_param -eq '*') {
+    $apps = applist (installed_apps $false) $false
+} else {
+    $apps = ensure_all_installed $apps_param
+}
+
+$requests = 0
+
 $apps | % {
-    $app = $_
+    ($app, $global) = $_
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
-        write-host -f darkred "Could not find manifest for '$app'"
+        warn("$app`: manifest not found")
         return
     }
 
     $hash = hash $manifest $architecture
     if (!$hash) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
-        write-host -f darkred "No hash information for $app"
+        warn("$app`: hash not found in manifest")
         return
     }
 
@@ -158,6 +190,13 @@ $apps | % {
     }
 
     $hash | % { $i = 0 } {
+        $requests += 1
+        if ($requests -eq 5) {
+            info("Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit")
+        }
+        if ($requests -gt 4) {
+            Start-Sleep -s (50 + ($requests * 2))
+        }
         try {
             $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
         } catch [Exception] {
@@ -166,7 +205,10 @@ $apps | % {
                 SubmitMaybe-ToVirusTotal $url[$i] $app ($opt.scan -or $opt.s)
             }
             else {
-                write-host -f darkred "$app`: error fetching information`: $($_.Exception.Message)"
+                if ($_.Exception.Message -match "\(204|429\)") {
+                    abort("$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code)
+                }
+                warn("$app`: VirusTotal request failed`: $($_.Exception.Message)")
             }
         }
         $i = $i + 1
