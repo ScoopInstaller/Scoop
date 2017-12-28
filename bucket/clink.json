@@ -1,9 +1,9 @@
 {
     "homepage": "https://mridgers.github.io/clink/",
-    "url": "https://github.com/mridgers/clink/releases/download/0.4.8/clink_0.4.8.zip",
-    "version": "0.4.8",
-    "hash": "cc1e07c1000e95ebbe1c6480df53487261e6457a733b925e13665740c14e15aa",
-    "extract_dir": "clink_0.4.8",
+    "url": "https://github.com/mridgers/clink/releases/download/0.4.9/clink_0.4.9.zip",
+    "version": "0.4.9",
+    "hash": "57618d5fab9f0f777430fde5beceffdfb99cc81cfbd353ca58f41b7faf84eddc",
+    "extract_dir": "clink_0.4.9",
     "checkver": {
         "github": "https://github.com/mridgers/clink/"
     },
@@ -13,5 +13,9 @@
     "notes": [
         "Run 'clink inject' to start clink on the current cmd",
         "Run 'clink autorun' to auto start clink"
-    ]
+    ],
+    "autoupdate": {
+        "url": "https://github.com/mridgers/clink/releases/download/$version/clink_$version.zip",
+        "extract_dir": "clink_$version"
+    }
 }
