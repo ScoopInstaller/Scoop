@@ -6,9 +6,15 @@
         "nvm.exe"
     ],
     "persist": [
-       "nodejs",
-        ["elevate.cmd", "nodejs\\elevate.cmd"],
-        ["elevate.vbs", "nodejs\\elevate.vbs"],
+        "nodejs",
+        [
+            "elevate.cmd",
+            "nodejs\\elevate.cmd"
+        ],
+        [
+            "elevate.vbs",
+            "nodejs\\elevate.vbs"
+        ],
         "settings.txt"
     ],
     "env_add_path": "nodejs\\nodejs",

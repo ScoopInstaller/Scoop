@@ -1,7 +1,7 @@
 {
-    "homepage":  "https://github.com/nodejs/node-chakracore",
-    "version":  "8.6.0",
-    "license":  "MIT",
+    "homepage": "https://github.com/nodejs/node-chakracore",
+    "version": "8.6.0",
+    "license": "MIT",
     "architecture": {
         "32bit": {
             "url": "https://nodejs.org/download/chakracore-release/v8.6.0/node-v8.6.0-win-x86.7z",

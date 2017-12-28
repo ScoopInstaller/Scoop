@@ -36,6 +36,6 @@
         "Docker Machine",
         "",
         "Boot2Docker: https://github.com/boot2docker/windows-installer/releases/",
-        "Docker Machine: http://docs.docker.com/machine/"
+        "Docker Machine: https://docs.docker.com/machine/"
     ]
 }
