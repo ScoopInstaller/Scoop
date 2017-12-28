@@ -27,7 +27,7 @@
         "rax2.exe"
     ],
     "checkver": {
-        "url": "http://www.radare.org/r/down.html",
+        "url": "https://www.radare.org/r/down.html",
         "re": "last release is ([\\d.]+)"
     },
     "autoupdate": {

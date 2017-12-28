@@ -33,7 +33,7 @@
         ]
     },
     "checkver": {
-        "url": "http://www.erlang.org/downloads",
+        "url": "https://www.erlang.org/downloads",
         "re": "DOWNLOAD\\s+OTP ([\\d.]+)"
     },
     "autoupdate": {
