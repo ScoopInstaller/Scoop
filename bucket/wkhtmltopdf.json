@@ -5,40 +5,29 @@
     "license": "LGPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_msvc2015-win64.exe",
-            "hash": "14a5996adc77dc606944dbc0dc682bff104cd38cc1bec19253444cb87f259797"
+            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_mingw-w64-cross-win64.exe#/dl.7z",
+            "hash": "6ccf4d4056fdee7b25d173b830429f2ceaf7febcc309ee9a21e6fd932edaf4ed"
         },
         "32bit": {
-            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_msvc2015-win32.exe",
-            "hash": "6883d1456201bc9d421cb7dd32a99458be3d56631ea4f292e51b3c1aecbe2723"
+            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_mingw-w64-cross-win32.exe#/dl.7z",
+            "hash": "2788d14d24eae350940b5757b82728e870b2f1b8767fe8842ca179f46c2b6dc5"
         }
     },
+    "extract_dir": "bin",
     "bin": [
-        "bin\\wkhtmltoimage.exe",
-        "bin\\wkhtmltopdf.exe"
+        "wkhtmltoimage.exe",
+        "wkhtmltopdf.exe"
     ],
-    "installer": {
-        "args": [
-            "/S",
-            "/D=$dir"
-        ]
-    },
-    "uninstaller": {
-        "args": [
-            "/S"
-        ],
-        "file": "Uninstall.exe"
-    },
     "checkver": {
         "github": "https://github.com/wkhtmltopdf/wkhtmltopdf"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version_msvc2015-win64.exe"
+                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version_mingw-w64-cross-win64.exe#/dl.7z"
             },
             "32bit": {
-                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version_msvc2015-win32.exe"
+                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version_mingw-w64-cross-win32.exe#/dl.7z"
             }
         },
         "hash": {
