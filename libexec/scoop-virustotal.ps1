@@ -99,7 +99,7 @@ Function Get-RedirectedUrl {
     $request = [System.Net.WebRequest]::Create($url)
     $request.AllowAutoRedirect=$false
     $response=$request.GetResponse()
-    if ($response.StatusCode -eq "Found") {
+    if (([int]$response.StatusCode -ge 300) -and ([int]$response.StatusCode -lt 400)) {
         $redir = $response.GetResponseHeader("Location")
     }
     else {
