@@ -1,11 +1,19 @@
-# Usage: scoop virustotal <app> [options]
+# Usage: scoop virustotal [* | app1 app2 ...] [options]
 # Summary: Look for app's hash on virustotal.com
 # Help: Look for app's hash (MD5, SHA1 or SHA256) on virustotal.com
+#
+# Use a single '*' for app to check all installed apps.
 #
 # The download's hash is also a key to access VirusTotal's scan results.
 # This allows to check the safety of the files without even downloading
 # them in many cases.  If the hash is unknown to VirusTotal, the
 # download link is printed to submit it to VirusTotal.
+#
+# If you have signed up to VirusTotal's community, you have an API key
+# that this script can use to submit unknown packages for inspection
+# if you use the `--scan' flag.  Tell scoop about your API key with:
+#
+#   scoop config virustotal_api_key <your API key: 64 lower case hex digits>
 #
 # Exit codes:
 # 0 -> success
@@ -21,7 +29,8 @@
 # Options:
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 #   -s, --scan For packages where VirusTotal has no information, send download URL
-#              for analysis (and future retrieval)
+#              for analysis (and future retrieval).  This requires you to configure
+#              your virustotal_api_key.
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
