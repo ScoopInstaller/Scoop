@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/restic/restic/releases/download/v0.8.1/restic_0.8.1_windows_amd64.zip",
-            "hash": "59c0a05c0d8132f23c08a93e81d5c9603ee1d11116cbc6e9a577ff5882865c53"
+            "hash": "9010d659ebb3159009acff108d94c8347aa48f1c41c12176a6c7142ef7ddfd05"
         },
         "32bit": {
             "url": "https://github.com/restic/restic/releases/download/v0.8.1/restic_0.8.1_windows_386.zip",
-            "hash": "0bd0942c6c1ab0e47f04fb5eeb92d2ec4f486b2d3439057b2e57ec6c41792e69"
+            "hash": "42ab238bd96334665442e896141ba5e9aca31b2a27d672f7a6f111be1f825611"
         }
     },
     "bin": "restic.exe",
