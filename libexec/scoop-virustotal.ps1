@@ -55,10 +55,6 @@ $exit_code = 0
 Function Navigate-ToHash($hash, $app) {
     $hash = $hash.ToLower()
     $url = "https://www.virustotal.com/ui/files/$hash"
-    $api_key = get_config("virustotal_api_key")
-    if ($api_key) {
-        $url += '?apikey=' + $api_key
-    }
     $result = (new-object net.webclient).downloadstring($url)
     $stats = json_path $result '$.data.attributes.last_analysis_stats'
     $malicious = json_path $stats '$.malicious'
