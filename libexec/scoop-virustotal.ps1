@@ -114,8 +114,17 @@ Function Get-RedirectedUrl {
     return $redir
 }
 
+# Global flag to warn only once about missing API key:
+$warned_no_api_key = $False
+
 Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
-    if ($do_scan) {
+    $api_key = get_config("virustotal_api_key")
+    if ($do_scan -and !$api_key -and !$global:warned_no_api_key) {
+        $global:warned_no_api_key = $true
+        info("Submitting unknown apps needs a VirusTotal API key.  " +
+             "Set it up with`n`tscoop config virustotal_api_key <API key>")
+    }
+    if ($do_scan -and $api_key) {
         try {
             # Follow redirections (for e.g. sourceforge URLs) because
             # VirusTotal analyzes only "direct" download links
@@ -126,7 +135,6 @@ Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
                 $new_redir = Get-RedirectedUrl $orig_redir
             } while ($orig_redir -ne $new_redir)
             $uri = "https://www.virustotal.com/ui/urls?url=$new_redir"
-            $api_key = get_config("virustotal_api_key")
             if ($api_key) {
                 $url += '&apikey=' + $api_key
             }
