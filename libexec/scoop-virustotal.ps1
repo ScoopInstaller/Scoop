@@ -117,7 +117,24 @@ Function Get-RedirectedUrl {
 # Global flag to warn only once about missing API key:
 $warned_no_api_key = $False
 
-Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
+# Global flag to explain only once about sleep between requests
+$explained_rate_limit_sleeping = $False
+
+# Requests counter to slow down requests submitted to VirusTotal as
+# script execution progresses
+$requests = 0
+
+# SubmitMaybe-ToVirusTotal
+# - $url: where file to check can be downloaded
+# - $app: Name of the application (used for reporting)
+# - $do_scan: [boolean flag] whether to actually submit to VirusTotal
+#             This is a parameter instead of conditionnally calling
+#             the function to consolidate the warning message
+# - $retrying: [boolean] Optional, for internal use to retry
+#              submitting the file after a delay if the rate limit is
+#              exceeded, without risking an infinite loop (as stack
+#              overflow) if the submission keeps failing.
+Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
     $api_key = get_config("virustotal_api_key")
     if ($do_scan -and !$api_key -and !$global:warned_no_api_key) {
         $global:warned_no_api_key = $true
@@ -134,12 +151,27 @@ Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
                 $orig_redir = $new_redir
                 $new_redir = Get-RedirectedUrl $orig_redir
             } while ($orig_redir -ne $new_redir)
-            $uri = "https://www.virustotal.com/ui/urls?url=$new_redir"
-            if ($api_key) {
-                $url += '&apikey=' + $api_key
+            $global:requests += 1
+            $result = Invoke-WebRequest -Uri "https://www.virustotal.com/vtapi/v2/url/scan" -Body @{apikey=$api_key;url=$new_redir} -Method Post -UseBasicParsing
+            $submitted = $result.StatusCode -eq 200
+            if ($submitted) {
+                warn("$app`: not found`: submitted $url")
             }
-            Invoke-RestMethod -Method POST -Uri $uri | Out-Null
-            warn("$app`: not found`: submitted $url")
+            else {
+                # EAFP: submission failed -> sleep, then retry
+                if (!$retrying) {
+                    if (!$global:explained_rate_limit_sleeping) {
+                        $global:explained_rate_limit_sleeping = $True
+                        info("Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit")
+                    }
+                    Start-Sleep -s (60 + $global:requests)
+                    SubmitMaybe-ToVirusTotal $new_redir $app $do_scan $True
+                }
+                else {
+                    warn("$app`: VirusTotal submission of $url failed`:`n" +
+                         "`tAPI returned $($result.StatusCode) after retrying")
+                }
+            }
         } catch [Exception] {
             warn("$app`: VirusTotal submission failed`: $($_.Exception.Message)")
             return
@@ -196,13 +228,6 @@ $apps | % {
     }
 
     $hash | % { $i = 0 } {
-        $requests += 1
-        if ($requests -eq 5) {
-            info("Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit")
-        }
-        if ($requests -gt 4) {
-            Start-Sleep -s (50 + ($requests * 2))
-        }
         try {
             $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
         } catch [Exception] {
