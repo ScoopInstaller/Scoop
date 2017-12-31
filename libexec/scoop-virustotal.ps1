@@ -131,18 +131,11 @@ Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
                 $url += '&apikey=' + $api_key
             }
             Invoke-RestMethod -Method POST -Uri $uri | Out-Null
-            $submitted = $True
+            warn("$app`: not found`: submitted $url")
         } catch [Exception] {
             warn("$app`: VirusTotal submission failed`: $($_.Exception.Message)")
-            $submitted = $False
             return
         }
-    }
-    else {
-        $submitted = $False
-    }
-    if ($submitted) {
-        warn("$app`: not found`: submitted $url")
     }
     else {
         warn("$app`: not found`: manually submit $url")
