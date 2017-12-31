@@ -63,7 +63,7 @@ Function Navigate-ToHash($hash, $app) {
     $unsafe = [int]$malicious + [int]$suspicious
     $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
     switch ($unsafe) {
-        0 {$fg = "DarkGreen"}
+        0 { if ($undetected -eq 0) { $fg = "Yellow" } else { $fg = "DarkGreen" } }
         1 {$fg = "DarkYellow"}
         2 {$fg = "Yellow"}
         default {$fg = "Red"}
