@@ -193,15 +193,16 @@ if(is_scoop_outdated) {
 $apps_param = $apps
 
 if($apps_param -eq '*') {
-    $apps = applist (installed_apps $false) $false
-} else {
-    $apps = ensure_all_installed $apps_param
+    $apps = (applist (installed_apps $false) $false) | % {
+                ($a, $_global_flag_to_drop) = $_
+                $a
+            }
 }
 
 $requests = 0
 
 $apps | % {
-    ($app, $global) = $_
+    $app = $_
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
