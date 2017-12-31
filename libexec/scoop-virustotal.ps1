@@ -31,6 +31,8 @@
 #   -s, --scan For packages where VirusTotal has no information, send download URL
 #              for analysis (and future retrieval).  This requires you to configure
 #              your virustotal_api_key.
+#   -n, --no-depends By default, all dependencies are checked, too.  This flag allows
+#                    to avoid it.
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
@@ -39,10 +41,13 @@
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\json.ps1"
 . "$psscriptroot\..\lib\config.ps1"
+. "$psscriptroot\..\lib\decompress.ps1"
+. "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\depends.ps1"
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'a:s' @('arch=', 'scan')
+$opt, $apps, $err = getopt $args 'a:sn' @('arch=', 'scan', 'no-depends')
 if($err) { "scoop virustotal: $err"; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
@@ -197,6 +202,10 @@ if($apps_param -eq '*') {
                 ($a, $_global_flag_to_drop) = $_
                 $a
             }
+}
+
+if (!$opt.n -and !$opt."no-depends") {
+    $apps = install_order $apps $architecture
 }
 
 $requests = 0
