@@ -1,0 +1,43 @@
+{
+    "version": "0.2.2",
+    "license": "https://github.com/neovim/neovim/blob/master/LICENSE",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/neovim/neovim/releases/download/v0.2.2/nvim-win64.zip",
+            "hash": "66bab53ec0a8aff854921b6925630026649f3a49bb7913d19a4a602ffc138c92"
+        },
+        "32bit": {
+            "url": "https://github.com/neovim/neovim/releases/download/v0.2.2/nvim-win32.zip",
+            "hash": "edbb17047f9a1bdc01acf965430ebbc61bd05a9d39668c9cc6961ea47f471c47"
+        }
+    },
+    "suggest": {
+        "Visual Studio 2015 C++ redistributable": [
+            "vcredist2015"
+        ]
+    },
+    "homepage": "https://neovim.io/",
+    "bin": [
+        "Neovim\\bin\\nvim.exe",
+        "Neovim\\bin\\nvim-qt.exe"
+    ],
+    "shortcuts": [
+        [
+            "Neovim\\bin\\nvim-qt.exe",
+            "Neovim"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/neovim/neovim"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/neovim/neovim/releases/download/v$version/nvim-win64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/neovim/neovim/releases/download/v$version/nvim-win32.zip"
+            }
+        }
+    }
+}
