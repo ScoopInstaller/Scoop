@@ -42,7 +42,7 @@
             "--root $dir\\root",
             "--site https://mirrors.kernel.org/sourceware/cygwin/"
         ],
-        "keep": "true"
+        "keep": true
     },
     "notes": "To start a Cygwin shell, type \"cygwin\"",
     "persist": [

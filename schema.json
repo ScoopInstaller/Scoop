@@ -232,7 +232,7 @@
                     "type": "string"
                 },
                 "keep": {
-                    "type": "string"
+                    "type": "boolean"
                 }
             },
             "type": "object"
