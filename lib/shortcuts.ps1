@@ -25,6 +25,13 @@ function startmenu_shortcut($target, $shortcutName, $global) {
     if(!(Test-Path $scoop_startmenu_folder)) {
         New-Item $scoop_startmenu_folder -type Directory
     }
+    $dirname = [System.IO.Path]::GetDirectoryName($shortcutName)
+    if ($dirname) {
+        $dirname = [io.path]::combine($scoop_startmenu_folder, $dirname)
+        if(!(Test-Path $dirname)) {
+            New-Item $dirname -type Directory
+        }
+    }
     $wsShell = New-Object -ComObject WScript.Shell
     $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
     $wsShell.TargetPath = "$target"
