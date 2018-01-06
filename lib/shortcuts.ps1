@@ -4,7 +4,12 @@ function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
     $shortcuts | ?{ $_ -ne $null } | % {
         $target = $_.item(0)
         $name = $_.item(1)
-        startmenu_shortcut "$dir\$target" $name $global
+        try {
+            $arguments = $_.item(2)
+        } catch {
+            $arguments = ""
+        }
+        startmenu_shortcut "$dir\$target" $name $global $arguments
     }
 }
 
@@ -16,7 +21,7 @@ function shortcut_folder($global) {
     "$([environment]::getfolderpath('startmenu'))\Programs\Scoop Apps"
 }
 
-function startmenu_shortcut($target, $shortcutName, $global) {
+function startmenu_shortcut($target, $shortcutName, $global, $arguments) {
     if(!(Test-Path $target)) {
         Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find $target"
         return
@@ -35,6 +40,9 @@ function startmenu_shortcut($target, $shortcutName, $global) {
     $wsShell = New-Object -ComObject WScript.Shell
     $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
     $wsShell.TargetPath = "$target"
+    if ($arguments) {
+        $wsShell.Arguments = $arguments
+    }
     $wsShell.Save()
     write-host "Creating shortcut for $shortcutName ($(fname $target))"
 }
