@@ -8,7 +8,7 @@
     "installer": {
         "args": [
             "-s",
-            "-d$dir"
+            "-d\"$dir\""
         ]
     },
     "checkver": {

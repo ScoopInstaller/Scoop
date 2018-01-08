@@ -22,7 +22,7 @@
     },
     "bin": "wget.exe",
     "depends": "cacert",
-    "post_install": "\"ca_certificate=$(appdir cacert)\\current\\cacert.pem\" | out-file $dir\\wget.ini -encoding default",
+    "post_install": "\"ca_certificate=$(appdir cacert)\\current\\cacert.pem\" | out-file \"$dir\\wget.ini\" -encoding default",
     "checkver": "<title>GNU Wget ([\\d.]+) for Windows",
     "autoupdate": {
         "architecture": {

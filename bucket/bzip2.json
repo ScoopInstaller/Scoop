@@ -17,6 +17,6 @@
         "bzip2.exe",
         "bzip2recover.exe"
     ],
-    "pre_install": "cp $dir\\bzip2.exe $dir\\bunzip2.exe; cp $dir\\bzip2.exe $dir\\bzcat.exe",
+    "pre_install": "cp \"$dir\\bzip2.exe\" \"$dir\\bunzip2.exe\"; cp \"$dir\\bzip2.exe\" \"$dir\\bzcat.exe\"",
     "checkver": "The current version is <b>([\\d.]+)"
 }

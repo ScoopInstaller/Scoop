@@ -10,8 +10,8 @@
     },
     "env_add_path": "home\\vendor\\bin",
     "pre_install": "
-        echo 'if($args -eq \"selfupdate\" -or $args -eq \"self-update\") { & scoop update composer }' | out-file $dir\\composer.ps1
-        echo 'else { & php (join-path \"$psscriptroot\" \"composer.phar\") @args }' | out-file $dir\\composer.ps1 -append
+        echo 'if($args -eq \"selfupdate\" -or $args -eq \"self-update\") { & scoop update composer }' | out-file \"$dir\\composer.ps1\"
+        echo 'else { & php (join-path \"$psscriptroot\" \"composer.phar\") @args }' | out-file \"$dir\\composer.ps1\" -append
     ",
     "post_install": "
         $och = \"$env:APPDATA\\Composer\"
