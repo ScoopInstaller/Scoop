@@ -17,7 +17,7 @@
         "args": [
             "/quiet",
             "InstallAllUsers=$(@{$true=1;$false=0}[$global])",
-            "TargetDir=$dir",
+            "TargetDir=\"$dir\"",
             "AssociateFiles=0",
             "Shortcuts=0",
             "InstallLauncherAllUsers=$(@{$true=1;$false=0}[$global])"
