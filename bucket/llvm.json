@@ -13,7 +13,10 @@
         }
     },
     "installer": {
-        "args": "/S /D=$dir"
+        "args": [
+            "/S",
+            "/D=\"$dir\""
+        ]
     },
     "uninstaller": {
         "file": "Uninstall.exe",
