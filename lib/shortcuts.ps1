@@ -28,6 +28,7 @@ function startmenu_shortcut($target, $shortcutName, $global) {
     $wsShell = New-Object -ComObject WScript.Shell
     $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
     $wsShell.TargetPath = "$target"
+    $wsShell.WorkingDirectory = "$dir"
     $wsShell.Save()
     write-host "Creating shortcut for $shortcutName ($(fname $target))"
 }
