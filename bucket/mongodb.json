@@ -1,11 +1,11 @@
 {
     "homepage": "https://www.mongodb.org",
-    "version": "3.6.1",
+    "version": "3.6.2",
     "license": "https://www.mongodb.org/about/licensing/",
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.6.1-signed.msi",
-            "hash": "ff04f71216c93de9d96735cece828be5c48478d9b92519f647152ba7f17494de",
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.6.2-signed.msi",
+            "hash": "b1450b0b716214986ce92a981ce4878edabd4a2032712453f9034b63933607ca",
             "extract_dir": "MongoDB\\Server\\3.6"
         }
     },
