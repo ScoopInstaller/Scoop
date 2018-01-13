@@ -14,7 +14,8 @@
     },
     "bin": [
         "php.exe",
-        "php-cgi.exe"
+        "php-cgi.exe",
+        "phpdbg.exe"
     ],
     "persist": [
         "cli",
