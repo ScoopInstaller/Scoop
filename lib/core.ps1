@@ -249,6 +249,10 @@ set invalid=`"='
 if !args! == !invalid! ( set args= )
 powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
     }
+
+    # make command accessible from sh terminals
+    $shim_cmd = $(strip_ext($shim))
+    "#!/bin/sh`npowershell -ex unrestricted `"$(resolve-path $path)`" `"$@`"" | out-file $shim_cmd -encoding ascii
 }
 
 function ensure_in_path($dir, $global) {
