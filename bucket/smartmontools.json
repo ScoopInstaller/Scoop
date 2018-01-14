@@ -21,7 +21,7 @@
         ]
     },
     "checkver": {
-        "re": "Download\\s+smartmontools-(?<version>(?<short>[\\d.]+)-[\\d]+)\\.",
+        "re": "smartmontools-(?<version>(?<short>[\\d.]+)-[\\d]+)\\.win32",
         "url": "https://sourceforge.net/projects/smartmontools/files/smartmontools/"
     },
     "autoupdate": {
