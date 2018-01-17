@@ -20,6 +20,14 @@
         "usr\\bin\\tig.exe",
         "git-bash.exe"
     ],
+    "shortcuts": [
+        [
+            "git-bash.exe",
+            "Git Bash",
+            "--cd-to-home",
+            "usr\\share\\git\\git-for-windows.ico"
+        ]
+    ],
     "post_install": [
         "git config --global credential.helper manager"
     ],
