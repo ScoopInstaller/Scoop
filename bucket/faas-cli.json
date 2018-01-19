@@ -9,7 +9,11 @@
         }
     },
     "bin": [
-        "faas-cli.exe"
+        "faas-cli.exe",
+        [
+            "faas-cli.exe",
+            "faas"
+        ]
     ],
     "post_install": [
         "faas-cli version"
