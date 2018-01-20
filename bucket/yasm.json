@@ -17,8 +17,8 @@
         "yasm.exe"
     ],
     "checkver": {
-        "url": "https://yasm.tortall.net/Download.html",
-        "re": "Latest Release: [\\d.]+"
+        "url": "http://yasm.tortall.net/Download.html",
+        "re": "Latest Release: ([\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
