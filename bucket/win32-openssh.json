@@ -4,12 +4,12 @@
     "license": "https://raw.githubusercontent.com/PowerShell/Win32-OpenSSH/L1-Prod/LICENCE",
     "architecture": {
         "32bit": {
-            "hash": "0466cc64bbab15e819965c764d2d40b15eccae91dcc260c3fd66dfcbe6e9953c",
+            "hash": "a20c2bfc4a672c4262abbcc546e91b0ecc9b074907ddcceb11329c042029611a",
             "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v1.0.0.0/OpenSSH-Win32.zip",
             "extract_dir": "OpenSSH-Win32"
         },
         "64bit": {
-            "hash": "9a68c9bd5a51efc31be0231c8bddb829fe274beee9147a836922f23d05e8a0a3",
+            "hash": "0c5dd4a30497f6c40ddc6dfc95cbf3a90adcce0148d87de65ffcc555d8890c4f",
             "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v1.0.0.0/OpenSSH-Win64.zip",
             "extract_dir": "OpenSSH-Win64"
         }
