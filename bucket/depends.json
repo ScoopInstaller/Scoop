@@ -1,0 +1,35 @@
+{
+    "version": "2.2",
+    "homepage": "http://www.dependencywalker.com/",
+    "checkver": {
+        "url": "http://www.dependencywalker.com/",
+        "re": "Version (\\d+\\.\\d+).*for x86"
+    },
+    "bin": "depends.exe",
+    "shortcuts": [
+        [
+            "depends.exe",
+            "Dependency Walker"
+        ]
+    ],
+    "architecture": {
+        "64bit": {
+            "url": "http://www.dependencywalker.com/depends22_x64.zip",
+            "hash": "35db68a613874a2e8c1422eb0ea7861f825fc71717d46dabf1f249ce9634b4f1"
+        },
+        "32bit": {
+            "url": "http://www.dependencywalker.com/depends22_x86.zip",
+            "hash": "03d73abba0e856c81ba994505373fdb94a13b84eb29e6c268be1bf21b7417ca3"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://www.dependencywalker.com/depends$majorVersion$minorVersion_x64.zip"
+            },
+            "32bit": {
+                "url": "http://www.dependencywalker.com/depends$majorVersion$minorVersion_x86.zip"
+            }
+        }
+    }
+}
