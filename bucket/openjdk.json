@@ -1,17 +1,17 @@
 {
     "homepage": "https://github.com/ojdkbuild/ojdkbuild",
-    "version": "1.8.0.151-1",
+    "version": "1.8.0.161-1",
     "license": "GPL2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.151-1/java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86_64.zip",
-            "hash": "1905ea74b79d6d1d2ea2b2b6887c14770f090fbb8b46e7e1bfb56e92845e9cf2",
-            "extract_dir": "java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86_64"
+            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.161-1/java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86_64.zip",
+            "hash": "7fcd9909173ed19f4ae6c0bba8b32b1e6bece2d49eb9d87271828be8121fc31b",
+            "extract_dir": "java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86_64"
         },
         "32bit": {
-            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.151-1/java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86.zip",
-            "hash": "4586478efec0bae5f8c7846accbbc90f06012bcc9079c725f4588fd3484e8624",
-            "extract_dir": "java-1.8.0-openjdk-1.8.0.151-1.b12.ojdkbuild.windows.x86"
+            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.161-1/java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86.zip",
+            "hash": "73cf753afe0590b90edb8643b4d628339bfe942a4f539c892fb4f82d9a122173",
+            "extract_dir": "java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86"
         }
     },
     "env_add_path": "bin",
