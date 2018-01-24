@@ -1,4 +1,4 @@
-﻿#requires -v 3
+#requires -v 3
 
 # remote install:
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
