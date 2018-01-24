@@ -1,36 +1,36 @@
 # list manifests which do not specify a checkver regex
 param(
-    [String]$dir,
-    [Switch]$skipSupported = $false
+  [string]$dir,
+  [switch]$skipSupported = $false
 )
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
+."$psscriptroot\..\lib\core.ps1"
+."$psscriptroot\..\lib\manifest.ps1"
 
-if(!$dir) { $dir = "$psscriptroot\..\bucket" }
-$dir = resolve-path $dir
+if (!$dir) { $dir = "$psscriptroot\..\bucket" }
+$dir = Resolve-Path $dir
 
-write-host "[" -nonewline
-write-host -f green "C" -nonewline
-write-host "]heckver"
-write-host " | [" -nonewline
-write-host -f cyan "A" -nonewline
-write-host "]utoupdate"
-write-host " |  |"
+Write-Host "[" -NoNewline
+Write-Host -f green "C" -NoNewline
+Write-Host "]heckver"
+Write-Host " | [" -NoNewline
+Write-Host -f cyan "A" -NoNewline
+Write-Host "]utoupdate"
+Write-Host " |  |"
 
-gci $dir "*.json" | % {
-    $json = parse_json "$dir\$_"
+Get-ChildItem $dir "*.json" | ForEach-Object {
+  $json = parse_json "$dir\$_"
 
-    if ($skipSupported -and $json.checkver -and $json.autoupdate) {
-        return
-    }
+  if ($skipSupported -and $json.checkver -and $json.autoupdate) {
+    return
+  }
 
-    write-host "[" -nonewline
-    write-host -f green -nonewline $( If ($json.checkver) {"C"} Else {" "} )
-    write-host "]" -nonewline
+  Write-Host "[" -NoNewline
+  Write-Host -f green -NoNewline $(if ($json.checkver) { "C" } else { " " })
+  Write-Host "]" -NoNewline
 
-    write-host "[" -nonewline
-    write-host -f cyan -nonewline $( If ($json.autoupdate) {"A"} Else {" "} )
-    write-host "] " -nonewline
-    write-host (strip_ext $_)
+  Write-Host "[" -NoNewline
+  Write-Host -f cyan -NoNewline $(if ($json.autoupdate) { "A" } else { " " })
+  Write-Host "] " -NoNewline
+  Write-Host (strip_ext $_)
 }

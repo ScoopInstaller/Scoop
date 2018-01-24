@@ -10,43 +10,43 @@
 #
 # To clear everything in your cache, use:
 #     scoop cache rm *
-param($cmd, $app)
+param($cmd,$app)
 
-. "$psscriptroot\..\lib\help.ps1"
+."$psscriptroot\..\lib\help.ps1"
 
 reset_aliases
 
-function cacheinfo($file) {
-    $app, $version, $url = $file.name -split '#'
-    $size = filesize $file.length
-    return new-object psobject -prop @{ app=$app; version=$version; url=$url; size=$size }
+function cacheinfo ($file) {
+  $app,$version,$url = $file.Name -split '#'
+  $size = filesize $file.length
+  return New-Object psobject -prop @{ app = $app; version = $version; url = $url; size = $size }
 }
 
-function show($app) {
-    $files = @(gci "$scoopdir\cache" | ? { $_.name -match "^$app" })
-    $total_length = ($files | measure length -sum).sum -as [double]
+function show ($app) {
+  $files = @( Get-ChildItem "$scoopdir\cache" | Where-Object { $_.Name -match "^$app" })
+  $total_length = ($files | Measure-Object length -Sum).sum -as [double]
 
-    $f_app  = @{ expression={"$($_.app) ($($_.version))" }}
-    $f_url  = @{ expression={$_.url};alignment='right'}
-    $f_size = @{ expression={$_.size}; alignment='right'}
+  $f_app = @{ expression = { "$($_.app) ($($_.version))" } }
+  $f_url = @{ expression = { $_.url }; alignment = 'right' }
+  $f_size = @{ expression = { $_.size }; alignment = 'right' }
 
 
-    $files | % { cacheinfo $_ } | ft $f_size, $f_app, $f_url -auto -hide
+  $files | ForEach-Object { cacheinfo $_ } | Format-Table $f_size,$f_app,$f_url -auto -hide
 
-    "Total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
+  "Total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
 }
 
-switch($cmd) {
-    'rm' {
-        if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
-        rm "$scoopdir\cache\$app#*"
-    }
-    'show' {
-        show $app
-    }
-    default {
-        show
-    }
+switch ($cmd) {
+  'rm' {
+    if (!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
+    rm "$scoopdir\cache\$app#*"
+  }
+  'show' {
+    show $app
+  }
+  default {
+    show
+  }
 }
 
 exit 0

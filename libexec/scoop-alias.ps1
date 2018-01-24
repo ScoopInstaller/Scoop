@@ -11,32 +11,32 @@
 # e.g.:
 #     scoop alias add rm 'scoop uninstall $args[0]' "Uninstalls an app"
 
-param($opt, $name, $command, $description)
+param($opt,$name,$command,$description)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\config.ps1"
-. "$psscriptroot\..\lib\install.ps1"
+."$psscriptroot\..\lib\core.ps1"
+."$psscriptroot\..\lib\help.ps1"
+."$psscriptroot\..\lib\config.ps1"
+."$psscriptroot\..\lib\install.ps1"
 
 $script:config_alias = "alias"
 
 function init_alias_config {
   $aliases = get_config $script:config_alias
-  if(!$aliases) {
+  if (!$aliases) {
     $aliases = @{}
   }
 
   $aliases
 }
 
-function add_alias($name, $command) {
-  if(!$command) {
+function add_alias ($name,$command) {
+  if (!$command) {
     abort "Can't create an empty alias."
   }
 
   # get current aliases from config
   $aliases = init_alias_config
-  if($aliases.containskey($name)) {
+  if ($aliases.containskey($name)) {
     abort "Alias $name already exists."
   }
 
@@ -45,24 +45,24 @@ function add_alias($name, $command) {
   # generate script
   $shimdir = shimdir $false
   $script =
-@"
+  @"
 # Summary: $description
 $command
 "@
-  $script | out-file "$shimdir\$alias_file.ps1" -encoding utf8
+  $script | Out-File "$shimdir\$alias_file.ps1" -Encoding utf8
 
   # add alias to config
   $aliases += @{ $name = $alias_file }
   set_config $script:config_alias $aliases
 }
 
-function rm_alias($name) {
+function rm_alias ($name) {
   $aliases = init_alias_config
-  if(!$name) {
+  if (!$name) {
     abort "Which alias should be removed?"
   }
 
-  if($aliases.containskey($name)) {
+  if ($aliases.containskey($name)) {
     "Removing alias $name..."
 
     rm_shim $aliases.get_item($name) (shimdir $false)
@@ -76,20 +76,20 @@ function rm_alias($name) {
 function list_aliases {
   $aliases = @{}
 
-  (init_alias_config).getenumerator() |% {
-    $summary = summary (gc (command_path $_.name) -raw)
-    if(!($summary)) { $summary = '' }
-    $aliases.add("$($_.name) ", $summary)
+  (init_alias_config).GetEnumerator() | ForEach-Object {
+    $summary = summary (Get-Content (command_path $_.Name) -Raw)
+    if (!($summary)) { $summary = '' }
+    $aliases.Add("$($_.name) ",$summary)
   }
 
-  if(!$aliases.count) {
+  if (!$aliases.count) {
     warn "No aliases founds."
   }
 
-  $aliases.getenumerator() | sort name | ft -hidetablehead -autosize -wrap
+  $aliases.GetEnumerator() | sort name | Format-Table -hidetablehead -AutoSize -Wrap
 }
 
-switch($opt) {
+switch ($opt) {
   "add" { add_alias $name $command }
   "rm" { rm_alias $name }
   "list" { list_aliases }
