@@ -883,6 +883,9 @@ function env_ensure_home($manifest, $global) {
 function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
     if($pre_install) {
+        if ($pre_install -isnot [String]) {
+            $pre_install = $pre_install -Join "`r`n"
+        }
         write-output "Running pre-install script..."
         iex $pre_install
     }
@@ -891,6 +894,9 @@ function pre_install($manifest, $arch) {
 function post_install($manifest, $arch) {
     $post_install = arch_specific 'post_install' $manifest $arch
     if($post_install) {
+        if ($post_install -isnot [String]) {
+            $post_install = $post_install -Join "`r`n"
+        }
         write-output "Running post-install script..."
         iex $post_install
     }
