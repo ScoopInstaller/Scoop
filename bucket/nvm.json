@@ -26,12 +26,12 @@
     "architecture": {
         "64bit": {
             "pre_install": "if(!(test-path \"$dir\\settings.txt\")) {
-                write-output \"root: $persist_dir\\nodejs`r`narch: 64`r`nproxy: none\" | Out-File -encoding \"ASCII\" $dir\\settings.txt
+                write-output \"root: $persist_dir\\nodejs`r`narch: 64`r`nproxy: none\" | Out-File -encoding \"ASCII\" \"$dir\\settings.txt\"
             }"
         },
         "32bit": {
             "pre_install": "if(!(test-path \"$dir\\settings.txt\")) {
-                write-output \"root: $persist_dir\\nodejs`r`narch: 32`r`nproxy: none\" | Out-File -encoding \"ASCII\" $dir\\settings.txt
+                write-output \"root: $persist_dir\\nodejs`r`narch: 32`r`nproxy: none\" | Out-File -encoding \"ASCII\" \"$dir\\settings.txt\"
             }"
         }
     },
