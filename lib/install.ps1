@@ -884,7 +884,7 @@ function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
     if($pre_install) {
         write-output "Running pre-install script..."
-        iex $pre_install
+        iex (@($pre_install) -join "`r`n")
     }
 }
 
@@ -892,7 +892,7 @@ function post_install($manifest, $arch) {
     $post_install = arch_specific 'post_install' $manifest $arch
     if($post_install) {
         write-output "Running post-install script..."
-        iex $post_install
+        iex (@($post_install) -join "`r`n")
     }
 }
 
