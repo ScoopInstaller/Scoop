@@ -1,71 +1,71 @@
-. "$psscriptroot\Scoop-TestLib.ps1"
-. "$psscriptroot\..\lib\getopt.ps1"
+."$psscriptroot\Scoop-TestLib.ps1"
+."$psscriptroot\..\lib\getopt.ps1"
 
-describe "getopt" {
-    it 'handle short option with required argument missing' {
-        $null, $null, $err = getopt '-x' 'x:' ''
-        $err | should be 'Option -x requires an argument.'
+Describe "getopt" {
+  It 'handle short option with required argument missing' {
+    $null,$null,$err = getopt '-x' 'x:' ''
+    $err | Should be 'Option -x requires an argument.'
 
-        $null, $null, $err = getopt '-xy' 'x:y' ''
-        $err | should be 'Option -x requires an argument.'
-    }
+    $null,$null,$err = getopt '-xy' 'x:y' ''
+    $err | Should be 'Option -x requires an argument.'
+  }
 
-    it 'handle long option with required argument missing' {
-        $null, $null, $err = getopt '--arb' '' 'arb='
-        $err | should be 'Option --arb requires an argument.'
-    }
+  It 'handle long option with required argument missing' {
+    $null,$null,$err = getopt '--arb' '' 'arb='
+    $err | Should be 'Option --arb requires an argument.'
+  }
 
-    it 'handle unrecognized short option' {
-        $null, $null, $err = getopt '-az' 'a' ''
-        $err | should be 'Option -z not recognized.'
-    }
+  It 'handle unrecognized short option' {
+    $null,$null,$err = getopt '-az' 'a' ''
+    $err | Should be 'Option -z not recognized.'
+  }
 
-    it 'handle unrecognized long option' {
-        $null, $null, $err = getopt '--non-exist' '' ''
-        $err | should be 'Option --non-exist not recognized.'
+  It 'handle unrecognized long option' {
+    $null,$null,$err = getopt '--non-exist' '' ''
+    $err | Should be 'Option --non-exist not recognized.'
 
-        $null, $null, $err = getopt '--global','--another' 'abc:de:' 'global','one'
-        $err | should be 'Option --another not recognized.'
-    }
+    $null,$null,$err = getopt '--global','--another' 'abc:de:' 'global','one'
+    $err | Should be 'Option --another not recognized.'
+  }
 
-    it 'remaining args returned' {
-        $opt, $rem, $err = getopt '-g','rem' 'g' ''
-        $err | should be $null
-        $opt.g | should be $true
-        $rem | should not be $null
-        $rem.length | should be 1
-        $rem[0] | should be 'rem'
-    }
+  It 'remaining args returned' {
+    $opt,$rem,$err = getopt '-g','rem' 'g' ''
+    $err | Should be $null
+    $opt.g | Should be $true
+    $rem | Should not be $null
+    $rem.length | Should be 1
+    $rem[0] | Should be 'rem'
+  }
 
-    it 'get a long flag and a short option with argument' {
-        $a = "--global -a 32bit test" -split ' '
-        $opt, $rem, $err = getopt $a 'ga:' 'global','arch='
+  It 'get a long flag and a short option with argument' {
+    $a = "--global -a 32bit test" -split ' '
+    $opt,$rem,$err = getopt $a 'ga:' 'global','arch='
 
-        $err | should be $null
-        $opt.global | should be $true
-        $opt.a | should be '32bit'
-    }
+    $err | Should be $null
+    $opt.global | Should be $true
+    $opt.a | Should be '32bit'
+  }
 
-    it 'handles regex characters' {
-        $a = "-?"
-        { $opt, $rem, $err = getopt $a 'ga:' 'global' 'arch=' } | should not throw
-        { $null, $null, $null = getopt $a '?:' 'help' | should not throw }
-    }
+  It 'handles regex characters' {
+    $a = "-?"
+    { $opt,$rem,$err = getopt $a 'ga:' 'global' 'arch=' } | Should not throw
+    { $null,$null,$null = getopt $a '?:' 'help' | Should not throw }
+  }
 
-    it 'handles short option without required argument' {
-        $null, $null, $err = getopt '-x' 'x' ''
-        $err | should be $null
-    }
+  It 'handles short option without required argument' {
+    $null,$null,$err = getopt '-x' 'x' ''
+    $err | Should be $null
+  }
 
-    it 'handles long option without required argument' {
-        $opt, $null, $err = getopt '--long-arg' '' 'long-arg'
-        $err | should be $null
-        $opt."long-arg" | should be $true
-    }
+  It 'handles long option without required argument' {
+    $opt,$null,$err = getopt '--long-arg' '' 'long-arg'
+    $err | Should be $null
+    $opt."long-arg" | Should be $true
+  }
 
-    it 'handles long option with required argument' {
-        $opt, $null, $err = getopt '--long-arg', 'test' '' 'long-arg='
-        $err | should be $null
-        $opt."long-arg" | should be "test"
-    }
+  It 'handles long option with required argument' {
+    $opt,$null,$err = getopt '--long-arg','test' '' 'long-arg='
+    $err | Should be $null
+    $opt."long-arg" | Should be "test"
+  }
 }

@@ -8,66 +8,66 @@
 #    array of strings that are long-form options. options that take
 #    a parameter should end with '='
 # returns @(opts hash, remaining_args array, error string)
-function getopt($argv, $shortopts, $longopts) {
-    $opts = @{}; $rem = @()
+function getopt ($argv,$shortopts,$longopts) {
+  $opts = @{}; $rem = @()
 
-    function err($msg) {
-        $opts, $rem, $msg
-    }
+  function err ($msg) {
+    $opts,$rem,$msg
+  }
 
-    function regex_escape($str) {
-        return [regex]::escape($str)
-    }
+  function regex_escape ($str) {
+    return [regex]::Escape($str)
+  }
 
-    # ensure these are arrays
-    $argv = @($argv)
-    $longopts = @($longopts)
+  # ensure these are arrays
+  $argv = @( $argv)
+  $longopts = @( $longopts)
 
-    for($i = 0; $i -lt $argv.length; $i++) {
-        $arg = $argv[$i]
-        # don't try to parse array arguments
-        if($arg -is [array]) { $rem += ,$arg; continue }
-        if($arg -is [int]) { $rem += $arg; continue }
+  for ($i = 0; $i -lt $argv.length; $i++) {
+    $arg = $argv[$i]
+    # don't try to parse array arguments
+    if ($arg -is [array]) { $rem +=,$arg; continue }
+    if ($arg -is [int]) { $rem += $arg; continue }
 
-        if($arg.startswith('--')) {
-            $name = $arg.substring(2)
+    if ($arg.StartsWith('--')) {
+      $name = $arg.substring(2)
 
-            $longopt = $longopts | ? { $_ -match "^$name=?$" }
+      $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
 
-            if($longopt) {
-                if($longopt.endswith('=')) { # requires arg
-                    if($i -eq $argv.length - 1) {
-                        return err "Option --$name requires an argument."
-                    }
-                    $opts.$name = $argv[++$i]
-                } else {
-                    $opts.$name = $true
-                }
-            } else {
-                return err "Option --$name not recognized."
-            }
-        } elseif($arg.startswith('-') -and $arg -ne '-') {
-            for($j = 1; $j -lt $arg.length; $j++) {
-                $letter = $arg[$j].tostring()
-
-                if($shortopts -match "$(regex_escape $letter)`:?") {
-                    $shortopt = $matches[0]
-                    if($shortopt[1] -eq ':') {
-                        if($j -ne $arg.length -1 -or $i -eq $argv.length - 1) {
-                            return err "Option -$letter requires an argument."
-                        }
-                        $opts.$letter = $argv[++$i]
-                    } else {
-                        $opts.$letter = $true
-                    }
-                } else {
-                    return err "Option -$letter not recognized."
-                }
-            }
+      if ($longopt) {
+        if ($longopt.EndsWith('=')) { # requires arg
+          if ($i -eq $argv.length - 1) {
+            return err "Option --$name requires an argument."
+          }
+          $opts.$name = $argv[++ $i]
         } else {
-            $rem += $arg
+          $opts.$name = $true
         }
-    }
+      } else {
+        return err "Option --$name not recognized."
+      }
+    } elseif ($arg.StartsWith('-') -and $arg -ne '-') {
+      for ($j = 1; $j -lt $arg.length; $j++) {
+        $letter = $arg[$j].ToString()
 
-    $opts, $rem
+        if ($shortopts -match "$(regex_escape $letter)`:?") {
+          $shortopt = $matches[0]
+          if ($shortopt[1] -eq ':') {
+            if ($j -ne $arg.length - 1 -or $i -eq $argv.length - 1) {
+              return err "Option -$letter requires an argument."
+            }
+            $opts.$letter = $argv[++ $i]
+          } else {
+            $opts.$letter = $true
+          }
+        } else {
+          return err "Option -$letter not recognized."
+        }
+      }
+    } else {
+      $rem += $arg
+    }
+  }
+
+  $opts,$rem
 }

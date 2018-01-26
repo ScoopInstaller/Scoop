@@ -26,21 +26,21 @@
 # * An empty or unset value for proxy is equivalent to 'default' (with no username or password)
 # * To bypass the system proxy and connect directly, use 'none' (with no username or password)
 
-param($name, $value)
+param($name,$value)
 
-. "$psscriptroot\..\lib\config.ps1"
-. "$psscriptroot\..\lib\help.ps1"
+."$psscriptroot\..\lib\config.ps1"
+."$psscriptroot\..\lib\help.ps1"
 
 reset_aliases
 
-if(!$name) { my_usage; exit 1 }
+if (!$name) { my_usage; exit 1 }
 
-if($name -like 'rm') {
-    set_config $value $null
-} elseif($value) {
-    set_config $name $value
+if ($name -like 'rm') {
+  set_config $value $null
+} elseif ($value) {
+  set_config $name $value
 } else {
-    get_config $name $value
+  get_config $name $value
 }
 
 exit 0
