@@ -686,7 +686,7 @@ function create_shims($manifest, $dir, $global, $arch) {
         }
         if(!(test-path $bin)) { abort "Can't shim '$target': File doesn't exist."}
 
-        shim "$dir\$target" $global $name $arg
+        shim "$dir\$target" $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir})
     }
 }
 
