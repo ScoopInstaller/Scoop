@@ -19,6 +19,11 @@
         "OPENSSL_CONF": "$dir\\bin\\cnf\\openssl.cnf"
     },
     "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^\\s]+)</a>",
+    "suggest": {
+        "cacert": [
+            "cacert"
+        ]
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
