@@ -23,7 +23,7 @@ function cacheinfo($file) {
 }
 
 function show($app) {
-    $files = @(gci "$scoopdir\cache" | ? { $_.name -match "^$app" })
+    $files = @(gci "$cachedir" | ? { $_.name -match "^$app" })
     $total_length = ($files | measure length -sum).sum -as [double]
 
     $f_app  = @{ expression={"$($_.app) ($($_.version))" }}
@@ -39,7 +39,7 @@ function show($app) {
 switch($cmd) {
     'rm' {
         if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
-        rm "$scoopdir\cache\$app#*"
+        rm "$cachedir\$app#*"
     }
     'show' {
         show $app
