@@ -53,7 +53,7 @@ function set_config($name, $val) {
         $cfg.remove($name)
     }
 
-    convertto-json $cfg | out-file $cfgpath -encoding utf8
+    convertto-json $cfg | set-content $cfgpath -encoding utf8
 }
 
 $cfg = load_cfg
