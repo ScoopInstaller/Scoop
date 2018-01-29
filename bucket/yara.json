@@ -1,0 +1,14 @@
+{
+	"version": "3.7.0",
+	"architecture": {
+		"64bit": {
+			"url": "https://ci.appveyor.com/api/buildjobs/qry58xodlexyqu2s/artifacts/windows%2Fvs2015%2FRelease%2Fyara64.exe#/yara.exe"
+		},
+		"32bit": {
+			"url": "https://ci.appveyor.com/api/buildjobs/t16bfkex27hhaul0/artifacts/windows%2Fvs2015%2FRelease%2Fyara32.exe#/yara.exe"
+		}
+	},
+	"bin": "yara.exe",
+	"homepage": "https://virustotal.github.io/yara/",
+	"license": "BSD-3-Clause"
+}
