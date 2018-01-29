@@ -7,7 +7,7 @@
     "extract_dir": "PyGitUp-1.4.6",
     "depends": "python",
     "post_install": "
-        pushd $dir
+        pushd \"$dir\"
         try {
             scoop reset python
             iex \"$(scoop which python) setup.py install\"

@@ -6,7 +6,10 @@
     "hash": "5dbe89981a8d567e5b9b935fbf8019885e7347f45c5af69cab21e8dcafee3393",
     "extract_dir": "nmap",
     "installer": {
-        "args": "/S /D=$dir"
+        "args": [
+            "/S",
+            "/D=\"$dir\""
+        ]
     },
     "uninstaller": {
         "file": "Uninstall.exe",

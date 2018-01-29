@@ -19,7 +19,8 @@
     "homepage": "https://neovim.io/",
     "bin": [
         "Neovim\\bin\\nvim.exe",
-        "Neovim\\bin\\nvim-qt.exe"
+        "Neovim\\bin\\nvim-qt.exe",
+        "Neovim\\bin\\win32yank.exe"
     ],
     "shortcuts": [
         [
