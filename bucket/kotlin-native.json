@@ -23,6 +23,8 @@
         "github": "https://github.com/JetBrains/kotlin-native"
     },
     "autoupdate": {
-        "url": "https://github.com/JetBrains/kotlin-native/releases/download/v$version/kotlin-native-windows-$version.zip"
-    }
+        "url": "https://github.com/JetBrains/kotlin-native/releases/download/v$version/kotlin-native-windows-$version.zip",
+        "extract_dir": "kotlin-native-windows-$version"
+    },
+    "notes": "Please keep in mind that this is still a pre-release!"
 }
