@@ -1,0 +1,38 @@
+{
+    "homepage": "https://virustotal.github.io/yara/",
+    "license": "BSD-3-Clause",
+    "version": "3.7.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://www.dropbox.com/sh/umip8ndplytwzj1/AADwymyp3R8WxOnO0Auy_dKWa/yara-3.7.0-win64.zip?dl=1",
+            "hash": "b68134a0aa5752b24b5326b9f62a47e3fcc18ddb2371eb6c02cb374873c783a2",
+            "bin": [
+                [
+                    "yara64.exe",
+                    "yara"
+                ],
+                [
+                    "yarac64.exe",
+                    "yarac"
+                ]
+            ]
+        },
+        "32bit": {
+            "url": "https://www.dropbox.com/sh/umip8ndplytwzj1/AAAjBGGrW-MRwM82qG85vW13a/yara-3.7.0-win32.zip?dl=1",
+            "hash": "d71821941f8b941ee56020286e3047e9d0694ea79d557a63e4a6d19a033b8f27",
+            "bin": [
+                [
+                    "yara32.exe",
+                    "yara"
+                ],
+                [
+                    "yarac32.exe",
+                    "yarac"
+                ]
+            ]
+        }
+    },
+    "checkver": {
+        "github": "https://github.com/VirusTotal/yara"
+    }
+}
