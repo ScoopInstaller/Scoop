@@ -1,0 +1,30 @@
+{
+    "homepage": "https://kotlinlang.org/",
+    "version": "0.5",
+    "license": "Apache 2.0",
+    "url": "https://github.com/JetBrains/kotlin-native/releases/download/v0.5/kotlin-native-windows-0.5.zip",
+    "hash": "b2b18093fe04ad234fe5e99e547c43cb884d44e0900a1d519d85ae4adf97b47a",
+    "extract_dir": "kotlin-native-windows-0.5",
+    "bin": [
+        "bin\\cinterop.bat",
+        "bin\\klib.bat",
+        "bin\\konanc.bat",
+        "bin\\kotlinc.bat",
+        "bin\\kotlinc-native.bat",
+        "bin\\run_konan.bat"
+    ],
+    "env_add_path": "bin",
+    "suggest": {
+        "Kotlin": [
+            "kotlin"
+        ]
+    },
+    "checkver": {
+        "github": "https://github.com/JetBrains/kotlin-native"
+    },
+    "autoupdate": {
+        "url": "https://github.com/JetBrains/kotlin-native/releases/download/v$version/kotlin-native-windows-$version.zip",
+        "extract_dir": "kotlin-native-windows-$version"
+    },
+    "notes": "Please keep in mind that this is still a pre-release!"
+}
