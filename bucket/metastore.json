@@ -1,13 +1,31 @@
 {
-    "bin": "metastore.exe",
-    "checkver": {
-        "re": "/releases/tag/([a-f0-9]+)\"",
-        "url": "https://github.com/rasa/metastore/releases/latest"
-    },
     "description": "Store and restore metadata from a filesystem",
-    "hash": "93394fa2c43f60155f811cfa7c718d85aa4d0b61a9ce3267075ded716fdc7025",
     "homepage": "https://github.com/rasa/metastore",
     "license": "GPL-2.0",
-    "url": "https://github.com/rasa/metastore/releases/download/95d4e2d/metastore.exe",
-    "version": "95d4e2d"
+    "version": "v1.1.2-9-gdafa727",
+    "bin": "metastore.exe",
+    "checkver": {
+        "re": "/releases/tag/([vga-f0-9.-]+)\"",
+        "url": "https://github.com/rasa/metastore/releases/latest"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/rasa/metastore/releases/download/v1.1.2-9-gdafa727/metastore-x64.exe#/metastore.exe",
+            "hash": "7521c6c43ebd8640674c573363b74e5c6a612ef855349eba4548e013fd4f940d"
+        },
+        "32bit": {
+            "url": "https://github.com/rasa/metastore/releases/download/v1.1.2-9-gdafa727/metastore.exe",
+            "hash": "a3ecd6ce64750cb3925bb5cce1785ffdc1ee7ae7f5d50c879396e246c68b0a2d"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/rasa/metastore/releases/download/$version/metastore-x64.exe#/metastore.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/rasa/metastore/releases/download/$version/metastore.exe"
+            }
+        }
+    }
 }
