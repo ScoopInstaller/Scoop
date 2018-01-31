@@ -1,9 +1,9 @@
 {
     "homepage": "https://github.com/Lone-Coder/letsencrypt-win-simple/",
-    "version": "1.9.8.3",
+    "version": "1.9.8.4",
     "license": "https://github.com/Lone-Coder/letsencrypt-win-simple/blob/master/LICENSE",
-    "hash": "2e46c4ac102d1e4e765ee07607645b4652c0c37dbb7ea7825e4f77e9e35bd28c",
-    "url": "https://github.com/Lone-Coder/letsencrypt-win-simple/releases/download/v1.9.8.3/letsencrypt-win-simple.v1.9.8.3.zip",
+    "hash": "6b5d3899df25b6a7b6b439bbb10c5ce05f77108e443b3bea8286d37721a82c56",
+    "url": "https://github.com/Lone-Coder/letsencrypt-win-simple/releases/download/v1.9.8.4/letsencrypt-win-simple.v1.9.8.4.zip",
     "bin": "letsencrypt.exe",
     "persist": "letsencrypt.exe.config",
     "checkver": {
