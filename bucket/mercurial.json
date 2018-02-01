@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.mercurial-scm.org/",
-    "version": "4.4.2",
+    "version": "4.5",
     "license": "https://www.gnu.org/licenses/gpl-2.0.txt",
     "architecture": {
         "64bit": {
-            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.4.2-x64.exe",
-            "hash": "c5aebde645e346c8b5507813beadb47247aa10652bb143046731ea365edb48fc"
+            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.5-x64.exe",
+            "hash": "e96f0312e462ca96ef69d4be0c0f4b458ce853c49672cfe32be7c5ce99e5fc6b"
         },
         "32bit": {
-            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.4.2.exe",
-            "hash": "3ec92f184d68e9b218e38ae635bc24387e92681a42687e19aa2b2c3d90f73101"
+            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.5.exe",
+            "hash": "e66db15844aca97a140f49b2b7c35a105674f4dccd1f7a13ca4b6be780d666d0"
         }
     },
     "innosetup": true,
