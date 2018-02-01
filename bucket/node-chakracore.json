@@ -1,17 +1,17 @@
 {
     "homepage": "https://github.com/nodejs/node-chakracore",
-    "version": "8.6.0",
+    "version": "8.9.4",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://nodejs.org/download/chakracore-release/v8.6.0/node-v8.6.0-win-x86.7z",
-            "hash": "f01d7f645d7441d4ae89ac8f12c1d269e6ff920755274f86e47fccf46bf1a5fb",
-            "extract_dir": "node-v8.6.0-win-x86"
+            "url": "https://nodejs.org/download/chakracore-release/v8.9.4/node-v8.9.4-win-x86.7z",
+            "hash": "1f173aeb61367904b77d1af2bb678c8eae1bcf201237df9462e7f9f554d39089",
+            "extract_dir": "node-v8.9.4-win-x86"
         },
         "64bit": {
-            "url": "https://nodejs.org/download/chakracore-release/v8.6.0/node-v8.6.0-win-x64.7z",
-            "hash": "6b60f47773a57eec1603ae43ef7a75622498596aff98a71b3673ee8a9126deb2",
-            "extract_dir": "node-v8.6.0-win-x64"
+            "url": "https://nodejs.org/download/chakracore-release/v8.9.4/node-v8.9.4-win-x64.7z",
+            "hash": "aa73d134f9329bb85d39ac74ec90b3fa7911086848484475f05a0c450cda39c5",
+            "extract_dir": "node-v8.9.4-win-x64"
         }
     },
     "persist": [
