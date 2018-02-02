@@ -1009,7 +1009,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                     Move-Item $source $target
                 } elseif($target.GetType() -eq [System.IO.DirectoryInfo]) {
                     # if there is no source and it's a directory we create an empty directory
-                    ensure $target.FullName
+                    ensure $target.FullName | out-null
                 }
             } elseif ($source.Exists) {
                 # (re)move original (keep a copy)
