@@ -2,7 +2,7 @@
     "description": "Dynamic DNS client",
     "homepage": "https://sourceforge.net/projects/inadyn-mt/files/inadyn-mt/",
     "license": "GPL-3.0",
-    "version": "02.28.10"
+    "version": "02.28.10",
     "autoupdate": {
         "extract_dir": "inadyn-mt.v.$version",
         "url": "https://sourceforge.net/projects/inadyn-mt/files/inadyn-mt/inadyn-mt.v.$version/inadyn-mt.v.$version.tar.gz"
