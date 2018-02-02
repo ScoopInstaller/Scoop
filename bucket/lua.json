@@ -1,8 +1,8 @@
 {
-    "version": "5.1.5-51",
-    "url": "https://github.com/rjpcomputing/luaforwindows/releases/download/v5.1.5-51/LuaForWindows_v5.1.5-51.exe",
+    "version": "5.1.5-52",
+    "url": "https://github.com/rjpcomputing/luaforwindows/releases/download/v5.1.5-52/LuaForWindows_v5.1.5-52.exe",
     "homepage": "https://github.com/rjpcomputing/luaforwindows",
-    "hash": "f56df460eb9717702297a29373334fe9b01bedc5cd24d1380bc29c352ade090b",
+    "hash": "c5f96e5183adea82a0f0d25ad0940c7ae50d40c542d2d7331cc887d5fddb4191",
     "innosetup": true,
     "bin": [
         "lua.exe",
@@ -14,5 +14,8 @@
     "checkver": {
         "url": "https://github.com/rjpcomputing/luaforwindows/releases/latest",
         "re": "/releases/tag/v([\\d.\\-]+)"
+    },
+    "autoupdate": {
+        "url": "https://github.com/rjpcomputing/luaforwindows/releases/download/v$version/LuaForWindows_v$version.exe"
     }
 }
