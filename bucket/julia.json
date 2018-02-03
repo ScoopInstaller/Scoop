@@ -16,7 +16,7 @@
         "file": "julia-installer.exe",
         "args": [
             "/S",
-            "/D=\"$dir\""
+            "/D=$dir"
         ]
     },
     "uninstaller": {
