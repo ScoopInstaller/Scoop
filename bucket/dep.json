@@ -1,0 +1,35 @@
+{
+    "homepage": "https://github.com/golang/dep",
+    "version": "0.4.1",
+    "license": "https://github.com/golang/dep/blob/master/LICENSE",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/golang/dep/releases/download/v0.4.1/dep-windows-amd64.exe#/dep.exe",
+            "hash": "f6e6a872c54d5ae7536ac71fd5bcac9f4e7b8a1dafa1ef7c23866e2f3069fe4e"
+        },
+        "32bit": {
+            "url": "https://github.com/golang/dep/releases/download/v0.4.1/dep-windows-386.exe#/dep.exe",
+            "hash": "6c70c937a4d08b1f8cc9d2beee89344a64540d58d83c179e18edb7e271997997"
+        }
+    },
+    "bin": [
+        [
+            "dep.exe",
+            "dep"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/golang/dep/releases/download/v$version/dep-windows-amd64.exe#/dep.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/golang/dep/releases/download/v$version/dep-windows-386.exe#/dep.exe"
+            }
+        },
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}
