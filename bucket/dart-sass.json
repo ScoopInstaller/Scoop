@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/sass/dart-sass",
-    "version": "1.0.0-beta.4",
+    "version": "1.0.0-beta.5.1",
     "license": "https://raw.githubusercontent.com/sass/dart-sass/master/LICENSE",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-beta.4/dart-sass-1.0.0-beta.4-windows-x64.zip",
-            "hash": "08383c5317e4ea980f1eb1548cec76701948d3db87b6940005258dcfe67b41ac"
+            "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-beta.5.1/dart-sass-1.0.0-beta.5.1-windows-x64.zip",
+            "hash": "7ea401235d1e97d7bcd5b5500a1dacdcd50482c79d082038fac3a416d60aed4b"
         },
         "32bit": {
-            "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-beta.4/dart-sass-1.0.0-beta.4-windows-ia32.zip",
-            "hash": "d86a78902f55b3eb77b52f0e5e1578ef780e63acfca97a698f4e6d38203e241b"
+            "url": "https://github.com/sass/dart-sass/releases/download/1.0.0-beta.5.1/dart-sass-1.0.0-beta.5.1-windows-ia32.zip",
+            "hash": "56e2bed3e7eb064ff41ccee3554934bd09671d8f16eacb58bb495bdc98017af4"
         }
     },
     "extract_dir": "dart-sass",
