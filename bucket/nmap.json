@@ -8,7 +8,7 @@
     "installer": {
         "args": [
             "/S",
-            "/D=\"$dir\""
+            "/D=$dir"
         ]
     },
     "uninstaller": {
