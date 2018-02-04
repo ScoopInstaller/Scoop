@@ -218,10 +218,14 @@ function get_version_substitutions([String] $version, [Hashtable] $customMatches
         '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
         '$preReleaseVersion' = $lastPart;
     }
+    if($version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
+        $versionVariables.Set_Item('$matchHead', $matches['head'])
+        $versionVariables.Set_Item('$matchTail', $matches['tail'])
+    }
     if($customMatches) {
         $customMatches.GetEnumerator() | % {
             if($_.Name -ne "0") {
-                $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+                $versionVariables.Set_Item('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
             }
         }
     }
