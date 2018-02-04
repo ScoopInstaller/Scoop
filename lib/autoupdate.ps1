@@ -204,7 +204,7 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 }
 
-function get_version_substitutions([String] $version, [Hashtable] $matches) {
+function get_version_substitutions([String] $version, [Hashtable] $customMatches) {
     $firstPart = $version.Split('-') | Select-Object -first 1
     $lastPart = $version.Split('-') | Select-Object -last 1
     $versionVariables = @{
@@ -218,8 +218,8 @@ function get_version_substitutions([String] $version, [Hashtable] $matches) {
         '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
         '$preReleaseVersion' = $lastPart;
     }
-    if($matches) {
-        $matches.GetEnumerator() | % {
+    if($customMatches) {
+        $customMatches.GetEnumerator() | % {
             if($_.Name -ne "0") {
                 $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
             }
