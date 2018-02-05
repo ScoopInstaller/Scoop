@@ -1,11 +1,11 @@
 {
     "homepage": "https://github.com/Azure/draft",
     "license": "https://github.com/Azure/draft/blob/master/LICENSE",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "architecture": {
         "64bit": {
-            "url": "https://azuredraft.blob.core.windows.net/draft/draft-v0.10.0-windows-amd64.tar.gz",
-            "hash": "340083b5739b2473ddbef4cf5765a9122b80147dc0aefe0ae640271454314844"
+            "url": "https://azuredraft.blob.core.windows.net/draft/draft-v0.10.1-windows-amd64.tar.gz",
+            "hash": "ba27cb2b48bbdca3a27a950e7e2e97464c8b9e3f372711acfdf7bf973174a5e0"
         }
     },
     "extract_dir": "windows-amd64",
