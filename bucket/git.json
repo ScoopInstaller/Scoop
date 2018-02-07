@@ -2,15 +2,15 @@
     "##": "Maintainers: when updating this manifest to a new version, you might like to also update git-with-openssh.json",
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL2",
-    "version": "2.16.1.windows.3",
+    "version": "2.16.1.windows.4",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.16.1.windows.3/PortableGit-2.16.1.3-64-bit.7z.exe#/dl.7z",
-            "hash": "bcb3ca27ae151313ab369d9f39b018129035d7fa018fa0df364424b6e22be4d3"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.16.1.windows.4/PortableGit-2.16.1.4-64-bit.7z.exe#/dl.7z",
+            "hash": "a2191f676d77f8b8ba88501b8d373dc5418845c52dca86313ec449881af14cbd"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.16.1.windows.3/PortableGit-2.16.1.3-32-bit.7z.exe#/dl.7z",
-            "hash": "ae4cf93c391c66698856b8b38ba3a42e7fcc7141f61531562134f72b1c014f36"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.16.1.windows.4/PortableGit-2.16.1.4-32-bit.7z.exe#/dl.7z",
+            "hash": "5d3e89163cb8b88484d906f8ba53604279e3d7b8c170e39d89116aa5c7274f26"
         }
     },
     "bin": [
