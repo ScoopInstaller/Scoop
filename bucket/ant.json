@@ -1,10 +1,10 @@
 {
     "homepage": "https://ant.apache.org/",
-    "version": "1.10.1",
+    "version": "1.10.2",
     "license": "Apache 2.0",
-    "url": "https://www-us.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.zip",
-    "hash": "sha512:cf85d2b52ac379eaf83ae98544fd0317833a57811764cb1f5082f1ef046ba4f069bddf980f594ca00a93e1b37b4e646fdc8885a37651c5c9e8fc5d2b595256f6",
-    "extract_dir": "apache-ant-1.10.1",
+    "url": "https://www-us.apache.org/dist/ant/binaries/apache-ant-1.10.2-bin.zip",
+    "hash": "sha512:2b6b3b1769a38e0037c8f3825ffeb2094fbb2985128f3b03d1b10d792e75850d13cf04513a0c59a8ca89f1a446ca509def0bd5c2f2644f51054f56f2007a29d9",
+    "extract_dir": "apache-ant-1.10.2",
     "env_add_path": "bin",
     "env_set": {
         "ANT_HOME": "$dir"
