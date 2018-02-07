@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.consul.io",
     "license": "Mozilla Public License 2.0",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "architecture": {
         "64bit": {
-            "url": "https://releases.hashicorp.com/consul/1.0.3/consul_1.0.3_windows_amd64.zip",
-            "hash": "287581af4f30a19921bb6c3c4d80282dddae7e8ccced135366af83358e3f62a5"
+            "url": "https://releases.hashicorp.com/consul/1.0.5/consul_1.0.5_windows_amd64.zip",
+            "hash": "2b16d12b32bb37b373f955d17f9cac606505a6391d87532a4dd81024f03b70bc"
         },
         "32bit": {
-            "url": "https://releases.hashicorp.com/consul/1.0.3/consul_1.0.3_windows_386.zip",
-            "hash": "1beb71cf1da5563d1dc05beb309b6a3bb2a884733bf8f9a9c3a851d148691712"
+            "url": "https://releases.hashicorp.com/consul/1.0.5/consul_1.0.5_windows_386.zip",
+            "hash": "b60609be51d53433a08f58e9f177fabd39af30b043462930abc73fb373b2fcec"
         }
     },
     "bin": [
