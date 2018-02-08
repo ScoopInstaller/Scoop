@@ -1,11 +1,11 @@
 {
     "homepage": "https://helm.sh/",
     "license": "https://github.com/kubernetes/helm/blob/master/LICENSE",
-    "version": "2.8.0",
+    "version": "2.8.1",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/kubernetes-helm/helm-v2.8.0-windows-amd64.tar.gz",
-            "hash": "c84d880680de4be85c6d52b1c394a6113e8d7da52e058de46cffcf88728291bf"
+            "url": "https://storage.googleapis.com/kubernetes-helm/helm-v2.8.1-windows-amd64.tar.gz",
+            "hash": "c2eff97ff48b3d089701deec642529f4e87947c0e46022e1b6fd2bbcb005cdbc"
         }
     },
     "extract_dir": "windows-amd64",
