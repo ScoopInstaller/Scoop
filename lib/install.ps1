@@ -672,7 +672,7 @@ function run_uninstaller($manifest, $architecture, $dir, $bucket) {
                 $bucketdir = $(bucketdir $bucket)
                 $exe = "$bucketdir\$($uninstaller.bucket_file)"
                 if(!(is_in_dir $bucketdir $exe)) {
-                    warn "Error in manifest: Installer $exe is outside the app directory, skipping."
+                    warn "Error in manifest: Installer $exe is outside the bucket directory, skipping."
                     $exe = $null;
                 }
             } else {
