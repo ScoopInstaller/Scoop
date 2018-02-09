@@ -42,7 +42,10 @@
     "env_add_path": [
         "scripts"
     ],
-    "checkver": "<p>Latest: <a href=\".*\">Python ([\\d.]+)</a> - <a.*>.*</a></p>",
+    "checkver": {
+        "url": "https://www.python.org/downloads/windows/",
+        "re": "Latest Python 3 Release - Python ([\\d.]+)"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
