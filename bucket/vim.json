@@ -19,7 +19,46 @@
             "vim.exe",
             "vi"
         ],
-        "gvim.exe"
+        [
+            "gvim.cmd",
+            "gvim"
+        ]
+    ],
+    "pre_install": [
+        "# Create gvim.cmd",
+        "@\"",
+        "@echo off",
+        "setlocal",
+        "set VIM_EXE_DIR=$dir",
+        "if exist \"%VIM_EXE_DIR%\\gvim.exe\" goto havevim",
+        "echo \"%VIM_EXE_DIR%\\gvim.exe\" not found",
+        "goto eof",
+        ":havevim",
+        "rem collect the arguments in VIMARGS for Win95",
+        "set VIMARGS=",
+        "set VIMNOFORK=",
+        ":loopstart",
+        "if .%1==. goto loopend",
+        "if NOT .%1==.--nofork goto noforklongarg",
+        "set VIMNOFORK=1",
+        ":noforklongarg",
+        "if NOT .%1==.-f goto noforkarg",
+        "set VIMNOFORK=1",
+        ":noforkarg",
+        "set VIMARGS=%VIMARGS% %1",
+        "shift",
+        "goto loopstart",
+        ":loopend",
+        "rem for WinNT we can use %*",
+        "if .%VIMNOFORK%==.1 goto noforknt",
+        "start \"dummy\" /b \"%VIM_EXE_DIR%\\gvim.exe\"  %*",
+        "goto eof",
+        ":noforknt",
+        "start \"dummy\" /b /wait \"%VIM_EXE_DIR%\\gvim.exe\"  %*",
+        ":eof",
+        "set VIMARGS=",
+        "set VIMNOFORK=",
+        "\"@ | out-file -encoding oem \"$dir\\gvim.cmd\""
     ],
     "post_install": "if( !(test-path ~\\.vimrc) -and !(test-path ~\\_vimrc) -and !(test-path ~\\vimfiles\\vimrc) -and !(test-path $env:VIM\\_vimrc) ) {
         cp \"$dir\\vimrc_example.vim\" ~\\_vimrc
