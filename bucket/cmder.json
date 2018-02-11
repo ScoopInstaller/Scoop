@@ -1,12 +1,12 @@
 {
     "homepage": "http://cmder.net",
-    "version": "1.3.4",
+    "version": "1.3.5",
     "license": "MIT",
     "persist": [
         "config"
     ],
-    "url": "https://github.com/cmderdev/cmder/releases/download/v1.3.4/cmder_mini.zip",
-    "hash": "6a80ea6f6e90251fcc17756c50bf2277ccbc4eac662295161cd59b39c530b50f",
+    "url": "https://github.com/cmderdev/cmder/releases/download/v1.3.5/cmder_mini.zip",
+    "hash": "dd1b7a555e11ec8526d8a2bb9beb871a16628af5b96e72607b2cad9c2ae5b4a7",
     "bin": "Cmder.exe",
     "shortcuts": [
         [
