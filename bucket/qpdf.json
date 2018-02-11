@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://sourceforge.net/projects/qpdf/files/qpdf/7.1.1/qpdf-7.1.1-bin-mingw64.zip",
-            "hash": "d98e13963822a48e43f5433e96e22f4a6c9ca690b8d6af8b3c11229a41a0cf2a"
+            "hash": "sha512:9e01309cd911c9ffae0487d50094bafe727a6645ee7dc7be9d12248b2e15e5818763f81d2bbbff5aae4723ad126ff153e0dd06654f6e82f8202d338a8658569b"
         },
         "32bit": {
             "url": "https://sourceforge.net/projects/qpdf/files/qpdf/7.1.1/qpdf-7.1.1-bin-mingw32.zip",
-            "hash": "5bf9c6f3131e9415c3ccbc029501c8aa369f581b426afabbc49e566fd729fc3a"
+            "hash": "sha512:929fe51b1e8d7e31b7fe431ed70f734872f43d3e0d1e73b205122b66c35c59bdf98c322c73f2bc2b55affb6720a2f86c36e441c3f5e22e5c928f9bedb9cad951"
         }
     },
     "extract_dir": "qpdf-7.1.1",
