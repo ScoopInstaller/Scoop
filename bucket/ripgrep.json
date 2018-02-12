@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/BurntSushi/ripgrep/releases/download/0.8.0/ripgrep-0.8.0-x86_64-pc-windows-msvc.zip",
-            "hash": "1500c7957a7a80790fc5f0afbe36b8e500583a0e37b5c078cfd434ba2fd99e47"
+            "hash": "db91da02074418628361995648b31fc16ef97a87def082ac285ab4e1041dc557"
         },
         "32bit": {
             "url": "https://github.com/BurntSushi/ripgrep/releases/download/0.8.0/ripgrep-0.8.0-i686-pc-windows-msvc.zip",
-            "hash": "be1b0a8ce10f76b558feef9a2e00dfcaf2641f960705a742a7a8c978a8188e97"
+            "hash": "e48ad9df4285e8ace26804c8985ea647d3ee3682f4279c3d42a16c419c47321e"
         }
     },
     "bin": "rg.exe",
