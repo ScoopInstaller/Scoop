@@ -1,17 +1,17 @@
 {
-    "version": "3.4.1",
+    "version": "20180213-474194a",
     "homepage": "https://ffmpeg.zeranoe.com/builds/",
     "license": "GPL3",
     "architecture": {
         "64bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-3.4.1-win64-static.zip",
-            "hash": "c7d9f3e5db788a73c5601cf5581f7d0e26018ba697ff6e3e48990093cac740be",
-            "extract_dir": "ffmpeg-3.4.1-win64-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20180213-474194a-win64-static.zip",
+            "hash": "2f5ba9dec9d1e76915b3e214b0d4b8cb2bbb95dca386bd5e59fbd28e6047b922",
+            "extract_dir": "ffmpeg-20180213-474194a-win64-static"
         },
         "32bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-3.4.1-win32-static.zip",
-            "hash": "c0312b4b99598761e918aab7e24a0169b3394d49451143c9b9b81220addb9767",
-            "extract_dir": "ffmpeg-3.4.1-win32-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-20180213-474194a-win32-static.zip",
+            "hash": "1ab7ec1cae584e0a11990404e4bf368a23924a1b55328b40c37fc8b370a669ed",
+            "extract_dir": "ffmpeg-20180213-474194a-win32-static"
         }
     },
     "bin": [
@@ -19,7 +19,7 @@
         "bin\\ffplay.exe",
         "bin\\ffprobe.exe"
     ],
-    "checkver": "name=\"v\"\\s+value=\"([\\d.]+)\"",
+    "checkver": "value=\"([\\d]{8}-[\\d\\w]+)\"",
     "autoupdate": {
         "architecture": {
             "64bit": {
