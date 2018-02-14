@@ -234,6 +234,9 @@ function shim($path, $global, $name, $arg) {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         $shim_cmd = "$(strip_ext($shim)).cmd"
         "@`"$(resolve-path $path)`" $arg %*" | out-file $shim_cmd -encoding ascii
+
+        $shim_sh = "$(strip_ext($shim))"
+        "#!/bin/sh`ncmd `"$(resolve-path $path)`" `"$@`"" | out-file $shim_sh -encoding ascii
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
         $shim_cmd = "$(strip_ext($shim)).cmd"
@@ -248,11 +251,10 @@ set args=%args:)=``)%
 set invalid=`"='
 if !args! == !invalid! ( set args= )
 powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
-    }
 
-    # make command accessible from sh terminals
-    $shim_cmd = $(strip_ext($shim))
-    "#!/bin/sh`npowershell -ex unrestricted `"$(resolve-path $path)`" `"$@`"" | out-file $shim_cmd -encoding ascii
+        $shim_sh = "$(strip_ext($shim))"
+        "#!/bin/sh`npowershell -ex unrestricted `"$(resolve-path $path)`" `"$@`"" | out-file $shim_sh -encoding ascii
+    }
 }
 
 function ensure_in_path($dir, $global) {
