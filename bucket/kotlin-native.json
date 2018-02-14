@@ -1,10 +1,10 @@
 {
     "homepage": "https://kotlinlang.org/",
-    "version": "0.5",
+    "version": "0.6",
     "license": "Apache 2.0",
-    "url": "https://github.com/JetBrains/kotlin-native/releases/download/v0.5/kotlin-native-windows-0.5.zip",
-    "hash": "b2b18093fe04ad234fe5e99e547c43cb884d44e0900a1d519d85ae4adf97b47a",
-    "extract_dir": "kotlin-native-windows-0.5",
+    "url": "https://github.com/JetBrains/kotlin-native/releases/download/v0.6/kotlin-native-windows-0.6.zip",
+    "hash": "91208ed7721be03e3cee2a3f5dfe8992d26e1367523fee524aac6705b7d078b8",
+    "extract_dir": "kotlin-native-windows-0.6",
     "bin": [
         "bin\\cinterop.bat",
         "bin\\klib.bat",
