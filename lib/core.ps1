@@ -236,7 +236,7 @@ function shim($path, $global, $name, $arg) {
         "@`"$(resolve-path $path)`" $arg %*" | out-file $shim_cmd -encoding ascii
 
         $shim_sh = "$(strip_ext($shim))"
-        "#!/bin/sh`ncmd `"$(resolve-path $path)`" $arg `"$@`"" | out-file $shim_sh -encoding ascii
+        "#!/bin/sh`ncmd //C `"$(resolve-path $path)`" $arg `"$@`"" | out-file $shim_sh -encoding ascii
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
         $shim_cmd = "$(strip_ext($shim)).cmd"
