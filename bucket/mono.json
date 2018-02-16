@@ -7,7 +7,7 @@
     "extract_dir": "Mono",
     "env_add_path": "bin",
     "checkver": {
-        "url": "http://www.mono-project.com/download/",
+        "url": "http://www.mono-project.com/download/stable/",
         "re": "(?<short>[\\d.]+)/windows-installer/(?<file>mono-(?<version>[\\d.]+).*win32.*).msi"
     },
     "autoupdate": {
