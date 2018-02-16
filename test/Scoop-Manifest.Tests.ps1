@@ -6,9 +6,9 @@ describe "manifest-validation" {
     beforeall {
         $working_dir = setup_working "manifest"
         $schema = "$psscriptroot/../schema.json"
-        Add-Type -Path "$psscriptroot\..\supporting\validator\Newtonsoft.Json.dll"
-        Add-Type -Path "$psscriptroot\..\supporting\validator\Newtonsoft.Json.Schema.dll"
-        Add-Type -Path "$psscriptroot\..\supporting\validator\Scoop.Validator.dll"
+        Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Newtonsoft.Json.dll"
+        Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Newtonsoft.Json.Schema.dll"
+        Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Scoop.Validator.dll"
     }
 
     it "Scoop.Validator is available" {

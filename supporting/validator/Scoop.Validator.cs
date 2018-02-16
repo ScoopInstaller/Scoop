@@ -83,6 +83,16 @@ namespace Scoop
 
         public bool Validate()
         {
+            if (!this.SchemaFile.Exists)
+            {
+                Console.WriteLine("ERROR: Please provide schema.json!");
+                return false;
+            }
+            if (!this.ManifestFile.Exists)
+            {
+                Console.WriteLine("ERROR: Please provide manifest.json!");
+                return false;
+            }
             this.Errors.Clear();
             try
             {
