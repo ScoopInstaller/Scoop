@@ -211,6 +211,18 @@ function shim($path, $global, $name, $arg) {
     popd
     $resolved_path = resolve-path $path
 
+    $warned = $FALSE
+    if ([System.IO.File]::Exists("$shim.ps1")) {
+        $reader = [System.IO.File]::OpenText("$shim.ps1")
+        $data = $reader.ReadLine().replace("`r","").replace("`n","")
+        $reader.Close()
+        if ($data -match "([^/\\]+)[/\\]current") {
+            $data = $Matches[1]
+        }
+        warn "Overwriting $shim.ps1 installed from $data"
+        $warned = $TRUE
+    }
+
     # if $path points to another drive resolve-path prepends .\ which could break shims
     if($relative_path -match "^(.\\[\w]:).*$") {
         write-output "`$path = `"$path`"" | out-file "$shim.ps1" -encoding utf8
@@ -229,6 +241,18 @@ function shim($path, $global, $name, $arg) {
     }
 
     if($path -match '\.exe$') {
+
+        if ((!$warned) -and [System.IO.File]::Exists("$shim.shim")) {
+            $reader = [System.IO.File]::OpenText("$shim.shim")
+            $data = $reader.ReadLine().replace("`r","").replace("`n","")
+            $reader.Close()
+            if ($data -match "([^/\\]+)[/\\]current") {
+                $data = $Matches[1]
+            }
+            warn "Overwriting $shim.shim installed from $data"
+            $warned = $TRUE
+        }
+
         # for programs with no awareness of any shell
         cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
@@ -236,11 +260,33 @@ function shim($path, $global, $name, $arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
         }
     } elseif($path -match '\.((bat)|(cmd))$') {
+        if ((!$warned) -and [System.IO.File]::Exists("$shim.cmd")) {
+            $reader = [System.IO.File]::OpenText("$shim.cmd")
+            $data = $reader.ReadLine().replace("`r","").replace("`n","")
+            $reader.Close()
+            if ($data -match "([^/\\]+)[/\\]current") {
+                $data = $Matches[1]
+            }
+            warn "Overwriting $shim.cmd installed from $data"
+            $warned = $TRUE
+        }
+
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
         "#!/bin/sh`ncmd //C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.ps1$') {
+        if ((!$warned) -and [System.IO.File]::Exists("$shim.cmd")) {
+            $reader = [System.IO.File]::OpenText("$shim.cmd")
+            $data = $reader.ReadLine().replace("`r","").replace("`n","")
+            $reader.Close()
+            if ($data -match "([^/\\]+)[/\\]current") {
+                $data = $Matches[1]
+            }
+            warn "Overwriting $shim.cmd installed from $data"
+            $warned = $TRUE
+        }
+
         # make ps1 accessible from cmd.exe
         "@echo off
 setlocal enabledelayedexpansion
