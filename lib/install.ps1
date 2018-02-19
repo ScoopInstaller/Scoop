@@ -701,8 +701,10 @@ function rm_shim($name, $shimdir) {
     }
 
     # other shim types might be present
-    '.exe', '.shim', '.cmd' | % {
-        if(test-path "$shimdir\$name$_") { rm "$shimdir\$name$_" }
+    '', '.exe', '.shim', '.cmd' | % {
+        if(test-path -Path "$shimdir\$name$_" -PathType leaf) {
+            rm "$shimdir\$name$_"
+        }
     }
 }
 
