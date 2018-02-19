@@ -219,8 +219,10 @@ function shim($path, $global, $name, $arg) {
         if ($data -match "([^/\\]+)[/\\]current") {
             $data = $Matches[1]
         }
-        warn "Overwriting $shim.ps1 installed from $data"
-        $warned = $TRUE
+        if (!($name -like $data)) {
+            warn "Overwriting $shim.ps1 installed from $data"
+            $warned = $TRUE
+        }
     }
 
     # if $path points to another drive resolve-path prepends .\ which could break shims
@@ -249,8 +251,10 @@ function shim($path, $global, $name, $arg) {
             if ($data -match "([^/\\]+)[/\\]current") {
                 $data = $Matches[1]
             }
-            warn "Overwriting $shim.shim installed from $data"
-            $warned = $TRUE
+            if (!($name -like $data)) {
+                warn "Overwriting $shim.shim installed from $data"
+                $warned = $TRUE
+            }
         }
 
         # for programs with no awareness of any shell
@@ -267,8 +271,10 @@ function shim($path, $global, $name, $arg) {
             if ($data -match "([^/\\]+)[/\\]current") {
                 $data = $Matches[1]
             }
-            warn "Overwriting $shim.cmd installed from $data"
-            $warned = $TRUE
+            if (!($name -like $data)) {
+                warn "Overwriting $shim.cmd installed from $data"
+                $warned = $TRUE
+            }
         }
 
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
@@ -283,8 +289,10 @@ function shim($path, $global, $name, $arg) {
             if ($data -match "([^/\\]+)[/\\]current") {
                 $data = $Matches[1]
             }
-            warn "Overwriting $shim.cmd installed from $data"
-            $warned = $TRUE
+            if (!($name -like $data)) {
+                warn "Overwriting $shim.cmd installed from $data"
+                $warned = $TRUE
+            }
         }
 
         # make ps1 accessible from cmd.exe
