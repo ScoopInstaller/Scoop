@@ -198,6 +198,29 @@ function movedir($from, $to) {
     }
 }
 
+$warned_on_overwrite = @{}
+
+function warn_on_overwrite($filename) {
+    $name = [System.IO.Path]::GetFileNameWithoutExtension($filename)
+    if ($warned_on_overwrite.ContainsKey($name)) {
+        return
+    }
+    if ([System.IO.File]::Exists($filename)) {
+        $reader = [System.IO.File]::OpenText($filename)
+        $data = $reader.ReadLine().replace("`r","").replace("`n","")
+        $reader.Close()
+        if ($data -match '([^/\\]+)[/\\]current[/\\]([^"]+)') {
+            $data = $Matches[1]
+            $filename = $Matches[2]
+        }
+        if ((!$data) -or $name -like $data) {
+            return
+        }
+        warn "Overwriting $filename installed from $data"
+        $warned_on_overwrite[$name] = $filename
+    }
+}
+
 function shim($path, $global, $name, $arg) {
     if(!(test-path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
@@ -211,19 +234,7 @@ function shim($path, $global, $name, $arg) {
     popd
     $resolved_path = resolve-path $path
 
-    $warned = $FALSE
-    if ([System.IO.File]::Exists("$shim.ps1")) {
-        $reader = [System.IO.File]::OpenText("$shim.ps1")
-        $data = $reader.ReadLine().replace("`r","").replace("`n","")
-        $reader.Close()
-        if ($data -match "([^/\\]+)[/\\]current") {
-            $data = $Matches[1]
-        }
-        if (!($name -like $data)) {
-            warn "Overwriting $shim.ps1 installed from $data"
-            $warned = $TRUE
-        }
-    }
+    warn_on_overwrite "$shim.ps1"
 
     # if $path points to another drive resolve-path prepends .\ which could break shims
     if($relative_path -match "^(.\\[\w]:).*$") {
@@ -243,58 +254,21 @@ function shim($path, $global, $name, $arg) {
     }
 
     if($path -match '\.exe$') {
-
-        if ((!$warned) -and [System.IO.File]::Exists("$shim.shim")) {
-            $reader = [System.IO.File]::OpenText("$shim.shim")
-            $data = $reader.ReadLine().replace("`r","").replace("`n","")
-            $reader.Close()
-            if ($data -match "([^/\\]+)[/\\]current") {
-                $data = $Matches[1]
-            }
-            if (!($name -like $data)) {
-                warn "Overwriting $shim.shim installed from $data"
-                $warned = $TRUE
-            }
-        }
-
         # for programs with no awareness of any shell
         cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$shim.exe" -force
+        warn_on_overwrite "$shim.shim"
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
         }
     } elseif($path -match '\.((bat)|(cmd))$') {
-        if ((!$warned) -and [System.IO.File]::Exists("$shim.cmd")) {
-            $reader = [System.IO.File]::OpenText("$shim.cmd")
-            $data = $reader.ReadLine().replace("`r","").replace("`n","")
-            $reader.Close()
-            if ($data -match "([^/\\]+)[/\\]current") {
-                $data = $Matches[1]
-            }
-            if (!($name -like $data)) {
-                warn "Overwriting $shim.cmd installed from $data"
-                $warned = $TRUE
-            }
-        }
-
+        warn_on_overwrite "$shim.cmd"
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
         "#!/bin/sh`ncmd //C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.ps1$') {
-        if ((!$warned) -and [System.IO.File]::Exists("$shim.cmd")) {
-            $reader = [System.IO.File]::OpenText("$shim.cmd")
-            $data = $reader.ReadLine().replace("`r","").replace("`n","")
-            $reader.Close()
-            if ($data -match "([^/\\]+)[/\\]current") {
-                $data = $Matches[1]
-            }
-            if (!($name -like $data)) {
-                warn "Overwriting $shim.cmd installed from $data"
-                $warned = $TRUE
-            }
-        }
-
+        warn_on_overwrite "$shim.cmd"
         # make ps1 accessible from cmd.exe
         "@echo off
 setlocal enabledelayedexpansion
