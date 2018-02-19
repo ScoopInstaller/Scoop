@@ -17,29 +17,29 @@ $global = installed_apps $true | % { @{ name = $_; global = $true } }
 $apps = @($local) + @($global)
 
 if($apps) {
-    write-host "Installed apps$(if($query) { `" matching '$query'`"}): `n"
+    write-output ""
     $apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
         $app = $_.name
         $global = $_.global
         $ver = current_version $app $global
-
         $install_info = install_info $app $ver $global
-        write-host "  $app " -NoNewline
-        write-host -f DarkCyan $ver -NoNewline
+
+        $str = "$app $ver";
+
         if($global) {
-            write-host -f DarkRed ' *global*' -NoNewline
+            $str = "$str *global*"
         }
         if ($install_info.bucket) {
-            write-host -f Yellow " [$($install_info.bucket)]" -NoNewline
+            $str = "$str [$($install_info.bucket)]"
         } elseif ($install_info.url) {
-            write-host -f Yellow " [$($install_info.url)]" -NoNewline
+            $str = "$str [$($install_info.url)]"
         }
         if ($install_info.architecture -and $def_arch -ne $install_info.architecture) {
-            write-host -f DarkRed " {$($install_info.architecture)}" -NoNewline
+            $str = "$str {$($install_info.architecture)}"
         }
-        write-host ''
+        write-output $str
     }
-    write-host ''
+    write-output ""
     exit 0
 } else {
     write-host "There aren't any apps installed."
