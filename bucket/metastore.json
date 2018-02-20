@@ -2,10 +2,10 @@
     "description": "Store and restore metadata from a filesystem",
     "homepage": "https://github.com/rasa/metastore",
     "license": "GPL-2.0",
-    "version": "v1.1.2-9-gdafa727",
+    "version": "1.1.2-9-gdafa727",
     "bin": "metastore.exe",
     "checkver": {
-        "re": "/releases/tag/([vga-f0-9.-]+)\"",
+        "re": "/releases/tag/v([ga-f0-9.-]+)\"",
         "url": "https://github.com/rasa/metastore/releases/latest"
     },
     "architecture": {
@@ -21,10 +21,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/rasa/metastore/releases/download/$version/metastore-x64.exe#/metastore.exe"
+                "url": "https://github.com/rasa/metastore/releases/download/v$version/metastore-x64.exe#/metastore.exe"
             },
             "32bit": {
-                "url": "https://github.com/rasa/metastore/releases/download/$version/metastore.exe"
+                "url": "https://github.com/rasa/metastore/releases/download/v$version/metastore.exe"
             }
         }
     }
