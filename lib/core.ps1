@@ -198,6 +198,33 @@ function movedir($from, $to) {
     }
 }
 
+$warned_on_overwrite = @{}
+
+function warn_on_overwrite($filename) {
+    if (!([System.IO.File]::Exists($filename))) {
+        return
+    }
+    $name = [System.IO.Path]::GetFileNameWithoutExtension($filename).tolower()
+    if ($warned_on_overwrite.ContainsKey($name)) {
+        return
+    }
+    $reader = [System.IO.File]::OpenText($filename)
+    $line = $reader.ReadLine().replace("`r","").replace("`n","")
+    $reader.Close()
+    if (!$line) {
+        return
+    }
+    if ($line -match '([^/\\]+)[/\\]current[/\\]([^"]+)') {
+        $line = $Matches[1]
+        $filename = $Matches[2]
+    }
+    if ($name -like $line) {
+        return
+    }
+    warn "Overwriting $filename installed from $line"
+    $warned_on_overwrite[$name] = $filename
+}
+
 function shim($path, $global, $name, $arg) {
     if(!(test-path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
@@ -210,6 +237,8 @@ function shim($path, $global, $name, $arg) {
     $relative_path = resolve-path -relative $path
     popd
     $resolved_path = resolve-path $path
+
+    warn_on_overwrite "$shim.ps1"
 
     # if $path points to another drive resolve-path prepends .\ which could break shims
     if($relative_path -match "^(.\\[\w]:).*$") {
@@ -231,16 +260,19 @@ function shim($path, $global, $name, $arg) {
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
         cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$shim.exe" -force
+        warn_on_overwrite "$shim.shim"
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
         }
     } elseif($path -match '\.((bat)|(cmd))$') {
+        warn_on_overwrite "$shim.cmd"
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
         "#!/bin/sh`ncmd //C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.ps1$') {
+        warn_on_overwrite "$shim.cmd"
         # make ps1 accessible from cmd.exe
         "@echo off
 setlocal enabledelayedexpansion
