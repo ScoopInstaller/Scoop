@@ -201,24 +201,28 @@ function movedir($from, $to) {
 $warned_on_overwrite = @{}
 
 function warn_on_overwrite($filename) {
-    $name = [System.IO.Path]::GetFileNameWithoutExtension($filename)
+    if (!([System.IO.File]::Exists($filename))) {
+        return
+    }
+    $name = [System.IO.Path]::GetFileNameWithoutExtension($filename).tolower()
     if ($warned_on_overwrite.ContainsKey($name)) {
         return
     }
-    if ([System.IO.File]::Exists($filename)) {
-        $reader = [System.IO.File]::OpenText($filename)
-        $data = $reader.ReadLine().replace("`r","").replace("`n","")
-        $reader.Close()
-        if ($data -match '([^/\\]+)[/\\]current[/\\]([^"]+)') {
-            $data = $Matches[1]
-            $filename = $Matches[2]
-        }
-        if ((!$data) -or $name -like $data) {
-            return
-        }
-        warn "Overwriting $filename installed from $data"
-        $warned_on_overwrite[$name] = $filename
+    $reader = [System.IO.File]::OpenText($filename)
+    $line = $reader.ReadLine().replace("`r","").replace("`n","")
+    $reader.Close()
+    if (!$line) {
+        return
     }
+    if ($line -match '([^/\\]+)[/\\]current[/\\]([^"]+)') {
+        $line = $Matches[1]
+        $filename = $Matches[2]
+    }
+    if ($name -like $line) {
+        return
+    }
+    warn "Overwriting $filename installed from $line"
+    $warned_on_overwrite[$name] = $filename
 }
 
 function shim($path, $global, $name, $arg) {
