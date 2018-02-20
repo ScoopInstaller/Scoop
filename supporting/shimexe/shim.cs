@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace shim {
+namespace Scoop {
 
     class Program {
         [DllImport("kernel32.dll", SetLastError=true)]

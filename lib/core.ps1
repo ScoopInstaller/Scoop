@@ -230,7 +230,7 @@ function shim($path, $global, $name, $arg) {
 
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
-        cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$shim.exe" -force
+        cp "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append

@@ -6,7 +6,8 @@ $project_file_exclusions = @(
     $([regex]::Escape($repo_dir)+'(\\|/).git(\\|/).*$'),
     '.sublime-workspace$',
     '.DS_Store$',
-    'supporting(\\|/)validator(\\|/)packages(\\|/)*'
+    'supporting(\\|/)validator(\\|/)packages(\\|/)*',
+    'supporting(\\|/)shimexe(\\|/)packages(\\|/)*'
 )
 
 describe 'Project code' {
