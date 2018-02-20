@@ -198,12 +198,44 @@ function movedir($from, $to) {
     }
 }
 
+function get_app_name($path) {
+    if ($path -match '([^/\\]+)[/\\]current[/\\]') {
+        return $Matches[1].tolower()
+    }
+    return ""
+}
+
+$warned_on_overwrite = @{}
+
+function warn_on_overwrite($shim_ps1, $path) {
+    if (!([System.IO.File]::Exists($shim_ps1))) {
+        return
+    }
+    $shim = [System.IO.Path]::GetFileNameWithoutExtension($shim_ps1).tolower()
+    if ($warned_on_overwrite.ContainsKey($shim)) {
+        return
+    }
+    $reader = [System.IO.File]::OpenText($shim_ps1)
+    $line = $reader.ReadLine().replace("`r","").replace("`n","")
+    $reader.Close()
+    $shim_app = get_app_name $line
+    $path_app = get_app_name $path
+    if ($shim_app -eq $path_app) {
+        return
+    }
+    $filename = [System.IO.Path]::GetFileName($path)
+    warn "Overwriting shim to $filename installed from $shim_app"
+    $warned_on_overwrite[$shim] = $shim_ps1
+}
+
 function shim($path, $global, $name, $arg) {
     if(!(test-path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
     if(!$name) { $name = strip_ext (fname $path) }
 
     $shim = "$abs_shimdir\$($name.tolower())"
+
+    warn_on_overwrite "$shim.ps1" $path
 
     # convert to relative path
     pushd $abs_shimdir
