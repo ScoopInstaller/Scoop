@@ -1,0 +1,33 @@
+{
+    "description": "Store encrypted data in git repository",
+    "homepage": "https://www.agwa.name/projects/git-crypt/",
+    "license": "GPL-3.0",
+    "version": "0.6.0",
+    "bin": "git-crypt.exe",
+    "checkver": {
+        "github": "https://github.com/rasa/git-crypt"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/rasa/git-crypt/releases/download/0.6.0/git-crypt-x64.exe#/git-crypt.exe",
+            "hash": "8eabe3850943472b9e339c48c93895064d95d833eee62426aa0688baecd7cf2e"
+        },
+        "32bit": {
+            "url": "https://github.com/rasa/git-crypt/releases/download/0.6.0/git-crypt.exe",
+            "hash": "d4d7b46488815c6fb6b108bd20ef1291f6a1bf2b5bff1dcf41043e6d35e437ee"
+        }
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/rasa/git-crypt/releases/download/$version/git-crypt-x64.exe#/git-crypt.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/rasa/git-crypt/releases/download/$version/git-crypt.exe"
+            }
+        },
+        "hash": {
+            "url": "https://github.com/rasa/git-crypt/releases/tag/$version"
+        }
+    }
+}
