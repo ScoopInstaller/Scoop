@@ -5,8 +5,7 @@
     "version": "0.6.0",
     "bin": "git-crypt.exe",
     "checkver": {
-        "re": "/releases/tag/([\\d.]+)",
-        "url": "https://github.com/rasa/git-crypt/releases"
+        "github": "https://github.com/rasa/git-crypt"
     },
     "architecture": {
         "64bit": {
@@ -26,6 +25,9 @@
             "32bit": {
                 "url": "https://github.com/rasa/git-crypt/releases/download/$version/git-crypt.exe"
             }
+        },
+        "hash": {
+            "url": "https://github.com/rasa/git-crypt/releases/tag/$version"
         }
     }
 }
