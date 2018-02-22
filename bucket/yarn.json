@@ -20,7 +20,7 @@
     ],
     "post_install": "
         yarn config set cache-folder \"$dir\\cache\"
-        yarn config set yarn-offline-mirror \"$dir\\mirror"
+        yarn config set yarn-offline-mirror \"$dir\\mirror\"
         yarn config set prefix \"$dir\"
     ",
     "env_add_path": [
