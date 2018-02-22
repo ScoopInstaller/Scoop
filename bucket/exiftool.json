@@ -1,9 +1,9 @@
 {
     "homepage": "https://sno.phy.queensu.ca/~phil/exiftool/index.html",
-    "version": "10.79",
+    "version": "10.80",
     "license": "https://dev.perl.org/licenses/",
-    "url": "https://sourceforge.net/projects/exiftool/files/exiftool-10.79.zip",
-    "hash": "sha1:53045f1082390be3f612e18811589e29d4aa200d",
+    "url": "https://sourceforge.net/projects/exiftool/files/exiftool-10.80.zip",
+    "hash": "sha1:ac57ffe104e4016c1e7f588c7ebbe04194f3d038",
     "bin": [
         [
             "exiftool(-k).exe",
