@@ -15,10 +15,12 @@
     "hash": "d2a4f6887381df152b0595fcf3b5590c6a7bc7b380ed364ad9f11595d099664d",
     "persist": [
         "cache",
-        "bin"
+        "bin",
+        "mirror"
     ],
     "post_install": "
         yarn config set cache-folder \"$dir\\cache\"
+        yarn config set yarn-offline-mirror \"$dir\\mirror\"
         yarn config set prefix \"$dir\"
     ",
     "env_add_path": [
