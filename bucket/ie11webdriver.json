@@ -1,15 +1,15 @@
 {
-    "version": "3.8.0",
+    "version": "3.9.0",
     "homepage": "http://www.seleniumhq.org/",
     "bin": "IEDriverServer.exe",
     "architecture": {
         "64bit": {
-            "url": "https://selenium-release.storage.googleapis.com/3.8/IEDriverServer_x64_3.8.0.zip",
-            "hash": "d1e633dece685e506d06159bd70850711d38fd47c74b1db241b9020db796b92f"
+            "url": "https://selenium-release.storage.googleapis.com/3.9/IEDriverServer_x64_3.9.0.zip",
+            "hash": "c2018b82f1e992d73e2f2e8d2711717d5441667fce4002c6649fda992a7546ef"
         },
         "32bit": {
-            "url": "https://selenium-release.storage.googleapis.com/3.8/IEDriverServer_Win32_3.8.0.zip",
-            "hash": "17d0d4095c6fdfd8b8699eefb8fadd7fcfa322f789d9cba43aafc5e40c88789a"
+            "url": "https://selenium-release.storage.googleapis.com/3.9/IEDriverServer_Win32_3.9.0.zip",
+            "hash": "0f083ec3dce2f40459aefe850a820c98bb4428bebc51ab3834387d4e35071fd1"
         }
     },
     "checkver": {
