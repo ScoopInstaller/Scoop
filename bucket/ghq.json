@@ -1,0 +1,27 @@
+{
+    "homepage": "https://github.com/motemen/ghq",
+    "version": "0.8.0",
+    "license": "MIT License",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/motemen/ghq/releases/download/v0.8.0/ghq_windows_amd64.zip",
+            "hash": "08b3aace14b1dfba38422400f3566ce4d98a49a2c1f260f083eba49f31e9938b"
+        },
+        "32bit": {
+            "url": "https://github.com/motemen/ghq/releases/download/v0.8.0/ghq_windows_386.zip",
+            "hash": "67012b204914d8c54bca5a840e78f48c2c59f45b922caa4bf1cba533748447ea"
+        }
+    },
+    "bin": "ghq.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/motemen/ghq/releases/download/v$version/ghq_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/motemen/ghq/releases/download/v$version/ghq_windows_386.zip"
+            }
+        }
+    }
+}
