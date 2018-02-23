@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/motemen/ghq/releases/download/v0.8.0/ghq_windows_amd64.zip",
-            "hash": "08b3aace14b1dfba38422400f3566ce4d98a49a2c1f260f083eba49f31e9938b"
+            "hash": "sha1:181d62a33acd5bdd132a96f6dae6831cdf977320"
         },
         "32bit": {
             "url": "https://github.com/motemen/ghq/releases/download/v0.8.0/ghq_windows_386.zip",
-            "hash": "67012b204914d8c54bca5a840e78f48c2c59f45b922caa4bf1cba533748447ea"
+            "hash": "sha1:a611c0da3629936904bb05fcab33935cf0fb17a7"
         }
     },
     "bin": "ghq.exe",
@@ -22,6 +22,9 @@
             "32bit": {
                 "url": "https://github.com/motemen/ghq/releases/download/v$version/ghq_windows_386.zip"
             }
+        },
+        "hash": {
+            "url": "https://github.com/motemen/ghq/releases/download/v$version/SHASUMS"
         }
     }
 }
