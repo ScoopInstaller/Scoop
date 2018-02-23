@@ -10,11 +10,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/rasa/git-crypt/releases/download/0.6.0-701fb8e/git-crypt-x64.exe#/git-crypt.exe",
-            "hash": "8ccaac66aab2215f2f78cbafc827fd5e6312f76f17f484a1c4a50c9158701e36"
+            "hash": "ae9126b1fe96b723a7d29fc53755d9e3ea81a454378a28f8baad78607143d1ce"
         },
         "32bit": {
             "url": "https://github.com/rasa/git-crypt/releases/download/0.6.0-701fb8e/git-crypt.exe",
-            "hash": "234228590c584413bd3739c9b81eeaf0443d80edb76c224988bd148a894739d2"
+            "hash": "52a0087796381e401d15f16b8c819e64b8dc76d6b850799a086fb18d5022bd4e"
         }
     },
     "autoupdate": {
