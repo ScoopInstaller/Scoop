@@ -43,6 +43,10 @@
             "32bit": {
                 "url": "https://github.com/git-for-windows/git/releases/download/v$matchVersion/PortableGit-$matchShort-32-bit.7z.exe#/dl.7z"
             }
+        },
+        "hash": {
+            "url": "https://github.com/git-for-windows/git/releases/latest",
+            "find": "<td>$basename<\\/td>\\s*<td>([0-9a-fA-F]+)<\\/td>"
         }
     }
 }
