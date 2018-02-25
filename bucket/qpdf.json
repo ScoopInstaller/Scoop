@@ -1,18 +1,18 @@
 {
     "homepage": "http://qpdf.sourceforge.net/",
-    "version": "8.0.",
+    "version": "8.0.0",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/qpdf/files/qpdf/8.0./qpdf-8.0.-bin-mingw64.zip",
-            "hash": "3d0ef53dfff337253562fb69553a6ae2a3762a627cb8f2288d01d80cb92bd3a5"
+            "url": "https://sourceforge.net/projects/qpdf/files/qpdf/8.0.0/qpdf-8.0.0-bin-mingw64.zip",
+            "hash": "7a07d3f7cca5c0b38ca811984ef8da536da32932d68c1a6cce33ec2462b930bf"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/qpdf/files/qpdf/8.0./qpdf-8.0.-bin-mingw32.zip",
-            "hash": "cc0de7344d77e2988d31489b8786b65869ae6cdf80bf6b0ae4e3e26585d339aa"
+            "url": "https://sourceforge.net/projects/qpdf/files/qpdf/8.0.0/qpdf-8.0.0-bin-mingw32.zip",
+            "hash": "7a07d3f7cca5c0b38ca811984ef8da536da32932d68c1a6cce33ec2462b930bf"
         }
     },
-    "extract_dir": "qpdf-8.0.",
+    "extract_dir": "qpdf-8.0.0",
     "bin": "bin\\qpdf.exe",
     "checkver": {
         "github": "https://github.com/qpdf/qpdf",
