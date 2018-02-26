@@ -450,11 +450,15 @@ function is_scoop_outdated() {
     return $last_update -lt  $now.ToLocalTime()
 }
 
-function substitute([String] $str, [Hashtable] $params) {
-    $params.GetEnumerator() | % {
-        $str = $str.Replace($_.Name, $_.Value)
+function substitute($entity, [Hashtable] $params) {
+    if ($entity -is [Array]) {
+        return $entity | % { substitute $_ $params }
+    } elseif ($entity -is [String]) {
+        $params.GetEnumerator() | % {
+            $entity = $entity.Replace($_.Name, $_.Value)
+        }
+        return $entity
     }
-    return $str
 }
 
 function format_hash([String] $hash) {
