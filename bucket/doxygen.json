@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.windows.x64.bin.zip",
-            "hash": "742f77a3a55ae438076958e7103e95864fd8ed62ee86ce203e092a6792618f9c"
+            "hash": "e2d635a05fb0516311071cfcc41a3859fa22a912b484ed2c2ddec70248b75845"
         },
         "32bit": {
             "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.windows.bin.zip",
-            "hash": "c88e2ff9b5a27a255e8d4c655cd63f5a6c3786e016ce7c88fc585cc58f2c8704"
+            "hash": "c08900ffda8ed911746c86ad3354ad86084715cfd39ceca938f7bc2ead7988fc"
         }
     },
     "bin": [
