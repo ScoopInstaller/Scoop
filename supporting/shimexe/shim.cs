@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -18,6 +19,7 @@ namespace Scoop {
             uint dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory,
             [In] ref STARTUPINFO lpStartupInfo,
             out PROCESS_INFORMATION lpProcessInformation);
+        const int ERROR_ELEVATION_REQUIRED = 740;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         struct STARTUPINFO {
@@ -97,7 +99,24 @@ namespace Scoop {
                 lpStartupInfo: ref si,
                 lpProcessInformation: out pi)) {
 
-                return Marshal.GetLastWin32Error();
+                var error = Marshal.GetLastWin32Error();
+                if(error == ERROR_ELEVATION_REQUIRED) {
+                    // Unfortunately, ShellExecute() does not allow us to run program without
+                    // CREATE_NEW_CONSOLE, so we can not replace CreateProcess() completely.
+                    // The good news is we are okay with CREATE_NEW_CONSOLE when we run program with elevation.
+                    Process process = new Process();
+                    process.StartInfo = new ProcessStartInfo(path, cmd_args);
+                    process.StartInfo.UseShellExecute = true;
+                    try {
+                        process.Start();
+                    }
+                    catch(Win32Exception exception) {
+                        return exception.ErrorCode;
+                    }
+                    process.WaitForExit();
+                    return process.ExitCode;
+                }
+                return error;
             }
 
             WaitForSingleObject(pi.hProcess, INFINITE);
