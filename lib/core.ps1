@@ -205,14 +205,8 @@ function get_app_name($path) {
     return ""
 }
 
-$warned_on_overwrite = @{}
-
 function warn_on_overwrite($shim_ps1, $path) {
     if (!([System.IO.File]::Exists($shim_ps1))) {
-        return
-    }
-    $shim = [System.IO.Path]::GetFileNameWithoutExtension($shim_ps1).tolower()
-    if ($warned_on_overwrite.ContainsKey($shim)) {
         return
     }
     $reader = [System.IO.File]::OpenText($shim_ps1)
@@ -225,7 +219,6 @@ function warn_on_overwrite($shim_ps1, $path) {
     }
     $filename = [System.IO.Path]::GetFileName($path)
     warn "Overwriting shim to $filename installed from $shim_app"
-    $warned_on_overwrite[$shim] = $shim_ps1
 }
 
 function shim($path, $global, $name, $arg) {
