@@ -113,6 +113,8 @@ function search_remotes($query) {
     }
 }
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 if (!$local_results -and !(github_ratelimit_reached)) {
     $remote_results = search_remotes $query
     if(!$remote_results) { [console]::error.writeline("No matches found."); exit 1 }
