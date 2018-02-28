@@ -1,5 +1,6 @@
 {
     "homepage": "https://virustotal.github.io/yara/",
+    "description": "The pattern matching swiss knife for malware researchers (and everyone else)",
     "license": "BSD-3-Clause",
     "version": "3.7.0",
     "architecture": {
