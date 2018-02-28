@@ -1,5 +1,6 @@
 {
     "homepage": "https://jedisct1.github.io/minisign/",
+    "description": "A dead simple tool to sign files and verify signatures",
     "license": "https://github.com/jedisct1/minisign/blob/master/LICENSE",
     "version": "0.8",
     "url": "https://github.com/jedisct1/minisign/releases/download/0.8/minisign-win32.zip",
