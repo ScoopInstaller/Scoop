@@ -1,5 +1,6 @@
 {
     "homepage": "https://upx.github.io/",
+    "description": "UPX is a free, portable, extendable, high-performance executable packer for several executable formats",
     "version": "3.94",
     "url": "https://github.com/upx/upx/releases/download/v3.94/upx394w.zip",
     "hash": "74308db1183436576d011bfcc3e7c99c836fb052de7b7eb0539026366453d6e8",

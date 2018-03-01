@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/BurntSushi/xsv",
+    "description": "A fast CSV command line toolkit written in Rust",
     "license": "Unlicense",
     "version": "0.12.2",
     "architecture": {

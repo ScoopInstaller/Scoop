@@ -15,7 +15,7 @@
     "bin": "dotnet.exe",
     "checkver": {
         "url": "https://www.microsoft.com/net/download/windows",
-        "re": "Download .NET Core ([\\d.]+) SDK"
+        "re": "Download .NET Core SDK ([\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
