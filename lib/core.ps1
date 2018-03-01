@@ -269,6 +269,15 @@ powershell -noprofile -ex unrestricted `"& '$resolved_path' %args%;exit `$lastex
     }
 }
 
+function search_in_path($target) {
+    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
+    $path.split(';') | % {
+        if(test-path "$_\$target") {
+            return "$_\$target"
+        }
+    }
+}
+
 function ensure_in_path($dir, $global) {
     $path = env 'PATH' $global
     $dir = fullpath $dir
