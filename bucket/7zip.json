@@ -1,5 +1,6 @@
 {
     "homepage": "http://www.7-zip.org/",
+    "description": "A free and open-source file archiver with a high compression ratio",
     "license": "http://www.7-zip.org/license.txt",
     "version": "18.01",
     "architecture": {
