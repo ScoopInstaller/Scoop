@@ -12,7 +12,7 @@
             "hash": "sha512:e4d4872733710ddb93bb00fe724a63be4c7fb352d120841c255a89fc42c3e81da8749c201f63ecfc0e86cb473c9854da719e92a3e665f0c380c3e7cf862b1db3"
         }
     },
-    "bin": "dotnet.exe",
+    "env_add_path": ".",
     "checkver": {
         "url": "https://www.microsoft.com/net/download/windows",
         "re": "Download .NET Core SDK ([\\d.]+)"
