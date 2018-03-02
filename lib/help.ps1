@@ -1,16 +1,16 @@
 function usage($text) {
-    $text | sls '(?m)^# Usage: ([^\n]*)$' | % { "Usage: " + $_.matches[0].groups[1].value }
+    $text | Select-String '(?m)^# Usage: ([^\n]*)$' | ForEach-Object { "Usage: " + $_.matches[0].groups[1].value }
 }
 
 function summary($text) {
-    $text | sls '(?m)^# Summary: ([^\n]*)$' | % { $_.matches[0].groups[1].value }
+    $text | Select-String '(?m)^# Summary: ([^\n]*)$' | ForEach-Object { $_.matches[0].groups[1].value }
 }
 
 function help($text) {
-    $help_lines = $text | sls '(?ms)^# Help:(.(?!^[^#]))*' | % { $_.matches[0].value; }
+    $help_lines = $text | Select-String '(?ms)^# Help:(.(?!^[^#]))*' | ForEach-Object { $_.matches[0].value; }
     $help_lines -replace '(?ms)^#\s?(Help: )?', ''
 }
 
 function my_usage { # gets usage for the calling script
-    usage (gc $myInvocation.PSCommandPath -raw)
+    usage (Get-Content $myInvocation.PSCommandPath -raw)
 }

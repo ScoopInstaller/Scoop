@@ -23,7 +23,7 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     }
 
     # Find file content
-    $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
+    $digest = $data.RDF.Content | Where-Object { [String]$_.about -eq $filename }
 
     return format_hash $digest.sha256
 }
@@ -195,7 +195,7 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
 
     # check if there are architecture specific variants
     if ($json.architecture -and $json.autoupdate.architecture) {
-        $json.architecture | Get-Member -MemberType NoteProperty | % {
+        $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
             $architecture = $_.Name
             if ($json.architecture.$architecture.$prop -and $json.autoupdate.architecture.$architecture.$prop) {
                 $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) $substitutions
@@ -223,7 +223,7 @@ function get_version_substitutions([String] $version, [Hashtable] $customMatches
         $versionVariables.Set_Item('$matchTail', $matches['tail'])
     }
     if($customMatches) {
-        $customMatches.GetEnumerator() | % {
+        $customMatches.GetEnumerator() | ForEach-Object {
             if($_.Name -ne "0") {
                 $versionVariables.Set_Item('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
             }
@@ -262,7 +262,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             throw "Could not update $app"
         }
     } else {
-        $json.architecture | Get-Member -MemberType NoteProperty | % {
+        $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
             $valid = $true
             $architecture = $_.Name
 

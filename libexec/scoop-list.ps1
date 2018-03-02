@@ -11,14 +11,14 @@ param($query)
 reset_aliases
 $def_arch = default_architecture
 
-$local = installed_apps $false | % { @{ name = $_ } }
-$global = installed_apps $true | % { @{ name = $_; global = $true } }
+$local = installed_apps $false | ForEach-Object { @{ name = $_ } }
+$global = installed_apps $true | ForEach-Object { @{ name = $_; global = $true } }
 
 $apps = @($local) + @($global)
 
 if($apps) {
     write-host "Installed apps$(if($query) { `" matching '$query'`"}): `n"
-    $apps | sort { $_.name } | ? { !$query -or ($_.name -match $query) } | % {
+    $apps | Sort-Object { $_.name } | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
         $app = $_.name
         $global = $_.global
         $ver = current_version $app $global

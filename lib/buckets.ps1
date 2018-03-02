@@ -9,7 +9,7 @@ function bucketdir($name) {
 function known_bucket_repos {
     $dir = versiondir 'scoop' 'current'
     $json = "$dir\buckets.json"
-    gc $json -raw | convertfrom-json -ea stop
+    Get-Content $json -raw | convertfrom-json -ea stop
 }
 
 function known_bucket_repo($name) {
@@ -18,13 +18,13 @@ function known_bucket_repo($name) {
 }
 
 function apps_in_bucket($dir) {
-    gci $dir | ? { $_.name.endswith('.json') } | % { $_ -replace '.json$', '' }
+    Get-ChildItem $dir | Where-Object { $_.name.endswith('.json') } | ForEach-Object { $_ -replace '.json$', '' }
 }
 
 function buckets {
     $buckets = @()
     if(test-path $bucketsdir) {
-        gci $bucketsdir | % { $buckets += $_.name }
+        Get-ChildItem $bucketsdir | ForEach-Object { $buckets += $_.name }
     }
     $buckets
 }

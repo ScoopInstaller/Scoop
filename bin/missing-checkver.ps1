@@ -18,7 +18,7 @@ write-host -f cyan "A" -nonewline
 write-host "]utoupdate"
 write-host " |  |"
 
-gci $dir "*.json" | % {
+Get-ChildItem $dir "*.json" | ForEach-Object {
     $json = parse_json "$dir\$_"
 
     if ($skipSupported -and $json.checkver -and $json.autoupdate) {

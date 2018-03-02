@@ -14,12 +14,12 @@ if($app) { $search = $app }
 
 # get apps to check
 $apps = @()
-gci $dir "$search.json" | % {
+Get-ChildItem $dir "$search.json" | ForEach-Object {
     $json = parse_json "$dir\$_"
     $apps += ,@(($_ -replace '\.json$', ''), $json)
 }
 
-$apps |% {
+$apps | ForEach-Object {
     $app, $json = $_
     write-host "$app`: " -nonewline
 

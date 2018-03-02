@@ -7,7 +7,7 @@ function manifest_path($app, $bucket) {
 
 function parse_json($path) {
     if(!(test-path $path)) { return $null }
-    gc $path -raw -Encoding UTF8 | convertfrom-json -ea stop
+    Get-Content $path -raw -Encoding UTF8 | convertfrom-json -ea stop
 }
 
 function url_manifest($url) {
@@ -30,7 +30,7 @@ function manifest($app, $bucket, $url) {
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
     if($url) { (new-object net.webclient).downloadstring($url) > "$dir\manifest.json" }
-    else { cp (manifest_path $app $bucket) "$dir\manifest.json" }
+    else { Copy-Item (manifest_path $app $bucket) "$dir\manifest.json" }
 }
 
 function installed_manifest($app, $version, $global) {
@@ -38,8 +38,8 @@ function installed_manifest($app, $version, $global) {
 }
 
 function save_install_info($info, $dir) {
-    $nulls = $info.keys | ? { $info[$_] -eq $null }
-    $nulls | % { $info.remove($_) } # strip null-valued
+    $nulls = $info.keys | Where-Object { $info[$_] -eq $null }
+    $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
     $info | convertto-json | out-file "$dir\install.json"
 }

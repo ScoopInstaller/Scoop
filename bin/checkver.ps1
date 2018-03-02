@@ -31,7 +31,7 @@ if($app) { $search = $app }
 
 # get apps to check
 $queue = @()
-gci $dir "$search.json" | % {
+Get-ChildItem $dir "$search.json" | ForEach-Object {
     $json = parse_json "$dir\$_"
     if($json.checkver) {
         $queue += ,@($_, $json)
@@ -39,14 +39,14 @@ gci $dir "$search.json" | % {
 }
 
 # clear any existing events
-get-event | % {
+get-event | ForEach-Object {
     remove-event $_.sourceidentifier
 }
 
 $original = use_any_https_protocol
 
 # start all downloads
-$queue | % {
+$queue | ForEach-Object {
     $wc = new-object net.webclient
     $wc.Headers.Add("user-agent", "Scoop/1.0 (+http://scoop.sh/) (Windows NT 6.1; WOW64)")
     register-objectevent $wc downloadstringcompleted -ea stop | out-null
@@ -168,7 +168,7 @@ while($in_progress -gt 0) {
 
         if($match -and $match.Success) {
             $matchesHashtable = @{}
-            $regex.GetGroupNames() | % { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
+            $regex.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
             $ver = $matchesHashtable['1']
             if ($replace) {
                 $ver = $regex.replace($match.Value, $replace)

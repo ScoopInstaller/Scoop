@@ -15,7 +15,7 @@ if($app) {
         if([string]::isnullorempty($manifest.homepage)) {
             abort "Could not find homepage in manifest for '$app'."
         }
-        start $manifest.homepage
+        Start-Process $manifest.homepage
     }
     else {
         abort "Could not find manifest for '$app'."
