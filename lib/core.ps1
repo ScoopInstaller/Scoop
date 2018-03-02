@@ -18,6 +18,13 @@ $globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | select -first 1
 
+# Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
+# for all communication with api.github.com
+function enable-encryptionscheme($scheme) {
+  [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor $scheme
+}
+enable-encryptionscheme "Tls12"
+
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 
