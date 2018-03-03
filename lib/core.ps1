@@ -3,20 +3,20 @@
 #       Old installations should continue to work using the old path.
 #       There is currently no automatic migration path to deal
 #       with updating old installations to the new path.
-$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | select -first 1
+$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | Select-Object -first 1
 
 $oldscoopdir = "$env:LOCALAPPDATA\scoop"
 if((test-path $oldscoopdir) -and !$env:SCOOP) {
     $scoopdir = $oldscoopdir
 }
 
-$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
+$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | Select-Object -first 1
 
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | select -first 1
+$cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
 # for all communication with api.github.com
@@ -29,7 +29,7 @@ enable-encryptionscheme "Tls12"
 function coalesce($a, $b) { if($a) { return $a } $b }
 
 function format($str, $hash) {
-    $hash.keys | % { set-variable $_ $hash[$_] }
+    $hash.keys | ForEach-Object { set-variable $_ $hash[$_] }
     $executionContext.invokeCommand.expandString($str)
 }
 function is_admin {
@@ -82,7 +82,7 @@ function installed($app, $global=$null) {
 function installed_apps($global) {
     $dir = appsdir $global
     if(test-path $dir) {
-        gci $dir | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
+        Get-ChildItem $dir | Where-Object { $_.psiscontainer -and $_.name -ne 'scoop' } | ForEach-Object { $_.name }
     }
 }
 
@@ -108,7 +108,7 @@ function app_status($app, $global) {
     }
 
     $status.missing_deps = @()
-    $deps = @(runtime_deps $manifest) | ? { !(installed $_) }
+    $deps = @(runtime_deps $manifest) | Where-Object { !(installed $_) }
     if($deps) {
         $status.missing_deps += ,$deps
     }
@@ -213,9 +213,9 @@ function shim($path, $global, $name, $arg) {
     $shim = "$abs_shimdir\$($name.tolower())"
 
     # convert to relative path
-    pushd $abs_shimdir
+    Push-Location $abs_shimdir
     $relative_path = resolve-path -relative $path
-    popd
+    Pop-Location
     $resolved_path = resolve-path $path
 
     # if $path points to another drive resolve-path prepends .\ which could break shims
@@ -237,7 +237,7 @@ function shim($path, $global, $name, $arg) {
 
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
-        cp "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
+        Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
@@ -292,7 +292,7 @@ function ensure_architecture($architecture_opt) {
 
 function ensure_all_installed($apps, $global) {
     $installed = @()
-    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | % {
+    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | ForEach-Object {
         $app = $_
         if(installed $app $false) {
             $installed += ,@($app, $false)
@@ -312,7 +312,7 @@ function ensure_all_installed($apps, $global) {
 
 function strip_path($orig_path, $dir) {
     if($orig_path -eq $null) { $orig_path = '' }
-    $stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
+    $stripped = [string]::join(';', @( $orig_path.split(';') | Where-Object { $_ -and $_ -ne $dir } ))
     return ($stripped -ne $orig_path), $stripped
 }
 
@@ -338,7 +338,7 @@ function ensure_scoop_in_path($global) {
 }
 
 function ensure_robocopy_in_path {
-    if(!(gcm robocopy -ea ignore)) {
+    if(!(Get-Command robocopy -ea ignore)) {
         shim "C:\Windows\System32\Robocopy.exe" $false
     }
 }
@@ -347,9 +347,9 @@ function wraptext($text, $width) {
     if(!$width) { $width = $host.ui.rawui.windowsize.width };
     $width -= 1 # be conservative: doesn't seem to print the last char
 
-    $text -split '\r?\n' | % {
+    $text -split '\r?\n' | ForEach-Object {
         $line = ''
-        $_ -split ' ' | % {
+        $_ -split ' ' | ForEach-Object {
             if($line.length -eq 0) { $line = $_ }
             elseif($line.length + $_.length + 1 -le $width) { $line += " $_" }
             else { $lines += ,$line; $line = $_ }
@@ -383,7 +383,7 @@ $default_aliases = @{
 }
 
 function reset_alias($name, $value) {
-    if($existing = get-alias $name -ea ignore |? { $_.options -match 'readonly' }) {
+    if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
             write-host "Alias $name is read-only; can't reset it." -f darkyellow
         }
@@ -401,8 +401,8 @@ function reset_alias($name, $value) {
 
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = get-alias |? { $_.options -notmatch 'readonly|allscope' } |% { $_.name }
-    get-childitem function: | % {
+    $aliases = get-alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
+    get-childitem function: | ForEach-Object {
         $fn = $_.name
         if($aliases -contains $fn) {
             set-alias $fn local:$fn -scope script
@@ -410,13 +410,13 @@ function reset_aliases() {
     }
 
     # set default aliases
-    $default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
+    $default_aliases.keys | ForEach-Object { reset_alias $_ $default_aliases[$_] }
 }
 
 # convert list of apps to list of ($app, $global) tuples
 function applist($apps, $global) {
     if(!$apps) { return @() }
-    return ,@($apps |% { ,@($_, $global) })
+    return ,@($apps | ForEach-Object { ,@($_, $global) })
 }
 
 function app($app) {
@@ -459,9 +459,9 @@ function is_scoop_outdated() {
 
 function substitute($entity, [Hashtable] $params) {
     if ($entity -is [Array]) {
-        return $entity | % { substitute $_ $params }
+        return $entity | ForEach-Object { substitute $_ $params }
     } elseif ($entity -is [String]) {
-        $params.GetEnumerator() | % {
+        $params.GetEnumerator() | ForEach-Object {
             $entity = $entity.Replace($_.Name, $_.Value)
         }
         return $entity

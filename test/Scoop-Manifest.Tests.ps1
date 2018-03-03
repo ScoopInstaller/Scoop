@@ -46,13 +46,13 @@ describe "manifest-validation" {
     context "manifest validates against the schema" {
         beforeall {
             $bucketdir = "$psscriptroot\..\bucket\"
-            $manifest_files = gci $bucketdir *.json
+            $manifest_files = Get-ChildItem $bucketdir *.json
             $validator = new-object Scoop.Validator($schema, $true)
         }
 
         $global:quota_exceeded = $false
 
-        $manifest_files | % {
+        $manifest_files | ForEach-Object {
             it "$_" {
                 $file = $_ # exception handling may overwrite $_
 

@@ -22,7 +22,7 @@ function do_uninstall($app, $global) {
     $install = install_info $app $version $global
     $architecture = $install.architecture
 
-    echo "Uninstalling '$app'"
+    Write-Output "Uninstalling '$app'"
     run_uninstaller $manifest $architecture $dir
     rm_shims $manifest $global $architecture
 
@@ -36,7 +36,7 @@ function do_uninstall($app, $global) {
 
     $appdir = appdir $app $global
     try {
-        rm -r -force $appdir -ea stop
+        Remove-Item -r -force $appdir -ea stop
     } catch {
         $errors = $true
         warn "Couldn't remove $(friendly_path $appdir): $_.exception"
@@ -44,7 +44,7 @@ function do_uninstall($app, $global) {
 }
 function rm_dir($dir) {
     try {
-        rm -r -force $dir -ea stop
+        Remove-Item -r -force $dir -ea stop
     } catch {
         abort "Couldn't remove $(friendly_path $dir): $_"
     }
@@ -53,11 +53,11 @@ function rm_dir($dir) {
 # run uninstallation for each app if necessary, continuing if there's
 # a problem deleting a directory (which is quite likely)
 if($global) {
-    installed_apps $true | % { # global apps
+    installed_apps $true | ForEach-Object { # global apps
         do_uninstall $_ $true
     }
 }
-installed_apps $false | % { # local apps
+installed_apps $false | ForEach-Object { # local apps
     do_uninstall $_ $false
 }
 

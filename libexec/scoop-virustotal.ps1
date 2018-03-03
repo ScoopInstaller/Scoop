@@ -162,7 +162,7 @@ if($apps_param -eq '*') {
 
 $requests = 0
 
-$apps | % {
+$apps | ForEach-Object {
     ($app, $global) = $_
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
@@ -189,7 +189,7 @@ $apps | % {
         $url = @($url)
     }
 
-    $hash | % { $i = 0 } {
+    $hash | ForEach-Object { $i = 0 } {
         $requests += 1
         if ($requests -eq 5) {
             info("Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit")

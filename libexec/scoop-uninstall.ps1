@@ -36,7 +36,7 @@ if($apps -eq 'scoop') {
 $apps = ensure_all_installed $apps $global
 if(!$apps) { exit 0 }
 
-$apps | % {
+$apps | ForEach-Object {
     ($app, $global) = $_
 
     $version = current_version $app $global
@@ -71,7 +71,7 @@ $apps | % {
     env_rm $manifest $global
 
     try {
-        rm -r $dir -ea stop -force
+        Remove-Item -r $dir -ea stop -force
     } catch {
         error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
         continue
@@ -83,7 +83,7 @@ $apps | % {
         write-host "Removing older version ($oldver)."
         $dir = versiondir $app $oldver $global
         try {
-            rm -r -force -ea stop $dir
+            Remove-Item -r -force -ea stop $dir
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
             continue
@@ -95,7 +95,7 @@ $apps | % {
         try {
             # if last install failed, the directory seems to be locked and this
             # will throw an error about the directory not existing
-            rm -r $appdir -ea stop -force
+            Remove-Item -r $appdir -ea stop -force
         } catch {
             if((test-path $appdir)) { throw } # only throw if the dir still exists
         }
@@ -107,7 +107,7 @@ $apps | % {
 
         if (Test-Path $persist_dir) {
             try {
-                rm -r $persist_dir -ea stop -force
+                Remove-Item -r $persist_dir -ea stop -force
             } catch {
                 error "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use."
                 continue

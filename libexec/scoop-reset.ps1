@@ -20,8 +20,8 @@ if($err) { "scoop reset: $err"; exit 1 }
 if(!$apps) { error 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if($apps -eq '*') {
-    $local = installed_apps $false | % { ,@($_, $false) }
-    $global = installed_apps $true | % { ,@($_, $true) }
+    $local = installed_apps $false | ForEach-Object { ,@($_, $false) }
+    $global = installed_apps $true | ForEach-Object { ,@($_, $true) }
     $apps = @($local) + @($global)
 }
 

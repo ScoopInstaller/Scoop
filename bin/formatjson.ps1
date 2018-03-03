@@ -20,7 +20,7 @@ if ($type -is [System.IO.DirectoryInfo]) {
     exit
 }
 
-$files | % {
+$files | ForEach-Object {
     # beautify
     $json = parse_json "$dir$_" | ConvertToPrettyJson
 
