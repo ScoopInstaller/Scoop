@@ -20,8 +20,10 @@ $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
 # for all communication with api.github.com
-function enable-encryptionscheme($scheme) {
-  [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor $scheme
+function enable-encryptionscheme([Net.SecurityProtocolType]$scheme) {
+    # Net.SecurityProtocolType is a [Flags] enum, binary-OR sets
+    # the specified scheme in addition to whatever scheme is already active
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor $scheme
 }
 enable-encryptionscheme "Tls12"
 
