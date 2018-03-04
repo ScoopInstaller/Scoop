@@ -16,7 +16,7 @@ function requires_lessmsi ($manifest, $architecture) {
 }
 
 function file_requires_7zip($fname) {
-    $fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(7z)|(rar)|(iso)|(xz)|(lzh))$'
+    $fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh))$'
 }
 
 function extract_7zip($path, $to, $recurse) {
