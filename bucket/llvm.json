@@ -4,11 +4,11 @@
     "license": "University of Illinois/NCSA Open Source License",
     "architecture": {
         "32bit": {
-            "url": "https://releases.llvm.org/5.0.1/LLVM-5.0.1-win32.exe/#7z",
+            "url": "https://releases.llvm.org/5.0.1/LLVM-5.0.1-win32.exe#/llvm.7z",
             "hash": "5de70ab482edb2da7ac20126dc58e23a691498aa644ca23a7b10c32c9ee62157"
         },
         "64bit": {
-            "url": "https://releases.llvm.org/5.0.1/LLVM-5.0.1-win64.exe/#7z",
+            "url": "https://releases.llvm.org/5.0.1/LLVM-5.0.1-win64.exe#/llvm.7z",
             "hash": "981543611d719624acb29a2cffd6a479cff36e8ab5ee8a57d8eca4f9c4c6956f"
         }
     },
