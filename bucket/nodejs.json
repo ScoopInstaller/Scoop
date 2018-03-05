@@ -1,17 +1,17 @@
 {
     "homepage": "https://nodejs.org",
-    "version": "9.3.0",
+    "version": "9.7.1",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v9.3.0/node-v9.3.0-win-x64.7z",
-            "hash": "e82bb00c604d01d9512a9a3e501b79c6f21aac1142c61c209b054883a37c8e67",
-            "extract_dir": "node-v9.3.0-win-x64"
+            "url": "https://nodejs.org/dist/v9.7.1/node-v9.7.1-win-x64.7z",
+            "hash": "7e805305d5ec00cd30952287a017203ae0c1ffa1d23fc5028bc3725e6d65583f",
+            "extract_dir": "node-v9.7.1-win-x64"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v9.3.0/node-v9.3.0-win-x86.7z",
-            "hash": "6e986688ad44538f0ab0253f393d20a978dd752586162fd6a036e0a5c45daaae",
-            "extract_dir": "node-v9.3.0-win-x86"
+            "url": "https://nodejs.org/dist/v9.7.1/node-v9.7.1-win-x86.7z",
+            "hash": "854cdff1c4a3a46d7e745ac9c436517b2144ccd8a36420e18c13f1d94d7c7104",
+            "extract_dir": "node-v9.7.1-win-x86"
         }
     },
     "persist": [
@@ -22,10 +22,10 @@
         ".",
         "bin"
     ],
-    "post_install": "
-        # Set npm prefix to install modules inside bin and npm cache so they persist
-        Set-Content -Value \"prefix=$persist_dir\\bin`ncache=$persist_dir\\cache\" -Path $dir\\node_modules\\npm\\npmrc
-    ",
+    "post_install": [
+        "# Set npm prefix to install modules inside bin and npm cache so they persist",
+        "Set-Content -Value \"prefix=$persist_dir\\bin`ncache=$persist_dir\\cache\" -Path \"$dir\\node_modules\\npm\\npmrc\""
+    ],
     "checkver": {
         "url": "https://nodejs.org/dist/latest/",
         "re": "node-v([\\d.]+)-x86.msi"

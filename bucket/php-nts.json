@@ -1,20 +1,21 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.2.0",
+    "version": "7.2.3",
     "license": "https://php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.2.0-nts-Win32-VC15-x64.zip",
-            "hash": "85a325601d0442dcefbd02fd859f3c6cc1580349857c2d21c8be58cd1e4d8f23"
+            "url": "http://windows.php.net/downloads/releases/php-7.2.3-nts-Win32-VC15-x64.zip",
+            "hash": "ddf1428f2896f942142202b7e9ca7cadf61bb71c4cdfa3910ef192c90bf46ea8"
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.2.0-nts-Win32-VC15-x86.zip",
-            "hash": "f5c1317e557ec814377a18af3ad325a59da8a9d127660ab1a03562b14824f686"
+            "url": "http://windows.php.net/downloads/releases/php-7.2.3-nts-Win32-VC15-x86.zip",
+            "hash": "e4d32bcc2e0fddbc17bd9609a4903171aa9d03c03caa88fcbd99fb500c67ea3c"
         }
     },
     "bin": [
         "php.exe",
-        "php-cgi.exe"
+        "php-cgi.exe",
+        "phpdbg.exe"
     ],
     "persist": [
         "cli",

@@ -2,15 +2,15 @@
     "##": "Maintainers: when updating this manifest to a new version, you might like to also update git-with-openssh.json",
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL2",
-    "version": "2.15.1.windows.2",
+    "version": "2.16.2.windows.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.15.1.windows.2/PortableGit-2.15.1.2-64-bit.7z.exe#/dl.7z",
-            "hash": "36847f62418a5c62a7f50650f3662283f8d324602f4a611d592095ee296cd912"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.16.2.windows.1/PortableGit-2.16.2-64-bit.7z.exe#/dl.7z",
+            "hash": "f51853689ad8a9e30759fb263a31bcd59753b3a97272b0e76a4210528a8631a1"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.15.1.windows.2/PortableGit-2.15.1.2-32-bit.7z.exe#/dl.7z",
-            "hash": "8b1973bde82718684945c7373266976c70be55022ac554847a8a201c941952af"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.16.2.windows.1/PortableGit-2.16.2-32-bit.7z.exe#/dl.7z",
+            "hash": "b5a91978956ac14f59ccdbc70c9c8d2f105e730e81ae8316a59791d33f3d6a87"
         }
     },
     "bin": [
@@ -19,6 +19,14 @@
         "cmd\\git-gui.exe",
         "usr\\bin\\tig.exe",
         "git-bash.exe"
+    ],
+    "shortcuts": [
+        [
+            "git-bash.exe",
+            "Git Bash",
+            "--cd-to-home",
+            "usr\\share\\git\\git-for-windows.ico"
+        ]
     ],
     "post_install": [
         "git config --global credential.helper manager"
@@ -44,6 +52,10 @@ and then restart powershell.",
             "32bit": {
                 "url": "https://github.com/git-for-windows/git/releases/download/v$matchVersion/PortableGit-$matchShort-32-bit.7z.exe#/dl.7z"
             }
+        },
+        "hash": {
+            "url": "https://github.com/git-for-windows/git/releases/latest",
+            "find": "<td>$basename<\\/td>\\s*<td>([0-9a-fA-F]+)<\\/td>"
         }
     }
 }

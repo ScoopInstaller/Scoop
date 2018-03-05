@@ -27,7 +27,7 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
     $null, $manifest, $null, $null = locate $app $bucket
     if(!$manifest) { abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })" }
 
-    $deps = @(install_deps $manifest $arch) + @(runtime_deps $manifest) | select -uniq
+    $deps = @(install_deps $manifest $arch) + @(runtime_deps $manifest) | Select-Object -uniq
 
     foreach($dep in $deps) {
         if($resolved -notcontains $dep) {

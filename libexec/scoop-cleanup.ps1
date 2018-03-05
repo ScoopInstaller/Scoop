@@ -35,11 +35,11 @@ function cleanup($app, $global, $verbose) {
     }
 
     write-host -f yellow "Removing $app`:" -nonewline
-    $versions | % {
+    $versions | ForEach-Object {
         $version = $_
         write-host " $version" -nonewline
         $dir = versiondir $app $version $global
-        gci $dir | % {
+        Get-ChildItem $dir | ForEach-Object {
             $file = $_
             if($file.LinkType -ne $null) {
                 fsutil.exe reparsepoint delete $file.FullName | out-null

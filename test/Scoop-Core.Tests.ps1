@@ -92,7 +92,7 @@ describe "unzip_old" {
 
             $to | should exist
 
-            (gci $to).count | should be 0
+            (Get-ChildItem $to).count | should be 0
         }
     }
 
@@ -183,7 +183,7 @@ describe "ensure_robocopy_in_path" {
     context "robocopy is not in path" {
         it "shims robocopy when not on path" -skip:$isUnix {
             mock gcm { $false }
-            gcm robocopy | should be $false
+            Get-Command robocopy | should be $false
 
             ensure_robocopy_in_path
 

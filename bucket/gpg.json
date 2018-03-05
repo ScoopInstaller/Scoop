@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.gnupg.org/",
-    "version": "2.2.4",
+    "version": "2.2.5",
     "license": "GPLv3",
-    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.4_20171220.exe#/dl.7z",
-    "hash": "sha1:d06a1413fd901c51eba14164ddb28d99ab9f84df",
+    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.5_20180222.exe#/dl.7z",
+    "hash": "sha1:080f801e833c7a9e0441d55cd19d4bdb5bb261f9",
     "env_add_path": "bin",
     "checkver": {
         "url": "https://www.gnupg.org/download/integrity_check.html",

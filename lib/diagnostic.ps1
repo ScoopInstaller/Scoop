@@ -9,7 +9,7 @@ function check_windows_defender($global) {
     $defender = get-service -name WinDefend -errorAction SilentlyContinue
     if($defender -and $defender.status) {
         if($defender.status -eq [system.serviceprocess.servicecontrollerstatus]::running) {
-            $hasGetMpPreference = gcm get-mppreference -errorAction SilentlyContinue
+            $hasGetMpPreference = Get-Command get-mppreference -errorAction SilentlyContinue
             if($hasGetMpPreference) {
                 $installPath = $scoopdir;
                 if($global) { $installPath = $globaldir; }

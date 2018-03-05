@@ -1,15 +1,19 @@
 {
     "homepage": "https://miktex.org",
-    "version": "2.9.6521",
+    "version": "2.9.6621",
     "license": "https://miktex.org/copying",
-    "url": "https://ftp.uni-erlangen.de/ctan/systems/win32/miktex/setup/miktex-portable-2.9.6521.exe#/dl.7z",
-    "hash": "745a6fa16593cda188bda10dc0915d2343301b5b0e5ca5a4800cf02385ae48b3",
+    "url": "https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x86/miktex-portable-2.9.6621.exe#/dl.7z",
+    "hash": "cc5a8ef0822378c72a3b95fa43852c740ba8c3b07b440e963db0e73f25a4f213",
     "env_add_path": "texmfs\\install\\miktex\\bin",
     "checkver": {
         "url": "https://miktex.org/portable",
         "re": "miktex-portable-([\\d.]+).exe"
     },
     "autoupdate": {
-        "url": "https://ftp.uni-erlangen.de/ctan/systems/win32/miktex/setup/miktex-portable-$version.exe#/dl.7z"
+        "url": "https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x86/miktex-portable-$version.exe#/dl.7z",
+        "hash": {
+            "url": "https://miktex.org/portable",
+            "find": "SHA-256:</td>\\s*<td>\\s*([a-fA-F0-9]{64})"
+        }
     }
 }

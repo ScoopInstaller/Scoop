@@ -23,7 +23,7 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     }
 
     # Find file content
-    $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
+    $digest = $data.RDF.Content | Where-Object { [String]$_.about -eq $filename }
 
     return format_hash $digest.sha256
 }
@@ -195,7 +195,7 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
 
     # check if there are architecture specific variants
     if ($json.architecture -and $json.autoupdate.architecture) {
-        $json.architecture | Get-Member -MemberType NoteProperty | % {
+        $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
             $architecture = $_.Name
             if ($json.architecture.$architecture.$prop -and $json.autoupdate.architecture.$architecture.$prop) {
                 $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) $substitutions
@@ -204,7 +204,7 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 }
 
-function get_version_substitutions([String] $version, [Hashtable] $matches) {
+function get_version_substitutions([String] $version, [Hashtable] $customMatches) {
     $firstPart = $version.Split('-') | Select-Object -first 1
     $lastPart = $version.Split('-') | Select-Object -last 1
     $versionVariables = @{
@@ -218,10 +218,14 @@ function get_version_substitutions([String] $version, [Hashtable] $matches) {
         '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
         '$preReleaseVersion' = $lastPart;
     }
-    if($matches) {
-        $matches.GetEnumerator() | % {
+    if($version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
+        $versionVariables.Set_Item('$matchHead', $matches['head'])
+        $versionVariables.Set_Item('$matchTail', $matches['tail'])
+    }
+    if($customMatches) {
+        $customMatches.GetEnumerator() | ForEach-Object {
             if($_.Name -ne "0") {
-                $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+                $versionVariables.Set_Item('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
             }
         }
     }
@@ -258,7 +262,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             throw "Could not update $app"
         }
     } else {
-        $json.architecture | Get-Member -MemberType NoteProperty | % {
+        $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
             $valid = $true
             $architecture = $_.Name
 

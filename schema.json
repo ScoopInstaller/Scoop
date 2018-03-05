@@ -98,7 +98,7 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "shortcuts": {
-                    "$ref": "#/definitions/arrayOfArrayOfStrings"
+                    "$ref": "#/definitions/shortcutsArray"
                 },
                 "uninstaller": {
                     "$ref": "#/definitions/uninstaller"
@@ -115,6 +115,18 @@
                     "type": "string"
                 },
                 "minItems": 1,
+                "type": "array"
+            },
+            "minItems": 1,
+            "type": "array"
+        },
+        "shortcutsArray": {
+            "items": {
+                "items": {
+                    "type": "string"
+                },
+                "minItems": 2,
+                "maxItems": 4,
                 "type": "array"
             },
             "minItems": 1,
@@ -232,7 +244,7 @@
                     "type": "string"
                 },
                 "keep": {
-                    "type": "string"
+                    "type": "boolean"
                 }
             },
             "type": "object"
@@ -412,7 +424,7 @@
             "type": "object"
         },
         "shortcuts": {
-            "$ref": "#/definitions/arrayOfArrayOfStrings"
+            "$ref": "#/definitions/shortcutsArray"
         },
         "suggest": {
             "additionalProperties": false,

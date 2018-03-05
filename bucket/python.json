@@ -17,7 +17,7 @@
         "args": [
             "/quiet",
             "InstallAllUsers=$(@{$true=1;$false=0}[$global])",
-            "TargetDir=$dir",
+            "TargetDir=\"$dir\"",
             "AssociateFiles=0",
             "Shortcuts=0",
             "InstallLauncherAllUsers=$(@{$true=1;$false=0}[$global])"
@@ -42,7 +42,10 @@
     "env_add_path": [
         "scripts"
     ],
-    "checkver": "<p>Latest: <a href=\".*\">Python ([\\d.]+)</a> - <a.*>.*</a></p>",
+    "checkver": {
+        "url": "https://www.python.org/downloads/windows/",
+        "re": "Latest Python 3 Release - Python ([\\d.]+)"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {

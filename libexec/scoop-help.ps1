@@ -9,7 +9,7 @@ param($cmd)
 reset_aliases
 
 function print_help($cmd) {
-    $file = gc (command_path $cmd) -raw
+    $file = Get-Content (command_path $cmd) -raw
 
     $usage = usage $file
     $summary = summary $file
@@ -22,14 +22,14 @@ function print_help($cmd) {
 function print_summaries {
     $commands = @{}
 
-    command_files | % {
+    command_files | ForEach-Object {
         $command = command_name $_
-        $summary = summary (gc (command_path $command) -raw)
+        $summary = summary (Get-Content (command_path $command) -raw)
         if(!($summary)) { $summary = '' }
         $commands.add("$command ", $summary) # add padding
     }
 
-    $commands.getenumerator() | sort name | ft -hidetablehead -autosize -wrap
+    $commands.getenumerator() | Sort-Object name | Format-Table -hidetablehead -autosize -wrap
 }
 
 $commands = commands

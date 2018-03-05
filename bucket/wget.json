@@ -1,28 +1,28 @@
 {
     "homepage": "https://eternallybored.org/misc/wget/",
     "license": "GPL3",
-    "version": "1.19.2",
+    "version": "1.19.4",
     "architecture": {
         "64bit": {
             "url": [
-                "https://eternallybored.org/misc/wget/releases/wget-1.19.2-win64.zip"
+                "https://eternallybored.org/misc/wget/releases/wget-1.19.4-win64.zip"
             ],
             "hash": [
-                "34d76a8a75315ccacf9fdd6f0d928b663f74d8ff641de3bbc822f704b82e57ad"
+                "3e370410a7818076a5ee30867a9966098dee5de2a94793e574d2531a6c95f5b9"
             ]
         },
         "32bit": {
             "url": [
-                "https://eternallybored.org/misc/wget/releases/wget-1.19.2-win32.zip"
+                "https://eternallybored.org/misc/wget/releases/wget-1.19.4-win32.zip"
             ],
             "hash": [
-                "2350a4391c6c3b666b6aaf11842009869fba1deae1dfbf4c005e2dc135c69148"
+                "b1a7e4ba4ab7f78e588c1186f2a5d7e1726628a5a66c645e41f8105b7cf5f61c"
             ]
         }
     },
     "bin": "wget.exe",
     "depends": "cacert",
-    "post_install": "\"ca_certificate=$(appdir cacert)\\current\\cacert.pem\" | out-file $dir\\wget.ini -encoding default",
+    "post_install": "\"ca_certificate=$(appdir cacert)\\current\\cacert.pem\" | out-file \"$dir\\wget.ini\" -encoding default",
     "checkver": "<title>GNU Wget ([\\d.]+) for Windows",
     "autoupdate": {
         "architecture": {

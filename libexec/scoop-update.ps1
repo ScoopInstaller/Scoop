@@ -49,7 +49,7 @@ if(!$branch) {
 
 function update_scoop() {
     # check for git
-    $git = try { gcm git -ea stop } catch { $null }
+    $git = try { Get-Command git -ea stop } catch { $null }
     if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     write-host "Updating Scoop..."
@@ -66,27 +66,27 @@ function update_scoop() {
         }
 
         # replace non-git scoop with the git version
-        rm -r -force $currentdir -ea stop
-        mv $newdir $currentdir
+        Remove-Item -r -force $currentdir -ea stop
+        Move-Item $newdir $currentdir
     }
     else {
-        pushd $currentdir
+        Push-Location $currentdir
         git_pull -q
         $res = $lastexitcode
         if($res -ne 0) {
             abort 'Update failed.'
         }
-        popd
+        Pop-Location
     }
 
     ensure_scoop_in_path
     shim "$currentdir\bin\scoop.ps1" $false
 
-    @(buckets) | % {
+    @(buckets) | ForEach-Object {
         write-host "Updating '$_' bucket..."
-        pushd (bucketdir $_)
+        Push-Location (bucketdir $_)
         git_pull -q
-        popd
+        Pop-Location
     }
 
     scoop config lastupdate (get-date)
@@ -106,8 +106,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     if(!$independent) {
         # check dependencies
-        $deps = @(deps $app $architecture) | ? { !(installed $_) }
-        $deps | % { install_app $_ $architecture $global $suggested $use_cache }
+        $deps = @(deps $app $architecture) | Where-Object { !(installed $_) }
+        $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache }
     }
 
     $version = latest_version $app $bucket $url
@@ -181,7 +181,7 @@ if(!$apps) {
         $apps = ensure_all_installed $apps_param $global
     }
     if($apps) {
-        $apps | % {
+        $apps | ForEach-Object {
             ($app, $global) = $_
             $status = app_status $app $global
             if($force -or $status.outdated) {
@@ -199,7 +199,7 @@ if(!$apps) {
 
     $suggested = @{};
     # # $outdated is a list of ($app, $global) tuples
-    $outdated | % { update @_ $quiet $independent $suggested $use_cache }
+    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache }
 }
 
 exit 0

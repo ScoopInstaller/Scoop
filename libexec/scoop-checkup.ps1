@@ -11,8 +11,20 @@ $issues = 0
 $issues += !(check_windows_defender $false)
 $issues += !(check_windows_defender $true)
 
+$globaldir = New-Object System.IO.DriveInfo($globaldir)
+if($globaldir.DriveFormat -ne 'NTFS') {
+    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP_GLOBAL variable to another Drive."
+    $issues++
+}
+
+$scoopdir = New-Object System.IO.DriveInfo($scoopdir)
+if($scoopdir.DriveFormat -ne 'NTFS') {
+    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP variable to another Drive."
+    $issues++
+}
+
 if($issues) {
-    warn "`nFound $issues potential $(pluralize $issues problem problems)."
+    warn "Found $issues potential $(pluralize $issues problem problems)."
 } else {
     success "No problems identified!"
 }

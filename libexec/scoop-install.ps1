@@ -109,13 +109,13 @@ ensure_none_failed $apps $global
 
 $apps, $skip = prune_installed $apps $global
 
-$skip | ? { $explicit_apps -contains $_} | % {
+$skip | Where-Object { $explicit_apps -contains $_} | ForEach-Object {
     $version = @(versions $_ $global)[-1]
     warn "'$_' ($version) is already installed. Skipping."
 }
 
 $suggested = @{};
-$apps | % { install_app $_ $architecture $global $suggested $use_cache }
+$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache }
 
 show_suggestions $suggested
 

@@ -10,13 +10,13 @@ function requires_lessmsi ($manifest, $architecture) {
     $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
     if (!$useLessMsi) { return $false }
 
-    $(url $manifest $architecture |? {
+    $(url $manifest $architecture | Where-Object {
         $_ -match '\.(msi)$'
-    } | measure | select -exp count) -gt 0
+    } | Measure-Object | Select-Object -exp count) -gt 0
 }
 
 function file_requires_7zip($fname) {
-    $fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(7z)|(rar)|(iso)|(xz)|(lzh))$'
+    $fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh))$'
 }
 
 function extract_7zip($path, $to, $recurse) {
@@ -29,5 +29,5 @@ function extract_7zip($path, $to, $recurse) {
         if(test-path "$to\$tar") { extract_7zip "$to\$tar" $to $true }
     }
 
-    if($recurse) { rm $path } # clean up intermediate files
+    if($recurse) { Remove-Item $path } # clean up intermediate files
 }

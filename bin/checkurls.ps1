@@ -20,7 +20,7 @@ $dir = resolve-path $dir
 
 # get apps to check
 $queue = @()
-gci $dir "$search.json" | % {
+Get-ChildItem $dir "$search.json" | ForEach-Object {
     $manifest = parse_json "$dir\$_"
     $queue += ,@($_, $manifest)
 }
@@ -63,7 +63,7 @@ function test_dl($url, $cookies) {
     }
 }
 
-$queue | % {
+$queue | ForEach-Object {
     $name, $manifest = $_
     $urls = @()
     $ok = 0
@@ -71,13 +71,13 @@ $queue | % {
     $errors = @()
 
     if($manifest.url) {
-        $manifest.url | % { $urls += $_ }
+        $manifest.url | ForEach-Object { $urls += $_ }
     } else {
-        url $manifest "64bit" | % { $urls += $_ }
-        url $manifest "32bit" | % { $urls += $_ }
+        url $manifest "64bit" | ForEach-Object { $urls += $_ }
+        url $manifest "32bit" | ForEach-Object { $urls += $_ }
     }
 
-    $urls | % {
+    $urls | ForEach-Object {
         $url, $status, $msg = test_dl $_ $manifest.cookie
         if($msg) { $errors += "$msg ($url)" }
         if($status -eq "OK" -or $status -eq "OpeningData") { $ok += 1 } else { $failed += 1 }
@@ -106,7 +106,7 @@ $queue | % {
     write-host "] " -nonewline
     write-host (strip_ext $name)
 
-    $errors | % {
+    $errors | ForEach-Object {
         write-host -f darkred "       > $_"
     }
 }

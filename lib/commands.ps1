@@ -1,15 +1,15 @@
 function command_files {
-    (gci (relpath '..\libexec')) `
-        + (gci "$scoopdir\shims") `
-        | where { $_.name -match 'scoop-.*?\.ps1$' }
+    (Get-ChildItem (relpath '..\libexec')) `
+        + (Get-ChildItem "$scoopdir\shims") `
+        | Where-Object { $_.name -match 'scoop-.*?\.ps1$' }
 }
 
 function commands {
-    command_files | % { command_name $_ }
+    command_files | ForEach-Object { command_name $_ }
 }
 
 function command_name($filename) {
-    $filename.name | sls 'scoop-(.*?)\.ps1$' | % { $_.matches[0].groups[1].value }
+    $filename.name | Select-String 'scoop-(.*?)\.ps1$' | ForEach-Object { $_.matches[0].groups[1].value }
 }
 
 function command_path($cmd) {
@@ -19,9 +19,9 @@ function command_path($cmd) {
     if (!(Test-Path $cmd_path)) {
         # get path from shim
         $shim_path = "$scoopdir\shims\scoop-$cmd.ps1"
-        $line = ((gc $shim_path) | where { $_.startswith('$path') })
+        $line = ((Get-Content $shim_path) | Where-Object { $_.startswith('$path') })
         if($line) {
-            iex -command "$line"
+            Invoke-Expression -command "$line"
             $cmd_path = $path
         }
         else { $cmd_path = $shim_path }

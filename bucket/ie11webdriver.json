@@ -1,0 +1,29 @@
+{
+    "version": "3.9.0",
+    "homepage": "http://www.seleniumhq.org/",
+    "bin": "IEDriverServer.exe",
+    "architecture": {
+        "64bit": {
+            "url": "https://selenium-release.storage.googleapis.com/3.9/IEDriverServer_x64_3.9.0.zip",
+            "hash": "c2018b82f1e992d73e2f2e8d2711717d5441667fce4002c6649fda992a7546ef"
+        },
+        "32bit": {
+            "url": "https://selenium-release.storage.googleapis.com/3.9/IEDriverServer_Win32_3.9.0.zip",
+            "hash": "0f083ec3dce2f40459aefe850a820c98bb4428bebc51ab3834387d4e35071fd1"
+        }
+    },
+    "checkver": {
+        "url": "http://www.seleniumhq.org/download/",
+        "re": "Download version ([\\d.]+).*[^<]+32 bit Windows IE"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://selenium-release.storage.googleapis.com/$majorVersion.$minorVersion/IEDriverServer_x64_$version.zip"
+            },
+            "32bit": {
+                "url": "https://selenium-release.storage.googleapis.com/$majorVersion.$minorVersion/IEDriverServer_Win32_$version.zip"
+            }
+        }
+    }
+}

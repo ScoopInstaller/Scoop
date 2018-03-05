@@ -6,7 +6,7 @@
     "hash": "fd0617585b88517a3d41d3d206c1dc38058c57b90dfd88c278049a41aeb5be38",
     "bin": "ack.bat",
     "depends": "perl",
-    "pre_install": "Set-Content -Value '@perl.exe %~dp0ack-single-file %*' -Path $dir\\ack.bat",
+    "pre_install": "Set-Content -Value '@perl.exe %~dp0ack-single-file %*' -Path \"$dir\\ack.bat\"",
     "checkver": {
         "url": "https://beyondgrep.com/install/",
         "re": "The current stable version of ack is version ([\\d.]+),"

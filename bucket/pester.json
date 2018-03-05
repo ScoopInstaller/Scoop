@@ -1,10 +1,10 @@
 {
-    "version": "4.1.1",
+    "version": "4.3.1",
     "license": "https://raw.githubusercontent.com/pester/Pester/master/LICENSE",
-    "url": "https://github.com/pester/pester/archive/4.1.1.tar.gz",
+    "url": "https://github.com/pester/pester/archive/4.3.1.tar.gz",
     "homepage": "https://github.com/pester/Pester",
-    "hash": "2e80b95f33f1c22be19100d62763b917662f339a1c4cf3454d434a0d3f433aef",
-    "extract_dir": "pester-4.1.1",
+    "hash": "34cabbfb33d46f9a91386308a3b86023af602845980b6c8507979db5c29214d0",
+    "extract_dir": "pester-4.3.1",
     "bin": "bin\\pester.bat",
     "post_install": "
         $import = \"try { `$null = gcm pester -ea stop; import-module `\"$dir\\pester.psm1`\" } catch { }\"

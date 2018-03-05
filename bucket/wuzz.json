@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/asciimoo/wuzz",
+    "description": "Interactive cli tool for HTTP inspection",
     "version": "0.4.0",
     "license": "AGPL-3.0",
     "architecture": {
