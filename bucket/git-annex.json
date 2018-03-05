@@ -1,0 +1,17 @@
+{
+    "description": "Manage files with git, without comitting them",
+    "homepage": "https://www.agwa.name/projects/git-crypt/",
+    "license": "GPL-3.0",
+    "version": "2018-02-27",
+    "_comment": "Pull version from git: 6.20180219-ge162efdbd",
+    "bin": "usr/bin/git-annex.exe",
+    "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z",
+    "hash": "c57c7d74b5fd63dbf614da829a6320507a11817a55a18b33ba52e1ffa0f30ed4",
+    "checkver": {
+        "url": "https://downloads.kitenet.net/git-annex/windows/current/",
+        "re": ">(\\d{4}-\\d{2}-\\d{2}) "
+    },
+    "autoupdate": {
+        "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z"
+    }
+}
