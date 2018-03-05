@@ -198,7 +198,7 @@ if(is_scoop_outdated) {
 $apps_param = $apps
 
 if($apps_param -eq '*') {
-    $apps = (applist (installed_apps $false) $false) | % {
+    $apps = (applist (installed_apps $false) $false) | ForEach-Object {
                 ($a, $_global_flag_to_drop) = $_
                 $a
             }
@@ -210,7 +210,7 @@ if (!$opt.n -and !$opt."no-depends") {
 
 $requests = 0
 
-$apps | % {
+$apps | ForEach-Object {
     $app = $_
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
@@ -237,7 +237,7 @@ $apps | % {
         $url = @($url)
     }
 
-    $hash | % { $i = 0 } {
+    $hash | ForEach-Object { $i = 0 } {
         try {
             $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
         } catch [Exception] {
