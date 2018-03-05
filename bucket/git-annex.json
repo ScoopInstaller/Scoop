@@ -8,7 +8,7 @@
     "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z",
     "hash": "c57c7d74b5fd63dbf614da829a6320507a11817a55a18b33ba52e1ffa0f30ed4",
     "checkver": {
-        "url": "http://hackage.haskell.org/package/git-annex",
+        "url": "https://hackage.haskell.org/package/git-annex",
         "re": "/git-annex-([\\d.]+)\\.tar\\.gz"
     },
     "autoupdate": {
