@@ -14,17 +14,17 @@
     },
     "installer": {
         "args": [
-            "--quiet-mode",
-            "--root $dir",
-            "--no-desktop"
-        ],
-        "keep": true
+            "/SILENT",
+            "/SUPPRESSMSHBOXES",
+            "/DIR=$dir"
+        ]
     },
     "uninstaller": {
         "file": "unins000.exe",
         "args": [
-            "/uninstall",
-            "/quiet"
+            "/SILENT",
+            "/SUPPRESSMSHBOXES",
+            "/NOCANCEL"
         ]
     },
     "bin": [
