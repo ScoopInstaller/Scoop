@@ -22,7 +22,8 @@
             }
         },
         "hash": {
-            "url": "$url.sha256"
+            "url": "https://github.com/kubernetes/kompose/releases/tag/v$version",
+            "find": ">kompose-windows-amd64.exe[^.]+([0-9a-fA-F]{64})"
         }
     }
 }
