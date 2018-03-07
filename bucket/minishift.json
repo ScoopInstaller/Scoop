@@ -20,7 +20,7 @@
         "architecture": {
             "64bit": {
                 "url": "https://github.com/minishift/minishift/releases/download/v$version/minishift-$version-windows-amd64.zip",
-        		"extract_dir": "minishift-$version-windows-amd64"
+                "extract_dir": "minishift-$version-windows-amd64"
             }
         },
         "hash": {
