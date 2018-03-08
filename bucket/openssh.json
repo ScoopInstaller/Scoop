@@ -1,30 +1,80 @@
 {
-    "version": "5.4p1-1",
+    "homepage": "https://www.openssh.com/",
+    "version": "7.6p1-2",
     "license": "https://www.openbsd.org/cgi-bin/cvsweb/src/usr.bin/ssh/LICENCE?rev=HEAD",
-    "url": [
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/openssh/openssh-5.4p1-1/openssh-5.4p1-1-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/openssh/openssh-5.4p1-1/openssh-5.4p1-1-msys-1.0.13-lic.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/zlib/zlib-1.2.3-2/zlib-1.2.3-2-msys-1.0.13-dll.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/minires/minires-1.02_1-2/libminires-1.02_1-2-msys-1.0.13-dll.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/openssl/openssl-1.0.0-1/libopenssl-1.0.0-1-msys-1.0.13-dll-100.tar.lzma"
-    ],
-    "hash": [
-        "8c8e6a030a34c341394bb8b9f1760743468a8cc5e4244efc34f7ab3cd3e67b64",
-        "edef96034d9ec958b9a58023bcfef54bb4f6b56c6df94c2cced178a675cc3a98",
-        "41c7d5561662e41da74951f373a08a95db40b27b1246227bbbc13abc44976ea7",
-        "4178940828b928b2d5a33042cc83fbb992b4bfb9ffeaef6dc3e555f2a6a8c0d1",
-        "e42fbdcff71404a76306f3b8f0024f453aafa7fe7dd9dac43c82b2e8d33e23f1",
-        "463ed0e62cc5ae102a8e2f4d30e665507cf8a3930f23668629eea48cb4dda71c"
-    ],
+    "architecture": {
+        "32bit": {
+            "url": [
+                "http://repo.msys2.org/msys/i686/openssh-7.6p1-2-i686.pkg.tar.xz",
+                "http://repo.msys2.org/msys/i686/gcc-libs-6.4.0-3-i686.pkg.tar.xz",
+                "http://repo.msys2.org/msys/i686/heimdal-libs-1.5.3-9-i686.pkg.tar.xz",
+                "http://repo.msys2.org/msys/i686/libopenssl-1.0.2.m-1-i686.pkg.tar.xz",
+                "http://repo.msys2.org/msys/i686/libsqlite-3.19.3.0-2-i686.pkg.tar.xz",
+                "http://repo.msys2.org/msys/i686/libcrypt-2.1-1-i686.pkg.tar.xz",
+                "http://repo.msys2.org/msys/i686/msys2-runtime-2.10.0-2-i686.pkg.tar.xz",
+                "http://repo.msys2.org/msys/i686/zlib-1.2.11-1-i686.pkg.tar.xz"
+            ],
+            "hash": [
+                "b519f921d447794cdbcacd18a966d0923bace2f65c9aa89433924b48a9bb86df",
+                "2e35404c82ad34e16a590597250f589c895ba6b41f30e84be1e745b8961492ba",
+                "854da7925d11e9d4ebbfbd662a13ddcf444cd1975c3fe0180e85fd2c10d5c570",
+                "4c48487173380dbd656da0c4b45de40a94f49b61dc89c71b48eb7cffe789c2cf",
+                "831ab93c6d29613ddf4498e48eca2c0f14c38198e7262eb3d5ad183995ca46d8",
+                "70d9af012fe29f4377b648d32e95f5de34528a48ab130c99a5796c82bca7f494",
+                "2420655b53a6a7c7a618b454f35ac6b5f273cfde1695b4c8f384adc0939fd915",
+                "8055bc4832aff838882ccbbc5526e5c26942d69959e66f6fe4b3a979b1d284d6"
+            ]
+        },
+        "64bit": {
+            "url": [
+                "http://repo.msys2.org/msys/x86_64/openssh-7.6p1-2-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/gcc-libs-6.4.0-3-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/heimdal-libs-1.5.3-9-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libopenssl-1.0.2.m-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libsqlite-3.19.3.0-2-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libcrypt-2.1-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/msys2-runtime-2.10.0-2-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/zlib-1.2.11-1-x86_64.pkg.tar.xz"
+            ],
+            "hash": [
+                "7c99caa5d676aa82ee2d30d8bc0c8d5d9f5ff4ca714fd46a9c092ce29fd9cd23",
+                "14f6f42e85fe15a9ddc4535cc536e5122bc6b49630066c357a7c941f150a2cc2",
+                "5d687b1055025238b8998c68c7c0066e85678f0ee5a13220305daa68327655a3",
+                "cfe7b54151a47150cfd2a7734db9e52467e702ad17676a69780f6c73c5bcb30e",
+                "6ab4b5bd5b85e19f41111890ead6179031350e67fa0777f677e53c8219986ff3",
+                "3dc05953cd3f23dace3068a972f838ab3502e642e8cd44763902cae998cfb27d",
+                "21d6008207f9808f95cf9a35373601471018f07d7315d9a6dd37a897599ee919",
+                "4af63558e39e7a4941292132b2985cb2650e78168ab21157a082613215e4839a"
+            ]
+        }
+    },
     "bin": [
-        "bin\\scp.exe",
-        "bin\\sftp.exe",
-        "bin\\slogin.exe",
-        "bin\\ssh-add.exe",
-        "bin\\ssh-agent.exe",
-        "bin\\ssh-keygen.exe",
-        "bin\\ssh-keyscan.exe",
-        "bin\\ssh.exe"
-    ]
+        "usr/bin/scp.exe",
+        "usr/bin/sftp.exe",
+        "usr/bin/ssh-add.exe",
+        "usr/bin/ssh-agent.exe",
+        "usr/bin/ssh-copy-id",
+        "usr/bin/ssh-keygen.exe",
+        "usr/bin/ssh-keyscan.exe",
+        "usr/bin/ssh.exe",
+        "usr/bin/sshd.exe",
+        "usr/lib/ssh/sftp-server.exe",
+        "usr/lib/ssh/ssh-keysign.exe",
+        "usr/lib/ssh/ssh-pkcs11-helper.exe"
+    ],
+    "notes": [
+        "Instructions on installing sshd as a service, can be found at",
+        "https://gist.github.com/samhocevar/00eec26d9e9988d080ac#file-gistfile1-sh"
+    ],
+    "persist": [
+        "etc/ssh/ssh_config",
+        "etc/ssh/sshd_config"
+    ],
+    "post_install": [
+        "Copy-Item \"$dir/usr/bin/ssh-copy-id\" $(shimdir $global)",
+        "ICACLS \"$(shimdir $global)\\ssh-copy-id\" /grant:r \"users:(RX)\" /C"
+    ],
+    "uninstaller": {
+        "script": "Remove-Item -Force \"$(shimdir $global)/ssh-copy-id\""
+    }
 }
