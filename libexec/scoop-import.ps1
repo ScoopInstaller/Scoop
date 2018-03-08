@@ -2,6 +2,8 @@
 # Summary: Import exported list!
 # Help: The basic way to install exported list:
 #      scoop import exportedfile.txt
+# It also supports for multiple file:
+#      scoop import file1.txt file2.txt
 
 
 function createAppsList($filePaths){
@@ -24,7 +26,7 @@ function createAppsList($filePaths){
             }
         }
     }
-  return $appslist
+  return $appslist.TrimEnd()
 }
 
 function importApps($appslist)
