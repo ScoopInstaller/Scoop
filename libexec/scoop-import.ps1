@@ -5,33 +5,38 @@
 # It also supports for multiple file:
 #      scoop import file1.txt file2.txt
 
-
 function createAppsList($filePaths){
     if($filePaths){
         foreach ($file in $filePaths){
-            foreach ($line in Get-Content $file)
+            $ext = [IO.Path]::GetExtension($file)
+            if($ext -eq ".txt")
             {
-                if($line -ne "") #Checks empty line!
+                foreach ($line in Get-Content $file)
                 {
-                    $appslist += $line.Split()[0] + " "
+                    if($line -ne "") #Checks empty line!
+                    {
+                        $appslist += $line.Split()[0] + " "
+                    }
                 }
+            }
+            else{
+                $extError = "Please select .txt file!"
+                Write-Error $extError
             }
         }
     }else{
-        foreach ($line in Get-Content $filePaths)
-        {
-            if($line -ne "")
-            {
-                $appslist += $line.Split()[0] + " "
-            }
-        }
+        $filePathsError = "There is no file to exported!"
+        Write-Error $filePathsError
     }
-  return $appslist.TrimEnd()
+
+    return $appslist.TrimEnd()
 }
 
 function importApps($appslist)
 {
-    scoop install $appslist
+    $appslist.Split() | ForEach-Object{
+        scoop install $_
+    }
 }
 
 
