@@ -7,24 +7,24 @@
 function createAppsList($filePaths){
     if($filePaths){
         foreach ($file in $filePaths){
-	          foreach ($line in Get-Content $file)
-	          {
+            foreach ($line in Get-Content $file)
+            {
                 if($line -ne "") #Checks empty line!
                 {
                     $appslist += $line.Split()[0] + " "
                 }
-	          }
+            }
         }
     }else{
-	      foreach ($line in Get-Content $filePaths)
-	      {
+        foreach ($line in Get-Content $filePaths)
+        {
             if($line -ne "")
             {
                 $appslist += $line.Split()[0] + " "
             }
-	      }
+        }
     }
-	return $appslist
+  return $appslist
 }
 
 function importApps($appslist)
@@ -35,4 +35,3 @@ function importApps($appslist)
 
 $filePaths = $args
 importApps(createAppsList($filepaths))
-
