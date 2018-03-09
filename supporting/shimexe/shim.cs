@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 namespace Scoop {
 
     class Program {
-        [DllImport("kernel32.dll", SetLastError=true)]
+        [DllImport("kernel32.dll", SetLastError=true, CharSet=CharSet.Unicode)]
         static extern bool CreateProcess(string lpApplicationName,
             string lpCommandLine, IntPtr lpProcessAttributes,
             IntPtr lpThreadAttributes, bool bInheritHandles,
