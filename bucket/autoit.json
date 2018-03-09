@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.autoitscript.com/site/autoit/",
     "license": "https://www.autoitscript.com/autoit3/docs/license.htm",
-    "version": "3.3.14.3",
+    "version": "3.3.14.4",
     "url": "https://www.autoitscript.com/files/autoit3/autoit-v3.zip",
-    "hash": "350a33f25e2c0293891536177e1bd484304bb8171743386742ebe2671812b094",
+    "hash": "a33cfd18e41a95e6a380730d296308f984447a36f5948edc2e44c4bfa5fd2c30",
     "extract_dir": "install",
     "architecture": {
         "64bit": {
