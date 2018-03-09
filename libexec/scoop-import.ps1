@@ -11,13 +11,13 @@ function createAppsList($filePaths){
             $ext = [IO.Path]::GetExtension($file)
             if($ext -eq ".txt")
             {
-                foreach ($line in Get-Content $file)
+                foreach ($line in (Get-Content $file | Select-Object -Unique))
                 {
                     if($line -ne "") #Checks empty line!
                     {
                         if($line.StartsWith("#") -Or $line.StartsWith(";") -Or $line.StartsWith(" "))
                         {
-                          continue
+                            continue
                         }else{
                             $appslist += $line.Split()[0] + " "
                         }
@@ -34,7 +34,9 @@ function createAppsList($filePaths){
         Write-Error $filePathsError
     }
 
-    return $appslist.TrimEnd()
+    $uniqueAppsList = $appslist.TrimEnd() | Select-Object -Unique
+
+    return $uniqueAppsList
 }
 
 function importApps($appslist)
