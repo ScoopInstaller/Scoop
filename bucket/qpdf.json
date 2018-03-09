@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://sourceforge.net/projects/qpdf/files/qpdf/8.0.2/qpdf-8.0.2-bin-mingw64.zip",
-            "hash": "37f4dab5bfca006261488fe074fea5e712a4c2ec77aca5096e159a1135ac9a11"
+            "hash": "sha512:131c0e80cef702dda91ac22a526d2e8e93be4dbbd8d0855468559b8553a50b873559cea4432548494bd3b9ff80734b92c9df5482222087c7f168d25e9fe646bc"
         },
         "32bit": {
             "url": "https://sourceforge.net/projects/qpdf/files/qpdf/8.0.2/qpdf-8.0.2-bin-mingw32.zip",
-            "hash": "384fa15fc8ef779003f7e827a56347684305cbf7fc3cab852576e85abdb8c48f"
+            "hash": "sha512:edbf8ccbba2a811632ca3b63b574c332f535b1701c9db89fc3ef2a233cec41295b864a1aea35a35e5c1818615fb495ec9dcd4ae546496102da60d1db53290486"
         }
     },
     "extract_dir": "qpdf-8.0.2",
