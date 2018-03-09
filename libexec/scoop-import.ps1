@@ -15,7 +15,12 @@ function createAppsList($filePaths){
                 {
                     if($line -ne "") #Checks empty line!
                     {
-                        $appslist += $line.Split()[0] + " "
+                        if($line.StartsWith("#") -Or $line.StartsWith(";") -Or $line.StartsWith(" "))
+                        {
+                          continue
+                        }else{
+                            $appslist += $line.Split()[0] + " "
+                        }
                     }
                 }
             }
@@ -35,6 +40,7 @@ function createAppsList($filePaths){
 function importApps($appslist)
 {
     $appslist.Split() | ForEach-Object{
+        #echo $_ #For test purpose!
         scoop install $_
     }
 }
