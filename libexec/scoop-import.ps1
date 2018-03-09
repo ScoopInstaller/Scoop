@@ -5,7 +5,6 @@
 # It also supports for multiple file:
 #      scoop import file1.txt file2.txt
 
-
 function createAppsList($filePaths) {
     if ($filePaths) {
         foreach ($file in $filePaths) {
@@ -18,12 +17,20 @@ function createAppsList($filePaths) {
                         }
                         else {
                             if ($line -like '*global*') {
-                                if ($line -like '*32bit*') {
-                                    $appslist += $line.Split()[0] + " -g -32bit,"
+                                if ($line -like '*http*') {
+                                    if ($line -like '*32bit*') {
+                                        $appslist += $line.Split()[0] + " -g " + $line.Split()[3] + " -32bit,"
+                                    }
+                                    else {
+                                        $appslist += $line.Split()[0] + " -g " + $line.Split()[3] + ","
+                                    }
                                 }
                                 else {
                                     $appslist += $line.Split()[0] + " -g,"
                                 }
+                            }
+                            elseif ($line -like '*http*') {
+                                $appslist += $line.Split()[0] + " " + $line.Split()[2] + ","
                             }
                             elseif ($line -like '*32bit*') {
                                 $appslist += $line.Split()[0] + " -32bit,"
@@ -53,22 +60,33 @@ function createAppsList($filePaths) {
 
 function importApps($appslist) {
     #echo $appslist
-
     $appslist.Split(",") | ForEach-Object {
+
         #echo $_         #For test purpose!
+
         if ($_ -match '-g') {
-            if ($_ -match '-32bit') {
-                #echo $_.Split()[0] --global --arch 32bit
-                scoop install $_.Split()[0] --global --arch 32bit
+            if ($_ -match '\[http') {
+                if ($_ -match '-32bit') {
+                    #echo $_.Split()[2].TrimStart("[").TrimEnd("]") --global --arch 32bit
+                    scoop install $_.Split()[2].TrimStart("[").TrimEnd("]") --global --arch 32bit
+                }
+                else {
+                    #echo $_.Split()[2].TrimStart("[").TrimEnd("]") --global
+                    scoop install $_.Split()[2].TrimStart("[").TrimEnd("]") --global
+                }
             }
             else {
                 #echo $_.Split()[0] --global
                 scoop install $_.Split()[0] --global
             }
         }
+        elseif ($_ -match '\[http') {
+            #echo $_.Split()[1].TrimStart("[").TrimEnd("]")
+            scoop install $_.Split()[1].TrimStart("[").TrimEnd("]")
+        }
         elseif ($_ -match '-32bit') {
-            #echo $_.Split()[0] -a 32bit
-            scoop install $_.Split()[0] -a 32bit
+            #echo $_.Split()[0] --arch 32bit
+            scoop install $_.Split()[0] --arch 32bit
         }
         else {
             #echo $_
@@ -76,6 +94,7 @@ function importApps($appslist) {
         }
     }
 }
+
 
 
 $filePaths = $args
