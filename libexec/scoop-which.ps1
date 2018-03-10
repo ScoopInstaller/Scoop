@@ -9,8 +9,11 @@ reset_aliases
 
 if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 
-try { $gcm = Get-Command "$command" -ea stop } catch { } #
-if(!$gcm) { [console]::error.writeline("'$command' not found"); exit 3 }
+try {
+    $gcm = Get-Command "$command" -ea stop
+} catch {
+    [console]::error.writeline("'$command' not found"); exit 3
+}
 
 $path = "$($gcm.path)"
 $usershims = "$(resolve-path $(shimdir $false))"
