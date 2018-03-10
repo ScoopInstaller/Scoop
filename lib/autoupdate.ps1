@@ -167,7 +167,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
 function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
     $json.version = $version
 
-    if ($architecture -eq $null) {
+    if ($null -eq $architecture) {
         if ($json.url -is [System.Array]) {
             $json.url[0] = $url
             $json.hash[0] = $hash
@@ -247,7 +247,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
         if($valid) {
             # create hash
             $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
-            if ($hash -eq $null) {
+            if ($null -eq $hash) {
                 $valid = $false
                 Write-Host -f DarkRed "Could not find hash!"
             }
@@ -273,7 +273,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             if($valid) {
                 # create hash
                 $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url $substitutions
-                if ($hash -eq $null) {
+                if ($null -eq $hash) {
                     $valid = $false
                     Write-Host -f DarkRed "Could not find hash!"
                 }

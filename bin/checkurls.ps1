@@ -58,7 +58,7 @@ function test_dl($url, $cookies) {
         if($e.innerexception) { $e = $e.innerexception }
         return $url, "Error", $e.message
     } finally {
-        if($wres -ne $null -and $wres -isnot [net.ftpwebresponse]) {
+        if($null -ne $wres -and $wres -isnot [net.ftpwebresponse]) {
             $wres.close()
         }
     }

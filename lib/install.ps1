@@ -109,7 +109,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
-    if (!($to -eq $null)) {
+    if (!($null -eq $to)) {
         Copy-Item $cached $to
     }
 }
