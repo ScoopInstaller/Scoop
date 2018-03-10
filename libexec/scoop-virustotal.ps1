@@ -70,7 +70,7 @@ Function Get-VirusTotalResult($hash, $app) {
     return 0
 }
 
-Function Start-VirusTotal ($h, $app) {
+Function Search-VirusTotal ($h, $app) {
     if ($h -match "(?<algo>[^:]+):(?<hash>.*)") {
         $hash = $matches["hash"]
         if ($matches["algo"] -match "(md5|sha1|sha256)") {
@@ -198,7 +198,7 @@ $apps | ForEach-Object {
             Start-Sleep -s (50 + ($requests * 2))
         }
         try {
-            $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
+            $exit_code = $exit_code -bor (Search-VirusTotal $_ $app)
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
             if ($_.Exception.Message -like "*(404)*") {
