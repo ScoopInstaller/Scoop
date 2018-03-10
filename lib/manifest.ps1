@@ -83,7 +83,7 @@ function generate_user_manifest($app, $version) {
 
     ensure $(usermanifestsdir) | out-null
     try {
-        autoupdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(New-Object HashTable)
+        autoupdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(@{})
         return "$(resolve-path $(usermanifest $app))"
     } catch {
         write-host -f darkred "Could not install $app@$version"
