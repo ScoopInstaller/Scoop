@@ -272,7 +272,7 @@ powershell -noprofile -ex unrestricted `"& '$resolved_path' %args%;exit `$lastex
 function search_in_path($target) {
     $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
     $path.split(';') | % {
-        if(test-path "$_\$target") {
+        if(test-path "$_\$target" -pathType leaf) {
             return "$_\$target"
         }
     }
