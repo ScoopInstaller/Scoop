@@ -1,0 +1,14 @@
+{
+    "version":  "2.11.7",
+    "description": "a lossy PNG compressor",
+    "license":  "GPL",
+    "extract_dir":  "",
+    "url":  "https://pngquant.org/pngquant-windows.zip",
+    "depends":  "",
+    "homepage":  "https://pngquant.org/",
+    "hash":  "2ec61729baeec7b0f1d7c11b5444d0419362b4ddfe2fc1f8d010710e71e2815b",
+    "bin":  "pngquant\\pngquant.exe",
+    "checkver": {
+        "re": "Current version is ([\\d.]+)"
+    }
+}
