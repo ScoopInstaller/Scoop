@@ -27,6 +27,8 @@ if($path.endswith(".ps1") -and ($path -like "$usershims*" -or $path -like "$glob
     }
 
     friendly_path $exepath
+} elseif($gcm.commandtype -eq 'Application') {
+    $gcm.Source
 } elseif($gcm.commandtype -eq 'Alias') {
     scoop which $gcm.resolvedcommandname
 } else {
