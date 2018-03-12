@@ -206,7 +206,7 @@ $apps | ForEach-Object {
             }
             else {
                 if ($_.Exception.Message -match "\(204|429\)") {
-                    abort("$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code)
+                    abort "$app`: VirusTotal request failed`: $($_.Exception.Message)" $exit_code
                 }
                 warn("$app`: VirusTotal request failed`: $($_.Exception.Message)")
             }

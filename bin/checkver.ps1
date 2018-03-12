@@ -65,7 +65,7 @@ $queue | ForEach-Object {
 
     if ($json.checkver -eq "github") {
         if (!$json.homepage.StartsWith("https://github.com/")) {
-            write-host "ERROR: $name checkver expects the homepage to be a github repository" -f DarkYellow
+            error "$name checkver expects the homepage to be a github repository"
         }
         $url = $json.homepage + "/releases/latest"
         $regex = $githubRegex

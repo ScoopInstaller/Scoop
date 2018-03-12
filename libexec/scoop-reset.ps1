@@ -17,7 +17,7 @@ reset_aliases
 $opt, $apps, $err = getopt $args
 if($err) { "scoop reset: $err"; exit 1 }
 
-if(!$apps) { error 'ERROR: <app> missing'; my_usage; exit 1 }
+if(!$apps) { error '<app> missing'; my_usage; exit 1 }
 
 if($apps -eq '*') {
     $local = installed_apps $false | ForEach-Object { ,@($_, $false) }
