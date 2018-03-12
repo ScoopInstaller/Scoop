@@ -6,38 +6,17 @@
 #      scoop import file1.txt file2.txt
 
 function createAppsList($filePaths) {
+    $appList = New-Object System.Collections.ArrayList
     if ($filePaths) {
         foreach ($file in $filePaths) {
-            $ext = [IO.Path]::GetExtension($file)
-            if ($ext -eq ".txt") {
+            if (checkFileExt($file)) {
                 foreach ($line in (Get-Content $file | Select-Object -Unique)) {
-                    if ($line -ne "") {
-                        if ($line.StartsWith("#") -Or $line.StartsWith(";") -Or $line.StartsWith(" ")) {
+                    if (checkEmptyLine($line)) {
+                        if (checkComment($line)) {
                             continue
                         }
                         else {
-                            if ($line -like '*global*') {
-                                if ($line -like '*http*') {
-                                    if ($line -like '*32bit*') {
-                                        $appslist += $line.Split()[0] + " -g " + $line.Split()[3] + " -32bit,"
-                                    }
-                                    else {
-                                        $appslist += $line.Split()[0] + " -g " + $line.Split()[3] + ","
-                                    }
-                                }
-                                else {
-                                    $appslist += $line.Split()[0] + " -g,"
-                                }
-                            }
-                            elseif ($line -like '*http*') {
-                                $appslist += $line.Split()[0] + " " + $line.Split()[2] + ","
-                            }
-                            elseif ($line -like '*32bit*') {
-                                $appslist += $line.Split()[0] + " -32bit,"
-                            }
-                            else {
-                                $appslist += $line.Split()[0] + ","
-                            }
+                            $appList += ($line + "`r`n")
                         }
                     }
                 }
@@ -53,62 +32,130 @@ function createAppsList($filePaths) {
         throw $filePathsError
     }
 
-    $uniqueAppsList = $appslist.TrimEnd(",") | Select-Object -Unique
+    $uniqueAppList = $appList | Get-Unique
 
-    return $uniqueAppsList
+    return $uniqueAppList
+}
+
+function checkFileExt ($file) {
+    $ext = [IO.Path]::GetExtension($file)
+    if ($ext -eq ".txt") {
+        return $True
+    }
+    else {
+        return $false
+    }
+}
+
+function checkEmptyLine ($line) {
+    if ($line -ne "") {
+        return $True
+    }
+    else {
+        return $False
+    }
+}
+function checkComment ($line) {
+    if ($line.StartsWith("#") -Or $line.StartsWith(";") -Or $line.StartsWith(" ")) {
+        return $True
+    }
+    else {
+        return $False
+    }
+}
+function checkGlobal ($line) {
+    if ($line.contains("*global*")) {
+        return $True
+    }
+    else {
+        return $False
+    }
+}
+
+function checkArch ($line) {
+    if ($line.contains("{32bit}")) {
+        return $True
+    }
+    else {
+        return $False
+    }
+}
+
+function checkURL ($line) {
+    if ($line.contains(".json")) {
+        return $True
+    }
+    else {
+        return $False
+    }
 }
 
 function importApps($appslist) {
 
-    $appslist.Split(",") | ForEach-Object {
 
-        #echo $_         #For test purpose!
+    $appslist | ForEach-Object {
 
-        if (checkAppsInstalled($_) -eq $True) {
-            if ($_ -match '-g') {
-                if ($_ -match '\[http') {
-                    if ($_ -match '-32bit') {
-                        #echo $_.Split()[2].TrimStart("[").TrimEnd("]") --global --arch 32bit
-                        scoop install $_.Split()[2].TrimStart("[").TrimEnd("]") --global --arch 32bit
+        $globalArgs = ""
+        $archArgs = ""
+
+        if (checkAppsInstalled($_)) {
+            if (checkURL($_)) {
+                if (checkGlobal($_)) {
+                    $globallArgs += "--global "
+                }
+                if (checkArch($_)) {
+                    $archlArgs += "--arch 32bit "
+                }
+
+                $_ -match '\[(?<url>\S+.json)\]' > $null
+
+                try {
+                    scoop install $Matches.url $globalArgs.TrimEnd(" ") $archArgs.TrimEnd(" ")
+                }
+                catch {
+                    $urlError = "Can't find the json file!"
+                    throw $urlError
+                    $installFromBucket = Read-Host -Prompt "Do you want to install from buckets? [Y/N]"
+
+                    if ($installFromBucket -eq "Y") {
+                        $_ -match '(?<appname>\S+)' > $null
+                        scoop install $Matches.appname + $globalArgs.TrimEnd(" ") $archArgs.TrimEnd(" ")
+
+                    }
+                    elseif ($installFromBucket -eq "N") {
+                        continue
                     }
                     else {
-                        #echo $_.Split()[2].TrimStart("[").TrimEnd("]") --global
-                        scoop install $_.Split()[2].TrimStart("[").TrimEnd("]") --global
+                        $installFromBucket = Read-Host -Prompt "Please enter proper choice: [Y/N]"
                     }
+
                 }
-                else {
-                    #echo $_.Split()[0] --global
-                    scoop install $_.Split()[0] --global
-                }
-            }
-            elseif ($_ -match '\[http') {
-                #echo $_.Split()[1].TrimStart("[").TrimEnd("]")
-                scoop install $_.Split()[1].TrimStart("[").TrimEnd("]")
-            }
-            elseif ($_ -match '-32bit') {
-                #echo $_.Split()[0] --arch 32bit
-                scoop install $_.Split()[0] --arch 32bit
+
             }
             else {
-                #echo $_
-                scoop install $_
-            }
-        }else{
-            Write-Host($_.Split()[0] + " is already installed!")
-        }
 
+                if (checkGlobal($_)) {
+                    $globalArgs += "--global "
+                }
+                if (checkArch($_)) {
+                    $archArgs += "--arch 32bit "
+                }
+
+                $_ -match '(?<appname>\S+)' > $null
+                scoop install $Matches.appname $globalArgs.TrimEnd(" ") $archArgs.TrimEnd(" ")
+            }
+
+        }
     }
+
 }
 
 function checkAppsInstalled($appslist) {
     $installedapps = Get-Content $scoopinstalledlist
 
-    #echo $scoopinstalledlist
-
     $installedapps | ForEach-Object {
         $installedappslist += $_.Split()[0] + " "
     }
-
     $appslist.Split(",") | ForEach-Object {
         if ($installedappslist -match $_.Split()[0]) {
             return $False
@@ -123,7 +170,7 @@ $filePaths = $args
 $scoopinstalledlist = "scoopinstalledlist.txt"
 scoop export > $scoopinstalledlist | Out-Null
 
-importApps(createAppsList($filepaths))
+
+importApps(createAppsList($filePaths))
 
 Remove-Item $scoopinstalledlist
-
