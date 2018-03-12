@@ -49,7 +49,8 @@ function search_bucket($bucket, $query) {
 
 function download_json($url) {
     $progressPreference = 'silentlycontinue'
-    $result = invoke-webrequest $url -UseBasicParsing | Select-Object -exp content | convertfrom-json
+    [System.Net.ServicePointManager]::SecurityProtocol = @("Tls12","Tls11","Tls","Ssl3")
+    $result = invoke-webrequest $url -UseBasicParsing | select -exp content | convertfrom-json
     $progressPreference = 'continue'
     $result
 }
