@@ -166,10 +166,49 @@ function env($name,$global,$val='__get') {
     else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
 
-function unzip($path,$to) {
-    if(!(test-path $path)) { abort "can't find $path to unzip"}
+function isFileLocked([string]$path) {
+    $file = New-Object System.IO.FileInfo $path
+
+    if ((Test-Path -Path $path) -eq $false) {
+        return $false
+    }
+
+    try {
+        $stream = $file.Open([System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        if ($stream) {
+            $stream.Close()
+        }
+        return $false
+    }
+    catch {
+        # file is locked by a process.
+        return $true
+    }
+}
+
+function unzip($path, $to) {
+    if (!(test-path $path)) { abort "can't find $path to unzip"}
     try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
     catch { unzip_old $path $to; return } # for .net earlier than 4.5
+    $retries = 0
+    while ($retries -le 10) {
+        if ($retries -eq 10) {
+            if (7zip_installed) {
+                extract_7zip $path $to $false
+                return
+            } else {
+                abort "Unzip failed: Windows can't unzip because a process is locking the file.`nRun 'scoop install 7zip' and try again."
+            }
+        }
+        if (isFileLocked $path) {
+            write-host "Waiting for $path to be unlocked by another process... ($retries/10)"
+            $retries++
+            Start-Sleep -s 2
+        } else {
+            break
+        }
+    }
+
     try {
         [io.compression.zipfile]::extracttodirectory($path,$to)
     } catch [system.io.pathtoolongexception] {
