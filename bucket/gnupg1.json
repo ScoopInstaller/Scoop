@@ -1,0 +1,23 @@
+{
+    "homepage": "https://www.gnupg.org/",
+    "version": "1.4.22",
+    "license": "GPLv3",
+    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32cli-1.4.22.exe#/dl.7z",
+    "hash": "7d0344a951ca49d34d2a884c9962d5104f73b637aeef717f33ee25c7a0465dca",
+    "bin": [
+        "gpg.exe",
+        "gpgkeys_curl.exe",
+        "gpgkeys_finger.exe",
+        "gpgkeys_hkp.exe",
+        "gpgkeys_ldap.exe",
+        "gpgsplit.exe",
+        "gpgv.exe"
+    ],
+    "checkver": {
+        "url": "https://www.gnupg.org/ftp/gcrypt/binary/",
+        "re": "gnupg-w32cli-(?<version>1\\.[\\d.]+)\\.exe"
+    },
+    "autoupdate": {
+        "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32cli-$version.exe#/dl.7z"
+    }
+}
