@@ -1,16 +1,16 @@
 {
     "homepage": "https://github.com/PowerShell/Win32-OpenSSH",
-    "version": "1.0.0.0",
+    "version": "7.6.0.0p1-Beta",
     "license": "https://raw.githubusercontent.com/PowerShell/Win32-OpenSSH/L1-Prod/LICENCE",
     "architecture": {
         "32bit": {
-            "hash": "a20c2bfc4a672c4262abbcc546e91b0ecc9b074907ddcceb11329c042029611a",
-            "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v1.0.0.0/OpenSSH-Win32.zip",
+            "hash": "3459d70c27173249165fa84e019150d7d175c46342673c1c18034c230d1089c5",
+            "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v7.6.0.0p1-Beta/OpenSSH-Win32.zip",
             "extract_dir": "OpenSSH-Win32"
         },
         "64bit": {
-            "hash": "0c5dd4a30497f6c40ddc6dfc95cbf3a90adcce0148d87de65ffcc555d8890c4f",
-            "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v1.0.0.0/OpenSSH-Win64.zip",
+            "hash": "585d28ce1aa2935c8cd5570413b9214e6c80c41bda6ba6b1b206dbe63d7d2e76",
+            "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v7.6.0.0p1-Beta/OpenSSH-Win64.zip",
             "extract_dir": "OpenSSH-Win64"
         }
     },
