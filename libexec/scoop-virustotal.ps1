@@ -75,7 +75,6 @@ $_ERR_NO_INFO = 8
 
 $exit_code = 0
 
-Function Navigate-ToHash($hash, $app) {
 # Global flag to warn only once about missing API key:
 $warned_no_api_key = $False
 
@@ -86,6 +85,7 @@ $explained_rate_limit_sleeping = $False
 # script execution progresses
 $requests = 0
 
+Function Get-VirusTotalResult($hash, $app) {
     $hash = $hash.ToLower()
     $url = "https://www.virustotal.com/ui/files/$hash"
     $result = (new-object net.webclient).downloadstring($url)
@@ -97,9 +97,9 @@ $requests = 0
     $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
     switch ($unsafe) {
         0 { if ($undetected -eq 0) { $fg = "Yellow" } else { $fg = "DarkGreen" } }
-        1 {$fg = "DarkYellow"}
-        2 {$fg = "Yellow"}
-        default {$fg = "Red"}
+        1 { $fg = "DarkYellow" }
+        2 { $fg = "Yellow" }
+        default { $fg = "Red" }
     }
     write-host -f $fg "$app`: $unsafe/$undetected, $see_url"
     if($unsafe -gt 0) {
@@ -108,23 +108,20 @@ $requests = 0
     return 0
 }
 
-Function Start-VirusTotal ($h, $app) {
-    if ($h -match "(?<algo>[^:]+):(?<hash>.*)") {
-        $hash = $matches["hash"]
+Function Search-VirusTotal ($hash, $app) {
+    if ($hash -match "(?<algo>[^:]+):(?<hash>.*)") {
         if ($matches["algo"] -match "(md5|sha1|sha256)") {
-            return Navigate-ToHash $hash $app
-        }
-        else {
-            warn("$app`: Unsupported hash $($matches['algo']). VirusTotal needs md5, sha1 or sha256.")
+            return Get-VirusTotalResult $matches["hash"] $app
+        } else {
+            warn "$app`: Unsupported hash $($matches['algo']). VirusTotal needs md5, sha1 or sha256."
             return $_ERR_NO_INFO
         }
     }
-    else {
-        return Navigate-ToHash $h $app
-    }
+
+    return Get-VirusTotalResult $hash $app
 }
 
-Function Get-RedirectedUrl {
+Function Submit-RedirectedUrl {
     # Follow up to one level of HTTP redirection
     #
     # Copied from http://www.powershellmagazine.com/2013/01/29/pstip-retrieve-a-redirected-url/
@@ -147,7 +144,7 @@ Function Get-RedirectedUrl {
     return $redir
 }
 
-# SubmitMaybe-ToVirusTotal
+# Submit-ToVirusTotal
 # - $url: where file to check can be downloaded
 # - $app: Name of the application (used for reporting)
 # - $do_scan: [boolean flag] whether to actually submit to VirusTotal
@@ -157,12 +154,12 @@ Function Get-RedirectedUrl {
 #              submitting the file after a delay if the rate limit is
 #              exceeded, without risking an infinite loop (as stack
 #              overflow) if the submission keeps failing.
-Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
+Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
     $api_key = get_config("virustotal_api_key")
     if ($do_scan -and !$api_key -and !$global:warned_no_api_key) {
         $global:warned_no_api_key = $true
-        info("Submitting unknown apps needs a VirusTotal API key.  " +
-             "Set it up with`n`tscoop config virustotal_api_key <API key>")
+        info "Submitting unknown apps needs a VirusTotal API key.  " +
+             "Set it up with`n`tscoop config virustotal_api_key <API key>"
     }
     if ($do_scan -and $api_key) {
         try {
