@@ -1,15 +1,15 @@
 {
-    "version": "2.1.4",
+    "version": "2.1.101",
     "homepage": "https://www.microsoft.com/net/",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/2.1.4/dotnet-sdk-2.1.4-win-x64.zip",
-            "hash": "sha512:955e20434007592f77fb866aa8543ef13efdc0b1cb91f0c946824f60d8726db5227d1245fbeb7409f93293cf918d50b99f96b0d4512b62a70577e69874f8c777"
+            "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/2.1.101/dotnet-sdk-2.1.101-win-x64.zip",
+            "hash": "sha512:794901f629921c2ef8db9de9ef984725a3b7f7b165289294593f4add34a5abb456d1165b90cf63df287d22ba21d06a136086e4db37a63c74196332608f18b0e8"
         },
         "32bit": {
-            "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/2.1.4/dotnet-sdk-2.1.4-win-x86.zip",
-            "hash": "sha512:e4d4872733710ddb93bb00fe724a63be4c7fb352d120841c255a89fc42c3e81da8749c201f63ecfc0e86cb473c9854da719e92a3e665f0c380c3e7cf862b1db3"
+            "url": "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/2.1.101/dotnet-sdk-2.1.101-win-x86.zip",
+            "hash": "sha512:7973c10b7cf32d71a1e564967f85e00f293f948d4f3ff58bc0a3ebdb4b936b1e5d2e247166f40e6f82cb4ba3d9fabc3d72ea78e145f76789c6f26ae5550acdf6"
         }
     },
     "env_add_path": ".",
