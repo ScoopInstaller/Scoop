@@ -161,106 +161,78 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
         info "Submitting unknown apps needs a VirusTotal API key.  " +
              "Set it up with`n`tscoop config virustotal_api_key <API key>"
     }
-    if ($do_scan -and $api_key) {
-        try {
-            # Follow redirections (for e.g. sourceforge URLs) because
-            # VirusTotal analyzes only "direct" download links
-            $url = $url.Split("#").GetValue(0)
-            $new_redir = $url
-            do {
-                $orig_redir = $new_redir
-                $new_redir = Get-RedirectedUrl $orig_redir
-            } while ($orig_redir -ne $new_redir)
-            $global:requests += 1
-            $result = Invoke-WebRequest -Uri "https://www.virustotal.com/vtapi/v2/url/scan" -Body @{apikey=$api_key;url=$new_redir} -Method Post -UseBasicParsing
-            $submitted = $result.StatusCode -eq 200
-            if ($submitted) {
-                warn("$app`: not found`: submitted $url")
-            }
-            else {
-                # EAFP: submission failed -> sleep, then retry
-                if (!$retrying) {
-                    if (!$global:explained_rate_limit_sleeping) {
-                        $global:explained_rate_limit_sleeping = $True
-                        info("Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit")
-                    }
-                    Start-Sleep -s (60 + $global:requests)
-                    SubmitMaybe-ToVirusTotal $new_redir $app $do_scan $True
-                }
-                else {
-                    warn("$app`: VirusTotal submission of $url failed`:`n" +
-                         "`tAPI returned $($result.StatusCode) after retrying")
-                }
-            }
-        } catch [Exception] {
-            warn("$app`: VirusTotal submission failed`: $($_.Exception.Message)")
+    if (!$do_scan -or !$api_key) {
+        warn "$app`: not found`: manually submit $url"
+        return
+    }
+
+    try {
+        # Follow redirections (for e.g. sourceforge URLs) because
+        # VirusTotal analyzes only "direct" download links
+        $url = $url.Split("#").GetValue(0)
+        $new_redir = $url
+        do {
+            $orig_redir = $new_redir
+            $new_redir = Submit-RedirectedUrl $orig_redir
+        } while ($orig_redir -ne $new_redir)
+        $global:requests += 1
+        $result = Invoke-WebRequest -Uri "https://www.virustotal.com/vtapi/v2/url/scan" -Body @{apikey=$api_key;url=$new_redir} -Method Post -UseBasicParsing
+        $submitted = $result.StatusCode -eq 200
+        if ($submitted) {
+            warn "$app`: not found`: submitted $url"
             return
         }
-    }
-    else {
-        warn("$app`: not found`: manually submit $url")
-    }
-}
 
-$apps_param = $apps
-
-if($apps_param -eq '*') {
-    # applist returns a list of tuples like this:
-    #     @(@("app1", flag1), @("app2", flag2))
-    # but for compatibility with the list consumed by install_order
-    # and uniformity with the list returned by install_order, we only
-    # need the application names, i.e.  @("app1", "app2).  Hence loop
-    # through the former list, returning the application name only to
-    # drop the flag.
-    $apps = (applist (installed_apps $false) $false) | ForEach-Object {
-                ($a, $_global_flag_to_drop) = $_
-                $a
+        # EAFP: submission failed -> sleep, then retry
+        if (!$retrying) {
+            if (!$global:explained_rate_limit_sleeping) {
+                $global:explained_rate_limit_sleeping = $True
+                info "Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit"
             }
+            Start-Sleep -s (60 + $global:requests)
+            Submit-ToVirusTotal $new_redir $app $do_scan $True
+        } else {
+            warn "$app`: VirusTotal submission of $url failed`:`n" +
+                    "`tAPI returned $($result.StatusCode) after retrying"
+        }
+    } catch [Exception] {
+        warn "$app`: VirusTotal submission failed`: $($_.Exception.Message)"
+        return
+    }
 }
 
 $apps | ForEach-Object {
-    $app = $_
+    ($app, $global) = $_
+    # write-host $app
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
-        warn("$app`: manifest not found")
+        warn "$app`: manifest not found"
         return
     }
 
-    $hash = hash $manifest $architecture
-    if (!$hash) {
-        $exit_code = $exit_code -bor $_ERR_NO_INFO
-        warn("$app`: hash not found in manifest")
-        return
-    }
+    $urls = url $manifest $architecture
+    $urls | ForEach-Object {
+        $url = $_
+        $hash = hash_for_url $manifest $url $architecture
 
-    $url = url $manifest $architecture
-
-    # Hacky way to see if $hash is an array (i.e. there was a list of
-    # hashes in the manifest) or a string (i.e. there was 1! hash in
-    # the manifest).
-    if ($hash[0].Length -eq 1) {
-        # Wrap download URL in array to traverse it in lockstep with
-        # the loop over the hash.
-        $url = @($url)
-    }
-
-    $hash | ForEach-Object { $i = 0 } {
         try {
-            $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
+            if($hash) {
+                $exit_code = $exit_code -bor (Search-VirusTotal $hash $app)
+            } else {
+                warn "$app`: Can't find hash for $url"
+            }
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
             if ($_.Exception.Message -like "*(404)*") {
-                SubmitMaybe-ToVirusTotal $url[$i] $app ($opt.scan -or $opt.s)
-            }
-            else {
+                Submit-ToVirusTotal $url $app ($opt.scan -or $opt.s)
+            } else {
                 if ($_.Exception.Message -match "\(204|429\)") {
-                    abort("$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code)
+                    abort "$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code
                 }
-                warn("$app`: VirusTotal request failed`: $($_.Exception.Message)")
+                warn "$app`: VirusTotal request failed`: $($_.Exception.Message)"
             }
         }
-        $i = $i + 1
     }
 }
 
