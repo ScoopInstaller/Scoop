@@ -109,9 +109,10 @@ Function Get-VirusTotalResult($hash, $app) {
 }
 
 Function Search-VirusTotal ($hash, $app) {
-    if ($hash -match "(?<algo>[^:]+):(?<hash>.*)") {
-        if ($matches["algo"] -match "(md5|sha1|sha256)") {
-            return Get-VirusTotalResult $matches["hash"] $app
+    if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
+        $hash = $matches['hash']
+        if ($matches['algo'] -match '(md5|sha1|sha256)') {
+            return Get-VirusTotalResult $hash $app
         } else {
             warn "$app`: Unsupported hash $($matches['algo']). VirusTotal needs md5, sha1 or sha256."
             return $_ERR_NO_INFO
