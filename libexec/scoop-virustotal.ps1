@@ -198,6 +198,13 @@ if(is_scoop_outdated) {
 $apps_param = $apps
 
 if($apps_param -eq '*') {
+    # applist returns a list of tuples like this:
+    #     @(@("app1", flag1), @("app2", flag2))
+    # but for compatibility with the list consumed by install_order
+    # and uniformity with the list returned by install_order, we only
+    # need the application names, i.e.  @("app1", "app2).  Hence loop
+    # through the former list, returning the application name only to
+    # drop the flag.
     $apps = (applist (installed_apps $false) $false) | ForEach-Object {
                 ($a, $_global_flag_to_drop) = $_
                 $a
