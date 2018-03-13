@@ -49,7 +49,25 @@ reset_aliases
 
 $opt, $apps, $err = getopt $args 'a:sn' @('arch=', 'scan', 'no-depends')
 if($err) { "scoop virustotal: $err"; exit 1 }
+if(!$apps) { my_usage; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
+
+if(is_scoop_outdated) { scoop update }
+
+$apps_param = $apps
+
+if($apps_param -eq '*') {
+    $apps = applist (installed_apps $false) $false
+    $apps += applist (installed_apps $true) $true
+    $apps = $apps | ForEach-Object {
+        ($app, $global) = $_
+        return $app
+    }
+}
+
+if (!$opt.n -and !$opt."no-depends") {
+    $apps = install_order $apps $architecture
+}
 
 $_ERR_UNSAFE = 2
 $_ERR_EXCEPTION = 4
@@ -58,6 +76,16 @@ $_ERR_NO_INFO = 8
 $exit_code = 0
 
 Function Navigate-ToHash($hash, $app) {
+# Global flag to warn only once about missing API key:
+$warned_no_api_key = $False
+
+# Global flag to explain only once about sleep between requests
+$explained_rate_limit_sleeping = $False
+
+# Requests counter to slow down requests submitted to VirusTotal as
+# script execution progresses
+$requests = 0
+
     $hash = $hash.ToLower()
     $url = "https://www.virustotal.com/ui/files/$hash"
     $result = (new-object net.webclient).downloadstring($url)
@@ -119,16 +147,6 @@ Function Get-RedirectedUrl {
     return $redir
 }
 
-# Global flag to warn only once about missing API key:
-$warned_no_api_key = $False
-
-# Global flag to explain only once about sleep between requests
-$explained_rate_limit_sleeping = $False
-
-# Requests counter to slow down requests submitted to VirusTotal as
-# script execution progresses
-$requests = 0
-
 # SubmitMaybe-ToVirusTotal
 # - $url: where file to check can be downloaded
 # - $app: Name of the application (used for reporting)
@@ -187,14 +205,6 @@ Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
     }
 }
 
-if(!$apps) {
-    my_usage; exit 1
-}
-
-if(is_scoop_outdated) {
-    scoop update
-}
-
 $apps_param = $apps
 
 if($apps_param -eq '*') {
@@ -210,12 +220,6 @@ if($apps_param -eq '*') {
                 $a
             }
 }
-
-if (!$opt.n -and !$opt."no-depends") {
-    $apps = install_order $apps $architecture
-}
-
-$requests = 0
 
 $apps | ForEach-Object {
     $app = $_
