@@ -1,0 +1,56 @@
+{
+    "homepage": "http://www.graphicsmagick.org/",
+    "license": "http://www.graphicsmagick.org/Copyright.html",
+    "version": "1.3.28",
+    "architecture": {
+        "64bit": {
+            "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/1.3.28/GraphicsMagick-1.3.28-Q16-win64-dll.exe",
+            "hash": "sha1:e67e2c25b837ca19901874a7522ab7b1f802eaf8"
+        },
+        "32bit": {
+            "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/1.3.28/GraphicsMagick-1.3.28-Q16-win32-dll.exe",
+            "hash": "sha1:32213a71020f308fb401cfe2ead7e6e1576f28c6"
+        }
+    },
+    "installer": {
+        "args": [
+            "/SILENT",
+            "/SUPPRESSMSHBOXES",
+            "/DIR=$dir"
+        ]
+    },
+    "uninstaller": {
+        "file": "unins000.exe",
+        "args": [
+            "/SILENT",
+            "/SUPPRESSMSHBOXES",
+            "/NOCANCEL"
+        ]
+    },
+    "bin": [
+        [
+            "gm.exe",
+            "gm-q16"
+        ]
+    ],
+    "shortcuts": [
+        [
+            "gm.exe",
+            "GraphicsMagick-Q16"
+        ]
+    ],
+    "checkver": {
+        "url": "https://sourceforge.net/p/graphicsmagick/news/?source=navbar",
+        "re": "GraphicsMagick ([\\d].[\\d].[\\d]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/$version/GraphicsMagick-$version-Q16-win64-dll.exe"
+            },
+            "32bit": {
+                "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/$version/GraphicsMagick-$version-Q16-win32-dll.exe"
+            }
+        }
+    }
+}

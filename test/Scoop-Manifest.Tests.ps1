@@ -50,13 +50,13 @@ describe "manifest-validation" {
             $validator = new-object Scoop.Validator($schema, $true)
         }
 
-        $global:quota_exceeded = $false
+        $quota_exceeded = $false
 
         $manifest_files | ForEach-Object {
             it "$_" {
                 $file = $_ # exception handling may overwrite $_
 
-                if(!($global:quota_exceeded)) {
+                if(!($quota_exceeded)) {
                     try {
                         $validator.Validate($file.fullname)
 
@@ -66,7 +66,7 @@ describe "manifest-validation" {
                         $validator.Errors.Count | should be 0
                     } catch {
                         if($_.exception.message -like '*The free-quota limit of 1000 schema validations per hour has been reached.*') {
-                            $global:quota_exceeded = $true
+                            $quota_exceeded = $true
                             write-host -f darkyellow 'Schema validation limit exceeded. Will skip further validations.'
                         } else {
                             throw

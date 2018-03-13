@@ -73,8 +73,10 @@ $apps | ForEach-Object {
     try {
         Remove-Item -r $dir -ea stop -force
     } catch {
-        error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
-        continue
+        if(test-path $dir) {
+            error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+            continue
+        }
     }
 
     # remove older versions

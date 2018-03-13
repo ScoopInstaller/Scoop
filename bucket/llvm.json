@@ -1,36 +1,26 @@
 {
     "homepage": "https://www.llvm.org/",
-    "version": "5.0.1",
+    "version": "6.0.0",
     "license": "University of Illinois/NCSA Open Source License",
     "architecture": {
         "32bit": {
-            "url": "https://releases.llvm.org/5.0.1/LLVM-5.0.1-win32.exe",
-            "hash": "5de70ab482edb2da7ac20126dc58e23a691498aa644ca23a7b10c32c9ee62157"
+            "url": "https://releases.llvm.org/6.0.0/LLVM-6.0.0-win32.exe#/llvm.7z",
+            "hash": "7e3142d623ff12e18bea598e1bd55d8c96ff660f735daf0a469c2033b4d13c2c"
         },
         "64bit": {
-            "url": "https://releases.llvm.org/5.0.1/LLVM-5.0.1-win64.exe",
-            "hash": "981543611d719624acb29a2cffd6a479cff36e8ab5ee8a57d8eca4f9c4c6956f"
+            "url": "https://releases.llvm.org/6.0.0/LLVM-6.0.0-win64.exe#/llvm.7z",
+            "hash": "2501887b2f638d3f65b0336f354b96f8108b563522d81e841d5c88c34af283dd"
         }
-    },
-    "installer": {
-        "args": [
-            "/S",
-            "/D=$dir"
-        ]
-    },
-    "uninstaller": {
-        "file": "Uninstall.exe",
-        "args": "/S"
     },
     "env_add_path": "bin",
     "checkver": "\\/releases\\/download.html#([\\d.]+)",
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://releases.llvm.org/$version/LLVM-$version-win64.exe"
+                "url": "https://releases.llvm.org/$version/LLVM-$version-win64.exe#/llvm.7z"
             },
             "32bit": {
-                "url": "https://releases.llvm.org/$version/LLVM-$version-win32.exe"
+                "url": "https://releases.llvm.org/$version/LLVM-$version-win32.exe#/llvm.7z"
             }
         }
     }

@@ -53,6 +53,7 @@ function update_scoop() {
     if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     write-host "Updating Scoop..."
+    $last_update = (Get-Date (Get-Date $(scoop config lastupdate)).ToLocalTime() -Format s)
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
         $newdir = fullpath $(versiondir 'scoop' 'new')
@@ -73,6 +74,7 @@ function update_scoop() {
         Push-Location $currentdir
         git_pull -q
         $res = $lastexitcode
+        git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"format: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
         if($res -ne 0) {
             abort 'Update failed.'
         }
@@ -86,6 +88,7 @@ function update_scoop() {
         write-host "Updating '$_' bucket..."
         Push-Location (bucketdir $_)
         git_pull -q
+        git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"format: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
         Pop-Location
     }
 

@@ -160,6 +160,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
         $global:warned_no_api_key = $true
         info "Submitting unknown apps needs a VirusTotal API key.  " +
              "Set it up with`n`tscoop config virustotal_api_key <API key>"
+
     }
     if (!$do_scan -or !$api_key) {
         warn "$app`: not found`: manually submit $url"

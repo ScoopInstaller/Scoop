@@ -53,8 +53,7 @@ if ((!$push -and !$request) -or $help) {
 }
 
 if(!($upstream -match "^(.*)\/(.*):(.*)$")) {
-    Write-Host -f DarkRed "Upstream must have this format: <user>/<repo>:<branch>"
-    exit 1
+    abort "Upstream must have this format: <user>/<repo>:<branch>"
 }
 
 function execute($cmd) {
@@ -62,8 +61,7 @@ function execute($cmd) {
     $output = Invoke-Expression $cmd
 
     if($LASTEXITCODE -gt 0) {
-        Write-Host -f Red "^^^ Error! See above ^^^ (last command: $cmd)"
-        exit 1
+        abort "^^^ Error! See above ^^^ (last command: $cmd)"
     }
     return $output
 }
@@ -91,7 +89,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     execute "hub push origin $branch"
 
     if($LASTEXITCODE -gt 0) {
-        Write-Host -f DarkRed "Push failed! (hub push origin $branch)"
+        error "Push failed! (hub push origin $branch)"
         execute "hub reset"
         return
     }
@@ -107,9 +105,8 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     $msg += "</table>"
     hub pull-request -m "$msg" -b '$upstream' -h '$branch'
     if($LASTEXITCODE -gt 0) {
-        Write-Host -f DarkRed "Pull Request failed! (hub pull-request -m 'Update $app to version $version' -b '$upstream' -h '$branch')"
         execute "hub reset"
-        exit 1
+        abort "Pull Request failed! (hub pull-request -m 'Update $app to version $version' -b '$upstream' -h '$branch')"
     }
 }
 
@@ -139,7 +136,7 @@ hub diff --name-only | ForEach-Object {
     $app = ([System.IO.Path]::GetFileNameWithoutExtension($manifest))
     $json = parse_json $manifest
     if(!$json.version) {
-        Write-Host -f Red "Invalid manifest: $manifest ..."
+        error "Invalid manifest: $manifest ..."
         return
     }
     $version = $json.version

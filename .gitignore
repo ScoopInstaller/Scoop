@@ -4,3 +4,4 @@ scoop.sublime-workspace
 test/installer/tmp/*
 test/tmp/*
 *~
+TestResults.xml

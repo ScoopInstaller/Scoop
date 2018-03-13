@@ -1,0 +1,22 @@
+{
+    "homepage": "http://dos2unix.sourceforge.net/",
+    "description": "Convert text files with DOS or Mac line endings to Unix line endings and vice versa",
+    "version":  "7.4.0",
+    "license":  "BSD",
+    "architecture": {
+        "64bit": {
+            "url": "https://downloads.sourceforge.net/project/dos2unix/dos2unix/7.4.0/dos2unix-7.4.0-win64.zip",
+            "hash": "1e3db91000c217c2de84f231615a2cc88dad275d8fa0f6698bbfd5f7d0c50a1b"
+        },
+        "32bit": {
+            "url": "https://downloads.sourceforge.net/project/dos2unix/dos2unix/7.4.0/dos2unix-7.4.0-win32.zip",
+            "hash": "12d9188179b0d5526df9044f0e8d3bc11e80201110fd520f21842e27e4ebd4fe"
+        }
+    },
+    "bin": [
+        "bin\\dos2unix.exe",
+        "bin\\mac2unix.exe",
+        "bin\\unix2dos.exe",
+        "bin\\unix2mac.exe"
+    ]
+}

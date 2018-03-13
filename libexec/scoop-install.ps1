@@ -56,13 +56,13 @@ $architecture = default_architecture
 try {
     $architecture = ensure_architecture ($opt.a + $opt.arch)
 } catch {
-    error "ERROR: $_"; exit 1
+    abort "ERROR: $_"
 }
 
-if(!$apps) { error 'ERROR: <app> missing'; my_usage; exit 1 }
+if(!$apps) { error '<app> missing'; my_usage; exit 1 }
 
 if($global -and !(is_admin)) {
-    error 'ERROR: you need admin rights to install global apps'; exit 1
+    abort 'ERROR: you need admin rights to install global apps'
 }
 
 if(is_scoop_outdated) {

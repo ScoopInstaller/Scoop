@@ -13,6 +13,7 @@ if($app) { $search = $app }
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
@@ -57,7 +58,7 @@ function test_dl($url, $cookies) {
         if($e.innerexception) { $e = $e.innerexception }
         return $url, "Error", $e.message
     } finally {
-        if($wres -ne $null -and $wres -isnot [net.ftpwebresponse]) {
+        if($null -ne $wres -and $wres -isnot [net.ftpwebresponse]) {
             $wres.close()
         }
     }

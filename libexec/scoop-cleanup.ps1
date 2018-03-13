@@ -41,7 +41,7 @@ function cleanup($app, $global, $verbose) {
         $dir = versiondir $app $version $global
         Get-ChildItem $dir | ForEach-Object {
             $file = $_
-            if($file.LinkType -ne $null) {
+            if($null -ne $file.LinkType) {
                 fsutil.exe reparsepoint delete $file.FullName | out-null
             }
         }

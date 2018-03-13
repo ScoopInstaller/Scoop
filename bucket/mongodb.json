@@ -39,5 +39,10 @@
                 "extract_dir": "MongoDB\\Server\\$majorVersion.$minorVersion"
             }
         }
+    },
+    "suggest": {
+        "vcredist": [
+            "extras/vcredist2017"
+        ]
     }
 }
