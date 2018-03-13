@@ -43,7 +43,7 @@ $_ERR_NO_INFO = 8
 
 $exit_code = 0
 
-Function Navigate-ToHash($hash, $app) {
+Function Get-VirusTotalResult($hash, $app) {
     $hash = $hash.ToLower()
     $url = "https://www.virustotal.com/ui/files/$hash"
     $api_key = get_config("virustotal_api_key")
@@ -70,11 +70,11 @@ Function Navigate-ToHash($hash, $app) {
     return 0
 }
 
-Function Start-VirusTotal ($h, $app) {
+Function Search-VirusTotal ($h, $app) {
     if ($h -match "(?<algo>[^:]+):(?<hash>.*)") {
         $hash = $matches["hash"]
         if ($matches["algo"] -match "(md5|sha1|sha256)") {
-            return Navigate-ToHash $hash $app
+            return Get-VirusTotalResult $hash $app
         }
         else {
             warn("$app`: Unsupported hash $($matches['algo']). VirusTotal needs md5, sha1 or sha256.")
@@ -82,7 +82,7 @@ Function Start-VirusTotal ($h, $app) {
         }
     }
     else {
-        return Navigate-ToHash $h $app
+        return Get-VirusTotalResult $h $app
     }
 }
 
@@ -109,7 +109,7 @@ Function Get-RedirectedUrl {
     return $redir
 }
 
-Function SubmitMaybe-ToVirusTotal ($url, $app, $do_scan) {
+Function Submit-ToVirusTotal ($url, $app, $do_scan) {
     if ($do_scan) {
         try {
             # Follow redirections (for e.g. sourceforge URLs) because
@@ -198,11 +198,11 @@ $apps | ForEach-Object {
             Start-Sleep -s (50 + ($requests * 2))
         }
         try {
-            $exit_code = $exit_code -bor (Start-VirusTotal $_ $app)
+            $exit_code = $exit_code -bor (Search-VirusTotal $_ $app)
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
             if ($_.Exception.Message -like "*(404)*") {
-                SubmitMaybe-ToVirusTotal $url[$i] $app ($opt.scan -or $opt.s)
+                Submit-ToVirusTotal $url[$i] $app ($opt.scan -or $opt.s)
             }
             else {
                 if ($_.Exception.Message -match "\(204|429\)") {

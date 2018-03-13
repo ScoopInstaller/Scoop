@@ -38,7 +38,7 @@ function compare_versions($a, $b) {
 }
 
 function qsort($ary, $fn) {
-    if($ary -eq $null) { return @() }
+    if($null -eq $ary) { return @() }
     if(!($ary -is [array])) { return @($ary) }
 
     $pivot = $ary[0]

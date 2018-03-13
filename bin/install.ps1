@@ -1,4 +1,4 @@
-#requires -v 3
+# requires -v 3
 
 # remote install:
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
@@ -26,7 +26,7 @@ Invoke-Expression (new-object net.webclient).downloadstring($core_url)
 # prep
 if(installed 'scoop') {
     write-host "Scoop is already installed. Run 'scoop update' to get the latest version." -f red
-    # don't abort if invoked with iex——that would close the PS session
+    # don't abort if invoked with iex that would close the PS session
     if($myinvocation.mycommand.commandtype -eq 'Script') { return } else { exit 1 }
 }
 $dir = ensure (versiondir 'scoop' 'current')

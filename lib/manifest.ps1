@@ -38,7 +38,7 @@ function installed_manifest($app, $version, $global) {
 }
 
 function save_install_info($info, $dir) {
-    $nulls = $info.keys | Where-Object { $info[$_] -eq $null }
+    $nulls = $info.keys | Where-Object { $null -eq $info[$_] }
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
     $info | convertto-json | out-file "$dir\install.json"
@@ -83,7 +83,7 @@ function generate_user_manifest($app, $version) {
 
     ensure $(usermanifestsdir) | out-null
     try {
-        autoupdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(New-Object HashTable)
+        autoupdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(@{})
         return "$(resolve-path $(usermanifest $app))"
     } catch {
         write-host -f darkred "Could not install $app@$version"

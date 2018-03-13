@@ -9,7 +9,7 @@ function hashtable($obj) {
 }
 
 function hashtable_val($obj) {
-    if($obj -eq $null) { return $null }
+    if($null -eq $obj) { return $null }
     if($obj -is [array]) {
         $arr = @()
         $obj | ForEach-Object {
@@ -49,7 +49,7 @@ function set_config($name, $val) {
         $cfg.$name = $val
     }
 
-    if($val -eq $null) {
+    if($null -eq $val) {
         $cfg.remove($name)
     }
 

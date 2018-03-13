@@ -78,7 +78,7 @@ function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -rep
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global=$null) {
-    if($global -eq $null) { return (installed $app $true) -or (installed $app $false) }
+    if($null -eq $global) { return (installed $app $true) -or (installed $app $false) }
     return is_directory (appdir $app $global)
 }
 function installed_apps($global) {
@@ -352,7 +352,7 @@ function ensure_all_installed($apps, $global) {
 }
 
 function strip_path($orig_path, $dir) {
-    if($orig_path -eq $null) { $orig_path = '' }
+    if($null -eq $orig_path) { $orig_path = '' }
     $stripped = [string]::join(';', @( $orig_path.split(';') | Where-Object { $_ -and $_ -ne $dir } ))
     return ($stripped -ne $orig_path), $stripped
 }
