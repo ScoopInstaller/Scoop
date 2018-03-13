@@ -156,8 +156,8 @@ Function Submit-RedirectedUrl {
 #              overflow) if the submission keeps failing.
 Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
     $api_key = get_config("virustotal_api_key")
-    if ($do_scan -and !$api_key -and !$global:warned_no_api_key) {
-        $global:warned_no_api_key = $true
+    if ($do_scan -and !$api_key -and !$warned_no_api_key) {
+        $warned_no_api_key = $true
         info "Submitting unknown apps needs a VirusTotal API key.  " +
              "Set it up with`n`tscoop config virustotal_api_key <API key>"
 
@@ -176,7 +176,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
             $orig_redir = $new_redir
             $new_redir = Submit-RedirectedUrl $orig_redir
         } while ($orig_redir -ne $new_redir)
-        $global:requests += 1
+        $requests += 1
         $result = Invoke-WebRequest -Uri "https://www.virustotal.com/vtapi/v2/url/scan" -Body @{apikey=$api_key;url=$new_redir} -Method Post -UseBasicParsing
         $submitted = $result.StatusCode -eq 200
         if ($submitted) {
@@ -186,11 +186,11 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
 
         # EAFP: submission failed -> sleep, then retry
         if (!$retrying) {
-            if (!$global:explained_rate_limit_sleeping) {
-                $global:explained_rate_limit_sleeping = $True
+            if (!$explained_rate_limit_sleeping) {
+                $explained_rate_limit_sleeping = $True
                 info "Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit"
             }
-            Start-Sleep -s (60 + $global:requests)
+            Start-Sleep -s (60 + $requests)
             Submit-ToVirusTotal $new_redir $app $do_scan $True
         } else {
             warn "$app`: VirusTotal submission of $url failed`:`n" +
