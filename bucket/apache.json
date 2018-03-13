@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.apachelounge.com",
-    "version": "2.4.29",
+    "version": "2.4.32",
     "license": "Apache 2.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.29-win64-VC15.zip",
-            "hash": "2F686F7CF56232E50F5E226D0C11C6B2E6CA241F77A966CC1282E1C940995950"
+            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.32-win64-VC15.zip",
+            "hash": "E983A8D1C9E228235C55E8417F4C11194F20434F814B4C42F1A89B061A06F548"
         },
         "32bit": {
-            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.29-win32-VC15.zip",
-            "hash": "4F7BA52D7B0A0991CAD581D2118910FAEB90652A2819D5355102589087BEEBE2"
+            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.32-win32-VC15.zip",
+            "hash": "BF33FFCF24891FA98A78351550DE23529EA2888B8514A3C3ABA15D2A6128108F"
         }
     },
     "extract_dir": "Apache24",
