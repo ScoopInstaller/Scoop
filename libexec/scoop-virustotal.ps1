@@ -57,12 +57,8 @@ if(is_scoop_outdated) { scoop update }
 $apps_param = $apps
 
 if($apps_param -eq '*') {
-    $apps = applist (installed_apps $false) $false
-    $apps += applist (installed_apps $true) $true
-    $apps = $apps | ForEach-Object {
-        ($app, $global) = $_
-        return $app
-    }
+    $apps = installed_apps $false
+    $apps += installed_apps $true
 }
 
 if (!$opt.n -and !$opt."no-depends") {
@@ -204,7 +200,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
 }
 
 $apps | ForEach-Object {
-    ($app, $global) = $_
+    $app = $_
     # write-host $app
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
