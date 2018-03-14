@@ -20,6 +20,14 @@
             "pgAdmin 4"
         ]
     ],
+    "persist": "data",
+    "env_set": {
+        "PGDATA": "$dir\\data"
+    },
+    "post_install": "
+        if (!(Test-Path \"$dir\\data\\pg_hba.conf\")) { iex \"initdb --encoding=UTF8 --locale=en\" }
+    ",
+    "notes": "To start/stop service, run `pg_ctl start`, `pg_ctl stop`.",
     "checkver": {
         "url": "https://www.enterprisedb.com/products-services-training/pgbindownload",
         "re": "<b>Version ([\\d.]+)"
