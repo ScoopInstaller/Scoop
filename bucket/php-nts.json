@@ -4,11 +4,11 @@
     "license": "https://php.net/license/",
     "architecture": {
         "64bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.2.3-nts-Win32-VC15-x64.zip",
+            "url": "https://windows.php.net/downloads/releases/php-7.2.3-nts-Win32-VC15-x64.zip",
             "hash": "ddf1428f2896f942142202b7e9ca7cadf61bb71c4cdfa3910ef192c90bf46ea8"
         },
         "32bit": {
-            "url": "http://windows.php.net/downloads/releases/php-7.2.3-nts-Win32-VC15-x86.zip",
+            "url": "https://windows.php.net/downloads/releases/php-7.2.3-nts-Win32-VC15-x86.zip",
             "hash": "e4d32bcc2e0fddbc17bd9609a4903171aa9d03c03caa88fcbd99fb500c67ea3c"
         }
     },
@@ -49,10 +49,10 @@ if (!(Test-Path \"$dir\\cli\\conf.d\")) {
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "http://windows.php.net/downloads/releases/php-$version-nts-Win32-VC15-x64.zip"
+                "url": "https://windows.php.net/downloads/releases/php-$version-nts-Win32-VC15-x64.zip"
             },
             "32bit": {
-                "url": "http://windows.php.net/downloads/releases/php-$version-nts-Win32-VC15-x86.zip"
+                "url": "https://windows.php.net/downloads/releases/php-$version-nts-Win32-VC15-x86.zip"
             }
         },
         "hash": {

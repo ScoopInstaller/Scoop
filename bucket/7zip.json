@@ -5,11 +5,11 @@
     "version": "18.01",
     "architecture": {
         "64bit": {
-            "url": "http://7-zip.org/a/7z1801-x64.msi",
+            "url": "https://7-zip.org/a/7z1801-x64.msi",
             "hash": "b23f97c230a921f834550d2bf467d313952861f641f49ca93ccddd9d2e0300e2"
         },
         "32bit": {
-            "url": "http://7-zip.org/a/7z1801.msi",
+            "url": "https://7-zip.org/a/7z1801.msi",
             "hash": "bad4ad66869fe95b887a1563d17d538b7fdcddb94b31b3f19ab4825b25d41999"
         }
     },
@@ -19,10 +19,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "http://7-zip.org/a/7z$cleanVersion-x64.msi"
+                "url": "https://7-zip.org/a/7z$cleanVersion-x64.msi"
             },
             "32bit": {
-                "url": "http://7-zip.org/a/7z$cleanVersion.msi"
+                "url": "https://7-zip.org/a/7z$cleanVersion.msi"
             }
         }
     },
