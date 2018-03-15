@@ -4,7 +4,7 @@
     "homepage": "http://invisible-island.net/lynx/lynx.html",
     "architecture": {
         "32bit": {
-            "url": "http://invisible-island.net/datafiles/current/lynx-newssl-setup.exe",
+            "url": "https://invisible-island.net/datafiles/current/lynx-newssl-setup.exe",
             "hash": "d64fdbed6b470953e2504cdde0a58c6b68d0c600d39791380e855030abb2db56"
         }
     },
