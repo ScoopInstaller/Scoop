@@ -1,15 +1,15 @@
 {
     "homepage": "https://frippery.org/busybox",
-    "version": "1946-g99daecdac",
+    "version": "1986-g701cea96c",
     "license": "GPL2",
     "architecture": {
         "32bit": {
-            "url": "https://frippery.org/files/busybox/busybox-w32-FRP-1946-g99daecdac.exe#/busybox.exe",
-            "hash": "b728af6280aa3502df3458eafd6bfca33e2dd047b0d89b63a5f97154aab09ca9"
+            "url": "https://frippery.org/files/busybox/busybox-w32-FRP-1986-g701cea96c.exe#/busybox.exe",
+            "hash": "b02b2d516d23097794cc91faf1624c9ffd6db7d85cd8b441a3f6cc87ff76f139"
         },
         "64bit": {
-            "url": "https://frippery.org/files/busybox/busybox-w64-FRP-1946-g99daecdac.exe#/busybox.exe",
-            "hash": "6db7bbc111584e18b2a6e328d6ccb7867f02d750ada2355decd072cce34ffcd9"
+            "url": "https://frippery.org/files/busybox/busybox-w64-FRP-1986-g701cea96c.exe#/busybox.exe",
+            "hash": "fcad08a5fd16a8e55d3e1e57d22d5ab687ea5440a7869a598307251df55f9679"
         }
     },
     "checkver": {
