@@ -1,4 +1,8 @@
 {
+    "homepage": "http://www.info-zip.org/",
+    "license": "http://www.info-zip.org/pub/infozip/license.html",
+    "description": "Unzip compression utility",
+    "version": "6.00",
     "bin": [
         "SFXWiz32.exe",
         "unzipsfx.exe",
@@ -10,11 +14,6 @@
             "-Z"
         ]
     ],
-    "description": "Unzip compression utility",
     "hash": "7869ee36346b47701ef01efd0bc2889f970266b66c80b30f74303d50bf7fa33d",
-    "homepage": "http://www.info-zip.org/",
-    "license": "http://www.info-zip.org/pub/infozip/license.html",
-    "pre_install": "& \"$dir\\unz600xn.exe\" -d \"$dir\" -o",
-    "url": "ftp://ftp.info-zip.org/pub/infozip/win32/unz600xn.exe",
-    "version": "6.00"
+    "url": "https://r15ch13.keybase.pub/scoop/unzip/unz600xn.exe#/dl.7z"
 }
