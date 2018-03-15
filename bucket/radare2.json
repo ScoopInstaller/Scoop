@@ -1,18 +1,31 @@
 {
-    "version": "2.0.1",
+    "version": "2.3.0",
     "license": "GPL2",
     "homepage": "https://www.radare.org/r/",
     "architecture": {
         "64bit": {
-            "url": "https://radare.mikelloc.com/get/2.0.1/radare2-w64-2.0.1.zip",
-            "hash": "sha1:0d10db6a27c7bb4ef329f25ffde395b94d77f94e",
-            "extract_dir": "radare2-w64-2.0.1"
+            "url": "https://radare.mikelloc.com/get/2.3.0/radare2_installer-msvc_64-2.3.0.exe",
+            "hash": "sha1:14b788ea01c778666a2d8ab7f5e68496f330cafc"
         },
         "32bit": {
-            "url": "https://radare.mikelloc.com/get/2.0.1/radare2-w32-2.0.1.zip",
-            "hash": "sha1:c8a25f003ec82e84394c1e646553065055cf0cec",
-            "extract_dir": "radare2-w32-2.0.1"
+            "url": "https://radare.mikelloc.com/get/2.3.0/radare2_installer-msvc_32-2.3.0.exe",
+            "hash": "sha1:057906cc3c88673ce161986bb19508d60d65746f"
         }
+    },
+    "installer":{
+        "args":[
+            "/SILENT",
+            "/SUPPRESSMSGBOXES",
+            "/DIR=$dir"
+        ]
+    },
+    "uninstaller":{
+        "file":"unins000.exe",
+        "args": [
+            "/SILENT",
+            "/SUPPRESSMSGBOXES",
+            "/NOCANCEL"
+        ]
     },
     "bin": [
         "r2agent.exe",
@@ -33,12 +46,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://radare.mikelloc.com/get/$version/radare2-w64-$version.zip",
-                "extract_dir": "radare2-w64-$version"
+                "url": "https://radare.mikelloc.com/get/$version/radare2_installer-msvc_64-$version.exe"
             },
             "32bit": {
-                "url": "https://radare.mikelloc.com/get/$version/radare2-w32-$version.zip",
-                "extract_dir": "radare2-w32-$version"
+                "url": "https://radare.mikelloc.com/get/$version/radare2_installer-msvc_32-$version.exe"
             }
         },
         "hash": {
