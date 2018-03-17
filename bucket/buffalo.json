@@ -11,8 +11,13 @@
             "buffalo"
         ]
     ],
-    "checkver": "Latest release: ([\\d\\.]+)",
+    "checkver": {
+        "github": "https://github.com/gobuffalo/buffalo"
+    },
     "autoupdate": {
-        "url": "https://github.com/gobuffalo/buffalo/releases/download/v$version/buffalo_$version_windows_amd64.tar.gz"
+        "url": "https://github.com/gobuffalo/buffalo/releases/download/v$version/buffalo_$version_windows_amd64.tar.gz",
+        "hash": {
+            "url": "https://github.com/gobuffalo/buffalo/releases/download/v$version/buffalo_$version_checksums.txt"
+        }
     }
 }
