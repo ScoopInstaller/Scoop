@@ -9,7 +9,7 @@
         "schemes"
     ],
     "checkver": {
-         "github": "https://github.com/Microsoft/console"
+        "github": "https://github.com/Microsoft/console"
     },
     "autoupdate": {
         "url": "https://github.com/Microsoft/console/releases/download/$version/colortool.zip"

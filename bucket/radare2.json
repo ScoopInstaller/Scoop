@@ -12,15 +12,15 @@
             "hash": "sha1:057906cc3c88673ce161986bb19508d60d65746f"
         }
     },
-    "installer":{
-        "args":[
+    "installer": {
+        "args": [
             "/SILENT",
             "/SUPPRESSMSGBOXES",
             "/DIR=$dir"
         ]
     },
-    "uninstaller":{
-        "file":"unins000.exe",
+    "uninstaller": {
+        "file": "unins000.exe",
         "args": [
             "/SILENT",
             "/SUPPRESSMSGBOXES",
