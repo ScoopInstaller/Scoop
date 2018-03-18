@@ -152,7 +152,7 @@ function do_dl($url, $to, $cookies) {
 function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
-        $wreq.useragent = 'Scoop/1.0'
+        $wreq.useragent = Get-UserAgent
         if (-not ($url -imatch "https?://downloads.sourceforge.net/")) {
             $wreq.referer = strip_filename $url
         }

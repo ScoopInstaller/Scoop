@@ -84,7 +84,9 @@ $requests = 0
 Function Get-VirusTotalResult($hash, $app) {
     $hash = $hash.ToLower()
     $url = "https://www.virustotal.com/ui/files/$hash"
-    $result = (new-object net.webclient).downloadstring($url)
+    $wc = New-Object Net.Webclient
+    $wc.Headers.Add('User-Agent', (Get-UserAgent))
+    $result = $wc.downloadstring($url)
     $stats = json_path $result '$.data.attributes.last_analysis_stats'
     $malicious = json_path $stats '$.malicious'
     $suspicious = json_path $stats '$.suspicious'

@@ -47,8 +47,8 @@ $original = use_any_https_protocol
 
 # start all downloads
 $queue | ForEach-Object {
-    $wc = new-object net.webclient
-    $wc.Headers.Add("user-agent", "Scoop/1.0 (+http://scoop.sh/) (Windows NT 6.1; WOW64)")
+    $wc = New-Object Net.Webclient
+    $wc.Headers.Add('User-Agent', (Get-UserAgent))
     register-objectevent $wc downloadstringcompleted -ea stop | out-null
 
     $name, $json = $_

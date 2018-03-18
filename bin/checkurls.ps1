@@ -43,7 +43,7 @@ function test_dl($url, $cookies) {
     $wreq = [net.webrequest]::create($url)
     $wreq.timeout = $timeout * 1000
     if($wreq -is [net.httpwebrequest]) {
-        $wreq.useragent = 'Scoop/1.0'
+        $wreq.useragent = Get-UserAgent
         $wreq.referer = strip_filename $url
         if($cookies) {
             $wreq.headers.add('Cookie', (cookie_header $cookies))

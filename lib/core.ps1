@@ -27,6 +27,10 @@ function enable-encryptionscheme([Net.SecurityProtocolType]$scheme) {
 }
 enable-encryptionscheme "Tls12"
 
+function Get-UserAgent() {
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
+}
+
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 
@@ -154,9 +158,9 @@ function is_local($path) {
 
 # operations
 function dl($url,$to) {
-    $wc = new-object system.net.webClient
-    $wc.headers.add('User-Agent', 'Scoop/1.0')
+    $wc = New-Object Net.Webclient
     $wc.headers.add('Referer', (strip_filename $url))
+    $wc.Headers.Add('User-Agent', (Get-UserAgent))
     $wc.downloadFile($url,$to)
 }
 

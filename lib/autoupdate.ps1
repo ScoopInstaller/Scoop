@@ -13,8 +13,9 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     $data = $null
     try {
         # Download and parse RDF XML file
-        $wc = new-object net.webclient
-        $wc.headers.add('Referer', (strip_filename $url))
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('Referer', (strip_filename $url))
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
         [xml]$data = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -32,8 +33,9 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
     $hashfile = $null
 
     try {
-        $wc = new-object net.webclient
-        $wc.headers.add('Referer', (strip_filename $url))
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('Referer', (strip_filename $url))
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $hashfile = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -69,8 +71,9 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
     $json = $null
 
     try {
-        $wc = new-object net.webclient
-        $wc.headers.add('Referer', (strip_filename $url))
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('Referer', (strip_filename $url))
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $json = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_

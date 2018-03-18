@@ -29,7 +29,9 @@ $apps | ForEach-Object {
     }
     # get description from homepage
     try {
-        $home_html = (new-object net.webclient).downloadstring($json.homepage)
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $home_html = $wc.downloadstring($json.homepage)
     } catch {
         write-host "`n$($_.exception.message)" -fore red
         return

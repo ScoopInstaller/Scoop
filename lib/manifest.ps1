@@ -13,7 +13,9 @@ function parse_json($path) {
 function url_manifest($url) {
     $str = $null
     try {
-        $str = (new-object net.webclient).downloadstring($url)
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $str = $wc.downloadstring($url)
     } catch [system.management.automation.methodinvocationexception] {
         warn "error: $($_.exception.innerexception.message)"
     } catch {
@@ -29,8 +31,13 @@ function manifest($app, $bucket, $url) {
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
-    if($url) { (new-object net.webclient).downloadstring($url) > "$dir\manifest.json" }
-    else { Copy-Item (manifest_path $app $bucket) "$dir\manifest.json" }
+    if($url) {
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $wc.downloadstring($url) > "$dir\manifest.json"
+    } else {
+        Copy-Item (manifest_path $app $bucket) "$dir\manifest.json"
+    }
 }
 
 function installed_manifest($app, $version, $global) {
