@@ -1031,4 +1031,4 @@ function persist_data($manifest, $original_dir, $persist_dir) {
         }
     }
 }
-& "refeshenv"
+Invoke-Expression -Command:"refeshenv"
