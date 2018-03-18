@@ -1,4 +1,4 @@
-{
+-{
     "homepage": "http://www.7-zip.org/",
     "description": "A free and open-source file archiver with a high compression ratio",
     "license": "http://www.7-zip.org/license.txt",
@@ -29,7 +29,7 @@
     "shortcuts": [
         [
             "7zFM.exe",
-            "7zip"
+            "7-Zip"
         ]
     ]
 }
