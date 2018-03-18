@@ -2,6 +2,25 @@
 . "$psscriptroot/buckets.ps1"
 
 
+function Expand-EnvironmentVariablesRecursively($unexpanded) {
+    $previous = ''
+    $expanded = $unexpanded
+    while($previous -ne $expanded) {
+        $previous = $expanded
+        $expanded = [System.Environment]::ExpandEnvironmentVariables($previous)
+    }
+    return $expanded
+}
+
+
+
+function Reset-Enviroment(){
+  Write-Output"Reseting Enviroment Variables"
+  $env:Path = Expand-EnvironmentVariablesRecursively([System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User"))
+  Write-Output "Done!"
+}
+
+
 function nightly_version($date, $quiet = $false) {
     $date_str = $date.tostring("yyyyMMdd")
     if (!$quiet) {
@@ -72,6 +91,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     success "'$app' ($version) was installed successfully!"
 
     show_notes $manifest $dir $original_dir $persist_dir
+    Reset-Enviroment
 }
 
 function locate($app, $bucket) {
