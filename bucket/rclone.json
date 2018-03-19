@@ -1,17 +1,17 @@
 {
     "homepage": "https://rclone.org",
-    "version": "1.39",
+    "version": "1.40",
     "license": "https://github.com/ncw/rclone/blob/master/COPYING",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ncw/rclone/releases/download/v1.39/rclone-v1.39-windows-amd64.zip",
-            "hash": "ccff7549455b07e95049afb778daf8fa9c83ade11fa780f65ef8e7c20bc1fbdc",
-            "extract_dir": "rclone-v1.39-windows-amd64"
+            "url": "https://github.com/ncw/rclone/releases/download/v1.40/rclone-v1.40-windows-amd64.zip",
+            "hash": "45d6cc3771f26500558db724799206ca8b1c784bc0f5ecf6bc5b0fade00a4ec6",
+            "extract_dir": "rclone-v1.40-windows-amd64"
         },
         "32bit": {
-            "url": "https://github.com/ncw/rclone/releases/download/v1.39/rclone-v1.39-windows-386.zip",
-            "hash": "7bc33e1d3a79dada96582c123a8ff7ed834d99f04fbc6cc294f1646f883bcfb1",
-            "extract_dir": "rclone-v1.39-windows-386"
+            "url": "https://github.com/ncw/rclone/releases/download/v1.40/rclone-v1.40-windows-386.zip",
+            "hash": "7d868143ff2779347aca8d411f354373ee01cb2c6d2ff3ce7d021d9aa9a60f02",
+            "extract_dir": "rclone-v1.40-windows-386"
         }
     },
     "bin": "rclone.exe",
