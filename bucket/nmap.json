@@ -1,9 +1,9 @@
 {
     "homepage": "https://nmap.org",
-    "version": "7.60",
+    "version": "7.70",
     "license": "https://svn.nmap.org/nmap/COPYING",
-    "url": "https://nmap.org/dist/nmap-7.60-setup.exe",
-    "hash": "5dbe89981a8d567e5b9b935fbf8019885e7347f45c5af69cab21e8dcafee3393",
+    "url": "https://nmap.org/dist/nmap-7.70-setup.exe",
+    "hash": "7828197e66f5f6efb0c89d21cdf3c34769da525437147eea72cf713a6d4e7a11",
     "extract_dir": "nmap",
     "installer": {
         "args": [
