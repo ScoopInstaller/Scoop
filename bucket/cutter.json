@@ -25,6 +25,12 @@
         "rasm2.exe",
         "rax2.exe"
     ],
+    "shortcuts": [
+        [
+            "cutter.exe",
+            "Cutter"
+        ]
+    ],
     "checkver": {
         "github": "https://github.com/radareorg/cutter"
     },
