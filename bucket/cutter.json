@@ -1,0 +1,47 @@
+{
+    "homepage": "https://github.com/radareorg/cutter",
+    "license": "https://github.com/radareorg/cutter/blob/master/COPYING",
+    "version": "1.3",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/radareorg/cutter/releases/download/v1.3/Cutter-v1.3-win64.zip",
+            "hash": "3c4bbc7acf8bed6b57c1bf75ec0c1320f7d2ecf54ac1eeb80f00108eb8fc7f9d"
+        },
+        "32bit": {
+            "url": "https://github.com/radareorg/cutter/releases/download/v1.3/Cutter-v1.3-win32.zip",
+            "hash": "df807e1125ea0ab3e20ecbe8e0a1d45039961fe176710e23e0632ce5f0812412"
+        }
+    },
+    "bin": [
+        "cutter.exe",
+        "r2agent.exe",
+        "rabin2.exe",
+        "radare2.exe",
+        "radiff2.exe",
+        "rafind2.exe",
+        "ragg2.exe",
+        "rahash2.exe",
+        "rarun2.exe",
+        "rasm2.exe",
+        "rax2.exe"
+    ],
+    "shortcuts": [
+        [
+            "cutter.exe",
+            "Cutter"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/radareorg/cutter"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/radareorg/cutter/releases/download/v$version/Cutter-v$version-win64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/radareorg/cutter/releases/download/v$version/Cutter-v$version-win32.zip"
+            }
+        }
+    }
+}
