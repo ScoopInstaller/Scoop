@@ -1,15 +1,15 @@
 {
-    "version": "17.12",
+    "version": "18.03",
     "homepage": "https://mediaarea.net/en/MediaInfo",
     "license": "BSD",
     "architecture": {
         "64bit": {
-            "url": "https://mediaarea.net/download/binary/mediainfo/17.12/MediaInfo_CLI_17.12_Windows_x64.zip",
-            "hash": "974a7772f11e0b45a5e54ba1e55e21bbbf88f649984394fc640fce62472c5ea6"
+            "url": "https://mediaarea.net/download/binary/mediainfo/18.03/MediaInfo_CLI_18.03_Windows_x64.zip",
+            "hash": "652b33d3a2afe2f26e444b99d61fa419ca77f3b010c9013477a2a298de826d8f"
         },
         "32bit": {
-            "url": "https://mediaarea.net/download/binary/mediainfo/17.12/MediaInfo_CLI_17.12_Windows_i386.zip",
-            "hash": "04017a7b0f55d1818828a2bf6dbef0a29cf16ae23cc44cf75c9cb5fe22293db3"
+            "url": "https://mediaarea.net/download/binary/mediainfo/18.03/MediaInfo_CLI_18.03_Windows_i386.zip",
+            "hash": "0ce58515d4c0a31ac2c750237fcb4eda61ea7c7a84067f79d452e04152d58edb"
         }
     },
     "bin": "mediainfo.exe",
