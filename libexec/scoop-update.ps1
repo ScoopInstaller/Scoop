@@ -74,7 +74,7 @@ function update_scoop() {
         Push-Location $currentdir
         git_pull -q
         $res = $lastexitcode
-        git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"format: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+        git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
         if($res -ne 0) {
             abort 'Update failed.'
         }
@@ -88,7 +88,7 @@ function update_scoop() {
         write-host "Updating '$_' bucket..."
         Push-Location (bucketdir $_)
         git_pull -q
-        git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"format: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+        git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
         Pop-Location
     }
 
