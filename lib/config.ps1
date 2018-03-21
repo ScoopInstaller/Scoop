@@ -25,6 +25,9 @@ function hashtable_val($obj) {
     if($obj.gettype().name -eq 'pscustomobject') { # -is is unreliable
         return hashtable $obj
     }
+    if($obj -eq [bool]::TrueString -or $obj -eq [bool]::FalseString) {
+        $obj = [System.Convert]::ToBoolean($obj)
+    }
     return $obj # assume primitive
 }
 
@@ -46,6 +49,9 @@ function set_config($name, $val) {
     if(!$cfg) {
         $cfg = @{ $name = $val }
     } else {
+        if($val -eq [bool]::TrueString -or $val -eq [bool]::FalseString) {
+            $val = [System.Convert]::ToBoolean($val)
+        }
         $cfg.$name = $val
     }
 
