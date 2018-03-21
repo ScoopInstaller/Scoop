@@ -490,16 +490,24 @@ function get_app_with_version([String] $app) {
         "version" = if ($version) { $version } else { 'latest' }
     }
 }
-function is_scoop_outdated() {
-    $now = Get-Date
-    try {
-        $last_update = (Get-Date $(scoop config lastupdate)).ToLocalTime().AddHours(3)
-    } catch {
-        scoop config lastupdate $now
-        # remove 1 minute to force an update for the first time
-        $last_update = $now.AddMinutes(-1)
+
+function last_scoop_update() {
+    $last_update = (scoop config lastupdate)
+    if(!$last_update) {
+        $last_update = [System.DateTime]::Now
     }
-    return $last_update -lt  $now.ToLocalTime()
+    return $last_update.ToLocalTime()
+}
+
+function is_scoop_outdated() {
+    $last_update = $(last_scoop_update)
+    $now = [System.DateTime]::Now
+    if($last_update -eq $now) {
+        scoop config lastupdate $now
+        # enforce an update for the first time
+        return $true
+    }
+    return $last_update.AddHours(3) -lt  [System.DateTime]::Now.ToLocalTime()
 }
 
 function substitute($entity, [Hashtable] $params) {
