@@ -24,5 +24,5 @@ function git_fetch {
 }
 
 function git_log {
-    git_proxy_cmd log $args
+    git_proxy_cmd --no-pager log $args
 }
