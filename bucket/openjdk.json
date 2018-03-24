@@ -1,36 +1,25 @@
 {
-    "homepage": "https://github.com/ojdkbuild/ojdkbuild",
-    "version": "1.8.0.161-1",
-    "license": "GPL2",
+    "homepage": "http://jdk.java.net/10",
+    "version": "10",
+    "license": "http://openjdk.java.net/legal/gplv2+ce.html",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.161-1/java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86_64.zip",
-            "hash": "7fcd9909173ed19f4ae6c0bba8b32b1e6bece2d49eb9d87271828be8121fc31b",
-            "extract_dir": "java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86_64"
-        },
-        "32bit": {
-            "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.161-1/java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86.zip",
-            "hash": "73cf753afe0590b90edb8643b4d628339bfe942a4f539c892fb4f82d9a122173",
-            "extract_dir": "java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86"
+            "url": "https://download.java.net/java/GA/jdk10/10/binaries/openjdk-10_windows-x64_bin.tar.gz",
+            "hash": "1019c5c7eefc164939674822ff90449e935d4d5c17ad4df3c9e9dc2377dfaa31"
         }
     },
+    "extract_dir": "jdk-10",
     "env_add_path": "bin",
     "env_set": {
         "JAVA_HOME": "$dir"
     },
     "checkver": {
-        "url": "https://raw.githubusercontent.com/ojdkbuild/ojdkbuild/master/README.md",
-        "re": "download/.*/java-(?<short>[\\d.]+)-openjdk-(?<version>[\\d.]+-[\\d]+)(?<tail>.*).x86_64.zip\\)"
+        "re": "https://download.java.net/java/GA/jdk10/([\\d.]+)/binaries/openjdk-([\\d.]+)_windows-x64_bin.tar.gz"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-$matchShort-openjdk-$version$matchTail.x86_64.zip",
-                "extract_dir": "java-$matchShort-openjdk-$version$matchTail.x86_64"
-            },
-            "32bit": {
-                "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/$version/java-$matchShort-openjdk-$version$matchTail.x86.zip",
-                "extract_dir": "java-$matchShort-openjdk-$version$matchTail.x86"
+                "url": "https://download.java.net/java/GA/jdk10/$version/binaries/openjdk-$version_windows-x64_bin.tar.gz"
             }
         },
         "hash": {
