@@ -1,0 +1,29 @@
+{
+    "homepage": "https://github.com/github/git-sizer",
+    "version": "1.1.0",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/github/git-sizer/releases/download/v1.1.0/git-sizer-1.1.0-windows-amd64.zip",
+            "hash": "24383cf861d46436c943458afca5ca6caa67161d1d58ad32e44ecee651493666"
+        },
+        "32bit": {
+            "url": "https://github.com/github/git-sizer/releases/download/v1.1.0/git-sizer-1.1.0-windows-386.zip",
+            "hash": "c598c84764aec2003a1772865d29d7936636863ee367df958f90fb25e59cee37"
+        }
+    },
+    "bin": "git-sizer.exe",
+    "checkver": {
+        "github": "https://github.com/github/git-sizer"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/github/git-sizer/releases/download/v$version/git-sizer-$version-windows-amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/github/git-sizer/releases/download/v$version/git-sizer-$version-windows-386.zip"
+            }
+        }
+    }
+}
