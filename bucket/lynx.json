@@ -1,11 +1,36 @@
 {
-    "version": "2.8.3",
-    "extract_dir": "lynx_w32",
-    "url": "http://www.vordweb.co.uk/standards/lynx_v283.zip",
-    "homepage": "http://www.vordweb.co.uk/standards/download_lynx.htm",
-    "hash": "552bc68afd2ff9a5de88f26d76f55dd8697cf6082c6afb01b3d1a9942f4d3ee0",
-    "bin": "lynx.ps1",
-    "pre_install": "
-        \"$dir\\lynx.exe --cfg=$dir\\lynx.cfg\" | out-file -enc oem $dir\\lynx.ps1
-    "
+    "_comment": "Version 2.8.3 was moved to https://github.com/rasa/versions/blob/master/nodejs4.json",
+    "version": "2.8.9dev.16",
+    "homepage": "http://invisible-island.net/lynx/lynx.html",
+    "architecture": {
+        "32bit": {
+            "url": "https://invisible-island.net/datafiles/current/lynx-newssl-setup.exe",
+            "hash": "d64fdbed6b470953e2504cdde0a58c6b68d0c600d39791380e855030abb2db56"
+        }
+    },
+    "bin": "lynx.cmd",
+    "innosetup": true,
+    "depends": [
+        "cacert",
+        "extras/vcredist2012",
+        "openssl"
+    ],
+    "persist": [
+        "$dir/lynx.cfg"
+    ],
+    "pre_install": [
+        "$q = [char]34",
+        "add-content \"$dir/lynx.cfg\" -value \"SSL_CERT_FILE:$(appdir openssl)/current/cacert.pem`n\"",
+        "add-content \"$dir/lynx.cfg\" -value \"FORCE_SSL_PROMPT:PROMPT`n\"",
+        "set-content \"$dir/lynx.cmd\" -value \"@$dir\\lynx.exe --cfg=$dir\\lynx.cfg %*\""
+    ],
+    "post_install": [
+        "if (Test-Path \"$(appdir openssl)/current/libcrypto-1_1,1.dll\") {",
+        "   cp \"$(appdir openssl)/current/libcrypto-1_1,1.dll\" \"$dir/libcrypto-1_1,1.dll\"",
+        "   cp \"$(appdir openssl)/current/libssl-1_1,1.dll\" \"$dir/libssl-1_1,1.dll\"",
+        "} else {",
+        "   echo 'lynx requires the 32-bit version of openssl to be installed'",
+        "   exit 1",
+        "}"
+    ]
 }

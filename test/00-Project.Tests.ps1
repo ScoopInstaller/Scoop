@@ -6,7 +6,8 @@ $project_file_exclusions = @(
     $([regex]::Escape($repo_dir)+'(\\|/).git(\\|/).*$'),
     '.sublime-workspace$',
     '.DS_Store$',
-    'supporting(\\|/)validator(\\|/)packages(\\|/)*'
+    'supporting(\\|/)validator(\\|/)packages(\\|/)*',
+    'supporting(\\|/)shimexe(\\|/)packages(\\|/)*'
 )
 
 describe 'Project code' {
@@ -99,6 +100,10 @@ describe 'Style constraints for non-binary project files' {
         $badFiles = @(
             foreach ($file in $files)
             {
+                # Ignore previous TestResults.xml
+                if ($file -match "TestResults.xml") {
+                    continue
+                }
                 $content = ([char[]](Get-Content $file.FullName -encoding byte -totalcount 3) -join '')
                 if ([regex]::match($content, '(?ms)^\xEF\xBB\xBF').success)
                 {
@@ -117,6 +122,10 @@ describe 'Style constraints for non-binary project files' {
         $badFiles = @(
             foreach ($file in $files)
             {
+                # Ignore previous TestResults.xml
+                if ($file -match "TestResults.xml") {
+                    continue
+                }
                 $string = [System.IO.File]::ReadAllText($file.FullName)
                 if ($string.Length -gt 0 -and $string[-1] -ne "`n")
                 {
@@ -163,6 +172,10 @@ describe 'Style constraints for non-binary project files' {
         $badLines = @(
             foreach ($file in $files)
             {
+                # Ignore previous TestResults.xml
+                if ($file -match "TestResults.xml") {
+                    continue
+                }
                 $lines = [System.IO.File]::ReadAllLines($file.FullName)
                 $lineCount = $lines.Count
 

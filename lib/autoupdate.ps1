@@ -13,8 +13,9 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     $data = $null
     try {
         # Download and parse RDF XML file
-        $wc = new-object net.webclient
-        $wc.headers.add('Referer', (strip_filename $url))
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('Referer', (strip_filename $url))
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
         [xml]$data = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -23,7 +24,7 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     }
 
     # Find file content
-    $digest = $data.RDF.Content | ? { [String]$_.about -eq $filename }
+    $digest = $data.RDF.Content | Where-Object { [String]$_.about -eq $filename }
 
     return format_hash $digest.sha256
 }
@@ -32,8 +33,9 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
     $hashfile = $null
 
     try {
-        $wc = new-object net.webclient
-        $wc.headers.add('Referer', (strip_filename $url))
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('Referer', (strip_filename $url))
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $hashfile = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -55,7 +57,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
 
     # find hash with filename in $hashfile (will be overridden by $regex)
     if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
-        $filenameRegex = "([a-fA-F0-9]+)\s+(?:\.\/|\*)?(?:`$basename)(\s[\d]+)?"
+        $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:[\x20\t]+\d+)?"
         $filenameRegex = substitute $filenameRegex @{'$basename' = [regex]::Escape($basename)}
         if ($hashfile -match $filenameRegex) {
             $hash = $matches[1]
@@ -69,8 +71,9 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
     $json = $null
 
     try {
-        $wc = new-object net.webclient
-        $wc.headers.add('Referer', (strip_filename $url))
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('Referer', (strip_filename $url))
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $json = $wc.downloadstring($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
@@ -167,7 +170,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
 function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
     $json.version = $version
 
-    if ($architecture -eq $null) {
+    if ($null -eq $architecture) {
         if ($json.url -is [System.Array]) {
             $json.url[0] = $url
             $json.hash[0] = $hash
@@ -195,7 +198,7 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
 
     # check if there are architecture specific variants
     if ($json.architecture -and $json.autoupdate.architecture) {
-        $json.architecture | Get-Member -MemberType NoteProperty | % {
+        $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
             $architecture = $_.Name
             if ($json.architecture.$architecture.$prop -and $json.autoupdate.architecture.$architecture.$prop) {
                 $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) $substitutions
@@ -204,7 +207,7 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 }
 
-function get_version_substitutions([String] $version, [Hashtable] $matches) {
+function get_version_substitutions([String] $version, [Hashtable] $customMatches) {
     $firstPart = $version.Split('-') | Select-Object -first 1
     $lastPart = $version.Split('-') | Select-Object -last 1
     $versionVariables = @{
@@ -218,10 +221,14 @@ function get_version_substitutions([String] $version, [Hashtable] $matches) {
         '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
         '$preReleaseVersion' = $lastPart;
     }
-    if($matches) {
-        $matches.GetEnumerator() | % {
+    if($version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
+        $versionVariables.Set_Item('$matchHead', $matches['head'])
+        $versionVariables.Set_Item('$matchTail', $matches['tail'])
+    }
+    if($customMatches) {
+        $customMatches.GetEnumerator() | ForEach-Object {
             if($_.Name -ne "0") {
-                $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+                $versionVariables.Set_Item('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
             }
         }
     }
@@ -243,7 +250,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
         if($valid) {
             # create hash
             $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
-            if ($hash -eq $null) {
+            if ($null -eq $hash) {
                 $valid = $false
                 Write-Host -f DarkRed "Could not find hash!"
             }
@@ -258,7 +265,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             throw "Could not update $app"
         }
     } else {
-        $json.architecture | Get-Member -MemberType NoteProperty | % {
+        $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
             $valid = $true
             $architecture = $_.Name
 
@@ -269,7 +276,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             if($valid) {
                 # create hash
                 $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url $substitutions
-                if ($hash -eq $null) {
+                if ($null -eq $hash) {
                     $valid = $false
                     Write-Host -f DarkRed "Could not find hash!"
                 }

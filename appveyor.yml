@@ -6,7 +6,9 @@ branches:
 
 init:
   - ps: (get-psprovider 'FileSystem').Home = $(pwd)
+  - ps: Install-PackageProvider Nuget -Force
   - ps: Install-Module -Name Pester -Repository PSGallery -Force
+  - ps: Install-Module -Name PSScriptAnalyzer -Repository PSGallery -Force
 
 build: off
 

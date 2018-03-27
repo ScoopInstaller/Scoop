@@ -23,15 +23,15 @@ function cacheinfo($file) {
 }
 
 function show($app) {
-    $files = @(gci "$scoopdir\cache" | ? { $_.name -match "^$app" })
-    $total_length = ($files | measure length -sum).sum -as [double]
+    $files = @(Get-ChildItem "$cachedir" | Where-Object { $_.name -match "^$app" })
+    $total_length = ($files | Measure-Object length -sum).sum -as [double]
 
     $f_app  = @{ expression={"$($_.app) ($($_.version))" }}
     $f_url  = @{ expression={$_.url};alignment='right'}
     $f_size = @{ expression={$_.size}; alignment='right'}
 
 
-    $files | % { cacheinfo $_ } | ft $f_size, $f_app, $f_url -auto -hide
+    $files | ForEach-Object { cacheinfo $_ } | Format-Table $f_size, $f_app, $f_url -auto -hide
 
     "Total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
 }
@@ -39,7 +39,7 @@ function show($app) {
 switch($cmd) {
     'rm' {
         if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
-        rm "$scoopdir\cache\$app#*"
+        Remove-Item "$cachedir\$app#*"
     }
     'show' {
         show $app

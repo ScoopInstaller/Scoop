@@ -53,17 +53,15 @@ if ((!$push -and !$request) -or $help) {
 }
 
 if(!($upstream -match "^(.*)\/(.*):(.*)$")) {
-    Write-Host -f DarkRed "Upstream must have this format: <user>/<repo>:<branch>"
-    exit 1
+    abort "Upstream must have this format: <user>/<repo>:<branch>"
 }
 
 function execute($cmd) {
     Write-Host -f Green $cmd
-    $output = iex $cmd
+    $output = Invoke-Expression $cmd
 
     if($LASTEXITCODE -gt 0) {
-        Write-Host -f Red "^^^ Error! See above ^^^ (last command: $cmd)"
-        exit 1
+        abort "^^^ Error! See above ^^^ (last command: $cmd)"
     }
     return $output
 }
@@ -91,7 +89,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     execute "hub push origin $branch"
 
     if($LASTEXITCODE -gt 0) {
-        Write-Host -f DarkRed "Push failed! (hub push origin $branch)"
+        error "Push failed! (hub push origin $branch)"
         execute "hub reset"
         return
     }
@@ -107,9 +105,8 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     $msg += "</table>"
     hub pull-request -m "$msg" -b '$upstream' -h '$branch'
     if($LASTEXITCODE -gt 0) {
-        Write-Host -f DarkRed "Pull Request failed! (hub pull-request -m 'Update $app to version $version' -b '$upstream' -h '$branch')"
         execute "hub reset"
-        exit 1
+        abort "Pull Request failed! (hub pull-request -m 'Update $app to version $version' -b '$upstream' -h '$branch')"
     }
 }
 
@@ -125,12 +122,12 @@ if($push -eq $true) {
 . "$psscriptroot\checkver.ps1" * -update -dir $dir
 if($specialSnowflakes) {
     write-host -f DarkCyan "Forcing update on our special snowflakes: $($specialSnowflakes -join ',')"
-    $specialSnowflakes -split ',' | % {
+    $specialSnowflakes -split ',' | ForEach-Object {
         . "$psscriptroot\checkver.ps1" $_ -update -forceUpdate -dir $dir
     }
 }
 
-hub diff --name-only | % {
+hub diff --name-only | ForEach-Object {
     $manifest = $_
     if(!$manifest.EndsWith(".json")) {
         return
@@ -139,7 +136,7 @@ hub diff --name-only | % {
     $app = ([System.IO.Path]::GetFileNameWithoutExtension($manifest))
     $json = parse_json $manifest
     if(!$json.version) {
-        Write-Host -f Red "Invalid manifest: $manifest ..."
+        error "Invalid manifest: $manifest ..."
         return
     }
     $version = $json.version
@@ -149,7 +146,7 @@ hub diff --name-only | % {
         execute "hub add $manifest"
 
         # detect if file was staged, because it's not when only LF or CRLF have changed
-        $status = iex "hub status --porcelain -uno"
+        $status = Invoke-Expression "hub status --porcelain -uno"
         $status = $status | select-object -first 1
         if($status -and $status.StartsWith('M  ') -and $status.EndsWith("$app.json")) {
             execute "hub commit -m 'Update $app to version $version'"

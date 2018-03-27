@@ -1,0 +1,56 @@
+{
+    "homepage": "http://www.graphicsmagick.org/",
+    "license": "http://www.graphicsmagick.org/Copyright.html",
+    "version": "1.3.28",
+    "architecture": {
+        "64bit": {
+            "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/1.3.28/GraphicsMagick-1.3.28-Q8-win64-dll.exe",
+            "hash": "sha1:db2cc7e89121bf46d5cfc7e0df2c5a7d9dfdf161"
+        },
+        "32bit": {
+            "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/1.3.28/GraphicsMagick-1.3.28-Q8-win32-dll.exe",
+            "hash": "sha1:95e52c2f9687344b93c36892c88020a30bf5bdc9"
+        }
+    },
+    "installer": {
+        "args": [
+            "/SILENT",
+            "/SUPPRESSMSHBOXES",
+            "/DIR=$dir"
+        ]
+    },
+    "uninstaller": {
+        "file": "unins000.exe",
+        "args": [
+            "/SILENT",
+            "/SUPPRESSMSHBOXES",
+            "/NOCANCEL"
+        ]
+    },
+    "bin": [
+        [
+            "gm.exe",
+            "gm-q8"
+        ]
+    ],
+    "shortcuts": [
+        [
+            "gm.exe",
+            "GraphicsMagick-Q8"
+        ]
+    ],
+    "checkver": {
+        "url": "https://sourceforge.net/p/graphicsmagick/news/?source=navbar",
+        "re": "GraphicsMagick ([\\d].[\\d].[\\d]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/$version/GraphicsMagick-$version-Q8-win64-dll.exe"
+            },
+            "32bit": {
+                "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/$version/GraphicsMagick-$version-Q8-win32-dll.exe"
+            }
+        }
+    }
+}

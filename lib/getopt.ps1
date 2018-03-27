@@ -32,7 +32,7 @@ function getopt($argv, $shortopts, $longopts) {
         if($arg.startswith('--')) {
             $name = $arg.substring(2)
 
-            $longopt = $longopts | ? { $_ -match "^$name=?$" }
+            $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
 
             if($longopt) {
                 if($longopt.endswith('=')) { # requires arg

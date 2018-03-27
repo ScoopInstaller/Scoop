@@ -10,9 +10,9 @@ if("$src" -eq "$dest") { abort "$(strip_ext $myinvocation.mycommand.name) is for
 'copying files...'
 $output = robocopy $src $dest /mir /njh /njs /nfl /ndl /xd .git tmp /xf .DS_Store last_updated
 
-$output | ? { $_ -ne "" }
+$output | Where-Object { $_ -ne "" }
 
-echo 'creating shim...'
+Write-Output 'creating shim...'
 shim "$dest\bin\scoop.ps1" $false
 
 ensure_scoop_in_path

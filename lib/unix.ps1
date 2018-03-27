@@ -10,9 +10,9 @@ if(!(is_unix)) {
 }
 
 # core.ps1
-$scoopdir = $env:SCOOP, (Join-Path $env:HOME "scoop") | select -first 1
-$globaldir = $env:SCOOP_GLOBAL, "/usr/local/scoop" | select -first 1
-$cachedir = $env:SCOOP_CACHE, (Join-Path $scoopdir "cache") | select -first 1
+$scoopdir = $env:SCOOP, (Join-Path $env:HOME "scoop") | Select-Object -first 1
+$globaldir = $env:SCOOP_GLOBAL, "/usr/local/scoop" | Select-Object -first 1
+$cachedir = $env:SCOOP_CACHE, (Join-Path $scoopdir "cache") | Select-Object -first 1
 
 # core.ps1
 function ensure($dir) {
@@ -41,5 +41,5 @@ function compute_hash($file, $algname) {
             default { $result = (sha256sum -b $file) }
         }
     }
-    return $result.split(' ') | select -first 1
+    return $result.split(' ') | Select-Object -first 1
 }

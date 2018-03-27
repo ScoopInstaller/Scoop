@@ -16,7 +16,9 @@ function find_description($url, $html, $redir = $false) {
     # check <meta http-equiv="refresh"> redirect
     $refresh = meta_refresh $meta $url
     if($refresh -and !$redir) {
-        $html = (new-object net.webclient).downloadstring($refresh)
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $html = $wc.downloadstring($refresh)
         return find_description $refresh $html $true
     }
 
@@ -47,10 +49,10 @@ function clean_description($description) {
 function meta_tags($html) {
     $tags = @()
     $meta = ([regex]'<meta [^>]+>').matches($html)
-    $meta |% {
+    $meta | ForEach-Object {
         $attrs = ([regex]'([\w-]+)="([^"]+)"').matches($_.value)
         $hash = @{}
-        $attrs |% {
+        $attrs | ForEach-Object {
             $hash[$_.groups[1].value] = $_.groups[2].value
         }
         $tags += $hash
@@ -60,7 +62,7 @@ function meta_tags($html) {
 
 function meta_content($tags, $attribute, $search) {
     if(!$tags) { return }
-    return $tags |? { $_[$attribute] -eq $search } |% { $_['content'] }
+    return $tags | Where-Object { $_[$attribute] -eq $search } | ForEach-Object { $_['content'] }
 }
 
 # Looks for a redirect URL in a <meta> refresh tag.
@@ -107,7 +109,9 @@ function strip_html($html) {
             $charset = $matches[1]
             try {
                 $encoding = [text.encoding]::getencoding($charset)
-            } catch { }
+            } catch {
+                Write-Warning "Unknown charset"
+            }
             if($encoding) {
                 $html = ([regex]'&#(\d+);?').replace($html, {
                     param($m)

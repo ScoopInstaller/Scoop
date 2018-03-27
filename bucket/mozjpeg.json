@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/mozilla/mozjpeg",
+    "description": "Improved JPEG encoder",
     "version": "3.1",
     "license": "https://raw.githubusercontent.com/mozilla/mozjpeg/master/LICENSE.md",
     "url": "https://mozjpeg.codelove.de/bin/mozjpeg_3.1_x86.zip",

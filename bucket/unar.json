@@ -2,13 +2,8 @@
     "homepage": "https://theunarchiver.com/command-line",
     "license": "GPL2.1",
     "version": "1.8.1",
-    "url": [
-        "https://theunarchiver.com/downloads/unarWindows.zip"
-    ],
-    "hash": [
-        "61a6b299606282f72f51c278801eac11d3dccfac83e2d68bccce33539912e0dd"
-    ],
-    "extract_dir": ".",
+    "url": "https://cdn.theunarchiver.com/downloads/unarWindows.zip",
+    "hash": "61A6B299606282F72F51C278801EAC11D3DCCFAC83E2D68BCCCE33539912E0DD",
     "bin": [
         "lsar.exe",
         "unar.exe"

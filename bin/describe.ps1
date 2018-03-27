@@ -14,12 +14,12 @@ if($app) { $search = $app }
 
 # get apps to check
 $apps = @()
-gci $dir "$search.json" | % {
+Get-ChildItem $dir "$search.json" | ForEach-Object {
     $json = parse_json "$dir\$_"
     $apps += ,@(($_ -replace '\.json$', ''), $json)
 }
 
-$apps |% {
+$apps | ForEach-Object {
     $app, $json = $_
     write-host "$app`: " -nonewline
 
@@ -29,7 +29,9 @@ $apps |% {
     }
     # get description from homepage
     try {
-        $home_html = (new-object net.webclient).downloadstring($json.homepage)
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $home_html = $wc.downloadstring($json.homepage)
     } catch {
         write-host "`n$($_.exception.message)" -fore red
         return

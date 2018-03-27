@@ -14,7 +14,6 @@ function install_psmodule($manifest, $dir, $global) {
     $module_name = $psmodule.name
     if(!$module_name) {
         abort "Invalid manifest: The 'name' property is missing from 'psmodule'."
-        return
     }
 
     $linkfrom = "$modulesdir\$module_name"

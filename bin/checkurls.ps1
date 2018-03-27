@@ -13,6 +13,7 @@ if($app) { $search = $app }
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
 if(!$dir) { $dir = "$psscriptroot\..\bucket" }
@@ -20,7 +21,7 @@ $dir = resolve-path $dir
 
 # get apps to check
 $queue = @()
-gci $dir "$search.json" | % {
+Get-ChildItem $dir "$search.json" | ForEach-Object {
     $manifest = parse_json "$dir\$_"
     $queue += ,@($_, $manifest)
 }
@@ -42,7 +43,7 @@ function test_dl($url, $cookies) {
     $wreq = [net.webrequest]::create($url)
     $wreq.timeout = $timeout * 1000
     if($wreq -is [net.httpwebrequest]) {
-        $wreq.useragent = 'Scoop/1.0'
+        $wreq.useragent = Get-UserAgent
         $wreq.referer = strip_filename $url
         if($cookies) {
             $wreq.headers.add('Cookie', (cookie_header $cookies))
@@ -57,13 +58,13 @@ function test_dl($url, $cookies) {
         if($e.innerexception) { $e = $e.innerexception }
         return $url, "Error", $e.message
     } finally {
-        if($wres -ne $null -and $wres -isnot [net.ftpwebresponse]) {
+        if($null -ne $wres -and $wres -isnot [net.ftpwebresponse]) {
             $wres.close()
         }
     }
 }
 
-$queue | % {
+$queue | ForEach-Object {
     $name, $manifest = $_
     $urls = @()
     $ok = 0
@@ -71,13 +72,13 @@ $queue | % {
     $errors = @()
 
     if($manifest.url) {
-        $manifest.url | % { $urls += $_ }
+        $manifest.url | ForEach-Object { $urls += $_ }
     } else {
-        url $manifest "64bit" | % { $urls += $_ }
-        url $manifest "32bit" | % { $urls += $_ }
+        url $manifest "64bit" | ForEach-Object { $urls += $_ }
+        url $manifest "32bit" | ForEach-Object { $urls += $_ }
     }
 
-    $urls | % {
+    $urls | ForEach-Object {
         $url, $status, $msg = test_dl $_ $manifest.cookie
         if($msg) { $errors += "$msg ($url)" }
         if($status -eq "OK" -or $status -eq "OpeningData") { $ok += 1 } else { $failed += 1 }
@@ -106,7 +107,7 @@ $queue | % {
     write-host "] " -nonewline
     write-host (strip_ext $name)
 
-    $errors | % {
+    $errors | ForEach-Object {
         write-host -f darkred "       > $_"
     }
 }

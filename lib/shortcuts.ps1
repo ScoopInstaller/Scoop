@@ -1,7 +1,7 @@
 # Creates shortcut for the app in the start menu
 function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
-    $shortcuts | ?{ $_ -ne $null } | % {
+    $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
         $target = [System.IO.Path]::Combine($dir, $_.item(0))
         $target = New-Object System.IO.FileInfo($target)
         $name = $_.item(1)
@@ -59,7 +59,7 @@ function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $argume
 # Removes the Startmenu shortcut if it exists
 function rm_startmenu_shortcuts($manifest, $global, $arch) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
-    $shortcuts | ?{ $_ -ne $null } | % {
+    $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
         $name = $_.item(1)
         $shortcut = "$(shortcut_folder $global)\$name.lnk"
         write-host "Removing shortcut $(friendly_path $shortcut)"

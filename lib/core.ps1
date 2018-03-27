@@ -3,26 +3,39 @@
 #       Old installations should continue to work using the old path.
 #       There is currently no automatic migration path to deal
 #       with updating old installations to the new path.
-$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | select -first 1
+$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | Select-Object -first 1
 
 $oldscoopdir = "$env:LOCALAPPDATA\scoop"
 if((test-path $oldscoopdir) -and !$env:SCOOP) {
     $scoopdir = $oldscoopdir
 }
 
-$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | select -first 1
+$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | Select-Object -first 1
 
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | select -first 1
+$cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
+
+# Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
+# for all communication with api.github.com
+function enable-encryptionscheme([Net.SecurityProtocolType]$scheme) {
+    # Net.SecurityProtocolType is a [Flags] enum, binary-OR sets
+    # the specified scheme in addition to whatever scheme is already active
+    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor $scheme
+}
+enable-encryptionscheme "Tls12"
+
+function Get-UserAgent() {
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
+}
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 
 function format($str, $hash) {
-    $hash.keys | % { set-variable $_ $hash[$_] }
+    $hash.keys | ForEach-Object { set-variable $_ $hash[$_] }
     $executionContext.invokeCommand.expandString($str)
 }
 function is_admin {
@@ -69,13 +82,13 @@ function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -rep
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global=$null) {
-    if($global -eq $null) { return (installed $app $true) -or (installed $app $false) }
+    if($null -eq $global) { return (installed $app $true) -or (installed $app $false) }
     return is_directory (appdir $app $global)
 }
 function installed_apps($global) {
     $dir = appsdir $global
     if(test-path $dir) {
-        gci $dir | where { $_.psiscontainer -and $_.name -ne 'scoop' } | % { $_.name }
+        Get-ChildItem $dir | Where-Object { $_.psiscontainer -and $_.name -ne 'scoop' } | ForEach-Object { $_.name }
     }
 }
 
@@ -101,7 +114,7 @@ function app_status($app, $global) {
     }
 
     $status.missing_deps = @()
-    $deps = @(runtime_deps $manifest) | ? { !(installed $_) }
+    $deps = @(runtime_deps $manifest) | Where-Object { !(installed $_) }
     if($deps) {
         $status.missing_deps += ,$deps
     }
@@ -145,9 +158,9 @@ function is_local($path) {
 
 # operations
 function dl($url,$to) {
-    $wc = new-object system.net.webClient
-    $wc.headers.add('User-Agent', 'Scoop/1.0')
+    $wc = New-Object Net.Webclient
     $wc.headers.add('Referer', (strip_filename $url))
+    $wc.Headers.Add('User-Agent', (Get-UserAgent))
     $wc.downloadFile($url,$to)
 }
 
@@ -157,10 +170,49 @@ function env($name,$global,$val='__get') {
     else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
 
-function unzip($path,$to) {
-    if(!(test-path $path)) { abort "can't find $path to unzip"}
+function isFileLocked([string]$path) {
+    $file = New-Object System.IO.FileInfo $path
+
+    if ((Test-Path -Path $path) -eq $false) {
+        return $false
+    }
+
+    try {
+        $stream = $file.Open([System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        if ($stream) {
+            $stream.Close()
+        }
+        return $false
+    }
+    catch {
+        # file is locked by a process.
+        return $true
+    }
+}
+
+function unzip($path, $to) {
+    if (!(test-path $path)) { abort "can't find $path to unzip"}
     try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
     catch { unzip_old $path $to; return } # for .net earlier than 4.5
+    $retries = 0
+    while ($retries -le 10) {
+        if ($retries -eq 10) {
+            if (7zip_installed) {
+                extract_7zip $path $to $false
+                return
+            } else {
+                abort "Unzip failed: Windows can't unzip because a process is locking the file.`nRun 'scoop install 7zip' and try again."
+            }
+        }
+        if (isFileLocked $path) {
+            write-host "Waiting for $path to be unlocked by another process... ($retries/10)"
+            $retries++
+            Start-Sleep -s 2
+        } else {
+            break
+        }
+    }
+
     try {
         [io.compression.zipfile]::extracttodirectory($path,$to)
     } catch [system.io.pathtoolongexception] {
@@ -203,42 +255,46 @@ function shim($path, $global, $name, $arg) {
     $abs_shimdir = ensure (shimdir $global)
     if(!$name) { $name = strip_ext (fname $path) }
 
-    $shim = "$abs_shimdir\$($name.tolower()).ps1"
+    $shim = "$abs_shimdir\$($name.tolower())"
 
     # convert to relative path
-    pushd $abs_shimdir
-    $relpath = resolve-path -relative $path
-    popd
+    Push-Location $abs_shimdir
+    $relative_path = resolve-path -relative $path
+    Pop-Location
+    $resolved_path = resolve-path $path
 
     # if $path points to another drive resolve-path prepends .\ which could break shims
-    if($relpath -match "^(.\\[\w]:).*$") {
-        write-output "`$path = `"$path`"" | out-file $shim -encoding utf8
+    if($relative_path -match "^(.\\[\w]:).*$") {
+        write-output "`$path = `"$path`"" | out-file "$shim.ps1" -encoding utf8
     } else {
-        write-output "`$path = join-path `"`$psscriptroot`" `"$relpath`"" | out-file $shim -encoding utf8
+        write-output "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" | out-file "$shim.ps1" -encoding utf8
     }
 
     if($arg) {
-        write-output "`$args = '$($arg -join "', '")', `$args" | out-file $shim -encoding utf8 -append
+        write-output "`$args = '$($arg -join "', '")', `$args" | out-file "$shim.ps1" -encoding utf8 -append
     }
-    write-output 'if($myinvocation.expectingInput) { $input | & $path @args } else { & $path @args }' | out-file $shim -encoding utf8 -append
+
+    if($path -match '\.jar$') {
+        "if(`$myinvocation.expectingInput) { `$input | & java -jar `$path @args } else { & java -jar `$path @args }" | out-file "$shim.ps1" -encoding utf8 -append
+    } else {
+        "if(`$myinvocation.expectingInput) { `$input | & `$path @args } else { & `$path @args }" | out-file "$shim.ps1" -encoding utf8 -append
+    }
 
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
-        $shim_exe = "$(strip_ext($shim)).shim"
-        cp "$(versiondir 'scoop' 'current')\supporting\shimexe\shim.exe" "$(strip_ext($shim)).exe" -force
-        write-output "path = $(resolve-path $path)" | out-file $shim_exe -encoding utf8
+        Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
+        write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
-            write-output "args = $arg" | out-file $shim_exe -encoding utf8 -append
+            write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
         }
     } elseif($path -match '\.((bat)|(cmd))$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
-        $shim_cmd = "$(strip_ext($shim)).cmd"
-        "@`"$(resolve-path $path)`" $arg %*" | out-file $shim_cmd -encoding ascii
+        "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
+
+        "#!/bin/sh`ncmd //C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
-        $shim_cmd = "$(strip_ext($shim)).cmd"
-
-"@echo off
+        "@echo off
 setlocal enabledelayedexpansion
 set args=%*
 :: replace problem characters in arguments
@@ -247,7 +303,12 @@ set args=%args:(=``(%
 set args=%args:)=``)%
 set invalid=`"='
 if !args! == !invalid! ( set args= )
-powershell -noprofile -ex unrestricted `"& '$(resolve-path $path)' %args%;exit `$lastexitcode`"" | out-file $shim_cmd -encoding ascii
+powershell -noprofile -ex unrestricted `"& '$resolved_path' %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
+
+        "#!/bin/sh`npowershell -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+    } elseif($path -match '\.jar$') {
+        "@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
+        "#!/bin/sh`njava -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     }
 }
 
@@ -276,7 +337,7 @@ function ensure_architecture($architecture_opt) {
 
 function ensure_all_installed($apps, $global) {
     $installed = @()
-    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | % {
+    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | ForEach-Object {
         $app = $_
         if(installed $app $false) {
             $installed += ,@($app, $false)
@@ -295,8 +356,8 @@ function ensure_all_installed($apps, $global) {
 }
 
 function strip_path($orig_path, $dir) {
-    if($orig_path -eq $null) { $orig_path = '' }
-    $stripped = [string]::join(';', @( $orig_path.split(';') | ? { $_ -and $_ -ne $dir } ))
+    if($null -eq $orig_path) { $orig_path = '' }
+    $stripped = [string]::join(';', @( $orig_path.split(';') | Where-Object { $_ -and $_ -ne $dir } ))
     return ($stripped -ne $orig_path), $stripped
 }
 
@@ -322,7 +383,7 @@ function ensure_scoop_in_path($global) {
 }
 
 function ensure_robocopy_in_path {
-    if(!(gcm robocopy -ea ignore)) {
+    if(!(Get-Command robocopy -ea ignore)) {
         shim "C:\Windows\System32\Robocopy.exe" $false
     }
 }
@@ -331,9 +392,9 @@ function wraptext($text, $width) {
     if(!$width) { $width = $host.ui.rawui.windowsize.width };
     $width -= 1 # be conservative: doesn't seem to print the last char
 
-    $text -split '\r?\n' | % {
+    $text -split '\r?\n' | ForEach-Object {
         $line = ''
-        $_ -split ' ' | % {
+        $_ -split ' ' | ForEach-Object {
             if($line.length -eq 0) { $line = $_ }
             elseif($line.length + $_.length + 1 -le $width) { $line += " $_" }
             else { $lines += ,$line; $line = $_ }
@@ -367,7 +428,7 @@ $default_aliases = @{
 }
 
 function reset_alias($name, $value) {
-    if($existing = get-alias $name -ea ignore |? { $_.options -match 'readonly' }) {
+    if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
             write-host "Alias $name is read-only; can't reset it." -f darkyellow
         }
@@ -385,8 +446,8 @@ function reset_alias($name, $value) {
 
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = get-alias |? { $_.options -notmatch 'readonly|allscope' } |% { $_.name }
-    get-childitem function: | % {
+    $aliases = get-alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
+    get-childitem function: | ForEach-Object {
         $fn = $_.name
         if($aliases -contains $fn) {
             set-alias $fn local:$fn -scope script
@@ -394,13 +455,13 @@ function reset_aliases() {
     }
 
     # set default aliases
-    $default_aliases.keys | % { reset_alias $_ $default_aliases[$_] }
+    $default_aliases.keys | ForEach-Object { reset_alias $_ $default_aliases[$_] }
 }
 
 # convert list of apps to list of ($app, $global) tuples
 function applist($apps, $global) {
     if(!$apps) { return @() }
-    return ,@($apps |% { ,@($_, $global) })
+    return ,@($apps | ForEach-Object { ,@($_, $global) })
 }
 
 function app($app) {
@@ -429,23 +490,35 @@ function get_app_with_version([String] $app) {
         "version" = if ($version) { $version } else { 'latest' }
     }
 }
-function is_scoop_outdated() {
-    $now = Get-Date
-    try {
-        $last_update = (Get-Date $(scoop config lastupdate)).ToLocalTime().AddHours(3)
-    } catch {
-        scoop config lastupdate $now
-        # remove 1 minute to force an update for the first time
-        $last_update = $now.AddMinutes(-1)
+
+function last_scoop_update() {
+    $last_update = (scoop config lastupdate)
+    if(!$last_update) {
+        $last_update = [System.DateTime]::Now
     }
-    return $last_update -lt  $now.ToLocalTime()
+    return $last_update.ToLocalTime()
 }
 
-function substitute([String] $str, [Hashtable] $params) {
-    $params.GetEnumerator() | % {
-        $str = $str.Replace($_.Name, $_.Value)
+function is_scoop_outdated() {
+    $last_update = $(last_scoop_update)
+    $now = [System.DateTime]::Now
+    if($last_update -eq $now) {
+        scoop config lastupdate $now
+        # enforce an update for the first time
+        return $true
     }
-    return $str
+    return $last_update.AddHours(3) -lt  [System.DateTime]::Now.ToLocalTime()
+}
+
+function substitute($entity, [Hashtable] $params) {
+    if ($entity -is [Array]) {
+        return $entity | ForEach-Object { substitute $_ $params }
+    } elseif ($entity -is [String]) {
+        $params.GetEnumerator() | ForEach-Object {
+            $entity = $entity.Replace($_.Name, $_.Value)
+        }
+        return $entity
+    }
 }
 
 function format_hash([String] $hash) {

@@ -25,7 +25,7 @@ function bin_match($manifest, $query) {
 }
 
 function search_bucket($bucket, $query) {
-    $apps = apps_in_bucket (bucketdir $bucket) | % {
+    $apps = apps_in_bucket (bucketdir $bucket) | ForEach-Object {
         @{ name = $_ }
     }
 
@@ -36,7 +36,7 @@ function search_bucket($bucket, $query) {
             abort "Invalid regular expression: $($_.exception.innerexception.message)"
         }
 
-        $apps = $apps | ? {
+        $apps = $apps | Where-Object {
             if($_.name -match $query) { return $true }
             $bin = bin_match (manifest $_.name $bucket) $query
             if($bin) {
@@ -44,12 +44,12 @@ function search_bucket($bucket, $query) {
             }
         }
     }
-    $apps | % { $_.version = (latest_version $_.name $bucket); $_ }
+    $apps | ForEach-Object { $_.version = (latest_version $_.name $bucket); $_ }
 }
 
 function download_json($url) {
     $progressPreference = 'silentlycontinue'
-    $result = invoke-webrequest $url -UseBasicParsing | select -exp content | convertfrom-json
+    $result = invoke-webrequest $url -UseBasicParsing | Select-Object -exp content | convertfrom-json
     $progressPreference = 'continue'
     $result
 }
@@ -67,9 +67,9 @@ function search_remote($bucket, $query) {
         $user = $matches[1]
         $repo_name = $matches[2]
         $api_link = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
-        $result = download_json $api_link | select -exp tree |? {
+        $result = download_json $api_link | Select-Object -exp tree | Where-Object {
             $_.path -match "(^(.*$query.*).json$)"
-        } |% { $matches[2] }
+        } | ForEach-Object { $matches[2] }
     }
 
     $result
@@ -77,11 +77,11 @@ function search_remote($bucket, $query) {
 
 function search_remotes($query) {
     $buckets = known_bucket_repos
-    $names = $buckets | get-member -m noteproperty | select -exp name
+    $names = $buckets | get-member -m noteproperty | Select-Object -exp name
 
-    $results = $names |? { !(test-path $(bucketdir $_)) } |% {
+    $results = $names | Where-Object { !(test-path $(bucketdir $_)) } | ForEach-Object {
         @{"bucket" = $_; "results" = (search_remote $_ $query)}
-    } |? { $_.results }
+    } | Where-Object { $_.results }
 
     if ($results.count -gt 0) {
         "Results from other known buckets..."
@@ -89,14 +89,14 @@ function search_remotes($query) {
         ""
     }
 
-    $results |% {
+    $results | ForEach-Object {
         "'$($_.bucket)' bucket:"
-        $_.results |% { "    $_" }
+        $_.results | ForEach-Object { "    $_" }
         ""
     }
 }
 
-@($null) + @(buckets) | % { # $null is main bucket
+@($null) + @(buckets) | ForEach-Object { # $null is main bucket
     $res = search_bucket $_ $query
     $local_results = $local_results -or $res
     if($res) {
@@ -104,7 +104,7 @@ function search_remotes($query) {
         if(!$_) { $name = "main" }
 
         "'$name' bucket:"
-        $res | % {
+        $res | ForEach-Object {
             $item = "    $($_.name) ($($_.version))"
             if($_.bin) { $item += " --> includes '$($_.bin)'" }
             $item

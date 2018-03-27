@@ -1,10 +1,10 @@
 {
     "homepage": "http://www.groovy-lang.org/",
-    "version": "2.4.13",
+    "version": "2.4.14",
     "license": "Apache 2.0",
-    "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.4.13.zip",
-    "hash": "b9e4ad752affe37867a28e186dccddc8b541ea82ad3d86e4172a0fd9084c146f",
-    "extract_dir": "groovy-2.4.13",
+    "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.4.14.zip",
+    "hash": "f9c846e21d9220bac464ffc00eae8f4146f4c26777b61f62e3123da95c6bc52a",
+    "extract_dir": "groovy-2.4.14",
     "bin": [
         "bin\\grape.bat",
         "bin\\groovy.bat",
