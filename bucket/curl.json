@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://dl.bintray.com/vszakats/generic/curl-7.59.0-win64-mingw.tar.xz",
-            "hash": "131738d015a816103c559ac1e523f333a5b34ede1dd8877605f284554c42e169",
+            "hash": "7c3d0d5a3c936d0e2307259527bdf239a48c8c05495f0106fd71ee7c6c04dbff",
             "extract_dir": "curl-7.59.0-win64-mingw"
         },
         "32bit": {
