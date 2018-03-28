@@ -74,19 +74,21 @@ function rm_alias($name) {
 }
 
 function list_aliases {
-  $aliases = @{}
+  $aliases = @()
 
-  (init_alias_config).getenumerator() | ForEach-Object {
-    $summary = summary (Get-Content (command_path $_.name) -raw)
-    if(!($summary)) { $summary = '' }
-    $aliases.add("$($_.name) ", $summary)
+  (init_alias_config).GetEnumerator() | ForEach-Object {
+    $content = Get-Content (command_path $_.name)
+    $command = ($content | Select-Object -Skip 1).Trim()
+    $summary = (summary $content).Trim()
+
+    $aliases += New-Object psobject -Property @{Name=$_.name; Summary=$summary; Command=$command}
   }
 
   if(!$aliases.count) {
     warn "No aliases founds."
   }
 
-  $aliases.getenumerator() | Sort-Object name | Format-Table -hidetablehead -autosize -wrap
+  $aliases.GetEnumerator() | Sort-Object Name | Select-Object Name, Command, Summary | Format-Table -autosize -wrap
 }
 
 switch($opt) {
