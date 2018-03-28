@@ -1,9 +1,9 @@
 {
     "homepage": "https://github.com/PKISharp/win-acme",
-    "version": "1.9.10.0",
+    "version": "1.9.10.1",
     "license": "Apache 2.0",
-    "hash": "34edd88fbe3a884afdccd15afd8cc1aa110423cb7b571418cd4ee3f23a4f8c05",
-    "url": "https://github.com/PKISharp/win-acme/releases/download/v1.9.10.0/win-acme.v1.9.10.0.zip",
+    "hash": "3b129167220925d8a7130190a27a65a54912aa5d3c173eb66995a669e5572b59",
+    "url": "https://github.com/PKISharp/win-acme/releases/download/v1.9.10.1/win-acme.v1.9.10.1.zip",
     "bin": "letsencrypt.exe",
     "persist": "letsencrypt.exe.config",
     "checkver": {
