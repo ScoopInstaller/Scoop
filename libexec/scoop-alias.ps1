@@ -11,7 +11,13 @@
 # e.g.:
 #     scoop alias add rm 'scoop uninstall $args[0]' "Uninstalls an app"
 
-param($opt, $name, $command, $description)
+param(
+  [String]$opt,
+  [String]$name,
+  [String]$command,
+  [String]$description,
+  [Switch]$verbose = $false
+)
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
@@ -87,8 +93,12 @@ function list_aliases {
   if(!$aliases.count) {
     warn "No aliases founds."
   }
-
-  $aliases.GetEnumerator() | Sort-Object Name | Select-Object Name, Command, Summary | Format-Table -autosize -wrap
+  $aliases = $aliases.GetEnumerator() | Sort-Object Name
+  if($verbose) {
+    return $aliases | Select-Object Name, Command, Summary | Format-Table -autosize -wrap
+  } else {
+    return $aliases | Select-Object Name, Command | Format-Table -autosize -hidetablehead -wrap
+  }
 }
 
 switch($opt) {
