@@ -9,7 +9,11 @@
 #     scoop alias add <name> <command> <description>
 #
 # e.g.:
-#     scoop alias add rm 'scoop uninstall $args[0]' "Uninstalls an app"
+#     scoop alias add rm 'scoop uninstall $args[0]' 'Uninstalls an app'
+#     scoop alias add upgrade 'scoop update *' 'Updates all apps, just like brew or apt'
+#
+# Options:
+#   -v, --verbose   Show alias description and table headers (works only for 'list')
 
 param(
   [String]$opt,
