@@ -1,7 +1,7 @@
 {
     "homepage": "http://innounp.sourceforge.net",
     "version": "0.46",
-    "url": "https://sourceforge.net/projects/innounp/files/innounp/innounp%200.46/innounp046.rar/",
+    "url": "https://r15ch13.keybase.pub/scoop/innounp/innounp046.rar",
     "hash": "3c056e2fc46ca9e92405f13ddf1f250cfe4bd66cb83b6647d87c74bc7242b121",
     "bin": "innounp.exe",
     "checkver": "Version\\s+([\\d.]+)\\s*<br>"
