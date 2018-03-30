@@ -25,10 +25,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/facebook/zstd/releases/download/v1.3.3/zstd-v$version-win64.zip"
+                "url": "https://github.com/facebook/zstd/releases/download/v$version/zstd-v$version-win64.zip"
             },
             "32bit": {
-                "url": "https://github.com/facebook/zstd/releases/download/v1.3.3/zstd-v$version-win32.zip"
+                "url": "https://github.com/facebook/zstd/releases/download/v$version/zstd-v$version-win32.zip"
             }
         }
     }
