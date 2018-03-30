@@ -81,10 +81,10 @@ function update_scoop() {
         if($show_update_log) {
             git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
         }
+        Pop-Location
         if($res -ne 0) {
             abort 'Update failed.'
         }
-        Pop-Location
     }
 
     ensure_scoop_in_path
