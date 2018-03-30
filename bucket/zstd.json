@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.zstd.net/",
     "license": "https://github.com/facebook/zstd/blob/dev/LICENSE",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/facebook/zstd/releases/download/v1.3.3/zstd-v1.3.3-win64.zip",
-            "hash": "5286a124abbc37d037209f0127b31c3f5d02fef256925b9b4289939096b66598"
+            "url": "https://github.com/facebook/zstd/releases/download/v1.3.4/zstd-v1.3.4-win64.zip",
+            "hash": "b71f16f211aa0397a90e046ac4358c982ab9947c33e1004c933e69aee548ff26"
         },
         "32bit": {
-            "url": "https://github.com/facebook/zstd/releases/download/v1.3.3/zstd-v1.3.3-win32.zip",
-            "hash": "df417642c66aa10c0ac83b5145514b361f982ce2300832b3728804e0d1836b3c"
+            "url": "https://github.com/facebook/zstd/releases/download/v1.3.4/zstd-v1.3.4-win32.zip",
+            "hash": "52e0553c7fb8f5af6f19b4cc85023335a3b96603149ccb1049423254be012a43"
         }
     },
     "bin": "zstd.exe",
