@@ -1,9 +1,9 @@
 {
     "homepage": "http://gittup.org",
-    "version": "0.7.5-58-ga9befa9",
+    "version": "0.7.5-112-g411cb98",
     "license": "GPL-2.0",
     "url": "http://gittup.org/tup/win32/tup-latest.zip",
-    "hash": "3eb0f3e28a38f1e29d426d414b2ffddff6b18db547e9ff56920f3cedb93e1d3c",
+    "hash": "49c70089759a8497d452ea8b400dcfac3860a0a66a03a9954a9d247cbe73278c",
     "bin": "tup.exe",
     "checkver": {
         "url": "http://gittup.org/tup/win32",
