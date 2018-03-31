@@ -4,7 +4,7 @@
     "license": "LGPL",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/bochs/files/bochs/2.6.9/bochs-2.6.9-win64.zip",
+            "url": "https://downloads.sourceforge.net/project/bochs/bochs/2.6.9/bochs-2.6.9-win64.zip",
             "hash": "sha1:35a590b30c13add8ff6d3271c6aadd293ee4d923",
             "bin": [
                 "bochs-win64.exe",
@@ -12,7 +12,7 @@
             ]
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/bochs/files/bochs/2.6.9/bochs-p4-smp-2.6.9-win32.zip",
+            "url": "https://downloads.sourceforge.net/project/bochs/bochs/2.6.9/bochs-p4-smp-2.6.9-win32.zip",
             "hash": "sha1:bc2aa106890c649ca2a94e1c073151b1f42ef2bb",
             "bin": [
                 "bochs-p4-smp.exe",
@@ -27,10 +27,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://sourceforge.net/projects/bochs/files/bochs/$version/bochs-$version-win64.zip"
+                "url": "https://downloads.sourceforge.net/project/bochs/bochs/$version/bochs-$version-win64.zip"
             },
             "32bit": {
-                "url": "https://sourceforge.net/projects/bochs/files/bochs/$version/bochs-p4-smp-$version-win32.zip"
+                "url": "https://downloads.sourceforge.net/project/bochs/bochs/$version/bochs-p4-smp-$version-win32.zip"
             }
         }
     }
