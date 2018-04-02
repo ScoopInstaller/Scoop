@@ -1,7 +1,7 @@
 {
     "homepage": "http://ctags.sourceforge.net/",
     "version": "5.8",
-    "url": "https://sourceforge.net/projects/ctags/files/ctags/5.8/ctags58.zip",
+    "url": "https://downloads.sourceforge.net/project/ctags/ctags/5.8/ctags58.zip",
     "extract_dir": "ctags58",
     "bin": "ctags.exe",
     "hash": "e1f5909ec0c7a58fd2149139fa6a1dc532070a3d919dd183671c57a32f8b243d",

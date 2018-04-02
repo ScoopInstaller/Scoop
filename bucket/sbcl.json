@@ -4,7 +4,7 @@
     "license": "http://www.sbcl.org/history.html",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/sbcl/files/sbcl/1.3.18/sbcl-1.3.18-x86-64-windows-binary.msi",
+            "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/1.3.18/sbcl-1.3.18-x86-64-windows-binary.msi",
             "hash": "a33691857519750beca2775498196e8b61f9862aea617b1207548882ded48fb3"
         }
     },

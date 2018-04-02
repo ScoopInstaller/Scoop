@@ -5,7 +5,7 @@
     "version": "02.28.10",
     "autoupdate": {
         "extract_dir": "inadyn-mt.v.$version",
-        "url": "https://sourceforge.net/projects/inadyn-mt/files/inadyn-mt/inadyn-mt.v.$version/inadyn-mt.v.$version.tar.gz"
+        "url": "https://downloads.sourceforge.net/project/inadyn-mt/inadyn-mt/inadyn-mt.v.$version/inadyn-mt.v.$version.tar.gz"
     },
     "bin": "bin/win32/inadyn-mt.exe",
     "checkver": "title=\"/inadyn-mt/inadyn-mt\\.v\\.([\\d.]+)",
@@ -48,5 +48,5 @@ For help, see $dir\\readme.html",
     "uninstaller": {
         "script": "sudo \"$dir/bin/win32/inadyn-mt.exe\" -x"
     },
-    "url": "https://sourceforge.net/projects/inadyn-mt/files/inadyn-mt/inadyn-mt.v.02.28.10/inadyn-mt.v.02.28.10.tar.gz"
+    "url": "https://downloads.sourceforge.net/project/inadyn-mt/inadyn-mt/inadyn-mt.v.02.28.10/inadyn-mt.v.02.28.10.tar.gz"
 }

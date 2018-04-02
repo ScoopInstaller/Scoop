@@ -4,12 +4,12 @@
     "license": "GPL3",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.2.0/threads-posix/seh/x86_64-7.2.0-release-posix-seh-rt_v5-rev1.7z",
+            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.2.0/threads-posix/seh/x86_64-7.2.0-release-posix-seh-rt_v5-rev1.7z",
             "hash": "ef88d8691566b993778ed3ad651a3c75bd67896d1d8e220729fe24ec405ec21c",
             "extract_dir": "mingw64"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/7.2.0/threads-posix/dwarf/i686-7.2.0-release-posix-dwarf-rt_v5-rev1.7z",
+            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/7.2.0/threads-posix/dwarf/i686-7.2.0-release-posix-dwarf-rt_v5-rev1.7z",
             "hash": "8451a013ce317c72edde4c65932d6770dd98910a27714527ac27dc76bd3123f1",
             "extract_dir": "mingw32"
         }

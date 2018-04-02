@@ -8,7 +8,7 @@
         }
     },
     "autoupdate": {
-        "url": "https://sourceforge.net/projects/tumagcc/files/schily-cdrtools-$version.7z"
+        "url": "https://downloads.sourceforge.net/project/tumagcc/schily-cdrtools-$version.7z"
     },
     "bin": [
         "btcflash.exe",
@@ -30,6 +30,6 @@
     "hash": "f534062cab7585b82bd764f02bc65fb0c7c27ac1615786bfc81c35880ce4acc6",
     "homepage": "https://sourceforge.net/projects/tumagcc/",
     "license": "CDDL-1.0/GPL-2.0/LGPL-2.1",
-    "url": "https://sourceforge.net/projects/tumagcc/files/schily-cdrtools-3.01.7z",
+    "url": "https://downloads.sourceforge.net/project/tumagcc/schily-cdrtools-3.01.7z",
     "version": "3.01"
 }
