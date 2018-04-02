@@ -1,14 +1,14 @@
 {
-    "version": "2.10.0",
+    "version": "2.891",
     "homepage": "https://cygwin.com/",
     "architecture": {
         "64bit": {
             "url": "https://cygwin.com/setup-x86_64.exe",
-            "hash": "4084fe6db9ed7518b7f02097210b4d6b1748979556f606fa5c79ee126f07db5f"
+            "hash": "22d80e6893200d377bdb46a7080d3c60092e027bba51c6e73013969e05c629f9"
         },
         "32bit": {
             "url": "https://cygwin.com/setup-x86.exe",
-            "hash": "e506e21fa713783751a214af9741be73b711c341e3abce5fc755c5aff7c1fb6a"
+            "hash": "d5a50bcc024834055664fc9412604f74061411531b9b32112dfda3f355e48a6c"
         }
     },
     "autoupdate": {
