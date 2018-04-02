@@ -1,6 +1,6 @@
 {
     "version": "rev13",
-    "url": "https://sourceforge.net/projects/mingwbuilds/files/external-binary-packages/msys%2B7za%2Bwget%2Bsvn%2Bgit%2Bmercurial%2Bcvs-rev13.7z",
+    "url": "https://downloads.sourceforge.net/project/mingwbuilds/external-binary-packages/msys%2B7za%2Bwget%2Bsvn%2Bgit%2Bmercurial%2Bcvs-rev13.7z",
     "hash": "5f2ea0c4b714a7d7e704e83040397d0ba7ecaf925afa5512aada180a711ef770",
     "extract_dir": "msys",
     "bin": "msys.bat"
