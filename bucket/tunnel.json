@@ -4,7 +4,7 @@
     "license": "https://github.com/labstack/tunnel/blob/master/LICENSE",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/labstack/tunnel/releases/download/0.1.1/tunnel-0.1.1-windows-8.0-amd64.exe",
+            "url": "https://github.com/labstack/tunnel/releases/download/0.1.1/tunnel-0.1.1-windows-8.0-amd64.exe#/tunnel.exe",
             "hash": "0fe800236fbfaa79c328b0bbd059cc2dfc2387d12cb106a627a2e25afafabd9d"
         }
     },
@@ -15,7 +15,7 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/labstack/tunnel/releases/download/$version/tunnel-$version-windows-8.0-amd64.exe"
+                "url": "https://github.com/labstack/tunnel/releases/download/$version/tunnel-$version-windows-8.0-amd64.exe#/tunnel.exe"
             }
         }
     }

@@ -4,7 +4,7 @@
     "license": "https://github.com/labstack/armor/blob/master/LICENSE",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/labstack/armor/releases/download/0.4.3/armor-0.4.3-windows-8.0-amd64.exe",
+            "url": "https://github.com/labstack/armor/releases/download/0.4.3/armor-0.4.3-windows-8.0-amd64.exe#/armor.exe",
             "hash": "618d53b71d8c8f7e332fc53d72188d11c43d01add9ec858b172b3f802bd3e6b6"
         }
     },
@@ -15,7 +15,7 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/labstack/armor/releases/download/$version/armor-$version-windows-8.0-amd64.exe"
+                "url": "https://github.com/labstack/armor/releases/download/$version/armor-$version-windows-8.0-amd64.exe#/armor.exe"
             }
         }
     }
