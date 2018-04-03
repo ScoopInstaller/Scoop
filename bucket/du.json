@@ -4,7 +4,7 @@
     "description": "Shows Disk Usage",
     "version": "1.6",
     "url": "https://download.sysinternals.com/files/DU.zip",
-    "hash": "a3757d8b646bcd2feac05af2d30eb6e8b7da8c79a896f57ff67036996e46b4a9",
+    "hash": "99b69f9d7930ae0fbc85e446b66446b2bc3ce344a50976f80d717f64aeec4d7b",
     "architecture": {
         "64bit": {
             "bin": [
