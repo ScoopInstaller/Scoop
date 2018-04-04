@@ -1,10 +1,10 @@
 {
     "homepage": "https://www.cockroachlabs.com/",
     "license": "https://github.com/cockroachdb/cockroach/blob/master/LICENSE",
-    "version": "1.1.7",
-    "url": "https://binaries.cockroachdb.com/cockroach-v1.1.7.windows-6.2-amd64.zip",
-    "hash": "bcc08c31530782918788a1a959955961010be28b5fd41fda9018ceae4f838ff2",
-    "extract_dir": "cockroach-v1.1.7.windows-6.2-amd64",
+    "version": "2.0.0",
+    "url": "https://binaries.cockroachdb.com/cockroach-v2.0.0.windows-6.2-amd64.zip",
+    "hash": "e3b971151ee936178f5e98c935d22bc3688387eb274a6afc4caf96d9a181ec70",
+    "extract_dir": "cockroach-v2.0.0.windows-6.2-amd64",
     "bin": "cockroach.exe",
     "checkver": {
         "url": "https://www.cockroachlabs.com/docs/stable/install-cockroachdb.html",
