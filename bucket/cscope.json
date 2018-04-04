@@ -1,0 +1,13 @@
+{
+    "version": "15.8a",
+    "architecture": {
+        "64bit": {
+            "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-15.8a-win64rev1-static.zip"
+        },
+        "32bit": {
+            "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-15.8a-win32rev1-static.zip"
+        }
+    },
+    "bin": "cscope.exe",
+    "homepage": "http://cscope.sourceforge.net/"
+}
