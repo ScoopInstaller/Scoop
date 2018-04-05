@@ -1,0 +1,14 @@
+{
+    "homepage": "https://gitversion.readthedocs.io/",
+    "license": "MIT License",
+    "version": "3.6.5",
+    "url": "https://github.com/GitTools/GitVersion/releases/download/v3.6.5/GitVersionTask.3.6.5.nupkg#/dl.7z",
+    "hash": "0493978dd7a54d8b06ede527f24adc73a3e0e91e7627fbfeef732e378cbd0b3e",
+    "bin": "GitVersion.exe",
+    "checkver": {
+        "github": "https://github.com/GitTools/GitVersion"
+    },
+    "autoupdate": {
+        "url": "https://github.com/GitTools/GitVersion/releases/download/v$version/GitVersionTask.$version.nupkg#/dl.7z"
+    }
+}
