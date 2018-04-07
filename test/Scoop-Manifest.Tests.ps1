@@ -45,7 +45,9 @@ describe "manifest-validation" {
 
     context "manifest validates against the schema" {
         beforeall {
-            $bucketdir = "$psscriptroot\..\bucket\"
+            if ($null -eq $bucketdir) {
+                $bucketdir = "$psscriptroot\..\bucket\"
+            }
             $manifest_files = Get-ChildItem $bucketdir *.json
             $validator = new-object Scoop.Validator($schema, $true)
         }
