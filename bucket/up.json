@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/apex/up",
     "license": "https://github.com/apex/up/blob/master/LICENSE",
-    "version": "0.5.12",
+    "version": "0.5.13",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/apex/up/releases/download/v0.5.12/up_0.5.12_windows_amd64.tar.gz",
-            "hash": "0a0b60c95f08d0608b2b99134e614795fbd521ef2f1517ffc6d973081a4ba458"
+            "url": "https://github.com/apex/up/releases/download/v0.5.13/up_0.5.13_windows_amd64.tar.gz",
+            "hash": "f972223a7e38c0d56f1fc2cedcd665194112dd5cb5c41cd1f473797e32b19ec5"
         },
         "32bit": {
-            "url": "https://github.com/apex/up/releases/download/v0.5.12/up_0.5.12_windows_386.tar.gz",
-            "hash": "04a2789536c4d7d6a31cae98b888db00fd20d058cd798ca78ad4f6eceddc15dd"
+            "url": "https://github.com/apex/up/releases/download/v0.5.13/up_0.5.13_windows_386.tar.gz",
+            "hash": "8b110c5d9c72986800274b95f65a56b8c3f3f5c77e2be5843f3cf2949feb5d56"
         }
     },
     "bin": "up.exe",
