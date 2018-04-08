@@ -1,9 +1,9 @@
 {
     "homepage": "https://rg3.github.io/youtube-dl/",
     "license": "Public Domain",
-    "version": "2018.04.03",
-    "url": "https://github.com/rg3/youtube-dl/releases/download/2018.04.03/youtube-dl.exe",
-    "hash": "20192a17b2941c27ee1f83330094d393e699eb3cc65831e2e8340e13e90be57f",
+    "version": "2018.04.09",
+    "url": "https://github.com/rg3/youtube-dl/releases/download/2018.04.09/youtube-dl.exe",
+    "hash": "7071c7a2361931a1706078a445fd94176a6c6004b8bbb26d0704b6c2aa77dde2",
     "bin": "youtube-dl.exe",
     "depends": [
         "ffmpeg"
