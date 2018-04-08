@@ -1,0 +1,13 @@
+{
+    "homepage": "http://astyle.sourceforge.net/",
+    "version": "3.1",
+    "license": "MIT",
+    "url": [
+        "https://sourceforge.net/projects/astyle/files/astyle/astyle%203.1/AStyle_3.1_windows.zip"
+    ],
+    "hash": [
+        "0759d0a3b3ad768e0f1984b6faf22c5d9d53c2e081d1cfbd1cc7d6e955e995cb"
+    ],
+    "bin": "AStyle\\bin\\AStyle.exe",
+    "checkver": "Artistic Style ([\\d.]+)"
+}
