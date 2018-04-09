@@ -2,27 +2,21 @@
     "homepage": "http://www.info-zip.org/",
     "license": "http://www.info-zip.org/pub/infozip/license.html",
     "description": "Zip compression utilities",
-    "version": "3.0",
+    "version": "3.1d26",
     "bin": [
         "zip.exe",
         "zipcloak.exe",
         "zipnote.exe",
         "zipsplit.exe"
     ],
+    "url": "http://r.windows.random.supplies/zip3.1d26.zip",
+    "hash": "822b1a808636e28d0c67e76572a21dc2bc1b2a1c092cc01c762c883e2c2cbd63",
     "architecture": {
-        "32bit": {
-            "hash": "f8bbc1821d50400245107ce8cfa4a6c7b524387b58bbd6cbe9c20094e82c3bb5",
-            "url": "https://r15ch13.keybase.pub/scoop/zip/zip300xn.zip"
-        },
         "64bit": {
-            "hash": "ed29893fcd7f8b2afb2ead0461663584b740b5d064d4e1c87084107941197a7b",
-            "url": "https://r15ch13.keybase.pub/scoop/zip/zip300xn-x64.zip"
+            "extract_dir": "x64"
+        },
+        "32bit": {
+            "extract_dir": "x32"
         }
-    },
-    "pre_install": [
-        "if(Test-Path \"$dir\\zip300xn-x64.zip\") {",
-        "unzip \"$dir\\zip300xn-x64.zip\" \"$dir\"",
-        "Remove-Item \"$dir\\zip300xn-x64.zip\"",
-        "}"
-    ]
+    }
 }
