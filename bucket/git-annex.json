@@ -2,11 +2,11 @@
     "description": "Manage files with git, without comitting them",
     "homepage": "https://www.agwa.name/projects/git-crypt/",
     "license": "GPL-3.0",
-    "version": "6.20180316",
+    "version": "6.20180409",
     "notes": "NOTE: Running `git-annex version` may report a slightly older version number",
     "bin": "usr/bin/git-annex.exe",
     "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z",
-    "hash": "c57c7d74b5fd63dbf614da829a6320507a11817a55a18b33ba52e1ffa0f30ed4",
+    "hash": "09c252e55706a58be8302b3b806591f7899d062404d866258fd3aa25349b6f8c",
     "checkver": {
         "url": "https://hackage.haskell.org/package/git-annex",
         "re": "/git-annex-([\\d.]+)\\.tar\\.gz"
