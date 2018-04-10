@@ -134,7 +134,8 @@ function set_https_protocols($protocols) {
 
 function do_dl($url, $to, $cookies) {
     $original_protocols = use_any_https_protocol
-    $progress = [console]::isoutputredirected -eq $false
+    $progress = [console]::isoutputredirected -eq $false -and
+        $host.name -ne 'Windows PowerShell ISE Host'
 
     try {
         $url = handle_special_urls $url
