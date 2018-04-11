@@ -389,7 +389,7 @@ function ensure_robocopy_in_path {
 }
 
 function wraptext($text, $width) {
-    if(!$width) { $width = $host.ui.rawui.windowsize.width };
+    if(!$width) { $width = $host.ui.rawui.buffersize.width };
     $width -= 1 # be conservative: doesn't seem to print the last char
 
     $text -split '\r?\n' | ForEach-Object {
