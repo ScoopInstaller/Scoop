@@ -1,11 +1,15 @@
 {
-    "version": "0.4.4",
+    "version": "0.4.7",
     "homepage": "https://github.com/labstack/armor",
     "license": "https://github.com/labstack/armor/blob/master/LICENSE",
     "architecture": {
+        "32bit": {
+            "url": "https://github.com/labstack/armor/releases/download/0.4.7/armor_0.4.7_windows_32-bit.zip",
+            "hash": "f75d7acf765314f555280a1d964c8312fbcac4f403c20bf0c4a58d84895037b5"
+        },
         "64bit": {
-            "url": "https://github.com/labstack/armor/releases/download/0.4.4/armor-0.4.4-windows-8.0-amd64.exe#/armor.exe",
-            "hash": "0d798772d2d9316203b13ab1cc052111dc6c0c5fe44909e3bc6f5a7f5b28dade"
+            "url": "https://github.com/labstack/armor/releases/download/0.4.7/armor_0.4.7_windows_64-bit.zip",
+            "hash": "0b7f655dab3769ff6fc928262fadb6dc2916fd23783843614485ce55bed90b59"
         }
     },
     "bin": "armor.exe",
@@ -14,9 +18,15 @@
     },
     "autoupdate": {
         "architecture": {
+            "32bit": {
+                "url": "https://github.com/labstack/armor/releases/download/$version/armor_$version_windows_32-bit.zip"
+            },
             "64bit": {
-                "url": "https://github.com/labstack/armor/releases/download/$version/armor-$version-windows-8.0-amd64.exe#/armor.exe"
+                "url": "https://github.com/labstack/armor/releases/download/$version/armor_$version_windows_64-bit.zip"
             }
+        },
+        "hash": {
+            "url": "https://github.com/labstack/armor/releases/download/$version/armor_checksum.txt"
         }
     }
 }
