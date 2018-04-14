@@ -5,11 +5,11 @@
     "architecture": {
         "32bit": {
             "url": "https://github.com/labstack/armor/releases/download/0.4.7/armor_0.4.7_windows_32-bit.zip",
-            "hash": "f75d7acf765314f555280a1d964c8312fbcac4f403c20bf0c4a58d84895037b5"
+            "hash": "56f5eed5d676e8e991fd3c45a9f7b4bfec17ae5ef108f37a46b7603c64338f79"
         },
         "64bit": {
             "url": "https://github.com/labstack/armor/releases/download/0.4.7/armor_0.4.7_windows_64-bit.zip",
-            "hash": "0b7f655dab3769ff6fc928262fadb6dc2916fd23783843614485ce55bed90b59"
+            "hash": "a1789a634268e246faf778063c95defc9df0341802cc282fc931024d0fc4577f"
         }
     },
     "bin": "armor.exe",
