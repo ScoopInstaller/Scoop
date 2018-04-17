@@ -1,4 +1,5 @@
 {
+    "description": "Pester is a test and mock framework for PowerShell.",
     "version": "4.3.1",
     "license": "https://raw.githubusercontent.com/pester/Pester/master/LICENSE",
     "url": "https://github.com/pester/pester/archive/4.3.1.tar.gz",
