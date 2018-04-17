@@ -1,4 +1,5 @@
 {
+    "description": "Uncomplicated, modern HTTP server",
     "version": "0.4.7",
     "homepage": "https://github.com/labstack/armor",
     "license": "https://github.com/labstack/armor/blob/master/LICENSE",
