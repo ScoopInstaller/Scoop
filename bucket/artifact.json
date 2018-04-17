@@ -1,4 +1,5 @@
 {
+    "description": "The open source design documentation tool",
     "version": "1.0.1",
     "homepage": "https://github.com/vitiral/artifact",
     "license": "LGPL",
