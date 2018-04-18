@@ -1,4 +1,5 @@
 {
+    "description": "Apex lets you build, deploy, and manage AWS Lambda functions.",
     "homepage": "http://apex.run/",
     "license": "https://github.com/apex/apex/blob/master/LICENSE",
     "version": "0.16.0",

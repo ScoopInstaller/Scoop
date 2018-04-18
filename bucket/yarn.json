@@ -1,5 +1,6 @@
 {
     "homepage": "https://yarnpkg.com/",
+    "description": "Dependency manager",
     "license": "BSD",
     "version": "1.6.0",
     "suggest": {

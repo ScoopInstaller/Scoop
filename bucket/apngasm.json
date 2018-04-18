@@ -1,4 +1,5 @@
 {
+    "description": "The next generation of apngasm, the APNG Assembler.",
     "homepage": "https://github.com/apngasm/apngasm",
     "version": "3.0.0",
     "url": "http://files.genshin.org/apngasm/apngasm-cli.7z",
