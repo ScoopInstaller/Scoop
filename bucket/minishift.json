@@ -9,7 +9,7 @@
             "hash": "c1789184ecb729e2c75cb1e6f65354185039c23606239a2b693bee30fa2ac206"
         }
     },
-    "extract_dir": "minishift-1.15.1-windows-amd64",
+    "extract_dir": "minishift-1.16.0-windows-amd64",
     "bin": [
         "minishift.exe"
     ],
