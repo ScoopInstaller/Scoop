@@ -1,7 +1,7 @@
 {
     "homepage": "https://ant.apache.org/",
     "version": "1.10.3",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "url": "https://www-us.apache.org/dist/ant/binaries/apache-ant-1.10.3-bin.zip",
     "hash": "sha512:e8f82a00ecfc460050975061ace65bb7e3e7156c97a5ed2dafdb1f9ef50165a8b8baaaf3164c5b39c70f51101167b188d81abb7a966945b9830a31a64043c463",
     "extract_dir": "apache-ant-1.10.3",

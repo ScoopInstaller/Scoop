@@ -2,7 +2,7 @@
     "description": "Uncomplicated, modern HTTP server",
     "version": "0.4.7",
     "homepage": "https://github.com/labstack/armor",
-    "license": "https://github.com/labstack/armor/blob/master/LICENSE",
+    "license": "MIT",
     "architecture": {
         "32bit": {
             "url": "https://github.com/labstack/armor/releases/download/0.4.7/armor_0.4.7_windows_32-bit.zip",

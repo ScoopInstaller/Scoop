@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.groovy-lang.org/",
     "version": "2.4.15",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.4.15.zip",
     "hash": "bd4ca37a4d1b3704526d56fc48c119a8f70d418093d8703724407d65250f4aed",
     "extract_dir": "groovy-2.4.15",

@@ -1,6 +1,6 @@
 {
     "homepage": "https://minio.io/",
-    "license": "https://github.com/minio/minio/blob/master/LICENSE",
+    "license": "Apache-2.0",
     "version": "2018-04-19T22-54-58Z",
     "bin": "minio.exe",
     "architecture": {

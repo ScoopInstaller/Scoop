@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/ojdkbuild/ojdkbuild",
     "version": "1.8.0.161-1",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "architecture": {
         "64bit": {
             "url": "https://github.com/ojdkbuild/ojdkbuild/releases/download/1.8.0.161-1/java-1.8.0-openjdk-1.8.0.161-1.b14.ojdkbuild.windows.x86_64.zip",

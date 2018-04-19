@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/docker/compose",
     "version": "1.21.0",
-    "license": "Apache",
+    "license": "Apache-2.0",
     "architecture": {
         "64bit": {
             "url": "https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Windows-x86_64.exe#/docker-compose.exe",

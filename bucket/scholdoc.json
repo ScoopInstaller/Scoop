@@ -1,6 +1,6 @@
 {
     "version": "0.1.3-alpha",
-    "license": "",
+    "license": "GPL-2.0",
     "extract_dir": "Scholdoc",
     "url": "http://scholarlymarkdown.com/scholdoc-distribution/windows/scholdoc-0.1.3-alpha-windows.msi",
     "homepage": "http://scholdoc.scholarlymarkdown.com/",

@@ -1,6 +1,6 @@
 {
     "homepage": "https://github.com/apex/up",
-    "license": "https://github.com/apex/up/blob/master/LICENSE",
+    "license": "GPL-3.0",
     "version": "0.6.1",
     "architecture": {
         "64bit": {

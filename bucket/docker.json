@@ -1,6 +1,6 @@
 {
     "version": "17.05.0-ce",
-    "license": "https://github.com/docker/docker/blob/master/LICENSE",
+    "license": "Apache-2.0",
     "architecture": {
         "64bit": {
             "url": "https://get.docker.com/builds/Windows/x86_64/docker-17.05.0-ce.zip",

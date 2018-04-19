@@ -1,7 +1,7 @@
 {
     "version": "0.2.5",
     "homepage": "https://github.com/labstack/tunnel",
-    "license": "https://github.com/labstack/tunnel/blob/master/LICENSE",
+    "license": "MIT",
     "architecture": {
         "32bit": {
             "url": "https://github.com/labstack/tunnel/releases/download/0.2.5/tunnel_0.2.5_windows_32-bit.zip",

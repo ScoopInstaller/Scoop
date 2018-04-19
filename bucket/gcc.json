@@ -1,7 +1,7 @@
 {
     "homepage": "https://mingw-w64.org",
     "version": "7.2.0",
-    "license": "GPL3",
+    "license": "GPL-3.0",
     "architecture": {
         "64bit": {
             "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.2.0/threads-posix/seh/x86_64-7.2.0-release-posix-seh-rt_v5-rev1.7z",

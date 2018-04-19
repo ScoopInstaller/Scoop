@@ -1,7 +1,7 @@
 {
     "homepage": "https://premake.github.io/download.html",
     "version": "4.4-b5",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "url": "https://downloads.sourceforge.net/project/premake/Premake/4.4/premake-4.4-beta5-windows.zip",
     "hash": "09614c122156617a2b7973cc9f686daa32e64e3e7335d38db887cfb8f6a8574d",
     "bin": [

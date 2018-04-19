@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.vim.org",
-    "license": "http://vimdoc.sourceforge.net/htmldoc/uganda.html#license",
+    "license": "Vim",
     "version": "8.0.1737",
     "architecture": {
         "32bit": {

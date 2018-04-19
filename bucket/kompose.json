@@ -1,7 +1,7 @@
 {
     "homepage": "http://kompose.io",
     "description": "Kompose is a conversion tool for Docker Compose to container orchestrators such as Kubernetes (or OpenShift).",
-    "license": "https://raw.githubusercontent.com/kubernetes/kompose/master/LICENSE",
+    "license": "Apache-2.0",
     "version": "1.12.0",
     "architecture": {
         "64bit": {

@@ -1,6 +1,6 @@
 {
     "homepage": "https://github.com/msiemens/PyGitUp",
-    "license": "https://github.com/msiemens/PyGitUp/blob/master/LICENCE",
+    "license": "MIT",
     "version": "1.4.6",
     "url": "https://github.com/msiemens/PyGitUp/archive/v1.4.6.zip",
     "hash": "1d5becf87fbe311124d01c722e5f3621bcfff19d9328810f6a6768aa8659c6e5",

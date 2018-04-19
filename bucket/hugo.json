@@ -1,6 +1,6 @@
 {
     "version": "0.39",
-    "license": "https://github.com/spf13/hugo/blob/master/LICENSE.md",
+    "license": "Apache-2.0",
     "architecture": {
         "64bit": {
             "url": "https://github.com/spf13/hugo/releases/download/v0.39/hugo_0.39_windows-64bit.zip",

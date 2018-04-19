@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.llvm.org/",
     "version": "6.0.0",
-    "license": "University of Illinois/NCSA Open Source License",
+    "license": "NCSA",
     "architecture": {
         "32bit": {
             "url": "https://releases.llvm.org/6.0.0/LLVM-6.0.0-win32.exe#/llvm.7z",

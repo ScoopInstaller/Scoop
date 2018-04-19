@@ -1,6 +1,6 @@
 {
     "homepage": "https://github.com/Azure/draft",
-    "license": "https://github.com/Azure/draft/blob/master/LICENSE",
+    "license": "MIT",
     "version": "0.13.0",
     "architecture": {
         "64bit": {

@@ -1,7 +1,7 @@
 {
     "version": "6.12",
     "homepage": "https://racket-lang.org",
-    "license": "LGPL",
+    "license": "LGPL-3.0",
     "architecture": {
         "64bit": {
             "url": "https://mirror.racket-lang.org/installers/6.12/racket-6.12-x86_64-win32.exe#/dl.7z",

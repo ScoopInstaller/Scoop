@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.zstd.net/",
-    "license": "https://github.com/facebook/zstd/blob/dev/LICENSE",
+    "license": "BSD-3-Clause",
     "description": "Zstandard is a real-time compression algorithm, providing high compression ratios.",
     "version": "1.3.4",
     "architecture": {

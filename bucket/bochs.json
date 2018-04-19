@@ -1,7 +1,7 @@
 {
     "homepage": "http://bochs.sourceforge.net/",
     "version": "2.6.9",
-    "license": "LGPL",
+    "license": "LGPL-2.1",
     "architecture": {
         "64bit": {
             "url": "https://downloads.sourceforge.net/project/bochs/bochs/2.6.9/bochs-2.6.9-win64.zip",

@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.mingw.org/wiki/MSYS",
     "version": "3.1.7",
-    "license": "GPL3",
+    "license": "GPL-3.0",
     "url": [
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/gawk/gawk-3.1.7-2/gawk-3.1.7-2-msys-1.0.13-bin.tar.lzma",
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma",

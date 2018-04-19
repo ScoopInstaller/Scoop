@@ -5,6 +5,6 @@
     "extract_dir": "ctags58",
     "bin": "ctags.exe",
     "hash": "e1f5909ec0c7a58fd2149139fa6a1dc532070a3d919dd183671c57a32f8b243d",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "checkver": "Version ([\\d.]+)"
 }

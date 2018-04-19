@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.isc.org/",
-    "license": "https://www.isc.org/downloads/software-support-policy/isc-license/",
+    "license": "ISC",
     "version": "9.12.1",
     "architecture": {
         "64bit": {

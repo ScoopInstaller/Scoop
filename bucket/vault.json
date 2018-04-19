@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.vaultproject.io",
-    "license": "Mozilla Public License 2.0",
+    "license": "MPL-2.0",
     "version": "0.10.0",
     "architecture": {
         "64bit": {

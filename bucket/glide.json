@@ -1,6 +1,6 @@
 {
     "homepage": "https://glide.sh/",
-    "license": "https://github.com/Masterminds/glide/blob/master/LICENSE",
+    "license": "MIT",
     "version": "0.13.1",
     "architecture": {
         "64bit": {

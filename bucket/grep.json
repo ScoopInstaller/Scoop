@@ -1,7 +1,7 @@
 {
     "homepage": "http://gnuwin32.sourceforge.net/packages/grep.htm",
     "version": "2.5.4",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "url": [
         "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-bin.zip",
         "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-dep.zip"

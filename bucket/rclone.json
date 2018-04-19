@@ -1,7 +1,7 @@
 {
     "homepage": "https://rclone.org",
     "version": "1.40",
-    "license": "https://github.com/ncw/rclone/blob/master/COPYING",
+    "license": "MIT",
     "architecture": {
         "64bit": {
             "url": "https://github.com/ncw/rclone/releases/download/v1.40/rclone-v1.40-windows-amd64.zip",

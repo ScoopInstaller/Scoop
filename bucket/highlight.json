@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.andre-simon.de/doku/highlight/en/highlight.php",
     "version": "3.42",
-    "license": "GPL3",
+    "license": "GPL-3.0",
     "architecture": {
         "64bit": {
             "url": "http://www.andre-simon.de/zip/highlight-3.42-x64.zip",

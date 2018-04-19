@@ -1,7 +1,7 @@
 {
     "homepage": "https://kotlinlang.org/",
     "version": "1.2.40",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "url": "https://github.com/JetBrains/kotlin/releases/download/v1.2.40/kotlin-compiler-1.2.40.zip",
     "hash": "3498571126c335be0feec24075c359f1954d46bbabccafc729ec49db1a509658",
     "extract_dir": "kotlinc",

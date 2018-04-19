@@ -1,6 +1,6 @@
 {
     "homepage": "https://fnproject.io/",
-    "license": "https://github.com/fnproject/cli/blob/master/LICENSE",
+    "license": "Apache-2.0",
     "version": "0.4.73",
     "architecture": {
         "64bit": {

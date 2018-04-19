@@ -1,7 +1,7 @@
 {
     "homepage": "https://thrift.apache.org/",
     "version": "0.11.0",
-    "license": "Apache License v2.0",
+    "license": "Apache-2.0",
     "url": "https://www-us.apache.org/dist/thrift/0.11.0/thrift-0.11.0.exe#/thrift.exe",
     "hash": "29a45c267f64ada6663fd449677b4d8ba3b4b3c772a9fd23910f876a224c2776",
     "bin": "thrift.exe",

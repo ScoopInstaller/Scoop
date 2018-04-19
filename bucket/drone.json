@@ -1,7 +1,7 @@
 {
     "homepage": "https://drone.io/",
     "version": "0.8.5",
-    "license": "Apache License 2.0",
+    "license": "Apache-2.0",
     "url": "https://github.com/drone/drone-cli/releases/download/v0.8.5/drone_windows_amd64.tar.gz",
     "hash": "98bc8907bd14e36ef251d2fc6117d233f62e6e7d25e5511be98bbba228bf3e86",
     "bin": "drone.exe",

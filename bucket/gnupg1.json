@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.gnupg.org/",
     "version": "1.4.22",
-    "license": "GPLv3",
+    "license": "GPL-3.0",
     "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32cli-1.4.22.exe#/dl.7z",
     "hash": "7d0344a951ca49d34d2a884c9962d5104f73b637aeef717f33ee25c7a0465dca",
     "bin": [

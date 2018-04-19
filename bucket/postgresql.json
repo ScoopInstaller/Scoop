@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.postgresql.org/",
     "version": "10.3",
-    "license": "https://www.postgresql.org/about/licence/",
+    "license": "PostgreSQL",
     "architecture": {
         "64bit": {
             "url": "https://get.enterprisedb.com/postgresql/postgresql-10.3-1-windows-x64-binaries.zip",

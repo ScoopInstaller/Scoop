@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.imagemagick.org/script/index.php",
-    "license": "https://www.imagemagick.org/script/license.php",
+    "license": "ImageMagick",
     "version": "7.0.7-28",
     "architecture": {
         "64bit": {

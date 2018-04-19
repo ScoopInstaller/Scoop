@@ -1,7 +1,7 @@
 {
     "homepage": "https://unbound.net/",
     "version": "1.7.0",
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "architecture": {
         "64bit": {
             "url": "https://unbound.net/downloads/unbound-1.7.0.zip",

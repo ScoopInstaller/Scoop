@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.apachelounge.com",
     "version": "2.4.33",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "architecture": {
         "64bit": {
             "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.33-win64-VC15.zip",

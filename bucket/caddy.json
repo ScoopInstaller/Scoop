@@ -1,7 +1,7 @@
 {
     "version": "0.10.14",
     "homepage": "https://caddyserver.com",
-    "license": "https://github.com/mholt/caddy/blob/master/LICENSE.txt",
+    "license": "Apache-2.0",
     "architecture": {
         "64bit": {
             "url": "https://github.com/mholt/caddy/releases/download/v0.10.14/caddy_v0.10.14_windows_amd64.zip",
