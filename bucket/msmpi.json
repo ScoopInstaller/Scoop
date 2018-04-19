@@ -1,0 +1,32 @@
+{
+    "homepage": "https://www.microsoft.com/en-us/download/details.aspx?id=56727",
+    "version": "9.0.1",
+    "license": "license.rtf",
+    "url": "https://download.microsoft.com/download/4/A/6/4A6AAED8-200C-457C-AB86-37505DE4C90D/msmpisetup.exe",
+    "hash": "2fa35146e3d7dce6aba3d9cd81c1e16166a405bfe7094d1ae03c60fcdeb8e455",
+    "env_add_path" : ".",
+    "pre_install": [
+        "7z x -t# \"$dir\\msmpisetup.exe\" -o\"$dir\\tmp\""
+    ],
+    "architecture": {
+        "64bit": {
+            "installer": {
+                "script": "
+                    7z x -r \"$dir\\tmp\\4.msi\" -o\"$dir\"
+                    Remove-Item \"$dir\\msmpires.dll\"
+                    Remove-Item \"$dir\\msmpi.dll\"
+                    Rename-Item \"$dir\\msmpires64.dll\" \"$dir\\msmpires.dll\"
+                    Rename-Item \"$dir\\msmpi64.dll\" \"$dir\\msmpi.dll\""
+            }
+        },
+        "32bit": {
+            "installer": {
+                "script": "7z x \"$dir\\tmp\\2.msi\" -o\"$dir\""
+            }
+        }
+    },
+    "post_install": [
+        "Remove-Item -Recurse \"$dir\\tmp\"",
+        "Remove-Item \"$dir\\msmpisetup.exe\""
+    ]
+}
