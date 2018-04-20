@@ -1,6 +1,6 @@
 {
     "version": "1.19",
-    "license": "https://github.com/muquit/mailsend/blob/master/COPYRIGHT",
+    "license": "BSD-3-Clause",
     "url": "https://github.com/muquit/mailsend/releases/download/1.19/mailsend1.19.exe.zip",
     "homepage": "https://github.com/muquit/mailsend",
     "checkver": {

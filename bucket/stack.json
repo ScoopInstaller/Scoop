@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.haskellstack.org",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "version": "1.6.5",
     "architecture": {
         "64bit": {

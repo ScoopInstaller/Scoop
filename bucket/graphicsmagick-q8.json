@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.graphicsmagick.org/",
-    "license": "http://www.graphicsmagick.org/Copyright.html",
+    "license": "MIT",
     "version": "1.3.28",
     "architecture": {
         "64bit": {

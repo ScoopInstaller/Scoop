@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.openshift.org",
     "description": "OpenShift Origin is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OpenShift adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams.",
-    "license": "https://raw.githubusercontent.com/openshift/origin/master/LICENSE",
+    "license": "Apache-2.0",
     "version": "3.9.0",
     "architecture": {
         "64bit": {

@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.r-project.org",
     "version": "3.4.4",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "architecture": {
         "64bit": {
             "url": "https://cran.rstudio.com/bin/windows/base/R-3.4.4-win.exe",

@@ -1,6 +1,6 @@
 {
     "homepage": "https://aria2.github.io/",
-    "license": "GPL2 or later",
+    "license": "GPL-2.0-or-later",
     "version": "1.33.1",
     "architecture": {
         "32bit": {

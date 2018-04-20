@@ -1,7 +1,7 @@
 {
     "version": "5.10.1.47",
     "homepage": "http://www.mono-project.com/",
-    "license": "https://raw.githubusercontent.com/mono/mono/master/LICENSE",
+    "license": "MIT",
     "url": "https://download.mono-project.com/archive/5.10.1/windows-installer/mono-5.10.1.47-gtksharp-2.12.45-win32-0.msi",
     "hash": "5e97f7913bd96ee6b8a950ffc7238af2bbc1715e639a9a2114be13f69e36f71e",
     "extract_dir": "Mono",

@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.scala-lang.org/",
     "version": "2.12.5",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "url": "https://downloads.typesafe.com/scala/2.12.5/scala-2.12.5.zip",
     "hash": "98d9e46f8ebe3696739a2016e0d763877c0242b265bb7cce9ee3ac828fe2bb14",
     "extract_dir": "scala-2.12.5",

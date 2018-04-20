@@ -1,7 +1,7 @@
 {
     "homepage": "https://cmake.org/",
     "version": "3.11.1",
-    "license": "https://cmake.org/licensing/",
+    "license": "BSD-3-Clause",
     "architecture": {
         "64bit": {
             "url": "https://cmake.org/files/v3.11/cmake-3.11.1-win64-x64.zip",

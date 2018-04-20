@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/sass/dart-sass",
     "version": "1.2.1",
-    "license": "https://raw.githubusercontent.com/sass/dart-sass/master/LICENSE",
+    "license": "MIT",
     "architecture": {
         "64bit": {
             "url": "https://github.com/sass/dart-sass/releases/download/1.2.1/dart-sass-1.2.1-windows-x64.zip",

@@ -1,6 +1,6 @@
 {
     "homepage": "https://github.com/radareorg/cutter",
-    "license": "https://github.com/radareorg/cutter/blob/master/COPYING",
+    "license": "GPL-3.0",
     "version": "1.3",
     "architecture": {
         "64bit": {

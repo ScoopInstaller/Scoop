@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.sonarqube.org",
     "version": "7.1",
-    "license": "GNU Lesser GPL License, Version 3",
+    "license": "LGPL-3.0",
     "url": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-7.1.zip",
     "hash": "sha1:5777921d4f9789b34d3f2a883c3d75e23246d8db",
     "architecture": {

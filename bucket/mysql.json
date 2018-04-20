@@ -1,7 +1,7 @@
 {
     "homepage": "https://dev.mysql.com/downloads/mysql/",
     "version": "5.7.22",
-    "license": "GPLv2",
+    "license": "GPL-2.0",
     "architecture": {
         "64bit": {
             "url": "https://dev.mysql.com/get/mysql-5.7.22-winx64.zip",

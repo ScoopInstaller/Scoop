@@ -1,7 +1,7 @@
 {
     "homepage": "https://gradle.org",
     "version": "4.7",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "hash": "fca5087dc8b50c64655c000989635664a73b11b9bd3703c7d6cabd31b7dcdb04",
     "url": "https://services.gradle.org/distributions/gradle-4.7-bin.zip",
     "extract_dir": "gradle-4.7",

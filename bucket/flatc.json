@@ -1,6 +1,6 @@
 {
     "homepage": "https://google.github.io/flatbuffers/index.html",
-    "license": "Apache2",
+    "license": "Apache-2.0",
     "version": "1.9.0",
     "url": "https://github.com/google/flatbuffers/releases/download/v1.9.0/flatc_windows_exe.zip",
     "bin": "flatc.exe",

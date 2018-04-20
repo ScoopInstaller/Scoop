@@ -1,7 +1,7 @@
 {
     "description": "Modular assembler based on NASM",
     "homepage": "http://yasm.tortall.net/",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "version": "1.3.0",
     "architecture": {
         "64bit": {

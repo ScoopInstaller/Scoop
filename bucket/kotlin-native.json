@@ -1,7 +1,7 @@
 {
     "homepage": "https://kotlinlang.org/",
     "version": "0.6.2",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "url": "https://github.com/JetBrains/kotlin-native/releases/download/v0.6.2/kotlin-native-windows-0.6.2.zip",
     "hash": "e0f38cbf653a1942b4e3a6619f27a9c1cbed5cff47a7e7bcd68c0b623147f6a4",
     "extract_dir": "kotlin-native-windows-0.6.2",

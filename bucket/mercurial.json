@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.mercurial-scm.org/",
     "version": "4.5.3",
-    "license": "https://www.gnu.org/licenses/gpl-2.0.txt",
+    "license": "GPL-2.0",
     "architecture": {
         "64bit": {
             "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.5.3-x64.exe",

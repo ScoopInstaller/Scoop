@@ -1,7 +1,7 @@
 {
     "##": "Maintainers: when updating this manifest to a new version, you might like to also update git-with-openssh.json",
     "homepage": "https://git-for-windows.github.io/",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "version": "2.17.0.windows.1",
     "architecture": {
         "64bit": {

@@ -1,7 +1,7 @@
 {
     "version": "1.10.1",
     "homepage": "https://golang.org",
-    "license": "https://golang.org/LICENSE",
+    "license": "BSD-3-Clause",
     "extract_dir": "go",
     "env_set": {
         "GOROOT": "$dir"

@@ -1,7 +1,7 @@
 {
     "homepage": "https://haxe.org/",
     "version": "3.4.7",
-    "license": "https://haxe.org/foundation/open-source.html",
+    "license": "GPL-2.0-or-later",
     "url": "https://github.com/HaxeFoundation/haxe/releases/download/3.4.7/haxe-3.4.7-win.zip",
     "hash": "d98b0f0e5c5bb000e9b9e99817c45af362658c9273e66ce5cb52359e6ade15a6",
     "bin": [

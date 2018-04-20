@@ -1,6 +1,6 @@
 {
     "version": "2.5.0",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "homepage": "https://www.radare.org/r/",
     "architecture": {
         "64bit": {

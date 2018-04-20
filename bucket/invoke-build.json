@@ -1,6 +1,6 @@
 {
     "version": "5.4.1",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "extract_dir": "tools",
     "url": "https://nuget.org/api/v2/package/Invoke-Build/5.4.1#/dl.7z",
     "homepage": "https://github.com/nightroman/Invoke-Build",

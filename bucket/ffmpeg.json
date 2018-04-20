@@ -1,7 +1,7 @@
 {
     "version": "3.4.2",
     "homepage": "https://ffmpeg.zeranoe.com/builds/",
-    "license": "GPL3",
+    "license": "GPL-3.0",
     "architecture": {
         "64bit": {
             "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-3.4.2-win64-static.zip",

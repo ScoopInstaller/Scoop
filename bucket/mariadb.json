@@ -1,7 +1,7 @@
 {
     "homepage": "https://mariadb.org",
     "version": "10.2.14",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "architecture": {
         "64bit": {
             "url": "https://downloads.mariadb.org/f/mariadb-10.2.14/winx64-packages/mariadb-10.2.14-winx64.zip",

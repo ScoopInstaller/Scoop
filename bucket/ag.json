@@ -1,6 +1,6 @@
 {
     "homepage": "https://geoff.greer.fm/ag/",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "version": "2.1.0-28-g4aa9f05",
     "architecture": {
         "64bit": {

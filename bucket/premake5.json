@@ -1,7 +1,7 @@
 {
     "homepage": "https://premake.github.io/",
     "version": "5.0.0-alpha12",
-    "license": "BSD 3-Clause",
+    "license": "BSD-3-Clause",
     "url": "https://github.com/premake/premake-core/releases/download/v5.0.0-alpha12/premake-5.0.0-alpha12-windows.zip",
     "hash": "d12ee2f8cfa0ab29a08c9bcaab3a5f76e575ae000b1596ee61d4f4916e9d154c",
     "bin": [
