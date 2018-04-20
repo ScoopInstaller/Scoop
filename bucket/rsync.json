@@ -1,10 +1,10 @@
 {
     "homepage": "https://www.itefix.net/cwrsync",
-    "version": "5.5.0",
+    "version": "5.7.1",
     "license": "https://www.itefix.net/content/cwrsync-licenseversion",
-    "url": "https://www.itefix.net/dl/cwRsync_5.5.0_x86_Free.zip",
-    "hash": "37e8ef21ac975d4ee86c9d3be40c8935e8b9d0ba84e9302fc106b9452296cb85",
-    "extract_dir": "cwRsync_5.5.0_x86_Free",
+    "url": "https://www.itefix.net/dl/cwRsync_5.7.1_x86_Free.zip",
+    "hash": "379dc8534b808bdd6c454470b293c1b65be8373f279fb0c1ea0a2e52a3cc5502",
+    "extract_dir": "cwRsync_5.7.1_x86_Free",
     "bin": "bin\\rsync.exe",
     "checkver": {
         "url": "https://www.itefix.net/content/cwrsync-free-edition",
