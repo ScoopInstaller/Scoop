@@ -1,0 +1,14 @@
+{
+  "version": "1.8.3",
+  "architecture": {
+    "64bit": {
+      "url": "http://github.com/danmar/cppcheck/releases/download/1.83/cppcheck-1.83-x64-Setup.msi"
+    },
+    "32bit": {
+      "url": "http://github.com/danmar/cppcheck/releases/download/1.83/cppcheck-1.83-x86-Setup.msi"
+    }
+  },
+  "extract_dir": "PFiles/Cppcheck",
+  "bin": "cppcheck.exe",
+  "homepage": "http://cppcheck.sourceforge.net/"
+}
