@@ -15,8 +15,9 @@
         "GEM_PATH": "$dir\\gems"
     },
     "suggest": {
-        "OpenJDK": [
-            "openjdk"
+        "JDK": [
+            "java/oraclejdk",
+            "java/openjdk"
         ]
     },
     "notes": "Install a JDK and set JAVA_HOME if you don't already have. JRuby won't work without it.

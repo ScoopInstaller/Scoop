@@ -8,8 +8,8 @@
     "bin": "bin\\gradle.bat",
     "suggest": {
         "JDK": [
-            "extras/oraclejdk",
-            "openjdk"
+            "java/oraclejdk",
+            "java/openjdk"
         ]
     },
     "checkver": {

@@ -22,8 +22,8 @@
     "extract_dir": "sonarqube-7.1",
     "suggest": {
         "JDK": [
-            "extras/oraclejdk",
-            "openjdk"
+            "java/oraclejdk",
+            "java/openjdk"
         ]
     },
     "checkver": {
