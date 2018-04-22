@@ -1,0 +1,30 @@
+{
+    "homepage": "http://cppcheck.sourceforge.net/",
+    "license": "GPL-3.0",
+    "version": "1.83",
+    "architecture": {
+        "64bit": {
+            "url": "http://github.com/danmar/cppcheck/releases/download/1.83/cppcheck-1.83-x64-Setup.msi",
+            "hash": "c41ed3af92318dc1bba5b525e752228576e730f5819d76cca9367c29b9472cfd"
+        },
+        "32bit": {
+            "url": "http://github.com/danmar/cppcheck/releases/download/1.83/cppcheck-1.83-x86-Setup.msi",
+            "hash": "f349a93ee73f74fea853b3a0426f689f17e342ff1be7bef15f5fa79bbfab44f2"
+        }
+    },
+    "extract_dir": "PFiles/Cppcheck",
+    "bin": "cppcheck.exe",
+    "checkver": {
+        "github": "https://github.com/danmar/cppcheck"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x64-Setup.msi"
+            },
+            "32bit": {
+                "url": "http://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x86-Setup.msi"
+            }
+        }
+    }
+}
