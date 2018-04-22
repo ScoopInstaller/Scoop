@@ -4,7 +4,7 @@
     "license": "license.rtf",
     "url": "https://download.microsoft.com/download/4/A/6/4A6AAED8-200C-457C-AB86-37505DE4C90D/msmpisetup.exe",
     "hash": "2fa35146e3d7dce6aba3d9cd81c1e16166a405bfe7094d1ae03c60fcdeb8e455",
-    "env_add_path" : ".",
+    "env_add_path": ".",
     "pre_install": [
         "7z x -t# \"$dir\\msmpisetup.exe\" -o\"$dir\\tmp\""
     ],
