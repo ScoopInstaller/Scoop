@@ -2,29 +2,30 @@
     "description": "Apex lets you build, deploy, and manage AWS Lambda functions.",
     "homepage": "http://apex.run/",
     "license": "MIT",
-    "version": "0.16.0",
+    "version": "1.0.0-rc2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/apex/apex/releases/download/v0.16.0/apex_windows_amd64.exe#/apex.exe",
-            "hash": "2035575715894a79509bfe30af791b5f939a98a172c0b876607207ff65a4f1c3"
+            "url": "https://github.com/apex/apex/releases/download/v1.0.0-rc2/apex_1.0.0-rc2_windows_amd64.tar.gz",
+            "hash": "3c324e4a08a5a7906cd4d8a64192ee530532bd3a6a90d15fc32b8e0860f2639e"
         },
         "32bit": {
-            "url": "https://github.com/apex/apex/releases/download/v0.16.0/apex_windows_386.exe#/apex.exe",
-            "hash": "e41634a45008b2bd9878fade394aa9a29f89dbc45a0cbabe99c1e27846475335"
+            "url": "https://github.com/apex/apex/releases/download/v1.0.0-rc2/apex_1.0.0-rc2_windows_386.tar.gz",
+            "hash": "d2b9d5353b1081e9ab61223d0ed7d3e747de5ba210fbb065cbf41beae34f9b19"
         }
     },
-    "extract_dir": "apex",
+    "notes": "This is a pre-release version (release candidate)!",
     "bin": "apex.exe",
     "checkver": {
-        "github": "https://github.com/apex/apex"
+        "github": "https://github.com/apex/apex",
+        "re": "v([a-z\\d.-]+)<"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/apex/apex/releases/download/v$version/apex_windows_amd64.exe#/apex.exe"
+                "url": "https://github.com/apex/apex/releases/download/v$version/apex_$version_windows_amd64.tar.gz"
             },
             "32bit": {
-                "url": "https://github.com/apex/apex/releases/download/v$version/apex_windows_386.exe#/apex.exe"
+                "url": "https://github.com/apex/apex/releases/download/v$version/apex_$version_windows_386.tar.gz"
             }
         }
     }
