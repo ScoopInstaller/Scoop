@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/radareorg/cutter",
     "license": "GPL-3.0",
-    "version": "1.3",
+    "version": "1.4",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/radareorg/cutter/releases/download/v1.3/Cutter-v1.3-win64.zip",
-            "hash": "3c4bbc7acf8bed6b57c1bf75ec0c1320f7d2ecf54ac1eeb80f00108eb8fc7f9d"
+            "url": "https://github.com/radareorg/cutter/releases/download/v1.4/Cutter-v1.4-win64.zip",
+            "hash": "368fa2270576100d7359133bdaf63afa232264051db13256cf6c24b16dc2b265"
         },
         "32bit": {
-            "url": "https://github.com/radareorg/cutter/releases/download/v1.3/Cutter-v1.3-win32.zip",
-            "hash": "df807e1125ea0ab3e20ecbe8e0a1d45039961fe176710e23e0632ce5f0812412"
+            "url": "https://github.com/radareorg/cutter/releases/download/v1.4/Cutter-v1.4-win32.zip",
+            "hash": "0c4e890ac3a193c9294dd654ada2b882877a9a12007745d5d39e2bc9f8f01d40"
         }
     },
     "bin": [
