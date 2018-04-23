@@ -20,7 +20,11 @@
       "dockerd.exe",
       "docker.exe"
   ],
-  "notes": "To test run you can use:
+  "notes": "Make sure to have container features enabled (will need a restart afterwards):
+sudo Enable-WindowsOptionalFeature -Online -FeatureName containers -All -NoRestart
+sudo Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All -NoRestart
+
+To test run you can use:
 sudo dockerd -D --experimental -H \"npipe:////./pipe//docker_lcow\"
 
 To install and run as a service (with linux containers support - lcow):
