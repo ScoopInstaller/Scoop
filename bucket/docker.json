@@ -1,8 +1,4 @@
-{
-    "version": "17.05.0-ce",
-    "license": "Apache-2.0",
-    "architecture": {
-        "64bit": {
+    "64bit": {
             "url": "https://get.docker.com/builds/Windows/x86_64/docker-17.05.0-ce.zip",
             "hash": "cbb0b47b511023a98dd0c83d76c1f30b315b8381b85b67be355eca4748229031"
         },
