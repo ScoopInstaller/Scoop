@@ -2,15 +2,15 @@
     "homepage": "http://www.7-zip.org/",
     "description": "A free and open-source file archiver with a high compression ratio",
     "license": "http://www.7-zip.org/license.txt",
-    "version": "18.01",
+    "version": "18.05",
     "architecture": {
         "64bit": {
-            "url": "https://7-zip.org/a/7z1801-x64.msi",
-            "hash": "b23f97c230a921f834550d2bf467d313952861f641f49ca93ccddd9d2e0300e2"
+            "url": "https://7-zip.org/a/7z1805-x64.msi",
+            "hash": "898c1ca0015183fe2ba7d55cacf0a1dea35e873bf3f8090f362a6288c6ef08d7"
         },
         "32bit": {
-            "url": "https://7-zip.org/a/7z1801.msi",
-            "hash": "bad4ad66869fe95b887a1563d17d538b7fdcddb94b31b3f19ab4825b25d41999"
+            "url": "https://7-zip.org/a/7z1805.msi",
+            "hash": "c554238bee18a03d736525e06d9258c9ecf7f64ead7c6b0d1eb04db2c0de30d0"
         }
     },
     "extract_dir": "Files/7-Zip",
