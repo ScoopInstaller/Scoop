@@ -1,16 +1,16 @@
 {
     "description": "Uncomplicated, modern HTTP server",
-    "version": "0.4.8",
+    "version": "0.4.10",
     "homepage": "https://github.com/labstack/armor",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/labstack/armor/releases/download/0.4.8/armor_0.4.8_windows_32-bit.zip",
-            "hash": "5d0594ad1df48fde87e2209b46410d3fc626c00d9f4e9d9fdcc2f87511dc8974"
+            "url": "https://github.com/labstack/armor/releases/download/0.4.10/armor_0.4.10_windows_32-bit.zip",
+            "hash": "8b10cbef193e6eeb6f17552e0a795ddb2d2706b9ba6094e7438b87ed3fe5c1d5"
         },
         "64bit": {
-            "url": "https://github.com/labstack/armor/releases/download/0.4.8/armor_0.4.8_windows_64-bit.zip",
-            "hash": "074d617c21c2befb3d01d85dd38be84fbf8c04cf3f36e68ae807f1194782fceb"
+            "url": "https://github.com/labstack/armor/releases/download/0.4.10/armor_0.4.10_windows_64-bit.zip",
+            "hash": "56f7a59654a48bba12220bd93163865e4a47a8f7538b34782175236c5011c716"
         }
     },
     "bin": "armor.exe",
