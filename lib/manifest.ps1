@@ -75,9 +75,8 @@ function supports_architecture($manifest, $architecture) {
     return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
 }
 
-function generate_user_manifest($app, $version) {
-
-    $null, $manifest, $bucket, $null = locate $app
+function generate_user_manifest($app, $bucket, $version) {
+    $null, $manifest, $bucket, $null = locate $app $bucket
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket
     }
