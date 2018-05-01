@@ -15,6 +15,12 @@
         "docker-compose.exe",
         "docker-machine.exe"
     ],
+    "shortcuts": [
+        [
+            "kitematic\\Kitematic.exe",
+            "Kitematic"
+        ]
+    ],
     "checkver": {
         "url": "https://github.com/docker/toolbox/releases/latest",
         "re": "/releases/tag/(?:v)?([\\d\\w.-]+)"
