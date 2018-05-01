@@ -29,13 +29,5 @@
             "url": "$baseurl/sha256sum.txt",
             "find": "([a-fA-F0-9]{64})\\s+DockerToolbox.exe"
         }
-    },
-    "notes": [
-        "This is the docker client only. Until the docker daemon can run natively",
-        "on Windows you will need a Virtual Machine such as Boot2Docker or",
-        "Docker Machine",
-        "",
-        "Boot2Docker: https://github.com/boot2docker/windows-installer/releases/",
-        "Docker Machine: https://docs.docker.com/machine/"
-    ]
+    }
 }
