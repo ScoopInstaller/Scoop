@@ -11,7 +11,7 @@
             "hash": "465e651c5fedcdd91417a7e25bcab351c9e99732192263afbcb91496138ef7d9"
         }
     },
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "extract_dir": "rancher-compose-v0.12.5",
     "bin": [
         "rancher-compose.exe"

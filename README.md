@@ -30,7 +30,7 @@ Scoop is very scriptable, so you can run repeatable setups to get your environme
 ```powershell
 scoop install sudo
 sudo scoop install 7zip git openssh --global
-scoop install curl grep sed less tail touch
+scoop install curl grep sed less touch
 scoop install python ruby go perl
 ```
 

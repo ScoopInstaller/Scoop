@@ -1,9 +1,9 @@
 {
     "homepage": "https://cakebuild.net/",
-    "version": "0.26.1",
+    "version": "0.27.1",
     "license": "MIT",
-    "url": "https://github.com/cake-build/cake/releases/download/v0.26.1/Cake-bin-net461-v0.26.1.zip",
-    "hash": "2359a39d5981fd9e5cb0c149ab4c1cc6b15e660e2286de45270ddf69567e45fe",
+    "url": "https://github.com/cake-build/cake/releases/download/v0.27.1/Cake-bin-net461-v0.27.1.zip",
+    "hash": "e2072d68aa401cfd75fa05413ac677fa1c03c87c65011b5c369a53109d6551c1",
     "bin": "cake.exe",
     "suggest": {
         "NuGet": [

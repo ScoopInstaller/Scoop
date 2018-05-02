@@ -1,7 +1,7 @@
 {
     "homepage": "https://nekovm.org/",
     "version": "2.2.0",
-    "license": "https://github.com/HaxeFoundation/neko/blob/master/LICENSE",
+    "license": "MIT",
     "url": "https://nekovm.org/media/neko-2.2.0-win.zip",
     "hash": "93d7ca96698a6825f38ca8eea49e2e6b691c0849270174f6c1bd531290db8d69",
     "extract_dir": "neko-2.2.0-win",

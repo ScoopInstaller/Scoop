@@ -1,7 +1,7 @@
 {
-    "version": "1.10",
+    "version": "1.10.2",
     "homepage": "https://golang.org",
-    "license": "https://golang.org/LICENSE",
+    "license": "BSD-3-Clause",
     "extract_dir": "go",
     "env_set": {
         "GOROOT": "$dir"
@@ -19,12 +19,12 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/golang/go1.10.windows-amd64.zip",
-            "hash": "210b223031c254a6eb8fa138c3782b23af710a9959d64b551fa81edd762ea167"
+            "url": "https://storage.googleapis.com/golang/go1.10.2.windows-amd64.zip",
+            "hash": "0fb4a893796e8151c0b8d0a3da4ed8cbb22bf6d98a3c29c915be4d7083f146ee"
         },
         "32bit": {
-            "url": "https://storage.googleapis.com/golang/go1.10.windows-386.zip",
-            "hash": "83edd9e52ce6d1c8f911e7bbf6f0a73952c613b4bf66438ceb1507f892240f11"
+            "url": "https://storage.googleapis.com/golang/go1.10.2.windows-386.zip",
+            "hash": "0bb12875044674d632d1f1b2f53cf33510a6df914178fe672f3f70f6f6cdf80d"
         }
     },
     "checkver": "Build version go([\\d\\.]+)\\.",

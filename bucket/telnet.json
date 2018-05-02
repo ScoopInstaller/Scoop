@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.mingw.org/wiki/msys",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "version": "msys-inetutils-1.7-1",
     "url": [
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",

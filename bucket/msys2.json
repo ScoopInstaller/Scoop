@@ -4,12 +4,12 @@
     "version": "20170918",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-20170918.tar.xz",
+            "url": "https://downloads.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20170918.tar.xz",
             "extract_dir": "msys64",
             "hash": "sha1:3f0c84114512990f389bbf397e5f7ef70dea963b"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/msys2/files/Base/i686/msys2-base-i686-20170918.tar.xz",
+            "url": "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20170918.tar.xz",
             "extract_dir": "msys32",
             "hash": "sha1:1b6d65454954148b47967316d76fba9637d7e283"
         }
@@ -29,11 +29,11 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-$version.tar.xz",
+                "url": "https://downloads.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-$version.tar.xz",
                 "extract_dir": "msys64"
             },
             "32bit": {
-                "url": "https://sourceforge.net/projects/msys2/files/Base/i686/msys2-base-i686-$version.tar.xz",
+                "url": "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-$version.tar.xz",
                 "extract_dir": "msys32"
             }
         }

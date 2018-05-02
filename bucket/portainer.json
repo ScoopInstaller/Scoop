@@ -1,0 +1,23 @@
+{
+    "homepage": "https://portainer.io/",
+    "license": "Zlib",
+    "version": "1.16.5",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/portainer/portainer/releases/download/1.16.5/portainer-1.16.5-windows-amd64.tar.gz",
+            "hash": "40cec845d502a16480a57b392f4329a1f6cc6bc56bbfe799321752d3c19e7a2f"
+        }
+    },
+    "extract_dir": "portainer",
+    "bin": "portainer.exe",
+    "checkver": {
+        "github": "https://github.com/portainer/portainer"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/portainer/portainer/releases/download/$version/portainer-$version-windows-amd64.tar.gz"
+            }
+        }
+    }
+}

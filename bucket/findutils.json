@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.mingw.org/wiki/msys",
     "version": "4.4.2",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "url": [
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/gettext/gettext-0.17-2/libintl-0.17-2-msys-dll-8.tar.lzma",

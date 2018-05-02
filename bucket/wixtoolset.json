@@ -1,6 +1,6 @@
 {
     "homepage": "http://wixtoolset.org/",
-    "license": "https://github.com/wixtoolset/wix3/blob/develop/LICENSE.TXT",
+    "license": "MS-RL",
     "version": "3.11.1",
     "url": "https://github.com/wixtoolset/wix3/releases/download/wix3111rtm/wix311-binaries.zip",
     "hash": "37f0a533b0978a454efb5dc3bd3598becf9660aaf4287e55bf68ca6b527d051d",

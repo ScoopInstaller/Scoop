@@ -1,6 +1,6 @@
 {
     "homepage": "https://corte.si/posts/devd/intro/index.html",
-    "license": "https://github.com/cortesi/devd/blob/master/LICENSE",
+    "license": "MIT",
     "version": "0.8",
     "url": "https://github.com/cortesi/devd/releases/download/v0.8/devd-0.8-windows64.zip",
     "hash": "fe08f585eca8e9e6a60afb88d5e7054da1e1c6cd317a32071be11199051731d1",

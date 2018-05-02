@@ -3,12 +3,12 @@
     "version": "7.9.1",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/tdm-gcc/files/GDB/gdb-7.9.1-tdm64-2.zip",
+            "url": "https://downloads.sourceforge.net/project/tdm-gcc/GDB/gdb-7.9.1-tdm64-2.zip",
             "hash": "89186aa83143f47902b52f5673dd32421ec9c221e53e3227fd065a7e86c8c6f5",
             "extract_dir": "gdb64"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/tdm-gcc/files/GDB/gdb32-7.9.1-tdm-1.zip",
+            "url": "https://downloads.sourceforge.net/project/tdm-gcc/GDB/gdb32-7.9.1-tdm-1.zip",
             "hash": "715604034bb269ecbfaf4577addac51b8ba798f93b2eca31cb21b114b7bc46e8",
             "extract_dir": "gdb32"
         }

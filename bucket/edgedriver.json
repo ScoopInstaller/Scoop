@@ -6,6 +6,6 @@
     "bin": "MicrosoftWebDriver.exe",
     "checkver": {
         "url": "https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/#downloads",
-        "re": "(Release \\d+)"
+        "re": "Version: ([\\d.]+)"
     }
 }
