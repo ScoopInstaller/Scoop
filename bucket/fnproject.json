@@ -1,11 +1,11 @@
 {
     "homepage": "https://fnproject.io/",
     "license": "Apache-2.0",
-    "version": "0.4.82",
+    "version": "0.4.83",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/fnproject/cli/releases/download/0.4.82/fn.exe",
-            "hash": "d4de385c5627a1584f8a2af64f9d4196dc6dded6d9d34362ae0ca71167d9d425"
+            "url": "https://github.com/fnproject/cli/releases/download/0.4.83/fn.exe",
+            "hash": "bb7411864194963fbb327951fd86ffb0f39510f439a608316851a9673832077d"
         }
     },
     "bin": "fn.exe",
