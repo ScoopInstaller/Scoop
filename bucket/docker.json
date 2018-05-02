@@ -22,7 +22,7 @@
         ]
     ],
     "checkver": {
-        "github": "https://github.com/docker/toolbox/releases/latest",
+        "github": "https://github.com/docker/toolbox",
         "re": "/releases/tag/(?:v)?([\\d\\w.-]+)"
     },
     "autoupdate": {
