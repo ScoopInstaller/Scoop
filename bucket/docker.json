@@ -9,7 +9,7 @@
     },
     "homepage": "https://docker.com",
     "innosetup": true,
-    "post_install": "rm -r $dir\\installers",
+    "post_install": "rm -r \"$dir\\installers\"",
     "bin": [
         "docker.exe",
         "docker-compose.exe",
@@ -22,7 +22,7 @@
         ]
     ],
     "checkver": {
-        "url": "https://github.com/docker/toolbox/releases/latest",
+        "github": "https://github.com/docker/toolbox/releases/latest",
         "re": "/releases/tag/(?:v)?([\\d\\w.-]+)"
     },
     "autoupdate": {
