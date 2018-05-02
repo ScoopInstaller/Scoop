@@ -41,6 +41,9 @@
                 "url": "https://cmake.org/files/v$majorVersion.$minorVersion/cmake-$version-win32-x86.zip",
                 "extract_dir": "cmake-$version-win32-x86"
             }
+        },
+        "hash": {
+            "url": "$baseurl/cmake-$version-SHA-256.txt"
         }
     }
 }
