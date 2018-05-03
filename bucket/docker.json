@@ -1,41 +1,39 @@
 {
-    "version": "17.05.0-ce",
+    "version": "18.03.0-ce",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://get.docker.com/builds/Windows/x86_64/docker-17.05.0-ce.zip",
-            "hash": "cbb0b47b511023a98dd0c83d76c1f30b315b8381b85b67be355eca4748229031"
-        },
-        "32bit": {
-            "url": "https://get.docker.com/builds/Windows/i386/docker-17.05.0-ce.zip",
-            "hash": "99820746a362466700718d33ee727b9aea993b9c2e05fb2c53ed606e9f6780f1"
+            "url": "https://github.com/docker/toolbox/releases/download/v18.03.0-ce/DockerToolbox-18.03.0-ce.exe",
+            "hash": "7c412e867e4708ec1b36005a217161131a21430a0ef0b0db3591218ec9ec5091"
         }
     },
     "homepage": "https://docker.com",
-    "extract_dir": "docker",
+    "innosetup": true,
+    "post_install": "rm -r \"$dir\\installers\"",
     "bin": [
-        "docker.exe"
+        "docker.exe",
+        "docker-compose.exe",
+        "docker-machine.exe"
+    ],
+    "shortcuts": [
+        [
+            "kitematic\\Kitematic.exe",
+            "Kitematic"
+        ]
     ],
     "checkver": {
-        "url": "https://github.com/docker/docker/releases/latest",
+        "github": "https://github.com/docker/toolbox",
         "re": "/releases/tag/(?:v)?([\\d\\w.-]+)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://get.docker.com/builds/Windows/x86_64/docker-$version.zip"
-            },
-            "32bit": {
-                "url": "https://get.docker.com/builds/Windows/i386/docker-$version.zip"
+                "url": "https://github.com/docker/toolbox/releases/download/v$version/DockerToolbox-$version.exe"
             }
+        },
+        "hash": {
+            "url": "$baseurl/sha256sum.txt",
+            "find": "([a-fA-F0-9]{64})\\s+DockerToolbox.exe"
         }
-    },
-    "notes": [
-        "This is the docker client only. Until the docker daemon can run natively",
-        "on Windows you will need a Virtual Machine such as Boot2Docker or",
-        "Docker Machine",
-        "",
-        "Boot2Docker: https://github.com/boot2docker/windows-installer/releases/",
-        "Docker Machine: https://docs.docker.com/machine/"
-    ]
+    }
 }
