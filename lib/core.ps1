@@ -270,14 +270,10 @@ function shim($path, $global, $name, $arg) {
         write-output "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" | out-file "$shim.ps1" -encoding utf8
     }
 
-    if($arg) {
-        write-output "`$args = '$($arg -join "', '")', `$args" | out-file "$shim.ps1" -encoding utf8 -append
-    }
-
     if($path -match '\.jar$') {
-        "if(`$myinvocation.expectingInput) { `$input | & java -jar `$path @args } else { & java -jar `$path @args }" | out-file "$shim.ps1" -encoding utf8 -append
+        "if(`$myinvocation.expectingInput) { `$input | & java -jar `$path $arg @args } else { & java -jar `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     } else {
-        "if(`$myinvocation.expectingInput) { `$input | & `$path @args } else { & `$path @args }" | out-file "$shim.ps1" -encoding utf8 -append
+        "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     }
 
     if($path -match '\.exe$') {
