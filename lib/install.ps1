@@ -10,8 +10,8 @@ function nightly_version($date, $quiet = $false) {
 }
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true) {
-    $app, $bucket = app $app
-    $app, $manifest, $bucket, $url = locate $app $bucket
+    $app, $bucket, $null = parse_app $app
+    $app, $manifest, $null, $url = locate $app $bucket
     $check_hash = $true
 
     if(!$manifest) {
@@ -889,7 +889,7 @@ function show_notes($manifest, $dir, $original_dir, $persist_dir) {
 
 function all_installed($apps, $global) {
     $apps | Where-Object {
-        $app, $null = app $_
+        $app, $null, $null = parse_app $_
         installed $app $global
     }
 }
@@ -930,7 +930,7 @@ function show_suggestions($suggested) {
 
             $fulfilled = $false
             foreach($suggestion in $feature_suggestions) {
-                $suggested_app, $bucket = app $suggestion
+                $suggested_app, $bucket, $null = parse_app $suggestion
 
                 if($installed_apps -contains $suggested_app) {
                     $fulfilled = $true;

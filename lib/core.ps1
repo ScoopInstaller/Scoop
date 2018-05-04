@@ -368,7 +368,7 @@ function ensure_architecture($architecture_opt) {
 function ensure_all_installed($apps, $global) {
     $installed = @()
     $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | ForEach-Object {
-        $app = $_
+        $app, $null, $null = parse_app $_
         if(installed $app $false) {
             $installed += ,@($app, $false)
         } elseif (installed $app $true) {
@@ -494,31 +494,15 @@ function applist($apps, $global) {
     return ,@($apps | ForEach-Object { ,@($_, $global) })
 }
 
-function app($app) {
+function parse_app($app) {
     $app = [string]$app
-    if($app -notmatch '^((ht)|f)tps?://') {
-        if($app -match '([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)') {
-            return $matches[2], $matches[1]
+    if($app -notmatch '^((ht)|f)tps?://' -and $app -notmatch '^(?:[\w]\:\\|\\\\)') {
+        if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>[a-zA-Z0-9-.]+)(?:@(?<version>.*))?') {
+            return $matches['app'], $matches['bucket'], $matches['version']
         }
     }
 
-    $app, $null
-}
-
-function is_app_with_specific_version([String] $app) {
-    $appWithVersion = get_app_with_version $app
-    $appWithVersion.version -ne 'latest'
-}
-
-function get_app_with_version([String] $app) {
-    $segments = $app -split '@'
-    $name     = $segments[0]
-    $version  = $segments[1];
-
-    return @{
-        "app" = $name;
-        "version" = if ($version) { $version } else { 'latest' }
-    }
+    $app, $null, $null
 }
 
 function last_scoop_update() {

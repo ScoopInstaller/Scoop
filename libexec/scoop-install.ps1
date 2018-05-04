@@ -70,13 +70,17 @@ if(is_scoop_outdated) {
 }
 
 if($apps.length -eq 1) {
-    if(is_installed $apps $global) {
+    $app, $null, $null = parse_app $apps
+    if(is_installed $app $global) {
         return
     }
 }
 
 # get any specific versions that we need to handle first
-$specific_versions = $apps | Where-Object { is_app_with_specific_version $_ }
+$specific_versions = $apps | Where-Object {
+    $null, $null, $version = parse_app $_
+    return $null -ne $version
+}
 
 # compare object does not like nulls
 if ($specific_versions.length -gt 0) {
@@ -86,15 +90,12 @@ if ($specific_versions.length -gt 0) {
 }
 
 $specific_versions_paths = $specific_versions | ForEach-Object {
-    $appWithVersion = get_app_with_version $_
-    $name           = $appWithVersion.app
-    $version        = $appWithVersion.version
-
-    if (installed_manifest $name $version) {
-        abort "'$name' ($version) is already installed.`nUse 'scoop update $name$global_flag' to install a new version."
+    $app, $bucket, $version = parse_app $_
+    if (installed_manifest $app $version) {
+        abort "'$app' ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
     }
 
-    generate_user_manifest $name $version
+    generate_user_manifest $app $bucket $version
 }
 $apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-Object -Unique)
 
@@ -110,8 +111,9 @@ ensure_none_failed $apps $global
 $apps, $skip = prune_installed $apps $global
 
 $skip | Where-Object { $explicit_apps -contains $_} | ForEach-Object {
-    $version = @(versions $_ $global)[-1]
-    warn "'$_' ($version) is already installed. Skipping."
+    $app, $null, $null = parse_app $_
+    $version = @(versions $app $global)[-1]
+    warn "'$app' ($version) is already installed. Skipping."
 }
 
 $suggested = @{};
