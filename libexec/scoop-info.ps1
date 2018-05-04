@@ -15,7 +15,7 @@ reset_aliases
 if(!$app) { my_usage; exit 1 }
 
 $global = installed $app $true
-$app, $bucket, $null = app $app
+$app, $bucket, $null = parse_app $app
 $status = app_status $app $global
 $manifest, $bucket = find_manifest $app $bucket
 
