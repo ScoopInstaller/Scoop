@@ -303,7 +303,7 @@ set args=%args:(=``(%
 set args=%args:)=``)%
 set invalid=`"='
 if !args! == !invalid! ( set args= )
-powershell -noprofile -ex unrestricted `"& '$resolved_path' %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
+powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
 
         "#!/bin/sh`npowershell -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.jar$') {
