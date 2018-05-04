@@ -12,19 +12,7 @@
             "hash": "0a068813a032b5fe0640fe8fd5d7d5e09737b48314ba30176614253390688ed1"
         }
     },
-    "bin": [
-        "cutter.exe",
-        "r2agent.exe",
-        "rabin2.exe",
-        "radare2.exe",
-        "radiff2.exe",
-        "rafind2.exe",
-        "ragg2.exe",
-        "rahash2.exe",
-        "rarun2.exe",
-        "rasm2.exe",
-        "rax2.exe"
-    ],
+    "bin": "cutter.exe",
     "shortcuts": [
         [
             "cutter.exe",
