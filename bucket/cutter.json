@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/radareorg/cutter/releases/download/v1.4/Cutter-v1.4-win64.zip",
-            "hash": "368fa2270576100d7359133bdaf63afa232264051db13256cf6c24b16dc2b265"
+            "hash": "3de1d6510461782fa8858a6b2cba33c2fb667b81cb6aa97fa324a8b76d9f121e"
         },
         "32bit": {
             "url": "https://github.com/radareorg/cutter/releases/download/v1.4/Cutter-v1.4-win32.zip",
-            "hash": "0c4e890ac3a193c9294dd654ada2b882877a9a12007745d5d39e2bc9f8f01d40"
+            "hash": "0a068813a032b5fe0640fe8fd5d7d5e09737b48314ba30176614253390688ed1"
         }
     },
     "bin": [
