@@ -57,7 +57,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     # persist data
     persist_data $manifest $original_dir $persist_dir
 
-    # env_ensure_home $manifest $global (see comment for env_ensure_home)
     post_install $manifest $architecture
 
     # save info for uninstall
@@ -860,29 +859,6 @@ function env_rm($manifest, $global) {
             $name = $_.name
             env $name $global $null
             if(test-path env:\$name) { Remove-Item env:\$name }
-        }
-    }
-}
-
-# UNNECESSARY? Re-evaluate after 3-Jun-2017
-# Supposedly some MSYS programs require %HOME% to be set, but I can't
-# find any examples.
-# Shims used to set %HOME% for the session, but this was removed.
-# This function remains in case we need to support this functionality again
-# (e.g. env_ensure_home in manifests). But if no problems arise by 3-Jun-2017,
-# it's probably safe to delete this, and the call to it install_app
-function env_ensure_home($manifest, $global) {
-    if($manifest.env_ensure_home -eq $true) {
-        if($global){
-            if(!(env 'HOME' $true)) {
-                env 'HOME' $true $env:ALLUSERSPROFILE
-                $env:HOME = $env:ALLUSERSPROFILE # current session
-            }
-        } else {
-            if(!(env 'HOME' $false)) {
-                env 'HOME' $false $env:USERPROFILE
-                $env:HOME = $env:USERPROFILE # current session
-            }
         }
     }
 }
