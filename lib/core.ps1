@@ -308,6 +308,15 @@ powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$l
     }
 }
 
+function search_in_path($target) {
+    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
+    foreach($dir in $path.split(';')) {
+        if(test-path "$dir\$target" -pathType leaf) {
+            return "$dir\$target"
+        }
+    }
+}
+
 function ensure_in_path($dir, $global) {
     $path = env 'PATH' $global
     $dir = fullpath $dir
