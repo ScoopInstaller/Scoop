@@ -28,6 +28,6 @@ if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
         Pop-Location
     }
 }
-elseif (@($null, '--help', '/?') -contains $cmd -or $args -contains '-h') { exec 'help' $args }
+elseif (@($null, '--help', '/?') -contains $cmd -or $args[0] -contains '-h') { exec 'help' $args }
 elseif ($commands -contains $cmd) { exec $cmd $args }
 else { "scoop: '$cmd' isn't a scoop command. See 'scoop help'."; exit 1 }

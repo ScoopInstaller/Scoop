@@ -1,7 +1,7 @@
 {
     "homepage": "http://gource.io/",
     "version": "0.47",
-    "license": "GPL3",
+    "license": "GPL-3.0",
     "url": "https://github.com/acaudwell/Gource/releases/download/gource-0.47/gource-0.47.win64.zip",
     "checkver": {
         "url": "https://github.com/acaudwell/Gource/releases/latest",

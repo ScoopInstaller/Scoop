@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.mingw.org/",
     "version": "1.14-3",
-    "license": "GPLv3+",
+    "license": "GPL-3.0-or-later",
     "url": [
         "https://sourceforge.net/projects/mingw/files/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-bin.tar.lzma",
         "https://sourceforge.net/projects/mingw/files/MinGW/Base/libiconv/libiconv-1.14-3/libiconv-1.14-3-mingw32-dll.tar.lzma",

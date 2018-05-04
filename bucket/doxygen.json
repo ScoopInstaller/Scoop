@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.doxygen.nl/",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "version": "1.8.14",
     "architecture": {
         "64bit": {

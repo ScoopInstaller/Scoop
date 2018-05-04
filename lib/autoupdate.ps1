@@ -52,7 +52,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
 
     $normalRegex = substitute $normalRegex @{'$basename' = [regex]::Escape($basename)}
     if ($hashfile -match $normalRegex) {
-        $hash = $matches[1]
+        $hash = $matches[1] -replace ' ',''
     }
 
     # find hash with filename in $hashfile (will be overridden by $regex)

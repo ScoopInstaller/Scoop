@@ -1,7 +1,7 @@
 {
     "homepage": "https://rtmpdump.mplayerhq.hu/",
     "version": "2.3",
-    "license": "GPLv2",
+    "license": "GPL-2.0",
     "url": "https://rtmpdump.mplayerhq.hu/download/rtmpdump-2.3-windows.zip",
     "hash": "6948aa372f04952d5675917c6ca2c7c0bf6b109de21a4323adc93247fff0189f",
     "extract_dir": "rtmpdump-2.3",

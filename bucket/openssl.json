@@ -1,7 +1,7 @@
 {
     "homepage": "https://slproweb.com/products/Win32OpenSSL.html",
     "version": "1.1.0h",
-    "license": "https://www.openssl.org/source/license.html",
+    "license": "OpenSSL",
     "architecture": {
         "64bit": {
             "url": "https://slproweb.com/download/Win64OpenSSL-1_1_0h.exe",

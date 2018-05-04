@@ -1,6 +1,6 @@
 {
     "version": "latest",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "url": "https://raw.githubusercontent.com/aspnet/Home/danroth27/restorednvm/dnvm.ps1",
     "homepage": "https://github.com/aspnet/Home",
     "env_set": {

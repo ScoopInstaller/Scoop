@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.ghostscript.com",
     "version": "9.23",
-    "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+    "license": "AGPL-3.0",
     "architecture": {
         "64bit": {
             "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs923/gs923w64.exe#/dl.7z",

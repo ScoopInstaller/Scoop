@@ -134,7 +134,8 @@ function set_https_protocols($protocols) {
 
 function do_dl($url, $to, $cookies) {
     $original_protocols = use_any_https_protocol
-    $progress = [console]::isoutputredirected -eq $false
+    $progress = [console]::isoutputredirected -eq $false -and
+        $host.name -ne 'Windows PowerShell ISE Host'
 
     try {
         $url = handle_special_urls $url
@@ -681,14 +682,16 @@ function create_shims($manifest, $dir, $global, $arch) {
         $target, $name, $arg = shim_def $_
         write-output "Creating shim for '$name'."
 
-        # check valid bin
-        $bin = "$dir\$target"
-        if(!(is_in_dir $dir $bin)) {
-            abort "Error in manifest: bin '$target' is outside the app directory."
+        if(test-path "$dir\$target" -pathType leaf) {
+            $bin = "$dir\$target"
+        } elseif(test-path $target -pathType leaf) {
+            $bin = $target
+        } else {
+            $bin = search_in_path $target
         }
-        if(!(test-path $bin)) { abort "Can't shim '$target': File doesn't exist."}
+        if(!$bin) { abort "Can't shim '$target': File doesn't exist."}
 
-        shim "$dir\$target" $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir})
+        shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir})
     }
 }
 

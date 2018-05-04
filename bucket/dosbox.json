@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.dosbox.com/",
     "version": "0.74",
-    "license": "GPL",
+    "license": "GPL-2.0",
     "url": "https://downloads.sourceforge.net/project/dosbox/dosbox/0.74/DOSBox0.74-win32-installer.exe",
     "hash": "c149cb85f732beb95bf6564d72bdfdd9306f7050edfd9d2cd475420efe3b84fc",
     "installer": {

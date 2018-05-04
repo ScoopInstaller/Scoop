@@ -270,14 +270,10 @@ function shim($path, $global, $name, $arg) {
         write-output "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" | out-file "$shim.ps1" -encoding utf8
     }
 
-    if($arg) {
-        write-output "`$args = '$($arg -join "', '")', `$args" | out-file "$shim.ps1" -encoding utf8 -append
-    }
-
     if($path -match '\.jar$') {
-        "if(`$myinvocation.expectingInput) { `$input | & java -jar `$path @args } else { & java -jar `$path @args }" | out-file "$shim.ps1" -encoding utf8 -append
+        "if(`$myinvocation.expectingInput) { `$input | & java -jar `$path $arg @args } else { & java -jar `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     } else {
-        "if(`$myinvocation.expectingInput) { `$input | & `$path @args } else { & `$path @args }" | out-file "$shim.ps1" -encoding utf8 -append
+        "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     }
 
     if($path -match '\.exe$') {
@@ -303,12 +299,21 @@ set args=%args:(=``(%
 set args=%args:)=``)%
 set invalid=`"='
 if !args! == !invalid! ( set args= )
-powershell -noprofile -ex unrestricted `"& '$resolved_path' %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
+powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
 
         "#!/bin/sh`npowershell -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.jar$') {
         "@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
         "#!/bin/sh`njava -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+    }
+}
+
+function search_in_path($target) {
+    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
+    foreach($dir in $path.split(';')) {
+        if(test-path "$dir\$target" -pathType leaf) {
+            return "$dir\$target"
+        }
     }
 }
 
@@ -389,7 +394,7 @@ function ensure_robocopy_in_path {
 }
 
 function wraptext($text, $width) {
-    if(!$width) { $width = $host.ui.rawui.windowsize.width };
+    if(!$width) { $width = $host.ui.rawui.buffersize.width };
     $width -= 1 # be conservative: doesn't seem to print the last char
 
     $text -split '\r?\n' | ForEach-Object {

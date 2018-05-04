@@ -6,7 +6,7 @@
     "hash": "74308db1183436576d011bfcc3e7c99c836fb052de7b7eb0539026366453d6e8",
     "extract_dir": "upx394w",
     "bin": "upx.exe",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "checkver": {
         "github": "https://github.com/upx/upx"
     },

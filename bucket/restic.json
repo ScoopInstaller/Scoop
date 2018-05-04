@@ -1,7 +1,7 @@
 {
     "homepage": "https://restic.github.io/",
     "version": "0.8.3",
-    "license": "https://github.com/restic/restic/blob/master/LICENSE",
+    "license": "BSD-2-Clause",
     "architecture": {
         "64bit": {
             "url": "https://github.com/restic/restic/releases/download/v0.8.3/restic_0.8.3_windows_amd64.zip",
