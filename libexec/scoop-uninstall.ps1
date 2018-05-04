@@ -36,7 +36,7 @@ if($apps -eq 'scoop') {
 $apps = ensure_all_installed $apps $global
 if(!$apps) { exit 0 }
 
-$apps | ForEach-Object {
+:app_loop foreach($_ in $apps) {
     ($app, $global) = $_
 
     $version = current_version $app $global
@@ -88,7 +88,7 @@ $apps | ForEach-Object {
             Remove-Item -r -force -ea stop $dir
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
-            continue
+            continue app_loop
         }
     }
 
