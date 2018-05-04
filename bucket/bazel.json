@@ -1,0 +1,40 @@
+{
+    "homepage": "https://bazel.build",
+    "version": "0.13.0",
+    "license": "Apache-2.0",
+    "bin": "bazel.exe",
+    "suggest": {
+        "MSYS2": [
+            "msys2"
+        ],
+        "Python27": [
+            "versions/python27"
+        ],
+        "curl": [
+            "curl"
+        ]
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/bazelbuild/bazel/releases/download/0.13.0/bazel-0.13.0-windows-x86_64.zip",
+            "hash": "de81cff0604618646d4e0ab64e078229fd75753628df51f5df833e0f1cd24147"
+        }
+    },
+    "checkver": {
+        "github": "https://github.com/bazelbuild/bazel"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/bazelbuild/bazel/releases/download/$version/bazel-$version-windows-x86_64.zip"
+            }
+        },
+        "hash": {
+            "mode": "extract",
+            "url": "$url.sha256"
+        }
+    },
+    "env_set": {
+        "BAZEL_SH": "$(appdir msys2)\\current\\usr\\bin\\bash.exe"
+    }
+}
