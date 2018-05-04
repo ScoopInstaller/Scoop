@@ -20,7 +20,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     $version = $manifest.version
     if(!$version) { abort "Manifest doesn't specify a version." }
-    if($version -match '[^\w\.\-_]') {
+    if($version -match '[^\w\.\-\+_]') {
         abort "Manifest version has unsupported character '$($matches[0])'."
     }
 
