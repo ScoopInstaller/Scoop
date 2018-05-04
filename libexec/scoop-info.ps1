@@ -31,6 +31,10 @@ $install = install_info $app $status.version $global
 $manifest_file = manifest_path $app $bucket
 $version_output = $manifest.version
 
+$dir = versiondir $app 'current' $global
+$original_dir = versiondir $app $manifest.version $global
+$persist_dir = persistdir $app $global
+
 if($status.installed) {
     $bucket = $install.bucket
     $manifest_file = manifest_path $app $bucket
@@ -57,8 +61,11 @@ if ($manifest.license) {
     Write-Output "License:   $license"
 }
 
-# Show installed versions
+# Manifest file
+Write-Output "Manifest:`n  $manifest_file"
+
 if($status.installed) {
+    # Show installed versions
     Write-Output "Installed:"
     $versions = versions $app $global
     $versions | ForEach-Object {
@@ -66,20 +73,42 @@ if($status.installed) {
         if($global) { $dir += " *global*" }
         Write-Output "  $dir"
     }
-    Write-Output "Binaries:"
-    $binaries = arch_specific 'bin' $manifest $install.architecture
-    Write-Output "  $binaries"
 } else {
     Write-Output "Installed: No"
 }
 
-# Manifest file
-Write-Output "Manifest:`n  $manifest_file"
+$binaries = arch_specific 'bin' $manifest $install.architecture
+if($binaries) {
+    Write-Output "Binaries:`n  $binaries"
+}
+
+if($manifest.env_set -or $manifest.env_add_path) {
+    if($status.installed) {
+        Write-Output "Environment:"
+    } else {
+        Write-Output "Environment: (simulated)"
+    }
+}
+if($manifest.env_set) {
+    $manifest.env_set | Get-Member -member noteproperty | ForEach-Object {
+        $value = env $_.name $global
+        if(!$value) {
+            $value = format $manifest.env_set.$($_.name) @{ "dir" = $dir }
+        }
+        Write-Output "  $($_.name)=$value"
+    }
+}
+if($manifest.env_add_path) {
+    $manifest.env_add_path | Where-Object { $_ } | ForEach-Object {
+        if($_ -eq '.') {
+            Write-Output "  PATH=%PATH%;$dir"
+        } else {
+            Write-Output "  PATH=%PATH%;$dir\$_"
+        }
+    }
+}
 
 # Show notes
-$dir = versiondir 'current' $global
-$original_dir = versiondir $app $manifest.version $global
-$persist_dir = persistdir $app $global
 show_notes $manifest $dir $original_dir $persist_dir
 
 exit 0
