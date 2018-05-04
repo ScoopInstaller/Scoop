@@ -1,5 +1,5 @@
 # Usage: scoop info <app>
-# Summary: Display information about the app
+# Summary: Display information about an app
 param($app)
 
 . "$psscriptroot\..\lib\buckets.ps1"
@@ -12,71 +12,74 @@ param($app)
 
 reset_aliases
 
-$global = $opt.g -or $opt.global
+if(!$app) { my_usage; exit 1 }
 
-if ($app) {
-    $app, $bucket = app $app
-    $status = app_status $app $global
-    if ($status.installed) {
-        $current_version = current_version $app $global
-        $manifest = installed_manifest $app $current_version $global
+$global = installed $app $true
+$app, $bucket, $null = app $app
+$status = app_status $app $global
+$manifest, $bucket = find_manifest $app $bucket
 
-        if ($bucket) {
-            $manifest = find_manifest $app $bucket
-        }
-
-        if ($manifest) {
-            $install = install_info $app $current_version $global
-            $bucket = $install.bucket
-            $url = $install.url
-            $versions = versions $app $global
-            $latest_version = latest_version $app $bucket $url
-
-            Write-Output "$($app): $($latest_version)"
-            if (![string]::isnullorempty($manifest.description)) {
-                Write-Output "$($manifest.description)"
-            }
-            Write-Output "Home: $($manifest.homepage)"
-
-            Write-Output "Installed:"
-            $versions | ForEach-Object {
-                $version = $_
-                $dir = versiondir $app $version $global
-                Write-Output "  $($dir)"
-            }
-
-            if ($url) {
-                Write-Output "From: $($url)"
-            } else {
-                $from = manifest_path $app $bucket
-                Write-Output "From: $($from)"
-            }
-        } else {
-            if ($bucket) {
-                abort "Could not find manifest for '$bucket/$app'."
-            } else {
-                abort "Could not find manifest for '$app'."
-            }
-        }
+if (!$manifest) {
+    if ($bucket) {
+        abort "Could not find manifest for '$bucket/$app'."
     } else {
-        $manifest = manifest $app $bucket
-        if ($manifest) {
-            Write-Output "$($app): $($manifest.version)"
-            if (![string]::isnullorempty($manifest.description)) {
-                Write-Output "$($manifest.description)"
-            }
-            Write-Output "Home: $($manifest.homepage)"
-            Write-Output "Not installed"
-            $from = manifest_path $app $bucket
-            Write-Output "From: $($from)"
-        } else {
-            if ($bucket) {
-                abort "Could not find manifest for '$bucket/$app'."
-            } else {
-                abort "Could not find manifest for '$app'."
-            }
-        }
+        abort "Could not find manifest for '$app'."
     }
-} else { my_usage }
+}
+
+$install = install_info $app $status.version $global
+$manifest_file = manifest_path $app $bucket
+$version_output = $manifest.version
+
+if($status.installed) {
+    $bucket = $install.bucket
+    $manifest_file = manifest_path $app $bucket
+    if($install.url) { $manifest_file = $install.url }
+    if($status.version -eq $manifest.version) {
+        $version_output = $status.version
+    } else {
+        $version_output = "$($status.version) (Update to $($manifest.version) available)"
+    }
+}
+
+Write-Output "Name:      $app"
+if ($manifest.description) {
+    Write-Output "  $($manifest.description)"
+}
+Write-Output "Version:   $version_output"
+Write-Output "Website:   $($manifest.homepage)"
+# Show license
+if ($manifest.license) {
+    $license = $manifest.license
+    if($manifest.license -notmatch '^((ht)|f)tps?://') {
+        $license = "$($manifest.license) (https://spdx.org/licenses/$($manifest.license).html)"
+    }
+    Write-Output "License:   $license"
+}
+
+# Show installed versions
+if($status.installed) {
+    Write-Output "Installed:"
+    $versions = versions $app $global
+    $versions | ForEach-Object {
+        $dir = versiondir $app $_ $global
+        if($global) { $dir += " *global*" }
+        Write-Output "  $dir"
+    }
+    Write-Output "Binaries:"
+    $binaries = arch_specific 'bin' $manifest $install.architecture
+    Write-Output "  $binaries"
+} else {
+    Write-Output "Installed: No"
+}
+
+# Manifest file
+Write-Output "Manifest:`n  $manifest_file"
+
+# Show notes
+$dir = versiondir 'current' $global
+$original_dir = versiondir $app $manifest.version $global
+$persist_dir = persistdir $app $global
+show_notes $manifest $dir $original_dir $persist_dir
 
 exit 0
