@@ -1,20 +1,19 @@
 {
     "homepage": "https://mingw-w64.org",
-    "version": "7.2.0",
+    "version": "7.3.0",
     "license": "GPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.2.0/threads-posix/seh/x86_64-7.2.0-release-posix-seh-rt_v5-rev1.7z",
-            "hash": "ef88d8691566b993778ed3ad651a3c75bd67896d1d8e220729fe24ec405ec21c",
+            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.3.0/threads-posix/seh/x86_64-7.3.0-release-posix-seh-rt_v5-rev0.7z",
+            "hash": "784D25B00E7CF27AA64ABE2363B315400C27526BFCE672FDEE97137F71823D03",
             "extract_dir": "mingw64"
         },
         "32bit": {
-            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/7.2.0/threads-posix/dwarf/i686-7.2.0-release-posix-dwarf-rt_v5-rev1.7z",
-            "hash": "8451a013ce317c72edde4c65932d6770dd98910a27714527ac27dc76bd3123f1",
+            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/7.3.0/threads-posix/dwarf/i686-7.3.0-release-posix-dwarf-rt_v5-rev0.7z",
+            "hash": "0475B097AD645AE25438AE3470AF7E16E218EC1BD617B73E50B6A6C9622589A7",
             "extract_dir": "mingw32"
         }
     },
     "env_add_path": "bin",
-    "notes": "The 64bit version is built with Structured Exception Handling (SEH), the 32bit is built with DWARF.
-Both 64bit and 32bit support Posix threading model"
+    "notes": "The 64bit version is built with Structured Exception Handling (SEH), the 32bit is built with DWARF. Both 64bit and 32bit support Posix threading model"
 }
