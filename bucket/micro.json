@@ -1,7 +1,7 @@
 {
     "homepage": "https://micro-editor.github.io/",
     "version": "1.4.0",
-    "license": "MIT Expat License",
+    "license": "MIT",
     "architecture": {
         "64bit": {
             "url": "https://github.com/zyedidia/micro/releases/download/v1.4.0/micro-1.4.0-win64.zip",
