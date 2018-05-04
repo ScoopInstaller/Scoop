@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.fossil-scm.org/",
-    "version": "2.5",
+    "version": "2.6",
     "license": "BSD-2-Clause",
-    "hash": "cad1caf56db436ca2a29e7b4919459482832dea6f6f3114258d28cbbfbc6bcb6",
-    "url": "https://www.fossil-scm.org/index.html/uv/fossil-w32-2.5.zip",
+    "hash": "8911c87f06cfe7c9d43825e79c8331ac31723434df62dc1d53d7ba5d6ca15edc",
+    "url": "https://www.fossil-scm.org/index.html/uv/fossil-w32-2.6.zip",
     "bin": "fossil.exe",
     "checkver": {
         "url": "https://www.fossil-scm.org/index.html/uv/download.html",
