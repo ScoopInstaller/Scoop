@@ -11,7 +11,7 @@ function nightly_version($date, $quiet = $false) {
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true) {
     $app, $bucket, $null = parse_app $app
-    $app, $manifest, $null, $url = locate $app $bucket
+    $app, $manifest, $bucket, $url = locate $app $bucket
     $check_hash = $true
 
     if(!$manifest) {
