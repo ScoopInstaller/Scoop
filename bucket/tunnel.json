@@ -1,15 +1,15 @@
 {
-    "version": "0.2.7",
+    "version": "0.2.8",
     "homepage": "https://github.com/labstack/tunnel",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/labstack/tunnel/releases/download/0.2.7/tunnel_0.2.7_windows_32-bit.zip",
-            "hash": "95be56c2b3a806e8d4648bdb8f36759194a66edadc42849a9e4010802f316551"
+            "url": "https://github.com/labstack/tunnel/releases/download/0.2.8/tunnel_0.2.8_windows_32-bit.zip",
+            "hash": "f685587fdb7fbf0b03c3bceed079d72c2beb1b84865ab9d3ce92d3fc1e2cbbfa"
         },
         "64bit": {
-            "url": "https://github.com/labstack/tunnel/releases/download/0.2.7/tunnel_0.2.7_windows_64-bit.zip",
-            "hash": "1ac18c7309d6e9a8efc166ffa7a744ea4367c3d82a1bed59c0393817b7f10742"
+            "url": "https://github.com/labstack/tunnel/releases/download/0.2.8/tunnel_0.2.8_windows_64-bit.zip",
+            "hash": "e1e909cbff3e8c618d4e9bf986f6286cd26e33ffe3f735e3874d4e9245fe6d50"
         }
     },
     "bin": "tunnel.exe",
