@@ -494,15 +494,11 @@ function applist($apps, $global) {
     return ,@($apps | ForEach-Object { ,@($_, $global) })
 }
 
-function parse_app($app) {
-    $app = [string]$app
-    if($app -notmatch '^((ht)|f)tps?://' -and $app -notmatch '^(?:[\w]\:\\|\\\\)') {
-        if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>[a-zA-Z0-9-.]+)(?:@(?<version>.*))?') {
-            return $matches['app'], $matches['bucket'], $matches['version']
-        }
+function parse_app([string] $app) {
+    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*.json$|[a-zA-Z0-9-.]+)(?:@(?<version>.*))?') {
+        return $matches['app'], $matches['bucket'], $matches['version']
     }
-
-    $app, $null, $null
+    return $app, $null, $null
 }
 
 function last_scoop_update() {

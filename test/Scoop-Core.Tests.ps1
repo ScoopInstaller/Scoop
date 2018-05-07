@@ -223,6 +223,30 @@ describe 'app' {
         $bucket | should be $null
         $version | should be $null
 
+        $query = "test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "test.json"
+        $bucket | should be $null
+        $version | should be $null
+
+        $query = ".\test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be ".\test.json"
+        $bucket | should be $null
+        $version | should be $null
+
+        $query = "..\test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "..\test.json"
+        $bucket | should be $null
+        $version | should be $null
+
+        $query = "\\share\test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "\\share\test.json"
+        $bucket | should be $null
+        $version | should be $null
+
         $query = "https://example.com/test.json"
         $app, $bucket, $version = parse_app $query
         $app | should be "https://example.com/test.json"
