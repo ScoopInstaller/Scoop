@@ -1,15 +1,15 @@
 {
-    "version": "0.12.2",
-    "extract_dir": "editorconfig-0.12.2-Windows-x86",
-    "url": "https://excellmedia.dl.sourceforge.net/project/editorconfig/EditorConfig-C-Core/0.12.2/binary-Windows/editorconfig-0.12.2-Windows-x86.zip",
+    "version": "0.12.1",
+    "extract_dir": "editorconfig-0.12.1-Windows-x86",
+    "url": "https://downloads.sourceforge.net/project/editorconfig/EditorConfig-C-Core/0.12.1/binary-Windows/editorconfig-0.12.1-Windows-x86.zip",
     "homepage": "http://editorconfig.org/",
-    "hash": "251a85b3bac687974f360d3796048c20ded3bf0bd69e0d1cfd1db23d013f89ed",
+    "hash": "sha1:7c44b819690baec3de22edc0c9f7eb21dc0a7850",
     "bin": "bin/editorconfig.exe",
     "checkver": {
         "github": "https://github.com/editorconfig/editorconfig-core-c"
     },
     "autoupdate": {
-        "url": "https://excellmedia.dl.sourceforge.net/project/editorconfig/EditorConfig-C-Core/$version/binary-Windows/editorconfig-$version-Windows-x86.zip",
+        "url": "https://downloads.sourceforge.net/project/editorconfig/EditorConfig-C-Core/$version/binary-Windows/editorconfig-$version-Windows-x86.zip",
         "extract_dir": "editorconfig-$version-Windows-x86"
     }
 }
