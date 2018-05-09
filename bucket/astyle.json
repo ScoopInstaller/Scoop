@@ -1,5 +1,6 @@
 {
     "homepage": "http://astyle.sourceforge.net/",
+    "description": "A Free, Fast, and Small Automatic Formatter for C, C++, C++/CLI, Objective‑C, C#, and Java Source Code",
     "version": "3.1",
     "license": "MIT",
     "url": [

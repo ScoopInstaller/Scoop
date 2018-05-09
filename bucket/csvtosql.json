@@ -1,5 +1,6 @@
 {
     "version": "v0.1.1-alpha",
+    "description": "Converts a comma delimitered CSV to a MSSQL script",
     "license": "Unlicense",
     "url": "https://github.com/deevus/CsvToSql/archive/v0.1.1-alpha.zip",
     "depends": "gow",

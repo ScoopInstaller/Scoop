@@ -1,5 +1,6 @@
 {
     "homepage": "https://geoff.greer.fm/ag/",
+    "description": "The Silver Searcher is a tool for searching code",
     "license": "Apache-2.0",
     "version": "2.1.0-34-g5b10c68",
     "architecture": {

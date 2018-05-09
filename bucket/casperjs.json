@@ -1,6 +1,7 @@
 {
     "version": "1.1.4-1",
     "homepage": "http://casperjs.org/",
+    "description": "Navigation scripting & testing for PhantomJS and SlimerJS",
     "license": "MIT",
     "url": "https://github.com/casperjs/casperjs/archive/1.1.4-1.zip",
     "hash": "9e2e74bb77466227d38facc442f76a69404e78bca02238b57c66b24094adf78c",

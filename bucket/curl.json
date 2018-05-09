@@ -1,5 +1,6 @@
 {
     "homepage": "https://curl.haxx.se/",
+    "description": "command line tool and library for transferring data with URLs",
     "version": "7.59.0",
     "license": "MIT",
     "architecture": {

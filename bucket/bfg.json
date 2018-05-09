@@ -1,5 +1,6 @@
 {
     "homepage": "https://rtyley.github.io/bfg-repo-cleaner/",
+    "description": "Removes large or troublesome blobs like git-filter-branch does, but faster, written in Scala",
     "license": "GPL-3.0-or-later",
     "version": "1.13.0",
     "url": "https://repo1.maven.org/maven2/com/madgag/bfg/1.13.0/bfg-1.13.0.jar",
@@ -12,13 +13,13 @@
     },
     "bin": "bfg.ps1",
     "pre_install": "
-        write-output ('java -jar {0}\\bfg-{1}.jar $args' -f \"$dir\", \"$version\") | out-file -filepath $dir\\bfg.ps1
-    ",
-    "checkver": {
-        "url": "https://search.maven.org/solrsearch/select/?q=g:com.madgag+AND+a:bfg",
-        "jp": "$.response.docs[0].latestVersion"
-    },
-    "autoupdate": {
-        "url": "https://repo1.maven.org/maven2/com/madgag/bfg/$version/bfg-$version.jar"
+    write - output('java -jar {0}\\bfg-{1}.jar $args' - f\ "$dir\", \"$version\") | out-file -filepath $dir\\bfg.ps1
+        ",
+        "checkver": {
+            "url": "https://search.maven.org/solrsearch/select/?q=g:com.madgag+AND+a:bfg",
+            "jp": "$.response.docs[0].latestVersion"
+        },
+        "autoupdate": {
+            "url": "https://repo1.maven.org/maven2/com/madgag/bfg/$version/bfg-$version.jar"
+        }
     }
-}
