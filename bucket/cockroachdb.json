@@ -1,5 +1,6 @@
 {
     "homepage": "https://www.cockroachlabs.com/",
+    "description": "The SQL database for global cloud services",
     "license": "https://github.com/cockroachdb/cockroach/blob/master/LICENSE",
     "version": "2.0.1",
     "url": "https://binaries.cockroachdb.com/cockroach-v2.0.1.windows-6.2-amd64.zip",

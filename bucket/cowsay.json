@@ -1,6 +1,7 @@
 {
     "version": "0.2013.07.19",
     "homepage": "https://github.com/lukesampson/cowsay-psh",
+    "description": "Cowsay/think in Powershell",
     "url": "https://github.com/lukesampson/cowsay-psh/archive/master.zip",
     "hash": "c65cdfbf43b15f65742831f812003a92abeaa5d416374d5d75a53388d0b59148",
     "extract_dir": "cowsay-psh-master",
