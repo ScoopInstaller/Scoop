@@ -28,6 +28,7 @@
         ]
     },
     "bin": [
+        "gm.exe",
         [
             "gm.exe",
             "gm-q8"
