@@ -34,12 +34,6 @@
             "gm-q16"
         ]
     ],
-    "shortcuts": [
-        [
-            "gm.exe",
-            "GraphicsMagick-Q16"
-        ]
-    ],
     "checkver": {
         "url": "https://sourceforge.net/p/graphicsmagick/news/?source=navbar",
         "re": "GraphicsMagick ([\\d].[\\d].[\\d]+)"

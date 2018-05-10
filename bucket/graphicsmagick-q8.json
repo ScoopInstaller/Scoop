@@ -34,12 +34,6 @@
             "gm-q8"
         ]
     ],
-    "shortcuts": [
-        [
-            "gm.exe",
-            "GraphicsMagick-Q8"
-        ]
-    ],
     "checkver": {
         "url": "https://sourceforge.net/p/graphicsmagick/news/?source=navbar",
         "re": "GraphicsMagick ([\\d].[\\d].[\\d]+)"
