@@ -1,15 +1,15 @@
 {
-    "version": "0.10.14",
+    "version": "0.11.0",
     "homepage": "https://caddyserver.com",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/mholt/caddy/releases/download/v0.10.14/caddy_v0.10.14_windows_amd64.zip",
-            "hash": "d1323482460aaf96c43849d7faa6d8ae6efc0c71e3ed80fc26f87b9184f2dce8"
+            "url": "https://github.com/mholt/caddy/releases/download/v0.11.0/caddy_v0.11.0_windows_amd64.zip",
+            "hash": "52de3956a913da2045221770978c5578d828f65e094db8f8fe414f1fea9c4a8a"
         },
         "32bit": {
-            "url": "https://github.com/mholt/caddy/releases/download/v0.10.14/caddy_v0.10.14_windows_386.zip",
-            "hash": "382ce467b9c536b2945a2eb740e5c7f38859911524554d0d7f2d4bae8886afb4"
+            "url": "https://github.com/mholt/caddy/releases/download/v0.11.0/caddy_v0.11.0_windows_386.zip",
+            "hash": "4d9d6402f0f5e63027461cb59046750bacfaf7a9176f72b731679e0d62674ddd"
         }
     },
     "bin": "caddy.exe",
