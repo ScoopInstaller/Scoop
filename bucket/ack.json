@@ -1,5 +1,6 @@
 {
     "homepage": "https://beyondgrep.com/",
+    "description": "A tool like grep, optimized for programmers",
     "license": "Artistic-2.0",
     "version": "2.22",
     "url": "https://beyondgrep.com/ack-2.22-single-file#/ack-single-file",

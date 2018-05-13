@@ -1,5 +1,5 @@
 {
-    "description": "Apex lets you build, deploy, and manage AWS Lambda functions.",
+    "description": "Lets you build, deploy, and manage AWS Lambda functions.",
     "homepage": "http://apex.run/",
     "license": "MIT",
     "version": "1.0.0-rc3",

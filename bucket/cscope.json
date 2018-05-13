@@ -1,5 +1,6 @@
 {
     "version": "15.8a",
+    "description": "Developer's tool for browsing source code",
     "architecture": {
         "64bit": {
             "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-15.8a-win64rev1-static.zip"

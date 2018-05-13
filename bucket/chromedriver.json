@@ -1,6 +1,7 @@
 {
     "version": "2.38",
     "homepage": "https://sites.google.com/a/chromium.org/chromedriver/",
+    "description": "An open source tool for automated testing of webapps across many browsers",
     "license": "BSD-3-Clause",
     "url": "https://chromedriver.storage.googleapis.com/2.38/chromedriver_win32.zip",
     "hash": "a8fa028acebef7b931ef9cb093f02865f9f7495e49351f556e919f7be77f072e",

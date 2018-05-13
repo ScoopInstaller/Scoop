@@ -1,5 +1,6 @@
 {
     "homepage": "https://cakebuild.net/",
+    "description": "Cake (C# Make) is a cross-platform build automation system with a C# DSL",
     "version": "0.27.1",
     "license": "MIT",
     "url": "https://github.com/cake-build/cake/releases/download/v0.27.1/Cake-bin-net461-v0.27.1.zip",

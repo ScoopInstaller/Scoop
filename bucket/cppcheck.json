@@ -1,5 +1,6 @@
 {
     "homepage": "http://cppcheck.sourceforge.net/",
+    "description": "Static analysis tool for C/C++ code",
     "license": "GPL-3.0",
     "version": "1.83",
     "architecture": {

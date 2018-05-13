@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/allure-framework/allure2",
+    "description": "A flexible lightweight multi-language test report tool",
     "version": "2.6.0",
     "license": "Apache-2.0",
     "url": "https://dl.bintray.com/qameta/generic/io/qameta/allure/allure/2.6.0/allure-2.6.0.zip",

@@ -1,5 +1,6 @@
 {
     "homepage": "http://www.mingw.org/wiki/msys",
+    "description": "A collection of GNU utilities such as bash, make, gawk and grep",
     "license": "GPL-2.0",
     "version": "5.97.3",
     "url": [

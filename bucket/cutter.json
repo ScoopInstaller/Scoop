@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/radareorg/cutter",
+    "description": "A Qt and C++ GUI for radare2 reverse engineering framework",
     "license": "GPL-3.0",
     "version": "1.4",
     "architecture": {

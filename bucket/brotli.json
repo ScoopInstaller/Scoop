@@ -1,6 +1,7 @@
 {
     "version": "1.0.1",
     "homepage": "https://brotli.org/",
+    "description": "Lossless compression algorithm",
     "architecture": {
         "64bit": {
             "url": "https://github.com/google/brotli/releases/download/v1.0.0/brotli-win-x86_64-v1.0.0.zip",

@@ -1,5 +1,6 @@
 {
     "homepage": "https://cmake.org/",
+    "description": "Open-source, cross-platform family of tools designed to build, test and package software",
     "version": "3.11.1",
     "license": "BSD-3-Clause",
     "architecture": {
