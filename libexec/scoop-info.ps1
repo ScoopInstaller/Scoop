@@ -46,19 +46,19 @@ if($status.installed) {
     }
 }
 
-Write-Output "Name:      $app"
+Write-Output "Name: $app"
 if ($manifest.description) {
-    Write-Output "  $($manifest.description)"
+    Write-Output "Description: $($manifest.description)"
 }
-Write-Output "Version:   $version_output"
-Write-Output "Website:   $($manifest.homepage)"
+Write-Output "Version: $version_output"
+Write-Output "Website: $($manifest.homepage)"
 # Show license
 if ($manifest.license) {
     $license = $manifest.license
     if($manifest.license -notmatch '^((ht)|f)tps?://') {
         $license = "$($manifest.license) (https://spdx.org/licenses/$($manifest.license).html)"
     }
-    Write-Output "License:   $license"
+    Write-Output "License: $license"
 }
 
 # Manifest file
