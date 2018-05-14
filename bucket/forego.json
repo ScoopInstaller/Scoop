@@ -1,0 +1,23 @@
+{
+    "homepage": "https://github.com/ddollar/forego",
+    "version": "20180217041714",
+    "architecture": {
+        "64bit": {
+            "url": "https://bin.equinox.io/a/cNQswJNYTQe/forego-20180217041714-windows-amd64.zip",
+            "hash": "97ccd726c7faaecf0fc6d9404137c82b11798482b6f03f6f477af889c602de1a"
+        }
+    },
+    "bin": "forego.exe",
+    "checkver": {
+        "url": "https://dl.equinox.io/ddollar/forego/stable/archive",
+        "re": "https://bin.equinox.io/a/(?<dir>.+)/forego-(?<version>\\d+)-windows-amd64.zip"
+    },
+    "autoupdate": {
+        "note": "Thanks for using autoupdate, please test your updates!",
+        "architecture": {
+            "64bit": {
+                "url": "https://bin.equinox.io/a/$matchDir/forego-$matchVersion-windows-amd64.zip"
+            }
+        }
+    }
+}
