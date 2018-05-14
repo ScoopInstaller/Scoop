@@ -1,7 +1,11 @@
 {
     "homepage": "https://github.com/ddollar/forego",
     "version": "20180217041714",
-    "url": "https://bin.equinox.io/c/ekMN3bCZFUn/forego-stable-windows-amd64.zip",
-    "hash": "97ccd726c7faaecf0fc6d9404137c82b11798482b6f03f6f477af889c602de1a",
+    "architecture": {
+        "64bit": {
+            "url": "https://bin.equinox.io/c/ekMN3bCZFUn/forego-stable-windows-amd64.zip",
+            "hash": "97ccd726c7faaecf0fc6d9404137c82b11798482b6f03f6f477af889c602de1a"
+        }
+    },
     "bin": "forego.exe"
 }
