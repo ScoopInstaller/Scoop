@@ -79,7 +79,15 @@ if($status.installed) {
 
 $binaries = arch_specific 'bin' $manifest $install.architecture
 if($binaries) {
-    Write-Output "Binaries:`n  $binaries"
+    $binary_output = "Binaries:`n  "
+    $binaries | ForEach-Object {
+        if($_ -is [System.Array]) {
+            $binary_output += " $($_[1]).exe"
+        } else {
+            $binary_output += " $_"
+        }
+    }
+    Write-Output $binary_output
 }
 
 if($manifest.env_set -or $manifest.env_add_path) {
