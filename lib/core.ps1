@@ -501,6 +501,16 @@ function parse_app([string] $app) {
     return $app, $null, $null
 }
 
+function show_app($app, $bucket, $version) {
+    if($bucket) {
+        $app = "$bucket/$app"
+    }
+    if($version) {
+        $app = "$app@$version"
+    }
+    return $app
+}
+
 function last_scoop_update() {
     $last_update = (scoop config lastupdate)
     if(!$last_update) {
