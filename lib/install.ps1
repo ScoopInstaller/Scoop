@@ -311,12 +311,16 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         $fname = $data.$url.fname
 
         if($check_hash) {
-            $ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
+            $manifest_hash = hash_for_url $manifest $url $arch
+            $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
             if(!$ok) {
-                # rm cached
+                error $err
                 $cached = cache_path $app $version $url
-                if(test-path $cached) { Remove-Item -force $cached }
-                abort $err
+                if(test-path $cached) {
+                    # rm cached file
+                    Remove-Item -force $cached
+                }
+                abort $(new_issue_msg $app $bucket "hash check failed")
             }
         }
 
@@ -435,11 +439,10 @@ function hash_for_url($manifest, $url, $arch) {
 }
 
 # returns (ok, err)
-function check_hash($file, $url, $manifest, $arch) {
-    $hash = hash_for_url $manifest $url $arch
+function check_hash($file, $hash, $app_name) {
     if(!$hash) {
         warn "Warning: No hash in manifest. SHA256 is:`n    $(compute_hash (fullpath $file) 'sha256')"
-        return $true
+        return $true, $null
     }
 
     write-host "Checking hash of $(url_remote_filename $url)... " -nonewline
@@ -455,11 +458,21 @@ function check_hash($file, $url, $manifest, $arch) {
 
     $actual = compute_hash (fullpath $file) $type
 
+    $expected = $expected.ToLower()
+    $actual = $actual.ToLower()
+
     if($actual -ne $expected) {
-        return $false, "Hash check failed for '$url'.`nExpected:`n    $($expected)`nActual:`n    $($actual)"
+        $msg = "Hash check failed!`n"
+        $msg += "App:       $app_name`n"
+        $msg += "URL:       $url`n"
+        if($expected -or $actual) {
+            $msg += "Expected:  $expected`n"
+            $msg += "Actual:    $actual"
+        }
+        return $false, $msg
     }
     write-host "ok."
-    return $true
+    return $true, $null
 }
 
 function compute_hash($file, $algname) {
@@ -478,6 +491,7 @@ function compute_hash($file, $algname) {
         if($fs) { $fs.dispose() }
         if($alg) { $alg.dispose() }
     }
+    return ''
 }
 
 function cmd_available($cmd) {
