@@ -359,7 +359,13 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             }
             # fails if zip contains long paths (e.g. atom.json)
             #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+            try {
+                movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+            }
+            catch {
+                error $_
+                abort $(new_issue_msg $app $bucket "extract_dir error")
+            }
 
             if(test-path "$dir\_tmp") { # might have been moved by movedir
                 try {
