@@ -12,10 +12,11 @@
 # When installing from your computer, you can leave the .json extension off if you like.
 #
 # Options:
-#   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
+#   -g, --global              Install the app globally
 #   -i, --independent         Don't install dependencies automatically
 #   -k, --no-cache            Don't use the download cache
-#   -g, --global              Install the app globally
+#   -s, --skip                Skip hash validation (use with caution!)
+#   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -46,10 +47,11 @@ function is_installed($app, $global) {
     return $false
 }
 
-$opt, $apps, $err = getopt $args 'gika:' 'global', 'independent', 'no-cache', 'arch='
+$opt, $apps, $err = getopt $args 'gfiksa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'arch='
 if($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
+$check_hash = !($opt.s -or $opt.skip)
 $independent = $opt.i -or $opt.independent
 $use_cache = !($opt.k -or $opt.'no-cache')
 $architecture = default_architecture
@@ -117,7 +119,7 @@ $skip | Where-Object { $explicit_apps -contains $_} | ForEach-Object {
 }
 
 $suggested = @{};
-$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache }
+$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
 
 show_suggestions $suggested
 
