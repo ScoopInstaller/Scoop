@@ -246,7 +246,7 @@ function movedir($from, $to) {
 
     $out = robocopy "$from" "$to" /e /move
     if($lastexitcode -ge 8) {
-        throw "Could not find '$(fname $from)'!"
+        throw "Could not find '$(fname $from)'! (error $lastexitcode)"
     }
 }
 
