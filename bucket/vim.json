@@ -12,7 +12,7 @@
             "hash": "4fdb0cbdaae804de884fae67c574de17ac0161fb8ac31dfeb25e7c2fff23df4c"
         }
     },
-    "extract_dir": "vim\\vim80",
+    "extract_dir": "vim\\vim81",
     "bin": [
         "vim.exe",
         [
@@ -87,14 +87,13 @@
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x86.zip",
-                "extract_dir": "vim\\vim$majorVersion$minorVersion"
+                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x86.zip"
             },
             "64bit": {
-                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x64.zip",
-                "extract_dir": "vim\\vim$majorVersion$minorVersion"
+                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x64.zip"
             }
-        }
+        },
+        "extract_dir": "vim\\vim$majorVersion$minorVersion"
     },
     "suggest": {
         "vimtutor": "vimtutor"
