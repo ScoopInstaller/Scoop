@@ -12,6 +12,8 @@ To install:
 
     iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 
+The default setup configure scoop so all user installed programs lives in ~/scoop, and the globally installed programs (yes, you can install programs globally, too) goes in C:\ProgramData\scoop. That configuration is user-definable, through environment variables. More on that later...
+
 Once installed, run `scoop help` for instructions.
 
 What does Scoop do?
