@@ -1,15 +1,15 @@
 {
-    "version": "1.0.1",
+    "version": "1.0.4",
     "homepage": "https://brotli.org/",
     "description": "Lossless compression algorithm",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/google/brotli/releases/download/v1.0.0/brotli-win-x86_64-v1.0.0.zip",
-            "hash": "b1475fb8e248415fecf511e2e1bd34d5e3bcf3f1e4edd214ea6e754055de1667"
+            "url": "https://github.com/google/brotli/releases/download/v1.0.4/brotli-v1.0.4-win_x86_64.zip",
+            "hash": "c1bee6f06c7e40633965c6d7fdb11edf3c3ed1b7e53c09c07c010757da29a598"
         },
         "32bit": {
-            "url": "https://github.com/google/brotli/releases/download/v1.0.0/brotli-win-i686-v1.0.0.zip",
-            "hash": "dbbf3fffa2926677a6633d92ba1d990f928ec6926514915b03e492d8b11b059f"
+            "url": "https://github.com/google/brotli/releases/download/v1.0.4/brotli-v1.0.4-win_i686.zip",
+            "hash": "82a47bbee2547fcdcfadf19582fbef793d283e3feaa8f1904d632919f8c8dade"
         }
     },
     "bin": [
@@ -23,10 +23,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/google/brotli/releases/download/v$version/brotli-win-x86_64-v$version.zip"
+                "url": "https://github.com/google/brotli/releases/download/v$version/brotli-v$version-win_x86_64.zip"
             },
             "32bit": {
-                "url": "https://github.com/google/brotli/releases/download/v$version/brotli-win-i686-v$version.zip"
+                "url": "https://github.com/google/brotli/releases/download/v$version/brotli-v$version-win_i686.zip"
             }
         }
     }
