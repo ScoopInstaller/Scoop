@@ -1,15 +1,15 @@
 {
-    "version": "2.92",
+    "version": "2.94",
     "homepage": "https://transmissionbt.com/",
     "license": "GPL-2.0 OR GPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/transmission/transmission/releases/download/2.92/transmission-2.92-x64.msi",
-            "hash": "8cee6436e79d48409d76a85bbb1bb506c8c76c8f686551b9e7e13b9a2ca2299d"
+            "url": "https://github.com/transmission/transmission-releases/raw/master/transmission-2.94-x64.msi",
+            "hash": "a35672252661f16382072fd0ae87b8eafd47f5535439336fe2f161a542f9a1ab"
         },
         "32bit": {
-            "url": "https://github.com/transmission/transmission/releases/download/2.92/transmission-2.92-x86.msi",
-            "hash": "f8bfaba603036d35f74bbd5d27ea5bc51fe58d991af48228c290323e406bef00"
+            "url": "https://github.com/transmission/transmission-releases/raw/master/transmission-2.94-x86.msi",
+            "hash": "9083bed824d707e8791f53811aaa88def8047d40f221a8e823571c103cf3aff6"
         }
     },
     "extract_dir": "PFiles\\Transmission",
@@ -26,10 +26,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/transmission/transmission/releases/download/$version/transmission-$version-x64.msi"
+                "url": "https://github.com/transmission/transmission-releases/raw/master/transmission-$version-x64.msi"
             },
             "32bit": {
-                "url": "https://github.com/transmission/transmission/releases/download/$version/transmission-$version-x86.msi"
+                "url": "https://github.com/transmission/transmission-releases/raw/master/transmission-$version-x86.msi"
             }
         }
     }
