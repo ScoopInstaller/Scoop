@@ -1,18 +1,15 @@
 {
     "homepage": "https://www.gnupg.org/",
-    "version": "2.2.5",
+    "version": "2.2.7",
     "license": "GPL-3.0",
-    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.5_20180222.exe#/dl.7z",
-    "hash": "sha1:080f801e833c7a9e0441d55cd19d4bdb5bb261f9",
+    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.7_20180502.exe#/dl.7z",
+    "hash": "2d7ffedb1737e4dbed7f89377c3273b5cc27ee0fd9c70a417bd602203fc419ee",
     "env_add_path": "bin",
     "checkver": {
-        "url": "https://www.gnupg.org/download/integrity_check.html",
+        "url": "https://www.gnupg.org/download/index.html",
         "re": "gnupg-w32-(?<version>[\\d.]+)_(?<date>[\\d]{8}).exe"
     },
     "autoupdate": {
-        "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-$version_$matchDate.exe#/dl.7z",
-        "hash": {
-            "url": "https://www.gnupg.org/download/integrity_check.html"
-        }
+        "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-$version_$matchDate.exe#/dl.7z"
     }
 }
