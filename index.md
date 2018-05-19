@@ -31,7 +31,7 @@ Not sure whether you need 32-bit or 64-bit? Can&rsquo;t remember that command yo
 # Demo
 
 <div class='videoWrapper'>
-<iframe src='http://www.youtube.com/embed/a85QLUJ0Wbs?rel=0' frameborder='0' allowfullscreen>
+<iframe src='//www.youtube.com/embed/a85QLUJ0Wbs?rel=0' frameborder='0' allowfullscreen>
 </iframe>
 </div>
 
@@ -39,7 +39,7 @@ Not sure whether you need 32-bit or 64-bit? Can&rsquo;t remember that command yo
 
 # Installs in seconds
 
-Make sure [Powershell 3](http://www.microsoft.com/en-us/download/details.aspx?id=34595)
+Make sure [Powershell 3](https://www.microsoft.com/en-us/download/details.aspx?id=34595)
 is installed, then run:
 
 ```powershell
