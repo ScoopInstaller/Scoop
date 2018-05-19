@@ -1,11 +1,11 @@
 {
     "homepage": "http://www.sbcl.org/",
-    "version": "1.3.18",
+    "version": "1.4.2",
     "license": "http://www.sbcl.org/history.html",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/1.3.18/sbcl-1.3.18-x86-64-windows-binary.msi",
-            "hash": "a33691857519750beca2775498196e8b61f9862aea617b1207548882ded48fb3"
+            "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-64-windows-binary.msi",
+            "hash": "sha1:e895c6b92aa5c590db9c3c88a6f0d543744094e4"
         }
     },
     "env_set": {
@@ -14,6 +14,16 @@
     "bin": [
         "PFiles\\Steel Bank Common Lisp\\1.3.18\\sbcl.exe"
     ],
-    "checkver": ">SBCL ([\\d.]+)<",
+    "checkver": {
+        "url": "http://www.sbcl.org/platform-table.html",
+        "re": "sbcl-([\\d.]+)-x86-64-windows"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/$version/sbcl-$version-x86-64-windows-binary.msi"
+            }
+        }
+    },
     "notes": "Please restart your command line for SBCL_HOME to take effect. Please consider installing http://www.quicklisp.org/"
 }
