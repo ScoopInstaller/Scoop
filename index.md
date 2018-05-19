@@ -39,7 +39,7 @@ Not sure whether you need 32-bit or 64-bit? Can&rsquo;t remember that command yo
 
 # Installs in seconds
 
-Make sure [Powershell 3](https://www.microsoft.com/en-us/download/details.aspx?id=34595)
+Make sure [Powershell 3](https://www.microsoft.com/en-us/download/details.aspx?id=34595) (or later)
 is installed, then run:
 
 ```powershell
