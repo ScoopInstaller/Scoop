@@ -1,8 +1,8 @@
 {
-    "version": "5.16299",
+    "version": "6.17134",
     "homepage": "https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/#downloads",
-    "url": "https://download.microsoft.com/download/D/4/1/D417998A-58EE-4EFE-A7CC-39EF9E020768/MicrosoftWebDriver.exe",
-    "hash": "0fd1429f22a63c36687904f28fac133e91ece3e0f5544e49c7986fc798c814f6",
+    "url": "https://download.microsoft.com/download/F/8/A/F8AF50AB-3C3A-4BC4-8773-DC27B32988DD/MicrosoftWebDriver.exe",
+    "hash": "6E8182697EA5189491B5519D8496A3392E43741B7C0515130F2F8205881D208E",
     "bin": "MicrosoftWebDriver.exe",
     "checkver": {
         "url": "https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/#downloads",
