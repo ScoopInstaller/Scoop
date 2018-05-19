@@ -13,8 +13,8 @@
         ]
     },
     "checkver": {
-        "url": "https://maven.apache.org/download.cgi",
-        "re": "Apache Maven ([\\d.]+) is the latest release"
+        "url": "https://maven.apache.org/docs/history.html",
+        "re": "<b>([\\d.]+)</b>"
     },
     "autoupdate": {
         "url": "https://archive.apache.org/dist/maven/maven-$majorVersion/$version/binaries/apache-maven-$version-bin.zip",
