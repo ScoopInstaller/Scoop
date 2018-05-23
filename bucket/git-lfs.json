@@ -5,12 +5,12 @@
     "architecture": {
         "32bit": {
             "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.4.1/git-lfs-windows-386-2.4.1.zip",
-            "hash": "bb46dbf7d8976f39b2afaf6357b11cb08b643bac53ac4861d5e970545bdd6ec4",
+            "hash": "887e9927abe79f8c94fe2464578929a8607084b641fdc07f39a4088e93d1a089",
             "extract_dir": "git-lfs-windows-386-2.4.1"
         },
         "64bit": {
             "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.4.1/git-lfs-windows-amd64-2.4.1.zip",
-            "hash": "5a1f355e5df457c7dabbe5577fd49b8284df8b09bd366b63e4501f3a31e84446",
+            "hash": "ebbab07348dbe71a5c20bfbdfafe4dbbafc8deacea6e6bf4143556721c860821",
             "extract_dir": "git-lfs-windows-amd64-2.4.1"
         }
     },
