@@ -1,11 +1,11 @@
 {
     "homepage": "https://flywaydb.org/",
     "license": "Apache-2.0",
-    "version": "5.1.0",
-    "url": "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/5.1.0/flyway-commandline-5.1.0-windows-x64.zip",
-    "extract_dir": "flyway-5.1.0",
+    "version": "5.0.7",
+    "url": "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/5.0.7/flyway-commandline-5.0.7-windows-x64.zip",
+    "extract_dir": "flyway-5.0.7",
     "bin": "flyway.cmd",
-    "hash": "sha1:5f3d5ee85dcf3caa24d755ec29c9f70e82137a8e",
+    "hash": "sha1:ab87627d54ae2095bbc19a6783dcb83f6d3febb3",
     "checkver": "Get Started with Flyway\\s+([\\d.]+)",
     "autoupdate": {
         "url": "https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/$version/flyway-commandline-$version-windows-x64.zip",
