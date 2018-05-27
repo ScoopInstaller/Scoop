@@ -1,0 +1,30 @@
+{
+    "description": "A Dependently Typed Functional Programming Language",
+    "homepage": "https://www.idris-lang.org/",
+    "version": "1.3.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://neon.se/idris/idris-1.3.0-win64.exe#/dl.7z",
+            "hash": "099e047ea5498d850f39097d61527d77c359788ca4984a9fe3b2a4cd74341165"
+        },
+        "32bit": {
+            "url": "https://neon.se/idris/idris-1.3.0-win32.exe#/dl.7z",
+            "hash": "256170a98cffc7db9734ceded13dada2335f6e0905337db92f3a1b760730047a"
+        }
+    },
+    "bin": "idris\\idris.exe",
+    "checkver": {
+        "url": "https://neon.se/idris.html",
+        "re": "idris-([\\d.]+)-win"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://neon.se/idris/idris-$version-win64.exe#/dl.7z"
+            },
+            "32bit": {
+                "url": "https://neon.se/idris/idris-$version-win32.exe#/dl.7z"
+            }
+        }
+    }
+}
