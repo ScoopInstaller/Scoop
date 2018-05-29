@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.scala-sbt.org/",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "license": "BSD",
-    "url": "https://github.com/sbt/sbt/releases/download/v1.1.5/sbt-1.1.5.zip",
-    "hash": "d2a6d4b78b4cc2eede3499abf3fdc995c3b95a098bb8c216ef7311496a57af51",
+    "url": "https://github.com/sbt/sbt/releases/download/v1.1.6/sbt-1.1.6.zip",
+    "hash": "73811a1789261da9334f1016bc0538953a24e0953690c75c9c2e59eb20c4983c",
     "extract_dir": "sbt",
     "bin": [
         "bin\\sbt.bat"
