@@ -15,7 +15,7 @@
     "env_add_path": ".",
     "checkver": {
         "url": "https://www.microsoft.com/net/download/windows",
-        "re": "Download .NET Core SDK ([\\d.]+)"
+        "re": "Download .NET Core (?<short>[\\d.]+) SDK <text>\\(v</text>(?<version>[\\d.]+)\\)"
     },
     "autoupdate": {
         "architecture": {
@@ -27,7 +27,7 @@
             }
         },
         "hash": {
-            "url": "https://dotnetcli.blob.core.windows.net/dotnet/checksums/$version-sdk-sha.txt"
+            "url": "https://dotnetcli.blob.core.windows.net/dotnet/checksums/$matchShort-sdk-sha.txt"
         }
     }
 }
