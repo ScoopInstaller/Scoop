@@ -1,17 +1,17 @@
 {
     "homepage": "http://msys2.github.io",
     "##": "64-bit version is able to build both 32-bit and 64-bit packages",
-    "version": "20170918",
+    "version": "20180531",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20170918.tar.xz",
+            "url": "https://downloads.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20180531.tar.xz",
             "extract_dir": "msys64",
-            "hash": "sha1:3f0c84114512990f389bbf397e5f7ef70dea963b"
+            "hash": "sha1:309f604a165179d50fbe4131cf87bd160769f974"
         },
         "32bit": {
-            "url": "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20170918.tar.xz",
+            "url": "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20180531.tar.xz",
             "extract_dir": "msys32",
-            "hash": "sha1:1b6d65454954148b47967316d76fba9637d7e283"
+            "hash": "sha1:c985127122d32e90967d2348fc97e879cba602a9"
         }
     },
     "bin": [
