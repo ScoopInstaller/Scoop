@@ -2,15 +2,15 @@
     "homepage": "https://geoff.greer.fm/ag/",
     "description": "A tool for searching code",
     "license": "Apache-2.0",
-    "version": "2.1.0-34-g5b10c68",
+    "version": "2.1.0-36-g160ea7b",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2018-04-24/2.1.0-34-g5b10c68/ag-2018-04-24_2.1.0-34-g5b10c68-x64.zip",
-            "hash": "d9b504031443d738beeffa6e4b9ac7162e7f76c5c11bd31ceaddfe0c0dba0d97"
+            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2018-06-04/2.1.0-36-g160ea7b/ag-2018-06-04_2.1.0-36-g160ea7b-x64.zip",
+            "hash": "f20b90d6ed2b6e9b410c9b06dc9b3097041083bd3a43f7bd875d11d5e894206d"
         },
         "32bit": {
-            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2018-04-24/2.1.0-34-g5b10c68/ag-2018-04-24_2.1.0-34-g5b10c68-x86.zip",
-            "hash": "0f3ecd3bc28fcb48fb71001ba3b0267d7587dcb2618beb2cbd26568d7d99ef99"
+            "url": "https://github.com/k-takata/the_silver_searcher-win32/releases/download/2018-06-04/2.1.0-36-g160ea7b/ag-2018-06-04_2.1.0-36-g160ea7b-x86.zip",
+            "hash": "576ca774acf2bf213f1d3eb9d9ffd990a03ef28b6de16ccebce92714e4ca64f2"
         }
     },
     "bin": "ag.exe",
