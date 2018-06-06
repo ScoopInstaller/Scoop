@@ -1,21 +1,39 @@
-Scoop [![Build status](https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true)](https://ci.appveyor.com/project/lukesampson/scoop) [![Gitter chat](https://badges.gitter.im/lukesampson/scoop.png)](https://gitter.im/lukesampson/scoop)
-=====
+# Scoop [![Build status](https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true)](https://ci.appveyor.com/project/lukesampson/scoop) [![Gitter chat](https://badges.gitter.im/lukesampson/scoop.png)](https://gitter.im/lukesampson/scoop)
 
 Scoop is a command-line installer for Windows.
 
-Requirements:
+## Requirements
 
 * [PowerShell 3](https://www.microsoft.com/en-us/download/details.aspx?id=34595) (or later)
 * PowerShell must be enabled for your user account e.g. `set-executionpolicy remotesigned -s currentuser`
 
-To install:
+## Installation
 
-    iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+Run this command from you PowerShell to install scoop to it's default location (`C:\Users\<user>\scoop`)
+```powershell
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+```
 
 Once installed, run `scoop help` for instructions.
 
-What does Scoop do?
--------------------
+The default setup is configured so all user installed programs and Scoop itself live in `C:\Users\<user>\scoop`.
+Globally installed programs (`--global`) live in `C:\ProgramData\scoop`.
+These settings can be changed through environment variables.
+
+#### Install Scoop to a Custom Directory
+```powershell
+[environment]::setEnvironmentVariable('SCOOP','D:\Applications\Scoop','User')
+$env:SCOOP='D:\Applications\Scoop'
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+```
+
+#### Configure Scoop to install global programs to a Custom Directory
+```powershell
+[environment]::setEnvironmentVariable('SCOOP_GLOBAL','F:\GlobalScoopApps','Machine')
+$env:SCOOP_GLOBAL='F:\GlobalScoopApps'
+```
+
+## What does Scoop do?
 
 Scoop installs programs from the command line with a minimal amount of friction. It tries to eliminate things like:
 * Permission popup windows
@@ -36,16 +54,14 @@ scoop install python ruby go perl
 
 If you've built software that you'd like others to use, Scoop is an alternative to building an installer (e.g. MSI or InnoSetup)—you just need to zip your program and provide a JSON manifest that describes how to install it.
 
-### [Documentation](https://github.com/lukesampson/scoop/wiki)
+## [Documentation](https://github.com/lukesampson/scoop/wiki)
 
-Inspiration
------------
+### Inspiration
 
 * [Homebrew](http://mxcl.github.io/homebrew/)
 * [sub](https://github.com/37signals/sub#readme)
 
-What sort of apps can Scoop install?
-------------------------------------
+### What sort of apps can Scoop install?
 
 The apps that install best with Scoop are commonly called "portable" apps: i.e. compressed program files that run stand-alone when extracted and don't have side-effects like changing the registry or putting files outside the program directory.
 
@@ -54,8 +70,7 @@ Since installers are common, Scoop supports them too (and their uninstallers).
 Scoop is also great at handling single-file programs and Powershell scripts. These don't even need to be compressed. See the [runat](https://github.com/lukesampson/scoop/blob/master/bucket/runat.json) package for an example: it's really just a GitHub gist.
 
 
-Support this project
---------------------
+### Support this project
 
 If you find Scoop useful and would like to support ongoing development and maintenance, here's how:
 
