@@ -14,8 +14,7 @@
         "url": "https://www.itefix.net/dl/cwrsync_$version_x86_free.zip",
         "extract_dir": "cwrsync_$version_x86_Free",
         "hash": {
-            "find": "SHA256:\\s+([a-fA-F0-9]{64})",
-            "url": "https://www.itefix.net/content/cwrsync-free-edition"
+            "url": "https://www.itefix.net/dl/cwrsync_$version_x86_free.zip.sha256.asc"
         }
     }
 }
