@@ -1,9 +1,9 @@
 {
     "homepage": "http://wixtoolset.org/",
     "license": "MS-RL",
-    "version": "3.11.1",
-    "url": "https://github.com/wixtoolset/wix3/releases/download/wix3111rtm/wix311-binaries.zip",
-    "hash": "37f0a533b0978a454efb5dc3bd3598becf9660aaf4287e55bf68ca6b527d051d",
+    "version": "3.11",
+    "url": "https://github.com/wixtoolset/wix3/releases/download/wix311rtm/wix311-binaries.zip",
+    "hash": "da034c489bd1dd6d8e1623675bf5e899f32d74d6d8312f8dd125a084543193de",
     "bin": [
         "candle.exe",
         "dark.exe",
