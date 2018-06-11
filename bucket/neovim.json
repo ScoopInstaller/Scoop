@@ -1,14 +1,14 @@
 {
-    "version": "0.2.2",
+    "version": "0.3.0",
     "license": "https://github.com/neovim/neovim/blob/master/LICENSE",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/neovim/neovim/releases/download/v0.2.2/nvim-win64.zip",
-            "hash": "66bab53ec0a8aff854921b6925630026649f3a49bb7913d19a4a602ffc138c92"
+            "url": "https://github.com/neovim/neovim/releases/download/v0.3.0/nvim-win64.zip",
+            "hash": "9e341575148884339055e8fccbf80907f36315ab5d27f843cbe535f06cbfdea1"
         },
         "32bit": {
-            "url": "https://github.com/neovim/neovim/releases/download/v0.2.2/nvim-win32.zip",
-            "hash": "edbb17047f9a1bdc01acf965430ebbc61bd05a9d39668c9cc6961ea47f471c47"
+            "url": "https://github.com/neovim/neovim/releases/download/v0.3.0/nvim-win32.zip",
+            "hash": "3b00c7ed7e6d53ac965cb8864d8780f7e96cb259a2c27c5eff7a535d22c44cb2"
         }
     },
     "suggest": {
