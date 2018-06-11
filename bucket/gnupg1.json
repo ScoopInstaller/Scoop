@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.gnupg.org/",
-    "version": "1.4.22",
+    "version": "1.4.23",
     "license": "GPL-3.0",
-    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32cli-1.4.22.exe#/dl.7z",
-    "hash": "7d0344a951ca49d34d2a884c9962d5104f73b637aeef717f33ee25c7a0465dca",
+    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32cli-1.4.23.exe#/dl.7z",
+    "hash": "59234aed42a0822c53480de33e2d6a2d82f3c0cde1dc0fdabebad1549014f2b6",
     "bin": [
         "gpg.exe",
         "gpgkeys_curl.exe",
