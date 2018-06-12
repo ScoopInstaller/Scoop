@@ -1,5 +1,7 @@
 {
     "homepage": "https://bintray.com/jfrog/jfrog-cli-go",
+    "license": "Apache License 2.0: https://github.com/jfrog/jfrog-cli-go/blob/master/LICENSE",
+    "description": "Command Line Interface for Artifactory and Bintray",
     "version": "1.16.1",
     "url": "https://jfrog.bintray.com/jfrog-cli-go/1.16.1/jfrog-cli-windows-amd64/jfrog.exe",
     "hash": "76f39e01bb081fe92795dc34d0bbc8441b29e2f7668ea5c22b542fdcc2357d1c",
