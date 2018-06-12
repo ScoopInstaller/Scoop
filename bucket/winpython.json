@@ -5,12 +5,12 @@
     "architecture": {
         "64bit": {
             "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.6/3.6.5.0/WinPython64-3.6.5.0Zero.exe#/dl.7z",
-            "hash": "83cb7ccf519a7fffc0cf6b00f0cb2d45f8d4cbf55b6e9b463fcd2534fa6f450a",
+            "hash": "6b8b79ebbfb157bb9e2122e32568219669cffa0204849ed79eefe1e9bcaec0b2",
             "extract_dir": "python-3.6.5.amd64"
         },
         "32bit": {
             "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.6/3.6.5.0/WinPython32-3.6.5.0Zero.exe#/dl.7z",
-            "hash": "83cb7ccf519a7fffc0cf6b00f0cb2d45f8d4cbf55b6e9b463fcd2534fa6f450a",
+            "hash": "35ecb4693bae593dd9faf80c53305591f0288195dd7f06730b30dd8b3db3774b",
             "extract_dir": "python-3.6.5"
         }
     },
@@ -43,7 +43,7 @@
         },
         "hash": {
             "url": "https://winpython.github.io/md5_sha1.txt",
-            "find": "([a-fA-F\\d]{64})\\s|\\s$basename"
+            "find": "([a-fA-F\\d]{64})\\s\\|\\s$basename"
         }
     }
 }
