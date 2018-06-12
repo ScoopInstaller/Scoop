@@ -1,6 +1,6 @@
 {
     "description": "Free, open-source and portable Python distribution for Windows",
-	"version": "3.6.5.0",
+    "version": "3.6.5.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
