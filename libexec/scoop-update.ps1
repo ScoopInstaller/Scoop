@@ -6,11 +6,13 @@
 # You can use '*' in place of <app> to update all apps.
 #
 # Options:
-#   --global, -g       Update a globally installed app
-#   --force, -f        Force update even when there isn't a newer version
-#   --no-cache, -k     Don't use the download cache
-#   --independent, -i  Don't install dependencies automatically
-#   --quiet, -q        Hide extraneous messages
+#   -f, --force               Force update even when there isn't a newer version
+#   -g, --global              Update a globally installed app
+#   -i, --independent         Don't install dependencies automatically
+#   -k, --no-cache            Don't use the download cache
+#   -s, --skip                Skip hash validation (use with caution!)
+#   -q, --quiet               Hide extraneous messages
+
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\psmodules.ps1"
@@ -26,10 +28,11 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'gfkqi' 'global','force', 'no-cache', 'quiet', 'independent'
+$opt, $apps, $err = getopt $args 'gfiksq:' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet'
 if($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
+$check_hash = !($opt.s -or $opt.skip)
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
@@ -104,11 +107,10 @@ function update_scoop() {
     success 'Scoop was updated successfully!'
 }
 
-function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true) {
+function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
     $old_version = current_version $app $global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
-    $check_hash = $true
 
     # re-use architecture, bucket and url from first install
     $architecture = ensure_architecture $install.architecture
@@ -118,7 +120,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     if(!$independent) {
         # check dependencies
         $deps = @(deps $app $architecture) | Where-Object { !(installed $_) }
-        $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache }
+        $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 
     $version = latest_version $app $bucket $url
@@ -161,7 +163,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         # add bucket name it was installed from
         $app = "$bucket/$app"
     }
-    install_app $app $architecture $global $suggested $use_cache
+    install_app $app $architecture $global $suggested $use_cache $check_hash
 }
 
 if(!$apps) {
@@ -210,7 +212,7 @@ if(!$apps) {
 
     $suggested = @{};
     # # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache }
+    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }
 
 exit 0

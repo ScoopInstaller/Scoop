@@ -20,11 +20,7 @@ $status = app_status $app $global
 $manifest, $bucket = find_manifest $app $bucket
 
 if (!$manifest) {
-    if ($bucket) {
-        abort "Could not find manifest for '$bucket/$app'."
-    } else {
-        abort "Could not find manifest for '$app'."
-    }
+    abort "Could not find manifest for '$(show_app $app $bucket)'."
 }
 
 $install = install_info $app $status.version $global

@@ -9,10 +9,9 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true) {
+function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $bucket, $null = parse_app $app
     $app, $manifest, $bucket, $url = locate $app $bucket
-    $check_hash = $true
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
@@ -41,7 +40,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $original_dir = $dir # keep reference to real (not linked) directory
     $persist_dir = persistdir $app $global
 
-    $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
+    $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
@@ -272,7 +271,7 @@ function dl_progress($read, $total, $url) {
     [console]::SetCursorPosition($left, $top)
 }
 
-function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
 
@@ -312,12 +311,16 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
         $fname = $data.$url.fname
 
         if($check_hash) {
-            $ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
+            $manifest_hash = hash_for_url $manifest $url $arch
+            $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
             if(!$ok) {
-                # rm cached
+                error $err
                 $cached = cache_path $app $version $url
-                if(test-path $cached) { Remove-Item -force $cached }
-                abort $err
+                if(test-path $cached) {
+                    # rm cached file
+                    Remove-Item -force $cached
+                }
+                abort $(new_issue_msg $app $bucket "hash check failed")
             }
         }
 
@@ -360,7 +363,13 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
             }
             # fails if zip contains long paths (e.g. atom.json)
             #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+            try {
+                movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+            }
+            catch {
+                error $_
+                abort $(new_issue_msg $app $bucket "extract_dir error")
+            }
 
             if(test-path "$dir\_tmp") { # might have been moved by movedir
                 try {
@@ -430,11 +439,10 @@ function hash_for_url($manifest, $url, $arch) {
 }
 
 # returns (ok, err)
-function check_hash($file, $url, $manifest, $arch) {
-    $hash = hash_for_url $manifest $url $arch
+function check_hash($file, $hash, $app_name) {
     if(!$hash) {
         warn "Warning: No hash in manifest. SHA256 is:`n    $(compute_hash (fullpath $file) 'sha256')"
-        return $true
+        return $true, $null
     }
 
     write-host "Checking hash of $(url_remote_filename $url)... " -nonewline
@@ -450,11 +458,21 @@ function check_hash($file, $url, $manifest, $arch) {
 
     $actual = compute_hash (fullpath $file) $type
 
+    $expected = $expected.ToLower()
+    $actual = $actual.ToLower()
+
     if($actual -ne $expected) {
-        return $false, "Hash check failed for '$url'.`nExpected:`n    $($expected)`nActual:`n    $($actual)"
+        $msg = "Hash check failed!`n"
+        $msg += "App:       $app_name`n"
+        $msg += "URL:       $url`n"
+        if($expected -or $actual) {
+            $msg += "Expected:  $expected`n"
+            $msg += "Actual:    $actual"
+        }
+        return $false, $msg
     }
     write-host "ok."
-    return $true
+    return $true, $null
 }
 
 function compute_hash($file, $algname) {
@@ -473,6 +491,7 @@ function compute_hash($file, $algname) {
         if($fs) { $fs.dispose() }
         if($alg) { $alg.dispose() }
     }
+    return ''
 }
 
 function cmd_available($cmd) {

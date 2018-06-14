@@ -246,7 +246,7 @@ function movedir($from, $to) {
 
     $out = robocopy "$from" "$to" /e /move
     if($lastexitcode -ge 8) {
-        throw "Error moving directory: `n$out"
+        throw "Could not find '$(fname $from)'! (error $lastexitcode)"
     }
 }
 
@@ -499,6 +499,16 @@ function parse_app([string] $app) {
         return $matches['app'], $matches['bucket'], $matches['version']
     }
     return $app, $null, $null
+}
+
+function show_app($app, $bucket, $version) {
+    if($bucket) {
+        $app = "$bucket/$app"
+    }
+    if($version) {
+        $app = "$app@$version"
+    }
+    return $app
 }
 
 function last_scoop_update() {
