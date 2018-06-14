@@ -311,7 +311,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         $fname = $data.$url.fname
 
         if($check_hash) {
-            $manifest_hash = hash_for_url $manifest $url $arch
+            $manifest_hash = hash_for_url $manifest $url $architecture
             $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
             if(!$ok) {
                 error $err
