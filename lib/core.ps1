@@ -96,6 +96,27 @@ function installed_apps($global) {
     }
 }
 
+function aria2_path() {
+    # normal path to executable
+    $aria2 = "$(versiondir 'aria2' 'current' $false)\aria2c.exe"
+    if(Test-Path($aria2)) {
+        return $aria2
+    }
+
+    # global path to executable
+    $aria2 = "$(versiondir 'aria2' 'current' $false)\aria2c.exe"
+    if(Test-Path($aria2)) {
+        return $aria2
+    }
+
+    # not found
+    return $null
+}
+
+function aria2_installed() {
+    return ![String]::IsNullOrWhiteSpace("$(aria2_path)")
+}
+
 function app_status($app, $global) {
     $status = @{}
     $status.installed = (installed $app $global)
@@ -582,6 +603,19 @@ function format_hash([String] $hash) {
         40 { $hash = "sha1:$hash" } # sha1
         64 { $hash = $hash } # sha256
         128 { $hash = "sha512:$hash" } # sha512
+        default { $hash = $null }
+    }
+    return $hash
+}
+
+function format_hash_aria2([String] $hash) {
+    $hash = $hash -split ':' | Select-Object -Last 1
+    switch ($hash.Length)
+    {
+        32 { $hash = "md5=$hash" } # md5
+        40 { $hash = "sha-1=$hash" } # sha1
+        64 { $hash = "sha-256=$hash" } # sha256
+        128 { $hash = "sha-512=$hash" } # sha512
         default { $hash = $null }
     }
     return $hash
