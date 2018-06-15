@@ -147,6 +147,116 @@ function do_dl($url, $to, $cookies) {
     }
 }
 
+function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
+    $data = @{}
+    $urls = @(url $manifest $architecture)
+
+    # aria2 input file
+    $urlstxt = "$cachedir\$app.txt"
+    $urlstxt_content = ''
+    $has_downloads = $false
+
+    # aria2 options
+    $options = @(
+        "--input-file='$urlstxt'"
+        "--dir='$cachedir'"
+        "--user-agent='$(Get-UserAgent)'"
+        "--allow-overwrite=true"
+        "--auto-file-renaming=false"
+        "--retry-wait=2"
+        "--split=5"
+        "--max-connection-per-server=5"
+        "--min-split-size=5M"
+        "--console-log-level=warn"
+        "--enable-color=false"
+    )
+
+    foreach($url in $urls) {
+        $data.$url = @{
+            'filename' = url_filename $url
+            'target' = "$dir\$(url_filename $url)"
+            'cachename' = fname (cache_path $app $version $url)
+            'source' = fullpath (cache_path $app $version $url)
+        }
+
+        if(!(test-path $data.$url.source)) {
+            $has_downloads = $true
+            # create aria2 input file content
+            $urlstxt_content += "$url`n"
+            $urlstxt_content += "    out=$($data.$url.cachename)`n"
+        } else {
+            Write-Host "Loading " -NoNewline
+            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+            Write-Host " from cache."
+        }
+    }
+
+    if($has_downloads) {
+        # write aria2 input file
+        Set-Content -Path $urlstxt $urlstxt_content
+
+        # build aria2 command
+        $aria2 = "$(aria2_path) $($options -join ' ')"
+
+        # handle aria2 console output
+        Write-Host "Starting download with aria2 ..."
+        $prefix = "Download: "
+        Invoke-Expression $aria2 | ForEach-Object {
+            if([String]::IsNullOrWhiteSpace($_)) {
+                # skip blank lines
+                return
+            }
+            Write-Host $prefix -NoNewline
+            if($_.EndsWith('download completed.')) {
+                Write-Host $_ -f Green
+            } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
+                Write-Host $_ -f Cyan
+            } else {
+                Write-Host $_
+            }
+        }
+
+        if($lastexitcode -gt 0) {
+            error 'Download failed!'
+            debug($urlstxt_content)
+            debug($aria2)
+            abort $(new_issue_msg $app $bucket "download via aria2 failed")
+        }
+
+        # remove aria2 input file when done
+        if(test-path($urlstxt)) {
+            Remove-Item $urlstxt
+        }
+    }
+
+    foreach($url in $urls) {
+
+        # run hash checks
+        if($check_hash) {
+            $manifest_hash = hash_for_url $manifest $url $architecture
+            $ok, $err = check_hash $data.$url.source $manifest_hash $(show_app $app $bucket)
+            if(!$ok) {
+                error $err
+                if(test-path $data.$url.source) {
+                    # rm cached file
+                    Remove-Item -force $data.$url.source
+                }
+                abort $(new_issue_msg $app $bucket "hash check failed")
+            }
+        }
+
+        # copy or move file to target location
+        if(!(test-path $data.$url.source) ) {
+            abort $(new_issue_msg $app $bucket "cached file not found")
+        }
+        if($use_cache) {
+            Copy-Item $data.$url.source $data.$url.target
+        } else {
+            Move-Item $data.$url.source $data.$url.target -force
+        }
+    }
+}
+
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
@@ -290,25 +400,43 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
-    $data = @{}
+    $enable_aria2 = get_config 'enable_aria2'
+    if($null -eq $enable_aria2) {
+        $enable_aria2 = $true
+    }
 
     # download first
-    foreach($url in $urls) {
-        $data.$url = @{
-            "fname" = url_filename $url
-        }
-        $fname = $data.$url.fname
+    if((aria2_installed) -and $enable_aria2) {
+        dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+    } else {
+        foreach($url in $urls) {
+            $fname = url_filename $url
 
-        try {
-            dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
-        } catch {
-            write-host -f darkred $_
-            abort "URL $url is not valid"
+            try {
+                dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+            } catch {
+                write-host -f darkred $_
+                abort "URL $url is not valid"
+            }
+
+            if($check_hash) {
+                $manifest_hash = hash_for_url $manifest $url $architecture
+                $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
+                if(!$ok) {
+                    error $err
+                    $cached = cache_path $app $version $url
+                    if(test-path $cached) {
+                        # rm cached file
+                        Remove-Item -force $cached
+                    }
+                    abort $(new_issue_msg $app $bucket "hash check failed")
+                }
+            }
         }
     }
 
     foreach($url in $urls) {
-        $fname = $data.$url.fname
+        $fname = url_filename $url
 
         if($check_hash) {
             $manifest_hash = hash_for_url $manifest $url $architecture
