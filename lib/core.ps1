@@ -632,5 +632,11 @@ function handle_special_urls($url)
         $url = "https://www.fosshub.com/gensLink/$name/$filename/2053434f4f5053434f4f5020"
         $url = (Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content)
     }
+
+    # Sourceforge.net
+    if ($url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
+        # Reshapes the URL to avoid redirections
+        $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])?r=&ts="
+    }
     return $url
 }
