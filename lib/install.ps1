@@ -357,7 +357,9 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         }
 
         if($extract_fn) {
-            write-host "Extracting... " -nonewline
+            Write-Host "Extracting " -NoNewline
+            Write-Host $fname -f Cyan -NoNewline
+            Write-Host " ... " -NoNewline
             $null = mkdir "$dir\_tmp"
             & $extract_fn "$dir\$fname" "$dir\_tmp"
             Remove-Item "$dir\$fname"
@@ -384,7 +386,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                 }
             }
 
-            write-host "done."
+            Write-Host "done." -f Green
 
             $extracted++
         }
@@ -449,7 +451,9 @@ function check_hash($file, $hash, $app_name) {
         return $true, $null
     }
 
-    write-host "Checking hash of $(url_remote_filename $url)... " -nonewline
+    Write-Host "Checking hash of " -NoNewline
+    Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+    Write-Host " ... " -nonewline
     $type, $expected = $hash.split(':')
     if(!$expected) {
         # no type specified, assume sha256
@@ -478,7 +482,7 @@ function check_hash($file, $hash, $app_name) {
         }
         return $false, $msg
     }
-    write-host "ok."
+    Write-Host "ok." -f Green
     return $true, $null
 }
 
@@ -536,7 +540,7 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
         write-host -f darkred $_.exception.tostring()
         return $false
     }
-    if($msg) { write-host "done." }
+    if($msg) { Write-Host "done." -f Green }
     return $true
 }
 
@@ -554,7 +558,7 @@ function unpack_inno($fname, $manifest, $dir) {
     Remove-Item -r -force "$dir\_scoop_unpack"
 
     Remove-Item "$dir\$fname"
-    write-host "done."
+    Write-Host "done." -f Green
 }
 
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
