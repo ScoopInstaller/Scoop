@@ -41,20 +41,19 @@
         "bin\\mysql_tzinfo_to_sql.exe",
         "bin\\mysql_upgrade.exe",
         "bin\\mysql_upgrade_service.exe",
-        "bin\\mysql_upgrade_wizard.exe",
         "bin\\my_print_defaults.exe"
     ],
     "persist": [
         "data"
     ],
-    "post_install": "#Initialize data directory (without generating root password)
-    if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
-        mysqld --initialize-insecure
-    }",
-    "notes": "Run following command as administrator to run MariaDB as a service.
-
-mysqld --install \"[Service Name(default:MySQL)]\"
-",
+    "post_install": [
+        "# Initialize data directory (without generating root password)",
+        "if (!(Test-Path \"$dir\\data\\auto.cnf\")) { mysqld --initialize-insecure }"
+    ],
+    "notes": [
+        "Run following command as administrator to run MariaDB as a service.\n",
+        "mysqld --install \"[Service Name(default:MySQL)]\"\n"
+    ],
     "checkver": {
         "url": "https://downloads.mariadb.org/",
         "re": "Download ([\\d.]+) Stable"
