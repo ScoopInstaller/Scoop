@@ -207,7 +207,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
                 return
             }
             Write-Host $prefix -NoNewline
-            if($_.EndsWith('download completed.')) {
+            if($_.StartsWith('(OK):')) {
                 Write-Host $_ -f Green
             } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
                 Write-Host $_ -f Cyan
