@@ -104,7 +104,7 @@ function aria2_path() {
     }
 
     # global path to executable
-    $aria2 = "$(versiondir 'aria2' 'current' $false)\aria2c.exe"
+    $aria2 = "$(versiondir 'aria2' 'current' $true)\aria2c.exe"
     if(Test-Path($aria2)) {
         return $aria2
     }
