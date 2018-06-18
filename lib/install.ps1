@@ -74,8 +74,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 function locate($app, $bucket) {
     $manifest, $url = $null, $null
 
-    # check if app is a url
-    if($app -match '^((ht)|f)tps?://') {
+    # check if app is a URL or UNC path
+    if($app -match '^(ht|f)tps?://|\\\\') {
         $url = $app
         $app = appname_from_url $url
         $manifest = url_manifest $url
