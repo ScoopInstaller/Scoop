@@ -1,6 +1,6 @@
 {
     "homepage": "https://eternallybored.org/misc/wget/",
-    "license": "GPL3",
+    "license": "GPL-3.0",
     "version": "1.19.4",
     "architecture": {
         "64bit": {

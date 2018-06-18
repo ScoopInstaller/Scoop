@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/golang/dep",
     "version": "0.4.1",
-    "license": "https://github.com/golang/dep/blob/master/LICENSE",
+    "license": "BSD-3-Clause",
     "architecture": {
         "64bit": {
             "url": "https://github.com/golang/dep/releases/download/v0.4.1/dep-windows-amd64.exe#/dep.exe",

@@ -1,6 +1,6 @@
 {
     "version": "1.5",
-    "license": "https://creativecommons.org/licenses/by/3.0/",
+    "license": "MIT",
     "architecture": {
         "32bit": {
             "url": "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-win32.exe#/jq.exe",

@@ -1,17 +1,17 @@
 {
     "homepage": "https://mariadb.org",
-    "version": "10.2.13",
-    "license": "GPL2",
+    "version": "10.3.7",
+    "license": "GPL-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.2.13/winx64-packages/mariadb-10.2.13-winx64.zip",
-            "hash": "5dce3e7052e7265ec23c9e70d7e5c8f8b05fa197fc38acc4e604b23b121ea8a6",
-            "extract_dir": "mariadb-10.2.13-winx64"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.3.7/winx64-packages/mariadb-10.3.7-winx64.zip",
+            "hash": "5c9783fd6c8871b710aed4f9516060e640b77f88bb134453379ff24e7b9edcf7",
+            "extract_dir": "mariadb-10.3.7-winx64"
         },
         "32bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.2.13/win32-packages/mariadb-10.2.13-win32.zip",
-            "hash": "4ba689f23e12812fc099ab1cf42224a5a13d63a75ccc0ec65af3c40defa80ed2",
-            "extract_dir": "mariadb-10.2.13-win32"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.3.7/win32-packages/mariadb-10.3.7-win32.zip",
+            "hash": "e3e877c775328ef244bf80cb962b815302722b71466d457d6356c37c799a6020",
+            "extract_dir": "mariadb-10.3.7-win32"
         }
     },
     "bin": [
@@ -41,20 +41,19 @@
         "bin\\mysql_tzinfo_to_sql.exe",
         "bin\\mysql_upgrade.exe",
         "bin\\mysql_upgrade_service.exe",
-        "bin\\mysql_upgrade_wizard.exe",
         "bin\\my_print_defaults.exe"
     ],
     "persist": [
         "data"
     ],
-    "post_install": "#Initialize data directory (without generating root password)
-    if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
-        mysqld --initialize-insecure
-    }",
-    "notes": "Run following command as administrator to run MariaDB as a service.
-
-mysqld --install \"[Service Name(default:MySQL)]\"
-",
+    "post_install": [
+        "# Initialize data directory (without generating root password)",
+        "if (!(Test-Path \"$dir\\data\\auto.cnf\")) { mysqld --initialize-insecure }"
+    ],
+    "notes": [
+        "Run following command as administrator to run MariaDB as a service.\n",
+        "mysqld --install \"[Service Name(default:MySQL)]\"\n"
+    ],
     "checkver": {
         "url": "https://downloads.mariadb.org/",
         "re": "Download ([\\d.]+) Stable"

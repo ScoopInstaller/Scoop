@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/Microsoft/Console/tree/master/tools/ColorTool",
+    "description": "Utility for helping to set the color palette of the Windows Console",
     "version": "1708.14008",
     "license": "MIT",
     "url": "https://github.com/Microsoft/console/releases/download/1708.14008/colortool.zip",

@@ -1,18 +1,18 @@
 {
     "homepage": "http://www.vim.org",
-    "license": "http://vimdoc.sourceforge.net/htmldoc/uganda.html#license",
-    "version": "8.0.1625",
+    "license": "Vim",
+    "version": "8.1.0072",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.0.1625/gvim_8.0.1625_x86.zip",
-            "hash": "e19fac82836f01f0a09a5cf1634d7f4cf68fe44459f37d97cffcbe1d91d38178"
+            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.1.0072/gvim_8.1.0072_x86.zip",
+            "hash": "55dd8a638413875f1008d149b96ff138ff2da731ce152b14ba96d2479288b65a"
         },
         "64bit": {
-            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.0.1625/gvim_8.0.1625_x64.zip",
-            "hash": "f96f3437939ffc4e019024377eca6da5cb3a92acea68bd3dad5188c7429a66ec"
+            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.1.0072/gvim_8.1.0072_x64.zip",
+            "hash": "87c4829a3e5bd4e6228c3ea5566b94d5780ff2420e1518c4fce7161980c03fc9"
         }
     },
-    "extract_dir": "vim\\vim80",
+    "extract_dir": "vim\\vim81",
     "bin": [
         "vim.exe",
         [
@@ -87,14 +87,13 @@
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x86.zip",
-                "extract_dir": "vim\\vim$majorVersion$minorVersion"
+                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x86.zip"
             },
             "64bit": {
-                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x64.zip",
-                "extract_dir": "vim\\vim$majorVersion$minorVersion"
+                "url": "https://github.com/vim/vim-win32-installer/releases/download/v$version/gvim_$version_x64.zip"
             }
-        }
+        },
+        "extract_dir": "vim\\vim$majorVersion$minorVersion"
     },
     "suggest": {
         "vimtutor": "vimtutor"

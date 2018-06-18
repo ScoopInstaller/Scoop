@@ -1,10 +1,10 @@
 {
     "homepage": "http://www.groovy-lang.org/",
-    "version": "2.4.14",
-    "license": "Apache 2.0",
-    "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.4.14.zip",
-    "hash": "f9c846e21d9220bac464ffc00eae8f4146f4c26777b61f62e3123da95c6bc52a",
-    "extract_dir": "groovy-2.4.14",
+    "version": "2.5.0",
+    "license": "Apache-2.0",
+    "url": "https://dl.bintray.com/groovy/maven/apache-groovy-binary-2.5.0.zip",
+    "hash": "13903caed7da4875b2c805ddaa5ac4a3c877342f339700fab9a54b8c628eece3",
+    "extract_dir": "groovy-2.5.0",
     "bin": [
         "bin\\grape.bat",
         "bin\\groovy.bat",
@@ -20,8 +20,8 @@
     },
     "suggest": {
         "JDK": [
-            "extras/oraclejdk",
-            "openjdk"
+            "java/oraclejdk",
+            "java/openjdk"
         ]
     },
     "checkver": {

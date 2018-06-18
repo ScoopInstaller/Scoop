@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.mingw.org/wiki/msys",
     "version": "1.23",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "depends": "gzip",
     "url": [
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/tar/tar-1.23-1/tar-1.23-1-msys-1.0.13-bin.tar.lzma",

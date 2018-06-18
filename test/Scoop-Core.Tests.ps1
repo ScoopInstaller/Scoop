@@ -217,24 +217,76 @@ describe 'sanitary_path' {
 
 describe 'app' {
     it 'parses the bucket name from an app query' {
+        $query = "C:\test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "C:\test.json"
+        $bucket | should be $null
+        $version | should be $null
+
+        $query = "test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "test.json"
+        $bucket | should be $null
+        $version | should be $null
+
+        $query = ".\test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be ".\test.json"
+        $bucket | should be $null
+        $version | should be $null
+
+        $query = "..\test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "..\test.json"
+        $bucket | should be $null
+        $version | should be $null
+
+        $query = "\\share\test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "\\share\test.json"
+        $bucket | should be $null
+        $version | should be $null
+
+        $query = "https://example.com/test.json"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "https://example.com/test.json"
+        $bucket | should be $null
+        $version | should be $null
+
         $query = "test"
-        $app, $bucket = app $query
+        $app, $bucket, $version = parse_app $query
         $app | should be "test"
         $bucket | should be $null
+        $version | should be $null
 
         $query = "extras/enso"
-        $app, $bucket = app $query
+        $app, $bucket, $version = parse_app $query
         $app | should be "enso"
         $bucket | should be "extras"
+        $version | should be $null
 
         $query = "test-app"
-        $app, $bucket = app $query
+        $app, $bucket, $version = parse_app $query
         $app | should be "test-app"
         $bucket | should be $null
+        $version | should be $null
 
         $query = "test-bucket/test-app"
-        $app, $bucket = app $query
+        $app, $bucket, $version = parse_app $query
         $app | should be "test-app"
         $bucket | should be "test-bucket"
+        $version | should be $null
+
+        $query = "test-bucket/test-app@1.8.0"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "test-app"
+        $bucket | should be "test-bucket"
+        $version | should be "1.8.0"
+
+        $query = "test-bucket/test-app@1.8.0-rc2"
+        $app, $bucket, $version = parse_app $query
+        $app | should be "test-app"
+        $bucket | should be "test-bucket"
+        $version | should be "1.8.0-rc2"
     }
 }

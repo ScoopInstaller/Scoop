@@ -368,7 +368,6 @@
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "description": {
-            "description": "Undocumented: only found in scoop/gibo",
             "type": "string"
         },
         "env_add_path": {

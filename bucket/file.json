@@ -1,7 +1,7 @@
 {
     "homepage": "http://gnuwin32.sourceforge.net/packages/file.htm",
     "version": "5.03",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "url": [
         "https://sourceforge.net/projects/gnuwin32/files/file/5.03/file-5.03-bin.zip",
         "https://sourceforge.net/projects/gnuwin32/files/file/5.03/file-5.03-dep.zip"

@@ -1,6 +1,7 @@
 {
     "version": "1.0.6",
     "homepage": "http://www.bzip.org/",
+    "description": "Freely available, patent free, high-quality data compressor",
     "architecture": {
         "32bit": {
             "url": "https://github.com/philr/bzip2-windows/releases/download/v1.0.6/bzip2-1.0.6-win-x86.zip",

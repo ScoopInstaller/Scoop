@@ -9,10 +9,9 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true) {
-    $app, $bucket = app $app
+function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
+    $app, $bucket, $null = parse_app $app
     $app, $manifest, $bucket, $url = locate $app $bucket
-    $check_hash = $true
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
@@ -20,7 +19,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     $version = $manifest.version
     if(!$version) { abort "Manifest doesn't specify a version." }
-    if($version -match '[^\w\.\-_]') {
+    if($version -match '[^\w\.\-\+_]') {
         abort "Manifest version has unsupported character '$($matches[0])'."
     }
 
@@ -41,7 +40,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $original_dir = $dir # keep reference to real (not linked) directory
     $persist_dir = persistdir $app $global
 
-    $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
+    $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
@@ -57,7 +56,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     # persist data
     persist_data $manifest $original_dir $persist_dir
 
-    # env_ensure_home $manifest $global (see comment for env_ensure_home)
     post_install $manifest $architecture
 
     # save info for uninstall
@@ -76,8 +74,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 function locate($app, $bucket) {
     $manifest, $url = $null, $null
 
-    # check if app is a url
-    if($app -match '^((ht)|f)tps?://') {
+    # check if app is a URL or UNC path
+    if($app -match '^(ht|f)tps?://|\\\\') {
         $url = $app
         $app = appname_from_url $url
         $manifest = url_manifest $url
@@ -134,7 +132,8 @@ function set_https_protocols($protocols) {
 
 function do_dl($url, $to, $cookies) {
     $original_protocols = use_any_https_protocol
-    $progress = [console]::isoutputredirected -eq $false
+    $progress = [console]::isoutputredirected -eq $false -and
+        $host.name -ne 'Windows PowerShell ISE Host'
 
     try {
         $url = handle_special_urls $url
@@ -272,7 +271,7 @@ function dl_progress($read, $total, $url) {
     [console]::SetCursorPosition($left, $top)
 }
 
-function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
 
@@ -312,12 +311,16 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
         $fname = $data.$url.fname
 
         if($check_hash) {
-            $ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
+            $manifest_hash = hash_for_url $manifest $url $architecture
+            $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
             if(!$ok) {
-                # rm cached
+                error $err
                 $cached = cache_path $app $version $url
-                if(test-path $cached) { Remove-Item -force $cached }
-                abort $err
+                if(test-path $cached) {
+                    # rm cached file
+                    Remove-Item -force $cached
+                }
+                abort $(new_issue_msg $app $bucket "hash check failed")
             }
         }
 
@@ -360,7 +363,13 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
             }
             # fails if zip contains long paths (e.g. atom.json)
             #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+            try {
+                movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+            }
+            catch {
+                error $_
+                abort $(new_issue_msg $app $bucket "extract_dir error")
+            }
 
             if(test-path "$dir\_tmp") { # might have been moved by movedir
                 try {
@@ -430,11 +439,10 @@ function hash_for_url($manifest, $url, $arch) {
 }
 
 # returns (ok, err)
-function check_hash($file, $url, $manifest, $arch) {
-    $hash = hash_for_url $manifest $url $arch
+function check_hash($file, $hash, $app_name) {
     if(!$hash) {
         warn "Warning: No hash in manifest. SHA256 is:`n    $(compute_hash (fullpath $file) 'sha256')"
-        return $true
+        return $true, $null
     }
 
     write-host "Checking hash of $(url_remote_filename $url)... " -nonewline
@@ -450,11 +458,21 @@ function check_hash($file, $url, $manifest, $arch) {
 
     $actual = compute_hash (fullpath $file) $type
 
+    $expected = $expected.ToLower()
+    $actual = $actual.ToLower()
+
     if($actual -ne $expected) {
-        return $false, "Hash check failed for '$url'.`nExpected:`n    $($expected)`nActual:`n    $($actual)"
+        $msg = "Hash check failed!`n"
+        $msg += "App:       $app_name`n"
+        $msg += "URL:       $url`n"
+        if($expected -or $actual) {
+            $msg += "Expected:  $expected`n"
+            $msg += "Actual:    $actual"
+        }
+        return $false, $msg
     }
     write-host "ok."
-    return $true
+    return $true, $null
 }
 
 function compute_hash($file, $algname) {
@@ -473,6 +491,7 @@ function compute_hash($file, $algname) {
         if($fs) { $fs.dispose() }
         if($alg) { $alg.dispose() }
     }
+    return ''
 }
 
 function cmd_available($cmd) {
@@ -681,14 +700,16 @@ function create_shims($manifest, $dir, $global, $arch) {
         $target, $name, $arg = shim_def $_
         write-output "Creating shim for '$name'."
 
-        # check valid bin
-        $bin = "$dir\$target"
-        if(!(is_in_dir $dir $bin)) {
-            abort "Error in manifest: bin '$target' is outside the app directory."
+        if(test-path "$dir\$target" -pathType leaf) {
+            $bin = "$dir\$target"
+        } elseif(test-path $target -pathType leaf) {
+            $bin = $target
+        } else {
+            $bin = search_in_path $target
         }
-        if(!(test-path $bin)) { abort "Can't shim '$target': File doesn't exist."}
+        if(!$bin) { abort "Can't shim '$target': File doesn't exist."}
 
-        shim "$dir\$target" $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir})
+        shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir})
     }
 }
 
@@ -861,29 +882,6 @@ function env_rm($manifest, $global) {
     }
 }
 
-# UNNECESSARY? Re-evaluate after 3-Jun-2017
-# Supposedly some MSYS programs require %HOME% to be set, but I can't
-# find any examples.
-# Shims used to set %HOME% for the session, but this was removed.
-# This function remains in case we need to support this functionality again
-# (e.g. env_ensure_home in manifests). But if no problems arise by 3-Jun-2017,
-# it's probably safe to delete this, and the call to it install_app
-function env_ensure_home($manifest, $global) {
-    if($manifest.env_ensure_home -eq $true) {
-        if($global){
-            if(!(env 'HOME' $true)) {
-                env 'HOME' $true $env:ALLUSERSPROFILE
-                $env:HOME = $env:ALLUSERSPROFILE # current session
-            }
-        } else {
-            if(!(env 'HOME' $false)) {
-                env 'HOME' $false $env:USERPROFILE
-                $env:HOME = $env:USERPROFILE # current session
-            }
-        }
-    }
-}
-
 function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
     if($pre_install) {
@@ -910,7 +908,7 @@ function show_notes($manifest, $dir, $original_dir, $persist_dir) {
 
 function all_installed($apps, $global) {
     $apps | Where-Object {
-        $app, $null = app $_
+        $app, $null, $null = parse_app $_
         installed $app $global
     }
 }
@@ -951,7 +949,7 @@ function show_suggestions($suggested) {
 
             $fulfilled = $false
             foreach($suggestion in $feature_suggestions) {
-                $suggested_app, $bucket = app $suggestion
+                $suggested_app, $bucket, $null = parse_app $suggestion
 
                 if($installed_apps -contains $suggested_app) {
                     $fulfilled = $true;

@@ -37,7 +37,7 @@ if(!$name) { my_usage; exit 1 }
 
 if($name -like 'rm') {
     set_config $value $null
-} elseif($value) {
+} elseif($null -ne $value) {
     set_config $name $value
 } else {
     get_config $name $value

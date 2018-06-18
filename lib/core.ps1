@@ -246,8 +246,31 @@ function movedir($from, $to) {
 
     $out = robocopy "$from" "$to" /e /move
     if($lastexitcode -ge 8) {
-        throw "Error moving directory: `n$out"
+        throw "Could not find '$(fname $from)'! (error $lastexitcode)"
     }
+}
+
+function get_app_name($path) {
+    if ($path -match '([^/\\]+)[/\\]current[/\\]') {
+        return $Matches[1].tolower()
+    }
+    return ""
+}
+
+function warn_on_overwrite($shim_ps1, $path) {
+    if (!([System.IO.File]::Exists($shim_ps1))) {
+        return
+    }
+    $reader = [System.IO.File]::OpenText($shim_ps1)
+    $line = $reader.ReadLine().replace("`r","").replace("`n","")
+    $reader.Close()
+    $shim_app = get_app_name $line
+    $path_app = get_app_name $path
+    if ($shim_app -eq $path_app) {
+        return
+    }
+    $filename = [System.IO.Path]::GetFileName($path)
+    warn "Overwriting shim to $filename installed from $shim_app"
 }
 
 function shim($path, $global, $name, $arg) {
@@ -256,6 +279,8 @@ function shim($path, $global, $name, $arg) {
     if(!$name) { $name = strip_ext (fname $path) }
 
     $shim = "$abs_shimdir\$($name.tolower())"
+
+    warn_on_overwrite "$shim.ps1" $path
 
     # convert to relative path
     Push-Location $abs_shimdir
@@ -270,14 +295,10 @@ function shim($path, $global, $name, $arg) {
         write-output "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" | out-file "$shim.ps1" -encoding utf8
     }
 
-    if($arg) {
-        write-output "`$args = '$($arg -join "', '")', `$args" | out-file "$shim.ps1" -encoding utf8 -append
-    }
-
     if($path -match '\.jar$') {
-        "if(`$myinvocation.expectingInput) { `$input | & java -jar `$path @args } else { & java -jar `$path @args }" | out-file "$shim.ps1" -encoding utf8 -append
+        "if(`$myinvocation.expectingInput) { `$input | & java -jar `$path $arg @args } else { & java -jar `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     } else {
-        "if(`$myinvocation.expectingInput) { `$input | & `$path @args } else { & `$path @args }" | out-file "$shim.ps1" -encoding utf8 -append
+        "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     }
 
     if($path -match '\.exe$') {
@@ -303,12 +324,21 @@ set args=%args:(=``(%
 set args=%args:)=``)%
 set invalid=`"='
 if !args! == !invalid! ( set args= )
-powershell -noprofile -ex unrestricted `"& '$resolved_path' %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
+powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
 
         "#!/bin/sh`npowershell -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.jar$') {
         "@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
         "#!/bin/sh`njava -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+    }
+}
+
+function search_in_path($target) {
+    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
+    foreach($dir in $path.split(';')) {
+        if(test-path "$dir\$target" -pathType leaf) {
+            return "$dir\$target"
+        }
     }
 }
 
@@ -338,7 +368,7 @@ function ensure_architecture($architecture_opt) {
 function ensure_all_installed($apps, $global) {
     $installed = @()
     $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | ForEach-Object {
-        $app = $_
+        $app, $null, $null = parse_app $_
         if(installed $app $false) {
             $installed += ,@($app, $false)
         } elseif (installed $app $true) {
@@ -389,7 +419,7 @@ function ensure_robocopy_in_path {
 }
 
 function wraptext($text, $width) {
-    if(!$width) { $width = $host.ui.rawui.windowsize.width };
+    if(!$width) { $width = $host.ui.rawui.buffersize.width };
     $width -= 1 # be conservative: doesn't seem to print the last char
 
     $text -split '\r?\n' | ForEach-Object {
@@ -464,31 +494,21 @@ function applist($apps, $global) {
     return ,@($apps | ForEach-Object { ,@($_, $global) })
 }
 
-function app($app) {
-    $app = [string]$app
-    if($app -notmatch '^((ht)|f)tps?://') {
-        if($app -match '([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)') {
-            return $matches[2], $matches[1]
-        }
+function parse_app([string] $app) {
+    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*.json$|[a-zA-Z0-9-.]+)(?:@(?<version>.*))?') {
+        return $matches['app'], $matches['bucket'], $matches['version']
     }
-
-    $app, $null
+    return $app, $null, $null
 }
 
-function is_app_with_specific_version([String] $app) {
-    $appWithVersion = get_app_with_version $app
-    $appWithVersion.version -ne 'latest'
-}
-
-function get_app_with_version([String] $app) {
-    $segments = $app -split '@'
-    $name     = $segments[0]
-    $version  = $segments[1];
-
-    return @{
-        "app" = $name;
-        "version" = if ($version) { $version } else { 'latest' }
+function show_app($app, $bucket, $version) {
+    if($bucket) {
+        $app = "$bucket/$app"
     }
+    if($version) {
+        $app = "$app@$version"
+    }
+    return $app
 }
 
 function last_scoop_update() {

@@ -1,7 +1,7 @@
 {
     "homepage": "http://gnuwin32.sourceforge.net/packages/which.htm",
     "version": "2.20",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "url": [
         "https://sourceforge.net/projects/gnuwin32/files/which/2.20/which-2.20-bin.zip"
     ],

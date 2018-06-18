@@ -1,7 +1,7 @@
 {
     "homepage": "http://gnuwin32.sourceforge.net/packages/sed.htm",
     "version": "4.2.1",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "url": [
         "https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-bin.zip",
         "https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-dep.zip"

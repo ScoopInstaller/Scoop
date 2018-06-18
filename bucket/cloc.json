@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/AlDanial/cloc",
+    "description": "Counts blank lines, comment lines, and physical lines of source code in many programming languages",
     "version": "1.76",
     "license": "GPL-2.0",
     "url": "https://github.com/AlDanial/cloc/releases/download/v1.76/cloc-1.76.exe#/cloc.exe",

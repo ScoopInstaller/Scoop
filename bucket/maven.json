@@ -1,20 +1,20 @@
 {
     "homepage": "https://maven.apache.org/",
     "version": "3.5.3",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "url": "https://archive.apache.org/dist/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.zip",
     "hash": "sha1:4a4844990333e2548540729ce9ab57f52a63148d",
     "extract_dir": "apache-maven-3.5.3",
     "env_add_path": "bin",
     "suggest": {
         "JDK": [
-            "extras/oraclejdk",
-            "openjdk"
+            "java/oraclejdk",
+            "java/openjdk"
         ]
     },
     "checkver": {
-        "url": "https://maven.apache.org/download.cgi",
-        "re": "Apache Maven ([\\d.]+) is the latest release"
+        "url": "https://maven.apache.org/docs/history.html",
+        "re": "<b>([\\d.]+)</b>"
     },
     "autoupdate": {
         "url": "https://archive.apache.org/dist/maven/maven-$majorVersion/$version/binaries/apache-maven-$version-bin.zip",

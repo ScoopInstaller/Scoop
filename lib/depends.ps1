@@ -20,10 +20,8 @@ function deps($app, $arch) {
 }
 
 function dep_resolve($app, $arch, $resolved, $unresolved) {
+    $app, $bucket, $null = parse_app $app
     $unresolved += $app
-
-    $query = $app
-    $app, $bucket = app $query
     $null, $manifest, $null, $null = locate $app $bucket
     if(!$manifest) { abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })" }
 

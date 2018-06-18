@@ -1,10 +1,11 @@
 {
     "homepage": "https://www.cockroachlabs.com/",
+    "description": "The SQL database for global cloud services",
     "license": "https://github.com/cockroachdb/cockroach/blob/master/LICENSE",
-    "version": "1.1.6",
-    "url": "https://binaries.cockroachdb.com/cockroach-v1.1.6.windows-6.2-amd64.zip",
-    "hash": "55940ab16a30fcc562946ac496980cb37db76137dfd8c0614f13a8c7902857f2",
-    "extract_dir": "cockroach-v1.1.6.windows-6.2-amd64",
+    "version": "2.0.2",
+    "url": "https://binaries.cockroachdb.com/cockroach-v2.0.2.windows-6.2-amd64.zip",
+    "hash": "26fc947557f08eb792b556327d67468853ac310eaa5504d29c5fb9bdb3e38e8c",
+    "extract_dir": "cockroach-v2.0.2.windows-6.2-amd64",
     "bin": "cockroach.exe",
     "checkver": {
         "url": "https://www.cockroachlabs.com/docs/stable/install-cockroachdb.html",

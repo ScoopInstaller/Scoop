@@ -2,15 +2,15 @@
     "homepage": "https://github.com/BurntSushi/xsv",
     "description": "A fast CSV command line toolkit written in Rust",
     "license": "Unlicense",
-    "version": "0.12.2",
+    "version": "0.13.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/BurntSushi/xsv/releases/download/0.12.2/xsv-0.12.2-x86_64-pc-windows-msvc.zip",
-            "hash": "7066b505f2e1098e0b83bea443b52a06c6a748aa62938d28d13fd7327b804a81"
+            "url": "https://github.com/BurntSushi/xsv/releases/download/0.13.0/xsv-0.13.0-x86_64-pc-windows-msvc.zip",
+            "hash": "3e319c08456031a9683c19c998ac9f61756a2e456413db17c8e6819b17818a1a"
         },
         "32bit": {
-            "url": "https://github.com/BurntSushi/xsv/releases/download/0.12.2/xsv-0.12.2-i686-pc-windows-msvc.zip",
-            "hash": "48dea268ba9eee197367f500c262975a25d6fbeda9ba99b5d07d48d74f66c7d9"
+            "url": "https://github.com/BurntSushi/xsv/releases/download/0.13.0/xsv-0.13.0-i686-pc-windows-msvc.zip",
+            "hash": "c11ac9e996e54f9ef070e815c1cc95f744ecae217d815e310dee6ab3afee1ee4"
         }
     },
     "bin": "xsv.exe",

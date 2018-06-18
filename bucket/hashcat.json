@@ -1,6 +1,6 @@
 {
     "homepage": "https://hashcat.net/hashcat/",
-    "license": "mit",
+    "license": "MIT",
     "version": "4.1.0",
     "url": "https://hashcat.net/files/hashcat-4.1.0.7z",
     "extract_dir": "hashcat-4.1.0",

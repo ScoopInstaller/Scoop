@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.cjmweb.net/vbindiff/",
     "version": "3.0-beta5",
-    "license": "GPL2",
+    "license": "GPL-2.0",
     "url": "https://www.cjmweb.net/vbindiff/VBinDiff-3.0_beta5.zip",
     "hash": "05e52b50d9101f9903cc1342fcc307eacf70485e8d942d43c7a440648c9c3a7f",
     "bin": "vbindiff.exe"

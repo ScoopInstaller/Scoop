@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.erlang.org",
     "version": "20.3",
-    "license": "https://www.apache.org/licenses/LICENSE-2.0",
+    "license": "Apache-2.0",
     "architecture": {
         "64bit": {
             "url": "http://erlang.org/download/otp_win64_20.3.exe",

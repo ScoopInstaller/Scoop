@@ -1,5 +1,6 @@
 {
     "homepage": "https://mridgers.github.io/clink/",
+    "description": "Powerful Bash-style command line editing for cmd.exe",
     "url": "https://github.com/mridgers/clink/releases/download/0.4.9/clink_0.4.9.zip",
     "version": "0.4.9",
     "hash": "57618d5fab9f0f777430fde5beceffdfb99cc81cfbd353ca58f41b7faf84eddc",

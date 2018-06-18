@@ -28,6 +28,8 @@ if($apps -eq '*') {
 $apps | ForEach-Object {
     ($app, $global) = $_
 
+    $app, $bucket, $version = parse_app $app
+
     if(($global -eq $null) -and (installed $app $true)) {
         # set global flag when running reset command on specific app
         $global = $true
@@ -38,16 +40,12 @@ $apps | ForEach-Object {
         return
     }
 
-    $appWithVersion = get_app_with_version $app
-    $app            = $appWithVersion.app;
-    $version        = $appWithVersion.version;
-
     if(!(installed $app)) {
         error "'$app' isn't installed"
         return
     }
 
-    if ($version -eq 'latest') {
+    if ($null -eq $version) {
         $version = current_version $app $global
     }
 

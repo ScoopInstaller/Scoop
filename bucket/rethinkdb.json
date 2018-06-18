@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.rethinkdb.com/",
-    "license": "https://www.gnu.org/licenses/agpl-3.0.html",
+    "license": "AGPL-3.0",
     "version": "2.3.6",
     "architecture": {
         "64bit": {

@@ -5,5 +5,6 @@
     "nirsoft": "https://github.com/kodybrown/scoop-nirsoft",
     "php": "https://github.com/nueko/scoop-php.git",
     "nerd-fonts": "https://github.com/matthewjberger/scoop-nerd-fonts.git",
-    "nonportable": "https://github.com/oltolm/scoop-nonportable"
+    "nonportable": "https://github.com/oltolm/scoop-nonportable",
+    "java": "https://github.com/se35710/scoop-java"
 }
