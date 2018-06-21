@@ -1,11 +1,11 @@
 {
-    "version": "2.0.0",
+    "version": "2.1.0",
     "homepage": "https://github.com/simonwhitaker/gibo",
     "license": "Unlicense",
     "description": "gibo (short for .gitignore boilerplates) is a shell script to help you easily access .gitignore boilerplates from github.com/github/gitignore.",
-    "url": "https://github.com/simonwhitaker/gibo/archive/2.0.0.zip",
-    "hash": "d041eb5e079fa8eca35e703a1e873e163c8ac43245fe9b99cb7b678ae630dc2f",
-    "extract_dir": "gibo-2.0.0",
+    "url": "https://github.com/simonwhitaker/gibo/archive/2.1.0.zip",
+    "hash": "5881bd6add6e93efc326219ec1a1d12c6b287e2b834b2eb52ea0873bf92815b2",
+    "extract_dir": "gibo-2.1.0",
     "bin": [
         "gibo.bat"
     ],
