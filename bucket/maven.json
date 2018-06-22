@@ -1,10 +1,10 @@
 {
     "homepage": "https://maven.apache.org/",
-    "version": "3.5.3",
+    "version": "3.5.4",
     "license": "Apache-2.0",
-    "url": "https://archive.apache.org/dist/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.zip",
-    "hash": "sha1:4a4844990333e2548540729ce9ab57f52a63148d",
-    "extract_dir": "apache-maven-3.5.3",
+    "url": "https://archive.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip",
+    "hash": "sha1:8a0d9cc9d4da3fac195de8e1e99fe07158d54192",
+    "extract_dir": "apache-maven-3.5.4",
     "env_add_path": "bin",
     "suggest": {
         "JDK": [
