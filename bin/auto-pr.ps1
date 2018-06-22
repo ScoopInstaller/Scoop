@@ -96,7 +96,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     Start-Sleep 1
     Write-Host -f DarkCyan "Pull-Request update $app ($version) ..."
     Write-Host -f green "hub pull-request -m '<msg>' -b '$upstream' -h '$branch'"
-    $msg = "Update $app to version $version`n`n"
+    $msg = "${app}: update to version $version`n`n"
     $msg += "Hello lovely humans,`n"
     $msg += "a new version of [$app]($homepage) is available.`n"
     $msg += "<table>"
