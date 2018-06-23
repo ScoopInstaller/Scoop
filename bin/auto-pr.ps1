@@ -84,7 +84,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     Write-Host -f DarkCyan "Creating update $app ($version) ..."
     execute "hub checkout -b $branch"
     execute "hub add $manifest"
-    execute "hub commit -m 'Update $app to version $version'"
+    execute "hub commit -m '${app}: Update to version $version'"
     Write-Host -f DarkCyan "Pushing update $app ($version) ..."
     execute "hub push origin $branch"
 
@@ -96,7 +96,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     Start-Sleep 1
     Write-Host -f DarkCyan "Pull-Request update $app ($version) ..."
     Write-Host -f green "hub pull-request -m '<msg>' -b '$upstream' -h '$branch'"
-    $msg = "${app}: update to version $version`n`n"
+    $msg = "${app}: Update to version $version`n`n"
     $msg += "Hello lovely humans,`n"
     $msg += "a new version of [$app]($homepage) is available.`n"
     $msg += "<table>"
@@ -106,7 +106,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     hub pull-request -m "$msg" -b '$upstream' -h '$branch'
     if($LASTEXITCODE -gt 0) {
         execute "hub reset"
-        abort "Pull Request failed! (hub pull-request -m 'Update $app to version $version' -b '$upstream' -h '$branch')"
+        abort "Pull Request failed! (hub pull-request -m '${app}: Update to version $version' -b '$upstream' -h '$branch')"
     }
 }
 
@@ -149,7 +149,7 @@ hub diff --name-only | ForEach-Object {
         $status = Invoke-Expression "hub status --porcelain -uno"
         $status = $status | select-object -first 1
         if($status -and $status.StartsWith('M  ') -and $status.EndsWith("$app.json")) {
-            execute "hub commit -m 'Update $app to version $version'"
+            execute "hub commit -m '${app}: Update to version $version'"
         } else {
             Write-Host -f Yellow "Skipping $app because only LF/CRLF changes were detected ..."
         }
