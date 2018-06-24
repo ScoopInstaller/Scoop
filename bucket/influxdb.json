@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.influxdata.com/",
-    "license": "https://github.com/influxdata/influxdb/blob/master/LICENSE",
+    "license": "MIT",
     "version": "1.5.4",
     "architecture": {
         "64bit": {
