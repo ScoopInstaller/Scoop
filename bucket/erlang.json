@@ -45,5 +45,11 @@
                 "url": "http://erlang.org/download/otp_win32_$version.exe"
             }
         }
-    }
+    },
+    "shortcuts": [
+        [
+            "bin\\werl.exe",
+            "Erlang"
+        ]
+    ]
 }
