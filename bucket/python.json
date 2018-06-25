@@ -37,6 +37,11 @@
         [
             "python.exe",
             "python3"
+        ],
+        "Lib\\idlelib\\idle.bat",
+        [
+            "Lib\\idlelib\\idle.bat",
+            "idle3"
         ]
     ],
     "env_add_path": [
