@@ -219,6 +219,11 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         $options += "--header='Cookie: $(cookie_header $cookies)'"
     }
 
+    $more_options = get_config 'aria2-options'
+    if($more_options) {
+        $options += $more_options
+    }
+
     foreach($url in $urls) {
         $data.$url = @{
             'filename' = url_filename $url
