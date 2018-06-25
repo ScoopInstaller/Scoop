@@ -219,6 +219,19 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         $options += "--header='Cookie: $(cookie_header $cookies)'"
     }
 
+    $proxy = get_config 'proxy'
+    if($proxy -ne 'none') {
+        if([Net.Webrequest]::DefaultWebProxy.Address) {
+            $options += "--all-proxy='$([Net.Webrequest]::DefaultWebProxy.Address.Authority)'"
+        }
+        if([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
+            $options += "--all-proxy-user='$([Net.Webrequest]::DefaultWebProxy.Credentials.UserName)'"
+        }
+        if([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
+            $options += "--all-proxy-passwd='$([Net.Webrequest]::DefaultWebProxy.Credentials.Password)'"
+        }
+    }
+
     $more_options = get_config 'aria2-options'
     if($more_options) {
         $options += $more_options
