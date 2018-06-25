@@ -206,12 +206,13 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--referer='$(strip_filename $url)'"
         "--allow-overwrite=true"
         "--auto-file-renaming=false"
-        "--retry-wait=2"
-        "--split=5"
-        "--max-connection-per-server=5"
-        "--min-split-size=5M"
+        "--retry-wait=$(get_config 'aria2-retry-wait' 2)"
+        "--split=$(get_config 'aria2-split' 5)"
+        "--max-connection-per-server=$(get_config 'aria2-max-connection-per-server' 5)"
+        "--min-split-size=$(get_config 'aria2-min-split-size' '5M')"
         "--console-log-level=warn"
         "--enable-color=false"
+        "--no-conf=true"
     )
 
     if($cookies) {
@@ -447,10 +448,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
-    $enable_aria2 = get_config 'enable_aria2'
-    if($null -eq $enable_aria2) {
-        $enable_aria2 = $true
-    }
+    $enable_aria2 = get_config 'aria2-enabled' $true
 
     # download first
     if((aria2_installed) -and $enable_aria2) {
