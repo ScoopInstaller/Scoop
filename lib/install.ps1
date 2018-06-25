@@ -254,7 +254,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
             } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
                 Write-Host $_ -f Cyan
             } else {
-                Write-Host $_
+                Write-Host $_ -f Gray
             }
         }
 
