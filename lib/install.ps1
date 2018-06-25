@@ -203,6 +203,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--input-file='$urlstxt'"
         "--dir='$cachedir'"
         "--user-agent='$(Get-UserAgent)'"
+        "--referer='$(strip_filename $url)'"
         "--allow-overwrite=true"
         "--auto-file-renaming=false"
         "--retry-wait=2"
@@ -212,6 +213,10 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--console-log-level=warn"
         "--enable-color=false"
     )
+
+    if($cookies) {
+        $options += "--header='Cookie: $(cookie_header $cookies)'"
+    }
 
     foreach($url in $urls) {
         $data.$url = @{
