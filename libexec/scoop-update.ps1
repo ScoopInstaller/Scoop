@@ -57,10 +57,7 @@ function update_scoop() {
 
     write-host "Updating Scoop..."
     $last_update = $(last_scoop_update).ToString('s')
-    $show_update_log = get_config "show_update_log"
-    if($null -eq $show_update_log) {
-        $show_update_log = $true
-    }
+    $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
         $newdir = fullpath $(versiondir 'scoop' 'new')
