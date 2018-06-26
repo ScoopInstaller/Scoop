@@ -1,0 +1,20 @@
+{
+    "version": "0.2.3",
+    "license": "MIT",
+    "url": "https://github.com/lihaoyi/mill/releases/download/0.2.3/0.2.3#/mill.bat",
+    "bin": "mill.bat",
+    "homepage": "http://www.lihaoyi.com/mill/",
+    "hash": "6946d52f877743f578d185a71e8c0baf79f1028ebb8de1ca7c022f95b5753997",
+    "checkver": {
+        "github": "https://github.com/lihaoyi/mill"
+    },
+    "autoupdate": {
+        "url": "https://github.com/lihaoyi/mill/releases/download/$version/$version#/mill.bat"
+    },
+    "suggest": {
+        "JDK": [
+            "java/oraclejdk",
+            "java/openjdk"
+        ]
+    }
+}
