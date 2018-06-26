@@ -201,9 +201,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
     # aria2 options
     $options = @(
         "--input-file='$urlstxt'"
-        "--dir='$cachedir'"
         "--user-agent='$(Get-UserAgent)'"
-        "--referer='$(strip_filename $url)'"
         "--allow-overwrite=true"
         "--auto-file-renaming=false"
         "--retry-wait=$(get_config 'aria2-retry-wait' 2)"
@@ -249,6 +247,8 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
             $has_downloads = $true
             # create aria2 input file content
             $urlstxt_content += "$url`n"
+            $urlstxt_content += "    referer=$(strip_filename $url)`n"
+            $urlstxt_content += "    dir=$cachedir`n"
             $urlstxt_content += "    out=$($data.$url.cachename)`n"
         } else {
             Write-Host "Loading " -NoNewline
