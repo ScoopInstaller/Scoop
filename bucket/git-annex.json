@@ -2,7 +2,7 @@
     "description": "Manage files with git, without comitting them",
     "homepage": "http://git-annex.branchable.com/",
     "license": "GPL-3.0",
-    "version": "6.20180529",
+    "version": "6.20180626",
     "notes": "NOTE: Running `git-annex version` may report a slightly older version number",
     "bin": "usr/bin/git-annex.exe",
     "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z",
