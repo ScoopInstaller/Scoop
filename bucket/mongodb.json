@@ -17,7 +17,6 @@
         "bin\\mongoexport.exe",
         "bin\\mongofiles.exe",
         "bin\\mongoimport.exe",
-        "bin\\mongoperf.exe",
         "bin\\mongorestore.exe",
         "bin\\mongos.exe",
         "bin\\mongostat.exe",
