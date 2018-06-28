@@ -320,6 +320,9 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                     # rm cached file
                     Remove-Item -force $cached
                 }
+                if($url.Contains('sourceforge.net')) {
+                    Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                }
                 abort $(new_issue_msg $app $bucket "hash check failed")
             }
         }
