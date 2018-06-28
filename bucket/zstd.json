@@ -2,15 +2,15 @@
     "homepage": "http://www.zstd.net/",
     "license": "BSD-3-Clause",
     "description": "Zstandard is a real-time compression algorithm, providing high compression ratios.",
-    "version": "1.3.4",
+    "version": "1.3.5",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/facebook/zstd/releases/download/v1.3.4/zstd-v1.3.4-win64.zip",
-            "hash": "b71f16f211aa0397a90e046ac4358c982ab9947c33e1004c933e69aee548ff26"
+            "url": "https://github.com/facebook/zstd/releases/download/v1.3.5/zstd-v1.3.5-win64.zip",
+            "hash": "5dabee0ab14a92d73226cf8cb90d09a17b96b77542dffd173bdeeb3c3a3bab4a"
         },
         "32bit": {
-            "url": "https://github.com/facebook/zstd/releases/download/v1.3.4/zstd-v1.3.4-win32.zip",
-            "hash": "52e0553c7fb8f5af6f19b4cc85023335a3b96603149ccb1049423254be012a43"
+            "url": "https://github.com/facebook/zstd/releases/download/v1.3.5/zstd-v1.3.5-win32.zip",
+            "hash": "836591dd15d78b22bd29ab0146c2291dbe27772941d56caac258ce0c36ae7070"
         }
     },
     "bin": "zstd.exe",
