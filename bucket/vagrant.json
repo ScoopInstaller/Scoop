@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://releases.hashicorp.com/vagrant/2.1.2/vagrant_2.1.2_x86_64.msi",
-            "hash": "a572aac4df16ed9077054df73e6dc34f5782d398d6660e48b0d5eb05ae69b636"
+            "hash": "492e01d5ef25bf97a5ba157d6ae2101e54f1b6965f41f05c5299dc701dc73182"
         },
         "32bit": {
             "url": "https://releases.hashicorp.com/vagrant/2.1.2/vagrant_2.1.2_i686.msi",
-            "hash": "1563f1a8c2a0153cccebd52efc9e20c67b342bc3ae5a712ba07b444a486c2bb1"
+            "hash": "d82fc463a2bd12e68fcc5cae8023ab8f5f8048864f2cffa39e152e9842e01125"
         }
     },
     "extract_dir": "HashiCorp/Vagrant",
