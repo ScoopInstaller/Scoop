@@ -148,6 +148,9 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     $dir = versiondir $app $old_version $global
 
+    # download before uninstalling to not end up without any version installed if download fails
+    dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+
     write-host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
