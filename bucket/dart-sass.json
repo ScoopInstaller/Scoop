@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/sass/dart-sass",
-    "version": "1.7.3",
+    "version": "1.8.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/sass/dart-sass/releases/download/1.7.3/dart-sass-1.7.3-windows-x64.zip",
-            "hash": "93fb4313fd954d12e06af3a8193ea7f98ca3cbc36feff7b6167eea1a88c12639"
+            "url": "https://github.com/sass/dart-sass/releases/download/1.8.0/dart-sass-1.8.0-windows-x64.zip",
+            "hash": "ba72bda1b32467debbaacc36923dae020940155226b07f7866b8ad0255e1f000"
         },
         "32bit": {
-            "url": "https://github.com/sass/dart-sass/releases/download/1.7.3/dart-sass-1.7.3-windows-ia32.zip",
-            "hash": "a238b782e89523cacffcc8d749e4250563aa36f1275829b7fb6e54e9fdfcdbf9"
+            "url": "https://github.com/sass/dart-sass/releases/download/1.8.0/dart-sass-1.8.0-windows-ia32.zip",
+            "hash": "2e3a2d9452bcf8f9b6d38cd55daa58b61e1b5474c4555c9f13c9dc1c38ec8e00"
         }
     },
     "extract_dir": "dart-sass",
