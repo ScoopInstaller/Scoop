@@ -12,12 +12,12 @@
             "hash": "b3b8b210cf93c0a8cd2b6c48c2bb0b9a8a9d6be8bfad23b13f8bb1be73aaca1a"
         }
     },
-    "post_install": "
-        # enable standard idiomatic access to user's home directory
-        ## remove HomeDir section from portable.perl (disables Portable.pm override of File::HomeDir)
-        ## NOTE: conversion to byte[] avoids adding an extra trailing newline to the output file
-        [byte[]][char[]]((Get-Content -raw \"$dir\\portable.perl\") -replace \"(?ms)^HomeDir:.*?^(?=\\S)\",\"\") | Set-Content \"$dir\\portable.perl\" -encoding byte
-    ",
+    "post_install": [
+        "# enable standard idiomatic access to user's home directory",
+        "## remove HomeDir section from portable.perl (disables Portable.pm override of File::HomeDir)",
+        "## NOTE: conversion to byte[] avoids adding an extra trailing newline to the output file",
+        "[byte[]][char[]]((Get-Content -raw \"$dir\\portable.perl\") -replace \"(?ms)^HomeDir:.*?^(?=\\S)\",\"\") | Set-Content \"$dir\\portable.perl\" -encoding byte"
+    ],
     "env_add_path": [
         "perl\\site\\bin",
         "perl\\bin",
