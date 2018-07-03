@@ -1,17 +1,17 @@
 {
     "homepage": "https://mariadb.org",
-    "version": "10.3.7",
+    "version": "10.3.8",
     "license": "GPL-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.3.7/winx64-packages/mariadb-10.3.7-winx64.zip",
-            "hash": "5c9783fd6c8871b710aed4f9516060e640b77f88bb134453379ff24e7b9edcf7",
-            "extract_dir": "mariadb-10.3.7-winx64"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.3.8/winx64-packages/mariadb-10.3.8-winx64.zip",
+            "hash": "0760cc80beb8283d8de8cf02bbfcd2074db9e191cfbb9ef2864d6c8f6119e693",
+            "extract_dir": "mariadb-10.3.8-winx64"
         },
         "32bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.3.7/win32-packages/mariadb-10.3.7-win32.zip",
-            "hash": "e3e877c775328ef244bf80cb962b815302722b71466d457d6356c37c799a6020",
-            "extract_dir": "mariadb-10.3.7-win32"
+            "url": "https://downloads.mariadb.org/f/mariadb-10.3.8/win32-packages/mariadb-10.3.8-win32.zip",
+            "hash": "84e03371d97575f405cda3bfd43f9f7a6e62f1d837f046a5af9ad63a56bff1cf",
+            "extract_dir": "mariadb-10.3.8-win32"
         }
     },
     "bin": [
@@ -51,8 +51,10 @@
         "if (!(Test-Path \"$dir\\data\\auto.cnf\")) { mysqld --initialize-insecure }"
     ],
     "notes": [
-        "Run following command as administrator to run MariaDB as a service.\n",
-        "mysqld --install \"[Service Name(default:MySQL)]\"\n"
+        "Run following command as administrator to run MariaDB as a service.
+",
+        "mysqld --install \"[Service Name(default:MySQL)]\"
+"
     ],
     "checkver": {
         "url": "https://downloads.mariadb.org/",
