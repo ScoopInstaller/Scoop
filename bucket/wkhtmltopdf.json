@@ -1,19 +1,19 @@
 {
     "homepage": "https://wkhtmltopdf.org/",
-    "version": "0.12.4",
+    "version": "0.12.5-1",
     "description": "Render HTML into PDF",
     "license": "LGPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_mingw-w64-cross-win64.exe#/dl.7z",
-            "hash": "6ccf4d4056fdee7b25d173b830429f2ceaf7febcc309ee9a21e6fd932edaf4ed"
+            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox-0.12.5-1.mxe-cross-win64.7z",
+            "hash": "d9c4717318439f7576ce201de145f0b71ffdd209faadec8dcfb1be088eae6e71"
         },
         "32bit": {
-            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_mingw-w64-cross-win32.exe#/dl.7z",
-            "hash": "2788d14d24eae350940b5757b82728e870b2f1b8767fe8842ca179f46c2b6dc5"
+            "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox-0.12.5-1.mxe-cross-win32.7z",
+            "hash": "eb00f88ceed2941430cb05bc91da4e753e2319188b8e891735ad141aad668ae8"
         }
     },
-    "extract_dir": "bin",
+    "extract_dir": "wkhtmltox/bin",
     "bin": [
         "wkhtmltoimage.exe",
         "wkhtmltopdf.exe"
@@ -24,10 +24,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version_mingw-w64-cross-win64.exe#/dl.7z"
+                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version.mxe-cross-win64.7z"
             },
             "32bit": {
-                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version_mingw-w64-cross-win32.exe#/dl.7z"
+                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version.mxe-cross-win32.7z"
             }
         },
         "hash": {
