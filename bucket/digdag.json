@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.digdag.io/",
     "license": "Apache-2.0",
-    "version": "0.9.26",
-    "url": "https://dl.bintray.com/digdag/maven/digdag-0.9.26.jar#/digdag.jar",
-    "hash": "f3df65ee357512deac01d33305baa7474cc477184c31e44255b624a039113193",
+    "version": "0.9.27",
+    "url": "https://dl.bintray.com/digdag/maven/digdag-0.9.27.jar#/digdag.jar",
+    "hash": "392b9b5343d25a3c16110bcb11677535e0b16d6faff03232407e4c975f7022a4",
     "pre_install": "\"@java -jar \"\"$dir\\digdag.jar\"\" %*\" | out-file -en oem \"$dir\\digdag.cmd\"",
     "bin": "digdag.cmd",
     "checkver": {
