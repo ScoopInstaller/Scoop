@@ -7,7 +7,8 @@
     "hash": "a650ff3ae1d61ba5fea01c5c4b664467f1691e83e3bea164ef99a95ae5833ef2",
     "bin": "jfrog.exe",
     "checkver": {
-        "github": "https://github.com/jfrog/jfrog-cli-go"
+        "url": "https://bintray.com/package/generalTab?pkgPath=/jfrog/jfrog-cli-go/jfrog-cli-windows-amd64",
+        "re": "ver: ([\\d.]+)"
     },
     "autoupdate": {
         "url": "https://jfrog.bintray.com/jfrog-cli-go/$version/jfrog-cli-windows-amd64/jfrog.exe",
