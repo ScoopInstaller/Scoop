@@ -1,15 +1,15 @@
 {
-    "version": "2.1.300",
+    "version": "2.1.301",
     "homepage": "https://www.microsoft.com/net/",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-2.1.300-win-x64.zip",
-            "hash": "sha512:4aa6ff6aa51e1d71733944e10fd9e37647a58df7efbc76f432b8c3ffa3f617f9da36f72532175a1e765dbaf4598a14350017342d5f776dfe8e25d5049696d003"
+            "url": "https://download.microsoft.com/download/D/0/4/D04C5489-278D-4C11-9BD3-6128472A7626/dotnet-sdk-2.1.301-win-x64.zip",
+            "hash": "sha256:FF49924A2C7FCE5284B69F1F11D6973C30A1F79C7F058EF591042B38A4000C52"
         },
         "32bit": {
-            "url": "https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-2.1.300-win-x86.zip",
-            "hash": "sha512:be5da1f6a7aa983d25feed7f1fcddb67d88ce98bacd6ff4b8116737b30e2132a004a93887a7f773818c81abf0ff8e3fc071956a3d08032a65300f1088707bf6a"
+            "url": "https://download.microsoft.com/download/D/0/4/D04C5489-278D-4C11-9BD3-6128472A7626/dotnet-sdk-2.1.301-win-x86.zip",
+            "hash": "sha256:4CF0033D3A6E067244148C73B45DFF40399DC4ED6191D2664CF4B94701BDF19D"
         }
     },
     "env_add_path": ".",
