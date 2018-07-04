@@ -1,30 +1,56 @@
 {
-    "version": "5.4p1-1",
-    "license": "https://www.openbsd.org/cgi-bin/cvsweb/src/usr.bin/ssh/LICENCE?rev=HEAD",
-    "url": [
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/openssh/openssh-5.4p1-1/openssh-5.4p1-1-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/openssh/openssh-5.4p1-1/openssh-5.4p1-1-msys-1.0.13-lic.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/zlib/zlib-1.2.3-2/zlib-1.2.3-2-msys-1.0.13-dll.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/minires/minires-1.02_1-2/libminires-1.02_1-2-msys-1.0.13-dll.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/openssl/openssl-1.0.0-1/libopenssl-1.0.0-1-msys-1.0.13-dll-100.tar.lzma"
-    ],
-    "hash": [
-        "8c8e6a030a34c341394bb8b9f1760743468a8cc5e4244efc34f7ab3cd3e67b64",
-        "edef96034d9ec958b9a58023bcfef54bb4f6b56c6df94c2cced178a675cc3a98",
-        "41c7d5561662e41da74951f373a08a95db40b27b1246227bbbc13abc44976ea7",
-        "4178940828b928b2d5a33042cc83fbb992b4bfb9ffeaef6dc3e555f2a6a8c0d1",
-        "e42fbdcff71404a76306f3b8f0024f453aafa7fe7dd9dac43c82b2e8d33e23f1",
-        "463ed0e62cc5ae102a8e2f4d30e665507cf8a3930f23668629eea48cb4dda71c"
-    ],
+    "homepage": "https://www.openssh.com/",
+    "version": "7.6p1",
+    "license": "ISC license",
+    "architecture": {
+        "64bit": {
+            "url": [
+                "http://repo.msys2.org/msys/x86_64/gcc-libs-6.4.0-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/heimdal-1.5.3-9-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/heimdal-libs-1.5.3-9-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/icu-59.1-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libcrypt-2.1-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libdb-5.3.28-2-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libedit-3.1-20170329-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libopenssl-1.0.2.m-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libreadline-7.0.003-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/libsqlite-3.19.3.0-2-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/msys2-runtime-2.9.0-2-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/ncurses-6.0.20170708-2-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/openssh-7.6p1-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/zlib-1.2.11-1-x86_64.pkg.tar.xz",
+                "http://repo.msys2.org/msys/x86_64/bash-4.4.012-1-x86_64.pkg.tar.xz"
+            ],
+            "hash": [
+                "892a8125b41e2c11f26769755bec092b55c8d0c6c78bf8bd2c61d977df7e1fbd",
+                "2a8fdd4466b98a5671c8b1a841d6a48e5d10ec1132820c4dc834efb086848a0b",
+                "5d687b1055025238b8998c68c7c0066e85678f0ee5a13220305daa68327655a3",
+                "d64bbf81b569b322f428cc4a18071991abca4b0d56c2ec2ce74052348d2b2e7a",
+                "3dc05953cd3f23dace3068a972f838ab3502e642e8cd44763902cae998cfb27d",
+                "2e96a2883d56a3909938ac160c2922e30cd7edb1fe733b8452bb24fbf7ec09a7",
+                "609221c599e437d4b7bd49d0b79a9292be74f03ed4f0214cb1fd8062d0af9803",
+                "cfe7b54151a47150cfd2a7734db9e52467e702ad17676a69780f6c73c5bcb30e",
+                "293e24e5ba18331672eea8ceea6891b6c499cce6e6b53a5102b13ce531358c90",
+                "6ab4b5bd5b85e19f41111890ead6179031350e67fa0777f677e53c8219986ff3",
+                "a3b8c0f46d9ba40830a868a8aa3b3951eae4ef9fdb9a679d857432ab18819d19",
+                "c0d86acc324c48f8bf7b12e229e3bbd8ceefa66323ef681379c4b591789a52f8",
+                "a2e7de5e8f1d4a714f17184b72874f07faa61764321b92b47aa81fab88360203",
+                "4af63558e39e7a4941292132b2985cb2650e78168ab21157a082613215e4839a",
+                "39bf8d6cca731d879144af160f1471c93241e5e2a82c4532dad0582a74bdce0d"
+            ]
+        }
+    },
     "bin": [
-        "bin\\scp.exe",
-        "bin\\sftp.exe",
-        "bin\\slogin.exe",
-        "bin\\ssh-add.exe",
-        "bin\\ssh-agent.exe",
-        "bin\\ssh-keygen.exe",
-        "bin\\ssh-keyscan.exe",
-        "bin\\ssh.exe"
-    ]
+        [ "usr/bin/sh.exe", "findssl.sh", "$dir/usr/bin/findssl.sh" ],
+        "usr/bin/scp.exe",
+        "usr/bin/sftp.exe",
+        "usr/bin/ssh.exe",
+        "usr/bin/ssh-add.exe",
+        "usr/bin/ssh-agent.exe",
+        [ "usr/bin/sh.exe", "ssh-copy-id", "$dir/usr/bin/ssh-copy-id" ],
+        "usr/bin/ssh-keygen.exe",
+        "usr/bin/ssh-keyscan.exe",
+        "usr/bin/sshd.exe"
+    ],
+    "pre_install": [ "mkdir $dir/tmp", "mkdir $dir/home", "cmd /c mklink /j $dir\\home\\%USERNAME% %USERPROFILE%" ]
 }
