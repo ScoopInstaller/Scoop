@@ -2,9 +2,9 @@
     "homepage": "https://jfrog.com/getcli/",
     "license": "Apache-2.0",
     "description": "Command Line Interface for Artifactory and Bintray",
-    "version": "1.16.2",
-    "url": "https://jfrog.bintray.com/jfrog-cli-go/1.16.2/jfrog-cli-windows-amd64/jfrog.exe",
-    "hash": "a650ff3ae1d61ba5fea01c5c4b664467f1691e83e3bea164ef99a95ae5833ef2",
+    "version": "1.17.0",
+    "url": "https://jfrog.bintray.com/jfrog-cli-go/1.17.0/jfrog-cli-windows-amd64/jfrog.exe",
+    "hash": "6a8bd2dbd5bc1e56b127b1b834d89e50424c045aef3ec0d3e986749daeef4586",
     "bin": "jfrog.exe",
     "checkver": {
         "url": "https://bintray.com/package/generalTab?pkgPath=/jfrog/jfrog-cli-go/jfrog-cli-windows-amd64",
