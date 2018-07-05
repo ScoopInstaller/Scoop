@@ -6,15 +6,16 @@
     "hash": "d7db91bb8c5d5a5d4635dee380ed496ca6a7da9903504357b752e0b396da327c",
     "extract_dir": "PyGitUp-1.5.0",
     "depends": "python",
-    "post_install": "
-        pushd \"$dir\"
-        try {
-            scoop reset python
-            iex \"$(scoop which python) setup.py install\"
-        }
-        finally {
-            popd
-        }",
+    "post_install": [
+        "pushd \"$dir\"",
+        "try {",
+        "    scoop reset python",
+        "    iex \"$(scoop which python) setup.py install\"",
+        "}",
+        "finally {",
+        "    popd",
+        "}"
+    ],
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/msiemens/PyGitUp/archive/v$version.zip",

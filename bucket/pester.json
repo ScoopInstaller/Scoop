@@ -7,29 +7,29 @@
     "hash": "34cabbfb33d46f9a91386308a3b86023af602845980b6c8507979db5c29214d0",
     "extract_dir": "pester-4.3.1",
     "bin": "bin\\pester.bat",
-    "post_install": "
-        $import = \"try { `$null = gcm pester -ea stop; import-module `\"$dir\\pester.psm1`\" } catch { }\"
-
-        if($profile) {
-            'adding pester to powershell profile...'
-            if(!(test-path $profile)) {
-                'powershell profile doesn''t exist. creating...'
-                $profile_dir = split-path $profile
-                if(!(test-path $profile_dir)) { mkdir $profile_dir > $null }
-                '' > $profile
-            }
-
-            $text = get-content $profile
-            if (($text | sls 'pester') -eq $null) {
-                $new_profile = @($text) + $import
-                $new_profile > $profile
-                success 'pester added to powershell profile.'
-            }
-        } else { warn 'no powershell profile found. the pester module will not be imported each session.' }
-
-        'importing pester for current session...'
-        iex \"$import\"
-    ",
+    "post_install": [
+        "$import = \"try { `$null = gcm pester -ea stop; import-module `\"$dir\\pester.psm1`\" } catch { }\"",
+        "",
+        "if($profile) {",
+        "    'adding pester to powershell profile...'",
+        "    if(!(test-path $profile)) {",
+        "        'powershell profile doesn''t exist. creating...'",
+        "        $profile_dir = split-path $profile",
+        "        if(!(test-path $profile_dir)) { mkdir $profile_dir > $null }",
+        "        '' > $profile",
+        "    }",
+        "",
+        "    $text = get-content $profile",
+        "    if (($text | sls 'pester') -eq $null) {",
+        "        $new_profile = @($text) + $import",
+        "        $new_profile > $profile",
+        "        success 'pester added to powershell profile.'",
+        "    }",
+        "} else { warn 'no powershell profile found. the pester module will not be imported each session.' }",
+        "",
+        "'importing pester for current session...'",
+        "iex \"$import\""
+    ],
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/pester/pester/archive/$version.tar.gz",

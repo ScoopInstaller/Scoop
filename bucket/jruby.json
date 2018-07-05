@@ -20,8 +20,10 @@
             "java/openjdk"
         ]
     },
-    "notes": "Install a JDK and set JAVA_HOME if you don't already have. JRuby won't work without it.
-Also note that this installation overrides GEM_HOME and GEM_PATH from any previous Ruby or JRuby installation.",
+    "notes": [
+        "Install a JDK and set JAVA_HOME if you don't already have. JRuby won't work without it.",
+        "Also note that this installation overrides GEM_HOME and GEM_PATH from any previous Ruby or JRuby installation."
+    ],
     "checkver": {
         "url": "http://jruby.org/download",
         "re": "Current Release:\\s+JRuby\\s+([\\d.]+)"
