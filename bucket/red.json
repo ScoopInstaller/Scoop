@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.red-lang.org",
     "version": "0.6.3",
-    "license": "BSD-3 AND BSL-1.0",
+    "license": "BSD-3-Clause,BSL-1.0",
     "url": "https://static.red-lang.org/dl/win/red-063.exe#/red.exe",
     "hash": "105d0f7b009a802a35a636c5dbedc69e89477fd62b6ba77690845fd78d436171",
     "bin": "red.exe",

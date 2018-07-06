@@ -1,7 +1,8 @@
 {
     "version": "2018.1.2",
     "homepage": "https://www.jetbrains.com/resharper/download/index.html#section=resharper-clt",
-    "license": "https://www.jetbrains.com/resharper/buy/command_line_license.html",
+    "license": "Freeware",
+    "_comment": "license_url=https://www.jetbrains.com/resharper/buy/command_line_license.html",
     "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.2018.1.2.zip",
     "hash": "2dbb844c4082a73e01d47395fd75cf52d35c05259dadbfaa74a54d1887f769b7",
     "bin": [

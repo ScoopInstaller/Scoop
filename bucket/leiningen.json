@@ -1,6 +1,6 @@
 {
     "version": "2.8.1",
-    "license": "Eclipse Public License 1.0",
+    "license": "EPL-1.0",
     "url": "https://raw.githubusercontent.com/technomancy/leiningen/2.8.1/bin/lein.bat",
     "homepage": "https://github.com/technomancy/leiningen",
     "bin": "lein.bat",
