@@ -1,7 +1,7 @@
 {
     "homepage": "http://strawberryperl.com",
     "version": "5.26.2.1",
-    "license": "GPL",
+    "license": "Artistic-1.0-Perl|GPL-1.0-or-later",
     "architecture": {
         "32bit": {
             "url": "http://strawberryperl.com/download/5.26.2.1/strawberry-perl-5.26.2.1-32bit-portable.zip",

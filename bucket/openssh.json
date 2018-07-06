@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.openssh.com/",
     "version": "7.6p1",
-    "license": "ISC license",
+    "license": "ISC",
     "architecture": {
         "64bit": {
             "url": [
