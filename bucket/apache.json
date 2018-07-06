@@ -4,12 +4,12 @@
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.33-win64-VC15.zip",
-            "hash": "A9F94DBA6AFFE3BD98FEC01EF77DC932C123E25E360D29D970CC2CDD9F5BA237"
+            "url": "https://fossies.org/windows/www/httpd-2.4.33-win64-VC15.zip",
+            "hash": "a9f94dba6affe3bd98fec01ef77dc932c123e25e360d29d970cc2cdd9f5ba237"
         },
         "32bit": {
-            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.33-win32-VC15.zip",
-            "hash": "52BA4FC88E661FE3C775E40EBC93E0B277F4470BCC2185F4F9D2A2C6A2DC05E5"
+            "url": "https://fossies.org/windows/www/httpd-2.4.33-win32-VC15.zip",
+            "hash": "52ba4fc88e661fe3c775e40ebc93e0b277f4470bcc2185f4f9d2a2c6a2dc05e5"
         }
     },
     "extract_dir": "Apache24",
@@ -36,21 +36,20 @@ $root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\
 (gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf
 ",
     "checkver": {
-        "url": "https://www.apachelounge.com/download/",
-        "re": "Apache ([\\d.]+) Win32"
+        "url": "https://fossies.org/search?q=folder_search&q1=httpd&ad=%2Ffresh%2Fwindows%2Fwww&ca=yes&dp=1",
+        "re": "httpd-([\\d.]+)-win64-VC15.zip"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-$version-win64-VC15.zip"
+                "url": "https://fossies.org/windows/www/httpd-$version-win64-VC15.zip"
             },
             "32bit": {
-                "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-$version-win32-VC15.zip"
+                "url": "https://fossies.org/windows/www/httpd-$version-win32-VC15.zip"
             }
         },
         "hash": {
-            "url": "$url.txt",
-            "find": "SHA256-Checksum for: (?:$basename):\\s+([a-fA-F0-9]{64})"
+            "url": "$url_fossies.sha256"
         }
     }
 }
