@@ -46,9 +46,9 @@
         }
     },
     "pre_install": "echo \"if (`$args.count -eq 0) {`n `t`Start-Process -WorkingDirectory `\"`$psscriptroot`\" -f unbound.exe  -a '-c service.conf'-WindowStyle Hidden`n`tWrite-Host -F Green `\"Unbound started in background.``nRun 'ps -n unbound' to show the processes``nRun 'kill -n unbound' to stop the processes`\"`n} else {`n`t& `$psscriptroot @args `n}\" | out-file $dir\\unbound.ps1",
-    "post_install": "
-        (gc \"$dir\\create_unbound_ad_servers.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\create_unbound_ad_servers.cmd\"
-        (gc \"$dir\\unbound_cache.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound_cache.cmd\"
-        (gc \"$dir\\unbound-control-setup.cmd\").Replace('C:\\Program Files', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound-control-setup.cmd\"
-    "
+    "post_install": [
+        "(gc \"$dir\\create_unbound_ad_servers.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\create_unbound_ad_servers.cmd\"",
+        "(gc \"$dir\\unbound_cache.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound_cache.cmd\"",
+        "(gc \"$dir\\unbound-control-setup.cmd\").Replace('C:\\Program Files', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound-control-setup.cmd\""
+    ]
 }

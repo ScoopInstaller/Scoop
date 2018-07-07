@@ -100,19 +100,20 @@
             "python3"
         ]
     ],
-    "post_install": "
-        python -m ensurepip; cp (gcm pip3).path \"$(split-path (gcm pip3).path)/pip.exe\"
-        $create_reg = {
-            param($path, $value)
-            $reg_base = \"Registry::HKEY_CURRENT_USER\\Software\"
-            new-item -path \"$reg_base\\$path\" -force | out-null
-            new-itemproperty -path \"$reg_base\\$path\" `
-                -name \"(Default)\" -value \"$value\" -force | out-null
-        }
-        $create_reg.Invoke(\"Classes\\Python.File\\shell\\open\\command\", \"`\"$dir\\py.exe`\" `\"%1`\" %*\")
-        $create_reg.Invoke(\"Classes\\.py\", \"Python.File\")
-        $create_reg.Invoke(\"Python\\PythonCore\\3.5\\InstallPath\", \"$dir\")
-        $create_reg.Invoke(\"Python\\PythonCore\\3.5\\PythonPath\", \"$dir;$dir\\Lib\\;$dir\\DLLs\\\")",
+    "post_install": [
+        "python -m ensurepip; cp (gcm pip3).path \"$(split-path (gcm pip3).path)/pip.exe\"",
+        "$create_reg = {",
+        "    param($path, $value)",
+        "    $reg_base = \"Registry::HKEY_CURRENT_USER\\Software\"",
+        "    new-item -path \"$reg_base\\$path\" -force | out-null",
+        "    new-itemproperty -path \"$reg_base\\$path\" `",
+        "        -name \"(Default)\" -value \"$value\" -force | out-null",
+        "}",
+        "$create_reg.Invoke(\"Classes\\Python.File\\shell\\open\\command\", \"`\"$dir\\py.exe`\" `\"%1`\" %*\")",
+        "$create_reg.Invoke(\"Classes\\.py\", \"Python.File\")",
+        "$create_reg.Invoke(\"Python\\PythonCore\\3.5\\InstallPath\", \"$dir\")",
+        "$create_reg.Invoke(\"Python\\PythonCore\\3.5\\PythonPath\", \"$dir;$dir\\Lib\\;$dir\\DLLs\\\")"
+    ],
     "env_add_path": [
         "scripts"
     ],

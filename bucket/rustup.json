@@ -21,14 +21,14 @@
         "RUSTUP_HOME": "$persist_dir\\.rustup"
     },
     "installer": {
-        "script": "
-            # Create environment variables for this process
-            [Environment]::SetEnvironmentVariable('CARGO_HOME', \"$persist_dir\\.cargo\", 'Process')
-            [Environment]::SetEnvironmentVariable('RUSTUP_HOME', \"$persist_dir\\.rustup\", 'Process')
-
-            # Install Rustup
-            & \"$dir\\rustup-init.exe\" -y --no-modify-path --default-toolchain stable-gnu
-        "
+        "script": [
+            "# Create environment variables for this process",
+            "[Environment]::SetEnvironmentVariable('CARGO_HOME', \"$persist_dir\\.cargo\", 'Process')",
+            "[Environment]::SetEnvironmentVariable('RUSTUP_HOME', \"$persist_dir\\.rustup\", 'Process')",
+            "",
+            "# Install Rustup",
+            "& \"$dir\\rustup-init.exe\" -y --no-modify-path --default-toolchain stable-gnu"
+        ]
     },
     "notes": "To use the MSVC ABI without Visual Studio 2015 (or higher) installed, you will need the Visual Studio 2017 Build Tools: https://www.visualstudio.com/downloads/#build-tools-for-visual-studio-2017"
 }
