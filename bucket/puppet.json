@@ -1,32 +1,34 @@
 {
     "homepage": "https://puppetlabs.com",
-    "version": "3.7.0",
+    "version": "5.5.3",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.puppetlabs.com/windows/puppet-3.7.0-x64.msi",
-            "hash": "56e7be8e94e6e4feec628fd956d64831a4d7e0aa78d9a3b3833877a97f8bbec5"
+            "url": "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-5.5.3-x64.msi",
+            "hash": "1fef4287c84eff46754f3435b93beb173e72e6b26250b4529f4658836294822f"
         },
         "32bit": {
-            "url": "https://downloads.puppetlabs.com/windows/puppet-3.7.0.msi",
-            "hash": "df22934cd64e271d9034874011c98378db4e4a6767436faa4576f04ef6fc4cce"
+            "url": "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-5.5.3-x86.msi",
+            "hash": "2639d48e140fdf53c65b054abaed4f676f29851ed9ef52d2828cb1a5402636d3"
         }
     },
     "bin": [
-        "Puppet Labs/Puppet/bin\\facter.bat",
-        "Puppet Labs/Puppet/bin\\hiera.bat",
-        "Puppet Labs/Puppet/bin\\puppet.bat"
+        "Puppet Labs\\Puppet\\bin\\facter.bat",
+        "Puppet Labs\\Puppet\\bin\\facter_interactive.bat",
+        "Puppet Labs\\Puppet\\bin\\hiera.bat",
+        "Puppet Labs\\Puppet\\bin\\puppet.bat",
+        "Puppet Labs\\Puppet\\bin\\puppet_interactive.bat"
     ],
     "checkver": {
-        "url": "https://downloads.puppetlabs.com/windows/?C=N;O=D",
-        "re": "puppet-([\\d.]+)-x64.msi</a>"
+        "url": "https://downloads.puppetlabs.com/windows/puppet5/index_by_name_reverse.html",
+        "re": "puppet-agent-([\\d.]+)-x64.msi"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://downloads.puppetlabs.com/windows/puppet-$version-x64.msi"
+                "url": "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-$version-x64.msi"
             },
             "32bit": {
-                "url": "https://downloads.puppetlabs.com/windows/puppet-$version.msi"
+                "url": "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-$version-x86.msi"
             }
         }
     }
