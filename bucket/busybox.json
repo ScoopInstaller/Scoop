@@ -26,17 +26,17 @@
             }
         }
     },
-    "post_install": "
-        if(!(test-path ~/.profile)) {
-            'creating ~/.profile'
-@\"
-if [ -e ~/.bashrc ]
-then
-    source ~/.bashrc
-fi
-\"@ | out-file -en oem ~/.profile
-        }
-    ",
+    "post_install": [
+        "if(!(test-path ~/.profile)) {",
+        "    'creating ~/.profile'",
+        "@\"",
+        "if [ -e ~/.bashrc ]",
+        "then",
+        "   source ~/.bashrc",
+        "fi",
+        "\"@ | out-file -en oem ~/.profile",
+        "}"
+    ],
     "bin": [
         "busybox.exe",
         [

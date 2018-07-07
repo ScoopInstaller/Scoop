@@ -7,13 +7,13 @@
         "url": "https://github.com/bmatzelle/gow/releases",
         "re": "<a.*?>Gow ([\\d.]+)</a>"
     },
-    "pre_install": "
-        \"@cscript //NoLogo \"\"$dir\\bin\\gow.vbs\"\" %1\" | Set-Content -force \"$dir\\bin\\gow.bat\"
-    ",
-    "post_install": "
-        # create etc directory (required by bash), if needed
-        if (! (test-path \"$dir\\etc\")) { new-item -itemtype directory \"$dir\\etc\" }
-    ",
+    "pre_install": [
+        "\"@cscript //NoLogo \"\"$dir\\bin\\gow.vbs\"\" %1\" | Set-Content -force \"$dir\\bin\\gow.bat\""
+    ],
+    "post_install": [
+        "# create etc directory (required by bash), if needed",
+        "if (! (test-path \"$dir\\etc\")) { new-item -itemtype directory \"$dir\\etc\" }"
+    ],
     "bin": [
         "bin\\awk.exe",
         "bin\\basename.exe",

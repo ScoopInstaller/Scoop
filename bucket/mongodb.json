@@ -22,11 +22,11 @@
         "bin\\mongostat.exe",
         "bin\\mongotop.exe"
     ],
-    "post_install": "
-        # create initial directories
-        if(!(test-path 'C:\\data')) { mkdir 'C:\\data' > $null }
-        if(!(test-path 'C:\\data\\db')) { mkdir 'C:\\data\\db' > $null }
-    ",
+    "post_install": [
+        "# create initial directories",
+        "if(!(test-path 'C:\\data')) { mkdir 'C:\\data' > $null }",
+        "if(!(test-path 'C:\\data\\db')) { mkdir 'C:\\data\\db' > $null }"
+    ],
     "checkver": {
         "url": "https://www.mongodb.com/download-center",
         "re": "Current Stable Release \\(([\\d.]+)\\)"

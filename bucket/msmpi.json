@@ -11,12 +11,13 @@
     "architecture": {
         "64bit": {
             "installer": {
-                "script": "
-                    7z x -r \"$dir\\tmp\\4.msi\" -o\"$dir\"
-                    Remove-Item \"$dir\\msmpires.dll\"
-                    Remove-Item \"$dir\\msmpi.dll\"
-                    Rename-Item \"$dir\\msmpires64.dll\" \"$dir\\msmpires.dll\"
-                    Rename-Item \"$dir\\msmpi64.dll\" \"$dir\\msmpi.dll\""
+                "script": [
+                    "7z x -r \"$dir\\tmp\\4.msi\" -o\"$dir\"",
+                    "Remove-Item \"$dir\\msmpires.dll\"",
+                    "Remove-Item \"$dir\\msmpi.dll\"",
+                    "Rename-Item \"$dir\\msmpires64.dll\" \"$dir\\msmpires.dll\"",
+                    "Rename-Item \"$dir\\msmpi64.dll\" \"$dir\\msmpi.dll\""
+                ]
             }
         },
         "32bit": {

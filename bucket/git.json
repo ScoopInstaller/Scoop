@@ -31,12 +31,14 @@
     "post_install": [
         "git config --global credential.helper manager"
     ],
-    "notes": "To get Git to recognise OpenSSH, you will need to run
-
-scoop install openssh
-[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')
-
-and then restart powershell.",
+    "notes": [
+        "To get Git to recognise OpenSSH, you will need to run",
+        "",
+        "scoop install openssh",
+        "[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')",
+        "",
+        "and then restart powershell."
+    ],
     "checkver": {
         "url": "https://github.com/git-for-windows/git/releases/latest",
         "re": "v(?<version>[\\d\\w.]+)/PortableGit-(?<short>[\\d.]+).*\\.exe"

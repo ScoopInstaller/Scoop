@@ -76,11 +76,13 @@
             "-d"
         ]
     ],
-    "post_install": "if( !(test-path ~\\.vimrc) -and !(test-path ~\\_vimrc) -and !(test-path ~\\vimfiles\\vimrc) -and !(test-path $env:VIM\\_vimrc) ) {
-        cp \"$dir\\vimrc_example.vim\" ~\\_vimrc
-        \"set shell=$((gcm powershell).path)\\ -executionpolicy\\ bypass\" | out-file  ~\\_vimrc -append -encoding ascii
-        echo 'Default vimrc file created in ~/_vimrc, with shell set to PowerShell.'
-    } else { echo 'Existing vimrc file found, no default configuration created' }",
+    "post_install": [
+        "if( !(test-path ~\\.vimrc) -and !(test-path ~\\_vimrc) -and !(test-path ~\\vimfiles\\vimrc) -and !(test-path $env:VIM\\_vimrc) ) {",
+        "    cp \"$dir\\vimrc_example.vim\" ~\\_vimrc",
+        "    \"set shell=$((gcm powershell).path)\\ -executionpolicy\\ bypass\" | out-file  ~\\_vimrc -append -encoding ascii",
+        "    echo 'Default vimrc file created in ~/_vimrc, with shell set to PowerShell.'",
+        "} else { echo 'Existing vimrc file found, no default configuration created' }"
+    ],
     "checkver": {
         "github": "https://github.com/vim/vim-win32-installer"
     },
