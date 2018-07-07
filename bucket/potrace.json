@@ -1,0 +1,31 @@
+{
+    "homepage": "http://potrace.sourceforge.net/",
+    "version": "1.15",
+    "license": "GPL-2.0-or-later",
+    "architecture": {
+        "64bit": {
+            "url": "http://potrace.sourceforge.net/download/1.15/potrace-1.15.win64.zip",
+            "hash": "d7d4cdf7e61eec711522e7f4868d3ea4f1f95eeff0824f12c2bbf645b82f2614",
+            "extract_dir": "potrace-1.15.win64"
+        },
+        "32bit": {
+            "url": "http://potrace.sourceforge.net/download/1.15/potrace-1.15.win32.zip",
+            "hash": "05e671a23117198a2e23ad0bfd7eeefe80147c02c985830d8fc9b9969ad3d99e",
+            "extract_dir": "potrace-1.15.win32"
+        }
+    },
+    "bin": "potrace.exe",
+    "checkver": "potrace-([\\d.]+)\\.win64\\.zip",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://potrace.sourceforge.net/download/$version/potrace-$version.win64.zip",
+                "extract_dir": "potrace-$version.win64"
+            },
+            "32bit": {
+                "url": "http://potrace.sourceforge.net/download/$version/potrace-$version.win32.zip",
+                "extract_dir": "potrace-$version.win32"
+            }
+        }
+    }
+}
