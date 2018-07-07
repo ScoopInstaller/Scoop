@@ -33,6 +33,8 @@
             }
         }
     },
-    "notes": "Manage Services with NSSM (GUI based) (e.g., 'nssm install nginx' to install nginx as service gui will popup or 'nssm start/status/stop apache').
-Visit https://nssm.cc/commands for more info"
+    "notes": [
+        "Manage Services with NSSM (GUI based) (e.g., 'nssm install nginx' to install nginx as service gui will popup or 'nssm start/status/stop apache').",
+        "Visit https://nssm.cc/commands for more info"
+    ]
 }

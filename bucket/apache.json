@@ -29,12 +29,12 @@
         "bin\\logresolve.exe",
         "bin\\rotatelogs.exe"
     ],
-    "post_install": "
-# set directory in httpd.conf
-$conf = \"$dir/conf/httpd.conf\"
-$root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\\', '/';
-(gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf
-",
+    "post_install": [
+        "# set directory in httpd.conf",
+        "$conf = \"$dir/conf/httpd.conf\"",
+        "$root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\\', '/';",
+        "(gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf"
+    ],
     "checkver": {
         "url": "https://fossies.org/search?q=folder_search&q1=httpd&ad=%2Ffresh%2Fwindows%2Fwww&ca=yes&dp=1",
         "re": "httpd-([\\d.]+)-win64-VC15.zip"

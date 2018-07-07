@@ -29,16 +29,16 @@
     "persist": [
         "data"
     ],
-    "post_install": "
-#Initialize data directory (without generating root password)
-if (!(Test-Path \"$dir\\data\\auto.cnf\")) {
-    mysqld --initialize-insecure
-}
-#Output client configuration to my.ini file so no username is required when connecting
-echo \"\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
-echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
-echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append
-",
+    "post_install": [
+        "#Initialize data directory (without generating root password)",
+        "if (!(Test-Path \"$dir\\data\\auto.cnf\")) {",
+        "    mysqld --initialize-insecure",
+        "}",
+        "#Output client configuration to my.ini file so no username is required when connecting",
+        "echo \"\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
+        "echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
+        "echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append"
+    ],
     "checkver": {
         "url": "https://dev.mysql.com/downloads/mysql/",
         "re": "<h1>MySQL Community Server ([\\d.]+)"

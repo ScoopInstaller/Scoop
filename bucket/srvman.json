@@ -19,6 +19,8 @@
         ]
     ],
     "checkver": "The latest version[^<]+<a href=\"[^\"]+srvman-([\\d.]+)\\.zip\"",
-    "notes": "Always use sudo to start, stop or edit (e.g., 'sudo srvman start nginx' or 'sudo service restart apache').
-Visit http://tools.sysprogs.org/srvman/ for more info"
+    "notes": [
+        "Always use sudo to start, stop or edit (e.g., 'sudo srvman start nginx' or 'sudo service restart apache').",
+        "Visit http://tools.sysprogs.org/srvman/ for more info"
+    ]
 }

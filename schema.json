@@ -241,7 +241,7 @@
                     "type": "string"
                 },
                 "script": {
-                    "type": "string"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "keep": {
                     "type": "boolean"
@@ -286,7 +286,7 @@
                     "type": "string"
                 },
                 "script": {
-                    "type": "string"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             },
             "oneOf": [
@@ -330,11 +330,11 @@
     "properties": {
         "_comment": {
             "description": "Undocumented: only found in scoop/git* and 6 manifests in scoop-extras",
-            "type": "string"
+            "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "##": {
             "description": "A comment.",
-            "type": "string"
+            "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "architecture": {
             "additionalProperties": false,

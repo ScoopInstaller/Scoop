@@ -559,7 +559,7 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
     $installer = installer $manifest $architecture
     if($installer.script) {
         write-output "Running installer script..."
-        Invoke-Expression $installer.script
+        Invoke-Expression (@($installer.script) -join "`r`n")
         return
     }
 
@@ -649,7 +649,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
     $uninstaller = uninstaller $manifest $architecture
     if($uninstaller.script) {
         write-output "Running uninstaller script..."
-        Invoke-Expression $uninstaller.script
+        Invoke-Expression (@($uninstaller.script) -join "`r`n")
         return
     }
 
