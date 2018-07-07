@@ -1,7 +1,10 @@
 {
     "version": "18.05",
     "homepage": "https://mediaarea.net/en/MediaInfo",
-    "license": "BSD",
+    "license": {
+        "identifier": "BSD-2-Clause",
+        "url": "https://mediaarea.net/en/MediaInfo/License"
+    },
     "architecture": {
         "64bit": {
             "url": "https://mediaarea.net/download/binary/mediainfo/18.05/MediaInfo_CLI_18.05_Windows_x64.zip",

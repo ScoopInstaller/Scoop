@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.packer.io",
-    "license": "Mozilla Public License 2.0",
+    "license": "MPL-2.0",
     "version": "1.2.3",
     "architecture": {
         "64bit": {

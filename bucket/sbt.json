@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.scala-sbt.org/",
     "version": "1.1.6",
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "url": "https://github.com/sbt/sbt/releases/download/v1.1.6/sbt-1.1.6.zip",
     "hash": "73811a1789261da9334f1016bc0538953a24e0953690c75c9c2e59eb20c4983c",
     "extract_dir": "sbt",

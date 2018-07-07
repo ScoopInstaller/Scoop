@@ -1,7 +1,7 @@
 {
     "version": "2.94",
     "homepage": "https://transmissionbt.com/",
-    "license": "GPL-2.0 OR GPL-3.0",
+    "license": "GPL-2.0-only|GPL-3.0-only",
     "architecture": {
         "64bit": {
             "url": "https://github.com/transmission/transmission-releases/raw/master/transmission-2.94-x64.msi",
