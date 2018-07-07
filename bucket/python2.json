@@ -1,0 +1,44 @@
+{
+    "homepage": "https://www.python.org/",
+    "license": "https://docs.python.org/2/license.html",
+    "version": "2.7.13",
+    "architecture": {
+        "64bit": {
+            "url": "https://www.python.org/ftp/python/2.7.13/python-2.7.13.amd64.msi",
+            "hash": "8b3e65fc1aad8809bb69477e922c3609a8e8fa9e2f6d5ab8f00f3553e3c61d7a"
+        },
+        "32bit": {
+            "url": "https://www.python.org/ftp/python/2.7.13/python-2.7.13.msi"
+        }
+    },
+    "bin": [
+        "python.exe",
+        "pythonw.exe",
+        [
+            "python.exe",
+            "python2"
+        ],
+        "Lib\\idlelib\\idle.bat",
+        [
+            "Lib\\idlelib\\idle.bat",
+            "idle3"
+        ]
+    ],
+    "env_add_path": [
+        "scripts"
+    ],
+    "checkver": {
+        "url": "https://www.python.org/downloads/windows/",
+        "re": "Latest Python 2 Release - Python ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://www.python.org/ftp/python/$version/python-$version.amd64.exe"
+            },
+            "32bit": {
+                "url": "https://www.python.org/ftp/python/$version/python-$version.exe"
+            }
+        }
+    }
+}
