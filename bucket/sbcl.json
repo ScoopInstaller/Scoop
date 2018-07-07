@@ -5,15 +5,14 @@
     "architecture": {
         "64bit": {
             "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-64-windows-binary.msi",
-            "hash": "sha1:e895c6b92aa5c590db9c3c88a6f0d543744094e4"
+            "hash": "sha1:e895c6b92aa5c590db9c3c88a6f0d543744094e4",
+            "extract_dir": "PFiles\\Steel Bank Common Lisp\\1.4.2"
         }
     },
     "env_set": {
-        "SBCL_HOME": "$dir\\PFiles\\Steel Bank Common Lisp\\1.3.18"
+        "SBCL_HOME": "$dir"
     },
-    "bin": [
-        "PFiles\\Steel Bank Common Lisp\\1.3.18\\sbcl.exe"
-    ],
+    "bin": "sbcl.exe",
     "checkver": {
         "url": "http://www.sbcl.org/platform-table.html",
         "re": "sbcl-([\\d.]+)-x86-64-windows"
@@ -21,7 +20,8 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/$version/sbcl-$version-x86-64-windows-binary.msi"
+                "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/$version/sbcl-$version-x86-64-windows-binary.msi",
+                "extract_dir": "PFiles\\Steel Bank Common Lisp\\$version"
             }
         }
     },
