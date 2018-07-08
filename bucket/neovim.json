@@ -1,6 +1,9 @@
 {
     "version": "0.3.0",
-    "license": "https://github.com/neovim/neovim/blob/master/LICENSE",
+    "license": {
+        "identifier": "Apache-2.0,MIT,Vim,Freeware(Node.js)",
+        "url": "https://github.com/neovim/neovim/blob/master/LICENSE"
+    },
     "architecture": {
         "64bit": {
             "url": "https://github.com/neovim/neovim/releases/download/v0.3.0/nvim-win64.zip",

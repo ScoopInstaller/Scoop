@@ -398,7 +398,27 @@
             "$ref": "#/definitions/installer"
         },
         "license": {
-            "type": "string"
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "url": {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        "identifier": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "identifier"
+                    ],
+                    "type": "object"
+                }
+            ]
         },
         "msi": {
             "$ref": "#/definitions/stringOrArrayOfStrings",

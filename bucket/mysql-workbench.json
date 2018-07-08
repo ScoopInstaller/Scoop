@@ -1,6 +1,6 @@
 {
     "version": "6.3.10",
-    "license": "GPL",
+    "license": "GPL-2.0-only",
     "homepage": "https://dev.mysql.com/downloads/workbench/",
     "architecture": {
         "64bit": {

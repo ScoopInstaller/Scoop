@@ -2,7 +2,7 @@
     "description": "The open source design documentation tool",
     "version": "1.0.1",
     "homepage": "https://github.com/vitiral/artifact",
-    "license": "MIT OR Apache-2.0",
+    "license": "MIT|Apache-2.0",
     "bin": "art.exe",
     "checkver": "github",
     "architecture": {

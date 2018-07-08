@@ -1,7 +1,7 @@
 {
     "homepage": "https://pcre.org/",
     "version": "10.20",
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "architecture": {
         "32bit": {
             "url": "https://github.com/rivy/PCRE/releases/download/10.20/pcre2grep-10.20-x32.zip",
