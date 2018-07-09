@@ -443,8 +443,9 @@ function hash_for_url($manifest, $url, $arch) {
 
 # returns (ok, err)
 function check_hash($file, $hash, $app_name) {
+    $file = fullpath $file
     if(!$hash) {
-        warn "Warning: No hash in manifest. SHA256 is:`n    $(compute_hash (fullpath $file) 'sha256')"
+        warn "Warning: No hash in manifest. SHA256 is:`n    $(compute_hash $file) 'sha256')"
         return $true, $null
     }
 
@@ -459,18 +460,21 @@ function check_hash($file, $hash, $app_name) {
         return $false, "Hash type '$type' isn't supported."
     }
 
-    $actual = compute_hash (fullpath $file) $type
-
+    $actual = (compute_hash $file $type).ToLower()
     $expected = $expected.ToLower()
-    $actual = $actual.ToLower()
 
     if($actual -ne $expected) {
         $msg = "Hash check failed!`n"
-        $msg += "App:       $app_name`n"
-        $msg += "URL:       $url`n"
+        $msg += "App:         $app_name`n"
+        $msg += "URL:         $url`n"
+        if(Test-Path $file) {
+            $hexbytes = Get-Content $file -Encoding byte -TotalCount 8 | ForEach-Object { $_.tostring('x2') }
+            $hexbytes = [string]::join(' ', $hexbytes).ToUpper()
+            $msg += "First bytes: $hexbytes`n"
+        }
         if($expected -or $actual) {
-            $msg += "Expected:  $expected`n"
-            $msg += "Actual:    $actual"
+            $msg += "Expected:    $expected`n"
+            $msg += "Actual:      $actual"
         }
         return $false, $msg
     }
