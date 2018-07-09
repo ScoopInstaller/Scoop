@@ -20,6 +20,7 @@
         "bin\\curr_arch\\rterm.exe",
         "bin\\curr_arch\\rscript.exe"
     ],
+    "persist": "library",
     "notes": [
         "You'll need to type 'r.ps1' or 'r.cmd' to run R, because in Powershell 'r' runs the last command. Alternatively 'rterm' can be used to start the interactive R terminal session.",
         "",
