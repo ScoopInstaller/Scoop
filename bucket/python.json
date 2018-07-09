@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.python.org/",
-    "license": "https://docs.python.org/3/license.html",
+    "license": "Python-2.0",
     "version": "3.7.0",
     "architecture": {
         "64bit": {

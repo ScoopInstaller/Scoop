@@ -1,7 +1,7 @@
 {
     "homepage": "https://pngquant.org/",
     "description": "A command-line utility for lossy compression of PNG images",
-    "license": "GPL",
+    "license": "GPL-3.0-only",
     "version": "2.11.7",
     "hash": "2ec61729baeec7b0f1d7c11b5444d0419362b4ddfe2fc1f8d010710e71e2815b",
     "url": "https://pngquant.org/pngquant-windows.zip",

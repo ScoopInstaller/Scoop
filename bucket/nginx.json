@@ -1,7 +1,7 @@
 {
     "homepage": "https://nginx.org",
     "version": "1.15.1",
-    "license": "BSD",
+    "license": "BSD-2-Clause",
     "url": "https://nginx.org/download/nginx-1.15.1.zip",
     "hash": "b5044013bdf2736e871cd63eb25e1e2d96a606dfafff81ffa03069c6ceffa6cb",
     "extract_dir": "nginx-1.15.1",

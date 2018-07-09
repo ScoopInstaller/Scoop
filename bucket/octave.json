@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.gnu.org/software/octave/",
     "version": "4.4.0",
-    "license": "GNU GPL",
+    "license": "GPL-3.0-only",
     "architecture": {
         "64bit": {
             "url": "https://ftp.gnu.org/gnu/octave/windows/octave-4.4.0-w64.zip",
