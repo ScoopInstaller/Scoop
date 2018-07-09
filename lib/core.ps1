@@ -244,9 +244,28 @@ function movedir($from, $to) {
     $from = $from.trimend('\')
     $to = $to.trimend('\')
 
-    $out = robocopy "$from" "$to" /e /move
-    if($lastexitcode -ge 8) {
-        throw "Could not find '$(fname $from)'! (error $lastexitcode)"
+    $proc = New-Object System.Diagnostics.Process
+    $proc.StartInfo.FileName = 'robocopy.exe'
+    $proc.StartInfo.Arguments = "$from $to /e /move"
+    $proc.StartInfo.RedirectStandardOutput = $true
+    $proc.StartInfo.RedirectStandardError = $true
+    $proc.StartInfo.UseShellExecute = $false
+    $proc.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    $proc.Start()
+    $out = $proc.StandardOutput.ReadToEnd()
+    $proc.WaitForExit()
+
+    if($proc.ExitCode -ge 8) {
+        debug $out
+        throw "Could not find '$(fname $from)'! (error $($proc.ExitCode))"
+    }
+
+    # wait for robocopy to terminate its threads
+    1..10 | ForEach-Object {
+        if (!(Test-Path $from)) {
+            break
+        }
+        Start-Sleep -Milliseconds 100
     }
 }
 
