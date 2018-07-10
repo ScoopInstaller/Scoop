@@ -262,10 +262,9 @@ function movedir($from, $to) {
 
     # wait for robocopy to terminate its threads
     1..10 | ForEach-Object {
-        if (!(Test-Path $from)) {
-            break
+        if (Test-Path $from) {
+            Start-Sleep -Milliseconds 100
         }
-        Start-Sleep -Milliseconds 100
     }
 }
 
