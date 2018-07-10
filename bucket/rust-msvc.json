@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.rust-lang.org",
-    "version": "1.27.0",
+    "version": "1.27.1",
     "license": "MIT OR Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.27.0-x86_64-pc-windows-msvc.msi",
-            "hash": "400219afb45c2a719b74c7680aaad2e60aee931734f9aa5163a5a73d0aa6fc49"
+            "url": "https://static.rust-lang.org/dist/rust-1.27.1-x86_64-pc-windows-msvc.msi",
+            "hash": "77006aa3727e8296a3ab9e7657da989975578da2f111d6f53d3d8def33b26990"
         },
         "32bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.27.0-i686-pc-windows-msvc.msi",
-            "hash": "8eda61fd09d264b5c723411da2a57726dfcf6f52263f4205bc7bd9ceb0804b4b"
+            "url": "https://static.rust-lang.org/dist/rust-1.27.1-i686-pc-windows-msvc.msi",
+            "hash": "fc909aca15e834fd2c21b1b7469193d14d07831631fa440718e568b20155b20d"
         }
     },
     "bin": [
