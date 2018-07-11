@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/motemen/ghq",
     "version": "0.8.0",
-    "license": "MIT License",
+    "license": "MIT",
     "architecture": {
         "64bit": {
             "url": "https://github.com/motemen/ghq/releases/download/v0.8.0/ghq_windows_amd64.zip",

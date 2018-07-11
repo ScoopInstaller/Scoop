@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.graphviz.org/",
     "version": "2.38",
-    "license": "EPL",
+    "license": "EPL-1.0",
     "url": "https://graphviz.gitlab.io/_pages/Download/windows/graphviz-2.38.msi",
     "hash": "c794ea03bc2631fff468f4d97fa6726c536fc98ee579529779aa6f45e94e4f6d",
     "bin": [

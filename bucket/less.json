@@ -1,7 +1,7 @@
 {
     "homepage": "http://www.greenwoodsoftware.com/less/",
     "version": "530",
-    "license": "BSD",
+    "license": "GPL-3.0-only,BSD-3-Clause",
     "bin": [
         "less.exe",
         "lesskey.exe"

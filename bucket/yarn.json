@@ -1,7 +1,7 @@
 {
     "homepage": "https://yarnpkg.com/",
     "description": "Dependency manager",
-    "license": "BSD",
+    "license": "BSD-2-Clause",
     "version": "1.7.0",
     "suggest": {
         "Node.js": [

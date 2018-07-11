@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.nasm.us",
-    "license": "BSD",
+    "license": "BSD-2-Clause",
     "version": "2.13.03",
     "extract_dir": "nasm-2.13.03",
     "architecture": {

@@ -1,7 +1,7 @@
 {
     "homepage": "https://www.pdflabs.com/tools/pdftk-server/",
     "version": "2.02",
-    "license": "GPL",
+    "license": "GPL-2.0-only",
     "url": "https://www.pdflabs.com/tools/pdftk-the-pdf-toolkit/pdftk_server-2.02-win-setup.exe",
     "hash": "cc8f6a43fc91026bb739ad0ad9a124c24750d6127662fb3638ec1d44403aabd2",
     "innosetup": true,

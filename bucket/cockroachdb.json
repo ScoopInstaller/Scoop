@@ -1,7 +1,10 @@
 {
     "homepage": "https://www.cockroachlabs.com/",
     "description": "The SQL database for global cloud services",
-    "license": "https://github.com/cockroachdb/cockroach/blob/master/LICENSE",
+    "license": {
+        "identifier": "Apache-2.0,BSD-3-Clause,MIT,Freeware",
+        "url": "https://github.com/cockroachdb/cockroach/blob/master/LICENSE"
+    },
     "version": "2.0.3",
     "url": "https://binaries.cockroachdb.com/cockroach-v2.0.3.windows-6.2-amd64.zip",
     "hash": "4115e1ab7a38527baa883960c91c00896a3cd8f994f683e1b8048aae5edfec4c",

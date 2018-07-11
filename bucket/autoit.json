@@ -1,7 +1,10 @@
 {
     "homepage": "https://www.autoitscript.com/site/autoit/",
     "description": "Scripting language designed for automating the Windows GUI and general scripting",
-    "license": "https://www.autoitscript.com/autoit3/docs/license.htm",
+    "license": {
+        "identifier": "Freeware",
+        "url": "https://www.autoitscript.com/autoit3/docs/license.htm"
+    },
     "version": "3.3.14.5",
     "url": "https://www.autoitscript.com/files/autoit3/autoit-v3.zip",
     "hash": "df9a20022998c7ac11af23fc69f5d42698ed187b4d03b75fa911570c648d9642",

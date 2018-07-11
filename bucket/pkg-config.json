@@ -1,6 +1,6 @@
 {
     "version": "0.26-1",
-    "license": "GNU GPL",
+    "license": "GPL-2.0-only",
     "url": [
         "https://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.26-1_win32.zip",
         "https://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip",

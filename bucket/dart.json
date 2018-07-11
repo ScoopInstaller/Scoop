@@ -1,6 +1,6 @@
 {
     "version": "1.24.3",
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "homepage": "https://www.dartlang.org/",
     "extract_dir": "dart-sdk",
     "env_add_path": [
