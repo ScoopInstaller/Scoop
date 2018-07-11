@@ -1,17 +1,17 @@
 {
-    "version": "4.0",
+    "version": "4.0.1",
     "homepage": "https://ffmpeg.zeranoe.com/builds/",
     "license": "GPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.0-win64-static.zip",
-            "hash": "bc14ebf92e27c77bc094a47084588dda7a77ce218b8fc68fca3dcf768be63b63",
-            "extract_dir": "ffmpeg-4.0-win64-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.0.1-win64-static.zip",
+            "hash": "19839bb0d2acf3900e3f502a461b39072d9d14b0f6ec9ab781a789e3d10f7e63",
+            "extract_dir": "ffmpeg-4.0.1-win64-static"
         },
         "32bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-4.0-win32-static.zip",
-            "hash": "8b6a9119c7ea4f24dd4a9e5781781acf6b3f8e5f8ad758c0e9d2745064125f76",
-            "extract_dir": "ffmpeg-4.0-win32-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-4.0.1-win32-static.zip",
+            "hash": "3bfbf93dc5810c8da80c5993e0e356a03d64ca0a2cbf6dcbd447eb26dcdf171b",
+            "extract_dir": "ffmpeg-4.0.1-win32-static"
         }
     },
     "bin": [
