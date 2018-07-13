@@ -1,14 +1,14 @@
 {
-    "version": "0.43",
+    "version": "0.44",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/spf13/hugo/releases/download/v0.43/hugo_0.43_windows-64bit.zip",
-            "hash": "907d0922488e40039a7078a89b83e9fa70312e3d6610a4067f491a629f46b315"
+            "url": "https://github.com/spf13/hugo/releases/download/v0.44/hugo_0.44_windows-64bit.zip",
+            "hash": "b16903f0221f4eb4b7718cc2bd0358af76227891a0d5113875dfff4dac3daf30"
         },
         "32bit": {
-            "url": "https://github.com/spf13/hugo/releases/download/v0.43/hugo_0.43_windows-32bit.zip",
-            "hash": "5e5da00419ef280557a7cb6e84483fca7515dc7712a8bfe892d790d472e83eef"
+            "url": "https://github.com/spf13/hugo/releases/download/v0.44/hugo_0.44_windows-32bit.zip",
+            "hash": "0660e331eb6345a00d5b4d6e719bf06c1c91de91b5ef65d309b8ed602ab89188"
         }
     },
     "bin": "hugo.exe",
