@@ -23,7 +23,12 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
     $app, $bucket, $null = parse_app $app
     $unresolved += $app
     $null, $manifest, $null, $null = locate $app $bucket
-    if(!$manifest) { abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })" }
+    if(!$manifest) {
+        if(!(buckets).Contains($bucket)) {
+            warn "Bucket '$bucket' not installed. Add it with 'scoop bucket add $bucket' or 'scoop bucket add $bucket <repo>'."
+        }
+        abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })"
+    }
 
     $deps = @(install_deps $manifest $arch) + @(runtime_deps $manifest) | Select-Object -uniq
 
