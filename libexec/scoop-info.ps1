@@ -51,7 +51,11 @@ Write-Output "Website: $($manifest.homepage)"
 # Show license
 if ($manifest.license) {
     $license = $manifest.license
-    if($manifest.license -notmatch '^((ht)|f)tps?://') {
+    if ($manifest.license.identifier -and $manifest.license.url) {
+        $license = "$($manifest.license.identifier) ($($manifest.license.url))"
+    } elseif ($manifest.license -match '^((ht)|f)tps?://') {
+        $license = "$($manifest.license)"
+    } else {
         $license = "$($manifest.license) (https://spdx.org/licenses/$($manifest.license).html)"
     }
     Write-Output "License: $license"
