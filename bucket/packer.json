@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.packer.io",
     "license": "MPL-2.0",
-    "version": "1.2.3",
+    "version": "1.2.5",
     "architecture": {
         "64bit": {
-            "url": "https://releases.hashicorp.com/packer/1.2.3/packer_1.2.3_windows_amd64.zip",
-            "hash": "c28c4d0710526a9029a9eb4ecc7ab967c267b5be1020680667484f4fe016bd99"
+            "url": "https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_windows_amd64.zip",
+            "hash": "537118113207f14f54352165ef664f53aa674a3b1e69ef653f917bab42f2c688"
         },
         "32bit": {
-            "url": "https://releases.hashicorp.com/packer/1.2.3/packer_1.2.3_windows_386.zip",
-            "hash": "0ac9f62e6bbebaeb848ab0f270928ef6045a1132fda1867072be05206eba5b44"
+            "url": "https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_windows_386.zip",
+            "hash": "a46e6ef42b0d5f7d30a8865be6bd26af3f7baeec70c4f48108c21e09e856222e"
         }
     },
     "bin": [
