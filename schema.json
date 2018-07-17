@@ -329,7 +329,7 @@
     },
     "properties": {
         "_comment": {
-            "description": "Undocumented: only found in scoop/git* and 6 manifests in scoop-extras",
+            "description": "Deprecated. Use ## instead.",
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "##": {
@@ -361,7 +361,7 @@
             "$ref": "#/definitions/checkver"
         },
         "cookie": {
-            "description": "Undocumented: only found in scoop-extras/oraclejdk*",
+            "description": "Undocumented: Found at https://github.com/se35710/scoop-java/search?l=JSON&q=cookie",
             "type": "object"
         },
         "depends": {
@@ -381,7 +381,7 @@
         },
         "extract_to": {
             "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "Undocumented: only found in scoop/ruby*"
+            "description": "No longer used."
         },
         "hash": {
             "$ref": "#/definitions/hash"
@@ -391,7 +391,7 @@
             "type": "string"
         },
         "innosetup": {
-            "description": "Undocumented: only found in 6 manifests in scoop",
+            "description": "True if the installer InnoSetup based. Found in https://github.com/lukesampson/scoop/search?l=JSON&q=innosetup",
             "type": "boolean"
         },
         "installer": {
