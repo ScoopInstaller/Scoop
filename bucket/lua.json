@@ -6,7 +6,8 @@
     "innosetup": true,
     "bin": [
         "lua.exe",
-        "luac.exe"
+        "luac.exe",
+        "luarocks.bat"
     ],
     "depends": [
         "innounp"
