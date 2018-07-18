@@ -152,7 +152,7 @@ function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "downloads\.sourceforge\.net" -or $url -imatch "portableapps\.com")) {
+        if (-not ($url -imatch "sourceforge\.net")) {
             $wreq.referer = strip_filename $url
         }
         if($cookies) {
