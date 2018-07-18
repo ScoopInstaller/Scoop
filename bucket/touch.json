@@ -1,6 +1,6 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "2013-07-02",
+    "version": "0.2013.07.02",
     "url": "https://raw.github.com/lukesampson/psutils/767c019fc81f60a990342103cbf75db6703d3593/touch.ps1",
     "hash": "1cedd53b77583d94264274ca8617f4ff5da535fc15d29274d3b12e5f72f7c2f5",
     "bin": "touch.ps1"
