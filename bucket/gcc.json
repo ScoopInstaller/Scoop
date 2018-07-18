@@ -1,16 +1,16 @@
 {
     "homepage": "https://mingw-w64.org",
-    "version": "7.3.0",
+    "version": "8.1.0",
     "license": "GPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.3.0/threads-posix/seh/x86_64-7.3.0-release-posix-seh-rt_v5-rev0.7z",
-            "hash": "784D25B00E7CF27AA64ABE2363B315400C27526BFCE672FDEE97137F71823D03",
+            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v5-rev0.7z",
+            "hash": "853970527B5DE4A55EC8CA4D3FD732C00AE1C69974CC930C82604396D43E79F8",
             "extract_dir": "mingw64"
         },
         "32bit": {
-            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/7.3.0/threads-posix/dwarf/i686-7.3.0-release-posix-dwarf-rt_v5-rev0.7z",
-            "hash": "0475B097AD645AE25438AE3470AF7E16E218EC1BD617B73E50B6A6C9622589A7",
+            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-posix/dwarf/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z",
+            "hash": "ADB84B70094C0225DD30187FF995E311D19424B1EB8F60934C60E4903297F946",
             "extract_dir": "mingw32"
         }
     },
