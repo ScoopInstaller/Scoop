@@ -2,15 +2,15 @@
     "homepage": "https://godoc.org/github.com/gokcehan/lf",
     "description": "A terminal file manager written in Go",
     "license": "MIT",
-    "version": "r6",
+    "version": "r7",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/gokcehan/lf/releases/download/r6/lf-windows-amd64.zip",
-            "hash": "aa611082193cf9418c9cc5d00bc20b85699e24eebfabf9ea0921cdf54024ddc9"
+            "url": "https://github.com/gokcehan/lf/releases/download/r7/lf-windows-amd64.zip",
+            "hash": "a2029d5ffdc265fd6cc9c3c08419d30a24023f80953db8c1ca0626f8525b6582"
         },
         "32bit": {
-            "url": "https://github.com/gokcehan/lf/releases/download/r6/lf-windows-386.zip",
-            "hash": "bdf7392d142c2c2383c9362667ac29a6fb866552126fcc4ee17a068e2ce5f26d"
+            "url": "https://github.com/gokcehan/lf/releases/download/r7/lf-windows-386.zip",
+            "hash": "3069936f993887f5a0023e40654f755471b9363ccc13cedc79aa0a064cf70ae5"
         }
     },
     "bin": "lf.exe",
