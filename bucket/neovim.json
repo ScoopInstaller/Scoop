@@ -1,17 +1,17 @@
 {
-    "version": "0.3.0",
+    "version": "0.3.1",
     "license": {
         "identifier": "Apache-2.0,MIT,Vim,Freeware(Node.js)",
         "url": "https://github.com/neovim/neovim/blob/master/LICENSE"
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/neovim/neovim/releases/download/v0.3.0/nvim-win64.zip",
-            "hash": "9e341575148884339055e8fccbf80907f36315ab5d27f843cbe535f06cbfdea1"
+            "url": "https://github.com/neovim/neovim/releases/download/v0.3.1/nvim-win64.zip",
+            "hash": "732520659032f9d2bc17e0318e6cf52bb880a6338aaaccc96162535269943c23"
         },
         "32bit": {
-            "url": "https://github.com/neovim/neovim/releases/download/v0.3.0/nvim-win32.zip",
-            "hash": "3b00c7ed7e6d53ac965cb8864d8780f7e96cb259a2c27c5eff7a535d22c44cb2"
+            "url": "https://github.com/neovim/neovim/releases/download/v0.3.1/nvim-win32.zip",
+            "hash": "9c06dcc0aacef56f6980d80d30321796cd1e1c9b27d778bd65423a5ca1fb4043"
         }
     },
     "suggest": {
