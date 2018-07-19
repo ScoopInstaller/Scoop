@@ -4,7 +4,7 @@
     "license": "GPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v5-rev0.7z",
+            "url": "https://downloads.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z",
             "hash": "853970527B5DE4A55EC8CA4D3FD732C00AE1C69974CC930C82604396D43E79F8",
             "extract_dir": "mingw64"
         },
