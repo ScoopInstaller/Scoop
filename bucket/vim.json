@@ -72,6 +72,12 @@
             "-d"
         ]
     ],
+    "shortcuts": [
+        [
+            "gvim.exe",
+            "gVim"
+        ]
+    ],
     "post_install": [
         "if( !(test-path ~\\.vimrc) -and !(test-path ~\\_vimrc) -and !(test-path ~\\vimfiles\\vimrc) -and !(test-path $env:VIM\\_vimrc) ) {",
         "    cp \"$dir\\vimrc_example.vim\" ~\\_vimrc",
