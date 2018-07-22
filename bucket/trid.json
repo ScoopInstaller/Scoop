@@ -1,6 +1,6 @@
 {
     "homepage": "http://mark0.net/soft-trid-e.html",
-    "version": "v2.24-19.07.18",
+    "version": "2.24-18.07.19",
     "url": [
         "http://mark0.net/download/triddefs.zip",
         "http://mark0.net/download/trid_w32.zip"
@@ -15,7 +15,7 @@
     "checkver": {
         "url": "http://mark0.net/soft-trid-e.html",
         "re": "(?smi)Win32.*?TrID v([\\d\\.]*).*?(\\d{2})\\/(\\d{2})\\/(\\d{2})",
-        "replace": "v${1}-${2}.${3}.${4}"
+        "replace": "${1}-${4}.${3}.${2}"
     },
     "autoupdate": {
         "note": "Autoupdate only updates TrID Definitions. If the main program updates, please change hashes manually",
