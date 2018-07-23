@@ -1,0 +1,37 @@
+{
+    "homepage": "https://developers.yubico.com/yubikey-personalization/",
+    "version": "1.19.0",
+    "license": "BSD-2-Clause",
+    "architecture": {
+        "64bit": {
+            "url": "https://developers.yubico.com/yubikey-personalization/Releases/ykpers-1.19.0-win64.zip",
+            "hash": "921bc18cc9232453877f60f663e0645c45740c935f0dcddacd245b69791898d7"
+        },
+        "32bit": {
+            "url": "https://developers.yubico.com/yubikey-personalization/Releases/ykpers-1.19.0-win32.zip",
+            "hash": "921d8f7b46eae4f445187375b023452154455f1492f51da0a0a8126025218ddb"
+        }
+    },
+    "bin": [
+        "bin\\modhex.exe",
+        "bin\\ykchalresp.exe",
+        "bin\\ykgenerate.exe",
+        "bin\\ykinfo.exe",
+        "bin\\ykparse.exe",
+        "bin\\ykpersonalize.exe"
+    ],
+    "checkver": {
+        "url": "https://www.yubico.com/support/knowledge-base/categories/articles/yubikey-personalization-tools/",
+        "re": "ykpers-([\\d.]+)-win64\\.zip"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://developers.yubico.com/yubikey-personalization/Releases/ykpers-$version-win64.zip"
+            },
+            "32bit": {
+                "url": "https://developers.yubico.com/yubikey-personalization/Releases/ykpers-$version-win32.zip"
+            }
+        }
+    }
+}
