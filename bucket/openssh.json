@@ -5,7 +5,7 @@
     "depends": [
         "git"
     ],
-    "##": "See https://github.com/excitoon/scoop-user/blob/master/openssh.json#L43",    
+    "##": "See https://github.com/excitoon/scoop-user/blob/master/openssh.json#L43",
     "bin": [
         [ "../../git/current/usr/bin/sh.exe", "findssl.sh", "$dir/../../git/current/usr/bin/findssl.sh" ],
         "../../git/current/usr/bin/scp.exe",
@@ -18,7 +18,7 @@
         "../../git/current/usr/bin/ssh-keyscan.exe",
         "../../git/current/usr/bin/sshd.exe"
     ],
-    "##": "See https://github.com/excitoon/scoop-user/blob/master/openssh.json#L55",    
+    "##": "See https://github.com/excitoon/scoop-user/blob/master/openssh.json#L55",
     "pre_install": [
         "If (!(Test-Path \"$(appdir git)/current/tmp/\")) {",
         "   Write-Host \"Creating directory '$(appdir git)/current/tmp'\"",

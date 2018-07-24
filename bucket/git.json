@@ -1,5 +1,5 @@
 {
-    "##": "Maintainers: when updating this manifest to a new version, you might like to also update git-with-openssh.json",
+    "##": "Maintainers: if the version of openssh changes, please update openssh.json",
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL-2.0",
     "version": "2.18.0.windows.1",
@@ -32,12 +32,12 @@
         "git config --global credential.helper manager"
     ],
     "notes": [
-        "To get Git to recognise OpenSSH, you will need to run",
+        "To get Git to recognise OpenSSH, you will need to run:",
         "",
-        "scoop install openssh",
-        "[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')",
+        "  scoop install openssh",
         "",
-        "and then restart powershell."
+        "to set the GIT_SSH environmental variable",
+        "and then restart powershell or the command processor (cmd.exe)."
     ],
     "checkver": {
         "url": "https://github.com/git-for-windows/git/releases/latest",
