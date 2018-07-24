@@ -1,0 +1,13 @@
+{
+    "homepage": "https://mpv.io",
+    "version": "0.29.0",
+    "license": "GPLv2",
+    "architecture": {
+        "64bit": {
+            "url": "https://mpv.srsfckn.biz/mpv-x86_64-20180722.7z",
+            "hash": "9a65ce6d0f267e2f8b1b4ed7fe115b9a06ae622dc6aef42d8668dea094855618"
+        },
+        "32bit": {
+            "url": "https://mpv.srsfckn.biz/mpv-i686-20180722.7z",
+            "hash": "ad1d504098f51ad6190e9bed5f5baad55c409a587db7d0eb764d40c08d1885cf"
+}
