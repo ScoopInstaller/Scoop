@@ -1,9 +1,9 @@
 {
     "homepage": "https://elixir-lang.org/",
-    "version": "1.6.6",
+    "version": "1.7.0",
     "depends": "erlang",
-    "url": "https://github.com/elixir-lang/elixir/releases/download/v1.6.6/Precompiled.zip",
-    "hash": "d6a84726a042407110d3b13b1ce8d9524b4a50df68174e79d89a9e42e30b410b",
+    "url": "https://github.com/elixir-lang/elixir/releases/download/v1.7.0/Precompiled.zip",
+    "hash": "19863a565875f4aaebb73de09f85c22d07b45d0e61d1e6bf5eb4b8e632569665",
     "env_add_path": [
         "bin"
     ],
