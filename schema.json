@@ -433,6 +433,9 @@
         "pre_install": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
+        "provides": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
         "psmodule": {
             "additionalProperties": false,
             "properties": {
