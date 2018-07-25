@@ -1,4 +1,5 @@
 {
+    "##": "Maintainers: if the version of openssh in the git package changes, please update the version property below",
     "homepage": "https://www.openssh.com/",
     "version": "7.7p1",
     "license": "ISC",
@@ -41,17 +42,25 @@
     ],
     "##": "See https://github.com/lukesampson/scoop/blob/master/bucket/git.json#L34",
     "post_install": [
+        "If ($global) {$target='Machine'} Else {$target='User'}",
         "$ssh_path=\"$(scoop which ssh)\"",
         "$ssh_path=\"$(resolve-path $ssh_path)\"",
-        "If ($global) {$target='Machine'} Else {$target='User'}",
-        "Write-Host -f darkgray \"Setting %GIT_SSH% to $ssh_path for the $target\"",
-        "[Environment]::SetEnvironmentVariable('GIT_SSH', $ssh_path, $target)"
+        "If (Test-Path $ssh_path) {",
+        "   Write-Host -f darkgray \"Setting %GIT_SSH% to $ssh_path for the $target\"",
+        "   [Environment]::SetEnvironmentVariable('GIT_SSH', $ssh_path, $target)",
+        "   Write-Host -f darkyellow \"Please restart your command shell for these changes to take effect\"",
+        "} else {",
+        "   Write-Host -f darkgray \"%GIT_SSH% has not been set as ssh.exe was not found in the path",
+        "}"
     ],
     "uninstaller": {
         "script": [
             "If ($global) {$target='Machine'} Else {$target='User'}",
-            "Write-Host -f darkgray \"Removing %GIT_SSH% for the $target\"",
-            "[Environment]::SetEnvironmentVariable('GIT_SSH', $null, $target)"
+            "If ([Environment]::GetEnvironmentVariable('GIT_SSH', $target)) {",
+            "   Write-Host -f darkgray \"Removing %GIT_SSH% for the $target\"",
+            "   [Environment]::SetEnvironmentVariable('GIT_SSH', $null, $target)",
+            "   Write-Host -f darkyellow \"Please restart your command shell for this change to take effect\"",
+            "}"
         ]
     },
     "autoupdate": {
