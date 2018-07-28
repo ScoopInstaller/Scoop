@@ -62,6 +62,7 @@ if ($manifest.license) {
 }
 
 # Manifest file
+$manifest_file = fullpath $manifest_file
 Write-Output "Manifest:`n  $manifest_file"
 
 if($status.installed) {

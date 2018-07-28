@@ -1,17 +1,17 @@
 {
     "homepage": "https://git-lfs.github.com/",
-    "version": "2.4.2",
+    "version": "2.5.0",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.4.2/git-lfs-windows-386-2.4.2.zip",
-            "hash": "c67df92538a88ce8f729da6e2edd0ac609450790eaec4b60eba59c04ba92f3b9",
-            "extract_dir": "git-lfs-windows-386-2.4.2"
+            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.5.0/git-lfs-windows-386-v2.5.0.zip",
+            "hash": "408f95d919037b068318cb2affb450c17a46915fe6b3d9b10dfc15dc0df15bca",
+            "extract_dir": "git-lfs-windows-386-v2.5.0"
         },
         "64bit": {
-            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.4.2/git-lfs-windows-amd64-2.4.2.zip",
-            "hash": "4c95d8e842ef55013c8ac99c4ffcad2a20a41bc41bd8e0943a228a03e07cd976",
-            "extract_dir": "git-lfs-windows-amd64-2.4.2"
+            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.5.0/git-lfs-windows-amd64-v2.5.0.zip",
+            "hash": "452375d3968491520df29cde989164c41c1c4ff12ba30dfb343872f6d24016f1",
+            "extract_dir": "git-lfs-windows-amd64-v2.5.0"
         }
     },
     "suggest": {
@@ -27,12 +27,12 @@
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "https://github.com/git-lfs/git-lfs/releases/download/v$version/git-lfs-windows-386-$version.zip",
-                "extract_dir": "git-lfs-windows-386-$version"
+                "url": "https://github.com/git-lfs/git-lfs/releases/download/v$version/git-lfs-windows-386-v$version.zip",
+                "extract_dir": "git-lfs-windows-386-v$version"
             },
             "64bit": {
-                "url": "https://github.com/git-lfs/git-lfs/releases/download/v$version/git-lfs-windows-amd64-$version.zip",
-                "extract_dir": "git-lfs-windows-amd64-$version"
+                "url": "https://github.com/git-lfs/git-lfs/releases/download/v$version/git-lfs-windows-amd64-v$version.zip",
+                "extract_dir": "git-lfs-windows-amd64-v$version"
             }
         },
         "hash": {

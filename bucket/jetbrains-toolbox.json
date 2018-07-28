@@ -1,12 +1,12 @@
 {
     "homepage": "https://jetbrains.com/",
-    "version": "1.9.3935",
+    "version": "1.10.4088",
     "license": {
         "identifier": "Freeware",
         "url": "https://www.jetbrains.com/store/license.html"
     },
-    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.9.3935.exe",
-    "hash": "1695b466ba256a8240ebf2a7e53504dfe99bc36905491d25e64f4a25e934259e",
+    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.10.4088.exe",
+    "hash": "217a8234eca7dad96347bdc19e19d58d82b1651fc9f7af365b12077702d67de3",
     "installer": {
         "args": [
             "/S",

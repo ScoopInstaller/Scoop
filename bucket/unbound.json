@@ -30,7 +30,7 @@
     },
     "checkver": {
         "url": "https://unbound.net/download.html",
-        "re": "\\(currently ([\\d.]+)\\)"
+        "re": "Unbound ([\\d.]+) \\(Current version\\)"
     },
     "autoupdate": {
         "architecture": {
