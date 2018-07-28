@@ -41,16 +41,28 @@
         }
     },
     "bin": [
-        [ "usr/bin/sh.exe", "findssl.sh", "$dir/usr/bin/findssl.sh" ],
+        [
+            "usr/bin/sh.exe",
+            "findssl.sh",
+            "$dir/usr/bin/findssl.sh"
+        ],
         "usr/bin/scp.exe",
         "usr/bin/sftp.exe",
         "usr/bin/ssh.exe",
         "usr/bin/ssh-add.exe",
         "usr/bin/ssh-agent.exe",
-        [ "usr/bin/sh.exe", "ssh-copy-id", "$dir/usr/bin/ssh-copy-id" ],
+        [
+            "usr/bin/sh.exe",
+            "ssh-copy-id",
+            "$dir/usr/bin/ssh-copy-id"
+        ],
         "usr/bin/ssh-keygen.exe",
         "usr/bin/ssh-keyscan.exe",
         "usr/bin/sshd.exe"
     ],
-    "pre_install": [ "mkdir $dir/tmp", "mkdir $dir/home", "cmd /c mklink /j $dir\\home\\%USERNAME% %USERPROFILE%" ]
+    "pre_install": [
+        "mkdir $dir/tmp",
+        "mkdir $dir/home",
+        "cmd /c mklink /j $dir\\home\\%USERNAME% %USERPROFILE%"
+    ]
 }

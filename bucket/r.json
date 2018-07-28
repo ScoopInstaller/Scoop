@@ -29,7 +29,7 @@
         "... but this only affects your current session: if you'd like to remove it for all future sessions you need to add the command above to your Powershell profile.",
         "",
         "Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--this has a plugin to remove some crazy aliases from Powershell, as well as many other improvements."
-            ],
+    ],
     "checkver": {
         "url": "https://cran.rstudio.com/bin/windows/base/",
         "re": "<h1>R-([\\d.]+)"

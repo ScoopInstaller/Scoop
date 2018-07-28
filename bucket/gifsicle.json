@@ -1,16 +1,16 @@
 {
-    "version":  "1.89",
-    "license":  "LGPL-2.0-only",
-    "homepage":  "http://www.lcdf.org/gifsicle/",
+    "version": "1.89",
+    "license": "LGPL-2.0-only",
+    "homepage": "http://www.lcdf.org/gifsicle/",
     "architecture": {
         "64bit": {
-            "url":  "https://eternallybored.org/misc/gifsicle/releases/gifsicle-1.89-win64.zip",
-            "hash":  "8c1fe58644fddc8fc1e3ccd97a048630f8e1e0df196931825dfbe5c3f93882f5",
+            "url": "https://eternallybored.org/misc/gifsicle/releases/gifsicle-1.89-win64.zip",
+            "hash": "8c1fe58644fddc8fc1e3ccd97a048630f8e1e0df196931825dfbe5c3f93882f5",
             "extract_dir": "gifsicle-1.89-win64"
         },
         "32bit": {
-            "url":  "https://eternallybored.org/misc/gifsicle/releases/gifsicle-1.89-win32.zip",
-            "hash":  "d9b2b29f383b5235be6c3518131febd55c1a4bb48cb39975cbac13e073094938",
+            "url": "https://eternallybored.org/misc/gifsicle/releases/gifsicle-1.89-win32.zip",
+            "hash": "d9b2b29f383b5235be6c3518131febd55c1a4bb48cb39975cbac13e073094938",
             "extract_dir": "gifsicle-1.89-win32"
         }
     },
