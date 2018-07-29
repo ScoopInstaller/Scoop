@@ -1,17 +1,17 @@
 {
     "homepage": "https://github.com/Netflix-Skunkworks/go-jira",
     "description": "simple command line client for Atlassian's Jira service written in Go",
-    "version": "1.0.17",
+    "version": "1.0.18",
     "license": "Apache-2.0",
     "bin": "jira.exe",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Netflix-Skunkworks/go-jira/releases/download/v1.0.17/jira-windows-4.0-amd64.exe#/jira.exe",
-            "hash": "e49f6c6b5a24c6bef74a9f1e81c2730ebb732e1b1b6c9fa3fc213b007884dbf2"
+            "url": "https://github.com/Netflix-Skunkworks/go-jira/releases/download/v1.0.18/jira-windows-4.0-amd64.exe#/jira.exe",
+            "hash": "da57207e9998c0ca7a1fedd8dda9a484c65e8c48fae9b7dbabe7026325567aec"
         },
         "32bit": {
-            "url": "https://github.com/Netflix-Skunkworks/go-jira/releases/download/v1.0.17/jira-windows-4.0-386.exe#/jira.exe",
-            "hash": "4a33b376a6297aeb88432fc4e63643f638117b66fc913d1ebbb91055e30a6165"
+            "url": "https://github.com/Netflix-Skunkworks/go-jira/releases/download/v1.0.18/jira-windows-4.0-386.exe#/jira.exe",
+            "hash": "fa5439ad1223ab171feecbbaee40fee98c2a0eb04240c6257035978824457c54"
         }
     },
     "checkver": "github",
