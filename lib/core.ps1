@@ -83,6 +83,10 @@ function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -rep
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global=$null) {
     if($null -eq $global) { return (installed $app $true) -or (installed $app $false) }
+    # Dependencies of the format "bucket/dependency" install in a directory of form
+    # "dependency". So we need to extract the bucket from the name and only give the app
+    # name to is_directory
+    $app = $app.split("/")[-1]
     return is_directory (appdir $app $global)
 }
 function installed_apps($global) {
@@ -114,7 +118,10 @@ function app_status($app, $global) {
     }
 
     $status.missing_deps = @()
-    $deps = @(runtime_deps $manifest) | Where-Object { !(installed $_) }
+    $deps = @(runtime_deps $manifest) | Where-Object {
+        $app, $bucket, $null = parse_app $_
+        return !(installed $app)
+    }
     if($deps) {
         $status.missing_deps += ,$deps
     }
