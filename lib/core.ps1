@@ -118,7 +118,10 @@ function app_status($app, $global) {
     }
 
     $status.missing_deps = @()
-    $deps = @(runtime_deps $manifest) | Where-Object { !(installed $_) }
+    $deps = @(runtime_deps $manifest) | Where-Object {
+        $app, $bucket, $null = parse_app $_
+        return !(installed $app)
+    }
     if($deps) {
         $status.missing_deps += ,$deps
     }
