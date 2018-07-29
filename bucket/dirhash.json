@@ -1,0 +1,34 @@
+{
+    "homepage": "https://idrassi.github.io/DirHash",
+    "license": "BSD-3-Clause",
+    "version": "1.6",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/idrassi/DirHash/releases/download/DirHash_1.6/DirHash-1.6-x64.zip",
+            "hash": "6e78ee0609ac1662fd63df271263e533a2cff322fab37b554dc2195e2f998b24"
+        },
+        "32bit": {
+            "url": "https://github.com/idrassi/DirHash/releases/download/DirHash_1.6/DirHash-1.6-x86.zip",
+            "hash": "125355264f6d75071fa4ad2cd3aba45cc58da6ceeba98a1a71c48dcc1624340f"
+        }
+    },
+    "bin": "DirHash.exe",
+    "checkver": {
+        "url": "https://github.com/idrassi/DirHash/releases/latest",
+        "re": "DirHash-([\\d.]+)-x64.zip"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/idrassi/DirHash/releases/download/DirHash_$version/DirHash-$version-x64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/idrassi/DirHash/releases/download/DirHash_$version/DirHash-$version-x86.zip"
+            }
+        },
+        "hash": {
+            "url": "https://github.com/idrassi/DirHash/releases/latest",
+            "find": "$basename:\\s+([0-9a-fA-F]{64})"
+        }
+    }
+}
