@@ -14,7 +14,7 @@
     },
     "bin": "DirHash.exe",
     "checkver": {
-        "url": "https://github.com/idrassi/DirHash/releases",
+        "url": "https://github.com/idrassi/DirHash/releases/latest",
         "re": "DirHash-([\\d.]+)-x64.zip"
     },
     "autoupdate": {
@@ -25,6 +25,10 @@
             "32bit": {
                 "url": "https://github.com/idrassi/DirHash/releases/download/DirHash_$version/DirHash-$version-x86.zip"
             }
+        },
+        "hash": {
+            "url": "https://github.com/idrassi/DirHash/releases/latest",
+            "find": "$basename:\\s+([0-9a-fA-F]{64})"
         }
     }
 }
