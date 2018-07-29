@@ -9,6 +9,9 @@ Function ConvertToPrettyJson {
     )
 
     Process  {
+        $data = normalize_values $data
+
+        # convert to string
         [String]$json = $data | ConvertTo-Json -Depth 8 -Compress
         [String]$output = ""
 
@@ -131,4 +134,26 @@ function json_path_legacy([String] $json, [String] $jsonpath, [String] $basename
         $result = $result.$el
     }
     return $result
+}
+
+function normalize_values([psobject] $json) {
+    # Iterate Through Manifest Properties
+    $json.PSObject.Properties | ForEach-Object {
+
+        # Process String Values
+        if ($_.Value -is [string]) {
+
+            # Split on new lines
+            [array] $parts = ($_.Value -split '\r?\n').Trim()
+
+            # Replace with string array if result is multiple lines
+            if ($parts.Count -gt 1) {
+                $_.Value = $parts
+            }
+        }
+
+        # Process other values as needed...
+    }
+
+    return $json
 }
