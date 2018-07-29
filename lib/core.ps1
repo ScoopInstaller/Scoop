@@ -560,6 +560,7 @@ function substitute($entity, [Hashtable] $params) {
 }
 
 function format_hash([String] $hash) {
+    $hash = $hash.toLower()
     switch ($hash.Length)
     {
         32 { $hash = "md5:$hash" } # md5
