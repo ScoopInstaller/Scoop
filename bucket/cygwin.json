@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://cygwin.com/setup-x86_64.exe",
-            "hash": "4084fe6db9ed7518b7f02097210b4d6b1748979556f606fa5c79ee126f07db5f"
+            "hash": "01794f55fab26842c12e2a67fc218ad9c1a9201ccf0bf2fbd9f5815d6f20182f"
         },
         "32bit": {
             "url": "https://cygwin.com/setup-x86.exe",
-            "hash": "e506e21fa713783751a214af9741be73b711c341e3abce5fc755c5aff7c1fb6a"
+            "hash": "3da0b1a5a14418abc8bb04bcbd475fe8cf25648526302dfee563de9e5c0b5ff2"
         }
     },
     "autoupdate": {
