@@ -1,12 +1,12 @@
 {
     "homepage": "http://mark0.net/soft-trid-e.html",
-    "version": "2.24-18.07.28",
+    "version": "2.24-18.07.30",
     "url": [
         "http://mark0.net/download/triddefs.zip",
         "http://mark0.net/download/trid_w32.zip"
     ],
     "hash": [
-        "95153a0448f89e14e214ff63e93d72fddb1d9edfd5b5c5917ef557a160fef4cc",
+        "e48e8c08c1a13a1338d4f797d157793d0f353d462ba96da67c67372f182d4294",
         "ea7f82363912f5b3c79217ba8716425ec3f2514887f788dcd5a2821d0b1fc83f"
     ],
     "bin": [
