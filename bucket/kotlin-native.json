@@ -1,10 +1,10 @@
 {
     "homepage": "https://kotlinlang.org/",
-    "version": "0.8",
+    "version": "0.8.1",
     "license": "Apache-2.0",
-    "url": "https://github.com/JetBrains/kotlin-native/releases/download/v0.8/kotlin-native-windows-0.8.zip",
-    "hash": "47506695a5e1716a680fc07663342145d701e177149c357d1bf641567a1d3114",
-    "extract_dir": "kotlin-native-windows-0.8",
+    "url": "https://github.com/JetBrains/kotlin-native/releases/download/v0.8.1/kotlin-native-windows-0.8.1.zip",
+    "hash": "efd9ba151f769b33507dd420d5daeddf520efeb538160ef093817fc61813ff2e",
+    "extract_dir": "kotlin-native-windows-0.8.1",
     "bin": [
         "bin\\cinterop.bat",
         "bin\\klib.bat",
