@@ -3,7 +3,7 @@
     "version": "1.2.0",
     "license": "BSD-3-Clause",
     "url": "https://github.com/sbt/sbt/releases/download/v1.2.0/sbt-1.2.0.zip",
-    "hash": "69a475163972eb4114997899d3169a71f0399f06434a473b2784c18f419621a2",
+    "hash": "8a1036004393c1dfa51a077f88a898d2736337fa0d22db9f3a60a93762fa326d",
     "extract_dir": "sbt",
     "bin": [
         "bin\\sbt.bat"
