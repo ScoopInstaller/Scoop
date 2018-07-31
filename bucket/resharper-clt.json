@@ -8,6 +8,7 @@
     "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.2018.1.3.zip",
     "hash": "6f6b06f16d885a0c9f7795b20c60446464f230444ce7119ec1b114b1438ddd55",
     "bin": [
+        "cleanupcode.exe",
         "dupfinder.exe",
         "inspectcode.exe"
     ],
