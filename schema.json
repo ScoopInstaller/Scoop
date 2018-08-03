@@ -306,6 +306,25 @@
                         "script": {
                             "$ref": "#/definitions/stringOrArrayOfStrings",
                             "description": "Custom PowerShell script to retrieve application version using more complex approach."
+                        },
+                        "sourceforge": {
+                            "anyOf": [
+                                {
+                                    "format": "regex",
+                                    "type": "string"
+                                },
+                                {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "project": {
+                                            "type": "string"
+                                        },
+                                        "path": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "type": "object"
