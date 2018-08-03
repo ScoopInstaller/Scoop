@@ -150,6 +150,9 @@
                                 },
                                 "hash": {
                                     "$ref": "#/definitions/hashExtraction"
+                                },
+                                "shortcuts": {
+                                    "$ref": "#/definitions/shortcutsArray"
                                 }
                             },
                             "type": "object"
@@ -166,6 +169,9 @@
                                 },
                                 "hash": {
                                     "$ref": "#/definitions/hashExtraction"
+                                },
+                                "shortcuts": {
+                                    "$ref": "#/definitions/shortcutsArray"
                                 }
                             },
                             "type": "object"
@@ -185,6 +191,12 @@
                 "url": {
                     "format": "uri",
                     "type": "string"
+                },
+                "shortcuts": {
+                    "$ref": "#/definitions/shortcutsArray"
+                },
+                "license": {
+                    "$ref": "#/definitions/properties/license"
                 }
             },
             "type": "object"
