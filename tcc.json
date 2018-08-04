@@ -14,7 +14,10 @@
         }
     },
     "env_add_path": "tcc",
-    "checkver": "tcc-([\\d.]+)-win64-bin.zip",
+    "checkver": {
+        "url": "http://download.savannah.gnu.org/releases/tinycc/",
+        "re": "tcc-([\\d.]+)-win64-bin.zip"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {
