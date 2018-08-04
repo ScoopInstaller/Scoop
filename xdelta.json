@@ -1,0 +1,18 @@
+{
+    "homepage": "http://xdelta.org/",
+    "version": "3.1.0",
+    "license": "GPL-3.0",
+    "bin": "xdelta.exe",
+    "pre_install": "Get-ChildItem \"$dir\\xdelta3-*.exe\" | Rename-Item -NewName \"$dir\\xdelta.exe\"",
+    "checkver": {"github": "https://github.com/jmacd/xdelta-gpl"},
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/jmacd/xdelta-gpl/releases/download/v3.1.0/xdelta3-3.1.0-x86_64.exe.zip",
+            "hash": "b10e0d1df3e212e5a2d37d5c088d2f72ecec760bc3c26caeca51499c3118b93a"
+        },
+        "32bit": {
+            "url": "https://github.com/jmacd/xdelta-gpl/releases/download/v3.1.0/xdelta3-3.1.0-i686.exe.zip",
+            "hash": "1e72f920dbae1b4edc7be0feba841d78fb06ad38b67630e99d5ff655d8c5d62f"
+        }
+    }
+}
