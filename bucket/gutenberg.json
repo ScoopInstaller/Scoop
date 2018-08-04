@@ -3,7 +3,7 @@
     "version": "0.4.0",
     "license": "MIT",
     "url": "https://github.com/Keats/gutenberg/releases/download/v0.4.0/gutenberg-v0.4.0-x86_64-pc-windows-msvc.zip",
-    "hash": "f22269f5f083bc33c7e042a735a72b0b47af727836a713dc00d82acfbb7c9df2",
+    "hash": "0b8907fb309d66e8fb4127fb8347b913cabed1b6773d3869e317670cc2d1d214",
     "bin": "gutenberg.exe",
     "checkver": {
         "github": "https://github.com/Keats/gutenberg"
