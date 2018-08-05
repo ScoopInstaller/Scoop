@@ -1,7 +1,7 @@
 {
     "homepage": "https://bellard.org/tcc/",
     "description": "The Tiny C Compiler (a.k.a. TCC, tCc, or TinyCC) is an x86, X86-64 and ARM processor C compiler created by Fabrice Bellard. It is designed to work for slow computers with little disk space (e.g. on rescue disks).",
-    "license": "LGPL",
+    "license": "LGPL-2.1-only",
     "version": "0.9.27",
     "architecture": {
         "64bit": {
