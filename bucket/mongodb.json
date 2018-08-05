@@ -1,11 +1,11 @@
 {
     "homepage": "https://www.mongodb.org",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "license": "AGPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-4.0.0-signed.msi",
-            "hash": "bf370d32e956eb5849cf92f3d092739a930531378091ea8f9237bd902368ae69",
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-4.0.1-signed.msi",
+            "hash": "234bebe451ca4601a8fd5016ede6b3ad424ac059dfcb3d0e76abf934f4143af4",
             "extract_dir": "MongoDB\\Server\\4.0"
         }
     },
