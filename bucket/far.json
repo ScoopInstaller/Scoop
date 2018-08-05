@@ -1,14 +1,14 @@
 {
     "homepage": "https://farmanager.com/",
-    "version": "30b5252",
+    "version": "30b5254",
     "architecture": {
         "64bit": {
-            "url": "https://farmanager.com/files/Far30b5252.x64.20180803.7z",
-            "hash": "8e913f2757d6a390f73f999ba7bdca2d21ce43076a59a6385217d69a1a81f700"
+            "url": "https://farmanager.com/files/Far30b5254.x64.20180805.7z",
+            "hash": "55559314f24b5b8b13d3f7620164b8b551c937eb93fd14898abe67aaf49ef4f0"
         },
         "32bit": {
-            "url": "https://farmanager.com/files/Far30b5252.x86.20180803.7z",
-            "hash": "7f19a76848cfbce542d0ba112d580626e353cd41c3c1dfc1f27cefd5c1f2a22b"
+            "url": "https://farmanager.com/files/Far30b5254.x86.20180805.7z",
+            "hash": "fb8af7b3d1d37a8cb4f93a23eb8f8062164e1ba738450bc3fca679c2fb1126fd"
         }
     },
     "checkver": {
