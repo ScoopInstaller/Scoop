@@ -14,6 +14,7 @@
         }
     },
     "bin": "tcc.exe",
+    "bin": "tcc\tcc.exe",
     "env_add_path": "tcc",
     "checkver": {
         "url": "http://download.savannah.gnu.org/releases/tinycc/",
