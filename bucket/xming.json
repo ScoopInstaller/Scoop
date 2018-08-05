@@ -26,6 +26,6 @@
         }
     },
     "autoupdate": {
-        "url": "https://downloads.sourceforge.net/project/xming/Xming-mesa/$version/Xming-mesa-$majorVersion-$minorVersion-$patchVersion-$buildVersion-setup.exe"
+        "url": "https://downloads.sourceforge.net/project/xming/Xming-mesa/$version/Xming-mesa-$dashVersion-setup.exe"
     }
 }
