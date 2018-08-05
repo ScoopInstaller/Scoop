@@ -13,8 +13,6 @@
             "hash": "02e2bfe8c272a549b15e4bfa4507bd7e05304692af1761db6c1e8e88af675651"
         }
     },
-    "bin": "tcc.exe",
-    "bin": "tcc\tcc.exe",
     "env_add_path": "tcc",
     "checkver": {
         "url": "http://download.savannah.gnu.org/releases/tinycc/",
