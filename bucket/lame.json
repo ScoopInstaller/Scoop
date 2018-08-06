@@ -16,7 +16,7 @@
     "bin": "lame.exe",
     "checkver": {
         "url": "http://www.rarewares.org/mp3-lame-bundle.php",
-        "re": "#lame-current">LAME ([\\d.]+)"
+        "re": "http://www.rarewares.org/files/mp3/lame([\\d.]+).zip"
     },
     "autoupdate": {
         "architecture": {
