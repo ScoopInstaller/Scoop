@@ -1,5 +1,5 @@
 {
-    "##": "Maintainers: when updating this manifest to a new version, you might like to also update git-with-openssh.json",
+    "##": "Maintainers: when updating this manifest to a new version, you might like to also update git-with-openssh.json and mingit.json",
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL-2.0",
     "version": "2.18.0.windows.1",
