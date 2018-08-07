@@ -209,6 +209,10 @@ if(!$apps) {
 
     $suggested = @{};
     # # $outdated is a list of ($app, $global) tuples
+    if(aria2_enabled) {
+        warn "Scoop uses 'aria2c' for multi-connection downloads."
+        warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+    }
     $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }
 
