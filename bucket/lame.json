@@ -1,0 +1,31 @@
+{
+    "homepage": "https://lame.sourceforge.net/",
+    "description": "LAME is a high quality MPEG Audio Layer III (MP3) encoder",
+    "license": "LGPL-2.0-only",
+    "version": "3.100",
+    "architecture": {
+        "64bit": {
+            "url": "http://www.rarewares.org/files/mp3/lame3.100-64.zip",
+            "hash": "8b32ef66beed351b6fbfc73a36f56bf5737ab3b01f40399cdfb02b9d8e86def2"
+        },
+        "32bit": {
+            "url": "http://www.rarewares.org/files/mp3/lame3.100.zip",
+            "hash": "09607ea8496003e45396e32101ff7f21aaa3cd9f2f9841749f85b049edbb2fdb"
+        }
+    },
+    "bin": "lame.exe",
+    "checkver": {
+        "url": "http://www.rarewares.org/mp3-lame-bundle.php",
+        "re": "http://www.rarewares.org/files/mp3/lame([\\d.]+).zip"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "http://www.rarewares.org/files/mp3/lame$version-64.zip"
+            },
+            "32bit": {
+                "url": "http://www.rarewares.org/files/mp3/lame$version.zip"
+            }
+        }
+    }
+}
