@@ -103,7 +103,7 @@ function update_scoop() {
         Pop-Location
     }
 
-    scoop config lastupdate (get-date)
+    scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
     success 'Scoop was updated successfully!'
 }
 

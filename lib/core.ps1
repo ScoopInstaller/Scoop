@@ -541,14 +541,22 @@ function last_scoop_update() {
     if(!$last_update) {
         $last_update = [System.DateTime]::Now
     }
-    return $last_update.ToLocalTime()
+
+    if($last_update.GetType() -eq [System.String]) {
+        try {
+            $last_update = [System.DateTime]::Parse($last_update)
+        } catch {
+            $last_update = [System.DateTime]::Now
+        }
+    }
+    return $last_update
 }
 
 function is_scoop_outdated() {
     $last_update = $(last_scoop_update)
     $now = [System.DateTime]::Now
     if($last_update -eq $now) {
-        scoop config lastupdate $now
+        scoop config lastupdate $now.ToString('o')
         # enforce an update for the first time
         return $true
     }
