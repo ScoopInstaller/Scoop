@@ -117,6 +117,10 @@ function aria2_installed() {
     return ![String]::IsNullOrWhiteSpace("$(aria2_path)")
 }
 
+function aria2_enabled() {
+    return (aria2_installed) -and (get_config 'aria2-enabled' $true)
+}
+
 function app_status($app, $global) {
     $status = @{}
     $status.installed = (installed $app $global)
