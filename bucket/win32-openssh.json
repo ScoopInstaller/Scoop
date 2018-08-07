@@ -7,12 +7,12 @@
     },
     "architecture": {
         "32bit": {
-            "hash": "738a52c00ac371c78850bc562f61e7dcb189c5ad579892b1bf6e3e5663f2352d",
+            "hash": "C9179BBD4D651CC15FE036120234FB0E1B21C2661CA3228106470F3AC7E86A19",
             "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v7.7.2.0p1-Beta/OpenSSH-Win32.zip",
             "extract_dir": "OpenSSH-Win32"
         },
         "64bit": {
-            "hash": "87e0cd468fe36a74bea0e40cee3021f99b38e431b7c8668af4461fdab03031b7",
+            "hash": "8631F00013116388362CB06F3E6FD2C44C8E57D8F857033111F98FEB34FA5BCE",
             "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v7.7.2.0p1-Beta/OpenSSH-Win64.zip",
             "extract_dir": "OpenSSH-Win64"
         }
