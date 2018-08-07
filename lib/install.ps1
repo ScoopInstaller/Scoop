@@ -468,10 +468,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
-    $enable_aria2 = get_config 'aria2-enabled' $true
-
     # download first
-    if((aria2_installed) -and $enable_aria2) {
+    if(aria2_enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach($url in $urls) {
