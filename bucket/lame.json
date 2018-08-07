@@ -1,7 +1,7 @@
 {
     "homepage": "http://lame.sourceforge.net/",
     "description": "LAME is a high quality MPEG Audio Layer III (MP3) encoder",
-    "license": "LGPL",
+    "license": "LGPL-2.0-only",
     "version": "3.100",
     "architecture": {
         "64bit": {
