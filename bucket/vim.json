@@ -70,7 +70,8 @@
             "gvim.exe",
             "gvimdiff",
             "-d"
-        ]
+        ],
+        "xxd.exe"
     ],
     "shortcuts": [
         [
