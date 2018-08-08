@@ -96,21 +96,25 @@ function installed_apps($global) {
     }
 }
 
-function aria2_path() {
-    # normal path to executable
-    $aria2 = "$(versiondir 'aria2' 'current' $false)\aria2c.exe"
-    if(Test-Path($aria2)) {
-        return $aria2
+function file_path($app, $file) {
+    # normal path to file
+    $path = "$(versiondir $app 'current' $false)\$file"
+    if(Test-Path($path)) {
+        return $path
     }
 
-    # global path to executable
-    $aria2 = "$(versiondir 'aria2' 'current' $true)\aria2c.exe"
-    if(Test-Path($aria2)) {
-        return $aria2
+    # global path to file
+    $path = "$(versiondir $app 'current' $true)\$file"
+    if(Test-Path($path)) {
+        return $path
     }
 
     # not found
     return $null
+}
+
+function aria2_path() {
+    return (file_path 'aria2' 'aria2c.exe')
 }
 
 function aria2_installed() {
