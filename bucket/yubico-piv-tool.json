@@ -1,15 +1,15 @@
 {
     "homepage": "https://developers.yubico.com/yubico-piv-tool/",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "license": "BSD-2-Clause",
     "architecture": {
         "64bit": {
-            "url": "https://developers.yubico.com/yubico-piv-tool/Releases/yubico-piv-tool-1.5.0-win64.zip",
-            "hash": "d51fdc7dc1f717e1b0fafb503e999377b95496c4fa2d1686e37fbbb063f9ca15"
+            "url": "https://developers.yubico.com/yubico-piv-tool/Releases/yubico-piv-tool-1.6.0-win64.zip",
+            "hash": "cf49f2e4b3be9108331a642674062df9e5e29d2cb40652a73e6e2e3e54f0ab27"
         },
         "32bit": {
-            "url": "https://developers.yubico.com/yubico-piv-tool/Releases/yubico-piv-tool-1.5.0-win32.zip",
-            "hash": "74695de467b13d7320b99ac85a04ff24ae18c7d3230f71aa85fda07feba426d2"
+            "url": "https://developers.yubico.com/yubico-piv-tool/Releases/yubico-piv-tool-1.6.0-win32.zip",
+            "hash": "516f9384b4bc7ba71d667c4490807258dac2d186987aac3907d531f6ee346e0e"
         }
     },
     "bin": [
