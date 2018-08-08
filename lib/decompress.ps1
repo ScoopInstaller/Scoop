@@ -1,5 +1,3 @@
-function 7zip_installed { cmd_available '7z' }
-
 function requires_7zip($manifest, $architecture) {
     foreach($dlurl in @(url $manifest $architecture)) {
         if(file_requires_7zip $dlurl) { return $true }

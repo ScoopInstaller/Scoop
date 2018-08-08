@@ -113,6 +113,14 @@ function file_path($app, $file) {
     return $null
 }
 
+function 7zip_path() {
+    return (file_path '7zip' '7z.exe')
+}
+
+function 7zip_installed() {
+    return ![String]::IsNullOrWhiteSpace("$(7zip_path)")
+}
+
 function aria2_path() {
     return (file_path 'aria2' 'aria2c.exe')
 }
