@@ -273,6 +273,13 @@ function unzip($path, $to) {
         } else {
             abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
         }
+    } catch [system.io.ioexception] {
+        if (7zip_installed) {
+            extract_7zip $path $to $false
+            return
+        } else {
+            abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
+        }
     } catch {
         abort "Unzip failed: $_"
     }
