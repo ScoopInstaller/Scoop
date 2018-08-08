@@ -656,9 +656,9 @@ function handle_special_urls($url)
     }
 
     # Sourceforge.net
-    if ($url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
+    if ($url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*?)(?:$|\/download|\?)") {
         # Reshapes the URL to avoid redirections
-        $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])?r=&ts="
+        $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
     }
     return $url
 }
