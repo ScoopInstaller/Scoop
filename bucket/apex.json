@@ -17,7 +17,7 @@
     "bin": "apex.exe",
     "checkver": {
         "github": "https://github.com/apex/apex",
-        "re": "v([a-z\\d.-]+)<"
+        "re": ">v([a-z\\d.-]+)<"
     },
     "autoupdate": {
         "architecture": {

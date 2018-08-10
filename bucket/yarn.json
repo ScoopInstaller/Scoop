@@ -1,8 +1,8 @@
 {
     "homepage": "https://yarnpkg.com/",
     "description": "Dependency manager",
-    "license": "BSD",
-    "version": "1.6.0",
+    "license": "BSD-2-Clause",
+    "version": "1.9.4",
     "suggest": {
         "Node.js": [
             "nodejs",
@@ -12,18 +12,18 @@
             "nvm"
         ]
     },
-    "url": "https://yarnpkg.com/downloads/1.6.0/yarn-1.6.0.msi",
-    "hash": "4773dd67bb54ac90b809716116d82bec17aa3c8a3c429fd5367b0b8ed2c82ae2",
+    "url": "https://yarnpkg.com/downloads/1.9.4/yarn-1.9.4.msi",
+    "hash": "5ca0adb78d2f3a718d7a1feef0496d8ead9bca599367dff0f98cd742d5a72fdd",
     "persist": [
         "cache",
         "bin",
         "mirror"
     ],
-    "post_install": "
-        yarn config set cache-folder \"$dir\\cache\"
-        yarn config set yarn-offline-mirror \"$dir\\mirror\"
-        yarn config set prefix \"$dir\"
-    ",
+    "post_install": [
+        "yarn config set cache-folder \"$dir\\cache\"",
+        "yarn config set yarn-offline-mirror \"$dir\\mirror\"",
+        "yarn config set prefix \"$dir\""
+    ],
     "env_add_path": [
         "bin",
         "Yarn\\bin"

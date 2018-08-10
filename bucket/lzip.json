@@ -1,0 +1,20 @@
+{
+    "version": "1.20",
+    "homepage": "https://www.nongnu.org/lzip/lzip.html",
+    "description": "Lzip is a lossless data compressor with a user interface similar to the one of gzip or bzip2",
+    "url": "https://download.savannah.gnu.org/releases/lzip/lzip-1.20-w32.zip",
+    "hash": "7ef27ab008377f6d96793b450391efee0a8682ca056a9fe688b264be92637271",
+    "extract_dir": "lzip-1.20-w32",
+    "bin": [
+        "bin\\lzip.exe"
+    ],
+    "checkver": {
+        "url": "https://download.savannah.gnu.org/releases/lzip/",
+        "re": "lzip-([\\d.]+)-w32.zip",
+        "reverse": true
+    },
+    "autoupdate": {
+        "url": "https://download.savannah.gnu.org/releases/lzip/lzip-$version-w32.zip",
+        "extract_dir": "lzip-$version-w32"
+    }
+}

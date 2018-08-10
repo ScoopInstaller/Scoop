@@ -12,11 +12,11 @@
         "HAXEPATH": "$dir"
     },
     "depends": "neko",
-    "pre_install": "
-        if(Test-Path \"$dir\\haxe_*\") {
-            Move-Item -Force \"$dir\\haxe_*\\*\" \"$dir\"
-        }
-    ",
+    "pre_install": [
+        "if(Test-Path \"$dir\\haxe_*\") {",
+        "    Move-Item -Force \"$dir\\haxe_*\\*\" \"$dir\"",
+        "}"
+    ],
     "checkver": {
         "github": "https://github.com/HaxeFoundation/haxe"
     },

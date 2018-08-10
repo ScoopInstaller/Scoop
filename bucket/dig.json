@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.isc.org/",
     "license": "ISC",
-    "version": "9.12.1",
+    "version": "9.13.2",
     "architecture": {
         "64bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.12.1/BIND9.12.1.x64.zip",
-            "hash": "8946b29544d97e2217110aeb42d6f86c43625614a9f2dac4509ca8099d276a46"
+            "url": "https://ftp.isc.org/isc/bind9/9.13.2/BIND9.13.2.x64.zip",
+            "hash": "1116e8c84b503a4fa7f41be0fbe51c7eb454f8ce677a26ef0676584b6117e2f4"
         },
         "32bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.12.1/BIND9.12.1.x86.zip",
-            "hash": "8e7474509846e15cef966b0a5786ff79dc898eb7f90a83c2109c59fcbad8c6ed"
+            "url": "https://ftp.isc.org/isc/bind9/9.13.2/BIND9.13.2.x86.zip",
+            "hash": "5b5c464a008b3632c7052bd6c590b8f4fa048017b282ebe7c34c185dc9ea4b2a"
         }
     },
     "bin": "dig.exe",

@@ -1,16 +1,16 @@
 {
-    "version": "0.20.1",
+    "version": "0.21.0",
     "homepage": "https://github.com/mozilla/geckodriver",
     "bin": "geckodriver.exe",
     "checkver": "github",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/mozilla/geckodriver/releases/download/v0.20.1/geckodriver-v0.20.1-win64.zip",
-            "hash": "515671d51ed75a25d03da829f1aae5371bf8133a4b7566d475661235a1d1cb51"
+            "url": "https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-win64.zip",
+            "hash": "d69db48b75b365b833c690435743b7ca4863e6491f989c8cb3d01e7e5c31779c"
         },
         "32bit": {
-            "url": "https://github.com/mozilla/geckodriver/releases/download/v0.20.1/geckodriver-v0.20.1-win32.zip",
-            "hash": "f9222ce6fd71282cdc4b487eeeb517eba2c856e494d3807486aef2e2ddb8e4c9"
+            "url": "https://github.com/mozilla/geckodriver/releases/download/v0.21.0/geckodriver-v0.21.0-win32.zip",
+            "hash": "5c12f80df2cd08ebb197ff4077e1ccc7589af13a89de19122c8b2cbaf910780d"
         }
     },
     "autoupdate": {

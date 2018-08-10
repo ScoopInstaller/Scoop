@@ -1,0 +1,24 @@
+{
+    "homepage": "https://github.com/dylanaraps/neofetch",
+    "license": "MIT",
+    "version": "5.0.0",
+    "url": "https://github.com/dylanaraps/neofetch/releases/download/5.0.0/neofetch",
+    "hash": "6aaa9826930c445ada70f80f444dce62f475a1f7b0d986ccd7f4576063b70706",
+    "pre_install": [
+        "if(installed 'git-with-openssh') { $git = 'git-with-openssh' } else { $git = 'git' }",
+        "Write-Output \"& `$(join-path `$(scoop prefix $git) 'bin\\bash.exe') `$(join-path `$psscriptroot 'neofetch') @args\" | Out-File \"$dir\\neofetch.ps1\" -encoding utf8"
+    ],
+    "bin": "neofetch.ps1",
+    "suggest": {
+        "git": [
+            "git",
+            "git-with-openssh"
+        ]
+    },
+    "checkver": {
+        "github": "https://github.com/dylanaraps/neofetch"
+    },
+    "autoupdate": {
+        "url": "https://github.com/dylanaraps/neofetch/releases/download/$version/neofetch"
+    }
+}

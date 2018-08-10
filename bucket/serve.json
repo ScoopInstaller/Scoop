@@ -1,0 +1,17 @@
+{
+    "version": "0.2.1",
+    "url": "https://github.com/philippgille/serve/releases/download/v0.2.1/serve_v0.2.1_Windows_x64.zip",
+    "hash": "1CEF8B0D6CE7F8F4E2116F5471D1B299B6852AF109B8E6F397C70FFC2C37A910",
+    "bin": "serve.exe",
+    "homepage": "https://github.com/philippgille/serve",
+    "checkver": {
+        "github": "https://github.com/philippgille/serve"
+    },
+    "autoupdate": {
+        "url": "https://github.com/philippgille/serve/releases/download/v$version/serve_v$version_Windows_x64.zip",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    },
+    "notes": "Thank you for installing serve! Type `serve -h` to print its usage."
+}

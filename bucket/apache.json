@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.apachelounge.com",
-    "version": "2.4.33",
+    "version": "2.4.34",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.33-win64-VC15.zip",
-            "hash": "A9F94DBA6AFFE3BD98FEC01EF77DC932C123E25E360D29D970CC2CDD9F5BA237"
+            "url": "https://fossies.org/windows/www/httpd-2.4.34-win64-VC15.zip",
+            "hash": "d61321a48d4d4ae2a2f0f116576eb704aecace506fa66ef0cd75d936fc540ea1"
         },
         "32bit": {
-            "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-2.4.33-win32-VC15.zip",
-            "hash": "52BA4FC88E661FE3C775E40EBC93E0B277F4470BCC2185F4F9D2A2C6A2DC05E5"
+            "url": "https://fossies.org/windows/www/httpd-2.4.34-Win32-VC15.zip",
+            "hash": "62bfe9ca0657314da51ec8130a33585a0f26126c643b12ffd491da4d8a69fa3e"
         }
     },
     "extract_dir": "Apache24",
@@ -29,28 +29,27 @@
         "bin\\logresolve.exe",
         "bin\\rotatelogs.exe"
     ],
-    "post_install": "
-# set directory in httpd.conf
-$conf = \"$dir/conf/httpd.conf\"
-$root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\\', '/';
-(gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf
-",
+    "post_install": [
+        "# set directory in httpd.conf",
+        "$conf = \"$dir/conf/httpd.conf\"",
+        "$root=(scoop which httpd | split-path -res -par | split-path -par) -replace '\\\\', '/';",
+        "(gc $conf) | % { $_ -replace 'c:/Apache24', \"$root\" } | sc $conf"
+    ],
     "checkver": {
-        "url": "https://www.apachelounge.com/download/",
-        "re": "Apache ([\\d.]+) Win32"
+        "url": "https://fossies.org/search?q=folder_search&q1=httpd&ad=%2Ffresh%2Fwindows%2Fwww&ca=yes&dp=1",
+        "re": "httpd-([\\d.]+)-win64-VC15.zip"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-$version-win64-VC15.zip"
+                "url": "https://fossies.org/windows/www/httpd-$version-win64-VC15.zip"
             },
             "32bit": {
-                "url": "https://www.apachelounge.com/download/VC15/binaries/httpd-$version-win32-VC15.zip"
+                "url": "https://fossies.org/windows/www/httpd-$version-win32-VC15.zip"
             }
         },
         "hash": {
-            "url": "$url.txt",
-            "find": "SHA256-Checksum for: (?:$basename):\\s+([a-fA-F0-9]{64})"
+            "url": "$url_fossies.sha256"
         }
     }
 }

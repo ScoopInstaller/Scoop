@@ -1,17 +1,17 @@
 {
     "homepage": "https://rclone.org",
-    "version": "1.41",
+    "version": "1.42",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ncw/rclone/releases/download/v1.41/rclone-v1.41-windows-amd64.zip",
-            "hash": "6d5dd6617afa1c5625e1e946093b3de8f06ce618d13ee3c61562cc09ca6aefd0",
-            "extract_dir": "rclone-v1.41-windows-amd64"
+            "url": "https://github.com/ncw/rclone/releases/download/v1.42/rclone-v1.42-windows-amd64.zip",
+            "hash": "0420e14de580b3ca35e3ed102e23ddbd6eb5cb182ccc3311f9d7b5576c5c9ab0",
+            "extract_dir": "rclone-v1.42-windows-amd64"
         },
         "32bit": {
-            "url": "https://github.com/ncw/rclone/releases/download/v1.41/rclone-v1.41-windows-386.zip",
-            "hash": "0e52006433efcdc02af2e8bb95628526c7bc4055d18551a0ea9732b5e4b2c5d7",
-            "extract_dir": "rclone-v1.41-windows-386"
+            "url": "https://github.com/ncw/rclone/releases/download/v1.42/rclone-v1.42-windows-386.zip",
+            "hash": "c87e3b833d70ddd60313c24a798bfb0a2142bc47005b4e93f46f7cc285b5c844",
+            "extract_dir": "rclone-v1.42-windows-386"
         }
     },
     "bin": "rclone.exe",

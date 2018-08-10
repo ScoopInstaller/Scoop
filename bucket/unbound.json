@@ -1,15 +1,15 @@
 {
     "homepage": "https://unbound.net/",
-    "version": "1.7.1",
+    "version": "1.7.3",
     "license": "BSD-3-Clause",
     "architecture": {
         "64bit": {
-            "url": "https://unbound.net/downloads/unbound-1.7.1.zip",
-            "hash": "bd1f9cc932d2e52204fe612bcab0290f83b84fc2a5adbc857817106991f42c9b"
+            "url": "https://unbound.net/downloads/unbound-1.7.3.zip",
+            "hash": "3a3e0cfa412b4189831040e670db83da14b932c4e334d0ef98a593de2570fa06"
         },
         "32bit": {
-            "url": "https://unbound.net/downloads/unbound-1.7.1-w32.zip",
-            "hash": "9377860b50e19d21820e57defe53ffa615977fa58bf7a0dbcd0e3a28acd5153a"
+            "url": "https://unbound.net/downloads/unbound-1.7.3-w32.zip",
+            "hash": "34fd2155749765c6b115967eebf3245574c0e5294061bc0faf40774d4c9a9598"
         }
     },
     "bin": [
@@ -30,7 +30,7 @@
     },
     "checkver": {
         "url": "https://unbound.net/download.html",
-        "re": "\\(currently ([\\d.]+)\\)"
+        "re": "Unbound ([\\d.]+) \\(Current version\\)"
     },
     "autoupdate": {
         "architecture": {
@@ -46,9 +46,9 @@
         }
     },
     "pre_install": "echo \"if (`$args.count -eq 0) {`n `t`Start-Process -WorkingDirectory `\"`$psscriptroot`\" -f unbound.exe  -a '-c service.conf'-WindowStyle Hidden`n`tWrite-Host -F Green `\"Unbound started in background.``nRun 'ps -n unbound' to show the processes``nRun 'kill -n unbound' to stop the processes`\"`n} else {`n`t& `$psscriptroot @args `n}\" | out-file $dir\\unbound.ps1",
-    "post_install": "
-        (gc \"$dir\\create_unbound_ad_servers.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\create_unbound_ad_servers.cmd\"
-        (gc \"$dir\\unbound_cache.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound_cache.cmd\"
-        (gc \"$dir\\unbound-control-setup.cmd\").Replace('C:\\Program Files', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound-control-setup.cmd\"
-    "
+    "post_install": [
+        "(gc \"$dir\\create_unbound_ad_servers.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\create_unbound_ad_servers.cmd\"",
+        "(gc \"$dir\\unbound_cache.cmd\").Replace('C:\\Program Files (x86)', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound_cache.cmd\"",
+        "(gc \"$dir\\unbound-control-setup.cmd\").Replace('C:\\Program Files', (convert-path \"$dir\\..\")).replace('%prefix%\\Unbound', '%prefix%\\current') | sc \"$dir\\unbound-control-setup.cmd\""
+    ]
 }

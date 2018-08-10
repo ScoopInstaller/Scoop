@@ -1,6 +1,6 @@
 {
     "homepage": "https://developers.google.com/speed/webp/",
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "version": "1.0.0",
     "architecture": {
         "64bit": {

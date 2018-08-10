@@ -1,5 +1,3 @@
-function 7zip_installed { cmd_available '7z' }
-
 function requires_7zip($manifest, $architecture) {
     foreach($dlurl in @(url $manifest $architecture)) {
         if(file_requires_7zip $dlurl) { return $true }
@@ -16,7 +14,7 @@ function requires_lessmsi ($manifest, $architecture) {
 }
 
 function file_requires_7zip($fname) {
-    $fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh))$'
+    $fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
 }
 
 function extract_7zip($path, $to, $recurse) {

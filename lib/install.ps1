@@ -9,10 +9,9 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true) {
+function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $bucket, $null = parse_app $app
     $app, $manifest, $bucket, $url = locate $app $bucket
-    $check_hash = $true
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
@@ -41,7 +40,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $original_dir = $dir # keep reference to real (not linked) directory
     $persist_dir = persistdir $app $global
 
-    $fname = dl_urls $app $version $manifest $architecture $dir $use_cache $check_hash
+    $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
@@ -75,8 +74,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 function locate($app, $bucket) {
     $manifest, $url = $null, $null
 
-    # check if app is a url
-    if($app -match '^((ht)|f)tps?://') {
+    # check if app is a URL or UNC path
+    if($app -match '^(ht|f)tps?://|\\\\') {
         $url = $app
         $app = appname_from_url $url
         $manifest = url_manifest $url
@@ -148,12 +147,193 @@ function do_dl($url, $to, $cookies) {
     }
 }
 
+function aria_exit_code($exitcode) {
+    $codes = @{
+        0='All downloads were successful'
+        1='An unknown error occurred'
+        2='Timeout'
+        3='Resource was not found'
+        4='Aria2 saw the specified number of "resource not found" error. See --max-file-not-found option'
+        5='Download aborted because download speed was too slow. See --lowest-speed-limit option'
+        6='Network problem occurred.'
+        7='There were unfinished downloads. This error is only reported if all finished downloads were successful and there were unfinished downloads in a queue when aria2 exited by pressing Ctrl-C by an user or sending TERM or INT signal'
+        8='Remote server did not support resume when resume was required to complete download'
+        9='There was not enough disk space available'
+        10='Piece length was different from one in .aria2 control file. See --allow-piece-length-change option'
+        11='Aria2 was downloading same file at that moment'
+        12='Aria2 was downloading same info hash torrent at that moment'
+        13='File already existed. See --allow-overwrite option'
+        14='Renaming file failed. See --auto-file-renaming option'
+        15='Aria2 could not open existing file'
+        16='Aria2 could not create new file or truncate existing file'
+        17='File I/O error occurred'
+        18='Aria2 could not create directory'
+        19='Name resolution failed'
+        20='Aria2 could not parse Metalink document'
+        21='FTP command failed'
+        22='HTTP response header was bad or unexpected'
+        23='Too many redirects occurred'
+        24='HTTP authorization failed'
+        25='Aria2 could not parse bencoded file (usually ".torrent" file)'
+        26='".torrent" file was corrupted or missing information that aria2 needed'
+        27='Magnet URI was bad'
+        28='Bad/unrecognized option was given or unexpected option argument was given'
+        29='The remote server was unable to handle the request due to a temporary overloading or maintenance'
+        30='Aria2 could not parse JSON-RPC request'
+        31='Reserved. Not used'
+        32='Checksum validation failed'
+    }
+    if($null -eq $codes[$exitcode]) {
+        return 'An unknown error occurred'
+    }
+    return $codes[$exitcode]
+}
+
+function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
+    $data = @{}
+    $urls = @(url $manifest $architecture)
+
+    # aria2 input file
+    $urlstxt = "$cachedir\$app.txt"
+    $urlstxt_content = ''
+    $has_downloads = $false
+
+    # aria2 options
+    $options = @(
+        "--input-file='$urlstxt'"
+        "--user-agent='$(Get-UserAgent)'"
+        "--allow-overwrite=true"
+        "--auto-file-renaming=false"
+        "--retry-wait=$(get_config 'aria2-retry-wait' 2)"
+        "--split=$(get_config 'aria2-split' 5)"
+        "--max-connection-per-server=$(get_config 'aria2-max-connection-per-server' 5)"
+        "--min-split-size=$(get_config 'aria2-min-split-size' '5M')"
+        "--console-log-level=warn"
+        "--enable-color=false"
+        "--no-conf=true"
+    )
+
+    if($cookies) {
+        $options += "--header='Cookie: $(cookie_header $cookies)'"
+    }
+
+    $proxy = get_config 'proxy'
+    if($proxy -ne 'none') {
+        if([Net.Webrequest]::DefaultWebProxy.Address) {
+            $options += "--all-proxy='$([Net.Webrequest]::DefaultWebProxy.Address.Authority)'"
+        }
+        if([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
+            $options += "--all-proxy-user='$([Net.Webrequest]::DefaultWebProxy.Credentials.UserName)'"
+        }
+        if([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
+            $options += "--all-proxy-passwd='$([Net.Webrequest]::DefaultWebProxy.Credentials.Password)'"
+        }
+    }
+
+    $more_options = get_config 'aria2-options'
+    if($more_options) {
+        $options += $more_options
+    }
+
+    foreach($url in $urls) {
+        $data.$url = @{
+            'filename' = url_filename $url
+            'target' = "$dir\$(url_filename $url)"
+            'cachename' = fname (cache_path $app $version $url)
+            'source' = fullpath (cache_path $app $version $url)
+        }
+
+        if(!(test-path $data.$url.source)) {
+            $has_downloads = $true
+            # create aria2 input file content
+            $urlstxt_content += "$url`n"
+            if(!$url.Contains('sourceforge.net')) {
+                $urlstxt_content += "    referer=$(strip_filename $url)`n"
+            }
+            $urlstxt_content += "    dir=$cachedir`n"
+            $urlstxt_content += "    out=$($data.$url.cachename)`n"
+        } else {
+            Write-Host "Loading " -NoNewline
+            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+            Write-Host " from cache."
+        }
+    }
+
+    if($has_downloads) {
+        # write aria2 input file
+        Set-Content -Path $urlstxt $urlstxt_content
+
+        # build aria2 command
+        $aria2 = "& '$(aria2_path)' $($options -join ' ')"
+
+        # handle aria2 console output
+        Write-Host "Starting download with aria2 ..."
+        $prefix = "Download: "
+        Invoke-Expression $aria2 | ForEach-Object {
+            if([String]::IsNullOrWhiteSpace($_)) {
+                # skip blank lines
+                return
+            }
+            Write-Host $prefix -NoNewline
+            if($_.StartsWith('(OK):')) {
+                Write-Host $_ -f Green
+            } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
+                Write-Host $_ -f Cyan
+            } else {
+                Write-Host $_ -f Gray
+            }
+        }
+
+        if($lastexitcode -gt 0) {
+            error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
+            debug $urlstxt_content
+            debug $aria2
+            abort $(new_issue_msg $app $bucket "download via aria2 failed")
+        }
+
+        # remove aria2 input file when done
+        if(test-path($urlstxt)) {
+            Remove-Item $urlstxt
+        }
+    }
+
+    foreach($url in $urls) {
+
+        # run hash checks
+        if($check_hash) {
+            $manifest_hash = hash_for_url $manifest $url $architecture
+            $ok, $err = check_hash $data.$url.source $manifest_hash $(show_app $app $bucket)
+            if(!$ok) {
+                error $err
+                if(test-path $data.$url.source) {
+                    # rm cached file
+                    Remove-Item -force $data.$url.source
+                }
+                if($url.Contains('sourceforge.net')) {
+                    Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                }
+                abort $(new_issue_msg $app $bucket "hash check failed")
+            }
+        }
+
+        # copy or move file to target location
+        if(!(test-path $data.$url.source) ) {
+            abort $(new_issue_msg $app $bucket "cached file not found")
+        }
+        if($use_cache) {
+            Copy-Item $data.$url.source $data.$url.target
+        } else {
+            Move-Item $data.$url.source $data.$url.target -force
+        }
+    }
+}
+
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($url)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "https?://downloads.sourceforge.net/")) {
+        if (-not ($url -imatch "sourceforge\.net")) {
             $wreq.referer = strip_filename $url
         }
         if($cookies) {
@@ -272,7 +452,7 @@ function dl_progress($read, $total, $url) {
     [console]::SetCursorPosition($left, $top)
 }
 
-function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
 
@@ -291,35 +471,41 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
-    $data = @{}
-
     # download first
-    foreach($url in $urls) {
-        $data.$url = @{
-            "fname" = url_filename $url
-        }
-        $fname = $data.$url.fname
+    if(aria2_enabled) {
+        dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+    } else {
+        foreach($url in $urls) {
+            $fname = url_filename $url
 
-        try {
-            dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
-        } catch {
-            write-host -f darkred $_
-            abort "URL $url is not valid"
+            try {
+                dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+            } catch {
+                write-host -f darkred $_
+                abort "URL $url is not valid"
+            }
+
+            if($check_hash) {
+                $manifest_hash = hash_for_url $manifest $url $architecture
+                $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
+                if(!$ok) {
+                    error $err
+                    $cached = cache_path $app $version $url
+                    if(test-path $cached) {
+                        # rm cached file
+                        Remove-Item -force $cached
+                    }
+                    if($url.Contains('sourceforge.net')) {
+                        Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                    }
+                    abort $(new_issue_msg $app $bucket "hash check failed")
+                }
+            }
         }
     }
 
     foreach($url in $urls) {
-        $fname = $data.$url.fname
-
-        if($check_hash) {
-            $ok, $err = check_hash "$dir\$fname" $url $manifest $architecture
-            if(!$ok) {
-                # rm cached
-                $cached = cache_path $app $version $url
-                if(test-path $cached) { Remove-Item -force $cached }
-                abort $err
-            }
-        }
+        $fname = url_filename $url
 
         $extract_dir = $extract_dirs[$extracted]
         $extract_to = $extract_tos[$extracted]
@@ -351,7 +537,9 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
         }
 
         if($extract_fn) {
-            write-host "Extracting... " -nonewline
+            Write-Host "Extracting " -NoNewline
+            Write-Host $fname -f Cyan -NoNewline
+            Write-Host " ... " -NoNewline
             $null = mkdir "$dir\_tmp"
             & $extract_fn "$dir\$fname" "$dir\_tmp"
             Remove-Item "$dir\$fname"
@@ -360,7 +548,13 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
             }
             # fails if zip contains long paths (e.g. atom.json)
             #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+            try {
+                movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+            }
+            catch {
+                error $_
+                abort $(new_issue_msg $app $bucket "extract_dir error")
+            }
 
             if(test-path "$dir\_tmp") { # might have been moved by movedir
                 try {
@@ -372,7 +566,7 @@ function dl_urls($app, $version, $manifest, $architecture, $dir, $use_cache = $t
                 }
             }
 
-            write-host "done."
+            Write-Host "done." -f Green
 
             $extracted++
         }
@@ -430,14 +624,16 @@ function hash_for_url($manifest, $url, $arch) {
 }
 
 # returns (ok, err)
-function check_hash($file, $url, $manifest, $arch) {
-    $hash = hash_for_url $manifest $url $arch
+function check_hash($file, $hash, $app_name) {
+    $file = fullpath $file
     if(!$hash) {
-        warn "Warning: No hash in manifest. SHA256 is:`n    $(compute_hash (fullpath $file) 'sha256')"
-        return $true
+        warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $(compute_hash $file 'sha256')"
+        return $true, $null
     }
 
-    write-host "Checking hash of $(url_remote_filename $url)... " -nonewline
+    Write-Host "Checking hash of " -NoNewline
+    Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+    Write-Host " ... " -nonewline
     $type, $expected = $hash.split(':')
     if(!$expected) {
         # no type specified, assume sha256
@@ -448,13 +644,26 @@ function check_hash($file, $url, $manifest, $arch) {
         return $false, "Hash type '$type' isn't supported."
     }
 
-    $actual = compute_hash (fullpath $file) $type
+    $actual = (compute_hash $file $type).ToLower()
+    $expected = $expected.ToLower()
 
     if($actual -ne $expected) {
-        return $false, "Hash check failed for '$url'.`nExpected:`n    $($expected)`nActual:`n    $($actual)"
+        $msg = "Hash check failed!`n"
+        $msg += "App:         $app_name`n"
+        $msg += "URL:         $url`n"
+        if(Test-Path $file) {
+            $hexbytes = Get-Content $file -Encoding byte -TotalCount 8 | ForEach-Object { $_.tostring('x2') }
+            $hexbytes = [string]::join(' ', $hexbytes).ToUpper()
+            $msg += "First bytes: $hexbytes`n"
+        }
+        if($expected -or $actual) {
+            $msg += "Expected:    $expected`n"
+            $msg += "Actual:      $actual"
+        }
+        return $false, $msg
     }
-    write-host "ok."
-    return $true
+    Write-Host "ok." -f Green
+    return $true, $null
 }
 
 function compute_hash($file, $algname) {
@@ -473,6 +682,7 @@ function compute_hash($file, $algname) {
         if($fs) { $fs.dispose() }
         if($alg) { $alg.dispose() }
     }
+    return ''
 }
 
 function cmd_available($cmd) {
@@ -510,7 +720,7 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
         write-host -f darkred $_.exception.tostring()
         return $false
     }
-    if($msg) { write-host "done." }
+    if($msg) { Write-Host "done." -f Green }
     return $true
 }
 
@@ -528,7 +738,7 @@ function unpack_inno($fname, $manifest, $dir) {
     Remove-Item -r -force "$dir\_scoop_unpack"
 
     Remove-Item "$dir\$fname"
-    write-host "done."
+    Write-Host "done." -f Green
 }
 
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
@@ -537,7 +747,7 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
     $installer = installer $manifest $architecture
     if($installer.script) {
         write-output "Running installer script..."
-        Invoke-Expression $installer.script
+        Invoke-Expression (@($installer.script) -join "`r`n")
         return
     }
 
@@ -627,7 +837,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
     $uninstaller = uninstaller $manifest $architecture
     if($uninstaller.script) {
         write-output "Running uninstaller script..."
-        Invoke-Expression $uninstaller.script
+        Invoke-Expression (@($uninstaller.script) -join "`r`n")
         return
     }
 
@@ -977,12 +1187,13 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             write-host "Persisting $source"
 
             # add base paths
-            $source = New-Object System.IO.FileInfo(fullpath "$dir\$source")
-            if(!$source.Extension) {
-                $source = New-Object System.IO.DirectoryInfo($source.FullName)
+            if (is_directory (fullpath "$dir\$source")) {
+                $source = New-Object System.IO.DirectoryInfo(fullpath "$dir\$source")
+            } else {
+                $source = New-Object System.IO.FileInfo(fullpath "$dir\$source")
             }
             $target = New-Object System.IO.FileInfo(fullpath "$persist_dir\$target")
-            if(!$target.Extension) {
+            if(!$target.Extension -and !$source.Exists) {
                 $target = New-Object System.IO.DirectoryInfo($target.FullName)
             }
 

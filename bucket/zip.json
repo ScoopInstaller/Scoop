@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.info-zip.org/",
-    "license": "http://www.info-zip.org/pub/infozip/license.html",
+    "license": "Info-ZIP",
     "description": "Zip compression utilities",
     "version": "3.0",
     "bin": [

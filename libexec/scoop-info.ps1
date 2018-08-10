@@ -20,11 +20,7 @@ $status = app_status $app $global
 $manifest, $bucket = find_manifest $app $bucket
 
 if (!$manifest) {
-    if ($bucket) {
-        abort "Could not find manifest for '$bucket/$app'."
-    } else {
-        abort "Could not find manifest for '$app'."
-    }
+    abort "Could not find manifest for '$(show_app $app $bucket)'."
 }
 
 $install = install_info $app $status.version $global
@@ -55,13 +51,18 @@ Write-Output "Website: $($manifest.homepage)"
 # Show license
 if ($manifest.license) {
     $license = $manifest.license
-    if($manifest.license -notmatch '^((ht)|f)tps?://') {
+    if ($manifest.license.identifier -and $manifest.license.url) {
+        $license = "$($manifest.license.identifier) ($($manifest.license.url))"
+    } elseif ($manifest.license -match '^((ht)|f)tps?://') {
+        $license = "$($manifest.license)"
+    } else {
         $license = "$($manifest.license) (https://spdx.org/licenses/$($manifest.license).html)"
     }
     Write-Output "License: $license"
 }
 
 # Manifest file
+$manifest_file = fullpath $manifest_file
 Write-Output "Manifest:`n  $manifest_file"
 
 if($status.installed) {
@@ -79,7 +80,15 @@ if($status.installed) {
 
 $binaries = arch_specific 'bin' $manifest $install.architecture
 if($binaries) {
-    Write-Output "Binaries:`n  $binaries"
+    $binary_output = "Binaries:`n  "
+    $binaries | ForEach-Object {
+        if($_ -is [System.Array]) {
+            $binary_output += " $($_[1]).exe"
+        } else {
+            $binary_output += " $_"
+        }
+    }
+    Write-Output $binary_output
 }
 
 if($manifest.env_set -or $manifest.env_add_path) {

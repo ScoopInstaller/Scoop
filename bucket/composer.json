@@ -1,26 +1,26 @@
 {
     "homepage": "https://getcomposer.org/",
     "license": "MIT",
-    "version": "1.6.5",
-    "url": "https://getcomposer.org/download/1.6.5/composer.phar",
+    "version": "1.7.1",
+    "url": "https://getcomposer.org/download/1.7.1/composer.phar",
     "bin": "composer.ps1",
     "persist": "home",
     "env_set": {
         "COMPOSER_HOME": "$persist_dir\\home"
     },
     "env_add_path": "home\\vendor\\bin",
-    "pre_install": "
-        echo 'if($args -eq \"selfupdate\" -or $args -eq \"self-update\") { & scoop update composer }' | out-file \"$dir\\composer.ps1\"
-        echo 'else { & php (join-path \"$psscriptroot\" \"composer.phar\") @args }' | out-file \"$dir\\composer.ps1\" -append
-    ",
-    "post_install": "
-        $och = \"$env:APPDATA\\Composer\"
-        if(Test-Path $och) {
-            Write-Host -F yellow \"Moving old 'COMPOSER_HOME' to '$persist_dir\\home'\"
-            Move-Item -Force \"$och\\*\" \"$persist_dir\\home\"
-            Remove-Item -Force \"$och\"
-        }
-    ",
+    "pre_install": [
+        "echo 'if($args.length -eq 1 -and ($args -eq \"selfupdate\" -or $args -eq \"self-update\")) { & scoop update composer }' | out-file \"$dir\\composer.ps1\"",
+        "echo 'else { & php (join-path $psscriptroot \"composer.phar\") @args }' | out-file \"$dir\\composer.ps1\" -append"
+    ],
+    "post_install": [
+        "$och = \"$env:APPDATA\\Composer\"",
+        "if(Test-Path $och) {",
+        "Write-Host -F yellow \"Moving old 'COMPOSER_HOME' to '$persist_dir\\home'\"",
+        "Move-Item -Force \"$och\\*\" \"$persist_dir\\home\"",
+        "Remove-Item -Force \"$och\"",
+        "}"
+    ],
     "suggest": {
         "PHP": [
             "php",
@@ -30,7 +30,7 @@
     "notes": [
         "'composer selfupdate' is aliased to 'scoop update composer'"
     ],
-    "hash": "67bebe9df9866a795078bb2cf21798d8b0214f2e0b2fd81f2e907a8ef0be3434",
+    "hash": "1c0e95dc3f33985f9eeabb6f57896c0f9d46b7c9e70ad7bf2210a5508869a8fa",
     "checkver": {
         "github": "https://github.com/composer/composer"
     },

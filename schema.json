@@ -241,7 +241,7 @@
                     "type": "string"
                 },
                 "script": {
-                    "type": "string"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "keep": {
                     "type": "boolean"
@@ -286,7 +286,7 @@
                     "type": "string"
                 },
                 "script": {
-                    "type": "string"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             },
             "oneOf": [
@@ -329,12 +329,12 @@
     },
     "properties": {
         "_comment": {
-            "description": "Undocumented: only found in scoop/git* and 6 manifests in scoop-extras",
-            "type": "string"
+            "description": "Deprecated. Use ## instead.",
+            "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "##": {
             "description": "A comment.",
-            "type": "string"
+            "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "architecture": {
             "additionalProperties": false,
@@ -361,7 +361,7 @@
             "$ref": "#/definitions/checkver"
         },
         "cookie": {
-            "description": "Undocumented: only found in scoop-extras/oraclejdk*",
+            "description": "Undocumented: Found at https://github.com/se35710/scoop-java/search?l=JSON&q=cookie",
             "type": "object"
         },
         "depends": {
@@ -381,7 +381,7 @@
         },
         "extract_to": {
             "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "Undocumented: only found in scoop/ruby*"
+            "description": "No longer used."
         },
         "hash": {
             "$ref": "#/definitions/hash"
@@ -391,14 +391,34 @@
             "type": "string"
         },
         "innosetup": {
-            "description": "Undocumented: only found in 6 manifests in scoop",
+            "description": "True if the installer InnoSetup based. Found in https://github.com/lukesampson/scoop/search?l=JSON&q=innosetup",
             "type": "boolean"
         },
         "installer": {
             "$ref": "#/definitions/installer"
         },
         "license": {
-            "type": "string"
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "url": {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        "identifier": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "identifier"
+                    ],
+                    "type": "object"
+                }
+            ]
         },
         "msi": {
             "$ref": "#/definitions/stringOrArrayOfStrings",

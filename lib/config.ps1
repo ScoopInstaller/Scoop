@@ -41,7 +41,10 @@ function load_cfg {
     }
 }
 
-function get_config($name) {
+function get_config($name, $default) {
+    if($null -eq $cfg.$name -and $null -ne $default) {
+        return $default
+    }
     return $cfg.$name
 }
 

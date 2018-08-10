@@ -1,15 +1,15 @@
 {
     "homepage": "http://windows.php.net",
-    "version": "7.2.5",
+    "version": "7.2.8",
     "license": "PHP-3.01",
     "architecture": {
         "64bit": {
-            "url": "https://windows.php.net/downloads/releases/php-7.2.5-Win32-VC15-x64.zip",
-            "hash": "a00982cd6f94b7c006771bb233fda649a4c159d47a8dfaba2bf10a885e2c9d9f"
+            "url": "https://windows.php.net/downloads/releases/php-7.2.8-Win32-VC15-x64.zip",
+            "hash": "430434e700e351544ded0cfcb541800521d0801ac20bccf9bc3987d25d9762bd"
         },
         "32bit": {
-            "url": "https://windows.php.net/downloads/releases/php-7.2.5-Win32-VC15-x86.zip",
-            "hash": "1a030f161f5577c8934bee39de0ea01c600249f2139b1fb881ddcc48dd6c21f1"
+            "url": "https://windows.php.net/downloads/releases/php-7.2.8-Win32-VC15-x86.zip",
+            "hash": "2068bd70f85a844f7053215dbfdb5f840c48da0a82692e65ab4924f643e60963"
         }
     },
     "bin": [
@@ -27,21 +27,21 @@
     "env_set": {
         "PHP_INI_SCAN_DIR": "$dir\\cli;$dir\\cli\\conf.d;"
     },
-    "post_install": "
-# Copy ini scan dir from old location before persistent update
-if ((Test-Path \"$dir\\..\\conf\") -and !(Test-Path \"$dir\\cli\\conf.d\")) {
-    Write-Host -ForegroundColor Cyan \"We are moving your php configuration to $dir\\cli\\conf.d\"
-    Move-Item \"$dir\\..\\conf\" \"$dir\\cli\\conf.d\"
-}
-
-# Create directory for custom PHP configuration
-if (!(Test-Path \"$dir\\cli\\conf.d\")) {
-    (New-Item -Type directory \"$dir\\cli\\conf.d\") | Out-Null
-}
-
-# Enable extensions to be found in installation-relative folder (the default is to search C:/php)
-(gc \"$dir\\cli\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\cli\\php.ini\"
-",
+    "post_install": [
+        "# Copy ini scan dir from old location before persistent update",
+        "if ((Test-Path \"$dir\\..\\conf\") -and !(Test-Path \"$dir\\cli\\conf.d\")) {",
+        "    Write-Host -ForegroundColor Cyan \"We are moving your php configuration to $dir\\cli\\conf.d\"",
+        "    Move-Item \"$dir\\..\\conf\" \"$dir\\cli\\conf.d\"",
+        "}",
+        "",
+        "# Create directory for custom PHP configuration",
+        "if (!(Test-Path \"$dir\\cli\\conf.d\")) {",
+        "    (New-Item -Type directory \"$dir\\cli\\conf.d\") | Out-Null",
+        "}",
+        "",
+        "# Enable extensions to be found in installation-relative folder (the default is to search C:/php)",
+        "(gc \"$dir\\cli\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\cli\\php.ini\""
+    ],
     "checkver": {
         "url": "http://windows.php.net/download/",
         "re": "<h3 id=\"php-7.2\".*?>.*?\\(([\\d.]+)\\)</h3>"

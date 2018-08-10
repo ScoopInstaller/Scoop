@@ -29,6 +29,6 @@
     },
     "description": "Tidy HTML and XML files",
     "homepage": "http://www.html-tidy.org/",
-    "license": "http://www.html-tidy.org/documentation/#license",
+    "license": "BSD-3-Clause",
     "version": "5.6.0"
 }

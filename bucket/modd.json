@@ -1,10 +1,10 @@
 {
     "homepage": "https://corte.si/posts/modd/announce/index.html",
     "license": "MIT",
-    "version": "0.5",
-    "url": "https://github.com/cortesi/modd/releases/download/v0.5/modd-0.5-windows64.zip",
-    "hash": "0417e71834aba98a58fc9b65395a8212f39a7fa336cb95cdf2005ebc28315d05",
-    "extract_dir": "modd-0.5-windows64",
+    "version": "0.7",
+    "url": "https://github.com/cortesi/modd/releases/download/v0.7/modd-0.7-windows64.zip",
+    "hash": "cadc3e7b68e67131c7db8260fda6bb9f91a08497eb04cd6cc451dd23a42ebe56",
+    "extract_dir": "modd-0.7-windows64",
     "bin": "modd.exe",
     "checkver": {
         "github": "https://github.com/cortesi/modd"

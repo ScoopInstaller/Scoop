@@ -1,7 +1,10 @@
 {
     "homepage": "http://www.7-zip.org/",
-    "description": "A free and open-source file archiver with a high compression ratio",
-    "license": "http://www.7-zip.org/license.txt",
+    "description": "A multi-format file archiver with high compression ratios",
+    "license": {
+        "identifier": "LGPL-2.0-only,BSD-3-Clause",
+        "url": "https://www.7-zip.org/license.txt"
+    },
     "version": "18.05",
     "architecture": {
         "64bit": {

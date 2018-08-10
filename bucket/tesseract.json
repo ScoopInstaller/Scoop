@@ -1,9 +1,9 @@
 {
     "homepage": "https://github.com/UB-Mannheim/tesseract/wiki",
     "license": "Apache-2.0",
-    "version": "3.05.01",
-    "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.01.exe#/dl.7z",
-    "hash": "d4c9d3613ee9531cd093692636b58bc87f87a29a188783dbeb03b127e66fa6ba",
+    "version": "3.05.02-20180621",
+    "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.02-20180621.exe#/dl.7z",
+    "hash": "26bd9ab1fadf0334a6fb60a45269d87e8a60824df82b7cc74c6d665c0fc1ec0c",
     "bin": [
         "ambiguous_words.exe",
         "classifier_tester.exe",

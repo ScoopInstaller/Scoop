@@ -11,9 +11,9 @@
         ]
     },
     "bin": "bfg.ps1",
-    "pre_install": "
-        write-output ('java -jar {0}\\bfg-{1}.jar $args' -f \"$dir\", \"$version\") | out-file -filepath $dir\\bfg.ps1
-    ",
+    "pre_install": [
+        "write-output ('java -jar {0}\\bfg-{1}.jar $args' -f \"$dir\", \"$version\") | out-file -filepath $dir\\bfg.ps1"
+    ],
     "checkver": {
         "url": "https://search.maven.org/solrsearch/select/?q=g:com.madgag+AND+a:bfg",
         "jp": "$.response.docs[0].latestVersion"
