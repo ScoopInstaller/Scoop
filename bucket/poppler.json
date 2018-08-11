@@ -1,6 +1,7 @@
 {
     "autoupdate": {
-        "url": "http://blog.alivate.com.au/wp-content/uploads/$matchDate/poppler-$version_x86.7z"
+        "url": "http://blog.alivate.com.au/wp-content/uploads/$matchDate/poppler-$version_x86.7z",
+        "extract_dir": "poppler-$version"
     },
     "bin": [
         "bin/pdfdetach.exe",
@@ -17,7 +18,7 @@
     ],
     "checkver": "Latest.*uploads/(?<date>\\d{4}/\\d{2})/poppler-(?<version>[\\d.]+)_x86.7z",
     "description": "PDF rendering library",
-    "extract_dir": "poppler-0.51",
+    "extract_dir": "poppler-0.67.0",
     "hash": "71763bfef42aa161c052a667139daeb81b69beabda3c4861a1c25e8f28ab65a6",
     "homepage": "http://blog.alivate.com.au/poppler-windows/",
     "license": "GPL-3.0",
