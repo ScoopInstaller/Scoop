@@ -2,6 +2,7 @@
 
 # remote install:
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+$old_erroractionpreference = $erroractionpreference
 $erroractionpreference = 'stop' # quit if anything goes wrong
 
 if(($PSVersionTable.PSVersion.Major) -lt 3) {
@@ -50,3 +51,5 @@ ensure_robocopy_in_path
 ensure_scoop_in_path
 success 'Scoop was installed successfully!'
 Write-Output "Type 'scoop help' for instructions."
+
+$erroractionpreference = $old_erroractionpreference # Reset $erroractionpreference to original value
