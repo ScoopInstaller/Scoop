@@ -31,6 +31,14 @@
             "root\\bin\\bash.exe",
             "cygwin",
             "--login -i"
+        ],
+        [
+            "setup-x86_64.exe",
+            "Cygwin-Setup"
+        ],
+        [
+            "setup-x86.exe",
+            "Cygwin-Setup"
         ]
     ],
     "installer": {
