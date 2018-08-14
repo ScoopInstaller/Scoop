@@ -3,7 +3,7 @@
     "version": "0.8.2",
     "license": "Apache-2.0",
     "url": "https://github.com/JetBrains/kotlin-native/releases/download/v0.8.2/kotlin-native-windows-0.8.2.zip",
-    "hash": "491a85ac0aba56c426a3febad2e0a22be31dd0bf28cdcc233561a59bdee111be",
+    "hash": "9e43c632685ec95566d1373b12ca047cc95bdba9eb8273a0903bd594d6cf33b7",
     "extract_dir": "kotlin-native-windows-0.8.2",
     "bin": [
         "bin\\cinterop.bat",
