@@ -22,7 +22,7 @@
         "NVM_HOME": "$dir",
         "NVM_SYMLINK": "$persist_dir\\nodejs\\nodejs"
     },
-    "hash": "e849bd99ace4c4d4d194409c3fb2858df2b775423acf6b099a8acf3443abd17c",
+    "hash": "md5:00acf86e40c5f038cca8c383b9d2c207",
     "architecture": {
         "64bit": {
             "pre_install": [
@@ -42,7 +42,12 @@
     "notes": [
         "You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly"
     ],
+    "checkver": "github",
     "autoupdate": {
-        "url": "https://github.com/coreybutler/nvm-windows/releases/download/$version/nvm-noinstall.zip"
+        "url": "https://github.com/coreybutler/nvm-windows/releases/download/$version/nvm-noinstall.zip",
+        "hash": {
+            "url": "$url.checksum.txt",
+            "find": "([a-fA-F0-9]{32})"
+        }
     }
 }
