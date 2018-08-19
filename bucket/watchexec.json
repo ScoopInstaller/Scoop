@@ -2,9 +2,9 @@
     "homepage": "https://github.com/mattgreen/watchexec",
     "description": "Execute commands in response to file modifications",
     "license": "Apache-2.0",
-    "version": "1.8.6",
-    "url": "https://github.com/mattgreen/watchexec/releases/download/1.8.6/watchexec-1.8.6-x86_64-pc-windows-gnu.zip",
-    "hash": "60084c13bafcaa9bd743f08d9094d23410eb87540f5ea1ce694843f900df326f",
+    "version": "1.9.0",
+    "url": "https://github.com/mattgreen/watchexec/releases/download/1.9.0/watchexec-1.9.0-x86_64-pc-windows-gnu.zip",
+    "hash": "d5132c10ba764a7af49aa1d26a621d1a6431ec84482b5762f8ab5a3bd1c63939",
     "bin": "watchexec.exe",
     "checkver": "github",
     "autoupdate": {
