@@ -1,0 +1,11 @@
+{
+    "homepage": "http://passgenwin.sourceforge.net/abpage/projects.xhtml#png2jpeg",
+    "description": "png2jpeg is a simple command-line image converter from PNG to JPEG",
+    "license": "MIT",
+    "version": "1.0.1.7",
+    "url": "https://sourceforge.net/projects/png2jpeg/files/win(?<arch>64|32)/png2jpeg-$version-win(?<arch>64|32).zip",
+    "extract_dir": "png2jpeg-$version-win(?<arch>64|32)",
+    "bin": "png2jpeg.exe",
+    "checkver": "png2jpeg-\\s+([\\d.]+)-src.zip",
+    "autoupdate": "https://sourceforge.net/projects/png2jpeg/files/win(?<arch>64|32)/png2jpeg-$version-win(?<arch>64|32).zip"
+}
