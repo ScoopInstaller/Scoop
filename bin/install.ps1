@@ -19,6 +19,13 @@ if((get-executionpolicy) -gt 'RemoteSigned') {
     break
 }
 
+if([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'Tls12') {
+    Write-Output "Scoop requires at least .NET Framework 4.5"
+    Write-Output "Please download and install it first:"
+    Write-Output "https://www.microsoft.com/net/download"
+    break
+}
+
 # get core functions
 $core_url = 'https://raw.github.com/lukesampson/scoop/master/lib/core.ps1'
 Write-Output 'Initializing...'
