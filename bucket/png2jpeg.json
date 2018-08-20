@@ -5,12 +5,14 @@
     "version": "1.0.1.7",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/png2jpeg/files/win64/png2jpeg-1.0.1.7-win64.zip",
-            "hash": "sha1:d9a87cd875e33b6c6c7d8a902c4da54e6f11e807"
+            "url": "https://downloads.sourceforge.net/project/png2jpeg/win64/png2jpeg-1.0.1.7-win64.zip",
+            "hash": "sha1:d9a87cd875e33b6c6c7d8a902c4da54e6f11e807",
+            "extract_dir": "png2jpeg-1.0.1.7-win64"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/png2jpeg/files/win32/png2jpeg-1.0.1.7-win32.zip",
-            "hash": "sha1:b4fe4bc3c776038c750733bfc520bc11d726cba5"
+            "url": "https://downloads.sourceforge.net/project/png2jpeg/win32/png2jpeg-1.0.1.7-win32.zip",
+            "hash": "sha1:b4fe4bc3c776038c750733bfc520bc11d726cba5",
+            "extract_dir": "png2jpeg-1.0.1.7-win32"
         }
     },
     "bin": "png2jpeg.exe",
@@ -21,11 +23,11 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://sourceforge.net/projects/png2jpeg/files/win64/png2jpeg-$version-win64.zip",
+                "url": "https://downloads.sourceforge.net/project/png2jpeg/win64/png2jpeg-$version-win64.zip",
                 "extract_dir": "png2jpeg-$version-win64"
             },
             "32bit": {
-                "url": "https://sourceforge.net/projects/png2jpeg/files/win32/png2jpeg-$version-win32.zip",
+                "url": "https://downloads.sourceforge.net/project/png2jpeg/win32/png2jpeg-$version-win32.zip",
                 "extract_dir": "png2jpeg-$version-win32"
             }
         }
