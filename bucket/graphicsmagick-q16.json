@@ -12,21 +12,7 @@
             "hash": "sha1:3eb4e6b12540e64bd1d78913e221ec5f3573fb55"
         }
     },
-    "installer": {
-        "args": [
-            "/SILENT",
-            "/SUPPRESSMSHBOXES",
-            "/DIR=$dir"
-        ]
-    },
-    "uninstaller": {
-        "file": "unins000.exe",
-        "args": [
-            "/SILENT",
-            "/SUPPRESSMSHBOXES",
-            "/NOCANCEL"
-        ]
-    },
+    "innosetup": true,
     "bin": [
         "gm.exe",
         [
