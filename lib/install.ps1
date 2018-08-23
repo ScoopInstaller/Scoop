@@ -1225,27 +1225,27 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
 #check whether write permission for Users usergroup is set to global persist dir, if not then set
 function persist_permission($persist, $global) {
-	if ($persist -and $global) {
-		$path = "$(basedir $global)\persist"
-		$user = -join ([System.Environment]::MachineName, "\Users")
-		$Rights = "Write"
-		$InheritSettings = "ObjectInherit"
-		$PropogationSettings = "none"
-		$RuleType = "Allow"
+    if ($persist -and $global) {
+        $path = "$(basedir $global)\persist"
+        $user = -join ([System.Environment]::MachineName, "\Users")
+        $Rights = "Write"
+        $InheritSettings = "ObjectInherit"
+        $PropogationSettings = "none"
+        $RuleType = "Allow"
 
-		$acl = Get-Acl -Path $path
-		
-		$perm = $user, $Rights, $InheritSettings, $PropogationSettings, $RuleType
-		$targetRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $perm
-		
-		$isSet = $true
-		ForEach ($existRule in $acl) {
-			$isSet = ($existRule -match $targetRule) -and $isSet
-		}
-		
-		if (!$isSet) {
-			$acl.SetAccessRule($targetRule)
-			$acl | Set-Acl -Path $path
-		}
-	}
+        $acl = Get-Acl -Path $path
+
+        $perm = $user, $Rights, $InheritSettings, $PropogationSettings, $RuleType
+        $targetRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $perm
+
+        $isSet = $true
+        ForEach ($existRule in $acl) {
+            $isSet = ($existRule -match $targetRule) -and $isSet
+        }
+
+        if (!$isSet) {
+            $acl.SetAccessRule($targetRule)
+            $acl | Set-Acl -Path $path
+        }
+    }
 }
