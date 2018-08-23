@@ -55,7 +55,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     # persist data
     persist_permission $persist $global
-    
+
     persist_data $manifest $original_dir $persist_dir
 
     post_install $manifest $architecture
