@@ -15,5 +15,8 @@
         }
     },
     "env_add_path": "bin",
-    "notes": "The 64bit version is built with Structured Exception Handling (SEH), the 32bit is built with DWARF. Both 64bit and 32bit support Posix threading model"
+    "notes": [
+        "The 64-bit version is built with Structured Exception Handling (SEH), whereas the 32-bit version is built with DWARF.",
+        "Both 64-bit and 32-bit versions use the POSIX threading model."
+    ]
 }
