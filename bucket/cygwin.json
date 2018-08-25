@@ -5,11 +5,35 @@
     "architecture": {
         "64bit": {
             "url": "https://cygwin.com/setup-x86_64.exe",
-            "hash": "01794f55fab26842c12e2a67fc218ad9c1a9201ccf0bf2fbd9f5815d6f20182f"
+            "hash": "01794f55fab26842c12e2a67fc218ad9c1a9201ccf0bf2fbd9f5815d6f20182f",
+            "bin": [
+                [
+                    "setup-x86_64.exe",
+                    "Setup-Cygwin"
+                ]
+            ],
+            "shortcuts": [
+                [
+                    "setup-x86_64.exe",
+                    "Setup Cygwin64"
+                ]
+            ]
         },
         "32bit": {
             "url": "https://cygwin.com/setup-x86.exe",
-            "hash": "3da0b1a5a14418abc8bb04bcbd475fe8cf25648526302dfee563de9e5c0b5ff2"
+            "hash": "3da0b1a5a14418abc8bb04bcbd475fe8cf25648526302dfee563de9e5c0b5ff2",
+            "bin": [
+                [
+                    "setup-x86.exe",
+                    "Setup-Cygwin"
+                ]
+            ],
+            "shortcuts": [
+                [
+                    "setup-x86.exe",
+                    "Setup Cygwin"
+                ]
+            ]
         }
     },
     "autoupdate": {
@@ -31,14 +55,6 @@
             "root\\bin\\bash.exe",
             "cygwin",
             "--login -i"
-        ],
-        [
-            "setup-x86_64.exe",
-            "Setup-Cygwin"
-        ],
-        [
-            "setup-x86.exe",
-            "Setup-Cygwin"
         ]
     ],
     "installer": {
@@ -59,24 +75,6 @@
         "root"
     ],
     "pre_install": "new-item -itemtype directory \"$dir\\root\"; new-item -itemtype directory \"$dir\\packages\"",
-    "post_install": [
-        "$customShortcut = (New-Object -ComObject (\"WScript.Shell\")).CreateShortcut(",
-        "   $( if ($global) {",
-        "           Join-Path ([Environment]::GetFolderPath('CommonStartMenu')) '\\Scoop Apps\\Setup Cygwin.lnk'",
-        "      } else {",
-        "           Join-Path ([Environment]::GetFolderPath('StartMenu')) '\\Scoop Apps\\Setup Cygwin.lnk'",
-        "      }",
-        "   )",
-        ")",
-        "If (Test-Path $dir\\setup-x86_64.exe) {",
-        "   $customShortcut.targetPath = Join-Path $dir '\\setup-x86_64.exe'",
-        "   $customShortcut.save()",
-        "}",
-        "If (Test-Path $dir\\setup-x86.exe) {",
-        "   $customShortcut.targetPath = Join-Path $dir '\\setup-x86.exe'",
-        "   $customShortcut.save()",
-        "}"
-    ],
     "shortcuts": [
         [
             "root\\Cygwin.bat",
