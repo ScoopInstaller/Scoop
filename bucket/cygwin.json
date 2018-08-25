@@ -34,11 +34,11 @@
         ],
         [
             "setup-x86_64.exe",
-            "Cygwin-Setup"
+            "Setup-Cygwin"
         ],
         [
             "setup-x86.exe",
-            "Cygwin-Setup"
+            "Setup-Cygwin"
         ]
     ],
     "installer": {
@@ -59,6 +59,24 @@
         "root"
     ],
     "pre_install": "new-item -itemtype directory \"$dir\\root\"; new-item -itemtype directory \"$dir\\packages\"",
+    "post_install": [
+        "$customShortcut = (New-Object -ComObject (\"WScript.Shell\")).CreateShortcut(",
+        "   $( if ($global) {",
+        "           Join-Path ([Environment]::GetFolderPath('CommonStartMenu')) '\\Scoop Apps\\Setup Cygwin.lnk'",
+        "      } else {",
+        "           Join-Path ([Environment]::GetFolderPath('StartMenu')) '\\Scoop Apps\\Setup Cygwin.lnk'",
+        "      }",
+        "   )",
+        ")",
+        "If (Test-Path $dir\\setup-x86_64.exe) {",
+        "   $customShortcut.targetPath = Join-Path $dir '\\setup-x86_64.exe'",
+        "   $customShortcut.save()",
+        "}",
+        "If (Test-Path $dir\\setup-x86.exe) {",
+        "   $customShortcut.targetPath = Join-Path $dir '\\setup-x86.exe'",
+        "   $customShortcut.save()",
+        "}"
+    ],
     "shortcuts": [
         [
             "root\\Cygwin.bat",
