@@ -8,11 +8,20 @@
             "hash": "01794f55fab26842c12e2a67fc218ad9c1a9201ccf0bf2fbd9f5815d6f20182f",
             "bin": [
                 [
+                    "root\\bin\\bash.exe",
+                    "cygwin",
+                    "--login -i"
+                ],
+                [
                     "setup-x86_64.exe",
                     "Setup-Cygwin"
                 ]
             ],
             "shortcuts": [
+                [
+                    "root\\Cygwin.bat",
+                    "Cygwin"
+                ],
                 [
                     "setup-x86_64.exe",
                     "Setup Cygwin64"
@@ -24,11 +33,20 @@
             "hash": "3da0b1a5a14418abc8bb04bcbd475fe8cf25648526302dfee563de9e5c0b5ff2",
             "bin": [
                 [
+                    "root\\bin\\bash.exe",
+                    "cygwin",
+                    "--login -i"
+                ],
+                [
                     "setup-x86.exe",
                     "Setup-Cygwin"
                 ]
             ],
             "shortcuts": [
+                [
+                    "root\\Cygwin.bat",
+                    "Cygwin"
+                ],
                 [
                     "setup-x86.exe",
                     "Setup Cygwin"
@@ -50,13 +68,6 @@
         "re": "<a.*href=\"/git/\\?p=cygwin-apps/setup\\.git;a=tag.*\">([\\d.]+)</a>",
         "url": "https://cygwin.com/git/?p=cygwin-apps/setup.git;a=tags"
     },
-    "bin": [
-        [
-            "root\\bin\\bash.exe",
-            "cygwin",
-            "--login -i"
-        ]
-    ],
     "installer": {
         "args": [
             "--no-admin",
@@ -74,11 +85,5 @@
         "packages",
         "root"
     ],
-    "pre_install": "new-item -itemtype directory \"$dir\\root\"; new-item -itemtype directory \"$dir\\packages\"",
-    "shortcuts": [
-        [
-            "root\\Cygwin.bat",
-            "Cygwin"
-        ]
-    ]
+    "pre_install": "new-item -itemtype directory \"$dir\\root\"; new-item -itemtype directory \"$dir\\packages\""
 }
