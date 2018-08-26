@@ -15,7 +15,7 @@
         }
     },
     "bin": [
-        "bin\\octave.exe",
+        "bin\\octave.bat",
         "bin\\octave-gui.exe",
         "bin\\octave-cli.exe",
         "bin\\octave-config.exe"
