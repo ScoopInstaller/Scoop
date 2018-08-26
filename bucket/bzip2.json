@@ -1,6 +1,6 @@
 {
     "version": "1.0.6",
-    "homepage": "http://www.bzip.org/",
+    "homepage": "https://github.com/philr/bzip2-windows",
     "description": "Freely available, patent free, high-quality data compressor",
     "architecture": {
         "32bit": {
@@ -19,5 +19,7 @@
         "bzip2recover.exe"
     ],
     "pre_install": "cp \"$dir\\bzip2.exe\" \"$dir\\bunzip2.exe\"; cp \"$dir\\bzip2.exe\" \"$dir\\bzcat.exe\"",
-    "checkver": "The current version is <b>([\\d.]+)"
+    "checkver": {
+        "github": "https://github.com/philr/bzip2-windows"
+    }
 }
