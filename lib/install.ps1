@@ -55,6 +55,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     # persist data
     persist_data $manifest $original_dir $persist_dir
+    persist_permission $manifest $global
 
     post_install $manifest $architecture
 
@@ -1219,4 +1220,17 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             }
         }
     }
+}
+
+# check whether write permission for Users usergroup is set to global persist dir, if not then set
+function persist_permission($manifest, $global) {
+    if ($manifest.persist -and !$global) {
+        return
+    }
+    $path = persistdir $null $global
+    $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
+    $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
+    $acl = Get-Acl -Path $path
+    $acl.SetAccessRule($target_rule)
+    $acl | Set-Acl -Path $path
 }
