@@ -1227,7 +1227,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 function persist_permission($persist, $global) {
     if ($persist -and $global) {
         $path = "$(basedir $global)\persist"
-        $user = -join ([System.Environment]::MachineName, (([System.Security.Principal.SecurityIdentifier]'S-1-5-32-545').Translate([System.Security.Principal.NTAccount])).Value)
+        $user = -join ([System.Environment]::MachineName, '\',
+            (([System.Security.Principal.SecurityIdentifier]'S-1-5-32-545').Translate([System.Security.Principal.NTAccount])).Value)
         $Rights = "Write"
         $InheritSettings = "ObjectInherit"
         $PropogationSettings = "none"
