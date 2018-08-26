@@ -18,8 +18,8 @@
         "Rust\\bin\\cargo.exe"
     ],
     "checkver": {
-        "url": "https://github.com/rust-lang/rust/releases",
-        "re": "<span class=\"tag-name\">([\\d.]+)</span>"
+        "url": "https://www.rust-lang.org/en-US/",
+        "re": "Install Rust <span>([\\d.]+)</span>"
     },
     "autoupdate": {
         "architecture": {
