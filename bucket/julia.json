@@ -8,8 +8,8 @@
             "hash": "3bf5572cbcbc7848b235dcf21caf24ce26b9fb3839eb13db1a7170d20cdf834d"
         },
         "32bit": {
-            "url": "https://julialang-s3.julialang.org/bin/winnt/x64/1.0/julia-1.0.0-win32.exe#/dl.7z",
-            "hash": "df7b3685c1bef8acb694ae2e771a9b9744494140815a7b3a5a40a28954d724ff"
+            "url": "https://julialang-s3.julialang.org/bin/winnt/x86/1.0/julia-1.0.0-win32.exe#/dl.7z",
+            "hash": "B3DDB27B9B5195032F7B405F411D36636F4E0964AD256C8B479AD8313AA16136"
         }
     },
     "installer": {
