@@ -37,7 +37,7 @@
     ],
     "checkver": {
         "url": "https://julialang.org/downloads/",
-        "re": "<h1[^>]+>Current Release \\(v([\\d.]+)\\)</h1>"
+        "re": "Current stable release \\(v([\\d.]+)\\)"
     },
     "autoupdate": {
         "architecture": {
