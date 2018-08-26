@@ -54,9 +54,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     env_set $manifest $dir $global
 
     # persist data
-    persist_permission $persist $global
-
     persist_data $manifest $original_dir $persist_dir
+    persist_permission $manifest $global
 
     post_install $manifest $architecture
 
@@ -1223,29 +1222,15 @@ function persist_data($manifest, $original_dir, $persist_dir) {
     }
 }
 
-#check whether write permission for Users usergroup is set to global persist dir, if not then set
-function persist_permission($persist, $global) {
-    if ($persist -and $global) {
-        $path = "$(basedir $global)\persist"
-        $user = [System.Security.Principal.SecurityIdentifier]'S-1-5-32-545'
-        $Rights = "Write"
-        $InheritSettings = "ObjectInherit"
-        $PropogationSettings = "none"
-        $RuleType = "Allow"
-
-        $acl = Get-Acl -Path $path
-
-        $perm = $user, $Rights, $InheritSettings, $PropogationSettings, $RuleType
-        $targetRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $perm
-
-        $isSet = $true
-        ForEach ($existRule in $acl) {
-            $isSet = ($existRule -match $targetRule) -and $isSet
-        }
-
-        if (!$isSet) {
-            $acl.SetAccessRule($targetRule)
-            $acl | Set-Acl -Path $path
-        }
+# check whether write permission for Users usergroup is set to global persist dir, if not then set
+function persist_permission($manifest, $global) {
+    if ($manifest.persist -and !$global) {
+        return
     }
+    $path = persistdir $null $global
+    $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
+    $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
+    $acl = Get-Acl -Path $path
+    $acl.SetAccessRule($target_rule)
+    $acl | Set-Acl -Path $path
 }
