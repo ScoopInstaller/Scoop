@@ -1,17 +1,34 @@
 {
     "homepage": "https://upx.github.io/",
     "description": "UPX is a free, portable, extendable, high-performance executable packer for several executable formats",
-    "version": "3.94",
-    "url": "https://github.com/upx/upx/releases/download/v3.94/upx394w.zip",
-    "hash": "74308db1183436576d011bfcc3e7c99c836fb052de7b7eb0539026366453d6e8",
-    "extract_dir": "upx394w",
+    "version": "3.95",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/upx/upx/releases/download/v3.95/upx-3.95-win64.zip",
+            "hash": "5c076f87ba64d82f11513f4af0ceb07246a3540aa3c72ca3ffc2d53971fa56e3",
+            "extract_dir": "upx-3.95-win64"
+        },
+        "32bit": {
+            "url": "https://github.com/upx/upx/releases/download/v3.95/upx-3.95-win32.zip",
+            "hash": "f94ff30b175d125d1c238458716f5808aee222547a813918b44d0f67035c0054",
+            "extract_dir": "upx-3.95-win32"
+        }
+    },
     "bin": "upx.exe",
     "license": "GPL-2.0",
     "checkver": {
         "github": "https://github.com/upx/upx"
     },
     "autoupdate": {
-        "url": "https://github.com/upx/upx/releases/download/v$version/upx$cleanVersionw.zip",
-        "extract_dir": "upx$cleanVersionw"
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/upx/upx/releases/download/v$version/upx-$version-win64.zip",
+                "extract_dir": "upx-$version-win64"
+            },
+            "32bit": {
+                "url": "https://github.com/upx/upx/releases/download/v$version/upx-$version-win32.zip",
+                "extract_dir": "upx-$version-win32"
+            }
+        }
     }
 }
