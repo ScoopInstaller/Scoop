@@ -34,6 +34,9 @@
 reset_aliases
 
 function is_installed($app, $global) {
+    if($app.EndsWith('.json')) {
+        $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
+    }
     if(installed $app $global) {
         function gf($g) { if($g) { ' --global' } }
 
