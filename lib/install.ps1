@@ -1224,13 +1224,12 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
 # check whether write permission for Users usergroup is set to global persist dir, if not then set
 function persist_permission($manifest, $global) {
-    if(($global -and !$manifest.persist) -or !(is_admin)) {
-        return
+    if($global -and $manifest.persist -and (is_admin)) {
+        $path = persistdir $null $global
+        $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
+        $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
+        $acl = Get-Acl -Path $path
+        $acl.SetAccessRule($target_rule)
+        $acl | Set-Acl -Path $path
     }
-    $path = persistdir $null $global
-    $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
-    $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
-    $acl = Get-Acl -Path $path
-    $acl.SetAccessRule($target_rule)
-    $acl | Set-Acl -Path $path
 }
