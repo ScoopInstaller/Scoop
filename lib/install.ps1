@@ -1224,7 +1224,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
 # check whether write permission for Users usergroup is set to global persist dir, if not then set
 function persist_permission($manifest, $global) {
-    if ($manifest.persist -and !$global) {
+    if(($global -and !$manifest.persist) -or !(is_admin)) {
         return
     }
     $path = persistdir $null $global
