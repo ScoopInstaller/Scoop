@@ -14,27 +14,41 @@ reset_aliases
 
 if(!$app) { my_usage; exit 1 }
 
-$global = installed $app $true
-$app, $bucket, $null = parse_app $app
-$status = app_status $app $global
-$manifest, $bucket = find_manifest $app $bucket
+if ($app -match '^(ht|f)tps?://|\\\\') {
+    # check if $app is a URL or UNC path
+    $url = $app
+    $app = appname_from_url $url
+    $global = installed $app $true
+    $status = app_status $app $global
+    $manifest = url_manifest $url
+    $manifest_file = $url
+} else {
+    # else $app is a normal app name
+    $global = installed $app $true
+    $app, $bucket, $null = parse_app $app
+    $status = app_status $app $global
+    $manifest, $bucket = find_manifest $app $bucket
+}
 
 if (!$manifest) {
     abort "Could not find manifest for '$(show_app $app $bucket)'."
 }
 
 $install = install_info $app $status.version $global
-$manifest_file = manifest_path $app $bucket
 $version_output = $manifest.version
+if (!$manifest_file) {
+    $manifest_file = manifest_path $app $bucket
+}
 
 $dir = versiondir $app 'current' $global
 $original_dir = versiondir $app $manifest.version $global
 $persist_dir = persistdir $app $global
 
 if($status.installed) {
-    $bucket = $install.bucket
-    $manifest_file = manifest_path $app $bucket
-    if($install.url) { $manifest_file = $install.url }
+    $manifest_file = manifest_path $app $install.bucket
+    if ($install.url) {
+        $manifest_file = $install.url
+    }
     if($status.version -eq $manifest.version) {
         $version_output = $status.version
     } else {
@@ -62,7 +76,6 @@ if ($manifest.license) {
 }
 
 # Manifest file
-$manifest_file = fullpath $manifest_file
 Write-Output "Manifest:`n  $manifest_file"
 
 if($status.installed) {
