@@ -15,15 +15,15 @@
     "env_add_path": ".",
     "checkver": {
         "url": "https://www.microsoft.com/net/download/windows",
-        "re": "Download .NET Core (?<short>[\\d.]+) SDK <text>\\(v</text>(?<version>[\\d.]+)\\)"
+        "re": "Build apps - SDK <text>\\(v</text>(?<version>[\\d.]+)\\)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-$versiom-win-x64.zip"
+                "url": "https://www.microsoft.com/net/download/thank-you/dotnet-sdk-$version-windows-x64-binaries"
             },
             "32bit": {
-                "url": "https://download.microsoft.com/download/8/8/5/88544F33-836A-49A5-8B67-451C24709A8F/dotnet-sdk-$version-win-x86.zip"
+                "url": "https://www.microsoft.com/net/download/thank-you/dotnet-sdk-$version-windows-x86-binaries"
             }
         },
         "hash": {
