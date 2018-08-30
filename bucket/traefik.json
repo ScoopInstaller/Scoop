@@ -30,7 +30,6 @@
         "github": "https://github.com/containous/traefik"
     },
     "autoupdate": {
-        "url": "https://github.com/cmderdev/cmder/releases/download/v$version/cmder_mini.zip",
         "architecture": {
             "64bit": {
                 "url": "https://github.com/containous/traefik/releases/download/v$version/traefik_windows-amd64.exe"
