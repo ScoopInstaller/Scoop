@@ -50,14 +50,15 @@ function create_manifest($url) {
             if ($url_64) {
                 $manifest.Remove("url")
                 $manifest.architecture = @{ "64bit" = @{ "url" = $url_64; "hash" = "" } }
-                $manifest.autoupdate = @{ "architecture" = @{ "64bit" = $url_64 } }
+                $manifest.autoupdate = @{ "architecture" = @{ "64bit" = @{ "url" = $url_64.Replace($manifest.version, '$version') } } }
                 if ($url_32) {
-                    $manifest.architecture.Add("32bit", @{ "url" = $url_32; "hash" = "" })
-                    $manifest.autoupdate.architecture.Add("32bit", $url_32)
+                    $manifest.architecture["32bit"] = @{ "url" = $url_32; "hash" = "" }
+                    $manifest.autoupdate.architecture["32bit"] = @{ "url" = $url_32.Replace($manifest.version, '$version') }
                 }
             }
             else {
                 $manifest.url = $version[0].assets[0].browser_download_url
+                $manifest.autoupdate = $manifest.url.Replace($manifest.version, '$version')
             }
         }
         else {
@@ -77,14 +78,23 @@ function create_manifest($url) {
         $manifest.version = choose_item $url_parts "Version"
     }
 
-    $manifest | convertto-json | ForEach-Object { [System.Text.RegularExpressions.Regex]::Unescape($_) } | out-file -filepath "$name.json" -encoding utf8
+    $manifest | ConvertTo-Json -Depth 4 | ForEach-Object { [System.Text.RegularExpressions.Regex]::Unescape($_) } | out-file -filepath "$name.json" -encoding utf8
     $manifest_path = join-path $pwd "$name.json"
     write-host "Created '$manifest_path'."
 }
 
 function new_manifest() {
-    @{ "homepage" = ""; "license" = ""; "version" = ""; "url" = "";
-        "hash" = ""; "extract_dir" = ""; "bin" = ""; "depends" = "" }
+    [ordered]@{ "homepage" = "";
+                "description" = "";
+                "license" = "";
+                "version" = "";
+                "url" = "";
+                "hash" = "";
+                "extract_dir" = "";
+                "bin" = "";
+                "depends" = "";
+                "checkver" = "";
+                "autoupdate" = "" }
 }
 
 function file_name($segment) {
