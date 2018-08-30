@@ -55,7 +55,7 @@ function create_manifest($url) {
         $manifest.version = choose_item $url_parts "Version"
     }
 
-    $manifest | convertto-json | % { [System.Text.RegularExpressions.Regex]::Unescape($_) } | out-file -filepath "$name.json" -encoding utf8
+    $manifest | convertto-json | ForEach-Object { [System.Text.RegularExpressions.Regex]::Unescape($_) } | out-file -filepath "$name.json" -encoding utf8
     $manifest_path = join-path $pwd "$name.json"
     write-host "Created '$manifest_path'."
 }
