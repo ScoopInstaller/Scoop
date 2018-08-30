@@ -36,14 +36,36 @@ function create_manifest($url) {
         $manifest.version = $version[0].tag_name
         $manifest.checkver = @{ github = $info.html_url }
         if ($version[0].assets) {
-            $manifest.url = $version.assets[0].browser_download_url
-            $manifest.autoupdate = @{ "url" = $manifest.url.Replace($manifest.version, '$version')}
+            # Trying to guess architecture if it's important
+            foreach ($asset in $version[0].assets) {
+                if ($asset.name -notMatch "linux|macos|osx|arm") {
+                    if ($asset.name -match "x64" -and (!$url_64 -or $asset.name -match "win")) {
+                        $url_64 = $asset.browser_download_url
+                    }
+                    if ($asset.name -match "x86" -and (!$url_32 -or $asset.name -match "win")) {
+                        $url_32 = $asset.browser_download_url
+                    }
+                }
+            }
+            if ($url_64) {
+                $manifest.Remove("url")
+                $manifest.architecture = @{ "64bit" = @{ "url" = $url_64; "hash" = "" } }
+                $manifest.autoupdate = @{ "architecture" = @{ "64bit" = $url_64 } }
+                if ($url_32) {
+                    $manifest.architecture.Add("32bit", @{ "url" = $url_32; "hash" = "" })
+                    $manifest.autoupdate.architecture.Add("32bit", $url_32)
+                }
+            }
+            else {
+                $manifest.url = $version[0].assets[0].browser_download_url
+            }
         }
         else {
             $manifest.url = $info.clone_url
         }
     }
     else {
+        # Old Code for default (any url) manifest
         $manifest.url = $url
         $name = choose_item $url_parts "App name"
         $name = if ($name.Length -gt 0) {
