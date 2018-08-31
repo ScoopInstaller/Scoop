@@ -1,12 +1,12 @@
 {
     "homepage": "https://jetbrains.com/",
-    "version": "1.11.4231",
+    "version": "1.11.4269",
     "license": {
         "identifier": "Freeware",
         "url": "https://www.jetbrains.com/store/license.html"
     },
-    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.11.4231.exe",
-    "hash": "d7686684e7f72840107c3305a4b5528565920908eb62f3211054b9224468b1c9",
+    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.11.4269.exe",
+    "hash": "4fc2fa872e7b90f60e8a646a4a30529ddaf28733a196ea6caba8d2c0bc629487",
     "installer": {
         "args": [
             "/S",
