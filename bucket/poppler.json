@@ -18,10 +18,10 @@
     ],
     "checkver": "Latest.*uploads/(?<date>\\d{4}/\\d{2})/poppler-(?<version>[\\d.]+)_x86.7z",
     "description": "PDF rendering library",
-    "extract_dir": "poppler-0.67.0",
-    "hash": "71763bfef42aa161c052a667139daeb81b69beabda3c4861a1c25e8f28ab65a6",
+    "extract_dir": "poppler-0.68.0",
+    "hash": "0fab9af51c3be7a5153f11a2e781b6c52cabf6f0dd071bfd0c3fe1d6b31bbfb9",
     "homepage": "http://blog.alivate.com.au/poppler-windows/",
     "license": "GPL-3.0",
-    "url": "http://blog.alivate.com.au/wp-content/uploads/2018/08/poppler-0.67.0_x86.7z",
-    "version": "0.67.0"
+    "url": "http://blog.alivate.com.au/wp-content/uploads/2018/08/poppler-0.68.0_x86.7z",
+    "version": "0.68.0"
 }
