@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://julialang-s3.julialang.org/bin/winnt/x64/1.0/julia-1.0.0-win64.exe#/dl.7z",
-            "hash": "3bf5572cbcbc7848b235dcf21caf24ce26b9fb3839eb13db1a7170d20cdf834d"
+            "hash": "001874185a26f598abe2e7fc287cacf66387c68caa3251f5aa6ef97fb22020dd"
         },
         "32bit": {
             "url": "https://julialang-s3.julialang.org/bin/winnt/x86/1.0/julia-1.0.0-win32.exe#/dl.7z",
