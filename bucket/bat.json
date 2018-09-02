@@ -10,6 +10,11 @@
         }
     },
     "bin": "bat.exe",
+    "suggest": {
+        "less": [
+            "less"
+        ]
+    },
     "checkver": "github",
     "autoupdate": {
         "architecture": {
