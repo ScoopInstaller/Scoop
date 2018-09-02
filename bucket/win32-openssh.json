@@ -29,7 +29,11 @@
         "ssh.exe",
         "sshd.exe"
     ],
-    "notes": "This is a pre-release (non-production ready)",
+    "notes": [
+        "This is a pre-release (non-production ready)",
+        "Run 'sudo $dir\\install-sshd.ps1' to install sshd and ssh-agent as a service.",
+        "Run 'sudo $dir\\uninstall-sshd.ps1' them service."
+    ],
     "checkver": {
         "re": "v([\\d.]+[a-zA-Z-\\d]*)",
         "github": "https://github.com/PowerShell/Win32-OpenSSH"
