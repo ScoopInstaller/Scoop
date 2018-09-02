@@ -62,7 +62,7 @@
         },
         "hash": {
             "url": "https://www.python.org/downloads/release/python-$cleanVersion/",
-            "find": "<td><a href=\".*$basename\".*</a></td>\\s+<td>Windows</td>\\s+<td>.*</td>\\s+<td>([A-f\\d]{32})"
+            "find": "<td><a href=\".*$basename\".*</a></td>\\s+<td>Windows</td>\\s+<td>.*</td>\\s+<td>([A-Fa-f\\d]{32})"
         }
     }
 }
