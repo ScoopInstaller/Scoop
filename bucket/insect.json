@@ -1,0 +1,28 @@
+{
+    "homepage": "https://github.com/sharkdp/insect",
+    "description": "A high precision scientific calculator with full support for physical units",
+    "license": "MIT",
+    "version": "5.0.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/sharkdp/insect/releases/download/v5.0.0/insect-windows-x64.exe#/insect.exe",
+            "hash": "2f6381b5a19c9ce279be83e74e746e084a5b2ec42741ad41be852c259ff5cb9e"
+        },
+        "32bit": {
+            "url": "https://github.com/sharkdp/insect/releases/download/v5.0.0/insect-windows-x86.exe#/insect.exe",
+            "hash": "376d99c0981bee83ba221dacd37d27102b0709504d643c853662faa089fd7f72"
+        }
+    },
+    "bin": "insect.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/sharkdp/insect/releases/download/v5.0.0/insect-windows-x64.exe#/insect.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/sharkdp/insect/releases/download/v5.0.0/insect-windows-x86.exe#/insect.exe"
+            }
+        }
+    }
+}
