@@ -653,7 +653,13 @@ function check_hash($file, $hash, $app_name) {
         $msg += "App:         $app_name`n"
         $msg += "URL:         $url`n"
         if(Test-Path $file) {
-            $hexbytes = Get-Content $file -Encoding byte -TotalCount 8 | ForEach-Object { $_.tostring('x2') }
+            if((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+                # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
+                $hexbytes = Get-Content $file -AsByteStream -TotalCount 8 | ForEach-Object { $_.tostring('x2') }
+            }
+            else {
+                $hexbytes = Get-Content $file -Encoding byte -TotalCount 8 | ForEach-Object { $_.tostring('x2') }
+            }
             $hexbytes = [string]::join(' ', $hexbytes).ToUpper()
             $msg += "First bytes: $hexbytes`n"
         }
