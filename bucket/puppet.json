@@ -1,14 +1,14 @@
 {
     "homepage": "https://puppetlabs.com",
-    "version": "5.5.4",
+    "version": "5.5.6",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-5.5.4-x64.msi",
-            "hash": "d9e9896a2fd2b4799b5fadcdc294377d08e29d9b4b24b90451ba3ad0501e551a"
+            "url": "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-5.5.6-x64.msi",
+            "hash": "6e419a73b7e55317eec05bf6a05a11dc46314c41eda0a922bc8d3146228715dd"
         },
         "32bit": {
-            "url": "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-5.5.4-x86.msi",
-            "hash": "1f91a70311b6939de4a0d10ba2b8373f418b7a7e217c85fbb3a0aad5020188a8"
+            "url": "https://downloads.puppetlabs.com/windows/puppet5/puppet-agent-5.5.6-x86.msi",
+            "hash": "f53ad644af4790d752baf9cf420ac065a800970765333477021b631279a20f7f"
         }
     },
     "bin": [

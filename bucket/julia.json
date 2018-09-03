@@ -1,15 +1,15 @@
 {
     "homepage": "https://julialang.org",
-    "version": "0.6.4",
+    "version": "1.0.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://julialang-s3.julialang.org/bin/winnt/x64/0.6/julia-0.6.4-win64.exe#/dl.7z",
-            "hash": "aa16b5fb54ab2821a09022db83d92db5d07c1092a24b7091f54fb4bca9e564eb"
+            "url": "https://julialang-s3.julialang.org/bin/winnt/x64/1.0/julia-1.0.0-win64.exe#/dl.7z",
+            "hash": "001874185a26f598abe2e7fc287cacf66387c68caa3251f5aa6ef97fb22020dd"
         },
         "32bit": {
-            "url": "https://julialang-s3.julialang.org/bin/winnt/x86/0.6/julia-0.6.4-win32.exe#/dl.7z",
-            "hash": "143f9269a35427986e80f7d4848150dee7f9e1a4c517640e021f7cc07a793bb4"
+            "url": "https://julialang-s3.julialang.org/bin/winnt/x86/1.0/julia-1.0.0-win32.exe#/dl.7z",
+            "hash": "B3DDB27B9B5195032F7B405F411D36636F4E0964AD256C8B479AD8313AA16136"
         }
     },
     "installer": {
@@ -37,7 +37,7 @@
     ],
     "checkver": {
         "url": "https://julialang.org/downloads/",
-        "re": "<h1[^>]+>Current Release \\(v([\\d.]+)\\)</h1>"
+        "re": "Current stable release \\(v([\\d.]+)\\)"
     },
     "autoupdate": {
         "architecture": {

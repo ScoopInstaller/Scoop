@@ -5,7 +5,7 @@
     },
     "bin": "xml.exe",
     "checkver": {
-        "re": "/files/latest/download\\?source=files\"\\s+title=\"/xmlstarlet/([\\d.]+)",
+        "re": "xmlstarlet-([\\d.]+)-win",
         "url": "https://sourceforge.net/projects/xmlstar/files/"
     },
     "description": "Transform, query, validate, and edit XML files",

@@ -1,8 +1,8 @@
 {
     "homepage": "https://getcomposer.org/",
     "license": "MIT",
-    "version": "1.6.5",
-    "url": "https://getcomposer.org/download/1.6.5/composer.phar",
+    "version": "1.7.2",
+    "url": "https://getcomposer.org/download/1.7.2/composer.phar",
     "bin": "composer.ps1",
     "persist": "home",
     "env_set": {
@@ -30,7 +30,7 @@
     "notes": [
         "'composer selfupdate' is aliased to 'scoop update composer'"
     ],
-    "hash": "67bebe9df9866a795078bb2cf21798d8b0214f2e0b2fd81f2e907a8ef0be3434",
+    "hash": "ec3428d049ae8877f7d102c2ee050dbd51a160fc2dde323f3e126a3b3846750e",
     "checkver": {
         "github": "https://github.com/composer/composer"
     },

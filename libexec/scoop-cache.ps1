@@ -40,6 +40,9 @@ switch($cmd) {
     'rm' {
         if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
         Remove-Item "$cachedir\$app#*"
+        if(test-path("$cachedir\$app.txt")) {
+            Remove-Item "$cachedir\$app.txt"
+        }
     }
     'show' {
         show $app

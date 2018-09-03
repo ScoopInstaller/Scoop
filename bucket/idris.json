@@ -4,12 +4,12 @@
     "version": "1.3.0",
     "architecture": {
         "64bit": {
-            "url": "https://neon.se/idris/idris-1.3.0-win64.exe#/dl.7z",
-            "hash": "99edeecf92194df0b798f4c3ecbf32fccc8fd36be2b1222c48ed35eac26bae70"
+            "url": "https://neon.se/idris/idris-1.3.0-win64.7z",
+            "hash": "97b7e15a9e9aa2f00f17c6f46d7482264666d11125dfdc22112c179c55051b09"
         },
         "32bit": {
-            "url": "https://neon.se/idris/idris-1.3.0-win32.exe#/dl.7z",
-            "hash": "8a8b29091612dc5ac6460e58a0c2a6598778e307d308b4ab47f28b3de7e5790f"
+            "url": "https://neon.se/idris/idris-1.3.0-win32.7z",
+            "hash": "d53b96437891d660d96c27105a7689809015a4510502820d6a3ab705cbd248e1"
         }
     },
     "bin": "idris\\idris.exe",
@@ -20,10 +20,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://neon.se/idris/idris-$version-win64.exe#/dl.7z"
+                "url": "https://neon.se/idris/idris-$version-win64.7z"
             },
             "32bit": {
-                "url": "https://neon.se/idris/idris-$version-win32.exe#/dl.7z"
+                "url": "https://neon.se/idris/idris-$version-win32.7z"
             }
         }
     }

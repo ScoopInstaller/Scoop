@@ -34,6 +34,9 @@
 reset_aliases
 
 function is_installed($app, $global) {
+    if($app.EndsWith('.json')) {
+        $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
+    }
     if(installed $app $global) {
         function gf($g) { if($g) { ' --global' } }
 
@@ -119,6 +122,10 @@ $skip | Where-Object { $explicit_apps -contains $_} | ForEach-Object {
 }
 
 $suggested = @{};
+if(aria2_enabled) {
+    warn "Scoop uses 'aria2c' for multi-connection downloads."
+    warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+}
 $apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
 
 show_suggestions $suggested

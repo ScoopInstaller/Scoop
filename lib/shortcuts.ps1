@@ -14,6 +14,7 @@ function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
             $icon = [System.IO.Path]::Combine($dir, $_.item(3))
             $icon = New-Object System.IO.FileInfo($icon)
         }
+        $arguments = (substitute $arguments @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir})
         startmenu_shortcut $target $name $arguments $icon $global
     }
 }

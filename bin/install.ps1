@@ -2,6 +2,7 @@
 
 # remote install:
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+$old_erroractionpreference = $erroractionpreference
 $erroractionpreference = 'stop' # quit if anything goes wrong
 
 if(($PSVersionTable.PSVersion.Major) -lt 3) {
@@ -15,6 +16,13 @@ if((get-executionpolicy) -gt 'RemoteSigned') {
     Write-Output "PowerShell requires an execution policy of 'RemoteSigned' to run Scoop."
     Write-Output "To make this change please run:"
     Write-Output "'Set-ExecutionPolicy RemoteSigned -scope CurrentUser'"
+    break
+}
+
+if([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'Tls12') {
+    Write-Output "Scoop requires at least .NET Framework 4.5"
+    Write-Output "Please download and install it first:"
+    Write-Output "https://www.microsoft.com/net/download"
     break
 }
 
@@ -50,3 +58,5 @@ ensure_robocopy_in_path
 ensure_scoop_in_path
 success 'Scoop was installed successfully!'
 Write-Output "Type 'scoop help' for instructions."
+
+$erroractionpreference = $old_erroractionpreference # Reset $erroractionpreference to original value

@@ -57,10 +57,7 @@ function update_scoop() {
 
     write-host "Updating Scoop..."
     $last_update = $(last_scoop_update).ToString('s')
-    $show_update_log = get_config "show_update_log"
-    if($null -eq $show_update_log) {
-        $show_update_log = $true
-    }
+    $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
         $newdir = fullpath $(versiondir 'scoop' 'new')
@@ -103,7 +100,7 @@ function update_scoop() {
         Pop-Location
     }
 
-    scoop config lastupdate (get-date)
+    scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
     success 'Scoop was updated successfully!'
 }
 
@@ -212,6 +209,10 @@ if(!$apps) {
 
     $suggested = @{};
     # # $outdated is a list of ($app, $global) tuples
+    if(aria2_enabled) {
+        warn "Scoop uses 'aria2c' for multi-connection downloads."
+        warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+    }
     $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }
 

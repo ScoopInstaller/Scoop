@@ -11,9 +11,9 @@
         "re": "v(?<version>[\\d\\w.]+)/PortableGit-(?<short>[\\d.]+).*\\.exe"
     },
     "autoupdate": {
-        "url": "https://gist.githubusercontent.com/rasa/ba5474f295cc92f80bfa6a655374a533/raw/3aaf08f5b592fbb87f5617b3d570bd8f1308e3a9/dummy.cmd"
+        "url": "https://gist.githubusercontent.com/rasa/ba5474f295cc92f80bfa6a655374a533/raw/dummy.cmd"
     },
     "##": "Dummy url is required",
-    "url": "https://gist.githubusercontent.com/rasa/ba5474f295cc92f80bfa6a655374a533/raw/3aaf08f5b592fbb87f5617b3d570bd8f1308e3a9/dummy.cmd",
+    "url": "https://gist.githubusercontent.com/rasa/ba5474f295cc92f80bfa6a655374a533/raw/dummy.cmd",
     "hash": "06531c1c55351094bcd1df60724c96c9ed44dbbe39663a244899fcbccb1956e8"
 }

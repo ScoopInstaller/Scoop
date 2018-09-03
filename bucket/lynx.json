@@ -1,11 +1,11 @@
 {
     "_comment": "Version 2.8.3 was moved to https://github.com/rasa/versions/blob/master/nodejs4.json",
-    "version": "2.8.9dev.16",
+    "version": "2.8.9rel.1",
     "homepage": "http://invisible-island.net/lynx/lynx.html",
     "architecture": {
         "32bit": {
             "url": "https://invisible-island.net/datafiles/current/lynx-newssl-setup.exe",
-            "hash": "d64fdbed6b470953e2504cdde0a58c6b68d0c600d39791380e855030abb2db56"
+            "hash": "6de2b0bc8fbde7f59dc718d5583cfef58c752b4bb107b5332f56b8ebe7f3ab42"
         }
     },
     "bin": "lynx.cmd",
@@ -32,5 +32,12 @@
         "   echo 'lynx requires the 32-bit version of openssl to be installed'",
         "   exit 1",
         "}"
-    ]
+    ],
+    "checkver": {
+        "url": "https://lynx.invisible-island.net/current/CHANGES",
+        "re": "[\\d-]{10}\\s+\\(([\\w.]+)\\)"
+    },
+    "autoupdate": {
+        "url": "https://invisible-island.net/datafiles/current/lynx-newssl-setup.exe"
+    }
 }

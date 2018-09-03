@@ -1,23 +1,15 @@
 {
     "homepage": "http://elm-lang.org",
     "license": "BSD-3-Clause",
-    "version": "0.18",
-    "url": "https://44a95588fe4cc47efd96-ec3c2a753a12d2be9f23ba16873acc23.ssl.cf2.rackcdn.com/Elm-Platform-0.18.exe#dl.7z",
-    "hash": "e4b392e2cb8deb0bcf6c4d0b5f69f4df187416ea815d4ab09bafa5c036640967",
-    "extract_dir": "bin",
-    "bin": [
-        "elm-make.exe",
-        "elm-package.exe",
-        "elm-reactor.exe",
-        "elm-repl.exe",
-        "elm.exe"
-    ],
+    "version": "0.19.0",
+    "url": "https://github.com/elm/compiler/releases/download/0.19.0/binaries-for-windows.tar.gz",
+    "hash": "cb6fa4656b67915b0f91ae04e23f145e96330472c8d96d25e5b21b1f2118b927",
+    "bin": "elm.exe",
     "depends": "nodejs",
     "checkver": {
-        "url": "https://guide.elm-lang.org/install.html",
-        "re": "Elm-Platform-([\\d.]+)\\."
+        "github": "https://github.com/elm/compiler"
     },
     "autoupdate": {
-        "url": "https://44a95588fe4cc47efd96-ec3c2a753a12d2be9f23ba16873acc23.ssl.cf2.rackcdn.com/Elm-Platform-$version.exe#dl.7z"
+        "url": "https://github.com/elm/compiler/releases/download/$version/binaries-for-windows.tar.gz"
     }
 }

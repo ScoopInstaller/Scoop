@@ -2,7 +2,7 @@
 . "$psscriptroot/autoupdate.ps1"
 
 function manifest_path($app, $bucket) {
-    "$(bucketdir $bucket)\$(sanitary_path $app).json"
+    fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
 }
 
 function parse_json($path) {
@@ -48,7 +48,8 @@ function save_install_info($info, $dir) {
     $nulls = $info.keys | Where-Object { $null -eq $info[$_] }
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
-    $info | convertto-json | out-file "$dir\install.json"
+    $file_content = $info | ConvertToPrettyJson
+    [System.IO.File]::WriteAllLines("$dir\install.json", $file_content)
 }
 
 function install_info($app, $version, $global) {
