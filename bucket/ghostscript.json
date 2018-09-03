@@ -1,19 +1,19 @@
 {
     "homepage": "https://www.ghostscript.com",
-    "version": "9.23",
+    "version": "9.24",
     "license": "AGPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs923/gs923w64.exe#/dl.7z",
-            "hash": "9e614cbac9f674710de965d9847ace29127d71dc1875e48517f4abce0e324400",
+            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs924/gs924w64.exe#/dl.7z",
+            "hash": "11957903142661d5a7f299fa38cda3b11c52e40efed69ab255e76a6e5396e5b0",
             "bin": [
                 "bin\\gswin64.exe",
                 "bin\\gswin64c.exe"
             ]
         },
         "32bit": {
-            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs923/gs923w32.exe#/dl.7z",
-            "hash": "5879b9970007490e62f1c1d9d6688bb633a069cdd5fc466dadb9ea8114c8c75a",
+            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs924/gs924w32.exe#/dl.7z",
+            "hash": "cf4ecf34ec8e0492716a293a815e15f3a8a6d59b2ecac3db10a49e600b856e68",
             "bin": [
                 "bin\\gswin32.exe",
                 "bin\\gswin32c.exe"
