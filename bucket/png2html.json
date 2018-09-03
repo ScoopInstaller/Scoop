@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.engr.mun.ca/~holden/png2html.html",
-    "description": "transform a PNG image and a text file into pure html"
+    "description": "transform a PNG image and a text file into pure html",
     "version": "1.1",
     "license": "Unknow",
     "bin": "png2html.exe",
