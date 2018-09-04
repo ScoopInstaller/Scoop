@@ -669,3 +669,25 @@ function handle_special_urls($url)
     }
     return $url
 }
+
+function get_magic_bytes($file) {
+    if(!(Test-Path $file)) {
+        return ''
+    }
+
+    if((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+        # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
+        return Get-Content $file -AsByteStream -TotalCount 8
+    }
+    else {
+        return Get-Content $file -Encoding byte -TotalCount 8
+    }
+}
+
+function get_magic_bytes_pretty($file, $glue = ' ') {
+    if(!(Test-Path $file)) {
+        return ''
+    }
+
+    return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
+}
