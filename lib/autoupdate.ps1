@@ -62,7 +62,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
         if ($hashfile -match $filenameRegex) {
             $hash = $matches[1]
         }
-        $metalinkRegex = "<hash[^>]+>(?<meta>[a-fA-F0-9]{64})"
+        $metalinkRegex = "<hash[^>]+>([a-fA-F0-9]{64})"
         if ($hashfile -match $metalinkRegex) {
             $hash = $matches[1]
         }
