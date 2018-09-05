@@ -1,18 +1,18 @@
 {
     "homepage": "https://curl.haxx.se/",
     "description": "Command line tool and library for transferring data with URLs",
-    "version": "7.61.0",
+    "version": "7.61.1",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://dl.bintray.com/vszakats/generic/curl-7.61.0-win64-mingw.tar.xz",
-            "hash": "7b8028868001e6acf99286e924106b9c014e5bf4cac45181636e3a1169007075",
-            "extract_dir": "curl-7.61.0-win64-mingw"
+            "url": "https://dl.bintray.com/vszakats/generic/curl-7.61.1-win64-mingw.tar.xz",
+            "hash": "1cb4d6318fe77179be72b7f3a4a55aeff347a84c817e8739776b0185f5342620",
+            "extract_dir": "curl-7.61.1-win64-mingw"
         },
         "32bit": {
-            "url": "https://dl.bintray.com/vszakats/generic/curl-7.61.0-win32-mingw.tar.xz",
-            "hash": "f71bafd67c83b144702349ea374bd3ba7b51663e427bbc7fc66d972305e4dfa2",
-            "extract_dir": "curl-7.61.0-win32-mingw"
+            "url": "https://dl.bintray.com/vszakats/generic/curl-7.61.1-win32-mingw.tar.xz",
+            "hash": "0cb9fb88e60ab68bb7a5fdbc96c38821720e492d6656251d49ea40fbc6a1bb40",
+            "extract_dir": "curl-7.61.1-win32-mingw"
         }
     },
     "bin": "bin\\curl.exe",
