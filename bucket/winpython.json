@@ -1,17 +1,17 @@
 {
     "description": "Free, open-source and portable Python distribution for Windows",
-    "version": "3.6.5.0",
+    "version": "3.6.6.2",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.6/3.6.5.0/WinPython64-3.6.5.0Zero.exe#/dl.7z",
-            "hash": "6b8b79ebbfb157bb9e2122e32568219669cffa0204849ed79eefe1e9bcaec0b2",
-            "extract_dir": "python-3.6.5.amd64"
+            "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.6/3.6.6.2/WinPython64-3.6.6.2Zero.exe#/dl.7z",
+            "hash": "e7feac807631eb7322ea36d74bb772f95c96457c4558464ed530d5d715ec8ac7",
+            "extract_dir": "python-3.6.6.amd64"
         },
         "32bit": {
-            "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.6/3.6.5.0/WinPython32-3.6.5.0Zero.exe#/dl.7z",
-            "hash": "35ecb4693bae593dd9faf80c53305591f0288195dd7f06730b30dd8b3db3774b",
-            "extract_dir": "python-3.6.5"
+            "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.6/3.6.6.2/WinPython32-3.6.6.2Zero.exe#/dl.7z",
+            "hash": "29c48621b7c0fd5c3513de40aaafb4795cdc1a47505aa5cc646a2b7f7c6f9b10",
+            "extract_dir": "python-3.6.6"
         }
     },
     "homepage": "https://winpython.github.io/",
