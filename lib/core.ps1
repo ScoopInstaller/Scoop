@@ -336,7 +336,7 @@ function get_app_name_from_ps1_shim($shim_ps1) {
     if (!([System.IO.File]::Exists($shim_ps1))) {
         return ""
     }
-    $first_1k_text = (Get-Content $shim_ps1 -Encoding utf8 -TotalCount 1000) -join ' '
+    $first_1k_text = (Get-Content $shim_ps1 -Encoding utf8) -join ' '
     return get_app_name $first_1k_text
 }
 
