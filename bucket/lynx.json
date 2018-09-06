@@ -1,5 +1,5 @@
 {
-    "_comment": "Version 2.8.3 was moved to https://github.com/rasa/versions/blob/master/nodejs4.json",
+    "_comment": "Version 2.8.3 was moved to https://github.com/scoopinstaller/versions/blob/master/lynx283.json",
     "version": "2.8.9rel.1",
     "homepage": "http://invisible-island.net/lynx/lynx.html",
     "architecture": {
@@ -22,7 +22,7 @@
         "$q = [char]34",
         "add-content \"$dir/lynx.cfg\" -value \"SSL_CERT_FILE:$(appdir openssl)/current/cacert.pem`n\"",
         "add-content \"$dir/lynx.cfg\" -value \"FORCE_SSL_PROMPT:PROMPT`n\"",
-        "set-content \"$dir/lynx.cmd\" -value \"@$dir\\lynx.exe --cfg=$dir\\lynx.cfg %*\""
+        "set-content \"$dir/lynx.cmd\" -value \"@$q$dir\\lynx.exe$q --cfg=$q$dir\\lynx.cfg$q %*\""
     ],
     "post_install": [
         "if (Test-Path \"$(appdir openssl)/current/libcrypto-1_1,1.dll\") {",
@@ -39,5 +39,8 @@
     },
     "autoupdate": {
         "url": "https://invisible-island.net/datafiles/current/lynx-newssl-setup.exe"
-    }
+    },
+    "notes": [
+        "lynx requires the 32-bit version of openssl to be installed"
+    ]
 }
