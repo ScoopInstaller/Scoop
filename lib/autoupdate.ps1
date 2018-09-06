@@ -91,6 +91,33 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
     return format_hash $hash
 }
 
+function find_hash_in_headers([String] $url) {
+    $hash = $null
+
+    try {
+        $req = [System.Net.WebRequest]::Create($url)
+        $req.Referer = (strip_filename $url)
+        $req.AllowAutoRedirect = $false
+        $req.UserAgent = (Get-UserAgent)
+        $req.Timeout = 2000
+        $req.Method = 'HEAD'
+        $res = $req.GetResponse()
+        if(([int]$response.StatusCode -ge 300) -and ([int]$response.StatusCode -lt 400)) {
+            if($res.Headers['Digest'] -match 'SHA-256=([^,]+)' -or $res.Headers['Digest'] -match 'SHA=([^,]+)' -or $res.Headers['Digest'] -match 'MD5=([^,]+)') {
+                $hash = ([System.Convert]::FromBase64String($matches[1]) | ForEach-Object { $_.ToString('x2') }) -join ''
+                debug $hash
+            }
+        }
+        $res.Close()
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return
+    }
+
+    return format_hash $hash
+}
+
 function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
     $hash = $null
 
@@ -131,16 +158,22 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hash = find_hash_in_textfile $hashfile_url $basename '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
     }
 
-    if ($hashmode -eq 'extract') {
-        $hash = find_hash_in_textfile $hashfile_url $basename $config.find
-    }
-
-    if ($hashmode -eq 'json') {
-        $hash = find_hash_in_json $hashfile_url $basename $config.jp
-    }
-
-    if ($hashmode -eq 'rdf') {
-        $hash = find_hash_in_rdf $hashfile_url $basename
+    switch ($hashmode) {
+        'extract' {
+            $hash = find_hash_in_textfile $hashfile_url $basename $config.find
+        }
+        'json' {
+            $hash = find_hash_in_json $hashfile_url $basename $config.jp
+        }
+        'rdf' {
+            $hash = find_hash_in_rdf $hashfile_url $basename
+        }
+        'metalink' {
+            $hash = find_hash_in_headers $url
+            if(!$hash) {
+                $hash = find_hash_in_textfile "$url.meta4"
+            }
+        }
     }
 
     if($hash) {

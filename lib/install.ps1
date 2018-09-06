@@ -190,6 +190,31 @@ function aria_exit_code($exitcode) {
     return $codes[$exitcode]
 }
 
+function get_filename_from_metalink($file) {
+    $bytes = get_magic_bytes_pretty $file ''
+    # check if file starts with '<?xml'
+    if(!($bytes.StartsWith('3c3f786d6c'))) {
+        return $null
+    }
+
+    # Add System.Xml for reading metalink files
+    Add-Type -AssemblyName 'System.Xml'
+    $xr = [System.Xml.XmlReader]::Create($file)
+    $filename = $null
+    try {
+        $xr.ReadStartElement('metalink')
+        if($xr.ReadToFollowing('file') -and $xr.MoveToFirstAttribute()) {
+            $filename = $xr.Value
+        }
+    } catch [System.Xml.XmlException] {
+        return $null
+    } finally {
+        $xr.Close()
+    }
+
+    return $filename
+}
+
 function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
     $data = @{}
     $urls = @(url $manifest $architecture)
@@ -212,6 +237,11 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--console-log-level=warn"
         "--enable-color=false"
         "--no-conf=true"
+        "--follow-metalink=true"
+        "--metalink-preferred-protocol=https"
+        "--min-tls-version=TLSv1.2"
+        "--stop-with-process=$PID"
+        "--continue"
     )
 
     if($cookies) {
@@ -299,6 +329,12 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
     }
 
     foreach($url in $urls) {
+
+        $metalink_filename = get_filename_from_metalink $data.$url.source
+        if($metalink_filename) {
+            Remove-Item $data.$url.source -Force
+            Rename-Item -Force (Join-Path -Path $cachedir -ChildPath $metalink_filename) $data.$url.source
+        }
 
         # run hash checks
         if($check_hash) {
