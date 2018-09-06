@@ -332,14 +332,19 @@ function get_app_name($path) {
     return ""
 }
 
+function get_app_name_from_ps1_shim($shim_ps1) {
+    if (!([System.IO.File]::Exists($shim_ps1))) {
+        return ""
+    }
+    $first_1k_text = (Get-Content $shim_ps1 -Encoding utf8 -TotalCount 1000) -join ' '
+    return get_app_name $first_1k_text
+}
+
 function warn_on_overwrite($shim_ps1, $path) {
     if (!([System.IO.File]::Exists($shim_ps1))) {
         return
     }
-    $reader = [System.IO.File]::OpenText($shim_ps1)
-    $line = $reader.ReadLine().replace("`r","").replace("`n","")
-    $reader.Close()
-    $shim_app = get_app_name $line
+    $shim_app = get_app_name_from_ps1_shim $shim_ps1
     $path_app = get_app_name $path
     if ($shim_app -eq $path_app) {
         return
