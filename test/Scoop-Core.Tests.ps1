@@ -172,6 +172,45 @@ describe "rm_shim" {
     }
 }
 
+Describe "get_app_name_from_ps1_shim" {
+    BeforeAll {
+        $working_dir = setup_working "shim"
+        $shimdir = shimdir
+        $(ensure_in_path $shimdir) | Out-Null
+    }
+
+    It "returns empty string if file does not exist" -skip:$isUnix {
+        get_app_name_from_ps1_shim "non-existent-file" | should be ""
+    }
+
+    It "returns app name if file exists and is a shim to an app" -skip:$isUnix {
+        mkdir -p "$working_dir/mockapp/current/"
+        Write-Output "" | Out-File "$working_dir/mockapp/current/mockapp.ps1"
+        shim "$working_dir/mockapp/current/mockapp.ps1" $false "shim-test"
+        $shim_path = (get-command "shim-test.ps1").Path
+        get_app_name_from_ps1_shim "$shim_path" | should be "mockapp"
+    }
+
+    It "returns app name if file exists and is a shim to an app cerca August 2018" -skip:$isUnix {
+        Write-Output '$path = join-path "$psscriptroot" "..\apps\vim\current\vim.exe"' | Out-File "$working_dir/moch-shim.ps1" -Encoding utf8
+        Write-Output 'if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }' | Out-File "$working_dir/moch-shim.ps1" -Append -Encoding utf8
+        get_app_name_from_ps1_shim "$working_dir/moch-shim.ps1" | should be "vim"
+    }
+
+    It "returns empty string if file exists and is not a shim" -skip:$isUnix {
+        Write-Output "lorem ipsum" | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
+        get_app_name_from_ps1_shim "$working_dir/mock-shim.ps1" | should be ""
+    }
+
+    AfterEach {
+        if (Get-Command "shim-test" -ErrorAction SilentlyContinue) {
+            rm_shim "shim-test" $shimdir -ErrorAction SilentlyContinue
+        }
+        Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
+        Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/moch-shim.ps1"
+    }
+}
+
 describe "ensure_robocopy_in_path" {
     $shimdir = shimdir $false
     mock versiondir { $repo_dir }
