@@ -4,15 +4,17 @@ branches:
   except:
     - gh-pages
 
+build: off
+
 init:
   - ps: (get-psprovider 'FileSystem').Home = $(pwd)
   - ps: Install-PackageProvider Nuget -Force
   - ps: Install-Module -Name Pester -Repository PSGallery -Force
   - ps: Install-Module -Name PSScriptAnalyzer -Repository PSGallery -Force
-
-build: off
+  - pwsh: (get-psprovider 'FileSystem').Home = $(pwd)
+  - pwsh: Install-Module -Name Pester -Repository PSGallery -Force
+  - pwsh: Install-Module -Name PSScriptAnalyzer -Repository PSGallery -Force
 
 test_script:
-  - ps: $result = invoke-pester -path test/ -outputfile TestResults.xml -outputformat NUnitXML -passthru; $env:failedcount = $result.failedcount
-  - ps: (new-object net.webclient).uploadfile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (resolve-path ./TestResults.xml))
-  - ps: if($env:failedcount -gt 0) { exit $env:failedcount }
+  - ps: ./appveyor/test_script.ps1; if($env:failedcount -gt 0) { exit $env:failedcount }
+  - pwsh: ./appveyor/test_script.ps1; if($env:failedcount -gt 0) { exit $env:failedcount }
