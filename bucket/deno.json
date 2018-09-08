@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/denoland/deno",
+    "description": "A secure TypeScript runtime on V8",
     "version": "0.1.3",
     "license": "MIT",
     "architecture": {
