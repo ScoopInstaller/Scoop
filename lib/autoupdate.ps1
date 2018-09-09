@@ -343,7 +343,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
         $path = join-path $dir "$app.json"
 
         $file_content = $json | ConvertToPrettyJson
-        [System.IO.File]::WriteAllLines($path, $file_content)
+        $file_content | Out-File -Encoding "UTF8" $path
 
         # notes
         if ($json.autoupdate.note) {
