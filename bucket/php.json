@@ -1,7 +1,10 @@
 {
     "homepage": "http://windows.php.net",
+    "license": {
+        "identifier": "PHP-3.01",
+        "url": "https://secure.php.net/license/"
+    },
     "version": "7.2.9",
-    "license": "PHP-3.01",
     "architecture": {
         "64bit": {
             "url": "https://windows.php.net/downloads/releases/php-7.2.9-Win32-VC15-x64.zip",
