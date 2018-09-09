@@ -55,6 +55,13 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
         $hash = $matches[1] -replace ' ',''
     }
 
+    # convert base64 encoded hash values
+    if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
+        try {
+            $hash = ([System.Convert]::FromBase64String($matches[0]) | ForEach-Object { $_.ToString('x2') }) -join ''
+        } catch { }
+    }
+
     # find hash with filename in $hashfile (will be overridden by $regex)
     if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
         $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:[\x20\t]+\d+)?"
