@@ -59,7 +59,9 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
     if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
         try {
             $hash = ([System.Convert]::FromBase64String($matches[0]) | ForEach-Object { $_.ToString('x2') }) -join ''
-        } catch { }
+        } catch {
+            $hash = $hash
+        }
     }
 
     # find hash with filename in $hashfile (will be overridden by $regex)
