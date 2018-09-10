@@ -19,9 +19,7 @@
             "PowerShell Core"
         ]
     ],
-    "checkver": {
-        "github": "https://github.com/PowerShell/PowerShell"
-    },
+    "checkver": "github",
     "autoupdate": {
         "architecture": {
             "64bit": {
@@ -30,6 +28,10 @@
             "32bit": {
                 "url": "https://github.com/PowerShell/PowerShell/releases/download/v$version/PowerShell-$version-win-x86.zip"
             }
+        },
+        "hash": {
+            "url": "https://github.com/PowerShell/PowerShell/releases/tag/v$version/",
+            "find": "$basename\\s*<ul>\\s*<li>([A-Fa-f\\d]{64})"
         }
     }
 }
