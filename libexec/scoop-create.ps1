@@ -3,6 +3,8 @@
 # Help: Create your own custom app manifest
 param($url)
 
+. "$psscriptroot\..\lib\json.ps1"
+
 $manifest = [ordered]@{ "homepage" = "";
                         "description" = "";
                         "license" = @{};
@@ -18,29 +20,26 @@ $manifest = [ordered]@{ "homepage" = "";
 function create_manifest($url) {
     try {
         $url_parts = parse_url $url
-    }
-    catch {
+    } catch {
         abort "Error: $url is not a valid URL"
     }
 
     if ($url.StartsWith("https://github.com/")) {
         github
         $name = $url_parts[1]
-    }
-    else {
+    } else {
         # Old Code for default (any url) manifest
         $manifest.url = $url
         $name = choose_item $url_parts "App name"
         $name = if ($name.Length -gt 0) {
             $name
-        }
-        else {
+        } else {
             file_name ($url_parts | select-object -last 1)
         }
         $manifest.version = choose_item $url_parts "Version"
     }
 
-    $manifest | ConvertTo-Json -Depth 4 | ForEach-Object { [System.Text.RegularExpressions.Regex]::Unescape($_) } | out-file -filepath "$name.json" -encoding utf8
+    $manifest | ConvertToPrettyJson | out-file -filepath "$name.json" -encoding utf8
     $manifest_path = join-path $pwd "$name.json"
     write-host "Created '$manifest_path'."
 }
@@ -48,27 +47,29 @@ function create_manifest($url) {
 function github {
     $owner = $url_parts[0]
     $name = $url_parts[1]
-    # Getting Info
+
     $info = Invoke-WebRequest -Uri ("https://api.github.com/repos/$owner/$name") | ConvertFrom-Json
+
     if ($info.homepage) {
         $manifest.homepage = $info.homepage
-    }
-    else {
+    } else {
         $manifest.homepage = $info.html_url
     }
+
     $manifest.description = $info.description
+
     if ($info.license) {
         if ($info.license -match "Other") {
             $manifest.license["url"] = "https://raw.githubusercontent.com/" + $info.full_name + "/" + $info.default_branch + "/LICENSE.txt"
-        }
-        else {
+        } else {
             $manifest.license["identifier"] = $licenses[$info.license.name]
         }
-    }
-    else {
+    } else {
         $manifest.Remove('license')
     }
+
     $manifest.checkver = @{ github = $info.html_url }
+
     $releases = Invoke-WebRequest -Uri ("https://api.github.com/repos/$owner/$name/releases") | ConvertFrom-Json
     if ($releases[0].assets) {
         $manifest.version = $releases[0].tag_name
@@ -91,21 +92,18 @@ function github {
                 $manifest.architecture["32bit"] = @{ "url" = $url_32; "hash" = "" }
                 $manifest.autoupdate.architecture["32bit"] = @{ "url" = $url_32.Replace($manifest.version, '$version') }
             }
-        }
-        else {
+        } else {
             $manifest.url = $releases[0].assets[0].browser_download_url
             $manifest.autoupdate["url"] = $manifest.url.Replace($manifest.version, '$version')
         }
-    }
-    else {
+    } else {
         # If there's no releases try to find tags
         $tags = Invoke-WebRequest -Uri ("https://api.github.com/repos/$owner/$name/tags") | ConvertFrom-Json
         if ($tags[0]) {
             $manifest.version = $tags[0].name
             $manifest.url = "https://github.com/$owner/$name/archive/" + $manifest.version + ".zip"
             $manifest.autoupdate["url"] = "https://github.com/$owner/$name/archive/`$version.zip"
-        }
-        else {
+        } else {
             $manifest.url = "https://github.com/$owner/$name/archive/" + $info.default_branch + ".zip"
         }
     }
