@@ -4,6 +4,7 @@
 param($url)
 
 . "$psscriptroot\..\lib\json.ps1"
+. "$psscriptroot\..\lib\install.ps1"
 
 $manifest = [ordered]@{ "homepage" = "";
                         "description" = "";
@@ -75,26 +76,30 @@ function github {
         $manifest.version = $releases[0].tag_name
         # Trying to guess architecture if it's important
         foreach ($asset in $releases[0].assets) {
-            if ($asset.name -notMatch "linux|macos|osx|arm") {
-                if ($asset.name -match "x64" -and (!$url_64 -or $asset.name -match "win")) {
-                    $url_64 = $asset.browser_download_url
+            if ($asset.name -match ".(zip|rar|7z|msi|exe)") {
+                if ($asset.name -match "x64" -and (!$release_64 -or $asset.name -match ".(zip|7z|rar)")) {
+                    $release_64 = $asset
                 }
-                if ($asset.name -match "x86" -and (!$url_32 -or $asset.name -match "win")) {
-                    $url_32 = $asset.browser_download_url
+                if ($asset.name -match "x86" -and (!$release_32 -or $asset.name -match ".(zip|7z|rar)")) {
+                    $release_32 = $asset
                 }
             }
         }
-        if ($url_64) {
+        if ($release_64) {
             $manifest.Remove("url")
-            $manifest.architecture = @{ "64bit" = @{ "url" = $url_64; "hash" = "" } }
-            $manifest.autoupdate["architecture"] = @{ "64bit" = @{ "url" = $url_64.Replace($manifest.version, '$version') } }
-            if ($url_32) {
-                $manifest.architecture["32bit"] = @{ "url" = $url_32; "hash" = "" }
-                $manifest.autoupdate.architecture["32bit"] = @{ "url" = $url_32.Replace($manifest.version, '$version') }
+            $manifest.Remove("hash")
+            $manifest.architecture = @{ "64bit" = @{ "url" = $release_64.browser_download_url; "hash" = "" } }
+            $manifest.architecture["64bit"].hash = calculate_hash $release_64.name $release_64.browser_download_url
+            $manifest.autoupdate["architecture"] = @{ "64bit" = @{ "url" = $release_64.browser_download_url.Replace($manifest.version, '$version') } }
+            if ($release_32) {
+                $manifest.architecture["32bit"] = @{ "url" = $release_32.browser_download_url; "hash" = "" }
+                $manifest.architecture["32bit"].hash = calculate_hash $release_32.name $release_32.browser_download_url
+                $manifest.autoupdate.architecture["32bit"] = @{ "url" = $release_32.browser_download_url.Replace($manifest.version, '$version') }
             }
         } else {
             $manifest.url = $releases[0].assets[0].browser_download_url
             $manifest.autoupdate["url"] = $manifest.url.Replace($manifest.version, '$version')
+            $manifest.hash = calculate_hash $releases[0].assets[0].name $manifest.url
         }
     } else {
         # If there's no releases try to find tags
@@ -102,10 +107,19 @@ function github {
         if ($tags[0]) {
             $manifest.version = $tags[0].name
             $manifest.url = "https://github.com/$owner/$name/archive/" + $manifest.version + ".zip"
+            $manifest.hash = calculate_hash $manifest.version $manifest.url
             $manifest.autoupdate["url"] = "https://github.com/$owner/$name/archive/`$version.zip"
         } else {
             $manifest.url = "https://github.com/$owner/$name/archive/" + $info.default_branch + ".zip"
         }
+    }
+
+}
+
+function calculate_hash($name, $url) {
+    $confirm = Read-Host "Download $name to calculate hash ? (y/N)"
+    if ($skip -or $confirm.ToLower() -eq 'y') {
+        get_hash_for_app $null $null $null $url
     }
 }
 
