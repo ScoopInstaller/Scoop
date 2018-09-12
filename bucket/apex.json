@@ -2,15 +2,15 @@
     "description": "Lets you build, deploy, and manage AWS Lambda functions.",
     "homepage": "http://apex.run/",
     "license": "MIT",
-    "version": "1.0.0-rc3",
+    "version": "1.0.0-rc4",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/apex/apex/releases/download/v1.0.0-rc3/apex_1.0.0-rc3_windows_amd64.tar.gz",
-            "hash": "0922b7760a5d2a5f1f36006834693680ad6398436cb019c1be410aa87a1efbe5"
+            "url": "https://github.com/apex/apex/releases/download/v1.0.0-rc4/apex_1.0.0-rc4_windows_amd64.tar.gz",
+            "hash": "6565cedc1e318a40e56b9405bb0b5f85cbc37743ca6e7859ff173303065e58cf"
         },
         "32bit": {
-            "url": "https://github.com/apex/apex/releases/download/v1.0.0-rc3/apex_1.0.0-rc3_windows_386.tar.gz",
-            "hash": "b7c3d48216304d90a2d3b714672caaa377b18f84f1c32dcd0464d53c51b82607"
+            "url": "https://github.com/apex/apex/releases/download/v1.0.0-rc4/apex_1.0.0-rc4_windows_386.tar.gz",
+            "hash": "064dfc9d22e9c95e66892d8189ee94b97f32e7cf70e8c38751cff63725f4f04d"
         }
     },
     "notes": "This is a pre-release version (release candidate)!",
