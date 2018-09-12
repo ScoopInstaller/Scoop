@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.vagrantup.com/",
-    "version": "2.1.4",
+    "version": "2.1.5",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://releases.hashicorp.com/vagrant/2.1.4/vagrant_2.1.4_x86_64.msi",
-            "hash": "e2a25aa4834033a6e77f95edccd0d04679d75dc9cf67f5819e73f446f68058d5"
+            "url": "https://releases.hashicorp.com/vagrant/2.1.5/vagrant_2.1.5_x86_64.msi",
+            "hash": "ae1221b1489afc03b5782acb8feb91dd26b847bc4aad336f769f9242fde6d373"
         },
         "32bit": {
-            "url": "https://releases.hashicorp.com/vagrant/2.1.4/vagrant_2.1.4_i686.msi",
-            "hash": "ddc36c76a1a0c6c598c203d65f238390092fcac91e5f4fe8ac41e71145359472"
+            "url": "https://releases.hashicorp.com/vagrant/2.1.5/vagrant_2.1.5_i686.msi",
+            "hash": "eecb0734e3cfc4951fe1be61ee313230edb36186e269c4e4c062604605d67e47"
         }
     },
     "extract_dir": "HashiCorp/Vagrant",
