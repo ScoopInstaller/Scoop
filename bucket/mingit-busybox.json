@@ -1,0 +1,48 @@
+{
+    "homepage": "https://git-for-windows.github.io/",
+    "license": "GPL-2.0",
+    "version": "2.18.0.windows.1",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/MinGit-2.18.0-busybox-64-bit.zip",
+            "hash": "1a34608fbb82f607924d21ac2737c189a250fd9c6f4255a939e55c7fc3b10a0d"
+        },
+        "32bit": {
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/MinGit-2.18.0-busybox-32-bit.zip",
+            "hash": "6a667b03bacbcd2627e4e9a29a222c1ccb01c340bc721352afd6427f3621945c"
+        }
+    },
+    "bin": [
+        "cmd\\git.exe",
+        "mingw64\\bin\\busybox.exe"
+    ],
+    "notes": [
+        "To get Git to recognise OpenSSH, you will need to run",
+        "",
+        "scoop install openssh",
+        "[environment]::setenvironmentvariable('GIT_SSH', (resolve-path (scoop which ssh)), 'USER')",
+        "",
+        "and then restart powershell."
+    ],
+    "checkver": {
+        "url": "https://github.com/git-for-windows/git/releases/latest",
+        "re": "v(?<version>[\\d\\w.]+)/MinGit-(?<short>[\\d.]+).*\\.exe"
+    },
+    "env_set": {
+        "GIT_INSTALL_ROOT": "$dir"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/git-for-windows/git/releases/download/v$matchVersion/MinGit-$matchShort-busybox-64-bit.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/git-for-windows/git/releases/download/v$matchVersion/MinGit-$matchShort-busybox-32-bit.zip"
+            }
+        },
+        "hash": {
+            "url": "https://github.com/git-for-windows/git/releases/latest",
+            "find": "<td>$basename<\\/td>\\s*<td>([0-9a-fA-F]+)<\\/td>"
+        }
+    }
+}
