@@ -8,5 +8,8 @@
     ],
     "homepage": "http://www.sentex.net/~mwandel/jhead/",
     "hash": "666e18ca6bdd85fc74b0dee6d501f06b4bf387a5567cf5ac483d47b59cfdca44",
-    "bin": "jhead.exe"
+    "bin": "jhead.exe",
+    "checkver": {
+        "re": "Current release version: (?<version>[\\d.]+) \\([\\w ]+\\)"
+    }
 }
