@@ -13,8 +13,5 @@
     },
     "homepage": "https://github.com/projectkudu/ARMClient",
     "bin": "ARMClient.exe",
-    "checkver": {
-        "url": "https://github.com/projectkudu/ARMClient/releases/latest",
-        "re": "/releases/tag/v([\\d.]+)"
-    }
+    "checkver": "github"
 }
