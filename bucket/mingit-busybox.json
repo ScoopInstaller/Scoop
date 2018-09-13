@@ -1,15 +1,15 @@
 {
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL-2.0",
-    "version": "2.18.0.windows.1",
+    "version": "2.19.0.windows.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/MinGit-2.18.0-busybox-64-bit.zip",
-            "hash": "1a34608fbb82f607924d21ac2737c189a250fd9c6f4255a939e55c7fc3b10a0d"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.19.0.windows.1/MinGit-2.19.0-busybox-64-bit.zip",
+            "hash": "128b355e4321dbaf699ff4994ddbb6cde92783f4930be50aad507f6d8dbec0d0"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.18.0.windows.1/MinGit-2.18.0-busybox-32-bit.zip",
-            "hash": "6a667b03bacbcd2627e4e9a29a222c1ccb01c340bc721352afd6427f3621945c"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.19.0.windows.1/MinGit-2.19.0-busybox-32-bit.zip",
+            "hash": "2695578e2c53f32194986456ce714388149d051041f638e9ed43dd8342465fb2"
         }
     },
     "bin": [
