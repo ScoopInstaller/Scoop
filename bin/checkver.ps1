@@ -94,6 +94,9 @@ $queue | ForEach-Object {
 
     $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq "true"
 
+    $substitutions = get_version_substitutions $json.version
+    $url = substitute $url $substitutions
+
     $state = new-object psobject @{
         app = (strip_ext $name);
         url = $url;
