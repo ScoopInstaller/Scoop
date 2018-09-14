@@ -21,16 +21,16 @@
     },
     "checkver": {
         "url": "https://curl.haxx.se/windows/",
-        "re": "dl-(?<curl>[\\d.]+)/openssl-(?<version>[\\w.]+)-win64-mingw"
+        "re": "dl-(?<curl>[\\d._]+)/openssl-(?<version>[\\w.]+)-win64-mingw"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://curl.haxx.se/windows/dl-7.61.1/openssl-$version-win64-mingw.tar.xz",
+                "url": "https://curl.haxx.se/windows/dl-$matchCurl/openssl-$version-win64-mingw.tar.xz",
                 "extract_dir": "openssl-$version-win64-mingw"
             },
             "32bit": {
-                "url": "https://curl.haxx.se/windows/dl-7.61.1/openssl-$version-win32-mingw.tar.xz",
+                "url": "https://curl.haxx.se/windows/dl-$matchCurl/openssl-$version-win32-mingw.tar.xz",
                 "extract_dir": "openssl-$version-win32-mingw"
             }
         },
