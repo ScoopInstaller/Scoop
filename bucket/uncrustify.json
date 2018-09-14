@@ -1,0 +1,34 @@
+{
+    "version": "0.67",
+    "description": "A source code beautifier for C, C++, C#, ObjectiveC, D, Java, Pawn and VALA",
+    "license": "LGPL-2.1-only",
+    "architecture": {
+        "64bit": {
+            "url": "https://downloads.sourceforge.net/project/uncrustify/uncrustify/uncrustify-0.67/uncrustify-0.67-win64.zip",
+            "hash": "434120c0f352ee430f01f44fd5f09b6af0fee6d72f0ee9c371112858b478903a"
+        },
+        "32bit": {
+            "url": "https://downloads.sourceforge.net/project/uncrustify/uncrustify/uncrustify-0.66.1/uncrustify-0.66.1-win32.zip",
+            "hash": "23c4ec06b82012314865e721435c683e6dbdd628861d5bbdef66d57cba127417"
+        }
+    },
+    "notes": "32-bit version is unavailable in the latest release",
+    "homepage": "http://uncrustify.sourceforge.net/",
+    "bin": [
+        "uncrustify.exe"
+    ],
+    "checkver": {
+        "re": "\/releases\/tag\/uncrustify-([\\d.]+)",
+        "github": "https://github.com/uncrustify/uncrustify"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.sourceforge.net/project/uncrustify/uncrustify/uncrustify-$version/uncrustify-$version-win64.zip"
+            },
+            "32bit": {
+                "url": "https://downloads.sourceforge.net/project/uncrustify/uncrustify/uncrustify-$version/uncrustify-$version-win32.zip"
+            }
+        }
+    }
+}
