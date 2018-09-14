@@ -15,8 +15,8 @@ if($app) { $search = $app }
 # get apps to check
 $apps = @()
 Get-ChildItem $dir "$search.json" | ForEach-Object {
-    $json = parse_json "$dir\$_"
-    $apps += ,@(($_ -replace '\.json$', ''), $json)
+    $json = parse_json "$dir\$($_.Name)"
+    $apps += ,@(($_.Name -replace '\.json$', ''), $json)
 }
 
 $apps | ForEach-Object {

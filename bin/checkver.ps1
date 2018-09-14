@@ -34,7 +34,7 @@ $queue = @()
 Get-ChildItem $dir "$search.json" | ForEach-Object {
     $json = parse_json "$dir\$($_.Name)"
     if($json.checkver) {
-        $queue += ,@($($_.Name), $json)
+        $queue += ,@($_.Name, $json)
     }
 }
 
