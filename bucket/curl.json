@@ -7,12 +7,12 @@
         "64bit": {
             "url": "https://curl.haxx.se/windows/dl-7.61.1_1/curl-7.61.1_1-win64-mingw.tar.xz",
             "hash": "7efcb8f2e4c06bc56d63a498b3f6c52d669143cfdfc045bcd6c704ab75d6e751",
-            "extract_dir": "curl-7.61.1_1-win64-mingw"
+            "extract_dir": "curl-7.61.1-win64-mingw"
         },
         "32bit": {
             "url": "https://curl.haxx.se/windows/dl-7.61.1_1/curl-7.61.1_1-win32-mingw.tar.xz",
             "hash": "b05b9dbd37b35e4dd9ae7e2723495ba641567703b14f592c0eb91bbd8c94c8e4",
-            "extract_dir": "curl-7.61.1_1-win32-mingw"
+            "extract_dir": "curl-7.61.1-win32-mingw"
         }
     },
     "bin": "bin\\curl.exe",
@@ -24,11 +24,11 @@
         "architecture": {
             "64bit": {
                 "url": "https://curl.haxx.se/windows/dl-$version/curl-$version-win64-mingw.tar.xz",
-                "extract_dir": "curl-$version-win64-mingw"
+                "extract_dir": "curl-$matchHead-win64-mingw"
             },
             "32bit": {
                 "url": "https://curl.haxx.se/windows/dl-$version/curl-$version-win32-mingw.tar.xz",
-                "extract_dir": "curl-$version-win32-mingw"
+                "extract_dir": "curl-$matchHead-win32-mingw"
             }
         },
         "hash": {
