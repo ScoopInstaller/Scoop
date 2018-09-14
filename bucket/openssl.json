@@ -21,7 +21,7 @@
     },
     "checkver": {
         "url": "https://curl.haxx.se/windows/",
-        "re": "dl-(?<curl>[\\d.]+)/openssl-(?<version>[\\w.]+)-win64-mingw"
+        "re": "dl-(?<curl>[\\d._]+)/openssl-(?<version>[\\w.]+)-win64-mingw"
     },
     "autoupdate": {
         "architecture": {

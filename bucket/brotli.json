@@ -21,7 +21,7 @@
     "pre_install": "Copy-Item \"$dir\\bin\\brotli.exe\" \"$dir\\bin\\unbrotli.exe\"",
     "checkver": {
         "url": "https://curl.haxx.se/windows/",
-        "re": "dl-(?<curl>[\\d.]+)/brotli-(?<version>[\\d.]+)-win64-mingw"
+        "re": "dl-(?<curl>[\\d._]+)/brotli-(?<version>[\\d._]+)-win64-mingw"
     },
     "autoupdate": {
         "architecture": {
