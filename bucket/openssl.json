@@ -26,11 +26,11 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://curl.haxx.se/windows/dl-$matchCurl/openssl-$version-win64-mingw.zip",
+                "url": "https://curl.haxx.se/windows/dl-$matchCurl/openssl-$version-win64-mingw.tar.xz",
                 "extract_dir": "openssl-$matchHead-win64-mingw"
             },
             "32bit": {
-                "url": "https://curl.haxx.se/windows/dl-$matchCurl/openssl-$version-win32-mingw.zip",
+                "url": "https://curl.haxx.se/windows/dl-$matchCurl/openssl-$version-win32-mingw.tar.xz",
                 "extract_dir": "openssl-$matchHead-win32-mingw"
             }
         },
