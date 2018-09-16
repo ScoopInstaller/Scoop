@@ -1,7 +1,7 @@
 . "$psscriptroot\Scoop-TestLib.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 
-describe "getopt" {
+describe "getopt" -Tag 'Scoop' {
     it 'handle short option with required argument missing' {
         $null, $null, $err = getopt '-x' 'x:' ''
         $err | should be 'Option -x requires an argument.'

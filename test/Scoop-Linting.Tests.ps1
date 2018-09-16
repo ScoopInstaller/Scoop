@@ -1,6 +1,6 @@
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 
-Describe "PSScriptAnalyzer" {
+Describe -Tag 'Linter' "PSScriptAnalyzer" {
     $scoop_modules = Get-ChildItem $repo_dir -Recurse -Include *.psd1, *.psm1, *.ps1
     $scoop_modules = $scoop_modules | Where-Object { $_.DirectoryName -notlike '*\supporting*' -and $_.DirectoryName -notlike '*\test*' }
     $scoop_modules = $scoop_modules | Select-Object -ExpandProperty Directory -Unique
