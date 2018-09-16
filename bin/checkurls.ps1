@@ -22,8 +22,8 @@ $dir = resolve-path $dir
 # get apps to check
 $queue = @()
 Get-ChildItem $dir "$search.json" | ForEach-Object {
-    $manifest = parse_json "$dir\$_"
-    $queue += ,@($_, $manifest)
+    $manifest = parse_json "$dir\$($_.Name)"
+    $queue += ,@($_.Name, $manifest)
 }
 
 $original = use_any_https_protocol

@@ -32,9 +32,9 @@ if($app) { $search = $app }
 # get apps to check
 $queue = @()
 Get-ChildItem $dir "$search.json" | ForEach-Object {
-    $json = parse_json "$dir\$_"
+    $json = parse_json "$dir\$($_.Name)"
     if($json.checkver) {
-        $queue += ,@($_, $json)
+        $queue += ,@($_.Name, $json)
     }
 }
 
