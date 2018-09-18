@@ -2,7 +2,7 @@
 
 reset_aliases
 
-describe "add_alias" {
+describe "add_alias" -Tag 'Scoop' {
   mock shimdir { "TestDrive:\shim" }
   mock set_config { }
   mock get_config { @{} }

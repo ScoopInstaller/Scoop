@@ -6,7 +6,7 @@
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 $isUnix = is_unix
 
-describe "is_directory" {
+describe "is_directory" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "is_directory"
     }
@@ -23,7 +23,7 @@ describe "is_directory" {
     }
 }
 
-describe "movedir" {
+describe "movedir" -Tag 'Scoop' {
     $extract_dir = "subdir"
     $extract_to = $null
 
@@ -61,7 +61,7 @@ describe "movedir" {
     }
 }
 
-describe "unzip_old" {
+describe "unzip_old" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "unzip_old"
     }
@@ -117,7 +117,7 @@ describe "unzip_old" {
     }
 }
 
-describe "shim" {
+describe "shim" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "shim"
         $shimdir = shimdir
@@ -153,7 +153,7 @@ describe "shim" {
     }
 }
 
-describe "rm_shim" {
+describe "rm_shim" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "shim"
         $shimdir = shimdir
@@ -172,7 +172,7 @@ describe "rm_shim" {
     }
 }
 
-Describe "get_app_name_from_ps1_shim" {
+Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
     BeforeAll {
         $working_dir = setup_working "shim"
         $shimdir = shimdir
@@ -211,7 +211,7 @@ Describe "get_app_name_from_ps1_shim" {
     }
 }
 
-describe "ensure_robocopy_in_path" {
+describe "ensure_robocopy_in_path" -Tag 'Scoop' {
     $shimdir = shimdir $false
     mock versiondir { $repo_dir }
 
@@ -245,7 +245,7 @@ describe "ensure_robocopy_in_path" {
     }
 }
 
-describe 'sanitary_path' {
+describe 'sanitary_path' -Tag 'Scoop' {
   it 'removes invalid path characters from a string' {
     $path = 'test?.json'
     $valid_path = sanitary_path $path
@@ -254,7 +254,7 @@ describe 'sanitary_path' {
   }
 }
 
-describe 'app' {
+describe 'app' -Tag 'Scoop' {
     it 'parses the bucket name from an app query' {
         $query = "C:\test.json"
         $app, $bucket, $version = parse_app $query

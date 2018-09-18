@@ -1,7 +1,7 @@
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
-describe "hashtable" {
+describe "hashtable" -Tag 'Scoop' {
     $json = '{ "one": 1, "two": [ { "a": "a" }, "b", 2 ], "three": { "four": 4 }, "five": true, "six": false, "seven": "\/Date(1529917395805)\/" }'
 
     it "converts pscustomobject to hashtable" {
