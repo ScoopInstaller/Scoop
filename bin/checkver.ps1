@@ -86,6 +86,9 @@ $queue | ForEach-Object {
     if($json.checkver.jp) {
         $jsonpath = $json.checkver.jp
     }
+    if($json.checkver.jsonpath) {
+        $jsonpath = $json.checkver.jsonpath
+    }
 
     if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
         $replace = $json.checkver.replace

@@ -159,7 +159,13 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'extract'
     }
 
-    if ($config.jp.Length -gt 0) {
+    $jsonpath = ''
+    if ($config.jp) {
+        $jsonpath = $config.jp
+        $hashmode = 'json'
+    }
+    if ($config.jsonpath) {
+        $jsonpath = $config.jsonpath
         $hashmode = 'json'
     }
 
@@ -175,7 +181,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             $hash = find_hash_in_textfile $hashfile_url $basename $config.find
         }
         'json' {
-            $hash = find_hash_in_json $hashfile_url $basename $config.jp
+            $hash = find_hash_in_json $hashfile_url $basename $jsonpath
         }
         'rdf' {
             $hash = find_hash_in_rdf $hashfile_url $basename

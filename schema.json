@@ -31,6 +31,11 @@
                 },
                 "jp": {
                     "pattern": "^\\$\\..*$",
+                    "type": "string",
+                    "description": "Same as 'jsonpath'"
+                },
+                "jsonpath": {
+                    "pattern": "^\\$\\..*$",
                     "type": "string"
                 },
                 "mode": {
@@ -216,6 +221,11 @@
                             "type": "string"
                         },
                         "jp": {
+                            "pattern": "^\\$\\..*$",
+                            "type": "string",
+                            "description": "Same as 'jsonpath'"
+                        },
+                        "jsonpath": {
                             "pattern": "^\\$\\..*$",
                             "type": "string"
                         },
