@@ -241,6 +241,9 @@
                         "replace": {
                             "description": "Allows rearrange the regexp matches",
                             "type": "string"
+                        },
+                        "useragent": {
+                            "type": "string"
                         }
                     },
                     "type": "object"

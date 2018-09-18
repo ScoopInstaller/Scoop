@@ -47,11 +47,17 @@ $original = use_any_https_protocol
 
 # start all downloads
 $queue | ForEach-Object {
-    $wc = New-Object Net.Webclient
-    $wc.Headers.Add('User-Agent', (Get-UserAgent))
-    register-objectevent $wc downloadstringcompleted -ea stop | out-null
-
     $name, $json = $_
+
+    $substitutions = get_version_substitutions $json.version
+
+    $wc = New-Object Net.Webclient
+    if($json.checkver.useragent) {
+        $wc.Headers.Add('User-Agent', (substitute $json.checkver.useragent $substitutions))
+    } else {
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+    }
+    Register-ObjectEvent $wc downloadstringcompleted -ErrorAction stop | Out-Null
 
     $githubRegex = "\/releases\/tag\/(?:v)?([\d.]+)"
 
@@ -100,7 +106,6 @@ $queue | ForEach-Object {
 
     $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq "true"
 
-    $substitutions = get_version_substitutions $json.version
     $url = substitute $url $substitutions
 
     $state = new-object psobject @{
