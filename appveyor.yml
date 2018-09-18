@@ -6,7 +6,7 @@ branches:
 
 build: off
 deploy: off
-clone_depth: 50
+clone_depth: 49
 
 image:
 - Visual Studio 2017
@@ -17,7 +17,7 @@ environment:
     - PowerShell: 6
 
 cache:
-  # - '%USERPROFILE%\Documents\WindowsPowerShell\Modules -> appveyor.yml'
+  - '%USERPROFILE%\Documents\WindowsPowerShell\Modules -> appveyor.yml'
 
 matrix:
   fast_finish: true

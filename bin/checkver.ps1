@@ -79,6 +79,9 @@ $queue | ForEach-Object {
     if($json.checkver.re) {
         $regex = $json.checkver.re
     }
+    if($json.checkver.regex) {
+        $regex = $json.checkver.regex
+    }
 
     if($json.checkver.jp) {
         $jsonpath = $json.checkver.jp
