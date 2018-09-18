@@ -27,6 +27,11 @@
             "properties": {
                 "find": {
                     "format": "regex",
+                    "type": "string",
+                    "description": "Same as 'regex'"
+                },
+                "regex": {
+                    "format": "regex",
                     "type": "string"
                 },
                 "jp": {

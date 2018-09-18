@@ -168,6 +168,13 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $jsonpath = $config.jsonpath
         $hashmode = 'json'
     }
+    $regex = ''
+    if ($config.find) {
+        $regex = $config.find
+    }
+    if ($config.regex) {
+        $regex = $config.regex
+    }
 
     if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
         $hashmode = 'sourceforge'
@@ -178,7 +185,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
 
     switch ($hashmode) {
         'extract' {
-            $hash = find_hash_in_textfile $hashfile_url $basename $config.find
+            $hash = find_hash_in_textfile $hashfile_url $basename $regex
         }
         'json' {
             $hash = find_hash_in_json $hashfile_url $basename $jsonpath
