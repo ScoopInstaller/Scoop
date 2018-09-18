@@ -230,29 +230,3 @@ while($in_progress -gt 0) {
 }
 
 set_https_protocols $original
-
-<#
-write-host "checking $(strip_ext (fname $_))..." -nonewline
-$expected_ver = $json.version
-
-$url = $json.checkver.url
-if(!$url) { $url = $json.homepage }
-
-$regexp = $json.checkver.re
-if(!$regexp) { $regexp = $json.checkver }
-
-$page = $wc.downloadstring($url)
-
-if($page -match $regexp) {
-    $ver = $matches[1]
-    if($ver -eq $expected_ver) {
-        write-host "$ver" -f darkgreen
-    } else {
-        write-host "$ver" -f darkred -nonewline
-        write-host " (scoop version is $expected_ver)"
-    }
-
-} else {
-    write-host "couldn't match '$regexp' in $url" -f darkred
-}
-#>
