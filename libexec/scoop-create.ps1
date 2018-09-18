@@ -7,7 +7,6 @@ param($url)
 . "$psscriptroot\..\lib\json.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
-$name
 $manifest = [ordered]@{ "homepage" = "";
                         "description" = "";
                         "license" = @{};
@@ -59,8 +58,12 @@ function github {
 
     if ($info.license.spdx_id) {
         $manifest.license["identifier"] = $info.license.spdx_id
+    } elseif ($info.license) {
+        # There's should be a way do get license url (License is not always in LICENSE.* file)
+        $license = Invoke-WebRequest -Uri ("https://api.github.com/repos/$owner/$name/license") | ConvertFrom-Json
+        $manifest.license["url"] = $license.download_url
     } else {
-        $manifest.license["url"] = "https://raw.githubusercontent.com/$($info.full_name)/$($info.default_branch)/LICENSE.txt"
+        $manifest.license["url"] = ""
     }
 
     $releases = Invoke-WebRequest -Uri ("https://api.github.com/repos/$owner/$name/releases") | ConvertFrom-Json
@@ -124,7 +127,6 @@ function github {
             $manifest.version = $tags[0].name
             url "https://github.com/$owner/$name/archive/$($manifest.version).zip"
             if (confirm "Download $($manifest.version) to calculate hash ?") {
-                $manifest.hash = get_hash_for_app $name $null $manifest.version $manifest.url
                 install_info $manifest.url
             }
         }
@@ -181,8 +183,9 @@ function bin($path) {
         $bin = $bin -Replace [Regex]::Escape("$path\")
     }
 
-    if ($bin -ne $manifest.bin) {
+    if ((Compare-Object $bin $manifest.bin).length -ne 0) {
         $manifest.bin += $bin
+        $manifest.bin = $manifest.bin | Sort-Object | Get-Unique
     } else {
         $manifest.bin = $bin
     }
