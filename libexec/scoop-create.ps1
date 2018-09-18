@@ -206,7 +206,7 @@ function choose_item($list, $quote, $property) {
     for ($i = 0; $i -lt $list.length; $i++) {
         $item = $list[$i]
         if ($property) {
-            $item = $item | Select -ExpandProperty $property
+            $item = $item | Select-Object -ExpandProperty $property
         }
         Write-Host "[$($i + 1)]: $item"
     }
