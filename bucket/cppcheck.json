@@ -5,11 +5,11 @@
     "version": "1.84",
     "architecture": {
         "64bit": {
-            "url": "http://github.com/danmar/cppcheck/releases/download/1.84/cppcheck-1.84-x64-Setup.msi",
+            "url": "https://github.com/danmar/cppcheck/releases/download/1.84/cppcheck-1.84-x64-Setup.msi",
             "hash": "558e2e646240ff32c311277e23146812be9b86308d4e45108a3ad435ba1be2b6"
         },
         "32bit": {
-            "url": "http://github.com/danmar/cppcheck/releases/download/1.84/cppcheck-1.84-x86-Setup.msi",
+            "url": "https://github.com/danmar/cppcheck/releases/download/1.84/cppcheck-1.84-x86-Setup.msi",
             "hash": "d9aabfb6ffb539bef269a4a688cb890a4d8dae2e64658c445e1b887ed0e9aa42"
         }
     },
@@ -21,10 +21,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "http://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x64-Setup.msi"
+                "url": "https://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x64-Setup.msi"
             },
             "32bit": {
-                "url": "http://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x86-Setup.msi"
+                "url": "https://github.com/danmar/cppcheck/releases/download/$version/cppcheck-$version-x86-Setup.msi"
             }
         }
     }
