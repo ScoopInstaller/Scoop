@@ -1,0 +1,37 @@
+{
+  "homepage": "https://docs.microsoft.com/en-us/sysinternals/downloads/pstools",
+  "version": "1.0",
+  "description": "Windows Process Tools",
+  "url": "https://download.sysinternals.com/files/PSTools.zip",
+  "hash": "378782e10a8d92b18ea95d80cb6ce5c16f7e7b8aae03580e05d9e47cee38b363",
+  "bin": [
+    "psexec.exe",
+    "psfile.exe",
+    "psgetsid.exe",
+    "psinfo.exe",
+    "psping.exe",
+    "pskill.exe",
+    "pslist.exe",
+    "psloggedon.exe",
+    "psloglist.exe",
+    "pspasswd.exe",
+    "psservice.exe",
+    "psshutdown.exe",
+    "pssuspend.exe"
+  ],
+  "post_install": [
+    "psexec.exe -accepteula -? > $null 2>&1",
+    "psfile.exe -accepteula -? > $null 2>&1",
+    "psgetsid.exe -accepteula -? > $null 2>&1",
+    "psinfo.exe -accepteula -? > $null 2>&1",
+    "psping.exe -accepteula -? > $null 2>&1",
+    "pskill.exe -accepteula -? > $null 2>&1",
+    "pslist.exe -accepteula -? > $null 2>&1",
+    "psloggedon.exe -accepteula -? > $null 2>&1",
+    "psloglist.exe -accepteula -? > $null 2>&1",
+    "pspasswd.exe -accepteula -? > $null 2>&1",
+    "psservice.exe -accepteula -? > $null 2>&1",
+    "psshutdown.exe -accepteula -? > $null 2>&1",
+    "pssuspend.exe -accepteula -? > $null 2>&1"
+  ]
+}
