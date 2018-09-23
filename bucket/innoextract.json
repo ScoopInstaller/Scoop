@@ -1,0 +1,15 @@
+{
+    "homepage": "http://constexpr.org/innoextract/",
+    "version": "1.7",
+    "description": "A tool to unpack installers created by Inno Setup",
+    "license": "zlib",
+    "url": "http://constexpr.org/innoextract/files/innoextract-1.7/innoextract-1.7-windows.zip",
+    "hash": "md5:b801b0740b4ab19d69a739ab4a9180ae",
+    "bin": [
+        "innoextract.exe"
+    ],
+    "checkver": "<b itemprop=\"softwareVersion\">(\\d+\\.\\d+)</b>",
+    "autoupdate": {
+        "url": "http://constexpr.org/innoextract/files/innoextract-$version/innoextract-$version-windows.zip"
+    }
+}
