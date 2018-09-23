@@ -2,11 +2,11 @@
     "homepage": "https://github.com/sharkdp/bat",
     "description": "A cat(1) clone with syntax highlighting and Git integration",
     "license": "MIT",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/sharkdp/bat/releases/download/v0.7.0/bat-v0.7.0-x86_64-pc-windows-msvc.zip",
-            "hash": "eb12a728bc54019d66ac836577bb45bf5fd1ab47547984fbaed1863d972018c8"
+            "url": "https://github.com/sharkdp/bat/releases/download/v0.7.1/bat-v0.7.1-x86_64-pc-windows-msvc.zip",
+            "hash": "d36ad941d7ccaf1ce9b4b61924e876cb24303ec045b81a86a878c5878a7e7cc1"
         }
     },
     "bin": "bat.exe",
