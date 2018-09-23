@@ -277,7 +277,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         if(!(test-path $data.$url.source)) {
             $has_downloads = $true
             # create aria2 input file content
-            $urlstxt_content += "$url`n"
+            $urlstxt_content += "$(handle_special_urls $url)`n"
             if(!$url.Contains('sourceforge.net')) {
                 $urlstxt_content += "    referer=$(strip_filename $url)`n"
             }
