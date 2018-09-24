@@ -3,9 +3,9 @@
 # Help: Create your own custom app manifest
 param($url)
 
-. "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\json.ps1"
 . "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\decompress.ps1"
 
 $manifest = [ordered]@{ "homepage" = "";
                         "description" = "";
@@ -59,17 +59,17 @@ function github {
     if ($info.license.spdx_id) {
         $manifest.license["identifier"] = $info.license.spdx_id
     } elseif ($info.license) {
-        # There's should be a way do get license url (License is not always in LICENSE.* file)
-        $license = Invoke-WebRequest -Uri ("https://api.github.com/repos/$owner/$name/license") | ConvertFrom-Json
+        # There should be a better way to get license url (License is not always in LICENSE.* -> 'mpv-player/mpv')
+        $license = Invoke-WebRequest -Uri "https://api.github.com/repos/$owner/$name/license" | ConvertFrom-Json
         $manifest.license["url"] = $license.download_url
     } else {
         $manifest.license["url"] = ""
     }
 
-    $releases = Invoke-WebRequest -Uri ("https://api.github.com/repos/$owner/$name/releases") | ConvertFrom-Json
+    $releases = Invoke-WebRequest -Uri "https://api.github.com/repos/$owner/$name/releases" | ConvertFrom-Json
     # If last version is prerelease try to find release and let user choose wich one to use
-    if ($releases[0].prerelease -and $releases.length -gt 1) {
-        for ($i = 0; $i -lt $releases.length; $i++) {
+    if ($releases[0].prerelease -and $releases.count -gt 1) {
+        for ($i = 0; $i -lt $releases.count; $i++) {
             if (!$releases[$i].prerelease) {
                 $release = $releases[$i]
                 break
@@ -83,92 +83,103 @@ function github {
     }
 
     if ($release.assets) {
-        $windows_ext = ".(zip|rar|7z|msi|exe)"
-        $prefered_ext = ".(zip|7z|rar)"
+        version $release.tag_name
 
-        $manifest.version = $release.tag_name
-
-        foreach ($asset in $release.assets) {
-            if ($asset.name -match $windows_ext) {
-                if ($asset.name -match "x64" -and (!$asset_64 -or $asset.name -match $prefered_ext)) {
-                    $asset_64 = $asset
-                }
-                if ($asset.name -match "x86" -and (!$asset_32 -or $asset.name -match $prefered_ext)) {
-                    $asset_32 = $asset
-                }
-            }
-        }
-
-        if (!($asset_32 -or $asset_64)) {
-            if ($release.assets.length -gt 1) {
-                $asset_32 = choose_item $release.assets $null "name"
-            } else {
-                $asset_32 = $release.assets[0]
+        $architectures = "32bit", "64bit", "32bit / 64bit"
+        $architecture = choose_item $architectures "Choose supported architecture"
+        switch ($architecture) {
+            $architectures[0] { $asset_32 = choose_item $release.assets "Choose 32bit asset" "name" }
+            $architectures[1] { $asset_64 = choose_item $release.assets "Choose 64bit asset" "name" }
+            $architectures[2] {
+                $asset_32 = choose_item $release.assets "Choose 32bit asset ?" "name"
+                $asset_64 = choose_item $release.assets "Choose 64bit asset ?" "name"
             }
         }
 
         url $asset_32.browser_download_url $asset_64.browser_download_url
 
-        if ($asset_64) {
-            if (confirm "Download $($asset_64.name) to calculate hash ?") {
-                install_info $asset_64.browser_download_url "64bit"
-            }
+        if (!(confirm "Download asset(s) to calculate hash")) { return }
+
+        hash $asset_32.browser_download_url $asset_64.browser_download_url
+
+        # Let's hope that there's no extension per architecture apps D:
+        $file = if ($asset_64) { $asset_64.name } else { $asset_32.name }
+        if ($file -match ".zip" -or (file_requires_7zip $file)) {
+            $type = "archive"
         }
 
-        if ($asset_32) {
-            if (confirm "Download $($asset_32.name) to calculate hash ?") {
-                install_info $asset_32.browser_download_url "32bit"
+        switch ($type) {
+            "archive" {
+                archive_info
             }
         }
-
     } else { # If there's no releases try to find tags
-        $tags = Invoke-WebRequest -Uri ("https://api.github.com/repos/$owner/$name/tags") | ConvertFrom-Json
+        $tags = Invoke-WebRequest -Uri "https://api.github.com/repos/$owner/$name/tags" | ConvertFrom-Json
         if ($tags[0]) {
-            $manifest.version = $tags[0].name
-            url "https://github.com/$owner/$name/archive/$($manifest.version).zip"
-            if (confirm "Download $($manifest.version) to calculate hash ?") {
-                install_info $manifest.url
+            version $tags[0].name
+            if (confirm "64bit only ?") {
+                url $null "https://github.com/$owner/$name/archive/$($manifest.version).zip"
+            } else {
+                url "https://github.com/$owner/$name/archive/$($manifest.version).zip"
             }
-        }
+            if (confirm "Download asset to calculate hash ?") {
+                archive_info
+            }
+        } else { Write-Host "No tags found" }
     }
-
 }
 
-function install_info($url, $architecture) {
-    if ($architecture -eq "64bit" -or $manifest.architecture) {
-        $manifest.architecture[$architecture].hash = get_hash_for_app $name $null $manifest.version $url
-    } else {
-        $manifest.hash = get_hash_for_app $name $null $manifest.version $url
-    }
-    $tmp = "$pwd\_tmp"
-    unzip (cache_path $name $manifest.version $url) $tmp
+function archive_info {
+    $url = if ($manifest.architecture) { $manifest.architecture["64bit"].url } else { $manifest.url }
+    $tmp = "$env:TEMP\scoop"
+    Write-Host "Extracting" -NoNewline
+    Write-Host "..."
+    extract_7zip (cache_path $name $manifest.version $url) $tmp
     extract_dir $tmp
     bin $tmp
     Remove-Item $tmp -Force -Recurse
 }
 
-function url($32bit, $64bit) {
-    if ($64bit) {
-        $manifest.remove("url")
-        $manifest.remove("hash")
-        $manifest.architecture = @{ "64bit" = @{ "url" = $64bit; "hash" =  "" } }
-        $manifest.autoupdate["architecture"] = @{ "64bit" = @{ "url" = $64bit.replace($manifest.version, '$version') } }
-        if ($32bit) {
-            $manifest.architecture["32bit"] = @{ "url" = $asset_32.browser_download_url; "hash" = "" }
-            $manifest.autoupdate.architecture["32bit"] = @{ "url" = $32bit.replace($manifest.version, '$version') }
+function hash($url_32, $url_64) {
+    if ($url_64) {
+        $manifest.architecture["64bit"].hash = get_hash_for_app $name $null $manifest.version $url_64
+        if ($url_32) {
+            $manifest.architecture["32bit"].hash = get_hash_for_app $name $null $manifest.version $url_32
         }
     } else {
-        $manifest.url = $32bit
-        $manifest.autoupdate["url"] = $32bit.replace($manifest.version, '$version')
+        $manifest.hash = get_hash_for_app $name $null $manifest.version $url_32
+    }
+}
+
+function version($version) {
+    $manifest.version = if ($version[0] -eq 'v') { $version.substring(1) } else { $version }
+}
+
+function url($url_32, $url_64) {
+    if ($url_64) {
+        $manifest.remove("url")
+        $manifest.remove("hash")
+        $manifest.architecture = @{ "64bit" = @{ "url" = $url_64; "hash" =  "" } }
+        $manifest.autoupdate["architecture"] = @{ "64bit" = @{ "url" = $url_64.replace($manifest.version, '$version') } }
+        if ($url_32) {
+            $manifest.architecture["32bit"] = @{ "url" = $url_32; "hash" = "" }
+            $manifest.autoupdate.architecture["32bit"] = @{ "url" = $url_32.replace($manifest.version, '$version') }
+        }
+    } else {
+        $manifest.url = $url_32
+        $manifest.autoupdate["url"] = $url_32.replace($manifest.version, '$version')
     }
 }
 
 function extract_dir($path) {
-    $dir = Get-ChildItem -Path $path -Directory -Name
-    if ($dir.count -eq 1) {
-        $manifest.extract_dir = "$dir"
-        if ($dir -match $manifest.version) {
-            $manifest.autoupdate["extract_dir"] = $dir.replace($manifest.version, '$version')
+    $files = Get-ChildItem -Path $path -File -Name
+    if ($files) { return }
+
+    $dirs = Get-ChildItem -Path $path -Directory -Name
+    if ($dirs.count -eq 1) {
+        $manifest.extract_dir = "$dirs"
+        if ($dirs -match $manifest.version) {
+            $manifest.autoupdate["extract_dir"] = $dirs.replace($manifest.version, '$version')
         }
     } else { $manifest.remove("extract_dir") }
 }
@@ -183,12 +194,7 @@ function bin($path) {
         $bin = $bin -Replace [Regex]::Escape("$path\")
     }
 
-    if ((Compare-Object $bin $manifest.bin).length -ne 0) {
-        $manifest.bin += $bin
-        $manifest.bin = $manifest.bin | Sort-Object | Get-Unique
-    } else {
-        $manifest.bin = $bin
-    }
+    $manifest.bin = $bin
 }
 
 function file_name($segment) {
@@ -196,27 +202,32 @@ function file_name($segment) {
 }
 
 function confirm($quote, $command) {
-    $answer = Read-Host $quote "(y/N)"
+    Write-Host $quote -NoNewline -ForegroundColor DarkYellow
+    Write-Host " (y/N)" -ForegroundColor Green
+    $answer = Read-Host
     return $answer.toLower() -eq 'y'
 }
 
 function parse_url($url) {
     $uri = new-object Uri $url
-    $uri.pathandquery.substring(1).split("/")
+    $uri.pathandquery.substring(1).split('/')
 }
 
 function choose_item($list, $quote, $property) {
-    for ($i = 0; $i -lt $list.length; $i++) {
+    if ($list.count -eq 1) { return $list }
+
+    for ($i = 0; $i -lt $list.count; $i++) {
         $item = $list[$i]
         if ($property) {
             $item = $item | Select-Object -ExpandProperty $property
         }
-        Write-Host "[$($i + 1)]: $item"
+        Write-Host "[$($i + 1)]: " -NoNewline -ForegroundColor Green
+        Write-Host $item -ForegroundColor DarkYellow
     }
 
     $choose =  {
-        $selection = if ($quote) {Read-Host $quote} else {Read-Host}
-        if ($selection -match "\d+" -and ($selection - 1) -lt $list.length) {
+        $selection = if ($quote) { Read-Host $quote } else { Read-Host }
+        if ($selection -match "\d+" -and ($selection - 1) -lt $list.count) {
             return $list[$selection - 1]
         } else {
             Write-Host "Out of bound. Try again..."
