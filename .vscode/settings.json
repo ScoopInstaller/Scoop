@@ -1,4 +1,23 @@
 // Configure PSScriptAnalyzer settings
 {
-    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1"
+    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+    "powershell.codeFormatting.preset": "OTBS",
+    "powershell.codeFormatting.alignPropertyValuePairs": true,
+    "powershell.codeFormatting.ignoreOneLineBlock": true,
+    "json.schemas": [
+        {
+            "url": "https://raw.githubusercontent.com/lukesampson/scoop/master/schema.json",
+            "fileMatch": [
+                "bucket/*.json"
+            ]
+        }
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/tmp": true
+    }
 }
