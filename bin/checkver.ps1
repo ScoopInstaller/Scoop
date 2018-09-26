@@ -141,6 +141,10 @@ $Queue | ForEach-Object {
 	$wc.DownloadStringAsync($url, $state)
 }
 
+function handleErrors($man) {
+	return $man
+}
+
 # wait for all to complete
 $in_progress = $Queue.length
 while ($in_progress -gt 0) {
@@ -148,21 +152,42 @@ while ($in_progress -gt 0) {
 	Remove-Event $ev.SourceIdentifier
 	$in_progress--
 
-	$state = $ev.SourceEventArgs.UserState
-	$App = $state.app
-	$json = $state.json
-	$url = $state.url
-	$expected_ver = $json.version
-	$regexp = $state.regex
-	$jsonpath = $state.jsonpath
-	$reverse = $state.reverse
-	$replace = $state.replace
-	$ver = ""
+	$state = $ev.SourceEventArgs.UserState;
+	$json_u = $state.json
+	$manifest = New-Object psobject @{
+		state        = $state;
+		app          = $state.app;
+		json         = $json_u;
+		url          = $state.url;
+		expected_ver = $json_u.version;
+		regexp       = $state.regex;
+		jsonpath     = $state.jsonpath;
+		reverse      = $state.reverse;
+		replace      = $state.replace;
+		ver          = '';
+		err          = $ev.SourceEventArgs.Error;
+		page         = $ev.SourceEventArgs.Result;
+		errors       = @();
+	}
 
-	$err = $ev.SourceEventArgs.Error
-	$page = $ev.SourceEventArgs.Result
+	$manifest = (handleErrors $manifest)
+	# Write-Host ($ev.SourceEventArgs.UserState -eq $manifest.state) -f Yellow
 
-	Write-Host "$App`: " -NoNewline
+	$state = $manifest.state
+	$app = $manifest.app
+	$json = $manifest.json
+	$url = $manifest.url
+	$expected_ver = $manifest.expected_ver
+	$regexp = $manifest.regexp
+	$jsonpath = $manifest.jsonpath
+	$reverse = $manifest.reverse
+	$replace = $manifest.replace
+	$ver = $manifest.ver
+	$err = $manifest.err
+	$page = $manifest.page
+	$errors = $manifest.errors
+
+	Write-Host "$app`: " -NoNewline
 
 	if ($err) {
 		Write-Host $err.message -ForegroundColor DarkRed
@@ -220,8 +245,8 @@ while ($in_progress -gt 0) {
 		continue
 	}
 
+	# version hasn't changed (step over if forced update)
 	if ($ver -eq $expected_ver -and $ForceUpdate -eq $false) {
-		# version hasn't changed (step over if forced update)
 		Write-Host $ver -ForegroundColor DarkGreen
 		continue
 	}
