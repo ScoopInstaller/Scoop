@@ -2,11 +2,11 @@
     "description": "Manage files with git, without comitting them",
     "homepage": "http://git-annex.branchable.com/",
     "license": "GPL-3.0",
-    "version": "6.20180913",
+    "version": "6.20180926",
     "notes": "NOTE: Running `git-annex version` may report a slightly older version number",
     "bin": "usr/bin/git-annex.exe",
     "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z",
-    "hash": "119c8cce4895d0a58496b06a30c9952f6ccf94d5dfb6886ba5a816b33cb8e6da",
+    "hash": "4c81fda484af4c2504a7881e14024c26f378fd9aab4ca18e956816e8a1c20eea",
     "checkver": {
         "url": "https://hackage.haskell.org/package/git-annex",
         "re": "/git-annex-([\\d.]+)\\.tar\\.gz"
