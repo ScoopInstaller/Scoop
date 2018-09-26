@@ -1,16 +1,37 @@
-# checks websites for newer versions using an (optional) regular expression defined in the manifest
-# use $dir to specify a manifest directory to check from, otherwise ./bucket is used
+<#
+.SYNOPSIS
+    Check manifest for newer version.
+.DESCRIPTION
+    Checks websites for newer versions using an (optional) regular expression defined in the manifest.
+.PARAMETER App
+    Manifest name to search.
+    Placeholders are supported.
+.PARAMETER Dir
+    Where to seach for manfiest(s).
+.PARAMETER Update
+    Update given manifest
+.PARAMETER ForceUpdate
+    Update given manfiest(s) even when there is no new version.
+    Usefull for hash updates.
+.PARAMETER SkipSupported
+    Updated manifests will not be showed.
+.EXAMPLE
+    PS $BUCKETDIR $ .\bin\checkver.ps1
+    Check all manifest inside default directory.
+#>
 param(
-    [String]$app,
-    [String]$dir,
-    [Switch]$update = $false,
-    [Switch]$forceUpdate = $false
+	[String] $App = '*',
+	[ValidateScript( {Test-Path $_ -Type Container})]
+	[String] $Dir = "$psscriptroot\..\bucket",
+	[Switch] $Update,
+	[Switch] $ForceUpdate,
+	[Switch] $SkipSupported
 )
 
-if (!$app -and $update) {
-    # While developing the feature we only allow specific updates
-    Write-Host "[ERROR] AUTOUPDATE CAN ONLY BE USED WITH A APP SPECIFIED" -f DarkRed
-    exit
+if (($App -eq '*') -and $Update) {
+	# While developing the feature we only allow specific updates
+	Write-Host '[ERROR] AUTOUPDATE CAN ONLY BE USED WITH A APP SPECIFIED' -ForegroundColor DarkRed
+	exit
 }
 
 . "$psscriptroot\..\lib\core.ps1"
@@ -23,215 +44,211 @@ if (!$app -and $update) {
 . "$psscriptroot\..\lib\install.ps1" # needed for hash generation
 . "$psscriptroot\..\lib\unix.ps1"
 
-if(!$dir) { $dir = "$psscriptroot\..\bucket" }
-$dir = resolve-path $dir
-
-$search = "*"
-if($app) { $search = $app }
+$Dir = Resolve-Path $Dir
+$Search = $App
 
 # get apps to check
-$queue = @()
-Get-ChildItem $dir "$search.json" | ForEach-Object {
-    $json = parse_json "$dir\$($_.Name)"
-    if($json.checkver) {
-        $queue += ,@($_.Name, $json)
-    }
+$Queue = @()
+$json = ''
+Get-ChildItem $Dir "$Search.json" | ForEach-Object {
+	$json = parse_json "$Dir\$($_.Name)"
+	if ($json.checkver) {
+		$Queue += , @($_.Name, $json)
+	}
 }
 
 # clear any existing events
-get-event | ForEach-Object {
-    remove-event $_.sourceidentifier
+Get-Event | ForEach-Object {
+	Remove-Event $_.SourceIdentifier
 }
 
 $original = use_any_https_protocol
 
 # start all downloads
-$queue | ForEach-Object {
-    $name, $json = $_
+$Queue | ForEach-Object {
+	$name, $json = $_
 
-    $substitutions = get_version_substitutions $json.version
+	$substitutions = get_version_substitutions $json.version
 
-    $wc = New-Object Net.Webclient
-    if($json.checkver.useragent) {
-        $wc.Headers.Add('User-Agent', (substitute $json.checkver.useragent $substitutions))
-    } else {
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
-    }
-    Register-ObjectEvent $wc downloadstringcompleted -ErrorAction stop | Out-Null
+	$wc = New-Object Net.Webclient
+	if ($json.checkver.useragent) {
+		$wc.Headers.Add('User-Agent', (substitute $json.checkver.useragent $substitutions))
+	} else {
+		$wc.Headers.Add('User-Agent', (Get-UserAgent))
+	}
+	Register-ObjectEvent $wc downloadstringcompleted -ErrorAction Stop | Out-Null
 
-    $githubRegex = "\/releases\/tag\/(?:v)?([\d.]+)"
+	$githubRegex = '\/releases\/tag\/(?:v)?([\d.]+)'
 
-    $url = $json.homepage
-    if($json.checkver.url) {
-        $url = $json.checkver.url
-    }
-    $regex = ""
-    $jsonpath = ""
-    $replace = ""
+	$url = $json.homepage
+	if ($json.checkver.url) {
+		$url = $json.checkver.url
+	}
+	$regex = ''
+	$jsonpath = ''
+	$replace = ''
 
-    if ($json.checkver -eq "github") {
-        if (!$json.homepage.StartsWith("https://github.com/")) {
-            error "$name checkver expects the homepage to be a github repository"
-        }
-        $url = $json.homepage + "/releases/latest"
-        $regex = $githubRegex
-    }
+	if ($json.checkver -eq 'github') {
+		if (!$json.homepage.StartsWith('https://github.com/')) {
+			error "$name checkver expects the homepage to be a github repository"
+		}
+		$url = $json.homepage + '/releases/latest'
+		$regex = $githubRegex
+	}
 
-    if ($json.checkver.github) {
-        $url = $json.checkver.github + "/releases/latest"
-        $regex = $githubRegex
-    }
+	if ($json.checkver.github) {
+		$url = $json.checkver.github + '/releases/latest'
+		$regex = $githubRegex
+	}
 
-    if($json.checkver.re) {
-        $regex = $json.checkver.re
-    }
-    if($json.checkver.regex) {
-        $regex = $json.checkver.regex
-    }
+	if ($json.checkver.re) {
+		$regex = $json.checkver.re
+	}
+	if ($json.checkver.regex) {
+		$regex = $json.checkver.regex
+	}
 
-    if($json.checkver.jp) {
-        $jsonpath = $json.checkver.jp
-    }
-    if($json.checkver.jsonpath) {
-        $jsonpath = $json.checkver.jsonpath
-    }
+	if ($json.checkver.jp) {
+		$jsonpath = $json.checkver.jp
+	}
+	if ($json.checkver.jsonpath) {
+		$jsonpath = $json.checkver.jsonpath
+	}
 
-    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
-        $replace = $json.checkver.replace
-    }
+	if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
+		$replace = $json.checkver.replace
+	}
 
-    if(!$jsonpath -and !$regex) {
-        $regex = $json.checkver
-    }
+	if (!$jsonpath -and !$regex) {
+		$regex = $json.checkver
+	}
 
-    $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq "true"
+	$reverse = $json.checkver.reverse -and $json.checkver.reverse -eq 'true'
 
-    $url = substitute $url $substitutions
+	$url = substitute $url $substitutions
 
-    $state = new-object psobject @{
-        app = (strip_ext $name);
-        url = $url;
-        regex = $regex;
-        json = $json;
-        jsonpath = $jsonpath;
-        reverse = $reverse;
-        replace = $replace;
-    }
+	$state = New-Object psobject @{
+		app      = (strip_ext $name);
+		url      = $url;
+		regex    = $regex;
+		json     = $json;
+		jsonpath = $jsonpath;
+		reverse  = $reverse;
+		replace  = $replace;
+	}
 
-    $wc.headers.add('Referer', (strip_filename $url))
-    $wc.downloadstringasync($url, $state)
+	$wc.Headers.Add('Referer', (strip_filename $url))
+	$wc.DownloadStringAsync($url, $state)
 }
 
 # wait for all to complete
-$in_progress = $queue.length
-while($in_progress -gt 0) {
-    $ev = wait-event
-    remove-event $ev.sourceidentifier
-    $in_progress--
+$in_progress = $Queue.length
+while ($in_progress -gt 0) {
+	$ev = Wait-Event
+	Remove-Event $ev.SourceIdentifier
+	$in_progress--
 
-    $state = $ev.sourceeventargs.userstate
-    $app = $state.app
-    $json = $state.json
-    $url = $state.url
-    $expected_ver = $json.version
-    $regexp = $state.regex
-    $jsonpath = $state.jsonpath
-    $reverse = $state.reverse
-    $replace = $state.replace
-    $ver = ""
+	$state = $ev.SourceEventArgs.UserState
+	$App = $state.app
+	$json = $state.json
+	$url = $state.url
+	$expected_ver = $json.version
+	$regexp = $state.regex
+	$jsonpath = $state.jsonpath
+	$reverse = $state.reverse
+	$replace = $state.replace
+	$ver = ""
 
-    $err = $ev.sourceeventargs.error
-    $page = $ev.sourceeventargs.result
+	$err = $ev.SourceEventArgs.Error
+	$page = $ev.SourceEventArgs.Result
 
-    write-host "$app`: " -nonewline
+	Write-Host "$App`: " -NoNewline
 
-    if($err) {
-        write-host -f darkred $err.message
-        write-host -f darkred "URL $url is not valid"
-        continue
-    }
+	if ($err) {
+		Write-Host $err.message -ForegroundColor DarkRed
+		Write-Host "URL $url is not valid" -ForegroundColor DarkRed
+		continue
+	}
 
-    if(!$regex -and $replace) {
-        write-host -f darkred "'replace' requires 're'"
-        continue
-    }
+	if (!$regex -and $replace) {
+		Write-Host "'replace' requires 're' or 'regex'" -ForegroundColor DarkRed
+		continue
+	}
 
-    if($jsonpath) {
-        $ver = json_path $page $jsonpath
-        if(!$ver) {
-            $ver = json_path_legacy $page $jsonpath
-        }
-        if(!$ver) {
-            write-host -f darkred "couldn't find '$jsonpath' in $url"
-            continue
-        }
-    }
+	if ($jsonpath) {
+		$ver = json_path $page $jsonpath
+		if (!$ver) {
+			$ver = json_path_legacy $page $jsonpath
+		}
+		if (!$ver) {
+			Write-Host "couldn't find '$jsonpath' in $url" -ForegroundColor DarkRed
+			continue
+		}
+	}
 
-    if($jsonpath -and $regexp) {
-        $page = $ver
-        $ver = ""
-    }
+	if ($jsonpath -and $regexp) {
+		$page = $ver
+		$ver = ''
+	}
 
-    if($regexp) {
-        $regex = new-object System.Text.RegularExpressions.Regex($regexp)
-        if($reverse) {
-            $match = $regex.matches($page) | select-object -last 1
-        } else {
-            $match = $regex.matches($page) | select-object -first 1
-        }
+	if ($regexp) {
+		$regex = New-Object System.Text.RegularExpressions.Regex($regexp)
+		if ($reverse) {
+			$match = $regex.Matches($page) | Select-Object -Last 1
+		} else {
+			$match = $regex.Matches($page) | Select-Object -First 1
+		}
 
-        if($match -and $match.Success) {
-            $matchesHashtable = @{}
-            $regex.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
-            $ver = $matchesHashtable['1']
-            if ($replace) {
-                $ver = $regex.replace($match.Value, $replace)
-            }
-            if(!$ver) {
-                $ver = $matchesHashtable['version']
-            }
-        } else {
-            write-host -f darkred "couldn't match '$regexp' in $url"
-            continue
-        }
-    }
+		if ($match -and $match.Success) {
+			$matchesHashtable = @{}
+			$regex.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
+			$ver = $matchesHashtable['1']
+			if ($replace) {
+				$ver = $regex.Replace($match.Value, $replace)
+			}
+			if (!$ver) {
+				$ver = $matchesHashtable['version']
+			}
+		} else {
+			Write-Host "couldn't match '$regexp' in $url" -ForegroundColor DarkRed
+			continue
+		}
+	}
 
-    if(!$ver) {
-        write-host -f darkred "couldn't find new version in $url"
-        continue
-    }
+	if (!$ver) {
+		Write-Host "couldn't find new version in $url" -ForegroundColor DarkRed
+		continue
+	}
 
-    if($ver -eq $expected_ver -and $forceUpdate -eq $false) {
-        # version hasn't changed (step over if forced update)
-        write-host "$ver" -f darkgreen
-        continue
-    }
+	if ($ver -eq $expected_ver -and $ForceUpdate -eq $false) {
+		# version hasn't changed (step over if forced update)
+		Write-Host $ver -ForegroundColor DarkGreen
+		continue
+	}
 
-    write-host "$ver" -f darkred -nonewline
-    write-host " (scoop version is $expected_ver)" -NoNewline
-    $update_available = (compare_versions $expected_ver $ver) -eq -1
+	Write-Host $ver -ForegroundColor DarkRed -NoNewline
+	Write-Host " (scoop version is $expected_ver)" -NoNewline
+	$Update_available = (compare_versions $expected_ver $ver) -eq -1
 
-    if ($json.autoupdate -and $update_available) {
-        Write-Host " autoupdate available" -f Cyan
-    } else {
-        Write-Host ""
-    }
+	if ($json.autoupdate -and $Update_available) {
+		Write-Host ' autoupdate available' -ForegroundColor Cyan
+	} else {
+		Write-Host ''
+	}
 
-    if($forceUpdate) {
-        # forcing an update implies updating, right?
-        $update = $true
-    }
+	# forcing an update implies updating, right?
+	if ($ForceUpdate) { $Update = $true }
 
-    if($update -and $json.autoupdate) {
-        if($forceUpdate) {
-            Write-Host "Forcing autoupdate!" -f DarkMagenta
-        }
-        try {
-            autoupdate $app $dir $json $ver $matchesHashtable
-        } catch {
-            error $_.exception.message
-        }
-    }
+	if ($Update -and $json.autoupdate) {
+		if ($ForceUpdate) {
+			Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
+		}
+		try {
+			autoupdate $App $Dir $json $ver $matchesHashtable
+		} catch {
+			error $_.Exception.Message
+		}
+	}
 }
 
 set_https_protocols $original
