@@ -1,0 +1,14 @@
+{
+    "homepage": "https://github.com/paolosalvatori/ServiceBusExplorer",
+    "license": "Apache-2.0",
+    "version": "4.0.110",
+    "url": "https://github.com/paolosalvatori/ServiceBusExplorer/releases/download/4.0.110/servicebusexplorer.4.0.110.nupkg",
+    "hash": "1635606975b7dc9b4c959eba01fbfc73c7474d4f1eeec3102631ed9bafbee6e3",
+    "bin": "tools/servicebusexplorer.exe",
+    "checkver": {
+        "github": "https://github.com/paolosalvatori/ServiceBusExplorer"
+    },
+    "autoupdate": {
+        "url": "https://github.com/paolosalvatori/ServiceBusExplorer/releases/download/$version/servicebusexplorer.$version.nupkg"
+    }
+}
