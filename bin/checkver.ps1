@@ -1,20 +1,20 @@
 <#
 .SYNOPSIS
-    Check manifest for newer version.
+    Check manifest for a newer version.
 .DESCRIPTION
     Checks websites for newer versions using an (optional) regular expression defined in the manifest.
 .PARAMETER App
     Manifest name to search.
     Placeholders are supported.
 .PARAMETER Dir
-    Where to seach for manfiest(s).
+    Where to search for manifest(s).
 .PARAMETER Update
     Update given manifest
 .PARAMETER ForceUpdate
-    Update given manfiest(s) even when there is no new version.
-    Usefull for hash updates.
+    Update given manifest(s) even when there is no new version.
+    Useful for hash updates.
 .PARAMETER SkipSupported
-    Updated manifests will not be showed.
+    Updated manifests will not be shown.
 .EXAMPLE
     PS $BUCKETDIR $ .\bin\checkver.ps1
     Check all manifest inside default directory.
