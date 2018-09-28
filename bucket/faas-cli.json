@@ -1,11 +1,11 @@
 {
     "homepage": "https://www.openfaas.com/",
     "license": "MIT",
-    "version": "0.7.4",
+    "version": "0.7.5",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/openfaas/faas-cli/releases/download/0.7.4/faas-cli.exe",
-            "hash": "ed93bc97acef3cf63e6638af97199a15107f5120c8c83c004936ab679f1ce284"
+            "url": "https://github.com/openfaas/faas-cli/releases/download/0.7.5/faas-cli.exe",
+            "hash": "d0bb3f63cf8c0a3a94fbaa4b587f9b4b04bf07f047de89d2fbbe1250a5127ef0"
         }
     },
     "bin": [
