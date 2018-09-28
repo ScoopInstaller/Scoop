@@ -13,7 +13,7 @@
 .PARAMETER ForceUpdate
     Update given manifest(s) even when there is no new version.
     Useful for hash updates.
-.PARAMETER SkipSupported
+.PARAMETER SkipUpdated
     Updated manifests will not be shown.
 .EXAMPLE
     PS $BUCKETDIR $ .\bin\checkver.ps1
@@ -30,7 +30,7 @@ param(
     [String] $Dir = "$psscriptroot\..\bucket",
     [Switch] $Update,
     [Switch] $ForceUpdate,
-    [Switch] $SkipSupported
+    [Switch] $SkipUpdated
 )
 
 . "$psscriptroot\..\lib\core.ps1"
@@ -222,7 +222,7 @@ while ($in_progress -gt 0) {
     }
 
     # Skip actual only if versions are same and there is no -f
-    if (($ver -eq $expected_ver) -and !$ForceUpdate -and $SkipSupported) { continue }
+    if (($ver -eq $expected_ver) -and !$ForceUpdate -and $SkipUpdated) { continue }
 
     Write-Host "$App`: " -NoNewline
 
