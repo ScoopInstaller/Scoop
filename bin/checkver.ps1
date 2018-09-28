@@ -21,7 +21,12 @@
 #>
 param(
     [String] $App = '*',
-    [ValidateScript( {Test-Path $_ -Type Container})]
+    [ValidateScript( {
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        }
+        $true
+    })]
     [String] $Dir = "$psscriptroot\..\bucket",
     [Switch] $Update,
     [Switch] $ForceUpdate,
