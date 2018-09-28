@@ -4,8 +4,8 @@
     "version": "1.3.6",
     "license": "MIT",
     "persist": "config",
-    "url": "https://github.com/cmderdev/cmder/releases/download/v1.3.6/cmder_mini.zip",
-    "hash": "d151bd1e6293dce24b86a1170674661f573a40e346622fa524e57a1aee4e3ab7",
+    "url": "https://github.com/cmderdev/cmder/releases/download/v1.3.6/cmder.7z",
+    "hash": "4ad3f927932feb6754683a4db1a4984db8ee662d45b7bde57ef8e206e8749711",
     "bin": "Cmder.exe",
     "shortcuts": [
         [
@@ -21,7 +21,7 @@
         "github": "https://github.com/cmderdev/cmder"
     },
     "autoupdate": {
-        "url": "https://github.com/cmderdev/cmder/releases/download/v$version/cmder_mini.zip",
+        "url": "https://github.com/cmderdev/cmder/releases/download/v$version/cmder.7z",
         "hash": {
             "url": "https://github.com/cmderdev/cmder/releases/download/v$version/hashes.txt",
             "find": "$basename\\s+([A-Fa-f\\d]{64})"
