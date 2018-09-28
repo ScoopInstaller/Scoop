@@ -234,9 +234,9 @@ while ($in_progress -gt 0) {
 
     Write-Host $ver -ForegroundColor DarkRed -NoNewline
     Write-Host " (scoop version is $expected_ver)" -NoNewline
-    $Update_available = (compare_versions $expected_ver $ver) -eq -1
+    $update_available = (compare_versions $expected_ver $ver) -eq -1
 
-    if ($json.autoupdate -and $Update_available) {
+    if ($json.autoupdate -and $update_available) {
         Write-Host ' autoupdate available' -ForegroundColor Cyan
     } else {
         Write-Host ''
