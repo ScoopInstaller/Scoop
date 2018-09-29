@@ -1,11 +1,11 @@
 {
     "description": "Pester is a test and mock framework for PowerShell.",
-    "version": "4.4.0",
+    "version": "4.4.1",
     "license": "Apache-2.0",
-    "url": "https://github.com/pester/pester/archive/4.4.0.tar.gz",
+    "url": "https://github.com/pester/pester/archive/4.4.1.tar.gz",
     "homepage": "https://github.com/pester/Pester",
-    "hash": "944dfc0e9e631316c13395ab6346745d9de3749109f1a5e62bcffd9d0bc016ae",
-    "extract_dir": "pester-4.4.0",
+    "hash": "cf5e85c9b241d058930110d727aeff0fb6dd34dddf6ba266b3220401cd6d5a29",
+    "extract_dir": "pester-4.4.1",
     "bin": "bin\\pester.bat",
     "post_install": [
         "$import = \"try { `$null = gcm pester -ea stop; import-module `\"$dir\\pester.psm1`\" } catch { }\"",
