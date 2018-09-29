@@ -18,7 +18,7 @@
         "uncrustify.exe"
     ],
     "checkver": {
-        "re": "\/releases\/tag\/uncrustify-([\\d.]+)",
+        "re": "/releases/tag/uncrustify-([\\d.]+)",
         "github": "https://github.com/uncrustify/uncrustify"
     },
     "autoupdate": {
