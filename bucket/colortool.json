@@ -1,10 +1,10 @@
 {
     "homepage": "https://github.com/Microsoft/Console/tree/master/tools/ColorTool",
     "description": "Utility for helping to set the color palette of the Windows Console",
-    "version": "1708.14008",
+    "version": "1810.02002",
     "license": "MIT",
-    "url": "https://github.com/Microsoft/console/releases/download/1708.14008/colortool.zip",
-    "hash": "ef317660a8caca83c708b2915274b2b4d611a3ab90c4de128d21b58461fcddfa",
+    "url": "https://github.com/Microsoft/console/releases/download/1810.02002/colortool.zip",
+    "hash": "fa3373d02b0835502bf0fa643ef3d7cf247b082357a33c6bceee07416371b672",
     "bin": "colortool.exe",
     "persist": [
         "schemes"
