@@ -1,0 +1,33 @@
+{
+    "homepage": "https://github.com/evansmurithi/cloak",
+    "description": "a Command Line OTP Authenticator application",
+    "license": "MIT",
+    "version": "0.1.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/evansmurithi/cloak/releases/download/v0.1.0/cloak-v0.1.0-x86_64-pc-windows-msvc.zip",
+            "hash": "1df16fe865284ad0df3fc64658404abd889162b3604d97b47105f6c5111937b1"
+        },
+        "32bit": {
+            "url": "https://github.com/evansmurithi/cloak/releases/download/v0.1.0/cloak-v0.1.0-i686-pc-windows-msvc.zip",
+            "hash": "8286f5ad1fb5d8191077e41a13e6e53b70f90d27fad0b0304662284e5da5a09e"
+        }
+    },
+    "bin": "cloak.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/evansmurithi/cloak/releases/download/v$version/cloak-v$version-x86_64-pc-windows-msvc.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/evansmurithi/cloak/releases/download/v$version/cloak-v$version-i686-pc-windows-msvc.zip"
+            }
+        }
+    },
+    "suggest": {
+        "vcredist": [
+            "extras/vcredist2015"
+        ]
+    }
+}
