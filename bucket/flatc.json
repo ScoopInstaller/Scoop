@@ -1,10 +1,10 @@
 {
     "homepage": "https://google.github.io/flatbuffers/index.html",
     "license": "Apache-2.0",
-    "version": "1.9.0",
-    "url": "https://github.com/google/flatbuffers/releases/download/v1.9.0/flatc_windows_exe.zip",
+    "version": "1.10.0",
+    "url": "https://github.com/google/flatbuffers/releases/download/v1.10.0/flatc_windows_exe.zip",
     "bin": "flatc.exe",
-    "hash": "171fa148506d2c10d197e17fa9cdfc9745d1c82236369f7aebeb89fd15502eff",
+    "hash": "e6efb66c5c531856506f11799956f03c2397ef2ba37538558dbd7ca11fdb9faa",
     "checkver": {
         "github": "https://github.com/google/flatbuffers"
     },
