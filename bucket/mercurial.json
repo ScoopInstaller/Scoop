@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.mercurial-scm.org/",
-    "version": "4.7.1",
+    "version": "4.7.2",
     "license": "GPL-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.7.1-x64.exe",
-            "hash": "fb7845d03c163e2483810d8a15b385d4d4aaaf90dd0cc835cfa786e15aca672d"
+            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.7.2-x64.exe",
+            "hash": "48229827ca9b040289cf973f36866779140ed63b4a22824b7d115e1869e69955"
         },
         "32bit": {
-            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.7.1.exe",
-            "hash": "d09ff19ca5f49ceab46b32eb5ec145cf4dfe5927f5307bf2f9d3b405fcaade30"
+            "url": "https://www.mercurial-scm.org/release/windows/Mercurial-4.7.2.exe",
+            "hash": "56a61062862cceeec2eea9c4b37cf515251ea8370620c3e1682eb15d79431b5d"
         }
     },
     "innosetup": true,
