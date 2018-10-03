@@ -155,19 +155,34 @@ function version($version) {
     $manifest.version = if ($version[0] -eq 'v') { $version.substring(1) } else { $version }
 }
 
+function replace_version($url) {
+    $versionVariables = @{
+        '$version' = $manifest.version;
+        '$underscoreVersion' = ($manifest.version -replace "\.", "_");
+        '$dashVersion' = ($manifest.version -replace "\.", "-");
+        '$cleanVersion' = ($manifest.version -replace "\.", "");
+    }
+
+    foreach($pair in $versionVariables.GetEnumerator()) {
+        $url = $url -replace $pair.value, $pair.name
+    }
+
+    return $url
+}
+
 function url($url_32, $url_64) {
     if ($url_64) {
         $manifest.remove("url")
         $manifest.remove("hash")
         $manifest.architecture = @{ "64bit" = @{ "url" = $url_64; "hash" =  "" } }
-        $manifest.autoupdate["architecture"] = @{ "64bit" = @{ "url" = $url_64.replace($manifest.version, '$version') } }
+        $manifest.autoupdate["architecture"] = @{ "64bit" = @{ "url" = (replace_version $url_64) } }
         if ($url_32) {
             $manifest.architecture["32bit"] = @{ "url" = $url_32; "hash" = "" }
-            $manifest.autoupdate.architecture["32bit"] = @{ "url" = $url_32.replace($manifest.version, '$version') }
+            $manifest.autoupdate.architecture["32bit"] = @{ "url" = (replace_version $url_32) }
         }
     } else {
         $manifest.url = $url_32
-        $manifest.autoupdate["url"] = $url_32.replace($manifest.version, '$version')
+        $manifest.autoupdate["url"] = (replace_version $url_32)
     }
 }
 
@@ -179,7 +194,7 @@ function extract_dir($path) {
     if ($dirs.count -eq 1) {
         $manifest.extract_dir = "$dirs"
         if ($dirs -match $manifest.version) {
-            $manifest.autoupdate["extract_dir"] = $dirs.replace($manifest.version, '$version')
+            $manifest.autoupdate["extract_dir"] = (replace_version $manifest.version)
         }
     } else { $manifest.remove("extract_dir") }
 }
