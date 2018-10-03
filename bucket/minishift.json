@@ -2,14 +2,14 @@
     "homepage": "https://www.openshift.org/minishift",
     "description": "Minishift is a tool that helps you run OpenShift locally by running a single-node OpenShift cluster inside a VM. You can try out OpenShift or develop with it, day-to-day, on your local host.",
     "license": "Apache-2.0",
-    "version": "1.24.0",
+    "version": "1.25.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/minishift/minishift/releases/download/v1.24.0/minishift-1.24.0-windows-amd64.zip",
-            "hash": "d2cc83b57436e8091da4ce42fa5af00cf827a44e1cf8ee7aa9c0727fbbc7f08c"
+            "url": "https://github.com/minishift/minishift/releases/download/v1.25.0/minishift-1.25.0-windows-amd64.zip",
+            "hash": "256fc7e039234ba34e15cb18837f054c9e2239aff81cd34af9cb4ca44f07eaf6"
         }
     },
-    "extract_dir": "minishift-1.24.0-windows-amd64",
+    "extract_dir": "minishift-1.25.0-windows-amd64",
     "bin": [
         "minishift.exe"
     ],
