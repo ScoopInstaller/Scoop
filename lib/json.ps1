@@ -8,7 +8,7 @@ Function ConvertToPrettyJson {
         $data
     )
 
-    Process  {
+    Process {
         $data = normalize_values $data
 
         # convert to string
@@ -117,19 +117,19 @@ function json_path_legacy([String] $json, [String] $jsonpath, [String] $basename
         $el = $_
 
         # substitute the base filename into the jsonpath
-        if($el.Contains("`$basename")) {
+        if ($el.Contains("`$basename")) {
             $el = $el.Replace("`$basename", $basename)
         }
 
         # skip $ if it's jsonpath format
-        if($el -eq "`$" -and $isJsonPath) {
+        if ($el -eq "`$" -and $isJsonPath) {
             return
         }
 
         # array detection
-        if($el -match "^(?<property>\w+)?\[(?<index>\d+)\]$") {
+        if ($el -match "^(?<property>\w+)?\[(?<index>\d+)\]$") {
             $property = $matches['property']
-            if($property) {
+            if ($property) {
                 $result = $result.$property[$matches['index']]
             } else {
                 $result = $result[$matches['index']]
@@ -158,6 +158,19 @@ function normalize_values([psobject] $json) {
             }
         }
 
+        # Convert single value array into string
+        if (($_.Value -is [array]) -and ($_.Value.Length -eq 1)) {
+            $_.Value = $_.Value[0]
+        }
+
+        # Recursively edit psobjects
+        # If the values is psobjects, its not normalized
+        # For Example if manfiest have architecture and it's architecture have array with single value it's not formated
+        # @see: Without recursion: https://i.imgur.com/ILJ0QNh.png
+        # @see" With recurseion: https://i.imgur.com/ucdBijn.png
+        if ($_.Value -is [System.Management.Automation.PSCustomObject]) {
+            $_.Value = normalize_values $_.Value
+        }
         # Process other values as needed...
     }
 
