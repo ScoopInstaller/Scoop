@@ -159,7 +159,8 @@ function normalize_values([psobject] $json) {
         }
 
         # Convert single value array into string
-        if (($_.Value -is [array]) -and ($_.Value.Length -eq 1)) {
+        if (($_.Value -is [array]) -and ($_.Value.Count -eq 1) -and ((($_.Value.Split(' ')).Count) -eq 1)) {
+            # Write-Host ANO $_.Value -f RED
             $_.Value = $_.Value[0]
         }
 
@@ -167,10 +168,12 @@ function normalize_values([psobject] $json) {
         # If the values is psobjects, its not normalized
         # For Example if manfiest have architecture and it's architecture have array with single value it's not formated
         # @see: Without recursion: https://i.imgur.com/ILJ0QNh.png
-        # @see" With recurseion: https://i.imgur.com/ucdBijn.png
+        # @see: With recurseion: https://i.imgur.com/ucdBijn.png
         if ($_.Value -is [System.Management.Automation.PSCustomObject]) {
+            $parent = $_
             $_.Value = normalize_values $_.Value
         }
+
         # Process other values as needed...
     }
 
