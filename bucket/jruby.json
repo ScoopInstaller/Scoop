@@ -1,5 +1,5 @@
 {
-    "homepage": "http://jruby.org/",
+    "homepage": "https://www.jruby.org/",
     "version": "9.2.0.0",
     "url": "https://s3.amazonaws.com/jruby.org/downloads/9.2.0.0/jruby-bin-9.2.0.0.zip",
     "hash": "9939a09371f6d01017634ee57d508bc787d3a0e3c3b7448b0109c2d0219546b4",
@@ -25,7 +25,7 @@
         "Also note that this installation overrides GEM_HOME and GEM_PATH from any previous Ruby or JRuby installation."
     ],
     "checkver": {
-        "url": "http://jruby.org/download",
+        "url": "https://www.jruby.org/download",
         "re": "Current Release:\\s+JRuby\\s+([\\d.]+)"
     },
     "autoupdate": {
