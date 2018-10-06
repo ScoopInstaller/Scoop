@@ -5,7 +5,7 @@
 Describe 'Pretty json formating' -Tag 'Scoop' {
     BeforeAll {
         $format = "$PSScriptRoot\fixtures\format"
-        $manifests = Get-ChildItem "$format\formated" -File
+        $manifests = Get-ChildItem "$format\formated" -File -Filter '*.json'
     }
 
     Context 'Beatify manifest' {
