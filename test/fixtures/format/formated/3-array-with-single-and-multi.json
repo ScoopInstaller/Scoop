@@ -9,9 +9,7 @@
     "architecture": {
         "64bit": {
             "url": "https://7-zip.org/a/7z1805-x64.msi",
-            "hash": [
-                "898c1ca0015183fe2ba7d55cacf0a1dea35e873bf3f8090f362a6288c6ef08d7"
-            ]
+            "hash": "898c1ca0015183fe2ba7d55cacf0a1dea35e873bf3f8090f362a6288c6ef08d7"
         },
         "32bit": {
             "url": "https://7-zip.org/a/7z1805.msi",
@@ -20,9 +18,7 @@
     },
     "extract_dir": "Files/7-Zip",
     "bin": [
-        [
-            "single"
-        ],
+        "single",
         [
             "7z.exe",
             "cosi"
@@ -30,9 +26,16 @@
         [
             "7z.exe",
             "cosi",
+            "param",
+            "icon"
+        ],
+        [
+            "7z.exe",
+            "empty",
             "",
             ""
-        ]
+        ],
+        "singtwo"
     ],
     "checkver": "Download 7-Zip ([\\d.]+)",
     "autoupdate": {

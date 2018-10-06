@@ -146,6 +146,15 @@ function normalize_values([psobject] $json) {
     # Iterate Through Manifest Properties
     $json.PSObject.Properties | ForEach-Object {
 
+        # Recursively edit psobjects
+        # If the values is psobjects, its not normalized
+        # For Example if manfiest have architecture and it's architecture have array with single value it's not formated
+        # @see: Without recursion: https://i.imgur.com/pHOf9f2.png
+        # @see: With recurseion: https://i.imgur.com/QVSLaiV.png
+        if ($_.Value -is [System.Management.Automation.PSCustomObject]) {
+            $_.Value = normalize_values $_.Value
+        }
+
         # Process String Values
         if ($_.Value -is [string]) {
 
@@ -159,17 +168,22 @@ function normalize_values([psobject] $json) {
         }
 
         # Convert single value array into string
-        if (($_.Value -is [array]) -and ($_.Value.Count -eq 1) -and ((($_.Value.Split(' ')).Count) -eq 1)) {
-            $_.Value = $_.Value[0]
-        }
-
-        # Recursively edit psobjects
-        # If the values is psobjects, its not normalized
-        # For Example if manfiest have architecture and it's architecture have array with single value it's not formated
-        # @see: Without recursion: https://i.imgur.com/pHOf9f2.png
-        # @see: With recurseion: https://i.imgur.com/QVSLaiV.png
-        if ($_.Value -is [System.Management.Automation.PSCustomObject]) {
-            $_.Value = normalize_values $_.Value
+        if (($_.Value -is [array])) {
+            if ($_.Value.Count -eq 1) {
+                if (($_.Value.Split(' ')).Count -eq 1) {
+                    $_.Value = $_.Value[0]
+                }
+            } else {
+                $resulted_arrs = @()
+                foreach ($element in $_.Value) {
+                    if ($element.Split(' ').Count -eq 1){
+                        $resulted_arrs += $element
+                    } else {
+                        $resulted_arrs += , $element
+                    }
+                }
+                $_.Value = $resulted_arrs
+            }
         }
 
         # Process other values as needed...
