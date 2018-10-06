@@ -1,5 +1,8 @@
 # Convert objects to pretty json
 # Only needed until PowerShell ConvertTo-Json will be improved https://github.com/PowerShell/PowerShell/issues/2736
+# https://github.com/PowerShell/PowerShell/issues/2736 was fixed in pwsh
+# Still needed in normal powershell
+
 Function ConvertToPrettyJson {
     [cmdletbinding()]
 
@@ -176,7 +179,7 @@ function normalize_values([psobject] $json) {
             } else {
                 $resulted_arrs = @()
                 foreach ($element in $_.Value) {
-                    if ($element.Split(' ').Count -eq 1){
+                    if ($element.Split(' ').Count -eq 1) {
                         $resulted_arrs += $element
                     } else {
                         $resulted_arrs += , $element
