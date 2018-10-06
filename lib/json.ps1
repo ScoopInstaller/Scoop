@@ -32,7 +32,6 @@ Function ConvertToPrettyJson {
             # read current char
             $buffer = $json.Substring($i, 1)
 
-            #
             $objectStart = !$inString -and $buffer.Equals('{')
             $objectEnd = !$inString -and $buffer.Equals('}')
             $arrayStart = !$inString -and $buffer.Equals('[')
