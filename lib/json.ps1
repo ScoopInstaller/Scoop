@@ -13,15 +13,15 @@ Function ConvertToPrettyJson {
 
         # convert to string
         [String]$json = $data | ConvertTo-Json -Depth 8 -Compress
-        [String]$output = ""
+        [String]$output = ''
 
         # state
-        [String]$buffer = ""
+        [String]$buffer = ''
         [Int]$depth = 0
         [Bool]$inString = $false
 
         # configuration
-        [String]$indent = " " * 4
+        [String]$indent = ' ' * 4
         [Bool]$unescapeString = $true
         [String]$eol = "`r`n"
 
@@ -30,12 +30,12 @@ Function ConvertToPrettyJson {
             $buffer = $json.Substring($i, 1)
 
             #
-            $objectStart = !$inString -and $buffer.Equals("{")
-            $objectEnd = !$inString -and $buffer.Equals("}")
-            $arrayStart = !$inString -and $buffer.Equals("[")
-            $arrayEnd = !$inString -and $buffer.Equals("]")
-            $colon = !$inString -and $buffer.Equals(":")
-            $comma = !$inString -and $buffer.Equals(",")
+            $objectStart = !$inString -and $buffer.Equals('{')
+            $objectEnd = !$inString -and $buffer.Equals('}')
+            $arrayStart = !$inString -and $buffer.Equals('[')
+            $arrayEnd = !$inString -and $buffer.Equals(']')
+            $colon = !$inString -and $buffer.Equals(':')
+            $comma = !$inString -and $buffer.Equals(',')
             $quote = $buffer.Equals('"')
             $escape = $buffer.Equals('\')
 
@@ -92,7 +92,7 @@ Function ConvertToPrettyJson {
 
 function json_path([String] $json, [String] $jsonpath, [String] $basename) {
     Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Newtonsoft.Json.dll"
-    $jsonpath = $jsonpath.Replace("`$basename", $basename)
+    $jsonpath = $jsonpath.Replace('$basename', $basename)
     try {
         $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)
     } catch [Newtonsoft.Json.JsonReaderException] {
@@ -112,22 +112,22 @@ function json_path([String] $json, [String] $jsonpath, [String] $basename) {
 
 function json_path_legacy([String] $json, [String] $jsonpath, [String] $basename) {
     $result = $json | ConvertFrom-Json -ea stop
-    $isJsonPath = $jsonpath.StartsWith("`$")
-    $jsonpath.split(".") | ForEach-Object {
+    $isJsonPath = $jsonpath.StartsWith('$')
+    $jsonpath.split('.') | ForEach-Object {
         $el = $_
 
         # substitute the base filename into the jsonpath
-        if ($el.Contains("`$basename")) {
-            $el = $el.Replace("`$basename", $basename)
+        if ($el.Contains('$basename')) {
+            $el = $el.Replace('$basename', $basename)
         }
 
         # skip $ if it's jsonpath format
-        if ($el -eq "`$" -and $isJsonPath) {
+        if ($el -eq '$' -and $isJsonPath) {
             return
         }
 
         # array detection
-        if ($el -match "^(?<property>\w+)?\[(?<index>\d+)\]$") {
+        if ($el -match '^(?<property>\w+)?\[(?<index>\d+)\]$') {
             $property = $matches['property']
             if ($property) {
                 $result = $result.$property[$matches['index']]
