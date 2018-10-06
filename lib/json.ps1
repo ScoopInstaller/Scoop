@@ -3,11 +3,11 @@
 # https://github.com/PowerShell/PowerShell/issues/2736 was fixed in pwsh
 # Still needed in normal powershell
 
-Function ConvertToPrettyJson {
-    [cmdletbinding()]
+function ConvertToPrettyJson {
+    [CmdletBinding()]
 
     Param (
-        [parameter(Mandatory, ValueFromPipeline)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         $data
     )
 
@@ -81,14 +81,14 @@ Function ConvertToPrettyJson {
 
             # add whitespace and newlines after the content
             if ($colon) {
-                $output += " "
+                $output += ' '
             } elseif ($comma -or $arrayStart -or $objectStart) {
                 $output += $eol
                 $output += $indent * $depth
             }
         }
 
-        $output
+        return $output
     }
 }
 
@@ -158,10 +158,10 @@ function normalize_values([psobject] $json) {
         }
 
         # Process String Values
-        if ($_.Value -is [string]) {
+        if ($_.Value -is [String]) {
 
             # Split on new lines
-            [array] $parts = ($_.Value -split '\r?\n').Trim()
+            [Array] $parts = ($_.Value -split '\r?\n').Trim()
 
             # Replace with string array if result is multiple lines
             if ($parts.Count -gt 1) {
@@ -170,9 +170,9 @@ function normalize_values([psobject] $json) {
         }
 
         # Convert single value array into string
-        if (($_.Value -is [array])) {
+        if ($_.Value -is [Array]) {
             if ($_.Value.Count -eq 1) {
-                if (($_.Value.Split(' ')).Count -eq 1) {
+                if ($_.Value.Split(' ').Count -eq 1) {
                     $_.Value = $_.Value[0]
                 }
             } else {
