@@ -14,7 +14,10 @@
     },
     "extract_dir": "dart-sass",
     "bin": [
-        "dart-sass.bat"
+        [
+            "sass.bat",
+            "sass"
+        ]
     ],
     "checkver": {
         "url": "https://github.com/sass/dart-sass/releases/latest",
