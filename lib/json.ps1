@@ -155,7 +155,7 @@ function normalize_values([psobject] $json) {
         # @see: Without recursion: https://i.imgur.com/pHOf9f2.png
         # @see: With recurseion: https://i.imgur.com/QVSLaiV.png
         if ($value -is [System.Management.Automation.PSCustomObject]) {
-            $vallue = normalize_values $value
+            $value = normalize_values $value
         }
 
         # Process String Values
