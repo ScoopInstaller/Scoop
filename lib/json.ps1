@@ -148,47 +148,58 @@ function normalize_values([psobject] $json) {
     # Iterate Through Manifest Properties
     $json.PSObject.Properties | ForEach-Object {
 
+        $value = $_.Value
         # Recursively edit psobjects
         # If the values is psobjects, its not normalized
         # For Example if manfiest have architecture and it's architecture have array with single value it's not formated
         # @see: Without recursion: https://i.imgur.com/pHOf9f2.png
         # @see: With recurseion: https://i.imgur.com/QVSLaiV.png
-        if ($_.Value -is [System.Management.Automation.PSCustomObject]) {
-            $_.Value = normalize_values $_.Value
+        if ($value -is [System.Management.Automation.PSCustomObject]) {
+            $vallue = normalize_values $value
         }
 
         # Process String Values
-        if ($_.Value -is [String]) {
+        if ($value -is [String]) {
 
             # Split on new lines
-            [Array] $parts = ($_.Value -split '\r?\n').Trim()
+            [Array] $parts = ($value -split '\r?\n').Trim()
 
             # Replace with string array if result is multiple lines
             if ($parts.Count -gt 1) {
-                $_.Value = $parts
+                $value = $parts
             }
         }
 
         # Convert single value array into string
-        if ($_.Value -is [Array]) {
-            if ($_.Value.Count -eq 1) {
-                if ($_.Value.Split(' ').Count -eq 1) {
-                    $_.Value = $_.Value[0]
+        if ($value -is [Array]) {
+            # Array contains only 1 element String or Array
+            if ($value.Count -eq 1) {
+                # Array
+                if ($value[0] -is [Array]) {
+                    $value = $value
+                } else {
+                    # String
+                    $value = $value[0]
                 }
             } else {
+                # Array of Arrays
                 $resulted_arrs = @()
-                foreach ($element in $_.Value) {
-                    if ($element.Split(' ').Count -eq 1) {
+                foreach ($element in $value) {
+                    if ($element.Count -eq 1) {
                         $resulted_arrs += $element
                     } else {
                         $resulted_arrs += , $element
                     }
                 }
-                $_.Value = $resulted_arrs
+
+                $value = $resulted_arrs
             }
         }
 
         # Process other values as needed...
+
+        # Bind edited values into original
+        $_.Value = $value
     }
 
     return $json

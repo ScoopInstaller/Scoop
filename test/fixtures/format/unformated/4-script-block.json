@@ -5,7 +5,7 @@
     "url": "https://github.com/ramboxapp/download/releases/download/v1.0.6/RamboxPro-1.0.6-win.exe#/cosi.7z",
     "hash": "sha512:f4a1b5e12ae15c9a1339fef56b0522b6619d6c23b0ab806f128841c2ba7ce9d9c997fea81f5bc4a24988aed672a4415ff353542535dc7869b5e496f2f1e1efff",
     "extract_dir": "\\$PLUGINSDIR",
-    "pre_install": "Get-ChildItem \"$dir\" -Exclude 'app-64.7z', 'app-32.7z' | Remove-Item -Force -Recurse",
+    "pre_install": ["Get-ChildItem \"$dir\" -Exclude 'app-64.7z', 'app-32.7z' | Remove-Item -Force -Recurse"],
     "architecture": {
         "64bit": {
             "installer": {
