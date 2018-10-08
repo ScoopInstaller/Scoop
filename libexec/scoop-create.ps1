@@ -15,8 +15,8 @@ $manifest = [ordered]@{ "homepage" = "";
                         "hash" = "";
                         "extract_dir" = "";
                         "bin" = @();
-                        "depends" = "";
                         "checkver" = "";
+                        "depends" = "";
                         "autoupdate" = @{} }
 
 function create_manifest($url) {
@@ -56,7 +56,8 @@ function github {
     $manifest.description = $info.description
     $manifest.checkver = @{ github = $info.html_url }
 
-    if ($info.license.spdx_id) {
+    # License with key = "other" now gets spdx_id = "NOASSERTION" instead of null? Url stays as null, workaround for now :/
+    if ($info.license -and $info.license.url) {
         $manifest.license["identifier"] = $info.license.spdx_id
     } elseif ($info.license) {
         # There should be a better way to get license url (License is not always in LICENSE.* -> 'mpv-player/mpv')
@@ -67,73 +68,55 @@ function github {
     }
 
     $releases = Invoke-WebRequest -Uri "https://api.github.com/repos/$owner/$name/releases" | ConvertFrom-Json
-    # If last version is prerelease try to find release and let user choose wich one to use
-    if ($releases[0].prerelease -and $releases.count -gt 1) {
-        for ($i = 0; $i -lt $releases.count; $i++) {
-            if (!$releases[$i].prerelease) {
-                $release = $releases[$i]
-                break
-            }
-        }
-        if ($release -and (confirm "Want to use prerelease ?")) {
-            $release = $releases[0]
-        }
-    } else {
-        $release = $releases[0]
-    }
 
-    if ($release.assets) {
+    if ($releases) {
+        $release = choose_item $releases "Choose version" "tag_name"
         version $release.tag_name
 
         $architectures = "32bit", "64bit", "32bit / 64bit"
         $architecture = choose_item $architectures "Choose supported architecture"
         switch ($architecture) {
-            $architectures[0] { $asset_32 = choose_item $release.assets "Choose 32bit asset" "name" }
-            $architectures[1] { $asset_64 = choose_item $release.assets "Choose 64bit asset" "name" }
+            $architectures[0] { $url_32 = (choose_item $release.assets "Choose 32bit asset" "name").browser_download_url }
+            $architectures[1] { $url_64 = (choose_item $release.assets "Choose 64bit asset" "name").browser_download_url }
             $architectures[2] {
-                $asset_32 = choose_item $release.assets "Choose 32bit asset ?" "name"
-                $asset_64 = choose_item $release.assets "Choose 64bit asset ?" "name"
+                $url_32 = (choose_item $release.assets "Choose 32bit asset" "name").browser_download_url
+                $url_64 = (choose_item $release.assets "Choose 64bit asset" "name").browser_download_url
             }
         }
-
-        url $asset_32.browser_download_url $asset_64.browser_download_url
-
-        if (!(confirm "Download asset(s) to calculate hash")) { return }
-
-        hash $asset_32.browser_download_url $asset_64.browser_download_url
-
-        # Let's hope that there's no extension per architecture apps D:
-        $file = if ($asset_64) { $asset_64.name } else { $asset_32.name }
-        if ($file -match ".zip" -or (file_requires_7zip $file)) {
-            $type = "archive"
-        }
-
-        switch ($type) {
-            "archive" {
-                archive_info
-            }
-        }
-    } else { # If there's no releases try to find tags
+    } else {
         $tags = Invoke-WebRequest -Uri "https://api.github.com/repos/$owner/$name/tags" | ConvertFrom-Json
-        if ($tags[0]) {
-            version $tags[0].name
-            if (confirm "64bit only ?") {
-                url $null "https://github.com/$owner/$name/archive/$($manifest.version).zip"
-            } else {
-                url "https://github.com/$owner/$name/archive/$($manifest.version).zip"
-            }
-            if (confirm "Download asset to calculate hash ?") {
-                archive_info
-            }
-        } else { Write-Host "No tags found" }
+        $tag = choose_item $tags "Choose version" "name"
+        version $tag.name
+        $architectures = "32bit", "64bit"
+        $architecture = choose_item $architectures "Choose architecture"
+        switch ($architecture) {
+            $architectures[0] { $url_32 = "https://github.com/$owner/$name/archive/$($tag.name).zip" }
+            $architectures[1] { $url_64 = "https://github.com/$owner/$name/archive/$($tag.name).zip" }
+        }
+    }
+
+    url $url_32 $url_64
+
+    if (!(confirm "Download asset(s) to calculate hash")) { return }
+
+    hash $url_32 $url_64
+
+    $file = if ($url_64) { $url_64 } else { $url_32 }
+    if ($file.endsWith(".zip") -or (file_requires_7zip $file)) {
+        $type = "archive"
+    }
+
+    switch ($type) {
+        "archive" {
+            archive_info
+        }
     }
 }
 
 function archive_info {
     $url = if ($manifest.architecture) { $manifest.architecture["64bit"].url } else { $manifest.url }
     $tmp = "$env:TEMP\scoop"
-    Write-Host "Extracting" -NoNewline
-    Write-Host "..."
+    Write-Host "Extracting..."
     extract_7zip (cache_path $name $manifest.version $url) $tmp
     extract_dir $tmp
     bin $tmp
@@ -152,7 +135,7 @@ function hash($url_32, $url_64) {
 }
 
 function version($version) {
-    $manifest.version = if ($version[0] -eq 'v') { $version.substring(1) } else { $version }
+    $manifest.version = if ($version.startsWith('v')) { $version.substring(1) } else { $version }
 }
 
 function replace_version($url) {
@@ -194,9 +177,9 @@ function extract_dir($path) {
     if ($dirs.count -eq 1) {
         $manifest.extract_dir = "$dirs"
         if ($dirs -match $manifest.version) {
-            $manifest.autoupdate["extract_dir"] = (replace_version $manifest.version)
+            $manifest.autoupdate["extract_dir"] = (replace_version $manifest.extract_dir)
         }
-    } else { $manifest.remove("extract_dir") }
+    }
 }
 
 function bin($path) {
@@ -249,8 +232,7 @@ function choose_item($list, $quote, $property) {
             & $choose
         }
     }
-
-    & $choose
+    & $choose;
 }
 
 if (!$url) {
