@@ -9,9 +9,7 @@
     "architecture": {
         "64bit": {
             "url": "https://7-zip.org/a/7z1805-x64.msi",
-            "hash": [
-                "898c1ca0015183fe2ba7d55cacf0a1dea35e873bf3f8090f362a6288c6ef08d7"
-            ]
+            "hash": "898c1ca0015183fe2ba7d55cacf0a1dea35e873bf3f8090f362a6288c6ef08d7"
         },
         "32bit": {
             "url": "https://7-zip.org/a/7z1805.msi",
@@ -20,40 +18,44 @@
     },
     "extract_dir": "Files/7-Zip",
     "bin": [
-        [
-            "single"
-        ],
+        "single",
         [
             "7z.exe",
             "cosi"
         ],
-                        [
+        [
             "7z.exe",
             "cosi",
-    "param",
+            "param",
             "icon"
         ],
         [
-                        "7z.exe",
+            "7z.exe",
             "empty",
-     "",
-              ""
+            "",
+            ""
         ],
-        [
-            "singtwo"
-        ]
+        "singtwo"
     ],
-    "checkver":                       "Download 7-Zip ([\\d.]+)",
+    "checkver": "Download 7-Zip ([\\d.]+)",
     "autoupdate": {
         "architecture": {
             "64bit": {
                 "url": "https://7-zip.org/a/7z$cleanVersion-x64.msi"
-            },        "32bit": {
+            },
+            "32bit": {
                 "url": "https://7-zip.org/a/7z$cleanVersion.msi"
-       }
+            }
         }
     },
     "shortcuts": [
-        [   "7zFM.exe",
+        [
+            "7zFM.exe",
             "7-Zip"
-], ["name with spaces.exe", "Shortcut with spaces in name"]    ]}
+        ],
+        [
+            "name with spaces.exe",
+            "Shortcut with spaces in name"
+        ]
+    ]
+}
