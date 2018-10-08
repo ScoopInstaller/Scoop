@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.1.0466/gvim_8.1.0466_x64.zip",
-            "hash": "8a87038ca34be9fa1463e6ef0f65bc7a0e85823ee75eb6fcd13ace447e53c226"
+            "hash": "dc77d7ef6b3b1e506a84a51d4e0d3058ee459b3e169605a068c768051984550d"
         }
     },
     "extract_dir": "vim\\vim81",
