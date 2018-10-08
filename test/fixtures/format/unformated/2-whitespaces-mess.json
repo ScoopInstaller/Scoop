@@ -7,7 +7,7 @@
   			     "64bit": {          "installer": {
 
    "script": [
-                    "Do something"    
+                    "Do something"    , "cosi"
                 ]
             }
         }

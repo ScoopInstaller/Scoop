@@ -56,4 +56,4 @@
     "shortcuts": [
         [   "7zFM.exe",
             "7-Zip"
-]    ]}
+], ["name with spaces.exe", "Shortcut with spaces in name"]    ]}
