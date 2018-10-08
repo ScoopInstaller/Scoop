@@ -71,10 +71,20 @@ function github {
 
     if ($releases) {
         $release = choose_item $releases "Choose version" "tag_name"
-        version $release.tag_name
+        # Version value for release and tag stored in different properties, we don't store actual value in manifest.version, so we store it here just in case.
+        $version = $release.tag_name
+        version $version
+    } else {
+        $tags = Invoke-WebRequest -Uri "https://api.github.com/repos/$owner/$name/tags" | ConvertFrom-Json
+        $release = choose_item $tags "Choose version" "name"
+        $version = $release.name
+        version $version
+    }
 
-        $architectures = "32bit", "64bit", "32bit / 64bit"
-        $architecture = choose_item $architectures "Choose supported architecture"
+    $architectures = "32bit", "64bit", "32bit / 64bit"
+    $architecture = choose_item $architectures "Choose supported architecture"
+
+    if ($release.assets) {
         switch ($architecture) {
             $architectures[0] { $url_32 = (choose_item $release.assets "Choose 32bit asset" "name").browser_download_url }
             $architectures[1] { $url_64 = (choose_item $release.assets "Choose 64bit asset" "name").browser_download_url }
@@ -84,14 +94,9 @@ function github {
             }
         }
     } else {
-        $tags = Invoke-WebRequest -Uri "https://api.github.com/repos/$owner/$name/tags" | ConvertFrom-Json
-        $tag = choose_item $tags "Choose version" "name"
-        version $tag.name
-        $architectures = "32bit", "64bit"
-        $architecture = choose_item $architectures "Choose architecture"
         switch ($architecture) {
-            $architectures[0] { $url_32 = "https://github.com/$owner/$name/archive/$($tag.name).zip" }
-            $architectures[1] { $url_64 = "https://github.com/$owner/$name/archive/$($tag.name).zip" }
+            $architectures[0] { $url_32 = "https://github.com/$owner/$name/archive/$version.zip" }
+            $architectures[1] { $url_64 = "https://github.com/$owner/$name/archive/$version.zip" }
         }
     }
 
