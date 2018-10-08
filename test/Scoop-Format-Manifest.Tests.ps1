@@ -10,7 +10,8 @@ Describe 'Pretty json formating' -Tag 'Scoop' {
 
     Context 'Beatify manifest' {
         $manifests | ForEach-Object {
-            $_ = $_.Name # pwsh fix
+            if ($PSVersionTable.PSVersion.Major -gt 5) { $_ = $_.Name } # Fix for pwsh
+
             It "$_" {
                 $pretty_json = (parse_json "$format\unformated\$_") | ConvertToPrettyJson
                 $correct = (Get-Content "$format\formated\$_") -join "`r`n"
