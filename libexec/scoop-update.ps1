@@ -112,6 +112,9 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # re-use architecture, bucket and url from first install
     $architecture = ensure_architecture $install.architecture
     $bucket = $install.bucket
+    if ($install.url) {
+        $app = $install.url
+    }
     $url = $install.url
 
     if(!$independent) {
