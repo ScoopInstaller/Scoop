@@ -6,7 +6,7 @@
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 $isUnix = is_unix
 
-describe "is_directory" {
+describe "is_directory" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "is_directory"
     }
@@ -23,7 +23,7 @@ describe "is_directory" {
     }
 }
 
-describe "movedir" {
+describe "movedir" -Tag 'Scoop' {
     $extract_dir = "subdir"
     $extract_to = $null
 
@@ -61,7 +61,7 @@ describe "movedir" {
     }
 }
 
-describe "unzip_old" {
+describe "unzip_old" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "unzip_old"
     }
@@ -117,7 +117,7 @@ describe "unzip_old" {
     }
 }
 
-describe "shim" {
+describe "shim" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "shim"
         $shimdir = shimdir
@@ -153,7 +153,7 @@ describe "shim" {
     }
 }
 
-describe "rm_shim" {
+describe "rm_shim" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "shim"
         $shimdir = shimdir
@@ -172,7 +172,46 @@ describe "rm_shim" {
     }
 }
 
-describe "ensure_robocopy_in_path" {
+Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
+    BeforeAll {
+        $working_dir = setup_working "shim"
+        $shimdir = shimdir
+        $(ensure_in_path $shimdir) | Out-Null
+    }
+
+    It "returns empty string if file does not exist" -skip:$isUnix {
+        get_app_name_from_ps1_shim "non-existent-file" | should be ""
+    }
+
+    It "returns app name if file exists and is a shim to an app" -skip:$isUnix {
+        mkdir -p "$working_dir/mockapp/current/"
+        Write-Output "" | Out-File "$working_dir/mockapp/current/mockapp.ps1"
+        shim "$working_dir/mockapp/current/mockapp.ps1" $false "shim-test"
+        $shim_path = (get-command "shim-test.ps1").Path
+        get_app_name_from_ps1_shim "$shim_path" | should be "mockapp"
+    }
+
+    It "returns app name if file exists and is a shim to an app cerca August 2018" -skip:$isUnix {
+        Write-Output '$path = join-path "$psscriptroot" "..\apps\vim\current\vim.exe"' | Out-File "$working_dir/moch-shim.ps1" -Encoding utf8
+        Write-Output 'if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }' | Out-File "$working_dir/moch-shim.ps1" -Append -Encoding utf8
+        get_app_name_from_ps1_shim "$working_dir/moch-shim.ps1" | should be "vim"
+    }
+
+    It "returns empty string if file exists and is not a shim" -skip:$isUnix {
+        Write-Output "lorem ipsum" | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
+        get_app_name_from_ps1_shim "$working_dir/mock-shim.ps1" | should be ""
+    }
+
+    AfterEach {
+        if (Get-Command "shim-test" -ErrorAction SilentlyContinue) {
+            rm_shim "shim-test" $shimdir -ErrorAction SilentlyContinue
+        }
+        Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
+        Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/moch-shim.ps1"
+    }
+}
+
+describe "ensure_robocopy_in_path" -Tag 'Scoop' {
     $shimdir = shimdir $false
     mock versiondir { $repo_dir }
 
@@ -206,7 +245,7 @@ describe "ensure_robocopy_in_path" {
     }
 }
 
-describe 'sanitary_path' {
+describe 'sanitary_path' -Tag 'Scoop' {
   it 'removes invalid path characters from a string' {
     $path = 'test?.json'
     $valid_path = sanitary_path $path
@@ -215,7 +254,7 @@ describe 'sanitary_path' {
   }
 }
 
-describe 'app' {
+describe 'app' -Tag 'Scoop' {
     it 'parses the bucket name from an app query' {
         $query = "C:\test.json"
         $app, $bucket, $version = parse_app $query

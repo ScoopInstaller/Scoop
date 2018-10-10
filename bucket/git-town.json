@@ -12,7 +12,9 @@
             "hash": "110d672eb9903eca7dc8d4ccdb621e009c5697003b0b5d1e0d084cad59b87e90"
         }
     },
-    "depends": "git",
+    "suggest": {
+        "git": "git"
+    },
     "bin": "git-town.exe",
     "checkver": {
         "github": "https://github.com/Originate/git-town"

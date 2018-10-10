@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/monochromegane/the_platinum_searcher",
     "license": "MIT",
-    "version": "2.1.6",
+    "version": "2.2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.1.6/pt_windows_amd64.zip",
-            "hash": "c0916da58860e509932f6e8558a90e39038e4fe3665c83319a43fd83e37ad7b0"
+            "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.2.0/pt_windows_amd64.zip",
+            "hash": "7fa5aab0462a63cc1a746af3f07f1d03bf6521e23f8b2d149fc5af7b4e00596c"
         },
         "32bit": {
-            "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.1.6/pt_windows_386.zip",
-            "hash": "e9ebd094e6b837d0a6b2bcead377f9321e62db990b6386b8a7921e94fede3c22"
+            "url": "https://github.com/monochromegane/the_platinum_searcher/releases/download/v2.2.0/pt_windows_386.zip",
+            "hash": "d32ebffe0c2cf142351b6037e73e0bde18044f9c77960c7b55076e45dc80929d"
         }
     },
     "bin": "pt.exe",

@@ -22,10 +22,10 @@ if ($type -is [System.IO.DirectoryInfo]) {
 
 $files | ForEach-Object {
     # beautify
-    $json = parse_json "$dir$_" | ConvertToPrettyJson
+    $json = parse_json "$dir$($_.Name)" | ConvertToPrettyJson
 
     # convert to 4 spaces
     $json = $json -replace "`t",'    '
 
-    [System.IO.File]::WriteAllLines("$dir$_", $json)
+    [System.IO.File]::WriteAllLines("$dir$($_.Name)", $json)
 }

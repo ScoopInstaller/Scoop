@@ -18,5 +18,9 @@
         "bin\\mac2unix.exe",
         "bin\\unix2dos.exe",
         "bin\\unix2mac.exe"
-    ]
+    ],
+    "checkver": {
+        "url": "https://waterlan.home.xs4all.nl/dos2unix.html",
+        "re": "Latest version: (?<version>[\\d.]+) \\([\\d\\-]+\\)"
+    }
 }

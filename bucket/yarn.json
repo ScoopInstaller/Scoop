@@ -2,7 +2,7 @@
     "homepage": "https://yarnpkg.com/",
     "description": "Dependency manager",
     "license": "BSD-2-Clause",
-    "version": "1.9.4",
+    "version": "1.10.1",
     "suggest": {
         "Node.js": [
             "nodejs",
@@ -12,8 +12,8 @@
             "nvm"
         ]
     },
-    "url": "https://yarnpkg.com/downloads/1.9.4/yarn-1.9.4.msi",
-    "hash": "5ca0adb78d2f3a718d7a1feef0496d8ead9bca599367dff0f98cd742d5a72fdd",
+    "url": "https://yarnpkg.com/downloads/1.10.1/yarn-1.10.1.msi",
+    "hash": "adefc7e8f0ca401c9b36873323c6a9880b5b21f56a4efb88311d774e4c0ffb2a",
     "persist": [
         "cache",
         "bin",

@@ -6,7 +6,7 @@
 
 $isUnix = is_unix
 
-describe "ensure_architecture" {
+describe "ensure_architecture" -Tag 'Scoop' {
     it "should keep correct architectures" {
         ensure_architecture "32bit" | Should be "32bit"
         ensure_architecture "32" | Should be "32bit"
@@ -37,13 +37,13 @@ describe "ensure_architecture" {
     }
 }
 
-describe "appname_from_url" {
+describe "appname_from_url" -Tag 'Scoop' {
     it "should extract the correct name" {
         appname_from_url "https://example.org/directory/foobar.json" | Should be "foobar"
     }
 }
 
-describe "url_filename" {
+describe "url_filename" -Tag 'Scoop' {
     it "should extract the real filename from an url" {
         url_filename "http://example.org/foo.txt" | Should be "foo.txt"
         url_filename "http://example.org/foo.txt?var=123" | Should be "foo.txt"
@@ -54,7 +54,7 @@ describe "url_filename" {
     }
 }
 
-describe "url_remote_filename" {
+describe "url_remote_filename" -Tag 'Scoop' {
     it "should extract the real filename from an url" {
         url_remote_filename "http://example.org/foo.txt" | Should be "foo.txt"
         url_remote_filename "http://example.org/foo.txt?var=123" | Should be "foo.txt"
@@ -65,7 +65,7 @@ describe "url_remote_filename" {
     }
 }
 
-describe "is_in_dir" {
+describe "is_in_dir" -Tag 'Scoop' {
     it "should work correctly" -skip:$isUnix {
         is_in_dir "C:\test" "C:\foo" | Should be $false
         is_in_dir "C:\test" "C:\test\foo\baz.zip" | Should be $true
@@ -75,7 +75,7 @@ describe "is_in_dir" {
     }
 }
 
-describe "env add and remove path" {
+describe "env add and remove path" -Tag 'Scoop' {
     # test data
     $manifest = @{
         "env_add_path" = @("foo", "bar")
@@ -101,7 +101,7 @@ describe "env add and remove path" {
     }
 }
 
-describe "shim_def" {
+describe "shim_def" -Tag 'Scoop' {
     it "should use strings correctly" {
         $target, $name, $shimArgs = shim_def "command.exe"
         $target | Should be "command.exe"
@@ -122,7 +122,7 @@ describe "shim_def" {
     }
 }
 
-describe 'persist_def' {
+describe 'persist_def' -Tag 'Scoop' {
     it 'parses string correctly' {
         $source, $target = persist_def "test"
         $source | Should be "test"
@@ -153,7 +153,7 @@ describe 'persist_def' {
     }
 }
 
-describe 'compute_hash' {
+describe 'compute_hash' -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "manifest"
     }

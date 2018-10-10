@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.rarlab.com/",
-    "version": "5.60",
+    "version": "5.61",
     "license": "Freeware",
     "url": "https://www.rarlab.com/rar/unrarw32.exe",
-    "hash": "bdd354b9b677a5dda154b56627398aef13b1445ae235406799acd6fbb6c72989",
+    "hash": "8be53506cf8cacdabd952c28ce5d498a482e931615c544867d73d5be7b5e0286",
     "bin": "UnRAR.exe",
     "installer": {
         "args": [

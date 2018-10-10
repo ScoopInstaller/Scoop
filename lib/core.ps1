@@ -327,19 +327,24 @@ function movedir($from, $to) {
 
 function get_app_name($path) {
     if ($path -match '([^/\\]+)[/\\]current[/\\]') {
-        return $Matches[1].tolower()
+        return $matches[1].tolower()
     }
-    return ""
+    return ''
+}
+
+function get_app_name_from_ps1_shim($shim_ps1) {
+    if (!(Test-Path($shim_ps1))) {
+        return ''
+    }
+    $content = (Get-Content $shim_ps1 -Encoding utf8) -join ' '
+    return get_app_name $content
 }
 
 function warn_on_overwrite($shim_ps1, $path) {
-    if (!([System.IO.File]::Exists($shim_ps1))) {
+    if (!(Test-Path($shim_ps1))) {
         return
     }
-    $reader = [System.IO.File]::OpenText($shim_ps1)
-    $line = $reader.ReadLine().replace("`r","").replace("`n","")
-    $reader.Close()
-    $shim_app = get_app_name $line
+    $shim_app = get_app_name_from_ps1_shim $shim_ps1
     $path_app = get_app_name $path
     if ($shim_app -eq $path_app) {
         return
@@ -367,7 +372,9 @@ function shim($path, $global, $name, $arg) {
     if($relative_path -match "^(.\\[\w]:).*$") {
         write-output "`$path = `"$path`"" | out-file "$shim.ps1" -encoding utf8
     } else {
-        write-output "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" | out-file "$shim.ps1" -encoding utf8
+        # Setting PSScriptRoot in Shim if it is not defined, so the shim doesn't break in PowerShell 2.0
+        Write-Output "if (!(Test-Path Variable:PSScriptRoot)) { `$PSScriptRoot = Split-Path `$MyInvocation.MyCommand.Path -Parent }" | Out-File "$shim.ps1" -Encoding utf8
+        write-output "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" | out-file "$shim.ps1" -Encoding utf8 -Append
     }
 
     if($path -match '\.jar$') {
@@ -668,4 +675,26 @@ function handle_special_urls($url)
         $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
     }
     return $url
+}
+
+function get_magic_bytes($file) {
+    if(!(Test-Path $file)) {
+        return ''
+    }
+
+    if((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+        # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
+        return Get-Content $file -AsByteStream -TotalCount 8
+    }
+    else {
+        return Get-Content $file -Encoding byte -TotalCount 8
+    }
+}
+
+function get_magic_bytes_pretty($file, $glue = ' ') {
+    if(!(Test-Path $file)) {
+        return ''
+    }
+
+    return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }

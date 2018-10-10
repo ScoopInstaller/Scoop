@@ -9,13 +9,13 @@
     "hash": "c8b85fc4694d748e8e481ea8e9a31057688c9e16dda8ea7686c00b29b9d6f6e2",
     "env_add_path": "texmfs\\install\\miktex\\bin",
     "checkver": {
-        "url": "https://miktex.org/portable",
+        "url": "https://miktex.org/download#portable",
         "re": "miktex-portable-([\\d.]+).exe"
     },
     "autoupdate": {
         "url": "https://ftp.fau.de/ctan/systems/win32/miktex/setup/windows-x86/miktex-portable-$version.exe#/dl.7z",
         "hash": {
-            "url": "https://miktex.org/portable",
+            "url": "https://miktex.org/download#portable",
             "find": "SHA-256:</td>\\s*<td>\\s*([a-fA-F0-9]{64})"
         }
     }

@@ -2,7 +2,7 @@
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 
-describe "manifest-validation" {
+describe -Tag 'Manifests' "manifest-validation" {
     beforeall {
         $working_dir = setup_working "manifest"
         $schema = "$psscriptroot/../schema.json"
@@ -48,6 +48,11 @@ describe "manifest-validation" {
             if ($null -eq $bucketdir) {
                 $bucketdir = "$psscriptroot\..\bucket\"
             }
+            $changed_manifests = @()
+            if($env:CI -eq $true) {
+                $commit = if($env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT) { $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT } else { $env:APPVEYOR_REPO_COMMIT }
+                $changed_manifests = (Get-GitChangedFile -Include '*.json' -Commit $commit)
+            }
             $manifest_files = Get-ChildItem $bucketdir *.json
             $validator = new-object Scoop.Validator($schema, $true)
         }
@@ -55,7 +60,11 @@ describe "manifest-validation" {
         $quota_exceeded = $false
 
         $manifest_files | ForEach-Object {
-            it "$_" {
+            $skip_manifest = ($changed_manifests -inotcontains $_.FullName)
+            if($env:CI -ne $true -or $changed_manifests -imatch 'schema.json') {
+                $skip_manifest = $false
+            }
+            it "$_" -skip:$skip_manifest {
                 $file = $_ # exception handling may overwrite $_
 
                 if(!($quota_exceeded)) {

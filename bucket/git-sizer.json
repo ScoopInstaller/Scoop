@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/github/git-sizer",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/github/git-sizer/releases/download/v1.2.0/git-sizer-1.2.0-windows-amd64.zip",
-            "hash": "600a3945a1478dff29f7d40d190989d30bacad6119294bd0e97aafc2a6793c02"
+            "url": "https://github.com/github/git-sizer/releases/download/v1.3.0/git-sizer-1.3.0-windows-amd64.zip",
+            "hash": "15d9e56c10f81612796e8cbe6ff8e53eecfbabae1770b4a557252fce6e6addce"
         },
         "32bit": {
-            "url": "https://github.com/github/git-sizer/releases/download/v1.2.0/git-sizer-1.2.0-windows-386.zip",
-            "hash": "8b8037c4f1ce91923ed52ffbb5f53e6a879cc27dc53debe541b3a8d3fa30c531"
+            "url": "https://github.com/github/git-sizer/releases/download/v1.3.0/git-sizer-1.3.0-windows-386.zip",
+            "hash": "abad6350e72f848117b6b12b3fa0f7695a1dd9ed87b5dec8e7d2e65246753dbf"
         }
     },
     "bin": "git-sizer.exe",

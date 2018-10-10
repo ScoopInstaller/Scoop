@@ -1,7 +1,7 @@
 . "$psscriptroot\Scoop-TestLib.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 
-describe "versions" {
+describe "versions" -Tag 'Scoop' {
     it 'compares versions with integer-string mismatch' {
         $a = '1.8.9'
         $b = '1.8.5-1'

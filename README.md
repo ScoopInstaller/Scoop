@@ -71,12 +71,12 @@ You can tweak the following `aria2` settings with the `scoop config` command:
 - [aria2-max-connection-per-server](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-x) (default: 5)
 - [aria2-min-split-size](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-k) (default: 5M)
 
-### Inspiration
+## Inspiration
 
 * [Homebrew](http://mxcl.github.io/homebrew/)
 * [sub](https://github.com/37signals/sub#readme)
 
-### What sort of apps can Scoop install?
+## What sort of apps can Scoop install?
 
 The apps that install best with Scoop are commonly called "portable" apps: i.e. compressed program files that run stand-alone when extracted and don't have side-effects like changing the registry or putting files outside the program directory.
 

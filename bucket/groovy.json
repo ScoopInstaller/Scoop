@@ -22,6 +22,9 @@
         "JDK": [
             "java/oraclejdk",
             "java/openjdk"
+        ],
+        "groovyserv": [
+            "groovyserv"
         ]
     },
     "checkver": {

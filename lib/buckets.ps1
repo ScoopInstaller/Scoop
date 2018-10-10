@@ -61,6 +61,6 @@ function new_issue_msg($app, $bucket, $title, $body) {
         $url += "&body=$body"
     }
 
-    $msg = "`nPlease create a new issue by using the following link and paste your console output:"
+    $msg = "`nPlease try again or create a new issue by using the following link and paste your console output:"
     return "$msg`n$url"
 }

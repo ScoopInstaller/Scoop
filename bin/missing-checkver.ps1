@@ -19,7 +19,7 @@ write-host "]utoupdate"
 write-host " |  |"
 
 Get-ChildItem $dir "*.json" | ForEach-Object {
-    $json = parse_json "$dir\$_"
+    $json = parse_json "$dir\($_.Name)"
 
     if ($skipSupported -and $json.checkver -and $json.autoupdate) {
         return
@@ -32,5 +32,5 @@ Get-ChildItem $dir "*.json" | ForEach-Object {
     write-host "[" -nonewline
     write-host -f cyan -nonewline $( If ($json.autoupdate) {"A"} Else {" "} )
     write-host "] " -nonewline
-    write-host (strip_ext $_)
+    write-host (strip_ext $_.Name)
 }

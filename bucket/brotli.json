@@ -1,33 +1,42 @@
 {
-    "version": "1.0.4",
+    "version": "1.0.6_6",
     "homepage": "https://brotli.org/",
     "description": "Lossless compression algorithm",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/google/brotli/releases/download/v1.0.4/brotli-v1.0.4-win_x86_64.zip",
-            "hash": "c1bee6f06c7e40633965c6d7fdb11edf3c3ed1b7e53c09c07c010757da29a598"
+            "url": "https://curl.haxx.se/windows/dl-7.61.1_6/brotli-1.0.6_6-win64-mingw.tar.xz",
+            "hash": "b5580588d905b776955da4507949877c024c5ab243216fe667f9c0d14df75188",
+            "extract_dir": "brotli-1.0.6-win64-mingw"
         },
         "32bit": {
-            "url": "https://github.com/google/brotli/releases/download/v1.0.4/brotli-v1.0.4-win_i686.zip",
-            "hash": "82a47bbee2547fcdcfadf19582fbef793d283e3feaa8f1904d632919f8c8dade"
+            "url": "https://curl.haxx.se/windows/dl-7.61.1_6/brotli-1.0.6_6-win32-mingw.tar.xz",
+            "hash": "11dfdeff5dba89acf0bebc005dd218f13d46de5118608348f74b2753c29d6ab7",
+            "extract_dir": "brotli-1.0.6-win32-mingw"
         }
     },
     "bin": [
-        "brotli.exe",
-        "unbrotli.exe"
+        "bin\\brotli.exe",
+        "bin\\unbrotli.exe"
     ],
-    "pre_install": "Copy-Item \"$dir\\brotli.exe\" \"$dir\\unbrotli.exe\"",
+    "pre_install": "Copy-Item \"$dir\\bin\\brotli.exe\" \"$dir\\bin\\unbrotli.exe\"",
     "checkver": {
-        "github": "https://github.com/google/brotli"
+        "url": "https://curl.haxx.se/windows/",
+        "re": "dl-(?<curl>[\\d._]+)/brotli-(?<version>[\\d._]+)-win64-mingw"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/google/brotli/releases/download/v$version/brotli-v$version-win_x86_64.zip"
+                "url": "https://curl.haxx.se/windows/dl-$matchCurl/brotli-$version-win64-mingw.tar.xz",
+                "extract_dir": "brotli-$matchHead-win64-mingw"
             },
             "32bit": {
-                "url": "https://github.com/google/brotli/releases/download/v$version/brotli-v$version-win_i686.zip"
+                "url": "https://curl.haxx.se/windows/dl-$matchCurl/brotli-$version-win32-mingw.tar.xz",
+                "extract_dir": "brotli-$matchHead-win32-mingw"
             }
+        },
+        "hash": {
+            "url": "$baseurl/hashes.txt",
+            "find": "SHA256\\($basename\\)=\\s+([a-fA-F\\d]{64})"
         }
     }
 }

@@ -55,6 +55,18 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
         $hash = $matches[1] -replace ' ',''
     }
 
+    # convert base64 encoded hash values
+    if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
+        $base64 = $matches[0]
+        if(!($hash -match "^[a-fA-F0-9]+$") -and $hash.length -in @(32, 40, 64, 128)) {
+            try {
+                $hash = ([System.Convert]::FromBase64String($base64) | ForEach-Object { $_.ToString('x2') }) -join ''
+            } catch {
+                $hash = $hash
+            }
+        }
+    }
+
     # find hash with filename in $hashfile (will be overridden by $regex)
     if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
         $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:[\x20\t]+\d+)?"
@@ -62,7 +74,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
         if ($hashfile -match $filenameRegex) {
             $hash = $matches[1]
         }
-        $metalinkRegex = "<hash[^>]+>(?<meta>[a-fA-F0-9]{64})"
+        $metalinkRegex = "<hash[^>]+>([a-fA-F0-9]{64})"
         if ($hashfile -match $metalinkRegex) {
             $hash = $matches[1]
         }
@@ -88,6 +100,33 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
     if(!$hash) {
         $hash = json_path_legacy $json $jsonpath $basename
     }
+    return format_hash $hash
+}
+
+function find_hash_in_headers([String] $url) {
+    $hash = $null
+
+    try {
+        $req = [System.Net.WebRequest]::Create($url)
+        $req.Referer = (strip_filename $url)
+        $req.AllowAutoRedirect = $false
+        $req.UserAgent = (Get-UserAgent)
+        $req.Timeout = 2000
+        $req.Method = 'HEAD'
+        $res = $req.GetResponse()
+        if(([int]$response.StatusCode -ge 300) -and ([int]$response.StatusCode -lt 400)) {
+            if($res.Headers['Digest'] -match 'SHA-256=([^,]+)' -or $res.Headers['Digest'] -match 'SHA=([^,]+)' -or $res.Headers['Digest'] -match 'MD5=([^,]+)') {
+                $hash = ([System.Convert]::FromBase64String($matches[1]) | ForEach-Object { $_.ToString('x2') }) -join ''
+                debug $hash
+            }
+        }
+        $res.Close()
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return
+    }
+
     return format_hash $hash
 }
 
@@ -120,8 +159,21 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'extract'
     }
 
-    if ($config.jp.Length -gt 0) {
+    $jsonpath = ''
+    if ($config.jp) {
+        $jsonpath = $config.jp
         $hashmode = 'json'
+    }
+    if ($config.jsonpath) {
+        $jsonpath = $config.jsonpath
+        $hashmode = 'json'
+    }
+    $regex = ''
+    if ($config.find) {
+        $regex = $config.find
+    }
+    if ($config.regex) {
+        $regex = $config.regex
     }
 
     if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
@@ -131,16 +183,22 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hash = find_hash_in_textfile $hashfile_url $basename '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
     }
 
-    if ($hashmode -eq 'extract') {
-        $hash = find_hash_in_textfile $hashfile_url $basename $config.find
-    }
-
-    if ($hashmode -eq 'json') {
-        $hash = find_hash_in_json $hashfile_url $basename $config.jp
-    }
-
-    if ($hashmode -eq 'rdf') {
-        $hash = find_hash_in_rdf $hashfile_url $basename
+    switch ($hashmode) {
+        'extract' {
+            $hash = find_hash_in_textfile $hashfile_url $basename $regex
+        }
+        'json' {
+            $hash = find_hash_in_json $hashfile_url $basename $jsonpath
+        }
+        'rdf' {
+            $hash = find_hash_in_rdf $hashfile_url $basename
+        }
+        'metalink' {
+            $hash = find_hash_in_headers $url
+            if(!$hash) {
+                $hash = find_hash_in_textfile "$url.meta4"
+            }
+        }
     }
 
     if($hash) {

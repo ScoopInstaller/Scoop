@@ -1,0 +1,16 @@
+{
+    "homepage": "https://github.com/projectkudu/ARMClient",
+    "description": "A simple command line tool to invoke the Azure Resource Manager API",
+    "license": "Apache-2.0",
+    "version": "1.3",
+    "url": "https://github.com/projectkudu/ARMClient/releases/download/v1.3/ARMClient.zip",
+    "hash": "029e54777c863b1b27fc9caf201d0279b1b76f3ba3da882c367f6ec730539b8d",
+    "bin": [
+        "ARMClient.exe",
+        "AADClient.exe"
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/projectkudu/ARMClient/releases/download/v$version/ARMClient.zip"
+    }
+}

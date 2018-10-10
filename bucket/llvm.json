@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.llvm.org/",
-    "version": "6.0.1",
+    "version": "7.0.0",
     "license": "NCSA",
     "architecture": {
         "32bit": {
-            "url": "https://releases.llvm.org/6.0.1/LLVM-6.0.1-win32.exe#/llvm.7z",
-            "hash": "534dbe5931f48979e793ef4ab245eb47fbc9c40e6a5b9f25fbc599c787834d35"
+            "url": "https://releases.llvm.org/7.0.0/LLVM-7.0.0-win32.exe#/llvm.7z",
+            "hash": "c3aa07231ab84f7ab4bb47b3cda4393c8203f3254a04b602cdfdc116c4c058f5"
         },
         "64bit": {
-            "url": "https://releases.llvm.org/6.0.1/LLVM-6.0.1-win64.exe#/llvm.7z",
-            "hash": "780276221635aa08120187ffc2c72ff7873dee37f5609455ee7bba6fcdd91d79"
+            "url": "https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe#/llvm.7z",
+            "hash": "74b197a3959b0408adf0824be01db8dddfa2f9a967f4085af3fad900ed5fdbf6"
         }
     },
     "env_add_path": "bin",

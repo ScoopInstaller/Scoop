@@ -2,15 +2,16 @@
     "homepage": "https://github.com/datalust/seqcli",
     "description": "Seq command-line client",
     "license": "Apache-2.0",
-    "version": "0.1.137",
-    "url": "https://github.com/datalust/seqcli/releases/download/v0.1.137/seqcli-0.1.137.msi",
-    "hash": "207019fe2691a4a8d42ff653de6f9d90f6d545a54d77754b2dbe78c2b017f597",
-    "extract_dir": "SeqCli",
+    "version": "0.1.153",
+    "url": "https://github.com/datalust/seqcli/releases/download/v0.1.153/seqcli-0.1.153-win-x64.zip",
+    "hash": "7bb084a6268a55caef86711cf7e65ef70d776bf2285b0a5dbb6e21df10298ece",
+    "extract_dir": "seqcli-0.1.153-win-x64",
     "bin": [
         "seqcli.exe"
     ],
     "checkver": "github",
     "autoupdate": {
-        "url": "https://github.com/vitiral/artifact/releases/download/$version/seqcli-$version.msi"
+        "url": "https://github.com/datalust/seqcli/releases/download/v$version/seqcli-$version-win-x64.zip",
+        "extract_dir": "seqcli-$version-win-x64"
     }
 }
