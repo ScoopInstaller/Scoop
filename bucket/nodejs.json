@@ -1,17 +1,17 @@
 {
     "homepage": "https://nodejs.org",
-    "version": "10.11.0",
+    "version": "10.12.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nodejs.org/dist/v10.11.0/node-v10.11.0-win-x64.7z",
-            "hash": "631569ce1e7e2eba1d3b214e19c05b1f2e50a295a03c78836cfbccfb53670218",
-            "extract_dir": "node-v10.11.0-win-x64"
+            "url": "https://nodejs.org/dist/v10.12.0/node-v10.12.0-win-x64.7z",
+            "hash": "2d6f1b952d48a89d34a18b05cdef0af4f7ab13ba8c4f8dc42a458ea15023f645",
+            "extract_dir": "node-v10.12.0-win-x64"
         },
         "32bit": {
-            "url": "https://nodejs.org/dist/v10.11.0/node-v10.11.0-win-x86.7z",
-            "hash": "b40e2357d28598265d0da5309d3993320210bd15a7ef4e3bdfb60ebd4d145432",
-            "extract_dir": "node-v10.11.0-win-x86"
+            "url": "https://nodejs.org/dist/v10.12.0/node-v10.12.0-win-x86.7z",
+            "hash": "c376c7e3fe5de91c5e71fd4c7324f705679eb9899850851b93c2292eb85b4594",
+            "extract_dir": "node-v10.12.0-win-x86"
         }
     },
     "persist": [
