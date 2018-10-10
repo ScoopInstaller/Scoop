@@ -112,6 +112,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # re-use architecture, bucket and url from first install
     $architecture = ensure_architecture $install.architecture
     $bucket = $install.bucket
+    $app_name = $app
     if ($install.url) {
         $app = $install.url
     }
@@ -132,23 +133,23 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     if(!$force -and ($old_version -eq $version)) {
         if (!$quiet) {
-            warn "The latest version of '$app' ($version) is already installed."
+            warn "The latest version of '$app_name' ($version) is already installed."
         }
         return
     }
     if(!$version) {
         # installed from a custom bucket/no longer supported
-        error "No manifest available for '$app'."
+        error "No manifest available for '$app_name'."
         return
     }
 
     $manifest = manifest $app $bucket $url
 
-    write-host "Updating '$app' ($old_version -> $version)"
+    write-host "Updating '$app_name' ($old_version -> $version)"
 
     $dir = versiondir $app $old_version $global
 
-    write-host "Uninstalling '$app' ($old_version)"
+    write-host "Uninstalling '$app_name' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
     env_rm_path $old_manifest $dir $global
