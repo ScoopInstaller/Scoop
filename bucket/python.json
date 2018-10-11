@@ -45,6 +45,7 @@
         ]
     ],
     "env_add_path": [
+        ".",
         "scripts"
     ],
     "checkver": {
