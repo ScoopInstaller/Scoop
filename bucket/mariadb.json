@@ -34,7 +34,6 @@
         "bin\\mysqlimport.exe",
         "bin\\mysqlshow.exe",
         "bin\\mysqlslap.exe",
-        "bin\\mysql_client_test.exe",
         "bin\\mysql_install_db.exe",
         "bin\\mysql_plugin.exe",
         "bin\\mysql_tzinfo_to_sql.exe",
