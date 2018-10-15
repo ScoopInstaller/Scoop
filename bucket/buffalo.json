@@ -1,10 +1,10 @@
 {
     "homepage": "https://gobuffalo.io",
     "description": "A Go web development eco-system, designed to make the life of a Go web developer easier.",
-    "version": "0.12.8",
+    "version": "0.13.0",
     "license": "MIT",
-    "url": "https://github.com/gobuffalo/buffalo/releases/download/v0.12.8/buffalo_0.12.8_windows_amd64.tar.gz",
-    "hash": "8998cf0b0f958d1f732c97fd4bb9157a542f198c830878978b9c5e54b824370d",
+    "url": "https://github.com/gobuffalo/buffalo/releases/download/v0.13.0/buffalo_0.13.0_windows_amd64.tar.gz",
+    "hash": "4bc420c0ceb9bf8fce6f1ab79d809538ef9da52727e3c158cb390cb244517453",
     "bin": [
         [
             "buffalo.exe",
