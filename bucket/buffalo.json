@@ -7,7 +7,7 @@
     "hash": "4bc420c0ceb9bf8fce6f1ab79d809538ef9da52727e3c158cb390cb244517453",
     "bin": [
         [
-            "buffalo.exe",
+            "buffalo-no-sqlite.exe",
             "buffalo"
         ]
     ],
