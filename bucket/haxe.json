@@ -11,6 +11,7 @@
     "env_set": {
         "HAXEPATH": "$dir"
     },
+    "persist": "lib",
     "depends": "neko",
     "pre_install": [
         "if(Test-Path \"$dir\\haxe_*\") {",
