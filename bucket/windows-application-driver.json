@@ -2,7 +2,7 @@
     "version": "1.1",
     "description": "Supports Selenium-like UI Test Automation on Windows Applications.",
     "homepage": "https://github.com/Microsoft/WinAppDriver",
-    "license" : {
+    "license": {
         "identifier": "MIT",
         "url": "https://github.com/Microsoft/WinAppDriver/blob/master/LICENSE"
     },
