@@ -1,9 +1,9 @@
 {
     "homepage": "https://gitversion.readthedocs.io/",
     "license": "MIT",
-    "version": "3.6.5",
-    "url": "https://github.com/GitTools/GitVersion/releases/download/v3.6.5/GitVersion.Portable.3.6.5.nupkg#/dl.7z",
-    "hash": "2715ec558d12215aae2f25f16a5865fc2a8cb8bf790ac57e74c1a95844145193",
+    "version": "4.0.0",
+    "url": "https://github.com/GitTools/GitVersion/releases/download/v4.0.0/GitVersion.Portable.4.0.0.nupkg#/dl.7z",
+    "hash": "69b0f096d172199365618372e24adb76b9f75fe762e7d30fd769b4e6338a79e6",
     "bin": "GitVersion.exe",
     "extract_dir": "tools",
     "post_install": "Remove-Item \"$dir\\*.ps1\"",
