@@ -10,6 +10,12 @@
             "/D=$dir"
         ]
     },
+    "uninstaller": {
+        "file": "uninstall.exe",
+        "args": [
+            "/S"
+        ]
+    },
     "bin": [
         "DOSBox.exe",
         "SDL.dll",
