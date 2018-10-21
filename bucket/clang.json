@@ -1,0 +1,62 @@
+{
+    "homepage": "https://clang.llvm.org/",
+    "description": "C/C++ compiler and related tools",
+    "license": "NCSA",
+    "version": "7.0.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe#/dl.7z",
+            "hash": "74b197a3959b0408adf0824be01db8dddfa2f9a967f4085af3fad900ed5fdbf6"
+        },
+        "32bit": {
+            "url": "https://releases.llvm.org/7.0.0/LLVM-7.0.0-win32.exe#/dl.7z",
+            "hash": "c3aa07231ab84f7ab4bb47b3cda4393c8203f3254a04b602cdfdc116c4c058f5"
+        }
+    },
+    "bin": [
+        "bin/clang-apply-replacements.exe",
+        "bin/clang-change-namespace.exe",
+        "bin/clang-check.exe",
+        "bin/clang-cl.exe",
+        "bin/clang-cpp.exe",
+        "bin/clangd.exe",
+        "bin/clang++.exe",
+        "bin/clang.exe",
+        "bin/clang-format.exe",
+        "bin/clang-func-mapping.exe",
+        "bin/clang-import-test.exe",
+        "bin/clang-include-fixer.exe",
+        "bin/clang-offload-bundler.exe",
+        "bin/clang-query.exe",
+        "bin/clang-refactor.exe",
+        "bin/clang-rename.exe",
+        "bin/clang-reorder-fields.exe",
+        "bin/clang-tidy.exe",
+        "bin/find-all-symbols.exe",
+        "bin/ld64.lld.exe",
+        "bin/ld.lld.exe",
+        "bin/lld.exe",
+        "bin/lld-link.exe",
+        "bin/llvm-ar.exe",
+        "bin/llvm-lib.exe",
+        "bin/llvm-objdump.exe",
+        "bin/llvm-ranlib.exe",
+        "bin/llvm-rc.exe",
+        "bin/modularize.exe",
+        "bin/wasm-ld.exe"
+    ],
+    "checkver": {
+        "url": "https://releases.llvm.org/download.html",
+        "re": "Download LLVM ([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://releases.llvm.org/$version/LLVM-$version-win64.exe#/dl.7z"
+            },
+            "32bit": {
+                "url": "https://releases.llvm.org/$version/LLVM-$version-win32.exe#/dl.7z"
+            }
+        }
+    }
+}
