@@ -1,0 +1,15 @@
+{
+    "homepage": "https://github.com/CobaltFusion/DebugViewPP",
+    "description": "DebugView++, collect, view and filter your application logs",
+    "license": "BSL-1.0",
+    "version": "1.8.0.34",
+    "url": "https://github.com/CobaltFusion/DebugViewPP/releases/download/v1.8.0.34/DebugView++.zip",
+    "hash": "677389538cd593e10b79c12c113cbda4038a9ca1ea205454c30ebd64d815072d",
+    "bin": [
+        "DebugView++.exe"
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/CobaltFusion/DebugViewPP/releases/download/v$version/DebugView++.zip"
+    }
+}
