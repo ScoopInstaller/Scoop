@@ -28,8 +28,8 @@
         "if(!(test-path 'C:\\data\\db')) { mkdir 'C:\\data\\db' > $null }"
     ],
     "checkver": {
-        "url": "https://www.mongodb.com/download-center",
-        "re": "Current Stable Release \\(([\\d.]+)\\)"
+        "url": "https://www.mongodb.com/download-center/community",
+        "re": "([\\d.]+) \\(current release\\)"
     },
     "autoupdate": {
         "architecture": {
