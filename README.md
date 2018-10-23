@@ -10,7 +10,7 @@ Scoop is a command-line installer for Windows.
 
 ## Installation
 
-Run this command from you PowerShell to install scoop to it's default location (`C:\Users\<user>\scoop`)
+Run this command from your PowerShell to install scoop to its default location (`C:\Users\<user>\scoop`)
 ```powershell
 iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 ```
