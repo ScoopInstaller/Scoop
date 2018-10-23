@@ -3,19 +3,13 @@
     "description": "A Windows installer package of Openssh for Windows that is actively maintained and current.",
     "license": "ISC",
     "version": "7.8p1-1",
-    "url": "https://www.mls-software.com/files/setupssh-7.8p1-1.exe#/setupssh.exe",
+    "url": "https://www.mls-software.com/files/setupssh-7.8p1-1.exe#/dl.7z",
     "hash": "sha1:ef12f4c3148e95134614e2dd0a2b71cedb545027",
-    "installer": {
-        "args": [
-            "/S /clientonly=1 /D=$dir"
-        ]
-    },
-    "uninstaller": {
-        "file": "uninstall.exe",
-        "args": [
-            "/S"
-        ]
-    },
+    "post_install": [
+        "Remove-Item \"$dir\\`$PLUGINSDIR\" -Recurse",
+        "Remove-Item \"$dir\\`$TEMP\" -Recurse",
+        "Remove-Item \"$dir\\uninstall.exe\""
+    ],
     "bin": [
         "bin\\scp.exe",
         "bin\\sftp.exe",
@@ -30,7 +24,7 @@
         "re": "New Version<.*\\n<b>OpenSSH (?<version>[\\d.\\-p]+)<br />"
     },
     "autoupdate": {
-        "url": "https://www.mls-software.com/files/setupssh-$version.exe#/setupssh.exe",
+        "url": "https://www.mls-software.com/files/setupssh-$version.exe#/dl.7z",
         "hash": {
             "url": "https://www.mls-software.com/opensshd.html",
             "find": "$basename</a.*\\n<.*<small>SHA1=([a-fA-F0-9]+)</small>"
