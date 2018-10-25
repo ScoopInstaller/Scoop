@@ -12,7 +12,7 @@ if(($PSVersionTable.PSVersion.Major) -lt 3) {
 }
 
 # show notification to change execution policy:
-if((get-executionpolicy) -gt 'RemoteSigned') {
+if((get-executionpolicy -scope CurrentUser) -gt 'RemoteSigned') {
     Write-Output "PowerShell requires an execution policy of 'RemoteSigned' to run Scoop."
     Write-Output "To make this change please run:"
     Write-Output "'Set-ExecutionPolicy RemoteSigned -scope CurrentUser'"
