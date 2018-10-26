@@ -6,7 +6,7 @@
         "url": "https://dev.perl.org/licenses/"
     },
     "url": "https://downloads.sourceforge.net/project/exiftool/exiftool-11.16.zip",
-    "hash": "sha1:e4109f5b85e86cf585b303635674590c3fb332e1",
+    "hash": "sha1:ea7b2c7f8158b4d3d7c1175e184db811cc83be5d",
     "bin": [
         [
             "exiftool(-k).exe",
