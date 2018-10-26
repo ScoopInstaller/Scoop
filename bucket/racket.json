@@ -1,15 +1,15 @@
 {
-    "version": "7.0",
+    "version": "7.1",
     "homepage": "https://racket-lang.org",
     "license": "LGPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://mirror.racket-lang.org/installers/7.0/racket-7.0-x86_64-win32.exe#/dl.7z",
-            "hash": "39784c066be45fde89bec1ce7cf5e9200a79efd6fe7ed996ad44cc6d535dddd0"
+            "url": "https://mirror.racket-lang.org/installers/7.1/racket-7.1-x86_64-win32.exe#/dl.7z",
+            "hash": "788a9d1e37e9ca16cf39f9328afa8d8e2017d7a1d7de581baa4b50c0fd7af26e"
         },
         "32bit": {
-            "url": "https://mirror.racket-lang.org/installers/7.0/racket-7.0-i386-win32.exe#/dl.7z",
-            "hash": "1366343c3dfe8fee70db0358d52eae31e46cede0a6787f2ebfa590e455137e2c"
+            "url": "https://mirror.racket-lang.org/installers/7.1/racket-7.1-i386-win32.exe#/dl.7z",
+            "hash": "d561713d1356f1c12d1fbb20f9d6246c1031856b97d17f51365cabf582302125"
         }
     },
     "bin": [
