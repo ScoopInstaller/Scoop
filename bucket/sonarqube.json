@@ -2,7 +2,7 @@
     "homepage": "https://www.sonarqube.org",
     "version": "7.3",
     "license": "LGPL-3.0",
-    "url": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-7.3.zip",
+    "url": "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.3.zip",
     "hash": "sha1:8c7a42bcdde9495c0449ed44496793c246cb829a",
     "architecture": {
         "64bit": {
@@ -31,7 +31,7 @@
         "re": "sonarqube-([\\d\\.]+).zip"
     },
     "autoupdate": {
-        "url": "https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-$version.zip",
+        "url": "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-$version.zip",
         "extract_dir": "sonarqube-$version",
         "hash": {
             "url": "$url.sha"
