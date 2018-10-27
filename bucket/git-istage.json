@@ -17,13 +17,13 @@
     "license": "MIT",
     "installer": {
         "script": [
-            "Move-Item $dir\\$version $dir\\git-istage.$version.nupkg",
+            "Move-Item \"$dir\\$version\" \"$dir\\git-istage.$version.nupkg\"",
             "$nugetConfig = \"<?xml version=`\"1.0`\" encoding=`\"utf-8`\"?><configuration><packageSources><clear /><add key=`\"Local`\" value=`\"$dir`\" /></packageSources></configuration>\"",
             "$nugetConfigFile = \"$dir\\nuget.config\"",
-            "$nugetConfig | Out-File -Encoding UTF8 $nugetConfigFile",
-            "dotnet tool install git-istage --tool-path $dir --configfile $nugetConfigFile",
+            "$nugetConfig | Out-File -Encoding UTF8 \"$nugetConfigFile\"",
+            "dotnet tool install git-istage --tool-path \"$dir\" --configfile \"$nugetConfigFile\"",
             "$runCommand = \"if (-not (Test-Path env:DOTNET_ROOT)) { `$env:DOTNET_ROOT=Split-Path -Parent (Get-Command dotnet).Path } & `\"$dir\\git-istage.exe`\" `$args\"",
-            "$runCommand | Out-File -Encoding UTF8 $dir\\run.ps1"
+            "$runCommand | Out-File -Encoding UTF8 \"$dir\\run.ps1\""
         ]
     },
     "bin": [
