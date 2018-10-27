@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/sharkdp/fd",
     "license": "MIT",
-    "version": "7.1.0",
+    "version": "7.2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/sharkdp/fd/releases/download/v7.1.0/fd-v7.1.0-x86_64-pc-windows-msvc.zip",
-            "hash": "2a8f64fc7a1c6b43a0290896ace44b99a923739c43357972bc6c98fa4cfb1b10"
+            "url": "https://github.com/sharkdp/fd/releases/download/v7.2.0/fd-v7.2.0-x86_64-pc-windows-msvc.zip",
+            "hash": "c5616586befa3fc7658b7ef0e07e29829d76cca17d69638f41bcc84e9e71abe0"
         },
         "32bit": {
-            "url": "https://github.com/sharkdp/fd/releases/download/v7.1.0/fd-v7.1.0-i686-pc-windows-msvc.zip",
-            "hash": "510d1c4a0adcacb6508f0e360c9eee344f6eaef25be760674204d6c1c8f2e5d0"
+            "url": "https://github.com/sharkdp/fd/releases/download/v7.2.0/fd-v7.2.0-i686-pc-windows-msvc.zip",
+            "hash": "b4c785cfe48a0144b23a87619891c840f652d6635ee1a42b3323917d1fb217fe"
         }
     },
     "bin": "fd.exe",
