@@ -1,16 +1,16 @@
 {
     "homepage": "https://curl.haxx.se/windows/",
-    "version": "1.1.1_7",
+    "version": "1.1.1_8",
     "license": "OpenSSL",
     "architecture": {
         "64bit": {
-            "url": "https://curl.haxx.se/windows/dl-7.61.1_7/openssl-1.1.1_7-win64-mingw.tar.xz",
-            "hash": "daba0971a0a54b6691732f4502d3cf7a36c8295bd7b9621f6deaa76d0c4c883a",
+            "url": "https://curl.haxx.se/windows/dl-7.61.1_8/openssl-1.1.1_8-win64-mingw.tar.xz",
+            "hash": "dd4c5fae74069ac9b2ac641d547c23ef5cf2efdc3e4d3f11f0d359c3660a0d07",
             "extract_dir": "openssl-1.1.1-win64-mingw"
         },
         "32bit": {
-            "url": "https://curl.haxx.se/windows/dl-7.61.1_7/openssl-1.1.1_7-win32-mingw.tar.xz",
-            "hash": "e9dfd3224088de50e0fa28bbe82a7dcb38dccfd87fe1510abffd3a1844c9ab77",
+            "url": "https://curl.haxx.se/windows/dl-7.61.1_8/openssl-1.1.1_8-win32-mingw.tar.xz",
+            "hash": "fbf3c64ef8e808e2fea0017252330c311669970a62d2550463833b25d9b3794a",
             "extract_dir": "openssl-1.1.1-win32-mingw"
         }
     },
