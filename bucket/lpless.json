@@ -1,0 +1,10 @@
+{
+    "version":  "1.1.0",
+    "extract_dir":  "tools",
+    "url":  "https://www.nuget.org/api/v2/package/LinqPadless/1.1.0#lpless.zip",
+    "homepage":  "https://github.com/linqpadless/LinqPadless",
+    "hash":  "a0a2a261460ae18ab00be7e57a3e3b81d80f4a39b79160c8c7e0092492c216af",
+    "bin":  "lpless.exe",
+	"description": "LINQPadless compiles LINQPad query files into stand-alone C# scripts (csx) or executable binaries so that they can be run outside and independent of LINQPad",
+	"extract_dir": "tools"
+}
