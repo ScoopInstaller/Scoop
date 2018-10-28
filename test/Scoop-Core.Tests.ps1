@@ -12,14 +12,14 @@ describe "is_directory" -Tag 'Scoop' {
     }
 
     it "is_directory recognize directories" {
-        is_directory "$working_dir\i_am_a_directory" | Should be $true
+        is_directory "$working_dir\i_am_a_directory" | should -be $true
     }
     it "is_directory recognize files" {
-        is_directory "$working_dir\i_am_a_file.txt" | Should be $false
+        is_directory "$working_dir\i_am_a_file.txt" | should -be $false
     }
 
     it "is_directory is falsey on unknown path" {
-        is_directory "$working_dir\i_do_not_exist" | Should be $false
+        is_directory "$working_dir\i_do_not_exist" | should -be $false
     }
 }
 
@@ -35,29 +35,29 @@ describe "movedir" -Tag 'Scoop' {
         $dir = "$working_dir\user"
         movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
-        "$dir\test.txt" | should FileContentMatch "this is the one"
-        "$dir\_tmp\$extract_dir" | should not exist
+        "$dir\test.txt" | should -FileContentMatch "this is the one"
+        "$dir\_tmp\$extract_dir" | should -not -exist
     }
 
     it "moves directories with spaces in path" -skip:$isUnix {
         $dir = "$working_dir\user with space"
         movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
-        "$dir\test.txt" | should FileContentMatch "this is the one"
-        "$dir\_tmp\$extract_dir" | should not exist
+        "$dir\test.txt" | should -FileContentMatch "this is the one"
+        "$dir\_tmp\$extract_dir" | should -not -exist
 
         # test trailing \ in from dir
         movedir "$dir\_tmp\$null" "$dir\another"
-        "$dir\another\test.txt" | should FileContentMatch "testing"
-        "$dir\_tmp" | should not exist
+        "$dir\another\test.txt" | should -FileContentMatch "testing"
+        "$dir\_tmp" | should -not -exist
     }
 
     it "moves directories with quotes in path" -skip:$isUnix {
         $dir = "$working_dir\user with 'quote"
         movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
-        "$dir\test.txt" | should FileContentMatch "this is the one"
-        "$dir\_tmp\$extract_dir" | should not exist
+        "$dir\test.txt" | should -FileContentMatch "this is the one"
+        "$dir\_tmp\$extract_dir" | should -not -exist
     }
 }
 
@@ -80,39 +80,39 @@ describe "unzip_old" -Tag 'Scoop' {
 
     context "zip file size is zero bytes" {
         $zerobyte = "$working_dir\zerobyte.zip"
-        $zerobyte | should exist
+        $zerobyte | should -exist
 
         it "unzips file with zero bytes without error" -skip:$isUnix {
             # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
             # `$to = test-unzip $zerobyte` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
             $to = ([string](test-unzip $zerobyte)).trimStart()
 
-            $to | should not match '^\s'
-            $to | should not be NullOrEmpty
+            $to | should -not -match '^\s'
+            $to | should -not -benullorempty
 
-            $to | should exist
+            $to | should -exist
 
-            (Get-ChildItem $to).count | should be 0
+            (Get-ChildItem $to).count | should -be 0
         }
     }
 
     context "zip file is small in size" {
         $small = "$working_dir\small.zip"
-        $small | should exist
+        $small | should -exist
 
         it "unzips file which is small in size" -skip:$isUnix {
             # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
             # `$to = test-unzip $small` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
             $to = ([string](test-unzip $small)).trimStart()
 
-            $to | should not match '^\s'
-            $to | should not be NullOrEmpty
+            $to | should -not -match '^\s'
+            $to | should -not -benullorempty
 
-            $to | should exist
+            $to | should -exist
 
             # these don't work for some reason on appveyor
-            #join-path $to "empty" | should exist
-            #(gci $to).count | should be 1
+            #join-path $to "empty" | should -exist
+            #(gci $to).count | should -be 1
         }
     }
 }
@@ -125,26 +125,26 @@ describe "shim" -Tag 'Scoop' {
     }
 
     it "links a file onto the user's path" -skip:$isUnix {
-        { get-command "shim-test" -ea stop } | should throw
-        { get-command "shim-test.ps1" -ea stop } | should throw
-        { get-command "shim-test.cmd" -ea stop } | should throw
-        { shim-test } | should throw
+        { get-command "shim-test" -ea stop } | should -throw
+        { get-command "shim-test.ps1" -ea stop } | should -throw
+        { get-command "shim-test.cmd" -ea stop } | should -throw
+        { shim-test } | should -throw
 
         shim "$working_dir\shim-test.ps1" $false "shim-test"
-        { get-command "shim-test" -ea stop } | should not throw
-        { get-command "shim-test.ps1" -ea stop } | should not throw
-        { get-command "shim-test.cmd" -ea stop } | should not throw
-        shim-test | should be "Hello, world!"
+        { get-command "shim-test" -ea stop } | should -not -throw
+        { get-command "shim-test.ps1" -ea stop } | should -not -throw
+        { get-command "shim-test.cmd" -ea stop } | should -not -throw
+        shim-test | should -be "Hello, world!"
     }
 
     context "user with quote" {
         it "shims a file with quote in path" -skip:$isUnix {
-            { get-command "shim-test" -ea stop } | should throw
-            { shim-test } | should throw
+            { get-command "shim-test" -ea stop } | should -throw
+            { shim-test } | should -throw
 
             shim "$working_dir\user with 'quote\shim-test.ps1" $false "shim-test"
-            { get-command "shim-test" -ea stop } | should not throw
-            shim-test | should be "Hello, world!"
+            { get-command "shim-test" -ea stop } | should -not -throw
+            shim-test | should -be "Hello, world!"
         }
     }
 
@@ -165,10 +165,10 @@ describe "rm_shim" -Tag 'Scoop' {
 
         rm_shim "shim-test" $shimdir
 
-        { get-command "shim-test" -ea stop } | should throw
-        { get-command "shim-test.ps1" -ea stop } | should throw
-        { get-command "shim-test.cmd" -ea stop } | should throw
-        { shim-test } | should throw
+        { get-command "shim-test" -ea stop } | should -throw
+        { get-command "shim-test.ps1" -ea stop } | should -throw
+        { get-command "shim-test.cmd" -ea stop } | should -throw
+        { shim-test } | should -throw
     }
 }
 
@@ -180,7 +180,7 @@ Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
     }
 
     It "returns empty string if file does not exist" -skip:$isUnix {
-        get_app_name_from_ps1_shim "non-existent-file" | should be ""
+        get_app_name_from_ps1_shim "non-existent-file" | should -be ""
     }
 
     It "returns app name if file exists and is a shim to an app" -skip:$isUnix {
@@ -188,18 +188,18 @@ Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
         Write-Output "" | Out-File "$working_dir/mockapp/current/mockapp.ps1"
         shim "$working_dir/mockapp/current/mockapp.ps1" $false "shim-test"
         $shim_path = (get-command "shim-test.ps1").Path
-        get_app_name_from_ps1_shim "$shim_path" | should be "mockapp"
+        get_app_name_from_ps1_shim "$shim_path" | should -be "mockapp"
     }
 
     It "returns app name if file exists and is a shim to an app cerca August 2018" -skip:$isUnix {
         Write-Output '$path = join-path "$psscriptroot" "..\apps\vim\current\vim.exe"' | Out-File "$working_dir/moch-shim.ps1" -Encoding utf8
         Write-Output 'if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }' | Out-File "$working_dir/moch-shim.ps1" -Append -Encoding utf8
-        get_app_name_from_ps1_shim "$working_dir/moch-shim.ps1" | should be "vim"
+        get_app_name_from_ps1_shim "$working_dir/moch-shim.ps1" | should -be "vim"
     }
 
     It "returns empty string if file exists and is not a shim" -skip:$isUnix {
         Write-Output "lorem ipsum" | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
-        get_app_name_from_ps1_shim "$working_dir/mock-shim.ps1" | should be ""
+        get_app_name_from_ps1_shim "$working_dir/mock-shim.ps1" | should -be ""
     }
 
     AfterEach {
@@ -222,12 +222,12 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
     context "robocopy is not in path" {
         it "shims robocopy when not on path" -skip:$isUnix {
             mock gcm { $false }
-            Get-Command robocopy | should be $false
+            Get-Command robocopy | should -be $false
 
             ensure_robocopy_in_path
 
-            "$shimdir/robocopy.ps1" | should exist
-            "$shimdir/robocopy.exe" | should exist
+            "$shimdir/robocopy.ps1" | should -exist
+            "$shimdir/robocopy.exe" | should -exist
 
             # clean up
             rm_shim robocopy $(shimdir $false) | out-null
@@ -239,8 +239,8 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
             mock gcm { $true }
             ensure_robocopy_in_path
 
-            "$shimdir/robocopy.ps1" | should not exist
-            "$shimdir/robocopy.exe" | should not exist
+            "$shimdir/robocopy.ps1" | should -not -exist
+            "$shimdir/robocopy.exe" | should -not -exist
         }
     }
 }
@@ -250,7 +250,7 @@ describe 'sanitary_path' -Tag 'Scoop' {
     $path = 'test?.json'
     $valid_path = sanitary_path $path
 
-    $valid_path | should be "test.json"
+    $valid_path | should -be "test.json"
   }
 }
 
@@ -258,74 +258,74 @@ describe 'app' -Tag 'Scoop' {
     it 'parses the bucket name from an app query' {
         $query = "C:\test.json"
         $app, $bucket, $version = parse_app $query
-        $app | should be "C:\test.json"
-        $bucket | should be $null
-        $version | should be $null
+        $app | should -be "C:\test.json"
+        $bucket | should -benullorempty
+        $version | should -benullorempty
 
         $query = "test.json"
         $app, $bucket, $version = parse_app $query
-        $app | should be "test.json"
-        $bucket | should be $null
-        $version | should be $null
+        $app | should -be "test.json"
+        $bucket | should -benullorempty
+        $version | should -benullorempty
 
         $query = ".\test.json"
         $app, $bucket, $version = parse_app $query
-        $app | should be ".\test.json"
-        $bucket | should be $null
-        $version | should be $null
+        $app | should -be ".\test.json"
+        $bucket | should -benullorempty
+        $version | should -benullorempty
 
         $query = "..\test.json"
         $app, $bucket, $version = parse_app $query
-        $app | should be "..\test.json"
-        $bucket | should be $null
-        $version | should be $null
+        $app | should -be "..\test.json"
+        $bucket | should -benullorempty
+        $version | should -benullorempty
 
         $query = "\\share\test.json"
         $app, $bucket, $version = parse_app $query
-        $app | should be "\\share\test.json"
-        $bucket | should be $null
-        $version | should be $null
+        $app | should -be "\\share\test.json"
+        $bucket | should -benullorempty
+        $version | should -benullorempty
 
         $query = "https://example.com/test.json"
         $app, $bucket, $version = parse_app $query
-        $app | should be "https://example.com/test.json"
-        $bucket | should be $null
-        $version | should be $null
+        $app | should -be "https://example.com/test.json"
+        $bucket | should -benullorempty
+        $version | should -benullorempty
 
         $query = "test"
         $app, $bucket, $version = parse_app $query
-        $app | should be "test"
-        $bucket | should be $null
-        $version | should be $null
+        $app | should -be "test"
+        $bucket | should -benullorempty
+        $version | should -benullorempty
 
         $query = "extras/enso"
         $app, $bucket, $version = parse_app $query
-        $app | should be "enso"
-        $bucket | should be "extras"
-        $version | should be $null
+        $app | should -be "enso"
+        $bucket | should -be "extras"
+        $version | should -benullorempty
 
         $query = "test-app"
         $app, $bucket, $version = parse_app $query
-        $app | should be "test-app"
-        $bucket | should be $null
-        $version | should be $null
+        $app | should -be "test-app"
+        $bucket | should -benullorempty
+        $version | should -benullorempty
 
         $query = "test-bucket/test-app"
         $app, $bucket, $version = parse_app $query
-        $app | should be "test-app"
-        $bucket | should be "test-bucket"
-        $version | should be $null
+        $app | should -be "test-app"
+        $bucket | should -be "test-bucket"
+        $version | should -benullorempty
 
         $query = "test-bucket/test-app@1.8.0"
         $app, $bucket, $version = parse_app $query
-        $app | should be "test-app"
-        $bucket | should be "test-bucket"
-        $version | should be "1.8.0"
+        $app | should -be "test-app"
+        $bucket | should -be "test-bucket"
+        $version | should -be "1.8.0"
 
         $query = "test-bucket/test-app@1.8.0-rc2"
         $app, $bucket, $version = parse_app $query
-        $app | should be "test-app"
-        $bucket | should be "test-bucket"
-        $version | should be "1.8.0-rc2"
+        $app | should -be "test-app"
+        $bucket | should -be "test-bucket"
+        $version | should -be "1.8.0-rc2"
     }
 }
