@@ -18,15 +18,15 @@ function known_bucket_repo($name) {
 }
 
 function apps_in_bucket($dir) {
-    Get-ChildItem $dir | Where-Object { $_.name.endswith('.json') } | ForEach-Object { $_ -replace '.json$', '' }
+    return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
 }
 
 function buckets {
     $buckets = @()
     if(test-path $bucketsdir) {
-        Get-ChildItem $bucketsdir | ForEach-Object { $buckets += $_.name }
+        Get-ChildItem $bucketsdir | ForEach-Object { $buckets += $_.Name }
     }
-    $buckets
+    return $buckets
 }
 
 function find_manifest($app, $bucket) {
