@@ -1,9 +1,17 @@
 {
     "homepage": "https://github.com/UB-Mannheim/tesseract/wiki",
     "license": "Apache-2.0",
-    "version": "3.05.02-20180621",
-    "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-3.05.02-20180621.exe#/dl.7z",
-    "hash": "26bd9ab1fadf0334a6fb60a45269d87e8a60824df82b7cc74c6d665c0fc1ec0c",
+    "version": "4.0.0.20181030",
+    "architecture": {
+        "64bit": {
+            "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-v4.0.0.20181030.exe#/dl.7z",
+            "hash": "f590c1fb1a5e02781635758eada2d87084d64d1e6fb0f761ef8237e60d7ea8ea"
+        },
+        "32bit": {
+            "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w32-setup-v4.0.0.20181030.exe#/dl.7z",
+            "hash": "edd28909ffb1d6961f9155441b8d9d5584c99cc8633ad5bb92f8bf4098201ea6"
+        }
+    },
     "bin": [
         "ambiguous_words.exe",
         "classifier_tester.exe",
@@ -26,10 +34,17 @@
     ],
     "notes": "Language data files can be downloaded from https://github.com/tesseract-ocr/tessdata",
     "checkver": {
-        "re": "tesseract-ocr-setup-(?<version>3.[\\d\\w.-]+).exe",
-        "url": "https://github.com/UB-Mannheim/tesseract/wiki"
+        "re": "tesseract-ocr-w32-setup-v(?<version>[\\d.]+).exe",
+        "url": "https://digi.bib.uni-mannheim.de/tesseract/"
     },
     "autoupdate": {
-        "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-setup-$version.exe#/dl.7z"
+        "architecture": {
+            "64bit": {
+                "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-v$version.exe#/dl.7z"
+            },
+            "32bit": {
+                "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w32-setup-v$version.exe#/dl.7z"
+            }
+        }
     }
 }
