@@ -16,8 +16,12 @@
         "ambiguous_words.exe",
         "classifier_tester.exe",
         "cntraining.exe",
+        "combine_lang_model.exe",
         "combine_tessdata.exe",
         "dawg2wordlist.exe",
+        "lstmeval.exe",
+        "lstmtraining.exe",
+        "merge_unicharsets.exe",
         "mftraining.exe",
         "set_unicharset_properties.exe",
         "shapeclustering.exe",
@@ -27,7 +31,7 @@
         "wordlist2dawg.exe"
     ],
     "env_set": {
-        "TESSDATA_PREFIX": "$dir"
+        "TESSDATA_PREFIX": "$persist_dir\\tessdata"
     },
     "persist": [
         "tessdata"
