@@ -348,6 +348,32 @@
                     "uniqueItems": true
                 }
             ]
+        },
+        "licenseIdentifiers": {
+            "type": "string",
+            "description": "License identifier based on SPDX License List https://spdx.org/licenses/",
+            "examples": [
+                "Apache-2.0",
+                "BSD-3-Clause",
+                "Freeware",
+                "GPL-2.0-only",
+                "GPL-2.0-or-later",
+                "GPL-3.0-only",
+                "GPL-3.0-or-later",
+                "ISC",
+                "LGPL-2.0-only",
+                "LGPL-2.0-or-later",
+                "LGPL-2.1-only",
+                "LGPL-2.1-or-later",
+                "LGPL-3.0-only",
+                "LGPL-3.0-or-later",
+                "MIT",
+                "MS-PL",
+                "Proprietary",
+                "Public Domain",
+                "Shareware",
+                "Unlicense"
+            ]
         }
     },
     "properties": {
@@ -423,7 +449,7 @@
         "license": {
             "anyOf": [
                 {
-                    "type": "string"
+                    "$ref": "#/definitions/licenseIdentifiers"
                 },
                 {
                     "additionalProperties": false,
@@ -433,7 +459,7 @@
                             "type": "string"
                         },
                         "identifier": {
-                            "type": "string"
+                            "$ref": "#/definitions/licenseIdentifiers"
                         }
                     },
                     "required": [
