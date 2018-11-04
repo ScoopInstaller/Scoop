@@ -1223,14 +1223,12 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             write-host "Persisting $source"
 
             # add base paths
-            if (is_directory (fullpath "$dir\$source")) {
+            if (!(Test-Path(fullpath "$dir\$source")) -or (is_directory(fullpath "$dir\$source"))) {
                 $source = New-Object System.IO.DirectoryInfo(fullpath "$dir\$source")
+                $target = New-Object System.IO.DirectoryInfo(fullpath "$persist_dir\$target")
             } else {
                 $source = New-Object System.IO.FileInfo(fullpath "$dir\$source")
-            }
-            $target = New-Object System.IO.FileInfo(fullpath "$persist_dir\$target")
-            if(!$target.Extension -and !$source.Exists) {
-                $target = New-Object System.IO.DirectoryInfo($target.FullName)
+                $target = New-Object System.IO.FileInfo(fullpath "$persist_dir\$target")
             }
 
             if (!$target.Exists) {
