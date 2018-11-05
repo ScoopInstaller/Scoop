@@ -394,7 +394,7 @@ function shim($path, $global, $name, $arg) {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
-        "#!/bin/sh`ncmd.exe /C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        "#!/bin/sh`nMSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.ps1$') {
         # make ps1 accessible from cmd.exe
         "@echo off
