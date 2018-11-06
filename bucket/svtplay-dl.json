@@ -1,13 +1,17 @@
 {
-    "version":  "2.1",
-    "license":  "MIT",
-    "description":"svtplay-dl cli program for downloading media",
-    "url":  "https://svtplay-dl.se/download/2.1/svtplay-dl.zip",
-    "homepage":  "https://svtplay-dl.se/",
-    "hash":  "40593e54b2054a955042b42577629413442b6cb59d6a85f99d063f3fb874043b",
-    "bin":  "svtplay-dl.exe",
+    "version": "2.1",
+    "license": "MIT",
+    "description": "svtplay-dl cli program for downloading media",
+    "url": "https://svtplay-dl.se/download/2.1/svtplay-dl.zip",
+    "homepage": "https://svtplay-dl.se/",
+    "hash": "40593e54b2054a955042b42577629413442b6cb59d6a85f99d063f3fb874043b",
+    "extract_dir": "svtplay-dl",
+    "bin": "svtplay-dl.exe",
     "checkver": "<p.*>Currently v([\\d\\.\\d]+) \\(.*\\)</p>",
     "autoupdate": {
         "url": "https://svtplay-dl.se/download/$version/svtplay-dl.zip"
+    },
+    "suggest": {
+        "ffmpeg for joining audio and video streams": ["ffmpeg"]
     }
 }
