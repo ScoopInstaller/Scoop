@@ -1,43 +1,60 @@
 {
     "homepage": "https://dev.mysql.com/downloads/mysql/",
-    "version": "5.7.22",
+    "version": "8.0.13",
     "license": "GPL-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://dev.mysql.com/get/mysql-5.7.22-winx64.zip",
-            "hash": "5494b1facbea8daaa25862e9a4ee298a98c47fbb3eff5529f9779fd8486a5abe",
-            "extract_dir": "mysql-5.7.22-winx64"
-        },
-        "32bit": {
-            "url": "https://dev.mysql.com/get/mysql-5.7.22-win32.zip",
-            "hash": "c998915403cb52c0eca19291606db944c9fa8bcf06722e70226a591c80e97ea8",
-            "extract_dir": "mysql-5.7.22-win32"
+            "url": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.13-winx64.zip",
+            "hash": "7221ae12ed6adeecb3ca0467144e30d12e28d9ca19c848eee87905a85a189274",
+            "extract_dir": "mysql-8.0.13-winx64"
         }
     },
     "bin": [
-        "bin\\mysqld.exe",
-        "bin\\mysql.exe",
-        "bin\\mysqldump.exe",
-        "bin\\mysqladmin.exe",
-        "bin\\mysqlbinlog.exe",
-        "bin\\mysqlcheck.exe",
-        "bin\\mysqlimport.exe",
-        "bin\\mysqlshow.exe",
-        "bin\\mysqlslap.exe",
-        "bin\\my_print_defaults.exe"
+        "bin/ibd2sdi.exe",
+        "bin/innochecksum.exe",
+        "bin/lz4_decompress.exe",
+        "bin/myisamchk.exe",
+        "bin/myisamlog.exe",
+        "bin/myisampack.exe",
+        "bin/myisam_ftdump.exe",
+        "bin/mysql.exe",
+        "bin/mysqladmin.exe",
+        "bin/mysqlbinlog.exe",
+        "bin/mysqlcheck.exe",
+        "bin/mysqld.exe",
+        "bin/mysqldump.exe",
+        "bin/mysqlimport.exe",
+        "bin/mysqlpump.exe",
+        "bin/mysqlrouter.exe",
+        "bin/mysqlrouter_plugin_info.exe",
+        "bin/mysqlshow.exe",
+        "bin/mysqlslap.exe",
+        "bin/mysql_config_editor.exe",
+        "bin/mysql_secure_installation.exe",
+        "bin/mysql_ssl_rsa_setup.exe",
+        "bin/mysql_tzinfo_to_sql.exe",
+        "bin/mysql_upgrade.exe",
+        "bin/my_print_defaults.exe",
+        "bin/perror.exe",
+        "bin/resolveip.exe",
+        "bin/zlib_decompress.exe"
     ],
     "persist": [
         "data"
     ],
     "post_install": [
-        "#Initialize data directory (without generating root password)",
-        "if (!(Test-Path \"$dir\\data\\auto.cnf\")) {",
-        "    mysqld --initialize-insecure",
-        "}",
+        "# Using $dir instead of $persist_dir, causes this error:",
+        "# [ERROR] [MY-010187] [Server] Could not open file 'C:/Users/ex/scoop/apps/mysql/current/data/host.err' for error logging: Permission denied",
+        "$dir_u = ($persist_dir -replace '\\\\', '/')",
         "#Output client configuration to my.ini file so no username is required when connecting",
-        "echo \"\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
+        "echo \"[mysqld]\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
+        "echo \"datadir=$dir_u/data \" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
         "echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
-        "echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append"
+        "echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
+        "if (!(Test-Path \"$dir\\data\\auto.cnf\")) {",
+        "   #Initialize data directory (without generating root password)",
+        "    mysqld --initialize-insecure",
+        "}"
     ],
     "checkver": {
         "url": "https://dev.mysql.com/downloads/mysql/",
@@ -46,12 +63,8 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://dev.mysql.com/get/mysql-$version-winx64.zip",
+                "url": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-$version-winx64.zip",
                 "extract_dir": "mysql-$version-winx64"
-            },
-            "32bit": {
-                "url": "https://dev.mysql.com/get/mysql-$version-win32.zip",
-                "extract_dir": "mysql-$version-win32"
             }
         }
     }
