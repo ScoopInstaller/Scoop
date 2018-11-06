@@ -1,10 +1,10 @@
 {
-    "version": "1.4.0",
+    "version": "1.4.2",
     "license": "MIT",
-    "url": "https://github.com/lihaoyi/Ammonite/releases/download/1.4.0/2.12-1.4.0#/amm.bat",
+    "url": "https://github.com/lihaoyi/Ammonite/releases/download/1.4.2/2.12-1.4.2#/amm.bat",
     "bin": "amm.bat",
     "homepage": "http://ammonite.io",
-    "hash": "c095776dec98a19bb5f3b1bd6e0431e917689d046886f4871b308ed694ca19d8",
+    "hash": "5d3d4f559754c2e8db40e96ae24db0153bbcffc3949f8323f46b7e9eb7b5a682",
     "checkver": {
         "github": "https://github.com/lihaoyi/Ammonite"
     },
