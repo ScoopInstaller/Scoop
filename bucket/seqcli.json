@@ -2,10 +2,10 @@
     "homepage": "https://github.com/datalust/seqcli",
     "description": "Seq command-line client",
     "license": "Apache-2.0",
-    "version": "5.0.160",
-    "url": "https://github.com/datalust/seqcli/releases/download/v5.0.160/seqcli-5.0.160-win-x64.zip",
-    "hash": "7b24f276694d41db9ecf938e6de5a2ea732cecef8930e8671e5a8d2cd4ba757c",
-    "extract_dir": "seqcli-5.0.160-win-x64",
+    "version": "5.0.165",
+    "url": "https://github.com/datalust/seqcli/releases/download/v5.0.165/seqcli-5.0.165-win-x64.zip",
+    "hash": "9011b2c2cadae31aa4a3f8097ed55ae06cf154973c869e10a4373594956a3090",
+    "extract_dir": "seqcli-5.0.165-win-x64",
     "bin": [
         "seqcli.exe"
     ],
