@@ -10,5 +10,8 @@
         "0759d0a3b3ad768e0f1984b6faf22c5d9d53c2e081d1cfbd1cc7d6e955e995cb"
     ],
     "bin": "AStyle\\bin\\AStyle.exe",
-    "checkver": "Artistic Style ([\\d.]+)"
+    "checkver": "Artistic Style ([\\d.]+)",
+    "autoupdate": {
+        "url": "https://sourceforge.net/projects/astyle/files/astyle/astyle%20$version/AStyle_$version_windows.zip"
+    }
 }
