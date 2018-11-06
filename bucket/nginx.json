@@ -1,10 +1,10 @@
 {
     "homepage": "https://nginx.org",
-    "version": "1.15.5",
+    "version": "1.15.6",
     "license": "BSD-2-Clause",
-    "url": "https://nginx.org/download/nginx-1.15.5.zip",
-    "hash": "bc5582e8459ce9a56919f6b3a7db2ba666a5223f63e0f3dae58b3a82766172ef",
-    "extract_dir": "nginx-1.15.5",
+    "url": "https://nginx.org/download/nginx-1.15.6.zip",
+    "hash": "e3429c131c6062f292976516ecb21f691ed289dddb613f79b4dc8c3caf94e8fa",
+    "extract_dir": "nginx-1.15.6",
     "bin": "nginx.exe",
     "env_set": {
         "NGINX_HOME": "$dir"
