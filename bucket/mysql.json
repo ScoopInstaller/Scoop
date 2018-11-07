@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.13-winx64.zip",
-            "hash": "7221ae12ed6adeecb3ca0467144e30d12e28d9ca19c848eee87905a85a189274",
+            "hash": "md5:34a5983273314c99fdbc4a17b01d5859",
             "extract_dir": "mysql-8.0.13-winx64"
         }
     },
@@ -60,13 +60,17 @@
     ],
     "checkver": {
         "url": "https://dev.mysql.com/downloads/mysql/",
-        "re": ">MySQL Community Server ([\\d.]+)"
+        "re": "<h1>MySQL Community Server ([\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
                 "url": "https://dev.mysql.com/get/Downloads/MySQL-$majorVersion.$minorVersion/mysql-$version-winx64.zip",
-                "extract_dir": "mysql-$version-winx64"
+                "extract_dir": "mysql-$version-winx64",
+                "hash": {
+                    "url": "https://dev.mysql.com/downloads/mysql/",
+                    "find": "md5\">([A-Fa-f\\d]{32})"
+                }
             }
         }
     }
