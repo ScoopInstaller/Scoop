@@ -14,7 +14,7 @@
     ],
     "checkver": {
         "url": "https://data.services.jetbrains.com/products/releases?code=RSCLT&latest=true&type=release",
-        "re": "JetBrains.ReSharper.CommandLineTools.([\\d.]+).zip"
+        "jp": "$.RSCLT.[0].version"
     },
     "autoupdate": {
         "url": "https://download.jetbrains.com/resharper/JetBrains.ReSharper.CommandLineTools.$version.zip",
