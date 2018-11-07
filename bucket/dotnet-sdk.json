@@ -14,8 +14,8 @@
     },
     "env_add_path": ".",
     "checkver": {
-        "url": "https://raw.githubusercontent.com/dotnet/core/master/release-notes/releases.json",
-        "re": "\"version-sdk\":\\s+\"(?<version>[\\d.]+)\","
+        "url": "https://raw.githubusercontent.com/dotnet/core/master/release-notes/download-archive.md",
+        "re": "with SDK ([\\d.-]+)"
     },
     "autoupdate": {
         "architecture": {
