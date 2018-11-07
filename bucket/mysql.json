@@ -65,7 +65,7 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-$version-winx64.zip",
+                "url": "https://dev.mysql.com/get/Downloads/MySQL-$majorVersion.$minorVersion/mysql-$version-winx64.zip",
                 "extract_dir": "mysql-$version-winx64"
             }
         }
