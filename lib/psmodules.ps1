@@ -47,7 +47,7 @@ function uninstall_psmodule($manifest, $dir, $global) {
 function ensure_in_psmodulepath($dir, $global) {
     $path = env 'psmodulepath' $global
     if(!$global -and $null -eq $path) {
-        $path = "$home\Documents\WindowsPowerShell\Modules"
+        $path = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules"
     }
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
