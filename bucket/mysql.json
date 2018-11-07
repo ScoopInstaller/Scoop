@@ -43,22 +43,24 @@
         "data"
     ],
     "post_install": [
-        "# Using $dir instead of $persist_dir, causes this error:",
-        "# [ERROR] [MY-010187] [Server] Could not open file 'C:/Users/ex/scoop/apps/mysql/current/data/host.err' for error logging: Permission denied",
-        "$dir_u = ($persist_dir -replace '\\\\', '/')",
-        "#Output client configuration to my.ini file so no username is required when connecting",
-        "echo \"[mysqld]\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
-        "echo \"datadir=$dir_u/data \" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
-        "echo \"[client]\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
-        "echo \"user=root\" | out-file \"$dir/my.ini\" -Encoding ASCII -Append",
-        "if (!(Test-Path \"$dir\\data\\auto.cnf\")) {",
-        "   #Initialize data directory (without generating root password)",
-        "    mysqld --initialize-insecure",
+        "if (!(Test-Path \"$dir/my.ini\")) {",
+        "   # Using $dir instead of $persist_dir, causes this error:",
+        "   # [ERROR] [MY-010187] [Server] Could not open file 'C:/Users/ex/scoop/apps/mysql/current/data/host.err' for error logging: Permission denied",
+        "   $dir_u = ($persist_dir -replace '\\\\', '/')",
+        "   Add-Content \"$dir/my.ini\" '[mysqld]' -Encoding Ascii",
+        "   Add-Content \"$dir/my.ini\" \"datadir=$dir_u/data\" -Encoding Ascii",
+        "   # Set username so it's not required when connecting",
+        "   Add-Content \"$dir/my.ini\" '[client]' -Encoding Ascii",
+        "   Add-Content \"$dir/my.ini\" 'user=root' -Encoding Ascii",
+        "}",
+        "if (!(Test-Path \"$dir/data\\auto.cnf\")) {",
+        "   # Initialize data directory (without generating root password)",
+        "   mysqld.exe --initialize-insecure",
         "}"
     ],
     "checkver": {
         "url": "https://dev.mysql.com/downloads/mysql/",
-        "re": "<h1>MySQL Community Server ([\\d.]+)"
+        "re": ">MySQL Community Server ([\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
