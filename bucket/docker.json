@@ -1,10 +1,10 @@
 {
-    "version": "18.06.1-ce",
+    "version": "18.09.0",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/docker/toolbox/releases/download/v18.06.1-ce/DockerToolbox-18.06.1-ce.exe",
-            "hash": "5149ec6adf9400634a2cc0461eef39d482b0c90897dcfc2e1368347e935c95d1"
+            "url": "https://github.com/docker/toolbox/releases/download/v18.09.0/DockerToolbox-18.09.0.exe",
+            "hash": "5971379f1c2a1a7d200330a2042097d5c0820097dfdaeacc031c1475f8dfd683"
         }
     },
     "homepage": "https://docker.com",
