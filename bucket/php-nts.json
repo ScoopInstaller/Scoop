@@ -4,15 +4,15 @@
         "identifier": "PHP-3.01",
         "url": "https://secure.php.net/license/"
     },
-    "version": "7.2.11",
+    "version": "7.2.12",
     "architecture": {
         "64bit": {
-            "url": "https://windows.php.net/downloads/releases/php-7.2.11-nts-Win32-VC15-x64.zip",
-            "hash": "74e3fbff785943c5b17c0859264f06f72f0a7bb1fbb2ace17040ec89ec560f03"
+            "url": "https://windows.php.net/downloads/releases/php-7.2.12-nts-Win32-VC15-x64.zip",
+            "hash": "d911f377c1dcdd0a62d235db064baac0317851dec3bb1b60b22916045de4728c"
         },
         "32bit": {
-            "url": "https://windows.php.net/downloads/releases/php-7.2.11-nts-Win32-VC15-x86.zip",
-            "hash": "feaede2c9b666b9c192406043ad8be0bc0f82c133bd0918854d51c5439c16bf5"
+            "url": "https://windows.php.net/downloads/releases/php-7.2.12-nts-Win32-VC15-x86.zip",
+            "hash": "f799fbe7aae8939e3eba3c9814777dca7e641554cf6fee9dcf1dd9c3c792e027"
         }
     },
     "bin": [
