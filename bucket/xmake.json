@@ -1,0 +1,16 @@
+{
+    "homepage": "https://xmake.io",
+    "description": "A cross-platform build utility based on Lua",
+    "version": "2.2.2",
+    "license": "Apache-2.0",
+    "url": "https://github.com/tboox/xmake/releases/download/v2.2.2/xmake-v2.2.2.win32.zip",
+    "hash": "4a3ef078f83befac8583a85d16562457bb26ddc898ef8545b9b8b347d452e728",
+    "bin": "xmake.exe",
+    "extract_dir": "xmake",
+    "checkver": {
+        "github": "https://github.com/tboox/xmake"
+    },
+    "autoupdate": {
+        "url": "https://github.com/tboox/xmake/releases/download/v$version/xmake-v$version.win32.zip"
+    }
+}
