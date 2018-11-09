@@ -7,14 +7,8 @@
     "hash": "sha1:a989b527f3f990d471e6d47ee410e57d8be7620b",
     "extract_dir": "zookeeper-3.4.13",
     "bin": [
-        [
-            "bin\\zkServer.cmd",
-            "zkServer"
-        ],
-        [
-            "bin\\zkCli.cmd",
-            "zkCli"
-        ]
+        "bin\\zkServer.cmd",
+        "bin\\zkCli.cmd"
     ],
     "persist": [
         "data"
