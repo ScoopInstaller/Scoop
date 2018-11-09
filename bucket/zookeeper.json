@@ -22,7 +22,7 @@
     },
     "post_install": [
         "Copy-Item \"$dir/conf/zoo_sample.cfg\" -Destination \"$dir/conf/zoo.cfg\"",
-        "$dataDirPath = (\"$persist_dir\\data\").replace('\\', '\\\\')",
+        "$dataDirPath = (\"$dir\\data\").replace('\\', '\\\\')",
         "(Get-Content \"$dir/conf/zoo.cfg\") -Replace '^dataDir=(.+)$', \"dataDir=$dataDirPath\" | Set-Content \"$dir/conf/zoo.cfg\""
     ],
     "checkver": {
