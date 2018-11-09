@@ -10,6 +10,10 @@
         [
             "bin\\zkServer.cmd",
             "zkServer"
+        ],
+        [
+            "bin\\zkCli.cmd",
+            "zkCli"
         ]
     ],
     "persist": [
