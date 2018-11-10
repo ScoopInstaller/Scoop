@@ -21,9 +21,8 @@
         ]
     },
     "post_install": [
-        "Copy-Item \"$dir/conf/zoo_sample.cfg\" -Destination \"$dir/conf/zoo.cfg\"",
         "$dataDirPath = (\"$dir\\data\").replace('\\', '\\\\')",
-        "(Get-Content \"$dir/conf/zoo.cfg\") -Replace '^dataDir=(.+)$', \"dataDir=$dataDirPath\" | Set-Content \"$dir/conf/zoo.cfg\""
+        "(Get-Content \"$dir\\conf\\zoo_sample.cfg\") -Replace '^dataDir=(.+)$', \"dataDir=$dataDirPath\" | Set-Content \"$dir\\conf\\zoo.cfg\" -Encoding Ascii"
     ],
     "checkver": {
         "url": "https://www.apache.org/dist/zookeeper/",
