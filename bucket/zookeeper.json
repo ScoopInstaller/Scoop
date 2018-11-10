@@ -1,0 +1,39 @@
+{
+    "homepage": "https://zookeeper.apache.org/",
+    "description": "High-performance coordination service for distributed applications",
+    "version": "3.4.13",
+    "license": "Apache-2.0",
+    "url": "https://www.apache.org/dist/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz",
+    "hash": "sha1:a989b527f3f990d471e6d47ee410e57d8be7620b",
+    "extract_dir": "zookeeper-3.4.13",
+    "bin": [
+        "bin\\zkServer.cmd",
+        "bin\\zkCli.cmd"
+    ],
+    "persist": [
+        "data"
+    ],
+    "suggest": {
+        "JDK": [
+            "java/oraclejdk",
+            "java/oraclejdk8",
+            "java/openjdk"
+        ]
+    },
+    "post_install": [
+        "$dataDirPath = (\"$dir\\data\").replace('\\', '\\\\')",
+        "(Get-Content \"$dir\\conf\\zoo_sample.cfg\") -Replace '^dataDir=(.+)$', \"dataDir=$dataDirPath\" | Set-Content \"$dir\\conf\\zoo.cfg\" -Encoding Ascii"
+    ],
+    "checkver": {
+        "url": "https://www.apache.org/dist/zookeeper/",
+        "re": "zookeeper-([\\d.]+)/",
+        "reverse": true
+    },
+    "autoupdate": {
+        "url": "https://www.apache.org/dist/zookeeper/zookeeper-$version/zookeeper-$version.tar.gz",
+        "hash": {
+            "url": "$url.sha1"
+        },
+        "extract_dir": "zookeeper-$version"
+    }
+}
