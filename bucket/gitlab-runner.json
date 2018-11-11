@@ -6,7 +6,7 @@
     "bin": "gitlab-runner.exe",
     "checkver": {
         "url": "https://gitlab.com/gitlab-org/gitlab-runner/tags?format=atom",
-        "regex": "/tags/v([\\d.]+)"
+        "regex": "/tags/v([\\d.]+)<"
     },
     "architecture": {
         "64bit": {
