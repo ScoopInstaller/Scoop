@@ -101,7 +101,7 @@ $Queue | ForEach-Object {
     }
     Register-ObjectEvent $wc downloadstringcompleted -ErrorAction Stop | Out-Null
 
-    $githubRegex = '\/releases\/tag\/(?:v)?([\d.]+)'
+    $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
 
     $url = $json.homepage
     if ($json.checkver.url) {
