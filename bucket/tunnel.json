@@ -1,15 +1,15 @@
 {
-    "version": "0.2.11",
+    "version": "0.2.12",
     "homepage": "https://github.com/labstack/tunnel-client",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/labstack/tunnel-client/releases/download/0.2.11/tunnel-client_0.2.11_windows_32-bit.zip",
-            "hash": "ee486c40330187137cbdbf067580cad88f307d925834799200d656f7a694405b"
+            "url": "https://github.com/labstack/tunnel-client/releases/download/v0.2.12/tunnel-client_0.2.12_windows_32-bit.zip",
+            "hash": "bb5af7de73e6636f3e1cfe07af8be251f562248f9dac21eb886079d20893c10c"
         },
         "64bit": {
-            "url": "https://github.com/labstack/tunnel-client/releases/download/0.2.11/tunnel-client_0.2.11_windows_64-bit.zip",
-            "hash": "fe5439ccc6b2618940d7d604f531ce277f9c6c9a16d75022c7512e0b60b70778"
+            "url": "https://github.com/labstack/tunnel-client/releases/download/v0.2.12/tunnel-client_0.2.12_windows_64-bit.zip",
+            "hash": "0923cb853726b9d62ab1b9cf9a1b18b2e5e0705fd3896143e1da948b0a8cf6eb"
         }
     },
     "bin": "tunnel.exe",
@@ -19,11 +19,14 @@
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "https://github.com/labstack/tunnel-client/releases/download/$version/tunnel-client_$version_windows_32-bit.zip"
+                "url": "https://github.com/labstack/tunnel-client/releases/download/v$version/tunnel-client_$version_windows_32-bit.zip"
             },
             "64bit": {
-                "url": "https://github.com/labstack/tunnel-client/releases/download/$version/tunnel-client_$version_windows_64-bit.zip"
+                "url": "https://github.com/labstack/tunnel-client/releases/download/v$version/tunnel-client_$version_windows_64-bit.zip"
             }
+        },
+        "hash": {
+            "url": "https://github.com/labstack/tunnel-client/releases/download/v$version/tunnel-client_checksum.txt"
         }
     }
 }
