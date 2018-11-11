@@ -29,10 +29,13 @@
     Check manifest MAN.json inside default directory.
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 MAN -u
-    Check manifest MAN.json and update, if there is newer vesion.
+    Check manifest MAN.json and update, if there is newer version.
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 MAN -f
-    Check manifest MAN.json and update, even if there is no new vesion.
+    Check manifest MAN.json and update, even if there is no new version.
+.EXAMPLE
+    PS BUCKETDIR > .\bin\checkver.ps1 MAN -u -v VER
+    Check manifest MAN.json and update, using version VER
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 MAN DIR
     Check manifest MAN.json inside ./DIR directory.
@@ -54,7 +57,8 @@ param(
     [String] $Dir = "$psscriptroot\..\bucket",
     [Switch] $Update,
     [Switch] $ForceUpdate,
-    [Switch] $SkipUpdated
+    [Switch] $SkipUpdated,
+    [String] $Version = ""
 )
 
 . "$psscriptroot\..\lib\core.ps1"
@@ -274,6 +278,9 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
+            if ($Version -ne "") {
+                $ver = $Version
+            }
             autoupdate $App $Dir $json $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
