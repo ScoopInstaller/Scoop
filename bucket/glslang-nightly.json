@@ -1,0 +1,9 @@
+{
+    "homepage": "https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/",
+    "version": "nightly",
+    "url": "https://github.com/KhronosGroup/glslang/releases/download/master-tot/glslang-master-windows-x64-Release.zip",
+    "bin": [
+        "bin\\glslangValidator.exe",
+        "bin\\spirv-remap.exe"
+    ]
+}
