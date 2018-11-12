@@ -2,6 +2,10 @@
     "version": "1.12.0",
     "homepage": "https://dlang.org/",
     "description": "LDC is LLVM based D-language compiler",
+    "license": {
+        "identifier": "BSD-3-Clause,BSL-1.0,NCSA,MIT,GPL-2.0-or-later",
+        "url": "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+    },
     "architecture": {
         "64bit": {
             "url": "https://github.com/ldc-developers/ldc/releases/download/v1.12.0/ldc2-1.12.0-windows-x64.7z",
