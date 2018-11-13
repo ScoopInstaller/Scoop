@@ -8,11 +8,11 @@
     "version": "18.05",
     "architecture": {
         "64bit": {
-            "url": "https://7-zip.org/a/7z1805-x64.msi",
+            "url": "https://datapacket.dl.sourceforge.net/project/sevenzip/7-Zip/18.05/7z1805-x64.msi",
             "hash": "898c1ca0015183fe2ba7d55cacf0a1dea35e873bf3f8090f362a6288c6ef08d7"
         },
         "32bit": {
-            "url": "https://7-zip.org/a/7z1805.msi",
+            "url": "https://datapacket.dl.sourceforge.net/project/sevenzip/7-Zip/18.05/7z1805.msi",
             "hash": "c554238bee18a03d736525e06d9258c9ecf7f64ead7c6b0d1eb04db2c0de30d0"
         }
     },
