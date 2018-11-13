@@ -1,15 +1,15 @@
 {
     "homepage": "https://github.com/PowerShell/PowerShell",
-    "version": "6.1.0",
+    "version": "6.1.1",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/PowerShell/PowerShell/releases/download/v6.1.0/PowerShell-6.1.0-win-x64.zip",
-            "hash": "ca4ed36e663ab5f7fd32f636f9d274b1544173cea05b8a78481eb51c3f23163d"
+            "url": "https://github.com/PowerShell/PowerShell/releases/download/v6.1.1/PowerShell-6.1.1-win-x64.zip",
+            "hash": "f1198f0421a9d0d8cfe10d012ae8edb625787b341777bf0a2187ff0069ee8661"
         },
         "32bit": {
-            "url": "https://github.com/PowerShell/PowerShell/releases/download/v6.1.0/PowerShell-6.1.0-win-x86.zip",
-            "hash": "b214dba4e4fb3afc8a4b946bcbef95e8fbec0e313214663938d57eccd8b068b9"
+            "url": "https://github.com/PowerShell/PowerShell/releases/download/v6.1.1/PowerShell-6.1.1-win-x86.zip",
+            "hash": "1c7146e3879eae99476ff75fc560245b6097a39ab0bda76fab62ca2525b06b69"
         }
     },
     "bin": "pwsh.exe",
