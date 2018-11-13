@@ -9,7 +9,7 @@
     Where to search for manifest(s).
 .EXAMPLE
     PS BUCKETROOT> .\bin\formatjson.ps1
-    Format all manifets inside bucket directory.
+    Format all manifests inside bucket directory.
 .EXAMPLE
     PS BUCKETROOT> .\bin\formatjson.ps1 7zip
     Format manifest '7zip' inside bucket directory.

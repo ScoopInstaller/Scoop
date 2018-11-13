@@ -8,7 +8,7 @@ Describe 'Pretty json formating' -Tag 'Scoop' {
         $manifests = Get-ChildItem "$format\formated" -File -Filter '*.json'
     }
 
-    Context 'Beatify manifest' {
+    Context 'Beautify manifest' {
         $manifests | ForEach-Object {
             if ($PSVersionTable.PSVersion.Major -gt 5) { $_ = $_.Name } # Fix for pwsh
 

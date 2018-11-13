@@ -149,11 +149,11 @@ function normalize_values([psobject] $json) {
     $json.PSObject.Properties | ForEach-Object {
 
         $value = $_.Value
+
         # Recursively edit psobjects
         # If the values is psobjects, its not normalized
-        # For Example if manfiest have architecture and it's architecture have array with single value it's not formated
-        # @see: Without recursion: https://i.imgur.com/pHOf9f2.png
-        # @see: With recurseion: https://i.imgur.com/QVSLaiV.png
+        # For example if manifest have architecture and it's architecture have array with single value it's not formatted.
+        # @see https://github.com/lukesampson/scoop/pull/2642#issue-220506263
         if ($value -is [System.Management.Automation.PSCustomObject]) {
             $value = normalize_values $value
         }
