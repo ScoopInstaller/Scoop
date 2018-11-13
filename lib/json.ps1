@@ -147,44 +147,41 @@ function json_path_legacy([String] $json, [String] $jsonpath, [String] $basename
 function normalize_values([psobject] $json) {
     # Iterate Through Manifest Properties
     $json.PSObject.Properties | ForEach-Object {
-
-        $value = $_.Value
-
         # Recursively edit psobjects
         # If the values is psobjects, its not normalized
         # For example if manifest have architecture and it's architecture have array with single value it's not formatted.
         # @see https://github.com/lukesampson/scoop/pull/2642#issue-220506263
-        if ($value -is [System.Management.Automation.PSCustomObject]) {
-            $value = normalize_values $value
+        if ($_.Value -is [System.Management.Automation.PSCustomObject]) {
+            $_.Value = normalize_values $_.Value
         }
 
         # Process String Values
-        if ($value -is [String]) {
+        if ($_.Value -is [String]) {
 
             # Split on new lines
-            [Array] $parts = ($value -split '\r?\n').Trim()
+            [Array] $parts = ($_.Value -split '\r?\n').Trim()
 
             # Replace with string array if result is multiple lines
             if ($parts.Count -gt 1) {
-                $value = $parts
+                $_.Value = $parts
             }
         }
 
         # Convert single value array into string
-        if ($value -is [Array]) {
+        if ($_.Value -is [Array]) {
             # Array contains only 1 element String or Array
-            if ($value.Count -eq 1) {
+            if ($_.Value.Count -eq 1) {
                 # Array
-                if ($value[0] -is [Array]) {
-                    $value = $value
+                if ($_.Value[0] -is [Array]) {
+                    $_.Value = $_.Value
                 } else {
                     # String
-                    $value = $value[0]
+                    $_.Value = $_.Value[0]
                 }
             } else {
                 # Array of Arrays
                 $resulted_arrs = @()
-                foreach ($element in $value) {
+                foreach ($element in $_.Value) {
                     if ($element.Count -eq 1) {
                         $resulted_arrs += $element
                     } else {
@@ -192,14 +189,11 @@ function normalize_values([psobject] $json) {
                     }
                 }
 
-                $value = $resulted_arrs
+                $_.Value = $resulted_arrs
             }
         }
 
         # Process other values as needed...
-
-        # Bind edited values into original
-        $_.Value = $value
     }
 
     return $json
