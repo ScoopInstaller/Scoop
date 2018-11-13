@@ -1,0 +1,15 @@
+{
+    "version": "0.5.18",
+    "url": "https://whatever",
+    "hash": "whatever",
+    "architecture": {
+        "64bit": {
+            "installer": {
+                "script": [
+                    "Do something",
+                    "cosi"
+                ]
+            }
+        }
+    }
+}

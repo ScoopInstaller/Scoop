@@ -1,0 +1,59 @@
+{
+    "homepage": "http://www.7-zip.org/",
+    "description": "A multi-format file archiver with high compression ratios",
+    "license": {
+        "identifier": "LGPL-2.0-only,BSD-3-Clause",
+        "url": "https://www.7-zip.org/license.txt"
+    },
+    "version": "18.05",
+    "architecture": {
+        "64bit": {
+            "url": "https://7-zip.org/a/7z1805-x64.msi",
+            "hash": [
+                "898c1ca0015183fe2ba7d55cacf0a1dea35e873bf3f8090f362a6288c6ef08d7"
+            ]
+        },
+        "32bit": {
+            "url": "https://7-zip.org/a/7z1805.msi",
+            "hash": "c554238bee18a03d736525e06d9258c9ecf7f64ead7c6b0d1eb04db2c0de30d0"
+        }
+    },
+    "extract_dir": "Files/7-Zip",
+    "bin": [
+        [
+            "single"
+        ],
+        [
+            "7z.exe",
+            "cosi"
+        ],
+                        [
+            "7z.exe",
+            "cosi",
+    "param",
+            "icon"
+        ],
+        [
+                        "7z.exe",
+            "empty",
+     "",
+              ""
+        ],
+        [
+            "singtwo"
+        ]
+    ],
+    "checkver":                       "Download 7-Zip ([\\d.]+)",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://7-zip.org/a/7z$cleanVersion-x64.msi"
+            },        "32bit": {
+                "url": "https://7-zip.org/a/7z$cleanVersion.msi"
+       }
+        }
+    },
+    "shortcuts": [
+        [   "7zFM.exe",
+            "7-Zip"
+], ["name with spaces.exe", "Shortcut with spaces in name"]    ]}

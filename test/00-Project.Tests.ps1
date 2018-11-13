@@ -81,7 +81,8 @@ describe 'Style constraints for non-binary project files' {
         # gather all files except '*.exe', '*.zip', or any .git repository files
         $repo_files |
             where-object { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
-            where-object { $_.fullname -inotmatch '(.exe|.zip|.dll)$' }
+            where-object { $_.fullname -inotmatch '(.exe|.zip|.dll)$' } |
+            where-object { $_.fullname -inotmatch '(unformated)' }
     )
 
     $files_exist = ($files.Count -gt 0)
