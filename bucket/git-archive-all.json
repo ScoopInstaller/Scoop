@@ -1,0 +1,25 @@
+{
+    "homepage": "https://github.com/Kentzo/git-archive-all",
+    "license": "MIT",
+    "version": "1.19.2",
+    "url": "https://github.com/Kentzo/git-archive-all/archive/1.19.2.zip",
+    "hash": "386d095d4b462b29cb177959e15210569e9fd78f9dffb7d1cb7129645ae8facf",
+    "extract_dir": "git-archive-all-1.19.2",
+    "installer": {
+        "script": [
+            "Push-Location \"$dir\"",
+            "try {",
+            "    python --version | Out-Null",
+            "} catch {",
+            "    Write-Host 'No Python is found' -ForegroundColor Red",
+            "}",
+            "python setup.py install",
+            "Pop-Location"
+        ]
+    },
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/Kentzo/git-archive-all/archive/$version.zip",
+        "extract_dir": "git-archive-all-$version"
+    }
+}
