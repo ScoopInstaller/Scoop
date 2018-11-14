@@ -65,6 +65,8 @@ $apps | ForEach-Object {
     write-host "Resetting $app ($version)."
 
     $dir = resolve-path (versiondir $app $version $global)
+    $original_dir = $dir
+    $persist_dir = persistdir $app $global
 
     $install = install_info $app $version $global
     $architecture = $install.architecture
@@ -74,6 +76,8 @@ $apps | ForEach-Object {
     create_startmenu_shortcuts $manifest $dir $global $architecture
     env_add_path $manifest $dir
     env_set $manifest $dir $global
+    persist_data $manifest $original_dir $persist_dir
+    persist_permission $manifest $global
 }
 
 exit 0
