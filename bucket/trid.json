@@ -1,17 +1,15 @@
 {
     "homepage": "http://mark0.net/soft-trid-e.html",
-    "version": "2.24-18.11.13",
+    "version": "2.24-18.11.15",
     "url": [
         "http://mark0.net/download/triddefs.zip",
         "http://mark0.net/download/trid_w32.zip"
     ],
     "hash": [
-        "00483575a7fb58fb68453eb308088b01b95b7749b0ef0ad92039e67e0c0fefd9",
+        "820013453a9f01b69a6d87387df4a7d9cd81abb45b29daf52e2f96bd22fa2029",
         "ea7f82363912f5b3c79217ba8716425ec3f2514887f788dcd5a2821d0b1fc83f"
     ],
-    "bin": [
-        "trid.exe"
-    ],
+    "bin": "trid.exe",
     "checkver": {
         "url": "http://mark0.net/soft-trid-e.html",
         "re": "(?smi)Win32.*?TrID v([\\d\\.]*).*?(\\d{2})\\/(\\d{2})\\/(\\d{2})",
