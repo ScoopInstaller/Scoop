@@ -31,7 +31,7 @@ param(
             $true
         }
     })]
-    [String] $Dir = "$psscriptroot\..\bucket",
+    [String] $Dir = "$PSScriptRoot\..\bucket",
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipCorrect,
