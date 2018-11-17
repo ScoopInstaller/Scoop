@@ -1,0 +1,14 @@
+{
+    "homepage": "https://www.getzola.org/",
+    "version": "0.5.0",
+    "license": "MIT",
+    "url": "https://github.com/getzola/zola/releases/download/v0.5.0/zola-v0.5.0-x86_64-pc-windows-msvc.zip",
+    "hash": "492ccea9c52cf8026352488b6064b02ca91ae93a9e70f34d09928868b2f0f011",
+    "bin": "zola.exe",
+    "checkver": {
+        "github": "https://github.com/getzola/zola"
+    },
+    "autoupdate": {
+        "url": "https://github.com/getzola/zola/releases/download/v$version/zola-v$version-x86_64-pc-windows-msvc.zip"
+    }
+}
