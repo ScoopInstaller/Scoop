@@ -41,7 +41,7 @@ if ($global -and !(is_admin)) {
 }
 
 if ($apps -eq 'scoop') {
-    & "$PSScriptRoot\..\bin\uninstall.ps1" $global
+    & "$PSScriptRoot\..\bin\uninstall.ps1" $global $purge
     exit
 }
 

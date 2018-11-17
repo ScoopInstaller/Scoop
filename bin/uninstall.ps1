@@ -1,10 +1,15 @@
 <#
 .SYNOPSIS
-    Uninstall ALL scoop applications and scoop itself.
+	Uninstall ALL scoop applications and scoop itself.
 .PARAMETER global
-    Global applications will be uninstalled.
+	Global applications will be uninstalled.
+.PARAMETER purge
+	Persisted data will be deleted.
 #>
-param([bool] $global)
+param(
+	[bool] $global,
+	[bool] $purge
+)
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
@@ -17,7 +22,11 @@ if ($global -and !(is_admin)) {
 	exit 1
 }
 
-warn 'This will uninstall Scoop and all the programs that have been installed with Scoop!'
+if ($purge) {
+	warn 'This will uninstall Scoop, all the programs that have been installed with Scoop and all persisted data!'
+} else {
+	warn 'This will uninstall Scoop and all the programs that have been installed with Scoop!'
+}
 $yn = Read-Host 'Are you sure? (yN)'
 if ($yn -notlike 'y*') { exit }
 
@@ -60,6 +69,11 @@ function rm_dir($dir) {
 	}
 }
 
+# Remove all folders (except persist) inside given scoop directory.
+function keep_onlypersist($directory) {
+	Get-ChildItem $directory -Exclude 'persist' | ForEach-Object { rm_dir $_ }
+}
+
 # Run uninstallation for each app if necessary, continuing if there's
 # a problem deleting a directory (which is quite likely)
 if ($global) {
@@ -76,8 +90,13 @@ if ($errors) {
 	abort 'Not all apps could be deleted. Try again or restart.'
 }
 
-rm_dir $scoopdir
-if ($global) { rm_dir $globaldir }
+if ($purge) {
+	rm_dir $scoopdir
+	if ($global) { rm_dir $globaldir }
+} else {
+	keep_onlypersist $scoopdir
+	if ($global) { keep_onlypersist $globaldir }
+}
 
 remove_from_path (shimdir $false)
 if ($global) { remove_from_path (shimdir $true) }
