@@ -12,7 +12,7 @@
     "bin": "cockroach.exe",
     "checkver": {
         "url": "https://www.cockroachlabs.com/docs/stable/install-cockroachdb.html",
-        "re": "cockroach-v([\\d.]+).windows-6.2-amd64.zip"
+        "re": "\"version-name\">v([\\d.]+)<"
     },
     "autoupdate": {
         "url": "https://binaries.cockroachdb.com/cockroach-v$version.windows-6.2-amd64.zip",
