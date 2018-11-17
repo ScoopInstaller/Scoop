@@ -1,17 +1,17 @@
 {
     "homepage": "https://github.com/nodejs/node-chakracore",
-    "version": "10.6.0",
+    "version": "10.13.0",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://nodejs.org/download/chakracore-release/v10.6.0/node-v10.6.0-win-x86.7z",
-            "hash": "b8dc360c067a2925e912cf82df164a92e20d4c526a9605943000180a07958d16",
-            "extract_dir": "node-v10.6.0-win-x86"
+            "url": "https://nodejs.org/download/chakracore-release/v10.13.0/node-v10.13.0-win-x86.7z",
+            "hash": "09ebe6d83ac19d20dbcc7b3960d69d1dc4b2e955e0e730e715c729f3ee5a4774",
+            "extract_dir": "node-v10.13.0-win-x86"
         },
         "64bit": {
-            "url": "https://nodejs.org/download/chakracore-release/v10.6.0/node-v10.6.0-win-x64.7z",
-            "hash": "f2e38fe6f70893282608674dfb16c5e12e75b5cdfdc278a18a51e2f7d75fbb17",
-            "extract_dir": "node-v10.6.0-win-x64"
+            "url": "https://nodejs.org/download/chakracore-release/v10.13.0/node-v10.13.0-win-x64.7z",
+            "hash": "25eacbf5008c498a90739167efd8661f89bc13a36a2e4ea2a351ea1180e11a1e",
+            "extract_dir": "node-v10.13.0-win-x64"
         }
     },
     "persist": [
