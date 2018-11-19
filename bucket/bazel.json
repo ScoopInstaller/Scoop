@@ -1,23 +1,17 @@
 {
     "homepage": "https://bazel.build",
-    "version": "0.19.1",
+    "version": "0.19.2",
     "license": "Apache-2.0",
     "bin": "bazel.exe",
     "suggest": {
-        "MSYS2": [
-            "msys2"
-        ],
-        "Python27": [
-            "versions/python27"
-        ],
-        "curl": [
-            "curl"
-        ]
+        "MSYS2": "msys2",
+        "Python27": "versions/python27",
+        "curl": "curl"
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/bazelbuild/bazel/releases/download/0.19.1/bazel-0.19.1-windows-x86_64.zip",
-            "hash": "ec413372d342f25991286e9dba011219495c97a9adc0f867c4c6b8a3261696db"
+            "url": "https://github.com/bazelbuild/bazel/releases/download/0.19.2/bazel-0.19.2-windows-x86_64.zip",
+            "hash": "64b14350ed0de786a68aea2d1f9651904404e247e91b79609ed78fc8ae390845"
         }
     },
     "checkver": {
