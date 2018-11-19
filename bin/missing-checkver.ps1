@@ -1,36 +1,44 @@
-# list manifests which do not specify a checkver regex
+<#
+.SYNOPSIS
+    Check if manifest contains checkver and autoupdate property.
+.PARAMETER App
+    Manifest name.
+    Wirldcard is supported.
+.PARAMETER Dir
+    Location of manifests.
+.PARAMETER SkipSupported
+    Manifests with checkver and autoupdate will not be presented.
+#>
 param(
-    [String]$dir,
-    [Switch]$skipSupported = $false
+    [String] $App = '*',
+    [String] $Dir = "$PSScriptRoot\..\bucket",
+    [Switch] $SkipSupported
 )
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
 
-if(!$dir) { $dir = "$psscriptroot\..\bucket" }
-$dir = resolve-path $dir
+$Dir = Resolve-Path $Dir
 
-write-host "[" -nonewline
-write-host -f green "C" -nonewline
-write-host "]heckver"
-write-host " | [" -nonewline
-write-host -f cyan "A" -nonewline
-write-host "]utoupdate"
-write-host " |  |"
+Write-Host '[' -NoNewLine
+Write-Host 'C' -NoNewLine -ForegroundColor Green
+Write-Host ']heckver'
+Write-Host ' | [' -NoNewLine
+Write-Host 'A' -NoNewLine -ForegroundColor Cyan
+Write-Host ']utoupdate'
+Write-Host ' |  |'
 
-Get-ChildItem $dir "*.json" | ForEach-Object {
-    $json = parse_json "$dir\($_.Name)"
+Get-ChildItem $Dir "$App.json" | ForEach-Object {
+    $json = parse_json "$Dir\$($_.Name)"
 
-    if ($skipSupported -and $json.checkver -and $json.autoupdate) {
-        return
-    }
+    if ($SkipSupported -and $json.checkver -and $json.autoupdate) { return }
 
-    write-host "[" -nonewline
-    write-host -f green -nonewline $( If ($json.checkver) {"C"} Else {" "} )
-    write-host "]" -nonewline
+    Write-Host '[' -NoNewLine
+    Write-Host $(if ($json.checkver) { 'C' } else { ' ' }) -NoNewLine -ForegroundColor Green
+    Write-Host ']' -NoNewLine
 
-    write-host "[" -nonewline
-    write-host -f cyan -nonewline $( If ($json.autoupdate) {"A"} Else {" "} )
-    write-host "] " -nonewline
-    write-host (strip_ext $_.Name)
+    Write-Host '[' -NoNewLine
+    Write-Host $(if ($json.autoupdate) { 'A' } else { ' ' }) -NoNewLine -ForegroundColor Cyan
+    Write-Host '] ' -NoNewLine
+    Write-Host (strip_ext $_.Name)
 }
