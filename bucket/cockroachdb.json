@@ -5,10 +5,10 @@
         "identifier": "Apache-2.0,BSD-3-Clause,MIT,Freeware",
         "url": "https://github.com/cockroachdb/cockroach/blob/master/LICENSE"
     },
-    "version": "2.1.0",
-    "url": "https://binaries.cockroachdb.com/cockroach-v2.1.0.windows-6.2-amd64.zip",
-    "hash": "d2b799bba978ca55db974d49f1f6f85f1285bcc6866afc19e19e3a49031aa885",
-    "extract_dir": "cockroach-v2.1.0.windows-6.2-amd64",
+    "version": "2.1.1",
+    "url": "https://binaries.cockroachdb.com/cockroach-v2.1.1.windows-6.2-amd64.zip",
+    "hash": "ded54a367d108453e6cdcefeabe7d9915387d09364f8e8d1aa40a178b5f36a5c",
+    "extract_dir": "cockroach-v2.1.1.windows-6.2-amd64",
     "bin": "cockroach.exe",
     "checkver": {
         "url": "https://www.cockroachlabs.com/docs/stable/install-cockroachdb.html",
