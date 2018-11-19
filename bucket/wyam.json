@@ -1,9 +1,9 @@
 {
     "homepage": "https://wyam.io",
-    "version": "1.7.3",
+    "version": "1.7.4",
     "license": "MIT",
-    "url": "https://github.com/Wyamio/Wyam/releases/download/v1.7.3/Wyam-v1.7.3.zip",
-    "hash": "b9eee516b49a646476cf1776d6074653a0094b41e2eb9ff1926b36fe397d1c69",
+    "url": "https://github.com/Wyamio/Wyam/releases/download/v1.7.4/Wyam-v1.7.4.zip",
+    "hash": "6cbdb530708deb78c7fe05e0cefcd9e0fb7a35661988f706f0d2cc3d5157d105",
     "bin": "wyam.exe",
     "checkver": {
         "github": "https://github.com/Wyamio/Wyam"
