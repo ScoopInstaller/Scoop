@@ -1,0 +1,30 @@
+{
+    "homepage": "https://github.com/peco/peco/",
+    "description": "Simplistic interactive filtering tool",
+    "version": "0.5.3",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/peco/peco/releases/download/v0.5.3/peco_windows_amd64.zip",
+            "hash": "3b82aee17ee3cd872bde959aa7ff2537cb51bfad7a11264fdfffe879d2e4b0ee",
+            "extract_dir": "peco_windows_amd64"
+        },
+        "32bit": {
+            "url": "https://github.com/peco/peco/releases/download/v0.5.3/peco_windows_386.zip",
+            "hash": "fdfe414be7f0d7937fa86b4c78f07a61015f3a2901eb5a5788d21156966f9b35",
+            "extract_dir": "peco_windows_386"
+        }
+    },
+    "bin": "peco.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/peco/peco/releases/download/v$version/peco-windows-amd64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/peco/peco/releases/download/v$version/peco-windows-386.zip"
+            }
+        }
+    }
+}
