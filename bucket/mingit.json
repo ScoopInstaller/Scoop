@@ -1,23 +1,19 @@
 {
     "homepage": "https://git-for-windows.github.io/",
     "license": "GPL-2.0",
-    "version": "2.19.1.windows.1",
+    "version": "2.19.2.windows.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.19.1.windows.1/MinGit-2.19.1-64-bit.zip",
-            "hash": "f89e103a41bda8e12efeaab198a8c20bb4a84804683862da518ee2cb66a5a5b3"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.19.2.windows.1/MinGit-2.19.2-64-bit.zip",
+            "hash": "9d260fd4b9cf279491a1cc6762c2f08f7e8ca6c1d6492300cacbc800fe384a0f"
         },
         "32bit": {
-            "url": "https://github.com/git-for-windows/git/releases/download/v2.19.1.windows.1/MinGit-2.19.1-32-bit.zip",
-            "hash": "9bde728fe03f66a022b3e41408902ccfceb56a34067db1f35d6509375b9be922"
+            "url": "https://github.com/git-for-windows/git/releases/download/v2.19.2.windows.1/MinGit-2.19.2-32-bit.zip",
+            "hash": "a85f4343628e7591a60ced4d54df176dba1c599b9097d1dc86597fd00bc3a5b3"
         }
     },
-    "bin": [
-        "cmd\\git.exe"
-    ],
-    "post_install": [
-        "git config --global credential.helper manager"
-    ],
+    "bin": "cmd\\git.exe",
+    "post_install": "git config --global credential.helper manager",
     "notes": [
         "To get Git to recognise OpenSSH, you will need to run",
         "",
