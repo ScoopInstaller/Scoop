@@ -1,9 +1,9 @@
 {
     "homepage": "http://www.red-lang.org",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "license": "BSD-3-Clause,BSL-1.0",
-    "url": "https://static.red-lang.org/dl/win/red-063.exe#/red.exe",
-    "hash": "105d0f7b009a802a35a636c5dbedc69e89477fd62b6ba77690845fd78d436171",
+    "url": "https://static.red-lang.org/dl/win/red-064.exe#/red.exe",
+    "hash": "9785f077558c5054c987a351c5ecaa9cb36cb45b00d8d10c38b228504bbc37ab",
     "bin": "red.exe",
     "checkver": {
         "url": "http://static.red-lang.org/download.html",
