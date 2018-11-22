@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.isc.org/",
     "license": "ISC",
-    "version": "9.13.3",
+    "version": "9.13.4",
     "architecture": {
         "64bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.13.3/BIND9.13.3.x64.zip",
-            "hash": "ff89ccabc53e27a08c85e3b519168fd89008d45554223436e63ba9e52b080b58"
+            "url": "https://ftp.isc.org/isc/bind9/9.13.4/BIND9.13.4.x64.zip",
+            "hash": "09aa7cfda0a0ebf7f87c2211351dc2268b205fbef9b3ed9ab6bccb1aa5f6583f"
         },
         "32bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.13.3/BIND9.13.3.x86.zip",
-            "hash": "dae5083e38b7d8f46f7a6dda87b61a5d3c1057611c8fcd272cb76503da7357e2"
+            "url": "https://ftp.isc.org/isc/bind9/9.13.4/BIND9.13.4.x86.zip",
+            "hash": "344c16268648d33bfc9771b10b5fd6931dd99874b3154c2f5fb828a9afaf9c33"
         }
     },
     "bin": "dig.exe",
@@ -28,8 +28,6 @@
         }
     },
     "suggest": {
-        "vcredist": [
-            "extras/vcredist2012"
-        ]
+        "vcredist": "extras/vcredist2012"
     }
 }
