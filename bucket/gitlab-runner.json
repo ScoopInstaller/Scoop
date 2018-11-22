@@ -2,7 +2,7 @@
     "description": "GitLab Runner is the open source project that is used to run your jobs and send the results back to GitLab",
     "homepage": "https://docs.gitlab.com/runner/",
     "license": "MIT",
-    "version": "11.4.2",
+    "version": "11.5.0",
     "bin": "gitlab-runner.exe",
     "checkver": {
         "url": "https://gitlab.com/gitlab-org/gitlab-runner/tags?format=atom",
@@ -10,12 +10,12 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://gitlab-runner-downloads.s3.amazonaws.com/v11.4.2/binaries/gitlab-runner-windows-amd64.exe#/gitlab-runner.exe",
-            "hash": "03cb05f250fb5f2291e48260facc9f04dcd743c7ee39ca5c629b46749f6ee709"
+            "url": "https://gitlab-runner-downloads.s3.amazonaws.com/v11.5.0/binaries/gitlab-runner-windows-amd64.exe#/gitlab-runner.exe",
+            "hash": "76c0d31ce8bad68456bd2bc5c7eef94b8bedf0eb74ea05eecbef0da43e937774"
         },
         "32bit": {
-            "url": "https://gitlab-runner-downloads.s3.amazonaws.com/v11.4.2/binaries/gitlab-runner-windows-386.exe#/gitlab-runner.exe",
-            "hash": "718657db9540e3a15ce178baa30cef73cd4a8ad85b24cb177ed751357331eb61"
+            "url": "https://gitlab-runner-downloads.s3.amazonaws.com/v11.5.0/binaries/gitlab-runner-windows-386.exe#/gitlab-runner.exe",
+            "hash": "8bf74e66a50e6c5d52e9bc03fb3197661966f01e4b270ba23cc804e76f1660af"
         }
     },
     "autoupdate": {
