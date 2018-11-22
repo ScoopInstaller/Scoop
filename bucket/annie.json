@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/iawia002/annie",
+    "description": "A fast, simple and clean video downloader built with Go.",
     "license": "MIT",
     "version": "0.8.4",
     "architecture": {
@@ -14,23 +15,18 @@
     },
     "bin": "annie.exe",
     "depends": "ffmpeg",
-    "checkver": {
-        "github": "https://github.com/iawia002/annie"
-    },
+    "checkver": "github",
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/iawia002/annie/releases/download/$version/annie_$version_Windows_64-bit.zip",
-                "hash": {
-                    "url": "$baseurl/SHA2-256SUMS"
-                }
+                "url": "https://github.com/iawia002/annie/releases/download/$version/annie_$version_Windows_64-bit.zip"
             },
             "32bit": {
-                "url": "https://github.com/iawia002/annie/releases/download/$version/annie_$version_Windows_32-bit.zip",
-                "hash": {
-                    "url": "$baseurl/SHA2-256SUMS"
-                }
+                "url": "https://github.com/iawia002/annie/releases/download/$version/annie_$version_Windows_32-bit.zip"
             }
+        },
+        "hash": {
+            "url": "$baseurl/SHA2-256SUMS"
         }
     }
 }
