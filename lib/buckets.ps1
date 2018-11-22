@@ -52,8 +52,8 @@ function new_issue_msg($app, $bucket, $title, $body) {
         $url = 'https://github.com/lukesampson/scoop'
     } elseif (Test-Path $bucket_path) {
         Push-Location $bucket_path
-        $alfa = git config --get remote.origin.url
-        $alfa -match 'git@(?<url>.*):(?<username>.*)/(?<repository>.*)\.git' | Out-Null # match git@github.com:lukesampson/scoop-extras.git
+        $remote = git config --get remote.origin.url
+        $remote -match 'git@(?<url>.*):(?<username>.*)/(?<repository>.*)\.git' | Out-Null # match git@github.com:lukesampson/scoop-extras.git
         $url = "https://www.$($matches.url)/$($matches.username)/$($matches.repository)"
         Pop-Location
     }
