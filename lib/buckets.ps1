@@ -46,11 +46,19 @@ function find_manifest($app, $bucket) {
 function new_issue_msg($app, $bucket, $title, $body) {
     $app, $manifest, $bucket, $url = locate $app $bucket
     $url = known_bucket_repo $bucket
-    if($manifest -and $null -eq $url -and $null -eq $bucket) {
+    $bucket_path = "$bucketsdir\$bucket"
+
+    if($manifest -and ($null -eq $url) -and ($null -eq $bucket)) {
         $url = 'https://github.com/lukesampson/scoop'
+    } elseif (Test-Path $bucket_path) {
+        Push-Location $bucket_path
+        $alfa = git config --get remote.origin.url
+        $alfa -match 'git@(?<url>.*):(?<username>.*)/(?<repository>.*)\.git' | Out-Null # match git@github.com:lukesampson/scoop-extras.git
+        $url = "https://www.$($matches.url)/$($matches.username)/$($matches.repository)"
+        Pop-Location
     }
     if(!$url) {
-        return "Please contact the bucket maintainer!"
+        return 'Please contact the bucket maintainer!'
     }
 
     $title = [System.Web.HttpUtility]::UrlEncode("$app@$($manifest.version): $title")
