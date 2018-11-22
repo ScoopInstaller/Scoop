@@ -1,13 +1,22 @@
 {
-    "version": "0.2018.04.22",
-    "url": "https://github.com/lukesampson/pshazz/archive/4504a758b3df95d424aadb4364fa7f2030c5b906.zip",
-    "extract_dir": "pshazz-4504a758b3df95d424aadb4364fa7f2030c5b906",
-    "hash": "4ff9b6bceda97b71084db390391d0fff27aff79ccd25cee3498967b76c47b085",
+    "homepage": "https://github.com/lukesampson/pshazz",
+    "version": "0.2018.09.25",
+    "url": "https://github.com/lukesampson/pshazz/archive/master.zip",
+    "extract_dir": "pshazz-master",
+    "hash": "1a95d06daa98b165e1121f66961049a0df98aa1ba6112afeb30e5a78ba41410f",
     "bin": [
         "bin\\pshazz.ps1",
         "libexec\\askpass.exe"
     ],
     "installer": {
         "file": "bin\\install.ps1"
+    },
+    "checkver": {
+        "url": "https://github.com/lukesampson/pshazz",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)",
+        "replace": "0.${1}.${2}.${3}"
+    },
+    "autoupdate": {
+        "url": "https://github.com/lukesampson/pshazz/archive/master.zip"
     }
 }
