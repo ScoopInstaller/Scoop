@@ -158,8 +158,7 @@
                                     "type": "string"
                                 },
                                 "url": {
-                                    "format": "uri",
-                                    "type": "string"
+                                    "$ref": "#/definitions/uriOrArrayOfUris"
                                 },
                                 "hash": {
                                     "$ref": "#/definitions/hashExtraction"
@@ -174,8 +173,7 @@
                                     "type": "string"
                                 },
                                 "url": {
-                                    "format": "uri",
-                                    "type": "string"
+                                    "$ref": "#/definitions/uriOrArrayOfUris"
                                 },
                                 "hash": {
                                     "$ref": "#/definitions/hashExtraction"
@@ -196,8 +194,7 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "url": {
-                    "format": "uri",
-                    "type": "string"
+                    "$ref": "#/definitions/uriOrArrayOfUris"
                 }
             },
             "type": "object"
