@@ -1,9 +1,9 @@
 {
     "homepage": "https://github.com/activescott/lessmsi/",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "license": "MIT",
-    "hash": "284182d13fa29cf3d8001d6054f17b15e729c0cd1846ccc5dc95e0b37e068660",
-    "url": "https://github.com/activescott/lessmsi/releases/download/v1.6.2/lessmsi-v1.6.2.zip",
+    "hash": "ef9219fdfbe7fb8508b984b2407394a97dd77ca3c23ed539a5cbb711bcb834d8",
+    "url": "https://github.com/activescott/lessmsi/releases/download/v1.6.3/lessmsi-v1.6.3.zip",
     "bin": "lessmsi.exe",
     "checkver": {
         "github": "https://github.com/activescott/lessmsi"
