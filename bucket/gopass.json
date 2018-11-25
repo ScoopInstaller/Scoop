@@ -22,10 +22,12 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/gopasspw/gopass/releases/download/v$version/gopass-$version-windows-amd64.zip"
+                "url": "https://github.com/gopasspw/gopass/releases/download/v$version/gopass-$version-windows-amd64.zip",
+                "extract_dir": "gopass-$version-windows-amd64"
             },
             "32bit": {
-                "url": "https://github.com/gopasspw/gopass/releases/download/v$version/gopass-$version-windows-386.zip"
+                "url": "https://github.com/gopasspw/gopass/releases/download/v$version/gopass-$version-windows-386.zip",
+                "extract_dir": "gopass-$version-windows-386"
             }
         }
     }
