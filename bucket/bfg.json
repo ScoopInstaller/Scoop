@@ -2,23 +2,23 @@
     "homepage": "https://rtyley.github.io/bfg-repo-cleaner/",
     "license": "GPL-3.0-or-later",
     "version": "1.13.0",
-    "url": "https://repo1.maven.org/maven2/com/madgag/bfg/1.13.0/bfg-1.13.0.jar",
-    "hash": "bf22bab9dd42d4682b490d6bc366afdad6c3da99f97521032d3be8ba7526c8ce",
+    "url": "https://repo1.maven.org/maven2/com/madgag/bfg/1.13.0/bfg-1.13.0.jar#/bfg.jar",
+    "hash": "md5:f437b07a4651c8b549703940de6ce1d2",
     "suggest": {
         "JDK": [
             "java/oraclejdk",
             "java/openjdk"
         ]
     },
-    "bin": "bfg.ps1",
-    "pre_install": [
-        "write-output ('java -jar {0}\\bfg-{1}.jar $args' -f \"$dir\", \"$version\") | out-file -filepath $dir\\bfg.ps1"
-    ],
+    "bin": "bfg.jar",
     "checkver": {
         "url": "https://search.maven.org/solrsearch/select/?q=g:com.madgag+AND+a:bfg",
         "jp": "$.response.docs[0].latestVersion"
     },
     "autoupdate": {
-        "url": "https://repo1.maven.org/maven2/com/madgag/bfg/$version/bfg-$version.jar"
+        "url": "https://repo1.maven.org/maven2/com/madgag/bfg/$version/bfg-$version.jar#/bfg.jar",
+        "hash": {
+            "url": "$url.md5"
+        }
     }
 }
