@@ -23,6 +23,9 @@
             "32bit": {
                 "url": "https://github.com/alecthomas/chroma/releases/download/v$version/chroma-$version-windows-386.tar.gz"
             }
+        },
+        "hash": {
+            "url": "$baseurl/chroma-$version-checksums.txt"
         }
     }
 }

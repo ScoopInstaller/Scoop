@@ -29,6 +29,9 @@
                 "url": "https://github.com/gopasspw/gopass/releases/download/v$version/gopass-$version-windows-386.zip",
                 "extract_dir": "gopass-$version-windows-386"
             }
+        },
+        "hash": {
+            "url": "$baseurl/gopass_$version_SHA256SUMS"
         }
     }
 }
