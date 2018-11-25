@@ -1,21 +1,20 @@
 {
-    "version": "1.1.4-1",
+    "version": "1.1.4-2",
     "homepage": "http://casperjs.org/",
     "description": "Navigation scripting & testing for PhantomJS and SlimerJS",
     "license": "MIT",
-    "url": "https://github.com/casperjs/casperjs/archive/1.1.4-1.zip",
-    "hash": "9e2e74bb77466227d38facc442f76a69404e78bca02238b57c66b24094adf78c",
-    "extract_dir": "casperjs-1.1.4-1",
+    "url": "https://github.com/casperjs/casperjs/archive/1.1.4-2.zip",
+    "hash": "50ecfb26694949006d21b0832f2e62b440b19689aac0282cbaa7a2e6184edf9a",
+    "extract_dir": "casperjs-1.1.4-2",
     "bin": "bin\\casperjs.exe",
     "suggest": {
-        "phantomjs": [
-            "phantomjs"
-        ],
-        "python": [
-            "python"
-        ]
+        "phantomjs": "phantomjs",
+        "python": "python"
     },
-    "checkver": "archive/([\\d.-]+).zip",
+    "checkver": {
+        "github": "https://github.com/casperjs/casperjs/",
+        "regex": "/tag/([\\d\\.-]+)"
+    },
     "autoupdate": {
         "url": "https://github.com/casperjs/casperjs/archive/$version.zip",
         "extract_dir": "casperjs-$version"
