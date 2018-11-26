@@ -18,7 +18,11 @@
         "cmd\\gitk.exe",
         "cmd\\git-gui.exe",
         "usr\\bin\\tig.exe",
-        "git-bash.exe"
+        "git-bash.exe",
+        [
+            "bin\\sh.exe",
+            "git-sh"
+        ]
     ],
     "shortcuts": [
         [
