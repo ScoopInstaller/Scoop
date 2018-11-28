@@ -1,7 +1,17 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "0.2015.08.26",
-    "url": "https://raw.githubusercontent.com/lukesampson/psutils/3c67dbf56a0e541bf928b9a8811dc4c627d8230c/gitignore.ps1",
-    "hash": "9a08d37386219add0bf79fe6293ab02f5dfdce6ece95173c003bdb96a8016533",
-    "bin": "gitignore.ps1"
+    "description": "Fetches .gitignore file templates from gitignore.io and writes them to standard output.",
+    "version": "0.2018.08.04",
+    "license": "MIT",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/gitignore.ps1",
+    "hash": "733e4e2bece6e84ad1d25589cc6d1f852587f2d4a6ffe74b8268435ae229487a",
+    "bin": "gitignore.ps1",
+    "checkver": {
+        "url": "https://github.com/lukesampson/psutils",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "replace": "0.${1}.${2}.${3}"
+    },
+    "autoupdate": {
+        "url": "https://raw.githubusercontent.com/lukesampson/psutils/$matchSha/gitignore.ps1"
+    }
 }

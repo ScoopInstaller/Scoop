@@ -1,11 +1,20 @@
 {
-    "version": "3653063",
-    "license": "MIT",
-    "url": "https://raw.github.com/lukesampson/psutils/3653063/vimtutor.ps1",
     "homepage": "https://github.com/lukesampson/psutils",
-    "hash": "f6081071fa95a6f49c049e9d2aed2d2a2632ec47635b4b497a97bab5f5add498",
+    "description": "The vimtutor that comes with Vim for Windows doesn't work with Scoop. This one does.",
+    "version": "0.2018.08.04",
+    "license": "MIT",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/vimtutor.ps1",
+    "hash": "1df57e3bf4139ca096acd71896cc1797ae539ed3ab77185c0ed93846b3c60790",
     "bin": "vimtutor.ps1",
     "suggest": {
         "vim": "vim"
+    },
+    "checkver": {
+        "url": "https://github.com/lukesampson/psutils",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "replace": "0.${1}.${2}.${3}"
+    },
+    "autoupdate": {
+        "url": "https://raw.githubusercontent.com/lukesampson/psutils/$matchSha/vimtutor.ps1"
     }
 }

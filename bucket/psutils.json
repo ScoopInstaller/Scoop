@@ -1,0 +1,33 @@
+{
+    "homepage": "https://github.com/lukesampson/psutils",
+    "description": "\n\tA collection of command line utilities written in PowerShell,\n\tproudly ignoring PowerShell Verb-Noun naming conventions.",
+    "version": "0.2018.08.04",
+    "url": "https://github.com/lukesampson/psutils/archive/de1a069215c54a1cb105f3dc79f14e25570c75f2.zip",
+    "hash": "432d21448ec3ed8e95e82e6ad0b633e096b1cd1c37bed081b8dbe2fd59f9fb1b",
+    "extract_dir": "psutils-de1a069215c54a1cb105f3dc79f14e25570c75f2",
+    "bin": [
+        "gitignore.ps1",
+        "ln.ps1",
+        "runat.ps1",
+        "say.ps1",
+        "shasum.ps1",
+        "sudo.ps1",
+        "time.ps1",
+        [
+            "time.ps1",
+            "timecmd"
+        ],
+        "touch.ps1",
+        "vimtutor.ps1"
+    ],
+    "notes": "Please use 'timecmd' instead of 'time' in cmd.exe.",
+    "checkver": {
+        "url": "https://github.com/lukesampson/psutils",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "replace": "0.${1}.${2}.${3}"
+    },
+    "autoupdate": {
+        "url": "https://github.com/lukesampson/psutils/archive/$matchSha.zip",
+        "extract_dir": "psutils-$matchSha"
+    }
+}

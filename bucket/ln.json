@@ -1,7 +1,17 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "0.2015.04.25",
-    "url": "https://raw.githubusercontent.com/lukesampson/psutils/4e363db/ln.ps1",
-    "hash": "81e9447d5d0108057c54380a8e49f6db9fa5806d2018e7b27bd68f3fb8332b98",
-    "bin": "ln.ps1"
+    "description": "An approximation of the Unix ln command.",
+    "version": "0.2018.08.04",
+    "license": "MIT",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/ln.ps1",
+    "hash": "2e97f2f1bacba1c403c538a80493e8c6c56203ba689f2a29a9fde6ba3576d3f7",
+    "bin": "ln.ps1",
+    "checkver": {
+        "url": "https://github.com/lukesampson/psutils",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "replace": "0.${1}.${2}.${3}"
+    },
+    "autoupdate": {
+        "url": "https://raw.githubusercontent.com/lukesampson/psutils/$matchSha/ln.ps1"
+    }
 }
