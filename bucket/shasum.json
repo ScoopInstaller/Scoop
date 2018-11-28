@@ -1,13 +1,20 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "0.2013.09.29",
+    "description": "An approximation of the Unix shasum command.",
+    "version": "0.2018.08.04",
+    "license": "MIT",
     "url": [
-        "https://raw.github.com/lukesampson/psutils/4fa05b1c9b/shasum.ps1",
-        "https://raw.github.com/lukesampson/psutils/4fa05b1c9b/getopt.ps1"
+        "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/shasum.ps1",
+        "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/getopt.ps1"
     ],
     "hash": [
-        "002ed0928a9d80f2d603e8de12bcd922fcdff5acfc4c6f6c67c2e2ace8728b08",
-        "452e61d92dd0eb4e4d6fe5fcd70f30b8c4f36cc9e3b618a7816ec45768d21262"
+        "569cd02dd49cff0c92c93a609e58cc902d850fe0c312ee86c3dc3fba0976e596",
+        "e3939d732ee937db60f336c2a0ed7a463874b37e213d5f42c5346b489a6edb65"
     ],
-    "bin": "shasum.ps1"
+    "bin": "shasum.ps1",
+    "checkver": {
+        "url": "https://github.com/lukesampson/psutils",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)",
+        "replace": "0.${1}.${2}.${3}"
+    }
 }

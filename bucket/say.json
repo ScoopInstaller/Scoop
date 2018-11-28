@@ -1,13 +1,20 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "0.2013.09.08",
+    "description": "An approximation of say from macOS.",
+    "version": "0.2018.08.04",
+    "license": "MIT",
     "url": [
-        "https://raw.github.com/lukesampson/psutils/3554f2db73/say.ps1",
-        "https://raw.github.com/lukesampson/psutils/2938900e58/getopt.ps1"
+        "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/say.ps1",
+        "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/getopt.ps1"
     ],
     "hash": [
-        "75e0013ed0a60b47646f6190b523fc6986177f7360e5352a22806d7e6143bb62",
-        "452e61d92dd0eb4e4d6fe5fcd70f30b8c4f36cc9e3b618a7816ec45768d21262"
+        "b8951f0c7f54701c8775fedfb0e33a97a2fa45931d7c6571c739b82627bad73d",
+        "e3939d732ee937db60f336c2a0ed7a463874b37e213d5f42c5346b489a6edb65"
     ],
-    "bin": "say.ps1"
+    "bin": "say.ps1",
+    "checkver": {
+        "url": "https://github.com/lukesampson/psutils",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)",
+        "replace": "0.${1}.${2}.${3}"
+    }
 }

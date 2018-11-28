@@ -1,7 +1,17 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "0.2017.04.16",
-    "url": "https://raw.github.com/lukesampson/psutils/master/runat.ps1",
+    "description": "A replacement for the at command which Microsoft has deprecated and removed in Windows 2012.",
+    "version": "0.2018.08.04",
+    "license": "MIT",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/runat.ps1",
     "hash": "3a7f3cf34a9695ae607627f4d3c041543909c217f54997ebbeb3871ce6f96889",
-    "bin": "runat.ps1"
+    "bin": "runat.ps1",
+    "checkver": {
+        "url": "https://github.com/lukesampson/psutils",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "replace": "0.${1}.${2}.${3}"
+    },
+    "autoupdate": {
+        "url": "https://raw.githubusercontent.com/lukesampson/psutils/$matchSha/runat.ps1"
+    }
 }

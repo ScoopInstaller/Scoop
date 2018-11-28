@@ -1,7 +1,17 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "version": "0.2013.07.02",
-    "url": "https://raw.github.com/lukesampson/psutils/767c019fc81f60a990342103cbf75db6703d3593/touch.ps1",
-    "hash": "1cedd53b77583d94264274ca8617f4ff5da535fc15d29274d3b12e5f72f7c2f5",
-    "bin": "touch.ps1"
+    "description": "A port of the Unix touch command.",
+    "version": "0.2018.08.04",
+    "license": "MIT",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/touch.ps1",
+    "hash": "11eeb18ca3143929b5ace9a838a88d9b1c5bc657bcc8dd46708ba7e50ba331d9",
+    "bin": "touch.ps1",
+    "checkver": {
+        "url": "https://github.com/lukesampson/psutils",
+        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "replace": "0.${1}.${2}.${3}"
+    },
+    "autoupdate": {
+        "url": "https://raw.githubusercontent.com/lukesampson/psutils/$matchSha/touch.ps1"
+    }
 }
