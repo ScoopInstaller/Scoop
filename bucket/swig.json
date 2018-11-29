@@ -1,0 +1,17 @@
+{
+    "homepage": "http://www.swig.org",
+    "version": "3.0.12",
+    "license": "GPL-3.0-or-later",
+    "url": "https://downloads.sourceforge.net/project/swig/swigwin/swigwin-3.0.12/swigwin-3.0.12.zip",
+    "hash": "21ce6cbe297a56b697ef6e7e92a83e75ca41dedc87e48282ab444591986c35f5",
+    "checkver": {
+        "url": "http://www.swig.org/download.html",
+        "re": "swigwin-((\\d+\\.){0,3}\\d+)"
+    },
+    "extract_dir": "swigwin-3.0.12",
+    "bin": "swig.exe",
+    "autoupdate": {
+        "url": "https://downloads.sourceforge.net/project/swig/swigwin/swigwin-$version/swigwin-$version.zip",
+        "extract_dir": "swigwin-$version"
+    }
+}
