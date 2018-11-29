@@ -1,12 +1,12 @@
 {
     "homepage": "http://www.sbcl.org/",
-    "version": "1.4.2",
+    "version": "1.4.14",
     "license": "http://www.sbcl.org/history.html",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-64-windows-binary.msi",
-            "hash": "sha1:e895c6b92aa5c590db9c3c88a6f0d543744094e4",
-            "extract_dir": "PFiles\\Steel Bank Common Lisp\\1.4.2"
+            "url": "https://downloads.sourceforge.net/project/sbcl/sbcl/1.4.14/sbcl-1.4.14-x86-64-windows-binary.msi",
+            "hash": "sha1:bc2eb3df2da434ba84f2ccce67d64652d82c4626",
+            "extract_dir": "PFiles\\Steel Bank Common Lisp\\1.4.14"
         }
     },
     "env_set": {
