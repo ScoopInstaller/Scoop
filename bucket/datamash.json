@@ -15,8 +15,9 @@
     },
     "bin": "datamash.exe",
     "checkver": {
-        "url": "https://www.gnu.org/software/datamash/download/",
-        "re": "wget http:\\/\\/ftp\\.gnu\\.org\\/gnu\\/datamash\\/datamash-([\\d.]+)\\.tar\\.gz"
+        "url": "http://download-mirror.savannah.gnu.org/releases/datamash/windows-binaries/",
+        "re": "datamash-([\d.]+)-no-locale",
+        "reverse": true
     },
     "autoupdate": {
         "architecture": {
