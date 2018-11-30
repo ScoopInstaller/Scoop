@@ -1,11 +1,11 @@
 {
     "homepage": "http://cmder.net",
     "description": "Portable console emulator for Windows",
-    "version": "1.3.8",
+    "version": "1.3.10",
     "license": "MIT",
     "persist": "config",
-    "url": "https://github.com/cmderdev/cmder/releases/download/v1.3.8/cmder.7z",
-    "hash": "0a063247a2bc7091237a56a12a7e5d88b94c109149b3ceb02f9e86029a2eefbc",
+    "url": "https://github.com/cmderdev/cmder/releases/download/v1.3.10/cmder.7z",
+    "hash": "7d0c597a0013aad9feb4be11f5672532b8e722a6751e3b1ba6c5fdf7c9ef23ba",
     "bin": "Cmder.exe",
     "shortcuts": [
         [
