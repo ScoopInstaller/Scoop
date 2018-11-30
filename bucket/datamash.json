@@ -16,7 +16,7 @@
     "bin": "datamash.exe",
     "checkver": {
         "url": "http://download-mirror.savannah.gnu.org/releases/datamash/windows-binaries/",
-        "re": "datamash-([\d.]+)-no-locale",
+        "re": "datamash-([\\d.]+)-no-locale",
         "reverse": true
     },
     "autoupdate": {
