@@ -1,17 +1,18 @@
 {
     "homepage": "http://www.andre-simon.de/doku/highlight/en/highlight.php",
-    "version": "3.43",
+    "version": "3.47",
+    "description": "Converts source code to formatted text with syntax highlighting.",
     "license": "GPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "http://www.andre-simon.de/zip/highlight-3.43-x64.zip",
-            "hash": "356b37409363539c083c96ed2ecd96f38c820b549fe37fe749061e9ed23e7155",
-            "extract_dir": "highlight-3.43-x64"
+            "url": "http://www.andre-simon.de/zip/highlight-3.47-x64.zip",
+            "hash": "140dfc4160f1ed3a240dd21f50c9e9a952cc61498763e724313e5a3745242192",
+            "extract_dir": "highlight-3.47-x64"
         },
         "32bit": {
-            "url": "http://www.andre-simon.de/zip/highlight-3.43.zip",
-            "hash": "7caabf4eb999a2ee9d730e1d89202906a0413ae36a5fb74ae09b409ccde45a45",
-            "extract_dir": "highlight-3.43"
+            "url": "http://www.andre-simon.de/zip/highlight-3.47.zip",
+            "hash": "3809d84546ee6b35680b33d2faf31e376db8028ca7dbddaab54d2157bbb92502",
+            "extract_dir": "highlight-3.47"
         }
     },
     "bin": "highlight.exe",
@@ -23,25 +24,26 @@
     ],
     "notes": "You need to set the working directory of the shortcut to '$dir'",
     "checkver": {
-        "github": "https://github.com/andre-simon/highlight"
+        "url": "https://gitlab.com/saalen/highlight/tags",
+        "regex": "v([\\d\\.]+)</a>"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
                 "url": "http://www.andre-simon.de/zip/highlight-$version-x64.zip",
-                "extract_dir": "highlight-$version-x64",
                 "hash": {
-                    "find": "<code>([a-fA-F0-9]{64})</code>\\s+\\|\\s+<a href=\"highlight-(?:[\\d.]+)-x64.zip.asc\">",
-                    "url": "http://www.andre-simon.de/zip/download.php"
-                }
+                    "url": "http://www.andre-simon.de/zip/download.php",
+                    "find": "([a-fA-F0-9]{64})</code>\\s+\\|\\s+<a href=\"highlight-[\\d\\.]+-x64.zip"
+                },
+                "extract_dir": "highlight-$version-x64"
             },
             "32bit": {
                 "url": "http://www.andre-simon.de/zip/highlight-$version.zip",
-                "extract_dir": "highlight-$version",
                 "hash": {
-                    "find": "<code>([a-fA-F0-9]{64})</code>\\s+\\|\\s+<a href=\"highlight-(?:[\\d.]+).zip.asc\">",
-                    "url": "http://www.andre-simon.de/zip/download.php"
-                }
+                    "url": "http://www.andre-simon.de/zip/download.php",
+                    "find": "([a-fA-F\\d]{64})</code>\\s+\\|\\s+<a href=\"highlight-[\\d\\.]+.zip"
+                },
+                "extract_dir": "highlight-$version"
             }
         }
     }
