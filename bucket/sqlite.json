@@ -1,6 +1,6 @@
 {
     "homepage": "https://www.sqlite.org/",
-    "version": "3.25.3",
+    "version": "3.26.0",
     "license": "Public Domain",
     "url": "https://www.sqlite.org/2018/sqlite-tools-win32-x86-3250300.zip",
     "hash": "d2df1ef9f31e4d4e159e3afac87088f8614ad157e62f627c6317482744823b1f",
