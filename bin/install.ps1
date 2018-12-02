@@ -42,8 +42,9 @@ $dir = ensure (versiondir 'scoop' 'current')
 # download scoop zip
 $zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
 $zipfile = "$dir\scoop.zip"
-Write-Output 'Downloading...'
+Write-Host -NoNewline 'Downloading...'
 dl $zipurl $zipfile
+Write-Host -f Green "done" 
 
 'Extracting...'
 unzip $zipfile "$dir\_tmp"
