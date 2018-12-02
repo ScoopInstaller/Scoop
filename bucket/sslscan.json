@@ -1,9 +1,13 @@
 {
-    "bin": "sslscan.exe",
-    "description": "Discover supported cipher suites for SSL/TLS enabled services",
-    "hash": "cd0e4f86b2b494afa187fbef4753e876c3fb7f06cb528785bb89ab25cc26989c",
+    "version": "1.11.11",
+    "description": "Tests SSL/TLS enabled services to discover supported cipher suites",
     "homepage": "https://github.com/rbsec/sslscan",
     "license": "GPL-3.0",
-    "url": "https://github.com/rbsec/sslscan/releases/download/1.11.0-rbsec/sslscan-win-1.11.0-rbsec.zip",
-    "version": "1.11.0"
+    "url": "https://github.com/rbsec/sslscan/releases/download/1.11.11-rbsec/sslscan-win-1.11.11-rbsec.zip",
+    "hash": "72b1ad5101b8782a72dfac02e2ad44034d02d586779ae9e2dd98f0f493652784",
+    "bin": "sslscan.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/rbsec/sslscan/releases/download/$version-rbsec/sslscan-win-$version-rbsec.zip"
+    }
 }
