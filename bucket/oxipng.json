@@ -2,11 +2,11 @@
     "homepage": "https://github.com/shssoichiro/oxipng",
     "description": "Multi-threaded lossless PNG optimizer",
     "license": "MIT",
-    "version": "2.1.7",
+    "version": "2.1.8",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/shssoichiro/oxipng/releases/download/v2.1.7/oxipng-v2.1.7-x86_64-pc-windows-msvc.zip",
-            "hash": "c6c4bd8d96eb0f3d11b358ce3597bc47dd51a11e8e07ff8c305e0b8a0022482d"
+            "url": "https://github.com/shssoichiro/oxipng/releases/download/v2.1.8/oxipng-v2.1.8-x86_64-pc-windows-msvc.zip",
+            "hash": "80d691853bb09074046cab8415e4be6a1756ac2ad1b7f27a4904139f8551b4cd"
         }
     },
     "bin": "oxipng.exe",
