@@ -1,10 +1,10 @@
 {
     "homepage": "https://shellcheck.net/",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "Static analysis tool for shell scripts",
     "license": "GPL-3.0",
-    "url": "https://shellcheck.storage.googleapis.com/shellcheck-v0.5.0.zip",
-    "hash": "cbfca919a03f058bc9b31b1d932450f63dbdb92dcfec1a30140e022f7db49bc0",
+    "url": "https://shellcheck.storage.googleapis.com/shellcheck-v0.6.0.zip",
+    "hash": "4799d9fce810d9f576706695f34dc63cbe8b1083f49530e528e7be5709b0f61e",
     "bin": "shellcheck.exe",
     "pre_install": "Get-ChildItem \"$dir\\shellcheck-*.exe\" | Rename-Item -NewName \"$dir\\shellcheck.exe\"",
     "checkver": {
