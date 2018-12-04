@@ -1,15 +1,15 @@
 {
     "homepage": "https://unbound.net/",
-    "version": "1.8.1",
+    "version": "1.8.2",
     "license": "BSD-3-Clause",
     "architecture": {
         "64bit": {
-            "url": "https://unbound.net/downloads/unbound-1.8.1.zip",
-            "hash": "4abf62d553d59f057b4fff593f6f1b01bf17bb26743db1f6f47495e08bab31d8"
+            "url": "https://unbound.net/downloads/unbound-1.8.2.zip",
+            "hash": "c69d83b7172097f72715ce659bb95005eaf8a3101bb490525550b13eb8685117"
         },
         "32bit": {
-            "url": "https://unbound.net/downloads/unbound-1.8.1-w32.zip",
-            "hash": "36de208f742f08b29e1f68e0ffb8f6dfe7f4b95fffbf6b040248ccce60c2a8ef"
+            "url": "https://unbound.net/downloads/unbound-1.8.2-w32.zip",
+            "hash": "6181bfaa1567b6cb7d1977ef867537c7f0f977440a7b3a5403597b501f50a79d"
         }
     },
     "bin": [
@@ -24,9 +24,7 @@
             "openssl",
             "openssl10x"
         ],
-        "wget": [
-            "wget"
-        ]
+        "wget": "wget"
     },
     "checkver": {
         "url": "https://unbound.net/download.html",
