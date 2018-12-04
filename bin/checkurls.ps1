@@ -8,6 +8,8 @@
     Where to search for manifest(s).
 .PARAMETER Timeout
     How long (seconds) the request can be pending before it times out.
+.PARAMETER SkipValid
+    Manifests will all valid URLs will not be shown.
 #>
 param(
     [String] $App = '*',
@@ -19,7 +21,8 @@ param(
         }
     })]
     [String] $Dir = "$PSScriptRoot\\..\bucket",
-    [Int] $Timeout = 5
+    [Int] $Timeout = 5,
+    [Switch] $SkipValid
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -75,8 +78,8 @@ function test_dl([String] $url, $cookies) {
     }
 }
 
-$Queue | ForEach-Object {
-    $name, $manifest = $_
+foreach ($man in $Queue) {
+    $name, $manifest = $man
     $urls = @()
     $ok = 0
     $failed = 0
@@ -96,14 +99,16 @@ $Queue | ForEach-Object {
         if ($status -eq 'OK' -or $status -eq 'OpeningData') { $ok += 1 } else { $failed += 1 }
     }
 
+    if (($ok -eq $urls.Length) -and $SkipValid) { continue }
+
     # URLS
     Write-Host '[' -NoNewLine
-    Write-Host $urls.length -NoNewLine -ForegroundColor Cyan
+    Write-Host $urls.Length -NoNewLine -ForegroundColor Cyan
     Write-Host ']' -NoNewLine
 
     # Okay
     Write-Host '[' -NoNewLine
-    if ($ok -eq $urls.length) {
+    if ($ok -eq $urls.Length) {
         Write-Host $ok -NoNewLine -ForegroundColor Green
     } elseif ($ok -eq 0) {
         Write-Host $ok -NoNewLine -ForegroundColor Red
