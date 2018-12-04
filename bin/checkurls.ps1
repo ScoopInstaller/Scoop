@@ -92,7 +92,6 @@ foreach ($man in $Queue) {
         url $manifest '32bit' | ForEach-Object { $urls += $_ }
     }
 
-    # TODO: Add homepage/checkver
     $urls | ForEach-Object {
         $url, $status, $msg = test_dl $_ $manifest.cookie
         if ($msg) { $errors += "$msg ($url)" }
