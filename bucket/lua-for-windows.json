@@ -1,4 +1,5 @@
 {
+    "description": "A 'batteries included environment' for the Lua scripting language on Windows.",
     "version": "5.1.5-52",
     "url": "https://github.com/rjpcomputing/luaforwindows/releases/download/v5.1.5-52/LuaForWindows_v5.1.5-52.exe",
     "homepage": "https://github.com/rjpcomputing/luaforwindows",
@@ -9,6 +10,9 @@
         "luac.exe",
         "luarocks.bat"
     ],
+    "env_set": {
+        "LUA_DEV": "$dir"
+    },
     "depends": [
         "innounp"
     ],
