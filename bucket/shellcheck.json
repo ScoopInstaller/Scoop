@@ -4,7 +4,7 @@
     "description": "Static analysis tool for shell scripts",
     "license": "GPL-3.0",
     "url": "https://shellcheck.storage.googleapis.com/shellcheck-v0.6.0.zip",
-    "hash": "4799d9fce810d9f576706695f34dc63cbe8b1083f49530e528e7be5709b0f61e",
+    "hash": "25837b10b8387d3a7377f087ca3a27c6caa3765a41d993f25b816d65821c9a26",
     "bin": "shellcheck.exe",
     "pre_install": "Get-ChildItem \"$dir\\shellcheck-*.exe\" | Rename-Item -NewName \"$dir\\shellcheck.exe\"",
     "checkver": {
