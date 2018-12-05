@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://releases.hashicorp.com/vault/1.0.0/vault_1.0.0_windows_amd64.zip",
-            "hash": "96f3a62013d2a50cebcc8b81c7e83c12bac757959fe4f23cb391d5f11e23a5fe"
+            "hash": "40625092265076ff20925a29fde13e9bd64a5dfca9abfe7d73a59b5f8f2d24b9"
         },
         "32bit": {
             "url": "https://releases.hashicorp.com/vault/1.0.0/vault_1.0.0_windows_386.zip",
-            "hash": "3feb25dd708c94b424c12b5663991c7e80beebd38ca65ee53a0470965800c1e5"
+            "hash": "6a4e1c41006b3e71f09123c716be3d9487acfed897cf2671771746602fb95a1e"
         }
     },
     "bin": "vault.exe",
