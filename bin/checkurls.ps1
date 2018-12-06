@@ -1,116 +1,134 @@
-# list manifests which do not specify a checkver regex
+<#
+.SYNOPSIS
+    List manifests which do not have valid URLs.
+.PARAMETER App
+    Manifest name to search.
+    Placeholder is supported.
+.PARAMETER Dir
+    Where to search for manifest(s).
+.PARAMETER Timeout
+    How long (seconds) the request can be pending before it times out.
+.PARAMETER SkipValid
+    Manifests will all valid URLs will not be shown.
+#>
 param(
-    [String]$app,
-    [String]$dir,
-    [Int]$timeout = 5
+    [String] $App = '*',
+    [ValidateScript( {
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        } else {
+            $true
+        }
+    })]
+    [String] $Dir = "$PSScriptRoot\\..\bucket",
+    [Int] $Timeout = 5,
+    [Switch] $SkipValid
 )
 
-if(!$dir) { $dir = "$psscriptroot\..\bucket" }
-$dir = resolve-path $dir
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\config.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
 
-$search = "*"
-if($app) { $search = $app }
+$Dir = Resolve-Path $Dir
+$Queue = @()
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\config.ps1"
-. "$psscriptroot\..\lib\install.ps1"
-
-if(!$dir) { $dir = "$psscriptroot\..\bucket" }
-$dir = resolve-path $dir
-
-# get apps to check
-$queue = @()
-Get-ChildItem $dir "$search.json" | ForEach-Object {
-    $manifest = parse_json "$dir\$($_.Name)"
-    $queue += ,@($_.Name, $manifest)
+Get-ChildItem $Dir "$App.json" | ForEach-Object {
+    $manifest = parse_json "$Dir\$($_.Name)"
+    $Queue += , @($_.Name, $manifest)
 }
 
 $original = use_any_https_protocol
 
-write-host "[" -nonewline
-write-host -f cyan "U" -nonewline
-write-host "]RLs"
-write-host " | [" -nonewline
-write-host -f green "O" -nonewline
-write-host "]kay"
-write-host " |  | [" -nonewline
-write-host -f red "F" -nonewline
-write-host "]ailed"
-write-host " |  |  |"
+Write-Host '[' -NoNewLine
+Write-Host 'U' -NoNewLine -ForegroundColor Cyan
+Write-Host ']RLs'
+Write-Host ' | [' -NoNewLine
+Write-Host 'O' -NoNewLine -ForegroundColor Green
+Write-Host ']kay'
+Write-Host ' |  | [' -NoNewLine
+Write-Host 'F' -NoNewLine -ForegroundColor Red
+Write-Host ']ailed'
+Write-Host ' |  |  |'
 
-function test_dl($url, $cookies) {
-    $wreq = [net.webrequest]::create($url)
-    $wreq.timeout = $timeout * 1000
-    if($wreq -is [net.httpwebrequest]) {
-        $wreq.useragent = Get-UserAgent
-        $wreq.referer = strip_filename $url
-        if($cookies) {
-            $wreq.headers.add('Cookie', (cookie_header $cookies))
+function test_dl([String] $url, $cookies) {
+    $wreq = [Net.WebRequest]::Create($url)
+    $wreq.Timeout = $Timeout * 1000
+    if ($wreq -is [Net.HttpWebRequest]) {
+        $wreq.UserAgent = Get-UserAgent
+        $wreq.Referer = strip_filename $url
+        if ($cookies) {
+            $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
     }
     $wres = $null
     try {
-        $wres = $wreq.getresponse()
-        return $url, $wres.statuscode, $null
+        $wres = $wreq.GetResponse()
+
+        return $url, $wres.StatusCode, $null
     } catch {
-        $e = $_.exception
-        if($e.innerexception) { $e = $e.innerexception }
-        return $url, "Error", $e.message
+        $e = $_.Exception
+        if ($e.InnerException) { $e = $e.InnerException }
+
+        return $url, 'Error', $e.Message
     } finally {
-        if($null -ne $wres -and $wres -isnot [net.ftpwebresponse]) {
-            $wres.close()
+        if ($null -ne $wres -and $wres -isnot [Net.FtpWebResponse]) {
+            $wres.Close()
         }
     }
 }
 
-$queue | ForEach-Object {
-    $name, $manifest = $_
+foreach ($man in $Queue) {
+    $name, $manifest = $man
     $urls = @()
     $ok = 0
     $failed = 0
     $errors = @()
 
-    if($manifest.url) {
+    if ($manifest.url) {
         $manifest.url | ForEach-Object { $urls += $_ }
     } else {
-        url $manifest "64bit" | ForEach-Object { $urls += $_ }
-        url $manifest "32bit" | ForEach-Object { $urls += $_ }
+        url $manifest '64bit' | ForEach-Object { $urls += $_ }
+        url $manifest '32bit' | ForEach-Object { $urls += $_ }
     }
 
     $urls | ForEach-Object {
         $url, $status, $msg = test_dl $_ $manifest.cookie
-        if($msg) { $errors += "$msg ($url)" }
-        if($status -eq "OK" -or $status -eq "OpeningData") { $ok += 1 } else { $failed += 1 }
+        if ($msg) { $errors += "$msg ($url)" }
+        if ($status -eq 'OK' -or $status -eq 'OpeningData') { $ok += 1 } else { $failed += 1 }
     }
 
-    write-host "[" -nonewline
-    write-host -f cyan -nonewline $urls.length
-    write-host "]" -nonewline
+    if (($ok -eq $urls.Length) -and $SkipValid) { continue }
 
-    write-host "[" -nonewline
-    if($ok -eq $urls.length) {
-        write-host -f green -nonewline $ok
-    } elseif($ok -eq 0) {
-        write-host -f red -nonewline $ok
+    # URLS
+    Write-Host '[' -NoNewLine
+    Write-Host $urls.Length -NoNewLine -ForegroundColor Cyan
+    Write-Host ']' -NoNewLine
+
+    # Okay
+    Write-Host '[' -NoNewLine
+    if ($ok -eq $urls.Length) {
+        Write-Host $ok -NoNewLine -ForegroundColor Green
+    } elseif ($ok -eq 0) {
+        Write-Host $ok -NoNewLine -ForegroundColor Red
     } else {
-        write-host -f yellow -nonewline $ok
+        Write-Host $ok -NoNewLine -ForegroundColor Yellow
     }
-    write-host "]" -nonewline
+    Write-Host ']' -NoNewLine
 
-    write-host "[" -nonewline
-    if($failed -eq 0) {
-        write-host -f green -nonewline $failed
+    # Failed
+    Write-Host '[' -NoNewLine
+    if ($failed -eq 0) {
+        Write-Host $failed -NoNewLine -ForegroundColor Green
     } else {
-        write-host -f red -nonewline $failed
+        Write-Host $failed -NoNewLine -ForegroundColor Red
     }
-    write-host "] " -nonewline
-    write-host (strip_ext $name)
+    Write-Host '] ' -NoNewLine
+    Write-Host (strip_ext $name)
 
     $errors | ForEach-Object {
-        write-host -f darkred "       > $_"
+        Write-Host "       > $_" -ForegroundColor DarkRed
     }
 }
-
 
 set_https_protocols $original
