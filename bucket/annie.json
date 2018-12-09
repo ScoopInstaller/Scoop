@@ -26,7 +26,7 @@
             }
         },
         "hash": {
-            "url": "$baseurl/SHA2-256SUMS"
+            "url": "$baseurl/annie_$version_checksums.txt"
         }
     }
 }

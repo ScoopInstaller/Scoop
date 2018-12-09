@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20181128.exe#/dl.7z",
-            "hash": "7f58c2486ca9d6ab464e9304861b75208031c3e4acc250798fc0fe5312d7e0f2"
+            "hash": "sha512:b28fcf021a5700657949d2246f5e50840f86ee9ab8812d22c2a5d0059b88376ae519d8fbfb02dec770bdb69fc2125c8de0ddb4e95ef2c5284e0d7cc82d11ae10"
         },
         "32bit": {
             "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-20181128.exe#/dl.7z",
-            "hash": "90bc45f50d6d53804a9c89bce460b7751331ecd59ffa946bff77b5bfa2bcc36f"
+            "hash": "sha512:07ee553cef7fe7690db0e3d042897ca7a7a844a3c6f90e22b7a40bdde5871946e2cd3a03fc6a90b414e6ae4bb1be462275e3026bdc74c9d843b73b70331cd9c4"
         }
     },
     "bin": [
@@ -50,8 +50,6 @@
         "qemu-system-ppc.exe",
         "qemu-system-ppc64.exe",
         "qemu-system-ppc64w.exe",
-        "qemu-system-ppcemb.exe",
-        "qemu-system-ppcembw.exe",
         "qemu-system-ppcw.exe",
         "qemu-system-s390x.exe",
         "qemu-system-s390xw.exe",

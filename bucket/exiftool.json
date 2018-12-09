@@ -1,12 +1,12 @@
 {
     "homepage": "https://sno.phy.queensu.ca/~phil/exiftool/index.html",
-    "version": "11.20",
+    "version": "11.21",
     "license": {
         "identifier": "Artistic-1.0-Perl|GPL-1.0-only",
         "url": "https://dev.perl.org/licenses/"
     },
-    "url": "https://downloads.sourceforge.net/project/exiftool/exiftool-11.20.zip",
-    "hash": "sha1:561566607055c66457056f77563ab09b223631a0",
+    "url": "https://downloads.sourceforge.net/project/exiftool/exiftool-11.21.zip",
+    "hash": "sha1:16faa7c9c888a23f9d8e15b772ec0018583f300e",
     "bin": [
         [
             "exiftool(-k).exe",

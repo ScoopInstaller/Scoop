@@ -156,6 +156,18 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # directory.
     $refdir = unlink_current $dir
 
+    if ($force -and ($old_version -eq $version)) {
+        if (!(Test-Path "$dir/../_$version.old")) {
+            Move-Item "$dir" "$dir/../_$version.old"
+        } else {
+            $i = 1
+            While (Test-Path "$dir/../_$version.old($i)") {
+                $i++
+            }
+            Move-Item "$dir" "$dir/../_$version.old($i)"
+        }
+    }
+
     if($bucket) {
         # add bucket name it was installed from
         $app = "$bucket/$app"

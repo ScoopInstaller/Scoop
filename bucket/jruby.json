@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.jruby.org/",
-    "version": "9.2.4.1",
-    "url": "https://s3.amazonaws.com/jruby.org/downloads/9.2.4.1/jruby-bin-9.2.4.1.zip",
-    "hash": "75ab17a905f7a8049dd45f65df4ace44e78602b892091b6b020ef71dc30b798a",
-    "extract_dir": "jruby-9.2.4.1",
+    "version": "9.2.5.0",
+    "url": "https://s3.amazonaws.com/jruby.org/downloads/9.2.5.0/jruby-bin-9.2.5.0.zip",
+    "hash": "00ef7fb87b064e4d7864de79fbfbb139990e91b22c26df80daf2260822f11bfd",
+    "extract_dir": "jruby-9.2.5.0",
     "persist": "gems",
     "env_add_path": [
         "bin",
