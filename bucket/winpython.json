@@ -2,20 +2,26 @@
     "description": "Free, open-source and portable Python distribution for Windows",
     "version": "3.7.1.0",
     "license": "MIT",
+    "homepage": "https://winpython.github.io/",
     "architecture": {
         "64bit": {
             "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.7/3.7.1.0/WinPython64-3.7.1.0Zero.exe",
-            "hash": "4e81abd373c089cd9b6687393bb3d179e6792a97d8f088f77d35b9067f118c0f",
-            "pre_install": "Get-ChildItem -Path \"$dir\" -Recurse -Exclude \"python-3.7.1.amd64\" | Select -ExpandProperty FullName | Where {$_ -notlike \"$dir\\python-3.7.1.amd64\\*\"} | sort length -Descending | Remove-Item -Force; Move-Item \"$dir\\python-3.7.1.amd64\\*\" \"$dir\"; Remove-Item \"$dir\\python-3.7.1.amd64\""
+            "hash": "4e81abd373c089cd9b6687393bb3d179e6792a97d8f088f77d35b9067f118c0f"
         },
         "32bit": {
             "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.7/3.7.1.0/WinPython32-3.7.1.0Zero.exe",
-            "hash": "a09c79c7630278f831d257c03bab99f76d3a0e23f8b4362a3e1e2495a3aa088f",
-            "pre_install": "Get-ChildItem -Path \"$dir\" -Recurse -Exclude \"python-3.7.1\" | Select -ExpandProperty FullName | Where {$_ -notlike \"$dir\\python-3.7.1\\*\"} | sort length -Descending | Remove-Item -Force; Move-Item \"$dir\\python-3.7.1\\*\" \"$dir\"; Remove-Item \"$dir\\python-3.7.1\""
+            "hash": "a09c79c7630278f831d257c03bab99f76d3a0e23f8b4362a3e1e2495a3aa088f"
         }
     },
     "innosetup": true,
-    "homepage": "https://winpython.github.io/",
+    "installer": {
+        "script": [
+            "Get-ChildItem \"$dir\" -Exclude 'python-*' | Remove-Item -Force -Recurse",
+            "$fold = (Get-ChildItem \"$dir\")[0] | Select-Object -ExpandProperty FullName",
+            "Move-Item \"$fold\\*\" \"$dir\" -Force",
+            "Remove-Item $fold -Recurse"
+        ]
+    },
     "bin": [
         "python.exe",
         "pythonw.exe",
@@ -27,18 +33,16 @@
     "env_add_path": "scripts",
     "checkver": {
         "url": "https://github.com/winpython/winpython/releases",
-        "re": "-([\\d.]+)Zero\\.exe"
+        "regex": "-([\\d.]+)Zero\\.exe"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython64-$versionZero.exe",
-                "pre_install": "Get-ChildItem -Path \"$dir\" -Recurse -Exclude \"python-$matchHead.amd64\" | Select -ExpandProperty FullName | Where {$_ -notlike \"$dir\\python-$matchHead.amd64\\*\"} | sort length -Descending | Remove-Item -Force; Move-Item \"$dir\\python-$matchHead.amd64\\*\" \"$dir\"; Remove-Item \"$dir\\python-$matchHead.amd64\""
+                "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython64-$versionZero.exe"
 
             },
             "32bit": {
-                "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython32-$versionZero.exe",
-                "pre_install": "Get-ChildItem -Path \"$dir\" -Recurse -Exclude \"python-$matchHead\" | Select -ExpandProperty FullName | Where {$_ -notlike \"$dir\\python-$matchHead\\*\"} | sort length -Descending | Remove-Item -Force; Move-Item \"$dir\\python-$matchHead\\*\" \"$dir\"; Remove-Item \"$dir\\python-$matchHead\""
+                "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython32-$versionZero.exe"
             }
         },
         "hash": {
