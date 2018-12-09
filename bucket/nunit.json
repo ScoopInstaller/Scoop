@@ -15,6 +15,6 @@
         "github": "https://github.com/nunit/nunit-console"
     },
     "autoupdate": {
-        "url": "https://github.com/nunit/nunit-console/releases/download/v3.9/NUnit.Console-$version.zip"
+        "url": "https://github.com/nunit/nunit-console/releases/download/v$majorVersion.$minorVersion/NUnit.Console-$version.zip"
     }
 }
