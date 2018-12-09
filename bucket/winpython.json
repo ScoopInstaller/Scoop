@@ -17,9 +17,8 @@
     "installer": {
         "script": [
             "Get-ChildItem \"$dir\" -Exclude 'python-*' | Remove-Item -Force -Recurse",
-            "$fold = \"$dir\\\" + ((Get-ChildItem \"$dir\")[0])",
-            "Move-Item \"$fold\\*\" \"$dir\" -Force",
-            "Remove-Item $fold -Recurse"
+            "Move-Item \"$dir\\python-*\\*\" \"$dir\" -Force",
+            "Remove-Item \"$dir\\python-*\""
         ]
     },
     "bin": [
