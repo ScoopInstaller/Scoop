@@ -32,8 +32,9 @@
     ],
     "env_add_path": "scripts",
     "checkver": {
-        "url": "https://github.com/winpython/winpython/releases",
-        "regex": "-([\\d.]+)Zero\\.exe"
+        "github": "https://github.com/winpython/winpython/",
+        "regex": "-([\\d.]+)Zero\\.exe",
+        "reverse": true
     },
     "autoupdate": {
         "architecture": {
