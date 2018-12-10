@@ -1,13 +1,15 @@
 using System;
-using System.ComponentModel;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 namespace Scoop {
 
@@ -16,7 +18,7 @@ namespace Scoop {
         static extern bool CreateProcess(string lpApplicationName,
             string lpCommandLine, IntPtr lpProcessAttributes,
             IntPtr lpThreadAttributes, bool bInheritHandles,
-            uint dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory,
+            uint dwCreationFlags, [In, MarshalAs(UnmanagedType.LPStr)] StringBuilder lpEnvironment, string lpCurrentDirectory,
             [In] ref STARTUPINFO lpStartupInfo,
             out PROCESS_INFORMATION lpProcessInformation);
         const int ERROR_ELEVATION_REQUIRED = 740;
@@ -91,10 +93,25 @@ namespace Scoop {
             if(!string.IsNullOrEmpty(cmd_args)) cmd_args = " " + cmd_args;
             var cmd = "\"" + path + "\"" + cmd_args;
 
+            var environment_dictionary = Environment.GetEnvironmentVariables();
+            var environment = new StringBuilder();
+            foreach (KeyValuePair<string, string> entry in config) {
+                if (entry.Key.StartsWith("env::")) {
+                    environment_dictionary[entry.Key.Substring(5)] = entry.Value;
+                }
+            }
+            foreach (DictionaryEntry entry in environment_dictionary) {
+                environment.Append(entry.Key);
+                environment.Append("=");
+                environment.Append(entry.Value);
+                environment.Length += 1;
+            }
+            environment.Length += 1;
+
             if(!CreateProcess(null, cmd, IntPtr.Zero, IntPtr.Zero,
                 bInheritHandles: true,
                 dwCreationFlags: 0,
-                lpEnvironment: IntPtr.Zero, // inherit parent
+                lpEnvironment: environment,
                 lpCurrentDirectory: null, // inherit parent
                 lpStartupInfo: ref si,
                 lpProcessInformation: out pi)) {
