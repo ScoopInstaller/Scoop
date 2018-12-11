@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.erlang.org",
-    "version": "21.1",
+    "version": "21.2",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "http://erlang.org/download/otp_win64_21.1.exe",
-            "hash": "170c44850a3e4f0a5b510653b500f7a7b99337fbfb38d19a745f38869baa23a5"
+            "url": "http://erlang.org/download/otp_win64_21.2.exe",
+            "hash": "468f50caa643bbed484be475419d200d47c87597efd4057142bdb000e1accb72"
         },
         "32bit": {
-            "url": "http://erlang.org/download/otp_win32_21.1.exe",
-            "hash": "9c8a48f6622325124795563a7d848f9d03bb3b9b011226886326245c05ffd92e"
+            "url": "http://erlang.org/download/otp_win32_21.2.exe",
+            "hash": "f1e8153530ef91c9cdc4a73593fe0fe41755412244370060bd8e4b80572ba242"
         }
     },
     "bin": [
@@ -28,9 +28,7 @@
     },
     "uninstaller": {
         "file": "Uninstall.exe",
-        "args": [
-            "/S"
-        ]
+        "args": "/S"
     },
     "checkver": {
         "url": "https://www.erlang.org/downloads",
