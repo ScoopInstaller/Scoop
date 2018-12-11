@@ -1,10 +1,10 @@
 {
-    "version": "2.44",
+    "version": "2.45",
     "homepage": "https://sites.google.com/a/chromium.org/chromedriver/",
     "description": "An open source tool for automated testing of webapps across many browsers",
     "license": "BSD-3-Clause",
-    "url": "https://chromedriver.storage.googleapis.com/2.44/chromedriver_win32.zip",
-    "hash": "5d2d2ddb2ed3730672484160c822b75b41c4e77f9cadb5111530699d561c548c",
+    "url": "https://chromedriver.storage.googleapis.com/2.45/chromedriver_win32.zip",
+    "hash": "8f3373a260a524410e25ea643ecb0175ed49a078088c7ab4d88db323ee19a230",
     "bin": "chromedriver.exe",
     "checkver": {
         "url": "https://chromedriver.storage.googleapis.com/LATEST_RELEASE",
