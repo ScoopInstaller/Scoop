@@ -1,10 +1,10 @@
 {
-    "version": "2.8.1",
+    "version": "2.8.2",
     "license": "EPL-1.0",
-    "url": "https://raw.githubusercontent.com/technomancy/leiningen/2.8.1/bin/lein.bat",
+    "url": "https://raw.githubusercontent.com/technomancy/leiningen/2.8.2/bin/lein.bat",
     "homepage": "https://github.com/technomancy/leiningen",
     "bin": "lein.bat",
-    "hash": "1dadc0ac8f9ae0d76fa5ab560ce027793b6bd9b90fb49aaddcad9c243faf2ed3",
+    "hash": "1f612a05bf890bdbe42a270d8258431391138bb4815ca3fc81ccff0424664b60",
     "post_install": "lein self-install",
     "checkver": {
         "github": "https://github.com/technomancy/leiningen"
