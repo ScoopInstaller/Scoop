@@ -41,8 +41,12 @@ function cleanup($app, $global, $verbose) {
         $dir = versiondir $app $version $global
         Get-ChildItem $dir | ForEach-Object {
             $file = $_
+            # the file is a junction
             if($null -ne $file.LinkType) {
-                fsutil.exe reparsepoint delete $file.FullName | out-null
+                # remove read-only attribute on the link
+                attrib -R /L $file
+                # remove the junction
+                & "$env:COMSPEC" /c "rmdir $file"
             }
         }
         Remove-Item $dir -Recurse -Force
