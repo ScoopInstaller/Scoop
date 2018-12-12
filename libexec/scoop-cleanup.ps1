@@ -42,11 +42,12 @@ function cleanup($app, $global, $verbose) {
         Get-ChildItem $dir | ForEach-Object {
             $file = $_
             # the file is a junction
-            if($null -ne $file.LinkType) {
+            if ($null -ne $file.LinkType -and $file -is [System.IO.DirectoryInfo]) {
                 # remove read-only attribute on the link
                 attrib -R /L $file
                 # remove the junction
-                & "$env:COMSPEC" /c "rmdir $file"
+                $filepath = Resolve-Path $file
+                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
             }
         }
         Remove-Item $dir -Recurse -Force
