@@ -1,0 +1,30 @@
+{
+    "version": "1.5.1",
+    "description": "Node Version Switcher - A cross-platform tool for switching between versions and forks of Node.js",
+    "homepage": "https://github.com/jasongin/nvs",
+    "license": {
+        "identifier": "MIT"
+    },
+    "notes": "If an \"EPERM\" error occurs, remove the error one and add it again.",
+    "url": "https://github.com/jasongin/nvs/releases/download/v1.5.1/nvs-1.5.1.msi",
+    "hash": "908ef382cd25733f3d02e92f3e73fd76bcd89c822879ffbc6f768326a040b3b7",
+    "extract_dir": "nvs",
+    "bin": "nvs.ps1",
+    "persist": "nodejs",
+    "env_set": {
+        "NVS_HOME": "$dir\\nodejs"
+    },
+    "post_install": [
+        "powershell -NoProfile -File $dir\\nvs.ps1 remote >> null",
+        "$CONF = (Get-Content \"$persist_dir\\nodejs\\settings.json\") | ConvertFrom-Json",
+        "Add-Member -NotePropertyName linkToSystem -NotePropertyValue $false -Force -InputObject $CONF",
+        "ConvertTo-Json $CONF | Out-File -encoding \"ASCII\" \"$persist_dir\\nodejs\\settings.json\""
+    ],
+    "uninstaller": {
+        "script": "nvs unlink >> null"
+    },
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/jasongin/nvs/releases/download/v$version/nvs-$version.msi"
+    }
+}
