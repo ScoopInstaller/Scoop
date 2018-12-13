@@ -71,6 +71,18 @@ if(!$apps) { exit 0 }
     env_rm $manifest $global
 
     try {
+        # remove read-only junction link before doing recursive Remove-Item
+        Get-ChildItem $dir | ForEach-Object {
+            $file = $_
+            # the file is a junction
+            if ($null -ne $file.LinkType -and $file -is [System.IO.DirectoryInfo]) {
+                # remove read-only attribute on the link
+                attrib -R /L $file
+                # remove the junction
+                $filepath = Resolve-Path $file
+                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+            }
+        }
         Remove-Item -r $dir -ea stop -force
     } catch {
         if(test-path $dir) {
@@ -85,6 +97,18 @@ if(!$apps) { exit 0 }
         write-host "Removing older version ($oldver)."
         $dir = versiondir $app $oldver $global
         try {
+            # remove read-only junction link before doing recursive Remove-Item
+            Get-ChildItem $dir | ForEach-Object {
+                $file = $_
+                # the file is a junction
+                if ($null -ne $file.LinkType -and $file -is [System.IO.DirectoryInfo]) {
+                    # remove read-only attribute on the link
+                    attrib -R /L $file
+                    # remove the junction
+                    $filepath = Resolve-Path $file
+                    & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+                }
+            }
             Remove-Item -r -force -ea stop $dir
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
