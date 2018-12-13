@@ -5,12 +5,7 @@
     "license": "GPL-2.0",
     "url": "https://github.com/AlDanial/cloc/releases/download/1.80/cloc-1.80.exe#/cloc.exe",
     "hash": "9e547b01c946aa818ffad43b9ebaf05d3da08ed6ca876ef2b6847be3bf1cf8be",
-    "bin": [
-        [
-            "cloc.exe",
-            "cloc"
-        ]
-    ],
+    "bin": "cloc.exe",
     "checkver": {
         "github": "https://github.com/AlDanial/cloc"
     },
