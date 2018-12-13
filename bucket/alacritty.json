@@ -1,0 +1,25 @@
+{
+    "homepage": "https://github.com/jwilm/alacritty",
+    "description": "A cross-platform, GPU-accelerated terminal emulator",
+    "license": {
+        "identifier": "Apache-2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "version": "0.2.4",
+    "url": [
+        "https://github.com/jwilm/alacritty/releases/download/v0.2.4/Alacritty-v0.2.4.exe#/alacritty.exe",
+        "https://github.com/jwilm/alacritty/releases/download/v0.2.4/winpty-agent.exe"
+    ],
+    "hash": [
+        "a31cdb56170f4973db42736f0e35d11b9ea43ab6729e3ab2fec5dc72b09cdc70",
+        "9add1a61155ec47cf6f347faf776b746eebbde1dc9360d81b8a909da34650642"
+    ],
+    "checkver": "github",
+    "shortcuts": [
+        [
+            "alacritty.exe",
+            "Alacritty",
+            "--working-directory %USERPROFILE%"
+        ]
+    ]
+}
