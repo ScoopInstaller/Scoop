@@ -283,7 +283,7 @@ if($global -and !(is_admin)) {
     abort 'ERROR: you need admin rights to fix global apps.'
 }
 
-,@( ( if($specified) {
+,@( $( if($specified) {
           ensure_all_installed $specified $global
       } else {
           ,@($false, $true | ForEach-Object {
@@ -304,7 +304,10 @@ if($global -and !(is_admin)) {
     }
 ) | ForEach-Object {
     & $ExecutionContext.InvokeCommand.NewScriptBlock(
-        $_ -join ' + '
+        $(  $(foreach($i in $($_.indexOf($_[-1]))) {
+                '$_' + "[$i]" + '+'
+            }) | Out-String
+        ).replace("`r`n","") -replace('\+$','')
     )
 } | ForEach-Object {
     info "Finding broken apps$(if($specified) { `" in '$specified'`"})..."
