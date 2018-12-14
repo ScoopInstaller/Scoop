@@ -1,13 +1,14 @@
 {
     "homepage": "https://github.com/AlDanial/cloc",
     "description": "Counts blank lines, comment lines, and physical lines of source code in many programming languages",
-    "version": "1.70",
+    "version": "1.80",
     "license": "GPL-2.0",
-    "url": "https://github.com/AlDanial/cloc/releases/download/1.70/cloc-1.70.exe#/cloc.exe",
-    "hash": "1c1a64fff0c7065954c52c36d288d800d9b18c558162aab3bd239d2e537476f0",
+    "url": "https://github.com/AlDanial/cloc/releases/download/1.80/cloc-1.80.exe#/cloc.exe",
+    "hash": "9e547b01c946aa818ffad43b9ebaf05d3da08ed6ca876ef2b6847be3bf1cf8be",
     "bin": "cloc.exe",
     "checkver": {
-        "github": "https://github.com/AlDanial/cloc"
+        "url": "https://github.com/AlDanial/cloc/releases",
+        "regex": "/releases/tag/(?:v|V)?([\\d.]+)"
     },
     "autoupdate": {
         "url": "https://github.com/AlDanial/cloc/releases/download/$version/cloc-$version.exe#/cloc.exe"
