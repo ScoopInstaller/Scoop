@@ -1,18 +1,18 @@
 {
     "homepage": "http://www.andre-simon.de/doku/highlight/en/highlight.php",
-    "version": "3.47",
+    "version": "3.48",
     "description": "Converts source code to formatted text with syntax highlighting.",
     "license": "GPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "http://www.andre-simon.de/zip/highlight-3.47-x64.zip",
-            "hash": "140dfc4160f1ed3a240dd21f50c9e9a952cc61498763e724313e5a3745242192",
-            "extract_dir": "highlight-3.47-x64"
+            "url": "http://www.andre-simon.de/zip/highlight-3.48-x64.zip",
+            "hash": "23a4698b6e09a32eabdc6861c8807d3c4e735503ad8bd830dfe6adf17399bbe6",
+            "extract_dir": "highlight-3.48-x64"
         },
         "32bit": {
-            "url": "http://www.andre-simon.de/zip/highlight-3.47.zip",
-            "hash": "3809d84546ee6b35680b33d2faf31e376db8028ca7dbddaab54d2157bbb92502",
-            "extract_dir": "highlight-3.47"
+            "url": "http://www.andre-simon.de/zip/highlight-3.48.zip",
+            "hash": "19ce655295172f6ae7f44cd81264dbbb9590a708abc9ac774ca8df923436e265",
+            "extract_dir": "highlight-3.48"
         }
     },
     "bin": "highlight.exe",
