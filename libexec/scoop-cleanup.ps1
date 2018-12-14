@@ -13,6 +13,7 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\help.ps1"
+. "$psscriptroot\..\lib\install.ps1"
 
 reset_aliases
 
@@ -39,17 +40,8 @@ function cleanup($app, $global, $verbose) {
         $version = $_
         write-host " $version" -nonewline
         $dir = versiondir $app $version $global
-        Get-ChildItem $dir | ForEach-Object {
-            $file = $_
-            # the file is a junction
-            if ($null -ne $file.LinkType -and $file -is [System.IO.DirectoryInfo]) {
-                # remove read-only attribute on the link
-                attrib -R /L $file
-                # remove the junction
-                $filepath = Resolve-Path $file
-                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
-            }
-        }
+        # unlink all potential old link before doing recursive Remove-Item
+        unlink_persist_data $dir
         Remove-Item $dir -ErrorAction Stop -Recurse -Force
     }
     write-host ''
