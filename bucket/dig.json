@@ -1,21 +1,21 @@
 {
     "homepage": "https://www.isc.org/",
     "license": "ISC",
-    "version": "9.13.5",
+    "version": "9.12.3-P1",
     "architecture": {
         "64bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.13.5/BIND9.13.5.x64.zip",
-            "hash": "6cb7c149278e97d2e3d5abe4fc78068f098df9569321c8cd4a76f90e90de8fbe"
+            "url": "https://ftp.isc.org/isc/bind9/9.12.3-P1/BIND9.12.3-P1.x64.zip",
+            "hash": "932b4fc2b4b14603f5e7c9e821b01ec82d6a753f3a9628fa634ad83cf2714da8"
         },
         "32bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.13.5/BIND9.13.5.x86.zip",
-            "hash": "eacdd899a800f75cbde9b0b90009a11286993e6ce213e0cdcb74185718c80594"
+            "url": "https://ftp.isc.org/isc/bind9/9.12.3-P1/BIND9.12.3-P1.x86.zip",
+            "hash": "68567aba79e97d9c1ff416bf9a7a1cb6071dbf16e1ed7d3bfa05fb9f34188fab"
         }
     },
     "bin": "dig.exe",
     "checkver": {
-        "url": "https://ftp.isc.org/isc/bind9/?C=N;O=D",
-        "re": "<a href=\"([\\d\\.]+)/"
+        "url": "https://www.isc.org/downloads/",
+        "re": "(?sm)Current-Stable.*?BIND([\\d.]+(?:[-P\\d]*))"
     },
     "autoupdate": {
         "architecture": {
