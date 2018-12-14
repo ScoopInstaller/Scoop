@@ -1209,9 +1209,6 @@ function persist_def($persist) {
 }
 
 function persist_data($manifest, $original_dir, $persist_dir) {
-    # unlink all potential old link before doing data persisting
-    unlink_persist_data $original_dir
-
     $persist = $manifest.persist
     if($persist) {
         $persist_dir = ensure $persist_dir
