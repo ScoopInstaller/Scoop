@@ -41,11 +41,16 @@ function cleanup($app, $global, $verbose) {
         $dir = versiondir $app $version $global
         Get-ChildItem $dir | ForEach-Object {
             $file = $_
-            if($null -ne $file.LinkType) {
-                fsutil.exe reparsepoint delete $file.FullName | out-null
+            # the file is a junction
+            if ($null -ne $file.LinkType -and $file -is [System.IO.DirectoryInfo]) {
+                # remove read-only attribute on the link
+                attrib -R /L $file
+                # remove the junction
+                $filepath = Resolve-Path $file
+                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
             }
         }
-        Remove-Item $dir -Recurse -Force
+        Remove-Item $dir -ErrorAction Stop -Recurse -Force
     }
     write-host ''
 }
