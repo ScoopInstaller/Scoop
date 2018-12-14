@@ -129,10 +129,10 @@ describe 'persist_def' -Tag 'Scoop' {
         $target | should -be "test"
     }
 
-    it 'should strip directories of source for target' {
+    it 'should handle sub-folder' {
         $source, $target = persist_def "foo/bar"
         $source | should -be "foo/bar"
-        $target | should -be "bar"
+        $target | should -be "foo/bar"
     }
 
     it 'should handle arrays' {
