@@ -17,7 +17,7 @@ function bucketdir($name) {
         $bucket = "$bucket\bucket"
     }
 
-    return Resolve-Path $bucket
+    return $bucket
 }
 
 function known_bucket_repos {
