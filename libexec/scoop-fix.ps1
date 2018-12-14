@@ -33,6 +33,8 @@ function I($OUTER_ARGS = $ARGS) {
     ,@( foreach($i in 0..$($OUTER_ARGS.count - 1)) {
             if($OUTER_ARGS[$i][0] -is [scriptblock]) {
                 $OUTER_ARGS[$i][0]
+            } elseif(($OUTER_ARGS -is [array]) -and ($OUTER_ARGS.count -eq 1)) {
+                I $OUTER_ARGS[0]
             } else {
                 $OUTER_ARGS[$i]
             }
@@ -103,7 +105,7 @@ function current_shim($app, $global) {
                            ( & $ExecutionContext.InvokeCommand.NewScriptBlock(
                                  @($matches.values)[-1].
                                  replace('$psscriptroot',$shimdir) -replace('^\$path\s*=\s*','')) |
-                               Resolve-Path | Test-Path)
+                                Resolve-Path | Test-Path)
                          }
                 $_
                 } |
@@ -197,7 +199,7 @@ function check_app([HashTable] $apps, [HashTable] $broken = $broken) {
         if(!($broken.$app)) {
             $broken[$app] = @{ 'isGlobal' = $global; 'version' = $version }
         }
-        $broken[$app][$ARGS[0]] = Compare-Object -ReferenceObject $ARGS[1] -DifferenceObject $ARGS[2] |
+        $broken[$app][$ARGS[0][0]] = Compare-Object -ReferenceObject $ARGS[0][1] -DifferenceObject $ARGS[0][2] |
                                          Where-Object { $_.SideIndicator -eq '<=' } |
                                          Select-Object -ExpandProperty 'InputObject'
       } { Write-Output $_ $(Get-Variable "manifest$_" -ValueOnly) $(Get-Variable "current$_" -ValueOnly) }
@@ -215,7 +217,7 @@ function whats_found_broken([HashTable] $broken = $broken) {
 }
 
 function fix($broken) {
-    $broken.keys | ForEach-Object {
+    @($broken.keys) | ForEach-Object {
         $app = $_
         $global = $broken[$_].isGlobal
 
@@ -347,7 +349,7 @@ if($broken.scoop) {
 }
 
 if(!$global) {
-    $broken.keys | ForEach-Object {
+    @($broken.keys) | ForEach-Object {
         if($broken[$_].isGlobal) {
             $broken.remove($_)
         }
