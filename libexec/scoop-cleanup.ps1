@@ -50,7 +50,7 @@ function cleanup($app, $global, $verbose) {
                 & "$env:COMSPEC" /c "rmdir /s /q $filepath"
             }
         }
-        Remove-Item $dir -Recurse -Force
+        Remove-Item $dir -ErrorAction Stop -Recurse -Force
     }
     write-host ''
 }
