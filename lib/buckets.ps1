@@ -1,9 +1,23 @@
 $bucketsdir = "$scoopdir\buckets"
 
+<#
+.DESCRIPTION
+    Return full path for bucket with given name.
+    Main bucket will be returned as default.
+.PARAMETER name
+    Name of bucket
+#>
 function bucketdir($name) {
-    if(!$name) { return relpath "..\bucket" } # main bucket
+    $bucket = relpath '..\bucket' # main bucket
 
-    "$bucketsdir\$name"
+    if ($name) {
+        $bucket = "$bucketsdir\$name"
+    }
+    if (Test-Path "$bucket\bucket") {
+        $bucket = "$bucket\bucket"
+    }
+
+    return Resolve-Path $bucket
 }
 
 function known_bucket_repos {
