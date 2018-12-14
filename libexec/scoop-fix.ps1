@@ -101,8 +101,9 @@ function current_shim($app, $global) {
                 $_[2] += { ( $shimContent_[0].tolower() -match
                                ( '\$path\s*=\s*join-path\s+"\$psscriptroot"\s+' + """.+$fname_""$" )) -and
                            ( & $ExecutionContext.InvokeCommand.NewScriptBlock(
-                                 @($matches.values)[-1].replace('$psscriptroot',$shimdir)
-                                                            -replace('^\$path\s*=\s*','')) | Resolve-Path | Test-Path)
+                                 @($matches.values)[-1].
+                                 replace('$psscriptroot',$shimdir) -replace('^\$path\s*=\s*','')) |
+                               Resolve-Path | Test-Path)
                          }
                 $_
                 } |
