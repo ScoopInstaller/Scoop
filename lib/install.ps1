@@ -1262,11 +1262,11 @@ function unlink_persist_data($dir) {
     Get-ChildItem -Recurse $dir | ForEach-Object {
         $file = $_
         if ($null -ne $file.LinkType) {
-            $filepath = Resolve-Path $file
+            $filepath = $file.FullName
             # directory (junction)
             if ($file -is [System.IO.DirectoryInfo]) {
                 # remove read-only attribute on the link
-                attrib -R /L $file
+                attrib -R /L $filepath
                 # remove the junction
                 & "$env:COMSPEC" /c "rmdir /s /q $filepath"
             } else {
