@@ -16,5 +16,5 @@ trim_trailing_whitespace = true
 # DOS/Win *requires* BAT/CMD files to have CRLF newlines
 end_of_line = crlf
 
-[*.{yml, yaml}]
+[*.{yml,yaml}]
 indent_size = 2

@@ -1,6 +1,8 @@
 {
     "recommendations": [
         "EditorConfig.EditorConfig",
-        "ms-vscode.PowerShell"
-    ]
+        "ms-vscode.PowerShell",
+        "fabiospampinato.vscode-terminals",
+        "redhat.vscode-yaml",
+    ],
 }

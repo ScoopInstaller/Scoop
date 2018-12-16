@@ -1,0 +1,10 @@
+version: '3.6'
+
+services:
+  test:
+    image: mcr.microsoft/powershell:windowsservercore-1803
+    container_name: SCOOP
+    command: powershell.exe -NoLogo -NoExit
+    working_dir: /code
+    volumes:
+      - .:/code
