@@ -56,7 +56,9 @@ function update_scoop() {
     if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     write-host "Updating Scoop..."
-    $last_update = $(last_scoop_update).ToString('s')
+    $last_update = $(last_scoop_update)
+    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
+    $last_update = $last_update.ToString('s')
     $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
