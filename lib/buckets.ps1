@@ -23,6 +23,7 @@ function bucketdir($name) {
 function known_bucket_repos {
     $dir = versiondir 'scoop' 'current'
     $json = "$dir\buckets.json"
+    # TODO: return Scoop-ParseManifest $buckets
     Get-Content $json -raw | convertfrom-json -ea stop
 }
 
@@ -32,6 +33,7 @@ function known_bucket_repo($name) {
 }
 
 function apps_in_bucket($dir) {
+    # TODO: YAML
     return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
 }
 

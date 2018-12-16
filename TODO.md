@@ -1,4 +1,4 @@
-# Add support for yml typed manifests.
+# Add support for yml typed manifests
 
 - [ ] Blocked by <https://github.com/cloudbase/powershell-yaml/issues/38>
 - [x] .vscode settings
@@ -10,6 +10,7 @@
     - [ ] auto-pr
         - [ ] Inspect TODOs
     - [ ] checkver
+        - [ ] fix noteproperty
     - [ ] autoupdate function call
 - [ ] Download progress is not showing
 - [ ] Commands

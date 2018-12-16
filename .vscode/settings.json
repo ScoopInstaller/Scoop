@@ -1,35 +1,35 @@
 // Configure PSScriptAnalyzer settings
 {
-    "[powershell]": {
-        // Disable formating until: https://github.com/PowerShell/vscode-powershell/issues/1019 is fixed
-        "editor.formatOnSave": false
-    },
-    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
-    "powershell.codeFormatting.preset": "OTBS",
-    "powershell.codeFormatting.alignPropertyValuePairs": true,
-    "powershell.codeFormatting.ignoreOneLineBlock": true,
-    "json.schemas": [
-        {
-            "url": "https://raw.githubusercontent.com/lukesampson/scoop/master/schema.json",
-            "fileMatch": [
-                "bucket/*.json"
-            ]
-        }
-    ],
-    "yaml.completion": true,
-    "yaml.format.singleQuote": true,
-    "yaml.schemas": {
-        "https://raw.githubusercontent.com/lukesampson/scoop/master/schema.json": [
-            "bucket/**/*.yml",
-            "bucket/**/*.yaml",
-        ]
-    },
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
         "**/.hg": true,
         "**/CVS": true,
         "**/.DS_Store": true,
-        "**/tmp": true
-    }
+        "**/tmp": true,
+    },
+    "json.schemas": [
+        {
+            "url": "https://raw.githubusercontent.com/lukesampson/scoop/master/schema.json",
+            "fileMatch": [
+                "bucket/**/*.json",
+            ],
+        },
+    ],
+    "[powershell]": {
+        // Disable formating until: https://github.com/PowerShell/vscode-powershell/issues/1019 is fixed
+        "editor.formatOnSave": false,
+    },
+    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+    "powershell.codeFormatting.preset": "OTBS",
+    "powershell.codeFormatting.alignPropertyValuePairs": true,
+    "powershell.codeFormatting.ignoreOneLineBlock": true,
+    "yaml.completion": true,
+    "yaml.format.singleQuote": true,
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/lukesampson/scoop/master/schema.json": [
+            "bucket/**/*.yml",
+            "bucket/**/*.yaml",
+        ],
+    },
 }

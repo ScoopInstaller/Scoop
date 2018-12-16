@@ -1,12 +1,15 @@
-. "$psscriptroot/core.ps1"
-. "$psscriptroot/autoupdate.ps1"
+. "$PSScriptRoot\core.ps1"
+. "$PSScriptRoot\autoupdate.ps1"
+
+$INSTALL_FILE = 'install.json'
+$MANIFEST_FILE = 'manifest.json'
 
 function manifest_path($app, $bucket) {
     fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
 }
 
 function parse_json($path) {
-    if(!(test-path $path)) { return $null }
+    if (!(test-path $path)) { return $null }
     Get-Content $path -raw -Encoding UTF8 | convertfrom-json -ea stop
 }
 
@@ -21,27 +24,33 @@ function url_manifest($url) {
     } catch {
         throw
     }
-    if(!$str) { return $null }
+    # TODO: YAML
+    if (!$str) { return $null }
     $str | convertfrom-json
 }
 
 function manifest($app, $bucket, $url) {
-    if($url) { return url_manifest $url }
+    if ($url) { return url_manifest $url }
     parse_json (manifest_path $app $bucket)
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
-    if($url) {
+    if ($url) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $wc.downloadstring($url) > "$dir\manifest.json"
+        $cont = $wc.DownloadString($url)
+        # TODO: YAML
+        # if (Is-Yaml $url) { ConvertFrom-Yaml | ConvertToPrettyJson}
+
+        Set-Content "$dir\$MANIFEST_FILE" $cont -Encoding UTF8
     } else {
-        Copy-Item (manifest_path $app $bucket) "$dir\manifest.json"
+        # TODO: YAML
+        Copy-Item (manifest_path $app $bucket) "$dir\$MANIFEST_FILE"
     }
 }
 
 function installed_manifest($app, $version, $global) {
-    parse_json "$(versiondir $app $version $global)\manifest.json"
+    parse_json "$(versiondir $app $version $global)\$MANIFEST_FILE"
 }
 
 function save_install_info($info, $dir) {
@@ -49,27 +58,30 @@ function save_install_info($info, $dir) {
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
     $file_content = $info | ConvertToPrettyJson
-    [System.IO.File]::WriteAllLines("$dir\install.json", $file_content)
+    [System.IO.File]::WriteAllLines("$dir\$INSTALL_FILE", $file_content)
 }
 
 function install_info($app, $version, $global) {
-    $path = "$(versiondir $app $version $global)\install.json"
-    if(!(test-path $path)) { return $null }
+    $path = "$(versiondir $app $version $global)\$INSTALL_FILE"
+    if (!(test-path $path)) { return $null }
     parse_json $path
 }
 
 function default_architecture {
-    if([intptr]::size -eq 8) { return "64bit" }
-    "32bit"
+    if ([intptr]::Size -eq 8) {
+        return '64bit'
+    } else {
+        return '32bit'
+    }
 }
 
 function arch_specific($prop, $manifest, $architecture) {
-    if($manifest.architecture) {
+    if ($manifest.architecture) {
         $val = $manifest.architecture.$architecture.$prop
-        if($val) { return $val } # else fallback to generic prop
+        if ($val) { return $val } # else fallback to generic prop
     }
 
-    if($manifest.$prop) { return $manifest.$prop }
+    if ($manifest.$prop) { return $manifest.$prop }
 }
 
 function supports_architecture($manifest, $architecture) {
@@ -88,12 +100,12 @@ function generate_user_manifest($app, $bucket, $version) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
-    ensure $(usermanifestsdir) | out-null
+    ensure $(usermanifestsdir) | Out-Null
     try {
-        autoupdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(@{})
-        return "$(resolve-path $(usermanifest $app))"
+        autoupdate $app "$(Resolve-Path $(usermanifestsdir))" $manifest $version $(@{})
+        return "$(Resolve-Path $(usermanifest $app))"
     } catch {
-        write-host -f darkred "Could not install $app@$version"
+        Write-Host "Could not install $app@$version" -ForegroundColor DarkRed
     }
 
     return $null
