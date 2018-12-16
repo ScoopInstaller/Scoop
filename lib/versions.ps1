@@ -9,7 +9,7 @@ function versions($app, $global) {
     $appdir = appdir $app $global
     if(!(test-path $appdir)) { return @() }
 
-    sort_versions (Get-ChildItem $appdir -dir -attr !reparsePoint | ForEach-Object { $_.name })
+    sort_versions (Get-ChildItem $appdir -dir -attr !reparsePoint | Where-Object { $null -ne $(Get-ChildItem $_.fullname) } | ForEach-Object { $_.name })
 }
 
 function version($ver) {
