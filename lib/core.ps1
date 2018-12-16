@@ -595,15 +595,12 @@ function show_app($app, $bucket, $version) {
 
 function last_scoop_update() {
     $last_update = (scoop config lastupdate)
-    if(!$last_update) {
-        $last_update = [System.DateTime]::Now
-    }
 
-    if($last_update.GetType() -eq [System.String]) {
+    if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
         try {
             $last_update = [System.DateTime]::Parse($last_update)
         } catch {
-            $last_update = [System.DateTime]::Now
+            $last_update = $null
         }
     }
     return $last_update
@@ -612,12 +609,12 @@ function last_scoop_update() {
 function is_scoop_outdated() {
     $last_update = $(last_scoop_update)
     $now = [System.DateTime]::Now
-    if($last_update -eq $now) {
+    if($null -eq $last_update) {
         scoop config lastupdate $now.ToString('o')
         # enforce an update for the first time
         return $true
     }
-    return $last_update.AddHours(3) -lt  [System.DateTime]::Now.ToLocalTime()
+    return $last_update.AddHours(3) -lt $now.ToLocalTime()
 }
 
 function substitute($entity, [Hashtable] $params) {
