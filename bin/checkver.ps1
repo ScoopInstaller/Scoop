@@ -60,7 +60,7 @@ param(
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipUpdated,
-    [String] $Version
+    [String] $Version = ''
 )
 
 . "$PSScriptRoot\..\lib\autoupdate.ps1"
