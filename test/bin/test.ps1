@@ -3,7 +3,7 @@
 #requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '4.4.0' }
 #requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
-    [String] $TestPath = 'test/',
+    [String] $TestPath = 'test/'
 )
 
 $resultsXml = "$PSScriptRoot/TestResults.xml"
