@@ -1,10 +1,9 @@
 version: '3.6'
 
+#docker-compose kill; docker-compose rm -f; docker-compose up --build -d; docker-compose run test
 services:
   test:
-    image: mcr.microsoft/powershell:windowsservercore-1803
+    build: .
     container_name: SCOOP
-    command: powershell.exe -NoLogo -NoExit
-    working_dir: /code
     volumes:
-      - .:/code
+      - .:C:\SCOOP\apps\scoop\current
