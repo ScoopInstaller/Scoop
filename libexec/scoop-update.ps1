@@ -13,18 +13,18 @@
 #   -s, --skip                Skip hash validation (use with caution!)
 #   -q, --quiet               Hide extraneous messages
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\shortcuts.ps1"
-. "$psscriptroot\..\lib\psmodules.ps1"
-. "$psscriptroot\..\lib\decompress.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\getopt.ps1"
-. "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\config.ps1"
-. "$psscriptroot\..\lib\git.ps1"
-. "$psscriptroot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\config.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\decompress.ps1"
+. "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\git.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\psmodules.ps1"
+. "$PSScriptRoot\..\lib\shortcuts.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1"
 
 reset_aliases
 
@@ -40,13 +40,13 @@ $independent = $opt.i -or $opt.independent
 # load config
 $repo = $(scoop config SCOOP_REPO)
 if(!$repo) {
-    $repo = "https://github.com/lukesampson/scoop"
+    $repo = 'https://github.com/lukesampson/scoop'
     scoop config SCOOP_REPO "$repo"
 }
 
 $branch = $(scoop config SCOOP_BRANCH)
 if(!$branch) {
-    $branch = "master"
+    $branch = 'master'
     scoop config SCOOP_BRANCH "$branch"
 }
 
@@ -66,6 +66,7 @@ function update_scoop() {
 
         # get git scoop
         git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
+        # TODO: YAML INIT SUBMODULE
 
         # check if scoop was successful downloaded
         if(!(test-path "$newdir")) {
@@ -78,6 +79,7 @@ function update_scoop() {
     }
     else {
         Push-Location $currentdir
+        # TODO: YAML pull recursive
         git_pull -q
         $res = $lastexitcode
         if($show_update_log) {
