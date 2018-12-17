@@ -18,7 +18,7 @@
     "env_set": {
         "OPENSSL_CONF": "$dir\\bin\\cnf\\openssl.cnf"
     },
-    "checkver": "<a href=\"[^\"]*\">Win32 OpenSSL v([^\\s]+)</a>",
+    "checkver": "Win32 OpenSSL v([^\\s]+)",
     "autoupdate": {
         "architecture": {
             "64bit": {
