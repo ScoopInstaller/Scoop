@@ -1,5 +1,9 @@
 FROM microsoft/windowsservercore:1803 as servercore
 
+LABEL org.label-schema.maintainer="Jakub 'Ash258' Čábera <cabera.jakub@gmail.com>" \
+      org.label-schema.description="Servercore image for scoop's core testing." \
+      org.label-schema.url="https://github.com/lukesampson/scoop"
+
 ENV SCOOP "C:\SCOOP"
 ENV SCOOP_HOME "C:\SCOOP\apps\scoop\current"
 
