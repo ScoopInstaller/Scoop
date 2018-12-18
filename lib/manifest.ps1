@@ -6,11 +6,9 @@ $MANIFEST_FILE = 'manifest.json'
 
 <#
 .SYNOPSIS
-    Test if there is manifest with all specific extensions.
+    Test if there is manifest with all specific extensions. If so return it.
 .PARAMETER Path
     Path to manifest without file extension.
-.OUTPUTS
-    Path to correct manifest file.
 #>
 function Scoop-GetCorrectManifestExtension {
     param([String] $Path)
@@ -57,8 +55,6 @@ function Is-Yaml {
 <#
 .SYNOPSIS
     Parse manifest from given path and returns adequate hashtable.
-.OUTPUTS
-    Hashtable representation of manifest.
 #>
 function Scoop-ParseManifest {
     param([String] $Path)
