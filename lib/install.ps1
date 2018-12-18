@@ -90,7 +90,6 @@ function locate($app, $bucket) {
             $ext = Get-Extension $path
 
             if ($path -eq $ext) { # No Extension specified
-                Write-Host 'ANO'
                 $path = Scoop-GetCorrectManifestExtension $path
             }
             if(Test-Path $path) {

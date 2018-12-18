@@ -145,13 +145,13 @@ function save_install_info($info, $dir) {
     $nulls = $info.keys | Where-Object { $null -eq $info[$_] }
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
-    $file_content = $info | ConvertToPrettyJson
-    [System.IO.File]::WriteAllLines("$dir\$INSTALL_FILE", $file_content)
+    Scoop-WriteManifest "$dir\$INSTALL_FILE" $info
 }
 
 function install_info($app, $version, $global) {
     $path = "$(versiondir $app $version $global)\$INSTALL_FILE"
     if (!(test-path $path)) { return $null }
+
     return Scoop-ParseManifest $path
 }
 
