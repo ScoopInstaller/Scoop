@@ -31,11 +31,17 @@ Predefined docker for adequate testing.
 1. [ ] Make sure implementation work same for json and yaml.
 1. [ ] Commands
     1. [ ] Installing
-        1. [ ] Remote
-        1. [ ] apacheyaml
         1. [ ] Bucket folder
+            - `scoop install yamBoth` and `scoop install yamApache` should produce same output
+            - `scoop install yamOne` and `scoop install yamFaas` should produce same output
+            - `scoop install yamURL` and `scoop install yamAhoy` should produce same output
+            - Same output mean:
+                - `manifest.json`
+                - persisted files
+                - shortcuts
+        1. [ ] Remote
         1. [ ] Local full path
-    1. [ ] Uninstalling
+    1. [ ] Uninstalling (See installing)
         1. [ ] Remote
         1. [ ] Bucket folder
         1. [ ] Local relative file
