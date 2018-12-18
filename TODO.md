@@ -7,11 +7,17 @@
 - [x] url_manifest function
 - [ ] ConvertTo-Yaml is converting `|` to `>` (See: <https://github.com/cloudbase/powershell-yaml/issues/40>)
 - [ ] Binaries
+    - [x] autoupdate function call
     - [ ] auto-pr
         - [ ] Inspect TODOs
+    - [x] checkurls
     - [x] checkver
         - [x] Fix noteproperty
-    - [x] autoupdate function call
+    - [ ] describe
+    - [ ] formatjson
+    - [ ] format
+    - [ ] missing-checkver
+    - [ ] test
 - [ ] Commands
     - [x] install.ps1
 - [ ] Remote install yaml

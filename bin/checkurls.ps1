@@ -20,7 +20,8 @@ param(
             $true
         }
     })]
-    [String] $Dir = "$PSScriptRoot\\..\bucket",
+    # [String] $Dir = "$PSScriptRoot\..\bucket",
+    [String] $Dir = "$PSScriptRoot\..\bucket\yamTEST",
     [Int] $Timeout = 5,
     [Switch] $SkipValid
 )
@@ -33,8 +34,7 @@ param(
 $Dir = Resolve-Path $Dir
 $Queue = @()
 
-# TODO: YAML
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
+Get-ChildItem $Dir "$App.*" | ForEach-Object {
     $manifest = Scoop-ParseManifest "$Dir\$($_.Name)"
     $Queue += , @($_.Name, $manifest)
 }
