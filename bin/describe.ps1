@@ -1,53 +1,64 @@
-param($app, $dir)
-# TODO: REWRITE
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\description.ps1"
+<#
+.SYNOPSIS
+    Search description on manifests homepage.
+.PARAMETER App
+    Manifest name to search.
+    Placeholders are supported.
+.PARAMETER Dir
+    Where to search for manifest(s).
+#>
+param(
+    [String] $App = '*',
+    [ValidateScript( {
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        }
+        $true
+    })]
+    # TODO: YAML seelct correct folder
+    # [String] $Dir = "$PSScriptRoot\..\bucket",
+    [String] $Dir = "$psscriptroot\..\bucket\yamTEST"
+)
 
-if(!$dir) {
-    $dir = "$psscriptroot\..\bucket"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\description.ps1"
+
+$Dir = Resolve-Path $Dir
+$Queue = @()
+
+Get-ChildItem $Dir "$App.*" | ForEach-Object {
+    $man = Scoop-ParseManifest "$Dir\$($_.Name)"
+    $Queue += , @($_.Name, $man)
 }
-$dir = resolve-path $dir
 
-$search = "*"
-if($app) { $search = $app }
+$Queue | ForEach-Object {
+    $app, $man = $_
+    Write-Host "$app`: " -NoNewLine
 
-# get apps to check
-$apps = @()
-# TODO: YAML
-Get-ChildItem $dir "$search.json" | ForEach-Object {
-    $json = Scoop-ParseManifest "$dir\$($_.Name)"
-    $apps += ,@(($_.Name -replace '\.json$', ''), $json)
-}
-
-$apps | ForEach-Object {
-    $app, $json = $_
-    write-host "$app`: " -nonewline
-
-    if(!$json.homepage) {
-        write-host "`nNo homepage set." -fore red
+    if(!$man.homepage) {
+        Write-Host "`nNo homepage set." -ForegroundColor Red
         return
     }
     # get description from homepage
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $home_html = $wc.downloadstring($json.homepage)
+        $home_html = $wc.DownloadString($man.homepage)
     } catch {
-        write-host "`n$($_.exception.message)" -fore red
+        Write-Host "`n$($_.Exception.Message)" -ForegroundColor Red
         return
     }
 
-    $description, $descr_method = find_description $json.homepage $home_html
+    $description, $descr_method = find_description $man.homepage $home_html
     if(!$description) {
-        write-host -fore red "`nDescription not found ($($json.homepage))"
+        Write-Host "`nDescription not found ($($man.homepage))" -ForegroundColor Red
         return
     }
 
     $description = clean_description $description
 
-    write-host "(found by $descr_method)"
-    write-host "  ""$description""" -fore green
-
+    Write-Host "(found by $descr_method)"
+    Write-Host "  ""$description""" -ForegroundColor Green
 }
 
