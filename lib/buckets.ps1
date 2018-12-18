@@ -22,9 +22,9 @@ function bucketdir($name) {
 
 function known_bucket_repos {
     $dir = versiondir 'scoop' 'current'
-    $json = "$dir\buckets.json"
-    # TODO: return Scoop-ParseManifest $buckets
-    return Get-Content $json -Raw | ConvertFrom-Json -ErrorAction Stop
+    $buckets = "$dir\buckets.json"
+
+    return Scoop-ParseManifest $buckets
 }
 
 function known_bucket_repo($name) {
@@ -33,9 +33,12 @@ function known_bucket_repo($name) {
 }
 
 function apps_in_bucket($dir) {
-    # TODO: YAML
-    Write-Host 'YAMLDUBUG: APPS_IN_BUCKET'
-    return Get-ChildItem $dir | Where-Object { $_.Name.EndsWith('.json') } | ForEach-Object { $_.Name -replace '.(json|yaml|yml)$', '' }
+    Write-Host $dir -f yellow
+    # Use a little bit hacky way, when it't not possible to filter more file extensions
+    # https://stackoverflow.com/questions/18616581/how-to-properly-filter-multiple-strings-in-a-powershell-copy-script#18626464
+    $manifests = Get-ChildItem "$dir\*" -File -Include '*.json', '*.yaml', '*.yml'
+
+    return $manifests | ForEach-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.Name) }
 }
 
 function buckets {
