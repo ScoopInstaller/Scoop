@@ -13,7 +13,6 @@
     PS BUCKETROOT> .\bin\formatjson.ps1 7zip
     Format manifest '7zip' inside bucket directory.
 #>
-# TODO: Notify all bucket maintainers about using format.ps1 instead of formatjson.ps1
 param(
     [String] $App = '*',
     [ValidateScript( {
@@ -23,7 +22,9 @@ param(
         $true
     })]
     [Alias('Path')]
-    [String] $Dir = "$PSScriptRoot\..\bucket"
+    # [String] $Dir = "$PSScriptRoot\..\bucket"
+    # TODO: YAML Select correct dir
+    [String] $Dir = "$PSScriptRoot\..\bucket\yamTEST"
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -32,13 +33,11 @@ param(
 
 $Dir = Resolve-Path $Dir
 
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
+Get-ChildItem $Dir "$App.*" | ForEach-Object {
     if ($PSVersionTable.PSVersion.Major -gt 5) { $_ = $_.Name } # Fix for pwsh
 
     # beautify
-    $man = Scoop-ParseManifest "$Dir\$_" | ConvertToPrettyJson
+    $man = Scoop-ParseManifest "$Dir\$_"
 
-    # convert to 4 spaces
-    $man = $man -replace "`t", '    '
     Scoop-WriteManifest "$Dir\$_" $man
 }

@@ -13,7 +13,7 @@
     - [x] checkurls
     - [x] checkver
         - [x] Fix noteproperty
-    - [ ] describe
+    - [x] describe
     - [ ] formatjson
     - [ ] format
     - [ ] missing-checkver
