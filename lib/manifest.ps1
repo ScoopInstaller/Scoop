@@ -29,7 +29,7 @@ function parse_json($path) {
 }
 
 function parse_yaml($path) {
-    return Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Yaml -Ordered -ErrorAction Stop
+    return (Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Yaml -Ordered -ErrorAction Stop)
 }
 
 function Get-Extension {
@@ -92,18 +92,21 @@ function manifest($app, $bucket, $url) {
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
+    $cont = $null
     if ($url) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $cont = $wc.DownloadString($url)
-        # TODO: YAML
-        # if (Is-Yaml $url) { ConvertFrom-Yaml | ConvertToPrettyJson}
-
-        Set-Content "$dir\$MANIFEST_FILE" $cont -Encoding UTF8
+        if (Is-Yaml $url) {
+            $cont = $cont | ConvertFrom-Yaml
+        }
     } else {
-        # TODO: YAML
-        Copy-Item (manifest_path $app $bucket) "$dir\$MANIFEST_FILE"
+        $manifest = manifest_path $app $bucket
+        $cont = Scoop-ParseManifest $manifest
     }
+    $cont = $cont | ConvertToPrettyJson
+
+    Set-Content "$dir\$MANIFEST_FILE" $cont -Encoding UTF8
 }
 
 function installed_manifest($app, $version, $global) {
