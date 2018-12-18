@@ -24,7 +24,7 @@ function known_bucket_repos {
     $dir = versiondir 'scoop' 'current'
     $json = "$dir\buckets.json"
     # TODO: return Scoop-ParseManifest $buckets
-    Get-Content $json -raw | convertfrom-json -ea stop
+    return Get-Content $json -Raw | ConvertFrom-Json -ErrorAction Stop
 }
 
 function known_bucket_repo($name) {
@@ -34,12 +34,13 @@ function known_bucket_repo($name) {
 
 function apps_in_bucket($dir) {
     # TODO: YAML
-    return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
+    Write-Host 'YAMLDUBUG: APPS_IN_BUCKET'
+    return Get-ChildItem $dir | Where-Object { $_.Name.EndsWith('.json') } | ForEach-Object { $_.Name -replace '.(json|yaml|yml)$', '' }
 }
 
 function buckets {
     $buckets = @()
-    if(test-path $bucketsdir) {
+    if(Test-Path $bucketsdir) {
         Get-ChildItem $bucketsdir | ForEach-Object { $buckets += $_.Name }
     }
     return $buckets

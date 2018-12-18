@@ -3,7 +3,7 @@
 - [ ] Blocked by <https://github.com/cloudbase/powershell-yaml/issues/38>
 - [x] .vscode settings
 - [x] Submodule
-- [ ] `parse_json` -> `Scoop-ParseManifest { if (json) { _parseJson } else {_parseYaml} }`
+- [x] `parse_json` -> `Scoop-ParseManifest { if (json) { _parseJson } else {_parseYaml} }`
 - [ ] ConvertTo-Yaml is converting `|` to `>`
 - [ ] url_manifest function
 - [ ] Binaries
@@ -26,7 +26,7 @@
 
 # Local testing
 
-Create bucket YAMLs in `$env:SCOOP\buckets`. Keep only few manifests prefixed with yam (to make sure non of them exists in main):
+Predefined docker for adequate testing.
 
 1. [ ] Make sure implementation work same for json and yaml.
 1. [ ] Commands
@@ -57,3 +57,4 @@ Create bucket YAMLs in `$env:SCOOP\buckets`. Keep only few manifests prefixed wi
    1. [ ] TODO.md
    1. [ ] Nested bucket folder
    1. [ ] docker-compose.yml
+1. [ ] Cleanup debug information

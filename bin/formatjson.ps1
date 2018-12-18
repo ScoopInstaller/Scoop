@@ -32,6 +32,7 @@ param(
 
 $Dir = Resolve-Path $Dir
 
+# TODO: YAML
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
     if ($PSVersionTable.PSVersion.Major -gt 5) { $_ = $_.Name } # Fix for pwsh
 

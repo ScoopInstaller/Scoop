@@ -1,5 +1,5 @@
 param($app, $dir)
-
+# TODO: REWRITE
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\description.ps1"
@@ -14,6 +14,7 @@ if($app) { $search = $app }
 
 # get apps to check
 $apps = @()
+# TODO: YAML
 Get-ChildItem $dir "$search.json" | ForEach-Object {
     $json = Scoop-ParseManifest "$dir\$($_.Name)"
     $apps += ,@(($_.Name -replace '\.json$', ''), $json)

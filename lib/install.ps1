@@ -1,5 +1,5 @@
-. "$psscriptroot/autoupdate.ps1"
-. "$psscriptroot/buckets.ps1"
+. "$PSScriptRoot\autoupdate.ps1"
+. "$PSScriptRoot\buckets.ps1"
 
 function nightly_version($date, $quiet = $false) {
     $date_str = $date.tostring("yyyyMMdd")
@@ -87,9 +87,23 @@ function locate($app, $bucket) {
         if(!$manifest) {
             # couldn't find app in buckets: check if it's a local path
             $path = $app
-            if(!$path.endswith('.json')) { $path += '.json' }
-            if(test-path $path) {
-                $url = "$(resolve-path $path)"
+            $ext = Get-Extension $path
+
+            if ($path -eq $ext) { # No Extension specified
+                # TODO: YAML Make some function like Get-CorrectExtension which, return full path of manifest
+                if (Test-Path "$path.yaml") {
+                    Write-Host 'YAMLDUBUG: ANO YAML' -f Cyan
+                    $path += '.yaml'
+                } elseif (Test-Path "$path.yml") {
+                    Write-Host 'YAMLDUBUG: ANO YML' -f Cyan
+                    $path += '.yml'
+                } else {
+                    Write-Host 'YAMLDUBUG: ANO JSON' -f Cyan
+                    $path += '.json'
+                }
+            }
+            if(Test-Path $path) {
+                $url = "$(Resolve-Path $path)"
                 $app = appname_from_url $url
                 $manifest, $bucket = url_manifest $url
             }

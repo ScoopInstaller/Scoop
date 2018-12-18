@@ -34,6 +34,7 @@
 reset_aliases
 
 function is_installed($app, $global) {
+    # TODO: YAML
     if($app.EndsWith('.json')) {
         $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
     }

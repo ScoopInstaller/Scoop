@@ -576,10 +576,11 @@ function applist($apps, $global) {
     return ,@($apps | ForEach-Object { ,@($_, $global) })
 }
 
-function parse_app([string] $app) {
-    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*.json$|[a-zA-Z0-9-.]+)(?:@(?<version>.*))?') {
+function parse_app([String] $app) {
+    if($app -match '(?:(?<bucket>[a-zA-Z\d-]+)\/)?(?<app>.*.(json|yaml|yml)$|[a-zA-Z\d-.]+)(?:@(?<version>.*))?') {
         return $matches['app'], $matches['bucket'], $matches['version']
     }
+
     return $app, $null, $null
 }
 

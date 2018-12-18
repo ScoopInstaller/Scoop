@@ -28,6 +28,7 @@ Write-Host 'A' -NoNewLine -ForegroundColor Cyan
 Write-Host ']utoupdate'
 Write-Host ' |  |'
 
+# TODO: YAML
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $json = Scoop-ParseManifest "$Dir\$($_.Name)"
 

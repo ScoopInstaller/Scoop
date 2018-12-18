@@ -33,6 +33,7 @@ param(
 $Dir = Resolve-Path $Dir
 $Queue = @()
 
+# TODO: YAML
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $manifest = Scoop-ParseManifest "$Dir\$($_.Name)"
     $Queue += , @($_.Name, $manifest)

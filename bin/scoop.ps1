@@ -9,6 +9,7 @@ set-strictmode -off
 . (relpath '..\lib\commands')
 
 reset_aliases
+Import-Module (Resolve-Path "$PSScriptRoot\..\supporting\yaml\powershell-yaml.psm1") # Import yaml module
 
 $commands = commands
 if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {

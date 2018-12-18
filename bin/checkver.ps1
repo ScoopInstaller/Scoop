@@ -76,6 +76,7 @@ param(
 $Dir = Resolve-Path $Dir
 $Queue = @()
 
+# TODO: YAML
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $json = Scoop-ParseManifest "$Dir\$($_.Name)"
     if ($json.checkver) {

@@ -5,12 +5,43 @@ $INSTALL_FILE = 'install.json'
 $MANIFEST_FILE = 'manifest.json'
 
 function manifest_path($app, $bucket) {
-    # TODO: YAML
-    fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
+    $bucketDirectory = bucketdir $bucket
+    $man = sanitary_path $app
+    $path = "$bucketDirectory\$man"
+
+    # TODO: YAML Make some function like Get-CorrectExtension which, return full path of manifest
+    if (Test-Path "$path.yaml") {
+        Write-Host "YAMLDEBUG: manifest_path $path yaml" -f DarkCyan
+        $path += '.yaml'
+    } elseif (Test-Path "$path.yml") {
+        Write-Host "YAMLDEBUG: manifest_path $path yml" -f DarkCyan
+        $path += '.yml'
+    } else {
+        Write-Host "YAMLDEBUG: manifest_path $path json" -f DarkCyan
+        $path += '.json'
+    }
+
+    return fullpath $path
 }
 
 function parse_json($path) {
     return Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+}
+
+function parse_yaml($path) {
+    return Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Yaml -Ordered -ErrorAction Stop
+}
+
+function Get-Extension {
+    param([String] $Path)
+
+    return ((Split-Path $Path -Leaf) -split '\.')[-1]
+}
+
+function Is-Yaml {
+    param([String] $Extension)
+
+    return ($Extension -like '*yml') -or ($Extension -like '*yaml')
 }
 
 <#
@@ -24,6 +55,10 @@ function Scoop-ParseManifest {
 
     if (!(Test-Path $Path)) { return $null }
     # TODO: YAML
+    if (Is-Yaml (Get-Extension $Path)) {
+        Write-Host 'YAMLDUBUG: PARSEMANIFEST ANO YAML' $Path -f DarkCyan
+        return parse_yaml $path
+    }
 
     return parse_json $Path
 }
@@ -33,19 +68,26 @@ function url_manifest($url) {
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $str = $wc.downloadstring($url)
-    } catch [system.management.automation.methodinvocationexception] {
-        warn "error: $($_.exception.innerexception.message)"
+        $str = $wc.DownloadString($url)
+    } catch [System.Management.Automation.MethodInvocationException] {
+        warn "error: $($_.Exception.InnerException.Message)"
     } catch {
         throw
     }
-    # TODO: YAML
     if (!$str) { return $null }
-    $str | convertfrom-json
+
+    if (Is-Yaml $url) {
+        $str = $str | ConvertFrom-Yaml -Ordered
+    } else {
+        $str = $str | ConvertFrom-Json
+    }
+
+    return $str
 }
 
 function manifest($app, $bucket, $url) {
     if ($url) { return url_manifest $url }
+    Write-Host 'YAMLDUBUG: BEFORE find call'
     return Scoop-ParseManifest (manifest_path $app $bucket)
 }
 
