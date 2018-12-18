@@ -24,17 +24,26 @@ bin:
 - bin\httxt2dbm.exe
 - bin\logresolve.exe
 - bin\rotatelogs.exe
+# ENVs for testing
 env_add_path:
 - .
 - conf
 env_set:
   SOMEENVVAL: THIS IS SET for testing purpose
+installer:
+  script: |
+    Write-Host 'TESTING OF INSTALLER SCRIPT' -f YELLOW
+    Write-Host 'AHOJ' -f YELLOW
 post_install: >
   # set directory in httpd.conf
 
   $conf = "$dir\conf\httpd.conf"
 
+  Write-Host $conf -f Yellow
+
   $root = (scoop which httpd | Split-Path -Resolve -Parent | Split-Path -Parent) -replace '\\', '/'
+
+  Write-Host $root -f Yellow
 
   (Get-Content $conf) -replace 'c:/Apache\d+', "$root" | Set-Content $conf
 checkver:

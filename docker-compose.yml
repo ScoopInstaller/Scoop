@@ -7,4 +7,4 @@ services:
     container_name: SCOOP
     volumes:
       - .:C:\SCOOP\apps\scoop\current
-      - .\bucket\yamTEST:C:\SCOOP\buckets\yamTEST
+      - .\bucket\yamTEST:C:\SCOOP\buckets\yamTEST # TODO: DELETE

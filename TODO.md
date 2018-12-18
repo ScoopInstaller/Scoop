@@ -5,7 +5,7 @@
 - [x] Submodule
 - [x] `parse_json` -> `Scoop-ParseManifest { if (json) { _parseJson } else {_parseYaml} }`
 - [x] url_manifest function
-- [ ] ConvertTo-Yaml is converting `|` to `>`
+- [ ] ConvertTo-Yaml is converting `|` to `>` (See: <https://github.com/cloudbase/powershell-yaml/issues/40>)
 - [ ] Binaries
     - [ ] auto-pr
         - [ ] Inspect TODOs
@@ -56,6 +56,8 @@ Predefined docker for adequate testing.
     1. [ ] auto-pr
 
 # After Review; Before Merging changes
+
+Maybe we could keep Docker related files? For easier debugging of core functions?
 
 1. [ ] Delete
     1. [ ] TODO.md
