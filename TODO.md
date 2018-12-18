@@ -27,6 +27,9 @@
     - [ ] Import Yaml module
 - [ ] `Scoop-Format-Manifest.Tests.ps1` -> `Scoop-Format-Manifest.json.Tests.ps1`
 - [ ] `Scoop-Format-Manifest.yml.Tests.ps1`
+- [ ] `ConvertToPrettyYaml` ❓❓
+    - [ ] Indent arrays with 2 spaces
+    - [ ] Convert `>` to `|` (workarround)
 
 # Local testing
 
@@ -39,16 +42,17 @@ Predefined docker for adequate testing.
             - `scoop install yamBoth` and `scoop install yamApache` should produce same output
             - `scoop install yamOne` and `scoop install yamFaas` should produce same output
             - `scoop install yamURL` and `scoop install yamAhoy` should produce same output
+            - `scoop install yamMultipleURL` and `scoop install yamCoreutils` should produce same output
             - Same output meaning:
                 - `manifest.json`
                 - persisted files
                 - shortcuts
         1. [ ] Remote
-        1. [ ] Local full path
+        1. [ ] Local relative / full path
     1. [ ] Uninstalling (See installing)
-        1. [ ] Remote
         1. [ ] Bucket folder
-        1. [ ] Local relative file
+        1. [ ] Remote
+        1. [ ] Local relative / full file
     1. [ ] Info
     1. [ ] Reset
     1. [ ] Update
@@ -57,7 +61,7 @@ Predefined docker for adequate testing.
         1. [ ] JSON converted to yaml
             1. [ ] Normal
             1. [ ] Force
-1. [ ] Binaries
+1. [ ] Binaries which write /edit manifests
     1. [ ] checkver
     1. [ ] auto-pr
 
