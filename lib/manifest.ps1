@@ -29,8 +29,7 @@ function Scoop-GetCorrectManifestExtension {
 function manifest_path($app, $bucket) {
     $bucketDirectory = bucketdir $bucket
     $man = sanitary_path $app
-    $path = "$bucketDirectory\$man"
-    $path = Scoop-GetCorrectManifestExtension $path
+    $path = Scoop-GetCorrectManifestExtension "$bucketDirectory\$man"
 
     return fullpath $path
 }
