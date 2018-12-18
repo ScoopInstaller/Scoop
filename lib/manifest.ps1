@@ -4,15 +4,6 @@
 $INSTALL_FILE = 'install.json'
 $MANIFEST_FILE = 'manifest.json'
 
-function manifest_path($app, $bucket) {
-    $bucketDirectory = bucketdir $bucket
-    $man = sanitary_path $app
-    $path = "$bucketDirectory\$man"
-    $path = Scoop-GetCorrectManifestExtension $path
-
-    return fullpath $path
-}
-
 <#
 .SYNOPSIS
     Test if there is manifest with all specific extensions.
@@ -33,6 +24,15 @@ function Scoop-GetCorrectManifestExtension {
     }
 
     return $Path
+}
+
+function manifest_path($app, $bucket) {
+    $bucketDirectory = bucketdir $bucket
+    $man = sanitary_path $app
+    $path = "$bucketDirectory\$man"
+    $path = Scoop-GetCorrectManifestExtension $path
+
+    return fullpath $path
 }
 
 function parse_json($path) {
