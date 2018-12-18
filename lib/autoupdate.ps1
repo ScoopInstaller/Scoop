@@ -84,21 +84,21 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
 }
 
 function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath) {
-    $json = $null
+    $man = $null
 
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $json = $wc.downloadstring($url)
+        $man = $wc.DownloadString($url)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
         return
     }
-    $hash = json_path $json $jsonpath $basename
+    $hash = json_path $man $jsonpath $basename
     if(!$hash) {
-        $hash = json_path_legacy $json $jsonpath $basename
+        $hash = json_path_legacy $man $jsonpath $basename
     }
     return format_hash $hash
 }
@@ -143,8 +143,8 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $basename = url_remote_filename($url)
 
     $hashfile_url = substitute $config.url @{
-        '$url' = (strip_fragment $url);
-        '$baseurl' = (strip_filename (strip_fragment $url)).TrimEnd('/')
+        '$url'      = (strip_fragment $url)
+        '$baseurl'  = (strip_filename (strip_fragment $url)).TrimEnd('/')
         '$basename' = $basename
     }
     $hashfile_url = substitute $hashfile_url $substitutions
@@ -229,41 +229,41 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     return $hash
 }
 
-function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
-    $json.version = $version
+function update_manifest_with_new_version($man, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
+    $man.version = $version
 
     if ($null -eq $architecture) {
-        if ($json.url -is [System.Array]) {
-            $json.url[0] = $url
-            $json.hash[0] = $hash
+        if ($man.url -is [System.Array]) {
+            $man.url[0] = $url
+            $man.hash[0] = $hash
         } else {
-            $json.url = $url
-            $json.hash = $hash
+            $man.url = $url
+            $man.hash = $hash
         }
     } else {
         # If there are multiple urls we replace the first one
-        if ($json.architecture.$architecture.url -is [System.Array]) {
-            $json.architecture.$architecture.url[0] = $url
-            $json.architecture.$architecture.hash[0] = $hash
+        if ($man.architecture.$architecture.url -is [System.Array]) {
+            $man.architecture.$architecture.url[0] = $url
+            $man.architecture.$architecture.hash[0] = $hash
         } else {
-            $json.architecture.$architecture.url = $url
-            $json.architecture.$architecture.hash = $hash
+            $man.architecture.$architecture.url = $url
+            $man.architecture.$architecture.hash = $hash
         }
     }
 }
 
-function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions) {
+function update_manifest_prop([String] $prop, $man, [Hashtable] $substitutions) {
     # first try the global property
-    if ($json.$prop -and $json.autoupdate.$prop) {
-        $json.$prop = substitute $json.autoupdate.$prop $substitutions
+    if ($man.$prop -and $man.autoupdate.$prop) {
+        $man.$prop = substitute $man.autoupdate.$prop $substitutions
     }
 
     # check if there are architecture specific variants
-    if ($json.architecture -and $json.autoupdate.architecture) {
-        $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
+    if ($man.architecture -and $man.autoupdate.architecture) {
+        $man.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
             $architecture = $_.Name
-            if ($json.architecture.$architecture.$prop -and $json.autoupdate.architecture.$architecture.$prop) {
-                $json.architecture.$architecture.$prop = substitute (arch_specific $prop $json.autoupdate $architecture) $substitutions
+            if ($man.architecture.$architecture.$prop -and $man.autoupdate.architecture.$architecture.$prop) {
+                $man.architecture.$architecture.$prop = substitute (arch_specific $prop $man.autoupdate $architecture) $substitutions
             }
         }
     }
@@ -273,15 +273,15 @@ function get_version_substitutions([String] $version, [Hashtable] $customMatches
     $firstPart = $version.Split('-') | Select-Object -first 1
     $lastPart = $version.Split('-') | Select-Object -last 1
     $versionVariables = @{
-        '$version' = $version;
-        '$underscoreVersion' = ($version -replace "\.", "_");
-        '$dashVersion' = ($version -replace "\.", "-");
-        '$cleanVersion' = ($version -replace "\.", "");
-        '$majorVersion' = $firstPart.Split('.') | Select-Object -first 1;
-        '$minorVersion' = $firstPart.Split('.') | Select-Object -skip 1 -first 1;
-        '$patchVersion' = $firstPart.Split('.') | Select-Object -skip 2 -first 1;
-        '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
-        '$preReleaseVersion' = $lastPart;
+        '$version'           = $version
+        '$underscoreVersion' = ($version -replace "\.", "_")
+        '$dashVersion'       = ($version -replace "\.", "-")
+        '$cleanVersion'      = ($version -replace "\.", "")
+        '$majorVersion'      = $firstPart.Split('.') | Select-Object -first 1
+        '$minorVersion'      = $firstPart.Split('.') | Select-Object -skip 1 -first 1
+        '$patchVersion'      = $firstPart.Split('.') | Select-Object -skip 2 -first 1
+        '$buildVersion'      = $firstPart.Split('.') | Select-Object -skip 3 -first 1
+        '$preReleaseVersion' = $lastPart
     }
     if($version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
         $versionVariables.Set_Item('$matchHead', $matches['head'])
@@ -297,21 +297,21 @@ function get_version_substitutions([String] $version, [Hashtable] $customMatches
     return $versionVariables
 }
 
-function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $matches) {
+function autoupdate([String] $app, $dir, $man, [String] $version, [Hashtable] $matches) {
     Write-Host -f DarkCyan "Autoupdating $app"
     $has_changes = $false
     $has_errors = $false
     [Bool]$valid = $true
     $substitutions = get_version_substitutions $version $matches
 
-    if ($json.url) {
+    if ($man.url) {
         # create new url
-        $url   = substitute $json.autoupdate.url $substitutions
+        $url   = substitute $man.autoupdate.url $substitutions
         $valid = $true
 
         if($valid) {
             # create hash
-            $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
+            $hash = get_hash_for_app $app $man.autoupdate.hash $version $url $substitutions
             if ($null -eq $hash) {
                 $valid = $false
                 Write-Host -f DarkRed "Could not find hash!"
@@ -321,23 +321,32 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
         # write changes to the json object
         if ($valid) {
             $has_changes = $true
-            update_manifest_with_new_version $json $version $url $hash
+            update_manifest_with_new_version $man $version $url $hash
         } else {
             $has_errors = $true
             throw "Could not update $app"
         }
     } else {
-        $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
+        if ($man.architecture | Get-Member -MemberType NoteProperty) {
+            # JSOn
+            $properties = $man.architecture | Get-Member -MemberType NoteProperty
+        } else {
+            # YAML
+            # Convert orderedDictionary into pscustom object to preserver implementation
+            $properties = ([pscustomobject] $man.architecture) | Get-Member -MemberType NoteProperty
+        }
+
+        $properties | ForEach-Object {
             $valid = $true
             $architecture = $_.Name
 
             # create new url
-            $url   = substitute (arch_specific "url" $json.autoupdate $architecture) $substitutions
+            $url = substitute (arch_specific 'url' $man.autoupdate $architecture) $substitutions
             $valid = $true
 
             if($valid) {
                 # create hash
-                $hash = get_hash_for_app $app (arch_specific "hash" $json.autoupdate $architecture) $version $url $substitutions
+                $hash = get_hash_for_app $app (arch_specific "hash" $man.autoupdate $architecture) $version $url $substitutions
                 if ($null -eq $hash) {
                     $valid = $false
                     Write-Host -f DarkRed "Could not find hash!"
@@ -347,7 +356,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
             # write changes to the json object
             if ($valid) {
                 $has_changes = $true
-                update_manifest_with_new_version $json $version $url $hash $architecture
+                update_manifest_with_new_version $man $version $url $hash $architecture
             } else {
                 $has_errors = $true
                 throw "Could not update $app $architecture"
@@ -356,26 +365,24 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
     }
 
     # update properties
-    update_manifest_prop "extract_dir" $json $substitutions
+    update_manifest_prop "extract_dir" $man $substitutions
 
     # update license
-    update_manifest_prop "license" $json $substitutions
+    update_manifest_prop "license" $man $substitutions
 
     if ($has_changes -and !$has_errors) {
         # write file
-        Write-Host -f DarkGreen "Writing updated $app manifest"
+        Write-Host "Writing updated $app manifest" -ForegroundColor DarkGreen
 
-        $path = join-path $dir "$app.json"
-
-        $file_content = $json | ConvertToPrettyJson
-        [System.IO.File]::WriteAllLines($path, $file_content)
+        $extension = Get-Extension (Get-ChildItem $dir "$app.*")
+        Scoop-WriteManifest "$dir\$app.$extension" $man
 
         # notes
-        if ($json.autoupdate.note) {
-            Write-Host ""
-            Write-Host -f DarkYellow $json.autoupdate.note
+        if ($man.autoupdate.note) {
+            Write-Host ''
+            Write-Host $man.autoupdate.note -ForegroundColor Yellow
         }
     } else {
-        Write-Host -f DarkGray "No updates for $app"
+        Write-Host "No updates for $app" -ForegroundColor DarkGray
     }
 }

@@ -28,25 +28,25 @@
     Check all manifests and update All outdated manifests.
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 MAN
-    Check manifest MAN.json inside default directory.
+    Check manifest MAN inside default directory.
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 MAN -u
-    Check manifest MAN.json and update, if there is newer version.
+    Check manifest MAN. and update, if there is newer version.
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 MAN -f
-    Check manifest MAN.json and update, even if there is no new version.
+    Check manifest MAN and update, even if there is no new version.
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 MAN -u -v VER
-    Check manifest MAN.json and update, using version VER
+    Check manifest MAN and update, using version VER
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 MAN DIR
-    Check manifest MAN.json inside ./DIR directory.
+    Check manifest MAN inside ./DIR directory.
 .EXAMPLE
     PS BUCKETDIR > .\bin\checkver.ps1 -Dir DIR
     Check all manifests inside ./DIR directory.
 .EXAMPLE
-        PS BUCKETDIR > .\bin\checkver.ps1 MAN DIR -u
-        Check manifest MAN.json inside ./DIR directory and update if there is newer version.
+    PS BUCKETDIR > .\bin\checkver.ps1 MAN DIR -u
+    Check manifest MAN inside ./DIR directory and update if there is newer version.
 #>
 param(
     [String] $App = '*',
@@ -56,31 +56,32 @@ param(
         }
         $true
     })]
-    [String] $Dir = "$psscriptroot\..\bucket",
+    # TODO: YAML seelct correct folder
+    # [String] $Dir = "$PSScriptRoot\..\bucket",
+    [String] $Dir = "$psscriptroot\..\bucket\yamTEST",
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipUpdated,
     [String] $Version = ''
 )
 
-. "$PSScriptRoot\..\lib\autoupdate.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\config.ps1"
 . "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
-. "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\unix.ps1"
+. "$PSScriptRoot\..\lib\config.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\autoupdate.ps1"
+. "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
+. "$PSScriptRoot\..\lib\unix.ps1"
 
 $Dir = Resolve-Path $Dir
 $Queue = @()
 
-# TODO: YAML
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = Scoop-ParseManifest "$Dir\$($_.Name)"
-    if ($json.checkver) {
-        $Queue += , @($_.Name, $json)
+Get-ChildItem $Dir "$App.*" | ForEach-Object {
+    $man = Scoop-ParseManifest "$Dir\$($_.Name)"
+    if ($man.checkver) {
+        $Queue += , @($_.Name, $man)
     }
 }
 
@@ -93,13 +94,13 @@ $original = use_any_https_protocol
 
 # start all downloads
 $Queue | ForEach-Object {
-    $name, $json = $_
+    $name, $man = $_
 
-    $substitutions = get_version_substitutions $json.version
+    $substitutions = get_version_substitutions $man.version
 
     $wc = New-Object Net.Webclient
-    if ($json.checkver.useragent) {
-        $wc.Headers.Add('User-Agent', (substitute $json.checkver.useragent $substitutions))
+    if ($man.checkver.useragent) {
+        $wc.Headers.Add('User-Agent', (substitute $man.checkver.useragent $substitutions))
     } else {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
     }
@@ -107,61 +108,61 @@ $Queue | ForEach-Object {
 
     $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
 
-    $url = $json.homepage
-    if ($json.checkver.url) {
-        $url = $json.checkver.url
+    $url = $man.homepage
+    if ($man.checkver.url) {
+        $url = $man.checkver.url
     }
     $regex = ''
     $jsonpath = ''
     $replace = ''
 
-    if ($json.checkver -eq 'github') {
-        if (!$json.homepage.StartsWith('https://github.com/')) {
+    if ($man.checkver -eq 'github') {
+        if (!$man.homepage.StartsWith('https://github.com/')) {
             error "$name checkver expects the homepage to be a github repository"
         }
-        $url = $json.homepage + '/releases/latest'
+        $url = $man.homepage + '/releases/latest'
         $regex = $githubRegex
     }
 
-    if ($json.checkver.github) {
-        $url = $json.checkver.github + '/releases/latest'
+    if ($man.checkver.github) {
+        $url = $man.checkver.github + '/releases/latest'
         $regex = $githubRegex
     }
 
-    if ($json.checkver.re) {
-        $regex = $json.checkver.re
+    if ($man.checkver.re) {
+        $regex = $man.checkver.re
     }
-    if ($json.checkver.regex) {
-        $regex = $json.checkver.regex
-    }
-
-    if ($json.checkver.jp) {
-        $jsonpath = $json.checkver.jp
-    }
-    if ($json.checkver.jsonpath) {
-        $jsonpath = $json.checkver.jsonpath
+    if ($man.checkver.regex) {
+        $regex = $man.checkver.regex
     }
 
-    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
-        $replace = $json.checkver.replace
+    if ($man.checkver.jp) {
+        $jsonpath = $man.checkver.jp
+    }
+    if ($man.checkver.jsonpath) {
+        $jsonpath = $man.checkver.jsonpath
+    }
+
+    if ($man.checkver.replace -and $man.checkver.replace.GetType() -eq [System.String]) {
+        $replace = $man.checkver.replace
     }
 
     if (!$jsonpath -and !$regex) {
-        $regex = $json.checkver
+        $regex = $man.checkver
     }
 
-    $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq 'true'
+    $reverse = $man.checkver.reverse -and $man.checkver.reverse -eq 'true'
 
     $url = substitute $url $substitutions
 
     $state = New-Object psobject @{
-        app      = (strip_ext $name);
-        url      = $url;
-        regex    = $regex;
-        json     = $json;
-        jsonpath = $jsonpath;
-        reverse  = $reverse;
-        replace  = $replace;
+        app      = (strip_ext $name)
+        url      = $url
+        regex    = $regex
+        man      = $man
+        jsonpath = $jsonpath
+        reverse  = $reverse
+        replace  = $replace
     }
 
     $wc.Headers.Add('Referer', (strip_filename $url))
@@ -182,13 +183,13 @@ while ($in_progress -gt 0) {
 
     $state = $ev.SourceEventArgs.UserState
     $app = $state.app
-    $json = $state.json
+    $man = $state.man
     $url = $state.url
     $regexp = $state.regex
     $jsonpath = $state.jsonpath
     $reverse = $state.reverse
     $replace = $state.replace
-    $expected_ver = $json.version
+    $expected_ver = $man.version
     $ver = ''
 
     $err = $ev.SourceEventArgs.Error
@@ -264,7 +265,7 @@ while ($in_progress -gt 0) {
     Write-Host " (scoop version is $expected_ver)" -NoNewline
     $update_available = (compare_versions $expected_ver $ver) -eq -1
 
-    if ($json.autoupdate -and $update_available) {
+    if ($man.autoupdate -and $update_available) {
         Write-Host ' autoupdate available' -ForegroundColor Cyan
     } else {
         Write-Host ''
@@ -273,7 +274,7 @@ while ($in_progress -gt 0) {
     # forcing an update implies updating, right?
     if ($ForceUpdate) { $Update = $true }
 
-    if ($Update -and $json.autoupdate) {
+    if ($Update -and $man.autoupdate) {
         if ($ForceUpdate) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
@@ -281,7 +282,7 @@ while ($in_progress -gt 0) {
             if ($Version -ne "") {
                 $ver = $Version
             }
-            autoupdate $App $Dir $json $ver $matchesHashtable
+            autoupdate $App $Dir $man $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
         }

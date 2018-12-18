@@ -4,18 +4,16 @@
 - [x] .vscode settings
 - [x] Submodule
 - [x] `parse_json` -> `Scoop-ParseManifest { if (json) { _parseJson } else {_parseYaml} }`
+- [x] url_manifest function
 - [ ] ConvertTo-Yaml is converting `|` to `>`
-- [ ] url_manifest function
 - [ ] Binaries
     - [ ] auto-pr
         - [ ] Inspect TODOs
-    - [ ] checkver
-        - [ ] fix noteproperty
-    - [ ] autoupdate function call
-- [ ] Download progress is not showing
+    - [x] checkver
+        - [x] Fix noteproperty
+    - [x] autoupdate function call
 - [ ] Commands
-    - [ ] install.ps1
-        - [ ] `Copy-Item (manifest_path $app $bucket) "$dir\manifest.json"` -> `(parse_manifest (manifest_path $app $bucket))`
+    - [x] install.ps1
 - [ ] Remote install yaml
 - [ ] Tests
   - [ ] Validate yaml
@@ -35,7 +33,7 @@ Predefined docker for adequate testing.
             - `scoop install yamBoth` and `scoop install yamApache` should produce same output
             - `scoop install yamOne` and `scoop install yamFaas` should produce same output
             - `scoop install yamURL` and `scoop install yamAhoy` should produce same output
-            - Same output mean:
+            - Same output meaning:
                 - `manifest.json`
                 - persisted files
                 - shortcuts
@@ -60,7 +58,8 @@ Predefined docker for adequate testing.
 # After Review; Before Merging changes
 
 1. [ ] Delete
-   1. [ ] TODO.md
-   1. [ ] Nested bucket folder
-   1. [ ] docker-compose.yml
+    1. [ ] TODO.md
+    1. [ ] Nested yamTEST bucket folder
+    1. [ ] docker-compose.yml
+    1. [ ] Dockerfile
 1. [ ] Cleanup debug information

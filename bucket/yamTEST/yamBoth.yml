@@ -25,10 +25,10 @@ bin:
 - bin\logresolve.exe
 - bin\rotatelogs.exe
 env_add_path:
-  - '.'
-  - 'conf'
+- .
+- conf
 env_set:
-  'SOMEENVVAL': 'THIS IS SET'
+  SOMEENVVAL: THIS IS SET for testing purpose
 post_install: >
   # set directory in httpd.conf
 
