@@ -17,7 +17,7 @@ describe -Tag 'Manifests' "manifest-validation" {
 
     context "parse_json function" {
         it "fails with invalid json" {
-            { parse_json "$working_dir\broken_wget.json" } | should -throw
+            { Scoop-ParseManifest "$working_dir\broken_wget.json" } | should -throw
         }
     }
 
@@ -85,7 +85,7 @@ describe -Tag 'Manifests' "manifest-validation" {
                     }
                 }
 
-                $manifest = parse_json $file.fullname
+                $manifest = Scoop-ParseManifest $file.fullname
                 $url = arch_specific "url" $manifest "32bit"
                 $url64 = arch_specific "url" $manifest "64bit"
                 if(!$url) {

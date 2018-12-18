@@ -15,7 +15,7 @@ if($app) { $search = $app }
 # get apps to check
 $apps = @()
 Get-ChildItem $dir "$search.json" | ForEach-Object {
-    $json = parse_json "$dir\$($_.Name)"
+    $json = Scoop-ParseManifest "$dir\$($_.Name)"
     $apps += ,@(($_.Name -replace '\.json$', ''), $json)
 }
 

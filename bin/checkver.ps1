@@ -77,7 +77,7 @@ $Dir = Resolve-Path $Dir
 $Queue = @()
 
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = parse_json "$Dir\$($_.Name)"
+    $json = Scoop-ParseManifest "$Dir\$($_.Name)"
     if ($json.checkver) {
         $Queue += , @($_.Name, $json)
     }

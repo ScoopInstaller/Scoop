@@ -5,12 +5,27 @@ $INSTALL_FILE = 'install.json'
 $MANIFEST_FILE = 'manifest.json'
 
 function manifest_path($app, $bucket) {
+    # TODO: YAML
     fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
 }
 
 function parse_json($path) {
-    if (!(test-path $path)) { return $null }
-    Get-Content $path -raw -Encoding UTF8 | convertfrom-json -ea stop
+    return Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+}
+
+<#
+.SYNOPSIS
+    Parse manifest and return adequate hashtable.
+.DESCRIPTION
+    Long description
+#>
+function Scoop-ParseManifest {
+    param([String] $Path)
+
+    if (!(Test-Path $Path)) { return $null }
+    # TODO: YAML
+
+    return parse_json $Path
 }
 
 function url_manifest($url) {
@@ -31,7 +46,7 @@ function url_manifest($url) {
 
 function manifest($app, $bucket, $url) {
     if ($url) { return url_manifest $url }
-    parse_json (manifest_path $app $bucket)
+    return Scoop-ParseManifest (manifest_path $app $bucket)
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
@@ -50,7 +65,7 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
 }
 
 function installed_manifest($app, $version, $global) {
-    parse_json "$(versiondir $app $version $global)\$MANIFEST_FILE"
+    return Scoop-ParseManifest "$(versiondir $app $version $global)\$MANIFEST_FILE"
 }
 
 function save_install_info($info, $dir) {
@@ -64,7 +79,7 @@ function save_install_info($info, $dir) {
 function install_info($app, $version, $global) {
     $path = "$(versiondir $app $version $global)\$INSTALL_FILE"
     if (!(test-path $path)) { return $null }
-    parse_json $path
+    return Scoop-ParseManifest $path
 }
 
 function default_architecture {
