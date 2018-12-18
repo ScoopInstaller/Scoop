@@ -90,17 +90,8 @@ function locate($app, $bucket) {
             $ext = Get-Extension $path
 
             if ($path -eq $ext) { # No Extension specified
-                # TODO: YAML Make some function like Get-CorrectExtension which, return full path of manifest
-                if (Test-Path "$path.yaml") {
-                    Write-Host 'YAMLDUBUG: ANO YAML' -f Cyan
-                    $path += '.yaml'
-                } elseif (Test-Path "$path.yml") {
-                    Write-Host 'YAMLDUBUG: ANO YML' -f Cyan
-                    $path += '.yml'
-                } else {
-                    Write-Host 'YAMLDUBUG: ANO JSON' -f Cyan
-                    $path += '.json'
-                }
+                Write-Host 'ANO'
+                $path = Scoop-GetCorrectManifestExtension $path
             }
             if(Test-Path $path) {
                 $url = "$(Resolve-Path $path)"
@@ -931,12 +922,16 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
 # get target, name, arguments for shim
 function shim_def($item) {
-    if($item -is [array]) { return $item }
+    # See: https://github.com/cloudbase/powershell-yaml/issues/15
+    if ($item -is [System.Collections.Generic.List[System.Object]]) { $item = [System.Array] $item } # YAML FIX
+    if ($item -is [Array]) { return $item }
+
     return $item, (strip_ext (fname $item)), $null
 }
 
 function create_shims($manifest, $dir, $global, $arch) {
     $shims = @(arch_specific 'bin' $manifest $arch)
+
     $shims | Where-Object { $_ -ne $null } | ForEach-Object {
         $target, $name, $arg = shim_def $_
         write-output "Creating shim for '$name'."

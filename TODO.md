@@ -16,7 +16,7 @@
     - [x] install.ps1
 - [ ] Remote install yaml
 - [ ] Tests
-  - [ ] Validate yaml
+    - [ ] Validate yaml
 - [ ] `bin\*`
     - [ ] Import Yaml module
 - [ ] `Scoop-Format-Manifest.Tests.ps1` -> `Scoop-Format-Manifest.json.Tests.ps1`

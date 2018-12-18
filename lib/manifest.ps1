@@ -8,20 +8,31 @@ function manifest_path($app, $bucket) {
     $bucketDirectory = bucketdir $bucket
     $man = sanitary_path $app
     $path = "$bucketDirectory\$man"
-
-    # TODO: YAML Make some function like Get-CorrectExtension which, return full path of manifest
-    if (Test-Path "$path.yaml") {
-        Write-Host "YAMLDEBUG: manifest_path $path yaml" -f DarkCyan
-        $path += '.yaml'
-    } elseif (Test-Path "$path.yml") {
-        Write-Host "YAMLDEBUG: manifest_path $path yml" -f DarkCyan
-        $path += '.yml'
-    } else {
-        Write-Host "YAMLDEBUG: manifest_path $path json" -f DarkCyan
-        $path += '.json'
-    }
+    $path = Scoop-GetCorrectManifestExtension $path
 
     return fullpath $path
+}
+
+<#
+.SYNOPSIS
+    Test if there is manifest with all specific extensions.
+.PARAMETER Path
+    Path to manifest without file extension.
+.OUTPUTS
+    Path to correct manifest file.
+#>
+function Scoop-GetCorrectManifestExtension {
+    param([String] $Path)
+
+    if (Test-Path "$Path.yaml") {
+        $Path += '.yaml'
+    } elseif (Test-Path "$Path.yml") {
+        $Path += '.yml'
+    } else {
+        $Path += '.json'
+    }
+
+    return $Path
 }
 
 function parse_json($path) {
