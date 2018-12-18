@@ -1,4 +1,4 @@
-version: '2.4.37'
+version: 2.4.37
 description: Apache web server.
 homepage: https://www.apachelounge.com
 license: Apache-2.0
@@ -11,26 +11,34 @@ architecture:
     hash: aecae187d55813a1bfa73337b386e9bc457de40b7d0796dbfd76b94a8d9892e6
 extract_dir: Apache24
 persist:
-  - htdocs
-  - conf
+- htdocs
+- conf
 bin:
-  - bin\ab.exe
-  - bin\abs.exe
-  - bin\htcacheclean.exe
-  - bin\htdbm.exe
-  - bin\htdigest.exe
-  - bin\htpasswd.exe
-  - bin\httpd.exe
-  - bin\httxt2dbm.exe
-  - bin\logresolve.exe
-  - bin\rotatelogs.exe
-post_install: |
+- bin\ab.exe
+- bin\abs.exe
+- bin\htcacheclean.exe
+- bin\htdbm.exe
+- bin\htdigest.exe
+- bin\htpasswd.exe
+- bin\httpd.exe
+- bin\httxt2dbm.exe
+- bin\logresolve.exe
+- bin\rotatelogs.exe
+env_add_path:
+  - '.'
+  - 'conf'
+env_set:
+  'SOMEENVVAL': 'THIS IS SET'
+post_install: >
   # set directory in httpd.conf
+
   $conf = "$dir\conf\httpd.conf"
+
   $root = (scoop which httpd | Split-Path -Resolve -Parent | Split-Path -Parent) -replace '\\', '/'
+
   (Get-Content $conf) -replace 'c:/Apache\d+', "$root" | Set-Content $conf
 checkver:
-  url: https:https://www.apachelounge.com/download/
+  url: https://www.apachelounge.com/download/
   regex: Apache ([\d\.]+) Win64
 autoupdate:
   architecture:

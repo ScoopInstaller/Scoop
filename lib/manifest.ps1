@@ -63,6 +63,29 @@ function Scoop-ParseManifest {
     return parse_json $Path
 }
 
+<#
+.SYNOPSIS
+    Write manifest to file.
+.PARAMETER Path
+    Manifest to write.
+.PARAMETER Content
+    Hashtable representation of manifest.
+#>
+function Scoop-WriteManifest {
+    param([String] $Path, $Content)
+
+    if (Is-Yaml $path) {
+        $Content = $Content | ConvertTo-Yaml
+    } else {
+        $Content = $Content | ConvertToPrettyJson
+    }
+
+    # Remove potentional empty lines
+    $content = $content.Trim()
+
+    [System.IO.File]::WriteAllLines($path, $Content)
+}
+
 function url_manifest($url) {
     $str = $null
     try {
@@ -136,6 +159,7 @@ function default_architecture {
 
 function arch_specific($prop, $manifest, $architecture) {
     if ($manifest.architecture) {
+        $manifest.architecture = [pscustomobject] $manifest.architecture # Fix for yaml
         $val = $manifest.architecture.$architecture.$prop
         if ($val) { return $val } # else fallback to generic prop
     }
