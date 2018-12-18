@@ -1,11 +1,11 @@
-#requires -v 3
+#Requires -Version 3
 param($cmd)
 
 set-strictmode -off
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\git.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\git.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
 . (relpath '..\lib\commands')
 
 reset_aliases
@@ -28,7 +28,11 @@ if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
         }
         Pop-Location
     }
+}elseif (@($null, '--help', '/?') -contains $cmd -or $args[0] -contains '-h') {
+    exec 'help' $args
+}elseif ($commands -contains $cmd) {
+    exec $cmd $args
+}else {
+    Write-Output "scoop: '$cmd' isn't a scoop command. See 'scoop help'."
+    exit 1
 }
-elseif (@($null, '--help', '/?') -contains $cmd -or $args[0] -contains '-h') { exec 'help' $args }
-elseif ($commands -contains $cmd) { exec $cmd $args }
-else { "scoop: '$cmd' isn't a scoop command. See 'scoop help'."; exit 1 }

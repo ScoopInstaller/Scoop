@@ -11,7 +11,9 @@
 #>
 param(
     [String] $App = '*',
-    [String] $Dir = "$PSScriptRoot\..\bucket",
+    # [String] $Dir = "$PSScriptRoot\..\bucket",
+    # TODO: YAML select correct dir
+    [String] $Dir = "$PSScriptRoot\..\bucket\yamTEST",
     [Switch] $SkipSupported
 )
 
@@ -28,18 +30,17 @@ Write-Host 'A' -NoNewLine -ForegroundColor Cyan
 Write-Host ']utoupdate'
 Write-Host ' |  |'
 
-# TODO: YAML
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = Scoop-ParseManifest "$Dir\$($_.Name)"
+Get-ChildItem $Dir "$App.*" | ForEach-Object {
+    $man = Scoop-ParseManifest "$Dir\$($_.Name)"
 
-    if ($SkipSupported -and $json.checkver -and $json.autoupdate) { return }
+    if ($SkipSupported -and $man.checkver -and $man.autoupdate) { return }
 
     Write-Host '[' -NoNewLine
-    Write-Host $(if ($json.checkver) { 'C' } else { ' ' }) -NoNewLine -ForegroundColor Green
+    Write-Host $(if ($man.checkver) { 'C' } else { ' ' }) -NoNewLine -ForegroundColor Green
     Write-Host ']' -NoNewLine
 
     Write-Host '[' -NoNewLine
-    Write-Host $(if ($json.autoupdate) { 'A' } else { ' ' }) -NoNewLine -ForegroundColor Cyan
+    Write-Host $(if ($man.autoupdate) { 'A' } else { ' ' }) -NoNewLine -ForegroundColor Cyan
     Write-Host '] ' -NoNewLine
     Write-Host (strip_ext $_.Name)
 }

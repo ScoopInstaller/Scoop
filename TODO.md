@@ -14,10 +14,10 @@
     - [x] checkver
         - [x] Fix noteproperty
     - [x] describe
-    - [ ] formatjson
-    - [ ] format
-    - [ ] missing-checkver
-    - [ ] test
+    - [x] formatjson
+    - [x] format
+    - [x] missing-checkver
+    - [x] test
 - [ ] Commands
     - [x] install.ps1
 - [ ] Remote install yaml
