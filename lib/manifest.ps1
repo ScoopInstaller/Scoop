@@ -29,7 +29,7 @@ function parse_json($path) {
 }
 
 function parse_yaml($path) {
-    return (Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Yaml -Ordered -ErrorAction Stop)
+    return Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Yaml -Ordered -ErrorAction Stop
 }
 
 function Get-Extension {
@@ -46,20 +46,20 @@ function Is-Yaml {
 
 <#
 .SYNOPSIS
-    Parse manifest and return adequate hashtable.
-.DESCRIPTION
-    Long description
+    Parse manifest from given path and returns adequate hashtable.
+.OUTPUTS
+    Hashtable representation of manifest.
 #>
 function Scoop-ParseManifest {
     param([String] $Path)
 
     if (!(Test-Path $Path)) { return $null }
-    # TODO: YAML
+
     if (Is-Yaml (Get-Extension $Path)) {
-        Write-Host 'YAMLDUBUG: PARSEMANIFEST ANO YAML' $Path -f DarkCyan
         return parse_yaml $path
     }
 
+    # Fallback to json
     return parse_json $Path
 }
 
@@ -87,7 +87,6 @@ function url_manifest($url) {
 
 function manifest($app, $bucket, $url) {
     if ($url) { return url_manifest $url }
-    Write-Host 'YAMLDUBUG: BEFORE find call'
     return Scoop-ParseManifest (manifest_path $app $bucket)
 }
 
