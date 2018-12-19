@@ -1,9 +1,9 @@
 {
     "homepage": "https://dotnet.github.io/docfx/",
-    "version": "2.40.5",
+    "version": "2.40.6",
     "license": "MIT",
-    "url": "https://github.com/dotnet/docfx/releases/download/v2.40.5/docfx.zip",
-    "hash": "0423bf89e82630cbb39e11cfce3f3385849df0aabaaaa1a5d4319d50defd1685",
+    "url": "https://github.com/dotnet/docfx/releases/download/v2.40.6/docfx.zip",
+    "hash": "2d11aaad61c99c688c286ab42fd9af498380895150cbe91e8ab11a6cbf411756",
     "bin": "docfx.exe",
     "checkver": {
         "github": "https://github.com/dotnet/docfx"
