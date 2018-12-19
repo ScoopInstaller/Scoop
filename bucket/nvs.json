@@ -15,13 +15,13 @@
         "NVS_HOME": "$dir\\nodejs"
     },
     "post_install": [
-        "powershell -NoProfile -File $dir\\nvs.ps1 remote >> null",
+        "powershell -NoProfile -File $dir\\nvs.ps1 remote | Out-Null",
         "$CONF = (Get-Content \"$persist_dir\\nodejs\\settings.json\") | ConvertFrom-Json",
         "Add-Member -NotePropertyName linkToSystem -NotePropertyValue $false -Force -InputObject $CONF",
         "ConvertTo-Json $CONF | Out-File -encoding \"ASCII\" \"$persist_dir\\nodejs\\settings.json\""
     ],
     "uninstaller": {
-        "script": "nvs unlink >> null"
+        "script": "nvs unlink | Out-Null"
     },
     "checkver": "github",
     "autoupdate": {
