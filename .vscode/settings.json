@@ -25,6 +25,7 @@
     "powershell.codeFormatting.alignPropertyValuePairs": true,
     "powershell.codeFormatting.ignoreOneLineBlock": true,
     "yaml.completion": true,
+    "yaml.format.enable": true,
     "yaml.format.singleQuote": true,
     "yaml.schemas": {
         "https://raw.githubusercontent.com/lukesampson/scoop/master/schema.json": [
@@ -32,4 +33,5 @@
             "bucket/**/*.yaml",
         ],
     },
+    "yaml.validate": true,
 }
