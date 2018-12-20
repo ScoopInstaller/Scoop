@@ -18,7 +18,9 @@ namespace Scoop {
         static extern bool CreateProcess(string lpApplicationName,
             string lpCommandLine, IntPtr lpProcessAttributes,
             IntPtr lpThreadAttributes, bool bInheritHandles,
-            uint dwCreationFlags, [In, MarshalAs(UnmanagedType.LPStr)] StringBuilder lpEnvironment, string lpCurrentDirectory,
+            uint dwCreationFlags,
+            [In, MarshalAs(UnmanagedType.LPStr)] StringBuilder lpEnvironment,
+            string lpCurrentDirectory,
             [In] ref STARTUPINFO lpStartupInfo,
             out PROCESS_INFORMATION lpProcessInformation);
         const int ERROR_ELEVATION_REQUIRED = 740;
@@ -94,12 +96,12 @@ namespace Scoop {
             var cmd = "\"" + path + "\"" + cmd_args;
 
             var environment_dictionary = Environment.GetEnvironmentVariables();
-            var environment = new StringBuilder();
             foreach (KeyValuePair<string, string> entry in config) {
                 if (entry.Key.StartsWith("env::")) {
-                    environment_dictionary[entry.Key.Substring(5)] = entry.Value;
+                    environment_dictionary[entry.Key.Substring(5)] = ExpandEnvironmentVariables(environment_dictionary, entry.Value);
                 }
             }
+            var environment = new StringBuilder();
             foreach (DictionaryEntry entry in environment_dictionary) {
                 environment.Append(entry.Key);
                 environment.Append("=");
@@ -180,6 +182,32 @@ namespace Scoop {
                 }
             }
             return config;
+        }
+
+        private static string ExpandEnvironmentVariables(IDictionary environment_dictionary, string name)
+        {
+            StringBuilder result = new StringBuilder();
+
+            int lastPos = 0, pos;
+            while (lastPos < name.Length && (pos = name.IndexOf('%', lastPos + 1)) >= 0)
+            {
+                if (name[lastPos] == '%')
+                {
+                    string key = name.Substring(lastPos + 1, pos - lastPos - 1);
+                    object value = environment_dictionary[key];
+                    if (value != null)
+                    {
+                        result.Append((string)value);
+                        lastPos = pos + 1;
+                        continue;
+                    }
+                }
+                result.Append(name.Substring(lastPos, pos - lastPos));
+                lastPos = pos;
+            }
+            result.Append(name.Substring(lastPos));
+
+            return result.ToString();
         }
     }
 }
