@@ -4,11 +4,11 @@
     "version": "1.8.14",
     "architecture": {
         "64bit": {
-            "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.windows.x64.bin.zip",
+            "url": "http://doxygen.nl/files/doxygen-1.8.14.windows.x64.bin.zip",
             "hash": "e2d635a05fb0516311071cfcc41a3859fa22a912b484ed2c2ddec70248b75845"
         },
         "32bit": {
-            "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.windows.bin.zip",
+            "url": "http://doxygen.nl/files/doxygen-1.8.14.windows.bin.zip",
             "hash": "c08900ffda8ed911746c86ad3354ad86084715cfd39ceca938f7bc2ead7988fc"
         }
     },
@@ -24,10 +24,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-$version.windows.x64.bin.zip"
+                "url": "http://doxygen.nl/files/doxygen-$version.windows.x64.bin.zip"
             },
             "32bit": {
-                "url": "https://ftp.stack.nl/pub/users/dimitri/doxygen-$version.windows.bin.zip"
+                "url": "http://doxygen.nl/files/doxygen-$version.windows.bin.zip"
             }
         }
     }
