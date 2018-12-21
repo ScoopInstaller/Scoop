@@ -113,19 +113,13 @@ namespace Scoop {
                     catch(Win32Exception exception) {
                         return exception.ErrorCode;
                     }
-                    if (IsGUIApplication(path))
-                    {
-                        process.WaitForExit();
-                    }
+                    process.WaitForExit();
                     return process.ExitCode;
                 }
                 return error;
             }
 
-            if (IsGUIApplication(path))
-            {
-                WaitForSingleObject(pi.hProcess, INFINITE);
-            }
+            WaitForSingleObject(pi.hProcess, INFINITE);
 
             uint exit_code = 0;
             GetExitCodeProcess(pi.hProcess, out exit_code);
@@ -169,30 +163,6 @@ namespace Scoop {
                 }
             }
             return config;
-        }
-
-        private static bool IsGUIApplication(string path)
-        {
-            // Let's extract application subsystem. For more information see:
-            // https://docs.microsoft.com/en-us/windows/desktop/Debug/pe-format
-            using (FileStream file_stream = new FileStream(path, FileMode.Open, FileAccess.Read))
-            {
-                using (BinaryReader binary_reader = new BinaryReader(file_stream))
-                {
-                    var bytes = binary_reader.ReadBytes(4 + 0x14 + 0x46); // Signature, File Header and part of Optional Header
-                    if (BitConverter.ToInt32(bytes, 0) == 0x4550) // Signature
-                    {
-                        if (BitConverter.ToInt32(bytes, 4 + 0x10) >= 0x46) // SizeOfOptionalHeader
-                        {
-                            var pe_format = BitConverter.ToInt16(bytes, 4 + 0x14); // Magic
-                            if (pe_format == 0x10b || pe_format == 0x20b) { // PE32 or PE32+
-                                return BitConverter.ToInt16(bytes, 4 + 0x14 + 0x44) == 2; // Subsystem
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
         }
     }
 }

@@ -5,8 +5,11 @@ Write-Host "Install dependencies ..."
 Invoke-Expression "$psscriptroot\install.ps1"
 
 $output = "$psscriptroot\bin"
-Write-Output 'Compiling shim.cs ...'
+Write-Output 'Compiling shim.cs to shim.exe ...'
 & "$psscriptroot\packages\Microsoft.Net.Compilers\tools\csc.exe" /deterministic /platform:anycpu /nologo /optimize /target:exe /out:"$output\shim.exe" shim.cs
+
+Write-Output 'Compiling shim.cs to shim-gui.exe ...'
+& "$psscriptroot\packages\Microsoft.Net.Compilers\tools\csc.exe" /deterministic /platform:anycpu /nologo /optimize /target:winexe /out:"$output\shim-gui.exe" shim.cs
 
 Write-Output 'Computing checksums ...'
 Remove-Item "$psscriptroot\bin\checksum.sha256" -ErrorAction Ignore

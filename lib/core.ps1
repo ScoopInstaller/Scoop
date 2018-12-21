@@ -385,7 +385,12 @@ function shim($path, $global, $name, $arg) {
 
     if($path -match '\.exe$') {
         # for programs with no awareness of any shell
-        Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
+        if (is_gui_application($path)) {
+            $shim_source_name = 'shim-gui.exe'
+        } else {
+            $shim_source_name = 'shim.exe'
+        }
+        Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\$shim_source_name" "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
@@ -694,4 +699,27 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
     }
 
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
+}
+
+# check if application has GUI subsystem
+function is_gui_application($path) {
+    # Let's extract application subsystem. For more information see:
+    # https://docs.microsoft.com/en-us/windows/desktop/Debug/pe-format
+    $file_stream = New-Object System.IO.FileStream($path, 'Open', 'Read')
+    $binary_reader = New-Object System.IO.BinaryReader($file_stream)
+    $dos_header = $binary_reader.ReadBytes(0x40);
+    if ([BitConverter]::ToInt16($dos_header, 0) -eq 0x5a4d) { # Signature
+        $pe_offset = [BitConverter]::ToInt32($dos_header, 0x3c);
+        $_ = $file_stream.Seek($pe_offset, 'Begin');
+        $bytes = $binary_reader.ReadBytes(4 + 0x14 + 0x46); # Signature, File Header and part of Optional Header
+        if ([BitConverter]::ToInt32($bytes, 0) -eq 0x4550) { # Signature
+            if ([BitConverter]::ToInt32($bytes, 4 + 0x10) -ge 0x46) { # SizeOfOptionalHeader
+                $pe_format = [BitConverter]::ToInt16($bytes, 4 + 0x14); # Magic
+                if ($pe_format -eq 0x10b -or $pe_format -eq 0x20b) { # PE32 or PE32+
+                    return [BitConverter]::ToInt16($bytes, 4 + 0x14 + 0x44) -eq 2; # Subsystem
+                }
+            }
+        }
+    }
+    return $false;
 }
