@@ -19,5 +19,10 @@ $project_file_exclusions = @(
     'supporting(\\|/)validator(\\|/)packages(\\|/)*'
 )
 
+$bucketdir = $repo_dir
+if(Test-Path("$repo_dir\bucket")) {
+    $bucketdir = "$repo_dir\bucket"
+}
+
 . "$psscriptroot\Import-File-Tests.ps1"
-. "$psscriptroot\Scoop-Manifest.Tests.ps1"
+. "$psscriptroot\Scoop-Manifest.Tests.ps1" -bucketdir $bucketdir
