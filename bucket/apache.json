@@ -1,5 +1,6 @@
 {
     "homepage": "https://www.apachelounge.com",
+    "description": "The Apache HTTP Server (\"httpd\")",
     "version": "2.4.37",
     "license": "Apache-2.0",
     "architecture": {
