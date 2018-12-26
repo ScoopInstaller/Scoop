@@ -1,6 +1,7 @@
 {
     "version": "2018-12-05",
     "homepage": "https://curl.haxx.se/docs/caextract.html",
+    "description": "CA certificates extracted from the Mozilla CA certificate store, in PEM format",
     "license": "MPL-2.0",
     "url": "https://curl.haxx.se/ca/cacert-2018-12-05.pem#/cacert.pem",
     "hash": "4d89992b90f3e177ab1d895c00e8cded6c9009bec9d56981ff4f0a59e9cc56d6",
