@@ -1,18 +1,18 @@
 {
     "homepage": "https://www.gopass.pw/",
     "description": "The slightly more awesome standard unix password manager for teams",
-    "version": "1.8.3",
+    "version": "1.8.4",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/gopasspw/gopass/releases/download/v1.8.3/gopass-1.8.3-windows-amd64.zip",
-            "hash": "53738a9002b2b734db0405f8cc0169fd941b2eebed5944439bc135e3d167c551",
-            "extract_dir": "gopass-1.8.3-windows-amd64"
+            "url": "https://github.com/gopasspw/gopass/releases/download/v1.8.4/gopass-1.8.4-windows-amd64.zip",
+            "hash": "e524eaebbbc706f33970da3fd595298bba66a3e989d436966ec23979e842c87e",
+            "extract_dir": "gopass-1.8.4-windows-amd64"
         },
         "32bit": {
-            "url": "https://github.com/gopasspw/gopass/releases/download/v1.8.3/gopass-1.8.3-windows-386.zip",
-            "hash": "13de1f1c8c2382f9f3324b5b9539be9ef46a1951f4364f9585f583a0839ae62d",
-            "extract_dir": "gopass-1.8.3-windows-386"
+            "url": "https://github.com/gopasspw/gopass/releases/download/v1.8.4/gopass-1.8.4-windows-386.zip",
+            "hash": "5df88f9097f6fc9d7e9b125da1c55cd52a7b1ba375f1600341cbe37fe1084ad9",
+            "extract_dir": "gopass-1.8.4-windows-386"
         }
     },
     "bin": "gopass.exe",
