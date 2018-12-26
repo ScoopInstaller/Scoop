@@ -1,5 +1,6 @@
 {
     "homepage": "https://blink1.thingm.com/",
+    "description": "Control the blink(1) USB RGB indicator light",
     "license": "CC-BY-SA-3.0",
     "version": "2.0.2",
     "url": "https://github.com/todbot/blink1-tool/releases/download/v2.0.2/blink1-tool-v2.0.2-windows-x86_64.zip",

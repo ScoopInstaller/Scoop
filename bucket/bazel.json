@@ -1,5 +1,6 @@
 {
     "homepage": "https://bazel.build",
+    "description": "A fast, scalable, multi-language and extensible build system",
     "version": "0.21.0",
     "license": "Apache-2.0",
     "bin": "bazel.exe",

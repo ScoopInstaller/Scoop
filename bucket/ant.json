@@ -1,5 +1,6 @@
 {
     "homepage": "https://ant.apache.org/",
+    "description": "Apache Ant is a Java library and command-line tool for compiling, assembling, testing and running Java and non-Java applications.",
     "version": "1.10.5",
     "license": "Apache-2.0",
     "url": "https://www-us.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip",

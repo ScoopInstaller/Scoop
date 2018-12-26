@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/golang/dep",
+    "description": "Go dependency management tool",
     "version": "0.5.0",
     "license": "BSD-3-Clause",
     "architecture": {

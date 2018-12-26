@@ -2,6 +2,7 @@
     "version": "2.1.0",
     "license": "BSD-3-Clause",
     "homepage": "https://www.dartlang.org/",
+    "description": "SDK for the Dart programming language",
     "extract_dir": "dart-sdk",
     "env_add_path": "bin",
     "architecture": {

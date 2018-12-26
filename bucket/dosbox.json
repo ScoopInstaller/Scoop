@@ -1,5 +1,6 @@
 {
     "homepage": "https://www.dosbox.com/",
+    "description": "DOSBox emulates an Intel x86 PC, complete with sound, graphics, mouse, joystick, modem, etc.",
     "version": "0.74-2",
     "license": "GPL-2.0",
     "url": "https://downloads.sourceforge.net/project/dosbox/dosbox/0.74-2/DOSBox0.74-2-win32-installer.exe",

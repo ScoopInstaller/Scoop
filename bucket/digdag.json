@@ -1,5 +1,6 @@
 {
     "homepage": "https://www.digdag.io/",
+    "description": "A simple, open source, multi-cloud workflow engine that helps you to build, run, schedule, and monitor complex pipelines of tasks",
     "license": "Apache-2.0",
     "version": "0.9.31",
     "url": "https://dl.bintray.com/digdag/maven/digdag-0.9.31.jar#/digdag.jar",

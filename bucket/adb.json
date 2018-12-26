@@ -1,6 +1,7 @@
 {
     "version": "28.0.1",
     "homepage": "https://developer.android.com/studio/releases/platform-tools.html",
+    "description": "Android SDK platform-tools includes tools that interface with the Android platform, such as adb, fastboot, and systrace",
     "url": "https://dl.google.com/android/repository/platform-tools_r28.0.1-windows.zip",
     "hash": "db78f726d5dc653706dcd15a462ab1b946c643f598df76906c4c1858411c54df",
     "bin": [

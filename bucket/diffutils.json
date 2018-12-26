@@ -1,5 +1,6 @@
 {
     "homepage": "http://www.msys2.org",
+    "description": "A package of several programs related to finding differences between files",
     "version": "3.5",
     "architecture": {
         "64bit": {

@@ -1,5 +1,6 @@
 {
     "homepage": "https://github.com/docker/compose",
+    "description": "Define and run multi-container applications with Docker",
     "version": "1.23.2",
     "license": "Apache-2.0",
     "architecture": {

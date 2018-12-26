@@ -1,5 +1,6 @@
 {
     "homepage": "https://getcomposer.org/",
+    "description": "Dependency Manager for PHP",
     "license": "MIT",
     "version": "1.8.0",
     "url": "https://getcomposer.org/download/1.8.0/composer.phar",

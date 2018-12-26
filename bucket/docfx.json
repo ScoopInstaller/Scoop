@@ -1,5 +1,6 @@
 {
     "homepage": "https://dotnet.github.io/docfx/",
+    "description": "A documentation generation tool for API reference and Markdown files",
     "version": "2.40.6",
     "license": "MIT",
     "url": "https://github.com/dotnet/docfx/releases/download/v2.40.6/docfx.zip",
