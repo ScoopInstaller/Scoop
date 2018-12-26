@@ -1,5 +1,6 @@
 {
     "homepage": "https://frippery.org/busybox",
+    "description": "BusyBox is a single binary that contains many common Unix tools",
     "version": "2501-g858091c25",
     "license": "GPL-2.0",
     "architecture": {
