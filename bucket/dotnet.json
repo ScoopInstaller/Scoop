@@ -1,6 +1,7 @@
 {
     "version": "1.1.1",
     "homepage": "https://www.microsoft.com/net/core#windows",
+    "description": ".NET is a free, cross-platform, open source developer platform for building many different types of applications.",
     "architecture": {
         "64bit": {
             "url": "https://go.microsoft.com/fwlink/?linkid=843454#/dl.7z",
