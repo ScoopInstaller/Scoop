@@ -1,16 +1,16 @@
 {
     "homepage": "http://www.nasm.us",
     "license": "BSD-2-Clause",
-    "version": "2.14.01",
-    "extract_dir": "nasm-2.14.01",
+    "version": "2.14.02",
+    "extract_dir": "nasm-2.14.02",
     "architecture": {
         "64bit": {
-            "url": "http://www.nasm.us/pub/nasm/releasebuilds/2.14.01/win64/nasm-2.14.01-win64.zip",
-            "hash": "9a6a04c30d5c30fc592c155cbc71670cbaad618ecde2b812b5ecc623b58919dd"
+            "url": "http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/win64/nasm-2.14.02-win64.zip",
+            "hash": "18918ac906e29417b936466e7a2517068206c8db8c04b9762a5befa18bfea5f0"
         },
         "32bit": {
-            "url": "http://www.nasm.us/pub/nasm/releasebuilds/2.14.01/win32/nasm-2.14.01-win32.zip",
-            "hash": "844565d553d20c70d33db9b9a0fa0d7f4d8f40116d223435fef69fd72fb1bc4d"
+            "url": "http://www.nasm.us/pub/nasm/releasebuilds/2.14.02/win32/nasm-2.14.02-win32.zip",
+            "hash": "250f9b5eeb2111e8c7b494a977490985b8604fe7518a6f5041cde37cc727a067"
         }
     },
     "bin": [
