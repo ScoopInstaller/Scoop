@@ -1,5 +1,6 @@
 {
     "homepage": "https://www.isc.org/",
+    "description": "dig (domain information groper) is a flexible tool for interrogating DNS name servers",
     "license": "ISC",
     "version": "9.12.3-P1",
     "architecture": {
