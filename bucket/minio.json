@@ -1,12 +1,12 @@
 {
     "homepage": "https://minio.io/",
     "license": "Apache-2.0",
-    "version": "2018-12-19T23-46-24Z",
+    "version": "2018-12-27T18-33-08Z",
     "bin": "minio.exe",
     "architecture": {
         "64bit": {
-            "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.2018-12-19T23-46-24Z#/minio.exe",
-            "hash": "5866205e462df08f87aa4bd250380c341085853ee71ed184cfbc6d10c4538715"
+            "url": "https://dl.minio.io/server/minio/release/windows-amd64/minio.RELEASE.2018-12-27T18-33-08Z#/minio.exe",
+            "hash": "572f90ffcf215b3e948453a37567530d3a149cee2d66f98372a4ab50f0cf615e"
         }
     },
     "suggest": {
