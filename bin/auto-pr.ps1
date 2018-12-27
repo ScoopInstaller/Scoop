@@ -96,13 +96,18 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     Start-Sleep 1
     Write-Host -f DarkCyan "Pull-Request update $app ($version) ..."
     Write-Host -f green "hub pull-request -m '<msg>' -b '$upstream' -h '$branch'"
-    $msg = "${app}: Update to version $version`n`n"
-    $msg += "Hello lovely humans,`n"
-    $msg += "a new version of [$app]($homepage) is available.`n"
-    $msg += "<table>"
-    $msg += "<tr><th align=left>State</th><td>Update :rocket:</td></tr>"
-    $msg += "<tr><th align=left>New version</td><td>$version</td></tr>"
-    $msg += "</table>"
+
+    $msg = @"
+$app`: Update to version $version
+
+Hello lovely humans,
+a new version of [$app]($homepage) is available.
+
+| State | Update :rocket: |
+| :---: | :-------------: |
+| New Version | $version  |
+"@
+
     hub pull-request -m "$msg" -b '$upstream' -h '$branch'
     if($LASTEXITCODE -gt 0) {
         execute "hub reset"
