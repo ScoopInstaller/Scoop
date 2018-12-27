@@ -23,16 +23,28 @@
     Update all manifests inside 'bucket/' directory.
 #>
 param(
-    [String] $Upstream = "lukesampson/scoop:master",
-    [String] $Dir,
+    [ValidateScript( {
+        if (!($_ -match '^(.*)\/(.*):(.*)$')) {
+            throw 'Upstream must be in this format: <user>/<repo>:<branch>'
+        } else {
+            $true
+        }
+    })]
+    [String] $Upstream = 'lukesampson/scoop:master',
+    [ValidateScript( {
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        }
+        $true
+    })]
+    [String] $Dir = "$PSScriptRoot\..\bucket",
     [Switch] $Push,
     [Switch] $Request,
     [Switch] $Help,
     [string[]] $SpecialSnowflakes
 )
 
-if (!$Dir) { $Dir = "$psscriptroot\..\bucket" }
-$Dir = resolve-path $Dir
+$Dir = Resolve-Path $Dir
 
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\json.ps1"
@@ -64,10 +76,6 @@ if (is_unix) {
         Write-Host -f yellow "Please install hub 'scoop install hub'"
         exit 1
     }
-}
-
-if (!($Upstream -match "^(.*)\/(.*):(.*)$")) {
-    abort "Upstream must have this format: <user>/<repo>:<branch>"
 }
 
 function execute($cmd) {
