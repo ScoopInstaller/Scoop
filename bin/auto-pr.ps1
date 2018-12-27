@@ -23,22 +23,22 @@
     Update all manifests inside 'bucket/' directory.
 #>
 param(
-    [String]$upstream = "lukesampson/scoop:master",
-    [String]$dir,
-    [Switch]$push = $false,
-    [Switch]$request = $false,
-    [Switch]$help = $false,
-    [string[]]$specialSnowflakes
+    [String] $Upstream = "lukesampson/scoop:master",
+    [String] $Dir,
+    [Switch] $Push,
+    [Switch] $Request,
+    [Switch] $Help,
+    [string[]] $SpecialSnowflakes
 )
 
-if (!$dir) { $dir = "$psscriptroot\..\bucket" }
-$dir = resolve-path $dir
+if (!$Dir) { $Dir = "$psscriptroot\..\bucket" }
+$Dir = resolve-path $Dir
 
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\json.ps1"
 . "$psscriptroot\..\lib\unix.ps1"
 
-if ((!$push -and !$request) -or $help) {
+if ((!$Push -and !$Request) -or $Help) {
     Write-Host @"
 Usage: auto-pr.ps1 [OPTION]
 
@@ -66,7 +66,7 @@ if (is_unix) {
     }
 }
 
-if (!($upstream -match "^(.*)\/(.*):(.*)$")) {
+if (!($Upstream -match "^(.*)\/(.*):(.*)$")) {
     abort "Upstream must have this format: <user>/<repo>:<branch>"
 }
 
@@ -129,7 +129,7 @@ a new version of [$app]($homepage) is available.
 }
 
 Write-Host -f DarkCyan "Updating ..."
-if ($push -eq $true) {
+if ($Push) {
     execute("hub pull origin master")
     execute "hub checkout master"
 } else {
@@ -137,11 +137,11 @@ if ($push -eq $true) {
     execute("hub push origin master")
 }
 
-. "$psscriptroot\checkver.ps1" * -update -dir $dir
-if ($specialSnowflakes) {
-    write-host -f DarkCyan "Forcing update on our special snowflakes: $($specialSnowflakes -join ',')"
-    $specialSnowflakes -split ',' | ForEach-Object {
-        . "$psscriptroot\checkver.ps1" $_ -update -forceUpdate -dir $dir
+. "$psscriptroot\checkver.ps1" * -update -dir $Dir
+if ($SpecialSnowflakes) {
+    write-host -f DarkCyan "Forcing update on our special snowflakes: $($SpecialSnowflakes -join ',')"
+    $SpecialSnowflakes -split ',' | ForEach-Object {
+        . "$psscriptroot\checkver.ps1" $_ -update -forceUpdate -dir $Dir
     }
 }
 
@@ -159,7 +159,7 @@ hub diff --name-only | ForEach-Object {
     }
     $version = $json.version
 
-    if ($push -eq $true) {
+    if ($Push) {
         Write-Host -f DarkCyan "Creating update $app ($version) ..."
         execute "hub add $manifest"
 
@@ -172,11 +172,11 @@ hub diff --name-only | ForEach-Object {
             Write-Host -f Yellow "Skipping $app because only LF/CRLF changes were detected ..."
         }
     } else {
-        pull_requests $json $app $upstream $manifest
+        pull_requests $json $app $Upstream $manifest
     }
 }
 
-if ($push -eq $true) {
+if ($Push) {
     Write-Host -f DarkCyan "Pushing updates ..."
     execute "hub push origin master"
 } else {
