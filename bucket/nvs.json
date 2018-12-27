@@ -2,10 +2,7 @@
     "version": "1.5.2",
     "description": "Node Version Switcher - A cross-platform tool for switching between versions and forks of Node.js",
     "homepage": "https://github.com/jasongin/nvs",
-    "license": {
-        "identifier": "MIT"
-    },
-    "notes": "If an \"EPERM\" error occurs, remove the error one and add it again.",
+    "license": "MIT",
     "url": "https://github.com/jasongin/nvs/releases/download/v1.5.2/nvs-1.5.2.msi",
     "hash": "08f19e925434d7fbc33c4c3c1985c02eee8f8560e7e673762cc324e5533bf5e1",
     "extract_dir": "nvs",
