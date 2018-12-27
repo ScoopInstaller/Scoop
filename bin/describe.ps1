@@ -25,17 +25,17 @@ param(
 $Dir = Resolve-Path $Dir
 
 # get apps to check
-$apps = @()
+$Queue = @()
 Get-ChildItem $dir "$App.json" | ForEach-Object {
-    $json = parse_json "$dir\$($_.Name)"
-    $apps += ,@(($_.Name -replace '\.json$', ''), $json)
+    $manifest = parse_json "$Dir\$($_.Name)"
+    $Queue += ,@(($_.Name -replace '\.json$', ''), $manifest)
 }
 
-$apps | ForEach-Object {
-    $app, $json = $_
-    write-host "$app`: " -nonewline
+$Queue | ForEach-Object {
+    $name, $manifest = $_
+    write-host "$name`: " -nonewline
 
-    if(!$json.homepage) {
+    if(!$manifest.homepage) {
         write-host "`nNo homepage set." -fore red
         return
     }
@@ -43,15 +43,15 @@ $apps | ForEach-Object {
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $home_html = $wc.downloadstring($json.homepage)
+        $home_html = $wc.downloadstring($manifest.homepage)
     } catch {
         write-host "`n$($_.exception.message)" -fore red
         return
     }
 
-    $description, $descr_method = find_description $json.homepage $home_html
+    $description, $descr_method = find_description $manifest.homepage $home_html
     if(!$description) {
-        write-host -fore red "`nDescription not found ($($json.homepage))"
+        write-host -fore red "`nDescription not found ($($manifest.homepage))"
         return
     }
 
