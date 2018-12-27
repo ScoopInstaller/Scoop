@@ -23,40 +23,39 @@ param(
 . "$PSScriptRoot\..\lib\description.ps1"
 
 $Dir = Resolve-Path $Dir
-
-# get apps to check
 $Queue = @()
-Get-ChildItem $dir "$App.json" | ForEach-Object {
+
+Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $manifest = parse_json "$Dir\$($_.Name)"
-    $Queue += ,@(($_.Name -replace '\.json$', ''), $manifest)
+    $Queue += , @(($_.Name -replace '\.json$', ''), $manifest)
 }
 
 $Queue | ForEach-Object {
     $name, $manifest = $_
-    write-host "$name`: " -nonewline
+    Write-Host "$name`: " -NoNewline
 
     if(!$manifest.homepage) {
-        write-host "`nNo homepage set." -fore red
+        Write-Host "`nNo homepage set." -ForegroundColor Red
         return
     }
     # get description from homepage
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $home_html = $wc.downloadstring($manifest.homepage)
+        $home_html = $wc.DownloadString($manifest.homepage)
     } catch {
-        write-host "`n$($_.exception.message)" -fore red
+        Write-Host "`n$($_.Exception.Message)" -ForegroundColor Red
         return
     }
 
     $description, $descr_method = find_description $manifest.homepage $home_html
     if(!$description) {
-        write-host -fore red "`nDescription not found ($($manifest.homepage))"
+        Write-Host "`nDescription not found ($($manifest.homepage))" -ForegroundColor Red
         return
     }
 
     $description = clean_description $description
 
-    write-host "(found by $descr_method)"
-    write-host "  ""$description""" -fore green
+    Write-Host "(found by $descr_method)"
+    Write-Host "  ""$description""" -ForegroundColor Green
 }
