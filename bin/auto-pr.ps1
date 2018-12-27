@@ -24,32 +24,32 @@ $dir = resolve-path $dir
 . "$psscriptroot\..\lib\json.ps1"
 . "$psscriptroot\..\lib\unix.ps1"
 
-if(is_unix) {
-    if (!(which hub)) {
-        Write-Host -f yellow "Please install hub ('brew install hub' or visit: https://hub.github.com/)"
-        exit 1
-    }
-} else {
-    if (!(scoop which hub)) {
-        Write-Host -f yellow "Please install hub 'scoop install hub'"
-        exit 1
-    }
+if ((!$push -and !$request) -or $help) {
+    Write-Host @"
+Usage: auto-pr.ps1 [OPTION]
+
+Mandatory options:
+  -p,  -push                       push updates directly to 'origin master'
+  -r,  -request                    create pull-requests on 'upstream master' for each update
+
+Optional options:
+  -u,  -upstream                   upstream repository with target branch
+                                     only used if -r is set (default: lukesampson/scoop:master)
+  -h,  -help
+"@
+    exit 0
 }
 
-if ((!$push -and !$request) -or $help) {
-    Write-Host ""
-    Write-Host "Usage: auto-pr.ps1 [OPTION]"
-    Write-Host ""
-    Write-Host "Mandatory options:"
-    Write-Host "  -p,  -push                       push updates directly to 'origin master'"
-    Write-Host "  -r,  -request                    create pull-requests on 'upstream master' for each update"
-    Write-Host ""
-    Write-Host "Optional options:"
-    Write-Host "  -u,  -upstream                   upstream repository with target branch"
-    Write-Host "                                     only used if -r is set (default: lukesampson/scoop:master)"
-    Write-Host "  -h,  -help"
-    Write-Host ""
-    exit 0
+if (is_unix) {
+	if (!(which hub)) {
+		Write-Host -f yellow "Please install hub ('brew install hub' or visit: https://hub.github.com/)"
+		exit 1
+	}
+} else {
+	if (!(scoop which hub)) {
+		Write-Host -f yellow "Please install hub 'scoop install hub'"
+		exit 1
+	}
 }
 
 if(!($upstream -match "^(.*)\/(.*):(.*)$")) {
