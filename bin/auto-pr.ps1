@@ -1,13 +1,27 @@
-# Usage: .\bin\auto-pr.ps1 [options]
-# Summary: Updates manifests and pushes them or creates pull-requests
-# Help: Updates manifests and pushes them to directly the master branch or creates pull-requests for upstream
-#
-# Options:
-#   -p, --push                push updates directly to 'origin master'
-#   -r, --request             create pull-requests on 'upstream master' for each update
-#   -u, --upstream <upstream> upstream repository with target branch
-#                               only used if -r is set (default: lukesampson/scoop:master)
-
+<#
+.SYNOPSIS
+    Updates manifests and pushes them or creates pull-requests.
+.DESCRIPTION
+    Updates manifests and pushes them directly to the master branch or creates pull-requests for upstream.
+.PARAMETER Upstream
+    Upstream repository with target branch.
+    Must be in format '<user>/<repo>:<branch>'
+.PARAMETER Dir
+    Directory where to search for manifests.
+.PARAMETER Push
+    Push updates directly to 'origin master'.
+.PARAMETER Request
+    Create pull-requests on 'upstream master' for each update.
+.PARAMETER Help
+    Print help to console.
+.PARAMETER SpecialSnoflakes
+    Array of manifests, which should be updated all the time. (-ForceUpdate paramter to checkver)
+.EXAMPLE
+    PS REPODIR > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
+.EXAMPLE
+    PS REPODIR > .\bin\auto-pr.ps1 -Push
+    Update all manifests inside 'bucket/' directory.
+#>
 param(
     [String]$upstream = "lukesampson/scoop:master",
     [String]$dir,
@@ -17,7 +31,7 @@ param(
     [string[]]$specialSnowflakes
 )
 
-if(!$dir) { $dir = "$psscriptroot\..\bucket" }
+if (!$dir) { $dir = "$psscriptroot\..\bucket" }
 $dir = resolve-path $dir
 
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -41,18 +55,18 @@ Optional options:
 }
 
 if (is_unix) {
-	if (!(which hub)) {
-		Write-Host -f yellow "Please install hub ('brew install hub' or visit: https://hub.github.com/)"
-		exit 1
-	}
+    if (!(which hub)) {
+        Write-Host -f yellow "Please install hub ('brew install hub' or visit: https://hub.github.com/)"
+        exit 1
+    }
 } else {
-	if (!(scoop which hub)) {
-		Write-Host -f yellow "Please install hub 'scoop install hub'"
-		exit 1
-	}
+    if (!(scoop which hub)) {
+        Write-Host -f yellow "Please install hub 'scoop install hub'"
+        exit 1
+    }
 }
 
-if(!($upstream -match "^(.*)\/(.*):(.*)$")) {
+if (!($upstream -match "^(.*)\/(.*):(.*)$")) {
     abort "Upstream must have this format: <user>/<repo>:<branch>"
 }
 
@@ -60,14 +74,13 @@ function execute($cmd) {
     Write-Host -f Green $cmd
     $output = Invoke-Expression $cmd
 
-    if($LASTEXITCODE -gt 0) {
+    if ($LASTEXITCODE -gt 0) {
         abort "^^^ Error! See above ^^^ (last command: $cmd)"
     }
     return $output
 }
 
-function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest)
-{
+function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest) {
     $version = $json.version
     $homepage = $json.homepage
     $branch = "manifest/$app-$version"
@@ -76,7 +89,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     Write-Host -f Green "hub rev-parse --verify $branch"
     hub rev-parse --verify $branch
 
-    if($LASTEXITCODE -eq 0) {
+    if ($LASTEXITCODE -eq 0) {
         Write-Host -f Yellow "Skipping update $app ($version) ..."
         return
     }
@@ -88,7 +101,7 @@ function pull_requests($json, [String]$app, [String]$upstream, [String]$manifest
     Write-Host -f DarkCyan "Pushing update $app ($version) ..."
     execute "hub push origin $branch"
 
-    if($LASTEXITCODE -gt 0) {
+    if ($LASTEXITCODE -gt 0) {
         error "Push failed! (hub push origin $branch)"
         execute "hub reset"
         return
@@ -109,14 +122,14 @@ a new version of [$app]($homepage) is available.
 "@
 
     hub pull-request -m "$msg" -b '$upstream' -h '$branch'
-    if($LASTEXITCODE -gt 0) {
+    if ($LASTEXITCODE -gt 0) {
         execute "hub reset"
         abort "Pull Request failed! (hub pull-request -m '${app}: Update to version $version' -b '$upstream' -h '$branch')"
     }
 }
 
 Write-Host -f DarkCyan "Updating ..."
-if($push -eq $true) {
+if ($push -eq $true) {
     execute("hub pull origin master")
     execute "hub checkout master"
 } else {
@@ -125,7 +138,7 @@ if($push -eq $true) {
 }
 
 . "$psscriptroot\checkver.ps1" * -update -dir $dir
-if($specialSnowflakes) {
+if ($specialSnowflakes) {
     write-host -f DarkCyan "Forcing update on our special snowflakes: $($specialSnowflakes -join ',')"
     $specialSnowflakes -split ',' | ForEach-Object {
         . "$psscriptroot\checkver.ps1" $_ -update -forceUpdate -dir $dir
@@ -134,26 +147,26 @@ if($specialSnowflakes) {
 
 hub diff --name-only | ForEach-Object {
     $manifest = $_
-    if(!$manifest.EndsWith(".json")) {
+    if (!$manifest.EndsWith(".json")) {
         return
     }
 
     $app = ([System.IO.Path]::GetFileNameWithoutExtension($manifest))
     $json = parse_json $manifest
-    if(!$json.version) {
+    if (!$json.version) {
         error "Invalid manifest: $manifest ..."
         return
     }
     $version = $json.version
 
-    if($push -eq $true) {
+    if ($push -eq $true) {
         Write-Host -f DarkCyan "Creating update $app ($version) ..."
         execute "hub add $manifest"
 
         # detect if file was staged, because it's not when only LF or CRLF have changed
         $status = Invoke-Expression "hub status --porcelain -uno"
         $status = $status | select-object -first 1
-        if($status -and $status.StartsWith('M  ') -and $status.EndsWith("$app.json")) {
+        if ($status -and $status.StartsWith('M  ') -and $status.EndsWith("$app.json")) {
             execute "hub commit -m '${app}: Update to version $version'"
         } else {
             Write-Host -f Yellow "Skipping $app because only LF/CRLF changes were detected ..."
@@ -163,7 +176,7 @@ hub diff --name-only | ForEach-Object {
     }
 }
 
-if($push -eq $true) {
+if ($push -eq $true) {
     Write-Host -f DarkCyan "Pushing updates ..."
     execute "hub push origin master"
 } else {
