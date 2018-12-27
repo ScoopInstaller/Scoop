@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.doxygen.nl/",
     "license": "GPL-2.0",
-    "version": "1.8.14",
+    "version": "1.8.15",
     "architecture": {
         "64bit": {
-            "url": "http://doxygen.nl/files/doxygen-1.8.14.windows.x64.bin.zip",
-            "hash": "e2d635a05fb0516311071cfcc41a3859fa22a912b484ed2c2ddec70248b75845"
+            "url": "http://doxygen.nl/files/doxygen-1.8.15.windows.x64.bin.zip",
+            "hash": "911327b393c5068a5b34063f12a9bacb0ab536c12b5843e98b10f6da906f9214"
         },
         "32bit": {
-            "url": "http://doxygen.nl/files/doxygen-1.8.14.windows.bin.zip",
-            "hash": "c08900ffda8ed911746c86ad3354ad86084715cfd39ceca938f7bc2ead7988fc"
+            "url": "http://doxygen.nl/files/doxygen-1.8.15.windows.bin.zip",
+            "hash": "b34b82e0e036e0ebefc609c78f9ff5de305abac0330b9356acc91e57f77b1f59"
         }
     },
     "bin": [
