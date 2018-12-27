@@ -1,20 +1,32 @@
-param($app, $dir)
+<#
+.SYNOPSIS
+    Search for application description on homepage.
+.PARAMETER App
+    Manifest name to search.
+    Placeholders are supported.
+.PARAMETER Dir
+    Where to search for manifest(s).
+#>
+param(
+    [String] $App = '*',
+    [ValidateScript( {
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        }
+        $true
+    })]
+    [String] $Dir = "$PSScriptRoot\..\bucket"
+)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\description.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\description.ps1"
 
-if(!$dir) {
-    $dir = "$psscriptroot\..\bucket"
-}
-$dir = resolve-path $dir
-
-$search = "*"
-if($app) { $search = $app }
+$Dir = Resolve-Path $Dir
 
 # get apps to check
 $apps = @()
-Get-ChildItem $dir "$search.json" | ForEach-Object {
+Get-ChildItem $dir "$App.json" | ForEach-Object {
     $json = parse_json "$dir\$($_.Name)"
     $apps += ,@(($_.Name -replace '\.json$', ''), $json)
 }
@@ -47,6 +59,4 @@ $apps | ForEach-Object {
 
     write-host "(found by $descr_method)"
     write-host "  ""$description""" -fore green
-
 }
-
