@@ -1,12 +1,27 @@
 {
-    "homepage": "https://github.com/coreybutler/nvm-windows",
     "version": "1.1.7",
+    "description": "A node.js version management utility for Windows",
+    "homepage": "https://github.com/coreybutler/nvm-windows",
+    "license": "MIT",
+    "notes": "You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly",
     "url": "https://github.com/coreybutler/nvm-windows/releases/download/1.1.7/nvm-noinstall.zip",
-    "bin": [
-        "nvm.exe"
+    "hash": "md5:00acf86e40c5f038cca8c383b9d2c207",
+    "pre_install": [
+        "# $architecture variable from lib/install.ps1 scope",
+        "$valueArch = $architecture -replace '(\\d+)bit', '$1'",
+        "if(Test-Path \"$persist_dir\\settings.txt\") {",
+        "    $valueProxy = (Get-Content \"$persist_dir\\settings.txt\") -match('proxy:\\s+') -replace 'proxy:\\s+', ''",
+        "} else {",
+        "    $valueProxy = 'none'",
+        "}",
+        "$content = \"root: $persist_dir\\nodejs`r`n\"",
+        "$content += \"arch: $valueArch`r`n\"",
+        "$content += \"proxy: $valueProxy\"",
+        "Set-Content \"$dir\\settings.txt\" $content -Encoding Ascii"
     ],
     "persist": [
         "nodejs",
+        "settings.txt",
         [
             "elevate.cmd",
             "nodejs\\elevate.cmd"
@@ -14,35 +29,14 @@
         [
             "elevate.vbs",
             "nodejs\\elevate.vbs"
-        ],
-        "settings.txt"
+        ]
     ],
     "env_add_path": "nodejs\\nodejs",
     "env_set": {
         "NVM_HOME": "$dir",
         "NVM_SYMLINK": "$persist_dir\\nodejs\\nodejs"
     },
-    "hash": "md5:00acf86e40c5f038cca8c383b9d2c207",
-    "architecture": {
-        "64bit": {
-            "pre_install": [
-                "if(!(test-path \"$dir\\settings.txt\")) {",
-                "    write-output \"root: $persist_dir\\nodejs`r`narch: 64`r`nproxy: none\" | Out-File -encoding \"ASCII\" \"$dir\\settings.txt\"",
-                "}"
-            ]
-        },
-        "32bit": {
-            "pre_install": [
-                "if(!(test-path \"$dir\\settings.txt\")) {",
-                "    write-output \"root: $persist_dir\\nodejs`r`narch: 32`r`nproxy: none\" | Out-File -encoding \"ASCII\" \"$dir\\settings.txt\"",
-                "}"
-            ]
-        }
-    },
-    "post_install": "((Get-Content \"$persist_dir\\settings.txt\" -Raw) -replace '^root:\\s+\\w+:\\\\([^:><*?|/\\\\\"]+\\\\?)+\\r\\n',\"root: $persist_dir\\nodejs`r`n\") | Set-Content \"$persist_dir\\settings.txt\"",
-    "notes": [
-        "You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly"
-    ],
+    "bin": "nvm.exe",
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/coreybutler/nvm-windows/releases/download/$version/nvm-noinstall.zip",
