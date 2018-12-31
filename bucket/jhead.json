@@ -1,11 +1,11 @@
 {
-    "version": "3.02",
+    "version": "3.03",
     "description": "JPEG Exif header manipulation tool",
     "homepage": "http://www.sentex.net/~mwandel/jhead/",
     "license": "Public Domain",
     "depends": "mozjpeg",
     "url": "http://www.sentex.net/~mwandel/jhead/jhead.exe",
-    "hash": "140b9a7a08903c02a757e389c5896d8c74be25dc164471af0fab9e960647e037",
+    "hash": "79611d61aede001fd79574d99a56892f1e19e2d339367d43fe6e5e9ef2cc4a10",
     "bin": "jhead.exe",
     "checkver": "Current release version: ([\\d\\.]+) \\(",
     "autoupdate": {
