@@ -42,7 +42,7 @@
         "Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--this has a plugin to remove some crazy aliases from Powershell, as well as many other improvements."
     ],
     "checkver": {
-        "url": "https://github.com/Microsoft/microsoft-r-open/releases/latest",
+        "github": "https://github.com/Microsoft/microsoft-r-open",
         "regex": "Microsoft R Open ([\\d.]+)"
     },
     "autoupdate": {
