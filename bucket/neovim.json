@@ -1,23 +1,21 @@
 {
-    "version": "0.3.1",
+    "version": "0.3.2",
     "license": {
         "identifier": "Apache-2.0,MIT,Vim,Freeware(Node.js)",
         "url": "https://github.com/neovim/neovim/blob/master/LICENSE"
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/neovim/neovim/releases/download/v0.3.1/nvim-win64.zip",
-            "hash": "732520659032f9d2bc17e0318e6cf52bb880a6338aaaccc96162535269943c23"
+            "url": "https://github.com/neovim/neovim/releases/download/v0.3.2/nvim-win64.zip",
+            "hash": "ea1251a9d09beb04cc0ec80bdff7080b4d5dadee32c54677d4785625ea88f8e2"
         },
         "32bit": {
-            "url": "https://github.com/neovim/neovim/releases/download/v0.3.1/nvim-win32.zip",
-            "hash": "9c06dcc0aacef56f6980d80d30321796cd1e1c9b27d778bd65423a5ca1fb4043"
+            "url": "https://github.com/neovim/neovim/releases/download/v0.3.2/nvim-win32.zip",
+            "hash": "f892fa66c97fe589e0a173c735c0ad81d943bec00e815213031ff56a4882dab6"
         }
     },
     "suggest": {
-        "Visual Studio 2015 C++ redistributable": [
-            "vcredist2015"
-        ]
+        "Visual Studio 2015 C++ redistributable": "vcredist2015"
     },
     "homepage": "https://neovim.io/",
     "bin": [
