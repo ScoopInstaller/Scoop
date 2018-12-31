@@ -7,25 +7,30 @@
         "wixtoolset",
         "extras/vcredist2015"
     ],
-    "url": "https://mran.blob.core.windows.net/install/mro/3.5.1/microsoft-r-open-3.5.1.exe#/mro.exe",
-    "hash": "30de2b2fefed091452695e03c805fcefcef00ab30b3df04363b72d9d44bac494",
-    "installer": {
-        "script":[
-            "&(scoop which dark) -nologo -x \"$dir\\tmp\" \"$dir\\mro.exe\" | Out-Null",
-            "extract_msi \"$dir\\tmp\\AttachedContainer\\ROpen.msi\" \"$dir\\tmp\" | Out-Null",
-            "Move-Item \"$dir\\tmp\\Microsoft\\MRO-$version.0\\*\" \"$dir\" -Force",
-            "extract_7zip \"$dir\\Setup\\*.cab\" \"$dir\\Setup\"",
-            "Remove-Item \"$dir\\bin\\x64\\Rblas.dll\", \"$dir\\bin\\x64\\Rlapack.dll\" -Force",
-            "Move-Item \"$dir\\Setup\\bin\\x64\\*\" \"$dir\\bin\\x64\" -Force",
-            "Move-Item \"$dir\\Setup\\library\\*\" \"$dir\\library\" -Force",
-            "Remove-Item \"$dir\\tmp\", \"$dir\\Setup\", \"$dir\\mro.exe\" -Force -Recurse"
-        ]
+    "architecture": {
+        "64bit": {
+            "url": "https://mran.blob.core.windows.net/install/mro/3.5.1/microsoft-r-open-3.5.1.exe#/mro.exe",
+            "hash": "30de2b2fefed091452695e03c805fcefcef00ab30b3df04363b72d9d44bac494",
+            "installer": {
+                "script": [
+                    "&(scoop which dark) -nologo -x \"$dir\\tmp\" \"$dir\\mro.exe\" | Out-Null",
+                    "extract_msi \"$dir\\tmp\\AttachedContainer\\ROpen.msi\" \"$dir\\tmp\" | Out-Null",
+                    "Move-Item \"$dir\\tmp\\Microsoft\\MRO-$version.0\\*\" \"$dir\" -Force",
+                    "extract_7zip \"$dir\\Setup\\*.cab\" \"$dir\\Setup\"",
+                    "Remove-Item \"$dir\\bin\\x64\\Rblas.dll\", \"$dir\\bin\\x64\\Rlapack.dll\" -Force",
+                    "Move-Item \"$dir\\Setup\\bin\\x64\\*\" \"$dir\\bin\\x64\" -Force",
+                    "Move-Item \"$dir\\Setup\\library\\*\" \"$dir\\library\" -Force",
+                    "Remove-Item \"$dir\\tmp\", \"$dir\\Setup\", \"$dir\\mro.exe\" -Force -Recurse"
+                ]
+            },
+            "bin": [
+                "bin\\x64\\r.exe",
+                "bin\\x64\\rterm.exe",
+                "bin\\x64\\rscript.exe"
+            ]
+        }
     },
-    "bin": [
-        "bin\\x64\\r.exe",
-        "bin\\x64\\rterm.exe",
-        "bin\\x64\\rscript.exe"
-    ],
+
     "notes": [
         "You'll need to type 'r.ps1' or 'r.cmd' to run MRO, because in Powershell 'r' runs the last command. Alternatively 'rterm' can be used to start the interactive R terminal session.",
         "",
@@ -41,6 +46,10 @@
         "regex": "Microsoft R Open ([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://mran.blob.core.windows.net/install/mro/$version/microsoft-r-open-$version.exe"
+        "architecture": {
+            "64bit": {
+                "url": "https://mran.blob.core.windows.net/install/mro/$version/microsoft-r-open-$version.exe#/mro.exe"
+            }
+        }
     }
 }
