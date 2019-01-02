@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://cygwin.com/setup-x86_64.exe#/cygwin-setup.exe",
-            "hash": "837e77e4d77c34097d2b071ab01ca3658cfe46573d68cb763a2358d1e30aac70"
+            "hash": "sha512:4ddf57775794d7d42e2bccf1f717553ba319010579978087e3e9162a0d12e0a4f665a79c3da1710d84037d9e43851cf858a0c5d965e9a4e32b3d38495b4f8f0e"
         },
         "32bit": {
             "url": "https://cygwin.com/setup-x86.exe#/cygwin-setup.exe",
-            "hash": "90591855813dfb79ba1fe468c1d425450d4619fd269f6ee6e02ccd38b84d5e41"
+            "hash": "sha512:e0b321c4898416722c6402d86ec00cc8d7f38a541e51bcda9b34da9f71c3255d20566057cb7e3df70aadc6d2d1e6abefe371dce72a86d1b28163f6de97b2f0cd"
         }
     },
     "autoupdate": {
@@ -20,6 +20,9 @@
             "32bit": {
                 "url": "https://cygwin.com/setup-x86.exe#/cygwin-setup.exe"
             }
+        },
+        "hash": {
+            "url": "https://cygwin.com/sha512.sum"
         }
     },
     "checkver": {
