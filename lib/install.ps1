@@ -104,13 +104,25 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
 
     if(!(test-path $cached) -or !$use_cache) {
         $null = ensure $cachedir
-        do_dl $url "$cached.download" $cookies
-        Move-Item "$cached.download" $cached -force
+        if (is_local_path $url) {
+            Copy-Item (resolve_local_path $url) $cached -Force
+        } else {
+            do_dl $url "$cached.download" $cookies
+            Move-Item "$cached.download" $cached -force
+        }
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
     if (!($null -eq $to)) {
         Copy-Item $cached $to
     }
+}
+
+function is_local_path($url) {
+    return $url -and $url.Length -gt 2 -and ($url[1] -eq ':' -OR $url.StartsWith('\\') -OR $url[0] -eq '/' -OR $url -match '^file://')
+}
+
+function resolve_local_path($url) {
+    [uri]::new($url).LocalPath
 }
 
 function use_any_https_protocol() {
@@ -509,8 +521,16 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extract_tos = @(extract_to $manifest $architecture)
     $extracted = 0;
 
+    $has_local_path = $false
+    foreach($url in $urls) {
+        if (is_local_path $url) {
+            $has_local_path = $true
+            break
+        }
+    }
+
     # download first
-    if(aria2_enabled) {
+    if((aria2_enabled) -and !$has_local_path) {
         dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach($url in $urls) {
