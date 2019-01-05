@@ -118,7 +118,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
 }
 
 function is_local_path($url) {
-    return $url -and $url.Length -gt 2 -and ($url[1] -eq ':' -OR $url.StartsWith('\\') -OR $url[0] -eq '/' -OR $url -match '^file://')
+    return $url -and $url.Length -gt 2 -and ($url[1] -eq ':' -or $url.StartsWith('\\') -or $url[0] -eq '/' -or $url -match '^file://')
 }
 
 function resolve_local_path($url) {
