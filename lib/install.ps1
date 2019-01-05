@@ -122,7 +122,7 @@ function is_local_path($url) {
 }
 
 function resolve_local_path($url) {
-    [uri]::new($url).LocalPath
+    return [uri]::new($url).LocalPath
 }
 
 function use_any_https_protocol() {
