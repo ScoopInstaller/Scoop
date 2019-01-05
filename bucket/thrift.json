@@ -1,9 +1,9 @@
 {
     "homepage": "https://thrift.apache.org/",
-    "version": "0.11.0",
+    "version": "0.12.0",
     "license": "Apache-2.0",
-    "url": "https://www-us.apache.org/dist/thrift/0.11.0/thrift-0.11.0.exe#/thrift.exe",
-    "hash": "29a45c267f64ada6663fd449677b4d8ba3b4b3c772a9fd23910f876a224c2776",
+    "url": "https://www-us.apache.org/dist/thrift/0.12.0/thrift-0.12.0.exe#/thrift.exe",
+    "hash": "3ef62b5839029c3d6e25da975a398c194e661f48a500a1af0daead3ddf7e602d",
     "bin": "thrift.exe",
     "checkver": "Apache\\s+Thrift\\s+v([\\d.]+)",
     "autoupdate": {
