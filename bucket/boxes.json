@@ -10,9 +10,6 @@
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/ascii-boxes/boxes/releases/download/v$version/boxes-$version-intel-win32.zip",
-        "hash": {
-            "url": "$url.sha256"
-        },
         "extract_dir": "boxes-$version"
     }
 }
