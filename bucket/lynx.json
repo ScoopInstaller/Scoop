@@ -12,9 +12,11 @@
     "innosetup": true,
     "depends": [
         "cacert",
-        "extras/vcredist2012",
         "openssl"
     ],
+    "suggest": {
+        "vcredist": "extras/vcredist2012"
+    },
     "persist": [
         "$dir/lynx.cfg"
     ],
