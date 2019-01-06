@@ -2,7 +2,7 @@
     "description": "Feature Control Multi-tool for Windows 10",
     "homepage": "https://github.com/riverar/mach2",
     "version": "0.3.0.0",
-    "license": "GPLv3",
+    "license": "GPL-3.0-or-later",
     "architecture": {
         "64bit": {
             "url": "https://github.com/riverar/mach2/releases/download/0.3.0.0/mach2_0.3.0.0_x64.zip",
