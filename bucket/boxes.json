@@ -7,10 +7,7 @@
     "hash": "6f2081a51e541920debeb779df7ea8fe91d73e3ef8bdaa75b3984b531d0271ed",
     "extract_dir": "boxes-1.2",
     "bin": "boxes.exe",
-    "checkver": {
-        "url": "https://github.com/ascii-boxes/boxes/releases/latest",
-        "re": "/releases/tag/v([\\d\\.]+)"
-    },
+    "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/ascii-boxes/boxes/releases/download/v$version/boxes-$version-intel-win32.zip",
         "hash": {
