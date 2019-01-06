@@ -23,9 +23,6 @@
             "32bit": {
                 "url": "https://github.com/riverar/mach2/releases/download/$version/mach2_$version_x86.zip"
             }
-        },
-        "hash": {
-            "url": "$url.sha256"
         }
     }
 }
