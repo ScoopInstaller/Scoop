@@ -42,13 +42,17 @@
         "Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--this has a plugin to remove some crazy aliases from Powershell, as well as many other improvements."
     ],
     "checkver": {
-        "github": "https://github.com/Microsoft/microsoft-r-open",
-        "regex": "Microsoft R Open ([\\d.]+)"
+        "url": "https://mran.microsoft.com/assets/configurations/app.config.json",
+        "jp": "$.latestMicrosoftRVersion"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://mran.blob.core.windows.net/install/mro/$version/microsoft-r-open-$version.exe#/mro.exe"
+                "url": "https://mran.blob.core.windows.net/install/mro/$version/microsoft-r-open-$version.exe#/mro.exe",
+                "hash": {
+                    "url": "https://mranapi.azurewebsites.net/api/download",
+                    "regex": "$basename.+?([A-Fa-f\\d]{64})"
+                }
             }
         }
     }
