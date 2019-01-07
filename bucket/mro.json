@@ -3,10 +3,10 @@
     "description": "Microsoft R Open: The enhanced distribution of R from Microsoft Corporation",
     "homepage": "https://mran.microsoft.com/",
     "license": "GPL-2.0-only",
-    "depends": [
-        "wixtoolset",
-        "extras/vcredist2015"
-    ],
+    "depends": "wixtoolset",
+    "suggest": {
+        "Visual C/C++ Runtime 2015": "extras/vcredist2015"
+    },
     "architecture": {
         "64bit": {
             "url": "https://mran.blob.core.windows.net/install/mro/3.5.1/microsoft-r-open-3.5.1.exe#/mro.exe",
