@@ -1,0 +1,59 @@
+{
+    "version": "3.5.1",
+    "description": "Microsoft R Open: The enhanced distribution of R from Microsoft Corporation",
+    "homepage": "https://mran.microsoft.com/",
+    "license": "GPL-2.0-only",
+    "depends": "wixtoolset",
+    "suggest": {
+        "Visual C/C++ Runtime 2015": "extras/vcredist2015"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://mran.blob.core.windows.net/install/mro/3.5.1/microsoft-r-open-3.5.1.exe#/mro.exe",
+            "hash": "30de2b2fefed091452695e03c805fcefcef00ab30b3df04363b72d9d44bac494",
+            "installer": {
+                "script": [
+                    "&(scoop which dark) -nologo -x \"$dir\\tmp\" \"$dir\\mro.exe\" | Out-Null",
+                    "extract_msi \"$dir\\tmp\\AttachedContainer\\ROpen.msi\" \"$dir\\tmp\" | Out-Null",
+                    "Move-Item \"$dir\\tmp\\Microsoft\\MRO-$version.0\\*\" \"$dir\" -Force",
+                    "extract_7zip \"$dir\\Setup\\*.cab\" \"$dir\\Setup\"",
+                    "Remove-Item \"$dir\\bin\\x64\\Rblas.dll\", \"$dir\\bin\\x64\\Rlapack.dll\" -Force",
+                    "Move-Item \"$dir\\Setup\\bin\\x64\\*\" \"$dir\\bin\\x64\" -Force",
+                    "Move-Item \"$dir\\Setup\\library\\*\" \"$dir\\library\" -Force",
+                    "Remove-Item \"$dir\\tmp\", \"$dir\\Setup\", \"$dir\\mro.exe\" -Force -Recurse"
+                ]
+            },
+            "bin": [
+                "bin\\x64\\r.exe",
+                "bin\\x64\\rterm.exe",
+                "bin\\x64\\rscript.exe"
+            ]
+        }
+    },
+
+    "notes": [
+        "You'll need to type 'r.ps1' or 'r.cmd' to run MRO, because in Powershell 'r' runs the last command. Alternatively 'rterm' can be used to start the interactive R terminal session.",
+        "",
+        "You can remove Powershell's 'r' command with:",
+        "    rm alias:\\r",
+        "",
+        "... but this only affects your current session: if you'd like to remove it for all future sessions you need to add the command above to your Powershell profile.",
+        "",
+        "Annoying, right?! You might want to check out Pshazz (scoop install pshazz)--this has a plugin to remove some crazy aliases from Powershell, as well as many other improvements."
+    ],
+    "checkver": {
+        "url": "https://mran.microsoft.com/assets/configurations/app.config.json",
+        "jp": "$.latestMicrosoftRVersion"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://mran.blob.core.windows.net/install/mro/$version/microsoft-r-open-$version.exe#/mro.exe",
+                "hash": {
+                    "url": "https://mranapi.azurewebsites.net/api/download",
+                    "regex": "$basename.+?([A-Fa-f\\d]{64})"
+                }
+            }
+        }
+    }
+}
