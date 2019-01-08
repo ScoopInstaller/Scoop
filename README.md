@@ -34,6 +34,11 @@ iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 $env:SCOOP_GLOBAL='F:\GlobalScoopApps'
 ```
 
+#### Update manifest
+```powershell
+scoop update
+```
+
 ## What does Scoop do?
 
 Scoop installs programs from the command line with a minimal amount of friction. It tries to eliminate things like:
