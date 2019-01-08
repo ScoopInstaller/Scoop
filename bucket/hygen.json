@@ -1,15 +1,14 @@
 {
     "description": "The scalable code generator that saves you time",
     "homepage": "https://www.hygen.io/",
-    "version": "2.1.0",
-    "url": "https://github.com/jondot/hygen/releases/download/v2.1.0/hygen.win.exe.v2.1.0.tar.gz",
-    "hash": "263f28403d9833cde650a97fc1a243b5ef46e8af3f0fa5f89f6045f4ffecf918",
+    "version": "2.1.1",
+    "url": "https://github.com/jondot/hygen/releases/download/v2.1.1/hygen.win.exe.v2.1.1.zip",
+    "hash": "a8b319cfb133c1996ceb9371063f3c8aa33f504654f37457dfe9f5be401a0ce2",
     "bin": "hygen.exe",
-    "pre_install": "if(Test-Path \"$dir\\hygen\") { Rename-Item \"$dir\\hygen\" \"$dir\\hygen.exe\" }",
     "checkver": {
         "github": "https://github.com/jondot/hygen"
     },
     "autoupdate": {
-        "url": "https://github.com/jondot/hygen/releases/download/v$version/hygen.win.exe.v$version.tar.gz"
+        "url": "https://github.com/jondot/hygen/releases/download/v$version/hygen.win.exe.v$version.zip"
     }
 }
