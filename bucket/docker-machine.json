@@ -1,16 +1,16 @@
 {
     "homepage": "https://github.com/docker/machine",
     "description": "Docker Machine is a tool that lets you install Docker Engine on virtual hosts, and manage the hosts with commands",
-    "version": "0.16.0",
+    "version": "0.16.1",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.16.0/docker-machine-Windows-x86_64.exe#/docker-machine.exe",
-            "hash": "90ec9329ea8657791e421fc8c74da75ebda567786cd4a50266f35d895ecd8dea"
+            "url": "https://github.com/docker/machine/releases/download/v0.16.1/docker-machine-Windows-x86_64.exe#/docker-machine.exe",
+            "hash": "2d3b55682b704f9d61b74d1db9b4f6ddbb4f80302c4333aef7e5dc746049b1d9"
         },
         "32bit": {
-            "url": "https://github.com/docker/machine/releases/download/v0.16.0/docker-machine-Windows-i386.exe#/docker-machine.exe",
-            "hash": "475cb2b894201653cda30ae6955f8c5d9cf9d8fc6d171dbc3995bc0ef9589fa3"
+            "url": "https://github.com/docker/machine/releases/download/v0.16.1/docker-machine-Windows-i386.exe#/docker-machine.exe",
+            "hash": "12de35cfb21898dc5a72fec265d660bed5236f2198c6ffed78cda275e68e2cba"
         }
     },
     "bin": [
