@@ -15,9 +15,12 @@
     "persist": [
         "cache",
         "bin",
-        "mirror"
+        "mirror",
+        "global"
     ],
     "post_install": [
+        "yarn config set global-folder \"$dir\\global\"",
+        "Set-Content $env:USERPROFILE\\.yarnrc (Get-Content $env:USERPROFILE\\.yarnrc | %{ $_ -replace \"^global-folder\", \"--global-folder\" })",
         "yarn config set cache-folder \"$dir\\cache\"",
         "yarn config set yarn-offline-mirror \"$dir\\mirror\"",
         "yarn config set prefix \"$dir\""
