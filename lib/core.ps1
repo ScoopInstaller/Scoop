@@ -594,16 +594,11 @@ function show_app($app, $bucket, $version) {
 }
 
 function last_scoop_update() {
-    $last_update = (scoop config lastupdate)
-
-    if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
-        try {
-            $last_update = [System.DateTime]::Parse($last_update)
-        } catch {
-            $last_update = $null
-        }
+    try {
+        return [System.DateTime]::Parse((scoop config lastupdate))
+    } catch {
+        return $null
     }
-    return $last_update
 }
 
 function is_scoop_outdated() {
