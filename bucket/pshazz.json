@@ -4,10 +4,7 @@
     "url": "https://github.com/lukesampson/pshazz/archive/f40bfabb011e38215f66610e5dce432fa67ba393.zip",
     "extract_dir": "pshazz-f40bfabb011e38215f66610e5dce432fa67ba393",
     "hash": "e93999abb13008348fef0c12a61bc17b35cb0addb7dc44fba7c4a22e2fe9adc1",
-    "bin": [
-        "bin\\pshazz.ps1",
-        "libexec\\askpass.exe"
-    ],
+    "bin": "bin\\pshazz.ps1",
     "installer": {
         "file": "bin\\install.ps1"
     },
