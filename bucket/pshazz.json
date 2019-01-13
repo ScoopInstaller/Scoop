@@ -1,9 +1,9 @@
 {
     "homepage": "https://github.com/lukesampson/pshazz",
-    "version": "0.2019.01.12",
-    "url": "https://github.com/lukesampson/pshazz/archive/f40bfabb011e38215f66610e5dce432fa67ba393.zip",
-    "extract_dir": "pshazz-f40bfabb011e38215f66610e5dce432fa67ba393",
-    "hash": "e93999abb13008348fef0c12a61bc17b35cb0addb7dc44fba7c4a22e2fe9adc1",
+    "version": "0.2019.01.13",
+    "url": "https://github.com/lukesampson/pshazz/archive/e0cbd3fe165ea194a0d2e58001306b9cab22aa56.zip",
+    "extract_dir": "pshazz-e0cbd3fe165ea194a0d2e58001306b9cab22aa56",
+    "hash": "43f2bd0a00b10d2d017e549a8ccac06e6af6efa3b6693d1f3ad4dde79a25821f",
     "bin": [
         "bin\\pshazz.ps1",
         "libexec\\askpass.exe"
