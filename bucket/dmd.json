@@ -10,8 +10,11 @@
         "windows\\bin\\dub.exe"
     ],
     "homepage": "https://dlang.org/",
-    "checkver": "Latest version: ([0-9.]+)",
+    "checkver": {
+        "url": "http://downloads.dlang.org/releases/LATEST",
+        "regex": "([\\d.]+)"
+    },
     "autoupdate": {
-        "url": "http://downloads.dlang.org/releases/2.x/$version/dmd.$version.windows.7z"
+        "url": "http://downloads.dlang.org/releases/$majorVersion.x/$version/dmd.$version.windows.7z"
     }
 }
