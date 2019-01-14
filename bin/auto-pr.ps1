@@ -4,18 +4,18 @@
 .DESCRIPTION
     Updates manifests and pushes them directly to the master branch or creates pull-requests for upstream.
 .PARAMETER Upstream
-    Upstream repository with target branch.
+    Upstream repository with the target branch.
     Must be in format '<user>/<repo>:<branch>'
 .PARAMETER Dir
-    Directory where to search for manifests.
+    The directory where to search for manifests.
 .PARAMETER Push
     Push updates directly to 'origin master'.
 .PARAMETER Request
     Create pull-requests on 'upstream master' for each update.
 .PARAMETER Help
     Print help to console.
-.PARAMETER SpecialSnoflakes
-    Array of manifests, which should be updated all the time. (-ForceUpdate paramter to checkver)
+.PARAMETER SpecialSnowflakes
+    An array of manifests, which should be updated all the time. (-ForceUpdate parameter to checkver)
 .EXAMPLE
     PS REPODIR > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
 .EXAMPLE
