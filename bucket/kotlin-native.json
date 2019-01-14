@@ -1,12 +1,13 @@
 {
     "homepage": "https://kotlinlang.org/",
-    "version": "0.9.3",
+    "version": "1.3.11",
     "license": "Apache-2.0",
-    "url": "https://github.com/JetBrains/kotlin-native/releases/download/v0.9.3/kotlin-native-windows-0.9.3.zip",
-    "hash": "b340076c29fff2239870c90ac1276ac8da355449fa3e1393ab435fa41b5354cd",
-    "extract_dir": "kotlin-native-windows-0.9.3",
+    "url": "https://github.com/JetBrains/kotlin/releases/download/v1.3.11/kotlin-native-windows-1.3.11.zip",
+    "hash": "0824d576091c9b2ee34df13ca542b00f6db1a9c1f4159aa9f37d4f1af362e43d",
+    "extract_dir": "kotlin-native-windows-1.3.11",
     "bin": [
         "bin\\cinterop.bat",
+        "bin\\jsinterop.bat",
         "bin\\klib.bat",
         "bin\\konanc.bat",
         "bin\\kotlinc.bat",
@@ -20,11 +21,11 @@
         ]
     },
     "checkver": {
-        "github": "https://github.com/JetBrains/kotlin-native"
+        "github": "https://github.com/JetBrains/kotlin"
     },
     "autoupdate": {
-        "url": "https://github.com/JetBrains/kotlin-native/releases/download/v$version/kotlin-native-windows-$version.zip",
+        "url": "https://github.com/JetBrains/kotlin/releases/download/v$version/kotlin-native-windows-$version.zip",
         "extract_dir": "kotlin-native-windows-$version"
     },
-    "notes": "Please keep in mind that this is still a pre-release!"
+    "notes": "Please keep in mind that this is still marked as an experimental feature!"
 }
