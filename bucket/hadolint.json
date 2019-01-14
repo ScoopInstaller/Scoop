@@ -1,7 +1,7 @@
 {
     "description": "Dockerfile linter",
     "homepage": "https://github.com/hadolint/hadolint",
-    "license": "GPL3.0",
+    "license": "GPL-3.0-or-later",
     "version": "1.15.0",
     "architecture": {
         "64bit": {
