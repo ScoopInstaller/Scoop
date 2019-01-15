@@ -18,12 +18,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/github/smimesign/releases/download/$version/smimesign-windows-amd64-$version.zip#/smimesign.exe",
-                "hash": "aa1dfc4a4aae98be1979b610fbcd1bef885798507de676e1167fa34984f8679a"
+                "url": "https://github.com/github/smimesign/releases/download/$version/smimesign-windows-amd64-$version.zip#/smimesign.exe"
             },
             "32bit": {
-                "url": "https://github.com/github/smimesign/releases/download/$version/smimesign-windows-386-$version.zip#/smimesign.exe",
-                "hash": "aa1dfc4a4aae98be1979b610fbcd1bef885798507de676e1167fa34984f8679a"
+                "url": "https://github.com/github/smimesign/releases/download/$version/smimesign-windows-386-$version.zip#/smimesign.exe"
             }
         }
     }
