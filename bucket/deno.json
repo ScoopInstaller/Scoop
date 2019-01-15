@@ -1,12 +1,12 @@
 {
     "homepage": "https://github.com/denoland/deno",
     "description": "A secure TypeScript runtime on V8",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/denoland/deno/releases/download/v0.2.6/deno_win_x64.zip",
-            "hash": "25f3a098bc6cd3bc38ac4cc3f4d47575e73b6b55edfd7096f9d1dc4ca94024da"
+            "url": "https://github.com/denoland/deno/releases/download/v0.2.7/deno_win_x64.zip",
+            "hash": "9c9b005c6cc2c3a1c24a23030d6d206cb596291eebd8e66788bec41b4493db61"
         }
     },
     "bin": [
