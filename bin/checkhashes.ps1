@@ -54,12 +54,43 @@ if ($ForceUpdate) { $Update = $true }
 # Cleanup
 if (!$UseCache) { scoop cache rm '*HASH_CHECK*' }
 
-$Queue = @()
+function err ([String] $name, [String[]] $message) {
+    Write-Host "$name`:" -ForegroundColor Red -NoNewline
+    Write-Host ($message -join "`r`n") -ForegroundColor Red
+}
+
+$MANIFESTS = @()
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
+    $name = (strip_ext $_.Name)
     $manifest = parse_json "$Dir\$($_.Name)"
+
     # Skip nighly manifests, since their hash validation is skipped
     if (!($manifest.version -eq 'nightly')) {
-        $Queue += , @($_.Name, $manifest)
+        $urls = @()
+        $hashes = @()
+
+        if ($manifest.architecture) {
+            # First handle 64bit
+            url $manifest '64bit' | ForEach-Object { $urls += $_ }
+            hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
+            url $manifest '32bit' | ForEach-Object { $urls += $_ }
+            hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
+        } elseif ($manifest.url) {
+            $manifest.url | ForEach-Object { $urls += $_ }
+            $manifest.hash | ForEach-Object { $hashes += $_ }
+        } else {
+            continue
+        }
+
+        # Number of URLS and Hashes is different
+        if (!($urls.Length -eq $hashes.Length)) { err $name 'URLS and hashes count mismatch.' }
+
+        $MANIFESTS += New-Object psobject @{
+            app      = $name
+            manifest = $manifest
+            urls     = $urls
+            hashes   = $hashes
+        }
     }
 }
 
@@ -68,44 +99,7 @@ Get-Event | ForEach-Object {
     Remove-Event $_.SourceIdentifier
 }
 
-function err ([String] $name, [String[]] $message) {
-    Write-Host "$name`:" -ForegroundColor Red -NoNewline
-    Write-Host ($message -join "`r`n") -ForegroundColor Red
-}
-
 $original = use_any_https_protocol
-
-$MANIFESTS = @()
-$MANIFESTS += $Queue | ForEach-Object {
-    $name, $manifest = $_
-    $urls = @()
-    $hashes = @()
-
-    if ($manifest.architecture) {
-        # First handle 64bit
-        url $manifest '64bit' | ForEach-Object { $urls += $_ }
-        hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
-        url $manifest '32bit' | ForEach-Object { $urls += $_ }
-        hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
-    } elseif ($manifest.url) {
-        $manifest.url | ForEach-Object { $urls += $_ }
-        $manifest.hash | ForEach-Object { $hashes += $_ }
-    } else {
-        continue
-    }
-
-    # Number of URLS and Hashes is different
-    if (!($urls.Length -eq $hashes.Length)) { err $name 'URLS and hashes count mismatch.' }
-
-    $man = New-Object psobject @{
-        app      = (strip_ext $name)
-        manifest = $manifest
-        urls     = $urls
-        hashes   = $hashes
-    }
-
-    return $man
-}
 
 $MANIFESTS | ForEach-Object {
     $current = $_
@@ -119,7 +113,7 @@ $MANIFESTS | ForEach-Object {
         $algorithm = 'sha256'
         $name = $current.app
         $version = 'HASH_CHECK'
-        $tmp = $expected_hash.Split(':')
+        $tmp = $expected_hash -split ':'
 
         if ($tmp.Length -eq 2) {
             $algorithm = $tmp[0]
@@ -170,7 +164,8 @@ $MANIFESTS | ForEach-Object {
             }
             if ($platforms.Contains('32bit')) {
                 $32bit_count = $current.manifest.architecture.'32bit'.hash.Count
-                $current.manifest.architecture.'32bit'.hash = $actuals[($64bit_count)..($32bit_count)]
+                $max = $64bit_count + $32bit_count - 1 # Edge case if manifest contains 64bit and 32bit.
+                $current.manifest.architecture.'32bit'.hash = $actuals[($64bit_count)..$max]
             }
         }
 
