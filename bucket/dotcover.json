@@ -1,0 +1,21 @@
+{
+    "version": "2018.3.1",
+    "homepage": "https://www.jetbrains.com/dotcover/download/#section=commandline",
+    "license": {
+        "identifier": "Freeware",
+        "url": "https://www.jetbrains.com/dotcover/download/dotcover_clt_license.html"
+    },
+    "url": "https://download.jetbrains.com/resharper/ReSharperUltimate.2018.3.1/JetBrains.dotCover.CommandLineTools.2018.3.1.zip",
+    "hash": "8671bf0dc4f31fcafca1499928ecde7e60461926c8883b6942bc081153cfd314",
+    "bin": "dotcover.exe",
+    "checkver": {
+        "url": "https://data.services.jetbrains.com/products/releases?code=DCCLT&latest=true&type=release",
+        "jp": "$.DCCLT.[0].version"
+    },
+    "autoupdate": {
+        "url": "https://download.jetbrains.com/resharper/ReSharperUltimate.$version/JetBrains.dotCover.CommandLineTools.$version.zip",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}
