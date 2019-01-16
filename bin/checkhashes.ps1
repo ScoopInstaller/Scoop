@@ -13,7 +13,7 @@
 .PARAMETER SkipCorrect
     Manifests without mismatch will not be shown.
 .PARAMETER UseCache
-    Downloaded files woun't be deleted after script finish.
+    Downloaded files will not be deleted after script finish.
     Should not be used, because check should be used for downloading actual version of file (as normal user, not finding in some document from vendors, which could be damaged / wrong (Example: Slack@3.3.1 lukesampson/scoop-extras#1192)), not some previously downloaded.
 .EXAMPLE
     PS BUCKETDIR> .\bin\checkhashes.ps1
@@ -25,12 +25,12 @@
 param(
     [String] $App = '*',
     [ValidateScript( {
-            if (!(Test-Path $_ -Type Container)) {
-                throw "$_ is not a directory!"
-            } else {
-                $true
-            }
-        })]
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        } else {
+            $true
+        }
+    })]
     [String] $Dir = "$PSScriptRoot\..\bucket",
     [Switch] $Update,
     [Switch] $ForceUpdate,
@@ -54,11 +54,10 @@ if ($ForceUpdate) { $Update = $true }
 # Cleanup
 if (!$UseCache) { scoop cache rm '*HASH_CHECK*' }
 
-# get apps to check
 $Queue = @()
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $manifest = parse_json "$Dir\$($_.Name)"
-    # Skip nighly manfiests, since their hash validation is skipped
+    # Skip nighly manifests, since their hash validation is skipped
     if (!($manifest.version -eq 'nightly')) {
         $Queue += , @($_.Name, $manifest)
     }
@@ -156,9 +155,6 @@ $MANIFESTS | ForEach-Object {
     }
 
     if ($Update) {
-        # Just
-        $man =
-
         if ($current.manifest.url -and $current.manifest.hash) {
             $current.manifest.hash = $actuals
         } else {
@@ -166,6 +162,7 @@ $MANIFESTS | ForEach-Object {
             # Defaults to zero, don't know, which architecture is available
             $64bit_count = 0
             $32bit_count = 0
+
             if ($platforms.Contains('64bit')) {
                 $64bit_count = $current.manifest.architecture.'64bit'.hash.Count
                 # 64bit is get, donwloaded and added first
