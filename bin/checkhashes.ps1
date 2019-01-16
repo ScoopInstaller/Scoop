@@ -127,11 +127,7 @@ $MANIFESTS | ForEach-Object {
             $expected_hash = $tmp[1]
         }
 
-        if ($UseCache) {
-            dl_with_cache $name $version $_ $null $null $true
-        } else {
-            dl_with_cache $name $version $_ $null $null $false
-        }
+        dl_with_cache $name $version $_ $null $null -use_cache:$UseCache
 
         $to_check = fullpath (cache_path $name $version $_)
         $actual_hash = (Get-FileHash $to_check -Algorithm $algorithm).Hash.ToLower()
