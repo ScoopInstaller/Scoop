@@ -1,14 +1,27 @@
 {
     "version": "15.8a",
-    "description": "Developer's tool for browsing source code",
+    "description": "Developer's tool for browsing source code.",
+    "homepage": "http://cscope.sourceforge.net/",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-15.8a-win64rev1-static.zip"
+            "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-15.8a-win64rev1-static.zip",
+            "hash": "649410e79bd2127108b89ee639612615b8e1c4fa427f987b973793430107c69f"
         },
         "32bit": {
-            "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-15.8a-win32rev1-static.zip"
+            "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-15.8a-win32rev1-static.zip",
+            "hash": "5505a8d707afd5e14599b9e69f10c22eabc82b402a80658c3ba554e442ed00e4"
         }
     },
     "bin": "cscope.exe",
-    "homepage": "http://cscope.sourceforge.net/"
+    "checkver": "([\\w\\.]+) Released",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-$version-win64rev1-static.zip"
+            },
+            "32bit": {
+                "url": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/cscope-win32/cscope-$version-win32rev1-static.zip"
+            }
+        }
+    }
 }
