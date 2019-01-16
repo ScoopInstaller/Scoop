@@ -55,14 +55,14 @@ if ($ForceUpdate) { $Update = $true }
 if (!$UseCache) { scoop cache rm '*HASH_CHECK*' }
 
 function err ([String] $name, [String[]] $message) {
-    Write-Host "$name`:" -ForegroundColor Red -NoNewline
+    Write-Host "$name`: " -ForegroundColor Red -NoNewline
     Write-Host ($message -join "`r`n") -ForegroundColor Red
 }
 
 $MANIFESTS = @()
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $name = (strip_ext $_.Name)
-    $manifest = parse_json "$Dir\$($_.Name)"
+foreach ($single in Get-ChildItem $Dir "$App.json") {
+    $name = (strip_ext $single.Name)
+    $manifest = parse_json "$Dir\$($single.Name)"
 
     # Skip nighly manifests, since their hash validation is skipped
     if (($manifest.version -ne 'nightly')) {
@@ -79,6 +79,7 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
             $manifest.url | ForEach-Object { $urls += $_ }
             $manifest.hash | ForEach-Object { $hashes += $_ }
         } else {
+            err $name 'Manifest does not contain URL property.'
             continue
         }
 
