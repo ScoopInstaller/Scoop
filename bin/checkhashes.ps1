@@ -65,7 +65,7 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $manifest = parse_json "$Dir\$($_.Name)"
 
     # Skip nighly manifests, since their hash validation is skipped
-    if (!($manifest.version -eq 'nightly')) {
+    if (($manifest.version -ne 'nightly')) {
         $urls = @()
         $hashes = @()
 
@@ -83,7 +83,7 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
         }
 
         # Number of URLS and Hashes is different
-        if (!($urls.Length -eq $hashes.Length)) { err $name 'URLS and hashes count mismatch.' }
+        if ($urls.Length -ne $hashes.Length) { err $name 'URLS and hashes count mismatch.' }
 
         $MANIFESTS += New-Object psobject @{
             app      = $name
@@ -126,9 +126,9 @@ $MANIFESTS | ForEach-Object {
         $to_check = fullpath (cache_path $name $version $_)
         $actual_hash = compute_hash $to_check $algorithm
         $actuals += $actual_hash
-        if (!($actual_hash -eq $expected_hash)) {
+        if ($actual_hash -ne $expected_hash) {
             $mismatched += $count
-            if (!$SkipCorrect) { Write-Host 'Wrong' -ForegroundColor Red }
+            Write-Host 'Wrong' -ForegroundColor Red
         } else {
             if (!$SkipCorrect) { Write-Host 'OK' -ForegroundColor Green }
         }
