@@ -176,6 +176,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $regex = $config.regex
     }
 
+    $substitutions.GetEnumerator() | ForEach-Object {
+        if ($_.Value) {
+            $regex = $regex.Replace($_.Name, [regex]::Escape($_.Value))
+        }
+    }
+
     if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
         $hashmode = 'sourceforge'
         # change the URL because downloads.sourceforge.net doesn't have checksums
