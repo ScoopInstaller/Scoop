@@ -83,7 +83,10 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
         }
 
         # Number of URLS and Hashes is different
-        if ($urls.Length -ne $hashes.Length) { err $name 'URLS and hashes count mismatch.' }
+        if ($urls.Length -ne $hashes.Length) {
+            err $name 'URLS and hashes count mismatch.'
+            continue
+        }
 
         $MANIFESTS += New-Object psobject @{
             app      = $name
