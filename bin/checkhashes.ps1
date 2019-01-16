@@ -106,6 +106,7 @@ $MANIFESTS | ForEach-Object {
     $count = 0
     # Array of indexes mismatched hashes.
     $mismatched = @()
+    # Array of computed hashes
     $actuals = @()
 
     $current.urls | ForEach-Object {
@@ -123,7 +124,7 @@ $MANIFESTS | ForEach-Object {
         dl_with_cache $name $version $_ $null $null -use_cache:$UseCache
 
         $to_check = fullpath (cache_path $name $version $_)
-        $actual_hash = (Get-FileHash $to_check -Algorithm $algorithm).Hash.ToLower()
+        $actual_hash = compute_hash $to_check $algorithm
         $actuals += $actual_hash
         if (!($actual_hash -eq $expected_hash)) {
             $mismatched += $count
