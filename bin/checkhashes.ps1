@@ -56,12 +56,11 @@ if (!$UseCache) { scoop cache rm '*HASH_CHECK*' }
 
 # get apps to check
 $Queue = @()
-$manifest_json = ''
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $manifest_json = parse_json "$Dir\$($_.Name)"
+    $manifest = parse_json "$Dir\$($_.Name)"
     # Skip nighly manfiests, since their hash validation is skipped
-    if (!($manifest_json.version -eq 'nightly')) {
-        $Queue += , @($_.Name, $manifest_json)
+    if (!($manifest.version -eq 'nightly')) {
+        $Queue += , @($_.Name, $manifest)
     }
 }
 
@@ -79,19 +78,19 @@ $original = use_any_https_protocol
 
 $MANIFESTS = @()
 $MANIFESTS += $Queue | ForEach-Object {
-    $name, $manifest_json = $_
+    $name, $manifest = $_
     $urls = @()
     $hashes = @()
 
-    if ($manifest_json.architecture) {
+    if ($manifest.architecture) {
         # First handle 64bit
-        url $manifest_json '64bit' | ForEach-Object { $urls += $_ }
-        hash $manifest_json '64bit' | ForEach-Object { $hashes += $_ }
-        url $manifest_json '32bit' | ForEach-Object { $urls += $_ }
-        hash $manifest_json '32bit' | ForEach-Object { $hashes += $_ }
-    } elseif ($manifest_json.url) {
-        $manifest_json.url | ForEach-Object { $urls += $_ }
-        $manifest_json.hash | ForEach-Object { $hashes += $_ }
+        url $manifest '64bit' | ForEach-Object { $urls += $_ }
+        hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
+        url $manifest '32bit' | ForEach-Object { $urls += $_ }
+        hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
+    } elseif ($manifest.url) {
+        $manifest.url | ForEach-Object { $urls += $_ }
+        $manifest.hash | ForEach-Object { $hashes += $_ }
     } else {
         continue
     }
@@ -101,7 +100,7 @@ $MANIFESTS += $Queue | ForEach-Object {
 
     $man = New-Object psobject @{
         app    = (strip_ext $name)
-        json   = $manifest_json
+        json   = $manifest
         urls   = $urls
         hashes = $hashes
     }
