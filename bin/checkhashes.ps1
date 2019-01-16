@@ -25,12 +25,12 @@
 param(
     [String] $App = '*',
     [ValidateScript( {
-        if (!(Test-Path $_ -Type Container)) {
-            throw "$_ is not a directory!"
-        } else {
-            $true
-        }
-    })]
+            if (!(Test-Path $_ -Type Container)) {
+                throw "$_ is not a directory!"
+            } else {
+                $true
+            }
+        })]
     [String] $Dir = "$PSScriptRoot\..\bucket",
     [Switch] $Update,
     [Switch] $ForceUpdate,
@@ -99,10 +99,10 @@ $MANIFESTS += $Queue | ForEach-Object {
     if (!($urls.Length -eq $hashes.Length)) { err $name 'URLS and hashes count mismatch.' }
 
     $man = New-Object psobject @{
-        app    = (strip_ext $name)
-        json   = $manifest
-        urls   = $urls
-        hashes = $hashes
+        app      = (strip_ext $name)
+        manifest = $manifest
+        urls     = $urls
+        hashes   = $hashes
     }
 
     return $man
@@ -156,30 +156,31 @@ $MANIFESTS | ForEach-Object {
     }
 
     if ($Update) {
-        $path = Resolve-Path "$Dir\$($current.app).json"
-        $json = parse_json $path
+        # Just
+        $man =
 
-        if ($json.url -and $json.hash) {
-            $json.hash = $actuals
+        if ($current.manifest.url -and $current.manifest.hash) {
+            $current.manifest.hash = $actuals
         } else {
-            $platforms = ($json.architecture | Get-Member -MemberType NoteProperty).Name
+            $platforms = ($current.manifest.architecture | Get-Member -MemberType NoteProperty).Name
             # Defaults to zero, don't know, which architecture is available
             $64bit_count = 0
             $32bit_count = 0
             if ($platforms.Contains('64bit')) {
-                $64bit_count = $json.architecture.'64bit'.hash.Count
+                $64bit_count = $current.manifest.architecture.'64bit'.hash.Count
                 # 64bit is get, donwloaded and added first
-                $json.architecture.'64bit'.hash = $actuals[0..($64bit_count - 1)]
+                $current.manifest.architecture.'64bit'.hash = $actuals[0..($64bit_count - 1)]
             }
             if ($platforms.Contains('32bit')) {
-                $32bit_count = $json.architecture.'32bit'.hash.Count
-                $json.architecture.'32bit'.hash = $actuals[($64bit_count)..($32bit_count)]
+                $32bit_count = $current.manifest.architecture.'32bit'.hash.Count
+                $current.manifest.architecture.'32bit'.hash = $actuals[($64bit_count)..($32bit_count)]
             }
         }
 
         Write-Host "Writing updated $($current.app) manifest" -ForegroundColor DarkGreen
 
-        $json = $json | ConvertToPrettyJson
-        [System.IO.File]::WriteAllLines($path, $json)
+        $current.manifest = $current.manifest | ConvertToPrettyJson
+        $path = Resolve-Path "$Dir\$($current.app).json"
+        [System.IO.File]::WriteAllLines($path, $current.manifest)
     }
 }
