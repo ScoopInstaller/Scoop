@@ -672,17 +672,12 @@ function check_hash($file, $hash, $app_name) {
     Write-Host "Checking hash of " -NoNewline
     Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
     Write-Host " ... " -nonewline
-    $type, $expected = $hash.split(':')
-    if(!$expected) {
-        # no type specified, assume sha256
-        $type, $expected = 'sha256', $type
+    $algorithm, $expected = get_hash $hash
+    if ($algorithm -eq $null) {
+        return $false, "Hash type '$algorithm' isn't supported."
     }
 
-    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
-        return $false, "Hash type '$type' isn't supported."
-    }
-
-    $actual = (compute_hash $file $type).ToLower()
+    $actual = compute_hash $file $algorithm
     $expected = $expected.ToLower()
 
     if($actual -ne $expected) {
