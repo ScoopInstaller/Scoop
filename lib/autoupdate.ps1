@@ -29,7 +29,7 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     return format_hash $digest.sha256
 }
 
-function find_hash_in_textfile([String] $url, [String] $basename, [String] $regex) {
+function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex = '^([a-fA-F0-9]+)$') {
     $hashfile = $null
 
     try {
@@ -43,15 +43,8 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
         return
     }
 
-    # find single line hash in $hashfile (will be overridden by $regex)
-    if ($regex.Length -eq 0) {
-        $normalRegex = "^([a-fA-F0-9]+)$"
-    } else {
-        $normalRegex = $regex
-    }
-
-    $normalRegex = substitute $normalRegex @{'$basename' = [regex]::Escape($basename)}
-    if ($hashfile -match $normalRegex) {
+    $regex = substitute $regex $substitutions $true
+    if ($hashfile -match $regex) {
         $hash = $matches[1] -replace ' ',''
     }
 
@@ -70,7 +63,7 @@ function find_hash_in_textfile([String] $url, [String] $basename, [String] $rege
     # find hash with filename in $hashfile (will be overridden by $regex)
     if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
         $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:[\x20\t]+\d+)?"
-        $filenameRegex = substitute $filenameRegex @{'$basename' = [regex]::Escape($basename)}
+        $filenameRegex = substitute $filenameRegex $substitutions $true
         if ($hashfile -match $filenameRegex) {
             $hash = $matches[1]
         }
@@ -142,12 +135,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hashmode = $config.mode
     $basename = url_remote_filename($url)
 
-    $hashfile_url = substitute $config.url @{
-        '$url' = (strip_fragment $url);
-        '$baseurl' = (strip_filename (strip_fragment $url)).TrimEnd('/')
-        '$basename' = $basename
-    }
-    $hashfile_url = substitute $hashfile_url $substitutions
+    $substitutions = $substitutions.Clone()
+    $substitutions.Add('$url', (strip_fragment $url))
+    $substitutions.Add('$baseurl', (strip_filename (strip_fragment $url)).TrimEnd('/'))
+    $substitutions.Add('$basename', $basename)
+
+    $hashfile_url = substitute $config.url $substitutions
     if($hashfile_url) {
         write-host -f DarkYellow 'Searching hash for ' -NoNewline
         write-host -f Green $(url_remote_filename $url) -NoNewline
@@ -176,22 +169,16 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $regex = $config.regex
     }
 
-    $substitutions.GetEnumerator() | ForEach-Object {
-        if ($_.Value) {
-            $regex = $regex.Replace($_.Name, [regex]::Escape($_.Value))
-        }
-    }
-
     if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
         $hashmode = 'sourceforge'
         # change the URL because downloads.sourceforge.net doesn't have checksums
         $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
-        $hash = find_hash_in_textfile $hashfile_url $basename '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
+        $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
     }
 
     switch ($hashmode) {
         'extract' {
-            $hash = find_hash_in_textfile $hashfile_url $basename $regex
+            $hash = find_hash_in_textfile $hashfile_url $substitutions $regex
         }
         'json' {
             $hash = find_hash_in_json $hashfile_url $basename $jsonpath
@@ -202,7 +189,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         'metalink' {
             $hash = find_hash_in_headers $url
             if(!$hash) {
-                $hash = find_hash_in_textfile "$url.meta4"
+                $hash = find_hash_in_textfile "$url.meta4" $substitutions
             }
         }
     }
