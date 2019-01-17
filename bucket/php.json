@@ -4,15 +4,15 @@
         "identifier": "PHP-3.01",
         "url": "https://secure.php.net/license/"
     },
-    "version": "7.2.14",
+    "version": "7.3.1",
     "architecture": {
         "64bit": {
-            "url": "https://windows.php.net/downloads/releases/php-7.2.14-Win32-VC15-x64.zip",
-            "hash": "f11bd2fc5e1b8034a3e23eb798ad757bdcb94e60df23adf01a1b76ebbc406a36"
+            "url": "https://windows.php.net/downloads/releases/php-7.3.1-Win32-VC15-x64.zip",
+            "hash": "023322399a9e60c8dacaa9e939563958769cc3f42ac510e28f558b805bd20cbb"
         },
         "32bit": {
-            "url": "https://windows.php.net/downloads/releases/php-7.2.14-Win32-VC15-x86.zip",
-            "hash": "8ca525a14b61b4ff4c9d111b38b05130d8edbef62e65e53a02c7b36e257d94a2"
+            "url": "https://windows.php.net/downloads/releases/php-7.3.1-Win32-VC15-x86.zip",
+            "hash": "1abbaf8b35b0922d8d131c73a8bca5dbc936fee5232f6c4902985750f2ab448a"
         }
     },
     "bin": [
@@ -41,8 +41,8 @@
         "(gc \"$dir\\cli\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\cli\\php.ini\""
     ],
     "checkver": {
-        "url": "http://windows.php.net/download/",
-        "re": "<h3 id=\"php-7.2\".*?>.*?\\(([\\d.]+)\\)</h3>"
+        "url": "https://windows.php.net/download/",
+        "re": "<h3 id=\"php-[\\d.]+\".*?>.*?\\(([\\d.]+)\\)</h3>"
     },
     "autoupdate": {
         "architecture": {
