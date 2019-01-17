@@ -18,7 +18,7 @@
             "bin": [ [ "direnv.windows-386.exe", "direnv" ] ]
         }
     },
-    "bin": "direnv.exe"
+    "bin": "direnv.exe",
     "autoupdate": {
         "architecture": {
             "64bit": {
