@@ -673,7 +673,7 @@ function check_hash($file, $hash, $app_name) {
     Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
     Write-Host " ... " -nonewline
     $algorithm, $expected = get_hash $hash
-    if ($algorithm -eq $null) {
+    if ($null -eq $algorithm) {
         return $false, "Hash type '$algorithm' isn't supported."
     }
 
