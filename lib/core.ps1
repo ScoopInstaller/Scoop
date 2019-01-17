@@ -612,12 +612,16 @@ function is_scoop_outdated() {
     return $last_update.AddHours(3) -lt $now.ToLocalTime()
 }
 
-function substitute($entity, [Hashtable] $params) {
+function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
     if ($entity -is [Array]) {
-        return $entity | ForEach-Object { substitute $_ $params }
+        return $entity | ForEach-Object { substitute $_ $params $regexEscape}
     } elseif ($entity -is [String]) {
         $params.GetEnumerator() | ForEach-Object {
-            $entity = $entity.Replace($_.Name, $_.Value)
+            if($regexEscape -eq $false -or $null -eq $_.Value) {
+                $entity = $entity.Replace($_.Name, $_.Value)
+            } else {
+                $entity = $entity.Replace($_.Name, [Regex]::Escape($_.Value))
+            }
         }
         return $entity
     }
