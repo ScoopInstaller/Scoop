@@ -1,5 +1,6 @@
 {
     "homepage": "https://direnv.net",
+    "description": "load or unload environment variables depending on the current directory",
     "checkver": {
         "github": "https://github.com/direnv/direnv"
     },
