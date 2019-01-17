@@ -1202,7 +1202,7 @@ function persist_def($persist) {
     }
 
     if (!$target) {
-        $target = fname($source)
+        $target = $source
     }
 
     return $source, $target
@@ -1222,34 +1222,56 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             write-host "Persisting $source"
 
-            # add base paths
-            if (!(Test-Path(fullpath "$dir\$source")) -or (is_directory(fullpath "$dir\$source"))) {
-                $source = New-Object System.IO.DirectoryInfo(fullpath "$dir\$source")
-                $target = New-Object System.IO.DirectoryInfo(fullpath "$persist_dir\$target")
-            } else {
-                $source = New-Object System.IO.FileInfo(fullpath "$dir\$source")
-                $target = New-Object System.IO.FileInfo(fullpath "$persist_dir\$target")
-            }
+            $source = fullpath "$dir\$source"
+            $target = fullpath "$persist_dir\$target"
 
-            if (!$target.Exists) {
-                # If we do not have data in the store we move the original
-                if ($source.Exists) {
-                    Move-Item $source $target
-                } elseif($target.GetType() -eq [System.IO.DirectoryInfo]) {
-                    # if there is no source and it's a directory we create an empty directory
-                    ensure $target.FullName | out-null
+            # if we have had persist data in the store, just create link and go
+            if (Test-Path $target) {
+                # if there is also a source data, rename it (to keep a original backup)
+                if (Test-Path $source) {
+                    Move-Item -Force $source "$source.original"
                 }
-            } elseif ($source.Exists) {
-                # (re)move original (keep a copy)
-                Move-Item $source "$source.original"
+            # we don't have persist data in the store, move the source to target, then create link
+            } elseif (Test-Path $source) {
+                # ensure target parent folder exist
+                $null = ensure (Split-Path -Path $target)
+                Move-Item $source $target
+            # we don't have neither source nor target data! we need to crate an empty target,
+            # but we can't make a judgement that the data should be a file or directory...
+            # so we create a directory by default. to avoid this, use pre_install
+            # to create the source file before persisting (DON'T use post_install)
+            } else {
+                $target = New-Object System.IO.DirectoryInfo($target)
             }
 
             # create link
             if (is_directory $target) {
+                # target is a directory, create junction
                 & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
-                attrib $source.FullName +R /L
+                attrib $source +R /L
             } else {
+                # target is a file, create hard link
                 & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
+            }
+        }
+    }
+}
+
+function unlink_persist_data($dir) {
+    # unlink all junction / hard link in the directory
+    Get-ChildItem -Recurse $dir | ForEach-Object {
+        $file = $_
+        if ($null -ne $file.LinkType) {
+            $filepath = $file.FullName
+            # directory (junction)
+            if ($file -is [System.IO.DirectoryInfo]) {
+                # remove read-only attribute on the link
+                attrib -R /L $filepath
+                # remove the junction
+                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+            } else {
+                # remove the hard link
+                & "$env:COMSPEC" /c "del $filepath"
             }
         }
     }

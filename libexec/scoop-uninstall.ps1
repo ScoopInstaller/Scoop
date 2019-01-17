@@ -71,6 +71,8 @@ if(!$apps) { exit 0 }
     env_rm $manifest $global
 
     try {
+        # unlink all potential old link before doing recursive Remove-Item
+        unlink_persist_data $dir
         Remove-Item -r $dir -ea stop -force
     } catch {
         if(test-path $dir) {
@@ -85,6 +87,8 @@ if(!$apps) { exit 0 }
         write-host "Removing older version ($oldver)."
         $dir = versiondir $app $oldver $global
         try {
+            # unlink all potential old link before doing recursive Remove-Item
+            unlink_persist_data $dir
             Remove-Item -r -force -ea stop $dir
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
