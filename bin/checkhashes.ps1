@@ -25,12 +25,12 @@
 param(
     [String] $App = '*',
     [ValidateScript( {
-        if (!(Test-Path $_ -Type Container)) {
-            throw "$_ is not a directory!"
-        } else {
-            $true
-        }
-    })]
+            if (!(Test-Path $_ -Type Container)) {
+                throw "$_ is not a directory!"
+            } else {
+                $true
+            }
+        })]
     [String] $Dir = "$PSScriptRoot\..\bucket",
     [Switch] $Update,
     [Switch] $ForceUpdate,
@@ -65,36 +65,38 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
     $manifest = parse_json "$Dir\$($single.Name)"
 
     # Skip nighly manifests, since their hash validation is skipped
-    if (($manifest.version -ne 'nightly')) {
-        $urls = @()
-        $hashes = @()
+    if ($manifest.version -eq 'nightly') {
+        continue
+    }
 
-        if ($manifest.architecture) {
-            # First handle 64bit
-            url $manifest '64bit' | ForEach-Object { $urls += $_ }
-            hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
-            url $manifest '32bit' | ForEach-Object { $urls += $_ }
-            hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
-        } elseif ($manifest.url) {
-            $manifest.url | ForEach-Object { $urls += $_ }
-            $manifest.hash | ForEach-Object { $hashes += $_ }
-        } else {
-            err $name 'Manifest does not contain URL property.'
-            continue
-        }
+    $urls = @()
+    $hashes = @()
 
-        # Number of URLS and Hashes is different
-        if ($urls.Length -ne $hashes.Length) {
-            err $name 'URLS and hashes count mismatch.'
-            continue
-        }
+    if ($manifest.architecture) {
+        # First handle 64bit
+        url $manifest '64bit' | ForEach-Object { $urls += $_ }
+        hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
+        url $manifest '32bit' | ForEach-Object { $urls += $_ }
+        hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
+    } elseif ($manifest.url) {
+        $manifest.url | ForEach-Object { $urls += $_ }
+        $manifest.hash | ForEach-Object { $hashes += $_ }
+    } else {
+        err $name 'Manifest does not contain URL property.'
+        continue
+    }
 
-        $MANIFESTS += New-Object psobject @{
-            app      = $name
-            manifest = $manifest
-            urls     = $urls
-            hashes   = $hashes
-        }
+    # Number of URLS and Hashes is different
+    if ($urls.Length -ne $hashes.Length) {
+        err $name 'URLS and hashes count mismatch.'
+        continue
+    }
+
+    $MANIFESTS += New-Object psobject @{
+        app      = $name
+        manifest = $manifest
+        urls     = $urls
+        hashes   = $hashes
     }
 }
 
@@ -114,27 +116,17 @@ $MANIFESTS | ForEach-Object {
     $actuals = @()
 
     $current.urls | ForEach-Object {
-        $expected_hash = $current.hashes[$count]
-        $algorithm = 'sha256'
-        $name = $current.app
+        $algorithm, $expected = get_hash $current.hashes[$count]
         $version = 'HASH_CHECK'
         $tmp = $expected_hash -split ':'
 
-        if ($tmp.Length -eq 2) {
-            $algorithm = $tmp[0]
-            $expected_hash = $tmp[1]
-        }
+        dl_with_cache $current.app $version $_ $null $null -use_cache:$UseCache
 
-        dl_with_cache $name $version $_ $null $null -use_cache:$UseCache
-
-        $to_check = fullpath (cache_path $name $version $_)
+        $to_check = fullpath (cache_path $current.app $version $_)
         $actual_hash = compute_hash $to_check $algorithm
         $actuals += $actual_hash
-        if ($actual_hash -ne $expected_hash) {
+        if ($actual_hash -ne $expected) {
             $mismatched += $count
-            Write-Host 'Wrong' -ForegroundColor Red
-        } else {
-            if (!$SkipCorrect) { Write-Host 'OK' -ForegroundColor Green }
         }
         $count++
     }
@@ -145,11 +137,16 @@ $MANIFESTS | ForEach-Object {
             Write-Host 'OK' -ForegroundColor Green
         }
     } else {
-        Write-Host "$($current.app): "
+        Write-Host "$($current.app): " -NoNewline
+        Write-Host 'Mismatch found ' -ForegroundColor Red
         $mismatched | ForEach-Object {
-            Write-Host "`t$($current.urls[$_])" -ForegroundColor Red
-            Write-Host "`t`tExp:" $current.hashes[$_] -ForegroundColor Green
-            Write-Host "`t`tAct:" $actuals[$_] -ForegroundColor Red
+            $file = fullpath (cache_path $current.app $version $current.urls[$_])
+            Write-Host  "`tURL:`t`t$($current.urls[$_])"
+            if (Test-Path $file) {
+                Write-Host  "`tFirst bytes:`t$((get_magic_bytes_pretty $file ' ').ToUpper())"
+            }
+            Write-Host  "`tExpected:`t$($current.urls[$_])" -ForegroundColor Green
+            Write-Host  "`tActual:`t`t$($actuals[$_])" -ForegroundColor Red
         }
     }
 
