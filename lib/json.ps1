@@ -92,9 +92,11 @@ function ConvertToPrettyJson {
     }
 }
 
-function json_path([String] $json, [String] $jsonpath, [String] $basename) {
+function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitutions) {
     Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Newtonsoft.Json.dll"
-    $jsonpath = $jsonpath.Replace('$basename', $basename)
+    if ($null -ne $substitutions) {
+        $jsonpath = substitute $jsonpath $substitutions
+    }
     try {
         $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)
     } catch [Newtonsoft.Json.JsonReaderException] {
@@ -112,15 +114,15 @@ function json_path([String] $json, [String] $jsonpath, [String] $basename) {
     return $null
 }
 
-function json_path_legacy([String] $json, [String] $jsonpath, [String] $basename) {
+function json_path_legacy([String] $json, [String] $jsonpath, [Hashtable] $substitutions) {
     $result = $json | ConvertFrom-Json -ea stop
     $isJsonPath = $jsonpath.StartsWith('$')
     $jsonpath.split('.') | ForEach-Object {
         $el = $_
 
-        # substitute the base filename into the jsonpath
-        if ($el.Contains('$basename')) {
-            $el = $el.Replace('$basename', $basename)
+        # substitute the basename and version varibales into the jsonpath
+        if ($null -ne $substitutions) {
+            $el = substitute $el $substitutions
         }
 
         # skip $ if it's jsonpath format

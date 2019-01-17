@@ -9,7 +9,7 @@ TODO
 . "$psscriptroot/core.ps1"
 . "$psscriptroot/json.ps1"
 
-function find_hash_in_rdf([String] $url, [String] $filename) {
+function find_hash_in_rdf([String] $url, [String] $basename) {
     $data = $null
     try {
         # Download and parse RDF XML file
@@ -24,7 +24,7 @@ function find_hash_in_rdf([String] $url, [String] $filename) {
     }
 
     # Find file content
-    $digest = $data.RDF.Content | Where-Object { [String]$_.about -eq $filename }
+    $digest = $data.RDF.Content | Where-Object { [String]$_.about -eq $basename }
 
     return format_hash $digest.sha256
 }
@@ -76,7 +76,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     return format_hash $hash
 }
 
-function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath) {
+function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $jsonpath) {
     $json = $null
 
     try {
@@ -89,9 +89,9 @@ function find_hash_in_json([String] $url, [String] $basename, [String] $jsonpath
         write-host -f darkred "URL $url is not valid"
         return
     }
-    $hash = json_path $json $jsonpath $basename
+    $hash = json_path $json $jsonpath $substitutions
     if(!$hash) {
-        $hash = json_path_legacy $json $jsonpath $basename
+        $hash = json_path_legacy $json $jsonpath $substitutions
     }
     return format_hash $hash
 }
@@ -181,7 +181,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             $hash = find_hash_in_textfile $hashfile_url $substitutions $regex
         }
         'json' {
-            $hash = find_hash_in_json $hashfile_url $basename $jsonpath
+            $hash = find_hash_in_json $hashfile_url $substitutions $jsonpath
         }
         'rdf' {
             $hash = find_hash_in_rdf $hashfile_url $basename
