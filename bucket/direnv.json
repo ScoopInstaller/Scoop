@@ -17,13 +17,14 @@
             "bin": [ [ "direnv.windows-386.exe", "direnv" ] ]
         }
     },
+    "bin": "direnv.exe"
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/direnv/direnv/releases/download/v$version/direnv.windows-amd64.exe"
+                "url": "https://github.com/direnv/direnv/releases/download/v$version/direnv.windows-amd64.exe#/direnv.exe"
             },
             "32bit": {
-                "url": "https://github.com/direnv/direnv/releases/download/v$version/direnv.windows-386.exe"
+                "url": "https://github.com/direnv/direnv/releases/download/v$version/direnv.windows-386.exe#/direnv.exe"
             }
         }
     }
