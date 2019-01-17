@@ -124,6 +124,13 @@ $MANIFESTS | ForEach-Object {
 
         $to_check = fullpath (cache_path $current.app $version $_)
         $actual_hash = compute_hash $to_check $algorithm
+
+        # Append type of algorithm to both expected and actual if it's not sha256
+        if ($algorithm -ne 'sha256') {
+            $actual_hash = "$algorithm`:$actual_hash"
+            $expected = "$algorithm`:$expected"
+        }
+
         $actuals += $actual_hash
         if ($actual_hash -ne $expected) {
             $mismatched += $count
