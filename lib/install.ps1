@@ -1242,6 +1242,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # to create the source file before persisting (DON'T use post_install)
             } else {
                 $target = New-Object System.IO.DirectoryInfo($target)
+                ensure $target | Out-Null
             }
 
             # create link
