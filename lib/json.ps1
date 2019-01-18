@@ -100,7 +100,11 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
     try {
         $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)
     } catch [Newtonsoft.Json.JsonReaderException] {
-        return $null
+        try {
+            $obj = [Newtonsoft.Json.Linq.JArray]::Parse($json)
+        } catch [Newtonsoft.Json.JsonReaderException] {
+            return $null
+        }
     }
 
     try {
