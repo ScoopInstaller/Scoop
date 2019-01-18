@@ -31,10 +31,11 @@
         "bin\\mongotop.exe"
     ],
     "post_install": [
-        "(Get-Content \"$dir\\bin\\mongod.cfg\") |",
-        "% { $_ -replace \"%MONGO_DATA_PATH%\", \"$dir\\data\" } |",
-        "% { $_ -replace \"%MONGO_LOG_PATH%\", \"$dir\\log\" } |",
-        "Set-Content \"$dir\\bin\\mongod.cfg\""
+        "$file = \"$dir\\bin\\mongod.cfg\"",
+        "$cfg = (Get-Content $file)",
+        "$cfg = $cfg -replace '%MONGO_DATA_PATH%', \"$dir\\data\"",
+        "$cfg = $cfg -replace '%MONGO_LOG_PATH%', \"$dir\\log\"",
+        "Set-Content $file ($cfg -join \"`n\") -Encoding Ascii -Force"
     ],
     "persist": [
         "bin\\mongod.cfg",
