@@ -108,7 +108,11 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
     }
 
     try {
-        $result = $obj.SelectToken($jsonpath, $true)
+        try {
+            $result = $obj.SelectToken($jsonpath, $true)
+        } catch [Newtonsoft.Json.JsonException] {
+            return $null
+        }
         return $result.ToString()
     } catch [System.Management.Automation.MethodInvocationException] {
         write-host -f DarkRed $_
