@@ -16,7 +16,11 @@
     "bin": [
         "bin\\bsondump.exe",
         "bin\\mongo.exe",
-        "bin\\mongod.exe",
+        [
+            "bin\\mongod.exe",
+            "mongod",
+            "--config \"$dir\\bin\\mongod.cfg\""
+        ],
         "bin\\mongodump.exe",
         "bin\\mongoexport.exe",
         "bin\\mongofiles.exe",
@@ -27,9 +31,16 @@
         "bin\\mongotop.exe"
     ],
     "post_install": [
-        "# create initial directories",
-        "if(!(test-path 'C:\\data')) { mkdir 'C:\\data' > $null }",
-        "if(!(test-path 'C:\\data\\db')) { mkdir 'C:\\data\\db' > $null }"
+        "$file = \"$dir\\bin\\mongod.cfg\"",
+        "$cfg = (Get-Content $file)",
+        "$cfg = $cfg -replace '%MONGO_DATA_PATH%', \"$dir\\data\"",
+        "$cfg = $cfg -replace '%MONGO_LOG_PATH%', \"$dir\\log\"",
+        "Set-Content $file ($cfg -join \"`n\") -Encoding Ascii -Force"
+    ],
+    "persist": [
+        "bin\\mongod.cfg",
+        "data",
+        "log"
     ],
     "checkver": {
         "url": "https://www.mongodb.com/download-center/community",
@@ -48,5 +59,14 @@
     },
     "suggest": {
         "vcredist": "extras/vcredist2017"
-    }
+    },
+    "notes": [
+        "Windows server 2012/2008 and Windows 7/8/8.1 need KB2999226 to provide Universal C Runtime support for Windows.",
+        "For more infomations, please refer to:",
+        "https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows",
+        "",
+        "mongod shim use \"$dir\\bin\\mongod.cfg\" as the default config file.",
+        "To use a different config file, please run",
+        "\"$dir\\bin\\mongod.exe --config NEW_CONFIG_FILE\""
+    ]
 }
