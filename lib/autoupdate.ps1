@@ -29,7 +29,7 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
     return format_hash $digest.sha256
 }
 
-function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex = '^([a-fA-F0-9]+)$') {
+function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex) {
     $hashfile = $null
 
     try {
@@ -41,6 +41,10 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
         return
+    }
+
+    if ($regex.Length -eq 0) {
+        $regex = '^([a-fA-F0-9]+)$'
     }
 
     $regex = substitute $regex $substitutions $true
@@ -61,7 +65,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     }
 
     # find hash with filename in $hashfile (will be overridden by $regex)
-    if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
+    if ($hash.Length -eq 0) {
         $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:[\x20\t]+\d+)?"
         $filenameRegex = substitute $filenameRegex $substitutions $true
         if ($hashfile -match $filenameRegex) {
