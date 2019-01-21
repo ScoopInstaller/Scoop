@@ -29,7 +29,7 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
     return format_hash $digest.sha256
 }
 
-function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex = '^([a-fA-F0-9]+)$') {
+function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex) {
     $hashfile = $null
 
     try {
@@ -41,6 +41,10 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
         return
+    }
+
+    if ($regex.Length -eq 0) {
+        $regex = '^([a-fA-F0-9]+)$'
     }
 
     $regex = substitute $regex $substitutions $true
@@ -60,8 +64,8 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         }
     }
 
-    # find hash with filename in $hashfile (will be overridden by $regex)
-    if ($hash.Length -eq 0 -and $regex.Length -eq 0) {
+    # find hash with filename in $hashfile
+    if ($hash.Length -eq 0) {
         $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:[\x20\t]+\d+)?"
         $filenameRegex = substitute $filenameRegex $substitutions $true
         if ($hashfile -match $filenameRegex) {
@@ -128,7 +132,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
 
     <#
     TODO implement more hashing types
-    `extract` Should be able to extract from origin page source (checkver)
+    `extract` Should be able to extract from origin page source
+    `sourceforge` Default `extract` method for sf.net
+    `metalink` Default `extract` method for metalink
+    `json` Find hash from JSONPath
     `rdf` Find hash from a RDF Xml file
     `download` Last resort, download the real file and hash it
     #>
@@ -141,14 +148,14 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $substitutions.Add('$basename', $basename)
 
     $hashfile_url = substitute $config.url $substitutions
-    if($hashfile_url) {
+    if ($hashfile_url) {
         write-host -f DarkYellow 'Searching hash for ' -NoNewline
         write-host -f Green $(url_remote_filename $url) -NoNewline
         write-host -f DarkYellow ' in ' -NoNewline
         write-host -f Green $hashfile_url
     }
 
-    if($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
+    if ($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
         $hashmode = 'extract'
     }
 
@@ -188,20 +195,20 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         }
         'metalink' {
             $hash = find_hash_in_headers $url
-            if(!$hash) {
+            if (!$hash) {
                 $hash = find_hash_in_textfile "$url.meta4" $substitutions
             }
         }
     }
 
-    if($hash) {
+    if ($hash) {
         # got one!
         write-host -f DarkYellow 'Found: ' -NoNewline
         write-host -f Green $hash -NoNewline
         write-host -f DarkYellow ' using ' -NoNewline
         write-host -f Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
         return $hash
-    } elseif($hashfile_url) {
+    } elseif ($hashfile_url) {
         write-host -f DarkYellow "Could not find hash in $hashfile_url"
     }
 
