@@ -594,11 +594,17 @@ function show_app($app, $bucket, $version) {
 }
 
 function last_scoop_update() {
-    try {
-        return [System.DateTime]::Parse((scoop config lastupdate))
-    } catch {
-        return $null
+    # PowerShell 6 returns an DateTime Object
+    $last_update = (scoop config lastupdate)
+
+    if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
+        try {
+            $last_update = [System.DateTime]::Parse($last_update)
+        } catch {
+            $last_update = $null
+        }
     }
+    return $last_update
 }
 
 function is_scoop_outdated() {
