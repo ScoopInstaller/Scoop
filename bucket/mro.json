@@ -30,7 +30,6 @@
             ]
         }
     },
-
     "notes": [
         "You'll need to type 'r.ps1' or 'r.cmd' to run MRO, because in Powershell 'r' runs the last command. Alternatively 'rterm' can be used to start the interactive R terminal session.",
         "",
@@ -50,8 +49,9 @@
             "64bit": {
                 "url": "https://mran.blob.core.windows.net/install/mro/$version/microsoft-r-open-$version.exe#/mro.exe",
                 "hash": {
-                    "url": "https://mranapi.azurewebsites.net/api/download",
-                    "regex": "$basename.+?([A-Fa-f\\d]{64})"
+                    "mode": "json",
+                    "jsonpath": "$..versions[?(@.downloadText == '$basename')].sha256",
+                    "url": "https://mranapi.azurewebsites.net/api/download"
                 }
             }
         }
