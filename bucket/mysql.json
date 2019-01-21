@@ -1,12 +1,12 @@
 {
     "homepage": "https://dev.mysql.com/downloads/mysql/",
-    "version": "8.0.13",
+    "version": "8.0.14",
     "license": "GPL-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.13-winx64.zip",
-            "hash": "md5:34a5983273314c99fdbc4a17b01d5859",
-            "extract_dir": "mysql-8.0.13-winx64"
+            "url": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.14-winx64.zip",
+            "hash": "md5:227dadd6a3c89dda1032be27619924ee",
+            "extract_dir": "mysql-8.0.14-winx64"
         }
     },
     "bin": [
@@ -39,9 +39,7 @@
         "bin/resolveip.exe",
         "bin/zlib_decompress.exe"
     ],
-    "persist": [
-        "data"
-    ],
+    "persist": "data",
     "post_install": [
         "if (!(Test-Path \"$dir/my.ini\")) {",
         "   # Using $dir instead of $persist_dir, causes this error:",
