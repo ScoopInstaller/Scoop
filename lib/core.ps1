@@ -222,7 +222,18 @@ function url_filename($url) {
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
 # this function extracts the original filename from the URL.
 function url_remote_filename($url) {
-    split-path (new-object uri $url).absolutePath -leaf
+    $uri = (New-Object URI $url)
+    $basename = Split-Path $uri.PathAndQuery -Leaf
+    If ($basename -match ".*[?=]+([\w._-]+)") {
+        $basename = $matches[1]
+    }
+    If (($basename -notlike "*.*") -or ($basename -match "^[v.\d]+$")) {
+        $basename = Split-Path $uri.AbsolutePath -Leaf
+    }
+    If (($basename -notlike "*.*") -and ($uri.Fragment -ne "")) {
+        $basename = $uri.Fragment.Trim('/', '#')
+    }
+    return $basename
 }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
