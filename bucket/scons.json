@@ -2,9 +2,9 @@
     "homepage": "https://scons.org/",
     "description": "A software construction tool",
     "license": "MIT",
-    "version": "3.0.3",
-    "url": "https://downloads.sourceforge.net/project/scons/scons-local/3.0.3/scons-local-3.0.3.zip",
-    "hash": "sha1:bab4e371d4643f7088efe2de7f324712e7ad742e",
+    "version": "3.0.4",
+    "url": "https://downloads.sourceforge.net/project/scons/scons-local/3.0.4/scons-local-3.0.4.zip",
+    "hash": "sha1:2e57414a77fc693ce52030a3017056d53653deb5",
     "pre_install": "echo \"python `\"$dir\\scons.py`\" @args\" | out-file \"$dir\\scons.ps1\"",
     "bin": "scons.ps1",
     "suggest": {
