@@ -5,12 +5,12 @@
         "64bit": {
             "url": "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.6.0-1/rubyinstaller-2.6.0-1-x64.7z",
             "hash": "1ac59ad3ffdbad6bfb63b2729e37c7d8b270901dfb354423d31cabe52122b938",
-            "extract_dir": "rubyinstaller-2.4.5-1-x64"
+            "extract_dir": "rubyinstaller-2.6.0-1-x64"
         },
         "32bit": {
             "url": "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.6.0-1/rubyinstaller-2.6.0-1-x86.7z",
             "hash": "a95d581d2c2b13cffa5ce221853489509c338817ae1a5a33e8253acedc4481e7",
-            "extract_dir": "rubyinstaller-2.4.5-1-x86"
+            "extract_dir": "rubyinstaller-2.6.0-1-x86"
         }
     },
     "persist": "gems",
@@ -23,24 +23,22 @@
         "GEM_PATH": "$dir\\gems"
     },
     "suggest": {
-        "MSYS2": [
-            "msys2"
-        ]
+        "MSYS2": "msys2"
     },
     "post_install": "gem install rake",
     "notes": "Install MSYS2 via 'scoop install msys2' and then run 'ridk install' to install the toolchain!",
     "checkver": {
         "github": "https://github.com/oneclick/rubyinstaller2",
-        "re": "/releases/tag/(?:v|rubyinstaller-)?([\\d.]+(?:-[\\d])?)"
+        "re": "/releases/tag/(?:v|RubyInstaller-)?([\\d.]+(?:-[\\d])?)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-$version/rubyinstaller-$version-x64.7z",
+                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-$version/rubyinstaller-$version-x64.7z",
                 "extract_dir": "rubyinstaller-$version-x64"
             },
             "32bit": {
-                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-$version/rubyinstaller-$version-x86.7z",
+                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-$version/rubyinstaller-$version-x86.7z",
                 "extract_dir": "rubyinstaller-$version-x86"
             }
         }
