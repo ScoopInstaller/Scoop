@@ -175,7 +175,7 @@ hub diff --name-only | ForEach-Object {
         # detect if file was staged, because it's not when only LF or CRLF have changed
         $status = execute 'hub status --porcelain -uno'
         $status = $status | Select-Object -First 1
-        if ($status -and $status -match "\s*M\s+.*$app.json") {
+        if ($status -and $status -match "^\x20*M\x20+.*$app.json") {
             execute "hub commit -m '${app}: Update to version $version'"
         } else {
             Write-Host "Skipping $app because only LF/CRLF changes were detected ..." -ForegroundColor Yellow
