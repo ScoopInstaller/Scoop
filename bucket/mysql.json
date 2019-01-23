@@ -36,7 +36,6 @@
         "bin/mysql_upgrade.exe",
         "bin/my_print_defaults.exe",
         "bin/perror.exe",
-        "bin/resolveip.exe",
         "bin/zlib_decompress.exe"
     ],
     "persist": "data",
