@@ -1,0 +1,14 @@
+{
+  "version":"0.139",
+  "hash":"md5:ea581b24f9dd0c5a8c51369ca2e5be07",
+  "url":"http://www.benf.org/other/cfr/cfr-0.139.jar",
+  "homepage":"http://www.benf.org/other/cfr",
+  "checkver":"cfr-([0-9.]+)\\.jar",
+  "autoupdate":{
+    "url":"http://www.benf.org/other/cfr/cfr-$version.jar",
+    "hash":{
+      "url":"$baseurl",
+      "find":"(?i)md5:\\s+([a-f0-9]{32})"
+    }
+  }
+}
