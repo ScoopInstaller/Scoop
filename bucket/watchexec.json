@@ -8,7 +8,6 @@
     "bin": "watchexec.exe",
     "checkver": "github",
     "autoupdate": {
-        "url": "https://github.com/mattgreen/watchexec/releases/download/$version/watchexec-$version-x86_64-pc-windows-gnu.zip",
-        "extract_dir": "watchexec-$version-x86_64-pc-windows-gnu"
+        "url": "https://github.com/mattgreen/watchexec/releases/download/$version/watchexec-$version-x86_64-pc-windows-gnu.zip"
     }
 }
