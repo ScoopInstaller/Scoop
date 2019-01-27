@@ -5,11 +5,9 @@
     "version": "1.10.0",
     "url": "https://github.com/mattgreen/watchexec/releases/download/1.10.0/watchexec-1.10.0-x86_64-pc-windows-gnu.zip",
     "hash": "6cb2d6bd9b6a2ad011f56b1aae793ae219704599dab5402ebed21efe9e6a2bde",
-    "extract_dir": "watchexec-1.10.0-x86_64-pc-windows-gnu",
     "bin": "watchexec.exe",
     "checkver": "github",
     "autoupdate": {
-        "url": "https://github.com/mattgreen/watchexec/releases/download/$version/watchexec-$version-x86_64-pc-windows-gnu.zip",
-        "extract_dir": "watchexec-$version-x86_64-pc-windows-gnu"
+        "url": "https://github.com/mattgreen/watchexec/releases/download/$version/watchexec-$version-x86_64-pc-windows-gnu.zip"
     }
 }
