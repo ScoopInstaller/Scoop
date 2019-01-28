@@ -1,17 +1,17 @@
 {
     "homepage": "https://prometheus.io/",
     "license": "Apache-2.0",
-    "version": "2.6.1",
+    "version": "2.7.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/prometheus/prometheus/releases/download/v2.6.1/prometheus-2.6.1.windows-amd64.tar.gz",
-            "hash": "8526e7f55f9eacecd839a62cbb7e897f7b2c2ded3b407af927de0d45049e7395",
-            "extract_dir": "prometheus-2.6.1.windows-amd64"
+            "url": "https://github.com/prometheus/prometheus/releases/download/v2.7.0/prometheus-2.7.0.windows-amd64.tar.gz",
+            "hash": "170284f69fcf709d022bacb754c51f732d527079af2fc85518d878faaedcd8c2",
+            "extract_dir": "prometheus-2.7.0.windows-amd64"
         },
         "32bit": {
-            "url": "https://github.com/prometheus/prometheus/releases/download/v2.6.1/prometheus-2.6.1.windows-386.tar.gz",
-            "hash": "d578eb33781bfdb00f0c4e0a0218d57301c8fa22c79e021ce40aad05e62a5865",
-            "extract_dir": "prometheus-2.6.1.windows-386"
+            "url": "https://github.com/prometheus/prometheus/releases/download/v2.7.0/prometheus-2.7.0.windows-386.tar.gz",
+            "hash": "0461aaeeec1bc7db3b3bde96c9f8a323196cc5a98921f6dc641a4c47c4526c1f",
+            "extract_dir": "prometheus-2.7.0.windows-386"
         }
     },
     "bin": "prometheus.exe",
