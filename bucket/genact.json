@@ -11,6 +11,6 @@
     "bin": "genact.exe",
     "checkver": "github",
     "autoupdate": {
-        "url": "https://github.com/svenstaro/genact/releases/download/0.6.0/genact-win.exe#/genact.exe"
+        "url": "https://github.com/svenstaro/genact/releases/download/$version/genact-win.exe#/genact.exe"
     }
 }
