@@ -2,15 +2,15 @@
     "homepage": "https://www.consul.io",
     "description": "Service Discovery and Configuration",
     "license": "MPL-2.0",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "architecture": {
         "64bit": {
-            "url": "https://releases.hashicorp.com/consul/1.4.1/consul_1.4.1_windows_amd64.zip",
-            "hash": "c1ef914331026a44174986ee74ecc86af8012d063770c01f3b90000f7ee46022"
+            "url": "https://releases.hashicorp.com/consul/1.4.2/consul_1.4.2_windows_amd64.zip",
+            "hash": "0ef2f5134a40a2cdcc33605bd08a3e2497923ba34adafcb2d0ccece09b1450d9"
         },
         "32bit": {
-            "url": "https://releases.hashicorp.com/consul/1.4.1/consul_1.4.1_windows_386.zip",
-            "hash": "c6f30543be2fd05b97375287d80fbca7c0ba59d7518c81ec1f8e38e48781d625"
+            "url": "https://releases.hashicorp.com/consul/1.4.2/consul_1.4.2_windows_386.zip",
+            "hash": "8eea49d41b8d3ae73392ecf11302166734749393aac15a45bd437f23137fe569"
         }
     },
     "bin": "consul.exe",
