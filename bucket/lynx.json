@@ -1,6 +1,6 @@
 {
     "_comment": "Version 2.8.3 was moved to https://github.com/scoopinstaller/versions/blob/master/lynx283.json",
-    "version": "2.8.9rel.1",
+    "version": "2.9.0dev.1",
     "homepage": "http://invisible-island.net/lynx/lynx.html",
     "architecture": {
         "32bit": {
@@ -17,9 +17,7 @@
     "suggest": {
         "vcredist": "extras/vcredist2012"
     },
-    "persist": [
-        "$dir/lynx.cfg"
-    ],
+    "persist": "$dir/lynx.cfg",
     "pre_install": [
         "$q = [char]34",
         "add-content \"$dir/lynx.cfg\" -value \"SSL_CERT_FILE:$(appdir openssl)/current/cacert.pem`n\"",
@@ -42,7 +40,5 @@
     "autoupdate": {
         "url": "https://invisible-island.net/datafiles/current/lynx-newssl-setup.exe"
     },
-    "notes": [
-        "lynx requires the 32-bit version of openssl to be installed"
-    ]
+    "notes": "lynx requires the 32-bit version of openssl to be installed"
 }
