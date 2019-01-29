@@ -9,9 +9,7 @@
     },
     "bin": "bin/win32/inadyn-mt.exe",
     "checkver": "title=\"/inadyn-mt/inadyn-mt\\.v\\.([\\d.]+)",
-    "depends": [
-        "sudo"
-    ],
+    "depends": "sudo",
     "extract_dir": "inadyn-mt.v.02.28.10",
     "hash": "f69bea12d96b66f9f662a8df0730c60457b24f5fb5308b109936880ebf7be5ca",
     "notes": [

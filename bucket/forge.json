@@ -3,9 +3,7 @@
     "version": "2.2.0",
     "url": "https://github.com/fsharp-editing/Forge/releases/download/2.2.0/forge.zip",
     "hash": "3033df677a766a0cb417fb987dcfbd8a54b06ae87ab58de2b849ede8bdc016f3",
-    "bin": [
-        "forge.exe"
-    ],
+    "bin": "forge.exe",
     "checkver": {
         "github": "https://github.com/fsharp-editing/Forge"
     },

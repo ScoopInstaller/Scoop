@@ -16,9 +16,7 @@
     ],
     "env_add_path": "bin",
     "suggest": {
-        "Kotlin": [
-            "kotlin"
-        ]
+        "Kotlin": "kotlin"
     },
     "checkver": {
         "github": "https://github.com/JetBrains/kotlin"

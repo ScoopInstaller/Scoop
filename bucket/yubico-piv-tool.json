@@ -12,9 +12,7 @@
             "hash": "97deb99fe1bc9320024cd6185a75bd5088e3fb03361494d31a73abbd7e42af5d"
         }
     },
-    "bin": [
-        "bin\\yubico-piv-tool.exe"
-    ],
+    "bin": "bin\\yubico-piv-tool.exe",
     "checkver": {
         "url": "https://developers.yubico.com/yubico-piv-tool/Releases/",
         "re": "yubico-piv-tool-([\\d.]+)-win64.zip"

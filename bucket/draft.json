@@ -9,9 +9,7 @@
         }
     },
     "extract_dir": "windows-amd64",
-    "bin": [
-        "draft.exe"
-    ],
+    "bin": "draft.exe",
     "checkver": {
         "github": "https://github.com/Azure/draft"
     },

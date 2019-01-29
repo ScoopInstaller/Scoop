@@ -7,9 +7,7 @@
     "hash": "EE11B97BD075414EC196ED6EAE8E526AA78BB59251D9BDABE513D07E3B2B7BEA",
     "bin": "nunit3-console.exe",
     "suggest": {
-        "NuGet": [
-            "nuget"
-        ]
+        "NuGet": "nuget"
     },
     "checkver": {
         "github": "https://github.com/nunit/nunit-console/",

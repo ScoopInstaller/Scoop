@@ -12,9 +12,7 @@
             "hash": "sha1:ce02f50fa3d82f0d5464f28ac78d3ecee10c5f58"
         }
     },
-    "bin": [
-        "pngcrush.exe"
-    ],
+    "bin": "pngcrush.exe",
     "checkver": {
         "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/",
         "re": "title=\"([0-9\\.]+)\""
