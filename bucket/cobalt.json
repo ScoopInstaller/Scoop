@@ -1,12 +1,12 @@
 {
     "homepage": "https://cobalt-org.github.io/",
     "description": "Static site generator written in Rust",
-    "version": "0.15.1",
+    "version": "0.15.2",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/cobalt-org/cobalt.rs/releases/download/v0.15.1/cobalt-v0.15.1-x86_64-pc-windows-msvc.zip",
-            "hash": "94781af50dbda24fab7bb13ff82fd4216ee5efcb429e49385306fae5516bd0ae"
+            "url": "https://github.com/cobalt-org/cobalt.rs/releases/download/v0.15.2/cobalt-v0.15.2-x86_64-pc-windows-msvc.zip",
+            "hash": "2c5d62e1d922342752bcd3d6223c9cabc36cb12f18d7a6731d9cf759c7af7e1f"
         }
     },
     "bin": "cobalt.exe",
