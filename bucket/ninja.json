@@ -1,9 +1,9 @@
 {
     "homepage": "https://ninja-build.org/",
     "license": "Apache-2.0",
-    "version": "1.8.2",
-    "url": "https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip",
-    "hash": "c80313e6c26c0b9e0c241504718e2d8bbc2798b73429933adf03fdc6d84f0e70",
+    "version": "1.9.0",
+    "url": "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip",
+    "hash": "6af9a6e5afba71fff0aa406ead9331038e87e56f1987a604b4a837dd5ee34fe3",
     "bin": "ninja.exe",
     "checkver": {
         "github": "https://github.com/ninja-build/ninja"
