@@ -1,0 +1,24 @@
+{
+    "homepage": "https://hashlink.haxe.org/",
+    "version": "1.8.0-win",
+    "license": "MIT",
+    "url": "https://github.com/HaxeFoundation/hashlink/releases/download/1.8/hl-1.8.0-win.zip",
+    "hash": "f20b4f5619cdcd56616185cfd22c1294f44e0f3e76bed4c63ac47344b82cb9da",
+    "bin": "hl.exe",
+    "env_set": {
+        "HASHLINKPATH": "$dir"
+    },
+    "env_add_path": "$dir",
+    "pre_install": [
+        "if(Test-Path \"$dir\\hl-*-win\") {",
+        "    Move-Item -Force \"$dir\\hl-*-win\\*\" \"$dir\"",
+        "}"
+    ],
+    "checkver": {
+        "url": "https://github.com/HaxeFoundation/hashlink/releases",
+        "re": "([\\d.]+-win)"
+    },
+    "autoupdate": {
+        "url": "https://github.com/HaxeFoundation/hashlink/releases/download/$majorVersion.$minorVersion/hl-$version.zip"
+    }
+}
