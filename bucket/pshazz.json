@@ -1,9 +1,9 @@
 {
     "homepage": "https://github.com/lukesampson/pshazz",
-    "version": "0.2019.01.29",
-    "url": "https://github.com/lukesampson/pshazz/archive/6c9fa8e483288cab7fd11117731c5fb46c7b9d99.zip",
-    "extract_dir": "pshazz-6c9fa8e483288cab7fd11117731c5fb46c7b9d99",
-    "hash": "672a57612a69e22d561c8ee475195e931468f71c197a080b0dd3e1966a8ab10d",
+    "version": "0.2019.01.30",
+    "url": "https://github.com/lukesampson/pshazz/archive/b40b82100e86a70394ac292c8799c0dd5d871c50.zip",
+    "extract_dir": "pshazz-b40b82100e86a70394ac292c8799c0dd5d871c50",
+    "hash": "6140bfb379dbc45625efc850b8ba6c524fd4b8b3cb8c6240be3988c2dd3bcaee",
     "bin": "bin\\pshazz.ps1",
     "installer": {
         "file": "bin\\install.ps1"
