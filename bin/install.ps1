@@ -71,5 +71,4 @@ ensure_robocopy_in_path
 ensure_scoop_in_path
 Write-Output "Type 'scoop help' for instructions."
 
-$erroractionpreference = $old_erroractionpreference # Reset $erroractionpreference to original value$erroractionpreference = $old_erroractionpreference # Reset $erroractionpreference to original value
 $erroractionpreference = $old_erroractionpreference # Reset $erroractionpreference to original value
