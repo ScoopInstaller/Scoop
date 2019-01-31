@@ -70,10 +70,6 @@ Remove-Item "$dir\_tmp", $zipfile -r -force
 ensure_robocopy_in_path
 ensure_scoop_in_path
 
-# Pre-create scoop folder structure
-@('apps', 'buckets', 'cache', 'modules', 'persist', 'shims', 'workspace') | ForEach-Object {
-    New-Item "$scoopdir\$_", "$globaldir\$_" -Type Directory
-}
 Write-Output "Type 'scoop help' for instructions."
 
 $erroractionpreference = $old_erroractionpreference # Reset $erroractionpreference to original value
