@@ -1,10 +1,6 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
-    "description": [
-        "",
-        "A collection of command line utilities written in PowerShell,",
-        "proudly ignoring PowerShell Verb-Noun naming conventions."
-    ],
+    "description": "A collection of command line utilities written in PowerShell proudly ignoring PowerShell Verb-Noun naming conventions.",
     "version": "0.2018.08.04",
     "url": "https://github.com/lukesampson/psutils/archive/de1a069215c54a1cb105f3dc79f14e25570c75f2.zip",
     "hash": "432d21448ec3ed8e95e82e6ad0b633e096b1cd1c37bed081b8dbe2fd59f9fb1b",
