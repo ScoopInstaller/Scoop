@@ -20,12 +20,24 @@ $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
 # for all communication with api.github.com
-function enable-encryptionscheme([Net.SecurityProtocolType]$scheme) {
-    # Net.SecurityProtocolType is a [Flags] enum, binary-OR sets
-    # the specified scheme in addition to whatever scheme is already active
-    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor $scheme
+function Optimize-SecurityProtocol {
+    # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
+    # which allows the operating system to choose the best protocol to use.
+    # If not contains 'SystemDefault', set highest encryption for SecurityProtocol.
+    if ([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'SystemDefault') {
+        # Set TLS 1.2 (3072), then TLS 1.1 (768), finially TLS 1.0 (192). Ssl3 has been superseded
+        # https://docs.microsoft.com/en-us/dotnet/api/system.net.securityprotocoltype?view=netframework-4.5
+        [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
+    } else {
+        # else if SecurityProtocol has been changed, reset it to SystemDefault
+        if (!([System.Net.ServicePointManager]::SecurityProtocol.Equals(`
+            [System.Net.SecurityProtocolType]::SystemDefault))) {
+            # Set to SystemDefault (0)
+            [System.Net.ServicePointManager]::SecurityProtocol = 0
+        }
+    }
 }
-enable-encryptionscheme "Tls12"
+Optimize-SecurityProtocol
 
 function Get-UserAgent() {
     return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"

@@ -38,8 +38,6 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $Queue += , @($_.Name, $manifest)
 }
 
-$original = use_any_https_protocol
-
 Write-Host '[' -NoNewLine
 Write-Host 'U' -NoNewLine -ForegroundColor Cyan
 Write-Host ']RLs'
@@ -130,5 +128,3 @@ foreach ($man in $Queue) {
         Write-Host "       > $_" -ForegroundColor DarkRed
     }
 }
-
-set_https_protocols $original
