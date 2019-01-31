@@ -20,5 +20,6 @@
         "hash": {
             "url": "$url.sha256"
         }
-    }
+    },
+    "pre_install": "Stop-Process -Name jx -Verbose -ErrorAction Ignore"
 }
