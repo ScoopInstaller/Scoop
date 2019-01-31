@@ -17,7 +17,7 @@
             "64bit": {
                 "url": "https://github.com/kubernetes/kops/releases/download/$version/kops-windows-amd64#/kops.exe",
                 "hash": {
-                    "url": "https://github.com/kubernetes/kops/releases/download/$version/kops-windows-amd64-sha1"
+                    "url": "$url-sha1"
                 }
             }
         }
