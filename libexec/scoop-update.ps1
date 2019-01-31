@@ -78,6 +78,11 @@ function update_scoop() {
     }
     else {
         Push-Location $currentdir
+
+        # Check if user configured other branch
+        $branch = $(scoop config SCOOP_BRANCH)
+        if ((git_branch) -notlike "*$branch") { git_checkout $branch }
+
         git_pull -q
         $res = $lastexitcode
         if($show_update_log) {
