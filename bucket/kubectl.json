@@ -1,15 +1,15 @@
 {
     "homepage": "https://kubernetes.io/docs/user-guide/kubectl-overview/",
     "license": "Apache-2.0",
-    "version": "1.13.2",
+    "version": "1.13.3",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.13.2/kubernetes-client-windows-amd64.tar.gz",
-            "hash": "sha1:96b717a94e124bc2d39dfcef7b7da901fedc0b1b"
+            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.13.3/kubernetes-client-windows-amd64.tar.gz",
+            "hash": "sha1:8a4beb8715a91d98f155b3899635a1686941d11c"
         },
         "32bit": {
-            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.13.2/kubernetes-client-windows-386.tar.gz",
-            "hash": "sha1:b0eac3b25d4833f6c81768ed43bc33545c930e89"
+            "url": "https://storage.googleapis.com/kubernetes-release/release/v1.13.3/kubernetes-client-windows-386.tar.gz",
+            "hash": "sha1:9e95938e2d9fa68d02f82faafff10a8748b9ba81"
         }
     },
     "extract_dir": "kubernetes\\client",
