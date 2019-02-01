@@ -14,7 +14,7 @@
             "extract_dir": "prometheus-2.7.1.windows-386"
         }
     },
-    "bin": "prometheus.exe",
+    "bin": ["prometheus.exe", "promtool.exe"],
     "checkver": {
         "github": "https://github.com/prometheus/prometheus"
     },
