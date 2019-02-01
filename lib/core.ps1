@@ -23,19 +23,17 @@ $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 function Optimize-SecurityProtocol {
     # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
     # which allows the operating system to choose the best protocol to use.
-    # If not contains 'SystemDefault', set highest encryption for SecurityProtocol.
-    if ([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'SystemDefault') {
-        # Set to TLS 1.2 (3072), then TLS 1.1 (768), finally TLS 1.0 (192). Ssl3 has been superseded
+    # If SecurityProtocolType contains 'SystemDefault' (means .NET4.7+ detected)
+    # and the value of SecurityProtocol is 'SystemDefault', just do nothing on SecurityProtocol,
+    # 'SystemDefault' will use TLS 1.2 if the webrequest requires.
+    $isNewerNetFramework = ([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -contains 'SystemDefault')
+    $isSystemDefault = ([System.Net.ServicePointManager]::SecurityProtocol.Equals([System.Net.SecurityProtocolType]::SystemDefault))
+
+    # If not, change it to support TLS 1.2
+    if (!($isNewerNetFramework -and $isSystemDefault)) {
+        # Set to TLS 1.2 (3072), then TLS 1.1 (768), and TLS 1.0 (192). Ssl3 has been superseded,
         # https://docs.microsoft.com/en-us/dotnet/api/system.net.securityprotocoltype?view=netframework-4.5
         [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
-    } else {
-        # else if SecurityProtocol has been changed, reset it to SystemDefault
-        if (!([System.Net.ServicePointManager]::SecurityProtocol.Equals(`
-            [System.Net.SecurityProtocolType]::SystemDefault))) {
-            # Set to SystemDefault (0) first. TLS 1.2 (3072), TLS 1.1 (768) and TLS 1.0 (192)
-            # follow up to prevent "The underlying connection was closed" problem.
-            [System.Net.ServicePointManager]::SecurityProtocol = 0 -bor 3072 -bor 768 -bor 192
-        }
     }
 }
 Optimize-SecurityProtocol
