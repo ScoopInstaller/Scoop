@@ -29,60 +29,11 @@ reset_aliases
 $usage_add = "usage: scoop bucket add <name> [<repo>]"
 $usage_rm = "usage: scoop bucket rm <name>"
 
-function add_bucket($name, $repo) {
-    if(!$name) { "<name> missing"; $usage_add; exit 1 }
-    if(!$repo) {
-        $repo = known_bucket_repo $name
-        if(!$repo) { "Unknown bucket '$name'. Try specifying <repo>."; $usage_add; exit 1 }
-    }
-
-    $git = try { Get-Command 'git' -ea stop } catch { $null }
-    if(!$git) {
-        abort "Git is required for buckets. Run 'scoop install git'."
-    }
-
-    $dir = bucketdir $name
-    if(test-path $dir) {
-        warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
-        exit 0
-    }
-
-    write-host 'Checking repo... ' -nonewline
-    $out = git_ls_remote $repo 2>&1
-    if($lastexitcode -ne 0) {
-        abort "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
-    }
-    write-host 'ok'
-
-    ensure $bucketsdir > $null
-    $dir = ensure $dir
-    git_clone "$repo" "`"$dir`"" -q
-    success "The $name bucket was added successfully."
-}
-
-function rm_bucket($name) {
-    if(!$name) { "<name> missing"; $usage_rm; exit 1 }
-    $dir = bucketdir $name
-    if(!(test-path $dir)) {
-        abort "'$name' bucket not found."
-    }
-
-    Remove-Item $dir -r -force -ea stop
-}
-
-function list_buckets {
-    buckets
-}
-
-function known_buckets {
-    known_bucket_repos | ForEach-Object { $_.psobject.properties | Select-Object -expand 'name' }
-}
-
 switch($cmd) {
-    "add" { add_bucket $name $repo }
-    "rm" { rm_bucket $name }
-    "list" { list_buckets }
-    "known" { known_buckets }
+    'add' { add_bucket $name $repo }
+    'rm' { rm_bucket $name }
+    'list' { buckets }
+    'known' { known_buckets }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
 
