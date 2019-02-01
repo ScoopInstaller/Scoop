@@ -89,8 +89,6 @@ Get-Event | ForEach-Object {
     Remove-Event $_.SourceIdentifier
 }
 
-$original = use_any_https_protocol
-
 # start all downloads
 $Queue | ForEach-Object {
     $name, $json = $_
@@ -287,5 +285,3 @@ while ($in_progress -gt 0) {
         }
     }
 }
-
-set_https_protocols $original

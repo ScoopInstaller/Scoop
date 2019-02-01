@@ -113,26 +113,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     }
 }
 
-function use_any_https_protocol() {
-    $original = "$([System.Net.ServicePointManager]::SecurityProtocol)"
-    $available = [string]::join(', ', [Enum]::GetNames([System.Net.SecurityProtocolType]))
-
-    # use whatever protocols are available that the server supports
-    set_https_protocols $available
-
-    return $original
-}
-
-function set_https_protocols($protocols) {
-    try {
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType] $protocols
-    } catch {
-        [System.Net.ServicePointManager]::SecurityProtocol = "Tls,Tls11,Tls12"
-    }
-}
-
 function do_dl($url, $to, $cookies) {
-    $original_protocols = use_any_https_protocol
     $progress = [console]::isoutputredirected -eq $false -and
         $host.name -ne 'Windows PowerShell ISE Host'
 
@@ -143,8 +124,6 @@ function do_dl($url, $to, $cookies) {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
         throw $e
-    } finally {
-        set_https_protocols $original_protocols
     }
 }
 
