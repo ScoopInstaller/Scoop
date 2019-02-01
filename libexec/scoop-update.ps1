@@ -38,16 +38,16 @@ $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
 
 # load config
-$repo = $(scoop config SCOOP_REPO)
+$repo = $(get_config SCOOP_REPO)
 if(!$repo) {
     $repo = "https://github.com/lukesampson/scoop"
-    scoop config SCOOP_REPO "$repo"
+    set_config SCOOP_REPO "$repo"
 }
 
-$branch = $(scoop config SCOOP_BRANCH)
+$branch = $(get_config SCOOP_BRANCH)
 if(!$branch) {
     $branch = "master"
-    scoop config SCOOP_BRANCH "$branch"
+    set_config SCOOP_BRANCH "$branch"
 }
 
 function update_scoop() {
@@ -102,7 +102,7 @@ function update_scoop() {
         Pop-Location
     }
 
-    scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
+    set_config lastupdate ([System.DateTime]::Now.ToString('o'))
     success 'Scoop was updated successfully!'
 }
 
