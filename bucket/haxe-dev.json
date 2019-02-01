@@ -1,0 +1,45 @@
+{
+    "homepage": "https://haxe.org/",
+    "description": "Pre-release version of Haxe, for a stable version use haxe. Haxe is an open source toolkit based on a modern, high level, strictly typed programming language, a cross-compiler, a complete cross-platform standard library and ways to access each platform's native capabilities.",
+    "version": "4.0.0-preview.5",
+    "license": "GPL-2.0-or-later",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/HaxeFoundation/haxe/releases/download/4.0.0-preview.5/haxe-4.0.0-preview.5-win64.zip",
+            "hash": "15409fce0a1d6a43c3ff5c24d1c39e9e56de63f06bb0a3d1a6641139a26aed26"
+        },
+        "32bit": {
+            "url": "https://github.com/HaxeFoundation/haxe/releases/download/4.0.0-preview.5/haxe-4.0.0-preview.5-win.zip",
+            "hash": "fa632a480b4cc7a4cdb868d84bcf0d3b4af7e8bdcd91abaedd8e25ecc78ac03d"
+        }
+    },
+    "bin": [
+        "haxe.exe",
+        "haxelib.exe"
+    ],
+    "env_set": {
+        "HAXEPATH": "$dir"
+    },
+    "env_add_path": "$dir",
+    "persist": "lib",
+    "depends": "neko",
+    "pre_install": [
+        "if(Test-Path \"$dir\\haxe_*\") {",
+        "    Move-Item -Force \"$dir\\haxe_*\\*\" \"$dir\"",
+        "}"
+    ],
+    "checkver": {
+        "url": "https://github.com/HaxeFoundation/haxe/releases",
+        "re": "([\\d.]+-preview[\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/HaxeFoundation/haxe/releases/download/$version/haxe-$version-win64.zip"
+            },
+            "32bit": {
+                "url": "https://github.com/HaxeFoundation/haxe/releases/download/$version/haxe-$version-win.zip"
+            }
+        }
+    }
+}
