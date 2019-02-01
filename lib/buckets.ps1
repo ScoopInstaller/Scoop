@@ -8,7 +8,8 @@ $bucketsdir = "$scoopdir\buckets"
     Name of bucket
 #>
 function bucketdir($name) {
-    $bucket = relpath '..\bucket' # main bucket
+    # This check should not be needed anymore
+    $bucket = "$bucketsdir\main" # main bucket
 
     if ($name) {
         $bucket = "$bucketsdir\$name"
@@ -50,6 +51,7 @@ function find_manifest($app, $bucket) {
         return $null
     }
 
+    # Is this check needed?
     $buckets = @($null) + @(buckets) # null for main bucket
     foreach($bucket in $buckets) {
         $manifest = manifest $app $bucket
@@ -110,6 +112,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $app, $manifest, $bucket, $url = locate $app $bucket
     $url = known_bucket_repo $bucket
     if($manifest -and $null -eq $url -and $null -eq $bucket) {
+        # TODO: Change URL
         $url = 'https://github.com/lukesampson/scoop'
     }
     if(!$url) {

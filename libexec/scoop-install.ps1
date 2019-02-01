@@ -4,6 +4,7 @@
 #      scoop install git
 #
 # To install an app from a manifest at a URL:
+# TODO: Change URL
 #      scoop install https://raw.github.com/lukesampson/scoop/master/bucket/runat.json
 #
 # To install an app from a manifest on your computer
