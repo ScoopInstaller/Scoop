@@ -40,14 +40,16 @@ if(installed 'scoop') {
 $dir = ensure (versiondir 'scoop' 'current')
 
 # download scoop zip
-$zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
+# TODO: Change URL
+$zipurl = 'https://github.com/Ash258/scoop/archive/new-master.zip'
 $zipfile = "$dir\scoop.zip"
 Write-Output 'Downloading scoop...'
 dl $zipurl $zipfile
 
 Write-Output 'Extracting...'
 unzip $zipfile "$dir\_tmp"
-Copy-Item "$dir\_tmp\scoop-master\*" $dir -r -force
+# TODO: Change
+Copy-Item "$dir\_tmp\*master\*" $dir -r -force
 Remove-Item "$dir\_tmp" -r -force
 Remove-Item $zipfile
 
