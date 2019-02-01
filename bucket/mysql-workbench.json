@@ -1,12 +1,12 @@
 {
-    "version": "8.0.14",
+    "version": "8.0.15",
     "license": "GPL-2.0-only",
     "homepage": "https://dev.mysql.com/downloads/workbench/",
     "architecture": {
         "64bit": {
-            "url": "https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-workbench-community-8.0.14-winx64.msi",
+            "url": "https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-workbench-community-8.0.15-winx64.msi",
             "extract_dir": "MySQL\\MySQL Workbench 8.0 CE",
-            "hash": "md5:1ac7ceb2e8c61ddf2ea693f96b33d448"
+            "hash": "md5:f13e016029846679a54e0ed902886985"
         }
     },
     "checkver": "MySQL Workbench (?<version>(?<short>[\\d]+.[\\d]+).[\\d]+)",
