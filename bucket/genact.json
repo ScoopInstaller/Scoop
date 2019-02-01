@@ -1,0 +1,16 @@
+{
+    "homepage": "https://github.com/svenstaro/genact/",
+    "description": "A nonsense activity generator",
+    "license": {
+        "identifier": "MIT",
+        "url": "https://raw.githubusercontent.com/svenstaro/genact/master/LICENSE"
+    },
+    "version": "0.6.0",
+    "url": "https://github.com/svenstaro/genact/releases/download/0.6.0/genact-win.exe#/genact.exe",
+    "hash": "sha256:4c48af34893554a8ddf00b2998843c760319a4d28324963853c583c13f6adb1a",
+    "bin": "genact.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/svenstaro/genact/releases/download/$version/genact-win.exe#/genact.exe"
+    }
+}
