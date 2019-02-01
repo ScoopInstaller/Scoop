@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/sharkdp/bat",
     "description": "A cat(1) clone with syntax highlighting and Git integration",
-    "license": "MIT",
+    "license": "Apache-2.0",
     "version": "0.9.0",
     "architecture": {
         "64bit": {
@@ -11,9 +11,8 @@
     },
     "bin": "bat.exe",
     "suggest": {
-        "less": [
-            "less"
-        ]
+        "less": "less",
+        "ccat": "ccat"
     },
     "checkver": "github",
     "autoupdate": {

@@ -35,12 +35,12 @@
                     "type": "string"
                 },
                 "jp": {
-                    "pattern": "^\\$\\..*$",
+                    "pattern": "^\\$[.[].*$",
                     "type": "string",
                     "description": "Same as 'jsonpath'"
                 },
                 "jsonpath": {
-                    "pattern": "^\\$\\..*$",
+                    "pattern": "^\\$[.[].*$",
                     "type": "string"
                 },
                 "mode": {
@@ -226,12 +226,12 @@
                             "type": "string"
                         },
                         "jp": {
-                            "pattern": "^\\$\\..*$",
+                            "pattern": "^\\$[.[].*$",
                             "type": "string",
                             "description": "Same as 'jsonpath'"
                         },
                         "jsonpath": {
-                            "pattern": "^\\$\\..*$",
+                            "pattern": "^\\$[.[].*$",
                             "type": "string"
                         },
                         "reverse": {

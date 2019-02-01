@@ -14,9 +14,7 @@
         "bin\\groovyserver.exe"
     ],
     "suggest": {
-        "Groovy": [
-            "groovy"
-        ]
+        "Groovy": "groovy"
     },
     "checkver": {
         "github": "https://github.com/kobo/groovyserv"

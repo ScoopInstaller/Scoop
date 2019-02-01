@@ -32,6 +32,10 @@ function known_bucket_repo($name) {
     $buckets.$name
 }
 
+function known_buckets {
+    known_bucket_repos | ForEach-Object { $_.psobject.properties | Select-Object -expand 'name' }
+}
+
 function apps_in_bucket($dir) {
     return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
 }
@@ -60,26 +64,26 @@ function find_manifest($app, $bucket) {
 }
 
 function add_bucket($name, $repo) {
-    if(!$name) { "<name> missing"; $usage_add; exit 1 }
-    if(!$repo) {
+    if (!$name) { "<name> missing"; $usage_add; exit 1 }
+    if (!$repo) {
         $repo = known_bucket_repo $name
-        if(!$repo) { "Unknown bucket '$name'. Try specifying <repo>."; $usage_add; exit 1 }
+        if (!$repo) { "Unknown bucket '$name'. Try specifying <repo>."; $usage_add; exit 1 }
     }
 
     $git = try { Get-Command 'git' -ea stop } catch { $null }
-    if(!$git) {
+    if (!$git) {
         abort "Git is required for buckets. Run 'scoop install git'."
     }
 
     $dir = bucketdir $name
-    if(test-path $dir) {
+    if (test-path $dir) {
         warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
         exit 0
     }
 
     write-host 'Checking repo... ' -nonewline
     $out = git_ls_remote $repo 2>&1
-    if($lastexitcode -ne 0) {
+    if ($lastexitcode -ne 0) {
         abort "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
     }
     write-host 'ok'
@@ -91,21 +95,13 @@ function add_bucket($name, $repo) {
 }
 
 function rm_bucket($name) {
-    if(!$name) { "<name> missing"; $usage_rm; exit 1 }
+    if (!$name) { "<name> missing"; $usage_rm; exit 1 }
     $dir = bucketdir $name
-    if(!(test-path $dir)) {
+    if (!(test-path $dir)) {
         abort "'$name' bucket not found."
     }
 
     Remove-Item $dir -r -force -ea stop
-}
-
-function list_buckets {
-    buckets
-}
-
-function known_buckets {
-    known_bucket_repos | ForEach-Object { $_.psobject.properties | Select-Object -expand 'name' }
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {

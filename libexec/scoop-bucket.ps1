@@ -30,10 +30,10 @@ $usage_add = "usage: scoop bucket add <name> [<repo>]"
 $usage_rm = "usage: scoop bucket rm <name>"
 
 switch($cmd) {
-    "add" { add_bucket $name $repo }
-    "rm" { rm_bucket $name }
-    "list" { list_buckets }
-    "known" { known_buckets }
+    'add' { add_bucket $name $repo }
+    'rm' { rm_bucket $name }
+    'list' { buckets }
+    'known' { known_buckets }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
 

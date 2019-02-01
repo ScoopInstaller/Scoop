@@ -1,24 +1,27 @@
 {
-    "homepage": "http://www.7-zip.org/",
+    "homepage": "https://www.7-zip.org/",
     "description": "A multi-format file archiver with high compression ratios",
     "license": {
         "identifier": "LGPL-2.0-only,BSD-3-Clause",
         "url": "https://www.7-zip.org/license.txt"
     },
-    "version": "18.05",
+    "version": "18.06",
     "architecture": {
         "64bit": {
-            "url": "https://7-zip.org/a/7z1805-x64.msi",
-            "hash": "898c1ca0015183fe2ba7d55cacf0a1dea35e873bf3f8090f362a6288c6ef08d7"
+            "url": "https://7-zip.org/a/7z1806-x64.msi",
+            "hash": "f00e1588ed54ddf633d8652eb89d0a8f95bd80cccfc3eed362d81927bec05aa5"
         },
         "32bit": {
-            "url": "https://7-zip.org/a/7z1805.msi",
-            "hash": "c554238bee18a03d736525e06d9258c9ecf7f64ead7c6b0d1eb04db2c0de30d0"
+            "url": "https://7-zip.org/a/7z1806.msi",
+            "hash": "e1e509fb1fc6c7b7c2f55b1831454084541ee0a6c0a3f67730cdc4ca6bdd443b"
         }
     },
     "extract_dir": "Files/7-Zip",
     "bin": "7z.exe",
-    "checkver": "Download 7-Zip ([\\d.]+)",
+    "checkver": {
+        "url": "https://www.7-zip.org/download.html",
+        "regex": "Download 7-Zip ([\\d.]+)"
+    },
     "autoupdate": {
         "architecture": {
             "64bit": {

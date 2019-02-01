@@ -45,7 +45,7 @@ if(!$repo) {
 }
 
 $branch = $(get_config SCOOP_BRANCH)
-if(!$branch) {
+if (!$branch) {
     $branch = "master"
     set_config SCOOP_BRANCH "$branch"
 }
@@ -81,7 +81,10 @@ function update_scoop() {
 
         # Check if user configured other branch
         $branch = $(get_config SCOOP_BRANCH)
-        if ((git_branch) -notlike "*$branch") { git_checkout $branch }
+        if ((git_branch) -notlike "*$branch") {
+            git_fetch --all -q
+            git_checkout -B $branch -q
+        }
 
         git_pull -q
         $res = $lastexitcode
@@ -119,7 +122,7 @@ function update_scoop() {
         Pop-Location
     }
 
-    scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
+    set_config lastupdate ([System.DateTime]::Now.ToString('o'))
     success 'Scoop was updated successfully!'
 }
 

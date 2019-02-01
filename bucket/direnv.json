@@ -1,0 +1,30 @@
+{
+    "homepage": "https://direnv.net",
+    "description": "load or unload environment variables depending on the current directory",
+    "checkver": {
+        "github": "https://github.com/direnv/direnv"
+    },
+    "license": "MIT",
+    "version": "2.19.1",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/direnv/direnv/releases/download/v2.19.1/direnv.windows-amd64.exe#/direnv.exe",
+            "hash": "a7d63a8033980cc0c8f7f0dea0f58fe2bbe797f22453b54e245434d575b9abcb"
+        },
+        "32bit": {
+            "url": "https://github.com/direnv/direnv/releases/download/v2.19.1/direnv.windows-386.exe#/direnv.exe",
+            "hash": "be22faa203fbcfaa63a47669df6545b7e9668b58419e3633f36642dfedd4b177"
+        }
+    },
+    "bin": "direnv.exe",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/direnv/direnv/releases/download/v$version/direnv.windows-amd64.exe#/direnv.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/direnv/direnv/releases/download/v$version/direnv.windows-386.exe#/direnv.exe"
+            }
+        }
+    }
+}

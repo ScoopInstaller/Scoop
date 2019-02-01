@@ -16,7 +16,7 @@
     ],
     "checkver": {
         "url": "https://eventstore.org/downloads",
-        "re": "EventStore-OSS-Win-v([\\d.]+(-[\\w\\d]+)?).zip"
+        "re": "/downloads/EventStore-OSS-Win-v([\\d.]+(-[\\w\\d]+)?).zip"
     },
     "autoupdate": {
         "url": "https://eventstore.org/downloads/EventStore-OSS-Win-v$version.zip"

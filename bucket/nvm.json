@@ -2,9 +2,7 @@
     "homepage": "https://github.com/coreybutler/nvm-windows",
     "version": "1.1.7",
     "url": "https://github.com/coreybutler/nvm-windows/releases/download/1.1.7/nvm-noinstall.zip",
-    "bin": [
-        "nvm.exe"
-    ],
+    "bin": "nvm.exe",
     "persist": [
         "nodejs",
         [
@@ -39,9 +37,7 @@
             ]
         }
     },
-    "notes": [
-        "You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly"
-    ],
+    "notes": "You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly",
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/coreybutler/nvm-windows/releases/download/$version/nvm-noinstall.zip",

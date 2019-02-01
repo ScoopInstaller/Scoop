@@ -9,9 +9,7 @@
             "hash": "7da79c4b559b84f02466a403c8294c87716c421c8321db935f6c452e5ceac8df"
         }
     },
-    "bin": [
-        "kompose.exe"
-    ],
+    "bin": "kompose.exe",
     "checkver": {
         "github": "https://github.com/kubernetes/kompose"
     },

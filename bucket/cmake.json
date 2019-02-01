@@ -1,18 +1,18 @@
 {
     "homepage": "https://cmake.org/",
     "description": "Open-source, cross-platform family of tools designed to build, test and package software",
-    "version": "3.13.2",
+    "version": "3.13.3",
     "license": "BSD-3-Clause",
     "architecture": {
         "64bit": {
-            "url": "https://cmake.org/files/v3.13/cmake-3.13.2-win64-x64.zip",
-            "hash": "6e73a41f51788be757bac547e796c33dc5fd8f6a13eef7c11620ec71812c8333",
-            "extract_dir": "cmake-3.13.2-win64-x64"
+            "url": "https://cmake.org/files/v3.13/cmake-3.13.3-win64-x64.zip",
+            "hash": "6edc6686cd29572984497bb14de338b496604b5029c75321bf559d47664b38ab",
+            "extract_dir": "cmake-3.13.3-win64-x64"
         },
         "32bit": {
-            "url": "https://cmake.org/files/v3.13/cmake-3.13.2-win32-x86.zip",
-            "hash": "402737c6b304f48afd85c11e765bd5eff95e9d0e03673d5cf87ec9dd8bca0b59",
-            "extract_dir": "cmake-3.13.2-win32-x86"
+            "url": "https://cmake.org/files/v3.13/cmake-3.13.3-win32-x86.zip",
+            "hash": "1382a32494b49d0554268a6d4c321865ace7e66c9189323c4f43630f067cf135",
+            "extract_dir": "cmake-3.13.3-win32-x86"
         }
     },
     "bin": [

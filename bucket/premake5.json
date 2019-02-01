@@ -4,9 +4,7 @@
     "license": "BSD-3-Clause",
     "url": "https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-windows.zip",
     "hash": "712ee206fd2df4adf6320500b755d131ff5fac188a2a653876ae10d3066f4163",
-    "bin": [
-        "premake5.exe"
-    ],
+    "bin": "premake5.exe",
     "checkver": {
         "url": "https://github.com/premake/premake-core/releases/latest",
         "re": "/releases/tag/v(5[0-9.]+-?(alpha|beta)?([0-9.]+)?)"

@@ -1,18 +1,18 @@
 {
-    "homepage": "http://windows.php.net",
+    "homepage": "https://windows.php.net/",
     "license": {
         "identifier": "PHP-3.01",
         "url": "https://secure.php.net/license/"
     },
-    "version": "7.2.13",
+    "version": "7.3.1",
     "architecture": {
         "64bit": {
-            "url": "https://windows.php.net/downloads/releases/php-7.2.13-nts-Win32-VC15-x64.zip",
-            "hash": "559bcee2dd1aab439164a7dc5b7e17c96937c744d02cd035e1d04b055197f7ff"
+            "url": "https://windows.php.net/downloads/releases/php-7.3.1-nts-Win32-VC15-x64.zip",
+            "hash": "15e70a10cab6c97e2bdd17135223200072d716ded5df316a2a7a3132a526ae6a"
         },
         "32bit": {
-            "url": "https://windows.php.net/downloads/releases/php-7.2.13-nts-Win32-VC15-x86.zip",
-            "hash": "51a6bde8241a56d5396717d87857c14e0987e2c503c5c465d2f4bee71a338f72"
+            "url": "https://windows.php.net/downloads/releases/php-7.3.1-nts-Win32-VC15-x86.zip",
+            "hash": "5cc187873c08bcdc1b9a7f9b119a6340d3f0534967bc392ff7d8fa2978757124"
         }
     },
     "bin": [
@@ -30,24 +30,19 @@
     "env_set": {
         "PHP_INI_SCAN_DIR": "$dir\\cli;$dir\\cli\\conf.d;"
     },
-    "post_install": [
-        "# Copy ini scan dir from old location before persistent update",
-        "if ((Test-Path \"$dir\\..\\conf\") -and !(Test-Path \"$dir\\cli\\conf.d\")) {",
-        "    Write-Host -ForegroundColor Cyan \"We are moving your php configuration to $dir\\cli\\conf.d\"",
-        "    Move-Item \"$dir\\..\\conf\" \"$dir\\cli\\conf.d\"",
-        "}",
-        "",
+    "pre_install": [
         "# Create directory for custom PHP configuration",
         "if (!(Test-Path \"$dir\\cli\\conf.d\")) {",
         "    (New-Item -Type directory \"$dir\\cli\\conf.d\") | Out-Null",
-        "}",
-        "",
+        "}"
+    ],
+    "post_install": [
         "# Enable extensions to be found in installation-relative folder (the default is to search C:/php)",
         "(gc \"$dir\\cli\\php.ini\") | % { $_ -replace '; extension_dir = \"ext\"', 'extension_dir = \"ext\"' } | sc \"$dir\\cli\\php.ini\""
     ],
     "checkver": {
-        "url": "http://windows.php.net/download/",
-        "re": "<h3 id=\"php-7.2\".*?>.*?\\(([\\d.]+)\\)</h3>"
+        "url": "https://windows.php.net/download/",
+        "re": "<h3 id=\"php-[\\d.]+\".*?>.*?\\(([\\d.]+)\\)</h3>"
     },
     "autoupdate": {
         "architecture": {

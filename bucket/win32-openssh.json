@@ -1,19 +1,19 @@
 {
     "homepage": "https://github.com/PowerShell/Win32-OpenSSH",
-    "version": "7.7.2.0p1-Beta",
+    "version": "7.9.0.0p1-Beta",
     "license": {
         "identifier": "BSD-3-Clause",
         "url": "https://github.com/PowerShell/openssh-portable/blob/latestw_all/LICENCE"
     },
     "architecture": {
         "32bit": {
-            "hash": "c9179bbd4d651cc15fe036120234fb0e1b21c2661ca3228106470f3ac7e86a19",
-            "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v7.7.2.0p1-Beta/OpenSSH-Win32.zip",
+            "hash": "e7f9714215f19de841a2bf2643734d4b25ea42958c013461096a4963cede0ec6",
+            "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v7.9.0.0p1-Beta/OpenSSH-Win32.zip",
             "extract_dir": "OpenSSH-Win32"
         },
         "64bit": {
-            "hash": "8631f00013116388362cb06f3e6fd2c44c8e57d8f857033111f98feb34fa5bce",
-            "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v7.7.2.0p1-Beta/OpenSSH-Win64.zip",
+            "hash": "fe297667f80f9021e374dd64ce286dcdc50fbf68311765c0336f1ea5fbcb5893",
+            "url": "https://github.com/PowerShell/Win32-OpenSSH/releases/download/v7.9.0.0p1-Beta/OpenSSH-Win64.zip",
             "extract_dir": "OpenSSH-Win64"
         }
     },

@@ -13,9 +13,7 @@
             "url": "http://www.tortall.net/projects/yasm/releases/yasm-1.3.0-win32.exe#/yasm.exe"
         }
     },
-    "bin": [
-        "yasm.exe"
-    ],
+    "bin": "yasm.exe",
     "checkver": {
         "url": "http://yasm.tortall.net/Download.html",
         "re": "Latest Release: ([\\d.]+)"

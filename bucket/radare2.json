@@ -1,15 +1,15 @@
 {
-    "version": "3.1.0",
+    "version": "3.2.1",
     "license": "GPL-2.0",
     "homepage": "https://www.radare.org/r/",
     "architecture": {
         "64bit": {
-            "url": "https://radare.mikelloc.com/get/3.1.0/radare2_installer-msvc_64-3.1.0.exe",
-            "hash": "sha1:3f87d19da73207162b200f805584b8374dbdd42b"
+            "url": "https://radare.mikelloc.com/get/3.2.1/radare2_installer-msvc_64-3.2.1.exe",
+            "hash": "sha1:8a0ebab9b4ae5bdb10653a065bc01769747662c7"
         },
         "32bit": {
-            "url": "https://radare.mikelloc.com/get/3.1.0/radare2_installer-msvc_32-3.1.0.exe",
-            "hash": "sha1:e5e0f989125caef34a63548341a79e138809dc08"
+            "url": "https://radare.mikelloc.com/get/3.2.1/radare2_installer-msvc_32-3.2.1.exe",
+            "hash": "sha1:61f9a14254ad09986724ce82f81cb12250a7e589"
         }
     },
     "installer": {

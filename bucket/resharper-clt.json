@@ -1,12 +1,12 @@
 {
-    "version": "2018.3.1",
+    "version": "2018.3.2",
     "homepage": "https://www.jetbrains.com/resharper/download/index.html#section=resharper-clt",
     "license": {
         "identifier": "Freeware",
         "url": "https://www.jetbrains.com/resharper/buy/command_line_license.html"
     },
-    "url": "https://download.jetbrains.com/resharper/ReSharperUltimate.2018.3.1/JetBrains.ReSharper.CommandLineTools.2018.3.1.zip",
-    "hash": "c28403f4865104d28eaed7b4a8e79445e3170c0170a7d370620f07eec238b91e",
+    "url": "https://download.jetbrains.com/resharper/ReSharperUltimate.2018.3.2/JetBrains.ReSharper.CommandLineTools.2018.3.2.zip",
+    "hash": "a76e69789f9db39a2e5c13cfe338b4d29596e1e500744f1e484729a99d34edf8",
     "bin": [
         "cleanupcode.exe",
         "dupfinder.exe",

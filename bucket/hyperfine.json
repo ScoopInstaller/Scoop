@@ -1,0 +1,21 @@
+{
+    "homepage": "https://github.com/sharkdp/hyperfine",
+    "description": "A command-line benchmarking tool",
+    "license": "Apache-2.0",
+    "version": "1.5.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/sharkdp/hyperfine/releases/download/v1.5.0/hyperfine-v1.5.0-x86_64-pc-windows-msvc.zip",
+            "hash": "8e34992ef9ad8ccd12a2212982bc54b918083607d3018a19246f024d0d6bc690"
+        }
+    },
+    "bin": "hyperfine.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/sharkdp/hyperfine/releases/download/v1.5.0/hyperfine-v$version-x86_64-pc-windows-msvc.zip"
+            }
+        }
+    }
+}

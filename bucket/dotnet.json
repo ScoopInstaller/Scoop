@@ -13,7 +13,5 @@
         }
     },
     "bin": "dotnet.exe",
-    "notes": [
-        "This app is deprecated. Install `dotnet-sdk` instead."
-    ]
+    "notes": "This app is deprecated. Install `dotnet-sdk` instead."
 }

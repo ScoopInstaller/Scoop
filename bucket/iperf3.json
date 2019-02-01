@@ -15,9 +15,7 @@
             "extract_dir": "iperf-3.1.3-win32"
         }
     },
-    "bin": [
-        "iperf3.exe"
-    ],
+    "bin": "iperf3.exe",
     "checkver": {
         "url": "https://iperf.fr/iperf-download.php",
         "re": "iPerf ([\\d.]+)<\\/a>"

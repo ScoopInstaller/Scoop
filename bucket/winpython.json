@@ -39,7 +39,6 @@
         "architecture": {
             "64bit": {
                 "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython64-$versionZero.exe"
-
             },
             "32bit": {
                 "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython32-$versionZero.exe"
