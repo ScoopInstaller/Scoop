@@ -45,7 +45,7 @@ if(!$repo) {
 }
 
 $branch = $(get_config SCOOP_BRANCH)
-if(!$branch) {
+if (!$branch) {
     $branch = "master"
     set_config SCOOP_BRANCH "$branch"
 }
@@ -78,6 +78,14 @@ function update_scoop() {
     }
     else {
         Push-Location $currentdir
+
+        # Check if user configured other branch
+        $branch = $(get_config SCOOP_BRANCH)
+        if ((git_branch) -notlike "*$branch") {
+            git_fetch --all -q
+            git_checkout -B $branch -q
+        }
+
         git_pull -q
         $res = $lastexitcode
         if($show_update_log) {
