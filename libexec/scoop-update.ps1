@@ -103,7 +103,15 @@ function update_scoop() {
 
     @(buckets) | ForEach-Object {
         write-host "Updating '$_' bucket..."
-        Push-Location (bucketdir $_)
+
+        # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
+        $loc = bucketdir $_
+        if (($_ -eq 'main') -and !(Test-Path "$_\.git")) {
+            rm_bucket 'main'
+            add_bucket 'main'
+        }
+
+        Push-Location $loc
         git_pull -q
         if($show_update_log) {
             git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
