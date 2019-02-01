@@ -32,7 +32,7 @@ function known_bucket_repo($name) {
 }
 
 function known_buckets {
-	known_bucket_repos | ForEach-Object { $_.psobject.properties | Select-Object -expand 'name' }
+    known_bucket_repos | ForEach-Object { $_.psobject.properties | Select-Object -expand 'name' }
 }
 
 function apps_in_bucket($dir) {
