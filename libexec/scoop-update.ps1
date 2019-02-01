@@ -38,16 +38,16 @@ $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
 
 # load config
-$repo = $(scoop config SCOOP_REPO)
+$repo = $(get_config SCOOP_REPO)
 if(!$repo) {
     $repo = "https://github.com/lukesampson/scoop"
-    scoop config SCOOP_REPO "$repo"
+    set_config SCOOP_REPO "$repo"
 }
 
-$branch = $(scoop config SCOOP_BRANCH)
+$branch = $(get_config SCOOP_BRANCH)
 if(!$branch) {
     $branch = "master"
-    scoop config SCOOP_BRANCH "$branch"
+    set_config SCOOP_BRANCH "$branch"
 }
 
 function update_scoop() {
@@ -80,7 +80,7 @@ function update_scoop() {
         Push-Location $currentdir
 
         # Check if user configured other branch
-        $branch = $(scoop config SCOOP_BRANCH)
+        $branch = $(get_config SCOOP_BRANCH)
         if ((git_branch) -notlike "*$branch") { git_checkout $branch }
 
         git_pull -q
