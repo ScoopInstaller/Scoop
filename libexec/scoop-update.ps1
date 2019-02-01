@@ -94,6 +94,10 @@ function update_scoop() {
         }
     }
 
+    if (@(buckets) -notcontains 'main') {
+        add_bucket 'main'
+    }
+
     ensure_scoop_in_path
     shim "$currentdir\bin\scoop.ps1" $false
 
