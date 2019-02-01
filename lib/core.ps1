@@ -25,15 +25,16 @@ function Optimize-SecurityProtocol {
     # which allows the operating system to choose the best protocol to use.
     # If not contains 'SystemDefault', set highest encryption for SecurityProtocol.
     if ([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'SystemDefault') {
-        # Set TLS 1.2 (3072), then TLS 1.1 (768), finially TLS 1.0 (192). Ssl3 has been superseded
+        # Set to TLS 1.2 (3072), then TLS 1.1 (768), finally TLS 1.0 (192). Ssl3 has been superseded
         # https://docs.microsoft.com/en-us/dotnet/api/system.net.securityprotocoltype?view=netframework-4.5
         [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
     } else {
         # else if SecurityProtocol has been changed, reset it to SystemDefault
         if (!([System.Net.ServicePointManager]::SecurityProtocol.Equals(`
             [System.Net.SecurityProtocolType]::SystemDefault))) {
-            # Set to SystemDefault (0)
-            [System.Net.ServicePointManager]::SecurityProtocol = 0
+            # Set to SystemDefault (0) first. TLS 1.2 (3072), TLS 1.1 (768) and TLS 1.0 (192)
+            # follow up to prevent "The underlying connection was closed" problem.
+            [System.Net.ServicePointManager]::SecurityProtocol = 0 -bor 3072 -bor 768 -bor 192
         }
     }
 }
