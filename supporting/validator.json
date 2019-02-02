@@ -1,0 +1,8 @@
+{
+    "notes": [
+        "Newtonsoft.json.dll",
+        "Newtonsoft.json.Schema.dll",
+        "Scoop.Validator.dll",
+        "validator.exe"
+    ]
+}

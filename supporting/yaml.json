@@ -1,0 +1,18 @@
+{
+    "version": "0.4.0",
+    "homepage": "https://github.com/cloudbase/powershell-yaml/",
+    "url": "https://psg-prod-eastus.azureedge.net/packages/powershell-yaml.0.4.0.nupkg",
+    "hash": "442ad58604699867e0dbefa852370b5becb0ec6fc5ba9cad41ff79271f350fcb",
+    "pre_install": [
+        "@('package', 'Tests', '_rels', '*.xml') | ForEach-Object { Remove-Item \"$dir\\$_\" -Force -Recurse }",
+        "$delete = (Get-ChildItem \"$dir\\*\" -Exclude '*.dll', '*.psd1', '*.ps1', '*.psm1' -File -Recurse).FullName",
+        "Remove-Item $delete"
+    ],
+    "checkver": {
+        "url": "https://www.powershellgallery.com/packages/powershell-yaml/",
+        "regex": "<h2>([\\d\\.]+)"
+    },
+    "autoupdate": {
+        "url": "https://psg-prod-eastus.azureedge.net/packages/powershell-yaml.$version.nupkg"
+    }
+}
