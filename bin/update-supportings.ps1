@@ -14,7 +14,7 @@ foreach ($sup in $SUPPORTINGS) {
 
     $manifest = parse_json $sup
     $dir = "$(Split-Path $sup -Parent)\$name\bin"
-    if (!(Tets-Path $dir)) { New-Item $dir -ItemType Directory | Out-Null }
+    if (!(Test-Path $dir)) { New-Item $dir -ItemType Directory | Out-Null }
 
     $fname = dl_urls $name $manifest.version $manifest '' default_architecture $dir $true $true
     # Pre install es enough now
