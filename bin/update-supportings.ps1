@@ -17,7 +17,7 @@ foreach ($sup in $SUPPORTINGS) {
     if (!(Test-Path $dir)) { New-Item $dir -ItemType Directory | Out-Null }
 
     $fname = dl_urls $name $manifest.version $manifest '' default_architecture $dir $true $true
-    # Pre install es enough now
+    # Pre install is enough now
     pre_install $manifest $architecture
 
     Write-Host "$name done" -ForegroundColor Green
