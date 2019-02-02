@@ -18,6 +18,12 @@ $globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | Select-Object -first 
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 
+$hashMD5 = '[A-Fa-f\d]{32}'
+$hashsha1 = '[A-Fa-f\d]{40}'
+$hashsha256 = '[A-Fa-f\d]{64}'
+$hashsha512 = '[A-Fa-f\d]{128}'
+$hashBASE64 = '(?:[A-Za-z\d+\/]{4})*(?:[A-Za-z\d+\/]{2}==|[A-Za-z\d+\/]{3}=|[A-Za-z\d+\/]{4})'
+
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
 # for all communication with api.github.com
 function Optimize-SecurityProtocol {
@@ -637,7 +643,12 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
             if($regexEscape -eq $false -or $null -eq $_.Value) {
                 $entity = $entity.Replace($_.Name, $_.Value)
             } else {
-                $entity = $entity.Replace($_.Name, [Regex]::Escape($_.Value))
+                $rep = [Regex]::Escape($_.Value)
+                # If regex contains $hash variables, value cannot be escaped
+                if ($_.Name.StartsWith('$hash')) {
+                    $rep = $_.Value
+                }
+                $entity = $entity.Replace($_.Name, $rep)
             }
         }
         return $entity

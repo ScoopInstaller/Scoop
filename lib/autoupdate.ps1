@@ -1,13 +1,10 @@
 <#
 TODO
- - add a github release autoupdate type
  - tests (single arch, without hashes etc.)
  - clean up
 #>
-. "$psscriptroot\..\lib\json.ps1"
-
-. "$psscriptroot/core.ps1"
-. "$psscriptroot/json.ps1"
+. "$PSScriptRoot\core.ps1"
+. "$PSScriptRoot\json.ps1"
 
 function find_hash_in_rdf([String] $url, [String] $basename) {
     $data = $null
@@ -146,6 +143,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $substitutions.Add('$url', (strip_fragment $url))
     $substitutions.Add('$baseurl', (strip_filename (strip_fragment $url)).TrimEnd('/'))
     $substitutions.Add('$basename', $basename)
+
+    $substitutions.Add('$hashMD5', $hashMD5)
+    $substitutions.Add('$hashSHA1', $hashSHA1)
+    $substitutions.Add('$hashSHA256', $hashSHA256)
+    $substitutions.Add('$hashSHA512', $hashSHA512)
+    $substitutions.Add('$hashBASE64', $hashBASE64)
 
     $hashfile_url = substitute $config.url $substitutions
     if ($hashfile_url) {
