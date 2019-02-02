@@ -1,12 +1,12 @@
 {
     "homepage": "https://dev.mysql.com/downloads/mysql/",
-    "version": "8.0.14",
+    "version": "8.0.15",
     "license": "GPL-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.14-winx64.zip",
-            "hash": "md5:227dadd6a3c89dda1032be27619924ee",
-            "extract_dir": "mysql-8.0.14-winx64"
+            "url": "https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.15-winx64.zip",
+            "hash": "md5:75fd5cd2676209550a8b9bac4fd0a8b6",
+            "extract_dir": "mysql-8.0.15-winx64"
         }
     },
     "bin": [
