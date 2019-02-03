@@ -296,8 +296,8 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         if($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
-            debug $urlstxt_content
-            debug $aria2
+            error $urlstxt_content
+            error $aria2
             abort $(new_issue_msg $app $bucket "download via aria2 failed")
         }
 
