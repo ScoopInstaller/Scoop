@@ -48,6 +48,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     }
 
     $regex = substitute $regex $substitutions $true
+    debug $regex
     if ($hashfile -match $regex) {
         $hash = $matches[1] -replace ' ',''
     }
@@ -146,8 +147,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $substitutions.Add('$url', (strip_fragment $url))
     $substitutions.Add('$baseurl', (strip_filename (strip_fragment $url)).TrimEnd('/'))
     $substitutions.Add('$basename', $basename)
+    debug $substitutions
 
     $hashfile_url = substitute $config.url $substitutions
+    debug $hashfile_url
     if ($hashfile_url) {
         write-host -f DarkYellow 'Searching hash for ' -NoNewline
         write-host -f Green $(url_remote_filename $url) -NoNewline
