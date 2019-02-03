@@ -32,6 +32,14 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
 function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex) {
     $hashfile = $null
 
+    $templates = @{
+        '$md5' = '([a-fA-F0-9]{32})';
+        '$sha1' = '([a-fA-F0-9]{40})';
+        '$sha256' = '([a-fA-F0-9]{64})';
+        '$sha512' = '([a-fA-F0-9]{128})';
+        '$checksum' = '([a-fA-F0-9]{32,128})';
+    }
+
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
@@ -47,6 +55,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $regex = '^([a-fA-F0-9]+)$'
     }
 
+    $regex = substitute $regex $templates $false
     $regex = substitute $regex $substitutions $true
     debug $regex
     if ($hashfile -match $regex) {
