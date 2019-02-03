@@ -251,7 +251,7 @@ function isFileLocked([string]$path) {
     }
 }
 
-function unzip($path, $to) {
+function extract_zip($path, $to) {
     if (!(test-path $path)) { abort "can't find $path to unzip"}
     try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
     catch { unzip_old $path $to; return } # for .net earlier than 4.5

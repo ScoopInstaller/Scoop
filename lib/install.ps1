@@ -529,8 +529,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         # work out extraction method, if applicable
         $extract_fn = $null
-        if($fname -match '\.zip$') { # unzip
-            $extract_fn = 'unzip'
+        if($fname -match '\.zip$') {
+            $extract_fn = 'extract_zip'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
             $msi = msi $manifest $architecture
