@@ -61,7 +61,7 @@ function error($msg) { write-host "ERROR $msg" -f darkred }
 function warn($msg) {  write-host "WARN  $msg" -f darkyellow }
 function info($msg) {  write-host "INFO  $msg" -f darkgray }
 function debug($obj) {
-    if($env:SCOOP_DEBUG -ine 'true') {
+    if((get_config 'debug' $false) -ine 'true') {
         return
     }
 
