@@ -1,6 +1,56 @@
-# Scoop [![Build status](https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true)](https://ci.appveyor.com/project/lukesampson/scoop) [![Gitter chat](https://badges.gitter.im/lukesampson/scoop.png)](https://gitter.im/lukesampson/scoop)
+<p align="center">
+<!--<img src="scoop.png" alt="Long live Scoop!"/>-->
+    <h1 align="center">Scoop</h1>
+</p>
+<p align="center">
+<b><a href="https://github.com/lukesampson/scoop#what-does-scoop-do">Features</a></b>
+|
+<b><a href="https://github.com/lukesampson/scoop#installation">Installation</a></b>
+|
+<b><a href="https://github.com/lukesampson/scoop/wiki">Documentation</a></b>
+</p>
+
+- - -
+<p align="center" >
+    <a href="https://github.com/lukesampson/scoop">
+        <img src="https://img.shields.io/github/languages/code-size/lukesampson/scoop.svg" alt="Code Size" />
+    </a>
+    <a href="https://github.com/lukesampson/scoop">
+        <img src="https://img.shields.io/github/repo-size/lukesampson/scoop.svg" alt="Repository size" />
+    </a>
+    <a href="https://ci.appveyor.com/project/lukesampson/scoop">
+        <img src="https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true" alt="Build Status" />
+    </a> 
+    <a href="https://gitter.im/lukesampson/scoop">
+        <img src="https://badges.gitter.im/lukesampson/scoop.png" alt="Gitter Chat" />
+    </a> 
+    <a href="https://github.com/lukesampson/scoop/blob/master/LICENSE">
+        <img src="https://img.shields.io/github/license/lukesampson/scoop.svg" alt="License" />
+    </a>
+</p>
 
 Scoop is a command-line installer for Windows.
+
+## What does Scoop do?
+
+Scoop installs programs from the command line with a minimal amount of friction. It tries to eliminate things like:
+* Permission popup windows
+* GUI wizard-style installers
+* Path pollution from installing lots of programs
+* Unexpected side-effects from installing and uninstalling programs
+* The need to find and install dependencies
+* The need to perform extra setup steps to get a working program
+
+Scoop is very scriptable, so you can run repeatable setups to get your environment just the way you like, e.g.:
+
+```powershell
+scoop install sudo
+sudo scoop install 7zip git openssh --global
+scoop install aria2 curl grep sed less touch
+scoop install python ruby go perl
+```
+
+If you've built software that you'd like others to use, Scoop is an alternative to building an installer (e.g. MSI or InnoSetup) — you just need to zip your program and provide a JSON manifest that describes how to install it.
 
 ## Requirements
 
@@ -33,27 +83,6 @@ iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 [environment]::setEnvironmentVariable('SCOOP_GLOBAL','F:\GlobalScoopApps','Machine')
 $env:SCOOP_GLOBAL='F:\GlobalScoopApps'
 ```
-
-## What does Scoop do?
-
-Scoop installs programs from the command line with a minimal amount of friction. It tries to eliminate things like:
-* Permission popup windows
-* GUI wizard-style installers
-* Path pollution from installing lots of programs
-* Unexpected side-effects from installing and uninstalling programs
-* The need to find and install dependencies
-* The need to perform extra setup steps to get a working program
-
-Scoop is very scriptable, so you can run repeatable setups to get your environment just the way you like, e.g.:
-
-```powershell
-scoop install sudo
-sudo scoop install 7zip git openssh --global
-scoop install aria2 curl grep sed less touch
-scoop install python ruby go perl
-```
-
-If you've built software that you'd like others to use, Scoop is an alternative to building an installer (e.g. MSI or InnoSetup)—you just need to zip your program and provide a JSON manifest that describes how to install it.
 
 ## [Documentation](https://github.com/lukesampson/scoop/wiki)
 
