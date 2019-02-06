@@ -20,10 +20,10 @@
     </a>
     <a href="https://ci.appveyor.com/project/lukesampson/scoop">
         <img src="https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true" alt="Build Status" />
-    </a> 
+    </a>
     <a href="https://gitter.im/lukesampson/scoop">
         <img src="https://badges.gitter.im/lukesampson/scoop.png" alt="Gitter Chat" />
-    </a> 
+    </a>
     <a href="https://github.com/lukesampson/scoop/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/lukesampson/scoop.svg" alt="License" />
     </a>
