@@ -1,11 +1,11 @@
 {
     "homepage": "https://hashlink.haxe.org/",
     "description": "HashLink is a virtual machine for Haxe",
-    "version": "1.8.0",
+    "version": "1.9.0",
     "license": "MIT",
-    "url": "https://github.com/HaxeFoundation/hashlink/releases/download/1.8/hl-1.8.0-win.zip",
-    "hash": "f20b4f5619cdcd56616185cfd22c1294f44e0f3e76bed4c63ac47344b82cb9da",
-    "extract_dir": "hl-1.8.0-win",
+    "url": "https://github.com/HaxeFoundation/hashlink/releases/download/1.9/hl-1.9.0-win.zip",
+    "hash": "9ac9fe3a25ed98267951f55a31967f8d5c335381000426178a64a98e8200e112",
+    "extract_dir": "hl-1.9.0-win",
     "bin": "hl.exe",
     "env_set": {
         "HASHLINKPATH": "$dir"
