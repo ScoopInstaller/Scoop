@@ -3,7 +3,7 @@
     "license": "Apache-2.0",
     "version": "1.9.0",
     "url": "https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip",
-    "hash": "6af9a6e5afba71fff0aa406ead9331038e87e56f1987a604b4a837dd5ee34fe3",
+    "hash": "2d70010633ddaacc3af4ffbd21e22fae90d158674a09e132e06424ba3ab036e9",
     "bin": "ninja.exe",
     "checkver": {
         "github": "https://github.com/ninja-build/ninja"
