@@ -1,7 +1,9 @@
 {
     "_comment": "Version 2.8.3 was moved to https://github.com/scoopinstaller/versions/blob/master/lynx283.json",
     "version": "2.9.0dev.1",
-    "homepage": "http://invisible-island.net/lynx/lynx.html",
+    "description": "Fully featured World-Wide Web browser.",
+    "homepage": "https://invisible-island.net/lynx/lynx.html",
+    "license": "GPL-2.0-only",
     "architecture": {
         "32bit": {
             "url": "https://invisible-island.net/datafiles/current/lynx-newssl-setup.exe",
