@@ -20,12 +20,23 @@ $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
 # for all communication with api.github.com
-function enable-encryptionscheme([Net.SecurityProtocolType]$scheme) {
-    # Net.SecurityProtocolType is a [Flags] enum, binary-OR sets
-    # the specified scheme in addition to whatever scheme is already active
-    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor $scheme
+function Optimize-SecurityProtocol {
+    # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
+    # which allows the operating system to choose the best protocol to use.
+    # If SecurityProtocolType contains 'SystemDefault' (means .NET4.7+ detected)
+    # and the value of SecurityProtocol is 'SystemDefault', just do nothing on SecurityProtocol,
+    # 'SystemDefault' will use TLS 1.2 if the webrequest requires.
+    $isNewerNetFramework = ([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -contains 'SystemDefault')
+    $isSystemDefault = ([System.Net.ServicePointManager]::SecurityProtocol.Equals([System.Net.SecurityProtocolType]::SystemDefault))
+
+    # If not, change it to support TLS 1.2
+    if (!($isNewerNetFramework -and $isSystemDefault)) {
+        # Set to TLS 1.2 (3072), then TLS 1.1 (768), and TLS 1.0 (192). Ssl3 has been superseded,
+        # https://docs.microsoft.com/en-us/dotnet/api/system.net.securityprotocoltype?view=netframework-4.5
+        [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
+    }
 }
-enable-encryptionscheme "Tls12"
+Optimize-SecurityProtocol
 
 function Get-UserAgent() {
     return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
@@ -49,11 +60,33 @@ function abort($msg, [int] $exit_code=1) { write-host $msg -f red; exit $exit_co
 function error($msg) { write-host "ERROR $msg" -f darkred }
 function warn($msg) {  write-host "WARN  $msg" -f darkyellow }
 function info($msg) {  write-host "INFO  $msg" -f darkgray }
-function debug($msg, $indent = $false) {
-    if($indent) {
-        write-host "    DEBUG $msg" -f darkcyan
+function debug($obj) {
+    if((get_config 'debug' $false) -ine 'true') {
+        return
+    }
+
+    $prefix = "DEBUG[$(Get-Date -UFormat %s)]"
+    $param = $MyInvocation.Line.Replace($MyInvocation.InvocationName, '').Trim()
+    $msg = $obj | Out-String -Stream
+
+    if($null -eq $obj -or $null -eq $msg) {
+        Write-Host "$prefix $param = " -f DarkCyan -NoNewline
+        Write-Host '$null' -f DarkYellow -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        return
+    }
+
+    if($msg.GetType() -eq [System.Object[]]) {
+        Write-Host "$prefix $param ($($obj.GetType()))" -f DarkCyan -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        $msg | Where-Object { ![String]::IsNullOrWhiteSpace($_) } |
+            Select-Object -Skip 2 | # Skip headers
+            ForEach-Object {
+                Write-Host "$prefix $param.$($_)" -f DarkCyan
+            }
     } else {
-        write-host "DEBUG $msg" -f darkcyan
+        Write-Host "$prefix $param = $($msg.Trim())" -f DarkCyan -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
     }
 }
 function success($msg) { write-host $msg -f darkgreen }
@@ -240,7 +273,7 @@ function isFileLocked([string]$path) {
     }
 }
 
-function unzip($path, $to) {
+function extract_zip($path, $to) {
     if (!(test-path $path)) { abort "can't find $path to unzip"}
     try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
     catch { unzip_old $path $to; return } # for .net earlier than 4.5

@@ -32,6 +32,14 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
 function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex) {
     $hashfile = $null
 
+    $templates = @{
+        '$md5' = '([a-fA-F0-9]{32})';
+        '$sha1' = '([a-fA-F0-9]{40})';
+        '$sha256' = '([a-fA-F0-9]{64})';
+        '$sha512' = '([a-fA-F0-9]{128})';
+        '$checksum' = '([a-fA-F0-9]{32,128})';
+    }
+
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
@@ -47,7 +55,9 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $regex = '^([a-fA-F0-9]+)$'
     }
 
+    $regex = substitute $regex $templates $false
     $regex = substitute $regex $substitutions $true
+    debug $regex
     if ($hashfile -match $regex) {
         $hash = $matches[1] -replace ' ',''
     }
@@ -146,8 +156,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $substitutions.Add('$url', (strip_fragment $url))
     $substitutions.Add('$baseurl', (strip_filename (strip_fragment $url)).TrimEnd('/'))
     $substitutions.Add('$basename', $basename)
+    debug $substitutions
 
     $hashfile_url = substitute $config.url $substitutions
+    debug $hashfile_url
     if ($hashfile_url) {
         write-host -f DarkYellow 'Searching hash for ' -NoNewline
         write-host -f Green $(url_remote_filename $url) -NoNewline

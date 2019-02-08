@@ -1,6 +1,7 @@
 {
-    "homepage": "http://www.red-lang.org",
+    "homepage": "https://www.red-lang.org",
     "version": "0.6.4",
+    "description": "Programming language inspired by Rebol.",
     "license": "BSD-3-Clause,BSL-1.0",
     "url": "https://static.red-lang.org/dl/win/red-064.exe#/red.exe",
     "hash": "45eb8d089b6e25701e4208ac5d1db0c483752e0abff28f58baff5a39f765db9c",
@@ -10,6 +11,10 @@
         "re": "Red\\s+([\\d.]+)\\s+for"
     },
     "autoupdate": {
-        "url": "https://static.red-lang.org/dl/win/red-$cleanVersion.exe#/red.exe"
+        "url": "https://static.red-lang.org/dl/win/red-$cleanVersion.exe#/red.exe",
+        "hash": {
+            "url": "http://static.red-lang.org/download.html",
+            "regex": "($sha256)"
+        }
     }
 }

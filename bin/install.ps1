@@ -46,7 +46,7 @@ Write-Output 'Downloading...'
 dl $zipurl $zipfile
 
 'Extracting...'
-unzip $zipfile "$dir\_tmp"
+extract_zip $zipfile "$dir\_tmp"
 Copy-Item "$dir\_tmp\scoop-master\*" $dir -r -force
 Remove-Item "$dir\_tmp" -r -force
 Remove-Item $zipfile
