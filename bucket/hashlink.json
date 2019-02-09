@@ -4,7 +4,7 @@
     "version": "1.9.0",
     "license": "MIT",
     "url": "https://github.com/HaxeFoundation/hashlink/releases/download/1.9/hl-1.9.0-win.zip",
-    "hash": "9ac9fe3a25ed98267951f55a31967f8d5c335381000426178a64a98e8200e112",
+    "hash": "8a2f2960f0174e6585e685fcc6fb93839b2f01600be3f6327f13bf72b5363950",
     "extract_dir": "hl-1.9.0-win",
     "bin": "hl.exe",
     "env_set": {

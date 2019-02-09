@@ -1,16 +1,16 @@
 {
     "homepage": "https://haxe.org/",
     "description": "Pre-release version of Haxe, for a stable version use haxe. Haxe is an open source toolkit based on a modern, high level, strictly typed programming language, a cross-compiler, a complete cross-platform standard library and ways to access each platform's native capabilities.",
-    "version": "4.0.0-preview.5",
+    "version": "4.0.0-rc.1",
     "license": "GPL-2.0-or-later",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/HaxeFoundation/haxe/releases/download/4.0.0-preview.5/haxe-4.0.0-preview.5-win64.zip",
-            "hash": "15409fce0a1d6a43c3ff5c24d1c39e9e56de63f06bb0a3d1a6641139a26aed26"
+            "url": "https://github.com/HaxeFoundation/haxe/releases/download/4.0.0-rc.1/haxe-4.0.0-rc.1-win64.zip",
+            "hash": "ef533d35e628cf8bb28753ef25c242ecc439173bfb2abaddcad9eee690d0b9c0"
         },
         "32bit": {
-            "url": "https://github.com/HaxeFoundation/haxe/releases/download/4.0.0-preview.5/haxe-4.0.0-preview.5-win.zip",
-            "hash": "fa632a480b4cc7a4cdb868d84bcf0d3b4af7e8bdcd91abaedd8e25ecc78ac03d"
+            "url": "https://github.com/HaxeFoundation/haxe/releases/download/4.0.0-rc.1/haxe-4.0.0-rc.1-win.zip",
+            "hash": "5ab125971dc8696af30035dc5af44a68a2f956d53682ca4f4c021c30b09e87f5"
         }
     },
     "bin": [
@@ -30,7 +30,7 @@
     ],
     "checkver": {
         "url": "https://github.com/HaxeFoundation/haxe/releases",
-        "re": "([\\d.]+-preview[\\d.]+)"
+        "re": "([\\d\\.]+-(rc|preview)[\\d\\.]+)"
     },
     "autoupdate": {
         "architecture": {
