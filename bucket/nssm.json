@@ -1,14 +1,16 @@
 {
-    "homepage": "https://nssm.cc",
     "version": "2.24",
+    "description": "The Non-Sucking Service Manager.",
+    "homepage": "https://nssm.cc/",
+    "license": "Public Domain",
     "url": "https://nssm.cc/release/nssm-2.24.zip",
-    "hash": "727d1e42275c605e0f04aba98095c38a8e1e46def453cdffce42869428aa6743",
+    "hash": "sha1:be7b3577c6e3a280e5106a9e9db5b3775931cefc",
     "architecture": {
         "64bit": {
-            "extract_dir": "nssm-2.24/win64"
+            "extract_dir": "nssm-2.24\\win64"
         },
         "32bit": {
-            "extract_dir": "nssm-2.24/win32"
+            "extract_dir": "nssm-2.24\\win32"
         }
     },
     "bin": [
@@ -19,22 +21,22 @@
         ]
     ],
     "checkver": {
-        "re": "<a href=\"/release/nssm-([\\d.]+)\\.zip\"",
-        "url": "https://nssm.cc/download"
+        "url": "https://nssm.cc/changelog/",
+        "regex": "Changes since ([\\d\\.]+)"
     },
     "autoupdate": {
         "url": "https://nssm.cc/release/nssm-$version.zip",
+        "hash": {
+            "url": "https://nssm.cc/download/",
+            "regex": "\\[($sha1)\\]"
+        },
         "architecture": {
             "64bit": {
-                "extract_dir": "nssm-$version/win64"
+                "extract_dir": "nssm-$version\\win64"
             },
             "32bit": {
-                "extract_dir": "nssm-$version/win32"
+                "extract_dir": "nssm-$version\\win32"
             }
         }
-    },
-    "notes": [
-        "Manage Services with NSSM (GUI based) (e.g., 'nssm install nginx' to install nginx as service gui will popup or 'nssm start/status/stop apache').",
-        "Visit https://nssm.cc/commands for more info"
-    ]
+    }
 }
