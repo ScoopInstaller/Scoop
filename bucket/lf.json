@@ -2,21 +2,21 @@
     "homepage": "https://godoc.org/github.com/gokcehan/lf",
     "description": "A terminal file manager written in Go",
     "license": "MIT",
-    "version": "r1",
+    "version": "r10",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/gokcehan/lf/releases/download/r1/lf-windows-amd64.zip",
-            "hash": "f74911b28801e385709f11934874586c748b63cd69e2937c67211b5ca7e67d7b"
+            "url": "https://github.com/gokcehan/lf/releases/download/r10/lf-windows-amd64.zip",
+            "hash": "719d2586e7bf449af8f9dd64b6f784a505903b355f2a09938108c87c86f51bd9"
         },
         "32bit": {
-            "url": "https://github.com/gokcehan/lf/releases/download/r1/lf-windows-386.zip",
-            "hash": "13183efb038da0d1186cf7056832301e9b07bbd75b3e27992d38d765c43663f1"
+            "url": "https://github.com/gokcehan/lf/releases/download/r10/lf-windows-386.zip",
+            "hash": "fe37dfd6ea18c5645ff095737a49adcc26de8b5535a0772fbe1bdcae2c7fbbe7"
         }
     },
     "bin": "lf.exe",
     "checkver": {
-        "url": "https://github.com/gokcehan/lf/releases/latest",
-        "re": "/releases/tag/(r[\\d])"
+        "github": "https://github.com/gokcehan/lf/",
+        "regex": "tag/(r[\\d]+)"
     },
     "autoupdate": {
         "architecture": {
