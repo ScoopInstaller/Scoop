@@ -4,7 +4,7 @@
     "license": "Public Domain",
     "url": "https://www.sqlite.org/2019/sqlite-tools-win32-x86-3270100.zip",
     "hash": "d0c0929e51682c28cd81247d6c894543bb8aaf441b0a6546d7f29b6aa38045e9",
-    "extract_dir": "sqlite-tools-win32-x86-3260000",
+    "extract_dir": "sqlite-tools-win32-x86-3270100",
     "bin": [
         "sqlite3.exe",
         "sqldiff.exe",
