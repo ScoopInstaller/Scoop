@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.sqlite.org/",
-    "version": "3.26.0",
+    "version": "3.27.1",
     "license": "Public Domain",
-    "url": "https://www.sqlite.org/2018/sqlite-tools-win32-x86-3260000.zip",
-    "hash": "0218b458495affe108e63e0786bbe7418dcd2da3d28c07207c466a16cded8793",
+    "url": "https://www.sqlite.org/2019/sqlite-tools-win32-x86-3270100.zip",
+    "hash": "d0c0929e51682c28cd81247d6c894543bb8aaf441b0a6546d7f29b6aa38045e9",
     "extract_dir": "sqlite-tools-win32-x86-3260000",
     "bin": [
         "sqlite3.exe",
@@ -15,7 +15,7 @@
         "re": "sqlite-tools-win32-x86-(?<number>[\\d]+).zip[\\s\\S]+for SQLite version (?<version>[\\d.]+)\\."
     },
     "autoupdate": {
-        "url": "https://www.sqlite.org/2018/sqlite-tools-win32-x86-$matchNumber.zip",
+        "url": "https://www.sqlite.org/2019/sqlite-tools-win32-x86-$matchNumber.zip",
         "extract_dir": "sqlite-tools-win32-x86-$matchNumber"
     }
 }
