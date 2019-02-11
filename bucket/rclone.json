@@ -1,33 +1,38 @@
 {
     "homepage": "https://rclone.org",
+    "description": "rsync for cloud storage",
     "version": "1.46",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ncw/rclone/releases/download/v1.46/rclone-v1.46-windows-amd64.zip",
+            "url": "https://downloads.rclone.org/v1.46/rclone-v1.46-windows-amd64.zip",
             "hash": "1ac2930725ddb9c3d22c7ed677a4c1d3c5358972ef38d5f1a33486dc5c64be6b",
             "extract_dir": "rclone-v1.46-windows-amd64"
         },
         "32bit": {
-            "url": "https://github.com/ncw/rclone/releases/download/v1.46/rclone-v1.46-windows-386.zip",
+            "url": "https://downloads.rclone.org/v1.46/rclone-v1.46-windows-386.zip",
             "hash": "3b706a692d8a8e6260d09a33fda350b369e7c71a85ca822f4ab071eac79fc4fe",
             "extract_dir": "rclone-v1.46-windows-386"
         }
     },
     "bin": "rclone.exe",
     "checkver": {
-        "github": "https://github.com/ncw/rclone"
+        "url": "https://downloads.rclone.org/version.txt",
+        "regex": "rclone v(.+)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/ncw/rclone/releases/download/v$version/rclone-v$version-windows-amd64.zip",
+                "url": "https://downloads.rclone.org/v$version/rclone-v$version-windows-amd64.zip",
                 "extract_dir": "rclone-v$version-windows-amd64"
             },
             "32bit": {
-                "url": "https://github.com/ncw/rclone/releases/download/v$version/rclone-v$version-windows-386.zip",
+                "url": "https://downloads.rclone.org/v$version/rclone-v$version-windows-386.zip",
                 "extract_dir": "rclone-v$version-windows-386"
             }
+        },
+        "hash": {
+            "url": "$baseurl/SHA256SUMS"
         }
     }
 }
