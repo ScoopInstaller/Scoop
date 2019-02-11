@@ -16,9 +16,6 @@
         }
     },
     "bin": "rclone.exe",
-    "env_set": {
-        "XDG_CONFIG_HOME": "$persist_dir\\.."
-    },
     "checkver": {
         "url": "https://downloads.rclone.org/version.txt",
         "regex": "rclone v(.+)"
