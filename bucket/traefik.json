@@ -1,16 +1,16 @@
 {
     "homepage": "https://traefik.io/",
     "description": "HTTP reverse proxy and load balancer",
-    "version": "1.7.8",
+    "version": "1.7.9",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/containous/traefik/releases/download/v1.7.8/traefik_windows-amd64.exe#/traefik.exe",
-            "hash": "34dd09c2f229ca55da0d616aa7fe044f87a8f98cb8c32eb4183e38f0cf508a7f"
+            "url": "https://github.com/containous/traefik/releases/download/v1.7.9/traefik_windows-amd64.exe#/traefik.exe",
+            "hash": "88a8f2c7b0032a2edbf896153f9bbae4929872abb7fb51b9ffd0b136ce38a102"
         },
         "32bit": {
-            "url": "https://github.com/containous/traefik/releases/download/v1.7.8/traefik_windows-386.exe#/traefik.exe",
-            "hash": "e3132ebee01973219bbc8ab8eee92544838bcdd597a80b77d702e6b0dd12f7c5"
+            "url": "https://github.com/containous/traefik/releases/download/v1.7.9/traefik_windows-386.exe#/traefik.exe",
+            "hash": "12d2e0288f3c29d5c6d42e6ac541421e7cd09a9fe4c61a3866b5a876f9ac0371"
         }
     },
     "bin": "traefik.exe",
