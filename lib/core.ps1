@@ -3,20 +3,39 @@
 #       Old installations should continue to work using the old path.
 #       There is currently no automatic migration path to deal
 #       with updating old installations to the new path.
-$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | Select-Object -first 1
+
+# Note: migrating $env:SCOOP to `.scoop` config
+if (!(get_config 'rootPath' $null) -and $env:SCOOP) {
+    scoop config 'rootPath' $env:SCOOP
+    [Environment]::SetEnvironmentVariable("SCOOP", $null, "User")
+    Write-Output "Notice: `$env:SCOOP has been migrated to 'rootPath' variable in '~/.scoop'."
+}
+
+$scoopdir = (get_config 'rootPath' $null), "$env:USERPROFILE\scoop" | Select-Object -first 1
 
 $oldscoopdir = "$env:LOCALAPPDATA\scoop"
 if((test-path $oldscoopdir) -and !$env:SCOOP) {
     $scoopdir = $oldscoopdir
 }
 
-$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | Select-Object -first 1
+# Note: migrating $env:SCOOP_GLOBAL to `.scoop` config
+if (!(get_config 'globalPath' $null) -and $env:SCOOP_GLOBAL) {
+    scoop config 'globalPath' $env:SCOOP_GLOBAL
+    Write-Output "Notice: `$env:SCOOP_GLOBAL has been migrated to 'globalPath' variable in '~/.scoop', you can now unset `$env:SCOOP_GLOBAL."
+}
+
+$globaldir = (get_config 'globalPath' $null), "$env:ProgramData\scoop" | Select-Object -first 1
 
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
+# Note: migrating $env:SCOOP_CACHE to `.scoop` config
+if (!(get_config 'cachePath' $null) -and $env:SCOOP_CACHE) {
+    scoop config 'cachePath' $env:SCOOP_CACHE
+    Write-Output "Notice: `$env:SCOOP_CACHE has been migrated to 'cachePath' variable in '~/.scoop', you can now unset `$env:SCOOP_CACHE."
+}
+$cachedir = (get_config 'cachePath' $null), "$scoopdir\cache" | Select-Object -first 1
 
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
 # for all communication with api.github.com
