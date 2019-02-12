@@ -19,8 +19,6 @@
         "Copy-Item -Recurse \"$dir\\dist\\nimble\\src\\nimblepkg\" \"$dir\\bin\""
     ],
     "bin": [
-        "bin\\c2nim.exe",
-        "bin\\makelink.exe",
         "bin\\nim.exe",
         "bin\\nimble.exe",
         "bin\\nimgrab.exe",
