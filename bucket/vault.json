@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.vaultproject.io",
     "license": "MPL-2.0",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "architecture": {
         "64bit": {
-            "url": "https://releases.hashicorp.com/vault/1.0.2/vault_1.0.2_windows_amd64.zip",
-            "hash": "3feb682ce8a3452ab1b9f7029710bf813662f56d6faa0f2d92fd545b9f7bcf76"
+            "url": "https://releases.hashicorp.com/vault/1.0.3/vault_1.0.3_windows_amd64.zip",
+            "hash": "1ab014315e40374e58fd3474a37d5989d65936419e8d6311f4d530913f2378f5"
         },
         "32bit": {
-            "url": "https://releases.hashicorp.com/vault/1.0.2/vault_1.0.2_windows_386.zip",
-            "hash": "6e74a1f0f752aed1bb8ccf39c18b30f585ff98e2dce9b1cfcaefc1421bce16d1"
+            "url": "https://releases.hashicorp.com/vault/1.0.3/vault_1.0.3_windows_386.zip",
+            "hash": "a906a5263acb8ef1ad7726cc1ae5105d468e0c0ba7308664a13c6f7d01627652"
         }
     },
     "bin": "vault.exe",
