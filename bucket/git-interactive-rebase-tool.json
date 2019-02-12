@@ -1,0 +1,32 @@
+{
+    "homepage": "https://gitrebasetool.mitmaro.ca/",
+    "version": "0.7.0",
+    "license": "ISC",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/MitMaro/git-interactive-rebase-tool/releases/download/0.7.0/git-interactive-rebase-tool-0.7.0-i686-pc-windows-msvc.zip",
+            "hash": "3d0e7e33c03929052830aefb40fdde1644e3cbb72b82c3a54b4308e197949a73"
+        },
+        "64bit": {
+            "url": "https://github.com/MitMaro/git-interactive-rebase-tool/releases/download/0.7.0/git-interactive-rebase-tool-0.7.0-x86_64-pc-windows-msvc.zip",
+            "hash": "158d5f5d0549da0d576d3d760c515f6e7c96be5dd451dd312f4090ad0ee5d269"
+        }
+    },
+    "bin": "interactive-rebase-tool.exe",
+    "notes": [
+        "Run 'git config --global sequence.editor interactive-rebase-tool' to configure as your rebase tool."
+    ],
+    "checkver": {
+        "github": "https://github.com/MitMaro/git-interactive-rebase-tool/"
+    },
+    "autoupdate": {
+        "architecture": {
+            "32bit": {
+                "url": "https://github.com/MitMaro/git-interactive-rebase-tool/releases/download/$version/git-interactive-rebase-tool-$version-i686-pc-windows-msvc.zip"
+            },
+            "64bit": {
+                "url": "https://github.com/MitMaro/git-interactive-rebase-tool/releases/download/$version/git-interactive-rebase-tool-$version-x86_64-pc-windows-msvc.zip"
+            }
+        }
+    }
+}
