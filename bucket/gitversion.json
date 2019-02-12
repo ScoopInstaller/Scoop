@@ -1,16 +1,21 @@
 {
-    "homepage": "https://gitversion.readthedocs.io/",
+    "homepage": "https://github.com/GitTools/GitVersion",
+    "description": "Easy Semantic Versioning for projects using Git.",
     "license": "MIT",
     "version": "4.0.0",
-    "url": "https://github.com/GitTools/GitVersion/releases/download/v4.0.0/GitVersion.Portable.4.0.0.nupkg#/dl.7z",
-    "hash": "69b0f096d172199365618372e24adb76b9f75fe762e7d30fd769b4e6338a79e6",
-    "bin": "GitVersion.exe",
+    "url": "https://packages.chocolatey.org/GitVersion.Portable.4.0.0.nupkg",
+    "hash": "b398d4ae7943fdfba9917bf8e96044191bef4b62fd4292c3083550d7cd6b95d7",
     "extract_dir": "tools",
-    "post_install": "Remove-Item \"$dir\\*.ps1\"",
+    "bin": "GitVersion.exe",
     "checkver": {
-        "github": "https://github.com/GitTools/GitVersion"
+        "url": "https://chocolatey.org/packages/GitVersion.Portable",
+        "regex": "Latest Version[\\S\\s]+?/([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://github.com/GitTools/GitVersion/releases/download/v$version/GitVersion.Portable.$version.nupkg#/dl.7z"
+        "url": "https://packages.chocolatey.org/GitVersion.Portable.$version.nupkg",
+        "hash": {
+            "url": "https://chocolatey.org/packages/GitVersion.Portable/$version",
+            "regex": "($sha256)/analysis/\">$basename"
+        }
     }
 }
