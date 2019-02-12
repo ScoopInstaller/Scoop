@@ -1,11 +1,11 @@
 {
     "homepage": "http://www.vim.org",
     "license": "Vim",
-    "version": "8.1.0895",
+    "version": "8.1.0897",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.1.0895/gvim_8.1.0895_x64.zip",
-            "hash": "6ab56e156720290c0b0bb06d3a66df9d56574ffe614a4b7dc2b3fab9b08a8e53"
+            "url": "https://github.com/vim/vim-win32-installer/releases/download/v8.1.0897/gvim_8.1.0897_x64.zip",
+            "hash": "116d6f48a606e6874189a3614c0f39f5a62ce1ae535120ef6d84dee2a99d632f"
         }
     },
     "extract_dir": "vim\\vim81",
