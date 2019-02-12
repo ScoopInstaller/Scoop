@@ -13,13 +13,13 @@ $issues += !(check_windows_defender $true)
 
 $globaldir = New-Object System.IO.DriveInfo($globaldir)
 if($globaldir.DriveFormat -ne 'NTFS') {
-    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP_GLOBAL variable to another Drive."
+    error "Scoop requires an NTFS volume to work! Please point 'globalPath' variable in '~/.scoop' to another Drive."
     $issues++
 }
 
 $scoopdir = New-Object System.IO.DriveInfo($scoopdir)
 if($scoopdir.DriveFormat -ne 'NTFS') {
-    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP variable to another Drive."
+    error "Scoop requires an NTFS volume to work! Please point 'rootPath' variable in '~/.scoop' to another Drive."
     $issues++
 }
 
