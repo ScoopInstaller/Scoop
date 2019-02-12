@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://slproweb.com/download/Win64OpenSSL-1_1_1a.exe",
-            "hash": "sha512:a5fb33664633161377210183ec27b5845b99161e3ce54ce3d32a3906676c03ac4177d32223986884da60e0c9e2d7fcc7ee66c29b620df544e6df9a3cc1d6075f"
+            "hash": "sha512:07a88335c05104f3d923c813053f4b9345be5357a1f3c4b5c8bbf3f76cae7cca09176d84d91dd63ac26e94a73825298e88d1c6350921e350828f11437a90beb5"
         },
         "32bit": {
             "url": "https://slproweb.com/download/Win32OpenSSL-1_1_1a.exe",
-            "hash": "sha512:f97700ac81e80dc91f194a39e7b3c03533778c8ff0f40a53333ec3c760f72c7559f8dd2df0c5b786fdf284a05faa91fb4fc58bcff8d923bbc300b7965c4eb69f"
+            "hash": "sha512:ed8b123a87e595846c8fde14ce03ec57f4d21d73f01bcbe1f63ed41a62b27a7386e8e918a55bf88357c3dc877c23bafb7ba5a8cb34d32fec3273fe8be300e0c0"
         }
     },
     "innosetup": true,
