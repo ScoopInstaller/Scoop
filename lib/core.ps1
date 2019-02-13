@@ -30,6 +30,7 @@ $globaldir = (get_config 'globalPath' $null), "$env:ProgramData\scoop" | Select-
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
+
 # Note: migrating $env:SCOOP_CACHE to `.scoop` config
 if (!(get_config 'cachePath' $null) -and $env:SCOOP_CACHE) {
     scoop config 'cachePath' $env:SCOOP_CACHE
