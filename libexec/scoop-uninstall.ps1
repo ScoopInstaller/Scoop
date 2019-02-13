@@ -109,6 +109,7 @@ if(!$apps) { exit 0 }
 
     # purge persistant data
     if ($purge) {
+        Write-Host 'Removing persisted data.'
         $persist_dir = persistdir $app $global
 
         if (Test-Path $persist_dir) {
