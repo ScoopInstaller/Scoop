@@ -695,13 +695,20 @@ function format_hash_aria2([String] $hash) {
 function handle_special_urls($url)
 {
     # FossHub.com
-    if($url -match "^(.*fosshub.com\/)(?<name>.*)\/(?<filename>.*)$") {
-        # create an url to request to request the expiring url
-        $name = $matches['name'] -replace '.html',''
-        $filename = $matches['filename']
-        # the key is a random 24 chars long hex string, so lets use ' SCOOPSCOOP ' :)
-        $url = "https://www.fosshub.com/gensLink/$name/$filename/2053434f4f5053434f4f5020"
-        $url = (Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content)
+    if ($url -match "^(?:.*fosshub.com\/)(?<name>.*)(?:\/|\?dwl=)(?<filename>.*)$") {
+        $Body = @{
+            projectUri      = $Matches.name;
+            fileName        = $Matches.filename;
+            isLatestVersion = $true
+        }
+        if ((Invoke-RestMethod -Uri $url) -match '"p":"(?<pid>[a-f0-9]{24}).*?"r":"(?<rid>[a-f0-9]{24})') {
+            $Body.Add("projectId", $Matches.pid)
+            $Body.Add("releaseId", $Matches.rid)
+        }
+        $url = Invoke-RestMethod -Method Post -Uri "https://api.fosshub.com/download/" -ContentType "application/json" -Body (ConvertTo-Json $Body -Compress)
+        if ($null -eq $url.error) {
+            $url = $url.data.url
+        }
     }
 
     # Sourceforge.net
