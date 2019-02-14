@@ -1,11 +1,11 @@
 {
     "homepage": "https://www.postgresql.org/",
-    "version": "11.1",
+    "version": "11.2",
     "license": "PostgreSQL",
     "architecture": {
         "64bit": {
-            "url": "https://get.enterprisedb.com/postgresql/postgresql-11.1-1-windows-x64-binaries.zip",
-            "hash": "e158f4e7b714bde8fa5b37370f8646b31ea9ab87595320d900bea07add4a7887"
+            "url": "https://get.enterprisedb.com/postgresql/postgresql-11.2-1-windows-x64-binaries.zip",
+            "hash": "12c361d7a43542e1556f593fe9971463199b73286f5dac6c6bdc83ded45a1ed8"
         }
     },
     "extract_dir": "pgsql",
