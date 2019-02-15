@@ -6,7 +6,7 @@
     "url": "https://s3.amazonaws.com/aws-cli/AWSCLI64PY3-1.16.105.msi",
     "hash": "74ddf3e45bcec079045aa111401f5064aa882b62593a315b95dc4fa117814a19",
     "extract_dir": "Amazon/AWSCLI",
-    "bin": "bin/aws.cmd",
+    "bin": "bin/aws.exe",
     "checkver": {
         "github": "https://github.com/aws/aws-cli"
     },
