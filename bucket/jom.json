@@ -14,6 +14,9 @@
         "regex": "This is the changelog for jom ([\\d.]+), the parallel make tool."
     },
     "autoupdate": {
-        "url": "https://download.qt.io/official_releases/jom/jom_$underscoreVersion.zip"
+        "url": "https://download.qt.io/official_releases/jom/jom_$underscoreVersion.zip",
+        "hash": {
+            "url": "$baseurl/md5sums.txt"
+        }
     }
 }
