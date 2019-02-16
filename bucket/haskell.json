@@ -5,6 +5,10 @@
         "64bit": {
             "url": "https://haskell.org/platform/download/8.6.3/HaskellPlatform-8.6.3-core-x86_64-setup.exe",
             "hash": "d94df2008a96a12957d27e4a99bbee38bd84f096a9474ede20126c73c89c1304"
+        },
+        "32bit": {
+            "url": "https://haskell.org/platform/download/8.6.3/HaskellPlatform-8.6.3-core-i386-setup.exe",
+            "hash": "e7ced4ec8aaee98cb49fd8e1d7dbd3f63fb148fec354e1bd7998a5e4e622f6b9"
         }
     },
     "installer": {
@@ -36,7 +40,18 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-core-x86_64-setup.exe"
+                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-core-x86_64-setup.exe",
+                "hash": {
+                    "url": "https://www.haskell.org/platform/windows.html",
+                    "regex": "(?sm)Start Menu.*64 bit Core:<br><textarea.+>($sha256).*32 bit Core"
+                }
+            },
+            "32bit": {
+                "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-core-i386-setup.exe",
+                "hash": {
+                    "url": "https://www.haskell.org/platform/windows.html",
+                    "regex": "32 bit Core:<br><textarea.+>($sha256)"
+                }
             }
         }
     }
