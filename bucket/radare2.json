@@ -53,7 +53,7 @@
             }
         },
         "hash": {
-            "url": "https://github.com/radare/radare2/releases/download/$version/checksums.sha1sum"
+            "url": "$baseurl/checksums.sha1sum"
         }
     }
 }
