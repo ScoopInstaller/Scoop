@@ -39,8 +39,8 @@ describe -Tag 'Manifests' "manifest-validation" {
             $validator = new-object Scoop.Validator($schema, $true)
             $validator.Validate("$working_dir/invalid_wget.json") | should -BeFalse
             $validator.Errors.Count | should -be 16
-            $validator.Errors | select-object -First 1 | should -match "invalid_wget.*randomproperty.*properties\.$"
-            $validator.Errors | select-object -Last 1 | should -match "invalid_wget.*version\.$"
+            $validator.Errors | select-object -First 1 | should -match "Property 'randomproperty' has not been defined and the schema does not allow additional properties\."
+            $validator.Errors | select-object -Last 1 | should -match "Required properties are missing from object: version\."
         }
     }
 
@@ -73,6 +73,7 @@ describe -Tag 'Manifests' "manifest-validation" {
                         $validator.Validate($file.fullname)
 
                         if ($validator.Errors.Count -gt 0) {
+                            write-host -f red "      [-] $_ has $($validator.Errors.Count) Error$(If($validator.Errors.Count -gt 1) { 's' })!"
                             write-host -f yellow $validator.ErrorsAsString
                         }
                         $validator.Errors.Count | should -be 0
