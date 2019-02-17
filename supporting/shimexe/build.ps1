@@ -1,8 +1,11 @@
+Param([Switch]$Fast)
 Push-Location $psscriptroot
 . "$psscriptroot\..\..\lib\install.ps1"
 
-Write-Host "Install dependencies ..."
-Invoke-Expression "$psscriptroot\install.ps1"
+if(!$Fast) {
+    Write-Host "Install dependencies ..."
+    Invoke-Expression "$psscriptroot\install.ps1"
+}
 
 $output = "$psscriptroot\bin"
 Write-Output 'Compiling shim.cs ...'
