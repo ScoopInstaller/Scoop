@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
@@ -118,19 +119,44 @@ namespace Scoop
 
             this.Manifest.IsValid(this.Schema, out validationErrors);
 
-            if (validationErrors.Count > 0)
+            if (validationErrors.Count == 0)
             {
-                foreach (ValidationError error in validationErrors)
-                {
-                    this.Errors.Add(String.Format("{0}{1}: {2}", (this.CI ? "    [*] " : ""), this.ManifestFile.Name, error.Message));
-                    foreach (ValidationError childError in error.ChildErrors)
-                    {
-                        this.Errors.Add(String.Format((this.CI ? "    [^] {0}{1}" : "{0}^ {1}"), new String(' ', this.ManifestFile.Name.Length + 2), childError.Message));
-                    }
-                }
+                return true;
             }
+            traverseErrors(validationErrors, this.CI ? 3 : 1);
 
             return (this.Errors.Count == 0);
+        }
+
+        public void traverseErrors(IList<ValidationError> errors, int level = 1) {
+            if(errors == null) {
+                return;
+            }
+            foreach (ValidationError error in errors)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Insert(sb.Length, " ", level * 2);
+                sb.Insert(sb.Length, this.CI ? "[*] " : "- ");
+                sb.AppendFormat("Error: {0}\n", error.Message);
+
+                sb.Insert(sb.Length, " ", level * 2);
+                sb.Insert(sb.Length, this.CI ? "  [^] " : "  ");
+                sb.AppendFormat("Line: {0}:{1}:{2}\n", this.ManifestFile.FullName, error.LineNumber, error.LinePosition);
+
+                sb.Insert(sb.Length, " ", level * 2);
+                sb.Insert(sb.Length, this.CI ? "  [^] " : "  ");
+                sb.AppendFormat("Path: {0}/{1}", error.SchemaId, error.ErrorType);
+
+                if(!this.CI) {
+                    sb.Insert(sb.Length, "\n");
+                }
+
+                this.Errors.Add(sb.ToString());
+
+                if(error.ChildErrors != null || error.ChildErrors.Count > 0) {
+                    traverseErrors(error.ChildErrors, level + 1);
+                }
+            }
         }
     }
 }
