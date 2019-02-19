@@ -8,7 +8,7 @@ function git_proxy_cmd {
 }
 
 function git_clone {
-    git_proxy_cmd clone $args
+    git_proxy_cmd clone --depth 1 $args
 }
 
 function git_ls_remote {
