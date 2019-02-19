@@ -26,14 +26,17 @@ if($apps) {
         $install_info = install_info $app $ver $global
         write-host "  $app " -NoNewline
         write-host -f DarkCyan $ver -NoNewline
-        if($global) {
-            write-host -f DarkRed ' *global*' -NoNewline
-        }
+
+        if($global) { write-host -f DarkGreen ' *global*' -NoNewline }
+
+        if (!$install_info) { Write-Host ' *failed*' -ForegroundColor DarkRed -NoNewline }
+
         if ($install_info.bucket) {
             write-host -f Yellow " [$($install_info.bucket)]" -NoNewline
         } elseif ($install_info.url) {
             write-host -f Yellow " [$($install_info.url)]" -NoNewline
         }
+
         if ($install_info.architecture -and $def_arch -ne $install_info.architecture) {
             write-host -f DarkRed " {$($install_info.architecture)}" -NoNewline
         }
