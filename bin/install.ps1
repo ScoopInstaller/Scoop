@@ -27,7 +27,7 @@ if([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'Tls1
 }
 
 # get core functions
-$core_url = 'https://raw.github.com/lukesampson/scoop/master/lib/core.ps1'
+$core_url = 'https://raw.githubusercontent.com/lukesampson/scoop/master/lib/core.ps1'
 Write-Output 'Initializing...'
 Invoke-Expression (new-object net.webclient).downloadstring($core_url)
 
