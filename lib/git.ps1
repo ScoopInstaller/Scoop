@@ -34,3 +34,7 @@ function git_checkout {
 function git_branch {
     git_proxy_cmd branch $args
 }
+
+function git_config {
+    git_proxy_cmd config $args
+}
