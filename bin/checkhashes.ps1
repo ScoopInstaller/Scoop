@@ -25,12 +25,12 @@
 param(
     [String] $App = '*',
     [ValidateScript( {
-            if (!(Test-Path $_ -Type Container)) {
-                throw "$_ is not a directory!"
-            } else {
-                $true
-            }
-        })]
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        } else {
+            $true
+        }
+    })]
     [String] $Dir = "$PSScriptRoot\..\bucket",
     [Switch] $Update,
     [Switch] $ForceUpdate,
@@ -92,7 +92,7 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
         continue
     }
 
-    $MANIFESTS += New-Object psobject @{
+    $MANIFESTS += @{
         app      = $name
         manifest = $manifest
         urls     = $urls
