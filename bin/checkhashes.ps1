@@ -65,9 +65,7 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
     $manifest = parse_json "$Dir\$($single.Name)"
 
     # Skip nighly manifests, since their hash validation is skipped
-    if ($manifest.version -eq 'nightly') {
-        continue
-    }
+    if ($manifest.version -eq 'nightly') { continue }
 
     $urls = @()
     $hashes = @()
@@ -101,12 +99,9 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
 }
 
 # clear any existing events
-Get-Event | ForEach-Object {
-    Remove-Event $_.SourceIdentifier
-}
+Get-Event | ForEach-Object { Remove-Event $_.SourceIdentifier }
 
-$MANIFESTS | ForEach-Object {
-    $current = $_
+foreach ($current in $MANIFESTS) {
     $count = 0
     # Array of indexes mismatched hashes.
     $mismatched = @()
