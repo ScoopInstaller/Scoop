@@ -105,8 +105,6 @@ Get-Event | ForEach-Object {
     Remove-Event $_.SourceIdentifier
 }
 
-$original = use_any_https_protocol
-
 $MANIFESTS | ForEach-Object {
     $current = $_
     $count = 0
