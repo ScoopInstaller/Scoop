@@ -1,9 +1,9 @@
 {
     "homepage": "https://drone.io/",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "license": "Apache-2.0",
-    "url": "https://github.com/drone/drone-cli/releases/download/v1.0.6/drone_windows_amd64.tar.gz",
-    "hash": "38a6fbf6aa048c992ab11c9912eb7edd56ffb26ace790b9bac46a410a8d3eb8c",
+    "url": "https://github.com/drone/drone-cli/releases/download/v1.0.7/drone_windows_amd64.tar.gz",
+    "hash": "40545cb57b50efa9bce0e5e129ad66a624e4aacaa6edb8c8282a2e712f157375",
     "bin": "drone.exe",
     "pre_install": "if(Test-Path \"$dir\\drone\") { Rename-Item \"$dir\\drone\" \"$dir\\drone.exe\" }",
     "checkver": {
