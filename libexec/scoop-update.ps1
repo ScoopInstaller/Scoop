@@ -153,6 +153,41 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     write-host "Updating '$app' ($old_version -> $version)"
 
+    # region Workaround
+    # Workaround for https://github.com/lukesampson/scoop/issues/2220 until install is refactored
+    # Remove whole region after proper fix
+    Write-Host "Downloading new version to verify integrity of files"
+    if (aria2_enabled) {
+        dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookies $true $check_hash
+    } else {
+        # dl_with_cache $app $version $
+        $urls = url $manifest $architecture
+
+        foreach ($url in $urls) {
+            dl_with_cache $app $version $url $null $manifest.cookies $true
+
+            $manifest_hash = hash_for_url $manifest $url $architecture
+            $source = fullpath (cache_path $app $version $url)
+            $ok, $err = check_hash $source $manifest_hash $(show_app $app $bucket)
+
+            if(!$ok) {
+                error $err
+                if(test-path $source) {
+                    # rm cached file
+                    Remove-Item -force $source
+                }
+                if($url.Contains('sourceforge.net')) {
+                    Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                }
+                abort $(new_issue_msg $app $bucket "hash check failed")
+            }
+        }
+    }
+    # There is no need to check hash again
+    $check_hash = $false
+    Write-Host "Verifing OK. Updating continue" -ForegroundColor Green
+    # endregion Workaround
+
     $dir = versiondir $app $old_version $global
 
     write-host "Uninstalling '$app' ($old_version)"
