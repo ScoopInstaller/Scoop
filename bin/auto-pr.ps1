@@ -153,7 +153,7 @@ if ($Push) {
 if ($SpecialSnowflakes) {
     Write-Host "Forcing update on our special snowflakes: $($SpecialSnowflakes -join ',')" -ForegroundColor DarkCyan
     $SpecialSnowflakes -split ',' | ForEach-Object {
-        . "$PSScriptRoot\checkver.ps1" $_ -Dir $Dir -ForceUpdate -SkipUpdated:$SkipUpdated
+        . "$PSScriptRoot\checkver.ps1" $_ -Dir $Dir -ForceUpdate
     }
 }
 
