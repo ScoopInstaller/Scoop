@@ -6,6 +6,9 @@
 .PARAMETER Upstream
     Upstream repository with the target branch.
     Must be in format '<user>/<repo>:<branch>'
+.PARAMETER App
+    Manifest name to search.
+    Placeholders are supported.
 .PARAMETER Dir
     The directory where to search for manifests.
 .PARAMETER Push
@@ -30,6 +33,7 @@ param(
         $true
     })]
     [String] $Upstream = 'lukesampson/scoop:master',
+    [String] $App = '*',
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -59,7 +63,7 @@ Mandatory options:
 
 Optional options:
   -u,  -upstream                   upstream repository with target branch
-                                     only used if -r is set (default: lukesampson/scoop:master)
+                                   only used if -r is set (default: lukesampson/scoop:master)
   -h,  -help
 '@
     exit 0
@@ -146,7 +150,7 @@ if ($Push) {
     execute 'hub push origin master'
 }
 
-. "$PSScriptRoot\checkver.ps1" -Dir $Dir -Update
+. "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update
 if ($SpecialSnowflakes) {
     Write-Host "Forcing update on our special snowflakes: $($SpecialSnowflakes -join ',')" -ForegroundColor DarkCyan
     $SpecialSnowflakes -split ',' | ForEach-Object {
