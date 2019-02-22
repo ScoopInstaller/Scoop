@@ -1,4 +1,4 @@
-﻿{
+{
     "version": "0.4.2",
     "license": "MIT",
     "description": "Simple http server in Rust",
