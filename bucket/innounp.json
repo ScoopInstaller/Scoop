@@ -8,7 +8,7 @@
     "bin": "innounp.exe",
     "checkver": "Version\\s+([\\d\\.]+)\\s*<br>",
     "autoupdate": {
-        "url": "https://github.com/scoopinstaller/binary-mirror/raw/master/innounp/innounp$cleanVersion.rar",
+        "url": "https://raw.githubusercontent.com/scoopinstaller/binary-mirror/master/innounp/innounp$cleanVersion.rar",
         "hash": {
             "url": "$baseurl/innounp$cleanVersion.sha1"
         }
