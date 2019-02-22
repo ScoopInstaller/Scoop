@@ -1,8 +1,16 @@
 {
-    "homepage": "http://innounp.sourceforge.net",
     "version": "0.47",
+    "description": "Inno Setup Unpacker.",
+    "homepage": "http://innounp.sourceforge.net",
+    "license": "GPL-3.0-only",
     "url": "https://github.com/scoopinstaller/binary-mirror/raw/master/innounp/innounp047.rar",
     "hash": "sha1:ba0cebf7e3003847d5ed5811620c54d7576146e7",
     "bin": "innounp.exe",
-    "checkver": "Version\\s+([\\d.]+)\\s*<br>"
+    "checkver": "Version\\s+([\\d\\.]+)\\s*<br>",
+    "autoupdate": {
+        "url": "https://github.com/scoopinstaller/binary-mirror/raw/master/innounp/innounp$cleanVersion.rar",
+        "hash": {
+            "url": "$baseurl/innounp$cleanVersion.sha1"
+        }
+    }
 }
