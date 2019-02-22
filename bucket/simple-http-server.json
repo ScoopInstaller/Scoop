@@ -1,0 +1,11 @@
+﻿{
+    "version": "0.4.2",
+    "license": "MIT",
+    "description": "Simple http server in Rust",
+    "extract_dir": "",
+    "url": "https://github.com/TheWaWaR/simple-http-server/releases/download/0.4.2/simple-http-server-win64.zip",
+    "depends": "",
+    "homepage": "https://github.com/TheWaWaR/simple-http-server",
+    "hash": "05dec305f1f6bbfa0d343abdbc288e473139c6ee878c907bc079b94e7cc35944",
+    "bin": "simple-http-server.exe"
+}
