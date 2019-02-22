@@ -27,19 +27,19 @@
 #>
 param(
     [ValidateScript( {
-            if (!($_ -match '^(.*)\/(.*):(.*)$')) {
-                throw 'Upstream must be in this format: <user>/<repo>:<branch>'
-            }
-            $true
-        })]
+        if (!($_ -match '^(.*)\/(.*):(.*)$')) {
+            throw 'Upstream must be in this format: <user>/<repo>:<branch>'
+        }
+        $true
+    })]
     [String] $Upstream = 'lukesampson/scoop:master',
     [String] $App = '*',
     [ValidateScript( {
-            if (!(Test-Path $_ -Type Container)) {
-                throw "$_ is not a directory!"
-            }
-            $true
-        })]
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        }
+        $true
+    })]
     [String] $Dir = "$PSScriptRoot\..\bucket",
     [Switch] $Push,
     [Switch] $Request,
