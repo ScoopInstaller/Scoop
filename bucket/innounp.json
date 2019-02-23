@@ -4,7 +4,7 @@
     "homepage": "http://innounp.sourceforge.net",
     "license": "GPL-3.0-only",
     "url": "https://raw.githubusercontent.com/scoopinstaller/binary-mirror/master/innounp/innounp048.rar",
-    "hash": "59e80a6f46b2de48d5cd929479adf0784a2a2580cd6ea67ea2a9560eb8082ba4",
+    "hash": "sha1:638a8ff3b87c40d12b43ca964e6777baca2176c8",
     "bin": "innounp.exe",
     "checkver": "Version\\s+([\\d\\.]+)\\s*<br>",
     "autoupdate": {
