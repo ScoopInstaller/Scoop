@@ -1,11 +1,16 @@
+Param([Switch]$Fast)
 Push-Location $psscriptroot
 . "$psscriptroot\..\..\lib\install.ps1"
 
-Write-Host "Install dependencies ..."
-Invoke-Expression "$psscriptroot\install.ps1"
+if(!$Fast) {
+    Write-Host "Install dependencies ..."
+    Invoke-Expression "$psscriptroot\install.ps1"
+}
 
 $output = "$psscriptroot\bin"
-Get-ChildItem "$psscriptroot\packages\Newtonsoft.*\lib\net45\*.dll" -File | ForEach-Object { Copy-Item $_ $output }
+if(!$Fast) {
+    Get-ChildItem "$psscriptroot\packages\Newtonsoft.*\lib\net45\*.dll" -File | ForEach-Object { Copy-Item $_ $output }
+}
 Write-Output 'Compiling Scoop.Validator.cs ...'
 & "$psscriptroot\packages\Microsoft.Net.Compilers\tools\csc.exe" /deterministic /platform:anycpu /nologo /optimize /target:library /reference:"$output\Newtonsoft.Json.dll","$output\Newtonsoft.Json.Schema.dll" /out:"$output\Scoop.Validator.dll" Scoop.Validator.cs
 Write-Output 'Compiling validator.cs ...'

@@ -327,5 +327,23 @@ describe 'app' -Tag 'Scoop' {
         $app | should -be "test-app"
         $bucket | should -be "test-bucket"
         $version | should -be "1.8.0-rc2"
+
+        $query = "test-bucket/test_app"
+        $app, $bucket, $version = parse_app $query
+        $app | should -be "test_app"
+        $bucket | should -be "test-bucket"
+        $version | should -benullorempty
+
+        $query = "test-bucket/test_app@1.8.0"
+        $app, $bucket, $version = parse_app $query
+        $app | should -be "test_app"
+        $bucket | should -be "test-bucket"
+        $version | should -be "1.8.0"
+
+        $query = "test-bucket/test_app@1.8.0-rc2"
+        $app, $bucket, $version = parse_app $query
+        $app | should -be "test_app"
+        $bucket | should -be "test-bucket"
+        $version | should -be "1.8.0-rc2"
     }
 }

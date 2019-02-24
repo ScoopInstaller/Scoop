@@ -1,6 +1,6 @@
 {
     "homepage": "http://www.greenwoodsoftware.com/less/",
-    "version": "548",
+    "version": "550",
     "license": "GPL-3.0-only,BSD-3-Clause",
     "bin": [
         "less.exe",
@@ -10,9 +10,9 @@
         "url": "https://www.guysalias.tk/misc/less/",
         "re": "less-([\\d]+)-"
     },
-    "extract_dir": "less-548-win32-static-x86",
-    "hash": "4b71434c5b01022ff9fdd98f410eba643cd05bfae51161177fa6f0e894659969",
-    "url": "https://www.guysalias.tk/misc/less/less-548-win32-static-x86.7z",
+    "extract_dir": "less-550-win32-static-x86",
+    "hash": "af55dd42c3053707027f7684e3fad05abe676ffb09d33cf229580dadc99aabe8",
+    "url": "https://www.guysalias.tk/misc/less/less-550-win32-static-x86.7z",
     "autoupdate": {
         "extract_dir": "less-$version-win32-static-x86",
         "hash": {
