@@ -19,6 +19,8 @@
     Print help to console.
 .PARAMETER SpecialSnowflakes
     An array of manifests, which should be updated all the time. (-ForceUpdate parameter to checkver)
+.PARAMETER SkipUpdated
+    Updated manifests will not be shown.
 .EXAMPLE
     PS REPODIR > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
 .EXAMPLE
@@ -44,7 +46,8 @@ param(
     [Switch] $Push,
     [Switch] $Request,
     [Switch] $Help,
-    [string[]] $SpecialSnowflakes
+    [string[]] $SpecialSnowflakes,
+    [Switch] $SkipUpdated
 )
 
 . "$PSScriptRoot\..\lib\manifest.ps1"
@@ -150,7 +153,7 @@ if ($Push) {
     execute 'hub push origin master'
 }
 
-. "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update
+. "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update -SkipUpdated:$SkipUpdated
 if ($SpecialSnowflakes) {
     Write-Host "Forcing update on our special snowflakes: $($SpecialSnowflakes -join ',')" -ForegroundColor DarkCyan
     $SpecialSnowflakes -split ',' | ForEach-Object {
