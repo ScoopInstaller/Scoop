@@ -1,17 +1,17 @@
 {
     "homepage": "https://www.gnu.org/software/octave/",
-    "version": "4.4.1",
+    "version": "5.1.0",
     "license": "GPL-3.0-only",
     "architecture": {
         "64bit": {
-            "url": "https://ftp.gnu.org/gnu/octave/windows/octave-4.4.1-w64.zip",
-            "hash": "69482931038a63fa258a58e23c4745015cbf0a6283dec92dfd866d8dfb7807c0",
-            "extract_dir": "octave-4.4.1-w64"
+            "url": "https://ftp.gnu.org/gnu/octave/windows/octave-5.1.0-w64.zip",
+            "hash": "05ba8de71b17ddf6c9f36bbba4e92a1344e3b505a15f1a5a2bd70021feecab93",
+            "extract_dir": "octave-5.1.0-w64"
         },
         "32bit": {
-            "url": "https://ftp.gnu.org/gnu/octave/windows/octave-4.4.1-w32.zip",
-            "hash": "e2fe876c72feb396af2ff4c4a7a893cbd802634ac1f6cadd05f29fb8d4bf26e2",
-            "extract_dir": "octave-4.4.1-w32"
+            "url": "https://ftp.gnu.org/gnu/octave/windows/octave-5.1.0-w32.zip",
+            "hash": "949d5b174410cfdcf60e543742adf4d9e206ae93a4face4b0258f16b7d081f63",
+            "extract_dir": "octave-5.1.0-w32"
         }
     },
     "bin": [
