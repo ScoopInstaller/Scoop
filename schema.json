@@ -48,7 +48,8 @@
                         "download",
                         "extract",
                         "json",
-                        "rdf"
+                        "rdf",
+                        "metalink"
                     ]
                 },
                 "type": {
