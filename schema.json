@@ -49,7 +49,9 @@
                         "extract",
                         "json",
                         "rdf",
-                        "metalink"
+                        "metalink",
+                        "fosshub",
+                        "sourceforge"
                     ]
                 },
                 "type": {
