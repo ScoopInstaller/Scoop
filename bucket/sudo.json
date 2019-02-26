@@ -1,14 +1,14 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
     "description": "An approximation of the Unix sudo command. Shows a UAC popup window unfortunately.",
-    "version": "0.2018.08.04",
+    "version": "0.2018.07.25",
     "license": "MIT",
-    "url": "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/sudo.ps1",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/3290c04d7653ea8183a5e11d3d5a4e46716035d1/sudo.ps1",
     "hash": "7c124e37f3f15e200a651cec5c5f58d05b5e347d8697f2204d0a40c4181b3642",
     "bin": "sudo.ps1",
     "checkver": {
         "url": "https://github.com/lukesampson/psutils",
-        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "re": "sudo\\.ps1[\\S\\s]*?/(?<sha>[0-9a-f]{40})[\\S\\s]*?(\\d+)-(\\d+)-(\\d+)",
         "replace": "0.${1}.${2}.${3}"
     },
     "autoupdate": {

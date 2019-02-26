@@ -9,8 +9,8 @@
         "file": "bin\\install.ps1"
     },
     "checkver": {
-        "url": "https://github.com/lukesampson/pshazz",
-        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "url": "https://github.com/lukesampson/pshazz/commits/master.atom",
+        "re": "(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})",
         "replace": "0.${1}.${2}.${3}"
     },
     "autoupdate": {

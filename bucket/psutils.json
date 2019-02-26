@@ -22,8 +22,8 @@
     ],
     "notes": "Please use 'timecmd' instead of 'time' in cmd.exe.",
     "checkver": {
-        "url": "https://github.com/lukesampson/psutils",
-        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "url": "https://github.com/lukesampson/psutils/commits/master.atom",
+        "re": "(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})",
         "replace": "0.${1}.${2}.${3}"
     },
     "autoupdate": {
