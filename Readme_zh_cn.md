@@ -30,10 +30,10 @@
 
 Scoop是Windows上的的命令行软件安装程序。
 
-## Scoop有什么作用？
+## Scoop 有什么作用？
 
-Scoop希望以最小的代价从命令行安装程序。它试图解决以下的问题:
-* UAC弹出窗口
+Scoop 希望以最小的代价从命令行安装程序。它试图解决以下的问题:
+* UAC 弹出窗口
 * GUI 向导式安装程序
 * 安装大量程序造成的路径污染
 * 安装和卸载程序时出现意外的副作用
@@ -51,16 +51,16 @@ scoop install aria2 curl grep sed less touch
 scoop install python ruby go perl
 ```
 
-如果您构建了您希望其他人使用的软件，Scoop是构建.MSI或.EXE安装程序的替代方法，您只需要压缩程序并提供描述如何安装它的JSON清单。
+如果您构建了您希望其他人使用的软件，Scoop是构建 .MSI 或 .EXE 安装程序的替代方法，您只需要压缩程序并提供描述如何安装它的JSON清单。
 
 * Windows 7 SP1+ / Windows Server 2008+
 * [PowerShell 3](https://www.microsoft.com/en-us/download/details.aspx?id=34595) (或更高版本) 与 [.NET Framework 4.5+](https://www.microsoft.com/net/download)
-* 必须为您的用户账户启用PowerShel，使用
+* 必须为您的用户账户启用 PowerShell，使用
   `set-executionpolicy remotesigned -s currentuser`
 
 ## 安装
 
-从PowerShell运行此命令以将scoop安装到其默认位置（`C:\Users\<您的用户名>\scoop`）
+从 PowerShell 运行此命令以将 Scoop 安装到其默认位置（`C:\Users\<您的用户名>\scoop`）
 ```powershell
 iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 ```
@@ -71,14 +71,14 @@ iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 全局安装的程序（`--global`）存在于`C：\ProgramData\scoop`中。
 您可以通过环境变量更改这些设置。
 
-#### 将Scoop安装到自定义目录（例子中，自定义目录为D:\Applications\Scoop）
+#### 将 Scoop 安装到自定义目录（例子中，自定义目录为D:\Applications\Scoop）
 ```powershell
 [environment]::setEnvironmentVariable('SCOOP','D:\Applications\Scoop','User')
 $env:SCOOP='D:\Applications\Scoop'
 iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 ```
 
-#### 配置Scoop以将全局程序安装到自定义目录
+#### 配置 Scoop 以将全局程序安装到自定义目录
 ```powershell
 [environment]::setEnvironmentVariable('SCOOP_GLOBAL','F:\GlobalScoopApps','Machine')
 $env:SCOOP_GLOBAL='F:\GlobalScoopApps'
@@ -96,7 +96,7 @@ scoop install aria2
 
 - aria2-enabled (default: true)  是否启用aria2
 - [aria2-retry-wait](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-retry-wait) (default: 2)  重试等待
-- [aria2-split](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-s) (default: 5)  （对不起，看不懂）
+- [aria2-split](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-s) (default: 5)  单任务连接数
 - [aria2-max-connection-per-server](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-x) (default: 5)  最大线程数
 - [aria2-min-split-size](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-k) (default: 5M) 最小单文件分割尺寸
 
@@ -105,25 +105,17 @@ scoop install aria2
 * [Homebrew](http://mxcl.github.io/homebrew/)
 * [sub](https://github.com/37signals/sub#readme)
 
-## Scoop可以安装什么类型的应用程序?
+## Scoop 可以安装什么类型的应用程序?
 
-使用Scoop最佳安装的应用程序通常称为“便携式”应用程序：即在解压缩时独立运行的压缩程序文件，并且没有诸如更改注册表或将文件放在程序目录之外的副作用。
+使用 Scoop 最适合安装的应用程序通常称为“便携式”应用程序：即在解压缩时独立运行的压缩程序文件，并且没有诸如更改注册表或将文件放在程序目录之外的副作用。
 
-由于安装程序很常见，Scoop也支持它们（以及它们的卸载程序）。
+由于安装程序很常见，Scoop 也支持它们（以及它们的卸载程序）。
 
-Scoop在处理单文件程序和Powershell脚本方面也很出色。 这些甚至不需要压缩。 请参阅[runat](https://github.com/lukesampson/scoop/blob/master/bucket/runat.json)包作为示例：它实际上只是一个GitHub仓库。
+Scoop 在处理单文件程序和 Powershell 脚本方面也很出色。 这些甚至不需要压缩。 请参阅[ runat ](https://github.com/lukesampson/scoop/blob/master/bucket/runat.json)包作为示例：它实际上只是一个 GitHub 仓库。
 
-Scoop默认仓库的要求十分苛刻：
+Scoop 默认仓库的要求jiaow苛刻，许多应用无法安装，因此，请手动添加 bucket，您可以通过`scoop bucket known`查询 Scoop 还能直接识别哪些 bucket。并通过`scoop bucket add bucket `的格式添加 bucket。
 
-- 必须是主流的开发者工具
-- 必须是维护中的最新版本的软件
-- 必须是完整版本（非精简版本）的软件
-- 不可以有复杂的安装前与安装后处理步骤
-- **不可以有 GUI**
-
-因此，请手动添加bucket，您可以通过`scoop bucket known`查询 Scoop 还能直接识别哪些bucket。并通过`scoop bucket add bucket `的格式添加bucket。
-
-### [社区bucket](https://github.com/rasa/scoop-directory/blob/master/by-score.md)
+### [社区 bucket 列表](https://github.com/rasa/scoop-directory/blob/master/by-score.md)
 
 我们可以通过这样的方式来将社区维护的 bucket 添加至本机的 Scoop bucket 列表：
 
@@ -131,7 +123,7 @@ Scoop默认仓库的要求十分苛刻：
 scoop bucket add <仓库名> <仓库地址>
 ```
 
-再举个例子，比如添加「 dorado」仓：
+再举个例子，比如添加「 dorado 」仓：
 
 ```
 scoop bucket add dorado https://github.com/h404bi/dorado
