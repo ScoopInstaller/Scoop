@@ -7,8 +7,8 @@
     "extract_dir": "concfg-d9628d71460f3a3ae83dfbaf20a60f17fa40c45a",
     "bin": "bin\\concfg.ps1",
     "checkver": {
-        "url": "https://github.com/lukesampson/concfg",
-        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "url": "https://github.com/lukesampson/concfg/commits/master.atom",
+        "re": "(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})",
         "replace": "0.${1}.${2}.${3}"
     },
     "autoupdate": {
