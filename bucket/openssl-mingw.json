@@ -1,17 +1,17 @@
 {
     "homepage": "https://curl.haxx.se/windows/",
-    "version": "1.1.1a",
+    "version": "1.1.1b_1",
     "license": "OpenSSL",
     "architecture": {
         "64bit": {
-            "url": "https://curl.haxx.se/windows/dl-7.63.0/openssl-1.1.1a-win64-mingw.tar.xz",
-            "hash": "f86dabd6ee767d46efbe80bd557814e3dc0dc62f951dda1a3648e56adcdd129b",
-            "extract_dir": "openssl-1.1.1a-win64-mingw"
+            "url": "https://curl.haxx.se/windows/dl-7.64.0_1/openssl-1.1.1b_1-win64-mingw.tar.xz",
+            "hash": "f5414264bd5992c9ff303587958679b9574767c1ec042707065b1058e18fca80",
+            "extract_dir": "openssl-1.1.1b-win64-mingw"
         },
         "32bit": {
-            "url": "https://curl.haxx.se/windows/dl-7.63.0/openssl-1.1.1a-win32-mingw.tar.xz",
-            "hash": "59a9ac103db3a2c7aee041015ced07c0a53409a1445ef74b556476d9118424c4",
-            "extract_dir": "openssl-1.1.1a-win32-mingw"
+            "url": "https://curl.haxx.se/windows/dl-7.64.0_1/openssl-1.1.1b_1-win32-mingw.tar.xz",
+            "hash": "6086cb1e04ae83f1b54cb1a4b3c24353af8cea290d3bcc7cac1481201fb0927e",
+            "extract_dir": "openssl-1.1.1b-win32-mingw"
         }
     },
     "bin": "openssl.exe",
