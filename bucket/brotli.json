@@ -1,16 +1,16 @@
 {
-    "version": "1.0.7",
+    "version": "1.0.7_1",
     "homepage": "https://brotli.org/",
     "description": "Lossless compression algorithm",
     "architecture": {
         "64bit": {
-            "url": "https://curl.haxx.se/windows/dl-7.64.0/brotli-1.0.7-win64-mingw.tar.xz",
-            "hash": "23589e6cb9a1b200724aceefd7be1e930ddcaba0f544b49dcbe9ff85deca36ba",
+            "url": "https://curl.haxx.se/windows/dl-7.64.0_1/brotli-1.0.7_1-win64-mingw.tar.xz",
+            "hash": "f78e7f797429a393568df335366052e1b1fa61ac0d3a7d4e3a5398a517659ab0",
             "extract_dir": "brotli-1.0.7-win64-mingw"
         },
         "32bit": {
-            "url": "https://curl.haxx.se/windows/dl-7.64.0/brotli-1.0.7-win32-mingw.tar.xz",
-            "hash": "c5ee8e78cbf0ef9c552cbde4e42b4312d641d411ae533e5cc65bd5d0b389a2d0",
+            "url": "https://curl.haxx.se/windows/dl-7.64.0_1/brotli-1.0.7_1-win32-mingw.tar.xz",
+            "hash": "acdca43cd1f135a9db182a7d90e576320c17823951bc41ab29935ce05c85372c",
             "extract_dir": "brotli-1.0.7-win32-mingw"
         }
     },
