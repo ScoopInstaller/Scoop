@@ -2,15 +2,15 @@
     "homepage": "https://github.com/iawia002/annie",
     "description": "A fast, simple and clean video downloader built with Go.",
     "license": "MIT",
-    "version": "0.9.2",
+    "version": "0.9.3",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/iawia002/annie/releases/download/0.9.2/annie_0.9.2_Windows_64-bit.zip",
-            "hash": "dd6d729cb8e298c9db32b76d56327355c85b33363ed3e8760ea183b43ffc6230"
+            "url": "https://github.com/iawia002/annie/releases/download/0.9.3/annie_0.9.3_Windows_64-bit.zip",
+            "hash": "8a1feba060f488d714df32c65541b0fad1eb78a246962782fff05f150b773cf3"
         },
         "32bit": {
-            "url": "https://github.com/iawia002/annie/releases/download/0.9.2/annie_0.9.2_Windows_32-bit.zip",
-            "hash": "e5081d0cda23ff836e399338e91981a6e4f6f473c031d741b646f9775a672b7f"
+            "url": "https://github.com/iawia002/annie/releases/download/0.9.3/annie_0.9.3_Windows_32-bit.zip",
+            "hash": "e4b5a87f01b26d3c135105a39f70986cc2be6329676da651c871734e26f149b2"
         }
     },
     "bin": "annie.exe",
