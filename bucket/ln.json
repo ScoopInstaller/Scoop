@@ -1,10 +1,10 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
     "description": "An approximation of the Unix ln command.",
-    "version": "0.2018.07.25",
+    "version": "0.2013.08.10",
     "license": "MIT",
-    "url": "https://raw.githubusercontent.com/lukesampson/psutils/3290c04d7653ea8183a5e11d3d5a4e46716035d1/ln.ps1",
-    "hash": "2e97f2f1bacba1c403c538a80493e8c6c56203ba689f2a29a9fde6ba3576d3f7",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/598331a7e2b6d4bb60d8a458f8212d349b383e7c/ln.ps1",
+    "hash": "91e4d355fbccbc4c89611d9c66a1d36ea357d554342ff63f7130bfe09e101558",
     "bin": "ln.ps1",
     "checkver": {
         "url": "https://github.com/lukesampson/psutils",
