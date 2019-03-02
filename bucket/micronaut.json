@@ -8,7 +8,7 @@
   "extract_dir": "micronaut-1.0.4",
   "bin": "bin\\mn.bat",
   "env_set": {
-	"MICRONAUT_HOME": "$dir"
+    "MICRONAUT_HOME": "$dir"
   },
   "suggest": {
     "JDK": [
