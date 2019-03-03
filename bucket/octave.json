@@ -6,20 +6,26 @@
         "64bit": {
             "url": "https://ftp.gnu.org/gnu/octave/windows/octave-5.1.0-w64.zip",
             "hash": "05ba8de71b17ddf6c9f36bbba4e92a1344e3b505a15f1a5a2bd70021feecab93",
-            "extract_dir": "octave-5.1.0-w64"
+            "extract_dir": "octave-5.1.0-w64",
+            "bin": [
+                "mingw64\\bin\\octave.bat",
+                "mingw64\\bin\\octave-gui.exe",
+                "mingw64\\bin\\octave-cli.exe",
+                "mingw64\\bin\\octave-config.exe"
+            ]
         },
         "32bit": {
             "url": "https://ftp.gnu.org/gnu/octave/windows/octave-5.1.0-w32.zip",
             "hash": "949d5b174410cfdcf60e543742adf4d9e206ae93a4face4b0258f16b7d081f63",
-            "extract_dir": "octave-5.1.0-w32"
+            "extract_dir": "octave-5.1.0-w32",
+            "bin": [
+                "mingw32\\bin\\octave.bat",
+                "mingw32\\bin\\octave-gui.exe",
+                "mingw32\\bin\\octave-cli.exe",
+                "mingw32\\bin\\octave-config.exe"
+            ]
         }
     },
-    "bin": [
-        "bin\\octave.bat",
-        "bin\\octave-gui.exe",
-        "bin\\octave-cli.exe",
-        "bin\\octave-config.exe"
-    ],
     "checkver": {
         "url": "https://wiki.octave.org/GNU_Octave_Wiki",
         "re": "GNU Octave ([\\d.]+) is the current stable release"
