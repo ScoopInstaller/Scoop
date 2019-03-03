@@ -1,9 +1,9 @@
 {
-    "homepage": "https://www.microsoft.com/en-us/download/details.aspx?id=56727",
-    "version": "9.0.1",
-    "license": "Freeware",
-    "url": "https://download.microsoft.com/download/4/A/6/4A6AAED8-200C-457C-AB86-37505DE4C90D/msmpisetup.exe",
-    "hash": "2fa35146e3d7dce6aba3d9cd81c1e16166a405bfe7094d1ae03c60fcdeb8e455",
+    "homepage": "https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi",
+    "version": "10.0",
+    "license": "MIT",
+    "url": "https://github.com/Microsoft/Microsoft-MPI/releases/download/v10.0/msmpisetup.exe",
+    "hash": "7dae13797627726f67fab9c1d251aec2df9ecd25939984645ec05748bdffd396",
     "env_add_path": ".",
     "pre_install": "7z x -t# \"$dir\\msmpisetup.exe\" -o\"$dir\\tmp\"",
     "architecture": {
@@ -27,5 +27,12 @@
     "post_install": [
         "Remove-Item -Recurse \"$dir\\tmp\"",
         "Remove-Item \"$dir\\msmpisetup.exe\""
-    ]
+    ],
+    "checkver": {
+        "github": "https://github.com/Microsoft/Microsoft-MPI"
+    },
+    "autoupdate": {
+        "url": "https://github.com/Microsoft/Microsoft-MPI/releases/download/v$version/msmpisetup.exe"
+    }
+
 }
