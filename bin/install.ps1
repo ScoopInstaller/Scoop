@@ -46,7 +46,8 @@ Write-Output 'Downloading...'
 dl $zipurl $zipfile
 
 'Extracting...'
-extract_zip $zipfile "$dir\_tmp"
+Add-Type -Assembly "System.IO.Compression.FileSystem"
+[IO.Compression.ZipFile]::ExtractToDirectory($zipfile,"$dir\_tmp")
 Copy-Item "$dir\_tmp\scoop-master\*" $dir -r -force
 Remove-Item "$dir\_tmp" -r -force
 Remove-Item $zipfile
