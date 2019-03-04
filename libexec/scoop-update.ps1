@@ -186,7 +186,6 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
     # There is no need to check hash again while installing
     $check_hash = $false
-    Write-Host "Verifing OK. Updating continue" -ForegroundColor Green
     # endregion Workaround
 
     $dir = versiondir $app $old_version $global
