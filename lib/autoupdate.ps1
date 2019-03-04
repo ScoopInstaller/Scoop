@@ -190,14 +190,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
 
     if (!$hashfile_url -and $url -match "^(?:.*fosshub.com\/).*(?:\/|\?dwl=)(?<filename>.*)$") {
         $hashmode = 'fosshub'
-        $hash = find_hash_in_textfile $url $substitutions ($Matches.filename+'.*?"sha256":"([a-fA-F0-9]{64})"')
     }
 
     if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
         $hashmode = 'sourceforge'
-        # change the URL because downloads.sourceforge.net doesn't have checksums
-        $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
-        $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
     }
 
     switch ($hashmode) {
@@ -215,6 +211,14 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             if (!$hash) {
                 $hash = find_hash_in_textfile "$url.meta4" $substitutions
             }
+        }
+        'fosshub' {
+            $hash = find_hash_in_textfile $url $substitutions ($Matches.filename+'.*?"sha256":"([a-fA-F0-9]{64})"')
+        }
+        'sourceforge' {
+            # change the URL because downloads.sourceforge.net doesn't have checksums
+            $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
+            $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
         }
     }
 

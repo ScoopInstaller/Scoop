@@ -48,7 +48,10 @@
                         "download",
                         "extract",
                         "json",
-                        "rdf"
+                        "rdf",
+                        "metalink",
+                        "fosshub",
+                        "sourceforge"
                     ]
                 },
                 "type": {
