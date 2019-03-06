@@ -34,6 +34,7 @@ function cleanup($app, $global, $verbose, $cache) {
     $current_version = current_version $app $global
     if ($cache) {
         Remove-Item "$cachedir\$app#*" -Exclude "$app#$current_version#*"
+        Remove-Item "$cachedir\*.download"
     }
     $versions = versions $app $global | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
     if (!$versions) {
