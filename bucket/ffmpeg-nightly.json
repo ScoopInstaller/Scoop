@@ -1,17 +1,17 @@
 {
-    "version": "20190304-db33283",
+    "version": "20190306-056a2ac",
     "homepage": "https://ffmpeg.zeranoe.com/builds/",
     "license": "GPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20190304-db33283-win64-static.zip",
-            "hash": "5bd14251005c69dbac6c6e544734f746274c633b312658e1a22c760be8e24730",
-            "extract_dir": "ffmpeg-20190304-db33283-win64-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20190306-056a2ac-win64-static.zip",
+            "hash": "45f1db408c60f7967b12293828582ae536d51aab4cbf4a2e0b55cc7130756e7d",
+            "extract_dir": "ffmpeg-20190306-056a2ac-win64-static"
         },
         "32bit": {
-            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-20190304-db33283-win32-static.zip",
-            "hash": "f84520f58dc26a7205bc1ef4d301680f7e4573e43da0d9ca58bae5b91ebb6b1e",
-            "extract_dir": "ffmpeg-20190304-db33283-win32-static"
+            "url": "https://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-20190306-056a2ac-win32-static.zip",
+            "hash": "8acff5bd2ad36bcbdac71c74c922dd18a7d505856cc8a22093dbeda5fc150e76",
+            "extract_dir": "ffmpeg-20190306-056a2ac-win32-static"
         }
     },
     "bin": [
