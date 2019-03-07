@@ -1,12 +1,12 @@
 {
-    "version": "2.1.3",
+    "version": "2.2.2",
     "description": "Cross platform build tool / task runner.",
     "homepage": "https://github.com/brad-jones/gomake/",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/brad-jones/gomake/releases/download/v2.1.3/gomake_windows_amd64.zip",
-            "hash": "bbe90be48f75d95489c7b6db8ac5a2dc0b73108ab467bd1b4853ff7f3d40945b"
+            "url": "https://github.com/brad-jones/gomake/releases/download/v2.2.2/gomake_windows_amd64.zip",
+            "hash": "a99e75e4248f7595d8631bb20fcabb13e47a4fb13da138e6d7f4937f05d27b9d"
         }
     },
     "bin": "gomake.exe",
