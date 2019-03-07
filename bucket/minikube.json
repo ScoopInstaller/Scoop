@@ -1,11 +1,11 @@
 {
     "homepage": "https://kubernetes.io/docs/getting-started-guides/minikube/",
     "license": "Apache-2.0",
-    "version": "0.34.1",
+    "version": "0.35.0",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/minikube/releases/v0.34.1/minikube-windows-amd64.exe",
-            "hash": "90fdaddd3ffe62beef2503e59295b15124b454b795324a8dcb54dd0cc7ba3296"
+            "url": "https://storage.googleapis.com/minikube/releases/v0.35.0/minikube-windows-amd64.exe",
+            "hash": "748c9087e876491332897d8dc937eeea92f9fda9003443ef668dc75f5638ed5b"
         }
     },
     "bin": [
