@@ -284,12 +284,12 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
                 # skip blank lines
                 return
             }
+            # clean line
+            Write-Host (' ' * ($Host.UI.RawUI.WindowSize.Width) + "`r") -NoNewline
             Write-Host $prefix -NoNewline
             if($_.StartsWith('(OK):')) {
                 Write-Host $_ -f Green
             } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
-                # clean line
-                Write-Host (' ' * $Host.UI.RawUI.WindowSize.Width + "`r") -NoNewline
                 # download progress without newline
                 Write-Host "$_`r" -f Cyan -NoNewline
             } else {
