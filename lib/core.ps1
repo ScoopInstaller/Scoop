@@ -273,59 +273,6 @@ function isFileLocked([string]$path) {
     }
 }
 
-function extract_zip($path, $to) {
-    if (!(test-path $path)) { abort "can't find $path to unzip"}
-    try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
-    catch { unzip_old $path $to; return } # for .net earlier than 4.5
-    $retries = 0
-    while ($retries -le 10) {
-        if ($retries -eq 10) {
-            if (7zip_installed) {
-                extract_7zip $path $to $false
-                return
-            } else {
-                abort "Unzip failed: Windows can't unzip because a process is locking the file.`nRun 'scoop install 7zip' and try again."
-            }
-        }
-        if (isFileLocked $path) {
-            write-host "Waiting for $path to be unlocked by another process... ($retries/10)"
-            $retries++
-            Start-Sleep -s 2
-        } else {
-            break
-        }
-    }
-
-    try {
-        [io.compression.zipfile]::extracttodirectory($path,$to)
-    } catch [system.io.pathtoolongexception] {
-        # try to fall back to 7zip if path is too long
-        if(7zip_installed) {
-            extract_7zip $path $to $false
-            return
-        } else {
-            abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
-        }
-    } catch [system.io.ioexception] {
-        if (7zip_installed) {
-            extract_7zip $path $to $false
-            return
-        } else {
-            abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
-        }
-    } catch {
-        abort "Unzip failed: $_"
-    }
-}
-
-function unzip_old($path,$to) {
-    # fallback for .net earlier than 4.5
-    $shell = (new-object -com shell.application -strict)
-    $zipfiles = $shell.namespace("$path").items()
-    $to = ensure $to
-    $shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
-}
-
 function is_directory([String] $path) {
     return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
 }
