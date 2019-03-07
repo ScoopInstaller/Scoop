@@ -1,7 +1,8 @@
 {
     "homepage": "https://www.python.org/",
-    "license": "https://docs.python.org/3/license.html",
+    "license": "Python-2.0",
     "version": "3.7.2",
+    "depends": "wixtoolset",
     "architecture": {
         "64bit": {
             "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2-amd64.exe#/py3.exe",
@@ -13,22 +14,20 @@
         }
     },
     "installer": {
-        "args": [
-            "/quiet",
-            "InstallAllUsers=$(@{$true=1;$false=0}[$global])",
-            "TargetDir=\"$dir\"",
-            "AssociateFiles=0",
-            "Shortcuts=0",
-            "InstallLauncherAllUsers=$(@{$true=1;$false=0}[$global])"
-        ],
-        "keep": true
+        "script": [
+            "&(file_path wixtoolset dark.exe) -nologo -x \"$dir\\_tmp\" \"$dir\\py3.exe\" | Out-Null",
+            "Remove-Item \"$dir\\_tmp\\AttachedContainer\\launcher.msi\" | Out-Null",
+            "Remove-Item \"$dir\\_tmp\\AttachedContainer\\path.msi\" | Out-Null",
+            "Remove-Item \"$dir\\_tmp\\AttachedContainer\\pip.msi\" | Out-Null",
+            "Get-ChildItem \"$dir\\_tmp\\AttachedContainer\\*.msi\" | ForEach-Object { extract_msi $_ $dir }",
+            "Remove-Item \"$dir\\_tmp\", \"$dir\\*.msi\", \"$dir\\py3.exe\" -Force -Recurse",
+            "&(\"$dir\\python.exe\") -E -s -m ensurepip -U --default-pip | Out-Null",
+            "if ($global) { $pathext = (env 'PATHEXT' $true) -replace ';.PYW?', ''; env 'PATHEXT' $true \"$pathext;.PY;.PYW\" }"
+        ]
     },
     "uninstaller": {
-        "file": "py3.exe",
-        "args": [
-            "/uninstall",
-            "/quiet",
-            "InstallAllUsers=0"
+        "script": [
+            "if ($global) { $pathext = (env 'PATHEXT' $true) -replace ';.PYW?', ''; env 'PATHEXT' $true \"$pathext\" }"
         ]
     },
     "bin": [
@@ -44,7 +43,7 @@
             "idle3"
         ]
     ],
-    "env_add_path": "scripts",
+    "env_add_path": "Scripts",
     "checkver": {
         "url": "https://www.python.org/downloads/windows/",
         "re": "Latest Python 3 Release - Python ([\\d\\.]+)"
@@ -60,7 +59,7 @@
         },
         "hash": {
             "url": "https://www.python.org/downloads/release/python-$cleanVersion/",
-            "find": "<td><a href=\".*$basename\".*</a></td>\\s+<td>Windows</td>\\s+<td>.*</td>\\s+<td>([A-Fa-f\\d]{32})"
+            "find": "$basename[\\S\\s]+?$md5"
         }
     }
 }
