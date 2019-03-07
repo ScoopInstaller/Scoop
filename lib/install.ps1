@@ -288,7 +288,10 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
             if($_.StartsWith('(OK):')) {
                 Write-Host $_ -f Green
             } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
-                Write-Host $_ -f Cyan
+                # clean line
+                Write-Host (' ' * $Host.UI.RawUI.WindowSize.Width + "`r") -NoNewline
+                # download progress without newline
+                Write-Host "$_`r" -f Cyan -NoNewline
             } else {
                 Write-Host $_ -f Gray
             }
