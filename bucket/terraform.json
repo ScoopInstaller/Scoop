@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.terraform.io",
     "license": "MPL-2.0",
-    "version": "0.11.11",
+    "version": "0.11.12",
     "architecture": {
         "64bit": {
-            "url": "https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_windows_amd64.zip",
-            "hash": "87252cc67486ef2ff2b8501c0bf9e795a53585b4dc5c09a8aa876c2564f77991"
+            "url": "https://releases.hashicorp.com/terraform/0.11.12/terraform_0.11.12_windows_amd64.zip",
+            "hash": "8bcde36ba8cc415322abf68a2a47219e0a3bd001a66a7728dbfb332b65cdd269"
         },
         "32bit": {
-            "url": "https://releases.hashicorp.com/terraform/0.11.11/terraform_0.11.11_windows_386.zip",
-            "hash": "f97dbb8a43081b67bc3d7176115adee0a578d724a6b0885c506f62ad39c9b2b0"
+            "url": "https://releases.hashicorp.com/terraform/0.11.12/terraform_0.11.12_windows_386.zip",
+            "hash": "a600447a98b5078e29253e34a33a029ac1199f641125e7ff3f5d3645cc3a0470"
         }
     },
     "bin": "terraform.exe",
