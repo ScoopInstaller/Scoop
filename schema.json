@@ -82,6 +82,21 @@
             },
             "type": "object"
         },
+        "hashExtractionOrArrayOfHashExtractions": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/hashExtraction"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/hashExtraction"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": false
+                }
+            ]
+        },
         "architecture": {
             "additionalProperties": false,
             "properties": {
@@ -158,10 +173,10 @@
                                     "type": "string"
                                 },
                                 "url": {
-                                    "$ref": "#/definitions/uriOrArrayOfUris"
+                                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
                                 },
                                 "hash": {
-                                    "$ref": "#/definitions/hashExtraction"
+                                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
                                 }
                             },
                             "type": "object"
@@ -173,10 +188,10 @@
                                     "type": "string"
                                 },
                                 "url": {
-                                    "$ref": "#/definitions/uriOrArrayOfUris"
+                                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
                                 },
                                 "hash": {
-                                    "$ref": "#/definitions/hashExtraction"
+                                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
                                 }
                             },
                             "type": "object"
@@ -188,13 +203,13 @@
                     "type": "string"
                 },
                 "hash": {
-                    "$ref": "#/definitions/hashExtraction"
+                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
                 },
                 "note": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "url": {
-                    "$ref": "#/definitions/uriOrArrayOfUris"
+                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
                 }
             },
             "type": "object"
@@ -341,6 +356,23 @@
                         "not": {
                             "pattern": "(\\$)"
                         },
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array",
+                    "uniqueItems": true
+                }
+            ]
+        },
+        "autoupdateUriOrArrayOfAutoupdateUris": {
+            "anyOf": [
+                {
+                    "format": "uri",
+                    "type": "string"
+                },
+                {
+                    "items": {
+                        "format": "uri",
                         "type": "string"
                     },
                     "minItems": 1,
