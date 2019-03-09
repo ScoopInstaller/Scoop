@@ -332,7 +332,7 @@ function lets_do_autoupdates([String] $app, $json, [String] $version, $substitut
 
         if($valid) {
             # create hash
-            if ($json.autoupdate.hash.length > $i) {
+            if ($json.autoupdate.hash.length -gt $i) {
                 $h = $json.autoupdate.hash[$i]
             } else {
                 $h = $null
