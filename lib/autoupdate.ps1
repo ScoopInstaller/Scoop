@@ -284,11 +284,11 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     return $hash
 }
 
-function update_manifest_with_new_version($json, [String] $version, [String] $url, [String] $hash, $architecture = $null) {
+function update_manifest_with_new_version($json, [String] $version, $url, $hash, $architecture = $null) {
     $json.version = $version
 
     if ($null -eq $architecture) {
-        if ($json.url -is [System.Array]) {
+        if ($json.url -is [System.Array] -and $url -isnot [System.Array]) {
             $json.url[0] = $url
             $json.hash[0] = $hash
         } else {
@@ -297,7 +297,7 @@ function update_manifest_with_new_version($json, [String] $version, [String] $ur
         }
     } else {
         # If there are multiple urls we replace the first one
-        if ($json.architecture.$architecture.url -is [System.Array]) {
+        if ($json.architecture.$architecture.url -is [System.Array] -and $url -isnot [System.Array]) {
             $json.architecture.$architecture.url[0] = $url
             $json.architecture.$architecture.hash[0] = $hash
         } else {
@@ -352,6 +352,47 @@ function get_version_substitutions([String] $version, [Hashtable] $customMatches
     return $versionVariables
 }
 
+function lets_do_autoupdates([String] $app, $json, [String] $version, $substitutions) {
+    $urls = @()
+    $hashes = @()
+    $has_changes = $false
+    $has_errors = $false
+    [Bool]$valid = $true
+
+    for ($i=0; $i -lt $json.autoupdate.url.Length; $i++) {
+        # create new url
+        $url   = substitute $json.autoupdate.url[$i] $substitutions
+        $urls += $url
+
+        if($valid) {
+            # create hash
+            if ($json.autoupdate.hash.length -gt $i) {
+                $h = $json.autoupdate.hash[$i]
+            } else {
+                $h = $null
+            }
+            $hash = get_hash_for_app $app $h $version $url $substitutions
+            $hashes += $hash
+            if ($null -eq $hash) {
+                $valid = $false
+                Write-Host -f DarkRed "Could not find hash!"
+            }
+        }
+    }
+
+    # write changes to the json object
+    if ($valid) {
+        $has_changes = $true
+        update_manifest_with_new_version $json $version $urls $hashes
+    } else {
+        $has_errors = $true
+        throw "Could not update $app"
+    }
+
+    return $has_changes, $has_errors
+}
+
+
 function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $matches) {
     Write-Host -f DarkCyan "Autoupdating $app"
     $has_changes = $false
@@ -360,26 +401,32 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
     $substitutions = get_version_substitutions $version $matches
 
     if ($json.url) {
-        # create new url
-        $url   = substitute $json.autoupdate.url $substitutions
-        $valid = $true
-
-        if($valid) {
-            # create hash
-            $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
-            if ($null -eq $hash) {
-                $valid = $false
-                Write-Host -f DarkRed "Could not find hash!"
-            }
-        }
-
-        # write changes to the json object
-        if ($valid) {
-            $has_changes = $true
-            update_manifest_with_new_version $json $version $url $hash
+        if ($json.autoupdate.url -is [System.Array]) {
+            $has_changes, $has_errors = lets_do_autoupdates $app $json $version $substitutions
+            $has_changes = $return[0]
+            $has_errors = $return[1]
         } else {
-            $has_errors = $true
-            throw "Could not update $app"
+            # create new url
+            $url   = substitute $json.autoupdate.url $substitutions
+            $valid = $true
+
+            if($valid) {
+                # create hash
+                $hash = get_hash_for_app $app $json.autoupdate.hash $version $url $substitutions
+                if ($null -eq $hash) {
+                    $valid = $false
+                    Write-Host -f DarkRed "Could not find hash!"
+                }
+            }
+
+            # write changes to the json object
+            if ($valid) {
+                $has_changes = $true
+                update_manifest_with_new_version $json $version $url $hash
+            } else {
+                $has_errors = $true
+                throw "Could not update $app"
+            }
         }
     } else {
         $json.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
