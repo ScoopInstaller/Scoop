@@ -1161,6 +1161,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             write-host "Persisting $source"
 
+            $source = $source.TrimEnd("/").TrimEnd("\\")
+
             $source = fullpath "$dir\$source"
             $target = fullpath "$persist_dir\$target"
 
