@@ -41,7 +41,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
@@ -529,19 +528,15 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         # work out extraction method, if applicable
         $extract_fn = $null
-        if($fname -match '\.zip$') {
+        if ($manifest.innosetup) {
+            $extract_fn = 'extract_inno'
+        } elseif($fname -match '\.zip$') {
             $extract_fn = 'extract_zip'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
             $msi = msi $manifest $architecture
             if(!$msi) {
-                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
-                if ($useLessMsi -eq $true) {
-                    $extract_fn, $extract_dir = lessmsi_config $extract_dir
-                }
-                else {
-                    $extract_fn = 'extract_msi'
-                }
+                $extract_fn = 'extract_msi'
             } else {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
             }
@@ -558,8 +553,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
             $null = mkdir "$dir\_tmp"
-            & $extract_fn "$dir\$fname" "$dir\_tmp"
-            Remove-Item "$dir\$fname"
+            & $extract_fn "$dir\$fname" "$dir\_tmp" $true
             if ($extract_to) {
                 $null = mkdir "$dir\$extract_to" -force
             }
