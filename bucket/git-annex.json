@@ -6,12 +6,16 @@
     "notes": "NOTE: Running `git-annex version` may report a slightly older version number",
     "bin": "usr/bin/git-annex.exe",
     "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z",
-    "hash": "837c0c66cf8f77d743701808b65bd1578b9e898bd595c18cf14c9d27631ebea9",
+    "hash": "c1b4935398eece873be29effc60f6c48ef5b5a92a2648675bb14e79a00ae4905",
     "checkver": {
         "url": "https://hackage.haskell.org/package/git-annex",
         "re": "/git-annex-([\\d.]+)\\.tar\\.gz"
     },
     "autoupdate": {
-        "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z"
+        "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z",
+        "hash": {
+            "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe.info",
+            "find": "([a-f0-9]{64}).exe"
+        }
     }
 }
