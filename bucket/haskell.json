@@ -43,14 +43,14 @@
                 "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-core-x86_64-setup.exe",
                 "hash": {
                     "url": "https://www.haskell.org/platform/windows.html",
-                    "regex": "(?sm)Start Menu.*64 bit Core:<br><textarea.+>($sha256).*32 bit Core"
+                    "regex": "(?sm)Start Menu.*64 bit Core:<br><textarea.+>$sha256.*32 bit Core"
                 }
             },
             "32bit": {
                 "url": "https://haskell.org/platform/download/$version/HaskellPlatform-$version-core-i386-setup.exe",
                 "hash": {
                     "url": "https://www.haskell.org/platform/windows.html",
-                    "regex": "32 bit Core:<br><textarea.+>($sha256)"
+                    "regex": "32 bit Core:<br><textarea.+>$sha256"
                 }
             }
         }

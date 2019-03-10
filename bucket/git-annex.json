@@ -14,8 +14,8 @@
     "autoupdate": {
         "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe#/dl.7z",
         "hash": {
-            "url": "https://downloads.kitenet.net/git-annex/windows/current/git-annex-installer.exe.info",
-            "find": "([a-f0-9]{64}).exe"
+            "url": "$url.info",
+            "find": "$sha256.exe"
         }
     }
 }
