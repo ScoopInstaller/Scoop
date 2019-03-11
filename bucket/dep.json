@@ -1,16 +1,16 @@
 {
     "homepage": "https://github.com/golang/dep",
     "description": "Go dependency management tool",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "license": "BSD-3-Clause",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/golang/dep/releases/download/v0.5.0/dep-windows-amd64.exe#/dep.exe",
-            "hash": "9cd5925582a0291f44281d09e3b1ddb8c555a3dd5097fabca1a5ebd3202de88b"
+            "url": "https://github.com/golang/dep/releases/download/v0.5.1/dep-windows-amd64.exe#/dep.exe",
+            "hash": "cc12b97ca5cec38e7b3b1b5813baf2b5874c691b8352e02c86ed3dc2098f4149"
         },
         "32bit": {
-            "url": "https://github.com/golang/dep/releases/download/v0.5.0/dep-windows-386.exe#/dep.exe",
-            "hash": "d106a371fed8ccf79ad1c5c2f0046731351c612003ab8ec8037e9420634a9668"
+            "url": "https://github.com/golang/dep/releases/download/v0.5.1/dep-windows-386.exe#/dep.exe",
+            "hash": "aa3b4b02a41cef7b4cf6aedc1380b84373cba87273d7055bf398ee2a6b7c06a0"
         }
     },
     "bin": [
