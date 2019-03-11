@@ -1128,18 +1128,27 @@ function show_suggestions($suggested) {
 # Persistent data
 function persist_def($persist) {
     if ($persist -is [Array]) {
-        $source = $persist[0]
-        $target = $persist[1]
+        # if $persist is Array, use its length to determine its type
+        switch ($persist.Count) {
+            # lenght = 1, type is file
+            1 { $source = $persist[0]; $target = $null; $contents = "" }
+            # length = 2, type is directory and persist to different name
+            2 { $source = $persist[0]; $target = $persist[1]; $contents = $null }
+            # length > 2, type is file and the remaining rows are file contents
+            Default { $source = $persist[0]; $target = $persist[1]; $contents = $persist[2..($persist.Count-1)] -join "`r`n" }
+        }
     } else {
+        # $persist is directory
         $source = $persist
         $target = $null
+        $contents = $null
     }
 
     if (!$target) {
         $target = $source
     }
 
-    return $source, $target
+    return $source, $target, $contents
 }
 
 function persist_data($manifest, $original_dir, $persist_dir) {
@@ -1152,7 +1161,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
         }
 
         $persist | ForEach-Object {
-            $source, $target = persist_def $_
+            $source, $target, $contents = persist_def $_
 
             write-host "Persisting $source"
 
@@ -1172,23 +1181,22 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 # ensure target parent folder exist
                 $null = ensure (Split-Path -Path $target)
                 Move-Item $source $target
-            # we don't have neither source nor target data! we need to crate an empty target,
-            # but we can't make a judgement that the data should be a file or directory...
-            # so we create a directory by default. to avoid this, use pre_install
-            # to create the source file before persisting (DON'T use post_install)
+            # use file contents to determine $source's type, $null for directory and others for file
+            } elseif ($null -eq $contents) {
+                New-Item -Path $target -ItemType Directory -Force | Out-Null
             } else {
-                $target = New-Object System.IO.DirectoryInfo($target)
-                ensure $target | Out-Null
+                $contents = $ExecutionContext.InvokeCommand.ExpandString($contents)
+                New-Item -Path $target -ItemType File -Value $contents -Force | Out-Null
             }
 
             # create link
             if (is_directory $target) {
                 # target is a directory, create junction
-                & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
+                New-Item -Path $source -ItemType Junction -Value $target | Out-Null
                 attrib $source +R /L
             } else {
                 # target is a file, create hard link
-                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
+                New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
             }
         }
     }
@@ -1201,14 +1209,14 @@ function unlink_persist_data($dir) {
         if ($null -ne $file.LinkType) {
             $filepath = $file.FullName
             # directory (junction)
-            if ($file -is [System.IO.DirectoryInfo]) {
+            if (is_directory $file) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
                 # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+                Remove-Item -Path $filepath -Recurse -Force | Out-Null
             } else {
                 # remove the hard link
-                & "$env:COMSPEC" /c "del $filepath"
+                Remove-Item -Path $filepath -Force | Out-Null
             }
         }
     }
