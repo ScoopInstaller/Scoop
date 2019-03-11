@@ -650,6 +650,20 @@ function format_hash_aria2([String] $hash) {
     return $hash
 }
 
+function get_hash([String] $multihash) {
+    $type, $hash = $multihash -split ':'
+    if(!$hash) {
+        # no type specified, assume sha256
+        $type, $hash = 'sha256', $multihash
+    }
+
+    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
+        return $null, "Hash type '$type' isn't supported."
+    }
+
+    return $type, $hash.ToLower()
+}
+
 function handle_special_urls($url)
 {
     # FossHub.com
