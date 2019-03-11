@@ -1,36 +1,42 @@
 {
     "homepage": "https://yarnpkg.com/",
-    "description": "Dependency manager",
+    "description": "Node.js dependency manager",
+    "version": "1.15.0",
     "license": "BSD-2-Clause",
-    "version": "1.13.0",
-    "suggest": {
-        "Node.js": [
-            "nodejs",
-            "nodejs-lts"
-        ],
-        "NVM": "nvm"
-    },
-    "url": "https://yarnpkg.com/downloads/1.13.0/yarn-1.13.0.msi",
-    "hash": "e3da89d8ea6b200908e1a47ed95a474e0acd5437b719590f497f52c1a9d32730",
+    "url": "https://github.com/yarnpkg/yarn/releases/download/v1.15.0/yarn-1.15.0.msi",
+    "hash": "823abe4ca1c71d07338260cb540b7eaf853d923a2ca92c0daf765c0c091f6f47",
     "persist": [
         "cache",
-        "bin",
-        "mirror"
+        "mirror",
+        "global"
     ],
     "post_install": [
         "yarn config set cache-folder \"$dir\\cache\"",
         "yarn config set yarn-offline-mirror \"$dir\\mirror\"",
-        "yarn config set prefix \"$dir\""
+        "yarn config set global-folder \"$dir\\global\""
     ],
+    "uninstaller": {
+        "script": [
+            "Remove-Item $env:LOCALAPPDATA\\Yarn -Recurse -Force",
+            "Remove-Item $env:USERPROFILE\\.yarnrc -Force"
+        ]
+    },
     "env_add_path": [
-        "bin",
+        "global\\node_modules\\.bin",
         "Yarn\\bin"
     ],
     "checkver": {
-        "url": "https://yarnpkg.com/latest-version",
-        "re": "([\\d.]+)"
+        "github": "https://github.com/yarnpkg/yarn/"
     },
     "autoupdate": {
-        "url": "https://yarnpkg.com/downloads/$version/yarn-$version.msi"
+        "url": "https://github.com/yarnpkg/yarn/releases/download/v$version/yarn-$version.msi"
+    },
+    "suggest": {
+        "Node.js": [
+            "nodejs",
+            "nodejs-lts",
+            "nvm",
+            "nvs"
+        ]
     }
 }
