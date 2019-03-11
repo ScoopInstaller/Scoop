@@ -1,0 +1,29 @@
+{
+    "homepage": "https://wp-cli.org",
+    "description": "WP-CLI is the command-line interface for WordPress. You can update plugins, configure multisite installs and much more, without using a web browser.",
+    "license": "MIT",
+    "version": "2.1.0",
+    "url": "https://github.com/wp-cli/wp-cli/releases/download/v2.1.0/wp-cli-2.1.0.phar#/wp-cli.phar",
+    "hash": "sha512:c2ff556c21c85bbcf11be38d058224f53d3d57a1da45320ecf0079d480063dcdc11b5029b94b0b181c1e3bec84745300cd848d28065c0d3619f598980cc17244",
+    "bin": "wp.ps1",
+    "pre_install": [
+        "echo 'if($args.length -eq 2 -and ($args[0] -eq \"cli\" -and $args[1] -eq \"update\")) { & scoop update wp-cli }' | out-file \"$dir\\wp.ps1\"",
+        "echo 'else { & php (join-path $psscriptroot \"wp-cli.phar\") @args }' | out-file \"$dir\\wp.ps1\" -append"
+    ],
+    "suggest": {
+        "PHP": [
+            "php",
+            "php-nts"
+        ]
+    },
+    "notes": "'wp cli update' is aliased to 'scoop update wp-cli'",
+    "checkver": {
+        "github": "https://github.com/wp-cli/wp-cli"
+    },
+    "autoupdate": {
+        "url": "https://github.com/wp-cli/wp-cli/releases/download/v$version/wp-cli-$version.phar#/wp-cli.phar",
+        "hash": {
+            "url": "$url.sha512"
+        }
+    }
+}
