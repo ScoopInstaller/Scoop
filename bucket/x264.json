@@ -2,15 +2,15 @@
     "description": "H.264/MPEG-4 AVC video encoder (8 bit)",
     "homepage": "https://www.videolan.org/developers/x264.html",
     "license": "GPL-2.0",
-    "version": "2935",
+    "version": "2945",
     "architecture": {
         "64bit": {
-            "hash": "e0cee77e4f1c83266b961d0fde333a7f871da67cfd9e764833eca7899f9722b6",
-            "url": "https://download.videolan.org/pub/x264/binaries/win64/x264-r2935-545de2f.exe#/x264.exe"
+            "hash": "d7137c9ece42b2d6ab4bd17d2b192d653d588522d80b18728fb57ed12e6d4608",
+            "url": "https://download.videolan.org/pub/x264/binaries/win64/x264-r2945-72db437.exe#/x264.exe"
         },
         "32bit": {
-            "hash": "942b7845bb3bbd88e6a0f8180c407bc05947946b2789343b036bd2086929f0f9",
-            "url": "https://download.videolan.org/pub/x264/binaries/win32/x264-r2935-545de2f.exe#/x264.exe"
+            "hash": "79314c26762d0f9d1d94f762af3786144a36c649a5638ee9c3498004cb850a27",
+            "url": "https://download.videolan.org/pub/x264/binaries/win32/x264-r2945-72db437.exe#/x264.exe"
         }
     },
     "bin": [
