@@ -927,14 +927,9 @@ function link_current($versiondir) {
         abort "Error: Version 'current' is not allowed!"
     }
 
-    if(test-path $currentdir) {
-        # remove the junction
-        attrib -R /L $currentdir
-        & "$env:COMSPEC" /c rmdir $currentdir
-    }
-
-    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
-    attrib $currentdir +R /L
+    # recreate new junction
+    remove_junction $currentdir | Out-Null
+    create_junction $currentdir $versiondir | Out-Null
     return $currentdir
 }
 
@@ -950,11 +945,7 @@ function unlink_current($versiondir) {
     if(test-path $currentdir) {
         write-host "Unlinking $(friendly_path $currentdir)"
 
-        # remove read-only attribute on link
-        attrib $currentdir -R /L
-
-        # remove the junction
-        & "$env:COMSPEC" /c "rmdir $currentdir"
+        remove_junction $currentdir | Out-Null
         return $currentdir
     }
     return $versiondir
@@ -1184,11 +1175,10 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # create link
             if (is_directory $target) {
                 # target is a directory, create junction
-                & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
-                attrib $source +R /L
+                create_junction $source $target | Out-Null
             } else {
                 # target is a file, create hard link
-                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
+                create_hardlink $source $target | Out-Null
             }
         }
     }
@@ -1202,13 +1192,9 @@ function unlink_persist_data($dir) {
             $filepath = $file.FullName
             # directory (junction)
             if ($file -is [System.IO.DirectoryInfo]) {
-                # remove read-only attribute on the link
-                attrib -R /L $filepath
-                # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+                remove_junction | Out-Null
             } else {
-                # remove the hard link
-                & "$env:COMSPEC" /c "del $filepath"
+                remove_hardlink $filepath | Out-Null
             }
         }
     }
