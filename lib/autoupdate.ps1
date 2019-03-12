@@ -368,7 +368,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
 
     if ($json.url) {
         if ($json.autoupdate.url -is [System.Array]) {
-            $return = lets_do_autoupdates $app $json $version $substitutions
+            $has_changes, $has_errors = lets_do_autoupdates $app $json $version $substitutions
             $has_changes = $return[0]
             $has_errors = $return[1]
         } else {
