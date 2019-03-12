@@ -13,7 +13,7 @@
             "elevate.vbs",
             "nodejs\\elevate.vbs"
         ],
-        "settings.txt"
+        ["settings.txt", "", "root: $persist_dir\\nodejs`r`narch: $architecture`r`nproxy: none"]
     ],
     "env_add_path": "nodejs\\nodejs",
     "env_set": {
@@ -21,22 +21,6 @@
         "NVM_SYMLINK": "$persist_dir\\nodejs\\nodejs"
     },
     "hash": "md5:00acf86e40c5f038cca8c383b9d2c207",
-    "architecture": {
-        "64bit": {
-            "pre_install": [
-                "if(!(test-path \"$dir\\settings.txt\")) {",
-                "    write-output \"root: $persist_dir\\nodejs`r`narch: 64`r`nproxy: none\" | Out-File -encoding \"ASCII\" \"$dir\\settings.txt\"",
-                "}"
-            ]
-        },
-        "32bit": {
-            "pre_install": [
-                "if(!(test-path \"$dir\\settings.txt\")) {",
-                "    write-output \"root: $persist_dir\\nodejs`r`narch: 32`r`nproxy: none\" | Out-File -encoding \"ASCII\" \"$dir\\settings.txt\"",
-                "}"
-            ]
-        }
-    },
     "notes": "You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly",
     "checkver": "github",
     "autoupdate": {
