@@ -1209,7 +1209,7 @@ function unlink_persist_data($dir) {
         if ($null -ne $file.LinkType) {
             $filepath = $file.FullName
             # directory (junction)
-            if (is_directory $file) {
+            if (is_directory $filepath) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
                 # remove the junction
