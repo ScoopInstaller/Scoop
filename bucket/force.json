@@ -1,15 +1,15 @@
 {
     "homepage": "https://force-cli.herokuapp.com/",
     "description": "Force.com CLI tool",
-    "version": "0.25.0",
+    "version": "0.26.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ForceCLI/force/releases/download/v0.25.0/force_windows_amd64.exe#/force.exe",
-            "hash": "0ac2c961f33e668fb991788da7811a2ea9013d10dfa63e6d3eb8a4ec8a667706"
+            "url": "https://github.com/ForceCLI/force/releases/download/v0.26.0/force_windows_amd64.exe#/force.exe",
+            "hash": "c823399a474bdb68ed65a035c0890001e37d3a537e9b5fac4052f380c75dd963"
         },
         "32bit": {
-            "url": "https://github.com/ForceCLI/force/releases/download/v0.25.0/force_windows_386.exe#/force.exe",
-            "hash": "153358408a0cc80d904c23760616f46ccef29a65798bb645c149420c3ad796b1"
+            "url": "https://github.com/ForceCLI/force/releases/download/v0.26.0/force_windows_386.exe#/force.exe",
+            "hash": "9799c2208a4c41ec1759f7c086fbe6591e44cd81ea189758dbb955c72bf988ab"
         }
     },
     "bin": "force.exe",
