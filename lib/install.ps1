@@ -1135,52 +1135,73 @@ function persist_def($persist) {
 
 function persist_data($manifest, $original_dir, $persist_dir) {
     $persist = $manifest.persist
-    if($persist) {
-        $persist_dir = ensure $persist_dir
+    if(!$persist) {
+        return
+    }
+    $persist_dir = ensure $persist_dir
 
-        if ($persist -is [String]) {
-            $persist = @($persist);
-        }
+    if ($persist -is [String]) {
+        persist_data_old $persist $original_dir $persist_dir
+        return
+    }
 
+    if ($persist -is [Array]) {
         $persist | ForEach-Object {
-            $source, $target = persist_def $_
-
-            write-host "Persisting $source"
-
-            $source = $source.TrimEnd("/").TrimEnd("\\")
-
-            $source = fullpath "$dir\$source"
-            $target = fullpath "$persist_dir\$target"
-
-            # if we have had persist data in the store, just create link and go
-            if (Test-Path $target) {
-                # if there is also a source data, rename it (to keep a original backup)
-                if (Test-Path $source) {
-                    Move-Item -Force $source "$source.original"
-                }
-            # we don't have persist data in the store, move the source to target, then create link
-            } elseif (Test-Path $source) {
-                # ensure target parent folder exist
-                $null = ensure (Split-Path -Path $target)
-                Move-Item $source $target
-            # we don't have neither source nor target data! we need to crate an empty target,
-            # but we can't make a judgement that the data should be a file or directory...
-            # so we create a directory by default. to avoid this, use pre_install
-            # to create the source file before persisting (DON'T use post_install)
-            } else {
-                $target = New-Object System.IO.DirectoryInfo($target)
-                ensure $target | Out-Null
+            if($_ -is [Object]) {
+                persist_data_new $_ $original_dir $persist_dir
             }
-
-            # create link
-            if (is_directory $target) {
-                # target is a directory, create junction
-                create_junction $source $target | Out-Null
-            } else {
-                # target is a file, create hard link
-                create_hardlink $source $target | Out-Null
+            if ($_ -is [String]) {
+                persist_data_old $_ $original_dir $persist_dir
             }
         }
+    }
+}
+
+function persist_data_new($persist, $original_dir, $persist_dir) {
+    # TODO
+}
+
+function persist_data_old($persist, $original_dir, $persist_dir) {
+    if(!$persist) {
+        return
+    }
+
+    $source, $target = persist_def $persist
+
+    write-host "Persisting $source"
+
+    $source = $source.TrimEnd("/").TrimEnd("\\")
+
+    $source = fullpath "$dir\$source"
+    $target = fullpath "$persist_dir\$target"
+
+    # if we have had persist data in the store, just create link and go
+    if (Test-Path $target) {
+        # if there is also a source data, rename it (to keep a original backup)
+        if (Test-Path $source) {
+            Move-Item -Force $source "$source.original"
+        }
+    # we don't have persist data in the store, move the source to target, then create link
+    } elseif (Test-Path $source) {
+        # ensure target parent folder exist
+        $null = ensure (Split-Path -Path $target)
+        Move-Item $source $target
+    # we don't have neither source nor target data! we need to crate an empty target,
+    # but we can't make a judgement that the data should be a file or directory...
+    # so we create a directory by default. to avoid this, use pre_install
+    # to create the source file before persisting (DON'T use post_install)
+    } else {
+        $target = New-Object System.IO.DirectoryInfo($target)
+        ensure $target | Out-Null
+    }
+
+    # create link
+    if (is_directory $target) {
+        # target is a directory, create junction
+        create_junction $source $target | Out-Null
+    } else {
+        # target is a file, create hard link
+        create_hardlink $source $target | Out-Null
     }
 }
 
