@@ -124,32 +124,58 @@ describe "shim_def" -Tag 'Scoop' {
 
 describe 'persist_def' -Tag 'Scoop' {
     it 'parses string correctly' {
-        $source, $target = persist_def "test"
+        $source, $target, $contents = persist_def "test"
         $source | should -be "test"
         $target | should -be "test"
+        $contents | should -be $null
     }
 
     it 'should handle sub-folder' {
-        $source, $target = persist_def "foo/bar"
+        $source, $target, $contents = persist_def "foo/bar"
         $source | should -be "foo/bar"
         $target | should -be "foo/bar"
+        $contents | should -be $null
     }
 
-    it 'should handle arrays' {
+    it 'should handle directory' {
         # both specified
-        $source, $target = persist_def @("foo", "bar")
+        $source, $target, $contents = persist_def @("foo", "bar")
         $source | should -be "foo"
         $target | should -be "bar"
-
-        # only first specified
-        $source, $target = persist_def @("foo")
-        $source | should -be "foo"
-        $target | should -be "foo"
+        $contents | should -be $null
 
         # null value specified
-        $source, $target = persist_def @("foo", $null)
+        $source, $target, $contents = persist_def @("foo", $null)
         $source | should -be "foo"
         $target | should -be "foo"
+        $contents | should -be $null
+    }
+
+    it 'should handle file' {
+
+        # no file contents specified
+        $source, $target, $contents = persist_def @("foo")
+        $source | should -be "foo"
+        $target | should -be "foo"
+        $contents | should -be ""
+
+        # file contents specified
+        $source, $target, $contents = persist_def @("foo", "", "file contents")
+        $source | should -be "foo"
+        $target | should -be "foo"
+        $contents | should -be "file contents"
+
+        # null and file contents specified
+        $source, $target, $contents = persist_def @("foo", $null, "file contents")
+        $source | should -be "foo"
+        $target | should -be "foo"
+        $contents | should -be "file contents"
+
+        # several lines of file contents specified
+        $source, $target, $contents = persist_def @("foo", "", "file", "contents")
+        $source | should -be "foo"
+        $target | should -be "foo"
+        $contents | should -be "file`r`ncontents"
     }
 }
 
