@@ -1155,45 +1155,48 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
         $persist | ForEach-Object {
             $source, $target, $contents = persist_def $_
-
-            write-host "Persisting $source"
-
-            $source = $source.TrimEnd("/").TrimEnd("\\")
-
-            $source = fullpath "$dir\$source"
-            $target = fullpath "$persist_dir\$target"
-
-            # if we have had persist data in the store, just create link and go
-            if (Test-Path $target) {
-                # if there is also a source data, rename it (to keep a original backup)
-                if (Test-Path $source) {
-                    Move-Item -Force $source "$source.original"
-                }
-            # we don't have persist data in the store, move the source to target, then create link
-            } elseif (Test-Path $source) {
-                # ensure target parent folder exist
-                $null = ensure (Split-Path -Path $target)
-                Move-Item $source $target
-            # use file contents to determine $source's type, $null for directory and others for file
-            } elseif ($null -eq $contents) {
-                New-Item -Path $target -ItemType Directory -Force | Out-Null
-            } else {
-                $contents = $ExecutionContext.InvokeCommand.ExpandString($contents)
-                New-Item -Path $target -ItemType File -Value $contents -Force | Out-Null
-            }
-
-            # create link
-            if (is_directory $target) {
-                # target is a directory, create junction
-                create_junction $source $target | Out-Null
-            } else {
-                # target is a file, create hard link
-                create_hardlink $source $target | Out-Null
-            }
+            persist_helper $source $target $contents
         }
     }
 }
 
+function persist_helper($source, $target, $contents = $null, $method = "link", $encoding = "ASCII") {
+    write-host "Persisting $source"
+
+    $source = $source.TrimEnd("/").TrimEnd("\\")
+
+    $source = fullpath "$dir\$source"
+    $target = fullpath "$persist_dir\$target"
+
+    # TODO using $method
+    # if we have had persist data in the store, just create link and go
+    if (Test-Path $target) {
+        # if there is also a source data, rename it (to keep a original backup)
+        if (Test-Path $source) {
+            Move-Item -Force $source "$source.original"
+        }
+    # we don't have persist data in the store, move the source to target, then create link
+    } elseif (Test-Path $source) {
+        # ensure target parent folder exist
+        $null = ensure (Split-Path -Path $target)
+        Move-Item $source $target
+    # use file contents to determine $source's type, $null for directory and others for file
+    } elseif ($null -eq $contents) {
+        New-Item -Path $target -ItemType Directory -Force | Out-Null
+    } else {
+        $contents = $ExecutionContext.InvokeCommand.ExpandString($contents)
+        Out-File -FilePath $target -Encoding $encoding -InputObject $contents -Force | Out-Null
+    }
+
+    # create link
+    if (is_directory $target) {
+        # target is a directory, create junction
+        create_junction $source $target | Out-Null
+    } else {
+        # target is a file, create hard link
+        create_hardlink $source $target | Out-Null
+    }
+}
 function unlink_persist_data($dir) {
     # unlink all junction / hard link in the directory
     Get-ChildItem -Recurse $dir | ForEach-Object {
