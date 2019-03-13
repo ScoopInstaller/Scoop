@@ -1,10 +1,10 @@
 {
-    "version": "5.18.0.240",
+    "version": "5.18.0.268",
     "description": "Cross platform, open source .NET framework.",
     "homepage": "https://www.mono-project.com/",
     "license": "MIT",
-    "url": "https://download.mono-project.com/archive/5.18.0/windows-installer/mono-5.18.0.240-gtksharp-2.12.45-win32-0.msi",
-    "hash": "9b556968c7f57ed0df9a2319ae47ff4dae98e0ba95a3f0e51d8160f918300aee",
+    "url": "https://download.mono-project.com/archive/5.18.0/windows-installer/mono-5.18.0.268-gtksharp-2.12.45-win32-0.msi",
+    "hash": "6a5cff82cc46c0bea69537086e3597cfd1a7c800ead9550c61d9b955360c26aa",
     "extract_dir": "Mono",
     "env_add_path": "bin",
     "checkver": {
