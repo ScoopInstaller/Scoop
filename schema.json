@@ -202,6 +202,69 @@
             },
             "type": "object"
         },
+        "persist": {
+            "anyOf": [
+                {
+                    "description": "Deprecated, use object representation instead.",
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                {
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "type"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "target": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "enum": [
+                                    "file",
+                                    "directory"
+                                ]
+                            },
+                            "encoding": {
+                                "enum": [
+                                    "ASCII",
+                                    "BigEndianUnicode",
+                                    "BigEndianUTF32",
+                                    "Byte",
+                                    "Default",
+                                    "OEM",
+                                    "Unicode",
+                                    "UTF7",
+                                    "UTF8",
+                                    "UTF32"
+                                ]
+                            },
+                            "content": {
+                                "$ref": "#/definitions/stringOrArrayOfStrings"
+                            },
+                            "glue": {
+                                "description": "Characters to join content array",
+                                "type": "string"
+                            },
+                            "method": {
+                                "enum": [
+                                    "link",
+                                    "copy",
+                                    "merge",
+                                    "update"
+                                ]
+                            }
+                        }
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                }
+            ]
+        },
         "checkver": {
             "anyOf": [
                 {
@@ -407,7 +470,7 @@
             "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
         },
         "persist": {
-            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+            "$ref": "#/definitions/persist"
         },
         "checkver": {
             "$ref": "#/definitions/checkver"
