@@ -927,14 +927,11 @@ function link_current($versiondir) {
         abort "Error: Version 'current' is not allowed!"
     }
 
-    if(test-path $currentdir) {
-        # remove the junction
-        attrib -R /L $currentdir
-        & "$env:COMSPEC" /c rmdir $currentdir
+    # recreate new junction
+    if (Test-Path $currentdir) {
+        Remove-Item $currentdir -Recurse -Force | Out-Null
     }
-
-    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
-    attrib $currentdir +R /L
+    create_junction $currentdir $versiondir | Out-Null
     return $currentdir
 }
 
@@ -950,11 +947,7 @@ function unlink_current($versiondir) {
     if(test-path $currentdir) {
         write-host "Unlinking $(friendly_path $currentdir)"
 
-        # remove read-only attribute on link
-        attrib $currentdir -R /L
-
-        # remove the junction
-        & "$env:COMSPEC" /c "rmdir $currentdir"
+        Remove-Item $currentdir -Recurse -Force | Out-Null
         return $currentdir
     }
     return $versiondir
@@ -1192,11 +1185,10 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # create link
             if (is_directory $target) {
                 # target is a directory, create junction
-                New-Item -Path $source -ItemType Junction -Value $target | Out-Null
-                attrib $source +R /L
+                create_junction $source $target | Out-Null
             } else {
                 # target is a file, create hard link
-                New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
+                create_hardlink $source $target | Out-Null
             }
         }
     }
@@ -1207,17 +1199,7 @@ function unlink_persist_data($dir) {
     Get-ChildItem -Recurse $dir | ForEach-Object {
         $file = $_
         if ($null -ne $file.LinkType) {
-            $filepath = $file.FullName
-            # directory (junction)
-            if (is_directory $filepath) {
-                # remove read-only attribute on the link
-                attrib -R /L $filepath
-                # remove the junction
-                Remove-Item -Path $filepath -Recurse -Force | Out-Null
-            } else {
-                # remove the hard link
-                Remove-Item -Path $filepath -Force | Out-Null
-            }
+            Remove-Item $file.FullName -Recurse -Force | Out-Null
         }
     }
 }

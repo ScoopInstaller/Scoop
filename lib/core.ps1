@@ -285,7 +285,25 @@ function isFileLocked([string]$path) {
 }
 
 function is_directory([String] $path) {
-    return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
+    return (Test-Path $path) -and (Get-Item -Path $path) -is [System.IO.DirectoryInfo]
+}
+
+function create_junction([String] $link, [String] $target) {
+    if (!(Test-Path $link) -and (is_directory $target)) {
+        New-Item -ItemType Junction -Path $link -Target $target | Out-Null
+        $dirInfo = New-Object System.IO.DirectoryInfo($link)
+        $dirInfo.Attributes = $dirInfo.Attributes -bor [System.IO.FileAttributes]::ReadOnly
+        return $true
+    }
+    return $false
+}
+
+function create_hardlink([String] $link, [String] $target) {
+    if (!(Test-Path $link) -and (Test-Path $target) -and !(is_directory $target)) {
+        New-Item -ItemType HardLink -Path $link -Target $target | Out-Null
+        return $true
+    }
+    return $false
 }
 
 function movedir($from, $to) {
