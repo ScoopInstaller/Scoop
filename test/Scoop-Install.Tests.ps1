@@ -101,7 +101,7 @@ describe "env add and remove path" -Tag 'Scoop' {
     }
 }
 
-describe "shim_def" -Tag 'Scoop' {
+describe "shim parsing" -Tag 'Scoop' {
     it "should use strings correctly" {
         $target, $name, $shimArgs = shim_def "command.exe"
         $target | should -be "command.exe"
@@ -122,60 +122,60 @@ describe "shim_def" -Tag 'Scoop' {
     }
 }
 
-describe 'persist_def' -Tag 'Scoop' {
+describe 'persist parsing for array' -Tag 'Scoop' {
     it 'parses string correctly' {
-        $source, $target, $contents = persist_def "test"
-        $source | should -be "test"
-        $target | should -be "test"
-        $contents | should -be $null
+        $persist_def = persist_def_arr "test"
+        $persist_def.source | should -be "test"
+        $persist_def.target | should -be "test"
+        $persist_def.contents | should -be $null
     }
 
     it 'should handle sub-folder' {
-        $source, $target, $contents = persist_def "foo/bar"
-        $source | should -be "foo/bar"
-        $target | should -be "foo/bar"
-        $contents | should -be $null
+        $persist_def = persist_def_arr "foo/bar"
+        $persist_def.source | should -be "foo/bar"
+        $persist_def.target | should -be "foo/bar"
+        $persist_def.contents | should -be $null
     }
 
     it 'should handle directory' {
         # both specified
-        $source, $target, $contents = persist_def @("foo", "bar")
-        $source | should -be "foo"
-        $target | should -be "bar"
-        $contents | should -be $null
+        $persist_def = persist_def_arr @("foo", "bar")
+        $persist_def.source | should -be "foo"
+        $persist_def.target | should -be "bar"
+        $persist_def.contents | should -be $null
 
         # null value specified
-        $source, $target, $contents = persist_def @("foo", $null)
-        $source | should -be "foo"
-        $target | should -be "foo"
-        $contents | should -be $null
+        $persist_def = persist_def_arr @("foo", $null)
+        $persist_def.source | should -be "foo"
+        $persist_def.target | should -be "foo"
+        $persist_def.contents | should -be $null
     }
 
     it 'should handle file' {
 
         # no file contents specified
-        $source, $target, $contents = persist_def @("foo")
-        $source | should -be "foo"
-        $target | should -be "foo"
-        $contents | should -be ""
+        $persist_def = persist_def_arr @("foo")
+        $persist_def.source | should -be "foo"
+        $persist_def.target | should -be "foo"
+        $persist_def.contents | should -be ""
 
         # file contents specified
-        $source, $target, $contents = persist_def @("foo", "", "file contents")
-        $source | should -be "foo"
-        $target | should -be "foo"
-        $contents | should -be "file contents"
+        $persist_def = persist_def_arr @("foo", "", "file contents")
+        $persist_def.source | should -be "foo"
+        $persist_def.target | should -be "foo"
+        $persist_def.contents | should -be "file contents"
 
         # null and file contents specified
-        $source, $target, $contents = persist_def @("foo", $null, "file contents")
-        $source | should -be "foo"
-        $target | should -be "foo"
-        $contents | should -be "file contents"
+        $persist_def = persist_def_arr @("foo", $null, "file contents")
+        $persist_def.source | should -be "foo"
+        $persist_def.target | should -be "foo"
+        $persist_def.contents | should -be "file contents"
 
         # several lines of file contents specified
-        $source, $target, $contents = persist_def @("foo", "", "file", "contents")
-        $source | should -be "foo"
-        $target | should -be "foo"
-        $contents | should -be "file`r`ncontents"
+        $persist_def = persist_def_arr @("foo", "", "file", "contents")
+        $persist_def.source | should -be "foo"
+        $persist_def.target | should -be "foo"
+        $persist_def.contents | should -be "file`r`ncontents"
     }
 }
 

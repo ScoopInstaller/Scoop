@@ -929,7 +929,7 @@ function link_current($versiondir) {
 
     # recreate new junction
     if (Test-Path $currentdir) {
-        Remove-Item $currentdir -Recurse -Force | Out-Null
+        Remove-Item $currentdir -Recurse -Force
     }
     create_junction $currentdir $versiondir | Out-Null
     return $currentdir
@@ -947,7 +947,7 @@ function unlink_current($versiondir) {
     if(test-path $currentdir) {
         write-host "Unlinking $(friendly_path $currentdir)"
 
-        Remove-Item $currentdir -Recurse -Force | Out-Null
+        Remove-Item $currentdir -Recurse -Force
         return $currentdir
     }
     return $versiondir
@@ -1119,7 +1119,31 @@ function show_suggestions($suggested) {
 }
 
 # Persistent data
-function persist_def($persist) {
+
+function persist_data($manifest, $original_dir, $persist_dir) {
+    $persist = $manifest.persist
+    if($persist) {
+        $persist_dir = ensure $persist_dir
+
+        if ($persist -isnot [Array]) {
+            $persist = @($persist);
+        }
+
+        $persist | ForEach-Object {
+            if ($persist -is [Object]) {
+                $persist_def = persist_def_obj $_
+            } else {
+                $persist_def = persist_def_arr $_
+            }
+            persist_helper @persist_def
+        }
+    }
+}
+
+function persist_def_obj($persist) {
+    # TODO [Object] parsing
+}
+function persist_def_arr($persist) {
     if ($persist -is [Array]) {
         # if $persist is Array, use its length to determine its type
         switch ($persist.Count) {
@@ -1141,22 +1165,10 @@ function persist_def($persist) {
         $target = $source
     }
 
-    return $source, $target, $contents
-}
-
-function persist_data($manifest, $original_dir, $persist_dir) {
-    $persist = $manifest.persist
-    if($persist) {
-        $persist_dir = ensure $persist_dir
-
-        if ($persist -is [String]) {
-            $persist = @($persist);
-        }
-
-        $persist | ForEach-Object {
-            $source, $target, $contents = persist_def $_
-            persist_helper $source $target $contents
-        }
+    return @{
+        source = $source
+        target = $target
+        contents = $contents
     }
 }
 
@@ -1168,12 +1180,42 @@ function persist_helper($source, $target, $contents = $null, $method = "link", $
     $source = fullpath "$dir\$source"
     $target = fullpath "$persist_dir\$target"
 
-    # TODO using $method
     # if we have had persist data in the store, just create link and go
     if (Test-Path $target) {
-        # if there is also a source data, rename it (to keep a original backup)
+        # if there is also a source data, using $method to determine what to do
         if (Test-Path $source) {
-            Move-Item -Force $source "$source.original"
+            if (is_directory $source) {
+                # for dir persisting
+                switch ($method) {
+                    # keep $source
+                    "copy" {
+                        Remove-Item $target -Recurse -Force
+                        movedir $source $target
+                    }
+                    # keep all files based on $target
+                    "merge" { movedir $source $target "/XC /XN /XO" }
+                    # keep all newer files
+                    "update" { movedir $source $target "/XO" }
+                    # keep $target ("link")
+                    Default { movedir $source "$source.original" }
+                }
+            } else {
+                # for file persisting
+                switch ($method) {
+                    # keep $source
+                    "copy" { Move-Item $source $target -Force }
+                    # keep newer
+                    "update" {
+                        if ((Get-Item $source).LastWriteTimeUtc -gt (Get-Item $target).LastWriteTimeUtc){
+                            Move-Item $source $target -Force
+                        } else {
+                            Rename-Item $source "$source.original" -Force
+                        }
+                    }
+                    # keep $target ("link", "merge")
+                    Default { Rename-Item $source "$source.original" -Force }
+                }
+            }
         }
     # we don't have persist data in the store, move the source to target, then create link
     } elseif (Test-Path $source) {
@@ -1182,10 +1224,11 @@ function persist_helper($source, $target, $contents = $null, $method = "link", $
         Move-Item $source $target
     # use file contents to determine $source's type, $null for directory and others for file
     } elseif ($null -eq $contents) {
-        New-Item -Path $target -ItemType Directory -Force | Out-Null
+        New-Item $target -ItemType Directory -Force | Out-Null
     } else {
+        $null = ensure (Split-Path -Path $target)
         $contents = $ExecutionContext.InvokeCommand.ExpandString($contents)
-        Out-File -FilePath $target -Encoding $encoding -InputObject $contents -Force | Out-Null
+        Out-File -FilePath $target -Encoding $encoding -InputObject $contents -Force
     }
 
     # create link
@@ -1202,7 +1245,7 @@ function unlink_persist_data($dir) {
     Get-ChildItem -Recurse $dir | ForEach-Object {
         $file = $_
         if ($null -ne $file.LinkType) {
-            Remove-Item $file.FullName -Recurse -Force | Out-Null
+            Remove-Item $file.FullName -Recurse -Force
         }
     }
 }
