@@ -14,7 +14,7 @@
         "script": [
             "$extracted = \"$dir\\extracted\"",
             "$msi = \"$dir\\msi\"",
-            "&(scoop which dark) -nologo -x \"$extracted\" \"$dir\\installer.exe\" | Out-Null",
+            "&(file_path dark dark.exe) -nologo -x \"$extracted\" \"$dir\\installer.exe\" | Out-Null",
             "extract_msi \"$extracted\\AttachedContainer\\pms.msi\" \"$msi\"",
             "Move-Item \"$msi\\Msi\\*\" \"$dir\" -Force",
             "Remove-Item $extracted, $msi, \"$dir\\installer.exe\" -Force -Recurse"

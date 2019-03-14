@@ -1,0 +1,18 @@
+{
+    "homepage": "http://wixtoolset.org/",
+    "license": "MS-RL",
+    "version": "3.11",
+    "url": "https://raw.githubusercontent.com/scoopinstaller/binary-mirror/master/dark/dark-3.11.zip",
+    "hash": "48763b0f63062ccbf4a4d852761008ae59e0c01ef3fb116883592f4a1c67c61d",
+    "bin": "dark.exe",
+    "checkver": {
+        "url": "https://github.com/scoopinstaller/binary-mirror/tree/master/dark",
+        "re": "dark-([0-9.]+).zip"
+    },
+    "autoupdate": {
+        "url": "https://raw.githubusercontent.com/scoopinstaller/binary-mirror/master/dark/dark-$version.zip",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}
