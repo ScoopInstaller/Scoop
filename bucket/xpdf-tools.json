@@ -1,18 +1,18 @@
 {
     "homepage": "https://www.xpdfreader.com",
     "description": "Several command-line utilities to read and extract data from PDF files",
-    "version": "4.01",
-    "url": "https://xpdfreader-dl.s3.amazonaws.com/xpdf-tools-win-4.01.zip",
-    "hash": "e5fe92db4a401f121e2455da721b2a4731e109d2b378262d62daa2a504d38681",
+    "version": "4.01.01",
+    "url": "https://xpdfreader-dl.s3.amazonaws.com/xpdf-tools-win-4.01.01.zip",
+    "hash": "87f526b2fb4f55c73be5c2443184704dce4efa77ba864b7f8ff2bcd4467f18f9",
     "license": {
         "identifier": "GPL-2.0-only,GPL-3.0-only"
     },
     "architecture": {
         "32bit": {
-            "extract_dir": "xpdf-tools-win-4.01/bin32"
+            "extract_dir": "xpdf-tools-win-4.01.01/bin32"
         },
         "64bit": {
-            "extract_dir": "xpdf-tools-win-4.01/bin64"
+            "extract_dir": "xpdf-tools-win-4.01.01/bin64"
         }
     },
     "checkver": {
