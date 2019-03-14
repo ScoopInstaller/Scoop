@@ -202,63 +202,72 @@
             },
             "type": "object"
         },
-        "persist": {
+        "persistItem": {
             "anyOf": [
                 {
                     "description": "Deprecated, use object representation instead.",
-                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                {
+                    "additionalProperties": false,
+                    "required": [
+                        "name",
+                        "type"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "target": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "enum": [
+                                "file",
+                                "directory"
+                            ]
+                        },
+                        "encoding": {
+                            "enum": [
+                                "ASCII",
+                                "BigEndianUnicode",
+                                "BigEndianUTF32",
+                                "Default",
+                                "OEM",
+                                "Unicode",
+                                "UTF7",
+                                "UTF8",
+                                "UTF32"
+                            ]
+                        },
+                        "content": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "glue": {
+                            "description": "Characters to join content array",
+                            "type": "string"
+                        },
+                        "method": {
+                            "enum": [
+                                "link",
+                                "copy",
+                                "merge",
+                                "update"
+                            ]
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "persist": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/persistItem"
                 },
                 {
                     "items": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                            "name",
-                            "type"
-                        ],
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "target": {
-                                "type": "string"
-                            },
-                            "type": {
-                                "enum": [
-                                    "file",
-                                    "directory"
-                                ]
-                            },
-                            "encoding": {
-                                "enum": [
-                                    "ASCII",
-                                    "BigEndianUnicode",
-                                    "BigEndianUTF32",
-                                    "Byte",
-                                    "Default",
-                                    "OEM",
-                                    "Unicode",
-                                    "UTF7",
-                                    "UTF8",
-                                    "UTF32"
-                                ]
-                            },
-                            "content": {
-                                "$ref": "#/definitions/stringOrArrayOfStrings"
-                            },
-                            "glue": {
-                                "description": "Characters to join content array",
-                                "type": "string"
-                            },
-                            "method": {
-                                "enum": [
-                                    "link",
-                                    "copy",
-                                    "merge",
-                                    "update"
-                                ]
-                            }
-                        }
+                        "$ref": "#/definitions/persistItem"
                     },
                     "minItems": 1,
                     "type": "array"
