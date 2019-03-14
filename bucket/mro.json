@@ -3,7 +3,7 @@
     "description": "Microsoft R Open: The enhanced distribution of R from Microsoft Corporation",
     "homepage": "https://mran.microsoft.com/",
     "license": "GPL-2.0-only",
-    "depends": "wixtoolset",
+    "depends": "dark",
     "suggest": {
         "Visual C/C++ Runtime 2015": "extras/vcredist2015"
     },
@@ -13,13 +13,13 @@
             "hash": "30de2b2fefed091452695e03c805fcefcef00ab30b3df04363b72d9d44bac494",
             "installer": {
                 "script": [
-                    "&(scoop which dark) -nologo -x \"$dir\\tmp\" \"$dir\\mro.exe\" | Out-Null",
+                    "&(file_path dark dark.exe) -nologo -x \"$dir\\tmp\" \"$dir\\mro.exe\" | Out-Null",
                     "extract_msi \"$dir\\tmp\\AttachedContainer\\ROpen.msi\" \"$dir\\tmp\" | Out-Null",
-                    "Move-Item \"$dir\\tmp\\Microsoft\\MRO-$version.0\\*\" \"$dir\" -Force",
+                    "movedir \"$dir\\tmp\\Microsoft\\MRO-$version.0\" \"$dir\" | Out-Null",
                     "extract_7zip \"$dir\\Setup\\*.cab\" \"$dir\\Setup\"",
                     "Remove-Item \"$dir\\bin\\x64\\Rblas.dll\", \"$dir\\bin\\x64\\Rlapack.dll\" -Force",
-                    "Move-Item \"$dir\\Setup\\bin\\x64\\*\" \"$dir\\bin\\x64\" -Force",
-                    "Move-Item \"$dir\\Setup\\library\\*\" \"$dir\\library\" -Force",
+                    "movedir \"$dir\\Setup\\bin\\x64\" \"$dir\\bin\\x64\" | Out-Null",
+                    "movedir \"$dir\\Setup\\library\" \"$dir\\library\" | Out-Null",
                     "Remove-Item \"$dir\\tmp\", \"$dir\\Setup\", \"$dir\\mro.exe\" -Force -Recurse"
                 ]
             },
