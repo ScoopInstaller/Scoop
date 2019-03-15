@@ -8,7 +8,7 @@
         "url": "https://support.plex.tv/articles/204096476-license-information/"
     },
     "depends": "dark",
-    "url": "https://downloads.plex.tv/plex-media-server/1.15.1.791-8bec0f76c/Plex-Media-Server-1.15.1.791-8bec0f76c.exe#/installer.exe",
+    "url": "https://downloads.plex.tv/plex-media-server-new/1.15.1.791-8bec0f76c/windows/PlexMediaServer-1.15.1.791-8bec0f76c-x86.exe#/installer.exe",
     "hash": "sha1:ce9a27f4b56674fb5b364d0769521751c38b1ad5",
     "installer": {
         "script": [
@@ -37,7 +37,7 @@
         "jsonpath": "$.computer.windows.version"
     },
     "autoupdate": {
-        "url": "https://downloads.plex.tv/plex-media-server/$version/Plex-Media-Server-$version.exe#/installer.exe",
+        "url": "https://downloads.plex.tv/plex-media-server-new/$version/windows/PlexMediaServer-$version-x86.exe#/installer.exe",
         "hash": {
             "url": "https://plex.tv/api/downloads/1.json",
             "jsonpath": "$.computer.Windows.releases..checksum"
