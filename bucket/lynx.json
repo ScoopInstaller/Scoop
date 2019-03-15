@@ -22,14 +22,14 @@
     "persist": "$dir/lynx.cfg",
     "pre_install": [
         "$q = [char]34",
-        "add-content \"$dir/lynx.cfg\" -value \"SSL_CERT_FILE:$(appdir openssl)/current/cacert.pem`n\"",
+        "add-content \"$dir/lynx.cfg\" -value \"SSL_CERT_FILE:$(appdir openssl $global)/current/cacert.pem`n\"",
         "add-content \"$dir/lynx.cfg\" -value \"FORCE_SSL_PROMPT:PROMPT`n\"",
         "set-content \"$dir/lynx.cmd\" -value \"@$q$dir\\lynx.exe$q --cfg=$q$dir\\lynx.cfg$q %*\""
     ],
     "post_install": [
-        "if (Test-Path \"$(appdir openssl)/current/libcrypto-1_1,1.dll\") {",
-        "   cp \"$(appdir openssl)/current/libcrypto-1_1,1.dll\" \"$dir/libcrypto-1_1,1.dll\"",
-        "   cp \"$(appdir openssl)/current/libssl-1_1,1.dll\" \"$dir/libssl-1_1,1.dll\"",
+        "if (Test-Path \"$(appdir openssl $global)/current/libcrypto-1_1,1.dll\") {",
+        "   cp \"$(appdir openssl $global)/current/libcrypto-1_1,1.dll\" \"$dir/libcrypto-1_1,1.dll\"",
+        "   cp \"$(appdir openssl $global)/current/libssl-1_1,1.dll\" \"$dir/libssl-1_1,1.dll\"",
         "} else {",
         "   echo 'lynx requires the 32-bit version of openssl to be installed'",
         "   exit 1",
