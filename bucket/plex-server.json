@@ -7,7 +7,7 @@
         "identifier": "Proprietary",
         "url": "https://support.plex.tv/articles/204096476-license-information/"
     },
-    "depends": "wixtoolset",
+    "depends": "dark",
     "url": "https://downloads.plex.tv/plex-media-server/1.15.1.791-8bec0f76c/Plex-Media-Server-1.15.1.791-8bec0f76c.exe#/installer.exe",
     "hash": "sha1:ce9a27f4b56674fb5b364d0769521751c38b1ad5",
     "installer": {
