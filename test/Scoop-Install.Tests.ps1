@@ -122,60 +122,156 @@ describe "shim parsing" -Tag 'Scoop' {
     }
 }
 
-describe 'persist parsing for array' -Tag 'Scoop' {
-    it 'parses string correctly' {
-        $persist_def = persist_def_arr "test"
-        $persist_def.source | should -be "test"
-        $persist_def.target | should -be "test"
-        $persist_def.contents | should -be $null
+describe 'persist parsing' -Tag 'Scoop' {
+    beforeall {
+        $working_dir = setup_working "persist"
     }
 
-    it 'should handle sub-folder' {
-        $persist_def = persist_def_arr "foo/bar"
-        $persist_def.source | should -be "foo/bar"
-        $persist_def.target | should -be "foo/bar"
-        $persist_def.contents | should -be $null
+    context "parsing object" {
+        $objfile = "$working_dir\persist-object.json"
+        $objfile | should -exist
+        $obj = Get-Content $objfile -Raw -Encoding UTF8 | ConvertFrom-Json -ea Stop
+
+        it 'should handle directory' {
+            # explicitly defined
+            $persist_def = persist_def_obj $obj.persist_dir[0]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be $null
+
+            # implicitly defined
+            $persist_def = persist_def_obj $obj.persist_dir[1]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be $null
+
+            # sub-dir
+            $persist_def = persist_def_obj $obj.persist_dir[2]
+            $persist_def.source | should -be "foo\bar"
+            $persist_def.target | should -be "foo\bar"
+            $persist_def.contents | should -be $null
+
+            # renaming
+            $persist_def = persist_def_obj $obj.persist_dir[3]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "bar"
+            $persist_def.contents | should -be $null
+
+            # ignore other params if dir
+            $persist_def = persist_def_obj $obj.persist_dir[4]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.encoding | should -be $null
+            $persist_def.contents | should -be $null
+
+            # passthru $method
+            $persist_def = persist_def_obj $obj.persist_dir[5]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be $null
+            $persist_def.method | should -be "merge"
+        }
+
+        it 'should handle file' {
+            # explicitly defined
+            $persist_def = persist_def_obj $obj.persist_file[0]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be ""
+
+            # implicitly defined
+            $persist_def = persist_def_obj $obj.persist_file[1]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be ""
+
+            # passthru file comtents
+            $persist_def = persist_def_obj $obj.persist_file[2]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be "file contents"
+
+            # passthru array file contents
+            $persist_def = persist_def_obj $obj.persist_file[3]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be "file`r`ncontents"
+
+            # using $glue to join array file contents
+            $persist_def = persist_def_obj $obj.persist_file[4]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be "file contents"
+
+            # passthru other params
+            $persist_def = persist_def_obj $obj.persist_file[5]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be "file`r`ncontents"
+            $persist_def.method | should -be "update"
+            $persist_def.encoding | should -be "UTF8"
+        }
     }
 
-    it 'should handle directory' {
-        # both specified
-        $persist_def = persist_def_arr @("foo", "bar")
-        $persist_def.source | should -be "foo"
-        $persist_def.target | should -be "bar"
-        $persist_def.contents | should -be $null
+    context 'parsing string and array of string' {
+        $arrfile = "$working_dir\persist-array.json"
+        $arrfile | should -exist
+        $arr = Get-Content $arrfile -Raw -Encoding UTF8 | ConvertFrom-Json -ea Stop
 
-        # null value specified
-        $persist_def = persist_def_arr @("foo", $null)
-        $persist_def.source | should -be "foo"
-        $persist_def.target | should -be "foo"
-        $persist_def.contents | should -be $null
-    }
+        it 'parses string correctly' {
+            $persist_def = persist_def_arr $arr.persist_dir[0]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be $null
+        }
 
-    it 'should handle file' {
+        it 'should handle sub-folder' {
+            $persist_def = persist_def_arr $arr.persist_dir[1]
+            $persist_def.source | should -be "foo\bar"
+            $persist_def.target | should -be "foo\bar"
+            $persist_def.contents | should -be $null
+        }
 
-        # no file contents specified
-        $persist_def = persist_def_arr @("foo")
-        $persist_def.source | should -be "foo"
-        $persist_def.target | should -be "foo"
-        $persist_def.contents | should -be ""
+        it 'should handle directory' {
+            # both specified
+            $persist_def = persist_def_arr $arr.persist_dir[2]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "bar"
+            $persist_def.contents | should -be $null
 
-        # file contents specified
-        $persist_def = persist_def_arr @("foo", "", "file contents")
-        $persist_def.source | should -be "foo"
-        $persist_def.target | should -be "foo"
-        $persist_def.contents | should -be "file contents"
+            # null value specified
+            $persist_def = persist_def_arr $arr.persist_dir[3]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be $null
+        }
 
-        # null and file contents specified
-        $persist_def = persist_def_arr @("foo", $null, "file contents")
-        $persist_def.source | should -be "foo"
-        $persist_def.target | should -be "foo"
-        $persist_def.contents | should -be "file contents"
+        it 'should handle file' {
 
-        # several lines of file contents specified
-        $persist_def = persist_def_arr @("foo", "", "file", "contents")
-        $persist_def.source | should -be "foo"
-        $persist_def.target | should -be "foo"
-        $persist_def.contents | should -be "file`r`ncontents"
+            # no file contents specified
+            $persist_def = persist_def_arr $arr.persist_file[0]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be ""
+
+            # file contents specified
+            $persist_def = persist_def_arr $arr.persist_file[1]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be "file contents"
+
+            # null and file contents specified
+            $persist_def = persist_def_arr $arr.persist_file[2]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be "file contents"
+
+            # several lines of file contents specified
+            $persist_def = persist_def_arr $arr.persist_file[3]
+            $persist_def.source | should -be "foo"
+            $persist_def.target | should -be "foo"
+            $persist_def.contents | should -be "file`r`ncontents"
+        }
     }
 }
 
