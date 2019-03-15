@@ -1130,18 +1130,53 @@ function persist_data($manifest, $original_dir, $persist_dir) {
         }
 
         $persist | ForEach-Object {
-            if ($persist -is [Object]) {
-                $persist_def = persist_def_obj $_
-            } else {
+            if ($_ -is [String] -or $_ -is [Array]) {
                 $persist_def = persist_def_arr $_
+            } else {
+                $persist_def = persist_def_obj $_
             }
+            debug $persist_def
             persist_helper @persist_def
         }
     }
 }
 
 function persist_def_obj($persist) {
-    # TODO [Object] parsing
+    $persist_def = @{}
+    $persist_def.source = $persist.name.TrimEnd('/').TrimEnd('\')
+    if ($persist.target) {
+        $persist_def.target = $persist.target
+    } else {
+        $persist_def.target = $persist_def.source
+    }
+
+    if ($persist.type) {
+        $type = $persist.type
+    } elseif ($persist.name -match "[/\\]$") {
+        $type = "directory"
+    } else {
+        $type = "file"
+    }
+    if ($null -eq $persist.glue) {
+        $glue = "`r`n"
+    } else {
+        $glue = $persist.glue
+    }
+    if ($type -eq "file") {
+        $persist_def.contents = $persist.contents -join $glue
+    } else {
+        $persist_def.contents = $null
+    }
+
+    if ($persist.method) {
+        $persist_def.method = $persist.method
+    }
+
+    if ($persist.encoding -and ($type -eq "file")) {
+        $persist_def.encoding = $persist.encoding
+    }
+
+    return $persist_def
 }
 function persist_def_arr($persist) {
     if ($persist -is [Array]) {
@@ -1165,17 +1200,17 @@ function persist_def_arr($persist) {
         $target = $source
     }
 
-    return @{
-        source = $source
+    $persist_def = @{
+        source = $source.TrimEnd('/').TrimEnd('\')
         target = $target
         contents = $contents
     }
+
+    return $persist_def
 }
 
 function persist_helper($source, $target, $contents = $null, $method = "link", $encoding = "ASCII") {
     write-host "Persisting $source"
-
-    $source = $source.TrimEnd("/").TrimEnd("\\")
 
     $source = fullpath "$dir\$source"
     $target = fullpath "$persist_dir\$target"
