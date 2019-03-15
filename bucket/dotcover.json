@@ -1,5 +1,6 @@
 {
     "version": "2018.3.1",
+    "description": "Analyses code coverage outside of Visual Studio",
     "homepage": "https://www.jetbrains.com/dotcover/download/#section=commandline",
     "license": {
         "identifier": "Freeware",
