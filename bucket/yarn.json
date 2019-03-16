@@ -1,10 +1,10 @@
 {
     "homepage": "https://yarnpkg.com/",
     "description": "Node.js dependency manager",
-    "version": "1.15.0",
+    "version": "1.15.2",
     "license": "BSD-2-Clause",
-    "url": "https://github.com/yarnpkg/yarn/releases/download/v1.15.0/yarn-1.15.0.msi",
-    "hash": "823abe4ca1c71d07338260cb540b7eaf853d923a2ca92c0daf765c0c091f6f47",
+    "url": "https://yarnpkg.com/downloads/1.15.2/yarn-1.15.2.msi",
+    "hash": "e3b07031012c83367809da702db77a70a151f457b4e83e6cb4d70e9426625f67",
     "persist": [
         "cache",
         "mirror",
@@ -26,10 +26,11 @@
         "Yarn\\bin"
     ],
     "checkver": {
-        "github": "https://github.com/yarnpkg/yarn/"
+        "url": "https://yarnpkg.com/latest-version",
+        "re": "([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://github.com/yarnpkg/yarn/releases/download/v$version/yarn-$version.msi"
+        "url": "https://yarnpkg.com/downloads/$version/yarn-$version.msi"
     },
     "suggest": {
         "Node.js": [
