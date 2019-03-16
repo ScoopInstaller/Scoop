@@ -1,15 +1,15 @@
 {
     "homepage": "https://unbound.net/",
-    "version": "1.9.0",
+    "version": "1.9.1",
     "license": "BSD-3-Clause",
     "architecture": {
         "64bit": {
-            "url": "https://unbound.net/downloads/unbound-1.9.0.zip",
-            "hash": "da382337f96e9e737af4f134504fad8d6b5bee3bf0edcc099bc65771afacef16"
+            "url": "https://unbound.net/downloads/unbound-1.9.1.zip",
+            "hash": "7b37194eab44f2ca00c6557f1fffd9375ff14a38c4ed917f7cba1e710a626b38"
         },
         "32bit": {
-            "url": "https://unbound.net/downloads/unbound-1.9.0-w32.zip",
-            "hash": "822e7a912e2084ee1f7b5274fd7221fc4c45153bd788882a7bc4d7ddc82aade6"
+            "url": "https://unbound.net/downloads/unbound-1.9.1-w32.zip",
+            "hash": "4fbf6323db806b99bacefeb4753b9c906c3eefc9a5dc3d53f82549468e0d7192"
         }
     },
     "bin": [
