@@ -8,12 +8,12 @@
     "version": "19.00",
     "architecture": {
         "64bit": {
-            "url": "https://7-zip.org/a/7z1900-x64.msi",
-            "hash": "a7803233eedb6a4b59b3024ccf9292a6fffb94507dc998aa67c5b745d197a5dc"
+            "url": "https://downloads.sourceforge.net/project/sevenzip/7-Zip/19.00/7z1900-x64.msi",
+            "hash": "sha1:d0dc016df5f9f9bf1a57b57db0e9e82f097b02b6"
         },
         "32bit": {
-            "url": "https://7-zip.org/a/7z1900.msi",
-            "hash": "b49d55a52bc0eab14947c8982c413d9be141c337da1368a24aa0484cbb5e89cd"
+            "url": "https://downloads.sourceforge.net/project/sevenzip/7-Zip/19.00/7z1900.msi",
+            "hash": "sha1:887ccdf0e9bab497a39a66506bd6ba641c30ff53"
         }
     },
     "extract_dir": "Files/7-Zip",
@@ -25,10 +25,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://7-zip.org/a/7z$cleanVersion-x64.msi"
+                "url": "https://downloads.sourceforge.net/project/sevenzip/7-Zip/$version/7z$cleanVersion-x64.msi"
             },
             "32bit": {
-                "url": "https://7-zip.org/a/7z$cleanVersion.msi"
+                "url": "https://downloads.sourceforge.net/project/sevenzip/7-Zip/$version/7z$cleanVersion.msi"
             }
         }
     },
