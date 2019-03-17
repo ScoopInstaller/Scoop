@@ -22,21 +22,22 @@ function file_requires_7zip($fname) {
 
 function extract_7zip($path, $to, $recurse) {
     $logfile = "$(Split-Path $path)\7zip.log"
-    $output = &(file_path 7zip 7z.exe) x "$path" -o"$to" -y > "$logfile"
+    &(file_path 7zip 7z.exe) x "$path" -o"$to" -y > "$logfile"
     if ($lastexitcode -ne 0) {
         abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
     }
     if (Test-Path $logfile) {
         Remove-Item $logfile -Force
     }
-    if ((fname $path) -match '\.tgz$') {
-        $tar = (fname $path) -replace 'tgz', 'tar'
-    } else {
-        $tar = strip_ext (fname $path)
-    }
-    if ($tar -match '\.tar$') {
-        if (Test-Path "$to\$tar") {
+    if ((strip_ext (fname $path)) -match '\.tar$' -or (fname $path) -match '\.tgz$') {
+        debug $path
+        $listfiles = &(file_path 7zip 7z.exe) l "$path"
+        if ($lastexitcode -eq 0) {
+            $listfiles[-3] -match "(\S*.tar)$"
+            $tar = $Matches[1]
             extract_7zip "$to\$tar" $to $true
+        } else {
+            abort "Failed to list files in $path."
         }
     } # Check for tar
     if ($recurse) {
