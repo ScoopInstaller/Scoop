@@ -2,11 +2,11 @@
     "homepage": "https://github.com/timvisee/ffsend",
     "description": "Easily and securely share files from the command line. A fully featured Firefox Send client.",
     "license": "GPL-3.0-only",
-    "version": "0.2.35",
+    "version": "0.2.36",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/timvisee/ffsend/releases/download/v0.2.35/ffsend-v0.2.35-windows-x64-static.exe#/ffsend.exe",
-            "hash": "1a7941a04e49400808fe28926cc6e868df389e9d3ca15759689d86964306de67"
+            "url": "https://github.com/timvisee/ffsend/releases/download/v0.2.36/ffsend-v0.2.36-windows-x64-static.exe#/ffsend.exe",
+            "hash": "8df9d92aaabd792f7c060e1b9a6f8ce82044c8abadadd634500d012f60c8a5a6"
         }
     },
     "depends": "openssl",
