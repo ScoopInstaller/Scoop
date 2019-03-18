@@ -30,6 +30,6 @@
         }
     },
     "env_set": {
-        "BAZEL_SH": "$(appdir msys2)\\current\\usr\\bin\\bash.exe"
+        "BAZEL_SH": "$(appdir msys2 $global)\\current\\usr\\bin\\bash.exe"
     }
 }
