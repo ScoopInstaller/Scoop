@@ -512,24 +512,6 @@ function pluralize($count, $singular, $plural) {
     if($count -eq 1) { $singular } else { $plural }
 }
 
-# for dealing with user aliases
-$default_aliases = @{
-    'cp' = 'copy-item'
-    'echo' = 'write-output'
-    'gc' = 'get-content'
-    'gci' = 'get-childitem'
-    'gcm' = 'get-command'
-    'gm' = 'get-member'
-    'iex' = 'invoke-expression'
-    'ls' = 'get-childitem'
-    'mkdir' = { new-item -type directory @args }
-    'mv' = 'move-item'
-    'rm' = 'remove-item'
-    'sc' = 'set-content'
-    'select' = 'select-object'
-    'sls' = 'select-string'
-}
-
 function reset_alias($name, $value) {
     if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
@@ -555,6 +537,24 @@ function reset_aliases() {
         if($aliases -contains $fn) {
             set-alias $fn local:$fn -scope script
         }
+    }
+
+    # for dealing with user aliases
+    $default_aliases = @{
+        'cp' = 'copy-item'
+        'echo' = 'write-output'
+        'gc' = 'get-content'
+        'gci' = 'get-childitem'
+        'gcm' = 'get-command'
+        'gm' = 'get-member'
+        'iex' = 'invoke-expression'
+        'ls' = 'get-childitem'
+        'mkdir' = { new-item -type directory @args }
+        'mv' = 'move-item'
+        'rm' = 'remove-item'
+        'sc' = 'set-content'
+        'select' = 'select-object'
+        'sls' = 'select-string'
     }
 
     # set default aliases
