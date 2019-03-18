@@ -25,7 +25,6 @@ param(
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
 $script:config_alias = "alias"

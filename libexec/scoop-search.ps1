@@ -9,7 +9,6 @@ param($query)
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 

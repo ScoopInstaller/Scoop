@@ -40,7 +40,6 @@
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\json.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\depends.ps1"

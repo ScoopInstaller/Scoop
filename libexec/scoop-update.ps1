@@ -22,7 +22,6 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\git.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
