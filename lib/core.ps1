@@ -18,6 +18,14 @@ $globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | Select-Object -first 
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 
+$configFile = "$env:USERPROFILE\.config\scoop\config.json"
+if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
+    New-Item -ItemType Directory "$env:USERPROFILE\.config\scoop" -ErrorAction Ignore | Out-Null
+    Move-Item "$env:USERPROFILE\.scoop" $configFile
+    warn "Scoops configurations has been migrated from '~/.scoop'"
+    warn "to '$configFile'"
+}
+
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
 # for all communication with api.github.com
 function Optimize-SecurityProtocol {
@@ -57,6 +65,76 @@ function Show-DeprecatedWarning {
     warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
     Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
 }
+
+function load_cfg($file) {
+    if(!(Test-Path $file)) {
+        return $null
+    }
+
+    try {
+        return (Get-Content $file -Raw | ConvertFrom-Json -ErrorAction Stop)
+    } catch {
+        Write-Host "ERROR loading $file`: $($_.exception.message)"
+    }
+}
+
+$scoopConfig = load_cfg $configFile
+
+function get_config($name, $default) {
+    if($null -eq $scoopConfig.$name -and $null -ne $default) {
+        return $default
+    }
+    return $scoopConfig.$name
+}
+
+function set_config($name, $val) {
+    if(!$scoopConfig) {
+        $scoopConfig = @{ $name = $val }
+    } else {
+        if($val -eq [bool]::TrueString -or $val -eq [bool]::FalseString) {
+            $val = [System.Convert]::ToBoolean($val)
+        }
+        $scoopConfig.$name = $val
+    }
+
+    if($null -eq $val) {
+        $scoopConfig.remove($name)
+    }
+
+    ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding utf8
+}
+
+function setup_proxy() {
+    # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
+    $proxy = get_config 'proxy'
+    if(!$proxy) {
+        return
+    }
+    try {
+        $credentials, $address = $proxy -split '(?<!\\)@'
+        if(!$address) {
+            $address, $credentials = $credentials, $null # no credentials supplied
+        }
+
+        if($address -eq 'none') {
+            [net.webrequest]::defaultwebproxy = $null
+        } elseif($address -ne 'default') {
+            [net.webrequest]::defaultwebproxy = new-object net.webproxy "http://$address"
+        }
+
+        if($credentials -eq 'currentuser') {
+            [net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
+        } elseif($credentials) {
+            $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])','$1' }
+            [net.webrequest]::defaultwebproxy.credentials = new-object net.networkcredential($user, $pass)
+        }
+    } catch {
+        warn "Failed to use proxy '$proxy': $($_.exception.message)"
+    }
+}
+
+setup_proxy
+
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
