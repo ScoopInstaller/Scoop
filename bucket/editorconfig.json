@@ -1,15 +1,15 @@
 {
-    "version": "0.12.3",
+    "version": "0.12.1",
     "description": "Maintain consistent coding styles for multiple developers working on the same project across various editors and IDEs.",
     "homepage": "https://editorconfig.org/",
     "license": "CC-BY-30",
-    "url": "https://downloads.sourceforge.net/project/editorconfig/EditorConfig-C-Core/0.12.3/binary-Windows/editorconfig-0.12.3-Windows-x86.zip",
-    "hash": "251a85b3bac687974f360d3796048c20ded3bf0bd69e0d1cfd1db23d013f89ed",
-    "extract_dir": "editorconfig-0.12.3-Windows-x86",
+    "url": "https://downloads.sourceforge.net/project/editorconfig/EditorConfig-C-Core/0.12.1/binary-Windows/editorconfig-0.12.1-Windows-x86.zip",
+    "hash": "sha1:7c44b819690baec3de22edc0c9f7eb21dc0a7850",
+    "extract_dir": "editorconfig-0.12.1-Windows-x86",
     "bin": "bin/editorconfig.exe",
     "checkver": {
-        "url": "https://sourceforge.net/projects/editorconfig/files/EditorConfig-C-Core/",
-        "re": "title=\"([\\d.]+)\"\\sclass=\"folder"
+        "url": "https://sourceforge.net/projects/editorconfig/rss?path=/EditorConfig-C-Core",
+        "re": "([0-9.]+)/binary-Windows"
     },
     "autoupdate": {
         "url": "https://downloads.sourceforge.net/project/editorconfig/EditorConfig-C-Core/$version/binary-Windows/editorconfig-$version-Windows-x86.zip",
