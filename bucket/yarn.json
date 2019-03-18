@@ -1,29 +1,28 @@
 {
     "homepage": "https://yarnpkg.com/",
-    "description": "Dependency manager",
-    "license": "BSD-2-Clause",
+    "description": "Node.js dependency manager",
     "version": "1.15.2",
-    "suggest": {
-        "Node.js": [
-            "nodejs",
-            "nodejs-lts"
-        ],
-        "NVM": "nvm"
-    },
+    "license": "BSD-2-Clause",
     "url": "https://yarnpkg.com/downloads/1.15.2/yarn-1.15.2.msi",
     "hash": "e3b07031012c83367809da702db77a70a151f457b4e83e6cb4d70e9426625f67",
     "persist": [
         "cache",
-        "bin",
-        "mirror"
+        "mirror",
+        "global"
     ],
     "post_install": [
         "yarn config set cache-folder \"$dir\\cache\"",
         "yarn config set yarn-offline-mirror \"$dir\\mirror\"",
-        "yarn config set prefix \"$dir\""
+        "yarn config set global-folder \"$dir\\global\""
     ],
+    "uninstaller": {
+        "script": [
+            "Remove-Item $env:LOCALAPPDATA\\Yarn -Recurse -Force",
+            "Remove-Item $env:USERPROFILE\\.yarnrc -Force"
+        ]
+    },
     "env_add_path": [
-        "bin",
+        "global\\node_modules\\.bin",
         "Yarn\\bin"
     ],
     "checkver": {
@@ -32,5 +31,13 @@
     },
     "autoupdate": {
         "url": "https://yarnpkg.com/downloads/$version/yarn-$version.msi"
+    },
+    "suggest": {
+        "Node.js": [
+            "nodejs",
+            "nodejs-lts",
+            "nvm",
+            "nvs"
+        ]
     }
 }
