@@ -19,7 +19,7 @@
         "Kotlin": "kotlin"
     },
     "checkver": {
-        "url": "https://github.com/JetBrains/kotlin/releases/latest",
+        "github": "https://github.com/JetBrains/kotlin",
         "regex": "v(?<kv>[0-9.]+)/kotlin-native-windows-([0-9.]+).zip"
     },
     "autoupdate": {
