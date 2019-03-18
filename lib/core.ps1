@@ -102,7 +102,7 @@ function set_config($name, $val) {
         $scoopConfig.PSObject.Properties.Remove($name)
     }
 
-    ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding utf8
+    ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding ASCII
 }
 
 function setup_proxy() {
