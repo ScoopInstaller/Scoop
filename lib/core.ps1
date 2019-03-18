@@ -21,7 +21,7 @@ $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
 if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
-    New-Item -ItemType Directory "$env:USERPROFILE\.config\scoop" -ErrorAction Ignore | Out-Null
+    New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
     Move-Item "$env:USERPROFILE\.scoop" $configFile
     warn "Scoops configurations has been migrated from '~/.scoop'"
     warn "to '$configFile'"
