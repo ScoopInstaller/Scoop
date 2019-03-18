@@ -94,7 +94,7 @@ function add_bucket($name, $repo) {
 
 function rm_bucket($name) {
     if (!$name) { "<name> missing"; $usage_rm; exit 1 }
-    $dir = bucketdir $name
+    $dir = "$bucketsdir\$name"
     if (!(test-path $dir)) {
         abort "'$name' bucket not found."
     }
