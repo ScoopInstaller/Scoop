@@ -23,8 +23,8 @@ $configFile = "$configHome\scoop\config.json"
 if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
     New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
     Move-Item "$env:USERPROFILE\.scoop" $configFile
-    warn "Scoops configurations has been migrated from '~/.scoop'"
-    warn "to '$configFile'"
+    write-host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
+    write-host "WARN  to '$configFile'" -f darkyellow
 }
 
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
