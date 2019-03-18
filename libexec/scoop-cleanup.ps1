@@ -34,7 +34,6 @@ function cleanup($app, $global, $verbose, $cache) {
     $current_version = current_version $app $global
     if ($cache) {
         Remove-Item "$cachedir\$app#*" -Exclude "$app#$current_version#*"
-        Remove-Item "$cachedir\*.download"
     }
     $versions = versions $app $global | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
     if (!$versions) {
@@ -68,6 +67,10 @@ if ($apps) {
 
     # $apps is now a list of ($app, $global) tuples
     $apps | ForEach-Object { cleanup @_ $verbose $cache}
+
+    if ($cache) {
+        Remove-Item "$cachedir\*.download" -ErrorAction Ignore
+    }
 
     if (!$verbose) {
         success 'Everything is shiny now!'
