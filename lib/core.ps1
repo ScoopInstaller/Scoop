@@ -98,7 +98,7 @@ function set_config($name, $val) {
     }
 
     if($null -eq $val) {
-        $scoopConfig.remove($name)
+        $scoopConfig.PSObject.Properties.Remove($name)
     }
 
     ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding utf8
