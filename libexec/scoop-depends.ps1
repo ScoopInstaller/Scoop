@@ -7,7 +7,6 @@
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
 reset_aliases
