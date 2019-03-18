@@ -1,30 +1,30 @@
 {
     "homepage": "https://www.isc.org/",
     "description": "dig (domain information groper) is a flexible tool for interrogating DNS name servers",
-    "license": "ISC",
-    "version": "9.12.3-P4",
+    "license": "MPL-2.0",
+    "version": "9.12.4",
     "architecture": {
         "64bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.12.3-P4/BIND9.12.3-P4.x64.zip",
-            "hash": "f365b597b41c49251b5c321a3fbc85db4311040406bb39c8d6671ef2e144c4af"
+            "url": "https://ftp.isc.org/isc/bind9/9.12.4/BIND9.12.4.x64.zip",
+            "hash": "3c004658cefba6faa2843e3894ff867f642d7758b5d337953a0e7ac014ba6df5"
         },
         "32bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.12.3-P4/BIND9.12.3-P4.x86.zip",
-            "hash": "4fa633d3393cfdaad38b303dfa723a0e912c29870fba3392552fd8a42313a7b0"
+            "url": "https://ftp.isc.org/isc/bind9/9.12.4/BIND9.12.4.x86.zip",
+            "hash": "3c004658cefba6faa2843e3894ff867f642d7758b5d337953a0e7ac014ba6df5"
         }
     },
     "bin": "dig.exe",
     "checkver": {
         "url": "https://www.isc.org/downloads/",
-        "re": "(?sm)Current-Stable.*?BIND([\\d.]+(?:[-P\\d]*))"
+        "re": "Current-Stable[\\S\\s]*?BIND(.+).x64.zip"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://ftp.isc.org/isc/bind9/$version/BIND$version.x64.zip"
+                "url": "https://ftp.isc.org/isc/bind$majorVersion/$version/BIND$version.x64.zip"
             },
             "32bit": {
-                "url": "https://ftp.isc.org/isc/bind9/$version/BIND$version.x86.zip"
+                "url": "https://ftp.isc.org/isc/bind$majorVersion/$version/BIND$version.x86.zip"
             }
         }
     },
