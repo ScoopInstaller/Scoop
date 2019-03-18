@@ -10,13 +10,15 @@
         "jom.exe"
     ],
     "checkver": {
-        "url": "https://download.qt.io/official_releases/jom/changelog.txt",
-        "regex": "This is the changelog for jom ([\\d.]+), the parallel make tool."
+        "url": "https://download.qt.io/official_releases/jom/md5sums.txt",
+        "regex": "jom_(\\d+)_(\\d+)_(\\d+).zip",
+        "reverse": true,
+        "replace": "${1}.${2}.${3}"
     },
     "autoupdate": {
         "url": "https://download.qt.io/official_releases/jom/jom_$underscoreVersion.zip",
         "hash": {
-            "url": "$baseurl/md5sums.txt"
+            "url": "$url.sha256"
         }
     }
 }
