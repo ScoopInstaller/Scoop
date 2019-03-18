@@ -10,7 +10,7 @@
         "jom.exe"
     ],
     "checkver": {
-        "url": "http://download.qt.io/official_releases/jom/md5sums.txt",
+        "url": "https://download.qt.io/official_releases/jom/md5sums.txt",
         "regex": "jom_(\\d+)_(\\d+)_(\\d+).zip",
         "reverse": true,
         "replace": "${1}.${2}.${3}"
