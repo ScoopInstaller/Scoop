@@ -88,18 +88,18 @@ function get_config($name, $default) {
     return $scoopConfig.$name
 }
 
-function set_config($name, $val) {
+function set_config($name, $value) {
     if(!$scoopConfig) {
         ensure (Split-Path -Path $configFile) | Out-Null
-        $scoopConfig = @{ $name = $val }
+        $scoopConfig = @{ $name = $value }
     } else {
-        if($val -eq [bool]::TrueString -or $val -eq [bool]::FalseString) {
-            $val = [System.Convert]::ToBoolean($val)
+        if($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
+            $value = [System.Convert]::ToBoolean($value)
         }
-        $scoopConfig.$name = $val
+        $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
     }
 
-    if($null -eq $val) {
+    if($null -eq $value) {
         $scoopConfig.PSObject.Properties.Remove($name)
     }
 
