@@ -1,11 +1,22 @@
 . "$psscriptroot\Scoop-TestLib.ps1"
-. "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 . "$psscriptroot\..\lib\unix.ps1"
+. "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 
 $isUnix = is_unix
 
-describe "extract_zip" -Tag 'Scoop' {
+function install_app_ci($app, $architecture) {
+    $manifest = manifest $app
+    $version = $manifest.version
+    $dir = ensure (versiondir $app $version)
+    $fname = dl_urls $app $version $manifest $null $architecture $dir
+    $dir = link_current $dir
+    success "'$app' ($version) was installed successfully!"
+}
+
+describe "extract_zip" -Tag 'Scoop', 'Decompress' {
     beforeall {
         $working_dir = setup_working "decompress"
     }
