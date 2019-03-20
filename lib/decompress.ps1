@@ -51,7 +51,9 @@ function extract_msi($path, $to, $recurse) {
         if ($lastexitcode -ne 0) {
             abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
         }
-        movedir "$to\SourceDir" "$to"
+        if (Test-Path "$to\SourceDir") {
+            movedir "$to\SourceDir" "$to"
+        }
     } else {
         $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
         if (!$ok) {
@@ -69,7 +71,7 @@ function extract_msi($path, $to, $recurse) {
 
 function extract_inno($path, $to, $recurse) {
     $logfile = "$(Split-Path $path)\innounp.log"
-    &(file_path innounp innounp.exe) -x -d"$to" -c"{app}" "$path" > "$logfile"
+    &(file_path innounp innounp.exe) -x -d"$to" -c"{app}" "$path" -y > "$logfile"
     if ($lastexitcode -ne 0) {
         abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
     }

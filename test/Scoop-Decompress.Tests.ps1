@@ -80,6 +80,56 @@ Describe "Decompression function" -Tag 'Scoop', 'Decompress' {
         }
     }
 
+    Context "msi extraction" {
+        if (!$isUnix) {
+            install_app_ci lessmsi
+            $test1 = "$working_dir\MSITest.msi"
+            $test2 = "$working_dir\MSITestNull.msi"
+        }
+
+        It "extract normal MSI file" -Skip:$isUnix {
+            mock get_config { $false }
+            $to = test_extract "extract_msi" $test1
+            $to | Should -Exist
+            "$to\MSITest\empty" | Should -Exist
+            (Get-ChildItem "$to\MSITest").Count | Should -Be 1
+        }
+
+        It "extract empty MSI file using lessmsi" -Skip:$isUnix {
+            mock get_config { $true }
+            $to = test_extract "extract_msi" $test2
+            $to | Should -Exist
+        }
+
+        It "works with '`$recurse' param" -Skip:$isUnix {
+            mock get_config { $false }
+            $test1 | Should -Exist
+            test_extract "extract_msi" $test1 $true
+            $test1 | Should -Not -Exist
+        }
+    }
+
+    Context "inno extraction" {
+
+        if (!$isUnix) {
+            install_app_ci innounp
+            $test = "$working_dir\InnoTest.exe"
+        }
+
+        It "extract Inno Setup file" -Skip:$isUnix {
+            $to = test_extract "extract_inno" $test
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It "works with '`$recurse' param" -Skip:$isUnix {
+            $test | Should -Exist
+            test_extract "extract_inno" $test $true
+            $test | Should -Not -Exist
+        }
+    }
+
     Context "zip extraction" {
 
         if (!$isUnix) {
