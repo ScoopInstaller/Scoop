@@ -3,13 +3,17 @@
     "version": "2.2.14",
     "license": "GPL-3.0",
     "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.14_20190319.exe#/dl.7z",
-    "hash": "a1c0e899e2c44192b7e39b0ff0b904057bb08f9f72f531f152715e21646e3de2",
+    "hash": "sha1:a8f74358cab09b737b2f69c096072428e5ae2d9d",
     "env_add_path": "bin",
     "checkver": {
         "url": "https://www.gnupg.org/download/index.html",
         "re": "gnupg-w32-(?<version>[\\d.]+)_(?<date>[\\d]{8}).exe"
     },
     "autoupdate": {
-        "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-$version_$matchDate.exe#/dl.7z"
+        "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-$version_$matchDate.exe#/dl.7z",
+        "hash": {
+            "url": "https://www.gnupg.org/download/integrity_check.html",
+            "regex": "$sha1.*$basename"
+        }
     }
 }
