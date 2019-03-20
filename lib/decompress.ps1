@@ -30,11 +30,9 @@ function extract_7zip($path, $to, $recurse) {
         Remove-Item $logfile -Force
     }
     if ((strip_ext (fname $path)) -match '\.tar$' -or (fname $path) -match '\.tgz$') {
-        debug $path
         $listfiles = &(file_path 7zip 7z.exe) l "$path"
         if ($lastexitcode -eq 0) {
-            $listfiles[-3] -match "(\S*.tar)$"
-            $tar = $Matches[1]
+            $tar = ([Regex]"(\S*.tar)$").Matches($listfiles[-3]).Value
             extract_7zip "$to\$tar" $to $true
         } else {
             abort "Failed to list files in $path."
