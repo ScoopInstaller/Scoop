@@ -16,6 +16,10 @@
             "64bit": {
                 "url": "https://github.com/garethr/kubeval/releases/download/$version/kubeval-windows-amd64.zip"
             }
+        },
+        "hash": {
+            "url": "https://github.com/garethr/kubeval/releases/tag/$version",
+            "regex": "<td>$basename</td>\\s+<td>$sha256</td>"
         }
     }
 }
