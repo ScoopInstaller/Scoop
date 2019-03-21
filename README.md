@@ -21,7 +21,7 @@
     <a href="https://ci.appveyor.com/project/lukesampson/scoop">
         <img src="https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true" alt="Build Status" />
     </a>
-    <a href="https://discord.gg/Gj5ZtfR">
+    <a href="https://discord.gg/s9yRQHt">
         <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
     </a>
     <a href="https://gitter.im/lukesampson/scoop">
