@@ -2,15 +2,15 @@
     "homepage": "https://www.isc.org/",
     "description": "dig (domain information groper) is a flexible tool for interrogating DNS name servers",
     "license": "MPL-2.0",
-    "version": "9.12.4",
+    "version": "9.14.0",
     "architecture": {
         "64bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.12.4/BIND9.12.4.x64.zip",
-            "hash": "3c004658cefba6faa2843e3894ff867f642d7758b5d337953a0e7ac014ba6df5"
+            "url": "https://ftp.isc.org/isc/bind9/9.14.0/BIND9.14.0.x64.zip",
+            "hash": "a81ca8327da0a4c7c8042f8947a80a11e9e98c9ea741105622d04d7eb9bbd3b4"
         },
         "32bit": {
-            "url": "https://ftp.isc.org/isc/bind9/9.12.4/BIND9.12.4.x86.zip",
-            "hash": "3c004658cefba6faa2843e3894ff867f642d7758b5d337953a0e7ac014ba6df5"
+            "url": "https://ftp.isc.org/isc/bind9/9.14.0/BIND9.14.0.x86.zip",
+            "hash": "1f2aebad977c9625d01f806f78b21a4e788ff431f91587431ab73ad60dec52a5"
         }
     },
     "bin": "dig.exe",
