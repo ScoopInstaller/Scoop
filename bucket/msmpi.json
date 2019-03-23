@@ -34,5 +34,4 @@
     "autoupdate": {
         "url": "https://github.com/Microsoft/Microsoft-MPI/releases/download/v$version/msmpisetup.exe"
     }
-
 }
