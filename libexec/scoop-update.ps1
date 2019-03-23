@@ -158,12 +158,12 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # Remove and replace whole region after proper fix
     Write-Host "Downloading new version"
     if (aria2_enabled) {
-        dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookies $true $check_hash
+        dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
         $urls = url $manifest $architecture
 
         foreach ($url in $urls) {
-            dl_with_cache $app $version $url $null $manifest.cookies $true
+            dl_with_cache $app $version $url $null $manifest.cookie $true
 
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
