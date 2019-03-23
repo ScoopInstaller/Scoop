@@ -1,0 +1,37 @@
+{
+    "homepage": "https://www.blat.net",
+    "version": "3.2.19",
+    "description": "A Windows command line utility that sends eMail using SMTP or post to usenet using NNTP.",
+    "license": {
+        "identifier": "Public Domain",
+        "url": "https://www.blat.net/?docs/license.txt"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://downloads.sourceforge.net/project/blat/Blat%20Full%20Version/64%20bit%20versions/blat3219_64.full.zip",
+            "hash": "sha1:7eb7d3befdf2877c8f1590e118d82e82b171e3b0"
+        },
+        "32bit": {
+            "url": "https://downloads.sourceforge.net/project/blat/Blat%20Full%20Version/32%20bit%20versions/Win2000%20and%20newer/blat3219_32.full.zip",
+            "hash": "sha1:563f3f47bbc861b5e8c93021dac51373e7838e2e"
+        }
+    },
+    "extract_dir": "blat3219",
+    "bin": "full\\blat.exe",
+    "checkver": {
+        "url": "https://sourceforge.net/projects/blat/rss?path=/Blat%20Full%20Version",
+        "regex": "blat(\\d)(\\d)(\\d+)_32.full.zip",
+        "replace": "${1}.${2}.${3}"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.sourceforge.net/project/blat/Blat%20Full%20Version/64%20bit%20versions/blat$cleanVersion_64.full.zip"
+            },
+            "32bit": {
+                "url": "https://downloads.sourceforge.net/project/blat/Blat%20Full%20Version/32%20bit%20versions/Win2000%20and%20newer/blat$cleanVersion_32.full.zip"
+            }
+        },
+        "extract_dir": "blat$cleanVersion"
+    }
+}
