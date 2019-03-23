@@ -6,7 +6,7 @@
     "architecture": {
         "64bit": {
             "url": "https://cmake.org/files/v3.14/cmake-3.14.0-win64-x64.zip",
-            "hash": "42c47c0b378834d1250c8076c39175d21ccf9801f67d7e8662b5edc0b2f4f7a6",
+            "hash": "40e8140d68120378262322bbc8c261db8d184d7838423b2e5bf688a6209d3807",
             "extract_dir": "cmake-3.14.0-win64-x64"
         },
         "32bit": {
