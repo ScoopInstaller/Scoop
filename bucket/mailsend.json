@@ -14,5 +14,6 @@
             "url": "https://github.com/muquit/mailsend/releases/tag/$version",
             "regex": "SHA1\\($basename\\).*$sha1"
         }
-    }
+    },
+    "notes": "Depricated, please use 'mailsend-go' instead."
 }
