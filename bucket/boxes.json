@@ -1,0 +1,17 @@
+{
+    "description": "A command line filter program that draws ASCII art boxes around your input text",
+    "version": "1.3",
+    "license": "GPL-2.0-or-later",
+    "url": "https://github.com/ascii-boxes/boxes/releases/download/v1.3/boxes-1.3-intel-win32.zip",
+    "homepage": "https://boxes.thomasjensen.com/",
+    "hash": "3f3e158298bcf7bbead18d2ae095083235f117f2eb05cbd1f977e193d56fee41",
+    "extract_dir": "boxes-1.3",
+    "bin": "boxes.exe",
+    "checkver": {
+        "github": "https://github.com/ascii-boxes/boxes"
+    },
+    "autoupdate": {
+        "url": "https://github.com/ascii-boxes/boxes/releases/download/v$version/boxes-$version-intel-win32.zip",
+        "extract_dir": "boxes-$version"
+    }
+}

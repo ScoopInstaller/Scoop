@@ -1,5 +1,6 @@
 {
     "homepage": "https://idrassi.github.io/DirHash",
+    "description": "DirHash is a Windows console program that computes the hash of a given directory content or a single file",
     "license": "BSD-3-Clause",
     "version": "1.7.1",
     "architecture": {

@@ -1,10 +1,10 @@
 {
     "homepage": "https://www.scala-lang.org/",
-    "version": "2.12.7",
+    "version": "2.12.8",
     "license": "BSD-3-Clause",
-    "url": "https://downloads.typesafe.com/scala/2.12.7/scala-2.12.7.zip",
-    "hash": "6d9f99e4c3e2af89bef74b655eb8166053940e1d0900609f3e9a97fa90b85c91",
-    "extract_dir": "scala-2.12.7",
+    "url": "https://downloads.typesafe.com/scala/2.12.8/scala-2.12.8.zip",
+    "hash": "8beb410ad9bfc3087589d13f07f062fba0091cf1c4e8534c334e28d1213ed675",
+    "extract_dir": "scala-2.12.8",
     "bin": [
         "bin\\fsc.bat",
         "bin\\scala.bat",

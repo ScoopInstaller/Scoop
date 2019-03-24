@@ -1,20 +1,18 @@
 {
     "homepage": "https://www.haskellstack.org",
     "license": "BSD-3-Clause",
-    "version": "1.9.1",
+    "version": "1.9.3",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.9.1/stack-1.9.1-windows-x86_64.zip",
-            "hash": "7b1c22b9171f7a7cd70d776c8853ce7819da949fcccd69e7d87c948ac7e7140f"
+            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.9.3/stack-1.9.3-windows-x86_64.zip",
+            "hash": "9ff25247ad90478bdea042df2520e7865521d9023ba8dc6eae79875e1b11fcbb"
         },
         "32bit": {
-            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.9.1/stack-1.9.1-windows-i386.zip",
-            "hash": "049663dafd1c4e5f5d1cf9cb16dc200787fe3ea31d2f04dcd77dd3286e41aa72"
+            "url": "https://github.com/commercialhaskell/stack/releases/download/v1.9.3/stack-1.9.3-windows-i386.zip",
+            "hash": "3d73c8a63503efc387a926a705d2cde013ebc3a991f6f62bfccc12aa62b5b8aa"
         }
     },
-    "bin": [
-        "stack.exe"
-    ],
+    "bin": "stack.exe",
     "installer": {
         "script": "add_first_in_path \"$env:APPDATA\\local\\bin\" $global"
     },

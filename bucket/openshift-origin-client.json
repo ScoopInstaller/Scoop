@@ -9,9 +9,7 @@
             "hash": "cdb84cc0000d0f0983120f903b2cad7114527ce2a9c4eb1988986eda7b877bfa"
         }
     },
-    "bin": [
-        "oc.exe"
-    ],
+    "bin": "oc.exe",
     "checkver": {
         "url": "https://github.com/openshift/origin/releases/latest",
         "re": "openshift-origin-client-tools-v(?<version>[\\d.]+)-(?<commit>[\\d\\w]+)-windows\\.zip"

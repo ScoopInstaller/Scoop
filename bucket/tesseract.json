@@ -33,10 +33,14 @@
     "env_set": {
         "TESSDATA_PREFIX": "$persist_dir\\tessdata"
     },
-    "persist": [
-        "tessdata"
+    "persist": "tessdata",
+    "notes": [
+        "Recognition data files can be installed via \"scoop install tesseract-languages\"",
+        "or downloaded manually from https://github.com/tesseract-ocr/tessdata_fast"
     ],
-    "notes": "Language data files can be downloaded from https://github.com/tesseract-ocr/tessdata",
+    "suggest": {
+        "tesseract-languages": "tesseract-languages"
+    },
     "checkver": {
         "re": "tesseract-ocr-w32-setup-v(?<version>[\\d.]+).exe",
         "url": "https://digi.bib.uni-mannheim.de/tesseract/"

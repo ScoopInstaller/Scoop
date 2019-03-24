@@ -1,23 +1,18 @@
 {
     "homepage": "https://bazel.build",
-    "version": "0.19.1",
+    "description": "A fast, scalable, multi-language and extensible build system",
+    "version": "0.23.2",
     "license": "Apache-2.0",
     "bin": "bazel.exe",
     "suggest": {
-        "MSYS2": [
-            "msys2"
-        ],
-        "Python27": [
-            "versions/python27"
-        ],
-        "curl": [
-            "curl"
-        ]
+        "MSYS2": "msys2",
+        "Python27": "versions/python27",
+        "curl": "curl"
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/bazelbuild/bazel/releases/download/0.19.1/bazel-0.19.1-windows-x86_64.zip",
-            "hash": "ec413372d342f25991286e9dba011219495c97a9adc0f867c4c6b8a3261696db"
+            "url": "https://github.com/bazelbuild/bazel/releases/download/0.23.2/bazel-0.23.2-windows-x86_64.zip",
+            "hash": "a91c8c2b8d31709e74310e31d0a11ba237c4f4dcff7adc0e1102fbb66a489ffe"
         }
     },
     "checkver": {
@@ -35,6 +30,6 @@
         }
     },
     "env_set": {
-        "BAZEL_SH": "$(appdir msys2)\\current\\usr\\bin\\bash.exe"
+        "BAZEL_SH": "$(appdir msys2 $global)\\current\\usr\\bin\\bash.exe"
     }
 }

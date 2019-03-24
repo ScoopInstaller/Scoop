@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.python.org/",
     "license": "https://docs.python.org/3/license.html",
-    "version": "3.7.1",
+    "version": "3.7.2",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.7.1/python-3.7.1-amd64.exe#/py3.exe",
-            "hash": "md5:4c9fd65b437ad393532e57f15ce832bc"
+            "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2-amd64.exe#/py3.exe",
+            "hash": "md5:ff258093f0b3953c886192dec9f52763"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.7.1/python-3.7.1.exe#/py3.exe",
-            "hash": "md5:da24541f28e4cc133c53f0638459993c"
+            "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2.exe#/py3.exe",
+            "hash": "md5:38156b62c0cbcb03bfddeb86e66c3a0f"
         }
     },
     "installer": {
@@ -44,9 +44,7 @@
             "idle3"
         ]
     ],
-    "env_add_path": [
-        "scripts"
-    ],
+    "env_add_path": "scripts",
     "checkver": {
         "url": "https://www.python.org/downloads/windows/",
         "re": "Latest Python 3 Release - Python ([\\d\\.]+)"

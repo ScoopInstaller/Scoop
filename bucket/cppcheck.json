@@ -2,15 +2,15 @@
     "homepage": "http://cppcheck.sourceforge.net/",
     "description": "Static analysis tool for C/C++ code",
     "license": "GPL-3.0",
-    "version": "1.85",
+    "version": "1.87",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/danmar/cppcheck/releases/download/1.85/cppcheck-1.85-x64-Setup.msi",
-            "hash": "0c35b667a882e22de135fb2eb14f27cb9d118e2cca1181b577cc8b607490aae7"
+            "url": "https://github.com/danmar/cppcheck/releases/download/1.87/cppcheck-1.87-x64-Setup.msi",
+            "hash": "3f44683661f08be7dc5749fdcd9b9a41118cb3533da9ba68645f33d2baa77f14"
         },
         "32bit": {
-            "url": "https://github.com/danmar/cppcheck/releases/download/1.85/cppcheck-1.85-x86-Setup.msi",
-            "hash": "c7073dd05ec7100219c2cc4b935d2e7fa0f531e9e8a559097fc1bd150b3859d5"
+            "url": "https://github.com/danmar/cppcheck/releases/download/1.87/cppcheck-1.87-x86-Setup.msi",
+            "hash": "63ed92bc86b5b10710791d5609ae5e7f87ab594b7a7ad32de491680ec5f7f25a"
         }
     },
     "extract_dir": "PFiles/Cppcheck",

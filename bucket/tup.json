@@ -3,7 +3,7 @@
     "version": "0.7.8",
     "license": "GPL-2.0",
     "url": "http://gittup.org/tup/win32/tup-latest.zip",
-    "hash": "25b93f7c58bda918c1fc291c79f820424f35179fc09470afc3cc6150ae25d06d",
+    "hash": "1446b032834e42d49b70cd260cc88498dcf690e60499eaea5637f35c9c37cd27",
     "bin": "tup.exe",
     "checkver": {
         "url": "http://gittup.org/tup/win32",

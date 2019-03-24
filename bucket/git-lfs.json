@@ -1,27 +1,15 @@
 {
     "homepage": "https://git-lfs.github.com/",
-    "version": "2.6.0",
+    "version": "2.7.1",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.6.0/git-lfs-windows-386-v2.6.0.zip",
-            "hash": "7fa3475c60221837860138b4fd0fd0ad1213a5e49c596fdb0aac8932ca7a20a5",
-            "bin": [
-                [
-                    "git-lfs-windows-386.exe",
-                    "git-lfs"
-                ]
-            ]
+            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.7.1/git-lfs-windows-386-v2.7.1.zip",
+            "hash": "5ce9466934b37a258aae07f19ba8a70cdeff75239fb66126e718a60cf2820ed8"
         },
         "64bit": {
-            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.6.0/git-lfs-windows-amd64-v2.6.0.zip",
-            "hash": "f1312d00e435c16c8d19d914d5108db6a5ddbee1badb214c66f22cfa5d18b279",
-            "bin": [
-                [
-                    "git-lfs-windows-amd64.exe",
-                    "git-lfs"
-                ]
-            ]
+            "url": "https://github.com/git-lfs/git-lfs/releases/download/v2.7.1/git-lfs-windows-amd64-v2.7.1.zip",
+            "hash": "5c12db9728b53cba23e5f58f4a53d88cb2132e82fa1de0f8a79ce9d112e4d396"
         }
     },
     "suggest": {
@@ -30,6 +18,7 @@
             "git-with-openssh"
         ]
     },
+    "bin": "git-lfs.exe",
     "checkver": {
         "github": "https://github.com/git-lfs/git-lfs"
     },

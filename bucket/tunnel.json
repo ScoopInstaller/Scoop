@@ -12,7 +12,13 @@
             "hash": "0923cb853726b9d62ab1b9cf9a1b18b2e5e0705fd3896143e1da948b0a8cf6eb"
         }
     },
-    "bin": "tunnel.exe",
+    "bin": [
+        [
+            "tunnel-client.exe",
+            "tunnel"
+        ],
+        "tunnel-client.exe"
+    ],
     "checkver": {
         "github": "https://github.com/labstack/tunnel-client"
     },

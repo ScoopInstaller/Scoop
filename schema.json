@@ -1,6 +1,6 @@
 {
     "$id": "http://scoop.sh/draft/schema#",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "additionalProperties": false,
     "definitions": {
         "hashPattern": {
@@ -35,12 +35,12 @@
                     "type": "string"
                 },
                 "jp": {
-                    "pattern": "^\\$\\..*$",
+                    "pattern": "^\\$[.[].*$",
                     "type": "string",
                     "description": "Same as 'jsonpath'"
                 },
                 "jsonpath": {
-                    "pattern": "^\\$\\..*$",
+                    "pattern": "^\\$[.[].*$",
                     "type": "string"
                 },
                 "mode": {
@@ -48,7 +48,10 @@
                         "download",
                         "extract",
                         "json",
-                        "rdf"
+                        "rdf",
+                        "metalink",
+                        "fosshub",
+                        "sourceforge"
                     ]
                 },
                 "type": {
@@ -226,12 +229,12 @@
                             "type": "string"
                         },
                         "jp": {
-                            "pattern": "^\\$\\..*$",
+                            "pattern": "^\\$[.[].*$",
                             "type": "string",
                             "description": "Same as 'jsonpath'"
                         },
                         "jsonpath": {
-                            "pattern": "^\\$\\..*$",
+                            "pattern": "^\\$[.[].*$",
                             "type": "string"
                         },
                         "reverse": {

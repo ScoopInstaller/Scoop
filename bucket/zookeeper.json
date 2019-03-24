@@ -10,9 +10,7 @@
         "bin\\zkServer.cmd",
         "bin\\zkCli.cmd"
     ],
-    "persist": [
-        "data"
-    ],
+    "persist": "data",
     "suggest": {
         "JDK": [
             "java/oraclejdk",

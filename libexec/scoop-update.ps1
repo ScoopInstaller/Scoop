@@ -38,16 +38,16 @@ $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
 
 # load config
-$repo = $(scoop config SCOOP_REPO)
+$repo = $(get_config SCOOP_REPO)
 if(!$repo) {
     $repo = "https://github.com/lukesampson/scoop"
-    scoop config SCOOP_REPO "$repo"
+    set_config SCOOP_REPO "$repo"
 }
 
-$branch = $(scoop config SCOOP_BRANCH)
-if(!$branch) {
+$branch = $(get_config SCOOP_BRANCH)
+if (!$branch) {
     $branch = "master"
-    scoop config SCOOP_BRANCH "$branch"
+    set_config SCOOP_BRANCH "$branch"
 }
 
 function update_scoop() {
@@ -56,7 +56,9 @@ function update_scoop() {
     if(!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     write-host "Updating Scoop..."
-    $last_update = $(last_scoop_update).ToString('s')
+    $last_update = $(last_scoop_update)
+    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
+    $last_update = $last_update.ToString('s')
     $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if(!(test-path "$currentdir\.git")) {
@@ -76,6 +78,14 @@ function update_scoop() {
     }
     else {
         Push-Location $currentdir
+
+        # Check if user configured other branch
+        $branch = $(get_config SCOOP_BRANCH)
+        if ((git_branch) -notlike "*$branch") {
+            git_fetch --all -q
+            git_checkout -B $branch -q
+        }
+
         git_pull -q
         $res = $lastexitcode
         if($show_update_log) {
@@ -100,7 +110,7 @@ function update_scoop() {
         Pop-Location
     }
 
-    scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
+    set_config lastupdate ([System.DateTime]::Now.ToString('o'))
     success 'Scoop was updated successfully!'
 }
 
@@ -143,6 +153,41 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     write-host "Updating '$app' ($old_version -> $version)"
 
+    # region Workaround
+    # Workaround for https://github.com/lukesampson/scoop/issues/2220 until install is refactored
+    # Remove and replace whole region after proper fix
+    Write-Host "Downloading new version"
+    if (aria2_enabled) {
+        dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
+    } else {
+        $urls = url $manifest $architecture
+
+        foreach ($url in $urls) {
+            dl_with_cache $app $version $url $null $manifest.cookie $true
+
+            if ($check_hash) {
+                $manifest_hash = hash_for_url $manifest $url $architecture
+                $source = fullpath (cache_path $app $version $url)
+                $ok, $err = check_hash $source $manifest_hash $(show_app $app $bucket)
+
+                if (!$ok) {
+                    error $err
+                    if (test-path $source) {
+                        # rm cached file
+                        Remove-Item -force $source
+                    }
+                    if ($url.Contains('sourceforge.net')) {
+                        Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                    }
+                    abort $(new_issue_msg $app $bucket "hash check failed")
+                }
+            }
+        }
+    }
+    # There is no need to check hash again while installing
+    $check_hash = $false
+    # endregion Workaround
+
     $dir = versiondir $app $old_version $global
 
     write-host "Uninstalling '$app' ($old_version)"
@@ -155,6 +200,18 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # as the reference directory. Otherwise it will just be the version
     # directory.
     $refdir = unlink_current $dir
+
+    if ($force -and ($old_version -eq $version)) {
+        if (!(Test-Path "$dir/../_$version.old")) {
+            Move-Item "$dir" "$dir/../_$version.old"
+        } else {
+            $i = 1
+            While (Test-Path "$dir/../_$version.old($i)") {
+                $i++
+            }
+            Move-Item "$dir" "$dir/../_$version.old($i)"
+        }
+    }
 
     if($bucket) {
         # add bucket name it was installed from

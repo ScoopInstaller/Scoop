@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.rust-lang.org",
-    "version": "1.30.1",
+    "version": "1.33.0",
     "license": "MIT|Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.30.1-x86_64-pc-windows-gnu.msi",
-            "hash": "b4e57abc59acc53ee5a2f29e4f53bb4de013646a4ff98acc8a2699cc920dd43a"
+            "url": "https://static.rust-lang.org/dist/rust-1.33.0-x86_64-pc-windows-gnu.msi",
+            "hash": "1235c3d5bf51a2543efd5389618a394e51c3c5de2fc8390171f132d5c5557d09"
         },
         "32bit": {
-            "url": "https://static.rust-lang.org/dist/rust-1.30.1-i686-pc-windows-gnu.msi",
-            "hash": "5508ec39d6421ff87f13bf12d1718d5b6eb8c1349ce78838d96a0a66636ec82d"
+            "url": "https://static.rust-lang.org/dist/rust-1.33.0-i686-pc-windows-gnu.msi",
+            "hash": "fd4680e91ac3e859b2aa1a0197ab9823ea9f0edb54073ab57838939dd17d363b"
         }
     },
     "bin": [
@@ -18,8 +18,8 @@
         "Rust\\bin\\cargo.exe"
     ],
     "checkver": {
-        "url": "https://www.rust-lang.org/en-US/",
-        "re": "Install Rust <span>([\\d.]+)</span>"
+        "url": "https://www.rust-lang.org/",
+        "re": "Version ([\\d.]+)"
     },
     "autoupdate": {
         "architecture": {

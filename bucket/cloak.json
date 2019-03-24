@@ -26,8 +26,6 @@
         }
     },
     "suggest": {
-        "vcredist": [
-            "extras/vcredist2015"
-        ]
+        "vcredist": "extras/vcredist2015"
     }
 }

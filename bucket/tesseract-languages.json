@@ -1,0 +1,28 @@
+{
+    "homepage": "https://github.com/tesseract-ocr/tessdata_fast",
+    "license": "Apache-2.0",
+    "description": "Fast integer versions of trained models for the Tesseract Open Source OCR Engine",
+    "version": "4.0.0",
+    "url": [
+        "https://github.com/tesseract-ocr/tessdata_fast/archive/4.0.0.zip",
+        "https://github.com/USCDataScience/counterfeit-electronics-tesseract/raw/319a6eeacff181dad5c02f3e7a3aff804eaadeca/Training%20Tesseract/snum.traineddata"
+    ],
+    "hash": [
+        "6551f6ac0c8d0f75b1dd0fb9bc005af6b8ecc564db711a0e3b33dad2c7c23dd3",
+        "36f772980ff17c66a767f584a0d80bf2302a1afa585c01a226c1863afcea1392"
+    ],
+    "extract_dir": "tessdata_fast-4.0.0",
+    "notes": [
+        "This packages has overwritten the 'TESSDATA_PREFIX' environment variable with \"$dir\".",
+        "After updating \"tesseract\" please run \"scoop reset tesseract-languages\" to update the environment variable!"
+    ],
+    "depends": "tesseract",
+    "env_set": {
+        "TESSDATA_PREFIX": "$dir"
+    },
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/tesseract-ocr/tessdata_fast/archive/$version.zip",
+        "extract_dir": "tessdata_fast-$version"
+    }
+}

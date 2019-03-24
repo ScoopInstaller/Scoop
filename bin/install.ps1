@@ -27,7 +27,7 @@ if([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'Tls1
 }
 
 # get core functions
-$core_url = 'https://raw.github.com/lukesampson/scoop/master/lib/core.ps1'
+$core_url = 'https://raw.githubusercontent.com/lukesampson/scoop/master/lib/core.ps1'
 Write-Output 'Initializing...'
 Invoke-Expression (new-object net.webclient).downloadstring($core_url)
 
@@ -46,7 +46,8 @@ Write-Output 'Downloading...'
 dl $zipurl $zipfile
 
 'Extracting...'
-unzip $zipfile "$dir\_tmp"
+Add-Type -Assembly "System.IO.Compression.FileSystem"
+[IO.Compression.ZipFile]::ExtractToDirectory($zipfile,"$dir\_tmp")
 Copy-Item "$dir\_tmp\scoop-master\*" $dir -r -force
 Remove-Item "$dir\_tmp" -r -force
 Remove-Item $zipfile
@@ -56,6 +57,7 @@ shim "$dir\bin\scoop.ps1" $false
 
 ensure_robocopy_in_path
 ensure_scoop_in_path
+scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
 success 'Scoop was installed successfully!'
 Write-Output "Type 'scoop help' for instructions."
 

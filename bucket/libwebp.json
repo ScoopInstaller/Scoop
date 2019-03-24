@@ -1,12 +1,12 @@
 {
     "homepage": "https://developers.google.com/speed/webp/",
     "license": "BSD-3-Clause",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.0.0-windows-x64.zip",
-            "hash": "d52149dd7bf2161178a0bf92f8c324f4de685d4388d18ef01b0a6f5a6c7a9429",
-            "extract_dir": "libwebp-1.0.0-windows-x64",
+            "url": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.0.2-windows-x64.zip",
+            "hash": "a70c935887e5ed617d65ba6c1796ad9f212fab58610730f3d7df582f51041ee3",
+            "extract_dir": "libwebp-1.0.2-windows-x64",
             "bin": [
                 "bin\\anim_diff.exe",
                 "bin\\cwebp.exe",
@@ -17,9 +17,9 @@
             ]
         },
         "32bit": {
-            "url": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.0.0-windows-x86.zip",
-            "hash": "3e55a6e261c66d70ca67324fc931451b6d6fb99750aa51a207008404d181f967",
-            "extract_dir": "libwebp-1.0.0-windows-x86",
+            "url": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.0.2-windows-x86.zip",
+            "hash": "c1ff80200f069ad28098692c0c4022cfcee4804c552c2a4cee05e6a087b08724",
+            "extract_dir": "libwebp-1.0.2-windows-x86",
             "bin": [
                 "bin\\anim_diff.exe",
                 "bin\\cwebp.exe",

@@ -1,42 +1,37 @@
 {
-    "homepage": "https://curl.haxx.se/windows/",
-    "version": "1.1.1",
+    "homepage": "https://slproweb.com/products/Win32OpenSSL.html",
+    "version": "1.1.1b",
     "license": "OpenSSL",
     "architecture": {
         "64bit": {
-            "url": "https://curl.haxx.se/windows/dl-7.62.0/openssl-1.1.1-win64-mingw.tar.xz",
-            "hash": "dd4c5fae74069ac9b2ac641d547c23ef5cf2efdc3e4d3f11f0d359c3660a0d07",
-            "extract_dir": "openssl-1.1.1-win64-mingw"
+            "url": "https://slproweb.com/download/Win64OpenSSL-1_1_1b.exe",
+            "hash": "sha512:a0576f772f8ac7f7ab26be0458ed9cedcd5024f1f130bdc41809c4f7d2ffda128ea94bf86898894c1439a3120772ec335f9579d47863ddaa9ae4233548800850"
         },
         "32bit": {
-            "url": "https://curl.haxx.se/windows/dl-7.62.0/openssl-1.1.1-win32-mingw.tar.xz",
-            "hash": "fbf3c64ef8e808e2fea0017252330c311669970a62d2550463833b25d9b3794a",
-            "extract_dir": "openssl-1.1.1-win32-mingw"
+            "url": "https://slproweb.com/download/Win32OpenSSL-1_1_1b.exe",
+            "hash": "sha512:d4816b90b4ee8fc3fc0499c886f16f239da4f398692d81e523c02423154032490389142a70c0e5ee57b0b39aa1363b89dd59219e22881f52238b0a58ece9e5e6"
         }
     },
-    "bin": "openssl.exe",
-    "env_add_path": ".",
+    "innosetup": true,
+    "bin": "bin\\openssl.exe",
+    "env_add_path": "bin",
     "env_set": {
-        "OPENSSL_CONF": "$dir\\openssl.cnf"
+        "OPENSSL_CONF": "$dir\\bin\\cnf\\openssl.cnf"
     },
-    "checkver": {
-        "url": "https://curl.haxx.se/windows/",
-        "re": "dl-(?<curl>[\\d._]+)/openssl-(?<version>[\\w.]+)-win64-mingw"
-    },
+    "checkver": "Win32 OpenSSL v([^\\s]+)",
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://curl.haxx.se/windows/dl-$matchCurl/openssl-$version-win64-mingw.tar.xz",
-                "extract_dir": "openssl-$matchHead-win64-mingw"
+                "url": "https://slproweb.com/download/Win64OpenSSL-$underscoreVersion.exe"
             },
             "32bit": {
-                "url": "https://curl.haxx.se/windows/dl-$matchCurl/openssl-$version-win32-mingw.tar.xz",
-                "extract_dir": "openssl-$matchHead-win32-mingw"
+                "url": "https://slproweb.com/download/Win32OpenSSL-$underscoreVersion.exe"
             }
         },
         "hash": {
-            "url": "$baseurl/hashes.txt",
-            "find": "SHA256\\($basename\\)=\\s+([a-fA-F\\d]{64})"
+            "mode": "json",
+            "jp": "$.files.['$basename'].sha512",
+            "url": "$baseurl/win32_openssl_hashes.json"
         }
     }
 }

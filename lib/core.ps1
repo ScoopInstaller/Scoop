@@ -20,12 +20,23 @@ $cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
 
 # Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
 # for all communication with api.github.com
-function enable-encryptionscheme([Net.SecurityProtocolType]$scheme) {
-    # Net.SecurityProtocolType is a [Flags] enum, binary-OR sets
-    # the specified scheme in addition to whatever scheme is already active
-    [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor $scheme
+function Optimize-SecurityProtocol {
+    # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
+    # which allows the operating system to choose the best protocol to use.
+    # If SecurityProtocolType contains 'SystemDefault' (means .NET4.7+ detected)
+    # and the value of SecurityProtocol is 'SystemDefault', just do nothing on SecurityProtocol,
+    # 'SystemDefault' will use TLS 1.2 if the webrequest requires.
+    $isNewerNetFramework = ([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -contains 'SystemDefault')
+    $isSystemDefault = ([System.Net.ServicePointManager]::SecurityProtocol.Equals([System.Net.SecurityProtocolType]::SystemDefault))
+
+    # If not, change it to support TLS 1.2
+    if (!($isNewerNetFramework -and $isSystemDefault)) {
+        # Set to TLS 1.2 (3072), then TLS 1.1 (768), and TLS 1.0 (192). Ssl3 has been superseded,
+        # https://docs.microsoft.com/en-us/dotnet/api/system.net.securityprotocoltype?view=netframework-4.5
+        [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
+    }
 }
-enable-encryptionscheme "Tls12"
+Optimize-SecurityProtocol
 
 function Get-UserAgent() {
     return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
@@ -49,11 +60,33 @@ function abort($msg, [int] $exit_code=1) { write-host $msg -f red; exit $exit_co
 function error($msg) { write-host "ERROR $msg" -f darkred }
 function warn($msg) {  write-host "WARN  $msg" -f darkyellow }
 function info($msg) {  write-host "INFO  $msg" -f darkgray }
-function debug($msg, $indent = $false) {
-    if($indent) {
-        write-host "    DEBUG $msg" -f darkcyan
+function debug($obj) {
+    if((get_config 'debug' $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
+        return
+    }
+
+    $prefix = "DEBUG[$(Get-Date -UFormat %s)]"
+    $param = $MyInvocation.Line.Replace($MyInvocation.InvocationName, '').Trim()
+    $msg = $obj | Out-String -Stream
+
+    if($null -eq $obj -or $null -eq $msg) {
+        Write-Host "$prefix $param = " -f DarkCyan -NoNewline
+        Write-Host '$null' -f DarkYellow -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        return
+    }
+
+    if($msg.GetType() -eq [System.Object[]]) {
+        Write-Host "$prefix $param ($($obj.GetType()))" -f DarkCyan -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        $msg | Where-Object { ![String]::IsNullOrWhiteSpace($_) } |
+            Select-Object -Skip 2 | # Skip headers
+            ForEach-Object {
+                Write-Host "$prefix $param.$($_)" -f DarkCyan
+            }
     } else {
-        write-host "DEBUG $msg" -f darkcyan
+        Write-Host "$prefix $param = $($msg.Trim())" -f DarkCyan -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
     }
 }
 function success($msg) { write-host $msg -f darkgreen }
@@ -189,7 +222,18 @@ function url_filename($url) {
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
 # this function extracts the original filename from the URL.
 function url_remote_filename($url) {
-    split-path (new-object uri $url).absolutePath -leaf
+    $uri = (New-Object URI $url)
+    $basename = Split-Path $uri.PathAndQuery -Leaf
+    If ($basename -match ".*[?=]+([\w._-]+)") {
+        $basename = $matches[1]
+    }
+    If (($basename -notlike "*.*") -or ($basename -match "^[v.\d]+$")) {
+        $basename = Split-Path $uri.AbsolutePath -Leaf
+    }
+    If (($basename -notlike "*.*") -and ($uri.Fragment -ne "")) {
+        $basename = $uri.Fragment.Trim('/', '#')
+    }
+    return $basename
 }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
@@ -238,59 +282,6 @@ function isFileLocked([string]$path) {
         # file is locked by a process.
         return $true
     }
-}
-
-function unzip($path, $to) {
-    if (!(test-path $path)) { abort "can't find $path to unzip"}
-    try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
-    catch { unzip_old $path $to; return } # for .net earlier than 4.5
-    $retries = 0
-    while ($retries -le 10) {
-        if ($retries -eq 10) {
-            if (7zip_installed) {
-                extract_7zip $path $to $false
-                return
-            } else {
-                abort "Unzip failed: Windows can't unzip because a process is locking the file.`nRun 'scoop install 7zip' and try again."
-            }
-        }
-        if (isFileLocked $path) {
-            write-host "Waiting for $path to be unlocked by another process... ($retries/10)"
-            $retries++
-            Start-Sleep -s 2
-        } else {
-            break
-        }
-    }
-
-    try {
-        [io.compression.zipfile]::extracttodirectory($path,$to)
-    } catch [system.io.pathtoolongexception] {
-        # try to fall back to 7zip if path is too long
-        if(7zip_installed) {
-            extract_7zip $path $to $false
-            return
-        } else {
-            abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
-        }
-    } catch [system.io.ioexception] {
-        if (7zip_installed) {
-            extract_7zip $path $to $false
-            return
-        } else {
-            abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
-        }
-    } catch {
-        abort "Unzip failed: $_"
-    }
-}
-
-function unzip_old($path,$to) {
-    # fallback for .net earlier than 4.5
-    $shell = (new-object -com shell.application -strict)
-    $zipfiles = $shell.namespace("$path").items()
-    $to = ensure $to
-    $shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
 function is_directory([String] $path) {
@@ -408,7 +399,7 @@ set invalid=`"='
 if !args! == !invalid! ( set args= )
 powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
 
-        "#!/bin/sh`npowershell.exe -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        "#!/bin/sh`npowershell.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.jar$') {
         "@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
         "#!/bin/sh`njava -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
@@ -521,24 +512,6 @@ function pluralize($count, $singular, $plural) {
     if($count -eq 1) { $singular } else { $plural }
 }
 
-# for dealing with user aliases
-$default_aliases = @{
-    'cp' = 'copy-item'
-    'echo' = 'write-output'
-    'gc' = 'get-content'
-    'gci' = 'get-childitem'
-    'gcm' = 'get-command'
-    'gm' = 'get-member'
-    'iex' = 'invoke-expression'
-    'ls' = 'get-childitem'
-    'mkdir' = { new-item -type directory @args }
-    'mv' = 'move-item'
-    'rm' = 'remove-item'
-    'sc' = 'set-content'
-    'select' = 'select-object'
-    'sls' = 'select-string'
-}
-
 function reset_alias($name, $value) {
     if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
@@ -566,6 +539,24 @@ function reset_aliases() {
         }
     }
 
+    # for dealing with user aliases
+    $default_aliases = @{
+        'cp' = 'copy-item'
+        'echo' = 'write-output'
+        'gc' = 'get-content'
+        'gci' = 'get-childitem'
+        'gcm' = 'get-command'
+        'gm' = 'get-member'
+        'iex' = 'invoke-expression'
+        'ls' = 'get-childitem'
+        'mkdir' = { new-item -type directory @args }
+        'mv' = 'move-item'
+        'rm' = 'remove-item'
+        'sc' = 'set-content'
+        'select' = 'select-object'
+        'sls' = 'select-string'
+    }
+
     # set default aliases
     $default_aliases.keys | ForEach-Object { reset_alias $_ $default_aliases[$_] }
 }
@@ -577,7 +568,7 @@ function applist($apps, $global) {
 }
 
 function parse_app([string] $app) {
-    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*.json$|[a-zA-Z0-9-.]+)(?:@(?<version>.*))?') {
+    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?') {
         return $matches['app'], $matches['bucket'], $matches['version']
     }
     return $app, $null, $null
@@ -594,16 +585,14 @@ function show_app($app, $bucket, $version) {
 }
 
 function last_scoop_update() {
+    # PowerShell 6 returns an DateTime Object
     $last_update = (scoop config lastupdate)
-    if(!$last_update) {
-        $last_update = [System.DateTime]::Now
-    }
 
-    if($last_update.GetType() -eq [System.String]) {
+    if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
         try {
             $last_update = [System.DateTime]::Parse($last_update)
         } catch {
-            $last_update = [System.DateTime]::Now
+            $last_update = $null
         }
     }
     return $last_update
@@ -612,20 +601,24 @@ function last_scoop_update() {
 function is_scoop_outdated() {
     $last_update = $(last_scoop_update)
     $now = [System.DateTime]::Now
-    if($last_update -eq $now) {
+    if($null -eq $last_update) {
         scoop config lastupdate $now.ToString('o')
         # enforce an update for the first time
         return $true
     }
-    return $last_update.AddHours(3) -lt  [System.DateTime]::Now.ToLocalTime()
+    return $last_update.AddHours(3) -lt $now.ToLocalTime()
 }
 
-function substitute($entity, [Hashtable] $params) {
+function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
     if ($entity -is [Array]) {
-        return $entity | ForEach-Object { substitute $_ $params }
+        return $entity | ForEach-Object { substitute $_ $params $regexEscape}
     } elseif ($entity -is [String]) {
         $params.GetEnumerator() | ForEach-Object {
-            $entity = $entity.Replace($_.Name, $_.Value)
+            if($regexEscape -eq $false -or $null -eq $_.Value) {
+                $entity = $entity.Replace($_.Name, $_.Value)
+            } else {
+                $entity = $entity.Replace($_.Name, [Regex]::Escape($_.Value))
+            }
         }
         return $entity
     }
@@ -657,16 +650,37 @@ function format_hash_aria2([String] $hash) {
     return $hash
 }
 
+function get_hash([String] $multihash) {
+    $type, $hash = $multihash -split ':'
+    if(!$hash) {
+        # no type specified, assume sha256
+        $type, $hash = 'sha256', $multihash
+    }
+
+    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
+        return $null, "Hash type '$type' isn't supported."
+    }
+
+    return $type, $hash.ToLower()
+}
+
 function handle_special_urls($url)
 {
     # FossHub.com
-    if($url -match "^(.*fosshub.com\/)(?<name>.*)\/(?<filename>.*)$") {
-        # create an url to request to request the expiring url
-        $name = $matches['name'] -replace '.html',''
-        $filename = $matches['filename']
-        # the key is a random 24 chars long hex string, so lets use ' SCOOPSCOOP ' :)
-        $url = "https://www.fosshub.com/gensLink/$name/$filename/2053434f4f5053434f4f5020"
-        $url = (Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content)
+    if ($url -match "^(?:.*fosshub.com\/)(?<name>.*)(?:\/|\?dwl=)(?<filename>.*)$") {
+        $Body = @{
+            projectUri      = $Matches.name;
+            fileName        = $Matches.filename;
+            isLatestVersion = $true
+        }
+        if ((Invoke-RestMethod -Uri $url) -match '"p":"(?<pid>[a-f0-9]{24}).*?"r":"(?<rid>[a-f0-9]{24})') {
+            $Body.Add("projectId", $Matches.pid)
+            $Body.Add("releaseId", $Matches.rid)
+        }
+        $url = Invoke-RestMethod -Method Post -Uri "https://api.fosshub.com/download/" -ContentType "application/json" -Body (ConvertTo-Json $Body -Compress)
+        if ($null -eq $url.error) {
+            $url = $url.data.url
+        }
     }
 
     # Sourceforge.net

@@ -1,8 +1,9 @@
 {
     "homepage": "https://getcomposer.org/",
+    "description": "Dependency Manager for PHP",
     "license": "MIT",
-    "version": "1.7.3",
-    "url": "https://getcomposer.org/download/1.7.3/composer.phar",
+    "version": "1.8.4",
+    "url": "https://getcomposer.org/download/1.8.4/composer.phar",
     "bin": "composer.ps1",
     "persist": "home",
     "env_set": {
@@ -27,10 +28,8 @@
             "php-nts"
         ]
     },
-    "notes": [
-        "'composer selfupdate' is aliased to 'scoop update composer'"
-    ],
-    "hash": "bc6cbcd2c0fbc03c7ab87442b5f1fbc9407f0b9900bddc10d755bdc81bbe7b6e",
+    "notes": "'composer selfupdate' is aliased to 'scoop update composer'",
+    "hash": "1722826c8fbeaf2d6cdd31c9c9af38694d6383a0f2bf476fe6bbd30939de058a",
     "checkver": {
         "github": "https://github.com/composer/composer"
     },

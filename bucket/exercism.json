@@ -1,16 +1,16 @@
 {
     "homepage": "https://github.com/exercism/cli",
     "description": "A Go based command line tool for exercism.io.",
-    "version": "3.0.10",
+    "version": "3.0.11",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/exercism/cli/releases/download/v3.0.10/exercism-windows-64bit.zip",
-            "hash": "f580668bc73151ef569d8fee0946c8120385d85c129f6a8384a87c1546d427ec"
+            "url": "https://github.com/exercism/cli/releases/download/v3.0.11/exercism-windows-64bit.zip",
+            "hash": "7445ac2a56acd76c816e2ca3afb8df52b30c5f16ff3f8b36102cbffd5b8fd93b"
         },
         "32bit": {
-            "url": "https://github.com/exercism/cli/releases/download/v3.0.10/exercism-windows-32bit.zip",
-            "hash": "ef68a697231062052d684fdf2f50ca3366c7f41f2644c68c0b45a2f6ddcc6bef"
+            "url": "https://github.com/exercism/cli/releases/download/v3.0.11/exercism-windows-32bit.zip",
+            "hash": "2275f66b63c399706585efa389bc40e444c612bc8f64781c10ae20cb73eb8ba0"
         }
     },
     "bin": "exercism.exe",

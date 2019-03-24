@@ -1,7 +1,7 @@
 {
     "homepage": "https://github.com/terrajobst/git-istage",
-    "version": "0.2.57",
-    "url": "https://www.nuget.org/api/v2/package/git-istage/0.2.57",
+    "version": "0.2.61",
+    "url": "https://www.nuget.org/api/v2/package/git-istage/0.2.61",
     "checkver": {
         "url": "https://api.nuget.org/v3-flatcontainer/git-istage/index.json",
         "jsonpath": "$.versions[-1:]"
@@ -9,10 +9,8 @@
     "autoupdate": {
         "url": "https://www.nuget.org/api/v2/package/git-istage/$version"
     },
-    "hash": "b10a695780221c51870de0247f4f8603a14474635f61be06ae876d3a30fba529",
-    "depends": [
-        "dotnet-sdk"
-    ],
+    "hash": "ae35a6d19c323b66e6ef4430b323617698d9f24c2e867e7fe61da96d3810a326",
+    "depends": "dotnet-sdk",
     "description": "A better git add -p",
     "license": "MIT",
     "installer": {

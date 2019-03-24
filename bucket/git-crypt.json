@@ -5,7 +5,8 @@
     "version": "0.6.0-701fb8e",
     "bin": "git-crypt.exe",
     "checkver": {
-        "github": "https://github.com/rasa/git-crypt"
+        "github": "https://github.com/rasa/git-crypt/",
+        "regex": "tag/([\\w\\.-]+)"
     },
     "architecture": {
         "64bit": {

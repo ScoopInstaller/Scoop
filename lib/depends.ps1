@@ -23,14 +23,15 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
     $app, $bucket, $null = parse_app $app
     $unresolved += $app
     $null, $manifest, $null, $null = locate $app $bucket
+
     if(!$manifest) {
-        if((buckets) -notcontains $bucket) {
+        if(((buckets) -notcontains $bucket) -and $bucket) {
             warn "Bucket '$bucket' not installed. Add it with 'scoop bucket add $bucket' or 'scoop bucket add $bucket <repo>'."
         }
         abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })"
     }
 
-    $deps = @(install_deps $manifest $arch) + @(runtime_deps $manifest) | Select-Object -uniq
+    $deps = @(install_deps $manifest $arch) + @(runtime_deps $manifest) | Select-Object -Unique
 
     foreach($dep in $deps) {
         if($resolved -notcontains $dep) {
@@ -40,7 +41,7 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
             dep_resolve $dep $arch $resolved $unresolved
         }
     }
-    $resolved.add($app) > $null
+    $resolved.add($app) | Out-Null
     $unresolved = $unresolved -ne $app # remove from unresolved
 }
 
@@ -52,10 +53,10 @@ function install_deps($manifest, $arch) {
     $deps = @()
 
     if((requires_7zip $manifest $arch) -and !(7zip_installed)) {
-        $deps += "7zip"
+        $deps += '7zip'
     }
-    if(requires_lessmsi $manifest $arch) { $deps += "lessmsi" }
-    if($manifest.innosetup) { $deps += "innounp" }
+    if(requires_lessmsi $manifest $arch) { $deps += 'lessmsi' }
+    if($manifest.innosetup) { $deps += 'innounp' }
 
-    $deps
+    return $deps
 }

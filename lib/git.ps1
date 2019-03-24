@@ -1,7 +1,7 @@
 function git_proxy_cmd {
     $proxy = $(scoop config proxy)
     $cmd = "git $($args | ForEach-Object { "$_ " })"
-    if($proxy) {
+    if($proxy -and $proxy -ne 'none') {
         $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
     }
     & "$env:COMSPEC" /c $cmd
@@ -25,4 +25,16 @@ function git_fetch {
 
 function git_log {
     git_proxy_cmd --no-pager log $args
+}
+
+function git_checkout {
+    git_proxy_cmd checkout $args
+}
+
+function git_branch {
+    git_proxy_cmd branch $args
+}
+
+function git_config {
+    git_proxy_cmd config $args
 }

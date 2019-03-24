@@ -1,10 +1,10 @@
 {
     "homepage": "https://github.com/msiemens/PyGitUp",
     "license": "MIT",
-    "version": "1.6.0",
-    "url": "https://github.com/msiemens/PyGitUp/archive/v1.6.0.zip",
-    "hash": "3e4495b2c40d13d8d40a648fc89b04e8b4889289377df7713d2bc98177783eaf",
-    "extract_dir": "PyGitUp-1.6.0",
+    "version": "1.6.1",
+    "url": "https://github.com/msiemens/PyGitUp/archive/v1.6.1.zip",
+    "hash": "a512da35867a9ccb1861b23c4a1623ed2d9845eb769aea5987495c162b50a652",
+    "extract_dir": "PyGitUp-1.6.1",
     "depends": "python",
     "post_install": [
         "pushd \"$dir\"",

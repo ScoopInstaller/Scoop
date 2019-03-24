@@ -6,9 +6,7 @@
     "url": "https://github.com/Microsoft/console/releases/download/1810.02002/colortool.zip",
     "hash": "fa3373d02b0835502bf0fa643ef3d7cf247b082357a33c6bceee07416371b672",
     "bin": "colortool.exe",
-    "persist": [
-        "schemes"
-    ],
+    "persist": "schemes",
     "checkver": {
         "github": "https://github.com/Microsoft/console"
     },

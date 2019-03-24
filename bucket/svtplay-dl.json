@@ -12,6 +12,6 @@
         "url": "https://svtplay-dl.se/download/$version/svtplay-dl.zip"
     },
     "suggest": {
-        "ffmpeg for joining audio and video streams": ["ffmpeg"]
+        "ffmpeg for joining audio and video streams": "ffmpeg"
     }
 }

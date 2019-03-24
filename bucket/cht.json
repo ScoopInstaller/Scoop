@@ -1,0 +1,15 @@
+{
+    "homepage": "https://github.com/tpanj/cht.exe",
+    "description": "A command line client for https://cht.sh, working examples about various commands, APIs, ... Unified access to the best community driven documentation repositories of the world.",
+    "license": "GPL-3.0-or-later",
+    "version": "0.6",
+    "url": "https://github.com/tpanj/cht.exe/archive/v0.6.zip",
+    "hash": "771061cefff950be8ec3f2987e0b56e8ec20b79c8d451e24e5f89b7f391629df",
+    "extract_dir": "cht.exe-0.6/bin",
+    "bin": "cht.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/tpanj/cht.exe/archive/v$version.zip",
+        "extract_dir": "cht.exe-$version/bin"
+    }
+}

@@ -1,15 +1,20 @@
 {
-    "homepage": "http://gource.io/",
+    "homepage": "https://gource.io/",
+    "description": "OpenGL-based 3D visualisation tool for source control repositories.",
     "version": "0.47",
     "license": "GPL-3.0",
-    "url": "https://github.com/acaudwell/Gource/releases/download/gource-0.47/gource-0.47.win64.zip",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/acaudwell/Gource/releases/download/gource-0.47/gource-0.47.win64.zip",
+            "hash": "4dd9726ad1a4bceecaeeb042494f213ed8ce70ea42aaffbae451a4a5707dbd03",
+            "bin": "gource.exe"
+        }
+    },
     "checkver": {
-        "url": "https://github.com/acaudwell/Gource/releases/latest",
-        "re": "gource-([\\d.]+)"
+        "url": "https://gource.io/",
+        "re": "gource-([\\d.]+).win64.zip</a>"
     },
     "autoupdate": {
         "url": "https://github.com/acaudwell/Gource/releases/download/gource-$version/gource-$version.win64.zip"
-    },
-    "hash": "4dd9726ad1a4bceecaeeb042494f213ed8ce70ea42aaffbae451a4a5707dbd03",
-    "bin": "gource.exe"
+    }
 }

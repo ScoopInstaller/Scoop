@@ -5,7 +5,5 @@
     "url": "https://downloads.sourceforge.net/project/xming/Xming-mesa/6.9.0.31/Xming-mesa-6-9-0-31-setup.exe?r=scoop",
     "hash": "md5:E580DEBBF6110CFC4D8FCD20BEB541C1",
     "innosetup": true,
-    "bin": [
-        "XLaunch.exe"
-    ]
+    "bin": "XLaunch.exe"
 }

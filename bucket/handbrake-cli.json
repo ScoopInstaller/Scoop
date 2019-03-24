@@ -1,16 +1,14 @@
 {
     "homepage": "https://handbrake.fr/",
     "license": "GPL-2.0",
-    "version": "1.1.2",
+    "version": "1.2.2",
     "architecture": {
         "64bit": {
-            "hash": "8b275a6584a3a2d01244d4c372bf002ed6a9fc86189dbc18ff7a3204851c4fcd",
-            "url": "https://download.handbrake.fr/handbrake/releases/1.1.2/HandBrakeCLI-1.1.2-win-x86_64.zip"
+            "hash": "e5f2f510d56fcc199faa2a29cefae9b0fa8a7928f55114bcd40ad337fb8e0671",
+            "url": "https://download.handbrake.fr/handbrake/releases/1.2.2/HandBrakeCLI-1.2.2-win-x86_64.zip"
         }
     },
-    "bin": [
-        "HandBrakeCLI.exe"
-    ],
+    "bin": "HandBrakeCLI.exe",
     "checkver": {
         "github": "https://github.com/HandBrake/HandBrake"
     },

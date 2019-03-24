@@ -61,8 +61,10 @@
         "usr/bin/sshd.exe"
     ],
     "pre_install": [
-        "mkdir $dir/tmp",
-        "mkdir $dir/home",
-        "cmd /c mklink /j $dir\\home\\%USERNAME% %USERPROFILE%"
+        "mkdir \"$dir/tmp\"",
+        "mkdir \"$dir/home\"",
+        "mkdir \"$dir/home/$env:UserName\"",
+        "mkdir -Force \"$env:UserProfile/.ssh\"",
+        "cmd /c mklink /j \"$dir\\home\\%UserName%\\.ssh\" \"%UserProfile%\\.ssh\""
     ]
 }

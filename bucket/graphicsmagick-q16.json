@@ -1,15 +1,15 @@
 {
     "homepage": "http://www.graphicsmagick.org/",
     "license": "MIT",
-    "version": "1.3.30",
+    "version": "1.3.31",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/1.3.30/GraphicsMagick-1.3.30-Q16-win64-dll.exe",
-            "hash": "sha1:0089fc322981ae80d91c5f90677fd0b2248553ed"
+            "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/1.3.31/GraphicsMagick-1.3.31-Q16-win64-dll.exe",
+            "hash": "sha1:8b80ca47ec44d69da03a27c25a405213b962ef75"
         },
         "32bit": {
-            "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/1.3.30/GraphicsMagick-1.3.30-Q16-win32-dll.exe",
-            "hash": "sha1:3eb4e6b12540e64bd1d78913e221ec5f3573fb55"
+            "url": "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick-binaries/1.3.31/GraphicsMagick-1.3.31-Q16-win32-dll.exe",
+            "hash": "sha1:be91ea018a1313b3e52088e1e36b83df6b6f2988"
         }
     },
     "innosetup": true,
