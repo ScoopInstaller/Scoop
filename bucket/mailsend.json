@@ -11,7 +11,7 @@
     "autoupdate": {
         "url": "https://github.com/muquit/mailsend/releases/download/$version/mailsend$version.exe.zip",
         "hash": {
-            "url": "https://github.com/muquit/mailsend/releases/latest",
+            "url": "https://github.com/muquit/mailsend/releases/tag/$version",
             "regex": "SHA1\\($basename\\).*$sha1"
         }
     }
