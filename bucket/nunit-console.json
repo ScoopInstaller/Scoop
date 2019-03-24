@@ -1,10 +1,10 @@
 {
     "homepage": "https://nunit.org/",
     "description": "NUnit Console runner for NUnit, the most popular and widely used unit testing framework for .NET",
-    "version": "3.9.0",
+    "version": "3.10.0",
     "license": "MIT",
-    "url": "https://github.com/nunit/nunit-console/releases/download/v3.9/NUnit.Console-3.9.0.zip",
-    "hash": "EE11B97BD075414EC196ED6EAE8E526AA78BB59251D9BDABE513D07E3B2B7BEA",
+    "url": "https://github.com/nunit/nunit-console/releases/download/v3.10/NUnit.Console-3.10.0.zip",
+    "hash": "64f4420a90a3ee12c60a13d7162ac52e32b84b704bfd54b9e9d6d4500313d0ac",
     "bin": "nunit3-console.exe",
     "suggest": {
         "NuGet": "nuget"
