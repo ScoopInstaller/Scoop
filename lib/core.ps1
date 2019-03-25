@@ -96,7 +96,7 @@ function set_config($name, $value) {
         if($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
             $value = [System.Convert]::ToBoolean($value)
         }
-        if($scoopConfig.$name) {
+        if($scoopConfig.PSObject.Properties.Item($name)) {
             $scoopConfig.$name = $value
         } else {
             $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
