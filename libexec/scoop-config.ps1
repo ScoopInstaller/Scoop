@@ -36,9 +36,9 @@ reset_aliases
 if(!$name) { my_usage; exit 1 }
 
 if($name -like 'rm') {
-    set_config $value $null
+    set_config $value $null | Out-Null
 } elseif($null -ne $value) {
-    set_config $name $value
+    set_config $name $value | Out-Null
 } else {
     get_config $name $value
 }
