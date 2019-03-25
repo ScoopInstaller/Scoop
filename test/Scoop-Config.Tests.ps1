@@ -2,7 +2,7 @@
 
 describe "config" -Tag 'Scoop' {
     BeforeAll {
-        $json = '{ "one": 1, "two": [ { "a": "a" }, "b", 2 ], "three": { "four": 4 }, "five": true, "six": false, "seven": "\/Date(1529917395805)\/", "eight": "2019-03-18T15:22:09.3930000+01:00" }'
+        $json = '{ "one": 1, "two": [ { "a": "a" }, "b", 2 ], "three": { "four": 4 }, "five": true, "six": false, "seven": "\/Date(1529917395805)\/", "eight": "2019-03-18T15:22:09.3930000+00:00" }'
     }
 
     it "converts JSON to PSObject" {
@@ -15,22 +15,19 @@ describe "config" -Tag 'Scoop' {
         $obj.three.four | Should -BeExactly 4
         $obj.five | Should -BeTrue
         $obj.six | Should -BeFalse
+        $obj.seven | Should -BeOfType [System.DateTime]
         if($PSVersionTable.PSVersion.Major -lt 6) {
-            $obj.eight = [System.DateTime]::parse($obj.eight)
+            $obj.eight | Should -BeOfType [System.String]
+        } else {
+            $obj.eight | Should -BeOfType [System.DateTime]
         }
-        write-host -f blue $obj.seven
-        write-host -f blue (New-Object System.DateTime (2018, 06, 25, 09, 03, 15, 805))
-        write-host -f blue $obj.eight
-        write-host -f blue (New-Object System.DateTime (2019, 03, 18, 15, 22, 09, 393))
-        [System.DateTime]::Equals($obj.seven, $(New-Object System.DateTime (2018, 06, 25, 09, 03, 15, 805))) | Should -BeTrue
-        [System.DateTime]::Equals($obj.eight, $(New-Object System.DateTime (2019, 03, 18, 15, 22, 09, 393))) | Should -BeTrue
     }
 
     it "load_config should return PSObject" {
         mock Get-Content { $json }
         mock Test-Path { $true }
         (load_cfg 'file') | Should -Not -BeNullOrEmpty
-        (load_cfg 'file') | Should -BeOfType System.Management.Automation.PSObject
+        (load_cfg 'file') | Should -BeOfType [System.Management.Automation.PSObject]
         (load_cfg 'file').one | Should -BeExactly 1
 
     }
@@ -46,11 +43,11 @@ describe "config" -Tag 'Scoop' {
         (get_config 'three').four | Should -BeExactly 4
         get_config 'five' | Should -BeTrue
         get_config 'six' | Should -BeFalse
-        [System.DateTime]::Equals((get_config 'seven'), $(New-Object System.DateTime (2018, 06, 25, 09, 03, 15, 805))) | Should -BeTrue
-        $eight = get_config 'eight'
+        get_config 'seven' | Should -BeOfType [System.DateTime]
         if($PSVersionTable.PSVersion.Major -lt 6) {
-            $eight = [System.DateTime]::parse($eight)
+            get_config 'eight' | Should -BeOfType [System.String]
+        } else {
+            get_config 'eight' | Should -BeOfType [System.DateTime]
         }
-        [System.DateTime]::Equals($eight, $(New-Object System.DateTime (2019, 03, 18, 15, 22, 09, 393))) | Should -BeTrue
     }
 }
