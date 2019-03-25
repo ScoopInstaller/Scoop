@@ -15,8 +15,15 @@ describe "config" -Tag 'Scoop' {
         $obj.three.four | Should -BeExactly 4
         $obj.five | Should -BeTrue
         $obj.six | Should -BeFalse
+        if($PSVersionTable.PSVersion.Major -lt 6) {
+            $obj.eight = [System.DateTime]::parse($obj.eight)
+        }
+        write-host -f blue $obj.seven
+        write-host -f blue (New-Object System.DateTime (2018, 06, 25, 09, 03, 15, 805))
+        write-host -f blue $obj.eight
+        write-host -f blue (New-Object System.DateTime (2019, 03, 18, 15, 22, 09, 393))
         [System.DateTime]::Equals($obj.seven, $(New-Object System.DateTime (2018, 06, 25, 09, 03, 15, 805))) | Should -BeTrue
-        [System.DateTime]::Equals([System.DateTime]::parse($obj.eight), $(New-Object System.DateTime (2019, 03, 18, 15, 22, 09, 393))) | Should -BeTrue
+        [System.DateTime]::Equals($obj.eight, $(New-Object System.DateTime (2019, 03, 18, 15, 22, 09, 393))) | Should -BeTrue
     }
 
     it "load_config should return PSObject" {
@@ -40,6 +47,10 @@ describe "config" -Tag 'Scoop' {
         get_config 'five' | Should -BeTrue
         get_config 'six' | Should -BeFalse
         [System.DateTime]::Equals((get_config 'seven'), $(New-Object System.DateTime (2018, 06, 25, 09, 03, 15, 805))) | Should -BeTrue
-        [System.DateTime]::Equals([System.DateTime]::parse((get_config 'eight')), $(New-Object System.DateTime (2019, 03, 18, 15, 22, 09, 393))) | Should -BeTrue
+        $eight = get_config 'eight'
+        if($PSVersionTable.PSVersion.Major -lt 6) {
+            $eight = [System.DateTime]::parse($eight)
+        }
+        [System.DateTime]::Equals($eight, $(New-Object System.DateTime (2019, 03, 18, 15, 22, 09, 393))) | Should -BeTrue
     }
 }
