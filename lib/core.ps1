@@ -89,17 +89,18 @@ function get_config($name, $default) {
 }
 
 function set_config($name, $value) {
-    if(!$scoopConfig) {
+    if($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
         ensure (Split-Path -Path $configFile) | Out-Null
-        $scoopConfig = @{ $name = $value }
+        $scoopConfig = New-Object PSObject
+        $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
     } else {
         if($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
             $value = [System.Convert]::ToBoolean($value)
         }
-        if($scoopConfig.PSObject.Properties.Item($name)) {
-            $scoopConfig.$name = $value
-        } else {
+        if($null -eq $scoopConfig.$name) {
             $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
+        } else {
+            $scoopConfig.$name = $value
         }
     }
 
@@ -108,6 +109,7 @@ function set_config($name, $value) {
     }
 
     ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding ASCII
+    return $scoopConfig
 }
 
 function setup_proxy() {
