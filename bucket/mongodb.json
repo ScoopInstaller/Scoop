@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.mongodb.org",
     "description": "A document database with the scalability and flexibility.",
-    "version": "4.0.6",
+    "version": "4.0.7",
     "license": {
         "identifier": "SSPL-1.0",
         "url": "https://www.mongodb.com/licensing/server-side-public-license"
     },
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-4.0.6-signed.msi",
-            "hash": "aeb91f88930c77828c45f6aa41ad8219a8bb7c90c1a3c308b92329afc907cb1c",
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-4.0.7-signed.msi",
+            "hash": "b83e6fc04ea332b9cb60a31543805d87b7226f1da29db23cf108c4c208ff5d9f",
             "extract_dir": "MongoDB\\Server\\4.0"
         }
     },
