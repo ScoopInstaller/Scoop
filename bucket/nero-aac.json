@@ -1,0 +1,19 @@
+{
+    "homepage": "https://www.videohelp.com/software/Nero-AAC-Codec",
+    "version": "1.5.4.0",
+    "description": "Nero Digital AAC Encoder (Command Line Tools)",
+    "license": {
+        "identifier": "Proprietary",
+        "url": "https://www.nero.com/eng/corp-legal/end-user-agreement.php"
+    },
+    "url": "https://www.videohelp.com/download/NeroAACCodec-1.5.4.zip",
+    "hash": "e0496ad856e2803001a59985368d21b22f4fbdd55589c7f313d6040cefff648b",
+    "bin": [
+        "win32\\neroAacEnc.exe",
+        "win32\\neroAacDec.exe",
+        "win32\\neroAacTag.exe"
+    ],
+    "suggest": {
+        "LameXP": "extras/lamexp"
+    }
+}
