@@ -1,16 +1,16 @@
 {
-    "version": "2.24",
+    "version": "2.24-103",
     "description": "The Non-Sucking Service Manager.",
     "homepage": "https://nssm.cc/",
     "license": "Public Domain",
-    "url": "https://nssm.cc/release/nssm-2.24.zip",
-    "hash": "sha1:be7b3577c6e3a280e5106a9e9db5b3775931cefc",
+    "url": "https://nssm.cc/ci/nssm-2.24-103-gdee49fc.zip",
+    "hash": "sha1:0722c8a775deb4a1460d1750088916f4f5951773",
     "architecture": {
         "64bit": {
-            "extract_dir": "nssm-2.24\\win64"
+            "extract_dir": "nssm-2.24-103-gdee49fc\\win64"
         },
         "32bit": {
-            "extract_dir": "nssm-2.24\\win32"
+            "extract_dir": "nssm-2.24-103-gdee49fc\\win32"
         }
     },
     "bin": [
@@ -21,21 +21,21 @@
         ]
     ],
     "checkver": {
-        "url": "https://nssm.cc/changelog/",
-        "regex": "Changes since ([\\d\\.]+)"
+        "url": "https://nssm.cc/builds",
+        "regex": "nssm-([\\d.]+-\\d+)-(?<build>.*?).zip"
     },
     "autoupdate": {
-        "url": "https://nssm.cc/release/nssm-$version.zip",
+        "url": "https://nssm.cc/ci/nssm-$version-$matchBuild.zip",
         "hash": {
-            "url": "https://nssm.cc/download/",
-            "regex": "\\[$sha1\\]"
+            "url": "https://nssm.cc/builds",
+            "regex": "$basename.*?$sha1"
         },
         "architecture": {
             "64bit": {
-                "extract_dir": "nssm-$version\\win64"
+                "extract_dir": "nssm-$version-$matchBuild\\win64"
             },
             "32bit": {
-                "extract_dir": "nssm-$version\\win32"
+                "extract_dir": "nssm-$version-$matchBuild\\win32"
             }
         }
     }
