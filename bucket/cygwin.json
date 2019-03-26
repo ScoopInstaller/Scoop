@@ -1,15 +1,15 @@
 {
-    "version": "2.896",
+    "version": "2.897",
     "homepage": "https://cygwin.com/",
     "description": "A large collection of GNU and Open Source tools which provide functionality similar to a Linux distribution on Windows",
     "architecture": {
         "64bit": {
             "url": "https://cygwin.com/setup-x86_64.exe#/cygwin-setup.exe",
-            "hash": "sha512:4ddf57775794d7d42e2bccf1f717553ba319010579978087e3e9162a0d12e0a4f665a79c3da1710d84037d9e43851cf858a0c5d965e9a4e32b3d38495b4f8f0e"
+            "hash": "sha512:32f94fbf0d69c9be6d8e36b7d462811de197d34f63edba8459cffe6f40ad462bbba4499c4746532571472a185eacc95255005c3af280757ad59a4f8c8eb600f3"
         },
         "32bit": {
             "url": "https://cygwin.com/setup-x86.exe#/cygwin-setup.exe",
-            "hash": "sha512:e0b321c4898416722c6402d86ec00cc8d7f38a541e51bcda9b34da9f71c3255d20566057cb7e3df70aadc6d2d1e6abefe371dce72a86d1b28163f6de97b2f0cd"
+            "hash": "sha512:88821ab4075d851e7d087e36950636c1fdac5ff3b4d3ac4bb20eab0335396bc83dcf336782ffc25da0df239c554202698c7fafe5e19f2c05ecd1207fea4a81bb"
         }
     },
     "autoupdate": {
