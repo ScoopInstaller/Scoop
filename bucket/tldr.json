@@ -1,0 +1,24 @@
+{
+    "homepage": "https://github.com/isacikgoz/tldr",
+    "description": "Interactive tldr pages (simplified and community-driven man pages) client",
+    "license": "MIT",
+    "version": "0.5.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/isacikgoz/tldr/releases/download/v0.5.0/tldr_0.5.0_windows_amd64.zip",
+            "hash": "4dcca09f8de9b9837d60d36eeb873215c5ec5dcdb3226cd10effcd73a59451f2"
+        }
+    },
+    "bin": "tldr.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/isacikgoz/tldr/releases/download/v$version/tldr_$version_windows_amd64.zip"
+            }
+        },
+        "hash": {
+            "url": "$baseurl/checksums_tldr_$version.txt"
+        }
+    }
+}

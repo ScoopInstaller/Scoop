@@ -8,13 +8,13 @@ describe "hashtable" -Tag 'Scoop' {
         $obj = convertfrom-json $json
         $ht = hashtable $obj
 
-        $ht.one | should beexactly 1
-        $ht.two[0].a | should be "a"
-        $ht.two[1] | should be "b"
-        $ht.two[2] | should beexactly 2
-        $ht.three.four | should beexactly 4
-        $ht.five | should beexactly $true
-        $ht.six | should beexactly $false
-        [System.DateTime]::Equals($ht.seven, $(New-Object System.DateTime (2018, 06, 25, 09, 03, 15, 805))) | should be $true
+        $ht.one | should -beexactly 1
+        $ht.two[0].a | should -be "a"
+        $ht.two[1] | should -be "b"
+        $ht.two[2] | should -beexactly 2
+        $ht.three.four | should -beexactly 4
+        $ht.five | should -beexactly $true
+        $ht.six | should -beexactly $false
+        [System.DateTime]::Equals($ht.seven, $(New-Object System.DateTime (2018, 06, 25, 09, 03, 15, 805))) | should -betrue
     }
 }

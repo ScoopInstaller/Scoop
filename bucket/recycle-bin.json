@@ -1,0 +1,13 @@
+{
+    "version": "1.0.1",
+    "description": "Move files and folders to the Windows recycle bin within command line.",
+    "homepage": "https://github.com/sindresorhus/recycle-bin",
+    "license": "MIT",
+    "url": "https://github.com/sindresorhus/recycle-bin/releases/download/1.0.1/recycle-bin.exe",
+    "hash": "6f605ff88aa63c613073b2bb475eae61b24d477caf119e107134780085a3e47b",
+    "bin": "recycle-bin.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/sindresorhus/recycle-bin/releases/download/$version/recycle-bin.exe"
+    }
+}

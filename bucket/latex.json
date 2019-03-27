@@ -1,12 +1,12 @@
 {
     "homepage": "https://miktex.org",
-    "version": "2.9.6753",
+    "version": "2.9.6942",
     "license": {
         "identifier": "Freeware",
         "url": "https://miktex.org/copying"
     },
-    "url": "https://ftp.fau.de/ctan/systems/win32/miktex/setup/windows-x86/miktex-portable-2.9.6753.exe#/dl.7z",
-    "hash": "c8b85fc4694d748e8e481ea8e9a31057688c9e16dda8ea7686c00b29b9d6f6e2",
+    "url": "https://ftp.fau.de/ctan/systems/win32/miktex/setup/windows-x86/miktex-portable-2.9.6942.exe#/dl.7z",
+    "hash": "20e42d52e7601f7b0abaf042408a18b39ffd84b3bb5c2a51f9b70a6555ea5897",
     "env_add_path": "texmfs\\install\\miktex\\bin",
     "checkver": {
         "url": "https://miktex.org/download#portable",

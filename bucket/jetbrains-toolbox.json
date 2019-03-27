@@ -1,12 +1,12 @@
 {
     "homepage": "https://jetbrains.com/",
-    "version": "1.11.4269",
+    "version": "1.14.5037",
     "license": {
         "identifier": "Freeware",
         "url": "https://www.jetbrains.com/store/license.html"
     },
-    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.11.4269.exe",
-    "hash": "4fc2fa872e7b90f60e8a646a4a30529ddaf28733a196ea6caba8d2c0bc629487",
+    "url": "https://download.jetbrains.com/toolbox/jetbrains-toolbox-1.14.5037.exe",
+    "hash": "3956a4344d4cb86247d8d242f51fc228e60d19cd96d39da17bd008e340610d6c",
     "installer": {
         "args": [
             "/S",
@@ -15,13 +15,9 @@
     },
     "uninstaller": {
         "file": "Uninstall.exe",
-        "args": [
-            "/S"
-        ]
+        "args": "/S"
     },
-    "bin": [
-        "jetbrains-toolbox.exe"
-    ],
+    "bin": "jetbrains-toolbox.exe",
     "persist": "apps",
     "checkver": {
         "url": "https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release",

@@ -1,0 +1,38 @@
+{
+    "homepage": "https://xiph.org/flac/",
+    "description": "Free Lossless Audio Codec - command line tools",
+    "version": "1.3.2",
+    "license": "BSD-3-Clause,GPL-2.0",
+    "url": "https://downloads.xiph.org/releases/flac/flac-1.3.2-win.zip",
+    "hash": "4cca0acfa829921ab647f48e83f4b40288f2018d7819f0b15230d3992c13c966",
+    "architecture": {
+        "64bit": {
+            "extract_dir": "flac-1.3.2-win\\win64"
+        },
+        "32bit": {
+            "extract_dir": "flac-1.3.2-win\\win32"
+        }
+    },
+    "bin": [
+        "flac.exe",
+        "metaflac.exe"
+    ],
+    "checkver": {
+        "re": "FLAC ([\\d.]+)",
+        "url": "https://xiph.org/flac/changelog.html"
+    },
+    "autoupdate": {
+        "url": "https://downloads.xiph.org/releases/flac/flac-$version-win.zip",
+        "hash": {
+            "url": "https://downloads.xiph.org/releases/flac/SHA256SUMS.txt"
+        },
+        "architecture": {
+            "64bit": {
+                "extract_dir": "flac-$version-win\\win64"
+            },
+            "32bit": {
+                "extract_dir": "flac-$version-win\\win32"
+            }
+        }
+    }
+}

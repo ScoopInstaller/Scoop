@@ -1,15 +1,16 @@
 {
     "homepage": "https://www.apachelounge.com",
-    "version": "2.4.35",
+    "description": "The Apache HTTP Server (\"httpd\")",
+    "version": "2.4.38",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://fossies.org/windows/www/httpd-2.4.35-win64-VC15.zip",
-            "hash": "eb9a6223a2ed5110887460a3ffa6d43cb146041f741a0aedc7bc2f707cf6cb61"
+            "url": "https://fossies.org/windows/www/httpd-2.4.38-win64-VC15.zip",
+            "hash": "6a5381734d4f73583ef4872b3bfd4348a24635bd87b1828a5c4ea2f7a4e3d7ed"
         },
         "32bit": {
-            "url": "https://fossies.org/windows/www/httpd-2.4.35-win32-VC15.zip",
-            "hash": "3310aceb84623d8235002619fa965c3692107f759d75ea1e44623fd6f6b43225"
+            "url": "https://fossies.org/windows/www/httpd-2.4.38-win32-VC15.zip",
+            "hash": "3ef4c7c155b54ef9d46878d7f140f6c6697ee2367a11d0b3406d97a2f2f075a1"
         }
     },
     "extract_dir": "Apache24",

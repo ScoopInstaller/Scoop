@@ -1,0 +1,26 @@
+{
+    "homepage": "https://github.com/Genymobile/gnirehtet",
+    "description": "Reverse tethering for Android (no root required)",
+    "license": "Apache-2.0",
+    "version": "2.3",
+    "depends": "adb",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Genymobile/gnirehtet/releases/download/v2.3/gnirehtet-rust-win64-v2.3.zip",
+            "hash": "4c4d961f069a663d6b826f24a8795d1752f3e316f121d2bfc296a4cd32c8d4ca"
+        }
+    },
+    "extract_dir": "gnirehtet-rust-win64",
+    "bin": "gnirehtet.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/Genymobile/gnirehtet/releases/download/$version/gnirehtet-rust-win64-$version.zip",
+                "hash": {
+                    "url": "$baseurl/SHA256SUMS.txt"
+                }
+            }
+        }
+    }
+}

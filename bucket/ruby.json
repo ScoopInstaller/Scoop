@@ -1,16 +1,16 @@
 {
     "homepage": "https://rubyinstaller.org",
-    "version": "2.5.1-2",
+    "version": "2.6.1-1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-2.5.1-2/rubyinstaller-2.5.1-2-x64.7z",
-            "hash": "e8a636088a63c8ad50bce1fdef7a3295f162f562440545e936df9c76a04eb6bd",
-            "extract_dir": "rubyinstaller-2.5.1-2-x64"
+            "url": "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.6.1-1/rubyinstaller-2.6.1-1-x64.7z",
+            "hash": "3f637d73092d3004fb1cee2d7047949aad3880042879d8de55bf661a399f06fc",
+            "extract_dir": "rubyinstaller-2.6.1-1-x64"
         },
         "32bit": {
-            "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-2.5.1-2/rubyinstaller-2.5.1-2-x86.7z",
-            "hash": "82bb69afce9877110d72879ac45c23dd5ece0283862281bd7e5b9299e615da53",
-            "extract_dir": "rubyinstaller-2.5.1-2-x86"
+            "url": "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.6.1-1/rubyinstaller-2.6.1-1-x86.7z",
+            "hash": "6e5b244159156dc484d783abeee21cd5f67235de9c42eff99b04ba5dc7a9d60c",
+            "extract_dir": "rubyinstaller-2.6.1-1-x86"
         }
     },
     "persist": "gems",
@@ -23,24 +23,22 @@
         "GEM_PATH": "$dir\\gems"
     },
     "suggest": {
-        "MSYS2": [
-            "msys2"
-        ]
+        "MSYS2": "msys2"
     },
     "post_install": "gem install rake",
     "notes": "Install MSYS2 via 'scoop install msys2' and then run 'ridk install' to install the toolchain!",
     "checkver": {
         "github": "https://github.com/oneclick/rubyinstaller2",
-        "re": "/releases/tag/(?:v|rubyinstaller-)?([\\d.]+(?:-[\\d])?)"
+        "re": "/releases/tag/(?:v|RubyInstaller-)?([\\d.]+(?:-[\\d])?)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-$version/rubyinstaller-$version-x64.7z",
+                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-$version/rubyinstaller-$version-x64.7z",
                 "extract_dir": "rubyinstaller-$version-x64"
             },
             "32bit": {
-                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/rubyinstaller-$version/rubyinstaller-$version-x86.7z",
+                "url": "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-$version/rubyinstaller-$version-x86.7z",
                 "extract_dir": "rubyinstaller-$version-x86"
             }
         }

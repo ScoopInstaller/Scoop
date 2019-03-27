@@ -1,26 +1,24 @@
 {
     "homepage": "https://nim-lang.org/",
-    "version": "0.19.0",
+    "version": "0.19.4",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://nim-lang.org/download/nim-0.19.0_x64.zip",
-            "hash": "dab7bdc35f826581faa124c3b826e7bb9222e94ea4c056233779d0d4d777a283"
+            "url": "https://nim-lang.org/download/nim-0.19.4_x64.zip",
+            "hash": "60e4098921b17b4849a6c6105d588cf59407e1311ff0b5b38805050ba9c7818f"
         },
         "32bit": {
-            "url": "https://nim-lang.org/download/nim-0.19.0_x32.zip",
-            "hash": "1fdbbc8afe24f551f2a6ac3a1d5a40ba057534e3a11a370882753f8724d03d66"
+            "url": "https://nim-lang.org/download/nim-0.19.4_x32.zip",
+            "hash": "c54f33f7733eb79175f9e6e4d35b807de44151a8f80cd9f658305e76d906facd"
         }
     },
     "depends": "gcc",
-    "extract_dir": "nim-0.19.0",
+    "extract_dir": "nim-0.19.4",
     "post_install": [
         "# Copy Nimble package",
         "Copy-Item -Recurse \"$dir\\dist\\nimble\\src\\nimblepkg\" \"$dir\\bin\""
     ],
     "bin": [
-        "bin\\c2nim.exe",
-        "bin\\makelink.exe",
         "bin\\nim.exe",
         "bin\\nimble.exe",
         "bin\\nimgrab.exe",

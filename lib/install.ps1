@@ -113,26 +113,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     }
 }
 
-function use_any_https_protocol() {
-    $original = "$([System.Net.ServicePointManager]::SecurityProtocol)"
-    $available = [string]::join(', ', [Enum]::GetNames([System.Net.SecurityProtocolType]))
-
-    # use whatever protocols are available that the server supports
-    set_https_protocols $available
-
-    return $original
-}
-
-function set_https_protocols($protocols) {
-    try {
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType] $protocols
-    } catch {
-        [System.Net.ServicePointManager]::SecurityProtocol = "Tls,Tls11,Tls12"
-    }
-}
-
 function do_dl($url, $to, $cookies) {
-    $original_protocols = use_any_https_protocol
     $progress = [console]::isoutputredirected -eq $false -and
         $host.name -ne 'Windows PowerShell ISE Host'
 
@@ -143,8 +124,6 @@ function do_dl($url, $to, $cookies) {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
         throw $e
-    } finally {
-        set_https_protocols $original_protocols
     }
 }
 
@@ -317,8 +296,8 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         if($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
-            debug $urlstxt_content
-            debug $aria2
+            error $urlstxt_content
+            error $aria2
             abort $(new_issue_msg $app $bucket "download via aria2 failed")
         }
 
@@ -550,8 +529,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         # work out extraction method, if applicable
         $extract_fn = $null
-        if($fname -match '\.zip$') { # unzip
-            $extract_fn = 'unzip'
+        if($fname -match '\.zip$') {
+            $extract_fn = 'extract_zip'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
             $msi = msi $manifest $architecture
@@ -613,18 +592,6 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $fname # returns the last downloaded file
 }
 
-function lessmsi_config ($extract_dir) {
-    $extract_fn = 'extract_lessmsi'
-    if ($extract_dir) {
-        $extract_dir = join-path SourceDir $extract_dir
-    }
-    else {
-        $extract_dir = "SourceDir"
-    }
-
-    $extract_fn, $extract_dir
-}
-
 function cookie_header($cookies) {
     if(!$cookies) { return }
 
@@ -672,17 +639,12 @@ function check_hash($file, $hash, $app_name) {
     Write-Host "Checking hash of " -NoNewline
     Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
     Write-Host " ... " -nonewline
-    $type, $expected = $hash.split(':')
-    if(!$expected) {
-        # no type specified, assume sha256
-        $type, $expected = 'sha256', $type
+    $algorithm, $expected = get_hash $hash
+    if ($null -eq $algorithm) {
+        return $false, "Hash type '$algorithm' isn't supported."
     }
 
-    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
-        return $false, "Hash type '$type' isn't supported."
-    }
-
-    $actual = (compute_hash $file $type).ToLower()
+    $actual = compute_hash $file $algorithm
     $expected = $expected.ToLower()
 
     if($actual -ne $expected) {
@@ -760,23 +722,6 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
     return $true
 }
 
-function unpack_inno($fname, $manifest, $dir) {
-    if(!$manifest.innosetup) { return }
-
-    write-host "Unpacking innosetup... " -nonewline
-    innounp -x -d"$dir\_scoop_unpack" "$dir\$fname" > "$dir\innounp.log"
-    if($lastexitcode -ne 0) {
-        abort "Failed to unpack innosetup file. See $dir\innounp.log"
-    }
-
-    Get-ChildItem "$dir\_scoop_unpack\{app}" -r | Move-Item -dest "$dir" -force
-
-    Remove-Item -r -force "$dir\_scoop_unpack"
-
-    Remove-Item "$dir\$fname"
-    Write-Host "done." -f Green
-}
-
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
     # MSI or other installer
     $msi = msi $manifest $architecture
@@ -819,17 +764,6 @@ function install_msi($fname, $dir, $msi) {
     }
     Remove-Item $logfile
     Remove-Item $msifile
-}
-
-function extract_msi($path, $to) {
-    $logfile = "$(split-path $path)\msi.log"
-    $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
-    if(!$ok) { abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)" }
-    if(test-path $logfile) { Remove-Item $logfile }
-}
-
-function extract_lessmsi($path, $to) {
-    Invoke-Expression "lessmsi x `"$path`" `"$to\`""
 }
 
 # deprecated
@@ -1202,7 +1136,7 @@ function persist_def($persist) {
     }
 
     if (!$target) {
-        $target = fname($source)
+        $target = $source
     }
 
     return $source, $target
@@ -1222,36 +1156,59 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             write-host "Persisting $source"
 
-            # add base paths
-            if (is_directory (fullpath "$dir\$source")) {
-                $source = New-Object System.IO.DirectoryInfo(fullpath "$dir\$source")
-            } else {
-                $source = New-Object System.IO.FileInfo(fullpath "$dir\$source")
-            }
-            $target = New-Object System.IO.FileInfo(fullpath "$persist_dir\$target")
-            if(!$target.Extension -and !$source.Exists) {
-                $target = New-Object System.IO.DirectoryInfo($target.FullName)
-            }
+            $source = $source.TrimEnd("/").TrimEnd("\\")
 
-            if (!$target.Exists) {
-                # If we do not have data in the store we move the original
-                if ($source.Exists) {
-                    Move-Item $source $target
-                } elseif($target.GetType() -eq [System.IO.DirectoryInfo]) {
-                    # if there is no source and it's a directory we create an empty directory
-                    ensure $target.FullName | out-null
+            $source = fullpath "$dir\$source"
+            $target = fullpath "$persist_dir\$target"
+
+            # if we have had persist data in the store, just create link and go
+            if (Test-Path $target) {
+                # if there is also a source data, rename it (to keep a original backup)
+                if (Test-Path $source) {
+                    Move-Item -Force $source "$source.original"
                 }
-            } elseif ($source.Exists) {
-                # (re)move original (keep a copy)
-                Move-Item $source "$source.original"
+            # we don't have persist data in the store, move the source to target, then create link
+            } elseif (Test-Path $source) {
+                # ensure target parent folder exist
+                $null = ensure (Split-Path -Path $target)
+                Move-Item $source $target
+            # we don't have neither source nor target data! we need to crate an empty target,
+            # but we can't make a judgement that the data should be a file or directory...
+            # so we create a directory by default. to avoid this, use pre_install
+            # to create the source file before persisting (DON'T use post_install)
+            } else {
+                $target = New-Object System.IO.DirectoryInfo($target)
+                ensure $target | Out-Null
             }
 
             # create link
             if (is_directory $target) {
+                # target is a directory, create junction
                 & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
-                attrib $source.FullName +R /L
+                attrib $source +R /L
             } else {
+                # target is a file, create hard link
                 & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
+            }
+        }
+    }
+}
+
+function unlink_persist_data($dir) {
+    # unlink all junction / hard link in the directory
+    Get-ChildItem -Recurse $dir | ForEach-Object {
+        $file = $_
+        if ($null -ne $file.LinkType) {
+            $filepath = $file.FullName
+            # directory (junction)
+            if ($file -is [System.IO.DirectoryInfo]) {
+                # remove read-only attribute on the link
+                attrib -R /L $filepath
+                # remove the junction
+                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+            } else {
+                # remove the hard link
+                & "$env:COMSPEC" /c "del $filepath"
             }
         }
     }

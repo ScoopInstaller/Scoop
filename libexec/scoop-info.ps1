@@ -69,6 +69,9 @@ if ($manifest.license) {
         $license = "$($manifest.license.identifier) ($($manifest.license.url))"
     } elseif ($manifest.license -match '^((ht)|f)tps?://') {
         $license = "$($manifest.license)"
+    } elseif ($manifest.license -match '[|,]') {
+        $licurl = $manifest.license.Split("|,") | ForEach-Object {"https://spdx.org/licenses/$_.html"}
+        $license = "$($manifest.license) ($($licurl -join ', '))"
     } else {
         $license = "$($manifest.license) (https://spdx.org/licenses/$($manifest.license).html)"
     }

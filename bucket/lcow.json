@@ -1,12 +1,12 @@
 {
     "homepage": "https://github.com/linuxkit/lcow",
     "license": "Apache-2.0",
-    "version": "4.14.29-0aea33bc",
-    "url": "https://github.com/linuxkit/lcow/releases/download/4.14.29-0aea33bc/release.zip",
-    "hash": "5687be10447757cc0eb04a91b4dec3e296bf980200923fe806755d5fbb1a03fa",
+    "version": "v4.14.35-v0.3.9",
+    "url": "https://github.com/linuxkit/lcow/releases/download/v4.14.35-v0.3.9/release.zip",
+    "hash": "9d929afe79b4abd96ffa00841ed0b2178402f773bc85d4f177cdeb339afe44df",
     "checkver": {
         "url": "https://github.com/linuxkit/lcow/releases/latest",
-        "re": "/releases/tag/(?:v)?([\\d.]+-\\w+)"
+        "re": "/releases/tag/(v?[\\d.]+-[\\w\\d.]+)"
     },
     "autoupdate": {
         "url": "https://github.com/linuxkit/lcow/releases/download/$version/release.zip",

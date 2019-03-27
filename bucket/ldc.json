@@ -1,0 +1,37 @@
+{
+    "version": "1.14.0",
+    "homepage": "https://dlang.org/",
+    "description": "LDC is LLVM based D-language compiler",
+    "license": {
+        "identifier": "BSD-3-Clause,BSL-1.0,NCSA,MIT,GPL-2.0-or-later",
+        "url": "https://github.com/ldc-developers/ldc/blob/master/LICENSE"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/ldc-developers/ldc/releases/download/v1.14.0/ldc2-1.14.0-windows-x64.7z",
+            "extract_dir": "ldc2-1.14.0-windows-x64",
+            "hash": "30f35444a6b260206669e16e1af7d31c141efd2f1524fb583483a5d418aa0911"
+        },
+        "32bit": {
+            "url": "https://github.com/ldc-developers/ldc/releases/download/v1.14.0/ldc2-1.14.0-windows-x86.7z",
+            "extract_dir": "ldc2-1.14.0-windows-x86",
+            "hash": "7f65ccc3dd9a31874efea2852b85332fab6a9bd0959a6ac3b7607b113f2a0be3"
+        }
+    },
+    "env_add_path": "bin",
+    "checkver": {
+        "github": "https://github.com/ldc-developers/ldc/"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/ldc-developers/ldc/releases/download/v$version/ldc2-$version-windows-x64.7z",
+                "extract_dir": "ldc2-$version-windows-x64"
+            },
+            "32bit": {
+                "url": "https://github.com/ldc-developers/ldc/releases/download/v$version/ldc2-$version-windows-x86.7z",
+                "extract_dir": "ldc2-$version-windows-x86"
+            }
+        }
+    }
+}

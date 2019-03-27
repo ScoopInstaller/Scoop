@@ -1,16 +1,16 @@
 {
     "description": "Uncomplicated, modern HTTP server",
-    "version": "0.4.11",
+    "version": "0.4.12",
     "homepage": "https://github.com/labstack/armor",
     "license": "MIT",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/labstack/armor/releases/download/0.4.11/armor_0.4.11_windows_32-bit.zip",
-            "hash": "25bf01056df4b3afecdcd5288bf8ddb98066b143a62462b50f6fce0afbd17a7f"
+            "url": "https://github.com/labstack/armor/releases/download/v0.4.12/armor_0.4.12_windows_32-bit.zip",
+            "hash": "6cec0d1b63e926851a068460988ccd2202c7650b1d8e2c8d3495c7860653b873"
         },
         "64bit": {
-            "url": "https://github.com/labstack/armor/releases/download/0.4.11/armor_0.4.11_windows_64-bit.zip",
-            "hash": "053096ad9f19f6e7b7ce19b33c623489140f4fab933c942275fa5ca29c46d0ad"
+            "url": "https://github.com/labstack/armor/releases/download/v0.4.12/armor_0.4.12_windows_64-bit.zip",
+            "hash": "d734939d021ecd40f44c7389a2d3dd2234f9584e8c8f31a3fa1964ed254b8a9e"
         }
     },
     "bin": "armor.exe",
@@ -20,14 +20,14 @@
     "autoupdate": {
         "architecture": {
             "32bit": {
-                "url": "https://github.com/labstack/armor/releases/download/$version/armor_$version_windows_32-bit.zip"
+                "url": "https://github.com/labstack/armor/releases/download/v$version/armor_$version_windows_32-bit.zip"
             },
             "64bit": {
-                "url": "https://github.com/labstack/armor/releases/download/$version/armor_$version_windows_64-bit.zip"
+                "url": "https://github.com/labstack/armor/releases/download/v$version/armor_$version_windows_64-bit.zip"
             }
         },
         "hash": {
-            "url": "https://github.com/labstack/armor/releases/download/$version/armor_checksum.txt"
+            "url": "https://github.com/labstack/armor/releases/download/v$version/armor_checksum.txt"
         }
     }
 }

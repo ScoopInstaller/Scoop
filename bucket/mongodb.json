@@ -1,18 +1,26 @@
 {
     "homepage": "https://www.mongodb.org",
-    "version": "4.0.3",
-    "license": "AGPL-3.0",
+    "description": "A document database with the scalability and flexibility.",
+    "version": "4.0.7",
+    "license": {
+        "identifier": "SSPL-1.0",
+        "url": "https://www.mongodb.com/licensing/server-side-public-license"
+    },
     "architecture": {
         "64bit": {
-            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-4.0.3-signed.msi",
-            "hash": "0e53cfd224d27862c286b765b85d769b39e3518b2dc2704ff87bd8a565ea9b7f",
+            "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-4.0.7-signed.msi",
+            "hash": "b83e6fc04ea332b9cb60a31543805d87b7226f1da29db23cf108c4c208ff5d9f",
             "extract_dir": "MongoDB\\Server\\4.0"
         }
     },
     "bin": [
         "bin\\bsondump.exe",
         "bin\\mongo.exe",
-        "bin\\mongod.exe",
+        [
+            "bin\\mongod.exe",
+            "mongod",
+            "--config \"$dir\\bin\\mongod.cfg\""
+        ],
         "bin\\mongodump.exe",
         "bin\\mongoexport.exe",
         "bin\\mongofiles.exe",
@@ -23,25 +31,42 @@
         "bin\\mongotop.exe"
     ],
     "post_install": [
-        "# create initial directories",
-        "if(!(test-path 'C:\\data')) { mkdir 'C:\\data' > $null }",
-        "if(!(test-path 'C:\\data\\db')) { mkdir 'C:\\data\\db' > $null }"
+        "$file = \"$dir\\bin\\mongod.cfg\"",
+        "$cfg = (Get-Content $file)",
+        "$cfg = $cfg -replace '%MONGO_DATA_PATH%', \"$dir\\data\"",
+        "$cfg = $cfg -replace '%MONGO_LOG_PATH%', \"$dir\\log\"",
+        "Set-Content $file ($cfg -join \"`n\") -Encoding Ascii -Force"
+    ],
+    "persist": [
+        "bin\\mongod.cfg",
+        "data",
+        "log"
     ],
     "checkver": {
-        "url": "https://www.mongodb.com/download-center",
-        "re": "Current Stable Release \\(([\\d.]+)\\)"
+        "url": "https://www.mongodb.com/download-center/community",
+        "re": "([\\d.]+) \\(current release\\)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
                 "url": "https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-$version-signed.msi",
+                "hash": {
+                    "url": "$url.sha256"
+                },
                 "extract_dir": "MongoDB\\Server\\$majorVersion.$minorVersion"
             }
         }
     },
     "suggest": {
-        "vcredist": [
-            "extras/vcredist2017"
-        ]
-    }
+        "vcredist": "extras/vcredist2017"
+    },
+    "notes": [
+        "Windows server 2012/2008 and Windows 7/8/8.1 need KB2999226 to provide Universal C Runtime support for Windows.",
+        "For more infomations, please refer to:",
+        "https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows",
+        "",
+        "mongod shim use \"$dir\\bin\\mongod.cfg\" as the default config file.",
+        "To use a different config file, please run",
+        "\"$dir\\bin\\mongod.exe --config NEW_CONFIG_FILE\""
+    ]
 }

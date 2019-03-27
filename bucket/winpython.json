@@ -1,20 +1,26 @@
 {
     "description": "Free, open-source and portable Python distribution for Windows",
-    "version": "3.6.6.2",
+    "version": "3.7.2.0",
     "license": "MIT",
+    "homepage": "https://winpython.github.io/",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.6/3.6.6.2/WinPython64-3.6.6.2Zero.exe#/dl.7z",
-            "hash": "e7feac807631eb7322ea36d74bb772f95c96457c4558464ed530d5d715ec8ac7",
-            "extract_dir": "python-3.6.6.amd64"
+            "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.7/3.7.2.0/WinPython64-3.7.2.0Zero.exe",
+            "hash": "33060b8180e7ce536256874ddf97e383cae22cc3f3b1de3e1b000d899c140b31"
         },
         "32bit": {
-            "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.6/3.6.6.2/WinPython32-3.6.6.2Zero.exe#/dl.7z",
-            "hash": "29c48621b7c0fd5c3513de40aaafb4795cdc1a47505aa5cc646a2b7f7c6f9b10",
-            "extract_dir": "python-3.6.6"
+            "url": "https://downloads.sourceforge.net/project/winpython/WinPython_3.7/3.7.2.0/WinPython32-3.7.2.0Zero.exe",
+            "hash": "e24c4d4f183f478cba9104ddeac9b44a4908642c7ddab80fe452323e22c7ac75"
         }
     },
-    "homepage": "https://winpython.github.io/",
+    "innosetup": true,
+    "installer": {
+        "script": [
+            "Get-ChildItem \"$dir\" -Exclude 'python-*' | Remove-Item -Force -Recurse",
+            "Move-Item \"$dir\\python-*\\*\" \"$dir\" -Force",
+            "Remove-Item \"$dir\\python-*\""
+        ]
+    },
     "bin": [
         "python.exe",
         "pythonw.exe",
@@ -23,22 +29,19 @@
             "python3"
         ]
     ],
-    "env_add_path": [
-        "scripts"
-    ],
+    "env_add_path": "scripts",
     "checkver": {
-        "url": "https://winpython.github.io/md5_sha1.txt",
-        "re": "-([\\d.]+)Zero.exe"
+        "github": "https://github.com/winpython/winpython/",
+        "regex": "-([\\d.]+)Zero\\.exe",
+        "reverse": true
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython64-$versionZero.exe#/dl.7z",
-                "extract_dir": "python-$majorVersion.$minorVersion.$patchVersion.amd64"
+                "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython64-$versionZero.exe"
             },
             "32bit": {
-                "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython32-$versionZero.exe#/dl.7z",
-                "extract_dir": "python-$majorVersion.$minorVersion.$patchVersion"
+                "url": "https://downloads.sourceforge.net/project/winpython/WinPython_$majorVersion.$minorVersion/$version/WinPython32-$versionZero.exe"
             }
         },
         "hash": {

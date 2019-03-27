@@ -1,0 +1,45 @@
+{
+    "version": "1.10.2",
+    "description": "Collection of programs for accessing Mega.nz service from a command line.",
+    "homepage": "https://megatools.megous.com/",
+    "license": "GPL-2.0-or-later",
+    "architecture": {
+        "64bit": {
+            "url": "https://megatools.megous.com/builds/megatools-1.10.2-win64.zip",
+            "hash": "0c2dc2bd509ca739ca7d734f381930a3c8c58c5ea4b385d408c775c4082aebd9",
+            "extract_dir": "megatools-1.10.2-win64"
+        },
+        "32bit": {
+            "url": "https://megatools.megous.com/builds/megatools-1.10.2-win32.zip",
+            "hash": "2724dfbc91c764540b3d3b12261c11f74f706b40b114639472388edef0743069",
+            "extract_dir": "megatools-1.10.2-win32"
+        }
+    },
+    "persist": "mega.ini",
+    "bin": [
+        "megacopy.exe",
+        "megadf.exe",
+        "megadl.exe",
+        "megaget.exe",
+        "megals.exe",
+        "megamkdir.exe",
+        "megaput.exe",
+        "megareg.exe",
+        "megarm.exe"
+    ],
+    "checkver": {
+        "github": "https://github.com/megous/megatools/"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://megatools.megous.com/builds/megatools-$version-win64.zip",
+                "extract_dir": "megatools-$version-win64"
+            },
+            "32bit": {
+                "url": "https://megatools.megous.com/builds/megatools-$version-win32.zip",
+                "extract_dir": "megatools-$version-win32"
+            }
+        }
+    }
+}

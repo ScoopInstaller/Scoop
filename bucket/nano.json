@@ -6,9 +6,7 @@
     "hash": "c012456b9f29e488b0e9a688aa43a34326dd573f9e99765cbdac2b81a4bc1060",
     "bin": "nano.exe",
     "extract_dir": "nano-2.5.3-win32",
-    "post_install": [
-        "if (-not (Test-Path ~/nano.rc)) { Copy-Item \"$dir/nano.rc\" ~/nano.rc }"
-    ],
+    "post_install": "if (-not (Test-Path ~/nano.rc)) { Copy-Item \"$dir/nano.rc\" ~/nano.rc }",
     "checkver": "Latest Version\\s+([\\d.]+)",
     "notes": [
         "You can configure nano editor by editing the configuration file nano.rc",

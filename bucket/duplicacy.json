@@ -1,0 +1,33 @@
+{
+    "homepage": "https://duplicacy.com/",
+    "description": "A lock-free deduplication cloud backup tool",
+    "license": {
+        "identifier": "free-for-personal-use",
+        "url": "https://github.com/gilbertchen/duplicacy/blob/master/LICENSE.md"
+    },
+    "version": "2.1.2",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/gilbertchen/duplicacy/releases/download/v2.1.2/duplicacy_win_x64_2.1.2.exe#/duplicacy.exe",
+            "hash": "1c821f142204d9670457d7e79bc2db0c590f7e26a38648434c7ba8fbced26835"
+        },
+        "32bit": {
+            "url": "https://github.com/gilbertchen/duplicacy/releases/download/v2.1.2/duplicacy_win_i386_2.1.2.exe#/duplicacy.exe",
+            "hash": "664d8cf5d8a2ca93564994994621f9e260bdc4aa0a703e10e278fdd446a52bd8"
+        }
+    },
+    "bin": "duplicacy.exe",
+    "checkver": {
+        "github": "https://github.com/gilbertchen/duplicacy"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/gilbertchen/duplicacy/releases/download/v2.1.2/duplicacy_win_x64_2.1.2.exe#/duplicacy.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/gilbertchen/duplicacy/releases/download/v2.1.2/duplicacy_win_i386_2.1.2.exe#/duplicacy.exe"
+            }
+        }
+    }
+}

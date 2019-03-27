@@ -13,9 +13,7 @@
     },
     "license": "Apache-2.0",
     "extract_dir": "rancher-compose-v0.12.5",
-    "bin": [
-        "rancher-compose.exe"
-    ],
+    "bin": "rancher-compose.exe",
     "checkver": {
         "github": "https://github.com/rancher/rancher-compose"
     },

@@ -1,10 +1,12 @@
 {
-    "extras": "https://github.com/lukesampson/scoop-extras.git",
+    "extras": "https://github.com/lukesampson/scoop-extras",
     "versions": "https://github.com/scoopinstaller/versions",
     "nightlies": "https://github.com/scoopinstaller/nightlies",
     "nirsoft": "https://github.com/kodybrown/scoop-nirsoft",
-    "php": "https://github.com/nueko/scoop-php.git",
-    "nerd-fonts": "https://github.com/matthewjberger/scoop-nerd-fonts.git",
+    "php": "https://github.com/scoopinstaller/php",
+    "nerd-fonts": "https://github.com/matthewjberger/scoop-nerd-fonts",
     "nonportable": "https://github.com/oltolm/scoop-nonportable",
-    "java": "https://github.com/se35710/scoop-java"
+    "java": "https://github.com/se35710/scoop-java",
+    "games": "https://github.com/Calinou/scoop-games",
+    "jetbrains": "https://github.com/Ash258/Scoop-JetBrains"
 }

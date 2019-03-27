@@ -2,9 +2,9 @@
     "homepage": "https://www.smartmontools.org/",
     "description": "Read SMART data from disks",
     "license": "GPL-2.0",
-    "version": "6.6-1",
-    "url": "https://downloads.sourceforge.net/project/smartmontools/smartmontools/6.6/smartmontools-6.6-1.win32-setup.exe",
-    "hash": "sha1:bd6df66831ee9dd738fbe9bcd779ecba62673231",
+    "version": "7.0-1",
+    "url": "https://downloads.sourceforge.net/project/smartmontools/smartmontools/7.0/smartmontools-7.0-1.win32-setup.exe",
+    "hash": "sha1:75c18937014df11722c9ef22f81d2a4fc0db60ea",
     "bin": [
         "bin/runcmdu.exe",
         "bin/smartctl.exe",

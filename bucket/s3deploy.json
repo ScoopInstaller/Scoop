@@ -1,14 +1,14 @@
 {
-    "version": "2.2.0",
+    "version": "2.3.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/bep/s3deploy/releases/download/v2.2.0/s3deploy_2.2.0_windows-64bit.zip",
-            "hash": "3fe11b8a83822852aad3ddd3250576a509b8436433ccbe4ee2834e2a7b19d455"
+            "url": "https://github.com/bep/s3deploy/releases/download/v2.3.0/s3deploy_2.3.0_windows-64bit.zip",
+            "hash": "5130c6e09101a220baf38bbe0c09782b9fdfc16e3bd1a311c762cc56fc28a208"
         },
         "32bit": {
-            "url": "https://github.com/bep/s3deploy/releases/download/v2.2.0/s3deploy_2.2.0_windows-32bit.zip",
-            "hash": "a1f7ec46f2c3a67afa0996ee25afd3bd2a0b9817d6b62728eee190a810476936"
+            "url": "https://github.com/bep/s3deploy/releases/download/v2.3.0/s3deploy_2.3.0_windows-32bit.zip",
+            "hash": "29e973975fa067529db743967f991f876489f4dab5c5938455e3a0c408a509d9"
         }
     },
     "bin": "s3deploy.exe",

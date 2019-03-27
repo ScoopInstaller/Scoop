@@ -1,15 +1,15 @@
 {
     "homepage": "https://qemu.weilnetz.de/",
     "license": "GPL-2.0",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "architecture": {
         "64bit": {
-            "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20180815.exe#/dl.7z",
-            "hash": "sha512:f5bc43c4b196bae5fbc3a1f6adb1dc6126e0bb32443bacf27314928b5b2c95be72a6043dbc750b6d39c55c2ac9210db73998fa75085323904bc98f1e06d7fdce"
+            "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20181211.exe#/dl.7z",
+            "hash": "sha512:9b76fa77f241c6baa98705b6c9951a2d5c5e10a1f5d2cb91219adb0fc81d7d95a15c52cd92035e90b643ef4f77be8f72de4cab8744f263bdd971f1855ab18235"
         },
         "32bit": {
-            "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-20180815.exe#/dl.7z",
-            "hash": "sha512:77335c4a58d8b0f5a55a69f68e21a59be13783e7d7db5f9b427f1b11291c91be229116deaad27188111cb8df9380e75443c66e648523f5167d7cc734dd9d8411"
+            "url": "https://qemu.weilnetz.de/w32/qemu-w32-setup-20181211.exe#/dl.7z",
+            "hash": "sha512:2d99439595e1da05bdc49e3fc6b8e47b4d505e5ba2558734983ea73726caf921a4c636c4ba1b8d15a4d5f6b500aa005a322e36895baa561f160b19dbc6595c78"
         }
     },
     "bin": [
@@ -50,8 +50,6 @@
         "qemu-system-ppc.exe",
         "qemu-system-ppc64.exe",
         "qemu-system-ppc64w.exe",
-        "qemu-system-ppcemb.exe",
-        "qemu-system-ppcembw.exe",
         "qemu-system-ppcw.exe",
         "qemu-system-s390x.exe",
         "qemu-system-s390xw.exe",

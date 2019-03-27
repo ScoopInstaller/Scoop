@@ -1,12 +1,12 @@
 {
-    "version": "2.67",
+    "version": "2.68",
     "license": "Public Domain",
     "homepage": "https://sites.google.com/site/qaacpage/",
-    "url": "https://github.com/nu774/qaac/releases/download/v2.67/qaac_2.67.zip",
-    "hash": "bdc626c4707b839793194c67f0c0e7846422fe4bc5caae55063a916ea0d96377",
+    "url": "https://github.com/nu774/qaac/releases/download/v2.68/qaac_2.68.zip",
+    "hash": "8067826564d182a239a2347b40d52369c4a378b7df7918bd156138bf904168d0",
     "architecture": {
         "64bit": {
-            "extract_dir": "qaac_2.67\\x64",
+            "extract_dir": "qaac_2.68\\x64",
             "bin": [
                 [
                     "qaac64.exe",
@@ -19,7 +19,7 @@
             ]
         },
         "32bit": {
-            "extract_dir": "qaac_2.67\\x86",
+            "extract_dir": "qaac_2.68\\x86",
             "bin": [
                 "qaac.exe",
                 "refalac.exe"

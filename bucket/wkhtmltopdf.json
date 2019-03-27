@@ -19,15 +19,16 @@
         "wkhtmltopdf.exe"
     ],
     "checkver": {
-        "github": "https://github.com/wkhtmltopdf/wkhtmltopdf"
+        "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/latest",
+        "re": "releases/download/(?<head>[0-9.]+)/wkhtmltox-(?<version>[0-9.-]+)\\.mxe-cross-"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version.mxe-cross-win64.7z"
+                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$matchHead/wkhtmltox-$version.mxe-cross-win64.7z"
             },
             "32bit": {
-                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$version/wkhtmltox-$version.mxe-cross-win32.7z"
+                "url": "https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/$matchHead/wkhtmltox-$version.mxe-cross-win32.7z"
             }
         },
         "hash": {

@@ -5,9 +5,7 @@
     "url": "https://download.savannah.gnu.org/releases/lzip/lzip-1.20-w32.zip",
     "hash": "7ef27ab008377f6d96793b450391efee0a8682ca056a9fe688b264be92637271",
     "extract_dir": "lzip-1.20-w32",
-    "bin": [
-        "bin\\lzip.exe"
-    ],
+    "bin": "bin\\lzip.exe",
     "checkver": {
         "url": "https://download.savannah.gnu.org/releases/lzip/",
         "re": "lzip-([\\d.]+)-w32.zip",

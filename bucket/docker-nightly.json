@@ -10,24 +10,12 @@
         "lcow"
     ],
     "suggest": {
-        "Linux container support on Windows": [
-            "lcow"
-        ],
-        "Docker Compose": [
-            "docker-compose"
-        ],
-        "Docker Machine": [
-            "docker-machine"
-        ],
-        "Kubernetes Standalone": [
-            "minikube"
-        ],
-        "Kubernetes Client": [
-            "kubectl"
-        ],
-        "compose.yml to kubernetes.yml": [
-            "kompose"
-        ]
+        "Linux container support on Windows": "lcow",
+        "Docker Compose": "docker-compose",
+        "Docker Machine": "docker-machine",
+        "Kubernetes Standalone": "minikube",
+        "Kubernetes Client": "kubectl",
+        "compose.yml to kubernetes.yml": "kompose"
     },
     "bin": [
         "dockerd.exe",

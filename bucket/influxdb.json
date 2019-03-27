@@ -1,17 +1,15 @@
 {
     "homepage": "https://www.influxdata.com/",
     "license": "MIT",
-    "version": "1.6.3",
+    "version": "1.7.4",
     "architecture": {
         "64bit": {
-            "url": "https://dl.influxdata.com/influxdb/releases/influxdb-1.6.3_windows_amd64.zip#/influxdb.zip",
-            "hash": "dcccb7cca4e4c162fa5c1fc77a48f4ada80b8dc2f8192fe8c498975f59b995f6"
+            "url": "https://dl.influxdata.com/influxdb/releases/influxdb-1.7.4_windows_amd64.zip#/influxdb.zip",
+            "hash": "bd24ce16753fd5b140638af737677779b9e34a6380ac17fa593572b72929fd37"
         }
     },
-    "extract_dir": "influxdb-1.6.3-1",
-    "persist": [
-        "influxdb.conf"
-    ],
+    "extract_dir": "influxdb-1.7.4-1",
+    "persist": "influxdb.conf",
     "bin": [
         "influx.exe",
         "influx_inspect.exe",

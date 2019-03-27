@@ -1,31 +1,44 @@
-# reformat manifest json
-param($path)
+<#
+.SYNOPSIS
+    Format manifest.
+.PARAMETER App
+    Manifest to format.
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\json.ps1"
+    Wildcards are supported.
+.PARAMETER Dir
+    Where to search for manifest(s).
+.EXAMPLE
+    PS BUCKETROOT> .\bin\formatjson.ps1
+    Format all manifests inside bucket directory.
+.EXAMPLE
+    PS BUCKETROOT> .\bin\formatjson.ps1 7zip
+    Format manifest '7zip' inside bucket directory.
+#>
+param(
+    [String] $App = '*',
+    [ValidateScript( {
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        }
+        $true
+    })]
+    [Alias('Path')]
+    [String] $Dir = "$PSScriptRoot\..\bucket"
+)
 
-if(!$path) { $path = "$psscriptroot\..\bucket" }
-$path = resolve-path $path
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\json.ps1"
 
-$dir = ""
-$type = Get-Item $path
-if ($type -is [System.IO.DirectoryInfo]) {
-    $dir = "$path\"
-    $files = Get-ChildItem $path "*.json"
-} elseif ($type -is [System.IO.FileInfo]) {
-    $files = @($path)
-} else {
-    Write-Error "unknown item"
-    exit
-}
+$Dir = Resolve-Path $Dir
 
-$files | ForEach-Object {
+Get-ChildItem $Dir "$App.json" | ForEach-Object {
+    if ($PSVersionTable.PSVersion.Major -gt 5) { $_ = $_.Name } # Fix for pwsh
+
     # beautify
-    $json = parse_json "$dir$($_.Name)" | ConvertToPrettyJson
+    $json = parse_json "$Dir\$_" | ConvertToPrettyJson
 
     # convert to 4 spaces
-    $json = $json -replace "`t",'    '
-
-    [System.IO.File]::WriteAllLines("$dir$($_.Name)", $json)
+    $json = $json -replace "`t", '    '
+    [System.IO.File]::WriteAllLines("$Dir\$_", $json)
 }

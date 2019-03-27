@@ -2,7 +2,7 @@ Write-Host "PowerShell: $($PSVersionTable.PSVersion)"
 
 Write-Host "Install dependencies ..."
 Install-Module -Repository PSGallery -Scope CurrentUser -Force -Name Pester -SkipPublisherCheck
-Install-Module -Repository PSGallery -Scope CurrentUser -Name PSScriptAnalyzer,BuildHelpers
+Install-Module -Repository PSGallery -Scope CurrentUser -Force -Name PSScriptAnalyzer,BuildHelpers
 
 if($env:CI -eq $true) {
     Write-Host "Load 'BuildHelpers' environment variables ..."
