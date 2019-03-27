@@ -14,7 +14,7 @@
         "url": "https://static.red-lang.org/dl/win/red-$cleanVersion.exe#/red.exe",
         "hash": {
             "url": "http://static.red-lang.org/download.html",
-            "regex": "($sha256)"
+            "regex": "$sha256"
         }
     }
 }

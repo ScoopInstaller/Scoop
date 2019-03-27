@@ -1,16 +1,16 @@
 {
     "homepage": "https://www.r-project.org",
-    "version": "3.5.2",
+    "version": "3.5.3",
     "license": "GPL-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://cran.rstudio.com/bin/windows/base/R-3.5.2-win.exe",
-            "hash": "519f54bc707e61a6562995ec89830d78920c6e2383d06a601f3543d9e511535e",
+            "url": "https://cran.rstudio.com/bin/windows/base/R-3.5.3-win.exe",
+            "hash": "c9df8192e49823fbeb5ac71a21ec244084bcd9ae178603245292735cf4896893",
             "pre_install": "copy-item -recurse \"$dir\\bin\\x64\" \"$dir\\bin\\curr_arch\""
         },
         "32bit": {
-            "url": "https://cran.rstudio.com/bin/windows/base/R-3.5.2-win.exe",
-            "hash": "519f54bc707e61a6562995ec89830d78920c6e2383d06a601f3543d9e511535e",
+            "url": "https://cran.rstudio.com/bin/windows/base/R-3.5.3-win.exe",
+            "hash": "c9df8192e49823fbeb5ac71a21ec244084bcd9ae178603245292735cf4896893",
             "pre_install": "copy-item -recurse \"$dir\\bin\\i386\" \"$dir\\bin\\curr_arch\""
         }
     },

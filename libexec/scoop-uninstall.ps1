@@ -5,49 +5,61 @@
 # Options:
 #   -g, --global   Uninstall a globally installed app
 #   -p, --purge    Remove all persistent data
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\install.ps1"
-. "$psscriptroot\..\lib\shortcuts.ps1"
-. "$psscriptroot\..\lib\psmodules.ps1"
-. "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\getopt.ps1"
-. "$psscriptroot\..\lib\config.ps1"
+
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\shortcuts.ps1"
+. "$PSScriptRoot\..\lib\psmodules.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\config.ps1"
 
 reset_aliases
 
 # options
 $opt, $apps, $err = getopt $args 'gp' 'global', 'purge'
-if($err) { "scoop uninstall: $err"; exit 1 }
+
+if ($err) {
+    error "scoop uninstall: $err"
+    exit 1
+}
+
 $global = $opt.g -or $opt.global
 $purge = $opt.p -or $opt.purge
 
-if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
-
-if($global -and !(is_admin)) {
-    'ERROR: You need admin rights to uninstall global apps.'; exit 1
+if (!$apps) {
+    error '<app> missing'
+    my_usage
+    exit 1
 }
 
-if($apps -eq 'scoop') {
-    & "$psscriptroot\..\bin\uninstall.ps1" $global; exit
+if ($global -and !(is_admin)) {
+    error 'You need admin rights to uninstall global apps.'
+    exit 1
+}
+
+if ($apps -eq 'scoop') {
+    & "$PSScriptRoot\..\bin\uninstall.ps1" $global $purge
+    exit
 }
 
 $apps = ensure_all_installed $apps $global
-if(!$apps) { exit 0 }
+if (!$apps) { exit 0 }
 
-:app_loop foreach($_ in $apps) {
+:app_loop foreach ($_ in $apps) {
     ($app, $global) = $_
 
     $version = current_version $app $global
-    write-host "Uninstalling '$app' ($version)."
+    Write-Host "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
     $persist_dir = persistdir $app $global
 
     try {
-        test-path $dir -ea stop | out-null
-    } catch [unauthorizedaccessexception] {
+        Test-Path $dir -ErrorAction Stop | Out-Null
+    } catch [UnauthorizedAccessException] {
         error "Access denied: $dir. You might need to restart."
         continue
     }
@@ -73,9 +85,9 @@ if(!$apps) { exit 0 }
     try {
         # unlink all potential old link before doing recursive Remove-Item
         unlink_persist_data $dir
-        Remove-Item -r $dir -ea stop -force
+        Remove-Item $dir -Recurse -Force -ErrorAction Stop
     } catch {
-        if(test-path $dir) {
+        if (Test-Path $dir) {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
             continue
         }
@@ -83,27 +95,27 @@ if(!$apps) { exit 0 }
 
     # remove older versions
     $old = @(versions $app $global)
-    foreach($oldver in $old) {
-        write-host "Removing older version ($oldver)."
+    foreach ($oldver in $old) {
+        Write-Host "Removing older version ($oldver)."
         $dir = versiondir $app $oldver $global
         try {
             # unlink all potential old link before doing recursive Remove-Item
             unlink_persist_data $dir
-            Remove-Item -r -force -ea stop $dir
+            Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
             continue app_loop
         }
     }
 
-    if(@(versions $app).length -eq 0) {
+    if (@(versions $app).length -eq 0) {
         $appdir = appdir $app $global
         try {
             # if last install failed, the directory seems to be locked and this
             # will throw an error about the directory not existing
-            Remove-Item -r $appdir -ea stop -force
+            Remove-Item $appdir -Recurse -Force -ErrorAction Stop
         } catch {
-            if((test-path $appdir)) { throw } # only throw if the dir still exists
+            if ((Test-Path $appdir)) { throw } # only throw if the dir still exists
         }
     }
 
@@ -114,7 +126,7 @@ if(!$apps) { exit 0 }
 
         if (Test-Path $persist_dir) {
             try {
-                Remove-Item -r $persist_dir -ea stop -force
+                Remove-Item $persist_dir -Recurse -Force -ErrorAction Stop
             } catch {
                 error "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use."
                 continue

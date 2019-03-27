@@ -28,7 +28,7 @@
         "url": "https://nssm.cc/release/nssm-$version.zip",
         "hash": {
             "url": "https://nssm.cc/download/",
-            "regex": "\\[($sha1)\\]"
+            "regex": "\\[$sha1\\]"
         },
         "architecture": {
             "64bit": {

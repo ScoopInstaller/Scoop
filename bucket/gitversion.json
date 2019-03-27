@@ -15,7 +15,7 @@
         "url": "https://packages.chocolatey.org/GitVersion.Portable.$version.nupkg",
         "hash": {
             "url": "https://chocolatey.org/packages/GitVersion.Portable/$version",
-            "regex": "($sha256)/analysis/\">$basename"
+            "regex": "$sha256/analysis/\">$basename"
         }
     }
 }

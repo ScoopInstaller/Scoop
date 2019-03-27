@@ -222,7 +222,18 @@ function url_filename($url) {
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
 # this function extracts the original filename from the URL.
 function url_remote_filename($url) {
-    split-path (new-object uri $url).absolutePath -leaf
+    $uri = (New-Object URI $url)
+    $basename = Split-Path $uri.PathAndQuery -Leaf
+    If ($basename -match ".*[?=]+([\w._-]+)") {
+        $basename = $matches[1]
+    }
+    If (($basename -notlike "*.*") -or ($basename -match "^[v.\d]+$")) {
+        $basename = Split-Path $uri.AbsolutePath -Leaf
+    }
+    If (($basename -notlike "*.*") -and ($uri.Fragment -ne "")) {
+        $basename = $uri.Fragment.Trim('/', '#')
+    }
+    return $basename
 }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
@@ -271,59 +282,6 @@ function isFileLocked([string]$path) {
         # file is locked by a process.
         return $true
     }
-}
-
-function extract_zip($path, $to) {
-    if (!(test-path $path)) { abort "can't find $path to unzip"}
-    try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
-    catch { unzip_old $path $to; return } # for .net earlier than 4.5
-    $retries = 0
-    while ($retries -le 10) {
-        if ($retries -eq 10) {
-            if (7zip_installed) {
-                extract_7zip $path $to $false
-                return
-            } else {
-                abort "Unzip failed: Windows can't unzip because a process is locking the file.`nRun 'scoop install 7zip' and try again."
-            }
-        }
-        if (isFileLocked $path) {
-            write-host "Waiting for $path to be unlocked by another process... ($retries/10)"
-            $retries++
-            Start-Sleep -s 2
-        } else {
-            break
-        }
-    }
-
-    try {
-        [io.compression.zipfile]::extracttodirectory($path,$to)
-    } catch [system.io.pathtoolongexception] {
-        # try to fall back to 7zip if path is too long
-        if(7zip_installed) {
-            extract_7zip $path $to $false
-            return
-        } else {
-            abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
-        }
-    } catch [system.io.ioexception] {
-        if (7zip_installed) {
-            extract_7zip $path $to $false
-            return
-        } else {
-            abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
-        }
-    } catch {
-        abort "Unzip failed: $_"
-    }
-}
-
-function unzip_old($path,$to) {
-    # fallback for .net earlier than 4.5
-    $shell = (new-object -com shell.application -strict)
-    $zipfiles = $shell.namespace("$path").items()
-    $to = ensure $to
-    $shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
 function is_directory([String] $path) {
@@ -554,24 +512,6 @@ function pluralize($count, $singular, $plural) {
     if($count -eq 1) { $singular } else { $plural }
 }
 
-# for dealing with user aliases
-$default_aliases = @{
-    'cp' = 'copy-item'
-    'echo' = 'write-output'
-    'gc' = 'get-content'
-    'gci' = 'get-childitem'
-    'gcm' = 'get-command'
-    'gm' = 'get-member'
-    'iex' = 'invoke-expression'
-    'ls' = 'get-childitem'
-    'mkdir' = { new-item -type directory @args }
-    'mv' = 'move-item'
-    'rm' = 'remove-item'
-    'sc' = 'set-content'
-    'select' = 'select-object'
-    'sls' = 'select-string'
-}
-
 function reset_alias($name, $value) {
     if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
@@ -597,6 +537,24 @@ function reset_aliases() {
         if($aliases -contains $fn) {
             set-alias $fn local:$fn -scope script
         }
+    }
+
+    # for dealing with user aliases
+    $default_aliases = @{
+        'cp' = 'copy-item'
+        'echo' = 'write-output'
+        'gc' = 'get-content'
+        'gci' = 'get-childitem'
+        'gcm' = 'get-command'
+        'gm' = 'get-member'
+        'iex' = 'invoke-expression'
+        'ls' = 'get-childitem'
+        'mkdir' = { new-item -type directory @args }
+        'mv' = 'move-item'
+        'rm' = 'remove-item'
+        'sc' = 'set-content'
+        'select' = 'select-object'
+        'sls' = 'select-string'
     }
 
     # set default aliases
@@ -690,6 +648,20 @@ function format_hash_aria2([String] $hash) {
         default { $hash = $null }
     }
     return $hash
+}
+
+function get_hash([String] $multihash) {
+    $type, $hash = $multihash -split ':'
+    if(!$hash) {
+        # no type specified, assume sha256
+        $type, $hash = 'sha256', $multihash
+    }
+
+    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
+        return $null, "Hash type '$type' isn't supported."
+    }
+
+    return $type, $hash.ToLower()
 }
 
 function handle_special_urls($url)

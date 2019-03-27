@@ -1,9 +1,9 @@
 {
     "homepage": "https://www.gnupg.org/",
-    "version": "2.2.13",
+    "version": "2.2.15",
     "license": "GPL-3.0",
-    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.13_20190212.exe#/dl.7z",
-    "hash": "7245d857c1641610e8759426a12b62eeee84e27aa4dc4640d7523f4ab51d2da7",
+    "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.15_20190326.exe#/dl.7z",
+    "hash": "24d003adaacdbb16047a3e08fdb40b855f7ecdedc28435c767c88493260d6b25",
     "env_add_path": "bin",
     "checkver": {
         "url": "https://www.gnupg.org/download/index.html",

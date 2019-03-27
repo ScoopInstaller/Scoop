@@ -13,9 +13,7 @@
         }
     },
     "bin": "interactive-rebase-tool.exe",
-    "notes": [
-        "Run 'git config --global sequence.editor interactive-rebase-tool' to configure as your rebase tool."
-    ],
+    "notes": "Run 'git config --global sequence.editor interactive-rebase-tool' to configure as your rebase tool.",
     "checkver": {
         "github": "https://github.com/MitMaro/git-interactive-rebase-tool/"
     },

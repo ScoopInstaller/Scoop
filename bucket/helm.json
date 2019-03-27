@@ -1,11 +1,11 @@
 {
     "homepage": "https://helm.sh/",
     "license": "Apache-2.0",
-    "version": "2.13.0",
+    "version": "2.13.1",
     "architecture": {
         "64bit": {
-            "url": "https://storage.googleapis.com/kubernetes-helm/helm-v2.13.0-windows-amd64.tar.gz",
-            "hash": "e0143c3fc6c3e585e62cfa31de8d5e7e00ee3a702ed7416157360fcdd2026a72"
+            "url": "https://storage.googleapis.com/kubernetes-helm/helm-v2.13.1-windows-amd64.tar.gz",
+            "hash": "fc810c306526197dce1d43068bc6385dad13b9d86e912bfd79fc06fe9d275a3d"
         }
     },
     "extract_dir": "windows-amd64",

@@ -10,8 +10,8 @@
         "vim": "vim"
     },
     "checkver": {
-        "url": "https://github.com/lukesampson/psutils",
-        "re": "vimtutor\\.ps1[\\S\\s]*?/(?<sha>[0-9a-f]{40})[\\S\\s]*?(\\d+)-(\\d+)-(\\d+)",
+        "url": "https://api.github.com/repos/lukesampson/psutils/commits?path=vimtutor.ps1",
+        "re": "\"(\\d+)-(\\d+)-(\\d+)",
         "replace": "0.${1}.${2}.${3}"
     },
     "autoupdate": {

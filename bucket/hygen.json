@@ -1,9 +1,9 @@
 {
     "description": "The scalable code generator that saves you time",
     "homepage": "https://www.hygen.io/",
-    "version": "3.0.0",
-    "url": "https://github.com/jondot/hygen/releases/download/v3.0.0/hygen.win.exe.v3.0.0.zip",
-    "hash": "4c09a30f0b197f561d83fe0eeef13ec475265de54b08d49d2e3c5ae74ffebd05",
+    "version": "4.0.2",
+    "url": "https://github.com/jondot/hygen/releases/download/v4.0.2/hygen.win.exe.v4.0.2.zip",
+    "hash": "bff1a2cb49061560038ff66bd1f07e9eedbc1037ab455a989bd5be903a148a47",
     "bin": "hygen.exe",
     "checkver": {
         "github": "https://github.com/jondot/hygen"

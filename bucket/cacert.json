@@ -9,7 +9,7 @@
         "url": "https://curl.haxx.se/docs/caextract.html",
         "re": "cacert-([\\d-]{10}).pem"
     },
-    "post_install": "if (Test-Path \"$(appdir curl)\") {cp \"$dir\\cacert.pem\" \"$(appdir curl)\\current\\bin\\curl-ca-bundle.crt\"}",
+    "post_install": "if (Test-Path \"$(appdir curl $global)\") {cp \"$dir\\cacert.pem\" \"$(appdir curl $global)\\current\\bin\\curl-ca-bundle.crt\"}",
     "autoupdate": {
         "url": "https://curl.haxx.se/ca/cacert-$version.pem#/cacert.pem"
     }

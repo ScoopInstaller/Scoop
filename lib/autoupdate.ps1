@@ -162,7 +162,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     debug $hashfile_url
     if ($hashfile_url) {
         write-host -f DarkYellow 'Searching hash for ' -NoNewline
-        write-host -f Green $(url_remote_filename $url) -NoNewline
+        write-host -f Green $basename -NoNewline
         write-host -f DarkYellow ' in ' -NoNewline
         write-host -f Green $hashfile_url
     }
@@ -234,7 +234,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     }
 
     write-host -f DarkYellow 'Downloading ' -NoNewline
-    write-host -f Green $(url_remote_filename $url) -NoNewline
+    write-host -f Green $basename -NoNewline
     write-host -f DarkYellow ' to compute hashes!'
     try {
         dl_with_cache $app $version $url $null $null $true

@@ -2,14 +2,13 @@
     "homepage": "https://www.python.org/",
     "license": "Python-2.0",
     "version": "3.7.3",
-    "depends": "dark",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe",
+            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe#/py3.exe",
             "hash": "md5:a2b79563476e9aa47f11899a53349383"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3.exe",
+            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3.exe#/py3.exe",
             "hash": "md5:ebf1644cdc1eeeebacc92afa949cfc01"
         }
     },

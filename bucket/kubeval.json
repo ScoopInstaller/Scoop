@@ -1,0 +1,25 @@
+{
+    "description": "Kubernetes resource files linter",
+    "homepage": "https://github.com/garethr/kubeval",
+    "license": "Apache-2.0",
+    "version": "0.7.3",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/garethr/kubeval/releases/download/0.7.3/kubeval-windows-amd64.zip",
+            "hash": "c3ce47aefa0651e732f675ca2f73d994e3206a3a29617afc8f315cddde7e3ab6"
+        }
+    },
+    "bin": "kubeval.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/garethr/kubeval/releases/download/$version/kubeval-windows-amd64.zip"
+            }
+        },
+        "hash": {
+            "url": "https://github.com/garethr/kubeval/releases/tag/$version",
+            "regex": "<td>$basename</td>\\s+<td>$sha256</td>"
+        }
+    }
+}

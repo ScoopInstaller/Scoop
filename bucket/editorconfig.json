@@ -8,8 +8,8 @@
     "extract_dir": "editorconfig-0.12.1-Windows-x86",
     "bin": "bin/editorconfig.exe",
     "checkver": {
-        "url": "https://sourceforge.net/projects/editorconfig/files/EditorConfig-C-Core/",
-        "re": "title=\"([\\d.]+)\"\\sclass=\"folder"
+        "url": "https://sourceforge.net/projects/editorconfig/rss?path=/EditorConfig-C-Core",
+        "re": "([0-9.]+)/binary-Windows"
     },
     "autoupdate": {
         "url": "https://downloads.sourceforge.net/project/editorconfig/EditorConfig-C-Core/$version/binary-Windows/editorconfig-$version-Windows-x86.zip",
