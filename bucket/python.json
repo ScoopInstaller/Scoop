@@ -2,25 +2,25 @@
     "homepage": "https://www.python.org/",
     "license": "Python-2.0",
     "version": "3.7.3",
-    "depends": "wixtoolset",
+    "depends": "dark",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe#/py3.exe",
+            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe",
             "hash": "md5:a2b79563476e9aa47f11899a53349383"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3.exe#/py3.exe",
+            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3.exe",
             "hash": "md5:ebf1644cdc1eeeebacc92afa949cfc01"
         }
     },
     "installer": {
         "script": [
-            "&(file_path wixtoolset dark.exe) -nologo -x \"$dir\\_tmp\" \"$dir\\py3.exe\" | Out-Null",
+            "&(file_path dark dark.exe) -nologo -x \"$dir\\_tmp\" \"$dir\\$fname\" | Out-Null",
             "Remove-Item \"$dir\\_tmp\\AttachedContainer\\launcher.msi\" | Out-Null",
             "Remove-Item \"$dir\\_tmp\\AttachedContainer\\path.msi\" | Out-Null",
             "Remove-Item \"$dir\\_tmp\\AttachedContainer\\pip.msi\" | Out-Null",
             "Get-ChildItem \"$dir\\_tmp\\AttachedContainer\\*.msi\" | ForEach-Object { extract_msi $_ $dir }",
-            "Remove-Item \"$dir\\_tmp\", \"$dir\\*.msi\", \"$dir\\py3.exe\" -Force -Recurse",
+            "Remove-Item \"$dir\\_tmp\", \"$dir\\*.msi\", \"$dir\\$fname\" -Force -Recurse",
             "&(\"$dir\\python.exe\") -E -s -m ensurepip -U --default-pip | Out-Null",
             "if ($global) { $pathext = (env 'PATHEXT' $true) -replace ';.PYW?', ''; env 'PATHEXT' $true \"$pathext;.PY;.PYW\" }"
         ]
@@ -49,10 +49,10 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://www.python.org/ftp/python/$version/python-$version-amd64.exe#/py3.exe"
+                "url": "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
             },
             "32bit": {
-                "url": "https://www.python.org/ftp/python/$version/python-$version.exe#/py3.exe"
+                "url": "https://www.python.org/ftp/python/$version/python-$version.exe"
             }
         },
         "hash": {
