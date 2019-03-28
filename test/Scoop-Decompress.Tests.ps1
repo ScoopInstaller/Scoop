@@ -18,7 +18,7 @@ function install_app_ci($app, $architecture) {
 
 function test_extract($extract_fn, $from, $recurse) {
     $to = (strip_ext $from) -replace '\.tar$', ''
-    & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') $recurse | Out-Null
+    & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') $recurse
     $to
 }
 

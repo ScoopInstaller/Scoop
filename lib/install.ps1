@@ -556,6 +556,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             & $extract_fn "$dir\$fname" "$dir\_tmp" $true
             if ($extract_to) {
                 $null = mkdir "$dir\$extract_to" -force
+                warn "'`$extract_to' is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
             }
             # fails if zip contains long paths (e.g. atom.json)
             #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop

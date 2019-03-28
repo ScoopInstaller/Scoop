@@ -22,7 +22,7 @@ function file_requires_7zip($fname) {
 
 function extract_7zip($path, $to, $recurse) {
     $logfile = "$(Split-Path $path)\7zip.log"
-    &(file_path 7zip 7z.exe) x "$path" -o"$to" -y > "$logfile"
+    &(file_path 7zip 7z.exe) x "$path" -o"$to" -y | Out-File "$logfile"
     if ($lastexitcode -ne 0) {
         abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
     }
@@ -47,12 +47,12 @@ function extract_msi($path, $to, $recurse) {
     $logfile = "$(split-path $path)\msi.log"
     $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
     if ($useLessMsi) {
-        &(file_path lessmsi lessmsi.exe) x "$path" "$to\" > "$logfile"
+        &(file_path lessmsi lessmsi.exe) x "$path" "$to\" | Out-File "$logfile"
         if ($lastexitcode -ne 0) {
             abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
         }
         if (Test-Path "$to\SourceDir") {
-            movedir "$to\SourceDir" "$to"
+            movedir "$to\SourceDir" "$to" | Out-Null
         }
     } else {
         $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
@@ -71,7 +71,7 @@ function extract_msi($path, $to, $recurse) {
 
 function extract_inno($path, $to, $recurse) {
     $logfile = "$(Split-Path $path)\innounp.log"
-    &(file_path innounp innounp.exe) -x -d"$to" -c"{app}" "$path" -y > "$logfile"
+    &(file_path innounp innounp.exe) -x -d"$to" -c"{app}" "$path" -y | Out-File "$logfile"
     if ($lastexitcode -ne 0) {
         abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
     }
