@@ -115,3 +115,7 @@ function extract_zip($path, $to, $recurse) {
         Remove-Item $path -Force
     } # Clean up compressed files
 }
+
+function unpack_inno($path, $to) {
+    extract_inno "$path" "$to" $true
+}
