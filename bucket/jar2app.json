@@ -4,7 +4,7 @@
   "license": "GPL-2.0-only",
   "url": "https://github.com/Jorl17/jar2app/archive/master.zip",
   "extract_dir": "jar2app-master",
-  "depend": [
+  "depends": [
     "python"
   ],
   "pre_install": "echo \"python `\"$dir\\jar2app.py`\" @args\" | out-file \"$dir\\jar2app.ps1\"",
