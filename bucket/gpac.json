@@ -2,7 +2,7 @@
   "description": "GPAC is an Open Source multimedia framework.",
   "homepage": "https://gpac.wp.imt.fr/",
   "version": "0.7.0",
-    "license": "LGPL-2.1-only",
+    "license": "LGPL-2.1-only"
   },
    "architecture": {
         "64bit": {
