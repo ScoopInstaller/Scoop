@@ -13,7 +13,8 @@
             "hash": "cf877b88020441b32350356066151e9b11547ccbcd8fc298bdb71662f1ff0b93"
         },
         "32bit": {
-            "url": "https://download.tsi.telecom-paristech.fr/gpac/release/0.7.0/gpac-0.7.0-rev0-gbd5c9af-master-win32.exe#/gpac.7z"
+            "url": "https://download.tsi.telecom-paristech.fr/gpac/release/0.7.0/gpac-0.7.0-rev0-gbd5c9af-master-win32.exe#/gpac.7z",
+
             "hash": "39afe993464bbf7b1d29c35c05adab317a028192e968ae033f15a8265c34e076"
         }
     },
