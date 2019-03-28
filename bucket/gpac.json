@@ -2,7 +2,7 @@
   "description": "GPAC is an Open Source multimedia framework.",
   "homepage": "https://gpac.wp.imt.fr/",
   "version": "0.7.0",
-  "license": {
+    "license": "LGPL-2.1-only",
 ## not sure if 2.1 only or 2.1 or later
     "identifier": "GNU Lesser General Public License",
     "url": "https://www.gnu.org/licenses/lgpl-2.1.txt"
