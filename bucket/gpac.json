@@ -25,7 +25,7 @@
     "dashcast.exe"
   ],
   "checkver": {
-    "url": "https://github.com/oneclick/rubyinstaller2",
+    "url": "https://gpac.wp.imt.fr/downloads/",
     "re": "The current GPAC release is ([\\d.]+)"
   }
 }
