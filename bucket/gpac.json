@@ -1,28 +1,37 @@
 {
-  "description": "GPAC is an Open Source multimedia framework.",
-  "homepage": "https://gpac.wp.imt.fr/",
-  "version": "0.7.0",
-    "license": "LGPL-2.1-only"
-  },
-   "architecture": {
+    "version": "0.7.0",
+    "description": "GPAC is an Open Source multimedia framework.",
+    "homepage": "https://gpac.wp.imt.fr/",
+    "license": "LGPL-2.1-only",
+    "architecture": {
         "64bit": {
             "url": "https://download.tsi.telecom-paristech.fr/gpac/release/0.7.0/gpac-0.7.0-rev0-gbd5c9af-master-x64.exe#/gpac.7z",
             "hash": "cf877b88020441b32350356066151e9b11547ccbcd8fc298bdb71662f1ff0b93"
         },
         "32bit": {
             "url": "https://download.tsi.telecom-paristech.fr/gpac/release/0.7.0/gpac-0.7.0-rev0-gbd5c9af-master-win32.exe#/gpac.7z",
-
             "hash": "39afe993464bbf7b1d29c35c05adab317a028192e968ae033f15a8265c34e076"
         }
     },
-  "bin": [
-    "mp4box.exe",
-    "mp4client.exe",
-    "mp42ts.exe",
-    "dashcast.exe"
-  ],
-  "checkver": {
-    "url": "https://gpac.wp.imt.fr/downloads/",
-    "re": "The current GPAC release is ([\\d.]+)"
-  }
+    "post_install": "Remove-Item \"$dir\\`$PLUGINSDIR\" -Recurse",
+    "bin": [
+        "mp4box.exe",
+        "mp4client.exe",
+        "mp42ts.exe",
+        "dashcast.exe"
+    ],
+    "checkver": {
+        "url": "https://gpac.wp.imt.fr/downloads/",
+        "regex": "The current GPAC release is ([\\d\\.]+).+gpac-[\\d\\.]+-(?<junk>.+)-win32\\.exe"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://download.tsi.telecom-paristech.fr/gpac/release/$version/gpac-$version-$matchJunk-x64.exe#/gpac.7z"
+            },
+            "32bit": {
+                "url": "https://download.tsi.telecom-paristech.fr/gpac/release/$version/gpac-$version-$matchJunk-win32.exe#/gpac.7z"
+            }
+        }
+    }
 }
