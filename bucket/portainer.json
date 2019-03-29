@@ -1,11 +1,11 @@
 {
     "homepage": "https://portainer.io/",
     "license": "Zlib",
-    "version": "1.20.1",
+    "version": "1.20.2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/portainer/portainer/releases/download/1.20.1/portainer-1.20.1-windows-amd64.tar.gz",
-            "hash": "89a7568ef4da50e0514efa09aae4166ea932b422fea0809299367a0c12f4d487"
+            "url": "https://github.com/portainer/portainer/releases/download/1.20.2/portainer-1.20.2-windows-amd64.tar.gz",
+            "hash": "38e5ad79505ae75e42659a9e4e437b00ea761a127ec89dfda1c255623622656d"
         }
     },
     "extract_dir": "portainer",
