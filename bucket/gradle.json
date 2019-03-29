@@ -1,10 +1,10 @@
 {
     "homepage": "https://gradle.org",
-    "version": "5.3",
+    "version": "5.3.1",
     "license": "Apache-2.0",
-    "hash": "f4d820c2a9685710eba5b92f10e0e4fb20e0d6c0dd1f46971e658160f25e7147",
-    "url": "https://services.gradle.org/distributions/gradle-5.3-all.zip",
-    "extract_dir": "gradle-5.3",
+    "hash": "b018a7308cb43633662363d100c14a3c41c66fd4e32b59e1dfc644d6fd2109f6",
+    "url": "https://services.gradle.org/distributions/gradle-5.3.1-all.zip",
+    "extract_dir": "gradle-5.3.1",
     "bin": "bin\\gradle.bat",
     "suggest": {
         "JDK": [
