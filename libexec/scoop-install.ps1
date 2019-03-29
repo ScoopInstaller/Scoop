@@ -39,7 +39,9 @@ function is_installed($app, $global) {
 
         $version = @(versions $app $global)[-1]
         if (!(install_info $app $version $global)) {
-            error "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$(gf $global)' before retrying the install."
+            warn "Purging previous failed installation of $app."
+            & "$PSScriptRoot\scoop-uninstall.ps1" $app $(if ($global) { "--global" })
+            return $false
         }
         warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(gf $global)' to install a new version."
         return $true
