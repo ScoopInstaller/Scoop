@@ -12,9 +12,7 @@
         }
     },
     "checkver": {
-        "url": "https://dashboard.gravitational.com/webapi/releases-oss/latest?product=teleport",
-        "jsonpath": "$.version",
-        "regex": "v([\\d\\.]+)"
+        "github": "https://github.com/gravitational/teleport"
     },
     "autoupdate": {
         "architecture": {
