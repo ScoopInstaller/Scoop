@@ -1,6 +1,6 @@
 {
   "homepage": "https://github.com/Jorl17/jar2app",
-  "version": "master",
+  "version": "nightly",
   "license": "GPL-2.0-only",
   "url": "https://github.com/Jorl17/jar2app/archive/master.zip",
   "extract_dir": "jar2app-master",
