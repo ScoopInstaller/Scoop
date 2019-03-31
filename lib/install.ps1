@@ -201,7 +201,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
     # aria2 input file
     $urlstxt = "$cachedir\$app.txt"
     $urlstxt_content = ''
-    $has_downloads = $false
+    $download_finished = $false
 
     # aria2 options
     $options = @(
