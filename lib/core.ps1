@@ -442,17 +442,24 @@ function ensure_all_installed($apps, $global) {
     $installed = @()
     $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | ForEach-Object {
         $app, $null, $null = parse_app $_
-        if(installed $app $false) {
-            $installed += ,@($app, $false)
-        } elseif (installed $app $true) {
-            if($global) {
+        if ($global) {
+            if (installed $app $true) {
                 $installed += ,@($app, $true)
+            } elseif (installed $app $false) {
+                error "'$app' isn't installed globally, but it is installed for your account."
+                warn "Try again without the --global (or -g) flag instead."
             } else {
-                error "'$app' isn't installed for your account, but it is installed globally."
-                warn "Try again with the --global (or -g) flag instead."
+                error "'$app' isn't installed."
             }
         } else {
-            error "'$app' isn't installed."
+            if(installed $app $false) {
+                $installed += ,@($app, $false)
+            } elseif (installed $app $true) {
+                error "'$app' isn't installed for your account, but it is installed globally."
+                warn "Try again with the --global (or -g) flag instead."
+            } else {
+                error "'$app' isn't installed."
+            }
         }
     }
     return ,$installed

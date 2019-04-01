@@ -108,7 +108,7 @@ if (!$apps) { exit 0 }
         }
     }
 
-    if (@(versions $app).length -eq 0) {
+    if (@(versions $app $global).length -eq 0) {
         $appdir = appdir $app $global
         try {
             # if last install failed, the directory seems to be locked and this
