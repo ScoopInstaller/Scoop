@@ -1,10 +1,10 @@
 {
     "homepage": "https://cakebuild.net/",
     "description": "Cake (C# Make) is a cross-platform build automation system with a C# DSL",
-    "version": "0.32.1",
+    "version": "0.33.0",
     "license": "MIT",
-    "url": "https://github.com/cake-build/cake/releases/download/v0.32.1/Cake-bin-net461-v0.32.1.zip",
-    "hash": "fa98c3e22876e30e13df2081c02b5d03686d59a8cea5d28f050de86e7b6f6233",
+    "url": "https://github.com/cake-build/cake/releases/download/v0.33.0/Cake-bin-net461-v0.33.0.zip",
+    "hash": "72b42e2a1acd1d4dab942c38c769a56db1e47c6666cb792da15abcdbc5c36157",
     "bin": "cake.exe",
     "suggest": {
         "NuGet": "nuget"
