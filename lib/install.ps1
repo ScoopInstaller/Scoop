@@ -44,6 +44,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
+    persist_data $manifest $original_dir $persist_dir
+    persist_permission $manifest $global
     post_install $manifest $architecture
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
@@ -53,10 +55,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
     env_add_path $manifest $dir $global
     env_set $manifest $dir $global
-
-    # persist data
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
 
 
     # save info for uninstall
