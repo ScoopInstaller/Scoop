@@ -1,5 +1,6 @@
 {
   "homepage": "https://github.com/Jorl17/jar2app",
+  "description": "Convert any Java jar to a Mac OS X .App bundle.",
   "version": "nightly",
   "license": "GPL-2.0-only",
   "url": "https://github.com/Jorl17/jar2app/archive/master.zip",
