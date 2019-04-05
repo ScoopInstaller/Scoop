@@ -22,16 +22,16 @@ function test_extract($extract_fn, $from, $recurse) {
     $to
 }
 
-Describe "Decompression function" -Tag 'Scoop', 'Decompress' {
+Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     BeforeAll {
-        $working_dir = setup_working "decompress"
+        $working_dir = setup_working 'decompress'
     }
 
     if (!$isUnix) {
         # Expanding Test Cases
         $testcases = "$working_dir\TestCases.zip"
         $testcases | Should -Exist
-        compute_hash $testcases 'sha256' | Should -Be "695bb18cafda52644a19afd184b2545e9c48f1a191f7ff1efc26cb034587079c"
+        compute_hash $testcases 'sha256' | Should -Be '695bb18cafda52644a19afd184b2545e9c48f1a191f7ff1efc26cb034587079c'
         extract_zip $testcases $working_dir
     }
 

@@ -22,8 +22,8 @@ function file_requires_7zip($fname) {
 
 function extract_7zip($path, $to, $recurse) {
     $logfile = "$(Split-Path $path)\7zip.log"
-    &(file_path 7zip 7z.exe) x "$path" -o"$to" -y | Out-File "$logfile"
-    if ($lastexitcode -ne 0) {
+    &(file_path 7zip 7z.exe) x "$path" -o"$to" -y | Out-File $logfile
+    if ($LASTEXITCODE -ne 0) {
         abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
     }
     if (Test-Path $logfile) {
@@ -31,7 +31,7 @@ function extract_7zip($path, $to, $recurse) {
     }
     if ((strip_ext (fname $path)) -match '\.tar$' -or (fname $path) -match '\.tgz$') {
         $listfiles = &(file_path 7zip 7z.exe) l "$path"
-        if ($lastexitcode -eq 0) {
+        if ($LASTEXITCODE -eq 0) {
             $tar = ([Regex]"(\S*.tar)$").Matches($listfiles[-3]).Value
             extract_7zip "$to\$tar" $to $true
         } else {
@@ -47,8 +47,8 @@ function extract_msi($path, $to, $recurse) {
     $logfile = "$(split-path $path)\msi.log"
     $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
     if ($useLessMsi) {
-        &(file_path lessmsi lessmsi.exe) x "$path" "$to\" | Out-File "$logfile"
-        if ($lastexitcode -ne 0) {
+        &(file_path lessmsi lessmsi.exe) x "$path" "$to\" | Out-File $logfile
+        if ($LASTEXITCODE -ne 0) {
             abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
         }
         if (Test-Path "$to\SourceDir") {
@@ -71,8 +71,8 @@ function extract_msi($path, $to, $recurse) {
 
 function extract_inno($path, $to, $recurse) {
     $logfile = "$(Split-Path $path)\innounp.log"
-    &(file_path innounp innounp.exe) -x -d"$to" -c"{app}" "$path" -y | Out-File "$logfile"
-    if ($lastexitcode -ne 0) {
+    &(file_path innounp innounp.exe) -x -d"$to" -c'{app}' "$path" -y | Out-File $logfile
+    if ($LASTEXITCODE -ne 0) {
         abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
     }
     if (Test-Path $logfile) {
