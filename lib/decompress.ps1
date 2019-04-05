@@ -1,5 +1,9 @@
 function requires_7zip($manifest, $architecture) {
-    return (@(url $manifest $architecture) | Where-Object { file_requires_7zip $_ }).Count -gt 0
+    if (get_config 7ZIPEXTRACT_USE_EXTERNAL) {
+        return $false
+    } else {
+        return (@(url $manifest $architecture) | Where-Object { file_requires_7zip $_ }).Count -gt 0
+    }
 }
 
 function requires_lessmsi ($manifest, $architecture) {
@@ -16,7 +20,15 @@ function file_requires_7zip($fname) {
 
 function extract_7zip($path, $to, $recurse) {
     $logfile = "$(Split-Path $path)\7zip.log"
-    &(file_path 7zip 7z.exe) x "$path" -o"$to" -y | Out-File $logfile
+    if (get_config 7ZIPEXTRACT_USE_EXTERNAL) {
+        try {
+            7z x "$path" -o"$to" -y | Out-File $logfile
+        } catch [System.Management.Automation.CommandNotFoundException] {
+            abort "Cannot find '7Zip (7z.exe)' while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' and try again."
+        }
+    } else {
+        &(file_path 7zip 7z.exe) x "$path" -o"$to" -y | Out-File $logfile
+    }
     if ($LASTEXITCODE -ne 0) {
         abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
     }
