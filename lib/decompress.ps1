@@ -1,19 +1,13 @@
 function requires_7zip($manifest, $architecture) {
-    foreach ($dlurl in @(url $manifest $architecture)) {
-        if (file_requires_7zip $dlurl) {
-            return $true
-        }
-    }
+    return (@(url $manifest $architecture) | Where-Object { file_requires_7zip $_ }).Count -gt 0
 }
 
 function requires_lessmsi ($manifest, $architecture) {
-    $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
-    if (!$useLessMsi) {
+    if (get_config MSIEXTRACT_USE_LESSMSI) {
+        return (@(url $manifest $architecture) | Where-Object { $_ -match '\.msi$' }).Count -gt 0
+    } else {
         return $false
     }
-    $(url $manifest $architecture | Where-Object {
-            $_ -match '\.(msi)$'
-        } | Measure-Object | Select-Object -exp count) -gt 0
 }
 
 function file_requires_7zip($fname) {
@@ -36,7 +30,7 @@ function extract_7zip($path, $to, $recurse) {
             $tar = ([Regex]"(\S*.tar)$").Matches($listfiles[-3]).Value # get inner tar file name
             extract_7zip "$to\$tar" $to $true
         } else {
-            abort "Failed to list files in $path."
+            abort "Failed to list files in $path.`nNot a 7Zip supported compressed file."
         }
     }
     if ($recurse) {
@@ -47,8 +41,7 @@ function extract_7zip($path, $to, $recurse) {
 
 function extract_msi($path, $to, $recurse) {
     $logfile = "$(split-path $path)\msi.log"
-    $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
-    if ($useLessMsi) {
+    if (get_config MSIEXTRACT_USE_LESSMSI) {
         &(file_path lessmsi lessmsi.exe) x "$path" "$to\" | Out-File $logfile
         if ($LASTEXITCODE -ne 0) {
             abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
@@ -61,7 +54,7 @@ function extract_msi($path, $to, $recurse) {
         if (!$ok) {
             abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
         }
-        Remove-Item "$to\$(fname $path)"
+        Remove-Item "$to\$(fname $path)" -Force
     }
     if (Test-Path $logfile) {
         Remove-Item $logfile -Force
