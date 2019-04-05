@@ -30,17 +30,19 @@ function extract_7zip($path, $to, $recurse) {
         Remove-Item $logfile -Force
     }
     if ((strip_ext (fname $path)) -match '\.tar$' -or (fname $path) -match '\.tgz$') {
+        # Check for tar
         $listfiles = &(file_path 7zip 7z.exe) l "$path"
         if ($LASTEXITCODE -eq 0) {
-            $tar = ([Regex]"(\S*.tar)$").Matches($listfiles[-3]).Value
+            $tar = ([Regex]"(\S*.tar)$").Matches($listfiles[-3]).Value # get inner tar file name
             extract_7zip "$to\$tar" $to $true
         } else {
             abort "Failed to list files in $path."
         }
-    } # Check for tar
+    }
     if ($recurse) {
+        # Clean up compressed files
         Remove-Item $path -Force
-    } # Clean up compressed files
+    }
 }
 
 function extract_msi($path, $to, $recurse) {
@@ -65,8 +67,9 @@ function extract_msi($path, $to, $recurse) {
         Remove-Item $logfile -Force
     }
     if ($recurse) {
+        # Clean up compressed files
         Remove-Item $path -Force
-    } # Clean up compressed files
+    }
 }
 
 function extract_inno($path, $to, $recurse) {
@@ -79,8 +82,9 @@ function extract_inno($path, $to, $recurse) {
         Remove-Item $logfile -Force
     }
     if ($recurse) {
+        # Clean up compressed files
         Remove-Item $path -Force
-    } # Clean up compressed files
+    }
 }
 
 function extract_zip($path, $to, $recurse) {
@@ -112,10 +116,11 @@ function extract_zip($path, $to, $recurse) {
         Expand-Archive -Path $path -DestinationPath $to -Force
     }
     if ($recurse) {
+        # Clean up compressed files
         Remove-Item $path -Force
-    } # Clean up compressed files
+    }
 }
 
 function unpack_inno($path, $to) {
-    extract_inno "$path" "$to" $true
+    extract_inno $path $to $true
 }
