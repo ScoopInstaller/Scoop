@@ -1,8 +1,8 @@
 {
-    "version": "2.085.0",
+    "version": "2.085.1",
     "description": "D is a general-purpose programming language with static typing, systems-level access, and C-like syntax",
-    "url": "http://downloads.dlang.org/releases/2.x/2.085.0/dmd.2.085.0.windows.7z",
-    "hash": "6cf6e3d78a2a7966d4ddbdb572ece45c6edb7d4f16a88f726a4dfcfe670c9d70",
+    "url": "http://downloads.dlang.org/releases/2.x/2.085.1/dmd.2.085.1.windows.7z",
+    "hash": "5f2525e11a6deaea78d29704a9b42adf65686a445157966403469cdbdd15a17a",
     "license": "BSL-1.0",
     "extract_dir": "dmd2",
     "bin": [
