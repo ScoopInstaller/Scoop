@@ -1,15 +1,15 @@
 {
     "homepage": "https://eternallybored.org/misc/wget/",
     "license": "GPL-3.0",
-    "version": "1.20",
+    "version": "1.20.3",
     "architecture": {
         "64bit": {
-            "url": "https://eternallybored.org/misc/wget/releases/wget-1.20-win64.zip",
-            "hash": "2414cc1c00140c0773a7933dd517cf99c462a034101a002277656fff3240ec23"
+            "url": "https://eternallybored.org/misc/wget/releases/wget-1.20.3-win64.zip",
+            "hash": "c0d150fcf41d4646410c6d5a9ef3831a0b27209be533fb4033f62d1daa348ce9"
         },
         "32bit": {
-            "url": "https://eternallybored.org/misc/wget/releases/wget-1.20-win32.zip",
-            "hash": "96d7dfe0467a7ca9d443792dd58da93fe550a91a4d6184a07087b48362bfd6f8"
+            "url": "https://eternallybored.org/misc/wget/releases/wget-1.20.3-win32.zip",
+            "hash": "4ac00c798d9ef6a394a0442607e0961de75bc6abf8fa36dbdea381eb0e93a0ab"
         }
     },
     "bin": "wget.exe",
