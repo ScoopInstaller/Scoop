@@ -1,12 +1,12 @@
 {
-    "version": "0.7.1",
+    "version": "0.7.2",
     "description": "A tool for exploring each layer in a docker image.",
     "homepage": "https://github.com/wagoodman/dive/",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/wagoodman/dive/releases/download/v0.7.1/dive_0.7.1_windows_amd64.zip",
-            "hash": "a8c7a1ee450cbe223808484e9ee6c36c24ef1d35179997426caf9d1fc6cd871d"
+            "url": "https://github.com/wagoodman/dive/releases/download/v0.7.2/dive_0.7.2_windows_amd64.zip",
+            "hash": "16388360124bdbd55d67cf8fe129b93aa2ae7d220c9fd986cb5c655cb42d3dc6"
         }
     },
     "bin": "dive.exe",
