@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.imagemagick.org/script/index.php",
     "license": "ImageMagick",
-    "version": "7.0.8-37",
+    "version": "7.0.8-38",
     "architecture": {
         "64bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.8-37-portable-Q16-x64.zip",
-            "hash": "d746872e7ae93dca04d06ae84f1dd8f67ab7843187b8b93c118f110377e84db5"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.8-38-portable-Q16-x64.zip",
+            "hash": "803adfc1c871a3aa04613b660e9c08c4b785e9cab81d89b16be98a6705a91eb4"
         },
         "32bit": {
-            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.8-37-portable-Q16-x86.zip",
-            "hash": "b89c34331899fc58b7cf2504d4be939f58a8092f99318aede5d52427a920a60b"
+            "url": "https://www.imagemagick.org/download/binaries/ImageMagick-7.0.8-38-portable-Q16-x86.zip",
+            "hash": "1671a899fc3f2ed0f392cf50b910cf5501fddf9ad40e92867d8f53865dc7a854"
         }
     },
     "depends": "ffmpeg",
