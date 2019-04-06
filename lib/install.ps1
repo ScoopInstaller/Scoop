@@ -273,7 +273,9 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
     if(-not($download_finished)) {
         # write aria2 input file
-        Set-Content -Path $urlstxt $urlstxt_content
+        if($null -ne $urlstxt_content) {
+            Set-Content -Path $urlstxt $urlstxt_content
+        }
 
         # build aria2 command
         $aria2 = "& '$(aria2_path)' $($options -join ' ')"
