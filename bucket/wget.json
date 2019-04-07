@@ -5,7 +5,7 @@
     "architecture": {
         "64bit": {
             "url": "https://eternallybored.org/misc/wget/releases/wget-1.20.3-win64.zip",
-            "hash": "c0d150fcf41d4646410c6d5a9ef3831a0b27209be533fb4033f62d1daa348ce9"
+            "hash": "9dea6d658ab14a77958233a116a86bc2f5adb1feb425848d58f918d354bdd1ea"
         },
         "32bit": {
             "url": "https://eternallybored.org/misc/wget/releases/wget-1.20.3-win32.zip",
