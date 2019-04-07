@@ -16,9 +16,9 @@ function install_app_ci($app, $architecture) {
     success "'$app' ($version) was installed successfully!"
 }
 
-function test_extract($extract_fn, $from, $recurse) {
+function test_extract($extract_fn, $from, $removal) {
     $to = (strip_ext $from) -replace '\.tar$', ''
-    & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') $recurse
+    & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') $removal
     return $to
 }
 
@@ -73,7 +73,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It "works with '`$recurse' param" -Skip:$isUnix {
+        It "works with '`$removal' param" -Skip:$isUnix {
             $test1 | Should -Exist
             test_extract "extract_7zip" $test1 $true
             $test1 | Should -Not -Exist
@@ -101,7 +101,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             $to | Should -Exist
         }
 
-        It "works with '`$recurse' param" -Skip:$isUnix {
+        It "works with '`$removal' param" -Skip:$isUnix {
             mock get_config { $false }
             $test1 | Should -Exist
             test_extract "extract_msi" $test1 $true
@@ -123,7 +123,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It "works with '`$recurse' param" -Skip:$isUnix {
+        It "works with '`$removal' param" -Skip:$isUnix {
             $test | Should -Exist
             test_extract "extract_inno" $test $true
             $test | Should -Not -Exist
@@ -143,7 +143,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It "works with '`$recurse' param" -Skip:$isUnix {
+        It "works with '`$removal' param" -Skip:$isUnix {
             $test | Should -Exist
             test_extract "extract_zip" $test $true
             $test | Should -Not -Exist

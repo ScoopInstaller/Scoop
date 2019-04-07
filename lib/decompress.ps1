@@ -18,7 +18,7 @@ function file_requires_7zip($fname) {
     $fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
 }
 
-function extract_7zip($path, $to, $recurse) {
+function extract_7zip($path, $to, $removal) {
     $logfile = "$(Split-Path $path)\7zip.log"
     if (get_config 7ZIPEXTRACT_USE_EXTERNAL) {
         try {
@@ -45,13 +45,13 @@ function extract_7zip($path, $to, $recurse) {
             abort "Failed to list files in $path.`nNot a 7Zip supported compressed file."
         }
     }
-    if ($recurse) {
+    if ($removal) {
         # Clean up compressed files
         Remove-Item $path -Force
     }
 }
 
-function extract_msi($path, $to, $recurse) {
+function extract_msi($path, $to, $removal) {
     $logfile = "$(split-path $path)\msi.log"
     if (get_config MSIEXTRACT_USE_LESSMSI) {
         &(file_path lessmsi lessmsi.exe) x "$path" "$to\" | Out-File $logfile
@@ -71,13 +71,13 @@ function extract_msi($path, $to, $recurse) {
     if (Test-Path $logfile) {
         Remove-Item $logfile -Force
     }
-    if ($recurse) {
+    if ($removal) {
         # Clean up compressed files
         Remove-Item $path -Force
     }
 }
 
-function extract_inno($path, $to, $recurse) {
+function extract_inno($path, $to, $removal) {
     $logfile = "$(Split-Path $path)\innounp.log"
     &(file_path innounp innounp.exe) -x -d"$to" -c'{app}' "$path" -y | Out-File $logfile
     if ($LASTEXITCODE -ne 0) {
@@ -86,13 +86,13 @@ function extract_inno($path, $to, $recurse) {
     if (Test-Path $logfile) {
         Remove-Item $logfile -Force
     }
-    if ($recurse) {
+    if ($removal) {
         # Clean up compressed files
         Remove-Item $path -Force
     }
 }
 
-function extract_zip($path, $to, $recurse) {
+function extract_zip($path, $to, $removal) {
     # All methods to unzip the file require .NET4.5+
     if ($PSVersionTable.PSVersion.Major -lt 5) {
         Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -101,14 +101,14 @@ function extract_zip($path, $to, $recurse) {
         } catch [System.IO.PathTooLongException] {
             # try to fall back to 7zip if path is too long
             if (7zip_installed) {
-                extract_7zip $path $to $recurse
+                extract_7zip $path $to $removal
                 return
             } else {
                 abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
             }
         } catch [System.IO.IOException] {
             if (7zip_installed) {
-                extract_7zip $path $to $recurse
+                extract_7zip $path $to $removal
                 return
             } else {
                 abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
@@ -120,7 +120,7 @@ function extract_zip($path, $to, $recurse) {
         # Use Expand-Archive to unzip in PowerShell 5+
         Expand-Archive -Path $path -DestinationPath $to -Force
     }
-    if ($recurse) {
+    if ($removal) {
         # Clean up compressed files
         Remove-Item $path -Force
     }
