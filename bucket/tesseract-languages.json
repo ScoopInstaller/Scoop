@@ -5,10 +5,12 @@
     "version": "4.0.0",
     "url": [
         "https://github.com/tesseract-ocr/tessdata_fast/archive/4.0.0.zip",
+        "https://github.com/tesseract-ocr/tessdata/raw/d87b3cbc75555bd3282e0cadab5e159e2d468396/equ.traineddata",
         "https://github.com/USCDataScience/counterfeit-electronics-tesseract/raw/319a6eeacff181dad5c02f3e7a3aff804eaadeca/Training%20Tesseract/snum.traineddata"
     ],
     "hash": [
         "6551f6ac0c8d0f75b1dd0fb9bc005af6b8ecc564db711a0e3b33dad2c7c23dd3",
+        "3af43a2420ce927dbce68474d644625947189a82ce6ae4fd32106399146819db",
         "36f772980ff17c66a767f584a0d80bf2302a1afa585c01a226c1863afcea1392"
     ],
     "extract_dir": "tessdata_fast-4.0.0",

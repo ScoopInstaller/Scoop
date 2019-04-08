@@ -1,15 +1,16 @@
 {
     "homepage": "https://github.com/UB-Mannheim/tesseract/wiki",
     "license": "Apache-2.0",
-    "version": "4.0.0.20181030",
+    "version": "4.1.0.20190314",
+    "description": "Open Source OCR Engine",
     "architecture": {
         "64bit": {
-            "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-v4.0.0.20181030.exe#/dl.7z",
-            "hash": "f590c1fb1a5e02781635758eada2d87084d64d1e6fb0f761ef8237e60d7ea8ea"
+            "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-v4.1.0.20190314.exe#/dl.7z",
+            "hash": "097ff3850e01281257617e3099d8b22239243fa2e3ff9756f2dafa7ab44b9f98"
         },
         "32bit": {
-            "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w32-setup-v4.0.0.20181030.exe#/dl.7z",
-            "hash": "edd28909ffb1d6961f9155441b8d9d5584c99cc8633ad5bb92f8bf4098201ea6"
+            "url": "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w32-setup-v4.1.0.20190314.exe#/dl.7z",
+            "hash": "87b8041504f304e6e7d942acab7683989eed2440a6c8f8581755810c96ec18f8"
         }
     },
     "bin": [
@@ -42,8 +43,8 @@
         "tesseract-languages": "tesseract-languages"
     },
     "checkver": {
-        "re": "tesseract-ocr-w32-setup-v(?<version>[\\d.]+).exe",
-        "url": "https://digi.bib.uni-mannheim.de/tesseract/"
+        "re": "tesseract-ocr-w32-setup-v(4.[\\d\\w.-]+)\\.exe",
+        "url": "https://digi.bib.uni-mannheim.de/tesseract/?C=M;O=D"
     },
     "autoupdate": {
         "architecture": {
