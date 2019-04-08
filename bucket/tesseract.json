@@ -43,8 +43,8 @@
         "tesseract-languages": "tesseract-languages"
     },
     "checkver": {
-        "re": "tesseract-ocr-w32-setup-v(4.[\\d\\w.-]+)\\.exe",
-        "url": "https://digi.bib.uni-mannheim.de/tesseract/?C=M;O=D"
+        "url": "https://digi.bib.uni-mannheim.de/tesseract/?C=M;O=D",
+        "regex": "tesseract-ocr-w32-setup-v([\\d\\w.-]+)\\.exe"
     },
     "autoupdate": {
         "architecture": {
