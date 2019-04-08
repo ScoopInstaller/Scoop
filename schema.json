@@ -432,8 +432,7 @@
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "extract_to": {
-            "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "No longer used."
+            "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "hash": {
             "$ref": "#/definitions/hash"
