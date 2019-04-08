@@ -1,14 +1,14 @@
 {
-    "version": "0.54.0",
+    "version": "0.55.0",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/gohugoio/hugo/releases/download/v0.54.0/hugo_0.54.0_windows-64bit.zip",
-            "hash": "15608bb9146fcbc28203945241dbab108a6c5d9f02f0ecafcbe15d08f5f698b8"
+            "url": "https://github.com/gohugoio/hugo/releases/download/v0.55.0/hugo_0.55.0_windows-64bit.zip",
+            "hash": "7e71eca663973801297f9377d5f79c40a50ac9a0ffa08178f51681e22bf7ade4"
         },
         "32bit": {
-            "url": "https://github.com/gohugoio/hugo/releases/download/v0.54.0/hugo_0.54.0_windows-32bit.zip",
-            "hash": "3b5a9d625bca15c643a05b92686f1cc42a091c3e77316f24933920a71b8b5be1"
+            "url": "https://github.com/gohugoio/hugo/releases/download/v0.55.0/hugo_0.55.0_windows-32bit.zip",
+            "hash": "f62984e82cbffbff077cfa8f2afe5047ccb06f7f1a5b89db06c9cc9c399016c1"
         }
     },
     "bin": "hugo.exe",
