@@ -68,9 +68,8 @@ function add_bucket($name, $repo) {
         if (!$repo) { "Unknown bucket '$name'. Try specifying <repo>."; $usage_add; exit 1 }
     }
 
-    $git = try { Get-Command 'git' -ea stop } catch { $null }
-    if (!$git) {
-        abort "Git is required for buckets. Run 'scoop install git'."
+    if (!(cmd_available git)) {
+        abort "Git is required for buckets. Run 'scoop install git' and try again."
     }
 
     $dir = bucketdir $name
