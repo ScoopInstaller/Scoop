@@ -125,7 +125,3 @@ function extract_zip($path, $to, $removal) {
         Remove-Item $path -Force
     }
 }
-
-function unpack_inno($path, $to) {
-    extract_inno $path $to $true
-}
