@@ -178,6 +178,11 @@
         ],
         [
             "busybox.exe",
+            "dpkg",
+            "dpkg"
+        ],
+        [
+            "busybox.exe",
             "dpkg-deb",
             "dpkg-deb"
         ],
@@ -218,13 +223,13 @@
         ],
         [
             "busybox.exe",
-            "false",
-            "false"
+            "factor",
+            "factor"
         ],
         [
             "busybox.exe",
-            "factor",
-            "factor"
+            "false",
+            "false"
         ],
         [
             "busybox.exe",
@@ -240,6 +245,11 @@
             "busybox.exe",
             "fold",
             "fold"
+        ],
+        [
+            "busybox.exe",
+            "fsync",
+            "fsync"
         ],
         [
             "busybox.exe",
@@ -293,6 +303,11 @@
         ],
         [
             "busybox.exe",
+            "iconv",
+            "iconv"
+        ],
+        [
+            "busybox.exe",
             "id",
             "id"
         ],
@@ -315,6 +330,11 @@
             "busybox.exe",
             "less",
             "less"
+        ],
+        [
+            "busybox.exe",
+            "link",
+            "link"
         ],
         [
             "busybox.exe",
@@ -413,6 +433,16 @@
         ],
         [
             "busybox.exe",
+            "pipe_progress",
+            "pipe_progress"
+        ],
+        [
+            "busybox.exe",
+            "pkill",
+            "pkill"
+        ],
+        [
+            "busybox.exe",
             "printenv",
             "printenv"
         ],
@@ -430,6 +460,16 @@
             "busybox.exe",
             "pwd",
             "pwd"
+        ],
+        [
+            "busybox.exe",
+            "readlink",
+            "readlink"
+        ],
+        [
+            "busybox.exe",
+            "realpath",
+            "realpath"
         ],
         [
             "busybox.exe",
@@ -493,6 +533,11 @@
         ],
         [
             "busybox.exe",
+            "shred",
+            "shred"
+        ],
+        [
+            "busybox.exe",
             "shuf",
             "shuf"
         ],
@@ -513,6 +558,11 @@
         ],
         [
             "busybox.exe",
+            "ssl_client",
+            "ssl_client"
+        ],
+        [
+            "busybox.exe",
             "stat",
             "stat"
         ],
@@ -520,6 +570,11 @@
             "busybox.exe",
             "strings",
             "strings"
+        ],
+        [
+            "busybox.exe",
+            "su",
+            "su"
         ],
         [
             "busybox.exe",
@@ -575,6 +630,11 @@
             "busybox.exe",
             "truncate",
             "truncate"
+        ],
+        [
+            "busybox.exe",
+            "ttysize",
+            "ttysize"
         ],
         [
             "busybox.exe",
