@@ -24,7 +24,7 @@ function extract_7zip($path, $to, $removal) {
         try {
             7z x "$path" -o"$to" -y | Out-File $logfile
         } catch [System.Management.Automation.CommandNotFoundException] {
-            abort "Cannot find '7Zip (7z.exe)' while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' and try again."
+            abort "Cannot find external 7Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7Zip manually and try again."
         }
     } else {
         &(file_path 7zip 7z.exe) x "$path" -o"$to" -y | Out-File $logfile
@@ -39,7 +39,7 @@ function extract_7zip($path, $to, $removal) {
         # Check for tar
         $listfiles = &(file_path 7zip 7z.exe) l "$path"
         if ($LASTEXITCODE -eq 0) {
-            $tar = ([Regex]"(\S*.tar)$").Matches($listfiles[-3]).Value # get inner tar file name
+            $tar = $listfiles[-3] -replace '.{53}(.*)', '$1' # get inner tar file name
             extract_7zip "$to\$tar" $to $true
         } else {
             abort "Failed to list files in $path.`nNot a 7Zip supported compressed file."

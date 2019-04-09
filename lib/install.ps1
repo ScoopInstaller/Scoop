@@ -102,7 +102,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     $cached = fullpath (cache_path $app $version $url)
 
     if(!(test-path $cached) -or !$use_cache) {
-        $null = ensure $cachedir
+        ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
@@ -534,11 +534,10 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             $extract_fn = 'extract_zip'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
-            $msi = msi $manifest $architecture
-            if(!$msi) {
-                $extract_fn = 'extract_msi'
-            } else {
+            if(msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
+            } else {
+                $extract_fn = 'extract_msi'
             }
         } elseif(file_requires_7zip $fname) { # 7zip
             if(!(7zip_installed)) {
@@ -552,11 +551,10 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            $null = mkdir "$dir\_tmp"
+            ensure "$dir\_tmp" | Out-Null
             & $extract_fn "$dir\$fname" "$dir\_tmp" $true
             if ($extract_to) {
-                $null = mkdir "$dir\$extract_to" -force
-                warn "'extract_to' property is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
+                ensure "$dir\$extract_to" | Out-Null
             }
             # fails if zip contains long paths (e.g. atom.json)
             #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
@@ -1165,7 +1163,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # we don't have persist data in the store, move the source to target, then create link
             } elseif (Test-Path $source) {
                 # ensure target parent folder exist
-                $null = ensure (Split-Path -Path $target)
+                ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
             # we don't have neither source nor target data! we need to crate an empty target,
             # but we can't make a judgement that the data should be a file or directory...
