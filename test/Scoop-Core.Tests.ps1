@@ -165,8 +165,8 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
     context "robocopy is not in path" {
         it "shims robocopy when not on path" -skip:$isUnix {
-            mock gcm { $false }
-            Get-Command robocopy | should -be $false
+            mock cmd_available { $false }
+            cmd_available robocopy | should -be $false
 
             ensure_robocopy_in_path
 
