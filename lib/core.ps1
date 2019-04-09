@@ -153,8 +153,7 @@ function file_path($app, $file) {
 }
 
 function cmd_available($cmd) {
-    try { Get-Command $cmd -ea stop | out-null } catch { return $false }
-    return $true
+    return [Boolean](Get-Command $cmd -ErrorAction Ignore)
 }
 
 function 7zip_path() {
