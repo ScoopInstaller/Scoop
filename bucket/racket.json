@@ -4,12 +4,12 @@
     "license": "LGPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://mirror.racket-lang.org/installers/7.2/racket-7.2-x86_64-win32.exe#/dl.7z",
-            "hash": "fead67267ef21747d6db4358e2eecb121356ea7983c8bdf0e7b3b2e485ae8525"
+            "url": "https://www.cs.utah.edu/plt/installers/7.2/racket-7.2-x86_64-win32.exe#/dl.7z",
+            "hash": "sha1:bdacb28b7f442e99359462d6b640c39c432bbbc1"
         },
         "32bit": {
-            "url": "https://mirror.racket-lang.org/installers/7.2/racket-7.2-i386-win32.exe#/dl.7z",
-            "hash": "5183dd55d7322eddb0b09426b461d63e6bab8e26dbfeb72f970c34c4ee344bd6"
+            "url": "https://www.cs.utah.edu/plt/installers/7.2/racket-7.2-i386-win32.exe#/dl.7z",
+            "hash": "sha1:480d5ccd1f48831a0ed6c085bfe22145f137ffb6"
         }
     },
     "bin": [
@@ -33,11 +33,15 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://mirror.racket-lang.org/installers/$version/racket-$version-x86_64-win32.exe#/dl.7z"
+                "url": "https://www.cs.utah.edu/plt/installers/$version/racket-$version-x86_64-win32.exe#/dl.7z"
             },
             "32bit": {
-                "url": "https://mirror.racket-lang.org/installers/$version/racket-$version-i386-win32.exe#/dl.7z"
+                "url": "https://www.cs.utah.edu/plt/installers/$version/racket-$version-i386-win32.exe#/dl.7z"
             }
+        },
+        "hash": {
+            "url": "https://download.racket-lang.org/releases/$version/",
+            "regex": "$basename[\\s\\S]*?\"checksum\">$sha1</span>"
         }
     }
 }
