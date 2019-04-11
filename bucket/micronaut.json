@@ -1,11 +1,11 @@
 {
     "description": "Micronaut - A modern, JVM-based (Java, Groovy, Kotlin), full-stack framework for building modular and testable microservice and serverless applications",
-    "version": "1.0.5",
+    "version": "1.1.0",
     "homepage": "https://micronaut.io",
     "license": "Apache-2.0",
-    "url": "https://github.com/micronaut-projects/micronaut-core/releases/download/v1.0.5/micronaut-1.0.5.zip",
-    "hash": "4a7ab0a1bd094ff19cd47fbe6382f7470f91ead146497090109ea202af35ff41",
-    "extract_dir": "micronaut-1.0.5",
+    "url": "https://github.com/micronaut-projects/micronaut-core/releases/download/v1.1.0/micronaut-1.1.0.zip",
+    "hash": "21595867692f61317a20c8222c88c86a6599663461b2bed1d1922e6643cc84b9",
+    "extract_dir": "micronaut-1.1.0",
     "bin": "bin\\mn.bat",
     "env_set": {
         "MICRONAUT_HOME": "$dir"
