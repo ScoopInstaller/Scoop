@@ -3,17 +3,30 @@
     "description": "NUnit Console runner for NUnit, the most popular and widely used unit testing framework for .NET",
     "version": "3.10.0",
     "license": "MIT",
-    "url": "https://github.com/nunit/nunit-console/releases/download/v3.10/NUnit.Console-3.10.0.zip",
-    "hash": "64f4420a90a3ee12c60a13d7162ac52e32b84b704bfd54b9e9d6d4500313d0ac",
+    "url": "https://packages.chocolatey.org/nunit-console-runner.3.10.0.nupkg",
+    "hash": "ffe44c9c1c118c570bc1758293a3a88ac02df1d78b7fbda78aabf200659cda15",
+    "extract_dir": "tools",
+    "post_install": "New-Item -Path \"$dir\\nunit.scoop.addins\" -ItemType File -Value '../../nunit-extension-*/current/     # find extensions installed under scoop' | Out-Null",
     "bin": "nunit3-console.exe",
     "suggest": {
-        "NuGet": "nuget"
+        "NuGet": "nuget",
+        "NUnit Extension": [
+            "nunit-extension-nunit-project-loader",
+            "nunit-extension-nunit-v2-driver",
+            "nunit-extension-nunit-v2-result-writer",
+            "nunit-extension-teamcity-event-listener",
+            "nunit-extension-vs-project-loader"
+        ]
     },
     "checkver": {
-        "github": "https://github.com/nunit/nunit-console/",
-        "regex": "NUnit\\.Console-([\\d\\.]+)\\.zip"
+        "url": "https://chocolatey.org/packages/nunit-console-runner",
+        "regex": "Chocolatey.*?([\\d.]+)\\r"
     },
     "autoupdate": {
-        "url": "https://github.com/nunit/nunit-console/releases/download/v$majorVersion.$minorVersion/NUnit.Console-$version.zip"
+        "url": "https://packages.chocolatey.org/nunit-console-runner.$version.nupkg",
+        "hash": {
+            "url": "https://chocolatey.org/packages/nunit-console-runner",
+            "regex": "$sha256.*?$basename"
+        }
     }
 }

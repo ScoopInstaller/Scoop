@@ -1,0 +1,21 @@
+{
+    "homepage": "https://nunit.org/",
+    "description": "NUnit Visual Studio Project Loader Extension",
+    "version": "3.8.0",
+    "license": "MIT",
+    "url": "https://packages.chocolatey.org/nunit-extension-vs-project-loader.3.8.0.nupkg",
+    "hash": "ed024f0c6695951babb015ce7eee601cfca68f40512ec95ac4fe07dc08e27f0a",
+    "extract_dir": "tools",
+    "depends": "nunit-console",
+    "checkver": {
+        "url": "https://chocolatey.org/packages/nunit-extension-vs-project-loader",
+        "regex": "Chocolatey.*?([\\d.]+)\\r"
+    },
+    "autoupdate": {
+        "url": "https://packages.chocolatey.org/nunit-extension-vs-project-loader.$version.nupkg",
+        "hash": {
+            "url": "https://chocolatey.org/packages/nunit-extension-vs-project-loader",
+            "regex": "$sha256.*?$basename"
+        }
+    }
+}
