@@ -1,0 +1,16 @@
+{
+    "version": "0.9.2",
+    "description": "Command line Java Decompiler.",
+    "homepage": "https://github.com/kwart/jd-cmd/",
+    "license": "GPL-3.0-only",
+    "url": "https://github.com/kwart/jd-cmd/releases/download/jd-cmd-0.9.2.Final/jd-cli-0.9.2-dist.zip",
+    "hash": "059c498e14510f588fede1f0230c6fb62e9e7ef34d8efd80ddee61a57d083404",
+    "bin": "jd-cli.jar",
+    "checkver": {
+        "github": "https://github.com/kwart/jd-cmd/",
+        "regex": "jd-cmd-([\\d\\.]+)\\."
+    },
+    "autoupdate": {
+        "url": "https://github.com/kwart/jd-cmd/releases/download/jd-cmd-$version.Final/jd-cli-$version-dist.zip"
+    }
+}

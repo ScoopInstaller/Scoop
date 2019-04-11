@@ -1,13 +1,13 @@
 {
-    "version": "0.141",
+    "version": "0.142",
     "description": "Java decompiler",
     "homepage": "https://www.benf.org/other/cfr",
     "license": "MIT",
     "suggest": {
         "JRE": "java/oraclejre8u"
     },
-    "url": "https://www.benf.org/other/cfr/cfr-0.141.jar#/cfr.jar",
-    "hash": "md5:3890cc7334ee7b34052da9b34999b006",
+    "url": "https://www.benf.org/other/cfr/cfr-0.142.jar#/cfr.jar",
+    "hash": "md5:e219e2758259f14cef1e99a1ea15e837",
     "bin": "cfr.jar",
     "checkver": "cfr-([\\d\\.]+)\\.jar",
     "autoupdate": {

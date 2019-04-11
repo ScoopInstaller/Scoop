@@ -1,0 +1,20 @@
+{
+    "homepage": "http://www.opus-codec.org/",
+    "version": "0.2",
+    "description": "Command-line utilities to encode, inspect, and decode .opus files.",
+    "license": "BSD-2-Clause|GPL-2.0-only",
+    "url": "https://archive.mozilla.org/pub/opus/win32/opus-tools-0.2-opus-1.3.zip",
+    "hash": "a1ae3c806adee9b008348166251f938dd7774ba6987d392187202b11d1152e90",
+    "bin": [
+        "opusenc.exe",
+        "opusdec.exe",
+        "opusinfo.exe"
+    ],
+    "checkver": {
+        "url": "http://www.opus-codec.org/downloads/",
+        "regex": "opus-tools-([\\d.]+)-opus-(?<opus>[\\d.]+).zip"
+    },
+    "autoupdate": {
+        "url": "https://archive.mozilla.org/pub/opus/win32/opus-tools-$version-opus-$matchOpus.zip"
+    }
+}
