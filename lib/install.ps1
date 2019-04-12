@@ -666,7 +666,7 @@ function check_hash($file, $hash, $app_name) {
 
 function compute_hash($file, $algname) {
     try {
-        if(cmd_available Get-FileHash) {
+        if(Test-CommandAvailable Get-FileHash) {
             return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
             $fs = [system.io.file]::openread($file)
