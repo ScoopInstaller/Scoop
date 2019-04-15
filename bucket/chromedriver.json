@@ -8,7 +8,7 @@
     "bin": "chromedriver.exe",
     "checkver": {
         "url": "https://sites.google.com/a/chromium.org/chromedriver/",
-        "re": "Latest stable release: ChromeDriver ([\\d.]+)"
+        "regex": "Latest stable release:\\s*<a[^>]+>ChromeDriver\\s*([\\d.]+)<"
     },
     "autoupdate": {
         "url": "https://chromedriver.storage.googleapis.com/$version/chromedriver_win32.zip"
