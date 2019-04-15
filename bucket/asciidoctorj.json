@@ -1,5 +1,5 @@
 {
-    "description": "AsciidoctorJ -  Asciidoctor integration & API for Java and other JVM languages",
+    "description": "Asciidoctor integration & API for Java and other JVM languages",
     "version": "1.6.2",
     "homepage": "https://asciidoctor.org/docs/asciidoctorj",
     "license": "Apache-2.0",
