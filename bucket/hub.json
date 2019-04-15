@@ -1,15 +1,15 @@
 {
     "homepage": "https://hub.github.com/",
-    "version": "2.11.1",
+    "version": "2.11.2",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/github/hub/releases/download/v2.11.1/hub-windows-amd64-2.11.1.zip",
-            "hash": "7bfb5bc5f090825141bc6fbbc5b34b7e9c937e63ca641a58715d7af645c944bd"
+            "url": "https://github.com/github/hub/releases/download/v2.11.2/hub-windows-amd64-2.11.2.zip",
+            "hash": "837fa0a61f4d0d48a3f09ca8f3f6b013feb7e748b21434809998a14b4ae8ec89"
         },
         "32bit": {
-            "url": "https://github.com/github/hub/releases/download/v2.11.1/hub-windows-386-2.11.1.zip",
-            "hash": "b723524f08bfe9c49668ddf3ea3b142fa572f4d8a48ccc1bdaf4cae6411b434a"
+            "url": "https://github.com/github/hub/releases/download/v2.11.2/hub-windows-386-2.11.2.zip",
+            "hash": "cfac3277683452f066ee48a2f321cc19b05b9936db911412eb7569cd1aaf8970"
         }
     },
     "bin": "bin\\hub.exe",
