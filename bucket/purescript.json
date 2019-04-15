@@ -2,11 +2,11 @@
     "homepage": "http://purescript.org/",
     "description": "A strongly-typed language that compiles to Javascript",
     "license": "MIT",
-    "version": "0.12.4",
+    "version": "0.12.5",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/purescript/purescript/releases/download/v0.12.4/win64.tar.gz",
-            "hash": "sha1:472d3f397912eb11265a0a413534f2a5d1a5df85"
+            "url": "https://github.com/purescript/purescript/releases/download/v0.12.5/win64.tar.gz",
+            "hash": "sha1:6b93a1d0c629414a6b9f6fc607edb4bc2d30e2d1"
         }
     },
     "bin": "purs.exe",
