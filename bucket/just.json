@@ -2,9 +2,9 @@
     "homepage": "https://github.com/casey/just",
     "description": "A command runner written in rust",
     "license": "CC0",
-    "version": "0.4.1",
-    "url": "https://github.com/casey/just/releases/download/v0.4.1/just-v0.4.1-x86_64-pc-windows-gnu.zip",
-    "hash": "482a31bfc61bf83cc1e61df7e5fc1f7bd224961bc103b7bc5bd4fea292eccbc3",
+    "version": "0.4.2",
+    "url": "https://github.com/casey/just/releases/download/v0.4.2/just-v0.4.2-x86_64-pc-windows-gnu.zip",
+    "hash": "f7aad1e08ec8dd69d13fbff55228cb924ee5b4b42e8d5f6b7c16f2c23ebcdf8d",
     "bin": "just.exe",
     "checkver": "github",
     "autoupdate": {
