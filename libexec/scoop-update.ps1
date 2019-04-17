@@ -51,6 +51,20 @@ if (!$branch) {
     set_config SCOOP_BRANCH "$branch"
 }
 
+if(($PSVersionTable.PSVersion.Major) -lt 5) {
+    # check powershell version
+    # should be deleted after Oct 1, 2019
+    If ((Get-Date).ToUniversalTime() -ge "2019-10-01") {
+        Write-Output "PowerShell 5 or later is required to run Scoop."
+        Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
+        break
+    } else {
+        Write-Output "PowerShell 5 or later is required to run Scoop."
+        Write-Output "Please upgrade before Oct 1, 2019 UTC."
+        Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
+    }
+}
+
 function update_scoop() {
     # check for git
     $git = try { Get-Command git -ea stop } catch { $null }
