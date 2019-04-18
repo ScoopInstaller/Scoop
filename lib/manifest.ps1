@@ -81,8 +81,7 @@ function save_install_info($info, $dir) {
     $nulls = $info.keys | Where-Object { $null -eq $info[$_] }
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
-    $file_content = $info | ConvertToPrettyJson
-    [System.IO.File]::WriteAllLines("$dir\install.json", $file_content)
+    Out-Manifest "$dir\install.json" $info
 }
 
 function install_info($app, $version, $global) {

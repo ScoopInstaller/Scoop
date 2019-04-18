@@ -173,8 +173,6 @@ foreach ($current in $MANIFESTS) {
 
         Write-Host "Writing updated $($current.app) manifest" -ForegroundColor DarkGreen
 
-        $current.manifest = $current.manifest | ConvertToPrettyJson
-        $path = Resolve-Path "$Dir\$($current.app).json"
-        [System.IO.File]::WriteAllLines($path, $current.manifest)
+        Out-Manifest (Resolve-Path "$Dir\$($current.app).json") $current.manifest
     }
 }
