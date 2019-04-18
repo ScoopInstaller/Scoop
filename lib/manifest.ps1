@@ -1,12 +1,9 @@
 . "$PSScriptRoot\core.ps1"
 . "$PSScriptRoot\autoupdate.ps1"
+. "$PSScriptRoot\json.ps1"
 
 function manifest_path($app, $bucket) {
     return fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
-}
-
-function parse_json($path) {
-    return Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
 }
 
 function Get-Manifest {

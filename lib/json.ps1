@@ -3,6 +3,10 @@
 # https://github.com/PowerShell/PowerShell/issues/2736 was fixed in pwsh
 # Still needed in normal powershell
 
+function parse_json($path) {
+    return Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+}
+
 function ConvertToPrettyJson {
     [CmdletBinding()]
 
