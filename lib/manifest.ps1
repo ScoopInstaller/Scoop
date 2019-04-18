@@ -33,11 +33,10 @@ function Out-Manifest {
     .PARAMETER Content
         Object representation of manifest.
     #>
-    param([Strin] $Path, $Content)
+    param([String] $Path, $Content)
 
     # TODO: YAML
-    $Content = $Content | ConvertToPretty-Json
-    $Content.Trim()
+    $Content = ($Content | ConvertToPrettyJson).Trim()
 
     [System.IO.File]::WriteAllLines($Path, $Content)
 }
