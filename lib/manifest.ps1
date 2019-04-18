@@ -10,18 +10,18 @@ function parse_json($path) {
 }
 
 function Get-Manifest {
-	<#
+    <#
     .SYNOPSIS
         Parse manifest.
     .PARAMETER Path
         Path to manifest.
     #>
-	param([String] $Path)
+    param([String] $Path)
 
-	if (!(Test-Path $Path)) { return $null }
+    if (!(Test-Path $Path)) { return $null }
 
-	# TODO: YML
-	return parse_json $Path
+    # TODO: YML
+    return parse_json $Path
 }
 
 function Out-Manifest {
