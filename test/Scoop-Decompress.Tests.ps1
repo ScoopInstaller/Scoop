@@ -18,11 +18,7 @@ function install_app_ci($app, $architecture) {
 
 function test_extract($extract_fn, $from, $removal) {
     $to = (strip_ext $from) -replace '\.tar$', ''
-    if ($removal) {
-        & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal
-    } else {
-        & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\')
-    }
+    & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal
     return $to
 }
 

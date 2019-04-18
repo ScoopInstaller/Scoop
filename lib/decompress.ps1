@@ -188,33 +188,17 @@ function Expand-ZipArchive {
 }
 
 function extract_7zip($path, $to, $removal) {
-    if ($removal) {
-        Expand-7ZipArchive -Path $path -DestinationPath $to -Removal
-    } else {
-        Expand-7ZipArchive -Path $path -DestinationPath $to
-    }
+    Expand-7ZipArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
 function extract_msi($path, $to, $removal) {
-    if ($removal) {
-        Expand-MSIArchive -Path $path -DestinationPath $to -Removal
-    } else {
-        Expand-MSIArchive -Path $path -DestinationPath $to
-    }
+    Expand-MSIArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
 function extract_inno($path, $to, $removal) {
-    if ($removal) {
-        Expand-InnoArchive -Path $path -DestinationPath $to -Removal
-    } else {
-        Expand-InnoArchive -Path $path -DestinationPath $to
-    }
+    Expand-InnoArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
 function extract_zip($path, $to, $removal) {
-    if ($removal) {
-        Expand-ZipArchive -Path $path -DestinationPath $to -Removal
-    } else {
-        Expand-ZipArchive -Path $path -DestinationPath $to
-    }
+    Expand-ZipArchive -Path $path -DestinationPath $to -Removal:$removal
 }
