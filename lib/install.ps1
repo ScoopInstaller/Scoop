@@ -529,22 +529,18 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         # work out extraction method, if applicable
         $extract_fn = $null
         if ($manifest.innosetup) {
-            $extract_fn = 'extract_inno'
+            $extract_fn = 'Expand-InnoArchive'
         } elseif($fname -match '\.zip$') {
-            $extract_fn = 'extract_zip'
+            $extract_fn = 'Expand-ZipArchive'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
             if(msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
             } else {
-                $extract_fn = 'extract_msi'
+                $extract_fn = 'Expand-MSIArchive'
             }
-        } elseif(file_requires_7zip $fname) { # 7zip
-            if(!(7zip_installed)) {
-                warn "Aborting. You'll need to run 'scoop uninstall $app' to clean up."
-                abort "7-zip is required. You can install it with 'scoop install 7zip'."
-            }
-            $extract_fn = 'extract_7zip'
+        } elseif(Test-7ZipRequirement -File $fname) { # 7zip
+            $extract_fn = 'Expand-7ZipArchive'
         }
 
         if($extract_fn) {
@@ -552,7 +548,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
             ensure "$dir\_tmp" | Out-Null
-            & $extract_fn "$dir\$fname" "$dir\_tmp" $true
+            & $extract_fn "$dir\$fname" "$dir\_tmp" -Removal
             if ($extract_to) {
                 ensure "$dir\$extract_to" | Out-Null
             }
@@ -566,7 +562,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                 abort $(new_issue_msg $app $bucket "extract_dir error")
             }
 
-            if(test-path "$dir\_tmp") { # might have been moved by movedir
+            if(Test-Path "$dir\_tmp") { # might have been moved by movedir
                 try {
                     Remove-Item -r -force "$dir\_tmp" -ea stop
                 } catch [system.io.pathtoolongexception] {

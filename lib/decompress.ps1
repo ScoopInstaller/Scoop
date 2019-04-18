@@ -1,114 +1,175 @@
-function requires_7zip($manifest, $architecture) {
-    if (get_config 7ZIPEXTRACT_USE_EXTERNAL) {
-        return $false
+function Test-7ZipRequirement {
+    [CmdletBinding(DefaultParameterSetName = "URL")]
+    [OutputType([Boolean])]
+    param(
+        [Parameter(Mandatory = $true, ParameterSetName = "URL")]
+        [String[]]
+        $URL,
+        [Parameter(Mandatory = $true, ParameterSetName = "File")]
+        [String]
+        $File
+    )
+    if ($URL) {
+        if (get_config 7ZIPEXTRACT_USE_EXTERNAL) {
+            return $false
+        } else {
+            return ($URL | Where-Object { Test-7ZipRequirement -File $_ }).Count -gt 0
+        }
     } else {
-        return (@(url $manifest $architecture) | Where-Object { file_requires_7zip $_ }).Count -gt 0
+        return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
     }
 }
 
-function requires_lessmsi ($manifest, $architecture) {
+function Test-LessMSIRequirement {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $URL
+    )
     if (get_config MSIEXTRACT_USE_LESSMSI) {
-        return (@(url $manifest $architecture) | Where-Object { $_ -match '\.msi$' }).Count -gt 0
+        return ($URL | Where-Object { $_ -match '\.msi$' }).Count -gt 0
     } else {
         return $false
     }
 }
 
-function file_requires_7zip($fname) {
-    $fname -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
-}
-
-function extract_7zip($path, $to, $removal) {
-    $logfile = "$(Split-Path $path)\7zip.log"
+function Expand-7ZipArchive {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [Switch]
+        $Removal
+    )
+    $LogLocation = "$(Split-Path $Path)\7zip.log"
     if (get_config 7ZIPEXTRACT_USE_EXTERNAL) {
         try {
-            7z x "$path" -o"$to" -y | Out-File $logfile
+            7z x "$Path" -o"$DestinationPath" -y | Out-File $LogLocation
         } catch [System.Management.Automation.CommandNotFoundException] {
             abort "Cannot find external 7Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7Zip manually and try again."
         }
     } else {
-        &(file_path 7zip 7z.exe) x "$path" -o"$to" -y | Out-File $logfile
+        &(file_path 7zip 7z.exe) x "$Path" -o"$DestinationPath" -y | Out-File $LogLocation
     }
     if ($LASTEXITCODE -ne 0) {
-        abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
     }
-    if (Test-Path $logfile) {
-        Remove-Item $logfile -Force
+    if (Test-Path $LogLocation) {
+        Remove-Item $LogLocation -Force
     }
-    if ((strip_ext (fname $path)) -match '\.tar$' -or (fname $path) -match '\.tgz$') {
+    if ((strip_ext $Path) -match '\.tar$' -or $Path -match '\.tgz$') {
         # Check for tar
-        $listfiles = &(file_path 7zip 7z.exe) l "$path"
+        $ArchivedFile = &(file_path 7zip 7z.exe) l "$Path"
         if ($LASTEXITCODE -eq 0) {
-            $tar = $listfiles[-3] -replace '.{53}(.*)', '$1' # get inner tar file name
-            extract_7zip "$to\$tar" $to $true
+            $TarFile = $ArchivedFile[-3] -replace '.{53}(.*)', '$1' # get inner tar file name
+            Expand-7ZipArchive "$DestinationPath\$TarFile" $DestinationPath -Removal
         } else {
-            abort "Failed to list files in $path.`nNot a 7Zip supported compressed file."
+            abort "Failed to list files in $Path.`nNot a 7Zip supported archive file."
         }
     }
-    if ($removal) {
-        # Clean up compressed files
-        Remove-Item $path -Force
+    if ($Removal) {
+        # Remove original archive file
+        Remove-Item $Path -Force
     }
 }
 
-function extract_msi($path, $to, $removal) {
-    $logfile = "$(split-path $path)\msi.log"
+function Expand-MSIArchive {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [Switch]
+        $Removal
+    )
+    $LogLocation = "$(Split-Path $Path)\msi.log"
     if (get_config MSIEXTRACT_USE_LESSMSI) {
-        &(file_path lessmsi lessmsi.exe) x "$path" "$to\" | Out-File $logfile
+        &(file_path lessmsi lessmsi.exe) x "$Path" "$DestinationPath\" | Out-File $LogLocation
         if ($LASTEXITCODE -ne 0) {
-            abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
+            abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
         }
-        if (Test-Path "$to\SourceDir") {
-            movedir "$to\SourceDir" "$to" | Out-Null
+        if (Test-Path "$DestinationPath\SourceDir") {
+            movedir "$DestinationPath\SourceDir" "$DestinationPath" | Out-Null
         }
     } else {
-        $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
+        $ok = run 'msiexec' @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath`"", "/lwe `"$LogLocation`"")
         if (!$ok) {
-            abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
+            abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
         }
-        Remove-Item "$to\$(fname $path)" -Force
+        Remove-Item "$DestinationPath\$(fname $Path)" -Force
     }
-    if (Test-Path $logfile) {
-        Remove-Item $logfile -Force
+    if (Test-Path $LogLocation) {
+        Remove-Item $LogLocation -Force
     }
-    if ($removal) {
-        # Clean up compressed files
-        Remove-Item $path -Force
+    if ($Removal) {
+        # Remove original archive file
+        Remove-Item $Path -Force
     }
 }
 
-function extract_inno($path, $to, $removal) {
-    $logfile = "$(Split-Path $path)\innounp.log"
-    &(file_path innounp innounp.exe) -x -d"$to" -c'{app}' "$path" -y | Out-File $logfile
+function Expand-InnoArchive {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [Switch]
+        $Removal
+    )
+    $LogLocation = "$(Split-Path $Path)\innounp.log"
+    &(file_path innounp innounp.exe) -x -d"$DestinationPath" -c'{app}' "$Path" -y | Out-File $LogLocation
     if ($LASTEXITCODE -ne 0) {
-        abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)"
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
     }
-    if (Test-Path $logfile) {
-        Remove-Item $logfile -Force
+    if (Test-Path $LogLocation) {
+        Remove-Item $LogLocation -Force
     }
-    if ($removal) {
-        # Clean up compressed files
-        Remove-Item $path -Force
+    if ($Removal) {
+        # Remove original archive file
+        Remove-Item $Path -Force
     }
 }
 
-function extract_zip($path, $to, $removal) {
+function Expand-ZipArchive {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [Switch]
+        $Removal
+    )
     # All methods to unzip the file require .NET4.5+
     if ($PSVersionTable.PSVersion.Major -lt 5) {
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         try {
-            [System.IO.Compression.ZipFile]::ExtractToDirectory($path, $to)
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath)
         } catch [System.IO.PathTooLongException] {
             # try to fall back to 7zip if path is too long
             if (7zip_installed) {
-                extract_7zip $path $to $removal
+                Expand-7ZipArchive $Path $DestinationPath -Removal
                 return
             } else {
                 abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
             }
         } catch [System.IO.IOException] {
             if (7zip_installed) {
-                extract_7zip $path $to $removal
+                Expand-7ZipArchive $Path $DestinationPath -Removal
                 return
             } else {
                 abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
@@ -118,10 +179,42 @@ function extract_zip($path, $to, $removal) {
         }
     } else {
         # Use Expand-Archive to unzip in PowerShell 5+
-        Expand-Archive -Path $path -DestinationPath $to -Force
+        Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     }
+    if ($Removal) {
+        # Remove original archive file
+        Remove-Item $Path -Force
+    }
+}
+
+function extract_7zip($path, $to, $removal) {
     if ($removal) {
-        # Clean up compressed files
-        Remove-Item $path -Force
+        Expand-7ZipArchive -Path $path -DestinationPath $to -Removal
+    } else {
+        Expand-7ZipArchive -Path $path -DestinationPath $to
+    }
+}
+
+function extract_msi($path, $to, $removal) {
+    if ($removal) {
+        Expand-MSIArchive -Path $path -DestinationPath $to -Removal
+    } else {
+        Expand-MSIArchive -Path $path -DestinationPath $to
+    }
+}
+
+function extract_inno($path, $to, $removal) {
+    if ($removal) {
+        Expand-InnoArchive -Path $path -DestinationPath $to -Removal
+    } else {
+        Expand-InnoArchive -Path $path -DestinationPath $to
+    }
+}
+
+function extract_zip($path, $to, $removal) {
+    if ($removal) {
+        Expand-ZipArchive -Path $path -DestinationPath $to -Removal
+    } else {
+        Expand-ZipArchive -Path $path -DestinationPath $to
     }
 }

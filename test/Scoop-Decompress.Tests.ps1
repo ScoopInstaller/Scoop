@@ -18,7 +18,11 @@ function install_app_ci($app, $architecture) {
 
 function test_extract($extract_fn, $from, $removal) {
     $to = (strip_ext $from) -replace '\.tar$', ''
-    & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') $removal
+    if ($removal) {
+        & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal
+    } else {
+        & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\')
+    }
     return $to
 }
 
@@ -32,7 +36,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         $testcases = "$working_dir\TestCases.zip"
         $testcases | Should -Exist
         compute_hash $testcases 'sha256' | Should -Be '695bb18cafda52644a19afd184b2545e9c48f1a191f7ff1efc26cb034587079c'
-        extract_zip $testcases $working_dir
+        Expand-Archive $testcases $working_dir
     }
 
     Context "7zip extraction" {
@@ -46,7 +50,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         }
 
         It "extract normal compressed file" -Skip:$isUnix {
-            $to = test_extract "extract_7zip" $test1
+            $to = test_extract "Expand-7ZipArchive" $test1
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
@@ -54,28 +58,28 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         It "extract nested compressed file" -Skip:$isUnix {
             # file ext: tgz
-            $to = test_extract "extract_7zip" $test2
+            $to = test_extract "Expand-7ZipArchive" $test2
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
 
             # file ext: tar.bz2
-            $to = test_extract "extract_7zip" $test3
+            $to = test_extract "Expand-7ZipArchive" $test3
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
         It "extract nested compressed file with different inner name" -Skip:$isUnix {
-            $to = test_extract "extract_7zip" $test4
+            $to = test_extract "Expand-7ZipArchive" $test4
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It "works with '`$removal' param" -Skip:$isUnix {
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
             $test1 | Should -Exist
-            test_extract "extract_7zip" $test1 $true
+            test_extract "Expand-7ZipArchive" $test1 $true
             $test1 | Should -Not -Exist
         }
     }
@@ -89,7 +93,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         It "extract normal MSI file" -Skip:$isUnix {
             mock get_config { $false }
-            $to = test_extract "extract_msi" $test1
+            $to = test_extract "Expand-MSIArchive" $test1
             $to | Should -Exist
             "$to\MSITest\empty" | Should -Exist
             (Get-ChildItem "$to\MSITest").Count | Should -Be 1
@@ -97,14 +101,14 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         It "extract empty MSI file using lessmsi" -Skip:$isUnix {
             mock get_config { $true }
-            $to = test_extract "extract_msi" $test2
+            $to = test_extract "Expand-MSIArchive" $test2
             $to | Should -Exist
         }
 
-        It "works with '`$removal' param" -Skip:$isUnix {
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
             mock get_config { $false }
             $test1 | Should -Exist
-            test_extract "extract_msi" $test1 $true
+            test_extract "Expand-MSIArchive" $test1 $true
             $test1 | Should -Not -Exist
         }
     }
@@ -117,15 +121,15 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         }
 
         It "extract Inno Setup file" -Skip:$isUnix {
-            $to = test_extract "extract_inno" $test
+            $to = test_extract "Expand-InnoArchive" $test
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It "works with '`$removal' param" -Skip:$isUnix {
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
             $test | Should -Exist
-            test_extract "extract_inno" $test $true
+            test_extract "Expand-InnoArchive" $test $true
             $test | Should -Not -Exist
         }
     }
@@ -137,15 +141,15 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         }
 
         It "extract compressed file" -Skip:$isUnix {
-            $to = test_extract "extract_zip" $test
+            $to = test_extract "Expand-ZipArchive" $test
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It "works with '`$removal' param" -Skip:$isUnix {
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
             $test | Should -Exist
-            test_extract "extract_zip" $test $true
+            test_extract "Expand-ZipArchive" $test $true
             $test | Should -Not -Exist
         }
     }
