@@ -10,7 +10,7 @@ function parse_json($path) {
 }
 
 function Get-Manifest {
-    <#
+	<#
     .SYNOPSIS
         Parse manifest.
     .PARAMETER Path
@@ -20,7 +20,7 @@ function Get-Manifest {
 
 	if (!(Test-Path $Path)) { return $null }
 
-    # TODO: YML
+	# TODO: YML
 	return parse_json $Path
 }
 
@@ -60,7 +60,8 @@ function url_manifest($url) {
 
 function manifest($app, $bucket, $url) {
     if($url) { return url_manifest $url }
-    return parse_json (manifest_path $app $bucket)
+
+    return Get-Manifest (manifest_path $app $bucket)
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
@@ -74,7 +75,7 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
 }
 
 function installed_manifest($app, $version, $global) {
-    return parse_json "$(versiondir $app $version $global)\manifest.json"
+    return Get-Manifest "$(versiondir $app $version $global)\manifest.json"
 }
 
 function save_install_info($info, $dir) {
@@ -87,8 +88,7 @@ function save_install_info($info, $dir) {
 
 function install_info($app, $version, $global) {
     $path = "$(versiondir $app $version $global)\install.json"
-    if(!(test-path $path)) { return $null }
-    return parse_json $path
+    return Get-Manifest $path
 }
 
 function default_architecture {

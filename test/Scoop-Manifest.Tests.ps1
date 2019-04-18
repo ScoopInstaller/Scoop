@@ -87,7 +87,7 @@ describe -Tag 'Manifests' "manifest-validation" {
                     }
                 }
 
-                $manifest = parse_json $file.fullname
+                $manifest = Get-Manifest $file.fullname
                 $url = arch_specific "url" $manifest "32bit"
                 $url64 = arch_specific "url" $manifest "64bit"
                 if(!$url) {

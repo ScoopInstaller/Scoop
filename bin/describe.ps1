@@ -26,7 +26,7 @@ $Dir = Resolve-Path $Dir
 $Queue = @()
 
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $manifest = parse_json "$Dir\$($_.Name)"
+    $manifest = Get-Manifest "$Dir\$($_.Name)"
     $Queue += , @(($_.Name -replace '\.json$', ''), $manifest)
 }
 

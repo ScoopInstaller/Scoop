@@ -168,7 +168,7 @@ hub diff --name-only | ForEach-Object {
     }
 
     $app = ([System.IO.Path]::GetFileNameWithoutExtension($manifest))
-    $json = parse_json $manifest
+    $json = Get-Manifest $manifest
     if (!$json.version) {
         error "Invalid manifest: $manifest ..."
         return

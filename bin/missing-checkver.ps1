@@ -29,7 +29,7 @@ Write-Host ']utoupdate'
 Write-Host ' |  |'
 
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = parse_json "$Dir\$($_.Name)"
+    $json = Get-Manifest "$Dir\$($_.Name)"
 
     if ($SkipSupported -and $json.checkver -and $json.autoupdate) { return }
 

@@ -78,7 +78,7 @@ $Search = $App
 $Queue = @()
 $json = ''
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = parse_json "$Dir\$($_.Name)"
+    $json = Get-Manifest "$Dir\$($_.Name)"
     if ($json.checkver) {
         $Queue += , @($_.Name, $json)
     }

@@ -62,7 +62,7 @@ function err ([String] $name, [String[]] $message) {
 $MANIFESTS = @()
 foreach ($single in Get-ChildItem $Dir "$App.json") {
     $name = (strip_ext $single.Name)
-    $manifest = parse_json "$Dir\$($single.Name)"
+    $manifest = Get-Manifest "$Dir\$($single.Name)"
 
     # Skip nighly manifests, since their hash validation is skipped
     if ($manifest.version -eq 'nightly') { continue }

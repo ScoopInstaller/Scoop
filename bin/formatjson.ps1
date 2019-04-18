@@ -36,7 +36,7 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
     if ($PSVersionTable.PSVersion.Major -gt 5) { $_ = $_.Name } # Fix for pwsh
 
     # beautify
-    $json = parse_json "$Dir\$_" | ConvertToPrettyJson
+    $json = Get-Manifest "$Dir\$_" | ConvertToPrettyJson
 
     # convert to 4 spaces
     $json = $json -replace "`t", '    '
