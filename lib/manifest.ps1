@@ -1,13 +1,45 @@
-. "$psscriptroot/core.ps1"
-. "$psscriptroot/autoupdate.ps1"
+. "$PSScriptRoot\core.ps1"
+. "$PSScriptRoot\autoupdate.ps1"
 
 function manifest_path($app, $bucket) {
-    fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
+    return fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
 }
 
 function parse_json($path) {
-    if(!(test-path $path)) { return $null }
-    Get-Content $path -raw -Encoding UTF8 | convertfrom-json -ea stop
+    return Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+}
+
+function Get-Manifest {
+    <#
+    .SYNOPSIS
+        Parse manifest.
+    .PARAMETER Path
+        Path to manifest.
+    #>
+	param([String] $Path)
+
+	if (!(Test-Path $Path)) { return $null }
+
+    # TODO: YML
+	return parse_json $Path
+}
+
+function Out-Manifest {
+    <#
+    .SYNOPSIS
+        Write manifest into file.
+    .PARAMETER Path
+        Location of manifest.
+    .PARAMETER Content
+        Object representation of manifest.
+    #>
+    param([Strin] $Path, $Content)
+
+    # TODO: YAML
+    $Content = $Content | ConvertToPretty-Json
+    $Content.Trim()
+
+    [System.IO.File]::WriteAllLines($Path, $Content)
 }
 
 function url_manifest($url) {
@@ -22,12 +54,13 @@ function url_manifest($url) {
         throw
     }
     if(!$str) { return $null }
-    $str | convertfrom-json
+
+    return $str | convertfrom-json
 }
 
 function manifest($app, $bucket, $url) {
     if($url) { return url_manifest $url }
-    parse_json (manifest_path $app $bucket)
+    return parse_json (manifest_path $app $bucket)
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
@@ -41,7 +74,7 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
 }
 
 function installed_manifest($app, $version, $global) {
-    parse_json "$(versiondir $app $version $global)\manifest.json"
+    return parse_json "$(versiondir $app $version $global)\manifest.json"
 }
 
 function save_install_info($info, $dir) {
@@ -55,12 +88,12 @@ function save_install_info($info, $dir) {
 function install_info($app, $version, $global) {
     $path = "$(versiondir $app $version $global)\install.json"
     if(!(test-path $path)) { return $null }
-    parse_json $path
+    return parse_json $path
 }
 
 function default_architecture {
     if([intptr]::size -eq 8) { return "64bit" }
-    "32bit"
+    return "32bit"
 }
 
 function arch_specific($prop, $manifest, $architecture) {
