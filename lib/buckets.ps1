@@ -40,11 +40,16 @@ function apps_in_bucket($dir) {
 }
 
 function buckets {
-    $buckets = @()
-    if(test-path $bucketsdir) {
-        Get-ChildItem $bucketsdir | ForEach-Object { $buckets += $_.Name }
-    }
-    return $buckets
+    return (Get-ChildItem $bucketsdir).Name
+}
+
+function Get-LocalBucket {
+	<#
+    .SYNOPSIS
+        List all local buckets.
+    #>
+
+	return buckets
 }
 
 function find_manifest($app, $bucket) {
@@ -54,7 +59,7 @@ function find_manifest($app, $bucket) {
         return $null
     }
 
-    $buckets = @($null) + @(buckets) # null for main bucket
+    $buckets = @($null) + @(Get-LocalBucket) # null for main bucket
     foreach($bucket in $buckets) {
         $manifest = manifest $app $bucket
         if($manifest) { return $manifest, $bucket }
