@@ -39,17 +39,17 @@ function apps_in_bucket($dir) {
     return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
 }
 
-function buckets {
-    return (Get-ChildItem $bucketsdir).Name
-}
-
 function Get-LocalBucket {
 	<#
     .SYNOPSIS
         List all local buckets.
     #>
 
-	return buckets
+	return (Get-ChildItem $bucketsdir).Name
+}
+
+function buckets {
+    return Get-LocalBucket
 }
 
 function find_manifest($app, $bucket) {
