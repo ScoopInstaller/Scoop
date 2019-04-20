@@ -145,7 +145,7 @@ foreach ($current in $MANIFESTS) {
             if (Test-Path $file) {
                 Write-Host  "`tFirst bytes:`t$((get_magic_bytes_pretty $file ' ').ToUpper())"
             }
-            Write-Host  "`tExpected:`t$($current.urls[$_])" -ForegroundColor Green
+            Write-Host  "`tExpected:`t$($current.hashes[$_])" -ForegroundColor Green
             Write-Host  "`tActual:`t`t$($actuals[$_])" -ForegroundColor Red
         }
     }

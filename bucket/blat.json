@@ -1,7 +1,7 @@
 {
-    "homepage": "https://www.blat.net",
     "version": "3.2.19",
     "description": "A Windows command line utility that sends eMail using SMTP or post to usenet using NNTP.",
+    "homepage": "https://www.blat.net",
     "license": {
         "identifier": "Public Domain",
         "url": "https://www.blat.net/?docs/license.txt"
