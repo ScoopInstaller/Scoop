@@ -1,3 +1,5 @@
+. "$PSScriptRoot\core.ps1"
+
 $bucketsdir = "$scoopdir\buckets"
 
 <#
@@ -49,6 +51,8 @@ function Get-LocalBucket {
 }
 
 function buckets {
+    Show-DeprecatedWarning $MyInvocation 'Get-LocalBucet'
+
     return Get-LocalBucket
 }
 
