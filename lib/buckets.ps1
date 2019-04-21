@@ -51,7 +51,7 @@ function Get-LocalBucket {
 }
 
 function buckets {
-    Show-DeprecatedWarning $MyInvocation 'Get-LocalBucet'
+    Show-DeprecatedWarning $MyInvocation 'Get-LocalBucket'
 
     return Get-LocalBucket
 }
