@@ -70,6 +70,25 @@ function find_manifest($app, $bucket) {
     }
 }
 
+function Convert-RepositoryURL {
+    <#
+    .SYNOPSIS
+        Convert repository URL into comparable format.
+    .PARAMETER Url
+        Repository URL.
+    #>
+    param([String] $URL)
+
+    # https://regex101.com/r/YkCcid/3
+    $URL -match '(@|:\/\/)(www\.)?(?<provider>.+)[:\/](?<user>.+)\/(?<repo>.+)$' | Out-Null
+    $comparable = $Matches.provider + '/' + $Matches.user + '/' + $Matches.repo
+    if ($comparable.EndsWith('.git')) {
+        $comparable = $comparable.Substring(0, $comparable.IndexOf('.git'))
+    }
+
+    return $comparable
+}
+
 function add_bucket($name, $repo) {
     if (!$name) { "<name> missing"; $usage_add; exit 1 }
     if (!$repo) {
@@ -87,6 +106,22 @@ function add_bucket($name, $repo) {
         warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
         exit 0
     }
+
+    $cmp_repo = Convert-RepositoryURL $repo
+    $err = $false
+
+    Get-LocalBucket | ForEach-Object {
+        Push-Location "$bucketsdir\$_"
+        $remote = git_config --get remote.origin.url
+        $cmp_remote = Convert-RepositoryURL $remote
+
+        if ($cmp_remote -eq $cmp_repo) {
+            error "Bucket $_ already exists for $repo"
+            $err = $true
+        }
+        Pop-Location
+    }
+    if ($err) { exit 1 }
 
     write-host 'Checking repo... ' -nonewline
     $out = git_ls_remote $repo 2>&1
