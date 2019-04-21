@@ -1,3 +1,5 @@
+. "$PSScriptRoot\core.ps1"
+
 $bucketsdir = "$scoopdir\buckets"
 
 <#
@@ -39,12 +41,19 @@ function apps_in_bucket($dir) {
     return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
 }
 
+function Get-LocalBucket {
+    <#
+    .SYNOPSIS
+        List all local buckets.
+    #>
+
+    return (Get-ChildItem $bucketsdir).Name
+}
+
 function buckets {
-    $buckets = @()
-    if(test-path $bucketsdir) {
-        Get-ChildItem $bucketsdir | ForEach-Object { $buckets += $_.Name }
-    }
-    return $buckets
+    Show-DeprecatedWarning $MyInvocation 'Get-LocalBucket'
+
+    return Get-LocalBucket
 }
 
 function find_manifest($app, $bucket) {
@@ -54,7 +63,7 @@ function find_manifest($app, $bucket) {
         return $null
     }
 
-    $buckets = @($null) + @(buckets) # null for main bucket
+    $buckets = @($null) + @(Get-LocalBucket) # null for main bucket
     foreach($bucket in $buckets) {
         $manifest = manifest $app $bucket
         if($manifest) { return $manifest, $bucket }
