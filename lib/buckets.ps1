@@ -47,7 +47,7 @@ function Get-LocalBucket {
         List all local buckets.
     #>
 
-    return (Get-ChildItem $bucketsdir).Name
+    return (Get-ChildItem $bucketsdir -ErrorAction SilentlyContinue).Name
 }
 
 function buckets {
