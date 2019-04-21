@@ -113,9 +113,8 @@ function add_bucket($name, $repo) {
     Get-LocalBucket | ForEach-Object {
         Push-Location "$bucketsdir\$_"
         $remote = git_config --get remote.origin.url
-        $cmp_remote = Convert-RepositoryURL $remote
 
-        if ($cmp_remote -eq $cmp_repo) {
+        if ((Convert-RepositoryURL $remote) -eq $cmp_repo) {
             error "Bucket $_ already exists for $repo"
             $err = $true
         }
