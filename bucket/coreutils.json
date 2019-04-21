@@ -1,23 +1,23 @@
 {
-    "homepage": "http://www.mingw.org/wiki/msys",
-    "description": "A collection of GNU utilities such as bash, make, gawk and grep",
-    "license": "GPL-2.0",
     "version": "5.97.3",
+    "description": "A collection of GNU utilities such as bash, make, gawk and grep",
+    "homepage": "http://www.mingw.org/wiki/msys",
+    "license": "GPL-2.0-only",
     "url": [
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/gettext/gettext-0.17-2/libintl-0.17-2-msys-dll-8.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/libiconv/libiconv-1.13.1-2/libiconv-1.13.1-2-msys-1.0.13-dll-2.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/termcap/termcap-0.20050421_1-2/libtermcap-0.20050421_1-2-msys-1.0.13-dll-0.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/coreutils/coreutils-5.97-3/coreutils-5.97-3-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/coreutils/coreutils-5.97-3/coreutils-5.97-3-msys.RELEASE_NOTES.txt"
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/gettext/gettext-0.17-2/libintl-0.17-2-msys-dll-8.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/libiconv/libiconv-1.13.1-2/libiconv-1.13.1-2-msys-1.0.13-dll-2.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/termcap/termcap-0.20050421_1-2/libtermcap-0.20050421_1-2-msys-1.0.13-dll-0.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/coreutils/coreutils-5.97-3/coreutils-5.97-3-msys-1.0.13-bin.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/coreutils/coreutils-5.97-3/coreutils-5.97-3-msys.RELEASE_NOTES.txt"
     ],
     "hash": [
-        "41c7d5561662e41da74951f373a08a95db40b27b1246227bbbc13abc44976ea7",
-        "b533de0ee04dc4d53ca745210e41eb9437044ebd367c001f3615092e7214a4a3",
-        "f13de6d2e3c428e7f9a7251c6b01d6f7569e20f7ac126c68c028eb5f542473bb",
-        "62b58fe0880f0972fcc84a819265989b02439c1c5185870227bd25f870f7adb6",
-        "f8c7990416ea16a74ac336dcfe0f596bc46b8724b2d58cf8a3509414220b2366",
-        "256208bca7a86a10bc377bdccfe6fb8f1e1f1868d0d1952a6692ee9f1d985abd"
+        "sha1:fff020614bd796697739887c636f15a42b4b14aa",
+        "sha1:f4fd249ff5810b01fedc4a1dbdbe1b7d1e4cc619",
+        "sha1:2b64c42ac61c7ebd710333a6db2f35b21e4fccaf",
+        "sha1:e4273ccfde8ecf3a7631446fb2b01971a24ff9f7",
+        "sha1:54ac256a8f0c6a89f1b3c7758f3703b4e56382be",
+        "sha1:d5e3fc0f1450527b07259802f585d9186fa78c00"
     ],
     "bin": [
         "bin\\basename.exe",

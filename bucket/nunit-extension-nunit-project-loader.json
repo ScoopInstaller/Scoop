@@ -1,0 +1,21 @@
+{
+    "homepage": "https://nunit.org/",
+    "description": "NUnit Project Loader Extension",
+    "version": "3.6.0",
+    "license": "MIT",
+    "url": "https://packages.chocolatey.org/nunit-extension-nunit-project-loader.3.6.0.nupkg",
+    "hash": "521c80333844358fcb8cd9896464f87a31dd20dfa4998d1bb6f881e855753dc5",
+    "extract_dir": "tools",
+    "depends": "nunit-console",
+    "checkver": {
+        "url": "https://chocolatey.org/packages/nunit-extension-nunit-project-loader",
+        "regex": "Chocolatey.*?([\\d.]+)\\r"
+    },
+    "autoupdate": {
+        "url": "https://packages.chocolatey.org/nunit-extension-nunit-project-loader.$version.nupkg",
+        "hash": {
+            "url": "https://chocolatey.org/packages/nunit-extension-nunit-project-loader",
+            "regex": "$sha256.*?$basename"
+        }
+    }
+}

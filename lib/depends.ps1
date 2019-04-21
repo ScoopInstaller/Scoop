@@ -24,8 +24,8 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
     $unresolved += $app
     $null, $manifest, $null, $null = locate $app $bucket
 
-    if (!$manifest) {
-        if (((buckets) -notcontains $bucket) -and $bucket) {
+    if(!$manifest) {
+        if(((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
             warn "Bucket '$bucket' not installed. Add it with 'scoop bucket add $bucket' or 'scoop bucket add $bucket <repo>'."
         }
         abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })"

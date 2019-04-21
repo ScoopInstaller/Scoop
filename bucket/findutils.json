@@ -1,20 +1,21 @@
 {
-    "homepage": "http://www.mingw.org/wiki/msys",
     "version": "4.4.2",
-    "license": "GPL-2.0",
+    "description": "Basic file searching utilities.",
+    "homepage": "http://www.mingw.org/wiki/msys",
+    "license": "GPL-2.0-only",
     "url": [
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/gettext/gettext-0.17-2/libintl-0.17-2-msys-dll-8.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/libiconv/libiconv-1.13.1-2/libiconv-1.13.1-2-msys-1.0.13-dll-2.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/findutils/findutils-4.4.2-2/findutils-4.4.2-2-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/findutils/findutils-4.4.2-2/locate-4.4.2-2-msys-1.0.13-bin.tar.lzma"
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/msys-core/msys-1.0.13-2/msysCORE-1.0.13-2-msys-1.0.13-bin.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/gettext/gettext-0.17-2/libintl-0.17-2-msys-dll-8.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/libiconv/libiconv-1.13.1-2/libiconv-1.13.1-2-msys-1.0.13-dll-2.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/findutils/findutils-4.4.2-2/findutils-4.4.2-2-msys-1.0.13-bin.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/findutils/findutils-4.4.2-2/locate-4.4.2-2-msys-1.0.13-bin.tar.lzma"
     ],
     "hash": [
-        "41c7d5561662e41da74951f373a08a95db40b27b1246227bbbc13abc44976ea7",
-        "b533de0ee04dc4d53ca745210e41eb9437044ebd367c001f3615092e7214a4a3",
-        "f13de6d2e3c428e7f9a7251c6b01d6f7569e20f7ac126c68c028eb5f542473bb",
-        "779e819b7942dc070c45f4cba633e6a9ae4bfe8b506a3541f4ce86ad0595726d",
-        "3fbb9826feae0698a58c8e1bbaa46caafb2bd07a63c59e33cd4478aee14ee147"
+        "sha1:fff020614bd796697739887c636f15a42b4b14aa",
+        "sha1:f4fd249ff5810b01fedc4a1dbdbe1b7d1e4cc619",
+        "sha1:2b64c42ac61c7ebd710333a6db2f35b21e4fccaf",
+        "sha1:fbdf7bae277f02f4189fa1d9ebf92fba6852dbce",
+        "sha1:7e5454e063f6b6adbc6278232afb5e54c80517d7"
     ],
     "bin": [
         "bin\\find.exe",

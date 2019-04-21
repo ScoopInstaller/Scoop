@@ -335,10 +335,13 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         if(!(test-path $data.$url.source) ) {
             abort $(new_issue_msg $app $bucket "cached file not found")
         }
-        if($use_cache) {
-            Copy-Item $data.$url.source $data.$url.target
-        } else {
-            Move-Item $data.$url.source $data.$url.target -force
+
+        if(!($dir -eq $cachedir)) {
+            if($use_cache) {
+                Copy-Item $data.$url.source $data.$url.target
+            } else {
+                Move-Item $data.$url.source $data.$url.target -force
+            }
         }
     }
 }

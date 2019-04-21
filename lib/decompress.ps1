@@ -188,17 +188,21 @@ function Expand-ZipArchive {
 }
 
 function extract_7zip($path, $to, $removal) {
+    Show-DeprecationMessage $MyInvocation 'Expand-7ZipArchive'
     Expand-7ZipArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
 function extract_msi($path, $to, $removal) {
+    Show-DeprecationMessage $MyInvocation 'Expand-MSIArchive'
     Expand-MSIArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
 function extract_inno($path, $to, $removal) {
+    Show-DeprecationMessage $MyInvocation 'Expand-InnoArchive'
     Expand-InnoArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
 function extract_zip($path, $to, $removal) {
+    Show-DeprecationMessage $MyInvocation 'Expand-ZipArchive'
     Expand-ZipArchive -Path $path -DestinationPath $to -Removal:$removal
 }

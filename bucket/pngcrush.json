@@ -1,6 +1,7 @@
 {
-    "homepage": "https://pmt.sourceforge.io/pngcrush/",
     "version": "1.8.11",
+    "description": "Optimizer for PNG (Portable Network Graphics) files.",
+    "homepage": "https://pmt.sourceforge.io/pngcrush/",
     "license": "libpng",
     "architecture": {
         "64bit": {
@@ -15,7 +16,7 @@
     "bin": "pngcrush.exe",
     "checkver": {
         "url": "https://sourceforge.net/projects/pmt/files/pngcrush-executables/",
-        "re": "title=\"([0-9\\.]+)\""
+        "regex": "title=\"([0-9\\.]+)\""
     },
     "autoupdate": {
         "architecture": {

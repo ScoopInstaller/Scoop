@@ -2,15 +2,15 @@
     "description": "An S/MIME signing utility compatible with Git that allows developers to sign their commits and tags using X.509 certificates",
     "homepage": "https://github.com/github/smimesign",
     "license": "MIT",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/github/smimesign/releases/download/0.0.10/smimesign-windows-amd64-0.0.10.zip",
-            "hash": "9f773fdfed78b4f03e5d6c7132319db1aa38790514396ae286fcd65753167789"
+            "url": "https://github.com/github/smimesign/releases/download/0.0.11/smimesign-windows-amd64-0.0.11.zip",
+            "hash": "263ccbafc365729b5020da0527151757d531793e8ff9209020b6d104b563da28"
         },
         "32bit": {
-            "url": "https://github.com/github/smimesign/releases/download/0.0.10/smimesign-windows-386-0.0.10.zip",
-            "hash": "bec931ed85e78637b1ccb8c21838516ff95b0f7bc50fdd76c03227b98526ebdf"
+            "url": "https://github.com/github/smimesign/releases/download/0.0.11/smimesign-windows-386-0.0.11.zip",
+            "hash": "0893c35e3afbb41d37ca8cdc924bc06cb5bfa36cd2d7997a0c5c4c31c3970d01"
         }
     },
     "bin": "smimesign.exe",

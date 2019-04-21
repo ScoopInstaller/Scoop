@@ -2,11 +2,11 @@
     "homepage": "https://github.com/radareorg/cutter",
     "description": "A Qt and C++ GUI for radare2 reverse engineering framework",
     "license": "GPL-3.0",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/radareorg/cutter/releases/download/v1.8.0/Cutter-v1.8.0-x64.Windows.zip",
-            "hash": "e7d747d2c088ba5eb6114e386cc82aa8174a2a8296ea6fcd75dce3fa339a9850"
+            "url": "https://github.com/radareorg/cutter/releases/download/v1.8.1/Cutter-v1.8.1-x64.Windows.zip",
+            "hash": "9b7620f6f7554fa71918d67d91c5bdc76d82c28003218b395e91a1b0febf923a"
         }
     },
     "bin": "cutter.exe",

@@ -1,11 +1,11 @@
 {
     "homepage": "https://zookeeper.apache.org/",
     "description": "High-performance coordination service for distributed applications",
-    "version": "3.4.13",
+    "version": "3.4.14",
     "license": "Apache-2.0",
-    "url": "https://www.apache.org/dist/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz",
-    "hash": "sha1:a989b527f3f990d471e6d47ee410e57d8be7620b",
-    "extract_dir": "zookeeper-3.4.13",
+    "url": "https://www.apache.org/dist/zookeeper/zookeeper-3.4.14/zookeeper-3.4.14.tar.gz",
+    "hash": "b14f7a0fece8bd34c7fffa46039e563ac5367607c612517aa7bd37306afbd1cd",
+    "extract_dir": "zookeeper-3.4.14",
     "bin": [
         "bin\\zkServer.cmd",
         "bin\\zkCli.cmd"

@@ -2,9 +2,9 @@
     "homepage": "https://github.com/coursier/coursier",
     "description": "Pure Scala Artifact Fetching",
     "license": "Apache-2.0",
-    "version": "1.1.0-M13-2",
-    "url": "https://github.com/coursier/coursier/releases/download/v1.1.0-M13-2/coursier#/coursier.jar",
-    "hash": "9b3cc9df0d66d7ebc8ecfca193eb8d2df11e162a8c2560762d2b97c3ca35a9cb",
+    "version": "1.1.0-M14-1",
+    "url": "https://github.com/coursier/coursier/releases/download/v1.1.0-M14-1/coursier#/coursier.jar",
+    "hash": "dc18e0918c38920fbffd7155cc19ab8dbb92f0f65f96e8cd3e7009c8605fa94e",
     "bin": "coursier.jar",
     "checkver": {
         "url": "https://github.com/coursier/coursier/releases",

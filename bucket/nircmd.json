@@ -1,5 +1,5 @@
 {
-    "version": "2.81",
+    "version": "2.83",
     "homepage": "https://www.nirsoft.net/utils/nircmd.html",
     "checkver": {
         "re": "<td>NirCmd v([\\d\\.]+)"
@@ -7,11 +7,11 @@
     "architecture": {
         "64bit": {
             "url": "https://www.nirsoft.net/utils/nircmd-x64.zip",
-            "hash": "37445b39e2fc437688164866c495bd28890ded5d0dbf71615bf92776e57c5189"
+            "hash": "d634e3c88d28504e12b0807021450fe5b82144c3300c9d3cf36e52af330f1c3f"
         },
         "32bit": {
             "url": "https://www.nirsoft.net/utils/nircmd.zip",
-            "hash": "f56a6166f8956c507cc2bfec71339f3c467c0421fe6d16fbe4c52a36d79ce0ea"
+            "hash": "ce8295cb6e225af2ae44d3416dda4e5a8e320f3801ba6361bc96e360bb66e88a"
         }
     },
     "autoupdate": {
