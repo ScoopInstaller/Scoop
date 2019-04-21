@@ -55,7 +55,7 @@ function Show-DeprecatedWarning {
     param($Invocation, [String] $New)
 
     Write-Host ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New) -ForegroundColor DarkYellow -NoNewline
-    Write-Host " -> $($invocation.PSCommandPath):$($invocation.ScriptLineNumber):$($invocation.OffsetInLine)" -ForegroundColor DarkGray
+    Write-Host " -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
 }
 
 # helper functions
