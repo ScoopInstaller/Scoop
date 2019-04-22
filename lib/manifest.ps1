@@ -77,7 +77,7 @@ function supports_architecture($manifest, $architecture) {
 }
 
 function generate_user_manifest($app, $bucket, $version) {
-    $null, $manifest, $bucket, $null = locate $app $bucket
+    $null, $manifest, $bucket, $null = Find-Manifest $app $bucket
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket
     }
