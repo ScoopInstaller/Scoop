@@ -1,5 +1,5 @@
 {
-    "main": "https://github.com/Ash258/Scoop-MainBucket",
+    "main": "https://github.com/scoopinstaller/scoop-main",
     "extras": "https://github.com/lukesampson/scoop-extras.git",
     "versions": "https://github.com/scoopinstaller/versions",
     "nightlies": "https://github.com/scoopinstaller/nightlies",

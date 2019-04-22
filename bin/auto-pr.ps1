@@ -35,8 +35,7 @@ param(
         }
         $true
     })]
-    # TODO: Change URL
-    [String] $Upstream = 'lukesampson/scoop:master',
+    [String] $Upstream = 'scoopinstaller/scoop-main:master',
     [String] $App = '*',
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {

@@ -125,8 +125,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $url = known_bucket_repo $bucket
 
     if($manifest -and ($null -eq $url) -and ($null -eq $bucket)) {
-        # TODO: Change URL
-        $url = 'https://github.com/lukesampson/scoop'
+        $url = 'https://github.com/scoopinstaller/scoop-main'
     } elseif (Test-path $bucket_path) {
         Push-Location $bucket_path
         $remote = git_config --get remote.origin.url
