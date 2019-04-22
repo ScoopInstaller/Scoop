@@ -26,7 +26,7 @@ function bin_match($manifest, $query) {
 }
 
 function search_bucket($bucket, $query) {
-    $apps = apps_in_bucket (bucketdir $bucket) | ForEach-Object {
+    $apps = apps_in_bucket (Find-BucketDirectory $bucket) | ForEach-Object {
         @{ name = $_ }
     }
 
@@ -80,7 +80,7 @@ function search_remotes($query) {
     $buckets = known_bucket_repos
     $names = $buckets | get-member -m noteproperty | Select-Object -exp name
 
-    $results = $names | Where-Object { !(test-path $(bucketdir $_)) } | ForEach-Object {
+    $results = $names | Where-Object { !(test-path $(Find-BucketDirectory $_)) } | ForEach-Object {
         @{"bucket" = $_; "results" = (search_remote $_ $query)}
     } | Where-Object { $_.results }
 

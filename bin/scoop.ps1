@@ -20,7 +20,7 @@ if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
     Pop-Location
 
     Get-LocalBucket | ForEach-Object {
-        Push-Location $(bucketdir $_)
+        Push-Location (Find-BucketDirectory $_ -Root)
         if(test-path '.git') {
             write-host "'$_' bucket:"
             git_log --oneline HEAD -n 1

@@ -108,7 +108,7 @@ function update_scoop() {
         write-host "Updating '$_' bucket..."
 
         # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
-        $loc = bucketdir $_
+        $loc = Find-BucketDirectory $_ -Root
         if (($_ -eq 'main') -and !(Test-Path "$_\.git")) {
             rm_bucket 'main'
             add_bucket 'main'

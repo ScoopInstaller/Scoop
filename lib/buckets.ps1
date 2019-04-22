@@ -2,25 +2,34 @@
 
 $bucketsdir = "$scoopdir\buckets"
 
-<#
-.DESCRIPTION
-    Return full path for bucket with given name.
-    Main bucket will be returned as default.
-.PARAMETER name
-    Name of bucket
-#>
-function bucketdir($name) {
-    # This check should not be needed anymore
-    $bucket = "$bucketsdir\main" # main bucket
+function Find-BucketDirectory {
+    <#
+    .DESCRIPTION
+        Return full path for bucket with given name.
+        Main bucket will be returned as default.
+    .PARAMETER Name
+        Name of bucket.
+    .PARAMETER Root
+        Root folder of bucket repository will be returned instead of 'bucket' subdirectory (if exists).
+    #>
+    param(
+        [string] $Name = 'main',
+        [switch] $Root
+    )
 
-    if ($name) {
-        $bucket = "$bucketsdir\$name"
-    }
-    if (Test-Path "$bucket\bucket") {
+    $bucket = "$bucketsdir\$Name" # main bucket
+
+    if ((Test-Path "$bucket\bucket") -and !$Root) {
         $bucket = "$bucket\bucket"
     }
 
     return $bucket
+}
+
+function bucketdir($name) {
+    Show-DeprecatedWarning $MyInvocation 'Find-BucketDirectory'
+
+    return Find-BucketDirectory $name
 }
 
 function known_bucket_repos {
@@ -48,9 +57,7 @@ function Get-LocalBucket {
         List all local buckets.
     #>
 
-    if (Test-Path $bucketsdir) {
-        return (Get-ChildItem $bucketsdir).Name
-    }
+    return (Get-ChildItem $bucketsdir).Name
 }
 
 function buckets {
@@ -84,7 +91,7 @@ function add_bucket($name, $repo) {
         abort "Git is required for buckets. Run 'scoop install git'."
     }
 
-    $dir = bucketdir $name
+    $dir = Find-BucketDirectory $name -Root
     if (test-path $dir) {
         warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
         exit 0
@@ -105,7 +112,7 @@ function add_bucket($name, $repo) {
 
 function rm_bucket($name) {
     if (!$name) { "<name> missing"; $usage_rm; exit 1 }
-    $dir = "$bucketsdir\$name"
+    $dir = Find-BucketDirectory $name -Root
     if (!(test-path $dir)) {
         abort "'$name' bucket not found."
     }

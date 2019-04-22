@@ -2,7 +2,7 @@
 . "$psscriptroot/autoupdate.ps1"
 
 function manifest_path($app, $bucket) {
-    fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
+    fullpath "$(Find-BucketDirectory $bucket)\$(sanitary_path $app).json"
 }
 
 function parse_json($path) {
