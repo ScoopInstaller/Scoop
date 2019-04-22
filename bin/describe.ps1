@@ -15,7 +15,7 @@ param(
         }
         $true
     })]
-    [String] $Dir = "$PSScriptRoot\..\bucket"
+    [String] $Dir = "$env:SCOOP\bucketsdir\main"
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"

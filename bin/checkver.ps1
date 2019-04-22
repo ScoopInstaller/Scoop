@@ -54,7 +54,7 @@ param(
         }
         $true
     })]
-    [String] $Dir = "$psscriptroot\..\bucket",
+    [String] $Dir = "$env:SCOOP\bucketsdir\main",
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipUpdated,

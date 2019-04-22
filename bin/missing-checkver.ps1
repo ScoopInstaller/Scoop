@@ -11,7 +11,7 @@
 #>
 param(
     [String] $App = '*',
-    [String] $Dir = "$PSScriptRoot\..\bucket",
+    [String] $Dir = "$env:SCOOP\bucketsdir\main",
     [Switch] $SkipSupported
 )
 

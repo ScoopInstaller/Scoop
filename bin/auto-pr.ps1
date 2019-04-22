@@ -27,6 +27,7 @@
     PS REPODIR > .\bin\auto-pr.ps1 -Push
     Update all manifests inside 'bucket/' directory.
 #>
+
 param(
     [ValidateScript( {
         if (!($_ -match '^(.*)\/(.*):(.*)$')) {
@@ -34,6 +35,7 @@ param(
         }
         $true
     })]
+    # TODO: Change URL
     [String] $Upstream = 'lukesampson/scoop:master',
     [String] $App = '*',
     [ValidateScript( {
@@ -42,17 +44,13 @@ param(
         }
         $true
     })]
-    [String] $Dir = "$PSScriptRoot\..\bucket",
+    [String] $Dir = "$env:SCOOP\bucketsdir\main",
     [Switch] $Push,
     [Switch] $Request,
     [Switch] $Help,
     [string[]] $SpecialSnowflakes,
     [Switch] $SkipUpdated
 )
-
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\json.ps1"
-. "$PSScriptRoot\..\lib\unix.ps1"
 
 $Dir = Resolve-Path $Dir
 

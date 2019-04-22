@@ -20,7 +20,7 @@ param(
             $true
         }
     })]
-    [String] $Dir = "$PSScriptRoot\\..\bucket",
+    [String] $Dir = "$env:SCOOP\bucketsdir\main",
     [Int] $Timeout = 5,
     [Switch] $SkipValid
 )
