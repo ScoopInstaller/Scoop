@@ -97,7 +97,7 @@ function search_remotes($query) {
     }
 }
 
-@($null) + @(buckets) | ForEach-Object { # $null is main bucket
+@($null) + @(Get-LocalBucket) | ForEach-Object {
     $res = search_bucket $_ $query
     $local_results = $local_results -or $res
     if($res) {

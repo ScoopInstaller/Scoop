@@ -11,7 +11,7 @@ function nightly_version($date, $quiet = $false) {
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $bucket, $null = parse_app $app
-    $app, $manifest, $bucket, $url = locate $app $bucket
+    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
@@ -73,6 +73,11 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 }
 
 function locate($app, $bucket) {
+    Show-DeprecatedWarning $MyInvocation 'Find-Manifest'
+    return Find-Manifest $app $bucket
+}
+
+function Find-Manifest($app, $bucket) {
     $manifest, $url = $null, $null
 
     # check if app is a URL or UNC path
