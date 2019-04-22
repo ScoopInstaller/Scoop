@@ -51,6 +51,10 @@ param(
     [Switch] $SkipUpdated
 )
 
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\json.ps1"
+. "$PSScriptRoot\..\lib\unix.ps1"
+
 $Dir = Resolve-Path $Dir
 
 if ((!$Push -and !$Request) -or $Help) {
