@@ -257,7 +257,7 @@
             "additionalProperties": false,
             "properties": {
                 "_comment": {
-                    "description": "Undocumented: only used in scoop-extras/oraclejdk* and scoop-extras/appengine-go",
+                    "description": "Undocumented: only used in scoop-extras/appengine-go",
                     "type": "string"
                 },
                 "args": {
