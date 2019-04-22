@@ -17,7 +17,9 @@ function Find-BucketDirectory {
         [switch] $Root
     )
 
-    $bucket = "$bucketsdir\$Name" # main bucket
+    # Handle info passing empty string as bucket ($install.bucket)
+    if(($null -eq $Name) -or ($Name -eq '')) { $Name = 'main' }
+    $bucket = "$bucketsdir\$Name"
 
     if ((Test-Path "$bucket\bucket") -and !$Root) {
         $bucket = "$bucket\bucket"
@@ -33,8 +35,8 @@ function bucketdir($name) {
 }
 
 function known_bucket_repos {
-    $dir = versiondir 'scoop' 'current'
-    $json = "$dir\buckets.json"
+    # $dir = versiondir 'scoop' 'current'
+    $json = "$PSScriptRoot\..\buckets.json"
     Get-Content $json -raw | convertfrom-json -ea stop
 }
 
