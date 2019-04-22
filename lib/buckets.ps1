@@ -66,8 +66,7 @@ function find_manifest($app, $bucket) {
         return $null
     }
 
-    $buckets = @($null) + @(Get-LocalBucket) # null for main bucket
-    foreach($bucket in $buckets) {
+    foreach($bucket in Get-LocalBucket) {
         $manifest = manifest $app $bucket
         if($manifest) { return $manifest, $bucket }
     }

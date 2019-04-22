@@ -97,7 +97,7 @@ function update_scoop() {
         }
     }
 
-    if (@(buckets) -notcontains 'main') {
+    if ((Get-LocalBucket) -notcontains 'main') {
         add_bucket 'main'
     }
 

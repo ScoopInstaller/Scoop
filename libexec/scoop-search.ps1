@@ -97,14 +97,13 @@ function search_remotes($query) {
     }
 }
 
-@($null) + @(Get-LocalBucket) | ForEach-Object {
+Get-LocalBucket | ForEach-Object {
     $res = search_bucket $_ $query
     $local_results = $local_results -or $res
     if($res) {
         $name = "$_"
-        if(!$_) { $name = "main" }
 
-        "'$name' bucket:"
+        Write-Host "'$name' bucket:"
         $res | ForEach-Object {
             $item = "    $($_.name) ($($_.version))"
             if($_.bin) { $item += " --> includes '$($_.bin)'" }

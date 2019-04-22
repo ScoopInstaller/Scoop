@@ -29,7 +29,7 @@ function check_windows_defender($global) {
 }
 
 function check_main_bucket {
-    if (@(buckets) -notcontains 'main'){
+    if ((Get-LocalBucket) -notcontains 'main'){
         warn 'Main bucket is not added.'
         Write-Host "  run 'scoop bucket add main'"
 
