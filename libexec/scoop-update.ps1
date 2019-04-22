@@ -107,8 +107,8 @@ function update_scoop() {
     Get-LocalBucket | ForEach-Object {
         write-host "Updating '$_' bucket..."
 
-        # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
         $loc = Find-BucketDirectory $_ -Root
+        # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
         if (($_ -eq 'main') -and !(Test-Path "$loc\.git")) {
             rm_bucket 'main'
             add_bucket 'main'
