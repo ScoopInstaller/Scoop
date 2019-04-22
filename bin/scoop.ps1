@@ -3,6 +3,7 @@ param($cmd)
 
 set-strictmode -off
 
+. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\git.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
@@ -18,7 +19,7 @@ if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
     write-host ""
     Pop-Location
 
-    buckets | ForEach-Object {
+    Get-LocalBucket | ForEach-Object {
         Push-Location $(bucketdir $_)
         if(test-path '.git') {
             write-host "'$_' bucket:"

@@ -1,14 +1,14 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
     "description": "An approximation of the Unix ln command.",
-    "version": "0.2018.08.04",
+    "version": "0.2018.07.25",
     "license": "MIT",
-    "url": "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/ln.ps1",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/3290c04d7653ea8183a5e11d3d5a4e46716035d1/ln.ps1",
     "hash": "2e97f2f1bacba1c403c538a80493e8c6c56203ba689f2a29a9fde6ba3576d3f7",
     "bin": "ln.ps1",
     "checkver": {
         "url": "https://github.com/lukesampson/psutils",
-        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "re": "ln\\.ps1[\\S\\s]*?/(?<sha>[0-9a-f]{40})[\\S\\s]*?(\\d+)-(\\d+)-(\\d+)",
         "replace": "0.${1}.${2}.${3}"
     },
     "autoupdate": {

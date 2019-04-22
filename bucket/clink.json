@@ -9,6 +9,7 @@
         "github": "https://github.com/mridgers/clink/"
     },
     "bin": "clink.bat",
+    "persist": "profile",
     "notes": [
         "Run 'clink inject' to start clink on the current cmd",
         "Run 'clink autorun' to auto start clink"

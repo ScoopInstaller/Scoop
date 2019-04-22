@@ -1,0 +1,13 @@
+{
+    "homepage": "https://github.com/99designs/aws-vault",
+    "description": "A vault for securely storing and accessing AWS credentials in development environments",
+    "license": "MIT",
+    "version": "4.5.1",
+    "url": "https://github.com/99designs/aws-vault/releases/download/v4.5.1/aws-vault-windows-386.exe#/aws-vault.exe",
+    "hash": "39b46ef9f19cb9b8898eb48f7f42420abf0e514b80811b05ebfa534ccdb30ee7",
+    "bin": "aws-vault.exe",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/99designs/aws-vault/releases/download/v$version/aws-vault-windows-386.exe#/aws-vault.exe"
+    }
+}

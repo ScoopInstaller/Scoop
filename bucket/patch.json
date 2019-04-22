@@ -1,13 +1,15 @@
 {
-    "homepage": "http://www.mingw.org/wiki/MSYS",
     "version": "2.6.1",
+    "description": "Apply diff to original.",
+    "homepage": "http://www.mingw.org/wiki/MSYS",
+    "license": "GPL-2.0-only",
     "url": [
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Extension/patch/patch-2.6.1-1/patch-2.6.1-1-msys-1.0.13-bin.tar.lzma"
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Extension/patch/patch-2.6.1-1/patch-2.6.1-1-msys-1.0.13-bin.tar.lzma"
     ],
     "hash": [
-        "4e262a414f238773b311c8bb55a52e62743c06e0e55b319ca5b47e3e306464d5",
-        "c8b7771304fb5e9fc33d8fca9045402f2e1bca055bf0b28127f3c3e85a254f67"
+        "sha1:36d52ca7066eb6ad0da68c6f31214416f4c9dcec",
+        "sha1:b4a82565f739f45dfa5ee3db8c59e9638833f89c"
     ],
     "bin": "bin\\patch.exe"
 }

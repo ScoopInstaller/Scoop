@@ -1,6 +1,6 @@
 {
     "$id": "http://scoop.sh/draft/schema#",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "additionalProperties": false,
     "definitions": {
         "hashPattern": {
@@ -48,7 +48,10 @@
                         "download",
                         "extract",
                         "json",
-                        "rdf"
+                        "rdf",
+                        "metalink",
+                        "fosshub",
+                        "sourceforge"
                     ]
                 },
                 "type": {
@@ -429,8 +432,7 @@
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "extract_to": {
-            "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "No longer used."
+            "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "hash": {
             "$ref": "#/definitions/hash"

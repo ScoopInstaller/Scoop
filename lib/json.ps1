@@ -95,7 +95,7 @@ function ConvertToPrettyJson {
 function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitutions) {
     Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Newtonsoft.Json.dll"
     if ($null -ne $substitutions) {
-        $jsonpath = substitute $jsonpath $substitutions
+        $jsonpath = substitute $jsonpath $substitutions ($jsonpath -like "*=~*")
     }
     try {
         $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)

@@ -4,11 +4,11 @@
     "homepage": "https://www.radare.org/r/",
     "architecture": {
         "64bit": {
-            "url": "https://radare.mikelloc.com/get/3.2.1/radare2_installer-msvc_64-3.2.1.exe",
+            "url": "https://github.com/radare/radare2/releases/download/3.2.1/radare2_installer-msvc_64-3.2.1.exe",
             "hash": "sha1:8a0ebab9b4ae5bdb10653a065bc01769747662c7"
         },
         "32bit": {
-            "url": "https://radare.mikelloc.com/get/3.2.1/radare2_installer-msvc_32-3.2.1.exe",
+            "url": "https://github.com/radare/radare2/releases/download/3.2.1/radare2_installer-msvc_32-3.2.1.exe",
             "hash": "sha1:61f9a14254ad09986724ce82f81cb12250a7e589"
         }
     },
@@ -46,14 +46,14 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://radare.mikelloc.com/get/$version/radare2_installer-msvc_64-$version.exe"
+                "url": "https://github.com/radare/radare2/releases/download/$version/radare2_installer-msvc_64-$version.exe"
             },
             "32bit": {
-                "url": "https://radare.mikelloc.com/get/$version/radare2_installer-msvc_32-$version.exe"
+                "url": "https://github.com/radare/radare2/releases/download/$version/radare2_installer-msvc_32-$version.exe"
             }
         },
         "hash": {
-            "url": "https://radare.mikelloc.com/get/$version/checksums.sha1sum"
+            "url": "$baseurl/checksums.sha1sum"
         }
     }
 }

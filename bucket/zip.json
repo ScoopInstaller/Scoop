@@ -21,7 +21,7 @@
     },
     "pre_install": [
         "if(Test-Path \"$dir\\zip300xn-x64.zip\") {",
-        "unzip \"$dir\\zip300xn-x64.zip\" \"$dir\"",
+        "extract_zip \"$dir\\zip300xn-x64.zip\" \"$dir\"",
         "Remove-Item \"$dir\\zip300xn-x64.zip\"",
         "}"
     ]

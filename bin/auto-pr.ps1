@@ -6,6 +6,9 @@
 .PARAMETER Upstream
     Upstream repository with the target branch.
     Must be in format '<user>/<repo>:<branch>'
+.PARAMETER App
+    Manifest name to search.
+    Placeholders are supported.
 .PARAMETER Dir
     The directory where to search for manifests.
 .PARAMETER Push
@@ -16,6 +19,8 @@
     Print help to console.
 .PARAMETER SpecialSnowflakes
     An array of manifests, which should be updated all the time. (-ForceUpdate parameter to checkver)
+.PARAMETER SkipUpdated
+    Updated manifests will not be shown.
 .EXAMPLE
     PS REPODIR > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
 .EXAMPLE
@@ -30,6 +35,7 @@ param(
         $true
     })]
     [String] $Upstream = 'lukesampson/scoop:master',
+    [String] $App = '*',
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -40,7 +46,8 @@ param(
     [Switch] $Push,
     [Switch] $Request,
     [Switch] $Help,
-    [string[]] $SpecialSnowflakes
+    [string[]] $SpecialSnowflakes,
+    [Switch] $SkipUpdated
 )
 
 . "$PSScriptRoot\..\lib\manifest.ps1"
@@ -59,7 +66,7 @@ Mandatory options:
 
 Optional options:
   -u,  -upstream                   upstream repository with target branch
-                                     only used if -r is set (default: lukesampson/scoop:master)
+                                   only used if -r is set (default: lukesampson/scoop:master)
   -h,  -help
 '@
     exit 0
@@ -146,7 +153,7 @@ if ($Push) {
     execute 'hub push origin master'
 }
 
-. "$PSScriptRoot\checkver.ps1" -Dir $Dir -Update
+. "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update -SkipUpdated:$SkipUpdated
 if ($SpecialSnowflakes) {
     Write-Host "Forcing update on our special snowflakes: $($SpecialSnowflakes -join ',')" -ForegroundColor DarkCyan
     $SpecialSnowflakes -split ',' | ForEach-Object {

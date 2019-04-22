@@ -1,3 +1,5 @@
+. "$PSScriptRoot\core.ps1"
+
 $bucketsdir = "$scoopdir\buckets"
 
 <#
@@ -40,12 +42,21 @@ function apps_in_bucket($dir) {
     return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
 }
 
-function buckets {
-    $buckets = @()
-    if(test-path $bucketsdir) {
-        Get-ChildItem $bucketsdir | ForEach-Object { $buckets += $_.Name }
+function Get-LocalBucket {
+    <#
+    .SYNOPSIS
+        List all local buckets.
+    #>
+
+    if (Test-Path $bucketsdir) {
+        return (Get-ChildItem $bucketsdir).Name
     }
-    return $buckets
+}
+
+function buckets {
+    Show-DeprecatedWarning $MyInvocation 'Get-LocalBucket'
+
+    return Get-LocalBucket
 }
 
 function find_manifest($app, $bucket) {
@@ -55,8 +66,7 @@ function find_manifest($app, $bucket) {
         return $null
     }
 
-    # Is this check needed?
-    $buckets = @($null) + @(buckets) # null for main bucket
+    $buckets = @($null) + @(Get-LocalBucket) # null for main bucket
     foreach($bucket in $buckets) {
         $manifest = manifest $app $bucket
         if($manifest) { return $manifest, $bucket }
@@ -96,7 +106,7 @@ function add_bucket($name, $repo) {
 
 function rm_bucket($name) {
     if (!$name) { "<name> missing"; $usage_rm; exit 1 }
-    $dir = bucketdir $name
+    $dir = "$bucketsdir\$name"
     if (!(test-path $dir)) {
         abort "'$name' bucket not found."
     }
@@ -107,20 +117,32 @@ function rm_bucket($name) {
 function new_issue_msg($app, $bucket, $title, $body) {
     $app, $manifest, $bucket, $url = locate $app $bucket
     $url = known_bucket_repo $bucket
-    if($manifest -and $null -eq $url -and $null -eq $bucket) {
+
+    if($manifest -and ($null -eq $url) -and ($null -eq $bucket)) {
         # TODO: Change URL
         $url = 'https://github.com/lukesampson/scoop'
-    }
-    if(!$url) {
-        return "Please contact the bucket maintainer!"
+    } elseif (Test-path $bucket_path) {
+        Push-Location $bucket_path
+        $remote = git_config --get remote.origin.url
+        # Support ssh and http syntax
+        # git@PROVIDER:USER/REPO.git
+        # https://PROVIDER/USER/REPO.git
+        $remote -match '(@|:\/\/)(?<provider>.+)[:/](?<user>.*)\/(?<repo>.*)(\.git)?$' | Out-Null
+        $url = "https://$($Matches.Provider)/$($Matches.User)/$($Matches.Repo)"
+        Pop-Location
     }
 
-    $title = [System.Web.HttpUtility]::UrlEncode("$app@$($manifest.version): $title")
-    $body = [System.Web.HttpUtility]::UrlEncode($body)
-    $url = $url -replace '^(.*).git$','$1'
-    $url = "$url/issues/new?title=$title"
-    if($body) {
-        $url += "&body=$body"
+    if(!$url) { return 'Please contact the bucket maintainer!' }
+
+    # Print only github repositories
+    if ($url -like '*github*') {
+        $title = [System.Web.HttpUtility]::UrlEncode("$app@$($manifest.version): $title")
+        $body = [System.Web.HttpUtility]::UrlEncode($body)
+        $url = $url -replace '\.git$', ''
+        $url = "$url/issues/new?title=$title"
+        if($body) {
+            $url += "&body=$body"
+        }
     }
 
     $msg = "`nPlease try again or create a new issue by using the following link and paste your console output:"

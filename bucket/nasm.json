@@ -1,7 +1,8 @@
 {
-    "homepage": "http://www.nasm.us",
+    "homepage": "https://www.nasm.us",
     "license": "BSD-2-Clause",
     "version": "2.14.02",
+    "description": "80x86 and x86-64 assembler designed for portability and modularity.",
     "extract_dir": "nasm-2.14.02",
     "architecture": {
         "64bit": {

@@ -2,9 +2,9 @@
     "homepage": "https://www.mls-software.com/opensshd.html",
     "description": "A Windows installer package of Openssh for Windows that is actively maintained and current.",
     "license": "ISC",
-    "version": "7.9p1-1",
-    "url": "https://www.mls-software.com/files/setupssh-7.9p1-1.exe#/dl.7z",
-    "hash": "sha1:64425b56f890cbf51ddf4a9292b02b06df70487e",
+    "version": "8.0p1-2",
+    "url": "https://www.mls-software.com/files/setupssh-8.0p1-2.exe#/dl.7z",
+    "hash": "sha1:4cdf9628aab704f2b086008857430456b2333a35",
     "post_install": [
         "Remove-Item \"$dir\\`$PLUGINSDIR\" -Recurse",
         "Remove-Item \"$dir\\`$TEMP\" -Recurse",

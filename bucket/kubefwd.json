@@ -1,11 +1,11 @@
 {
     "homepage": "https://github.com/txn2/kubefwd",
     "license": "Apache-2.0",
-    "version": "1.4.10",
+    "version": "1.8.2",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/txn2/kubefwd/releases/download/1.4.10/kubefwd_windows_amd64.zip",
-            "hash": "6808571a1acd6e1a80e4390e28b29f41548327059e1d75f0f618fd40606f0dcb"
+            "url": "https://github.com/txn2/kubefwd/releases/download/1.8.2/kubefwd_windows_amd64.zip",
+            "hash": "16b967ebc664a7ec712bf5349f2209827cffc260750efd8559a667d2a1ba6347"
         }
     },
     "bin": "kubefwd.exe",

@@ -296,8 +296,8 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         if($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
-            debug $urlstxt_content
-            debug $aria2
+            error $urlstxt_content
+            error $aria2
             abort $(new_issue_msg $app $bucket "download via aria2 failed")
         }
 
@@ -336,10 +336,13 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         if(!(test-path $data.$url.source) ) {
             abort $(new_issue_msg $app $bucket "cached file not found")
         }
-        if($use_cache) {
-            Copy-Item $data.$url.source $data.$url.target
-        } else {
-            Move-Item $data.$url.source $data.$url.target -force
+
+        if(!($dir -eq $cachedir)) {
+            if($use_cache) {
+                Copy-Item $data.$url.source $data.$url.target
+            } else {
+                Move-Item $data.$url.source $data.$url.target -force
+            }
         }
     }
 }
@@ -529,8 +532,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         # work out extraction method, if applicable
         $extract_fn = $null
-        if($fname -match '\.zip$') { # unzip
-            $extract_fn = 'unzip'
+        if($fname -match '\.zip$') {
+            $extract_fn = 'extract_zip'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
             $msi = msi $manifest $architecture
@@ -592,18 +595,6 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $fname # returns the last downloaded file
 }
 
-function lessmsi_config ($extract_dir) {
-    $extract_fn = 'extract_lessmsi'
-    if ($extract_dir) {
-        $extract_dir = join-path SourceDir $extract_dir
-    }
-    else {
-        $extract_dir = "SourceDir"
-    }
-
-    $extract_fn, $extract_dir
-}
-
 function cookie_header($cookies) {
     if(!$cookies) { return }
 
@@ -651,17 +642,12 @@ function check_hash($file, $hash, $app_name) {
     Write-Host "Checking hash of " -NoNewline
     Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
     Write-Host " ... " -nonewline
-    $type, $expected = $hash.split(':')
-    if(!$expected) {
-        # no type specified, assume sha256
-        $type, $expected = 'sha256', $type
+    $algorithm, $expected = get_hash $hash
+    if ($null -eq $algorithm) {
+        return $false, "Hash type '$algorithm' isn't supported."
     }
 
-    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
-        return $false, "Hash type '$type' isn't supported."
-    }
-
-    $actual = (compute_hash $file $type).ToLower()
+    $actual = compute_hash $file $algorithm
     $expected = $expected.ToLower()
 
     if($actual -ne $expected) {
@@ -739,23 +725,6 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
     return $true
 }
 
-function unpack_inno($fname, $manifest, $dir) {
-    if(!$manifest.innosetup) { return }
-
-    write-host "Unpacking innosetup... " -nonewline
-    innounp -x -d"$dir\_scoop_unpack" "$dir\$fname" > "$dir\innounp.log"
-    if($lastexitcode -ne 0) {
-        abort "Failed to unpack innosetup file. See $dir\innounp.log"
-    }
-
-    Get-ChildItem "$dir\_scoop_unpack\{app}" -r | Move-Item -dest "$dir" -force
-
-    Remove-Item -r -force "$dir\_scoop_unpack"
-
-    Remove-Item "$dir\$fname"
-    Write-Host "done." -f Green
-}
-
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
     # MSI or other installer
     $msi = msi $manifest $architecture
@@ -798,17 +767,6 @@ function install_msi($fname, $dir, $msi) {
     }
     Remove-Item $logfile
     Remove-Item $msifile
-}
-
-function extract_msi($path, $to) {
-    $logfile = "$(split-path $path)\msi.log"
-    $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
-    if(!$ok) { abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)" }
-    if(test-path $logfile) { Remove-Item $logfile }
-}
-
-function extract_lessmsi($path, $to) {
-    Invoke-Expression "lessmsi x `"$path`" `"$to\`""
 }
 
 # deprecated
@@ -1200,6 +1158,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             $source, $target = persist_def $_
 
             write-host "Persisting $source"
+
+            $source = $source.TrimEnd("/").TrimEnd("\\")
 
             $source = fullpath "$dir\$source"
             $target = fullpath "$persist_dir\$target"

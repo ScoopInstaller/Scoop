@@ -3,7 +3,7 @@
     "description": "Apache Ant is a Java library and command-line tool for compiling, assembling, testing and running Java and non-Java applications.",
     "version": "1.10.5",
     "license": "Apache-2.0",
-    "url": "https://www-us.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip",
+    "url": "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.zip",
     "hash": "sha512:2e48f9e429d67708f5690bc307232f08440d01ebe414059292b6543971da9c7cd259c21533b9163b4dd753321c17bd917adf8407d03245a0945fc30a4e633163",
     "extract_dir": "apache-ant-1.10.5",
     "env_add_path": "bin",
@@ -21,7 +21,7 @@
         "re": "Currently, Apache Ant (?:[\\d.]+ and )?([\\d.]+) (?:is|are) the best"
     },
     "autoupdate": {
-        "url": "https://www-us.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip",
+        "url": "https://www.apache.org/dist/ant/binaries/apache-ant-$version-bin.zip",
         "extract_dir": "apache-ant-$version",
         "hash": {
             "url": "$url.sha512"

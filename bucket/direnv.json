@@ -5,15 +5,15 @@
         "github": "https://github.com/direnv/direnv"
     },
     "license": "MIT",
-    "version": "2.19.1",
+    "version": "2.20.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/direnv/direnv/releases/download/v2.19.1/direnv.windows-amd64.exe#/direnv.exe",
-            "hash": "a7d63a8033980cc0c8f7f0dea0f58fe2bbe797f22453b54e245434d575b9abcb"
+            "url": "https://github.com/direnv/direnv/releases/download/v2.20.0/direnv.windows-amd64.exe#/direnv.exe",
+            "hash": "4a17d21b409f0e82dac61107b3785924e5dfd2ed35578705205af5ec170372ca"
         },
         "32bit": {
-            "url": "https://github.com/direnv/direnv/releases/download/v2.19.1/direnv.windows-386.exe#/direnv.exe",
-            "hash": "be22faa203fbcfaa63a47669df6545b7e9668b58419e3633f36642dfedd4b177"
+            "url": "https://github.com/direnv/direnv/releases/download/v2.20.0/direnv.windows-386.exe#/direnv.exe",
+            "hash": "1fe776c1e0dd5d4af2af1b7418dd7f946b731d9fe2932f16c0cbda29381ccba3"
         }
     },
     "bin": "direnv.exe",

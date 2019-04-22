@@ -1,0 +1,21 @@
+{
+    "homepage": "https://nunit.org/",
+    "description": "NUnit V2 Framework Driver Extension",
+    "version": "3.7.0",
+    "license": "MIT",
+    "url": "https://packages.chocolatey.org/nunit-extension-nunit-v2-driver.3.7.0.nupkg",
+    "hash": "3cd3d4a16f5a304eaf8090221bcc8edc867f6f1ff3ee7bb2d2376afeb2e9512e",
+    "extract_dir": "tools",
+    "depends": "nunit-console",
+    "checkver": {
+        "url": "https://chocolatey.org/packages/nunit-extension-nunit-v2-driver",
+        "regex": "Chocolatey.*?([\\d.]+)\\r"
+    },
+    "autoupdate": {
+        "url": "https://packages.chocolatey.org/nunit-extension-nunit-v2-driver.$version.nupkg",
+        "hash": {
+            "url": "https://chocolatey.org/packages/nunit-extension-nunit-v2-driver",
+            "regex": "$sha256.*?$basename"
+        }
+    }
+}

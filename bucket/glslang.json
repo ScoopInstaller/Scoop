@@ -1,8 +1,8 @@
 {
     "homepage": "https://www.khronos.org/opengles/sdk/tools/Reference-Compiler/",
-    "version": "7.10.2984",
-    "url": "https://github.com/KhronosGroup/glslang/releases/download/7.10.2984/glslang-master-windows-x64-Release.zip",
-    "hash": "1a8ad69dbc957faf83ffb8263bc27a6c7ad0fe415b5b7d3d5afbb64e6932c25b",
+    "version": "7.11.3113",
+    "url": "https://github.com/KhronosGroup/glslang/releases/download/7.11.3113/glslang-master-windows-x64-Release.zip",
+    "hash": "3e4826a47bee7442e1c39311575dc91a265b7ba5a3d59795191b0b2a114ad8f6",
     "bin": [
         "bin\\glslangValidator.exe",
         "bin\\spirv-remap.exe"

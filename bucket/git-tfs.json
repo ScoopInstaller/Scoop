@@ -1,0 +1,16 @@
+{
+    "version": "0.29.0",
+    "description": "A Git/TFS bridge, similar to git-svn.",
+    "homepage": "https://git-tfs.com",
+    "license": "Apache-2.0",
+    "depends": "git",
+    "url": "https://github.com/git-tfs/git-tfs/releases/download/v0.29.0/GitTfs-0.29.0.zip",
+    "hash": "029c514e1ce5740ae99ac3a7b30875610b2af9c1ed22e56e0ae9fcb75d11dcf3",
+    "bin": "git-tfs.exe",
+    "checkver": {
+        "github": "https://github.com/git-tfs/git-tfs"
+    },
+    "autoupdate": {
+        "url": "https://github.com/git-tfs/git-tfs/releases/download/v$version/GitTfs-$version.zip"
+    }
+}

@@ -1,14 +1,15 @@
 {
-    "homepage": "http://gnuwin32.sourceforge.net/packages/file.htm",
     "version": "5.03",
-    "license": "GPL-2.0",
+    "description": "Determine file type.",
+    "homepage": "http://gnuwin32.sourceforge.net/packages/file.htm",
+    "license": "GPL-2.0-only",
     "url": [
-        "https://sourceforge.net/projects/gnuwin32/files/file/5.03/file-5.03-bin.zip",
-        "https://sourceforge.net/projects/gnuwin32/files/file/5.03/file-5.03-dep.zip"
+        "https://downloads.sourceforge.net/projects/gnuwin32/file/5.03/file-5.03-bin.zip",
+        "https://downloads.sourceforge.net/projects/gnuwin32/file/5.03/file-5.03-dep.zip"
     ],
     "hash": [
-        "dbd28e191c1bf7e3db08b983e603e79959295717f6fc1032ba97e7a8680c8cf9",
-        "2dbf891e42c642e372e5b21b0528bb5ba3c5b6eeb9fb01fb1e9cc77f2f44a091"
+        "sha1:fcf8946fd56e64fa34d1a9cff53671e5ff89f3de",
+        "sha1:3a8cc3b5c2c2d1d1686c8a14a474d38686bab873"
     ],
     "bin": "bin\\file.exe"
 }

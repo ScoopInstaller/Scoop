@@ -1,20 +1,20 @@
 {
     "##": "https://support.plex.tv/articles/201941078-uninstall-plex-media-server/",
-    "version": "1.14.1.5488-cc260c476",
+    "version": "1.15.3.876-ad6e39743",
     "description": "Plex Media Server. Stream content to all of devices, anywhere.",
     "homepage": "https://www.plex.tv/",
     "license": {
         "identifier": "Proprietary",
         "url": "https://support.plex.tv/articles/204096476-license-information/"
     },
-    "depends": "wixtoolset",
-    "url": "https://downloads.plex.tv/plex-media-server/1.14.1.5488-cc260c476/Plex-Media-Server-1.14.1.5488-cc260c476.exe#/installer.exe",
-    "hash": "sha1:9e285238a3d247fcf823981a0b22c27230a054dd",
+    "depends": "dark",
+    "url": "https://downloads.plex.tv/plex-media-server-new/1.15.3.876-ad6e39743/windows/PlexMediaServer-1.15.3.876-ad6e39743-x86.exe#/installer.exe",
+    "hash": "sha1:3a6c609780c24e1967d4b922f58d4b22d8f6e379",
     "installer": {
         "script": [
             "$extracted = \"$dir\\extracted\"",
             "$msi = \"$dir\\msi\"",
-            "&(scoop which dark) -nologo -x \"$extracted\" \"$dir\\installer.exe\" | Out-Null",
+            "&(file_path dark dark.exe) -nologo -x \"$extracted\" \"$dir\\installer.exe\" | Out-Null",
             "extract_msi \"$extracted\\AttachedContainer\\pms.msi\" \"$msi\"",
             "Move-Item \"$msi\\Msi\\*\" \"$dir\" -Force",
             "Remove-Item $extracted, $msi, \"$dir\\installer.exe\" -Force -Recurse"
@@ -37,7 +37,7 @@
         "jsonpath": "$.computer.windows.version"
     },
     "autoupdate": {
-        "url": "https://downloads.plex.tv/plex-media-server/$version/Plex-Media-Server-$version.exe#/installer.exe",
+        "url": "https://downloads.plex.tv/plex-media-server-new/$version/windows/PlexMediaServer-$version-x86.exe#/installer.exe",
         "hash": {
             "url": "https://plex.tv/api/downloads/1.json",
             "jsonpath": "$.computer.Windows.releases..checksum"
