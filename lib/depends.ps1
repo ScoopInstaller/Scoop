@@ -22,7 +22,7 @@ function deps($app, $arch) {
 function dep_resolve($app, $arch, $resolved, $unresolved) {
     $app, $bucket, $null = parse_app $app
     $unresolved += $app
-    $null, $manifest, $null, $null = locate $app $bucket
+    $null, $manifest, $null, $null = Find-Manifest $app $bucket
 
     if(!$manifest) {
         if(((Get-LocalBucket) -notcontains $bucket) -and $bucket) {

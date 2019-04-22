@@ -114,7 +114,7 @@ function rm_bucket($name) {
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {
-    $app, $manifest, $bucket, $url = locate $app $bucket
+    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
