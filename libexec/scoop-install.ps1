@@ -30,20 +30,20 @@
 reset_aliases
 
 function is_installed($app, $global) {
-	if ($app.EndsWith('.json')) {
-		$app = [System.IO.Path]::GetFileNameWithoutExtension($app)
-	}
-	if (installed $app $global) {
-		function gf($g) { if ($g) { ' --global' } }
+    if ($app.EndsWith('.json')) {
+        $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
+    }
+    if (installed $app $global) {
+        function gf($g) { if ($g) { ' --global' } }
 
-		$version = @(versions $app $global)[-1]
-		if (!(install_info $app $version $global)) {
-			error "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$(gf $global)' before retrying the install."
-		}
-		warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(gf $global)' to install a new version."
-		return $true
-	}
-	return $false
+        $version = @(versions $app $global)[-1]
+        if (!(install_info $app $version $global)) {
+            error "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$(gf $global)' before retrying the install."
+        }
+        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(gf $global)' to install a new version."
+        return $true
+    }
+    return $false
 }
 
 $opt, $apps, $err = getopt $args 'gfiksa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'arch='
@@ -55,48 +55,48 @@ $independent = $opt.i -or $opt.independent
 $use_cache = !($opt.k -or $opt.'no-cache')
 $architecture = default_architecture
 try {
-	$architecture = ensure_architecture ($opt.a + $opt.arch)
+    $architecture = ensure_architecture ($opt.a + $opt.arch)
 } catch {
-	abort "ERROR: $_"
+    abort "ERROR: $_"
 }
 
 if (!$apps) { error '<app> missing'; my_usage; exit 1 }
 
 if ($global -and !(is_admin)) {
-	abort 'ERROR: you need admin rights to install global apps'
+    abort 'ERROR: you need admin rights to install global apps'
 }
 
 if (is_scoop_outdated) {
-	scoop update
+    scoop update
 }
 
 if ($apps.length -eq 1) {
-	$app, $null, $null = parse_app $apps
-	if (is_installed $app $global) {
-		return
-	}
+    $app, $null, $null = parse_app $apps
+    if (is_installed $app $global) {
+        return
+    }
 }
 
 # get any specific versions that we need to handle first
 $specific_versions = $apps | Where-Object {
-	$null, $null, $version = parse_app $_
-	return $null -ne $version
+    $null, $null, $version = parse_app $_
+    return $null -ne $version
 }
 
 # compare object does not like nulls
 if ($specific_versions.length -gt 0) {
-	$difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
+    $difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
 } else {
-	$difference = $apps
+    $difference = $apps
 }
 
 $specific_versions_paths = $specific_versions | ForEach-Object {
-	$app, $bucket, $version = parse_app $_
-	if (installed_manifest $app $version) {
-		abort "'$app' ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
-	}
+    $app, $bucket, $version = parse_app $_
+    if (installed_manifest $app $version) {
+        abort "'$app' ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
+    }
 
-	generate_user_manifest $app $bucket $version
+    generate_user_manifest $app $bucket $version
 }
 $apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-Object -Unique)
 
@@ -105,22 +105,22 @@ $apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-
 $explicit_apps = $apps
 
 if (!$independent) {
-	$apps = install_order $apps $architecture # adds dependencies
+    $apps = install_order $apps $architecture # adds dependencies
 }
 ensure_none_failed $apps $global
 
 $apps, $skip = prune_installed $apps $global
 
 $skip | Where-Object { $explicit_apps -contains $_ } | ForEach-Object {
-	$app, $null, $null = parse_app $_
-	$version = @(versions $app $global)[-1]
-	warn "'$app' ($version) is already installed. Skipping."
+    $app, $null, $null = parse_app $_
+    $version = @(versions $app $global)[-1]
+    warn "'$app' ($version) is already installed. Skipping."
 }
 
 $suggested = @{ };
 if (aria2_enabled) {
-	warn "Scoop uses 'aria2c' for multi-connection downloads."
-	warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+    warn "Scoop uses 'aria2c' for multi-connection downloads."
+    warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
 }
 $apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
 
