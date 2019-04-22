@@ -20,7 +20,7 @@ param(
             $true
         }
     })]
-    [String] $Dir = "$env:SCOOP\bucketsdir\main",
+    [String] $Dir = "$env:SCOOP\buckets\main",
     [Int] $Timeout = 5,
     [Switch] $SkipValid
 )

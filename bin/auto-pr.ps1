@@ -43,7 +43,7 @@ param(
         }
         $true
     })]
-    [String] $Dir = "$env:SCOOP\bucketsdir\main",
+    [String] $Dir = "$env:SCOOP\buckets\main",
     [Switch] $Push,
     [Switch] $Request,
     [Switch] $Help,

@@ -23,7 +23,7 @@ param(
         $true
     })]
     [Alias('Path')]
-    [String] $Dir = "$env:SCOOP\bucketsdir\main"
+    [String] $Dir = "$env:SCOOP\buckets\main"
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
