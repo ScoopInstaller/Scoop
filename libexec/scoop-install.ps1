@@ -126,8 +126,3 @@ $apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_ca
 show_suggestions $suggested
 
 exit 0
-$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
-
-show_suggestions $suggested
-
-exit 0
