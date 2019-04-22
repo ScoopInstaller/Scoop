@@ -1,0 +1,35 @@
+{
+    "homepage": "https://sourceforge.net/projects/osslsigncode/",
+    "description": "Platform-independent tool for Authenticode signing of PE(EXE/SYS/DLL/etc), CAB and MSI files - uses OpenSSL and libcurl. It also supports timestamping (Authenticode and RFC3161).",
+    "license": "GPL-3.0-or-later",
+    "version": "1.7.1-1",
+    "architecture": {
+        "64bit": {
+            "url": "https://downloads.sourceforge.net/project/unix-utils/files/osslsigncode/osslsigncode-1.7.1-1-x86_64.zip",
+            "hash": "sha1:2b45c724569c564adbe6546e7c13f4305340d8f0",
+            "extract_dir": "osslsigncode-1.7.1-1-x86_64"
+        },
+        "32bit": {
+            "url": "https://downloads.sourceforge.net/project/unix-utils/files/osslsigncode/osslsigncode-1.7.1-1-win32.zip",
+            "hash": "sha1:b02dd2ac3ae5962253a11d76766fb63a314f845e",
+            "extract_dir": "osslsigncode-1.7.1-1-win32"
+        }
+    },
+    "bin": "bin/osslsigncode.exe",
+    "checkver": {
+        "url": "https://sourceforge.net/projects/unix-utils/files/osslsigncode/",
+        "re": "osslsigncode-([\\d.-]+)-x86_64"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://downloads.sourceforge.net/project/unix-utils/files/osslsigncode/osslsigncode-$version-x86_64.zip",
+                "extract_dir": "osslsigncode-$version-x86_64"
+            },
+            "32bit": {
+                "url": "https://downloads.sourceforge.net/project/unix-utils/files/osslsigncode/osslsigncode-$version-win32.zip",
+                "extract_dir": "osslsigncode-$version-win32"
+            }
+        }
+    }
+}
