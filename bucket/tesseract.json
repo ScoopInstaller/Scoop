@@ -44,7 +44,7 @@
     },
     "checkver": {
         "url": "https://digi.bib.uni-mannheim.de/tesseract/?C=M;O=D",
-        "regex": "tesseract-ocr-w32-setup-v([\\d\\w.-]+)\\.exe"
+        "regex": "tesseract-ocr-w32-setup-v([\\w\\.-]+)\\.exe"
     },
     "autoupdate": {
         "architecture": {
