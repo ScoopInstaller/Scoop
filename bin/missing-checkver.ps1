@@ -11,7 +11,16 @@
 #>
 param(
     [String] $App = '*',
-    [String] $Dir = "$env:SCOOP\buckets\main",
+    [Parameter(Mandatory = $true)]
+    [ValidateScript( {
+        if (!(Test-Path $_ -Type Container)) {
+            throw "$_ is not a directory!"
+        } else {
+            $true
+        }
+    })]
+    [Alias('Path')]
+    [String] $Dir,
     [Switch] $SkipSupported
 )
 

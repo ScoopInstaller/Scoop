@@ -16,14 +16,16 @@
 #>
 param(
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
+        } else {
+            $true
         }
-        $true
     })]
     [Alias('Path')]
-    [String] $Dir = "$env:SCOOP\buckets\main"
+    [String] $Dir
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
