@@ -245,7 +245,7 @@ if(!$apps) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        $apps = ensure_all_installed $apps_param $global
+        $apps = Confirm-InstallationStatus $apps_param -Global:$global
     }
     if($apps) {
         $apps | ForEach-Object {

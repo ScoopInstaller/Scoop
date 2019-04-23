@@ -45,7 +45,7 @@ if ($apps -eq 'scoop') {
     exit
 }
 
-$apps = ensure_all_installed $apps $global
+$apps = Confirm-InstallationStatus $apps -Global:$global
 if (!$apps) { exit 0 }
 
 :app_loop foreach ($_ in $apps) {

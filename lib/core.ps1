@@ -438,31 +438,39 @@ function ensure_architecture($architecture_opt) {
     }
 }
 
-function ensure_all_installed($apps, $global) {
-    $installed = @()
-    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | ForEach-Object {
-        $app, $null, $null = parse_app $_
-        if ($global) {
-            if (installed $app $true) {
-                $installed += ,@($app, $true)
-            } elseif (installed $app $false) {
-                error "'$app' isn't installed globally, but it is installed for your account."
+function Confirm-InstallationStatus {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Apps,
+        [Switch]
+        $Global
+    )
+    $Installed = @()
+    $Apps | Select-Object -Unique | Where-Object { $_.Name -ne 'scoop' } | ForEach-Object {
+        $App, $null, $null = parse_app $_
+        if ($Global) {
+            if (installed $App $true) {
+                $Installed += ,@($App, $true)
+            } elseif (installed $App $false) {
+                error "'$App' isn't installed globally, but it is installed for your account."
                 warn "Try again without the --global (or -g) flag instead."
             } else {
-                error "'$app' isn't installed."
+                error "'$App' isn't installed."
             }
         } else {
-            if(installed $app $false) {
-                $installed += ,@($app, $false)
-            } elseif (installed $app $true) {
-                error "'$app' isn't installed for your account, but it is installed globally."
+            if(installed $App $false) {
+                $Installed += ,@($App, $false)
+            } elseif (installed $App $true) {
+                error "'$App' isn't installed for your account, but it is installed globally."
                 warn "Try again with the --global (or -g) flag instead."
             } else {
-                error "'$app' isn't installed."
+                error "'$App' isn't installed."
             }
         }
     }
-    return ,$installed
+    return ,$Installed
 }
 
 function strip_path($orig_path, $dir) {
