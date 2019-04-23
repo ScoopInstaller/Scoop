@@ -1,0 +1,26 @@
+{
+    "version": "2007.03.01",
+    "description": "GNU utilities for Win32.",
+    "homepage": "https://http://unxutils.sourceforge.net/",
+    "license": "0BSD",
+    "url": [
+        "https://downloads.sourceforge.net/project/unxutils/unxutils/current/UnxUtils.zip",
+        "http://unxutils.sourceforge.net/UnxUpdates.zip"
+    ],
+    "hash": [
+        "b8c694072723a417194022a2ba265750eec61e15d1725e39449df1763e224b45",
+        "3f442b5d2a84cf112f3688ef21ab7cf8be0a905529e90fd33ec2370d3e263f80"
+    ],
+    "extract_to": [
+        ".",
+        "usr\\local\\wbin"
+    ],
+    "bin": [
+        "bin\\sh.exe",
+        [
+            "bin\\sh.exe",
+            "unxutils"
+        ]
+    ],
+    "env_add_path": "usr\\local\\wbin"
+}
