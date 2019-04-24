@@ -1,0 +1,20 @@
+{
+    "homepage": "https://github.com/Azure/azure-api-management-devops-resource-kit",
+    "description": "Azure API Management DevOps Resource Kit",
+    "license": "MIT",
+    "version": "0.1-alpha",
+    "url": "https://github.com/Azure/azure-api-management-devops-resource-kit/releases/download/v0.1-alpha/azure-api-management-devops-example-win-x64-v0.1-alpha.zip",
+    "hash": "8b980e59eec011c5eed042e8dc576b76e22b871f8dccefec6e4181dfcc281889",
+    "depends": "azure-cli",
+    "bin": [
+        "apimtemplate.exe"
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/Azure/azure-api-management-devops-resource-kit/releases/download/v$version/azure-api-management-devops-example-win-x64-v$version.zip"
+    },
+    "notes": [
+        "Run the apimtemplate tool with the following command to extract: 'apimtemplate.exe extract' (include arguments, check docs, az login required)",
+        "Run the apimtemplate tool with the following command to create: 'apimtemplate.exe create' (include arguments, check docs)"
+    ]
+}
