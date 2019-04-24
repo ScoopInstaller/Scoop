@@ -1,4 +1,4 @@
-# requires -v 3
+#Requires -Version 3
 
 # remote install:
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
@@ -42,23 +42,37 @@ $dir = ensure (versiondir 'scoop' 'current')
 # download scoop zip
 $zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
 $zipfile = "$dir\scoop.zip"
-Write-Output 'Downloading...'
+Write-Output 'Downloading scoop...'
 dl $zipurl $zipfile
 
-'Extracting...'
+Write-Output 'Extracting...'
 Add-Type -Assembly "System.IO.Compression.FileSystem"
 [IO.Compression.ZipFile]::ExtractToDirectory($zipfile,"$dir\_tmp")
-Copy-Item "$dir\_tmp\scoop-master\*" $dir -r -force
-Remove-Item "$dir\_tmp" -r -force
-Remove-Item $zipfile
+Copy-Item "$dir\_tmp\*master\*" $dir -Recurse -Force
+Remove-Item "$dir\_tmp", $zipfile -Recurse -Force
 
 Write-Output 'Creating shim...'
 shim "$dir\bin\scoop.ps1" $false
 
+# download main bucket
+$dir = "$scoopdir\buckets\main"
+$zipurl = 'https://github.com/scoopinstaller/scoop-main/archive/master.zip'
+$zipfile = "$dir\main-bucket.zip"
+Write-Output 'Downloading main bucket...'
+New-Item $dir -Type Directory -Force | Out-Null
+dl $zipurl $zipfile
+
+Write-Output 'Extracting...'
+[IO.Compression.ZipFile]::ExtractToDirectory($zipfile, "$dir\_tmp")
+Copy-Item "$dir\_tmp\*-master\*" $dir -Recurse -Force
+Remove-Item "$dir\_tmp", $zipfile -Recurse -Force
+
 ensure_robocopy_in_path
 ensure_scoop_in_path
+
 scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
 success 'Scoop was installed successfully!'
+
 Write-Output "Type 'scoop help' for instructions."
 
 $erroractionpreference = $old_erroractionpreference # Reset $erroractionpreference to original value

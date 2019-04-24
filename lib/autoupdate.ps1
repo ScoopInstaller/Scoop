@@ -1,7 +1,5 @@
 <#
 TODO
- - add a github release autoupdate type
- - tests (single arch, without hashes etc.)
  - clean up
 #>
 . "$psscriptroot\..\lib\json.ps1"
@@ -141,15 +139,6 @@ function find_hash_in_headers([String] $url) {
 function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
     $hash = $null
 
-    <#
-    TODO implement more hashing types
-    `extract` Should be able to extract from origin page source
-    `sourceforge` Default `extract` method for sf.net
-    `metalink` Default `extract` method for metalink
-    `json` Find hash from JSONPath
-    `rdf` Find hash from a RDF Xml file
-    `download` Last resort, download the real file and hash it
-    #>
     $hashmode = $config.mode
     $basename = url_remote_filename($url)
 
