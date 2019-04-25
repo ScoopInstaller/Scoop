@@ -82,11 +82,18 @@ function update_scoop() {
         # Check if user configured other branch
         $branch = $(get_config SCOOP_BRANCH)
         if ((git_branch) -notlike "*$branch") {
-            git_fetch --all -q
+            # reset git fetch refs (GH-3368)
+            git_config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+            # fetch remote branches
+            git_fetch --force origin -q
+            # checkou and track the branch
             git_checkout -B $branch -q
+            # reset branch HEAD
+            git_reset --hard origin/$branch -q
+        } else {
+            git_pull -q
         }
 
-        git_pull -q
         $res = $lastexitcode
         if($show_update_log) {
             git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
