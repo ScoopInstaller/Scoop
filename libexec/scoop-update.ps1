@@ -44,6 +44,7 @@ if (!$repo) {
     set_config SCOOP_REPO "$repo"
 }
 
+# Find current update channel from config
 $branch = $(get_config SCOOP_BRANCH)
 if (!$branch) {
     $branch = "master"
@@ -78,8 +79,7 @@ function update_scoop() {
     } else {
         Push-Location $currentdir
 
-        # Check if user configured other branch
-        $branch = $(get_config SCOOP_BRANCH)
+        # Change branch if user configured other branch
         if (!((git_branch) -match "\*\s+$branch")) {
             # reset git fetch refs (GH-3368)
             git_config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
