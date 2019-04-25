@@ -10,6 +10,7 @@ $issues = 0
 
 $issues += !(check_windows_defender $false)
 $issues += !(check_windows_defender $true)
+$issues += !(check_long_paths)
 
 $globaldir = New-Object System.IO.DriveInfo($globaldir)
 if($globaldir.DriveFormat -ne 'NTFS') {
