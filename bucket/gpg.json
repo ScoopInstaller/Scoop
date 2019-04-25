@@ -4,6 +4,7 @@
     "license": "GPL-3.0",
     "url": "https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.2.15_20190326.exe#/dl.7z",
     "hash": "sha1:f5f7eeadfdf6ad971b5313f045083b4f95ace07b",
+    "post_install": "Remove-Item \"$dir\\`$PLUGINSDIR\" -Recurse",
     "env_add_path": "bin",
     "checkver": {
         "url": "https://www.gnupg.org/download/index.html",
