@@ -3,6 +3,7 @@ Diagnostic tests.
 Return $true if the test passed, otherwise $false.
 Use 'warn' to highlight the issue, and follow up with the recommended actions to rectify.
 #>
+. "$PSScriptRoot\buckets.ps1"
 
 function check_windows_defender($global) {
     $defender = get-service -name WinDefend -errorAction SilentlyContinue
@@ -24,6 +25,17 @@ function check_windows_defender($global) {
             }
         }
     }
+    return $true
+}
+
+function check_main_bucket {
+    if ((Get-LocalBucket) -notcontains 'main'){
+        warn 'Main bucket is not added.'
+        Write-Host "  run 'scoop bucket add main'"
+
+        return $false
+    }
+
     return $true
 }
 
