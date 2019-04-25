@@ -125,10 +125,9 @@ function rm_bucket($name) {
 function new_issue_msg($app, $bucket, $title, $body) {
     $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
     $url = known_bucket_repo $bucket
+    $bucket_path = "$bucketsdir\$bucket"
 
-    if($manifest -and ($null -eq $url) -and ($null -eq $bucket)) {
-        $url = 'https://github.com/scoopinstaller/scoop-main'
-    } elseif (Test-path $bucket_path) {
+    if (Test-path $bucket_path) {
         Push-Location $bucket_path
         $remote = git_config --get remote.origin.url
         # Support ssh and http syntax
