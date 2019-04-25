@@ -81,7 +81,7 @@ function update_scoop() {
 
         # Check if user configured other branch
         $branch = $(get_config SCOOP_BRANCH)
-        if ((git_branch) -notlike "*$branch") {
+        if (!((git_branch) -match "\*\s+$branch")) {
             # reset git fetch refs (GH-3368)
             git_config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
             # fetch remote branches
