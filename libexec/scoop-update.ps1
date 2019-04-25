@@ -86,7 +86,7 @@ function update_scoop() {
             # fetch remote branches
             git_fetch --force origin -q
             # checkout and track the branch
-            git_checkout -B $branch -q
+            git_checkout -B $branch -t origin/$branch -q
             # reset branch HEAD
             git_reset --hard origin/$branch -q
         } else {
