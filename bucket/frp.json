@@ -1,0 +1,32 @@
+{
+    "version": "0.27.0",
+    "description": "A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet.",
+    "homepage": "https://github.com/fatedier/frp",
+    "license": "Apache License 2.0",
+	"architecture": {
+		"64bit": {
+			"url": "https://github.com/fatedier/frp/releases/download/v0.27.0/frp_0.27.0_windows_amd64.zip",
+			"extract_dir": "frp_0.27.0_windows_amd64"
+		},
+		"32bit": {
+            "url": "https://github.com/fatedier/frp/releases/download/v0.27.0/frp_0.27.0_windows_386.zip",
+			"extract_dir": "frp_0.27.0_windows_386"
+        }
+	},
+    "bin": ["frpc.exe", "frps.exe"],
+    "checkver": {
+        "github": "https://github.com/fatedier/frp"
+    },
+    "autoupdate": {
+        "architecture": {
+			"64bit": {
+				"url": "https://github.com/fatedier/frp/releases/download/v$version/frp_$version_windows_amd64.zip",
+				"extract_dir": "frp_$version_windows_amd64"
+			},
+			"32bit": {
+				"url": "https://github.com/fatedier/frp/releases/download/v$version/frp_$version_windows_386.zip",
+				"extract_dir": "frp_$version_windows_386"
+			}
+		}
+    }
+}
