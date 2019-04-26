@@ -5,11 +5,11 @@
     "architecture": {
         "64bit": {
             "url": "https://eternallybored.org/misc/wget/releases/wget-1.20.3-win64.zip",
-            "hash": "9dea6d658ab14a77958233a116a86bc2f5adb1feb425848d58f918d354bdd1ea"
+            "hash": "7EF40A647A153ACCBFB8CD79B3D9E3BF8AC1BAB95B704176E3172589285A13DE"
         },
         "32bit": {
             "url": "https://eternallybored.org/misc/wget/releases/wget-1.20.3-win32.zip",
-            "hash": "4ac00c798d9ef6a394a0442607e0961de75bc6abf8fa36dbdea381eb0e93a0ab"
+            "hash": "021F547BACA74FCA939D50951CE967502D160A7502F02FAB706F9293E1475FB8"
         }
     },
     "bin": "wget.exe",
