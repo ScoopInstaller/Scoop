@@ -46,3 +46,7 @@ function git_branch {
 function git_config {
     git_proxy_cmd config $args
 }
+
+function git_reset {
+    git_proxy_cmd reset $args
+}
