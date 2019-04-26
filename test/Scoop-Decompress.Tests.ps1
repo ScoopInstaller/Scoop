@@ -8,6 +8,10 @@
 $isUnix = is_unix
 
 function install_app_ci($app, $architecture) {
+    if(installed $app) {
+        return
+    }
+
     $manifest = manifest $app
     $version = $manifest.version
     $dir = ensure (versiondir $app $version)
