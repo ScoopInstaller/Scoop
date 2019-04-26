@@ -1,9 +1,0 @@
-{
-    "homepage": "https://www.engr.mun.ca/~holden/png2html.html",
-    "version": "1.1",
-    "description": "transform a PNG image and a text file into pure html",
-    "license": "GPL-2.0-only",
-    "bin": "png2html.exe",
-    "url": "https://www.engr.mun.ca/~holden/png2html.exe",
-    "hash": "67685c4527d85f694a57c2e70d242b74156ba341f57bd300d82db453003e2319"
-}
