@@ -10,7 +10,7 @@ function Test-7ZipRequirement {
         $File
     )
     if ($URL) {
-        if (get_config 7ZIPEXTRACT_USE_EXTERNAL) {
+        if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
             return $false
         } else {
             return ($URL | Where-Object { Test-7ZipRequirement -File $_ }).Count -gt 0
@@ -28,7 +28,7 @@ function Test-LessMSIRequirement {
         [String[]]
         $URL
     )
-    if (get_config MSIEXTRACT_USE_LESSMSI) {
+    if ((get_config MSIEXTRACT_USE_LESSMSI)) {
         return ($URL | Where-Object { $_ -match '\.msi$' }).Count -gt 0
     } else {
         return $false
@@ -48,7 +48,7 @@ function Expand-7ZipArchive {
         $Removal
     )
     $LogLocation = "$(Split-Path $Path)\7zip.log"
-    if (get_config 7ZIPEXTRACT_USE_EXTERNAL) {
+    if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
         try {
             7z x "$Path" -o"$DestinationPath" -y | Out-File $LogLocation
         } catch [System.Management.Automation.CommandNotFoundException] {
@@ -92,7 +92,7 @@ function Expand-MSIArchive {
         $Removal
     )
     $LogLocation = "$(Split-Path $Path)\msi.log"
-    if (get_config MSIEXTRACT_USE_LESSMSI) {
+    if ((get_config MSIEXTRACT_USE_LESSMSI)) {
         &(file_path lessmsi lessmsi.exe) x "$Path" "$DestinationPath\" | Out-File $LogLocation
         if ($LASTEXITCODE -ne 0) {
             abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
