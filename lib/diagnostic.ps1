@@ -38,3 +38,16 @@ function check_main_bucket {
 
     return $true
 }
+
+function check_long_paths {
+    $key = Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -ErrorAction SilentlyContinue -Name 'LongPathsEnabled'
+    if (!$key -or ($key.LongPathsEnabled -eq 0)) {
+        warn 'LongPaths support is not enabled.'
+        Write-Host "You can enable it with running:"
+        Write-Host "    Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1"
+
+        return $false
+    }
+
+    return $true
+}
