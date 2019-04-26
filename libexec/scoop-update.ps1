@@ -105,6 +105,8 @@ function update_scoop() {
     }
 
     if ((Get-LocalBucket) -notcontains 'main') {
+        info "The main bucket of Scoop has been separated to 'https://github.com/scoopinstaller/scoop-main'"
+        info "Adding main bucket..."
         add_bucket 'main'
     }
 
