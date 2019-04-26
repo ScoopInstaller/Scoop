@@ -29,20 +29,23 @@ function test_extract($extract_fn, $from, $removal) {
 Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     BeforeAll {
         $working_dir = setup_working 'decompress'
-    }
 
-    if (!$isUnix) {
-        # Expanding Test Cases
-        $testcases = "$working_dir\TestCases.zip"
-        $testcases | Should -Exist
-        compute_hash $testcases 'sha256' | Should -Be '695bb18cafda52644a19afd184b2545e9c48f1a191f7ff1efc26cb034587079c'
-        Expand-Archive $testcases $working_dir
+        It "Decompression test cases should exist" {
+            $testcases = "$working_dir\TestCases.zip"
+            if (!$isUnix) {
+                Expand-Archive $testcases $working_dir
+            }
+            $testcases | Should -Exist
+            compute_hash $testcases 'sha256' | Should -Be '695bb18cafda52644a19afd184b2545e9c48f1a191f7ff1efc26cb034587079c'
+        }
     }
 
     Context "7zip extraction" {
 
-        if (!$isUnix) {
-            install_app_ci 7zip 64bit
+        BeforeAll {
+            if (!$isUnix) {
+                install_app_ci 7zip 64bit
+            }
             $test1 = "$working_dir\7ZipTest1.7z"
             $test2 = "$working_dir\7ZipTest2.tgz"
             $test3 = "$working_dir\7ZipTest3.tar.bz2"
@@ -85,8 +88,11 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     }
 
     Context "msi extraction" {
-        if (!$isUnix) {
-            install_app_ci lessmsi
+
+        BeforeAll {
+            if (!$isUnix) {
+                install_app_ci lessmsi
+            }
             $test1 = "$working_dir\MSITest.msi"
             $test2 = "$working_dir\MSITestNull.msi"
         }
@@ -115,8 +121,10 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
     Context "inno extraction" {
 
-        if (!$isUnix) {
-            install_app_ci innounp
+        BeforeAll {
+            if (!$isUnix) {
+                install_app_ci innounp
+            }
             $test = "$working_dir\InnoTest.exe"
         }
 
@@ -136,7 +144,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
     Context "zip extraction" {
 
-        if (!$isUnix) {
+        BeforeAll {
             $test = "$working_dir\ZipTest.zip"
         }
 
