@@ -1,62 +1,152 @@
 . "$psscriptroot\Scoop-TestLib.ps1"
-. "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\decompress.ps1"
 . "$psscriptroot\..\lib\unix.ps1"
+. "$psscriptroot\..\lib\install.ps1"
+. "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 
 $isUnix = is_unix
 
-describe "unzip_old" -Tag 'Scoop' {
-    beforeall {
-        $working_dir = setup_working "unzip_old"
+function install_app_ci($app, $architecture) {
+    $manifest = manifest $app
+    $version = $manifest.version
+    $dir = ensure (versiondir $app $version)
+    $fname = dl_urls $app $version $manifest $null $architecture $dir
+    $dir = link_current $dir
+    success "'$app' ($version) was installed successfully!"
+}
+
+function test_extract($extract_fn, $from, $removal) {
+    $to = (strip_ext $from) -replace '\.tar$', ''
+    & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal
+    return $to
+}
+
+Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
+    BeforeAll {
+        $working_dir = setup_working 'decompress'
     }
 
-    function test-unzip($from) {
-        $to = strip_ext $from
+    if (!$isUnix) {
+        # Expanding Test Cases
+        $testcases = "$working_dir\TestCases.zip"
+        $testcases | Should -Exist
+        compute_hash $testcases 'sha256' | Should -Be '695bb18cafda52644a19afd184b2545e9c48f1a191f7ff1efc26cb034587079c'
+        Expand-Archive $testcases $working_dir
+    }
 
-        if(is_unix) {
-            unzip_old ($from -replace '\\','/') ($to -replace '\\','/')
-        } else {
-            unzip_old ($from -replace '/','\') ($to -replace '/','\')
+    Context "7zip extraction" {
+
+        if (!$isUnix) {
+            install_app_ci 7zip 64bit
+            $test1 = "$working_dir\7ZipTest1.7z"
+            $test2 = "$working_dir\7ZipTest2.tgz"
+            $test3 = "$working_dir\7ZipTest3.tar.bz2"
+            $test4 = "$working_dir\7ZipTest4.tar.gz"
         }
 
-        $to
-    }
+        It "extract normal compressed file" -Skip:$isUnix {
+            $to = test_extract "Expand-7ZipArchive" $test1
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
 
-    context "zip file size is zero bytes" {
-        $zerobyte = "$working_dir\zerobyte.zip"
-        $zerobyte | should -exist
+        It "extract nested compressed file" -Skip:$isUnix {
+            # file ext: tgz
+            $to = test_extract "Expand-7ZipArchive" $test2
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
 
-        it "unzips file with zero bytes without error" -skip:$isUnix {
-            # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
-            # `$to = test-unzip $zerobyte` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
-            $to = ([string](test-unzip $zerobyte)).trimStart()
+            # file ext: tar.bz2
+            $to = test_extract "Expand-7ZipArchive" $test3
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
 
-            $to | should -not -match '^\s'
-            $to | should -not -benullorempty
+        It "extract nested compressed file with different inner name" -Skip:$isUnix {
+            $to = test_extract "Expand-7ZipArchive" $test4
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
 
-            $to | should -exist
-
-            (Get-ChildItem $to).count | should -be 0
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
+            $test1 | Should -Exist
+            test_extract "Expand-7ZipArchive" $test1 $true
+            $test1 | Should -Not -Exist
         }
     }
 
-    context "zip file is small in size" {
-        $small = "$working_dir\small.zip"
-        $small | should -exist
+    Context "msi extraction" {
+        if (!$isUnix) {
+            install_app_ci lessmsi
+            $test1 = "$working_dir\MSITest.msi"
+            $test2 = "$working_dir\MSITestNull.msi"
+        }
 
-        it "unzips file which is small in size" -skip:$isUnix {
-            # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
-            # `$to = test-unzip $small` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
-            $to = ([string](test-unzip $small)).trimStart()
+        It "extract normal MSI file" -Skip:$isUnix {
+            mock get_config { $false }
+            $to = test_extract "Expand-MSIArchive" $test1
+            $to | Should -Exist
+            "$to\MSITest\empty" | Should -Exist
+            (Get-ChildItem "$to\MSITest").Count | Should -Be 1
+        }
 
-            $to | should -not -match '^\s'
-            $to | should -not -benullorempty
+        It "extract empty MSI file using lessmsi" -Skip:$isUnix {
+            mock get_config { $true }
+            $to = test_extract "Expand-MSIArchive" $test2
+            $to | Should -Exist
+        }
 
-            $to | should -exist
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
+            mock get_config { $false }
+            $test1 | Should -Exist
+            test_extract "Expand-MSIArchive" $test1 $true
+            $test1 | Should -Not -Exist
+        }
+    }
 
-            # these don't work for some reason on appveyor
-            #join-path $to "empty" | should -exist
-            #(gci $to).count | should -be 1
+    Context "inno extraction" {
+
+        if (!$isUnix) {
+            install_app_ci innounp
+            $test = "$working_dir\InnoTest.exe"
+        }
+
+        It "extract Inno Setup file" -Skip:$isUnix {
+            $to = test_extract "Expand-InnoArchive" $test
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
+            $test | Should -Exist
+            test_extract "Expand-InnoArchive" $test $true
+            $test | Should -Not -Exist
+        }
+    }
+
+    Context "zip extraction" {
+
+        if (!$isUnix) {
+            $test = "$working_dir\ZipTest.zip"
+        }
+
+        It "extract compressed file" -Skip:$isUnix {
+            $to = test_extract "Expand-ZipArchive" $test
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
+            $test | Should -Exist
+            test_extract "Expand-ZipArchive" $test $true
+            $test | Should -Not -Exist
         }
     }
 }
