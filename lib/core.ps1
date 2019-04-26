@@ -301,7 +301,47 @@ function isFileLocked([string]$path) {
 }
 
 function is_directory([String] $path) {
-    return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
+    return (Test-Path $path) -and (Get-Item -Path $path) -is [System.IO.DirectoryInfo]
+}
+
+function is_junction([String] $path) {
+    return (Test-Path $path) -and (Get-Item -Path $path).LinkType -eq 'Junction'
+}
+
+function create_junction([String] $link, [String] $target) {
+    if (!(Test-Path $link) -and (is_directory $target)) {
+        New-Item -ItemType Junction -Path (Split-Path -Path $link) -Name (Split-Path -Leaf $link) -Target $target | Out-Null
+        $dirInfo = New-Object System.IO.DirectoryInfo($link)
+        $dirInfo.Attributes = $dirInfo.Attributes -bor [System.IO.FileAttributes]::ReadOnly
+        return $true
+    }
+    return $false
+}
+
+function remove_junction([String] $link) {
+    if(is_junction $link) {
+        $dirInfo = New-Object System.IO.DirectoryInfo($link)
+        $dirInfo.Attributes = $dirInfo.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)
+        $dirInfo.Delete()
+        return $true
+    }
+    return $false
+}
+
+function create_hardlink([String] $link, [String] $target) {
+    if (!(Test-Path $link) -and (Test-Path $target) -and !(is_directory $target)) {
+        New-Item -ItemType HardLink -Path (Split-Path -Path $link) -Name (Split-Path -Leaf $link) -Target $target | Out-Null
+        return $true
+    }
+    return $false
+}
+
+function remove_hardlink([String] $link) {
+    if ((Test-Path $link) -and !(is_directory $link)) {
+        Remove-Item -Path $link | Out-Null
+        return $true
+    }
+    return $false
 }
 
 function movedir($from, $to) {
