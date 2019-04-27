@@ -21,7 +21,6 @@ param(
             $true
         }
     })]
-    [Alias('Path')]
     [String] $Dir,
     [Int] $Timeout = 5,
     [Switch] $SkipValid

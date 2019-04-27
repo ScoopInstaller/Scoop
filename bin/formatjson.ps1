@@ -24,7 +24,6 @@ param(
             $true
         }
     })]
-    [Alias('Path')]
     [String] $Dir
 )
 

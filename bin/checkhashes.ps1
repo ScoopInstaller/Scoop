@@ -32,7 +32,6 @@ param(
             $true
         }
     })]
-    [Alias('Path')]
     [String] $Dir,
     [Switch] $Update,
     [Switch] $ForceUpdate,
