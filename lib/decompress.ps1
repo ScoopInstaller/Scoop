@@ -197,7 +197,7 @@ function extract_msi($path, $to, $removal) {
     Expand-MSIArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
-function extract_inno($path, $to, $removal) {
+function unpack_inno($path, $to, $removal) {
     Show-DeprecationMessage $MyInvocation 'Expand-InnoArchive'
     Expand-InnoArchive -Path $path -DestinationPath $to -Removal:$removal
 }
