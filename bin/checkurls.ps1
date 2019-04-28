@@ -13,6 +13,7 @@
 #>
 param(
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -20,7 +21,7 @@ param(
             $true
         }
     })]
-    [String] $Dir = "$PSScriptRoot\\..\bucket",
+    [String] $Dir,
     [Int] $Timeout = 5,
     [Switch] $SkipValid
 )

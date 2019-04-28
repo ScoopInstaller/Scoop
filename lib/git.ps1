@@ -15,6 +15,14 @@ function git_ls_remote {
     git_proxy_cmd ls-remote $args
 }
 
+function git_checkout {
+    git_proxy_cmd checkout $args
+}
+
+function git_branch {
+    git_proxy_cmd branch $args
+}
+
 function git_pull {
     git_proxy_cmd pull $args
 }
@@ -37,4 +45,8 @@ function git_branch {
 
 function git_config {
     git_proxy_cmd config $args
+}
+
+function git_reset {
+    git_proxy_cmd reset $args
 }

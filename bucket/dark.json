@@ -1,5 +1,6 @@
 {
     "homepage": "http://wixtoolset.org/",
+    "description": "Converts a Windows Installer database into a set of WiX source files.",
     "license": "MS-RL",
     "version": "3.11",
     "url": "https://raw.githubusercontent.com/scoopinstaller/binary-mirror/master/dark/dark-3.11.zip",

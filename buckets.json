@@ -1,4 +1,5 @@
 {
+    "main": "https://github.com/scoopinstaller/scoop-main",
     "extras": "https://github.com/lukesampson/scoop-extras",
     "versions": "https://github.com/scoopinstaller/versions",
     "nightlies": "https://github.com/scoopinstaller/nightlies",
