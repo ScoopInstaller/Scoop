@@ -168,6 +168,13 @@ function file_path($app, $file) {
     return $null
 }
 
+Function Test-CommandAvailable {
+    Param (
+        [String]$Name
+    )
+    Return [Boolean](Get-Command $Name -ErrorAction Ignore)
+}
+
 function 7zip_path() {
     return (file_path '7zip' '7z.exe')
 }
@@ -502,7 +509,7 @@ function ensure_scoop_in_path($global) {
 }
 
 function ensure_robocopy_in_path {
-    if(!(Get-Command robocopy -ea ignore)) {
+    if(!(Test-CommandAvailable robocopy)) {
         shim "C:\Windows\System32\Robocopy.exe" $false
     }
 }

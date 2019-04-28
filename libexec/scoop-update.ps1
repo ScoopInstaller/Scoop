@@ -67,8 +67,7 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
 
 function update_scoop() {
     # check for git
-    $git = try { Get-Command git -ea stop } catch { $null }
-    if (!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     write-host "Updating Scoop..."
     $last_update = $(last_scoop_update)

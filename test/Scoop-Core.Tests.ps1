@@ -135,12 +135,6 @@ Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
         get_app_name_from_ps1_shim "$shim_path" | should -be "mockapp"
     }
 
-    It "returns app name if file exists and is a shim to an app cerca August 2018" -skip:$isUnix {
-        Write-Output '$path = join-path "$psscriptroot" "..\apps\vim\current\vim.exe"' | Out-File "$working_dir/moch-shim.ps1" -Encoding utf8
-        Write-Output 'if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }' | Out-File "$working_dir/moch-shim.ps1" -Append -Encoding utf8
-        get_app_name_from_ps1_shim "$working_dir/moch-shim.ps1" | should -be "vim"
-    }
-
     It "returns empty string if file exists and is not a shim" -skip:$isUnix {
         Write-Output "lorem ipsum" | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
         get_app_name_from_ps1_shim "$working_dir/mock-shim.ps1" | should -be ""
@@ -165,8 +159,8 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
     context "robocopy is not in path" {
         it "shims robocopy when not on path" -skip:$isUnix {
-            mock gcm { $false }
-            Get-Command robocopy | should -be $false
+            mock Test-CommandAvailable { $false }
+            Test-CommandAvailable robocopy | should -be $false
 
             ensure_robocopy_in_path
 
@@ -180,7 +174,9 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
     context "robocopy is in path" {
         it "does not shim robocopy when it is in path" -skip:$isUnix {
-            mock gcm { $true }
+            mock Test-CommandAvailable { $true }
+            Test-CommandAvailable robocopy | should -be $true
+
             ensure_robocopy_in_path
 
             "$shimdir/robocopy.ps1" | should -not -exist
