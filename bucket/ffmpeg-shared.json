@@ -1,0 +1,35 @@
+{
+    "version": "4.1.3",
+    "homepage": "https://ffmpeg.zeranoe.com/builds/",
+    "license": "GPL-3.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-4.1.3-win64-shared.zip",
+            "hash": "0b974578e07d974c4bafb36c7ed0b46e46b001d38b149455089c13b57ddefe5d",
+            "extract_dir": "ffmpeg-4.1.3-win64-shared"
+        },
+        "32bit": {
+            "url": "https://ffmpeg.zeranoe.com/builds/win32/shared/ffmpeg-4.1.3-win32-shared.zip",
+            "hash": "8ea472d673370d5e87517a75587abfa6f189ee4f82e8da21fdbc49d0db0c1a89",
+            "extract_dir": "ffmpeg-4.1.3-win32-shared"
+        }
+    },
+    "bin": [
+        "bin\\ffmpeg.exe",
+        "bin\\ffplay.exe",
+        "bin\\ffprobe.exe"
+    ],
+    "checkver": "name=\"v\"\\s+value=\"([\\d.]+)\"",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-$version-win64-shared.zip",
+                "extract_dir": "ffmpeg-$version-win64-shared"
+            },
+            "32bit": {
+                "url": "https://ffmpeg.zeranoe.com/builds/win32/shared/ffmpeg-$version-win32-shared.zip",
+                "extract_dir": "ffmpeg-$version-win32-shared"
+            }
+        }
+    }
+}
