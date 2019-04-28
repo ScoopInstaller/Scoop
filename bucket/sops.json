@@ -2,12 +2,12 @@
     "homepage": "https://github.com/mozilla/sops",
     "description": "Editor of encrypted files that supports YAML, JSON, ENV, INI and BINARY formats and encrypts with AWS KMS, GCP KMS, Azure Key Vault and PGP",
     "license": "MPL-2.0",
-    "version": "3.2.0",
+    "version": "3.3.0",
     "depends": "gpg",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/mozilla/sops/releases/download/3.2.0/sops-3.2.0.exe#/sops.exe",
-            "hash": "7514b90613e1ba5df4516257eccab0cbe8ed0c6128366ca9b8ce2312ff208dbf"
+            "url": "https://github.com/mozilla/sops/releases/download/3.3.0/sops-3.3.0.exe#/sops.exe",
+            "hash": "6a5a1dd94cb6fe5ca82eee810629f4bccc46368fa932c016d18d8bb8dc1adb78"
         }
     },
     "bin": "sops.exe",

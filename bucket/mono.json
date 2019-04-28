@@ -1,10 +1,18 @@
 {
-    "version": "5.18.1.3",
+    "version": "5.20.1.19",
     "description": "Cross platform, open source .NET framework.",
     "homepage": "https://www.mono-project.com/",
     "license": "MIT",
-    "url": "https://download.mono-project.com/archive/5.18.1/windows-installer/mono-5.18.1.3-gtksharp-2.12.45-win32-0.msi",
-    "hash": "c2dbda052aa8adfa89e38b99f1eda293b22fbcd8401a047535c5a2710aa5ea8c",
+    "architecture": {
+        "64bit": {
+            "url": "https://download.mono-project.com/archive/5.20.1/windows-installer/mono-5.20.1.19-x64-0.msi",
+            "hash": "f84dde8ac4cb7de9c063fa0deb4c0fe0f7fecc6d01fda9824ddaada823acf70b"
+        },
+        "32bit": {
+            "url": "https://download.mono-project.com/archive/5.20.1/windows-installer/mono-5.20.1.19-gtksharp-2.12.45-win32-0.msi",
+            "hash": "50b964763edaae697a65ef27848c74e9eaa172050ddca94e5ebcf29ad4117b70"
+        }
+    },
     "extract_dir": "Mono",
     "env_add_path": "bin",
     "checkver": {
@@ -12,6 +20,19 @@
         "re": "(?<short>[\\d.]+)/windows-installer/(?<file>mono-(?<version>[\\d.]+).*win32.*).msi"
     },
     "autoupdate": {
-        "url": "https://download.mono-project.com/archive/$matchShort/windows-installer/$matchFile.msi"
+        "architecture": {
+            "64bit": {
+                "url": "https://download.mono-project.com/archive/$matchShort/windows-installer/mono-$version-x64-0.msi"
+            },
+            "32bit": {
+                "url": "https://download.mono-project.com/archive/$matchShort/windows-installer/$matchFile.msi"
+            }
+        }
+    },
+    "suggest": {
+        "vcredist": [
+            "extras/vcredist2013",
+            "extras/vcredist2015"
+        ]
     }
 }

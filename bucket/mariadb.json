@@ -4,12 +4,12 @@
     "license": "GPL-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.3.14/winx64-packages/mariadb-10.3.14-winx64.zip",
+            "url": "https://mirror.netcologne.de/mariadb/mariadb-10.3.14/winx64-packages/mariadb-10.3.14-winx64.zip",
             "hash": "34afaff2ab4412755210f7ae3eea67fc6d2ac0c71f081fd4aad413a2b3fb4a4a",
             "extract_dir": "mariadb-10.3.14-winx64"
         },
         "32bit": {
-            "url": "https://downloads.mariadb.org/f/mariadb-10.3.14/win32-packages/mariadb-10.3.14-win32.zip",
+            "url": "https://mirror.netcologne.de/mariadb/mariadb-10.3.14/win32-packages/mariadb-10.3.14-win32.zip",
             "hash": "c109f9ea4cc1ff31617a2057092038f188936b986a12c3202e5773aa5e23b388",
             "extract_dir": "mariadb-10.3.14-win32"
         }
@@ -57,17 +57,17 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://downloads.mariadb.org/f/mariadb-$version/winx64-packages/mariadb-$version-winx64.zip",
+                "url": "https://mirror.netcologne.de/mariadb/mariadb-$version/winx64-packages/mariadb-$version-winx64.zip",
                 "extract_dir": "mariadb-$version-winx64",
                 "hash": {
-                    "url": "http://mirror2.hs-esslingen.de/mariadb/mariadb-$version/winx64-packages/sha256sums.txt"
+                    "url": "https://mirror.netcologne.de/mariadb/mariadb-$version/winx64-packages/sha256sums.txt"
                 }
             },
             "32bit": {
-                "url": "https://downloads.mariadb.org/f/mariadb-$version/win32-packages/mariadb-$version-win32.zip",
+                "url": "https://mirror.netcologne.de/mariadb/mariadb-$version/win32-packages/mariadb-$version-win32.zip",
                 "extract_dir": "mariadb-$version-win32",
                 "hash": {
-                    "url": "http://mirror2.hs-esslingen.de/mariadb/mariadb-$version/win32-packages/sha256sums.txt"
+                    "url": "https://mirror.netcologne.de/mariadb/mariadb-$version/win32-packages/sha256sums.txt"
                 }
             }
         }

@@ -42,6 +42,22 @@ function Get-UserAgent() {
     return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
 }
 
+function Show-DeprecatedWarning {
+    <#
+    .SYNOPSIS
+        Print deprecated warning for functions, which will be deleted in near future.
+    .PARAMETER Invocation
+        Invocation to identify location of line.
+        Just pass $MyInvocation.
+    .PARAMETER New
+        New command name.
+    #>
+    param($Invocation, [String] $New)
+
+    warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
+    Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
+}
+
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 

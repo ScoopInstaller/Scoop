@@ -1,14 +1,15 @@
 {
-    "homepage": "http://gnuwin32.sourceforge.net/packages/grep.htm",
     "version": "2.5.4",
-    "license": "GPL-2.0",
+    "description": "Print lines matching a pattern.",
+    "homepage": "http://gnuwin32.sourceforge.net/packages/grep.htm",
+    "license": "GPL-2.0-only",
     "url": [
-        "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-bin.zip",
-        "https://sourceforge.net/projects/gnuwin32/files/grep/2.5.4/grep-2.5.4-dep.zip"
+        "https://downloads.sourceforge.net/projects/gnuwin32/grep/2.5.4/grep-2.5.4-bin.zip",
+        "https://downloads.sourceforge.net/projects/gnuwin32/grep/2.5.4/grep-2.5.4-dep.zip"
     ],
     "hash": [
-        "3fd98201561b5af3f54a7dacc4f88068f5b5edf19ccdfc981c3c9fc60ff73519",
-        "2150e12da6631899842c28881a75889794d67b2bbc108341a26052f9bcb27584"
+        "sha1:56f41d351b3ed8ac671df4dd3bbd4c4d3b9190a2",
+        "sha1:6dc3a0d1a1751c731fb680a01650a1396c76648c"
     ],
     "bin": "bin\\grep.exe"
 }

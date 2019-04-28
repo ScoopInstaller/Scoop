@@ -19,8 +19,8 @@ if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
     write-host ""
     Pop-Location
 
-    buckets | ForEach-Object {
-        Push-Location $(bucketdir $_)
+    Get-LocalBucket | ForEach-Object {
+        Push-Location (Find-BucketDirectory $_ -Root)
         if(test-path '.git') {
             write-host "'$_' bucket:"
             git_log --oneline HEAD -n 1
