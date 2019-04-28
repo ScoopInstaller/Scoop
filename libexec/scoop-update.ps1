@@ -104,12 +104,26 @@ function update_scoop() {
         }
     }
 
+    if ((Get-LocalBucket) -notcontains 'main') {
+        info "The main bucket of Scoop has been separated to 'https://github.com/scoopinstaller/scoop-main'"
+        info "Adding main bucket..."
+        add_bucket 'main'
+    }
+
     ensure_scoop_in_path
     shim "$currentdir\bin\scoop.ps1" $false
 
     Get-LocalBucket | ForEach-Object {
         write-host "Updating '$_' bucket..."
-        Push-Location (bucketdir $_)
+
+        $loc = Find-BucketDirectory $_ -Root
+        # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
+        if (($_ -eq 'main') -and !(Test-Path "$loc\.git")) {
+            rm_bucket 'main'
+            add_bucket 'main'
+        }
+
+        Push-Location $loc
         git_pull -q
         if ($show_update_log) {
             git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
@@ -129,6 +143,9 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # re-use architecture, bucket and url from first install
     $architecture = ensure_architecture $install.architecture
     $bucket = $install.bucket
+    if ($null -eq $bucket) {
+        $bucket = 'main'
+    }
     $url = $install.url
 
     if (!$independent) {

@@ -41,7 +41,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
@@ -108,7 +107,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     $cached = fullpath (cache_path $app $version $url)
 
     if(!(test-path $cached) -or !$use_cache) {
-        $null = ensure $cachedir
+        ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
@@ -537,39 +536,29 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         # work out extraction method, if applicable
         $extract_fn = $null
-        if($fname -match '\.zip$') {
-            $extract_fn = 'extract_zip'
+        if ($manifest.innosetup) {
+            $extract_fn = 'Expand-InnoArchive'
+        } elseif($fname -match '\.zip$') {
+            $extract_fn = 'Expand-ZipArchive'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
-            $msi = msi $manifest $architecture
-            if(!$msi) {
-                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
-                if ($useLessMsi -eq $true) {
-                    $extract_fn, $extract_dir = lessmsi_config $extract_dir
-                }
-                else {
-                    $extract_fn = 'extract_msi'
-                }
-            } else {
+            if(msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
+            } else {
+                $extract_fn = 'Expand-MSIArchive'
             }
-        } elseif(file_requires_7zip $fname) { # 7zip
-            if(!(7zip_installed)) {
-                warn "Aborting. You'll need to run 'scoop uninstall $app' to clean up."
-                abort "7-zip is required. You can install it with 'scoop install 7zip'."
-            }
-            $extract_fn = 'extract_7zip'
+        } elseif(Test-7ZipRequirement -File $fname) { # 7zip
+            $extract_fn = 'Expand-7ZipArchive'
         }
 
         if($extract_fn) {
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            $null = mkdir "$dir\_tmp"
-            & $extract_fn "$dir\$fname" "$dir\_tmp"
-            Remove-Item "$dir\$fname"
+            ensure "$dir\_tmp" | Out-Null
+            & $extract_fn "$dir\$fname" "$dir\_tmp" -Removal
             if ($extract_to) {
-                $null = mkdir "$dir\$extract_to" -force
+                ensure "$dir\$extract_to" | Out-Null
             }
             # fails if zip contains long paths (e.g. atom.json)
             #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
@@ -581,7 +570,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                 abort $(new_issue_msg $app $bucket "extract_dir error")
             }
 
-            if(test-path "$dir\_tmp") { # might have been moved by movedir
+            if(Test-Path "$dir\_tmp") { # might have been moved by movedir
                 try {
                     Remove-Item -r -force "$dir\_tmp" -ea stop
                 } catch [system.io.pathtoolongexception] {
@@ -1178,7 +1167,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # we don't have persist data in the store, move the source to target, then create link
             } elseif (Test-Path $source) {
                 # ensure target parent folder exist
-                $null = ensure (Split-Path -Path $target)
+                ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
             # we don't have neither source nor target data! we need to crate an empty target,
             # but we can't make a judgement that the data should be a file or directory...

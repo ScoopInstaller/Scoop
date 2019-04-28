@@ -9,13 +9,15 @@
 #>
 param(
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
+        } else {
+            $true
         }
-        $true
     })]
-    [String] $Dir = "$PSScriptRoot\..\bucket"
+    [String] $Dir
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -34,7 +36,7 @@ $Queue | ForEach-Object {
     $name, $manifest = $_
     Write-Host "$name`: " -NoNewline
 
-    if(!$manifest.homepage) {
+    if (!$manifest.homepage) {
         Write-Host "`nNo homepage set." -ForegroundColor Red
         return
     }
@@ -49,7 +51,7 @@ $Queue | ForEach-Object {
     }
 
     $description, $descr_method = find_description $manifest.homepage $home_html
-    if(!$description) {
+    if (!$description) {
         Write-Host "`nDescription not found ($($manifest.homepage))" -ForegroundColor Red
         return
     }
