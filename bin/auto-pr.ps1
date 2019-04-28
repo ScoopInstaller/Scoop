@@ -46,7 +46,6 @@ param(
             $true
         }
     })]
-    [Alias('Path')]
     [String] $Dir,
     [Switch] $Push,
     [Switch] $Request,

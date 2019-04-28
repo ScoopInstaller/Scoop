@@ -19,7 +19,6 @@ param(
             $true
         }
     })]
-    [Alias('Path')]
     [String] $Dir,
     [Switch] $SkipSupported
 )
