@@ -7,19 +7,6 @@
 
 $isUnix = is_unix
 
-function install_app_ci($app, $architecture) {
-    if(installed $app) {
-        return
-    }
-
-    $manifest = manifest $app
-    $version = $manifest.version
-    $dir = ensure (versiondir $app $version)
-    $fname = dl_urls $app $version $manifest $null $architecture $dir
-    $dir = link_current $dir
-    success "'$app' ($version) was installed successfully!"
-}
-
 function test_extract($extract_fn, $from, $removal) {
     $to = (strip_ext $from) -replace '\.tar$', ''
     & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal
@@ -43,8 +30,10 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     Context "7zip extraction" {
 
         BeforeAll {
-            if (!$isUnix) {
-                install_app_ci 7zip 64bit
+            if($env:CI) {
+                mock file_path { (Get-Command 7z.exe).Path }
+            } elseif(!(installed 7zip)) {
+                scoop install 7zip
             }
             $test1 = "$working_dir\7ZipTest1.7z"
             $test2 = "$working_dir\7ZipTest2.tgz"
@@ -90,8 +79,10 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     Context "msi extraction" {
 
         BeforeAll {
-            if (!$isUnix) {
-                install_app_ci lessmsi
+            if($env:CI) {
+                mock file_path { $env:lessmsi }
+            } elseif(!(installed lessmsi)) {
+                scoop install lessmsi
             }
             $test1 = "$working_dir\MSITest.msi"
             $test2 = "$working_dir\MSITestNull.msi"
@@ -122,8 +113,10 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     Context "inno extraction" {
 
         BeforeAll {
-            if (!$isUnix) {
-                install_app_ci innounp
+            if($env:CI) {
+                mock file_path { $env:innounp }
+            } elseif(!(installed innounp)) {
+                scoop install innounp
             }
             $test = "$working_dir\InnoTest.exe"
         }
