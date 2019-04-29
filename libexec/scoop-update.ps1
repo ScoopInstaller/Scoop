@@ -194,7 +194,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # Workaround for https://github.com/lukesampson/scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
     Write-Host "Downloading new version"
-    if (aria2_enabled) {
+    if (Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
         $urls = url $manifest $architecture
@@ -307,7 +307,7 @@ if (!$apps) {
 
     $suggested = @{};
     # # $outdated is a list of ($app, $global) tuples
-    if (aria2_enabled) {
+    if (Test-Aria2Enabled) {
         warn "Scoop uses 'aria2c' for multi-connection downloads."
         warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
     }
