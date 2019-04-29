@@ -183,6 +183,22 @@ function Test-7zipInstalled() {
     return ![String]::IsNullOrWhiteSpace("$(Get-7zipPath)")
 }
 
+function Get-LessmsiPath() {
+    return (file_path 'lessmsi' 'lessmsi.exe')
+}
+
+function Test-LessmsiInstalled() {
+    return ![String]::IsNullOrWhiteSpace("$(Get-LessmsiPath)")
+}
+
+function Get-InnounpPath() {
+    return (file_path 'innounp' 'innounp.exe')
+}
+
+function Test-InnounpInstalled() {
+    return ![String]::IsNullOrWhiteSpace("$(Get-InnounpPath)")
+}
+
 function Get-Aria2Path() {
     return (file_path 'aria2' 'aria2c.exe')
 }
