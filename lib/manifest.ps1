@@ -13,7 +13,12 @@ function Get-Manifest {
     .PARAMETER Path
         Path to manifest.
     #>
-    param([String] $Path)
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Path
+    )
 
     if (!(Test-Path $Path)) { return $null }
 
@@ -30,10 +35,18 @@ function Out-Manifest {
     .PARAMETER Content
         Object representation of manifest.
     #>
-    param([String] $Path, $Content)
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Path,
+        [Parameter(Position = 1)]
+        [ValidateNotNullOrEmpty()]
+        $Content
+    )
 
-    # TODO: YAML
-    $Content = ($Content | ConvertToPrettyJson).Trim()
+    $Content = ($Content | ConvertToPrettyJson)
+    $Content = $Content.Trim()
 
     [System.IO.File]::WriteAllLines($Path, $Content)
 }
