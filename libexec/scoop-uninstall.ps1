@@ -45,7 +45,7 @@ if ($apps -eq 'scoop') {
     exit
 }
 
-$apps = ensure_all_installed $apps $global
+$apps = Confirm-InstallationStatus $apps -Global:$global
 if (!$apps) { exit 0 }
 
 :app_loop foreach ($_ in $apps) {
@@ -108,7 +108,7 @@ if (!$apps) { exit 0 }
         }
     }
 
-    if (@(versions $app).length -eq 0) {
+    if (@(versions $app $global).length -eq 0) {
         $appdir = appdir $app $global
         try {
             # if last install failed, the directory seems to be locked and this
