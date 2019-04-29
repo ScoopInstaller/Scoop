@@ -397,14 +397,14 @@ function shim($path, $global, $name, $arg) {
         "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     }
 
-    if($path -match '\.exe$') {
+    if($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
         Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
         }
-    } elseif($path -match '\.((bat)|(cmd))$') {
+    } elseif($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
