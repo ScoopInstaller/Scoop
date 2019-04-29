@@ -1,4 +1,4 @@
-function Test-7ZipRequirement {
+function Test-7zipRequirement {
     [CmdletBinding(DefaultParameterSetName = "URL")]
     [OutputType([Boolean])]
     param(
@@ -13,14 +13,14 @@ function Test-7ZipRequirement {
         if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
             return $false
         } else {
-            return ($URL | Where-Object { Test-7ZipRequirement -File $_ }).Count -gt 0
+            return ($URL | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
         }
     } else {
         return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
     }
 }
 
-function Test-LessMSIRequirement {
+function Test-LessmsiRequirement {
     [CmdletBinding()]
     [OutputType([Boolean])]
     param(
@@ -35,7 +35,7 @@ function Test-LessMSIRequirement {
     }
 }
 
-function Expand-7ZipArchive {
+function Expand-7zipArchive {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
@@ -63,7 +63,7 @@ function Expand-7ZipArchive {
         try {
             7z x "$Path" -o"$DestinationPath" (-split $Switches) -y | Out-File $LogLocation
         } catch [System.Management.Automation.CommandNotFoundException] {
-            abort "Cannot find external 7Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7Zip manually and try again."
+            abort "Cannot find external 7-Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7-Zip manually and try again."
         }
     } else {
         &(file_path 7zip 7z.exe) x "$Path" -o"$DestinationPath" (-split $Switches) -y | Out-File $LogLocation
@@ -79,9 +79,9 @@ function Expand-7ZipArchive {
         $ArchivedFile = &(file_path 7zip 7z.exe) l "$Path"
         if ($LASTEXITCODE -eq 0) {
             $TarFile = $ArchivedFile[-3] -replace '.{53}(.*)', '$1' # get inner tar file name
-            Expand-7ZipArchive "$DestinationPath\$TarFile" $DestinationPath -Removal
+            Expand-7zipArchive "$DestinationPath\$TarFile" $DestinationPath -Removal
         } else {
-            abort "Failed to list files in $Path.`nNot a 7Zip supported archive file."
+            abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
     }
     if ($Removal) {
@@ -90,7 +90,7 @@ function Expand-7ZipArchive {
     }
 }
 
-function Expand-MSIArchive {
+function Expand-MsiArchive {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
@@ -175,15 +175,15 @@ function Expand-ZipArchive {
             [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath)
         } catch [System.IO.PathTooLongException] {
             # try to fall back to 7zip if path is too long
-            if (7zip_installed) {
-                Expand-7ZipArchive $Path $DestinationPath -Removal
+            if (Test-7zipInstalled) {
+                Expand-7zipArchive $Path $DestinationPath -Removal
                 return
             } else {
                 abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
             }
         } catch [System.IO.IOException] {
-            if (7zip_installed) {
-                Expand-7ZipArchive $Path $DestinationPath -Removal
+            if (Test-7zipInstalled) {
+                Expand-7zipArchive $Path $DestinationPath -Removal
                 return
             } else {
                 abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
@@ -202,13 +202,13 @@ function Expand-ZipArchive {
 }
 
 function extract_7zip($path, $to, $removal) {
-    Show-DeprecatedWarning $MyInvocation 'Expand-7ZipArchive'
-    Expand-7ZipArchive -Path $path -DestinationPath $to -Removal:$removal @args
+    Expand-7zipArchive -Path $path -DestinationPath $to -Removal:$removal @args
+    Show-DeprecatedWarning $MyInvocation 'Expand-7zipArchive'
 }
 
 function extract_msi($path, $to, $removal) {
-    Show-DeprecatedWarning $MyInvocation 'Expand-MSIArchive'
-    Expand-MSIArchive -Path $path -DestinationPath $to -Removal:$removal
+    Show-DeprecatedWarning $MyInvocation 'Expand-MsiArchive'
+    Expand-MsiArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
 function unpack_inno($path, $to, $removal) {

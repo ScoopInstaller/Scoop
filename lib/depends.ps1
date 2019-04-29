@@ -52,8 +52,8 @@ function runtime_deps($manifest) {
 function install_deps($manifest, $arch) {
     $deps = @()
 
-    if (Test-7ZipRequirement -URL (url $manifest $arch)) { $deps += '7zip' }
-    if (Test-LessMSIRequirement -URL (url $manifest $arch)) { $deps += 'lessmsi' }
+    if (Test-7zipRequirement -URL (url $manifest $arch)) { $deps += '7zip'}
+    if (Test-LessmsiRequirement -URL (url $manifest $arch)) { $deps += 'lessmsi' }
     if ($manifest.innosetup) { $deps += 'innounp' }
 
     return $deps
