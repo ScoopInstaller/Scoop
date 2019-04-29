@@ -696,7 +696,10 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
             $parameters.arg = $arg;
         }
 
-        $proc = start-process $exe -wait -ea stop -passthru @parameters
+        # Don't use Start-Process -Wait
+        # https://github.com/PowerShell/PowerShell/issues/6561
+        $proc = start-process $exe -ea stop -passthru @parameters
+        $proc | Wait-Process
 
 
         if($proc.exitcode -ne 0) {
