@@ -175,12 +175,12 @@ Function Test-CommandAvailable {
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
-function 7zip_path() {
+function Get-7zipPath() {
     return (file_path '7zip' '7z.exe')
 }
 
-function 7zip_installed() {
-    return ![String]::IsNullOrWhiteSpace("$(7zip_path)")
+function Test-7zipInstalled() {
+    return ![String]::IsNullOrWhiteSpace("$(Get-7zipPath)")
 }
 
 function aria2_path() {

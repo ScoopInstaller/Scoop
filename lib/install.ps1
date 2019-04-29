@@ -545,10 +545,10 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             if(msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
             } else {
-                $extract_fn = 'Expand-MSIArchive'
+                $extract_fn = 'Expand-MsiArchive'
             }
-        } elseif(Test-7ZipRequirement -File $fname) { # 7zip
-            $extract_fn = 'Expand-7ZipArchive'
+        } elseif(Test-7zipRequirement -File $fname) { # 7zip
+            $extract_fn = 'Expand-7zipArchive'
         }
 
         if($extract_fn) {
