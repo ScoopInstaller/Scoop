@@ -169,13 +169,13 @@ function Get-AppFilePath {
 
     # normal path to file
     $Path = "$(versiondir $App 'current' $false)\$File"
-    if(Test-Path($Path)) {
+    if(Test-Path $Path) {
         return $Path
     }
 
     # global path to file
     $Path = "$(versiondir $App 'current' $true)\$File"
-    if(Test-Path($Path)) {
+    if(Test-Path $Path) {
         return $Path
     }
 
@@ -220,7 +220,7 @@ function Test-HelperInstalled {
     return ![String]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
 }
 
-function Test-Aria2Enabled() {
+function Test-Aria2Enabled {
     return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
