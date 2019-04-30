@@ -202,8 +202,8 @@ function Expand-ZipArchive {
 }
 
 function extract_7zip($path, $to, $removal) {
-    Expand-7zipArchive -Path $path -DestinationPath $to -Removal:$removal @args
     Show-DeprecatedWarning $MyInvocation 'Expand-7zipArchive'
+    Expand-7zipArchive -Path $path -DestinationPath $to -Removal:$removal @args
 }
 
 function extract_msi($path, $to, $removal) {
