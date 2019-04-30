@@ -190,40 +190,38 @@ Function Test-CommandAvailable {
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
-function Get-7zipPath() {
-    return (file_path '7zip' '7z.exe')
+function Get-HelperPath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [String]
+        $Helper
+    )
+
+    switch ($Helper) {
+        '7zip' { Get-AppFilePath '7zip' '7z.exe' }
+        'Lessmsi' { Get-AppFilePath 'lessmsi' 'lessmsi.exe' }
+        'Innounp' { Get-AppFilePath 'innounp' 'innounp.exe' }
+        'Dark' { Get-AppFilePath 'dark' 'dark.exe' }
+        'Aria2' { Get-AppFilePath 'aria2' 'aria2c.exe' }
+    }
 }
 
-function Test-7zipInstalled() {
-    return ![String]::IsNullOrWhiteSpace("$(Get-7zipPath)")
-}
+function Test-HelperInstalled {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [String]
+        $Helper
+    )
 
-function Get-LessmsiPath() {
-    return (file_path 'lessmsi' 'lessmsi.exe')
-}
-
-function Test-LessmsiInstalled() {
-    return ![String]::IsNullOrWhiteSpace("$(Get-LessmsiPath)")
-}
-
-function Get-InnounpPath() {
-    return (file_path 'innounp' 'innounp.exe')
-}
-
-function Test-InnounpInstalled() {
-    return ![String]::IsNullOrWhiteSpace("$(Get-InnounpPath)")
-}
-
-function Get-Aria2Path() {
-    return (file_path 'aria2' 'aria2c.exe')
-}
-
-function Test-Aria2Installed() {
-    return ![String]::IsNullOrWhiteSpace("$(Get-Aria2Path)")
+    return ![String]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
 }
 
 function Test-Aria2Enabled() {
-    return (Test-Aria2Installed) -and (get_config 'aria2-enabled' $true)
+    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
 function app_status($app, $global) {
