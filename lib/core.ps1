@@ -152,16 +152,31 @@ function installed_apps($global) {
 }
 
 function file_path($app, $file) {
+    Show-DeprecatedWarning $MyInvocation 'Get-AppFilePath'
+    Get-AppFilePath -App $app -File $file
+}
+
+function Get-AppFilePath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [String]
+        $App,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $File
+    )
+
     # normal path to file
-    $path = "$(versiondir $app 'current' $false)\$file"
-    if(Test-Path($path)) {
-        return $path
+    $Path = "$(versiondir $App 'current' $false)\$File"
+    if(Test-Path($Path)) {
+        return $Path
     }
 
     # global path to file
-    $path = "$(versiondir $app 'current' $true)\$file"
-    if(Test-Path($path)) {
-        return $path
+    $Path = "$(versiondir $App 'current' $true)\$File"
+    if(Test-Path($Path)) {
+        return $Path
     }
 
     # not found
