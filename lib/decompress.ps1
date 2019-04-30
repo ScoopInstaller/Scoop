@@ -66,7 +66,7 @@ function Expand-7zipArchive {
             abort "Cannot find external 7-Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7-Zip manually and try again."
         }
     } else {
-        & (Get-7zipPath) x "$Path" -o"$DestinationPath" (-split $Switches) -y | Out-File $LogLocation
+        & (Get-HelperPath -Helper 7zip) x "$Path" -o"$DestinationPath" (-split $Switches) -y | Out-File $LogLocation
     }
     if ($LASTEXITCODE -ne 0) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
@@ -76,7 +76,7 @@ function Expand-7zipArchive {
     }
     if ((strip_ext $Path) -match '\.tar$' -or $Path -match '\.tgz$') {
         # Check for tar
-        $ArchivedFile = & (Get-7zipPath) l "$Path"
+        $ArchivedFile = & (Get-HelperPath -Helper 7zip) l "$Path"
         if ($LASTEXITCODE -eq 0) {
             $TarFile = $ArchivedFile[-3] -replace '.{53}(.*)', '$1' # get inner tar file name
             Expand-7zipArchive "$DestinationPath\$TarFile" $DestinationPath -Removal
@@ -104,7 +104,7 @@ function Expand-MsiArchive {
     )
     $LogLocation = "$(Split-Path $Path)\msi.log"
     if ((get_config MSIEXTRACT_USE_LESSMSI)) {
-        & (Get-LessmsiPath) x "$Path" "$DestinationPath\" | Out-File $LogLocation
+        & (Get-HelperPath -Helper Lessmsi) x "$Path" "$DestinationPath\" | Out-File $LogLocation
         if ($LASTEXITCODE -ne 0) {
             abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
         }
@@ -143,7 +143,7 @@ function Expand-InnoArchive {
         $Removal
     )
     $LogLocation = "$(Split-Path $Path)\innounp.log"
-    & (Get-InnounpPath) -x -d"$DestinationPath" -c'{app}' "$Path" (-split $Switches) -y | Out-File $LogLocation
+    & (Get-HelperPath -Helper Innounp) -x -d"$DestinationPath" -c'{app}' "$Path" (-split $Switches) -y | Out-File $LogLocation
     if ($LASTEXITCODE -ne 0) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
     }
@@ -175,14 +175,14 @@ function Expand-ZipArchive {
             [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath)
         } catch [System.IO.PathTooLongException] {
             # try to fall back to 7zip if path is too long
-            if (Test-7zipInstalled) {
+            if (Test-HelperInstalled -Helper 7zip) {
                 Expand-7zipArchive $Path $DestinationPath -Removal
                 return
             } else {
                 abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
             }
         } catch [System.IO.IOException] {
-            if (Test-7zipInstalled) {
+            if (Test-HelperInstalled -Helper 7zip) {
                 Expand-7zipArchive $Path $DestinationPath -Removal
                 return
             } else {

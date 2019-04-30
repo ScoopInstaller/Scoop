@@ -31,7 +31,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         BeforeAll {
             if($env:CI) {
-                mock file_path { (Get-Command 7z.exe).Path }
+                mock Get-AppFilePath { (Get-Command 7z.exe).Path }
             } elseif(!(installed 7zip)) {
                 scoop install 7zip
             }
@@ -80,7 +80,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         BeforeAll {
             if($env:CI) {
-                mock file_path { $env:lessmsi }
+                mock Get-AppFilePath { $env:lessmsi }
             } elseif(!(installed lessmsi)) {
                 scoop install lessmsi
             }
@@ -114,7 +114,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         BeforeAll {
             if($env:CI) {
-                mock file_path { $env:innounp }
+                mock Get-AppFilePath { $env:innounp }
             } elseif(!(installed innounp)) {
                 scoop install innounp
             }

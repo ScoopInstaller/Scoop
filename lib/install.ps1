@@ -278,7 +278,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         Set-Content -Path $urlstxt $urlstxt_content
 
         # build aria2 command
-        $aria2 = "& '$(Get-Aria2Path)' $($options -join ' ')"
+        $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
         Write-Host "Starting download with aria2 ..."
