@@ -4,16 +4,16 @@
     "license": "AGPL-3.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs926/gs926w64.exe#/dl.7z",
-            "hash": "56ab1f0cd518c0fa551ed464f2f87242819199f0dcfeb9a8d5392333d67e35d3",
+            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs926/gs926aw64.exe#/dl.7z",
+            "hash": "sha512:4c961b852bd207e9a1cae00355c5e582ad047dec54912ae5e7d326c4eacc0c8300bf49164d7ba5817f9ab5a7b9cb5d60f235b162dd30c0d6e8706566f7e0a605",
             "bin": [
                 "bin\\gswin64.exe",
                 "bin\\gswin64c.exe"
             ]
         },
         "32bit": {
-            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs926/gs926w32.exe#/dl.7z",
-            "hash": "7e418e831f0c684020d7b148fad6593ff04551979b66f88a20d14e20670a40eb",
+            "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs926/gs926aw32.exe#/dl.7z",
+            "hash": "sha512:5e3f9e8303e1b65c9c6b67dbd3c5a999c7b7eeafe499638d3bbe718ccb1a1b26928dd441d65431b423f385b1a70d698e5027f7ee701c963eb410d3f79fde5a40",
             "bin": [
                 "bin\\gswin32.exe",
                 "bin\\gswin32c.exe"
@@ -31,14 +31,14 @@
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$cleanVersion/gs$cleanVersionw64.exe#/dl.7z"
+                "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$cleanVersion/gs$cleanVersionaw64.exe#/dl.7z"
             },
             "32bit": {
-                "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$cleanVersion/gs$cleanVersionw32.exe#/dl.7z"
+                "url": "https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs$cleanVersion/gs$cleanVersionaw32.exe#/dl.7z"
             }
         },
         "hash": {
-            "url": "$baseurl/SHA256SUMS"
+            "url": "$baseurl/SHA512SUMS"
         }
     }
 }

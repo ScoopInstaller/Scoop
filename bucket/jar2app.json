@@ -1,0 +1,13 @@
+{
+  "homepage": "https://github.com/Jorl17/jar2app",
+  "description": "Convert any Java jar to a Mac OS X .App bundle.",
+  "version": "nightly",
+  "license": "GPL-2.0-only",
+  "url": "https://github.com/Jorl17/jar2app/archive/master.zip",
+  "extract_dir": "jar2app-master",
+  "depends": [
+    "python"
+  ],
+  "pre_install": "echo \"python `\"$dir\\jar2app.py`\" @args\" | out-file \"$dir\\jar2app.ps1\"",
+  "bin": "jar2app.ps1"
+}

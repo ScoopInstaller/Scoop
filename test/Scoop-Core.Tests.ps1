@@ -1,10 +1,116 @@
 . "$psscriptroot\..\lib\core.ps1"
+. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\unix.ps1"
 . "$psscriptroot\Scoop-TestLib.ps1"
 
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 $isUnix = is_unix
+
+describe "Get-AppFilePath" -Tag 'Scoop' {
+    beforeall {
+        $working_dir = setup_working "is_directory"
+        Mock versiondir { 'local' } -Verifiable -ParameterFilter { $global -eq $false }
+        Mock versiondir { 'global' } -Verifiable -ParameterFilter { $global -eq $true }
+    }
+
+    it "should return locally installed program" {
+        Mock Test-Path { $true } -Verifiable -ParameterFilter { $Path -eq 'local\i_am_a_file.txt' }
+        Mock Test-Path { $false } -Verifiable -ParameterFilter { $Path -eq 'global\i_am_a_file.txt' }
+        Get-AppFilePath -App 'is_directory' -File 'i_am_a_file.txt' | Should -Be 'local\i_am_a_file.txt'
+    }
+
+    it "should return globally installed program" {
+        Mock Test-Path { $false } -Verifiable -ParameterFilter { $Path -eq 'local\i_am_a_file.txt' }
+        Mock Test-Path { $true } -Verifiable -ParameterFilter { $Path -eq 'global\i_am_a_file.txt' }
+        Get-AppFilePath -App 'is_directory' -File 'i_am_a_file.txt' | Should -Be 'global\i_am_a_file.txt'
+    }
+
+    it "should return null if program is not installed" {
+        Get-AppFilePath -App 'is_directory' -File 'i_do_not_exist' | Should -BeNullOrEmpty
+    }
+
+    it "should throw if parameter is wrong or missing" {
+        { Get-AppFilePath -App 'is_directory' -File } | Should -Throw
+        { Get-AppFilePath -App -File 'i_am_a_file.txt' } | Should -Throw
+        { Get-AppFilePath -App -File } | Should -Throw
+    }
+}
+
+describe "Get-HelperPath" -Tag 'Scoop' {
+    beforeall {
+        $working_dir = setup_working "is_directory"
+    }
+    it "should return path if program is installed" {
+        Mock Get-AppFilePath { '7zip\current\7z.exe' }
+        Get-HelperPath -Helper 7zip | Should -Be '7zip\current\7z.exe'
+    }
+
+    it "should return null if program is not installed" {
+        Mock Get-AppFilePath { $null }
+        Get-HelperPath -Helper 7zip | Should -BeNullOrEmpty
+    }
+
+    it "should throw if parameter is wrong or missing" {
+        { Get-HelperPath -Helper } | Should -Throw
+        { Get-HelperPath -Helper Wrong } | Should -Throw
+    }
+}
+
+
+describe "Test-HelperInstalled" -Tag 'Scoop' {
+    it "should return true if program is installed" {
+        Mock Get-HelperPath { '7z.exe' }
+        Test-HelperInstalled -Helper 7zip | Should -BeTrue
+    }
+
+    it "should return false if program is not installed" {
+        Mock Get-HelperPath { $null }
+        Test-HelperInstalled -Helper 7zip | Should -BeFalse
+    }
+
+    it "should throw if parameter is wrong or missing" {
+        { Test-HelperInstalled -Helper } | Should -Throw
+        { Test-HelperInstalled -Helper Wrong } | Should -Throw
+    }
+}
+
+describe "Test-Aria2Enabled" -Tag 'Scoop' {
+    it "should return true if aria2 is installed" {
+        Mock Test-HelperInstalled { $true }
+        Mock get_config { $true }
+        Test-Aria2Enabled | Should -BeTrue
+    }
+
+    it "should return false if aria2 is not installed" {
+        Mock Test-HelperInstalled { $false }
+        Mock get_config { $false }
+        Test-Aria2Enabled | Should -BeFalse
+
+        Mock Test-HelperInstalled { $false }
+        Mock get_config { $true }
+        Test-Aria2Enabled | Should -BeFalse
+
+        Mock Test-HelperInstalled { $true }
+        Mock get_config { $false }
+        Test-Aria2Enabled | Should -BeFalse
+    }
+}
+
+describe "Test-CommandAvailable" -Tag 'Scoop' {
+    it "should return true if command exists" {
+        Test-CommandAvailable 'Write-Host' | Should -BeTrue
+    }
+
+    it "should return false if command doesn't exist" {
+        Test-CommandAvailable 'Write-ThisWillProbablyNotExist' | Should -BeFalse
+    }
+
+    it "should throw if parameter is wrong or missing" {
+        { Test-CommandAvailable } | Should -Throw
+    }
+}
+
 
 describe "is_directory" -Tag 'Scoop' {
     beforeall {
@@ -58,62 +164,6 @@ describe "movedir" -Tag 'Scoop' {
 
         "$dir\test.txt" | should -FileContentMatch "this is the one"
         "$dir\_tmp\$extract_dir" | should -not -exist
-    }
-}
-
-describe "unzip_old" -Tag 'Scoop' {
-    beforeall {
-        $working_dir = setup_working "unzip_old"
-    }
-
-    function test-unzip($from) {
-        $to = strip_ext $from
-
-        if(is_unix) {
-            unzip_old ($from -replace '\\','/') ($to -replace '\\','/')
-        } else {
-            unzip_old ($from -replace '/','\') ($to -replace '/','\')
-        }
-
-        $to
-    }
-
-    context "zip file size is zero bytes" {
-        $zerobyte = "$working_dir\zerobyte.zip"
-        $zerobyte | should -exist
-
-        it "unzips file with zero bytes without error" -skip:$isUnix {
-            # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
-            # `$to = test-unzip $zerobyte` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
-            $to = ([string](test-unzip $zerobyte)).trimStart()
-
-            $to | should -not -match '^\s'
-            $to | should -not -benullorempty
-
-            $to | should -exist
-
-            (Get-ChildItem $to).count | should -be 0
-        }
-    }
-
-    context "zip file is small in size" {
-        $small = "$working_dir\small.zip"
-        $small | should -exist
-
-        it "unzips file which is small in size" -skip:$isUnix {
-            # some combination of pester, COM (used within unzip_old), and Win10 causes a bugged return value from test-unzip
-            # `$to = test-unzip $small` * RETURN_VAL has a leading space and complains of $null usage when used in PoSH functions
-            $to = ([string](test-unzip $small)).trimStart()
-
-            $to | should -not -match '^\s'
-            $to | should -not -benullorempty
-
-            $to | should -exist
-
-            # these don't work for some reason on appveyor
-            #join-path $to "empty" | should -exist
-            #(gci $to).count | should -be 1
-        }
     }
 }
 
@@ -191,12 +241,6 @@ Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
         get_app_name_from_ps1_shim "$shim_path" | should -be "mockapp"
     }
 
-    It "returns app name if file exists and is a shim to an app cerca August 2018" -skip:$isUnix {
-        Write-Output '$path = join-path "$psscriptroot" "..\apps\vim\current\vim.exe"' | Out-File "$working_dir/moch-shim.ps1" -Encoding utf8
-        Write-Output 'if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }' | Out-File "$working_dir/moch-shim.ps1" -Append -Encoding utf8
-        get_app_name_from_ps1_shim "$working_dir/moch-shim.ps1" | should -be "vim"
-    }
-
     It "returns empty string if file exists and is not a shim" -skip:$isUnix {
         Write-Output "lorem ipsum" | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
         get_app_name_from_ps1_shim "$working_dir/mock-shim.ps1" | should -be ""
@@ -221,8 +265,8 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
     context "robocopy is not in path" {
         it "shims robocopy when not on path" -skip:$isUnix {
-            mock gcm { $false }
-            Get-Command robocopy | should -be $false
+            mock Test-CommandAvailable { $false }
+            Test-CommandAvailable robocopy | should -be $false
 
             ensure_robocopy_in_path
 
@@ -236,7 +280,9 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
     context "robocopy is in path" {
         it "does not shim robocopy when it is in path" -skip:$isUnix {
-            mock gcm { $true }
+            mock Test-CommandAvailable { $true }
+            Test-CommandAvailable robocopy | should -be $true
+
             ensure_robocopy_in_path
 
             "$shimdir/robocopy.ps1" | should -not -exist
@@ -325,6 +371,24 @@ describe 'app' -Tag 'Scoop' {
         $query = "test-bucket/test-app@1.8.0-rc2"
         $app, $bucket, $version = parse_app $query
         $app | should -be "test-app"
+        $bucket | should -be "test-bucket"
+        $version | should -be "1.8.0-rc2"
+
+        $query = "test-bucket/test_app"
+        $app, $bucket, $version = parse_app $query
+        $app | should -be "test_app"
+        $bucket | should -be "test-bucket"
+        $version | should -benullorempty
+
+        $query = "test-bucket/test_app@1.8.0"
+        $app, $bucket, $version = parse_app $query
+        $app | should -be "test_app"
+        $bucket | should -be "test-bucket"
+        $version | should -be "1.8.0"
+
+        $query = "test-bucket/test_app@1.8.0-rc2"
+        $app, $bucket, $version = parse_app $query
+        $app | should -be "test_app"
         $bucket | should -be "test-bucket"
         $version | should -be "1.8.0-rc2"
     }

@@ -1,15 +1,15 @@
 {
     "homepage": "https://www.python.org/",
     "license": "https://docs.python.org/3/license.html",
-    "version": "3.7.2",
+    "version": "3.7.3",
     "architecture": {
         "64bit": {
-            "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2-amd64.exe#/py3.exe",
-            "hash": "md5:ff258093f0b3953c886192dec9f52763"
+            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3-amd64.exe#/py3.exe",
+            "hash": "md5:a2b79563476e9aa47f11899a53349383"
         },
         "32bit": {
-            "url": "https://www.python.org/ftp/python/3.7.2/python-3.7.2.exe#/py3.exe",
-            "hash": "md5:38156b62c0cbcb03bfddeb86e66c3a0f"
+            "url": "https://www.python.org/ftp/python/3.7.3/python-3.7.3.exe#/py3.exe",
+            "hash": "md5:ebf1644cdc1eeeebacc92afa949cfc01"
         }
     },
     "installer": {

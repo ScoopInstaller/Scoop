@@ -1,21 +1,22 @@
 {
-    "homepage": "http://www.mingw.org/wiki/msys",
     "version": "1.23",
-    "license": "GPL-2.0",
+    "description": "File archiver for manipulation with '.tar.*' files.",
+    "homepage": "http://www.mingw.org/wiki/msys",
+    "license": "GPL-2.0-only",
     "depends": "gzip",
     "url": [
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/tar/tar-1.23-1/tar-1.23-1-msys-1.0.13-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/libiconv/libiconv-1.14-1/libiconv-1.14-1-msys-1.0.17-dll-2.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/gettext/gettext-0.18.1.1-1/libintl-0.18.1.1-1-msys-1.0.17-dll-8.tar.lzma",
-        "https://sourceforge.net/projects/mingw/files/MSYS/Base/regex/regex-1.20090805-2/libregex-1.20090805-2-msys-1.0.13-dll-1.tar.lzma"
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/tar/tar-1.23-1/tar-1.23-1-msys-1.0.13-bin.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/libiconv/libiconv-1.14-1/libiconv-1.14-1-msys-1.0.17-dll-2.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/gettext/gettext-0.18.1.1-1/libintl-0.18.1.1-1-msys-1.0.17-dll-8.tar.lzma",
+        "https://downloads.sourceforge.net/projects/mingw/MSYS/Base/regex/regex-1.20090805-2/libregex-1.20090805-2-msys-1.0.13-dll-1.tar.lzma"
     ],
     "hash": [
-        "2fa09e5a9563a9608077a65b276891c9f89de416dbe4b4a9eb4e8f36250a2887",
-        "4e262a414f238773b311c8bb55a52e62743c06e0e55b319ca5b47e3e306464d5",
-        "196921e8c232259c8e6a6852b9ee8d9ab2d29a91419f0c8dc27ba6f034231683",
-        "29db8c969661c511fbe2a341ab25c993c5f9c555842a75d6ddbcfa70dec16910",
-        "85dd8c1e27a90675c5f867be57ba7ae2bb55dde8cd2d19f284c896be134bd3d1"
+        "sha1:1791b71ad8573612049a8a4821d93e870fb2ae38",
+        "sha1:36d52ca7066eb6ad0da68c6f31214416f4c9dcec",
+        "sha1:056d16bfb7a91c3e3b1acf8adb20edea6fceecdd",
+        "sha1:4000b935a5bc30b4c757fde69d27716fa3c2c269",
+        "sha1:d95faa144cf06625b3932a8e84ed1a6ab6bbe644"
     ],
     "bin": "bin\\tar.exe"
 }

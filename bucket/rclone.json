@@ -1,33 +1,38 @@
 {
     "homepage": "https://rclone.org",
-    "version": "1.45",
+    "description": "rsync for cloud storage",
+    "version": "1.47.0",
     "license": "MIT",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ncw/rclone/releases/download/v1.45/rclone-v1.45-windows-amd64.zip",
-            "hash": "fe7224efc3cd54c31b8bfb3fb61b68bc88088bd123556da23e1448efb4321d8c",
-            "extract_dir": "rclone-v1.45-windows-amd64"
+            "url": "https://downloads.rclone.org/v1.47.0/rclone-v1.47.0-windows-amd64.zip",
+            "hash": "70a5325eba25fd10598ed69d0bd980e2e5c5538e1eb589c96aa772dee4393bb0",
+            "extract_dir": "rclone-v1.47.0-windows-amd64"
         },
         "32bit": {
-            "url": "https://github.com/ncw/rclone/releases/download/v1.45/rclone-v1.45-windows-386.zip",
-            "hash": "beecafc94c4214cc9655d380bb45cd22f10c633532376cc2d53fcd602468ba93",
-            "extract_dir": "rclone-v1.45-windows-386"
+            "url": "https://downloads.rclone.org/v1.47.0/rclone-v1.47.0-windows-386.zip",
+            "hash": "0cf904ce984fcd353cb137fae51d6c8ed14ff70e2c4c597717619cb213dab042",
+            "extract_dir": "rclone-v1.47.0-windows-386"
         }
     },
     "bin": "rclone.exe",
     "checkver": {
-        "github": "https://github.com/ncw/rclone"
+        "url": "https://downloads.rclone.org/version.txt",
+        "regex": "rclone v(.+)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/ncw/rclone/releases/download/v$version/rclone-v$version-windows-amd64.zip",
+                "url": "https://downloads.rclone.org/v$version/rclone-v$version-windows-amd64.zip",
                 "extract_dir": "rclone-v$version-windows-amd64"
             },
             "32bit": {
-                "url": "https://github.com/ncw/rclone/releases/download/v$version/rclone-v$version-windows-386.zip",
+                "url": "https://downloads.rclone.org/v$version/rclone-v$version-windows-386.zip",
                 "extract_dir": "rclone-v$version-windows-386"
             }
+        },
+        "hash": {
+            "url": "$baseurl/SHA256SUMS"
         }
     }
 }

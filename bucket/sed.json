@@ -1,14 +1,15 @@
 {
-    "homepage": "http://gnuwin32.sourceforge.net/packages/sed.htm",
     "version": "4.2.1",
-    "license": "GPL-2.0",
+    "description": "Stream editor.",
+    "homepage": "http://gnuwin32.sourceforge.net/packages/sed.htm",
+    "license": "GPL-2.0-only",
     "url": [
-        "https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-bin.zip",
-        "https://sourceforge.net/projects/gnuwin32/files/sed/4.2.1/sed-4.2.1-dep.zip"
+        "https://downloads.sourceforge.net/projects/gnuwin32/sed/4.2.1/sed-4.2.1-bin.zip",
+        "https://downloads.sourceforge.net/projects/gnuwin32/sed/4.2.1/sed-4.2.1-dep.zip"
     ],
     "hash": [
-        "ae1651ffb461d69a7c51c76867a859d8addf802b85678834c0ebb402ef79b3cd",
-        "53e2e84db3e6c5855fd8013e1b79ccbd53b6bae7e7e4d59c0d18bb1dd5d18961"
+        "sha1:dfd3d1dae27a24784d7ab40eb074196509fa48fe",
+        "sha1:f7edbd7152d8720c95d46dd128b87b8ba48a5d6f"
     ],
     "bin": "bin\\sed.exe"
 }

@@ -1,7 +1,8 @@
 {
-    "homepage": "http://www.mingw.org/wiki/MSYS",
     "version": "3.1.7",
-    "license": "GPL-3.0",
+    "description": "Interprets a special-purpose programming language that makes it possible to handle simple data-reformatting jobs with just a few lines of code.",
+    "homepage": "http://www.mingw.org/wiki/MSYS",
+    "license": "GPL-3.0-only",
     "url": [
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/gawk/gawk-3.1.7-2/gawk-3.1.7-2-msys-1.0.13-bin.tar.lzma",
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/msys-core/msys-1.0.18-1/msysCORE-1.0.18-1-msys-1.0.18-bin.tar.lzma",
@@ -9,10 +10,10 @@
         "https://sourceforge.net/projects/mingw/files/MSYS/Base/libiconv/libiconv-1.14-1/libiconv-1.14-1-msys-1.0.17-dll-2.tar.lzma"
     ],
     "hash": [
-        "eb15478ea76e75b666ad7fc7049de21b9f487e0e1ea0e96d40953a477e91c3dd",
-        "4e262a414f238773b311c8bb55a52e62743c06e0e55b319ca5b47e3e306464d5",
-        "29db8c969661c511fbe2a341ab25c993c5f9c555842a75d6ddbcfa70dec16910",
-        "196921e8c232259c8e6a6852b9ee8d9ab2d29a91419f0c8dc27ba6f034231683"
+        "sha1:421ecc23e764ed87291796501189cc92fa905c0d",
+        "sha1:36d52ca7066eb6ad0da68c6f31214416f4c9dcec",
+        "sha1:4000b935a5bc30b4c757fde69d27716fa3c2c269",
+        "sha1:056d16bfb7a91c3e3b1acf8adb20edea6fceecdd"
     ],
     "bin": [
         "bin\\awk.exe",

@@ -13,8 +13,8 @@
     ],
     "bin": "shasum.ps1",
     "checkver": {
-        "url": "https://github.com/lukesampson/psutils",
-        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)",
+        "url": "https://api.github.com/repos/lukesampson/psutils/commits",
+        "re": "\"(\\d+)-(\\d+)-(\\d+)",
         "replace": "0.${1}.${2}.${3}"
     }
 }

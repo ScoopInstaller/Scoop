@@ -1,14 +1,14 @@
 {
     "homepage": "https://github.com/lukesampson/concfg",
     "description": "Import / export Windows console settings",
-    "version": "0.2019.01.19",
-    "url": "https://github.com/lukesampson/concfg/archive/5554161e349d95ec1966a87e6132fdf82cc6eecd.zip",
-    "hash": "c5ab22b2ff2a0a26c1cc0df50a89498a1422f00e7d79d34aeb47ddbc664c22b2",
-    "extract_dir": "concfg-5554161e349d95ec1966a87e6132fdf82cc6eecd",
+    "version": "0.2019.03.09",
+    "url": "https://github.com/lukesampson/concfg/archive/a38c23651458ea48e463f7402bf166c65855759f.zip",
+    "hash": "dfc4796e912c23755028891041034698e7e930119bd44d68e8bd14c51e26b2b5",
+    "extract_dir": "concfg-a38c23651458ea48e463f7402bf166c65855759f",
     "bin": "bin\\concfg.ps1",
     "checkver": {
-        "url": "https://github.com/lukesampson/concfg",
-        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "url": "https://github.com/lukesampson/concfg/commits/master.atom",
+        "re": "(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})",
         "replace": "0.${1}.${2}.${3}"
     },
     "autoupdate": {

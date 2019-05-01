@@ -6,7 +6,9 @@
 # You can use '*' in place of <app> to cleanup all apps.
 #
 # Options:
-#   --global, -g       Cleanup a globally installed app
+#   -g, --global       Cleanup a globally installed app
+#   -k, --cache        Remove outdated download cache
+
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
@@ -17,21 +19,25 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'g' 'global'
+$opt, $apps, $err = getopt $args 'gk' 'global', 'cache'
 if ($err) { "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
+$cache = $opt.k -or $opt.cache
 
-if(!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
+if (!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
-if($global -and !(is_admin)) {
+if ($global -and !(is_admin)) {
     'ERROR: you need admin rights to cleanup global apps'; exit 1
 }
 
-function cleanup($app, $global, $verbose) {
-    $current_version  = current_version $app $global
+function cleanup($app, $global, $verbose, $cache) {
+    $current_version = current_version $app $global
+    if ($cache) {
+        Remove-Item "$cachedir\$app#*" -Exclude "$app#$current_version#*"
+    }
     $versions = versions $app $global | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
-    if(!$versions) {
-        if($verbose) { success "$app is already clean" }
+    if (!$versions) {
+        if ($verbose) { success "$app is already clean" }
         return
     }
 
@@ -47,7 +53,7 @@ function cleanup($app, $global, $verbose) {
     write-host ''
 }
 
-if($apps) {
+if ($apps) {
     $verbose = $true
     if ($apps -eq '*') {
         $verbose = $false
@@ -55,15 +61,18 @@ if($apps) {
         if ($global) {
             $apps += applist (installed_apps $true) $true
         }
-    }
-    else {
-        $apps = ensure_all_installed $apps $global
+    } else {
+        $apps = Confirm-InstallationStatus $apps -Global:$global
     }
 
     # $apps is now a list of ($app, $global) tuples
-    $apps | ForEach-Object { cleanup @_ $verbose }
+    $apps | ForEach-Object { cleanup @_ $verbose $cache}
 
-    if(!$verbose) {
+    if ($cache) {
+        Remove-Item "$cachedir\*.download" -ErrorAction Ignore
+    }
+
+    if (!$verbose) {
         success 'Everything is shiny now!'
     }
 }

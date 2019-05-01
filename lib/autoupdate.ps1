@@ -1,7 +1,5 @@
 <#
 TODO
- - add a github release autoupdate type
- - tests (single arch, without hashes etc.)
  - clean up
 #>
 . "$psscriptroot\..\lib\json.ps1"
@@ -32,6 +30,15 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
 function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex) {
     $hashfile = $null
 
+    $templates = @{
+        '$md5' = '([a-fA-F0-9]{32})';
+        '$sha1' = '([a-fA-F0-9]{40})';
+        '$sha256' = '([a-fA-F0-9]{64})';
+        '$sha512' = '([a-fA-F0-9]{128})';
+        '$checksum' = '([a-fA-F0-9]{32,128})';
+        '$base64' = '([a-zA-Z0-9+\/=]{24,88})';
+    }
+
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
@@ -47,7 +54,9 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $regex = '^([a-fA-F0-9]+)$'
     }
 
+    $regex = substitute $regex $templates $false
     $regex = substitute $regex $substitutions $true
+    debug $regex
     if ($hashfile -match $regex) {
         $hash = $matches[1] -replace ' ',''
     }
@@ -130,15 +139,6 @@ function find_hash_in_headers([String] $url) {
 function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
     $hash = $null
 
-    <#
-    TODO implement more hashing types
-    `extract` Should be able to extract from origin page source
-    `sourceforge` Default `extract` method for sf.net
-    `metalink` Default `extract` method for metalink
-    `json` Find hash from JSONPath
-    `rdf` Find hash from a RDF Xml file
-    `download` Last resort, download the real file and hash it
-    #>
     $hashmode = $config.mode
     $basename = url_remote_filename($url)
 
@@ -146,11 +146,13 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $substitutions.Add('$url', (strip_fragment $url))
     $substitutions.Add('$baseurl', (strip_filename (strip_fragment $url)).TrimEnd('/'))
     $substitutions.Add('$basename', $basename)
+    debug $substitutions
 
     $hashfile_url = substitute $config.url $substitutions
+    debug $hashfile_url
     if ($hashfile_url) {
         write-host -f DarkYellow 'Searching hash for ' -NoNewline
-        write-host -f Green $(url_remote_filename $url) -NoNewline
+        write-host -f Green $basename -NoNewline
         write-host -f DarkYellow ' in ' -NoNewline
         write-host -f Green $hashfile_url
     }
@@ -176,11 +178,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $regex = $config.regex
     }
 
+    if (!$hashfile_url -and $url -match "^(?:.*fosshub.com\/).*(?:\/|\?dwl=)(?<filename>.*)$") {
+        $hashmode = 'fosshub'
+    }
+
     if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
         $hashmode = 'sourceforge'
-        # change the URL because downloads.sourceforge.net doesn't have checksums
-        $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
-        $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
     }
 
     switch ($hashmode) {
@@ -199,6 +202,14 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
                 $hash = find_hash_in_textfile "$url.meta4" $substitutions
             }
         }
+        'fosshub' {
+            $hash = find_hash_in_textfile $url $substitutions ($Matches.filename+'.*?"sha256":"([a-fA-F0-9]{64})"')
+        }
+        'sourceforge' {
+            # change the URL because downloads.sourceforge.net doesn't have checksums
+            $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
+            $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
+        }
     }
 
     if ($hash) {
@@ -213,7 +224,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     }
 
     write-host -f DarkYellow 'Downloading ' -NoNewline
-    write-host -f Green $(url_remote_filename $url) -NoNewline
+    write-host -f Green $basename -NoNewline
     write-host -f DarkYellow ' to compute hashes!'
     try {
         dl_with_cache $app $version $url $null $null $true

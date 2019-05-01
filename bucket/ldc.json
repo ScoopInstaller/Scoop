@@ -1,5 +1,5 @@
 {
-    "version": "1.13.0",
+    "version": "1.15.0",
     "homepage": "https://dlang.org/",
     "description": "LDC is LLVM based D-language compiler",
     "license": {
@@ -8,14 +8,14 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/ldc-developers/ldc/releases/download/v1.13.0/ldc2-1.13.0-windows-x64.7z",
-            "extract_dir": "ldc2-1.13.0-windows-x64",
-            "hash": "ce6fb5f0008659b46051641239fb3c573083d70fd24b73225ab3ebe3e309e2ed"
+            "url": "https://github.com/ldc-developers/ldc/releases/download/v1.15.0/ldc2-1.15.0-windows-x64.7z",
+            "extract_dir": "ldc2-1.15.0-windows-x64",
+            "hash": "0e58319651160fd97e6d90d9204f80c56025bd6012a5a89168a39f8e3ddc5881"
         },
         "32bit": {
-            "url": "https://github.com/ldc-developers/ldc/releases/download/v1.13.0/ldc2-1.13.0-windows-x86.7z",
-            "extract_dir": "ldc2-1.13.0-windows-x86",
-            "hash": "540387227a0d2701d93af4cf2ff771f2312aba5256404e73453f4cc399def0b6"
+            "url": "https://github.com/ldc-developers/ldc/releases/download/v1.15.0/ldc2-1.15.0-windows-x86.7z",
+            "extract_dir": "ldc2-1.15.0-windows-x86",
+            "hash": "86e82bb96fed7ba6a457b93ba7403ea9b7418b5645165e0d882da4701f1ee891"
         }
     },
     "env_add_path": "bin",

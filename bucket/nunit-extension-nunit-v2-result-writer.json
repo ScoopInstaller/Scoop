@@ -1,0 +1,21 @@
+{
+    "homepage": "https://nunit.org/",
+    "description": "NUnit V2 Result Writer Extension",
+    "version": "3.6.0",
+    "license": "MIT",
+    "url": "https://packages.chocolatey.org/nunit-extension-nunit-v2-result-writer.3.6.0.nupkg",
+    "hash": "9e3526f9b272ab22802c300b8640f34cec29cb9466db785477b414e3f688b16d",
+    "extract_dir": "tools",
+    "depends": "nunit-console",
+    "checkver": {
+        "url": "https://chocolatey.org/packages/nunit-extension-nunit-v2-result-writer",
+        "regex": "Chocolatey.*?([\\d.]+)\\r"
+    },
+    "autoupdate": {
+        "url": "https://packages.chocolatey.org/nunit-extension-nunit-v2-result-writer.$version.nupkg",
+        "hash": {
+            "url": "https://chocolatey.org/packages/nunit-extension-nunit-v2-result-writer",
+            "regex": "$sha256.*?$basename"
+        }
+    }
+}

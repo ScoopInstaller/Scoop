@@ -2,16 +2,16 @@
     "homepage": "https://github.com/Genymobile/scrcpy",
     "description": "Display and control your Android device",
     "license": "Apache-2.0",
-    "version": "1.6",
+    "version": "1.8",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Genymobile/scrcpy/releases/download/v1.6/scrcpy-win64-v1.6.zip",
-            "hash": "f66b7eace8dd6537a9a27176fd824704a284d8e82077ccc903344396043f90c9",
+            "url": "https://github.com/Genymobile/scrcpy/releases/download/v1.8/scrcpy-win64-v1.8.zip",
+            "hash": "9cc980d07bd8f036ae4e91d0bc6fc3281d7fa8f9752d4913b643c0fb72a19fb7",
             "extract_dir": "scrcpy-win64"
         },
         "32bit": {
-            "url": "https://github.com/Genymobile/scrcpy/releases/download/v1.6/scrcpy-win32-v1.6.zip",
-            "hash": "4ca0c5924ab2ebf19b70f6598b2e546f65ba469a72ded2d1b213df3380fb46b1",
+            "url": "https://github.com/Genymobile/scrcpy/releases/download/v1.8/scrcpy-win32-v1.8.zip",
+            "hash": "c0c29ed1c66deaa73bdadacd09e598aafb3a117929cf7a314cce1cc45e34de53",
             "extract_dir": "scrcpy-win32"
         }
     },

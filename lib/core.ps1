@@ -42,6 +42,22 @@ function Get-UserAgent() {
     return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
 }
 
+function Show-DeprecatedWarning {
+    <#
+    .SYNOPSIS
+        Print deprecated warning for functions, which will be deleted in near future.
+    .PARAMETER Invocation
+        Invocation to identify location of line.
+        Just pass $MyInvocation.
+    .PARAMETER New
+        New command name.
+    #>
+    param($Invocation, [String] $New)
+
+    warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
+    Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
+}
+
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 
@@ -60,11 +76,33 @@ function abort($msg, [int] $exit_code=1) { write-host $msg -f red; exit $exit_co
 function error($msg) { write-host "ERROR $msg" -f darkred }
 function warn($msg) {  write-host "WARN  $msg" -f darkyellow }
 function info($msg) {  write-host "INFO  $msg" -f darkgray }
-function debug($msg, $indent = $false) {
-    if($indent) {
-        write-host "    DEBUG $msg" -f darkcyan
+function debug($obj) {
+    if((get_config 'debug' $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
+        return
+    }
+
+    $prefix = "DEBUG[$(Get-Date -UFormat %s)]"
+    $param = $MyInvocation.Line.Replace($MyInvocation.InvocationName, '').Trim()
+    $msg = $obj | Out-String -Stream
+
+    if($null -eq $obj -or $null -eq $msg) {
+        Write-Host "$prefix $param = " -f DarkCyan -NoNewline
+        Write-Host '$null' -f DarkYellow -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        return
+    }
+
+    if($msg.GetType() -eq [System.Object[]]) {
+        Write-Host "$prefix $param ($($obj.GetType()))" -f DarkCyan -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        $msg | Where-Object { ![String]::IsNullOrWhiteSpace($_) } |
+            Select-Object -Skip 2 | # Skip headers
+            ForEach-Object {
+                Write-Host "$prefix $param.$($_)" -f DarkCyan
+            }
     } else {
-        write-host "DEBUG $msg" -f darkcyan
+        Write-Host "$prefix $param = $($msg.Trim())" -f DarkCyan -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
     }
 }
 function success($msg) { write-host $msg -f darkgreen }
@@ -114,40 +152,76 @@ function installed_apps($global) {
 }
 
 function file_path($app, $file) {
+    Show-DeprecatedWarning $MyInvocation 'Get-AppFilePath'
+    Get-AppFilePath -App $app -File $file
+}
+
+function Get-AppFilePath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [String]
+        $App,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $File
+    )
+
     # normal path to file
-    $path = "$(versiondir $app 'current' $false)\$file"
-    if(Test-Path($path)) {
-        return $path
+    $Path = "$(versiondir $App 'current' $false)\$File"
+    if(Test-Path $Path) {
+        return $Path
     }
 
     # global path to file
-    $path = "$(versiondir $app 'current' $true)\$file"
-    if(Test-Path($path)) {
-        return $path
+    $Path = "$(versiondir $App 'current' $true)\$File"
+    if(Test-Path $Path) {
+        return $Path
     }
 
     # not found
     return $null
 }
 
-function 7zip_path() {
-    return (file_path '7zip' '7z.exe')
+Function Test-CommandAvailable {
+    Param (
+        [String]$Name
+    )
+    Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
-function 7zip_installed() {
-    return ![String]::IsNullOrWhiteSpace("$(7zip_path)")
+function Get-HelperPath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [String]
+        $Helper
+    )
+
+    switch ($Helper) {
+        '7zip' { Get-AppFilePath '7zip' '7z.exe' }
+        'Lessmsi' { Get-AppFilePath 'lessmsi' 'lessmsi.exe' }
+        'Innounp' { Get-AppFilePath 'innounp' 'innounp.exe' }
+        'Dark' { Get-AppFilePath 'dark' 'dark.exe' }
+        'Aria2' { Get-AppFilePath 'aria2' 'aria2c.exe' }
+    }
 }
 
-function aria2_path() {
-    return (file_path 'aria2' 'aria2c.exe')
+function Test-HelperInstalled {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [String]
+        $Helper
+    )
+
+    return ![String]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
 }
 
-function aria2_installed() {
-    return ![String]::IsNullOrWhiteSpace("$(aria2_path)")
-}
-
-function aria2_enabled() {
-    return (aria2_installed) -and (get_config 'aria2-enabled' $true)
+function Test-Aria2Enabled {
+    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
 function app_status($app, $global) {
@@ -200,7 +274,18 @@ function url_filename($url) {
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
 # this function extracts the original filename from the URL.
 function url_remote_filename($url) {
-    split-path (new-object uri $url).absolutePath -leaf
+    $uri = (New-Object URI $url)
+    $basename = Split-Path $uri.PathAndQuery -Leaf
+    If ($basename -match ".*[?=]+([\w._-]+)") {
+        $basename = $matches[1]
+    }
+    If (($basename -notlike "*.*") -or ($basename -match "^[v.\d]+$")) {
+        $basename = Split-Path $uri.AbsolutePath -Leaf
+    }
+    If (($basename -notlike "*.*") -and ($uri.Fragment -ne "")) {
+        $basename = $uri.Fragment.Trim('/', '#')
+    }
+    return $basename
 }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
@@ -249,59 +334,6 @@ function isFileLocked([string]$path) {
         # file is locked by a process.
         return $true
     }
-}
-
-function unzip($path, $to) {
-    if (!(test-path $path)) { abort "can't find $path to unzip"}
-    try { add-type -assembly "System.IO.Compression.FileSystem" -ea stop }
-    catch { unzip_old $path $to; return } # for .net earlier than 4.5
-    $retries = 0
-    while ($retries -le 10) {
-        if ($retries -eq 10) {
-            if (7zip_installed) {
-                extract_7zip $path $to $false
-                return
-            } else {
-                abort "Unzip failed: Windows can't unzip because a process is locking the file.`nRun 'scoop install 7zip' and try again."
-            }
-        }
-        if (isFileLocked $path) {
-            write-host "Waiting for $path to be unlocked by another process... ($retries/10)"
-            $retries++
-            Start-Sleep -s 2
-        } else {
-            break
-        }
-    }
-
-    try {
-        [io.compression.zipfile]::extracttodirectory($path,$to)
-    } catch [system.io.pathtoolongexception] {
-        # try to fall back to 7zip if path is too long
-        if(7zip_installed) {
-            extract_7zip $path $to $false
-            return
-        } else {
-            abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
-        }
-    } catch [system.io.ioexception] {
-        if (7zip_installed) {
-            extract_7zip $path $to $false
-            return
-        } else {
-            abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
-        }
-    } catch {
-        abort "Unzip failed: $_"
-    }
-}
-
-function unzip_old($path,$to) {
-    # fallback for .net earlier than 4.5
-    $shell = (new-object -com shell.application -strict)
-    $zipfiles = $shell.namespace("$path").items()
-    $to = ensure $to
-    $shell.namespace("$to").copyHere($zipfiles, 4) # 4 = don't show progress dialog
 }
 
 function is_directory([String] $path) {
@@ -394,14 +426,14 @@ function shim($path, $global, $name, $arg) {
         "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     }
 
-    if($path -match '\.exe$') {
+    if($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
         Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
         }
-    } elseif($path -match '\.((bat)|(cmd))$') {
+    } elseif($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
@@ -419,7 +451,7 @@ set invalid=`"='
 if !args! == !invalid! ( set args= )
 powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
 
-        "#!/bin/sh`npowershell.exe -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        "#!/bin/sh`npowershell.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.jar$') {
         "@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
         "#!/bin/sh`njava -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
@@ -458,24 +490,39 @@ function ensure_architecture($architecture_opt) {
     }
 }
 
-function ensure_all_installed($apps, $global) {
-    $installed = @()
-    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | ForEach-Object {
-        $app, $null, $null = parse_app $_
-        if(installed $app $false) {
-            $installed += ,@($app, $false)
-        } elseif (installed $app $true) {
-            if($global) {
-                $installed += ,@($app, $true)
+function Confirm-InstallationStatus {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Apps,
+        [Switch]
+        $Global
+    )
+    $Installed = @()
+    $Apps | Select-Object -Unique | Where-Object { $_.Name -ne 'scoop' } | ForEach-Object {
+        $App, $null, $null = parse_app $_
+        if ($Global) {
+            if (installed $App $true) {
+                $Installed += ,@($App, $true)
+            } elseif (installed $App $false) {
+                error "'$App' isn't installed globally, but it is installed for your account."
+                warn "Try again without the --global (or -g) flag instead."
             } else {
-                error "'$app' isn't installed for your account, but it is installed globally."
-                warn "Try again with the --global (or -g) flag instead."
+                error "'$App' isn't installed."
             }
         } else {
-            error "'$app' isn't installed."
+            if(installed $App $false) {
+                $Installed += ,@($App, $false)
+            } elseif (installed $App $true) {
+                error "'$App' isn't installed for your account, but it is installed globally."
+                warn "Try again with the --global (or -g) flag instead."
+            } else {
+                error "'$App' isn't installed."
+            }
         }
     }
-    return ,$installed
+    return ,$Installed
 }
 
 function strip_path($orig_path, $dir) {
@@ -506,7 +553,7 @@ function ensure_scoop_in_path($global) {
 }
 
 function ensure_robocopy_in_path {
-    if(!(Get-Command robocopy -ea ignore)) {
+    if(!(Test-CommandAvailable robocopy)) {
         shim "C:\Windows\System32\Robocopy.exe" $false
     }
 }
@@ -530,24 +577,6 @@ function wraptext($text, $width) {
 
 function pluralize($count, $singular, $plural) {
     if($count -eq 1) { $singular } else { $plural }
-}
-
-# for dealing with user aliases
-$default_aliases = @{
-    'cp' = 'copy-item'
-    'echo' = 'write-output'
-    'gc' = 'get-content'
-    'gci' = 'get-childitem'
-    'gcm' = 'get-command'
-    'gm' = 'get-member'
-    'iex' = 'invoke-expression'
-    'ls' = 'get-childitem'
-    'mkdir' = { new-item -type directory @args }
-    'mv' = 'move-item'
-    'rm' = 'remove-item'
-    'sc' = 'set-content'
-    'select' = 'select-object'
-    'sls' = 'select-string'
 }
 
 function reset_alias($name, $value) {
@@ -577,6 +606,24 @@ function reset_aliases() {
         }
     }
 
+    # for dealing with user aliases
+    $default_aliases = @{
+        'cp' = 'copy-item'
+        'echo' = 'write-output'
+        'gc' = 'get-content'
+        'gci' = 'get-childitem'
+        'gcm' = 'get-command'
+        'gm' = 'get-member'
+        'iex' = 'invoke-expression'
+        'ls' = 'get-childitem'
+        'mkdir' = { new-item -type directory @args }
+        'mv' = 'move-item'
+        'rm' = 'remove-item'
+        'sc' = 'set-content'
+        'select' = 'select-object'
+        'sls' = 'select-string'
+    }
+
     # set default aliases
     $default_aliases.keys | ForEach-Object { reset_alias $_ $default_aliases[$_] }
 }
@@ -588,7 +635,7 @@ function applist($apps, $global) {
 }
 
 function parse_app([string] $app) {
-    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*.json$|[a-zA-Z0-9-.]+)(?:@(?<version>.*))?') {
+    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?') {
         return $matches['app'], $matches['bucket'], $matches['version']
     }
     return $app, $null, $null
@@ -670,16 +717,37 @@ function format_hash_aria2([String] $hash) {
     return $hash
 }
 
+function get_hash([String] $multihash) {
+    $type, $hash = $multihash -split ':'
+    if(!$hash) {
+        # no type specified, assume sha256
+        $type, $hash = 'sha256', $multihash
+    }
+
+    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
+        return $null, "Hash type '$type' isn't supported."
+    }
+
+    return $type, $hash.ToLower()
+}
+
 function handle_special_urls($url)
 {
     # FossHub.com
-    if($url -match "^(.*fosshub.com\/)(?<name>.*)\/(?<filename>.*)$") {
-        # create an url to request to request the expiring url
-        $name = $matches['name'] -replace '.html',''
-        $filename = $matches['filename']
-        # the key is a random 24 chars long hex string, so lets use ' SCOOPSCOOP ' :)
-        $url = "https://www.fosshub.com/gensLink/$name/$filename/2053434f4f5053434f4f5020"
-        $url = (Invoke-WebRequest -Uri $url | Select-Object -ExpandProperty Content)
+    if ($url -match "^(?:.*fosshub.com\/)(?<name>.*)(?:\/|\?dwl=)(?<filename>.*)$") {
+        $Body = @{
+            projectUri      = $Matches.name;
+            fileName        = $Matches.filename;
+            isLatestVersion = $true
+        }
+        if ((Invoke-RestMethod -Uri $url) -match '"p":"(?<pid>[a-f0-9]{24}).*?"r":"(?<rid>[a-f0-9]{24})') {
+            $Body.Add("projectId", $Matches.pid)
+            $Body.Add("releaseId", $Matches.rid)
+        }
+        $url = Invoke-RestMethod -Method Post -Uri "https://api.fosshub.com/download/" -ContentType "application/json" -Body (ConvertTo-Json $Body -Compress)
+        if ($null -eq $url.error) {
+            $url = $url.data.url
+        }
     }
 
     # Sourceforge.net

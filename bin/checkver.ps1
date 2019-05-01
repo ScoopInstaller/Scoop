@@ -16,49 +16,51 @@
 .PARAMETER SkipUpdated
     Updated manifests will not be shown.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1
+    PS BUCKETROOT > .\bin\checkver.ps1
     Check all manifest inside default directory.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 -s
+    PS BUCKETROOT > .\bin\checkver.ps1 -SkipUpdated
     Check all manifest inside default directory (list only outdated manifests).
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 -u
+    PS BUCKETROOT > .\bin\checkver.ps1 -Update
     Check all manifests and update All outdated manifests.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN
-    Check manifest MAN.json inside default directory.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP
+    Check manifest APP.json inside default directory.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN -u
-    Check manifest MAN.json and update, if there is newer version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -Update
+    Check manifest APP.json and update, if there is newer version.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN -f
-    Check manifest MAN.json and update, even if there is no new version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -ForceUpdate
+    Check manifest APP.json and update, even if there is no new version.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN -u -v VER
-    Check manifest MAN.json and update, using version VER
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -Update -Version VER
+    Check manifest APP.json and update, using version VER
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN DIR
-    Check manifest MAN.json inside ./DIR directory.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP DIR
+    Check manifest APP.json inside ./DIR directory.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 -Dir DIR
+    PS BUCKETROOT > .\bin\checkver.ps1 -Dir DIR
     Check all manifests inside ./DIR directory.
 .EXAMPLE
-        PS BUCKETDIR > .\bin\checkver.ps1 MAN DIR -u
-        Check manifest MAN.json inside ./DIR directory and update if there is newer version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP DIR -Update
+    Check manifest APP.json inside ./DIR directory and update if there is newer version.
 #>
 param(
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
+        } else {
+            $true
         }
-        $true
     })]
-    [String] $Dir = "$psscriptroot\..\bucket",
+    [String] $Dir,
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipUpdated,
-    [String] $Version = ""
+    [String] $Version = ''
 )
 
 . "$psscriptroot\..\lib\core.ps1"

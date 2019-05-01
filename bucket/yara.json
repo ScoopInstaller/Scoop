@@ -2,11 +2,11 @@
     "homepage": "https://virustotal.github.io/yara/",
     "description": "The pattern matching swiss knife for malware researchers (and everyone else)",
     "license": "BSD-3-Clause",
-    "version": "3.8.1",
+    "version": "3.9.0",
     "architecture": {
         "64bit": {
-            "url": "https://www.dropbox.com/sh/umip8ndplytwzj1/AADDmWwQWZ81GcEif7XvGyuxa/yara-3.8.1-win64.zip?dl=1",
-            "hash": "70CFFA5B7C81A506A5C2D74D9F970F857D8D2DE548ADAB252C7F4BFDBB28E982",
+            "url": "https://www.dropbox.com/sh/umip8ndplytwzj1/AAAk2e9BYo-JudtgMXZZOL0Ka/yara-3.9.0-win64.zip?dl=1",
+            "hash": "30D79573CEEE4D253CD9CF87229205B5561357A047EAB33FDB9F72F37A091BAC",
             "bin": [
                 [
                     "yara64.exe",
@@ -19,8 +19,8 @@
             ]
         },
         "32bit": {
-            "url": "https://www.dropbox.com/sh/umip8ndplytwzj1/AAAa5VT4VvFdTfq-c5Cn3yk1a/yara-3.8.1-win32.zip?dl=1",
-            "hash": "9F13A6DE03237BCF10367A69F9EF7B5CF22B829244E8D45C48A2047ED22CFD9A",
+            "url": "https://www.dropbox.com/sh/umip8ndplytwzj1/AAATdLgeg_-_d4QfTdkkowaIa/yara-3.9.0-win32.zip?dl=1",
+            "hash": "851B62F185CDEDD3972134535EE6C3F64DED5535B7E417DE8AF2910241690128",
             "bin": [
                 [
                     "yara32.exe",

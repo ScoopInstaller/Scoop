@@ -1,11 +1,11 @@
 {
     "description": "Small improved command line ICMP ping program lovingly inspired by windows and linux.",
     "homepage": "https://github.com/Killeroo/PowerPing",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "license": "MIT",
-    "url": "https://github.com/Killeroo/PowerPing/releases/download/v1.2.0/PowerPing.exe",
+    "url": "https://github.com/Killeroo/PowerPing/releases/download/v1.3.0/PowerPing.exe",
     "bin": "PowerPing.exe",
-    "hash": "913e0fbaf311acdc52bcea2456185fd4018f35f545b7bd34df1d44e449e285af",
+    "hash": "7d0354d78cd3892542462fc3fd6c572f11e585fa473cc9f1299601732ec5a50b",
     "checkver": "github",
     "autoupdate": {
         "url": "https://github.com/Killeroo/PowerPing/releases/download/v$version/PowerPing.exe"

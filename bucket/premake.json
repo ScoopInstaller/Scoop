@@ -6,8 +6,8 @@
     "hash": "712ee206fd2df4adf6320500b755d131ff5fac188a2a653876ae10d3066f4163",
     "bin": "premake5.exe",
     "checkver": {
-        "url": "https://github.com/premake/premake-core/releases/latest",
-        "re": "/releases/tag/v(5[0-9.]+-?(alpha|beta)?([0-9.]+)?)"
+        "url": "https://premake.github.io/download.html",
+        "regex": "v(5[0-9a-z.-]+)"
     },
     "autoupdate": {
         "url": "https://github.com/premake/premake-core/releases/download/v$version/premake-$version-windows.zip"

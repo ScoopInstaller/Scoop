@@ -1,14 +1,14 @@
 {
     "homepage": "https://github.com/lukesampson/psutils",
     "description": "A port of the Unix touch command.",
-    "version": "0.2018.08.04",
+    "version": "0.2018.07.25",
     "license": "MIT",
-    "url": "https://raw.githubusercontent.com/lukesampson/psutils/de1a069215c54a1cb105f3dc79f14e25570c75f2/touch.ps1",
+    "url": "https://raw.githubusercontent.com/lukesampson/psutils/3290c04d7653ea8183a5e11d3d5a4e46716035d1/touch.ps1",
     "hash": "11eeb18ca3143929b5ace9a838a88d9b1c5bc657bcc8dd46708ba7e50ba331d9",
     "bin": "touch.ps1",
     "checkver": {
         "url": "https://github.com/lukesampson/psutils",
-        "re": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
+        "re": "touch\\.ps1[\\S\\s]*?/(?<sha>[0-9a-f]{40})[\\S\\s]*?(\\d+)-(\\d+)-(\\d+)",
         "replace": "0.${1}.${2}.${3}"
     },
     "autoupdate": {

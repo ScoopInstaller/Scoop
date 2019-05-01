@@ -11,7 +11,7 @@ function nightly_version($date, $quiet = $false) {
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $bucket, $null = parse_app $app
-    $app, $manifest, $bucket, $url = locate $app $bucket
+    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
@@ -41,7 +41,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
@@ -73,6 +72,11 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 }
 
 function locate($app, $bucket) {
+    Show-DeprecatedWarning $MyInvocation 'Find-Manifest'
+    return Find-Manifest $app $bucket
+}
+
+function Find-Manifest($app, $bucket) {
     $manifest, $url = $null, $null
 
     # check if app is a URL or UNC path
@@ -103,7 +107,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     $cached = fullpath (cache_path $app $version $url)
 
     if(!(test-path $cached) -or !$use_cache) {
-        $null = ensure $cachedir
+        ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
@@ -274,7 +278,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         Set-Content -Path $urlstxt $urlstxt_content
 
         # build aria2 command
-        $aria2 = "& '$(aria2_path)' $($options -join ' ')"
+        $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
         Write-Host "Starting download with aria2 ..."
@@ -296,8 +300,8 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         if($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
-            debug $urlstxt_content
-            debug $aria2
+            error $urlstxt_content
+            error $aria2
             abort $(new_issue_msg $app $bucket "download via aria2 failed")
         }
 
@@ -336,10 +340,13 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         if(!(test-path $data.$url.source) ) {
             abort $(new_issue_msg $app $bucket "cached file not found")
         }
-        if($use_cache) {
-            Copy-Item $data.$url.source $data.$url.target
-        } else {
-            Move-Item $data.$url.source $data.$url.target -force
+
+        if(!($dir -eq $cachedir)) {
+            if($use_cache) {
+                Copy-Item $data.$url.source $data.$url.target
+            } else {
+                Move-Item $data.$url.source $data.$url.target -force
+            }
         }
     }
 }
@@ -489,7 +496,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extracted = 0;
 
     # download first
-    if(aria2_enabled) {
+    if(Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach($url in $urls) {
@@ -529,39 +536,29 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         # work out extraction method, if applicable
         $extract_fn = $null
-        if($fname -match '\.zip$') { # unzip
-            $extract_fn = 'unzip'
+        if ($manifest.innosetup) {
+            $extract_fn = 'Expand-InnoArchive'
+        } elseif($fname -match '\.zip$') {
+            $extract_fn = 'Expand-ZipArchive'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
-            $msi = msi $manifest $architecture
-            if(!$msi) {
-                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
-                if ($useLessMsi -eq $true) {
-                    $extract_fn, $extract_dir = lessmsi_config $extract_dir
-                }
-                else {
-                    $extract_fn = 'extract_msi'
-                }
-            } else {
+            if(msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
+            } else {
+                $extract_fn = 'Expand-MsiArchive'
             }
-        } elseif(file_requires_7zip $fname) { # 7zip
-            if(!(7zip_installed)) {
-                warn "Aborting. You'll need to run 'scoop uninstall $app' to clean up."
-                abort "7-zip is required. You can install it with 'scoop install 7zip'."
-            }
-            $extract_fn = 'extract_7zip'
+        } elseif(Test-7zipRequirement -File $fname) { # 7zip
+            $extract_fn = 'Expand-7zipArchive'
         }
 
         if($extract_fn) {
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            $null = mkdir "$dir\_tmp"
-            & $extract_fn "$dir\$fname" "$dir\_tmp"
-            Remove-Item "$dir\$fname"
+            ensure "$dir\_tmp" | Out-Null
+            & $extract_fn "$dir\$fname" "$dir\_tmp" -Removal
             if ($extract_to) {
-                $null = mkdir "$dir\$extract_to" -force
+                ensure "$dir\$extract_to" | Out-Null
             }
             # fails if zip contains long paths (e.g. atom.json)
             #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
@@ -573,7 +570,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                 abort $(new_issue_msg $app $bucket "extract_dir error")
             }
 
-            if(test-path "$dir\_tmp") { # might have been moved by movedir
+            if(Test-Path "$dir\_tmp") { # might have been moved by movedir
                 try {
                     Remove-Item -r -force "$dir\_tmp" -ea stop
                 } catch [system.io.pathtoolongexception] {
@@ -590,18 +587,6 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     }
 
     $fname # returns the last downloaded file
-}
-
-function lessmsi_config ($extract_dir) {
-    $extract_fn = 'extract_lessmsi'
-    if ($extract_dir) {
-        $extract_dir = join-path SourceDir $extract_dir
-    }
-    else {
-        $extract_dir = "SourceDir"
-    }
-
-    $extract_fn, $extract_dir
 }
 
 function cookie_header($cookies) {
@@ -651,17 +636,12 @@ function check_hash($file, $hash, $app_name) {
     Write-Host "Checking hash of " -NoNewline
     Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
     Write-Host " ... " -nonewline
-    $type, $expected = $hash.split(':')
-    if(!$expected) {
-        # no type specified, assume sha256
-        $type, $expected = 'sha256', $type
+    $algorithm, $expected = get_hash $hash
+    if ($null -eq $algorithm) {
+        return $false, "Hash type '$algorithm' isn't supported."
     }
 
-    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
-        return $false, "Hash type '$type' isn't supported."
-    }
-
-    $actual = (compute_hash $file $type).ToLower()
+    $actual = compute_hash $file $algorithm
     $expected = $expected.ToLower()
 
     if($actual -ne $expected) {
@@ -683,7 +663,7 @@ function check_hash($file, $hash, $app_name) {
 
 function compute_hash($file, $algname) {
     try {
-        if([bool](Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) -eq $true) {
+        if(Test-CommandAvailable Get-FileHash) {
             return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
             $fs = [system.io.file]::openread($file)
@@ -698,11 +678,6 @@ function compute_hash($file, $algname) {
         if($alg) { $alg.dispose() }
     }
     return ''
-}
-
-function cmd_available($cmd) {
-    try { Get-Command $cmd -ea stop | out-null } catch { return $false }
-    $true
 }
 
 # for dealing with installers
@@ -721,7 +696,10 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
             $parameters.arg = $arg;
         }
 
-        $proc = start-process $exe -wait -ea stop -passthru @parameters
+        # Don't use Start-Process -Wait
+        # https://github.com/PowerShell/PowerShell/issues/6561
+        $proc = start-process $exe -ea stop -passthru @parameters
+        $proc | Wait-Process
 
 
         if($proc.exitcode -ne 0) {
@@ -737,23 +715,6 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
     }
     if($msg) { Write-Host "done." -f Green }
     return $true
-}
-
-function unpack_inno($fname, $manifest, $dir) {
-    if(!$manifest.innosetup) { return }
-
-    write-host "Unpacking innosetup... " -nonewline
-    innounp -x -d"$dir\_scoop_unpack" "$dir\$fname" > "$dir\innounp.log"
-    if($lastexitcode -ne 0) {
-        abort "Failed to unpack innosetup file. See $dir\innounp.log"
-    }
-
-    Get-ChildItem "$dir\_scoop_unpack\{app}" -r | Move-Item -dest "$dir" -force
-
-    Remove-Item -r -force "$dir\_scoop_unpack"
-
-    Remove-Item "$dir\$fname"
-    Write-Host "done." -f Green
 }
 
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
@@ -798,17 +759,6 @@ function install_msi($fname, $dir, $msi) {
     }
     Remove-Item $logfile
     Remove-Item $msifile
-}
-
-function extract_msi($path, $to) {
-    $logfile = "$(split-path $path)\msi.log"
-    $ok = run 'msiexec' @('/a', "`"$path`"", '/qn', "TARGETDIR=`"$to`"", "/lwe `"$logfile`"")
-    if(!$ok) { abort "Failed to extract files from $path.`nLog file:`n  $(friendly_path $logfile)" }
-    if(test-path $logfile) { Remove-Item $logfile }
-}
-
-function extract_lessmsi($path, $to) {
-    Invoke-Expression "lessmsi x `"$path`" `"$to\`""
 }
 
 # deprecated
@@ -1201,6 +1151,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             write-host "Persisting $source"
 
+            $source = $source.TrimEnd("/").TrimEnd("\\")
+
             $source = fullpath "$dir\$source"
             $target = fullpath "$persist_dir\$target"
 
@@ -1213,7 +1165,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # we don't have persist data in the store, move the source to target, then create link
             } elseif (Test-Path $source) {
                 # ensure target parent folder exist
-                $null = ensure (Split-Path -Path $target)
+                ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
             # we don't have neither source nor target data! we need to crate an empty target,
             # but we can't make a judgement that the data should be a file or directory...
