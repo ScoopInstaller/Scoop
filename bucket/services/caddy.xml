@@ -1,0 +1,12 @@
+<service>
+  <id>scoop-$name</id>
+  <name>Scoop $name</name>
+  <description>Scoop $name Service</description>
+  <executable>$dir\caddy.exe</executable>
+  <env name="HOME" value="$persist_dir" />
+  <env name="USERPROFILE" value="$persist_dir" />
+  <arguments>-conf $persist_dir\Caddyfile -agree</arguments>
+  <log mode="roll-by-size" />
+  <logpath>$service_dir\logs</logpath>
+  <onfailure action="restart" delay="10 sec"/>
+</service>

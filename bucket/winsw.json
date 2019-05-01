@@ -1,0 +1,14 @@
+{
+    "homepage": "https://github.com/kohsuke/winsw",
+    "license": "https://github.com/kohsuke/winsw/blob/master/LICENSE.txt",
+    "version": "2.1.0",
+    "url": "https://github.com/kohsuke/winsw/releases/download/winsw-v2.1.0/WinSW.NET2.exe#/winsw.exe",
+    "hash": "a5cc5bb943c884e1bb31172eeb91e275bdd4f81a0bbf12f9450e6a230bfee784",
+    "checkver": {
+        "url": "https://github.com/kohsuke/winsw",
+        "re": "winsw-v([\\d.]+)"
+    },
+    "autoupdate": {
+        "url": "https://github.com/kohsuke/winsw/releases/download/winsw-v2.1.0/WinSW.NET2.exe#/winsw.exe"
+    }
+}

@@ -15,6 +15,7 @@
             "hash": "b812727cbe395bd4c5d066b7c850205780d2d5eebbe255b3e3e04430b26cac6b"
         }
     },
+    "service": "php-fpm",
     "bin": [
         "php.exe",
         "php-cgi.exe",
