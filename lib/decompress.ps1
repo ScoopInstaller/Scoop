@@ -179,7 +179,7 @@ function Expand-ZipArchive {
         }
     } else {
         # Use Expand-Archive to unzip in PowerShell 5+
-        Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+        Microsoft.Powershell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     }
     if ($Removal) {
         # Remove original archive file
