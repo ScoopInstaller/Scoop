@@ -1,7 +1,7 @@
 {
     "homepage": "https://bazel.build",
     "description": "A fast, scalable, multi-language and extensible build system",
-    "version": "0.24.1",
+    "version": "0.25.0",
     "license": "Apache-2.0",
     "bin": "bazel.exe",
     "suggest": {
@@ -11,8 +11,8 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/bazelbuild/bazel/releases/download/0.24.1/bazel-0.24.1-windows-x86_64.zip",
-            "hash": "e7c59af824976e3f6a55354894276c7262234ee3635cb1c6b8d879f24a7eec30"
+            "url": "https://github.com/bazelbuild/bazel/releases/download/0.25.0/bazel-0.25.0-windows-x86_64.zip",
+            "hash": "16da23bd399d8510bc78d99489ffee167029a7eb29cea6667942c038efab70f7"
         }
     },
     "checkver": {
