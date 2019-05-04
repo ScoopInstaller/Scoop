@@ -15,7 +15,7 @@ You can contribute into core codebase these ways:
 1. [Fix bugs](https://github.com/lukesampson/scoop/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
 1. Identify / report reproducible steps of issues
 
-Scoop's core codebase started to go towards standard / preferred powershell code style. Mainly with adoption of `Verb-Noun` naming.
+Scoop's core codebase started moving towards standard / preferred powershell code style. Mainly with adoption of `Verb-Noun` naming.
 Starting from April 2019 use `Verb-Noun` naming for functions when manipulating with codebase.
 
 TODO:
@@ -52,12 +52,12 @@ Let's fast mention some points, which you need to follow when writing manifests.
     - `license`
 1. Write readable / extendable code inside script blocks
 1. Test your autoupdates before publishing PR
-1. Try to inspect if vendor of application provide checksums for provided artifacts
+1. Always inspect if vendor of application provides checksums for artifacts
 
 ### Manifest format
 
 When you publish PR, appveyor pipeline will be executed and check for formatting errors inside your manifests.
-Best practise for always passing PR is to run [checkver][checkver] of [format][formatjson] binary before posting PR.
+Best practise for always passing PR is to run [checkver][checkver] or [format][formatjson] binary before posting PR.
 
 Binaries are powershell scripts which should run on all platforms (Linux, MacOS with pwsh), so you are not tied with Windows platform.
 
