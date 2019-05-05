@@ -1,0 +1,20 @@
+{
+    "homepage": "http://avro.apache.org/",
+    "description": "A collection of Avro tools.",
+    "license": "Apache-2.0",
+    "version": "1.8.2",
+    "url": "http://apache.org/dist/avro/avro-1.8.2/java/avro-tools-1.8.2.jar",
+    "hash": "sha1:80e4519289ef9c5a09280639c8c9a669d0a4704d",
+    "bin": [
+        [
+            "avro-tools-1.8.2.jar",
+            "avro-tools"
+        ]
+    ],
+    "suggest": {
+        "JDK": [
+            "java/oraclejdk",
+            "java/openjdk"
+        ]
+    }
+}
