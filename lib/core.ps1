@@ -194,7 +194,7 @@ function Get-HelperPath {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Shim')]
         [String]
         $Helper
     )
@@ -205,6 +205,7 @@ function Get-HelperPath {
         'Innounp' { Get-AppFilePath 'innounp' 'innounp.exe' }
         'Dark' { Get-AppFilePath 'dark' 'dark.exe' }
         'Aria2' { Get-AppFilePath 'aria2' 'aria2c.exe' }
+        'Shim' { Get-AppFilePath 'scoop-shim' 'shim.exe' }
     }
 }
 
@@ -212,7 +213,7 @@ function Test-HelperInstalled {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Shim')]
         [String]
         $Helper
     )
@@ -427,8 +428,11 @@ function shim($path, $global, $name, $arg) {
     }
 
     if($path -match '\.(exe|com)$') {
+        if(!(Test-HelperInstalled -Helper Shim)) {
+            scoop install 'main/scoop-shim'
+        }
         # for programs with no awareness of any shell
-        Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
+        Copy-Item "$(versiondir 'scoop-shim' 'current')\shim.exe" "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
