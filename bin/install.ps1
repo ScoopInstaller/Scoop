@@ -56,7 +56,7 @@ shim "$dir\bin\scoop.ps1" $false
 
 # download main bucket
 $dir = "$scoopdir\buckets\main"
-$zipurl = 'https://github.com/scoopinstaller/scoop-main/archive/master.zip'
+$zipurl = 'https://github.com/ScoopInstaller/Main/archive/master.zip'
 $zipfile = "$dir\main-bucket.zip"
 Write-Output 'Downloading main bucket...'
 New-Item $dir -Type Directory -Force | Out-Null
