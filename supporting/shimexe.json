@@ -1,22 +1,14 @@
 {
-    "##": "TODO: Change proper values and release flow",
-    "version": "0.2014.09.17",
-    "homepage": "https://github.com/lukesampson/shimexe/",
-    "url": "https://raw.githubusercontent.com/lukesampson/scoop/master/supporting/shimexe/bin/shim.exe",
+    "version": "1.0.1",
+    "desciprtion": "A Scoop helper program for shimming executables.",
+    "homepage": "https://github.com/ScoopInstaller/Shim/",
+    "url": "https://github.com/ScoopInstaller/Shim/releases/download/v1.0.1/shim.exe",
     "hash": "cb440b8a08a2095a59666a859b35aa5a1524b140b909ecc760f38f3baccf80e6",
-    "checkver": {
-        "regex": "datetime=\"(\\d+)-(\\d+)-(\\d+)[\\S\\s]*?(?<sha>[0-9a-f]{40})\"",
-        "replace": "0.${1}.${2}.${3}"
-    },
+    "checkver": "github",
     "autoupdate": {
-        "url": "https://raw.githubusercontent.com/lukesampson/scoop/master/supporting/shimexe/bin/shim.exe"
-    },
-    "notes": [
-        "autoupdate: {",
-        "    url: https://github.com/scoopinstaller/shimexe/releases/v$version/shim.exe",
-        "    hash: {",
-        "        url: $baseurl/checksum.sha256",
-        "    }",
-        "}"
-    ]
+        "url": "https://github.com/ScoopInstaller/Shim/releases/download/v$version/shim.exe",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
 }
