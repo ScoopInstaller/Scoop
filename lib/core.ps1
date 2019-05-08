@@ -233,6 +233,7 @@ function app_status($app, $global) {
     $install_info = install_info $app $status.version $global
 
     $status.failed = (!$install_info -or !$status.version)
+    $status.hold = ($install_info.hold -eq $true)
 
     $manifest = manifest $app $install_info.bucket $install_info.url
     $status.removed = (!$manifest)

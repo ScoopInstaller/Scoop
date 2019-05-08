@@ -289,13 +289,21 @@ if (!$apps) {
             ($app, $global) = $_
             $status = app_status $app $global
             if ($force -or $status.outdated) {
-                $outdated += applist $app $global
-                write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
+                if(!$status.hold) {
+                    $outdated += applist $app $global
+                    write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
+                } else {
+                    warn "'$app' is locked to version $($status.version)"
+                }
             } elseif ($apps_param -ne '*') {
                 write-host -f green "$app`: $($status.version) (latest version)"
             }
         }
 
+        if ($outdated -and (Test-Aria2Enabled)) {
+            warn "Scoop uses 'aria2c' for multi-connection downloads."
+            warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+        }
         if ($outdated.Length -gt 1) {
             write-host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
         } elseif ($outdated.Length -eq 0) {
@@ -306,11 +314,7 @@ if (!$apps) {
     }
 
     $suggested = @{};
-    # # $outdated is a list of ($app, $global) tuples
-    if (Test-Aria2Enabled) {
-        warn "Scoop uses 'aria2c' for multi-connection downloads."
-        warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
-    }
+    # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }
 

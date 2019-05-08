@@ -51,7 +51,7 @@ $true, $false | ForEach-Object { # local and global apps
             $removed += @{ $app = $status.version }
         }
         if($status.outdated) {
-            $outdated += @{ $app = @($status.version, $status.latest_version) }
+            $outdated += @{ $app = @($status.version, $status.latest_version, $status.hold) }
         }
         if($status.missing_deps) {
             $missing_deps += ,(@($app) + @($status.missing_deps))
@@ -63,7 +63,7 @@ if($outdated) {
     write-host -f DarkCyan 'Updates are available for:'
     $outdated.keys | ForEach-Object {
         $versions = $outdated.$_
-        "    $_`: $($versions[0]) -> $($versions[1])"
+        "    $_`: $($versions[0]) -> $($versions[1])$(if($versions[2]){' *hold*'})"
     }
 }
 
