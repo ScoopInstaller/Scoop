@@ -17,6 +17,7 @@
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
 . "$psscriptroot\..\lib\decompress.ps1"
+. "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\shortcuts.ps1"
 . "$psscriptroot\..\lib\psmodules.ps1"
