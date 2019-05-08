@@ -1,0 +1,33 @@
+{
+    "homepage": "https://www.nomadproject.io",
+    "license": "MPL-2.0",
+    "version": "0.9.1",
+    "architecture": {
+        "64bit": {
+            "url": "https://releases.hashicorp.com/nomad/0.9.1/nomad_0.9.1_windows_amd64.zip",
+            "hash": "1ad2bf46ff668fa1abf309709c8f89f7e44093cf58a45dd8bcc75144e469f1ed"
+        },
+        "32bit": {
+            "url": "https://releases.hashicorp.com/nomad/0.9.1/nomad_0.9.1_windows_386.zip",
+            "hash": "b9ece3a860cee8b9a01438bd314a5a31aa4699b58bf3ba9faba2d9360d6fc7bb"
+        }
+    },
+    "bin": "nomad.exe",
+    "checkver": {
+        "url": "https://releases.hashicorp.com/nomad/",
+        "re": "nomad_([\\d.]+)</a>"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://releases.hashicorp.com/nomad/$version/nomad_$version_windows_amd64.zip"
+            },
+            "32bit": {
+                "url": "https://releases.hashicorp.com/nomad/$version/nomad_$version_windows_386.zip"
+            }
+        },
+        "hash": {
+            "url": "$baseurl/nomad_$version_SHA256SUMS"
+        }
+    }
+}
