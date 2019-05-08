@@ -23,6 +23,8 @@ param(
   [Switch]$verbose = $false
 )
 
+. "$psscriptroot\..\lib\install.ps1"
+
 $script:config_alias = "alias"
 
 function init_alias_config {
