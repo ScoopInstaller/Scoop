@@ -63,7 +63,7 @@ $command
     # add alias to config
     $aliases | Add-Member -MemberType NoteProperty -Name $name -Value $alias_file
 
-    set_config $script:config_alias $aliases
+    set_config $script:config_alias $aliases | Out-Null
 }
 
 function rm_alias($name) {
@@ -78,7 +78,7 @@ function rm_alias($name) {
         rm_shim $aliases.$name (shimdir $false)
 
         $aliases.PSObject.Properties.Remove($name)
-        set_config $script:config_alias $aliases
+        set_config $script:config_alias $aliases | Out-Null
     } else {
         abort "Alias $name doesn't exist."
     }

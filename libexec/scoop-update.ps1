@@ -40,14 +40,14 @@ $independent = $opt.i -or $opt.independent
 $repo = $(get_config SCOOP_REPO)
 if (!$repo) {
     $repo = "https://github.com/lukesampson/scoop"
-    set_config SCOOP_REPO "$repo"
+    set_config SCOOP_REPO "$repo" | Out-Null
 }
 
 # Find current update channel from config
 $branch = $(get_config SCOOP_BRANCH)
 if (!$branch) {
     $branch = "master"
-    set_config SCOOP_BRANCH "$branch"
+    set_config SCOOP_BRANCH "$branch" | Out-Null
 }
 
 if(($PSVersionTable.PSVersion.Major) -lt 5) {
@@ -143,7 +143,7 @@ function update_scoop() {
         Pop-Location
     }
 
-    set_config lastupdate ([System.DateTime]::Now.ToString('o'))
+    set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 }
 
