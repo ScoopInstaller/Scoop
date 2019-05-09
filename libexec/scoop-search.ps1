@@ -5,70 +5,92 @@
 # If used with [query], shows app names that match the query.
 # Without [query], shows all the available apps.
 param($query)
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 
-function bin_match($manifest, $query) {
-    if(!$manifest.bin) { return $false }
-    foreach($bin in $manifest.bin) {
-        $exe, $alias, $args = $bin
-        $fname = split-path $exe -leaf -ea stop
-
-        if((strip_ext $fname) -match $query) { return $fname }
-        if($alias -match $query) { return $alias }
-    }
-    $false
-}
-
 function search_bucket($bucket, $query) {
+    $arch = default_architecture
     $apps = apps_in_bucket (Find-BucketDirectory $bucket) | ForEach-Object {
-        @{ name = $_ }
+        $manifest = manifest $_ $bucket
+        @{
+            name = $_
+            version = $manifest.version
+            description = $manifest.description
+            binaries = @()
+            bin = @(arch_specific 'bin' $manifest $arch)
+        }
     }
 
-    if($query) {
-        try {
-            $query = new-object regex $query, 'IgnoreCase'
-        } catch {
-            abort "Invalid regular expression: $($_.exception.innerexception.message)"
+    if(!$query) {
+        return $apps
+    }
+
+    try {
+        $query = new-object regex $query, 'IgnoreCase'
+    } catch {
+        abort "Invalid regular expression: $($_.exception.innerexception.message)"
+    }
+
+    $result = @()
+
+    $apps | Foreach-Object {
+        $app = $_
+        if($app.name -match $query -and !$result.Contains($app)) {
+            $result += $app
         }
 
-        $apps = $apps | Where-Object {
-            if($_.name -match $query) { return $true }
-            $bin = bin_match (manifest $_.name $bucket) $query
-            if($bin) {
-                $_.bin = $bin; return $true;
+        if(!$app.bin) {
+            return
+        }
+
+        $app.bin | ForEach-Object {
+            $exe, $name, $arg = shim_def $_
+            if($name -match $query) {
+                if($result.Contains($app)) {
+                    $result[$result.IndexOf($app)].binaries += $name
+                } else {
+                    $app.binaries += $name
+                    $result += $app
+                }
             }
         }
     }
-    $apps | ForEach-Object { $_.version = (latest_version $_.name $bucket); $_ }
-}
 
-function download_json($url) {
-    $progressPreference = 'silentlycontinue'
-    $result = invoke-webrequest $url -UseBasicParsing | Select-Object -exp content | convertfrom-json
-    $progressPreference = 'continue'
-    $result
+    return $result
 }
 
 function github_ratelimit_reached {
-    $api_link = "https://api.github.com/rate_limit"
-    (download_json $api_link).rate.remaining -eq 0
+    (Invoke-RestMethod -Uri 'https://api.github.com/rate_limit').rate.remaining -eq 0
 }
+
+$ratelimit_reached = github_ratelimit_reached
 
 function search_remote($bucket, $query) {
     $repo = known_bucket_repo $bucket
+    if($ratelimit_reached) {
+        Write-Host "GitHub ratelimit reached: Can't query $repo"
+        return $null
+    }
 
     $uri = [system.uri]($repo)
     if ($uri.absolutepath -match '/([a-zA-Z0-9]*)/([a-zA-Z0-9-]*)(.git|/)?') {
         $user = $matches[1]
         $repo_name = $matches[2]
-        $api_link = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
-        $result = download_json $api_link | Select-Object -exp tree | Where-Object {
+        $request_uri = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
+
+        if((Get-Command Invoke-RestMethod).parameters.ContainsKey('ResponseHeadersVariable')) {
+            $response = Invoke-RestMethod -Uri $request_uri -ResponseHeadersVariable headers
+            $ratelimit_reached = (0 -eq $headers['X-RateLimit-Remaining'][0])
+        } else {
+            $response = Invoke-RestMethod -Uri $request_uri
+            $ratelimit_reached = (github_ratelimit_reached)
+        }
+
+        $result = $response.tree | Where-Object {
             $_.path -match "(^(.*$query.*).json$)"
         } | ForEach-Object { $matches[2] }
     }
@@ -77,25 +99,22 @@ function search_remote($bucket, $query) {
 }
 
 function search_remotes($query) {
-    $buckets = known_bucket_repos
-    $names = $buckets | get-member -m noteproperty | Select-Object -exp name
-
-    $results = $names | Where-Object { !(test-path $(Find-BucketDirectory $_)) } | ForEach-Object {
+    $results = known_buckets | Where-Object { !(test-path $(Find-BucketDirectory $_)) } | ForEach-Object {
         @{"bucket" = $_; "results" = (search_remote $_ $query)}
     } | Where-Object { $_.results }
 
     if ($results.count -gt 0) {
-        "Results from other known buckets..."
-        "(add them using 'scoop bucket add <name>')"
-        ""
+        "`nResults from other known buckets:`n"
     }
 
     $results | ForEach-Object {
-        "'$($_.bucket)' bucket:"
+        "'$($_.bucket)' bucket (Run 'scoop bucket add $($_.bucket)'):"
         $_.results | ForEach-Object { "    $_" }
         ""
     }
 }
+
+Write-Host 'Searching in local buckets ...'
 
 Get-LocalBucket | ForEach-Object {
     $res = search_bucket $_ $query
@@ -106,17 +125,27 @@ Get-LocalBucket | ForEach-Object {
         Write-Host "'$name' bucket:"
         $res | ForEach-Object {
             $item = "    $($_.name) ($($_.version))"
-            if($_.bin) { $item += " --> includes '$($_.bin)'" }
+            if($_.binaries) { $item += " --> $($_.binaries -join ', ')" }
+            if($_.description) { $item += "`n        $($_.description)" }
             $item
         }
         ""
     }
 }
 
-if (!$local_results -and !(github_ratelimit_reached)) {
-    $remote_results = search_remotes $query
-    if(!$remote_results) { [console]::error.writeline("No matches found."); exit 1 }
-    $remote_results
+if(!$local_results) {
+    [console]::error.writeline("No matches found.")
+
+    if(!$ratelimit_reached) {
+        Write-Host 'Searching in remote buckets ...'
+        $remote_results = search_remotes $query
+        if(!$remote_results) {
+            [console]::error.writeline("No matches found."); exit 1
+        }
+        $remote_results
+    } else {
+        Write-Host "GitHub ratelimit reached: Can't query known repositories, please try again later"
+    }
 }
 
 exit 0
