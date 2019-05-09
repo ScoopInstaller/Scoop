@@ -84,7 +84,7 @@ function search_remote($bucket, $query) {
 
         if((Get-Command Invoke-RestMethod).parameters.ContainsKey('ResponseHeadersVariable')) {
             $response = Invoke-RestMethod -Uri $request_uri -ResponseHeadersVariable headers
-            $ratelimit_reached = (0 -eq $headers['X-RateLimit-Remaining'][0])
+            $ratelimit_reached = (1 -eq $headers['X-RateLimit-Remaining'][0])
         } else {
             $response = Invoke-RestMethod -Uri $request_uri
             $ratelimit_reached = (github_ratelimit_reached)
