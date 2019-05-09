@@ -95,23 +95,15 @@ function search_remote($bucket, $query) {
         } | ForEach-Object { $matches[2] }
     }
 
-    $result
+    return $result
 }
 
 function search_remotes($query) {
     $results = known_buckets | Where-Object { !(test-path $(Find-BucketDirectory $_)) } | ForEach-Object {
-        @{"bucket" = $_; "results" = (search_remote $_ $query)}
+        @{bucket = $_; results = (search_remote $_ $query)}
     } | Where-Object { $_.results }
 
-    if ($results.count -gt 0) {
-        "`nResults from other known buckets:`n"
-    }
-
-    $results | ForEach-Object {
-        "'$($_.bucket)' bucket (Run 'scoop bucket add $($_.bucket)'):"
-        $_.results | ForEach-Object { "    $_" }
-        ""
-    }
+    return $results
 }
 
 Write-Host 'Searching in local buckets ...'
@@ -127,22 +119,26 @@ Get-LocalBucket | ForEach-Object {
             $item = "    $($_.name) ($($_.version))"
             if($_.binaries) { $item += " --> $($_.binaries -join ', ')" }
             if($_.description) { $item += "`n        $($_.description)" }
-            $item
+            Write-Host $item
         }
-        ""
     }
 }
 
 if(!$local_results) {
-    [console]::error.writeline("No matches found.")
+    error 'No matches found.'
 
     if(!$ratelimit_reached) {
         Write-Host 'Searching in remote buckets ...'
         $remote_results = search_remotes $query
-        if(!$remote_results) {
-            [console]::error.writeline("No matches found."); exit 1
+        if ($remote_results) {
+            Write-Host "`nResults from other known buckets:`n"
+            $remote_results | ForEach-Object {
+                Write-Host "'$($_.bucket)' bucket (Run 'scoop bucket add $($_.bucket)'):"
+                $_.results | ForEach-Object { "    $_" }
+            }
+        } else {
+            error 'No matches found.'
         }
-        $remote_results
     } else {
         Write-Host "GitHub ratelimit reached: Can't query known repositories, please try again later"
     }
