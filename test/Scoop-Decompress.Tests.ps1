@@ -3,7 +3,6 @@
 . "$psscriptroot\..\lib\unix.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 
 $isUnix = is_unix
 
