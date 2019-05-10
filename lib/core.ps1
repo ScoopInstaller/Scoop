@@ -838,18 +838,7 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
 #       for all communication with api.github.com
 Optimize-SecurityProtocol
 
-# Note: The default directory changed from ~/AppData/Local/scoop to ~/scoop
-#       on 1 Nov, 2016 to work around long paths used by NodeJS.
-#       Old installations should continue to work using the old path.
-#       There is currently no automatic migration path to deal
-#       with updating old installations to the new path.
 $scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Select-Object -first 1
-
-$oldscoopdir = "$env:LOCALAPPDATA\scoop"
-if((test-path $oldscoopdir) -and !$env:SCOOP) {
-    $scoopdir = $oldscoopdir
-}
-
 $globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Select-Object -first 1
 
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
