@@ -3,20 +3,20 @@
 #       Old installations should continue to work using the old path.
 #       There is currently no automatic migration path to deal
 #       with updating old installations to the new path.
-$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | Select-Object -first 1
+$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Select-Object -first 1
 
 $oldscoopdir = "$env:LOCALAPPDATA\scoop"
 if((test-path $oldscoopdir) -and !$env:SCOOP) {
     $scoopdir = $oldscoopdir
 }
 
-$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | Select-Object -first 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Select-Object -first 1
 
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
+$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Select-Object -first 1
 
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
