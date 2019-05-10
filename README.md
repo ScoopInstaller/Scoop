@@ -79,16 +79,16 @@ These settings can be changed through environment variables.
 ### Install Scoop to a Custom Directory
 
 ```powershell
-[environment]::setEnvironmentVariable('SCOOP','D:\Applications\Scoop','User')
 $env:SCOOP='D:\Applications\Scoop'
+[Environment]::SetEnvironmentVariable('SCOOP', $env:SCOOP, 'User')
 iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 ```
 
 ### Configure Scoop to install global programs to a Custom Directory
 
 ```powershell
-[environment]::setEnvironmentVariable('SCOOP_GLOBAL','F:\GlobalScoopApps','Machine')
 $env:SCOOP_GLOBAL='F:\GlobalScoopApps'
+[Environment]::SetEnvironmentVariable('SCOOP_GLOBAL', $env:SCOOP_GLOBAL, 'Machine')
 ```
 
 ## [Documentation](https://github.com/lukesampson/scoop/wiki)
