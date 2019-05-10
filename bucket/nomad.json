@@ -1,6 +1,7 @@
 {
     "homepage": "https://www.nomadproject.io",
     "license": "MPL-2.0",
+    "description": "Easy-to-use, flexible, and performant workload orchestrator that can deploy a mix of microservice, batch, containerized, and non-containerized applications.",
     "version": "0.9.1",
     "architecture": {
         "64bit": {
