@@ -1,34 +1,3 @@
-# Note: The default directory changed from ~/AppData/Local/scoop to ~/scoop
-#       on 1 Nov, 2016 to work around long paths used by NodeJS.
-#       Old installations should continue to work using the old path.
-#       There is currently no automatic migration path to deal
-#       with updating old installations to the new path.
-$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Select-Object -first 1
-
-$oldscoopdir = "$env:LOCALAPPDATA\scoop"
-if((test-path $oldscoopdir) -and !$env:SCOOP) {
-    $scoopdir = $oldscoopdir
-}
-
-$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Select-Object -first 1
-
-# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
-#       is experimental and untested. There may be concurrency issues when
-#       multiple users write and access cached files at the same time.
-#       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Select-Object -first 1
-
-$configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
-$configFile = "$configHome\scoop\config.json"
-if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
-    New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
-    Move-Item "$env:USERPROFILE\.scoop" $configFile
-    write-host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
-    write-host "WARN  to '$configFile'" -f darkyellow
-}
-
-# Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
-# for all communication with api.github.com
 function Optimize-SecurityProtocol {
     # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
     # which allows the operating system to choose the best protocol to use.
@@ -45,7 +14,6 @@ function Optimize-SecurityProtocol {
         [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
     }
 }
-Optimize-SecurityProtocol
 
 function Get-UserAgent() {
     return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
@@ -78,8 +46,6 @@ function load_cfg($file) {
         Write-Host "ERROR loading $file`: $($_.exception.message)"
     }
 }
-
-$scoopConfig = load_cfg $configFile
 
 function get_config($name, $default) {
     if($null -eq $scoopConfig.$name -and $null -ne $default) {
@@ -140,9 +106,6 @@ function setup_proxy() {
         warn "Failed to use proxy '$proxy': $($_.exception.message)"
     }
 }
-
-setup_proxy
-
 
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
@@ -866,3 +829,47 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
 
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }
+
+##################
+# Core Bootstrap #
+##################
+
+# Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
+#       for all communication with api.github.com
+Optimize-SecurityProtocol
+
+# Note: The default directory changed from ~/AppData/Local/scoop to ~/scoop
+#       on 1 Nov, 2016 to work around long paths used by NodeJS.
+#       Old installations should continue to work using the old path.
+#       There is currently no automatic migration path to deal
+#       with updating old installations to the new path.
+$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Select-Object -first 1
+
+$oldscoopdir = "$env:LOCALAPPDATA\scoop"
+if((test-path $oldscoopdir) -and !$env:SCOOP) {
+    $scoopdir = $oldscoopdir
+}
+
+$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Select-Object -first 1
+
+# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
+#       is experimental and untested. There may be concurrency issues when
+#       multiple users write and access cached files at the same time.
+#       Use at your own risk.
+$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Select-Object -first 1
+
+# Scoop config file migration
+$configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
+$configFile = "$configHome\scoop\config.json"
+if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
+    New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
+    Move-Item "$env:USERPROFILE\.scoop" $configFile
+    write-host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
+    write-host "WARN  to '$configFile'" -f darkyellow
+}
+
+# Load Scoop config
+$scoopConfig = load_cfg $configFile
+
+# Setup proxy globally
+setup_proxy
