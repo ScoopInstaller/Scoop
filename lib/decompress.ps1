@@ -202,6 +202,32 @@ function Expand-ZipArchive {
     }
 }
 
+function Expand-DarkArchive {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [Switch]
+        $Removal
+    )
+    $LogLocation = "$(Split-Path $Path)\dark.log"
+    & (Get-HelperPath -Helper Dark) -nologo -x "$DestinationPath" "$Path" | Out-File $LogLocation
+    if ($LASTEXITCODE -ne 0) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
+    }
+    if (Test-Path $LogLocation) {
+        Remove-Item $LogLocation -Force
+    }
+    if ($Removal) {
+        # Remove original archive file
+        Remove-Item $Path -Force
+    }
+}
+
 function extract_7zip($path, $to, $removal) {
     Show-DeprecatedWarning $MyInvocation 'Expand-7zipArchive'
     Expand-7zipArchive -Path $path -DestinationPath $to -Removal:$removal @args
