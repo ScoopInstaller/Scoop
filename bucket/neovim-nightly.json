@@ -1,0 +1,29 @@
+{
+    "homepage": "https://neovim.io/",
+    "version": "nightly",
+    "license": {
+        "identifier": "Apache-2.0,MIT,Vim,Freeware(Node.js)",
+        "url": "https://github.com/neovim/neovim/blob/master/LICENSE"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip"
+        },
+        "32bit": {
+            "url": "https://github.com/neovim/neovim/releases/download/nightly/nvim-win32.zip"
+        }
+    },
+    "suggest": {
+        "vcredist": "extras/vcredist2015"
+    },
+    "bin": [
+        "Neovim\\bin\\nvim.exe",
+        "Neovim\\bin\\nvim-qt.exe"
+    ],
+    "shortcuts": [
+        [
+            "Neovim\\bin\\nvim-qt.exe",
+            "Neovim"
+        ]
+    ]
+}
