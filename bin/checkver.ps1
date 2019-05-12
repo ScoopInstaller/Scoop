@@ -19,32 +19,32 @@
     PS BUCKETROOT > .\bin\checkver.ps1
     Check all manifest inside default directory.
 .EXAMPLE
-    PS BUCKETROOT > .\bin\checkver.ps1 -s
+    PS BUCKETROOT > .\bin\checkver.ps1 -SkipUpdated
     Check all manifest inside default directory (list only outdated manifests).
 .EXAMPLE
-    PS BUCKETROOT > .\bin\checkver.ps1 -u
+    PS BUCKETROOT > .\bin\checkver.ps1 -Update
     Check all manifests and update All outdated manifests.
 .EXAMPLE
-    PS BUCKETROOT > .\bin\checkver.ps1 MAN
-    Check manifest MAN.json inside default directory.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP
+    Check manifest APP.json inside default directory.
 .EXAMPLE
-    PS BUCKETROOT > .\bin\checkver.ps1 MAN -u
-    Check manifest MAN.json and update, if there is newer version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -Update
+    Check manifest APP.json and update, if there is newer version.
 .EXAMPLE
-    PS BUCKETROOT > .\bin\checkver.ps1 MAN -f
-    Check manifest MAN.json and update, even if there is no new version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -ForceUpdate
+    Check manifest APP.json and update, even if there is no new version.
 .EXAMPLE
-    PS BUCKETROOT > .\bin\checkver.ps1 MAN -u -v VER
-    Check manifest MAN.json and update, using version VER
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -Update -Version VER
+    Check manifest APP.json and update, using version VER
 .EXAMPLE
-    PS BUCKETROOT > .\bin\checkver.ps1 MAN DIR
-    Check manifest MAN.json inside ./DIR directory.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP DIR
+    Check manifest APP.json inside ./DIR directory.
 .EXAMPLE
     PS BUCKETROOT > .\bin\checkver.ps1 -Dir DIR
     Check all manifests inside ./DIR directory.
 .EXAMPLE
-    PS BUCKETROOT > .\bin\checkver.ps1 MAN DIR -u
-    Check manifest MAN.json inside ./DIR directory and update if there is newer version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP DIR -Update
+    Check manifest APP.json inside ./DIR directory and update if there is newer version.
 #>
 param(
     [String] $App = '*',
@@ -65,7 +65,6 @@ param(
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\autoupdate.ps1"
 . "$psscriptroot\..\lib\json.ps1"

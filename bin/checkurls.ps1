@@ -28,7 +28,6 @@ param(
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\config.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 
 $Dir = Resolve-Path $Dir

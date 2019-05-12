@@ -3,7 +3,6 @@ param($cmd)
 
 set-strictmode -off
 
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\git.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"

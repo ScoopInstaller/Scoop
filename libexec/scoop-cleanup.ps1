@@ -62,7 +62,7 @@ if ($apps) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        $apps = ensure_all_installed $apps $global
+        $apps = Confirm-InstallationStatus $apps -Global:$global
     }
 
     # $apps is now a list of ($app, $global) tuples

@@ -12,7 +12,7 @@ if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 try {
     $gcm = Get-Command "$command" -ea stop
 } catch {
-    [console]::error.writeline("'$command' not found"); exit 3
+    abort "'$command' not found" 3
 }
 
 $path = "$($gcm.path)"
