@@ -58,9 +58,9 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
         Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
         break
     } else {
-        Write-Output "PowerShell 5 or later is required to run Scoop."
-        Write-Output "Please upgrade before Oct 1, 2019 UTC."
-        Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
+        Write-Output "Scoop is going to stop supporting old version of PowerShell."
+        Write-Output "Please upgrade to PowerShell 5 or later version before Oct 1, 2019 UTC."
+        Write-Output "Guideline: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
     }
 }
 
