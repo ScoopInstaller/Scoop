@@ -37,17 +37,17 @@ $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
 
 # load config
-$configRepo = $(get_config SCOOP_REPO)
+$configRepo = get_config SCOOP_REPO
 if (!$configRepo) {
     $configRepo = "https://github.com/lukesampson/scoop"
-    set_config SCOOP_REPO "$configRepo" | Out-Null
+    set_config SCOOP_REPO $configRepo | Out-Null
 }
 
 # Find current update channel from config
-$configBranch = $(get_config SCOOP_BRANCH)
+$configBranch = get_config SCOOP_BRANCH
 if (!$configBranch) {
     $configBranch = "master"
-    set_config SCOOP_BRANCH "$configBranch" | Out-Null
+    set_config SCOOP_BRANCH $configBranch | Out-Null
 }
 
 if(($PSVersionTable.PSVersion.Major) -lt 5) {
