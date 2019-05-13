@@ -233,6 +233,11 @@ while ($in_progress -gt 0) {
         $page = $ver
         $ver = ''
     }
+    
+    if ($xpath -and $regexp) {
+        $page = $ver
+        $ver = ''
+    }
 
     if ($regexp) {
         $regex = New-Object System.Text.RegularExpressions.Regex($regexp)
