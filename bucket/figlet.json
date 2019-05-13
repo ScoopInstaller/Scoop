@@ -1,7 +1,0 @@
-{
-    "homepage": "https://github.com/lukesampson/figlet",
-    "version": "1.0-go",
-    "url": "https://github.com/lukesampson/figlet/releases/download/go-1.0-win/figlet-go-1.0-win.zip",
-    "hash": "11ee1f4de608d147ab5b61ddb5967730e9b2c1e43f7d2c96582ee260c030e413",
-    "bin": "figlet.exe"
-}

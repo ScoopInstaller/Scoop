@@ -278,7 +278,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         Set-Content -Path $urlstxt $urlstxt_content
 
         # build aria2 command
-        $aria2 = "& '$(aria2_path)' $($options -join ' ')"
+        $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
         Write-Host "Starting download with aria2 ..."
@@ -496,7 +496,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extracted = 0;
 
     # download first
-    if(aria2_enabled) {
+    if(Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach($url in $urls) {
@@ -545,10 +545,10 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             if(msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
             } else {
-                $extract_fn = 'Expand-MSIArchive'
+                $extract_fn = 'Expand-MsiArchive'
             }
-        } elseif(Test-7ZipRequirement -File $fname) { # 7zip
-            $extract_fn = 'Expand-7ZipArchive'
+        } elseif(Test-7zipRequirement -File $fname) { # 7zip
+            $extract_fn = 'Expand-7zipArchive'
         }
 
         if($extract_fn) {
@@ -663,7 +663,7 @@ function check_hash($file, $hash, $app_name) {
 
 function compute_hash($file, $algname) {
     try {
-        if([bool](Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) -eq $true) {
+        if(Test-CommandAvailable Get-FileHash) {
             return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
             $fs = [system.io.file]::openread($file)
@@ -678,11 +678,6 @@ function compute_hash($file, $algname) {
         if($alg) { $alg.dispose() }
     }
     return ''
-}
-
-function cmd_available($cmd) {
-    try { Get-Command $cmd -ea stop | out-null } catch { return $false }
-    $true
 }
 
 # for dealing with installers
@@ -701,7 +696,10 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
             $parameters.arg = $arg;
         }
 
-        $proc = start-process $exe -wait -ea stop -passthru @parameters
+        # Don't use Start-Process -Wait
+        # https://github.com/PowerShell/PowerShell/issues/6561
+        $proc = start-process $exe -ea stop -passthru @parameters
+        $proc | Wait-Process
 
 
         if($proc.exitcode -ne 0) {

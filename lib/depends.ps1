@@ -49,12 +49,50 @@ function runtime_deps($manifest) {
     if ($manifest.depends) { return $manifest.depends }
 }
 
+function script_deps($script) {
+    $deps = @()
+    if($script -is [Array]) {
+        $script = $script -join "`n"
+    }
+    if([String]::IsNullOrEmpty($script)) {
+        return $deps
+    }
+
+    if($script -like '*Expand-7zipArchive *' -or $script -like '*extract_7zip *') {
+        $deps += '7zip'
+    }
+    if($script -like '*Expand-MsiArchive *' -or $script -like '*extract_msi *') {
+        $deps += 'lessmsi'
+    }
+    if($script -like '*Expand-InnoArchive *' -or $script -like '*unpack_inno *') {
+        $deps += 'innounp'
+    }
+    if($script -like '*Expand-DarkArchive *') {
+        $deps += 'dark'
+    }
+
+    return $deps
+}
+
 function install_deps($manifest, $arch) {
     $deps = @()
 
-    if (Test-7ZipRequirement -URL (url $manifest $arch)) { $deps += '7zip' }
-    if (Test-LessMSIRequirement -URL (url $manifest $arch)) { $deps += 'lessmsi' }
-    if ($manifest.innosetup) { $deps += 'innounp' }
+    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -URL (url $manifest $arch))) {
+        $deps += '7zip'
+    }
+    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -URL (url $manifest $arch))) {
+        $deps += 'lessmsi'
+    }
+    if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
+        $deps += 'innounp'
+    }
 
-    return $deps
+    $pre_install = arch_specific 'pre_install' $manifest $arch
+    $installer = arch_specific 'installer' $manifest $arch
+    $post_install = arch_specific 'post_install' $manifest $arch
+    $deps += script_deps $pre_install
+    $deps += script_deps $installer.script
+    $deps += script_deps $post_install
+
+    return $deps | Select-Object -Unique
 }

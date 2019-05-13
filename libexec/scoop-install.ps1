@@ -4,7 +4,7 @@
 #      scoop install git
 #
 # To install an app from a manifest at a URL:
-#      scoop install https://raw.githubusercontent.com/scoopinstaller/scoop-main/master/bucket/runat.json
+#      scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
 #
 # To install an app from a manifest on your computer
 #      scoop install \path\to\app.json
@@ -27,7 +27,6 @@
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 
@@ -120,7 +119,7 @@ $skip | Where-Object { $explicit_apps -contains $_ } | ForEach-Object {
 }
 
 $suggested = @{ };
-if (aria2_enabled) {
+if (Test-Aria2Enabled) {
     warn "Scoop uses 'aria2c' for multi-connection downloads."
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
 }

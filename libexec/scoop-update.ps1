@@ -22,7 +22,6 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\git.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
@@ -41,20 +40,33 @@ $independent = $opt.i -or $opt.independent
 $repo = $(get_config SCOOP_REPO)
 if (!$repo) {
     $repo = "https://github.com/lukesampson/scoop"
-    set_config SCOOP_REPO "$repo"
+    set_config SCOOP_REPO "$repo" | Out-Null
 }
 
 # Find current update channel from config
 $branch = $(get_config SCOOP_BRANCH)
 if (!$branch) {
     $branch = "master"
-    set_config SCOOP_BRANCH "$branch"
+    set_config SCOOP_BRANCH "$branch" | Out-Null
+}
+
+if(($PSVersionTable.PSVersion.Major) -lt 5) {
+    # check powershell version
+    # should be deleted after Oct 1, 2019
+    If ((Get-Date).ToUniversalTime() -ge "2019-10-01") {
+        Write-Output "PowerShell 5 or later is required to run Scoop."
+        Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
+        break
+    } else {
+        Write-Output "Scoop is going to stop supporting old version of PowerShell."
+        Write-Output "Please upgrade to PowerShell 5 or later version before Oct 1, 2019 UTC."
+        Write-Output "Guideline: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
+    }
 }
 
 function update_scoop() {
     # check for git
-    $git = try { Get-Command git -ea stop } catch { $null }
-    if (!$git) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     write-host "Updating Scoop..."
     $last_update = $(last_scoop_update)
@@ -105,7 +117,7 @@ function update_scoop() {
     }
 
     if ((Get-LocalBucket) -notcontains 'main') {
-        info "The main bucket of Scoop has been separated to 'https://github.com/scoopinstaller/scoop-main'"
+        info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
         info "Adding main bucket..."
         add_bucket 'main'
     }
@@ -131,7 +143,7 @@ function update_scoop() {
         Pop-Location
     }
 
-    set_config lastupdate ([System.DateTime]::Now.ToString('o'))
+    set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 }
 
@@ -181,7 +193,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # Workaround for https://github.com/lukesampson/scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
     Write-Host "Downloading new version"
-    if (aria2_enabled) {
+    if (Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
         $urls = url $manifest $architecture
@@ -269,20 +281,28 @@ if (!$apps) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        $apps = ensure_all_installed $apps_param $global
+        $apps = Confirm-InstallationStatus $apps_param -Global:$global
     }
     if ($apps) {
         $apps | ForEach-Object {
             ($app, $global) = $_
             $status = app_status $app $global
             if ($force -or $status.outdated) {
-                $outdated += applist $app $global
-                write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
+                if(!$status.hold) {
+                    $outdated += applist $app $global
+                    write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
+                } else {
+                    warn "'$app' is locked to version $($status.version)"
+                }
             } elseif ($apps_param -ne '*') {
                 write-host -f green "$app`: $($status.version) (latest version)"
             }
         }
 
+        if ($outdated -and (Test-Aria2Enabled)) {
+            warn "Scoop uses 'aria2c' for multi-connection downloads."
+            warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+        }
         if ($outdated.Length -gt 1) {
             write-host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
         } elseif ($outdated.Length -eq 0) {
@@ -293,11 +313,7 @@ if (!$apps) {
     }
 
     $suggested = @{};
-    # # $outdated is a list of ($app, $global) tuples
-    if (aria2_enabled) {
-        warn "Scoop uses 'aria2c' for multi-connection downloads."
-        warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
-    }
+    # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }
 

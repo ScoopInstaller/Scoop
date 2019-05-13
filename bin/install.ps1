@@ -1,12 +1,12 @@
-#Requires -Version 3
+#Requires -Version 5
 
 # remote install:
 #   iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
 $old_erroractionpreference = $erroractionpreference
 $erroractionpreference = 'stop' # quit if anything goes wrong
 
-if(($PSVersionTable.PSVersion.Major) -lt 3) {
-    Write-Output "PowerShell 3 or greater is required to run Scoop."
+if(($PSVersionTable.PSVersion.Major) -lt 5) {
+    Write-Output "PowerShell 5 or later is required to run Scoop."
     Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
     break
 }
@@ -56,7 +56,7 @@ shim "$dir\bin\scoop.ps1" $false
 
 # download main bucket
 $dir = "$scoopdir\buckets\main"
-$zipurl = 'https://github.com/scoopinstaller/scoop-main/archive/master.zip'
+$zipurl = 'https://github.com/ScoopInstaller/Main/archive/master.zip'
 $zipfile = "$dir\main-bucket.zip"
 Write-Output 'Downloading main bucket...'
 New-Item $dir -Type Directory -Force | Out-Null

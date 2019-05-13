@@ -6,6 +6,111 @@
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 $isUnix = is_unix
 
+describe "Get-AppFilePath" -Tag 'Scoop' {
+    beforeall {
+        $working_dir = setup_working "is_directory"
+        Mock versiondir { 'local' } -Verifiable -ParameterFilter { $global -eq $false }
+        Mock versiondir { 'global' } -Verifiable -ParameterFilter { $global -eq $true }
+    }
+
+    it "should return locally installed program" {
+        Mock Test-Path { $true } -Verifiable -ParameterFilter { $Path -eq 'local\i_am_a_file.txt' }
+        Mock Test-Path { $false } -Verifiable -ParameterFilter { $Path -eq 'global\i_am_a_file.txt' }
+        Get-AppFilePath -App 'is_directory' -File 'i_am_a_file.txt' | Should -Be 'local\i_am_a_file.txt'
+    }
+
+    it "should return globally installed program" {
+        Mock Test-Path { $false } -Verifiable -ParameterFilter { $Path -eq 'local\i_am_a_file.txt' }
+        Mock Test-Path { $true } -Verifiable -ParameterFilter { $Path -eq 'global\i_am_a_file.txt' }
+        Get-AppFilePath -App 'is_directory' -File 'i_am_a_file.txt' | Should -Be 'global\i_am_a_file.txt'
+    }
+
+    it "should return null if program is not installed" {
+        Get-AppFilePath -App 'is_directory' -File 'i_do_not_exist' | Should -BeNullOrEmpty
+    }
+
+    it "should throw if parameter is wrong or missing" {
+        { Get-AppFilePath -App 'is_directory' -File } | Should -Throw
+        { Get-AppFilePath -App -File 'i_am_a_file.txt' } | Should -Throw
+        { Get-AppFilePath -App -File } | Should -Throw
+    }
+}
+
+describe "Get-HelperPath" -Tag 'Scoop' {
+    beforeall {
+        $working_dir = setup_working "is_directory"
+    }
+    it "should return path if program is installed" {
+        Mock Get-AppFilePath { '7zip\current\7z.exe' }
+        Get-HelperPath -Helper 7zip | Should -Be '7zip\current\7z.exe'
+    }
+
+    it "should return null if program is not installed" {
+        Mock Get-AppFilePath { $null }
+        Get-HelperPath -Helper 7zip | Should -BeNullOrEmpty
+    }
+
+    it "should throw if parameter is wrong or missing" {
+        { Get-HelperPath -Helper } | Should -Throw
+        { Get-HelperPath -Helper Wrong } | Should -Throw
+    }
+}
+
+
+describe "Test-HelperInstalled" -Tag 'Scoop' {
+    it "should return true if program is installed" {
+        Mock Get-HelperPath { '7z.exe' }
+        Test-HelperInstalled -Helper 7zip | Should -BeTrue
+    }
+
+    it "should return false if program is not installed" {
+        Mock Get-HelperPath { $null }
+        Test-HelperInstalled -Helper 7zip | Should -BeFalse
+    }
+
+    it "should throw if parameter is wrong or missing" {
+        { Test-HelperInstalled -Helper } | Should -Throw
+        { Test-HelperInstalled -Helper Wrong } | Should -Throw
+    }
+}
+
+describe "Test-Aria2Enabled" -Tag 'Scoop' {
+    it "should return true if aria2 is installed" {
+        Mock Test-HelperInstalled { $true }
+        Mock get_config { $true }
+        Test-Aria2Enabled | Should -BeTrue
+    }
+
+    it "should return false if aria2 is not installed" {
+        Mock Test-HelperInstalled { $false }
+        Mock get_config { $false }
+        Test-Aria2Enabled | Should -BeFalse
+
+        Mock Test-HelperInstalled { $false }
+        Mock get_config { $true }
+        Test-Aria2Enabled | Should -BeFalse
+
+        Mock Test-HelperInstalled { $true }
+        Mock get_config { $false }
+        Test-Aria2Enabled | Should -BeFalse
+    }
+}
+
+describe "Test-CommandAvailable" -Tag 'Scoop' {
+    it "should return true if command exists" {
+        Test-CommandAvailable 'Write-Host' | Should -BeTrue
+    }
+
+    it "should return false if command doesn't exist" {
+        Test-CommandAvailable 'Write-ThisWillProbablyNotExist' | Should -BeFalse
+    }
+
+    it "should throw if parameter is wrong or missing" {
+        { Test-CommandAvailable } | Should -Throw
+    }
+}
+
+
 describe "is_directory" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "is_directory"
@@ -135,12 +240,6 @@ Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
         get_app_name_from_ps1_shim "$shim_path" | should -be "mockapp"
     }
 
-    It "returns app name if file exists and is a shim to an app cerca August 2018" -skip:$isUnix {
-        Write-Output '$path = join-path "$psscriptroot" "..\apps\vim\current\vim.exe"' | Out-File "$working_dir/moch-shim.ps1" -Encoding utf8
-        Write-Output 'if($myinvocation.expectingInput) { $input | & $path  @args } else { & $path  @args }' | Out-File "$working_dir/moch-shim.ps1" -Append -Encoding utf8
-        get_app_name_from_ps1_shim "$working_dir/moch-shim.ps1" | should -be "vim"
-    }
-
     It "returns empty string if file exists and is not a shim" -skip:$isUnix {
         Write-Output "lorem ipsum" | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
         get_app_name_from_ps1_shim "$working_dir/mock-shim.ps1" | should -be ""
@@ -165,8 +264,8 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
     context "robocopy is not in path" {
         it "shims robocopy when not on path" -skip:$isUnix {
-            mock gcm { $false }
-            Get-Command robocopy | should -be $false
+            mock Test-CommandAvailable { $false }
+            Test-CommandAvailable robocopy | should -be $false
 
             ensure_robocopy_in_path
 
@@ -180,7 +279,9 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
     context "robocopy is in path" {
         it "does not shim robocopy when it is in path" -skip:$isUnix {
-            mock gcm { $true }
+            mock Test-CommandAvailable { $true }
+            Test-CommandAvailable robocopy | should -be $true
+
             ensure_robocopy_in_path
 
             "$shimdir/robocopy.ps1" | should -not -exist

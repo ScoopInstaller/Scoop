@@ -28,7 +28,7 @@
 
 param($name, $value)
 
-. "$psscriptroot\..\lib\config.ps1"
+. "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
 
 reset_aliases
@@ -36,11 +36,18 @@ reset_aliases
 if(!$name) { my_usage; exit 1 }
 
 if($name -like 'rm') {
-    set_config $value $null
+    set_config $value $null | Out-Null
+    Write-Output "'$name' has been removed"
 } elseif($null -ne $value) {
-    set_config $name $value
+    set_config $name $value | Out-Null
+    Write-Output "'$name' has been set to '$value'"
 } else {
-    get_config $name $value
+    $value = get_config $name
+    if($null -eq $value) {
+        Write-Output "'$name' is not set"
+    } else {
+        Write-Output $value
+    }
 }
 
 exit 0
