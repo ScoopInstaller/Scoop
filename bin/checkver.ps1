@@ -112,6 +112,7 @@ $Queue | ForEach-Object {
     }
     $regex = ''
     $jsonpath = ''
+    $xpath = ''
     $replace = ''
 
     if ($json.checkver -eq 'github') {
@@ -140,12 +141,15 @@ $Queue | ForEach-Object {
     if ($json.checkver.jsonpath) {
         $jsonpath = $json.checkver.jsonpath
     }
+    if ($json.checkver.xpath) {
+        $xpath = $json.checkver.xpath
+    }
 
     if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
         $replace = $json.checkver.replace
     }
 
-    if (!$jsonpath -and !$regex) {
+    if (!$jsonpath -and !$regex -and !$xpath) {
         $regex = $json.checkver
     }
 
@@ -159,6 +163,7 @@ $Queue | ForEach-Object {
         regex    = $regex;
         json     = $json;
         jsonpath = $jsonpath;
+        xpath    = $xpath;
         reverse  = $reverse;
         replace  = $replace;
     }
@@ -185,6 +190,7 @@ while ($in_progress -gt 0) {
     $url = $state.url
     $regexp = $state.regex
     $jsonpath = $state.jsonpath
+    $xpath = $state.xpath
     $reverse = $state.reverse
     $replace = $state.replace
     $expected_ver = $json.version
@@ -214,7 +220,21 @@ while ($in_progress -gt 0) {
         }
     }
 
+    if ($xpath) {
+        # Getting version from XML, using XPath
+        $ver = ([xml]$page).SelectSingleNode($xpath).'#text'
+        if (!$ver) {
+            next "couldn't find '$xpath' in $url"
+            continue
+        }
+    }
+
     if ($jsonpath -and $regexp) {
+        $page = $ver
+        $ver = ''
+    }
+
+    if ($xpath -and $regexp) {
         $page = $ver
         $ver = ''
     }
