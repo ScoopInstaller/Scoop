@@ -39,7 +39,7 @@ Not sure whether you need 32-bit or 64-bit? Can&rsquo;t remember that command yo
 
 # Installs in seconds
 
-Make sure [Powershell 3](https://www.microsoft.com/en-us/download/details.aspx?id=34595) (or later) 
+Make sure [PowerShell 5](https://aka.ms/wmf5download) (or later, include [PowerShell Core](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows?view=powershell-6)) 
 and [.NET Framework 4.5](https://www.microsoft.com/net/download) (or later) are installed. Then run:
 
 ```powershell
