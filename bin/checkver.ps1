@@ -184,7 +184,6 @@ while ($in_progress -gt 0) {
     Remove-Event $ev.SourceIdentifier
     $in_progress--
 
-
     $state = $ev.SourceEventArgs.UserState
     $app = $state.app
     $json = $state.json
