@@ -3,7 +3,7 @@
 . "$PSScriptRoot\json.ps1"
 
 function manifest_path($app, $bucket) {
-    return fullpath "$(bucketdir $bucket)\$(sanitary_path $app).json"
+    return fullpath "$(Find-BucketDirectory $bucket)\$(sanitary_path $app).json"
 }
 
 function Get-Manifest {
@@ -64,7 +64,7 @@ function url_manifest($url) {
     }
     if(!$str) { return $null }
 
-    return $str | convertfrom-json
+    return $str | ConvertFrom-Json
 }
 
 function manifest($app, $bucket, $url) {
