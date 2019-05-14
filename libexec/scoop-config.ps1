@@ -1,6 +1,6 @@
 # Usage: scoop config [rm] name [value]
 # Summary: Get or set configuration values
-# Help: The scoop configuration file is saved at ~/.scoop.
+# Help: The scoop configuration file is saved at ~/.config/scoop/config.json.
 #
 # To get a configuration setting:
 #
