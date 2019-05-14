@@ -104,10 +104,6 @@
                 "installer": {
                     "$ref": "#/definitions/installer"
                 },
-                "msi": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings",
-                    "description": "Deprecated"
-                },
                 "post_install": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
@@ -477,10 +473,6 @@
                     "type": "object"
                 }
             ]
-        },
-        "msi": {
-            "$ref": "#/definitions/stringOrArrayOfStrings",
-            "description": "Deprecated"
         },
         "notes": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
