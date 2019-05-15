@@ -233,7 +233,7 @@ function Get-AppFilePath {
 }
 
 Function Test-CommandAvailable {
-    Param (
+    param (
         [String]$Name
     )
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
@@ -366,6 +366,89 @@ function is_local($path) {
 }
 
 # operations
+
+function run($exe, $arg, $msg, $continue_exit_codes) {
+    Show-DeprecatedWarning $MyInvocation 'Invoke-ExternalCommand'
+    Invoke-ExternalCommand -FilePath $exe -ArgumentList $arg -Activity $msg -ContinueExitCodes $continue_exit_codes
+}
+
+function Invoke-ExternalCommand {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true,
+                   Position = 0)]
+        [Alias("Path")]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $FilePath,
+        [Parameter(Position = 1)]
+        [Alias("Args")]
+        [String[]]
+        $ArgumentList,
+        [Switch]
+        $RunAs,
+        [Alias("Msg")]
+        [String]
+        $Activity,
+        [Alias("cec")]
+        [Hashtable]
+        $ContinueExitCodes,
+        [Alias("Log")]
+        [String]
+        $LogPath
+    )
+    if ($Activity) {
+        Write-Host "$Activity " -NoNewline
+    }
+    $Process = New-Object System.Diagnostics.Process
+    $Process.StartInfo.FileName = $FilePath
+    $Process.StartInfo.Arguments = ($ArgumentList | Select-Object -Unique) -join ' '
+    $Process.StartInfo.UseShellExecute = $false
+    if ($LogPath) {
+        if ($FilePath -match '(^|\W)msiexec($|\W)') {
+            $Process.StartInfo.Arguments += " /lwe `"$LogPath`""
+        } else {
+            $Process.StartInfo.RedirectStandardOutput = $true
+        }
+    }
+    if ($RunAs) {
+        $Process.StartInfo.Verb = 'RunAs'
+    }
+    try {
+        $Process.Start() | Out-Null
+    } catch {
+        if ($Activity) {
+            Write-Host "error." -ForegroundColor DarkRed
+        }
+        error $_.Exception.Message
+        return $false
+    }
+    if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
+        Out-File -FilePath $LogPath -Encoding ASCII -Append -InputObject $Process.StandardOutput.ReadToEnd()
+    }
+    $Process.WaitForExit()
+    if ($Process.ExitCode -ne 0) {
+        if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
+            if ($Activity) {
+                Write-Host "done." -ForegroundColor DarkYellow
+            }
+            warn $ContinueExitCodes[$Process.ExitCode]
+            return $true
+        } else {
+            if ($Activity) {
+                Write-Host "error." -ForegroundColor DarkRed
+            }
+            error "Exit code was $($Process.ExitCode)!"
+            return $false
+        }
+    }
+    if ($Activity) {
+        Write-Host "done." -ForegroundColor Green
+    }
+    return $true
+}
+
 function dl($url,$to) {
     $wc = New-Object Net.Webclient
     $wc.headers.add('Referer', (strip_filename $url))
