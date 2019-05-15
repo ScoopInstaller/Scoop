@@ -221,8 +221,16 @@ while ($in_progress -gt 0) {
     }
 
     if ($xpath) {
+        $xml = [xml]$page
+        # Find all `significant namespace declarations` from the XML file
+        $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
+        # Then add them into the NamespaceManager
+        $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+        $nsList | ForEach-Object {
+            $nsmgr.AddNamespace($_.LocalName, $_.Value)
+        }
         # Getting version from XML, using XPath
-        $ver = ([xml]$page).SelectSingleNode($xpath).'#text'
+        $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
         if (!$ver) {
             next "couldn't find '$xpath' in $url"
             continue
