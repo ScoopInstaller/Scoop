@@ -128,7 +128,16 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
         $xpath = substitute $xpath $substitutions
     }
 
-    $hash = $xml.SelectSingleNode($xpath).'#text'
+    # Find all `significant namespace declarations` from the XML file
+    $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
+    # Then add them into the NamespaceManager
+    $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+    $nsList | ForEach-Object {
+        $nsmgr.AddNamespace($_.LocalName, $_.Value)
+    }
+
+    # Getting hash from XML, using XPath
+    $hash = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
     return format_hash $hash
 }
 
