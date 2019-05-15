@@ -215,7 +215,7 @@ function Expand-DarkArchive {
         $Removal
     )
     $LogLocation = "$(Split-Path $Path)\dark.log"
-    & (Get-HelperPath -Helper Dark) -nologo -x "$Path" "$DestinationPath" | Out-File $LogLocation
+    & (Get-HelperPath -Helper Dark) -nologo -x "$DestinationPath" "$Path" | Out-File $LogLocation
     if ($LASTEXITCODE -ne 0) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogLocation)"
     }
