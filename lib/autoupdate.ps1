@@ -109,6 +109,38 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
     return format_hash $hash
 }
 
+function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $xpath) {
+    $xml = $null
+
+    try {
+        $wc = New-Object Net.Webclient
+        $wc.Headers.Add('Referer', (strip_filename $url))
+        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $xml = [xml]$wc.downloadstring($url)
+    } catch [system.net.webexception] {
+        write-host -f darkred $_
+        write-host -f darkred "URL $url is not valid"
+        return
+    }
+
+    # Replace placeholders
+    if ($substitutions) {
+        $xpath = substitute $xpath $substitutions
+    }
+
+    # Find all `significant namespace declarations` from the XML file
+    $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
+    # Then add them into the NamespaceManager
+    $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+    $nsList | ForEach-Object {
+        $nsmgr.AddNamespace($_.LocalName, $_.Value)
+    }
+
+    # Getting hash from XML, using XPath
+    $hash = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
+    return format_hash $hash
+}
+
 function find_hash_in_headers([String] $url) {
     $hash = $null
 
@@ -178,6 +210,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $regex = $config.regex
     }
 
+    $xpath = ''
+    if ($config.xpath) {
+        $xpath = $config.xpath
+        $hashmode = 'xpath'
+    }
+
     if (!$hashfile_url -and $url -match "^(?:.*fosshub.com\/).*(?:\/|\?dwl=)(?<filename>.*)$") {
         $hashmode = 'fosshub'
     }
@@ -192,6 +230,9 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         }
         'json' {
             $hash = find_hash_in_json $hashfile_url $substitutions $jsonpath
+        }
+        'xpath' {
+            $hash = find_hash_in_xml $hashfile_url $substitutions $xpath
         }
         'rdf' {
             $hash = find_hash_in_rdf $hashfile_url $basename

@@ -37,17 +37,17 @@ $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
 
 # load config
-$repo = $(get_config SCOOP_REPO)
-if (!$repo) {
-    $repo = "https://github.com/lukesampson/scoop"
-    set_config SCOOP_REPO "$repo" | Out-Null
+$configRepo = get_config SCOOP_REPO
+if (!$configRepo) {
+    $configRepo = "https://github.com/lukesampson/scoop"
+    set_config SCOOP_REPO $configRepo | Out-Null
 }
 
 # Find current update channel from config
-$branch = $(get_config SCOOP_BRANCH)
-if (!$branch) {
-    $branch = "master"
-    set_config SCOOP_BRANCH "$branch" | Out-Null
+$configBranch = get_config SCOOP_BRANCH
+if (!$configBranch) {
+    $configBranch = "master"
+    set_config SCOOP_BRANCH $configBranch | Out-Null
 }
 
 if(($PSVersionTable.PSVersion.Major) -lt 5) {
@@ -78,7 +78,7 @@ function update_scoop() {
         $newdir = fullpath $(versiondir 'scoop' 'new')
 
         # get git scoop
-        git_clone -q $repo --branch $branch --single-branch "`"$newdir`""
+        git_clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
 
         # check if scoop was successful downloaded
         if (!(test-path "$newdir")) {
@@ -91,16 +91,27 @@ function update_scoop() {
     } else {
         Push-Location $currentdir
 
-        # Change branch if user configured other branch
-        if (!((git_branch) -match "\*\s+$branch")) {
-            # reset git fetch refs (GH-3368)
+        $currentRepo = git_config remote.origin.url
+        $currentBranch = git_branch
+
+        $isRepoChanged = !($currentRepo -match $configRepo)
+        $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
+
+        # Change remote url if the repo is changed
+        if ($isRepoChanged) {
+            git_config remote.origin.url "$configRepo"
+        }
+
+        # Fetch and reset local repo if the repo or the branch is changed
+        if ($isRepoChanged -or $isBranchChanged) {
+            # Reset git fetch refs, so that it can fetch all branches (GH-3368)
             git_config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-            # fetch remote branches
-            git_fetch --force origin -q
+            # fetch remote branch
+            git_fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
             # checkout and track the branch
-            git_checkout -B $branch -t origin/$branch -q
+            git_checkout -B $configBranch -t origin/$configBranch -q
             # reset branch HEAD
-            git_reset --hard origin/$branch -q
+            git_reset --hard origin/$configBranch -q
         } else {
             git_pull -q
         }
