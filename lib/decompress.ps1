@@ -1,22 +1,29 @@
 function Test-7zipRequirement {
-    [CmdletBinding(DefaultParameterSetName = "URL")]
+    [CmdletBinding(DefaultParameterSetName = "Manifest")]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true, ParameterSetName = "URL")]
-        [String[]]
-        $URL,
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "Manifest")]
+        [PSObject]
+        $Manifest,
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "Manifest")]
+        [String]
+        $Architecture,
         [Parameter(Mandatory = $true, ParameterSetName = "File")]
         [String]
         $File
     )
-    if ($URL) {
+    if ($File) {
+        return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
+    } else {
+        $URL = url $Manifest $Architecture
+        $Installer = installer $Manifest $Architecture
         if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
             return $false
+        } elseif (($Installer.type -eq "nsis")) {
+            return $true
         } else {
             return ($URL | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
         }
-    } else {
-        return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
     }
 }
 
@@ -24,12 +31,54 @@ function Test-LessmsiRequirement {
     [CmdletBinding()]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true)]
-        [String[]]
-        $URL
+        [Parameter(Mandatory = $true, Position = 0)]
+        [PSObject]
+        $Manifest,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $Architecture
     )
+    $URL = url $Manifest $Architecture
     if ((get_config MSIEXTRACT_USE_LESSMSI)) {
         return ($URL | Where-Object { $_ -match '\.msi$' }).Count -gt 0
+    } else {
+        return $false
+    }
+}
+
+function Test-InnounpRequirement {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [PSObject]
+        $Manifest,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $Architecture
+    )
+    $Installer = installer $Manifest $Architecture
+    if (($Installer.type -eq "inno") -or $Manifest.innosetup) {
+        return $true
+    } else {
+        return $false
+    }
+}
+
+function Test-DarkRequirement {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [PSObject]
+        $Manifest,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $Architecture
+    )
+    $Installer = installer $Manifest $Architecture
+    if (($Installer.type -eq "wix")) {
+        return $true
     } else {
         return $false
     }
