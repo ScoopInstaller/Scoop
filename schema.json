@@ -55,7 +55,8 @@
                         "rdf",
                         "metalink",
                         "fosshub",
-                        "sourceforge"
+                        "sourceforge",
+                        "chocolatey"
                     ]
                 },
                 "type": {
@@ -217,6 +218,13 @@
                     "properties": {
                         "github": {
                             "format": "uri",
+                            "type": "string"
+                        },
+                        "choco": {
+                            "type": "string",
+                            "description": "Same as 'chocolatey'"
+                        },
+                        "chocolatey": {
                             "type": "string"
                         },
                         "re": {

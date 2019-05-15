@@ -15,6 +15,8 @@
     Useful for hash updates.
 .PARAMETER SkipUpdated
     Updated manifests will not be shown.
+.PARAMETER Version
+    Updated manifests to given version.
 .EXAMPLE
     PS BUCKETROOT > .\bin\checkver.ps1
     Check all manifest inside default directory.
@@ -105,6 +107,7 @@ $Queue | ForEach-Object {
     Register-ObjectEvent $wc downloadstringcompleted -ErrorAction Stop | Out-Null
 
     $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
+    $chocoRegex = '<h2[^>]+>([\d.]+)<\/h2>'
 
     $url = $json.homepage
     if ($json.checkver.url) {
@@ -126,6 +129,22 @@ $Queue | ForEach-Object {
     if ($json.checkver.github) {
         $url = $json.checkver.github + '/releases/latest'
         $regex = $githubRegex
+    }
+
+    if ($json.checkver -eq 'choco' -or $json.checkver -eq 'chocolatey') {
+        $url = 'https://chocolatey.org/packages/' + ($App -replace '[-]', '')
+    }
+
+    if ($json.checkver.choco) {
+        $url = 'https://chocolatey.org/packages/' + $json.checkver.choco
+    }
+
+    if ($json.checkver.chocolatey) {
+        $url = 'https://chocolatey.org/packages/' + $json.checkver.chocolatey
+    }
+
+    if ($url.Contains("chocolatey.org")) {
+        $regex = $chocoRegex
     }
 
     if ($json.checkver.re) {

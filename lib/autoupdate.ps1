@@ -224,6 +224,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'sourceforge'
     }
 
+    if (!$hashfile_url -and $url -match "^(?:.*chocolatey.org\/)(?<choconame>.*)$version.*$") {
+        $hashmode = 'chocolatey'
+    }
+
     switch ($hashmode) {
         'extract' {
             $hash = find_hash_in_textfile $hashfile_url $substitutions $regex
@@ -250,6 +254,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             # change the URL because downloads.sourceforge.net doesn't have checksums
             $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
             $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
+        }
+        'chocolatey' {
+            $hashfile_url = "https://chocolatey.org/packages/" + $Matches.choconame
+            $hash = find_hash_in_textfile $hashfile_url $substitutions '$sha256.*?$basename'
         }
     }
 
