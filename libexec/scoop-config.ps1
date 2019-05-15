@@ -1,6 +1,6 @@
 # Usage: scoop config [rm] name [value]
 # Summary: Get or set configuration values
-# Help: The scoop configuration file is saved at ~/.scoop.
+# Help: The scoop configuration file is saved at ~/.config/scoop/config.json.
 #
 # To get a configuration setting:
 #
@@ -37,7 +37,7 @@ if(!$name) { my_usage; exit 1 }
 
 if($name -like 'rm') {
     set_config $value $null | Out-Null
-    Write-Output "'$name' has been removed"
+    Write-Output "'$value' has been removed"
 } elseif($null -ne $value) {
     set_config $name $value | Out-Null
     Write-Output "'$name' has been set to '$value'"
