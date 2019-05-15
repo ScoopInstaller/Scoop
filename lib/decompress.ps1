@@ -44,6 +44,8 @@ function Expand-7zipArchive {
         [Parameter(Position = 1)]
         [String]
         $DestinationPath = (Split-Path $Path),
+        [String]
+        $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
@@ -53,6 +55,7 @@ function Expand-7zipArchive {
         [Switch]
         $Removal
     )
+    $DestinationPath = $DestinationPath.TrimEnd("\")
     if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
         try {
             $7zPath = (Get-Command '7z' -CommandType Application | Select-Object -First 1).Source
@@ -64,6 +67,9 @@ function Expand-7zipArchive {
     }
     $LogPath = "$(Split-Path $Path)\7zip.log"
     $ArgList = @('x', "`"$Path`"", "-o`"$DestinationPath`"", '-y')
+    if ($ExtractDir) {
+        $ArgList += "-ir!$ExtractDir\*"
+    }
     if ($Switches) {
         $ArgList += (-split $Switches)
     }
@@ -74,7 +80,10 @@ function Expand-7zipArchive {
     }
     $Status = Invoke-ExternalCommand $7zPath $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)"
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    }
+    if ($ExtractDir) {
+        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
@@ -104,18 +113,21 @@ function Expand-MsiArchive {
         [Parameter(Position = 1)]
         [String]
         $DestinationPath = (Split-Path $Path),
+        [String]
+        $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
         [Switch]
         $Removal
     )
+    $DestinationPath = $DestinationPath.TrimEnd("\")
     if ((get_config MSIEXTRACT_USE_LESSMSI)) {
         $MsiPath = Get-HelperPath -Helper Lessmsi
         $ArgList = @('x', "`"$Path`"", "`"$DestinationPath\\`"")
     } else {
         $MsiPath = 'msiexec.exe'
-        $ArgList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath`"")
+        $ArgList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath\\SourceDir`"")
     }
     $LogPath = "$(Split-Path $Path)\msi.log"
     if ($Switches) {
@@ -123,10 +135,16 @@ function Expand-MsiArchive {
     }
     $Status = Invoke-ExternalCommand $MsiPath $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)"
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
-    if (Test-Path "$DestinationPath\SourceDir") {
-        movedir "$DestinationPath\SourceDir" "$DestinationPath" | Out-Null
+    if ($ExtractDir -and (Test-Path "$DestinationPath\SourceDir")) {
+        movedir "$DestinationPath\SourceDir\$ExtractDir" $DestinationPath | Out-Null
+        Remove-Item "$DestinationPath\SourceDir" -Recurse -Force
+    } elseif ($ExtractDir) {
+        Get-ChildItem $DestinationPath -Exclude $ExtractDir | Remove-Item -Recurse -Force
+        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+    } elseif (Test-Path "$DestinationPath\SourceDir") {
+        movedir "$DestinationPath\SourceDir" $DestinationPath | Out-Null
     }
     if (($DestinationPath -ne (Split-Path $Path)) -and (Test-Path "$DestinationPath\$(fname $Path)")) {
         Remove-Item "$DestinationPath\$(fname $Path)" -Force
@@ -149,20 +167,23 @@ function Expand-InnoArchive {
         [Parameter(Position = 1)]
         [String]
         $DestinationPath = (Split-Path $Path),
+        [String]
+        $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
         [Switch]
         $Removal
     )
+    $DestinationPath = $DestinationPath.TrimEnd("\")
     $LogPath = "$(Split-Path $Path)\innounp.log"
-    $ArgList = @('-x', "-d`"$DestinationPath`"", "-c`{app`}", "`"$Path`"", '-y')
+    $ArgList = @('-x', "-d`"$DestinationPath`"", "-c`{app`}\$ExtractDir", "`"$Path`"", '-y')
     if ($Switches) {
         $ArgList += (-split $Switches)
     }
     $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innounp) $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)"
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
@@ -182,9 +203,12 @@ function Expand-ZipArchive {
         [Parameter(Position = 1)]
         [String]
         $DestinationPath = (Split-Path $Path),
+        [String]
+        $ExtractDir,
         [Switch]
         $Removal
     )
+    $DestinationPath = $DestinationPath.TrimEnd("\")
     # All methods to unzip the file require .NET4.5+
     if ($PSVersionTable.PSVersion.Major -lt 5) {
         Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -213,6 +237,10 @@ function Expand-ZipArchive {
         # Compatible with Pscx (https://github.com/Pscx/Pscx)
         Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     }
+    if ($ExtractDir) {
+        Get-ChildItem $DestinationPath -Exclude $ExtractDir | Remove-Item -Recurse -Force
+        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+    }
     if ($Removal) {
         # Remove original archive file
         Remove-Item $Path -Force
@@ -221,19 +249,22 @@ function Expand-ZipArchive {
 
 function Expand-DarkArchive {
     [CmdletBinding()]
-    param(
+    param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [String]
         $Path,
         [Parameter(Position = 1)]
         [String]
         $DestinationPath = (Split-Path $Path),
+        [String]
+        $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
         [Switch]
         $Removal
     )
+    $DestinationPath = $DestinationPath.TrimEnd("\")
     $LogPath = "$(Split-Path $Path)\dark.log"
     $ArgList = @('-nologo', "-x `"$DestinationPath`"", "`"$Path`"")
     if ($Switches) {
@@ -241,10 +272,14 @@ function Expand-DarkArchive {
     }
     $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Dark) $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)"
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
+    }
+    if ($ExtractDir) {
+        Get-ChildItem $DestinationPath -Exclude $ExtractDir | Remove-Item -Recurse -Force
+        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
     }
     if ($Removal) {
         # Remove original archive file
