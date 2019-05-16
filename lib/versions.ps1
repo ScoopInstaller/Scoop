@@ -18,7 +18,7 @@ function version($ver) {
         if($num) { $num } else { $_ }
     }
 }
-function compare_versions($a, $b) {
+function compare_versions_base($a, $b) {
     $ver_a = @(version $a)
     $ver_b = @(version $b)
 
@@ -34,6 +34,20 @@ function compare_versions($a, $b) {
         if($ver_a[$i] -lt $ver_b[$i]) { return -1; }
     }
     if($ver_b.length -gt $ver_a.length) { return -1 }
+    return 0
+}
+
+function compare_versions($a, $b) {
+    $list_a = @($a -split '-')
+    $list_b = @($b -split '-')
+
+    for($i=0;$i -lt $list_a.length -or $i -lt $list_b.length;$i++) {
+        $result = compare_versions_base $list_a[$i] $list_b[$i]
+
+        if($result -ne 0) {
+            return $result
+        }
+    }
     return 0
 }
 
