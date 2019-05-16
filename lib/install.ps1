@@ -555,33 +555,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            ensure "$dir\_tmp" | Out-Null
-            & $extract_fn "$dir\$fname" "$dir\_tmp" -Removal
-            if ($extract_to) {
-                ensure "$dir\$extract_to" | Out-Null
-            }
-            # fails if zip contains long paths (e.g. atom.json)
-            #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            try {
-                movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
-            }
-            catch {
-                error $_
-                abort $(new_issue_msg $app $bucket "extract_dir error")
-            }
-
-            if(Test-Path "$dir\_tmp") { # might have been moved by movedir
-                try {
-                    Remove-Item -r -force "$dir\_tmp" -ea stop
-                } catch [system.io.pathtoolongexception] {
-                    & "$env:COMSPEC" /c "rmdir /s /q $dir\_tmp"
-                } catch [system.unauthorizedaccessexception] {
-                    warn "Couldn't remove $dir\_tmp: unauthorized access."
-                }
-            }
-
+            & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
             Write-Host "done." -f Green
-
             $extracted++
         }
     }
