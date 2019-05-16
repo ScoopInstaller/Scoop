@@ -107,7 +107,6 @@ $Queue | ForEach-Object {
     Register-ObjectEvent $wc downloadstringcompleted -ErrorAction Stop | Out-Null
 
     $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
-    $chocoRegex = '<h2[^>]+>([\d.]+)<\/h2>'
 
     $url = $json.homepage
     if ($json.checkver.url) {
@@ -132,19 +131,18 @@ $Queue | ForEach-Object {
     }
 
     if ($json.checkver -eq 'choco' -or $json.checkver -eq 'chocolatey') {
-        $url = 'https://chocolatey.org/packages/' + ($App -replace '[-]', '')
+        $url = "https://chocolatey.org/packages/$App"
+        $regex = "(?i:$App)\.([\d.]+)\.nupkg"
     }
 
     if ($json.checkver.choco) {
-        $url = 'https://chocolatey.org/packages/' + $json.checkver.choco
+        $url = "https://chocolatey.org/packages/$($json.checkver.choco)"
+        $regex = "(?i:$($json.checkver.choco))\.([\d.]+)\.nupkg"
     }
 
     if ($json.checkver.chocolatey) {
-        $url = 'https://chocolatey.org/packages/' + $json.checkver.chocolatey
-    }
-
-    if ($url.Contains("chocolatey.org")) {
-        $regex = $chocoRegex
+        $url = "https://chocolatey.org/packages/$($json.checkver.chocolatey)"
+        $regex = "(?i:$($json.checkver.chocolatey))\.([\d.]+)\.nupkg"
     }
 
     if ($json.checkver.re) {
