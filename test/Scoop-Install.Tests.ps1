@@ -101,7 +101,7 @@ describe "env add and remove path" -Tag 'Scoop' {
     }
 }
 
-describe "shim_def" -Tag 'Scoop' {
+describe "shim parsing" -Tag 'Scoop' {
     it "should use strings correctly" {
         $target, $name, $shimArgs = shim_def "command.exe"
         $target | should -be "command.exe"
@@ -119,37 +119,6 @@ describe "shim_def" -Tag 'Scoop' {
         $target | should -be "foo.exe"
         $name | should -be "bar"
         $shimArgs | should -be "--test"
-    }
-}
-
-describe 'persist_def' -Tag 'Scoop' {
-    it 'parses string correctly' {
-        $source, $target = persist_def "test"
-        $source | should -be "test"
-        $target | should -be "test"
-    }
-
-    it 'should handle sub-folder' {
-        $source, $target = persist_def "foo/bar"
-        $source | should -be "foo/bar"
-        $target | should -be "foo/bar"
-    }
-
-    it 'should handle arrays' {
-        # both specified
-        $source, $target = persist_def @("foo", "bar")
-        $source | should -be "foo"
-        $target | should -be "bar"
-
-        # only first specified
-        $source, $target = persist_def @("foo")
-        $source | should -be "foo"
-        $target | should -be "foo"
-
-        # null value specified
-        $source, $target = persist_def @("foo", $null)
-        $source | should -be "foo"
-        $target | should -be "foo"
     }
 }
 

@@ -1,0 +1,35 @@
+{
+    "persist_dir": [
+        "foo",
+        "foo\\bar",
+        [
+            "foo",
+            "bar"
+        ],
+        [
+            "foo",
+            null
+        ]
+    ],
+    "persist_file": [
+        [
+            "foo"
+        ],
+        [
+            "foo",
+            "",
+            "file content"
+        ],
+        [
+            "foo",
+            null,
+            "file content"
+        ],
+        [
+            "foo",
+            "",
+            "file",
+            "content"
+        ]
+    ]
+}

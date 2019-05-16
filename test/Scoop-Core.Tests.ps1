@@ -111,20 +111,57 @@ describe "Test-CommandAvailable" -Tag 'Scoop' {
 }
 
 
-describe "is_directory" -Tag 'Scoop' {
+describe "directory/junction/hardlink handling" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "is_directory"
     }
 
-    it "is_directory recognize directories" {
+    it "is_directory recognizes directories" {
         is_directory "$working_dir\i_am_a_directory" | should -be $true
     }
-    it "is_directory recognize files" {
+
+    it "is_directory recognizes files" {
         is_directory "$working_dir\i_am_a_file.txt" | should -be $false
     }
 
     it "is_directory is falsey on unknown path" {
         is_directory "$working_dir\i_do_not_exist" | should -be $false
+    }
+
+    it "create_junction recognizes directories and creates junction" {
+        create_junction "$working_dir\i_am_a_junction" "$working_dir\i_am_a_directory" | should -be $true
+        Test-Path "$working_dir\i_am_a_junction" | should -be $true
+    }
+
+    it "create_junction recognizes existing target" {
+        create_junction "$working_dir\i_am_a_junction" "$working_dir\i_am_a_directory" | should -be $false
+    }
+
+    it "create_junction recognizes files" {
+        create_junction "$working_dir\i_am_a_junction_file.txt" "$working_dir\i_am_a_file.txt" | should -be $false
+        Test-Path "$working_dir\i_am_a_junction_file.txt" | should -be $false
+    }
+
+    it "create_junction is falsey on unknown path" {
+        create_junction "$working_dir\i_am_a_junction" "$working_dir\i_do_not_exist" | should -be $false
+    }
+
+    it "create_hardlink recognizes files and creates hardlink" {
+        create_hardlink "$working_dir\i_am_a_hardlinked_file.txt" "$working_dir\i_am_a_file.txt" | should -be $true
+        Test-Path "$working_dir\i_am_a_hardlinked_file.txt" | should -be $true
+    }
+
+    it "create_hardlink recognizes existing target" {
+        create_hardlink "$working_dir\i_am_a_hardlinked_file.txt" "$working_dir\i_am_a_file.txt" | should -be $false
+    }
+
+    it "create_hardlink recognizes directories" {
+        create_hardlink "$working_dir\i_am_a_hardlinked_directory" "$working_dir\i_am_a_directory" | should -be $false
+        Test-Path "$working_dir\i_am_a_hardlinked_directory" | should -be $false
+    }
+
+    it "create_hardlink is falsey on unknown path" {
+        create_hardlink "$working_dir\i_do_not_exist.txt" "$working_dir\i_do_not_exist.txt" | should -be $false
     }
 }
 

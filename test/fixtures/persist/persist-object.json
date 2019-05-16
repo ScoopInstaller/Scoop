@@ -1,0 +1,61 @@
+{
+    "persist_dir": [
+        {
+            "name": "foo",
+            "type": "directory"
+        }, {
+            "name": "foo\\"
+        }, {
+            "name": "foo\\bar\\"
+        }, {
+            "name": "foo\\",
+            "target": "bar"
+        }, {
+            "name": "foo\\",
+            "encoding": "UTF8",
+            "content": "file content"
+        }, {
+            "name": "foo\\",
+            "method": "merge"
+        }
+    ],
+    "persist_file": [
+        {
+            "name": "foo",
+            "type": "file"
+        }, {
+            "name": "foo"
+        }, {
+            "name": "foo",
+            "content": "file content"
+        }, {
+            "name": "foo",
+            "content": [
+                "file",
+                "content"
+            ]
+        }, {
+            "name": "foo",
+            "content": [
+                "file",
+                "content"
+            ],
+            "glue": " "
+        }, {
+            "name": "foo",
+            "content": [
+                "ZmlsZQ0K",
+                "Y29udGVudA=="
+            ],
+            "base64": true
+        }, {
+            "name": "foo",
+            "content": [
+                "file",
+                "content"
+            ],
+            "encoding": "UTF8",
+            "method": "update"
+        }
+    ]
+}
