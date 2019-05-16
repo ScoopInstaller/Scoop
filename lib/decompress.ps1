@@ -55,7 +55,6 @@ function Expand-7zipArchive {
         [Switch]
         $Removal
     )
-    $DestinationPath = $DestinationPath.TrimEnd("\")
     if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
         try {
             $7zPath = (Get-Command '7z' -CommandType Application | Select-Object -First 1).Source
@@ -67,7 +66,8 @@ function Expand-7zipArchive {
     }
     $LogPath = "$(Split-Path $Path)\7zip.log"
     $ArgList = @('x', "`"$Path`"", "-o`"$DestinationPath`"", '-y')
-    if ($ExtractDir) {
+    $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
+    if (!$IsTar -and $ExtractDir) {
         $ArgList += "-ir!$ExtractDir\*"
     }
     if ($Switches) {
@@ -82,18 +82,18 @@ function Expand-7zipArchive {
     if (!$Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
-    if ($ExtractDir) {
+    if (!$IsTar -and $ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
     }
-    if ((strip_ext $Path) -match '\.tar$' -or $Path -match '\.t[abgpx]z2?$') {
+    if ($IsTar) {
         # Check for tar
         $Status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $LogPath
         if ($Status) {
             $TarFile = (Get-Content -Path $LogPath)[-4] -replace '.{53}(.*)', '$1' # get inner tar file name
-            Expand-7zipArchive "$DestinationPath\$TarFile" $DestinationPath -Removal
+            Expand-7zipArchive -Path "$DestinationPath\$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
         } else {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
@@ -175,7 +175,6 @@ function Expand-InnoArchive {
         [Switch]
         $Removal
     )
-    $DestinationPath = $DestinationPath.TrimEnd("\")
     $LogPath = "$(Split-Path $Path)\innounp.log"
     $ArgList = @('-x', "-d`"$DestinationPath`"", "-c`{app`}\$ExtractDir", "`"$Path`"", '-y')
     if ($Switches) {
@@ -208,7 +207,6 @@ function Expand-ZipArchive {
         [Switch]
         $Removal
     )
-    $DestinationPath = $DestinationPath.TrimEnd("\")
     # All methods to unzip the file require .NET4.5+
     if ($PSVersionTable.PSVersion.Major -lt 5) {
         Add-Type -AssemblyName System.IO.Compression.FileSystem
