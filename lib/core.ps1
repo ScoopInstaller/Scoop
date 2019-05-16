@@ -351,7 +351,7 @@ function url_remote_filename($url) {
     return $basename
 }
 
-function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
+function ensure($dir) { if(!(test-path $dir)) { New-Item $dir -ItemType Directory -Force | Out-Null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
     $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }
@@ -487,16 +487,34 @@ function isFileLocked([string]$path) {
 }
 
 function is_directory([String] $path) {
-    return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
+    return (Test-Path $path) -and (Get-Item -Path $path) -is [System.IO.DirectoryInfo]
 }
 
-function movedir($from, $to) {
+function create_junction([String] $link, [String] $target) {
+    if (!(Test-Path $link) -and (is_directory $target)) {
+        New-Item -ItemType Junction -Path $link -Target $target | Out-Null
+        $dirInfo = New-Object System.IO.DirectoryInfo($link)
+        $dirInfo.Attributes = $dirInfo.Attributes -bor [System.IO.FileAttributes]::ReadOnly
+        return $true
+    }
+    return $false
+}
+
+function create_hardlink([String] $link, [String] $target) {
+    if (!(Test-Path $link) -and (Test-Path $target) -and !(is_directory $target)) {
+        New-Item -ItemType HardLink -Path $link -Target $target | Out-Null
+        return $true
+    }
+    return $false
+}
+
+function movedir($from, $to, $par = "") {
     $from = $from.trimend('\')
     $to = $to.trimend('\')
 
     $proc = New-Object System.Diagnostics.Process
     $proc.StartInfo.FileName = 'robocopy.exe'
-    $proc.StartInfo.Arguments = "`"$from`" `"$to`" /e /move"
+    $proc.StartInfo.Arguments = "`"$from`" `"$to`" /e /move " + $par
     $proc.StartInfo.RedirectStandardOutput = $true
     $proc.StartInfo.RedirectStandardError = $true
     $proc.StartInfo.UseShellExecute = $false
@@ -513,6 +531,7 @@ function movedir($from, $to) {
     # wait for robocopy to terminate its threads
     1..10 | ForEach-Object {
         if (Test-Path $from) {
+            Remove-Item -Path $from.FullName -Recurse -Force
             Start-Sleep -Milliseconds 100
         }
     }

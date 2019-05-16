@@ -1,5 +1,6 @@
 . "$psscriptroot/autoupdate.ps1"
 . "$psscriptroot/buckets.ps1"
+. "$psscriptroot/persist.ps1"
 
 function nightly_version($date, $quiet = $false) {
     $date_str = $date.tostring("yyyyMMdd")
@@ -872,14 +873,11 @@ function link_current($versiondir) {
         abort "Error: Version 'current' is not allowed!"
     }
 
-    if(test-path $currentdir) {
-        # remove the junction
-        attrib -R /L $currentdir
-        & "$env:COMSPEC" /c rmdir $currentdir
+    # recreate new junction
+    if (Test-Path $currentdir) {
+        Remove-Item $currentdir -Recurse -Force
     }
-
-    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
-    attrib $currentdir +R /L
+    create_junction $currentdir $versiondir | Out-Null
     return $currentdir
 }
 
@@ -895,11 +893,7 @@ function unlink_current($versiondir) {
     if(test-path $currentdir) {
         write-host "Unlinking $(friendly_path $currentdir)"
 
-        # remove read-only attribute on link
-        attrib $currentdir -R /L
-
-        # remove the junction
-        & "$env:COMSPEC" /c "rmdir `"$currentdir`""
+        Remove-Item $currentdir -Recurse -Force
         return $currentdir
     }
     return $versiondir
@@ -1058,106 +1052,5 @@ function show_suggestions($suggested) {
                 write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
             }
         }
-    }
-}
-
-# Persistent data
-function persist_def($persist) {
-    if ($persist -is [Array]) {
-        $source = $persist[0]
-        $target = $persist[1]
-    } else {
-        $source = $persist
-        $target = $null
-    }
-
-    if (!$target) {
-        $target = $source
-    }
-
-    return $source, $target
-}
-
-function persist_data($manifest, $original_dir, $persist_dir) {
-    $persist = $manifest.persist
-    if($persist) {
-        $persist_dir = ensure $persist_dir
-
-        if ($persist -is [String]) {
-            $persist = @($persist);
-        }
-
-        $persist | ForEach-Object {
-            $source, $target = persist_def $_
-
-            write-host "Persisting $source"
-
-            $source = $source.TrimEnd("/").TrimEnd("\\")
-
-            $source = fullpath "$dir\$source"
-            $target = fullpath "$persist_dir\$target"
-
-            # if we have had persist data in the store, just create link and go
-            if (Test-Path $target) {
-                # if there is also a source data, rename it (to keep a original backup)
-                if (Test-Path $source) {
-                    Move-Item -Force $source "$source.original"
-                }
-            # we don't have persist data in the store, move the source to target, then create link
-            } elseif (Test-Path $source) {
-                # ensure target parent folder exist
-                ensure (Split-Path -Path $target) | Out-Null
-                Move-Item $source $target
-            # we don't have neither source nor target data! we need to crate an empty target,
-            # but we can't make a judgement that the data should be a file or directory...
-            # so we create a directory by default. to avoid this, use pre_install
-            # to create the source file before persisting (DON'T use post_install)
-            } else {
-                $target = New-Object System.IO.DirectoryInfo($target)
-                ensure $target | Out-Null
-            }
-
-            # create link
-            if (is_directory $target) {
-                # target is a directory, create junction
-                & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
-                attrib $source +R /L
-            } else {
-                # target is a file, create hard link
-                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
-            }
-        }
-    }
-}
-
-function unlink_persist_data($dir) {
-    # unlink all junction / hard link in the directory
-    Get-ChildItem -Recurse $dir | ForEach-Object {
-        $file = $_
-        if ($null -ne $file.LinkType) {
-            $filepath = $file.FullName
-            # directory (junction)
-            if ($file -is [System.IO.DirectoryInfo]) {
-                # remove read-only attribute on the link
-                attrib -R /L $filepath
-                # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
-            } else {
-                # remove the hard link
-                & "$env:COMSPEC" /c "del `"$filepath`""
-            }
-        }
-    }
-}
-
-# check whether write permission for Users usergroup is set to global persist dir, if not then set
-function persist_permission($manifest, $global) {
-    if($global -and $manifest.persist -and (is_admin)) {
-        $path = persistdir $null $global
-        $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
-        $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
-        $acl = Get-Acl -Path $path
-        $acl.SetAccessRule($target_rule)
-        $acl | Set-Acl -Path $path
     }
 }
