@@ -141,7 +141,7 @@ function Expand-MsiArchive {
         movedir "$DestinationPath\SourceDir\$ExtractDir" $DestinationPath | Out-Null
         Remove-Item "$DestinationPath\SourceDir" -Recurse -Force
     } elseif ($ExtractDir) {
-        Get-ChildItem $DestinationPath -Exclude $ExtractDir | Remove-Item -Recurse -Force
+        Get-ChildItem $DestinationPath -Exclude $ExtractDir, $Path | Remove-Item -Recurse -Force
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
     } elseif (Test-Path "$DestinationPath\SourceDir") {
         movedir "$DestinationPath\SourceDir" $DestinationPath | Out-Null
@@ -236,7 +236,7 @@ function Expand-ZipArchive {
         Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     }
     if ($ExtractDir) {
-        Get-ChildItem $DestinationPath -Exclude $ExtractDir | Remove-Item -Recurse -Force
+        Get-ChildItem $DestinationPath -Exclude $ExtractDir, $Path | Remove-Item -Recurse -Force
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
     }
     if ($Removal) {
@@ -276,7 +276,7 @@ function Expand-DarkArchive {
         Remove-Item $LogPath -Force
     }
     if ($ExtractDir) {
-        Get-ChildItem $DestinationPath -Exclude $ExtractDir | Remove-Item -Recurse -Force
+        Get-ChildItem $DestinationPath -Exclude $ExtractDir, $Path | Remove-Item -Recurse -Force
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
     }
     if ($Removal) {
