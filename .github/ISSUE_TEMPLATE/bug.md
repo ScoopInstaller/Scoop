@@ -1,6 +1,6 @@
 ---
 name: Bug
-about: Create a report to help us make scoop better
+about: Problem which make it impossible to use scoop.
 labels: bug
 ---
 
