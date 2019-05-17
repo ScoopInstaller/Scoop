@@ -122,6 +122,10 @@ function Expand-MsiArchive {
         $Removal
     )
     $DestinationPath = $DestinationPath.TrimEnd("\")
+    if ($ExtractDir) {
+        $OriDestinationPath = $DestinationPath
+        $DestinationPath = "$DestinationPath\_tmp"
+    }
     if ((get_config MSIEXTRACT_USE_LESSMSI)) {
         $MsiPath = Get-HelperPath -Helper Lessmsi
         $ArgList = @('x', "`"$Path`"", "`"$DestinationPath\\`"")
@@ -138,11 +142,11 @@ function Expand-MsiArchive {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if ($ExtractDir -and (Test-Path "$DestinationPath\SourceDir")) {
-        movedir "$DestinationPath\SourceDir\$ExtractDir" $DestinationPath | Out-Null
-        Remove-Item "$DestinationPath\SourceDir" -Recurse -Force
+        movedir "$DestinationPath\SourceDir\$ExtractDir" $OriDestinationPath | Out-Null
+        Remove-Item $DestinationPath -Recurse -Force
     } elseif ($ExtractDir) {
-        Get-ChildItem $DestinationPath -Exclude $ExtractDir, $Path | Remove-Item -Recurse -Force
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+        movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
+        Remove-Item $DestinationPath -Recurse -Force
     } elseif (Test-Path "$DestinationPath\SourceDir") {
         movedir "$DestinationPath\SourceDir" $DestinationPath | Out-Null
     }
@@ -207,6 +211,10 @@ function Expand-ZipArchive {
         [Switch]
         $Removal
     )
+    if ($ExtractDir) {
+        $OriDestinationPath = $DestinationPath
+        $DestinationPath = "$DestinationPath\_tmp"
+    }
     # All methods to unzip the file require .NET4.5+
     if ($PSVersionTable.PSVersion.Major -lt 5) {
         Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -236,8 +244,8 @@ function Expand-ZipArchive {
         Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     }
     if ($ExtractDir) {
-        Get-ChildItem $DestinationPath -Exclude $ExtractDir, $Path | Remove-Item -Recurse -Force
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+        movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
+        Remove-Item $DestinationPath -Recurse -Force
     }
     if ($Removal) {
         # Remove original archive file
@@ -254,15 +262,12 @@ function Expand-DarkArchive {
         [Parameter(Position = 1)]
         [String]
         $DestinationPath = (Split-Path $Path),
-        [String]
-        $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
         [Switch]
         $Removal
     )
-    $DestinationPath = $DestinationPath.TrimEnd("\")
     $LogPath = "$(Split-Path $Path)\dark.log"
     $ArgList = @('-nologo', "-x `"$DestinationPath`"", "`"$Path`"")
     if ($Switches) {
@@ -274,10 +279,6 @@ function Expand-DarkArchive {
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
-    }
-    if ($ExtractDir) {
-        Get-ChildItem $DestinationPath -Exclude $ExtractDir, $Path | Remove-Item -Recurse -Force
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
     }
     if ($Removal) {
         # Remove original archive file
