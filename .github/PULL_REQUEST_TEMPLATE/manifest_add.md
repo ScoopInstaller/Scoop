@@ -5,6 +5,6 @@ title: 'Add %%manifestname%% %%manifestversion%%'
 labels: please-review
 ---
 
-<!-- Is there issue, which request this manifest? -->
+<!-- Is there an issue, which requests this manifest? -->
 <!--     If yes, please add closing directive as follows: -->
 <!--     - Closes #ISSUE_ID -->
