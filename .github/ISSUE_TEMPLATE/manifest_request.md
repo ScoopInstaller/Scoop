@@ -12,6 +12,6 @@ labels: app-request, help wanted, missing-package
 - **Portable version**: Yes/No
 
 <!-- Is there anything else contributors need to know? -->
-<!-- Files, folders to persist -->
+<!-- Files, folders to persist across updates -->
 <!-- Installation requirements -->
 <!-- ... -->
