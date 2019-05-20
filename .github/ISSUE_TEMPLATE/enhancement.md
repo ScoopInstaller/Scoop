@@ -1,7 +1,7 @@
 ---
 name: Enhancement
-about: Some feature could be better.
+about: Some feature, idea or enhancement to improve Scoop.
 labels: enhancement
 ---
 
-<!-- Describe your idea how to make some feature better. -->
+<!-- Describe your feature, idea or enhancement about how to improve Scoop. -->

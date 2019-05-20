@@ -1,14 +1,14 @@
 ---
 name: Bug
-about: Problem which make it impossible to use scoop.
+about: A problem which makes it impossible to use Scoop.
 labels: bug
 ---
 
 <!-- Describe your problem: -->
 
-<!-- Add screenshot, reproducible steps or terminal output: -->
+<!-- Add a screenshot, reproducible steps or terminal output: -->
 
 - **Branch**: master/develop <!-- `scoop config SCOOP_BRANCH | clip` -->
 - **Powershell Version**: <!-- Use: `$PSVersionTable.PSVersion.ToString() | clip` -->
 
-<!-- Are you under special environment? Do you use proxy? Can you provide other relevant information which could help with problem identifying? -->
+<!-- Are you under a special environment? Do you use a proxy? Can you provide other relevant information which could help with problem identifying? -->
