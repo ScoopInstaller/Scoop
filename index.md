@@ -12,7 +12,7 @@ scoop install curl
 
 ### Get comfortable on the Windows command line
 
-Looking for familiar Unix tools? Tired of Powershell&rsquo;s *Verb-Noun* verbosity? Scoop helps you get the [programs](https://github.com/lukesampson/scoop/tree/master/bucket) you [need](https://github.com/lukesampson/scoop-extras), with a minimal amount of point-and-clicking.
+Looking for familiar Unix tools? Tired of Powershell&rsquo;s *Verb-Noun* verbosity? Scoop helps you get the [programs](https://github.com/ScoopInstaller/Main/blob/master/bucket/) you [need](https://github.com/lukesampson/scoop-extras), with a minimal amount of point-and-clicking.
 
 <br>
 
