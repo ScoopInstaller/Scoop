@@ -72,11 +72,14 @@ param(
 . "$psscriptroot\..\lib\install.ps1" # needed for hash generation
 . "$psscriptroot\..\lib\unix.ps1"
 
-$Dir = Resolve-Path $Dir
-$Search = $App
-
 # get apps to check
-$Queue = Get-ChildItem -Path $Dir -Filter "$App.json"
+$Queue = @()
+if((Test-Path $App) -and $App -ne "*") {
+    $Queue = @(Get-ChildItem $App)
+} else {
+    $Dir = Resolve-Path $Dir
+    $Queue = @(Get-ChildItem -Path $Dir -Filter "$App.json")
+}
 
 # clear any existing events
 Get-Event | Remove-Event
@@ -85,7 +88,7 @@ Get-EventSubscriber | Unregister-Event
 # start all downloads
 $Queue | ForEach-Object {
     $file = $_
-    $json = parse_json $_.FullName
+    $json = parse_json $file.FullName
     $name = (strip_ext $file.Name)
     if (!$json.checkver) {
         New-Event -SourceIdentifier $name -MessageData "skip" | Out-Null
@@ -157,6 +160,7 @@ $Queue | ForEach-Object {
 
     $state = New-Object psobject @{
         app      = $name;
+        dir      = $file.Directory;
         url      = $url;
         regex    = $regex;
         json     = $json;
@@ -187,6 +191,7 @@ while ($in_progress -gt 0) {
 
     $state = $ev.SourceEventArgs.UserState
     $app = $state.app
+    $dir = $state.dir
     $json = $state.json
     $url = $state.url
     $regexp = $state.regex
@@ -309,7 +314,7 @@ while ($in_progress -gt 0) {
             if ($Version -ne "") {
                 $ver = $Version
             }
-            autoupdate $App $Dir $json $ver $matchesHashtable
+            autoupdate $app $dir $json $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
         }
