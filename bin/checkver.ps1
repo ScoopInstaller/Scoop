@@ -76,14 +76,7 @@ $Dir = Resolve-Path $Dir
 $Search = $App
 
 # get apps to check
-$Queue = @()
-$json = ''
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = parse_json "$Dir\$($_.Name)"
-    if ($json.checkver) {
-        $Queue += , @($_.Name, $json)
-    }
-}
+$Queue = Get-ChildItem -Path $Dir -Filter "$App.json"
 
 # clear any existing events
 Get-Event | Remove-Event
@@ -91,7 +84,13 @@ Get-EventSubscriber | Unregister-Event
 
 # start all downloads
 $Queue | ForEach-Object {
-    $name, $json = $_
+    $file = $_
+    $json = parse_json $_.FullName
+    $name = (strip_ext $file.Name)
+    if (!$json.checkver) {
+        New-Event -SourceIdentifier $name -MessageData "skip" | Out-Null
+        return
+    }
 
     $substitutions = get_version_substitutions $json.version
 
@@ -101,7 +100,7 @@ $Queue | ForEach-Object {
     } else {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
     }
-    Register-ObjectEvent $wc downloadstringcompleted -ErrorAction Stop | Out-Null
+    Register-ObjectEvent -InputObject $wc -EventName DownloadStringCompleted -ErrorAction Stop | Out-Null
 
     $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
 
@@ -157,7 +156,7 @@ $Queue | ForEach-Object {
     $url = substitute $url $substitutions
 
     $state = New-Object psobject @{
-        app      = (strip_ext $name);
+        app      = $name;
         url      = $url;
         regex    = $regex;
         json     = $json;
@@ -182,6 +181,9 @@ while ($in_progress -gt 0) {
     $ev = Wait-Event
     Remove-Event $ev.SourceIdentifier
     $in_progress--
+    if($ev.MessageData -eq "skip") {
+        continue
+    }
 
     $state = $ev.SourceEventArgs.UserState
     $app = $state.app
