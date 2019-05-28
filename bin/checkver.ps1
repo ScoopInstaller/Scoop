@@ -86,9 +86,8 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
 }
 
 # clear any existing events
-Get-Event | ForEach-Object {
-    Remove-Event $_.SourceIdentifier
-}
+Get-Event | Remove-Event
+Get-EventSubscriber | Unregister-Event
 
 # start all downloads
 $Queue | ForEach-Object {
