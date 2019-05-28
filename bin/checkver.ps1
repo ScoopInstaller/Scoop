@@ -117,7 +117,7 @@ $Queue | ForEach-Object {
 
     if ($json.checkver -eq 'github') {
         if (!$json.homepage.StartsWith('https://github.com/')) {
-            error "$name checkver expects the homepage to be a github repository"
+            error "$name`: checkver expects the homepage to be a github repository"
         }
         $url = $json.homepage + '/releases/latest'
         $regex = $githubRegex
@@ -172,9 +172,9 @@ $Queue | ForEach-Object {
     $wc.DownloadStringAsync($url, $state)
 }
 
-function next($er) {
-    Write-Host "$App`: " -NoNewline
-    Write-Host $er -ForegroundColor DarkRed
+function next($app, $err) {
+    Write-Host "$app`: " -NoNewline
+    Write-Host $err -ForegroundColor DarkRed
 }
 
 # wait for all to complete
@@ -200,7 +200,7 @@ while ($in_progress -gt 0) {
     $page = $ev.SourceEventArgs.Result
 
     if ($err) {
-        next "$($err.message)`r`nURL $url is not valid"
+        next $app "$($err.message)`r`nURL $url is not valid"
         continue
     }
 
@@ -215,7 +215,7 @@ while ($in_progress -gt 0) {
             $ver = json_path_legacy $page $jsonpath
         }
         if (!$ver) {
-            next "couldn't find '$jsonpath' in $url"
+            next $app "couldn't find '$jsonpath' in $url"
             continue
         }
     }
@@ -232,7 +232,7 @@ while ($in_progress -gt 0) {
         # Getting version from XML, using XPath
         $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
         if (!$ver) {
-            next "couldn't find '$xpath' in $url"
+            next $app "couldn't find '$xpath' in $url"
             continue
         }
     }
@@ -266,20 +266,20 @@ while ($in_progress -gt 0) {
                 $ver = $matchesHashtable['version']
             }
         } else {
-            next "couldn't match '$regexp' in $url"
+            next $app "couldn't match '$regexp' in $url"
             continue
         }
     }
 
     if (!$ver) {
-        next "couldn't find new version in $url"
+        next $app "couldn't find new version in $url"
         continue
     }
 
     # Skip actual only if versions are same and there is no -f
     if (($ver -eq $expected_ver) -and !$ForceUpdate -and $SkipUpdated) { continue }
 
-    Write-Host "$App`: " -NoNewline
+    Write-Host "$app`: " -NoNewline
 
     # version hasn't changed (step over if forced update)
     if ($ver -eq $expected_ver -and !$ForceUpdate) {
