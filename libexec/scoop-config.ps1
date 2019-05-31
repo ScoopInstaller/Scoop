@@ -14,6 +14,10 @@
 #
 #     scoop config rm <name>
 #
+# To list all configuration settings:
+#
+#     scoop config list
+#
 # Settings
 # --------
 #
