@@ -38,6 +38,8 @@ if(!$name) { my_usage; exit 1 }
 if($name -like 'rm') {
     set_config $value $null | Out-Null
     Write-Output "'$value' has been removed"
+} elseif($name -like 'list') {
+    list_config
 } elseif($null -ne $value) {
     set_config $name $value | Out-Null
     Write-Output "'$name' has been set to '$value'"
