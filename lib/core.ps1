@@ -78,6 +78,12 @@ function set_config($name, $value) {
     return $scoopConfig
 }
 
+function list_config() {
+    $scoopConfig | Get-Member -MemberType NoteProperty | ForEach-Object {
+        Write-Output "$($_.Name)=$($scoopConfig.$($_.Name))"
+    }
+}
+
 function setup_proxy() {
     # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
     $proxy = get_config 'proxy'
