@@ -20,8 +20,10 @@ function search_bucket($bucket, $query) {
             name = $_
             version = $manifest.version
             description = $manifest.description
-            binaries = @()
+            shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
+            matchingShortcuts = @()
             bin = @(arch_specific 'bin' $manifest $arch)
+            matchingBinaries = @()
         }
     }
 
@@ -43,18 +45,30 @@ function search_bucket($bucket, $query) {
             $result += $app
         }
 
-        if(!$app.bin) {
-            return
-        }
-
         $app.bin | ForEach-Object {
             $exe, $name, $arg = shim_def $_
             if($name -match $query) {
+                $bin = @{'exe' = $exe; 'name' = $name }
                 if($result.Contains($app)) {
-                    $result[$result.IndexOf($app)].binaries += $name
+                    $result[$result.IndexOf($app)].matchingBinaries += $bin
                 } else {
-                    $app.binaries += $name
+                    $app.matchingBinaries += $bin
                     $result += $app
+                }
+            }
+        }
+
+        $app.shortcuts | ForEach-Object {
+            $shortcut = $_
+            if($shortcut -is [Array] -and $shortcut.length -ge 2) {
+                $name = $shortcut[1]
+                if($name -match $query) {
+                    if($result.Contains($app)) {
+                        $result[$result.IndexOf($app)].matchingShortcuts += $name
+                    } else {
+                        $app.matchingShortcuts += $name
+                        $result += $app
+                    }
                 }
             }
         }
