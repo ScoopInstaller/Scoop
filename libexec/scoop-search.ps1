@@ -130,25 +130,47 @@ function search_remotes($query) {
 }
 
 Write-Host 'Searching in local buckets ...'
+$local_results = @()
 
 Get-LocalBucket | ForEach-Object {
-    $res = search_bucket $_ $query
-    $local_results = $local_results -or $res
-    if($res) {
-        $name = "$_"
+    $bucket = $_
+    $result = search_bucket $bucket $query
+    if(!$result) {
+        return
+    }
+    $local_results += $result
+    $result | ForEach-Object {
 
-        Write-Host "'$name' bucket:"
-        $res | ForEach-Object {
-            $item = "    $($_.name) ($($_.version))"
-            if($_.binaries) { $item += " --> $($_.binaries -join ', ')" }
-            if($_.description) { $item += "`n        $($_.description)" }
-            Write-Host $item
+        Write-Host "$bucket" -NoNewline -ForegroundColor Yellow
+        Write-Host '/' -NoNewline
+        Write-Host $_.name -ForegroundColor Green
+        Write-Host "  Version: " -NoNewline
+        Write-Host $_.version -ForegroundColor DarkCyan
+        if($_.description) {
+            Write-Host "  Description: $($_.description)"
+        }
+        if($_.matchingBinaries) {
+            Write-Host "  Binaries:"
+            $_.matchingBinaries | ForEach-Object {
+                if($_.exe.Contains($_.name)) {
+                    Write-Host "    - $($_.exe)"
+                } else {
+                    Write-Host "    - $($_.exe) > $($_.name)"
+                }
+            }
+        }
+        if($_.matchingShortcuts) {
+            Write-Host "  Shortcuts:"
+            $_.matchingShortcuts | ForEach-Object {
+                Write-Host "    - $_"
+            }
         }
     }
 }
 
 if(!$local_results) {
-    error 'No matches found.'
+    error 'No matches in local buckets found.'
+}
 
 if(!$local_results -or $Remote) {
     if(!$ratelimit_reached) {
@@ -161,10 +183,10 @@ if(!$local_results -or $Remote) {
                 $_.results | ForEach-Object { "    $_" }
             }
         } else {
-            error 'No matches found.'
+            error 'No matches in remote buckets found.'
         }
     } else {
-        Write-Host "GitHub ratelimit reached: Can't query known repositories, please try again later"
+        error "GitHub ratelimit reached: Can't query known repositories, please try again later"
     }
 }
 
