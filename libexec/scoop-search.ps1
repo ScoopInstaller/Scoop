@@ -81,18 +81,23 @@ function search_remote($bucket, $query) {
         $user = $matches[1]
         $repo_name = $matches[2]
         $request_uri = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
+        try {
+            if((Get-Command Invoke-RestMethod).parameters.ContainsKey('ResponseHeadersVariable')) {
+                $response = Invoke-RestMethod -Uri $request_uri -ResponseHeadersVariable headers
+                if($headers['X-RateLimit-Remaining']) {
+                    $ratelimit_reached = (1 -eq $headers['X-RateLimit-Remaining'][0])
+                }
+            } else {
+                $response = Invoke-RestMethod -Uri $request_uri
+                $ratelimit_reached = (github_ratelimit_reached)
+            }
 
-        if((Get-Command Invoke-RestMethod).parameters.ContainsKey('ResponseHeadersVariable')) {
-            $response = Invoke-RestMethod -Uri $request_uri -ResponseHeadersVariable headers
-            $ratelimit_reached = (1 -eq $headers['X-RateLimit-Remaining'][0])
-        } else {
-            $response = Invoke-RestMethod -Uri $request_uri
-            $ratelimit_reached = (github_ratelimit_reached)
+            $result = $response.tree | Where-Object {
+                $_.path -match "(^(.*$query.*).json$)"
+            } | ForEach-Object { $matches[2] }
+        } catch [System.Web.Http.HttpResponseException] {
+            $ratelimit_reached = $true
         }
-
-        $result = $response.tree | Where-Object {
-            $_.path -match "(^(.*$query.*).json$)"
-        } | ForEach-Object { $matches[2] }
     }
 
     return $result
