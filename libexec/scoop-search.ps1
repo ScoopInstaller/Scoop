@@ -4,7 +4,11 @@
 #
 # If used with [query], shows app names that match the query.
 # Without [query], shows all the available apps.
-param($query)
+param(
+    [Parameter(Mandatory = $true)]
+    $Query,
+    [Switch] $Remote
+)
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
@@ -146,6 +150,7 @@ Get-LocalBucket | ForEach-Object {
 if(!$local_results) {
     error 'No matches found.'
 
+if(!$local_results -or $Remote) {
     if(!$ratelimit_reached) {
         Write-Host 'Searching in remote buckets ...'
         $remote_results = search_remotes $query
