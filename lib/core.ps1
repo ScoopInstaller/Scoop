@@ -963,8 +963,12 @@ if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
     write-host "WARN  to '$configFile'" -f darkyellow
 }
 
+# Default config file
+$configFileDefault = "$PSScriptRoot\..\default\config.json"
+
 # Load Scoop config
 $scoopConfig = load_cfg $configFile
+$CONFIG_DEFAULT = load_cfg $configFileDefault
 
 # Setup proxy globally
 setup_proxy
