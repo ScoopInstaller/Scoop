@@ -48,8 +48,13 @@ function load_cfg($file) {
 }
 
 function get_config($name, $default) {
-    if($null -eq $scoopConfig.$name -and $null -ne $default) {
-        return $default
+    if($null -eq $scoopConfig.$name) {
+        if($null -ne $default) {
+            Show-DeprecatedWarning $MyInvocation "get_config <name> (specify defaults in default/config.json)"
+            return $default
+        } else {
+            return $CONFIG_DEFAULT.$name
+        }
     }
     return $scoopConfig.$name
 }
