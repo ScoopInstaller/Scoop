@@ -6,15 +6,41 @@
 
 $isUnix = is_unix
 
-function test_extract($extract_fn, $from, $removal) {
-    $to = (strip_ext $from) -replace '\.tar$', ''
-    & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal
-    return $to
+Describe 'Requirement function' -Tag 'Scoop' {
+    It 'Test 7zip requirement' {
+        Mock get_config { $true }
+        Test-7zipRequirement @{ url = "test.7z" } '64bit' | Should -BeFalse
+        Mock get_config { $false }
+        Test-7zipRequirement @{ url = "test.7z" } '64bit' | Should -BeTrue
+        Test-7zipRequirement @{ installer = @{ type = "nsis" } } '64bit' | Should -BeTrue
+        Test-7zipRequirement @{ url = "test.exe" } '64bit' | Should -BeFalse
+        Test-7zipRequirement -File 'test.xz' | Should -BeTrue
+        Test-7zipRequirement -File 'test.bin' | Should -BeFalse
+    }
+    It 'Test lessmsi requirement' {
+        Mock get_config { $true }
+        Test-LessmsiRequirement @{ url = "test.msi"} '64bit' | Should -BeTrue
+        Test-LessmsiRequirement @{ url = "test.exe"} '64bit' | Should -BeFalse
+    }
+    It 'Test innounp requirement' {
+        Test-InnounpRequirement @{ installer = @{ type = "inno" } } '64bit' | Should -BeTrue
+        Test-InnounpRequirement @{ } '64bit' | Should -BeFalse
+    }
+    It 'Test dark requirement' {
+        Test-DarkRequirement @{ installer = @{ type = "wix" } } '64bit' | Should -BeTrue
+        Test-DarkRequirement @{ } '64bit' | Should -BeFalse
+    }
 }
 
 Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     BeforeAll {
         $working_dir = setup_working 'decompress'
+
+        function test_extract($extract_fn, $from, $removal) {
+            $to = (strip_ext $from) -replace '\.tar$', ''
+            & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal
+            return $to
+        }
 
         It "Decompression test cases should exist" {
             $testcases = "$working_dir\TestCases.zip"
