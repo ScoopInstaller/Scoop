@@ -553,7 +553,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         if($extract_fn) {
             Write-Host "Extracting " -NoNewline
-            Write-Host $fname -f Cyan -NoNewline
+            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
             & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
             Write-Host "done." -f Green
