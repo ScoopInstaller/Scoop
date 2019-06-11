@@ -594,13 +594,25 @@ function strip_path($orig_path, $dir) {
     return ($stripped -ne $orig_path), $stripped
 }
 
-function remove_from_path($dir,$global) {
+function add_first_in_path($dir, $global) {
+    $dir = fullpath $dir
+
+    # future sessions
+    $null, $currpath = strip_path (env 'path' $global) $dir
+    env 'path' $global "$dir;$currpath"
+
+    # this session
+    $null, $env:PATH = strip_path $env:PATH $dir
+    $env:PATH = "$dir;$env:PATH"
+}
+
+function remove_from_path($dir, $global) {
     $dir = fullpath $dir
 
     # future sessions
     $was_in_path, $newpath = strip_path (env 'path' $global) $dir
     if($was_in_path) {
-        write-output "Removing $(friendly_path $dir) from your path."
+        Write-Output "Removing $(friendly_path $dir) from your path."
         env 'path' $global $newpath
     }
 
