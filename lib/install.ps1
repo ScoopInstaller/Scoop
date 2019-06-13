@@ -36,6 +36,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     # Change 'innosetup' to 'installer.type:inno'
     if ($manifest.innosetup) {
+        warn "'innosetup' is deprecated, please use 'installer.type:inno' instead."
+        warn "If you maintain this manifest, please refer to the manifest reference docs."
         if ($manifest.$architecture.installer) {
             $manifest.$architecture.installer | Add-Member -MemberType NoteProperty -Name type -Value 'inno'
         } elseif ($manifest.installer) {
@@ -52,8 +54,9 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    Invoke-Extraction -FileName $fname -Manifest $manifest -Architecture $architecture -DestinationPath $dir
     pre_install $manifest $architecture
-    Invoke-InstallerScript -Name $fname -Manifest $manifest -Architecture $architecture -DestinationPath $dir -Global:$global
+    Invoke-InstallerScript -AppName $app -FileName $fname -Manifest $manifest -Architecture $architecture -DestinationPath $dir -Global:$global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
@@ -498,14 +501,6 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     # can be multiple cookies: they will be used for all HTTP requests.
     $cookies = $manifest.cookie
 
-    $fname = $null
-
-    # extract_dir and extract_to in manifest are like queues: for each url that
-    # needs to be extracted, will get the next dir from the queue
-    $extract_dirs = @(extract_dir $manifest $architecture)
-    $extract_tos = @(extract_to $manifest $architecture)
-    $extracted = 0;
-
     # download first
     if(Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
@@ -539,19 +534,36 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         }
     }
 
-    foreach($url in $urls) {
-        $fname = url_filename $url
+    return $urls | ForEach-Object { url_filename $_ }
+}
 
-        $extract_dir = $extract_dirs[$extracted]
-        $extract_to = $extract_tos[$extracted]
-        $Installer = installer $manifest $architecture
+function Invoke-Extraction {
+    [CmdletBinding()]
+    param (
+        [String[]]
+        $FileName,
+        [PSObject]
+        $Manifest,
+        [String]
+        $Architecture,
+        [String]
+        $DestinationPath
+    )
+
+    # 'url', 'extract_dir' and 'extract_to' are paired
+    $Urls = @(url $Manifest $Architecture)
+    $ExtractDirs = @(extract_dir $Manifest $Architecture)
+    $ExtractTos = @(extract_to $Manifest $Architecture)
+    $Installer = installer $Manifest $Architecture
+
+    for ($i = 0; $i -lt $Urls.Length; $i++) {
         $Args = @{
-            Path = "$dir\$fname"
-            DestinationPath = "$dir\$extract_to"
+            Path            = "$DestinationPath\$($FileName[$i])"
+            DestinationPath = "$DestinationPath\$($ExtractTos[$i])"
         }
         # work out extraction method, if applicable
-        $extract_fn = $null
-        if ($Installer.type) {
+        $ExtractFn = $null
+        if ($i -eq 0 -and $Installer.type) {
             switch ($Installer.type) {
                 'inno' { $ExtractFn = 'Expand-InnoInstaller'; $Args.ExtractDir = $ExtractDirs[$i]; $Args.Include = $Installer.include; $Args.Exclude = $Installer.exclude }
                 'nsis' { $ExtractFn = 'Expand-NsisInstaller'; $Args.Architecture = $Architecture }
@@ -559,25 +571,22 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                 Default { abort "Error in manifest: installer type $_ is not supported." }
             }
         } else {
-            switch -Regex ($fname) {
-                ".*\.zip$" { $extract_fn = 'Expand-ZipArchive' }
-                ".*\.msi$" { $extract_fn = 'Expand-MsiArchive' }
-                { Test-7zipRequirement -File $_ } { $extract_fn = 'Expand-7zipArchive' }
+            switch -Regex ($Args.Path) {
+                ".*\.zip$" { $ExtractFn = 'Expand-ZipArchive' }
+                ".*\.msi$" { $ExtractFn = 'Expand-MsiArchive' }
+                { Test-7zipRequirement -File $_ } { $ExtractFn = 'Expand-7zipArchive' }
             }
-            $Args.ExtractDir = $extract_dir
+            $Args.ExtractDir = $ExtractDirs[$i]
         }
         debug $Args
-        if ($extract_fn) {
+        if ($ExtractFn) {
             Write-Host "Extracting " -NoNewline
-            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+            Write-Host $(url_remote_filename $Urls[$i]) -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            & $extract_fn @Args -Removal
+            & $ExtractFn @Args -Removal
             Write-Host "done." -f Green
-            $extracted++
         }
     }
-
-    $fname # returns the last downloaded file
 }
 
 function cookie_header($cookies) {
@@ -681,7 +690,9 @@ function Invoke-InstallerScript {
     [CmdletBinding()]
     param (
         [String]
-        $Name,
+        $AppName,
+        [String[]]
+        $FileName,
         [PSObject]
         $Manifest,
         [String]
@@ -705,23 +716,24 @@ function Invoke-InstallerScript {
     }
 
     if ($Installer) {
-        $prog = "$DestinationPath\$(coalesce $Installer.file "$Name")"
-        if(!(is_in_dir $DestinationPath $prog)) {
-            abort "Error in manifest: Installer $prog is outside the app directory."
+        # Installer filename is either explicit defined ('installer.file') or file name in the first URL
+        $ProgName = "$DestinationPath\$(coalesce $Installer.file $FileName[1])"
+        if(!(is_in_dir $DestinationPath $ProgName)) {
+            abort "Error in manifest: Installer $ProgName is outside the app directory."
         }
-        $arg = @(args $Installer.args $DestinationPath $global)
+        $Args = @(args $Installer.args $DestinationPath $Global)
 
-        if($prog.endswith('.ps1')) {
-            & $prog @arg
+        if($ProgName.EndsWith('.ps1')) {
+            & $ProgName @Args
         } else {
-            $installed = Invoke-ExternalCommand $prog $arg -Activity "Running installer..."
-            if(!$installed) {
-                abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
+            $IsInstalled = Invoke-ExternalCommand $ProgName $Args -Activity "Running installer..."
+            if(!$IsInstalled) {
+                abort "Installation aborted. You might need to run 'scoop uninstall $AppName' before trying again."
             }
 
             # Don't remove installer if "keep" flag is set to true
             if($Installer.keep -ne "true") {
-                Remove-Item $prog
+                Remove-Item $ProgName
             }
         }
     }
