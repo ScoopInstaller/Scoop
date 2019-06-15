@@ -231,6 +231,14 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         $options += "--header='Cookie: $(cookie_header $cookies)'"
     }
 
+    if ($env:HTTP_PROXY) {
+        $options += "--http-proxy='$env:HTTP_PROXY'"
+    }
+
+    if ($env:HTTPS_PROXY) {
+        $options += "--https-proxy='$env:HTTPS_PROXY'"
+    }
+
     $proxy = get_config 'proxy'
     if($proxy -ne 'none') {
         if([Net.Webrequest]::DefaultWebProxy.Address) {
