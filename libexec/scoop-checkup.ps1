@@ -24,7 +24,7 @@ if (!(Test-HelperInstalled -Helper Innounp)) {
 }
 
 if (!(Test-HelperInstalled -Helper Dark)) {
-    error "'dark' is not installed! It's require for unpacking installers created with the WiX Toolset. Please run 'scoop install dark' or 'scoop install wixtoolset'."
+    error "'dark' is not installed! It's required for unpacking installers created with the WiX Toolset. Please run 'scoop install dark' or 'scoop install wixtoolset'."
     $issues++
 }
 
