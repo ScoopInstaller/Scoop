@@ -127,3 +127,32 @@ Scoop is also great at handling single-file programs and Powershell scripts. The
 If you find Scoop useful and would like to support ongoing development and maintenance, here's how:
 
 - [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DM2SUH9EUXSKJ) (one-time donation)
+
+## Known application buckets
+
+The following buckets are known to scoop:
+
+* [main](https://github.com/ScoopInstaller/Main) - Default bucket for command/command-line apps
+* [extras](https://github.com/lukesampson/scoop-extras) - Apps that don't fit the main bucket's [criteria](https://github.com/lukesampson/scoop/wiki/Criteria-for-including-apps-in-the-main-bucket)
+* [games](https://github.com/Calinou/scoop-games) - Open source/freeware games and game-related tools
+* [nerd-fonts](https://github.com/matthewjberger/scoop-nerd-fonts) -  Nerd Fonts
+* [nirsoft](https://github.com/kodybrown/scoop-nirsoft) - A subset of the 200+ [Nirsoft](https://nirsoft.net) apps
+* [java](https://github.com/ScoopInstaller/Java) - Installers for Oracle Java, OpenJDK, Zulu, ojdkbuild, AdoptOpenJDK, Amazon Corretto, BellSoft Liberica & SapMachine 
+* [jetbrains](https://github.com/Ash258/Scoop-JetBrains) - Installers for all JetBrains utilities and IDEs
+<!-- * [nightlies](https://github.com/ScoopInstaller/Nightlies) - No longer used -->
+* [nonportable](https://github.com/oltolm/scoop-nonportable) - Non-portable apps (may require UAC)
+* [php](https://github.com/ScoopInstaller/PHP) - Installers for most versions of PHP
+* [versions](https://github.com/ScoopInstaller/Versions) - Alternative versions of apps found in other buckets
+
+The main bucket is installed by default. To add any of the other buckets, type:
+```
+> scoop bucket add bucketname
+```
+For example, to add the extras bucket, type:
+```
+> scoop bucket add extras
+```
+
+## Other application buckets
+
+Many other application buckets hosted on Github can be found in the [Scoop Directory](https://github.com/rasa/scoop-directory). 
