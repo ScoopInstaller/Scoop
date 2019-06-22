@@ -12,7 +12,7 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{bat,cmd,[Bb][Aa][Tt],[Cc][Mm][Dd]]
+[*.{bat,cmd,[Bb][Aa][Tt],[Cc][Mm][Dd]}]
 # DOS/Win *requires* BAT/CMD files to have CRLF newlines
 end_of_line = crlf
 
