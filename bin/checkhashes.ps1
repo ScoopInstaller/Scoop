@@ -52,7 +52,7 @@ param(
 $Dir = Resolve-Path $Dir
 if ($ForceUpdate) { $Update = $true }
 # Cleanup
-if (!$UseCache) { scoop cache rm '*HASH_CHECK*' }
+if (!$UseCache) { Remove-Item "$cachedir\*HASH_CHECK*" -Force }
 
 function err ([String] $name, [String[]] $message) {
     Write-Host "$name`: " -ForegroundColor Red -NoNewline
