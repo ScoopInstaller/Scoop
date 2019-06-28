@@ -73,11 +73,15 @@ function Expand-7zipArchive {
         }
         for ($i = 0; $i -lt $Path.Length; $i++) {
             $aPath = $Path[$i]
-            if ($aDestinationPath = $DestinationPath[$i]) {
+            if ($null -eq $DestinationPath[$i]) {
+                $aDestinationPath = $DestinationPath[$i]
+            } else {
                 $aDestinationPath = $DestinationPath[-1]
             }
             if ($ExtractDir) {
-                if ($aExtractDir = $ExtractDir[$i]) {
+                if ($null -eq $ExtractDir[$i]) {
+                    $aExtractDir = $ExtractDir[$i]
+                } else {
                     $aExtractDir = $ExtractDir[-1]
                 }
             }
@@ -147,11 +151,15 @@ function Expand-MsiArchive {
         }
         for ($i = 0; $i -lt $Path.Length; $i++) {
             $aPath = $Path[$i]
-            if ($aDestinationPath = $DestinationPath[$i]) {
+            if ($null -eq $DestinationPath[$i]) {
+                $aDestinationPath = $DestinationPath[$i]
+            } else {
                 $aDestinationPath = $DestinationPath[-1]
             }
             if ($ExtractDir) {
-                if ($aExtractDir = $ExtractDir[$i]) {
+                if ($null -eq $ExtractDir[$i]) {
+                    $aExtractDir = $ExtractDir[$i]
+                } else {
                     $aExtractDir = $ExtractDir[-1]
                 }
             }
@@ -222,11 +230,15 @@ function Expand-InnoArchive {
         }
         for ($i = 0; $i -lt $Path.Length; $i++) {
             $aPath = $Path[$i]
-            if ($aDestinationPath = $DestinationPath[$i]) {
+            if ($null -eq $DestinationPath[$i]) {
+                $aDestinationPath = $DestinationPath[$i]
+            } else {
                 $aDestinationPath = $DestinationPath[-1]
             }
             if ($ExtractDir) {
-                if ($aExtractDir = $ExtractDir[$i]) {
+                if ($null -eq $ExtractDir[$i]) {
+                    $aExtractDir = $ExtractDir[$i]
+                } else {
                     $aExtractDir = $ExtractDir[-1]
                 }
             }
@@ -276,11 +288,15 @@ function Expand-ZipArchive {
         }
         for ($i = 0; $i -lt $Path.Length; $i++) {
             $aPath = $Path[$i]
-            if ($aDestinationPath = $DestinationPath[$i]) {
+            if ($null -eq $DestinationPath[$i]) {
+                $aDestinationPath = $DestinationPath[$i]
+            } else {
                 $aDestinationPath = $DestinationPath[-1]
             }
             if ($ExtractDir) {
-                if ($aExtractDir = $ExtractDir[$i]) {
+                if ($null -eq $ExtractDir[$i]) {
+                    $aExtractDir = $ExtractDir[$i]
+                } else {
                     $aExtractDir = $ExtractDir[-1]
                 }
             }
