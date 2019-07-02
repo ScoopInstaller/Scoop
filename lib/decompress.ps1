@@ -74,16 +74,18 @@ function Expand-7zipArchive {
         for ($i = 0; $i -lt $Path.Length; $i++) {
             $aPath = $Path[$i]
             if ($null -eq $DestinationPath[$i]) {
-                $aDestinationPath = $DestinationPath[$i]
-            } else {
                 $aDestinationPath = $DestinationPath[-1]
+            } else {
+                $aDestinationPath = $DestinationPath[$i]
             }
             if ($ExtractDir) {
                 if ($null -eq $ExtractDir[$i]) {
-                    $aExtractDir = $ExtractDir[$i]
-                } else {
                     $aExtractDir = $ExtractDir[-1]
+                } else {
+                    $aExtractDir = $ExtractDir[$i]
                 }
+            } else {
+                $aExtractDir = $null
             }
             $LogPath = "$(Split-Path $aPath)\7zip.log"
             $ArgList = @('x', "`"$aPath`"", "-o`"$aDestinationPath`"", '-y')
@@ -152,16 +154,18 @@ function Expand-MsiArchive {
         for ($i = 0; $i -lt $Path.Length; $i++) {
             $aPath = $Path[$i]
             if ($null -eq $DestinationPath[$i]) {
-                $aDestinationPath = $DestinationPath[$i]
-            } else {
                 $aDestinationPath = $DestinationPath[-1]
+            } else {
+                $aDestinationPath = $DestinationPath[$i]
             }
             if ($ExtractDir) {
                 if ($null -eq $ExtractDir[$i]) {
-                    $aExtractDir = $ExtractDir[$i]
-                } else {
                     $aExtractDir = $ExtractDir[-1]
+                } else {
+                    $aExtractDir = $ExtractDir[$i]
                 }
+            } else {
+                $aExtractDir = $null
             }
             $aDestinationPath = $aDestinationPath.TrimEnd("\")
             if ($aExtractDir) {
@@ -231,16 +235,18 @@ function Expand-InnoArchive {
         for ($i = 0; $i -lt $Path.Length; $i++) {
             $aPath = $Path[$i]
             if ($null -eq $DestinationPath[$i]) {
-                $aDestinationPath = $DestinationPath[$i]
-            } else {
                 $aDestinationPath = $DestinationPath[-1]
+            } else {
+                $aDestinationPath = $DestinationPath[$i]
             }
             if ($ExtractDir) {
                 if ($null -eq $ExtractDir[$i]) {
-                    $aExtractDir = $ExtractDir[$i]
-                } else {
                     $aExtractDir = $ExtractDir[-1]
+                } else {
+                    $aExtractDir = $ExtractDir[$i]
                 }
+            } else {
+                $aExtractDir = $null
             }
             $LogPath = "$(Split-Path $aPath)\innounp.log"
             $ArgList = @('-x', "-d`"$aDestinationPath`"", "`"$aPath`"", '-y')
@@ -289,16 +295,18 @@ function Expand-ZipArchive {
         for ($i = 0; $i -lt $Path.Length; $i++) {
             $aPath = $Path[$i]
             if ($null -eq $DestinationPath[$i]) {
-                $aDestinationPath = $DestinationPath[$i]
-            } else {
                 $aDestinationPath = $DestinationPath[-1]
+            } else {
+                $aDestinationPath = $DestinationPath[$i]
             }
             if ($ExtractDir) {
                 if ($null -eq $ExtractDir[$i]) {
-                    $aExtractDir = $ExtractDir[$i]
-                } else {
                     $aExtractDir = $ExtractDir[-1]
+                } else {
+                    $aExtractDir = $ExtractDir[$i]
                 }
+            } else {
+                $aExtractDir = $null
             }
             if ($aExtractDir) {
                 $OriDestinationPath = $aDestinationPath
