@@ -410,6 +410,7 @@ function Invoke-ExternalCommand {
             $Process.StartInfo.Arguments += " /lwe `"$LogPath`""
         } else {
             $Process.StartInfo.RedirectStandardOutput = $true
+            $Process.StartInfo.RedirectStandardError = $true
         }
     }
     if ($RunAs) {
