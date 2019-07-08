@@ -10,25 +10,41 @@
 
 reset_aliases
 
-# check if scoop needs updating
-$currentdir = fullpath $(versiondir 'scoop' 'current')
-$needs_update = $false
+function needs_update() {
+    # check if scoop needs updating
+    $currentdir = fullpath $(versiondir 'scoop' 'current')
 
-if(test-path "$currentdir\.git") {
+    if (!(Test-Path "$currentdir\.git")) {
+        return $true
+    }
+
     Push-Location $currentdir
     git_fetch -q origin
     $commits = $(git log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
-    if($commits) { $needs_update = $true }
+    if ($commits) { return $true }
     Pop-Location
-}
-else {
-    $needs_update = $true
+
+    Get-LocalBucket | ForEach-Object {
+        $loc = Find-BucketDirectory $_ -Root
+        # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
+        if (($_ -eq 'main') -and !(Test-Path "$loc\.git")) {
+            rm_bucket 'main'
+            add_bucket 'main'
+        }
+
+        Push-Location $loc
+        git_fetch -q origin
+        $commits = $(git log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
+        if ($commits) { return $true }
+        Pop-Location
+    }
 }
 
-if($needs_update) {
+$needs_update = needs_update
+if ($needs_update) {
     warn "Scoop is out of date. Run 'scoop update' to get the latest changes."
 }
-else { success "Scoop is up to date."}
+else { success "Scoop is up to date." }
 
 $failed = @()
 $outdated = @()
