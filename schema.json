@@ -274,6 +274,19 @@
                 },
                 "keep": {
                     "type": "boolean"
+                },
+                "type": {
+                    "enum": [
+                        "inno",
+                        "nsis",
+                        "wix"
+                    ]
+                },
+                "include": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "exclude": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             },
             "type": "object"
@@ -445,7 +458,7 @@
             "type": "string"
         },
         "innosetup": {
-            "description": "True if the installer InnoSetup based. Found in https://github.com/lukesampson/scoop/search?l=JSON&q=innosetup",
+            "description": "Deprecated. Use 'installer.type.inno' instead.",
             "type": "boolean"
         },
         "installer": {
