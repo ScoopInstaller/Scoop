@@ -10,37 +10,33 @@
 
 reset_aliases
 
-function needs_update() {
-    # check if scoop needs updating
-    $currentdir = fullpath $(versiondir 'scoop' 'current')
-
-    if (!(Test-Path "$currentdir\.git")) {
-        return $true
-    }
-
-    Push-Location $currentdir
+function Test-GitRepoLatest($location) {
+    Push-Location $location
     git_fetch -q origin
-    $commits = $(git log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
-    if ($commits) { return $true }
+    $is_behind = (git_status) -like '*is behind*' -as [bool]
     Pop-Location
 
-    Get-LocalBucket | ForEach-Object {
-        $loc = Find-BucketDirectory $_ -Root
-        # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
-        if (($_ -eq 'main') -and !(Test-Path "$loc\.git")) {
-            rm_bucket 'main'
-            add_bucket 'main'
-        }
-
-        Push-Location $loc
-        git_fetch -q origin
-        $commits = $(git log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
-        if ($commits) { return $true }
-        Pop-Location
-    }
+    return !($is_behind)
 }
 
-$needs_update = needs_update
+function Test-ScoopLatest {
+    $currentdir = fullpath $(versiondir 'scoop' 'current')
+    if (!(Test-Path "$currentdir\.git") -or !(Test-GitRepoLatest $currentdir)) {
+        return $false
+    }
+
+    foreach ($bucket in Get-LocalBucket) {
+        $loc = Find-BucketDirectory $bucket -Root
+        if (!(Test-GitRepoLatest $loc)) {
+            return $false
+        }
+    }
+
+    return $true
+}
+
+# check if scoop needs updating
+$needs_update = !(Test-ScoopLatest)
 if ($needs_update) {
     warn "Scoop is out of date. Run 'scoop update' to get the latest changes."
 }
