@@ -34,6 +34,17 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         return
     }
 
+    # Change 'innosetup' to 'installer.type:inno'
+    if ($manifest.innosetup) {
+        if ($manifest.$architecture.installer) {
+            $manifest.$architecture.installer | Add-Member -MemberType NoteProperty -Name type -Value 'inno'
+        } elseif ($manifest.installer) {
+            $manifest.installer | Add-Member -MemberType NoteProperty -Name type -Value 'inno'
+        } else {
+            $manifest | Add-Member -MemberType NoteProperty -Name installer -Value @{ type = 'inno' }
+        }
+    }
+
     write-output "Installing '$app' ($version) [$architecture]"
 
     $dir = ensure (versiondir $app $version $global)
@@ -42,7 +53,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     pre_install $manifest $architecture
-    run_installer $fname $manifest $architecture $dir $global
+    Invoke-InstallerScript -Name $fname -Manifest $manifest -Architecture $architecture -DestinationPath $dir -Global:$global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
@@ -533,24 +544,34 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         $extract_dir = $extract_dirs[$extracted]
         $extract_to = $extract_tos[$extracted]
-
+        $Installer = installer $manifest $architecture
+        $Args = @{
+            Path = "$dir\$fname"
+            DestinationPath = "$dir\$extract_to"
+        }
         # work out extraction method, if applicable
         $extract_fn = $null
-        if ($manifest.innosetup) {
-            $extract_fn = 'Expand-InnoArchive'
-        } elseif($fname -match '\.zip$') {
-            $extract_fn = 'Expand-ZipArchive'
-        } elseif($fname -match '\.msi$') {
-            $extract_fn = 'Expand-MsiArchive'
-        } elseif(Test-7zipRequirement -File $fname) { # 7zip
-            $extract_fn = 'Expand-7zipArchive'
+        if ($Installer.type) {
+            switch ($Installer.type) {
+                'inno' { $ExtractFn = 'Expand-InnoInstaller'; $Args.ExtractDir = $ExtractDirs[$i]; $Args.Include = $Installer.include; $Args.Exclude = $Installer.exclude }
+                'nsis' { $ExtractFn = 'Expand-NsisInstaller'; $Args.Architecture = $Architecture }
+                'wix' { $ExtractFn = 'Expand-WixInstaller'; $Args.Exclude = $Installer.exclude }
+                Default { abort "Error in manifest: installer type $_ is not supported." }
+            }
+        } else {
+            switch -Regex ($fname) {
+                ".*\.zip$" { $extract_fn = 'Expand-ZipArchive' }
+                ".*\.msi$" { $extract_fn = 'Expand-MsiArchive' }
+                { Test-7zipRequirement -File $_ } { $extract_fn = 'Expand-7zipArchive' }
+            }
+            $Args.ExtractDir = $extract_dir
         }
-
-        if($extract_fn) {
+        debug $Args
+        if ($extract_fn) {
             Write-Host "Extracting " -NoNewline
             Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
+            & $extract_fn @Args -Removal
             Write-Host "done." -f Green
             $extracted++
         }
@@ -656,37 +677,52 @@ function args($config, $dir, $global) {
     @()
 }
 
-function run_installer($fname, $manifest, $architecture, $dir, $global) {
-    $installer = installer $manifest $architecture
-    if($installer.script) {
-        write-output "Running installer script..."
-        Invoke-Expression (@($installer.script) -join "`r`n")
+function Invoke-InstallerScript {
+    [CmdletBinding()]
+    param (
+        [String]
+        $Name,
+        [PSObject]
+        $Manifest,
+        [String]
+        $Architecture,
+        [String]
+        $DestinationPath,
+        [Switch]
+        $Global
+    )
+    $Installer = installer $Manifest $Architecture
+
+    if ($Installer.script) {
+        Write-Host "Running installer script..." -NoNewline
+        Invoke-Expression (@($Installer.script) -join "`r`n")
+        Write-Host "done." -f Green
         return
     }
 
-    if ($installer) {
-        install_prog $fname $dir $installer $global
+    if ($Installer.type) {
+        return
     }
-}
 
-function install_prog($fname, $dir, $installer, $global) {
-    $prog = "$dir\$(coalesce $installer.file "$fname")"
-    if(!(is_in_dir $dir $prog)) {
-        abort "Error in manifest: Installer $prog is outside the app directory."
-    }
-    $arg = @(args $installer.args $dir $global)
-
-    if($prog.endswith('.ps1')) {
-        & $prog @arg
-    } else {
-        $installed = Invoke-ExternalCommand $prog $arg -Activity "Running installer..."
-        if(!$installed) {
-            abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
+    if ($Installer) {
+        $prog = "$DestinationPath\$(coalesce $Installer.file "$Name")"
+        if(!(is_in_dir $DestinationPath $prog)) {
+            abort "Error in manifest: Installer $prog is outside the app directory."
         }
+        $arg = @(args $Installer.args $DestinationPath $global)
 
-        # Don't remove installer if "keep" flag is set to true
-        if($installer.keep -ne "true") {
-            Remove-Item $prog
+        if($prog.endswith('.ps1')) {
+            & $prog @arg
+        } else {
+            $installed = Invoke-ExternalCommand $prog $arg -Activity "Running installer..."
+            if(!$installed) {
+                abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
+            }
+
+            # Don't remove installer if "keep" flag is set to true
+            if($Installer.keep -ne "true") {
+                Remove-Item $prog
+            }
         }
     }
 }

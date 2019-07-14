@@ -57,12 +57,7 @@ function Test-InnounpRequirement {
         [String]
         $Architecture
     )
-    $Installer = installer $Manifest $Architecture
-    if (($Installer.type -eq "inno") -or $Manifest.innosetup) {
-        return $true
-    } else {
-        return $false
-    }
+    return (installer $Manifest $Architecture).type -eq 'inno'
 }
 
 function Test-DarkRequirement {
@@ -76,12 +71,7 @@ function Test-DarkRequirement {
         [String]
         $Architecture
     )
-    $Installer = installer $Manifest $Architecture
-    if (($Installer.type -eq "wix")) {
-        return $true
-    } else {
-        return $false
-    }
+    return (installer $Manifest $Architecture).type -eq 'wix'
 }
 
 function Expand-7zipArchive {
@@ -192,10 +182,10 @@ function Expand-MsiArchive {
     }
     if ($ExtractDir -and (Test-Path "$DestinationPath\SourceDir")) {
         movedir "$DestinationPath\SourceDir\$ExtractDir" $OriDestinationPath | Out-Null
-        Remove-Item $DestinationPath -Recurse -Force
+        Remove-Directory -Path $DestinationPath
     } elseif ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
-        Remove-Item $DestinationPath -Recurse -Force
+        Remove-Directory -Path $DestinationPath
     } elseif (Test-Path "$DestinationPath\SourceDir") {
         movedir "$DestinationPath\SourceDir" $DestinationPath | Out-Null
     }
@@ -231,9 +221,10 @@ function Expand-InnoArchive {
     $LogPath = "$(Split-Path $Path)\innounp.log"
     $ArgList = @('-x', "-d`"$DestinationPath`"", "`"$Path`"", '-y')
     switch -Regex ($ExtractDir) {
-        "^[^{].*" { $ArgList += "-c{app}\$ExtractDir" }
-        "^{.*" { $ArgList += "-c$ExtractDir" }
-        Default { $ArgList += "-c{app}" }
+        "^\.$" { break } # Suppress '-cDIR' param
+        "^[^{].*" { $ArgList += "-c`"{app}\$ExtractDir`""; break }
+        "^{.*" { $ArgList += "-c`"$ExtractDir`""; break }
+        Default { $ArgList += "-c`"{app}`"" }
     }
     if ($Switches) {
         $ArgList += (-split $Switches)
@@ -299,7 +290,7 @@ function Expand-ZipArchive {
     }
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
-        Remove-Item $DestinationPath -Recurse -Force
+        Remove-Directory -Path $DestinationPath
     }
     if ($Removal) {
         # Remove original archive file
@@ -347,7 +338,7 @@ function extract_7zip($path, $to, $removal) {
 
 function extract_msi($path, $to, $removal) {
     Show-DeprecatedWarning $MyInvocation 'Expand-MsiArchive'
-    Expand-MsiArchive -Path $path -DestinationPath $to -Removal:$removal
+    Expand-MsiArchive -Path $path -DestinationPath $to -Removal:$removal @args
 }
 
 function unpack_inno($path, $to, $removal) {
@@ -358,4 +349,151 @@ function unpack_inno($path, $to, $removal) {
 function extract_zip($path, $to, $removal) {
     Show-DeprecatedWarning $MyInvocation 'Expand-ZipArchive'
     Expand-ZipArchive -Path $path -DestinationPath $to -Removal:$removal
+}
+
+function Expand-NsisInstaller {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [String]
+        $Architecture,
+        [Switch]
+        $Removal
+    )
+    Expand-7ZipArchive -Path $Path -DestinationPath $DestinationPath -Removal:$Removal
+    if (Test-Path "$DestinationPath\`$PLUGINSDIR\app-64.7z") {
+        if ($Architecture -eq "64bit") {
+            Expand-7ZipArchive -Path "$DestinationPath\`$PLUGINSDIR\app-64.7z" -DestinationPath $DestinationPath
+        } else {
+            abort "Software doesn't support $Architecture architecture!"
+        }
+    } elseif (Test-Path "$DestinationPath\`$PLUGINSDIR\app-32.7z") {
+        Expand-7ZipArchive -Path "$DestinationPath\`$PLUGINSDIR\app-32.7z" -DestinationPath $DestinationPath
+    }
+    @("*uninst*", "`$*") | ForEach-Object { Get-Item "$DestinationPath\$_" | Remove-Item -Recurse -Force }
+}
+
+function Expand-WixInstaller {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [String[]]
+        $Exclude,
+        [Switch]
+        $Removal
+    )
+    Expand-DarkArchive -Path $Path -DestinationPath (ensure "$DestinationPath\_tmp") -Removal:$Removal
+    if ($Exclude) {
+        Remove-Item "$DestinationPath\_tmp\AttachedContainer\*.msi" -Include $Exclude -Force
+    }
+    Get-ChildItem "$DestinationPath\_tmp\AttachedContainer\*.msi" | ForEach-Object { Expand-MsiArchive $_ $DestinationPath }
+    Remove-Directory -Path "$DestinationPath\_tmp"
+}
+
+function ConvertFrom-Inno {
+    [CmdletBinding()]
+    [OutputType([Hashtable])]
+    param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [System.Array]
+        $InputObject,
+        [String[]]
+        $Include,
+        [String[]]
+        $Exclude
+    )
+
+    $FileList = New-Object System.Collections.Generic.List[System.Object]
+    $Files = $InputObject -match '^Source:'
+    foreach ($File in $Files) {
+        if ($File -match 'Source: "(?<source>(?<srcdir>[^\\]*).*?)"; DestDir: "(?<destdir>.*?)"; (?:DestName: "(?<destname>.*?)"; )?(?:Components: (?<components>.*?);)?') {
+            $FileList.Add([PSCustomObject]@{source = $Matches.source; srcdir = $Matches.srcdir; destdir = $Matches.destdir; destname = $Matches.destname; components = $Matches.components })
+        }
+    }
+    if ($FileList.components) {
+        $Comps = $FileList.components | Select-Object -Unique
+        $IncludeComps = @()
+        $ExcludeComps = @()
+        if ($Include) {
+            $Include = $Include -split '\\' | Select-Object -Unique
+            foreach ($IncFile in $Include) {
+                $IncFile = '\b' + [Regex]::Escape($IncFile) + '\b'
+                $IncludeComps += $Comps | Where-Object {
+                    ($_ -match "$IncFile") -and ($_ -notmatch "not[^(]*?\(?[^(]*?$IncFile")
+                }
+                $ExcludeComps += $Comps | Where-Object { $_ -match "not[^(]*?\(?[^(]*?$IncFile" }
+            }
+        }
+        if ($Exclude) {
+            foreach ($ExcFile in $Exclude) {
+                $ExcFile = '\b' + [Regex]::Escape($ExcFile) + '\b'
+                $ExcludeComps += $Comps | Where-Object { ($_ -match "$ExcFile") -and ($_ -notmatch "not[^(]*?\(?[^(]*?$ExcFile") -and ($_ -notmatch "or[^(]*?$ExcFile") -and ($_ -notmatch "$ExcFile[^(]*?or") }
+            }
+            $IncludeComps = $IncludeComps | Where-Object { $_ -notin $ExcludeComps }
+        }
+        $Included = $FileList | Where-Object { $_.components -in $IncludeComps }
+        $Excluded = $FileList | Where-Object { $_.components -in $ExcludeComps }
+    }
+
+    return @{
+        FileList = $FileList;
+        Excluded = $Excluded;
+        Included = $Included;
+        Extracted = ($FileList.srcdir | Select-Object -Unique) -ne '{tmp}'
+    }
+}
+
+function Expand-InnoInstaller {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [String]
+        $ExtractDir,
+        [String[]]
+        $Include,
+        [String[]]
+        $Exclude,
+        [Switch]
+        $Removal
+    )
+    if ($ExtractDir) {
+        Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal:$Removal
+    } else {
+        Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir '.' -Switches 'install_script.iss' # Just extract install script
+        $InstallScript = Get-Content -Path "$DestinationPath\install_script.iss"
+        $InnoFiles = ConvertFrom-Inno -InputObject $InstallScript -Include $Include -Exclude ($Exclude -notlike '{*}')
+        $InnoFiles.Extracted | Where-Object { $_ -notin ($Exclude -like '{*}') } | ForEach-Object {
+            Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $_ -Switches '-a'
+        }
+        if ($InnoFiles.Excluded) {
+            ($InnoFiles.Excluded.source -replace "{.*?}", "$DestinationPath") | Remove-Item -Force -ErrorAction Ignore
+        }
+        if ($InnoFiles.Included) {
+            $InnoFiles.Included | Where-Object { $_.source -match ',' } | Rename-Item -Path { $_.source -replace "{.*?}", "$DestinationPath" } -NewName { $_.destname } -Force -ErrorAction Ignore
+        }
+        Get-ChildItem -Path $DestinationPath -Filter '*,*' -Recurse | Rename-Item -NewName { $_.name -Replace ',\d', '' } -Force -ErrorAction Ignore
+        Get-ChildItem -Path $DestinationPath -Filter '*,*' -Recurse | Remove-Item -Force -ErrorAction Ignore
+        Remove-Directory -Path $DestinationPath -OnlyEmpty
+        Remove-Item -Path "$DestinationPath\install_script.iss" -Force
+
+        if ($Removal) {
+            # Remove original archive file
+            Remove-Item -Path $Path -Force
+        }
+    }
 }
