@@ -69,6 +69,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     success "'$app' ($version) was installed successfully!"
 
     show_notes $manifest $dir $original_dir $persist_dir
+
+    hook $app 'post_install'
 }
 
 function locate($app, $bucket) {
@@ -1162,5 +1164,23 @@ function persist_permission($manifest, $global) {
         $acl = Get-Acl -Path $path
         $acl.SetAccessRule($target_rule)
         $acl | Set-Acl -Path $path
+    }
+}
+
+function hook($app, $suffix) {
+    If (get_config 'hooks-enabled') {
+        Write-Output "Running $suffix hook..."
+        # Prevent severe errors in hook file from halting scoop execution
+        trap { # Neither mild nor severe errors are suppressed
+            Write-Output "$suffix hook: terminated with error."
+        }
+        try {
+            # Call operator allows scope inheritance, but prevents hooks from messing up current scope
+            & "$scoopdir\hooks\$($app)_$suffix.ps1"
+            Write-Output "$suffix hook: execution complete."
+        }
+        catch [System.Management.Automation.CommandNotFoundException] {
+            Write-Output "$suffix hook: not found."
+        }
     }
 }
