@@ -373,7 +373,7 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
 }
 
 function Invoke-ExternalCommand {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "Default")]
     [OutputType([Boolean])]
     param (
         [Parameter(Mandatory = $true,
@@ -386,6 +386,7 @@ function Invoke-ExternalCommand {
         [Alias("Args")]
         [String[]]
         $ArgumentList,
+        [Parameter(ParameterSetName = "UseShellExecute")]
         [Switch]
         $RunAs,
         [Alias("Msg")]
@@ -394,6 +395,7 @@ function Invoke-ExternalCommand {
         [Alias("cec")]
         [Hashtable]
         $ContinueExitCodes,
+        [Parameter(ParameterSetName = "Default")]
         [Alias("Log")]
         [String]
         $LogPath
@@ -410,9 +412,11 @@ function Invoke-ExternalCommand {
             $Process.StartInfo.Arguments += " /lwe `"$LogPath`""
         } else {
             $Process.StartInfo.RedirectStandardOutput = $true
+            $Process.StartInfo.RedirectStandardError = $true
         }
     }
     if ($RunAs) {
+        $Process.StartInfo.UseShellExecute = $true
         $Process.StartInfo.Verb = 'RunAs'
     }
     try {
