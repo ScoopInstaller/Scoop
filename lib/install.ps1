@@ -222,7 +222,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--no-conf=true"
         "--follow-metalink=true"
         "--metalink-preferred-protocol=https"
-        "--min-tls-version=SSLv3"
+        "--min-tls-version=TLSv1"
         "--stop-with-process=$PID"
         "--continue"
     )
