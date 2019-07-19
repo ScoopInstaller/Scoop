@@ -10,33 +10,33 @@
 
 reset_aliases
 
-function Test-GitRepoLatest($location) {
+function Test-IsGitRepositoryBehind($location) {
     Push-Location $location
     git_fetch -q origin
     $is_behind = (git_status) -like '*is behind*' -as [bool]
     Pop-Location
 
-    return !($is_behind)
+    return $is_behind
 }
 
-function Test-ScoopLatest {
-    $currentdir = fullpath $(versiondir 'scoop' 'current')
-    if (!(Test-Path "$currentdir\.git") -or !(Test-GitRepoLatest $currentdir)) {
-        return $false
+function Test-IsScoopBehind {
+    $currentdir = fullpath (versiondir 'scoop' 'current')
+    if (!(Test-Path "$currentdir\.git") -or (Test-IsGitRepositoryBehind $currentdir)) {
+        return $true
     }
 
     foreach ($bucket in Get-LocalBucket) {
         $loc = Find-BucketDirectory $bucket -Root
-        if (!(Test-GitRepoLatest $loc)) {
-            return $false
+        if (Test-IsGitRepositoryBehind $loc) {
+            return $true
         }
     }
 
-    return $true
+    return $false
 }
 
 # check if scoop needs updating
-$needs_update = !(Test-ScoopLatest)
+$needs_update = Test-IsScoopBehind
 if ($needs_update) {
     warn "Scoop is out of date. Run 'scoop update' to get the latest changes."
 }
