@@ -203,7 +203,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
     $urls = @(url $manifest $architecture)
 
     # aria2 input file
-    $urlstxt = "$cachedir\$app.txt"
+    $urlstxt = Join-Path $cachedir "$app.txt"
     $urlstxt_content = ''
     $has_downloads = $false
 
