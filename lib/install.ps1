@@ -555,33 +555,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            ensure "$dir\_tmp" | Out-Null
-            & $extract_fn "$dir\$fname" "$dir\_tmp" -Removal
-            if ($extract_to) {
-                ensure "$dir\$extract_to" | Out-Null
-            }
-            # fails if zip contains long paths (e.g. atom.json)
-            #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            try {
-                movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
-            }
-            catch {
-                error $_
-                abort $(new_issue_msg $app $bucket "extract_dir error")
-            }
-
-            if(Test-Path "$dir\_tmp") { # might have been moved by movedir
-                try {
-                    Remove-Item -r -force "$dir\_tmp" -ea stop
-                } catch [system.io.pathtoolongexception] {
-                    & "$env:COMSPEC" /c "rmdir /s /q $dir\_tmp"
-                } catch [system.unauthorizedaccessexception] {
-                    warn "Couldn't remove $dir\_tmp: unauthorized access."
-                }
-            }
-
+            & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
             Write-Host "done." -f Green
-
             $extracted++
         }
     }
@@ -686,37 +661,6 @@ function args($config, $dir, $global) {
     @()
 }
 
-function run($exe, $arg, $msg, $continue_exit_codes) {
-    if($msg) { write-host "$msg " -nonewline }
-    try {
-        #Allow null/no arguments to be passed
-        $parameters = @{ }
-        if ($arg)
-        {
-            $parameters.arg = $arg;
-        }
-
-        # Don't use Start-Process -Wait
-        # https://github.com/PowerShell/PowerShell/issues/6561
-        $proc = start-process $exe -ea stop -passthru @parameters
-        $proc | Wait-Process
-
-
-        if($proc.exitcode -ne 0) {
-            if($continue_exit_codes -and ($continue_exit_codes.containskey($proc.exitcode))) {
-                warn $continue_exit_codes[$proc.exitcode]
-                return $true
-            }
-            write-host "Exit code was $($proc.exitcode)."; return $false
-        }
-    } catch {
-        write-host -f darkred $_.exception.tostring()
-        return $false
-    }
-    if($msg) { Write-Host "done." -f Green }
-    return $true
-}
-
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
     # MSI or other installer
     $msi = msi $manifest $architecture
@@ -753,7 +697,7 @@ function install_msi($fname, $dir, $msi) {
 
     $continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
 
-    $installed = run 'msiexec' $arg "Running installer..." $continue_exit_codes
+    $installed = Invoke-ExternalCommand 'msiexec' $arg -Activity "Running installer..." -ContinueExitCodes $continue_exit_codes
     if(!$installed) {
         abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
     }
@@ -785,7 +729,7 @@ function install_prog($fname, $dir, $installer, $global) {
     if($prog.endswith('.ps1')) {
         & $prog @arg
     } else {
-        $installed = run $prog $arg "Running installer..."
+        $installed = Invoke-ExternalCommand $prog $arg -Activity "Running installer..."
         if(!$installed) {
             abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
         }
@@ -837,7 +781,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
             if($exe.endswith('.ps1')) {
                 & $exe @arg
             } else {
-                $uninstalled = run $exe $arg "Running uninstaller..." $continue_exit_codes
+                $uninstalled = Invoke-ExternalCommand $exe $arg -Activity "Running uninstaller..." -ContinueExitCodes $continue_exit_codes
                 if(!$uninstalled) { abort "Uninstallation aborted." }
             }
         }
@@ -949,7 +893,7 @@ function unlink_current($versiondir) {
         attrib $currentdir -R /L
 
         # remove the junction
-        & "$env:COMSPEC" /c "rmdir $currentdir"
+        & "$env:COMSPEC" /c "rmdir `"$currentdir`""
         return $currentdir
     }
     return $versiondir
@@ -1200,10 +1144,10 @@ function unlink_persist_data($dir) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
                 # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+                & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
             } else {
                 # remove the hard link
-                & "$env:COMSPEC" /c "del $filepath"
+                & "$env:COMSPEC" /c "del `"$filepath`""
             }
         }
     }
