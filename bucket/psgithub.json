@@ -1,9 +1,0 @@
-{
-    "version": "2017.01.22",
-    "url": "https://github.com/pcgeek86/PSGitHub/archive/3e05a8faa50106c4f339696b0b08b065ae96bb7d.zip",
-    "hash": "6f34c7041b1b8262fddf0d66cd7a165bbe78a0d40701a682b8ddd8c0d20f74b0",
-    "extract_dir": "PSGitHub-3e05a8faa50106c4f339696b0b08b065ae96bb7d",
-    "psmodule": {
-        "name": "PSGitHub"
-    }
-}
