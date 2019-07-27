@@ -22,27 +22,31 @@
 .PARAMETER SkipUpdated
     Updated manifests will not be shown.
 .EXAMPLE
-    PS REPODIR > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
+    PS BUCKETROOT > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
 .EXAMPLE
-    PS REPODIR > .\bin\auto-pr.ps1 -Push
+    PS BUCKETROOT > .\bin\auto-pr.ps1 -Push
     Update all manifests inside 'bucket/' directory.
 #>
+
 param(
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!($_ -match '^(.*)\/(.*):(.*)$')) {
             throw 'Upstream must be in this format: <user>/<repo>:<branch>'
         }
         $true
     })]
-    [String] $Upstream = 'lukesampson/scoop:master',
+    [String] $Upstream,
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
+        } else {
+            $true
         }
-        $true
     })]
-    [String] $Dir = "$PSScriptRoot\..\bucket",
+    [String] $Dir,
     [Switch] $Push,
     [Switch] $Request,
     [Switch] $Help,

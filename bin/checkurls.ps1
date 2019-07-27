@@ -13,6 +13,7 @@
 #>
 param(
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -20,14 +21,13 @@ param(
             $true
         }
     })]
-    [String] $Dir = "$PSScriptRoot\\..\bucket",
+    [String] $Dir,
     [Int] $Timeout = 5,
     [Switch] $SkipValid
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\config.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 
 $Dir = Resolve-Path $Dir

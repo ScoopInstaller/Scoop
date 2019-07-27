@@ -11,7 +11,7 @@ function nightly_version($date, $quiet = $false) {
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $bucket, $null = parse_app $app
-    $app, $manifest, $bucket, $url = locate $app $bucket
+    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
@@ -41,7 +41,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
@@ -73,6 +72,11 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 }
 
 function locate($app, $bucket) {
+    Show-DeprecatedWarning $MyInvocation 'Find-Manifest'
+    return Find-Manifest $app $bucket
+}
+
+function Find-Manifest($app, $bucket) {
     $manifest, $url = $null, $null
 
     # check if app is a URL or UNC path
@@ -103,7 +107,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     $cached = fullpath (cache_path $app $version $url)
 
     if(!(test-path $cached) -or !$use_cache) {
-        $null = ensure $cachedir
+        ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
@@ -274,7 +278,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         Set-Content -Path $urlstxt $urlstxt_content
 
         # build aria2 command
-        $aria2 = "& '$(aria2_path)' $($options -join ' ')"
+        $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
         Write-Host "Starting download with aria2 ..."
@@ -492,7 +496,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extracted = 0;
 
     # download first
-    if(aria2_enabled) {
+    if(Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach($url in $urls) {
@@ -532,62 +536,27 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         # work out extraction method, if applicable
         $extract_fn = $null
-        if($fname -match '\.zip$') {
-            $extract_fn = 'extract_zip'
+        if ($manifest.innosetup) {
+            $extract_fn = 'Expand-InnoArchive'
+        } elseif($fname -match '\.zip$') {
+            $extract_fn = 'Expand-ZipArchive'
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
-            $msi = msi $manifest $architecture
-            if(!$msi) {
-                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
-                if ($useLessMsi -eq $true) {
-                    $extract_fn, $extract_dir = lessmsi_config $extract_dir
-                }
-                else {
-                    $extract_fn = 'extract_msi'
-                }
-            } else {
+            if(msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
+            } else {
+                $extract_fn = 'Expand-MsiArchive'
             }
-        } elseif(file_requires_7zip $fname) { # 7zip
-            if(!(7zip_installed)) {
-                warn "Aborting. You'll need to run 'scoop uninstall $app' to clean up."
-                abort "7-zip is required. You can install it with 'scoop install 7zip'."
-            }
-            $extract_fn = 'extract_7zip'
+        } elseif(Test-7zipRequirement -File $fname) { # 7zip
+            $extract_fn = 'Expand-7zipArchive'
         }
 
         if($extract_fn) {
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            $null = mkdir "$dir\_tmp"
-            & $extract_fn "$dir\$fname" "$dir\_tmp"
-            Remove-Item "$dir\$fname"
-            if ($extract_to) {
-                $null = mkdir "$dir\$extract_to" -force
-            }
-            # fails if zip contains long paths (e.g. atom.json)
-            #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            try {
-                movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
-            }
-            catch {
-                error $_
-                abort $(new_issue_msg $app $bucket "extract_dir error")
-            }
-
-            if(test-path "$dir\_tmp") { # might have been moved by movedir
-                try {
-                    Remove-Item -r -force "$dir\_tmp" -ea stop
-                } catch [system.io.pathtoolongexception] {
-                    & "$env:COMSPEC" /c "rmdir /s /q $dir\_tmp"
-                } catch [system.unauthorizedaccessexception] {
-                    warn "Couldn't remove $dir\_tmp: unauthorized access."
-                }
-            }
-
+            & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
             Write-Host "done." -f Green
-
             $extracted++
         }
     }
@@ -669,7 +638,7 @@ function check_hash($file, $hash, $app_name) {
 
 function compute_hash($file, $algname) {
     try {
-        if([bool](Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) -eq $true) {
+        if(Test-CommandAvailable Get-FileHash) {
             return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
             $fs = [system.io.file]::openread($file)
@@ -686,43 +655,10 @@ function compute_hash($file, $algname) {
     return ''
 }
 
-function cmd_available($cmd) {
-    try { Get-Command $cmd -ea stop | out-null } catch { return $false }
-    $true
-}
-
 # for dealing with installers
 function args($config, $dir, $global) {
     if($config) { return $config | ForEach-Object { (format $_ @{'dir'=$dir;'global'=$global}) } }
     @()
-}
-
-function run($exe, $arg, $msg, $continue_exit_codes) {
-    if($msg) { write-host "$msg " -nonewline }
-    try {
-        #Allow null/no arguments to be passed
-        $parameters = @{ }
-        if ($arg)
-        {
-            $parameters.arg = $arg;
-        }
-
-        $proc = start-process $exe -wait -ea stop -passthru @parameters
-
-
-        if($proc.exitcode -ne 0) {
-            if($continue_exit_codes -and ($continue_exit_codes.containskey($proc.exitcode))) {
-                warn $continue_exit_codes[$proc.exitcode]
-                return $true
-            }
-            write-host "Exit code was $($proc.exitcode)."; return $false
-        }
-    } catch {
-        write-host -f darkred $_.exception.tostring()
-        return $false
-    }
-    if($msg) { Write-Host "done." -f Green }
-    return $true
 }
 
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
@@ -761,7 +697,7 @@ function install_msi($fname, $dir, $msi) {
 
     $continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
 
-    $installed = run 'msiexec' $arg "Running installer..." $continue_exit_codes
+    $installed = Invoke-ExternalCommand 'msiexec' $arg -Activity "Running installer..." -ContinueExitCodes $continue_exit_codes
     if(!$installed) {
         abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
     }
@@ -793,7 +729,7 @@ function install_prog($fname, $dir, $installer, $global) {
     if($prog.endswith('.ps1')) {
         & $prog @arg
     } else {
-        $installed = run $prog $arg "Running installer..."
+        $installed = Invoke-ExternalCommand $prog $arg -Activity "Running installer..."
         if(!$installed) {
             abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
         }
@@ -845,7 +781,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
             if($exe.endswith('.ps1')) {
                 & $exe @arg
             } else {
-                $uninstalled = run $exe $arg "Running uninstaller..." $continue_exit_codes
+                $uninstalled = Invoke-ExternalCommand $exe $arg -Activity "Running uninstaller..." -ContinueExitCodes $continue_exit_codes
                 if(!$uninstalled) { abort "Uninstallation aborted." }
             }
         }
@@ -957,7 +893,7 @@ function unlink_current($versiondir) {
         attrib $currentdir -R /L
 
         # remove the junction
-        & "$env:COMSPEC" /c "rmdir $currentdir"
+        & "$env:COMSPEC" /c "rmdir `"$currentdir`""
         return $currentdir
     }
     return $versiondir
@@ -1173,7 +1109,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # we don't have persist data in the store, move the source to target, then create link
             } elseif (Test-Path $source) {
                 # ensure target parent folder exist
-                $null = ensure (Split-Path -Path $target)
+                ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
             # we don't have neither source nor target data! we need to crate an empty target,
             # but we can't make a judgement that the data should be a file or directory...
@@ -1208,10 +1144,10 @@ function unlink_persist_data($dir) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
                 # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+                & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
             } else {
                 # remove the hard link
-                & "$env:COMSPEC" /c "del $filepath"
+                & "$env:COMSPEC" /c "del `"$filepath`""
             }
         }
     }

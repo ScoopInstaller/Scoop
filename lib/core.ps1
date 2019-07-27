@@ -1,25 +1,3 @@
-# Note: The default directory changed from ~/AppData/Local/scoop to ~/scoop
-#       on 1 Nov, 2016 to work around long paths used by NodeJS.
-#       Old installations should continue to work using the old path.
-#       There is currently no automatic migration path to deal
-#       with updating old installations to the new path.
-$scoopdir = $env:SCOOP, "$env:USERPROFILE\scoop" | Select-Object -first 1
-
-$oldscoopdir = "$env:LOCALAPPDATA\scoop"
-if((test-path $oldscoopdir) -and !$env:SCOOP) {
-    $scoopdir = $oldscoopdir
-}
-
-$globaldir = $env:SCOOP_GLOBAL, "$env:ProgramData\scoop" | Select-Object -first 1
-
-# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
-#       is experimental and untested. There may be concurrency issues when
-#       multiple users write and access cached files at the same time.
-#       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, "$scoopdir\cache" | Select-Object -first 1
-
-# Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
-# for all communication with api.github.com
 function Optimize-SecurityProtocol {
     # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
     # which allows the operating system to choose the best protocol to use.
@@ -36,7 +14,6 @@ function Optimize-SecurityProtocol {
         [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
     }
 }
-Optimize-SecurityProtocol
 
 function Get-UserAgent() {
     return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
@@ -56,6 +33,78 @@ function Show-DeprecatedWarning {
 
     warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
     Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
+}
+
+function load_cfg($file) {
+    if(!(Test-Path $file)) {
+        return $null
+    }
+
+    try {
+        return (Get-Content $file -Raw | ConvertFrom-Json -ErrorAction Stop)
+    } catch {
+        Write-Host "ERROR loading $file`: $($_.exception.message)"
+    }
+}
+
+function get_config($name, $default) {
+    if($null -eq $scoopConfig.$name -and $null -ne $default) {
+        return $default
+    }
+    return $scoopConfig.$name
+}
+
+function set_config($name, $value) {
+    if($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
+        ensure (Split-Path -Path $configFile) | Out-Null
+        $scoopConfig = New-Object PSObject
+        $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
+    } else {
+        if($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
+            $value = [System.Convert]::ToBoolean($value)
+        }
+        if($null -eq $scoopConfig.$name) {
+            $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
+        } else {
+            $scoopConfig.$name = $value
+        }
+    }
+
+    if($null -eq $value) {
+        $scoopConfig.PSObject.Properties.Remove($name)
+    }
+
+    ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding ASCII
+    return $scoopConfig
+}
+
+function setup_proxy() {
+    # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
+    $proxy = get_config 'proxy'
+    if(!$proxy) {
+        return
+    }
+    try {
+        $credentials, $address = $proxy -split '(?<!\\)@'
+        if(!$address) {
+            $address, $credentials = $credentials, $null # no credentials supplied
+        }
+
+        if($address -eq 'none') {
+            [net.webrequest]::defaultwebproxy = $null
+        } elseif($address -ne 'default') {
+            [net.webrequest]::defaultwebproxy = new-object net.webproxy "http://$address"
+        }
+
+        if($credentials -eq 'currentuser') {
+            [net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
+        } elseif($credentials) {
+            $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])','$1' }
+            [net.webrequest]::defaultwebproxy.credentials = new-object net.networkcredential($username, $password)
+        }
+    } catch {
+        warn "Failed to use proxy '$proxy': $($_.exception.message)"
+    }
 }
 
 # helper functions
@@ -152,40 +201,89 @@ function installed_apps($global) {
 }
 
 function file_path($app, $file) {
+    Show-DeprecatedWarning $MyInvocation 'Get-AppFilePath'
+    Get-AppFilePath -App $app -File $file
+}
+
+function Get-AppFilePath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [String]
+        $App,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $File
+    )
+
     # normal path to file
-    $path = "$(versiondir $app 'current' $false)\$file"
-    if(Test-Path($path)) {
-        return $path
+    $Path = "$(versiondir $App 'current' $false)\$File"
+    if(Test-Path $Path) {
+        return $Path
     }
 
     # global path to file
-    $path = "$(versiondir $app 'current' $true)\$file"
-    if(Test-Path($path)) {
-        return $path
+    $Path = "$(versiondir $App 'current' $true)\$File"
+    if(Test-Path $Path) {
+        return $Path
     }
 
     # not found
     return $null
 }
 
-function 7zip_path() {
-    return (file_path '7zip' '7z.exe')
+Function Test-CommandAvailable {
+    param (
+        [String]$Name
+    )
+    Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
-function 7zip_installed() {
-    return ![String]::IsNullOrWhiteSpace("$(7zip_path)")
+function Get-HelperPath {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [String]
+        $Helper
+    )
+
+    $HelperPath = $null
+    switch ($Helper) {
+        '7zip' {
+            $HelperPath = Get-AppFilePath '7zip' '7z.exe'
+            if([String]::IsNullOrEmpty($HelperPath)) {
+                $HelperPath = Get-AppFilePath '7zip-zstd' '7z.exe'
+            }
+        }
+        'Lessmsi' { $HelperPath = Get-AppFilePath 'lessmsi' 'lessmsi.exe' }
+        'Innounp' { $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe' }
+        'Dark' {
+            $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
+            if([String]::IsNullOrEmpty($HelperPath)) {
+                $HelperPath = Get-AppFilePath 'wixtoolset' 'dark.exe'
+            }
+        }
+        'Aria2' { $HelperPath = Get-AppFilePath 'aria2' 'aria2c.exe' }
+    }
+
+    return $HelperPath
 }
 
-function aria2_path() {
-    return (file_path 'aria2' 'aria2c.exe')
+function Test-HelperInstalled {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [String]
+        $Helper
+    )
+
+    return ![String]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
 }
 
-function aria2_installed() {
-    return ![String]::IsNullOrWhiteSpace("$(aria2_path)")
-}
-
-function aria2_enabled() {
-    return (aria2_installed) -and (get_config 'aria2-enabled' $true)
+function Test-Aria2Enabled {
+    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
 function app_status($app, $global) {
@@ -197,6 +295,7 @@ function app_status($app, $global) {
     $install_info = install_info $app $status.version $global
 
     $status.failed = (!$install_info -or !$status.version)
+    $status.hold = ($install_info.hold -eq $true)
 
     $manifest = manifest $app $install_info.bucket $install_info.url
     $status.removed = (!$manifest)
@@ -267,6 +366,93 @@ function is_local($path) {
 }
 
 # operations
+
+function run($exe, $arg, $msg, $continue_exit_codes) {
+    Show-DeprecatedWarning $MyInvocation 'Invoke-ExternalCommand'
+    Invoke-ExternalCommand -FilePath $exe -ArgumentList $arg -Activity $msg -ContinueExitCodes $continue_exit_codes
+}
+
+function Invoke-ExternalCommand {
+    [CmdletBinding(DefaultParameterSetName = "Default")]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true,
+                   Position = 0)]
+        [Alias("Path")]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $FilePath,
+        [Parameter(Position = 1)]
+        [Alias("Args")]
+        [String[]]
+        $ArgumentList,
+        [Parameter(ParameterSetName = "UseShellExecute")]
+        [Switch]
+        $RunAs,
+        [Alias("Msg")]
+        [String]
+        $Activity,
+        [Alias("cec")]
+        [Hashtable]
+        $ContinueExitCodes,
+        [Parameter(ParameterSetName = "Default")]
+        [Alias("Log")]
+        [String]
+        $LogPath
+    )
+    if ($Activity) {
+        Write-Host "$Activity " -NoNewline
+    }
+    $Process = New-Object System.Diagnostics.Process
+    $Process.StartInfo.FileName = $FilePath
+    $Process.StartInfo.Arguments = ($ArgumentList | Select-Object -Unique) -join ' '
+    $Process.StartInfo.UseShellExecute = $false
+    if ($LogPath) {
+        if ($FilePath -match '(^|\W)msiexec($|\W)') {
+            $Process.StartInfo.Arguments += " /lwe `"$LogPath`""
+        } else {
+            $Process.StartInfo.RedirectStandardOutput = $true
+            $Process.StartInfo.RedirectStandardError = $true
+        }
+    }
+    if ($RunAs) {
+        $Process.StartInfo.UseShellExecute = $true
+        $Process.StartInfo.Verb = 'RunAs'
+    }
+    try {
+        $Process.Start() | Out-Null
+    } catch {
+        if ($Activity) {
+            Write-Host "error." -ForegroundColor DarkRed
+        }
+        error $_.Exception.Message
+        return $false
+    }
+    if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
+        Out-File -FilePath $LogPath -Encoding ASCII -Append -InputObject $Process.StandardOutput.ReadToEnd()
+    }
+    $Process.WaitForExit()
+    if ($Process.ExitCode -ne 0) {
+        if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
+            if ($Activity) {
+                Write-Host "done." -ForegroundColor DarkYellow
+            }
+            warn $ContinueExitCodes[$Process.ExitCode]
+            return $true
+        } else {
+            if ($Activity) {
+                Write-Host "error." -ForegroundColor DarkRed
+            }
+            error "Exit code was $($Process.ExitCode)!"
+            return $false
+        }
+    }
+    if ($Activity) {
+        Write-Host "done." -ForegroundColor Green
+    }
+    return $true
+}
+
 function dl($url,$to) {
     $wc = New-Object Net.Webclient
     $wc.headers.add('Referer', (strip_filename $url))
@@ -390,14 +576,14 @@ function shim($path, $global, $name, $arg) {
         "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     }
 
-    if($path -match '\.exe$') {
+    if($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
         Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
         }
-    } elseif($path -match '\.((bat)|(cmd))$') {
+    } elseif($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
@@ -454,24 +640,39 @@ function ensure_architecture($architecture_opt) {
     }
 }
 
-function ensure_all_installed($apps, $global) {
-    $installed = @()
-    $apps | Select-Object -Unique | Where-Object { $_.name -ne 'scoop' } | ForEach-Object {
-        $app, $null, $null = parse_app $_
-        if(installed $app $false) {
-            $installed += ,@($app, $false)
-        } elseif (installed $app $true) {
-            if($global) {
-                $installed += ,@($app, $true)
+function Confirm-InstallationStatus {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Apps,
+        [Switch]
+        $Global
+    )
+    $Installed = @()
+    $Apps | Select-Object -Unique | Where-Object { $_.Name -ne 'scoop' } | ForEach-Object {
+        $App, $null, $null = parse_app $_
+        if ($Global) {
+            if (installed $App $true) {
+                $Installed += ,@($App, $true)
+            } elseif (installed $App $false) {
+                error "'$App' isn't installed globally, but it is installed for your account."
+                warn "Try again without the --global (or -g) flag instead."
             } else {
-                error "'$app' isn't installed for your account, but it is installed globally."
-                warn "Try again with the --global (or -g) flag instead."
+                error "'$App' isn't installed."
             }
         } else {
-            error "'$app' isn't installed."
+            if(installed $App $false) {
+                $Installed += ,@($App, $false)
+            } elseif (installed $App $true) {
+                error "'$App' isn't installed for your account, but it is installed globally."
+                warn "Try again with the --global (or -g) flag instead."
+            } else {
+                error "'$App' isn't installed."
+            }
         }
     }
-    return ,$installed
+    return ,$Installed
 }
 
 function strip_path($orig_path, $dir) {
@@ -502,7 +703,7 @@ function ensure_scoop_in_path($global) {
 }
 
 function ensure_robocopy_in_path {
-    if(!(Get-Command robocopy -ea ignore)) {
+    if(!(Test-CommandAvailable robocopy)) {
         shim "C:\Windows\System32\Robocopy.exe" $false
     }
 }
@@ -728,3 +929,40 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
 
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }
+
+##################
+# Core Bootstrap #
+##################
+
+# Note: Github disabled TLS 1.0 support on 2018-02-23. Need to enable TLS 1.2
+#       for all communication with api.github.com
+Optimize-SecurityProtocol
+
+# Scoop root directory
+$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+
+# Scoop global apps directory
+$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
+
+# Scoop cache directory
+# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
+#       is experimental and untested. There may be concurrency issues when
+#       multiple users write and access cached files at the same time.
+#       Use at your own risk.
+$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
+
+# Scoop config file migration
+$configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
+$configFile = "$configHome\scoop\config.json"
+if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
+    New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
+    Move-Item "$env:USERPROFILE\.scoop" $configFile
+    write-host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
+    write-host "WARN  to '$configFile'" -f darkyellow
+}
+
+# Load Scoop config
+$scoopConfig = load_cfg $configFile
+
+# Setup proxy globally
+setup_proxy

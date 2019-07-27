@@ -1,5 +1,5 @@
 function git_proxy_cmd {
-    $proxy = $(scoop config proxy)
+    $proxy = get_config 'proxy'
     $cmd = "git $($args | ForEach-Object { "$_ " })"
     if($proxy -and $proxy -ne 'none') {
         $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
@@ -13,6 +13,14 @@ function git_clone {
 
 function git_ls_remote {
     git_proxy_cmd ls-remote $args
+}
+
+function git_checkout {
+    git_proxy_cmd checkout $args
+}
+
+function git_branch {
+    git_proxy_cmd branch $args
 }
 
 function git_pull {
@@ -37,4 +45,8 @@ function git_branch {
 
 function git_config {
     git_proxy_cmd config $args
+}
+
+function git_reset {
+    git_proxy_cmd reset $args
 }

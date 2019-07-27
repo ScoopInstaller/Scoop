@@ -6,7 +6,6 @@
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\git.ps1"
 
 reset_aliases
@@ -35,6 +34,7 @@ $failed = @()
 $outdated = @()
 $removed = @()
 $missing_deps = @()
+$onhold = @()
 
 $true, $false | ForEach-Object { # local and global apps
     $global = $_
@@ -52,6 +52,9 @@ $true, $false | ForEach-Object { # local and global apps
         }
         if($status.outdated) {
             $outdated += @{ $app = @($status.version, $status.latest_version) }
+            if($status.hold) {
+                $onhold += @{ $app = @($status.version, $status.latest_version) }
+            }
         }
         if($status.missing_deps) {
             $missing_deps += ,(@($app) + @($status.missing_deps))
@@ -63,6 +66,14 @@ if($outdated) {
     write-host -f DarkCyan 'Updates are available for:'
     $outdated.keys | ForEach-Object {
         $versions = $outdated.$_
+        "    $_`: $($versions[0]) -> $($versions[1])"
+    }
+}
+
+if($onhold) {
+    write-host -f DarkCyan 'These apps are outdated and on hold:'
+    $onhold.keys | ForEach-Object {
+        $versions = $onhold.$_
         "    $_`: $($versions[0]) -> $($versions[1])"
     }
 }
