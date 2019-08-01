@@ -29,14 +29,29 @@ function Compare-Version {
         return 0
     }
 
+    $ReferenceVersion = ($ReferenceVersion -replace '[a-zA-Z]+', '.$&.').Replace('..', '.').Trim('.')
+    $DifferenceVersion = ($DifferenceVersion -replace '[a-zA-Z]+', '.$&.').Replace('..', '.').Trim('.')
+
     $SplitReferenceVersion = @($ReferenceVersion -split $Delimiter | ForEach-Object { if ($_ -match "^\d+$") { [int]$_ } else { $_ } })
     $SplitDifferenceVersion = @($DifferenceVersion -split $Delimiter | ForEach-Object { if ($_ -match "^\d+$") { [int]$_ } else { $_ } })
 
-    for ($i = 0; $i -lt [Math]::Max($ReferenceVersion.Length, $DifferenceVersion.Length); $i++) {
-        if ($i -gt $ReferenceVersion.Length) {
-            return 1
+    for ($i = 0; $i -lt [Math]::Max($SplitReferenceVersion.Length, $SplitDifferenceVersion.Length); $i++) {
+        if ($i -ge $SplitReferenceVersion.Length) {
+            if ($SplitDifferenceVersion[$i] -match "alpha|beta|rc|pre") {
+                return -1
+            } else {
+                return 1
+            }
         }
-        if ($SplitReferenceVersion[$i] -match '\.' -or $SplitDifferenceVersion[$i] -match '\.') {
+        if ($i -ge $SplitDifferenceVersion.Length) {
+            if ($SplitReferenceVersion[$i] -match "alpha|beta|rc|pre") {
+                return 1
+            } else {
+                return -1
+            }
+        }
+
+        if (($SplitReferenceVersion[$i] -match "\.") -or ($SplitDifferenceVersion[$i] -match "\.")) {
             $Result = Compare-Version $SplitReferenceVersion[$i] $SplitDifferenceVersion[$i] -Delimiter '\.'
             if ($Result -ne 0) {
                 return $Result
@@ -45,9 +60,14 @@ function Compare-Version {
             }
         }
 
-        # don't try to compare int to string
-        if ($SplitReferenceVersion[$i] -is [string] -and $SplitDifferenceVersion[$i] -isnot [string]) {
-            $SplitDifferenceVersion[$i] = "$($SplitDifferenceVersion[$i])"
+        if ($null -ne $SplitReferenceVersion[$i] -and $null -ne $SplitDifferenceVersion[$i]) {
+            # don't try to compare int to string
+            if ($SplitReferenceVersion[$i] -is [string] -and $SplitDifferenceVersion[$i] -isnot [string]) {
+                $SplitDifferenceVersion[$i] = "$($SplitDifferenceVersion[$i])"
+            }
+            if ($SplitDifferenceVersion[$i] -is [string] -and $SplitReferenceVersion[$i] -isnot [string]) {
+                $SplitReferenceVersion[$i] = "$($SplitReferenceVersion[$i])"
+            }
         }
 
         if ($SplitDifferenceVersion[$i] -gt $SplitReferenceVersion[$i]) { return 1 }

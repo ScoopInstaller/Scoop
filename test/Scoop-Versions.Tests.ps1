@@ -8,19 +8,25 @@ describe "versions" -Tag 'Scoop' {
 
     it 'handles plain string version comparison to int version' {
         Compare-Version 'latest' '20150405' | Should -Be -1
+        Compare-Version '0.5alpha' '0.5' | Should -Be 1
+        Compare-Version '0.5' '0.5Beta' | Should -Be -1
     }
 
     it 'handles dashed version components' {
         Compare-Version '7.0.4-9' '7.0.4-10' | Should -Be 1
         Compare-Version '7.0.4' '7.0.4-9' | Should -Be 1
+        Compare-Version '7.0.4-beta9' '7.0.4' | Should -Be 1
         Compare-Version '7.0.4-9' '7.0.4-8' | Should -Be -1
+        Compare-Version '7.0.4' '7.0.4-beta9' | Should -Be -1
     }
 
     it 'handle example comparisons' {
         Compare-Version '1' '1.1' | Should -Be 1
         Compare-Version '1.0' '1.1' | Should -Be 1
+        Compare-Version '1.9.8' '1.10.0' | Should -Be 1
         Compare-Version '1.1' '1.0' | Should -Be -1
         Compare-Version '1.1' '1' | Should -Be -1
+        Compare-Version '1.10.0' '1.9.8' | Should -Be -1
         Compare-Version '1.1.1_8' '1.1.1' | Should -Be -1
         Compare-Version '1.1.1b' '1.1.1a' | Should -Be -1
         Compare-Version '1.1.1a' '1.1.1b' | Should -Be 1
