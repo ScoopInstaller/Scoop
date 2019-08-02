@@ -43,5 +43,6 @@ describe "versions" -Tag 'Scoop' {
     it 'handles equal versions' {
         Compare-Version '12.0' '12.0' | Should -Be 0
         Compare-Version '7.0.4-9' '7.0.4-9' | Should -Be 0
+        Compare-Version 'nightly-20190801' 'nightly' | Should -Be 0
     }
 }

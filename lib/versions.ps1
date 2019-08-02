@@ -29,11 +29,12 @@ function Compare-Version {
         return 0
     }
 
-    $ReferenceVersion = ($ReferenceVersion -replace '[a-zA-Z]+', '.$&.').Replace('..', '.').Trim('.')
-    $DifferenceVersion = ($DifferenceVersion -replace '[a-zA-Z]+', '.$&.').Replace('..', '.').Trim('.')
+    $SplitReferenceVersion = @($ReferenceVersion -split $Delimiter | ForEach-Object { if ($_ -match "^\d+$") { [int]$_ } else { ($_ -replace '[a-zA-Z]+', '.$&.').Replace('..', '.').Trim('.') } })
+    $SplitDifferenceVersion = @($DifferenceVersion -split $Delimiter | ForEach-Object { if ($_ -match "^\d+$") { [int]$_ } else { ($_ -replace '[a-zA-Z]+', '.$&.').Replace('..', '.').Trim('.') } })
 
-    $SplitReferenceVersion = @($ReferenceVersion -split $Delimiter | ForEach-Object { if ($_ -match "^\d+$") { [int]$_ } else { $_ } })
-    $SplitDifferenceVersion = @($DifferenceVersion -split $Delimiter | ForEach-Object { if ($_ -match "^\d+$") { [int]$_ } else { $_ } })
+    if ($SplitReferenceVersion[0] -eq 'nightly' -and $SplitDifferenceVersion[0] -eq 'nightly') {
+        return 0
+    }
 
     for ($i = 0; $i -lt [Math]::Max($SplitReferenceVersion.Length, $SplitDifferenceVersion.Length); $i++) {
         if ($i -ge $SplitReferenceVersion.Length) {
