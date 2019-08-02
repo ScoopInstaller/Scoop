@@ -204,4 +204,4 @@ if ($Push) {
     execute 'hub checkout -f master'
 }
 
-execute 'hub reset'
+execute 'hub reset --hard'
