@@ -28,7 +28,7 @@ function Test-Persistence {
             if ($Execution) {
                 & $Execution
             } else {
-                $cont = if ($Content.Count -le $ind) { $Content[$ind] } else { $null } # $null when there is none specified on this index
+                $cont = if ($Content.Count -lt $ind) { $Content[$ind] } else { $null } # $null when there is none specified on this index
                 $path = (Join-Path $dir $f)
 
                 New-Item -Path $path -Force | Out-Null
