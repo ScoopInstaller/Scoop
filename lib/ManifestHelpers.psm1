@@ -22,7 +22,7 @@ function Test-Persistence {
 
     for ($ind = 0; $ind -lt $File.Count; ++$ind) {
         $f = $File[$ind]
-        $cont = $Content[$ind] # $null when there is none specified on this index
+        $cont = if ($Content.Count -lt $ind) { $Content[$ind] } else { $null } # $null when there is none specified on this index
         # PWSH has UTF-8 without BOM while, <=5 is using UTF-8 with bom
         $enc = if ($PSVersionTable.PSVersion.Major -ge 6) { 'UTF-8' } else { 'ASCII' }
 
@@ -30,8 +30,7 @@ function Test-Persistence {
             if ($Execution) {
                 & $Execution
             } else {
-                Set-Content (Join-Path $dir $f) -ItemType File -Value $cont -Encoding $enc | Out-Null
-                New-Item -Path $dir -Name $f -ItemType File -Value $cont | Out-Null
+                Set-Content -LiteralPath (Join-Path $dir $f) -Value $cont -Encoding $enc -Force | Out-Null
             }
         }
     }
