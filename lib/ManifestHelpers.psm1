@@ -31,7 +31,7 @@ function Test-Persistence {
                 $cont = if ($Content.Count -le $ind) { $Content[$ind] } else { $null } # $null when there is none specified on this index
                 $path = (Join-Path $dir $f)
 
-                New-Item -Path -Path $path -Force | Out-Null
+                New-Item -Path $path -Force | Out-Null
                 Set-Content -LiteralPath $path -Value $cont -Encoding 'ASCII'
             }
         }

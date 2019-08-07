@@ -42,7 +42,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $original_dir = $dir # keep reference to real (not linked) directory
     $global:persist_dir = persistdir $app $global
 
-    $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    $global:fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
