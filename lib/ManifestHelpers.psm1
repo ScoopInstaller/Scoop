@@ -16,6 +16,7 @@ function Test-Persistence {
         [CmdletBinding(DefaultParameterSetName = 'Content')]
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [String[]] $File,
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
         [Object[]] $Content,
         [ScriptBlock] $Execution
     )
