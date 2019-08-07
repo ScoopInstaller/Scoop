@@ -23,13 +23,16 @@ function Test-Persistence {
 
     for ($ind = 0; $ind -lt $File.Count; ++$ind) {
         $f = $File[$ind]
-        $cont = if ($Content.Count -lt $ind) { $Content[$ind] } else { $null } # $null when there is none specified on this index
 
         if (-not (Test-Path (Join-Path $persist_dir $f))) {
             if ($Execution) {
                 & $Execution
             } else {
-                Set-Content -LiteralPath (Join-Path $dir $f) -Value $cont -Encoding 'ASCII' -Force | Out-Null
+                $cont = if ($Content.Count -le $ind) { $Content[$ind] } else { $null } # $null when there is none specified on this index
+                $path = (Join-Path $dir $f)
+
+                New-Item -Path -Path $path -Force | Out-Null
+                Set-Content -LiteralPath $path -Value $cont -Encoding 'ASCII'
             }
         }
     }
