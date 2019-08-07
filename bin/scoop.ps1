@@ -3,6 +3,8 @@ param($cmd)
 
 set-strictmode -off
 
+Import-Module (Join-Path $PSScriptRoot '\..\lib\ManifestHelpers.psm1' -Resolve) -Force
+
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\git.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"

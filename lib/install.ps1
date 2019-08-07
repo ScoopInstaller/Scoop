@@ -1,3 +1,5 @@
+Import-Module (Join-Path $PSScriptRoot 'ManifestHelpers.psm1' -Resolve)
+
 . "$psscriptroot/autoupdate.ps1"
 . "$psscriptroot/buckets.ps1"
 
@@ -36,9 +38,9 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     write-output "Installing '$app' ($version) [$architecture]"
 
-    $dir = ensure (versiondir $app $version $global)
+    $global:dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
-    $persist_dir = persistdir $app $global
+    $global:persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     pre_install $manifest $architecture
