@@ -24,14 +24,12 @@ function Test-Persistence {
     for ($ind = 0; $ind -lt $File.Count; ++$ind) {
         $f = $File[$ind]
         $cont = if ($Content.Count -lt $ind) { $Content[$ind] } else { $null } # $null when there is none specified on this index
-        # PWSH has UTF-8 without BOM while, <=5 is using UTF-8 with bom
-        $enc = if ($PSVersionTable.PSVersion.Major -ge 6) { 'UTF-8' } else { 'ASCII' }
 
         if (-not (Test-Path (Join-Path $persist_dir $f))) {
             if ($Execution) {
                 & $Execution
             } else {
-                Set-Content -LiteralPath (Join-Path $dir $f) -Value $cont -Encoding $enc -Force | Out-Null
+                Set-Content -LiteralPath (Join-Path $dir $f) -Value $cont -Encoding 'ASCII' -Force | Out-Null
             }
         }
     }
