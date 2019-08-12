@@ -744,6 +744,7 @@ function install_prog($fname, $dir, $installer, $global) {
 function run_uninstaller($manifest, $architecture, $dir) {
     $msi = msi $manifest $architecture
     $uninstaller = uninstaller $manifest $architecture
+    $version = $manifest.version
     if($uninstaller.script) {
         write-output "Running uninstaller script..."
         Invoke-Expression (@($uninstaller.script) -join "`r`n")
