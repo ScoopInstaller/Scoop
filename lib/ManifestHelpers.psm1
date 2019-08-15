@@ -12,8 +12,8 @@ function Test-Persistence {
         Custom scriptblock to run when file is not persisted.
         https://github.com/lukesampson/scoop-extras/blob/a84b257fd9636d02295b48c3fd32826487ca9bd3/bucket/ditto.json#L25-L33
     #>
+    [CmdletBinding()]
     param(
-        [CmdletBinding(DefaultParameterSetName = 'Content')]
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [String[]] $File,
         [Parameter(ValueFromPipelineByPropertyName = $true)]
@@ -32,10 +32,26 @@ function Test-Persistence {
                 $path = (Join-Path $dir $f)
 
                 New-Item -Path $path -Force | Out-Null
-                Set-Content -LiteralPath $path -Value $cont -Encoding 'ASCII'
+                Set-Content -LiteralPath $path -Value $cont -Encoding ASCII
             }
         }
     }
 }
 
-Export-ModuleMember -Function Test-Persistence
+function Remove-AppDirItem {
+    <#
+    .SYNOPSIS
+        Remove given item from applications directory. Wildcards are supported.
+    .PARAMETER Item
+        Item to be removed.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [String[]] $Item
+    )
+
+    foreach ($it in $Item) { Get-ChildItem $dir $it | Remove-Item -Force -Recurse }
+}
+
+Export-ModuleMember -Function Test-Persistence, Remove-DirItem
