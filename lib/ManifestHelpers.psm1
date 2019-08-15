@@ -54,4 +54,4 @@ function Remove-AppDirItem {
     foreach ($it in $Item) { Get-ChildItem $dir $it | Remove-Item -Force -Recurse }
 }
 
-Export-ModuleMember -Function Test-Persistence, Remove-DirItem
+Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem
