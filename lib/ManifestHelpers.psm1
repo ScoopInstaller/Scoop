@@ -6,19 +6,13 @@ function Initialize-Variables {
     #>
     # Do not create variable when there are already defined.
     if (-not $dir) {
-        $script:dir = $env:I_Dir
-        $script:persist_dir = $env:I_PersistDir
-        $script:fname = $env:I_Fname
+        $script:dir = $PSCmdlet.SessionState.PSVariable.GetValue('dir')
+        $script:persist_dir = $PSCmdlet.SessionState.PSVariable.GetValue('persist_dir')
+        $script:fname = $PSCmdlet.SessionState.PSVariable.GetValue('fname')
+        $script:version = $PSCmdlet.SessionState.PSVariable.GetValue('version')
+        $script:global = $PSCmdlet.SessionState.PSVariable.GetValue('global')
+        $script:manifest = $PSCmdlet.SessionState.PSVariable.GetValue('manifest')
     }
-}
-
-function Remove-RegisteredVariable {
-    <#
-    .SYNOPSIS
-        Remove registered helper environment variables to prevent leakage into main powershell process.
-    #>
-
-    Get-ChildItem env: | Where-Object { $_.Name -like 'I_*' } | ForEach-Object { Remove-Item env:\$($_.Name) -Force }
 }
 
 function Test-Persistence {
@@ -89,4 +83,4 @@ function Remove-AppDirItem {
     foreach ($it in $Item) { Get-ChildItem $dir $it | Remove-Item -Force -Recurse }
 }
 
-Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem, Remove-RegisteredVariable
+Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem

@@ -43,13 +43,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
 
-    # All variables are simple string so there is no problem with environment.
-    # Expose needed variables as process environmnet to be able to capture them in helpers.
-    # Prefix it with I_ for easier removing and not conflicting with possible registered variables
-    [System.Environment]::SetEnvironmentVariable('I_Dir', $dir, 'Process')
-    [System.Environment]::SetEnvironmentVariable('I_PersistDir', $persist_dir, 'Process')
-    [System.Environment]::SetEnvironmentVariable('I_Fname', $fname, 'Process')
-
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
@@ -78,8 +71,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     success "'$app' ($version) was installed successfully!"
 
     show_notes $manifest $dir $original_dir $persist_dir
-
-    Remove-RegisteredVariable
 }
 
 function locate($app, $bucket) {
