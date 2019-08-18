@@ -1,3 +1,26 @@
+function Initialize-Variables {
+    <#
+    .SYNOPSIS
+        Helper which needs to be executed in all other exposed helpers as it will provide all local variables to be used.
+        Script bounded variables will be created and set.
+    #>
+    # Do not create variable when there are already defined.
+    if (-not $dir) {
+        $script:dir = $env:I_Dir
+        $script:persist_dir = $env:I_PersistDir
+        $script:fname = $env:I_Fname
+    }
+}
+
+function Remove-RegisteredVariable {
+    <#
+    .SYNOPSIS
+        Remove registered helper environment variables to prevent leakage into main powershell process.
+    #>
+
+    Get-ChildItem env: | Where-Object { $_.Name -like 'I_*' } | ForEach-Object { Remove-Item env:\$($_.Name) -Force }
+}
+
 function Test-Persistence {
     <#
     .SYNOPSIS
@@ -21,6 +44,8 @@ function Test-Persistence {
         [ScriptBlock] $Execution
     )
 
+    Initialize-Variables
+
     for ($ind = 0; $ind -lt $File.Count; ++$ind) {
         $f = $File[$ind]
 
@@ -28,7 +53,16 @@ function Test-Persistence {
             if ($Execution) {
                 & $Execution
             } else {
-                $cont = if ($Content.Count -lt $ind) { $Content[$ind] } else { $null } # $null when there is none specified on this index
+                # Handle edge case when there is only one file and mulitple contents caused by
+                # If `Test-Persistence alfa.txt @('new', 'beta')` is used,
+                # Powershell will bind Content as simple array with 2 values instead of Array with nested array with 2 values.
+                if (($File.Count -eq 1) -and ($Content.Count -gt 1)) {
+                    $cont = $Content
+                } elseif ($ind -lt $Content.Count) {
+                    $cont = $Content[$ind]
+                } else {
+                    $cont = $null
+                }
                 $path = (Join-Path $dir $f)
 
                 New-Item -Path $path -Force | Out-Null
@@ -50,8 +84,9 @@ function Remove-AppDirItem {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [String[]] $Item
     )
+    Initialize-Variables
 
     foreach ($it in $Item) { Get-ChildItem $dir $it | Remove-Item -Force -Recurse }
 }
 
-Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem
+Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem, Remove-RegisteredVariable
