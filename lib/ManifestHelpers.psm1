@@ -60,7 +60,7 @@ function Test-Persistence {
                 $path = (Join-Path $dir $f)
 
                 New-Item -Path $path -Force | Out-Null
-                Set-Content -LiteralPath $path -Value $cont -Encoding ASCII
+                if ($cont) { Set-Content -LiteralPath $path -Value $cont -Encoding ASCII }
             }
         }
     }
