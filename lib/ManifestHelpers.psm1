@@ -74,13 +74,26 @@ function Remove-AppDirItem {
         Item to be removed.
     #>
     [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [String[]] $Item
-    )
+    param([Parameter(Mandatory = $true, ValueFromPipeline = $true)] [String[]] $Item)
+
     Initialize-Variables
 
     foreach ($it in $Item) { Get-ChildItem $dir $it | Remove-Item -Force -Recurse }
 }
 
-Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem
+function New-JavaShortcutWrapper {
+    <#
+    .SYNOPSIS
+        Create new shim-like batch file wrapper to spawn jar files from shortcut.
+    .PARAMETER Filename
+        Filename of jar executable without file .jar extension!
+    #>
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $true, ValueFromPipeline = $true)] [String] $Filename)
+
+    Initialize-Variables
+
+    Set-Content (Join-Path $dir "$Filename.bat") @('@echo off', "start javaw.exe -jar `"%~dp0\$Filename.jar`" %*") -Encoding ASCII
+}
+
+Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem, New-JavaShortcutWrapper
