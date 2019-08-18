@@ -93,7 +93,7 @@ function New-JavaShortcutWrapper {
 
     Initialize-Variables
 
-    Set-Content (Join-Path $dir "$Filename.bat") @('@echo off', "start javaw.exe -jar `"%~dp0\$Filename.jar`" %*") -Encoding ASCII
+    Set-Content (Join-Path $dir "$Filename.bat") "@start javaw.exe -jar `"%~dp0\$Filename.jar`" %*" -Encoding ASCII
 }
 
 Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem, New-JavaShortcutWrapper
