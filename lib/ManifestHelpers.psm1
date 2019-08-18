@@ -1,3 +1,13 @@
+function Resolve-LocalScopeVariable {
+    <#
+    .SYNOPSIS
+        Get correct value for variable defined in different / unaccessible scope from module.
+    #>
+    param([Parameter(Mandatory = $true, ValueFromPipeline = $true)][String] $Variable)
+
+    return $PSCmdlet.SessionState.PSVariable.GetValue($Variable)
+}
+
 function Initialize-Variables {
     <#
     .SYNOPSIS
@@ -6,12 +16,12 @@ function Initialize-Variables {
     #>
     # Do not create variable when there are already defined.
     if (-not $dir) {
-        $script:dir = $PSCmdlet.SessionState.PSVariable.GetValue('dir')
-        $script:persist_dir = $PSCmdlet.SessionState.PSVariable.GetValue('persist_dir')
-        $script:fname = $PSCmdlet.SessionState.PSVariable.GetValue('fname')
-        $script:version = $PSCmdlet.SessionState.PSVariable.GetValue('version')
-        $script:global = $PSCmdlet.SessionState.PSVariable.GetValue('global')
-        $script:manifest = $PSCmdlet.SessionState.PSVariable.GetValue('manifest')
+        $script:dir = Resolve-LocalScopeVariable 'dir'
+        $script:persist_dir = Resolve-LocalScopeVariable 'persist_dir'
+        $script:fname = Resolve-LocalScopeVariable 'fname'
+        $script:version = Resolve-LocalScopeVariable 'version'
+        $script:global = Resolve-LocalScopeVariable 'global'
+        $script:manifest = Resolve-LocalScopeVariable 'manifest'
     }
 }
 
