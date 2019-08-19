@@ -67,7 +67,7 @@ If you've built software that you'd like others to use, Scoop is an alternative 
 Run this command from your PowerShell to install scoop to its default location (`C:\Users\<user>\scoop`)
 
 ```powershell
-iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+iwr -useb get.scoop.sh | iex
 ```
 
 Once installed, run `scoop help` for instructions.
@@ -81,7 +81,7 @@ These settings can be changed through environment variables.
 ```powershell
 $env:SCOOP='D:\Applications\Scoop'
 [Environment]::SetEnvironmentVariable('SCOOP', $env:SCOOP, 'User')
-iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+iwr -useb get.scoop.sh | iex
 ```
 
 ### Configure Scoop to install global programs to a Custom Directory
