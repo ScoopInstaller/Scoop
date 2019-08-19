@@ -43,7 +43,7 @@ Make sure [PowerShell 5](https://aka.ms/wmf5download) (or later, include [PowerS
 and [.NET Framework 4.5](https://www.microsoft.com/net/download) (or later) are installed. Then run:
 
 ```powershell
-iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+iwr -useb get.scoop.sh | iex
 ```
 
 **Note:** if you get an error you might need to change the execution policy
