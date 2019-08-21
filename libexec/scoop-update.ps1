@@ -118,7 +118,7 @@ function update_scoop() {
 
         $res = $lastexitcode
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD | Where-Object { $_ -notlike '*[scoop skip]*' }
         }
 
         Pop-Location
