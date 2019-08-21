@@ -89,11 +89,13 @@ function New-JavaShortcutWrapper {
         Filename of jar executable without file .jar extension!
     #>
     [CmdletBinding()]
-    param([Parameter(Mandatory = $true, ValueFromPipeline = $true)] [String] $Filename)
+    param([Parameter(Mandatory = $true, ValueFromPipeline = $true)] [String[]] $Filename)
 
     Initialize-Variables
 
-    Set-Content (Join-Path $dir "$Filename.bat") "@start javaw.exe -jar `"%~dp0\$Filename.jar`" %*" -Encoding ASCII
+    foreach ($f in $Filename) {
+        Set-Content (Join-Path $dir "$f.bat") "@start javaw.exe -jar `"%~dp0\$f.jar`" %*" -Encoding ASCII
+    }
 }
 
 Export-ModuleMember -Function Test-Persistence, Remove-AppDirItem, New-JavaShortcutWrapper
