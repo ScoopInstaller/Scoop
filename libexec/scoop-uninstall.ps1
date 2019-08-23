@@ -56,6 +56,15 @@ if (!$apps) { exit 0 }
     $dir = versiondir $app $version $global
     $persist_dir = persistdir $app $global
 
+
+    #region Workaround for #2952
+    # Split-path for getting $env:SCOOP\apps\<app> and not current or specific version
+    if (Get-Process | Where-Object { $_.Path -like "$(Split-Path $dir)\*" }) {
+        error "Application is still running. Close all instances and try again."
+        continue
+    }
+    #endregion Workaround for #2952
+
     try {
         Test-Path $dir -ErrorAction Stop | Out-Null
     } catch [UnauthorizedAccessException] {
