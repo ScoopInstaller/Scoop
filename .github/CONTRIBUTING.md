@@ -13,7 +13,7 @@ You can contribute to core codebase these ways:
 
 1. [Implement new features](https://github.com/lukesampson/scoop/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Aenhancement)
 1. [Fix bugs](https://github.com/lukesampson/scoop/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
-1. Identify/report reproducible steps of issues
+1. Identify and report reproducible steps of issues
 
 Scoop's core codebase started moving towards standard/preferred PowerShell code style. Mainly with the adoption of [`Verb-Noun`][approved-verbs] naming.
 Starting from April 2019 use `Verb-Noun` naming for functions when manipulating the codebase.
@@ -40,9 +40,10 @@ See [Decompress module](https://github.com/lukesampson/scoop/blob/1caaed8f3d51d1
 
 ### General code sins to avoid and restricitons to follow
 
-There are few misdemeanors that often show up in PRs and code base.
+There are few misdemeanors that often show up in pull-requests and code base.
 Keep source code more tidier and cleaner with these.
 
+- Commits/pull-requests naming have to follow [Conventional Commits Specification][commits]
 - [Cmdlet aliases](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/AvoidUsingCmdletAliases.md)
     - Never use aliases
     - Aliases are usefull only in interactive (terminal) usage
@@ -51,12 +52,12 @@ Keep source code more tidier and cleaner with these.
 - Short format of function parameters
     - Powershell allows you to use short version of parameters
         - Instead of `Write-Host -ForegroundColor Yellow` you can use `Write-Host -f Yellow`
-        - This should be avoid due to compatibility with newer versions of powershell / functions
+        - This should be avoided due to compatibility with newer versions of powershell / functions
     - When there are parameters with same starting characters it will lead to `Ambiguous` parameter error (`gci -p` for example)
 - Returning data from function without `return` statement
     - Powershell allow to "return" data from function with simply putting it into pipeline, but should not be used in scripts
-    - Instead of `function Alfa { "Help" }` use `function Alfa { return "Help" }`
-- [Plural nouns in function names](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/UseSingularNouns.md)
+    - Instead of `function Alfa { "Help" }` use `function Alfa { return 'Help' }`
+- Use [singular nouns in function / parameters names](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/UseSingularNouns.md)
 - Local functions variables use classic **Camel Case** `$camelCase`
 - Use single quotes for simple strings
 - [Use correct casing for function names / parameters](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/UseCorrectCasing.md)
@@ -91,6 +92,52 @@ Best practice for always passing all checks is to run [checkver][checkver] or [f
 
 These are PowerShell scripts which should run on all platforms (Linux, MacOS with `pwsh`), so you are not tied with Windows platform.
 
+#### Manifest naming
+
+<!-- TODO -->
+
+#### Description
+
+<!-- TODO -->
+
+#### Properties order
+
+Manifest consists of 7 main groups (regions) of properties. These properties should be logically ordered from top to bottom as they are evaluated in installation process.
+
+Best order of all properties as follows:
+
+1. Information region
+    1. Version
+    1. Description
+    1. Homepage
+    1. License
+    1. Notes
+1. Requirements
+    1. Depends
+    1. Suggest
+1. Downloading
+    1. Cookies
+    1. Url
+    1. Hash
+1. Extraction
+    1. Extract_dir
+    1. Extract_to
+1. Installation
+    1. Pre_install
+    1. Installer
+    1. Post_Install
+    1. Uninstall
+1. Links
+    1. Bin
+    1. Shortcuts
+    1. Modules
+    1. Env_add_path
+    1. Env_set
+    1. Persist
+1. Updating
+    1. Checkver
+    1. Autoudpate
+
 ### Readable code
 
 You can specify `post_install`, `pre_install` and `installer.script` blocks, which could be an array (or a simple string) with PowerShell code.
@@ -116,3 +163,4 @@ This will check for the latest version of the program (specified within the `che
 [formatjson]: ../bin/formatjson.ps1
 [Show-DeprecatedWarning]: https://github.com/lukesampson/scoop/blob/6141e46d6ae74b3ccf65e02a1c3fc92e1b4d3e7a/lib/core.ps1#L22-L36
 [approved-verbs]: https://docs.microsoft.com/en-us/powershell/developer/cmdlet/approved-verbs-for-windows-powershell-commands
+[commits]: https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification
