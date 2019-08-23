@@ -237,6 +237,14 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     $dir = versiondir $app $old_version $global
 
+    #region Workaround for #2952
+    # Split-path for getting $env:SCOOP\apps\<app> and not current or specific version
+    if (Get-Process | Where-Object { $_.Path -like "$(Split-Path $dir)\*" }) {
+        error "Aplication is still running. Close all instances and try again."
+        return
+    }
+    #endregion Workaround for #2952
+
     write-host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
