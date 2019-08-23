@@ -240,7 +240,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     #region Workaround for #2952
     # Split-path for getting $env:SCOOP\apps\<app> and not current or specific version
     if (Get-Process | Where-Object { $_.Path -like "$(Split-Path $dir)\*" }) {
-        error "Aplication is still running. Close all instances and try again."
+        error "Application is still running. Close all instances and try again."
         return
     }
     #endregion Workaround for #2952
