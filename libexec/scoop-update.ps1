@@ -238,11 +238,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $dir = versiondir $app $old_version $global
 
     #region Workaround for #2952
-    # Split-path for getting $env:SCOOP\apps\<app> and not current or specific version
-    $split = Split-Path $dir
-    # Do not get whole $env:SCOOP\apps. When there is broken installation it will be just application root `$env:SCOOP\<app>\`
-    if ((Split-Path $split -Leaf) -eq 'apps') { $split = $dir }
-    if (Get-Process | Where-Object { $_.Path -like "$split\*" }) {
+    $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
+    if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
         error "Application is still running. Close all instances and try again."
         return
     }
