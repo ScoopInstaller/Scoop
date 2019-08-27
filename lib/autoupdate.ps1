@@ -58,7 +58,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     $regex = substitute $regex $substitutions $true
     debug $regex
     if ($hashfile -match $regex) {
-        $hash = $matches[1] -replace ' ',''
+        $hash = $matches[1] -replace '\s',''
     }
 
     # convert base64 encoded hash values
