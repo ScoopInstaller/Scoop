@@ -519,7 +519,7 @@
             "$ref": "#/definitions/uriOrArrayOfUris"
         },
         "version": {
-            "pattern": "^[\\w\\.\\-_]+$",
+            "pattern": "^[\\w\\.\\+\\-_]+$",
             "type": "string"
         }
     },
