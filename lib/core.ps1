@@ -815,7 +815,7 @@ function show_app($app, $bucket, $version) {
 
 function last_scoop_update() {
     # PowerShell 6 returns an DateTime Object
-    $last_update = (scoop config lastupdate)
+    $last_update = (get_config lastupdate)
 
     if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
         try {
@@ -831,7 +831,7 @@ function is_scoop_outdated() {
     $last_update = $(last_scoop_update)
     $now = [System.DateTime]::Now
     if($null -eq $last_update) {
-        scoop config lastupdate $now.ToString('o')
+        set_config lastupdate $now.ToString('o')
         # enforce an update for the first time
         return $true
     }

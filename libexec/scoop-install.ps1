@@ -68,7 +68,7 @@ if ($global -and !(is_admin)) {
 }
 
 if (is_scoop_outdated) {
-    scoop update
+    & "$PSScriptRoot\scoop-update.ps1"
 }
 
 if ($apps.length -eq 1) {
