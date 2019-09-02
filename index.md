@@ -39,10 +39,13 @@ Not sure whether you need 32-bit or 64-bit? Can&rsquo;t remember that command yo
 
 # Installs in seconds
 
-Make sure [PowerShell 5](https://aka.ms/wmf5download) (or later, include [PowerShell Core](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows?view=powershell-6)) 
+Make sure [PowerShell 5](https://aka.ms/wmf5download) (or later, include [PowerShell Core](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows?view=powershell-6))
 and [.NET Framework 4.5](https://www.microsoft.com/net/download) (or later) are installed. Then run:
 
 ```powershell
+Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+
+# or shorter
 iwr -useb get.scoop.sh | iex
 ```
 
