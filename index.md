@@ -50,4 +50,8 @@ iwr -useb get.scoop.sh | iex
 ```
 
 **Note:** if you get an error you might need to change the execution policy
-(i.e. enable Powershell) with `Set-ExecutionPolicy RemoteSigned -scope CurrentUser`
+(i.e. enable Powershell) with
+
+```powershell
+Set-ExecutionPolicy RemoteSigned -scope CurrentUser
+```
