@@ -333,7 +333,12 @@ if (!$apps) {
 
     $suggested = @{ };
     # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
+    $outdated | ForEach-Object { try {
+            update @_ $quiet $independent $suggested $use_cache $check_hash
+        } catch {
+            Write-Error $_
+        }
+    }
 }
 
 exit 0
