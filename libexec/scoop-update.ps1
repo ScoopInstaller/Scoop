@@ -50,7 +50,7 @@ if (!$configBranch) {
     set_config SCOOP_BRANCH $configBranch | Out-Null
 }
 
-if(($PSVersionTable.PSVersion.Major) -lt 5) {
+if (($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
     # should be deleted after Oct 1, 2019
     If ((Get-Date).ToUniversalTime() -ge "2019-10-01") {
@@ -66,11 +66,11 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
 
 function update_scoop() {
     # check for git
-    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     write-host "Updating Scoop..."
     $last_update = $(last_scoop_update)
-    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
+    if ($null -eq $last_update) { $last_update = [System.DateTime]::Now }
     $last_update = $last_update.ToString('s')
     $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
@@ -307,9 +307,9 @@ if (!$apps) {
             ($app, $global) = $_
             $status = app_status $app $global
             if ($force -or $status.outdated) {
-                if(!$status.hold) {
+                if (!$status.hold) {
                     $outdated += applist $app $global
-                    write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
+                    write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('', ' (global)')[$global])
                 } else {
                     warn "'$app' is locked to version $($status.version)"
                 }
@@ -331,7 +331,7 @@ if (!$apps) {
         }
     }
 
-    $suggested = @{};
+    $suggested = @{ };
     # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }
