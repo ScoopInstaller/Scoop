@@ -263,39 +263,50 @@
             ]
         },
         "installer": {
-            "additionalProperties": false,
-            "properties": {
-                "_comment": {
-                    "description": "Undocumented: only used in scoop-extras/oraclejdk* and scoop-extras/appengine-go",
-                    "type": "string"
-                },
-                "args": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                },
-                "file": {
-                    "type": "string"
-                },
-                "script": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                },
-                "keep": {
-                    "type": "boolean"
-                },
-                "type": {
+            "anyOf": [
+                {
                     "enum": [
                         "inno",
                         "nsis",
                         "wix"
                     ]
                 },
-                "include": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                },
-                "exclude": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "_comment": {
+                            "description": "Undocumented: only used in scoop-extras/oraclejdk* and scoop-extras/appengine-go",
+                            "type": "string"
+                        },
+                        "args": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "file": {
+                            "type": "string"
+                        },
+                        "script": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "keep": {
+                            "type": "boolean"
+                        },
+                        "type": {
+                            "enum": [
+                                "inno",
+                                "nsis",
+                                "wix"
+                            ]
+                        },
+                        "include": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "exclude": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        }
+                    },
+                    "type": "object"
                 }
-            },
-            "type": "object"
+            ]
         },
         "stringOrArrayOfStrings": {
             "anyOf": [

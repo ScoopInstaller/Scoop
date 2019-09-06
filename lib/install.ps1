@@ -47,6 +47,11 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         }
     }
 
+    # Change 'installer:xxx' to 'installer.type:xxx'
+    if ($manifest.installer -is [String]) {
+        $manifest.installer = @{ type = $manifest.installer }
+    }
+
     write-output "Installing '$app' ($version) [$architecture]"
 
     $dir = ensure (versiondir $app $version $global)

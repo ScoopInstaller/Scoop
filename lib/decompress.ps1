@@ -449,7 +449,7 @@ function ConvertFrom-Inno {
         FileList = $FileList;
         Excluded = $Excluded;
         Included = $Included;
-        Extracted = ($FileList.srcdir | Select-Object -Unique) -ne '{tmp}'
+        Extracted = @($FileList.srcdir | Select-Object -Unique) -ne '{tmp}'
     }
 }
 
