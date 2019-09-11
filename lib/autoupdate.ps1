@@ -244,7 +244,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             }
         }
         'fosshub' {
-            $hash = find_hash_in_textfile $url $substitutions ($Matches.filename+'.*?"sha256":"([a-fA-F0-9]{64})"')
+            $hash = find_hash_in_textfile $url $substitutions '$basename.*?"sha256":"([a-fA-F0-9]{64})"'
         }
         'sourceforge' {
             # change the URL because downloads.sourceforge.net doesn't have checksums
