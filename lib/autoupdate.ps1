@@ -216,7 +216,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'xpath'
     }
 
-    if (!$hashfile_url -and $url -match "^(?:.*fosshub.com\/).*(?:\/|\?dwl=)(?<filename>.*)$") {
+    if (!$hashfile_url -and $url -match "fosshub.com") {
         $hashmode = 'fosshub'
     }
 
