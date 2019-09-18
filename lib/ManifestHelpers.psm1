@@ -94,7 +94,7 @@ function New-JavaShortcutWrapper {
     Initialize-Variables
 
     foreach ($f in $Filename) {
-        Set-Content (Join-Path $dir "$f.bat") "@start javaw.exe -jar `"%~dp0\$f.jar`" %*" -Encoding ASCII
+        Set-Content (Join-Path $dir "$f.bat") "@start javaw.exe -jar `"%~dp0$f.jar`" %*" -Encoding ASCII
     }
 }
 
