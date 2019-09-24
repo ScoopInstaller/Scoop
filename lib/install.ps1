@@ -715,18 +715,7 @@ function Invoke-InstallerScript {
     )
     $Installer = installer $Manifest $Architecture
 
-    if ($Installer.script) {
-        Write-Host "Running installer script..." -NoNewline
-        Invoke-Expression (@($Installer.script) -join "`r`n")
-        Write-Host "done." -f Green
-        return
-    }
-
-    if ($Installer.type) {
-        return
-    }
-
-    if ($Installer) {
+    if ($Installer.file -or $Installer.args) {
         # Installer filename is either explicit defined ('installer.file') or file name in the first URL
         $ProgName = "$DestinationPath\$(coalesce $Installer.file $FileName[1])"
         if(!(is_in_dir $DestinationPath $ProgName)) {
@@ -748,6 +737,15 @@ function Invoke-InstallerScript {
             }
         }
     }
+
+    if ($Installer.script) {
+        Write-Host "Running installer script..." -NoNewline
+        Invoke-Expression (@($Installer.script) -join "`r`n")
+        Write-Host "done." -f Green
+    }
+
+    return
+
 }
 
 function run_uninstaller($manifest, $architecture, $dir) {
