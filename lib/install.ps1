@@ -499,7 +499,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
 
-    # can be multiple urls: if there are, then installer should go last,
+    # can be multiple urls: if there are, then installer should go first,
     # so that $fname is set properly
     $urls = @(url $manifest $architecture)
 
@@ -717,7 +717,7 @@ function Invoke-InstallerScript {
 
     if ($Installer.file -or $Installer.args) {
         # Installer filename is either explicit defined ('installer.file') or file name in the first URL
-        $ProgName = "$DestinationPath\$(coalesce $Installer.file $FileName[1])"
+         $ProgName = "$DestinationPath\$(coalesce $Installer.file $FileName[0])"
         if(!(is_in_dir $DestinationPath $ProgName)) {
             abort "Error in manifest: Installer $ProgName is outside the app directory."
         }
