@@ -189,9 +189,9 @@ function installed($app, $global=$null) {
     if($null -eq $global) { return (installed $app $true) -or (installed $app $false) }
     # Dependencies of the format "bucket/dependency" install in a directory of form
     # "dependency". So we need to extract the bucket from the name and only give the app
-    # name to is_directory
+    # name to "Confirm-IsDirectory"
     $app = $app.split("/")[-1]
-    return is_directory (appdir $app $global)
+    return Confirm-IsDirectory -Path (appdir $app $global)
 }
 function installed_apps($global) {
     $dir = appsdir $global
@@ -374,7 +374,8 @@ function run($exe, $arg, $msg, $continue_exit_codes) {
 
 function Invoke-ExternalCommand {
     [CmdletBinding(DefaultParameterSetName = "Default")]
-    [OutputType([Boolean])]
+    [OutputType([System.Boolean])]
+    [OutputType([System.Object[]])]
     param (
         [Parameter(Mandatory = $true,
                    Position = 0)]
@@ -395,62 +396,88 @@ function Invoke-ExternalCommand {
         [Alias("cec")]
         [Hashtable]
         $ContinueExitCodes,
+        [Alias("iec")]
+        [Int32[]]
+        $IgnoreExitCodes,
         [Parameter(ParameterSetName = "Default")]
         [Alias("Log")]
         [String]
-        $LogPath
+        $LogPath,
+        [Parameter(ParameterSetName = "Default")]
+        [Switch]
+        $PassThru
     )
     if ($Activity) {
         Write-Host "$Activity " -NoNewline
     }
-    $Process = New-Object System.Diagnostics.Process
-    $Process.StartInfo.FileName = $FilePath
-    $Process.StartInfo.Arguments = ($ArgumentList | Select-Object -Unique) -join ' '
-    $Process.StartInfo.UseShellExecute = $false
+    $process = New-Object System.Diagnostics.Process
+    $process.StartInfo.FileName = $FilePath
+    $process.StartInfo.Arguments = ($ArgumentList | Select-Object -Unique) -join ' '
+    $process.StartInfo.UseShellExecute = $false
     if ($LogPath) {
         if ($FilePath -match '(^|\W)msiexec($|\W)') {
-            $Process.StartInfo.Arguments += " /lwe `"$LogPath`""
+            $process.StartInfo.Arguments += " /lwe `"$LogPath`""
         } else {
-            $Process.StartInfo.RedirectStandardOutput = $true
-            $Process.StartInfo.RedirectStandardError = $true
+            $process.StartInfo.RedirectStandardOutput = $true
+            $process.StartInfo.RedirectStandardError = $true
         }
     }
     if ($RunAs) {
-        $Process.StartInfo.UseShellExecute = $true
-        $Process.StartInfo.Verb = 'RunAs'
+        $process.StartInfo.UseShellExecute = $true
+        $process.StartInfo.Verb = 'RunAs'
     }
     try {
-        $Process.Start() | Out-Null
+        $process.Start() | Out-Null
+        if (($PassThru -or $LogPath) -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
+            $Log = $process.StandardOutput.ReadToEnd()
+            if ($LogPath) {
+                Add-Content -Path $LogPath -Value $Log -Encoding OEM
+            }
+        }
     } catch {
         if ($Activity) {
             Write-Host "error." -ForegroundColor DarkRed
         }
         error $_.Exception.Message
-        return $false
+        if ($PassThru) {
+            return $false, $Log
+        } else {
+            return $false
+        }
     }
-    if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
-        Out-File -FilePath $LogPath -Encoding ASCII -Append -InputObject $Process.StandardOutput.ReadToEnd()
-    }
-    $Process.WaitForExit()
-    if ($Process.ExitCode -ne 0) {
-        if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
+
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) {
+        if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($process.ExitCode))) {
             if ($Activity) {
                 Write-Host "done." -ForegroundColor DarkYellow
             }
-            warn $ContinueExitCodes[$Process.ExitCode]
-            return $true
-        } else {
+            warn $ContinueExitCodes[$process.ExitCode]
+            if ($PassThru) {
+                return $true, $Log
+            } else {
+                return $true
+            }
+        } elseif ($process.ExitCode -notin $IgnoreExitCodes) {
             if ($Activity) {
                 Write-Host "error." -ForegroundColor DarkRed
             }
-            error "Exit code was $($Process.ExitCode)!"
-            return $false
+            error "Exit code was $($process.ExitCode)!"
+            if ($PassThru) {
+                return $false, $Log
+            } else {
+                return $false
+            }
         }
     }
     if ($Activity) {
         Write-Host "done." -ForegroundColor Green
     }
-    return $true
+    if ($PassThru) {
+        return $true, $Log
+    } else {
+        return $true
+    }
 }
 
 function dl($url,$to) {
@@ -486,52 +513,82 @@ function isFileLocked([string]$path) {
     }
 }
 
-function is_directory([String] $path) {
-    return (Test-Path $path) -and (Get-Item -Path $path) -is [System.IO.DirectoryInfo]
+function Confirm-IsDirectory {
+    param (
+        [String]
+        $Path
+    )
+    return (Test-Path -Path $Path) -and (Get-Item -Path $Path) -is [System.IO.DirectoryInfo]
 }
 
-function create_junction([String] $link, [String] $target) {
-    if (!(Test-Path $link) -and (is_directory $target)) {
-        New-Item -ItemType Junction -Path $link -Target $target | Out-Null
-        $dirInfo = New-Object System.IO.DirectoryInfo($link)
-        $dirInfo.Attributes = $dirInfo.Attributes -bor [System.IO.FileAttributes]::ReadOnly
+function Set-Junction {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    [OutputType([System.Boolean])]
+    param (
+        [String]
+        $Path,
+        [Alias("Target")]
+        [String]
+        $Value
+    )
+    if (!(Test-Path -Path $Path) -and (Confirm-IsDirectory -Path $Value)) {
+        New-Item -ItemType Junction -Path $Path -Target $Value | Out-Null
+        $directoryInfo = New-Object System.IO.DirectoryInfo($Path)
+        $directoryInfo.Attributes = $directoryInfo.Attributes -bor [System.IO.FileAttributes]::ReadOnly
         return $true
     }
     return $false
 }
 
-function create_hardlink([String] $link, [String] $target) {
-    if (!(Test-Path $link) -and (Test-Path $target) -and !(is_directory $target)) {
-        New-Item -ItemType HardLink -Path $link -Target $target | Out-Null
+function Set-HardLink {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    [OutputType([System.Boolean])]
+    param (
+        [String]
+        $Path,
+        [Alias("Target")]
+        [String]
+        $Value
+    )
+    if (!(Test-Path -Path $Path) -and (Test-Path -Path $Value) -and !(Confirm-IsDirectory -Path $Value)) {
+        New-Item -ItemType HardLink -Path $Path -Target $Value | Out-Null
         return $true
     }
     return $false
 }
 
 function movedir($from, $to, $par = "") {
-    $from = $from.trimend('\')
-    $to = $to.trimend('\')
+    Show-DeprecatedWarning $MyInvocation 'Move-Directory'
+    Move-Directory -Path $from -Destination $to -ArgumentList $par
+}
 
-    $proc = New-Object System.Diagnostics.Process
-    $proc.StartInfo.FileName = 'robocopy.exe'
-    $proc.StartInfo.Arguments = "`"$from`" `"$to`" /e /move " + $par
-    $proc.StartInfo.RedirectStandardOutput = $true
-    $proc.StartInfo.RedirectStandardError = $true
-    $proc.StartInfo.UseShellExecute = $false
-    $proc.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    $proc.Start()
-    $out = $proc.StandardOutput.ReadToEnd()
-    $proc.WaitForExit()
+function Move-Directory {
+    param (
+        [String]
+        $Path,
+        [String]
+        $Destination,
+        [String[]]
+        $ArgumentList
+    )
+    $Path = $Path.trimend('\')
+    $Destination = $Destination.trimend('\')
+    # two special cases: 'merge' and 'update'
+    # merge: only move new files to destination
+    # update: only move new files or newer files to destination
+    $ArgumentList = ($ArgumentList -replace 'merge', '/XC /XN /XO') -replace 'update', '/XO'
+    $ArgumentList = "`"$Path`" `"$Destination`" /E /MOVE /SJ /SL /IS /DCOPY:DAT $($ArgumentList -join ' ')"
+    $logPath = "$Env:TEMP\robocopy.log"
 
-    if($proc.ExitCode -ge 8) {
-        debug $out
-        throw "Could not find '$(fname $from)'! (error $($proc.ExitCode))"
+    $Status = Invoke-ExternalCommand -FilePath 'robocopy.exe' -ArgumentList $ArgumentList -IgnoreExitCodes (1..7) -LogPath $logPath
+    if (!$Status) {
+        abort "Failed to move $Path to $Destination.`nLog file:`n  $(friendly_path $logPath)"
     }
 
     # wait for robocopy to terminate its threads
     1..10 | ForEach-Object {
-        if (Test-Path $from) {
-            Remove-Item -Path $from.FullName -Recurse -Force
+        if (Test-Path $Path) {
+            Remove-Item -Path $Path -Recurse -Force
             Start-Sleep -Milliseconds 100
         }
     }

@@ -39,7 +39,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
-    $persist_dir = persistdir $app $global
+    $persist_dir = ensure (persistdir $app $global)
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     pre_install $manifest $architecture
@@ -54,8 +54,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     env_set $manifest $dir $global $architecture
 
     # persist data
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
+    Add-PersistentLink -Persist $manifest.persist -InstalledPath $original_dir -PersistentPath $persist_dir
+    Set-PersistentPermission -Manifest $manifest -Global:$global
 
     post_install $manifest $architecture
 
@@ -877,7 +877,7 @@ function link_current($versiondir) {
     if (Test-Path $currentdir) {
         Remove-Item $currentdir -Recurse -Force
     }
-    create_junction $currentdir $versiondir | Out-Null
+    Set-Junction -Path $currentdir -Target $versiondir | Out-Null
     return $currentdir
 }
 

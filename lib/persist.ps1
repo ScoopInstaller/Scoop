@@ -1,180 +1,232 @@
-function persist_data($manifest, $original_dir, $persist_dir) {
-    $persist = $manifest.persist
-    if($persist) {
-        $persist_dir = ensure $persist_dir
+function Add-PersistentLink {
+    param (
+        [Object[]]
+        $Persist,
+        [String]
+        $InstalledPath,
+        [String]
+        $PersistentPath
+    )
 
-        if ($persist -isnot [Array]) {
-            $persist = @($persist);
-        }
-
-        $persist | ForEach-Object {
-            if ($_ -is [String] -or $_ -is [Array]) {
-                $persist_def = persist_def_arr $_
-            } else {
-                $persist_def = persist_def_obj $_
+    process {
+        debug $Persist
+        if ($Persist) {
+            $Persist | ForEach-Object {
+                $persistDef = Get-PersistentDefination $_
+                $persistDef.Source = "$InstalledPath\$($persistDef.Source)"
+                $persistDef.Target = "$PersistentPath\$($persistDef.Target)"
+                debug $persistDef
+                PersistentHelper @PersistDef
             }
-            debug $persist_def
-            persist_core @persist_def
         }
     }
 }
-
-function persist_def_obj($persist) {
-    $persist_def = @{}
-    $persist_def.source = $persist.name.TrimEnd('/').TrimEnd('\')
-    if ($persist.target) {
-        $persist_def.target = $persist.target
-    } else {
-        $persist_def.target = $persist_def.source
-    }
-
-    if ($persist.type) {
-        $type = $persist.type
-    } elseif ($persist.name -match "[/\\]$") {
-        $type = "directory"
-    } else {
-        $type = "file"
-    }
-    if ($null -eq $persist.glue) {
-        $glue = "`r`n"
-    } else {
-        $glue = $persist.glue
-    }
-    if ($type -eq "file") {
-        if ($persist.base64) {
-            $persist_def.content = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($persist.content -join ''))
-        } else {
-            $persist_def.content = $persist.content -join $glue
-        }
-    } else {
-        $persist_def.content = $null
-    }
-
-    if ($persist.method) {
-        $persist_def.method = $persist.method
-    }
-
-    if ($persist.encoding -and ($type -eq "file")) {
-        $persist_def.encoding = $persist.encoding
-    }
-
-    return $persist_def
-}
-function persist_def_arr($persist) {
-    if ($persist -is [Array]) {
-        # if $persist is Array, use its length to determine its type
-        switch ($persist.Count) {
-            # lenght = 1, type is file
-            1 { $source = $persist[0]; $target = $null; $content = "" }
-            # length = 2, type is directory and persist to different name
-            2 { $source = $persist[0]; $target = $persist[1]; $content = $null }
-            # length > 2, type is file and the remaining rows are file content
-            Default { $source = $persist[0]; $target = $persist[1]; $content = $persist[2..($persist.Count-1)] -join "`r`n" }
-        }
-    } else {
-        # $persist is directory
-        $source = $persist
-        $target = $null
-        $content = $null
-    }
-
-    if (!$target) {
-        $target = $source
-    }
-
-    $persist_def = @{
-        source = $source.TrimEnd('/').TrimEnd('\')
-        target = $target
-        content = $content
-    }
-
-    return $persist_def
+function persist_data($manifest, $original_dir, $persist_dir) {
+    Show-DeprecatedWarning $MyInvocation 'Add-PersistentLink'
+    Add-PersistentLink -Persist $manifest.persist -InstalledPath $original_dir -PersistentPath $persist_dir
 }
 
-function persist_core($source, $target, $content = $null, $method = "link", $encoding = "ASCII") {
-    write-host "Persisting $source"
+function Get-PersistentDefination {
+    param (
+        [Object]
+        $Persist
+    )
 
-    $source = fullpath "$original_dir\$source"
-    $target = fullpath "$persist_dir\$target"
+    $persistDef = @{ }
 
+    switch ($Persist.GetType().Name) {
+        'PSCustomObject' {
+            $persistDef.Source = $Persist.name
+            $persistDef.Target = $Persist.target
+
+            # if there is no $Persist.type, try to determine type from trailing slash
+            if ($Persist.type) {
+                $type = $Persist.type
+            } elseif ($Persist.name -match "[/\\]$") {
+                $type = 'directory'
+            } else {
+                $type = 'file'
+            }
+            # combine $Persist.glue and $Persist.content to file content
+            # directory has $null file content
+            if ($null -eq $Persist.glue) {
+                $glue = "`r`n"
+            } else {
+                $glue = $Persist.glue
+            }
+            if ($type -eq 'file') {
+                if ($Persist.base64) {
+                    $persistDef.Content = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Persist.content -join ''))
+                } else {
+                    $persistDef.Content = $Persist.content -join $glue
+                }
+            }
+
+            if ($Persist.method) {
+                $persistDef.Method = $Persist.method
+            }
+
+            if ($Persist.encoding -and ($type -eq "file")) {
+                $persistDef.Encoding = $Persist.encoding
+            }
+        }
+        'Object[]' {
+            # if $Persist is [Array], use its length to determine its type
+            switch ($Persist.Count) {
+                # lenght = 1, type is file
+                1 {
+                    $persistDef.Source = $Persist[0]
+                    $persistDef.Content = ""
+                }
+                # length = 2, type is directory and persist to different name
+                2 {
+                    $persistDef.Source = $Persist[0]
+                    $persistDef.Target = $Persist[1]
+                }
+                # length > 2, type is file and the remaining rows are file content
+                Default {
+                    $persistDef.Source = $Persist[0]
+                    $persistDef.Target = $Persist[1]
+                    $persistDef.Content = $Persist[2..($Persist.Count - 1)] -join "`r`n"
+                }
+            }
+        }
+        'String' {
+            # $Persist is [String]
+            $persistDef.Source = $Persist
+        }
+    }
+
+    $persistDef.Source = $persistDef.Source.TrimEnd('\/')
+    # $persistDef.target is $null or empty string
+    if (!$persistDef.Target) {
+        $persistDef.Target = $persistDef.Source
+    }
+
+    return $persistDef
+}
+
+function PersistentHelper {
+    <#
+    .SYNOPSIS
+        Core persistence helper function
+    .DESCRIPTION
+        Persist data to some location according to given parameters.
+    .PARAMETER Source
+        File or directory to be persisted
+    .PARAMETER Target
+        Target store location of persisted item
+    .PARAMETER Content
+        File content if target file not existed, $null for directory
+    .PARAMETER Method
+        Persisting method, one of copy, merge, update or link
+    .PARAMETER Encoding
+        Encoding of new file
+    #>
+    param (
+        [String]
+        $Source,
+        [String]
+        $Target,
+        [String]
+        $Content = $null,
+        [String]
+        $Method = 'link',
+        [String]
+        $Encoding = 'ASCII'
+    )
+
+    Write-Host "Persisting $Source"
     # if we have had persist data in the store, just create link and go
-    if (Test-Path $target) {
-        # if there is also a source data, using $method to determine what to do
-        if (Test-Path $source) {
-            if (is_directory $source) {
+    if (Test-Path $Target) {
+        # if there is also a source data, using $Method to determine what to do
+        if (Test-Path $Source) {
+            if (Confirm-IsDirectory $Source) {
                 # for dir persisting
-                switch ($method) {
-                    # keep $source
-                    "copy" {
-                        Remove-Item $target -Recurse -Force
-                        movedir $source $target
+                switch ($Method) {
+                    # keep $Source
+                    'copy' {
+                        Remove-Item -Path $Target -Recurse -Force
+                        Move-Directory -Path $Source -Destination $Target
                     }
-                    # keep all files based on $target
-                    "merge" { movedir $source $target "/XC /XN /XO" }
+                    # keep all files based on $Target
+                    'merge' { Move-Directory -Path $Source -Destination $Target -ArgumentList 'Merge' }
                     # keep all newer files
-                    "update" { movedir $source $target "/XO" }
-                    # keep $target ("link")
-                    Default { movedir $source "$source.original" }
+                    'update' { Move-Directory -Path $Source -Destination $Target -ArgumentList 'Update' }
+                    # keep $Target ("link")
+                    Default { Move-Directory -Path $Source -Destination "$Source.original" }
                 }
             } else {
                 # for file persisting
-                switch ($method) {
-                    # keep $source
-                    "copy" { Move-Item $source $target -Force }
+                switch ($Method) {
+                    # keep $Source
+                    'copy' { Move-Item $Source $Target -Force }
                     # keep newer
-                    "update" {
-                        if ((Get-Item $source).LastWriteTimeUtc -gt (Get-Item $target).LastWriteTimeUtc){
-                            Move-Item $source $target -Force
+                    'update' {
+                        if ((Get-Item $Source).LastWriteTimeUtc -gt (Get-Item $Target).LastWriteTimeUtc){
+                            Move-Item $Source $Target -Force
                         } else {
-                            Rename-Item $source "$source.original" -Force
+                            Rename-Item $Source "$Source.original" -Force
                         }
                     }
-                    # keep $target ("link", "merge")
-                    Default { Rename-Item $source "$source.original" -Force }
+                    # keep $Target ("link", "merge")
+                    Default { Rename-Item $Source "$Source.original" -Force }
                 }
             }
         }
     # we don't have persist data in the store, move the source to target, then create link
-    } elseif (Test-Path $source) {
+    } elseif (Test-Path $Source) {
         # ensure target parent folder exist
-        $null = ensure (Split-Path -Path $target)
-        Move-Item $source $target
-    # use file content to determine $source's type, $null for directory and others for file
-    } elseif ($null -eq $content) {
-        New-Item $target -ItemType Directory -Force | Out-Null
+        ensure (Split-Path -Path $Target) | Out-Null
+        Move-Directory -Path $Source -Destination $Target
+    # use file content to determine $Source's type, $null for directory and others for file
+    } elseif ($null -eq $Content) {
+        New-Item $Target -ItemType Directory -Force | Out-Null
     } else {
-        $null = ensure (Split-Path -Path $target)
-        $content = $ExecutionContext.InvokeCommand.ExpandString($content)
-        Out-File -FilePath $target -Encoding $encoding -InputObject $content -Force
+        ensure (Split-Path -Path $Target) | Out-Null
+        $Content = $ExecutionContext.InvokeCommand.ExpandString($Content)
+        Out-File -FilePath $Target -Encoding $Encoding -InputObject $Content -Force
     }
 
     # create link
-    if (is_directory $target) {
+    if (Confirm-IsDirectory $Target) {
         # target is a directory, create junction
-        create_junction $source $target | Out-Null
+        Set-Junction -Path $Source -Target $Target | Out-Null
     } else {
         # target is a file, create hard link
-        create_hardlink $source $target | Out-Null
+        Set-HardLink -Path $Source -Target $Target | Out-Null
     }
 }
-function unlink_persist_data($dir) {
+
+function Remove-PersistentLink {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param (
+        [String]
+        $Path
+    )
     # unlink all junction / hard link in the directory
-    Get-ChildItem -Recurse $dir | ForEach-Object {
-        $file = $_
-        if ($null -ne $file.LinkType) {
-            Remove-Item $file.FullName -Recurse -Force
+    Get-ChildItem -Recurse $Path | ForEach-Object {
+        if ($null -ne $_.LinkType) {
+            Remove-Item $_.FullName -Recurse -Force
         }
     }
 }
 
 # check whether write permission for Users usergroup is set to global persist dir, if not then set
-function persist_permission($manifest, $global) {
-    if($global -and $manifest.persist -and (is_admin)) {
-        $path = persistdir $null $global
-        $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
-        $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
-        $acl = Get-Acl -Path $path
-        $acl.SetAccessRule($target_rule)
-        $acl | Set-Acl -Path $path
+function Set-PersistentPermission {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param (
+        [PSObject]
+        $Manifest,
+        [Switch]
+        $Global
+    )
+    if ($Global -and $Manifest.persist -and (is_admin)) {
+        $Path = persistdir $null $true
+        $User = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
+        $Rule = New-Object System.Security.AccessControl.FileSystemAccessRule($User, 'Write', 'ObjectInherit', 'none', 'Allow')
+        $Acl = Get-Acl -Path $Path
+        $Acl.SetAccessRule($Rule)
+        $Acl | Set-Acl -Path $Path
     }
 }
