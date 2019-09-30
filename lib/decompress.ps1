@@ -72,26 +72,26 @@ function Expand-7zipArchive {
             $DestinationPath = Split-Path -Path $Path
         }
         for ($i = 0; $i -lt $Path.Length; $i++) {
-            $aPath = $Path[$i]
+            $currentPath = $Path[$i]
             if ($null -eq $DestinationPath[$i]) {
-                $aDestinationPath = $DestinationPath[-1]
+                $currentDestinationPath = $DestinationPath[-1]
             } else {
-                $aDestinationPath = $DestinationPath[$i]
+                $currentDestinationPath = $DestinationPath[$i]
             }
             if ($ExtractDir) {
                 if ($null -eq $ExtractDir[$i]) {
-                    $aExtractDir = $ExtractDir[-1]
+                    $currentExtractDir = $ExtractDir[-1]
                 } else {
-                    $aExtractDir = $ExtractDir[$i]
+                    $currentExtractDir = $ExtractDir[$i]
                 }
             } else {
-                $aExtractDir = $null
+                $currentExtractDir = $null
             }
-            $LogPath = "$(Split-Path $aPath)\7zip.log"
-            $ArgList = @('x', "`"$aPath`"", "-o`"$aDestinationPath`"", '-y')
-            $IsTar = ((strip_ext $aPath) -match '\.tar$') -or ($aPath -match '\.t[abgpx]z2?$')
-            if (!$IsTar -and $aExtractDir) {
-                $ArgList += "-ir!$aExtractDir\*"
+            $LogPath = "$(Split-Path $currentPath)\7zip.log"
+            $ArgList = @('x', "`"$currentPath`"", "-o`"$currentDestinationPath`"", '-y')
+            $IsTar = ((strip_ext $currentPath) -match '\.tar$') -or ($currentPath -match '\.t[abgpx]z2?$')
+            if (!$IsTar -and $currentExtractDir) {
+                $ArgList += "-ir!$currentExtractDir\*"
             }
             if ($Switches) {
                 $ArgList += (-split $Switches)
@@ -103,27 +103,27 @@ function Expand-7zipArchive {
             }
             $Status = Invoke-ExternalCommand $7zPath $ArgList -LogPath $LogPath
             if (!$Status) {
-                abort "Failed to extract files from $aPath.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+                abort "Failed to extract files from $currentPath.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
             }
-            if (!$IsTar -and $aExtractDir) {
-                movedir "$aDestinationPath\$aExtractDir" $aDestinationPath | Out-Null
+            if (!$IsTar -and $currentExtractDir) {
+                movedir "$currentDestinationPath\$currentExtractDir" $currentDestinationPath | Out-Null
             }
             if (Test-Path $LogPath) {
                 Remove-Item $LogPath -Force
             }
             if ($IsTar) {
                 # Check for tar
-                $Status = Invoke-ExternalCommand $7zPath @('l', "`"$aPath`"") -LogPath $LogPath
+                $Status = Invoke-ExternalCommand $7zPath @('l', "`"$currentPath`"") -LogPath $LogPath
                 if ($Status) {
                     $TarFile = (Get-Content -Path $LogPath)[-4] -replace '.{53}(.*)', '$1' # get inner tar file name
-                    Expand-7zipArchive -Path "$aDestinationPath\$TarFile" -DestinationPath $aDestinationPath -ExtractDir $aExtractDir -Removal
+                    Expand-7zipArchive -Path "$currentDestinationPath\$TarFile" -DestinationPath $currentDestinationPath -ExtractDir $currentExtractDir -Removal
                 } else {
-                    abort "Failed to list files in $aPath.`nNot a 7-Zip supported archive file."
+                    abort "Failed to list files in $currentPath.`nNot a 7-Zip supported archive file."
                 }
             }
             if ($Removal) {
                 # Remove original archive file
-                Remove-Item $aPath -Force
+                Remove-Item $currentPath -Force
             }
         }
     }
@@ -152,59 +152,59 @@ function Expand-MsiArchive {
             $DestinationPath = Split-Path -Path $Path
         }
         for ($i = 0; $i -lt $Path.Length; $i++) {
-            $aPath = $Path[$i]
+            $currentPath = $Path[$i]
             if ($null -eq $DestinationPath[$i]) {
-                $aDestinationPath = $DestinationPath[-1]
+                $currentDestinationPath = $DestinationPath[-1]
             } else {
-                $aDestinationPath = $DestinationPath[$i]
+                $currentDestinationPath = $DestinationPath[$i]
             }
             if ($ExtractDir) {
                 if ($null -eq $ExtractDir[$i]) {
-                    $aExtractDir = $ExtractDir[-1]
+                    $currentExtractDir = $ExtractDir[-1]
                 } else {
-                    $aExtractDir = $ExtractDir[$i]
+                    $currentExtractDir = $ExtractDir[$i]
                 }
             } else {
-                $aExtractDir = $null
+                $currentExtractDir = $null
             }
-            $aDestinationPath = $aDestinationPath.TrimEnd("\")
-            if ($aExtractDir) {
-                $OriDestinationPath = $aDestinationPath
-                $aDestinationPath = "$aDestinationPath\_tmp"
+            $currentDestinationPath = $currentDestinationPath.TrimEnd("\")
+            if ($currentExtractDir) {
+                $OriDestinationPath = $currentDestinationPath
+                $currentDestinationPath = "$currentDestinationPath\_tmp"
             }
             if ((get_config MSIEXTRACT_USE_LESSMSI)) {
                 $MsiPath = Get-HelperPath -Helper Lessmsi
-                $ArgList = @('x', "`"$aPath`"", "`"$aDestinationPath\\`"")
+                $ArgList = @('x', "`"$currentPath`"", "`"$currentDestinationPath\\`"")
             } else {
                 $MsiPath = 'msiexec.exe'
-                $ArgList = @('/a', "`"$aPath`"", '/qn', "TARGETDIR=`"$aDestinationPath\\SourceDir`"")
+                $ArgList = @('/a', "`"$currentPath`"", '/qn', "TARGETDIR=`"$currentDestinationPath\\SourceDir`"")
             }
-            $LogPath = "$(Split-Path $aPath)\msi.log"
+            $LogPath = "$(Split-Path $currentPath)\msi.log"
             if ($Switches) {
                 $ArgList += (-split $Switches)
             }
             $Status = Invoke-ExternalCommand $MsiPath $ArgList -LogPath $LogPath
             if (!$Status) {
-                abort "Failed to extract files from $aPath.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+                abort "Failed to extract files from $currentPath.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
             }
-            if ($aExtractDir -and (Test-Path "$aDestinationPath\SourceDir")) {
-                movedir "$aDestinationPath\SourceDir\$aExtractDir" $OriDestinationPath | Out-Null
-                Remove-Item $aDestinationPath -Recurse -Force
-            } elseif ($aExtractDir) {
-                movedir "$aDestinationPath\$aExtractDir" $OriDestinationPath | Out-Null
-                Remove-Item $aDestinationPath -Recurse -Force
-            } elseif (Test-Path "$aDestinationPath\SourceDir") {
-                movedir "$aDestinationPath\SourceDir" $aDestinationPath | Out-Null
+            if ($currentExtractDir -and (Test-Path "$currentDestinationPath\SourceDir")) {
+                movedir "$currentDestinationPath\SourceDir\$currentExtractDir" $OriDestinationPath | Out-Null
+                Remove-Item $currentDestinationPath -Recurse -Force
+            } elseif ($currentExtractDir) {
+                movedir "$currentDestinationPath\$currentExtractDir" $OriDestinationPath | Out-Null
+                Remove-Item $currentDestinationPath -Recurse -Force
+            } elseif (Test-Path "$currentDestinationPath\SourceDir") {
+                movedir "$currentDestinationPath\SourceDir" $currentDestinationPath | Out-Null
             }
-            if (($aDestinationPath -ne (Split-Path $aPath)) -and (Test-Path "$aDestinationPath\$(fname $aPath)")) {
-                Remove-Item "$aDestinationPath\$(fname $aPath)" -Force
+            if (($currentDestinationPath -ne (Split-Path $currentPath)) -and (Test-Path "$currentDestinationPath\$(fname $currentPath)")) {
+                Remove-Item "$currentDestinationPath\$(fname $currentPath)" -Force
             }
             if (Test-Path $LogPath) {
                 Remove-Item $LogPath -Force
             }
             if ($Removal) {
                 # Remove original archive file
-                Remove-Item $aPath -Force
+                Remove-Item $currentPath -Force
             }
         }
     }
@@ -233,26 +233,26 @@ function Expand-InnoArchive {
             $DestinationPath = Split-Path -Path $Path
         }
         for ($i = 0; $i -lt $Path.Length; $i++) {
-            $aPath = $Path[$i]
+            $currentPath = $Path[$i]
             if ($null -eq $DestinationPath[$i]) {
-                $aDestinationPath = $DestinationPath[-1]
+                $currentDestinationPath = $DestinationPath[-1]
             } else {
-                $aDestinationPath = $DestinationPath[$i]
+                $currentDestinationPath = $DestinationPath[$i]
             }
             if ($ExtractDir) {
                 if ($null -eq $ExtractDir[$i]) {
-                    $aExtractDir = $ExtractDir[-1]
+                    $currentExtractDir = $ExtractDir[-1]
                 } else {
-                    $aExtractDir = $ExtractDir[$i]
+                    $currentExtractDir = $ExtractDir[$i]
                 }
             } else {
-                $aExtractDir = $null
+                $currentExtractDir = $null
             }
-            $LogPath = "$(Split-Path $aPath)\innounp.log"
-            $ArgList = @('-x', "-d`"$aDestinationPath`"", "`"$aPath`"", '-y')
-            switch -Regex ($aExtractDir) {
-                "^[^{].*" { $ArgList += "-c{app}\$aExtractDir" }
-                "^{.*" { $ArgList += "-c$aExtractDir" }
+            $LogPath = "$(Split-Path $currentPath)\innounp.log"
+            $ArgList = @('-x', "-d`"$currentDestinationPath`"", "`"$currentPath`"", '-y')
+            switch -Regex ($currentExtractDir) {
+                "^[^{].*" { $ArgList += "-c{app}\$currentExtractDir" }
+                "^{.*" { $ArgList += "-c$currentExtractDir" }
                 Default { $ArgList += "-c{app}" }
             }
             if ($Switches) {
@@ -260,14 +260,14 @@ function Expand-InnoArchive {
             }
             $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innounp) $ArgList -LogPath $LogPath
             if (!$Status) {
-                abort "Failed to extract files from $aPath.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+                abort "Failed to extract files from $currentPath.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
             }
             if (Test-Path $LogPath) {
                 Remove-Item $LogPath -Force
             }
             if ($Removal) {
                 # Remove original archive file
-                Remove-Item $aPath -Force
+                Remove-Item $currentPath -Force
             }
         }
     }
@@ -293,41 +293,41 @@ function Expand-ZipArchive {
             $DestinationPath = Split-Path -Path $Path
         }
         for ($i = 0; $i -lt $Path.Length; $i++) {
-            $aPath = $Path[$i]
+            $currentPath = $Path[$i]
             if ($null -eq $DestinationPath[$i]) {
-                $aDestinationPath = $DestinationPath[-1]
+                $currentDestinationPath = $DestinationPath[-1]
             } else {
-                $aDestinationPath = $DestinationPath[$i]
+                $currentDestinationPath = $DestinationPath[$i]
             }
             if ($ExtractDir) {
                 if ($null -eq $ExtractDir[$i]) {
-                    $aExtractDir = $ExtractDir[-1]
+                    $currentExtractDir = $ExtractDir[-1]
                 } else {
-                    $aExtractDir = $ExtractDir[$i]
+                    $currentExtractDir = $ExtractDir[$i]
                 }
             } else {
-                $aExtractDir = $null
+                $currentExtractDir = $null
             }
-            if ($aExtractDir) {
-                $OriDestinationPath = $aDestinationPath
-                $aDestinationPath = "$aDestinationPath\_tmp"
+            if ($currentExtractDir) {
+                $OriDestinationPath = $currentDestinationPath
+                $currentDestinationPath = "$currentDestinationPath\_tmp"
             }
             # All methods to unzip the file require .NET4.5+
             if ($PSVersionTable.PSVersion.Major -lt 5) {
                 Add-Type -AssemblyName System.IO.Compression.FileSystem
                 try {
-                    [System.IO.Compression.ZipFile]::ExtractToDirectory($aPath, $aDestinationPath)
+                    [System.IO.Compression.ZipFile]::ExtractToDirectory($currentPath, $currentDestinationPath)
                 } catch [System.IO.PathTooLongException] {
                     # try to fall back to 7zip if path is too long
                     if (Test-HelperInstalled -Helper 7zip) {
-                        Expand-7zipArchive $aPath $aDestinationPath -Removal
+                        Expand-7zipArchive $currentPath $currentDestinationPath -Removal
                         return
                     } else {
                         abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
                     }
                 } catch [System.IO.IOException] {
                     if (Test-HelperInstalled -Helper 7zip) {
-                        Expand-7zipArchive $aPath $aDestinationPath -Removal
+                        Expand-7zipArchive $currentPath $currentDestinationPath -Removal
                         return
                     } else {
                         abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
@@ -338,15 +338,15 @@ function Expand-ZipArchive {
             } else {
                 # Use Expand-Archive to unzip in PowerShell 5+
                 # Compatible with Pscx (https://github.com/Pscx/Pscx)
-                Microsoft.PowerShell.Archive\Expand-Archive -Path $aPath -DestinationPath $aDestinationPath -Force
+                Microsoft.PowerShell.Archive\Expand-Archive -Path $currentPath -DestinationPath $currentDestinationPath -Force
             }
-            if ($aExtractDir) {
-                movedir "$aDestinationPath\$aExtractDir" $OriDestinationPath | Out-Null
-                Remove-Item $aDestinationPath -Recurse -Force
+            if ($currentExtractDir) {
+                movedir "$currentDestinationPath\$currentExtractDir" $OriDestinationPath | Out-Null
+                Remove-Item $currentDestinationPath -Recurse -Force
             }
             if ($Removal) {
                 # Remove original archive file
-                Remove-Item $aPath -Force
+                Remove-Item $currentPath -Force
             }
         }
     }
