@@ -91,7 +91,7 @@ function Expand-7zipArchive {
             $ArgList = @('x', "`"$currentPath`"", "-o`"$currentDestinationPath`"", '-y')
             $IsTar = ((strip_ext $currentPath) -match '\.tar$') -or ($currentPath -match '\.t[abgpx]z2?$')
             if (!$IsTar -and $currentExtractDir) {
-                $ArgList += "-ir!$currentExtractDir\*"
+                $ArgList += "-ir!`"$currentExtractDir\*`""
             }
             if ($Switches) {
                 $ArgList += (-split $Switches)
