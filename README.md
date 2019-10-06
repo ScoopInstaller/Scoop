@@ -24,11 +24,11 @@
     <a href="https://discord.gg/s9yRQHt">
         <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
     </a>
-    <a href="https://gitter.im/lukesampson/scoop">
-        <img src="https://badges.gitter.im/lukesampson/scoop.png" alt="Gitter Chat" />
-    </a>
     <a href="https://github.com/lukesampson/scoop/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/lukesampson/scoop.svg" alt="License" />
+    </a>
+    <a href="https://github.com/ScoopInstaller/Awesome">
+        <img src="https://awesome.re/badge.svg" alt="Awesome Scoop" />
     </a>
 </p>
 
