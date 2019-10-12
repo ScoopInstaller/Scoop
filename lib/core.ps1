@@ -62,7 +62,7 @@ function set_config {
     )
 
     if ($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
-        $null = ensure (Split-Path -Path $configFile)
+        ensure (Split-Path -Path $configFile) | Out-Null
         $scoopConfig = New-Object -TypeName PSObject
     }
 
