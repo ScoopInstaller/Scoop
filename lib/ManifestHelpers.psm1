@@ -1,24 +1,34 @@
-function Initialize-Variables {
+function Get-VaribleFromSessionState {
+    <#
+    .SYNOPSIS
+        Helper to get content of variable from session state.
+    .PARAMETER Name
+        Name of variable to be resolved.
+    #>
+    param([String] $Name)
+
+    return $PSCmdlet.SessionState.PSVariable.GetValue($Name)
+}
+
+function Initialize-Variable {
     <#
     .SYNOPSIS
         Helper which needs to be executed in all other exposed helpers as it will provide all local variables to be used.
         Script bounded variables will be created and set.
     #>
+
     # Do not create variable when there are already defined.
     if (-not $dir) {
-        $script:dir = $PSCmdlet.SessionState.PSVariable.GetValue('dir')
-        $script:persist_dir = $PSCmdlet.SessionState.PSVariable.GetValue('persist_dir')
-        $script:fname = $PSCmdlet.SessionState.PSVariable.GetValue('fname')
-        $script:version = $PSCmdlet.SessionState.PSVariable.GetValue('version')
-        $script:global = $PSCmdlet.SessionState.PSVariable.GetValue('global')
-        $script:manifest = $PSCmdlet.SessionState.PSVariable.GetValue('manifest')
+        'dir', 'persist_dir', 'fname', 'version', 'global', 'manifest' | ForEach-Object {
+            Get-VaribleFromSessionState $_ | New-Variable -Name $_ -Scope Script
+        }
     }
 }
 
 function Test-Persistence {
     <#
     .SYNOPSIS
-        Persistence check helper.
+        Persistence check helper for files.
     .DESCRIPTION
         This will save some lines to not always write `if (-not (Test-Path $persist_dir\$file)) { New-item | Out-Null }` inside manifests.
     .PARAMETER File
@@ -38,7 +48,7 @@ function Test-Persistence {
         [ScriptBlock] $Execution
     )
 
-    Initialize-Variables
+    Initialize-Variable
 
     for ($ind = 0; $ind -lt $File.Count; ++$ind) {
         $f = $File[$ind]
@@ -57,10 +67,10 @@ function Test-Persistence {
                 } else {
                     $cont = $null
                 }
-                $path = (Join-Path $dir $f)
+                $path = Join-Path $dir $f
 
-                New-Item -Path $path -Force | Out-Null
-                if ($cont) { Set-Content -LiteralPath $path -Value $cont -Encoding ASCII }
+                New-Item -Path $path -ItemType File -Force | Out-Null
+                if ($cont) { Set-Content -LiteralPath $path -Value $cont -Encoding Ascii }
             }
         }
     }
@@ -73,10 +83,10 @@ function Remove-AppDirItem {
     .PARAMETER Item
         Item to be removed.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param([Parameter(Mandatory = $true, ValueFromPipeline = $true)] [String[]] $Item)
 
-    Initialize-Variables
+    Initialize-Variable
 
     foreach ($it in $Item) { Get-ChildItem $dir $it | Remove-Item -Force -Recurse }
 }
@@ -84,17 +94,17 @@ function Remove-AppDirItem {
 function New-JavaShortcutWrapper {
     <#
     .SYNOPSIS
-        Create new shim-like batch file wrapper to spawn jar files from shortcut.
+        Create new shim-like batch file wrapper to spawn jar files within start menu (shortcut).
     .PARAMETER Filename
-        Filename of jar executable without file .jar extension!
+        Filename of jar executable. Without .jar extension!
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param([Parameter(Mandatory = $true, ValueFromPipeline = $true)] [String[]] $Filename)
 
-    Initialize-Variables
+    Initialize-Variable
 
     foreach ($f in $Filename) {
-        Set-Content (Join-Path $dir "$f.bat") "@start javaw.exe -jar `"%~dp0$f.jar`" %*" -Encoding ASCII
+        Set-Content -LiteralPath (Join-Path $dir "$f.bat") -Value "@start javaw.exe -jar `"%~dp0$f.jar`" %*" -Encoding Ascii -Force
     }
 }
 
