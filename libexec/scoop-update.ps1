@@ -173,6 +173,11 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     if (!$independent) {
         # check dependencies
+        if ($install.url) {
+            $deps = @(deps $install.url $architecture) | Where-Object { !(installed $_) }
+        } else {
+            $deps = @(deps $app $architecture) | Where-Object { !(installed $_) }
+        }
         $deps = @(deps $app $architecture) | Where-Object { !(installed $_) }
         $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
