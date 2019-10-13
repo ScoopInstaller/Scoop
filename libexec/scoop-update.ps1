@@ -271,7 +271,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     if ($bucket) {
         # add bucket name it was installed from
         $app = "$bucket/$app"
-    } elseif ($install.url) {
+    } 
+    if ($install.url) {
         # use the url of the install json if the application was installed through url
         $app = $install.url
     }
