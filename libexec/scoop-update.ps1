@@ -173,7 +173,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     if (!$independent) {
         # check dependencies
-        $deps = @(deps $app $architecture) | Where-Object { !(installed $_) }
+        $man = if ($url) { $url } else { $app }
+        $deps = @(deps $man $architecture) | Where-Object { !(installed $_) }
         $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 
@@ -271,6 +272,10 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     if ($bucket) {
         # add bucket name it was installed from
         $app = "$bucket/$app"
+    }
+    if ($install.url) {
+        # use the url of the install json if the application was installed through url
+        $app = $install.url
     }
     install_app $app $architecture $global $suggested $use_cache $check_hash
 }
