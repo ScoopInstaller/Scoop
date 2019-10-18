@@ -1,11 +1,7 @@
 
-. "$PSScriptRoot\core.ps1"
-. "$PSScriptRoot\manifest.ps1"
-. "$PSScriptRoot\help.ps1"
-. "$PSScriptRoot\install.ps1"
-. "$PSScriptRoot\shortcuts.ps1"
-. "$PSScriptRoot\psmodules.ps1"
-. "$PSScriptRoot\versions.ps1"
+'core', 'manifest', 'help', 'install', 'shortcuts', 'psmodules', 'versions' | ForEach-Object {
+    . "$PSScriptRoot\$_.ps1"
+}
 
 function Uninstall-ScoopApplication {
     <#
@@ -42,7 +38,7 @@ function Uninstall-ScoopApplication {
     $persist_dir = persistdir $App $Global
     $dir = versiondir $App $version $Global
 
-    info "Uninstalling '$App' ($version)"
+    message "Uninstalling '$App' ($version)"
 
     try {
         Test-Path $dir -ErrorAction Stop | Out-Null
@@ -82,7 +78,7 @@ function Uninstall-ScoopApplication {
     # Remove older versions
     if ($Older) {
         @(versions $App $Global) | ForEach-Object {
-            info "Removing older version ($_)."
+            message "Removing older version ($_)."
 
             $dir = versiondir $app $_ $Global
             try {
@@ -108,7 +104,7 @@ function Uninstall-ScoopApplication {
     }
 
     if ($Purge) {
-        info 'Removing persisted data.'
+        message 'Removing persisted data.'
         $persist_dir = persistdir $App $Global
 
         if (Test-Path $persist_dir) {

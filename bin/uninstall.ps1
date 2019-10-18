@@ -17,6 +17,8 @@ param(
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 
+Join-Path $PSScriptRoot '..\lib\Uninstall.psm1'
+
 if ($global -and !(is_admin)) {
     error 'You need admin rights to uninstall globally.'
     exit 1
@@ -31,35 +33,6 @@ $yn = Read-Host 'Are you sure? (yN)'
 if ($yn -notlike 'y*') { exit }
 
 $errors = $false
-
-# Uninstall given app
-function do_uninstall($app, $global) {
-    $version = current_version $app $global
-    $dir = versiondir $app $version $global
-    $manifest = installed_manifest $app $version $global
-    $install = install_info $app $version $global
-    $architecture = $install.architecture
-
-    Write-Output "Uninstalling '$app'"
-    run_uninstaller $manifest $architecture $dir
-    rm_shims $manifest $global $architecture
-
-    # If a junction was used during install, that will have been used
-    # as the reference directory. Othewise it will just be the version
-    # directory.
-    $refdir = unlink_current (appdir $app $global)
-
-    env_rm_path $manifest $refdir $global
-    env_rm $manifest $global
-
-    $appdir = appdir $app $global
-    try {
-        Remove-Item $appdir -Recurse -Force -ErrorAction Stop
-    } catch {
-        $errors = $true
-        warn "Couldn't remove $(friendly_path $appdir): $_.Exception"
-    }
-}
 
 function rm_dir($dir) {
     try {
@@ -78,17 +51,15 @@ function keep_onlypersist($directory) {
 # a problem deleting a directory (which is quite likely)
 if ($global) {
     installed_apps $true | ForEach-Object { # global apps
-        do_uninstall $_ $true
+        $errors = Uninstall-ScoopApplication -App $_ -Global:$true
     }
 }
 
 installed_apps $false | ForEach-Object { # local apps
-    do_uninstall $_ $false
+    $errors = Uninstall-ScoopApplication -App $_ -Global:$false
 }
 
-if ($errors) {
-    abort 'Not all apps could be deleted. Try again or restart.'
-}
+if ($errors) { abort 'Not all apps could be deleted. Try again or restart.' }
 
 if ($purge) {
     rm_dir $scoopdir
