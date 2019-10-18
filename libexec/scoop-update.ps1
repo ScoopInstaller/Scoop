@@ -91,7 +91,7 @@ function update_scoop() {
     } else {
         Push-Location $currentdir
 
-        $currentRepo = git_config remote.origin.url
+        $previousCommit = Invoke-Expression 'git rev-parse HEAD'
         $currentRepo = Invoke-Expression "git config remote.origin.url"
         $currentBranch = Invoke-Expression "git branch"
 
@@ -119,7 +119,7 @@ function update_scoop() {
 
         $res = $lastexitcode
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
         Pop-Location
@@ -148,9 +148,10 @@ function update_scoop() {
         }
 
         Push-Location $loc
+        $previousCommit = (Invoke-Expression 'git rev-parse HEAD')
         git_pull -q
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
         Pop-Location
     }
