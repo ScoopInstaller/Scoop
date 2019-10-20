@@ -63,7 +63,6 @@ function search_bucket($bucket, $query) {
         }
 
         foreach ($shortcut in $app.shortcuts) {
-            $shortcut = $_
             if($shortcut -is [Array] -and $shortcut.length -ge 2) {
                 $name = $shortcut[1]
                 if($name -match $query) {
