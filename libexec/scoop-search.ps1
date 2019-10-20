@@ -132,7 +132,6 @@ Write-Host 'Searching in local buckets ...'
 $local_results = @()
 
 foreach ($bucket in (Get-LocalBucket) {
-    $bucket = $_
     $result = search_bucket $bucket $query
     if(!$result) {
         return
