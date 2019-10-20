@@ -44,7 +44,6 @@ function search_bucket($bucket, $query) {
     $result = @()
 
     foreach ($app in $apps) {
-        $app = $_
         if($app.name -match $query -and !$result.Contains($app)) {
             $result += $app
         }
