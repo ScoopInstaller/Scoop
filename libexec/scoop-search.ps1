@@ -106,7 +106,7 @@ function search_remote($bucket, $query) {
                 }
             } else {
                 $response = Invoke-RestMethod -Uri $request_uri
-                $ratelimit_reached = (github_ratelimit_reached)
+                $ratelimit_reached = github_ratelimit_reached
             }
 
             $result = $response.tree | Where-Object {
