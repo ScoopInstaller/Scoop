@@ -53,7 +53,7 @@ function Test-Persistence {
     for ($ind = 0; $ind -lt $File.Count; ++$ind) {
         $f = $File[$ind]
 
-        if (-not (Test-Path (Join-Path $persist_dir $f))) {
+        if (-not (Join-Path $persist_dir $f | Test-Path -Type Leaf)) {
             if ($Execution) {
                 & $Execution
             } else {
