@@ -43,7 +43,7 @@ function search_bucket($bucket, $query) {
 
     $result = @()
 
-    $apps | Foreach-Object {
+    foreach ($app in $apps) {
         $app = $_
         if($app.name -match $query -and !$result.Contains($app)) {
             $result += $app
