@@ -82,7 +82,7 @@ function search_bucket($bucket, $query) {
 }
 
 function github_ratelimit_reached {
-    (Invoke-RestMethod -Uri 'https://api.github.com/rate_limit').rate.remaining -eq 0
+    return (Invoke-RestMethod -Uri 'https://api.github.com/rate_limit').rate.remaining -eq 0
 }
 
 $ratelimit_reached = github_ratelimit_reached
