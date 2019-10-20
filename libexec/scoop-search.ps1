@@ -131,7 +131,7 @@ function search_remotes($query) {
 Write-Host 'Searching in local buckets ...'
 $local_results = @()
 
-Get-LocalBucket | ForEach-Object {
+foreach ($bucket in (Get-LocalBucket) {
     $bucket = $_
     $result = search_bucket $bucket $query
     if(!$result) {
