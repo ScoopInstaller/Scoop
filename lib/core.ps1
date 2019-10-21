@@ -844,11 +844,17 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
     } elseif ($entity -is [String]) {
         $params.GetEnumerator() | ForEach-Object {
             if($regexEscape -eq $false -or $null -eq $_.Value) {
-                $entity = $entity.Replace($_.Name, $_.Value)
+                $value = $_.Value
             } else {
-                $entity = $entity.Replace($_.Name, [Regex]::Escape($_.Value))
+                $value = [Regex]::Escape($_.Value)
             }
+
+            $curly = '${'  + $_.Name.TrimStart('$') + '}'
+
+            $entity = $entity.Replace($curly, $value)
+            $entity = $entity.Replace($_.Name, $value)
         }
+
         return $entity
     }
 }
