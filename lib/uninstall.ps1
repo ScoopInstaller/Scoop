@@ -114,9 +114,8 @@ function Uninstall-ScoopApplication {
                 return $false
             }
         }
-
         # TODO: System wide purge uninstallation
     }
-}
 
-Export-ModuleMember -Function Uninstall-ScoopApplication
+    return $true
+}

@@ -11,13 +11,9 @@ param(
     [bool] $purge
 )
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\shortcuts.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-
-Join-Path $PSScriptRoot '..\lib\Uninstall.psm1' | Import-Module
+'core', 'install', 'shortcuts', 'versions', 'manifest', 'uninstall' | ForEach-Object {
+    . "$PSScriptRoot\..\lib\$_.ps1"
+}
 
 if ($global -and !(is_admin)) {
     error 'You need admin rights to uninstall globally.'

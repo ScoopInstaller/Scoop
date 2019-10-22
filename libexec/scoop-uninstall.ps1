@@ -6,10 +6,9 @@
 #   -g, --global   Uninstall a globally installed app
 #   -p, --purge    Remove all persistent data
 
-'core', 'manifest', 'help', 'install', 'shortcuts', 'psmodules', 'versions', 'getopt' | ForEach-Object {
+'core', 'manifest', 'help', 'install', 'shortcuts', 'psmodules', 'versions', 'getopt', 'uninstall' | ForEach-Object {
     . "$PSScriptRoot\..\lib\$_.ps1"
 }
-Join-Path $PSScriptRoot '..\lib\Uninstall.psm1' | Import-Module
 
 reset_aliases
 

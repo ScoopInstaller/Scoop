@@ -13,10 +13,9 @@
 #   -s, --skip                Skip hash validation (use with caution!)
 #   -q, --quiet               Hide extraneous messages
 
-'core', 'shortcuts', 'psmodules', 'decompress', 'manifest', 'buckets', 'versions', 'getopt', 'depends', 'git', 'install' | ForEach-Object {
+'core', 'shortcuts', 'psmodules', 'decompress', 'manifest', 'buckets', 'versions', 'getopt', 'depends', 'git', 'install', 'uninstall' | ForEach-Object {
     . "PSScriptRoot\..\lib\$_.ps1"
 }
-Join-Path $PSScriptRoot '..\lib\Uninstall.psm1' | Import-Module
 
 reset_aliases
 
