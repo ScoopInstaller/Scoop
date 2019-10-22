@@ -33,7 +33,7 @@ describe "versions" -Tag 'Scoop' {
         Compare-Version '2019-01-01' '2018-01-01' | Should -Be -1
     }
 
-    it 'handles comparsion against en empty string' {
+    it 'handles comparsion against an empty string' {
         Compare-Version '7.0.4-9' '' | Should -Be -1
     }
 
@@ -41,5 +41,76 @@ describe "versions" -Tag 'Scoop' {
         Compare-Version '12.0' '12.0' | Should -Be 0
         Compare-Version '7.0.4-9' '7.0.4-9' | Should -Be 0
         Compare-Version 'nightly-20190801' 'nightly' | Should -Be 0
+    }
+
+    Context 'semver compliant versions' {
+        it 'handles major.minor.patch progressing' {
+            Compare-Version "0.1.0" "0.1.1" | Should -be 1
+            Compare-Version "0.1.1" "0.2.0" | Should -be 1
+            Compare-Version "0.2.0" "1.0.0" | Should -be 1
+        }
+
+        it 'handles pre-release versioning progression' {
+            Compare-Version "0.4.0" "0.5.0-alpha.1" | Should -be 1
+            Compare-Version "0.5.0-alpha.1" "0.5.0-alpha.2" | Should -be 1
+            Compare-Version "0.5.0-alpha.2" "0.5.0-alpha.10" | Should -be 1
+            Compare-Version "0.5.0-alpha.10" "0.5.0-beta" | Should -be 1
+            Compare-Version "0.5.0-beta" "0.5.0-alpha.10" | Should -be -1
+            Compare-Version "0.5.0-beta" "0.5.0-beta.0" | Should -be 1
+        }
+
+        it 'handles the pre-release tags in an alphabetic order' {
+            Compare-Version "0.5.0-rc.1" "0.5.0-z" | Should -be 1
+            Compare-Version "0.5.0-rc.1" "0.5.0-howdy" | Should -be -1
+        }
+
+        it 'handles version strings containing metadata' {
+            Compare-Version "1.0.0-beta.3.4.5+metadata1" "1.0.0-beta.3.4.5+metadata2" | Should -be 0
+            Compare-Version "1.0.0-beta.3.4.6+metadata1" "1.0.0-beta.3.4.5+metadata2" | Should -be -1
+            Compare-Version "1.0.0-beta.3.4.5.643634.643643+metadata1" "1.0.0-beta.3.4.6+metadata2" | Should -be 1
+        }
+    }
+
+    Context 'semver semi-compliant versions' {
+        it 'handles Windows-styled major.minor.patch.build progression' {
+            Compare-Version "0.0.0.0" "0.0.0.1" | Should -be 1
+            Compare-Version "0.0.0.1" "0.0.0.2" | Should -be 1
+            Compare-Version "0.0.0.2" "0.0.1.0" | Should -be 1
+            Compare-Version "0.0.1.0" "0.0.1.1" | Should -be 1
+            Compare-Version "0.0.1.1" "0.0.1.2" | Should -be 1
+            Compare-Version "0.0.1.2" "0.0.2.0" | Should -be 1
+            Compare-Version "0.0.2.0" "0.1.0.0" | Should -be 1
+            Compare-Version "0.1.0.0" "0.1.0.1" | Should -be 1
+            Compare-Version "0.1.0.1" "0.1.0.2" | Should -be 1
+            Compare-Version "0.1.0.2" "0.1.1.0" | Should -be 1
+            Compare-Version "0.1.1.0" "0.1.1.1" | Should -be 1
+            Compare-Version "0.1.1.1" "0.1.1.2" | Should -be 1
+            Compare-Version "0.1.1.2" "0.2.0.0" | Should -be 1
+            Compare-Version "0.2.0.0" "1.0.0.0" | Should -be 1
+        }
+
+        it 'handles partial semver version differences' {
+            Compare-Version "1" "1.1" | Should -be 1
+            Compare-Version "1" "1.0" | Should -be 1
+            Compare-Version "1.1.0.0" "1.1" | Should -be -1
+            Compare-Version "1.4" "1.3.0" | Should -be -1
+            Compare-Version "1.4" "1.3.255.255" | Should -be -1
+            Compare-Version "1.4" "1.4.4" | Should -be 1
+        }
+
+        it 'handles post-release tagging' {
+            Compare-Version "1" "1+hotfix.0" | Should -be 1
+            Compare-Version "1.0.0" "1.0.0+hotfix.0" | Should -be 1
+            Compare-Version "1.0.0+hotfix.0" "1.0.0+hotfix.1" | Should -be 1
+            Compare-Version "1.0.0+hotfix.1" "1.0.1" | Should -be 1
+            Compare-Version "0.5.0-rc.1" "0.5.0+hotfix.1" | Should -be 1
+            Compare-Version "0.5.0+update" "0.5.0-rc.1" | Should -be -1
+            Compare-Version "1.0.0+a" "1.0.0+b" | Should -be 1
+        }
+
+        it 'handles post-release tagging AND metadata' {
+            Compare-Version "1+hotfix.0+metadata" "1+hotfix.0+notthesamemetadata" | Should -be 0
+            Compare-Version "1.2.3.4+maintenance.1.7+somemeta" "1.2.3.4+maintenance.1.7.1+othermeta" | Should -be 1
+        }
     }
 }

@@ -25,6 +25,28 @@ function Compare-Version {
         $Delimiter = '-'
     )
 
+
+    # Trim metadata from version (usually anything after the '+' sign, if we're considering semver)
+    # This metadata usually doesn't matter to the end user anyways and is of no value for the comparison.
+    # However, we still must be aware of post-release tagging which uses the '+' sign.
+    if ($ReferenceVersion -match ".+[-+].+\+.+") {
+        $refverarray = $ReferenceVersion.split("+")
+        if ($refverarray.length -eq 3) {
+            $ReferenceVersion = $refverarray[0] + "+" + $refverarray[1]
+        } else {
+            $ReferenceVersion = $refverarray[0]
+        }
+    }
+
+    if ($DifferenceVersion -match ".+[-+].+\+.+") {
+        $diffverarray = $DifferenceVersion.split("+")
+        if ($diffverarray.length -eq 3) {
+            $DifferenceVersion = $diffverarray[0] + "+" + $diffverarray[1]
+        } else {
+            $DifferenceVersion = $diffverarray[0]
+        }
+    }
+
     if ($DifferenceVersion -eq $ReferenceVersion) {
         return 0
     }
