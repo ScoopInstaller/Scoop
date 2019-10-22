@@ -51,12 +51,12 @@ function keep_onlypersist($directory) {
 # a problem deleting a directory (which is quite likely)
 if ($global) {
     installed_apps $true | ForEach-Object { # global apps
-        $errors = Uninstall-ScoopApplication -App $_ -Global:$true
+        $errors = Uninstall-ScoopApplication -App $_ -Global
     }
 }
 
 installed_apps $false | ForEach-Object { # local apps
-    $errors = Uninstall-ScoopApplication -App $_ -Global:$false
+    $errors = Uninstall-ScoopApplication -App $_
 }
 
 if ($errors) { abort 'Not all apps could be deleted. Try again or restart.' }
