@@ -17,9 +17,7 @@ function Test-7zipRequirement {
     } else {
         $URL = url $Manifest $Architecture
         $Installer = installer $Manifest $Architecture
-        if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
-            return $false
-        } elseif (($Installer.type -eq "nsis")) {
+        if (($Installer.type -eq "nsis")) {
             return $true
         } else {
             return ($URL | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0

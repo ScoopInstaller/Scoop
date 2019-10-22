@@ -96,5 +96,9 @@ function install_deps($manifest, $arch) {
     $deps += script_deps $installer.script
     $deps += script_deps $post_install
 
-    return $deps | Select-Object -Unique
+    if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
+        $deps = @($deps | Select-Object -Unique) -ne '7zip'
+    }
+
+    return $deps
 }

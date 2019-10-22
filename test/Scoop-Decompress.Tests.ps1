@@ -8,9 +8,6 @@ $isUnix = is_unix
 
 Describe 'Requirement function' -Tag 'Scoop' {
     It 'Test 7zip requirement' {
-        Mock get_config { $true }
-        Test-7zipRequirement @{ url = "test.7z" } '64bit' | Should -BeFalse
-        Mock get_config { $false }
         Test-7zipRequirement @{ url = "test.7z" } '64bit' | Should -BeTrue
         Test-7zipRequirement @{ installer = @{ type = "nsis" } } '64bit' | Should -BeTrue
         Test-7zipRequirement @{ url = "test.exe" } '64bit' | Should -BeFalse
