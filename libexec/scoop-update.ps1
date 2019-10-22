@@ -84,34 +84,35 @@ function update_scoop() {
     } else {
         Push-Location $currentdir
 
-        $currentRepo = git_config remote.origin.url
-        $currentBranch = git_branch
+        $previousCommit = Invoke-Expression 'git rev-parse HEAD'
+        $currentRepo = Invoke-Expression "git config remote.origin.url"
+        $currentBranch = Invoke-Expression "git branch"
 
         $isRepoChanged = !($currentRepo -match $configRepo)
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
         # Change remote url if the repo is changed
         if ($isRepoChanged) {
-            git_config remote.origin.url "$configRepo"
+            Invoke-Expression "git config remote.origin.url '$configRepo'"
         }
 
         # Fetch and reset local repo if the repo or the branch is changed
         if ($isRepoChanged -or $isBranchChanged) {
             # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-            git_config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+            Invoke-Expression "git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'"
             # fetch remote branch
             git_fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
             # checkout and track the branch
             git_checkout -B $configBranch -t origin/$configBranch -q
             # reset branch HEAD
-            git_reset --hard origin/$configBranch -q
+            Invoke-Expression "git reset --hard origin/$configBranch -q"
         } else {
             git_pull -q
         }
 
         $res = $lastexitcode
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
         Pop-Location
@@ -140,9 +141,10 @@ function update_scoop() {
         }
 
         Push-Location $loc
+        $previousCommit = (Invoke-Expression 'git rev-parse HEAD')
         git_pull -q
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
         Pop-Location
     }
