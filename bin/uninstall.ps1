@@ -28,7 +28,7 @@ if ($purge) {
 $yn = Read-Host 'Are you sure? (yN)'
 if ($yn -notlike 'y*') { exit }
 
-$errors = $false
+$errors = 0
 
 function rm_dir($dir) {
     try {
@@ -47,15 +47,17 @@ function keep_onlypersist($directory) {
 # a problem deleting a directory (which is quite likely)
 if ($global) {
     installed_apps $true | ForEach-Object { # global apps
-        $errors = Uninstall-ScoopApplication -App $_ -Global
+        $result = Uninstall-ScoopApplication -App $_ -Global
+        if ($result -eq $false) { $errors += 1 }
     }
 }
 
 installed_apps $false | ForEach-Object { # local apps
-    $errors = Uninstall-ScoopApplication -App $_
+    $result = Uninstall-ScoopApplication -App $_
+    if ($result -eq $false) { $errors += 1 }
 }
 
-if ($errors) { abort 'Not all apps could be deleted. Try again or restart.' }
+if ($errors -gt 0) { abort 'Not all apps could be deleted. Try again or restart.' }
 
 if ($purge) {
     rm_dir $scoopdir
