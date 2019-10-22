@@ -17,7 +17,6 @@ function Uninstall-ScoopApplication {
         Remove older versions. Older versions are removed only on uninstallation, not on update.
     #>
     [CmdletBinding()]
-    # TODO: Use trow instead of boolean
     [OutputType([Bool])]
     param(
         [String] $App,
@@ -35,8 +34,8 @@ function Uninstall-ScoopApplication {
     }
 
     $version = current_version $App $Global
-    $persist_dir = persistdir $App $Global
     $dir = versiondir $App $version $Global
+    $persist_dir = persistdir $App $Global
 
     message "Uninstalling '$App' ($version)"
 
@@ -64,19 +63,19 @@ function Uninstall-ScoopApplication {
     env_rm_path $manifest $refdir $Global
     env_rm $manifest $Global
 
-    try {
-        # unlink all potential old link before doing recursive Remove-Item
-        unlink_persist_data $dir
-        Remove-Item $dir -Recurse -Force -ErrorAction Stop
-    } catch {
-        if (Test-Path $dir) {
-            error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
-            return $false
-        }
-    }
-
     # Remove older versions
     if ($Older) {
+        try {
+            # unlink all potential old link before doing recursive Remove-Item
+            unlink_persist_data $dir
+            Remove-Item $dir -Recurse -Force -ErrorAction Stop
+        } catch {
+            if (Test-Path $dir) {
+                error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+                return $false
+            }
+        }
+
         @(versions $App $Global) | ForEach-Object {
             message "Removing older version ($_)."
 
