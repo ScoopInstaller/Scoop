@@ -232,10 +232,10 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $result = Uninstall-ScoopApplication -App $app -Global:$global
     if ($result -eq $false) { return }
 
-    $dir = versiondir $app $old_version $global
-
     # Rename current version to .old if same version is installed
     if ($force -and ($old_version -eq $version)) {
+        $dir = versiondir $app $old_version $global
+
         if (!(Test-Path "$dir/../_$version.old")) {
             Move-Item "$dir" "$dir/../_$version.old"
         } else {
