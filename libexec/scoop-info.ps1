@@ -84,7 +84,7 @@ Write-Output "Manifest:`n  $manifest_file"
 if($status.installed) {
     # Show installed versions
     Write-Output "Installed:"
-    $versions = versions $app $global
+    $versions = Get-InstalledVersion -App $app -Global:$global
     $versions | ForEach-Object {
         $dir = versiondir $app $_ $global
         if($global) { $dir += " *global*" }

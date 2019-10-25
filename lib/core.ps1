@@ -289,7 +289,7 @@ function Test-Aria2Enabled {
 function app_status($app, $global) {
     $status = @{}
     $status.installed = (installed $app $global)
-    $status.version = current_version $app $global
+    $status.version = Select-CurrentVersion -App $app -Global:$global
     $status.latest_version = $status.version
 
     $install_info = install_info $app $status.version $global

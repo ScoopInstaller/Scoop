@@ -1021,7 +1021,7 @@ function prune_installed($apps, $global) {
 
 # check whether the app failed to install
 function failed($app, $global) {
-    $ver = current_version $app $global
+    $ver = Select-CurrentVersion -App $app -Global:$global
     if(!$ver) { return $false }
     $info = install_info $app $ver $global
     if(!$info) { return $true }
