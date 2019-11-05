@@ -21,7 +21,7 @@ function deps($app, $arch) {
 
 function dep_resolve($app, $arch, $resolved, $unresolved) {
     $app, $bucket, $null = parse_app $app
-    if(((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
+    if ($bucket -and ((Get-LocalBucket) -notcontains $bucket)) {
         abort "Bucket '$bucket' not installed. Add it with 'scoop bucket add $bucket' or 'scoop bucket add $bucket <repo>'."
     }
     $unresolved += $app
