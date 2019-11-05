@@ -89,7 +89,7 @@ function Find-Manifest($app, $bucket) {
         if (!$bucket) {
             $manifest, $bucket = find_manifest $app $bucket
         } else {
-            $manifest, $null = find_manifest $app $bucket            
+            $manifest, $null = find_manifest $app $bucket
         }
 
         if(!$manifest -and !$bucket) {
