@@ -87,7 +87,7 @@ function Find-Manifest($app, $bucket) {
     } else {
         # check buckets
         if (!$bucket) {
-            $manifest, $bucket = find_manifest $app $bucket
+            $manifest, $bucket = find_manifest $app
         } else {
             $manifest, $null = find_manifest $app $bucket
         }
