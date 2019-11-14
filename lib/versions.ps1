@@ -1,21 +1,38 @@
 # versions
 function Get-LatestVersion {
+    <#
+    .SYNOPSIS
+        Get latest version of app
+    .DESCRIPTION
+        Get latest version of app from manifest
+    #>
     param (
         [String]
+        # App's name
         $App,
         [String]
+        # Bucket which the app is belong to
         $Bucket,
         [String]
+        # Remote app manifest's URI
         $URL
     )
     return (manifest $App $Bucket $URL).version
 }
 
 function Select-CurrentVersion {
+    <#
+    .SYNOPSIS
+        Select current version of app
+    .DESCRIPTION
+        Select current version of installed app, from 'current\manifest.json' or modified time of version directory
+    #>
     param (
         [String]
+        # App's name
         $App,
         [Switch]
+        # If global installed
         $Global
     )
 
@@ -34,10 +51,18 @@ function Select-CurrentVersion {
 }
 
 function Get-InstalledVersion {
+    <#
+    .SYNOPSIS
+        Get installed version of app
+    .DESCRIPTION
+        Get all installed version of app, by checking version directories' 'install.json'
+    #>
     param (
         [String]
+        # App's name
         $App,
         [Switch]
+        # If global installed
         $Global
     )
 
@@ -53,16 +78,25 @@ function Get-InstalledVersion {
 }
 
 function Compare-Version {
+    <#
+    .SYNOPSIS
+        Compare versions
+    .DESCRIPTION
+        Compare versions, mainly according to SemVer's rules
+    #>
     [OutputType('System.Int32')]
     [CmdletBinding()]
     param (
         [Parameter(Position = 0)]
         [String]
+        # Specifies a version used as a reference for comparison.
         $ReferenceVersion,
         [Parameter(Position = 1)]
         [String]
+        # Specifies the version that are compared to the reference version.
         $DifferenceVersion,
         [String]
+        # Specifies the delimiter of versions
         $Delimiter = '-'
     )
 
