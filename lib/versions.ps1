@@ -23,7 +23,12 @@ function Select-CurrentVersion {
     if (Test-Path "$appPath\current") {
         $currentVersion = (installed_manifest $App 'current' $Global).version
     } else {
-        $currentVersion = (Get-InstalledVersion -App $App -Global:$Global)[-1]
+        $installedVersion = Get-InstalledVersion -App $App -Global:$Global
+        if ($installedVersion) {
+            $currentVersion = $installedVersion[-1]
+        } else {
+            $currentVersion = $null
+        }
     }
     return $currentVersion
 }
