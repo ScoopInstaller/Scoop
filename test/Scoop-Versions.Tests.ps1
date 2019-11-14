@@ -23,13 +23,6 @@ Describe "versions comparison" -Tag 'Scoop' {
             Compare-Version "0.5.0-rc.1" "0.5.0-howdy" | Should -Be -1
             Compare-Version "0.5.0-howdy" "0.5.0-rc.1" | Should -Be 1
         }
-
-        It 'handles version strings containing metadata' {
-            Compare-Version "1.0.0-beta.3.4.5+metadata1" "1.0.0-beta.3.4.5+metadata2" | Should -Be 0
-            Compare-Version "1.0.0-beta.3.4.6+metadata1" "1.0.0-beta.3.4.5+metadata2" | Should -Be -1
-            Compare-Version "1.0.0-beta.3.4.5.643634.643643+metadata1" "1.0.0-beta.3.4.6+metadata2" | Should -Be 1
-            Compare-Version "1.0.0+20130313144700" "1.0.0-beta+exp.sha.5114f85" | Should -Be -1
-        }
     }
 
     Context 'semver semi-compliant versions' {
@@ -71,17 +64,11 @@ Describe "versions comparison" -Tag 'Scoop' {
             Compare-Version '2018-01-01' '2019-01-01' | Should -Be 1
             Compare-Version '2019-01-01' '2018-01-01' | Should -Be -1
         }
-        It 'handles post-release tagging (Flutter''s "hotfix")' {
+        It 'handles post-release tagging ("+")' {
             Compare-Version "1" "1+hotfix.0" | Should -Be 1
             Compare-Version "1.0.0" "1.0.0+hotfix.0" | Should -Be 1
             Compare-Version "1.0.0+hotfix.0" "1.0.0+hotfix.1" | Should -Be 1
             Compare-Version "1.0.0+hotfix.1" "1.0.1" | Should -Be 1
-            Compare-Version "0.5.0-rc.1" "0.5.0+hotfix.1" | Should -Be 1
-        }
-
-        It 'handles post-release tagging AND metadata' {
-            Compare-Version "1+hotfix.0+metadata" "1+hotfix.0+notthesamemetadata" | Should -Be 0
-            Compare-Version "1.2.3.4+hotfix.7+003" "1.2.3.4+hotfix.8+001" | Should -Be 1
         }
     }
 
@@ -92,7 +79,6 @@ Describe "versions comparison" -Tag 'Scoop' {
             Compare-Version '0.5' '0.5Beta' | Should -Be -1
             Compare-Version '0.4' '0.5Beta' | Should -Be 1
         }
-
 
         It 'handles empty string' {
             Compare-Version '7.0.4-9' '' | Should -Be -1

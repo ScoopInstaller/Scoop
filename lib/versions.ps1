@@ -100,21 +100,9 @@ function Compare-Version {
         $Delimiter = '-'
     )
 
-    # Trim metadata from version (usually anything after the '+' sign, if we're considering semver)
-    # This metadata usually doesn't matter to the end user anyways and is of no value for the comparison.
-    # However, we still must be aware of post-release tagging which uses the '+' sign (only seen in Flutter https://flutter.dev/docs/development/tools/sdk/releases).
-
-    # Special usage of '+' for Flutter (https://github.com/flutter/flutter/wiki/Release-process#applying-emergency-fixes)
-    $ReferenceVersion = $ReferenceVersion -replace '^([^+]*)\+([^+]*?hotfix.*)$', '$1-$2'
-    $DifferenceVersion = $DifferenceVersion -replace '^([^+]*)\+([^+]*?hotfix.*)$', '$1-$2'
-
-    # Trim metadata (https://semver.org/#spec-item-10)
-    if ( -join ($ReferenceVersion, $DifferenceVersion) -match '\+') {
-        return (Compare-Version ($ReferenceVersion -replace '(.*)\+[0-9A-Za-z.-]+$', '$1') ($DifferenceVersion -replace '(.*)\+[0-9A-Za-z.-]+$', '$1'))
-    }
-    # Turn back Flutter's '+' for correct comparison
-    $ReferenceVersion = $ReferenceVersion -replace '^([^+]*)\-([^+]*?hotfix.*)$', '$1+$2'
-    $DifferenceVersion = $DifferenceVersion -replace '^([^+]*)\-([^+]*?hotfix.*)$', '$1+$2'
+    # Use '+' sign as post-release, see https://github.com/lukesampson/scoop/pull/3721#issuecomment-553718093
+    $ReferenceVersion = $ReferenceVersion -replace '\+', '-'
+    $DifferenceVersion = $DifferenceVersion -replace '\+', '-'
 
     if ($DifferenceVersion -eq $ReferenceVersion) {
         return 0
