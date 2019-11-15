@@ -120,6 +120,34 @@ function is_admin {
     ([security.principal.windowsprincipal]($id)).isinrole($admin)
 }
 
+function Stop-ScoopExecution {
+    <#
+    .SYNOPSIS
+        Print error message and exit whole scoop execution.
+    .DESCRIPTION
+        This function should be used only as the last thing, where there is not possible to recover from error state or
+        if you can freely exit entire execution without causing problems to user.
+        If it is called there is no failsafe / error state handling.
+        For Example. When there is installation of multiple application happening, and first failed, rest of
+        applications are not installed, which is not user friendly.
+    .PARAMETER Message
+        Message, which will be printed to user.
+    .PARAMETER ExitCode
+        Exit code
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position = 0, ValueFromPipeline = $true, Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+        [String[]] $Message,
+        [Parameter(Position = 1, ValueFromPipelineByPropertyName = $true)]
+        [Int] $ExitCode = 1
+    )
+
+    process { $Message | ForEach-Object { error $_ } }
+
+    end { exit $ExitCode }
+}
+
 # messages
 function abort($msg, [int] $exit_code=1) { write-host $msg -f red; exit $exit_code }
 function error($msg) { write-host "ERROR $msg" -f darkred }
