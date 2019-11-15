@@ -9,17 +9,21 @@ param($app)
 
 reset_aliases
 
+$exitCode = 0
+
 if($app) {
     $manifest, $bucket = find_manifest $app
     if($manifest) {
-        if([string]::isnullorempty($manifest.homepage)) {
-            abort "Could not find homepage in manifest for '$app'."
+        if ([string]::isnullorempty($manifest.homepage)) {
+            error "Could not find homepage in manifest for '$app'."
+            $exitCode = 1
+        } else {
+            Start-Process $manifest.homepage
         }
-        Start-Process $manifest.homepage
-    }
-    else {
-        abort "Could not find manifest for '$app'."
+    } else {
+        error "Could not find manifest for '$app'."
+        $exitCode = 1
     }
 } else { my_usage }
 
-exit 0
+exit $exitCode

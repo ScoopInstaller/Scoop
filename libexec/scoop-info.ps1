@@ -31,7 +31,7 @@ if ($app -match '^(ht|f)tps?://|\\\\') {
 }
 
 if (!$manifest) {
-    abort "Could not find manifest for '$(show_app $app $bucket)'."
+    Stop-ScoopExecution "Could not find manifest for '$(show_app $app $bucket)'."
 }
 
 $install = install_info $app $status.version $global

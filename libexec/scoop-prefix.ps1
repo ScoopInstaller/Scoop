@@ -16,10 +16,12 @@ if(!(Test-Path $app_path)) {
     $app_path = versiondir $app 'current' $true
 }
 
+$exitCode = 0
 if(Test-Path $app_path) {
     Write-Output $app_path
 } else {
-    abort "Could not find app path for '$app'."
+    error "Could not find app path for '$app'."
+    $exitCode = 1
 }
 
-exit 0
+exit $exitCode
