@@ -135,7 +135,7 @@ function Stop-ScoopExecution {
     .PARAMETER ExitCode
         Exit code
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param(
         [Parameter(Position = 0, ValueFromPipeline = $true, Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
         [String[]] $Message,
