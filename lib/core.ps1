@@ -128,8 +128,8 @@ function Stop-ScoopExecution {
         This function should be used only as the last thing, where there is not possible to recover from error state or
         if you can freely exit entire execution without causing problems to user.
         If it is called there is no failsafe / error state handling.
-        For Example. When there is installation of multiple application happening, and first failed, rest of
-        applications are not installed, which is not user friendly.
+        For Example. When there is installation of multiple applications happening, and first failed. On fail this function
+        is called, and rest of applications are not installed, which is not user friendly.
     .PARAMETER Message
         Message, which will be printed to user.
     .PARAMETER ExitCode
