@@ -69,6 +69,7 @@ Describe "versions comparison" -Tag 'Scoop' {
             Compare-Version "1.0.0" "1.0.0+hotfix.0" | Should -Be 1
             Compare-Version "1.0.0+hotfix.0" "1.0.0+hotfix.1" | Should -Be 1
             Compare-Version "1.0.0+hotfix.1" "1.0.1" | Should -Be 1
+            Compare-Version "1.0.0+1.1" "1.0.0+1" | Should -Be -1
         }
     }
 
