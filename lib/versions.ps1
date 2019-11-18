@@ -6,13 +6,18 @@ function Get-LatestVersion {
     .DESCRIPTION
         Get latest version of app from manifest
     #>
+    [OutputType([String])]
+    [CmdletBinding()]
     param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [String]
         # App's name
         $App,
+        [Parameter(Position = 1)]
         [String]
         # Bucket which the app is belong to
         $Bucket,
+        [Parameter(Position = 2)]
         [String]
         # Remote app manifest's URI
         $URL
@@ -27,10 +32,14 @@ function Select-CurrentVersion {
     .DESCRIPTION
         Select current version of installed app, from 'current\manifest.json' or modified time of version directory
     #>
+    [OutputType([String])]
+    [CmdletBinding()]
     param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [String]
         # App's name
         $App,
+        [Parameter(Position = 1)]
         [Switch]
         # If global installed
         $Global
@@ -57,10 +66,14 @@ function Get-InstalledVersion {
     .DESCRIPTION
         Get all installed version of app, by checking version directories' 'install.json'
     #>
+    [OutputType([Object[]])]
+    [CmdletBinding()]
     param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [String]
         # App's name
         $App,
+        [Parameter(Position = 1)]
         [Switch]
         # If global installed
         $Global
@@ -96,7 +109,7 @@ function Compare-Version {
         [String]
         # Specifies a version used as a reference for comparison.
         $ReferenceVersion,
-        [Parameter(Position = 1)]
+        [Parameter(Position = 1, ValueFromPipeline = $true)]
         [String]
         # Specifies the version that are compared to the reference version.
         $DifferenceVersion,
