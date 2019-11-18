@@ -94,6 +94,7 @@ function Assert-Administrator {
     #>
     if (-not (is_admin)) {
         error 'Administrator privileges are required for installation'
+        # TODO:
         abort
     }
 }
@@ -112,12 +113,13 @@ function Assert-WindowsVersion {
 
     if ((Compare-Version ([System.Environment]::OSVersion.Version.ToString()) $RequiredVersion) -eq -1) {
         error "Application requires at least Windows version $RequiredVersion"
+        # TODO:
         abort
     }
 }
 
 #region dotNet Framework
-function Get-AllDotNetFrameworkVersions {
+function Get-InstalledDotNetFrameworkVersion {
     <#
     .SYNOPSIS
         List all installed .NET Framework versions.
@@ -146,7 +148,7 @@ function Get-LatestDotNetFrameworkVersion {
     [OutputType([String])]
     param() # For some reason there has to be empty param block
 
-    return Get-AllDotNetFrameworkVersions | Sort-Object | Select-Object -Last 1
+    return Get-InstalledDotNetFrameworkVersion | Sort-Object | Select-Object -Last 1
 }
 
 function Convert-DotNetFrameworkVersion {
@@ -204,6 +206,7 @@ function Assert-DotNetFramework {
 
     if ($latest -lt $required) {
         error "Application requires at least .NET Framework $RequiredVersion"
+        # TODO:
         abort
     }
 }
