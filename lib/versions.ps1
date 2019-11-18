@@ -5,21 +5,24 @@ function Get-LatestVersion {
         Get latest version of app
     .DESCRIPTION
         Get latest version of app from manifest
+    .PARAMETER App
+        App's name
+    .PARAMETER Bucket
+        Bucket which the app is belong to
+    .PARAMETER URL
+        Remote app manifest's URI
     #>
     [OutputType([String])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [String]
-        # App's name
         $App,
         [Parameter(Position = 1)]
         [String]
-        # Bucket which the app is belong to
         $Bucket,
         [Parameter(Position = 2)]
         [String]
-        # Remote app manifest's URI
         $URL
     )
     return (manifest $App $Bucket $URL).version
@@ -31,17 +34,19 @@ function Select-CurrentVersion {
         Select current version of app
     .DESCRIPTION
         Select current version of installed app, from 'current\manifest.json' or modified time of version directory
+    .PARAMETER App
+        App's name
+    .PARAMETER Global
+        If global installed
     #>
     [OutputType([String])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [String]
-        # App's name
         $App,
         [Parameter(Position = 1)]
         [Switch]
-        # If global installed
         $Global
     )
 
@@ -65,17 +70,19 @@ function Get-InstalledVersion {
         Get installed version of app
     .DESCRIPTION
         Get all installed version of app, by checking version directories' 'install.json'
+    .PARAMETER App
+        App's name
+    .PARAMETER Global
+        If global installed
     #>
     [OutputType([Object[]])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [String]
-        # App's name
         $App,
         [Parameter(Position = 1)]
         [Switch]
-        # If global installed
         $Global
     )
 
@@ -96,6 +103,12 @@ function Compare-Version {
         Compare versions
     .DESCRIPTION
         Compare versions, mainly according to SemVer's rules
+    .PARAMETER ReferenceVersion
+        Specifies a version used as a reference for comparison
+    .PARAMETER DifferenceVersion
+        Specifies the version that are compared to the reference version
+    .PARAMETER Delimiter
+        Specifies the delimiter of versions
     .OUTPUTS
         System.Int32
             '0' if DifferenceVersion is equal to ReferenceVersion,
@@ -107,14 +120,11 @@ function Compare-Version {
     param (
         [Parameter(Position = 0)]
         [String]
-        # Specifies a version used as a reference for comparison.
         $ReferenceVersion,
         [Parameter(Position = 1, ValueFromPipeline = $true)]
         [String]
-        # Specifies the version that are compared to the reference version.
         $DifferenceVersion,
         [String]
-        # Specifies the delimiter of versions
         $Delimiter = '-'
     )
 
