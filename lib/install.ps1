@@ -1,7 +1,6 @@
-Import-Module (Join-Path $PSScriptRoot 'ManifestHelpers.psm1' -Resolve)
-
-. "$psscriptroot/autoupdate.ps1"
-. "$psscriptroot/buckets.ps1"
+'autoupdate', 'buckets', 'ManifestHelpers' | ForEach-Object {
+    . "$PSScriptRoot\$_.ps1"
+}
 
 function nightly_version($date, $quiet = $false) {
     $date_str = $date.tostring("yyyyMMdd")
