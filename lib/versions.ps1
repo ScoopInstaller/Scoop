@@ -83,8 +83,13 @@ function Compare-Version {
         Compare versions
     .DESCRIPTION
         Compare versions, mainly according to SemVer's rules
+    .OUTPUTS
+        System.Int32
+            '0' if DifferenceVersion is equal to ReferenceVersion,
+            '1' if DifferenceVersion is greater then ReferenceVersion,
+            '-1' if DifferenceVersion is less then ReferenceVersion
     #>
-    [OutputType('System.Int32')]
+    [OutputType([Int])]
     [CmdletBinding()]
     param (
         [Parameter(Position = 0)]
@@ -158,18 +163,25 @@ function Compare-Version {
 }
 
 # Deprecated
-# function qsort($ary, $fn) {
-#     if($null -eq $ary) { return @() }
-#     if(!($ary -is [array])) { return @($ary) }
-#
-#     $pivot = $ary[0]
-#     $rem = $ary[1..($ary.length-1)]
-#
-#     $lesser = qsort ($rem | Where-Object { (& $fn $pivot $_) -lt 0 }) $fn
-#
-#     $greater = qsort ($rem | Where-Object { (& $fn $pivot $_) -ge 0 }) $fn
-#
-#     return @() + $lesser + @($pivot) + $greater
-# }
-#
-# function sort_versions($versions) { qsort $versions Compare-Version }
+# Not used anymore in scoop core
+function qsort($ary, $fn) {
+    warn '"qsort" is deprecated. Please avoid using it anymore.'
+    if($null -eq $ary) { return @() }
+    if(!($ary -is [array])) { return @($ary) }
+
+    $pivot = $ary[0]
+    $rem = $ary[1..($ary.length-1)]
+
+    $lesser = qsort ($rem | Where-Object { (& $fn $pivot $_) -lt 0 }) $fn
+
+    $greater = qsort ($rem | Where-Object { (& $fn $pivot $_) -ge 0 }) $fn
+
+    return @() + $lesser + @($pivot) + $greater
+}
+
+# Deprecated
+# Not used anymore in scoop core
+function sort_versions($versions) {
+    warn '"sort_versions" is deprecated. Please avoid using it anymore.'
+    qsort $versions Compare-Version
+}
