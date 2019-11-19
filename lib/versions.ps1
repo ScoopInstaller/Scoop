@@ -8,7 +8,7 @@ function Get-LatestVersion {
     .PARAMETER App
         App's name
     .PARAMETER Bucket
-        Bucket which the app is belong to
+        Bucket which the app belongs to
     .PARAMETER URL
         Remote app manifest's URI
     #>
@@ -37,7 +37,7 @@ function Select-CurrentVersion {
     .PARAMETER App
         App's name
     .PARAMETER Global
-        If global installed
+        Globally installed application
     #>
     [OutputType([String])]
     [CmdletBinding()]
@@ -73,7 +73,7 @@ function Get-InstalledVersion {
     .PARAMETER App
         App's name
     .PARAMETER Global
-        If global installed
+        Globally installed application
     #>
     [OutputType([Object[]])]
     [CmdletBinding()]
