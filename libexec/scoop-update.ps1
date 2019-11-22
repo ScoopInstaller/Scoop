@@ -180,7 +180,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 
-    $version = Get-LatestVersion $app $bucket $url
+    $version = Get-LatestVersion -App $app -Bucket $bucket -URL $url
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
         $version = nightly_version $(get-date) $quiet

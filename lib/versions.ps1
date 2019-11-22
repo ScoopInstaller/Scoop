@@ -2,8 +2,6 @@
 function Get-LatestVersion {
     <#
     .SYNOPSIS
-        Get latest version of app
-    .DESCRIPTION
         Get latest version of app from manifest
     .PARAMETER App
         App's name
@@ -31,8 +29,6 @@ function Get-LatestVersion {
 function Select-CurrentVersion {
     <#
     .SYNOPSIS
-        Select current version of app
-    .DESCRIPTION
         Select current version of installed app, from 'current\manifest.json' or modified time of version directory
     .PARAMETER App
         App's name
@@ -67,13 +63,14 @@ function Select-CurrentVersion {
 function Get-InstalledVersion {
     <#
     .SYNOPSIS
-        Get installed version of app
-    .DESCRIPTION
         Get all installed version of app, by checking version directories' 'install.json'
     .PARAMETER App
         App's name
     .PARAMETER Global
         Globally installed application
+    .NOTES
+        Versions are sorted from oldest to newest, i.e., latest installed version is the last one in the output array.
+        If no installed version found, NULL will be returned.
     #>
     [OutputType([Object[]])]
     [CmdletBinding()]
@@ -87,10 +84,10 @@ function Get-InstalledVersion {
     )
 
     $appPath = appdir $App $Global
-    if (!(Test-Path $appPath)) {
-        return @()
-    } else {
+    if (Test-Path $appPath) {
         return @((Get-ChildItem "$appPath\*\install.json" | Sort-Object -Property LastWriteTimeUtc).Directory.Name) -ne 'current'
+    } else {
+        return @()
     }
 
     # Deprecated
@@ -100,8 +97,6 @@ function Get-InstalledVersion {
 function Compare-Version {
     <#
     .SYNOPSIS
-        Compare versions
-    .DESCRIPTION
         Compare versions, mainly according to SemVer's rules
     .PARAMETER ReferenceVersion
         Specifies a version used as a reference for comparison
@@ -129,38 +124,44 @@ function Compare-Version {
     )
 
     # Use '+' sign as post-release, see https://github.com/lukesampson/scoop/pull/3721#issuecomment-553718093
-    $ReferenceVersion = $ReferenceVersion -replace '\+', '-'
-    $DifferenceVersion = $DifferenceVersion -replace '\+', '-'
+    $ReferenceVersion, $DifferenceVersion = @($ReferenceVersion, $DifferenceVersion) -replace '\+', '-'
 
+    # Return 0 if versions are equal
     if ($DifferenceVersion -eq $ReferenceVersion) {
         return 0
     }
 
-    $splitReferenceVersion = @($ReferenceVersion -split $Delimiter | ForEach-Object { if ($_ -match "^\d+$") { [Long]$_ } else { ($_ -replace '[a-zA-Z]+', '.$&.').Replace('..', '.').Trim('.') } })
-    $splitDifferenceVersion = @($DifferenceVersion -split $Delimiter | ForEach-Object { if ($_ -match "^\d+$") { [Long]$_ } else { ($_ -replace '[a-zA-Z]+', '.$&.').Replace('..', '.').Trim('.') } })
+    # Preprocess versions (split, convert and separate)
+    $splitReferenceVersion = @(SplitVersion -Version $ReferenceVersion -Delimiter $Delimiter)
+    $splitDifferenceVersion = @(SplitVersion -Version $DifferenceVersion -Delimiter $Delimiter)
 
+    # Nightly versions are always equal
     if ($splitReferenceVersion[0] -eq 'nightly' -and $splitDifferenceVersion[0] -eq 'nightly') {
         return 0
     }
 
     for ($i = 0; $i -lt [Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
+        # '1.1-alpha' is less then '1.1'
         if ($i -ge $splitReferenceVersion.Length) {
-            if ($splitDifferenceVersion[$i] -match "alpha|beta|rc|pre") {
+            if ($splitDifferenceVersion[$i] -match 'alpha|beta|rc|pre') {
                 return -1
             } else {
                 return 1
             }
         }
+        # '1.1' is greater then '1.1-beta'
         if ($i -ge $splitDifferenceVersion.Length) {
-            if ($splitReferenceVersion[$i] -match "alpha|beta|rc|pre") {
+            if ($splitReferenceVersion[$i] -match 'alpha|beta|rc|pre') {
                 return 1
             } else {
                 return -1
             }
         }
 
-        if (($splitReferenceVersion[$i] -match "\.") -or ($splitDifferenceVersion[$i] -match "\.")) {
-            $Result = Compare-Version $splitReferenceVersion[$i] $splitDifferenceVersion[$i] -Delimiter '\.'
+        # If some parts of versions have '.', compare them with delimiter '.'
+        if (($splitReferenceVersion[$i] -match '\.') -or ($splitDifferenceVersion[$i] -match '\.')) {
+            $Result = Compare-Version -ReferenceVersion $splitReferenceVersion[$i] -DifferenceVersion $splitDifferenceVersion[$i] -Delimiter '.'
+            # If the parts are equal, continue to next part, otherwise return
             if ($Result -ne 0) {
                 return $Result
             } else {
@@ -168,21 +169,44 @@ function Compare-Version {
             }
         }
 
+        # Don't try to compare [Long] to [String]
         if ($null -ne $splitReferenceVersion[$i] -and $null -ne $splitDifferenceVersion[$i]) {
-            # don't try to compare int to string
-            if ($splitReferenceVersion[$i] -is [string] -and $splitDifferenceVersion[$i] -isnot [string]) {
+            if ($splitReferenceVersion[$i] -is [String] -and $splitDifferenceVersion[$i] -isnot [String]) {
                 $splitDifferenceVersion[$i] = "$($splitDifferenceVersion[$i])"
             }
-            if ($splitDifferenceVersion[$i] -is [string] -and $splitReferenceVersion[$i] -isnot [string]) {
+            if ($splitDifferenceVersion[$i] -is [String] -and $splitReferenceVersion[$i] -isnot [String]) {
                 $splitReferenceVersion[$i] = "$($splitReferenceVersion[$i])"
             }
         }
 
-        if ($splitDifferenceVersion[$i] -gt $splitReferenceVersion[$i]) { return 1 }
-        if ($splitDifferenceVersion[$i] -lt $splitReferenceVersion[$i]) { return -1 }
+        # Compare [String] or [Long]
+        if ($splitDifferenceVersion[$i] -gt $splitReferenceVersion[$i]) {
+            return 1
+        }
+        if ($splitDifferenceVersion[$i] -lt $splitReferenceVersion[$i]) {
+            return -1
+        }
     }
+}
 
-    return 0
+# Helper function
+function SplitVersion {
+    <#
+    .SYNOPSIS
+        Split version by Delimiter, convert number string to number, and separate letters from numbers
+    .PARAMETER Version
+        Specifies a version
+    .PARAMETER Delimiter
+        Specifies the delimiter of version (Literal)
+    #>
+    param (
+        [String]
+        $Version,
+        [String]
+        $Delimiter = '-'
+    )
+    $Version = $Version -replace '[a-zA-Z]+', "$Delimiter$&$Delimiter"
+    return ($Version -split [Regex]::Escape($Delimiter) -ne '' | ForEach-Object { if ($_ -match '^\d+$') { [Long]$_ } else { $_ } })
 }
 
 # Deprecated

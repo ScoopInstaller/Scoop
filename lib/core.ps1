@@ -305,7 +305,7 @@ function app_status($app, $global) {
 
     $status.outdated = $false
     if($status.version -and $status.latest_version) {
-        $status.outdated = ((Compare-Version $status.version $status.latest_version) -ne 0)
+        $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
     }
 
     $status.missing_deps = @()
