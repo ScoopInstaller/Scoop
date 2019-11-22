@@ -53,6 +53,8 @@ Describe 'versions comparison' -Tag 'Scoop' {
             Compare-Version '1.1.1_8' '1.1.1' | Should -Be -1
             Compare-Version '1.1.1b' '1.1.1a' | Should -Be -1
             Compare-Version '1.1.1a' '1.1.1b' | Should -Be 1
+            Compare-Version '1.1a2' '1.1a3' | Should -Be 1
+            Compare-Version '1.1.1a10' '1.1.1b1' | Should -Be 1
         }
 
         It 'handles dash-style versions' {
