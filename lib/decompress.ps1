@@ -66,7 +66,6 @@ function Expand-7zipArchive {
     }
     $LogPath = "$(Split-Path $Path)\7zip.log"
     $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
-    $DestinationPath = $DestinationPath.TrimEnd("\")
     $ArgList = @('x', "`"$Path`"", '-y')
     if (!$IsTar -and $ExtractDir) {
         $OriDestinationPath = $DestinationPath
