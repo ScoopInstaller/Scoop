@@ -3,34 +3,35 @@ function Get-LatestVersion {
     <#
     .SYNOPSIS
         Get latest version of app from manifest
-    .PARAMETER App
+    .PARAMETER AppName
         App's name
     .PARAMETER Bucket
         Bucket which the app belongs to
-    .PARAMETER URL
+    .PARAMETER Uri
         Remote app manifest's URI
     #>
     [OutputType([String])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [Alias('App')]
         [String]
-        $App,
+        $AppName,
         [Parameter(Position = 1)]
         [String]
         $Bucket,
         [Parameter(Position = 2)]
         [String]
-        $URL
+        $Uri
     )
-    return (manifest $App $Bucket $URL).version
+    return (manifest $AppName $Bucket $Uri).version
 }
 
 function Select-CurrentVersion {
     <#
     .SYNOPSIS
         Select current version of installed app, from 'current\manifest.json' or modified time of version directory
-    .PARAMETER App
+    .PARAMETER AppName
         App's name
     .PARAMETER Global
         Globally installed application
@@ -39,18 +40,19 @@ function Select-CurrentVersion {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [Alias('App')]
         [String]
-        $App,
+        $AppName,
         [Parameter(Position = 1)]
         [Switch]
         $Global
     )
 
-    $appPath = appdir $App $Global
+    $appPath = appdir $AppName $Global
     if (Test-Path "$appPath\current") {
-        $currentVersion = (installed_manifest $App 'current' $Global).version
+        $currentVersion = (installed_manifest $AppName 'current' $Global).version
     } else {
-        $installedVersion = Get-InstalledVersion -App $App -Global:$Global
+        $installedVersion = Get-InstalledVersion -AppName $AppName -Global:$Global
         if ($installedVersion) {
             $currentVersion = $installedVersion[-1]
         } else {
@@ -64,7 +66,7 @@ function Get-InstalledVersion {
     <#
     .SYNOPSIS
         Get all installed version of app, by checking version directories' 'install.json'
-    .PARAMETER App
+    .PARAMETER AppName
         App's name
     .PARAMETER Global
         Globally installed application
@@ -76,14 +78,15 @@ function Get-InstalledVersion {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [Alias('App')]
         [String]
-        $App,
+        $AppName,
         [Parameter(Position = 1)]
         [Switch]
         $Global
     )
 
-    $appPath = appdir $App $Global
+    $appPath = appdir $AppName $Global
     if (Test-Path $appPath) {
         return @((Get-ChildItem "$appPath\*\install.json" | Sort-Object -Property LastWriteTimeUtc).Directory.Name) -ne 'current'
     } else {
@@ -241,15 +244,15 @@ function compare_versions($a, $b) {
 
 function latest_version($app, $bucket, $url) {
     Show-DeprecatedWarning $MyInvocation 'Get-LatestVersion'
-    return Get-LatestVersion -App $app -Bucket $bucket -URL $url
+    return Get-LatestVersion -AppName $app -Bucket $bucket -Uri $url
 }
 
 function current_version($app, $global) {
     Show-DeprecatedWarning $MyInvocation 'Select-CurrentVersion'
-    return Select-CurrentVersion -App $app -Global:$global
+    return Select-CurrentVersion -AppName $app -Global:$global
 }
 
 function versions($app, $global) {
     Show-DeprecatedWarning $MyInvocation 'Get-InstalledVersion'
-    return Get-InstalledVersion -App $app -Global:$global
+    return Get-InstalledVersion -AppName $app -Global:$global
 }

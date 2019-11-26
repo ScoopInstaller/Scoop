@@ -44,7 +44,7 @@ function search_bucket($bucket, $query) {
             }
         }
     }
-    $apps | ForEach-Object { $_.version = (Get-LatestVersion -App $_.name -Bucket $bucket); $_ }
+    $apps | ForEach-Object { $_.version = (Get-LatestVersion -AppName $_.name -Bucket $bucket); $_ }
 }
 
 function download_json($url) {

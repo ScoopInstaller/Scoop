@@ -161,7 +161,7 @@ function update_scoop() {
 }
 
 function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
-    $old_version = Select-CurrentVersion -App $app -Global:$global
+    $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
 
@@ -180,7 +180,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 
-    $version = Get-LatestVersion -App $app -Bucket $bucket -URL $url
+    $version = Get-LatestVersion -AppName $app -Bucket $bucket -Uri $url
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
         $version = nightly_version $(get-date) $quiet

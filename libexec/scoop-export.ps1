@@ -23,7 +23,7 @@ if($apps) {
     $apps | Sort-Object { $_.name } | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
         $app = $_.name
         $global = $_.global
-        $ver = Select-CurrentVersion -App $app -Global:$global
+        $ver = Select-CurrentVersion -AppName $app -Global:$global
         $global_display = $null; if($global) { $global_display = ' *global*'}
 
         $install_info = install_info $app $ver $global
