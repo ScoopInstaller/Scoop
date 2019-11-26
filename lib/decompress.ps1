@@ -444,12 +444,12 @@ function Expand-InnoInstaller {
     )
     if ($ExtractDir) {
         Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal:$Removal
-    } else {
+    } elseif ($Include -or $Exclude) {
         Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir '.' -Switches 'install_script.iss' # Just extract install script
         $installScript = Get-Content -Path "$DestinationPath\install_script.iss"
         $innoFiles = ConvertFrom-Inno -InputObject $installScript -Include $Include -Exclude ($Exclude -notlike '{*}')
         $innoFiles.Extracted | Where-Object { $_ -notin ($Exclude -like '{*}') } | ForEach-Object {
-            Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $_ -Switches '-a'
+            Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $_ -Switches '-a' -Removal:$Removal
         }
         if ($innoFiles.Excluded) {
             ($innoFiles.Excluded.source -replace '{.*?}', "$DestinationPath") | Remove-Item -Force -ErrorAction Ignore
@@ -461,10 +461,7 @@ function Expand-InnoInstaller {
         Get-ChildItem -Path $DestinationPath -Filter '*,*' -Recurse | Remove-Item -Force -ErrorAction Ignore
         Remove-Directory -Path $DestinationPath -OnlyEmpty
         Remove-Item -Path "$DestinationPath\install_script.iss" -Force
-
-        if ($Removal) {
-            # Remove original archive file
-            Remove-Item -Path $Path -Force
-        }
+    } else {
+        Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -Removal:$Removal
     }
 }
