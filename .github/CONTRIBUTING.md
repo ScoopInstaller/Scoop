@@ -15,13 +15,14 @@ You can contribute to core codebase these ways:
 1. [Fix bugs](https://github.com/lukesampson/scoop/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
 1. Identify and report reproducible steps of issues
 
-Scoop's core codebase started moving towards standard/preferred PowerShell code style. Mainly with the adoption of [`Verb-Noun`][approved-verbs] naming.
+Scoop's core codebase started moving towards standard/preferred PowerShell code style.
+Mainly with the adoption of [`Verb-Noun`][approved-verbs] naming.
 Starting from April 2019 use `Verb-Noun` naming for functions when manipulating the codebase.
 
 ### How to properly deprecate function
 
-When you want to refactor any function, keep in mind that original function need to be kept (With same name, parameters, return values).
-Some internal functions are used inside manifests and if you would remove them all these manifests could not be installed.
+When you want to refactor any function, keep in mind that original function need to be kept (With same name, parameters, return values), so tools which are utilizing scoop core codebase have time to adapt new changes without breaking functionality.
+Some internal functions are used inside manifests and if you would remove them all these manifests cannot not be installed.
 
 1. Create new funtion with Verb-Noun name
     1. Use [`[CmdletBinding()]`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute?view=powershell-6)
@@ -41,10 +42,10 @@ See [Decompress module](https://github.com/lukesampson/scoop/blob/1caaed8f3d51d1
 ### General code sins to avoid and restricitons to follow
 
 There are few misdemeanors that often show up in pull-requests and code base.
-Keep source code more tidier and cleaner with these.
+Keep source code more tidier and cleaner with following best practice.
 
 - Commits/pull-requests naming have to follow [Conventional Commits Specification][commits]
-- [Cmdlet aliases](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/AvoidUsingCmdletAliases.md)
+- [Cmdlet aliases](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/AvoidUsingCmdletAliases.md) usage
     - Never use aliases
     - Aliases are usefull only in interactive (terminal) usage
     - Code readibility is significantly lowered
@@ -54,17 +55,19 @@ Keep source code more tidier and cleaner with these.
         - Instead of `Write-Host -ForegroundColor Yellow` you can use `Write-Host -f Yellow`
         - This should be avoided due to compatibility with newer versions of powershell / functions
     - When there are parameters with same starting characters it will lead to `Ambiguous` parameter error (`gci -p` for example)
-- Returning data from function without `return` statement
+- Do not return data from function without `return` statement
     - Powershell allow to "return" data from function with simply putting it into pipeline, but should not be used in scripts
     - Instead of `function Alfa { "Help" }` use `function Alfa { return 'Help' }`
-- Use [singular nouns in function / parameters names](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/UseSingularNouns.md)
-- Local functions variables use classic **Camel Case** `$camelCase`
+- Use [singular nouns in function/parameters names](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/UseSingularNouns.md)
+- Variable naming
+    - Local functions variables use classic **Camel Case** `$camelCase`
+    - Global variables should have uppercase character and underscore. `$SCOOP_GLOBAL`
 - Use single quotes for simple strings
-- [Use correct casing for function names / parameters](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/UseCorrectCasing.md)
+- [Use correct casing for function names/parameters](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/UseCorrectCasing.md)
 
 ## Manifest creation
 
-All official buckets are community driven and everyone can add, update and edit them.
+All official buckets are community driven and everyone can add, update and edit manifests.
 Pull-Requests are warmly welcomed.
 The next few lines will guide you on how to write manifests, which pass our standards without any problems.
 
@@ -90,19 +93,29 @@ A small overview of guidelines which you need to follow when writing manifests. 
 When you publish a Pull-Request the AppVeyor pipeline will be executed and check for formatting errors inside your manifests.
 Best practice for always passing all checks is to run [checkver][checkver] or [format][formatjson] scripts before posting Pull-Request.
 
-These are PowerShell scripts which should run on all platforms (Linux, MacOS with `pwsh`), so you are not tied with Windows platform.
+[checkver][checkver], [format][formatjson] and other scripts under `bin` folder are PowerShell scripts which should run on all platforms (Linux, MacOS with `pwsh`), so you are not tied with Windows platform.
+All of them are ported into each bucket with prefilled parameters.
 
 #### Manifest naming
 
-<!-- TODO -->
+All manifests name under official buckets should meet these conventions
+
+1. All characters should be lowercased
+1. `-` is used as separator when application name contains space
+
+<!-- @ScoopInstaller/maintainers Anything else? -->
 
 #### Description
 
-<!-- TODO -->
+<!-- TODO some preface -->
+
+- Do not mention application name
+    - Application name is needed only in case when manifest name is different (in case of more popular acronym for command line utilites for example) from application name
+<!-- TODO other specifications -->
 
 #### Properties order
 
-Manifest consists of 7 main groups (regions) of properties. These properties should be logically ordered from top to bottom as they are evaluated in installation process.
+Manifest consists of 7 main groups (regions) of properties. These properties (and it's sub-properties) should be logically ordered from top to bottom as they are evaluated in installation process.
 
 Best order of all properties as follows:
 
@@ -144,14 +157,14 @@ You can specify `post_install`, `pre_install` and `installer.script` blocks, whi
 For these blocks use the syntax as you would normally write PowerShell scripts (Follow PSScriptAnalyzer rules; See: [core codebase](#core-codebase)).
 
 How script blocks should **NOT** look like: <https://github.com/lukesampson/scoop/blob/fa6ccc9471a29bf621c80a507d387a371293de75/bucket/jetbrains-toolbox.json#L32>
-You can compare it with [refactored version](https://github.com/lukesampson/scoop-extras/blob/781a2128150505b4cd00ed4854a7af4160c0e772/bucket/jetbrains-toolbox.json#L12-L24) to see significant differences.
+You can compare it with [refactored version](https://github.com/lukesampson/scoop-extras/blob/781a2128150505b4cd00ed4854a7af4160c0e772/bucket/jetbrains-toolbox.json#L12-L24) to see significant differences in readability.
 
 ### Autoupdates
 
-❗ Always test your auto-updates before posting a Pull-Request ❗
+❗ Always test auto-updates before posting a Pull-Request ❗
 
-The last step what you should do before posting a Pull-Request is to run the [checkver][checkver] script with the `-Force` (`-f`) parameter.
-This will check for the latest version of the program (specified within the `checkver` property) and update the manifest file.
+The last step what should be done before posting a Pull-Request is to run the [checkver][checkver] script with the `-Force` (`-f`) parameter.
+This will check for the latest version of the application (specified within the `checkver` property) and update the manifest file.
 
 - Update all properties inside `autoupdate` property with actual values (URL, `extract_dir`, ...)
 - Calculates or extracts checksums for all artifacts

@@ -1,8 +1,7 @@
 ---
 name: New manifest
 about: Add new manifest into bucket.
-title: 'Add %%manifestname%% %%manifestversion%%'
-labels: please-review
+title: '%%manifestname%%: Add version %%manifestversion%%'
 ---
 
 <!-- Is there an issue, which requests this manifest? -->
