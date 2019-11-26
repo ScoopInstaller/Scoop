@@ -15,12 +15,12 @@ function Test-7zipRequirement {
     if ($File) {
         return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
     } else {
-        $URL = url $Manifest $Architecture
-        $Installer = installer $Manifest $Architecture
-        if (($Installer.type -eq "nsis")) {
+        $uri = url $Manifest $Architecture
+        $installer = installer $Manifest $Architecture
+        if (($installer.type -eq 'nsis')) {
             return $true
         } else {
-            return ($URL | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
+            return ($uri | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
         }
     }
 }
@@ -36,9 +36,9 @@ function Test-LessmsiRequirement {
         [String]
         $Architecture
     )
-    $URL = url $Manifest $Architecture
+    $uri = url $Manifest $Architecture
     if ((get_config MSIEXTRACT_USE_LESSMSI)) {
-        return ($URL | Where-Object { $_ -match '\.msi$' }).Count -gt 0
+        return ($uri | Where-Object { $_ -match '\.msi$' }).Count -gt 0
     } else {
         return $false
     }
@@ -86,7 +86,7 @@ function Expand-7zipArchive {
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
-        [ValidateSet("All", "Skip", "Rename")]
+        [ValidateSet('All', 'Skip', 'Rename')]
         [String]
         $Overwrite,
         [Switch]
@@ -96,41 +96,41 @@ function Expand-7zipArchive {
         try {
             $7zPath = (Get-Command '7z' -CommandType Application | Select-Object -First 1).Source
         } catch [System.Management.Automation.CommandNotFoundException] {
-            abort "Cannot find external 7-Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7-Zip manually and try again."
+            abort 'Cannot find external 7-Zip (7z.exe) while "7ZIPEXTRACT_USE_EXTERNAL" is "true"!`nRun "scoop config 7ZIPEXTRACT_USE_EXTERNAL false" or install 7-Zip manually and try again.'
         }
     } else {
         $7zPath = Get-HelperPath -Helper 7zip
     }
-    $LogPath = "$(Split-Path $Path)\7zip.log"
-    $ArgList = @('x', "`"$Path`"", "-o`"$DestinationPath`"", '-y')
-    $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
-    if (!$IsTar -and $ExtractDir) {
-        $ArgList += "-ir!`"$ExtractDir\*`""
+    $logPath = "$(Split-Path $Path)\7zip.log"
+    $argList = @('x', "`"$Path`"", "-o`"$DestinationPath`"", '-y')
+    $isTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
+    if (!$isTar -and $ExtractDir) {
+        $argList += "-ir!`"$ExtractDir\*`""
     }
     if ($Switches) {
-        $ArgList += (-split $Switches)
+        $argList += (-split $Switches)
     }
     switch ($Overwrite) {
-        "All" { $ArgList += "-aoa" }
-        "Skip" { $ArgList += "-aos" }
-        "Rename" { $ArgList += "-aou" }
+        'All' { $argList += '-aoa' }
+        'Skip' { $argList += '-aos' }
+        'Rename' { $argList += '-aou' }
     }
-    $Status = Invoke-ExternalCommand $7zPath $ArgList -LogPath $LogPath
-    if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    $status = Invoke-ExternalCommand $7zPath $argList -LogPath $logPath
+    if (!$status) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $logPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
-    if (!$IsTar -and $ExtractDir) {
+    if (!$isTar -and $ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
     }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
+    if (Test-Path $logPath) {
+        Remove-Item $logPath -Force
     }
-    if ($IsTar) {
+    if ($isTar) {
         # Check for tar
-        $Status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $LogPath
-        if ($Status) {
-            $TarFile = (Get-Content -Path $LogPath)[-4] -replace '.{53}(.*)', '$1' # get inner tar file name
-            Expand-7zipArchive -Path "$DestinationPath\$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
+        $status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $logPath
+        if ($status) {
+            $tarFile = (Get-Content -Path $logPath)[-4] -replace '.{53}(.*)', '$1' # get inner tar file name
+            Expand-7zipArchive -Path "$DestinationPath\$tarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
         } else {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
@@ -158,31 +158,31 @@ function Expand-MsiArchive {
         [Switch]
         $Removal
     )
-    $DestinationPath = $DestinationPath.TrimEnd("\")
+    $DestinationPath = $DestinationPath.TrimEnd('\')
     if ($ExtractDir) {
-        $OriDestinationPath = $DestinationPath
+        $oriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
     if ((get_config MSIEXTRACT_USE_LESSMSI)) {
-        $MsiPath = Get-HelperPath -Helper Lessmsi
-        $ArgList = @('x', "`"$Path`"", "`"$DestinationPath\\`"")
+        $msiPath = Get-HelperPath -Helper Lessmsi
+        $argList = @('x', "`"$Path`"", "`"$DestinationPath\\`"")
     } else {
-        $MsiPath = 'msiexec.exe'
-        $ArgList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath\\SourceDir`"")
+        $msiPath = 'msiexec.exe'
+        $argList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath\\SourceDir`"")
     }
-    $LogPath = "$(Split-Path $Path)\msi.log"
+    $logPath = "$(Split-Path $Path)\msi.log"
     if ($Switches) {
-        $ArgList += (-split $Switches)
+        $argList += (-split $Switches)
     }
-    $Status = Invoke-ExternalCommand $MsiPath $ArgList -LogPath $LogPath
-    if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    $status = Invoke-ExternalCommand $msiPath $argList -LogPath $logPath
+    if (!$status) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $logPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if ($ExtractDir -and (Test-Path "$DestinationPath\SourceDir")) {
-        movedir "$DestinationPath\SourceDir\$ExtractDir" $OriDestinationPath | Out-Null
+        movedir "$DestinationPath\SourceDir\$ExtractDir" $oriDestinationPath | Out-Null
         Remove-Directory -Path $DestinationPath
     } elseif ($ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
+        movedir "$DestinationPath\$ExtractDir" $oriDestinationPath | Out-Null
         Remove-Directory -Path $DestinationPath
     } elseif (Test-Path "$DestinationPath\SourceDir") {
         movedir "$DestinationPath\SourceDir" $DestinationPath | Out-Null
@@ -190,8 +190,8 @@ function Expand-MsiArchive {
     if (($DestinationPath -ne (Split-Path $Path)) -and (Test-Path "$DestinationPath\$(fname $Path)")) {
         Remove-Item "$DestinationPath\$(fname $Path)" -Force
     }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
+    if (Test-Path $logPath) {
+        Remove-Item $logPath -Force
     }
     if ($Removal) {
         # Remove original archive file
@@ -216,23 +216,23 @@ function Expand-InnoArchive {
         [Switch]
         $Removal
     )
-    $LogPath = "$(Split-Path $Path)\innounp.log"
-    $ArgList = @('-x', "-d`"$DestinationPath`"", "`"$Path`"", '-y')
+    $logPath = "$(Split-Path $Path)\innounp.log"
+    $argList = @('-x', "-d`"$DestinationPath`"", "`"$Path`"", '-y')
     switch -Regex ($ExtractDir) {
-        "^\.$" { break } # Suppress '-cDIR' param
-        "^[^{].*" { $ArgList += "-c`"{app}\$ExtractDir`""; break }
-        "^{.*" { $ArgList += "-c`"$ExtractDir`""; break }
-        Default { $ArgList += "-c`"{app}`"" }
+        '^\.$' { break } # Suppress '-cDIR' param
+        '^[^{].*' { $argList += "-c`"{app}\$ExtractDir`""; break }
+        '^{.*' { $argList += "-c`"$ExtractDir`""; break }
+        Default { $argList += '-c"{app}"' }
     }
     if ($Switches) {
-        $ArgList += (-split $Switches)
+        $argList += (-split $Switches)
     }
-    $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innounp) $ArgList -LogPath $LogPath
-    if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    $status = Invoke-ExternalCommand (Get-HelperPath -Helper Innounp) $argList -LogPath $logPath
+    if (!$status) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $logPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
+    if (Test-Path $logPath) {
+        Remove-Item $logPath -Force
     }
     if ($Removal) {
         # Remove original archive file
@@ -255,39 +255,13 @@ function Expand-ZipArchive {
         $Removal
     )
     if ($ExtractDir) {
-        $OriDestinationPath = $DestinationPath
+        $oriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    # All methods to unzip the file require .NET4.5+
-    if ($PSVersionTable.PSVersion.Major -lt 5) {
-        Add-Type -AssemblyName System.IO.Compression.FileSystem
-        try {
-            [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath)
-        } catch [System.IO.PathTooLongException] {
-            # try to fall back to 7zip if path is too long
-            if (Test-HelperInstalled -Helper 7zip) {
-                Expand-7zipArchive $Path $DestinationPath -Removal
-                return
-            } else {
-                abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
-            }
-        } catch [System.IO.IOException] {
-            if (Test-HelperInstalled -Helper 7zip) {
-                Expand-7zipArchive $Path $DestinationPath -Removal
-                return
-            } else {
-                abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
-            }
-        } catch {
-            abort "Unzip failed: $_"
-        }
-    } else {
-        # Use Expand-Archive to unzip in PowerShell 5+
-        # Compatible with Pscx (https://github.com/Pscx/Pscx)
-        Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
-    }
+    # Compatible with Pscx (https://github.com/Pscx/Pscx)
+    Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     if ($ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
+        movedir "$DestinationPath\$ExtractDir" $oriDestinationPath | Out-Null
         Remove-Directory -Path $DestinationPath
     }
     if ($Removal) {
@@ -311,17 +285,17 @@ function Expand-DarkArchive {
         [Switch]
         $Removal
     )
-    $LogPath = "$(Split-Path $Path)\dark.log"
-    $ArgList = @('-nologo', "-x `"$DestinationPath`"", "`"$Path`"")
+    $logPath = "$(Split-Path $Path)\dark.log"
+    $argList = @('-nologo', "-x `"$DestinationPath`"", "`"$Path`"")
     if ($Switches) {
-        $ArgList += (-split $Switches)
+        $argList += (-split $Switches)
     }
-    $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Dark) $ArgList -LogPath $LogPath
-    if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    $status = Invoke-ExternalCommand (Get-HelperPath -Helper Dark) $argList -LogPath $logPath
+    if (!$status) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $logPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
+    if (Test-Path $logPath) {
+        Remove-Item $logPath -Force
     }
     if ($Removal) {
         # Remove original archive file
@@ -365,7 +339,7 @@ function Expand-NsisInstaller {
     )
     Expand-7ZipArchive -Path $Path -DestinationPath $DestinationPath -Removal:$Removal
     if (Test-Path "$DestinationPath\`$PLUGINSDIR\app-64.7z") {
-        if ($Architecture -eq "64bit") {
+        if ($Architecture -eq '64bit') {
             Expand-7ZipArchive -Path "$DestinationPath\`$PLUGINSDIR\app-64.7z" -DestinationPath $DestinationPath
         } else {
             abort "Software doesn't support $Architecture architecture!"
@@ -373,7 +347,7 @@ function Expand-NsisInstaller {
     } elseif (Test-Path "$DestinationPath\`$PLUGINSDIR\app-32.7z") {
         Expand-7ZipArchive -Path "$DestinationPath\`$PLUGINSDIR\app-32.7z" -DestinationPath $DestinationPath
     }
-    @("*uninst*", "`$*") | ForEach-Object { Get-Item "$DestinationPath\$_" | Remove-Item -Recurse -Force }
+    @('*uninst*', '$*') | ForEach-Object { Get-Item "$DestinationPath\$_" | Remove-Item -Recurse -Force }
 }
 
 function Expand-WixInstaller {
@@ -403,7 +377,7 @@ function ConvertFrom-Inno {
     [OutputType([Hashtable])]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [System.Array]
+        [Object[]]
         $InputObject,
         [String[]]
         $Include,
@@ -411,43 +385,42 @@ function ConvertFrom-Inno {
         $Exclude
     )
 
-    $FileList = New-Object System.Collections.Generic.List[System.Object]
-    $Files = $InputObject -match '^Source:'
-    foreach ($File in $Files) {
-        if ($File -match 'Source: "(?<source>(?<srcdir>[^\\]*).*?)"; DestDir: "(?<destdir>.*?)"; (?:DestName: "(?<destname>.*?)"; )?(?:Components: (?<components>.*?);)?') {
-            $FileList.Add([PSCustomObject]@{source = $Matches.source; srcdir = $Matches.srcdir; destdir = $Matches.destdir; destname = $Matches.destname; components = $Matches.components })
+    $fileList = New-Object System.Collections.Generic.List[System.Object]
+    foreach ($file in ($InputObject -match '^Source:')) {
+        if ($file -match 'Source: "(?<source>(?<srcdir>[^\\]*).*?)"; DestDir: "(?<destdir>.*?)"; (?:DestName: "(?<destname>.*?)"; )?(?:Components: (?<components>.*?);)?') {
+            $fileList.Add([PSCustomObject]@{source = $Matches.source; srcdir = $Matches.srcdir; destdir = $Matches.destdir; destname = $Matches.destname; components = $Matches.components })
         }
     }
-    if ($FileList.components) {
-        $Comps = $FileList.components | Select-Object -Unique
-        $IncludeComps = @()
-        $ExcludeComps = @()
+    if ($fileList.components) {
+        $comps = $fileList.components | Select-Object -Unique
+        $includeComps = @()
+        $excludeComps = @()
         if ($Include) {
             $Include = $Include -split '\\' | Select-Object -Unique
-            foreach ($IncFile in $Include) {
-                $IncFile = '\b' + [Regex]::Escape($IncFile) + '\b'
-                $IncludeComps += $Comps | Where-Object {
-                    ($_ -match "$IncFile") -and ($_ -notmatch "not[^(]*?\(?[^(]*?$IncFile")
+            foreach ($incFile in $Include) {
+                $incFile = '\b' + [Regex]::Escape($incFile) + '\b'
+                $includeComps += $comps | Where-Object {
+                    ($_ -match "$incFile") -and ($_ -notmatch "not[^(]*?\(?[^(]*?$incFile")
                 }
-                $ExcludeComps += $Comps | Where-Object { $_ -match "not[^(]*?\(?[^(]*?$IncFile" }
+                $excludeComps += $comps | Where-Object { $_ -match "not[^(]*?\(?[^(]*?$incFile" }
             }
         }
         if ($Exclude) {
-            foreach ($ExcFile in $Exclude) {
-                $ExcFile = '\b' + [Regex]::Escape($ExcFile) + '\b'
-                $ExcludeComps += $Comps | Where-Object { ($_ -match "$ExcFile") -and ($_ -notmatch "not[^(]*?\(?[^(]*?$ExcFile") -and ($_ -notmatch "or[^(]*?$ExcFile") -and ($_ -notmatch "$ExcFile[^(]*?or") }
+            foreach ($excFile in $Exclude) {
+                $excFile = '\b' + [Regex]::Escape($excFile) + '\b'
+                $excludeComps += $comps | Where-Object { ($_ -match "$excFile") -and ($_ -notmatch "not[^(]*?\(?[^(]*?$excFile") -and ($_ -notmatch "or[^(]*?$excFile") -and ($_ -notmatch "$excFile[^(]*?or") }
             }
-            $IncludeComps = $IncludeComps | Where-Object { $_ -notin $ExcludeComps }
+            $includeComps = $includeComps | Where-Object { $_ -notin $excludeComps }
         }
-        $Included = $FileList | Where-Object { $_.components -in $IncludeComps }
-        $Excluded = $FileList | Where-Object { $_.components -in $ExcludeComps }
+        $included = $fileList | Where-Object { $_.components -in $includeComps }
+        $excluded = $fileList | Where-Object { $_.components -in $excludeComps }
     }
 
     return @{
-        FileList = $FileList;
-        Excluded = $Excluded;
-        Included = $Included;
-        Extracted = @($FileList.srcdir | Select-Object -Unique) -ne '{tmp}'
+        FileList = $fileList;
+        Excluded = $excluded;
+        Included = $included;
+        Extracted = @($fileList.srcdir | Select-Object -Unique) -ne '{tmp}'
     }
 }
 
@@ -473,16 +446,16 @@ function Expand-InnoInstaller {
         Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal:$Removal
     } else {
         Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir '.' -Switches 'install_script.iss' # Just extract install script
-        $InstallScript = Get-Content -Path "$DestinationPath\install_script.iss"
-        $InnoFiles = ConvertFrom-Inno -InputObject $InstallScript -Include $Include -Exclude ($Exclude -notlike '{*}')
-        $InnoFiles.Extracted | Where-Object { $_ -notin ($Exclude -like '{*}') } | ForEach-Object {
+        $installScript = Get-Content -Path "$DestinationPath\install_script.iss"
+        $innoFiles = ConvertFrom-Inno -InputObject $installScript -Include $Include -Exclude ($Exclude -notlike '{*}')
+        $innoFiles.Extracted | Where-Object { $_ -notin ($Exclude -like '{*}') } | ForEach-Object {
             Expand-InnoArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $_ -Switches '-a'
         }
-        if ($InnoFiles.Excluded) {
-            ($InnoFiles.Excluded.source -replace "{.*?}", "$DestinationPath") | Remove-Item -Force -ErrorAction Ignore
+        if ($innoFiles.Excluded) {
+            ($innoFiles.Excluded.source -replace '{.*?}', "$DestinationPath") | Remove-Item -Force -ErrorAction Ignore
         }
-        if ($InnoFiles.Included) {
-            $InnoFiles.Included | Where-Object { $_.source -match ',' } | Rename-Item -Path { $_.source -replace "{.*?}", "$DestinationPath" } -NewName { $_.destname } -Force -ErrorAction Ignore
+        if ($innoFiles.Included) {
+            $innoFiles.Included | Where-Object { $_.source -match ',' } | Rename-Item -Path { $_.source -replace '{.*?}', "$DestinationPath" } -NewName { $_.destname } -Force -ErrorAction Ignore
         }
         Get-ChildItem -Path $DestinationPath -Filter '*,*' -Recurse | Rename-Item -NewName { $_.name -Replace ',\d', '' } -Force -ErrorAction Ignore
         Get-ChildItem -Path $DestinationPath -Filter '*,*' -Recurse | Remove-Item -Force -ErrorAction Ignore

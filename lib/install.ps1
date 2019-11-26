@@ -36,8 +36,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     # Change 'innosetup' to 'installer.type:inno'
     if ($manifest.innosetup) {
-        warn "'innosetup' is deprecated, please use 'installer.type:inno' instead."
-        warn "If you maintain this manifest, please refer to the manifest reference docs."
+        warn '"innosetup" is deprecated, please use "installer.type:inno" instead.'
+        warn 'If you maintain this manifest, please refer to the manifest reference docs.'
         if ($manifest.$architecture.installer) {
             $manifest.$architecture.installer | Add-Member -MemberType NoteProperty -Name type -Value 'inno'
         } elseif ($manifest.installer) {
@@ -556,46 +556,46 @@ function Invoke-Extraction {
     )
 
     # 'url', 'extract_dir' and 'extract_to' are paired
-    $Urls = @(url $Manifest $Architecture)
-    $ExtractDirs = @(extract_dir $Manifest $Architecture)
-    $ExtractTos = @(extract_to $Manifest $Architecture)
-    $Installer = installer $Manifest $Architecture
+    $uris = @(url $Manifest $Architecture)
+    $extractDirs = @(extract_dir $Manifest $Architecture)
+    $extractTos = @(extract_to $Manifest $Architecture)
+    $installer = installer $Manifest $Architecture
 
-    for ($i = 0; $i -lt $Urls.Length; $i++) {
-        $Args = @{
-            Path            = "$DestinationPath\$($FileName[$i])"
-            DestinationPath = "$DestinationPath\$($ExtractTos[$i])"
+    for ($i = 0; $i -lt $uris.Length; $i++) {
+        $args = @{
+            Path = "$DestinationPath\$($FileName[$i])"
+            DestinationPath = "$DestinationPath\$($extractTos[$i])"
         }
         # work out extraction method, if applicable
-        $ExtractFn = $null
-        if ($i -eq 0 -and $Installer.type) {
-            switch ($Installer.type) {
-                'inno' { $ExtractFn = 'Expand-InnoInstaller'; $Args.ExtractDir = $ExtractDirs[$i]; $Args.Include = $Installer.include; $Args.Exclude = $Installer.exclude }
-                'nsis' { $ExtractFn = 'Expand-NsisInstaller'; $Args.Architecture = $Architecture }
-                'wix' { $ExtractFn = 'Expand-WixInstaller'; $Args.Exclude = $Installer.exclude }
+        $extractFn = $null
+        if ($i -eq 0 -and $installer.type) {
+            switch ($installer.type) {
+                'inno' { $extractFn = 'Expand-InnoInstaller'; $args.ExtractDir = $extractDirs[$i]; $args.Include = $installer.include; $args.Exclude = $installer.exclude }
+                'nsis' { $extractFn = 'Expand-NsisInstaller'; $args.Architecture = $Architecture }
+                'wix' { $extractFn = 'Expand-WixInstaller'; $args.Exclude = $installer.exclude }
                 Default { abort "Error in manifest: installer type $_ is not supported." }
             }
         } else {
-            switch -Regex ($Args.Path) {
-                ".*\.zip$" {
+            switch -Regex ($args.Path) {
+                '.*\.zip$' {
                     if (((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
-                        $ExtractFn = 'Expand-7zipArchive'
+                        $extractFn = 'Expand-7zipArchive'
                     } else {
-                        $ExtractFn = 'Expand-ZipArchive'
+                        $extractFn = 'Expand-ZipArchive'
                     }
                 }
-                ".*\.msi$" { $ExtractFn = 'Expand-MsiArchive' }
-                { Test-7zipRequirement -File $_ } { $ExtractFn = 'Expand-7zipArchive' }
+                '.*\.msi$' { $extractFn = 'Expand-MsiArchive' }
+                { Test-7zipRequirement -File $_ } { $extractFn = 'Expand-7zipArchive' }
             }
-            $Args.ExtractDir = $ExtractDirs[$i]
+            $args.ExtractDir = $extractDirs[$i]
         }
-        debug $Args
-        if ($ExtractFn) {
+        debug $args
+        if ($extractFn) {
             Write-Host "Extracting " -NoNewline
-            Write-Host $(url_remote_filename $Urls[$i]) -f Cyan -NoNewline
+            Write-Host $(url_remote_filename $uris[$i]) -ForegroundColor Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            & $ExtractFn @Args -Removal
-            Write-Host "done." -f Green
+            & $extractFn @Args -Removal
+            Write-Host "done." -ForegroundColor Green
         }
     }
 }
@@ -713,35 +713,35 @@ function Invoke-InstallerScript {
         [Switch]
         $Global
     )
-    $Installer = installer $Manifest $Architecture
+    $installer = installer $Manifest $Architecture
 
-    if ($Installer.file -or $Installer.args) {
+    if ($installer.file -or $installer.args) {
         # Installer filename is either explicit defined ('installer.file') or file name in the first URL
-         $ProgName = "$DestinationPath\$(coalesce $Installer.file $FileName[0])"
-        if(!(is_in_dir $DestinationPath $ProgName)) {
-            abort "Error in manifest: Installer $ProgName is outside the app directory."
+         $progName = "$DestinationPath\$(coalesce $installer.file $FileName[0])"
+        if(!(is_in_dir $DestinationPath $progName)) {
+            abort "Error in manifest: Installer $progName is outside the app directory."
         }
-        $Args = @(args $Installer.args $DestinationPath $Global)
+        $args = @(args $installer.args $DestinationPath $Global)
 
-        if($ProgName.EndsWith('.ps1')) {
-            & $ProgName @Args
+        if($progName.EndsWith('.ps1')) {
+            & $progName @Args
         } else {
-            $IsInstalled = Invoke-ExternalCommand $ProgName $Args -Activity "Running installer..."
-            if(!$IsInstalled) {
+            $isInstalled = Invoke-ExternalCommand $progName $args -Activity "Running installer..."
+            if(!$isInstalled) {
                 abort "Installation aborted. You might need to run 'scoop uninstall $AppName' before trying again."
             }
 
             # Don't remove installer if "keep" flag is set to true
-            if($Installer.keep -ne "true") {
-                Remove-Item $ProgName
+            if($installer.keep -ne 'true') {
+                Remove-Item $progName
             }
         }
     }
 
-    if ($Installer.script) {
-        Write-Host "Running installer script..." -NoNewline
-        Invoke-Expression (@($Installer.script) -join "`r`n")
-        Write-Host "done." -f Green
+    if ($installer.script) {
+        Write-Host 'Running installer script...' -NoNewline
+        Invoke-Expression (@($installer.script) -join "`r`n")
+        Write-Host 'done.' -ForegroundColor Green
     }
 
     return
