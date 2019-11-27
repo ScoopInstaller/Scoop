@@ -81,11 +81,12 @@ A small overview of guidelines which you need to follow when writing manifests. 
     - 4 spaces indentation
     - New line at end of file
     - No trailing whitespace
+    - Line endings have to be CRLF
 1. Always include these informative properties:
     - `description`
     - `license`
 1. Write readable/extendable code inside script blocks
-1. Test your auto-updates before publishing a Pull-Request
+1. [Test your auto-updates](https://github.com/lukesampson/scoop/wiki/App-Manifest-Autoupdate) before publishing a Pull-Request
 1. Always inspect if the vendor of the application provides checksums for artifacts
 
 ### Manifest format
