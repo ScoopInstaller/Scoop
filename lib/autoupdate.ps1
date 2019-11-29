@@ -256,7 +256,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
         }
         'chocolatey' {
-            $hashfile_url = "https://chocolatey.org/packages/$($Matches.choconame)"
+            $hashfile_url = "https://chocolatey.org/packages/$($Matches.choconame)/$version"
             $hash = find_hash_in_textfile $hashfile_url $substitutions 'sha256:\s+([a-fA-F0-9]{64})"[^>]+>$basename'
         }
     }
