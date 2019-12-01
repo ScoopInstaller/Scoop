@@ -144,7 +144,7 @@ The following buckets are known to scoop:
 - [java](https://github.com/ScoopInstaller/Java) - Installers for Oracle Java, OpenJDK, Zulu, ojdkbuild, AdoptOpenJDK, Amazon Corretto, BellSoft Liberica & SapMachine
 - [jetbrains](https://github.com/Ash258/Scoop-JetBrains) - Installers for all JetBrains utilities and IDEs
 <!-- * [nightlies](https://github.com/ScoopInstaller/Nightlies) - No longer used -->
-- [nonportable](https://github.com/oltolm/scoop-nonportable) - Non-portable apps (may require UAC)
+- [nonportable](https://github.com/TheRandomLabs/scoop-nonportable) - Non-portable apps (may require UAC)
 - [php](https://github.com/ScoopInstaller/PHP) - Installers for most versions of PHP
 - [versions](https://github.com/ScoopInstaller/Versions) - Alternative versions of apps found in other buckets
 
