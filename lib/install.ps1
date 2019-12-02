@@ -86,7 +86,11 @@ function Find-Manifest($app, $bucket) {
         $manifest = url_manifest $url
     } else {
         # check buckets
-        if (!$bucket) {
+        if ($bucket) {
+            $manifest, $null = find_manifest $app $bucket
+        } else {
+            $manifest, $bucket = find_manifest $app
+        }
             $manifest, $bucket = find_manifest $app
         } else {
             $manifest, $null = find_manifest $app $bucket
