@@ -36,8 +36,6 @@ if (!$manifest) {
 
 $install = install_info $app $status.version $global
 $status.installed = $install.bucket -eq $bucket
-    $status.installed = $false
-}
 $version_output = $manifest.version
 if (!$manifest_file) {
     $manifest_file = manifest_path $app $bucket
