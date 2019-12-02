@@ -91,10 +91,6 @@ function Find-Manifest($app, $bucket) {
         } else {
             $manifest, $bucket = find_manifest $app
         }
-            $manifest, $bucket = find_manifest $app
-        } else {
-            $manifest, $null = find_manifest $app $bucket
-        }
 
         if(!$manifest -and !$bucket) {
             # couldn't find app in buckets: check if it's a local path
