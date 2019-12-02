@@ -35,7 +35,7 @@ if (!$manifest) {
 }
 
 $install = install_info $app $status.version $global
-if ($install.bucket -ne $bucket) {
+$status.installed = $install.bucket -eq $bucket
     $status.installed = $false
 }
 $version_output = $manifest.version
