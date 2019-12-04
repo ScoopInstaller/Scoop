@@ -59,12 +59,13 @@ function install_info($app, $version, $global) {
 }
 
 function default_architecture {
-    if (get_config 'prefer-32bit' $false) {
-        $arch = '32bit'
-    } elseif ([Environment]::Is64BitOperatingSystem) {
-        $arch = '64bit'
-    } else {
-        $arch = '32bit'
+    $arch = get_config 'default-architecture'
+    if ($null -eq $arch) {
+        if ([Environment]::Is64BitOperatingSystem) {
+            $arch = '64bit'
+        } else {
+            $arch = '32bit'
+        }
     }
 
     return $arch
