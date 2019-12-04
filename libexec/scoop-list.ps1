@@ -23,8 +23,10 @@ $orderUpdated = $opt.u -or $opt.updated
 if ($orderUpdated -and $orderInstalled) { error '--installed and --updated parameters cannot be used simultaneously'; exit 1 }
 $def_arch = default_architecture
 
-$local = installed_apps $false | ForEach-Object { @{ name = $_; gci = (Get-ChildItem (appsdir $false) $_) } }
-$global = installed_apps $true | ForEach-Object { @{ name = $_; gci = (Get-ChildItem (appsdir $true) $_); global = $true } }
+$locA = appsdir $false
+$globA = appsdir $true
+$local = installed_apps $false | ForEach-Object { @{ name = $_; gci = (Get-ChildItem $locA $_) } }
+$global = installed_apps $true | ForEach-Object { @{ name = $_; gci = (Get-ChildItem $globA $_); global = $true } }
 
 $apps = @($local) + @($global)
 
