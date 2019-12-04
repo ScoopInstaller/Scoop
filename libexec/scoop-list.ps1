@@ -1,24 +1,46 @@
-# Usage: scoop list [query]
+# Usage: scoop list [query] [options]
 # Summary: List installed apps
 # Help: Lists all installed apps, or the apps matching the supplied query.
-param($query)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
+# Options:
+#   -i, --installed     List apps sorted by installed date
+#   -u, --updated       List apps sorted by update time
+
+
+'core', 'buckets', 'getopt', 'versions', 'manifest' | ForEach-Object {
+    . "$PSScriptRoot\..\lib\$_.ps1"
+}
 
 reset_aliases
+
+$opt, $query, $err = getopt $args 'iu' 'installed', 'updated'
+# TODO: Stop-ScoopExecution
+if ($err) { "scoop install: $err"; exit 1 }
+
+$orderInstalled = $opt.i -or $opt.installed
+$orderUpdated = $opt.u -or $opt.updated
+# TODO: Stop-ScoopExecution
+if ($orderUpdated -and $orderInstalled) { error '--installed and --updated parameters cannot be used simultaneously'; exit 1 }
 $def_arch = default_architecture
 
-$local = installed_apps $false | ForEach-Object { @{ name = $_ } }
-$global = installed_apps $true | ForEach-Object { @{ name = $_; global = $true } }
+$local = installed_apps $false | ForEach-Object { @{ name = $_; gci = (Get-ChildItem (appsdir $false) $_) } }
+$global = installed_apps $true | ForEach-Object { @{ name = $_; gci = (Get-ChildItem (appsdir $true) $_); global = $true } }
 
 $apps = @($local) + @($global)
 
 if($apps) {
-    write-host "Installed apps$(if($query) { `" matching '$query'`"}): `n"
-    $apps | Sort-Object { $_.name } | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
+    $mes = if ($query) { " matching '$query'" }
+    write-host "Installed apps${mes}: `n"
+
+    if ($orderInstalled) {
+        $sorted = $apps | Sort-Object { $_.gci.CreationTime }
+    } elseif ($orderUpdated) {
+        # TODO:
+    } else {
+        $sorted = $apps | Sort-Object { $_.name }
+    }
+
+    $sorted | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
         $app = $_.name
         $global = $_.global
         $ver = current_version $app $global
