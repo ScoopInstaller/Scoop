@@ -1,10 +1,13 @@
 # Usage: scoop list [query] [options]
 # Summary: List installed apps
+
 # Help: Lists all installed apps, or the apps matching the supplied query.
 
 # Options:
 #   -i, --installed     List apps sorted by installed date
 #   -u, --updated       List apps sorted by update time
+#   -r, --reverse       Apps will be listed descending order.
+#                           In case of Installed or Updated, apps will be listed from newest to oldest.
 
 
 'core', 'buckets', 'getopt', 'versions', 'manifest' | ForEach-Object {
@@ -13,12 +16,13 @@
 
 reset_aliases
 
-$opt, $query, $err = getopt $args 'iu' 'installed', 'updated'
+$opt, $query, $err = getopt $args 'iur' 'installed', 'updated', 'reverse'
 # TODO: Stop-ScoopExecution
 if ($err) { "scoop install: $err"; exit 1 }
 
 $orderInstalled = $opt.i -or $opt.installed
 $orderUpdated = $opt.u -or $opt.updated
+$reverse = $opt.r -or $opt.reverse
 # TODO: Stop-ScoopExecution
 if ($orderUpdated -and $orderInstalled) { error '--installed and --updated parameters cannot be used simultaneously'; exit 1 }
 $def_arch = default_architecture
@@ -34,15 +38,16 @@ if($apps) {
     $mes = if ($query) { " matching '$query'" }
     write-host "Installed apps${mes}: `n"
 
+    $sortSplat = @{ 'Property' = { $_.name }; 'Descending' = $reverse }
     if ($orderInstalled) {
-        $sorted = $apps | Sort-Object { $_.gci.CreationTime }
+        $sortSplat.Property = { $_.gci.CreationTime }
     } elseif ($orderUpdated) {
-        # TODO:
-    } else {
-        $sorted = $apps | Sort-Object { $_.name }
+        $sortSplat.Property = {
+            Join-Path $_.gci.Fullname '*\install.json' | Get-ChildItem | Sort-Object -Property LastWriteTimeUtc | Select-Object -ExpandProperty LastWriteTimeUtc -Last 1
+        }
     }
 
-    $sorted | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
+    $apps | Sort-Object @sortSplat | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
         $app = $_.name
         $global = $_.global
         $ver = current_version $app $global
@@ -68,8 +73,10 @@ if($apps) {
         write-host ''
     }
     write-host ''
-    exit 0
+    $exitCode = 0
 } else {
     write-host "There aren't any apps installed."
-    exit 1
+    $exitCode = 1
 }
+
+exit $exitCode
