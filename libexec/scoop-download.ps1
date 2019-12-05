@@ -5,11 +5,11 @@
 #
 # Options:
 #   -s, --skip                      Skip hash check validation.
-#   -a, --arch <32bit|64bit>        Use the specified architecture.
 #   -u, --utility <native|aria2>    Force using specific download utility.
+#   -a, --arch <32bit|64bit>        Use the specified architecture.
 #   -b, --all-architectures         All avaible files across all architectures will be downloaded.
 
-@('getopt', 'help', 'install', 'manifest') | ForEach-Object {
+@('getopt', 'help', 'manifest', 'install') | ForEach-Object {
     . "$PSScriptRoot\..\lib\$_.ps1"
 }
 
@@ -49,11 +49,14 @@ if (($utility -eq 'aria2') -and (-not (Test-HelperInstalled -Helper Aria2))) {
 #endregion Parameter validation
 
 foreach ($app in $application) {
-    # Prevent leaking variable from previous iteration
-    $cleanAppName, $bucket, $version, $appname, $manifest, $foundBucket, $url = $null, $null, $null, $null, $null, $null, $null
+    Write-Host 'Starting download for' $app -ForegroundColor Green
+
+    # Prevent leaking variables from previous iteration
+    $cleanAppName = $bucket = $version = $appName = $manifest = $foundBucket = $url = $null
 
     $cleanAppName, $bucket, $version = parse_app $app
     $appName, $manifest, $foundBucket, $url = Find-Manifest $cleanAppName $bucket
+    if ($null -eq $bucket) { $bucket = $foundBucket }
 
     # Handle potential use case, which should not appear, but just in case
     # If parsed name/bucket is not same as the provided one
@@ -68,7 +71,12 @@ foreach ($app in $application) {
 
     # Generate manifest if there is different version in manifest
     if (($null -ne $version) -and ($manifest.version -ne $version)) {
-        $manifest = parse_json(generate_user_manifest $appName $bucket $version)
+        $generated = generate_user_manifest $appName $bucket $version
+        if ($null -eq $generated) {
+            error 'Manifest cannot be generated with provided version'
+            continue
+        }
+        $manifest = parse_json($generated)
     }
     if (-not $version) { $version = $manifest.version }
 
@@ -81,11 +89,9 @@ foreach ($app in $application) {
         }
 
         'native' {
-            # $env:SCOOP_DEBUG = $false; scoop cache rm *; .\bin\scoop.ps1 download main/git D:\MEGA\Projects\SCOOPs\Ash258\bucket\Wavebox10.json Ash258/Wavebox@4.10.6 -s
             foreach ($arch in $architecture) {
                 foreach ($url in (url $manifest $arch)) {
-                    dl_with_cache 'cosi' '1.0' 'https://wavebox.pro/dl/client/4_10_6/Wavebox_4_10_6_windows_x86_64/RELEASES' $null $null $true
-                    # dl_with_cache $appName $version $url $null $manifest.cookie $true
+                    dl_with_cache $appName $version $url $null $manifest.cookie $true
 
                     if ($checkHash) {
                         $manifestHash = hash_for_url $manifest $url $arch
