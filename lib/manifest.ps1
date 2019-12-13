@@ -60,11 +60,15 @@ function install_info($app, $version, $global) {
 
 function default_architecture {
     $arch = get_config 'default-architecture'
+    $system = if ([Environment]::Is64BitOperatingSystem) { '64bit' } else { '32bit' }
     if ($null -eq $arch) {
-        if ([Environment]::Is64BitOperatingSystem) {
-            $arch = '64bit'
-        } else {
-            $arch = '32bit'
+        $arch = $system
+    } else {
+        try {
+            $arch = ensure_architecture $arch
+        } catch {
+            warn 'Invalid default architecture configured. Determining default system architecture'
+            $arch = $system
         }
     }
 
