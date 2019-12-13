@@ -35,7 +35,11 @@
 # MSIEXTRACT_USE_LESSMSI: $true|$false
 #       Prefer lessmsi utility over native msiexec.
 #
-# NO_JUNCTIONS: TODO:
+# NO_JUNCTIONS: $true|$false
+#       The 'Current' version alias will not be used. Shims and shortcuts will point to specifc version instad.
+#
+# debug: $true|$false
+#       Additional and detailed output will be shown.
 #
 # SCOOP_REPO: http://github.com/lukesampson/scoop
 #       Git repository containining scoop source code.
