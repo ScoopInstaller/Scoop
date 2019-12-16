@@ -36,7 +36,7 @@
 #       Prefer lessmsi utility over native msiexec.
 #
 # NO_JUNCTIONS: $true|$false
-#       The 'Current' version alias will not be used. Shims and shortcuts will point to specifc version instad.
+#       The 'Current' version alias will not be used. Shims and shortcuts will point to specific version instead.
 #
 # debug: $true|$false
 #       Additional and detailed output will be shown.
