@@ -72,7 +72,7 @@ function Get-InstalledVersion {
         Globally installed application
     .NOTES
         Versions are sorted from oldest to newest, i.e., latest installed version is the last one in the output array.
-        If no installed version found, NULL will be returned.
+        If no installed version found, empty array will be returned.
     #>
     [OutputType([Object[]])]
     [CmdletBinding()]
