@@ -286,6 +286,10 @@ function Test-Aria2Enabled {
     return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
+function Test-Aria2SkipCertificateCheck {
+    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-skipCertificateCheck' $false)
+}
+
 function app_status($app, $global) {
     $status = @{}
     $status.installed = (installed $app $global)

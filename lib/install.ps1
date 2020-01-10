@@ -227,6 +227,13 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--continue"
     )
 
+    if (Test-Aria2SkipCertificateCheck) {
+        Write-Host "Download by aria2 without certificate check. To enforce the check, use: scoop config rm aria2-skipCertificateCheck"
+        $options += "--check-certificate=false"
+    } else {
+        Write-Host "Download by aria2 with certificate check. To skip the check, use: scoop config aria2-skipCertificateCheck true"
+    }
+
     if($cookies) {
         $options += "--header='Cookie: $(cookie_header $cookies)'"
     }
