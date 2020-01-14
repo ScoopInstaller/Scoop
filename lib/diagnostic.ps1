@@ -39,11 +39,25 @@ function check_main_bucket {
 }
 
 function check_long_paths {
+    if (!(check_windows_version)) {
+        return $false
+    }
     $key = Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -ErrorAction SilentlyContinue -Name 'LongPathsEnabled'
     if (!$key -or ($key.LongPathsEnabled -eq 0)) {
         warn 'LongPaths support is not enabled.'
         Write-Host "You can enable it with running:"
         Write-Host "    Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1"
+
+        return $false
+    }
+
+    return $true
+}
+
+function check_windows_version {
+    $key = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -ErrorAction SilentlyContinue -Name 'ReleaseId'
+    if (!$key -or ($key.ReleaseId -lt 1607)) {
+        warn 'Your version of Windows does not support the LongPathsEnabled key.'
 
         return $false
     }
