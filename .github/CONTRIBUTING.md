@@ -5,7 +5,7 @@ There are two main ways how to contribute to the Scoop codebase.
 1. [Extending codebase of scoop itself](#core-codebase)
 1. [Writing/updating manifests](#manifest-creation)
 
-If you have a question regarding Scoop overall, feel free to head into community Discord server. (Invitation link inside [README][README])
+If you have a question regarding Scoop overall, feel free to head into the community Discord server. (Invitation link inside [README][README])
 
 ## Core codebase
 
@@ -17,18 +17,18 @@ You can contribute to core codebase these ways:
 
 Scoop's core codebase started moving towards standard/preferred PowerShell code style.
 Mainly with the adoption of [`Verb-Noun`][approved-verbs] naming.
-Starting from April 2019 use `Verb-Noun` naming for functions when manipulating the codebase.
+Starting from April 2019, use `Verb-Noun` naming for functions when manipulating the codebase.
 
-### How to properly deprecate function
+### How to properly deprecate a function
 
-When you want to refactor any function, keep in mind that original function need to be kept (With same name, parameters, return values), so tools which are utilizing scoop core codebase have time to adapt new changes without breaking functionality.
-Some internal functions are used inside manifests and if you would remove them all these manifests cannot not be installed.
+When you want to refactor any function, keep in mind that the original function needs to remain with the same name, parameters, return values. Hence, tools that are utilizing scoop's core codebase have time to adapt to new changes without breaking functionality.
+Some internal functions are used inside manifests, and if they would be removed, all these manifests cannot be installed.
 
-1. Create new funtion with Verb-Noun name
+1. Create the new function with `Verb-Noun` name
     1. Use [`[CmdletBinding()]`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_cmdletbindingattribute?view=powershell-6)
-        - This will allow functions to benefit from advantages of compiled cmdlets
-            - Default parameters will be added (Debug, Verbose, ErrorAction, ...)
-1. Change body of old function to this:
+        - With binding functions benefit from advantages of compiled cmdlets
+            - Default parameters are added (Debug, Verbose, ErrorAction, ...)
+1. Change the body of the old function to this:
 
 ```powershell
 function old_f {
@@ -39,23 +39,23 @@ function old_f {
 
 See [Decompress module](https://github.com/lukesampson/scoop/blob/1caaed8f3d51d141c6cafe7dc690b7dc08802702/lib/decompress.ps1) for specific example.
 
-### General code sins to avoid and restricitons to follow
+### General code sins to avoid and restrictions to follow
 
-There are few misdemeanors that often show up in pull-requests and code base.
-Keep source code more tidier and cleaner with following best practice.
+Few misdemeanors often show up in pull-requests and codebase.
+Keep source code tidier and cleaner with following best practices.
 
 - Commits/pull-requests naming have to follow [Conventional Commits Specification][commits]
 - [Cmdlet aliases](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/AvoidUsingCmdletAliases.md) usage
     - Never use aliases
-    - Aliases are usefull only in interactive (terminal) usage
-    - Code readibility is significantly lowered
-    - Also aliases could be different in different workspaces / system versions
+    - Aliases are useful only in interactive (terminal) usage
+    - Code readability is significantly lowered
+    - Also, aliases could be different in different workspaces/system versions
 - Short format of function parameters
-    - Powershell allows you to use short version of parameters
+    - Powershell allows you to use a short version of parameters
         - Instead of `Write-Host -ForegroundColor Yellow` you can use `Write-Host -f Yellow`
-        - This should be avoided due to compatibility with newer versions of powershell / functions
-    - When there are parameters with same starting characters it will lead to `Ambiguous` parameter error (`gci -p` for example)
-- Do not return data from function without `return` statement
+        - This should be avoided due to compatibility with newer versions of PowerShell / functions
+    - When there are parameters with the same starting characters, it leads to `Ambiguous` parameter error (`gci -p` for example)
+- Do not return data from a function without `return` statement
     - Powershell allow to "return" data from function with simply putting it into pipeline, but should not be used in scripts
     - Instead of `function Alfa { "Help" }` use `function Alfa { return 'Help' }`
 - Use [singular nouns in function/parameters names](https://github.com/PowerShell/PSScriptAnalyzer/blob/master/RuleDocumentation/UseSingularNouns.md)
@@ -67,19 +67,19 @@ Keep source code more tidier and cleaner with following best practice.
 
 ## Manifest creation
 
-All official buckets are community driven and everyone can add, update and edit manifests.
+All official buckets are community-driven, and everyone can add, update, and edit manifests.
 Pull-Requests are warmly welcomed.
 The next few lines will guide you on how to write manifests, which pass our standards without any problems.
 
-❗ If you haven't read the Wiki please do it now. You could visit the [projects Wiki](https://github.com/lukesampson/scoop/wiki/App-Manifests) or the [exprimental external documentaion](https://scoop.netlify.com/concepts/#app-manifests) ❗
+❗ If you haven't read the Wiki, please do it now. You can visit the [Scoop Wiki](https://github.com/lukesampson/scoop/wiki/App-Manifests) or the [exprimental external documentaion](https://scoop.netlify.com/concepts/#app-manifests) ❗
 
-The Wiki gives you a basic insight on how manifests should look like and how everything works together.
+The Wiki gives you a fundamental insight into how manifests should look like and how everything works together.
 
-A small overview of guidelines which you need to follow when writing manifests. (Explanation to each of them below)
+A small overview of guidelines that you need to follow when writing manifests. (Explanation to each of them below)
 
 1. Manifests need to be formatted as described in [.editorconfig file][.editorconfig]
     - 4 spaces indentation
-    - New line at end of file
+    - Newline at the end of file
     - No trailing whitespace
     - Line endings have to be CRLF
 1. Always include these informative properties:
@@ -91,18 +91,18 @@ A small overview of guidelines which you need to follow when writing manifests. 
 
 ### Manifest format
 
-When you publish a Pull-Request the AppVeyor pipeline will be executed and check for formatting errors inside your manifests.
-Best practice for always passing all checks is to run [checkver][checkver] or [format][formatjson] scripts before posting Pull-Request.
+When Pull-Request is published, the AppVeyor pipeline is executed with various manifests errors.
+Best practice for always passing all checks is to run [checkver][checkver] or [format][formatjson] scripts before submitting Pull-Request.
 
-[checkver][checkver], [format][formatjson] and other scripts under `bin` folder are PowerShell scripts which should run on all platforms (Linux, MacOS with `pwsh`), so you are not tied with Windows platform.
+[checkver][checkver], [format][formatjson], and other scripts under the `bin` folder are PowerShell scripts that should run on all platforms (Linux, macOS with `pwsh`), so you are not tied with Windows platform.
 All of them are ported into each bucket with prefilled parameters.
 
 #### Manifest naming
 
-All manifests name under official buckets should meet these conventions
+All manifests name under official buckets should meet these conventions.
 
 1. All characters should be lowercased
-1. `-` is used as separator when application name contains space
+1. `-` is used as a separator when the application name contains space
 
 <!-- @ScoopInstaller/maintainers Anything else? -->
 
@@ -111,14 +111,14 @@ All manifests name under official buckets should meet these conventions
 <!-- TODO some preface -->
 
 - Do not mention application name
-    - Application name is needed only in case when manifest name is different (in case of more popular acronym for command line utilites for example) from application name
+    - The application's name is needed only in case when the manifest name is different from the application's name. (in case of a more popular acronym for command-line utilities for example)
 <!-- TODO other specifications -->
 
 #### Properties order
 
-Manifest consists of 7 main groups (regions) of properties. These properties (and it's sub-properties) should be logically ordered from top to bottom as they are evaluated in installation process.
+Manifest consists of 7 main groups (regions) of properties. These properties (and their sub-properties) should be logically ordered from top to bottom as they are evaluated in the installation process.
 
-Best order of all properties as follows:
+The best order of all properties as follows:
 
 1. Information region
     1. Version
@@ -154,18 +154,17 @@ Best order of all properties as follows:
 
 ### Readable code
 
-You can specify `post_install`, `pre_install` and `installer.script` blocks, which could be an array (or a simple string) with PowerShell code.
-For these blocks use the syntax as you would normally write PowerShell scripts (Follow PSScriptAnalyzer rules; See: [core codebase](#core-codebase)).
+You can specify `post_install`, `pre_install`, and `installer.script` blocks, which could be an array (or a simple string) with PowerShell code.
+For these blocks, use the syntax as you would generally write PowerShell scripts (Follow PSScriptAnalyzer rules; See: [core codebase](#core-codebase)).
 
 How script blocks should **NOT** look like: <https://github.com/lukesampson/scoop/blob/fa6ccc9471a29bf621c80a507d387a371293de75/bucket/jetbrains-toolbox.json#L32>
 You can compare it with [refactored version](https://github.com/lukesampson/scoop-extras/blob/781a2128150505b4cd00ed4854a7af4160c0e772/bucket/jetbrains-toolbox.json#L12-L24) to see significant differences in readability.
 
 ### Autoupdates
 
-❗ Always test auto-updates before posting a Pull-Request ❗
+❗ Always test auto-updates before posting a Pull-Request. ❗
 
-The last step what should be done before posting a Pull-Request is to run the [checkver][checkver] script with the `-Force` (`-f`) parameter.
-This will check for the latest version of the application (specified within the `checkver` property) and update the manifest file.
+The last step that should be done before submitting a Pull-Request is to run the [checkver][checkver] script with the `-Force` (`-f`) parameter for updating to the latest available version of the application and proper manifest format.
 
 - Update all properties inside `autoupdate` property with actual values (URL, `extract_dir`, ...)
 - Calculates or extracts checksums for all artifacts
