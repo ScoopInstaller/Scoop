@@ -576,6 +576,9 @@ function shim($path, $global, $name, $arg) {
         "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
     }
 
+    # make sure exitcode is returned from .ps1 shim
+    'exit $LastExitCode' | out-file "$shim.ps1" -encoding utf8 -append
+
     if($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
         Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
