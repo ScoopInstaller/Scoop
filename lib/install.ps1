@@ -1021,11 +1021,7 @@ function prune_installed($apps, $global) {
 
 # check whether the app failed to install
 function failed($app, $global) {
-    $ver = current_version $app $global
-    if(!$ver) { return $false }
-    $info = install_info $app $ver $global
-    if(!$info) { return $true }
-    return $false
+    return !(install_info $app (current_version $app $global) $global)
 }
 
 function ensure_none_failed($apps, $global) {
