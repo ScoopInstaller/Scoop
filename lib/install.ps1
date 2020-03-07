@@ -1021,11 +1021,11 @@ function prune_installed($apps, $global) {
 
 # check whether the app failed to install
 function failed($app, $global) {
-    $ver = Select-CurrentVersion -AppName $app -Global:$global
-    if(!$ver) { return $false }
-    $info = install_info $app $ver $global
-    if(!$info) { return $true }
-    return $false
+    if (is_directory (appdir $app $global)) {
+        return !(install_info $app (current_version $app $global) $global)
+    } else {
+        return $false
+    }
 }
 
 function ensure_none_failed($apps, $global) {

@@ -239,6 +239,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # endregion Workaround
 
     $dir = versiondir $app $old_version $global
+    $persist_dir = persistdir $app $global
 
     #region Workaround for #2952
     $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path

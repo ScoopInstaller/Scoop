@@ -20,7 +20,7 @@ function git_checkout {
 }
 
 function git_pull {
-    git_proxy_cmd pull $args
+    git_proxy_cmd pull --rebase=false $args
 }
 
 function git_fetch {

@@ -32,7 +32,7 @@ if($apps) {
         if (!$install_info) { Write-Host ' *failed*' -ForegroundColor DarkRed -NoNewline }
         if ($install_info.hold) { Write-Host ' *hold*' -ForegroundColor DarkMagenta -NoNewline }
 
-        if ($install_info.bucket -and ($install_info.bucket -ne 'main')) {
+        if ($install_info.bucket) {
             write-host -f Yellow " [$($install_info.bucket)]" -NoNewline
         } elseif ($install_info.url) {
             write-host -f Yellow " [$($install_info.url)]" -NoNewline
