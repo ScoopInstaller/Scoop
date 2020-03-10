@@ -324,26 +324,34 @@ function update_manifest_prop([String] $prop, $json, [Hashtable] $substitutions)
     }
 }
 
-function get_version_substitutions([String] $version, [Hashtable] $customMatches) {
-    $firstPart = $version.Split('-') | Select-Object -first 1
-    $lastPart = $version.Split('-') | Select-Object -last 1
+function Get-VersionSubstitution {
+    param (
+        [String]
+        $Version,
+        [Hashtable]
+        $CustomMatches
+    )
+
+    $firstPart = $Version.Split('-') | Select-Object -First 1
+    $lastPart = $Version.Split('-') | Select-Object -Last 1
     $versionVariables = @{
-        '$version' = $version;
-        '$underscoreVersion' = ($version -replace "\.", "_");
-        '$dashVersion' = ($version -replace "\.", "-");
-        '$cleanVersion' = ($version -replace "\.", "");
-        '$majorVersion' = $firstPart.Split('.') | Select-Object -first 1;
-        '$minorVersion' = $firstPart.Split('.') | Select-Object -skip 1 -first 1;
-        '$patchVersion' = $firstPart.Split('.') | Select-Object -skip 2 -first 1;
-        '$buildVersion' = $firstPart.Split('.') | Select-Object -skip 3 -first 1;
+        '$version' = $Version;
+        '$dotVersion' = ($Version -replace '[._-]', '.');
+        '$underscoreVersion' = ($Version -replace '[._-]', '_');
+        '$dashVersion' = ($Version -replace '[._-]', '-');
+        '$cleanVersion' = ($Version -replace '[._-]', '');
+        '$majorVersion' = $firstPart.Split('.') | Select-Object -First 1;
+        '$minorVersion' = $firstPart.Split('.') | Select-Object -Skip 1 -First 1;
+        '$patchVersion' = $firstPart.Split('.') | Select-Object -Skip 2 -First 1;
+        '$buildVersion' = $firstPart.Split('.') | Select-Object -Skip 3 -First 1;
         '$preReleaseVersion' = $lastPart;
     }
-    if($version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
-        $versionVariables.Set_Item('$matchHead', $matches['head'])
-        $versionVariables.Set_Item('$matchTail', $matches['tail'])
+    if($Version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
+        $versionVariables.Set_Item('$matchHead', $Matches['head'])
+        $versionVariables.Set_Item('$matchTail', $Matches['tail'])
     }
-    if($customMatches) {
-        $customMatches.GetEnumerator() | ForEach-Object {
+    if($CustomMatches) {
+        $CustomMatches.GetEnumerator() | ForEach-Object {
             if($_.Name -ne "0") {
                 $versionVariables.Set_Item('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
             }
@@ -398,7 +406,7 @@ function autoupdate([String] $app, $dir, $json, [String] $version, [Hashtable] $
     $has_changes = $false
     $has_errors = $false
     [Bool]$valid = $true
-    $substitutions = get_version_substitutions $version $matches
+    $substitutions = Get-VersionSubstitution $version $matches
 
     if ($json.url) {
         if ($json.autoupdate.url -is [System.Array]) {
