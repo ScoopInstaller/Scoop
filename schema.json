@@ -170,58 +170,88 @@
             "minItems": 1,
             "type": "array"
         },
-        "autoupdate": {
+        "autoupdateArch": {
             "additionalProperties": false,
             "properties": {
-                "architecture": {
-                    "additionalProperties": false,
-                    "properties": {
-                        "32bit": {
-                            "additionalProperties": false,
-                            "properties": {
-                                "extract_dir": {
-                                    "type": "string"
-                                },
-                                "url": {
-                                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
-                                },
-                                "hash": {
-                                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
-                                }
-                            },
-                            "type": "object"
-                        },
-                        "64bit": {
-                            "additionalProperties": false,
-                            "properties": {
-                                "extract_dir": {
-                                    "type": "string"
-                                },
-                                "url": {
-                                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
-                                },
-                                "hash": {
-                                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
-                                }
-                            },
-                            "type": "object"
-                        }
-                    },
-                    "type": "object"
-                },
-                "extract_dir": {
-                    "type": "string"
+                "url": {
+                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
                 },
                 "hash": {
                     "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
                 },
-                "note": {
+                "extract_dir": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
-                "url": {
-                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
+                "extract_to": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "env_add_path": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "env_set": {
+                    "type": "object"
+                },
+                "bin": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "shortcuts": {
+                    "$ref": "#/definitions/shortcutsArray"
+                },
+                "installer": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "file": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "post_install": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "psmodule": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "type": "object"
+                },
+                "persist": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "note": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             },
+            "type": "object"
+        },
+        "autoupdate": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/autoupdateArch"
+                },
+                {
+                    "properties": {
+                        "note": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "architecture": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "32bit": {
+                                    "$ref": "#/definitions/autoupdateArch"
+                                },
+                                "64bit": {
+                                    "$ref": "#/definitions/autoupdateArch"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
             "type": "object"
         },
         "checkver": {
