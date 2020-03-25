@@ -106,7 +106,7 @@ $Queue | ForEach-Object {
     $substitutions = get_version_substitutions $json.version
 
     $wc = New-Object Net.Webclient
-    
+
     if ($json.checkver.useragent) {
         $wc.Headers.Add('User-Agent', (substitute $json.checkver.useragent $substitutions))
     } else {
@@ -116,7 +116,7 @@ $Queue | ForEach-Object {
             $wc.Headers.Add('User-Agent', (Get-UserAgent))
         }
     }
-    
+
     if ($json.checkver.cookie) {
         $wc.Headers.Add('cookie', $json.checkver.cookie)
     } else {
@@ -149,7 +149,7 @@ $Queue | ForEach-Object {
         $url = $json.checkver.github + '/releases/latest'
         $regex = $githubRegex
     }
-    
+
     if ($json.checkver.encode) {
         $wc.Encoding = [System.Text.Encoding]::GetEncoding($json.checkver.encode)
     } else {
@@ -157,7 +157,7 @@ $Queue | ForEach-Object {
             $wc.Encoding = [System.Text.Encoding]::GetEncoding($Encode)
         }
     }
-    
+
     if ($json.checkver.re) {
         $regex = $json.checkver.re
     }
