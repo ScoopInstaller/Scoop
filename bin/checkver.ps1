@@ -68,7 +68,7 @@ param(
     [Switch] $SkipUpdated,
     [String] $Cookie,
     [String] $UserAgent,
-    [String] $Encode
+    [String] $Encode,
     [String] $Version = ''
 )
 
@@ -106,6 +106,7 @@ $Queue | ForEach-Object {
     $substitutions = get_version_substitutions $json.version
 
     $wc = New-Object Net.Webclient
+    
     if ($json.checkver.useragent) {
         $wc.Headers.Add('User-Agent', (substitute $json.checkver.useragent $substitutions))
     } else {
@@ -115,6 +116,7 @@ $Queue | ForEach-Object {
             $wc.Headers.Add('User-Agent', (Get-UserAgent))
         }
     }
+    
     if ($json.checkver.cookie) {
         $wc.Headers.Add('cookie', $json.checkver.cookie)
     } else {
