@@ -196,8 +196,12 @@ while ($in_progress -gt 0) {
     $expected_ver = $json.version
     $ver = ''
 
-    $err = $ev.SourceEventArgs.Error
-    $page = $ev.SourceEventArgs.Result
+    if ($json.checkver.script) {
+        $page = $json.checkver.script -join "`r`n" | Invoke-Expression
+    } else {
+        $err = $ev.SourceEventArgs.Error
+        $page = $ev.SourceEventArgs.Result
+    }
 
     if ($err) {
         next "$($err.message)`r`nURL $url is not valid"
