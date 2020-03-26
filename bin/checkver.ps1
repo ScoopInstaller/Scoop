@@ -196,11 +196,10 @@ while ($in_progress -gt 0) {
     $expected_ver = $json.version
     $ver = ''
 
+    $page = $ev.SourceEventArgs.Result
+    $err = $ev.SourceEventArgs.Error
     if ($json.checkver.script) {
         $page = $json.checkver.script -join "`r`n" | Invoke-Expression
-    } else {
-        $err = $ev.SourceEventArgs.Error
-        $page = $ev.SourceEventArgs.Result
     }
 
     if ($err) {
