@@ -365,7 +365,31 @@ function dl($url, $to, $cookies, $progress) {
         }
     }
 
-    $wres = $wreq.getresponse()
+    try {
+        $wres = $wreq.GetResponse()
+    } catch [System.Net.WebException] {
+        $exc = $_.Exception
+        $redirectRes = $exc.Response
+        if ($redirectRes.StatusCode -ne [System.Net.HttpStatusCode]::Redirect) {
+            throw $exc
+        }
+
+        if ((-not $redirectRes.Headers) -or ($redirectRes.Headers -notcontains 'Location')) {
+            throw $exc
+        }
+        $newUrl = $redirectRes.Headers['Location']
+        info "Following redirect to ${newUrl}..."
+
+        # Handle manual file rename
+        if ($url -like '*#/*') {
+            $null, $postfix = $url -split '#/'
+            $newUrl = "${newUrl}#/${postfix}"
+        }
+
+        dl $newUrl $to $cookies $progress
+        return
+    }
+
     $total = $wres.ContentLength
     if($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
         $total = ftp_file_size($url)
