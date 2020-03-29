@@ -378,12 +378,12 @@ function dl($url, $to, $cookies, $progress) {
             throw $exc
         }
         $newUrl = $redirectRes.Headers['Location']
-        info "Following redirect to ${newUrl}..."
+        info "Following redirect to $newUrl..."
 
         # Handle manual file rename
         if ($url -like '*#/*') {
             $null, $postfix = $url -split '#/'
-            $newUrl = "${newUrl}#/${postfix}"
+            $newUrl = "$newUrl#/$postfix"
         }
 
         dl $newUrl $to $cookies $progress
