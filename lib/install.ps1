@@ -369,14 +369,24 @@ function dl($url, $to, $cookies, $progress) {
         $wres = $wreq.GetResponse()
     } catch [System.Net.WebException] {
         $exc = $_.Exception
+        $handledCodes = @(
+            [System.Net.HttpStatusCode]::MovedPermanently,  # HTTP 301
+            [System.Net.HttpStatusCode]::Found,             # HTTP 302
+            [System.Net.HttpStatusCode]::SeeOther,          # HTTP 303
+            [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
+        )
+
+        # Only handle redirection codes
         $redirectRes = $exc.Response
-        if ($redirectRes.StatusCode -ne [System.Net.HttpStatusCode]::Redirect) {
+        if ($handledCodes -notcontains $redirectRes.StatusCode) {
             throw $exc
         }
 
+        # Get the new location of the file
         if ((-not $redirectRes.Headers) -or ($redirectRes.Headers -notcontains 'Location')) {
             throw $exc
         }
+
         $newUrl = $redirectRes.Headers['Location']
         info "Following redirect to $newUrl..."
 
