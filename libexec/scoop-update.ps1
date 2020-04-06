@@ -319,7 +319,7 @@ if (!$apps) {
                     $outdated += applist $app $global
                     write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
                 } else {
-                    warn "'$app' is locked to version $($status.version)"
+                    warn "'$app' is held to version $($status.version)"
                 }
             } elseif ($apps_param -ne '*') {
                 write-host -f green "$app`: $($status.version) (latest version)"
