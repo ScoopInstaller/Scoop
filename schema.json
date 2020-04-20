@@ -260,6 +260,10 @@
                         },
                         "useragent": {
                             "type": "string"
+                        },
+                        "script": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings",
+                            "description": "Custom PowerShell script to retrieve application version using more complex approach."
                         }
                     },
                     "type": "object"
