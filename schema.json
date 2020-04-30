@@ -168,7 +168,6 @@
                                     "type": "string"
                                 },
                                 "url": {
-                                    "format": "uri",
                                     "type": "string"
                                 },
                                 "hash": {
@@ -184,7 +183,6 @@
                                     "type": "string"
                                 },
                                 "url": {
-                                    "format": "uri",
                                     "type": "string"
                                 },
                                 "hash": {
@@ -206,7 +204,6 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "url": {
-                    "format": "uri",
                     "type": "string"
                 }
             },
