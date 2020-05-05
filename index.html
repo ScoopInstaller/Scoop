@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<title>Scoop</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link rel="stylesheet" href="stylesheets/styles.css">
+		<!--[if lt IE 9]>
+			<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<!--[if lt IE 8]>
+		<link rel="stylesheet" href="/stylesheets/ie.css">
+		<![endif]-->
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+	</head>
+	<body>
+        <nav class="header navbar navbar-expand-md navbar-light bg-faded">
+            <div class="container">
+                <a class="navbar-brand" href="#">scoop.</a>
+                <div class="collapse navbar-collapse">
+                    <ul class="ml-sm-auto navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link nav-link" href="https://github.com/lukesampson/scoop/wiki">Documentation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DM2SUH9EUXSKJ">Donations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="https://github.com/lukesampson/scoop" class="nav-link">Github</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <section class="jumbotron-header text-center mb-3 jumbotron">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<p class="lead">
+							<!-- <img src="/assets/logo.png" alt="" width="150px"> -->
+						</p>
+						<h1 class="jumbotron-heading display-4">scoop</h1>
+						<p class="lead">A command-line installer for Windows</p>
+						<p>
+							<a href="https://github.com/lukesampson/scoop" class="btn btn-outline-dark">View on Github</a>
+							<a class="btn btn-dark" href="https://github.com/lukesampson/scoop/wiki">Documentation</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div class="container">
+			<div class="justify-content-sm-center row">
+				<div class="col col-sm-8">
+					<h2>About</h2>
+					<hr>
+					<h3 class="mt-5">Scoop installs the tools you know and love</h3>
+					<pre class="language-bash"><code class=" language-bash"><span class="token function">scoop</span> <span class="token function">install</span> curl</code></pre>
+					<h3 class="mt-5">Get comfortable on the Windows command line</h3>
+					<p>
+						Looking for familiar Unix tools? Tired of Powershell’s Verb-Noun verbosity? Scoop helps you get the programs you need, with
+						a minimal amount of point-and-clicking.
+					</p>
+					<h3 class="mt-5">Say goodbye to persmission pop-ups</h3>
+					<p>
+						Scoop installs programs to your home directory by default. So you don’t need admin permissions to install programs, and you
+						won’t see UAC popups every time you need to add or remove a program.
+					</p>
+					<h3 class="mt-5">Scoop reads the README for you</h3>
+					<p>
+						Not sure whether you need 32-bit or 64-bit? Can’t remember that command you have to type after you install to get that other
+						thing you need? Scoop has you covered. Just scoop install and you’ll be ready to work in no time.
+					</p>
+					<h2 class="mt-5">Demo</h2>
+					<hr>
+					<div class="embed-responsive embed-responsive-16by9">
+						<iframe class="embed-responsive-item" src="http://www.youtube.com/embed/a85QLUJ0Wbs?rel=0" allowfullscreen></iframe>
+					</div>
+					<h2 class="mt-5">Installation</h2>
+					<hr>
+					<p>Make sure <a href="http://www.microsoft.com/en-us/download/details.aspx?id=34595">Powershell 3</a> is installed, then run:</p>
+					<pre class="language-bash"><code class=" language-bash"><span class="token function">iex</span> (<span class="token function">new-object</span> net.webclient).downloadstring('<a class="token website-link" href="https://get.scoop.sh">https://get.scoop.sh</a>')</code></pre>
+					<p>
+						<strong>Note: </strong>
+						if you get an error you might need to change the execution policy (i.e. enable Powershell) with
+						<pre class="language-bash"><code class=" language-bash"><span class="token function">Set-ExecutionPolicy</span> RemoteSigned -scope CurrentUser</code></pre>
+					</p>
+					<hr class="mt-5">
+					<div class="row">
+						<div class="col-md-6">
+							<small>
+								Project maintained by <a href="https://github.com/lukesampson">lukesampson</a>
+							</small>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <small>
+                                Website <a href="https://twitter.com/ravt3" target="_blank">ravtakhar</a>
+                            </small>
+                        </div>
+					</div>
+					<br>
+				</div>
+			</div>
+		</div>
+
+		<!--[if !IE]><script>fixScale(document);</script><![endif]-->
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+            crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+            crossorigin="anonymous"></script>
+		<script type="text/javascript">
+			var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+			document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+		<script type="text/javascript">
+			try {
+				var pageTracker = _gat._getTracker("UA-42894266-1");
+				pageTracker._trackPageview();
+			} catch(err) {}
+		</script>
+	</body>
+</html>
