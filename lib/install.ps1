@@ -848,7 +848,7 @@ function rm_shims($manifest, $global, $arch) {
     }
 }
 
-# Gets the path for the 'current' directory junction for
+# Gets the path for the 'current' directory Symbolic link for
 # the specified version directory.
 function current_dir($versiondir) {
     $parent = split-path $versiondir
@@ -856,10 +856,10 @@ function current_dir($versiondir) {
 }
 
 
-# Creates or updates the directory junction for [app]/current,
+# Creates or updates the directory Symbolic link for [app]/current,
 # pointing to the specified version directory for the app.
 #
-# Returns the 'current' junction directory if in use, otherwise
+# Returns the 'current' Symbolic link directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
     if(get_config NO_JUNCTIONS) { return $versiondir }
@@ -873,20 +873,20 @@ function link_current($versiondir) {
     }
 
     if(test-path $currentdir) {
-        # remove the junction
+        # remove the Symbolic link
         attrib -R /L $currentdir
         & "$env:COMSPEC" /c rmdir $currentdir
     }
 
-    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
+    & "$env:COMSPEC" /c mklink /d $currentdir $versiondir | out-null
     attrib $currentdir +R /L
     return $currentdir
 }
 
-# Removes the directory junction for [app]/current which
+# Removes the directory Symbolic link for [app]/current which
 # points to the current version directory for the app.
 #
-# Returns the 'current' junction directory (if it exists),
+# Returns the 'current' Symbolic link directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
     if(get_config NO_JUNCTIONS) { return $versiondir }
@@ -898,7 +898,7 @@ function unlink_current($versiondir) {
         # remove read-only attribute on link
         attrib $currentdir -R /L
 
-        # remove the junction
+        # remove the Symbolic link
         & "$env:COMSPEC" /c "rmdir `"$currentdir`""
         return $currentdir
     }
@@ -1119,31 +1119,31 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             # create link
             if (is_directory $target) {
-                # target is a directory, create junction
-                & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
+                # target is a directory, create Symbolic link
+                & "$env:COMSPEC" /c "mklink /d `"$source`" `"$target`"" | out-null
                 attrib $source +R /L
             } else {
-                # target is a file, create hard link
-                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
+                # target is a file, create Symbolic link also works
+                & "$env:COMSPEC" /c "mklink /d `"$source`" `"$target`"" | out-null
             }
         }
     }
 }
 
 function unlink_persist_data($dir) {
-    # unlink all junction / hard link in the directory
+    # unlink all Symbolic link in the directory
     Get-ChildItem -Recurse $dir | ForEach-Object {
         $file = $_
         if ($null -ne $file.LinkType) {
             $filepath = $file.FullName
-            # directory (junction)
+            # directory (Symbolic link)
             if ($file -is [System.IO.DirectoryInfo]) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
-                # remove the junction
+                # remove the Symbolic link (Symbolic link supports rm to delete)
                 & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
             } else {
-                # remove the hard link
+                # remove the Symbolic link (Symbolic link also supports del to delete)
                 & "$env:COMSPEC" /c "del `"$filepath`""
             }
         }
