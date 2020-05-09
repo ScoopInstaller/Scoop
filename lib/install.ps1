@@ -1123,15 +1123,15 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 & "$env:COMSPEC" /c "mklink /d `"$source`" `"$target`"" | out-null
                 attrib $source +R /L
             } else {
-                # target is a file, create symbolic link also works
-                & "$env:COMSPEC" /c "mklink /d `"$source`" `"$target`"" | out-null
+                # target is a file, create hard link
+                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
             }
         }
     }
 }
 
 function unlink_persist_data($dir) {
-    # unlink all symbolic link in the directory
+    # unlink all symbolic / hard link in the directory
     Get-ChildItem -Recurse $dir | ForEach-Object {
         $file = $_
         if ($null -ne $file.LinkType) {
@@ -1140,10 +1140,10 @@ function unlink_persist_data($dir) {
             if ($file -is [System.IO.DirectoryInfo]) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
-                # remove the symbolic link (symbolic link supports rm to delete)
+                # remove the symbolic link
                 & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
             } else {
-                # remove the symbolic link (symbolic link also supports del to delete)
+                # remove the hard link
                 & "$env:COMSPEC" /c "del `"$filepath`""
             }
         }
