@@ -469,6 +469,7 @@ function dl_progress($read, $total, $url) {
             write-host
             $left = 0
             $top  = $top + 1
+            if($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
         }
     }
 
