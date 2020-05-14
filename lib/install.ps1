@@ -357,7 +357,7 @@ function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($reqUrl)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "sourceforge\.net")) {
+        if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
             $wreq.referer = strip_filename $url
         }
         if($cookies) {
@@ -503,6 +503,7 @@ function dl_progress($read, $total, $url) {
             write-host
             $left = 0
             $top  = $top + 1
+            if($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
         }
     }
 
