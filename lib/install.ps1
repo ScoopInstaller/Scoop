@@ -225,6 +225,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--min-tls-version=TLSv1.2"
         "--stop-with-process=$PID"
         "--continue"
+        "--summary-interval 0"
     )
 
     if($cookies) {
@@ -282,21 +283,27 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         # handle aria2 console output
         Write-Host "Starting download with aria2 ..."
-        $prefix = "Download: "
+
         Invoke-Expression $aria2 | ForEach-Object {
-            if([String]::IsNullOrWhiteSpace($_)) {
-                # skip blank lines
-                return
+            # Skip blank lines
+            if ([String]::IsNullOrWhiteSpace($_)) { return }
+            # Prevent potential overlaping of text when one line is shorter
+            $blank = ' ' * ($Host.UI.RawUI.WindowSize.Width - $_.Length - 20)
+            $color = 'Gray'
+
+            if ($_.StartsWith('(OK):')) {
+                $noNewLine = $true
+                $color = 'Green'
+            } elseif ($_.StartsWith('[') -and $_.EndsWith(']')) {
+                $noNewLine = $true
+                $color = 'Cyan'
+            } elseif ($_.StartsWith('Download Results:')) {
+                $noNewLine = $false
             }
-            Write-Host $prefix -NoNewline
-            if($_.StartsWith('(OK):')) {
-                Write-Host $_ -f Green
-            } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
-                Write-Host $_ -f Cyan
-            } else {
-                Write-Host $_ -f Gray
-            }
+
+            Write-Host "`rDownload: $_$blank" -ForegroundColor $color -NoNewline:$noNewLine
         }
+        Write-Host ''
 
         if($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
