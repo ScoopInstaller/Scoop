@@ -52,16 +52,9 @@ if (!$configBranch) {
 
 if(($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
-    # should be deleted after Oct 1, 2019
-    If ((Get-Date).ToUniversalTime() -ge "2019-10-01") {
-        Write-Output "PowerShell 5 or later is required to run Scoop."
-        Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
-        break
-    } else {
-        Write-Output "Scoop is going to stop supporting old version of PowerShell."
-        Write-Output "Please upgrade to PowerShell 5 or later version before Oct 1, 2019 UTC."
-        Write-Output "Guideline: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
-    }
+    Write-Output "PowerShell 5 or later is required to run Scoop."
+    Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
+    break
 }
 
 function update_scoop() {
