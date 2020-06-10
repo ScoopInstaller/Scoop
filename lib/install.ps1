@@ -275,7 +275,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
     if($has_downloads) {
         # write aria2 input file
-        Set-Content -Path $urlstxt $urlstxt_content
+        [IO.File]::WriteAllLines($urlstxt, $urlstxt_content)
 
         # build aria2 command
         $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
