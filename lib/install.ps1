@@ -287,8 +287,10 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         Invoke-Expression $aria2 | ForEach-Object {
             # Skip blank lines
             if ([String]::IsNullOrWhiteSpace($_)) { return }
+
             # Prevent potential overlaping of text when one line is shorter
-            $blank = ' ' * ($Host.UI.RawUI.WindowSize.Width - $_.Length - 20)
+            $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
+            $blank = if ($len -gt 0) { ' ' * $len } else { '' }
             $color = 'Gray'
 
             if ($_.StartsWith('(OK):')) {
