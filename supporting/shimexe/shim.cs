@@ -63,7 +63,13 @@ namespace Scoop {
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetExitCodeProcess(IntPtr hProcess, out uint lpExitCode);
 
+        [DllImport("user32.dll", SetLastError=true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
         static int Main(string[] args) {
+            ShowWindow(Process.GetCurrentProcess().MainWindowHandle, 0);
+
             var exe = Assembly.GetExecutingAssembly().Location;
             var dir = Path.GetDirectoryName(exe);
             var name = Path.GetFileNameWithoutExtension(exe);
