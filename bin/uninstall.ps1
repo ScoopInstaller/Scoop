@@ -4,7 +4,7 @@
 .PARAMETER global
     Global applications will be uninstalled.
 .PARAMETER purge
-    Persisted data will be deleted. 
+    Persisted data will be deleted.
 #>
 param(
     [bool] $global,
