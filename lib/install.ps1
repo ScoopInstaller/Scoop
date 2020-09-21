@@ -353,17 +353,18 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
+    $no_proxy = get_config 'no_proxy'
+
     $reqUrl = ($url -split "#")[0]
     $wreq = [net.webrequest]::create($reqUrl)
-    if($wreq -is [net.httpwebrequest]) {
-        $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
-            $wreq.referer = strip_filename $url
-        }
-        if($cookies) {
-            $wreq.headers.add('Cookie', (cookie_header $cookies))
+
+    if($no_proxy) {
+        if($reqUrl -like "*$no_proxy*") {
+            $wreq.proxy = $null
+            Write-Host "Removing proxy for installation from url: $url"
         }
     }
+
 
     $wres = $wreq.getresponse()
     $total = $wres.ContentLength

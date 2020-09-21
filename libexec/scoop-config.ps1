@@ -18,6 +18,7 @@
 # --------
 #
 # proxy: [username:password@]host:port
+# no_proxy: host
 #
 # By default, Scoop will use the proxy settings from Internet Options, but with anonymous authentication.
 #
