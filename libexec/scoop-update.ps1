@@ -129,9 +129,8 @@ function update_scoop() {
     }
 
     if ((Get-LocalBucket) -notcontains 'main') {
-        info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
-        info "Adding main bucket..."
-        add_bucket 'main'
+        warn "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
+        warn "Run 'scoop bucket add main' to install from main bucket"
     }
 
     ensure_scoop_in_path
