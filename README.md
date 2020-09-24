@@ -71,6 +71,9 @@ Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.
 
 # or shorter
 iwr -useb get.scoop.sh | iex
+
+# or if you are in China
+iwr -useb github.wuyanzheshui.workers.dev/lukesampson/scoop/raw/master/bin/install-cn.ps1 | iex
 ```
 
 Once installed, run `scoop help` for instructions.
