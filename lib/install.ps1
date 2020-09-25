@@ -354,7 +354,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
     try {
-        Invoke-WebRequest 'https://v2ray.com/robots.txt' -TimeoutSec 1
+        Invoke-WebRequest 'https://v2ray.com/robots.txt' -UseBasicParsing -TimeoutSec 1
     } catch {
         $url = $url -replace '//github.com/', '//github.wuyanzheshui.workers.dev/'
         if ($url -match '//raw.githubusercontent.com/') {
