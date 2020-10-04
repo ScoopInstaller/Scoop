@@ -353,6 +353,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
+    $url = ConvertTo-FastGitUrl $url
     $reqUrl = ($url -split "#")[0]
     $wreq = [net.webrequest]::create($reqUrl)
     if($wreq -is [net.httpwebrequest]) {

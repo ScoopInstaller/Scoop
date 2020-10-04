@@ -71,6 +71,9 @@ Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.
 
 # or shorter
 iwr -useb get.scoop.sh | iex
+
+# if iwr: failed to resolve this remote name:'raw.githubusercontent.com'
+iwr -useb raw.fastgit.org/lukesampson/scoop/master/bin/install.ps1 | iex
 ```
 
 Once installed, run `scoop help` for instructions.

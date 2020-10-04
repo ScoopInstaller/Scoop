@@ -27,8 +27,27 @@ if ([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'Tls
     break
 }
 
+function ConvertTo-FastGitUrl {
+    param (
+        [Parameter(Mandatory = $True)]
+        [string]$Url
+    )
+    $map = @{
+        '//github.com/'                = '//hub.fastgit.org/';
+        '//raw.githubusercontent.com/' = '//raw.fastgit.org/'
+    }
+    if ($map.Keys | Where-Object { $Url -match $_ }) {
+        try {
+            Invoke-WebRequest 'https://v2ray.com/robots.txt' -UseBasicParsing -TimeoutSec 1 | Out-Null
+        } catch {
+            $map.Keys | ForEach-Object { $Url = $Url -replace $_, $map[$_] }
+        }
+    }
+    return $Url
+}
+
 # get core functions
-$core_url = 'https://raw.githubusercontent.com/lukesampson/scoop/master/lib/core.ps1'
+$core_url = ConvertTo-FastGitUrl 'https://raw.githubusercontent.com/lukesampson/scoop/master/lib/core.ps1'
 Write-Output 'Initializing...'
 Invoke-Expression (new-object net.webclient).downloadstring($core_url)
 
@@ -41,7 +60,7 @@ if (installed 'scoop') {
 $dir = ensure (versiondir 'scoop' 'current')
 
 # download scoop zip
-$zipurl = 'https://github.com/lukesampson/scoop/archive/master.zip'
+$zipurl = ConvertTo-FastGitUrl 'https://github.com/lukesampson/scoop/archive/master.zip'
 $zipfile = "$dir\scoop.zip"
 Write-Output 'Downloading scoop...'
 dl $zipurl $zipfile
@@ -57,7 +76,7 @@ shim "$dir\bin\scoop.ps1" $false
 
 # download main bucket
 $dir = "$scoopdir\buckets\main"
-$zipurl = 'https://github.com/ScoopInstaller/Main/archive/master.zip'
+$zipurl = ConvertTo-FastGitUrl 'https://github.com/ScoopInstaller/Main/archive/master.zip'
 $zipfile = "$dir\main-bucket.zip"
 Write-Output 'Downloading main bucket...'
 New-Item $dir -Type Directory -Force | Out-Null

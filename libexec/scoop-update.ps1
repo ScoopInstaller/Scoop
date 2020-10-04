@@ -42,6 +42,7 @@ if (!$configRepo) {
     $configRepo = "https://github.com/lukesampson/scoop"
     set_config SCOOP_REPO $configRepo | Out-Null
 }
+$configRepo = ConvertTo-FastGitUrl $configRepo
 
 # Find current update channel from config
 $configBranch = get_config SCOOP_BRANCH

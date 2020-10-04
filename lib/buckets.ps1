@@ -82,6 +82,7 @@ function find_manifest($app, $bucket) {
 }
 
 function add_bucket($name, $repo) {
+    $repo = ConvertTo-FastGitUrl $repo
     if (!$name) { "<name> missing"; $usage_add; exit 1 }
     if (!$repo) {
         $repo = known_bucket_repo $name

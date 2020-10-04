@@ -1,3 +1,22 @@
+function ConvertTo-FastGitUrl {
+    param (
+        [Parameter(Mandatory = $True)]
+        [string]$Url
+    )
+    $map = @{
+        '//github.com/'                = '//hub.fastgit.org/';
+        '//raw.githubusercontent.com/' = '//raw.fastgit.org/'
+    }
+    if ($map.Keys | Where-Object { $Url -match $_ }) {
+        try {
+            Invoke-WebRequest 'https://v2ray.com/robots.txt' -UseBasicParsing -TimeoutSec 1 | Out-Null
+        } catch {
+            $map.Keys | ForEach-Object { $Url = $Url -replace $_, $map[$_] }
+        }
+    }
+    return $Url
+}
+
 function Optimize-SecurityProtocol {
     # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
     # which allows the operating system to choose the best protocol to use.
