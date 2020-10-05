@@ -37,9 +37,15 @@ function ConvertTo-FastGitUrl {
         '//raw.githubusercontent.com/' = '//raw.fastgit.org/'
     }
     if ($map.Keys | Where-Object { $Url -match $_ }) {
-        try {
-            Invoke-WebRequest 'https://v2ray.com/robots.txt' -UseBasicParsing -TimeoutSec 1 | Out-Null
-        } catch {
+        if ($null -eq $env:SCOOP_INGFW) {
+            try {
+                Invoke-WebRequest 'https://v2ray.com/robots.txt' -UseBasicParsing -TimeoutSec 3 | Out-Null
+                $env:SCOOP_INGFW = 'false'
+            } catch {
+                $env:SCOOP_INGFW = 'true'
+            }
+        }
+        if ($env:SCOOP_INGFW -eq 'true') {
             $map.Keys | ForEach-Object { $Url = $Url -replace $_, $map[$_] }
         }
     }
