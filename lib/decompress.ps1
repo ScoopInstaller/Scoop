@@ -16,7 +16,7 @@ function Test-7zipRequirement {
             return ($URL | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
         }
     } else {
-        return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
+        return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg)|(zst))$'
     }
 }
 
