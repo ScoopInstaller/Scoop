@@ -555,6 +555,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             }
         } elseif(Test-7zipRequirement -File $fname) { # 7zip
             $extract_fn = 'Expand-7zipArchive'
+        } elseif(Test-7zip-zstdRequirement -File $fname) { # 7zip-zstd
+            $extract_fn = 'Expand-7zip-zstdArchive'
         }
 
         if($extract_fn) {

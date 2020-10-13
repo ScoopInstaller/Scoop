@@ -61,6 +61,9 @@ function script_deps($script) {
     if($script -like '*Expand-7zipArchive *' -or $script -like '*extract_7zip *') {
         $deps += '7zip'
     }
+    if($script -like '*Expand-7zip-zstdArchive *' -or $script -like '*extract_7zip-zstd *') {
+        $deps += '7zip-zstd'
+    }
     if($script -like '*Expand-MsiArchive *' -or $script -like '*extract_msi *') {
         $deps += 'lessmsi'
     }
@@ -79,6 +82,9 @@ function install_deps($manifest, $arch) {
 
     if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -URL (url $manifest $arch))) {
         $deps += '7zip'
+    }
+    if (!(Test-HelperInstalled -Helper 7zip-zstd) -and (Test-7zip-zstdRequirement -URL (url $manifest $arch))) {
+        $deps += '7zip-zstd'
     }
     if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -URL (url $manifest $arch))) {
         $deps += 'lessmsi'
