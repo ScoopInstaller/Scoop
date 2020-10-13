@@ -18,11 +18,6 @@ if (!(Test-HelperInstalled -Helper 7zip)) {
     $issues++
 }
 
-if (!(Test-HelperInstalled -Helper 7zip-zstd)) {
-    error "'7zip-zstd' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip-zstd'."
-    $issues++
-}
-
 if (!(Test-HelperInstalled -Helper Innounp)) {
     error "'Inno Setup Unpacker' is not installed! It's required for unpacking InnoSetup files. Please run 'scoop install innounp'."
     $issues++
