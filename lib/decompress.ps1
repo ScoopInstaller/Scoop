@@ -20,7 +20,7 @@ function Test-7zipRequirement {
     }
 }
 
-function Test-7zip-zstdRequirement {
+function Test-7zipZstdRequirement {
     [CmdletBinding(DefaultParameterSetName = "URL")]
     [OutputType([Boolean])]
     param (
@@ -35,7 +35,7 @@ function Test-7zip-zstdRequirement {
         if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
             return $false
         } else {
-            return ($URL | Where-Object { Test-7zip-zstdRequirement -File $_ }).Count -gt 0
+            return ($URL | Where-Object { Test-7zipZstdRequirement -File $_ }).Count -gt 0
         }
     } else {
         return $File -match '\.zst$'
@@ -127,7 +127,7 @@ function Expand-7zipArchive {
     }
 }
 
-function Expand-7zip-zstdArchive {
+function Expand-7zipZstdArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
