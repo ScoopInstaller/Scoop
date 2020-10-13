@@ -38,6 +38,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             $test2 = "$working_dir\7ZipTest2.tgz"
             $test3 = "$working_dir\7ZipTest3.tar.bz2"
             $test4 = "$working_dir\7ZipTest4.tar.gz"
+            $test5 = "$working_dir\7ZipTest5.tar.zst"
         }
 
         It "extract normal compressed file" -Skip:$isUnix {
@@ -70,9 +71,9 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         It "extract nested compressed file with different inner name" -Skip:$isUnix {
             $to = test_extract "Expand-7zip-zstdArchive" $test5
-            $to | Should Exist
-            "$to\empty" | Should Exist
-            (Get-ChildItem $to).Count | Should Be 1
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
         }
 
         It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
