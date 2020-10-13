@@ -70,7 +70,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         }
 
         It "extract nested compressed file with different inner name" -Skip:$isUnix {
-            $to = test_extract "Expand-7zipZstdArchive" $test5
+            $to = test_extract "Expand-7zipArchive" $test5
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
