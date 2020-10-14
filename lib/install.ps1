@@ -558,7 +558,6 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         } elseif(Test-ZstdRequirement -File $fname) { # Zstd
             $extract_fn = 'Expand-ZstdArchive'
         }
-
         if($extract_fn) {
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline

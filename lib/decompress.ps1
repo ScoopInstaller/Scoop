@@ -81,7 +81,6 @@ function Expand-7zipArchive {
         $Path = "$DestinationPath\$TarFilename"
         Expand-ZstdArchive -Path "$OrigPath" -DestinationPath $Path
     }
-
     if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
         try {
             $7zPath = (Get-Command '7z' -CommandType Application | Select-Object -First 1).Source
@@ -169,7 +168,7 @@ function Expand-ZstdArchive {
     }
 
     try {
-    $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
+        $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
     } catch [System.Management.Automation.ParameterBindingException] {
         Set-TerminatingError -Title 'Ignore|-''zstd'' is not installed or cannot be used'
     }
@@ -177,7 +176,6 @@ function Expand-ZstdArchive {
     if (!$Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
-
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
     }
