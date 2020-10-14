@@ -150,7 +150,7 @@ function Expand-ZstdArchive {
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
-        [ValidateSet("All", "Skip")]
+        [ValidateSet("All")]
         [String]
         $Overwrite,
         [Switch]
@@ -166,7 +166,6 @@ function Expand-ZstdArchive {
     }
     switch ($Overwrite) {
         "All" { $ArgList += "-f" }
-        "Skip" { $ArgList += "-q" }
     }
 
     $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
