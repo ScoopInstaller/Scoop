@@ -168,7 +168,12 @@ function Expand-ZstdArchive {
         "All" { $ArgList += "-f" }
     }
 
+    try {
     $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
+    } catch [System.Management.Automation.ParameterBindingException] {
+        Set-TerminatingError -Title 'Ignore|-''zstd'' is not installed or cannot be used'
+    }
+
     if (!$Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
