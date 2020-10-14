@@ -69,7 +69,8 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It "extract nested compressed file with different inner name" -Skip:$isUnix {
+        It "extract nested compressed file" -Skip:$isUnix {
+            # file ext: tar.zst
             $to = test_extract "Expand-7zipArchive" $test5
             $to | Should -Exist
             "$to\empty" | Should -Exist
@@ -158,6 +159,34 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
             $test | Should -Exist
             test_extract "Expand-ZipArchive" $test $true
+            $test | Should -Not -Exist
+        }
+    }
+
+
+
+    Context "zstd extraction" {
+
+        BeforeAll {
+            if($env:CI) {
+                mock Get-AppFilePath { (Get-Command zstd.exe).Path }
+            } elseif(!(installed zstd)) {
+                scoop install zstd
+            }
+
+            $test = "$working_dir\7ZipTest5.tar.zst"
+        }
+
+        It "extract normal compressed file" -Skip:$isUnix {
+            $to = test_extract "Expand-ZstdArchive" $test
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It "works with '-Removal' switch (`$removal param)" -Skip:$isUnix {
+            $test | Should -Exist
+            test_extract "Expand-ZstdArchive" $test $true
             $test | Should -Not -Exist
         }
     }
