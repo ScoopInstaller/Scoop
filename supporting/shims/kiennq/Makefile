@@ -17,7 +17,7 @@ check: version.txt ## Check the version number in version.txt and update if need
 bump: check ## Bump version number in Makefile
 	@rm -f Makefile.bak
 	@sed -i.bak -e 's|=$(VER)|=$(NEWVER)|' Makefile
-	@test -f Makefile.bak && echo "Makefile bumped from $(VER) to $(NEWVER)"
+	@cmp --quiet Makefile{,.bak} || echo "Makefile bumped from $(VER) to $(NEWVER)"
 
 $(ZIP): version.txt
 	curl -L -s -o $(ZIP) $(URL)
