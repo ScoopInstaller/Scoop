@@ -9,25 +9,25 @@ all: verify ## make download upzip verify
 
 version.txt:
 	@curl --max-redirs 0 -s -D - -o /dev/null $(LATEST_URL) | grep -i ^location | sed -E -e "s|.*/([^/]+)$$|\1|" >version.txt
-	@echo Latest version is:
+	@printf "%s " "Latest version is:"
 	@cat version.txt
 
 check: version.txt ## Check the version number in version.txt and update if needed
 
 bump: check ## Bump version number in Makefile
-	@echo "Current version: $(VER)"
-	@echo "New version:     $(NEWVER)"
-	@sed -i -e 's|=$(VER)|=$(NEWVER)|' Makefile
+	@rm -f Makefile.bak
+	@sed -i.bak -e 's|=$(VER)|=$(NEWVER)|' Makefile
+	@test -f Makefile.bak && echo "Makefile bumped from $(VER) to $(NEWVER)"
 
 $(ZIP): version.txt
 	curl -L -s -o $(ZIP) $(URL)
-	touch $@
+	@touch $@
 
 download: $(ZIP)  ## Download shim from https://github.com/kiennq/scoop-better-shimexe
 
 shim.exe: $(ZIP)
 	unzip -z -j -o $(ZIP)
-	touch $@
+	@touch $@
 
 unzip: shim.exe ## Unzip download
 
