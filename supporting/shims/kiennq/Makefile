@@ -31,7 +31,7 @@ shim.exe: $(ZIP)
 
 unzip: shim.exe ## Unzip download
 
-verify: shim.exe ## Version SHA256 checksum for shim.exe
+verify: shim.exe ## Verify SHA256 checksum for shim.exe
 	sed -e "s|bin/||" checksum.sha256 | sha256sum -c
 
 clean: ## Clean .zip files
