@@ -5,7 +5,7 @@ URL?=https://github.com/kiennq/scoop-better-shimexe/releases/download/$(VER)/$(Z
 LATEST_URL?=https://github.com/kiennq/scoop-better-shimexe/releases/latest
 NEWVER=$(shell cat version.txt)
 
-all: verify ## make download upzip verify
+all: verify ## make download unzip verify
 
 version.txt:
 	@curl --max-redirs 0 -s -D - -o /dev/null $(LATEST_URL) | grep -i ^location | sed -E -e "s|.*/([^/]+)$$|\1|" >version.txt
