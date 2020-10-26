@@ -111,24 +111,61 @@ describe "Test-CommandAvailable" -Tag 'Scoop' {
 }
 
 
-describe "is_directory" -Tag 'Scoop' {
+describe "directory/junction/hardlink handling" -Tag 'Scoop' {
     beforeall {
         $working_dir = setup_working "is_directory"
     }
 
-    it "is_directory recognize directories" {
-        is_directory "$working_dir\i_am_a_directory" | should -be $true
-    }
-    it "is_directory recognize files" {
-        is_directory "$working_dir\i_am_a_file.txt" | should -be $false
+    it "Confirm-IsDirectory recognizes directories" {
+        Confirm-IsDirectory -Path "$working_dir\i_am_a_directory" | should -be $true
     }
 
-    it "is_directory is falsey on unknown path" {
-        is_directory "$working_dir\i_do_not_exist" | should -be $false
+    it "Confirm-IsDirectory recognizes files" {
+        Confirm-IsDirectory -Path "$working_dir\i_am_a_file.txt" | should -be $false
+    }
+
+    it "Confirm-IsDirectory is falsey on unknown path" {
+        Confirm-IsDirectory -Path "$working_dir\i_do_not_exist" | should -be $false
+    }
+
+    it "Set-Junction recognizes directories and creates junction" {
+        Set-Junction "$working_dir\i_am_a_junction" "$working_dir\i_am_a_directory" | should -be $true
+        Test-Path "$working_dir\i_am_a_junction" | should -be $true
+    }
+
+    it "Set-Junction recognizes existing target" {
+        Set-Junction "$working_dir\i_am_a_junction" "$working_dir\i_am_a_directory" | should -be $false
+    }
+
+    it "Set-Junction recognizes files" {
+        Set-Junction "$working_dir\i_am_a_junction_file.txt" "$working_dir\i_am_a_file.txt" | should -be $false
+        Test-Path "$working_dir\i_am_a_junction_file.txt" | should -be $false
+    }
+
+    it "Set-Junction is falsey on unknown path" {
+        Set-Junction "$working_dir\i_am_a_junction" "$working_dir\i_do_not_exist" | should -be $false
+    }
+
+    it "Set-HardLink recognizes files and creates hardlink" {
+        Set-HardLink "$working_dir\i_am_a_hardlinked_file.txt" "$working_dir\i_am_a_file.txt" | should -be $true
+        Test-Path "$working_dir\i_am_a_hardlinked_file.txt" | should -be $true
+    }
+
+    it "Set-HardLink recognizes existing target" {
+        Set-HardLink "$working_dir\i_am_a_hardlinked_file.txt" "$working_dir\i_am_a_file.txt" | should -be $false
+    }
+
+    it "Set-HardLink recognizes directories" {
+        Set-HardLink "$working_dir\i_am_a_hardlinked_directory" "$working_dir\i_am_a_directory" | should -be $false
+        Test-Path "$working_dir\i_am_a_hardlinked_directory" | should -be $false
+    }
+
+    it "Set-HardLink is falsey on unknown path" {
+        Set-HardLink "$working_dir\i_do_not_exist.txt" "$working_dir\i_do_not_exist.txt" | should -be $false
     }
 }
 
-describe "movedir" -Tag 'Scoop' {
+describe "Move-Directory" -Tag 'Scoop' {
     $extract_dir = "subdir"
     $extract_to = $null
 
@@ -138,7 +175,7 @@ describe "movedir" -Tag 'Scoop' {
 
     it "moves directories with no spaces in path" -skip:$isUnix {
         $dir = "$working_dir\user"
-        movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+        Move-Directory "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
         "$dir\test.txt" | should -FileContentMatch "this is the one"
         "$dir\_tmp\$extract_dir" | should -not -exist
@@ -146,20 +183,20 @@ describe "movedir" -Tag 'Scoop' {
 
     it "moves directories with spaces in path" -skip:$isUnix {
         $dir = "$working_dir\user with space"
-        movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+        Move-Directory "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
         "$dir\test.txt" | should -FileContentMatch "this is the one"
         "$dir\_tmp\$extract_dir" | should -not -exist
 
         # test trailing \ in from dir
-        movedir "$dir\_tmp\$null" "$dir\another"
+        Move-Directory "$dir\_tmp\$null" "$dir\another"
         "$dir\another\test.txt" | should -FileContentMatch "testing"
         "$dir\_tmp" | should -not -exist
     }
 
     it "moves directories with quotes in path" -skip:$isUnix {
         $dir = "$working_dir\user with 'quote"
-        movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
+        Move-Directory "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
         "$dir\test.txt" | should -FileContentMatch "this is the one"
         "$dir\_tmp\$extract_dir" | should -not -exist

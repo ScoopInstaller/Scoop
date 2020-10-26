@@ -1,0 +1,43 @@
+{
+    "homepage": "https://github.com/coreybutler/nvm-windows",
+    "version": "1.1.7",
+    "url": "https://github.com/coreybutler/nvm-windows/releases/download/1.1.7/nvm-noinstall.zip",
+    "bin": "nvm.exe",
+    "persist": [
+        {
+            "name": "nodejs",
+            "type": "directory",
+            "method": "link"
+        },
+        {
+            "name": "elevate.cmd",
+            "type": "file",
+            "target": "nodejs\\elevate.cmd"
+        },
+        {
+            "name": "elevate.vbs",
+            "type": "file",
+            "target": "nodejs\\elevate.vbs"
+        },
+        {
+            "name": "settings.txt",
+            "type": "file",
+            "content": "root: $persist_dir\\nodejs`r`narch: $architecture`r`nproxy: none"
+        }
+    ],
+    "env_add_path": "nodejs\\nodejs",
+    "env_set": {
+        "NVM_HOME": "$dir",
+        "NVM_SYMLINK": "$persist_dir\\nodejs\\nodejs"
+    },
+    "hash": "md5:00acf86e40c5f038cca8c383b9d2c207",
+    "notes": "You'll need to restart powershell/cmd to have it reload Environment Variables so nvm will work correctly",
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/coreybutler/nvm-windows/releases/download/$version/nvm-noinstall.zip",
+        "hash": {
+            "url": "$url.checksum.txt",
+            "find": "([a-fA-F0-9]{32})"
+        }
+    }
+}

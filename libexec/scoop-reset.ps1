@@ -76,9 +76,9 @@ $apps | ForEach-Object {
     env_add_path $manifest $dir
     env_set $manifest $dir $global
     # unlink all potential old link before re-persisting
-    unlink_persist_data $original_dir
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
+    Remove-PersistentLink -Path $original_dir
+    Add-PersistentLink -Persist $manifest.persist -InstalledPath $original_dir -PersistentPath $persist_dir
+    Set-PersistentPermission -Manifest $manifest -Global:$global
 }
 
 exit 0

@@ -212,6 +212,83 @@
             },
             "type": "object"
         },
+        "persistItem": {
+            "anyOf": [
+                {
+                    "description": "Deprecated, use object representation instead.",
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                {
+                    "additionalProperties": false,
+                    "required": [
+                        "name",
+                        "type"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "target": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "enum": [
+                                "file",
+                                "directory",
+                                "dir",
+                                "folder"
+                            ]
+                        },
+                        "encoding": {
+                            "enum": [
+                                "ASCII",
+                                "BigEndianUnicode",
+                                "BigEndianUTF32",
+                                "Default",
+                                "OEM",
+                                "Unicode",
+                                "UTF7",
+                                "UTF8",
+                                "UTF32"
+                            ]
+                        },
+                        "content": {
+                            "$ref": "#/definitions/stringOrArrayOfStrings"
+                        },
+                        "glue": {
+                            "description": "Characters to join content array",
+                            "type": "string"
+                        },
+                        "method": {
+                            "enum": [
+                                "link",
+                                "copy",
+                                "merge",
+                                "update"
+                            ]
+                        },
+                        "base64": {
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
+                }
+            ]
+        },
+        "persist": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/persistItem"
+                },
+                {
+                    "items": {
+                        "$ref": "#/definitions/persistItem"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                }
+            ]
+        },
         "checkver": {
             "anyOf": [
                 {
@@ -424,7 +501,7 @@
             "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
         },
         "persist": {
-            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+            "$ref": "#/definitions/persist"
         },
         "checkver": {
             "$ref": "#/definitions/checkver"

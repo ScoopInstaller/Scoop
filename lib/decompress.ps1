@@ -83,7 +83,7 @@ function Expand-7zipArchive {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if (!$IsTar -and $ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+        Move-Directory -Path "$DestinationPath\$ExtractDir" -Destination $DestinationPath
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
@@ -142,13 +142,13 @@ function Expand-MsiArchive {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if ($ExtractDir -and (Test-Path "$DestinationPath\SourceDir")) {
-        movedir "$DestinationPath\SourceDir\$ExtractDir" $OriDestinationPath | Out-Null
+        Move-Directory -Path "$DestinationPath\SourceDir\$ExtractDir" -Destination $OriDestinationPath
         Remove-Item $DestinationPath -Recurse -Force
     } elseif ($ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
+        Move-Directory -Path "$DestinationPath\$ExtractDir" -Destination $OriDestinationPath
         Remove-Item $DestinationPath -Recurse -Force
     } elseif (Test-Path "$DestinationPath\SourceDir") {
-        movedir "$DestinationPath\SourceDir" $DestinationPath | Out-Null
+        Move-Directory -Path "$DestinationPath\SourceDir" -Destination $DestinationPath | Out-Null
     }
     if (($DestinationPath -ne (Split-Path $Path)) -and (Test-Path "$DestinationPath\$(fname $Path)")) {
         Remove-Item "$DestinationPath\$(fname $Path)" -Force
@@ -249,7 +249,7 @@ function Expand-ZipArchive {
         Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     }
     if ($ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
+        Move-Directory -Path "$DestinationPath\$ExtractDir" -Destination $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
     }
     if ($Removal) {
