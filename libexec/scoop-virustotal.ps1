@@ -83,15 +83,20 @@ $requests = 0
 Function Get-VirusTotalResult($hash, $app) {
     $hash = $hash.ToLower()
     $url = "https://www.virustotal.com/ui/files/$hash"
+    $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
     $wc = New-Object Net.Webclient
     $wc.Headers.Add('User-Agent', (Get-UserAgent))
-    $result = $wc.downloadstring($url)
+    try {
+        $result = $wc.downloadstring($url)
+    } catch {
+        write-host "$app`: $_`n    $see_url"
+        return $_ERR_EXCEPTION
+    }
     $stats = json_path $result '$.data.attributes.last_analysis_stats'
     $malicious = json_path $stats '$.malicious'
     $suspicious = json_path $stats '$.suspicious'
     $undetected = json_path $stats '$.undetected'
     $unsafe = [int]$malicious + [int]$suspicious
-    $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
     switch ($unsafe) {
         0 { if ($undetected -eq 0) { $fg = "Yellow" } else { $fg = "DarkGreen" } }
         1 { $fg = "DarkYellow" }
