@@ -88,15 +88,17 @@ $requests = 0
 
 Function Get-VirusTotalResult($hash, $app) {
     $hash = $hash.ToLower()
+    $API_URL = "https://www.virustotal.com/api/v3/search?query=$hash"
+    $UI_URL = "https://www.virustotal.com/ui/files/$hash"
     $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
     $wc = New-Object Net.Webclient
     $wc.Headers.Add('User-Agent', (Get-UserAgent))
     if ($_API_KEY) {
         $wc.Headers.Add('x-apikey', $_API_KEY)
-        $url = "https://www.virustotal.com/api/v3/search?query=$hash"
+        $url = $API_URL
         $stats_json_path = '$.data[0].attributes.last_analysis_stats'
     } else {
-        $url = "https://www.virustotal.com/ui/files/$hash"
+        $url = $UI_URL
         $stats_json_path = '$.data.attributes.last_analysis_stats'
     }
     try {
@@ -105,7 +107,19 @@ Function Get-VirusTotalResult($hash, $app) {
         error "querying VirusTotal for $app`: $_`n    $see_url"
         return $_ERR_EXCEPTION
     }
+    if ($url -eq $API_URL) {
+        $error_message = json_path $result '$.error.message'
+        $error_code = json_path $result '$.error.code'
+        if ($error_code) {
+            throw "$error_message ($error_code)"
+        }
+    }
     $stats = json_path $result $stats_json_path
+    if ($stats -eq $null) {
+        # Make sure to include '(404)' in the exception as this is the trigger
+        # for the exception handler to attempt submitting the file for analysis
+        throw "No data found (404) for $app with hash $hash"
+    }
     $malicious = json_path $stats '$.malicious'
     $suspicious = json_path $stats '$.suspicious'
     $undetected = json_path $stats '$.undetected'
