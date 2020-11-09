@@ -115,7 +115,7 @@ Function Get-VirusTotalResult($hash, $app) {
         }
     }
     $stats = json_path $result $stats_json_path
-    if ($stats -eq $null) {
+    if ($null -eq $stats) {
         # Make sure to include '(404)' in the exception as this is the trigger
         # for the exception handler to attempt submitting the file for analysis
         throw "No data found (404) for $app with hash $hash"
