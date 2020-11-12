@@ -364,7 +364,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 function dl($url, $to, $cookies, $progress) {
     if ($url.ToString().ToLower().StartsWith('https://github.com/')) {
         $url = "https://g.ioiox.com/$url"
-        Write-Host "Found github url, replace it to mirror: https://g.ioiox.com/$url"
+        Write-Host "Found github url, replace it to mirror: $url"
     }
     $reqUrl = ($url -split "#")[0]
     $wreq = [net.webrequest]::create($reqUrl)
