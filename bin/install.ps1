@@ -343,7 +343,7 @@ function Add-Config {
     )
 
     $scoopConfig = Use-Config
-    
+
     if ($scoopConfig -is [System.Management.Automation.PSObject]) {
         if ($Value -eq [bool]::TrueString -or $Value -eq [bool]::FalseString) {
             $Value = [System.Convert]::ToBoolean($Value)
