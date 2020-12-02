@@ -582,6 +582,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         $extract_fn = $null
         if ($manifest.innosetup) {
             $extract_fn = 'Expand-InnoArchive'
+        } elseif($manifest.innoexsetup) {
+            $extract_fn = 'Expand-InnoExArchive'
         } elseif($fname -match '\.zip$') {
             # Use 7zip when available (more fast)
             if (((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {

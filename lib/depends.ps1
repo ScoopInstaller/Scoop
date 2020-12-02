@@ -66,6 +66,8 @@ function script_deps($script) {
     }
     if($script -like '*Expand-InnoArchive *' -or $script -like '*unpack_inno *') {
         $deps += 'innounp'
+    }
+    if($script -like '*Expand-InnoExArchive *' -or $script -like '*unpack_innoex *') {
         $deps += 'innoextract'
     }
     if($script -like '*Expand-DarkArchive *') {
