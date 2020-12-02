@@ -191,17 +191,17 @@ function Expand-InnoArchive {
     }
     $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innounp) $ArgList -LogPath $LogPath
     if (!$Status) {
-		$InnoextractLogPath = "$(Split-Path $Path)\innoextract.log"
-		$InnoextractArgList = @($Path, "-d", $DestinationPath)
-		$NewStatus = Invoke-ExternalCommand (Get-HelperPath -Helper innoextract) $InnoextractArgList -LogPath $InnoextractLogPath
-		
-		if (!$NewStatus) {
-			abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n  $(friendly_path $InnoextractLogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
-		} else {
-			dir $DestinationPath\app\* | mv -dest $DestinationPath
-			rm $DestinationPath\app\
-		}
-	}
+        $InnoextractLogPath = "$(Split-Path $Path)\innoextract.log"
+        $InnoextractArgList = @($Path, "-d", $DestinationPath)
+        $NewStatus = Invoke-ExternalCommand (Get-HelperPath -Helper innoextract) $InnoextractArgList -LogPath $InnoextractLogPath
+        
+        if (!$NewStatus) {
+            abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n  $(friendly_path $InnoextractLogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+        } else {
+            dir $DestinationPath\app\* | mv -dest $DestinationPath
+            rm $DestinationPath\app\
+        }
+    }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
     }

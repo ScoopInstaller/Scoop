@@ -66,7 +66,7 @@ function script_deps($script) {
     }
     if($script -like '*Expand-InnoArchive *' -or $script -like '*unpack_inno *') {
         $deps += 'innounp'
-		$deps += 'innoextract'
+        $deps += 'innoextract'
     }
     if($script -like '*Expand-DarkArchive *') {
         $deps += 'dark'
@@ -87,7 +87,7 @@ function install_deps($manifest, $arch) {
     if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
         $deps += 'innounp'
     }
-	if (!(Test-HelperInstalled -Helper innoextract) -and $manifest.innosetup) {
+    if (!(Test-HelperInstalled -Helper innoextract) -and $manifest.innosetup) {
         $deps += 'innoextract'
     }
 
