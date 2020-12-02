@@ -198,8 +198,8 @@ function Expand-InnoArchive {
         if (!$NewStatus) {
             abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n  $(friendly_path $InnoextractLogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
         } else {
-            dir $DestinationPath\app\* | mv -dest $DestinationPath
-            rm $DestinationPath\app\
+            Get-ChildItem $DestinationPath\app\* | Move-Item -Destination $DestinationPath
+            Remove-Item $DestinationPath\app\
         }
     }
     if (Test-Path $LogPath) {
