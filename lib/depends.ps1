@@ -88,14 +88,14 @@ function install_deps($manifest, $arch) {
         $deps += 'lessmsi'
     }
     if ($manifest.innosetup) {
-        if (get_config 'INNOSETUP_USE_INNOEXTRACT' $false) {
-            if (!(Test-HelperInstalled -Helper Innounp)) {
-                $deps += 'innounp'
-            }
-        } else {
+        if (get_config 'INNOSETUP_USE_INNOEXTRACT') {
             if (!(Test-HelperInstalled -Helper innoextract)) {
                 $deps += 'innoextract'
             }
+        } else {
+            if (!(Test-HelperInstalled -Helper Innounp)) {
+                $deps += 'innounp'
+            }   
         }
     }
 

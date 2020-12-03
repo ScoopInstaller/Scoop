@@ -179,7 +179,15 @@ function Expand-InnoArchive {
         [Switch]
         $Removal
     )
-    if (get_config 'INNOSETUP_USE_INNOEXTRACT' $false) {
+    if (get_config 'INNOSETUP_USE_INNOEXTRACT') {
+        $LogPath = "$(Split-Path $Path)\innoextract.log"
+        $ArgList = @($Path, "-d", $DestinationPath)
+        $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innoextract) $ArgList -LogPath $LogPath
+        if ($Status) {
+            Get-ChildItem $DestinationPath\app\* | Move-Item -Destination $DestinationPath
+            Remove-Item $DestinationPath\app\
+        }
+    } else {
         $LogPath = "$(Split-Path $Path)\innounp.log"
         $ArgList = @('-x', "-d`"$DestinationPath`"", "`"$Path`"", '-y')
         switch -Regex ($ExtractDir) {
@@ -191,14 +199,6 @@ function Expand-InnoArchive {
             $ArgList += (-split $Switches)
         }
         $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innounp) $ArgList -LogPath $LogPath
-    } else {
-        $LogPath = "$(Split-Path $Path)\innoextract.log"
-        $ArgList = @($Path, "-d", $DestinationPath)
-        $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innoextract) $ArgList -LogPath $LogPath
-        if ($Status) {
-            Get-ChildItem $DestinationPath\app\* | Move-Item -Destination $DestinationPath
-            Remove-Item $DestinationPath\app\
-        }
     }
     if (!$Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
