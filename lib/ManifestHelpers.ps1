@@ -1,37 +1,47 @@
-#region Persists
+. (Join-Path $PSScriptRoot 'core.ps1')
+
+#region Persistence
 function Test-Persistence {
     <#
     .SYNOPSIS
         Persistence check helper for files.
     .DESCRIPTION
-        This will save some lines to not always write `if (-not (Test-Path "$persist_dir\$file")) { New-item "$dir\$file" | Out-Null }` inside manifests.
+        This will save some lines to not always write `if (!(Test-Path "$persist_dir\$file")) { New-item "$dir\$file" | Out-Null }` inside manifests.
+        Variables `$currentFile`, `$currentFilePersist`, `$currentFileDir` are exposed and could be used inside `Execution` block.
     .PARAMETER File
-        File to be checked.
-        Do not prefix with $dir. All files are already checked against $dir.
+        Specifies the file to be checked.
+        Do not prefix with $dir. All files are already checked against $dir and $persist_dir.
     .PARAMETER Content
-        If file does not exists it will be created with this value. Value should be array of strings or string.
+        Specifies the content/value of the created file.
+        Value should be array of strings or string.
     .PARAMETER Execution
-        Custom scriptblock to run when file is not persisted.
+        Specifies custom scriptblock to run when file is not persisted.
         https://github.com/lukesampson/scoop-extras/blob/a84b257fd9636d02295b48c3fd32826487ca9bd3/bucket/ditto.json#L25-L33
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('Path', 'LiteralPath', 'Name', 'InputObject')]
         [String[]] $File,
-        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [Alias('Value')]
         [Object[]] $Content,
+        [Parameter(ValueFromPipelineByPropertyName)]
+        [Alias('ScriptBlock')]
         [ScriptBlock] $Execution
     )
 
     process {
         for ($ind = 0; $ind -lt $File.Count; ++$ind) {
             $currentFile = $File[$ind]
+            $currentFileDir = Join-Path $dir $currentFile
+            $currentFilePersist = Join-Path $persist_dir $currentFile
 
-            if (-not (Join-Path $persist_dir $currentFile | Test-Path -PathType Leaf)) {
+            if (!(Test-Path -LiteralPath $currentFilePersist -PathType 'Leaf')) {
                 if ($Execution) {
                     & $Execution
                 } else {
-                    # Handle edge case when there is only one file and mulitple contents caused by
+                    # Handle edge case when there is only one file and multiple contents caused by
                     # If `Test-Persistence alfa.txt @('new', 'beta')` is used,
                     # Powershell will bind Content as simple array with 2 values instead of Array with nested array with 2 values.
                     if (($File.Count -eq 1) -and ($Content.Count -gt 1)) {
@@ -41,57 +51,61 @@ function Test-Persistence {
                     } else {
                         $cont = $null
                     }
-                    $path = Join-Path $dir $currentFile
 
-                    New-Item -Path $path -ItemType File -Force | Out-Null
-                    if ($cont) { Set-Content -LiteralPath $path -Value $cont -Encoding Ascii }
+                    # File needs to be precreated in case of nested directories
+                    New-Item -Path $currentFileDir -ItemType 'File' -Force | Out-Null
+                    if ($cont) { Out-UTF8File -Path $currentFileDir -Value $cont }
                 }
             }
         }
     }
 }
-#endregion Persists
+#endregion Persistence
 
 function Remove-AppDirItem {
     <#
     .SYNOPSIS
-        Remove given item from applications directory.
-        Wildcards are supported.
+        Removes the given item from application directory.
     .PARAMETER Item
-        Specify item for removing from $dir.
+        Specifies the item, which should be removed from $dir.
+        Wildcards are supported.
     #>
-    [CmdletBinding(SupportsShouldProcess = $true)]
+    [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [Parameter(Mandatory, ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
         [SupportsWildcards()]
-        [String[]]
-        $Item
+        [String[]] $Item
     )
 
-    process { foreach ($it in $Item) { Get-ChildItem $dir $it | Remove-Item -Force -Recurse } }
+    process {
+        # GCI is not suitable as it do not support nested folder with include
+        foreach ($it in $Item) {
+            Join-Path $dir $it | Remove-Item -ErrorAction 'SilentlyContinue' -Force -Recurse
+        }
+    }
 }
 
 function Edit-File {
     <#
     .SYNOPSIS
-        Find and replace text in given file.
+        Finds and replaces text in given file.
     .PARAMETER File
-        Specify file, which will be loaded.
+        Specifies the file, which will be loaded.
         File could be passed as full path (used for changing files outside $dir) or just relative path to $dir.
     .PARAMETER Find
-        Specify the string to be replaced.
+        Specifies the string to be replaced.
     .PARAMETER Replace
-        Specify the string for replacing all occurrences.
+        Specifies the string for replacing all occurrences.
         Empty string is default => Found string will be removed.
     .PARAMETER Regex
-        Specify if regular expression should be used instead of simple match.
+        Specifies to use regular expression instead of simple match.
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [String] $File,
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [System.IO.FileInfo] $File,
+        [Parameter(Mandatory)]
         [String[]] $Find,
         [String[]] $Replace,
         [Switch] $Regex
@@ -99,18 +113,20 @@ function Edit-File {
 
     begin {
         # Use file from $dir
-        if (Join-Path $dir $File | Test-Path -PathType Leaf) { $File = Join-Path $dir $File }
-        if (-not (Test-Path $File)) {
-            error "File $File does not exist."
-            return
-        }
+        if (Join-Path $dir $File | Test-Path -PathType 'Leaf') { $File = Join-Path $dir $File }
     }
 
     process {
+        if (!(Test-Path $File -PathType 'Leaf')) {
+            error "File '$File' does not exist" -Err
+            return
+        }
+
         $content = Get-Content $File
+
         for ($i = 0; $i -lt $Find.Count; ++$i) {
             $toFind = $Find[$i]
-            if (-not $Replace -or ($null -eq $Replace[$i])) {
+            if (!$Replace -or ($null -eq $Replace[$i])) {
                 $toReplace = ''
             } else {
                 $toReplace = $Replace[$i]
@@ -123,23 +139,57 @@ function Edit-File {
             }
         }
 
-        Set-Content -LiteralPath $File -Value $content -Encoding Ascii -Force
+        Out-UTF8File -Path $File -Value $content
     }
 }
 
 function New-JavaShortcutWrapper {
     <#
     .SYNOPSIS
-        Create new shim-like batch file wrapper to spawn jar files within start menu (using shortcut).
+        Creates new shim-like batch file wrapper to spawn jar files within start menu (using shortcut).
     .PARAMETER FileName
-        Jar executable filename without .jar extension.
+        Specifies the jar executable filename without .jar extension.
+        Do not pass fullpath, just FILENAME!
     #>
-    [CmdletBinding(SupportsShouldProcess = $true)]
-    param([Parameter(Mandatory = $true, ValueFromPipeline = $true)] [String[]] $FileName)
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('Name', 'InputObject')]
+        [System.IO.FileInfo[]] $FileName
+    )
 
     process {
         foreach ($f in $FileName) {
-            Set-Content -LiteralPath (Join-Path $dir "$f.bat") -Value "@start javaw.exe -jar `"%~dp0$f.jar`" %*" -Encoding Ascii -Force
+            Out-UTF8File -Path (Join-Path $dir "$f.bat") -Value "@start javaw.exe -jar `"%~dp0$f.jar`" %*"
         }
     }
 }
+
+#region Asserts
+function Assert-Administrator {
+    <#
+    .SYNOPSIS
+        Test administrator privileges.
+    #>
+    if (!(is_admin)) { throw 'Administrator privileges are required' }
+}
+
+function Assert-ScoopConfigValue {
+    <#
+    .SYNOPSIS
+        Test specific value of scoop's configuration.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [String] $ConfigOption,
+        [Parameter(Mandatory)]
+        $ExpectedValue
+        # TODO: Add parameter to define operator (Where-Object)
+    )
+
+    process {
+        $actualValue = get_config $ConfigOption
+        if ($actualValue -ne $ExpectedValue) { throw "Configuration option '$ConfigOption' needs to be set to '$ExpectedValue'" }
+    }
+}
+#endregion Asserts
