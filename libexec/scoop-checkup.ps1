@@ -24,6 +24,11 @@ if (!(Test-HelperInstalled -Helper Innounp)) {
     $issues++
 }
 
+if (!(Test-HelperInstalled -Helper Innoextract)) {
+    error "'innoextract' is not installed! It's required for unpacking InnoSetup files. Please run 'scoop install innoextract'."
+    $issues++
+}
+
 if (!(Test-HelperInstalled -Helper Dark)) {
     error "'dark' is not installed! It's required for unpacking installers created with the WiX Toolset. Please run 'scoop install dark' or 'scoop install wixtoolset'."
     $issues++
