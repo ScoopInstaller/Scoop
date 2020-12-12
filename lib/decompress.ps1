@@ -177,9 +177,11 @@ function Expand-InnoArchive {
         [String]
         $Switches,
         [Switch]
-        $Removal
+        $Removal,
+        [Switch]
+        $UseInnoextract
     )
-    if (get_config 'INNOSETUP_USE_INNOEXTRACT') {
+    if ((get_config 'INNOSETUP_USE_INNOEXTRACT') -or ($UseInnoextract)) {
         $LogPath = "$(Split-Path $Path)\innoextract.log"
         $ArgList = @($Path, "-d", $DestinationPath)
         $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innoextract) $ArgList -LogPath $LogPath
@@ -311,9 +313,9 @@ function extract_msi($path, $to, $removal) {
     Expand-MsiArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
-function unpack_inno($path, $to, $removal) {
+function unpack_inno($path, $to, $removal, $useinnoextract) {
     Show-DeprecatedWarning $MyInvocation 'Expand-InnoArchive'
-    Expand-InnoArchive -Path $path -DestinationPath $to -Removal:$removal @args
+    Expand-InnoArchive -Path $path -DestinationPath $to -Removal:$removal -UseInnoextract:$useinnoextract @args
 }
 
 function extract_zip($path, $to, $removal) {

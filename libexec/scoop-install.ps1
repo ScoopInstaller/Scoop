@@ -47,7 +47,7 @@ function is_installed($app, $global) {
     return $false
 }
 
-$opt, $apps, $err = getopt $args 'gfiksa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'arch='
+$opt, $apps, $err = getopt $args 'gfiksa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'arch=', 'useinnoextract'
 if ($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
@@ -55,6 +55,7 @@ $check_hash = !($opt.s -or $opt.skip)
 $independent = $opt.i -or $opt.independent
 $use_cache = !($opt.k -or $opt.'no-cache')
 $architecture = default_architecture
+$useinnoextract = $opt.useinnoextract
 try {
     $architecture = ensure_architecture ($opt.a + $opt.arch)
 } catch {
@@ -123,7 +124,7 @@ if (Test-Aria2Enabled) {
     warn "Scoop uses 'aria2c' for multi-connection downloads."
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
 }
-$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash $useinnoextract }
 
 show_suggestions $suggested
 
