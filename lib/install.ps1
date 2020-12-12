@@ -523,6 +523,7 @@ function dl_progress($read, $total, $url) {
 function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
+
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
     $urls = @(url $manifest $architecture)
