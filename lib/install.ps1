@@ -9,7 +9,7 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true, $useinnoextract) {
+function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $bucket, $null = parse_app $app
     $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
@@ -40,7 +40,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $original_dir = $dir # keep reference to real (not linked) directory
     $persist_dir = persistdir $app $global
 
-    $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash $useinnoextract
+    $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
@@ -520,10 +520,9 @@ function dl_progress($read, $total, $url) {
     [console]::SetCursorPosition($left, $top)
 }
 
-function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true, $useinnoextract) {
+function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
-    if($useinnoextract) { warn "Use of innoextract is experimental as it may not work in all scenarios" }
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
     $urls = @(url $manifest $architecture)
@@ -604,7 +603,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal -UseInnoextract:$useinnoextract
+            & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
             Write-Host "done." -f Green
             $extracted++
         }

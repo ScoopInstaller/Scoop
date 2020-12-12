@@ -27,7 +27,7 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'gfiksq:' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'useinnoextract'
+$opt, $apps, $err = getopt $args 'gfiksq:' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet'
 if ($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
@@ -35,7 +35,6 @@ $check_hash = !($opt.s -or $opt.skip)
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
-$useinnoextract = $opt.useinnoextract
 
 # load config
 $configRepo = get_config SCOOP_REPO
@@ -154,10 +153,11 @@ function update_scoop() {
     success 'Scoop was updated successfully!'
 }
 
-function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true, $useinnoextract) {
+function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
     $old_version = current_version $app $global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
+
     # re-use architecture, bucket and url from first install
     $architecture = ensure_architecture $install.architecture
     $bucket = $install.bucket
@@ -170,7 +170,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         # check dependencies
         $man = if ($url) { $url } else { $app }
         $deps = @(deps $man $architecture) | Where-Object { !(installed $_) }
-        $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash $useinnoextract }
+        $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 
     $version = latest_version $app $bucket $url
@@ -273,7 +273,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         # use the url of the install json if the application was installed through url
         $app = $install.url
     }
-    install_app $app $architecture $global $suggested $use_cache $check_hash $useinnoextract
+    install_app $app $architecture $global $suggested $use_cache $check_hash
 }
 
 if (!$apps) {
@@ -334,7 +334,7 @@ if (!$apps) {
 
     $suggested = @{};
     # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash $useinnoextract }
+    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }
 
 exit 0

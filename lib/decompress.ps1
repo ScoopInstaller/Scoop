@@ -313,9 +313,9 @@ function extract_msi($path, $to, $removal) {
     Expand-MsiArchive -Path $path -DestinationPath $to -Removal:$removal
 }
 
-function unpack_inno($path, $to, $removal, $useinnoextract) {
+function unpack_inno($path, $to, $removal) {
     Show-DeprecatedWarning $MyInvocation 'Expand-InnoArchive'
-    Expand-InnoArchive -Path $path -DestinationPath $to -Removal:$removal -UseInnoextract:$useinnoextract @args
+    Expand-InnoArchive -Path $path -DestinationPath $to -Removal:$removal @args
 }
 
 function extract_zip($path, $to, $removal) {
