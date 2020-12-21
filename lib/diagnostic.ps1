@@ -50,3 +50,14 @@ function check_long_paths {
 
     return $true
 }
+
+function check_envs_requirements {
+    if ($null -eq $env:COMSPEC) {
+        warn '$env:COMSPEC environment variable is missing.'
+        Write-Host "    By default the variable should points to the cmd.exe in Windows: '%SystemRoot%\system32\cmd.exe'."
+
+        return $false
+    }
+
+    return $true
+}
