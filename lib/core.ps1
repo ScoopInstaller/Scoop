@@ -455,7 +455,7 @@ function Invoke-ExternalCommand {
 
 function dl($url,$to) {
     if ($url.ToString().ToLower().StartsWith('https://github.com/')) {
-        $url = "https://g.ioiox.com/$url"
+        $url = "https://ghproxy.com/$url"
         Write-Host "Found github url, replace it to mirror: $url"
     }
     $wc = New-Object Net.Webclient
