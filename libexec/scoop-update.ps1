@@ -52,16 +52,9 @@ if (!$configBranch) {
 
 if(($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
-    # should be deleted after Oct 1, 2019
-    If ((Get-Date).ToUniversalTime() -ge "2019-10-01") {
-        Write-Output "PowerShell 5 or later is required to run Scoop."
-        Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
-        break
-    } else {
-        Write-Output "Scoop is going to stop supporting old version of PowerShell."
-        Write-Output "Please upgrade to PowerShell 5 or later version before Oct 1, 2019 UTC."
-        Write-Output "Guideline: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
-    }
+    Write-Output "PowerShell 5 or later is required to run Scoop."
+    Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
+    break
 }
 
 function update_scoop() {
@@ -91,34 +84,35 @@ function update_scoop() {
     } else {
         Push-Location $currentdir
 
-        $currentRepo = git_config remote.origin.url
-        $currentBranch = git_branch
+        $previousCommit = Invoke-Expression 'git rev-parse HEAD'
+        $currentRepo = Invoke-Expression "git config remote.origin.url"
+        $currentBranch = Invoke-Expression "git branch"
 
         $isRepoChanged = !($currentRepo -match $configRepo)
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
         # Change remote url if the repo is changed
         if ($isRepoChanged) {
-            git_config remote.origin.url "$configRepo"
+            Invoke-Expression "git config remote.origin.url '$configRepo'"
         }
 
         # Fetch and reset local repo if the repo or the branch is changed
         if ($isRepoChanged -or $isBranchChanged) {
             # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-            git_config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+            Invoke-Expression "git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'"
             # fetch remote branch
             git_fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
             # checkout and track the branch
             git_checkout -B $configBranch -t origin/$configBranch -q
             # reset branch HEAD
-            git_reset --hard origin/$configBranch -q
+            Invoke-Expression "git reset --hard origin/$configBranch -q"
         } else {
             git_pull -q
         }
 
         $res = $lastexitcode
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
         Pop-Location
@@ -147,9 +141,10 @@ function update_scoop() {
         }
 
         Push-Location $loc
+        $previousCommit = (Invoke-Expression 'git rev-parse HEAD')
         git_pull -q
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
         Pop-Location
     }
@@ -237,6 +232,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # endregion Workaround
 
     $dir = versiondir $app $old_version $global
+    $persist_dir = persistdir $app $global
 
     #region Workaround for #2952
     $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
@@ -316,7 +312,7 @@ if (!$apps) {
                     $outdated += applist $app $global
                     write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
                 } else {
-                    warn "'$app' is locked to version $($status.version)"
+                    warn "'$app' is held to version $($status.version)"
                 }
             } elseif ($apps_param -ne '*') {
                 write-host -f green "$app`: $($status.version) (latest version)"

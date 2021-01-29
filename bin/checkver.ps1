@@ -196,8 +196,11 @@ while ($in_progress -gt 0) {
     $expected_ver = $json.version
     $ver = ''
 
-    $err = $ev.SourceEventArgs.Error
     $page = $ev.SourceEventArgs.Result
+    $err = $ev.SourceEventArgs.Error
+    if ($json.checkver.script) {
+        $page = $json.checkver.script -join "`r`n" | Invoke-Expression
+    }
 
     if ($err) {
         next "$($err.message)`r`nURL $url is not valid"
@@ -289,7 +292,7 @@ while ($in_progress -gt 0) {
 
     Write-Host $ver -ForegroundColor DarkRed -NoNewline
     Write-Host " (scoop version is $expected_ver)" -NoNewline
-    $update_available = (Compare-Version $ver $expected_ver) -ne 0
+    $update_available = (compare_versions $expected_ver $ver) -eq -1
 
     if ($json.autoupdate -and $update_available) {
         Write-Host ' autoupdate available' -ForegroundColor Cyan

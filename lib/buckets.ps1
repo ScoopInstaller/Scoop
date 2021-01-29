@@ -128,7 +128,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
 
     if (Test-path $bucket_path) {
         Push-Location $bucket_path
-        $remote = git_config --get remote.origin.url
+        $remote = Invoke-Expression "git config --get remote.origin.url"
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
         # https://PROVIDER/USER/REPO.git

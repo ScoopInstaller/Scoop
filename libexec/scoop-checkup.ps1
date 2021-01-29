@@ -12,6 +12,7 @@ $issues += !(check_windows_defender $false)
 $issues += !(check_windows_defender $true)
 $issues += !(check_main_bucket)
 $issues += !(check_long_paths)
+$issues += !(check_envs_requirements)
 
 if (!(Test-HelperInstalled -Helper 7zip)) {
     error "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip' or 'scoop install 7zip-zstd'."
