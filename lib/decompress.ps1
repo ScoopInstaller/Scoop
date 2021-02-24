@@ -75,26 +75,36 @@ function Expand-ZstdArchive {
         $Removal
     )
 
-    $TarPath = "$scoopdir\apps\git\current\usr\bin\tar.exe"
+    try {
+        $ZstdPath = (Get-Command 'zstd' -CommandType Application | Select-Object -First 1).Source
+    }
+    catch [System.Management.Automation.CommandNotFoundException] {
+        abort "Cannot find external Zstd (zstd.exe). Install Zstd (sccop install zstd) manually and try again."
+    }
+    
     $LogPath = "$(Split-Path $Path)\zstd.log"
-    $DestinationPath = $DestinationPath.Replace('\', '/')
-    $ArgList = @("-C", "`"$DestinationPath`"", "-xavf", "`"$Path`"", "--force-local")
+    $ArgList = @('-d', '-v',"`"$Path`"" )
 
-    # if ($Switches) {
-    #     $ArgList += (-split $Switches)
-    # }
-    # switch ($Overwrite) {
-    #     "All" { $ArgList += "-f" }
-    # }
+    if ($Switches) {
+        $ArgList += (-split $Switches)
+    }
+    switch ($Overwrite) {
+        "All" { $ArgList += "-f" }
+    }
 
     try {
-        $Status = Invoke-ExternalCommand $TarPath $ArgList -LogPath $LogPath
+        $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
     } catch [System.Management.Automation.ParameterBindingException] {
         Set-TerminatingError -Title 'Ignore|-''zstd'' is not installed or cannot be used'
     }
 
-    # Write-Host $TarPath $Status -f Red
     if (!$Status) { abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"  }
+
+    Expand-7zipArchive (strip_ext $Path) -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
+
+    if (Test-Path $LogPath) {
+        Remove-Item $LogPath -Force
+    }
 
     if ($Removal) {
         # Remove original archive file
@@ -145,6 +155,7 @@ function Expand-7zipArchive {
         "Rename" { $ArgList += "-aou" }
     }
     $Status = Invoke-ExternalCommand $7zPath $ArgList -LogPath $LogPath
+
     if (!$Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
