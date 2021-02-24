@@ -81,7 +81,7 @@ function Expand-ZstdArchive {
     catch [System.Management.Automation.CommandNotFoundException] {
         abort "Cannot find external Zstd (zstd.exe). Install Zstd (sccop install zstd) manually and try again."
     }
-    
+
     $LogPath = "$(Split-Path $Path)\zstd.log"
     $ArgList = @('-d', '-v',"`"$Path`"" )
 
