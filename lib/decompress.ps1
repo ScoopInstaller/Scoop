@@ -79,7 +79,6 @@ function Expand-ZstdArchive {
     $LogPath = "$(Split-Path $Path)\zstd.log"
     $DestinationPath = $DestinationPath.Replace('\', '/')
     $ArgList = @("-C", "`"$DestinationPath`"", "-xavf", "`"$Path`"", "--force-local")
-  
 
     # if ($Switches) {
     #     $ArgList += (-split $Switches)
