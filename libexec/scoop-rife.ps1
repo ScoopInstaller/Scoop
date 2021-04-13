@@ -20,16 +20,18 @@ if ($app) {
 if ($status.installed) {
     $dir = versiondir $app $_ $global
     $versions = Get-InstalledVersion -AppName $app -Global:$global
-    if ($versions.getType().Name -eq 'String') {
-        $dir += $versions
-    } else {
-        $dir += $versions[-1]
+    try {
+        if ($versions.getType().Name -eq 'String') {
+            $dir += $versions
+        } else {
+            $dir += $versions[-1]
+        }
+    } catch {
+        $dir += 'current'
     }
-    # Deprecated
-    # $dir += '\current'
     Start-Process $dir
 } else {
-    Stop-ScoopExecution -Message "'$app' isn't installed."
+    Write-UserMessage -Message "'$app' isn't installed." -Err
 }
 
 exit 0
