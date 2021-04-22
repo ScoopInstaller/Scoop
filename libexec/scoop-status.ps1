@@ -51,9 +51,11 @@ $true, $false | ForEach-Object { # local and global apps
             $removed += @{ $app = $status.version }
         }
         if($status.outdated) {
-            $outdated += @{ $app = @($status.version, $status.latest_version) }
             if($status.hold) {
                 $onhold += @{ $app = @($status.version, $status.latest_version) }
+            }
+            else {
+                $outdated += @{ $app = @($status.version, $status.latest_version) }
             }
         }
         if($status.missing_deps) {
