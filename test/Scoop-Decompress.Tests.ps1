@@ -79,7 +79,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         BeforeAll {
             if($env:CI) {
-                mock Get-AppFilePath { (Get-Command zstd.exe).Path }
+                mock Get-AppFilePath { $env:zstd }
             } elseif(!(installed zstd)) {
                 scoop install zstd
             }
