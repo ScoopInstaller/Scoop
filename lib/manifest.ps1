@@ -111,7 +111,15 @@ function generate_user_manifest($app, $bucket, $version) {
     return $null
 }
 
-function url($manifest, $arch) { arch_specific 'url' $manifest $arch }
+function url($manifest, $arch) {
+    $url = arch_specific 'url' $manifest $arch
+    $mirrors = get_config 'mirrors'
+    $keys = ($mirrors |  Get-Member -MemberType NoteProperty ).name
+    foreach ($mirror in $keys) {
+        $url = $url -replace ($mirror, $mirrors.$mirror)
+    }
+    $url
+}
 function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch }
 function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
 function msi($manifest, $arch) { arch_specific 'msi' $manifest $arch }

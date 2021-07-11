@@ -41,7 +41,7 @@ function load_cfg($file) {
     }
 
     try {
-        return (Get-Content $file -Raw | ConvertFrom-Json -AsHashtable -ErrorAction Stop)
+        return (Get-Content $file -Raw | ConvertFrom-Json -ErrorAction Stop)
     } catch {
         Write-Host "ERROR loading $file`: $($_.exception.message)"
     }
