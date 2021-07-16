@@ -37,7 +37,7 @@ function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $argume
         return
     }
 
-    $scoop_startmenu_folder = shortcut_folder $global
+    $scoop_startmenu_folder = Convert-Path $(shortcut_folder $global)
     $subdirectory = [System.IO.Path]::GetDirectoryName($shortcutName)
     if ($subdirectory) {
         $subdirectory = ensure $([System.IO.Path]::Combine($scoop_startmenu_folder, $subdirectory))
@@ -62,7 +62,7 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
     $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
         $name = $_.item(1)
-        $shortcut = "$(shortcut_folder $global)\$name.lnk"
+        $shortcut = "$(Convert-Path $(shortcut_folder $global))\$name.lnk"
         write-host "Removing shortcut $(friendly_path $shortcut)"
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
@@ -75,7 +75,7 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
         # TODO: Remove this 'if' block and comment after
         #       27 June 2018.
         if($global) {
-            $shortcut = "$(shortcut_folder $false)\$name.lnk"
+            $shortcut = "$(Convert-Path $(shortcut_folder $false))\$name.lnk"
             if(Test-Path -Path $shortcut) {
                  Remove-Item $shortcut
             }
