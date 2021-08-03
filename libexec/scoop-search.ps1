@@ -25,7 +25,8 @@ function bin_match($manifest, $query) {
 }
 
 function search_bucket($bucket, $query) {
-    $apps = apps_in_bucket (Find-BucketDirectory $bucket) | ForEach-Object {
+    $bucket_dir = Find-BucketDirectory $bucket
+    $apps = apps_in_bucket ($bucket_dir) | ForEach-Object {
         @{ name = $_ }
     }
 
@@ -38,7 +39,7 @@ function search_bucket($bucket, $query) {
 
         $apps = $apps | Where-Object {
             if($_.name -match $query) { return $true }
-            $bin = bin_match (manifest $_.name $bucket) $query
+            $bin = bin_match (fullpath "$bucket_dir\$(sanitary_path $_.name).json") $query
             if($bin) {
                 $_.bin = $bin; return $true;
             }
