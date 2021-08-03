@@ -105,9 +105,12 @@ Scoop can utilize [`aria2`](https://github.com/aria2/aria2) to use multi-connect
 scoop install aria2
 ```
 
+By default, `scoop` displays a warning when running `scoop install` or `scoop update` while `aria2` is enabled. This warning can be suppressed by running `scoop config aria2-warning-enabled false`.
+
 You can tweak the following `aria2` settings with the `scoop config` command:
 
 - aria2-enabled (default: true)
+- aria2-warning-enabled (default: true)
 - [aria2-retry-wait](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-retry-wait) (default: 2)
 - [aria2-split](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-s) (default: 5)
 - [aria2-max-connection-per-server](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-x) (default: 5)

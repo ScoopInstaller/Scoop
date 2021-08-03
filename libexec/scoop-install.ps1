@@ -119,9 +119,10 @@ $skip | Where-Object { $explicit_apps -contains $_ } | ForEach-Object {
 }
 
 $suggested = @{ };
-if (Test-Aria2Enabled) {
+if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "Scoop uses 'aria2c' for multi-connection downloads."
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+    warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
 $apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
 
