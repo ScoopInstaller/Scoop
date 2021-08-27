@@ -83,39 +83,41 @@ function update_scoop() {
         Move-Item $newdir $currentdir
     } else {
         Push-Location $currentdir
+        try {
+            $previousCommit = Invoke-Expression 'git rev-parse HEAD'
+            $currentRepo = Invoke-Expression "git config remote.origin.url"
+            $currentBranch = Invoke-Expression "git branch"
 
-        $previousCommit = Invoke-Expression 'git rev-parse HEAD'
-        $currentRepo = Invoke-Expression "git config remote.origin.url"
-        $currentBranch = Invoke-Expression "git branch"
+            $isRepoChanged = !($currentRepo -match $configRepo)
+            $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
-        $isRepoChanged = !($currentRepo -match $configRepo)
-        $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
+            # Change remote url if the repo is changed
+            if ($isRepoChanged) {
+                Invoke-Expression "git config remote.origin.url '$configRepo'"
+            }
 
-        # Change remote url if the repo is changed
-        if ($isRepoChanged) {
-            Invoke-Expression "git config remote.origin.url '$configRepo'"
+            # Fetch and reset local repo if the repo or the branch is changed
+            if ($isRepoChanged -or $isBranchChanged) {
+                # Reset git fetch refs, so that it can fetch all branches (GH-3368)
+                Invoke-Expression "git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'"
+                # fetch remote branch
+                git_fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
+                # checkout and track the branch
+                git_checkout -B $configBranch -t origin/$configBranch -q
+                # reset branch HEAD
+                Invoke-Expression "git reset --hard origin/$configBranch -q"
+            } else {
+                git_pull -q
+            }
+
+            $res = $lastexitcode
+            if ($show_update_log) {
+                Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            }
+        } finally {
+            Pop-Location
         }
 
-        # Fetch and reset local repo if the repo or the branch is changed
-        if ($isRepoChanged -or $isBranchChanged) {
-            # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-            Invoke-Expression "git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'"
-            # fetch remote branch
-            git_fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
-            # checkout and track the branch
-            git_checkout -B $configBranch -t origin/$configBranch -q
-            # reset branch HEAD
-            Invoke-Expression "git reset --hard origin/$configBranch -q"
-        } else {
-            git_pull -q
-        }
-
-        $res = $lastexitcode
-        if ($show_update_log) {
-            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
-        }
-
-        Pop-Location
         if ($res -ne 0) {
             abort 'Update failed.'
         }
