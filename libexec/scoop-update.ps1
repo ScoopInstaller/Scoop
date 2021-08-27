@@ -141,12 +141,16 @@ function update_scoop() {
         }
 
         Push-Location $loc
-        $previousCommit = (Invoke-Expression 'git rev-parse HEAD')
-        git_pull -q
-        if ($show_update_log) {
-            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+        try {
+            $previousCommit = (Invoke-Expression 'git rev-parse HEAD')
+            git_pull -q
+            if ($show_update_log) {
+                Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            }
         }
-        Pop-Location
+        finally {
+            Pop-Location
+        }
     }
 
     set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
