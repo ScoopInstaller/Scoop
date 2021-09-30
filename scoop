@@ -1,0 +1,101 @@
+$ gh repo edit --help
+
+Edit your Github Repo settings
+
+If the current repository is a local git repository and the currently authenticated user has WRITE/ADMIN access to the repository, the command will let the user make changes to the repo settings.
+
+USAGE
+ARGUMENTS
+
+A repository can be supplied as an argument in any of the following formats:
+
+"OWNER/REPO"
+by URL, e.g. "https://github.com/OWNER/REPO"
+EXAMPLES
+
+# update repo description, allow squash merge and delete merged branches automatically
+$ gh repo edit --description="awesome description" --allow-squash-merge --delete-merged-branch
+
+Available APIs
+via GraphQL
+Name
+Description
+HasIssuesEnabled
+HasWikiEnabled
+HasProjectsEnabled
+Homepage URL
+IsTemplate
+
+Reference: https://docs.github.com/en/graphql/reference/input-objects#updaterepositoryinput
+
+via REST
+Everything GraphQL supports +
+Private
+Visibility
+Allow Squash Merge
+Allow Merge Commit
+Allow Rebase Merge
+Delete Branch on Merge
+Archive Repo
+
+Reference: https://docs.github.com/en/rest/reference/repos#update-a-repository
+
+MOCK UP
+
+$ cd cli/
+$ ls
+share/⠀README.md⠀Makefile⠀internal/⠀go.mod⠀ﳑ docs/⠀cmd/⠀api/⠀
+
+⠀utils/ wix.json⠀test/⠀script/⠀pkg/⠀LICENSE⠀go.sum⠀ﳑ git/⠀context/⠀bin/⠀
+
+$ /cli gh repo edit // if user has no access
+
+You do not have enough permissions to edit settings of `[<repository>]`
+
+$ /cli gh repo edit // if user has WRITE access
+? Repository name (cli) awesome-cli
+? Repository description (Github’s Official command line tool) Github’s Awesome official command line tool
+? Repository Homepage URL (cli.github.com) cli.github.io
+? Visibility [Use arrows to move, type to filter]
+> Public
+Private
+Internal
+? Enable Issues (y/N) y
+? Enable Wiki (y/N) y
+? Merge Options [Use arrows to move, type to filter]
+> Allow Merge Commits
+
+Allow Squash Merging
+Allow Rebase Merging
+
+? Convert into a Template Repository (y/N) N
+? Automatically delete head branches (y/N) N
+? Archive Repository (y/N) N
+Successfully updated repository settings
+2nd Iteration of Design Draft
+$ /cli gh repo edit
+? What would you like to edit? [Use arrows to move, space to select, <right> to all, <left> to none, type to filter]
+Name
+Description
+Homepage URL
+Repo Visibility
+Merge Options
+Other Options
+// Enter
+? Name (cli) awesome-cli
+? Description (Github’s official command line tool) Github’s Awesome official command line tool
+? Homepage URL (cli.github.com) cli.github.io
+? Visibility [Use arrows to move, type to filter]
+> Public
+Private
+Internal
+? Merge Options [Use arrows to move, type to filter]
+> Allow Merge Commits
+Allow Squash Merging
+Allow Rebase Merging
+? Enable Issues (y/N) y
+? Enable Wiki (y/N) y
+? Convert into a Template Repository (y/N) N
+? Automatically delete head branches (y/N) N
+? Archive Repository (y/N) N
+Successfully updated repository settings by ©Google LLC®©®
