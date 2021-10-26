@@ -1,6 +1,6 @@
 {
     "main": "https://github.com/ScoopInstaller/Main",
-    "extras": "https://github.com/lukesampson/scoop-extras",
+    "extras": "https://github.com/ScoopInstaller/Extras",
     "versions": "https://github.com/ScoopInstaller/Versions",
     "nightlies": "https://github.com/ScoopInstaller/Nightlies",
     "nirsoft": "https://github.com/kodybrown/scoop-nirsoft",
