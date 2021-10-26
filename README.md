@@ -137,7 +137,7 @@ If you find Scoop useful and would like to support ongoing development and maint
 The following buckets are known to scoop:
 
 - [main](https://github.com/ScoopInstaller/Main) - Default bucket for the most common (mostly CLI) apps
-- [extras](https://github.com/lukesampson/scoop-extras) - Apps that don't fit the main bucket's [criteria](https://github.com/lukesampson/scoop/wiki/Criteria-for-including-apps-in-the-main-bucket)
+- [extras](https://github.com/ScoopInstaller/Extras) - Apps that don't fit the main bucket's [criteria](https://github.com/lukesampson/scoop/wiki/Criteria-for-including-apps-in-the-main-bucket)
 - [games](https://github.com/Calinou/scoop-games) - Open source/freeware games and game-related tools
 - [nerd-fonts](https://github.com/matthewjberger/scoop-nerd-fonts) -  Nerd Fonts
 - [nirsoft](https://github.com/kodybrown/scoop-nirsoft) - A subset of the [250](https://github.com/rasa/scoop-directory/blob/master/by-score.md#MCOfficer_scoop-nirsoft) [Nirsoft](https://nirsoft.net) apps
