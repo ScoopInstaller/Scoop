@@ -3,32 +3,32 @@
     <h1 align="center">Scoop</h1>
 </p>
 <p align="center">
-<b><a href="https://github.com/ScoopInstaller/scoop#what-does-scoop-do">Features</a></b>
+<b><a href="https://github.com/ScoopInstaller/Scoop#what-does-scoop-do">Features</a></b>
 |
-<b><a href="https://github.com/ScoopInstaller/scoop#installation">Installation</a></b>
+<b><a href="https://github.com/ScoopInstaller/Scoop#installation">Installation</a></b>
 |
-<b><a href="https://github.com/ScoopInstaller/scoop/wiki">Documentation</a></b>
+<b><a href="https://github.com/ScoopInstaller/Scoop/wiki">Documentation</a></b>
 </p>
 
 - - -
 <p align="center" >
-    <a href="https://github.com/ScoopInstaller/scoop">
-        <img src="https://img.shields.io/github/languages/code-size/ScoopInstaller/scoop.svg" alt="Code Size" />
+    <a href="https://github.com/ScoopInstaller/Scoop">
+        <img src="https://img.shields.io/github/languages/code-size/ScoopInstaller/Scoop.svg" alt="Code Size" />
     </a>
-    <a href="https://github.com/ScoopInstaller/scoop">
-        <img src="https://img.shields.io/github/repo-size/ScoopInstaller/scoop.svg" alt="Repository size" />
+    <a href="https://github.com/ScoopInstaller/Scoop">
+        <img src="https://img.shields.io/github/repo-size/ScoopInstaller/Scoop.svg" alt="Repository size" />
     </a>
-    <a href="https://ci.appveyor.com/project/ScoopInstaller/scoop">
+    <a href="https://ci.appveyor.com/project/ScoopInstaller/Scoop">
         <img src="https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true" alt="Build Status" />
     </a>
     <a href="https://discord.gg/s9yRQHt">
         <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
     </a>
-    <a href="https://gitter.im/ScoopInstaller/scoop">
-        <img src="https://badges.gitter.im/ScoopInstaller/scoop.png" alt="Gitter Chat" />
+    <a href="https://gitter.im/ScoopInstaller/Scoop">
+        <img src="https://badges.gitter.im/ScoopInstaller/Scoop.png" alt="Gitter Chat" />
     </a>
-    <a href="https://github.com/ScoopInstaller/scoop/blob/master/LICENSE">
-        <img src="https://img.shields.io/github/license/ScoopInstaller/scoop.svg" alt="License" />
+    <a href="https://github.com/ScoopInstaller/Scoop/blob/master/LICENSE">
+        <img src="https://img.shields.io/github/license/ScoopInstaller/Scoop.svg" alt="License" />
     </a>
 </p>
 
@@ -95,7 +95,7 @@ $env:SCOOP_GLOBAL='F:\GlobalScoopApps'
 # run the installer
 ```
 
-## [Documentation](https://github.com/ScoopInstaller/scoop/wiki)
+## [Documentation](https://github.com/ScoopInstaller/Scoop/wiki)
 
 ## Multi-connection downloads with `aria2`
 
@@ -137,7 +137,7 @@ If you find Scoop useful and would like to support ongoing development and maint
 The following buckets are known to scoop:
 
 - [main](https://github.com/ScoopInstaller/Main) - Default bucket for the most common (mostly CLI) apps
-- [extras](https://github.com/ScoopInstaller/Extras) - Apps that don't fit the main bucket's [criteria](https://github.com/ScoopInstaller/scoop/wiki/Criteria-for-including-apps-in-the-main-bucket)
+- [extras](https://github.com/ScoopInstaller/Extras) - Apps that don't fit the main bucket's [criteria](https://github.com/ScoopInstaller/Scoop/wiki/Criteria-for-including-apps-in-the-main-bucket)
 - [games](https://github.com/Calinou/scoop-games) - Open source/freeware games and game-related tools
 - [nerd-fonts](https://github.com/matthewjberger/scoop-nerd-fonts) -  Nerd Fonts
 - [nirsoft](https://github.com/kodybrown/scoop-nirsoft) - A subset of the [250](https://github.com/rasa/scoop-directory/blob/master/by-score.md#MCOfficer_scoop-nirsoft) [Nirsoft](https://nirsoft.net) apps
