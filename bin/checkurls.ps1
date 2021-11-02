@@ -89,8 +89,8 @@ foreach ($man in $Queue) {
     if ($manifest.url) {
         $manifest.url | ForEach-Object { $urls += $_ }
     } else {
-        url $manifest '64bit' | ForEach-Object { $urls += $_ }
-        url $manifest '32bit' | ForEach-Object { $urls += $_ }
+        script:url $manifest '64bit' | ForEach-Object { $urls += $_ }
+        script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
     }
 
     $urls | ForEach-Object {
