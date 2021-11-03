@@ -210,7 +210,7 @@ $apps | ForEach-Object {
         return
     }
 
-    $urls = url $manifest $architecture
+    $urls = script:url $manifest $architecture
     $urls | ForEach-Object {
         $url = $_
         $hash = hash_for_url $manifest $url $architecture

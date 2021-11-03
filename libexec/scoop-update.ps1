@@ -203,7 +203,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     if (Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
-        $urls = url $manifest $architecture
+        $urls = script:url $manifest $architecture
 
         foreach ($url in $urls) {
             dl_with_cache $app $version $url $null $manifest.cookie $true
