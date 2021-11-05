@@ -67,14 +67,22 @@ $apps | ForEach-Object {
     $original_dir = $dir
     $persist_dir = persistdir $app $global
 
+    #region Workaround for #2952
+    $processdir = $dir | Select-Object -ExpandProperty Path
+    if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
+        error "Application is still running. Close all instances and try again."
+        continue
+    }
+    #endregion Workaround for #2952
+
     $install = install_info $app $version $global
     $architecture = $install.architecture
 
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global $architecture
-    env_add_path $manifest $dir
-    env_set $manifest $dir $global
+    env_add_path $manifest $dir $global $architecture
+    env_set $manifest $dir $global $architecture
     # unlink all potential old link before re-persisting
     unlink_persist_data $original_dir
     persist_data $manifest $original_dir $persist_dir
