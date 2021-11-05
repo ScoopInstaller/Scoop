@@ -2,14 +2,13 @@
 # Summary: Returns the path to the specified app
 param($app)
 
+if(!$app) { 
+    . "$psscriptroot\..\lib\help.ps1"
+    my_usage
+    exit 1
+}
+
 . "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-
-reset_aliases
-
-if(!$app) { my_usage; exit 1 }
 
 $app_path = versiondir $app 'current' $false
 if(!(Test-Path $app_path)) {
