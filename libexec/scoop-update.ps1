@@ -319,9 +319,10 @@ if (!$apps) {
             }
         }
 
-        if ($outdated -and (Test-Aria2Enabled)) {
+        if ($outdated -and ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true))) {
             warn "Scoop uses 'aria2c' for multi-connection downloads."
             warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+            warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
         }
         if ($outdated.Length -gt 1) {
             write-host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
