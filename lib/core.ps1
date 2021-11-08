@@ -864,7 +864,7 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
                 }
             }
             'Object[]' {
-                $newentity = $entity | ForEach-Object { substitute $_ $params $regexEscape }
+                $newentity = $entity | ForEach-Object { ,(substitute $_ $params $regexEscape) }
             }
             'PSCustomObject' {
                 $newentity.PSObject.Properties | ForEach-Object { $_.Value = substitute $_.Value $params $regexEscape }
