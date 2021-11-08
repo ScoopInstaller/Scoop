@@ -346,7 +346,12 @@ function Update-ManifestProperty {
                 }
             } elseif ($Manifest.$currentProperty -and $Manifest.autoupdate.$currentProperty) {
                 # Update other property (global)
-                $newValue = substitute $Manifest.autoupdate.$currentProperty $Substitutions
+                $autoupdateProperty = $Manifest.autoupdate.$currentProperty
+                $newValue = substitute $autoupdateProperty $Substitutions
+                if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
+                    # Make sure it's an array
+                    $newValue = ,$newValue
+                }
                 $Manifest.$currentProperty, $hasPropertyChanged = PropertyHelper -Property $Manifest.$currentProperty -Value $newValue
                 $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
             } elseif ($Manifest.architecture) {
@@ -354,7 +359,12 @@ function Update-ManifestProperty {
                 $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
                     $arch = $_.Name
                     if ($Manifest.architecture.$arch.$currentProperty -and ($Manifest.autoupdate.architecture.$arch.$currentProperty -or $Manifest.autoupdate.$currentProperty)) {
-                        $newValue = substitute (arch_specific $currentProperty $Manifest.autoupdate $arch) $Substitutions
+                        $autoupdateProperty = @(arch_specific $currentProperty $Manifest.autoupdate $arch)
+                        $newValue = substitute $autoupdateProperty $Substitutions
+                        if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
+                            # Make sure it's an array
+                            $newValue = ,$newValue
+                        }
                         $Manifest.architecture.$arch.$currentProperty, $hasPropertyChanged = PropertyHelper -Property $Manifest.architecture.$arch.$currentProperty -Value $newValue
                         $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
                     }
