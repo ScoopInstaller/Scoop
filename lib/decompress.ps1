@@ -16,7 +16,7 @@ function Test-7zipRequirement {
             return ($URL | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
         }
     } else {
-        return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
+        return $File -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
     }
 }
 
@@ -136,24 +136,36 @@ function Expand-ZstdArchive {
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
-        [ValidateSet("All")]
-        [String]
+        [Switch]
         $Overwrite,
         [Switch]
         $Removal
     )
     $ZstdPath = Get-HelperPath -Helper Zstd
     $LogPath = "$(Split-Path $Path)\zstd.log"
-    $ArgList = @('-d', '-f', "`"$Path`"")
+    ensure $DestinationPath | Out-Null
+    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"")
+    if ($Switches) {
+        $ArgList += (-split $Switches)
+    }
+    if ($Overwrite) {
+        $ArgList += '-f'
+    }
     $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path. `n$(new_issue_msg $app $bucket 'decompress error')"
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
-    $ZstdExtractPath = (strip_ext $Path) # default extract location for zstd (just remove zst extension)
-    $DecompressedFileName = (Split-Path $ZstdExtractPath -Leaf)
-    $IsTar = ($ZstdExtractPath -match '\.tar$')
+    $IsTar = (strip_ext $Path) -match '\.tar$'
+    if (!$IsTar -and $ExtractDir) {
+        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+    }
+    if (Test-Path $LogPath) {
+        Remove-Item $LogPath -Force
+    }
     if ($IsTar) {
-        Expand-7zipArchive $ZstdExtractPath -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
+        # Check for tar
+        $TarFile = Get-ChildItem -Path $DestinationPath -Filter '*.tar'
+        Expand-7zipArchive -Path "$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
     }
     if ($Removal) {
         # Remove original archive file

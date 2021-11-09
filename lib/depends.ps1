@@ -61,9 +61,6 @@ function script_deps($script) {
     if($script -like '*Expand-7zipArchive *' -or $script -like '*extract_7zip *') {
         $deps += '7zip'
     }
-    if($script -like '*Expand-ZstdArchive *') {
-        $deps += 'zstd'
-    }
     if($script -like '*Expand-MsiArchive *' -or $script -like '*extract_msi *') {
         $deps += 'lessmsi'
     }
@@ -72,6 +69,9 @@ function script_deps($script) {
     }
     if($script -like '*Expand-DarkArchive *') {
         $deps += 'dark'
+    }
+    if ($script -like '*Expand-ZstdArchive *') {
+        $deps += 'zstd'
     }
 
     return $deps
