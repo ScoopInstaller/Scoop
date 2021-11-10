@@ -49,8 +49,11 @@ function Select-CurrentVersion {
     )
 
     $appPath = appdir $AppName $Global
-    if (Test-Path "$appPath\current") {
+    if (Test-Path "$appPath\current" -PathType Container) {
         $currentVersion = (installed_manifest $AppName 'current' $Global).version
+        if ($currentVersion -eq 'nightly') {
+            $currentVersion = (Get-Item "$appPath\current").Target | Split-Path -Leaf
+        }
     } else {
         $installedVersion = Get-InstalledVersion -AppName $AppName -Global:$Global
         if ($installedVersion) {
@@ -88,7 +91,8 @@ function Get-InstalledVersion {
 
     $appPath = appdir $AppName $Global
     if (Test-Path $appPath) {
-        return @((Get-ChildItem "$appPath\*\install.json" | Sort-Object -Property LastWriteTimeUtc).Directory.Name) -ne 'current'
+        $versions = @((Get-ChildItem "$appPath\*\install.json" | Sort-Object -Property LastWriteTimeUtc).Directory.Name)
+        return $versions | Where-Object { ($_ -ne 'current') -and ($_ -notlike '_*.old*') }
     } else {
         return @()
     }
