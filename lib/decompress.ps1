@@ -143,8 +143,9 @@ function Expand-ZstdArchive {
     )
     $ZstdPath = Get-HelperPath -Helper Zstd
     $LogPath = "$(Split-Path $Path)\zstd.log"
+    $DestinationPath = $DestinationPath.TrimEnd("\")
     ensure $DestinationPath | Out-Null
-    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"")
+    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"", "-v")
     if ($Switches) {
         $ArgList += (-split $Switches)
     }
@@ -164,7 +165,7 @@ function Expand-ZstdArchive {
     }
     if ($IsTar) {
         # Check for tar
-        $TarFile = Get-ChildItem -Path $DestinationPath -Filter '*.tar'
+        $TarFile = (strip_ext $Path)
         Expand-7zipArchive -Path "$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
     }
     if ($Removal) {
