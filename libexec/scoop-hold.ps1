@@ -27,7 +27,7 @@ $apps | ForEach-Object {
     $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name))}
     $install.hold = $true
     save_install_info $install $dir
-    success "$app is now locked and can not be updated anymore."
+    success "$app is now held and can not be updated anymore."
 }
 
 exit $exitcode

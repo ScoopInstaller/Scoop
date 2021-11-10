@@ -52,16 +52,9 @@ if (!$configBranch) {
 
 if(($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
-    # should be deleted after Oct 1, 2019
-    If ((Get-Date).ToUniversalTime() -ge "2019-10-01") {
-        Write-Output "PowerShell 5 or later is required to run Scoop."
-        Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
-        break
-    } else {
-        Write-Output "Scoop is going to stop supporting old version of PowerShell."
-        Write-Output "Please upgrade to PowerShell 5 or later version before Oct 1, 2019 UTC."
-        Write-Output "Guideline: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
-    }
+    Write-Output "PowerShell 5 or later is required to run Scoop."
+    Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
+    break
 }
 
 function update_scoop() {
@@ -210,7 +203,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     if (Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
-        $urls = url $manifest $architecture
+        $urls = script:url $manifest $architecture
 
         foreach ($url in $urls) {
             dl_with_cache $app $version $url $null $manifest.cookie $true
@@ -252,8 +245,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     write-host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
-    env_rm_path $old_manifest $dir $global
-    env_rm $old_manifest $global
+    env_rm_path $old_manifest $dir $global $architecture
+    env_rm $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
@@ -319,16 +312,17 @@ if (!$apps) {
                     $outdated += applist $app $global
                     write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
                 } else {
-                    warn "'$app' is locked to version $($status.version)"
+                    warn "'$app' is held to version $($status.version)"
                 }
             } elseif ($apps_param -ne '*') {
                 write-host -f green "$app`: $($status.version) (latest version)"
             }
         }
 
-        if ($outdated -and (Test-Aria2Enabled)) {
+        if ($outdated -and ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true))) {
             warn "Scoop uses 'aria2c' for multi-connection downloads."
             warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+            warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
         }
         if ($outdated.Length -gt 1) {
             write-host -f DarkCyan "Updating $($outdated.Length) outdated apps:"

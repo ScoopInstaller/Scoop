@@ -200,7 +200,7 @@ function get_filename_from_metalink($file) {
 
 function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
     $data = @{}
-    $urls = @(url $manifest $architecture)
+    $urls = @(script:url $manifest $architecture)
 
     # aria2 input file
     $urlstxt = Join-Path $cachedir "$app.txt"
@@ -225,6 +225,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--min-tls-version=TLSv1.2"
         "--stop-with-process=$PID"
         "--continue"
+        "--summary-interval 0"
     )
 
     if($cookies) {
@@ -282,21 +283,29 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         # handle aria2 console output
         Write-Host "Starting download with aria2 ..."
-        $prefix = "Download: "
+
         Invoke-Expression $aria2 | ForEach-Object {
-            if([String]::IsNullOrWhiteSpace($_)) {
-                # skip blank lines
-                return
+            # Skip blank lines
+            if ([String]::IsNullOrWhiteSpace($_)) { return }
+
+            # Prevent potential overlaping of text when one line is shorter
+            $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
+            $blank = if ($len -gt 0) { ' ' * $len } else { '' }
+            $color = 'Gray'
+
+            if ($_.StartsWith('(OK):')) {
+                $noNewLine = $true
+                $color = 'Green'
+            } elseif ($_.StartsWith('[') -and $_.EndsWith(']')) {
+                $noNewLine = $true
+                $color = 'Cyan'
+            } elseif ($_.StartsWith('Download Results:')) {
+                $noNewLine = $false
             }
-            Write-Host $prefix -NoNewline
-            if($_.StartsWith('(OK):')) {
-                Write-Host $_ -f Green
-            } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
-                Write-Host $_ -f Cyan
-            } else {
-                Write-Host $_ -f Gray
-            }
+
+            Write-Host "`rDownload: $_$blank" -ForegroundColor $color -NoNewline:$noNewLine
         }
+        Write-Host ''
 
         if($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
@@ -357,7 +366,7 @@ function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($reqUrl)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "sourceforge\.net")) {
+        if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
             $wreq.referer = strip_filename $url
         }
         if($cookies) {
@@ -365,7 +374,41 @@ function dl($url, $to, $cookies, $progress) {
         }
     }
 
-    $wres = $wreq.getresponse()
+    try {
+        $wres = $wreq.GetResponse()
+    } catch [System.Net.WebException] {
+        $exc = $_.Exception
+        $handledCodes = @(
+            [System.Net.HttpStatusCode]::MovedPermanently,  # HTTP 301
+            [System.Net.HttpStatusCode]::Found,             # HTTP 302
+            [System.Net.HttpStatusCode]::SeeOther,          # HTTP 303
+            [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
+        )
+
+        # Only handle redirection codes
+        $redirectRes = $exc.Response
+        if ($handledCodes -notcontains $redirectRes.StatusCode) {
+            throw $exc
+        }
+
+        # Get the new location of the file
+        if ((-not $redirectRes.Headers) -or ($redirectRes.Headers -notcontains 'Location')) {
+            throw $exc
+        }
+
+        $newUrl = $redirectRes.Headers['Location']
+        info "Following redirect to $newUrl..."
+
+        # Handle manual file rename
+        if ($url -like '*#/*') {
+            $null, $postfix = $url -split '#/'
+            $newUrl = "$newUrl#/$postfix"
+        }
+
+        dl $newUrl $to $cookies $progress
+        return
+    }
+
     $total = $wres.ContentLength
     if($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
         $total = ftp_file_size($url)
@@ -469,6 +512,7 @@ function dl_progress($read, $total, $url) {
             write-host
             $left = 0
             $top  = $top + 1
+            if($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
         }
     }
 
@@ -482,7 +526,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
-    $urls = @(url $manifest $architecture)
+    $urls = @(script:url $manifest $architecture)
 
     # can be multiple cookies: they will be used for all HTTP requests.
     $cookies = $manifest.cookie
@@ -552,6 +596,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             } else {
                 $extract_fn = 'Expand-MsiArchive'
             }
+        } elseif(Test-ZstdRequirement -File $fname) { # Zstd first
+            $extract_fn = 'Expand-ZstdArchive'
         } elseif(Test-7zipRequirement -File $fname) { # 7zip
             $extract_fn = 'Expand-7zipArchive'
         }
@@ -597,7 +643,7 @@ function hash_for_url($manifest, $url, $arch) {
 
     if($hashes.length -eq 0) { return $null }
 
-    $urls = @(url $manifest $arch)
+    $urls = @(script:url $manifest $arch)
 
     $index = [array]::indexof($urls, $url)
     if($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
@@ -938,13 +984,17 @@ function find_dir_or_subdir($path, $dir) {
 
 function env_add_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
-    $env_add_path | Where-Object { $_ } | ForEach-Object {
-        $path_dir = Join-Path $dir $_
+    if ($env_add_path) {
+        # GH-3785: Add path in ascending order.
+        [Array]::Reverse($env_add_path)
+        $env_add_path | Where-Object { $_ } | ForEach-Object {
+            $path_dir = Join-Path $dir $_
 
-        if (!(is_in_dir $dir $path_dir)) {
-            abort "Error in manifest: env_add_path '$_' is outside the app directory."
+            if (!(is_in_dir $dir $path_dir)) {
+                abort "Error in manifest: env_add_path '$_' is outside the app directory."
+            }
+            add_first_in_path $path_dir $global
         }
-        add_first_in_path $path_dir $global
     }
 }
 

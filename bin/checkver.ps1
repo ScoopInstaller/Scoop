@@ -94,7 +94,7 @@ Get-Event | ForEach-Object {
 $Queue | ForEach-Object {
     $name, $json = $_
 
-    $substitutions = get_version_substitutions $json.version
+    $substitutions = Get-VersionSubstitution $json.version
 
     $wc = New-Object Net.Webclient
     if ($json.checkver.useragent) {
@@ -196,8 +196,11 @@ while ($in_progress -gt 0) {
     $expected_ver = $json.version
     $ver = ''
 
-    $err = $ev.SourceEventArgs.Error
     $page = $ev.SourceEventArgs.Result
+    $err = $ev.SourceEventArgs.Error
+    if ($json.checkver.script) {
+        $page = $json.checkver.script -join "`r`n" | Invoke-Expression
+    }
 
     if ($err) {
         next "$($err.message)`r`nURL $url is not valid"
@@ -308,7 +311,7 @@ while ($in_progress -gt 0) {
             if ($Version -ne "") {
                 $ver = $Version
             }
-            autoupdate $App $Dir $json $ver $matchesHashtable
+            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
         }

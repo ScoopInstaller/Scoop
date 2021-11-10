@@ -243,7 +243,7 @@ function Get-HelperPath {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -265,6 +265,7 @@ function Get-HelperPath {
             }
         }
         'Aria2' { $HelperPath = Get-AppFilePath 'aria2' 'aria2c.exe' }
+        'Zstd' { $HelperPath = Get-AppFilePath 'zstd' 'zstd.exe' }
     }
 
     return $HelperPath
@@ -274,7 +275,7 @@ function Test-HelperInstalled {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -578,7 +579,7 @@ function shim($path, $global, $name, $arg) {
 
     if($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
-        Copy-Item "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe" "$shim.exe" -force
+        Copy-Item (get_shim_path) "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
             write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
@@ -606,6 +607,18 @@ powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$l
         "@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
         "#!/bin/sh`njava -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     }
+}
+
+function get_shim_path() {
+    $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"
+    $shim_version = get_config 'shim' 'default'
+    switch ($shim_version) {
+        '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
+        'kiennq' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"; Break }
+        'default' { Break }
+        default { warn "Unknown shim version: '$shim_version'" }
+    }
+    return $shim_path
 }
 
 function search_in_path($target) {
@@ -839,18 +852,27 @@ function is_scoop_outdated() {
 }
 
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
-    if ($entity -is [Array]) {
-        return $entity | ForEach-Object { substitute $_ $params $regexEscape}
-    } elseif ($entity -is [String]) {
-        $params.GetEnumerator() | ForEach-Object {
-            if($regexEscape -eq $false -or $null -eq $_.Value) {
-                $entity = $entity.Replace($_.Name, $_.Value)
-            } else {
-                $entity = $entity.Replace($_.Name, [Regex]::Escape($_.Value))
+    $newentity = $entity
+    if ($null -ne $newentity) {
+        switch ($entity.GetType().Name) {
+            'String' {
+                $params.GetEnumerator() | ForEach-Object {
+                    if ($regexEscape -eq $false -or $null -eq $_.Value) {
+                        $newentity = $newentity.Replace($_.Name, $_.Value)
+                    } else {
+                        $newentity = $newentity.Replace($_.Name, [Regex]::Escape($_.Value))
+                    }
+                }
+            }
+            'Object[]' {
+                $newentity = $entity | ForEach-Object { ,(substitute $_ $params $regexEscape) }
+            }
+            'PSCustomObject' {
+                $newentity.PSObject.Properties | ForEach-Object { $_.Value = substitute $_.Value $params $regexEscape }
             }
         }
-        return $entity
     }
+    return $newentity
 }
 
 function format_hash([String] $hash) {
@@ -900,6 +922,7 @@ function handle_special_urls($url)
         $Body = @{
             projectUri      = $Matches.name;
             fileName        = $Matches.filename;
+            source          = 'CF';
             isLatestVersion = $true
         }
         if ((Invoke-RestMethod -Uri $url) -match '"p":"(?<pid>[a-f0-9]{24}).*?"r":"(?<rid>[a-f0-9]{24})') {
