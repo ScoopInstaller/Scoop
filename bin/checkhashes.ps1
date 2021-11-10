@@ -16,14 +16,15 @@
     Downloaded files will not be deleted after script finish.
     Should not be used, because check should be used for downloading actual version of file (as normal user, not finding in some document from vendors, which could be damaged / wrong (Example: Slack@3.3.1 lukesampson/scoop-extras#1192)), not some previously downloaded.
 .EXAMPLE
-    PS BUCKETDIR> .\bin\checkhashes.ps1
+    PS BUCKETROOT> .\bin\checkhashes.ps1
     Check all manifests for hash mismatch.
 .EXAMPLE
-    PS BUCKETDIR> .\bin\checkhashes.ps1 MANIFEST -Update
+    PS BUCKETROOT> .\bin\checkhashes.ps1 MANIFEST -Update
     Check MANIFEST and Update if there are some wrong hashes.
 #>
 param(
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -31,7 +32,7 @@ param(
             $true
         }
     })]
-    [String] $Dir = "$PSScriptRoot\..\bucket",
+    [String] $Dir,
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipCorrect,
@@ -41,7 +42,6 @@ param(
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\config.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\autoupdate.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
@@ -52,7 +52,7 @@ param(
 $Dir = Resolve-Path $Dir
 if ($ForceUpdate) { $Update = $true }
 # Cleanup
-if (!$UseCache) { scoop cache rm '*HASH_CHECK*' }
+if (!$UseCache) { Remove-Item "$cachedir\*HASH_CHECK*" -Force }
 
 function err ([String] $name, [String[]] $message) {
     Write-Host "$name`: " -ForegroundColor Red -NoNewline
@@ -70,15 +70,15 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
     $urls = @()
     $hashes = @()
 
-    if ($manifest.architecture) {
-        # First handle 64bit
-        url $manifest '64bit' | ForEach-Object { $urls += $_ }
-        hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
-        url $manifest '32bit' | ForEach-Object { $urls += $_ }
-        hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
-    } elseif ($manifest.url) {
+    if ($manifest.url) {
         $manifest.url | ForEach-Object { $urls += $_ }
         $manifest.hash | ForEach-Object { $hashes += $_ }
+    } elseif ($manifest.architecture) {
+        # First handle 64bit
+        script:url $manifest '64bit' | ForEach-Object { $urls += $_ }
+        hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
+        script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
+        hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
     } else {
         err $name 'Manifest does not contain URL property.'
         continue

@@ -9,7 +9,6 @@ param($query)
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
 . "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 
@@ -26,7 +25,7 @@ function bin_match($manifest, $query) {
 }
 
 function search_bucket($bucket, $query) {
-    $apps = apps_in_bucket (bucketdir $bucket) | ForEach-Object {
+    $apps = apps_in_bucket (Find-BucketDirectory $bucket) | ForEach-Object {
         @{ name = $_ }
     }
 
@@ -80,7 +79,7 @@ function search_remotes($query) {
     $buckets = known_bucket_repos
     $names = $buckets | get-member -m noteproperty | Select-Object -exp name
 
-    $results = $names | Where-Object { !(test-path $(bucketdir $_)) } | ForEach-Object {
+    $results = $names | Where-Object { !(test-path $(Find-BucketDirectory $_)) } | ForEach-Object {
         @{"bucket" = $_; "results" = (search_remote $_ $query)}
     } | Where-Object { $_.results }
 
@@ -97,14 +96,13 @@ function search_remotes($query) {
     }
 }
 
-@($null) + @(Get-LocalBucket) | ForEach-Object {
+Get-LocalBucket | ForEach-Object {
     $res = search_bucket $_ $query
     $local_results = $local_results -or $res
     if($res) {
         $name = "$_"
-        if(!$_) { $name = "main" }
 
-        "'$name' bucket:"
+        Write-Host "'$name' bucket:"
         $res | ForEach-Object {
             $item = "    $($_.name) ($($_.version))"
             if($_.bin) { $item += " --> includes '$($_.bin)'" }

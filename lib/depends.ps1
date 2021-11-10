@@ -1,11 +1,11 @@
 # resolve dependencies for the supplied apps, and sort into the correct order
 function install_order($apps, $arch) {
     $res = @()
-    foreach($app in $apps) {
-        foreach($dep in deps $app $arch) {
-            if($res -notcontains $dep) { $res += $dep}
+    foreach ($app in $apps) {
+        foreach ($dep in deps $app $arch) {
+            if ($res -notcontains $dep) { $res += $dep}
         }
-        if($res -notcontains $app) { $res += $app }
+        if ($res -notcontains $app) { $res += $app }
     }
     return $res
 }
@@ -15,14 +15,14 @@ function deps($app, $arch) {
     $resolved = new-object collections.arraylist
     dep_resolve $app $arch $resolved @()
 
-    if($resolved.count -eq 1) { return @() } # no dependencies
+    if ($resolved.count -eq 1) { return @() } # no dependencies
     return $resolved[0..($resolved.count - 2)]
 }
 
 function dep_resolve($app, $arch, $resolved, $unresolved) {
     $app, $bucket, $null = parse_app $app
     $unresolved += $app
-    $null, $manifest, $null, $null = locate $app $bucket
+    $null, $manifest, $null, $null = Find-Manifest $app $bucket
 
     if(!$manifest) {
         if(((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
@@ -33,9 +33,9 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
 
     $deps = @(install_deps $manifest $arch) + @(runtime_deps $manifest) | Select-Object -Unique
 
-    foreach($dep in $deps) {
-        if($resolved -notcontains $dep) {
-            if($unresolved -contains $dep) {
+    foreach ($dep in $deps) {
+        if ($resolved -notcontains $dep) {
+            if ($unresolved -contains $dep) {
                 abort "Circular dependency detected: '$app' -> '$dep'."
             }
             dep_resolve $dep $arch $resolved $unresolved
@@ -46,17 +46,59 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
 }
 
 function runtime_deps($manifest) {
-    if($manifest.depends) { return $manifest.depends }
+    if ($manifest.depends) { return $manifest.depends }
+}
+
+function script_deps($script) {
+    $deps = @()
+    if($script -is [Array]) {
+        $script = $script -join "`n"
+    }
+    if([String]::IsNullOrEmpty($script)) {
+        return $deps
+    }
+
+    if($script -like '*Expand-7zipArchive *' -or $script -like '*extract_7zip *') {
+        $deps += '7zip'
+    }
+    if($script -like '*Expand-MsiArchive *' -or $script -like '*extract_msi *') {
+        $deps += 'lessmsi'
+    }
+    if($script -like '*Expand-InnoArchive *' -or $script -like '*unpack_inno *') {
+        $deps += 'innounp'
+    }
+    if($script -like '*Expand-DarkArchive *') {
+        $deps += 'dark'
+    }
+    if ($script -like '*Expand-ZstdArchive *') {
+        $deps += 'zstd'
+    }
+
+    return $deps
 }
 
 function install_deps($manifest, $arch) {
     $deps = @()
 
-    if((requires_7zip $manifest $arch) -and !(7zip_installed)) {
+    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -URL (script:url $manifest $arch))) {
         $deps += '7zip'
     }
-    if(requires_lessmsi $manifest $arch) { $deps += 'lessmsi' }
-    if($manifest.innosetup) { $deps += 'innounp' }
+    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -URL (script:url $manifest $arch))) {
+        $deps += 'lessmsi'
+    }
+    if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
+        $deps += 'innounp'
+    }
+    if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -URL (url $manifest $arch))) {
+        $deps += 'zstd'
+    }
 
-    return $deps
+    $pre_install = arch_specific 'pre_install' $manifest $arch
+    $installer = arch_specific 'installer' $manifest $arch
+    $post_install = arch_specific 'post_install' $manifest $arch
+    $deps += script_deps $pre_install
+    $deps += script_deps $installer.script
+    $deps += script_deps $post_install
+
+    return $deps | Select-Object -Unique
 }

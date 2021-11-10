@@ -47,8 +47,11 @@ switch($cmd) {
     'show' {
         show $app
     }
-    default {
+    '' {
         show
+    }
+    default {
+        my_usage
     }
 }
 
