@@ -23,8 +23,8 @@ if ($env:CI_WINDOWS -eq $true) {
         & 7z.exe x "$env:SCOOP_HELPERS\innounp.rar" -o"$env:SCOOP_HELPERS\innounp" -y
     }
     if(!(Test-Path "$env:SCOOP_HELPERS\zstd\zstd.exe")) {
-        Start-FileDownload 'https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-v1.5.0-win64.zip' -FileName "$env:SCOOP_HELPERS\zstd.zip"
-        & 7z.exe x "$env:SCOOP_HELPERS\zstd.zip" "zstd-v1.5.0-win64" -o"$env:SCOOP_HELPERS\zstd" -y
+        Start-FileDownload 'https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-v1.5.0-win32.zip' -FileName "$env:SCOOP_HELPERS\zstd.zip"
+        & 7z.exe x "$env:SCOOP_HELPERS\zstd.zip" "zstd-v1.5.0-win32" -o"$env:SCOOP_HELPERS\zstd" -y
     }
 }
 
