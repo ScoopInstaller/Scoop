@@ -24,7 +24,9 @@ function Get-LatestVersion {
         [String]
         $Uri
     )
-    return (manifest $AppName $Bucket $Uri).version
+    process {
+        return (manifest $AppName $Bucket $Uri).version
+    }
 }
 
 function Select-CurrentVersion {
@@ -47,22 +49,23 @@ function Select-CurrentVersion {
         [Switch]
         $Global
     )
-
-    $appPath = appdir $AppName $Global
-    if (Test-Path "$appPath\current" -PathType Container) {
-        $currentVersion = (installed_manifest $AppName 'current' $Global).version
-        if ($currentVersion -eq 'nightly') {
-            $currentVersion = (Get-Item "$appPath\current").Target | Split-Path -Leaf
-        }
-    } else {
-        $installedVersion = Get-InstalledVersion -AppName $AppName -Global:$Global
-        if ($installedVersion) {
-            $currentVersion = $installedVersion[-1]
+    process {
+        $appPath = appdir $AppName $Global
+        if (Test-Path "$appPath\current" -PathType Container) {
+            $currentVersion = (installed_manifest $AppName 'current' $Global).version
+            if ($currentVersion -eq 'nightly') {
+                $currentVersion = (Get-Item "$appPath\current").Target | Split-Path -Leaf
+            }
         } else {
-            $currentVersion = $null
+            $installedVersion = Get-InstalledVersion -AppName $AppName -Global:$Global
+            if ($installedVersion) {
+                $currentVersion = $installedVersion[-1]
+            } else {
+                $currentVersion = $null
+            }
         }
+        return $currentVersion
     }
-    return $currentVersion
 }
 
 function Get-InstalledVersion {
@@ -88,15 +91,15 @@ function Get-InstalledVersion {
         [Switch]
         $Global
     )
-
-    $appPath = appdir $AppName $Global
-    if (Test-Path $appPath) {
-        $versions = @((Get-ChildItem "$appPath\*\install.json" | Sort-Object -Property LastWriteTimeUtc).Directory.Name)
-        return $versions | Where-Object { ($_ -ne 'current') -and ($_ -notlike '_*.old*') }
-    } else {
-        return @()
+    process {
+        $appPath = appdir $AppName $Global
+        if (Test-Path $appPath) {
+            $versions = @((Get-ChildItem "$appPath\*\install.json" | Sort-Object -Property LastWriteTimeUtc).Directory.Name)
+            return $versions | Where-Object { ($_ -ne 'current') -and ($_ -notlike '_*.old*') }
+        } else {
+            return @()
+        }
     }
-
     # Deprecated
     # sort_versions (Get-ChildItem $appPath -dir -attr !reparsePoint | Where-Object { $null -ne $(Get-ChildItem $_.FullName) } | ForEach-Object { $_.Name })
 }
@@ -117,81 +120,84 @@ function Compare-Version {
             '1' if DifferenceVersion is greater then ReferenceVersion,
             '-1' if DifferenceVersion is less then ReferenceVersion
     #>
-    [OutputType([Int])]
+    [OutputType([Int32])]
     [CmdletBinding()]
     param (
-        [Parameter(Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
+        [AllowEmptyString()]
         [String]
         $ReferenceVersion,
-        [Parameter(Position = 1, ValueFromPipeline = $true)]
+        [Parameter(Mandatory = $true, Position = 1, ValueFromPipeline = $true)]
+        [AllowEmptyString()]
         [String]
         $DifferenceVersion,
         [String]
         $Delimiter = '-'
     )
+    process {
+        # Use '+' sign as post-release, see https://github.com/lukesampson/scoop/pull/3721#issuecomment-553718093
+        $ReferenceVersion, $DifferenceVersion = @($ReferenceVersion, $DifferenceVersion) -replace '\+', '-'
 
-    # Use '+' sign as post-release, see https://github.com/lukesampson/scoop/pull/3721#issuecomment-553718093
-    $ReferenceVersion, $DifferenceVersion = @($ReferenceVersion, $DifferenceVersion) -replace '\+', '-'
+        # Return 0 if versions are equal
+        if ($DifferenceVersion -eq $ReferenceVersion) {
+            return 0
+        }
 
-    # Return 0 if versions are equal
-    if ($DifferenceVersion -eq $ReferenceVersion) {
-        return 0
-    }
+        # Preprocess versions (split, convert and separate)
+        $splitReferenceVersion = @(SplitVersion -Version $ReferenceVersion -Delimiter $Delimiter)
+        $splitDifferenceVersion = @(SplitVersion -Version $DifferenceVersion -Delimiter $Delimiter)
 
-    # Preprocess versions (split, convert and separate)
-    $splitReferenceVersion = @(SplitVersion -Version $ReferenceVersion -Delimiter $Delimiter)
-    $splitDifferenceVersion = @(SplitVersion -Version $DifferenceVersion -Delimiter $Delimiter)
+        # Nightly versions are always equal
+        if ($splitReferenceVersion[0] -eq 'nightly' -and $splitDifferenceVersion[0] -eq 'nightly') {
+            return 0
+        }
 
-    # Nightly versions are always equal
-    if ($splitReferenceVersion[0] -eq 'nightly' -and $splitDifferenceVersion[0] -eq 'nightly') {
-        return 0
-    }
+        for ($i = 0; $i -lt [Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
+            # '1.1-alpha' is less then '1.1'
+            if ($i -ge $splitReferenceVersion.Length) {
+                if ($splitDifferenceVersion[$i] -match 'alpha|beta|rc|pre') {
+                    return -1
+                } else {
+                    return 1
+                }
+            }
+            # '1.1' is greater then '1.1-beta'
+            if ($i -ge $splitDifferenceVersion.Length) {
+                if ($splitReferenceVersion[$i] -match 'alpha|beta|rc|pre') {
+                    return 1
+                } else {
+                    return -1
+                }
+            }
 
-    for ($i = 0; $i -lt [Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
-        # '1.1-alpha' is less then '1.1'
-        if ($i -ge $splitReferenceVersion.Length) {
-            if ($splitDifferenceVersion[$i] -match 'alpha|beta|rc|pre') {
-                return -1
-            } else {
+            # If some parts of versions have '.', compare them with delimiter '.'
+            if (($splitReferenceVersion[$i] -match '\.') -or ($splitDifferenceVersion[$i] -match '\.')) {
+                $Result = Compare-Version -ReferenceVersion $splitReferenceVersion[$i] -DifferenceVersion $splitDifferenceVersion[$i] -Delimiter '.'
+                # If the parts are equal, continue to next part, otherwise return
+                if ($Result -ne 0) {
+                    return $Result
+                } else {
+                    continue
+                }
+            }
+
+            # Don't try to compare [Long] to [String]
+            if ($null -ne $splitReferenceVersion[$i] -and $null -ne $splitDifferenceVersion[$i]) {
+                if ($splitReferenceVersion[$i] -is [String] -and $splitDifferenceVersion[$i] -isnot [String]) {
+                    $splitDifferenceVersion[$i] = "$($splitDifferenceVersion[$i])"
+                }
+                if ($splitDifferenceVersion[$i] -is [String] -and $splitReferenceVersion[$i] -isnot [String]) {
+                    $splitReferenceVersion[$i] = "$($splitReferenceVersion[$i])"
+                }
+            }
+
+            # Compare [String] or [Long]
+            if ($splitDifferenceVersion[$i] -gt $splitReferenceVersion[$i]) {
                 return 1
             }
-        }
-        # '1.1' is greater then '1.1-beta'
-        if ($i -ge $splitDifferenceVersion.Length) {
-            if ($splitReferenceVersion[$i] -match 'alpha|beta|rc|pre') {
-                return 1
-            } else {
+            if ($splitDifferenceVersion[$i] -lt $splitReferenceVersion[$i]) {
                 return -1
             }
-        }
-
-        # If some parts of versions have '.', compare them with delimiter '.'
-        if (($splitReferenceVersion[$i] -match '\.') -or ($splitDifferenceVersion[$i] -match '\.')) {
-            $Result = Compare-Version -ReferenceVersion $splitReferenceVersion[$i] -DifferenceVersion $splitDifferenceVersion[$i] -Delimiter '.'
-            # If the parts are equal, continue to next part, otherwise return
-            if ($Result -ne 0) {
-                return $Result
-            } else {
-                continue
-            }
-        }
-
-        # Don't try to compare [Long] to [String]
-        if ($null -ne $splitReferenceVersion[$i] -and $null -ne $splitDifferenceVersion[$i]) {
-            if ($splitReferenceVersion[$i] -is [String] -and $splitDifferenceVersion[$i] -isnot [String]) {
-                $splitDifferenceVersion[$i] = "$($splitDifferenceVersion[$i])"
-            }
-            if ($splitDifferenceVersion[$i] -is [String] -and $splitReferenceVersion[$i] -isnot [String]) {
-                $splitReferenceVersion[$i] = "$($splitReferenceVersion[$i])"
-            }
-        }
-
-        # Compare [String] or [Long]
-        if ($splitDifferenceVersion[$i] -gt $splitReferenceVersion[$i]) {
-            return 1
-        }
-        if ($splitDifferenceVersion[$i] -lt $splitReferenceVersion[$i]) {
-            return -1
         }
     }
 }
@@ -206,25 +212,31 @@ function SplitVersion {
     .PARAMETER Delimiter
         Specifies the delimiter of version (Literal)
     #>
+    [OutputType([Object[]])]
+    [CmdletBinding()]
     param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [AllowEmptyString()]
         [String]
         $Version,
         [String]
         $Delimiter = '-'
     )
-    $Version = $Version -replace '[a-zA-Z]+', "$Delimiter$&$Delimiter"
-    return ($Version -split [Regex]::Escape($Delimiter) -ne '' | ForEach-Object { if ($_ -match '^\d+$') { [Long]$_ } else { $_ } })
+    process {
+        $Version = $Version -replace '[a-zA-Z]+', "$Delimiter$&$Delimiter"
+        return ($Version -split [Regex]::Escape($Delimiter) -ne '' | ForEach-Object { if ($_ -match '^\d+$') { [Long]$_ } else { $_ } })
+    }
 }
 
 # Deprecated
 # Not used anymore in scoop core
 function qsort($ary, $fn) {
     warn '"qsort" is deprecated. Please avoid using it anymore.'
-    if($null -eq $ary) { return @() }
-    if(!($ary -is [array])) { return @($ary) }
+    if ($null -eq $ary) { return @() }
+    if (!($ary -is [array])) { return @($ary) }
 
     $pivot = $ary[0]
-    $rem = $ary[1..($ary.length-1)]
+    $rem = $ary[1..($ary.length - 1)]
 
     $lesser = qsort ($rem | Where-Object { (& $fn $pivot $_) -lt 0 }) $fn
 
