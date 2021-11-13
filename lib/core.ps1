@@ -300,13 +300,17 @@ function app_status($app, $global) {
 
     $manifest = manifest $app $install_info.bucket $install_info.url
     $status.removed = (!$manifest)
-    if($manifest.version) {
+    if ($manifest.version) {
         $status.latest_version = $manifest.version
     }
 
     $status.outdated = $false
-    if($status.version -and $status.latest_version) {
-        $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
+    if ($status.version -and $status.latest_version) {
+        if (get_config 'force-update' $false) {
+            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
+        } else {
+            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)
+        }
     }
 
     $status.missing_deps = @()
@@ -314,8 +318,8 @@ function app_status($app, $global) {
         $app, $bucket, $null = parse_app $_
         return !(installed $app)
     }
-    if($deps) {
-        $status.missing_deps += ,$deps
+    if ($deps) {
+        $status.missing_deps += , $deps
     }
 
     return $status
