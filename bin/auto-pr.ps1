@@ -22,27 +22,31 @@
 .PARAMETER SkipUpdated
     Updated manifests will not be shown.
 .EXAMPLE
-    PS REPODIR > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
+    PS BUCKETROOT > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
 .EXAMPLE
-    PS REPODIR > .\bin\auto-pr.ps1 -Push
+    PS BUCKETROOT > .\bin\auto-pr.ps1 -Push
     Update all manifests inside 'bucket/' directory.
 #>
+
 param(
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!($_ -match '^(.*)\/(.*):(.*)$')) {
             throw 'Upstream must be in this format: <user>/<repo>:<branch>'
         }
         $true
     })]
-    [String] $Upstream = 'lukesampson/scoop:master',
+    [String] $Upstream,
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
+        } else {
+            $true
         }
-        $true
     })]
-    [String] $Dir = "$PSScriptRoot\..\bucket",
+    [String] $Dir,
     [Switch] $Push,
     [Switch] $Request,
     [Switch] $Help,
@@ -181,8 +185,8 @@ hub diff --name-only | ForEach-Object {
 
         # detect if file was staged, because it's not when only LF or CRLF have changed
         $status = execute 'hub status --porcelain -uno'
-        $status = $status | Select-Object -First 1
-        if ($status -and $status -match "^\x20*M\x20+.*$app.json") {
+        $status = $status | Where-Object { $_ -match "M\s{2}.*$app.json" }
+        if ($status -and $status.StartsWith('M  ') -and $status.EndsWith("$app.json")) {
             execute "hub commit -m '${app}: Update to version $version'"
         } else {
             Write-Host "Skipping $app because only LF/CRLF changes were detected ..." -ForegroundColor Yellow
@@ -200,4 +204,4 @@ if ($Push) {
     execute 'hub checkout -f master'
 }
 
-execute 'hub reset'
+execute 'hub reset --hard'

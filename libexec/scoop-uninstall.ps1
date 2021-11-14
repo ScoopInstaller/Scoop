@@ -14,7 +14,6 @@
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\config.ps1"
 
 reset_aliases
 
@@ -45,17 +44,25 @@ if ($apps -eq 'scoop') {
     exit
 }
 
-$apps = ensure_all_installed $apps $global
+$apps = Confirm-InstallationStatus $apps -Global:$global
 if (!$apps) { exit 0 }
 
 :app_loop foreach ($_ in $apps) {
     ($app, $global) = $_
 
-    $version = current_version $app $global
+    $version = Select-CurrentVersion -AppName $app -Global:$global
     Write-Host "Uninstalling '$app' ($version)."
 
     $dir = versiondir $app $version $global
     $persist_dir = persistdir $app $global
+
+    #region Workaround for #2952
+    $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
+    if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
+        error "Application is still running. Close all instances and try again."
+        continue
+    }
+    #endregion Workaround for #2952
 
     try {
         Test-Path $dir -ErrorAction Stop | Out-Null
@@ -79,8 +86,8 @@ if (!$apps) { exit 0 }
 
     uninstall_psmodule $manifest $refdir $global
 
-    env_rm_path $manifest $refdir $global
-    env_rm $manifest $global
+    env_rm_path $manifest $refdir $global $architecture
+    env_rm $manifest $global $architecture
 
     try {
         # unlink all potential old link before doing recursive Remove-Item
@@ -94,7 +101,7 @@ if (!$apps) { exit 0 }
     }
 
     # remove older versions
-    $old = @(versions $app $global)
+    $old = Get-InstalledVersion -AppName $app -Global:$global
     foreach ($oldver in $old) {
         Write-Host "Removing older version ($oldver)."
         $dir = versiondir $app $oldver $global
@@ -108,7 +115,7 @@ if (!$apps) { exit 0 }
         }
     }
 
-    if (@(versions $app).length -eq 0) {
+    if ((Get-InstalledVersion -AppName $app -Global:$global).length -eq 0) {
         $appdir = appdir $app $global
         try {
             # if last install failed, the directory seems to be locked and this

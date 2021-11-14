@@ -1,29 +1,43 @@
+. "$PSScriptRoot\core.ps1"
+
 $bucketsdir = "$scoopdir\buckets"
 
-<#
-.DESCRIPTION
-    Return full path for bucket with given name.
-    Main bucket will be returned as default.
-.PARAMETER name
-    Name of bucket
-#>
-function bucketdir($name) {
-    $bucket = relpath '..\bucket' # main bucket
+function Find-BucketDirectory {
+    <#
+    .DESCRIPTION
+        Return full path for bucket with given name.
+        Main bucket will be returned as default.
+    .PARAMETER Name
+        Name of bucket.
+    .PARAMETER Root
+        Root folder of bucket repository will be returned instead of 'bucket' subdirectory (if exists).
+    #>
+    param(
+        [string] $Name = 'main',
+        [switch] $Root
+    )
 
-    if ($name) {
-        $bucket = "$bucketsdir\$name"
-    }
-    if (Test-Path "$bucket\bucket") {
+    # Handle info passing empty string as bucket ($install.bucket)
+    if(($null -eq $Name) -or ($Name -eq '')) { $Name = 'main' }
+    $bucket = "$bucketsdir\$Name"
+
+    if ((Test-Path "$bucket\bucket") -and !$Root) {
         $bucket = "$bucket\bucket"
     }
 
     return $bucket
 }
 
+function bucketdir($name) {
+    Show-DeprecatedWarning $MyInvocation 'Find-BucketDirectory'
+
+    return Find-BucketDirectory $name
+}
+
 function known_bucket_repos {
-    $dir = versiondir 'scoop' 'current'
-    $json = "$dir\buckets.json"
-    Get-Content $json -raw | convertfrom-json -ea stop
+    $json = "$PSScriptRoot\..\buckets.json"
+
+    return Get-Content $json -raw | convertfrom-json -ea stop
 }
 
 function known_bucket_repo($name) {
@@ -39,12 +53,19 @@ function apps_in_bucket($dir) {
     return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
 }
 
+function Get-LocalBucket {
+    <#
+    .SYNOPSIS
+        List all local buckets.
+    #>
+
+    return (Get-ChildItem -Directory $bucketsdir).Name
+}
+
 function buckets {
-    $buckets = @()
-    if(test-path $bucketsdir) {
-        Get-ChildItem $bucketsdir | ForEach-Object { $buckets += $_.Name }
-    }
-    return $buckets
+    Show-DeprecatedWarning $MyInvocation 'Get-LocalBucket'
+
+    return Get-LocalBucket
 }
 
 function find_manifest($app, $bucket) {
@@ -54,8 +75,7 @@ function find_manifest($app, $bucket) {
         return $null
     }
 
-    $buckets = @($null) + @(buckets) # null for main bucket
-    foreach($bucket in $buckets) {
+    foreach($bucket in Get-LocalBucket) {
         $manifest = manifest $app $bucket
         if($manifest) { return $manifest, $bucket }
     }
@@ -68,12 +88,11 @@ function add_bucket($name, $repo) {
         if (!$repo) { "Unknown bucket '$name'. Try specifying <repo>."; $usage_add; exit 1 }
     }
 
-    $git = try { Get-Command 'git' -ea stop } catch { $null }
-    if (!$git) {
-        abort "Git is required for buckets. Run 'scoop install git'."
+    if (!(Test-CommandAvailable git)) {
+        abort "Git is required for buckets. Run 'scoop install git' and try again."
     }
 
-    $dir = bucketdir $name
+    $dir = Find-BucketDirectory $name -Root
     if (test-path $dir) {
         warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
         exit 0
@@ -94,7 +113,7 @@ function add_bucket($name, $repo) {
 
 function rm_bucket($name) {
     if (!$name) { "<name> missing"; $usage_rm; exit 1 }
-    $dir = "$bucketsdir\$name"
+    $dir = Find-BucketDirectory $name -Root
     if (!(test-path $dir)) {
         abort "'$name' bucket not found."
     }
@@ -103,15 +122,13 @@ function rm_bucket($name) {
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {
-    $app, $manifest, $bucket, $url = locate $app $bucket
+    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
-    if($manifest -and ($null -eq $url) -and ($null -eq $bucket)) {
-        $url = 'https://github.com/lukesampson/scoop'
-    } elseif (Test-path $bucket_path) {
+    if (Test-path $bucket_path) {
         Push-Location $bucket_path
-        $remote = git_config --get remote.origin.url
+        $remote = Invoke-Expression "git config --get remote.origin.url"
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
         # https://PROVIDER/USER/REPO.git

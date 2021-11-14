@@ -4,12 +4,10 @@
 #      scoop install git
 #
 # To install an app from a manifest at a URL:
-#      scoop install https://raw.githubusercontent.com/lukesampson/scoop/master/bucket/runat.json
+#      scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
 #
 # To install an app from a manifest on your computer
 #      scoop install \path\to\app.json
-#
-# When installing from your computer, you can leave the .json extension off if you like.
 #
 # Options:
 #   -g, --global              Install the app globally
@@ -29,20 +27,21 @@
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 
 reset_aliases
 
 function is_installed($app, $global) {
-    if($app.EndsWith('.json')) {
+    if ($app.EndsWith('.json')) {
         $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
     }
-    if(installed $app $global) {
-        function gf($g) { if($g) { ' --global' } }
+    if (installed $app $global) {
+        function gf($g) { if ($g) { ' --global' } }
 
-        $version = @(versions $app $global)[-1]
-        if(!(install_info $app $version $global)) {
-            error "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$(gf $global)' before retrying the install."
+        $version = Select-CurrentVersion -AppName $app -Global:$global
+        if (!(install_info $app $version $global)) {
+            warn "Purging previous failed installation of $app."
+            & "$PSScriptRoot\scoop-uninstall.ps1" $app$(gf $global)
+            return $false
         }
         warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(gf $global)' to install a new version."
         return $true
@@ -51,7 +50,7 @@ function is_installed($app, $global) {
 }
 
 $opt, $apps, $err = getopt $args 'gfiksa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'arch='
-if($err) { "scoop install: $err"; exit 1 }
+if ($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 $check_hash = !($opt.s -or $opt.skip)
@@ -64,19 +63,19 @@ try {
     abort "ERROR: $_"
 }
 
-if(!$apps) { error '<app> missing'; my_usage; exit 1 }
+if (!$apps) { error '<app> missing'; my_usage; exit 1 }
 
-if($global -and !(is_admin)) {
+if ($global -and !(is_admin)) {
     abort 'ERROR: you need admin rights to install global apps'
 }
 
-if(is_scoop_outdated) {
+if (is_scoop_outdated) {
     scoop update
 }
 
-if($apps.length -eq 1) {
-    $app, $null, $null = parse_app $apps
-    if(is_installed $app $global) {
+if ($apps.length -eq 1) {
+    $app, $null, $version = parse_app $apps
+    if ($null -eq $version -and (is_installed $app $global)) {
         return
     }
 }
@@ -97,7 +96,8 @@ if ($specific_versions.length -gt 0) {
 $specific_versions_paths = $specific_versions | ForEach-Object {
     $app, $bucket, $version = parse_app $_
     if (installed_manifest $app $version) {
-        abort "'$app' ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
+        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { " --global" })' to install a new version."
+        continue
     }
 
     generate_user_manifest $app $bucket $version
@@ -108,23 +108,24 @@ $apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-
 # differentiate after dependencies are added
 $explicit_apps = $apps
 
-if(!$independent) {
+if (!$independent) {
     $apps = install_order $apps $architecture # adds dependencies
 }
 ensure_none_failed $apps $global
 
 $apps, $skip = prune_installed $apps $global
 
-$skip | Where-Object { $explicit_apps -contains $_} | ForEach-Object {
+$skip | Where-Object { $explicit_apps -contains $_ } | ForEach-Object {
     $app, $null, $null = parse_app $_
-    $version = @(versions $app $global)[-1]
+    $version = Select-CurrentVersion -AppName $app -Global:$global
     warn "'$app' ($version) is already installed. Skipping."
 }
 
-$suggested = @{};
-if(aria2_enabled) {
+$suggested = @{ };
+if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "Scoop uses 'aria2c' for multi-connection downloads."
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+    warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
 $apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
 

@@ -16,54 +16,55 @@
 .PARAMETER SkipUpdated
     Updated manifests will not be shown.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1
+    PS BUCKETROOT > .\bin\checkver.ps1
     Check all manifest inside default directory.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 -s
+    PS BUCKETROOT > .\bin\checkver.ps1 -SkipUpdated
     Check all manifest inside default directory (list only outdated manifests).
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 -u
+    PS BUCKETROOT > .\bin\checkver.ps1 -Update
     Check all manifests and update All outdated manifests.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN
-    Check manifest MAN.json inside default directory.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP
+    Check manifest APP.json inside default directory.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN -u
-    Check manifest MAN.json and update, if there is newer version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -Update
+    Check manifest APP.json and update, if there is newer version.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN -f
-    Check manifest MAN.json and update, even if there is no new version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -ForceUpdate
+    Check manifest APP.json and update, even if there is no new version.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN -u -v VER
-    Check manifest MAN.json and update, using version VER
+    PS BUCKETROOT > .\bin\checkver.ps1 APP -Update -Version VER
+    Check manifest APP.json and update, using version VER
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 MAN DIR
-    Check manifest MAN.json inside ./DIR directory.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP DIR
+    Check manifest APP.json inside ./DIR directory.
 .EXAMPLE
-    PS BUCKETDIR > .\bin\checkver.ps1 -Dir DIR
+    PS BUCKETROOT > .\bin\checkver.ps1 -Dir DIR
     Check all manifests inside ./DIR directory.
 .EXAMPLE
-        PS BUCKETDIR > .\bin\checkver.ps1 MAN DIR -u
-        Check manifest MAN.json inside ./DIR directory and update if there is newer version.
+    PS BUCKETROOT > .\bin\checkver.ps1 APP DIR -Update
+    Check manifest APP.json inside ./DIR directory and update if there is newer version.
 #>
 param(
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
+        } else {
+            $true
         }
-        $true
     })]
-    [String] $Dir = "$psscriptroot\..\bucket",
+    [String] $Dir,
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipUpdated,
-    [String] $Version = ""
+    [String] $Version = ''
 )
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\config.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . "$psscriptroot\..\lib\autoupdate.ps1"
 . "$psscriptroot\..\lib\json.ps1"
@@ -93,7 +94,7 @@ Get-Event | ForEach-Object {
 $Queue | ForEach-Object {
     $name, $json = $_
 
-    $substitutions = get_version_substitutions $json.version
+    $substitutions = Get-VersionSubstitution $json.version
 
     $wc = New-Object Net.Webclient
     if ($json.checkver.useragent) {
@@ -111,6 +112,7 @@ $Queue | ForEach-Object {
     }
     $regex = ''
     $jsonpath = ''
+    $xpath = ''
     $replace = ''
 
     if ($json.checkver -eq 'github') {
@@ -139,12 +141,15 @@ $Queue | ForEach-Object {
     if ($json.checkver.jsonpath) {
         $jsonpath = $json.checkver.jsonpath
     }
+    if ($json.checkver.xpath) {
+        $xpath = $json.checkver.xpath
+    }
 
     if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
         $replace = $json.checkver.replace
     }
 
-    if (!$jsonpath -and !$regex) {
+    if (!$jsonpath -and !$regex -and !$xpath) {
         $regex = $json.checkver
     }
 
@@ -158,6 +163,7 @@ $Queue | ForEach-Object {
         regex    = $regex;
         json     = $json;
         jsonpath = $jsonpath;
+        xpath    = $xpath;
         reverse  = $reverse;
         replace  = $replace;
     }
@@ -184,13 +190,17 @@ while ($in_progress -gt 0) {
     $url = $state.url
     $regexp = $state.regex
     $jsonpath = $state.jsonpath
+    $xpath = $state.xpath
     $reverse = $state.reverse
     $replace = $state.replace
     $expected_ver = $json.version
     $ver = ''
 
-    $err = $ev.SourceEventArgs.Error
     $page = $ev.SourceEventArgs.Result
+    $err = $ev.SourceEventArgs.Error
+    if ($json.checkver.script) {
+        $page = $json.checkver.script -join "`r`n" | Invoke-Expression
+    }
 
     if ($err) {
         next "$($err.message)`r`nURL $url is not valid"
@@ -213,7 +223,29 @@ while ($in_progress -gt 0) {
         }
     }
 
+    if ($xpath) {
+        $xml = [xml]$page
+        # Find all `significant namespace declarations` from the XML file
+        $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
+        # Then add them into the NamespaceManager
+        $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+        $nsList | ForEach-Object {
+            $nsmgr.AddNamespace($_.LocalName, $_.Value)
+        }
+        # Getting version from XML, using XPath
+        $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
+        if (!$ver) {
+            next "couldn't find '$xpath' in $url"
+            continue
+        }
+    }
+
     if ($jsonpath -and $regexp) {
+        $page = $ver
+        $ver = ''
+    }
+
+    if ($xpath -and $regexp) {
         $page = $ver
         $ver = ''
     }
@@ -260,7 +292,7 @@ while ($in_progress -gt 0) {
 
     Write-Host $ver -ForegroundColor DarkRed -NoNewline
     Write-Host " (scoop version is $expected_ver)" -NoNewline
-    $update_available = (compare_versions $expected_ver $ver) -eq -1
+    $update_available = (Compare-Version -ReferenceVersion $ver -DifferenceVersion $expected_ver) -ne 0
 
     if ($json.autoupdate -and $update_available) {
         Write-Host ' autoupdate available' -ForegroundColor Cyan
@@ -279,7 +311,7 @@ while ($in_progress -gt 0) {
             if ($Version -ne "") {
                 $ver = $Version
             }
-            autoupdate $App $Dir $json $ver $matchesHashtable
+            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
         }

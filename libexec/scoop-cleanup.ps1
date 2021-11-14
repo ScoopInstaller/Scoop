@@ -31,11 +31,11 @@ if ($global -and !(is_admin)) {
 }
 
 function cleanup($app, $global, $verbose, $cache) {
-    $current_version = current_version $app $global
+    $current_version = Select-CurrentVersion -AppName $app -Global:$global
     if ($cache) {
         Remove-Item "$cachedir\$app#*" -Exclude "$app#$current_version#*"
     }
-    $versions = versions $app $global | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
+    $versions = Get-InstalledVersion -AppName $app -Global:$global | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
     if (!$versions) {
         if ($verbose) { success "$app is already clean" }
         return
@@ -62,7 +62,7 @@ if ($apps) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        $apps = ensure_all_installed $apps $global
+        $apps = Confirm-InstallationStatus $apps -Global:$global
     }
 
     # $apps is now a list of ($app, $global) tuples

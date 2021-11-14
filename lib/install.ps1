@@ -11,7 +11,7 @@ function nightly_version($date, $quiet = $false) {
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $bucket, $null = parse_app $app
-    $app, $manifest, $bucket, $url = locate $app $bucket
+    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
@@ -41,7 +41,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    unpack_inno $fname $manifest $dir
     pre_install $manifest $architecture
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
@@ -50,8 +49,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
     if($global) { ensure_scoop_in_path $global } # can assume local scoop is in path
-    env_add_path $manifest $dir $global
-    env_set $manifest $dir $global
+    env_add_path $manifest $dir $global $architecture
+    env_set $manifest $dir $global $architecture
 
     # persist data
     persist_data $manifest $original_dir $persist_dir
@@ -73,6 +72,11 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 }
 
 function locate($app, $bucket) {
+    Show-DeprecatedWarning $MyInvocation 'Find-Manifest'
+    return Find-Manifest $app $bucket
+}
+
+function Find-Manifest($app, $bucket) {
     $manifest, $url = $null, $null
 
     # check if app is a URL or UNC path
@@ -103,7 +107,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     $cached = fullpath (cache_path $app $version $url)
 
     if(!(test-path $cached) -or !$use_cache) {
-        $null = ensure $cachedir
+        ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
@@ -196,10 +200,10 @@ function get_filename_from_metalink($file) {
 
 function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
     $data = @{}
-    $urls = @(url $manifest $architecture)
+    $urls = @(script:url $manifest $architecture)
 
     # aria2 input file
-    $urlstxt = "$cachedir\$app.txt"
+    $urlstxt = Join-Path $cachedir "$app.txt"
     $urlstxt_content = ''
     $download_finished = $false
 
@@ -221,6 +225,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--min-tls-version=TLSv1.2"
         "--stop-with-process=$PID"
         "--continue"
+        "--summary-interval 0"
     )
 
     if($cookies) {
@@ -278,25 +283,33 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         }
 
         # build aria2 command
-        $aria2 = "& '$(aria2_path)' $($options -join ' ')"
+        $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
         Write-Host "Starting download with aria2 ..."
-        $prefix = "Download: "
+
         Invoke-Expression $aria2 | ForEach-Object {
-            if([String]::IsNullOrWhiteSpace($_)) {
-                # skip blank lines
-                return
+            # Skip blank lines
+            if ([String]::IsNullOrWhiteSpace($_)) { return }
+
+            # Prevent potential overlaping of text when one line is shorter
+            $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
+            $blank = if ($len -gt 0) { ' ' * $len } else { '' }
+            $color = 'Gray'
+
+            if ($_.StartsWith('(OK):')) {
+                $noNewLine = $true
+                $color = 'Green'
+            } elseif ($_.StartsWith('[') -and $_.EndsWith(']')) {
+                $noNewLine = $true
+                $color = 'Cyan'
+            } elseif ($_.StartsWith('Download Results:')) {
+                $noNewLine = $false
             }
-            Write-Host $prefix -NoNewline
-            if($_.StartsWith('(OK):')) {
-                Write-Host $_ -f Green
-            } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
-                Write-Host $_ -f Cyan
-            } else {
-                Write-Host $_ -f Gray
-            }
+
+            Write-Host "`rDownload: $_$blank" -ForegroundColor $color -NoNewline:$noNewLine
         }
+        Write-Host ''
 
         if($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
@@ -340,10 +353,13 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         if(!(test-path $data.$url.source) ) {
             abort $(new_issue_msg $app $bucket "cached file not found")
         }
-        if($use_cache) {
-            Copy-Item $data.$url.source $data.$url.target
-        } else {
-            Move-Item $data.$url.source $data.$url.target -force
+
+        if(!($dir -eq $cachedir)) {
+            if($use_cache) {
+                Copy-Item $data.$url.source $data.$url.target
+            } else {
+                Move-Item $data.$url.source $data.$url.target -force
+            }
         }
     }
 }
@@ -354,7 +370,7 @@ function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($reqUrl)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "sourceforge\.net")) {
+        if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
             $wreq.referer = strip_filename $url
         }
         if($cookies) {
@@ -362,7 +378,41 @@ function dl($url, $to, $cookies, $progress) {
         }
     }
 
-    $wres = $wreq.getresponse()
+    try {
+        $wres = $wreq.GetResponse()
+    } catch [System.Net.WebException] {
+        $exc = $_.Exception
+        $handledCodes = @(
+            [System.Net.HttpStatusCode]::MovedPermanently,  # HTTP 301
+            [System.Net.HttpStatusCode]::Found,             # HTTP 302
+            [System.Net.HttpStatusCode]::SeeOther,          # HTTP 303
+            [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
+        )
+
+        # Only handle redirection codes
+        $redirectRes = $exc.Response
+        if ($handledCodes -notcontains $redirectRes.StatusCode) {
+            throw $exc
+        }
+
+        # Get the new location of the file
+        if ((-not $redirectRes.Headers) -or ($redirectRes.Headers -notcontains 'Location')) {
+            throw $exc
+        }
+
+        $newUrl = $redirectRes.Headers['Location']
+        info "Following redirect to $newUrl..."
+
+        # Handle manual file rename
+        if ($url -like '*#/*') {
+            $null, $postfix = $url -split '#/'
+            $newUrl = "$newUrl#/$postfix"
+        }
+
+        dl $newUrl $to $cookies $progress
+        return
+    }
+
     $total = $wres.ContentLength
     if($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
         $total = ftp_file_size($url)
@@ -466,6 +516,7 @@ function dl_progress($read, $total, $url) {
             write-host
             $left = 0
             $top  = $top + 1
+            if($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
         }
     }
 
@@ -479,7 +530,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
-    $urls = @(url $manifest $architecture)
+    $urls = @(script:url $manifest $architecture)
 
     # can be multiple cookies: they will be used for all HTTP requests.
     $cookies = $manifest.cookie
@@ -493,7 +544,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extracted = 0;
 
     # download first
-    if(aria2_enabled) {
+    if(Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach($url in $urls) {
@@ -533,62 +584,34 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         # work out extraction method, if applicable
         $extract_fn = $null
-        if($fname -match '\.zip$') {
-            $extract_fn = 'extract_zip'
+        if ($manifest.innosetup) {
+            $extract_fn = 'Expand-InnoArchive'
+        } elseif($fname -match '\.zip$') {
+            # Use 7zip when available (more fast)
+            if (((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
+                $extract_fn = 'Expand-7zipArchive'
+            } else {
+                $extract_fn = 'Expand-ZipArchive'
+            }
         } elseif($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
-            $msi = msi $manifest $architecture
-            if(!$msi) {
-                $useLessMsi = get_config MSIEXTRACT_USE_LESSMSI
-                if ($useLessMsi -eq $true) {
-                    $extract_fn, $extract_dir = lessmsi_config $extract_dir
-                }
-                else {
-                    $extract_fn = 'extract_msi'
-                }
-            } else {
+            if(msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
+            } else {
+                $extract_fn = 'Expand-MsiArchive'
             }
-        } elseif(file_requires_7zip $fname) { # 7zip
-            if(!(7zip_installed)) {
-                warn "Aborting. You'll need to run 'scoop uninstall $app' to clean up."
-                abort "7-zip is required. You can install it with 'scoop install 7zip'."
-            }
-            $extract_fn = 'extract_7zip'
+        } elseif(Test-ZstdRequirement -File $fname) { # Zstd first
+            $extract_fn = 'Expand-ZstdArchive'
+        } elseif(Test-7zipRequirement -File $fname) { # 7zip
+            $extract_fn = 'Expand-7zipArchive'
         }
 
         if($extract_fn) {
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
-            $null = mkdir "$dir\_tmp"
-            & $extract_fn "$dir\$fname" "$dir\_tmp"
-            Remove-Item "$dir\$fname"
-            if ($extract_to) {
-                $null = mkdir "$dir\$extract_to" -force
-            }
-            # fails if zip contains long paths (e.g. atom.json)
-            #cp "$dir\_tmp\$extract_dir\*" "$dir\$extract_to" -r -force -ea stop
-            try {
-                movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
-            }
-            catch {
-                error $_
-                abort $(new_issue_msg $app $bucket "extract_dir error")
-            }
-
-            if(test-path "$dir\_tmp") { # might have been moved by movedir
-                try {
-                    Remove-Item -r -force "$dir\_tmp" -ea stop
-                } catch [system.io.pathtoolongexception] {
-                    & "$env:COMSPEC" /c "rmdir /s /q $dir\_tmp"
-                } catch [system.unauthorizedaccessexception] {
-                    warn "Couldn't remove $dir\_tmp: unauthorized access."
-                }
-            }
-
+            & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
             Write-Host "done." -f Green
-
             $extracted++
         }
     }
@@ -624,7 +647,7 @@ function hash_for_url($manifest, $url, $arch) {
 
     if($hashes.length -eq 0) { return $null }
 
-    $urls = @(url $manifest $arch)
+    $urls = @(script:url $manifest $arch)
 
     $index = [array]::indexof($urls, $url)
     if($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
@@ -670,7 +693,7 @@ function check_hash($file, $hash, $app_name) {
 
 function compute_hash($file, $algname) {
     try {
-        if([bool](Get-Command -Name Get-FileHash -ErrorAction SilentlyContinue) -eq $true) {
+        if(Test-CommandAvailable Get-FileHash) {
             return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
             $fs = [system.io.file]::openread($file)
@@ -687,43 +710,10 @@ function compute_hash($file, $algname) {
     return ''
 }
 
-function cmd_available($cmd) {
-    try { Get-Command $cmd -ea stop | out-null } catch { return $false }
-    $true
-}
-
 # for dealing with installers
 function args($config, $dir, $global) {
     if($config) { return $config | ForEach-Object { (format $_ @{'dir'=$dir;'global'=$global}) } }
     @()
-}
-
-function run($exe, $arg, $msg, $continue_exit_codes) {
-    if($msg) { write-host "$msg " -nonewline }
-    try {
-        #Allow null/no arguments to be passed
-        $parameters = @{ }
-        if ($arg)
-        {
-            $parameters.arg = $arg;
-        }
-
-        $proc = start-process $exe -wait -ea stop -passthru @parameters
-
-
-        if($proc.exitcode -ne 0) {
-            if($continue_exit_codes -and ($continue_exit_codes.containskey($proc.exitcode))) {
-                warn $continue_exit_codes[$proc.exitcode]
-                return $true
-            }
-            write-host "Exit code was $($proc.exitcode)."; return $false
-        }
-    } catch {
-        write-host -f darkred $_.exception.tostring()
-        return $false
-    }
-    if($msg) { Write-Host "done." -f Green }
-    return $true
 }
 
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
@@ -762,7 +752,7 @@ function install_msi($fname, $dir, $msi) {
 
     $continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
 
-    $installed = run 'msiexec' $arg "Running installer..." $continue_exit_codes
+    $installed = Invoke-ExternalCommand 'msiexec' $arg -Activity "Running installer..." -ContinueExitCodes $continue_exit_codes
     if(!$installed) {
         abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
     }
@@ -794,7 +784,7 @@ function install_prog($fname, $dir, $installer, $global) {
     if($prog.endswith('.ps1')) {
         & $prog @arg
     } else {
-        $installed = run $prog $arg "Running installer..."
+        $installed = Invoke-ExternalCommand $prog $arg -Activity "Running installer..."
         if(!$installed) {
             abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
         }
@@ -809,6 +799,7 @@ function install_prog($fname, $dir, $installer, $global) {
 function run_uninstaller($manifest, $architecture, $dir) {
     $msi = msi $manifest $architecture
     $uninstaller = uninstaller $manifest $architecture
+    $version = $manifest.version
     if($uninstaller.script) {
         write-output "Running uninstaller script..."
         Invoke-Expression (@($uninstaller.script) -join "`r`n")
@@ -846,7 +837,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
             if($exe.endswith('.ps1')) {
                 & $exe @arg
             } else {
-                $uninstalled = run $exe $arg "Running uninstaller..." $continue_exit_codes
+                $uninstalled = Invoke-ExternalCommand $exe $arg -Activity "Running uninstaller..." -ContinueExitCodes $continue_exit_codes
                 if(!$uninstalled) { abort "Uninstallation aborted." }
             }
         }
@@ -958,7 +949,7 @@ function unlink_current($versiondir) {
         attrib $currentdir -R /L
 
         # remove the junction
-        & "$env:COMSPEC" /c "rmdir $currentdir"
+        & "$env:COMSPEC" /c "rmdir `"$currentdir`""
         return $currentdir
     }
     return $versiondir
@@ -995,54 +986,49 @@ function find_dir_or_subdir($path, $dir) {
     return [string]::join(';', $fixed), $removed
 }
 
-function env_add_path($manifest, $dir, $global) {
-    $manifest.env_add_path | Where-Object { $_ } | ForEach-Object {
-        $path_dir = join-path $dir $_
+function env_add_path($manifest, $dir, $global, $arch) {
+    $env_add_path = arch_specific 'env_add_path' $manifest $arch
+    if ($env_add_path) {
+        # GH-3785: Add path in ascending order.
+        [Array]::Reverse($env_add_path)
+        $env_add_path | Where-Object { $_ } | ForEach-Object {
+            $path_dir = Join-Path $dir $_
 
-        if(!(is_in_dir $dir $path_dir)) {
-            abort "Error in manifest: env_add_path '$_' is outside the app directory."
+            if (!(is_in_dir $dir $path_dir)) {
+                abort "Error in manifest: env_add_path '$_' is outside the app directory."
+            }
+            add_first_in_path $path_dir $global
         }
-        add_first_in_path $path_dir $global
     }
 }
 
-function add_first_in_path($dir, $global) {
-    $dir = fullpath $dir
-
-    # future sessions
-    $null, $currpath = strip_path (env 'path' $global) $dir
-    env 'path' $global "$dir;$currpath"
-
-    # this session
-    $null, $env:PATH = strip_path $env:PATH $dir
-    $env:PATH = "$dir;$env:PATH"
-}
-
-function env_rm_path($manifest, $dir, $global) {
-    # remove from path
-    $manifest.env_add_path | Where-Object { $_ } | ForEach-Object {
-        $path_dir = join-path $dir $_
+function env_rm_path($manifest, $dir, $global, $arch) {
+    $env_add_path = arch_specific 'env_add_path' $manifest $arch
+    $env_add_path | Where-Object { $_ } | ForEach-Object {
+        $path_dir = Join-Path $dir $_
 
         remove_from_path $path_dir $global
     }
 }
 
-function env_set($manifest, $dir, $global) {
-    if($manifest.env_set) {
-        $manifest.env_set | Get-Member -member noteproperty | ForEach-Object {
+function env_set($manifest, $dir, $global, $arch) {
+    $env_set = arch_specific 'env_set' $manifest $arch
+    if ($env_set) {
+        $env_set | Get-Member -Member NoteProperty | ForEach-Object {
             $name = $_.name;
-            $val = format $manifest.env_set.$($_.name) @{ "dir" = $dir }
+            $val = format $env_set.$($_.name) @{ "dir" = $dir }
             env $name $global $val
             Set-Content env:\$name $val
         }
     }
 }
-function env_rm($manifest, $global) {
-    if($manifest.env_set) {
-        $manifest.env_set | Get-Member -member noteproperty | ForEach-Object {
+function env_rm($manifest, $global, $arch) {
+    $env_set = arch_specific 'env_set' $manifest $arch
+    if ($env_set) {
+        $env_set | Get-Member -Member NoteProperty | ForEach-Object {
             $name = $_.name
             env $name $global $null
-            if(test-path env:\$name) { Remove-Item env:\$name }
+            if (Test-Path env:\$name) { Remove-Item env:\$name }
         }
     }
 }
@@ -1089,11 +1075,11 @@ function prune_installed($apps, $global) {
 
 # check whether the app failed to install
 function failed($app, $global) {
-    $ver = current_version $app $global
-    if(!$ver) { return $false }
-    $info = install_info $app $ver $global
-    if(!$info) { return $true }
-    return $false
+    if (is_directory (appdir $app $global)) {
+        return !(install_info $app (current_version $app $global) $global)
+    } else {
+        return $false
+    }
 }
 
 function ensure_none_failed($apps, $global) {
@@ -1174,7 +1160,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # we don't have persist data in the store, move the source to target, then create link
             } elseif (Test-Path $source) {
                 # ensure target parent folder exist
-                $null = ensure (Split-Path -Path $target)
+                ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
             # we don't have neither source nor target data! we need to crate an empty target,
             # but we can't make a judgement that the data should be a file or directory...
@@ -1209,10 +1195,10 @@ function unlink_persist_data($dir) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
                 # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q $filepath"
+                & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
             } else {
                 # remove the hard link
-                & "$env:COMSPEC" /c "del $filepath"
+                & "$env:COMSPEC" /c "del `"$filepath`""
             }
         }
     }
