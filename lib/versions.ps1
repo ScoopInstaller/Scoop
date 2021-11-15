@@ -181,6 +181,17 @@ function Compare-Version {
                 }
             }
 
+            # If some parts of versions have '_', compare them with delimiter '_'
+            if (($splitReferenceVersion[$i] -match '_') -or ($splitDifferenceVersion[$i] -match '_')) {
+                $Result = Compare-Version -ReferenceVersion $splitReferenceVersion[$i] -DifferenceVersion $splitDifferenceVersion[$i] -Delimiter '_'
+                # If the parts are equal, continue to next part, otherwise return
+                if ($Result -ne 0) {
+                    return $Result
+                } else {
+                    continue
+                }
+            }
+
             # Don't try to compare [Long] to [String]
             if ($null -ne $splitReferenceVersion[$i] -and $null -ne $splitDifferenceVersion[$i]) {
                 if ($splitReferenceVersion[$i] -is [String] -and $splitDifferenceVersion[$i] -isnot [String]) {

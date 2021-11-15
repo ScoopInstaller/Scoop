@@ -51,6 +51,7 @@ Describe 'versions comparison' -Tag 'Scoop' {
             Compare-Version '1.4' '1.3.255.255' | Should -Be -1
             Compare-Version '1.4' '1.4.4' | Should -Be 1
             Compare-Version '1.1.1_8' '1.1.1' | Should -Be -1
+            Compare-Version '1.1.1_8' '1.1.1_9' | Should -Be 1
             Compare-Version '1.1.1b' '1.1.1a' | Should -Be -1
             Compare-Version '1.1.1a' '1.1.1b' | Should -Be 1
             Compare-Version '1.1a2' '1.1a3' | Should -Be 1
