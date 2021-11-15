@@ -52,6 +52,7 @@ Describe 'versions comparison' -Tag 'Scoop' {
             Compare-Version '1.4' '1.4.4' | Should -Be 1
             Compare-Version '1.1.1_8' '1.1.1' | Should -Be -1
             Compare-Version '1.1.1_8' '1.1.1_9' | Should -Be 1
+            Compare-Version '1.1.1_10' '1.1.1_9' | Should -Be -1
             Compare-Version '1.1.1b' '1.1.1a' | Should -Be -1
             Compare-Version '1.1.1a' '1.1.1b' | Should -Be 1
             Compare-Version '1.1a2' '1.1a3' | Should -Be 1
@@ -92,6 +93,7 @@ Describe 'versions comparison' -Tag 'Scoop' {
             Compare-Version '12.0' '12.0' | Should -Be 0
             Compare-Version '7.0.4-9' '7.0.4-9' | Should -Be 0
             Compare-Version 'nightly-20190801' 'nightly' | Should -Be 0
+            Compare-Version 'nightly-20190801' 'nightly-20200801' | Should -Be 0
         }
     }
 }
