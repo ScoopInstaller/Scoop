@@ -213,7 +213,14 @@ while ($in_progress -gt 0) {
     }
 
     if ($jsonpath) {
-        $ver = json_path $page $jsonpath
+        # Return only a single value if regex is absent
+        $json_path_return_single = [String]::IsNullOrEmpty($regex)
+        # If reverse is ON and regex is ON,
+        # Then reverse would have no effect because regex handles reverse
+        # on its own
+        # So in this case we have to disable reverse
+        $json_path_reverse = $reverse -and [String]::IsNullOrEmpty($regex)
+        $ver = json_path $page $jsonpath $null $json_path_reverse $json_path_return_single
         if (!$ver) {
             $ver = json_path_legacy $page $jsonpath
         }
