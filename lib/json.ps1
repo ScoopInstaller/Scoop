@@ -92,31 +92,33 @@ function ConvertToPrettyJson {
     }
 }
 
-function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitutions) {
+function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitutions, [bool] $reverse, [bool] $returnsingle) {
     Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Newtonsoft.Json.dll"
     if ($null -ne $substitutions) {
         $jsonpath = substitute $jsonpath $substitutions ($jsonpath -like "*=~*")
     }
     try {
-        $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)
+        $obj = [Newtonsoft.Json.Linq.JValue]::Parse($json)
     } catch [Newtonsoft.Json.JsonReaderException] {
-        try {
-            $obj = [Newtonsoft.Json.Linq.JArray]::Parse($json)
-        } catch [Newtonsoft.Json.JsonReaderException] {
-            return $null
-        }
-    }
-
-    try {
-        try {
-            $result = $obj.SelectToken($jsonpath, $true)
-        } catch [Newtonsoft.Json.JsonException] {
-            return $null
-        }
-        return $result.ToString()
-    } catch [System.Management.Automation.MethodInvocationException] {
-        write-host -f DarkRed $_
         return $null
+    }
+    try {
+        $result = $obj.SelectTokens($jsonpath, $true)
+        if ($reverse) {
+            # Return versions in reverse order
+            $result = [System.Linq.Enumerable]::Reverse($result)
+        }
+        if ($returnsingle) {
+            # Extract First value
+            $result = [System.Linq.Enumerable]::First($result)
+            # Convert first value to string
+            $result = $result.ToString()
+        } else {
+            $result = "$([String]::Join("\n",$result))"
+        }
+        return $result
+    } catch [Exception] {
+        write-host -f DarkRed $_
     }
 
     return $null
