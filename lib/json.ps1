@@ -118,7 +118,7 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
         }
         return $result
     } catch [Exception] {
-        write-host -f DarkRed $_
+        Write-Host $_ -ForegroundColor DarkRed
     }
 
     return $null
