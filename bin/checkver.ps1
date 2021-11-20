@@ -214,7 +214,7 @@ while ($in_progress -gt 0) {
 
     if ($jsonpath) {
         # Return only a single value if regex is absent
-        $json_path_return_single = [String]::IsNullOrEmpty($regex)
+        $single = [String]::IsNullOrEmpty($regex)
         # If reverse is ON and regex is ON,
         # Then reverse would have no effect because regex handles reverse
         # on its own
