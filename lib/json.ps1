@@ -92,7 +92,7 @@ function ConvertToPrettyJson {
     }
 }
 
-function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitutions, [bool] $reverse, [bool] $returnsingle) {
+function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitutions, [Boolean] $reverse, [Boolean] $single) {
     Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Newtonsoft.Json.dll"
     if ($null -ne $substitutions) {
         $jsonpath = substitute $jsonpath $substitutions ($jsonpath -like "*=~*")
