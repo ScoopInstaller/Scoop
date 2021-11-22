@@ -37,9 +37,11 @@ function is_installed($app, $global) {
     if (installed $app $global) {
         function gf($g) { if ($g) { ' --global' } }
 
-        $version = @(versions $app $global)[-1]
+        $version = Select-CurrentVersion -AppName $app -Global:$global
         if (!(install_info $app $version $global)) {
-            error "It looks like a previous installation of $app failed.`nRun 'scoop uninstall $app$(gf $global)' before retrying the install."
+            warn "Purging previous failed installation of $app."
+            & "$PSScriptRoot\scoop-uninstall.ps1" $app$(gf $global)
+            return $false
         }
         warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(gf $global)' to install a new version."
         return $true
@@ -94,7 +96,8 @@ if ($specific_versions.length -gt 0) {
 $specific_versions_paths = $specific_versions | ForEach-Object {
     $app, $bucket, $version = parse_app $_
     if (installed_manifest $app $version) {
-        abort "'$app' ($version) is already installed.`nUse 'scoop update $app$global_flag' to install a new version."
+        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { " --global" })' to install a new version."
+        continue
     }
 
     generate_user_manifest $app $bucket $version
@@ -114,14 +117,15 @@ $apps, $skip = prune_installed $apps $global
 
 $skip | Where-Object { $explicit_apps -contains $_ } | ForEach-Object {
     $app, $null, $null = parse_app $_
-    $version = @(versions $app $global)[-1]
+    $version = Select-CurrentVersion -AppName $app -Global:$global
     warn "'$app' ($version) is already installed. Skipping."
 }
 
 $suggested = @{ };
-if (Test-Aria2Enabled) {
+if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "Scoop uses 'aria2c' for multi-connection downloads."
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+    warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
 $apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
 

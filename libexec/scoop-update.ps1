@@ -12,6 +12,7 @@
 #   -k, --no-cache            Don't use the download cache
 #   -s, --skip                Skip hash validation (use with caution!)
 #   -q, --quiet               Hide extraneous messages
+#   -a, --all                 Update all apps (alternative to '*')
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\shortcuts.ps1"
@@ -27,7 +28,7 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'gfiksq:' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet'
+$opt, $apps, $err = getopt $args 'gfiksqa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
 if ($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
@@ -35,6 +36,7 @@ $check_hash = !($opt.s -or $opt.skip)
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
+$all = $opt.a -or $opt.all
 
 # load config
 $configRepo = get_config SCOOP_REPO
@@ -154,7 +156,7 @@ function update_scoop() {
 }
 
 function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
-    $old_version = current_version $app $global
+    $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
 
@@ -173,7 +175,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 
-    $version = latest_version $app $bucket $url
+    $version = Get-LatestVersion -AppName $app -Bucket $bucket -Uri $url
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
         $version = nightly_version $(get-date) $quiet
@@ -295,7 +297,7 @@ if (!$apps) {
     $outdated = @()
     $apps_param = $apps
 
-    if ($apps_param -eq '*') {
+    if ($apps_param -eq '*' -or $all) {
         $apps = applist (installed_apps $false) $false
         if ($global) {
             $apps += applist (installed_apps $true) $true
@@ -319,9 +321,10 @@ if (!$apps) {
             }
         }
 
-        if ($outdated -and (Test-Aria2Enabled)) {
+        if ($outdated -and ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true))) {
             warn "Scoop uses 'aria2c' for multi-connection downloads."
             warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+            warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
         }
         if ($outdated.Length -gt 1) {
             write-host -f DarkCyan "Updating $($outdated.Length) outdated apps:"

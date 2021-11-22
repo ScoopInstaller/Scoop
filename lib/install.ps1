@@ -205,7 +205,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
     # aria2 input file
     $urlstxt = Join-Path $cachedir "$app.txt"
     $urlstxt_content = ''
-    $has_downloads = $false
+    $download_finished = $true
 
     # aria2 options
     $options = @(
@@ -225,64 +225,66 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--min-tls-version=TLSv1.2"
         "--stop-with-process=$PID"
         "--continue"
-        "--summary-interval 0"
+        "--summary-interval=0"
+        "--auto-save-interval=1"
     )
 
-    if($cookies) {
+    if ($cookies) {
         $options += "--header='Cookie: $(cookie_header $cookies)'"
     }
 
     $proxy = get_config 'proxy'
-    if($proxy -ne 'none') {
-        if([Net.Webrequest]::DefaultWebProxy.Address) {
+    if ($proxy -ne 'none') {
+        if ([Net.Webrequest]::DefaultWebProxy.Address) {
             $options += "--all-proxy='$([Net.Webrequest]::DefaultWebProxy.Address.Authority)'"
         }
-        if([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
+        if ([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
             $options += "--all-proxy-user='$([Net.Webrequest]::DefaultWebProxy.Credentials.UserName)'"
         }
-        if([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
+        if ([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
             $options += "--all-proxy-passwd='$([Net.Webrequest]::DefaultWebProxy.Credentials.Password)'"
         }
     }
 
     $more_options = get_config 'aria2-options'
-    if($more_options) {
+    if ($more_options) {
         $options += $more_options
     }
 
-    foreach($url in $urls) {
+    foreach ($url in $urls) {
         $data.$url = @{
-            'filename' = url_filename $url
-            'target' = "$dir\$(url_filename $url)"
+            'target'    = "$dir\$(url_filename $url)"
             'cachename' = fname (cache_path $app $version $url)
-            'source' = fullpath (cache_path $app $version $url)
+            'source'    = fullpath (cache_path $app $version $url)
         }
 
-        if(!(test-path $data.$url.source)) {
-            $has_downloads = $true
+        if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
+            Write-Host 'Loading ' -NoNewline
+            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+            Write-Host ' from cache.'
+        } else {
+            $download_finished = $false
             # create aria2 input file content
             $urlstxt_content += "$(handle_special_urls $url)`n"
-            if(!$url.Contains('sourceforge.net')) {
+            if (!$url.Contains('sourceforge.net')) {
                 $urlstxt_content += "    referer=$(strip_filename $url)`n"
             }
             $urlstxt_content += "    dir=$cachedir`n"
             $urlstxt_content += "    out=$($data.$url.cachename)`n"
-        } else {
-            Write-Host "Loading " -NoNewline
-            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
-            Write-Host " from cache."
         }
     }
 
-    if($has_downloads) {
+    if (-not($download_finished)) {
         # write aria2 input file
-        Set-Content -Path $urlstxt $urlstxt_content
+        if ($urlstxt_content -ne '') {
+            Set-Content -Path $urlstxt $urlstxt_content
+        }
 
         # build aria2 command
         $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
-        Write-Host "Starting download with aria2 ..."
+        Write-Host 'Starting download with aria2 ...'
 
         Invoke-Expression $aria2 | ForEach-Object {
             # Skip blank lines
@@ -311,50 +313,52 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             error $urlstxt_content
             error $aria2
-            abort $(new_issue_msg $app $bucket "download via aria2 failed")
+            abort $(new_issue_msg $app $bucket 'download via aria2 failed')
         }
 
         # remove aria2 input file when done
-        if(test-path($urlstxt)) {
-            Remove-Item $urlstxt
+        if (Test-Path $urlstxt, "$($data.$url.source).aria2*") {
+            Remove-Item $urlstxt -Force -ErrorAction SilentlyContinue
+            Remove-Item "$($data.$url.source).aria2*" -Force -ErrorAction SilentlyContinue
         }
     }
 
-    foreach($url in $urls) {
+    foreach ($url in $urls) {
 
         $metalink_filename = get_filename_from_metalink $data.$url.source
-        if($metalink_filename) {
+        if ($metalink_filename) {
             Remove-Item $data.$url.source -Force
             Rename-Item -Force (Join-Path -Path $cachedir -ChildPath $metalink_filename) $data.$url.source
         }
 
         # run hash checks
-        if($check_hash) {
+        if ($check_hash) {
             $manifest_hash = hash_for_url $manifest $url $architecture
             $ok, $err = check_hash $data.$url.source $manifest_hash $(show_app $app $bucket)
-            if(!$ok) {
+            if (!$ok) {
                 error $err
-                if(test-path $data.$url.source) {
+                if (Test-Path $data.$url.source) {
                     # rm cached file
-                    Remove-Item -force $data.$url.source
+                    Remove-Item $data.$url.source -Force -ErrorAction SilentlyContinue
+                    Remove-Item "$($data.$url.source).aria2*" -Force -ErrorAction SilentlyContinue
                 }
-                if($url.Contains('sourceforge.net')) {
+                if ($url.Contains('sourceforge.net')) {
                     Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
-                abort $(new_issue_msg $app $bucket "hash check failed")
+                abort $(new_issue_msg $app $bucket 'hash check failed')
             }
         }
 
         # copy or move file to target location
-        if(!(test-path $data.$url.source) ) {
-            abort $(new_issue_msg $app $bucket "cached file not found")
+        if (!(Test-Path $data.$url.source) ) {
+            abort $(new_issue_msg $app $bucket 'cached file not found')
         }
 
-        if(!($dir -eq $cachedir)) {
-            if($use_cache) {
+        if (!($dir -eq $cachedir)) {
+            if ($use_cache) {
                 Copy-Item $data.$url.source $data.$url.target
             } else {
-                Move-Item $data.$url.source $data.$url.target -force
+                Move-Item $data.$url.source $data.$url.target -Force
             }
         }
     }
@@ -596,6 +600,8 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             } else {
                 $extract_fn = 'Expand-MsiArchive'
             }
+        } elseif(Test-ZstdRequirement -File $fname) { # Zstd first
+            $extract_fn = 'Expand-ZstdArchive'
         } elseif(Test-7zipRequirement -File $fname) { # 7zip
             $extract_fn = 'Expand-7zipArchive'
         }

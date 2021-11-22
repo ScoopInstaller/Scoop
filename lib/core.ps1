@@ -243,7 +243,7 @@ function Get-HelperPath {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -265,6 +265,7 @@ function Get-HelperPath {
             }
         }
         'Aria2' { $HelperPath = Get-AppFilePath 'aria2' 'aria2c.exe' }
+        'Zstd' { $HelperPath = Get-AppFilePath 'zstd' 'zstd.exe' }
     }
 
     return $HelperPath
@@ -274,7 +275,7 @@ function Test-HelperInstalled {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -289,7 +290,7 @@ function Test-Aria2Enabled {
 function app_status($app, $global) {
     $status = @{}
     $status.installed = (installed $app $global)
-    $status.version = current_version $app $global
+    $status.version = Select-CurrentVersion -AppName $app -Global:$global
     $status.latest_version = $status.version
 
     $install_info = install_info $app $status.version $global
@@ -299,13 +300,17 @@ function app_status($app, $global) {
 
     $manifest = manifest $app $install_info.bucket $install_info.url
     $status.removed = (!$manifest)
-    if($manifest.version) {
+    if ($manifest.version) {
         $status.latest_version = $manifest.version
     }
 
     $status.outdated = $false
-    if($status.version -and $status.latest_version) {
-        $status.outdated = ((compare_versions $status.latest_version $status.version) -gt 0)
+    if ($status.version -and $status.latest_version) {
+        if (get_config 'force-update' $false) {
+            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
+        } else {
+            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)
+        }
     }
 
     $status.missing_deps = @()
@@ -313,8 +318,8 @@ function app_status($app, $global) {
         $app, $bucket, $null = parse_app $_
         return !(installed $app)
     }
-    if($deps) {
-        $status.missing_deps += ,$deps
+    if ($deps) {
+        $status.missing_deps += , $deps
     }
 
     return $status
@@ -614,6 +619,7 @@ function get_shim_path() {
     switch ($shim_version) {
         '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
         'kiennq' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"; Break }
+        'rshim' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\rshim\shim.exe"; Break }
         'default' { Break }
         default { warn "Unknown shim version: '$shim_version'" }
     }
@@ -851,18 +857,27 @@ function is_scoop_outdated() {
 }
 
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
-    if ($entity -is [Array]) {
-        return $entity | ForEach-Object { substitute $_ $params $regexEscape}
-    } elseif ($entity -is [String]) {
-        $params.GetEnumerator() | ForEach-Object {
-            if($regexEscape -eq $false -or $null -eq $_.Value) {
-                $entity = $entity.Replace($_.Name, $_.Value)
-            } else {
-                $entity = $entity.Replace($_.Name, [Regex]::Escape($_.Value))
+    $newentity = $entity
+    if ($null -ne $newentity) {
+        switch ($entity.GetType().Name) {
+            'String' {
+                $params.GetEnumerator() | ForEach-Object {
+                    if ($regexEscape -eq $false -or $null -eq $_.Value) {
+                        $newentity = $newentity.Replace($_.Name, $_.Value)
+                    } else {
+                        $newentity = $newentity.Replace($_.Name, [Regex]::Escape($_.Value))
+                    }
+                }
+            }
+            'Object[]' {
+                $newentity = $entity | ForEach-Object { ,(substitute $_ $params $regexEscape) }
+            }
+            'PSCustomObject' {
+                $newentity.PSObject.Properties | ForEach-Object { $_.Value = substitute $_.Value $params $regexEscape }
             }
         }
-        return $entity
     }
+    return $newentity
 }
 
 function format_hash([String] $hash) {

@@ -94,7 +94,7 @@ Get-Event | ForEach-Object {
 $Queue | ForEach-Object {
     $name, $json = $_
 
-    $substitutions = get_version_substitutions $json.version
+    $substitutions = Get-VersionSubstitution $json.version
 
     $wc = New-Object Net.Webclient
     if ($json.checkver.useragent) {
@@ -292,7 +292,7 @@ while ($in_progress -gt 0) {
 
     Write-Host $ver -ForegroundColor DarkRed -NoNewline
     Write-Host " (scoop version is $expected_ver)" -NoNewline
-    $update_available = (compare_versions $expected_ver $ver) -eq -1
+    $update_available = (Compare-Version -ReferenceVersion $ver -DifferenceVersion $expected_ver) -ne 0
 
     if ($json.autoupdate -and $update_available) {
         Write-Host ' autoupdate available' -ForegroundColor Cyan
@@ -311,7 +311,7 @@ while ($in_progress -gt 0) {
             if ($Version -ne "") {
                 $ver = $Version
             }
-            autoupdate $App $Dir $json $ver $matchesHashtable
+            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
         }

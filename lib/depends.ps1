@@ -70,6 +70,9 @@ function script_deps($script) {
     if($script -like '*Expand-DarkArchive *') {
         $deps += 'dark'
     }
+    if ($script -like '*Expand-ZstdArchive *') {
+        $deps += 'zstd'
+    }
 
     return $deps
 }
@@ -85,6 +88,9 @@ function install_deps($manifest, $arch) {
     }
     if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
         $deps += 'innounp'
+    }
+    if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -URL (url $manifest $arch))) {
+        $deps += 'zstd'
     }
 
     $pre_install = arch_specific 'pre_install' $manifest $arch
