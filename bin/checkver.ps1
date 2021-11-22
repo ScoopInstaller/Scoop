@@ -219,8 +219,7 @@ while ($in_progress -gt 0) {
         # Then reverse would have no effect because regex handles reverse
         # on its own
         # So in this case we have to disable reverse
-        $reverse = $reverse -and $single
-        $ver = json_path $page $jsonpath $null $reverse $single
+        $ver = json_path $page $jsonpath $null ($reverse -and $noregex) $noregex
         if (!$ver) {
             $ver = json_path_legacy $page $jsonpath
         }
