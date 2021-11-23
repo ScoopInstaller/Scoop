@@ -278,7 +278,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     install_app $app $architecture $global $suggested $use_cache $check_hash
 }
 
-if (!$apps) {
+if (-not ($apps -or $all)) {
     if ($global) {
         "scoop update: --global is invalid when <app> is not specified."; exit 1
     }
