@@ -28,7 +28,7 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'gfiksqa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
+$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
 if ($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
