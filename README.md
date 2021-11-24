@@ -162,4 +162,4 @@ scoop bucket add extras
 
 ## Other application buckets
 
-Many other application buckets hosted on Github can be found in the [Scoop Directory](https://github.com/rasa/scoop-directory).
+Many other application buckets hosted on Github can be found in the [Scoop Directory](https://rasa.github.io/scoop-directory/) or via [other search engines](https://rasa.github.io/scoop-directory/#other-search-engines).
