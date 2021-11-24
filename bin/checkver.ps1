@@ -114,6 +114,7 @@ $Queue | ForEach-Object {
     $jsonpath = ''
     $xpath = ''
     $replace = ''
+    $msys = @()
 
     if ($json.checkver -eq 'github') {
         if (!$json.homepage.StartsWith('https://github.com/')) {
@@ -149,6 +150,20 @@ $Queue | ForEach-Object {
         $replace = $json.checkver.replace
     }
 
+    if ($json.checkver.msys -and $json.checkver.msys -is [array]) {
+        # Allow users to setup alternate MSYS repos
+        if (!$json.checkver.url) {
+            $url = "https://repo.msys2.org/msys/x86_64/"
+        }
+        # Allow users to support other regexes
+        # The ScoopMSYSSubstituteAppName is replaced by an app name
+        # Name has to be chosen to ensure minimum clashes
+        if (!$regex) {
+            $regex = "<a href=""ScoopMSYSSubstituteAppName-(?<version>\d[\w.-]+)-(x86_64|i686|any).pkg.tar.(xz|zst).sig"""
+        }
+        $msys = $json.checkver.msys
+    }
+
     if (!$jsonpath -and !$regex -and !$xpath) {
         $regex = $json.checkver
     }
@@ -166,6 +181,7 @@ $Queue | ForEach-Object {
         xpath    = $xpath;
         reverse  = $reverse;
         replace  = $replace;
+        msys = $msys;
     }
 
     $wc.Headers.Add('Referer', (strip_filename $url))
@@ -250,7 +266,23 @@ while ($in_progress -gt 0) {
         $ver = ''
     }
 
-    if ($regexp) {
+    if ($msys) {
+        $ver = ''
+        $matchesHashtable = @{}
+        $msys | ForEach-Object{
+            $regexp_msys = $regexp.Replace('ScoopMSYSSubstituteAppName', $_)
+            $regex_msys = New-Object System.Text.RegularExpressions.Regex($regexp_msys)
+            $match = $regex_msys.Matches($page) | Select-Object -Last 1
+            if ($match -and $match.Success) {
+                $msys_app_ver = $match.Groups['version'].Value
+                $matchesHashtable.Add($_, $msys_app_ver)
+                $ver += "$msys_app_ver-"
+            }
+        }
+        $ver = $ver.TrimEnd('-')
+    }
+
+    if ($regexp -and !$msys) {
         $regex = New-Object System.Text.RegularExpressions.Regex($regexp)
         if ($reverse) {
             $match = $regex.Matches($page) | Select-Object -Last 1
