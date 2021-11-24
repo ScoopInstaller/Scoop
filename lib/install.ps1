@@ -9,10 +9,6 @@ function nightly_version($date, $quiet = $false) {
     "nightly-$date_str"
 }
 
-function Test-ManifestReviewEnabled {
-    return get_config 'manifest-review' $false
-}
-
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $bucket, $null = parse_app $app
     $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
@@ -38,7 +34,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         return
     }
 
-    if (Test-ManifestReviewEnabled) {
+    if (get_config 'manifest-review' $false) {
         $show_manifest = read-host -Prompt "Show manifest? [y/N]"
         if ($show_manifest -eq "y") {
             write-output "manifest:"
