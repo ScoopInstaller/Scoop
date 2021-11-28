@@ -628,11 +628,11 @@ powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$l
 }
 
 function get_shim_path() {
-    $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"
+    $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"
     $shim_version = get_config 'shim' 'default'
     switch ($shim_version) {
         '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
-        'kiennq' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"; Break }
+        'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
         'rshim' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\rshim\shim.exe"; Break }
         'default' { Break }
         default { warn "Unknown shim version: '$shim_version'" }
