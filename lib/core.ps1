@@ -523,24 +523,36 @@ function movedir($from, $to) {
     }
 }
 
-# deprecated function
-function get_app_name_from_ps1_shim($shim_ps1) {
-    if (!(Test-Path($shim_ps1))) {
-        return ''
-    }
-    $content = (Get-Content $shim_ps1 -Encoding utf8) -join ' '
-    if ($content -match '([^/\\]+)[/\\]current[/\\]') {
+function get_app_name($path) {
+    if ($path -match '([^/\\]+)[/\\]current[/\\]') {
         return $matches[1].tolower()
     }
     return ''
+}
+
+function get_app_name_from_ext_shim($shim_ext) {
+    if (!(Test-Path($shim_ext))) {
+        return ''
+    }
+    $content = if ([System.IO.Path]::GetExtension($shim_ext) -eq '.exe') {
+        (Get-Content $shim_ext.Replace('.exe', '.shim') -Encoding utf8) -join ' '
+    } else {
+        (Get-Content $shim_ext -Encoding utf8) -join ' '
+    }
+    return get_app_name $content
 }
 
 function warn_on_overwrite($shim_ext, $path) {
     if (!(Test-Path($shim_ext))) {
         return
     }
+    $shim_app = get_app_name_from_ext_shim $shim_ext
+    $path_app = get_app_name $path
+    if ($shim_app -eq $path_app) {
+        return
+    }
     $filename = [System.IO.Path]::GetFileName($path)
-    warn "Overwriting already existing shim $filename"
+    warn "Overwriting shim to $filename installed from $shim_app"
 }
 
 function shim($path, $global, $name, $arg) {
