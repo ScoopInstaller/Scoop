@@ -628,7 +628,7 @@ powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$l
         if ($gitdir.FullName -imatch 'mingw') {
           $gitdir = $gitdir.Parent
         }
-        "@$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe') `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
+        "@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
         warn_on_overwrite $shim $path
         "#!/bin/sh`n`"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
