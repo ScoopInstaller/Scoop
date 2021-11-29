@@ -534,11 +534,7 @@ function get_app_name_from_ext_shim($shim_ext) {
     if (!(Test-Path($shim_ext))) {
         return ''
     }
-    $content = if ([System.IO.Path]::GetExtension($shim_ext) -eq '.exe') {
-        (Get-Content $shim_ext.Replace('.exe', '.shim') -Encoding utf8) -join ' '
-    } else {
-        (Get-Content $shim_ext -Encoding utf8) -join ' '
-    }
+    $content = (Get-Content $shim_ext -Encoding utf8) -join ' '
     return get_app_name $content
 }
 
@@ -570,7 +566,7 @@ function shim($path, $global, $name, $arg) {
 
     if($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
-        warn_on_overwrite "$shim.exe" $path
+        warn_on_overwrite "$shim.shim" $path
         Copy-Item (get_shim_path) "$shim.exe" -force
         write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
         if($arg) {
