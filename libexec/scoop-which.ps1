@@ -19,10 +19,12 @@ $path = "$($gcm.path)"
 $usershims = "$(resolve-path $(shimdir $false))"
 $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
 
-if($path.endswith(".ps1") -and ($path -like "$usershims*" -or $path -like "$globalshims*")) {
-    $shimtext = Get-Content $path
-
-    $exepath = ($shimtext | Where-Object { $_.startswith('$path') }).split(' ') | Select-Object -Last 1 | Invoke-Expression
+if($path -like "$usershims*" -or $path -like "$globalshims*") {
+    $exepath = if ($path.endswith(".exe")) {
+        (Get-Content "$(join-path ([system.io.fileinfo]$path).DirectoryName ([system.io.fileinfo]$path).BaseName).shim").split(' ') | Select-Object -Index 2
+    } elseif ($path.endswith(".ps1")) {
+        (Get-Content $path | Where-Object { $_.startswith('$path') }).split(' ') | Select-Object -Last 1 | Invoke-Expression
+    }
 
     if(![system.io.path]::ispathrooted($exepath)) {
         # Expand relative path
