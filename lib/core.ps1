@@ -598,8 +598,6 @@ if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$p
         }
         $ps1text | out-file "$shim.ps1" -encoding utf8
 
-        # TODO: Find a way to determine if pwsh.exe exists, and use that in the following batch and bash scripts
-
         # make ps1 accessible from cmd.exe
         warn_on_overwrite "$shim.cmd" $path
         "@rem $resolved_path
@@ -612,12 +610,21 @@ set args=%args:(=``(%
 set args=%args:)=``)%
 set invalid=`"='
 if !args! == !invalid! ( set args= )
-powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
+where /q pwsh.exe
+if %errorlevel% equ 0 (
+    pwsh -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"
+) else (
+    powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"
+)" | out-file "$shim.cmd" -encoding ascii
 
         warn_on_overwrite $shim $path
         "#!/bin/sh
 # $resolved_path
-powershell.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+if command -v pwsh.exe &> /dev/null; then
+    pwsh.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"
+else
+    powershell.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"
+fi" | out-file $shim -encoding ascii
     } elseif($path -match '\.jar$') {
         warn_on_overwrite "$shim.cmd" $path
         "@rem $resolved_path
