@@ -575,28 +575,35 @@ function shim($path, $global, $name, $arg) {
     } elseif($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
         warn_on_overwrite "$shim.cmd" $path
-        "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
+        "@rem $resolved_path
+@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
         warn_on_overwrite $shim $path
-        "#!/bin/sh`nMSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        "#!/bin/sh
+# $resolved_path
+MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.ps1$') {
         # if $path points to another drive resolve-path prepends .\ which could break shims
         warn_on_overwrite "$shim.ps1" $path
-        if($relative_path -match "^(.\\[\w]:).*$") {
-            "`$path = `"$path`""                                                                               | out-file "$shim.ps1" -encoding utf8
-            "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
+        $ps1text = if($relative_path -match "^(.\\[\w]:).*$") {
+            "# $resolved_path
+`$path = `"$path`"
+if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }"
         } else {
             # Setting PSScriptRoot in Shim if it is not defined, so the shim doesn't break in PowerShell 2.0
-            "if (!(Test-Path Variable:PSScriptRoot)) { `$PSScriptRoot = Split-Path `$MyInvocation.MyCommand.Path -Parent }" | out-file "$shim.ps1" -encoding utf8
-            "`$path = join-path `"`$psscriptroot`" `"$relative_path`""                                                      | out-file "$shim.ps1" -encoding utf8 -append
-            "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }"              | out-file "$shim.ps1" -encoding utf8 -append
+            "# $resolved_path
+if (!(Test-Path Variable:PSScriptRoot)) { `$PSScriptRoot = Split-Path `$MyInvocation.MyCommand.Path -Parent }
+`$path = join-path `"`$psscriptroot`" `"$relative_path`"
+if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }"
         }
+        $ps1text | out-file "$shim.ps1" -encoding utf8
 
         # TODO: Find a way to determine if pwsh.exe exists, and use that in the following batch and bash scripts
 
         # make ps1 accessible from cmd.exe
         warn_on_overwrite "$shim.cmd" $path
-        "@echo off
+        "@rem $resolved_path
+@echo off
 setlocal enabledelayedexpansion
 set args=%*
 :: replace problem characters in arguments
@@ -608,19 +615,27 @@ if !args! == !invalid! ( set args= )
 powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
 
         warn_on_overwrite $shim $path
-        "#!/bin/sh`npowershell.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        "#!/bin/sh
+# $resolved_path
+powershell.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.jar$') {
         warn_on_overwrite "$shim.cmd" $path
-        "@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
+        "@rem $resolved_path
+@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
         warn_on_overwrite $shim $path
-        "#!/bin/sh`njava -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        "#!/bin/sh
+# $resolved_path
+java -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } elseif($path -match '\.py$') {
         warn_on_overwrite "$shim.cmd" $path
-        "@python `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
+        "@rem $resolved_path
+@python `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
         warn_on_overwrite $shim $path
-        "#!/bin/sh`npython `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        "#!/bin/sh
+# $resolved_path
+python `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     } else {
         warn_on_overwrite "$shim.cmd" $path
         # find path to Git's bash so that batch scripts can run bash scripts
@@ -628,10 +643,13 @@ powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$l
         if ($gitdir.FullName -imatch 'mingw') {
           $gitdir = $gitdir.Parent
         }
-        "@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
+        "@rem $resolved_path
+@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
 
         warn_on_overwrite $shim $path
-        "#!/bin/sh`n`"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        "#!/bin/sh
+# $resolved_path
+`"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
     }
 }
 
