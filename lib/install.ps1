@@ -988,11 +988,16 @@ function find_dir_or_subdir($path, $dir) {
 
 function env_add_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
+    $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
         # GH-3785: Add path in ascending order.
         [Array]::Reverse($env_add_path)
         $env_add_path | Where-Object { $_ } | ForEach-Object {
-            $path_dir = Join-Path $dir $_
+            if ($_ -eq '.') {
+                $path_dir = $dir
+            } else {
+                $path_dir = Join-Path $dir $_
+            }
 
             if (!(is_in_dir $dir $path_dir)) {
                 abort "Error in manifest: env_add_path '$_' is outside the app directory."
