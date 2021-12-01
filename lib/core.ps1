@@ -588,13 +588,15 @@ MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`"" | out-file $sh
         $ps1text = if($relative_path -match "^(.\\[\w]:).*$") {
             "# $resolved_path
 `$path = `"$path`"
-if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }"
+if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }
+exit `$lastexitcode"
         } else {
             # Setting PSScriptRoot in Shim if it is not defined, so the shim doesn't break in PowerShell 2.0
             "# $resolved_path
 if (!(Test-Path Variable:PSScriptRoot)) { `$PSScriptRoot = Split-Path `$MyInvocation.MyCommand.Path -Parent }
 `$path = join-path `"`$psscriptroot`" `"$relative_path`"
-if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }"
+if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }
+exit `$lastexitcode"
         }
         $ps1text | out-file "$shim.ps1" -encoding utf8
 
