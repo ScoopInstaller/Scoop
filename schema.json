@@ -220,6 +220,9 @@
                 },
                 "persist": {
                     "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },                
+                "license": {
+                    "$ref": "#/definitions/license"
                 },
                 "note": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -613,7 +616,10 @@
         }
     },
     "required": [
-        "version"
+        "version",
+        "description",
+        "homepage",
+        "license"
     ],
     "title": "scoop app manifest schema",
     "type": "object"
