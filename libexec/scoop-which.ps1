@@ -21,12 +21,12 @@ $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
 
 if($path -like "$usershims*" -or $path -like "$globalshims*") {
     $exepath = if ($path.endswith(".exe") -or $path.endswith(".shim")) {
-        (Get-Content "$(join-path ([system.io.fileinfo]$path).DirectoryName ([system.io.fileinfo]$path).BaseName).shim" | Select-Object -First 1).replace('path = ', '')
+        (Get-Content ($path -replace '\.exe$', '.shim') | Select-Object -First 1).replace('path = ', '')
     } else {
         ((Select-String -Path $path -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
     }
     if (!$exepath) {
-        $exepath = (Get-Content $path | Where-Object { $_.startswith('$path') }).split(' ') | Select-Object -Last 1 | Invoke-Expression
+        $exepath = ((Select-String -Path $path -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
     }
 
     if(![system.io.path]::ispathrooted($exepath)) {

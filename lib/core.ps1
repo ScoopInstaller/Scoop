@@ -547,7 +547,7 @@ function warn_on_overwrite($shim_ext, $path) {
     if ($shim_app -eq $path_app) {
         return
     }
-    $filename = [System.IO.Path]::GetFileName($path)
+    $filename = [System.IO.Path]::GetFileName($path) -replace '\.shim$', '.exe'
     warn "Overwriting shim to $filename installed from $shim_app"
 }
 
