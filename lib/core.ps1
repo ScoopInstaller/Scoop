@@ -615,9 +615,9 @@ set invalid=`"='
 if !args! == !invalid! ( set args= )
 where /q pwsh.exe
 if %errorlevel% equ 0 (
-    pwsh -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"
+    pwsh -noprofile -ex unrestricted -command `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"
 ) else (
-    powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"
+    powershell -noprofile -ex unrestricted -command `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"
 )" | Out-File "$shim.cmd" -Encoding ASCII
 
         warn_on_overwrite $shim $path
