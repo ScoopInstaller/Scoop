@@ -624,9 +624,9 @@ if %errorlevel% equ 0 (
         "#!/bin/sh
 # $resolved_path
 if command -v pwsh.exe &> /dev/null; then
-    pwsh.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"
+    pwsh.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"
 else
-    powershell.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"
+    powershell.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"
 fi" | Out-File $shim -Encoding ASCII
     } elseif ($path -match '\.jar$') {
         warn_on_overwrite "$shim.cmd" $path
