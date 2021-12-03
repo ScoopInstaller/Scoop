@@ -74,6 +74,7 @@ param(
 
 $Dir = Resolve-Path $Dir
 $Search = $App
+$GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
 
 # get apps to check
 $Queue = @()
@@ -114,18 +115,21 @@ $Queue | ForEach-Object {
     $jsonpath = ''
     $xpath = ''
     $replace = ''
+    $useGithubAPI = $false
 
     if ($json.checkver -eq 'github') {
         if (!$json.homepage.StartsWith('https://github.com/')) {
             error "$name checkver expects the homepage to be a github repository"
         }
-        $url = $json.homepage + '/releases/latest'
+        $url = $json.homepage.TrimEnd('/') + '/releases/latest'
         $regex = $githubRegex
+        $useGithubAPI = $true
     }
 
     if ($json.checkver.github) {
-        $url = $json.checkver.github + '/releases/latest'
+        $url = $json.checkver.github.TrimEnd('/') + '/releases/latest'
         $regex = $githubRegex
+        if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
     }
 
     if ($json.checkver.re) {
@@ -154,6 +158,13 @@ $Queue | ForEach-Object {
     }
 
     $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq 'true'
+
+    if ($url -like '*api.github.com/*') { $useGithubAPI = $true }
+
+    if ($useGithubAPI -and ($null -ne $GitHubToken)) {
+        $url = $url -replace '//(www\.)?github.com/', '//api.github.com/repos/'
+        $wc.Headers.Add('Authorization', "token $GitHubToken")
+    }
 
     $url = substitute $url $substitutions
 
