@@ -74,7 +74,7 @@ param(
 
 $Dir = Resolve-Path $Dir
 $Search = $App
-$GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkverToken') | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # get apps to check
 $Queue = @()
@@ -129,7 +129,6 @@ $Queue | ForEach-Object {
     if ($json.checkver.github) {
         $url = $json.checkver.github.TrimEnd('/') + '/releases/latest'
         $regex = $githubRegex
-        # !!!
         if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
     }
 
