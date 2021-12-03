@@ -74,7 +74,7 @@ param(
 
 $Dir = Resolve-Path $Dir
 $Search = $App
-$GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
 
 # get apps to check
 $Queue = @()
