@@ -177,7 +177,7 @@ $Queue | ForEach-Object {
         $url = $url + '?path=' + $json.checkver.sourceforge.path
     }
 
-    if($json.checkver.re) {
+    if ($json.checkver.re) {
         $regex = $json.checkver.re
     }
     if ($json.checkver.regex) {
