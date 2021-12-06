@@ -89,7 +89,7 @@ function install_deps($manifest, $arch) {
     if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
         $deps += 'innounp'
     }
-    if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -URL (url $manifest $arch))) {
+    if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -URL (script:url $manifest $arch))) {
         $deps += 'zstd'
     }
 

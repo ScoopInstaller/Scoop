@@ -870,18 +870,9 @@ function create_shims($manifest, $dir, $global, $arch) {
 }
 
 function rm_shim($name, $shimdir) {
-    $shim = "$shimdir\$name.ps1"
-
-    if(!(test-path $shim)) { # handle no shim from failed install
-        warn "Shim for '$name' is missing. Skipping."
-    } else {
-        write-output "Removing shim for '$name'."
-        Remove-Item $shim
-    }
-
-    # other shim types might be present
-    '', '.exe', '.shim', '.cmd' | ForEach-Object {
+    '', '.exe', '.shim', '.cmd', '.ps1' | ForEach-Object {
         if(test-path -Path "$shimdir\$name$_" -PathType leaf) {
+            Write-Output "Removing shim '$name$_'."
             Remove-Item "$shimdir\$name$_"
         }
     }
@@ -988,11 +979,16 @@ function find_dir_or_subdir($path, $dir) {
 
 function env_add_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
+    $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
         # GH-3785: Add path in ascending order.
         [Array]::Reverse($env_add_path)
         $env_add_path | Where-Object { $_ } | ForEach-Object {
-            $path_dir = Join-Path $dir $_
+            if ($_ -eq '.') {
+                $path_dir = $dir
+            } else {
+                $path_dir = Join-Path $dir $_
+            }
 
             if (!(is_in_dir $dir $path_dir)) {
                 abort "Error in manifest: env_add_path '$_' is outside the app directory."
@@ -1076,7 +1072,7 @@ function prune_installed($apps, $global) {
 # check whether the app failed to install
 function failed($app, $global) {
     if (is_directory (appdir $app $global)) {
-        return !(install_info $app (current_version $app $global) $global)
+        return !(install_info $app (Select-CurrentVersion -AppName $app -Global:$global) $global)
     } else {
         return $false
     }
