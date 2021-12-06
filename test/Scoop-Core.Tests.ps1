@@ -221,7 +221,7 @@ describe "rm_shim" -Tag 'Scoop' {
     }
 }
 
-Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
+Describe "get_app_name_from_shim" -Tag 'Scoop' {
     BeforeAll {
         $working_dir = setup_working "shim"
         $shimdir = shimdir
@@ -229,7 +229,7 @@ Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
     }
 
     It "returns empty string if file does not exist" -skip:$isUnix {
-        get_app_name_from_ps1_shim "non-existent-file" | should -be ""
+        get_app_name_from_shim "non-existent-file" | should -be ""
     }
 
     It "returns app name if file exists and is a shim to an app" -skip:$isUnix {
@@ -237,12 +237,12 @@ Describe "get_app_name_from_ps1_shim" -Tag 'Scoop' {
         Write-Output "" | Out-File "$working_dir/mockapp/current/mockapp.ps1"
         shim "$working_dir/mockapp/current/mockapp.ps1" $false "shim-test"
         $shim_path = (get-command "shim-test.ps1").Path
-        get_app_name_from_ps1_shim "$shim_path" | should -be "mockapp"
+        get_app_name_from_shim "$shim_path" | should -be "mockapp"
     }
 
     It "returns empty string if file exists and is not a shim" -skip:$isUnix {
         Write-Output "lorem ipsum" | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
-        get_app_name_from_ps1_shim "$working_dir/mock-shim.ps1" | should -be ""
+        get_app_name_from_shim "$working_dir/mock-shim.ps1" | should -be ""
     }
 
     AfterEach {
@@ -269,7 +269,7 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
             ensure_robocopy_in_path
 
-            "$shimdir/robocopy.ps1" | should -exist
+            # "$shimdir/robocopy.ps1" | should -exist
             "$shimdir/robocopy.exe" | should -exist
 
             # clean up
@@ -284,7 +284,7 @@ describe "ensure_robocopy_in_path" -Tag 'Scoop' {
 
             ensure_robocopy_in_path
 
-            "$shimdir/robocopy.ps1" | should -not -exist
+            # "$shimdir/robocopy.ps1" | should -not -exist
             "$shimdir/robocopy.exe" | should -not -exist
         }
     }
