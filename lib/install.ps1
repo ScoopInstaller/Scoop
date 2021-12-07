@@ -35,17 +35,14 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     }
 
     if (get_config 'manifest-review' $false) {
-        $show_manifest = read-host -Prompt "Show manifest? [y/N]"
-        if ($show_manifest -eq "y") {
-            write-output "manifest:"
-            write-output $manifest | ConvertToPrettyJson
-            $answer = read-host -Prompt "Continue installation? [Y/n]"
-
-            if ($answer -eq "n") {
-                return
-            }
+        Write-Output 'Manifest:'
+        Write-Output $manifest | ConvertToPrettyJson
+        $answer = Read-Host -Prompt "Continue installation? [Y/n]"
+        if (($answer -eq 'n') -or ($answer -eq 'N')) {
+            return
         }
     }
+    write-output "Installing '$app' ($version) [$architecture]"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
