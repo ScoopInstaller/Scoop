@@ -2,19 +2,21 @@
 .SYNOPSIS
     Updates manifests and pushes them or creates pull-requests.
 .DESCRIPTION
-    Updates manifests and pushes them directly to the master branch or creates pull-requests for upstream.
+    Updates manifests and pushes them directly to the origin branch or creates pull-requests for upstream.
 .PARAMETER Upstream
     Upstream repository with the target branch.
     Must be in format '<user>/<repo>:<branch>'
+.PARAMETER OriginBranch
+    Origin (local) branch name.
 .PARAMETER App
     Manifest name to search.
     Placeholders are supported.
 .PARAMETER Dir
     The directory where to search for manifests.
 .PARAMETER Push
-    Push updates directly to 'origin master'.
+    Push updates directly to 'origin branch'.
 .PARAMETER Request
-    Create pull-requests on 'upstream master' for each update.
+    Create pull-requests on 'upstream branch' for each update.
 .PARAMETER Help
     Print help to console.
 .PARAMETER SpecialSnowflakes
@@ -37,6 +39,7 @@ param(
         $true
     })]
     [String] $Upstream,
+    [String] $OriginBranch = 'master',
     [String] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
@@ -65,12 +68,12 @@ if ((!$Push -and !$Request) -or $Help) {
 Usage: auto-pr.ps1 [OPTION]
 
 Mandatory options:
-  -p,  -push                       push updates directly to 'origin master'
-  -r,  -request                    create pull-requests on 'upstream master' for each update
+  -p,  -push                       push updates directly to 'origin branch'
+  -r,  -request                    create pull-requests on 'upstream branch' for each update
 
 Optional options:
   -u,  -upstream                   upstream repository with target branch
-                                   only used if -r is set (default: lukesampson/scoop:master)
+  -o,  -originbranch               origin (local) branch name
   -h,  -help
 '@
     exit 0
@@ -104,7 +107,7 @@ function pull_requests($json, [String] $app, [String] $upstream, [String] $manif
     $homepage = $json.homepage
     $branch = "manifest/$app-$version"
 
-    execute 'hub checkout master'
+    execute "hub checkout $OriginBranch"
     Write-Host "hub rev-parse --verify $branch" -ForegroundColor Green
     hub rev-parse --verify $branch
 
@@ -141,7 +144,7 @@ a new version of [$app]($homepage) is available.
 | New version | $version        |
 "@
 
-    hub pull-request -m "$msg" -b '$upstream' -h '$branch'
+    hub pull-request -m "$msg" -b "$upstream" -h "$branch"
     if ($LASTEXITCODE -gt 0) {
         execute 'hub reset'
         abort "Pull Request failed! (hub pull-request -m '${app}: Update to version $version' -b '$upstream' -h '$branch')"
@@ -150,11 +153,11 @@ a new version of [$app]($homepage) is available.
 
 Write-Host 'Updating ...' -ForegroundColor DarkCyan
 if ($Push) {
-    execute 'hub pull origin master'
-    execute 'hub checkout master'
+    execute "hub pull origin $OriginBranch"
+    execute "hub checkout $OriginBranch"
 } else {
-    execute 'hub pull upstream master'
-    execute 'hub push origin master'
+    execute "hub pull upstream $OriginBranch"
+    execute "hub push origin $OriginBranch"
 }
 
 . "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update -SkipUpdated:$SkipUpdated
@@ -198,10 +201,10 @@ hub diff --name-only | ForEach-Object {
 
 if ($Push) {
     Write-Host 'Pushing updates ...' -ForegroundColor DarkCyan
-    execute 'hub push origin master'
+    execute "hub push origin $OriginBranch"
 } else {
-    Write-Host 'Returning to master branch and removing unstaged files ...' -ForegroundColor DarkCyan
-    execute 'hub checkout -f master'
+    Write-Host "Returning to $OriginBranch branch and removing unstaged files ..." -ForegroundColor DarkCyan
+    execute "hub checkout -f $OriginBranch"
 }
 
 execute 'hub reset --hard'
