@@ -34,6 +34,14 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         return
     }
 
+    if (get_config 'manifest-review' $false) {
+        Write-Output 'Manifest:'
+        Write-Output $manifest | ConvertToPrettyJson
+        $answer = Read-Host -Prompt "Continue installation? [Y/n]"
+        if (($answer -eq 'n') -or ($answer -eq 'N')) {
+            return
+        }
+    }
     write-output "Installing '$app' ($version) [$architecture]"
 
     $dir = ensure (versiondir $app $version $global)
