@@ -2,7 +2,6 @@
     "main": "https://github.com/ScoopInstaller/Main",
     "extras": "https://github.com/ScoopInstaller/Extras",
     "versions": "https://github.com/ScoopInstaller/Versions",
-    "nightlies": "https://github.com/ScoopInstaller/Nightlies",
     "nirsoft": "https://github.com/kodybrown/scoop-nirsoft",
     "php": "https://github.com/ScoopInstaller/PHP",
     "nerd-fonts": "https://github.com/matthewjberger/scoop-nerd-fonts",
