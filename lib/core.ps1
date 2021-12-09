@@ -570,9 +570,9 @@ function shim($path, $global, $name, $arg) {
         # for programs with no awareness of any shell
         warn_on_overwrite "$shim.shim" $path
         Copy-Item (get_shim_path) "$shim.exe" -Force
-        Write-Output "path = $resolved_path" | Out-File "$shim.shim" -Encoding UTF8
+        Write-Output "path = $resolved_path" | Out-File "$shim.shim" -Encoding ASCII
         if ($arg) {
-            Write-Output "args = $arg" | Out-File "$shim.shim" -Encoding UTF8 -Append
+            Write-Output "args = $arg" | Out-File "$shim.shim" -Encoding ASCII -Append
         }
     } elseif ($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
@@ -600,7 +600,7 @@ if (!(Test-Path Variable:PSScriptRoot)) { `$PSScriptRoot = Split-Path `$MyInvoca
 if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }
 exit `$lastexitcode"
         }
-        $ps1text | Out-File "$shim.ps1" -Encoding UTF8
+        $ps1text | Out-File "$shim.ps1" -Encoding ASCII
 
         # make ps1 accessible from cmd.exe
         warn_on_overwrite "$shim.cmd" $path
