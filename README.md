@@ -36,14 +36,14 @@ Scoop is a command-line installer for Windows.
 
 ## What does Scoop do?
 
-Scoop installs programs from the command line with a minimal amount of friction. It tries to eliminate things like:
+Scoop installs programs from the command line with a minimal amount of friction. It:
 
-- Permission popup windows
-- GUI wizard-style installers
-- Path pollution from installing lots of programs
-- Unexpected side-effects from installing and uninstalling programs
-- The need to find and install dependencies
-- The need to perform extra setup steps to get a working program
+- Eliminates permission popup windows
+- Hides GUI wizard-style installers
+- Prevents PATH pollution from installing lots of programs
+- Avoids unexpected side-effects from installing and uninstalling programs
+- Finds and installs dependencies automatically
+- Performs all the extra setup steps itself to get a working program
 
 Scoop is very scriptable, so you can run repeatable setups to get your environment just the way you like, e.g.:
 
