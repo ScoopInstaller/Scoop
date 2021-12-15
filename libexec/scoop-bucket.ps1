@@ -10,7 +10,7 @@
 #     scoop bucket add <name> [<repo>]
 #
 # e.g.:
-#     scoop bucket add extras https://github.com/lukesampson/scoop-extras.git
+#     scoop bucket add extras https://github.com/ScoopInstaller/Extras.git
 #
 # Since the 'extras' bucket is known to Scoop, this can be shortened to:
 #     scoop bucket add extras
