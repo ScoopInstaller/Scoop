@@ -110,7 +110,7 @@ function Expand-7zipArchive {
         # Check for tar
         $Status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $LogPath
         if ($Status) {
-            $TarFile = (Get-Content -Path $LogPath)[-4] -replace '.{53}(.*)', '$1' # get inner tar file name
+            $TarFile = (Get-Content -Path $LogPath)[-5] -replace '.{53}(.*)', '$1' # get inner tar file name
             Expand-7zipArchive -Path "$DestinationPath\$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
         } else {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
