@@ -47,6 +47,34 @@ describe 'Style constraints for non-binary project files' {
         }
     }
 
+    it 'registry files should be UTF-16LE encoded' -skip:$(-not $files_exist) {
+        # UTF-16LE == 0xFF 0xFE
+        # see https://gist.github.com/SalviaSage/8eba542dc27eea3379a1f7dad3f729a0
+        # see http://www.powershellmagazine.com/2012/12/17/pscxtip-how-to-determine-the-byte-order-mark-of-a-text-file @@ https://archive.is/RgT42
+        # see https://en.wikipedia.org/w/index.php?title=Windows_Registry&action=view&section=19#.REG_files
+        $badFiles = @(
+            foreach ($file in $files)
+            {
+                if ([regex]::match($file.FullName, '(?<=\.)reg$').success)){
+                    if((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+                        # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
+                        $content = ([char[]](Get-Content $file.FullName -AsByteStream -TotalCount 3) -join '')
+                    } else {
+                        $content = ([char[]](Get-Content $file.FullName -Encoding byte -TotalCount 3) -join '')
+                    }
+                    if (![regex]::match($content, '(?ms)^\xFF\xFE').success) {
+                        $file.FullName
+                    }
+                }
+        )
+
+        if ($badFiles.Count -gt 0)
+        {
+            throw "The following registry files are not UTF-16LE encoded: `r`n`r`n$($badFiles -join "`r`n")"
+        }
+    }
+
+
     it 'files end with a newline' -skip:$(-not $files_exist) {
         $badFiles = @(
             foreach ($file in $files)
