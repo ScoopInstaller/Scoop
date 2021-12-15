@@ -41,7 +41,7 @@ $all = $opt.a -or $opt.all
 # load config
 $configRepo = get_config SCOOP_REPO
 if (!$configRepo) {
-    $configRepo = "https://github.com/lukesampson/scoop"
+    $configRepo = "https://github.com/ScoopInstaller/Scoop"
     set_config SCOOP_REPO $configRepo | Out-Null
 }
 
@@ -199,7 +199,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     write-host "Updating '$app' ($old_version -> $version)"
 
     # region Workaround
-    # Workaround for https://github.com/lukesampson/scoop/issues/2220 until install is refactored
+    # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
     Write-Host "Downloading new version"
     if (Test-Aria2Enabled) {

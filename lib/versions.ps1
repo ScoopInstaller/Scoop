@@ -135,7 +135,7 @@ function Compare-Version {
         $Delimiter = '-'
     )
     process {
-        # Use '+' sign as post-release, see https://github.com/lukesampson/scoop/pull/3721#issuecomment-553718093
+        # Use '+' sign as post-release, see https://github.com/ScoopInstaller/Scoop/pull/3721#issuecomment-553718093
         $ReferenceVersion, $DifferenceVersion = @($ReferenceVersion, $DifferenceVersion) -replace '\+', '-'
 
         # Return 0 if versions are equal
