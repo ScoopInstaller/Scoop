@@ -17,6 +17,24 @@
 # Settings
 # --------
 #
+# 7ZIPEXTRACT_USE_EXTERNAL: $true|$false
+#       External 7zip (from path) will be used for archives extraction.
+#
+# MSIEXTRACT_USE_LESSMSI: $true|$false
+#       Prefer lessmsi utility over native msiexec.
+#
+# NO_JUNCTIONS: $true|$false
+#       The 'current' version alias will not be used. Shims and shortcuts will point to specific version instead.
+#
+# SCOOP_REPO: http://github.com/ScoopInstaller/Scoop
+#       Git repository containining scoop source code.
+#       This configuration is useful for custom forks.
+#
+# SCOOP_BRANCH: master|develop
+#       Allow to use different branch than master.
+#       Could be used for testing specific functionalities before released into all users.
+#       If you want to receive updates earlier to test new functionalities use develop (see: 'https://github.com/ScoopInstaller/Scoop/issues/2939')
+#
 # proxy: [username:password@]host:port
 #       By default, Scoop will use the proxy settings from Internet Options, but with anonymous authentication.
 #
@@ -29,26 +47,11 @@
 #       Allow to configure preferred architecture for application installation.
 #       If not specified, architecture is determined be system.
 #
-# 7ZIPEXTRACT_USE_EXTERNAL: $true|$false
-#       External 7zip (from path) will be used for archives extraction.
-#
-# MSIEXTRACT_USE_LESSMSI: $true|$false
-#       Prefer lessmsi utility over native msiexec.
-#
-# NO_JUNCTIONS: $true|$false
-#       The 'Current' version alias will not be used. Shims and shortcuts will point to specific version instead.
-#
 # debug: $true|$false
 #       Additional and detailed output will be shown.
 #
-# SCOOP_REPO: http://github.com/ScoopInstaller/Scoop
-#       Git repository containining scoop source code.
-#       This configuration is useful for custom forks.
-#
-# SCOOP_BRANCH: master|develop
-#       Allow to use different branch than master.
-#       Could be used for testing specific functionalities before released into all users.
-#       If you want to receive updates earlier to test new functionalities use develop (see: 'https://github.com/ScoopInstaller/Scoop/issues/2939')
+# force-update: $true|$false
+#       Force apps updating to bucket's version.
 #
 # show_update_log: $true|$false
 #       Do not show changed commits on 'scoop update'
@@ -56,6 +59,18 @@
 # manifest_review: $true|$false
 #       Displays the manifest of every app that's about to
 #       be installed, then asks user if they wish to proceed.
+#
+# shim: kiennq|scoopcs|71
+#       Choose scoop shim build.
+#
+# rootPath:
+#       Root path of scoop, default '$env:USERPROFILE\scoop'.
+#
+# globalPath:
+#       Global root path of scoop, default '$env:ProgramData\scoop'.
+#
+# cachePath:
+#       Cache path for downloads, default '$rootPath\cache'.
 #
 # checkver_token:
 #       GitHub API token used to make authenticated requests.
