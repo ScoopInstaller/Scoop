@@ -434,8 +434,8 @@ function Invoke-ExternalCommand {
         return $false
     }
     if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
-        Out-File -FilePath $LogPath -Encoding ASCII -Append -InputObject $Process.StandardOutput.ReadToEnd()
-        Out-File -FilePath $LogPath -Encoding ASCII -Append -InputObject $Process.StandardError.ReadToEnd()
+        Out-File -FilePath $LogPath -Encoding Default -Append -InputObject $Process.StandardOutput.ReadToEnd()
+        Out-File -FilePath $LogPath -Encoding Default -Append -InputObject $Process.StandardError.ReadToEnd()
     }
     $Process.WaitForExit()
     if ($Process.ExitCode -ne 0) {
