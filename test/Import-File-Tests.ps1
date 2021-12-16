@@ -53,8 +53,13 @@ describe 'Style constraints for non-binary project files' {
         # UTF-8 == 0xEF 0xBB 0xBF
         # UTF-16LE == 0xFF 0xFE
         # UTF-16BE == 0xFE 0xFF
+<<<<<<< HEAD
         # UTF-32LE == 0xFF 0xFE 0x00 0x00
         # UTF-32BE == 0x00 0x00 0xFE 0xFF
+=======
+        # UTF-32-LE == 0xFF 0xFE 0x00 0x00
+        # UTF-32-BE == 0x00 0x00 0xFE 0xFF
+>>>>>>> 125ac1e35088f6252d7bf2ebb8478e3398a5f734
         # see https://gist.github.com/SalviaSage/8eba542dc27eea3379a1f7dad3f729a0
         # see http://www.powershellmagazine.com/2012/12/17/pscxtip-how-to-determine-the-byte-order-mark-of-a-text-file @@ https://archive.is/RgT42
         # see https://en.wikipedia.org/w/index.php?title=Windows_Registry&action=view&section=19#.REG_files
@@ -97,8 +102,13 @@ describe 'Style constraints for non-binary project files' {
 
                     if (([regex]::match($content, -match '^2B-2F-76')) -or # UTF-7
                         ([regex]::match($content, -match '^FE-FF')) -or # UTF-16BE
+<<<<<<< HEAD
                         ([regex]::match($content, -match '^FF-FE-00-00')) -or # UTF-32LE
                         ([regex]::match($content, -match '^00-00-FE-FF')) ) { #UTF-32BE
+=======
+                        ([regex]::match($content, -match '^FF-FE-00-00')) -or # UTF-32-LE
+                        ([regex]::match($content, -match '^00-00-FE-FF')) ) { #UTF-32-BE
+>>>>>>> 125ac1e35088f6252d7bf2ebb8478e3398a5f734
                             $file.FullName
                     }
                 }
