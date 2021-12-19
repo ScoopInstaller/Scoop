@@ -63,11 +63,11 @@
 # shim: kiennq|scoopcs|71
 #       Choose scoop shim build.
 #
-# rootPath:
-#       Root path of scoop, default '$env:USERPROFILE\scoop'.
+# rootPath: $Env:UserProfile\scoop
+#       Path to Scoop root directory.
 #
-# globalPath:
-#       Global root path of scoop, default '$env:ProgramData\scoop'.
+# globalPath: $Env:ProgramData\scoop
+#       Path to Scoop root directory for global apps.
 #
 # cachePath:
 #       For downloads, defaults to 'cache' folder under Scoop root directory.
