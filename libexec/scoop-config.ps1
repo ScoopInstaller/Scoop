@@ -70,7 +70,7 @@
 #       Global root path of scoop, default '$env:ProgramData\scoop'.
 #
 # cachePath:
-#       Cache path for downloads, default '$rootPath\cache'.
+#       For downloads, defaults to 'cache' folder under Scoop root directory.
 #
 # checkver_token:
 #       GitHub API token used to make authenticated requests.
