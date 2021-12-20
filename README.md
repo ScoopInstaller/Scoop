@@ -95,6 +95,22 @@ $env:SCOOP_GLOBAL='F:\GlobalScoopApps'
 # run the installer
 ```
 
+### Configure Scoop to store downloads to a Custom Directory by changing `SCOOP_CACHE`
+
+```powershell
+$env:SCOOP_CACHE='F:\ScoopCache'
+[Environment]::SetEnvironmentVariable('SCOOP_CACHE', $env:SCOOP_CACHE, 'Machine')
+# run the installer
+```
+
+### Configure Scoop to use a GitHub API token during searching and checkver by setting `SCOOP_CHECKVER_TOKEN`
+
+```powershell
+$env:SCOOP_CHECKVER_TOKEN='<paste-token-here>'
+[Environment]::SetEnvironmentVariable('SCOOP_CHECKVER_TOKEN', $env:SCOOP_CHECKVER_TOKEN, 'Machine')
+# search for an app
+```
+
 ## [Documentation](https://github.com/ScoopInstaller/Scoop/wiki)
 
 ## Multi-connection downloads with `aria2`
