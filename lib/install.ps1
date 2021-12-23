@@ -35,7 +35,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     }
 
     if ((get_config 'manifest-review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
-        Write-Output 'Manifest:'
+        Write-Output "Manifest: $app.json"
         Write-Output $manifest | ConvertToPrettyJson
         $answer = Read-Host -Prompt "Continue installation? [Y/n]"
         if (($answer -eq 'n') -or ($answer -eq 'N')) {
