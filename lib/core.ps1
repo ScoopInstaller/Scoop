@@ -670,7 +670,6 @@ function get_shim_path() {
     switch ($shim_version) {
         '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
         'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
-        'rshim' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\rshim\shim.exe"; Break }
         'kiennq' { Break } # for backward compatibility
         'default' { Break }
         default { warn "Unknown shim version: '$shim_version'" }
