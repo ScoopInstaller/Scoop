@@ -28,7 +28,7 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'gfiksqa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
+$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
 if ($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
@@ -41,7 +41,7 @@ $all = $opt.a -or $opt.all
 # load config
 $configRepo = get_config SCOOP_REPO
 if (!$configRepo) {
-    $configRepo = "https://github.com/lukesampson/scoop"
+    $configRepo = "https://github.com/ScoopInstaller/Scoop"
     set_config SCOOP_REPO $configRepo | Out-Null
 }
 
@@ -199,7 +199,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     write-host "Updating '$app' ($old_version -> $version)"
 
     # region Workaround
-    # Workaround for https://github.com/lukesampson/scoop/issues/2220 until install is refactored
+    # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
     Write-Host "Downloading new version"
     if (Test-Aria2Enabled) {
@@ -278,7 +278,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     install_app $app $architecture $global $suggested $use_cache $check_hash
 }
 
-if (!$apps) {
+if (-not ($apps -or $all)) {
     if ($global) {
         "scoop update: --global is invalid when <app> is not specified."; exit 1
     }

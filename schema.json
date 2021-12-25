@@ -220,6 +220,9 @@
                 },
                 "persist": {
                     "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },                
+                "license": {
+                    "$ref": "#/definitions/license"
                 },
                 "note": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -518,7 +521,7 @@
             "type": "string"
         },
         "innosetup": {
-            "description": "True if the installer InnoSetup based. Found in https://github.com/lukesampson/scoop/search?l=JSON&q=innosetup",
+            "description": "True if the installer InnoSetup based. Found in https://github.com/ScoopInstaller/Main/search?l=JSON&q=innosetup",
             "type": "boolean"
         },
         "installer": {
@@ -593,7 +596,10 @@
         }
     },
     "required": [
-        "version"
+        "version",
+        "description",
+        "homepage",
+        "license"
     ],
     "title": "scoop app manifest schema",
     "type": "object"
