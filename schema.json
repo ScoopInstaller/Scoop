@@ -224,6 +224,9 @@
                 "license": {
                     "$ref": "#/definitions/license"
                 },
+                "license": {
+                    "$ref": "#/definitions/license"
+                },
                 "note": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
@@ -456,6 +459,29 @@
                 "Shareware",
                 "Unlicense"
             ]
+        },
+        "license": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/licenseIdentifiers"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "url": {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        "identifier": {
+                            "$ref": "#/definitions/licenseIdentifiers"
+                        }
+                    },
+                    "required": [
+                        "identifier"
+                    ],
+                    "type": "object"
+                }
+            ]
         }
     },
     "properties": {
@@ -528,27 +554,7 @@
             "$ref": "#/definitions/installer"
         },
         "license": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/licenseIdentifiers"
-                },
-                {
-                    "additionalProperties": false,
-                    "properties": {
-                        "url": {
-                            "format": "uri",
-                            "type": "string"
-                        },
-                        "identifier": {
-                            "$ref": "#/definitions/licenseIdentifiers"
-                        }
-                    },
-                    "required": [
-                        "identifier"
-                    ],
-                    "type": "object"
-                }
-            ]
+            "$ref": "#/definitions/license"
         },
         "msi": {
             "$ref": "#/definitions/stringOrArrayOfStrings",
