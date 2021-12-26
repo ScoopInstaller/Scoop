@@ -40,7 +40,7 @@ describe -Tag 'Manifests' "manifest-validation" {
             $validator.Validate("$working_dir/invalid_wget.json") | should -BeFalse
             $validator.Errors.Count | should -be 16
             $validator.Errors | select-object -First 1 | should -match "Property 'randomproperty' has not been defined and the schema does not allow additional properties\."
-            $validator.Errors | select-object -Last 1 | should -match "Required properties are missing from object: version\."
+            $validator.Errors | select-object -Last 1 | should -match "Required properties are missing from object: version, description\."
         }
     }
 
