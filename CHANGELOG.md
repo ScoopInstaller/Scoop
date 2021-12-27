@@ -42,7 +42,7 @@
   - **shim:** Specify command arg ([3c90d1a0](https://github.com/ScoopInstaller/Scoop/commit/3c90d1a0701b0b64730dbf9ebc8d31f9b9c238f1))
   - **shim:** Specify command arg for bash ([2ec00d57](https://github.com/ScoopInstaller/Scoop/commit/2ec00d576c7e594dc5c0f1eac4536c5310ce6f17))
 
-### Documents
+### Documentation
 
 - **readme:** Add link to Contributing Guide ([5e11c94a](https://github.com/ScoopInstaller/Scoop/commit/5e11c94a544ff2adbdbec5072c32a94d3e5acb9c))
 - **readme:** Fix links ([3bb7036e](https://github.com/ScoopInstaller/Scoop/commit/3bb7036ee111bfe58e82ba3d0fd39189b058776a))
@@ -86,10 +86,9 @@
   - **test:** Add more test cases for versions ([e6630272](https://github.com/ScoopInstaller/Scoop/commit/e663027299d03ca768a252fa4bcbc51d124d4cae))
   - **versions:** Fix situation that contains '_' ([ae892138](https://github.com/ScoopInstaller/Scoop/commit/ae892138423bb9bbf54c8f0bed8331b93199f6b8))
 
-### Documents
+### Documentation
 
 - **readme:** Capitalize to prevent redirect ([#4483](https://github.com/ScoopInstaller/Scoop/issues/4483))
-
 - **readme:** s/lukesampson/ScoopInstaller in readme ([4f5acd72](https://github.com/ScoopInstaller/Scoop/commit/4f5acd72109a98a148d1bfa269c23a2d43644d23))
 - **readme:** Update extras bucket url in readme ([f1a46e10](https://github.com/ScoopInstaller/Scoop/commit/f1a46e109596c55c7e83c77fc1fc9daedbe71636))
 - **readme:** Update Java bucket text ([#4514](https://github.com/ScoopInstaller/Scoop/issues/4514))
@@ -179,11 +178,11 @@
 - **scoop-info:** Fix output for single binaries with alias ([#3651](https://github.com/ScoopInstaller/Scoop/issues/3651))
 - **scoop-info:** Remove a whitespace ([#3652](https://github.com/ScoopInstaller/Scoop/issues/3652))
 
-### CI/CD
+### Continuous Integrations
 
 - **appveyor:** use VS2019 image to fix PS6 issues ([#3646](https://github.com/ScoopInstaller/Scoop/issues/3646))
 
-### Documents
+### Documentation
 
 - **readme:** Improve installation instructions ([#3600](https://github.com/ScoopInstaller/Scoop/issues/3600))
 
@@ -209,7 +208,7 @@
 
 - **core:**  `run()` -> 'Invoke-ExternalCommand()' ([#3432](https://github.com/ScoopInstaller/Scoop/issues/3432))
 
-### Documents
+### Documentation
 
 - **readme:** Add known buckets to end of readme ([2849e0f9](https://github.com/ScoopInstaller/Scoop/commit/2849e0f96099004f761d7d8c715377e0d2c105f2))
 - **readme:** Adjust URL of `runat.json` ([#3484](https://github.com/ScoopInstaller/Scoop/issues/3484))
