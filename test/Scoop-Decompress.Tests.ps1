@@ -19,7 +19,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         It "Decompression test cases should exist" {
             $testcases = "$working_dir\TestCases.zip"
             $testcases | Should -Exist
-            compute_hash $testcases 'sha256' | Should -Be '900b6e05275ad11a57dad85ffac6d9b4995657956a980bb1eae12c173f34a280'
+            compute_hash $testcases 'sha256' | Should -Be '3a442e85b466833eeafbd08c57d8f51bf7ff041867ee0bdb7db1f12480b3624a'
             if (!$isUnix) {
                 Microsoft.PowerShell.Archive\Expand-Archive $testcases $working_dir
             }
@@ -91,14 +91,14 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         It "extract normal compressed file" -Skip:$isUnix {
             $to = test_extract "Expand-ZstdArchive" $test1
             $to | Should -Exist
-            "$to\empty" | Should -Exist
+            "$to\ZstdTest" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
         It "extract nested compressed file" -Skip:$isUnix {
-            $to = test_extract "Expand-7zipArchive" $test2
+            $to = test_extract "Expand-ZstdArchive" $test2
             $to | Should -Exist
-            "$to\empty" | Should -Exist
+            "$to\ZstdTest" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
         }
 

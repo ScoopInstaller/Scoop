@@ -1,7 +1,7 @@
-#requires -Version 5.0
-#requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
-#requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '4.4.0' }
-#requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
+#Requires -Version 5.0
+#Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
+#Requires -Modules @{ ModuleName = 'Pester'; RequiredVersion = '4.10.1' }
+#Requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
     [String] $TestPath = 'test/'
 )
@@ -39,7 +39,7 @@ if ($env:CI -eq $true) {
     }
 
     if ($env:CI_WINDOWS -ne $true) {
-        Write-Warning "Skipping tests and code linting for decompress.ps1 because they only work on Windows"
+        Write-Warning 'Skipping tests and code linting for decompress.ps1 because they only work on Windows'
         $excludes += 'Decompress'
     }
 
