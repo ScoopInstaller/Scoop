@@ -4,6 +4,11 @@
 ### Bug Fixes
 
 - **depends:** Prevent error on no URL ([#4595](https://github.com/ScoopInstaller/Scoop/issues/4595))
+- **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608))
+
+### Documentation
+
+- **changelog:** Add 'CHANGLOG.md' ([#4600](https://github.com/ScoopInstaller/Scoop/issues/4600))
 
 <a name="2021-12-26"></a>
 ## [2021-12-26]
