@@ -6,13 +6,17 @@
 - **depends:** Prevent error on no URL ([#4595](https://github.com/ScoopInstaller/Scoop/issues/4595))
 - **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608))
 
-### Documentation
-
-- **changelog:** Add 'CHANGLOG.md' ([#4600](https://github.com/ScoopInstaller/Scoop/issues/4600))
-
 ### Styles
 
 - **test:** Format scripts by VSCode's PowerShell extension ([#4609](https://github.com/ScoopInstaller/Scoop/issues/4609))
+
+### Tests
+
+- **test-bin:** Only write output file in CI and fix trailing whitespaces ([#4613](https://github.com/ScoopInstaller/Scoop/issues/4613))
+
+### Documentation
+
+- **changelog:** Add 'CHANGLOG.md' ([#4600](https://github.com/ScoopInstaller/Scoop/issues/4600))
 
 <a name="2021-12-26"></a>
 ## [2021-12-26]
