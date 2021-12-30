@@ -137,20 +137,20 @@ function Expand-ZstdArchive {
         [String]
         $Switches,
         [Switch]
-        $Overwrite,
-        [Switch]
         $Removal
     )
     $ZstdPath = Get-HelperPath -Helper Zstd
-    $LogPath = "$(Split-Path $Path)\zstd.log"
-    $DestinationPath = $DestinationPath.TrimEnd("\")
+    $LogPath = Join-Path (Split-Path $Path) 'zstd.log'
+    $DestinationPath = $DestinationPath.TrimEnd('\')
     ensure $DestinationPath | Out-Null
-    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"", "-v")
+    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"", '-f', '-v')
+
     if ($Switches) {
         $ArgList += (-split $Switches)
     }
-    if ($Overwrite) {
-        $ArgList += '-f'
+    if ($Removal) {
+        # Remove original archive file
+        $ArgList += '--rm'
     }
     $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
     if (!$Status) {
@@ -158,19 +158,15 @@ function Expand-ZstdArchive {
     }
     $IsTar = (strip_ext $Path) -match '\.tar$'
     if (!$IsTar -and $ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+        movedir (Join-Path $DestinationPath $ExtractDir) $DestinationPath | Out-Null
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
     }
     if ($IsTar) {
         # Check for tar
-        $TarFile = (strip_ext $Path)
-        Expand-7zipArchive -Path "$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
-    }
-    if ($Removal) {
-        # Remove original archive file
-        Remove-Item $Path -Force
+        $TarFile = Join-Path $DestinationPath (Split-Path $Path -LeafBase)
+        Expand-7zipArchive -Path $TarFile -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
     }
 }
 
