@@ -220,9 +220,6 @@
                 },
                 "persist": {
                     "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
-                },                
-                "license": {
-                    "$ref": "#/definitions/license"
                 },
                 "license": {
                     "$ref": "#/definitions/license"
