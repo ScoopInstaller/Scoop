@@ -6,17 +6,20 @@ param(
     [String] $TestPath = 'test/'
 )
 
-$resultsXml = "$PSScriptRoot/TestResults.xml"
-$excludes = @()
-
 $splat = @{
     Path         = $TestPath
-    OutputFile   = $resultsXml
-    OutputFormat = 'NUnitXML'
     PassThru     = $true
 }
 
 if ($env:CI -eq $true) {
+    $resultsXml = "$PSScriptRoot/TestResults.xml"
+    $excludes = @()
+
+    $splat += @{
+        OutputFile   = $resultsXml
+        OutputFormat = 'NUnitXML'
+    }
+
     $commit = if ($env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT) { $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT } else { $env:APPVEYOR_REPO_COMMIT }
     $commitMessage = "$env:APPVEYOR_REPO_COMMIT_MESSAGE $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED".TrimEnd()
 
@@ -62,7 +65,9 @@ if ($env:CI -eq $true) {
 Write-Host 'Invoke-Pester' @splat
 $result = Invoke-Pester @splat
 
-(New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
+if ($env:CI -eq $true) {
+    (New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
+}
 
 if ($result.FailedCount -gt 0) {
     exit $result.FailedCount
