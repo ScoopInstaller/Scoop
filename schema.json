@@ -331,7 +331,8 @@
                                         "path": {
                                             "type": "string"
                                         }
-                                    }
+                                    },
+                                    "type": "object"
                                 }
                             ]
                         }

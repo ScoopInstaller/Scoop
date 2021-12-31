@@ -121,8 +121,8 @@ $Queue | ForEach-Object {
     }
     Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
 
-    $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
-    $sourceforgeRegex = '(?:.*)?\/(?:v)?([\d.]+)\/'
+    $githubRegex = '/releases/tag/(?:v|V)?([\d.]+)'
+    $sourceforgeRegex = '(?:.*)?/(?:v)?([\d.]+)/'
 
     $url = $json.homepage
     if ($json.checkver.url) {
@@ -150,31 +150,31 @@ $Queue | ForEach-Object {
     }
 
     if ($json.checkver -eq 'sourceforge' -or $json.homepage.Contains('sourceforge.net') -or $json.checkver.sourceforge.path) {
-        if ($json.homepage -match '\/\/sourceforge\.net\/projects\/(?<project>([\w-]+$|[\w-]+))(?:[/]?)' -or $json.homepage -match '\/\/(?<project>[\w-]+)\.sourceforge\.net') {
+        if ($json.homepage -match '//sourceforge\.net/projects/(?<project>([\w-]+$|[\w-]+))(?:[/]?)' -or $json.homepage -match '//(?<project>[\w-]+)\.sourceforge\.net') {
             $url = 'https://sourceforge.net/projects/' + $matches['project'] + '/rss'
-            $regex = '\/\/sourceforge\.net\/projects\/' + $matches['project'] + $sourceforgeRegex
+            $regex = '//sourceforge\.net/projects/' + $matches['project'] + $sourceforgeRegex
             if ($json.checkver -ne 'sourceforge' -and $json.checkver.GetType() -eq [System.String]) {
                 $regex = $json.checkver
             }
         }
         else {
             $url = 'https://sourceforge.net/projects/' + (strip_ext $name) + '/rss'
-            $regex = '\/\/sourceforge\.net\/projects\/' + (strip_ext $name) + $sourceforgeRegex
+            $regex = '//sourceforge\.net/projects/' + (strip_ext $name) + $sourceforgeRegex
         }
     }
 
     if ($json.checkver.sourceforge -and $json.checkver.sourceforge.GetType() -eq [System.String]) {
         $url = 'https://sourceforge.net/projects/' + $json.checkver.sourceforge + '/rss'
-        $regex = '\/\/sourceforge\.net\/projects\/' + $json.checkver.sourceforge + $sourceforgeRegex
+        $regex = '//sourceforge\.net/projects/' + $json.checkver.sourceforge + $sourceforgeRegex
     }
 
     if ($json.checkver.sourceforge.project) {
         $url = 'https://sourceforge.net/projects/' + $json.checkver.sourceforge.project + '/rss'
-        $regex = '\/\/sourceforge\.net\/projects\/' + $json.checkver.sourceforge.project + $sourceforgeRegex
+        $regex = '//sourceforge\.net/projects/' + $json.checkver.sourceforge.project + $sourceforgeRegex
     }
 
     if ($json.checkver.sourceforge.path) {
-        $url = $url + '?path=' + $json.checkver.sourceforge.path
+        $url = $url + '?path=/' + $json.checkver.sourceforge.path.TrimStart('/')
     }
 
     if ($json.checkver.re) {
