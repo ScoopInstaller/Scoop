@@ -22,7 +22,7 @@
 reset_aliases
 
 $opt, $apps, $err = getopt $args 'fsa:' 'force', 'skip', 'arch='
-if ($err) { error "scoop install: $err"; exit 1 }
+if ($err) { error "scoop download: $err"; exit 1 }
 
 $check_hash = !($opt.s -or $opt.skip)
 $use_cache = !($opt.f -or $opt.force)
