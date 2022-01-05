@@ -584,7 +584,7 @@ function shim($path, $global, $name, $arg) {
 
         warn_on_overwrite $shim $path
         @(
-            '#!/bin/sh',
+            "#!/bin/sh",
             "# $resolved_path",
             "MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-File $shim -Encoding ASCII
@@ -614,32 +614,32 @@ function shim($path, $global, $name, $arg) {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
-            '@echo off',
-            'setlocal enabledelayedexpansion',
-            'set args=%*',
-            ':: replace problem characters in arguments',
+            "@echo off",
+            "setlocal enabledelayedexpansion",
+            "set args=%*",
+            ":: replace problem characters in arguments",
             "set args=%args:`"='%",
             "set args=%args:(=``(%",
             "set args=%args:)=``)%",
             "set invalid=`"='",
-            'if !args! == !invalid! ( set args= )',
-            'where /q pwsh.exe',
-            'if %errorlevel% equ 0 (',
+            "if !args! == !invalid! ( set args= )",
+            "where /q pwsh.exe",
+            "if %errorlevel% equ 0 (",
             "    pwsh -noprofile -ex unrestricted -command `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"",
-            ') else (',
+            ") else (",
             "    powershell -noprofile -ex unrestricted -command `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"",
-            ')'
+            ")"
         ) -join "`r`n" | Out-File "$shim.cmd" -Encoding ASCII
 
         warn_on_overwrite $shim $path
         @(
-            '#!/bin/sh',
+            "#!/bin/sh",
             "# $resolved_path",
-            'if command -v pwsh.exe &> /dev/null; then',
+            "if command -v pwsh.exe &> /dev/null; then",
             "    pwsh -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
-            'else',
+            "else",
             "    powershell -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
-            'fi'
+            "fi"
         ) -join "`n" | Out-File $shim -Encoding ASCII
     } elseif ($path -match '\.jar$') {
         warn_on_overwrite "$shim.cmd" $path
@@ -650,7 +650,7 @@ function shim($path, $global, $name, $arg) {
 
         warn_on_overwrite $shim $path
         @(
-            '#!/bin/sh',
+            "#!/bin/sh",
             "# $resolved_path",
             "java -jar `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-File $shim -Encoding ASCII
@@ -663,7 +663,7 @@ function shim($path, $global, $name, $arg) {
 
         warn_on_overwrite $shim $path
         @(
-            '#!/bin/sh',
+            "#!/bin/sh",
             "# $resolved_path",
             "python `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-File $shim -Encoding ASCII
@@ -681,7 +681,7 @@ function shim($path, $global, $name, $arg) {
 
         warn_on_overwrite $shim $path
         @(
-            '#!/bin/sh',
+            "#!/bin/sh",
             "# $resolved_path",
             "`"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-File $shim -Encoding ASCII
