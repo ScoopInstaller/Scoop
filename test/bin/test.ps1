@@ -58,7 +58,7 @@ if ($env:CI -eq $true) {
     }
 }
 
-if (!(Test-Path "$PSScriptRoot\..\bucket")) {
+if (!(Test-Path "$PSScriptRoot\..\..\bucket")) {
     Write-Warning 'Skipping tests and validation for manifest files because there is no bucket'
     $excludes += 'Manifests'
 }
