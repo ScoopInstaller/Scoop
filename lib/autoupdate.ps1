@@ -51,7 +51,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     }
 
     if ($regex.Length -eq 0) {
-        $regex = '^([a-fA-F0-9]+)$'
+        $regex = '^\s*([a-fA-F0-9]+)\s*$'
     }
 
     $regex = substitute $regex $templates $false

@@ -3,6 +3,7 @@
 
 ### Bug Fixes
 
+- **autoupdate:** Allow checksum file that contains whitespaces ([#4619](https://github.com/ScoopInstaller/Scoop/issues/4619))
 - **depends:** Prevent error on no URL ([#4595](https://github.com/ScoopInstaller/Scoop/issues/4595))
 - **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608))
 - **shim:** Fix PS1 shim error when in different drive in PS7 ([#4614](https://github.com/ScoopInstaller/Scoop/issues/4614))
@@ -321,7 +322,7 @@
 - **autoupdate:** Fix base64 hash extraction length ([#2852](https://github.com/ScoopInstaller/Scoop/issues/2852))
 - **autoupdate:** Fix metalink hash extraction ([2ad54747](https://github.com/ScoopInstaller/Scoop/commit/2ad547477b1432e7a269c90b393d62d88dce9803))
 - **autoupdate:** Fix single line hash extraction ([#3015](https://github.com/ScoopInstaller/Scoop/issues/3015))
-- **sutoupdate:** Improve auto-update hash extraction regex ([21bf0dea](https://github.com/ScoopInstaller/Scoop/commit/21bf0dea561db021aa59bcd9363792436ac7c162))
+- **autoupdate:** Improve auto-update hash extraction regex ([21bf0dea](https://github.com/ScoopInstaller/Scoop/commit/21bf0dea561db021aa59bcd9363792436ac7c162))
 - **autoupdate:** Linter fix ([c9539b65](https://github.com/ScoopInstaller/Scoop/commit/c9539b6575e8842a8f895d82b4119c3aef01d7c2))
 - **autoupdate:** Use normal variable instead of magic $matches variable name ([d74e0a85](https://github.com/ScoopInstaller/Scoop/commit/d74e0a85b4081745bd1ab107a45794f02299737d))
 - **bucket:** Change wording of new_issue_msg() ([e82587df](https://github.com/ScoopInstaller/Scoop/commit/e82587dfc41618474e03347df333e847dfaffc70))
