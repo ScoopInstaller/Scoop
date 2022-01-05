@@ -1,22 +1,25 @@
-#requires -Version 5.0
-#requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
-#requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '4.4.0' }
-#requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
+#Requires -Version 5.0
+#Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
+#Requires -Modules @{ ModuleName = 'Pester'; RequiredVersion = '4.10.1' }
+#Requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
     [String] $TestPath = 'test/'
 )
 
-$resultsXml = "$PSScriptRoot/TestResults.xml"
-$excludes = @()
-
 $splat = @{
     Path         = $TestPath
-    OutputFile   = $resultsXml
-    OutputFormat = 'NUnitXML'
     PassThru     = $true
 }
 
 if ($env:CI -eq $true) {
+    $resultsXml = "$PSScriptRoot/TestResults.xml"
+    $excludes = @()
+
+    $splat += @{
+        OutputFile   = $resultsXml
+        OutputFormat = 'NUnitXML'
+    }
+
     $commit = if ($env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT) { $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT } else { $env:APPVEYOR_REPO_COMMIT }
     $commitMessage = "$env:APPVEYOR_REPO_COMMIT_MESSAGE $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED".TrimEnd()
 
@@ -39,7 +42,7 @@ if ($env:CI -eq $true) {
     }
 
     if ($env:CI_WINDOWS -ne $true) {
-        Write-Warning "Skipping tests and code linting for decompress.ps1 because they only work on Windows"
+        Write-Warning 'Skipping tests and code linting for decompress.ps1 because they only work on Windows'
         $excludes += 'Decompress'
     }
 
@@ -62,7 +65,9 @@ if ($env:CI -eq $true) {
 Write-Host 'Invoke-Pester' @splat
 $result = Invoke-Pester @splat
 
-(New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
+if ($env:CI -eq $true) {
+    (New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
+}
 
 if ($result.FailedCount -gt 0) {
     exit $result.FailedCount
