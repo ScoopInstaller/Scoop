@@ -8,6 +8,10 @@
 - **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608))
 - **shim:** Fix PS1 shim error when in different drive in PS7 ([#4614](https://github.com/ScoopInstaller/Scoop/issues/4614))
 
+### Builds
+
+- **schema:** Add '$schema' property ([#4623](https://github.com/ScoopInstaller/Scoop/issues/4623))
+
 ### Styles
 
 - **test:** Format scripts by VSCode's PowerShell extension ([#4609](https://github.com/ScoopInstaller/Scoop/issues/4609))
