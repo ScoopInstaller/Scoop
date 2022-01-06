@@ -482,6 +482,10 @@
         }
     },
     "properties": {
+        "$schema": {
+            "type": "string",
+            "format": "uri"
+        },
         "_comment": {
             "description": "Deprecated. Use ## instead.",
             "$ref": "#/definitions/stringOrArrayOfStrings"
