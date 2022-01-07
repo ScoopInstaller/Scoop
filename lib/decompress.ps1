@@ -1,19 +1,19 @@
 function Test-7zipRequirement {
-    [CmdletBinding(DefaultParameterSetName = "Manifest")]
+    [CmdletBinding(DefaultParameterSetName = 'Manifest')]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "Manifest")]
+        [Parameter(Mandatory = $true, Position = 0, ParameterSetName = 'Manifest')]
         [PSObject]
         $Manifest,
-        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "Manifest")]
+        [Parameter(Mandatory = $true, Position = 1, ParameterSetName = 'Manifest')]
         [String]
         $Architecture,
-        [Parameter(Mandatory = $true, ParameterSetName = "File")]
+        [Parameter(Mandatory = $true, ParameterSetName = 'File')]
         [String]
         $File
     )
     if ($File) {
-        return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
+        return $File -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
     } else {
         $uri = url $Manifest $Architecture
         $installer = installer $Manifest $Architecture
@@ -22,6 +22,24 @@ function Test-7zipRequirement {
         } else {
             return ($uri | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
         }
+    }
+}
+
+function Test-ZstdRequirement {
+    [CmdletBinding(DefaultParameterSetName = 'URL')]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true, ParameterSetName = 'URL')]
+        [String[]]
+        $URL,
+        [Parameter(Mandatory = $true, ParameterSetName = 'File')]
+        [String]
+        $File
+    )
+    if ($URL) {
+        return ($URL | Where-Object { Test-ZstdRequirement -File $_ }).Count -gt 0
+    } else {
+        return $File -match '\.zst$'
     }
 }
 
@@ -127,10 +145,10 @@ function Expand-7zipArchive {
     }
     if ($isTar) {
         # Check for tar
-        $status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $logPath
-        if ($status) {
-            $tarFile = (Get-Content -Path $logPath)[-4] -replace '.{53}(.*)', '$1' # get inner tar file name
-            Expand-7zipArchive -Path "$DestinationPath\$tarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
+        $Status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $LogPath
+        if ($Status) {
+            $TarFile = (Get-Content -Path $LogPath)[-5] -replace '.{53}(.*)', '$1' # get inner tar file name
+            Expand-7zipArchive -Path "$DestinationPath\$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
         } else {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
@@ -138,6 +156,54 @@ function Expand-7zipArchive {
     if ($Removal) {
         # Remove original archive file
         Remove-Item $Path -Force
+    }
+}
+
+function Expand-ZstdArchive {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [String]
+        $ExtractDir,
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [String]
+        $Switches,
+        [Switch]
+        $Removal
+    )
+    $ZstdPath = Get-HelperPath -Helper Zstd
+    $LogPath = Join-Path (Split-Path $Path) 'zstd.log'
+    $DestinationPath = $DestinationPath.TrimEnd('\')
+    ensure $DestinationPath | Out-Null
+    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"", '-f', '-v')
+
+    if ($Switches) {
+        $ArgList += (-split $Switches)
+    }
+    if ($Removal) {
+        # Remove original archive file
+        $ArgList += '--rm'
+    }
+    $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
+    if (!$Status) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    }
+    $IsTar = (strip_ext $Path) -match '\.tar$'
+    if (!$IsTar -and $ExtractDir) {
+        movedir (Join-Path $DestinationPath $ExtractDir) $DestinationPath | Out-Null
+    }
+    if (Test-Path $LogPath) {
+        Remove-Item $LogPath -Force
+    }
+    if ($IsTar) {
+        # Check for tar
+        $TarFile = Join-Path $DestinationPath (Split-Path $Path -LeafBase)
+        Expand-7zipArchive -Path $TarFile -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
     }
 }
 
@@ -417,9 +483,9 @@ function ConvertFrom-Inno {
     }
 
     return @{
-        FileList = $fileList;
-        Excluded = $excluded;
-        Included = $included;
+        FileList  = $fileList;
+        Excluded  = $excluded;
+        Included  = $included;
         Extracted = @($fileList.srcdir | Select-Object -Unique) -ne '{tmp}'
     }
 }
