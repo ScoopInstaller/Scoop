@@ -74,7 +74,7 @@ function set_config($name, $value) {
         $scoopConfig.PSObject.Properties.Remove($name)
     }
 
-    ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding ASCII
+    ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding Default
     return $scoopConfig
 }
 
