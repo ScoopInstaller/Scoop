@@ -1,5 +1,5 @@
 # Usage: scoop download <app> [options]
-# Summary: Download apps in the cache folder
+# Summary: Download apps in the cache folder and verify hashes
 # Help: e.g. The usual way to download an app, without installing it (uses your local 'buckets'):
 #      scoop download git
 #
@@ -11,7 +11,7 @@
 #
 # Options:
 #   -f, --force               Force download (overwrite cache)
-#   -s, --skip                Skip hash validation (use with caution!)
+#   -h, --no-hash-heck        Skip hash verification (use with caution!)
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -21,10 +21,10 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'fsa:' 'force', 'skip', 'arch='
+$opt, $apps, $err = getopt $args 'fha:' 'force', 'no-hash-check', 'arch='
 if ($err) { error "scoop download: $err"; exit 1 }
 
-$check_hash = !($opt.s -or $opt.skip)
+$check_hash = !($opt.h -or $opt.'no-hash-check')
 $use_cache = !($opt.f -or $opt.force)
 $architecture = default_architecture
 try {
@@ -49,7 +49,7 @@ foreach ($curr_app in $apps) {
     $app, $bucket, $version = parse_app $curr_app
     $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
-    info "Starting download for $app"
+    info "Starting download for $app..."
 
     # Generate manifest if there is different version in manifest
     if (($null -ne $version) -and ($manifest.version -ne $version)) {
@@ -66,7 +66,7 @@ foreach ($curr_app in $apps) {
         continue
     }
     $version = $manifest.version
-    if(!$version) { 
+    if(!$version) {
         error "Manifest doesn't specify a version."
         continue
     }
