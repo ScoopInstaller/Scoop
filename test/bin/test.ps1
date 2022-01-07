@@ -7,8 +7,8 @@ param(
 )
 
 $splat = @{
-    Path         = $TestPath
-    PassThru     = $true
+    Path     = $TestPath
+    PassThru = $true
 }
 
 if ($env:CI -eq $true) {
@@ -51,15 +51,20 @@ if ($env:CI -eq $true) {
         $excludes += 'Manifests'
     }
 
-    $changed_manifests = (Get-GitChangedFile -Include '*.json' -Commit $commit)
+    $changed_manifests = (Get-GitChangedFile -Include 'bucket\*.json' -Commit $commit)
     if (!$changed_manifests) {
         Write-Warning "Skipping tests and validation for manifest files because they didn't change"
         $excludes += 'Manifests'
     }
+}
 
-    if ($excludes.Length -gt 0) {
-        $splat.ExcludeTag = $excludes
-    }
+if (!(Test-Path "$PSScriptRoot\..\..\bucket")) {
+    Write-Warning 'Skipping tests and validation for manifest files because there is no bucket'
+    $excludes += 'Manifests'
+}
+
+if ($excludes.Length -gt 0) {
+    $splat.ExcludeTag = $excludes
 }
 
 Write-Host 'Invoke-Pester' @splat
