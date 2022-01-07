@@ -618,21 +618,34 @@ function Invoke-Extraction {
     $installer = installer $Manifest $Architecture
 
     for ($i = 0; $i -lt $uris.Length; $i++) {
-        $args = @{
-            Path = "$DestinationPath\$($FileName[$i])"
+        $fnArgs = @{
+            Path            = "$DestinationPath\$($FileName[$i])"
             DestinationPath = "$DestinationPath\$($extractTos[$i])"
         }
         # work out extraction method, if applicable
         $extractFn = $null
         if ($i -eq 0 -and $installer.type) {
             switch ($installer.type) {
-                'inno' { $extractFn = 'Expand-InnoInstaller'; $args.ExtractDir = $extractDirs[$i]; $args.Include = $installer.include; $args.Exclude = $installer.exclude }
-                'nsis' { $extractFn = 'Expand-NsisInstaller'; $args.Architecture = $Architecture }
-                'wix' { $extractFn = 'Expand-WixInstaller'; $args.Exclude = $installer.exclude }
-                Default { abort "Error in manifest: installer type $_ is not supported." }
+                'inno' {
+                    $extractFn = 'Expand-InnoInstaller'
+                    $fnArgs.ExtractDir = $extractDirs[$i]
+                    $fnArgs.Include = $installer.include
+                    $fnArgs.Exclude = $installer.exclude
+                }
+                'nsis' {
+                    $extractFn = 'Expand-NsisInstaller'
+                    $fnArgs.Architecture = $Architecture
+                }
+                'wix' {
+                    $extractFn = 'Expand-WixInstaller'
+                    $fnArgs.Exclude = $installer.exclude
+                }
+                Default {
+                    abort "Error in manifest: installer type $_ is not supported."
+                }
             }
         } else {
-            switch -Regex ($args.Path) {
+            switch -Regex ($fnArgs.Path) {
                 '.*\.zip$' {
                     if (((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
                         $extractFn = 'Expand-7zipArchive'
@@ -656,15 +669,15 @@ function Invoke-Extraction {
                     continue
                 }
             }
-            $args.ExtractDir = $extractDirs[$i]
+            $fnArgs.ExtractDir = $extractDirs[$i]
         }
-        debug $args
+        debug $fnArgs
         if ($extractFn) {
-            Write-Host "Extracting " -NoNewline
+            Write-Host 'Extracting ' -NoNewline
             Write-Host $(url_remote_filename $uris[$i]) -ForegroundColor Cyan -NoNewline
-            Write-Host " ... " -NoNewline
-            & $extractFn @Args -Removal
-            Write-Host "done." -ForegroundColor Green
+            Write-Host ' ... ' -NoNewline
+            & $extractFn @fnArgs -Removal
+            Write-Host 'done.' -ForegroundColor Green
         }
     }
 }
@@ -786,22 +799,22 @@ function Invoke-InstallerScript {
 
     if ($installer.file -or $installer.args) {
         # Installer filename is either explicit defined ('installer.file') or file name in the first URL
-         $progName = "$DestinationPath\$(coalesce $installer.file $FileName[0])"
-        if(!(is_in_dir $DestinationPath $progName)) {
+        $progName = "$DestinationPath\$(coalesce $installer.file $FileName[0])"
+        if (!(is_in_dir $DestinationPath $progName)) {
             abort "Error in manifest: Installer $progName is outside the app directory."
         }
-        $args = @(args $installer.args $DestinationPath $Global)
+        $fnArgs = @(args $installer.args $DestinationPath $Global)
 
-        if($progName.EndsWith('.ps1')) {
-            & $progName @Args
+        if ($progName.EndsWith('.ps1')) {
+            & $progName @fnArgs
         } else {
-            $isInstalled = Invoke-ExternalCommand $progName $args -Activity "Running installer..."
-            if(!$isInstalled) {
+            $isInstalled = Invoke-ExternalCommand $progName $fnArgs -Activity 'Running installer...'
+            if (!$isInstalled) {
                 abort "Installation aborted. You might need to run 'scoop uninstall $AppName' before trying again."
             }
 
             # Don't remove installer if "keep" flag is set to true
-            if($installer.keep -ne 'true') {
+            if ($installer.keep -ne 'true') {
                 Remove-Item $progName
             }
         }
