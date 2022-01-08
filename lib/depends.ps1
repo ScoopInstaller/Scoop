@@ -70,7 +70,7 @@ function script_deps($script) {
     if (!(Test-HelperInstalled -Helper Dark) -and $script -like '*Expand-DarkArchive *') {
         $deps += 'dark'
     }
-    if ($script -like '*Expand-ZstdArchive *') {
+    if (!(Test-HelperInstalled -Helper Zstd) -and $script -like '*Expand-ZstdArchive *') {
         $deps += 'zstd'
     }
 
