@@ -20,6 +20,7 @@
 - **checkver:** Fix output with '-Version' ([#3774](https://github.com/ScoopInstaller/Scoop/issues/3774))
 - **schema:** Add '$schema' property ([#4623](https://github.com/ScoopInstaller/Scoop/issues/4623))
 - **schema:** Add explicit escape to opening bracket matcher in jp/jsonpath regex ([#3719](https://github.com/ScoopInstaller/Scoop/issues/3719))
+- **vscode-settings:** Remove 'formatOnSave' trigger ([#4635](https://github.com/ScoopInstaller/Scoop/issues/4635))
 
 ### Styles
 
