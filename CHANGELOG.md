@@ -11,6 +11,7 @@
 
 ### Builds
 
+- **checkver:** Fix output with '-Version' ([#3774](https://github.com/ScoopInstaller/Scoop/issues/3774))
 - **schema:** Add '$schema' property ([#4623](https://github.com/ScoopInstaller/Scoop/issues/4623))
 
 ### Styles
