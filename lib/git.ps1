@@ -4,7 +4,7 @@ function git_proxy_cmd {
     if($proxy -and $proxy -ne 'none') {
         $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
     }
-    & "$env:COMSPEC" /c $cmd
+    & "$env:COMSPEC" /d /c $cmd
 }
 
 function git_clone {
@@ -20,7 +20,7 @@ function git_checkout {
 }
 
 function git_pull {
-    git_proxy_cmd pull $args
+    git_proxy_cmd pull --rebase=false $args
 }
 
 function git_fetch {

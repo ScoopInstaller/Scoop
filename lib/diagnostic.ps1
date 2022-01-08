@@ -39,11 +39,26 @@ function check_main_bucket {
 }
 
 function check_long_paths {
+    if ([System.Environment]::OSVersion.Version.Major -lt 10 -or [System.Environment]::OSVersion.Version.Build -lt 1607) {
+        warn 'This version of Windows does not support configuration of LongPaths.'
+        return $false
+    }
     $key = Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -ErrorAction SilentlyContinue -Name 'LongPathsEnabled'
     if (!$key -or ($key.LongPathsEnabled -eq 0)) {
         warn 'LongPaths support is not enabled.'
-        Write-Host "You can enable it with running:"
-        Write-Host "    Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1"
+        Write-Host "  You can enable it by running:"
+        Write-Host "    sudo Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1"
+        Write-Host "  (Requires 'sudo' command. Run 'scoop install sudo' if you don't have it.)"
+        return $false
+    }
+
+    return $true
+}
+
+function check_envs_requirements {
+    if ($null -eq $env:COMSPEC) {
+        warn '$env:COMSPEC environment variable is missing.'
+        Write-Host "    By default the variable should point to the cmd.exe in Windows: '%SystemRoot%\system32\cmd.exe'."
 
         return $false
     }
