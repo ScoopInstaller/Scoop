@@ -286,34 +286,7 @@ function Expand-ZipArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    # All methods to unzip the file require .NET4.5+
-    if ($PSVersionTable.PSVersion.Major -lt 5) {
-        Add-Type -AssemblyName System.IO.Compression.FileSystem
-        try {
-            [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath)
-        } catch [System.IO.PathTooLongException] {
-            # try to fall back to 7zip if path is too long
-            if (Test-HelperInstalled -Helper 7zip) {
-                Expand-7zipArchive $Path $DestinationPath -Removal
-                return
-            } else {
-                abort "Unzip failed: Windows can't handle the long paths in this zip file.`nRun 'scoop install 7zip' and try again."
-            }
-        } catch [System.IO.IOException] {
-            if (Test-HelperInstalled -Helper 7zip) {
-                Expand-7zipArchive $Path $DestinationPath -Removal
-                return
-            } else {
-                abort "Unzip failed: Windows can't handle the file names in this zip file.`nRun 'scoop install 7zip' and try again."
-            }
-        } catch {
-            abort "Unzip failed: $_"
-        }
-    } else {
-        # Use Expand-Archive to unzip in PowerShell 5+
-        # Compatible with Pscx (https://github.com/Pscx/Pscx)
-        Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
-    }
+    Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
@@ -355,24 +328,4 @@ function Expand-DarkArchive {
         # Remove original archive file
         Remove-Item $Path -Force
     }
-}
-
-function extract_7zip($path, $to, $removal) {
-    Show-DeprecatedWarning $MyInvocation 'Expand-7zipArchive'
-    Expand-7zipArchive -Path $path -DestinationPath $to -Removal:$removal @args
-}
-
-function extract_msi($path, $to, $removal) {
-    Show-DeprecatedWarning $MyInvocation 'Expand-MsiArchive'
-    Expand-MsiArchive -Path $path -DestinationPath $to -Removal:$removal
-}
-
-function unpack_inno($path, $to, $removal) {
-    Show-DeprecatedWarning $MyInvocation 'Expand-InnoArchive'
-    Expand-InnoArchive -Path $path -DestinationPath $to -Removal:$removal @args
-}
-
-function extract_zip($path, $to, $removal) {
-    Show-DeprecatedWarning $MyInvocation 'Expand-ZipArchive'
-    Expand-ZipArchive -Path $path -DestinationPath $to -Removal:$removal
 }
