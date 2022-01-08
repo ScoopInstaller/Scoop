@@ -10,14 +10,6 @@ set-strictmode -off
 
 reset_aliases
 
-# TODO: remove this in a few weeks
-if ((Get-LocalBucket) -notcontains 'main') {
-    warn "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
-    warn "You don't have the main bucket added, adding main bucket for you..."
-    add_bucket 'main'
-    exit
-}
-
 $commands = commands
 if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
     Push-Location $(versiondir 'scoop' 'current')

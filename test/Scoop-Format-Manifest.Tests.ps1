@@ -15,7 +15,7 @@ Describe 'Pretty json formating' -Tag 'Scoop' {
             It "$_" {
                 $pretty_json = (parse_json "$format\unformated\$_") | ConvertToPrettyJson
                 $correct = (Get-Content "$format\formated\$_") -join "`r`n"
-                $correct.CompareTo($pretty_json) | Should Be 0
+                $correct.CompareTo($pretty_json) | Should -Be 0
             }
         }
     }

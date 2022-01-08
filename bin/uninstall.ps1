@@ -34,7 +34,7 @@ $errors = $false
 
 # Uninstall given app
 function do_uninstall($app, $global) {
-    $version = current_version $app $global
+    $version = Select-CurrentVersion -AppName $app -Global:$global
     $dir = versiondir $app $version $global
     $manifest = installed_manifest $app $version $global
     $install = install_info $app $version $global
@@ -49,8 +49,8 @@ function do_uninstall($app, $global) {
     # directory.
     $refdir = unlink_current (appdir $app $global)
 
-    env_rm_path $manifest $refdir $global
-    env_rm $manifest $global
+    env_rm_path $manifest $refdir $global $architecture
+    env_rm $manifest $global $architecture
 
     $appdir = appdir $app $global
     try {
