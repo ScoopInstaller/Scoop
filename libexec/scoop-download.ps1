@@ -11,7 +11,8 @@
 #
 # Options:
 #   -f, --force               Force download (overwrite cache)
-#   -h, --no-hash-heck        Skip hash verification (use with caution!)
+#   -h, --no-hash-check       Skip hash verification (use with caution!)
+#   -u, --no-update-scoop     Don't update Scoop before downloading if it's outdated
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
 . "$psscriptroot\..\lib\manifest.ps1"
@@ -21,7 +22,7 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'fha:' 'force', 'no-hash-check', 'arch='
+$opt, $apps, $err = getopt $args 'fhua:' 'force', 'no-hash-check', 'no-update-scoop', 'arch='
 if ($err) { error "scoop download: $err"; exit 1 }
 
 $check_hash = !($opt.h -or $opt.'no-hash-check')
@@ -36,7 +37,11 @@ try {
 if (!$apps) { error '<app> missing'; my_usage; exit 1 }
 
 if (is_scoop_outdated) {
-    scoop update
+    if ($opt.u -or $opt.'no-update-scoop') {
+        warn "Scoop is out of date."
+    } else {
+        scoop update
+    }
 }
 
 # we only want to show this warning once
