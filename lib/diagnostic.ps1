@@ -46,9 +46,9 @@ function check_long_paths {
     $key = Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -ErrorAction SilentlyContinue -Name 'LongPathsEnabled'
     if (!$key -or ($key.LongPathsEnabled -eq 0)) {
         warn 'LongPaths support is not enabled.'
-        Write-Host "You can enable it with running:"
-        Write-Host "    Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1"
-
+        Write-Host "  You can enable it by running:"
+        Write-Host "    sudo Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1"
+        Write-Host "  (Requires 'sudo' command. Run 'scoop install sudo' if you don't have it.)"
         return $false
     }
 
@@ -58,7 +58,7 @@ function check_long_paths {
 function check_envs_requirements {
     if ($null -eq $env:COMSPEC) {
         warn '$env:COMSPEC environment variable is missing.'
-        Write-Host "    By default the variable should points to the cmd.exe in Windows: '%SystemRoot%\system32\cmd.exe'."
+        Write-Host "    By default the variable should point to the cmd.exe in Windows: '%SystemRoot%\system32\cmd.exe'."
 
         return $false
     }
