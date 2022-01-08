@@ -1,11 +1,11 @@
 function Test-7zipRequirement {
-    [CmdletBinding(DefaultParameterSetName = "URL")]
+    [CmdletBinding(DefaultParameterSetName = 'URL')]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true, ParameterSetName = "URL")]
+        [Parameter(Mandatory = $true, ParameterSetName = 'URL')]
         [String[]]
         $URL,
-        [Parameter(Mandatory = $true, ParameterSetName = "File")]
+        [Parameter(Mandatory = $true, ParameterSetName = 'File')]
         [String]
         $File
     )
@@ -21,13 +21,13 @@ function Test-7zipRequirement {
 }
 
 function Test-ZstdRequirement {
-    [CmdletBinding(DefaultParameterSetName = "URL")]
+    [CmdletBinding(DefaultParameterSetName = 'URL')]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true, ParameterSetName = "URL")]
+        [Parameter(Mandatory = $true, ParameterSetName = 'URL')]
         [String[]]
         $URL,
-        [Parameter(Mandatory = $true, ParameterSetName = "File")]
+        [Parameter(Mandatory = $true, ParameterSetName = 'File')]
         [String]
         $File
     )
@@ -67,7 +67,7 @@ function Expand-7zipArchive {
         [Parameter(ValueFromRemainingArguments = $true)]
         [String]
         $Switches,
-        [ValidateSet("All", "Skip", "Rename")]
+        [ValidateSet('All', 'Skip', 'Rename')]
         [String]
         $Overwrite,
         [Switch]
@@ -92,9 +92,9 @@ function Expand-7zipArchive {
         $ArgList += (-split $Switches)
     }
     switch ($Overwrite) {
-        "All" { $ArgList += "-aoa" }
-        "Skip" { $ArgList += "-aos" }
-        "Rename" { $ArgList += "-aou" }
+        'All' { $ArgList += '-aoa' }
+        'Skip' { $ArgList += '-aos' }
+        'Rename' { $ArgList += '-aou' }
     }
     $Status = Invoke-ExternalCommand $7zPath $ArgList -LogPath $LogPath
     if (!$Status) {
@@ -187,7 +187,7 @@ function Expand-MsiArchive {
         [Switch]
         $Removal
     )
-    $DestinationPath = $DestinationPath.TrimEnd("\")
+    $DestinationPath = $DestinationPath.TrimEnd('\')
     if ($ExtractDir) {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
@@ -248,9 +248,9 @@ function Expand-InnoArchive {
     $LogPath = "$(Split-Path $Path)\innounp.log"
     $ArgList = @('-x', "-d`"$DestinationPath`"", "`"$Path`"", '-y')
     switch -Regex ($ExtractDir) {
-        "^[^{].*" { $ArgList += "-c{app}\$ExtractDir" }
-        "^{.*" { $ArgList += "-c$ExtractDir" }
-        Default { $ArgList += "-c{app}" }
+        '^[^{].*' { $ArgList += "-c{app}\$ExtractDir" }
+        '^{.*' { $ArgList += "-c$ExtractDir" }
+        Default { $ArgList += '-c{app}' }
     }
     if ($Switches) {
         $ArgList += (-split $Switches)
