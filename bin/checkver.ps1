@@ -207,94 +207,94 @@ while ($in_progress -gt 0) {
     $expected_ver = $json.version
     $ver = ''
 
-    $page = $ev.SourceEventArgs.Result
-    $err = $ev.SourceEventArgs.Error
-    if ($json.checkver.script) {
-        $page = $json.checkver.script -join "`r`n" | Invoke-Expression
-    }
-
-    if ($err) {
-        next "$($err.message)`r`nURL $url is not valid"
-        continue
-    }
-
-    if (!$regex -and $replace) {
-        next "'replace' requires 're' or 'regex'"
-        continue
-    }
-
-    if ($jsonpath) {
-        # Return only a single value if regex is absent
-        $noregex = [String]::IsNullOrEmpty($regex)
-        # If reverse is ON and regex is ON,
-        # Then reverse would have no effect because regex handles reverse
-        # on its own
-        # So in this case we have to disable reverse
-        $ver = json_path $page $jsonpath $null ($reverse -and $noregex) $noregex
-        if (!$ver) {
-            $ver = json_path_legacy $page $jsonpath
+        $page = $ev.SourceEventArgs.Result
+        $err = $ev.SourceEventArgs.Error
+        if ($json.checkver.script) {
+            $page = $json.checkver.script -join "`r`n" | Invoke-Expression
         }
-        if (!$ver) {
-            next "couldn't find '$jsonpath' in $url"
+
+        if ($err) {
+            next "$($err.message)`r`nURL $url is not valid"
             continue
         }
-    }
 
-    if ($xpath) {
-        $xml = [xml]$page
-        # Find all `significant namespace declarations` from the XML file
-        $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
-        # Then add them into the NamespaceManager
-        $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
-        $nsList | ForEach-Object {
-            $nsmgr.AddNamespace($_.LocalName, $_.Value)
-        }
-        # Getting version from XML, using XPath
-        $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
-        if (!$ver) {
-            next "couldn't find '$xpath' in $url"
+        if (!$regex -and $replace) {
+            next "'replace' requires 're' or 'regex'"
             continue
         }
-    }
 
-    if ($jsonpath -and $regexp) {
-        $page = $ver
-        $ver = ''
-    }
-
-    if ($xpath -and $regexp) {
-        $page = $ver
-        $ver = ''
-    }
-
-    if ($regexp) {
-        $regex = New-Object System.Text.RegularExpressions.Regex($regexp)
-        if ($reverse) {
-            $match = $regex.Matches($page) | Select-Object -Last 1
-        } else {
-            $match = $regex.Matches($page) | Select-Object -First 1
-        }
-
-        if ($match -and $match.Success) {
-            $matchesHashtable = @{}
-            $regex.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
-            $ver = $matchesHashtable['1']
-            if ($replace) {
-                $ver = $regex.Replace($match.Value, $replace)
+        if ($jsonpath) {
+            # Return only a single value if regex is absent
+            $noregex = [String]::IsNullOrEmpty($regex)
+            # If reverse is ON and regex is ON,
+            # Then reverse would have no effect because regex handles reverse
+            # on its own
+            # So in this case we have to disable reverse
+            $ver = json_path $page $jsonpath $null ($reverse -and $noregex) $noregex
+            if (!$ver) {
+                $ver = json_path_legacy $page $jsonpath
             }
             if (!$ver) {
-                $ver = $matchesHashtable['version']
+                next "couldn't find '$jsonpath' in $url"
+                continue
             }
-        } else {
-            next "couldn't match '$regexp' in $url"
+        }
+
+        if ($xpath) {
+            $xml = [xml]$page
+            # Find all `significant namespace declarations` from the XML file
+            $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
+            # Then add them into the NamespaceManager
+            $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+            $nsList | ForEach-Object {
+                $nsmgr.AddNamespace($_.LocalName, $_.Value)
+            }
+            # Getting version from XML, using XPath
+            $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
+            if (!$ver) {
+                next "couldn't find '$xpath' in $url"
+                continue
+            }
+        }
+
+        if ($jsonpath -and $regexp) {
+            $page = $ver
+            $ver = ''
+        }
+
+        if ($xpath -and $regexp) {
+            $page = $ver
+            $ver = ''
+        }
+
+        if ($regexp) {
+            $regex = New-Object System.Text.RegularExpressions.Regex($regexp)
+            if ($reverse) {
+                $match = $regex.Matches($page) | Select-Object -Last 1
+            } else {
+                $match = $regex.Matches($page) | Select-Object -First 1
+            }
+
+            if ($match -and $match.Success) {
+                $matchesHashtable = @{}
+                $regex.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
+                $ver = $matchesHashtable['1']
+                if ($replace) {
+                    $ver = $regex.Replace($match.Value, $replace)
+                }
+                if (!$ver) {
+                    $ver = $matchesHashtable['version']
+                }
+            } else {
+                next "couldn't match '$regexp' in $url"
+                continue
+            }
+        }
+
+        if (!$ver) {
+            next "couldn't find new version in $url"
             continue
         }
-    }
-
-    if (!$ver) {
-        next "couldn't find new version in $url"
-        continue
-    }
 
     # Skip actual only if versions are same and there is no -f
     if (($ver -eq $expected_ver) -and !$ForceUpdate -and $SkipUpdated) { continue }
