@@ -15,6 +15,8 @@
     Useful for hash updates.
 .PARAMETER SkipUpdated
     Updated manifests will not be shown.
+.PARAMETER Version
+    Update manifest to specific version.
 .EXAMPLE
     PS BUCKETROOT > .\bin\checkver.ps1
     Check all manifest inside default directory.
@@ -75,6 +77,11 @@ param(
 $Dir = Resolve-Path $Dir
 $Search = $App
 $GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+
+# don't use $Version with $App = '*'
+if ($App -eq '*' -and $Version -ne '') {
+    throw "Don't use '-Version' with '-App *'!"
+}
 
 # get apps to check
 $Queue = @()
@@ -205,8 +212,9 @@ while ($in_progress -gt 0) {
     $reverse = $state.reverse
     $replace = $state.replace
     $expected_ver = $json.version
-    $ver = ''
+    $ver = $Version
 
+    if (!$ver) {
         $page = $ev.SourceEventArgs.Result
         $err = $ev.SourceEventArgs.Error
         if ($json.checkver.script) {
@@ -295,6 +303,7 @@ while ($in_progress -gt 0) {
             next "couldn't find new version in $url"
             continue
         }
+    }
 
     # Skip actual only if versions are same and there is no -f
     if (($ver -eq $expected_ver) -and !$ForceUpdate -and $SkipUpdated) { continue }
@@ -325,9 +334,6 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
-            if ($Version -ne "") {
-                $ver = $Version
-            }
             Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
