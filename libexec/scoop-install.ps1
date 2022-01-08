@@ -13,6 +13,7 @@
 #   -g, --global              Install the app globally
 #   -i, --independent         Don't install dependencies automatically
 #   -k, --no-cache            Don't use the download cache
+#   -u, --no-update-scoop     Don't update Scoop before installing if it's outdated
 #   -s, --skip                Skip hash validation (use with caution!)
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
@@ -49,7 +50,7 @@ function is_installed($app, $global) {
     return $false
 }
 
-$opt, $apps, $err = getopt $args 'gfiksa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'arch='
+$opt, $apps, $err = getopt $args 'gikusa:' 'global', 'independent', 'no-cache', 'no-update-scoop', 'skip', 'arch='
 if ($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
@@ -70,7 +71,11 @@ if ($global -and !(is_admin)) {
 }
 
 if (is_scoop_outdated) {
-    scoop update
+    if ($opt.u -or $opt.'no-update-scoop') {
+        warn "Scoop is out of date."
+    } else {
+        scoop update
+    }
 }
 
 if ($apps.length -eq 1) {
