@@ -4,6 +4,7 @@
 ### Features
 
 - **scoop-download:** Add `scoop download` command ([#4621](https://github.com/ScoopInstaller/Scoop/issues/4621))
+- **scoop-(install|virustotal):** Allow skipping update check ([#4634](https://github.com/ScoopInstaller/Scoop/issues/4634))
 
 ### Bug Fixes
 
