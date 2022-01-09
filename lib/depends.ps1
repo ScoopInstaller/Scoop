@@ -31,7 +31,7 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
         abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })"
     }
 
-    $deps = @(Get-InstallationHelper $manifest $arch) + @(runtime_deps $manifest) | Select-Object -Unique
+    $deps = @(Get-InstallationHelper $manifest $arch) + @($manifest.depends) | Select-Object -Unique
 
     foreach ($dep in $deps) {
         if ($resolved -notcontains $dep) {
@@ -45,9 +45,6 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
     $unresolved = $unresolved -ne $app # remove from unresolved
 }
 
-function runtime_deps($manifest) {
-    if ($manifest.depends) { return $manifest.depends }
-}
 function Get-InstallationHelper {
     <#
     .SYNOPSIS
