@@ -1,41 +1,25 @@
 function Test-7zipRequirement {
-    [CmdletBinding(DefaultParameterSetName = 'URL')]
+    [CmdletBinding()]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true, ParameterSetName = 'URL')]
+        [Parameter(Mandatory = $true)]
         [String[]]
-        $URL,
-        [Parameter(Mandatory = $true, ParameterSetName = 'File')]
-        [String]
-        $File
+        $Uri
     )
-    if ($URL) {
-        if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
-            return $false
-        } else {
-            return ($URL | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
-        }
-    } else {
-        return $File -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
-    }
+    return ($Uri | Where-Object {
+            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
+        }).Count -gt 0
 }
 
 function Test-ZstdRequirement {
-    [CmdletBinding(DefaultParameterSetName = 'URL')]
+    [CmdletBinding()]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true, ParameterSetName = 'URL')]
+        [Parameter(Mandatory = $true)]
         [String[]]
-        $URL,
-        [Parameter(Mandatory = $true, ParameterSetName = 'File')]
-        [String]
-        $File
+        $Uri
     )
-    if ($URL) {
-        return ($URL | Where-Object { Test-ZstdRequirement -File $_ }).Count -gt 0
-    } else {
-        return $File -match '\.zst$'
-    }
+    return ($Uri | Where-Object { $_ -match '\.zst$' }).Count -gt 0
 }
 
 function Test-LessmsiRequirement {
@@ -44,13 +28,9 @@ function Test-LessmsiRequirement {
     param (
         [Parameter(Mandatory = $true)]
         [String[]]
-        $URL
+        $Uri
     )
-    if ((get_config MSIEXTRACT_USE_LESSMSI)) {
-        return ($URL | Where-Object { $_ -match '\.msi$' }).Count -gt 0
-    } else {
-        return $false
-    }
+    return ($Uri | Where-Object { $_ -match '\.msi$' }).Count -gt 0
 }
 
 function Expand-7zipArchive {

@@ -83,16 +83,16 @@ function install_deps($manifest, $arch) {
     $test_url = script:url $manifest $arch
     if (-not $test_url) { $test_url = ' ' }
 
-    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -URL $test_url)) {
+    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -Uri $test_url)) {
         $deps += '7zip'
     }
-    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -URL $test_url)) {
+    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -Uri $test_url)) {
         $deps += 'lessmsi'
     }
     if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
         $deps += 'innounp'
     }
-    if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -URL $test_url)) {
+    if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -Uri $test_url)) {
         $deps += 'zstd'
     }
 
