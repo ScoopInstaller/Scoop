@@ -1088,8 +1088,9 @@ function failed($app, $global) {
 
 function ensure_none_failed($apps, $global) {
     foreach($app in $apps) {
-        if(failed $app $global) {
-            abort "'$app' install failed previously. Please uninstall it and try again."
+        if (failed $app $global) {
+            warn "Purging previous failed installation of $app."
+            & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
         }
     }
 }
