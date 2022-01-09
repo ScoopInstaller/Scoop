@@ -635,12 +635,12 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
-            "if command -v pwsh.exe &> /dev/null; then",
-            "    pwsh -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
+            "if command -v pwsh.exe > /dev/null 2>&1; then",
+            "    pwsh.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
             "else",
-            "    powershell -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
+            "    powershell.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
             "fi"
-        ) -join "`n" | Out-File $shim -Encoding ASCII
+        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     } elseif ($path -match '\.jar$') {
         warn_on_overwrite "$shim.cmd" $path
         @(
