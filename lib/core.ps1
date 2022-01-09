@@ -587,7 +587,7 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-File $shim -Encoding ASCII
+        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     } elseif ($path -match '\.ps1$') {
         # if $path points to another drive resolve-path prepends .\ which could break shims
         warn_on_overwrite "$shim.ps1" $path
@@ -635,12 +635,12 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
-            "if command -v pwsh.exe &> /dev/null; then",
-            "    pwsh -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
+            "if command -v pwsh.exe > /dev/null 2>&1; then",
+            "    pwsh.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
             "else",
-            "    powershell -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
+            "    powershell.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
             "fi"
-        ) -join "`n" | Out-File $shim -Encoding ASCII
+        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     } elseif ($path -match '\.jar$') {
         warn_on_overwrite "$shim.cmd" $path
         @(
@@ -652,8 +652,8 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
-            "java -jar `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-File $shim -Encoding ASCII
+            "java.exe -jar `"$resolved_path`" $arg `"$@`""
+        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     } elseif ($path -match '\.py$') {
         warn_on_overwrite "$shim.cmd" $path
         @(
@@ -665,8 +665,8 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
-            "python `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-File $shim -Encoding ASCII
+            "python.exe `"$resolved_path`" $arg `"$@`""
+        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     } else {
         warn_on_overwrite "$shim.cmd" $path
         # find path to Git's bash so that batch scripts can run bash scripts
@@ -684,7 +684,7 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "`"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-File $shim -Encoding ASCII
+        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     }
 }
 
