@@ -168,14 +168,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
     $url = $install.url
 
-    if (!$independent) {
-        # check dependencies
-        $man = if ($url) { $url } else { $app }
-        $deps = @(Get-Dependency $man $architecture) | Where-Object { !(installed $_) }
-        $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
-    }
-
-    $version = Get-LatestVersion -AppName $app -Bucket $bucket -Uri $url
+    $manifest = manifest $app $bucket $url
+    $version = $manifest.version
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
         $version = nightly_version $(get-date) $quiet
@@ -193,8 +187,6 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         error "No manifest available for '$app'."
         return
     }
-
-    $manifest = manifest $app $bucket $url
 
     write-host "Updating '$app' ($old_version -> $version)"
 
@@ -275,7 +267,14 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         # use the url of the install json if the application was installed through url
         $app = $install.url
     }
-    install_app $app $architecture $global $suggested $use_cache $check_hash
+
+    if ($independent) {
+        install_app $app $architecture $global $suggested $use_cache $check_hash
+    } else {
+        # Also add missing dependencies
+        $apps = @(Get-Dependency $app $architecture) | Where-Object { !(installed $_) }
+        $apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+    }
 }
 
 if (-not ($apps -or $all)) {
