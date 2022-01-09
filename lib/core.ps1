@@ -652,7 +652,7 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
-            "java -jar `"$resolved_path`" $arg `"$@`""
+            "java.exe -jar `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     } elseif ($path -match '\.py$') {
         warn_on_overwrite "$shim.cmd" $path
@@ -665,7 +665,7 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
-            "python `"$resolved_path`" $arg `"$@`""
+            "python.exe `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     } else {
         warn_on_overwrite "$shim.cmd" $path
