@@ -1,21 +1,3 @@
-# resolve dependencies for the supplied apps, and sort into the correct order
-function install_order($apps, $arch) {
-    $res = @()
-    foreach ($app in $apps) {
-        foreach ($dep in deps $app $arch) {
-            if ($res -notcontains $dep) { $res += $dep }
-        }
-        if ($res -notcontains $app) { $res += $app }
-    }
-    return $res
-}
-
-function deps($app, $arch) {
-    $resolved = Get-Dependency $app $arch
-    if ($resolved.Length -eq 1) { return @() } # no dependencies
-    return $resolved[0..($resolved.Length - 2)]
-}
-
 function Get-Dependency {
     <#
     .SYNOPSIS

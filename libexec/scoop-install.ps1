@@ -114,7 +114,7 @@ $apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-
 $explicit_apps = $apps
 
 if (!$independent) {
-    $apps = install_order $apps $architecture # adds dependencies
+    $apps = $apps | Get-Dependency -Architecture $architecture | Select-Object -Unique # adds dependencies
 }
 ensure_none_failed $apps $global
 

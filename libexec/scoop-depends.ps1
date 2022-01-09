@@ -23,7 +23,7 @@ try {
     abort "ERROR: $_"
 }
 
-$deps = @(deps $app $architecture)
+$deps = @(Get-Dependency $app $architecture) -ne $app
 if($deps) {
     $deps[($deps.length - 1)..0]
 }
