@@ -31,7 +31,7 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
         abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })"
     }
 
-    $deps = @(install_deps $manifest $arch) + @(runtime_deps $manifest) | Select-Object -Unique
+    $deps = @(Get-InstallationHelper $manifest $arch) + @(runtime_deps $manifest) | Select-Object -Unique
 
     foreach ($dep in $deps) {
         if ($resolved -notcontains $dep) {
@@ -48,60 +48,106 @@ function dep_resolve($app, $arch, $resolved, $unresolved) {
 function runtime_deps($manifest) {
     if ($manifest.depends) { return $manifest.depends }
 }
-
-function script_deps($script) {
-    $deps = @()
-    if ($script -is [Array]) {
-        $script = $script -join "`n"
+function Get-InstallationHelper {
+    <#
+    .SYNOPSIS
+        Get helpers that used in installation
+    .PARAMETER Manifest
+        App's manifest
+    .PARAMETER Architecture
+        Architecture of the app
+    .PARAMETER All
+        If true, return all helpers, otherwise return only helpers that are not already installed
+    .OUTPUTS
+        [Object[]]
+        List of helpers
+    #>
+    [CmdletBinding()]
+    [OutputType([Object[]])]
+    param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [PSObject]
+        $Manifest,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $Architecture,
+        [Switch]
+        $All
+    )
+    begin {
+        $helper = @()
     }
-    if ([String]::IsNullOrEmpty($script)) {
-        return $deps
+    process {
+        $url = arch_specific 'url' $Manifest $Architecture
+        if (!$url) {
+            $url = ''
+        }
+        $pre_install = arch_specific 'pre_install' $Manifest $Architecture
+        $installer = arch_specific 'installer' $Manifest $Architecture
+        $post_install = arch_specific 'post_install' $Manifest $Architecture
+        $script = $pre_install + $installer.script + $post_install
+        if (!$script) {
+            $script = ''
+        }
+        if (((Test-7zipRequirement -Uri $url) -or ($script -like '*Expand-7zipArchive *')) -and !(get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
+            $helper += '7zip'
+        }
+        if (((Test-LessmsiRequirement -Uri $url) -or ($script -like '*Expand-MsiArchive *')) -and (get_config MSIEXTRACT_USE_LESSMSI)) {
+            $helper += 'lessmsi'
+        }
+        if ($Manifest.innosetup -or ($script -like '*Expand-InnoArchive *')) {
+            $helper += 'innounp'
+        }
+        if ($script -like '*Expand-DarkArchive *') {
+            $helper += 'dark'
+        }
+        if ((Test-ZstdRequirement -Uri $url) -or ($script -like '*Expand-ZstdArchive *')) {
+            $helper += 'zstd'
+        }
+        if (!$All) {
+            '7zip', 'lessmsi', 'innounp', 'dark', 'zstd' | ForEach-Object {
+                if (Test-HelperInstalled -Helper $_) {
+                    $helper = $helper -ne $_
+                }
+            }
+        }
     }
-
-    if (!(Test-HelperInstalled -Helper 7zip) -and ($script -like '*Expand-7zipArchive *')) {
-        $deps += '7zip'
+    end {
+        return $helper
     }
-    if (!(Test-HelperInstalled -Helper Lessmsi) -and ($script -like '*Expand-MsiArchive *')) {
-        $deps += 'lessmsi'
-    }
-    if (!(Test-HelperInstalled -Helper Innounp) -and ($script -like '*Expand-InnoArchive *')) {
-        $deps += 'innounp'
-    }
-    if (!(Test-HelperInstalled -Helper Dark) -and ($script -like '*Expand-DarkArchive *')) {
-        $deps += 'dark'
-    }
-    if (!(Test-HelperInstalled -Helper Zstd) -and ($script -like '*Expand-ZstdArchive *')) {
-        $deps += 'zstd'
-    }
-
-    return $deps
 }
 
-function install_deps($manifest, $arch) {
-    $deps = @()
+function Test-7zipRequirement {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Uri
+    )
+    return ($Uri | Where-Object {
+            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
+        }).Count -gt 0
+}
 
-    $test_url = script:url $manifest $arch
-    if (-not $test_url) { $test_url = ' ' }
+function Test-ZstdRequirement {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Uri
+    )
+    return ($Uri | Where-Object { $_ -match '\.zst$' }).Count -gt 0
+}
 
-    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -Uri $test_url)) {
-        $deps += '7zip'
-    }
-    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -Uri $test_url)) {
-        $deps += 'lessmsi'
-    }
-    if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
-        $deps += 'innounp'
-    }
-    if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -Uri $test_url)) {
-        $deps += 'zstd'
-    }
-
-    $pre_install = arch_specific 'pre_install' $manifest $arch
-    $installer = arch_specific 'installer' $manifest $arch
-    $post_install = arch_specific 'post_install' $manifest $arch
-    $deps += script_deps $pre_install
-    $deps += script_deps $installer.script
-    $deps += script_deps $post_install
-
-    return $deps | Select-Object -Unique
+function Test-LessmsiRequirement {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [String[]]
+        $Uri
+    )
+    return ($Uri | Where-Object { $_ -match '\.msi$' }).Count -gt 0
 }

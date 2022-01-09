@@ -1,38 +1,3 @@
-function Test-7zipRequirement {
-    [CmdletBinding()]
-    [OutputType([Boolean])]
-    param (
-        [Parameter(Mandatory = $true)]
-        [String[]]
-        $Uri
-    )
-    return ($Uri | Where-Object {
-            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
-        }).Count -gt 0
-}
-
-function Test-ZstdRequirement {
-    [CmdletBinding()]
-    [OutputType([Boolean])]
-    param (
-        [Parameter(Mandatory = $true)]
-        [String[]]
-        $Uri
-    )
-    return ($Uri | Where-Object { $_ -match '\.zst$' }).Count -gt 0
-}
-
-function Test-LessmsiRequirement {
-    [CmdletBinding()]
-    [OutputType([Boolean])]
-    param (
-        [Parameter(Mandatory = $true)]
-        [String[]]
-        $Uri
-    )
-    return ($Uri | Where-Object { $_ -match '\.msi$' }).Count -gt 0
-}
-
 function Expand-7zipArchive {
     [CmdletBinding()]
     param (

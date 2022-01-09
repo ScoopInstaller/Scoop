@@ -6,25 +6,6 @@
 
 $isUnix = is_unix
 
-Describe 'Requirement function' -Tag 'Scoop' {
-    It 'Test 7zip requirement' {
-        Test-7zipRequirement -Uri 'test.xz' | Should -BeTrue
-        Test-7zipRequirement -Uri 'test.bin' | Should -BeFalse
-        Test-7zipRequirement -Uri @('test.xz', 'test.bin') | Should -BeTrue
-    }
-    It 'Test Zstd requirement' {
-        Test-ZstdRequirement -Uri 'test.zst' | Should -BeTrue
-        Test-ZstdRequirement -Uri 'test.bin' | Should -BeFalse
-        Test-ZstdRequirement -Uri @('test.zst', 'test.bin') | Should -BeTrue
-    }
-    It 'Test lessmsi requirement' {
-        Mock get_config { $true }
-        Test-LessmsiRequirement -Uri 'test.msi' | Should -BeTrue
-        Test-LessmsiRequirement -Uri 'test.bin' | Should -BeFalse
-        Test-LessmsiRequirement -Uri @('test.msi', 'test.bin') | Should -BeTrue
-    }
-}
-
 Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
     BeforeAll {
