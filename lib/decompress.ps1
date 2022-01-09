@@ -20,9 +20,9 @@ function Expand-7zipArchive {
     )
     if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
         try {
-            $7zPath = (Get-Command '7z' -CommandType Application | Select-Object -First 1).Source
+            $7zPath = (Get-Command '7z' -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         } catch [System.Management.Automation.CommandNotFoundException] {
-            abort "Cannot find external 7-Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7-Zip manually and try again."
+            abort "`nCannot find external 7-Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7-Zip manually and try again."
         }
     } else {
         $7zPath = Get-HelperPath -Helper 7zip
