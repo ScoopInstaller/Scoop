@@ -624,7 +624,7 @@ if %errorlevel% equ 0 (
         warn_on_overwrite $shim $path
         "#!/bin/sh
 # $resolved_path
-if command -v pwsh.exe &> /dev/null; then
+if command -v pwsh.exe > /dev/null 2>&1; then
     pwsh.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"
 else
     powershell.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"
