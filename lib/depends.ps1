@@ -83,14 +83,17 @@ function install_deps($manifest, $arch) {
     $test_url = script:url $manifest $arch
     if (-not $test_url) { $test_url = " " }
 
-    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -URL $test_url)) {
+    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -Manifest $manifest -Architecture $arch)) {
         $deps += '7zip'
     }
-    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -URL $test_url)) {
+    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -Manifest $manifest -Architecture $arch)) {
         $deps += 'lessmsi'
     }
-    if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
+    if (!(Test-HelperInstalled -Helper Innounp) -and (Test-InnounpRequirement -Manifest $manifest -Architecture $arch)) {
         $deps += 'innounp'
+    }
+    if (!(Test-HelperInstalled -Helper Dark) -and (Test-DarkRequirement -Manifest $manifest -Architecture $arch)) {
+        $deps += 'dark'
     }
     if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -URL $test_url)) {
         $deps += 'zstd'
@@ -103,5 +106,9 @@ function install_deps($manifest, $arch) {
     $deps += script_deps $installer.script
     $deps += script_deps $post_install
 
-    return $deps | Select-Object -Unique
+    if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
+        $deps = @($deps | Select-Object -Unique) -ne '7zip'
+    }
+
+    return $deps
 }
