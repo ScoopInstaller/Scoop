@@ -10,39 +10,76 @@ function install_order($apps, $arch) {
     return $res
 }
 
-# http://www.electricmonk.nl/docs/dependency_resolving_algorithm/dependency_resolving_algorithm.html
 function deps($app, $arch) {
-    $resolved = New-Object collections.arraylist
-    dep_resolve $app $arch $resolved @()
-
-    if ($resolved.count -eq 1) { return @() } # no dependencies
-    return $resolved[0..($resolved.count - 2)]
+    $resolved = Get-Dependency $app $arch
+    if ($resolved.Length -eq 1) { return @() } # no dependencies
+    return $resolved[0..($resolved.Length - 2)]
 }
 
-function dep_resolve($app, $arch, $resolved, $unresolved) {
-    $app, $bucket, $null = parse_app $app
-    $unresolved += $app
-    $null, $manifest, $null, $null = Find-Manifest $app $bucket
+function Get-Dependency {
+    <#
+    .SYNOPSIS
+        Get app's dependencies (with apps attached at the end).
+    .PARAMETER AppName
+        App's name
+    .PARAMETER Architecture
+        App's architecture
+    .PARAMETER Resolved
+        List of resolved dependencies (internal use)
+    .PARAMETER Unresolved
+        List of unresolved dependencies (internal use)
+    .OUTPUTS
+        [Object[]]
+        List of app's dependencies
+    .NOTES
+        When pipeline input is used, the output will have duplicate items, and should be filtered by 'Select-Object -Unique'.
+        ALgorithm: http://www.electricmonk.nl/docs/dependency_resolving_algorithm/dependency_resolving_algorithm.html
+    #>
+    [CmdletBinding()]
+    [OutputType([Object[]])]
+    param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [PSObject]
+        $AppName,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $Architecture,
+        [String[]]
+        $Resolved = @(),
+        [String[]]
+        $Unresolved = @()
+    )
+    process {
+        $AppName, $bucket, $null = parse_app $AppName
+        $Unresolved += $AppName
+        $null, $manifest, $null, $null = Find-Manifest $AppName $bucket
 
-    if (!$manifest) {
-        if (((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
-            warn "Bucket '$bucket' not installed. Add it with 'scoop bucket add $bucket' or 'scoop bucket add $bucket <repo>'."
-        }
-        abort "Couldn't find manifest for '$app'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })"
-    }
-
-    $deps = @(Get-InstallationHelper $manifest $arch) + @($manifest.depends) | Select-Object -Unique
-
-    foreach ($dep in $deps) {
-        if ($resolved -notcontains $dep) {
-            if ($unresolved -contains $dep) {
-                abort "Circular dependency detected: '$app' -> '$dep'."
+        if (!$manifest) {
+            if (((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
+                warn "Bucket '$bucket' not installed. Add it with 'scoop bucket add $bucket' or 'scoop bucket add $bucket <repo>'."
             }
-            dep_resolve $dep $arch $resolved $unresolved
+            abort "Couldn't find manifest for '$AppName'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })"
+        }
+
+        $deps = @(Get-InstallationHelper $manifest $Architecture) + @($manifest.depends) | Select-Object -Unique
+
+        foreach ($dep in $deps) {
+            if ($Resolved -notcontains $dep) {
+                if ($Unresolved -contains $dep) {
+                    abort "Circular dependency detected: '$AppName' -> '$dep'."
+                }
+                $Resolved, $Unresolved = Get-Dependency $dep $Architecture -Resolved $Resolved -Unresolved $Unresolved
+            }
+        }
+
+        $Unresolved = $Unresolved -ne $AppName
+        $Resolved += $AppName
+        if ($Unresolved.Length -eq 0) {
+            return $Resolved
+        } else {
+            return $Resolved, $Unresolved
         }
     }
-    $resolved.add($app) | Out-Null
-    $unresolved = $unresolved -ne $app # remove from unresolved
 }
 
 function Get-InstallationHelper {
