@@ -95,6 +95,22 @@ $env:SCOOP_GLOBAL='F:\GlobalScoopApps'
 # run the installer
 ```
 
+### Configure Scoop to store downloads to a Custom Directory by changing `SCOOP_CACHE`
+
+```powershell
+$env:SCOOP_CACHE='F:\ScoopCache'
+[Environment]::SetEnvironmentVariable('SCOOP_CACHE', $env:SCOOP_CACHE, 'Machine')
+# run the installer
+```
+
+### Configure Scoop to use a GitHub API token during searching and checkver by setting `SCOOP_CHECKVER_TOKEN`
+
+```powershell
+$env:SCOOP_CHECKVER_TOKEN='<paste-token-here>'
+[Environment]::SetEnvironmentVariable('SCOOP_CHECKVER_TOKEN', $env:SCOOP_CHECKVER_TOKEN, 'Machine')
+# search for an app
+```
+
 ## [Documentation](https://github.com/ScoopInstaller/Scoop/wiki)
 
 ## Multi-connection downloads with `aria2`
@@ -115,6 +131,7 @@ You can tweak the following `aria2` settings with the `scoop config` command:
 - [aria2-split](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-s) (default: 5)
 - [aria2-max-connection-per-server](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-x) (default: 5)
 - [aria2-min-split-size](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-k) (default: 5M)
+- [aria2-options](https://aria2.github.io/manual/en/html/aria2c.html#options) (default: )
 
 ## Inspiration
 
@@ -128,6 +145,10 @@ The apps that install best with Scoop are commonly called "portable" apps: i.e. 
 Since installers are common, Scoop supports them too (and their uninstallers).
 
 Scoop is also great at handling single-file programs and Powershell scripts. These don't even need to be compressed. See the [runat](https://github.com/ScoopInstaller/Main/blob/master/bucket/runat.json) package for an example: it's really just a GitHub gist.
+
+### Contribute to this project
+
+If you'd like to improve Scoop by adding features or fixing bugs, please read our [Contributing Guide](https://github.com/ScoopInstaller/.github/blob/main/.github/CONTRIBUTING.md).
 
 ### Support this project
 
@@ -145,8 +166,6 @@ The following buckets are known to scoop:
 - [nerd-fonts](https://github.com/matthewjberger/scoop-nerd-fonts) -  Nerd Fonts
 - [nirsoft](https://github.com/kodybrown/scoop-nirsoft) - Almost all of the [250+](https://rasa.github.io/scoop-directory/by-apps#kodybrown_scoop-nirsoft) apps from [Nirsoft](https://nirsoft.net)
 - [java](https://github.com/ScoopInstaller/Java) - A collection of Java development kits (JDKs), Java runtime engines (JREs), Java's virtual machine debugging tools and Java based runtime engines.
-- [jetbrains](https://github.com/Ash258/Scoop-JetBrains) - Installers for all JetBrains utilities and IDEs
-<!-- * [nightlies](https://github.com/ScoopInstaller/Nightlies) - No longer used -->
 - [nonportable](https://github.com/TheRandomLabs/scoop-nonportable) - Non-portable apps (may require UAC)
 - [php](https://github.com/ScoopInstaller/PHP) - Installers for most versions of PHP
 - [versions](https://github.com/ScoopInstaller/Versions) - Alternative versions of apps found in other buckets
@@ -162,4 +181,4 @@ scoop bucket add extras
 
 ## Other application buckets
 
-Many other application buckets hosted on Github can be found in the [Scoop Directory](https://github.com/rasa/scoop-directory).
+Many other application buckets hosted on Github can be found in the [Scoop Directory](https://rasa.github.io/scoop-directory/) or via [other search engines](https://rasa.github.io/scoop-directory/#other-search-engines).

@@ -221,6 +221,9 @@
                 "persist": {
                     "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
                 },
+                "license": {
+                    "$ref": "#/definitions/license"
+                },
                 "note": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
@@ -453,6 +456,29 @@
                 "Shareware",
                 "Unlicense"
             ]
+        },
+        "license": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/licenseIdentifiers"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "url": {
+                            "format": "uri",
+                            "type": "string"
+                        },
+                        "identifier": {
+                            "$ref": "#/definitions/licenseIdentifiers"
+                        }
+                    },
+                    "required": [
+                        "identifier"
+                    ],
+                    "type": "object"
+                }
+            ]
         }
     },
     "properties": {
@@ -518,34 +544,14 @@
             "type": "string"
         },
         "innosetup": {
-            "description": "True if the installer InnoSetup based. Found in https://github.com/lukesampson/scoop/search?l=JSON&q=innosetup",
+            "description": "True if the installer InnoSetup based. Found in https://github.com/ScoopInstaller/Main/search?l=JSON&q=innosetup",
             "type": "boolean"
         },
         "installer": {
             "$ref": "#/definitions/installer"
         },
         "license": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/licenseIdentifiers"
-                },
-                {
-                    "additionalProperties": false,
-                    "properties": {
-                        "url": {
-                            "format": "uri",
-                            "type": "string"
-                        },
-                        "identifier": {
-                            "$ref": "#/definitions/licenseIdentifiers"
-                        }
-                    },
-                    "required": [
-                        "identifier"
-                    ],
-                    "type": "object"
-                }
-            ]
+            "$ref": "#/definitions/license"
         },
         "msi": {
             "$ref": "#/definitions/stringOrArrayOfStrings",
@@ -593,7 +599,10 @@
         }
     },
     "required": [
-        "version"
+        "version",
+        "description",
+        "homepage",
+        "license"
     ],
     "title": "scoop app manifest schema",
     "type": "object"
