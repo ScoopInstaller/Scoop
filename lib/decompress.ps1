@@ -165,7 +165,7 @@ function Expand-ZstdArchive {
     }
     if ($IsTar) {
         # Check for tar
-        $TarFile = Join-Path $DestinationPath (Split-Path $Path -LeafBase)
+        $TarFile = Join-Path $DestinationPath (strip_ext (fname $Path))
         Expand-7zipArchive -Path $TarFile -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
     }
 }
