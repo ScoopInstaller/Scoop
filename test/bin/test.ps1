@@ -41,7 +41,7 @@ if ($env:CI -eq $true) {
         $excludes += 'Decompress'
     }
 
-    if ($env:CI_WINDOWS -ne $true) {
+    if ($env:RUNNER_OS -ne 'Windows') {
         Write-Warning 'Skipping tests and code linting for decompress.ps1 because they only work on Windows'
         $excludes += 'Decompress'
     }
