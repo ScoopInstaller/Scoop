@@ -2,6 +2,7 @@ name: Tests
 
 on:
   pull_request:
+    types: [ opened ]
   push:
   workflow_dispatch:
 
