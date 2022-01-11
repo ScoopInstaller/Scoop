@@ -69,7 +69,4 @@ if ($excludes.Length -gt 0) {
 
 Write-Host 'Invoke-Pester' @splat
 $result = Invoke-Pester @splat
-
-if ($result.FailedCount -gt 0) {
-    exit $result.FailedCount
-}
+exit $result.FailedCount

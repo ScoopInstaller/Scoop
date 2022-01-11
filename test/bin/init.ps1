@@ -14,7 +14,7 @@ if ($env:CI -eq $true) {
         }
 
         if (!(Test-Path $env:SCOOP_HELPERS)) {
-            New-Item -ItemType Directory -Path $env:SCOOP_HELPERS
+            New-Item -ItemType Directory -Path $env:SCOOP_HELPERS | Out-Null
         }
         if (!(Test-Path "$env:SCOOP_HELPERS\lessmsi\lessmsi.exe")) {
             $source = 'https://github.com/activescott/lessmsi/releases/download/v1.10.0/lessmsi-v1.10.0.zip'
