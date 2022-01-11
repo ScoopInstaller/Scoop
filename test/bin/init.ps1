@@ -17,16 +17,16 @@ if ($env:CI -eq $true) {
             New-Item -ItemType Directory -Path $env:SCOOP_HELPERS
         }
         if (!(Test-Path "$env:SCOOP_HELPERS\lessmsi\lessmsi.exe")) {
-            Start-FileDownload 'https://github.com/activescott/lessmsi/releases/download/v1.10.0/lessmsi-v1.10.0.zip' -FileName "$env:SCOOP_HELPERS\lessmsi.zip"
-            & 7z.exe x "$env:SCOOP_HELPERS\lessmsi.zip" -o"$env:SCOOP_HELPERS\lessmsi" -y
+            $source = 'https://github.com/activescott/lessmsi/releases/download/v1.10.0/lessmsi-v1.10.0.zip'
+            $destination = "$env:SCOOP_HELPERS\lessmsi.zip"
+            Invoke-WebRequest -Uri $source -OutFile $destination
+            & 7z.exe x "$destination" -o"$env:SCOOP_HELPERS\lessmsi" -y
         }
         if (!(Test-Path "$env:SCOOP_HELPERS\innounp\innounp.exe")) {
-            Start-FileDownload 'https://raw.githubusercontent.com/ScoopInstaller/Binary/master/innounp/innounp050.rar' -FileName "$env:SCOOP_HELPERS\innounp.rar"
-            & 7z.exe x "$env:SCOOP_HELPERS\innounp.rar" -o"$env:SCOOP_HELPERS\innounp" -y
-        }
-        if (!(Test-Path "$env:SCOOP_HELPERS\zstd\zstd.exe")) {
-            Start-FileDownload 'https://github.com/facebook/zstd/releases/download/v1.5.0/zstd-v1.5.0-win32.zip' -FileName "$env:SCOOP_HELPERS\zstd.zip"
-            & 7z.exe x "$env:SCOOP_HELPERS\zstd.zip" 'zstd-v1.5.0-win32' -o"$env:SCOOP_HELPERS\zstd" -y
+            $source = 'https://raw.githubusercontent.com/ScoopInstaller/Binary/master/innounp/innounp050.rar'
+            $destination = "$env:SCOOP_HELPERS\innounp.rar"
+            Invoke-WebRequest -Uri $source -OutFile $destination
+            & 7z.exe x "$destination" -o"$env:SCOOP_HELPERS\innounp" -y
         }
     }
 
