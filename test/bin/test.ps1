@@ -1,5 +1,5 @@
 #Requires -Version 5.0
-#Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
+#Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.16' }
 #Requires -Modules @{ ModuleName = 'Pester'; RequiredVersion = '4.10.1' }
 #Requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
@@ -20,8 +20,8 @@ if ($env:CI -eq $true) {
         OutputFormat = 'NUnitXML'
     }
 
-    $commit = if ($env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT) { $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT } else { $env:APPVEYOR_REPO_COMMIT }
-    $commitMessage = "$env:APPVEYOR_REPO_COMMIT_MESSAGE $env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED".TrimEnd()
+    $commit = $env:BHCommitHash
+    $commitMessage = $env:BHCommitMessage
 
     if ($commitMessage -match '!linter') {
         Write-Warning "Skipping code linting per commit flag '!linter'"
@@ -69,10 +69,6 @@ if ($excludes.Length -gt 0) {
 
 Write-Host 'Invoke-Pester' @splat
 $result = Invoke-Pester @splat
-
-if ($env:CI -eq $true) {
-    (New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
-}
 
 if ($result.FailedCount -gt 0) {
     exit $result.FailedCount
