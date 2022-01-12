@@ -314,7 +314,7 @@ function app_status($app, $global) {
     }
 
     $status.missing_deps = @()
-    $deps = @(runtime_deps $manifest) | Where-Object {
+    $deps = @($manifest.depends) | Where-Object {
         $app, $bucket, $null = parse_app $_
         return !(installed $app)
     }

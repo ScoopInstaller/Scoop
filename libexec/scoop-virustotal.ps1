@@ -66,8 +66,8 @@ if($apps_param -eq '*') {
     $apps += installed_apps $true
 }
 
-if (!$opt.n -and !$opt."no-depends") {
-    $apps = install_order $apps $architecture
+if (!$opt.n -and !$opt.'no-depends') {
+    $apps = $apps | Get-Dependency -Architecture $architecture | Select-Object -Unique
 }
 
 $_ERR_UNSAFE = 2
