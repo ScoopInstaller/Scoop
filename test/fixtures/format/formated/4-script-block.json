@@ -9,12 +9,12 @@
     "architecture": {
         "64bit": {
             "installer": {
-                "script": "extract_7zip \"$dir\\app-64.7z\" \"$dir\""
+                "script": "Expand-7zipArchive \"$dir\\app-64.7z\" \"$dir\""
             }
         },
         "32bit": {
             "installer": {
-                "script": "extract_7zip \"$dir\\app-32.7z\" \"$dir\""
+                "script": "Expand-7zipArchive \"$dir\\app-32.7z\" \"$dir\""
             }
         }
     },
