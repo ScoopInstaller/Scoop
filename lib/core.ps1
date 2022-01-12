@@ -185,13 +185,17 @@ function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -rep
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
-function installed($app, $global=$null) {
-    if($null -eq $global) { return (installed $app $true) -or (installed $app $false) }
+function installed($app, $global) {
     # Dependencies of the format "bucket/dependency" install in a directory of form
     # "dependency". So we need to extract the bucket from the name and only give the app
     # name to is_directory
-    $app = $app.split("/")[-1]
-    return is_directory (appdir $app $global)
+    $app = ($app -split '/|\\')[-1]
+    if (get_config NO_JUNCTIONS) {
+        $installedVersion = Select-CurrentVersion -AppName $app -Global:$global
+    } else {
+        $installedVersion = 'current'
+    }
+    return Join-Path (versiondir $app $installedVersion $global) 'install.json' | Test-Path
 }
 function installed_apps($global) {
     $dir = appsdir $global
