@@ -11,9 +11,9 @@ $splat = @{
     PassThru = $true
 }
 
+$excludes = @()
 if ($env:CI -eq $true) {
     $resultsXml = "$PSScriptRoot/TestResults.xml"
-    $excludes = @()
 
     $splat += @{
         OutputFile   = $resultsXml
@@ -35,8 +35,7 @@ if ($env:CI -eq $true) {
         $excludes += 'Scoop'
     }
 
-    $changed_scripts = (Get-GitChangedFile -Include '*decompress.ps1' -Commit $commit)
-    if (!$changed_scripts) {
+    if (!($changed_scripts -like '*decompress.ps1')) {
         Write-Warning "Skipping tests and code linting for decompress.ps1 files because it didn't change"
         $excludes += 'Decompress'
     }
@@ -55,6 +54,30 @@ if ($env:CI -eq $true) {
     if (!$changed_manifests) {
         Write-Warning "Skipping tests and validation for manifest files because they didn't change"
         $excludes += 'Manifests'
+    }
+
+    if ($env:CI_WINDOWS -eq $true -and 'Decompress' -notin $excludes) {
+        Write-Host 'Install decompress dependencies ...'
+
+        $env:SCOOP_HELPERS = 'C:\projects\helpers'
+        if (!(Test-Path $env:SCOOP_HELPERS)) {
+            New-Item -ItemType Directory -Path $env:SCOOP_HELPERS
+        }
+        if (!(Test-Path "$env:SCOOP_HELPERS\lessmsi\lessmsi.exe")) {
+            Start-FileDownload 'https://github.com/activescott/lessmsi/releases/download/v1.10.0/lessmsi-v1.10.0.zip' -FileName "$env:SCOOP_HELPERS\lessmsi.zip"
+            & 7z.exe x "$env:SCOOP_HELPERS\lessmsi.zip" -o"$env:SCOOP_HELPERS\lessmsi" -y
+            $env:LESSMSI = "$env:SCOOP_HELPERS\lessmsi\lessmsi.exe"
+        }
+        if (!(Test-Path "$env:SCOOP_HELPERS\innounp\innounp.exe")) {
+            Start-FileDownload 'https://raw.githubusercontent.com/ScoopInstaller/Binary/master/innounp/innounp050.rar' -FileName "$env:SCOOP_HELPERS\innounp.rar"
+            & 7z.exe x "$env:SCOOP_HELPERS\innounp.rar" -o"$env:SCOOP_HELPERS\innounp" -y
+            $env:INNOUNP = "$env:SCOOP_HELPERS\innounp\innounp.exe"
+        }
+        if (!(Test-Path "$env:SCOOP_HELPERS\zstd\zstd.exe")) {
+            Start-FileDownload 'https://github.com/facebook/zstd/releases/download/v1.5.1/zstd-v1.5.1-win32.zip' -FileName "$env:SCOOP_HELPERS\zstd.zip"
+            & 7z.exe x "$env:SCOOP_HELPERS\zstd.zip" -o"$env:SCOOP_HELPERS\zstd" -y
+            $env:ZSTD = "$env:SCOOP_HELPERS\zstd\zstd.exe"
+        }
     }
 }
 
