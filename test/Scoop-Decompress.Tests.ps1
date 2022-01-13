@@ -80,7 +80,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         BeforeAll {
             if ($env:CI) {
-                Mock Get-AppFilePath { $env:ZSTD_PATH } -ParameterFilter { $Helper -eq 'zstd' }
+                Mock Get-AppFilePath { $env:SCOOP_ZSTD_PATH } -ParameterFilter { $Helper -eq 'zstd' }
                 Mock Get-AppFilePath { '7z.exe' } -ParameterFilter { $Helper -eq '7zip' }
             } elseif (!(installed zstd)) {
                 scoop install zstd
@@ -115,7 +115,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         BeforeAll {
             if ($env:CI) {
-                Mock Get-AppFilePath { $env:LESSMSI_PATH }
+                Mock Get-AppFilePath { $env:SCOOP_LESSMSI_PATH }
             } elseif (!(installed lessmsi)) {
                 scoop install lessmsi
             }
@@ -149,7 +149,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
 
         BeforeAll {
             if ($env:CI) {
-                Mock Get-AppFilePath { $env:INNOUNP_PATH }
+                Mock Get-AppFilePath { $env:SCOOP_INNOUNP_PATH }
             } elseif (!(installed innounp)) {
                 scoop install innounp
             }
