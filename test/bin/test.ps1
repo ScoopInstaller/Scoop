@@ -112,16 +112,9 @@ if ($env:CI -eq $true) {
         (New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
         exit $result.FailedCount
     }
-
-    # GitHub Actions
-    if ($env:BHBuildSystem -eq "GitHub Actions") {
-        Write-Host 'Invoke-Pester' @splat
-        $result = Invoke-Pester @splat
-        exit $result.FailedCount
-    }
 }
 
-# Local
+# GitHub Actions / Local
 Write-Host 'Invoke-Pester' @splat
 $result = Invoke-Pester @splat
 exit $result.FailedCount
