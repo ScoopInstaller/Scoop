@@ -115,8 +115,9 @@ Describe 'Style constraints for non-binary project files' {
                 if ($file -match 'TestResults.xml') {
                     continue
                 }
-                $string = [System.IO.File]::ReadAllText($file.FullName)
-                if ($string.Length -gt 0 -and $string[-1] -ne "`n") {
+                $string = [System.IO.File]::ReadAllBytes($file.FullName)
+                if ($string.Length -gt 0 -and $string[-2] -ne 10) # Char(10) ... New Line
+                {
                     $file.FullName
                 }
             }
