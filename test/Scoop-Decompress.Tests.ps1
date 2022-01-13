@@ -30,7 +30,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     Context '7zip extraction' {
 
         BeforeAll {
-            if ($env:CI_WINDOWS) {
+            if ($env:CI) {
                 Mock Get-AppFilePath { (Get-Command 7z.exe).Path }
             } elseif (!(installed 7zip)) {
                 scoop install 7zip
@@ -79,7 +79,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     Context 'zstd extraction' {
 
         BeforeAll {
-            if ($env:CI_WINDOWS) {
+            if ($env:CI) {
                 Mock Get-AppFilePath { $env:ZSTD } -ParameterFilter { $Helper -eq 'zstd' }
                 Mock Get-AppFilePath { '7z.exe' } -ParameterFilter { $Helper -eq '7zip' }
             } elseif (!(installed zstd)) {
@@ -114,7 +114,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     Context 'msi extraction' {
 
         BeforeAll {
-            if ($env:CI_WINDOWS) {
+            if ($env:CI) {
                 Mock Get-AppFilePath { $env:LESSMSI }
             } elseif (!(installed lessmsi)) {
                 scoop install lessmsi
@@ -148,7 +148,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
     Context 'inno extraction' {
 
         BeforeAll {
-            if ($env:CI_WINDOWS) {
+            if ($env:CI) {
                 Mock Get-AppFilePath { $env:INNOUNP }
             } elseif (!(installed innounp)) {
                 scoop install innounp

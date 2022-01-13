@@ -56,7 +56,7 @@ if ($env:CI -eq $true) {
         $excludes += 'Manifests'
     }
 
-    if ($env:CI_WINDOWS -eq $true -and 'Decompress' -notin $excludes) {
+    if ('Decompress' -notin $excludes) {
         Write-Host 'Install decompress dependencies ...'
 
         $env:SCOOP_HELPERS = 'C:\projects\helpers'
