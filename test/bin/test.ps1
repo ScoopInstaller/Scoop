@@ -59,24 +59,24 @@ if ($env:CI -eq $true) {
     if ('Decompress' -notin $excludes) {
         Write-Host 'Install decompress dependencies ...'
 
-        $env:SCOOP_HELPERS = 'C:\projects\helpers'
-        if (!(Test-Path $env:SCOOP_HELPERS)) {
-            New-Item -ItemType Directory -Path $env:SCOOP_HELPERS
+        $env:SCOOP_HELPERS_PATH = 'C:\projects\helpers'
+        if (!(Test-Path $env:SCOOP_HELPERS_PATH)) {
+            New-Item -ItemType Directory -Path $env:SCOOP_HELPERS_PATH
         }
-        if (!(Test-Path "$env:SCOOP_HELPERS\lessmsi\lessmsi.exe")) {
-            Start-FileDownload 'https://github.com/activescott/lessmsi/releases/download/v1.10.0/lessmsi-v1.10.0.zip' -FileName "$env:SCOOP_HELPERS\lessmsi.zip"
-            & 7z.exe x "$env:SCOOP_HELPERS\lessmsi.zip" -o"$env:SCOOP_HELPERS\lessmsi" -y
-            $env:LESSMSI = "$env:SCOOP_HELPERS\lessmsi\lessmsi.exe"
+        if (!(Test-Path "$env:SCOOP_HELPERS_PATH\lessmsi\lessmsi.exe")) {
+            Start-FileDownload 'https://github.com/activescott/lessmsi/releases/download/v1.10.0/lessmsi-v1.10.0.zip' -FileName "$env:SCOOP_HELPERS_PATH\lessmsi.zip"
+            & 7z.exe x "$env:SCOOP_HELPERS_PATH\lessmsi.zip" -o"$env:SCOOP_HELPERS_PATH\lessmsi" -y
+            $env:LESSMSI_PATH = "$env:SCOOP_HELPERS_PATH\lessmsi\lessmsi.exe"
         }
-        if (!(Test-Path "$env:SCOOP_HELPERS\innounp\innounp.exe")) {
-            Start-FileDownload 'https://raw.githubusercontent.com/ScoopInstaller/Binary/master/innounp/innounp050.rar' -FileName "$env:SCOOP_HELPERS\innounp.rar"
-            & 7z.exe x "$env:SCOOP_HELPERS\innounp.rar" -o"$env:SCOOP_HELPERS\innounp" -y
-            $env:INNOUNP = "$env:SCOOP_HELPERS\innounp\innounp.exe"
+        if (!(Test-Path "$env:SCOOP_HELPERS_PATH\innounp\innounp.exe")) {
+            Start-FileDownload 'https://raw.githubusercontent.com/ScoopInstaller/Binary/master/innounp/innounp050.rar' -FileName "$env:SCOOP_HELPERS_PATH\innounp.rar"
+            & 7z.exe x "$env:SCOOP_HELPERS_PATH\innounp.rar" -o"$env:SCOOP_HELPERS_PATH\innounp" -y
+            $env:INNOUNP_PATH = "$env:SCOOP_HELPERS_PATH\innounp\innounp.exe"
         }
-        if (!(Test-Path "$env:SCOOP_HELPERS\zstd\zstd.exe")) {
-            Start-FileDownload 'https://github.com/facebook/zstd/releases/download/v1.5.1/zstd-v1.5.1-win32.zip' -FileName "$env:SCOOP_HELPERS\zstd.zip"
-            & 7z.exe x "$env:SCOOP_HELPERS\zstd.zip" -o"$env:SCOOP_HELPERS\zstd" -y
-            $env:ZSTD = "$env:SCOOP_HELPERS\zstd\zstd.exe"
+        if (!(Test-Path "$env:SCOOP_HELPERS_PATH\zstd\zstd.exe")) {
+            Start-FileDownload 'https://github.com/facebook/zstd/releases/download/v1.5.1/zstd-v1.5.1-win32.zip' -FileName "$env:SCOOP_HELPERS_PATH\zstd.zip"
+            & 7z.exe x "$env:SCOOP_HELPERS_PATH\zstd.zip" -o"$env:SCOOP_HELPERS_PATH\zstd" -y
+            $env:ZSTD_PATH = "$env:SCOOP_HELPERS_PATH\zstd\zstd.exe"
         }
     }
 }
