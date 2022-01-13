@@ -37,6 +37,7 @@
 
 - **test-bin:** Only write output file in CI and fix trailing whitespaces ([#4613](https://github.com/ScoopInstaller/Scoop/issues/4613))
 - **manifest:** Fix manifests validation ([#4620](https://github.com/ScoopInstaller/Scoop/issues/4620))
+- **zstd:** Fix 'zstd' extraction error in test ([#4651](https://github.com/ScoopInstaller/Scoop/issues/4651))
 
 ### Documentation
 
