@@ -32,7 +32,7 @@ Describe 'add_alias' -Tag 'Scoop' {
     }
 }
 
-Describe 'rm_alias' {
+Describe 'rm_alias' -Tag 'Scoop' {
     Mock shimdir { 'TestDrive:\shim' }
     Mock set_config { }
     Mock get_config { @{} }
