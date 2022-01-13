@@ -1,0 +1,35 @@
+name: Tests
+
+on:
+  pull_request:
+    types: [ opened ]
+  push:
+  workflow_dispatch:
+
+jobs:
+  test_powershell:
+    name: WindowsPowerShell
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Init and Test
+        shell: powershell
+        run: |
+          .\test\bin\init.ps1
+          .\test\bin\test.ps1
+  test_pwsh:
+    name: PowerShell
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Init and Test
+        shell: pwsh
+        run: |
+          .\test\bin\init.ps1
+          .\test\bin\test.ps1
