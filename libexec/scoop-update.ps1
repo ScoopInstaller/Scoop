@@ -123,32 +123,42 @@ function update_scoop() {
         }
     }
 
-    if ((Get-LocalBucket) -notcontains 'main') {
-        info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
-        info "Adding main bucket..."
-        add_bucket 'main'
-    }
+    # This should have been deprecated after 2019-05-12
+    # if ((Get-LocalBucket) -notcontains 'main') {
+    #     info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
+    #     info "Adding main bucket..."
+    #     add_bucket 'main'
+    # }
 
     ensure_scoop_in_path
     shim "$currentdir\bin\scoop.ps1" $false
 
-    Get-LocalBucket | ForEach-Object {
-        write-host "Updating '$_' bucket..."
+    foreach ($bucket in Get-LocalBucket) {
+        Write-Host "Updating '$bucket' bucket..." -NoNewline
 
-        $loc = Find-BucketDirectory $_ -Root
-        # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
-        if (($_ -eq 'main') -and !(Test-Path "$loc\.git")) {
-            rm_bucket 'main'
-            add_bucket 'main'
+        $bucketLoc = Find-BucketDirectory $bucket -Root
+
+        if (!(Test-Path (Join-Path $bucketLoc '.git'))) {
+            if ($bucket -eq 'main') {
+                # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
+                Write-Host " Converting 'main' bucket to git..." -NoNewline
+                rm_bucket 'main'
+                add_bucket 'main'
+                Write-Host ' Done.'
+            } else {
+                Write-Host ' Not a git repository. Skipped.'
+            }
+            continue
         }
 
-        Push-Location $loc
+        Push-Location $bucketLoc
         $previousCommit = (Invoke-Expression 'git rev-parse HEAD')
         git_pull -q
         if ($show_update_log) {
             Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
         Pop-Location
+        Write-Host ' Done.'
     }
 
     set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
