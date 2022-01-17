@@ -47,7 +47,7 @@ function cleanup($app, $global, $verbose, $cache) {
         write-host " $version" -nonewline
         $dir = versiondir $app $version $global
         # unlink all potential old link before doing recursive Remove-Item
-        unlink_persist_data $dir
+        unlink_persist_data $manifest $dir
         Remove-Item $dir -ErrorAction Stop -Recurse -Force
     }
     write-host ''

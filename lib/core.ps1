@@ -650,7 +650,7 @@ python `"$resolved_path`" $arg `"$@`"" | Out-File $shim -Encoding ASCII
     } else {
         warn_on_overwrite "$shim.cmd" $path
         # find path to Git's bash so that batch scripts can run bash scripts
-        $gitdir = (Get-Item (Get-Command git -ErrorAction:Stop).Source -ErrorAction:Stop).Directory.Parent
+        $gitdir = (Get-Item (Get-Command git -CommandType:Application -ErrorAction:Stop).Source -ErrorAction:Stop).Directory.Parent
         if ($gitdir.FullName -imatch 'mingw') {
             $gitdir = $gitdir.Parent
         }
