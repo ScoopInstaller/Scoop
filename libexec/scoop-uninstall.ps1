@@ -91,7 +91,7 @@ if (!$apps) { exit 0 }
 
     try {
         # unlink all potential old link before doing recursive Remove-Item
-        unlink_persist_data $dir
+        unlink_persist_data $manifest $dir
         Remove-Item $dir -Recurse -Force -ErrorAction Stop
     } catch {
         if (Test-Path $dir) {
@@ -107,7 +107,7 @@ if (!$apps) { exit 0 }
         $dir = versiondir $app $oldver $global
         try {
             # unlink all potential old link before doing recursive Remove-Item
-            unlink_persist_data $dir
+            unlink_persist_data $manifest $dir
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."

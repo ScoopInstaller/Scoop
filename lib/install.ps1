@@ -1167,7 +1167,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 # ensure target parent folder exist
                 ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
-            # we don't have neither source nor target data! we need to crate an empty target,
+            # we don't have neither source nor target data! we need to create an empty target,
             # but we can't make a judgement that the data should be a file or directory...
             # so we create a directory by default. to avoid this, use pre_install
             # to create the source file before persisting (DON'T use post_install)
@@ -1189,21 +1189,31 @@ function persist_data($manifest, $original_dir, $persist_dir) {
     }
 }
 
-function unlink_persist_data($dir) {
+function unlink_persist_data($manifest, $dir) {
+    $persist = $manifest.persist
     # unlink all junction / hard link in the directory
-    Get-ChildItem -Recurse $dir | ForEach-Object {
-        $file = $_
-        if ($null -ne $file.LinkType) {
-            $filepath = $file.FullName
-            # directory (junction)
-            if ($file -is [System.IO.DirectoryInfo]) {
-                # remove read-only attribute on the link
-                attrib -R /L $filepath
-                # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
-            } else {
-                # remove the hard link
-                & "$env:COMSPEC" /c "del `"$filepath`""
+    if($persist) {
+        if ($persist -is [String]) {
+            $persist = @($persist);
+        }
+
+        $persist | ForEach-Object {
+            $source, $target = persist_def $_
+            write-host "Unlink persisted: $source"
+            $source = $source.TrimEnd("/").TrimEnd("\\")
+            $source = Get-Item "$dir\$source"
+            if ($null -ne $source.LinkType) {
+                $source_path = $source.FullName
+                # directory (junction)
+                if ($source -is [System.IO.DirectoryInfo]) {
+                    # remove read-only attribute on the link
+                    attrib -R /L $source_path
+                    # remove the junction
+                    & "$env:COMSPEC" /c "rmdir /s /q `"$source_path`""
+                } else {
+                    # remove the hard link
+                    & "$env:COMSPEC" /c "del `"$source_path`""
+                }
             }
         }
     }
