@@ -114,7 +114,7 @@ function update_scoop() {
 
         $res = $lastexitcode
         if ($show_update_log) {
-            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'" | Where-Object { $_ -notlike '* ?chore*' }
         }
 
         Pop-Location
@@ -155,7 +155,7 @@ function update_scoop() {
         $previousCommit = (Invoke-Expression 'git rev-parse HEAD')
         git_pull -q
         if ($show_update_log) {
-            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'" | Where-Object { $_ -notlike '* ?chore*' }
         }
         Pop-Location
         Write-Host ' Done.'
