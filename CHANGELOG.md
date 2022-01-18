@@ -18,6 +18,7 @@
 - **shim:** Fix PS1 shim error when in different drive in PS7 ([#4614](https://github.com/ScoopInstaller/Scoop/issues/4614))
 - **shim:** Fix `sh` shim error in WSL ([#4637](https://github.com/ScoopInstaller/Scoop/issues/4637))
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
+- **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670))
 
 ### Code Refactoring
 
@@ -29,6 +30,7 @@
 - **schema:** Add '$schema' property ([#4623](https://github.com/ScoopInstaller/Scoop/issues/4623))
 - **schema:** Add explicit escape to opening bracket matcher in jp/jsonpath regex ([#3719](https://github.com/ScoopInstaller/Scoop/issues/3719))
 - **tests:** Support both AppVeyor and GitHub Actions ([#4655](https://github.com/ScoopInstaller/Scoop/issues/4655))
+- **tests:** Run GitHub Actions CI on each commit ([#4664](https://github.com/ScoopInstaller/Scoop/issues/4664))
 - **vscode-settings:** Remove 'formatOnSave' trigger ([#4635](https://github.com/ScoopInstaller/Scoop/issues/4635))
 
 ### Styles
