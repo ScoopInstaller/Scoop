@@ -35,26 +35,34 @@ function cleanup($app, $global, $verbose, $cache) {
     if ($cache) {
         Remove-Item "$cachedir\$app#*" -Exclude "$app#$current_version#*"
     }
-    $versions = Get-InstalledVersion -AppName $app -Global:$global | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
+    $appDir = appdir $app $global
+    $versions = Get-ChildItem $appDir -Name
+    if (!$versions) {
+        Remove-Item $appDir -ErrorAction SilentlyContinue -Force
+        return
+    }
+    $versions = $versions | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
     if (!$versions) {
         if ($verbose) { success "$app is already clean" }
         return
     }
 
-    write-host -f yellow "Removing $app`:" -nonewline
+    Write-Host -f yellow "Removing $app`:" -NoNewline
     $versions | ForEach-Object {
         $version = $_
-        write-host " $version" -nonewline
+        Write-Host " $version" -NoNewline
         $dir = versiondir $app $version $global
         # unlink all potential old link before doing recursive Remove-Item
         unlink_persist_data $dir
         Remove-Item $dir -ErrorAction Stop -Recurse -Force
     }
-    write-host ''
+    if (!(Get-ChildItem $appDir)) {
+        Remove-Item $appDir -ErrorAction SilentlyContinue -Force
+    }
+    Write-Host ''
 }
 
 if ($apps) {
-    $verbose = $true
     if ($apps -eq '*') {
         $verbose = $false
         $apps = applist (installed_apps $false) $false
@@ -62,11 +70,12 @@ if ($apps) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
+        $verbose = $true
         $apps = Confirm-InstallationStatus $apps -Global:$global
     }
 
     # $apps is now a list of ($app, $global) tuples
-    $apps | ForEach-Object { cleanup @_ $verbose $cache}
+    $apps | ForEach-Object { cleanup @_ $verbose $cache }
 
     if ($cache) {
         Remove-Item "$cachedir\*.download" -ErrorAction Ignore
