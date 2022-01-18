@@ -19,6 +19,7 @@
 - **shim:** Fix `sh` shim error in WSL ([#4637](https://github.com/ScoopInstaller/Scoop/issues/4637))
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
 - **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670))
+  - **scoop-update:** Remove 'Done.' output ([#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
 
 ### Code Refactoring
 

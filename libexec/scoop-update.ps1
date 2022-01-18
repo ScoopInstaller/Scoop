@@ -114,7 +114,7 @@ function update_scoop() {
 
         $res = $lastexitcode
         if ($show_update_log) {
-            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'" | Where-Object { $_ -notlike '* ?chore*' }
+            Invoke-Expression "git --no-pager log --no-decorate --grep='^chore' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
         Pop-Location
@@ -134,19 +134,18 @@ function update_scoop() {
     shim "$currentdir\bin\scoop.ps1" $false
 
     foreach ($bucket in Get-LocalBucket) {
-        Write-Host "Updating '$bucket' bucket..." -NoNewline
+        Write-Host "Updating '$bucket' bucket..."
 
         $bucketLoc = Find-BucketDirectory $bucket -Root
 
         if (!(Test-Path (Join-Path $bucketLoc '.git'))) {
             if ($bucket -eq 'main') {
                 # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
-                Write-Host " Converting 'main' bucket to git..." -NoNewline
+                Write-Host " Converting 'main' bucket to git..."
                 rm_bucket 'main'
                 add_bucket 'main'
-                Write-Host ' Done.'
             } else {
-                Write-Host ' Not a git repository. Skipped.'
+                Write-Host "'$bucket' is not a git repository. Skipped."
             }
             continue
         }
@@ -155,10 +154,9 @@ function update_scoop() {
         $previousCommit = (Invoke-Expression 'git rev-parse HEAD')
         git_pull -q
         if ($show_update_log) {
-            Invoke-Expression "git --no-pager log --no-decorate --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'" | Where-Object { $_ -notlike '* ?chore*' }
+            Invoke-Expression "git --no-pager log --no-decorate --grep='^chore' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
         Pop-Location
-        Write-Host ' Done.'
     }
 
     set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
