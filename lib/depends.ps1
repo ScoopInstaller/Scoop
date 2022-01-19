@@ -55,7 +55,11 @@ function Get-Dependency {
         }
 
         $Unresolved = $Unresolved -ne $AppName
-        $Resolved += $AppName
+        if ($bucket) {
+            $Resolved += "$bucket/$AppName"
+        } else {
+            $Resolved += $AppName
+        }
         if ($Unresolved.Length -eq 0) {
             return $Resolved
         } else {
@@ -95,16 +99,10 @@ function Get-InstallationHelper {
     }
     process {
         $url = arch_specific 'url' $Manifest $Architecture
-        if (!$url) {
-            $url = ''
-        }
         $pre_install = arch_specific 'pre_install' $Manifest $Architecture
         $installer = arch_specific 'installer' $Manifest $Architecture
         $post_install = arch_specific 'post_install' $Manifest $Architecture
         $script = $pre_install + $installer.script + $post_install
-        if (!$script) {
-            $script = ''
-        }
         if (((Test-7zipRequirement -Uri $url) -or ($script -like '*Expand-7zipArchive *')) -and !(get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
             $helper += '7zip'
         }
@@ -138,6 +136,7 @@ function Test-7zipRequirement {
     [OutputType([Boolean])]
     param (
         [Parameter(Mandatory = $true)]
+        [AllowNull()]
         [String[]]
         $Uri
     )
@@ -151,6 +150,7 @@ function Test-ZstdRequirement {
     [OutputType([Boolean])]
     param (
         [Parameter(Mandatory = $true)]
+        [AllowNull()]
         [String[]]
         $Uri
     )
@@ -162,6 +162,7 @@ function Test-LessmsiRequirement {
     [OutputType([Boolean])]
     param (
         [Parameter(Mandatory = $true)]
+        [AllowNull()]
         [String[]]
         $Uri
     )

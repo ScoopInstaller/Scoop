@@ -24,6 +24,7 @@
 ### Code Refactoring
 
 - **depends:** Rewrite 'depends.ps1' ([#4638](https://github.com/ScoopInstaller/Scoop/issues/4638))
+  - **depends:** Keep bucket in 'Get-Dependency()' ([#4673](https://github.com/ScoopInstaller/Scoop/issues/4673))
 
 ### Builds
 
