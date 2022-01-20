@@ -226,7 +226,7 @@
                 "license": {
                     "$ref": "#/definitions/license"
                 },
-                "note": {
+                "notes": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             },
@@ -239,7 +239,7 @@
                 },
                 {
                     "properties": {
-                        "note": {
+                        "notes": {
                             "$ref": "#/definitions/stringOrArrayOfStrings"
                         },
                         "architecture": {
