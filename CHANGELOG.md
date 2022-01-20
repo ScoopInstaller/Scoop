@@ -15,6 +15,7 @@
 - **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608))
   - **decompress:** Fix `Split-Path -LeafBase` in PS5 ([#4639](https://github.com/ScoopInstaller/Scoop/issues/4639))
 - **installed:** Fix 'core/installed' that mark failed app as 'installed' ([#4650](https://github.com/ScoopInstaller/Scoop/issues/4650))
+  - **status:** Correctly handle failed installation of apps ([#4676](https://github.com/ScoopInstaller/Scoop/issues/4676))
 - **shim:** Fix PS1 shim error when in different drive in PS7 ([#4614](https://github.com/ScoopInstaller/Scoop/issues/4614))
 - **shim:** Fix `sh` shim error in WSL ([#4637](https://github.com/ScoopInstaller/Scoop/issues/4637))
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
