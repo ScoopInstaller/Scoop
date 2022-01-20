@@ -1079,12 +1079,12 @@ function prune_installed($apps, $global) {
 
 # check whether the app failed to install
 function failed($app, $global) {
-    $app = ($app -split '/|\\')[-1]
     return (is_directory (appdir $app $global)) -and !(Select-CurrentVersion -AppName $app -Global:$global)
 }
 
 function ensure_none_failed($apps, $global) {
-    foreach($app in $apps) {
+    foreach ($app in $apps) {
+        $app = ($app -split '/|\\')[-1] -replace '\.json$', ''
         if (failed $app $global) {
             warn "Purging previous failed installation of $app."
             & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
