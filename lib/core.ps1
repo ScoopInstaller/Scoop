@@ -190,16 +190,11 @@ function installed($app, $global) {
     # "dependency". So we need to extract the bucket from the name and only give the app
     # name to is_directory
     $app = ($app -split '/|\\')[-1]
-    if (get_config NO_JUNCTIONS) {
-        $installedVersion = Select-CurrentVersion -AppName $app -Global:$global
-    } else {
-        $installedVersion = 'current'
-    }
-    return Join-Path (versiondir $app $installedVersion $global) 'install.json' | Test-Path
+    return $null -ne (Select-CurrentVersion -AppName $app -Global:$global)
 }
 function installed_apps($global) {
     $dir = appsdir $global
-    if(test-path $dir) {
+    if (Test-Path $dir) {
         Get-ChildItem $dir | Where-Object { $_.psiscontainer -and $_.name -ne 'scoop' } | ForEach-Object { $_.name }
     }
 }
@@ -222,13 +217,13 @@ function Get-AppFilePath {
 
     # normal path to file
     $Path = "$(versiondir $App 'current' $false)\$File"
-    if(Test-Path $Path) {
+    if (Test-Path $Path) {
         return $Path
     }
 
     # global path to file
     $Path = "$(versiondir $App 'current' $true)\$File"
-    if(Test-Path $Path) {
+    if (Test-Path $Path) {
         return $Path
     }
 
@@ -256,7 +251,7 @@ function Get-HelperPath {
     switch ($Helper) {
         '7zip' {
             $HelperPath = Get-AppFilePath '7zip' '7z.exe'
-            if([String]::IsNullOrEmpty($HelperPath)) {
+            if ([String]::IsNullOrEmpty($HelperPath)) {
                 $HelperPath = Get-AppFilePath '7zip-zstd' '7z.exe'
             }
         }
@@ -264,7 +259,7 @@ function Get-HelperPath {
         'Innounp' { $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe' }
         'Dark' {
             $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
-            if([String]::IsNullOrEmpty($HelperPath)) {
+            if ([String]::IsNullOrEmpty($HelperPath)) {
                 $HelperPath = Get-AppFilePath 'wixtoolset' 'dark.exe'
             }
         }
@@ -319,8 +314,12 @@ function app_status($app, $global) {
 
     $status.missing_deps = @()
     $deps = @($manifest.depends) | Where-Object {
-        $app, $bucket, $null = parse_app $_
-        return !(installed $app)
+        if ($null -eq $_) {
+            return $false
+        } else {
+            $app, $bucket, $null = parse_app $_
+            return !(installed $app)
+        }
     }
     if ($deps) {
         $status.missing_deps += , $deps
@@ -739,6 +738,7 @@ function ensure_architecture($architecture_opt) {
 
 function Confirm-InstallationStatus {
     [CmdletBinding()]
+    [OutputType([Object[]])]
     param(
         [Parameter(Mandatory = $true)]
         [String[]]
@@ -750,26 +750,29 @@ function Confirm-InstallationStatus {
     $Apps | Select-Object -Unique | Where-Object { $_.Name -ne 'scoop' } | ForEach-Object {
         $App, $null, $null = parse_app $_
         if ($Global) {
-            if (installed $App $true) {
-                $Installed += ,@($App, $true)
-            } elseif (installed $App $false) {
-                error "'$App' isn't installed globally, but it is installed for your account."
+            if (Test-Path (appdir $App $true)) {
+                $Installed += , @($App, $true)
+            } elseif (Test-Path (appdir $App $false)) {
+                error "'$App' isn't installed globally, but it may be installed for your account."
                 warn "Try again without the --global (or -g) flag instead."
             } else {
                 error "'$App' isn't installed."
             }
         } else {
-            if(installed $App $false) {
-                $Installed += ,@($App, $false)
-            } elseif (installed $App $true) {
-                error "'$App' isn't installed for your account, but it is installed globally."
+            if (Test-Path (appdir $App $false)) {
+                $Installed += , @($App, $false)
+            } elseif (Test-Path (appdir $App $true)) {
+                error "'$App' isn't installed for your account, but it may be installed globally."
                 warn "Try again with the --global (or -g) flag instead."
             } else {
                 error "'$App' isn't installed."
             }
         }
+        if (failed $App $Global) {
+            warn "'$App' isn't installed correctly."
+        }
     }
-    return ,$Installed
+    return , $Installed
 }
 
 function strip_path($orig_path, $dir) {

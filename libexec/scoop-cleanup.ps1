@@ -37,11 +37,7 @@ function cleanup($app, $global, $verbose, $cache) {
     }
     $appDir = appdir $app $global
     $versions = Get-ChildItem $appDir -Name
-    if (!$versions) {
-        Remove-Item $appDir -ErrorAction SilentlyContinue -Force
-        return
-    }
-    $versions = $versions | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
+    $versions = $versions | Where-Object { $current_version -ne $_ -and $_ -ne 'current' }
     if (!$versions) {
         if ($verbose) { success "$app is already clean" }
         return
@@ -56,8 +52,14 @@ function cleanup($app, $global, $verbose, $cache) {
         unlink_persist_data $dir
         Remove-Item $dir -ErrorAction Stop -Recurse -Force
     }
-    if (!(Get-ChildItem $appDir)) {
-        Remove-Item $appDir -ErrorAction SilentlyContinue -Force
+    $leftVersions = Get-ChildItem $appDir
+    if ($leftVersions.Length -eq 1 -and $leftVersions.Name -eq 'current' -and $leftVersions.LinkType) {
+        attrib $leftVersions -R /L
+        Remove-Item $leftVersions -ErrorAction Stop -Force
+        $leftVersions = $null
+    }
+    if (!$leftVersions) {
+        Remove-Item $appDir -ErrorAction Stop -Force
     }
     Write-Host ''
 }
