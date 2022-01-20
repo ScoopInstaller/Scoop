@@ -320,7 +320,7 @@ function app_status($app, $global) {
     $status.missing_deps = @()
     $deps = @($manifest.depends) | Where-Object {
         if ($null -eq $_) {
-            return $false
+            return $null
         } else {
             $app, $bucket, $null = parse_app $_
             return !(installed $app)
@@ -774,7 +774,7 @@ function Confirm-InstallationStatus {
             }
         }
         if (failed $App $Global) {
-            warn "'$App' isn't installed correctly."
+            error "'$App' isn't installed correctly, please reinstall it or fix the manifest."
         }
     }
     return , $Installed
