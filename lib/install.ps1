@@ -1077,11 +1077,6 @@ function prune_installed($apps, $global) {
     return @($uninstalled), @($installed)
 }
 
-# check whether the app failed to install
-function failed($app, $global) {
-    return (is_directory (appdir $app $global)) -and !(Select-CurrentVersion -AppName $app -Global:$global)
-}
-
 function ensure_none_failed($apps, $global) {
     foreach ($app in $apps) {
         $app = ($app -split '/|\\')[-1] -replace '\.json$', ''

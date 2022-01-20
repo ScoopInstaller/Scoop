@@ -199,6 +199,11 @@ function installed_apps($global) {
     }
 }
 
+# check whether the app failed to install
+function failed($app, $global) {
+    return (is_directory (appdir $app $global)) -and !(Select-CurrentVersion -AppName $app -Global:$global)
+}
+
 function file_path($app, $file) {
     Show-DeprecatedWarning $MyInvocation 'Get-AppFilePath'
     Get-AppFilePath -App $app -File $file
