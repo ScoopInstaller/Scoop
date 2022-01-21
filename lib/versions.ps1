@@ -59,7 +59,7 @@ function Select-CurrentVersion {
         } else {
             $installedVersion = Get-InstalledVersion -AppName $AppName -Global:$Global
             if ($installedVersion) {
-                $currentVersion = $installedVersion[-1]
+                $currentVersion = @($installedVersion)[-1]
             } else {
                 $currentVersion = $null
             }
