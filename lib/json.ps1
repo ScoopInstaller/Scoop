@@ -179,7 +179,7 @@ function normalize_values([psobject] $json) {
             }
         }
 		
-		# Convert single value array into string
+        # Convert single value array into string
         if (($_.Value -is [Array]) -and $_.IsSettable) {
             # Array contains only 1 element String or Array
             if ($_.Value.Count -eq 1) {
