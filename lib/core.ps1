@@ -293,13 +293,13 @@ function Test-Aria2Enabled {
 
 function app_status($app, $global) {
     $status = @{}
-    $status.installed = (installed $app $global)
+    $status.installed = installed $app $global
     $status.version = Select-CurrentVersion -AppName $app -Global:$global
     $status.latest_version = $status.version
 
     $install_info = install_info $app $status.version $global
 
-    $status.failed = (!$install_info -or !$status.version)
+    $status.failed = failed $app $global
     $status.hold = ($install_info.hold -eq $true)
 
     $manifest = manifest $app $install_info.bucket $install_info.url
@@ -774,7 +774,7 @@ function Confirm-InstallationStatus {
             }
         }
         if (failed $App $Global) {
-            error "'$App' isn't installed correctly, please reinstall it or fix the manifest."
+            error "'$App' isn't installed correctly."
         }
     }
     return , $Installed
