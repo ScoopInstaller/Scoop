@@ -54,8 +54,8 @@ function cleanup($app, $global, $verbose, $cache) {
     }
     $leftVersions = Get-ChildItem $appDir
     if ($leftVersions.Length -eq 1 -and $leftVersions.Name -eq 'current' -and $leftVersions.LinkType) {
-        attrib $leftVersions -R /L
-        Remove-Item $leftVersions -ErrorAction Stop -Force
+        attrib $leftVersions.FullName -R /L
+        Remove-Item $leftVersions.FullName -ErrorAction Stop -Force
         $leftVersions = $null
     }
     if (!$leftVersions) {
