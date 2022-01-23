@@ -3,6 +3,7 @@
 
 . "$psscriptroot\..\lib\help.ps1"
 . "$psscriptroot\..\lib\manifest.ps1"
+. "$psscriptroot\..\lib\versions.ps1"
 
 reset_aliases
 $apps = $args
