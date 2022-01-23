@@ -758,7 +758,7 @@ function Confirm-InstallationStatus {
             if (Test-Path (appdir $App $true)) {
                 $Installed += , @($App, $true)
             } elseif (Test-Path (appdir $App $false)) {
-                error "'$App' isn't installed globally, but it may be installed for your account."
+                error "'$App' isn't installed globally, but it may be installed locally."
                 warn "Try again without the --global (or -g) flag instead."
             } else {
                 error "'$App' isn't installed."
@@ -767,7 +767,7 @@ function Confirm-InstallationStatus {
             if (Test-Path (appdir $App $false)) {
                 $Installed += , @($App, $false)
             } elseif (Test-Path (appdir $App $true)) {
-                error "'$App' isn't installed for your account, but it may be installed globally."
+                error "'$App' isn't installed locally, but it may be installed globally."
                 warn "Try again with the --global (or -g) flag instead."
             } else {
                 error "'$App' isn't installed."

@@ -61,7 +61,7 @@ if (!$apps) { exit 0 }
         #region Workaround for #2952
         $processdir = $appDir | Resolve-Path | Select-Object -ExpandProperty Path
         if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
-            Get-error 'Application is still running. Close all instances and try again.'
+            error 'Application is still running. Close all instances and try again.'
             continue
         }
         #endregion Workaround for #2952
@@ -69,7 +69,7 @@ if (!$apps) { exit 0 }
         try {
             Test-Path $dir -ErrorAction Stop | Out-Null
         } catch [UnauthorizedAccessException] {
-            Get-error "Access denied: $dir. You might need to restart."
+            error "Access denied: $dir. You might need to restart."
             continue
         }
 
@@ -97,7 +97,7 @@ if (!$apps) { exit 0 }
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             if (Test-Path $dir) {
-                Get-error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+                error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
                 continue
             }
         }
@@ -112,7 +112,7 @@ if (!$apps) { exit 0 }
             unlink_persist_data $dir
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
-            Get-error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+            error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
             continue app_loop
         }
     }
