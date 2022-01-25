@@ -911,23 +911,23 @@ function current_dir($versiondir) {
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if(get_config NO_JUNCTIONS) { return $versiondir }
+    if (get_config NO_JUNCTIONS) { return $versiondir }
 
     $currentdir = current_dir $versiondir
 
-    write-host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
+    Write-Host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
 
-    if($currentdir -eq $versiondir) {
+    if ($currentdir -eq $versiondir) {
         abort "Error: Version 'current' is not allowed!"
     }
 
-    if(test-path $currentdir) {
+    if (Test-Path $currentdir) {
         # remove the junction
         attrib -R /L $currentdir
-        & "$env:COMSPEC" /c rmdir $currentdir
+        Remove-Item $currentdir -Recurse -Force -ErrorAction Stop
     }
 
-    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
+    New-Item -Path $currentdir -Value $versiondir -ItemType Junction | Out-Null
     attrib $currentdir +R /L
     return $currentdir
 }
@@ -938,17 +938,17 @@ function link_current($versiondir) {
 # Returns the 'current' junction directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
-    if(get_config NO_JUNCTIONS) { return $versiondir }
+    if (get_config NO_JUNCTIONS) { return $versiondir }
     $currentdir = current_dir $versiondir
 
-    if(test-path $currentdir) {
-        write-host "Unlinking $(friendly_path $currentdir)"
+    if (Test-Path $currentdir) {
+        Write-Host "Unlinking $(friendly_path $currentdir)"
 
         # remove read-only attribute on link
         attrib $currentdir -R /L
 
         # remove the junction
-        & "$env:COMSPEC" /c "rmdir `"$currentdir`""
+        Remove-Item $currentdir -Recurse -Force -ErrorAction Stop
         return $currentdir
     }
     return $versiondir
