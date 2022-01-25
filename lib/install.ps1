@@ -1192,10 +1192,10 @@ function unlink_persist_data($dir) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
                 # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
+                Remove-Item -Path $filepath -Recurse -Force -ErrorAction SilentlyContinue
             } else {
                 # remove the hard link
-                & "$env:COMSPEC" /c "del `"$filepath`""
+                Remove-Item -Path $filepath -Force -ErrorAction SilentlyContinue
             }
         }
     }
