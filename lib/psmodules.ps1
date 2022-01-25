@@ -26,7 +26,7 @@ function install_psmodule($manifest, $dir, $global) {
         & "$env:COMSPEC" /c "rmdir `"$linkfrom`""
     }
 
-    & "$env:COMSPEC" /c "mklink /j `"$linkfrom`" `"$dir`"" | out-null
+    New-Item -Path $linkfrom -ItemType Junction -Value $dir | Out-Null
 }
 
 function uninstall_psmodule($manifest, $dir, $global) {

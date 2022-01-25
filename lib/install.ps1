@@ -927,7 +927,7 @@ function link_current($versiondir) {
         & "$env:COMSPEC" /c rmdir $currentdir
     }
 
-    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
+    New-Item -Path $currentdir -ItemType Junction -Value $versiondir | Out-Null
     attrib $currentdir +R /L
     return $currentdir
 }
@@ -1154,15 +1154,15 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 if (Test-Path $source) {
                     Move-Item -Force $source "$source.original"
                 }
-            # we don't have persist data in the store, move the source to target, then create link
+                # we don't have persist data in the store, move the source to target, then create link
             } elseif (Test-Path $source) {
                 # ensure target parent folder exist
                 ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
-            # we don't have neither source nor target data! we need to crate an empty target,
-            # but we can't make a judgement that the data should be a file or directory...
-            # so we create a directory by default. to avoid this, use pre_install
-            # to create the source file before persisting (DON'T use post_install)
+                # we don't have neither source nor target data! we need to crate an empty target,
+                # but we can't make a judgement that the data should be a file or directory...
+                # so we create a directory by default. to avoid this, use pre_install
+                # to create the source file before persisting (DON'T use post_install)
             } else {
                 $target = New-Object System.IO.DirectoryInfo($target)
                 ensure $target | Out-Null
@@ -1171,11 +1171,11 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # create link
             if (is_directory $target) {
                 # target is a directory, create junction
-                & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
+                New-Item -Path $source -ItemType Junction -Value $target | Out-Null
                 attrib $source +R /L
             } else {
                 # target is a file, create hard link
-                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
+                New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
             }
         }
     }
