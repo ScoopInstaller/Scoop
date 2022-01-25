@@ -28,6 +28,7 @@
 
 - **depends:** Rewrite 'depends.ps1' ([#4638](https://github.com/ScoopInstaller/Scoop/issues/4638))
   - **depends:** Keep bucket in 'Get-Dependency()' ([#4673](https://github.com/ScoopInstaller/Scoop/issues/4673))
+- **mklink:** Use 'New-Item' instead of 'mklink' ([#4690](https://github.com/ScoopInstaller/Scoop/issues/4690))
 
 ### Builds
 
