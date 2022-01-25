@@ -4,7 +4,7 @@ function git_proxy_cmd {
     if($proxy -and $proxy -ne 'none') {
         $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
     }
-    & "$env:COMSPEC" /d /c $cmd
+    cmd.exe /d /c $cmd
 }
 
 function git_clone {
