@@ -10,6 +10,7 @@
 
 - **autoupdate:** Allow checksum file that contains whitespaces ([#4619](https://github.com/ScoopInstaller/Scoop/issues/4619))
 - **config:** Allow scoop config use Unicode characters ([#4631](https://github.com/ScoopInstaller/Scoop/issues/4631))
+- **current:** Remove 'current' while it's not a junction ([#4687](https://github.com/ScoopInstaller/Scoop/issues/4687))
 - **depends:** Prevent error on no URL ([#4595](https://github.com/ScoopInstaller/Scoop/issues/4595))
 - **depends:** Check if extractor is available ([#4042](https://github.com/ScoopInstaller/Scoop/issues/4042))
 - **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608))
