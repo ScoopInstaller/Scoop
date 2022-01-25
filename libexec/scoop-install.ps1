@@ -31,25 +31,6 @@
 
 reset_aliases
 
-function is_installed($app, $global) {
-    if ($app.EndsWith('.json')) {
-        $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
-    }
-    if (installed $app $global) {
-        function gf($g) { if ($g) { ' --global' } }
-
-        $version = Select-CurrentVersion -AppName $app -Global:$global
-        if (!(install_info $app $version $global)) {
-            warn "Purging previous failed installation of $app."
-            & "$PSScriptRoot\scoop-uninstall.ps1" $app$(gf $global)
-            return $false
-        }
-        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(gf $global)' to install a new version."
-        return $true
-    }
-    return $false
-}
-
 $opt, $apps, $err = getopt $args 'gikusa:' 'global', 'independent', 'no-cache', 'no-update-scoop', 'skip', 'arch='
 if ($err) { "scoop install: $err"; exit 1 }
 
@@ -80,8 +61,13 @@ if (is_scoop_outdated) {
 
 if ($apps.length -eq 1) {
     $app, $null, $version = parse_app $apps
-    if ($null -eq $version -and (is_installed $app $global)) {
-        return
+    if ($app.EndsWith('.json')) {
+        $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
+    }
+    $curVersion = Select-CurrentVersion -AppName $app -Global:$global
+    if ($null -eq $version -and $curVersion) {
+        warn "'$app' ($curVersion) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
+        exit 0
     }
 }
 

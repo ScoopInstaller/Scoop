@@ -280,7 +280,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         install_app $app $architecture $global $suggested $use_cache $check_hash
     } else {
         # Also add missing dependencies
-        $apps = @(Get-Dependency $app $architecture) | Where-Object { !(installed $_) }
+        $apps = Get-Dependency $app $architecture | Where-Object { !(installed $_) }
         $apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 }
@@ -316,7 +316,7 @@ if (-not ($apps -or $all)) {
         $apps | ForEach-Object {
             ($app, $global) = $_
             $status = app_status $app $global
-            if ($force -or $status.outdated) {
+            if ($status.installed -and ($force -or $status.outdated)) {
                 if(!$status.hold) {
                     $outdated += applist $app $global
                     write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
@@ -324,7 +324,11 @@ if (-not ($apps -or $all)) {
                     warn "'$app' is held to version $($status.version)"
                 }
             } elseif ($apps_param -ne '*') {
-                write-host -f green "$app`: $($status.version) (latest version)"
+                if ($status.installed) {
+                    Write-Host "$app`: $($status.version) (latest version)" -ForegroundColor Green
+                } else {
+                    info 'Please reinstall it or fix the manifest.'
+                }
             }
         }
 

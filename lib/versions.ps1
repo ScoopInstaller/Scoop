@@ -51,17 +51,17 @@ function Select-CurrentVersion {
     )
     process {
         $appPath = appdir $AppName $Global
-        if (Test-Path "$appPath\current" -PathType Container) {
-            $currentVersion = (installed_manifest $AppName 'current' $Global).version
-            if ($currentVersion -eq 'nightly') {
-                $currentVersion = (Get-Item "$appPath\current").Target | Split-Path -Leaf
-            }
-        } else {
+        if (get_config NO_JUNCTIONS) {
             $installedVersion = Get-InstalledVersion -AppName $AppName -Global:$Global
             if ($installedVersion) {
                 $currentVersion = @($installedVersion)[-1]
             } else {
                 $currentVersion = $null
+            }
+        } else {
+            $currentVersion = (installed_manifest $AppName 'current' $Global).version
+            if ($currentVersion -eq 'nightly') {
+                $currentVersion = (Get-Item "$appPath\current").Target | Split-Path -Leaf
             }
         }
         return $currentVersion
