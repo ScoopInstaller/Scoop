@@ -927,7 +927,7 @@ function link_current($versiondir) {
         Remove-Item $currentdir -Recurse -Force -ErrorAction Stop
     }
 
-    New-Item -Path $currentdir -Value $versiondir -ItemType Junction | Out-Null
+    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
     attrib $currentdir +R /L
     return $currentdir
 }
