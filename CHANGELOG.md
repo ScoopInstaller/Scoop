@@ -31,6 +31,7 @@
   - **depends:** Keep bucket in 'Get-Dependency()' ([#4673](https://github.com/ScoopInstaller/Scoop/issues/4673))
 - **mklink:** Use 'New-Item' instead of 'mklink' ([#4690](https://github.com/ScoopInstaller/Scoop/issues/4690))
 - **rmdir:** Use 'Remove-Item' instead of 'rmdir' ([#4691](https://github.com/ScoopInstaller/Scoop/issues/4691))
+- **COMSPEC:** Deprecate use of subshell cmd.exe ([#4692](https://github.com/ScoopInstaller/Scoop/pull/4692))
 
 ### Builds
 
