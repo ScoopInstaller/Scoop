@@ -10,13 +10,17 @@
 
 - **autoupdate:** Allow checksum file that contains whitespaces ([#4619](https://github.com/ScoopInstaller/Scoop/issues/4619))
 - **config:** Allow scoop config use Unicode characters ([#4631](https://github.com/ScoopInstaller/Scoop/issues/4631))
+- **current:** Remove 'current' while it's not a junction ([#4687](https://github.com/ScoopInstaller/Scoop/issues/4687))
 - **depends:** Prevent error on no URL ([#4595](https://github.com/ScoopInstaller/Scoop/issues/4595))
 - **depends:** Check if extractor is available ([#4042](https://github.com/ScoopInstaller/Scoop/issues/4042))
 - **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608))
   - **decompress:** Fix `Split-Path -LeafBase` in PS5 ([#4639](https://github.com/ScoopInstaller/Scoop/issues/4639))
 - **installed:** Fix 'core/installed' that mark failed app as 'installed' ([#4650](https://github.com/ScoopInstaller/Scoop/issues/4650))
+  - **status:** Correctly handle failed installation of apps ([#4676](https://github.com/ScoopInstaller/Scoop/issues/4676))
+    - **test:** Import 'versions.ps1' in `Scoop-Decompress.Tests.ps1` ([#4689](https://github.com/ScoopInstaller/Scoop/issues/4689))
 - **shim:** Fix PS1 shim error when in different drive in PS7 ([#4614](https://github.com/ScoopInstaller/Scoop/issues/4614))
 - **shim:** Fix `sh` shim error in WSL ([#4637](https://github.com/ScoopInstaller/Scoop/issues/4637))
+- **versions:** Fix wrong version number when only one version dir ([#4679](https://github.com/ScoopInstaller/Scoop/issues/4679))
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
 - **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670))
   - **scoop-update:** Remove 'Done.' output ([#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
@@ -25,14 +29,19 @@
 
 - **depends:** Rewrite 'depends.ps1' ([#4638](https://github.com/ScoopInstaller/Scoop/issues/4638))
   - **depends:** Keep bucket in 'Get-Dependency()' ([#4673](https://github.com/ScoopInstaller/Scoop/issues/4673))
+- **mklink:** Use 'New-Item' instead of 'mklink' ([#4690](https://github.com/ScoopInstaller/Scoop/issues/4690))
+- **rmdir:** Use 'Remove-Item' instead of 'rmdir' ([#4691](https://github.com/ScoopInstaller/Scoop/issues/4691))
+- **COMSPEC:** Deprecate use of subshell cmd.exe ([#4692](https://github.com/ScoopInstaller/Scoop/pull/4692))
 
 ### Builds
 
 - **checkver:** Fix output with '-Version' ([#3774](https://github.com/ScoopInstaller/Scoop/issues/3774))
 - **schema:** Add '$schema' property ([#4623](https://github.com/ScoopInstaller/Scoop/issues/4623))
 - **schema:** Add explicit escape to opening bracket matcher in jp/jsonpath regex ([#3719](https://github.com/ScoopInstaller/Scoop/issues/3719))
+- **schema:** Fix typo ('note' -> 'notes') ([#4678](https://github.com/ScoopInstaller/Scoop/issues/4678))
 - **tests:** Support both AppVeyor and GitHub Actions ([#4655](https://github.com/ScoopInstaller/Scoop/issues/4655))
 - **tests:** Run GitHub Actions CI on each commit ([#4664](https://github.com/ScoopInstaller/Scoop/issues/4664))
+- **tests:** Disable CI test on 'push' ([#4677](https://github.com/ScoopInstaller/Scoop/issues/4677))
 - **vscode-settings:** Remove 'formatOnSave' trigger ([#4635](https://github.com/ScoopInstaller/Scoop/issues/4635))
 
 ### Styles

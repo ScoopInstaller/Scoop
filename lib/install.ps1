@@ -911,23 +911,23 @@ function current_dir($versiondir) {
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if(get_config NO_JUNCTIONS) { return $versiondir }
+    if (get_config NO_JUNCTIONS) { return $versiondir }
 
     $currentdir = current_dir $versiondir
 
-    write-host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
+    Write-Host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
 
-    if($currentdir -eq $versiondir) {
+    if ($currentdir -eq $versiondir) {
         abort "Error: Version 'current' is not allowed!"
     }
 
-    if(test-path $currentdir) {
+    if (Test-Path $currentdir) {
         # remove the junction
         attrib -R /L $currentdir
-        & "$env:COMSPEC" /c rmdir $currentdir
+        Remove-Item $currentdir -Recurse -Force -ErrorAction Stop
     }
 
-    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
+    New-Item -Path $currentdir -ItemType Junction -Value $versiondir | Out-Null
     attrib $currentdir +R /L
     return $currentdir
 }
@@ -938,17 +938,17 @@ function link_current($versiondir) {
 # Returns the 'current' junction directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
-    if(get_config NO_JUNCTIONS) { return $versiondir }
+    if (get_config NO_JUNCTIONS) { return $versiondir }
     $currentdir = current_dir $versiondir
 
-    if(test-path $currentdir) {
-        write-host "Unlinking $(friendly_path $currentdir)"
+    if (Test-Path $currentdir) {
+        Write-Host "Unlinking $(friendly_path $currentdir)"
 
         # remove read-only attribute on link
         attrib $currentdir -R /L
 
         # remove the junction
-        & "$env:COMSPEC" /c "rmdir `"$currentdir`""
+        Remove-Item $currentdir -Recurse -Force -ErrorAction Stop
         return $currentdir
     }
     return $versiondir
@@ -1077,17 +1077,9 @@ function prune_installed($apps, $global) {
     return @($uninstalled), @($installed)
 }
 
-# check whether the app failed to install
-function failed($app, $global) {
-    if (is_directory (appdir $app $global)) {
-        return !(install_info $app (Select-CurrentVersion -AppName $app -Global:$global) $global)
-    } else {
-        return $false
-    }
-}
-
 function ensure_none_failed($apps, $global) {
-    foreach($app in $apps) {
+    foreach ($app in $apps) {
+        $app = ($app -split '/|\\')[-1] -replace '\.json$', ''
         if (failed $app $global) {
             warn "Purging previous failed installation of $app."
             & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
@@ -1162,15 +1154,15 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 if (Test-Path $source) {
                     Move-Item -Force $source "$source.original"
                 }
-            # we don't have persist data in the store, move the source to target, then create link
+                # we don't have persist data in the store, move the source to target, then create link
             } elseif (Test-Path $source) {
                 # ensure target parent folder exist
                 ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
-            # we don't have neither source nor target data! we need to create an empty target,
-            # but we can't make a judgement that the data should be a file or directory...
-            # so we create a directory by default. to avoid this, use pre_install
-            # to create the source file before persisting (DON'T use post_install)
+                # we don't have neither source nor target data! we need to create an empty target,
+                # but we can't make a judgement that the data should be a file or directory...
+                # so we create a directory by default. to avoid this, use pre_install
+                # to create the source file before persisting (DON'T use post_install)
             } else {
                 $target = New-Object System.IO.DirectoryInfo($target)
                 ensure $target | Out-Null
@@ -1179,11 +1171,11 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # create link
             if (is_directory $target) {
                 # target is a directory, create junction
-                & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
+                New-Item -Path $source -ItemType Junction -Value $target | Out-Null
                 attrib $source +R /L
             } else {
                 # target is a file, create hard link
-                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
+                New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
             }
         }
     }
