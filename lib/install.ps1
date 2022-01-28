@@ -1201,10 +1201,10 @@ function unlink_persist_data($manifest, $dir) {
                     # remove read-only attribute on the link
                     attrib -R /L $source_path
                     # remove the junction
-                    & "$env:COMSPEC" /c "rmdir /s /q `"$source_path`""
+                    Remove-Item -Path $source_path -Recurse -Force -ErrorAction SilentlyContinue
                 } else {
                     # remove the hard link
-                    & "$env:COMSPEC" /c "del `"$source_path`""
+                    Remove-Item -Path $source_path -Force -ErrorAction SilentlyContinue
                 }
             }
         }
