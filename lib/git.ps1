@@ -30,3 +30,7 @@ function git_fetch {
 function git_checkout {
     git_proxy_cmd checkout $args
 }
+
+function git_cmd {
+    git_proxy_cmd $args
+}
