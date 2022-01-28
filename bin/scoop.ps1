@@ -12,20 +12,17 @@ reset_aliases
 
 $commands = commands
 if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
-    Push-Location $(versiondir 'scoop' 'current')
-    write-host "Current Scoop version:"
-    Invoke-Expression "git --no-pager log --oneline HEAD -n 1"
-    write-host ""
-    Pop-Location
+    Write-Host "Current Scoop version:"
+    Invoke-Expression "git -C '$(versiondir 'scoop' 'current')' --no-pager log --oneline HEAD -n 1"
+    Write-Host ""
 
     Get-LocalBucket | ForEach-Object {
-        Push-Location (Find-BucketDirectory $_ -Root)
-        if(test-path '.git') {
-            write-host "'$_' bucket:"
-            Invoke-Expression "git --no-pager log --oneline HEAD -n 1"
-            write-host ""
+        $bucket =  (Find-BucketDirectory $_ -Root)
+        if(Test-Path "$bucket\.git") {
+            Write-Host "'$_' bucket:"
+            Invoke-Expression "git -C '$bucket' --no-pager log --oneline HEAD -n 1"
+            Write-Host ""
         }
-        Pop-Location
     }
 }
 elseif (@($null, '--help', '/?') -contains $cmd -or $args[0] -contains '-h') { exec 'help' $args }
