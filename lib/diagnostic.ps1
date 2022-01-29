@@ -7,9 +7,10 @@ Use 'warn' to highlight the issue, and follow up with the recommended actions to
 
 function check_windows_defender($global) {
     $defender = Get-Service -Name WinDefend -ErrorAction SilentlyContinue
-    if ($defender -and $defender.Status) {
-        if ($defender.Status -eq [System.ServiceProcess.ServiceControllerStatus]::Running) {
-            if (Test-CommandAvailable Get-MpPreference) {
+    if (Test-CommandAvailable Get-MpPreference) {
+        if ((Get-MpPreference).DisableRealtimeMonitoring) { return $true }
+        if ($defender -and $defender.Status) {
+            if ($defender.Status -eq [System.ServiceProcess.ServiceControllerStatus]::Running) {
                 $installPath = $scoopdir;
                 if ($global) { $installPath = $globaldir; }
 
