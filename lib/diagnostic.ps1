@@ -6,19 +6,19 @@ Use 'warn' to highlight the issue, and follow up with the recommended actions to
 . "$PSScriptRoot\buckets.ps1"
 
 function check_windows_defender($global) {
-    $defender = get-service -name WinDefend -errorAction SilentlyContinue
-    if($defender -and $defender.status) {
-        if($defender.status -eq [system.serviceprocess.servicecontrollerstatus]::running) {
+    $defender = Get-Service -Name WinDefend -ErrorAction SilentlyContinue
+    if ($defender -and $defender.Status) {
+        if ($defender.Status -eq [System.ServiceProcess.ServiceControllerStatus]::Running) {
             if (Test-CommandAvailable Get-MpPreference) {
                 $installPath = $scoopdir;
-                if($global) { $installPath = $globaldir; }
+                if ($global) { $installPath = $globaldir; }
 
-                $exclusionPath = (Get-MpPreference).exclusionPath
-                if(!($exclusionPath -contains $installPath)) {
-                    warn "Windows Defender may slow down or disrupt installs with realtime scanning."
-                    write-host "  Consider running:"
-                    write-host "    sudo Add-MpPreference -ExclusionPath '$installPath'"
-                    write-host "  (Requires 'sudo' command. Run 'scoop install sudo' if you don't have it.)"
+                $exclusionPath = (Get-MpPreference).ExclusionPath
+                if (!($exclusionPath -contains $installPath)) {
+                    info "Windows Defender may slow down or disrupt installs with realtime scanning."
+                    Write-Host "  Consider running:"
+                    Write-Host "    sudo Add-MpPreference -ExclusionPath '$installPath'"
+                    Write-Host "  (Requires 'sudo' command. Run 'scoop install sudo' if you don't have it.)"
                     return $false
                 }
             }
@@ -28,7 +28,7 @@ function check_windows_defender($global) {
 }
 
 function check_main_bucket {
-    if ((Get-LocalBucket) -notcontains 'main'){
+    if ((Get-LocalBucket) -notcontains 'main') {
         warn 'Main bucket is not added.'
         Write-Host "  run 'scoop bucket add main'"
 
