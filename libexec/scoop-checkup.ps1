@@ -7,9 +7,15 @@
 . "$psscriptroot\..\lib\diagnostic.ps1"
 
 $issues = 0
+$defenderIssues = 0
 
-$issues += !(check_windows_defender $false)
-$issues += !(check_windows_defender $true)
+$adminPrivileges = ([System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+
+if ($adminPrivileges) {
+    $defenderIssues += !(check_windows_defender $false)
+    $defenderIssues += !(check_windows_defender $true)
+}
+
 $issues += !(check_main_bucket)
 $issues += !(check_long_paths)
 
@@ -29,19 +35,23 @@ if (!(Test-HelperInstalled -Helper Dark)) {
 }
 
 $globaldir = New-Object System.IO.DriveInfo($globaldir)
-if($globaldir.DriveFormat -ne 'NTFS') {
+if ($globaldir.DriveFormat -ne 'NTFS') {
     error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP_GLOBAL or 'globalPath' variable in '~/.config/scoop/config.json' to another Drive."
     $issues++
 }
 
 $scoopdir = New-Object System.IO.DriveInfo($scoopdir)
-if($scoopdir.DriveFormat -ne 'NTFS') {
+if ($scoopdir.DriveFormat -ne 'NTFS') {
     error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP or 'rootPath' variable in '~/.config/scoop/config.json' to another Drive."
     $issues++
 }
 
-if($issues) {
-    warn "Found $issues potential $(pluralize $issues problem problems)."
+if ($issues + $defenderIssues) {
+    if ($issues) { warn "Found $issues potential $(pluralize $issues problem problems)." }
+    if ($defenderIssues) {
+        info "Found $defenderIssues performance $(pluralize $defenderIssues problem problems)."
+        warn "Security is more important than performance, in most cases."
+    }
 } else {
     success "No problems identified!"
 }
