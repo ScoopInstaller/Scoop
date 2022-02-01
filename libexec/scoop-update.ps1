@@ -23,7 +23,6 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\git.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
 reset_aliases
@@ -73,7 +72,7 @@ function update_scoop() {
         $newdir = fullpath $(versiondir 'scoop' 'new')
 
         # get git scoop
-        git_clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
+        git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
 
         # check if scoop was successful downloaded
         if (!(Test-Path "$newdir")) {

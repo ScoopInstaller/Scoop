@@ -99,7 +99,7 @@ function add_bucket($name, $repo) {
     }
 
     write-host 'Checking repo... ' -nonewline
-    $out = git_ls_remote $repo 2>&1
+    $out = git_cmd ls-remote $repo 2>&1
     if ($lastexitcode -ne 0) {
         abort "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
     }
@@ -107,7 +107,7 @@ function add_bucket($name, $repo) {
 
     ensure $bucketsdir > $null
     $dir = ensure $dir
-    git_clone "$repo" "`"$dir`"" -q
+    git_cmd clone "$repo" "`"$dir`"" -q
     success "The $name bucket was added successfully."
 }
 
