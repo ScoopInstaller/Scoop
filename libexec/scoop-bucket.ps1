@@ -28,10 +28,30 @@ reset_aliases
 $usage_add = "usage: scoop bucket add <name> [<repo>]"
 $usage_rm = "usage: scoop bucket rm <name>"
 
-switch($cmd) {
+function list_buckets {
+    $buckets = @()
+
+    foreach ($bucket in Get-LocalBucket) {
+        $source = Find-BucketDirectory $bucket -Root
+        $updated = 'N/A'
+        if (Test-Path (Join-Path $source '.git')) {
+            $updated = git_cmd -C "`"$source`"" log --date=iso-local --pretty=format:'%ch' -n 1
+            $source = git_cmd -C "`"$source`"" remote get-url origin
+        }
+        if ($source.Contains((Get-PSProvider 'FileSystem').Home)) {
+            $source = $source.Replace((Get-PSProvider 'FileSystem').Home, '~')
+        }
+
+        $buckets += New-Object psobject -Property @{Name = $bucket; Source = $source; Updated = $updated }
+    }
+
+    return $buckets | Select-Object Name, Source, Updated | Format-Table -AutoSize -Wrap
+}
+
+switch ($cmd) {
     'add' { add_bucket $name $repo }
     'rm' { rm_bucket $name }
-    'list' { Get-LocalBucket }
+    "list" { list_buckets }
     'known' { known_buckets }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
