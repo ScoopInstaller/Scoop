@@ -46,12 +46,11 @@ if ($scoopdir.DriveFormat -ne 'NTFS') {
     $issues++
 }
 
-if ($issues + $defenderIssues) {
-    if ($issues) { warn "Found $issues potential $(pluralize $issues problem problems)." }
-    if ($defenderIssues) {
-        info "Found $defenderIssues performance $(pluralize $defenderIssues problem problems)."
-        warn "Security is more important than performance, in most cases."
-    }
+if ($issues) {
+    warn "Found $issues potential $(pluralize $issues problem problems)."
+} elseif ($defenderIssues) {
+    info "Found $defenderIssues performance $(pluralize $defenderIssues problem problems)."
+    warn "Security is more important than performance, in most cases."
 } else {
     success "No problems identified!"
 }
