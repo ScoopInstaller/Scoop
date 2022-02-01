@@ -19,9 +19,9 @@
 #     scoop bucket known
 param($cmd, $name, $repo)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
 reset_aliases
 
@@ -38,7 +38,7 @@ function list_buckets {
             $updated = git_cmd -C "`"$source`"" log --date=iso-local --pretty=format:'%ch' -n 1
             $source = git_cmd -C "`"$source`"" remote get-url origin
         }
-        if ($source.Contains((Get-PSProvider 'FileSystem').Home)) {
+        if ($source.StartsWith((Get-PSProvider 'FileSystem').Home)) {
             $source = $source.Replace((Get-PSProvider 'FileSystem').Home, '~')
         }
 
