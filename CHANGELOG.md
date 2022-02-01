@@ -37,6 +37,7 @@
 - **diagnostic** Skip check for 'exclusionPath' if defender realtime protect is disabled ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
 - **scoop-checkup** Skip 'check_windows_defender' when have not admin privileges ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
 - **scoop-checkup** Separate defender issues, mark as performance problem instead potential problem ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
+- **scoop-bucket** Show source/lastupdate for buckets list ([#4704](https://github.com/ScoopInstaller/Scoop/pull/4704))
 
 ### Builds
 
