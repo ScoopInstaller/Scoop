@@ -49,7 +49,7 @@ function list_buckets {
         }
     }
 
-    return $buckets | Select-Object Name, Source, Updated | Format-Table -AutoSize -Wrap
+    return $buckets | Select-Object Name, Source, Updated
 }
 
 switch ($cmd) {
