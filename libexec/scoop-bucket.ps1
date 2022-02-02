@@ -42,7 +42,7 @@ function list_buckets {
             $updated = git_cmd -C "`"$source`"" log --date=format:"`"%Y-%m-%d %H:%M:%S`"" --format='%ad' -n 1
             $source = git_cmd -C "`"$source`"" config remote.origin.url
         } else {
-            $updated = (Get-Item "$source\bucket").LastAccessTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+            $updated = (Get-Item "$source\bucket").LastWriteTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
             $source = friendly_path $source
         }
 
