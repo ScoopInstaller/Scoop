@@ -42,7 +42,11 @@ function list_buckets {
             $source = $source.Replace((Get-PSProvider 'FileSystem').Home, '~')
         }
 
-        $buckets += New-Object psobject -Property @{Name = $bucket; Source = $source; Updated = $updated }
+        $buckets += New-Object PSObject -Property @{
+            Name    = $bucket
+            Source  = $source
+            Updated = $updated
+        }
     }
 
     return $buckets | Select-Object Name, Source, Updated | Format-Table -AutoSize -Wrap
