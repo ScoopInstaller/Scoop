@@ -52,7 +52,7 @@ function list_buckets {
             Manifests = $manifests
         }
     }
-    return ($buckets | Select-Object Name, Source, Updated, Manifests | Out-String).Trim()
+    return $buckets | Select-Object Name, Source, Updated, Manifests
 }
 
 switch ($cmd) {
