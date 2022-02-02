@@ -33,6 +33,10 @@ function list_buckets {
 
     foreach ($bucket in Get-LocalBucket) {
         $source = Find-BucketDirectory $bucket -Root
+        $manifests = (
+            Get-ChildItem "$source\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
+            Measure-Object | Select-Object -ExpandProperty Count
+        )
         $updated = 'N/A'
         if (Test-Path (Join-Path $source '.git')) {
             $updated = git_cmd -C "`"$source`"" log --format='%ch' -n 1
@@ -43,13 +47,16 @@ function list_buckets {
         }
 
         $buckets += New-Object PSObject -Property @{
-            Name    = $bucket
-            Source  = $source
-            Updated = $updated
+            Name      = $bucket
+            Manifests = $manifests
+            Source    = $source
+            Updated   = $updated
         }
     }
 
-    return $buckets | Select-Object Name, Source, Updated
+    return $buckets | Select-Object Name, Manifests, Source, Updated
+
+    Write-Host
 }
 
 switch ($cmd) {
