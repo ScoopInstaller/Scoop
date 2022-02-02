@@ -55,8 +55,6 @@ function list_buckets {
     }
 
     return $buckets | Select-Object Name, Manifests, Source, Updated
-
-    Write-Host
 }
 
 switch ($cmd) {
