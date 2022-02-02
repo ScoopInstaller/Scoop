@@ -45,7 +45,6 @@ function list_buckets {
             $updated = (Get-Item "$source\bucket").LastWriteTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
             $source = friendly_path $source
         }
-
         $buckets += New-Object PSObject -Property @{
             Name      = $bucket
             Source    = $source
@@ -53,8 +52,7 @@ function list_buckets {
             Manifests = $manifests
         }
     }
-
-    return $buckets | Select-Object Name, Source, Updated, Manifests
+    return ($buckets | Select-Object Name, Source, Updated, Manifests | Out-String).Trim()
 }
 
 switch ($cmd) {
