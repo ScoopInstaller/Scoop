@@ -35,8 +35,8 @@ function list_buckets {
         $source = Find-BucketDirectory $bucket -Root
         $updated = 'N/A'
         if (Test-Path (Join-Path $source '.git')) {
-            $updated = git_cmd -C "`"$source`"" log --date=iso-local --pretty=format:'%ch' -n 1
-            $source = git_cmd -C "`"$source`"" remote get-url origin
+            $updated = git_cmd -C "`"$source`"" log --format='%ch' -n 1
+            $source = git_cmd -C "`"$source`"" config remote.origin.url
         }
         if ($source.StartsWith((Get-PSProvider 'FileSystem').Home)) {
             $source = $source.Replace((Get-PSProvider 'FileSystem').Home, '~')
