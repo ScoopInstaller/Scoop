@@ -48,13 +48,13 @@ function list_buckets {
 
         $buckets += New-Object PSObject -Property @{
             Name      = $bucket
-            Manifests = $manifests
             Source    = $source
             Updated   = $updated
+            Manifests = $manifests
         }
     }
 
-    return $buckets | Select-Object Name, Manifests, Source, Updated
+    return $buckets | Select-Object Name, Source, Updated, Manifests
 }
 
 switch ($cmd) {
