@@ -60,7 +60,8 @@ if (!$apps) { exit 0 }
 
         #region Workaround for #2952
         $processdir = $appDir | Resolve-Path | Select-Object -ExpandProperty Path
-        if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
+        if ((Get-Process | Where-Object { $_.Path -like "$processdir\*" }) -and
+            (Read-Host "Application '$app' is still running. Do you want to proceed uninstallation? All unsaved data will be lost [y/N]") -ne 'y') {
             error 'Application is still running. Close all instances and try again.'
             continue
         }
