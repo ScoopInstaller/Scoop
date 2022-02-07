@@ -1077,12 +1077,19 @@ function prune_installed($apps, $global) {
     return @($uninstalled), @($installed)
 }
 
-function ensure_none_failed($apps, $global) {
+function ensure_none_failed($apps) {
     foreach ($app in $apps) {
         $app = ($app -split '/|\\')[-1] -replace '\.json$', ''
-        if (failed $app $global) {
-            warn "Purging previous failed installation of $app."
-            & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
+        foreach ($global in $true, $false) {
+            if (failed $app $global) {
+                if (installed $app $global) {
+                    warn "Repair previous failed installation of $app."
+                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app$(if ($global) { ' --global' })
+                } else {
+                    warn "Purging previous failed installation of $app."
+                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
+                }
+            }
         }
     }
 }

@@ -59,6 +59,8 @@ if (is_scoop_outdated) {
     }
 }
 
+ensure_none_failed $apps
+
 if ($apps.length -eq 1) {
     $app, $null, $version = parse_app $apps
     if ($app.EndsWith('.json')) {
@@ -102,7 +104,7 @@ $explicit_apps = $apps
 if (!$independent) {
     $apps = $apps | Get-Dependency -Architecture $architecture | Select-Object -Unique # adds dependencies
 }
-ensure_none_failed $apps $global
+ensure_none_failed $apps
 
 $apps, $skip = prune_installed $apps $global
 

@@ -210,7 +210,10 @@ function installed_apps($global) {
 
 # check whether the app failed to install
 function failed($app, $global) {
-    return (is_directory (appdir $app $global)) -and !(Select-CurrentVersion -AppName $app -Global:$global)
+    $app = ($app -split '/|\\')[-1]
+    $appPath = appdir $app $global
+    $hasCurrent = (get_config NO_JUNCTIONS) -or (Test-Path "$appPath\current")
+    return (Test-Path $appPath) -and !($hasCurrent -and (installed $app $global))
 }
 
 function file_path($app, $file) {

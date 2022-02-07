@@ -29,7 +29,7 @@ if($apps) {
 
         if($global) { write-host -f DarkGreen ' *global*' -NoNewline }
 
-        if (!$install_info) { Write-Host ' *failed*' -ForegroundColor DarkRed -NoNewline }
+        if (failed $app $global) { Write-Host ' *failed*' -ForegroundColor DarkRed -NoNewline }
         if ($install_info.hold) { Write-Host ' *hold*' -ForegroundColor DarkMagenta -NoNewline }
 
         if ($install_info.bucket) {
