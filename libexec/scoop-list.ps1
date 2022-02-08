@@ -10,6 +10,9 @@ param($query)
 
 reset_aliases
 $def_arch = default_architecture
+if (-not (Get-FormatData ScoopAppsList)) {
+    Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopAppsList.Format.ps1xml"
+}
 
 $local = installed_apps $false | ForEach-Object { @{ name = $_ } }
 $global = installed_apps $true | ForEach-Object { @{ name = $_; global = $true } }
@@ -25,15 +28,17 @@ Write-Host "Installed apps$(if($query) { `" matching '$query'`"}):"
 $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $app = $_.name
     $global = $_.global
-    $item = [ordered]@{}
+    $item = @{ PSTypeName = 'ScoopAppsList' }
     $ver = Select-CurrentVersion -AppName $app -Global:$global
     $item.Name = $app
     $item.Version = $ver
 
     $install_info_path = "$(versiondir $app $ver $global)\install.json"
+    $updated = (Get-Item (appdir $app $global)).LastWriteTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     $install_info = $null
     if(Test-Path $install_info_path) {
         $install_info = parse_json $install_info_path
+        $updated = (Get-Item $install_info_path).LastWriteTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
     }
 
     $item.Source = if ($install_info.bucket) {
@@ -41,6 +46,7 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     } elseif ($install_info.url) {
         $install_info.url
     }
+    $item.Updated = $updated
 
     $info = @()
     if($global) { $info += "Global install" }
