@@ -9,8 +9,8 @@ $isUnix = is_unix
 Describe 'Get-AppFilePath' -Tag 'Scoop' {
     BeforeAll {
         $working_dir = setup_working 'is_directory'
-        Mock versiondir { 'local' } -Verifiable -ParameterFilter { $global -eq $false }
-        Mock versiondir { 'global' } -Verifiable -ParameterFilter { $global -eq $true }
+        Mock currentdir { 'local' } -Verifiable -ParameterFilter { $global -eq $false }
+        Mock currentdir { 'global' } -Verifiable -ParameterFilter { $global -eq $true }
     }
 
     It 'should return locally installed program' {
