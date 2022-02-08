@@ -32,6 +32,7 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $ver = Select-CurrentVersion -AppName $app -Global:$global
     $item.Name = $app
     $item.Version = $ver
+    $info = @()
 
     $install_info_path = "$(versiondir $app $ver $global)\install.json"
     $updated = (Get-Item (appdir $app $global)).LastWriteTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
@@ -44,11 +45,11 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $item.Source = if ($install_info.bucket) {
         $install_info.bucket
     } elseif ($install_info.url) {
+        if ($install_info.url -eq (usermanifest $app)) { $info += "Auto-generated" }
         $install_info.url
     }
     $item.Updated = $updated
 
-    $info = @()
     if($global) { $info += "Global install" }
     if (!$install_info) { $info += "Install failed" }
     if ($install_info.hold) { $info += "Held package" }
