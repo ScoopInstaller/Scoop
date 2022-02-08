@@ -642,9 +642,9 @@ function shim($path, $global, $name, $arg) {
             "if !args! == !invalid! ( set args= )",
             "where /q pwsh.exe",
             "if %errorlevel% equ 0 (",
-            "    pwsh -noprofile -ex unrestricted -command `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"",
+            "    pwsh -noprofile -ex unrestricted -file `"$resolved_path`" $arg %args%",
             ") else (",
-            "    powershell -noprofile -ex unrestricted -command `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"",
+            "    powershell -noprofile -ex unrestricted -file `"$resolved_path`" $arg %args%",
             ")"
         ) -join "`r`n" | Out-File "$shim.cmd" -Encoding ASCII
 
@@ -653,9 +653,9 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "if command -v pwsh.exe > /dev/null 2>&1; then",
-            "    pwsh.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
+            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
             "else",
-            "    powershell.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"",
+            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
             "fi"
         ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
     } elseif ($path -match '\.jar$') {
