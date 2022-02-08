@@ -35,11 +35,12 @@
 - **rmdir:** Use 'Remove-Item' instead of 'rmdir' ([#4691](https://github.com/ScoopInstaller/Scoop/issues/4691))
 - **COMSPEC:** Deprecate use of subshell cmd.exe ([#4692](https://github.com/ScoopInstaller/Scoop/pull/4692))
 - **git:** Use 'git -C' to specify the work directory instead of 'Push-Location'/'Pop-Location' ([#4697](https://github.com/ScoopInstaller/Scoop/pull/4697))
-- **diagnostic:** Downgrade defender checks from 'WARN' to 'INFO' ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
-- **diagnostic:** Skip check for 'exclusionPath' if defender realtime protect is disabled ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
-- **scoop-checkup:** Skip 'check_windows_defender' when have not admin privileges ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
-- **scoop-checkup:** Separate defender issues, mark as performance problem instead potential problem ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
+- **diagnostic** Downgrade defender checks from 'WARN' to 'INFO' ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
+- **diagnostic** Skip check for 'exclusionPath' if defender realtime protect is disabled ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
+- **scoop-checkup** Skip 'check_windows_defender' when have not admin privileges ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
+- **scoop-checkup** Separate defender issues, mark as performance problem instead potential problem ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
 - **scoop-list:** Allow list manipulation ([#4718](https://github.com/ScoopInstaller/Scoop/pull/4718))
+- **shim:** Use `-file` instead of `-command` in ps1 script shims ([#4721](https://github.com/ScoopInstaller/Scoop/pull/4721))
 
 ### Builds
 
