@@ -897,23 +897,15 @@ function rm_shims($manifest, $global, $arch) {
     }
 }
 
-# Gets the path for the 'current' directory junction for
-# the specified version directory.
-function current_dir($versiondir) {
-    $parent = split-path $versiondir
-    return "$parent\current"
-}
-
-
 # Creates or updates the directory junction for [app]/current,
 # pointing to the specified version directory for the app.
 #
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if (get_config NO_JUNCTIONS) { return $versiondir }
+    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
 
-    $currentdir = current_dir $versiondir
+    $currentdir = "$(Split-Path $versiondir)\current"
 
     Write-Host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
 
@@ -938,8 +930,8 @@ function link_current($versiondir) {
 # Returns the 'current' junction directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
-    if (get_config NO_JUNCTIONS) { return $versiondir }
-    $currentdir = current_dir $versiondir
+    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
+    $currentdir = "$(Split-Path $versiondir)\current"
 
     if (Test-Path $currentdir) {
         Write-Host "Unlinking $(friendly_path $currentdir)"
