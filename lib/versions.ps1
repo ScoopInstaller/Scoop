@@ -51,17 +51,18 @@ function Select-CurrentVersion {
     )
     process {
         $currentPath = "$(appdir $AppName $Global)\current"
-        if ((get_config NO_JUNCTIONS) -or !(Test-Path $currentPath)) {
+        if (!(get_config NO_JUNCTIONS)) {
+            $currentVersion = (parse_json "$currentPath\manifest.json").version
+            if ($currentVersion -eq 'nightly') {
+                $currentVersion = (Get-Item $currentPath).Target | Split-Path -Leaf
+            }
+        }
+        if ($null -eq $currentVersion) {
             $installedVersion = Get-InstalledVersion -AppName $AppName -Global:$Global
             if ($installedVersion) {
                 $currentVersion = @($installedVersion)[-1]
             } else {
                 $currentVersion = $null
-            }
-        } else {
-            $currentVersion = (parse_json "$currentPath\manifest.json").version
-            if ($currentVersion -eq 'nightly') {
-                $currentVersion = (Get-Item $currentPath).Target | Split-Path -Leaf
             }
         }
         return $currentVersion
