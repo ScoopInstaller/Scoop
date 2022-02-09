@@ -274,18 +274,20 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         install_app $app $architecture $global $suggested $use_cache $check_hash
     } else {
         # Also add missing dependencies
-        $apps = (Get-Dependency $app $architecture) -ne $app
+        $apps = @(Get-Dependency $app $architecture) -ne $app
         ensure_none_failed $apps
-        @($apps) + $app | Where-Object { !(installed $_) } | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 }
 
 if (-not ($apps -or $all)) {
     if ($global) {
-        "scoop update: --global is invalid when <app> is not specified."; exit 1
+        error 'scoop update: --global is invalid when <app> is not specified.'
+        exit 1
     }
     if (!$use_cache) {
-        "scoop update: --no-cache is invalid when <app> is not specified."; exit 1
+        error 'scoop update: --no-cache is invalid when <app> is not specified.'
+        exit 1
     }
     update_scoop
 } else {
@@ -320,7 +322,7 @@ if (-not ($apps -or $all)) {
                 }
             } elseif ($apps_param -ne '*') {
                 if ($status.installed) {
-                    ensure_none_failed $app $global
+                    ensure_none_failed $app
                     Write-Host "$app`: $($status.version) (latest version)" -ForegroundColor Green
                 } else {
                     info 'Please reinstall it or fix the manifest.'

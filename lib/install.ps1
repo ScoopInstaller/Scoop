@@ -1075,7 +1075,7 @@ function ensure_none_failed($apps) {
         foreach ($global in $true, $false) {
             if (failed $app $global) {
                 if (installed $app $global) {
-                    warn "Repair previous failed installation of $app."
+                    info "Repair previous failed installation of $app."
                     & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app$(if ($global) { ' --global' })
                 } else {
                     warn "Purging previous failed installation of $app."
