@@ -1212,3 +1212,22 @@ function persist_permission($manifest, $global) {
         $acl | Set-Acl -Path $path
     }
 }
+
+function handle_running_processes($app, $global) {
+    $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
+    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" }
+    if ($running_processes) {
+        $srpConfig = get_config 'stop_running_process' 'no'
+        if ($srpConfig -eq 'prompt') {
+            Read-Host "Scoop is about to stop all running processes of application `"$app`". Save progress and press any key to continue"
+        } elseif ($srpConfig -ne 'silent') {
+            error "Application `"$app`" is still running. Close all instances and try again."
+            return $false
+        }
+
+        $running_processes | Stop-Process -Force
+        Write-Host "Scoop stopped all running processes of application `"$app`"."
+    }
+
+    return $true
+}

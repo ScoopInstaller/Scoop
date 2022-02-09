@@ -1066,25 +1066,6 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }
 
-function handle_running_processes($app, $global) {
-    $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
-    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" }
-    if ($running_processes) {
-        $srpConfig = get_config 'stop_running_process' 'no'
-        if ($srpConfig -eq 'prompt') {
-            Read-Host "Scoop is about to stop all running processes of application `"$app`". Save progress and press any key to continue"
-        } elseif ($srpConfig -ne 'silent') {
-            error "Application `"$app`" is still running. Close all instances and try again."
-            return $false
-        }
-
-        $running_processes | Stop-Process
-        Write-Host "Scoop stopped all running processes of application `"$app`"."
-    }
-
-    return $true
-}
-
 ##################
 # Core Bootstrap #
 ##################
