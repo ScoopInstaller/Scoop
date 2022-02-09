@@ -3,6 +3,7 @@
 
 ### Features
 
+- **scoop-alter:** Add `scoop alter` command to switch shim's target ([#4727](https://github.com/ScoopInstaller/Scoop/issues/4727))
 - **scoop-download:** Add `scoop download` command ([#4621](https://github.com/ScoopInstaller/Scoop/issues/4621))
 - **scoop-(install|virustotal):** Allow skipping update check ([#4634](https://github.com/ScoopInstaller/Scoop/issues/4634))
 - **scoop-bucket:** List more detailed information for buckets ([#4704](https://github.com/ScoopInstaller/Scoop/pull/4704))
