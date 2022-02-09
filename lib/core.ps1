@@ -579,13 +579,18 @@ function get_app_name_from_shim($shim) {
 }
 
 function warn_on_overwrite($shim, $path) {
-    if (!(Test-Path($shim))) {
+    if (!(Test-Path $shim)) {
         return
     }
     $shim_app = get_app_name_from_shim $shim
     $path_app = get_app_name $path
     if ($shim_app -eq $path_app) {
         return
+    } else {
+        if (Test-Path -Path "$shim.$path_app" -PathType Leaf) {
+            Remove-Item -Path "$shim.$path_app" -Force
+        }
+        Rename-Item -Path $shim -NewName "$shim.$shim_app"
     }
     $shimname = (fname $shim) -replace '\.shim$', '.exe'
     $filename = (fname $path) -replace '\.shim$', '.exe'

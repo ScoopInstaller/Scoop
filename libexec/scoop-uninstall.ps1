@@ -78,7 +78,7 @@ if (!$apps) { exit 0 }
         $architecture = $install.architecture
 
         run_uninstaller $manifest $architecture $dir
-        rm_shims $manifest $global $architecture
+        rm_shims $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 
         # If a junction was used during install, that will have been used
