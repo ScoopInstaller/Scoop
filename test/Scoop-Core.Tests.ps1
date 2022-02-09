@@ -251,9 +251,12 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop' {
         get_app_name_from_shim "$working_dir/mock-shim.ps1" | Should -Be ''
     }
 
-    AfterEach {
-        if (Get-Command 'shim-test' -ErrorAction SilentlyContinue) {
-            rm_shim 'shim-test' $shimdir -ErrorAction SilentlyContinue
+    AfterAll {
+        if (Get-Command 'shim-test1' -ErrorAction SilentlyContinue) {
+            rm_shim 'shim-test1' $shimdir -ErrorAction SilentlyContinue
+        }
+        if (Get-Command 'shim-test2' -ErrorAction SilentlyContinue) {
+            rm_shim 'shim-test2' $shimdir -ErrorAction SilentlyContinue
         }
         Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
         Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/moch-shim.ps1"
