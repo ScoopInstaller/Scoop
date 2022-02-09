@@ -44,7 +44,7 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
 
     $info = @()
     if($global) { $info += "Global install" }
-    if (!$install_info) { $info += "Install failed" }
+    if (failed $app $global) { $info += "Install failed" }
     if ($install_info.hold) { $info += "Held package" }
     if ($install_info.architecture -and $def_arch -ne $install_info.architecture) {
         $info += $install_info.architecture

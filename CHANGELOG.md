@@ -23,6 +23,7 @@
 - **shim:** Fix PS1 shim error when in different drive in PS7 ([#4614](https://github.com/ScoopInstaller/Scoop/issues/4614))
 - **shim:** Fix `sh` shim error in WSL ([#4637](https://github.com/ScoopInstaller/Scoop/issues/4637))
 - **versions:** Fix wrong version number when only one version dir ([#4679](https://github.com/ScoopInstaller/Scoop/issues/4679))
+- **versions:** Get current version from failed installation if possible ([#4720](https://github.com/ScoopInstaller/Scoop/issues/4720))
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
 - **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670))
   - **scoop-update:** Remove 'Done.' output ([#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
