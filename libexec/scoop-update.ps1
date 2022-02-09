@@ -231,11 +231,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $persist_dir = persistdir $app $global
 
     #region Workaround for #2952
-    $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
-    if ((Get-Process | Where-Object { $_.Path -like "$processdir\*" }) -and
-        (Read-Host "Application '$app' is still running. Do you want to proceed uninstallation? All unsaved data will be lost [y/N]") -ne 'y') {
-        error "Application is still running. Close all instances and try again."
-        return
+    if (!(handle_running_processes $app $global)) {
+        continue
     }
     #endregion Workaround for #2952
 
