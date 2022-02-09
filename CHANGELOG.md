@@ -20,6 +20,7 @@
 - **installed:** Fix 'core/installed' that mark failed app as 'installed' ([#4650](https://github.com/ScoopInstaller/Scoop/issues/4650))
   - **status:** Correctly handle failed installation of apps ([#4676](https://github.com/ScoopInstaller/Scoop/issues/4676))
     - **test:** Import 'versions.ps1' in `Scoop-Decompress.Tests.ps1` ([#4689](https://github.com/ScoopInstaller/Scoop/issues/4689))
+- **no-junctions:** Fix error when `NO_JUNCTIONS` is been set ([#4722](https://github.com/ScoopInstaller/Scoop/issues/4722))
 - **shim:** Fix PS1 shim error when in different drive in PS7 ([#4614](https://github.com/ScoopInstaller/Scoop/issues/4614))
 - **shim:** Fix `sh` shim error in WSL ([#4637](https://github.com/ScoopInstaller/Scoop/issues/4637))
 - **versions:** Fix wrong version number when only one version dir ([#4679](https://github.com/ScoopInstaller/Scoop/issues/4679))

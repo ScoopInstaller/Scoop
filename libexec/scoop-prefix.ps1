@@ -3,16 +3,17 @@
 param($app)
 
 if (!$app) {
-    . "$psscriptroot\..\lib\help.ps1"
+    . "$PSScriptRoot\..\lib\help.ps1"
     my_usage
     exit 1
 }
 
-. "$psscriptroot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1"
 
-$app_path = versiondir $app 'current' $false
+$app_path = currentdir $app $false
 if (!(Test-Path $app_path)) {
-    $app_path = versiondir $app 'current' $true
+    $app_path = currentdir $app$true
 }
 
 if (Test-Path $app_path) {
