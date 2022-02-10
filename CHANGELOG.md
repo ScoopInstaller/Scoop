@@ -62,6 +62,7 @@
 
 - **changelog:** Add 'CHANGLOG.md' ([#4600](https://github.com/ScoopInstaller/Scoop/issues/4600))
 - **changelog:** Rearrange CHANGELOG ([#4729](https://github.com/ScoopInstaller/Scoop/issues/4729))
+- **changelog:** Link CHANGELOG headers to 'releases/tag' ([#4730](https://github.com/ScoopInstaller/Scoop/issues/4730))
 
 ## [2021-12-26](https://github.com/ScoopInstaller/Scoop/releases/tag/2021-12-26)
 
