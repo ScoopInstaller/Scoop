@@ -6,6 +6,7 @@
 - **scoop-download:** Add `scoop download` command ([#4621](https://github.com/ScoopInstaller/Scoop/issues/4621))
 - **scoop-(install|virustotal):** Allow skipping update check ([#4634](https://github.com/ScoopInstaller/Scoop/issues/4634))
 - **scoop-bucket:** List more detailed information for buckets ([#4704](https://github.com/ScoopInstaller/Scoop/pull/4704))
+- **scoop-list:** Allow list manipulation ([#4718](https://github.com/ScoopInstaller/Scoop/issues/4718), [#4723](https://github.com/ScoopInstaller/Scoop/issues/4723))
 
 ### Bug Fixes
 
@@ -16,36 +17,25 @@
 - **current:** Remove 'current' while it's not a junction ([#4687](https://github.com/ScoopInstaller/Scoop/issues/4687))
 - **depends:** Prevent error on no URL ([#4595](https://github.com/ScoopInstaller/Scoop/issues/4595))
 - **depends:** Check if extractor is available ([#4042](https://github.com/ScoopInstaller/Scoop/issues/4042))
-- **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608))
-  - **decompress:** Fix `Split-Path -LeafBase` in PS5 ([#4639](https://github.com/ScoopInstaller/Scoop/issues/4639))
-- **installed:** Fix 'core/installed' that mark failed app as 'installed' ([#4650](https://github.com/ScoopInstaller/Scoop/issues/4650))
-  - **status:** Correctly handle failed installation of apps ([#4676](https://github.com/ScoopInstaller/Scoop/issues/4676))
-  - **test:** Import 'versions.ps1' in `Scoop-Decompress.Tests.ps1` ([#4689](https://github.com/ScoopInstaller/Scoop/issues/4689))
-- **no-junctions:** Fix error when `NO_JUNCTIONS` is been set ([#4722](https://github.com/ScoopInstaller/Scoop/issues/4722))
-  - **test:** Remove unused shim files ([#4726](https://github.com/ScoopInstaller/Scoop/issues/4726))
+- **decompress:** Fix nested Zstd archive extraction ([#4608](https://github.com/ScoopInstaller/Scoop/issues/4608), [#4639](https://github.com/ScoopInstaller/Scoop/issues/4639))
+- **installed:** Fix 'core/installed' that mark failed app as 'installed' ([#4650](https://github.com/ScoopInstaller/Scoop/issues/4650), [#4676](https://github.com/ScoopInstaller/Scoop/issues/4676), [#4689](https://github.com/ScoopInstaller/Scoop/issues/4689))
+- **no-junctions:** Fix error when `NO_JUNCTIONS` is been set ([#4722](https://github.com/ScoopInstaller/Scoop/issues/4722), [#4726](https://github.com/ScoopInstaller/Scoop/issues/4726))
 - **shim:** Fix PS1 shim error when in different drive in PS7 ([#4614](https://github.com/ScoopInstaller/Scoop/issues/4614))
 - **shim:** Fix `sh` shim error in WSL ([#4637](https://github.com/ScoopInstaller/Scoop/issues/4637))
+- **shim:** Use `-file` instead of `-command` in ps1 script shims ([#4721](https://github.com/ScoopInstaller/Scoop/issues/4721))
 - **versions:** Fix wrong version number when only one version dir ([#4679](https://github.com/ScoopInstaller/Scoop/issues/4679))
-- **versions:** Get current version from failed installation if possible ([#4720](https://github.com/ScoopInstaller/Scoop/issues/4720))
-  - **scoop-update:** Enforce $null array ([#4725](https://github.com/ScoopInstaller/Scoop/issues/4725))
+- **versions:** Get current version from failed installation if possible ([#4720](https://github.com/ScoopInstaller/Scoop/issues/4720), [#4725](https://github.com/ScoopInstaller/Scoop/issues/4725))
+- **scoop-checkup:** Skip 'check_windows_defender' when have not admin privileges ([#4699](https://github.com/ScoopInstaller/Scoop/issues/4699))
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
-- **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670))
-  - **scoop-update:** Remove 'Done.' output ([#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
+- **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670), [#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
 
 ### Code Refactoring
 
-- **depends:** Rewrite 'depends.ps1' ([#4638](https://github.com/ScoopInstaller/Scoop/issues/4638))
-  - **depends:** Keep bucket in 'Get-Dependency()' ([#4673](https://github.com/ScoopInstaller/Scoop/issues/4673))
+- **depends:** Rewrite 'depends.ps1' ([#4638](https://github.com/ScoopInstaller/Scoop/issues/4638), [#4673](https://github.com/ScoopInstaller/Scoop/issues/4673))
 - **mklink:** Use 'New-Item' instead of 'mklink' ([#4690](https://github.com/ScoopInstaller/Scoop/issues/4690))
 - **rmdir:** Use 'Remove-Item' instead of 'rmdir' ([#4691](https://github.com/ScoopInstaller/Scoop/issues/4691))
-- **COMSPEC:** Deprecate use of subshell cmd.exe ([#4692](https://github.com/ScoopInstaller/Scoop/pull/4692))
-- **git:** Use 'git -C' to specify the work directory instead of 'Push-Location'/'Pop-Location' ([#4697](https://github.com/ScoopInstaller/Scoop/pull/4697))
-- **diagnostic** Downgrade defender checks from 'WARN' to 'INFO' ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
-- **diagnostic** Skip check for 'exclusionPath' if defender realtime protect is disabled ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
-- **scoop-checkup** Skip 'check_windows_defender' when have not admin privileges ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
-- **scoop-checkup** Separate defender issues, mark as performance problem instead potential problem ([#4699](https://github.com/ScoopInstaller/Scoop/pull/4699))
-- **scoop-list:** Allow list manipulation ([#4718](https://github.com/ScoopInstaller/Scoop/pull/4718))
-- **shim:** Use `-file` instead of `-command` in ps1 script shims ([#4721](https://github.com/ScoopInstaller/Scoop/pull/4721))
+- **COMSPEC:** Deprecate use of subshell cmd.exe ([#4692](https://github.com/ScoopInstaller/Scoop/issues/4692))
+- **git:** Use 'git -C' to specify the work directory instead of 'Push-Location'/'Pop-Location' ([#4697](https://github.com/ScoopInstaller/Scoop/issues/4697))
 
 ### Builds
 
@@ -71,18 +61,16 @@
 ### Documentation
 
 - **changelog:** Add 'CHANGLOG.md' ([#4600](https://github.com/ScoopInstaller/Scoop/issues/4600))
+- **changelog:** Rearrange CHANGELOG ([#4729](https://github.com/ScoopInstaller/Scoop/issues/4729))
 
 <a name="2021-12-26"></a>
 ## [2021-12-26]
 
 ### Features
 
-- **core:** Redirect 'StandardError' in `Invoke-ExternalCommand()` ([#4570](https://github.com/ScoopInstaller/Scoop/issues/4570))
-  - **decompress:** Fix 'Expand-7zipArchive()' for nested archive ([#4582](https://github.com/ScoopInstaller/Scoop/issues/4582))
+- **core:** Redirect 'StandardError' in `Invoke-ExternalCommand()` ([#4570](https://github.com/ScoopInstaller/Scoop/issues/4570), [#4582](https://github.com/ScoopInstaller/Scoop/issues/4582))
 - **install:** Add portableapps.com to strip_filename skips ([#3244](https://github.com/ScoopInstaller/Scoop/issues/3244))
-- **install:** Show manifest on installation ([#4155](https://github.com/ScoopInstaller/Scoop/issues/4155))
-  - **install:** Show manifest name while reviewing ([fb496c48](https://github.com/ScoopInstaller/Scoop/commit/fb496c482bec4063e01b328f943224ab703dbbd8))
-  - **install:** Don't show manifest while updating ([#4581](https://github.com/ScoopInstaller/Scoop/issues/4581))
+- **install:** Show manifest on installation ([#4155](https://github.com/ScoopInstaller/Scoop/issues/4155), [fb496c48](https://github.com/ScoopInstaller/Scoop/commit/fb496c482bec4063e01b328f943224ab703dbbd8), [#4581](https://github.com/ScoopInstaller/Scoop/issues/4581))
 - **template:** Add issue/PR templates ([#4572](https://github.com/ScoopInstaller/Scoop/issues/4572))
 - **scoop-cat:** Add `scoop cat` command ([#4532](https://github.com/ScoopInstaller/Scoop/issues/4532))
 - **scoop-config:** Document all configuration options ([#4579](https://github.com/ScoopInstaller/Scoop/issues/4579))
@@ -102,18 +90,14 @@
 
 ### Code Refactoring
 
-- **shim:** Rework shimming logic ([#4543](https://github.com/ScoopInstaller/Scoop/issues/4543))
-  - **shim:** Hotfix for PS1 shim([#4555](https://github.com/ScoopInstaller/Scoop/issues/4555))
-  - **shim:** Specify command arg ([3c90d1a0](https://github.com/ScoopInstaller/Scoop/commit/3c90d1a0701b0b64730dbf9ebc8d31f9b9c238f1))
-  - **shim:** Specify command arg for bash ([2ec00d57](https://github.com/ScoopInstaller/Scoop/commit/2ec00d576c7e594dc5c0f1eac4536c5310ce6f17))
+- **shim:** Rework shimming logic ([#4543](https://github.com/ScoopInstaller/Scoop/issues/4543), [#4555](https://github.com/ScoopInstaller/Scoop/issues/4555), [3c90d1a0](https://github.com/ScoopInstaller/Scoop/commit/3c90d1a0701b0b64730dbf9ebc8d31f9b9c238f1), [2ec00d57](https://github.com/ScoopInstaller/Scoop/commit/2ec00d576c7e594dc5c0f1eac4536c5310ce6f17))
 
 ### Builds
 
 - **auto-pr:** Remove hardcoded 'master' branch ([#4567](https://github.com/ScoopInstaller/Scoop/issues/4567))
 - **checkver:** Improve JSONPath extraction support ([#4522](https://github.com/ScoopInstaller/Scoop/issues/4522))
 - **checkver:** Use GitHub token from environment ([#4557](https://github.com/ScoopInstaller/Scoop/issues/4557))
-- **schema:** Enable autoupdate for 'license' ([#4528](https://github.com/ScoopInstaller/Scoop/issues/4528))
-  - **schema:** Add 'license' definition ([#4596](https://github.com/ScoopInstaller/Scoop/issues/4596))
+- **schema:** Enable autoupdate for 'license' ([#4528](https://github.com/ScoopInstaller/Scoop/issues/4528), [#4596](https://github.com/ScoopInstaller/Scoop/issues/4596))
 
 ### Documentation
 
@@ -130,9 +114,7 @@
 ### Features
 
 - **bucket:** Move extras bucket to [@ScoopInstaller](https://github.com/ScoopInstaller) ([3e9a4d4e](https://github.com/ScoopInstaller/Scoop/commit/3e9a4d4ea0e7e4d6489099c46a763f58db07e633))
-- **decompress:** Support Zstandard archive ([#4372](https://github.com/ScoopInstaller/Scoop/issues/4372))
-  - **decompress:** Check `.zst` first ([e35ff313](https://github.com/ScoopInstaller/Scoop/commit/e35ff313a5d35cab1049024938c3423a5f6bf060))
-  - **test:** Use 32bit version of `zstd` ([47ebc6f1](https://github.com/ScoopInstaller/Scoop/commit/47ebc6f176b0db0afeb51b4ee237a20b2d8649e9))
+- **decompress:** Support Zstandard archive ([#4372](https://github.com/ScoopInstaller/Scoop/issues/4372), [e35ff313](https://github.com/ScoopInstaller/Scoop/commit/e35ff313a5d35cab1049024938c3423a5f6bf060), [47ebc6f1](https://github.com/ScoopInstaller/Scoop/commit/47ebc6f176b0db0afeb51b4ee237a20b2d8649e9))
 - **install:** Handle arch-specific env_add_path ([#4013](https://github.com/ScoopInstaller/Scoop/issues/4013))
 - **install:** s/lukesamson/ScoopInstaller in install.ps1 ([5226f26f](https://github.com/ScoopInstaller/Scoop/commit/5226f26f18157ed78f1529144404ec682374452e))
 - **message:** Add config to disable aria2 warning message ([#4422](https://github.com/ScoopInstaller/Scoop/issues/4422))
@@ -143,22 +125,18 @@
 
 ### Bug Fixes
 
-- **core:** Change url() scope to avoid conflict with global aliases ([#4342](https://github.com/ScoopInstaller/Scoop/issues/4342))
-  - **core:** Use `script:url` instead of `url` ([#4492](https://github.com/ScoopInstaller/Scoop/issues/4492))
+- **core:** Change url() scope to avoid conflict with global aliases ([#4342](https://github.com/ScoopInstaller/Scoop/issues/4342), [#4492](https://github.com/ScoopInstaller/Scoop/issues/4492))
 - **install:** Fix `aria2`'s resume download feature ([#3292](https://github.com/ScoopInstaller/Scoop/issues/3292))
 - **shim:** Fixed trailing whitespace issue ([#4307](https://github.com/ScoopInstaller/Scoop/issues/4307))
 - **scoop-reset:** Skip when app instance is running ([#4359](https://github.com/ScoopInstaller/Scoop/issues/4359))
 
 ### Code Refactoring
 
-- **versions:** Refactor 'versions.ps1' ([#3721](https://github.com/ScoopInstaller/Scoop/issues/3721))
-  - **test:** Add more test cases for versions ([e6630272](https://github.com/ScoopInstaller/Scoop/commit/e663027299d03ca768a252fa4bcbc51d124d4cae))
-  - **versions:** Fix situation that contains '_' ([ae892138](https://github.com/ScoopInstaller/Scoop/commit/ae892138423bb9bbf54c8f0bed8331b93199f6b8))
+- **versions:** Refactor 'versions.ps1' ([#3721](https://github.com/ScoopInstaller/Scoop/issues/3721), [e6630272](https://github.com/ScoopInstaller/Scoop/commit/e663027299d03ca768a252fa4bcbc51d124d4cae), [ae892138](https://github.com/ScoopInstaller/Scoop/commit/ae892138423bb9bbf54c8f0bed8331b93199f6b8))
 
 ### Builds
 
-- **autoupdate:** Add multiple URL/hash/extract_dir... support ([#3518](https://github.com/ScoopInstaller/Scoop/issues/3518))
-  - **autoupdate:** Update array of arrays correctly ([#4502](https://github.com/ScoopInstaller/Scoop/issues/4502))
+- **autoupdate:** Add multiple URL/hash/extract_dir... support ([#3518](https://github.com/ScoopInstaller/Scoop/issues/3518), [#4502](https://github.com/ScoopInstaller/Scoop/issues/4502))
 - **schema:** Fix Schema to support `+` in version ([#4504](https://github.com/ScoopInstaller/Scoop/issues/4504))
 - **supporting:** Update Json to 12.0.3, Json.Schema to 3.0.14 ([#3352](https://github.com/ScoopInstaller/Scoop/issues/3352))
 
@@ -186,8 +164,7 @@
 - **autoupdate:** Add $urlNoExt and $basenameNoExt substitutions ([#3742](https://github.com/ScoopInstaller/Scoop/issues/3742))
 - **config:** Add configuration option for default architecture ([#3778](https://github.com/ScoopInstaller/Scoop/issues/3778))
 - **install:** Follow HTTP redirections when downloading a file ([#3902](https://github.com/ScoopInstaller/Scoop/issues/3902))
-- **install:** Let pathes in 'env_add_path' be added ascendantly ([#3788](https://github.com/ScoopInstaller/Scoop/issues/3788))
-  - **install:** `[Array]::Reverse` error ([#3976](https://github.com/ScoopInstaller/Scoop/issues/3976))
+- **install:** Let pathes in 'env_add_path' be added ascendantly ([#3788](https://github.com/ScoopInstaller/Scoop/issues/3788), [#3976](https://github.com/ScoopInstaller/Scoop/issues/3976))
 - **list:** Display main bucket name ([#3759](https://github.com/ScoopInstaller/Scoop/issues/3759))
 - **shim:** Add alt-shim support ([#3998](https://github.com/ScoopInstaller/Scoop/issues/3998))
 - **scoop-checkup:** Add check_envs_requirements ([#3860](https://github.com/ScoopInstaller/Scoop/issues/3860))
@@ -201,8 +178,7 @@
 - **git:** Don't execute autostart programs when executing git commands ([#3993](https://github.com/ScoopInstaller/Scoop/issues/3993))
 - **git:** Enforce pull without rebase ([#3765](https://github.com/ScoopInstaller/Scoop/issues/3765))
 - **install:** Aria2 inline progress negative values ([#4053](https://github.com/ScoopInstaller/Scoop/issues/4053))
-- **install:** Fix wrong output of 'install/failed' ([#3784](https://github.com/ScoopInstaller/Scoop/issues/3784))
-  - **install:** Fix 'failed' function ([#3867](https://github.com/ScoopInstaller/Scoop/issues/3867))
+- **install:** Fix wrong output of 'install/failed' ([#3784](https://github.com/ScoopInstaller/Scoop/issues/3784), [#3867](https://github.com/ScoopInstaller/Scoop/issues/3867))
 - **install:** Re-add "Don't send referer to portableapps.com" ([#3961](https://github.com/ScoopInstaller/Scoop/issues/3961))
 - **scoop:** Remove temporary code from the scoop executable ([#3898](https://github.com/ScoopInstaller/Scoop/issues/3898))
 - **update:** Update outdated PowerShell 5 warning ([#3986](https://github.com/ScoopInstaller/Scoop/issues/3986))
@@ -275,9 +251,7 @@
 
 ### Features
 
-- **decompress:** Add 'ExtractDir' to 'Expand-...' functions ([#3466](https://github.com/ScoopInstaller/Scoop/issues/3466))
-  - **decompress:** '$ExtractDir' removed original extract file by accident ([#3470](https://github.com/ScoopInstaller/Scoop/issues/3470))
-  - **decompress:** '$ExtractDir' error with '.zip' and subdir ([#3472](https://github.com/ScoopInstaller/Scoop/issues/3472))
+- **decompress:** Add 'ExtractDir' to 'Expand-...' functions ([#3466](https://github.com/ScoopInstaller/Scoop/issues/3466), [#3470](https://github.com/ScoopInstaller/Scoop/issues/3470), [#3472](https://github.com/ScoopInstaller/Scoop/issues/3472))
 - **decompress:** Allow 'Expand-InnoArchive -ExtractDir' to accept '{xxx}' ([#3487](https://github.com/ScoopInstaller/Scoop/issues/3487))
 
 ### Bug Fixes
@@ -494,8 +468,7 @@
 - **schema:** Add shortcutsArray definition to schema.json ([0c7e6002](https://github.com/ScoopInstaller/Scoop/commit/0c7e60024a06e122331b17a204a158e4c5800a3d))
 - **schema:** extract_to property is on active duty (not deprecated) ([59e994c5](https://github.com/ScoopInstaller/Scoop/commit/59e994c5fdeb8dffe6037ca6767d56ad13bf04da))
 - **schema:** Improve comments in schema.json ([b5ed0761](https://github.com/ScoopInstaller/Scoop/commit/b5ed0761aef4f3e864533dc0460d110115850ba7))
-- **supporting:** Update validator.exe and shim.exe ([#2024](https://github.com/ScoopInstaller/Scoop/issues/2024))
-  - **json:** Adapt to path change of Newtonsoft.Json.dll ([#2034](https://github.com/ScoopInstaller/Scoop/issues/2034))
+- **supporting:** Update validator.exe and shim.exe ([#2024](https://github.com/ScoopInstaller/Scoop/issues/2024), [#2034](https://github.com/ScoopInstaller/Scoop/issues/2034))
 - **supporting:** Update Newtonsoft.Json to 11.0.2, Newtonsoft.Json.Schema to 3.0.10 ([#3043](https://github.com/ScoopInstaller/Scoop/issues/3043))
 - **validator:** Improve error reporting, add support for multiple files ([#3134](https://github.com/ScoopInstaller/Scoop/issues/3134))
 
