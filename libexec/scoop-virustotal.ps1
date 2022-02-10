@@ -28,11 +28,11 @@
 #
 # Options:
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
-#   -s, --scan For packages where VirusTotal has no information, send download URL
-#              for analysis (and future retrieval).  This requires you to configure
-#              your virustotal_api_key.
-#   -n, --no-depends By default, all dependencies are checked, too.  This flag allows
-#                    to avoid it.
+#   -s, --scan                For packages where VirusTotal has no information, send download URL
+#                             for analysis (and future retrieval). This requires you to configure
+#                             your virustotal_api_key.
+#   -n, --no-depends          By default, all dependencies are checked too. This flag avoids it.
+#   -u, --no-update-scoop     Don't update Scoop before checking if it's outdated
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\help.ps1"
@@ -46,12 +46,18 @@
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'a:sn' @('arch=', 'scan', 'no-depends')
+$opt, $apps, $err = getopt $args 'a:snu' @('arch=', 'scan', 'no-depends', 'no-update-scoop')
 if($err) { "scoop virustotal: $err"; exit 1 }
 if(!$apps) { my_usage; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
-if(is_scoop_outdated) { scoop update }
+if (is_scoop_outdated) {
+    if ($opt.u -or $opt.'no-update-scoop') {
+        warn "Scoop is out of date."
+    } else {
+        scoop update
+    }
+}
 
 $apps_param = $apps
 
@@ -60,8 +66,8 @@ if($apps_param -eq '*') {
     $apps += installed_apps $true
 }
 
-if (!$opt.n -and !$opt."no-depends") {
-    $apps = install_order $apps $architecture
+if (!$opt.n -and !$opt.'no-depends') {
+    $apps = $apps | Get-Dependency -Architecture $architecture | Select-Object -Unique
 }
 
 $_ERR_UNSAFE = 2
@@ -210,7 +216,7 @@ $apps | ForEach-Object {
         return
     }
 
-    $urls = url $manifest $architecture
+    $urls = script:url $manifest $architecture
     $urls | ForEach-Object {
         $url = $_
         $hash = hash_for_url $manifest $url $architecture

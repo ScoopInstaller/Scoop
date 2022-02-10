@@ -4,36 +4,24 @@ param($cmd)
 set-strictmode -off
 
 . "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\git.ps1"
 . "$psscriptroot\..\lib\buckets.ps1"
 . (relpath '..\lib\commands')
 
 reset_aliases
 
-# TODO: remove this in a few weeks
-if ((Get-LocalBucket) -notcontains 'main') {
-    warn "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
-    warn "You don't have the main bucket added, adding main bucket for you..."
-    add_bucket 'main'
-    exit
-}
-
 $commands = commands
 if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
-    Push-Location $(versiondir 'scoop' 'current')
-    write-host "Current Scoop version:"
-    git_log --oneline HEAD -n 1
-    write-host ""
-    Pop-Location
+    Write-Host "Current Scoop version:"
+    Invoke-Expression "git -C '$(versiondir 'scoop' 'current')' --no-pager log --oneline HEAD -n 1"
+    Write-Host ""
 
     Get-LocalBucket | ForEach-Object {
-        Push-Location (Find-BucketDirectory $_ -Root)
-        if(test-path '.git') {
-            write-host "'$_' bucket:"
-            git_log --oneline HEAD -n 1
-            write-host ""
+        $bucketLoc =  Find-BucketDirectory $_ -Root
+        if(Test-Path (Join-Path $bucketLoc '.git')) {
+            Write-Host "'$_' bucket:"
+            Invoke-Expression "git -C '$bucketLoc' --no-pager log --oneline HEAD -n 1"
+            Write-Host ""
         }
-        Pop-Location
     }
 }
 elseif (@($null, '--help', '/?') -contains $cmd -or $args[0] -contains '-h') { exec 'help' $args }

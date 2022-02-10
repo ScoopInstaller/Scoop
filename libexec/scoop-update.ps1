@@ -12,6 +12,7 @@
 #   -k, --no-cache            Don't use the download cache
 #   -s, --skip                Skip hash validation (use with caution!)
 #   -q, --quiet               Hide extraneous messages
+#   -a, --all                 Update all apps (alternative to '*')
 
 . "$psscriptroot\..\lib\core.ps1"
 . "$psscriptroot\..\lib\shortcuts.ps1"
@@ -22,12 +23,11 @@
 . "$psscriptroot\..\lib\versions.ps1"
 . "$psscriptroot\..\lib\getopt.ps1"
 . "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\git.ps1"
 . "$psscriptroot\..\lib\install.ps1"
 
 reset_aliases
 
-$opt, $apps, $err = getopt $args 'gfiksq:' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet'
+$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
 if ($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
@@ -35,11 +35,12 @@ $check_hash = !($opt.s -or $opt.skip)
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
+$all = $opt.a -or $opt.all
 
 # load config
 $configRepo = get_config SCOOP_REPO
 if (!$configRepo) {
-    $configRepo = "https://github.com/lukesampson/scoop"
+    $configRepo = "https://github.com/ScoopInstaller/Scoop"
     set_config SCOOP_REPO $configRepo | Out-Null
 }
 
@@ -52,36 +53,29 @@ if (!$configBranch) {
 
 if(($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
-    # should be deleted after Oct 1, 2019
-    If ((Get-Date).ToUniversalTime() -ge "2019-10-01") {
-        Write-Output "PowerShell 5 or later is required to run Scoop."
-        Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
-        break
-    } else {
-        Write-Output "Scoop is going to stop supporting old version of PowerShell."
-        Write-Output "Please upgrade to PowerShell 5 or later version before Oct 1, 2019 UTC."
-        Write-Output "Guideline: https://docs.microsoft.com/en-us/powershell/scripting/setup/installing-windows-powershell"
-    }
+    Write-Output "PowerShell 5 or later is required to run Scoop."
+    Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
+    break
 }
 
 function update_scoop() {
     # check for git
     if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    write-host "Updating Scoop..."
+    Write-Host "Updating Scoop..."
     $last_update = $(last_scoop_update)
     if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
     $last_update = $last_update.ToString('s')
     $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
-    if (!(test-path "$currentdir\.git")) {
+    if (!(Test-Path "$currentdir\.git")) {
         $newdir = fullpath $(versiondir 'scoop' 'new')
 
         # get git scoop
-        git_clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
+        git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
 
         # check if scoop was successful downloaded
-        if (!(test-path "$newdir")) {
+        if (!(Test-Path "$newdir")) {
             abort 'Scoop update failed.'
         }
 
@@ -89,69 +83,74 @@ function update_scoop() {
         Remove-Item -r -force $currentdir -ea stop
         Move-Item $newdir $currentdir
     } else {
-        Push-Location $currentdir
-
-        $currentRepo = git_config remote.origin.url
-        $currentBranch = git_branch
+        $previousCommit = Invoke-Expression "git -C '$currentdir' rev-parse HEAD"
+        $currentRepo = Invoke-Expression "git -C '$currentdir' config remote.origin.url"
+        $currentBranch = Invoke-Expression "git -C '$currentdir' branch"
 
         $isRepoChanged = !($currentRepo -match $configRepo)
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
         # Change remote url if the repo is changed
         if ($isRepoChanged) {
-            git_config remote.origin.url "$configRepo"
+            Invoke-Expression "git -C '$currentdir' config remote.origin.url '$configRepo'"
         }
 
         # Fetch and reset local repo if the repo or the branch is changed
         if ($isRepoChanged -or $isBranchChanged) {
             # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-            git_config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+            Invoke-Expression "git -C '$currentdir' config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'"
             # fetch remote branch
-            git_fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
+            git_cmd -C "`"$currentdir`"" fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
             # checkout and track the branch
-            git_checkout -B $configBranch -t origin/$configBranch -q
+            git_cmd -C "`"$currentdir`"" checkout -B $configBranch -t origin/$configBranch -q
             # reset branch HEAD
-            git_reset --hard origin/$configBranch -q
+            Invoke-Expression "git -C '$currentdir' reset --hard origin/$configBranch -q"
         } else {
-            git_pull -q
+            git_cmd -C "`"$currentdir`"" pull -q
         }
 
         $res = $lastexitcode
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            Invoke-Expression "git -C '$currentdir' --no-pager log --no-decorate --grep='^chore' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
-        Pop-Location
         if ($res -ne 0) {
             abort 'Update failed.'
         }
     }
 
-    if ((Get-LocalBucket) -notcontains 'main') {
-        info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
-        info "Adding main bucket..."
-        add_bucket 'main'
-    }
+    # This should have been deprecated after 2019-05-12
+    # if ((Get-LocalBucket) -notcontains 'main') {
+    #     info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
+    #     info "Adding main bucket..."
+    #     add_bucket 'main'
+    # }
 
     ensure_scoop_in_path
     shim "$currentdir\bin\scoop.ps1" $false
 
-    Get-LocalBucket | ForEach-Object {
-        write-host "Updating '$_' bucket..."
+    foreach ($bucket in Get-LocalBucket) {
+        Write-Host "Updating '$bucket' bucket..."
 
-        $loc = Find-BucketDirectory $_ -Root
-        # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
-        if (($_ -eq 'main') -and !(Test-Path "$loc\.git")) {
-            rm_bucket 'main'
-            add_bucket 'main'
+        $bucketLoc = Find-BucketDirectory $bucket -Root
+
+        if (!(Test-Path (Join-Path $bucketLoc '.git'))) {
+            if ($bucket -eq 'main') {
+                # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
+                Write-Host " Converting 'main' bucket to git..."
+                rm_bucket 'main'
+                add_bucket 'main'
+            } else {
+                Write-Host "'$bucket' is not a git repository. Skipped."
+            }
+            continue
         }
 
-        Push-Location $loc
-        git_pull -q
+        $previousCommit = (Invoke-Expression "git -C '$bucketLoc' rev-parse HEAD")
+        git_cmd -C "`"$bucketLoc`"" pull -q
         if ($show_update_log) {
-            git_log --no-decorate --date=local --since="`"$last_update`"" --format="`"tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset`"" HEAD
+            Invoke-Expression "git -C '$bucketLoc' --no-pager log --no-decorate --grep='^chore' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
-        Pop-Location
     }
 
     set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
@@ -159,7 +158,7 @@ function update_scoop() {
 }
 
 function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
-    $old_version = current_version $app $global
+    $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
 
@@ -171,13 +170,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
     $url = $install.url
 
-    if (!$independent) {
-        # check dependencies
-        $deps = @(deps $app $architecture) | Where-Object { !(installed $_) }
-        $deps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
-    }
-
-    $version = latest_version $app $bucket $url
+    $manifest = manifest $app $bucket $url
+    $version = $manifest.version
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
         $version = nightly_version $(get-date) $quiet
@@ -196,18 +190,16 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         return
     }
 
-    $manifest = manifest $app $bucket $url
-
-    write-host "Updating '$app' ($old_version -> $version)"
+    Write-Host "Updating '$app' ($old_version -> $version)"
 
     # region Workaround
-    # Workaround for https://github.com/lukesampson/scoop/issues/2220 until install is refactored
+    # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
     Write-Host "Downloading new version"
     if (Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
-        $urls = url $manifest $architecture
+        $urls = script:url $manifest $architecture
 
         foreach ($url in $urls) {
             dl_with_cache $app $version $url $null $manifest.cookie $true
@@ -219,7 +211,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
                 if (!$ok) {
                     error $err
-                    if (test-path $source) {
+                    if (Test-Path $source) {
                         # rm cached file
                         Remove-Item -force $source
                     }
@@ -236,6 +228,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # endregion Workaround
 
     $dir = versiondir $app $old_version $global
+    $persist_dir = persistdir $app $global
 
     #region Workaround for #2952
     $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
@@ -245,11 +238,11 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
     #endregion Workaround for #2952
 
-    write-host "Uninstalling '$app' ($old_version)"
+    Write-Host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $old_manifest $global $architecture
-    env_rm_path $old_manifest $dir $global
-    env_rm $old_manifest $global
+    env_rm_path $old_manifest $dir $global $architecture
+    env_rm $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
@@ -272,15 +265,29 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         # add bucket name it was installed from
         $app = "$bucket/$app"
     }
-    install_app $app $architecture $global $suggested $use_cache $check_hash
+    if ($install.url) {
+        # use the url of the install json if the application was installed through url
+        $app = $install.url
+    }
+
+    if ($independent) {
+        install_app $app $architecture $global $suggested $use_cache $check_hash
+    } else {
+        # Also add missing dependencies
+        $apps = @(Get-Dependency $app $architecture) -ne $app
+        ensure_none_failed $apps
+        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+    }
 }
 
-if (!$apps) {
+if (-not ($apps -or $all)) {
     if ($global) {
-        "scoop update: --global is invalid when <app> is not specified."; exit 1
+        error 'scoop update: --global is invalid when <app> is not specified.'
+        exit 1
     }
     if (!$use_cache) {
-        "scoop update: --no-cache is invalid when <app> is not specified."; exit 1
+        error 'scoop update: --no-cache is invalid when <app> is not specified.'
+        exit 1
     }
     update_scoop
 } else {
@@ -294,7 +301,7 @@ if (!$apps) {
     $outdated = @()
     $apps_param = $apps
 
-    if ($apps_param -eq '*') {
+    if ($apps_param -eq '*' -or $all) {
         $apps = applist (installed_apps $false) $false
         if ($global) {
             $apps += applist (installed_apps $true) $true
@@ -306,28 +313,34 @@ if (!$apps) {
         $apps | ForEach-Object {
             ($app, $global) = $_
             $status = app_status $app $global
-            if ($force -or $status.outdated) {
-                if(!$status.hold) {
+            if ($status.installed -and ($force -or $status.outdated)) {
+                if (!$status.hold) {
                     $outdated += applist $app $global
-                    write-host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('',' (global)')[$global])
+                    Write-Host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('', ' (global)')[$global])
                 } else {
-                    warn "'$app' is locked to version $($status.version)"
+                    warn "'$app' is held to version $($status.version)"
                 }
             } elseif ($apps_param -ne '*') {
-                write-host -f green "$app`: $($status.version) (latest version)"
+                if ($status.installed) {
+                    ensure_none_failed $app
+                    Write-Host "$app`: $($status.version) (latest version)" -ForegroundColor Green
+                } else {
+                    info 'Please reinstall it or fix the manifest.'
+                }
             }
         }
 
-        if ($outdated -and (Test-Aria2Enabled)) {
+        if ($outdated -and ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true))) {
             warn "Scoop uses 'aria2c' for multi-connection downloads."
             warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
+            warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
         }
         if ($outdated.Length -gt 1) {
-            write-host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
+            Write-Host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
         } elseif ($outdated.Length -eq 0) {
-            write-host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
+            Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
         } else {
-            write-host -f DarkCyan "Updating one outdated app:"
+            Write-Host -f DarkCyan "Updating one outdated app:"
         }
     }
 

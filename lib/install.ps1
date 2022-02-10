@@ -34,6 +34,14 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         return
     }
 
+    if ((get_config 'manifest-review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+        Write-Output "Manifest: $app.json"
+        Write-Output $manifest | ConvertToPrettyJson
+        $answer = Read-Host -Prompt "Continue installation? [Y/n]"
+        if (($answer -eq 'n') -or ($answer -eq 'N')) {
+            return
+        }
+    }
     write-output "Installing '$app' ($version) [$architecture]"
 
     $dir = ensure (versiondir $app $version $global)
@@ -200,12 +208,12 @@ function get_filename_from_metalink($file) {
 
 function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
     $data = @{}
-    $urls = @(url $manifest $architecture)
+    $urls = @(script:url $manifest $architecture)
 
     # aria2 input file
     $urlstxt = Join-Path $cachedir "$app.txt"
     $urlstxt_content = ''
-    $has_downloads = $false
+    $download_finished = $true
 
     # aria2 options
     $options = @(
@@ -225,127 +233,140 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         "--min-tls-version=TLSv1.2"
         "--stop-with-process=$PID"
         "--continue"
+        "--summary-interval=0"
+        "--auto-save-interval=1"
     )
 
-    if($cookies) {
+    if ($cookies) {
         $options += "--header='Cookie: $(cookie_header $cookies)'"
     }
 
     $proxy = get_config 'proxy'
-    if($proxy -ne 'none') {
-        if([Net.Webrequest]::DefaultWebProxy.Address) {
+    if ($proxy -ne 'none') {
+        if ([Net.Webrequest]::DefaultWebProxy.Address) {
             $options += "--all-proxy='$([Net.Webrequest]::DefaultWebProxy.Address.Authority)'"
         }
-        if([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
+        if ([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
             $options += "--all-proxy-user='$([Net.Webrequest]::DefaultWebProxy.Credentials.UserName)'"
         }
-        if([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
+        if ([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
             $options += "--all-proxy-passwd='$([Net.Webrequest]::DefaultWebProxy.Credentials.Password)'"
         }
     }
 
     $more_options = get_config 'aria2-options'
-    if($more_options) {
+    if ($more_options) {
         $options += $more_options
     }
 
-    foreach($url in $urls) {
+    foreach ($url in $urls) {
         $data.$url = @{
-            'filename' = url_filename $url
-            'target' = "$dir\$(url_filename $url)"
+            'target'    = "$dir\$(url_filename $url)"
             'cachename' = fname (cache_path $app $version $url)
-            'source' = fullpath (cache_path $app $version $url)
+            'source'    = fullpath (cache_path $app $version $url)
         }
 
-        if(!(test-path $data.$url.source)) {
-            $has_downloads = $true
+        if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
+            Write-Host 'Loading ' -NoNewline
+            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+            Write-Host ' from cache.'
+        } else {
+            $download_finished = $false
             # create aria2 input file content
             $urlstxt_content += "$(handle_special_urls $url)`n"
-            if(!$url.Contains('sourceforge.net')) {
+            if (!$url.Contains('sourceforge.net')) {
                 $urlstxt_content += "    referer=$(strip_filename $url)`n"
             }
             $urlstxt_content += "    dir=$cachedir`n"
             $urlstxt_content += "    out=$($data.$url.cachename)`n"
-        } else {
-            Write-Host "Loading " -NoNewline
-            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
-            Write-Host " from cache."
         }
     }
 
-    if($has_downloads) {
+    if (-not($download_finished)) {
         # write aria2 input file
-        Set-Content -Path $urlstxt $urlstxt_content
+        if ($urlstxt_content -ne '') {
+            Set-Content -Path $urlstxt $urlstxt_content
+        }
 
         # build aria2 command
         $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
-        Write-Host "Starting download with aria2 ..."
-        $prefix = "Download: "
+        Write-Host 'Starting download with aria2 ...'
+
         Invoke-Expression $aria2 | ForEach-Object {
-            if([String]::IsNullOrWhiteSpace($_)) {
-                # skip blank lines
-                return
+            # Skip blank lines
+            if ([String]::IsNullOrWhiteSpace($_)) { return }
+
+            # Prevent potential overlaping of text when one line is shorter
+            $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
+            $blank = if ($len -gt 0) { ' ' * $len } else { '' }
+            $color = 'Gray'
+
+            if ($_.StartsWith('(OK):')) {
+                $noNewLine = $true
+                $color = 'Green'
+            } elseif ($_.StartsWith('[') -and $_.EndsWith(']')) {
+                $noNewLine = $true
+                $color = 'Cyan'
+            } elseif ($_.StartsWith('Download Results:')) {
+                $noNewLine = $false
             }
-            Write-Host $prefix -NoNewline
-            if($_.StartsWith('(OK):')) {
-                Write-Host $_ -f Green
-            } elseif($_.StartsWith('[') -and $_.EndsWith(']')) {
-                Write-Host $_ -f Cyan
-            } else {
-                Write-Host $_ -f Gray
-            }
+
+            Write-Host "`rDownload: $_$blank" -ForegroundColor $color -NoNewline:$noNewLine
         }
+        Write-Host ''
 
         if($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             error $urlstxt_content
             error $aria2
-            abort $(new_issue_msg $app $bucket "download via aria2 failed")
+            abort $(new_issue_msg $app $bucket 'download via aria2 failed')
         }
 
         # remove aria2 input file when done
-        if(test-path($urlstxt)) {
-            Remove-Item $urlstxt
+        if (Test-Path $urlstxt, "$($data.$url.source).aria2*") {
+            Remove-Item $urlstxt -Force -ErrorAction SilentlyContinue
+            Remove-Item "$($data.$url.source).aria2*" -Force -ErrorAction SilentlyContinue
         }
     }
 
-    foreach($url in $urls) {
+    foreach ($url in $urls) {
 
         $metalink_filename = get_filename_from_metalink $data.$url.source
-        if($metalink_filename) {
+        if ($metalink_filename) {
             Remove-Item $data.$url.source -Force
             Rename-Item -Force (Join-Path -Path $cachedir -ChildPath $metalink_filename) $data.$url.source
         }
 
         # run hash checks
-        if($check_hash) {
+        if ($check_hash) {
             $manifest_hash = hash_for_url $manifest $url $architecture
             $ok, $err = check_hash $data.$url.source $manifest_hash $(show_app $app $bucket)
-            if(!$ok) {
+            if (!$ok) {
                 error $err
-                if(test-path $data.$url.source) {
+                if (Test-Path $data.$url.source) {
                     # rm cached file
-                    Remove-Item -force $data.$url.source
+                    Remove-Item $data.$url.source -Force -ErrorAction SilentlyContinue
+                    Remove-Item "$($data.$url.source).aria2*" -Force -ErrorAction SilentlyContinue
                 }
-                if($url.Contains('sourceforge.net')) {
+                if ($url.Contains('sourceforge.net')) {
                     Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
-                abort $(new_issue_msg $app $bucket "hash check failed")
+                abort $(new_issue_msg $app $bucket 'hash check failed')
             }
         }
 
         # copy or move file to target location
-        if(!(test-path $data.$url.source) ) {
-            abort $(new_issue_msg $app $bucket "cached file not found")
+        if (!(Test-Path $data.$url.source) ) {
+            abort $(new_issue_msg $app $bucket 'cached file not found')
         }
 
-        if(!($dir -eq $cachedir)) {
-            if($use_cache) {
+        if (!($dir -eq $cachedir)) {
+            if ($use_cache) {
                 Copy-Item $data.$url.source $data.$url.target
             } else {
-                Move-Item $data.$url.source $data.$url.target -force
+                Move-Item $data.$url.source $data.$url.target -Force
             }
         }
     }
@@ -357,7 +378,7 @@ function dl($url, $to, $cookies, $progress) {
     $wreq = [net.webrequest]::create($reqUrl)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "sourceforge\.net")) {
+        if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
             $wreq.referer = strip_filename $url
         }
         if($cookies) {
@@ -365,7 +386,41 @@ function dl($url, $to, $cookies, $progress) {
         }
     }
 
-    $wres = $wreq.getresponse()
+    try {
+        $wres = $wreq.GetResponse()
+    } catch [System.Net.WebException] {
+        $exc = $_.Exception
+        $handledCodes = @(
+            [System.Net.HttpStatusCode]::MovedPermanently,  # HTTP 301
+            [System.Net.HttpStatusCode]::Found,             # HTTP 302
+            [System.Net.HttpStatusCode]::SeeOther,          # HTTP 303
+            [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
+        )
+
+        # Only handle redirection codes
+        $redirectRes = $exc.Response
+        if ($handledCodes -notcontains $redirectRes.StatusCode) {
+            throw $exc
+        }
+
+        # Get the new location of the file
+        if ((-not $redirectRes.Headers) -or ($redirectRes.Headers -notcontains 'Location')) {
+            throw $exc
+        }
+
+        $newUrl = $redirectRes.Headers['Location']
+        info "Following redirect to $newUrl..."
+
+        # Handle manual file rename
+        if ($url -like '*#/*') {
+            $null, $postfix = $url -split '#/'
+            $newUrl = "$newUrl#/$postfix"
+        }
+
+        dl $newUrl $to $cookies $progress
+        return
+    }
+
     $total = $wres.ContentLength
     if($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
         $total = ftp_file_size($url)
@@ -469,6 +524,7 @@ function dl_progress($read, $total, $url) {
             write-host
             $left = 0
             $top  = $top + 1
+            if($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
         }
     }
 
@@ -482,7 +538,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
-    $urls = @(url $manifest $architecture)
+    $urls = @(script:url $manifest $architecture)
 
     # can be multiple cookies: they will be used for all HTTP requests.
     $cookies = $manifest.cookie
@@ -552,7 +608,9 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             } else {
                 $extract_fn = 'Expand-MsiArchive'
             }
-        } elseif(Test-7zipRequirement -File $fname) { # 7zip
+        } elseif(Test-ZstdRequirement -Uri $fname) { # Zstd first
+            $extract_fn = 'Expand-ZstdArchive'
+        } elseif(Test-7zipRequirement -Uri $fname) { # 7zip
             $extract_fn = 'Expand-7zipArchive'
         }
 
@@ -597,7 +655,7 @@ function hash_for_url($manifest, $url, $arch) {
 
     if($hashes.length -eq 0) { return $null }
 
-    $urls = @(url $manifest $arch)
+    $urls = @(script:url $manifest $arch)
 
     $index = [array]::indexof($urls, $url)
     if($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
@@ -820,18 +878,9 @@ function create_shims($manifest, $dir, $global, $arch) {
 }
 
 function rm_shim($name, $shimdir) {
-    $shim = "$shimdir\$name.ps1"
-
-    if(!(test-path $shim)) { # handle no shim from failed install
-        warn "Shim for '$name' is missing. Skipping."
-    } else {
-        write-output "Removing shim for '$name'."
-        Remove-Item $shim
-    }
-
-    # other shim types might be present
-    '', '.exe', '.shim', '.cmd' | ForEach-Object {
+    '', '.exe', '.shim', '.cmd', '.ps1' | ForEach-Object {
         if(test-path -Path "$shimdir\$name$_" -PathType leaf) {
+            Write-Output "Removing shim '$name$_'."
             Remove-Item "$shimdir\$name$_"
         }
     }
@@ -848,37 +897,29 @@ function rm_shims($manifest, $global, $arch) {
     }
 }
 
-# Gets the path for the 'current' directory junction for
-# the specified version directory.
-function current_dir($versiondir) {
-    $parent = split-path $versiondir
-    return "$parent\current"
-}
-
-
 # Creates or updates the directory junction for [app]/current,
 # pointing to the specified version directory for the app.
 #
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if(get_config NO_JUNCTIONS) { return $versiondir }
+    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
 
-    $currentdir = current_dir $versiondir
+    $currentdir = "$(Split-Path $versiondir)\current"
 
-    write-host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
+    Write-Host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
 
-    if($currentdir -eq $versiondir) {
+    if ($currentdir -eq $versiondir) {
         abort "Error: Version 'current' is not allowed!"
     }
 
-    if(test-path $currentdir) {
+    if (Test-Path $currentdir) {
         # remove the junction
         attrib -R /L $currentdir
-        & "$env:COMSPEC" /c rmdir $currentdir
+        Remove-Item $currentdir -Recurse -Force -ErrorAction Stop
     }
 
-    & "$env:COMSPEC" /c mklink /j $currentdir $versiondir | out-null
+    New-Item -Path $currentdir -ItemType Junction -Value $versiondir | Out-Null
     attrib $currentdir +R /L
     return $currentdir
 }
@@ -889,17 +930,17 @@ function link_current($versiondir) {
 # Returns the 'current' junction directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
-    if(get_config NO_JUNCTIONS) { return $versiondir }
-    $currentdir = current_dir $versiondir
+    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
+    $currentdir = "$(Split-Path $versiondir)\current"
 
-    if(test-path $currentdir) {
-        write-host "Unlinking $(friendly_path $currentdir)"
+    if (Test-Path $currentdir) {
+        Write-Host "Unlinking $(friendly_path $currentdir)"
 
         # remove read-only attribute on link
         attrib $currentdir -R /L
 
         # remove the junction
-        & "$env:COMSPEC" /c "rmdir `"$currentdir`""
+        Remove-Item $currentdir -Recurse -Force -ErrorAction Stop
         return $currentdir
     }
     return $versiondir
@@ -938,13 +979,22 @@ function find_dir_or_subdir($path, $dir) {
 
 function env_add_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
-    $env_add_path | Where-Object { $_ } | ForEach-Object {
-        $path_dir = Join-Path $dir $_
+    $dir = $dir.TrimEnd('\')
+    if ($env_add_path) {
+        # GH-3785: Add path in ascending order.
+        [Array]::Reverse($env_add_path)
+        $env_add_path | Where-Object { $_ } | ForEach-Object {
+            if ($_ -eq '.') {
+                $path_dir = $dir
+            } else {
+                $path_dir = Join-Path $dir $_
+            }
 
-        if (!(is_in_dir $dir $path_dir)) {
-            abort "Error in manifest: env_add_path '$_' is outside the app directory."
+            if (!(is_in_dir $dir $path_dir)) {
+                abort "Error in manifest: env_add_path '$_' is outside the app directory."
+            }
+            add_first_in_path $path_dir $global
         }
-        add_first_in_path $path_dir $global
     }
 }
 
@@ -1019,19 +1069,19 @@ function prune_installed($apps, $global) {
     return @($uninstalled), @($installed)
 }
 
-# check whether the app failed to install
-function failed($app, $global) {
-    $ver = current_version $app $global
-    if(!$ver) { return $false }
-    $info = install_info $app $ver $global
-    if(!$info) { return $true }
-    return $false
-}
-
-function ensure_none_failed($apps, $global) {
-    foreach($app in $apps) {
-        if(failed $app $global) {
-            abort "'$app' install failed previously. Please uninstall it and try again."
+function ensure_none_failed($apps) {
+    foreach ($app in $apps) {
+        $app = ($app -split '/|\\')[-1] -replace '\.json$', ''
+        foreach ($global in $true, $false) {
+            if (failed $app $global) {
+                if (installed $app $global) {
+                    info "Repair previous failed installation of $app."
+                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app$(if ($global) { ' --global' })
+                } else {
+                    warn "Purging previous failed installation of $app."
+                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
+                }
+            }
         }
     }
 }
@@ -1103,15 +1153,15 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 if (Test-Path $source) {
                     Move-Item -Force $source "$source.original"
                 }
-            # we don't have persist data in the store, move the source to target, then create link
+                # we don't have persist data in the store, move the source to target, then create link
             } elseif (Test-Path $source) {
                 # ensure target parent folder exist
                 ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
-            # we don't have neither source nor target data! we need to crate an empty target,
-            # but we can't make a judgement that the data should be a file or directory...
-            # so we create a directory by default. to avoid this, use pre_install
-            # to create the source file before persisting (DON'T use post_install)
+                # we don't have neither source nor target data! we need to crate an empty target,
+                # but we can't make a judgement that the data should be a file or directory...
+                # so we create a directory by default. to avoid this, use pre_install
+                # to create the source file before persisting (DON'T use post_install)
             } else {
                 $target = New-Object System.IO.DirectoryInfo($target)
                 ensure $target | Out-Null
@@ -1120,11 +1170,11 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # create link
             if (is_directory $target) {
                 # target is a directory, create junction
-                & "$env:COMSPEC" /c "mklink /j `"$source`" `"$target`"" | out-null
+                New-Item -Path $source -ItemType Junction -Value $target | Out-Null
                 attrib $source +R /L
             } else {
                 # target is a file, create hard link
-                & "$env:COMSPEC" /c "mklink /h `"$source`" `"$target`"" | out-null
+                New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
             }
         }
     }
@@ -1141,10 +1191,10 @@ function unlink_persist_data($dir) {
                 # remove read-only attribute on the link
                 attrib -R /L $filepath
                 # remove the junction
-                & "$env:COMSPEC" /c "rmdir /s /q `"$filepath`""
+                Remove-Item -Path $filepath -Recurse -Force -ErrorAction SilentlyContinue
             } else {
                 # remove the hard link
-                & "$env:COMSPEC" /c "del `"$filepath`""
+                Remove-Item -Path $filepath -Force -ErrorAction SilentlyContinue
             }
         }
     }
