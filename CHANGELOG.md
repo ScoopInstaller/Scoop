@@ -6,7 +6,8 @@
 - **scoop-download:** Add `scoop download` command ([#4621](https://github.com/ScoopInstaller/Scoop/issues/4621))
 - **scoop-(install|virustotal):** Allow skipping update check ([#4634](https://github.com/ScoopInstaller/Scoop/issues/4634))
 - **scoop-bucket:** List more detailed information for buckets ([#4704](https://github.com/ScoopInstaller/Scoop/pull/4704))
-- **scoop-list:** Allow list manipulation ([#4718](https://github.com/ScoopInstaller/Scoop/issues/4718), [#4723](https://github.com/ScoopInstaller/Scoop/issues/4723))
+- **scoop-list:** Allow list manipulation ([#4718](https://github.com/ScoopInstaller/Scoop/issues/4718))
+- **scoop-list:** Show last-updated time [#4723](https://github.com/ScoopInstaller/Scoop/issues/4723))
 
 ### Bug Fixes
 
