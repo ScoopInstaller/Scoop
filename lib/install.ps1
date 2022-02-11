@@ -1225,3 +1225,21 @@ function persist_permission($manifest, $global) {
         $acl | Set-Acl -Path $path
     }
 }
+
+# test if there are running processes
+function test_running_process($app, $global) {
+    $processdir = appdir $app $global | Convert-Path
+    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" }
+
+    if ($running_processes) {
+        if (get_config 'ignore_running_processes') {
+            warn "Application `"$app`" is still running. Scoop is configured to ignore this condition."
+            return $false
+        } else {
+            error "Application `"$app`" is still running. Close all instances and try again."
+            return $true
+        }
+    } else {
+        return $false
+    }
+}
