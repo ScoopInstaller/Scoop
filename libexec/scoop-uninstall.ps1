@@ -59,9 +59,7 @@ if (!$apps) { exit 0 }
         $persist_dir = persistdir $app $global
 
         #region Workaround for #2952
-        $processdir = $appDir | Resolve-Path | Select-Object -ExpandProperty Path
-        if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
-            error 'Application is still running. Close all instances and try again.'
+        if (test_running_process $app $global) {
             continue
         }
         #endregion Workaround for #2952
