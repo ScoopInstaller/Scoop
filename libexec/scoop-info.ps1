@@ -41,7 +41,7 @@ if (!$manifest_file) {
     $manifest_file = manifest_path $app $bucket
 }
 
-$dir = versiondir $app 'current' $global
+$dir = currentdir $app $global
 $original_dir = versiondir $app $manifest.version $global
 $persist_dir = persistdir $app $global
 

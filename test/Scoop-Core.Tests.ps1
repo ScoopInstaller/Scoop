@@ -9,8 +9,8 @@ $isUnix = is_unix
 Describe 'Get-AppFilePath' -Tag 'Scoop' {
     BeforeAll {
         $working_dir = setup_working 'is_directory'
-        Mock versiondir { 'local' } -Verifiable -ParameterFilter { $global -eq $false }
-        Mock versiondir { 'global' } -Verifiable -ParameterFilter { $global -eq $true }
+        Mock currentdir { 'local' } -Verifiable -ParameterFilter { $global -eq $false }
+        Mock currentdir { 'global' } -Verifiable -ParameterFilter { $global -eq $true }
     }
 
     It 'should return locally installed program' {
@@ -226,6 +226,7 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop' {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
         $(ensure_in_path $shimdir) | Out-Null
+        Mock appsdir { $working_dir }
     }
 
     It 'returns empty string if file does not exist' -Skip:$isUnix {
@@ -234,10 +235,15 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop' {
 
     It 'returns app name if file exists and is a shim to an app' -Skip:$isUnix {
         mkdir -p "$working_dir/mockapp/current/"
-        Write-Output '' | Out-File "$working_dir/mockapp/current/mockapp.ps1"
-        shim "$working_dir/mockapp/current/mockapp.ps1" $false 'shim-test'
-        $shim_path = (Get-Command 'shim-test.ps1').Path
-        get_app_name_from_shim "$shim_path" | Should -Be 'mockapp'
+        Write-Output '' | Out-File "$working_dir/mockapp/current/mockapp1.ps1"
+        shim "$working_dir/mockapp/current/mockapp1.ps1" $false 'shim-test1'
+        $shim_path1 = (Get-Command 'shim-test1.ps1').Path
+        get_app_name_from_shim "$shim_path1" | Should -Be 'mockapp'
+        mkdir -p "$working_dir/mockapp/1.0.0/"
+        Write-Output '' | Out-File "$working_dir/mockapp/1.0.0/mockapp2.ps1"
+        shim "$working_dir/mockapp/1.0.0/mockapp2.ps1" $false 'shim-test2'
+        $shim_path2 = (Get-Command 'shim-test2.ps1').Path
+        get_app_name_from_shim "$shim_path2" | Should -Be 'mockapp'
     }
 
     It 'returns empty string if file exists and is not a shim' -Skip:$isUnix {
@@ -245,9 +251,12 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop' {
         get_app_name_from_shim "$working_dir/mock-shim.ps1" | Should -Be ''
     }
 
-    AfterEach {
-        if (Get-Command 'shim-test' -ErrorAction SilentlyContinue) {
-            rm_shim 'shim-test' $shimdir -ErrorAction SilentlyContinue
+    AfterAll {
+        if (Get-Command 'shim-test1' -ErrorAction SilentlyContinue) {
+            rm_shim 'shim-test1' $shimdir -ErrorAction SilentlyContinue
+        }
+        if (Get-Command 'shim-test2' -ErrorAction SilentlyContinue) {
+            rm_shim 'shim-test2' $shimdir -ErrorAction SilentlyContinue
         }
         Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
         Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/moch-shim.ps1"
