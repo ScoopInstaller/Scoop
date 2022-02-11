@@ -1220,7 +1220,7 @@ function handle_running_processes($app, $global) {
     $ret = $true
 
     if ($running_processes) {
-        $ret = get_config 'ignoreRunning' $false
+        $ret = get_config 'ignore_running_processes' $false
         if ($ret) {
             warn "Application `"$app`" is still running. Scoop is configured to ignore this condition."
         } else {

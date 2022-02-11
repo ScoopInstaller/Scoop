@@ -232,7 +232,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     #region Workaround for #2952
     if (!(handle_running_processes $app $global)) {
-        continue
+        return
     }
     #endregion Workaround for #2952
 
