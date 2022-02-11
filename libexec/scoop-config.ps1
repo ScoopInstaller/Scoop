@@ -81,6 +81,11 @@
 #       API key used for uploading/scanning files using virustotal.
 #       See: 'https://support.virustotal.com/hc/en-us/articles/115002088769-Please-give-me-an-API-key'
 #
+# ignore_running_processes: $true|$false
+#       When set to $false (default), Scoop would stop its procedure immediately if it detects
+#       any target app process is running. Procedure here refers to reset/uninstall/update.
+#       When set to $true, Scoop only displays a warning message and continues procedure.
+#
 # ARIA2 configuration
 # -------------------
 #
