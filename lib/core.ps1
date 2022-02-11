@@ -615,7 +615,7 @@ function shim($path, $global, $name, $arg) {
         # for programs with no awareness of any shell
         warn_on_overwrite "$shim.shim" $path
         Copy-Item (get_shim_path) "$shim.exe" -Force
-        Write-Output "path = $resolved_path" | Out-File "$shim.shim" -Encoding ASCII
+        Write-Output "path = `"$resolved_path`"" | Out-File "$shim.shim" -Encoding ASCII
         if ($arg) {
             Write-Output "args = $arg" | Out-File "$shim.shim" -Encoding ASCII -Append
         }
@@ -644,11 +644,9 @@ function shim($path, $global, $name, $arg) {
                 "exit `$LASTEXITCODE"
             )
         } else {
-            # Setting PSScriptRoot in Shim if it is not defined, so the shim doesn't break in PowerShell 2.0
             @(
                 "# $resolved_path",
-                "if (!(Test-Path Variable:PSScriptRoot)) { `$PSScriptRoot = Split-Path `$MyInvocation.MyCommand.Path -Parent }",
-                "`$path = Join-Path `"`$PSScriptRoot`" `"$relative_path`"",
+                "`$path = Join-Path `$PSScriptRoot `"$relative_path`"",
                 "if (`$MyInvocation.ExpectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }",
                 "exit `$LASTEXITCODE"
             )
