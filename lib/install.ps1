@@ -1212,20 +1212,16 @@ function persist_permission($manifest, $global) {
     }
 }
 
-# return $true if running processes do not exist, or are handled by this function
-function handle_running_processes($app, $global) {
-    $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
+# test if there are running processes
+function test_running_process($app, $global) {
+    $processdir = appdir $app $global | Convert-Path
     $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" }
-    $ret = $true
 
-    if ($running_processes) {
-        $ret = get_config 'ignore_running_processes' $false
-        if ($ret) {
-            warn "Application `"$app`" is still running. Scoop is configured to ignore this condition."
-        } else {
-            error "Application `"$app`" is still running. Close all instances and try again."
-        }
+    if ($running_processes -and !(get_config 'ignore_running_processes')) {
+        error "Application `"$app`" is still running. Close all instances and try again."
+        return $true
+    } else {
+        warn "Application `"$app`" is still running. Scoop is configured to ignore this condition."
+        return $false
     }
-
-    return $ret
 }

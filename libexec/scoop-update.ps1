@@ -231,7 +231,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $persist_dir = persistdir $app $global
 
     #region Workaround for #2952
-    if (!(handle_running_processes $app $global)) {
+    if (test_running_process $app $global) {
         return
     }
     #endregion Workaround for #2952

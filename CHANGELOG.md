@@ -3,6 +3,7 @@
 
 ### Features
 
+- **config:** Allow Scoop to ignore running processes during reset/uninstall/update ([#4713](https://github.com/ScoopInstaller/Scoop/issues/4713))
 - **scoop-download:** Add `scoop download` command ([#4621](https://github.com/ScoopInstaller/Scoop/issues/4621))
 - **scoop-(install|virustotal):** Allow skipping update check ([#4634](https://github.com/ScoopInstaller/Scoop/issues/4634))
 - **scoop-bucket:** List more detailed information for buckets ([#4704](https://github.com/ScoopInstaller/Scoop/pull/4704))
@@ -14,7 +15,6 @@
 - **autoupdate:** Allow checksum file that contains whitespaces ([#4619](https://github.com/ScoopInstaller/Scoop/issues/4619))
 - **autoupdate:** Rename $response to $res ([#4706](https://github.com/ScoopInstaller/Scoop/issues/4706))
 - **config:** Allow scoop config use Unicode characters ([#4631](https://github.com/ScoopInstaller/Scoop/issues/4631))
-- **config:** Allow Scoop to ignore running processes during reset/uninstall/update ([#4713](https://github.com/ScoopInstaller/Scoop/issues/4713))
 - **config:** Fix `set_config` bugs ([#3681](https://github.com/ScoopInstaller/Scoop/issues/3681))
 - **current:** Remove 'current' while it's not a junction ([#4687](https://github.com/ScoopInstaller/Scoop/issues/4687))
 - **depends:** Prevent error on no URL ([#4595](https://github.com/ScoopInstaller/Scoop/issues/4595))

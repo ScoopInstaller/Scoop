@@ -59,7 +59,7 @@ if (!$apps) { exit 0 }
         $persist_dir = persistdir $app $global
 
         #region Workaround for #2952
-        if (!(handle_running_processes $app $global)) {
+        if (test_running_process $app $global) {
             continue
         }
         #endregion Workaround for #2952
