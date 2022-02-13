@@ -877,23 +877,37 @@ function create_shims($manifest, $dir, $global, $arch) {
     }
 }
 
-function rm_shim($name, $shimdir) {
-    '', '.exe', '.shim', '.cmd', '.ps1' | ForEach-Object {
-        if(test-path -Path "$shimdir\$name$_" -PathType leaf) {
+function rm_shim($name, $shimdir, $app) {
+    '', '.shim', '.cmd', '.ps1' | ForEach-Object {
+        $shimPath = "$shimdir\$name$_"
+        $altShimPath = "$shimPath.$app"
+        if ($app -and (Test-Path -Path $altShimPath -PathType Leaf)) {
+            Write-Output "Removing shim '$name$_.$app'."
+            Remove-Item $altShimPath
+        } elseif (Test-Path -Path $shimPath -PathType Leaf) {
             Write-Output "Removing shim '$name$_'."
-            Remove-Item "$shimdir\$name$_"
+            Remove-Item $shimPath
+            $oldShims = Get-Item -Path "$shimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
+            if ($null -eq $oldShims) {
+                if ($_ -eq '.shim') {
+                    Write-Output "Removing shim '$name.exe'."
+                    Remove-Item -Path "$shimdir\$name.exe"
+                }
+            } else {
+                (@($oldShims) | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
+            }
         }
     }
 }
 
-function rm_shims($manifest, $global, $arch) {
+function rm_shims($app, $manifest, $global, $arch) {
     $shims = @(arch_specific 'bin' $manifest $arch)
 
     $shims | Where-Object { $_ -ne $null } | ForEach-Object {
         $target, $name, $null = shim_def $_
         $shimdir = shimdir $global
 
-        rm_shim $name $shimdir
+        rm_shim $name $shimdir $app
     }
 }
 

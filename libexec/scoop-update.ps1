@@ -238,7 +238,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     Write-Host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
-    rm_shims $old_manifest $global $architecture
+    rm_shims $app $old_manifest $global $architecture
     env_rm_path $old_manifest $dir $global $architecture
     env_rm $old_manifest $global $architecture
 
