@@ -42,7 +42,7 @@ function do_uninstall($app, $global) {
 
     Write-Output "Uninstalling '$app'"
     run_uninstaller $manifest $architecture $dir
-    rm_shims $manifest $global $architecture
+    rm_shims $app $manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Othewise it will just be the version
