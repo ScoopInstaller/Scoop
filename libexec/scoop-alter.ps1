@@ -3,8 +3,8 @@
 # Help: Display and maintain alternatives of a shimmed command installed with Scoop (similar to '(update-)alternatives' on Linux)
 
 param($command)
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
 reset_aliases
 
@@ -52,8 +52,8 @@ if ($path -like "$userShimPath*" -or $path -like "$globalShimPath*") {
         Write-Host 'done.'
     }
 } else {
-    [Console]::Error.WriteLine('Not a scoop shim.')
-    Write-Output "Command path is: $gcm"
+    Write-Host 'Not a scoop shim.'
+    Write-Host "Command path is: $gcm"
     exit 2
 }
 
