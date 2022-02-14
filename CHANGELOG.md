@@ -10,7 +10,7 @@
 - **scoop-bucket:** List more detailed information for buckets ([#4704](https://github.com/ScoopInstaller/Scoop/pull/4704))
 - **scoop-list:** Allow list manipulation ([#4718](https://github.com/ScoopInstaller/Scoop/issues/4718))
 - **scoop-list:** Show last-updated time [#4723](https://github.com/ScoopInstaller/Scoop/issues/4723))
-- **scoop-shim:** Add scoop shim to manipulate shims [#4736](https://github.com/ScoopInstaller/Scoop/issues/4736))
+- **scoop-shim:** Add `scoop shim` to manipulate shims and move `scoop alter` to `scoop shim alter` [#4736](https://github.com/ScoopInstaller/Scoop/issues/4736))
 
 ### Bug Fixes
 

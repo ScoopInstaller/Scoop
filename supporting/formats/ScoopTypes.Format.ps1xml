@@ -34,7 +34,7 @@
         <View>
             <Name>ScoopShimType</Name>
             <ViewSelectedBy>
-                <TypeName>ScoopShim</TypeName>
+                <TypeName>ScoopShims</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableRowEntries>
@@ -44,17 +44,11 @@
                                 <PropertyName>Name</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>Path</PropertyName>
-                            </TableColumnItem>
-                            <TableColumnItem>
                                 <PropertyName>Source</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Alternatives</PropertyName>
                                 <FormatString>G</FormatString>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <PropertyName>Type</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>IsGlobal</PropertyName>
@@ -66,6 +60,45 @@
                     </TableRowEntry>
                 </TableRowEntries>
             </TableControl>
+        </View>
+        <View>
+            <Name>ScoopShimsType</Name>
+            <ViewSelectedBy>
+                <TypeName>ScoopShim</TypeName>
+            </ViewSelectedBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Name</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Path</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Source</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Alternatives</PropertyName>
+                                <FormatString>G</FormatString>
+                                <ItemSelectionCondition>
+                                    <PropertyName>Alternatives</PropertyName>
+                                </ItemSelectionCondition>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Type</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>IsGlobal</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>IsHidden</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
         </View>
     </ViewDefinitions>
 </Configuration>
