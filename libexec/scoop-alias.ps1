@@ -31,11 +31,11 @@ $script:config_alias = 'alias'
 
 function init_alias_config {
     $aliases = get_config $script:config_alias
-    if (!$aliases) {
-        $aliases = @{}
+    if ($aliases) {
+        $aliases
+    } else {
+        New-Object -TypeName PSObject
     }
-
-    return $aliases
 }
 
 function add_alias($name, $command) {
@@ -102,7 +102,7 @@ function list_aliases {
     if ($verbose) {
         return $aliases | Select-Object Name, Command, Summary | Format-Table -AutoSize -Wrap
     } else {
-        return $aliases | Select-Object Name, Command | Format-Table -AutoSize -hidetablehead -Wrap
+        return $aliases | Select-Object Name, Command | Format-Table -AutoSize -Wrap
     }
 }
 
