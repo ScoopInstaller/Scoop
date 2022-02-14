@@ -32,7 +32,7 @@
             </TableControl>
         </View>
         <View>
-            <Name>ScoopShimType</Name>
+            <Name>ScoopShimsType</Name>
             <ViewSelectedBy>
                 <TypeName>ScoopShims</TypeName>
             </ViewSelectedBy>
@@ -62,7 +62,7 @@
             </TableControl>
         </View>
         <View>
-            <Name>ScoopShimsType</Name>
+            <Name>ScoopShimType</Name>
             <ViewSelectedBy>
                 <TypeName>ScoopShim</TypeName>
             </ViewSelectedBy>
