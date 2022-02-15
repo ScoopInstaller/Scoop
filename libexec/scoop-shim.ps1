@@ -27,7 +27,6 @@
 
 param($SubCommand, $ShimName)
 
-. "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1" # for getopt
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
@@ -72,15 +71,15 @@ function Get-ShimInfo($ShimPath) {
     if ($altShims) {
         $info.Alternatives = @($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)
     }
-    $info.IsGlobal = if ($ShimPath.StartsWith("$globalShimDir")) { $true } else { $false }
-    $info.IsHidden = if ((Get-Command -Name $info.Name).Path -eq $info.Path) { $false } else { $true }
+    $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
+    $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
     [PSCustomObject]$info
 }
 
 function Get-ShimPath($ShimName, $Global) {
     '.shim', '.cmd' | ForEach-Object {
         $shimPath = Join-Path (shimdir $Global) "$ShimName$_"
-        if (Test-Path -Path $shimPath) {
+        if (Test-Path $shimPath) {
             return $shimPath
         }
     }
@@ -115,7 +114,7 @@ switch ($SubCommand) {
             abort "ERROR: '$($addArgs[0])' does not exist" 3
         }
     }
-    { $_ -in @('remove', 'rm') } {
+    { $_ -in 'remove', 'rm' } {
         $failed = @()
         @($ShimName) + $addArgs | ForEach-Object {
             if (Get-ShimPath $_ $global) {
