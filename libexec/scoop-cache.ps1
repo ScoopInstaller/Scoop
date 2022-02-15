@@ -14,29 +14,35 @@ param($cmd)
 
 . "$PSScriptRoot\..\lib\help.ps1"
 
-reset_aliases
-
 function cacheinfo($file) {
-    $app, $version, $url = $file.name -split '#'
-    return New-Object psobject -Property @{ Name=$app; Version=$version; Length=$file.length; URL=$url }
+    $app, $version, $url = $file.Name -split '#'
+    New-Object PSObject -Property @{ Name = $app; Version = $version; Length = $file.Length; URL = $url }
 }
 
 function cacheshow($app) {
-    if (!$app) { $app = '*' }
-    else { $app = '(' + ($app -join '|') + ')' }
-    $files = @(Get-ChildItem "$cachedir" | Where-Object { $_.name.Split('#')[0] -match "^$app$" })
-    $total_length = ($files | Measure-Object length -sum).sum -as [double]
+    if (!$app -or $app -eq '*') {
+        $app = '.*?'
+    } else {
+        $app = '(' + ($app -join '|') + ')'
+    }
+    $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+    $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
     $files | ForEach-Object { cacheinfo $_ } | Select-Object Name, Version, Length, URL
 
-    Write-Host "Total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)" -ForegroundColor Yellow
+    Write-Host "Total: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
 }
 
 function cacheremove($app) {
-    if (!$app) { 'ERROR: <app(s)> missing'; my_usage; exit 1 }
-    elseif ($app -ne '*') { $app = '(' + ($app -join '|') + ')' }
-    $files = @(Get-ChildItem "$cachedir" | Where-Object { $_.name.Split('#')[0] -match "^$app$" })
-    $total_length = ($files | Measure-Object length -sum).sum -as [double]
+    if (!$app) {
+        'ERROR: <app(s)> missing'
+        my_usage
+        exit 1
+    } elseif ($app -ne '*') {
+        $app = '(' + ($app -join '|') + ')'
+    }
+    $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+    $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
     $files | ForEach-Object {
         $curr = cacheinfo $_
@@ -47,13 +53,19 @@ function cacheremove($app) {
         }
     }
 
-    Write-Host "Deleted: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)" -ForegroundColor Yellow
+    Write-Host "Deleted: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
 }
 
 switch($cmd) {
-    {$_ -in $null, 'show'}  { cacheshow   $args }
-    {$_ -in 'rm', 'remove'} { cacheremove $args }
-    default                 { my_usage }
+    'show' {
+        cacheshow $Args
+    }
+    {$_ -in 'rm', 'remove'} {
+        cacheremove $Args
+    }
+    default {
+        cacheshow (@($cmd) + $Args)
+    }
 }
 
 exit 0
