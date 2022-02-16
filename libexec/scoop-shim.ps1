@@ -86,15 +86,17 @@ function Get-ShimPath($ShimName, $Global) {
 }
 
 function Get-ShimTarget($ShimPath) {
-    $shimTarget = if ($ShimPath.EndsWith('.shim')) {
-        (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '')
-    } else {
-        ((Select-String -Path $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
+    if ($ShimPath) {
+        $shimTarget = if ($ShimPath.EndsWith('.shim')) {
+            (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '')
+        } else {
+            ((Select-String -Path $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
+        }
+        if (!$shimTarget) {
+            $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
+        }
+        $shimTarget | Convert-Path
     }
-    if (!$shimTarget) {
-        $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
-    }
-    $shimTarget | Convert-Path
 }
 
 switch ($SubCommand) {
