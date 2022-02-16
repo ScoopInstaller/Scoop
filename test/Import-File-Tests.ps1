@@ -44,7 +44,7 @@ Describe 'Style constraints for non-binary project files' {
         }
     }
 
-    it 'registry files should be UTF-16LE encoded' -skip:$(-not $files_exist) {
+    It 'registry files should be UTF-16LE encoded' -Skip:$(-not $files_exist) {
         # Unicode files with BOM
         # UTF-7 == 0x2B 0x2F 0x76
         # UTF-8 == 0xEF 0xBB 0xBF
@@ -108,7 +108,7 @@ Describe 'Style constraints for non-binary project files' {
     }
 
 
-    it 'files end with a newline' -skip:$(-not $files_exist) {
+    It 'files end with a newline' -Skip:$(-not $files_exist) {
         $badFiles = @(
             foreach ($file in $files) {
                 # Ignore previous TestResults.xml
