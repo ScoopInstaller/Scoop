@@ -82,53 +82,53 @@ $item.Manifest = $manifest_file
 
 if ($status.installed) {
     # Show installed versions
-    $installed_output = ""
+    $installed_output = @()
     Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
-        $installed_output += "`n$(versiondir $app $_ $global)"
+        $installed_output += versiondir $app $_ $global
     }
-    $item.Installed = $installed_output
+    $item.Installed = $installed_output -join "`n"
 }
 
 $binaries = @(arch_specific 'bin' $manifest $install.architecture)
 if ($binaries) {
-    $binary_output = ""
+    $binary_output = @()
     $binaries | ForEach-Object {
         if ($_ -is [System.Array]) {
-            $binary_output += "`n$($_[1]).exe"
+            $binary_output += "$($_[1]).exe"
         } else {
-            $binary_output += "`n$_"
+            $binary_output += $_
         }
     }
-    $item.Binaries = $binary_output
+    $item.Binaries = $binary_output -join "`n"
 }
 $env_set = (arch_specific 'env_set' $manifest $install.architecture)
 $env_add_path = (arch_specific 'env_add_path' $manifest $install.architecture)
 if ($env_set) {
-    $env_vars = ""
+    $env_vars = @()
     $env_set | Get-Member -member noteproperty | ForEach-Object {
         $value = env $_.name $global
         if (!$value) {
             $value = format $env_set.$($_.name) @{ "dir" = $dir }
         }
-        $env_vars += "`n$($_.name) = $value"
+        $env_vars += "$($_.name) = $value"
     }
-    $item.'Environment Variables' = $env_vars
+    $item.'Environment Variables' = $env_vars -join "`n"
 }
 if ($env_add_path) {
-    $env_path = ""
+    $env_path = @()
     $env_add_path | Where-Object { $_ } | ForEach-Object {
         if ($_ -eq '.') {
-            $env_path += "`n$dir"
+            $env_path += $dir
         } else {
-            $env_path += "`n$dir\$_"
+            $env_path += "$dir\$_"
         }
     }
-    $item.'Path Additions' = $env_path
+    $item.'Path Added' = $env_path -join "`n"
 }
 
 if ($manifest.notes) {
     # Show notes
-    $item.Notes = "`n" + ((substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}) -join "`n")
+    $item.Notes = (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}) -join "`n"
 }
 
 [PSCustomObject]$item
