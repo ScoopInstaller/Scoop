@@ -54,27 +54,33 @@ function get_config($name, $default) {
     return $scoopConfig.$name
 }
 
-function set_config($name, $value) {
-    if($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
+function set_config {
+    Param (
+        [ValidateNotNullOrEmpty()]
+        $name,
+        $value
+    )
+
+    if ($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
         ensure (Split-Path -Path $configFile) | Out-Null
-        $scoopConfig = New-Object PSObject
-        $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
-    } else {
-        if($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
-            $value = [System.Convert]::ToBoolean($value)
-        }
-        if($null -eq $scoopConfig.$name) {
-            $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
-        } else {
-            $scoopConfig.$name = $value
-        }
+        $scoopConfig = New-Object -TypeName PSObject
     }
 
-    if($null -eq $value) {
+    if ($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
+        $value = [System.Convert]::ToBoolean($value)
+    }
+
+    if ($null -eq $scoopConfig.$name) {
+        $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
+    } else {
+        $scoopConfig.$name = $value
+    }
+
+    if ($null -eq $value) {
         $scoopConfig.PSObject.Properties.Remove($name)
     }
 
-    ConvertTo-Json $scoopConfig | Set-Content $configFile -Encoding Default
+    ConvertTo-Json $scoopConfig | Set-Content -Path $configFile -Encoding Default
     return $scoopConfig
 }
 
@@ -579,13 +585,18 @@ function get_app_name_from_shim($shim) {
 }
 
 function warn_on_overwrite($shim, $path) {
-    if (!(Test-Path($shim))) {
+    if (!(Test-Path $shim)) {
         return
     }
     $shim_app = get_app_name_from_shim $shim
     $path_app = get_app_name $path
     if ($shim_app -eq $path_app) {
         return
+    } else {
+        if (Test-Path -Path "$shim.$path_app" -PathType Leaf) {
+            Remove-Item -Path "$shim.$path_app" -Force
+        }
+        Rename-Item -Path $shim -NewName "$shim.$shim_app"
     }
     $shimname = (fname $shim) -replace '\.shim$', '.exe'
     $filename = (fname $path) -replace '\.shim$', '.exe'

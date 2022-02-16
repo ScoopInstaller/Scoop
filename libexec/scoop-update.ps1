@@ -231,16 +231,14 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $persist_dir = persistdir $app $global
 
     #region Workaround for #2952
-    $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
-    if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
-        error "Application is still running. Close all instances and try again."
+    if (test_running_process $app $global) {
         return
     }
     #endregion Workaround for #2952
 
     Write-Host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
-    rm_shims $old_manifest $global $architecture
+    rm_shims $app $old_manifest $global $architecture
     env_rm_path $old_manifest $dir $global $architecture
     env_rm $old_manifest $global $architecture
 
