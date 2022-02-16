@@ -10,7 +10,7 @@ param($query)
 
 reset_aliases
 $def_arch = default_architecture
-if (-not (Get-FormatData ScoopApp)) {
+if (-not (Get-FormatData ScoopApps)) {
     Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
 }
 
@@ -28,7 +28,7 @@ Write-Host "Installed apps$(if($query) { `" matching '$query'`"}):"
 $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $app = $_.name
     $global = $_.global
-    $item = @{ PSTypeName = 'ScoopApp' }
+    $item = @{}
     $ver = Select-CurrentVersion -AppName $app -Global:$global
     $item.Name = $app
     $item.Version = $ver
@@ -61,5 +61,5 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $list += [PSCustomObject]$item
 }
 
-$list
+$list | Add-Member -TypeName 'ScoopApps' -PassThru
 exit 0

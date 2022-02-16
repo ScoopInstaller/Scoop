@@ -54,7 +54,7 @@ if ($SubCommand -eq 'add' -and $addArgs.Length -eq 0) {
     exit 1
 }
 
-if (-not (Get-FormatData ScoopShim)) {
+if (-not (Get-FormatData ScoopShims)) {
     Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
 }
 
@@ -62,14 +62,14 @@ $localShimDir = shimdir $false
 $globalShimDir = shimdir $true
 
 function Get-ShimInfo($ShimPath) {
-    $info = @{ PSTypeName = 'ScoopShim' }
+    $info = [Ordered]@{}
     $info.Name = strip_ext (fname $ShimPath)
     $info.Path = $ShimPath -replace 'shim$', 'exe'
     $info.Source = get_app_name_from_shim $ShimPath
     $info.Type = if ($ShimPath.EndsWith('.shim')) { 'Application' } elseif ($ShimPath.EndsWith('.cmd')) { 'Script' } else { 'Unknown' }
     $altShims = Get-Item -Path "$ShimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
     if ($altShims) {
-        $info.Alternatives = @($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)
+        $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
     }
     $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
     $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
@@ -165,6 +165,7 @@ switch ($SubCommand) {
                 Write-Host ' found.'
                 exit 2
             }
+            $shimInfo.Alternatives = $shimInfo.Alternatives.Split(' ')
             [System.Management.Automation.Host.ChoiceDescription[]]$altApps = 1..$shimInfo.Alternatives.Length | ForEach-Object {
                 New-Object System.Management.Automation.Host.ChoiceDescription "&$($_)`b$($shimInfo.Alternatives[$_ - 1])", "Sets '$ShimName' shim from $($shimInfo.Alternatives[$_ - 1])."
             }
