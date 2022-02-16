@@ -112,14 +112,20 @@ switch ($SubCommand) {
             $commandArgs = $Matches[2]
         }
         if ($commandPath -notmatch '[\\/]') {
-            $commandPath = Get-ShimTarget (Get-ShimPath $commandPath $global)
+            $shortPath = $commandPath
+            $commandPath = Get-ShimTarget (Get-ShimPath $shortPath $global)
+            if (!$commandPath) {
+                $exCommand = Get-Command $shortPath -ErrorAction SilentlyContinue
+                if ($exCommand -and $exCommand.CommandType -eq 'Application') {
+                    $commandPath = $exCommand.Path
+                } # TODO - add support for more command types: Alias, Cmdlet, ExternalScript, Filter, Function, Script, and Workflow
+            }
         }
         if ($commandPath -and (Test-Path $commandPath)) {
             Write-Host "Adding $globalTag shim " -NoNewline
             Write-Host $shimName -ForegroundColor Cyan -NoNewline
-            Write-Host ' ... ' -NoNewline
+            Write-Host '...'
             shim $commandPath $global $shimName $commandArgs
-            Write-Host 'Done'
         } else {
             abort "ERROR: '$($addArgs[1])' does not exist" 3
         }

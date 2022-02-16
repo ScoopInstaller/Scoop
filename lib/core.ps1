@@ -571,7 +571,7 @@ function get_app_name($path) {
     } elseif ((Test-Path (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $true))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
     } else {
-        $appName = ''
+        $appName = 'External'
     }
     return $appName
 }
@@ -596,11 +596,11 @@ function warn_on_overwrite($shim, $path) {
         if (Test-Path -Path "$shim.$path_app" -PathType Leaf) {
             Remove-Item -Path "$shim.$path_app" -Force
         }
-        Rename-Item -Path $shim -NewName "$shim.$shim_app"
+        Rename-Item -Path $shim -NewName "$shim.$shim_app" -ErrorAction SilentlyContinue
     }
     $shimname = (fname $shim) -replace '\.shim$', '.exe'
     $filename = (fname $path) -replace '\.shim$', '.exe'
-    warn "Overwriting shim ('$shimname' -> '$filename') installed from $shim_app"
+    warn "Overwriting shim ('$shimname' -> '$filename')$(if ($shim_app) { ' installed from ' + $shim_app })"
 }
 
 function shim($path, $global, $name, $arg) {
