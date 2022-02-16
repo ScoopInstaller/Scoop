@@ -571,7 +571,7 @@ function get_app_name($path) {
     } elseif ((Test-Path (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $true))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
     } else {
-        $appName = 'External'
+        $appName = ''
     }
     return $appName
 }
@@ -594,7 +594,7 @@ function warn_on_overwrite($shim, $path) {
         return
     } else {
         if (Test-Path -Path "$shim.$path_app" -PathType Leaf) {
-            Remove-Item -Path "$shim.$path_app" -Force
+            Remove-Item -Path "$shim.$path_app" -Force -ErrorAction SilentlyContinue
         }
         Rename-Item -Path $shim -NewName "$shim.$shim_app" -ErrorAction SilentlyContinue
     }

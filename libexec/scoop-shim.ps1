@@ -67,7 +67,7 @@ function Get-ShimInfo($ShimPath) {
     $info = [Ordered]@{}
     $info.Name = strip_ext (fname $ShimPath)
     $info.Path = $ShimPath -replace 'shim$', 'exe'
-    $info.Source = get_app_name_from_shim $ShimPath
+    $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
     $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
     $altShims = Get-Item -Path "$ShimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
     if ($altShims) {
