@@ -68,7 +68,7 @@ function Get-ShimInfo($ShimPath) {
     $info.Name = strip_ext (fname $ShimPath)
     $info.Path = $ShimPath -replace 'shim$', 'exe'
     $info.Source = get_app_name_from_shim $ShimPath
-    $info.Type = if ($ShimPath.EndsWith('.shim')) { 'Application' } elseif ($ShimPath.EndsWith('.cmd')) { 'Script' } else { 'Unknown' }
+    $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
     $altShims = Get-Item -Path "$ShimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
     if ($altShims) {
         $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
@@ -79,7 +79,7 @@ function Get-ShimInfo($ShimPath) {
 }
 
 function Get-ShimPath($shimName, $Global) {
-    '.shim', '.cmd' | ForEach-Object {
+    '.shim', '.ps1' | ForEach-Object {
         $shimPath = Join-Path (shimdir $Global) "$shimName$_"
         if (Test-Path $shimPath) {
             return $shimPath
@@ -146,11 +146,11 @@ switch ($SubCommand) {
         }
     }
     'list' {
-        $shims = Get-ChildItem -Path $localShimDir -Recurse -Include '*.shim', '*.cmd' |
+        $shims = Get-ChildItem -Path $localShimDir -Recurse -Include '*.shim', '*.ps1' |
             Where-Object { !$shimName -or ($_.BaseName -match $shimName) } |
             Select-Object -ExpandProperty FullName
         if (Test-Path $globalShimDir) {
-            $shims += Get-ChildItem -Path $globalShimDir -Recurse -Include '*.shim', '*.cmd' |
+            $shims += Get-ChildItem -Path $globalShimDir -Recurse -Include '*.shim', '*.ps1' |
                 Where-Object { !$shimName -or ($_.BaseName -match $shimName) } |
                 Select-Object -ExpandProperty FullName
         }
