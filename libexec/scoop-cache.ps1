@@ -38,10 +38,12 @@ function cacheremove($app) {
         'ERROR: <app(s)> missing'
         my_usage
         exit 1
-    } elseif ($app -ne '*') {
+    } elseif ($app -eq '*') {
+        $files = @(Get-ChildItem $cachedir)
+    } else {
         $app = '(' + ($app -join '|') + ')'
+        $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
     }
-    $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
     $files | ForEach-Object {
