@@ -1,4 +1,4 @@
-# Usage: scoop cache show|rm [app]
+# Usage: scoop cache show|rm [app(s)]
 # Summary: Show or clear the download cache
 # Help: Scoop caches downloads so you don't need to download the same files
 # when you uninstall and re-install the same version of an app.
@@ -10,48 +10,63 @@
 #
 # To clear everything in your cache, use:
 #     scoop cache rm *
-param($cmd, $app)
+param($cmd)
 
-. "$psscriptroot\..\lib\help.ps1"
-
-reset_aliases
+. "$PSScriptRoot\..\lib\help.ps1"
 
 function cacheinfo($file) {
-    $app, $version, $url = $file.name -split '#'
-    $size = filesize $file.length
-    return new-object psobject -prop @{ app=$app; version=$version; url=$url; size=$size }
+    $app, $version, $url = $file.Name -split '#'
+    New-Object PSObject -Property @{ Name = $app; Version = $version; Length = $file.Length; URL = $url }
 }
 
-function show($app) {
-    $files = @(Get-ChildItem "$cachedir" | Where-Object { $_.name -match "^$app" })
-    $total_length = ($files | Measure-Object length -sum).sum -as [double]
+function cacheshow($app) {
+    if (!$app -or $app -eq '*') {
+        $app = '.*?'
+    } else {
+        $app = '(' + ($app -join '|') + ')'
+    }
+    $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+    $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
-    $f_app  = @{ expression={"$($_.app) ($($_.version))" }}
-    $f_url  = @{ expression={$_.url};alignment='right'}
-    $f_size = @{ expression={$_.size}; alignment='right'}
+    $files | ForEach-Object { cacheinfo $_ } | Select-Object Name, Version, Length, URL
 
+    Write-Host "Total: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
+}
 
-    $files | ForEach-Object { cacheinfo $_ } | Format-Table $f_size, $f_app, $f_url -auto -hide
+function cacheremove($app) {
+    if (!$app) {
+        'ERROR: <app(s)> missing'
+        my_usage
+        exit 1
+    } elseif ($app -eq '*') {
+        $files = @(Get-ChildItem $cachedir)
+    } else {
+        $app = '(' + ($app -join '|') + ')'
+        $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+    }
+    $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
-    "Total: $($files.length) $(pluralize $files.length 'file' 'files'), $(filesize $total_length)"
+    $files | ForEach-Object {
+        $curr = cacheinfo $_
+        Write-Host "Removing $($curr.URL)..."
+        Remove-Item $_.FullName
+        if(Test-Path "$cachedir\$($curr.Name).txt") {
+            Remove-Item "$cachedir\$($curr.Name).txt"
+        }
+    }
+
+    Write-Host "Deleted: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
 }
 
 switch($cmd) {
     'rm' {
-        if(!$app) { 'ERROR: <app> missing'; my_usage; exit 1 }
-        Remove-Item "$cachedir\$app#*"
-        if(test-path("$cachedir\$app.txt")) {
-            Remove-Item "$cachedir\$app.txt"
-        }
+        cacheremove $Args
     }
     'show' {
-        show $app
-    }
-    '' {
-        show
+        cacheshow $Args
     }
     default {
-        my_usage
+        cacheshow (@($cmd) + $Args)
     }
 }
 
