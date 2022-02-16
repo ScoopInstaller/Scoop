@@ -48,7 +48,7 @@ function cacheremove($app) {
 
     $files | ForEach-Object {
         $curr = cacheinfo $_
-        Write-Host "Removing $(if ($curr.URL) { $curr.URL } else { $curr.Name })..."
+        Write-Host "Removing $($curr.URL)..."
         Remove-Item $_.FullName
         if(Test-Path "$cachedir\$($curr.Name).txt") {
             Remove-Item "$cachedir\$($curr.Name).txt"
@@ -59,11 +59,11 @@ function cacheremove($app) {
 }
 
 switch($cmd) {
+    'rm' {
+        cacheremove $Args
+    }
     'show' {
         cacheshow $Args
-    }
-    {$_ -in 'rm', 'remove'} {
-        cacheremove $Args
     }
     default {
         cacheshow (@($cmd) + $Args)
