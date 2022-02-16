@@ -3,9 +3,9 @@
 
 param($app)
 
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\install.ps1"
-. "$psscriptroot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
 reset_aliases
 
@@ -15,7 +15,11 @@ $app, $bucket, $null = parse_app $app
 $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
 if ($manifest) {
-        $manifest | ConvertToPrettyJson | Write-Host
+        if (Get-Command bat -CommandType Application -ErrorAction Ignore) {
+                $manifest | ConvertToPrettyJson | bat --no-paging --language json
+        } else {
+                $manifest | ConvertToPrettyJson
+        }
 } else {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
 }
