@@ -99,7 +99,7 @@ if ($binaries) {
             $binary_output += $_
         }
     }
-    $item.Binaries = $binary_output -join "`n"
+    $item.Binaries = $binary_output -join " | "
 }
 $env_set = (arch_specific 'env_set' $manifest $install.architecture)
 $env_add_path = (arch_specific 'env_add_path' $manifest $install.architecture)
