@@ -35,9 +35,9 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     }
 
     if ((get_config 'manifest_review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
-        "Manifest: $app.json"
-        $style = get_config cat_style ''
-        if (![String]::IsNullOrWhiteSpace($style)) {
+        Write-Host "Manifest: $app.json"
+        $style = get_config cat_style
+        if ($style) {
             $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
         } else {
             $manifest | ConvertToPrettyJson
