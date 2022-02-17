@@ -34,10 +34,11 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         return
     }
 
-    if ((get_config 'manifest-review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+    if ((get_config 'manifest_review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
         "Manifest: $app.json"
-        if (Get-Command bat -CommandType Application -ErrorAction Ignore) {
-            $manifest | ConvertToPrettyJson | bat -pp -l json
+        $style = get_config cat_style ''
+        if (![String]::IsNullOrWhiteSpace($style)) {
+            $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
         } else {
             $manifest | ConvertToPrettyJson
         }

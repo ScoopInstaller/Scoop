@@ -15,8 +15,9 @@ $app, $bucket, $null = parse_app $app
 $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
 if ($manifest) {
-        if (Get-Command bat -CommandType Application -ErrorAction Ignore) {
-                $manifest | ConvertToPrettyJson | bat -pp -l json
+        $style = get_config cat_style ''
+        if (![String]::IsNullOrWhiteSpace($style)) {
+                $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
         } else {
                 $manifest | ConvertToPrettyJson
         }
