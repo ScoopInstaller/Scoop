@@ -41,6 +41,7 @@
 - **rmdir:** Use 'Remove-Item' instead of 'rmdir' ([#4691](https://github.com/ScoopInstaller/Scoop/issues/4691))
 - **COMSPEC:** Deprecate use of subshell cmd.exe ([#4692](https://github.com/ScoopInstaller/Scoop/issues/4692))
 - **git:** Use 'git -C' to specify the work directory instead of 'Push-Location'/'Pop-Location' ([#4697](https://github.com/ScoopInstaller/Scoop/issues/4697))
+- **scoop-info:** Use List View for output ([#4741](https://github.com/ScoopInstaller/Scoop/issues/4741))
 
 ### Builds
 
