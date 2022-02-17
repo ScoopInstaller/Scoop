@@ -81,6 +81,12 @@
 #       API key used for uploading/scanning files using virustotal.
 #       See: 'https://support.virustotal.com/hc/en-us/articles/115002088769-Please-give-me-an-API-key'
 #
+# cat_style:
+#       When set to a non-empty string, Scoop will use 'bat' to display the manifest for
+#       the `scoop cat` command and while doing manifest review. This requires 'bat' to be
+#       installed (run `scoop install bat` to install it), otherwise errors will be thrown.
+#       The accepted values are the same as ones passed to the --style flag of 'bat'.
+#
 # ignore_running_processes: $true|$false
 #       When set to $false (default), Scoop would stop its procedure immediately if it detects
 #       any target app process is running. Procedure here refers to reset/uninstall/update.
