@@ -16,7 +16,7 @@ $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
 if ($manifest) {
         if (Get-Command bat -CommandType Application -ErrorAction Ignore) {
-                $manifest | ConvertToPrettyJson | bat --no-paging --language json
+                $manifest | ConvertToPrettyJson | bat -pp -l json
         } else {
                 $manifest | ConvertToPrettyJson
         }

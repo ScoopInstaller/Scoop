@@ -37,7 +37,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     if ((get_config 'manifest-review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
         "Manifest: $app.json"
         if (Get-Command bat -CommandType Application -ErrorAction Ignore) {
-            $manifest | ConvertToPrettyJson | bat --no-paging --language json
+            $manifest | ConvertToPrettyJson | bat -pp -l json
         } else {
             $manifest | ConvertToPrettyJson
         }
