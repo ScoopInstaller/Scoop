@@ -97,14 +97,10 @@ if ($manifest.depends) {
 }
 
 if (Test-Path $manifest_file) {
-    $isgit = $false
-    $gitroot = Split-Path $manifest_file
     if (Get-Command git -ErrorAction Ignore) {
-        git -C $gitroot rev-parse 2> $null
-        if ($LASTEXITCODE -eq 0) { $isgit = $true }
+        $gitinfo = (git -C (Split-Path $manifest_file) log -1 -s --date=format:'%d-%m-%Y %H:%M:%S' --format='%ad#%an' $manifest_file 2> $null) -Split '#'
     }
-    if ($isgit) {
-        $gitinfo = (git -C $gitroot log -1 -s --date=format:'%d-%m-%Y %H:%M:%S' --format='%ad#%an' $manifest_file).Split('#')
+    if ($gitinfo) {
         $item.'Updated at' = $gitinfo[0] | Get-Date
         $item.'Updated by' = $gitinfo[1]
     } else {
