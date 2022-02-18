@@ -1,8 +1,7 @@
 # Usage: scoop info <app>
 # Summary: Display information about an app
-param($app)
+param([string]$app, [switch]$verbose)
 
-. "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
@@ -33,15 +32,19 @@ if (!$manifest) {
 }
 
 $install = install_info $app $status.version $global
-$status.installed = $install.bucket -eq $bucket
+$status.installed = $bucket -and $install.bucket -eq $bucket
 $version_output = $manifest.version
 if (!$manifest_file) {
     $manifest_file = manifest_path $app $bucket
 }
 
-$dir = currentdir $app $global
-$original_dir = versiondir $app $manifest.version $global
-$persist_dir = persistdir $app $global
+if ($verbose) {
+    $dir = currentdir $app $global
+    $original_dir = versiondir $app $manifest.version $global
+    $persist_dir = persistdir $app $global
+} else {
+    $dir, $original_dir, $persist_dir = "<root>", "<root>", "<root>"
+}
 
 if ($status.installed) {
     $manifest_file = manifest_path $app $install.bucket
@@ -60,31 +63,32 @@ if ($manifest.description) {
     $item.Description = $manifest.description
 }
 $item.Version = $version_output
-$item.Website = $manifest.homepage
+$item.Website = $manifest.homepage.TrimEnd('/') -replace "^https?:\/\/", ""
 # Show license
 if ($manifest.license) {
-    $license = $manifest.license
-    if ($manifest.license.identifier -and $manifest.license.url) {
-        $license = "$($manifest.license.identifier) ($($manifest.license.url))"
+    $item.License = if ($manifest.license.identifier -and $manifest.license.url) {
+        if ($verbose) { "$($manifest.license.identifier) ($($manifest.license.url))" } else { $manifest.license.identifier }
     } elseif ($manifest.license -match '^((ht)|f)tps?://') {
-        $license = "$($manifest.license)"
+        $manifest.license
     } elseif ($manifest.license -match '[|,]') {
-        $licurl = $manifest.license.Split("|,") | ForEach-Object {"https://spdx.org/licenses/$_.html"}
-        $license = "$($manifest.license) ($($licurl -join ', '))"
+        if ($verbose) {
+            "$($manifest.license) ($(($manifest.license -Split "\||," | ForEach-Object { "https://spdx.org/licenses/$_.html" }) -join ', '))"
+        } else {
+            $manifest.license
+        }
     } else {
-        $license = "$($manifest.license) (https://spdx.org/licenses/$($manifest.license).html)"
+        if ($verbose) { "$($manifest.license) (https://spdx.org/licenses/$($manifest.license).html)" } else { $manifest.license }
     }
-    $item.License = $license
 }
 
 # Manifest file
-$item.Manifest = $manifest_file
+if ($verbose) { $item.Manifest = $manifest_file }
 
 if ($status.installed) {
     # Show installed versions
     $installed_output = @()
     Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
-        $installed_output += versiondir $app $_ $global
+        $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { " *global*" })" }
     }
     $item.Installed = $installed_output -join "`n"
 }
@@ -106,13 +110,9 @@ $env_add_path = (arch_specific 'env_add_path' $manifest $install.architecture)
 if ($env_set) {
     $env_vars = @()
     $env_set | Get-Member -member noteproperty | ForEach-Object {
-        $value = env $_.name $global
-        if (!$value) {
-            $value = format $env_set.$($_.name) @{ "dir" = $dir }
-        }
-        $env_vars += "$($_.name) = $value"
+        $env_vars += "$($_.name) = $(format $env_set.$($_.name) @{ "dir" = $dir })"
     }
-    $item.'Environment Variables' = $env_vars -join "`n"
+    $item.Environment = $env_vars -join "`n"
 }
 if ($env_add_path) {
     $env_path = @()
@@ -128,7 +128,7 @@ if ($env_add_path) {
 
 if ($manifest.notes) {
     # Show notes
-    $item.Notes = (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}) -join "`n"
+    $item.Notes = (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir }) -join "`n"
 }
 
 [PSCustomObject]$item
