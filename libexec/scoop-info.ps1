@@ -63,6 +63,9 @@ if ($manifest.description) {
     $item.Description = $manifest.description
 }
 $item.Version = $version_output
+if ($bucket) {
+    $item.Bucket = $bucket
+}
 if ($manifest.homepage) {
     $item.Website = $manifest.homepage.TrimEnd('/') -replace "^https?:\/\/", ""
 }
@@ -100,15 +103,22 @@ if ($binaries) {
     $binary_output = @()
     $binaries | ForEach-Object {
         if ($_ -is [System.Array]) {
-            $binary_output += "$($_[1]).exe"
+            $binary_output += "$($_[1]).$($_[0].Split('.')[-1])"
         } else {
             $binary_output += $_
         }
     }
     $item.Binaries = $binary_output -join " | "
 }
-$env_set = (arch_specific 'env_set' $manifest $install.architecture)
-$env_add_path = (arch_specific 'env_add_path' $manifest $install.architecture)
+$shortcuts = @(arch_specific 'shortcuts' $manifest $install.architecture)
+if ($shortcuts) {
+    $shortcut_output = @()
+    $shortcuts | ForEach-Object {
+        $shortcut_output += $_[1]
+    }
+    $item.Shortcuts = $shortcut_output -join " | "
+}
+$env_set = arch_specific 'env_set' $manifest $install.architecture
 if ($env_set) {
     $env_vars = @()
     $env_set | Get-Member -member noteproperty | ForEach-Object {
@@ -116,6 +126,7 @@ if ($env_set) {
     }
     $item.Environment = $env_vars -join "`n"
 }
+$env_add_path = arch_specific 'env_add_path' $manifest $install.architecture
 if ($env_add_path) {
     $env_path = @()
     $env_add_path | Where-Object { $_ } | ForEach-Object {
