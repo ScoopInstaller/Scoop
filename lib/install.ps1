@@ -1,5 +1,5 @@
-. "$psscriptroot/autoupdate.ps1"
-. "$psscriptroot/buckets.ps1"
+. "$PSScriptRoot/autoupdate.ps1"
+. "$PSScriptRoot/buckets.ps1"
 
 function nightly_version($date, $quiet = $false) {
     $date_str = $date.tostring("yyyyMMdd")
@@ -34,9 +34,14 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         return
     }
 
-    if ((get_config 'manifest-review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
-        Write-Output "Manifest: $app.json"
-        Write-Output $manifest | ConvertToPrettyJson
+    if ((get_config 'manifest_review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+        Write-Host "Manifest: $app.json"
+        $style = get_config cat_style
+        if ($style) {
+            $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
+        } else {
+            $manifest | ConvertToPrettyJson
+        }
         $answer = Read-Host -Prompt "Continue installation? [Y/n]"
         if (($answer -eq 'n') -or ($answer -eq 'N')) {
             return
@@ -877,33 +882,39 @@ function create_shims($manifest, $dir, $global, $arch) {
     }
 }
 
-function rm_shim($name, $shimdir) {
-    '', '.exe', '.shim', '.cmd', '.ps1' | ForEach-Object {
-        if(test-path -Path "$shimdir\$name$_" -PathType leaf) {
+function rm_shim($name, $shimdir, $app) {
+    '', '.shim', '.cmd', '.ps1' | ForEach-Object {
+        $shimPath = "$shimdir\$name$_"
+        $altShimPath = "$shimPath.$app"
+        if ($app -and (Test-Path -Path $altShimPath -PathType Leaf)) {
+            Write-Output "Removing shim '$name$_.$app'."
+            Remove-Item $altShimPath
+        } elseif (Test-Path -Path $shimPath -PathType Leaf) {
             Write-Output "Removing shim '$name$_'."
-            Remove-Item "$shimdir\$name$_"
+            Remove-Item $shimPath
+            $oldShims = Get-Item -Path "$shimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
+            if ($null -eq $oldShims) {
+                if ($_ -eq '.shim') {
+                    Write-Output "Removing shim '$name.exe'."
+                    Remove-Item -Path "$shimdir\$name.exe"
+                }
+            } else {
+                (@($oldShims) | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
+            }
         }
     }
 }
 
-function rm_shims($manifest, $global, $arch) {
+function rm_shims($app, $manifest, $global, $arch) {
     $shims = @(arch_specific 'bin' $manifest $arch)
 
     $shims | Where-Object { $_ -ne $null } | ForEach-Object {
         $target, $name, $null = shim_def $_
         $shimdir = shimdir $global
 
-        rm_shim $name $shimdir
+        rm_shim $name $shimdir $app
     }
 }
-
-# Gets the path for the 'current' directory junction for
-# the specified version directory.
-function current_dir($versiondir) {
-    $parent = split-path $versiondir
-    return "$parent\current"
-}
-
 
 # Creates or updates the directory junction for [app]/current,
 # pointing to the specified version directory for the app.
@@ -911,9 +922,9 @@ function current_dir($versiondir) {
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if (get_config NO_JUNCTIONS) { return $versiondir }
+    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
 
-    $currentdir = current_dir $versiondir
+    $currentdir = "$(Split-Path $versiondir)\current"
 
     Write-Host "Linking $(friendly_path $currentdir) => $(friendly_path $versiondir)"
 
@@ -938,8 +949,8 @@ function link_current($versiondir) {
 # Returns the 'current' junction directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
-    if (get_config NO_JUNCTIONS) { return $versiondir }
-    $currentdir = current_dir $versiondir
+    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
+    $currentdir = "$(Split-Path $versiondir)\current"
 
     if (Test-Path $currentdir) {
         Write-Host "Unlinking $(friendly_path $currentdir)"
@@ -1077,12 +1088,19 @@ function prune_installed($apps, $global) {
     return @($uninstalled), @($installed)
 }
 
-function ensure_none_failed($apps, $global) {
+function ensure_none_failed($apps) {
     foreach ($app in $apps) {
         $app = ($app -split '/|\\')[-1] -replace '\.json$', ''
-        if (failed $app $global) {
-            warn "Purging previous failed installation of $app."
-            & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
+        foreach ($global in $true, $false) {
+            if (failed $app $global) {
+                if (installed $app $global) {
+                    info "Repair previous failed installation of $app."
+                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app$(if ($global) { ' --global' })
+                } else {
+                    warn "Purging previous failed installation of $app."
+                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
+                }
+            }
         }
     }
 }
@@ -1220,5 +1238,23 @@ function persist_permission($manifest, $global) {
         $acl = Get-Acl -Path $path
         $acl.SetAccessRule($target_rule)
         $acl | Set-Acl -Path $path
+    }
+}
+
+# test if there are running processes
+function test_running_process($app, $global) {
+    $processdir = appdir $app $global | Convert-Path
+    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" }
+
+    if ($running_processes) {
+        if (get_config 'ignore_running_processes') {
+            warn "Application `"$app`" is still running. Scoop is configured to ignore this condition."
+            return $false
+        } else {
+            error "Application `"$app`" is still running. Close all instances and try again."
+            return $true
+        }
+    } else {
+        return $false
     }
 }

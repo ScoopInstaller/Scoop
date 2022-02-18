@@ -59,9 +59,7 @@ if (!$apps) { exit 0 }
         $persist_dir = persistdir $app $global
 
         #region Workaround for #2952
-        $processdir = $appDir | Resolve-Path | Select-Object -ExpandProperty Path
-        if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
-            error 'Application is still running. Close all instances and try again.'
+        if (test_running_process $app $global) {
             continue
         }
         #endregion Workaround for #2952
@@ -78,7 +76,7 @@ if (!$apps) { exit 0 }
         $architecture = $install.architecture
 
         run_uninstaller $manifest $architecture $dir
-        rm_shims $manifest $global $architecture
+        rm_shims $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 
         # If a junction was used during install, that will have been used

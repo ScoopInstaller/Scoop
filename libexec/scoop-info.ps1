@@ -2,17 +2,15 @@
 # Summary: Display information about an app
 param($app)
 
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\install.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1"
 
 reset_aliases
 
-if(!$app) { my_usage; exit 1 }
+if (!$app) { my_usage; exit 1 }
 
 if ($app -match '^(ht|f)tps?://|\\\\') {
     # check if $app is a URL or UNC path
@@ -41,28 +39,28 @@ if (!$manifest_file) {
     $manifest_file = manifest_path $app $bucket
 }
 
-$dir = versiondir $app 'current' $global
+$dir = currentdir $app $global
 $original_dir = versiondir $app $manifest.version $global
 $persist_dir = persistdir $app $global
 
-if($status.installed) {
+if ($status.installed) {
     $manifest_file = manifest_path $app $install.bucket
     if ($install.url) {
         $manifest_file = $install.url
     }
-    if($status.version -eq $manifest.version) {
+    if ($status.version -eq $manifest.version) {
         $version_output = $status.version
     } else {
         $version_output = "$($status.version) (Update to $($manifest.version) available)"
     }
 }
 
-Write-Output "Name: $app"
+$item = [ordered]@{ Name = $app }
 if ($manifest.description) {
-    Write-Output "Description: $($manifest.description)"
+    $item.Description = $manifest.description
 }
-Write-Output "Version: $version_output"
-Write-Output "Website: $($manifest.homepage)"
+$item.Version = $version_output
+$item.Website = $manifest.homepage
 # Show license
 if ($manifest.license) {
     $license = $manifest.license
@@ -76,66 +74,63 @@ if ($manifest.license) {
     } else {
         $license = "$($manifest.license) (https://spdx.org/licenses/$($manifest.license).html)"
     }
-    Write-Output "License: $license"
+    $item.License = $license
 }
 
 # Manifest file
-Write-Output "Manifest:`n  $manifest_file"
+$item.Manifest = $manifest_file
 
-if($status.installed) {
+if ($status.installed) {
     # Show installed versions
-    Write-Output "Installed:"
-    $versions = Get-InstalledVersion -AppName $app -Global:$global
-    $versions | ForEach-Object {
-        $dir = versiondir $app $_ $global
-        if($global) { $dir += " *global*" }
-        Write-Output "  $dir"
+    $installed_output = @()
+    Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
+        $installed_output += versiondir $app $_ $global
     }
-} else {
-    Write-Output "Installed: No"
+    $item.Installed = $installed_output -join "`n"
 }
 
 $binaries = @(arch_specific 'bin' $manifest $install.architecture)
-if($binaries) {
-    $binary_output = "Binaries:`n "
+if ($binaries) {
+    $binary_output = @()
     $binaries | ForEach-Object {
-        if($_ -is [System.Array]) {
-            $binary_output += " $($_[1]).exe"
+        if ($_ -is [System.Array]) {
+            $binary_output += "$($_[1]).exe"
         } else {
-            $binary_output += " $_"
+            $binary_output += $_
         }
     }
-    Write-Output $binary_output
+    $item.Binaries = $binary_output -join " | "
 }
 $env_set = (arch_specific 'env_set' $manifest $install.architecture)
 $env_add_path = (arch_specific 'env_add_path' $manifest $install.architecture)
-if($env_set -or $env_add_path) {
-    if($status.installed) {
-        Write-Output "Environment:"
-    } else {
-        Write-Output "Environment: (simulated)"
-    }
-}
-if($env_set) {
+if ($env_set) {
+    $env_vars = @()
     $env_set | Get-Member -member noteproperty | ForEach-Object {
         $value = env $_.name $global
-        if(!$value) {
+        if (!$value) {
             $value = format $env_set.$($_.name) @{ "dir" = $dir }
         }
-        Write-Output "  $($_.name)=$value"
+        $env_vars += "$($_.name) = $value"
     }
+    $item.'Environment Variables' = $env_vars -join "`n"
 }
-if($env_add_path) {
+if ($env_add_path) {
+    $env_path = @()
     $env_add_path | Where-Object { $_ } | ForEach-Object {
-        if($_ -eq '.') {
-            Write-Output "  PATH=%PATH%;$dir"
+        if ($_ -eq '.') {
+            $env_path += $dir
         } else {
-            Write-Output "  PATH=%PATH%;$dir\$_"
+            $env_path += "$dir\$_"
         }
     }
+    $item.'Path Added' = $env_path -join "`n"
 }
 
-# Show notes
-show_notes $manifest $dir $original_dir $persist_dir
+if ($manifest.notes) {
+    # Show notes
+    $item.Notes = (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}) -join "`n"
+}
+
+[PSCustomObject]$item
 
 exit 0
