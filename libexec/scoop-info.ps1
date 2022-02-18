@@ -24,7 +24,7 @@ if ($app -match '^(ht|f)tps?://|\\\\') {
     $global = installed $app $true
     $app, $bucket, $null = parse_app $app
     $status = app_status $app $global
-    $manifest, $bucket = find_manifest $app $bucket
+    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 }
 
 if (!$manifest) {
@@ -35,7 +35,7 @@ $install = install_info $app $status.version $global
 $status.installed = $bucket -and $install.bucket -eq $bucket
 $version_output = $manifest.version
 if (!$manifest_file) {
-    $manifest_file = manifest_path $app $bucket
+    $manifest_file = if ($bucket) { manifest_path $app $bucket } else { $url }
 }
 
 if ($verbose) {
@@ -63,7 +63,9 @@ if ($manifest.description) {
     $item.Description = $manifest.description
 }
 $item.Version = $version_output
-$item.Website = $manifest.homepage.TrimEnd('/') -replace "^https?:\/\/", ""
+if ($manifest.homepage) {
+    $item.Website = $manifest.homepage.TrimEnd('/') -replace "^https?:\/\/", ""
+}
 # Show license
 if ($manifest.license) {
     $item.License = if ($manifest.license.identifier -and $manifest.license.url) {
