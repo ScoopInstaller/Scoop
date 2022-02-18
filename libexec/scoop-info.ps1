@@ -86,6 +86,14 @@ if ($manifest.license) {
     }
 }
 
+if ($manifest.depends) {
+    $item.Dependencies = if ($manifest.depends -is [System.Array]) {
+        $manifest.depends -join ' | '
+    } else {
+        $manifest.depends
+    }
+}
+
 # Manifest file
 if ($verbose) { $item.Manifest = $manifest_file }
 
@@ -130,13 +138,25 @@ $env_add_path = arch_specific 'env_add_path' $manifest $install.architecture
 if ($env_add_path) {
     $env_path = @()
     $env_add_path | Where-Object { $_ } | ForEach-Object {
-        if ($_ -eq '.') {
-            $env_path += $dir
+        $env_path += if ($_ -eq '.') {
+            $dir
         } else {
-            $env_path += "$dir\$_"
+            "$dir\$_"
         }
     }
     $item.'Path Added' = $env_path -join "`n"
+}
+
+if ($manifest.suggest) {
+    $suggest_output = @()
+    $manifest.suggest.PSObject.Properties | ForEach-Object {
+        $suggest_output += if ($_.Value -is [System.Array]) {
+            $_.Value -join ' | '
+        } else {
+            $_.Value
+        }
+    }
+    $item.Suggestions = $suggest_output -join ' | '
 }
 
 if ($manifest.notes) {
