@@ -1,5 +1,7 @@
-# Usage: scoop info <app>
+# Usage: scoop info <app> [options]
 # Summary: Display information about an app
+# Options:
+#   -v, -verbose        Show full paths and URLs
 param([string]$app, [switch]$verbose)
 
 . "$PSScriptRoot\..\lib\help.ps1"
