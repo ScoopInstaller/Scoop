@@ -69,7 +69,7 @@ if ($bucket) {
     $item.Bucket = $bucket
 }
 if ($manifest.homepage) {
-    $item.Website = $manifest.homepage.TrimEnd('/') -replace "^https?:\/\/", ""
+    $item.Website = $manifest.homepage.TrimEnd('/')
 }
 # Show license
 if ($manifest.license) {
