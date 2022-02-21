@@ -69,7 +69,6 @@ Copy-Item "$dir\_tmp\*-master\*" $dir -Recurse -Force
 Remove-Item "$dir\_tmp", $zipfile -Recurse -Force
 
 ensure_robocopy_in_path
-ensure_scoop_in_path
 
 scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
 success 'Scoop was installed successfully!'

@@ -606,6 +606,7 @@ function warn_on_overwrite($shim, $path) {
 function shim($path, $global, $name, $arg) {
     if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
+    ensure_in_path $abs_shimdir $global
     if (!$name) { $name = strip_ext (fname $path) }
 
     $shim = "$abs_shimdir\$($name.tolower())"
@@ -853,12 +854,6 @@ function remove_from_path($dir, $global) {
     # current session
     $was_in_path, $newpath = strip_path $env:PATH $dir
     if($was_in_path) { $env:PATH = $newpath }
-}
-
-function ensure_scoop_in_path($global) {
-    $abs_shimdir = ensure (shimdir $global)
-    # be aggressive (b-e-aggressive) and install scoop first in the path
-    ensure_in_path $abs_shimdir $global
 }
 
 function ensure_robocopy_in_path {
