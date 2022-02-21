@@ -343,7 +343,7 @@ function app_status($app, $global) {
 
     $status.outdated = $false
     if ($status.version -and $status.latest_version) {
-        if (get_config 'force-update' $false) {
+        if (get_config 'force_update' $false) {
             $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
         } else {
             $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)

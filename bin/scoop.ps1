@@ -1,11 +1,11 @@
-#requires -v 3
+#Requires -Version 5
 param($cmd)
 
-set-strictmode -off
+Set-StrictMode -off
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. (relpath '..\lib\commands')
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\commands.ps1"
 
 reset_aliases
 

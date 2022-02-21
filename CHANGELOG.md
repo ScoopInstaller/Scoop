@@ -7,6 +7,7 @@
 - **scoop-alter:** Add `scoop alter` command to switch shim's target ([#4727](https://github.com/ScoopInstaller/Scoop/issues/4727))
 - **scoop-bucket:** List more detailed information for buckets ([#4704](https://github.com/ScoopInstaller/Scoop/issues/4704))
 - **scoop-cache:** Handle multiple apps and show detailed information ([#4738](https://github.com/ScoopInstaller/Scoop/issues/4738))
+- **scoop-cat:** Use `bat` to pretty-print JSON ([#4742](https://github.com/ScoopInstaller/Scoop/issues/4742))
 - **scoop-download:** Add `scoop download` command ([#4621](https://github.com/ScoopInstaller/Scoop/issues/4621))
 - **scoop-(install|virustotal):** Allow skipping update check ([#4634](https://github.com/ScoopInstaller/Scoop/issues/4634))
 - **scoop-list:** Allow list manipulation ([#4718](https://github.com/ScoopInstaller/Scoop/issues/4718))
@@ -42,6 +43,8 @@
 - **rmdir:** Use 'Remove-Item' instead of 'rmdir' ([#4691](https://github.com/ScoopInstaller/Scoop/issues/4691))
 - **COMSPEC:** Deprecate use of subshell cmd.exe ([#4692](https://github.com/ScoopInstaller/Scoop/issues/4692))
 - **git:** Use 'git -C' to specify the work directory instead of 'Push-Location'/'Pop-Location' ([#4697](https://github.com/ScoopInstaller/Scoop/issues/4697))
+- **scoop-info:** Use List View for output ([#4741](https://github.com/ScoopInstaller/Scoop/issues/4741))
+- **scoop-config:** Use underscores everywhere ([#4745](https://github.com/ScoopInstaller/Scoop/issues/4745))
 
 ### Builds
 

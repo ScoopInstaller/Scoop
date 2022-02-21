@@ -1,5 +1,5 @@
-. "$psscriptroot/autoupdate.ps1"
-. "$psscriptroot/buckets.ps1"
+. "$PSScriptRoot/autoupdate.ps1"
+. "$PSScriptRoot/buckets.ps1"
 
 function nightly_version($date, $quiet = $false) {
     $date_str = $date.tostring("yyyyMMdd")
@@ -34,9 +34,14 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         return
     }
 
-    if ((get_config 'manifest-review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
-        Write-Output "Manifest: $app.json"
-        Write-Output $manifest | ConvertToPrettyJson
+    if ((get_config 'manifest_review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+        Write-Host "Manifest: $app.json"
+        $style = get_config cat_style
+        if ($style) {
+            $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
+        } else {
+            $manifest | ConvertToPrettyJson
+        }
         $answer = Read-Host -Prompt "Continue installation? [Y/n]"
         if (($answer -eq 'n') -or ($answer -eq 'N')) {
             return
