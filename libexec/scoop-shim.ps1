@@ -25,7 +25,7 @@
 # Options:
 #   -g, --global       Add/Remove/Info/Alter global shim(s)
 
-param($SubCommand, $ShimName)
+param($SubCommand, $ShimName, [Switch]$g)
 
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
@@ -42,8 +42,17 @@ if ($SubCommand -ne 'list' -and !$ShimName) {
     exit 1
 }
 
+$global = $g
+
+if ($Args -and $Args[-1] -eq '--global' -and $SubCommand -ne 'list') {
+    $global = $true
+    if ($Args.Length -eq 1) {
+        $Args = @()
+    } else {
+        $Args = $Args[0..($Args.Length - 2)]
+    }
+}
 if ($Args) {
-    $global = $Args[-1] -eq '-g' -or $Args[-1] -eq '--global'
     switch ($SubCommand) {
         'add' {
             if ($Args[0] -like '-*') {
@@ -51,32 +60,28 @@ if ($Args) {
                 my_usage
                 exit 1
             } else {
-                if (($Args -join ' ') -match "^'(.*?)'(.*?)( -g| --global)?$") {
+                if (($Args -join ' ') -match "^'(.*?)'\s*(.*?)$") {
                     $commandPath = $Matches[1]
                     $commandArgs = $Matches[2]
                 } else {
                     $commandPath = $Args[0]
-                    $commandArgs = $Args[1..($Args.Length - $(if ($global) { 2 } else { 1 }))]
+                    if ($Args.Length -gt 1) {
+                        $commandArgs = $Args[1..($Args.Length - 1)]
+                    }
                 }
             }
         }
         { $_ -in 'remove', 'rm' } {
-            if ($Args.Length -gt 1) {
-                $ShimName = @($ShimName) + $Args[0..($Args.Length - $(if ($global) { 2 } else { 1 }))]
-            } elseif ($Args.Length -eq 1 -and !$global) {
-                $ShimName = @($ShimName) + $Args
-            }
+            $ShimName = @($ShimName) + $Args
         }
         'list' {
             $ShimName = (@($ShimName) + $Args) -join '|'
         }
         default {
             # For 'info' and 'alter'
-            if ($Args.Length -ne 1 -or $Args[0] -notin @('-g', '--global')) {
-                "ERROR: Option $Args not recognized."
-                my_usage
-                exit 1
-            }
+            "ERROR: Option $Args not recognized."
+            my_usage
+            exit 1
         }
     }
 }
