@@ -243,7 +243,7 @@ function Get-HelperPath {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -265,6 +265,7 @@ function Get-HelperPath {
             }
         }
         'Aria2' { $HelperPath = Get-AppFilePath 'aria2' 'aria2c.exe' }
+        'Zstd' { $HelperPath = Get-AppFilePath 'zstd' 'zstd.exe' }
     }
 
     return $HelperPath
@@ -274,7 +275,7 @@ function Test-HelperInstalled {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -289,7 +290,7 @@ function Test-Aria2Enabled {
 function app_status($app, $global) {
     $status = @{}
     $status.installed = (installed $app $global)
-    $status.version = current_version $app $global
+    $status.version = Select-CurrentVersion -AppName $app -Global:$global
     $status.latest_version = $status.version
 
     $install_info = install_info $app $status.version $global
@@ -299,13 +300,17 @@ function app_status($app, $global) {
 
     $manifest = manifest $app $install_info.bucket $install_info.url
     $status.removed = (!$manifest)
-    if($manifest.version) {
+    if ($manifest.version) {
         $status.latest_version = $manifest.version
     }
 
     $status.outdated = $false
-    if($status.version -and $status.latest_version) {
-        $status.outdated = ((compare_versions $status.latest_version $status.version) -gt 0)
+    if ($status.version -and $status.latest_version) {
+        if (get_config 'force-update' $false) {
+            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
+        } else {
+            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)
+        }
     }
 
     $status.missing_deps = @()
@@ -313,8 +318,8 @@ function app_status($app, $global) {
         $app, $bucket, $null = parse_app $_
         return !(installed $app)
     }
-    if($deps) {
-        $status.missing_deps += ,$deps
+    if ($deps) {
+        $status.missing_deps += , $deps
     }
 
     return $status
@@ -429,7 +434,8 @@ function Invoke-ExternalCommand {
         return $false
     }
     if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
-        Out-File -FilePath $LogPath -Encoding ASCII -Append -InputObject $Process.StandardOutput.ReadToEnd()
+        Out-File -FilePath $LogPath -Encoding Default -Append -InputObject $Process.StandardOutput.ReadToEnd()
+        Out-File -FilePath $LogPath -Encoding Default -Append -InputObject $Process.StandardError.ReadToEnd()
     }
     $Process.WaitForExit()
     if ($Process.ExitCode -ne 0) {
@@ -525,72 +531,81 @@ function get_app_name($path) {
     return ''
 }
 
-function get_app_name_from_ps1_shim($shim_ps1) {
-    if (!(Test-Path($shim_ps1))) {
+function get_app_name_from_shim($shim) {
+    if (!(Test-Path($shim))) {
         return ''
     }
-    $content = (Get-Content $shim_ps1 -Encoding utf8) -join ' '
+    $content = (Get-Content $shim -Encoding UTF8) -join ' '
     return get_app_name $content
 }
 
-function warn_on_overwrite($shim_ps1, $path) {
-    if (!(Test-Path($shim_ps1))) {
+function warn_on_overwrite($shim, $path) {
+    if (!(Test-Path($shim))) {
         return
     }
-    $shim_app = get_app_name_from_ps1_shim $shim_ps1
+    $shim_app = get_app_name_from_shim $shim
     $path_app = get_app_name $path
     if ($shim_app -eq $path_app) {
         return
     }
-    $filename = [System.IO.Path]::GetFileName($path)
-    warn "Overwriting shim to $filename installed from $shim_app"
+    $shimname = (fname $shim) -replace '\.shim$', '.exe'
+    $filename = (fname $path) -replace '\.shim$', '.exe'
+    warn "Overwriting shim ('$shimname' -> '$filename') installed from $shim_app"
 }
 
 function shim($path, $global, $name, $arg) {
-    if(!(test-path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
+    if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
-    if(!$name) { $name = strip_ext (fname $path) }
+    if (!$name) { $name = strip_ext (fname $path) }
 
     $shim = "$abs_shimdir\$($name.tolower())"
 
-    warn_on_overwrite "$shim.ps1" $path
-
     # convert to relative path
     Push-Location $abs_shimdir
-    $relative_path = resolve-path -relative $path
+    $relative_path = Resolve-Path -Relative $path
     Pop-Location
-    $resolved_path = resolve-path $path
+    $resolved_path = Resolve-Path $path
 
-    # if $path points to another drive resolve-path prepends .\ which could break shims
-    if($relative_path -match "^(.\\[\w]:).*$") {
-        write-output "`$path = `"$path`"" | out-file "$shim.ps1" -encoding utf8
-    } else {
-        # Setting PSScriptRoot in Shim if it is not defined, so the shim doesn't break in PowerShell 2.0
-        Write-Output "if (!(Test-Path Variable:PSScriptRoot)) { `$PSScriptRoot = Split-Path `$MyInvocation.MyCommand.Path -Parent }" | Out-File "$shim.ps1" -Encoding utf8
-        write-output "`$path = join-path `"`$psscriptroot`" `"$relative_path`"" | out-file "$shim.ps1" -Encoding utf8 -Append
-    }
-
-    if($path -match '\.jar$') {
-        "if(`$myinvocation.expectingInput) { `$input | & java -jar `$path $arg @args } else { & java -jar `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
-    } else {
-        "if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }" | out-file "$shim.ps1" -encoding utf8 -append
-    }
-
-    if($path -match '\.(exe|com)$') {
+    if ($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
-        Copy-Item (get_shim_path) "$shim.exe" -force
-        write-output "path = $resolved_path" | out-file "$shim.shim" -encoding utf8
-        if($arg) {
-            write-output "args = $arg" | out-file "$shim.shim" -encoding utf8 -append
+        warn_on_overwrite "$shim.shim" $path
+        Copy-Item (get_shim_path) "$shim.exe" -Force
+        Write-Output "path = $resolved_path" | Out-File "$shim.shim" -Encoding ASCII
+        if ($arg) {
+            Write-Output "args = $arg" | Out-File "$shim.shim" -Encoding ASCII -Append
         }
-    } elseif($path -match '\.(bat|cmd)$') {
+    } elseif ($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
-        "@`"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
+        warn_on_overwrite "$shim.cmd" $path
+        "@rem $resolved_path
+@`"$resolved_path`" $arg %*" | Out-File "$shim.cmd" -Encoding ASCII
 
-        "#!/bin/sh`nMSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
-    } elseif($path -match '\.ps1$') {
+        warn_on_overwrite $shim $path
+        "#!/bin/sh
+# $resolved_path
+MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`"" | Out-File $shim -Encoding ASCII
+    } elseif ($path -match '\.ps1$') {
+        # if $path points to another drive resolve-path prepends .\ which could break shims
+        warn_on_overwrite "$shim.ps1" $path
+        $ps1text = if ($relative_path -match '^(.\\[\w]:).*$') {
+            "# $resolved_path
+`$path = `"$path`"
+if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }
+exit `$lastexitcode"
+        } else {
+            # Setting PSScriptRoot in Shim if it is not defined, so the shim doesn't break in PowerShell 2.0
+            "# $resolved_path
+if (!(Test-Path Variable:PSScriptRoot)) { `$PSScriptRoot = Split-Path `$MyInvocation.MyCommand.Path -Parent }
+`$path = join-path `"`$psscriptroot`" `"$relative_path`"
+if(`$myinvocation.expectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }
+exit `$lastexitcode"
+        }
+        $ps1text | Out-File "$shim.ps1" -Encoding ASCII
+
         # make ps1 accessible from cmd.exe
-        "@echo off
+        warn_on_overwrite "$shim.cmd" $path
+        "@rem $resolved_path
+@echo off
 setlocal enabledelayedexpansion
 set args=%*
 :: replace problem characters in arguments
@@ -599,21 +614,63 @@ set args=%args:(=``(%
 set args=%args:)=``)%
 set invalid=`"='
 if !args! == !invalid! ( set args= )
-powershell -noprofile -ex unrestricted `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"" | out-file "$shim.cmd" -encoding ascii
+where /q pwsh.exe
+if %errorlevel% equ 0 (
+    pwsh -noprofile -ex unrestricted -command `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"
+) else (
+    powershell -noprofile -ex unrestricted -command `"& '$resolved_path' $arg %args%;exit `$lastexitcode`"
+)" | Out-File "$shim.cmd" -Encoding ASCII
 
-        "#!/bin/sh`npowershell.exe -noprofile -ex unrestricted `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
-    } elseif($path -match '\.jar$') {
-        "@java -jar `"$resolved_path`" $arg %*" | out-file "$shim.cmd" -encoding ascii
-        "#!/bin/sh`njava -jar `"$resolved_path`" $arg `"$@`"" | out-file $shim -encoding ascii
+        warn_on_overwrite $shim $path
+        "#!/bin/sh
+# $resolved_path
+if command -v pwsh.exe &> /dev/null; then
+    pwsh.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"
+else
+    powershell.exe -noprofile -ex unrestricted -command `"& '$resolved_path' $arg $@;exit \`$lastexitcode`"
+fi" | Out-File $shim -Encoding ASCII
+    } elseif ($path -match '\.jar$') {
+        warn_on_overwrite "$shim.cmd" $path
+        "@rem $resolved_path
+@java -jar `"$resolved_path`" $arg %*" | Out-File "$shim.cmd" -Encoding ASCII
+
+        warn_on_overwrite $shim $path
+        "#!/bin/sh
+# $resolved_path
+java -jar `"$resolved_path`" $arg `"$@`"" | Out-File $shim -Encoding ASCII
+    } elseif ($path -match '\.py$') {
+        warn_on_overwrite "$shim.cmd" $path
+        "@rem $resolved_path
+@python `"$resolved_path`" $arg %*" | Out-File "$shim.cmd" -Encoding ASCII
+
+        warn_on_overwrite $shim $path
+        "#!/bin/sh
+# $resolved_path
+python `"$resolved_path`" $arg `"$@`"" | Out-File $shim -Encoding ASCII
+    } else {
+        warn_on_overwrite "$shim.cmd" $path
+        # find path to Git's bash so that batch scripts can run bash scripts
+        $gitdir = (Get-Item (Get-Command git -ErrorAction:Stop).Source -ErrorAction:Stop).Directory.Parent
+        if ($gitdir.FullName -imatch 'mingw') {
+            $gitdir = $gitdir.Parent
+        }
+        "@rem $resolved_path
+@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*" | Out-File "$shim.cmd" -Encoding ASCII
+
+        warn_on_overwrite $shim $path
+        "#!/bin/sh
+# $resolved_path
+`"$resolved_path`" $arg `"$@`"" | Out-File $shim -Encoding ASCII
     }
 }
 
 function get_shim_path() {
-    $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"
+    $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"
     $shim_version = get_config 'shim' 'default'
     switch ($shim_version) {
         '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
-        'kiennq' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"; Break }
+        'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
+        'kiennq' { Break } # for backward compatibility
         'default' { Break }
         default { warn "Unknown shim version: '$shim_version'" }
     }
@@ -809,7 +866,7 @@ function applist($apps, $global) {
 }
 
 function parse_app([string] $app) {
-    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?') {
+    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*\.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?') {
         return $matches['app'], $matches['bucket'], $matches['version']
     }
     return $app, $null, $null
@@ -851,18 +908,27 @@ function is_scoop_outdated() {
 }
 
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
-    if ($entity -is [Array]) {
-        return $entity | ForEach-Object { substitute $_ $params $regexEscape}
-    } elseif ($entity -is [String]) {
-        $params.GetEnumerator() | ForEach-Object {
-            if($regexEscape -eq $false -or $null -eq $_.Value) {
-                $entity = $entity.Replace($_.Name, $_.Value)
-            } else {
-                $entity = $entity.Replace($_.Name, [Regex]::Escape($_.Value))
+    $newentity = $entity
+    if ($null -ne $newentity) {
+        switch ($entity.GetType().Name) {
+            'String' {
+                $params.GetEnumerator() | ForEach-Object {
+                    if ($regexEscape -eq $false -or $null -eq $_.Value) {
+                        $newentity = $newentity.Replace($_.Name, $_.Value)
+                    } else {
+                        $newentity = $newentity.Replace($_.Name, [Regex]::Escape($_.Value))
+                    }
+                }
+            }
+            'Object[]' {
+                $newentity = $entity | ForEach-Object { ,(substitute $_ $params $regexEscape) }
+            }
+            'PSCustomObject' {
+                $newentity.PSObject.Properties | ForEach-Object { $_.Value = substitute $_.Value $params $regexEscape }
             }
         }
-        return $entity
     }
+    return $newentity
 }
 
 function format_hash([String] $hash) {

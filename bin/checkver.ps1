@@ -74,6 +74,7 @@ param(
 
 $Dir = Resolve-Path $Dir
 $Search = $App
+$GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
 
 # get apps to check
 $Queue = @()
@@ -94,7 +95,7 @@ Get-Event | ForEach-Object {
 $Queue | ForEach-Object {
     $name, $json = $_
 
-    $substitutions = get_version_substitutions $json.version
+    $substitutions = Get-VersionSubstitution $json.version
 
     $wc = New-Object Net.Webclient
     if ($json.checkver.useragent) {
@@ -114,18 +115,21 @@ $Queue | ForEach-Object {
     $jsonpath = ''
     $xpath = ''
     $replace = ''
+    $useGithubAPI = $false
 
     if ($json.checkver -eq 'github') {
         if (!$json.homepage.StartsWith('https://github.com/')) {
             error "$name checkver expects the homepage to be a github repository"
         }
-        $url = $json.homepage + '/releases/latest'
+        $url = $json.homepage.TrimEnd('/') + '/releases/latest'
         $regex = $githubRegex
+        $useGithubAPI = $true
     }
 
     if ($json.checkver.github) {
-        $url = $json.checkver.github + '/releases/latest'
+        $url = $json.checkver.github.TrimEnd('/') + '/releases/latest'
         $regex = $githubRegex
+        if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
     }
 
     if ($json.checkver.re) {
@@ -154,6 +158,13 @@ $Queue | ForEach-Object {
     }
 
     $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq 'true'
+
+    if ($url -like '*api.github.com/*') { $useGithubAPI = $true }
+
+    if ($useGithubAPI -and ($null -ne $GitHubToken)) {
+        $url = $url -replace '//(www\.)?github.com/', '//api.github.com/repos/'
+        $wc.Headers.Add('Authorization', "token $GitHubToken")
+    }
 
     $url = substitute $url $substitutions
 
@@ -213,7 +224,13 @@ while ($in_progress -gt 0) {
     }
 
     if ($jsonpath) {
-        $ver = json_path $page $jsonpath
+        # Return only a single value if regex is absent
+        $noregex = [String]::IsNullOrEmpty($regex)
+        # If reverse is ON and regex is ON,
+        # Then reverse would have no effect because regex handles reverse
+        # on its own
+        # So in this case we have to disable reverse
+        $ver = json_path $page $jsonpath $null ($reverse -and $noregex) $noregex
         if (!$ver) {
             $ver = json_path_legacy $page $jsonpath
         }
@@ -292,7 +309,7 @@ while ($in_progress -gt 0) {
 
     Write-Host $ver -ForegroundColor DarkRed -NoNewline
     Write-Host " (scoop version is $expected_ver)" -NoNewline
-    $update_available = (compare_versions $expected_ver $ver) -eq -1
+    $update_available = (Compare-Version -ReferenceVersion $ver -DifferenceVersion $expected_ver) -ne 0
 
     if ($json.autoupdate -and $update_available) {
         Write-Host ' autoupdate available' -ForegroundColor Cyan
@@ -311,7 +328,7 @@ while ($in_progress -gt 0) {
             if ($Version -ne "") {
                 $ver = $Version
             }
-            autoupdate $App $Dir $json $ver $matchesHashtable
+            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
         }

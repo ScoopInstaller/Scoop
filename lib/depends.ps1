@@ -70,6 +70,9 @@ function script_deps($script) {
     if($script -like '*Expand-DarkArchive *') {
         $deps += 'dark'
     }
+    if ($script -like '*Expand-ZstdArchive *') {
+        $deps += 'zstd'
+    }
 
     return $deps
 }
@@ -77,14 +80,17 @@ function script_deps($script) {
 function install_deps($manifest, $arch) {
     $deps = @()
 
-    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -URL (url $manifest $arch))) {
+    if (!(Test-HelperInstalled -Helper 7zip) -and (Test-7zipRequirement -URL (script:url $manifest $arch))) {
         $deps += '7zip'
     }
-    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -URL (url $manifest $arch))) {
+    if (!(Test-HelperInstalled -Helper Lessmsi) -and (Test-LessmsiRequirement -URL (script:url $manifest $arch))) {
         $deps += 'lessmsi'
     }
     if (!(Test-HelperInstalled -Helper Innounp) -and $manifest.innosetup) {
         $deps += 'innounp'
+    }
+    if (!(Test-HelperInstalled -Helper Zstd) -and (Test-ZstdRequirement -URL (script:url $manifest $arch))) {
+        $deps += 'zstd'
     }
 
     $pre_install = arch_specific 'pre_install' $manifest $arch

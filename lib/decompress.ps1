@@ -16,7 +16,25 @@ function Test-7zipRequirement {
             return ($URL | Where-Object { Test-7zipRequirement -File $_ }).Count -gt 0
         }
     } else {
-        return $File -match '\.((gz)|(tar)|(tgz)|(lzma)|(bz)|(bz2)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))$'
+        return $File -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
+    }
+}
+
+function Test-ZstdRequirement {
+    [CmdletBinding(DefaultParameterSetName = "URL")]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true, ParameterSetName = "URL")]
+        [String[]]
+        $URL,
+        [Parameter(Mandatory = $true, ParameterSetName = "File")]
+        [String]
+        $File
+    )
+    if ($URL) {
+        return ($URL | Where-Object { Test-ZstdRequirement -File $_ }).Count -gt 0
+    } else {
+        return $File -match '\.zst$'
     }
 }
 
@@ -92,11 +110,63 @@ function Expand-7zipArchive {
         # Check for tar
         $Status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $LogPath
         if ($Status) {
-            $TarFile = (Get-Content -Path $LogPath)[-4] -replace '.{53}(.*)', '$1' # get inner tar file name
+            $TarFile = (Get-Content -Path $LogPath)[-5] -replace '.{53}(.*)', '$1' # get inner tar file name
             Expand-7zipArchive -Path "$DestinationPath\$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
         } else {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
+    }
+    if ($Removal) {
+        # Remove original archive file
+        Remove-Item $Path -Force
+    }
+}
+
+function Expand-ZstdArchive {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [String]
+        $Path,
+        [Parameter(Position = 1)]
+        [String]
+        $DestinationPath = (Split-Path $Path),
+        [String]
+        $ExtractDir,
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [String]
+        $Switches,
+        [Switch]
+        $Overwrite,
+        [Switch]
+        $Removal
+    )
+    $ZstdPath = Get-HelperPath -Helper Zstd
+    $LogPath = "$(Split-Path $Path)\zstd.log"
+    $DestinationPath = $DestinationPath.TrimEnd("\")
+    ensure $DestinationPath | Out-Null
+    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"", "-v")
+    if ($Switches) {
+        $ArgList += (-split $Switches)
+    }
+    if ($Overwrite) {
+        $ArgList += '-f'
+    }
+    $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
+    if (!$Status) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    }
+    $IsTar = (strip_ext $Path) -match '\.tar$'
+    if (!$IsTar -and $ExtractDir) {
+        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+    }
+    if (Test-Path $LogPath) {
+        Remove-Item $LogPath -Force
+    }
+    if ($IsTar) {
+        # Check for tar
+        $TarFile = (strip_ext $Path)
+        Expand-7zipArchive -Path "$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
     }
     if ($Removal) {
         # Remove original archive file
