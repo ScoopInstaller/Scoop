@@ -34,11 +34,11 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $item.Version = $ver
 
     $install_info_path = "$(versiondir $app $ver $global)\install.json"
-    $updated = (Get-Item (appdir $app $global)).LastWriteTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    $updated = (Get-Item (appdir $app $global)).LastWriteTime | Get-Date
     $install_info = $null
     if(Test-Path $install_info_path) {
         $install_info = parse_json $install_info_path
-        $updated = (Get-Item $install_info_path).LastWriteTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+        $updated = (Get-Item $install_info_path).LastWriteTime | Get-Date
     }
 
     $item.Source = if ($install_info.bucket) {
