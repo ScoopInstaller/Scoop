@@ -89,11 +89,7 @@ if ($manifest.license) {
 }
 
 if ($manifest.depends) {
-    $item.Dependencies = if ($manifest.depends -is [System.Array]) {
-        $manifest.depends -join ' | '
-    } else {
-        $manifest.depends
-    }
+    $item.Dependencies = $manifest.depends -join ' | '
 }
 
 if (Test-Path $manifest_file) {
@@ -165,11 +161,7 @@ if ($env_add_path) {
 if ($manifest.suggest) {
     $suggest_output = @()
     $manifest.suggest.PSObject.Properties | ForEach-Object {
-        $suggest_output += if ($_.Value -is [System.Array]) {
-            $_.Value -join ' | '
-        } else {
-            $_.Value
-        }
+        $suggest_output += $_.Value -join ' | '
     }
     $item.Suggestions = $suggest_output -join ' | '
 }
