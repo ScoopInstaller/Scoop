@@ -39,7 +39,7 @@ function list_buckets {
         )
         $updated = 'N/A'
         if ((Test-Path (Join-Path $source '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
-            $updated = git -C "`"$source`"" log --date=format:"`"%d-%m-%Y %H:%M:%S`"" --format='%ad' -n 1 | Get-Date
+            $updated = git -C "`"$source`"" log --format='%aD' -n 1 | Get-Date
             $source = git -C "`"$source`"" config remote.origin.url
         } else {
             $updated = (Get-Item "$source\bucket").LastWriteTime
