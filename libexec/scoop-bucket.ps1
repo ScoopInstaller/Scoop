@@ -38,7 +38,7 @@ function list_buckets {
             Measure-Object | Select-Object -ExpandProperty Count
         )
         $updated = 'N/A'
-        if ((Test-Path (Join-Path $source '.git')) -and (Get-Command git -ErrorAction Ignore)) {
+        if ((Test-Path (Join-Path $source '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
             $updated = git -C "`"$source`"" log --date=format:"`"%d-%m-%Y %H:%M:%S`"" --format='%ad' -n 1 | Get-Date
             $source = git -C "`"$source`"" config remote.origin.url
         } else {
