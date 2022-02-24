@@ -35,13 +35,16 @@
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
 - **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670), [#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
 
+### Performance Improvements
+
+- **install:** Avoid checking all files for unlinking persisted data ([#4681](https://github.com/ScoopInstaller/Scoop/issues/4681))
+
 ### Code Refactoring
 
 - **depends:** Rewrite 'depends.ps1' ([#4638](https://github.com/ScoopInstaller/Scoop/issues/4638), [#4673](https://github.com/ScoopInstaller/Scoop/issues/4673))
 - **mklink:** Use 'New-Item' instead of 'mklink' ([#4690](https://github.com/ScoopInstaller/Scoop/issues/4690))
 - **rmdir:** Use 'Remove-Item' instead of 'rmdir' ([#4691](https://github.com/ScoopInstaller/Scoop/issues/4691))
 - **COMSPEC:** Deprecate use of subshell cmd.exe ([#4692](https://github.com/ScoopInstaller/Scoop/issues/4692))
-- **install:** avoid checking all files for unlinking persisted data ([#4681](https://github.com/ScoopInstaller/Scoop/issues/4681))
 - **git:** Use 'git -C' to specify the work directory instead of 'Push-Location'/'Pop-Location' ([#4697](https://github.com/ScoopInstaller/Scoop/issues/4697))
 - **scoop-info:** Use List View for output ([#4741](https://github.com/ScoopInstaller/Scoop/issues/4741))
 
