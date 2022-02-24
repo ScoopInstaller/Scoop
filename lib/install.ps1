@@ -1202,17 +1202,11 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 function unlink_persist_data($manifest, $dir) {
     $persist = $manifest.persist
     # unlink all junction / hard link in the directory
-    if($persist) {
-        if ($persist -is [String]) {
-            $persist = @($persist);
-        }
-
-        $persist | ForEach-Object {
-            $source, $target = persist_def $_
-            write-host "Unlink persisted: $source"
-            $source = $source.TrimEnd("/").TrimEnd("\\")
+    if ($persist) {
+        @($persist) | ForEach-Object {
+            $source, $null = persist_def $_
             $source = Get-Item "$dir\$source"
-            if ($null -ne $source.LinkType) {
+            if ($source.LinkType) {
                 $source_path = $source.FullName
                 # directory (junction)
                 if ($source -is [System.IO.DirectoryInfo]) {
