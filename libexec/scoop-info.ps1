@@ -1,15 +1,19 @@
 # Usage: scoop info <app> [options]
 # Summary: Display information about an app
 # Options:
-#   -v, -verbose        Show full paths and URLs
-param([string]$app, [switch]$verbose)
+#   -v, --verbose       Show full paths and URLs
 
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
 
 reset_aliases
+
+$opt, $app, $err = getopt $args 'v' 'verbose'
+if ($err) { error "scoop info: $err"; exit 1 }
+$verbose = $opt.v -or $opt.verbose
 
 if (!$app) { my_usage; exit 1 }
 
@@ -94,7 +98,7 @@ if ($manifest.depends) {
 
 if (Test-Path $manifest_file) {
     if (Get-Command git -ErrorAction Ignore) {
-        $gitinfo = (git -C (Split-Path $manifest_file) log -1 -s --date=format:'%d-%m-%Y %H:%M:%S' --format='%ad#%an' $manifest_file 2> $null) -Split '#'
+        $gitinfo = (git -C (Split-Path $manifest_file) log -1 -s --format='%aD#%an' $manifest_file 2> $null) -Split '#'
     }
     if ($gitinfo) {
         $item.'Updated at' = $gitinfo[0] | Get-Date
