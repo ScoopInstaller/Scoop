@@ -36,6 +36,10 @@
 - **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670), [#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
 - **scoop-bucket:** Check for git before running command ([#4756](https://github.com/ScoopInstaller/Scoop/issues/4756))
 
+### Performance Improvements
+
+- **uninstall:** Avoid checking all files for unlinking persisted data ([#4681](https://github.com/ScoopInstaller/Scoop/issues/4681))
+
 ### Code Refactoring
 
 - **depends:** Rewrite 'depends.ps1' ([#4638](https://github.com/ScoopInstaller/Scoop/issues/4638), [#4673](https://github.com/ScoopInstaller/Scoop/issues/4673))
