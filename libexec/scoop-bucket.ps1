@@ -38,11 +38,11 @@ function list_buckets {
             Measure-Object | Select-Object -ExpandProperty Count
         )
         $updated = 'N/A'
-        if (Test-Path (Join-Path $source '.git')) {
-            $updated = git -C "`"$source`"" log --date=format:"`"%Y-%m-%d %H:%M:%S`"" --format='%ad' -n 1
-            $source = git -C "`"$source`"" config remote.origin.url
+        if ((Test-Path (Join-Path $source '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
+            $updated = git -C $source log --format='%aD' -n 1 | Get-Date
+            $source = git -C $source config remote.origin.url
         } else {
-            $updated = (Get-Item "$source\bucket").LastWriteTime | Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+            $updated = (Get-Item "$source\bucket").LastWriteTime
             $source = friendly_path $source
         }
         $buckets += New-Object PSObject -Property @{

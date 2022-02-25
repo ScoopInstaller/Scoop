@@ -12,6 +12,9 @@
 - **scoop-(install|virustotal):** Allow skipping update check ([#4634](https://github.com/ScoopInstaller/Scoop/issues/4634))
 - **scoop-list:** Allow list manipulation ([#4718](https://github.com/ScoopInstaller/Scoop/issues/4718))
 - **scoop-list:** Show last-updated time [#4723](https://github.com/ScoopInstaller/Scoop/issues/4723))
+- **scoop-cache:** Handle multiple apps and show detailed information ([#4738](https://github.com/ScoopInstaller/Scoop/issues/4738))
+- **scoop-cat:** Use `bat` to pretty-print JSON ([#4742](https://github.com/ScoopInstaller/Scoop/issues/4742))
+- **scoop-info:** Revamp details and show more information ([#4747](https://github.com/ScoopInstaller/Scoop/issues/4747))
 - **scoop-shim:** Add `scoop shim` to manipulate shims and move `scoop alter` to `scoop shim alter` [#4736](https://github.com/ScoopInstaller/Scoop/issues/4736))
 
 ### Bug Fixes
@@ -32,9 +35,15 @@
 - **versions:** Fix wrong version number when only one version dir ([#4679](https://github.com/ScoopInstaller/Scoop/issues/4679))
 - **versions:** Get current version from failed installation if possible ([#4720](https://github.com/ScoopInstaller/Scoop/issues/4720), [#4725](https://github.com/ScoopInstaller/Scoop/issues/4725))
 - **scoop-alias:** Fix alias initialization ([#4737](https://github.com/ScoopInstaller/Scoop/issues/4737))
+- **scoop-bucket:** Check for git before running command ([#4756](https://github.com/ScoopInstaller/Scoop/issues/4756))
+- **scoop-bucket:** Fix date formatting issues with git bucket(s) ([#4759](https://github.com/ScoopInstaller/Scoop/issues/4759))
 - **scoop-checkup:** Skip 'check_windows_defender' when have not admin privileges ([#4699](https://github.com/ScoopInstaller/Scoop/issues/4699))
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
 - **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670), [#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
+
+### Performance Improvements
+
+- **uninstall:** Avoid checking all files for unlinking persisted data ([#4681](https://github.com/ScoopInstaller/Scoop/issues/4681))
 
 ### Code Refactoring
 
