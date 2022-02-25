@@ -1,4 +1,4 @@
-# Usage: scoop info <app> [options]
+# Usage: scoop info <app> [--verbose]
 # Summary: Display information about an app
 # Options:
 #   -v, --verbose       Show full paths and URLs
