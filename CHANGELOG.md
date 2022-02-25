@@ -12,6 +12,7 @@
 - **scoop-list:** Show last-updated time [#4723](https://github.com/ScoopInstaller/Scoop/issues/4723))
 - **scoop-cache:** Handle multiple apps and show detailed information ([#4738](https://github.com/ScoopInstaller/Scoop/pull/4738))
 - **scoop-cat:** Use `bat` to pretty-print JSON ([#4742](https://github.com/ScoopInstaller/Scoop/pull/4742))
+- **scoop-info:** Revamp details and show more information ([#4747](https://github.com/ScoopInstaller/Scoop/pull/4747))
 
 ### Bug Fixes
 
