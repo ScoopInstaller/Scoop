@@ -25,7 +25,7 @@
 # Options:
 #   -g(lobal)       Add/Remove/Info/Alter global shim(s)
 #                   (NOTICE: USING SINGLE DASH)
-#                   (HINT: To pass argument likes '-g' to local shim, using quotes)
+#                   (HINT: To pass arguments like '-g' or '-global' to the shim, use quotes)
 
 param($SubCommand, $ShimName, [Switch]$global)
 
