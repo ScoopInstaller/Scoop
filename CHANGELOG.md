@@ -40,7 +40,7 @@
 
 ### Performance Improvements
 
-- **uninstall:** Avoid checking all files for unlinking persisted data ([#4681](https://github.com/ScoopInstaller/Scoop/issues/4681))
+- **uninstall:** Avoid checking all files for unlinking persisted data ([#4681](https://github.com/ScoopInstaller/Scoop/issues/4681), [#4763](https://github.com/ScoopInstaller/Scoop/issues/4763))
 
 ### Code Refactoring
 
