@@ -126,7 +126,6 @@ function update_scoop() {
     #     add_bucket 'main'
     # }
 
-    ensure_scoop_in_path
     shim "$currentdir\bin\scoop.ps1" $false
 
     foreach ($bucket in Get-LocalBucket) {
