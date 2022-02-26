@@ -1,4 +1,4 @@
-# Usage: scoop shim <subcommand> [<shim_names>] [<command_path> [<args>...]] [-g|--global]
+# Usage: scoop shim <subcommand> [<shim_names>] [<command_path> [<args>...]] [-g(lobal)]
 # Summary: Manipulate Scoop shims
 # Help: Manipulate Scoop shims: add, remove/rm, list, info, alter, etc.
 #
@@ -23,9 +23,11 @@
 #     scoop shim alter <shim_name>
 #
 # Options:
-#   -g, --global       Add/Remove/Info/Alter global shim(s)
+#   -g(lobal)       Add/Remove/Info/Alter global shim(s)
+#                   (NOTICE: USING SINGLE DASH)
+#                   (HINT: To pass argument likes '-g' to local shim, using quotes)
 
-param($SubCommand, $ShimName, [Switch]$g)
+param($SubCommand, $ShimName, [Switch]$global)
 
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
@@ -42,16 +44,6 @@ if ($SubCommand -ne 'list' -and !$ShimName) {
     exit 1
 }
 
-$global = $g
-
-if ($Args -and $Args[-1] -eq '--global' -and $SubCommand -ne 'list') {
-    $global = $true
-    if ($Args.Length -eq 1) {
-        $Args = @()
-    } else {
-        $Args = $Args[0..($Args.Length - 2)]
-    }
-}
 if ($Args) {
     switch ($SubCommand) {
         'add' {
