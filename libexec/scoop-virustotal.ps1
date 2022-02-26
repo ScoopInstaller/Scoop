@@ -44,8 +44,6 @@
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 
-reset_aliases
-
 $opt, $apps, $err = getopt $args 'a:snu' @('arch=', 'scan', 'no-depends', 'no-update-scoop')
 if($err) { "scoop virustotal: $err"; exit 1 }
 if(!$apps) { my_usage; exit 1 }

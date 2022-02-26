@@ -1,14 +1,12 @@
 . "$PSScriptRoot\..\libexec\scoop-alias.ps1" | Out-Null
 
-reset_aliases
-
 Describe 'add_alias' -Tag 'Scoop' {
     Mock shimdir { 'TestDrive:\shim' }
     Mock set_config { }
     Mock get_config { @{} }
 
     $shimdir = shimdir
-    mkdir $shimdir
+    ensure $shimdir
 
     Context "alias doesn't exist" {
         It 'creates a new alias' {
@@ -38,7 +36,7 @@ Describe 'rm_alias' -Tag 'Scoop' {
     Mock get_config { @{} }
 
     $shimdir = shimdir
-    mkdir $shimdir
+    ensure $shimdir
 
     Context 'alias exists' {
         It 'removes an existing alias' {

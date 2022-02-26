@@ -401,7 +401,12 @@ function url_remote_filename($url) {
     return $basename
 }
 
-function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
+function ensure($dir) {
+    if (!(Test-Path -Path $dir)) {
+        New-Item -Path $dir -ItemType Directory | Out-Null
+    }
+    Convert-Path -Path $dir
+}
 function fullpath($path) {
     # should be ~ rooted
     $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
@@ -883,55 +888,6 @@ function wraptext($text, $width) {
 
 function pluralize($count, $singular, $plural) {
     if($count -eq 1) { $singular } else { $plural }
-}
-
-function reset_alias($name, $value) {
-    if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
-        if($existing.definition -ne $value) {
-            write-host "Alias $name is read-only; can't reset it." -f darkyellow
-        }
-        return # already set
-    }
-    if($value -is [scriptblock]) {
-        if(!(test-path -path "function:script:$name")) {
-            new-item -path function: -name "script:$name" -value $value | out-null
-        }
-        return
-    }
-
-    set-alias $name $value -scope script -option allscope
-}
-
-function reset_aliases() {
-    # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = get-alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
-    get-childitem function: | ForEach-Object {
-        $fn = $_.name
-        if($aliases -contains $fn) {
-            set-alias $fn local:$fn -scope script
-        }
-    }
-
-    # for dealing with user aliases
-    $default_aliases = @{
-        'cp' = 'copy-item'
-        'echo' = 'write-output'
-        'gc' = 'get-content'
-        'gci' = 'get-childitem'
-        'gcm' = 'get-command'
-        'gm' = 'get-member'
-        'iex' = 'invoke-expression'
-        'ls' = 'get-childitem'
-        'mkdir' = { new-item -type directory @args }
-        'mv' = 'move-item'
-        'rm' = 'remove-item'
-        'sc' = 'set-content'
-        'select' = 'select-object'
-        'sls' = 'select-string'
-    }
-
-    # set default aliases
-    $default_aliases.keys | ForEach-Object { reset_alias $_ $default_aliases[$_] }
 }
 
 # convert list of apps to list of ($app, $global) tuples

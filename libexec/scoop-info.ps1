@@ -9,8 +9,6 @@
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
 
-reset_aliases
-
 $opt, $app, $err = getopt $args 'v' 'verbose'
 if ($err) { error "scoop info: $err"; exit 1 }
 $verbose = $opt.v -or $opt.verbose

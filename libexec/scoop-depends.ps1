@@ -9,8 +9,6 @@
 . "$PSScriptRoot\..\lib\decompress.ps1"
 . "$PSScriptRoot\..\lib\help.ps1"
 
-reset_aliases
-
 $opt, $apps, $err = getopt $args 'a:' 'arch='
 $app = $apps[0]
 

@@ -7,8 +7,6 @@
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 
-reset_aliases
-
 # check if scoop needs updating
 $currentdir = fullpath $(versiondir 'scoop' 'current')
 $needs_update = $false
