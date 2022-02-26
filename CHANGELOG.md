@@ -1,5 +1,4 @@
-<a name="unreleased"></a>
-## [Unreleased]
+## [v0.9.0](https://github.com/ScoopInstaller/Scoop/compare/2021-12-26...v0.9.0) - 2022-02-26
 
 ### Features
 
@@ -83,7 +82,7 @@
 - **changelog:** Rearrange CHANGELOG ([#4729](https://github.com/ScoopInstaller/Scoop/issues/4729))
 - **changelog:** Link CHANGELOG headers to 'releases/tag' ([#4730](https://github.com/ScoopInstaller/Scoop/issues/4730))
 
-## [2021-12-26](https://github.com/ScoopInstaller/Scoop/releases/tag/2021-12-26)
+## [2021-12-26](https://github.com/ScoopInstaller/Scoop/compare/2021-11-22...2021-12-26)
 
 ### Features
 
@@ -127,7 +126,7 @@
 
 - **shim:** Revert [#4229](https://github.com/ScoopInstaller/Scoop/issues/4229) ([#4553](https://github.com/ScoopInstaller/Scoop/issues/4553))
 
-## [2021-11-22](https://github.com/ScoopInstaller/Scoop/releases/tag/2021-11-22)
+## [2021-11-22](https://github.com/ScoopInstaller/Scoop/compare/2020-11-26...2021-11-22)
 
 ### Features
 
@@ -166,13 +165,13 @@
 - **readme:** Update Java bucket text ([#4514](https://github.com/ScoopInstaller/Scoop/issues/4514))
 - **readme:** Update notes about the NirSoft bucket ([#4524](https://github.com/ScoopInstaller/Scoop/issues/4524))
 
-## [2020-11-26](https://github.com/ScoopInstaller/Scoop/releases/tag/2020-11-26)
+## [2020-11-26](https://github.com/ScoopInstaller/Scoop/compare/2020-10-22...2020-11-26)
 
 ### Bug Fixes
 
 - **shim:** Fix Makefile typo ([0948824e](https://github.com/ScoopInstaller/Scoop/commit/0948824ec7269c979882d09342d9a269193cd674)) ([227de6cf](https://github.com/ScoopInstaller/Scoop/commit/227de6cfb8433a86ac0f0a279e691327ae04554c))
 
-## [2020-10-22](https://github.com/ScoopInstaller/Scoop/releases/tag/2020-10-22)
+## [2020-10-22](https://github.com/ScoopInstaller/Scoop/compare/2019-10-23...2020-10-22)
 
 ### Features
 
@@ -208,7 +207,7 @@
 
 - **init:** Force pester v4 ([#4040](https://github.com/ScoopInstaller/Scoop/issues/4040))
 
-## [2019-10-23](https://github.com/ScoopInstaller/Scoop/releases/tag/2019-10-23)
+## [2019-10-23](https://github.com/ScoopInstaller/Scoop/compare/2019-10-18...2019-10-23)
 
 ### Features
 
@@ -221,7 +220,7 @@
 - **install:** Check execution policy ([#3619](https://github.com/ScoopInstaller/Scoop/issues/3619))
 - **update:** Fix scoop update changelog output ([e997017f](https://github.com/ScoopInstaller/Scoop/commit/e997017f1a03e2eefef2157acdfefe2e4fced896))
 
-## [2019-10-18](https://github.com/ScoopInstaller/Scoop/releases/tag/2019-10-18)
+## [2019-10-18](https://github.com/ScoopInstaller/Scoop/compare/2019-06-24...2019-10-18)
 
 ### Features
 
@@ -260,7 +259,7 @@
 
 - **readme:** Improve installation instructions ([#3600](https://github.com/ScoopInstaller/Scoop/issues/3600))
 
-## [2019-06-24](https://github.com/ScoopInstaller/Scoop/releases/tag/2019-06-24)
+## [2019-06-24](https://github.com/ScoopInstaller/Scoop/compare/2019-05-15...2019-06-24)
 
 ### Features
 
@@ -290,7 +289,7 @@
 - **readme:** Fix typo in readme ([03bb07c8](https://github.com/ScoopInstaller/Scoop/commit/03bb07c8231563fa3a2092b9b52d4dde372f2a8e))
 - **readme:** Update readme with correct count of nirsoft apps ([e8d0be66](https://github.com/ScoopInstaller/Scoop/commit/e8d0be663b3bab25d9ee55c597b90bf922f4ec5d))
 
-## [2019-05-15](https://github.com/ScoopInstaller/Scoop/releases/tag/2019-05-15)
+## [2019-05-15](https://github.com/ScoopInstaller/Scoop/compare/2019-05-12...2019-05-15)
 
 ### Features
 
