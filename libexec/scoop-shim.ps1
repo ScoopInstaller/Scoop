@@ -1,14 +1,14 @@
 # Usage: scoop shim <subcommand> [<shim_names>] [<command_path> [<args>...]] [-g(lobal)]
 # Summary: Manipulate Scoop shims
-# Help: Manipulate Scoop shims: add, remove/rm, list, info, alter, etc.
+# Help: Manipulate Scoop shims: add, rm, list, info, alter, etc.
 #
 # To add a costom shim, use the 'add' subcommand:
 #
 #     scoop shim add <shim_name> <command_path> [<args>...]
 #
-# To remove a shim, use the 'remove' or 'rm' subcommand (CAUTION: this could remove shims added by app manifest):
+# To remove a shim, use the 'rm' subcommand (CAUTION: this could remove shims added by an app manifest):
 #
-#     scoop shim remove <shim_names>
+#     scoop shim rm <shim_names>
 #
 # To list all shims or matching shims, use the 'list' subcommand:
 #
@@ -32,8 +32,8 @@ param($SubCommand, $ShimName, [Switch]$global)
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
 
-if ($SubCommand -notin @('add', 'remove', 'rm', 'list', 'info', 'alter')) {
-    'ERROR: <subcommand> must be one of: add, remove/rm, list, info, alter'
+if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
+    'ERROR: <subcommand> must be one of: add, rm, list, info, alter'
     my_usage
     exit 1
 }
@@ -63,7 +63,7 @@ if ($Args) {
                 }
             }
         }
-        { $_ -in 'remove', 'rm' } {
+        'rm' {
             $ShimName = @($ShimName) + $Args
         }
         'list' {
@@ -144,7 +144,7 @@ switch ($SubCommand) {
             abort "ERROR: '$($Args[0])' does not exist" 3
         }
     }
-    { $_ -in 'remove', 'rm' } {
+    'rm' {
         $failed = @()
         $ShimName | ForEach-Object {
             if (Get-ShimPath $_ $global) {
@@ -179,7 +179,7 @@ switch ($SubCommand) {
             Write-Host $ShimName -ForegroundColor Cyan
             if (Get-ShimPath $ShimName (!$global)) {
                 Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, " -NoNewline
-                Write-Host "run 'scoop shim info $ShimName$(if (!$global) { ' --global' })' to show its info"
+                Write-Host "run 'scoop shim info $ShimName$(if (!$global) { ' -global' })' to show its info"
                 exit 2
             }
             exit 3
@@ -230,7 +230,7 @@ switch ($SubCommand) {
             Write-Host $ShimName -ForegroundColor Cyan
             if (Get-ShimPath $ShimName (!$global)) {
                 Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, " -NoNewline
-                Write-Host "run 'scoop shim alter $ShimName$(if (!$global) { ' --global' })' to alternate its source"
+                Write-Host "run 'scoop shim alter $ShimName$(if (!$global) { ' -global' })' to alternate its source"
                 exit 2
             }
             exit 3
