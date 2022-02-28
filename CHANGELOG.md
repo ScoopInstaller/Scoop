@@ -3,7 +3,8 @@
 
 ### Features
 
-- **config:** Allow Scoop to ignore running processes during reset/uninstall/update ([#4713](https://github.com/ScoopInstaller/Scoop/issues/4713), [#4731](https://github.com/ScoopInstaller/Scoop/issues/4731))
+- **scoop-config:** Allow Scoop to ignore running processes during reset/uninstall/update ([#4713](https://github.com/ScoopInstaller/Scoop/issues/4713), [#4731](https://github.com/ScoopInstaller/Scoop/issues/4731))
+- **scoop-config:** Show all settings ([#4765](https://github.com/ScoopInstaller/Scoop/issues/4765))
 - **scoop-alter:** Add `scoop alter` command to switch shim's target ([#4727](https://github.com/ScoopInstaller/Scoop/issues/4727))
 - **scoop-bucket:** List more detailed information for buckets ([#4704](https://github.com/ScoopInstaller/Scoop/issues/4704))
 - **scoop-cache:** Handle multiple apps and show detailed information ([#4738](https://github.com/ScoopInstaller/Scoop/issues/4738))

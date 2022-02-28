@@ -2,6 +2,10 @@
 # Summary: Get or set configuration values
 # Help: The scoop configuration file is saved at ~/.config/scoop/config.json.
 #
+# To get all configuration settings:
+#
+#     scoop config
+#
 # To get a configuration setting:
 #
 #     scoop config <name>
@@ -123,25 +127,27 @@
 
 param($name, $value)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
 reset_aliases
 
-if(!$name) { my_usage; exit 1 }
-
-if($name -like 'rm') {
+if (!$name) {
+    $scoopConfig
+} elseif ($name -like '--help') {
+    my_usage
+} elseif ($name -like 'rm') {
     set_config $value $null | Out-Null
-    Write-Output "'$value' has been removed"
-} elseif($null -ne $value) {
+    Write-Host "'$value' has been removed"
+} elseif ($null -ne $value) {
     set_config $name $value | Out-Null
-    Write-Output "'$name' has been set to '$value'"
+    Write-Host "'$name' has been set to '$value'"
 } else {
     $value = get_config $name
     if($null -eq $value) {
-        Write-Output "'$name' is not set"
+        Write-Host "'$name' is not set"
     } else {
-        Write-Output $value
+        $value
     }
 }
 
