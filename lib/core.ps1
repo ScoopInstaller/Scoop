@@ -41,7 +41,10 @@ function load_cfg($file) {
     }
 
     try {
-        return (Get-Content $file -Raw | ConvertFrom-Json -ErrorAction Stop)
+        # ReadAllText will detect the encoding of the file automatically
+        # Ref: https://docs.microsoft.com/en-us/dotnet/api/system.io.file.readalltext
+        $content = [System.IO.File]::ReadAllText($file)
+        return ($content | ConvertFrom-Json -ErrorAction Stop)
     } catch {
         Write-Host "ERROR loading $file`: $($_.exception.message)"
     }
@@ -80,7 +83,8 @@ function set_config {
         $scoopConfig.PSObject.Properties.Remove($name)
     }
 
-    ConvertTo-Json $scoopConfig | Set-Content -Path $configFile -Encoding Default
+    # Save config with UTF8NoBOM encoding
+    ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
     return $scoopConfig
 }
 
@@ -1090,6 +1094,22 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
     }
 
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
+}
+
+function Out-UTF8File {
+    param(
+        [Parameter(Mandatory = $True, Position = 0)]
+        [Alias("Path")]
+        [String] $FilePath,
+        [Parameter(ValueFromPipeline = $True)]
+        [PSObject] $InputObject
+    )
+    process {
+        # Ref: https://stackoverflow.com/questions/5596982
+        # Performance Note: `WriteAllLines` throttles memory usage while
+        # `WriteAllText` needs to keep the complete string in memory.
+        [System.IO.File]::WriteAllLines($FilePath, $InputObject)
+    }
 }
 
 ##################
