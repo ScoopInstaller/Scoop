@@ -1,6 +1,6 @@
-#Requires -Version 5.0
+#Requires -Version 5.1
 #Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
-#Requires -Modules @{ ModuleName = 'Pester'; RequiredVersion = '4.10.1' }
+#Requires -Modules @{ ModuleName = 'Pester'; MaximumVersion = '4.99' }
 #Requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
     [String] $TestPath = $(Resolve-Path "$PSScriptRoot\..\")
