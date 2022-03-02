@@ -33,11 +33,7 @@ Describe 'config' -Tag 'Scoop' {
 
         # datetime
         $scoopConfig = set_config 'time' ([System.DateTime]::Parse("2019-03-18T15:22:09.3930000+00:00"))
-        if ($PSVersionTable.PSVersion.Major -lt 6) {
-            $scoopConfig.time | Should -BeOfType [System.String]
-        } else {
-            $scoopConfig.time | Should -BeOfType [System.DateTime]
-        }
+        $scoopConfig.time | Should -BeOfType [System.DateTime]
 
         # non-ASCII
         $scoopConfig = set_config 'unicode' '你好こんにちは'
@@ -53,11 +49,8 @@ Describe 'config' -Tag 'Scoop' {
         $scoopConfig.three | Should -BeFalse
         $scoopConfig.under_line | Should -BeExactly 'four'
         $scoopConfig.five | Should -Be 'not null'
-        if ($PSVersionTable.PSVersion.Major -lt 6) {
-            $scoopConfig.time | Should -BeOfType [System.String]
-        } else {
-            $scoopConfig.time | Should -BeOfType [System.DateTime]
-        }
+        $scoopConfig.time | Should -BeOfType [System.DateTime]
+        $scoopConfig.time | Should -Be ([System.DateTime]::Parse("2019-03-18T15:22:09.3930000+00:00"))
         $scoopConfig.unicode | Should -Be '你好こんにちは'
     }
 
@@ -68,11 +61,8 @@ Describe 'config' -Tag 'Scoop' {
         (get_config 'three') | Should -BeFalse
         (get_config 'under_line') | Should -BeExactly 'four'
         (get_config 'five') | Should -Be 'not null'
-        if ($PSVersionTable.PSVersion.Major -lt 6) {
-            (get_config 'time') | Should -BeOfType [System.String]
-        } else {
-            (get_config 'time') | Should -BeOfType [System.DateTime]
-        }
+        (get_config 'time') | Should -BeOfType [System.DateTime]
+        (get_config 'time') | Should -Be ([System.DateTime]::Parse("2019-03-18T15:22:09.3930000+00:00"))
         (get_config 'unicode') | Should -Be '你好こんにちは'
     }
 
