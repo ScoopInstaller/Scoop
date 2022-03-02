@@ -1,4 +1,4 @@
-name: Tests
+name: Scoop Core CI Tests
 
 on:
   pull_request:
@@ -13,11 +13,14 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 2
-      - name: Init and Test
+      - name: Init Test Suite
+        uses: potatoqualitee/psmodulecache@v4
+        with:
+          modules-to-cache: PSScriptAnalyzer, BuildHelpers, Pester:4.10.1
+          shell: powershell
+      - name: Test Scoop Core
         shell: powershell
-        run: |
-          .\test\bin\init.ps1
-          .\test\bin\test.ps1
+        run: ./test/bin/test.ps1
   test_pwsh:
     name: PowerShell
     runs-on: windows-latest
@@ -26,8 +29,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 2
-      - name: Init and Test
+      - name: Init Test Suite
+        uses: potatoqualitee/psmodulecache@v4
+        with:
+          modules-to-cache: PSScriptAnalyzer, BuildHelpers, Pester:4.10.1
+          shell: pwsh
+      - name: Test Scoop Core
         shell: pwsh
-        run: |
-          .\test\bin\init.ps1
-          .\test\bin\test.ps1
+        run: ./test/bin/test.ps1
