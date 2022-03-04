@@ -23,7 +23,7 @@
     Check MANIFEST and Update if there are some wrong hashes.
 #>
 param(
-    [String] $App = '*',
+    [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -32,12 +32,12 @@ param(
             $true
         }
     })]
-    [String] $Dir,
-    [Switch] $Update,
-    [Switch] $ForceUpdate,
-    [Switch] $SkipCorrect,
+    [string] $Dir,
+    [switch] $Update,
+    [switch] $ForceUpdate,
+    [switch] $SkipCorrect,
     [Alias('k')]
-    [Switch] $UseCache
+    [switch] $UseCache
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -54,7 +54,7 @@ if ($ForceUpdate) { $Update = $true }
 # Cleanup
 if (!$UseCache) { Remove-Item "$cachedir\*HASH_CHECK*" -Force }
 
-function err ([String] $name, [String[]] $message) {
+function err ([string] $name, [string[]] $message) {
     Write-Host "$name`: " -ForegroundColor Red -NoNewline
     Write-Host ($message -join "`r`n") -ForegroundColor Red
 }

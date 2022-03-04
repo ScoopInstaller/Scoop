@@ -29,7 +29,7 @@ if($path -like "$usershims*" -or $path -like "$globalshims*") {
         $exepath = ((Select-String -Path $path -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
     }
 
-    if(![system.io.path]::ispathrooted($exepath)) {
+    if(![System.IO.Path]::IsPathRooted($exepath)) {
         # Expand relative path
         $exepath = Resolve-Path (join-path (Split-Path $path) $exepath)
     }
@@ -40,7 +40,7 @@ if($path -like "$usershims*" -or $path -like "$globalshims*") {
 } elseif($gcm.commandtype -eq 'Alias') {
     scoop which $gcm.resolvedcommandname
 } else {
-    [System.Console]::error.writeline("Not a scoop shim.")
+    [System.Console]::Error.WriteLine("Not a scoop shim.")
     $path
     exit 2
 }

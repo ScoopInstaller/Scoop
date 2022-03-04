@@ -2,7 +2,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; RequiredVersion = '4.10.1' }
 param(
     [ValidateNotNullOrEmpty()]
-    [String]
+    [string]
     $repo_dir = (Split-Path -Path $MyInvocation.PSCommandPath -Parent)
 )
 

@@ -10,18 +10,18 @@ function Get-LatestVersion {
     .PARAMETER Uri
         Remote app manifest's URI
     #>
-    [OutputType([String])]
+    [OutputType([string])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [Alias('App')]
-        [String]
+        [string]
         $AppName,
         [Parameter(Position = 1)]
-        [String]
+        [string]
         $Bucket,
         [Parameter(Position = 2)]
-        [String]
+        [string]
         $Uri
     )
     process {
@@ -38,15 +38,15 @@ function Select-CurrentVersion {
     .PARAMETER Global
         Globally installed application
     #>
-    [OutputType([String])]
+    [OutputType([string])]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [Alias('App')]
-        [String]
+        [string]
         $AppName,
         [Parameter(Position = 1)]
-        [Switch]
+        [switch]
         $Global
     )
     process {
@@ -86,10 +86,10 @@ function Get-InstalledVersion {
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [Alias('App')]
-        [String]
+        [string]
         $AppName,
         [Parameter(Position = 1)]
-        [Switch]
+        [switch]
         $Global
     )
     process {
@@ -126,13 +126,13 @@ function Compare-Version {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [AllowEmptyString()]
-        [String]
+        [string]
         $ReferenceVersion,
         [Parameter(Mandatory = $true, Position = 1, ValueFromPipeline = $true)]
         [AllowEmptyString()]
-        [String]
+        [string]
         $DifferenceVersion,
-        [String]
+        [string]
         $Delimiter = '-'
     )
     process {
@@ -153,7 +153,7 @@ function Compare-Version {
             return 0
         }
 
-        for ($i = 0; $i -lt [System.Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
+        for ($i = 0; $i -lt [Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
             # '1.1-alpha' is less then '1.1'
             if ($i -ge $splitReferenceVersion.Length) {
                 if ($splitDifferenceVersion[$i] -match 'alpha|beta|rc|pre') {
@@ -193,17 +193,17 @@ function Compare-Version {
                 }
             }
 
-            # Don't try to compare [Long] to [String]
+            # Don't try to compare [long] to [string]
             if ($null -ne $splitReferenceVersion[$i] -and $null -ne $splitDifferenceVersion[$i]) {
-                if ($splitReferenceVersion[$i] -is [String] -and $splitDifferenceVersion[$i] -isnot [String]) {
+                if ($splitReferenceVersion[$i] -is [string] -and $splitDifferenceVersion[$i] -isnot [string]) {
                     $splitDifferenceVersion[$i] = "$($splitDifferenceVersion[$i])"
                 }
-                if ($splitDifferenceVersion[$i] -is [String] -and $splitReferenceVersion[$i] -isnot [String]) {
+                if ($splitDifferenceVersion[$i] -is [string] -and $splitReferenceVersion[$i] -isnot [string]) {
                     $splitReferenceVersion[$i] = "$($splitReferenceVersion[$i])"
                 }
             }
 
-            # Compare [String] or [Long]
+            # Compare [string] or [long]
             if ($splitDifferenceVersion[$i] -gt $splitReferenceVersion[$i]) {
                 return 1
             }
@@ -229,14 +229,14 @@ function SplitVersion {
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [AllowEmptyString()]
-        [String]
+        [string]
         $Version,
-        [String]
+        [string]
         $Delimiter = '-'
     )
     process {
         $Version = $Version -replace '[a-zA-Z]+', "$Delimiter$&$Delimiter"
-        return ($Version -split [Regex]::Escape($Delimiter) -ne '' | ForEach-Object { if ($_ -match '^\d+$') { [Long]$_ } else { $_ } })
+        return ($Version -split [regex]::Escape($Delimiter) -ne '' | ForEach-Object { if ($_ -match '^\d+$') { [long]$_ } else { $_ } })
     }
 }
 
@@ -245,7 +245,7 @@ function SplitVersion {
 function qsort($ary, $fn) {
     warn '"qsort" is deprecated. Please avoid using it anymore.'
     if ($null -eq $ary) { return @() }
-    if (!($ary -is [array])) { return @($ary) }
+    if (!($ary -is [Array])) { return @($ary) }
 
     $pivot = $ary[0]
     $rem = $ary[1..($ary.Length - 1)]

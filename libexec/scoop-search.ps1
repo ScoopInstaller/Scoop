@@ -114,7 +114,7 @@ Get-LocalBucket | ForEach-Object {
 
 if (!$local_results -and !(github_ratelimit_reached)) {
     $remote_results = search_remotes $query
-    if(!$remote_results) { [System.Console]::error.writeline("No matches found."); exit 1 }
+    if(!$remote_results) { [System.Console]::Error.WriteLine("No matches found."); exit 1 }
     $remote_results
 }
 

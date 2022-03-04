@@ -2,20 +2,20 @@ function Expand-7zipArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [String]
+        [string]
         $Path,
         [Parameter(Position = 1)]
-        [String]
+        [string]
         $DestinationPath = (Split-Path $Path),
-        [String]
+        [string]
         $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
-        [String]
+        [string]
         $Switches,
         [ValidateSet('All', 'Skip', 'Rename')]
-        [String]
+        [string]
         $Overwrite,
-        [Switch]
+        [switch]
         $Removal
     )
     if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
@@ -71,17 +71,17 @@ function Expand-ZstdArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [String]
+        [string]
         $Path,
         [Parameter(Position = 1)]
-        [String]
+        [string]
         $DestinationPath = (Split-Path $Path),
-        [String]
+        [string]
         $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
-        [String]
+        [string]
         $Switches,
-        [Switch]
+        [switch]
         $Removal
     )
     $ZstdPath = Get-HelperPath -Helper Zstd
@@ -119,17 +119,17 @@ function Expand-MsiArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [String]
+        [string]
         $Path,
         [Parameter(Position = 1)]
-        [String]
+        [string]
         $DestinationPath = (Split-Path $Path),
-        [String]
+        [string]
         $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
-        [String]
+        [string]
         $Switches,
-        [Switch]
+        [switch]
         $Removal
     )
     $DestinationPath = $DestinationPath.TrimEnd('\')
@@ -177,17 +177,17 @@ function Expand-InnoArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [String]
+        [string]
         $Path,
         [Parameter(Position = 1)]
-        [String]
+        [string]
         $DestinationPath = (Split-Path $Path),
-        [String]
+        [string]
         $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
-        [String]
+        [string]
         $Switches,
-        [Switch]
+        [switch]
         $Removal
     )
     $LogPath = "$(Split-Path $Path)\innounp.log"
@@ -217,14 +217,14 @@ function Expand-ZipArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [String]
+        [string]
         $Path,
         [Parameter(Position = 1)]
-        [String]
+        [string]
         $DestinationPath = (Split-Path $Path),
-        [String]
+        [string]
         $ExtractDir,
-        [Switch]
+        [switch]
         $Removal
     )
     if ($ExtractDir) {
@@ -246,15 +246,15 @@ function Expand-DarkArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [String]
+        [string]
         $Path,
         [Parameter(Position = 1)]
-        [String]
+        [string]
         $DestinationPath = (Split-Path $Path),
         [Parameter(ValueFromRemainingArguments = $true)]
-        [String]
+        [string]
         $Switches,
-        [Switch]
+        [switch]
         $Removal
     )
     $LogPath = "$(Split-Path $Path)\dark.log"

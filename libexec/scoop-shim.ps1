@@ -27,7 +27,7 @@
 #                   (NOTICE: USING SINGLE DASH)
 #                   (HINT: To pass arguments like '-g' or '-global' to the shim, use quotes)
 
-param($SubCommand, $ShimName, [Switch]$global)
+param($SubCommand, $ShimName, [switch]$global)
 
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim

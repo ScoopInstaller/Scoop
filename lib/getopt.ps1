@@ -16,7 +16,7 @@ function getopt($argv, $shortopts, $longopts) {
     }
 
     function regex_escape($str) {
-        return [regex]::escape($str)
+        return [regex]::Escape($str)
     }
 
     # ensure these are arrays
@@ -27,7 +27,7 @@ function getopt($argv, $shortopts, $longopts) {
         $arg = $argv[$i]
         if ($null -eq $arg) { continue }
         # don't try to parse array arguments
-        if ($arg -is [array]) { $rem += , $arg; continue }
+        if ($arg -is [Array]) { $rem += , $arg; continue }
         if ($arg -is [int]) { $rem += $arg; continue }
         if ($arg -is [decimal]) { $rem += $arg; continue }
 

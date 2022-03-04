@@ -6,7 +6,7 @@ Describe 'config' -Tag 'Scoop' {
         if (Test-Path $configFile) {
             Remove-Item -Path $configFile -Force
         }
-        $unicode = [Regex]::Unescape('\u4f60\u597d\u3053\u3093\u306b\u3061\u306f') # 你好こんにちは
+        $unicode = [regex]::Unescape('\u4f60\u597d\u3053\u3093\u306b\u3061\u306f') # 你好こんにちは
     }
 
     BeforeEach {

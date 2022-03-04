@@ -5,7 +5,7 @@ TODO
 . "$PSScriptRoot\core.ps1"
 . "$PSScriptRoot\json.ps1"
 
-function find_hash_in_rdf([String] $url, [String] $basename) {
+function find_hash_in_rdf([string] $url, [string] $basename) {
     $data = $null
     try {
         # Download and parse RDF XML file
@@ -20,12 +20,12 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
     }
 
     # Find file content
-    $digest = $data.RDF.Content | Where-Object { [String]$_.about -eq $basename }
+    $digest = $data.RDF.Content | Where-Object { [string]$_.about -eq $basename }
 
     return format_hash $digest.sha256
 }
 
-function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex) {
+function find_hash_in_textfile([string] $url, [Hashtable] $substitutions, [string] $regex) {
     $hashfile = $null
 
     $templates = @{
@@ -87,7 +87,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     return format_hash $hash
 }
 
-function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $jsonpath) {
+function find_hash_in_json([string] $url, [Hashtable] $substitutions, [string] $jsonpath) {
     $json = $null
 
     try {
@@ -107,7 +107,7 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
     return format_hash $hash
 }
 
-function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $xpath) {
+function find_hash_in_xml([string] $url, [Hashtable] $substitutions, [string] $xpath) {
     $xml = $null
 
     try {
@@ -139,7 +139,7 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
     return format_hash $hash
 }
 
-function find_hash_in_headers([String] $url) {
+function find_hash_in_headers([string] $url) {
     $hash = $null
 
     try {
@@ -166,7 +166,7 @@ function find_hash_in_headers([String] $url) {
     return format_hash $hash
 }
 
-function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
+function get_hash_for_app([string] $app, $config, [string] $version, [string] $url, [Hashtable] $substitutions) {
     $hash = $null
 
     $hashmode = $config.mode
@@ -309,14 +309,14 @@ function Update-ManifestProperty {
         [PSCustomObject]
         $Manifest,
         [Parameter(ValueFromPipeline = $true, Position = 2)]
-        [String[]]
+        [string[]]
         $Property,
-        [String]
+        [string]
         $AppName,
-        [String]
+        [string]
         $Version,
         [Alias('Matches')]
-        [HashTable]
+        [Hashtable]
         $Substitutions
     )
     begin {
@@ -381,7 +381,7 @@ function Update-ManifestProperty {
 
 function Get-VersionSubstitution {
     param (
-        [String]
+        [string]
         $Version,
         [Hashtable]
         $CustomMatches
@@ -417,13 +417,13 @@ function Get-VersionSubstitution {
 
 function Invoke-AutoUpdate {
     param (
-        [String]
+        [string]
         $AppName,
-        [String]
+        [string]
         $Path,
         [PSObject]
         $Manifest,
-        [String]
+        [string]
         $Version,
         [Hashtable]
         $CustomMatches
@@ -503,7 +503,7 @@ function PropertyHelper {
     } else {
         switch ($Property.GetType().Name) {
             'String' {
-                $Value = $Value -as [String]
+                $Value = $Value -as [string]
                 if ($null -ne $Value) {
                     $Property = $Value
                     $hasChanged = $true
@@ -555,15 +555,15 @@ function HashHelper {
             Hash values (multi URLs)
     #>
     param (
-        [String]
+        [string]
         $AppName,
-        [String]
+        [string]
         $Version,
         [PSObject[]]
         $HashExtraction,
-        [String[]]
+        [string[]]
         $URL,
-        [HashTable]
+        [Hashtable]
         $Substitutions
     )
     $hash = @()

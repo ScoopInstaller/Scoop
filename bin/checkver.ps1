@@ -49,7 +49,7 @@
     Check manifest APP.json inside ./DIR directory and update if there is newer version.
 #>
 param(
-    [String] $App = '*',
+    [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -58,11 +58,11 @@ param(
             $true
         }
     })]
-    [String] $Dir,
-    [Switch] $Update,
-    [Switch] $ForceUpdate,
-    [Switch] $SkipUpdated,
-    [String] $Version = ''
+    [string] $Dir,
+    [switch] $Update,
+    [switch] $ForceUpdate,
+    [switch] $SkipUpdated,
+    [string] $Version = ''
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -156,7 +156,7 @@ $Queue | ForEach-Object {
         $xpath = $json.checkver.xpath
     }
 
-    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
+    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [string]) {
         $replace = $json.checkver.replace
     }
 
@@ -233,7 +233,7 @@ while ($in_progress -gt 0) {
 
         if ($jsonpath) {
             # Return only a single value if regex is absent
-            $noregex = [String]::IsNullOrEmpty($regex)
+            $noregex = [string]::IsNullOrEmpty($regex)
             # If reverse is ON and regex is ON,
             # Then reverse would have no effect because regex handles reverse
             # on its own

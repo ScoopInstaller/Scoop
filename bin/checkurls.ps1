@@ -12,7 +12,7 @@
     Manifests will all valid URLs will not be shown.
 #>
 param(
-    [String] $App = '*',
+    [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -21,9 +21,9 @@ param(
             $true
         }
     })]
-    [String] $Dir,
-    [Int] $Timeout = 5,
-    [Switch] $SkipValid
+    [string] $Dir,
+    [int] $Timeout = 5,
+    [switch] $SkipValid
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -49,7 +49,7 @@ Write-Host 'F' -NoNewline -ForegroundColor Red
 Write-Host ']ailed'
 Write-Host ' |  |  |'
 
-function test_dl([String] $url, $cookies) {
+function test_dl([string] $url, $cookies) {
     # Trim renaming suffix, prevent getting 40x response
     $url = ($url -split '#/')[0]
 

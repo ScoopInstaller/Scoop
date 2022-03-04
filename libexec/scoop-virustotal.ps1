@@ -133,7 +133,7 @@ Function Submit-RedirectedUrl {
     # Adapted to always return an URL
     Param (
         [Parameter(Mandatory=$true)]
-        [String]$URL
+        [string]$URL
     )
     $request = [System.Net.WebRequest]::Create($url)
     $request.AllowAutoRedirect=$false

@@ -306,7 +306,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         Invoke-Expression $aria2 | ForEach-Object {
             # Skip blank lines
-            if ([String]::IsNullOrWhiteSpace($_)) { return }
+            if ([string]::IsNullOrWhiteSpace($_)) { return }
 
             # Prevent potential overlaping of text when one line is shorter
             $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
@@ -388,7 +388,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split "#")[0]
-    $wreq = [System.Net.WebRequest]::create($reqUrl)
+    $wreq = [System.Net.WebRequest]::Create($reqUrl)
     if ($wreq -is [System.Net.HttpWebRequest]) {
         $wreq.useragent = Get-UserAgent
         if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
@@ -488,7 +488,7 @@ function dl_progress_output($url, $read, $total, $console) {
     $filename = url_remote_filename $url
 
     # calculate current percentage done
-    $p = [System.Math]::Round($read / $total * 100, 0)
+    $p = [Math]::Round($read / $total * 100, 0)
 
     # pre-generate LHS and RHS of progress string
     # so we know how much space we have
@@ -499,7 +499,7 @@ function dl_progress_output($url, $read, $total, $console) {
     $midwidth = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
 
     # calculate how many characters are completed
-    $completed = [System.Math]::Abs([System.Math]::Round(($p / 100) * $midwidth, 0) - 1)
+    $completed = [Math]::Abs([Math]::Round(($p / 100) * $midwidth, 0) - 1)
 
     # generate dashes to symbolise completed
     if ($completed -gt 1) {
@@ -672,7 +672,7 @@ function hash_for_url($manifest, $url, $arch) {
 
     $urls = @(script:url $manifest $arch)
 
-    $index = [array]::IndexOf($urls, $url)
+    $index = [Array]::IndexOf($urls, $url)
     if ($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
 
     @($hashes)[$index]
@@ -719,7 +719,7 @@ function compute_hash($file, $algname) {
         if (Test-CommandAvailable Get-FileHash) {
             return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
-            $fs = [System.IO.File]::openread($file)
+            $fs = [System.IO.File]::OpenRead($file)
             $alg = [System.Security.Cryptography.HashAlgorithm]::Create($algname)
             $hexbytes = $alg.ComputeHash($fs) | ForEach-Object { $_.ToString('x2') }
             return [string]::Join('', $hexbytes)
@@ -869,7 +869,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
 # get target, name, arguments for shim
 function shim_def($item) {
-    if ($item -is [array]) { return $item }
+    if ($item -is [Array]) { return $item }
     return $item, (strip_ext (fname $item)), $null
 }
 
@@ -1162,7 +1162,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
     if ($persist) {
         $persist_dir = ensure $persist_dir
 
-        if ($persist -is [String]) {
+        if ($persist -is [string]) {
             $persist = @($persist);
         }
 

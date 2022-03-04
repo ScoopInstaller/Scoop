@@ -24,11 +24,11 @@ function Get-Dependency {
         [PSObject]
         $AppName,
         [Parameter(Mandatory = $true, Position = 1)]
-        [String]
+        [string]
         $Architecture,
-        [String[]]
+        [string[]]
         $Resolved = @(),
-        [String[]]
+        [string[]]
         $Unresolved = @()
     )
     process {
@@ -89,9 +89,9 @@ function Get-InstallationHelper {
         [PSObject]
         $Manifest,
         [Parameter(Mandatory = $true, Position = 1)]
-        [String]
+        [string]
         $Architecture,
-        [Switch]
+        [switch]
         $All
     )
     begin {
@@ -137,7 +137,7 @@ function Test-7zipRequirement {
     param (
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [String[]]
+        [string[]]
         $Uri
     )
     return ($Uri | Where-Object {
@@ -151,7 +151,7 @@ function Test-ZstdRequirement {
     param (
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [String[]]
+        [string[]]
         $Uri
     )
     return ($Uri | Where-Object { $_ -match '\.zst$' }).Count -gt 0
@@ -163,7 +163,7 @@ function Test-LessmsiRequirement {
     param (
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [String[]]
+        [string[]]
         $Uri
     )
     return ($Uri | Where-Object { $_ -match '\.msi$' }).Count -gt 0

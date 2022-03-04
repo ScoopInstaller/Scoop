@@ -15,18 +15,18 @@ function ConvertToPrettyJson {
         $data = normalize_values $data
 
         # convert to string
-        [String]$json = $data | ConvertTo-Json -Depth 8 -Compress
-        [String]$output = ''
+        [string]$json = $data | ConvertTo-Json -Depth 8 -Compress
+        [string]$output = ''
 
         # state
-        [String]$buffer = ''
-        [Int]$depth = 0
-        [Bool]$inString = $false
+        [string]$buffer = ''
+        [int]$depth = 0
+        [bool]$inString = $false
 
         # configuration
-        [String]$indent = ' ' * 4
-        [Bool]$unescapeString = $true
-        [String]$eol = "`r`n"
+        [string]$indent = ' ' * 4
+        [bool]$unescapeString = $true
+        [string]$eol = "`r`n"
 
         for ($i = 0; $i -lt $json.Length; $i++) {
             # read current char
@@ -92,7 +92,7 @@ function ConvertToPrettyJson {
     }
 }
 
-function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitutions, [Boolean] $reverse, [Boolean] $single) {
+function json_path([string] $json, [string] $jsonpath, [Hashtable] $substitutions, [Boolean] $reverse, [Boolean] $single) {
     Add-Type -Path "$PSScriptRoot\..\supporting\validator\bin\Newtonsoft.Json.dll"
     if ($null -ne $substitutions) {
         $jsonpath = substitute $jsonpath $substitutions ($jsonpath -like "*=~*")
@@ -114,7 +114,7 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
             # Convert first value to string
             $result = $result.ToString()
         } else {
-            $result = "$([String]::Join('\n', $result))"
+            $result = "$([string]::Join('\n', $result))"
         }
         return $result
     } catch [Exception] {
@@ -124,7 +124,7 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
     return $null
 }
 
-function json_path_legacy([String] $json, [String] $jsonpath, [Hashtable] $substitutions) {
+function json_path_legacy([string] $json, [string] $jsonpath, [Hashtable] $substitutions) {
     $result = $json | ConvertFrom-Json -ErrorAction Stop
     $isJsonPath = $jsonpath.StartsWith('$')
     $jsonpath.Split('.') | ForEach-Object {
@@ -168,7 +168,7 @@ function normalize_values([psobject] $json) {
         }
 
         # Process String Values
-        if ($_.Value -is [String]) {
+        if ($_.Value -is [string]) {
 
             # Split on new lines
             [Array] $parts = ($_.Value -split '\r?\n').Trim()

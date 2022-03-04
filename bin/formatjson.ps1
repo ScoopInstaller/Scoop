@@ -15,7 +15,7 @@
     Format manifest '7zip' inside bucket directory.
 #>
 param(
-    [String] $App = '*',
+    [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -24,7 +24,7 @@ param(
             $true
         }
     })]
-    [String] $Dir
+    [string] $Dir
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"

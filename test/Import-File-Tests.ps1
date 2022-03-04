@@ -1,4 +1,4 @@
-if ([String]::IsNullOrEmpty($MyInvocation.PSScriptRoot)) {
+if ([string]::IsNullOrEmpty($MyInvocation.PSScriptRoot)) {
     Write-Error 'This script should not be called directly! It has to be imported from a buckets test file!'
     exit 1
 }
@@ -33,7 +33,7 @@ Describe 'Style constraints for non-binary project files' {
                 } else {
                     $content = ([char[]](Get-Content $file.FullName -Encoding byte -TotalCount 3) -join '')
                 }
-                if ([regex]::match($content, '(?ms)^\xEF\xBB\xBF').success) {
+                if ([regex]::Match($content, '(?ms)^\xEF\xBB\xBF').success) {
                     $file.FullName
                 }
             }
@@ -70,11 +70,11 @@ Describe 'Style constraints for non-binary project files' {
                 if (!$content) {
                     throw "File contents are null: $($file.FullName)"
                 }
-                $lines = [regex]::split($content, '\r\n')
+                $lines = [regex]::Split($content, '\r\n')
                 $lineCount = $lines.Count
 
                 for ($i = 0; $i -lt $lineCount; $i++) {
-                    if ( [regex]::match($lines[$i], '\r|\n').success ) {
+                    if ( [regex]::Match($lines[$i], '\r|\n').success ) {
                         $file.FullName
                         break
                     }

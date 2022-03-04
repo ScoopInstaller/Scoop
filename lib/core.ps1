@@ -29,7 +29,7 @@ function Show-DeprecatedWarning {
     .PARAMETER New
         New command name.
     #>
-    param($Invocation, [String] $New)
+    param($Invocation, [string] $New)
 
     warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
     Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
@@ -163,7 +163,7 @@ function debug($obj) {
     if ($msg.GetType() -eq [System.Object[]]) {
         Write-Host "$prefix $param ($($obj.GetType()))" -ForegroundColor DarkCyan -NoNewline
         Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -ForegroundColor DarkGray
-        $msg | Where-Object { ![String]::IsNullOrWhiteSpace($_) } |
+        $msg | Where-Object { ![string]::IsNullOrWhiteSpace($_) } |
         Select-Object -Skip 2 | # Skip headers
         ForEach-Object {
             Write-Host "$prefix $param.$($_)" -ForegroundColor DarkCyan
@@ -176,9 +176,9 @@ function debug($obj) {
 function success($msg) { Write-Host $msg -ForegroundColor DarkGreen }
 
 function filesize($length) {
-    $gb = [System.Math]::Pow(2, 30)
-    $mb = [System.Math]::Pow(2, 20)
-    $kb = [System.Math]::Pow(2, 10)
+    $gb = [Math]::Pow(2, 30)
+    $mb = [Math]::Pow(2, 20)
+    $kb = [Math]::Pow(2, 10)
 
     if ($length -gt $gb) {
         "{0:n1} GB" -f ($length / $gb)
@@ -213,7 +213,7 @@ function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
 
 # apps
-function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
+function sanitary_path($path) { return [regex]::Replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global) {
     # Dependencies of the format "bucket/dependency" install in a directory of form
     # "dependency". So we need to extract the bucket from the name and only give the app
@@ -243,13 +243,13 @@ function file_path($app, $file) {
 
 function Get-AppFilePath {
     [CmdletBinding()]
-    [OutputType([String])]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
-        [String]
+        [string]
         $App,
         [Parameter(Mandatory = $true, Position = 1)]
-        [String]
+        [string]
         $File
     )
 
@@ -271,18 +271,18 @@ function Get-AppFilePath {
 
 Function Test-CommandAvailable {
     param (
-        [String]$Name
+        [string]$Name
     )
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
 function Get-HelperPath {
     [CmdletBinding()]
-    [OutputType([String])]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
-        [String]
+        [string]
         $Helper
     )
     begin {
@@ -292,7 +292,7 @@ function Get-HelperPath {
         switch ($Helper) {
             '7zip' {
                 $HelperPath = Get-AppFilePath '7zip' '7z.exe'
-                if ([String]::IsNullOrEmpty($HelperPath)) {
+                if ([string]::IsNullOrEmpty($HelperPath)) {
                     $HelperPath = Get-AppFilePath '7zip-zstd' '7z.exe'
                 }
             }
@@ -300,7 +300,7 @@ function Get-HelperPath {
             'Innounp' { $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe' }
             'Dark' {
                 $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
-                if ([String]::IsNullOrEmpty($HelperPath)) {
+                if ([string]::IsNullOrEmpty($HelperPath)) {
                     $HelperPath = Get-AppFilePath 'wixtoolset' 'dark.exe'
                 }
             }
@@ -317,11 +317,11 @@ function Test-HelperInstalled {
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
-        [String]
+        [string]
         $Helper
     )
 
-    return ![String]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
+    return ![string]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
 }
 
 function Test-Aria2Enabled {
@@ -377,7 +377,7 @@ function appname_from_url($url) {
 # paths
 function fname($path) { Split-Path $path -Leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
-function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
+function strip_filename($path) { $path -replace [regex]::Escape((fname $path)) }
 function strip_fragment($url) { $url -replace (New-Object System.Uri $url).Fragment }
 
 function url_filename($url) {
@@ -410,7 +410,7 @@ function relpath($path) { "$($myinvocation.PSScriptRoot)\$path" } # relative to 
 function friendly_path($path) {
     $h = (Get-PSProvider 'FileSystem').Home; if (!$h.EndsWith('\')) { $h += '\' }
     if ($h -eq '\') { return $path }
-    return "$path" -replace ([regex]::escape($h)), "~\"
+    return "$path" -replace ([regex]::Escape($h)), "~\"
 }
 function is_local($path) {
     ($path -notmatch '^https?://') -and (Test-Path $path)
@@ -430,24 +430,24 @@ function Invoke-ExternalCommand {
         [Parameter(Mandatory = $true, Position = 0)]
         [Alias("Path")]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [string]
         $FilePath,
         [Parameter(Position = 1)]
         [Alias("Args")]
-        [String[]]
+        [string[]]
         $ArgumentList,
         [Parameter(ParameterSetName = "UseShellExecute")]
-        [Switch]
+        [switch]
         $RunAs,
         [Alias("Msg")]
-        [String]
+        [string]
         $Activity,
         [Alias("cec")]
         [Hashtable]
         $ContinueExitCodes,
         [Parameter(ParameterSetName = "Default")]
         [Alias("Log")]
-        [String]
+        [string]
         $LogPath
     )
     if ($Activity) {
@@ -536,7 +536,7 @@ function isFileLocked([string]$path) {
     }
 }
 
-function is_directory([String] $path) {
+function is_directory([string] $path) {
     return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
 }
 
@@ -569,9 +569,9 @@ function movedir($from, $to) {
 }
 
 function get_app_name($path) {
-    if ((Test-Path (appsdir $false)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $false))))[/\\]([^/\\]+)")) {
+    if ((Test-Path (appsdir $false)) -and ($path -match "$([regex]::Escape($(Convert-Path (appsdir $false))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
-    } elseif ((Test-Path (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $true))))[/\\]([^/\\]+)")) {
+    } elseif ((Test-Path (appsdir $true)) -and ($path -match "$([regex]::Escape($(Convert-Path (appsdir $true))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
     } else {
         $appName = ''
@@ -765,7 +765,7 @@ function search_in_path($target) {
 function ensure_in_path($dir, $global) {
     $path = env 'PATH' $global
     $dir = fullpath $dir
-    if ($path -notmatch [regex]::escape($dir)) {
+    if ($path -notmatch [regex]::Escape($dir)) {
         Write-Output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
 
         env 'PATH' $global "$dir;$path" # for future sessions...
@@ -790,9 +790,9 @@ function Confirm-InstallationStatus {
     [OutputType([Object[]])]
     param(
         [Parameter(Mandatory = $true)]
-        [String[]]
+        [string[]]
         $Apps,
-        [Switch]
+        [switch]
         $Global
     )
     $Installed = @()
@@ -960,7 +960,7 @@ function last_scoop_update() {
     # PowerShell 6 returns an DateTime Object
     $last_update = (scoop config lastupdate)
 
-    if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
+    if ($null -ne $last_update -and $last_update.GetType() -eq [string]) {
         try {
             $last_update = [System.DateTime]::Parse($last_update)
         } catch {
@@ -981,7 +981,7 @@ function is_scoop_outdated() {
     return $last_update.AddHours(3) -lt $now.ToLocalTime()
 }
 
-function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
+function substitute($entity, [Hashtable] $params, [bool]$regexEscape = $false) {
     $newentity = $entity
     if ($null -ne $newentity) {
         switch ($entity.GetType().Name) {
@@ -990,7 +990,7 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
                     if ($regexEscape -eq $false -or $null -eq $_.Value) {
                         $newentity = $newentity.Replace($_.Name, $_.Value)
                     } else {
-                        $newentity = $newentity.Replace($_.Name, [Regex]::Escape($_.Value))
+                        $newentity = $newentity.Replace($_.Name, [regex]::Escape($_.Value))
                     }
                 }
             }
@@ -1005,7 +1005,7 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
     return $newentity
 }
 
-function format_hash([String] $hash) {
+function format_hash([string] $hash) {
     $hash = $hash.ToLower()
     switch ($hash.Length) {
         32 { $hash = "md5:$hash" } # md5
@@ -1017,7 +1017,7 @@ function format_hash([String] $hash) {
     return $hash
 }
 
-function format_hash_aria2([String] $hash) {
+function format_hash_aria2([string] $hash) {
     $hash = $hash -split ':' | Select-Object -Last 1
     switch ($hash.Length) {
         32 { $hash = "md5=$hash" } # md5
@@ -1029,7 +1029,7 @@ function format_hash_aria2([String] $hash) {
     return $hash
 }
 
-function get_hash([String] $multihash) {
+function get_hash([string] $multihash) {
     $type, $hash = $multihash -split ':'
     if (!$hash) {
         # no type specified, assume sha256
@@ -1095,7 +1095,7 @@ function Out-UTF8File {
     param(
         [Parameter(Mandatory = $True, Position = 0)]
         [Alias("Path")]
-        [String] $FilePath,
+        [string] $FilePath,
         [Parameter(ValueFromPipeline = $True)]
         [PSObject] $InputObject
     )
@@ -1116,17 +1116,17 @@ function Out-UTF8File {
 Optimize-SecurityProtocol
 
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [string]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [string]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop cache directory
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [string]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop config file migration
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1

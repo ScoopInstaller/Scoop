@@ -85,7 +85,7 @@ function arch_specific($prop, $manifest, $architecture) {
 }
 
 function supports_architecture($manifest, $architecture) {
-    return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
+    return -not [string]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
 }
 
 function generate_user_manifest($app, $bucket, $version) {
