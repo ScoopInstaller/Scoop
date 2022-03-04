@@ -488,7 +488,7 @@ function dl_progress_output($url, $read, $total, $console) {
     $filename = url_remote_filename $url
 
     # calculate current percentage done
-    $p = [math]::Round($read / $total * 100, 0)
+    $p = [System.Math]::Round($read / $total * 100, 0)
 
     # pre-generate LHS and RHS of progress string
     # so we know how much space we have
@@ -499,7 +499,7 @@ function dl_progress_output($url, $read, $total, $console) {
     $midwidth  = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
 
     # calculate how many characters are completed
-    $completed = [math]::Abs([math]::Round(($p / 100) * $midwidth, 0) - 1)
+    $completed = [System.Math]::Abs([System.Math]::Round(($p / 100) * $midwidth, 0) - 1)
 
     # generate dashes to symbolise completed
     if ($completed -gt 1) {

@@ -153,7 +153,7 @@ function Compare-Version {
             return 0
         }
 
-        for ($i = 0; $i -lt [Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
+        for ($i = 0; $i -lt [System.Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
             # '1.1-alpha' is less then '1.1'
             if ($i -ge $splitReferenceVersion.Length) {
                 if ($splitDifferenceVersion[$i] -match 'alpha|beta|rc|pre') {
