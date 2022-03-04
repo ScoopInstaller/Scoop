@@ -2,7 +2,7 @@
 . "$PSScriptRoot\buckets.ps1"
 
 function nightly_version($date, $quiet = $false) {
-    $date_str = $date.tostring("yyyyMMdd")
+    $date_str = $date.ToString("yyyyMMdd")
     if (!$quiet) {
         warn "This is a nightly version. Downloaded files won't be verified."
     }
