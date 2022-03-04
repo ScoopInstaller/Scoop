@@ -33,7 +33,7 @@ Describe 'Style constraints for non-binary project files' {
                 } else {
                     $content = ([char[]](Get-Content $file.FullName -Encoding byte -TotalCount 3) -join '')
                 }
-                if ([regex]::Match($content, '(?ms)^\xEF\xBB\xBF').success) {
+                if ([regex]::Match($content, '(?ms)^\xEF\xBB\xBF').Success) {
                     $file.FullName
                 }
             }
@@ -74,7 +74,7 @@ Describe 'Style constraints for non-binary project files' {
                 $lineCount = $lines.Count
 
                 for ($i = 0; $i -lt $lineCount; $i++) {
-                    if ( [regex]::Match($lines[$i], '\r|\n').success ) {
+                    if ( [regex]::Match($lines[$i], '\r|\n').Success ) {
                         $file.FullName
                         break
                     }

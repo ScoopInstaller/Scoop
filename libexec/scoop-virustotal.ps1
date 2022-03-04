@@ -133,7 +133,7 @@ Function Submit-RedirectedUrl {
     # Adapted to always return an URL
     Param (
         [Parameter(Mandatory=$true)]
-        [string]$URL
+        [string] $URL
     )
     $request = [System.Net.WebRequest]::Create($url)
     $request.AllowAutoRedirect=$false
@@ -208,7 +208,6 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
 
 $apps | ForEach-Object {
     $app = $_
-    # Write-Host $app
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO

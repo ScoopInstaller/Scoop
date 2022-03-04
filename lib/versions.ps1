@@ -245,7 +245,7 @@ function SplitVersion {
 function qsort($ary, $fn) {
     warn '"qsort" is deprecated. Please avoid using it anymore.'
     if ($null -eq $ary) { return @() }
-    if (!($ary -is [Array])) { return @($ary) }
+    if (!($ary -is [array])) { return @($ary) }
 
     $pivot = $ary[0]
     $rem = $ary[1..($ary.Length - 1)]

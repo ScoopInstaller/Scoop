@@ -645,7 +645,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 function cookie_header($cookies) {
     if (!$cookies) { return }
 
-    $vals = $cookies.psobject.properties | ForEach-Object {
+    $vals = $cookies.PSObject.Properties | ForEach-Object {
         "$($_.Name)=$($_.Value)"
     }
 
@@ -672,7 +672,7 @@ function hash_for_url($manifest, $url, $arch) {
 
     $urls = @(script:url $manifest $arch)
 
-    $index = [Array]::IndexOf($urls, $url)
+    $index = [array]::IndexOf($urls, $url)
     if ($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
 
     @($hashes)[$index]
@@ -869,7 +869,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
 # get target, name, arguments for shim
 function shim_def($item) {
-    if ($item -is [Array]) { return $item }
+    if ($item -is [array]) { return $item }
     return $item, (strip_ext (fname $item)), $null
 }
 
@@ -1011,7 +1011,7 @@ function env_add_path($manifest, $dir, $global, $arch) {
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
         # GH-3785: Add path in ascending order.
-        [Array]::Reverse($env_add_path)
+        [array]::Reverse($env_add_path)
         $env_add_path | Where-Object { $_ } | ForEach-Object {
             if ($_ -eq '.') {
                 $path_dir = $dir
@@ -1142,7 +1142,7 @@ function show_suggestions($suggested) {
 
 # Persistent data
 function persist_def($persist) {
-    if ($persist -is [Array]) {
+    if ($persist -is [array]) {
         $source = $persist[0]
         $target = $persist[1]
     } else {

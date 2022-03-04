@@ -171,7 +171,7 @@ function normalize_values([psobject] $json) {
         if ($_.Value -is [string]) {
 
             # Split on new lines
-            [Array] $parts = ($_.Value -split '\r?\n').Trim()
+            [array]$parts = ($_.Value -split '\r?\n').Trim()
 
             # Replace with string array if result is multiple lines
             if ($parts.Count -gt 1) {
@@ -180,11 +180,11 @@ function normalize_values([psobject] $json) {
         }
 
         # Convert single value array into string
-        if ($_.Value -is [Array]) {
+        if ($_.Value -is [array]) {
             # Array contains only 1 element String or Array
             if ($_.Value.Count -eq 1) {
                 # Array
-                if ($_.Value[0] -is [Array]) {
+                if ($_.Value[0] -is [array]) {
                     $_.Value = $_.Value
                 } else {
                     # String
