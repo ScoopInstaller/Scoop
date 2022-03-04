@@ -18,6 +18,7 @@
 
 - **autoupdate:** Allow checksum file that contains whitespaces ([#4619](https://github.com/ScoopInstaller/Scoop/issues/4619))
 - **autoupdate:** Rename $response to $res ([#4706](https://github.com/ScoopInstaller/Scoop/issues/4706))
+- **config:** Ensure manipulating config with UTF8 encoding ([#4644](https://github.com/ScoopInstaller/Scoop/issues/4644))
 - **config:** Allow scoop config use Unicode characters ([#4631](https://github.com/ScoopInstaller/Scoop/issues/4631))
 - **config:** Fix `set_config` bugs ([#3681](https://github.com/ScoopInstaller/Scoop/issues/3681))
 - **current:** Remove 'current' while it's not a junction ([#4687](https://github.com/ScoopInstaller/Scoop/issues/4687))

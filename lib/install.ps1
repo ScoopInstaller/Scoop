@@ -289,7 +289,9 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
     if (-not($download_finished)) {
         # write aria2 input file
         if ($urlstxt_content -ne '') {
-            Set-Content -Path $urlstxt $urlstxt_content
+            ensure $cachedir | Out-Null
+            # Write aria2 input-file with UTF8NoBOM encoding
+            $urlstxt_content | Out-UTF8File -FilePath $urlstxt
         }
 
         # build aria2 command
@@ -297,6 +299,10 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         # handle aria2 console output
         Write-Host 'Starting download with aria2 ...'
+
+        # Set console output encoding to UTF8 for non-ASCII characters printing
+        $oriConsoleEncoding = [Console]::OutputEncoding
+        [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
         Invoke-Expression $aria2 | ForEach-Object {
             # Skip blank lines
@@ -333,6 +339,9 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
             Remove-Item $urlstxt -Force -ErrorAction SilentlyContinue
             Remove-Item "$($data.$url.source).aria2*" -Force -ErrorAction SilentlyContinue
         }
+
+        # Revert console encoding
+        [Console]::OutputEncoding = $oriConsoleEncoding
     }
 
     foreach ($url in $urls) {
