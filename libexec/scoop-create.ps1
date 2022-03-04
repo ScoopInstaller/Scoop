@@ -41,7 +41,7 @@ function file_name($segment) {
 
 function parse_url($url) {
     $uri = New-Object Uri $url
-    $uri.pathandquery.substring(1).split('/')
+    $uri.pathandquery.substring(1).Split('/')
 }
 
 function choose_item($list, $query) {

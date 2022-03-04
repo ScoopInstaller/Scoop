@@ -41,5 +41,5 @@ function compute_hash($file, $algname) {
             default { $result = (sha256sum -b $file) }
         }
     }
-    return $result.split(' ') | Select-Object -First 1
+    return $result.Split(' ') | Select-Object -First 1
 }

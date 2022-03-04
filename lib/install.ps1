@@ -995,7 +995,7 @@ function find_dir_or_subdir($path, $dir) {
     $dir = $dir.TrimEnd('\')
     $fixed = @()
     $removed = @()
-    $path.split(';') | ForEach-Object {
+    $path.Split(';') | ForEach-Object {
         if($_) {
             if(($_ -eq $dir) -or ($_ -like "$dir\*")) { $removed += $_ }
             else { $fixed += $_ }
