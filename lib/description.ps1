@@ -50,10 +50,10 @@ function meta_tags($html) {
     $tags = @()
     $meta = ([regex]'<meta [^>]+>').matches($html)
     $meta | ForEach-Object {
-        $attrs = ([regex]'([\w-]+)="([^"]+)"').matches($_.value)
+        $attrs = ([regex]'([\w-]+)="([^"]+)"').matches($_.Value)
         $hash = @{}
         $attrs | ForEach-Object {
-            $hash[$_.groups[1].value] = $_.groups[2].value
+            $hash[$_.Groups[1].Value] = $_.Groups[2].Value
         }
         $tags += $hash
     }
