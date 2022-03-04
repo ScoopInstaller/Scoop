@@ -505,7 +505,7 @@ function Invoke-ExternalCommand {
 }
 
 function dl($url,$to) {
-    $wc = New-Object Net.Webclient
+    $wc = New-Object System.Net.WebClient
     $wc.headers.add('Referer', (strip_filename $url))
     $wc.Headers.Add('User-Agent', (Get-UserAgent))
     $wc.downloadFile($url,$to)

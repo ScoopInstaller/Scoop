@@ -13,7 +13,7 @@ function parse_json($path) {
 function url_manifest($url) {
     $str = $null
     try {
-        $wc = New-Object Net.Webclient
+        $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $str = $wc.DownloadString($url)
     } catch [system.management.automation.methodinvocationexception] {
@@ -32,7 +32,7 @@ function manifest($app, $bucket, $url) {
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
     if($url) {
-        $wc = New-Object Net.Webclient
+        $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $wc.DownloadString($url) > "$dir\manifest.json"
     } else {

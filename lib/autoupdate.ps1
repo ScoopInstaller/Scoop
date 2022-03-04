@@ -9,7 +9,7 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
     $data = $null
     try {
         # Download and parse RDF XML file
-        $wc = New-Object Net.Webclient
+        $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         [xml]$data = $wc.DownloadString($url)
@@ -38,7 +38,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     }
 
     try {
-        $wc = New-Object Net.Webclient
+        $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $hashfile = $wc.DownloadString($url)
@@ -91,7 +91,7 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
     $json = $null
 
     try {
-        $wc = New-Object Net.Webclient
+        $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $json = $wc.DownloadString($url)
@@ -111,7 +111,7 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
     $xml = $null
 
     try {
-        $wc = New-Object Net.Webclient
+        $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $xml = [xml]$wc.DownloadString($url)

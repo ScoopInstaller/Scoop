@@ -104,7 +104,7 @@ $Queue | ForEach-Object {
 
     $substitutions = Get-VersionSubstitution $json.version
 
-    $wc = New-Object Net.Webclient
+    $wc = New-Object System.Net.WebClient
     if ($json.checkver.useragent) {
         $wc.Headers.Add('User-Agent', (substitute $json.checkver.useragent $substitutions))
     } else {

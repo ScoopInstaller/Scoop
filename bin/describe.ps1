@@ -42,7 +42,7 @@ $Queue | ForEach-Object {
     }
     # get description from homepage
     try {
-        $wc = New-Object Net.Webclient
+        $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $home_html = $wc.DownloadString($manifest.homepage)
     } catch {
