@@ -886,7 +886,7 @@ function pluralize($count, $singular, $plural) {
 }
 
 function reset_alias($name, $value) {
-    if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
+    if($existing = get-alias $name -ErrorAction Ignore | Where-Object { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
             Write-Host "Alias $name is read-only; can't reset it." -f darkyellow
         }

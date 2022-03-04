@@ -80,7 +80,7 @@ function update_scoop() {
         }
 
         # replace non-git scoop with the git version
-        Remove-Item -r -force $currentdir -ea stop
+        Remove-Item -r -force $currentdir -ErrorAction Stop
         Move-Item $newdir $currentdir
     } else {
         $previousCommit = Invoke-Expression "git -C '$currentdir' rev-parse HEAD"

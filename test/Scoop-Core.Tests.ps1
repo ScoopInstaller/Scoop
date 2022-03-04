@@ -174,25 +174,25 @@ Describe 'shim' -Tag 'Scoop' {
     }
 
     It "links a file onto the user's path" -Skip:$isUnix {
-        { Get-Command 'shim-test' -ea stop } | Should -Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should -Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should -Throw
+        { Get-Command 'shim-test' -ErrorAction Stop } | Should -Throw
+        { Get-Command 'shim-test.ps1' -ErrorAction Stop } | Should -Throw
+        { Get-Command 'shim-test.cmd' -ErrorAction Stop } | Should -Throw
         { shim-test } | Should -Throw
 
         shim "$working_dir\shim-test.ps1" $false 'shim-test'
-        { Get-Command 'shim-test' -ea stop } | Should -Not -Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should -Not -Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should -Not -Throw
+        { Get-Command 'shim-test' -ErrorAction Stop } | Should -Not -Throw
+        { Get-Command 'shim-test.ps1' -ErrorAction Stop } | Should -Not -Throw
+        { Get-Command 'shim-test.cmd' -ErrorAction Stop } | Should -Not -Throw
         shim-test | Should -Be 'Hello, world!'
     }
 
     Context 'user with quote' {
         It 'shims a file with quote in path' -Skip:$isUnix {
-            { Get-Command 'shim-test' -ea stop } | Should -Throw
+            { Get-Command 'shim-test' -ErrorAction Stop } | Should -Throw
             { shim-test } | Should -Throw
 
             shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
-            { Get-Command 'shim-test' -ea stop } | Should -Not -Throw
+            { Get-Command 'shim-test' -ErrorAction Stop } | Should -Not -Throw
             shim-test | Should -Be 'Hello, world!'
         }
     }
@@ -214,9 +214,9 @@ Describe 'rm_shim' -Tag 'Scoop' {
 
         rm_shim 'shim-test' $shimdir
 
-        { Get-Command 'shim-test' -ea stop } | Should -Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should -Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should -Throw
+        { Get-Command 'shim-test' -ErrorAction Stop } | Should -Throw
+        { Get-Command 'shim-test.ps1' -ErrorAction Stop } | Should -Throw
+        { Get-Command 'shim-test.cmd' -ErrorAction Stop } | Should -Throw
         { shim-test } | Should -Throw
     }
 }

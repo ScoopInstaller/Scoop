@@ -16,7 +16,7 @@ function bin_match($manifest, $query) {
     if(!$manifest.bin) { return $false }
     foreach($bin in $manifest.bin) {
         $exe, $alias, $args = $bin
-        $fname = split-path $exe -leaf -ea stop
+        $fname = split-path $exe -leaf -ErrorAction Stop
 
         if((strip_ext $fname) -match $query) { return $fname }
         if($alias -match $query) { return $alias }

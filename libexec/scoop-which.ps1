@@ -10,7 +10,7 @@ reset_aliases
 if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 
 try {
-    $gcm = Get-Command "$command" -ea stop
+    $gcm = Get-Command "$command" -ErrorAction Stop
 } catch {
     abort "'$command' not found" 3
 }

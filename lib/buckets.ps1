@@ -37,7 +37,7 @@ function bucketdir($name) {
 function known_bucket_repos {
     $json = "$PSScriptRoot\..\buckets.json"
 
-    return Get-Content $json -raw | ConvertFrom-Json -ea stop
+    return Get-Content $json -raw | ConvertFrom-Json -ErrorAction Stop
 }
 
 function known_bucket_repo($name) {
@@ -118,7 +118,7 @@ function rm_bucket($name) {
         abort "'$name' bucket not found."
     }
 
-    Remove-Item $dir -r -force -ea stop
+    Remove-Item $dir -r -force -ErrorAction Stop
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {

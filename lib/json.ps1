@@ -125,7 +125,7 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
 }
 
 function json_path_legacy([String] $json, [String] $jsonpath, [Hashtable] $substitutions) {
-    $result = $json | ConvertFrom-Json -ea stop
+    $result = $json | ConvertFrom-Json -ErrorAction Stop
     $isJsonPath = $jsonpath.StartsWith('$')
     $jsonpath.split('.') | ForEach-Object {
         $el = $_
