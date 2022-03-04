@@ -36,12 +36,12 @@ function new_manifest() {
 }
 
 function file_name($segment) {
-    $segment.substring(0, $segment.lastindexof('.'))
+    $segment.Substring(0, $segment.lastindexof('.'))
 }
 
 function parse_url($url) {
     $uri = New-Object Uri $url
-    $uri.pathandquery.substring(1).Split('/')
+    $uri.pathandquery.Substring(1).Split('/')
 }
 
 function choose_item($list, $query) {

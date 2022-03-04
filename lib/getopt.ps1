@@ -32,7 +32,7 @@ function getopt($argv, $shortopts, $longopts) {
         if($arg -is [decimal]) { $rem += $arg; continue }
 
         if($arg.startswith('--')) {
-            $name = $arg.substring(2)
+            $name = $arg.Substring(2)
 
             $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
 
