@@ -109,7 +109,7 @@ if ($env:CI -eq $true) {
         Write-Host 'Invoke-Pester' @splat
         $result = Invoke-Pester @splat
 
-        (New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
+        (New-Object Net.Webclient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
         exit $result.FailedCount
     }
 }

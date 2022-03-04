@@ -13,7 +13,7 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         [xml]$data = $wc.downloadstring($url)
-    } catch [system.net.webexception] {
+    } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
         return $null
@@ -42,7 +42,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $hashfile = $wc.downloadstring($url)
-    } catch [system.net.webexception] {
+    } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
         return
@@ -95,7 +95,7 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $json = $wc.downloadstring($url)
-    } catch [system.net.webexception] {
+    } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
         return
@@ -115,7 +115,7 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $xml = [xml]$wc.downloadstring($url)
-    } catch [system.net.webexception] {
+    } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
         return
@@ -157,7 +157,7 @@ function find_hash_in_headers([String] $url) {
             }
         }
         $res.Close()
-    } catch [system.net.webexception] {
+    } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
         return
@@ -270,7 +270,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     Write-Host -f DarkYellow ' to compute hashes!'
     try {
         dl_with_cache $app $version $url $null $null $true
-    } catch [system.net.webexception] {
+    } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
         return $null
