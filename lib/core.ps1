@@ -107,10 +107,10 @@ function setup_proxy() {
         }
 
         if($credentials -eq 'currentuser') {
-            [System.Net.WebRequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
+            [System.Net.WebRequest]::defaultwebproxy.Credentials = [net.credentialcache]::defaultcredentials
         } elseif($credentials) {
             $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])','$1' }
-            [System.Net.WebRequest]::defaultwebproxy.credentials = New-Object net.networkcredential($username, $password)
+            [System.Net.WebRequest]::defaultwebproxy.Credentials = New-Object net.networkcredential($username, $password)
         }
     } catch {
         warn "Failed to use proxy '$proxy': $($_.exception.message)"

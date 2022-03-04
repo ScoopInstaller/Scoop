@@ -250,11 +250,11 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         if ([System.Net.WebRequest]::DefaultWebProxy.Address) {
             $options += "--all-proxy='$([System.Net.WebRequest]::DefaultWebProxy.Address.Authority)'"
         }
-        if ([System.Net.WebRequest]::DefaultWebProxy.Credentials.UserName) {
-            $options += "--all-proxy-user='$([System.Net.WebRequest]::DefaultWebProxy.Credentials.UserName)'"
+        if ([System.Net.WebRequest]::defaultwebproxy.Credentials.UserName) {
+            $options += "--all-proxy-user='$([System.Net.WebRequest]::defaultwebproxy.Credentials.UserName)'"
         }
-        if ([System.Net.WebRequest]::DefaultWebProxy.Credentials.Password) {
-            $options += "--all-proxy-passwd='$([System.Net.WebRequest]::DefaultWebProxy.Credentials.Password)'"
+        if ([System.Net.WebRequest]::defaultwebproxy.Credentials.Password) {
+            $options += "--all-proxy-passwd='$([System.Net.WebRequest]::defaultwebproxy.Credentials.Password)'"
         }
     }
 
