@@ -121,7 +121,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     if(!(Test-Path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
-        Move-Item "$cached.download" $cached -force
+        Move-Item "$cached.download" $cached -Force
     } else { Write-Host "Loading $(url_remote_filename $url) from cache"}
 
     if (!($null -eq $to)) {
@@ -586,7 +586,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                     $cached = cache_path $app $version $url
                     if(Test-Path $cached) {
                         # rm cached file
-                        Remove-Item -force $cached
+                        Remove-Item -Force $cached
                     }
                     if($url.Contains('sourceforge.net')) {
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'

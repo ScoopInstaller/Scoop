@@ -118,7 +118,7 @@ function rm_bucket($name) {
         abort "'$name' bucket not found."
     }
 
-    Remove-Item $dir -r -force -ErrorAction Stop
+    Remove-Item $dir -r -Force -ErrorAction Stop
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {

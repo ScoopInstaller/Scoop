@@ -112,7 +112,7 @@ foreach ($curr_app in $apps) {
                     error $err
                     if(Test-Path $cached) {
                         # rm cached file
-                        Remove-Item -force $cached
+                        Remove-Item -Force $cached
                     }
                     if ($url -like '*sourceforge.net*') {
                         warn 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'

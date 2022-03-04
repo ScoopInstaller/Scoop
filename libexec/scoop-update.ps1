@@ -80,7 +80,7 @@ function update_scoop() {
         }
 
         # replace non-git scoop with the git version
-        Remove-Item -r -force $currentdir -ErrorAction Stop
+        Remove-Item -r -Force $currentdir -ErrorAction Stop
         Move-Item $newdir $currentdir
     } else {
         $previousCommit = Invoke-Expression "git -C '$currentdir' rev-parse HEAD"
@@ -212,7 +212,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
                     error $err
                     if (Test-Path $source) {
                         # rm cached file
-                        Remove-Item -force $source
+                        Remove-Item -Force $source
                     }
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
