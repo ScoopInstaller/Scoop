@@ -40,7 +40,7 @@ function file_name($segment) {
 }
 
 function parse_url($url) {
-    $uri = New-Object Uri $url
+    $uri = New-Object System.Uri $url
     $uri.pathandquery.Substring(1).Split('/')
 }
 

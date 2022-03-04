@@ -378,7 +378,7 @@ function appname_from_url($url) {
 function fname($path) { Split-Path $path -Leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
-function strip_fragment($url) { $url -replace (New-Object uri $url).Fragment }
+function strip_fragment($url) { $url -replace (New-Object System.Uri $url).Fragment }
 
 function url_filename($url) {
     (Split-Path $url -Leaf).Split('?') | Select-Object -First 1
@@ -387,7 +387,7 @@ function url_filename($url) {
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
 # this function extracts the original filename from the URL.
 function url_remote_filename($url) {
-    $uri = (New-Object uri $url)
+    $uri = (New-Object System.Uri $url)
     $basename = Split-Path $uri.PathAndQuery -Leaf
     If ($basename -match ".*[?=]+([\w._-]+)") {
         $basename = $matches[1]
@@ -885,7 +885,7 @@ function pluralize($count, $singular, $plural) {
 }
 
 function reset_alias($name, $value) {
-    if ($existing = Get-Alias $name -ErrorAction Ignore | Where-Object { $_.Options -match 'readonly' }) {
+    if ($existing = Get-Alias $name -ErrorAction Ignore | Where-Object { $_.Options -match 'Readonly' }) {
         if ($existing.Definition -ne $value) {
             Write-Host "Alias $name is read-only; can't reset it." -f darkyellow
         }
@@ -903,7 +903,7 @@ function reset_alias($name, $value) {
 
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = Get-Alias | Where-Object { $_.Options -notmatch 'ReadOnly|AllScope' } | ForEach-Object { $_.Name }
+    $aliases = Get-Alias | Where-Object { $_.Options -notmatch 'Readonly|AllScope' } | ForEach-Object { $_.Name }
     Get-ChildItem Function: | ForEach-Object {
         $fn = $_.name
         if ($aliases -contains $fn) {

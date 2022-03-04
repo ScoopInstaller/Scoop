@@ -73,7 +73,7 @@ function test_dl([String] $url, $cookies) {
 
         return $url, 'Error', $e.Message
     } finally {
-        if ($null -ne $wres -and $wres -isnot [Net.FtpWebResponse]) {
+        if ($null -ne $wres -and $wres -isnot [System.Net.FtpWebResponse]) {
             $wres.Close()
         }
     }
