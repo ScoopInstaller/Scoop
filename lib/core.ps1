@@ -381,7 +381,7 @@ function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
 function strip_fragment($url) { $url -replace (New-Object uri $url).Fragment }
 
 function url_filename($url) {
-    (Split-Path $url -Leaf).split('?') | Select-Object -First 1
+    (Split-Path $url -Leaf).Split('?') | Select-Object -First 1
 }
 # Unlike url_filename which can be tricked by appending a
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
