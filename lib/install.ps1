@@ -25,7 +25,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
-        $version = nightly_version $(get-date)
+        $version = nightly_version $(Get-Date)
         $check_hash = $false
     }
 

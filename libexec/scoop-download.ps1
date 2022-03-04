@@ -82,7 +82,7 @@ foreach ($curr_app in $apps) {
 
     $curr_check_hash = $check_hash
     if ($version -eq 'nightly') {
-        $version = nightly_version $(get-date)
+        $version = nightly_version $(Get-Date)
         $curr_check_hash = $false
     }
 
