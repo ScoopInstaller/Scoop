@@ -107,7 +107,7 @@ function setup_proxy() {
         }
 
         if($credentials -eq 'currentuser') {
-            [System.Net.WebRequest]::defaultwebproxy.Credentials = [net.credentialcache]::defaultcredentials
+            [System.Net.WebRequest]::defaultwebproxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
         } elseif($credentials) {
             $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])','$1' }
             [System.Net.WebRequest]::defaultwebproxy.Credentials = New-Object net.networkcredential($username, $password)
