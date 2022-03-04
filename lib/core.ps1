@@ -46,7 +46,7 @@ function load_cfg($file) {
         $content = [System.IO.File]::ReadAllLines($file)
         return ($content | ConvertFrom-Json -ErrorAction Stop)
     } catch {
-        Write-Host "ERROR loading $file`: $($_.exception.message)"
+        Write-Host "ERROR loading $file`: $($_.Exception.Message)"
     }
 }
 
@@ -113,7 +113,7 @@ function setup_proxy() {
             [System.Net.WebRequest]::DefaultWebProxy.Credentials = New-Object System.System.Net.NetworkCredential($username, $password)
         }
     } catch {
-        warn "Failed to use proxy '$proxy': $($_.exception.message)"
+        warn "Failed to use proxy '$proxy': $($_.Exception.Message)"
     }
 }
 

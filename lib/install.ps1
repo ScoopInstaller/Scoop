@@ -723,7 +723,7 @@ function compute_hash($file, $algname) {
             return [string]::join('', $hexbytes)
         }
     } catch {
-        error $_.exception.message
+        error $_.Exception.Message
     } finally {
         if($fs) { $fs.dispose() }
         if($alg) { $alg.dispose() }

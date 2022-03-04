@@ -106,7 +106,7 @@ Describe 'manifest validates against the schema' -Tag 'Manifests' {
                     }
                     $validator.Errors.Count | Should -Be 0
                 } catch {
-                    if ($_.exception.message -like '*The free-quota limit of 1000 schema validations per hour has been reached.*') {
+                    if ($_.Exception.Message -like '*The free-quota limit of 1000 schema validations per hour has been reached.*') {
                         $quota_exceeded = $true
                         Write-Host -f darkyellow 'Schema validation limit exceeded. Will skip further validations.'
                     } else {
