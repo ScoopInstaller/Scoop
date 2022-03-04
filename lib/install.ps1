@@ -47,7 +47,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
             return
         }
     }
-    write-output "Installing '$app' ($version) [$architecture]"
+    Write-Output "Installing '$app' ($version) [$architecture]"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
@@ -742,7 +742,7 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
     $msi = msi $manifest $architecture
     $installer = installer $manifest $architecture
     if($installer.script) {
-        write-output "Running installer script..."
+        Write-Output "Running installer script..."
         Invoke-Expression (@($installer.script) -join "`r`n")
         return
     }
@@ -822,7 +822,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
     $uninstaller = uninstaller $manifest $architecture
     $version = $manifest.version
     if($uninstaller.script) {
-        write-output "Running uninstaller script..."
+        Write-Output "Running uninstaller script..."
         Invoke-Expression (@($uninstaller.script) -join "`r`n")
         return
     }
@@ -875,7 +875,7 @@ function create_shims($manifest, $dir, $global, $arch) {
     $shims = @(arch_specific 'bin' $manifest $arch)
     $shims | Where-Object { $_ -ne $null } | ForEach-Object {
         $target, $name, $arg = shim_def $_
-        write-output "Creating shim for '$name'."
+        Write-Output "Creating shim for '$name'."
 
         if(test-path "$dir\$target" -pathType leaf) {
             $bin = "$dir\$target"
@@ -1059,7 +1059,7 @@ function env_rm($manifest, $global, $arch) {
 function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
     if($pre_install) {
-        write-output "Running pre-install script..."
+        Write-Output "Running pre-install script..."
         Invoke-Expression (@($pre_install) -join "`r`n")
     }
 }
@@ -1067,16 +1067,16 @@ function pre_install($manifest, $arch) {
 function post_install($manifest, $arch) {
     $post_install = arch_specific 'post_install' $manifest $arch
     if($post_install) {
-        write-output "Running post-install script..."
+        Write-Output "Running post-install script..."
         Invoke-Expression (@($post_install) -join "`r`n")
     }
 }
 
 function show_notes($manifest, $dir, $original_dir, $persist_dir) {
     if($manifest.notes) {
-        write-output "Notes"
-        write-output "-----"
-        write-output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}))
+        Write-Output "Notes"
+        Write-Output "-----"
+        Write-Output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}))
     }
 }
 

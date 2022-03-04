@@ -767,7 +767,7 @@ function ensure_in_path($dir, $global) {
     $path = env 'PATH' $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
-        write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
+        Write-Output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
 
         env 'PATH' $global "$dir;$path" # for future sessions...
         $env:PATH = "$dir;$env:PATH" # for this session
@@ -915,7 +915,7 @@ function reset_aliases() {
     # for dealing with user aliases
     $default_aliases = @{
         'cp' = 'copy-item'
-        'echo' = 'write-output'
+        'echo' = 'Write-Output'
         'gc' = 'get-content'
         'gci' = 'get-childitem'
         'gcm' = 'get-command'
