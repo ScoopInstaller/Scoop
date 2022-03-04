@@ -904,34 +904,34 @@ function reset_alias($name, $value) {
 
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = Get-Alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
+    $aliases = Get-Alias | Where-Object { $_.Options -notmatch 'ReadOnly|AllScope' } | ForEach-Object { $_.Name }
     Get-ChildItem Function: | ForEach-Object {
         $fn = $_.name
         if($aliases -contains $fn) {
-            Set-Alias $fn local:$fn -scope script
+            Set-Alias $fn local:$fn -Scope script
         }
     }
 
     # for dealing with user aliases
     $default_aliases = @{
-        'cp' = 'copy-item'
+        'cp' = 'Copy-Item'
         'echo' = 'Write-Output'
-        'gc' = 'get-content'
-        'gci' = 'get-childitem'
-        'gcm' = 'get-command'
-        'gm' = 'get-member'
-        'iex' = 'invoke-expression'
-        'ls' = 'get-childitem'
-        'mkdir' = { New-Item -type directory @args }
-        'mv' = 'move-item'
-        'rm' = 'remove-item'
-        'sc' = 'set-content'
-        'select' = 'select-object'
-        'sls' = 'select-string'
+        'gc' = 'Get-Content'
+        'gci' = 'Get-ChildItem'
+        'gcm' = 'Get-Command'
+        'gm' = 'Get-Member'
+        'iex' = 'Invoke-Expression'
+        'ls' = 'Get-ChildItem'
+        'mkdir' = { New-Item -ItemType Directory -Path @args }
+        'mv' = 'Move-Item'
+        'rm' = 'Remove-Item'
+        'sc' = 'Set-Content'
+        'select' = 'Select-Object'
+        'sls' = 'Select-String'
     }
 
     # set default aliases
-    $default_aliases.keys | ForEach-Object { reset_alias $_ $default_aliases[$_] }
+    $default_aliases.Keys | ForEach-Object { reset_alias $_ $default_aliases[$_] }
 }
 
 # convert list of apps to list of ($app, $global) tuples
