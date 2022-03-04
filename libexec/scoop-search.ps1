@@ -79,7 +79,7 @@ function search_remotes($query) {
     $buckets = known_bucket_repos
     $names = $buckets | get-member -m noteproperty | Select-Object -exp name
 
-    $results = $names | Where-Object { !(test-path $(Find-BucketDirectory $_)) } | ForEach-Object {
+    $results = $names | Where-Object { !(Test-Path $(Find-BucketDirectory $_)) } | ForEach-Object {
         @{"bucket" = $_; "results" = (search_remote $_ $query)}
     } | Where-Object { $_.results }
 

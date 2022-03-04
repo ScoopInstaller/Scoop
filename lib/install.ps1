@@ -104,7 +104,7 @@ function Find-Manifest($app, $bucket) {
             # couldn't find app in buckets: check if it's a local path
             $path = $app
             if(!$path.endswith('.json')) { $path += '.json' }
-            if(test-path $path) {
+            if(Test-Path $path) {
                 $url = "$(resolve-path $path)"
                 $app = appname_from_url $url
                 $manifest, $bucket = url_manifest $url
@@ -118,7 +118,7 @@ function Find-Manifest($app, $bucket) {
 function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
 
-    if(!(test-path $cached) -or !$use_cache) {
+    if(!(Test-Path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
@@ -584,7 +584,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                 if(!$ok) {
                     error $err
                     $cached = cache_path $app $version $url
-                    if(test-path $cached) {
+                    if(Test-Path $cached) {
                         # rm cached file
                         Remove-Item -force $cached
                     }
@@ -787,7 +787,7 @@ function install_msi($fname, $dir, $msi) {
 # http://blogs.technet.com/b/heyscriptingguy/archive/2011/12/14/use-powershell-to-find-and-uninstall-software.aspx
 function msi_installed($code) {
     $path = "hklm:\software\microsoft\windows\currentversion\uninstall\$code"
-    if(!(test-path $path)) { return $false }
+    if(!(Test-Path $path)) { return $false }
     $key = Get-Item $path
     $name = $key.getvalue('displayname')
     $version = $key.getvalue('displayversion')
@@ -848,7 +848,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
             if(!(is_in_dir $dir $exe)) {
                 warn "Error in manifest: Installer $exe is outside the app directory, skipping."
                 $exe = $null;
-            } elseif(!(test-path $exe)) {
+            } elseif(!(Test-Path $exe)) {
                 warn "Uninstaller $exe is missing, skipping."
                 $exe = $null;
             }
@@ -877,9 +877,9 @@ function create_shims($manifest, $dir, $global, $arch) {
         $target, $name, $arg = shim_def $_
         Write-Output "Creating shim for '$name'."
 
-        if(test-path "$dir\$target" -pathType leaf) {
+        if(Test-Path "$dir\$target" -pathType leaf) {
             $bin = "$dir\$target"
-        } elseif(test-path $target -pathType leaf) {
+        } elseif(Test-Path $target -pathType leaf) {
             $bin = $target
         } else {
             $bin = search_in_path $target

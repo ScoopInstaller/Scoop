@@ -401,7 +401,7 @@ function url_remote_filename($url) {
     return $basename
 }
 
-function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
+function ensure($dir) { if(!(Test-Path $dir)) { mkdir $dir > $null }; resolve-path $dir }
 function fullpath($path) { # should be ~ rooted
     $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }
@@ -412,7 +412,7 @@ function friendly_path($path) {
     return "$path" -replace ([regex]::escape($h)), "~\"
 }
 function is_local($path) {
-    ($path -notmatch '^https?://') -and (test-path $path)
+    ($path -notmatch '^https?://') -and (Test-Path $path)
 }
 
 # operations
@@ -757,7 +757,7 @@ function get_shim_path() {
 function search_in_path($target) {
     $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
     foreach($dir in $path.split(';')) {
-        if(test-path "$dir\$target" -pathType leaf) {
+        if(Test-Path "$dir\$target" -pathType leaf) {
             return "$dir\$target"
         }
     }
@@ -893,7 +893,7 @@ function reset_alias($name, $value) {
         return # already set
     }
     if($value -is [scriptblock]) {
-        if(!(test-path -path "function:script:$name")) {
+        if(!(Test-Path -path "function:script:$name")) {
             new-item -path function: -name "script:$name" -value $value | out-null
         }
         return

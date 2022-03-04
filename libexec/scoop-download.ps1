@@ -110,7 +110,7 @@ foreach ($curr_app in $apps) {
 
                 if(!$ok) {
                     error $err
-                    if(test-path $cached) {
+                    if(Test-Path $cached) {
                         # rm cached file
                         Remove-Item -force $cached
                     }

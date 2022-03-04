@@ -6,7 +6,7 @@ function manifest_path($app, $bucket) {
 }
 
 function parse_json($path) {
-    if(!(test-path $path)) { return $null }
+    if(!(Test-Path $path)) { return $null }
     Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
 }
 
@@ -54,7 +54,7 @@ function save_install_info($info, $dir) {
 
 function install_info($app, $version, $global) {
     $path = "$(versiondir $app $version $global)\install.json"
-    if(!(test-path $path)) { return $null }
+    if(!(Test-Path $path)) { return $null }
     parse_json $path
 }
 
