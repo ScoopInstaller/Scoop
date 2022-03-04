@@ -16,8 +16,8 @@ function url_manifest($url) {
         $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $str = $wc.DownloadString($url)
-    } catch [system.management.automation.methodinvocationexception] {
-        warn "error: $($_.exception.innerexception.message)"
+    } catch [System.Management.Automation.MethodInvocationException] {
+        warn "error: $($_.Exception.InnerException.Message)"
     } catch {
         throw
     }
