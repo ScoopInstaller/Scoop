@@ -103,7 +103,7 @@ function setup_proxy() {
         if($address -eq 'none') {
             [System.Net.WebRequest]::DefaultWebProxy = $null
         } elseif($address -ne 'default') {
-            [System.Net.WebRequest]::DefaultWebProxy = New-Object net.webproxy "http://$address"
+            [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebProxy "http://$address"
         }
 
         if($credentials -eq 'currentuser') {
