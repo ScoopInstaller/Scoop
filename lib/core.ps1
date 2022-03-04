@@ -224,7 +224,7 @@ function installed($app, $global) {
 function installed_apps($global) {
     $dir = appsdir $global
     if (Test-Path $dir) {
-        Get-ChildItem $dir | Where-Object { $_.psiscontainer -and $_.name -ne 'scoop' } | ForEach-Object { $_.name }
+        Get-ChildItem $dir | Where-Object { $_.psiscontainer -and $_.Name -ne 'scoop' } | ForEach-Object { $_.Name }
     }
 }
 
@@ -905,7 +905,7 @@ function reset_alias($name, $value) {
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
     $aliases = get-alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
-    get-childitem function: | ForEach-Object {
+    Get-ChildItem function: | ForEach-Object {
         $fn = $_.name
         if($aliases -contains $fn) {
             set-alias $fn local:$fn -scope script
