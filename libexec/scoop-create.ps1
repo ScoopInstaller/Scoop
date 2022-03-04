@@ -24,7 +24,7 @@ function create_manifest($url) {
 
     $manifest.version = choose_item $url_parts 'Version'
 
-    $manifest | ConvertTo-Json | Out-File -FilePath "$name.json" -Encoding ASCII
+    $manifest | ConvertTo-Json | Out-File -FilePath "$name.json" -Encoding ascii
     $manifest_path = Join-Path $pwd "$name.json"
     Write-Host "Created '$manifest_path'."
 }
