@@ -41,7 +41,7 @@ function file_name($segment) {
 
 function parse_url($url) {
     $uri = New-Object uri $url
-    $uri.pathandquery.Substring(1).Split('/')
+    $uri.PathAndQuery.Substring(1).Split('/')
 }
 
 function choose_item($list, $query) {

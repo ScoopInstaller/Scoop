@@ -1075,7 +1075,7 @@ function get_magic_bytes($file) {
         return ''
     }
 
-    if ((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+    if ((Get-Command Get-Content).Parameters.ContainsKey('AsByteStream')) {
         # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
         return Get-Content $file -AsByteStream -TotalCount 8
     } else {

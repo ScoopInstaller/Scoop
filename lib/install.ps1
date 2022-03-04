@@ -452,7 +452,7 @@ function dl($url, $to, $cookies, $progress) {
     }
 
     try {
-        $s = $wres.getresponsestream()
+        $s = $wres.GetResponseStream()
         $fs = [System.IO.File]::OpenWrite($to)
         $buffer = New-Object byte[] 2048
         $totalRead = 0

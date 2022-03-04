@@ -48,9 +48,9 @@ function clean_description($description) {
 # Collects meta tags from $html into hashtables.
 function meta_tags($html) {
     $tags = @()
-    $meta = ([regex]'<meta [^>]+>').matches($html)
+    $meta = ([regex]'<meta [^>]+>').Matches($html)
     $meta | ForEach-Object {
-        $attrs = ([regex]'([\w-]+)="([^"]+)"').matches($_.Value)
+        $attrs = ([regex]'([\w-]+)="([^"]+)"').Matches($_.Value)
         $hash = @{}
         $attrs | ForEach-Object {
             $hash[$_.Groups[1].Value] = $_.Groups[2].Value

@@ -49,7 +49,7 @@ function search_bucket($bucket, $query) {
 
 function download_json($url) {
     $progressPreference = 'silentlycontinue'
-    $result = invoke-webrequest $url -UseBasicParsing | Select-Object -exp content | ConvertFrom-Json
+    $result = invoke-webrequest $url -UseBasicParsing | Select-Object -ExpandProperty content | ConvertFrom-Json
     $progressPreference = 'continue'
     $result
 }
@@ -62,13 +62,13 @@ function github_ratelimit_reached {
 function search_remote($bucket, $query) {
     $repo = known_bucket_repo $bucket
 
-    $uri = [system.uri]($repo)
+    $uri = [uri]($repo)
     if ($uri.absolutepath -match '/([a-zA-Z0-9]*)/([a-zA-Z0-9-]*)(.git|/)?') {
         $user = $matches[1]
         $repo_name = $matches[2]
         $api_link = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
-        $result = download_json $api_link | Select-Object -exp tree | Where-Object {
-            $_.path -match "(^(.*$query.*).json$)"
+        $result = download_json $api_link | Select-Object -ExpandProperty tree | Where-Object {
+            $_.Path -match "(^(.*$query.*).json$)"
         } | ForEach-Object { $matches[2] }
     }
 
@@ -77,7 +77,7 @@ function search_remote($bucket, $query) {
 
 function search_remotes($query) {
     $buckets = known_bucket_repos
-    $names = $buckets | get-member -m noteproperty | Select-Object -exp name
+    $names = $buckets | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty name
 
     $results = $names | Where-Object { !(Test-Path $(Find-BucketDirectory $_)) } | ForEach-Object {
         @{"bucket" = $_; "results" = (search_remote $_ $query)}

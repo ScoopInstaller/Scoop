@@ -125,7 +125,7 @@ $binaries = @(arch_specific 'bin' $manifest $install.architecture)
 if ($binaries) {
     $binary_output = @()
     $binaries | ForEach-Object {
-        if ($_ -is [System.Array]) {
+        if ($_ -is [Array]) {
             $binary_output += "$($_[1]).$($_[0].Split('.')[-1])"
         } else {
             $binary_output += $_

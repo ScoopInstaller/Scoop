@@ -110,7 +110,7 @@ $Queue | ForEach-Object {
     } else {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
     }
-    Register-ObjectEvent $wc downloadstringcompleted -ErrorAction Stop | Out-Null
+    Register-ObjectEvent $wc DownloadStringCompleted -ErrorAction Stop | Out-Null
 
     $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
 

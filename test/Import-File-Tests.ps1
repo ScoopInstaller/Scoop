@@ -8,9 +8,9 @@ Describe 'Style constraints for non-binary project files' {
     $files = @(
         # gather all files except '*.exe', '*.zip', or any .git repository files
         $repo_files |
-            Where-Object { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
-            Where-Object { $_.fullname -inotmatch '(.exe|.zip|.dll)$' } |
-            Where-Object { $_.fullname -inotmatch '(unformated)' }
+            Where-Object { $_.FullName -inotmatch $($project_file_exclusions -join '|') } |
+            Where-Object { $_.FullName -inotmatch '(.exe|.zip|.dll)$' } |
+            Where-Object { $_.FullName -inotmatch '(unformated)' }
     )
 
     $files_exist = ($files.Count -gt 0)
@@ -27,7 +27,7 @@ Describe 'Style constraints for non-binary project files' {
         # ref: http://poshcode.org/2153 @@ https://archive.is/sGnnu
         $badFiles = @(
             foreach ($file in $files) {
-                if ((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+                if ((Get-Command Get-Content).Parameters.ContainsKey('AsByteStream')) {
                     # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
                     $content = ([char[]](Get-Content $file.FullName -AsByteStream -TotalCount 3) -join '')
                 } else {
@@ -113,7 +113,7 @@ Describe 'Style constraints for non-binary project files' {
     It 'any leading whitespace consists only of spaces (excepting makefiles)' -Skip:$(-not $files_exist) {
         $badLines = @(
             foreach ($file in $files) {
-                if ($file.fullname -inotmatch '(^|.)makefile$') {
+                if ($file.FullName -inotmatch '(^|.)makefile$') {
                     $lines = [System.IO.File]::ReadAllLines($file.FullName)
                     $lineCount = $lines.Count
 
