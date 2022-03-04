@@ -31,7 +31,7 @@ if($path -like "$usershims*" -or $path -like "$globalshims*") {
 
     if(![system.io.path]::ispathrooted($exepath)) {
         # Expand relative path
-        $exepath = resolve-path (join-path (split-path $path) $exepath)
+        $exepath = resolve-path (join-path (Split-Path $path) $exepath)
     }
 
     friendly_path $exepath
