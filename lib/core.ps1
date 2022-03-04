@@ -131,7 +131,7 @@ function coalesce($a, $b) { if($a) { return $a } $b }
 
 function format($str, $hash) {
     $hash.keys | ForEach-Object { Set-Variable $_ $hash[$_] }
-    $executionContext.invokeCommand.expandString($str)
+    $executionContext.InvokeCommand.ExpandString($str)
 }
 function is_admin {
     $admin = [security.principal.windowsbuiltinrole]::administrator
