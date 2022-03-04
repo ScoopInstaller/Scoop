@@ -520,7 +520,7 @@ function env($name,$global,$val='__get') {
 function isFileLocked([string]$path) {
     $file = New-Object System.IO.FileInfo $path
 
-    if ((Test-Path -Path $path) -eq $false) {
+    if ((Test-Path $path) -eq $false) {
         return $false
     }
 
@@ -893,7 +893,7 @@ function reset_alias($name, $value) {
         return # already set
     }
     if($value -is [scriptblock]) {
-        if(!(Test-Path -path "function:script:$name")) {
+        if(!(Test-Path -Path "function:script:$name")) {
             new-item -path function: -name "script:$name" -value $value | out-null
         }
         return

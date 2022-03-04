@@ -64,7 +64,7 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
         $name = $_.item(1)
         $shortcut = "$(shortcut_folder $global)\$name.lnk"
         Write-Host "Removing shortcut $(friendly_path $shortcut)"
-        if(Test-Path -Path $shortcut) {
+        if(Test-Path $shortcut) {
              Remove-Item $shortcut
         }
         # Before issue 1514 Startmenu shortcut removal
@@ -76,7 +76,7 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
         #       27 June 2018.
         if($global) {
             $shortcut = "$(shortcut_folder $false)\$name.lnk"
-            if(Test-Path -Path $shortcut) {
+            if(Test-Path $shortcut) {
                  Remove-Item $shortcut
             }
         }
