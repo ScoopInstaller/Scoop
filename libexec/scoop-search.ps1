@@ -90,7 +90,7 @@ function search_remotes($query) {
     }
 
     $results | ForEach-Object {
-        "'$($_.bucket)' bucket:"
+        "'$($_.bucket)' bucket (install using 'scoop install $($_.bucket)/<app>'):"
         $_.results | ForEach-Object { "    $_" }
         ""
     }
