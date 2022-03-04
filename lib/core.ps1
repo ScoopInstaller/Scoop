@@ -513,8 +513,8 @@ function dl($url,$to) {
 
 function env($name,$global,$val='__get') {
     $target = 'User'; if($global) {$target = 'Machine'}
-    if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
-    else { [environment]::setEnvironmentVariable($name,$val,$target) }
+    if($val -eq '__get') { [System.Environment]::GetEnvironmentVariable($name,$target) }
+    else { [System.Environment]::SetEnvironmentVariable($name,$val,$target) }
 }
 
 function isFileLocked([string]$path) {
