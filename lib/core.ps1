@@ -827,7 +827,7 @@ function Confirm-InstallationStatus {
 
 function strip_path($orig_path, $dir) {
     if($null -eq $orig_path) { $orig_path = '' }
-    $stripped = [string]::join(';', @( $orig_path.Split(';') | Where-Object { $_ -and $_ -ne $dir } ))
+    $stripped = [string]::Join(';', @( $orig_path.Split(';') | Where-Object { $_ -and $_ -ne $dir } ))
     return ($stripped -ne $orig_path), $stripped
 }
 
