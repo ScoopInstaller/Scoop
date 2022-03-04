@@ -893,8 +893,8 @@ function reset_alias($name, $value) {
         return # already set
     }
     if($value -is [scriptblock]) {
-        if(!(Test-Path -Path "function:script:$name")) {
-            New-Item -Path function: -Name "script:$name" -Value $value | Out-Null
+        if(!(Test-Path -Path "Function:script:$name")) {
+            New-Item -Path Function: -Name "script:$name" -Value $value | Out-Null
         }
         return
     }
@@ -905,7 +905,7 @@ function reset_alias($name, $value) {
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
     $aliases = Get-Alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
-    Get-ChildItem function: | ForEach-Object {
+    Get-ChildItem Function: | ForEach-Object {
         $fn = $_.name
         if($aliases -contains $fn) {
             Set-Alias $fn local:$fn -scope script
