@@ -12,7 +12,7 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        [xml]$data = $wc.downloadstring($url)
+        [xml]$data = $wc.DownloadString($url)
     } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
@@ -41,7 +41,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $hashfile = $wc.downloadstring($url)
+        $hashfile = $wc.DownloadString($url)
     } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
@@ -94,7 +94,7 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $json = $wc.downloadstring($url)
+        $json = $wc.DownloadString($url)
     } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
@@ -114,7 +114,7 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $xml = [xml]$wc.downloadstring($url)
+        $xml = [xml]$wc.DownloadString($url)
     } catch [System.Net.WebException] {
         Write-Host -f darkred $_
         Write-Host -f darkred "URL $url is not valid"
