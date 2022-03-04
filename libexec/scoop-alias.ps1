@@ -110,7 +110,7 @@ switch ($opt) {
     'add' { add_alias $name $command }
     'rm' { rm_alias $name }
     'list' { list_aliases }
-    default { my_usage; exit 1 }
+    Default { my_usage; exit 1 }
 }
 
 exit 0

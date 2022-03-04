@@ -102,7 +102,7 @@ Function Get-VirusTotalResult($hash, $app) {
         0 { if ($undetected -eq 0) { $fg = "Yellow" } else { $fg = "DarkGreen" } }
         1 { $fg = "DarkYellow" }
         2 { $fg = "Yellow" }
-        default { $fg = "Red" }
+        Default { $fg = "Red" }
     }
     Write-Host -ForegroundColor $fg "$app`: $unsafe/$undetected, $see_url"
     if($unsafe -gt 0) {

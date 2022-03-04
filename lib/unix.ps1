@@ -28,7 +28,7 @@ function compute_hash($file, $algname) {
             "sha1" { $result = (shasum -ba 1 $file) }
             "sha256" { $result = (shasum -ba 256 $file) }
             "sha512" { $result = (shasum -ba 512 $file) }
-            default { $result = (shasum -ba 256 $file) }
+            Default { $result = (shasum -ba 256 $file) }
         }
     } else {
         switch ($algname) {
@@ -36,7 +36,7 @@ function compute_hash($file, $algname) {
             "sha1" { $result = (sha1sum -b $file) }
             "sha256" { $result = (sha256sum -b $file) }
             "sha512" { $result = (sha512sum -b $file) }
-            default { $result = (sha256sum -b $file) }
+            Default { $result = (sha256sum -b $file) }
         }
     }
     return $result.Split(' ') | Select-Object -First 1

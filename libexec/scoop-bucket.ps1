@@ -60,7 +60,7 @@ switch ($cmd) {
     'rm' { rm_bucket $name }
     'list' { list_buckets }
     'known' { known_buckets }
-    default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
+    Default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }
 
 exit 0

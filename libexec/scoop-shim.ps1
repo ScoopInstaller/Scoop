@@ -69,7 +69,7 @@ if ($Args) {
         'list' {
             $ShimName = (@($ShimName) + $Args) -join '|'
         }
-        default {
+        Default {
             # For 'info' and 'alter'
             "ERROR: Option $Args not recognized."
             my_usage

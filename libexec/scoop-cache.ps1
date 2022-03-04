@@ -65,7 +65,7 @@ switch($cmd) {
     'show' {
         cacheshow $Args
     }
-    default {
+    Default {
         cacheshow (@($cmd) + $Args)
     }
 }

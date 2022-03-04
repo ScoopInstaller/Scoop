@@ -748,7 +748,7 @@ function get_shim_path() {
         'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
         'kiennq' { Break } # for backward compatibility
         'default' { Break }
-        default { warn "Unknown shim version: '$shim_version'" }
+        Default { warn "Unknown shim version: '$shim_version'" }
     }
     return $shim_path
 }
@@ -781,7 +781,7 @@ function ensure_architecture($architecture_opt) {
     switch ($architecture_opt) {
         { @('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64') -contains $_ } { return '64bit' }
         { @('32bit', '32', 'x86', 'i386', '386', 'i686') -contains $_ } { return '32bit' }
-        default { throw [System.ArgumentException] "Invalid architecture: '$architecture_opt'" }
+        Default { throw [System.ArgumentException] "Invalid architecture: '$architecture_opt'" }
     }
 }
 
@@ -1012,7 +1012,7 @@ function format_hash([string] $hash) {
         40 { $hash = "sha1:$hash" } # sha1
         64 { $hash = $hash } # sha256
         128 { $hash = "sha512:$hash" } # sha512
-        default { $hash = $null }
+        Default { $hash = $null }
     }
     return $hash
 }
@@ -1024,7 +1024,7 @@ function format_hash_aria2([string] $hash) {
         40 { $hash = "sha-1=$hash" } # sha1
         64 { $hash = "sha-256=$hash" } # sha256
         128 { $hash = "sha-512=$hash" } # sha512
-        default { $hash = $null }
+        Default { $hash = $null }
     }
     return $hash
 }

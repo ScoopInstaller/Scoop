@@ -509,13 +509,13 @@ function dl_progress_output($url, $read, $total, $console) {
     # this is why we calculate $completed - 1 above
     $dashes += switch ($p) {
         100 { "=" }
-        default { ">" }
+        Default { ">" }
     }
 
     # the remaining characters are filled with spaces
     $spaces = switch ($dashes.Length) {
         $midwidth { [string]::Empty }
-        default {
+        Default {
             [string]::Join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object { " " }))
         }
     }
