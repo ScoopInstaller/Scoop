@@ -134,9 +134,9 @@ function format($str, $hash) {
     $executionContext.InvokeCommand.ExpandString($str)
 }
 function is_admin {
-    $admin = [security.principal.windowsbuiltinrole]::administrator
-    $id = [security.principal.windowsidentity]::getcurrent()
-    ([security.principal.windowsprincipal]($id)).isinrole($admin)
+    $admin = [System.Security.Principal.WindowsBuiltInRole]::Administrator
+    $id = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    ([System.Security.Principal.WindowsPrincipal]($id)).IsInRole($admin)
 }
 
 # messages
