@@ -450,7 +450,7 @@ function Invoke-AutoUpdate {
         # Accept unusual Unicode characters
         # 'Set-Content -Encoding ASCII' don't works in PowerShell 5
         # Wait for 'UTF8NoBOM' Encoding in PowerShell 7
-        # $Manifest | ConvertToPrettyJson | Set-Content -Path (Join-Path $Path "$AppName.json") -Encoding UTF8NoBOM
+        # $Manifest | ConvertToPrettyJson | Set-Content -Path (Join-Path $Path "$AppName.json") -Encoding utf8NoBOM
         [System.IO.File]::WriteAllLines((Join-Path $Path "$AppName.json"), (ConvertToPrettyJson $Manifest))
         # notes
         $note = "`nUpdating note:"

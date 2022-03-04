@@ -584,7 +584,7 @@ function get_app_name_from_shim($shim) {
     if (!(Test-Path($shim))) {
         return ''
     }
-    $content = (Get-Content $shim -Encoding UTF8) -join ' '
+    $content = (Get-Content $shim -Encoding utf8) -join ' '
     return get_app_name $content
 }
 
