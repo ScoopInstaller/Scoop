@@ -130,7 +130,7 @@ function git_cmd {
 function coalesce($a, $b) { if($a) { return $a } $b }
 
 function format($str, $hash) {
-    $hash.keys | ForEach-Object { set-variable $_ $hash[$_] }
+    $hash.keys | ForEach-Object { Set-Variable $_ $hash[$_] }
     $executionContext.invokeCommand.expandString($str)
 }
 function is_admin {
