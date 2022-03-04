@@ -877,9 +877,9 @@ function create_shims($manifest, $dir, $global, $arch) {
         $target, $name, $arg = shim_def $_
         Write-Output "Creating shim for '$name'."
 
-        if(Test-Path "$dir\$target" -pathType leaf) {
+        if(Test-Path "$dir\$target" -PathType leaf) {
             $bin = "$dir\$target"
-        } elseif(Test-Path $target -pathType leaf) {
+        } elseif(Test-Path $target -PathType leaf) {
             $bin = $target
         } else {
             $bin = search_in_path $target
