@@ -30,7 +30,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     }
 
     if(!(supports_architecture $manifest $architecture)) {
-        write-host -f DarkRed "'$app' doesn't support $architecture architecture!"
+        Write-Host -f DarkRed "'$app' doesn't support $architecture architecture!"
         return
     }
 
@@ -122,7 +122,7 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
         ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
-    } else { write-host "Loading $(url_remote_filename $url) from cache"}
+    } else { Write-Host "Loading $(url_remote_filename $url) from cache"}
 
     if (!($null -eq $to)) {
         Copy-Item $cached $to
@@ -445,7 +445,7 @@ function dl($url, $to, $cookies, $progress) {
             dl_progress $read $total $url
         }
     } else {
-        write-host "Downloading $url ($(filesize $total))..."
+        Write-Host "Downloading $url ($(filesize $total))..."
         function dl_onProgress {
             #no op
         }
@@ -472,7 +472,7 @@ function dl($url, $to, $cookies, $progress) {
     } finally {
         if ($progress) {
             [console]::CursorVisible = $true
-            write-host
+            Write-Host
         }
         if ($fs) {
             $fs.close()
@@ -534,14 +534,14 @@ function dl_progress($read, $total, $url) {
         if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
             # print on new line
-            write-host
+            Write-Host
             $left = 0
             $top  = $top + 1
             if($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
         }
     }
 
-    write-host $(dl_progress_output $url $read $total $console) -nonewline
+    Write-Host $(dl_progress_output $url $read $total $console) -nonewline
     [console]::SetCursorPosition($left, $top)
 }
 
@@ -574,7 +574,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             try {
                 dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
             } catch {
-                write-host -f darkred $_
+                Write-Host -f darkred $_
                 abort "URL $url is not valid"
             }
 
@@ -1132,7 +1132,7 @@ function show_suggestions($suggested) {
             }
 
             if(!$fulfilled) {
-                write-host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
+                Write-Host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
             }
         }
     }
@@ -1167,7 +1167,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
         $persist | ForEach-Object {
             $source, $target = persist_def $_
 
-            write-host "Persisting $source"
+            Write-Host "Persisting $source"
 
             $source = $source.TrimEnd("/").TrimEnd("\\")
 

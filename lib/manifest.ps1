@@ -105,7 +105,7 @@ function generate_user_manifest($app, $bucket, $version) {
         Invoke-AutoUpdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(@{ })
         return "$(resolve-path $(usermanifest $app))"
     } catch {
-        write-host -f darkred "Could not install $app@$version"
+        Write-Host -f darkred "Could not install $app@$version"
     }
 
     return $null

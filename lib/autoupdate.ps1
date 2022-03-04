@@ -14,8 +14,8 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         [xml]$data = $wc.downloadstring($url)
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host -f darkred $_
+        Write-Host -f darkred "URL $url is not valid"
         return $null
     }
 
@@ -43,8 +43,8 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $hashfile = $wc.downloadstring($url)
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host -f darkred $_
+        Write-Host -f darkred "URL $url is not valid"
         return
     }
 
@@ -96,8 +96,8 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $json = $wc.downloadstring($url)
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host -f darkred $_
+        Write-Host -f darkred "URL $url is not valid"
         return
     }
     $hash = json_path $json $jsonpath $substitutions
@@ -116,8 +116,8 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $xml = [xml]$wc.downloadstring($url)
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host -f darkred $_
+        Write-Host -f darkred "URL $url is not valid"
         return
     }
 
@@ -158,8 +158,8 @@ function find_hash_in_headers([String] $url) {
         }
         $res.Close()
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host -f darkred $_
+        Write-Host -f darkred "URL $url is not valid"
         return
     }
 
@@ -184,10 +184,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hashfile_url = substitute $config.url $substitutions
     debug $hashfile_url
     if ($hashfile_url) {
-        write-host -f DarkYellow 'Searching hash for ' -NoNewline
-        write-host -f Green $basename -NoNewline
-        write-host -f DarkYellow ' in ' -NoNewline
-        write-host -f Green $hashfile_url
+        Write-Host -f DarkYellow 'Searching hash for ' -NoNewline
+        Write-Host -f Green $basename -NoNewline
+        Write-Host -f DarkYellow ' in ' -NoNewline
+        Write-Host -f Green $hashfile_url
     }
 
     if ($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
@@ -256,29 +256,29 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
 
     if ($hash) {
         # got one!
-        write-host -f DarkYellow 'Found: ' -NoNewline
-        write-host -f Green $hash -NoNewline
-        write-host -f DarkYellow ' using ' -NoNewline
-        write-host -f Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
+        Write-Host -f DarkYellow 'Found: ' -NoNewline
+        Write-Host -f Green $hash -NoNewline
+        Write-Host -f DarkYellow ' using ' -NoNewline
+        Write-Host -f Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
         return $hash
     } elseif ($hashfile_url) {
-        write-host -f DarkYellow "Could not find hash in $hashfile_url"
+        Write-Host -f DarkYellow "Could not find hash in $hashfile_url"
     }
 
-    write-host -f DarkYellow 'Downloading ' -NoNewline
-    write-host -f Green $basename -NoNewline
-    write-host -f DarkYellow ' to compute hashes!'
+    Write-Host -f DarkYellow 'Downloading ' -NoNewline
+    Write-Host -f Green $basename -NoNewline
+    Write-Host -f DarkYellow ' to compute hashes!'
     try {
         dl_with_cache $app $version $url $null $null $true
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host -f darkred $_
+        Write-Host -f darkred "URL $url is not valid"
         return $null
     }
     $file = fullpath (cache_path $app $version $url)
     $hash = compute_hash $file 'sha256'
-    write-host -f DarkYellow 'Computed hash: ' -NoNewline
-    write-host -f Green $hash
+    Write-Host -f DarkYellow 'Computed hash: ' -NoNewline
+    Write-Host -f Green $hash
     return $hash
 }
 

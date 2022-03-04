@@ -54,7 +54,7 @@ function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $argume
         $wsShell.IconLocation = $icon.FullName
     }
     $wsShell.Save()
-    write-host "Creating shortcut for $shortcutName ($(fname $target))"
+    Write-Host "Creating shortcut for $shortcutName ($(fname $target))"
 }
 
 # Removes the Startmenu shortcut if it exists
@@ -63,7 +63,7 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
     $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
         $name = $_.item(1)
         $shortcut = "$(shortcut_folder $global)\$name.lnk"
-        write-host "Removing shortcut $(friendly_path $shortcut)"
+        Write-Host "Removing shortcut $(friendly_path $shortcut)"
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
         }

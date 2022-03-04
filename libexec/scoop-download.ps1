@@ -98,7 +98,7 @@ foreach ($curr_app in $apps) {
             try {
                 dl_with_cache $app $version $url $null $manifest.cookie $use_cache
             } catch {
-                write-host -f darkred $_
+                Write-Host -f darkred $_
                 error "URL $url is not valid"
                 continue
             }

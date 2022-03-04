@@ -104,7 +104,7 @@ Function Get-VirusTotalResult($hash, $app) {
         2 { $fg = "Yellow" }
         default { $fg = "Red" }
     }
-    write-host -f $fg "$app`: $unsafe/$undetected, $see_url"
+    Write-Host -f $fg "$app`: $unsafe/$undetected, $see_url"
     if($unsafe -gt 0) {
         return $_ERR_UNSAFE
     }
@@ -208,7 +208,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
 
 $apps | ForEach-Object {
     $app = $_
-    # write-host $app
+    # Write-Host $app
     $manifest, $bucket = find_manifest $app
     if(!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO

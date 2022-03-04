@@ -140,10 +140,10 @@ function is_admin {
 }
 
 # messages
-function abort($msg, [int] $exit_code=1) { write-host $msg -f red; exit $exit_code }
-function error($msg) { write-host "ERROR $msg" -f darkred }
-function warn($msg) {  write-host "WARN  $msg" -f darkyellow }
-function info($msg) {  write-host "INFO  $msg" -f darkgray }
+function abort($msg, [int] $exit_code=1) { Write-Host $msg -f red; exit $exit_code }
+function error($msg) { Write-Host "ERROR $msg" -f darkred }
+function warn($msg) {  Write-Host "WARN  $msg" -f darkyellow }
+function info($msg) {  Write-Host "INFO  $msg" -f darkgray }
 function debug($obj) {
     if((get_config 'debug' $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
         return
@@ -173,7 +173,7 @@ function debug($obj) {
         Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
     }
 }
-function success($msg) { write-host $msg -f darkgreen }
+function success($msg) { Write-Host $msg -f darkgreen }
 
 function filesize($length) {
     $gb = [math]::pow(2, 30)
@@ -888,7 +888,7 @@ function pluralize($count, $singular, $plural) {
 function reset_alias($name, $value) {
     if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
-            write-host "Alias $name is read-only; can't reset it." -f darkyellow
+            Write-Host "Alias $name is read-only; can't reset it." -f darkyellow
         }
         return # already set
     }
@@ -1139,8 +1139,8 @@ $configFile = "$configHome\scoop\config.json"
 if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
     New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
     Move-Item "$env:USERPROFILE\.scoop" $configFile
-    write-host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
-    write-host "WARN  to '$configFile'" -f darkyellow
+    Write-Host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
+    Write-Host "WARN  to '$configFile'" -f darkyellow
 }
 
 # Load Scoop config

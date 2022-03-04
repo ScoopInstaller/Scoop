@@ -61,7 +61,7 @@ $apps | ForEach-Object {
         return
     }
 
-    write-host "Resetting $app ($version)."
+    Write-Host "Resetting $app ($version)."
 
     $dir = resolve-path (versiondir $app $version $global)
     $original_dir = $dir
