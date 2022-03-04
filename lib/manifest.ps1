@@ -100,7 +100,7 @@ function generate_user_manifest($app, $bucket, $version) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
-    ensure $(usermanifestsdir) | out-null
+    ensure $(usermanifestsdir) | Out-Null
     try {
         Invoke-AutoUpdate $app "$(Resolve-Path $(usermanifestsdir))" $manifest $version $(@{ })
         return "$(Resolve-Path $(usermanifest $app))"

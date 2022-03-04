@@ -886,20 +886,20 @@ function pluralize($count, $singular, $plural) {
 }
 
 function reset_alias($name, $value) {
-    if($existing = Get-Alias $name -ErrorAction Ignore | Where-Object { $_.options -match 'readonly' }) {
-        if($existing.definition -ne $value) {
+    if($existing = Get-Alias $name -ErrorAction Ignore | Where-Object { $_.Options -match 'readonly' }) {
+        if($existing.Definition -ne $value) {
             Write-Host "Alias $name is read-only; can't reset it." -f darkyellow
         }
         return # already set
     }
     if($value -is [scriptblock]) {
         if(!(Test-Path -Path "function:script:$name")) {
-            New-Item -path function: -name "script:$name" -value $value | out-null
+            New-Item -Path function: -Name "script:$name" -Value $value | Out-Null
         }
         return
     }
 
-    Set-Alias $name $value -scope script -option allscope
+    Set-Alias $name $value -Scope script -Option AllScope
 }
 
 function reset_aliases() {
