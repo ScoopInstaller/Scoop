@@ -757,7 +757,7 @@ function get_shim_path() {
 function search_in_path($target) {
     $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
     foreach($dir in $path.split(';')) {
-        if(Test-Path "$dir\$target" -PathType leaf) {
+        if(Test-Path "$dir\$target" -PathType Leaf) {
             return "$dir\$target"
         }
     }
