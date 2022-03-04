@@ -395,7 +395,7 @@ function dl($url, $to, $cookies, $progress) {
             $wreq.referer = strip_filename $url
         }
         if($cookies) {
-            $wreq.headers.add('Cookie', (cookie_header $cookies))
+            $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
     }
 
