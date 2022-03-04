@@ -66,7 +66,7 @@ function script:fmt($var) {
 
 # copies fixtures to a working directory
 function setup_working($name) {
-    $fixtures = "$psscriptroot/fixtures/$name"
+    $fixtures = "$PSScriptRoot/fixtures/$name"
     if (!(Test-Path $fixtures)) {
         Write-Host "couldn't find fixtures for $name at $fixtures" -f red
         exit 1
