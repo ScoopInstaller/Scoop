@@ -1,5 +1,5 @@
-. "$PSScriptRoot/core.ps1"
-. "$PSScriptRoot/autoupdate.ps1"
+. "$PSScriptRoot\core.ps1"
+. "$PSScriptRoot\autoupdate.ps1"
 
 function manifest_path($app, $bucket) {
     fullpath "$(Find-BucketDirectory $bucket)\$(sanitary_path $app).json"
