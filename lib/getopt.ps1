@@ -31,7 +31,7 @@ function getopt($argv, $shortopts, $longopts) {
         if($arg -is [int]) { $rem += $arg; continue }
         if($arg -is [decimal]) { $rem += $arg; continue }
 
-        if($arg.startswith('--')) {
+        if($arg.StartsWith('--')) {
             $name = $arg.Substring(2)
 
             $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
@@ -48,7 +48,7 @@ function getopt($argv, $shortopts, $longopts) {
             } else {
                 return err "Option --$name not recognized."
             }
-        } elseif($arg.startswith('-') -and $arg -ne '-') {
+        } elseif($arg.StartsWith('-') -and $arg -ne '-') {
             for($j = 1; $j -lt $arg.Length; $j++) {
                 $letter = $arg[$j].tostring()
 

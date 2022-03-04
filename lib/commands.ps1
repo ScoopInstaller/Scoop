@@ -19,7 +19,7 @@ function command_path($cmd) {
     if (!(Test-Path $cmd_path)) {
         # get path from shim
         $shim_path = "$scoopdir\shims\scoop-$cmd.ps1"
-        $line = ((Get-Content $shim_path) | Where-Object { $_.startswith('$path') })
+        $line = ((Get-Content $shim_path) | Where-Object { $_.StartsWith('$path') })
         if($line) {
             Invoke-Expression -Command "$line"
             $cmd_path = $path
