@@ -37,7 +37,7 @@ function getopt($argv, $shortopts, $longopts) {
             $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
 
             if($longopt) {
-                if($longopt.endswith('=')) { # requires arg
+                if($longopt.EndsWith('=')) { # requires arg
                     if($i -eq $argv.Length - 1) {
                         return err "Option --$name requires an argument."
                     }

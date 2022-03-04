@@ -20,7 +20,7 @@ $usershims = "$(Resolve-Path $(shimdir $false))"
 $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
 
 if($path -like "$usershims*" -or $path -like "$globalshims*") {
-    $exepath = if ($path.endswith(".exe") -or $path.endswith(".shim")) {
+    $exepath = if ($path.EndsWith(".exe") -or $path.EndsWith(".shim")) {
         (Get-Content ($path -replace '\.exe$', '.shim') | Select-Object -First 1).replace('path = ', '')
     } else {
         ((Select-String -Path $path -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value

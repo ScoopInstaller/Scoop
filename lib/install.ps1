@@ -103,7 +103,7 @@ function Find-Manifest($app, $bucket) {
         if(!$manifest) {
             # couldn't find app in buckets: check if it's a local path
             $path = $app
-            if(!$path.endswith('.json')) { $path += '.json' }
+            if(!$path.EndsWith('.json')) { $path += '.json' }
             if(Test-Path $path) {
                 $url = "$(Resolve-Path $path)"
                 $app = appname_from_url $url
@@ -802,7 +802,7 @@ function install_prog($fname, $dir, $installer, $global) {
     }
     $arg = @(args $installer.args $dir $global)
 
-    if($prog.endswith('.ps1')) {
+    if($prog.EndsWith('.ps1')) {
         & $prog @arg
     } else {
         $installed = Invoke-ExternalCommand $prog $arg -Activity "Running installer..."
@@ -855,7 +855,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
         }
 
         if($exe) {
-            if($exe.endswith('.ps1')) {
+            if($exe.EndsWith('.ps1')) {
                 & $exe @arg
             } else {
                 $uninstalled = Invoke-ExternalCommand $exe $arg -Activity "Running uninstaller..." -ContinueExitCodes $continue_exit_codes
