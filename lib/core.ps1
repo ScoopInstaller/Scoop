@@ -66,7 +66,7 @@ function set_config {
 
     if ($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
         ensure (Split-Path -Path $configFile) | Out-Null
-        $scoopConfig = New-Object -TypeName PSObject
+        $scoopConfig = New-Object PSObject
     }
 
     if ($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
@@ -378,7 +378,7 @@ function appname_from_url($url) {
 function fname($path) { Split-Path $path -Leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::Escape((fname $path)) }
-function strip_fragment($url) { $url -replace (New-Object System.Uri $url).Fragment }
+function strip_fragment($url) { $url -replace (New-Object uri $url).Fragment }
 
 function url_filename($url) {
     (Split-Path $url -Leaf).Split('?') | Select-Object -First 1
@@ -387,7 +387,7 @@ function url_filename($url) {
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
 # this function extracts the original filename from the URL.
 function url_remote_filename($url) {
-    $uri = (New-Object System.Uri $url)
+    $uri = (New-Object uri $url)
     $basename = Split-Path $uri.PathAndQuery -Leaf
     If ($basename -match ".*[?=]+([\w._-]+)") {
         $basename = $matches[1]

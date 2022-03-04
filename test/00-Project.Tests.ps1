@@ -47,7 +47,7 @@ Describe 'Project code' {
                 $errors = $null
                 $null = [System.Management.Automation.PSParser]::Tokenize($contents, [ref]$errors)
 
-                New-Object psobject -Property @{
+                New-Object PSObject -Property @{
                     Path              = $scriptPath
                     SyntaxErrorsFound = ($errors.Count -gt 0)
                 }

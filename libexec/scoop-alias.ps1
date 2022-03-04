@@ -34,7 +34,7 @@ function init_alias_config {
     if ($aliases) {
         $aliases
     } else {
-        New-Object -TypeName PSObject
+        New-Object PSObject
     }
 }
 
@@ -92,7 +92,7 @@ function list_aliases {
         $command = ($content | Select-Object -Skip 1).Trim()
         $summary = (summary $content).Trim()
 
-        $aliases += New-Object psobject -Property @{Name = $_.name; Summary = $summary; Command = $command }
+        $aliases += New-Object PSObject -Property @{Name = $_.name; Summary = $summary; Command = $command }
     }
 
     if (!$aliases.Count) {
