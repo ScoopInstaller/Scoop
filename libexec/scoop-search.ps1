@@ -31,7 +31,7 @@ function search_bucket($bucket, $query) {
 
     if($query) {
         try {
-            $query = new-object regex $query, 'IgnoreCase'
+            $query = New-Object regex $query, 'IgnoreCase'
         } catch {
             abort "Invalid regular expression: $($_.exception.innerexception.message)"
         }

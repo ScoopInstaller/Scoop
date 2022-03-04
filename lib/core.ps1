@@ -103,14 +103,14 @@ function setup_proxy() {
         if($address -eq 'none') {
             [net.webrequest]::defaultwebproxy = $null
         } elseif($address -ne 'default') {
-            [net.webrequest]::defaultwebproxy = new-object net.webproxy "http://$address"
+            [net.webrequest]::defaultwebproxy = New-Object net.webproxy "http://$address"
         }
 
         if($credentials -eq 'currentuser') {
             [net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
         } elseif($credentials) {
             $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])','$1' }
-            [net.webrequest]::defaultwebproxy.credentials = new-object net.networkcredential($username, $password)
+            [net.webrequest]::defaultwebproxy.credentials = New-Object net.networkcredential($username, $password)
         }
     } catch {
         warn "Failed to use proxy '$proxy': $($_.exception.message)"
@@ -378,7 +378,7 @@ function appname_from_url($url) {
 function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
-function strip_fragment($url) { $url -replace (new-object uri $url).fragment }
+function strip_fragment($url) { $url -replace (New-Object uri $url).fragment }
 
 function url_filename($url) {
     (split-path $url -leaf).split('?') | Select-Object -First 1

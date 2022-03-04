@@ -30,7 +30,7 @@ if ([System.Enum]::GetNames([System.Net.SecurityProtocolType]) -notcontains 'Tls
 # get core functions
 $core_url = 'https://raw.githubusercontent.com/ScoopInstaller/Scoop/master/lib/core.ps1'
 Write-Output 'Initializing...'
-Invoke-Expression (new-object Net.Webclient).DownloadString($core_url)
+Invoke-Expression (New-Object Net.Webclient).DownloadString($core_url)
 
 # prep
 if (installed 'scoop') {

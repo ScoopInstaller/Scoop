@@ -454,7 +454,7 @@ function dl($url, $to, $cookies, $progress) {
     try {
         $s = $wres.getresponsestream()
         $fs = [io.file]::openwrite($to)
-        $buffer = new-object byte[] 2048
+        $buffer = New-Object byte[] 2048
         $totalRead = 0
         $sw = [diagnostics.stopwatch]::StartNew()
 
