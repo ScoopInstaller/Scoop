@@ -387,7 +387,7 @@ function url_filename($url) {
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
 # this function extracts the original filename from the URL.
 function url_remote_filename($url) {
-    $uri = (New-Object URI $url)
+    $uri = (New-Object uri $url)
     $basename = Split-Path $uri.PathAndQuery -Leaf
     If ($basename -match ".*[?=]+([\w._-]+)") {
         $basename = $matches[1]
