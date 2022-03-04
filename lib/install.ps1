@@ -247,14 +247,14 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
     $proxy = get_config 'proxy'
     if ($proxy -ne 'none') {
-        if ([Net.Webrequest]::DefaultWebProxy.Address) {
-            $options += "--all-proxy='$([Net.Webrequest]::DefaultWebProxy.Address.Authority)'"
+        if ([System.Net.WebRequest]::DefaultWebProxy.Address) {
+            $options += "--all-proxy='$([System.Net.WebRequest]::DefaultWebProxy.Address.Authority)'"
         }
-        if ([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
-            $options += "--all-proxy-user='$([Net.Webrequest]::DefaultWebProxy.Credentials.UserName)'"
+        if ([System.Net.WebRequest]::DefaultWebProxy.Credentials.UserName) {
+            $options += "--all-proxy-user='$([System.Net.WebRequest]::DefaultWebProxy.Credentials.UserName)'"
         }
-        if ([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
-            $options += "--all-proxy-passwd='$([Net.Webrequest]::DefaultWebProxy.Credentials.Password)'"
+        if ([System.Net.WebRequest]::DefaultWebProxy.Credentials.Password) {
+            $options += "--all-proxy-passwd='$([System.Net.WebRequest]::DefaultWebProxy.Credentials.Password)'"
         }
     }
 
@@ -388,7 +388,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split "#")[0]
-    $wreq = [net.webrequest]::create($reqUrl)
+    $wreq = [System.Net.WebRequest]::create($reqUrl)
     if($wreq -is [net.httpwebrequest]) {
         $wreq.useragent = Get-UserAgent
         if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {

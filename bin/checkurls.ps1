@@ -53,7 +53,7 @@ function test_dl([String] $url, $cookies) {
     # Trim renaming suffix, prevent getting 40x response
     $url = ($url -split '#/')[0]
 
-    $wreq = [Net.WebRequest]::Create($url)
+    $wreq = [System.Net.WebRequest]::Create($url)
     $wreq.Timeout = $Timeout * 1000
     if ($wreq -is [Net.HttpWebRequest]) {
         $wreq.UserAgent = Get-UserAgent

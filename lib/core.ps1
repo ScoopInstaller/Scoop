@@ -101,16 +101,16 @@ function setup_proxy() {
         }
 
         if($address -eq 'none') {
-            [net.webrequest]::defaultwebproxy = $null
+            [System.Net.WebRequest]::defaultwebproxy = $null
         } elseif($address -ne 'default') {
-            [net.webrequest]::defaultwebproxy = New-Object net.webproxy "http://$address"
+            [System.Net.WebRequest]::defaultwebproxy = New-Object net.webproxy "http://$address"
         }
 
         if($credentials -eq 'currentuser') {
-            [net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
+            [System.Net.WebRequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
         } elseif($credentials) {
             $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])','$1' }
-            [net.webrequest]::defaultwebproxy.credentials = New-Object net.networkcredential($username, $password)
+            [System.Net.WebRequest]::defaultwebproxy.credentials = New-Object net.networkcredential($username, $password)
         }
     } catch {
         warn "Failed to use proxy '$proxy': $($_.exception.message)"
