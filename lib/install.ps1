@@ -992,7 +992,7 @@ function ensure_install_dir_not_in_path($dir, $global) {
 }
 
 function find_dir_or_subdir($path, $dir) {
-    $dir = $dir.trimend('\')
+    $dir = $dir.TrimEnd('\')
     $fixed = @()
     $removed = @()
     $path.split(';') | ForEach-Object {

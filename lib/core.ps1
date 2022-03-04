@@ -542,8 +542,8 @@ function is_directory([String] $path) {
 }
 
 function movedir($from, $to) {
-    $from = $from.trimend('\')
-    $to = $to.trimend('\')
+    $from = $from.TrimEnd('\')
+    $to = $to.TrimEnd('\')
 
     $proc = New-Object System.Diagnostics.Process
     $proc.StartInfo.FileName = 'robocopy.exe'
