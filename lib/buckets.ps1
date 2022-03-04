@@ -37,7 +37,7 @@ function bucketdir($name) {
 function known_bucket_repos {
     $json = "$PSScriptRoot\..\buckets.json"
 
-    return Get-Content $json -raw | ConvertFrom-Json -ErrorAction Stop
+    return Get-Content $json -Raw | ConvertFrom-Json -ErrorAction Stop
 }
 
 function known_bucket_repo($name) {

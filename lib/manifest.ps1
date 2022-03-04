@@ -7,7 +7,7 @@ function manifest_path($app, $bucket) {
 
 function parse_json($path) {
     if(!(test-path $path)) { return $null }
-    Get-Content $path -raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+    Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
 }
 
 function url_manifest($url) {
