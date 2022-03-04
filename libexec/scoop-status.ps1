@@ -93,7 +93,7 @@ if($missing_deps) {
     Write-Host -f DarkCyan 'Missing runtime dependencies:'
     $missing_deps | ForEach-Object {
         $app, $deps = $_
-        "    '$app' requires '$([string]::join("', '", $deps))'"
+        "    '$app' requires '$([string]::Join("', '", $deps))'"
     }
 }
 

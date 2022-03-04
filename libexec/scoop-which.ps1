@@ -40,7 +40,7 @@ if($path -like "$usershims*" -or $path -like "$globalshims*") {
 } elseif($gcm.commandtype -eq 'Alias') {
     scoop which $gcm.resolvedcommandname
 } else {
-    [console]::error.writeline("Not a scoop shim.")
+    [System.Console]::error.writeline("Not a scoop shim.")
     $path
     exit 2
 }

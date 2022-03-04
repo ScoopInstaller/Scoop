@@ -130,15 +130,15 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
 }
 
 function do_dl($url, $to, $cookies) {
-    $progress = [console]::isoutputredirected -eq $false -and
-        $host.name -ne 'Windows PowerShell ISE Host'
+    $progress = [System.Console]::IsOutputRedirected -eq $false -and
+        $host.Name -ne 'Windows PowerShell ISE Host'
 
     try {
         $url = handle_special_urls $url
         dl $url $to $cookies $progress
     } catch {
-        $e = $_.exception
-        if($e.innerexception) { $e = $e.innerexception }
+        $e = $_.Exception
+        if($e.InnerException) { $e = $e.InnerException }
         throw $e
     }
 }
@@ -301,8 +301,8 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         Write-Host 'Starting download with aria2 ...'
 
         # Set console output encoding to UTF8 for non-ASCII characters printing
-        $oriConsoleEncoding = [Console]::OutputEncoding
-        [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+        $oriConsoleEncoding = [System.Console]::OutputEncoding
+        [System.Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
         Invoke-Expression $aria2 | ForEach-Object {
             # Skip blank lines
@@ -341,7 +341,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         }
 
         # Revert console encoding
-        [Console]::OutputEncoding = $oriConsoleEncoding
+        [System.Console]::OutputEncoding = $oriConsoleEncoding
     }
 
     foreach ($url in $urls) {
@@ -389,7 +389,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 function dl($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split "#")[0]
     $wreq = [System.Net.WebRequest]::create($reqUrl)
-    if($wreq -is [net.httpwebrequest]) {
+    if($wreq -is [System.Net.HttpWebRequest]) {
         $wreq.useragent = Get-UserAgent
         if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
             $wreq.referer = strip_filename $url
@@ -440,7 +440,7 @@ function dl($url, $to, $cookies, $progress) {
     }
 
     if ($progress -and ($total -gt 0)) {
-        [console]::CursorVisible = $false
+        [System.Console]::CursorVisible = $false
         function dl_onProgress($read) {
             dl_progress $read $total $url
         }
@@ -453,17 +453,17 @@ function dl($url, $to, $cookies, $progress) {
 
     try {
         $s = $wres.getresponsestream()
-        $fs = [io.file]::openwrite($to)
+        $fs = [System.IO.File]::OpenWrite($to)
         $buffer = New-Object byte[] 2048
         $totalRead = 0
-        $sw = [diagnostics.stopwatch]::StartNew()
+        $sw = [System.Diagnostics.Stopwatch]::StartNew()
 
         dl_onProgress $totalRead
-        while(($read = $s.read($buffer, 0, $buffer.Length)) -gt 0) {
-            $fs.write($buffer, 0, $read)
+        while(($read = $s.Read($buffer, 0, $buffer.Length)) -gt 0) {
+            $fs.Write($buffer, 0, $read)
             $totalRead += $read
-            if ($sw.elapsedmilliseconds -gt 100) {
-                $sw.restart()
+            if ($sw.ElapsedMilliseconds -gt 100) {
+                $sw.Restart()
                 dl_onProgress $totalRead
             }
         }
@@ -471,16 +471,16 @@ function dl($url, $to, $cookies, $progress) {
         dl_onProgress $totalRead
     } finally {
         if ($progress) {
-            [console]::CursorVisible = $true
+            [System.Console]::CursorVisible = $true
             Write-Host
         }
         if ($fs) {
-            $fs.close()
+            $fs.Close()
         }
         if ($s) {
-            $s.close();
+            $s.Close();
         }
-        $wres.close()
+        $wres.Close()
     }
 }
 
@@ -542,7 +542,7 @@ function dl_progress($read, $total, $url) {
     }
 
     Write-Host $(dl_progress_output $url $read $total $console) -NoNewline
-    [console]::SetCursorPosition($left, $top)
+    [System.Console]::SetCursorPosition($left, $top)
 }
 
 function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
@@ -653,13 +653,13 @@ function cookie_header($cookies) {
 function is_in_dir($dir, $check) {
     $check = "$(fullpath $check)"
     $dir = "$(fullpath $dir)"
-    $check -match "^$([regex]::escape("$dir"))(\\|`$)"
+    $check -match "^$([regex]::Escape("$dir"))(\\|`$)"
 }
 
 function ftp_file_size($url) {
-    $request = [net.ftpwebrequest]::create($url)
-    $request.method = [net.webrequestmethods+ftp]::getfilesize
-    $request.getresponse().contentlength
+    $request = [System.Net.FtpWebRequest]::Create($url)
+    $request.Method = [System.Net.WebRequestMethods+Ftp]::GetFileSize
+    $request.GetResponse().ContentLength
 }
 
 # hashes
@@ -670,7 +670,7 @@ function hash_for_url($manifest, $url, $arch) {
 
     $urls = @(script:url $manifest $arch)
 
-    $index = [array]::indexof($urls, $url)
+    $index = [array]::IndexOf($urls, $url)
     if($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
 
     @($hashes)[$index]
@@ -717,16 +717,16 @@ function compute_hash($file, $algname) {
         if(Test-CommandAvailable Get-FileHash) {
             return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
-            $fs = [system.io.file]::openread($file)
-            $alg = [system.security.cryptography.hashalgorithm]::create($algname)
-            $hexbytes = $alg.computehash($fs) | ForEach-Object { $_.tostring('x2') }
-            return [string]::join('', $hexbytes)
+            $fs = [System.IO.File]::openread($file)
+            $alg = [System.Security.Cryptography.HashAlgorithm]::Create($algname)
+            $hexbytes = $alg.ComputeHash($fs) | ForEach-Object { $_.ToString('x2') }
+            return [string]::Join('', $hexbytes)
         }
     } catch {
         error $_.Exception.Message
     } finally {
-        if($fs) { $fs.dispose() }
-        if($alg) { $alg.dispose() }
+        if($fs) { $fs.Dispose() }
+        if($alg) { $alg.Dispose() }
     }
     return ''
 }
@@ -877,9 +877,9 @@ function create_shims($manifest, $dir, $global, $arch) {
         $target, $name, $arg = shim_def $_
         Write-Output "Creating shim for '$name'."
 
-        if(Test-Path "$dir\$target" -PathType Leaf) {
+        if(Test-Path -Path "$dir\$target" -PathType Leaf) {
             $bin = "$dir\$target"
-        } elseif(Test-Path $target -PathType Leaf) {
+        } elseif(Test-Path -Path $target -PathType Leaf) {
             $bin = $target
         } else {
             $bin = search_in_path $target
@@ -1001,7 +1001,7 @@ function find_dir_or_subdir($path, $dir) {
             else { $fixed += $_ }
         }
     }
-    return [string]::join(';', $fixed), $removed
+    return [string]::Join(';', $fixed), $removed
 }
 
 function env_add_path($manifest, $dir, $global, $arch) {
@@ -1038,10 +1038,10 @@ function env_set($manifest, $dir, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
-            $name = $_.name;
-            $val = format $env_set.$($_.name) @{ "dir" = $dir }
+            $name = $_.Name;
+            $val = format $env_set.$($_.Name) @{ "dir" = $dir }
             env $name $global $val
-            Set-Content env:\$name $val
+            Set-Content Env:\$name $val
         }
     }
 }
@@ -1049,9 +1049,9 @@ function env_rm($manifest, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
-            $name = $_.name
+            $name = $_.Name
             env $name $global $null
-            if (Test-Path env:\$name) { Remove-Item env:\$name }
+            if (Test-Path Env:\$name) { Remove-Item Env:\$name }
         }
     }
 }
@@ -1117,7 +1117,7 @@ function show_suggestions($suggested) {
     $installed_apps = (installed_apps $true) + (installed_apps $false)
 
     foreach($app in $suggested.keys) {
-        $features = $suggested[$app] | get-member -type noteproperty | ForEach-Object { $_.name }
+        $features = $suggested[$app] | get-member -type noteproperty | ForEach-Object { $_.Name }
         foreach($feature in $features) {
             $feature_suggestions = $suggested[$app].$feature
 
@@ -1132,7 +1132,7 @@ function show_suggestions($suggested) {
             }
 
             if(!$fulfilled) {
-                Write-Host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
+                Write-Host "'$app' suggests installing '$([string]::Join("' or '", $feature_suggestions))'."
             }
         }
     }
