@@ -2,10 +2,10 @@
 TODO
  - clean up
 #>
-. "$psscriptroot\..\lib\json.ps1"
+. "$PSScriptRoot\..\lib\json.ps1"
 
-. "$psscriptroot/core.ps1"
-. "$psscriptroot/json.ps1"
+. "$PSScriptRoot/core.ps1"
+. "$PSScriptRoot/json.ps1"
 
 function find_hash_in_rdf([String] $url, [String] $basename) {
     $data = $null

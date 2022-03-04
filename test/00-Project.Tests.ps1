@@ -71,4 +71,4 @@ Describe 'Project code' {
 
 }
 
-. "$psscriptroot\Import-File-Tests.ps1"
+. "$PSScriptRoot\Import-File-Tests.ps1"

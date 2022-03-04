@@ -65,14 +65,14 @@ param(
     [String] $Version = ''
 )
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\autoupdate.ps1"
-. "$psscriptroot\..\lib\json.ps1"
-. "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\install.ps1" # needed for hash generation
-. "$psscriptroot\..\lib\unix.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\autoupdate.ps1"
+. "$PSScriptRoot\..\lib\json.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
+. "$PSScriptRoot\..\lib\unix.ps1"
 
 $Dir = Resolve-Path $Dir
 $Search = $App

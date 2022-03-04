@@ -1,5 +1,5 @@
-. "$psscriptroot\Scoop-TestLib.ps1"
-. "$psscriptroot\..\lib\getopt.ps1"
+. "$PSScriptRoot\Scoop-TestLib.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
 
 Describe 'getopt' -Tag 'Scoop' {
     It 'handle short option with required argument missing' {
