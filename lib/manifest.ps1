@@ -102,8 +102,8 @@ function generate_user_manifest($app, $bucket, $version) {
 
     ensure $(usermanifestsdir) | out-null
     try {
-        Invoke-AutoUpdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(@{ })
-        return "$(resolve-path $(usermanifest $app))"
+        Invoke-AutoUpdate $app "$(Resolve-Path $(usermanifestsdir))" $manifest $version $(@{ })
+        return "$(Resolve-Path $(usermanifest $app))"
     } catch {
         Write-Host -f darkred "Could not install $app@$version"
     }

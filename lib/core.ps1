@@ -401,7 +401,7 @@ function url_remote_filename($url) {
     return $basename
 }
 
-function ensure($dir) { if(!(Test-Path $dir)) { mkdir $dir > $null }; resolve-path $dir }
+function ensure($dir) { if(!(Test-Path $dir)) { mkdir $dir > $null }; Resolve-Path $dir }
 function fullpath($path) { # should be ~ rooted
     $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }

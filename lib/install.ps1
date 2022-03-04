@@ -105,7 +105,7 @@ function Find-Manifest($app, $bucket) {
             $path = $app
             if(!$path.endswith('.json')) { $path += '.json' }
             if(Test-Path $path) {
-                $url = "$(resolve-path $path)"
+                $url = "$(Resolve-Path $path)"
                 $app = appname_from_url $url
                 $manifest, $bucket = url_manifest $url
             }
