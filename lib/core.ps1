@@ -403,7 +403,7 @@ function url_remote_filename($url) {
 
 function ensure($dir) { if(!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir > $null }; Resolve-Path $dir }
 function fullpath($path) { # should be ~ rooted
-    $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
+    $executionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
 }
 function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
 function friendly_path($path) {
