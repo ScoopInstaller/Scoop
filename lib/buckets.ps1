@@ -98,7 +98,7 @@ function add_bucket($name, $repo) {
         exit 0
     }
 
-    Write-Host 'Checking repo... ' -nonewline
+    Write-Host 'Checking repo... ' -NoNewline
     $out = git_cmd ls-remote $repo 2>&1
     if ($lastexitcode -ne 0) {
         abort "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"

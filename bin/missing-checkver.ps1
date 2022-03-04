@@ -28,11 +28,11 @@ param(
 
 $Dir = Resolve-Path $Dir
 
-Write-Host '[' -NoNewLine
-Write-Host 'C' -NoNewLine -ForegroundColor Green
+Write-Host '[' -NoNewline
+Write-Host 'C' -NoNewline -ForegroundColor Green
 Write-Host ']heckver'
-Write-Host ' | [' -NoNewLine
-Write-Host 'A' -NoNewLine -ForegroundColor Cyan
+Write-Host ' | [' -NoNewline
+Write-Host 'A' -NoNewline -ForegroundColor Cyan
 Write-Host ']utoupdate'
 Write-Host ' |  |'
 
@@ -41,12 +41,12 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
 
     if ($SkipSupported -and $json.checkver -and $json.autoupdate) { return }
 
-    Write-Host '[' -NoNewLine
-    Write-Host $(if ($json.checkver) { 'C' } else { ' ' }) -NoNewLine -ForegroundColor Green
-    Write-Host ']' -NoNewLine
+    Write-Host '[' -NoNewline
+    Write-Host $(if ($json.checkver) { 'C' } else { ' ' }) -NoNewline -ForegroundColor Green
+    Write-Host ']' -NoNewline
 
-    Write-Host '[' -NoNewLine
-    Write-Host $(if ($json.autoupdate) { 'A' } else { ' ' }) -NoNewLine -ForegroundColor Cyan
-    Write-Host '] ' -NoNewLine
+    Write-Host '[' -NoNewline
+    Write-Host $(if ($json.autoupdate) { 'A' } else { ' ' }) -NoNewline -ForegroundColor Cyan
+    Write-Host '] ' -NoNewline
     Write-Host (strip_ext $_.Name)
 }

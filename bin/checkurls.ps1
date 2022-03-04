@@ -38,14 +38,14 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $Queue += , @($_.Name, $manifest)
 }
 
-Write-Host '[' -NoNewLine
-Write-Host 'U' -NoNewLine -ForegroundColor Cyan
+Write-Host '[' -NoNewline
+Write-Host 'U' -NoNewline -ForegroundColor Cyan
 Write-Host ']RLs'
-Write-Host ' | [' -NoNewLine
-Write-Host 'O' -NoNewLine -ForegroundColor Green
+Write-Host ' | [' -NoNewline
+Write-Host 'O' -NoNewline -ForegroundColor Green
 Write-Host ']kay'
-Write-Host ' |  | [' -NoNewLine
-Write-Host 'F' -NoNewLine -ForegroundColor Red
+Write-Host ' |  | [' -NoNewline
+Write-Host 'F' -NoNewline -ForegroundColor Red
 Write-Host ']ailed'
 Write-Host ' |  |  |'
 
@@ -102,29 +102,29 @@ foreach ($man in $Queue) {
     if (($ok -eq $urls.Length) -and $SkipValid) { continue }
 
     # URLS
-    Write-Host '[' -NoNewLine
-    Write-Host $urls.Length -NoNewLine -ForegroundColor Cyan
-    Write-Host ']' -NoNewLine
+    Write-Host '[' -NoNewline
+    Write-Host $urls.Length -NoNewline -ForegroundColor Cyan
+    Write-Host ']' -NoNewline
 
     # Okay
-    Write-Host '[' -NoNewLine
+    Write-Host '[' -NoNewline
     if ($ok -eq $urls.Length) {
-        Write-Host $ok -NoNewLine -ForegroundColor Green
+        Write-Host $ok -NoNewline -ForegroundColor Green
     } elseif ($ok -eq 0) {
-        Write-Host $ok -NoNewLine -ForegroundColor Red
+        Write-Host $ok -NoNewline -ForegroundColor Red
     } else {
-        Write-Host $ok -NoNewLine -ForegroundColor Yellow
+        Write-Host $ok -NoNewline -ForegroundColor Yellow
     }
-    Write-Host ']' -NoNewLine
+    Write-Host ']' -NoNewline
 
     # Failed
-    Write-Host '[' -NoNewLine
+    Write-Host '[' -NoNewline
     if ($failed -eq 0) {
-        Write-Host $failed -NoNewLine -ForegroundColor Green
+        Write-Host $failed -NoNewline -ForegroundColor Green
     } else {
-        Write-Host $failed -NoNewLine -ForegroundColor Red
+        Write-Host $failed -NoNewline -ForegroundColor Red
     }
-    Write-Host '] ' -NoNewLine
+    Write-Host '] ' -NoNewline
     Write-Host (strip_ext $name)
 
     $errors | ForEach-Object {

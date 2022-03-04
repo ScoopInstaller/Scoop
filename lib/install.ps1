@@ -541,7 +541,7 @@ function dl_progress($read, $total, $url) {
         }
     }
 
-    Write-Host $(dl_progress_output $url $read $total $console) -nonewline
+    Write-Host $(dl_progress_output $url $read $total $console) -NoNewline
     [console]::SetCursorPosition($left, $top)
 }
 
@@ -686,7 +686,7 @@ function check_hash($file, $hash, $app_name) {
 
     Write-Host "Checking hash of " -NoNewline
     Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
-    Write-Host " ... " -nonewline
+    Write-Host " ... " -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
         return $false, "Hash type '$algorithm' isn't supported."
