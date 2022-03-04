@@ -50,7 +50,7 @@ function getopt($argv, $shortopts, $longopts) {
             }
         } elseif($arg.StartsWith('-') -and $arg -ne '-') {
             for($j = 1; $j -lt $arg.Length; $j++) {
-                $letter = $arg[$j].tostring()
+                $letter = $arg[$j].ToString()
 
                 if($shortopts -match "$(regex_escape $letter)`:?") {
                     $shortopt = $matches[0]
