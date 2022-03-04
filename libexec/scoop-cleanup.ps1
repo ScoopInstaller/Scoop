@@ -43,7 +43,7 @@ function cleanup($app, $global, $verbose, $cache) {
         return
     }
 
-    Write-Host -ForegroundColor yellow "Removing $app`:" -NoNewline
+    Write-Host -ForegroundColor Yellow "Removing $app`:" -NoNewline
     $versions | ForEach-Object {
         $version = $_
         Write-Host " $version" -NoNewline

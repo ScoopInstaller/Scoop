@@ -364,7 +364,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
                     Remove-Item "$($data.$url.source).aria2*" -Force -ErrorAction SilentlyContinue
                 }
                 if ($url.Contains('sourceforge.net')) {
-                    Write-Host -ForegroundColor yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                    Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
                 abort $(new_issue_msg $app $bucket 'hash check failed')
             }
@@ -574,7 +574,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             try {
                 dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
             } catch {
-                Write-Host -ForegroundColor darkred $_
+                Write-Host -ForegroundColor DarkRed $_
                 abort "URL $url is not valid"
             }
 
@@ -589,7 +589,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                         Remove-Item -Force $cached
                     }
                     if ($url.Contains('sourceforge.net')) {
-                        Write-Host -ForegroundColor yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                        Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     abort $(new_issue_msg $app $bucket "hash check failed")
                 }

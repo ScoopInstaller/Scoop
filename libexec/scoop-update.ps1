@@ -215,7 +215,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
                         Remove-Item -Force $source
                     }
                     if ($url.Contains('sourceforge.net')) {
-                        Write-Host -ForegroundColor yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                        Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     abort $(new_issue_msg $app $bucket "hash check failed")
                 }
@@ -313,7 +313,7 @@ if (-not ($apps -or $all)) {
             if ($status.installed -and ($force -or $status.outdated)) {
                 if (!$status.hold) {
                     $outdated += applist $app $global
-                    Write-Host -ForegroundColor yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('', ' (global)')[$global])
+                    Write-Host -ForegroundColor Yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('', ' (global)')[$global])
                 } else {
                     warn "'$app' is held to version $($status.version)"
                 }
