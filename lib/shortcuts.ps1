@@ -29,11 +29,11 @@ function shortcut_folder($global) {
 
 function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global) {
     if (!$target.Exists) {
-        Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find $target"
+        Write-Host -ForegroundColor DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find $target"
         return
     }
     if ($icon -and !$icon.Exists) {
-        Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find icon $icon"
+        Write-Host -ForegroundColor DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find icon $icon"
         return
     }
 

@@ -41,7 +41,7 @@ function test_results {
     }
 
     Write-Host "ran $script:run tests, " -NoNewline
-    Write-Host $res -f $col
+    Write-Host $res -ForegroundColor $col
 }
 
 function script:fail($msg) {
@@ -53,7 +53,7 @@ function script:fail($msg) {
 
     if ($script:test) { $msg = "$script:test`r`n      -> $msg" }
 
-    Write-Host "FAIL: $msg" -f darkred
+    Write-Host "FAIL: $msg" -ForegroundColor darkred
     Write-Host "$script line $line`:"
     Write-Host (($invoked.positionmessage -split "`r`n")[1..2] -join "`r`n")
 }
@@ -68,7 +68,7 @@ function script:fmt($var) {
 function setup_working($name) {
     $fixtures = "$PSScriptRoot/fixtures/$name"
     if (!(Test-Path $fixtures)) {
-        Write-Host "couldn't find fixtures for $name at $fixtures" -f red
+        Write-Host "couldn't find fixtures for $name at $fixtures" -ForegroundColor red
         exit 1
     }
 

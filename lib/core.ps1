@@ -140,10 +140,10 @@ function is_admin {
 }
 
 # messages
-function abort($msg, [int] $exit_code = 1) { Write-Host $msg -f red; exit $exit_code }
-function error($msg) { Write-Host "ERROR $msg" -f darkred }
-function warn($msg) { Write-Host "WARN  $msg" -f darkyellow }
-function info($msg) { Write-Host "INFO  $msg" -f darkgray }
+function abort($msg, [int] $exit_code = 1) { Write-Host $msg -ForegroundColor red; exit $exit_code }
+function error($msg) { Write-Host "ERROR $msg" -ForegroundColor darkred }
+function warn($msg) { Write-Host "WARN  $msg" -ForegroundColor darkyellow }
+function info($msg) { Write-Host "INFO  $msg" -ForegroundColor darkgray }
 function debug($obj) {
     if ((get_config 'debug' $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
         return
@@ -154,26 +154,26 @@ function debug($obj) {
     $msg = $obj | Out-String -Stream
 
     if ($null -eq $obj -or $null -eq $msg) {
-        Write-Host "$prefix $param = " -f DarkCyan -NoNewline
-        Write-Host '$null' -f DarkYellow -NoNewline
-        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        Write-Host "$prefix $param = " -ForegroundColor DarkCyan -NoNewline
+        Write-Host '$null' -ForegroundColor DarkYellow -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -ForegroundColor DarkGray
         return
     }
 
     if ($msg.GetType() -eq [System.Object[]]) {
-        Write-Host "$prefix $param ($($obj.GetType()))" -f DarkCyan -NoNewline
-        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        Write-Host "$prefix $param ($($obj.GetType()))" -ForegroundColor DarkCyan -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -ForegroundColor DarkGray
         $msg | Where-Object { ![String]::IsNullOrWhiteSpace($_) } |
         Select-Object -Skip 2 | # Skip headers
         ForEach-Object {
-            Write-Host "$prefix $param.$($_)" -f DarkCyan
+            Write-Host "$prefix $param.$($_)" -ForegroundColor DarkCyan
         }
     } else {
-        Write-Host "$prefix $param = $($msg.Trim())" -f DarkCyan -NoNewline
-        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        Write-Host "$prefix $param = $($msg.Trim())" -ForegroundColor DarkCyan -NoNewline
+        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -ForegroundColor DarkGray
     }
 }
-function success($msg) { Write-Host $msg -f darkgreen }
+function success($msg) { Write-Host $msg -ForegroundColor darkgreen }
 
 function filesize($length) {
     $gb = [System.Math]::Pow(2, 30)
@@ -887,7 +887,7 @@ function pluralize($count, $singular, $plural) {
 function reset_alias($name, $value) {
     if ($existing = Get-Alias $name -ErrorAction Ignore | Where-Object { $_.Options -match 'Readonly' }) {
         if ($existing.Definition -ne $value) {
-            Write-Host "Alias $name is read-only; can't reset it." -f darkyellow
+            Write-Host "Alias $name is read-only; can't reset it." -ForegroundColor darkyellow
         }
         return # already set
     }
@@ -1134,8 +1134,8 @@ $configFile = "$configHome\scoop\config.json"
 if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
     New-Item -ItemType Directory -Path (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
     Move-Item "$env:USERPROFILE\.scoop" $configFile
-    Write-Host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
-    Write-Host "WARN  to '$configFile'" -f darkyellow
+    Write-Host "WARN  Scoop configuration has been migrated from '~/.scoop'" -ForegroundColor darkyellow
+    Write-Host "WARN  to '$configFile'" -ForegroundColor darkyellow
 }
 
 # Load Scoop config

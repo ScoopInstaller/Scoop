@@ -60,7 +60,7 @@ $true, $false | ForEach-Object { # local and global apps
 }
 
 if($outdated) {
-    Write-Host -f DarkCyan 'Updates are available for:'
+    Write-Host -ForegroundColor DarkCyan 'Updates are available for:'
     $outdated.keys | ForEach-Object {
         $versions = $outdated.$_
         "    $_`: $($versions[0]) -> $($versions[1])"
@@ -68,7 +68,7 @@ if($outdated) {
 }
 
 if($onhold) {
-    Write-Host -f DarkCyan 'These apps are outdated and on hold:'
+    Write-Host -ForegroundColor DarkCyan 'These apps are outdated and on hold:'
     $onhold.keys | ForEach-Object {
         $versions = $onhold.$_
         "    $_`: $($versions[0]) -> $($versions[1])"
@@ -76,21 +76,21 @@ if($onhold) {
 }
 
 if($removed) {
-    Write-Host -f DarkCyan 'These app manifests have been removed:'
+    Write-Host -ForegroundColor DarkCyan 'These app manifests have been removed:'
     $removed.keys | ForEach-Object {
         "    $_"
     }
 }
 
 if($failed) {
-    Write-Host -f DarkCyan 'These apps failed to install:'
+    Write-Host -ForegroundColor DarkCyan 'These apps failed to install:'
     $failed.keys | ForEach-Object {
         "    $_"
     }
 }
 
 if($missing_deps) {
-    Write-Host -f DarkCyan 'Missing runtime dependencies:'
+    Write-Host -ForegroundColor DarkCyan 'Missing runtime dependencies:'
     $missing_deps | ForEach-Object {
         $app, $deps = $_
         "    '$app' requires '$([string]::Join("', '", $deps))'"

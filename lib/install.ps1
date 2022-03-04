@@ -30,7 +30,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     }
 
     if (!(supports_architecture $manifest $architecture)) {
-        Write-Host -f DarkRed "'$app' doesn't support $architecture architecture!"
+        Write-Host -ForegroundColor DarkRed "'$app' doesn't support $architecture architecture!"
         return
     }
 
@@ -272,7 +272,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
         if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
             Write-Host 'Loading ' -NoNewline
-            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+            Write-Host $(url_remote_filename $url) -ForegroundColor Cyan -NoNewline
             Write-Host ' from cache.'
         } else {
             $download_finished = $false
@@ -364,7 +364,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
                     Remove-Item "$($data.$url.source).aria2*" -Force -ErrorAction SilentlyContinue
                 }
                 if ($url.Contains('sourceforge.net')) {
-                    Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                    Write-Host -ForegroundColor yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
                 abort $(new_issue_msg $app $bucket 'hash check failed')
             }
@@ -574,7 +574,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             try {
                 dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
             } catch {
-                Write-Host -f darkred $_
+                Write-Host -ForegroundColor darkred $_
                 abort "URL $url is not valid"
             }
 
@@ -589,7 +589,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                         Remove-Item -Force $cached
                     }
                     if ($url.Contains('sourceforge.net')) {
-                        Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                        Write-Host -ForegroundColor yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     abort $(new_issue_msg $app $bucket "hash check failed")
                 }
@@ -631,10 +631,10 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
         if ($extract_fn) {
             Write-Host "Extracting " -NoNewline
-            Write-Host $fname -f Cyan -NoNewline
+            Write-Host $fname -ForegroundColor Cyan -NoNewline
             Write-Host " ... " -NoNewline
             & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
-            Write-Host "done." -f Green
+            Write-Host "done." -ForegroundColor Green
             $extracted++
         }
     }
@@ -687,7 +687,7 @@ function check_hash($file, $hash, $app_name) {
     }
 
     Write-Host "Checking hash of " -NoNewline
-    Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+    Write-Host $(url_remote_filename $url) -ForegroundColor Cyan -NoNewline
     Write-Host " ... " -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
@@ -710,7 +710,7 @@ function check_hash($file, $hash, $app_name) {
         }
         return $false, $msg
     }
-    Write-Host "ok." -f Green
+    Write-Host "ok." -ForegroundColor Green
     return $true, $null
 }
 

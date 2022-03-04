@@ -51,7 +51,7 @@ if (!$configBranch) {
     set_config SCOOP_BRANCH $configBranch | Out-Null
 }
 
-if(($PSVersionTable.PSVersion.Major) -lt 5) {
+if (($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
     Write-Output "PowerShell 5 or later is required to run Scoop."
     Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
@@ -60,11 +60,11 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
 
 function update_scoop() {
     # check for git
-    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     Write-Host "Updating Scoop..."
     $last_update = $(last_scoop_update)
-    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
+    if ($null -eq $last_update) { $last_update = [System.DateTime]::Now }
     $last_update = $last_update.ToString('s')
     $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
@@ -215,7 +215,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
                         Remove-Item -Force $source
                     }
                     if ($url.Contains('sourceforge.net')) {
-                        Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                        Write-Host -ForegroundColor yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     abort $(new_issue_msg $app $bucket "hash check failed")
                 }
@@ -313,7 +313,7 @@ if (-not ($apps -or $all)) {
             if ($status.installed -and ($force -or $status.outdated)) {
                 if (!$status.hold) {
                     $outdated += applist $app $global
-                    Write-Host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('', ' (global)')[$global])
+                    Write-Host -ForegroundColor yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('', ' (global)')[$global])
                 } else {
                     warn "'$app' is held to version $($status.version)"
                 }
@@ -333,11 +333,11 @@ if (-not ($apps -or $all)) {
             warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
         }
         if ($outdated.Length -gt 1) {
-            Write-Host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
+            Write-Host -ForegroundColor DarkCyan "Updating $($outdated.Length) outdated apps:"
         } elseif ($outdated.Length -eq 0) {
-            Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
+            Write-Host -ForegroundColor Green "Latest versions for all apps are installed! For more information try 'scoop status'"
         } else {
-            Write-Host -f DarkCyan "Updating one outdated app:"
+            Write-Host -ForegroundColor DarkCyan "Updating one outdated app:"
         }
     }
 

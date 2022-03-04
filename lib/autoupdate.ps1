@@ -14,8 +14,8 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         [xml]$data = $wc.DownloadString($url)
     } catch [System.Net.WebException] {
-        Write-Host -f darkred $_
-        Write-Host -f darkred "URL $url is not valid"
+        Write-Host -ForegroundColor darkred $_
+        Write-Host -ForegroundColor darkred "URL $url is not valid"
         return $null
     }
 
@@ -43,8 +43,8 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $hashfile = $wc.DownloadString($url)
     } catch [System.Net.WebException] {
-        Write-Host -f darkred $_
-        Write-Host -f darkred "URL $url is not valid"
+        Write-Host -ForegroundColor darkred $_
+        Write-Host -ForegroundColor darkred "URL $url is not valid"
         return
     }
 
@@ -96,8 +96,8 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $json = $wc.DownloadString($url)
     } catch [System.Net.WebException] {
-        Write-Host -f darkred $_
-        Write-Host -f darkred "URL $url is not valid"
+        Write-Host -ForegroundColor darkred $_
+        Write-Host -ForegroundColor darkred "URL $url is not valid"
         return
     }
     $hash = json_path $json $jsonpath $substitutions
@@ -116,8 +116,8 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $xml = [xml]$wc.DownloadString($url)
     } catch [System.Net.WebException] {
-        Write-Host -f darkred $_
-        Write-Host -f darkred "URL $url is not valid"
+        Write-Host -ForegroundColor darkred $_
+        Write-Host -ForegroundColor darkred "URL $url is not valid"
         return
     }
 
@@ -158,8 +158,8 @@ function find_hash_in_headers([String] $url) {
         }
         $res.Close()
     } catch [System.Net.WebException] {
-        Write-Host -f darkred $_
-        Write-Host -f darkred "URL $url is not valid"
+        Write-Host -ForegroundColor darkred $_
+        Write-Host -ForegroundColor darkred "URL $url is not valid"
         return
     }
 
@@ -184,10 +184,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hashfile_url = substitute $config.url $substitutions
     debug $hashfile_url
     if ($hashfile_url) {
-        Write-Host -f DarkYellow 'Searching hash for ' -NoNewline
-        Write-Host -f Green $basename -NoNewline
-        Write-Host -f DarkYellow ' in ' -NoNewline
-        Write-Host -f Green $hashfile_url
+        Write-Host -ForegroundColor DarkYellow 'Searching hash for ' -NoNewline
+        Write-Host -ForegroundColor Green $basename -NoNewline
+        Write-Host -ForegroundColor DarkYellow ' in ' -NoNewline
+        Write-Host -ForegroundColor Green $hashfile_url
     }
 
     if ($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
@@ -256,29 +256,29 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
 
     if ($hash) {
         # got one!
-        Write-Host -f DarkYellow 'Found: ' -NoNewline
-        Write-Host -f Green $hash -NoNewline
-        Write-Host -f DarkYellow ' using ' -NoNewline
-        Write-Host -f Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
+        Write-Host -ForegroundColor DarkYellow 'Found: ' -NoNewline
+        Write-Host -ForegroundColor Green $hash -NoNewline
+        Write-Host -ForegroundColor DarkYellow ' using ' -NoNewline
+        Write-Host -ForegroundColor Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
         return $hash
     } elseif ($hashfile_url) {
-        Write-Host -f DarkYellow "Could not find hash in $hashfile_url"
+        Write-Host -ForegroundColor DarkYellow "Could not find hash in $hashfile_url"
     }
 
-    Write-Host -f DarkYellow 'Downloading ' -NoNewline
-    Write-Host -f Green $basename -NoNewline
-    Write-Host -f DarkYellow ' to compute hashes!'
+    Write-Host -ForegroundColor DarkYellow 'Downloading ' -NoNewline
+    Write-Host -ForegroundColor Green $basename -NoNewline
+    Write-Host -ForegroundColor DarkYellow ' to compute hashes!'
     try {
         dl_with_cache $app $version $url $null $null $true
     } catch [System.Net.WebException] {
-        Write-Host -f darkred $_
-        Write-Host -f darkred "URL $url is not valid"
+        Write-Host -ForegroundColor darkred $_
+        Write-Host -ForegroundColor darkred "URL $url is not valid"
         return $null
     }
     $file = fullpath (cache_path $app $version $url)
     $hash = compute_hash $file 'sha256'
-    Write-Host -f DarkYellow 'Computed hash: ' -NoNewline
-    Write-Host -f Green $hash
+    Write-Host -ForegroundColor DarkYellow 'Computed hash: ' -NoNewline
+    Write-Host -ForegroundColor Green $hash
     return $hash
 }
 
