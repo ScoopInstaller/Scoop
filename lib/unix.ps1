@@ -16,7 +16,7 @@ $cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), (Join-Path $scoopdir "ca
 
 # core.ps1
 function ensure($dir) {
-    mkdir -p $dir > $null
+    New-Item -ItemType Directory -Path $dir > $null
     return Resolve-Path $dir
 }
 

@@ -401,7 +401,7 @@ function url_remote_filename($url) {
     return $basename
 }
 
-function ensure($dir) { if(!(Test-Path $dir)) { mkdir $dir > $null }; Resolve-Path $dir }
+function ensure($dir) { if(!(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir > $null }; Resolve-Path $dir }
 function fullpath($path) { # should be ~ rooted
     $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
 }
@@ -1137,7 +1137,7 @@ $cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Wher
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
 if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
-    New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
+    New-Item -ItemType Directory -Path (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
     Move-Item "$env:USERPROFILE\.scoop" $configFile
     Write-Host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
     Write-Host "WARN  to '$configFile'" -f darkyellow
