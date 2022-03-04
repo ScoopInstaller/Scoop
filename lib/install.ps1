@@ -644,10 +644,10 @@ function cookie_header($cookies) {
     if(!$cookies) { return }
 
     $vals = $cookies.psobject.properties | ForEach-Object {
-        "$($_.name)=$($_.value)"
+        "$($_.Name)=$($_.Value)"
     }
 
-    [string]::join(';', $vals)
+    [string]::Join(';', $vals)
 }
 
 function is_in_dir($dir, $check) {

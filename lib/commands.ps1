@@ -9,7 +9,7 @@ function commands {
 }
 
 function command_name($filename) {
-    $filename.name | Select-String 'scoop-(.*?)\.ps1$' | ForEach-Object { $_.matches[0].groups[1].value }
+    $filename.name | Select-String 'scoop-(.*?)\.ps1$' | ForEach-Object { $_.matches[0].Groups[1].Value }
 }
 
 function command_path($cmd) {

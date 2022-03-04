@@ -51,7 +51,7 @@ function choose_item($list, $query) {
     }
     $sel = Read-Host $query
 
-    if ($sel.trim() -match '^[0-9+]$') {
+    if ($sel.Trim() -match '^[0-9+]$') {
         return $list[$sel - 1]
     }
 

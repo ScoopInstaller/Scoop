@@ -42,7 +42,7 @@ function clean_description($description) {
     if(!$description) { return $description }
     $description = $description -replace '\n', ' '
     $description = $description -replace '\s{2,}', ' '
-    return $description.trim()
+    return $description.Trim()
 }
 
 # Collects meta tags from $html into hashtables.
@@ -70,7 +70,7 @@ function meta_refresh($tags, $url) {
     $refresh = meta_content $tags 'http-equiv' 'refresh'
     if($refresh) {
         if($refresh -match '\d+;\s*url\s*=\s*(.*)') {
-            $refresh_url = $matches[1].trim("'", '"')
+            $refresh_url = $matches[1].Trim("'", '"')
             if($refresh_url -notmatch '^https?://') {
                 $refresh_url = "$url$refresh_url"
             }
@@ -108,17 +108,17 @@ function strip_html($html) {
         if($encoding_meta -match 'charset\s*=\s*(.*)') {
             $charset = $matches[1]
             try {
-                $encoding = [text.encoding]::getencoding($charset)
+                $encoding = [System.Text.Encoding]::GetEncoding($charset)
             } catch {
                 Write-Warning "Unknown charset"
             }
             if($encoding) {
-                $html = ([regex]'&#(\d+);?').replace($html, {
+                $html = ([regex]'&#(\d+);?').Replace($html, {
                     param($m)
                     try {
-                        return $encoding.getstring($m.Groups[1].Value)
+                        return $encoding.GetString($m.Groups[1].Value)
                     } catch {
-                        return $m.value
+                        return $m.Value
                     }
                 })
             }
@@ -129,12 +129,12 @@ function strip_html($html) {
     $html = $html -replace '\n{2,}', "`r`n"
     $html = $html -replace ' {2,}', ' '
     $html = $html -replace ' (\.|,)', '$1'
-    return $html.trim()
+    return $html.Trim()
 }
 
 function find_is($text) {
     if($text -match '(?s)[\n\.]((?:[^\n\.])+? is .+?[\.!])') {
-        return $matches[1].trim()
+        return $matches[1].Trim()
     }
 }
 
