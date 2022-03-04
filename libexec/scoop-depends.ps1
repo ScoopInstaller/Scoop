@@ -25,7 +25,7 @@ try {
 
 $deps = @(Get-Dependency $app $architecture) -ne $app
 if($deps) {
-    $deps[($deps.length - 1)..0]
+    $deps[($deps.Length - 1)..0]
 }
 
 exit 0

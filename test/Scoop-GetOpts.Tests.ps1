@@ -33,7 +33,7 @@ Describe 'getopt' -Tag 'Scoop' {
         $err | Should -BeNullOrEmpty
         $opt.g | Should -BeTrue
         $rem | Should -Not -BeNullOrEmpty
-        $rem.length | Should -Be 1
+        $rem.Length | Should -Be 1
         $rem[0] | Should -Be 'rem'
     }
 

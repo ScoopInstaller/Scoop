@@ -459,7 +459,7 @@ function dl($url, $to, $cookies, $progress) {
         $sw = [diagnostics.stopwatch]::StartNew()
 
         dl_onProgress $totalRead
-        while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
+        while(($read = $s.read($buffer, 0, $buffer.Length)) -gt 0) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
             if ($sw.elapsedmilliseconds -gt 100) {
@@ -530,7 +530,7 @@ function dl_progress($read, $total, $url) {
     $width = $console.BufferSize.Width;
 
     if($read -eq 0) {
-        $maxOutputLength = $(dl_progress_output $url 100 $total $console).length
+        $maxOutputLength = $(dl_progress_output $url 100 $total $console).Length
         if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
             # print on new line
@@ -666,7 +666,7 @@ function ftp_file_size($url) {
 function hash_for_url($manifest, $url, $arch) {
     $hashes = @(hash $manifest $arch) | Where-Object { $_ -ne $null };
 
-    if($hashes.length -eq 0) { return $null }
+    if($hashes.Length -eq 0) { return $null }
 
     $urls = @(script:url $manifest $arch)
 

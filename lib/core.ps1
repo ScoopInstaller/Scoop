@@ -871,8 +871,8 @@ function wraptext($text, $width) {
     $text -split '\r?\n' | ForEach-Object {
         $line = ''
         $_ -split ' ' | ForEach-Object {
-            if($line.length -eq 0) { $line = $_ }
-            elseif($line.length + $_.length + 1 -le $width) { $line += " $_" }
+            if($line.Length -eq 0) { $line = $_ }
+            elseif($line.Length + $_.Length + 1 -le $width) { $line += " $_" }
             else { $lines += ,$line; $line = $_ }
         }
         $lines += ,$line

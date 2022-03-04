@@ -7,10 +7,10 @@ function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
         $name = $_.item(1)
         $arguments = ""
         $icon = $null
-        if($_.length -ge 3) {
+        if($_.Length -ge 3) {
             $arguments = $_.item(2)
         }
-        if($_.length -ge 4) {
+        if($_.Length -ge 4) {
             $icon = [System.IO.Path]::Combine($dir, $_.item(3))
             $icon = New-Object System.IO.FileInfo($icon)
         }

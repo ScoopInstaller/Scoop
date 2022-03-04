@@ -61,7 +61,7 @@ if (is_scoop_outdated) {
 
 ensure_none_failed $apps
 
-if ($apps.length -eq 1) {
+if ($apps.Length -eq 1) {
     $app, $null, $version = parse_app $apps
     if ($app.EndsWith('.json')) {
         $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
@@ -80,7 +80,7 @@ $specific_versions = $apps | Where-Object {
 }
 
 # compare object does not like nulls
-if ($specific_versions.length -gt 0) {
+if ($specific_versions.Length -gt 0) {
     $difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
 } else {
     $difference = $apps

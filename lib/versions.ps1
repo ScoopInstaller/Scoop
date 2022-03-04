@@ -248,7 +248,7 @@ function qsort($ary, $fn) {
     if (!($ary -is [array])) { return @($ary) }
 
     $pivot = $ary[0]
-    $rem = $ary[1..($ary.length - 1)]
+    $rem = $ary[1..($ary.Length - 1)]
 
     $lesser = qsort ($rem | Where-Object { (& $fn $pivot $_) -lt 0 }) $fn
 

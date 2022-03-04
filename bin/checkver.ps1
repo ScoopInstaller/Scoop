@@ -196,7 +196,7 @@ function next($er) {
 }
 
 # wait for all to complete
-$in_progress = $Queue.length
+$in_progress = $Queue.Length
 while ($in_progress -gt 0) {
     $ev = Wait-Event
     Remove-Event $ev.SourceIdentifier

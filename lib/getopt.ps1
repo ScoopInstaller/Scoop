@@ -23,7 +23,7 @@ function getopt($argv, $shortopts, $longopts) {
     $argv = @($argv)
     $longopts = @($longopts)
 
-    for($i = 0; $i -lt $argv.length; $i++) {
+    for($i = 0; $i -lt $argv.Length; $i++) {
         $arg = $argv[$i]
         if($null -eq $arg) { continue }
         # don't try to parse array arguments
@@ -38,7 +38,7 @@ function getopt($argv, $shortopts, $longopts) {
 
             if($longopt) {
                 if($longopt.endswith('=')) { # requires arg
-                    if($i -eq $argv.length - 1) {
+                    if($i -eq $argv.Length - 1) {
                         return err "Option --$name requires an argument."
                     }
                     $opts.$name = $argv[++$i]
@@ -49,13 +49,13 @@ function getopt($argv, $shortopts, $longopts) {
                 return err "Option --$name not recognized."
             }
         } elseif($arg.startswith('-') -and $arg -ne '-') {
-            for($j = 1; $j -lt $arg.length; $j++) {
+            for($j = 1; $j -lt $arg.Length; $j++) {
                 $letter = $arg[$j].tostring()
 
                 if($shortopts -match "$(regex_escape $letter)`:?") {
                     $shortopt = $matches[0]
                     if($shortopt[1] -eq ':') {
-                        if($j -ne $arg.length -1 -or $i -eq $argv.length - 1) {
+                        if($j -ne $arg.Length -1 -or $i -eq $argv.Length - 1) {
                             return err "Option -$letter requires an argument."
                         }
                         $opts.$letter = $argv[++$i]

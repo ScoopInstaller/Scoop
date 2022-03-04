@@ -19,7 +19,7 @@ function test($desc, $assertions) {
 }
 
 function assert($x, $eq = '__undefined', $ne = '__undefined') {
-    if ($args.length -gt 0) {
+    if ($args.Length -gt 0) {
         fail "unexpected arguments: $args"
     }
 
