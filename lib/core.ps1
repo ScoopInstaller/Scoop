@@ -101,7 +101,7 @@ function setup_proxy() {
         }
 
         if ($address -eq 'none') {
-            [System.Net.WebRequest]::DefaultWebProxyebproxy = $null
+            [System.Net.WebRequest]::DefaultWebProxy = $null
         } elseif ($address -ne 'default') {
             [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebProxy "http://$address"
         }
@@ -427,8 +427,7 @@ function Invoke-ExternalCommand {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true,
-            Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [Alias("Path")]
         [ValidateNotNullOrEmpty()]
         [String]

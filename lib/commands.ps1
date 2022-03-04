@@ -1,7 +1,7 @@
 function command_files {
     (Get-ChildItem (relpath '..\libexec')) `
         + (Get-ChildItem "$scoopdir\shims") `
-    | Where-Object { $_.name -match 'scoop-.*?\.ps1$' }
+        | Where-Object { $_.name -match 'scoop-.*?\.ps1$' }
 }
 
 function commands {

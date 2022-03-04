@@ -404,9 +404,9 @@ function dl($url, $to, $cookies, $progress) {
     } catch [System.Net.WebException] {
         $exc = $_.Exception
         $handledCodes = @(
-            [System.Net.HttpStatusCode]::MovedPermanently, # HTTP 301
-            [System.Net.HttpStatusCode]::Found, # HTTP 302
-            [System.Net.HttpStatusCode]::SeeOther, # HTTP 303
+            [System.Net.HttpStatusCode]::MovedPermanently,  # HTTP 301
+            [System.Net.HttpStatusCode]::Found,             # HTTP 302
+            [System.Net.HttpStatusCode]::SeeOther,          # HTTP 303
             [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
         )
 
@@ -435,7 +435,7 @@ function dl($url, $to, $cookies, $progress) {
     }
 
     $total = $wres.ContentLength
-    if ($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
+    if ($total -eq -1 -and $wreq -is [System.Net.FtpWebRequest]) {
         $total = ftp_file_size($url)
     }
 
