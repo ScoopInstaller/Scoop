@@ -1007,7 +1007,7 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
 }
 
 function format_hash([String] $hash) {
-    $hash = $hash.toLower()
+    $hash = $hash.ToLower()
     switch ($hash.Length)
     {
         32 { $hash = "md5:$hash" } # md5
