@@ -301,7 +301,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         Write-Host 'Starting download with aria2 ...'
 
         # Set console output encoding to UTF8 for non-ASCII characters printing
-        $ConsoleEncodingBackup = [Console]::OutputEncoding
+        $oriConsoleEncoding = [Console]::OutputEncoding
         [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
         Invoke-Expression $aria2 | ForEach-Object {
@@ -341,7 +341,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         }
 
         # Revert console encoding
-        [Console]::OutputEncoding = $ConsoleEncodingBackup
+        [Console]::OutputEncoding = $oriConsoleEncoding
     }
 
     foreach ($url in $urls) {

@@ -41,9 +41,9 @@ function load_cfg($file) {
     }
 
     try {
-        # ReadAllText will detect the encoding of the file automatically
-        # Ref: https://docs.microsoft.com/en-us/dotnet/api/system.io.file.readalltext
-        $content = [System.IO.File]::ReadAllText($file)
+        # ReadAllLines will detect the encoding of the file automatically
+        # Ref: https://docs.microsoft.com/en-us/dotnet/api/system.io.file.readalllines?view=netframework-4.5
+        $content = [System.IO.File]::ReadAllLines($file)
         return ($content | ConvertFrom-Json -ErrorAction Stop)
     } catch {
         Write-Host "ERROR loading $file`: $($_.exception.message)"
