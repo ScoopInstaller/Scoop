@@ -18,7 +18,7 @@ function Find-BucketDirectory {
     )
 
     # Handle info passing empty string as bucket ($install.bucket)
-    if(($null -eq $Name) -or ($Name -eq '')) { $Name = 'main' }
+    if (($null -eq $Name) -or ($Name -eq '')) { $Name = 'main' }
     $bucket = "$bucketsdir\$Name"
 
     if ((Test-Path "$bucket\bucket") -and !$Root) {
@@ -75,9 +75,9 @@ function find_manifest($app, $bucket) {
         return $null
     }
 
-    foreach($bucket in Get-LocalBucket) {
+    foreach ($bucket in Get-LocalBucket) {
         $manifest = manifest $app $bucket
-        if($manifest) { return $manifest, $bucket }
+        if ($manifest) { return $manifest, $bucket }
     }
 }
 
@@ -126,7 +126,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
-    if (Test-path $bucket_path) {
+    if (Test-Path $bucket_path) {
         $remote = Invoke-Expression "git -C '$bucket_path' config --get remote.origin.url"
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
@@ -135,7 +135,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
         $url = "https://$($Matches.Provider)/$($Matches.User)/$($Matches.Repo)"
     }
 
-    if(!$url) { return 'Please contact the bucket maintainer!' }
+    if (!$url) { return 'Please contact the bucket maintainer!' }
 
     # Print only github repositories
     if ($url -like '*github*') {
@@ -143,7 +143,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
         $body = [System.Web.HttpUtility]::UrlEncode($body)
         $url = $url -replace '\.git$', ''
         $url = "$url/issues/new?title=$title"
-        if($body) {
+        if ($body) {
             $url += "&body=$body"
         }
     }

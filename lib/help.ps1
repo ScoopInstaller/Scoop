@@ -11,6 +11,7 @@ function scoop_help($text) {
     $help_lines -replace '(?ms)^#\s?(Help: )?', ''
 }
 
-function my_usage { # gets usage for the calling script
+function my_usage {
+    # gets usage for the calling script
     usage (Get-Content $myInvocation.PSCommandPath -Raw)
 }

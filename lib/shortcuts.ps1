@@ -7,32 +7,32 @@ function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
         $name = $_.item(1)
         $arguments = ""
         $icon = $null
-        if($_.Length -ge 3) {
+        if ($_.Length -ge 3) {
             $arguments = $_.item(2)
         }
-        if($_.Length -ge 4) {
+        if ($_.Length -ge 4) {
             $icon = [System.IO.Path]::Combine($dir, $_.item(3))
             $icon = New-Object System.IO.FileInfo($icon)
         }
-        $arguments = (substitute $arguments @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir})
+        $arguments = (substitute $arguments @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
         startmenu_shortcut $target $name $arguments $icon $global
     }
 }
 
 function shortcut_folder($global) {
     $directory = [System.IO.Path]::Combine([Environment]::GetFolderPath('startmenu'), 'Programs', 'Scoop Apps')
-    if($global) {
+    if ($global) {
         $directory = [System.IO.Path]::Combine([Environment]::GetFolderPath('commonstartmenu'), 'Programs', 'Scoop Apps')
     }
     return $(ensure $directory)
 }
 
 function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global) {
-    if(!$target.Exists) {
+    if (!$target.Exists) {
         Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find $target"
         return
     }
-    if($icon -and !$icon.Exists) {
+    if ($icon -and !$icon.Exists) {
         Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find icon $icon"
         return
     }
@@ -50,7 +50,7 @@ function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $argume
     if ($arguments) {
         $wsShell.Arguments = $arguments
     }
-    if($icon -and $icon.Exists) {
+    if ($icon -and $icon.Exists) {
         $wsShell.IconLocation = $icon.FullName
     }
     $wsShell.Save()
@@ -64,8 +64,8 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
         $name = $_.item(1)
         $shortcut = "$(shortcut_folder $global)\$name.lnk"
         Write-Host "Removing shortcut $(friendly_path $shortcut)"
-        if(Test-Path $shortcut) {
-             Remove-Item $shortcut
+        if (Test-Path $shortcut) {
+            Remove-Item $shortcut
         }
         # Before issue 1514 Startmenu shortcut removal
         #
@@ -74,10 +74,10 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
         #
         # TODO: Remove this 'if' block and comment after
         #       27 June 2018.
-        if($global) {
+        if ($global) {
             $shortcut = "$(shortcut_folder $false)\$name.lnk"
-            if(Test-Path $shortcut) {
-                 Remove-Item $shortcut
+            if (Test-Path $shortcut) {
+                Remove-Item $shortcut
             }
         }
     }

@@ -13,13 +13,13 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $app, $bucket, $null = parse_app $app
     $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
-    if(!$manifest) {
+    if (!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
     }
 
     $version = $manifest.version
-    if(!$version) { abort "Manifest doesn't specify a version." }
-    if($version -match '[^\w\.\-\+_]') {
+    if (!$version) { abort "Manifest doesn't specify a version." }
+    if ($version -match '[^\w\.\-\+_]') {
         abort "Manifest version has unsupported character '$($matches[0])'."
     }
 
@@ -29,7 +29,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         $check_hash = $false
     }
 
-    if(!(supports_architecture $manifest $architecture)) {
+    if (!(supports_architecture $manifest $architecture)) {
         Write-Host -f DarkRed "'$app' doesn't support $architecture architecture!"
         return
     }
@@ -74,7 +74,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     save_installed_manifest $app $bucket $dir $url
     save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
-    if($manifest.suggest) {
+    if ($manifest.suggest) {
         $suggested[$app] = $manifest.suggest
     }
 
@@ -92,7 +92,7 @@ function Find-Manifest($app, $bucket) {
     $manifest, $url = $null, $null
 
     # check if app is a URL or UNC path
-    if($app -match '^(ht|f)tps?://|\\\\') {
+    if ($app -match '^(ht|f)tps?://|\\\\') {
         $url = $app
         $app = appname_from_url $url
         $manifest = url_manifest $url
@@ -100,11 +100,11 @@ function Find-Manifest($app, $bucket) {
         # check buckets
         $manifest, $bucket = find_manifest $app $bucket
 
-        if(!$manifest) {
+        if (!$manifest) {
             # couldn't find app in buckets: check if it's a local path
             $path = $app
-            if(!$path.EndsWith('.json')) { $path += '.json' }
-            if(Test-Path $path) {
+            if (!$path.EndsWith('.json')) { $path += '.json' }
+            if (Test-Path $path) {
                 $url = "$(Resolve-Path $path)"
                 $app = appname_from_url $url
                 $manifest, $bucket = url_manifest $url
@@ -118,11 +118,11 @@ function Find-Manifest($app, $bucket) {
 function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
 
-    if(!(Test-Path $cached) -or !$use_cache) {
+    if (!(Test-Path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
         do_dl $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -Force
-    } else { Write-Host "Loading $(url_remote_filename $url) from cache"}
+    } else { Write-Host "Loading $(url_remote_filename $url) from cache" }
 
     if (!($null -eq $to)) {
         Copy-Item $cached $to
@@ -131,55 +131,55 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
 
 function do_dl($url, $to, $cookies) {
     $progress = [System.Console]::IsOutputRedirected -eq $false -and
-        $host.Name -ne 'Windows PowerShell ISE Host'
+    $host.Name -ne 'Windows PowerShell ISE Host'
 
     try {
         $url = handle_special_urls $url
         dl $url $to $cookies $progress
     } catch {
         $e = $_.Exception
-        if($e.InnerException) { $e = $e.InnerException }
+        if ($e.InnerException) { $e = $e.InnerException }
         throw $e
     }
 }
 
 function aria_exit_code($exitcode) {
     $codes = @{
-        0='All downloads were successful'
-        1='An unknown error occurred'
-        2='Timeout'
-        3='Resource was not found'
-        4='Aria2 saw the specified number of "resource not found" error. See --max-file-not-found option'
-        5='Download aborted because download speed was too slow. See --lowest-speed-limit option'
-        6='Network problem occurred.'
-        7='There were unfinished downloads. This error is only reported if all finished downloads were successful and there were unfinished downloads in a queue when aria2 exited by pressing Ctrl-C by an user or sending TERM or INT signal'
-        8='Remote server did not support resume when resume was required to complete download'
-        9='There was not enough disk space available'
-        10='Piece length was different from one in .aria2 control file. See --allow-piece-length-change option'
-        11='Aria2 was downloading same file at that moment'
-        12='Aria2 was downloading same info hash torrent at that moment'
-        13='File already existed. See --allow-overwrite option'
-        14='Renaming file failed. See --auto-file-renaming option'
-        15='Aria2 could not open existing file'
-        16='Aria2 could not create new file or truncate existing file'
-        17='File I/O error occurred'
-        18='Aria2 could not create directory'
-        19='Name resolution failed'
-        20='Aria2 could not parse Metalink document'
-        21='FTP command failed'
-        22='HTTP response header was bad or unexpected'
-        23='Too many redirects occurred'
-        24='HTTP authorization failed'
-        25='Aria2 could not parse bencoded file (usually ".torrent" file)'
-        26='".torrent" file was corrupted or missing information that aria2 needed'
-        27='Magnet URI was bad'
-        28='Bad/unrecognized option was given or unexpected option argument was given'
-        29='The remote server was unable to handle the request due to a temporary overloading or maintenance'
-        30='Aria2 could not parse JSON-RPC request'
-        31='Reserved. Not used'
-        32='Checksum validation failed'
+        0  = 'All downloads were successful'
+        1  = 'An unknown error occurred'
+        2  = 'Timeout'
+        3  = 'Resource was not found'
+        4  = 'Aria2 saw the specified number of "resource not found" error. See --max-file-not-found option'
+        5  = 'Download aborted because download speed was too slow. See --lowest-speed-limit option'
+        6  = 'Network problem occurred.'
+        7  = 'There were unfinished downloads. This error is only reported if all finished downloads were successful and there were unfinished downloads in a queue when aria2 exited by pressing Ctrl-C by an user or sending TERM or INT signal'
+        8  = 'Remote server did not support resume when resume was required to complete download'
+        9  = 'There was not enough disk space available'
+        10 = 'Piece length was different from one in .aria2 control file. See --allow-piece-length-change option'
+        11 = 'Aria2 was downloading same file at that moment'
+        12 = 'Aria2 was downloading same info hash torrent at that moment'
+        13 = 'File already existed. See --allow-overwrite option'
+        14 = 'Renaming file failed. See --auto-file-renaming option'
+        15 = 'Aria2 could not open existing file'
+        16 = 'Aria2 could not create new file or truncate existing file'
+        17 = 'File I/O error occurred'
+        18 = 'Aria2 could not create directory'
+        19 = 'Name resolution failed'
+        20 = 'Aria2 could not parse Metalink document'
+        21 = 'FTP command failed'
+        22 = 'HTTP response header was bad or unexpected'
+        23 = 'Too many redirects occurred'
+        24 = 'HTTP authorization failed'
+        25 = 'Aria2 could not parse bencoded file (usually ".torrent" file)'
+        26 = '".torrent" file was corrupted or missing information that aria2 needed'
+        27 = 'Magnet URI was bad'
+        28 = 'Bad/unrecognized option was given or unexpected option argument was given'
+        29 = 'The remote server was unable to handle the request due to a temporary overloading or maintenance'
+        30 = 'Aria2 could not parse JSON-RPC request'
+        31 = 'Reserved. Not used'
+        32 = 'Checksum validation failed'
     }
-    if($null -eq $codes[$exitcode]) {
+    if ($null -eq $codes[$exitcode]) {
         return 'An unknown error occurred'
     }
     return $codes[$exitcode]
@@ -188,7 +188,7 @@ function aria_exit_code($exitcode) {
 function get_filename_from_metalink($file) {
     $bytes = get_magic_bytes_pretty $file ''
     # check if file starts with '<?xml'
-    if(!($bytes.StartsWith('3c3f786d6c'))) {
+    if (!($bytes.StartsWith('3c3f786d6c'))) {
         return $null
     }
 
@@ -198,7 +198,7 @@ function get_filename_from_metalink($file) {
     $filename = $null
     try {
         $xr.ReadStartElement('metalink')
-        if($xr.ReadToFollowing('file') -and $xr.MoveToFirstAttribute()) {
+        if ($xr.ReadToFollowing('file') -and $xr.MoveToFirstAttribute()) {
             $filename = $xr.Value
         }
     } catch [System.Xml.XmlException] {
@@ -327,7 +327,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         }
         Write-Host ''
 
-        if($lastexitcode -gt 0) {
+        if ($lastexitcode -gt 0) {
             error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             error $urlstxt_content
             error $aria2
@@ -389,12 +389,12 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 function dl($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split "#")[0]
     $wreq = [System.Net.WebRequest]::create($reqUrl)
-    if($wreq -is [System.Net.HttpWebRequest]) {
+    if ($wreq -is [System.Net.HttpWebRequest]) {
         $wreq.useragent = Get-UserAgent
         if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
             $wreq.referer = strip_filename $url
         }
-        if($cookies) {
+        if ($cookies) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
     }
@@ -404,9 +404,9 @@ function dl($url, $to, $cookies, $progress) {
     } catch [System.Net.WebException] {
         $exc = $_.Exception
         $handledCodes = @(
-            [System.Net.HttpStatusCode]::MovedPermanently,  # HTTP 301
-            [System.Net.HttpStatusCode]::Found,             # HTTP 302
-            [System.Net.HttpStatusCode]::SeeOther,          # HTTP 303
+            [System.Net.HttpStatusCode]::MovedPermanently, # HTTP 301
+            [System.Net.HttpStatusCode]::Found, # HTTP 302
+            [System.Net.HttpStatusCode]::SeeOther, # HTTP 303
             [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
         )
 
@@ -435,7 +435,7 @@ function dl($url, $to, $cookies, $progress) {
     }
 
     $total = $wres.ContentLength
-    if($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
+    if ($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
         $total = ftp_file_size($url)
     }
 
@@ -459,7 +459,7 @@ function dl($url, $to, $cookies, $progress) {
         $sw = [System.Diagnostics.Stopwatch]::StartNew()
 
         dl_onProgress $totalRead
-        while(($read = $s.Read($buffer, 0, $buffer.Length)) -gt 0) {
+        while (($read = $s.Read($buffer, 0, $buffer.Length)) -gt 0) {
             $fs.Write($buffer, 0, $read)
             $totalRead += $read
             if ($sw.ElapsedMilliseconds -gt 100) {
@@ -492,31 +492,31 @@ function dl_progress_output($url, $read, $total, $console) {
 
     # pre-generate LHS and RHS of progress string
     # so we know how much space we have
-    $left  = "$filename ($(filesize $total))"
+    $left = "$filename ($(filesize $total))"
     $right = [string]::Format("{0,3}%", $p)
 
     # calculate remaining width for progress bar
-    $midwidth  = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
+    $midwidth = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
 
     # calculate how many characters are completed
     $completed = [System.Math]::Abs([System.Math]::Round(($p / 100) * $midwidth, 0) - 1)
 
     # generate dashes to symbolise completed
     if ($completed -gt 1) {
-        $dashes = [string]::Join("", ((1..$completed) | ForEach-Object {"="}))
+        $dashes = [string]::Join("", ((1..$completed) | ForEach-Object { "=" }))
     }
 
     # this is why we calculate $completed - 1 above
-    $dashes += switch($p) {
-        100 {"="}
-        default {">"}
+    $dashes += switch ($p) {
+        100 { "=" }
+        default { ">" }
     }
 
     # the remaining characters are filled with spaces
-    $spaces = switch($dashes.Length) {
-        $midwidth {[string]::Empty}
+    $spaces = switch ($dashes.Length) {
+        $midwidth { [string]::Empty }
         default {
-            [string]::Join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object {" "}))
+            [string]::Join("", ((1..($midwidth - $dashes.Length)) | ForEach-Object { " " }))
         }
     }
 
@@ -525,19 +525,19 @@ function dl_progress_output($url, $read, $total, $console) {
 
 function dl_progress($read, $total, $url) {
     $console = $host.UI.RawUI;
-    $left  = $console.CursorPosition.X;
-    $top   = $console.CursorPosition.Y;
+    $left = $console.CursorPosition.X;
+    $top = $console.CursorPosition.Y;
     $width = $console.BufferSize.Width;
 
-    if($read -eq 0) {
+    if ($read -eq 0) {
         $maxOutputLength = $(dl_progress_output $url 100 $total $console).Length
         if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
             # print on new line
             Write-Host
             $left = 0
-            $top  = $top + 1
-            if($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
+            $top = $top + 1
+            if ($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
         }
     }
 
@@ -547,7 +547,7 @@ function dl_progress($read, $total, $url) {
 
 function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
-    if(!$use_cache) { warn "Cache is being ignored." }
+    if (!$use_cache) { warn "Cache is being ignored." }
 
     # can be multiple urls: if there are, then msi or installer should go last,
     # so that $fname is set properly
@@ -565,10 +565,10 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
     $extracted = 0;
 
     # download first
-    if(Test-Aria2Enabled) {
+    if (Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
-        foreach($url in $urls) {
+        foreach ($url in $urls) {
             $fname = url_filename $url
 
             try {
@@ -578,17 +578,17 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
                 abort "URL $url is not valid"
             }
 
-            if($check_hash) {
+            if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
                 $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
-                if(!$ok) {
+                if (!$ok) {
                     error $err
                     $cached = cache_path $app $version $url
-                    if(Test-Path $cached) {
+                    if (Test-Path $cached) {
                         # rm cached file
                         Remove-Item -Force $cached
                     }
-                    if($url.Contains('sourceforge.net')) {
+                    if ($url.Contains('sourceforge.net')) {
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     abort $(new_issue_msg $app $bucket "hash check failed")
@@ -597,7 +597,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         }
     }
 
-    foreach($url in $urls) {
+    foreach ($url in $urls) {
         $fname = url_filename $url
 
         $extract_dir = $extract_dirs[$extracted]
@@ -607,27 +607,29 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
         $extract_fn = $null
         if ($manifest.innosetup) {
             $extract_fn = 'Expand-InnoArchive'
-        } elseif($fname -match '\.zip$') {
+        } elseif ($fname -match '\.zip$') {
             # Use 7zip when available (more fast)
             if (((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
                 $extract_fn = 'Expand-7zipArchive'
             } else {
                 $extract_fn = 'Expand-ZipArchive'
             }
-        } elseif($fname -match '\.msi$') {
+        } elseif ($fname -match '\.msi$') {
             # check manifest doesn't use deprecated install method
-            if(msi $manifest $architecture) {
+            if (msi $manifest $architecture) {
                 warn "MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs."
             } else {
                 $extract_fn = 'Expand-MsiArchive'
             }
-        } elseif(Test-ZstdRequirement -Uri $fname) { # Zstd first
+        } elseif (Test-ZstdRequirement -Uri $fname) {
+            # Zstd first
             $extract_fn = 'Expand-ZstdArchive'
-        } elseif(Test-7zipRequirement -Uri $fname) { # 7zip
+        } elseif (Test-7zipRequirement -Uri $fname) {
+            # 7zip
             $extract_fn = 'Expand-7zipArchive'
         }
 
-        if($extract_fn) {
+        if ($extract_fn) {
             Write-Host "Extracting " -NoNewline
             Write-Host $fname -f Cyan -NoNewline
             Write-Host " ... " -NoNewline
@@ -641,7 +643,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 }
 
 function cookie_header($cookies) {
-    if(!$cookies) { return }
+    if (!$cookies) { return }
 
     $vals = $cookies.psobject.properties | ForEach-Object {
         "$($_.Name)=$($_.Value)"
@@ -666,12 +668,12 @@ function ftp_file_size($url) {
 function hash_for_url($manifest, $url, $arch) {
     $hashes = @(hash $manifest $arch) | Where-Object { $_ -ne $null };
 
-    if($hashes.Length -eq 0) { return $null }
+    if ($hashes.Length -eq 0) { return $null }
 
     $urls = @(script:url $manifest $arch)
 
     $index = [array]::IndexOf($urls, $url)
-    if($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
+    if ($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
 
     @($hashes)[$index]
 }
@@ -679,7 +681,7 @@ function hash_for_url($manifest, $url, $arch) {
 # returns (ok, err)
 function check_hash($file, $hash, $app_name) {
     $file = fullpath $file
-    if(!$hash) {
+    if (!$hash) {
         warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $(compute_hash $file 'sha256')"
         return $true, $null
     }
@@ -695,14 +697,14 @@ function check_hash($file, $hash, $app_name) {
     $actual = compute_hash $file $algorithm
     $expected = $expected.ToLower()
 
-    if($actual -ne $expected) {
+    if ($actual -ne $expected) {
         $msg = "Hash check failed!`n"
         $msg += "App:         $app_name`n"
         $msg += "URL:         $url`n"
-        if(Test-Path $file) {
+        if (Test-Path $file) {
             $msg += "First bytes: $((get_magic_bytes_pretty $file ' ').ToUpper())`n"
         }
-        if($expected -or $actual) {
+        if ($expected -or $actual) {
             $msg += "Expected:    $expected`n"
             $msg += "Actual:      $actual"
         }
@@ -714,7 +716,7 @@ function check_hash($file, $hash, $app_name) {
 
 function compute_hash($file, $algname) {
     try {
-        if(Test-CommandAvailable Get-FileHash) {
+        if (Test-CommandAvailable Get-FileHash) {
             return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
         } else {
             $fs = [System.IO.File]::openread($file)
@@ -725,15 +727,15 @@ function compute_hash($file, $algname) {
     } catch {
         error $_.Exception.Message
     } finally {
-        if($fs) { $fs.Dispose() }
-        if($alg) { $alg.Dispose() }
+        if ($fs) { $fs.Dispose() }
+        if ($alg) { $alg.Dispose() }
     }
     return ''
 }
 
 # for dealing with installers
 function args($config, $dir, $global) {
-    if($config) { return $config | ForEach-Object { (format $_ @{'dir'=$dir;'global'=$global}) } }
+    if ($config) { return $config | ForEach-Object { (format $_ @{'dir' = $dir; 'global' = $global }) } }
     @()
 }
 
@@ -741,15 +743,15 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
     # MSI or other installer
     $msi = msi $manifest $architecture
     $installer = installer $manifest $architecture
-    if($installer.script) {
+    if ($installer.script) {
         Write-Output "Running installer script..."
         Invoke-Expression (@($installer.script) -join "`r`n")
         return
     }
 
-    if($msi) {
+    if ($msi) {
         install_msi $fname $dir $msi
-    } elseif($installer) {
+    } elseif ($installer) {
         install_prog $fname $dir $installer $global
     }
 }
@@ -757,24 +759,24 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
 # deprecated (see also msi_installed)
 function install_msi($fname, $dir, $msi) {
     $msifile = "$dir\$(coalesce $msi.file "$fname")"
-    if(!(is_in_dir $dir $msifile)) {
+    if (!(is_in_dir $dir $msifile)) {
         abort "Error in manifest: MSI file $msifile is outside the app directory."
     }
-    if(!($msi.code)) { abort "Error in manifest: Couldn't find MSI code."}
-    if(msi_installed $msi.code) { abort "The MSI package is already installed on this system." }
+    if (!($msi.code)) { abort "Error in manifest: Couldn't find MSI code." }
+    if (msi_installed $msi.code) { abort "The MSI package is already installed on this system." }
 
     $logfile = "$dir\install.log"
 
     $arg = @("/i `"$msifile`"", '/norestart', "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"",
         "INSTALLDIR=`"$dir`"") + @(args $msi.args $dir)
 
-    if($msi.silent) { $arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1' }
+    if ($msi.silent) { $arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1' }
     else { $arg += '/qb-!' }
 
     $continue_exit_codes = @{ 3010 = "a restart is required to complete installation" }
 
     $installed = Invoke-ExternalCommand 'msiexec' $arg -Activity "Running installer..." -ContinueExitCodes $continue_exit_codes
-    if(!$installed) {
+    if (!$installed) {
         abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
     }
     Remove-Item $logfile
@@ -787,7 +789,7 @@ function install_msi($fname, $dir, $msi) {
 # http://blogs.technet.com/b/heyscriptingguy/archive/2011/12/14/use-powershell-to-find-and-uninstall-software.aspx
 function msi_installed($code) {
     $path = "hklm:\software\microsoft\windows\currentversion\uninstall\$code"
-    if(!(Test-Path $path)) { return $false }
+    if (!(Test-Path $path)) { return $false }
     $key = Get-Item $path
     $name = $key.getvalue('displayname')
     $version = $key.getvalue('displayversion')
@@ -797,21 +799,21 @@ function msi_installed($code) {
 
 function install_prog($fname, $dir, $installer, $global) {
     $prog = "$dir\$(coalesce $installer.file "$fname")"
-    if(!(is_in_dir $dir $prog)) {
+    if (!(is_in_dir $dir $prog)) {
         abort "Error in manifest: Installer $prog is outside the app directory."
     }
     $arg = @(args $installer.args $dir $global)
 
-    if($prog.EndsWith('.ps1')) {
+    if ($prog.EndsWith('.ps1')) {
         & $prog @arg
     } else {
         $installed = Invoke-ExternalCommand $prog $arg -Activity "Running installer..."
-        if(!$installed) {
+        if (!$installed) {
             abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
         }
 
         # Don't remove installer if "keep" flag is set to true
-        if(!($installer.keep -eq "true")) {
+        if (!($installer.keep -eq "true")) {
             Remove-Item $prog
         }
     }
@@ -821,20 +823,20 @@ function run_uninstaller($manifest, $architecture, $dir) {
     $msi = msi $manifest $architecture
     $uninstaller = uninstaller $manifest $architecture
     $version = $manifest.version
-    if($uninstaller.script) {
+    if ($uninstaller.script) {
         Write-Output "Running uninstaller script..."
         Invoke-Expression (@($uninstaller.script) -join "`r`n")
         return
     }
 
-    if($msi -or $uninstaller) {
+    if ($msi -or $uninstaller) {
         $exe = $null; $arg = $null; $continue_exit_codes = @{}
 
-        if($msi) {
+        if ($msi) {
             $code = $msi.code
             $exe = "msiexec";
             $arg = @("/norestart", "/x $code")
-            if($msi.silent) {
+            if ($msi.silent) {
                 $arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1'
             } else {
                 $arg += '/qb-!'
@@ -842,24 +844,24 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
             $continue_exit_codes.1605 = 'not installed, skipping'
             $continue_exit_codes.3010 = 'restart required'
-        } elseif($uninstaller) {
+        } elseif ($uninstaller) {
             $exe = "$dir\$($uninstaller.file)"
             $arg = args $uninstaller.args
-            if(!(is_in_dir $dir $exe)) {
+            if (!(is_in_dir $dir $exe)) {
                 warn "Error in manifest: Installer $exe is outside the app directory, skipping."
                 $exe = $null;
-            } elseif(!(Test-Path $exe)) {
+            } elseif (!(Test-Path $exe)) {
                 warn "Uninstaller $exe is missing, skipping."
                 $exe = $null;
             }
         }
 
-        if($exe) {
-            if($exe.EndsWith('.ps1')) {
+        if ($exe) {
+            if ($exe.EndsWith('.ps1')) {
                 & $exe @arg
             } else {
                 $uninstalled = Invoke-ExternalCommand $exe $arg -Activity "Running uninstaller..." -ContinueExitCodes $continue_exit_codes
-                if(!$uninstalled) { abort "Uninstallation aborted." }
+                if (!$uninstalled) { abort "Uninstallation aborted." }
             }
         }
     }
@@ -867,7 +869,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
 
 # get target, name, arguments for shim
 function shim_def($item) {
-    if($item -is [array]) { return $item }
+    if ($item -is [array]) { return $item }
     return $item, (strip_ext (fname $item)), $null
 }
 
@@ -877,16 +879,16 @@ function create_shims($manifest, $dir, $global, $arch) {
         $target, $name, $arg = shim_def $_
         Write-Output "Creating shim for '$name'."
 
-        if(Test-Path -Path "$dir\$target" -PathType Leaf) {
+        if (Test-Path -Path "$dir\$target" -PathType Leaf) {
             $bin = "$dir\$target"
-        } elseif(Test-Path -Path $target -PathType Leaf) {
+        } elseif (Test-Path -Path $target -PathType Leaf) {
             $bin = $target
         } else {
             $bin = search_in_path $target
         }
-        if(!$bin) { abort "Can't shim '$target': File doesn't exist."}
+        if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
-        shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir})
+        shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
     }
 }
 
@@ -978,15 +980,15 @@ function ensure_install_dir_not_in_path($dir, $global) {
     $path = (env 'path' $global)
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
-    if($removed) {
-        $removed | ForEach-Object { "Installer added '$(friendly_path $_)' to path. Removing."}
+    if ($removed) {
+        $removed | ForEach-Object { "Installer added '$(friendly_path $_)' to path. Removing." }
         env 'path' $global $fixed
     }
 
-    if(!$global) {
+    if (!$global) {
         $fixed, $removed = find_dir_or_subdir (env 'path' $true) "$dir"
-        if($removed) {
-            $removed | ForEach-Object { warn "Installer added '$_' to system path. You might want to remove this manually (requires admin permission)."}
+        if ($removed) {
+            $removed | ForEach-Object { warn "Installer added '$_' to system path. You might want to remove this manually (requires admin permission)." }
         }
     }
 }
@@ -996,8 +998,8 @@ function find_dir_or_subdir($path, $dir) {
     $fixed = @()
     $removed = @()
     $path.Split(';') | ForEach-Object {
-        if($_) {
-            if(($_ -eq $dir) -or ($_ -like "$dir\*")) { $removed += $_ }
+        if ($_) {
+            if (($_ -eq $dir) -or ($_ -like "$dir\*")) { $removed += $_ }
             else { $fixed += $_ }
         }
     }
@@ -1058,7 +1060,7 @@ function env_rm($manifest, $global, $arch) {
 
 function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
-    if($pre_install) {
+    if ($pre_install) {
         Write-Output "Running pre-install script..."
         Invoke-Expression (@($pre_install) -join "`r`n")
     }
@@ -1066,17 +1068,17 @@ function pre_install($manifest, $arch) {
 
 function post_install($manifest, $arch) {
     $post_install = arch_specific 'post_install' $manifest $arch
-    if($post_install) {
+    if ($post_install) {
         Write-Output "Running post-install script..."
         Invoke-Expression (@($post_install) -join "`r`n")
     }
 }
 
 function show_notes($manifest, $dir, $original_dir, $persist_dir) {
-    if($manifest.notes) {
+    if ($manifest.notes) {
         Write-Output "Notes"
         Write-Output "-----"
-        Write-Output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir}))
+        Write-Output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir }))
     }
 }
 
@@ -1116,22 +1118,22 @@ function ensure_none_failed($apps) {
 function show_suggestions($suggested) {
     $installed_apps = (installed_apps $true) + (installed_apps $false)
 
-    foreach($app in $suggested.keys) {
-        $features = $suggested[$app] | get-member -type noteproperty | ForEach-Object { $_.Name }
-        foreach($feature in $features) {
+    foreach ($app in $suggested.keys) {
+        $features = $suggested[$app] | Get-Member -type noteproperty | ForEach-Object { $_.Name }
+        foreach ($feature in $features) {
             $feature_suggestions = $suggested[$app].$feature
 
             $fulfilled = $false
-            foreach($suggestion in $feature_suggestions) {
+            foreach ($suggestion in $feature_suggestions) {
                 $suggested_app, $bucket, $null = parse_app $suggestion
 
-                if($installed_apps -contains $suggested_app) {
+                if ($installed_apps -contains $suggested_app) {
                     $fulfilled = $true;
                     break;
                 }
             }
 
-            if(!$fulfilled) {
+            if (!$fulfilled) {
                 Write-Host "'$app' suggests installing '$([string]::Join("' or '", $feature_suggestions))'."
             }
         }
@@ -1157,7 +1159,7 @@ function persist_def($persist) {
 
 function persist_data($manifest, $original_dir, $persist_dir) {
     $persist = $manifest.persist
-    if($persist) {
+    if ($persist) {
         $persist_dir = ensure $persist_dir
 
         if ($persist -is [String]) {
@@ -1233,7 +1235,7 @@ function unlink_persist_data($manifest, $dir) {
 
 # check whether write permission for Users usergroup is set to global persist dir, if not then set
 function persist_permission($manifest, $global) {
-    if($global -and $manifest.persist -and (is_admin)) {
+    if ($global -and $manifest.persist -and (is_admin)) {
         $path = persistdir $null $global
         $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
         $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')

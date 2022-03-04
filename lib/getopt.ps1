@@ -23,22 +23,23 @@ function getopt($argv, $shortopts, $longopts) {
     $argv = @($argv)
     $longopts = @($longopts)
 
-    for($i = 0; $i -lt $argv.Length; $i++) {
+    for ($i = 0; $i -lt $argv.Length; $i++) {
         $arg = $argv[$i]
-        if($null -eq $arg) { continue }
+        if ($null -eq $arg) { continue }
         # don't try to parse array arguments
-        if($arg -is [array]) { $rem += ,$arg; continue }
-        if($arg -is [int]) { $rem += $arg; continue }
-        if($arg -is [decimal]) { $rem += $arg; continue }
+        if ($arg -is [array]) { $rem += , $arg; continue }
+        if ($arg -is [int]) { $rem += $arg; continue }
+        if ($arg -is [decimal]) { $rem += $arg; continue }
 
-        if($arg.StartsWith('--')) {
+        if ($arg.StartsWith('--')) {
             $name = $arg.Substring(2)
 
             $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
 
-            if($longopt) {
-                if($longopt.EndsWith('=')) { # requires arg
-                    if($i -eq $argv.Length - 1) {
+            if ($longopt) {
+                if ($longopt.EndsWith('=')) {
+                    # requires arg
+                    if ($i -eq $argv.Length - 1) {
                         return err "Option --$name requires an argument."
                     }
                     $opts.$name = $argv[++$i]
@@ -48,14 +49,14 @@ function getopt($argv, $shortopts, $longopts) {
             } else {
                 return err "Option --$name not recognized."
             }
-        } elseif($arg.StartsWith('-') -and $arg -ne '-') {
-            for($j = 1; $j -lt $arg.Length; $j++) {
+        } elseif ($arg.StartsWith('-') -and $arg -ne '-') {
+            for ($j = 1; $j -lt $arg.Length; $j++) {
                 $letter = $arg[$j].ToString()
 
-                if($shortopts -match "$(regex_escape $letter)`:?") {
+                if ($shortopts -match "$(regex_escape $letter)`:?") {
                     $shortopt = $matches[0]
-                    if($shortopt[1] -eq ':') {
-                        if($j -ne $arg.Length -1 -or $i -eq $argv.Length - 1) {
+                    if ($shortopt[1] -eq ':') {
+                        if ($j -ne $arg.Length - 1 -or $i -eq $argv.Length - 1) {
                             return err "Option -$letter requires an argument."
                         }
                         $opts.$letter = $argv[++$i]

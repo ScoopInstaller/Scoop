@@ -29,12 +29,12 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     $hashfile = $null
 
     $templates = @{
-        '$md5' = '([a-fA-F0-9]{32})';
-        '$sha1' = '([a-fA-F0-9]{40})';
-        '$sha256' = '([a-fA-F0-9]{64})';
-        '$sha512' = '([a-fA-F0-9]{128})';
+        '$md5'      = '([a-fA-F0-9]{32})';
+        '$sha1'     = '([a-fA-F0-9]{40})';
+        '$sha256'   = '([a-fA-F0-9]{64})';
+        '$sha512'   = '([a-fA-F0-9]{128})';
         '$checksum' = '([a-fA-F0-9]{32,128})';
-        '$base64' = '([a-zA-Z0-9+\/=]{24,88})';
+        '$base64'   = '([a-zA-Z0-9+\/=]{24,88})';
     }
 
     try {
@@ -56,13 +56,13 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     $regex = substitute $regex $substitutions $true
     debug $regex
     if ($hashfile -match $regex) {
-        $hash = $matches[1] -replace '\s',''
+        $hash = $matches[1] -replace '\s', ''
     }
 
     # convert base64 encoded hash values
     if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
         $base64 = $matches[0]
-        if(!($hash -match '^[a-fA-F0-9]+$') -and $hash.Length -notin @(32, 40, 64, 128)) {
+        if (!($hash -match '^[a-fA-F0-9]+$') -and $hash.Length -notin @(32, 40, 64, 128)) {
             try {
                 $hash = ([System.Convert]::FromBase64String($base64) | ForEach-Object { $_.ToString('x2') }) -join ''
             } catch {
@@ -101,7 +101,7 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         return
     }
     $hash = json_path $json $jsonpath $substitutions
-    if(!$hash) {
+    if (!$hash) {
         $hash = json_path_legacy $json $jsonpath $substitutions
     }
     return format_hash $hash
@@ -150,8 +150,8 @@ function find_hash_in_headers([String] $url) {
         $req.Timeout = 2000
         $req.Method = 'HEAD'
         $res = $req.GetResponse()
-        if(([int]$res.StatusCode -ge 300) -and ([int]$res.StatusCode -lt 400)) {
-            if($res.Headers['Digest'] -match 'SHA-256=([^,]+)' -or $res.Headers['Digest'] -match 'SHA=([^,]+)' -or $res.Headers['Digest'] -match 'MD5=([^,]+)') {
+        if (([int]$res.StatusCode -ge 300) -and ([int]$res.StatusCode -lt 400)) {
+            if ($res.Headers['Digest'] -match 'SHA-256=([^,]+)' -or $res.Headers['Digest'] -match 'SHA=([^,]+)' -or $res.Headers['Digest'] -match 'MD5=([^,]+)') {
                 $hash = ([System.Convert]::FromBase64String($matches[1]) | ForEach-Object { $_.ToString('x2') }) -join ''
                 debug $hash
             }
@@ -245,7 +245,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             }
         }
         'fosshub' {
-            $hash = find_hash_in_textfile $url $substitutions ($Matches.filename+'.*?"sha256":"([a-fA-F0-9]{64})"')
+            $hash = find_hash_in_textfile $url $substitutions ($Matches.filename + '.*?"sha256":"([a-fA-F0-9]{64})"')
         }
         'sourceforge' {
             # change the URL because downloads.sourceforge.net doesn't have checksums
@@ -348,7 +348,7 @@ function Update-ManifestProperty {
                 $newValue = substitute $autoupdateProperty $Substitutions
                 if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
                     # Make sure it's an array
-                    $newValue = ,$newValue
+                    $newValue = , $newValue
                 }
                 $Manifest.$currentProperty, $hasPropertyChanged = PropertyHelper -Property $Manifest.$currentProperty -Value $newValue
                 $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
@@ -361,7 +361,7 @@ function Update-ManifestProperty {
                         $newValue = substitute $autoupdateProperty $Substitutions
                         if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
                             # Make sure it's an array
-                            $newValue = ,$newValue
+                            $newValue = , $newValue
                         }
                         $Manifest.architecture.$arch.$currentProperty, $hasPropertyChanged = PropertyHelper -Property $Manifest.architecture.$arch.$currentProperty -Value $newValue
                         $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
@@ -390,24 +390,24 @@ function Get-VersionSubstitution {
     $firstPart = $Version.Split('-') | Select-Object -First 1
     $lastPart = $Version.Split('-') | Select-Object -Last 1
     $versionVariables = @{
-        '$version' = $Version;
-        '$dotVersion' = ($Version -replace '[._-]', '.');
+        '$version'           = $Version;
+        '$dotVersion'        = ($Version -replace '[._-]', '.');
         '$underscoreVersion' = ($Version -replace '[._-]', '_');
-        '$dashVersion' = ($Version -replace '[._-]', '-');
-        '$cleanVersion' = ($Version -replace '[._-]', '');
-        '$majorVersion' = $firstPart.Split('.') | Select-Object -First 1;
-        '$minorVersion' = $firstPart.Split('.') | Select-Object -Skip 1 -First 1;
-        '$patchVersion' = $firstPart.Split('.') | Select-Object -Skip 2 -First 1;
-        '$buildVersion' = $firstPart.Split('.') | Select-Object -Skip 3 -First 1;
+        '$dashVersion'       = ($Version -replace '[._-]', '-');
+        '$cleanVersion'      = ($Version -replace '[._-]', '');
+        '$majorVersion'      = $firstPart.Split('.') | Select-Object -First 1;
+        '$minorVersion'      = $firstPart.Split('.') | Select-Object -Skip 1 -First 1;
+        '$patchVersion'      = $firstPart.Split('.') | Select-Object -Skip 2 -First 1;
+        '$buildVersion'      = $firstPart.Split('.') | Select-Object -Skip 3 -First 1;
         '$preReleaseVersion' = $lastPart;
     }
-    if($Version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
+    if ($Version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
         $versionVariables.Set_Item('$matchHead', $Matches['head'])
         $versionVariables.Set_Item('$matchTail', $Matches['tail'])
     }
-    if($CustomMatches) {
+    if ($CustomMatches) {
         $CustomMatches.GetEnumerator() | ForEach-Object {
-            if($_.Name -ne "0") {
+            if ($_.Name -ne "0") {
                 $versionVariables.Set_Item('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
             }
         }

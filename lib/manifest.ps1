@@ -6,7 +6,7 @@ function manifest_path($app, $bucket) {
 }
 
 function parse_json($path) {
-    if(!(Test-Path $path)) { return $null }
+    if (!(Test-Path $path)) { return $null }
     Get-Content $path -Raw -Encoding utf8 | ConvertFrom-Json -ErrorAction Stop
 }
 
@@ -21,17 +21,17 @@ function url_manifest($url) {
     } catch {
         throw
     }
-    if(!$str) { return $null }
+    if (!$str) { return $null }
     $str | ConvertFrom-Json
 }
 
 function manifest($app, $bucket, $url) {
-    if($url) { return url_manifest $url }
+    if ($url) { return url_manifest $url }
     parse_json (manifest_path $app $bucket)
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
-    if($url) {
+    if ($url) {
         $wc = New-Object System.Net.WebClient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $wc.DownloadString($url) > "$dir\manifest.json"
@@ -54,7 +54,7 @@ function save_install_info($info, $dir) {
 
 function install_info($app, $version, $global) {
     $path = "$(versiondir $app $version $global)\install.json"
-    if(!(Test-Path $path)) { return $null }
+    if (!(Test-Path $path)) { return $null }
     parse_json $path
 }
 
@@ -76,12 +76,12 @@ function default_architecture {
 }
 
 function arch_specific($prop, $manifest, $architecture) {
-    if($manifest.architecture) {
+    if ($manifest.architecture) {
         $val = $manifest.architecture.$architecture.$prop
-        if($val) { return $val } # else fallback to generic prop
+        if ($val) { return $val } # else fallback to generic prop
     }
 
-    if($manifest.$prop) { return $manifest.$prop }
+    if ($manifest.$prop) { return $manifest.$prop }
 }
 
 function supports_architecture($manifest, $architecture) {
@@ -116,5 +116,5 @@ function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch
 function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
 function msi($manifest, $arch) { arch_specific 'msi' $manifest $arch }
 function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
-function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch}
-function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch}
+function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch }
+function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch }

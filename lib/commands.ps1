@@ -1,7 +1,7 @@
 function command_files {
     (Get-ChildItem (relpath '..\libexec')) `
         + (Get-ChildItem "$scoopdir\shims") `
-        | Where-Object { $_.name -match 'scoop-.*?\.ps1$' }
+    | Where-Object { $_.name -match 'scoop-.*?\.ps1$' }
 }
 
 function commands {
@@ -20,11 +20,10 @@ function command_path($cmd) {
         # get path from shim
         $shim_path = "$scoopdir\shims\scoop-$cmd.ps1"
         $line = ((Get-Content $shim_path) | Where-Object { $_.StartsWith('$path') })
-        if($line) {
+        if ($line) {
             Invoke-Expression -Command "$line"
             $cmd_path = $path
-        }
-        else { $cmd_path = $shim_path }
+        } else { $cmd_path = $shim_path }
     }
 
     $cmd_path
