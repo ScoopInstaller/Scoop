@@ -1,6 +1,6 @@
-. "$psscriptroot\Scoop-TestLib.ps1"
-. "$psscriptroot\..\lib\json.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
+. "$PSScriptRoot\Scoop-TestLib.ps1"
+. "$PSScriptRoot\..\lib\json.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
 
 Describe 'Pretty json formating' -Tag 'Scoop' {
     BeforeAll {

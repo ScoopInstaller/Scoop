@@ -15,10 +15,10 @@
 #   -u, --no-update-scoop     Don't update Scoop before downloading if it's outdated
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\install.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
 
 reset_aliases
 

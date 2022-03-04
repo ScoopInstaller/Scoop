@@ -1,4 +1,4 @@
-. "$psscriptroot\..\libexec\scoop-alias.ps1" | Out-Null
+. "$PSScriptRoot\..\libexec\scoop-alias.ps1" | Out-Null
 
 reset_aliases
 

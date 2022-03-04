@@ -1,8 +1,8 @@
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\install.ps1"
-. "$psscriptroot\..\lib\unix.ps1"
-. "$psscriptroot\Scoop-TestLib.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\unix.ps1"
+. "$PSScriptRoot\Scoop-TestLib.ps1"
 
 $isUnix = is_unix
 
@@ -70,8 +70,8 @@ Describe 'is_in_dir' -Tag 'Scoop' {
         is_in_dir 'C:\test' 'C:\foo' | Should -BeFalse
         is_in_dir 'C:\test' 'C:\test\foo\baz.zip' | Should -BeTrue
 
-        is_in_dir 'test' "$psscriptroot" | Should -BeTrue
-        is_in_dir "$psscriptroot\..\" "$psscriptroot" | Should -BeFalse
+        is_in_dir 'test' "$PSScriptRoot" | Should -BeTrue
+        is_in_dir "$PSScriptRoot\..\" "$PSScriptRoot" | Should -BeFalse
     }
 }
 
@@ -80,7 +80,7 @@ Describe 'env add and remove path' -Tag 'Scoop' {
     $manifest = @{
         'env_add_path' = @('foo', 'bar')
     }
-    $testdir = Join-Path $psscriptroot 'path-test-directory'
+    $testdir = Join-Path $PSScriptRoot 'path-test-directory'
     $global = $false
 
     # store the original path to prevent leakage of tests
