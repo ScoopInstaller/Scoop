@@ -45,7 +45,7 @@ function parse_url($url) {
 }
 
 function choose_item($list, $query) {
-    for ($i = 0; $i -lt $list.count; $i++) {
+    for ($i = 0; $i -lt $list.Count; $i++) {
         $item = $list[$i]
         Write-Host "$($i + 1)) $item"
     }

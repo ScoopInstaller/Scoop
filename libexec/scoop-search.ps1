@@ -83,7 +83,7 @@ function search_remotes($query) {
         @{"bucket" = $_; "results" = (search_remote $_ $query)}
     } | Where-Object { $_.results }
 
-    if ($results.count -gt 0) {
+    if ($results.Count -gt 0) {
         "Results from other known buckets..."
         "(add them using 'scoop bucket add <name>')"
         ""

@@ -95,7 +95,7 @@ function list_aliases {
         $aliases += New-Object psobject -Property @{Name = $_.name; Summary = $summary; Command = $command }
     }
 
-    if (!$aliases.count) {
+    if (!$aliases.Count) {
         warn 'No aliases founds.'
     }
     $aliases = $aliases.GetEnumerator() | Sort-Object Name
