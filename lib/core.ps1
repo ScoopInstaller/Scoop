@@ -886,7 +886,7 @@ function pluralize($count, $singular, $plural) {
 }
 
 function reset_alias($name, $value) {
-    if($existing = get-alias $name -ErrorAction Ignore | Where-Object { $_.options -match 'readonly' }) {
+    if($existing = Get-Alias $name -ErrorAction Ignore | Where-Object { $_.options -match 'readonly' }) {
         if($existing.definition -ne $value) {
             Write-Host "Alias $name is read-only; can't reset it." -f darkyellow
         }
@@ -894,21 +894,21 @@ function reset_alias($name, $value) {
     }
     if($value -is [scriptblock]) {
         if(!(Test-Path -Path "function:script:$name")) {
-            new-item -path function: -name "script:$name" -value $value | out-null
+            New-Item -path function: -name "script:$name" -value $value | out-null
         }
         return
     }
 
-    set-alias $name $value -scope script -option allscope
+    Set-Alias $name $value -scope script -option allscope
 }
 
 function reset_aliases() {
     # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = get-alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
+    $aliases = Get-Alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
     Get-ChildItem function: | ForEach-Object {
         $fn = $_.name
         if($aliases -contains $fn) {
-            set-alias $fn local:$fn -scope script
+            Set-Alias $fn local:$fn -scope script
         }
     }
 
@@ -922,7 +922,7 @@ function reset_aliases() {
         'gm' = 'get-member'
         'iex' = 'invoke-expression'
         'ls' = 'get-childitem'
-        'mkdir' = { new-item -type directory @args }
+        'mkdir' = { New-Item -type directory @args }
         'mv' = 'move-item'
         'rm' = 'remove-item'
         'sc' = 'set-content'
