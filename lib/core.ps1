@@ -371,17 +371,17 @@ function app_status($app, $global) {
 }
 
 function appname_from_url($url) {
-    (Split-Path $url -leaf) -replace '.json$', ''
+    (Split-Path $url -Leaf) -replace '.json$', ''
 }
 
 # paths
-function fname($path) { Split-Path $path -leaf }
+function fname($path) { Split-Path $path -Leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
 function strip_fragment($url) { $url -replace (New-Object uri $url).fragment }
 
 function url_filename($url) {
-    (Split-Path $url -leaf).split('?') | Select-Object -First 1
+    (Split-Path $url -Leaf).split('?') | Select-Object -First 1
 }
 # Unlike url_filename which can be tricked by appending a
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
