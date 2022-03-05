@@ -29,7 +29,7 @@ function print_summaries {
         $commands.Add("$command ", $summary) # add padding
     }
 
-    $commands.GetEnumerator() | Sort-Object Name | Format-Table -HideTableHeaders -AutoSize -Wrap
+    $commands.GetEnumerator() | Sort-Object name | Format-Table -HideTableHeaders -AutoSize -Wrap
 }
 
 $commands = commands

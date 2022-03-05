@@ -646,7 +646,7 @@ function cookie_header($cookies) {
     if (!$cookies) { return }
 
     $vals = $cookies.PSObject.Properties | ForEach-Object {
-        "$($_.Name)=$($_.Value)"
+        "$($_.name)=$($_.value)"
     }
 
     [string]::Join(';', $vals)
@@ -1040,8 +1040,8 @@ function env_set($manifest, $dir, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
-            $name = $_.Name;
-            $val = format $env_set.$($_.Name) @{ "dir" = $dir }
+            $name = $_.name;
+            $val = format $env_set.$($_.name) @{ "dir" = $dir }
             env $name $global $val
             Set-Content Env:\$name $val
         }
@@ -1051,7 +1051,7 @@ function env_rm($manifest, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
-            $name = $_.Name
+            $name = $_.name
             env $name $global $null
             if (Test-Path Env:\$name) { Remove-Item Env:\$name }
         }
@@ -1118,8 +1118,8 @@ function ensure_none_failed($apps) {
 function show_suggestions($suggested) {
     $installed_apps = (installed_apps $true) + (installed_apps $false)
 
-    foreach ($app in $suggested.keys) {
-        $features = $suggested[$app] | Get-Member -type noteproperty | ForEach-Object { $_.Name }
+    foreach ($app in $suggested.Keys) {
+        $features = $suggested[$app] | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }
         foreach ($feature in $features) {
             $feature_suggestions = $suggested[$app].$feature
 

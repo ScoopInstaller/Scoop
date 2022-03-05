@@ -7,7 +7,7 @@ param($command)
 
 reset_aliases
 
-if(!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
+if (!$command) { 'ERROR: <command> missing'; my_usage; exit 1 }
 
 try {
     $gcm = Get-Command "$command" -ErrorAction Stop
@@ -15,11 +15,11 @@ try {
     abort "'$command' not found" 3
 }
 
-$path = "$($gcm.path)"
+$path = "$($gcm.Path)"
 $usershims = "$(Resolve-Path $(shimdir $false))"
 $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
 
-if($path -like "$usershims*" -or $path -like "$globalshims*") {
+if ($path -like "$usershims*" -or $path -like "$globalshims*") {
     $exepath = if ($path.EndsWith(".exe") -or $path.EndsWith(".shim")) {
         (Get-Content ($path -replace '\.exe$', '.shim') | Select-Object -First 1).Replace('path = ', '')
     } else {
@@ -29,16 +29,16 @@ if($path -like "$usershims*" -or $path -like "$globalshims*") {
         $exepath = ((Select-String -Path $path -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
     }
 
-    if(![System.IO.Path]::IsPathRooted($exepath)) {
+    if (![System.IO.Path]::IsPathRooted($exepath)) {
         # Expand relative path
-        $exepath = Resolve-Path (join-path (Split-Path $path) $exepath)
+        $exepath = Resolve-Path (Join-Path (Split-Path $path) $exepath)
     }
 
     friendly_path $exepath
-} elseif($gcm.commandtype -eq 'Application') {
+} elseif ($gcm.CommandType -eq 'Application') {
     $gcm.Source
-} elseif($gcm.commandtype -eq 'Alias') {
-    scoop which $gcm.resolvedcommandname
+} elseif ($gcm.CommandType -eq 'Alias') {
+    scoop which $gcm.ResolvedCommandName
 } else {
     [System.Console]::Error.WriteLine("Not a scoop shim.")
     $path

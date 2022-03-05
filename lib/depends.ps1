@@ -131,6 +131,7 @@ function Test-7zipRequirement {
         [Parameter(Mandatory = $true)]
         [AllowNull()]
         [string[]] $Uri
+    )
     return ($Uri | Where-Object {
             $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
         }).Count -gt 0
