@@ -8,9 +8,9 @@ Describe 'Style constraints for non-binary project files' {
     $files = @(
         # gather all files except '*.exe', '*.zip', or any .git repository files
         $repo_files |
-        Where-Object { $_.FullName -inotmatch $($project_file_exclusions -join '|') } |
-        Where-Object { $_.FullName -inotmatch '(.exe|.zip|.dll)$' } |
-        Where-Object { $_.FullName -inotmatch '(unformated)' }
+            Where-Object { $_.FullName -inotmatch $($project_file_exclusions -join '|') } |
+            Where-Object { $_.FullName -inotmatch '(.exe|.zip|.dll)$' } |
+            Where-Object { $_.FullName -inotmatch '(unformated)' }
     )
 
     $files_exist = ($files.Count -gt 0)

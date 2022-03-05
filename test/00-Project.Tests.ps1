@@ -14,8 +14,8 @@ Describe 'Project code' {
 
     $files = @(
         $repo_files |
-        Where-Object { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
-        Where-Object { $_.fullname -imatch '.(ps1|psm1)$' }
+            Where-Object { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
+            Where-Object { $_.fullname -imatch '.(ps1|psm1)$' }
     )
 
     $files_exist = ($files.Count -gt 0)

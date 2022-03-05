@@ -161,12 +161,12 @@ switch ($SubCommand) {
     }
     'list' {
         $shims = Get-ChildItem -Path $localShimDir -Recurse -Include '*.shim', '*.ps1' |
-        Where-Object { !$ShimName -or ($_.BaseName -match $ShimName) } |
-        Select-Object -ExpandProperty FullName
-        if (Test-Path $globalShimDir) {
-            $shims += Get-ChildItem -Path $globalShimDir -Recurse -Include '*.shim', '*.ps1' |
             Where-Object { !$ShimName -or ($_.BaseName -match $ShimName) } |
             Select-Object -ExpandProperty FullName
+        if (Test-Path $globalShimDir) {
+            $shims += Get-ChildItem -Path $globalShimDir -Recurse -Include '*.shim', '*.ps1' |
+                Where-Object { !$ShimName -or ($_.BaseName -match $ShimName) } |
+                Select-Object -ExpandProperty FullName
         }
         $shims.ForEach({ Get-ShimInfo $_ }) | Add-Member -TypeName 'ScoopShims' -PassThru
     }

@@ -35,7 +35,7 @@ function list_buckets {
         $source = Find-BucketDirectory $bucket -Root
         $manifests = (
             Get-ChildItem "$source\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
-            Measure-Object | Select-Object -ExpandProperty Count
+                Measure-Object | Select-Object -ExpandProperty Count
         )
         $updated = 'N/A'
         if ((Test-Path (Join-Path $source '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
