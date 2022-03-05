@@ -7,8 +7,8 @@
     Persisted data will be deleted.
 #>
 param(
-    [bool]$global,
-    [bool]$purge
+    [bool] $global,
+    [bool] $purge
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"

@@ -306,18 +306,13 @@ function Update-ManifestProperty {
     [OutputType([Boolean])]
     param (
         [Parameter(Mandatory = $true, Position = 1)]
-        [PSCustomObject]
-        $Manifest,
+        [PSCustomObject] $Manifest,
         [Parameter(ValueFromPipeline = $true, Position = 2)]
-        [string[]]
-        $Property,
-        [string]
-        $AppName,
-        [string]
-        $Version,
+        [string[]] $Property,
+        [string] $AppName,
+        [string] $Version,
         [Alias('Matches')]
-        [hashtable]
-        $Substitutions
+        [hashtable] $Substitutions
     )
     begin {
         $hasManifestChanged = $false
@@ -381,10 +376,8 @@ function Update-ManifestProperty {
 
 function Get-VersionSubstitution {
     param (
-        [string]
-        $Version,
-        [hashtable]
-        $CustomMatches
+        [string] $Version,
+        [hashtable] $CustomMatches
     )
 
     $firstPart = $Version.Split('-') | Select-Object -First 1
@@ -417,16 +410,11 @@ function Get-VersionSubstitution {
 
 function Invoke-AutoUpdate {
     param (
-        [string]
-        $AppName,
-        [string]
-        $Path,
-        [PSObject]
-        $Manifest,
-        [string]
-        $Version,
-        [hashtable]
-        $CustomMatches
+        [string] $AppName,
+        [string] $Path,
+        [PSObject] $Manifest,
+        [string] $Version,
+        [hashtable] $CustomMatches
     )
 
     Write-Host "Autoupdating $AppName" -ForegroundColor DarkCyan
@@ -493,9 +481,8 @@ function PropertyHelper {
             The first element is new property, the second element is change flag
     #>
     param (
-        [Object]$Property,
-        [Object]$Value
-        [System.Object]
+        [Object] $Property,
+        [Object] $Value
     )
     $hasChanged = $false
     if (@($Property).Length -lt @($Value).Length) {
@@ -556,16 +543,11 @@ function HashHelper {
             Hash values (multi URLs)
     #>
     param (
-        [string]
-        $AppName,
-        [string]
-        $Version,
-        [PSObject[]]
-        $HashExtraction,
-        [string[]]
-        $URL,
-        [hashtable]
-        $Substitutions
+        [string] $AppName,
+        [string] $Version,
+        [PSObject[]] $HashExtraction,
+        [string[]] $URL,
+        [hashtable] $Substitutions
     )
     $hash = @()
     for ($i = 0; $i -lt $URL.Length; $i++) {

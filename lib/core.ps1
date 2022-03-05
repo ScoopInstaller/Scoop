@@ -29,7 +29,10 @@ function Show-DeprecatedWarning {
     .PARAMETER New
         New command name.
     #>
-    param($Invocation, [string]$New)
+    param(
+        $Invocation,
+        [string] $New
+    )
 
     warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
     Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
@@ -246,11 +249,9 @@ function Get-AppFilePath {
     [OutputType([string])]
     param(
         [Parameter(Mandatory = $true, Position = 0)]
-        [string]
-        $App,
+        [string] $App,
         [Parameter(Mandatory = $true, Position = 1)]
-        [string]
-        $File
+        [string] $File
     )
 
     # normal path to file
@@ -271,7 +272,7 @@ function Get-AppFilePath {
 
 Function Test-CommandAvailable {
     param (
-        [string]$Name
+        [string] $Name
     )
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
@@ -282,8 +283,7 @@ function Get-HelperPath {
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
-        [string]
-        $Helper
+        [string] $Helper
     )
     begin {
         $HelperPath = $null
@@ -317,8 +317,7 @@ function Test-HelperInstalled {
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
-        [string]
-        $Helper
+        [string] $Helper
     )
 
     return ![string]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
@@ -430,25 +429,19 @@ function Invoke-ExternalCommand {
         [Parameter(Mandatory = $true, Position = 0)]
         [Alias("Path")]
         [ValidateNotNullOrEmpty()]
-        [string]
-        $FilePath,
+        [string] $FilePath,
         [Parameter(Position = 1)]
         [Alias("Args")]
-        [string[]]
-        $ArgumentList,
+        [string[]] $ArgumentList,
         [Parameter(ParameterSetName = "UseShellExecute")]
-        [switch]
-        $RunAs,
+        [switch] $RunAs,
         [Alias("Msg")]
-        [string]
-        $Activity,
+        [string] $Activity,
         [Alias("cec")]
-        [hashtable]
-        $ContinueExitCodes,
+        [hashtable] $ContinueExitCodes,
         [Parameter(ParameterSetName = "Default")]
         [Alias("Log")]
-        [string]
-        $LogPath
+        [string] $LogPath
     )
     if ($Activity) {
         Write-Host "$Activity " -NoNewline
@@ -790,8 +783,8 @@ function Confirm-InstallationStatus {
     [OutputType([Object[]])]
     param(
         [Parameter(Mandatory = $true)]
-        [string[]]$Apps,
-        [switch]$Global
+        [string[]] $Apps,
+        [switch] $Global
     )
     $Installed = @()
     $Apps | Select-Object -Unique | Where-Object { $_.Name -ne 'scoop' } | ForEach-Object {
@@ -1093,9 +1086,9 @@ function Out-UTF8File {
     param(
         [Parameter(Mandatory = $True, Position = 0)]
         [Alias("Path")]
-        [string]$FilePath,
+        [string] $FilePath,
         [Parameter(ValueFromPipeline = $True)]
-        [PSObject]$InputObject
+        [PSObject] $InputObject
     )
     process {
         # Ref: https://stackoverflow.com/questions/5596982

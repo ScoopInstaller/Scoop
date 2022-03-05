@@ -2,8 +2,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; RequiredVersion = '4.10.1' }
 param(
     [ValidateNotNullOrEmpty()]
-    [string]
-    $repo_dir = (Split-Path -Path $MyInvocation.PSCommandPath -Parent)
+    [string] $repo_dir = (Split-Path -Path $MyInvocation.PSCommandPath -Parent)
 )
 
 . "$PSScriptRoot\Scoop-TestLib.ps1"

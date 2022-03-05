@@ -49,7 +49,7 @@
     Check manifest APP.json inside ./DIR directory and update if there is newer version.
 #>
 param(
-    [string]$App = '*',
+    [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -58,11 +58,11 @@ param(
             $true
         }
     })]
-    [string]$Dir,
-    [switch]$Update,
-    [switch]$ForceUpdate,
-    [switch]$SkipUpdated,
-    [string]$Version = ''
+    [string] $Dir,
+    [switch] $Update,
+    [switch] $ForceUpdate,
+    [switch] $SkipUpdated,
+    [string] $Version = ''
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"

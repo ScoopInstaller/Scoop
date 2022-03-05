@@ -21,15 +21,11 @@ function Get-Dependency {
     [OutputType([Object[]])]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [PSObject]
-        $AppName,
+        [PSObject] $AppName,
         [Parameter(Mandatory = $true, Position = 1)]
-        [string]
-        $Architecture,
-        [string[]]
-        $Resolved = @(),
-        [string[]]
-        $Unresolved = @()
+        [string] $Architecture,
+        [string[]] $Resolved = @(),
+        [string[]] $Unresolved = @()
     )
     process {
         $AppName, $bucket, $null = parse_app $AppName
@@ -86,13 +82,10 @@ function Get-InstallationHelper {
     [OutputType([Object[]])]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [PSObject]
-        $Manifest,
+        [PSObject] $Manifest,
         [Parameter(Mandatory = $true, Position = 1)]
-        [string]
-        $Architecture,
-        [switch]
-        $All
+        [string] $Architecture,
+        [switch] $All
     )
     begin {
         $helper = @()
@@ -137,9 +130,7 @@ function Test-7zipRequirement {
     param (
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [string[]]
-        $Uri
-    )
+        [string[]] $Uri
     return ($Uri | Where-Object {
             $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
         }).Count -gt 0
@@ -151,8 +142,7 @@ function Test-ZstdRequirement {
     param (
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [string[]]
-        $Uri
+        [string[]] $Uri
     )
     return ($Uri | Where-Object { $_ -match '\.zst$' }).Count -gt 0
 }
@@ -163,8 +153,7 @@ function Test-LessmsiRequirement {
     param (
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [string[]]
-        $Uri
+        [string[]] $Uri
     )
     return ($Uri | Where-Object { $_ -match '\.msi$' }).Count -gt 0
 }

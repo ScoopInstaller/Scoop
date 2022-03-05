@@ -12,7 +12,7 @@
     Manifests will all valid URLs will not be shown.
 #>
 param(
-    [string]$App = '*',
+    [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -21,9 +21,9 @@ param(
             $true
         }
     })]
-    [string]$Dir,
-    [int]$Timeout = 5,
-    [switch]$SkipValid
+    [string] $Dir,
+    [int] $Timeout = 5,
+    [switch] $SkipValid
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"

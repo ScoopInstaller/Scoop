@@ -15,14 +15,11 @@ function Get-LatestVersion {
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [Alias('App')]
-        [string]
-        $AppName,
+        [string] $AppName,
         [Parameter(Position = 1)]
-        [string]
-        $Bucket,
+        [string] $Bucket,
         [Parameter(Position = 2)]
-        [string]
-        $Uri
+        [string] $Uri
     )
     process {
         return (manifest $AppName $Bucket $Uri).version
@@ -43,11 +40,9 @@ function Select-CurrentVersion {
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [Alias('App')]
-        [string]
-        $AppName,
+        [string] $AppName,
         [Parameter(Position = 1)]
-        [switch]
-        $Global
+        [switch] $Global
     )
     process {
         $currentPath = "$(appdir $AppName $Global)\current"
@@ -86,11 +81,9 @@ function Get-InstalledVersion {
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [Alias('App')]
-        [string]
-        $AppName,
+        [string] $AppName,
         [Parameter(Position = 1)]
-        [switch]
-        $Global
+        [switch] $Global
     )
     process {
         $appPath = appdir $AppName $Global
@@ -126,14 +119,11 @@ function Compare-Version {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
         [AllowEmptyString()]
-        [string]
-        $ReferenceVersion,
+        [string] $ReferenceVersion,
         [Parameter(Mandatory = $true, Position = 1, ValueFromPipeline = $true)]
         [AllowEmptyString()]
-        [string]
-        $DifferenceVersion,
-        [string]
-        $Delimiter = '-'
+        [string] $DifferenceVersion,
+        [string] $Delimiter = '-'
     )
     process {
         # Use '+' sign as post-release, see https://github.com/ScoopInstaller/Scoop/pull/3721#issuecomment-553718093
@@ -229,10 +219,8 @@ function SplitVersion {
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
         [AllowEmptyString()]
-        [string]
-        $Version,
-        [string]
-        $Delimiter = '-'
+        [string] $Version,
+        [string] $Delimiter = '-'
     )
     process {
         $Version = $Version -replace '[a-zA-Z]+', "$Delimiter$&$Delimiter"

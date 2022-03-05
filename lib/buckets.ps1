@@ -13,8 +13,8 @@ function Find-BucketDirectory {
         Root folder of bucket repository will be returned instead of 'bucket' subdirectory (if exists).
     #>
     param(
-        [string]$Name = 'main',
-        [switch]$Root
+        [string] $Name = 'main',
+        [switch] $Root
     )
 
     # Handle info passing empty string as bucket ($install.bucket)

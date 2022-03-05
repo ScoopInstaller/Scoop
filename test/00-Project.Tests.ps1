@@ -32,8 +32,7 @@ Describe 'Project code' {
         [CmdletBinding()]
         param (
             [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-            [string[]]
-            $Path
+            [string[]] $Path
         )
 
         process {

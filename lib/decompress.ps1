@@ -2,21 +2,15 @@ function Expand-7zipArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [string]
-        $Path,
+        [string] $Path,
         [Parameter(Position = 1)]
-        [string]
-        $DestinationPath = (Split-Path $Path),
-        [string]
-        $ExtractDir,
+        [string] $DestinationPath = (Split-Path $Path),
+        [string] $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
-        [string]
-        $Switches,
+        [string] $Switches,
         [ValidateSet('All', 'Skip', 'Rename')]
-        [string]
-        $Overwrite,
-        [switch]
-        $Removal
+        [string] $Overwrite,
+        [switch] $Removal
     )
     if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
         try {
@@ -71,18 +65,13 @@ function Expand-ZstdArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [string]
-        $Path,
+        [string] $Path,
         [Parameter(Position = 1)]
-        [string]
-        $DestinationPath = (Split-Path $Path),
-        [string]
-        $ExtractDir,
+        [string] $DestinationPath = (Split-Path $Path),
+        [string] $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
-        [string]
-        $Switches,
-        [switch]
-        $Removal
+        [string] $Switches,
+        [switch] $Removal
     )
     $ZstdPath = Get-HelperPath -Helper Zstd
     $LogPath = Join-Path (Split-Path $Path) 'zstd.log'
@@ -119,18 +108,13 @@ function Expand-MsiArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [string]
-        $Path,
+        [string] $Path,
         [Parameter(Position = 1)]
-        [string]
-        $DestinationPath = (Split-Path $Path),
-        [string]
-        $ExtractDir,
+        [string] $DestinationPath = (Split-Path $Path),
+        [string] $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
-        [string]
-        $Switches,
-        [switch]
-        $Removal
+        [string] $Switches,
+        [switch] $Removal
     )
     $DestinationPath = $DestinationPath.TrimEnd('\')
     if ($ExtractDir) {
@@ -177,18 +161,13 @@ function Expand-InnoArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [string]
-        $Path,
+        [string] $Path,
         [Parameter(Position = 1)]
-        [string]
-        $DestinationPath = (Split-Path $Path),
-        [string]
-        $ExtractDir,
+        [string] $DestinationPath = (Split-Path $Path),
+        [string] $ExtractDir,
         [Parameter(ValueFromRemainingArguments = $true)]
-        [string]
-        $Switches,
-        [switch]
-        $Removal
+        [string] $Switches,
+        [switch] $Removal
     )
     $LogPath = "$(Split-Path $Path)\innounp.log"
     $ArgList = @('-x', "-d`"$DestinationPath`"", "`"$Path`"", '-y')
@@ -217,15 +196,11 @@ function Expand-ZipArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [string]
-        $Path,
+        [string] $Path,
         [Parameter(Position = 1)]
-        [string]
-        $DestinationPath = (Split-Path $Path),
-        [string]
-        $ExtractDir,
-        [switch]
-        $Removal
+        [string] $DestinationPath = (Split-Path $Path),
+        [string] $ExtractDir,
+        [switch] $Removal
     )
     if ($ExtractDir) {
         $OriDestinationPath = $DestinationPath
@@ -246,16 +221,12 @@ function Expand-DarkArchive {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [string]
-        $Path,
+        [string] $Path,
         [Parameter(Position = 1)]
-        [string]
-        $DestinationPath = (Split-Path $Path),
+        [string] $DestinationPath = (Split-Path $Path),
         [Parameter(ValueFromRemainingArguments = $true)]
-        [string]
-        $Switches,
-        [switch]
-        $Removal
+        [string] $Switches,
+        [switch] $Removal
     )
     $LogPath = "$(Split-Path $Path)\dark.log"
     $ArgList = @('-nologo', "-x `"$DestinationPath`"", "`"$Path`"")

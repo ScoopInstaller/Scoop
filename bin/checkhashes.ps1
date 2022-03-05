@@ -23,7 +23,7 @@
     Check MANIFEST and Update if there are some wrong hashes.
 #>
 param(
-    [string]$App = '*',
+    [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -32,12 +32,12 @@ param(
             $true
         }
     })]
-    [string]$Dir,
-    [switch]$Update,
-    [switch]$ForceUpdate,
-    [switch]$SkipCorrect,
+    [string] $Dir,
+    [switch] $Update,
+    [switch] $ForceUpdate,
+    [switch] $SkipCorrect,
     [Alias('k')]
-    [switch]$UseCache
+    [switch] $UseCache
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"

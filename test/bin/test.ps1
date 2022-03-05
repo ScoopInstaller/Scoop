@@ -3,7 +3,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; MaximumVersion = '4.99' }
 #Requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
-    [string]$TestPath = $(Resolve-Path "$PSScriptRoot\..\")
+    [string] $TestPath = $(Resolve-Path "$PSScriptRoot\..\")
 )
 
 $splat = @{

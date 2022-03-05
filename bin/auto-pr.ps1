@@ -38,9 +38,9 @@ param(
         }
         $true
     })]
-    [string]$Upstream,
-    [string]$OriginBranch = 'master',
-    [string]$App = '*',
+    [string] $Upstream,
+    [string] $OriginBranch = 'master',
+    [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -49,12 +49,12 @@ param(
             $true
         }
     })]
-    [string]$Dir,
-    [switch]$Push,
-    [switch]$Request,
-    [switch]$Help,
-    [string[]]$SpecialSnowflakes,
-    [switch]$SkipUpdated
+    [string] $Dir,
+    [switch] $Push,
+    [switch] $Request,
+    [switch] $Help,
+    [string[]] $SpecialSnowflakes,
+    [switch] $SkipUpdated
 )
 
 . "$PSScriptRoot\..\lib\manifest.ps1"
