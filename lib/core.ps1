@@ -16,7 +16,7 @@ function Optimize-SecurityProtocol {
 }
 
 function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([Environment]::OSVersion.Version.Major).$([Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
 }
 
 function Show-DeprecatedWarning {
@@ -69,7 +69,7 @@ function set_config {
 
     if ($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
         ensure (Split-Path -Path $configFile) | Out-Null
-        $scoopConfig = New-Object PSObject
+        $scoopConfig = New-Object psobject
     }
 
     if ($value -eq [bool]::TrueString -or $value -eq [bool]::FalseString) {
@@ -506,8 +506,8 @@ function dl($url, $to) {
 
 function env($name, $global, $val = '__get') {
     $target = 'User'; if ($global) { $target = 'Machine' }
-    if ($val -eq '__get') { [System.Environment]::GetEnvironmentVariable($name, $target) }
-    else { [System.Environment]::SetEnvironmentVariable($name, $val, $target) }
+    if ($val -eq '__get') { [Environment]::GetEnvironmentVariable($name, $target) }
+    else { [Environment]::SetEnvironmentVariable($name, $val, $target) }
 }
 
 function isFileLocked([string]$path) {
@@ -1088,7 +1088,7 @@ function Out-UTF8File {
         [Alias("Path")]
         [string] $FilePath,
         [Parameter(ValueFromPipeline = $True)]
-        [PSObject] $InputObject
+        [psobject] $InputObject
     )
     process {
         # Ref: https://stackoverflow.com/questions/5596982

@@ -21,7 +21,7 @@ function Get-Dependency {
     [OutputType([Object[]])]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [PSObject] $AppName,
+        [psobject] $AppName,
         [Parameter(Mandatory = $true, Position = 1)]
         [string] $Architecture,
         [string[]] $Resolved = @(),
@@ -82,7 +82,7 @@ function Get-InstallationHelper {
     [OutputType([Object[]])]
     param (
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [PSObject] $Manifest,
+        [psobject] $Manifest,
         [Parameter(Mandatory = $true, Position = 1)]
         [string] $Architecture,
         [switch] $All

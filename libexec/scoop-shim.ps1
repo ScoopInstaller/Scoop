@@ -97,7 +97,7 @@ function Get-ShimInfo($ShimPath) {
     }
     $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
     $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
-    [PSCustomObject]$info
+    [pscustomobject]$info
 }
 
 function Get-ShimPath($ShimName, $Global) {

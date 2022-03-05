@@ -175,6 +175,6 @@ if ($manifest.notes) {
     $item.Notes = (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir }) -join "`n"
 }
 
-[PSCustomObject]$item
+[pscustomobject]$item
 
 exit 0

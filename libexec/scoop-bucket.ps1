@@ -45,7 +45,7 @@ function list_buckets {
             $updated = (Get-Item "$source\bucket").LastWriteTime
             $source = friendly_path $source
         }
-        $buckets += New-Object PSObject -Property @{
+        $buckets += New-Object psobject -Property @{
             Name      = $bucket
             Source    = $source
             Updated   = $updated

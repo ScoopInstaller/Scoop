@@ -306,7 +306,7 @@ function Update-ManifestProperty {
     [OutputType([Boolean])]
     param (
         [Parameter(Mandatory = $true, Position = 1)]
-        [PSCustomObject] $Manifest,
+        [pscustomobject] $Manifest,
         [Parameter(ValueFromPipeline = $true, Position = 2)]
         [string[]] $Property,
         [string] $AppName,
@@ -412,7 +412,7 @@ function Invoke-AutoUpdate {
     param (
         [string] $AppName,
         [string] $Path,
-        [PSObject] $Manifest,
+        [psobject] $Manifest,
         [string] $Version,
         [hashtable] $CustomMatches
     )
@@ -505,7 +505,7 @@ function PropertyHelper {
                 }
             }
             'PSCustomObject' {
-                if ($Value -is [PSObject]) {
+                if ($Value -is [psobject]) {
                     foreach ($name in $Property.PSObject.Properties.Name) {
                         if ($Value.$name) {
                             $Property.$name, $hasItemChanged = PropertyHelper -Property $Property.$name -Value $Value.$name

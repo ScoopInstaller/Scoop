@@ -175,7 +175,7 @@ $Queue | ForEach-Object {
 
     $url = substitute $url $substitutions
 
-    $state = New-Object PSObject @{
+    $state = New-Object psobject @{
         app      = (strip_ext $name);
         url      = $url;
         regex    = $regex;

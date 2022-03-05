@@ -36,7 +36,7 @@ function new_manifest() {
 }
 
 function file_name($segment) {
-    $segment.Substring(0, $segment.lastindexof('.'))
+    $segment.Substring(0, $segment.LastIndexOf('.'))
 }
 
 function parse_url($url) {

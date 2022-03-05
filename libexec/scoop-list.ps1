@@ -58,7 +58,7 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     }
     $item.Info = $info -join ', '
 
-    $list += [PSCustomObject]$item
+    $list += [pscustomobject]$item
 }
 
 $list | Add-Member -TypeName 'ScoopApps' -PassThru

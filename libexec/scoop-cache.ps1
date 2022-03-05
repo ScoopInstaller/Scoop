@@ -16,7 +16,12 @@ param($cmd)
 
 function cacheinfo($file) {
     $app, $version, $url = $file.Name -split '#'
-    New-Object PSObject -Property @{ Name = $app; Version = $version; Length = $file.Length; URL = $url }
+    New-Object psobject -Property @{
+        Name    = $app;
+        Version = $version;
+        Length  = $file.Length;
+        URL     = $url
+    }
 }
 
 function cacheshow($app) {
@@ -50,7 +55,7 @@ function cacheremove($app) {
         $curr = cacheinfo $_
         Write-Host "Removing $($curr.URL)..."
         Remove-Item $_.FullName
-        if(Test-Path "$cachedir\$($curr.Name).txt") {
+        if (Test-Path "$cachedir\$($curr.Name).txt") {
             Remove-Item "$cachedir\$($curr.Name).txt"
         }
     }
@@ -58,7 +63,7 @@ function cacheremove($app) {
     Write-Host "Deleted: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
 }
 
-switch($cmd) {
+switch ($cmd) {
     'rm' {
         cacheremove $Args
     }

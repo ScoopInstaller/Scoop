@@ -40,7 +40,7 @@ function check_main_bucket {
 }
 
 function check_long_paths {
-    if ([System.Environment]::OSVersion.Version.Major -lt 10 -or [System.Environment]::OSVersion.Version.Build -lt 1607) {
+    if ([Environment]::OSVersion.Version.Major -lt 10 -or [Environment]::OSVersion.Version.Build -lt 1607) {
         warn 'This version of Windows does not support configuration of LongPaths.'
         return $false
     }
