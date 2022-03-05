@@ -8,7 +8,7 @@
     Where to search for manifest(s).
 #>
 param(
-    [string] $App = '*',
+    [string]$App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -17,7 +17,7 @@ param(
             $true
         }
     })]
-    [string] $Dir
+    [string]$Dir
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"

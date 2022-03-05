@@ -29,7 +29,7 @@ function Show-DeprecatedWarning {
     .PARAMETER New
         New command name.
     #>
-    param($Invocation, [string] $New)
+    param($Invocation, [string]$New)
 
     warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
     Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
@@ -140,7 +140,7 @@ function is_admin {
 }
 
 # messages
-function abort($msg, [int] $exit_code = 1) { Write-Host $msg -ForegroundColor Red; exit $exit_code }
+function abort($msg, [int]$exit_code = 1) { Write-Host $msg -ForegroundColor Red; exit $exit_code }
 function error($msg) { Write-Host "ERROR $msg" -ForegroundColor DarkRed }
 function warn($msg) { Write-Host "WARN  $msg" -ForegroundColor DarkYellow }
 function info($msg) { Write-Host "INFO  $msg" -ForegroundColor DarkGray }
@@ -443,7 +443,7 @@ function Invoke-ExternalCommand {
         [string]
         $Activity,
         [Alias("cec")]
-        [Hashtable]
+        [hashtable]
         $ContinueExitCodes,
         [Parameter(ParameterSetName = "Default")]
         [Alias("Log")]
@@ -536,7 +536,7 @@ function isFileLocked([string]$path) {
     }
 }
 
-function is_directory([string] $path) {
+function is_directory([string]$path) {
     return (Test-Path $path) -and (Get-Item $path) -is [System.IO.DirectoryInfo]
 }
 
@@ -790,10 +790,8 @@ function Confirm-InstallationStatus {
     [OutputType([Object[]])]
     param(
         [Parameter(Mandatory = $true)]
-        [string[]]
-        $Apps,
-        [switch]
-        $Global
+        [string[]]$Apps,
+        [switch]$Global
     )
     $Installed = @()
     $Apps | Select-Object -Unique | Where-Object { $_.Name -ne 'scoop' } | ForEach-Object {
@@ -939,7 +937,7 @@ function applist($apps, $global) {
     return , @($apps | ForEach-Object { , @($_, $global) })
 }
 
-function parse_app([string] $app) {
+function parse_app([string]$app) {
     if ($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*\.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?') {
         return $matches['app'], $matches['bucket'], $matches['version']
     }
@@ -981,7 +979,7 @@ function is_scoop_outdated() {
     return $last_update.AddHours(3) -lt $now.ToLocalTime()
 }
 
-function substitute($entity, [Hashtable] $params, [bool]$regexEscape = $false) {
+function substitute($entity, [hashtable]$params, [bool]$regexEscape = $false) {
     $newentity = $entity
     if ($null -ne $newentity) {
         switch ($entity.GetType().Name) {
@@ -1005,7 +1003,7 @@ function substitute($entity, [Hashtable] $params, [bool]$regexEscape = $false) {
     return $newentity
 }
 
-function format_hash([string] $hash) {
+function format_hash([string]$hash) {
     $hash = $hash.ToLower()
     switch ($hash.Length) {
         32 { $hash = "md5:$hash" } # md5
@@ -1017,7 +1015,7 @@ function format_hash([string] $hash) {
     return $hash
 }
 
-function format_hash_aria2([string] $hash) {
+function format_hash_aria2([string]$hash) {
     $hash = $hash -split ':' | Select-Object -Last 1
     switch ($hash.Length) {
         32 { $hash = "md5=$hash" } # md5
@@ -1029,7 +1027,7 @@ function format_hash_aria2([string] $hash) {
     return $hash
 }
 
-function get_hash([string] $multihash) {
+function get_hash([string]$multihash) {
     $type, $hash = $multihash -split ':'
     if (!$hash) {
         # no type specified, assume sha256
@@ -1095,9 +1093,9 @@ function Out-UTF8File {
     param(
         [Parameter(Mandatory = $True, Position = 0)]
         [Alias("Path")]
-        [string] $FilePath,
+        [string]$FilePath,
         [Parameter(ValueFromPipeline = $True)]
-        [PSObject] $InputObject
+        [PSObject]$InputObject
     )
     process {
         # Ref: https://stackoverflow.com/questions/5596982

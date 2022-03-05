@@ -38,9 +38,9 @@ param(
         }
         $true
     })]
-    [string] $Upstream,
-    [string] $OriginBranch = 'master',
-    [string] $App = '*',
+    [string]$Upstream,
+    [string]$OriginBranch = 'master',
+    [string]$App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -49,12 +49,12 @@ param(
             $true
         }
     })]
-    [string] $Dir,
-    [switch] $Push,
-    [switch] $Request,
-    [switch] $Help,
-    [string[]] $SpecialSnowflakes,
-    [switch] $SkipUpdated
+    [string]$Dir,
+    [switch]$Push,
+    [switch]$Request,
+    [switch]$Help,
+    [string[]]$SpecialSnowflakes,
+    [switch]$SkipUpdated
 )
 
 . "$PSScriptRoot\..\lib\manifest.ps1"
@@ -102,7 +102,7 @@ function execute($cmd) {
     return $output
 }
 
-function pull_requests($json, [string] $app, [string] $upstream, [string] $manifest) {
+function pull_requests($json, [string]$app, [string]$upstream, [string]$manifest) {
     $version = $json.version
     $homepage = $json.homepage
     $branch = "manifest/$app-$version"

@@ -27,7 +27,7 @@ function shortcut_folder($global) {
     return $(ensure $directory)
 }
 
-function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global) {
+function startmenu_shortcut([System.IO.FileInfo]$target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global) {
     if (!$target.Exists) {
         Write-Host -ForegroundColor DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find $target"
         return

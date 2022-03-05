@@ -520,7 +520,7 @@ function dl_progress_output($url, $read, $total, $console) {
         }
     }
 
-    "$left [$dashes$spaces] $right"
+    "$left [$dashes$spaces]$right"
 }
 
 function dl_progress($read, $total, $url) {

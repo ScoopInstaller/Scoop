@@ -92,7 +92,7 @@ function ConvertToPrettyJson {
     }
 }
 
-function json_path([string] $json, [string] $jsonpath, [Hashtable] $substitutions, [Boolean] $reverse, [Boolean] $single) {
+function json_path([string]$json, [string]$jsonpath, [hashtable]$substitutions, [Boolean]$reverse, [Boolean]$single) {
     Add-Type -Path "$PSScriptRoot\..\supporting\validator\bin\Newtonsoft.Json.dll"
     if ($null -ne $substitutions) {
         $jsonpath = substitute $jsonpath $substitutions ($jsonpath -like "*=~*")
@@ -124,7 +124,7 @@ function json_path([string] $json, [string] $jsonpath, [Hashtable] $substitution
     return $null
 }
 
-function json_path_legacy([string] $json, [string] $jsonpath, [Hashtable] $substitutions) {
+function json_path_legacy([string]$json, [string]$jsonpath, [hashtable]$substitutions) {
     $result = $json | ConvertFrom-Json -ErrorAction Stop
     $isJsonPath = $jsonpath.StartsWith('$')
     $jsonpath.Split('.') | ForEach-Object {
@@ -156,7 +156,7 @@ function json_path_legacy([string] $json, [string] $jsonpath, [Hashtable] $subst
     return $result
 }
 
-function normalize_values([psobject] $json) {
+function normalize_values([psobject]$json) {
     # Iterate Through Manifest Properties
     $json.PSObject.Properties | ForEach-Object {
         # Recursively edit psobjects

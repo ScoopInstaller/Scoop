@@ -10,7 +10,7 @@
     Manifests with checkver and autoupdate will not be presented.
 #>
 param(
-    [string] $App = '*',
+    [string]$App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
@@ -19,8 +19,8 @@ param(
             $true
         }
     })]
-    [string] $Dir,
-    [switch] $SkipSupported
+    [string]$Dir,
+    [switch]$SkipSupported
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"

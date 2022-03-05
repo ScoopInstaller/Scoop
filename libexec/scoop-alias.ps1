@@ -16,11 +16,11 @@
 #   -v, --verbose   Show alias description and table headers (works only for 'list')
 
 param(
-    [string] $opt,
-    [string] $name,
-    [string] $command,
-    [string] $description,
-    [switch] $verbose = $false
+    [string]$opt,
+    [string]$name,
+    [string]$command,
+    [string]$description,
+    [switch]$verbose = $false
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
