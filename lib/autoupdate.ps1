@@ -259,7 +259,7 @@ function get_hash_for_app([string]$app, $config, [string]$version, [string]$url,
         Write-Host -ForegroundColor DarkYellow 'Found: ' -NoNewline
         Write-Host -ForegroundColor Green $hash -NoNewline
         Write-Host -ForegroundColor DarkYellow ' using ' -NoNewline
-        Write-Host -ForegroundColor Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
+        Write-Host -ForegroundColor Green "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
         return $hash
     } elseif ($hashfile_url) {
         Write-Host -ForegroundColor DarkYellow "Could not find hash in $hashfile_url"
