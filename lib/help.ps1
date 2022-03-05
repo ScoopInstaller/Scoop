@@ -13,5 +13,5 @@ function scoop_help($text) {
 
 function my_usage {
     # gets usage for the calling script
-    usage (Get-Content $myInvocation.PSCommandPath -Raw)
+    usage (Get-Content $MyInvocation.PSCommandPath -Raw)
 }

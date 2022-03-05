@@ -1040,8 +1040,8 @@ function env_set($manifest, $dir, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
-            $name = $_.name;
-            $val = format $env_set.$($_.name) @{ "dir" = $dir }
+            $name = $_.Name;
+            $val = format $env_set.$($_.Name) @{ "dir" = $dir }
             env $name $global $val
             Set-Content Env:\$name $val
         }
@@ -1051,7 +1051,7 @@ function env_rm($manifest, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
-            $name = $_.name
+            $name = $_.Name
             env $name $global $null
             if (Test-Path Env:\$name) { Remove-Item Env:\$name }
         }

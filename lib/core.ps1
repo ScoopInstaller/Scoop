@@ -405,7 +405,7 @@ function fullpath($path) {
     # should be ~ rooted
     $executionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
 }
-function relpath($path) { "$($myinvocation.PSScriptRoot)\$path" } # relative to calling script
+function relpath($path) { "$($MyInvocation.PSScriptRoot)\$path" } # relative to calling script
 function friendly_path($path) {
     $h = (Get-PSProvider 'FileSystem').Home; if (!$h.EndsWith('\')) { $h += '\' }
     if ($h -eq '\') { return $path }

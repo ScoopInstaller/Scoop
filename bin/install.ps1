@@ -36,7 +36,7 @@ Invoke-Expression (New-Object System.Net.WebClient).DownloadString($core_url)
 if (installed 'scoop') {
     Write-Host "Scoop is already installed. Run 'scoop update' to get the latest version." -ForegroundColor Red
     # don't abort if invoked with iex that would close the PS session
-    if ($myinvocation.mycommand.commandtype -eq 'Script') { return } else { exit 1 }
+    if ($MyInvocation.MyCommand.CommandType -eq 'Script') { return } else { exit 1 }
 }
 $dir = ensure (versiondir 'scoop' 'current')
 
