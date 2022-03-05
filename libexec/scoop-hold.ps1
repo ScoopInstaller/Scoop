@@ -8,7 +8,7 @@
 reset_aliases
 $apps = $args
 
-if(!$apps) {
+if (!$apps) {
     my_usage
     exit 1
 }
@@ -30,7 +30,7 @@ $apps | ForEach-Object {
     $dir = versiondir $app $version $global
     $json = install_info $app $version $global
     $install = @{}
-    $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name))}
+    $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
     $install.hold = $true
     save_install_info $install $dir
     success "$app is now held and can not be updated anymore."

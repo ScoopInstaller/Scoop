@@ -14,13 +14,13 @@
 
 reset_aliases
 $opt, $apps, $err = getopt $args
-if($err) { "scoop reset: $err"; exit 1 }
+if ($err) { "scoop reset: $err"; exit 1 }
 
-if(!$apps) { error '<app> missing'; my_usage; exit 1 }
+if (!$apps) { error '<app> missing'; my_usage; exit 1 }
 
-if($apps -eq '*') {
-    $local = installed_apps $false | ForEach-Object { ,@($_, $false) }
-    $global = installed_apps $true | ForEach-Object { ,@($_, $true) }
+if ($apps -eq '*') {
+    $local = installed_apps $false | ForEach-Object { , @($_, $false) }
+    $global = installed_apps $true | ForEach-Object { , @($_, $true) }
     $apps = @($local) + @($global)
 }
 
@@ -29,17 +29,17 @@ $apps | ForEach-Object {
 
     $app, $bucket, $version = parse_app $app
 
-    if(($global -eq $null) -and (installed $app $true)) {
+    if (($global -eq $null) -and (installed $app $true)) {
         # set global flag when running reset command on specific app
         $global = $true
     }
 
-    if($app -eq 'scoop') {
+    if ($app -eq 'scoop') {
         # skip scoop
         return
     }
 
-    if(!(installed $app)) {
+    if (!(installed $app)) {
         error "'$app' isn't installed"
         return
     }
@@ -56,7 +56,7 @@ $apps | ForEach-Object {
         return
     }
 
-    if($global -and !(is_admin)) {
+    if ($global -and !(is_admin)) {
         warn "'$app' ($version) is a global app. You need admin rights to reset it. Skipping."
         return
     }

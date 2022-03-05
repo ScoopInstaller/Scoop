@@ -15,14 +15,14 @@ $app, $bucket, $null = parse_app $app
 $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
 
 if ($manifest) {
-        $style = get_config cat_style
-        if ($style) {
-                $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
-        } else {
-                $manifest | ConvertToPrettyJson
-        }
+    $style = get_config cat_style
+    if ($style) {
+        $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
+    } else {
+        $manifest | ConvertToPrettyJson
+    }
 } else {
-        abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
+    abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
 }
 
 exit $exitCode

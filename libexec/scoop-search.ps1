@@ -13,13 +13,13 @@ param($query)
 reset_aliases
 
 function bin_match($manifest, $query) {
-    if(!$manifest.bin) { return $false }
-    foreach($bin in $manifest.bin) {
+    if (!$manifest.bin) { return $false }
+    foreach ($bin in $manifest.bin) {
         $exe, $alias, $args = $bin
         $fname = Split-Path $exe -Leaf -ErrorAction Stop
 
-        if((strip_ext $fname) -match $query) { return $fname }
-        if($alias -match $query) { return $alias }
+        if ((strip_ext $fname) -match $query) { return $fname }
+        if ($alias -match $query) { return $alias }
     }
     $false
 }
@@ -29,7 +29,7 @@ function search_bucket($bucket, $query) {
         @{ name = $_ }
     }
 
-    if($query) {
+    if ($query) {
         try {
             $query = New-Object regex $query, 'IgnoreCase'
         } catch {
@@ -37,9 +37,9 @@ function search_bucket($bucket, $query) {
         }
 
         $apps = $apps | Where-Object {
-            if($_.name -match $query) { return $true }
+            if ($_.name -match $query) { return $true }
             $bin = bin_match (manifest $_.name $bucket) $query
-            if($bin) {
+            if ($bin) {
                 $_.bin = $bin; return $true;
             }
         }
@@ -80,7 +80,7 @@ function search_remotes($query) {
     $names = $buckets | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty name
 
     $results = $names | Where-Object { !(Test-Path $(Find-BucketDirectory $_)) } | ForEach-Object {
-        @{"bucket" = $_; "results" = (search_remote $_ $query)}
+        @{"bucket" = $_; "results" = (search_remote $_ $query) }
     } | Where-Object { $_.results }
 
     if ($results.Count -gt 0) {
@@ -99,13 +99,13 @@ function search_remotes($query) {
 Get-LocalBucket | ForEach-Object {
     $res = search_bucket $_ $query
     $local_results = $local_results -or $res
-    if($res) {
+    if ($res) {
         $name = "$_"
 
         Write-Host "'$name' bucket:"
         $res | ForEach-Object {
             $item = "    $($_.name) ($($_.version))"
-            if($_.bin) { $item += " --> includes '$($_.bin)'" }
+            if ($_.bin) { $item += " --> includes '$($_.bin)'" }
             $item
         }
         ""
@@ -114,7 +114,7 @@ Get-LocalBucket | ForEach-Object {
 
 if (!$local_results -and !(github_ratelimit_reached)) {
     $remote_results = search_remotes $query
-    if(!$remote_results) { [System.Console]::Error.WriteLine("No matches found."); exit 1 }
+    if (!$remote_results) { [System.Console]::Error.WriteLine("No matches found."); exit 1 }
     $remote_results
 }
 

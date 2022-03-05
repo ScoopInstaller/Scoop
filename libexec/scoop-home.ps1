@@ -9,15 +9,14 @@ param($app)
 
 reset_aliases
 
-if($app) {
+if ($app) {
     $manifest, $bucket = find_manifest $app
-    if($manifest) {
-        if([string]::IsNullOrEmpty($manifest.homepage)) {
+    if ($manifest) {
+        if ([string]::IsNullOrEmpty($manifest.homepage)) {
             abort "Could not find homepage in manifest for '$app'."
         }
         Start-Process $manifest.homepage
-    }
-    else {
+    } else {
         abort "Could not find manifest for '$app'."
     }
 } else { my_usage }

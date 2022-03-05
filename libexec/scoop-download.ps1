@@ -45,7 +45,7 @@ if (is_scoop_outdated) {
 }
 
 # we only want to show this warning once
-if(!$use_cache) { warn "Cache is being ignored." }
+if (!$use_cache) { warn "Cache is being ignored." }
 
 foreach ($curr_app in $apps) {
     # Prevent leaking variables from previous iteration
@@ -66,16 +66,16 @@ foreach ($curr_app in $apps) {
         $manifest = parse_json($generated)
     }
 
-    if(!$manifest) {
+    if (!$manifest) {
         error "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
         continue
     }
     $version = $manifest.version
-    if(!$version) {
+    if (!$version) {
         error "Manifest doesn't specify a version."
         continue
     }
-    if($version -match '[^\w\.\-\+_]') {
+    if ($version -match '[^\w\.\-\+_]') {
         error "Manifest version has unsupported character '$($matches[0])'."
         continue
     }
@@ -86,15 +86,15 @@ foreach ($curr_app in $apps) {
         $curr_check_hash = $false
     }
 
-    if(!(supports_architecture $manifest $architecture)) {
+    if (!(supports_architecture $manifest $architecture)) {
         error "'$app' doesn't support $architecture architecture!"
         continue
     }
 
-    if(Test-Aria2Enabled) {
+    if (Test-Aria2Enabled) {
         dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash
     } else {
-        foreach($url in script:url $manifest $architecture) {
+        foreach ($url in script:url $manifest $architecture) {
             try {
                 dl_with_cache $app $version $url $null $manifest.cookie $use_cache
             } catch {
@@ -103,14 +103,14 @@ foreach ($curr_app in $apps) {
                 continue
             }
 
-            if($curr_check_hash) {
+            if ($curr_check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
                 $cached = cache_path $app $version $url
                 $ok, $err = check_hash $cached $manifest_hash (show_app $app $bucket)
 
-                if(!$ok) {
+                if (!$ok) {
                     error $err
-                    if(Test-Path $cached) {
+                    if (Test-Path $cached) {
                         # rm cached file
                         Remove-Item -Force $cached
                     }

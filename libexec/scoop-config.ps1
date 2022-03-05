@@ -144,7 +144,7 @@ if (!$name) {
     Write-Host "'$name' has been set to '$value'"
 } else {
     $value = get_config $name
-    if($null -eq $value) {
+    if ($null -eq $value) {
         Write-Host "'$name' is not set"
     } else {
         $value

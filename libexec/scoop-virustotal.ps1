@@ -47,8 +47,8 @@
 reset_aliases
 
 $opt, $apps, $err = getopt $args 'a:snu' @('arch=', 'scan', 'no-depends', 'no-update-scoop')
-if($err) { "scoop virustotal: $err"; exit 1 }
-if(!$apps) { my_usage; exit 1 }
+if ($err) { "scoop virustotal: $err"; exit 1 }
+if (!$apps) { my_usage; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
 if (is_scoop_outdated) {
@@ -61,7 +61,7 @@ if (is_scoop_outdated) {
 
 $apps_param = $apps
 
-if($apps_param -eq '*') {
+if ($apps_param -eq '*') {
     $apps = installed_apps $false
     $apps += installed_apps $true
 }
@@ -105,7 +105,7 @@ Function Get-VirusTotalResult($hash, $app) {
         Default { $fg = "Red" }
     }
     Write-Host -ForegroundColor $fg "$app`: $unsafe/$undetected, $see_url"
-    if($unsafe -gt 0) {
+    if ($unsafe -gt 0) {
         return $_ERR_UNSAFE
     }
     return 0
@@ -132,16 +132,15 @@ Function Submit-RedirectedUrl {
     # Adapted according to Roy's response (January 23, 2014 at 11:59 am)
     # Adapted to always return an URL
     Param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string] $URL
     )
     $request = [System.Net.WebRequest]::Create($url)
-    $request.AllowAutoRedirect=$false
-    $response=$request.GetResponse()
+    $request.AllowAutoRedirect = $false
+    $response = $request.GetResponse()
     if (([int]$response.StatusCode -ge 300) -and ([int]$response.StatusCode -lt 400)) {
         $redir = $response.GetResponseHeader("Location")
-    }
-    else {
+    } else {
         $redir = $URL
     }
     $response.Close()
@@ -158,12 +157,12 @@ Function Submit-RedirectedUrl {
 #              submitting the file after a delay if the rate limit is
 #              exceeded, without risking an infinite loop (as stack
 #              overflow) if the submission keeps failing.
-Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
+Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
     $api_key = get_config("virustotal_api_key")
     if ($do_scan -and !$api_key -and !$warned_no_api_key) {
         $warned_no_api_key = $true
         info "Submitting unknown apps needs a VirusTotal API key.  " +
-             "Set it up with`n`tscoop config virustotal_api_key <API key>"
+        "Set it up with`n`tscoop config virustotal_api_key <API key>"
 
     }
     if (!$do_scan -or !$api_key) {
@@ -181,7 +180,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
             $new_redir = Submit-RedirectedUrl $orig_redir
         } while ($orig_redir -ne $new_redir)
         $requests += 1
-        $result = Invoke-WebRequest -Uri "https://www.virustotal.com/vtapi/v2/url/scan" -Body @{apikey=$api_key;url=$new_redir} -Method Post -UseBasicParsing
+        $result = Invoke-WebRequest -Uri "https://www.virustotal.com/vtapi/v2/url/scan" -Body @{apikey = $api_key; url = $new_redir } -Method Post -UseBasicParsing
         $submitted = $result.StatusCode -eq 200
         if ($submitted) {
             warn "$app`: not found`: submitted $url"
@@ -198,7 +197,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
             Submit-ToVirusTotal $new_redir $app $do_scan $True
         } else {
             warn "$app`: VirusTotal submission of $url failed`:`n" +
-                    "`tAPI returned $($result.StatusCode) after retrying"
+            "`tAPI returned $($result.StatusCode) after retrying"
         }
     } catch [Exception] {
         warn "$app`: VirusTotal submission failed`: $($_.Exception.Message)"
@@ -209,7 +208,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
 $apps | ForEach-Object {
     $app = $_
     $manifest, $bucket = find_manifest $app
-    if(!$manifest) {
+    if (!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
         warn "$app`: manifest not found"
         return
@@ -221,7 +220,7 @@ $apps | ForEach-Object {
         $hash = hash_for_url $manifest $url $architecture
 
         try {
-            if($hash) {
+            if ($hash) {
                 $exit_code = $exit_code -bor (Search-VirusTotal $hash $app)
             } else {
                 warn "$app`: Can't find hash for $url"
