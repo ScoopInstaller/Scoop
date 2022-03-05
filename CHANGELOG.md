@@ -67,7 +67,7 @@
 ### Styles
 
 - **test:** Format scripts by VSCode's PowerShell extension ([#4609](https://github.com/ScoopInstaller/Scoop/issues/4609))
-- **style:** Use correct casing for `$PSScriptRoot` ([#4775](https://github.com/ScoopInstaller/Scoop/issues/4775))
+- **style:** Formatting the entire project ([#4775](https://github.com/ScoopInstaller/Scoop/issues/4775), [#4778](https://github.com/ScoopInstaller/Scoop/issues/4778))
 
 ### Tests
 
