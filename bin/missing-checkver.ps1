@@ -13,12 +13,12 @@ param(
     [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
-        if (!(Test-Path $_ -Type Container)) {
-            throw "$_ is not a directory!"
-        } else {
-            $true
-        }
-    })]
+            if (!(Test-Path $_ -Type Container)) {
+                throw "$_ is not a directory!"
+            } else {
+                $true
+            }
+        })]
     [string] $Dir,
     [switch] $SkipSupported
 )

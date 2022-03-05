@@ -33,22 +33,22 @@
 param(
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
-        if (!($_ -match '^(.*)\/(.*):(.*)$')) {
-            throw 'Upstream must be in this format: <user>/<repo>:<branch>'
-        }
-        $true
-    })]
+            if (!($_ -match '^(.*)\/(.*):(.*)$')) {
+                throw 'Upstream must be in this format: <user>/<repo>:<branch>'
+            }
+            $true
+        })]
     [string] $Upstream,
     [string] $OriginBranch = 'master',
     [string] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
-        if (!(Test-Path $_ -Type Container)) {
-            throw "$_ is not a directory!"
-        } else {
-            $true
-        }
-    })]
+            if (!(Test-Path $_ -Type Container)) {
+                throw "$_ is not a directory!"
+            } else {
+                $true
+            }
+        })]
     [string] $Dir,
     [switch] $Push,
     [switch] $Request,

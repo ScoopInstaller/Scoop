@@ -1,7 +1,7 @@
 #Requires -Version 5
 param($cmd)
 
-Set-StrictMode -off
+Set-StrictMode -Off
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
@@ -16,8 +16,8 @@ if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
     Write-Host ""
 
     Get-LocalBucket | ForEach-Object {
-        $bucketLoc =  Find-BucketDirectory $_ -Root
-        if(Test-Path (Join-Path $bucketLoc '.git')) {
+        $bucketLoc = Find-BucketDirectory $_ -Root
+        if (Test-Path (Join-Path $bucketLoc '.git')) {
             Write-Host "'$_' bucket:"
             Invoke-Expression "git -C '$bucketLoc' --no-pager log --oneline HEAD -n 1"
             Write-Host ""
