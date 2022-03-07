@@ -48,28 +48,26 @@ function search_bucket($bucket, $query) {
 }
 
 function download_json($url) {
-    $progressPreference = 'silentlycontinue'
-    $result = invoke-webrequest $url -UseBasicParsing | Select-Object -exp content | convertfrom-json
-    $progressPreference = 'continue'
+    $ProgressPreference = 'SilentlyContinue'
+    $result = Invoke-WebRequest $url -UseBasicParsing | Select-Object -ExpandProperty content | ConvertFrom-Json
+    $ProgressPreference = 'Continue'
     $result
 }
 
 function github_ratelimit_reached {
-    $api_link = "https://api.github.com/rate_limit"
+    $api_link = 'https://api.github.com/rate_limit'
     (download_json $api_link).rate.remaining -eq 0
 }
 
 function search_remote($bucket, $query) {
-    $repo = known_bucket_repo $bucket
-
-    $uri = [system.uri]($repo)
-    if ($uri.absolutepath -match '/([a-zA-Z0-9]*)/([a-zA-Z0-9-]*)(.git|/)?') {
-        $user = $matches[1]
-        $repo_name = $matches[2]
+    $uri = [System.Uri](known_bucket_repo $bucket)
+    if ($uri.AbsolutePath -match '/([a-zA-Z0-9]*)/([a-zA-Z0-9-]*)(?:.git|/)?') {
+        $user = $Matches[1]
+        $repo_name = $Matches[2]
         $api_link = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
-        $result = download_json $api_link | Select-Object -exp tree | Where-Object {
-            $_.path -match "(^bucket/(.*$query.*).json$)"
-        } | ForEach-Object { $matches[2] }
+        $result = download_json $api_link | Select-Object -ExpandProperty tree |
+            Where-Object -Value "^(?:bucket/)?(.*$query.*)\.json$" -Property Path -Match |
+            ForEach-Object { $Matches[1] }
     }
 
     $result
