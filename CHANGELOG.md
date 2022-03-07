@@ -36,6 +36,7 @@
 - **scoop-alias:** Fix alias initialization ([#4737](https://github.com/ScoopInstaller/Scoop/issues/4737))
 - **scoop-checkup:** Skip 'check_windows_defender' when have not admin privileges ([#4699](https://github.com/ScoopInstaller/Scoop/issues/4699))
 - **scoop-cleanup:** Remove apps other than current version ([#4665](https://github.com/ScoopInstaller/Scoop/issues/4665))
+- **scoop-search:** Remove redundant 'bucket/' in search result ([#4773](https://github.com/ScoopInstaller/Scoop/issues/4773))
 - **scoop-update:** Skip updating non git buckets ([#4670](https://github.com/ScoopInstaller/Scoop/issues/4670), [#4672](https://github.com/ScoopInstaller/Scoop/issues/4672))
 
 ### Performance Improvements
