@@ -112,7 +112,7 @@ function Get-ShimPath($ShimName, $Global) {
 function Get-ShimTarget($ShimPath) {
     if ($ShimPath) {
         $shimTarget = if ($ShimPath.EndsWith('.shim')) {
-            (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '')
+            (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
         } else {
             ((Select-String -Path $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
         }
