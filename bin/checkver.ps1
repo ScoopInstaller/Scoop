@@ -153,7 +153,7 @@ $Queue | ForEach-Object {
 
     if ($json.checkver.sourceforge.project) {
         $url = 'https://sourceforge.net/projects/' + $json.checkver.sourceforge.project + '/rss'
-        $regex = '\/\/sourceforge\.net\/projects\/' + $json.checkver.sourceforge.project + $sourceforgeRegex
+        $regex = '//sourceforge\.net/projects/' + $json.checkver.sourceforge.project + $sourceforgeRegex
     }
 
     if ($json.checkver.sourceforge.path) {
