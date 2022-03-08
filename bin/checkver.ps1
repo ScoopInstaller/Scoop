@@ -140,8 +140,7 @@ $Queue | ForEach-Object {
             if ($json.checkver -ne 'sourceforge' -and $json.checkver.GetType() -eq [System.String]) {
                 $regex = $json.checkver
             }
-        }
-        else {
+        } else {
             $url = 'https://sourceforge.net/projects/' + (strip_ext $name) + '/rss'
             $regex = '\/\/sourceforge\.net\/projects\/' + (strip_ext $name) + $sourceforgeRegex
         }
