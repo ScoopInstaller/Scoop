@@ -142,7 +142,7 @@ $Queue | ForEach-Object {
             }
         } else {
             $url = 'https://sourceforge.net/projects/' + (strip_ext $name) + '/rss'
-            $regex = '\/\/sourceforge\.net\/projects\/' + (strip_ext $name) + $sourceforgeRegex
+            $regex = '//sourceforge\.net/projects/' + (strip_ext $name) + $sourceforgeRegex
         }
     }
 
