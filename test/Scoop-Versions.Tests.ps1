@@ -1,5 +1,5 @@
-. "$psscriptroot\Scoop-TestLib.ps1"
-. "$psscriptroot\..\lib\versions.ps1"
+. "$PSScriptRoot\Scoop-TestLib.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1"
 
 Describe 'versions comparison' -Tag 'Scoop' {
     Context 'semver compliant versions' {

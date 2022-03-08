@@ -51,72 +51,74 @@ if (!$apps) { exit 0 }
     ($app, $global) = $_
 
     $version = Select-CurrentVersion -AppName $app -Global:$global
-    Write-Host "Uninstalling '$app' ($version)."
+    $appDir = appdir $app $global
+    if ($version) {
+        Write-Host "Uninstalling '$app' ($version)."
 
-    $dir = versiondir $app $version $global
-    $persist_dir = persistdir $app $global
+        $dir = versiondir $app $version $global
+        $persist_dir = persistdir $app $global
 
-    #region Workaround for #2952
-    $processdir = appdir $app $global | Resolve-Path | Select-Object -ExpandProperty Path
-    if (Get-Process | Where-Object { $_.Path -like "$processdir\*" }) {
-        error "Application is still running. Close all instances and try again."
-        continue
-    }
-    #endregion Workaround for #2952
-
-    try {
-        Test-Path $dir -ErrorAction Stop | Out-Null
-    } catch [UnauthorizedAccessException] {
-        error "Access denied: $dir. You might need to restart."
-        continue
-    }
-
-    $manifest = installed_manifest $app $version $global
-    $install = install_info $app $version $global
-    $architecture = $install.architecture
-
-    run_uninstaller $manifest $architecture $dir
-    rm_shims $manifest $global $architecture
-    rm_startmenu_shortcuts $manifest $global $architecture
-
-    # If a junction was used during install, that will have been used
-    # as the reference directory. Otherwise it will just be the version
-    # directory.
-    $refdir = unlink_current $dir
-
-    uninstall_psmodule $manifest $refdir $global
-
-    env_rm_path $manifest $refdir $global $architecture
-    env_rm $manifest $global $architecture
-
-    try {
-        # unlink all potential old link before doing recursive Remove-Item
-        unlink_persist_data $dir
-        Remove-Item $dir -Recurse -Force -ErrorAction Stop
-    } catch {
-        if (Test-Path $dir) {
-            error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+        #region Workaround for #2952
+        if (test_running_process $app $global) {
             continue
         }
-    }
+        #endregion Workaround for #2952
 
-    # remove older versions
-    $old = Get-InstalledVersion -AppName $app -Global:$global
-    foreach ($oldver in $old) {
-        Write-Host "Removing older version ($oldver)."
-        $dir = versiondir $app $oldver $global
+        try {
+            Test-Path $dir -ErrorAction Stop | Out-Null
+        } catch [UnauthorizedAccessException] {
+            error "Access denied: $dir. You might need to restart."
+            continue
+        }
+
+        $manifest = installed_manifest $app $version $global
+        $install = install_info $app $version $global
+        $architecture = $install.architecture
+
+        run_uninstaller $manifest $architecture $dir
+        rm_shims $app $manifest $global $architecture
+        rm_startmenu_shortcuts $manifest $global $architecture
+
+        # If a junction was used during install, that will have been used
+        # as the reference directory. Otherwise it will just be the version
+        # directory.
+        $refdir = unlink_current $dir
+
+        uninstall_psmodule $manifest $refdir $global
+
+        env_rm_path $manifest $refdir $global $architecture
+        env_rm $manifest $global $architecture
+
         try {
             # unlink all potential old link before doing recursive Remove-Item
-            unlink_persist_data $dir
+            unlink_persist_data $manifest $dir
+            Remove-Item $dir -Recurse -Force -ErrorAction Stop
+        } catch {
+            if (Test-Path $dir) {
+                error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+                continue
+            }
+        }
+    }
+    # remove older versions
+    $oldVersions = @(Get-ChildItem $appDir -Name -Exclude 'current')
+    foreach ($version in $oldVersions) {
+        Write-Host "Removing older version ($version)."
+        $dir = versiondir $app $version $global
+        try {
+            # unlink all potential old link before doing recursive Remove-Item
+            unlink_persist_data $manifest $dir
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
             continue app_loop
         }
     }
-
-    if ((Get-InstalledVersion -AppName $app -Global:$global).length -eq 0) {
-        $appdir = appdir $app $global
+    if (Test-Path ($currentDir = Join-Path $appDir 'current')) {
+        attrib $currentDir -R /L
+        Remove-Item $currentDir -ErrorAction Stop -Force
+    }
+    if (!(Get-ChildItem $appDir)) {
         try {
             # if last install failed, the directory seems to be locked and this
             # will throw an error about the directory not existing

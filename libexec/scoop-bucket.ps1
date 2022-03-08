@@ -19,20 +19,46 @@
 #     scoop bucket known
 param($cmd, $name, $repo)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\git.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
 reset_aliases
 
 $usage_add = "usage: scoop bucket add <name> [<repo>]"
 $usage_rm = "usage: scoop bucket rm <name>"
 
-switch($cmd) {
+function list_buckets {
+    $buckets = @()
+
+    foreach ($bucket in Get-LocalBucket) {
+        $source = Find-BucketDirectory $bucket -Root
+        $manifests = (
+            Get-ChildItem "$source\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
+            Measure-Object | Select-Object -ExpandProperty Count
+        )
+        $updated = 'N/A'
+        if ((Test-Path (Join-Path $source '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
+            $updated = git -C $source log --format='%aD' -n 1 | Get-Date
+            $source = git -C $source config remote.origin.url
+        } else {
+            $updated = (Get-Item "$source\bucket").LastWriteTime
+            $source = friendly_path $source
+        }
+        $buckets += New-Object PSObject -Property @{
+            Name      = $bucket
+            Source    = $source
+            Updated   = $updated
+            Manifests = $manifests
+        }
+    }
+    return $buckets | Select-Object Name, Source, Updated, Manifests
+}
+
+switch ($cmd) {
     'add' { add_bucket $name $repo }
     'rm' { rm_bucket $name }
-    'list' { Get-LocalBucket }
+    'list' { list_buckets }
     'known' { known_buckets }
     default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
 }

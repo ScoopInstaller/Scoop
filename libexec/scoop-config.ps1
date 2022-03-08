@@ -2,6 +2,10 @@
 # Summary: Get or set configuration values
 # Help: The scoop configuration file is saved at ~/.config/scoop/config.json.
 #
+# To get all configuration settings:
+#
+#     scoop config
+#
 # To get a configuration setting:
 #
 #     scoop config <name>
@@ -43,14 +47,14 @@
 #       * An empty or unset value for proxy is equivalent to 'default' (with no username or password)
 #       * To bypass the system proxy and connect directly, use 'none' (with no username or password)
 #
-# default-architecture: 64bit|32bit
+# default_architecture: 64bit|32bit
 #       Allow to configure preferred architecture for application installation.
 #       If not specified, architecture is determined be system.
 #
 # debug: $true|$false
 #       Additional and detailed output will be shown.
 #
-# force-update: $true|$false
+# force_update: $true|$false
 #       Force apps updating to bucket's version.
 #
 # show_update_log: $true|$false
@@ -80,6 +84,17 @@
 # virustotal_api_key:
 #       API key used for uploading/scanning files using virustotal.
 #       See: 'https://support.virustotal.com/hc/en-us/articles/115002088769-Please-give-me-an-API-key'
+#
+# cat_style:
+#       When set to a non-empty string, Scoop will use 'bat' to display the manifest for
+#       the `scoop cat` command and while doing manifest review. This requires 'bat' to be
+#       installed (run `scoop install bat` to install it), otherwise errors will be thrown.
+#       The accepted values are the same as ones passed to the --style flag of 'bat'.
+#
+# ignore_running_processes: $true|$false
+#       When set to $false (default), Scoop would stop its procedure immediately if it detects
+#       any target app process is running. Procedure here refers to reset/uninstall/update.
+#       When set to $true, Scoop only displays a warning message and continues procedure.
 #
 # ARIA2 configuration
 # -------------------
@@ -112,25 +127,27 @@
 
 param($name, $value)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
 reset_aliases
 
-if(!$name) { my_usage; exit 1 }
-
-if($name -like 'rm') {
+if (!$name) {
+    $scoopConfig
+} elseif ($name -like '--help') {
+    my_usage
+} elseif ($name -like 'rm') {
     set_config $value $null | Out-Null
-    Write-Output "'$value' has been removed"
-} elseif($null -ne $value) {
+    Write-Host "'$value' has been removed"
+} elseif ($null -ne $value) {
     set_config $name $value | Out-Null
-    Write-Output "'$name' has been set to '$value'"
+    Write-Host "'$name' has been set to '$value'"
 } else {
     $value = get_config $name
     if($null -eq $value) {
-        Write-Output "'$name' is not set"
+        Write-Host "'$name' is not set"
     } else {
-        Write-Output $value
+        $value
     }
 }
 

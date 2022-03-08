@@ -2,37 +2,34 @@ version: "{build}-{branch}"
 branches:
   except:
     - gh-pages
-build: off
-deploy: off
-clone_depth: 49
-image: Visual Studio 2019
+build: false
+deploy: false
+clone_depth: 2
+image: Visual Studio 2022
 environment:
-  scoop: C:\projects\scoop
-  scoop_home: C:\projects\scoop
-  scoop_helpers: C:\projects\helpers
-  lessmsi: '%scoop_helpers%\lessmsi\lessmsi.exe'
-  innounp: '%scoop_helpers%\innounp\innounp.exe'
-  zstd: '%scoop_helpers%\zstd\zstd.exe'
   matrix:
     - PowerShell: 5
-    - PowerShell: 6
-cache:
-  - '%USERPROFILE%\Documents\WindowsPowerShell\Modules -> appveyor.yml, test\bin\*.ps1'
-  - C:\projects\helpers  -> appveyor.yml, test\bin\*.ps1
+    - PowerShell: 7
 matrix:
   fast_finish: true
 for:
   - matrix:
       only:
         - PowerShell: 5
+    cache:
+      - '%USERPROFILE%\Documents\WindowsPowerShell\Modules -> appveyor.yml, test\bin\*.ps1'
+      - C:\projects\helpers  -> appveyor.yml, test\bin\*.ps1
     install:
-      - ps: . "$env:SCOOP_HOME\test\bin\init.ps1"
+      - ps: .\test\bin\init.ps1
     test_script:
-      - ps: . "$env:SCOOP_HOME\test\bin\test.ps1" -TestPath "$env:APPVEYOR_BUILD_FOLDER"
+      - ps: .\test\bin\test.ps1
   - matrix:
       only:
-        - PowerShell: 6
+        - PowerShell: 7
+    cache:
+      - '%USERPROFILE%\Documents\PowerShell\Modules -> appveyor.yml, test\bin\*.ps1'
+      - C:\projects\helpers  -> appveyor.yml, test\bin\*.ps1
     install:
-      - pwsh: . "$env:SCOOP_HOME\test\bin\init.ps1"
+      - pwsh: .\test\bin\init.ps1
     test_script:
-      - pwsh: . "$env:SCOOP_HOME\test\bin\test.ps1" -TestPath "$env:APPVEYOR_BUILD_FOLDER"
+      - pwsh: .\test\bin\test.ps1

@@ -23,19 +23,19 @@ param(
     [Switch]$verbose = $false
 )
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
 
 $script:config_alias = 'alias'
 
 function init_alias_config {
     $aliases = get_config $script:config_alias
-    if (!$aliases) {
-        $aliases = @{}
+    if ($aliases) {
+        $aliases
+    } else {
+        New-Object -TypeName PSObject
     }
-
-    return $aliases
 }
 
 function add_alias($name, $command) {
@@ -100,9 +100,9 @@ function list_aliases {
     }
     $aliases = $aliases.GetEnumerator() | Sort-Object Name
     if ($verbose) {
-        return $aliases | Select-Object Name, Command, Summary | Format-Table -AutoSize -Wrap
+        return $aliases | Select-Object Name, Command, Summary
     } else {
-        return $aliases | Select-Object Name, Command | Format-Table -AutoSize -hidetablehead -Wrap
+        return $aliases | Select-Object Name, Command
     }
 }
 

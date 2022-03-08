@@ -1,13 +1,13 @@
 # Usage: scoop depends <app>
 # Summary: List dependencies for an app
 
-. "$psscriptroot\..\lib\depends.ps1"
-. "$psscriptroot\..\lib\install.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\getopt.ps1"
-. "$psscriptroot\..\lib\decompress.ps1"
-. "$psscriptroot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\decompress.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
 reset_aliases
 
@@ -23,7 +23,7 @@ try {
     abort "ERROR: $_"
 }
 
-$deps = @(deps $app $architecture)
+$deps = @(Get-Dependency $app $architecture) -ne $app
 if($deps) {
     $deps[($deps.length - 1)..0]
 }

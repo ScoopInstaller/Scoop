@@ -13,43 +13,25 @@
 #   -g, --global              Install the app globally
 #   -i, --independent         Don't install dependencies automatically
 #   -k, --no-cache            Don't use the download cache
+#   -u, --no-update-scoop     Don't update Scoop before installing if it's outdated
 #   -s, --skip                Skip hash validation (use with caution!)
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\decompress.ps1"
-. "$psscriptroot\..\lib\install.ps1"
-. "$psscriptroot\..\lib\shortcuts.ps1"
-. "$psscriptroot\..\lib\psmodules.ps1"
-. "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\getopt.ps1"
-. "$psscriptroot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\decompress.ps1"
+. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\shortcuts.ps1"
+. "$PSScriptRoot\..\lib\psmodules.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\depends.ps1"
 
 reset_aliases
 
-function is_installed($app, $global) {
-    if ($app.EndsWith('.json')) {
-        $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
-    }
-    if (installed $app $global) {
-        function gf($g) { if ($g) { ' --global' } }
-
-        $version = Select-CurrentVersion -AppName $app -Global:$global
-        if (!(install_info $app $version $global)) {
-            warn "Purging previous failed installation of $app."
-            & "$PSScriptRoot\scoop-uninstall.ps1" $app$(gf $global)
-            return $false
-        }
-        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(gf $global)' to install a new version."
-        return $true
-    }
-    return $false
-}
-
-$opt, $apps, $err = getopt $args 'gfiksa:' 'global', 'force', 'independent', 'no-cache', 'skip', 'arch='
+$opt, $apps, $err = getopt $args 'gikusa:' 'global', 'independent', 'no-cache', 'no-update-scoop', 'skip', 'arch='
 if ($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
@@ -70,13 +52,24 @@ if ($global -and !(is_admin)) {
 }
 
 if (is_scoop_outdated) {
-    scoop update
+    if ($opt.u -or $opt.'no-update-scoop') {
+        warn "Scoop is out of date."
+    } else {
+        scoop update
+    }
 }
+
+ensure_none_failed $apps
 
 if ($apps.length -eq 1) {
     $app, $null, $version = parse_app $apps
-    if ($null -eq $version -and (is_installed $app $global)) {
-        return
+    if ($app.EndsWith('.json')) {
+        $app = [System.IO.Path]::GetFileNameWithoutExtension($app)
+    }
+    $curVersion = Select-CurrentVersion -AppName $app -Global:$global
+    if ($null -eq $version -and $curVersion) {
+        warn "'$app' ($curVersion) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
+        exit 0
     }
 }
 
@@ -109,9 +102,9 @@ $apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-
 $explicit_apps = $apps
 
 if (!$independent) {
-    $apps = install_order $apps $architecture # adds dependencies
+    $apps = $apps | Get-Dependency -Architecture $architecture | Select-Object -Unique # adds dependencies
 }
-ensure_none_failed $apps $global
+ensure_none_failed $apps
 
 $apps, $skip = prune_installed $apps $global
 

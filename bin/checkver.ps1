@@ -15,6 +15,8 @@
     Useful for hash updates.
 .PARAMETER SkipUpdated
     Updated manifests will not be shown.
+.PARAMETER Version
+    Update manifest to specific version.
 .EXAMPLE
     PS BUCKETROOT > .\bin\checkver.ps1
     Check all manifest inside default directory.
@@ -63,18 +65,23 @@ param(
     [String] $Version = ''
 )
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\autoupdate.ps1"
-. "$psscriptroot\..\lib\json.ps1"
-. "$psscriptroot\..\lib\versions.ps1"
-. "$psscriptroot\..\lib\install.ps1" # needed for hash generation
-. "$psscriptroot\..\lib\unix.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\autoupdate.ps1"
+. "$PSScriptRoot\..\lib\json.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
+. "$PSScriptRoot\..\lib\unix.ps1"
 
 $Dir = Resolve-Path $Dir
 $Search = $App
 $GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+
+# don't use $Version with $App = '*'
+if ($App -eq '*' -and $Version -ne '') {
+    throw "Don't use '-Version' with '-App *'!"
+}
 
 # get apps to check
 $Queue = @()
@@ -205,95 +212,97 @@ while ($in_progress -gt 0) {
     $reverse = $state.reverse
     $replace = $state.replace
     $expected_ver = $json.version
-    $ver = ''
-
-    $page = $ev.SourceEventArgs.Result
-    $err = $ev.SourceEventArgs.Error
-    if ($json.checkver.script) {
-        $page = $json.checkver.script -join "`r`n" | Invoke-Expression
-    }
-
-    if ($err) {
-        next "$($err.message)`r`nURL $url is not valid"
-        continue
-    }
-
-    if (!$regex -and $replace) {
-        next "'replace' requires 're' or 'regex'"
-        continue
-    }
-
-    if ($jsonpath) {
-        # Return only a single value if regex is absent
-        $noregex = [String]::IsNullOrEmpty($regex)
-        # If reverse is ON and regex is ON,
-        # Then reverse would have no effect because regex handles reverse
-        # on its own
-        # So in this case we have to disable reverse
-        $ver = json_path $page $jsonpath $null ($reverse -and $noregex) $noregex
-        if (!$ver) {
-            $ver = json_path_legacy $page $jsonpath
-        }
-        if (!$ver) {
-            next "couldn't find '$jsonpath' in $url"
-            continue
-        }
-    }
-
-    if ($xpath) {
-        $xml = [xml]$page
-        # Find all `significant namespace declarations` from the XML file
-        $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
-        # Then add them into the NamespaceManager
-        $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
-        $nsList | ForEach-Object {
-            $nsmgr.AddNamespace($_.LocalName, $_.Value)
-        }
-        # Getting version from XML, using XPath
-        $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
-        if (!$ver) {
-            next "couldn't find '$xpath' in $url"
-            continue
-        }
-    }
-
-    if ($jsonpath -and $regexp) {
-        $page = $ver
-        $ver = ''
-    }
-
-    if ($xpath -and $regexp) {
-        $page = $ver
-        $ver = ''
-    }
-
-    if ($regexp) {
-        $regex = New-Object System.Text.RegularExpressions.Regex($regexp)
-        if ($reverse) {
-            $match = $regex.Matches($page) | Select-Object -Last 1
-        } else {
-            $match = $regex.Matches($page) | Select-Object -First 1
-        }
-
-        if ($match -and $match.Success) {
-            $matchesHashtable = @{}
-            $regex.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
-            $ver = $matchesHashtable['1']
-            if ($replace) {
-                $ver = $regex.Replace($match.Value, $replace)
-            }
-            if (!$ver) {
-                $ver = $matchesHashtable['version']
-            }
-        } else {
-            next "couldn't match '$regexp' in $url"
-            continue
-        }
-    }
+    $ver = $Version
 
     if (!$ver) {
-        next "couldn't find new version in $url"
-        continue
+        $page = $ev.SourceEventArgs.Result
+        $err = $ev.SourceEventArgs.Error
+        if ($json.checkver.script) {
+            $page = $json.checkver.script -join "`r`n" | Invoke-Expression
+        }
+
+        if ($err) {
+            next "$($err.message)`r`nURL $url is not valid"
+            continue
+        }
+
+        if (!$regex -and $replace) {
+            next "'replace' requires 're' or 'regex'"
+            continue
+        }
+
+        if ($jsonpath) {
+            # Return only a single value if regex is absent
+            $noregex = [String]::IsNullOrEmpty($regex)
+            # If reverse is ON and regex is ON,
+            # Then reverse would have no effect because regex handles reverse
+            # on its own
+            # So in this case we have to disable reverse
+            $ver = json_path $page $jsonpath $null ($reverse -and $noregex) $noregex
+            if (!$ver) {
+                $ver = json_path_legacy $page $jsonpath
+            }
+            if (!$ver) {
+                next "couldn't find '$jsonpath' in $url"
+                continue
+            }
+        }
+
+        if ($xpath) {
+            $xml = [xml]$page
+            # Find all `significant namespace declarations` from the XML file
+            $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
+            # Then add them into the NamespaceManager
+            $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+            $nsList | ForEach-Object {
+                $nsmgr.AddNamespace($_.LocalName, $_.Value)
+            }
+            # Getting version from XML, using XPath
+            $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
+            if (!$ver) {
+                next "couldn't find '$xpath' in $url"
+                continue
+            }
+        }
+
+        if ($jsonpath -and $regexp) {
+            $page = $ver
+            $ver = ''
+        }
+
+        if ($xpath -and $regexp) {
+            $page = $ver
+            $ver = ''
+        }
+
+        if ($regexp) {
+            $regex = New-Object System.Text.RegularExpressions.Regex($regexp)
+            if ($reverse) {
+                $match = $regex.Matches($page) | Select-Object -Last 1
+            } else {
+                $match = $regex.Matches($page) | Select-Object -First 1
+            }
+
+            if ($match -and $match.Success) {
+                $matchesHashtable = @{}
+                $regex.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
+                $ver = $matchesHashtable['1']
+                if ($replace) {
+                    $ver = $regex.Replace($match.Value, $replace)
+                }
+                if (!$ver) {
+                    $ver = $matchesHashtable['version']
+                }
+            } else {
+                next "couldn't match '$regexp' in $url"
+                continue
+            }
+        }
+
+        if (!$ver) {
+            next "couldn't find new version in $url"
+            continue
+        }
     }
 
     # Skip actual only if versions are same and there is no -f
@@ -325,9 +334,6 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
-            if ($Version -ne "") {
-                $ver = $Version
-            }
             Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
         } catch {
             error $_.Exception.Message
