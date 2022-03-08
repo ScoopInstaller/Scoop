@@ -136,7 +136,7 @@ $Queue | ForEach-Object {
     if ($json.checkver -eq 'sourceforge' -or $json.homepage.Contains('sourceforge.net') -or $json.checkver.sourceforge.path) {
         if ($json.homepage -match '//sourceforge\.net/projects/(?<project>([\w-]+$|[\w-]+))(?:[/]?)' -or $json.homepage -match '//(?<project>[\w-]+)\.sourceforge\.net') {
             $url = 'https://sourceforge.net/projects/' + $matches['project'] + '/rss'
-            $regex = '\/\/sourceforge\.net\/projects\/' + $matches['project'] + $sourceforgeRegex
+            $regex = '//sourceforge\.net/projects/' + $matches['project'] + $sourceforgeRegex
             if ($json.checkver -ne 'sourceforge' -and $json.checkver.GetType() -eq [System.String]) {
                 $regex = $json.checkver
             }
