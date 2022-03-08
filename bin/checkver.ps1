@@ -157,7 +157,7 @@ $Queue | ForEach-Object {
     }
 
     if ($json.checkver.sourceforge.path) {
-        $url = $url + '?path=' + $json.checkver.sourceforge.path
+        $url = $url + '?path=/' + $json.checkver.sourceforge.path.TrimStart('/')
     }
 
     if ($json.checkver.re) {
