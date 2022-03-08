@@ -148,7 +148,7 @@ $Queue | ForEach-Object {
 
     if ($json.checkver.sourceforge -and $json.checkver.sourceforge.GetType() -eq [System.String]) {
         $url = 'https://sourceforge.net/projects/' + $json.checkver.sourceforge + '/rss'
-        $regex = '\/\/sourceforge\.net\/projects\/' + $json.checkver.sourceforge + $sourceforgeRegex
+        $regex = '//sourceforge\.net/projects/' + $json.checkver.sourceforge + $sourceforgeRegex
     }
 
     if ($json.checkver.sourceforge.project) {
