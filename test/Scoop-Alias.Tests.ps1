@@ -8,6 +8,7 @@ Describe 'add_alias' -Tag 'Scoop' {
     Mock get_config { @{} }
 
     $shimdir = shimdir
+    New-Item -ItemType Directory -Path $shimdir -ErrorAction Ignore
 
     Context "alias doesn't exist" {
         It 'creates a new alias' {
@@ -37,6 +38,7 @@ Describe 'rm_alias' -Tag 'Scoop' {
     Mock get_config { @{} }
 
     $shimdir = shimdir
+    New-Item -ItemType Directory -Path $shimdir -ErrorAction Ignore
 
     Context 'alias exists' {
         It 'removes an existing alias' {
