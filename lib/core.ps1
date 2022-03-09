@@ -642,7 +642,7 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-UTF8File $shim
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.ps1$') {
         # if $path points to another drive resolve-path prepends .\ which could break shims
         warn_on_overwrite "$shim.ps1" $path
@@ -693,7 +693,7 @@ function shim($path, $global, $name, $arg) {
             "else",
             "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
             "fi"
-        ) -join "`n" | Out-UTF8File $shim
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.jar$') {
         warn_on_overwrite "$shim.cmd" $path
         @(
@@ -706,7 +706,7 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "java.exe -jar `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-UTF8File $shim
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.py$') {
         warn_on_overwrite "$shim.cmd" $path
         @(
@@ -719,7 +719,7 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "python.exe `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-UTF8File $shim
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
         # find path to Git's bash so that batch scripts can run bash scripts
@@ -737,7 +737,7 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "`"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-UTF8File $shim
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     }
 }
 
@@ -1102,6 +1102,7 @@ function Out-UTF8File {
         [Alias("Path")]
         [String] $FilePath,
         [Switch] $Append,
+        [Switch] $NoNewLine,
         [Parameter(ValueFromPipeline = $True)]
         [PSObject] $InputObject
     )
@@ -1109,10 +1110,15 @@ function Out-UTF8File {
         if ($Append) {
             [System.IO.File]::AppendAllText($FilePath, $InputObject)
         } else {
-            # Ref: https://stackoverflow.com/questions/5596982
-            # Performance Note: `WriteAllLines` throttles memory usage while
-            # `WriteAllText` needs to keep the complete string in memory.
-            [System.IO.File]::WriteAllLines($FilePath, $InputObject)
+            if (!$NoNewLine) {
+                # Ref: https://stackoverflow.com/questions/5596982
+                # Performance Note: `WriteAllLines` throttles memory usage while
+                # `WriteAllText` needs to keep the complete string in memory.
+                [System.IO.File]::WriteAllLines($FilePath, $InputObject)
+            } else {
+                # However `WriteAllText` does not add ending newline.
+                [System.IO.File]::WriteAllText($FilePath, $InputObject)
+            }
         }
     }
 }
