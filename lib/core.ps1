@@ -402,10 +402,10 @@ function url_remote_filename($url) {
 }
 
 function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
-function fullpath($path) { # should be ~ rooted
-    $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
+function fullpath($path) {
+    # should be ~ rooted
+    $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
 }
-function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
 function friendly_path($path) {
     $h = (Get-PsProvider 'FileSystem').home; if(!$h.endswith('\')) { $h += '\' }
     if($h -eq '\') { return $path }
