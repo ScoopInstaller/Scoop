@@ -111,7 +111,7 @@ function update_scoop() {
 
         $res = $lastexitcode
         if ($show_update_log) {
-            Invoke-Expression "git -C '$currentdir' --no-pager log --no-decorate --grep='^chore' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            Invoke-Expression "git -C '$currentdir' --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
         if ($res -ne 0) {
@@ -148,7 +148,7 @@ function update_scoop() {
         $previousCommit = (Invoke-Expression "git -C '$bucketLoc' rev-parse HEAD")
         git_cmd -C "`"$bucketLoc`"" pull -q
         if ($show_update_log) {
-            Invoke-Expression "git -C '$bucketLoc' --no-pager log --no-decorate --grep='^chore' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            Invoke-Expression "git -C '$bucketLoc' --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
     }
 
