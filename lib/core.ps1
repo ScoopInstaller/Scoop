@@ -215,6 +215,9 @@ function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -rep
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global) {
+    if (-not $PSBoundParameters.ContainsKey('global')) {
+        return (installed $app $false) -or (installed $app $true)
+    }
     # Dependencies of the format "bucket/dependency" install in a directory of form
     # "dependency". So we need to extract the bucket from the name and only give the app
     # name to is_directory
