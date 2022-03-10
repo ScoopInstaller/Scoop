@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+- **shim:** Manipulating shims with UTF8 encoding ([#4791](https://github.com/ScoopInstaller/Scoop/issues/4791))
 - **installed:** If no `$global`, check both local and global installed ([#4798](https://github.com/ScoopInstaller/Scoop/issues/4798))
 - **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
 
