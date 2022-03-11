@@ -2,11 +2,9 @@
 # Summary: Show help for a command
 param($cmd)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\commands.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-
-reset_aliases
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\commands.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
 function print_help($cmd) {
     $file = Get-Content (command_path $cmd) -raw
@@ -47,4 +45,3 @@ Some useful commands are:"
 }
 
 exit 0
-

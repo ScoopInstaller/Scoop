@@ -1,7 +1,7 @@
 # for development, update the installed scripts to match local source
-. "$psscriptroot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
 
-$src = relpath ".."
+$src = "$PSScriptRoot\.."
 $dest = ensure (versiondir 'scoop' 'current')
 
 # make sure not running from the installed directory
@@ -15,5 +15,4 @@ $output | Where-Object { $_ -ne "" }
 Write-Output 'creating shim...'
 shim "$dest\bin\scoop.ps1" $false
 
-ensure_scoop_in_path
 success 'scoop was refreshed!'

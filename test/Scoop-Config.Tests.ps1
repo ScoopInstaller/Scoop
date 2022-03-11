@@ -1,81 +1,78 @@
 . "$PSScriptRoot\..\lib\core.ps1"
 
-Describe "config" -Tag 'Scoop' {
+Describe 'config' -Tag 'Scoop' {
     BeforeAll {
-        $json = '{ "one": 1, "two": [ { "a": "a" }, "b", 2 ], "three": { "four": 4 }, "five": true, "six": false, "seven": "\/Date(1529917395805)\/", "eight": "2019-03-18T15:22:09.3930000+00:00" }'
-    }
-
-    It "converts JSON to PSObject" {
-        $obj = ConvertFrom-Json $json
-
-        $obj.one | Should -BeExactly 1
-        $obj.two[0].a | Should -Be "a"
-        $obj.two[1] | Should -Be "b"
-        $obj.two[2] | Should -BeExactly 2
-        $obj.three.four | Should -BeExactly 4
-        $obj.five | Should -BeTrue
-        $obj.six | Should -BeFalse
-        $obj.seven | Should -BeOfType [System.DateTime]
-        if($PSVersionTable.PSVersion.Major -lt 6) {
-            $obj.eight | Should -BeOfType [System.String]
-        } else {
-            $obj.eight | Should -BeOfType [System.DateTime]
+        $configFile = "$env:TEMP\ScoopTestFixtures\config.json"
+        if (Test-Path $configFile) {
+            Remove-Item -Path $configFile -Force
         }
+        $unicode = [Regex]::Unescape('\u4f60\u597d\u3053\u3093\u306b\u3061\u306f') # 你好こんにちは
     }
 
-    It "load_config should return PSObject" {
-        Mock Get-Content { $json }
-        Mock Test-Path { $true }
-        (load_cfg 'file') | Should -Not -BeNullOrEmpty
-        (load_cfg 'file') | Should -BeOfType [System.Management.Automation.PSObject]
-        (load_cfg 'file').one | Should -BeExactly 1
-    }
-
-    It "get_config should return exactly the same values" {
-        $scoopConfig = ConvertFrom-Json $json
-        get_config 'does_not_exist' 'default' | Should -Be 'default'
-
-        get_config 'one' | Should -BeExactly 1
-        (get_config 'two')[0].a | Should -Be "a"
-        (get_config 'two')[1] | Should -Be "b"
-        (get_config 'two')[2] | Should -BeExactly 2
-        (get_config 'three').four | Should -BeExactly 4
-        get_config 'five' | Should -BeTrue
-        get_config 'six' | Should -BeFalse
-        get_config 'seven' | Should -BeOfType [System.DateTime]
-        if($PSVersionTable.PSVersion.Major -lt 6) {
-            get_config 'eight' | Should -BeOfType [System.String]
-        } else {
-            get_config 'eight' | Should -BeOfType [System.DateTime]
-        }
-    }
-
-    It "set_config should create a new PSObject and ensure existing directory" {
+    BeforeEach {
         $scoopConfig = $null
-        $configFile = "$PSScriptRoot\.scoop"
-
-        Mock ensure { $PSScriptRoot } -Verifiable -ParameterFilter { $dir -eq (Split-Path -Path $configFile) }
-        Mock Set-Content {} -Verifiable -ParameterFilter { $Path -eq $configFile }
-        Mock ConvertTo-Json { '' } -Verifiable -ParameterFilter { $InputObject -is [System.Management.Automation.PSObject] }
-
-        set_config 'does_not_exist' 'default'
-
-        Assert-VerifiableMock
     }
 
-    It "set_config should remove a value if set to `$null" {
-        $scoopConfig = New-Object PSObject
-        $scoopConfig | Add-Member -MemberType NoteProperty -Name 'should_be_removed' -Value 'a_value'
-        $scoopConfig | Add-Member -MemberType NoteProperty -Name 'should_stay' -Value 'another_value'
-        $configFile = "$PSScriptRoot\.scoop"
+    It 'load_cfg should return null if config file does not exist' {
+        load_cfg $configFile | Should -Be $null
+    }
 
-        Mock Set-Content {} -Verifiable -ParameterFilter { $Path -eq $configFile }
-        Mock ConvertTo-Json { '' } -Verifiable -ParameterFilter { $InputObject -is [System.Management.Automation.PSObject] }
+    It 'set_config should be able to save typed values correctly' {
+        # number
+        $scoopConfig = set_config 'one' 1
+        $scoopConfig.one | Should -BeExactly 1
 
-        $scoopConfig = set_config 'should_be_removed' $null
-        $scoopConfig.should_be_removed | Should -BeNullOrEmpty
-        $scoopConfig.should_stay | Should -Be 'another_value'
+        # boolean
+        $scoopConfig = set_config 'two' $true
+        $scoopConfig.two | Should -BeTrue
+        $scoopConfig = set_config 'three' $false
+        $scoopConfig.three | Should -BeFalse
 
-        Assert-VerifiableMock
+        # underline key
+        $scoopConfig = set_config 'under_line' 'four'
+        $scoopConfig.under_line | Should -BeExactly 'four'
+
+        # string
+        $scoopConfig = set_config 'five' 'not null'
+
+        # datetime
+        $scoopConfig = set_config 'time' ([System.DateTime]::Parse('2019-03-18T15:22:09.3930000+00:00', $null, [System.Globalization.DateTimeStyles]::AdjustToUniversal))
+        $scoopConfig.time | Should -BeOfType [System.DateTime]
+
+        # non-ASCII
+        $scoopConfig = set_config 'unicode' $unicode
+        $scoopConfig.unicode | Should -Be $unicode
+    }
+
+    It 'load_cfg should return PSObject if config file exist' {
+        $scoopConfig = load_cfg $configFile
+        $scoopConfig | Should -Not -BeNullOrEmpty
+        $scoopConfig | Should -BeOfType [System.Management.Automation.PSObject]
+        $scoopConfig.one | Should -BeExactly 1
+        $scoopConfig.two | Should -BeTrue
+        $scoopConfig.three | Should -BeFalse
+        $scoopConfig.under_line | Should -BeExactly 'four'
+        $scoopConfig.five | Should -Be 'not null'
+        $scoopConfig.time | Should -BeOfType [System.DateTime]
+        $scoopConfig.time | Should -Be ([System.DateTime]::Parse('2019-03-18T15:22:09.3930000+00:00', $null, [System.Globalization.DateTimeStyles]::AdjustToUniversal))
+        $scoopConfig.unicode | Should -Be $unicode
+    }
+
+    It 'get_config should return exactly the same values' {
+        $scoopConfig = load_cfg $configFile
+        (get_config 'one') | Should -BeExactly 1
+        (get_config 'two') | Should -BeTrue
+        (get_config 'three') | Should -BeFalse
+        (get_config 'under_line') | Should -BeExactly 'four'
+        (get_config 'five') | Should -Be 'not null'
+        (get_config 'time') | Should -BeOfType [System.DateTime]
+        (get_config 'time') | Should -Be ([System.DateTime]::Parse('2019-03-18T15:22:09.3930000+00:00', $null, [System.Globalization.DateTimeStyles]::AdjustToUniversal))
+        (get_config 'unicode') | Should -Be $unicode
+    }
+
+    It 'set_config should remove a value if being set to $null' {
+        $scoopConfig = load_cfg $configFile
+        $scoopConfig = set_config 'five' $null
+        $scoopConfig.five | Should -BeNullOrEmpty
     }
 }
