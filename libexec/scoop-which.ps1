@@ -5,8 +5,6 @@ param($command)
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\help.ps1"
 
-reset_aliases
-
 if (!$command) {
     'ERROR: <command> missing'
     my_usage

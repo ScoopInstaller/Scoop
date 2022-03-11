@@ -1,14 +1,12 @@
 . "$PSScriptRoot\..\libexec\scoop-alias.ps1" | Out-Null
 
-reset_aliases
-
 Describe 'add_alias' -Tag 'Scoop' {
     Mock shimdir { "$env:TEMP\shims" }
     Mock set_config { }
     Mock get_config { @{} }
 
     $shimdir = shimdir
-    New-Item -ItemType Directory -Path $shimdir -ErrorAction Ignore
+    ensure $shimdir
 
     Context "alias doesn't exist" {
         It 'creates a new alias' {
@@ -38,7 +36,7 @@ Describe 'rm_alias' -Tag 'Scoop' {
     Mock get_config { @{} }
 
     $shimdir = shimdir
-    New-Item -ItemType Directory -Path $shimdir -ErrorAction Ignore
+    ensure $shimdir
 
     Context 'alias exists' {
         It 'removes an existing alias' {

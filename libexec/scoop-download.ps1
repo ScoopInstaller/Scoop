@@ -20,8 +20,6 @@
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
 
-reset_aliases
-
 $opt, $apps, $err = getopt $args 'fhua:' 'force', 'no-hash-check', 'no-update-scoop', 'arch='
 if ($err) { error "scoop download: $err"; exit 1 }
 

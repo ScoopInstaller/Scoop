@@ -23,8 +23,6 @@ param($cmd, $name, $repo)
 . "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\help.ps1"
 
-reset_aliases
-
 $usage_add = "usage: scoop bucket add <name> [<repo>]"
 $usage_rm = "usage: scoop bucket rm <name>"
 

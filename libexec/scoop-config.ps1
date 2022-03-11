@@ -130,8 +130,6 @@ param($name, $value)
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\help.ps1"
 
-reset_aliases
-
 if (!$name) {
     $scoopConfig
 } elseif ($name -like '--help') {

@@ -17,8 +17,6 @@
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 
-reset_aliases
-
 $opt, $apps, $err = getopt $args 'gk' 'global', 'cache'
 if ($err) { "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global

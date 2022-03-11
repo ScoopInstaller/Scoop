@@ -29,8 +29,6 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 
-reset_aliases
-
 $opt, $apps, $err = getopt $args 'gikusa:' 'global', 'independent', 'no-cache', 'no-update-scoop', 'skip', 'arch='
 if ($err) { "scoop install: $err"; exit 1 }
 
