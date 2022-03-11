@@ -1032,18 +1032,19 @@ function handle_special_urls($url)
     }
 
     # Github.com
-    if ($url -match "github.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/(?<tag>[^\/]+)\/(?<file>.*)" -and (get_config 'gh_api_token')) {
+    if ($url -match "github.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/(?<tag>[^\/]+)\/(?<file>[^\/#]+)(?<filename>.*)" -and (get_config 'gh_api_token')) {
         $headers = @{
-           "Authorization" = "token $(get_config 'gh_api_token')"
+            "Authorization" = "token $(get_config 'gh_api_token')"
         }
         $privateUrl = "https://api.github.com/repos/$($matches['owner'])/$($matches['repo'])"
         $assetUrl="https://api.github.com/repos/$($matches['owner'])/$($matches['repo'])/releases/tags/$($matches['tag'])"
 
         $isPrivate = (Invoke-RestMethod -Uri $privateUrl -Headers $headers).private
         if ($isPrivate) {
-            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).assets | Where-Object { $_.name -eq $matches['file'] }).url
+            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).assets | Where-Object { $_.name -eq $matches['file'] }).url + $($matches['filename'])
         }
     }
+
     return $url
 }
 
