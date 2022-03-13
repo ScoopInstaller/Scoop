@@ -697,9 +697,9 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "if command -v pwsh.exe > /dev/null 2>&1; then",
-            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
+            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg `"$@`"",
             "else",
-            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
+            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg `"$@`"",
             "fi"
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.jar$') {
