@@ -396,7 +396,7 @@ function dl($url, $to, $cookies, $progress) {
         }
         if ($url -imatch "api\.github\.com\/repos") {
            $wreq.accept = "application/octet-stream"
-           $wreq.headers["Authorization"] = "token $(get_config 'gh_api_token')"
+           $wreq.headers["Authorization"] = "token $(get_config 'checkver_token')"
         }
         if($cookies) {
             $wreq.headers.add('Cookie', (cookie_header $cookies))
@@ -405,19 +405,11 @@ function dl($url, $to, $cookies, $progress) {
         $hosts = get_config "hosts"
         if ($hosts) {
             $hosts | Where-Object { $url -match $_.match } | ForEach-Object {
-                $customHeaders = $_.headers
-                break
+                (ConvertFrom-StringData -StringData $_.headers).GetEnumerator() | ForEach-Object {
+                    $wreq.headers[$_.Key] = $_.Value
+                }
             }
-
-            $mbrs =  $customHeaders | Get-Member -MemberType NoteProperty | ForEach-Object {
-                $key = $_.Name
-                [PSCustomObject]@{Key = $key; Value = $obj."$key"}
-            }
-
-            $mbrs | ForEach-Object {
-               $wreq.headers[$_.Key] = $_.Value
-            }
-        }     
+        }
     }
 
     try {
