@@ -385,23 +385,6 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
     }
 }
 
-function get_headers($url) {
-    $hosts = get_config "hosts"
-    if ($hosts) {
-        $hosts | Where-Object { $url -match $_.match } | ForEach-Object {
-            return $_.headers
-        }
-    }
-    return {}
-}
-
-function get-members($obj) {
-    $obj | Get-Member -MemberType NoteProperty | ForEach-Object {
-        $key = $_.Name
-        [PSCustomObject]@{Key = $key; Value = $obj."$key"}
-    }
-}
-
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split "#")[0]
@@ -419,12 +402,22 @@ function dl($url, $to, $cookies, $progress) {
             $wreq.headers.add('Cookie', (cookie_header $cookies))
         }
 
-        $customHeaders = get_headers $url
-        if ($customHeaders) {
-            get-members $customHeaders | ForEach-Object {
+        $hosts = get_config "hosts"
+        if ($hosts) {
+            $hosts | Where-Object { $url -match $_.match } | ForEach-Object {
+                $customHeaders = $_.headers
+                break
+            }
+
+            $mbrs =  $customHeaders | Get-Member -MemberType NoteProperty | ForEach-Object {
+                $key = $_.Name
+                [PSCustomObject]@{Key = $key; Value = $obj."$key"}
+            }
+
+            $mbrs | ForEach-Object {
                $wreq.headers[$_.Key] = $_.Value
             }
-        }
+        }     
     }
 
     try {
