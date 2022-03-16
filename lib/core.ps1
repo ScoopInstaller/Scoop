@@ -1032,7 +1032,7 @@ function handle_special_urls($url)
     }
 
     # Github.com
-    if ($url -match "github.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/(?<tag>[^\/]+)\/(?<file>[^\/#]+)(?<filename>.*)" -and (get_config 'gh_api_token')) {
+    if ($url -match "github.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/(?<tag>[^\/]+)\/(?<file>[^\/#]+)(?<filename>.*)" -and (get_config 'checkver_token')) {
         $headers = @{
             "Authorization" = "token $(get_config 'gh_api_token')"
         }
