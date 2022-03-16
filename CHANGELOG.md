@@ -10,6 +10,7 @@
 
 ### Code Refactoring
 
+- **bucket:** Move 'Find-Manifest' and 'list_buckets' to 'buckets' ([#4814](https://github.com/ScoopInstaller/Scoop/issues/4814))
 - **relpath:** Use `$PSScriptRoot` instead of `relpath` ([#4793](https://github.com/ScoopInstaller/Scoop/issues/4793))
 - **reset_aliases:** Move core function of `reset_aliases` to `scoop` ([#4794](https://github.com/ScoopInstaller/Scoop/issues/4794))
 
