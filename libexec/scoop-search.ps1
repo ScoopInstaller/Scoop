@@ -23,17 +23,38 @@ function bin_match($manifest, $query) {
 }
 
 function search_bucket($bucket, $query) {
-    $apps = apps_in_bucket (Find-BucketDirectory $bucket) | ForEach-Object {
-        @{ name = $_ }
-    }
-
-    if($query) {
+    # Parse query first. This can save substantial time when the query is invalid.
+    if ($query) {
         try {
             $query = new-object regex $query, 'IgnoreCase'
         } catch {
             abort "Invalid regular expression: $($_.exception.innerexception.message)"
         }
+    }
 
+    $bucketRootDir = (Find-BucketDirectory $bucket -Root)
+    $bucketDir = (Find-BucketDirectory $bucket)
+
+    if ((Test-Path "${bucketRootDir}\.git" -Type Container) -and (Test-CommandAvailable git)) {
+        # fast: use git magic to prune candidates in git buckets
+        $apps = (git -C "${bucketDir}" ls-files "*.json")
+
+        if ($query) {
+            $apps = ($apps | ?{$_.name -match $query})
+            $apps += ,(git -C "${bucketDir}" grep -l -E "${query}" "*.json")
+
+            $apps = ($apps | Sort-Object -Unique).ForEach({
+                @{ name = [io.path]::GetFileNameWithoutExtension($_)}
+            })
+        }
+    } else {
+        # slow: consider EVERY file for non-git buckets
+        $apps = apps_in_bucket "${bucketDir}" | ForEach-Object {
+            @{ name = $_ }
+        }
+    }
+
+    if ($query) {
         $apps = $apps | Where-Object {
             if($_.name -match $query) { return $true }
             $bin = bin_match (manifest $_.name $bucket) $query
@@ -42,7 +63,11 @@ function search_bucket($bucket, $query) {
             }
         }
     }
-    $apps | ForEach-Object { $_.version = (Get-LatestVersion -AppName $_.name -Bucket $bucket); $_ }
+
+    $apps.ForEach({
+        $_.version = (Get-LatestVersion -AppName $_.name -Bucket $bucket);
+        $_
+    })
 }
 
 function download_json($url) {
