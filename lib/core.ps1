@@ -697,9 +697,9 @@ function shim($path, $global, $name, $arg) {
             "#!/bin/sh",
             "# $resolved_path",
             "if command -v pwsh.exe > /dev/null 2>&1; then",
-            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
+            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg `"$@`"",
             "else",
-            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
+            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg `"$@`"",
             "fi"
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.jar$') {
@@ -1032,9 +1032,9 @@ function handle_special_urls($url)
     }
 
     # Github.com
-    if ($url -match "github.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/(?<tag>[^\/]+)\/(?<file>[^\/#]+)(?<filename>.*)" -and (get_config 'gh_api_token')) {
+    if ($url -match "github.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/(?<tag>[^\/]+)\/(?<file>[^\/#]+)(?<filename>.*)" -and (get_config 'checkver_token')) {
         $headers = @{
-            "Authorization" = "token $(get_config 'gh_api_token')"
+            "Authorization" = "token $(get_config 'checkver_token')"
         }
         $privateUrl = "https://api.github.com/repos/$($matches['owner'])/$($matches['repo'])"
         $assetUrl="https://api.github.com/repos/$($matches['owner'])/$($matches['repo'])/releases/tags/$($matches['tag'])"
