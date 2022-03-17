@@ -7,8 +7,6 @@ param($app)
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
 
-reset_aliases
-
 if($app) {
     $manifest, $bucket = find_manifest $app
     if($manifest) {

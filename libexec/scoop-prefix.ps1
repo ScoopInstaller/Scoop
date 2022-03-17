@@ -13,7 +13,7 @@ if (!$app) {
 
 $app_path = currentdir $app $false
 if (!(Test-Path $app_path)) {
-    $app_path = currentdir $app$true
+    $app_path = currentdir $app $true
 }
 
 if (Test-Path $app_path) {

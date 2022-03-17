@@ -8,7 +8,6 @@ param($query)
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
 
-reset_aliases
 $def_arch = default_architecture
 if (-not (Get-FormatData ScoopApps)) {
     Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
