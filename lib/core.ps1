@@ -328,13 +328,7 @@ function Test-HelperInstalled {
 }
 
 function Test-Aria2Enabled {
-    $aria2_installed = Test-HelperInstalled -Helper Aria2
-    $aria2_enabled = get_config 'aria2-enabled' $true
-
-    if (!($aria2_installed) -and ($aria2_enabled)) {
-        warn "aria2 is enabled but not installed, using standard download instead."
-    }
-    return ($aria2_installed) -and ($aria2_enabled)
+    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
 function app_status($app, $global) {
