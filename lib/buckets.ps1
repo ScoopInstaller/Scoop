@@ -103,6 +103,24 @@ function Find-Manifest($app, $bucket) {
     return $app, $manifest, $bucket, $url
 }
 
+function Convert-RepositoryUri {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline = $true)]
+        [String] $Uri
+    )
+
+    process {
+        # https://git-scm.com/docs/git-clone#_git_urls
+        # https://regex101.com/r/xGmwRr/1
+        if ($Uri -match '(?:@|/{1,3})(?:www\.|.*@)?(?<provider>[^/]+?)(?::\d+)?[:/](?<user>.+)/(?<repo>.+?)(?:\.git)?/?$') {
+            $Matches.provider, $Matches.user, $Matches.repo -join '/'
+        } else {
+            error "$Uri is not a valid Git URL!"
+        }
+    }
+}
+
 function list_buckets {
     $buckets = @()
     Get-LocalBucket | ForEach-Object {
@@ -131,6 +149,14 @@ function add_bucket($name, $repo) {
     if (Test-Path $dir) {
         warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
         exit 0
+    }
+
+    $uni_repo = Convert-RepositoryUri -Uri $repo
+    Get-LocalBucket | ForEach-Object {
+        $remote = git -C "$bucketsdir\$_" config --get remote.origin.url
+        if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
+            abort "Bucket $_ already exists for $repo"
+        }
     }
 
     Write-Host 'Checking repo... ' -NoNewline
