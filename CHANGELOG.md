@@ -7,6 +7,7 @@
 - **installed:** If no `$global`, check both local and global installed ([#4798](https://github.com/ScoopInstaller/Scoop/issues/4798))
 - **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
 - **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
+- **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/pull/4822))
 
 ### Code Refactoring
 
