@@ -98,6 +98,7 @@ foreach ($curr_app in $apps) {
             } catch {
                 write-host -f darkred $_
                 error "URL $url is not valid"
+                $dl_failure = $true
                 continue
             }
 
@@ -124,7 +125,9 @@ foreach ($curr_app in $apps) {
         }
     }
 
-    success "'$app' ($version) was downloaded successfully!"
+    if (!$dl_failure) {
+        success "'$app' ($version) was downloaded successfully!"
+    }
 }
 
 exit 0
