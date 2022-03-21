@@ -1030,6 +1030,18 @@ function handle_special_urls($url)
         # Reshapes the URL to avoid redirections
         $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
     }
+
+    # Github.com
+    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = get_config 'checkver_token')) {
+        $headers = @{ "Authorization" = "token $token" }
+        $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
+        $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
+
+        if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
+            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
+        }
+    }
+
     return $url
 }
 

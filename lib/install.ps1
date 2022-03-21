@@ -387,15 +387,25 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
-    $reqUrl = ($url -split "#")[0]
-    $wreq = [net.webrequest]::create($reqUrl)
-    if($wreq -is [net.httpwebrequest]) {
-        $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
-            $wreq.referer = strip_filename $url
+    $reqUrl = ($url -split '#')[0]
+    $wreq = [Net.WebRequest]::Create($reqUrl)
+    if ($wreq -is [Net.HttpWebRequest]) {
+        $wreq.UserAgent = Get-UserAgent
+        if (-not ($url -match 'sourceforge\.net' -or $url -match 'portableapps\.com')) {
+            $wreq.Referer = strip_filename $url
         }
-        if($cookies) {
-            $wreq.headers.add('Cookie', (cookie_header $cookies))
+        if ($url -match 'api\.github\.com/repos') {
+            $wreq.Accept = 'application/octet-stream'
+            $wreq.Headers['Authorization'] = "token $(get_config 'checkver_token')"
+        }
+        if ($cookies) {
+            $wreq.Headers.Add('Cookie', (cookie_header $cookies))
+        }
+
+        get_config 'private_hosts' | Where-Object { $url -match $_.match } | ForEach-Object {
+            (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
+                $wreq.Headers[$_.Key] = $_.Value
+            }
         }
     }
 
