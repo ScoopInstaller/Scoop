@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
 
+### Features
+
+- **install:** Allow downloading from private repositories ([$4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
+
 ### Bug Fixes
 
 - **shim:** Manipulating shims with UTF8 encoding ([#4791](https://github.com/ScoopInstaller/Scoop/issues/4791), [#4813](https://github.com/ScoopInstaller/Scoop/issues/4813))
@@ -13,10 +17,6 @@
 
 - **relpath:** Use `$PSScriptRoot` instead of `relpath` ([#4793](https://github.com/ScoopInstaller/Scoop/issues/4793))
 - **reset_aliases:** Move core function of `reset_aliases` to `scoop` ([#4794](https://github.com/ScoopInstaller/Scoop/issues/4794))
-
-### Features
-
-- **install:** Update to allow for dowloading from private repositories ([$4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
 
 ## [v0.1.0](https://github.com/ScoopInstaller/Scoop/compare/2021-12-26...v0.1.0) - 2022-03-01
 
