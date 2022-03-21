@@ -117,6 +117,8 @@ function Convert-RepositoryUri {
             $Matches.provider, $Matches.user, $Matches.repo -join '/'
         } else {
             error "$Uri is not a valid Git URL!"
+            error "Please see https://git-scm.com/docs/git-clone#_git_urls for valid ones."
+            exit 1
         }
     }
 }
