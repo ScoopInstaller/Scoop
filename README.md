@@ -18,14 +18,14 @@
     <a href="https://github.com/ScoopInstaller/Scoop">
         <img src="https://img.shields.io/github/repo-size/ScoopInstaller/Scoop.svg" alt="Repository size" />
     </a>
-    <a href="https://ci.appveyor.com/project/ScoopInstaller/Scoop">
-        <img src="https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true" alt="Build Status" />
+    <a href="https://github.com/ScoopInstaller/Scoop/actions/workflows/ci.yml">
+        <img src="https://github.com/ScoopInstaller/Scoop/actions/workflows/ci.yml/badge.svg" alt="Scoop Core CI Tests" />
     </a>
     <a href="https://discord.gg/s9yRQHt">
         <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
     </a>
-    <a href="https://gitter.im/ScoopInstaller/Scoop">
-        <img src="https://badges.gitter.im/ScoopInstaller/Scoop.png" alt="Gitter Chat" />
+    <a href="https://gitter.im/lukesampson/scoop">
+        <img src="https://badges.gitter.im/lukesampson/scoop.png" alt="Gitter Chat" />
     </a>
     <a href="https://github.com/ScoopInstaller/Scoop/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/ScoopInstaller/Scoop.svg" alt="License" />
