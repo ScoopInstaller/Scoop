@@ -76,7 +76,7 @@
 # cachePath:
 #       For downloads, defaults to 'cache' folder under Scoop root directory.
 #
-# checkver_token:
+# gh_token:
 #       GitHub API token used to make authenticated requests.
 #       This is essential for checkver and similar functions to run without
 #       incurring rate limits and download from private repositories.

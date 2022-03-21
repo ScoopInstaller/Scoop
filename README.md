@@ -103,11 +103,11 @@ $env:SCOOP_CACHE='F:\ScoopCache'
 # run the installer
 ```
 
-### Configure Scoop to use a GitHub API token during searching and checkver by setting `SCOOP_CHECKVER_TOKEN`
+### Configure Scoop to use a GitHub API token during searching and checkver by setting `SCOOP_GH_TOKEN`
 
 ```powershell
-$env:SCOOP_CHECKVER_TOKEN='<paste-token-here>'
-[Environment]::SetEnvironmentVariable('SCOOP_CHECKVER_TOKEN', $env:SCOOP_CHECKVER_TOKEN, 'Machine')
+$env:SCOOP_GH_TOKEN='<paste-token-here>'
+[Environment]::SetEnvironmentVariable('SCOOP_GH_TOKEN', $env:SCOOP_GH_TOKEN, 'Machine')
 # search for an app
 ```
 

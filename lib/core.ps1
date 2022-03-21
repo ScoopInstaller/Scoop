@@ -1032,7 +1032,7 @@ function handle_special_urls($url)
     }
 
     # Github.com
-    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = get_config 'checkver_token')) {
+    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = get_config 'gh_token')) {
         $headers = @{ "Authorization" = "token $token" }
         $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
         $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
