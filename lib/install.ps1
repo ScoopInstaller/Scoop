@@ -394,7 +394,7 @@ function dl($url, $to, $cookies, $progress) {
         if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
             $wreq.referer = strip_filename $url
         }
-        if ($url -imatch "api\.github\.com\/repos") {
+        if ($url -imatch "api\.github\.com/repos") {
            $wreq.accept = "application/octet-stream"
            $wreq.headers["Authorization"] = "token $(get_config 'checkver_token')"
         }
