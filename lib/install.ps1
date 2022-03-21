@@ -402,12 +402,9 @@ function dl($url, $to, $cookies, $progress) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
 
-        $privateHosts = get_config 'private_hosts'
-        if ($privateHosts) {
-            $privateHosts | Where-Object { $url -match $_.match } | ForEach-Object {
-                (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
-                    $wreq.Headers[$_.Key] = $_.Value
-                }
+        get_config 'private_hosts' | Where-Object { $url -match $_.match } | ForEach-Object {
+            (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
+                $wreq.Headers[$_.Key] = $_.Value
             }
         }
     }
