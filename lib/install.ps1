@@ -396,13 +396,13 @@ function dl($url, $to, $cookies, $progress) {
         }
         if ($url -match 'api\.github\.com/repos') {
             $wreq.Accept = 'application/octet-stream'
-            $wreq.Headers['Authorization'] = "token $(get_config 'checkver_token')"
+            $wreq.Headers['Authorization'] = "token $(get_config 'gh_token')"
         }
         if ($cookies) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
 
-        get_config 'private_hosts' | Where-Object { $url -match $_.match } | ForEach-Object {
+        get_config 'private_hosts' | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
             (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
                 $wreq.Headers[$_.Key] = $_.Value
             }

@@ -2,7 +2,8 @@
 
 ### Features
 
-- **install:** Allow downloading from private repositories ([$4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
+- **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
+- **config:** Rename checkver_token to gh_token and SCOOP_CHECKVER_TOKEN to SCOOP_GH_TOKEN ([#4832](https://github.com/ScoopInstaller/Scoop/pull/4832))
 
 ### Bug Fixes
 
