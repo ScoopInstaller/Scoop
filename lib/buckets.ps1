@@ -118,7 +118,7 @@ function Convert-RepositoryUri {
         } else {
             error "$Uri is not a valid Git URL!"
             error "Please see https://git-scm.com/docs/git-clone#_git_urls for valid ones."
-            exit 1
+            return $null
         }
     }
 }
@@ -144,43 +144,52 @@ function list_buckets {
 
 function add_bucket($name, $repo) {
     if (!(Test-CommandAvailable git)) {
-        abort "Git is required for buckets. Run 'scoop install git' and try again."
+        error "Git is required for buckets. Run 'scoop install git' and try again."
+        return 1
     }
 
     $dir = Find-BucketDirectory $name -Root
     if (Test-Path $dir) {
         warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
-        exit 0
+        return 2
     }
 
     $uni_repo = Convert-RepositoryUri -Uri $repo
-    Get-LocalBucket | ForEach-Object {
-        $remote = git -C "$bucketsdir\$_" config --get remote.origin.url
+    if ($null -eq $uni_repo) {
+        return 1
+    }
+    foreach ($bucket in Get-LocalBucket) {
+        $remote = git -C "$bucketsdir\$bucket" config --get remote.origin.url
         if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
-            abort "Bucket $_ already exists for $repo"
+            warn "Bucket $bucket already exists for $repo"
+            return 2
         }
     }
 
     Write-Host 'Checking repo... ' -NoNewline
     $out = git_cmd ls-remote $repo 2>&1
-    if ($lastexitcode -ne 0) {
-        abort "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
+    if ($LASTEXITCODE -ne 0) {
+        error "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
+        return 1
     }
-    Write-Host 'ok'
+    Write-Host 'OK'
 
-    ensure $bucketsdir > $null
+    ensure $bucketsdir | Out-Null
     $dir = ensure $dir
     git_cmd clone "$repo" "`"$dir`"" -q
     success "The $name bucket was added successfully."
+    return 0
 }
 
 function rm_bucket($name) {
     $dir = Find-BucketDirectory $name -Root
     if (!(Test-Path $dir)) {
-        abort "'$name' bucket not found."
+        error "'$name' bucket not found."
+        return 1
     }
 
-    Remove-Item $dir -Recurse -Force -ErrorAction stop
+    Remove-Item $dir -Recurse -Force -ErrorAction Stop
+    return 0
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {

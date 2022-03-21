@@ -41,7 +41,8 @@ switch ($cmd) {
                 exit 1
             }
         }
-        add_bucket $name $repo
+        $status = add_bucket $name $repo
+        exit $status
     }
     'rm' {
         if (!$name) {
@@ -49,13 +50,16 @@ switch ($cmd) {
             $usage_rm
             exit 1
         }
-        rm_bucket $name
+        $status = rm_bucket $name
+        exit $status
     }
     'list' {
         list_buckets
+        exit 0
     }
     'known' {
         known_buckets
+        exit 0
     }
     default {
         "scoop bucket: cmd '$cmd' not supported"
@@ -63,5 +67,3 @@ switch ($cmd) {
         exit 1
     }
 }
-
-exit 0
