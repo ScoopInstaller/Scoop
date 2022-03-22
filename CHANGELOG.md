@@ -22,6 +22,7 @@
 ### Documentation
 
 - **readme:** Fix badges for Gitter and CI Tests ([#4830](https://github.com/ScoopInstaller/Scoop/issues/4830))
+- **scoop-shim:**: Fix typo ([#4836](https://github.com/ScoopInstaller/Scoop/issues/4836))
 
 ## [v0.1.0](https://github.com/ScoopInstaller/Scoop/compare/2021-12-26...v0.1.0) - 2022-03-01
 
