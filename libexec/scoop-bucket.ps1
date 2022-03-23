@@ -19,10 +19,6 @@
 #     scoop bucket known
 param($cmd, $name, $repo)
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-
 $usage_add = 'usage: scoop bucket add <name> [<repo>]'
 $usage_rm = 'usage: scoop bucket rm <name>'
 

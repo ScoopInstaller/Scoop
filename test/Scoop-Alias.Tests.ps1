@@ -1,3 +1,6 @@
+. "$PSScriptRoot\Scoop-TestLib.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\libexec\scoop-alias.ps1" | Out-Null
 
 Describe 'add_alias' -Tag 'Scoop' {

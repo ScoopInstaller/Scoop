@@ -1,11 +1,13 @@
 #Requires -Version 5
 param($cmd)
 
-Set-StrictMode -off
+Set-StrictMode -Off
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\commands.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
+
 # for aliases where there's a local function, re-alias so the function takes precedence
 $aliases = Get-Alias | Where-Object { $_.Options -notmatch 'ReadOnly|AllScope' } | ForEach-Object { $_.Name }
 Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForEach-Object {
@@ -13,20 +15,24 @@ Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForE
 }
 
 $commands = commands
-if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
-    Write-Host "Current Scoop version:"
+if ('--version' -contains $cmd -or (!$cmd -and $Args -eq '-v')) {
+    Write-Host 'Current Scoop version:'
     Invoke-Expression "git -C '$(versiondir 'scoop' 'current')' --no-pager log --oneline HEAD -n 1"
-    Write-Host ""
+    Write-Host ''
 
     Get-LocalBucket | ForEach-Object {
-        $bucketLoc =  Find-BucketDirectory $_ -Root
-        if(Test-Path (Join-Path $bucketLoc '.git')) {
+        $bucketLoc = Find-BucketDirectory $_ -Root
+        if (Test-Path (Join-Path $bucketLoc '.git')) {
             Write-Host "'$_' bucket:"
             Invoke-Expression "git -C '$bucketLoc' --no-pager log --oneline HEAD -n 1"
-            Write-Host ""
+            Write-Host ''
         }
     }
+} elseif (@($null, '--help', '/?') -contains $cmd -or $Args[0] -eq '-h') {
+    exec 'help' "$cmd"
+} elseif ($commands -contains $cmd) {
+    exec $cmd $Args
+} else {
+    "scoop: '$cmd' isn't a scoop command. See 'scoop help'."
+    exit 1
 }
-elseif (@($null, '--help', '/?') -contains $cmd -or $args[0] -contains '-h') { exec 'help' $args }
-elseif ($commands -contains $cmd) { exec $cmd $args }
-else { "scoop: '$cmd' isn't a scoop command. See 'scoop help'."; exit 1 }

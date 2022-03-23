@@ -29,7 +29,6 @@
 
 param($SubCommand, $ShimName, [Switch]$global)
 
-. "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
 
 if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {

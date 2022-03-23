@@ -9,13 +9,10 @@
 #   -g, --global       Cleanup a globally installed app
 #   -k, --cache        Remove outdated download cache
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\install.ps1" # persist related
 
 $opt, $apps, $err = getopt $args 'gk' 'global', 'cache'
 if ($err) { "scoop cleanup: $err"; exit 1 }

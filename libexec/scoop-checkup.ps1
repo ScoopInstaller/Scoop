@@ -3,7 +3,6 @@
 # Help: Performs a series of diagnostic tests to try to identify things that may
 # cause problems with Scoop.
 
-. "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\diagnostic.ps1"
 
 $issues = 0

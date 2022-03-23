@@ -12,8 +12,6 @@
 #     scoop cache rm *
 param($cmd)
 
-. "$PSScriptRoot\..\lib\help.ps1"
-
 function cacheinfo($file) {
     $app, $version, $url = $file.Name -split '#'
     New-Object PSObject -Property @{ Name = $app; Version = $version; Length = $file.Length; URL = $url }
