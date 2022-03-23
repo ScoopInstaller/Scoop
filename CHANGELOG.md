@@ -13,6 +13,7 @@
 - **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
 - **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
 - **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/pull/4822))
+- **install:** Fix issue with installation inside containers ([#4837](https://github.com/ScoopInstaller/Scoop/pull/4837))
 
 ### Code Refactoring
 

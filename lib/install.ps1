@@ -924,7 +924,7 @@ function link_current($versiondir) {
         Remove-Item $currentdir -Recurse -Force -ErrorAction Stop
     }
 
-    New-Item -Path $currentdir -ItemType Junction -Value $versiondir | Out-Null
+    New-DirectoryJunction $currentdir $versiondir | Out-Null
     attrib $currentdir +R /L
     return $currentdir
 }
@@ -1175,7 +1175,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             # create link
             if (is_directory $target) {
                 # target is a directory, create junction
-                New-Item -Path $source -ItemType Junction -Value $target | Out-Null
+                New-DirectoryJunction $source $target | Out-Null
                 attrib $source +R /L
             } else {
                 # target is a file, create hard link
@@ -1236,5 +1236,16 @@ function test_running_process($app, $global) {
         }
     } else {
         return $false
+    }
+}
+
+# wrapper function to create junction links
+# Required to handle docker/for-win#12240
+function New-DirectoryJunction($source, $target) {
+    # test if this script is being executed inside a docker container
+    if (Get-Service -Name cexecsvc -ErrorAction SilentlyContinue) {
+        cmd.exe /d /c "mklink /j `"$source`" `"$target`""
+    } else {
+        New-Item -Path $source -ItemType Junction -Value $target
     }
 }
