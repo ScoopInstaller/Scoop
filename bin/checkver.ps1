@@ -76,7 +76,7 @@ param(
 
 $Dir = Resolve-Path $Dir
 $Search = $App
-$GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+$GitHubToken = $env:SCOOP_GH_TOKEN, (get_config 'gh_token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
 
 # don't use $Version with $App = '*'
 if ($App -eq '*' -and $Version -ne '') {

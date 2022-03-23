@@ -83,38 +83,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     show_notes $manifest $dir $original_dir $persist_dir
 }
 
-function locate($app, $bucket) {
-    Show-DeprecatedWarning $MyInvocation 'Find-Manifest'
-    return Find-Manifest $app $bucket
-}
-
-function Find-Manifest($app, $bucket) {
-    $manifest, $url = $null, $null
-
-    # check if app is a URL or UNC path
-    if($app -match '^(ht|f)tps?://|\\\\') {
-        $url = $app
-        $app = appname_from_url $url
-        $manifest = url_manifest $url
-    } else {
-        # check buckets
-        $manifest, $bucket = find_manifest $app $bucket
-
-        if(!$manifest) {
-            # couldn't find app in buckets: check if it's a local path
-            $path = $app
-            if(!$path.endswith('.json')) { $path += '.json' }
-            if(test-path $path) {
-                $url = "$(resolve-path $path)"
-                $app = appname_from_url $url
-                $manifest, $bucket = url_manifest $url
-            }
-        }
-    }
-
-    return $app, $manifest, $bucket, $url
-}
-
 function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
 
@@ -387,15 +355,25 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 
 # download with filesize and progress indicator
 function dl($url, $to, $cookies, $progress) {
-    $reqUrl = ($url -split "#")[0]
-    $wreq = [net.webrequest]::create($reqUrl)
-    if($wreq -is [net.httpwebrequest]) {
-        $wreq.useragent = Get-UserAgent
-        if (-not ($url -imatch "sourceforge\.net" -or $url -imatch "portableapps\.com")) {
-            $wreq.referer = strip_filename $url
+    $reqUrl = ($url -split '#')[0]
+    $wreq = [Net.WebRequest]::Create($reqUrl)
+    if ($wreq -is [Net.HttpWebRequest]) {
+        $wreq.UserAgent = Get-UserAgent
+        if (-not ($url -match 'sourceforge\.net' -or $url -match 'portableapps\.com')) {
+            $wreq.Referer = strip_filename $url
         }
-        if($cookies) {
-            $wreq.headers.add('Cookie', (cookie_header $cookies))
+        if ($url -match 'api\.github\.com/repos') {
+            $wreq.Accept = 'application/octet-stream'
+            $wreq.Headers['Authorization'] = "token $(get_config 'gh_token')"
+        }
+        if ($cookies) {
+            $wreq.Headers.Add('Cookie', (cookie_header $cookies))
+        }
+
+        get_config 'private_hosts' | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
+            (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
+                $wreq.Headers[$_.Key] = $_.Value
+            }
         }
     }
 
