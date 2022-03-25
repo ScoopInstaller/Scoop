@@ -1,3 +1,4 @@
+. "$PSScriptRoot\core.ps1"
 . "$PSScriptRoot\autoupdate.ps1"
 . "$PSScriptRoot\buckets.ps1"
 
@@ -364,7 +365,7 @@ function dl($url, $to, $cookies, $progress) {
         }
         if ($url -match 'api\.github\.com/repos') {
             $wreq.Accept = 'application/octet-stream'
-            $wreq.Headers['Authorization'] = "token $(get_config 'gh_token')"
+            $wreq.Headers['Authorization'] = "token $(Get-GitHubToken)"
         }
         if ($cookies) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
