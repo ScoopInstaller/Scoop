@@ -3,7 +3,6 @@
 ### Features
 
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
-- **config:** Rename checkver_token to gh_token and SCOOP_CHECKVER_TOKEN to SCOOP_GH_TOKEN ([#4832](https://github.com/ScoopInstaller/Scoop/pull/4832))
 
 ### Bug Fixes
 
@@ -24,6 +23,8 @@
 - **bucket:** Move 'Find-Manifest' and 'list_buckets' to 'buckets' ([#4814](https://github.com/ScoopInstaller/Scoop/issues/4814))
 - **relpath:** Use `$PSScriptRoot` instead of `relpath` ([#4793](https://github.com/ScoopInstaller/Scoop/issues/4793))
 - **reset_aliases:** Move core function of `reset_aliases` to `scoop` ([#4794](https://github.com/ScoopInstaller/Scoop/issues/4794))
+- **config:** Rename checkver_token to gh_token and SCOOP_CHECKVER_TOKEN to SCOOP_GH_TOKEN ([#4832](https://github.com/ScoopInstaller/Scoop/pull/4832))
+- **config:** try SCOOP_GH_TOKEN value first before gh_token value from config ([#4842](https://github.com/ScoopInstaller/Scoop/pull/4842))
 
 ### Documentation
 

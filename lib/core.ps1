@@ -1005,6 +1005,10 @@ function get_hash([String] $multihash) {
     return $type, $hash.ToLower()
 }
 
+function Get-GitHubToken {
+    return $env:SCOOP_GH_TOKEN, (get_config 'gh_token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+}
+
 function handle_special_urls($url)
 {
     # FossHub.com
@@ -1032,7 +1036,7 @@ function handle_special_urls($url)
     }
 
     # Github.com
-    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = get_config 'gh_token')) {
+    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = Get-GitHubToken)) {
         $headers = @{ "Authorization" = "token $token" }
         $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
         $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
