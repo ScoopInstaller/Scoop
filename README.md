@@ -18,14 +18,14 @@
     <a href="https://github.com/ScoopInstaller/Scoop">
         <img src="https://img.shields.io/github/repo-size/ScoopInstaller/Scoop.svg" alt="Repository size" />
     </a>
-    <a href="https://ci.appveyor.com/project/ScoopInstaller/Scoop">
-        <img src="https://ci.appveyor.com/api/projects/status/05foxatmrqo0l788?svg=true" alt="Build Status" />
+    <a href="https://github.com/ScoopInstaller/Scoop/actions/workflows/ci.yml">
+        <img src="https://github.com/ScoopInstaller/Scoop/actions/workflows/ci.yml/badge.svg" alt="Scoop Core CI Tests" />
     </a>
     <a href="https://discord.gg/s9yRQHt">
         <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
     </a>
-    <a href="https://gitter.im/ScoopInstaller/Scoop">
-        <img src="https://badges.gitter.im/ScoopInstaller/Scoop.png" alt="Gitter Chat" />
+    <a href="https://gitter.im/lukesampson/scoop">
+        <img src="https://badges.gitter.im/lukesampson/scoop.png" alt="Gitter Chat" />
     </a>
     <a href="https://github.com/ScoopInstaller/Scoop/blob/master/LICENSE">
         <img src="https://img.shields.io/github/license/ScoopInstaller/Scoop.svg" alt="License" />
@@ -56,60 +56,15 @@ scoop install python ruby go perl
 
 If you've built software that you'd like others to use, Scoop is an alternative to building an installer (e.g. MSI or InnoSetup) — you just need to zip your program and provide a JSON manifest that describes how to install it.
 
-## Requirements
-
-- Windows 7 SP1+ / Windows Server 2008+
-- [PowerShell 5](https://aka.ms/wmf5download) (or later, include [PowerShell Core](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows?view=powershell-6)) and [.NET Framework 4.5](https://www.microsoft.com/net/download) (or later)
-- PowerShell must be enabled for your user account e.g. `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
-
 ## Installation
 
-Run the following command from your PowerShell to install scoop to its default location (`C:\Users\<user>\scoop`)
+Run the following command from a **non-admin** PowerShell to install scoop to its default location `C:\Users\<YOUR USERNAME>\scoop`.
 
 ```powershell
-Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-
-# or shorter
 iwr -useb get.scoop.sh | iex
 ```
 
-Once installed, run `scoop help` for instructions.
-
-The default setup is configured so all user installed programs and Scoop itself live in `C:\Users\<user>\scoop`.
-Globally installed programs (`--global`) live in `C:\ProgramData\scoop`.
-These settings can be changed through environment variables.
-
-### Install Scoop to a Custom Directory by changing `SCOOP`
-
-```powershell
-$env:SCOOP='D:\Applications\Scoop'
-[Environment]::SetEnvironmentVariable('SCOOP', $env:SCOOP, 'User')
-# run the installer
-```
-
-### Configure Scoop to install global programs to a Custom Directory by changing `SCOOP_GLOBAL`
-
-```powershell
-$env:SCOOP_GLOBAL='F:\GlobalScoopApps'
-[Environment]::SetEnvironmentVariable('SCOOP_GLOBAL', $env:SCOOP_GLOBAL, 'Machine')
-# run the installer
-```
-
-### Configure Scoop to store downloads to a Custom Directory by changing `SCOOP_CACHE`
-
-```powershell
-$env:SCOOP_CACHE='F:\ScoopCache'
-[Environment]::SetEnvironmentVariable('SCOOP_CACHE', $env:SCOOP_CACHE, 'Machine')
-# run the installer
-```
-
-### Configure Scoop to use a GitHub API token during searching and checkver by setting `SCOOP_CHECKVER_TOKEN`
-
-```powershell
-$env:SCOOP_CHECKVER_TOKEN='<paste-token-here>'
-[Environment]::SetEnvironmentVariable('SCOOP_CHECKVER_TOKEN', $env:SCOOP_CHECKVER_TOKEN, 'Machine')
-# search for an app
-```
+Advanced installation instruction and full documentation of the installer are available in [ScoopInstaller/Install](https://github.com/ScoopInstaller/Install). Please create new issues there if you have questions about the installation.
 
 ## [Documentation](https://github.com/ScoopInstaller/Scoop/wiki)
 

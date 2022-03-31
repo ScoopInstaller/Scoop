@@ -44,8 +44,6 @@
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 
-reset_aliases
-
 $opt, $apps, $err = getopt $args 'a:snu' @('arch=', 'scan', 'no-depends', 'no-update-scoop')
 if($err) { "scoop virustotal: $err"; exit 1 }
 if(!$apps) { my_usage; exit 1 }
@@ -209,7 +207,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
 $apps | ForEach-Object {
     $app = $_
     # write-host $app
-    $manifest, $bucket = find_manifest $app
+    $null, $manifest, $bucket, $null = Find-Manifest $app
     if(!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
         warn "$app`: manifest not found"

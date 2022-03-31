@@ -6,8 +6,11 @@ Set-StrictMode -off
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\commands.ps1"
-
-reset_aliases
+# for aliases where there's a local function, re-alias so the function takes precedence
+$aliases = Get-Alias | Where-Object { $_.Options -notmatch 'ReadOnly|AllScope' } | ForEach-Object { $_.Name }
+Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForEach-Object {
+    Set-Alias -Name $_.Name -Value Local:$($_.Name) -Scope Script
+}
 
 $commands = commands
 if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {

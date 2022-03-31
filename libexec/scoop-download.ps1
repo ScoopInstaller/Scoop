@@ -20,8 +20,6 @@
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
 
-reset_aliases
-
 $opt, $apps, $err = getopt $args 'fhua:' 'force', 'no-hash-check', 'no-update-scoop', 'arch='
 if ($err) { error "scoop download: $err"; exit 1 }
 
@@ -100,6 +98,7 @@ foreach ($curr_app in $apps) {
             } catch {
                 write-host -f darkred $_
                 error "URL $url is not valid"
+                $dl_failure = $true
                 continue
             }
 
@@ -126,7 +125,9 @@ foreach ($curr_app in $apps) {
         }
     }
 
-    success "'$app' ($version) was downloaded successfully!"
+    if (!$dl_failure) {
+        success "'$app' ($version) was downloaded successfully!"
+    }
 }
 
 exit 0
