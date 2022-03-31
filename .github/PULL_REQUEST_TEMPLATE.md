@@ -32,3 +32,4 @@ Relates to #XXXX
 - [ ] I have ensured that I am targeting the `develop` branch.
 - [ ] I have updated the documentation accordingly.
 - [ ] I have updated the tests accordingly.
+- [ ] I have added an entry in the CHANGELOG.
