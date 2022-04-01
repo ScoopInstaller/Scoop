@@ -22,6 +22,10 @@
 - **config:** Rename checkver_token to gh_token and SCOOP_CHECKVER_TOKEN to SCOOP_GH_TOKEN ([#4832](https://github.com/ScoopInstaller/Scoop/pull/4832))
 - **config:** try SCOOP_GH_TOKEN value first before gh_token value from config ([#4842](https://github.com/ScoopInstaller/Scoop/pull/4842))
 
+### Builds
+
+- **schema:** Remove 'description' from required fields ([#4853](https://github.com/ScoopInstaller/Scoop/issues/4853))
+
 ### Documentation
 
 - **readme:** Update installation instruction ([#4825](https://github.com/ScoopInstaller/Scoop/issues/4825))
