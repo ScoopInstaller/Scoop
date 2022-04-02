@@ -604,7 +604,6 @@
     },
     "required": [
         "version",
-        "description",
         "homepage",
         "license"
     ],
