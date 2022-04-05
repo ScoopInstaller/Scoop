@@ -16,9 +16,13 @@ Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForE
 
 switch ($SubCommand) {
     ({ $SubCommand -in @($null, '--help', '/?') }) {
-        exec 'help'
+        if (!$SubCommand -and $Args -eq '-v') {
+            $SubCommand = '--version'
+        } else {
+            exec 'help'
+        }
     }
-    ({ $SubCommand -eq '--version' -or (!$SubCommand -and $Args -eq '-v') }) {
+    ({ $SubCommand -eq '--version' }) {
         Write-Host 'Current Scoop version:'
         Invoke-Expression "git -C '$(versiondir 'scoop' 'current')' --no-pager log --oneline HEAD -n 1"
         Write-Host ''
