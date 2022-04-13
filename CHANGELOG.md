@@ -2,6 +2,7 @@
 
 ### Features
 
+- **checkver:** Add option to throw error as exception ([#4863](https://github.com/ScoopInstaller/Scoop/issues/4863))
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
 
 ### Bug Fixes
