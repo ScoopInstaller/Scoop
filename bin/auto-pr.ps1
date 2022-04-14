@@ -23,6 +23,8 @@
     An array of manifests, which should be updated all the time. (-ForceUpdate parameter to checkver)
 .PARAMETER SkipUpdated
     Updated manifests will not be shown.
+.PARAMETER ThrowError
+    Throw error as exception instead of just printing it.
 .EXAMPLE
     PS BUCKETROOT > .\bin\auto-pr.ps1 'someUsername/repository:branch' -Request
 .EXAMPLE
@@ -54,7 +56,8 @@ param(
     [Switch] $Request,
     [Switch] $Help,
     [string[]] $SpecialSnowflakes,
-    [Switch] $SkipUpdated
+    [Switch] $SkipUpdated,
+    [Switch] $ThrowError
 )
 
 . "$PSScriptRoot\..\lib\manifest.ps1"
@@ -160,11 +163,11 @@ if ($Push) {
     execute "hub push origin $OriginBranch"
 }
 
-. "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update -SkipUpdated:$SkipUpdated
+. "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update -SkipUpdated:$SkipUpdated -ThrowError:$ThrowError
 if ($SpecialSnowflakes) {
     Write-Host "Forcing update on our special snowflakes: $($SpecialSnowflakes -join ',')" -ForegroundColor DarkCyan
     $SpecialSnowflakes -split ',' | ForEach-Object {
-        . "$PSScriptRoot\checkver.ps1" $_ -Dir $Dir -ForceUpdate
+        . "$PSScriptRoot\checkver.ps1" $_ -Dir $Dir -ForceUpdate -ThrowError:$ThrowError
     }
 }
 
