@@ -17,6 +17,8 @@
     Updated manifests will not be shown.
 .PARAMETER Version
     Update manifest to specific version.
+.PARAMETER ThrowError
+    Throw error as exception instead of just printing it.
 .EXAMPLE
     PS BUCKETROOT > .\bin\checkver.ps1
     Check all manifest inside default directory.
@@ -62,7 +64,8 @@ param(
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipUpdated,
-    [String] $Version = ''
+    [String] $Version = '',
+    [Switch] $ThrowError
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -336,7 +339,11 @@ while ($in_progress -gt 0) {
         try {
             Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
         } catch {
-            error $_.Exception.Message
+            if ($ThrowError) {
+                throw $_
+            } else {
+                error $_.Exception.Message
+            }
         }
     }
 }
