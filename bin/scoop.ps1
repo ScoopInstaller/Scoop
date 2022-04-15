@@ -24,7 +24,13 @@ switch ($SubCommand) {
     }
     ({ $SubCommand -eq '--version' }) {
         Write-Host 'Current Scoop version:'
-        Invoke-Expression "git -C '$(versiondir 'scoop' 'current')' --no-pager log --oneline HEAD -n 1"
+        if ((Test-CommandAvailable git) -and (Test-Path "$PSScriptRoot\..\.git") -and (get_config SCOOP_BRANCH 'master') -ne 'master') {
+            Invoke-Expression "git -C '$PSScriptRoot\..' --no-pager log --oneline HEAD -n 1"
+        } else {
+            $version = Select-String -Pattern '^## \[(v[\d.]+)\].*?([\d-]+)$' -Path "$PSScriptRoot\..\CHANGELOG.md"
+            Write-Host $version.Matches.Groups[1].Value -ForegroundColor Cyan -NoNewline
+            Write-Host " - Released at $($version.Matches.Groups[2].Value)"
+        }
         Write-Host ''
 
         Get-LocalBucket | ForEach-Object {
