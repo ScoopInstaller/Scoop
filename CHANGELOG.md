@@ -26,7 +26,8 @@
 
 ### Builds
 
-- **schema:** Remove 'description' from required fields ([#4853](https://github.com/ScoopInstaller/Scoop/issues/4853))
+- **checkver:** Add option to throw error as exception ([#4863](https://github.com/ScoopInstaller/Scoop/issues/4863))
+- **schema:** Remove 'description' from required fields ([#4853](https://github.com/ScoopInstaller/Scoop/issues/4853), [#4874](https://github.com/ScoopInstaller/Scoop/issues/4874))
 
 ### Documentation
 
