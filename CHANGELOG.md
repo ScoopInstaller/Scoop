@@ -3,7 +3,6 @@
 ### Features
 
 - **core:** Dual-license between MIT license and Unlicense ([#4870](https://github.com/ScoopInstaller/Scoop/pull/4870) and [#4868](https://github.com/ScoopInstaller/Scoop/issues/4868))
-- **checkver:** Add option to throw error as exception ([#4863](https://github.com/ScoopInstaller/Scoop/issues/4863))
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
 
 ### Bug Fixes
