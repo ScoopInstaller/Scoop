@@ -9,6 +9,7 @@
 - **shim:** Manipulating shims with UTF8 encoding ([#4791](https://github.com/ScoopInstaller/Scoop/issues/4791), [#4813](https://github.com/ScoopInstaller/Scoop/issues/4813))
 - **shim:** Correctly quote $@ in sh->ps1 shims ([#4808](https://github.com/ScoopInstaller/Scoop/issues/4808))
 - **installed:** If no `$global`, check both local and global installed ([#4798](https://github.com/ScoopInstaller/Scoop/issues/4798))
+- **scoop-list**: Fix date in 'Updated' column showing the months in the place of minutes ([#4880](https://github.com/ScoopInstaller/Scoop/pull/4880))
 - **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
 - **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
 - **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/pull/4822))
