@@ -1,7 +1,14 @@
-This project is licensed under the Unlicense license or the MIT license, at your option.
+This project is licensed under the Unlicense and the MIT license,
+your option. This project was previously licensed under only the
+Unlicense, but was dual-licensed later for several reasons.
+More info:
+  - https://github.com/ScoopInstaller/Scoop/pull/4870
+  - https://github.com/github/choosealicense.com/issues/805
 
-the Unlicense license
----------------------
+Copies of both licenses can be found below.
+
+Unlicense
+---------
 
 This is free and unencumbered software released into the public domain.
 
@@ -28,8 +35,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
 
-the MIT license
----------------
+MIT license
+-----------
 
 The MIT License (MIT)
 
