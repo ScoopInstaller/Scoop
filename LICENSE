@@ -1,12 +1,29 @@
+INFORMATION ABOUT THIS PROJECT'S LICENSE (SHORT)
+============================================================================================
 This project is licensed under the Unlicense and the MIT license,
-at your option. This project was previously licensed under only the
-Unlicense, but was dual-licensed later for several reasons.
-More info:
+at your option.
+
+INFORMATION ABOUT THIS PROJECT'S LICENSE (LONG)
+============================================================================================
+This project ("Scoop") is free software, licensed under the Unlicense and the
+MIT license, at your option. Scoop was previously licensed under only the Unlicense,
+but was dual-licensed later for several reasons.
+
+For more info, go to one of the following URLs:
   - https://github.com/ScoopInstaller/Scoop/pull/4870
   - https://github.com/github/choosealicense.com/issues/805
+  - https://github.com/ScoopInstaller/Scoop/issues/4868
+
+Scoop comes with ABSOLUTELY NO WARRANTY. Use it at your own risk. Scoop is provided
+on an AS-IS BASIS and it's contributors disclaim all warranties.
+
+You may use, modify, distribute, sell, copy, compile, sell, or merge Scoop
+by any means.
 
 Copies of both licenses can be found below.
 
+THE LICENSE OF SCOOP
+============================================================================================
 Unlicense
 ---------
 This is free and unencumbered software released into the public domain.
