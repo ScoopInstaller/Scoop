@@ -1,10 +1,4 @@
-<#
-TODO
- - clean up
-#>
-. "$PSScriptRoot\core.ps1"
-. "$PSScriptRoot\json.ps1"
-
+# Must included with 'json.ps1'
 function find_hash_in_rdf([String] $url, [String] $basename) {
     $data = $null
     try {

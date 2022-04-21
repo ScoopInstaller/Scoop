@@ -1,6 +1,3 @@
-. "$PSScriptRoot\core.ps1"
-. "$PSScriptRoot\autoupdate.ps1"
-
 function manifest_path($app, $bucket) {
     fullpath "$(Find-BucketDirectory $bucket)\$(sanitary_path $app).json"
 }
@@ -88,7 +85,7 @@ function supports_architecture($manifest, $architecture) {
     return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
 }
 
-function generate_user_manifest($app, $bucket, $version) {
+function generate_user_manifest($app, $bucket, $version) { # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
     $null, $manifest, $bucket, $null = Find-Manifest $app $bucket
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket

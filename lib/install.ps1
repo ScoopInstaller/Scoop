@@ -1,7 +1,3 @@
-. "$PSScriptRoot\core.ps1"
-. "$PSScriptRoot\autoupdate.ps1"
-. "$PSScriptRoot\buckets.ps1"
-
 function nightly_version($date, $quiet = $false) {
     $date_str = $date.tostring("yyyyMMdd")
     if (!$quiet) {

@@ -15,6 +15,10 @@
 - **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/pull/4822))
 - **install:** Fix issue with installation inside containers ([#4837](https://github.com/ScoopInstaller/Scoop/pull/4837))
 
+### Performance Improvements
+
+- **scoop:** Load libs only once ([#4839](https://github.com/ScoopInstaller/Scoop/issues/4839))
+
 ### Code Refactoring
 
 - **bucket:** Move 'Find-Manifest' and 'list_buckets' to 'buckets' ([#4814](https://github.com/ScoopInstaller/Scoop/issues/4814))

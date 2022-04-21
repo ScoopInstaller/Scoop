@@ -69,9 +69,9 @@ param(
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\autoupdate.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\autoupdate.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
@@ -105,7 +105,7 @@ Get-Event | ForEach-Object {
 $Queue | ForEach-Object {
     $name, $json = $_
 
-    $substitutions = Get-VersionSubstitution $json.version
+    $substitutions = Get-VersionSubstitution $json.version # 'autoupdate.ps1'
 
     $wc = New-Object Net.Webclient
     if ($json.checkver.useragent) {
@@ -337,7 +337,7 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
-            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
+            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable # 'autoupdate.ps1'
         } catch {
             if ($ThrowError) {
                 throw $_

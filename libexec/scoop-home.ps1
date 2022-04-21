@@ -2,10 +2,7 @@
 # Summary: Opens the app homepage
 param($app)
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Find-Manifest' (indirectly)
 
 if ($app) {
     $null, $manifest, $bucket, $null = Find-Manifest $app

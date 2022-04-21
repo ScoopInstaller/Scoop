@@ -132,9 +132,6 @@
 
 param($name, $value)
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-
 if (!$name) {
     $scoopConfig
 } elseif ($name -like '--help') {

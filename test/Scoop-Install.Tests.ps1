@@ -1,8 +1,8 @@
+. "$PSScriptRoot\Scoop-TestLib.ps1"
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\unix.ps1"
-. "$PSScriptRoot\Scoop-TestLib.ps1"
 
 $isUnix = is_unix
 
