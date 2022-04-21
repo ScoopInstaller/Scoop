@@ -35,7 +35,7 @@ switch ($SubCommand) {
 
         Get-LocalBucket | ForEach-Object {
             $bucketLoc = Find-BucketDirectory $_ -Root
-            if (Test-Path (Join-Path $bucketLoc '.git')) {
+            if ((Test-Path (Join-Path $bucketLoc '.git')) -and (Test-CommandAvailable git)) {
                 Write-Host "'$_' bucket:"
                 Invoke-Expression "git -C '$bucketLoc' --no-pager log --oneline HEAD -n 1"
                 Write-Host ''
