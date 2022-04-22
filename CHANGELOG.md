@@ -17,7 +17,7 @@
 
 ### Performance Improvements
 
-- **scoop:** Load libs only once ([#4839](https://github.com/ScoopInstaller/Scoop/issues/4839))
+- **scoop:** Load libs only once ([#4839](https://github.com/ScoopInstaller/Scoop/issues/4839), [#4884](https://github.com/ScoopInstaller/Scoop/issues/4884))
 
 ### Code Refactoring
 
