@@ -18,7 +18,7 @@
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' (indirectly)
+. "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' 'manifest.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture' 'generate_user_manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\install.ps1"
