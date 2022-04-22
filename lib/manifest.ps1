@@ -45,7 +45,7 @@ function save_install_info($info, $dir) {
     $nulls = $info.keys | Where-Object { $null -eq $info[$_] }
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
-    $file_content = $info | ConvertToPrettyJson
+    $file_content = $info | ConvertToPrettyJson # in 'json.ps1'
     [System.IO.File]::WriteAllLines("$dir\install.json", $file_content)
 }
 
