@@ -1,4 +1,3 @@
-# versions
 function Get-LatestVersion {
     <#
     .SYNOPSIS
@@ -29,7 +28,7 @@ function Get-LatestVersion {
     }
 }
 
-function Select-CurrentVersion {
+function Select-CurrentVersion { # 'manifest.ps1'
     <#
     .SYNOPSIS
         Select current version of installed app, from 'current\manifest.json' or modified time of version directory

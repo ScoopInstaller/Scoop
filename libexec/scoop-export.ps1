@@ -2,10 +2,8 @@
 # Summary: Exports (an importable) list of installed apps
 # Help: Lists all installed apps.
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture' 'Select-CurrentVersion' (indirectly)
 
 $def_arch = default_architecture
 

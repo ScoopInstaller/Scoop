@@ -15,10 +15,11 @@
 #   -u, --no-update-scoop     Don't update Scoop before downloading if it's outdated
 #   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
 
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' (indirectly)
+. "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture' 'generate_user_manifest' 'Find-Manifest' (indirectly)
+. "$PSScriptRoot\..\lib\install.ps1"
 
 $opt, $apps, $err = getopt $args 'fhua:' 'force', 'no-hash-check', 'no-update-scoop', 'arch='
 if ($err) { error "scoop download: $err"; exit 1 }

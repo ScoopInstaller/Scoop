@@ -1,9 +1,9 @@
 # Usage: scoop hold <apps>
 # Summary: Hold an app to disable updates
 
-. "$PSScriptRoot\..\lib\help.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\json.ps1" # 'save_install_info' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'install_info' 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 
 $apps = $args
 

@@ -1,3 +1,4 @@
+. "$PSScriptRoot\Scoop-TestLib.ps1"
 . "$PSScriptRoot\..\lib\core.ps1"
 
 Describe 'config' -Tag 'Scoop' {
