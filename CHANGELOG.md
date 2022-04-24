@@ -14,6 +14,7 @@
 - **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
 - **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/pull/4822))
 - **install:** Fix issue with installation inside containers ([#4837](https://github.com/ScoopInstaller/Scoop/pull/4837))
+- **bucket:** Return empty list correctly in `Get-LocalBucket` ([#4885](https://github.com/ScoopInstaller/Scoop/pull/4885))
 
 ### Performance Improvements
 
