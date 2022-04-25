@@ -134,8 +134,8 @@ if ($status.installed) {
         else {
             $fileTotals += 0
         }
-
     }
+
     $item.'Installed size' = "App: $(filesize $fileTotals[0])`nPersist: $(filesize $fileTotals[1])`nCache: $(filesize $fileTotals[2])`nTotal: $(filesize $totalSize)"
 }
 else {
