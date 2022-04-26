@@ -1,3 +1,8 @@
+C̶o̶p̶y̶r̶i̶g̶h̶t̶ ̶(̶c̶)̶  Luke Sampson (https://github.com/lukesampson)
+C̶o̶p̶y̶r̶i̶g̶h̶t̶ ̶(̶c̶)̶  Scoop contributors (https://github.com/ScoopInstaller/Scoop/graphs/contributors)
+Copyright (c) Scoop contributors
+
+-- START LICENSE FILE --
 INFORMATION ABOUT THIS PROJECT'S LICENSE (SHORT)
 ============================================================================================
 This project is licensed under the Unlicense or the MIT license,
@@ -55,10 +60,6 @@ MIT license
 -----------
 The MIT License (MIT)
 
-C̶o̶p̶y̶r̶i̶g̶h̶t̶ ̶(̶c̶)̶  Luke Sampson (https://github.com/lukesampson)
-C̶o̶p̶y̶r̶i̶g̶h̶t̶ ̶(̶c̶)̶  Scoop contributors (https://github.com/ScoopInstaller/Scoop/graphs/contributors)
-Copyright (c) Scoop contributors
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -76,3 +77,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+-- END LICENSE FILE --
