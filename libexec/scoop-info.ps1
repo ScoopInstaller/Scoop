@@ -116,75 +116,79 @@ if ($status.installed) {
     }
     $item.Installed = $installed_output -join "`n"
 
-    # Show size of installation
-    $appsdir = appsdir $global
+    if ($verbose) {
+        # Show size of installation
+        $appsdir = appsdir $global
 
-    $appFiles = Get-ChildItem $appsdir | Where-Object -Property Name -Value "^$app$" -Match
-    $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
-    $cacheFiles = Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match
+        $appFiles = Get-ChildItem $appsdir | Where-Object -Property Name -Value "^$app$" -Match
+        $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
+        $cacheFiles = Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match
 
-    $totalSize = 0
-    $fileTotals = @()
-    foreach ($fileType in ($appFiles, $persistFiles, $cacheFiles)) {
-        if ($fileType.Length -ne 0) {
-            $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
-            $fileTotals += $fileSum
-            $totalSize += $fileSum
-        }
-        else {
-            $fileTotals += 0
-        }
-    }
-
-    $item.'Installed size' = "App: $(filesize $fileTotals[0])`nPersist: $(filesize $fileTotals[1])`nCache: $(filesize $fileTotals[2])`nTotal: $(filesize $totalSize)"
-}
-else {
-    # Get download size if app not installed
-    $architecture = default_architecture
-
-    if(!(supports_architecture $manifest $architecture)) {
-       # No available download for current architecture
-        continue
-    }
-
-    if ($null -eq $manifest.url) {
-        # use url for current architecture
-        $urls = url $manifest $architecture
-    }
-    else {
-        # otherwise use non-architecture url
-        $urls = $manifest.url
-    }
-
-    $totalPackage = 0
-    foreach($url in $urls) {
-        try {
-            [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
-            $totalPackage += $urlLength
-
-            if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
-                $cached = " (latest version is cached)"
+        $totalSize = 0
+        $fileTotals = @()
+        foreach ($fileType in ($appFiles, $persistFiles, $cacheFiles)) {
+            if ($fileType.Length -ne 0) {
+                $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
+                $fileTotals += $fileSum
+                $totalSize += $fileSum
             }
             else {
-                $cached = $null
+                $fileTotals += 0
             }
         }
-        catch [System.Management.Automation.RuntimeException] {
-            $totalPackage = 0
-            $packageError = "the server at $(([System.Uri]$url).Host) did not send a Content-Length header"
-            break
-        }
-        catch {
-            $totalPackage = 0
-            $packageError = "the server at $(([System.Uri]$url).Host) is down"
-            break
-        }
+
+        $item.'Installed size' = "App: $(filesize $fileTotals[0])`nPersist: $(filesize $fileTotals[1])`nCache: $(filesize $fileTotals[2])`nTotal: $(filesize $totalSize)"
     }
-    if ($totalPackage -ne 0) {
-        $item.'Download size' = "$(filesize $totalPackage)$cached"
-    }
-    else {
-        $item.'Download size' = "Unknown ($packageError)"
+}
+else {
+    if ($verbose) {
+        # Get download size if app not installed
+        $architecture = default_architecture
+
+        if(!(supports_architecture $manifest $architecture)) {
+        # No available download for current architecture
+            continue
+        }
+
+        if ($null -eq $manifest.url) {
+            # use url for current architecture
+            $urls = url $manifest $architecture
+        }
+        else {
+            # otherwise use non-architecture url
+            $urls = $manifest.url
+        }
+
+        $totalPackage = 0
+        foreach($url in $urls) {
+            try {
+                [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
+                $totalPackage += $urlLength
+
+                if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
+                    $cached = " (latest version is cached)"
+                }
+                else {
+                    $cached = $null
+                }
+            }
+            catch [System.Management.Automation.RuntimeException] {
+                $totalPackage = 0
+                $packageError = "the server at $(([System.Uri]$url).Host) did not send a Content-Length header"
+                break
+            }
+            catch {
+                $totalPackage = 0
+                $packageError = "the server at $(([System.Uri]$url).Host) is down"
+                break
+            }
+        }
+        if ($totalPackage -ne 0) {
+            $item.'Download size' = "$(filesize $totalPackage)$cached"
+        }
+        else {
+            $item.'Download size' = "Unknown ($packageError)"
+        }
     }
 }
 
