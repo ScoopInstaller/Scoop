@@ -187,6 +187,9 @@ function filesize($length) {
     } elseif($length -gt $kb) {
         "{0:n1} KB" -f ($length / $kb)
     } else {
+        if ($null -eq $length) {
+            $length = 0
+       }
         "$($length) B"
     }
 }
