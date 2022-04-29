@@ -2,7 +2,7 @@
 
 ### Features
 
-- **relicense:** Dual-license using MIT license and Unlicense ([#4890](https://github.com/ScoopInstaller/Scoop/issues/4890))
+- **relicense:** Dual-license using MIT license and Unlicense ([#4892](https://github.com/ScoopInstaller/Scoop/issues/4892))
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
 
 ### Bug Fixes
