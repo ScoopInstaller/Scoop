@@ -94,7 +94,7 @@ function list_aliases {
     }
 
     if (!$aliases.count) {
-        warn 'No aliases founds.'
+        info "No alias found."
     }
     $aliases = $aliases.GetEnumerator() | Sort-Object Name
     if ($verbose) {
