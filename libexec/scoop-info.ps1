@@ -131,16 +131,14 @@ if ($status.installed) {
                 $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
                 $fileTotals += $fileSum
                 $totalSize += $fileSum
-            }
-            else {
+            } else {
                 $fileTotals += 0
             }
         }
 
         $item.'Installed size' = "App: $(filesize $fileTotals[0])`nPersist: $(filesize $fileTotals[1])`nCache: $(filesize $fileTotals[2])`nTotal: $(filesize $totalSize)"
     }
-}
-else {
+} else {
     if ($verbose) {
         # Get download size if app not installed
         $architecture = default_architecture
@@ -153,8 +151,7 @@ else {
         if ($null -eq $manifest.url) {
             # use url for current architecture
             $urls = url $manifest $architecture
-        }
-        else {
+        } else {
             # otherwise use non-architecture url
             $urls = $manifest.url
         }
@@ -167,17 +164,14 @@ else {
 
                 if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
                     $cached = " (latest version is cached)"
-                }
-                else {
+                } else {
                     $cached = $null
                 }
-            }
-            catch [System.Management.Automation.RuntimeException] {
+            } catch [System.Management.Automation.RuntimeException] {
                 $totalPackage = 0
                 $packageError = "the server at $(([System.Uri]$url).Host) did not send a Content-Length header"
                 break
-            }
-            catch {
+            } catch {
                 $totalPackage = 0
                 $packageError = "the server at $(([System.Uri]$url).Host) is down"
                 break
@@ -185,8 +179,7 @@ else {
         }
         if ($totalPackage -ne 0) {
             $item.'Download size' = "$(filesize $totalPackage)$cached"
-        }
-        else {
+        } else {
             $item.'Download size' = "Unknown ($packageError)"
         }
     }
