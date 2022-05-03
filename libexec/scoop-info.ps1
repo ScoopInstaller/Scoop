@@ -121,6 +121,7 @@ if ($status.installed) {
         $appsdir = appsdir $global
 
         $appFiles = Get-ChildItem $appsdir | Where-Object -Property Name -Value "^$app$" -Match
+        $currentFiles = Get-ChildItem $appFiles | Where-Object -Property Name -Value (Select-CurrentVersion $app $global) -Match
         $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
         $cacheFiles = Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match
 
@@ -136,7 +137,13 @@ if ($status.installed) {
             }
         }
 
-        $item.'Installed size' = "App: $(filesize $fileTotals[0])`nPersist: $(filesize $fileTotals[1])`nCache: $(filesize $fileTotals[2])`nTotal: $(filesize $totalSize)"
+        # Separate so that it doesn't double count in $totalSize
+        $currentTotal = (Get-ChildItem $currentFiles -Recurse | Measure-Object -Property Length -Sum).Sum
+
+        # Old versions = app total - current version size
+        $fileTotals += $fileTotals[0] - $currentTotal
+
+        $item.'Installed size' = "Current version: $(filesize $currentTotal)`nOld versions: $(filesize $fileTotals[3])`nPersisted data: $(filesize $fileTotals[1])`nCached downloads: $(filesize $fileTotals[2])`nTotal: $(filesize $totalSize)"
     }
 } else {
     if ($verbose) {
