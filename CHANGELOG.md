@@ -2,20 +2,19 @@
 
 ### Features
 
-- **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4243))
+- **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4254))
 
 ### Bug Fixes
 
-- **shim:** Manipulating shims with UTF8 encoding ([#4791](https://github.com/ScoopInstaller/Scoop/issues/4791), [#4813](https://github.com/ScoopInstaller/Scoop/issues/4813))
-- **shim:** Correctly quote $@ in sh->ps1 shims ([#4808](https://github.com/ScoopInstaller/Scoop/issues/4808))
+- **bucket:** Return empty list correctly in `Get-LocalBucket` ([#4885](https://github.com/ScoopInstaller/Scoop/issues/4885))
+- **install:** Fix issue with installation inside containers ([#4837](https://github.com/ScoopInstaller/Scoop/issues/4837))
 - **installed:** If no `$global`, check both local and global installed ([#4798](https://github.com/ScoopInstaller/Scoop/issues/4798))
-- **scoop-list**: Fix date in 'Updated' column showing the months in the place of minutes ([#4880](https://github.com/ScoopInstaller/Scoop/pull/4880))
-- **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
+- **shim:** Manipulating shims with UTF8 encoding ([#4791](https://github.com/ScoopInstaller/Scoop/issues/4791), [#4813](https://github.com/ScoopInstaller/Scoop/issues/4813))
+- **shim:** Correctly quote $@ in sh->ps1 shims ([#4809](https://github.com/ScoopInstaller/Scoop/issues/4809))
 - **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
-- **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/pull/4822))
-- **install:** Fix issue with installation inside containers ([#4837](https://github.com/ScoopInstaller/Scoop/pull/4837))
-- **scoop-info:** Display a breakdown of an app's installation size, or the download size if not installed (`--verbose` only) ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
-- **bucket:** Return empty list correctly in `Get-LocalBucket` ([#4885](https://github.com/ScoopInstaller/Scoop/pull/4885))
+- **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/issues/4822))
+- **scoop-list:**: Fix date in 'Updated' column showing the months in the place of minutes ([#4880](https://github.com/ScoopInstaller/Scoop/issues/4880))
+- **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
 
 ### Performance Improvements
 
@@ -26,16 +25,16 @@
 - **bucket:** Move 'Find-Manifest' and 'list_buckets' to 'buckets' ([#4814](https://github.com/ScoopInstaller/Scoop/issues/4814))
 - **relpath:** Use `$PSScriptRoot` instead of `relpath` ([#4793](https://github.com/ScoopInstaller/Scoop/issues/4793))
 - **reset_aliases:** Move core function of `reset_aliases` to `scoop` ([#4794](https://github.com/ScoopInstaller/Scoop/issues/4794))
-- **config:** Rename checkver_token to gh_token and SCOOP_CHECKVER_TOKEN to SCOOP_GH_TOKEN ([#4832](https://github.com/ScoopInstaller/Scoop/pull/4832))
-- **config:** try SCOOP_GH_TOKEN value first before gh_token value from config ([#4842](https://github.com/ScoopInstaller/Scoop/pull/4842))
+- **config:** Rename checkver_token to gh_token and SCOOP_CHECKVER_TOKEN to SCOOP_GH_TOKEN ([#4832](https://github.com/ScoopInstaller/Scoop/issues/4832), [#4842](https://github.com/ScoopInstaller/Scoop/issues/4842))
 
 ### Builds
 
-- **checkver:** Add option to throw error as exception ([#4863](https://github.com/ScoopInstaller/Scoop/issues/4863))
+- **checkver:** Add option to throw error as exception ([#4867](https://github.com/ScoopInstaller/Scoop/issues/4867))
 - **schema:** Remove 'description' from required fields ([#4853](https://github.com/ScoopInstaller/Scoop/issues/4853), [#4874](https://github.com/ScoopInstaller/Scoop/issues/4874))
 
 ### Documentation
 
+- **changelog:** Rearrange CHANGELOG ([#4897](https://github.com/ScoopInstaller/Scoop/issues/4897))
 - **readme:** Update installation instruction ([#4825](https://github.com/ScoopInstaller/Scoop/issues/4825))
 - **readme:** Fix badges for Gitter and CI Tests ([#4830](https://github.com/ScoopInstaller/Scoop/issues/4830))
 - **scoop-shim:**: Fix typo ([#4836](https://github.com/ScoopInstaller/Scoop/issues/4836))
