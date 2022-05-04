@@ -3,6 +3,7 @@
 ### Features
 
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4254))
+- **scoop-info:** Display a breakdown of an app's installation size, or download size if not installed (`--verbose` only) ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
 
 ### Bug Fixes
 
