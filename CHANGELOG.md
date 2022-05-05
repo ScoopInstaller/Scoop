@@ -2,7 +2,7 @@
 
 ### Features
 
-- **relicense:** Dual-license between MIT license and Unlicense ([#4870](https://github.com/ScoopInstaller/Scoop/issues/4870))
+- **relicense:** Relicense to dual-license (Unlicense or MIT) ([#4903](https://github.com/ScoopInstaller/Scoop/issues/4903), [#4870](https://github.com/ScoopInstaller/Scoop/issues/4870))
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4254))
 
 ### Bug Fixes
@@ -38,7 +38,7 @@
 - **changelog:** Rearrange CHANGELOG ([#4897](https://github.com/ScoopInstaller/Scoop/issues/4897))
 - **readme:** Update installation instruction ([#4825](https://github.com/ScoopInstaller/Scoop/issues/4825))
 - **readme:** Fix badges for Gitter and CI Tests ([#4830](https://github.com/ScoopInstaller/Scoop/issues/4830))
-- **scoop-shim:**: Fix typo ([#4836](https://github.com/ScoopInstaller/Scoop/issues/4836))
+- **scoop-shim:** Fix typo ([#4836](https://github.com/ScoopInstaller/Scoop/issues/4836))
 
 ## [v0.1.0](https://github.com/ScoopInstaller/Scoop/compare/2021-12-26...v0.1.0) - 2022-03-01
 
