@@ -143,7 +143,13 @@ if ($status.installed) {
         # Old versions = app total - current version size
         $fileTotals += $fileTotals[0] - $currentTotal
 
-        $item.'Installed size' = "Current version:   $(filesize $currentTotal)`nOld versions:      $(filesize $fileTotals[3])`nPersisted data:    $(filesize $fileTotals[1])`nCached downloads:  $(filesize $fileTotals[2])`nTotal:             $(filesize $totalSize)"
+        $item.'Installed size' = (
+            "Current version:   $(filesize $currentTotal)`n" +
+            "Old versions:      $(filesize $fileTotals[3])`n" +
+            "Persisted data:    $(filesize $fileTotals[1])`n" +
+            "Cached downloads:  $(filesize $fileTotals[2])`n" +
+            "Total:             $(filesize $totalSize)"
+        )
     }
 } else {
     if ($verbose) {
