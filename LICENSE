@@ -1,12 +1,4 @@
-COPYRIGHT NOTICES
-============================================================================================
-____________________________________________________________________________________________
-[ NOTE: Not the actual license, see below for it.                                          ]
-********************************************************************************************
-
-C̶o̶p̶y̶r̶i̶g̶h̶t̶ ̶(̶c̶)̶  Luke Sampson (https://github.com/lukesampson)
-C̶o̶p̶y̶r̶i̶g̶h̶t̶ ̶(̶c̶)̶  Scoop contributors (https://github.com/ScoopInstaller/Scoop/graphs/contributors)
-Copyright (c) Scoop contributors
+SPDX-License-Identifier: UNLICENSE or MIT
 
 INFORMATION ABOUT THIS PROJECT'S LICENSE (SHORT)
 ============================================================================================
@@ -17,12 +9,7 @@ INFORMATION ABOUT THIS PROJECT'S LICENSE (LONG)
 ============================================================================================
 This project ("Scoop") is free software, licensed under the Unlicense or the
 MIT license, at your option. Scoop was previously licensed under only the Unlicense,
-but was dual-licensed later for several reasons.
-
-For more info, go to one of the following URLs:
-  - https://github.com/ScoopInstaller/Scoop/pull/4870
-  - https://github.com/github/choosealicense.com/issues/805
-  - https://github.com/ScoopInstaller/Scoop/issues/4868
+but was dual-licensed from version 0.2.0.
 
 Scoop comes with ABSOLUTELY NO WARRANTY. Use it at your own risk. Scoop is provided
 on an AS-IS BASIS and it's contributors disclaim all warranties.
@@ -65,6 +52,9 @@ MIT license
 -----------
 The MIT License (MIT)
 
+Copyright (c) 2013-2017 Luke Sampson (https://github.com/lukesampson)
+Copyright (c) 2013-present Scoop contributors (https://github.com/ScoopInstaller/Scoop/graphs/contributors)
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -82,4 +72,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
--- END LICENSE FILE --
