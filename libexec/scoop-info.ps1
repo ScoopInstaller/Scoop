@@ -120,11 +120,13 @@ if ($status.installed) {
         # Show size of installation
         $appsdir = appsdir $global
 
+        # Collect file list from each location
         $appFiles = Get-ChildItem $appsdir | Where-Object -Property Name -Value "^$app$" -Match
         $currentFiles = Get-ChildItem $appFiles | Where-Object -Property Name -Value (Select-CurrentVersion $app $global) -Match
         $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
         $cacheFiles = Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match
 
+        # Get the sum of each file list and keep a total
         $totalSize = 0
         $fileTotals = @()
         foreach ($fileType in ($appFiles, $persistFiles, $cacheFiles)) {
@@ -137,19 +139,35 @@ if ($status.installed) {
             }
         }
 
-        # Separate so that it doesn't double count in $totalSize
+        # This is separate so that current version size doesn't double count in $totalSize
         $currentTotal = (Get-ChildItem $currentFiles -Recurse | Measure-Object -Property Length -Sum).Sum
 
         # Old versions = app total - current version size
         $fileTotals += $fileTotals[0] - $currentTotal
 
-        $item.'Installed size' = (
-            "Current version:   $(filesize $currentTotal)`n" +
-            "Old versions:      $(filesize $fileTotals[3])`n" +
-            "Persisted data:    $(filesize $fileTotals[1])`n" +
-            "Cached downloads:  $(filesize $fileTotals[2])`n" +
-            "Total:             $(filesize $totalSize)"
-        )
+        if ($currentTotal -eq $totalSize) {
+            # Simple app size output if no old versions, persisted data, cached downloads
+            $item.'Installed size' = filesize $currentTotal
+        } else {
+            $fileSizes = [ordered] @{
+                "Current version:  " = $(filesize $currentTotal)
+                "Old versions:     " = $(filesize $fileTotals[3])
+                "Persisted data:   " = $(filesize $fileTotals[1])
+                "Cached downloads: " = $(filesize $fileTotals[2])
+                "Total:            " = $(filesize $totalSize)
+            }
+
+            $fileSizeOutput = @()
+
+            # Don't output empty categories
+            $fileSizes.GetEnumerator() | ForEach-Object {
+                if ($_.value -ne "0 B") {
+                    $fileSizeOutput += $_.key + $_.value
+                }
+            }
+
+            $item.'Installed size' = $fileSizeOutput -join "`n"
+        }
     }
 } else {
     if ($verbose) {
