@@ -4,6 +4,7 @@
 
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4254))
 - **scoop-info:** Display a breakdown of an app's installation size, or download size if not installed (`--verbose` only) ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
+- **scoop-cleanup:** Add `-a/--all` switch to cleanup all apps ([#4906](https://github.com/ScoopInstaller/Scoop/issues/4906))
 
 ### Bug Fixes
 
