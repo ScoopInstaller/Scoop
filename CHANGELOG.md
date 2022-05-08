@@ -2,6 +2,7 @@
 
 ### Features
 
+- **relicense:** Relicense to dual-license (Unlicense or MIT) ([#4903](https://github.com/ScoopInstaller/Scoop/issues/4903), [#4870](https://github.com/ScoopInstaller/Scoop/issues/4870))
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4254))
 - **scoop-cleanup:** Add `-a/--all` switch to cleanup all apps ([#4906](https://github.com/ScoopInstaller/Scoop/issues/4906))
 
@@ -14,7 +15,7 @@
 - **shim:** Correctly quote $@ in sh->ps1 shims ([#4809](https://github.com/ScoopInstaller/Scoop/issues/4809))
 - **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
 - **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/issues/4822))
-- **scoop-list:**: Fix date in 'Updated' column showing the months in the place of minutes ([#4880](https://github.com/ScoopInstaller/Scoop/issues/4880))
+- **scoop-list:** Fix date in 'Updated' column showing the months in the place of minutes ([#4880](https://github.com/ScoopInstaller/Scoop/issues/4880))
 - **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
 
 ### Performance Improvements
@@ -38,7 +39,7 @@
 - **changelog:** Rearrange CHANGELOG ([#4897](https://github.com/ScoopInstaller/Scoop/issues/4897))
 - **readme:** Update installation instruction ([#4825](https://github.com/ScoopInstaller/Scoop/issues/4825))
 - **readme:** Fix badges for Gitter and CI Tests ([#4830](https://github.com/ScoopInstaller/Scoop/issues/4830))
-- **scoop-shim:**: Fix typo ([#4836](https://github.com/ScoopInstaller/Scoop/issues/4836))
+- **scoop-shim:** Fix typo ([#4836](https://github.com/ScoopInstaller/Scoop/issues/4836))
 
 ## [v0.1.0](https://github.com/ScoopInstaller/Scoop/compare/2021-12-26...v0.1.0) - 2022-03-01
 
