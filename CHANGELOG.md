@@ -13,6 +13,7 @@
 - **installed:** If no `$global`, check both local and global installed ([#4798](https://github.com/ScoopInstaller/Scoop/issues/4798))
 - **shim:** Manipulating shims with UTF8 encoding ([#4791](https://github.com/ScoopInstaller/Scoop/issues/4791), [#4813](https://github.com/ScoopInstaller/Scoop/issues/4813))
 - **shim:** Correctly quote $@ in sh->ps1 shims ([#4809](https://github.com/ScoopInstaller/Scoop/issues/4809))
+- **shim:** Use correct git source directory ([#4913](https://github.com/ScoopInstaller/Scoop/issues/4913))
 - **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
 - **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/issues/4822))
 - **scoop-list:** Fix date in 'Updated' column showing the months in the place of minutes ([#4880](https://github.com/ScoopInstaller/Scoop/issues/4880))
