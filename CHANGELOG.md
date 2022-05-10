@@ -1,5 +1,48 @@
 ### Bug Fixes
-autoupdate: Avoid digits in archive file extension (except for .7z and .001) (#4915)
+- Avoid digits in archive file extension (except for .7z and .001)([#4915](https://github.com/ScoopInstaller/Scoop/issues/4915))
+
+## [v0.2.0](https://github.com/ScoopInstaller/Scoop/compare/v0.1.0...v0.2.0) - 2022-05-10
+
+### Features
+
+- **relicense:** Relicense to dual-license (Unlicense or MIT) ([#4903](https://github.com/ScoopInstaller/Scoop/issues/4903), [#4870](https://github.com/ScoopInstaller/Scoop/issues/4870))
+- **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4254))
+- **scoop-cleanup:** Add `-a/--all` switch to cleanup all apps ([#4906](https://github.com/ScoopInstaller/Scoop/issues/4906))
+
+### Bug Fixes
+
+- **bucket:** Return empty list correctly in `Get-LocalBucket` ([#4885](https://github.com/ScoopInstaller/Scoop/issues/4885))
+- **install:** Fix issue with installation inside containers ([#4837](https://github.com/ScoopInstaller/Scoop/issues/4837))
+- **installed:** If no `$global`, check both local and global installed ([#4798](https://github.com/ScoopInstaller/Scoop/issues/4798))
+- **shim:** Manipulating shims with UTF8 encoding ([#4791](https://github.com/ScoopInstaller/Scoop/issues/4791), [#4813](https://github.com/ScoopInstaller/Scoop/issues/4813))
+- **shim:** Correctly quote $@ in sh->ps1 shims ([#4809](https://github.com/ScoopInstaller/Scoop/issues/4809))
+- **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
+- **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/issues/4822))
+- **scoop-list:** Fix date in 'Updated' column showing the months in the place of minutes ([#4880](https://github.com/ScoopInstaller/Scoop/issues/4880))
+- **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
+
+### Performance Improvements
+
+- **scoop:** Load libs only once ([#4839](https://github.com/ScoopInstaller/Scoop/issues/4839), [#4884](https://github.com/ScoopInstaller/Scoop/issues/4884))
+
+### Code Refactoring
+
+- **bucket:** Move 'Find-Manifest' and 'list_buckets' to 'buckets' ([#4814](https://github.com/ScoopInstaller/Scoop/issues/4814))
+- **relpath:** Use `$PSScriptRoot` instead of `relpath` ([#4793](https://github.com/ScoopInstaller/Scoop/issues/4793))
+- **reset_aliases:** Move core function of `reset_aliases` to `scoop` ([#4794](https://github.com/ScoopInstaller/Scoop/issues/4794))
+- **config:** Rename checkver_token to gh_token and SCOOP_CHECKVER_TOKEN to SCOOP_GH_TOKEN ([#4832](https://github.com/ScoopInstaller/Scoop/issues/4832), [#4842](https://github.com/ScoopInstaller/Scoop/issues/4842))
+
+### Builds
+
+- **checkver:** Add option to throw error as exception ([#4867](https://github.com/ScoopInstaller/Scoop/issues/4867))
+- **schema:** Remove 'description' from required fields ([#4853](https://github.com/ScoopInstaller/Scoop/issues/4853), [#4874](https://github.com/ScoopInstaller/Scoop/issues/4874))
+
+### Documentation
+
+- **changelog:** Rearrange CHANGELOG ([#4897](https://github.com/ScoopInstaller/Scoop/issues/4897))
+- **readme:** Update installation instruction ([#4825](https://github.com/ScoopInstaller/Scoop/issues/4825))
+- **readme:** Fix badges for Gitter and CI Tests ([#4830](https://github.com/ScoopInstaller/Scoop/issues/4830))
+- **scoop-shim:** Fix typo ([#4836](https://github.com/ScoopInstaller/Scoop/issues/4836))
 
 ## [v0.1.0](https://github.com/ScoopInstaller/Scoop/compare/2021-12-26...v0.1.0) - 2022-03-01
 
