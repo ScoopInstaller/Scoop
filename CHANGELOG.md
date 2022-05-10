@@ -1,3 +1,6 @@
+### Bug Fixes
+autoupdate: Avoid digits in archive file extension (except for .7z and .001) (#4915)
+
 ## [v0.1.0](https://github.com/ScoopInstaller/Scoop/compare/2021-12-26...v0.1.0) - 2022-03-01
 
 ### Features
