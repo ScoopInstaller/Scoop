@@ -1,5 +1,7 @@
 . "$PSScriptRoot\Scoop-TestLib.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 

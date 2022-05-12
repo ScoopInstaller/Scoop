@@ -187,6 +187,9 @@ function filesize($length) {
     } elseif($length -gt $kb) {
         "{0:n1} KB" -f ($length / $kb)
     } else {
+        if ($null -eq $length) {
+            $length = 0
+       }
         "$($length) B"
     }
 }
@@ -215,6 +218,9 @@ function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -rep
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
 function installed($app, $global) {
+    if (-not $PSBoundParameters.ContainsKey('global')) {
+        return (installed $app $false) -or (installed $app $true)
+    }
     # Dependencies of the format "bucket/dependency" install in a directory of form
     # "dependency". So we need to extract the bucket from the name and only give the app
     # name to is_directory
@@ -401,11 +407,16 @@ function url_remote_filename($url) {
     return $basename
 }
 
-function ensure($dir) { if(!(test-path $dir)) { mkdir $dir > $null }; resolve-path $dir }
-function fullpath($path) { # should be ~ rooted
-    $executionContext.sessionState.path.getUnresolvedProviderPathFromPSPath($path)
+function ensure($dir) {
+    if (!(Test-Path -Path $dir)) {
+        New-Item -Path $dir -ItemType Directory | Out-Null
+    }
+    Convert-Path -Path $dir
 }
-function relpath($path) { "$($myinvocation.psscriptroot)\$path" } # relative to calling script
+function fullpath($path) {
+    # should be ~ rooted
+    $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
+}
 function friendly_path($path) {
     $h = (Get-PsProvider 'FileSystem').home; if(!$h.endswith('\')) { $h += '\' }
     if($h -eq '\') { return $path }
@@ -479,8 +490,8 @@ function Invoke-ExternalCommand {
         return $false
     }
     if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
-        Out-File -FilePath $LogPath -Encoding Default -Append -InputObject $Process.StandardOutput.ReadToEnd()
-        Out-File -FilePath $LogPath -Encoding Default -Append -InputObject $Process.StandardError.ReadToEnd()
+        Out-UTF8File -FilePath $LogPath -Append -InputObject $Process.StandardOutput.ReadToEnd()
+        Out-UTF8File -FilePath $LogPath -Append -InputObject $Process.StandardError.ReadToEnd()
     }
     $Process.WaitForExit()
     if ($Process.ExitCode -ne 0) {
@@ -625,9 +636,9 @@ function shim($path, $global, $name, $arg) {
         # for programs with no awareness of any shell
         warn_on_overwrite "$shim.shim" $path
         Copy-Item (get_shim_path) "$shim.exe" -Force
-        Write-Output "path = `"$resolved_path`"" | Out-File "$shim.shim" -Encoding ASCII
+        Write-Output "path = `"$resolved_path`"" | Out-UTF8File "$shim.shim"
         if ($arg) {
-            Write-Output "args = $arg" | Out-File "$shim.shim" -Encoding ASCII -Append
+            Write-Output "args = $arg" | Out-UTF8File "$shim.shim" -Append
         }
     } elseif ($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
@@ -635,14 +646,14 @@ function shim($path, $global, $name, $arg) {
         @(
             "@rem $resolved_path",
             "@`"$resolved_path`" $arg %*"
-        ) -join "`r`n" | Out-File "$shim.cmd" -Encoding ASCII
+        ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
         @(
             "#!/bin/sh",
             "# $resolved_path",
             "MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.ps1$') {
         # if $path points to another drive resolve-path prepends .\ which could break shims
         warn_on_overwrite "$shim.ps1" $path
@@ -661,7 +672,7 @@ function shim($path, $global, $name, $arg) {
                 "exit `$LASTEXITCODE"
             )
         }
-        $ps1text -join "`r`n" | Out-File "$shim.ps1" -Encoding ASCII
+        $ps1text -join "`r`n" | Out-UTF8File "$shim.ps1"
 
         # make ps1 accessible from cmd.exe
         warn_on_overwrite "$shim.cmd" $path
@@ -682,44 +693,44 @@ function shim($path, $global, $name, $arg) {
             ") else (",
             "    powershell -noprofile -ex unrestricted -file `"$resolved_path`" $arg %args%",
             ")"
-        ) -join "`r`n" | Out-File "$shim.cmd" -Encoding ASCII
+        ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
         @(
             "#!/bin/sh",
             "# $resolved_path",
             "if command -v pwsh.exe > /dev/null 2>&1; then",
-            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
+            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg `"$@`"",
             "else",
-            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg $@",
+            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg `"$@`"",
             "fi"
-        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.jar$') {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
             "@java -jar `"$resolved_path`" $arg %*"
-        ) -join "`r`n" | Out-File "$shim.cmd" -Encoding ASCII
+        ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
         @(
             "#!/bin/sh",
             "# $resolved_path",
             "java.exe -jar `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.py$') {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
             "@python `"$resolved_path`" $arg %*"
-        ) -join "`r`n" | Out-File "$shim.cmd" -Encoding ASCII
+        ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
         @(
             "#!/bin/sh",
             "# $resolved_path",
             "python.exe `"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
         # find path to Git's bash so that batch scripts can run bash scripts
@@ -730,14 +741,14 @@ function shim($path, $global, $name, $arg) {
         @(
             "@rem $resolved_path",
             "@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*"
-        ) -join "`r`n" | Out-File "$shim.cmd" -Encoding ASCII
+        ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
         @(
             "#!/bin/sh",
             "# $resolved_path",
             "`"$resolved_path`" $arg `"$@`""
-        ) -join "`n" | Out-File $shim -Encoding ASCII -NoNewline
+        ) -join "`n" | Out-UTF8File $shim -NoNewLine
     }
 }
 
@@ -885,55 +896,6 @@ function pluralize($count, $singular, $plural) {
     if($count -eq 1) { $singular } else { $plural }
 }
 
-function reset_alias($name, $value) {
-    if($existing = get-alias $name -ea ignore | Where-Object { $_.options -match 'readonly' }) {
-        if($existing.definition -ne $value) {
-            write-host "Alias $name is read-only; can't reset it." -f darkyellow
-        }
-        return # already set
-    }
-    if($value -is [scriptblock]) {
-        if(!(test-path -path "function:script:$name")) {
-            new-item -path function: -name "script:$name" -value $value | out-null
-        }
-        return
-    }
-
-    set-alias $name $value -scope script -option allscope
-}
-
-function reset_aliases() {
-    # for aliases where there's a local function, re-alias so the function takes precedence
-    $aliases = get-alias | Where-Object { $_.options -notmatch 'readonly|allscope' } | ForEach-Object { $_.name }
-    get-childitem function: | ForEach-Object {
-        $fn = $_.name
-        if($aliases -contains $fn) {
-            set-alias $fn local:$fn -scope script
-        }
-    }
-
-    # for dealing with user aliases
-    $default_aliases = @{
-        'cp' = 'copy-item'
-        'echo' = 'write-output'
-        'gc' = 'get-content'
-        'gci' = 'get-childitem'
-        'gcm' = 'get-command'
-        'gm' = 'get-member'
-        'iex' = 'invoke-expression'
-        'ls' = 'get-childitem'
-        'mkdir' = { new-item -type directory @args }
-        'mv' = 'move-item'
-        'rm' = 'remove-item'
-        'sc' = 'set-content'
-        'select' = 'select-object'
-        'sls' = 'select-string'
-    }
-
-    # set default aliases
-    $default_aliases.keys | ForEach-Object { reset_alias $_ $default_aliases[$_] }
-}
-
 # convert list of apps to list of ($app, $global) tuples
 function applist($apps, $global) {
     if(!$apps) { return @() }
@@ -959,7 +921,7 @@ function show_app($app, $bucket, $version) {
 
 function last_scoop_update() {
     # PowerShell 6 returns an DateTime Object
-    $last_update = (scoop config lastupdate)
+    $last_update = (get_config lastupdate)
 
     if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
         try {
@@ -975,7 +937,7 @@ function is_scoop_outdated() {
     $last_update = $(last_scoop_update)
     $now = [System.DateTime]::Now
     if($null -eq $last_update) {
-        scoop config lastupdate $now.ToString('o')
+        set_config lastupdate $now.ToString('o')
         # enforce an update for the first time
         return $true
     }
@@ -1046,6 +1008,10 @@ function get_hash([String] $multihash) {
     return $type, $hash.ToLower()
 }
 
+function Get-GitHubToken {
+    return $env:SCOOP_GH_TOKEN, (get_config 'gh_token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+}
+
 function handle_special_urls($url)
 {
     # FossHub.com
@@ -1071,6 +1037,18 @@ function handle_special_urls($url)
         # Reshapes the URL to avoid redirections
         $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
     }
+
+    # Github.com
+    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = Get-GitHubToken)) {
+        $headers = @{ "Authorization" = "token $token" }
+        $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
+        $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
+
+        if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
+            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
+        }
+    }
+
     return $url
 }
 
@@ -1101,14 +1079,25 @@ function Out-UTF8File {
         [Parameter(Mandatory = $True, Position = 0)]
         [Alias("Path")]
         [String] $FilePath,
+        [Switch] $Append,
+        [Switch] $NoNewLine,
         [Parameter(ValueFromPipeline = $True)]
         [PSObject] $InputObject
     )
     process {
-        # Ref: https://stackoverflow.com/questions/5596982
-        # Performance Note: `WriteAllLines` throttles memory usage while
-        # `WriteAllText` needs to keep the complete string in memory.
-        [System.IO.File]::WriteAllLines($FilePath, $InputObject)
+        if ($Append) {
+            [System.IO.File]::AppendAllText($FilePath, $InputObject)
+        } else {
+            if (!$NoNewLine) {
+                # Ref: https://stackoverflow.com/questions/5596982
+                # Performance Note: `WriteAllLines` throttles memory usage while
+                # `WriteAllText` needs to keep the complete string in memory.
+                [System.IO.File]::WriteAllLines($FilePath, $InputObject)
+            } else {
+                # However `WriteAllText` does not add ending newline.
+                [System.IO.File]::WriteAllText($FilePath, $InputObject)
+            }
+        }
     }
 }
 

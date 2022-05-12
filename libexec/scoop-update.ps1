@@ -14,18 +14,15 @@
 #   -q, --quiet               Hide extraneous messages
 #   -a, --all                 Update all apps (alternative to '*')
 
-. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\json.ps1" # 'save_install_info' in 'manifest.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
-. "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
-
-reset_aliases
 
 $opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
 if ($err) { "scoop update: $err"; exit 1 }
@@ -111,7 +108,7 @@ function update_scoop() {
 
         $res = $lastexitcode
         if ($show_update_log) {
-            Invoke-Expression "git -C '$currentdir' --no-pager log --no-decorate --grep='^chore' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            Invoke-Expression "git -C '$currentdir' --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
         if ($res -ne 0) {
@@ -148,7 +145,7 @@ function update_scoop() {
         $previousCommit = (Invoke-Expression "git -C '$bucketLoc' rev-parse HEAD")
         git_cmd -C "`"$bucketLoc`"" pull -q
         if ($show_update_log) {
-            Invoke-Expression "git -C '$bucketLoc' --no-pager log --no-decorate --grep='^chore' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            Invoke-Expression "git -C '$bucketLoc' --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
     }
 

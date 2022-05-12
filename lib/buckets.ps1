@@ -1,5 +1,3 @@
-. "$PSScriptRoot\core.ps1"
-
 $bucketsdir = "$scoopdir\buckets"
 
 function Find-BucketDirectory {
@@ -18,7 +16,9 @@ function Find-BucketDirectory {
     )
 
     # Handle info passing empty string as bucket ($install.bucket)
-    if(($null -eq $Name) -or ($Name -eq '')) { $Name = 'main' }
+    if (($null -eq $Name) -or ($Name -eq '')) {
+        $Name = 'main'
+    }
     $bucket = "$bucketsdir\$Name"
 
     if ((Test-Path "$bucket\bucket") -and !$Root) {
@@ -37,7 +37,7 @@ function bucketdir($name) {
 function known_bucket_repos {
     $json = "$PSScriptRoot\..\buckets.json"
 
-    return Get-Content $json -raw | convertfrom-json -ea stop
+    return Get-Content $json -Raw | ConvertFrom-Json -ErrorAction stop
 }
 
 function known_bucket_repo($name) {
@@ -46,11 +46,11 @@ function known_bucket_repo($name) {
 }
 
 function known_buckets {
-    known_bucket_repos | ForEach-Object { $_.psobject.properties | Select-Object -expand 'name' }
+    known_bucket_repos | ForEach-Object { $_.PSObject.Properties | Select-Object -Expand 'name' }
 }
 
 function apps_in_bucket($dir) {
-    return Get-ChildItem $dir | Where-Object { $_.Name.endswith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
+    return Get-ChildItem $dir | Where-Object { $_.Name.EndsWith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
 }
 
 function Get-LocalBucket {
@@ -58,8 +58,12 @@ function Get-LocalBucket {
     .SYNOPSIS
         List all local buckets.
     #>
-
-    return (Get-ChildItem -Directory $bucketsdir).Name
+    $bucketNames = (Get-ChildItem -Path $bucketsdir -Directory).Name
+    if ($null -eq $bucketNames) {
+        return @() # Return a zero-length list instead of $null.
+    } else {
+        return $bucketNames
+    }
 }
 
 function buckets {
@@ -68,57 +72,126 @@ function buckets {
     return Get-LocalBucket
 }
 
-function find_manifest($app, $bucket) {
-    if ($bucket) {
-        $manifest = manifest $app $bucket
-        if ($manifest) { return $manifest, $bucket }
-        return $null
+function Find-Manifest($app, $bucket) {
+    $manifest, $url = $null, $null
+
+    # check if app is a URL or UNC path
+    if ($app -match '^(ht|f)tps?://|\\\\') {
+        $url = $app
+        $app = appname_from_url $url
+        $manifest = url_manifest $url
+    } else {
+        if ($bucket) {
+            $manifest = manifest $app $bucket
+        } else {
+            foreach ($bucket in Get-LocalBucket) {
+                $manifest = manifest $app $bucket
+                if ($manifest) { break }
+            }
+        }
+
+        if (!$manifest) {
+            # couldn't find app in buckets: check if it's a local path
+            $path = $app
+            if (!$path.endswith('.json')) { $path += '.json' }
+            if (Test-Path $path) {
+                $url = "$(Resolve-Path $path)"
+                $app = appname_from_url $url
+                $manifest, $bucket = url_manifest $url
+            }
+        }
     }
 
-    foreach($bucket in Get-LocalBucket) {
-        $manifest = manifest $app $bucket
-        if($manifest) { return $manifest, $bucket }
+    return $app, $manifest, $bucket, $url
+}
+
+function Convert-RepositoryUri {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline = $true)]
+        [String] $Uri
+    )
+
+    process {
+        # https://git-scm.com/docs/git-clone#_git_urls
+        # https://regex101.com/r/xGmwRr/1
+        if ($Uri -match '(?:@|/{1,3})(?:www\.|.*@)?(?<provider>[^/]+?)(?::\d+)?[:/](?<user>.+)/(?<repo>.+?)(?:\.git)?/?$') {
+            $Matches.provider, $Matches.user, $Matches.repo -join '/'
+        } else {
+            error "$Uri is not a valid Git URL!"
+            error "Please see https://git-scm.com/docs/git-clone#_git_urls for valid ones."
+            return $null
+        }
     }
+}
+
+function list_buckets {
+    $buckets = @()
+    Get-LocalBucket | ForEach-Object {
+        $bucket = [Ordered]@{ Name = $_ }
+        $path = Find-BucketDirectory $_ -Root
+        if ((Test-Path (Join-Path $path '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
+            $bucket.Source = git -C $path config remote.origin.url
+            $bucket.Updated = git -C $path log --format='%aD' -n 1 | Get-Date
+        } else {
+            $bucket.Source = friendly_path $path
+            $bucket.Updated = (Get-Item "$path\bucket").LastWriteTime
+        }
+        $bucket.Manifests = Get-ChildItem "$path\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
+                Measure-Object | Select-Object -ExpandProperty Count
+        $buckets += [PSCustomObject]$bucket
+    }
+    $buckets
 }
 
 function add_bucket($name, $repo) {
-    if (!$name) { "<name> missing"; $usage_add; exit 1 }
-    if (!$repo) {
-        $repo = known_bucket_repo $name
-        if (!$repo) { "Unknown bucket '$name'. Try specifying <repo>."; $usage_add; exit 1 }
-    }
-
     if (!(Test-CommandAvailable git)) {
-        abort "Git is required for buckets. Run 'scoop install git' and try again."
+        error "Git is required for buckets. Run 'scoop install git' and try again."
+        return 1
     }
 
     $dir = Find-BucketDirectory $name -Root
-    if (test-path $dir) {
+    if (Test-Path $dir) {
         warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
-        exit 0
+        return 2
     }
 
-    write-host 'Checking repo... ' -nonewline
+    $uni_repo = Convert-RepositoryUri -Uri $repo
+    if ($null -eq $uni_repo) {
+        return 1
+    }
+    foreach ($bucket in Get-LocalBucket) {
+        $remote = git -C "$bucketsdir\$bucket" config --get remote.origin.url
+        if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
+            warn "Bucket $bucket already exists for $repo"
+            return 2
+        }
+    }
+
+    Write-Host 'Checking repo... ' -NoNewline
     $out = git_cmd ls-remote $repo 2>&1
-    if ($lastexitcode -ne 0) {
-        abort "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
+    if ($LASTEXITCODE -ne 0) {
+        error "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
+        return 1
     }
-    write-host 'ok'
+    Write-Host 'OK'
 
-    ensure $bucketsdir > $null
+    ensure $bucketsdir | Out-Null
     $dir = ensure $dir
     git_cmd clone "$repo" "`"$dir`"" -q
     success "The $name bucket was added successfully."
+    return 0
 }
 
 function rm_bucket($name) {
-    if (!$name) { "<name> missing"; $usage_rm; exit 1 }
     $dir = Find-BucketDirectory $name -Root
-    if (!(test-path $dir)) {
-        abort "'$name' bucket not found."
+    if (!(Test-Path $dir)) {
+        error "'$name' bucket not found."
+        return 1
     }
 
-    Remove-Item $dir -r -force -ea stop
+    Remove-Item $dir -Recurse -Force -ErrorAction Stop
+    return 0
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {
@@ -126,7 +199,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
-    if (Test-path $bucket_path) {
+    if (Test-Path $bucket_path) {
         $remote = Invoke-Expression "git -C '$bucket_path' config --get remote.origin.url"
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
@@ -135,7 +208,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
         $url = "https://$($Matches.Provider)/$($Matches.User)/$($Matches.Repo)"
     }
 
-    if(!$url) { return 'Please contact the bucket maintainer!' }
+    if (!$url) { return 'Please contact the bucket maintainer!' }
 
     # Print only github repositories
     if ($url -like '*github*') {
@@ -143,7 +216,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
         $body = [System.Web.HttpUtility]::UrlEncode($body)
         $url = $url -replace '\.git$', ''
         $url = "$url/issues/new?title=$title"
-        if($body) {
+        if ($body) {
             $url += "&body=$body"
         }
     }

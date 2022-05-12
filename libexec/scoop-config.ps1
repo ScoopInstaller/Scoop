@@ -76,10 +76,10 @@
 # cachePath:
 #       For downloads, defaults to 'cache' folder under Scoop root directory.
 #
-# checkver_token:
+# gh_token:
 #       GitHub API token used to make authenticated requests.
-#       This is essential for checkver and similar functions
-#       to run without incurring rate limits.
+#       This is essential for checkver and similar functions to run without
+#       incurring rate limits and download from private repositories.
 #
 # virustotal_api_key:
 #       API key used for uploading/scanning files using virustotal.
@@ -95,6 +95,11 @@
 #       When set to $false (default), Scoop would stop its procedure immediately if it detects
 #       any target app process is running. Procedure here refers to reset/uninstall/update.
 #       When set to $true, Scoop only displays a warning message and continues procedure.
+#
+# private_hosts:
+#       Array of private hosts that need additional authentication.
+#       For example, if you want to access a private GitHub repository,
+#       you need to add the host to this list with 'match' and 'headers' strings.
 #
 # ARIA2 configuration
 # -------------------
@@ -126,11 +131,6 @@
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#options'
 
 param($name, $value)
-
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-
-reset_aliases
 
 if (!$name) {
     $scoopConfig

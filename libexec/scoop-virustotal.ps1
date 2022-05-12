@@ -34,26 +34,20 @@
 #   -n, --no-depends          By default, all dependencies are checked too. This flag avoids it.
 #   -u, --no-update-scoop     Don't update Scoop before checking if it's outdated
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\json.ps1"
-. "$PSScriptRoot\..\lib\decompress.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\depends.ps1"
-
-reset_aliases
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Find-Manifest' (indirectly)
+. "$PSScriptRoot\..\lib\json.ps1" # 'json_path'
+. "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
 $opt, $apps, $err = getopt $args 'a:snu' @('arch=', 'scan', 'no-depends', 'no-update-scoop')
-if($err) { "scoop virustotal: $err"; exit 1 }
-if(!$apps) { my_usage; exit 1 }
+if ($err) { "scoop virustotal: $err"; exit 1 }
+if (!$apps) { my_usage; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
 
 if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
-        warn "Scoop is out of date."
+        warn 'Scoop is out of date.'
     } else {
         scoop update
     }
@@ -61,7 +55,7 @@ if (is_scoop_outdated) {
 
 $apps_param = $apps
 
-if($apps_param -eq '*') {
+if ($apps_param -eq '*') {
     $apps = installed_apps $false
     $apps += installed_apps $true
 }
@@ -99,13 +93,13 @@ Function Get-VirusTotalResult($hash, $app) {
     $unsafe = [int]$malicious + [int]$suspicious
     $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
     switch ($unsafe) {
-        0 { if ($undetected -eq 0) { $fg = "Yellow" } else { $fg = "DarkGreen" } }
-        1 { $fg = "DarkYellow" }
-        2 { $fg = "Yellow" }
-        default { $fg = "Red" }
+        0 { if ($undetected -eq 0) { $fg = 'Yellow' } else { $fg = 'DarkGreen' } }
+        1 { $fg = 'DarkYellow' }
+        2 { $fg = 'Yellow' }
+        default { $fg = 'Red' }
     }
-    write-host -f $fg "$app`: $unsafe/$undetected, $see_url"
-    if($unsafe -gt 0) {
+    Write-Host -f $fg "$app`: $unsafe/$undetected, $see_url"
+    if ($unsafe -gt 0) {
         return $_ERR_UNSAFE
     }
     return 0
@@ -132,16 +126,15 @@ Function Submit-RedirectedUrl {
     # Adapted according to Roy's response (January 23, 2014 at 11:59 am)
     # Adapted to always return an URL
     Param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]$URL
     )
     $request = [System.Net.WebRequest]::Create($url)
-    $request.AllowAutoRedirect=$false
-    $response=$request.GetResponse()
+    $request.AllowAutoRedirect = $false
+    $response = $request.GetResponse()
     if (([int]$response.StatusCode -ge 300) -and ([int]$response.StatusCode -lt 400)) {
-        $redir = $response.GetResponseHeader("Location")
-    }
-    else {
+        $redir = $response.GetResponseHeader('Location')
+    } else {
         $redir = $URL
     }
     $response.Close()
@@ -158,8 +151,8 @@ Function Submit-RedirectedUrl {
 #              submitting the file after a delay if the rate limit is
 #              exceeded, without risking an infinite loop (as stack
 #              overflow) if the submission keeps failing.
-Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
-    $api_key = get_config("virustotal_api_key")
+Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
+    $api_key = get_config virustotal_api_key
     if ($do_scan -and !$api_key -and !$warned_no_api_key) {
         $warned_no_api_key = $true
         info "Submitting unknown apps needs a VirusTotal API key.  " +
@@ -209,7 +202,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying=$False) {
 $apps | ForEach-Object {
     $app = $_
     # write-host $app
-    $manifest, $bucket = find_manifest $app
+    $null, $manifest, $bucket, $null = Find-Manifest $app
     if(!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
         warn "$app`: manifest not found"

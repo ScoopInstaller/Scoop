@@ -2,18 +2,16 @@
 # Summary: Returns the path to the specified app
 param($app)
 
+. "$PSScriptRoot\..\lib\versions.ps1" # 'currentdir' (indirectly)
+
 if (!$app) {
-    . "$PSScriptRoot\..\lib\help.ps1"
     my_usage
     exit 1
 }
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
-
 $app_path = currentdir $app $false
 if (!(Test-Path $app_path)) {
-    $app_path = currentdir $app$true
+    $app_path = currentdir $app $true
 }
 
 if (Test-Path $app_path) {

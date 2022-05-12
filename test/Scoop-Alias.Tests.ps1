@@ -1,14 +1,15 @@
+. "$PSScriptRoot\Scoop-TestLib.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\libexec\scoop-alias.ps1" | Out-Null
 
-reset_aliases
-
 Describe 'add_alias' -Tag 'Scoop' {
-    Mock shimdir { 'TestDrive:\shim' }
+    Mock shimdir { "$env:TEMP\shims" }
     Mock set_config { }
     Mock get_config { @{} }
 
     $shimdir = shimdir
-    mkdir $shimdir
+    ensure $shimdir
 
     Context "alias doesn't exist" {
         It 'creates a new alias' {
@@ -23,7 +24,7 @@ Describe 'add_alias' -Tag 'Scoop' {
     Context 'alias exists' {
         It 'does not change existing alias' {
             $alias_file = "$shimdir\scoop-rm.ps1"
-            New-Item $alias_file -type file
+            New-Item $alias_file -Type File -Force
             $alias_file | Should -Exist
 
             add_alias 'rm' 'test'
@@ -33,12 +34,12 @@ Describe 'add_alias' -Tag 'Scoop' {
 }
 
 Describe 'rm_alias' -Tag 'Scoop' {
-    Mock shimdir { 'TestDrive:\shim' }
+    Mock shimdir { "$env:TEMP\shims" }
     Mock set_config { }
     Mock get_config { @{} }
 
     $shimdir = shimdir
-    mkdir $shimdir
+    ensure $shimdir
 
     Context 'alias exists' {
         It 'removes an existing alias' {

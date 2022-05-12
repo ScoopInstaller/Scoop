@@ -64,7 +64,7 @@ Describe 'Manifest Validator' -Tag 'Validator' {
             $validator.Validate("$working_dir\invalid_wget.json") | Should -BeFalse
             $validator.Errors.Count | Should -Be 16
             $validator.Errors | Select-Object -First 1 | Should -Match "Property 'randomproperty' has not been defined and the schema does not allow additional properties\."
-            $validator.Errors | Select-Object -Last 1 | Should -Match 'Required properties are missing from object: version, description\.'
+            $validator.Errors | Select-Object -Last 1 | Should -Match 'Required properties are missing from object: version\.'
         }
     }
 }
@@ -125,4 +125,3 @@ Describe 'manifest validates against the schema' -Tag 'Manifests' {
         }
     }
 }
-

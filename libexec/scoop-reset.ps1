@@ -4,15 +4,12 @@
 # if you've installed 'python' and 'python27', you can use 'scoop reset' to switch between
 # using one or the other.
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 
-reset_aliases
 $opt, $apps, $err = getopt $args
 if($err) { "scoop reset: $err"; exit 1 }
 

@@ -3,12 +3,9 @@
 # Help: Lists all installed apps, or the apps matching the supplied query.
 param($query)
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'parse_json' 'Select-CurrentVersion' (indirectly)
 
-reset_aliases
 $def_arch = default_architecture
 if (-not (Get-FormatData ScoopApps)) {
     Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"

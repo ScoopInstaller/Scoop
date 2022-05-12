@@ -1,6 +1,3 @@
-. "$PSScriptRoot\core.ps1"
-. "$PSScriptRoot\autoupdate.ps1"
-
 function manifest_path($app, $bucket) {
     fullpath "$(Find-BucketDirectory $bucket)\$(sanitary_path $app).json"
 }
@@ -48,7 +45,7 @@ function save_install_info($info, $dir) {
     $nulls = $info.keys | Where-Object { $null -eq $info[$_] }
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
-    $file_content = $info | ConvertToPrettyJson
+    $file_content = $info | ConvertToPrettyJson # in 'json.ps1'
     [System.IO.File]::WriteAllLines("$dir\install.json", $file_content)
 }
 
@@ -88,7 +85,7 @@ function supports_architecture($manifest, $architecture) {
     return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
 }
 
-function generate_user_manifest($app, $bucket, $version) {
+function generate_user_manifest($app, $bucket, $version) { # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
     $null, $manifest, $bucket, $null = Find-Manifest $app $bucket
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket
