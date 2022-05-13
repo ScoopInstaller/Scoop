@@ -71,6 +71,8 @@ if (!$apps) { exit 0 }
         $install = install_info $app $version $global
         $architecture = $install.architecture
 
+        pre_uninstall $manifest $architecture
+
         run_uninstaller $manifest $architecture $dir
         rm_shims $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
@@ -95,6 +97,8 @@ if (!$apps) { exit 0 }
                 continue
             }
         }
+
+        post_uninstall $manifest $architecture
     }
     # remove older versions
     $oldVersions = @(Get-ChildItem $appDir -Name -Exclude 'current')
