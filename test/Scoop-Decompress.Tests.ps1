@@ -22,7 +22,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         It 'Decompression test cases should exist' {
             $testcases = "$working_dir\TestCases.zip"
             $testcases | Should -Exist
-            compute_hash $testcases 'sha256' | Should -Be '058537b0fd37b2b0be68620e207331132440bcde4c4bc6e838d6393f285da0e0'
+            compute_hash $testcases 'sha256' | Should -Be '5f10dbb3033c3b51f0926d79a0b226103419e45a2485a8965cfa9799df9113e3'
             if (!$isUnix) {
                 Microsoft.PowerShell.Archive\Expand-Archive $testcases $working_dir
             }
