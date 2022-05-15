@@ -65,6 +65,11 @@ function Expand-7zipArchive {
     if ($Removal) {
         # Remove original archive file
         Remove-Item $Path -Force
+        if ([System.IO.Path]::GetExtension($Path) -eq '.001') {
+            # Remove remaining 7-zip archive parts
+            $FileNameWithoutExt = [System.IO.Path]::GetFileNameWithoutExtension($Path)
+            Get-ChildItem $([System.IO.Path]::GetDirectoryName($Path)) | Where {$_ -match ([Regex]::Escape($FileNameWithoutExt)+'\.\d{3}$')} | Remove-Item
+        }
     }
 }
 
