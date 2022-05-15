@@ -79,7 +79,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             test_extract 'Expand-7zipArchive' $test1 $true
             $test1 | Should -Not -Exist
         }
-        
+
         It 'extract splited 7z archives (.001, .002, ...) with "-Removal" switch' -Skip:$isUnix {
             $test5_1 | Should -Exist
             $test5_2 | Should -Exist
