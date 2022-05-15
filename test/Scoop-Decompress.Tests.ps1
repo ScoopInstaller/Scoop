@@ -22,7 +22,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         It 'Decompression test cases should exist' {
             $testcases = "$working_dir\TestCases.zip"
             $testcases | Should -Exist
-            compute_hash $testcases 'sha256' | Should -Be '5f10dbb3033c3b51f0926d79a0b226103419e45a2485a8965cfa9799df9113e3'
+            compute_hash $testcases 'sha256' | Should -Be '16507166814dbd02be80c14b737eb6b0245c47439ca3ed308b5625d64babecc8'
             if (!$isUnix) {
                 Microsoft.PowerShell.Archive\Expand-Archive $testcases $working_dir
             }
@@ -74,13 +74,17 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
+        It 'extract splited 7z archives (.001, .002, ...)' -Skip:$isUnix {
+            $to = test_extract 'Expand-7zipArchive' $test5_1
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
         It 'works with "-Removal" switch ($removal param)' -Skip:$isUnix {
             $test1 | Should -Exist
             test_extract 'Expand-7zipArchive' $test1 $true
             $test1 | Should -Not -Exist
-        }
-
-        It 'extract splited 7z archives (.001, .002, ...) with "-Removal" switch' -Skip:$isUnix {
             $test5_1 | Should -Exist
             $test5_2 | Should -Exist
             $test5_3 | Should -Exist
