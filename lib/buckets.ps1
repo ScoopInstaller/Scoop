@@ -109,6 +109,7 @@ function Convert-RepositoryUri {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, Position = 0, ValueFromPipeline = $true)]
+        [AllowEmptyString()]
         [String] $Uri
     )
 
@@ -161,10 +162,12 @@ function add_bucket($name, $repo) {
         return 1
     }
     foreach ($bucket in Get-LocalBucket) {
-        $remote = git -C "$bucketsdir\$bucket" config --get remote.origin.url
-        if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
-            warn "Bucket $bucket already exists for $repo"
-            return 2
+        if (Test-Path -Path "$bucketsdir\$bucket\.git") {
+            $remote = git -C "$bucketsdir\$bucket" config --get remote.origin.url
+            if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
+                warn "Bucket $bucket already exists for $repo"
+                return 2
+            }
         }
     }
 
