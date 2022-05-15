@@ -3,13 +3,9 @@
 # Options:
 #   -v, --verbose       Show full paths and URLs
 
-. "$PSScriptRoot\..\lib\help.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
-
-reset_aliases
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Find-Manifest' (indirectly)
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
 if ($err) { error "scoop info: $err"; exit 1 }

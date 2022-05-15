@@ -5,12 +5,9 @@
 # If used with [query], shows app names that match the query.
 # Without [query], shows all the available apps.
 param($query)
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
 
-reset_aliases
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest'
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Get-LatestVersion'
 
 function bin_match($manifest, $query) {
     if(!$manifest.bin) { return $false }

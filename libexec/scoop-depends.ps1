@@ -1,15 +1,9 @@
 # Usage: scoop depends <app>
 # Summary: List dependencies for an app
 
-. "$PSScriptRoot\..\lib\depends.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\decompress.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-
-reset_aliases
+. "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture'
 
 $opt, $apps, $err = getopt $args 'a:' 'arch='
 $app = $apps[0]

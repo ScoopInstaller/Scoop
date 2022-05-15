@@ -3,28 +3,25 @@
 # Help: 'scoop cleanup' cleans Scoop apps by removing old versions.
 # 'scoop cleanup <app>' cleans up the old versions of that app if said versions exist.
 #
-# You can use '*' in place of <app> to cleanup all apps.
+# You can use '*' in place of <app> or `-a`/`--all` switch to cleanup all apps.
 #
 # Options:
+#   -a, --all          Cleanup all apps (alternative to '*')
 #   -g, --global       Cleanup a globally installed app
 #   -k, --cache        Remove outdated download cache
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\install.ps1" # persist related
 
-reset_aliases
-
-$opt, $apps, $err = getopt $args 'gk' 'global', 'cache'
+$opt, $apps, $err = getopt $args 'agk' 'all', 'global', 'cache'
 if ($err) { "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
+$all = $opt.a -or $opt.all
 
-if (!$apps) { 'ERROR: <app> missing'; my_usage; exit 1 }
+if (!$apps -and !$all) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
 if ($global -and !(is_admin)) {
     'ERROR: you need admin rights to cleanup global apps'; exit 1
@@ -64,8 +61,8 @@ function cleanup($app, $global, $verbose, $cache) {
     Write-Host ''
 }
 
-if ($apps) {
-    if ($apps -eq '*') {
+if ($apps -or $all) {
+    if ($apps -eq '*' -or $all) {
         $verbose = $false
         $apps = applist (installed_apps $false) $false
         if ($global) {

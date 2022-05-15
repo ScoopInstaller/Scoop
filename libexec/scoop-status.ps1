@@ -1,31 +1,24 @@
 # Usage: scoop status
 # Summary: Show status and check for new app versions
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
-. "$PSScriptRoot\..\lib\depends.ps1"
-
-reset_aliases
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest' 'parse_json' "install_info"
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 
 # check if scoop needs updating
 $currentdir = fullpath $(versiondir 'scoop' 'current')
 $needs_update = $false
 
-if(Test-Path "$currentdir\.git") {
+if (Test-Path "$currentdir\.git") {
     git_cmd -C "`"$currentdir`"" fetch -q origin
-    $commits = $(git -C $currentdir log "HEAD..origin/$(scoop config SCOOP_BRANCH)" --oneline)
-    if($commits) { $needs_update = $true }
-}
-else {
+    $commits = $(git -C $currentdir log "HEAD..origin/$(get_config SCOOP_BRANCH)" --oneline)
+    if ($commits) { $needs_update = $true }
+} else {
     $needs_update = $true
 }
 
-if($needs_update) {
+if ($needs_update) {
     warn "Scoop is out of date. Run 'scoop update' to get the latest changes."
-}
-else { success "Scoop is up to date."}
+} else { success 'Scoop is up to date.' }
 
 $failed = @()
 $outdated = @()
@@ -36,30 +29,30 @@ $onhold = @()
 $true, $false | ForEach-Object { # local and global apps
     $global = $_
     $dir = appsdir $global
-    if(!(Test-Path $dir)) { return }
+    if (!(Test-Path $dir)) { return }
 
-    Get-ChildItem $dir | Where-Object name -ne 'scoop' | ForEach-Object {
+    Get-ChildItem $dir | Where-Object name -NE 'scoop' | ForEach-Object {
         $app = $_.name
         $status = app_status $app $global
-        if($status.failed) {
+        if ($status.failed) {
             $failed += @{ $app = $status.version }
         }
-        if($status.removed) {
+        if ($status.removed) {
             $removed += @{ $app = $status.version }
         }
-        if($status.outdated) {
+        if ($status.outdated) {
             $outdated += @{ $app = @($status.version, $status.latest_version) }
-            if($status.hold) {
+            if ($status.hold) {
                 $onhold += @{ $app = @($status.version, $status.latest_version) }
             }
         }
-        if($status.missing_deps) {
-            $missing_deps += ,(@($app) + @($status.missing_deps))
+        if ($status.missing_deps) {
+            $missing_deps += , (@($app) + @($status.missing_deps))
         }
     }
 }
 
-if($outdated) {
+if ($outdated) {
     Write-Host -f DarkCyan 'Updates are available for:'
     $outdated.keys | ForEach-Object {
         $versions = $outdated.$_
@@ -67,7 +60,7 @@ if($outdated) {
     }
 }
 
-if($onhold) {
+if ($onhold) {
     Write-Host -f DarkCyan 'These apps are outdated and on hold:'
     $onhold.keys | ForEach-Object {
         $versions = $onhold.$_
@@ -75,21 +68,21 @@ if($onhold) {
     }
 }
 
-if($removed) {
+if ($removed) {
     Write-Host -f DarkCyan 'These app manifests have been removed:'
     $removed.keys | ForEach-Object {
         "    $_"
     }
 }
 
-if($failed) {
+if ($failed) {
     Write-Host -f DarkCyan 'These apps failed to install:'
     $failed.keys | ForEach-Object {
         "    $_"
     }
 }
 
-if($missing_deps) {
+if ($missing_deps) {
     Write-Host -f DarkCyan 'Missing runtime dependencies:'
     $missing_deps | ForEach-Object {
         $app, $deps = $_
@@ -97,8 +90,8 @@ if($missing_deps) {
     }
 }
 
-if(!$old -and !$removed -and !$failed -and !$missing_deps -and !$needs_update) {
-    success "Everything is ok!"
+if (!$old -and !$removed -and !$failed -and !$missing_deps -and !$needs_update) {
+    success 'Everything is ok!'
 }
 
 exit 0

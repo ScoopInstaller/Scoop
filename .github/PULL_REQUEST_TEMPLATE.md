@@ -29,5 +29,7 @@ Relates to #XXXX
 <!-- Go over all the following points, and put an `x` in all the boxes that apply. -->
 <!-- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
 - [ ] I have read the [Contributing Guide](https://github.com/ScoopInstaller/.github/blob/main/.github/CONTRIBUTING.md).
+- [ ] I have ensured that I am targeting the `develop` branch.
 - [ ] I have updated the documentation accordingly.
 - [ ] I have updated the tests accordingly.
+- [ ] I have added an entry in the CHANGELOG.

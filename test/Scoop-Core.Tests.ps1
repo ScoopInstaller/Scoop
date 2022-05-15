@@ -1,7 +1,7 @@
+. "$PSScriptRoot\Scoop-TestLib.ps1"
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\unix.ps1"
-. "$PSScriptRoot\Scoop-TestLib.ps1"
 
 $repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
 $isUnix = is_unix
@@ -234,12 +234,12 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop' {
     }
 
     It 'returns app name if file exists and is a shim to an app' -Skip:$isUnix {
-        mkdir -p "$working_dir/mockapp/current/"
+        ensure "$working_dir/mockapp/current/"
         Write-Output '' | Out-File "$working_dir/mockapp/current/mockapp1.ps1"
         shim "$working_dir/mockapp/current/mockapp1.ps1" $false 'shim-test1'
         $shim_path1 = (Get-Command 'shim-test1.ps1').Path
         get_app_name_from_shim "$shim_path1" | Should -Be 'mockapp'
-        mkdir -p "$working_dir/mockapp/1.0.0/"
+        ensure "$working_dir/mockapp/1.0.0/"
         Write-Output '' | Out-File "$working_dir/mockapp/1.0.0/mockapp2.ps1"
         shim "$working_dir/mockapp/1.0.0/mockapp2.ps1" $false 'shim-test2'
         $shim_path2 = (Get-Command 'shim-test2.ps1').Path
@@ -266,10 +266,6 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop' {
 Describe 'ensure_robocopy_in_path' -Tag 'Scoop' {
     $shimdir = shimdir $false
     Mock versiondir { $repo_dir }
-
-    BeforeAll {
-        reset_aliases
-    }
 
     Context 'robocopy is not in path' {
         It 'shims robocopy when not on path' -Skip:$isUnix {
