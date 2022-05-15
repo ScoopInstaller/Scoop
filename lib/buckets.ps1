@@ -177,11 +177,10 @@ function add_bucket($name, $repo) {
         error "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
         return 1
     }
-    Write-Host 'OK'
-
     ensure $bucketsdir | Out-Null
     $dir = ensure $dir
     git_cmd clone "$repo" "`"$dir`"" -q
+    Write-Host 'OK'
     success "The $name bucket was added successfully."
     return 0
 }
