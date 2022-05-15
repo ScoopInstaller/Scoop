@@ -41,6 +41,9 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             $test2 = "$working_dir\7ZipTest2.tgz"
             $test3 = "$working_dir\7ZipTest3.tar.bz2"
             $test4 = "$working_dir\7ZipTest4.tar.gz"
+            $test5_1 = "$working_dir\7ZipTest5.7z.001"
+            $test5_2 = "$working_dir\7ZipTest5.7z.002"
+            $test5_3 = "$working_dir\7ZipTest5.7z.003"
         }
 
         It 'extract normal compressed file' -Skip:$isUnix {
@@ -75,6 +78,16 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             $test1 | Should -Exist
             test_extract 'Expand-7zipArchive' $test1 $true
             $test1 | Should -Not -Exist
+        }
+        
+        It 'extract splited 7z archives (.001, .002, ...) with "-Removal" switch' -Skip:$isUnix {
+            $test5_1 | Should -Exist
+            $test5_2 | Should -Exist
+            $test5_3 | Should -Exist
+            test_extract 'Expand-7zipArchive' $test5_1 $true
+            $test5_1 | Should -Not -Exist
+            $test5_2 | Should -Not -Exist
+            $test5_3 | Should -Not -Exist
         }
     }
 
