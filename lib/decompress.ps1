@@ -64,7 +64,12 @@ function Expand-7zipArchive {
     }
     if ($Removal) {
         # Remove original archive file
-        Remove-Item $Path -Force
+        if (($Path -replace '.*\.([^\.]*)$', '$1') -eq '001') {
+            # Remove splited 7-zip archive parts
+            Get-ChildItem "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
+        } else {
+            Remove-Item $Path -Force
+        }
     }
 }
 
