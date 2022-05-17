@@ -679,19 +679,11 @@ function shim($path, $global, $name, $arg) {
         @(
             "@rem $resolved_path",
             "@echo off",
-            "setlocal enabledelayedexpansion",
-            "set args=%*",
-            ":: replace problem characters in arguments",
-            "set args=%args:`"='%",
-            "set args=%args:(=``(%",
-            "set args=%args:)=``)%",
-            "set invalid=`"='",
-            "if !args! == !invalid! ( set args= )",
             "where /q pwsh.exe",
             "if %errorlevel% equ 0 (",
-            "    pwsh -noprofile -ex unrestricted -file `"$resolved_path`" $arg %args%",
+            "    pwsh -noprofile -ex unrestricted -file `"$resolved_path`" $arg %*",
             ") else (",
-            "    powershell -noprofile -ex unrestricted -file `"$resolved_path`" $arg %args%",
+            "    powershell -noprofile -ex unrestricted -file `"$resolved_path`" $arg %*",
             ")"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
