@@ -1109,19 +1109,6 @@ function Out-UTF8File {
 #       for all communication with api.github.com
 Optimize-SecurityProtocol
 
-# Scoop root directory
-$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
-
-# Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
-
-# Scoop cache directory
-# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
-#       is experimental and untested. There may be concurrency issues when
-#       multiple users write and access cached files at the same time.
-#       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
-
 # Scoop config file migration
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
@@ -1134,6 +1121,19 @@ if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
 
 # Load Scoop config
 $scoopConfig = load_cfg $configFile
+
+# Scoop root directory
+$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+
+# Scoop global apps directory
+$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
+
+# Scoop cache directory
+# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
+#       is experimental and untested. There may be concurrency issues when
+#       multiple users write and access cached files at the same time.
+#       Use at your own risk.
+$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
 
 # Setup proxy globally
 setup_proxy
