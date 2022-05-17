@@ -9,7 +9,7 @@ Describe 'Style constraints for non-binary project files' {
         # gather all files except '*.exe', '*.zip', or any .git repository files
         $repo_files |
             Where-Object { $_.fullname -inotmatch $($project_file_exclusions -join '|') } |
-            Where-Object { $_.fullname -inotmatch '(.exe|.zip|.dll)$' } |
+            Where-Object { $_.fullname -inotmatch '(.exe|.zip|.dll|.reg|.ps1)$' } |
             Where-Object { $_.fullname -inotmatch '(unformated)' }
     )
 
