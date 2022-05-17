@@ -30,7 +30,7 @@ if ($app -match '^(ht|f)tps?://|\\\\') {
 }
 
 if (!$manifest) {
-    abort "Could not find manifest for '$(show_app $app $bucket)'."
+    abort "Could not find manifest for '$(show_app $app)' in any buckets."
 }
 
 $install = install_info $app $status.version $global
