@@ -4,6 +4,7 @@
 - **depends:** Avoid digits in archive file extension (except for .7z and .001) ([#4915](https://github.com/ScoopInstaller/Scoop/issues/4915))
 - **bucket:** Don't check remote URL of non-git buckets ([#4923](https://github.com/ScoopInstaller/Scoop/issues/4923))
 - **bucket:** Don't write message OK before bucket is cloned ([#4925](https://github.com/ScoopInstaller/Scoop/issues/4925))
+- **scoop-info:** Fix error message when manifest is not found  ([#4928](https://github.com/ScoopInstaller/Scoop/issues/4928))
 
 ### Documentation
 
