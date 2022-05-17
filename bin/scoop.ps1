@@ -1,6 +1,8 @@
 #Requires -Version 5
-param($SubCommand)
-
+if ($Args.Count -gt 0) {
+    [string]$SubCommand = $Args[0]
+    [string[]]$arguments = $Args | Select-Object -Skip 1
+}
 Set-StrictMode -Off
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -15,14 +17,10 @@ Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForE
 }
 
 switch ($SubCommand) {
-    ({ $SubCommand -in @($null, '--help', '/?') }) {
-        if (!$SubCommand -and $Args -eq '-v') {
-            $SubCommand = '--version'
-        } else {
-            exec 'help'
-        }
+    ({ $SubCommand -in @($null, '-h', '--help', '/?') }) {
+        exec 'help'
     }
-    ({ $SubCommand -eq '--version' }) {
+    ({ $SubCommand -in @('-v', '--version') }) {
         Write-Host 'Current Scoop version:'
         if ((Test-CommandAvailable git) -and (Test-Path "$PSScriptRoot\..\.git") -and (get_config SCOOP_BRANCH 'master') -ne 'master') {
             Invoke-Expression "git -C '$PSScriptRoot\..' --no-pager log --oneline HEAD -n 1"
@@ -43,10 +41,10 @@ switch ($SubCommand) {
         }
     }
     ({ $SubCommand -in (commands) }) {
-        if ($Args -in @('-h', '--help', '/?')) {
+        if ($arguments.Count -gt 0 -and $arguments[0] -in @('-h', '--help', '/?')) {
             exec 'help' @($SubCommand)
         } else {
-            exec $SubCommand $Args
+            exec $SubCommand $arguments
         }
     }
     default {
