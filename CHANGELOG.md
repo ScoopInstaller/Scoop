@@ -7,6 +7,7 @@
 - **bucket:** Don't check remote URL of non-git buckets ([#4923](https://github.com/ScoopInstaller/Scoop/issues/4923))
 - **bucket:** Don't write message OK before bucket is cloned ([#4925](https://github.com/ScoopInstaller/Scoop/issues/4925))
 - **shim:** Remove character replacement in .cmd -> .ps1 shims ([#4914](https://github.com/ScoopInstaller/Scoop/issues/4914))
+- **scoop:** Pass CLI arguments as string objects ([#4931](https://github.com/ScoopInstaller/Scoop/issues/4931))
 - **scoop-info:** Fix error message when manifest is not found ([#4935](https://github.com/ScoopInstaller/Scoop/issues/4935))
 
 ### Documentation
