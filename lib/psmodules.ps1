@@ -26,7 +26,7 @@ function install_psmodule($manifest, $dir, $global) {
         Remove-Item -Path $linkfrom -Force -ErrorAction SilentlyContinue
     }
 
-    New-Item -Path $linkfrom -ItemType Junction -Value $dir | Out-Null
+    New-DirectoryJunction $linkfrom $dir | Out-Null
 }
 
 function uninstall_psmodule($manifest, $dir, $global) {

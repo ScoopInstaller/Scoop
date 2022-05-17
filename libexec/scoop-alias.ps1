@@ -23,9 +23,7 @@ param(
     [Switch]$verbose = $false
 )
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\install.ps1" # shim related
 
 $script:config_alias = 'alias'
 
@@ -96,7 +94,7 @@ function list_aliases {
     }
 
     if (!$aliases.count) {
-        warn 'No aliases founds.'
+        info "No alias found."
     }
     $aliases = $aliases.GetEnumerator() | Sort-Object Name
     if ($verbose) {

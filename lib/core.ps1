@@ -187,6 +187,9 @@ function filesize($length) {
     } elseif($length -gt $kb) {
         "{0:n1} KB" -f ($length / $kb)
     } else {
+        if ($null -eq $length) {
+            $length = 0
+       }
         "$($length) B"
     }
 }
@@ -918,7 +921,7 @@ function show_app($app, $bucket, $version) {
 
 function last_scoop_update() {
     # PowerShell 6 returns an DateTime Object
-    $last_update = (scoop config lastupdate)
+    $last_update = (get_config lastupdate)
 
     if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
         try {
@@ -934,7 +937,7 @@ function is_scoop_outdated() {
     $last_update = $(last_scoop_update)
     $now = [System.DateTime]::Now
     if($null -eq $last_update) {
-        scoop config lastupdate $now.ToString('o')
+        set_config lastupdate $now.ToString('o')
         # enforce an update for the first time
         return $true
     }
@@ -1005,6 +1008,10 @@ function get_hash([String] $multihash) {
     return $type, $hash.ToLower()
 }
 
+function Get-GitHubToken {
+    return $env:SCOOP_GH_TOKEN, (get_config 'gh_token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+}
+
 function handle_special_urls($url)
 {
     # FossHub.com
@@ -1030,6 +1037,18 @@ function handle_special_urls($url)
         # Reshapes the URL to avoid redirections
         $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
     }
+
+    # Github.com
+    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = Get-GitHubToken)) {
+        $headers = @{ "Authorization" = "token $token" }
+        $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
+        $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
+
+        if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
+            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
+        }
+    }
+
     return $url
 }
 

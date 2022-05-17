@@ -14,14 +14,13 @@
 #   -q, --quiet               Hide extraneous messages
 #   -a, --all                 Update all apps (alternative to '*')
 
-. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\json.ps1" # 'save_install_info' in 'manifest.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
-. "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 
@@ -134,9 +133,15 @@ function update_scoop() {
         if (!(Test-Path (Join-Path $bucketLoc '.git'))) {
             if ($bucket -eq 'main') {
                 # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
-                Write-Host " Converting 'main' bucket to git..."
-                rm_bucket 'main'
-                add_bucket 'main'
+                Write-Host " Converting 'main' bucket to git repo..."
+                $status = rm_bucket 'main'
+                if ($status -ne 0) {
+                    abort "Failed to remove local 'main' bucket."
+                }
+                $status = add_bucket 'main' (known_bucket_repo 'main')
+                if ($status -ne 0) {
+                    abort "Failed to add remote 'main' bucket."
+                }
             } else {
                 Write-Host "'$bucket' is not a git repository. Skipped."
             }

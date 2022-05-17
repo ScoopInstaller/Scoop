@@ -2,7 +2,7 @@
 # Summary: Manipulate Scoop shims
 # Help: Manipulate Scoop shims: add, rm, list, info, alter, etc.
 #
-# To add a costom shim, use the 'add' subcommand:
+# To add a custom shim, use the 'add' subcommand:
 #
 #     scoop shim add <shim_name> <command_path> [<args>...]
 #
@@ -29,7 +29,6 @@
 
 param($SubCommand, $ShimName, [Switch]$global)
 
-. "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
 
 if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {

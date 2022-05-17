@@ -17,6 +17,8 @@
     Updated manifests will not be shown.
 .PARAMETER Version
     Update manifest to specific version.
+.PARAMETER ThrowError
+    Throw error as exception instead of just printing it.
 .EXAMPLE
     PS BUCKETROOT > .\bin\checkver.ps1
     Check all manifest inside default directory.
@@ -62,13 +64,14 @@ param(
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipUpdated,
-    [String] $Version = ''
+    [String] $Version = '',
+    [Switch] $ThrowError
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\autoupdate.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
-. "$PSScriptRoot\..\lib\autoupdate.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
@@ -76,7 +79,7 @@ param(
 
 $Dir = Resolve-Path $Dir
 $Search = $App
-$GitHubToken = $env:SCOOP_CHECKVER_TOKEN, (get_config 'checkver-token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+$GitHubToken = Get-GitHubToken
 
 # don't use $Version with $App = '*'
 if ($App -eq '*' -and $Version -ne '') {
@@ -102,7 +105,7 @@ Get-Event | ForEach-Object {
 $Queue | ForEach-Object {
     $name, $json = $_
 
-    $substitutions = Get-VersionSubstitution $json.version
+    $substitutions = Get-VersionSubstitution $json.version # 'autoupdate.ps1'
 
     $wc = New-Object Net.Webclient
     if ($json.checkver.useragent) {
@@ -334,9 +337,13 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
-            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable
+            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable # 'autoupdate.ps1'
         } catch {
-            error $_.Exception.Message
+            if ($ThrowError) {
+                throw $_
+            } else {
+                error $_.Exception.Message
+            }
         }
     }
 }
