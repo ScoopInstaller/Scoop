@@ -2,7 +2,14 @@
 
 ### Bug Fixes
 
-- **core:** Don't use non-loaded config during initialization ([#4918](https://github.com/ScoopInstaller/Scoop/issues/4918))
+- **core:** Load config file before initialization ([#4932](https://github.com/ScoopInstaller/Scoop/issues/4932))
+- **depends:** Avoid digits in archive file extension (except for .7z and .001) ([#4915](https://github.com/ScoopInstaller/Scoop/issues/4915))
+- **bucket:** Don't check remote URL of non-git buckets ([#4923](https://github.com/ScoopInstaller/Scoop/issues/4923))
+- **bucket:** Don't write message OK before bucket is cloned ([#4925](https://github.com/ScoopInstaller/Scoop/issues/4925))
+
+### Documentation
+
+- **readme:** Update license badge ([#4929](https://github.com/ScoopInstaller/Scoop/issues/4929))
 
 ## [v0.2.0](https://github.com/ScoopInstaller/Scoop/compare/v0.1.0...v0.2.0) - 2022-05-10
 
