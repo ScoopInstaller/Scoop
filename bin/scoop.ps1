@@ -7,7 +7,6 @@ Set-StrictMode -Off
 . "$PSScriptRoot\..\lib\help.ps1"
 
 $subCommand = $Args[0]
-[string[]]$arguments = $Args | Select-Object -Skip 1
 
 # for aliases where there's a local function, re-alias so the function takes precedence
 $aliases = Get-Alias | Where-Object { $_.Options -notmatch 'ReadOnly|AllScope' } | ForEach-Object { $_.Name }
@@ -40,7 +39,8 @@ switch ($subCommand) {
         }
     }
     ({ $subCommand -in (commands) }) {
-        if ($arguments -in @('-h', '--help', '/?')) {
+        [string[]]$arguments = $Args | Select-Object -Skip 1
+        if ($null -ne $arguments -and $arguments[0] -in @('-h', '--help', '/?')) {
             exec 'help' @($subCommand)
         } else {
             exec $subCommand $arguments
