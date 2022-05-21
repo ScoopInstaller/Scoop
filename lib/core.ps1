@@ -318,6 +318,48 @@ function Get-HelperPath {
     }
 }
 
+function Get-CommandPath {
+    [CmdletBinding()]
+    [OutputType([String])]
+    param([Parameter(Mandatory = $true, ValueFromPipeline = $true)][String]$Command)
+
+    begin {
+        $CommandPath = $null
+        $gcm = Get-Command $Command -ErrorAction Ignore
+        $path = $gcm.Path
+        $usershims = Convert-Path (shimdir $false)
+        $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
+    }
+
+    process {
+        $CommandPath = if ($path -like "$usershims*" -or $path -like "$globalshims*") {
+            $exepath = if ($path.EndsWith('.exe') -or $path.EndsWith('.shim')) {
+                (Get-Content ($path -replace '\.exe$', '.shim') | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
+            } else {
+                ((Select-String -Path $path -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
+            }
+            if (!$exepath) {
+                $exepath = ((Select-String -Path $path -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
+            }
+
+            if (![System.IO.Path]::IsPathRooted($exepath)) {
+                # Expand relative path
+                $exepath = Convert-Path $exepath
+            }
+
+            friendly_path $exepath
+        } elseif ($gcm.CommandType -eq 'Application') {
+            $gcm.Source
+        } elseif ($gcm.CommandType -eq 'Alias') {
+            Get-CommandPath $gcm.ResolvedCommandName
+        } else {
+            $null
+        }
+
+        return $CommandPath
+    }
+}
+
 function Test-HelperInstalled {
     [CmdletBinding()]
     param(
@@ -726,7 +768,7 @@ function shim($path, $global, $name, $arg) {
     } else {
         warn_on_overwrite "$shim.cmd" $path
         # find path to Git's bash so that batch scripts can run bash scripts
-        $gitdir = (Get-Item (& "$PSScriptRoot\..\libexec\scoop-which.ps1" git) -ErrorAction:Stop).Directory.Parent
+        $gitdir = (Get-Item (Get-CommandPath git) -ErrorAction:Stop).Directory.Parent
         if ($gitdir.FullName -imatch 'mingw') {
             $gitdir = $gitdir.Parent
         }
