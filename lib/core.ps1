@@ -9,9 +9,9 @@ function Optimize-SecurityProtocol {
 
     # If not, change it to support TLS 1.2
     if (!($isNewerNetFramework -and $isSystemDefault)) {
-        # Set to TLS 1.2 (3072), then TLS 1.1 (768), and TLS 1.0 (192). Ssl3 has been superseded,
-        # https://docs.microsoft.com/en-us/dotnet/api/system.net.securityprotocoltype?view=netframework-4.5
-        [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
+        # Set to TLS 1.2 (3072). Ssl3, TLS 1.0, and 1.1 have been deprecated,
+        # https://datatracker.ietf.org/doc/html/rfc8996
+        [System.Net.ServicePointManager]::SecurityProtocol = 3072
     }
 }
 
