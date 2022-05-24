@@ -63,7 +63,7 @@ function search_remote($bucket, $query) {
         $repo_name = $Matches[2]
         $api_link = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
         $result = download_json $api_link | Select-Object -ExpandProperty tree |
-            Where-Object -Value "^(?:bucket/)?(.*$query.*)\.json$" -Property Path -Match |
+            Where-Object -Value "^bucket/(.*$query.*)\.json$" -Property Path -Match |
             ForEach-Object { $Matches[1] }
     }
 
