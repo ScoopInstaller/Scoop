@@ -67,18 +67,27 @@ function update_scoop() {
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = fullpath $(versiondir 'scoop' 'new')
+        $olddir = fullpath $(versiondir 'scoop' 'old')
 
         # get git scoop
+        Write-Host "git clone -q $configRepo --branch $configBranch --single-branch `"$newdir`""
         git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
 
         # check if scoop was successful downloaded
-        if (!(Test-Path "$newdir")) {
-            abort 'Scoop update failed.'
+        if (!(Test-Path "$newdir\bin\scoop.ps1")) {
+            Remove-Item -r -force $newdir
+            abort "Scoop download failed. If continuous seeing this, remove SCOOP_REPO by doing: scoop config rm SCOOP_REPO"
         }
 
         # replace non-git scoop with the git version
-        Remove-Item -r -force $currentdir -ea stop
-        Move-Item $newdir $currentdir
+        try {
+            Rename-Item $currentdir 'old' -ErrorAction Stop
+            Rename-Item $newdir 'current' -ErrorAction Stop
+        } catch {
+            Write-Warning $_
+            abort "Scoop update failed. Folder in use. Paste $newdir into $currentdir."
+        }
+        Remove-Item -r -force $olddir -ea stop
     } else {
         $previousCommit = Invoke-Expression "git -C '$currentdir' rev-parse HEAD"
         $currentRepo = Invoke-Expression "git -C '$currentdir' config remote.origin.url"
