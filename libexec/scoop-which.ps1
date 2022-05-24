@@ -16,11 +16,11 @@ try {
 }
 
 $path = Get-CommandPath $command
-$path
 
-if ($path -eq $null) {
+if ($null -eq $path) {
     Write-Host 'Not a scoop shim.'
     exit 2
+} else {
+    friendly_path $path
+    exit 0
 }
-
-exit 0

@@ -321,42 +321,33 @@ function Get-HelperPath {
 function Get-CommandPath {
     [CmdletBinding()]
     [OutputType([String])]
-    param([Parameter(Mandatory = $true, ValueFromPipeline = $true)][String]$Command)
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [String]
+        $Command
+    )
 
     begin {
-        $CommandPath = $null
-        $gcm = Get-Command $Command -ErrorAction Ignore
-        $path = $gcm.Path
-        $usershims = Convert-Path (shimdir $false)
-        $globalshims = fullpath (shimdir $true) # don't resolve: may not exist
+        $userShims = Convert-Path (shimdir $false)
+        $globalShims = fullpath (shimdir $true) # don't resolve: may not exist
     }
 
     process {
-        $CommandPath = if ($path -like "$usershims*" -or $path -like "$globalshims*") {
-            $exepath = if ($path.EndsWith('.exe') -or $path.EndsWith('.shim')) {
-                (Get-Content ($path -replace '\.exe$', '.shim') | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
-            } else {
-                ((Select-String -Path $path -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
-            }
-            if (!$exepath) {
-                $exepath = ((Select-String -Path $path -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
-            }
-
-            if (![System.IO.Path]::IsPathRooted($exepath)) {
-                # Expand relative path
-                $exepath = Convert-Path $exepath
-            }
-
-            friendly_path $exepath
-        } elseif ($gcm.CommandType -eq 'Application') {
-            $gcm.Source
-        } elseif ($gcm.CommandType -eq 'Alias') {
-            Get-CommandPath $gcm.ResolvedCommandName
+        try {
+            $comm = Get-Command $Command -ErrorAction Stop
+        } catch {
+            abort "'$Command' not found" 3
+        }
+        $commandPath = if ($comm.Path -like "$userShims*" -or $comm.Path -like "$globalShims*") {
+            Get-ShimTarget ($comm.Path -replace '\.exe$', '.shim')
+        } elseif ($comm.CommandType -eq 'Application') {
+            $comm.Source
+        } elseif ($comm.CommandType -eq 'Alias') {
+            Get-CommandPath $comm.ResolvedCommandName
         } else {
             $null
         }
-
-        return $CommandPath
+        return $commandPath
     }
 }
 
@@ -639,6 +630,20 @@ function get_app_name_from_shim($shim) {
     }
     $content = (Get-Content $shim -Encoding UTF8) -join ' '
     return get_app_name $content
+}
+
+function Get-ShimTarget($ShimPath) {
+    if ($ShimPath) {
+        $shimTarget = if ($ShimPath.EndsWith('.shim')) {
+            (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
+        } else {
+            ((Select-String -Path $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
+        }
+        if (!$shimTarget) {
+            $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
+        }
+        $shimTarget | Convert-Path
+    }
 }
 
 function warn_on_overwrite($shim, $path) {
