@@ -336,7 +336,7 @@ function Get-CommandPath {
         try {
             $comm = Get-Command $Command -ErrorAction Stop
         } catch {
-            abort "'$Command' not found" 3
+            return $null
         }
         $commandPath = if ($comm.Path -like "$userShims*" -or $comm.Path -like "$globalShims*") {
             Get-ShimTarget ($comm.Path -replace '\.exe$', '.shim')

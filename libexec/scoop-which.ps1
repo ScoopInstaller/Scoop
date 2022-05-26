@@ -9,16 +9,10 @@ if (!$command) {
     exit 1
 }
 
-try {
-    $gcm = Get-Command "$command" -ErrorAction Stop
-} catch {
-    abort "'$command' not found" 3
-}
-
 $path = Get-CommandPath $command
 
 if ($null -eq $path) {
-    Write-Host 'Not a scoop shim.'
+    Write-Host "'$command' not found / not a scoop shim."
     exit 2
 } else {
     friendly_path $path
