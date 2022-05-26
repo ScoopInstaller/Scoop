@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+- **chore:** Update Nonportable bucket URL ([#4955](https://github.com/ScoopInstaller/Scoop/issues/4955))
 - **core:** Using `Invoke-Command` instead of `Invoke-Expression` ([#4941](https://github.com/ScoopInstaller/Scoop/issues/4941))
 - **core:** Load config file before initialization ([#4932](https://github.com/ScoopInstaller/Scoop/issues/4932))
 - **core:** Allow to use '_' and '.' in bucket name ([#4952](https://github.com/ScoopInstaller/Scoop/pull/4952))
