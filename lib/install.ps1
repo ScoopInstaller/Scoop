@@ -269,7 +269,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         $oriConsoleEncoding = [Console]::OutputEncoding
         [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
-        Invoke-Expression $aria2 | ForEach-Object {
+        Invoke-Command ([scriptblock]::Create($aria2)) | ForEach-Object {
             # Skip blank lines
             if ([String]::IsNullOrWhiteSpace($_)) { return }
 
@@ -718,7 +718,7 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
     $installer = installer $manifest $architecture
     if($installer.script) {
         write-output "Running installer script..."
-        Invoke-Expression (@($installer.script) -join "`r`n")
+        Invoke-Command ([scriptblock]::Create($installer.script -join "`r`n"))
         return
     }
 
@@ -798,7 +798,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
     $version = $manifest.version
     if($uninstaller.script) {
         write-output "Running uninstaller script..."
-        Invoke-Expression (@($uninstaller.script) -join "`r`n")
+        Invoke-Command ([scriptblock]::Create($uninstaller.script -join "`r`n"))
         return
     }
 
@@ -1035,7 +1035,7 @@ function pre_install($manifest, $arch) {
     $pre_install = arch_specific 'pre_install' $manifest $arch
     if($pre_install) {
         write-output "Running pre-install script..."
-        Invoke-Expression (@($pre_install) -join "`r`n")
+        Invoke-Command ([scriptblock]::Create($pre_install -join "`r`n"))
     }
 }
 
@@ -1043,7 +1043,7 @@ function post_install($manifest, $arch) {
     $post_install = arch_specific 'post_install' $manifest $arch
     if($post_install) {
         write-output "Running post-install script..."
-        Invoke-Expression (@($post_install) -join "`r`n")
+        Invoke-Command ([scriptblock]::Create($post_install -join "`r`n"))
     }
 }
 

@@ -109,6 +109,7 @@ function Convert-RepositoryUri {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, Position = 0, ValueFromPipeline = $true)]
+        [AllowEmptyString()]
         [String] $Uri
     )
 
@@ -161,10 +162,12 @@ function add_bucket($name, $repo) {
         return 1
     }
     foreach ($bucket in Get-LocalBucket) {
-        $remote = git -C "$bucketsdir\$bucket" config --get remote.origin.url
-        if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
-            warn "Bucket $bucket already exists for $repo"
-            return 2
+        if (Test-Path -Path "$bucketsdir\$bucket\.git") {
+            $remote = git -C "$bucketsdir\$bucket" config --get remote.origin.url
+            if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
+                warn "Bucket $bucket already exists for $repo"
+                return 2
+            }
         }
     }
 
@@ -174,11 +177,10 @@ function add_bucket($name, $repo) {
         error "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
         return 1
     }
-    Write-Host 'OK'
-
     ensure $bucketsdir | Out-Null
     $dir = ensure $dir
     git_cmd clone "$repo" "`"$dir`"" -q
+    Write-Host 'OK'
     success "The $name bucket was added successfully."
     return 0
 }
@@ -200,7 +202,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $bucket_path = "$bucketsdir\$bucket"
 
     if (Test-Path $bucket_path) {
-        $remote = Invoke-Expression "git -C '$bucket_path' config --get remote.origin.url"
+        $remote = git -C "$bucket_path" config --get remote.origin.url
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
         # https://PROVIDER/USER/REPO.git

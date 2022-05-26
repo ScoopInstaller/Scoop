@@ -27,8 +27,8 @@
     <a href="https://gitter.im/lukesampson/scoop">
         <img src="https://badges.gitter.im/lukesampson/scoop.png" alt="Gitter Chat" />
     </a>
-    <a href="https://github.com/ScoopInstaller/Scoop/blob/master/LICENSE">
-        <img src="https://img.shields.io/github/license/ScoopInstaller/Scoop.svg" alt="License" />
+    <a href="./LICENSE">
+        <img src="https://img.shields.io/badge/license-UNLICENSE%20or%20MIT-blue" alt="License" />
     </a>
 </p>
 
