@@ -70,7 +70,6 @@ function update_scoop() {
         $olddir = fullpath $(versiondir 'scoop' 'old')
 
         # get git scoop
-        Write-Host "git clone -q $configRepo --branch $configBranch --single-branch `"$newdir`""
         git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
 
         # check if scoop was successful downloaded
