@@ -12,7 +12,8 @@ function url_manifest($url) {
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $str = $wc.downloadstring($url)
+        $data = $wc.DownloadData($url)
+        $str = (Get-Encoding($wc)).GetString($data)
     } catch [system.management.automation.methodinvocationexception] {
         warn "error: $($_.exception.innerexception.message)"
     } catch {
@@ -65,7 +66,8 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
     if ($url) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $wc.downloadstring($url) > "$dir\manifest.json"
+        $data = $wc.DownloadData($url)
+        (Get-Encoding($wc)).GetString($data) > "$dir\manifest.json"
     } else {
         Copy-Item (manifest_path $app $bucket) "$dir\manifest.json"
     }
