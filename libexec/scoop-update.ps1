@@ -90,7 +90,7 @@ function update_scoop() {
         if (Test-Path "$currentdir\..\old") {
             Remove-Item "$currentdir\..\old" -Recurse -Force -ErrorAction SilentlyContinue
         }
-        
+
         $previousCommit = git -C "$currentdir" rev-parse HEAD
         $currentRepo = git -C "$currentdir" config remote.origin.url
         $currentBranch = git -C "$currentdir" branch
