@@ -66,28 +66,30 @@ function update_scoop() {
     $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if (!(Test-Path "$currentdir\.git")) {
-        $newdir = fullpath $(versiondir 'scoop' 'new')
-        $olddir = fullpath $(versiondir 'scoop' 'old')
+        $newdir = "$currentdir\..\new"
+        $olddir = "$currentdir\..\old"
 
         # get git scoop
         git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
 
         # check if scoop was successful downloaded
         if (!(Test-Path "$newdir\bin\scoop.ps1")) {
-            Remove-Item -r -force $newdir
-            abort "Scoop download failed. If continuous seeing this, remove SCOOP_REPO by doing: scoop config rm SCOOP_REPO"
+            Remove-Item $newdir -Force -Recurse
+            abort "Scoop download failed. If this appears several times, try removing SCOOP_REPO by 'scoop config rm SCOOP_REPO'"
+        } else {
+            # replace non-git scoop with the git version
+            try {
+                Rename-Item $currentdir 'old' -ErrorAction Stop
+                Rename-Item $newdir 'current' -ErrorAction Stop
+            } catch {
+                Write-Warning $_
+                abort "Scoop update failed. Folder in use. Paste $newdir into $currentdir."
+            }
         }
-
-        # replace non-git scoop with the git version
-        try {
-            Rename-Item $currentdir 'old' -ErrorAction Stop
-            Rename-Item $newdir 'current' -ErrorAction Stop
-        } catch {
-            Write-Warning $_
-            abort "Scoop update failed. Folder in use. Paste $newdir into $currentdir."
-        }
-        Remove-Item -r -force $olddir -ea stop
     } else {
+        if (Test-Path "$currentdir\..\old") {
+            Remove-Item "$currentdir\..\old" -Recurse -Force -ErrorAction SilentlyContinue
+        }
         $previousCommit = Invoke-Expression "git -C '$currentdir' rev-parse HEAD"
         $currentRepo = Invoke-Expression "git -C '$currentdir' config remote.origin.url"
         $currentBranch = Invoke-Expression "git -C '$currentdir' branch"
