@@ -202,7 +202,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $bucket_path = "$bucketsdir\$bucket"
 
     if (Test-Path $bucket_path) {
-        $remote = Invoke-Expression "git -C '$bucket_path' config --get remote.origin.url"
+        $remote = git -C "$bucket_path" config --get remote.origin.url
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
         # https://PROVIDER/USER/REPO.git
