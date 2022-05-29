@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
 
+### Features
+
+- **core:** Add pre_uninstall and post_uninstall hooks ([#4957](https://github.com/ScoopInstaller/Scoop/issues/4957))
+
 ### Bug Fixes
 
 - **chore:** Deprecate tls1 and tls1.1 ([#4950](https://github.com/ScoopInstaller/Scoop/pull/4950))
