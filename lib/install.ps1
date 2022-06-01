@@ -51,7 +51,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    pre_install $manifest $architecture
+    Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -Arch $architecture
+
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
@@ -65,7 +66,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     persist_data $manifest $original_dir $persist_dir
     persist_permission $manifest $global
 
-    post_install $manifest $architecture
+    Invoke-HookScript -HookType 'post_install' -Manifest $manifest -Arch $architecture
 
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
@@ -1031,19 +1032,25 @@ function env_rm($manifest, $global, $arch) {
     }
 }
 
-function pre_install($manifest, $arch) {
-    $pre_install = arch_specific 'pre_install' $manifest $arch
-    if($pre_install) {
-        write-output "Running pre-install script..."
-        Invoke-Command ([scriptblock]::Create($pre_install -join "`r`n"))
-    }
-}
+function Invoke-HookScript {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('pre_install', 'post_install',
+                     'pre_uninstall', 'post_uninstall')]
+        [String] $HookType,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject] $Manifest,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('32bit', '64bit')]
+        [String] $Arch
+    )
 
-function post_install($manifest, $arch) {
-    $post_install = arch_specific 'post_install' $manifest $arch
-    if($post_install) {
-        write-output "Running post-install script..."
-        Invoke-Command ([scriptblock]::Create($post_install -join "`r`n"))
+    $script = arch_specific $HookType $Manifest $Arch
+    if ($script) {
+        Write-Output "Running $HookType script..."
+        Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
     }
 }
 
