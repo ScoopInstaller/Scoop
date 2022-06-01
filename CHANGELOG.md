@@ -15,6 +15,7 @@
 - **scoop:** Pass CLI arguments as string objects ([#4931](https://github.com/ScoopInstaller/Scoop/issues/4931))
 - **scoop-info:** Fix error message when manifest is not found ([#4935](https://github.com/ScoopInstaller/Scoop/issues/4935))
 - **scoop-search:** Require files in 'bucket' dir for remote known buckets ([#4943](https://github.com/ScoopInstaller/Scoop/issues/4943))
+- **update:** Prevent uninstall when update ([#4949](https://github.com/ScoopInstaller/Scoop/issues/4949))
 
 ### Documentation
 
