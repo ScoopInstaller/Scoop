@@ -2,7 +2,7 @@
 
 ### Features
 
-- **core:** Add pre_uninstall and post_uninstall hooks ([#4957](https://github.com/ScoopInstaller/Scoop/issues/4957))
+- **core:** Add pre_uninstall and post_uninstall hooks ([#4957](https://github.com/ScoopInstaller/Scoop/issues/4957) [#4962](https://github.com/ScoopInstaller/Scoop/issues/4962))
 
 ### Bug Fixes
 
