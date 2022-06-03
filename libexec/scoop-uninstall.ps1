@@ -54,6 +54,12 @@ if (!$apps) { exit 0 }
         $dir = versiondir $app $version $global
         $persist_dir = persistdir $app $global
 
+        $manifest = installed_manifest $app $version $global
+        $install = install_info $app $version $global
+        $architecture = $install.architecture
+
+        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+
         #region Workaround for #2952
         if (test_running_process $app $global) {
             continue
@@ -66,12 +72,6 @@ if (!$apps) { exit 0 }
             error "Access denied: $dir. You might need to restart."
             continue
         }
-
-        $manifest = installed_manifest $app $version $global
-        $install = install_info $app $version $global
-        $architecture = $install.architecture
-
-        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
 
         run_uninstaller $manifest $architecture $dir
         rm_shims $app $manifest $global $architecture
