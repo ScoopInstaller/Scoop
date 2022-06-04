@@ -82,7 +82,7 @@ $requests = 0
 
 Function Get-VirusTotalResult($hash, $app) {
     $hash = $hash.ToLower()
-    $url = "https://www.virustotal.com/ui/files/$hash"
+    $url = "https://www.virustotal.com/gui/files/$hash"
     $wc = New-Object Net.Webclient
     $wc.Headers.Add('User-Agent', (Get-UserAgent))
     $result = $wc.downloadstring($url)
