@@ -7,7 +7,7 @@
 #   -p, --purge    Remove all persistent data
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"

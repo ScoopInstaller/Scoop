@@ -32,9 +32,8 @@ function Get-Dependency {
         $Unresolved = @()
     )
     process {
-        $AppName, $bucket, $null = parse_app $AppName
+        $AppName, $manifest, $bucket, $null = Get-Manifest $AppName
         $Unresolved += $AppName
-        $null, $manifest, $null, $null = Find-Manifest $AppName $bucket
 
         if (!$manifest) {
             if (((Get-LocalBucket) -notcontains $bucket) -and $bucket) {

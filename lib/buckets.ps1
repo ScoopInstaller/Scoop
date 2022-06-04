@@ -72,39 +72,6 @@ function buckets {
     return Get-LocalBucket
 }
 
-function Find-Manifest($app, $bucket) {
-    $manifest, $url = $null, $null
-
-    # check if app is a URL or UNC path
-    if ($app -match '^(ht|f)tps?://|\\\\') {
-        $url = $app
-        $app = appname_from_url $url
-        $manifest = url_manifest $url
-    } else {
-        if ($bucket) {
-            $manifest = manifest $app $bucket
-        } else {
-            foreach ($bucket in Get-LocalBucket) {
-                $manifest = manifest $app $bucket
-                if ($manifest) { break }
-            }
-        }
-
-        if (!$manifest) {
-            # couldn't find app in buckets: check if it's a local path
-            $path = $app
-            if (!$path.endswith('.json')) { $path += '.json' }
-            if (Test-Path $path) {
-                $url = "$(Resolve-Path $path)"
-                $app = appname_from_url $url
-                $manifest, $bucket = url_manifest $url
-            }
-        }
-    }
-
-    return $app, $manifest, $bucket, $url
-}
-
 function Convert-RepositoryUri {
     [CmdletBinding()]
     param (
@@ -197,7 +164,7 @@ function rm_bucket($name) {
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {
-    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
+    $app, $manifest, $bucket, $url = Get-Manifest "$bucket/$app"
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
