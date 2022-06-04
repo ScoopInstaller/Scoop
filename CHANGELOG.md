@@ -21,6 +21,10 @@
 - **scoop-search:** Require files in 'bucket' dir for remote known buckets ([#4943](https://github.com/ScoopInstaller/Scoop/issues/4943))
 - **update:** Prevent uninstall when update ([#4949](https://github.com/ScoopInstaller/Scoop/issues/4949))
 
+### Code Refactoring
+
+- **manifest:** Rename 'Find-Manifest()' to 'Get-Manifest() ([#4966](https://github.com/ScoopInstaller/Scoop/issues/4966))
+
 ### Documentation
 
 - **readme:** Update license badge ([#4929](https://github.com/ScoopInstaller/Scoop/issues/4929))
