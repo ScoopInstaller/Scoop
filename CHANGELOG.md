@@ -272,6 +272,7 @@
 - **scoop:** Remove temporary code from the scoop executable ([#3898](https://github.com/ScoopInstaller/Scoop/issues/3898))
 - **update:** Update outdated PowerShell 5 warning ([#3986](https://github.com/ScoopInstaller/Scoop/issues/3986))
 - **scoop-info:** Check bucket of installed app ([#3740](https://github.com/ScoopInstaller/Scoop/issues/3740))
+- **scoop-download:** Use correct Args when calling `Get-Manifest` ([#4970](https://github.com/ScoopInstaller/Scoop/issues/4970))
 
 ### Builds
 
