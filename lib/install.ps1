@@ -7,8 +7,7 @@ function nightly_version($date, $quiet = $false) {
 }
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
-    $app, $bucket, $null = parse_app $app
-    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
+    $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
