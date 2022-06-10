@@ -32,8 +32,9 @@ function Get-Dependency {
         $Unresolved = @()
     )
     process {
-        $AppName, $manifest, $bucket, $null = Get-Manifest $AppName
+        $AppName, $bucket, $null = parse_app $AppName
         $Unresolved += $AppName
+        $null, $manifest, $null, $null = Find-Manifest $AppName $bucket
 
         if (!$manifest) {
             if (((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
@@ -140,7 +141,7 @@ function Test-7zipRequirement {
         $Uri
     )
     return ($Uri | Where-Object {
-            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(001)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^\d.]+)?$'
+            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
         }).Count -gt 0
 }
 

@@ -1,4 +1,6 @@
 #Requires -Version 5
+param($SubCommand)
+
 Set-StrictMode -Off
 
 . "$PSScriptRoot\..\lib\core.ps1"
@@ -6,22 +8,24 @@ Set-StrictMode -Off
 . "$PSScriptRoot\..\lib\commands.ps1"
 . "$PSScriptRoot\..\lib\help.ps1"
 
-$subCommand = $Args[0]
-
 # for aliases where there's a local function, re-alias so the function takes precedence
 $aliases = Get-Alias | Where-Object { $_.Options -notmatch 'ReadOnly|AllScope' } | ForEach-Object { $_.Name }
 Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForEach-Object {
     Set-Alias -Name $_.Name -Value Local:$($_.Name) -Scope Script
 }
 
-switch ($subCommand) {
-    ({ $subCommand -in @($null, '-h', '--help', '/?') }) {
-        exec 'help'
+switch ($SubCommand) {
+    ({ $SubCommand -in @($null, '--help', '/?') }) {
+        if (!$SubCommand -and $Args -eq '-v') {
+            $SubCommand = '--version'
+        } else {
+            exec 'help'
+        }
     }
-    ({ $subCommand -in @('-v', '--version') }) {
+    ({ $SubCommand -eq '--version' }) {
         Write-Host 'Current Scoop version:'
         if ((Test-CommandAvailable git) -and (Test-Path "$PSScriptRoot\..\.git") -and (get_config SCOOP_BRANCH 'master') -ne 'master') {
-            git -C "$PSScriptRoot\.." --no-pager log --oneline HEAD -n 1
+            Invoke-Expression "git -C '$PSScriptRoot\..' --no-pager log --oneline HEAD -n 1"
         } else {
             $version = Select-String -Pattern '^## \[(v[\d.]+)\].*?([\d-]+)$' -Path "$PSScriptRoot\..\CHANGELOG.md"
             Write-Host $version.Matches.Groups[1].Value -ForegroundColor Cyan -NoNewline
@@ -31,23 +35,22 @@ switch ($subCommand) {
 
         Get-LocalBucket | ForEach-Object {
             $bucketLoc = Find-BucketDirectory $_ -Root
-            if ((Test-Path "$bucketLoc\.git") -and (Test-CommandAvailable git)) {
+            if ((Test-Path (Join-Path $bucketLoc '.git')) -and (Test-CommandAvailable git)) {
                 Write-Host "'$_' bucket:"
-                git -C "$bucketLoc" --no-pager log --oneline HEAD -n 1
+                Invoke-Expression "git -C '$bucketLoc' --no-pager log --oneline HEAD -n 1"
                 Write-Host ''
             }
         }
     }
-    ({ $subCommand -in (commands) }) {
-        [string[]]$arguments = $Args | Select-Object -Skip 1
-        if ($null -ne $arguments -and $arguments[0] -in @('-h', '--help', '/?')) {
-            exec 'help' @($subCommand)
+    ({ $SubCommand -in (commands) }) {
+        if ($Args -in @('-h', '--help', '/?')) {
+            exec 'help' @($SubCommand)
         } else {
-            exec $subCommand $arguments
+            exec $SubCommand $Args
         }
     }
     default {
-        "scoop: '$subCommand' isn't a scoop command. See 'scoop help'."
+        "scoop: '$SubCommand' isn't a scoop command. See 'scoop help'."
         exit 1
     }
 }

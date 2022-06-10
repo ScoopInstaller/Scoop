@@ -2,10 +2,10 @@
 # Summary: Opens the app homepage
 param($app)
 
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Find-Manifest' (indirectly)
 
 if ($app) {
-    $null, $manifest, $bucket, $null = Get-Manifest $app
+    $null, $manifest, $bucket, $null = Find-Manifest $app
     if ($manifest) {
         if ($manifest.homepage) {
             Start-Process $manifest.homepage
