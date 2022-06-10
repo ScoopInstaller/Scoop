@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Features
+
+- **core:** Add `Get-Encoding` function to fix missing webclient encoding ([#4956](https://github.com/ScoopInstaller/Scoop/issues/4956))
+
 ## [v0.2.1](https://github.com/ScoopInstaller/Scoop/compare/v0.2.0...v0.2.1) - 2022-06-10
 
 ### Features
@@ -12,7 +18,6 @@
 - **core:** Using `Invoke-Command` instead of `Invoke-Expression` ([#4941](https://github.com/ScoopInstaller/Scoop/issues/4941))
 - **core:** Load config file before initialization ([#4932](https://github.com/ScoopInstaller/Scoop/issues/4932))
 - **core:** Allow to use '_' and '.' in bucket name ([#4952](https://github.com/ScoopInstaller/Scoop/issues/4952))
-- **core:** Add `Get-Encoding` function to fix missing webclient encoding ([#4956](https://github.com/ScoopInstaller/Scoop/issues/4956))
 - **depends:** Avoid digits in archive file extension (except for .7z and .001) ([#4915](https://github.com/ScoopInstaller/Scoop/issues/4915))
 - **bucket:** Don't check remote URL of non-git buckets ([#4923](https://github.com/ScoopInstaller/Scoop/issues/4923))
 - **bucket:** Don't write message OK before bucket is cloned ([#4925](https://github.com/ScoopInstaller/Scoop/issues/4925))
