@@ -18,7 +18,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture' 'generate_user_manifest' 'Find-Manifest' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture' 'generate_user_manifest' 'Get-Manifest'
 . "$PSScriptRoot\..\lib\install.ps1"
 
 $opt, $apps, $err = getopt $args 'fhua:' 'force', 'no-hash-check', 'no-update-scoop', 'arch='
@@ -51,7 +51,7 @@ foreach ($curr_app in $apps) {
     $bucket = $version = $app = $manifest = $url = $null
 
     $app, $bucket, $version = parse_app $curr_app
-    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
+    $app, $manifest, $bucket, $url = Get-Manifest $curr_app
 
     info "Starting download for $app..."
 

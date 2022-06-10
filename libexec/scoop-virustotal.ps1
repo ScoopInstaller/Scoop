@@ -35,7 +35,7 @@
 #   -u, --no-update-scoop     Don't update Scoop before checking if it's outdated
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'Find-Manifest' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\json.ps1" # 'json_path'
 . "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
@@ -155,8 +155,8 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
     $api_key = get_config virustotal_api_key
     if ($do_scan -and !$api_key -and !$warned_no_api_key) {
         $warned_no_api_key = $true
-        info "Submitting unknown apps needs a VirusTotal API key.  " +
-             "Set it up with`n`tscoop config virustotal_api_key <API key>"
+        info 'Submitting unknown apps needs a VirusTotal API key. ' +
+        "Set it up with`n`tscoop config virustotal_api_key <API key>"
 
     }
     if (!$do_scan -or !$api_key) {
@@ -167,14 +167,14 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
     try {
         # Follow redirections (for e.g. sourceforge URLs) because
         # VirusTotal analyzes only "direct" download links
-        $url = $url.Split("#").GetValue(0)
+        $url = $url.Split('#').GetValue(0)
         $new_redir = $url
         do {
             $orig_redir = $new_redir
             $new_redir = Submit-RedirectedUrl $orig_redir
         } while ($orig_redir -ne $new_redir)
         $requests += 1
-        $result = Invoke-WebRequest -Uri "https://www.virustotal.com/vtapi/v2/url/scan" -Body @{apikey=$api_key;url=$new_redir} -Method Post -UseBasicParsing
+        $result = Invoke-WebRequest -Uri 'https://www.virustotal.com/vtapi/v2/url/scan' -Body @{apikey = $api_key; url = $new_redir } -Method Post -UseBasicParsing
         $submitted = $result.StatusCode -eq 200
         if ($submitted) {
             warn "$app`: not found`: submitted $url"
@@ -191,7 +191,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
             Submit-ToVirusTotal $new_redir $app $do_scan $True
         } else {
             warn "$app`: VirusTotal submission of $url failed`:`n" +
-                    "`tAPI returned $($result.StatusCode) after retrying"
+            "`tAPI returned $($result.StatusCode) after retrying"
         }
     } catch [Exception] {
         warn "$app`: VirusTotal submission failed`: $($_.Exception.Message)"
@@ -199,14 +199,13 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
     }
 }
 
-$apps | ForEach-Object {
-    $app = $_
+foreach ($app in $apps) {
     # write-host $app
-    $null, $manifest, $bucket, $null = Find-Manifest $app
-    if(!$manifest) {
+    $null, $manifest, $bucket, $null = Get-Manifest $app
+    if (!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
         warn "$app`: manifest not found"
-        return
+        continue
     }
 
     $urls = script:url $manifest $architecture
@@ -215,17 +214,17 @@ $apps | ForEach-Object {
         $hash = hash_for_url $manifest $url $architecture
 
         try {
-            if($hash) {
+            if ($hash) {
                 $exit_code = $exit_code -bor (Search-VirusTotal $hash $app)
             } else {
                 warn "$app`: Can't find hash for $url"
             }
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
-            if ($_.Exception.Message -like "*(404)*") {
+            if ($_.Exception.Message -like '*(404)*') {
                 Submit-ToVirusTotal $url $app ($opt.scan -or $opt.s)
             } else {
-                if ($_.Exception.Message -match "\(204|429\)") {
+                if ($_.Exception.Message -match '\(204|429\)') {
                     abort "$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code
                 }
                 warn "$app`: VirusTotal request failed`: $($_.Exception.Message)"

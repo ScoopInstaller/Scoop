@@ -221,7 +221,7 @@ while ($in_progress -gt 0) {
         $page = $ev.SourceEventArgs.Result
         $err = $ev.SourceEventArgs.Error
         if ($json.checkver.script) {
-            $page = $json.checkver.script -join "`r`n" | Invoke-Expression
+            $page = Invoke-Command ([scriptblock]::Create($json.checkver.script -join "`r`n"))
         }
 
         if ($err) {
