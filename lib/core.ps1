@@ -9,9 +9,9 @@ function Optimize-SecurityProtocol {
 
     # If not, change it to support TLS 1.2
     if (!($isNewerNetFramework -and $isSystemDefault)) {
-        # Set to TLS 1.2 (3072), then TLS 1.1 (768), and TLS 1.0 (192). Ssl3 has been superseded,
-        # https://docs.microsoft.com/en-us/dotnet/api/system.net.securityprotocoltype?view=netframework-4.5
-        [System.Net.ServicePointManager]::SecurityProtocol = 3072 -bor 768 -bor 192
+        # Set to TLS 1.2 (3072). Ssl3, TLS 1.0, and 1.1 have been deprecated,
+        # https://datatracker.ietf.org/doc/html/rfc8996
+        [System.Net.ServicePointManager]::SecurityProtocol = 3072
     }
 }
 
@@ -318,6 +318,39 @@ function Get-HelperPath {
     }
 }
 
+function Get-CommandPath {
+    [CmdletBinding()]
+    [OutputType([String])]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [String]
+        $Command
+    )
+
+    begin {
+        $userShims = Convert-Path (shimdir $false)
+        $globalShims = fullpath (shimdir $true) # don't resolve: may not exist
+    }
+
+    process {
+        try {
+            $comm = Get-Command $Command -ErrorAction Stop
+        } catch {
+            return $null
+        }
+        $commandPath = if ($comm.Path -like "$userShims*" -or $comm.Path -like "$globalShims*") {
+            Get-ShimTarget ($comm.Path -replace '\.exe$', '.shim')
+        } elseif ($comm.CommandType -eq 'Application') {
+            $comm.Source
+        } elseif ($comm.CommandType -eq 'Alias') {
+            Get-CommandPath $comm.ResolvedCommandName
+        } else {
+            $null
+        }
+        return $commandPath
+    }
+}
+
 function Test-HelperInstalled {
     [CmdletBinding()]
     param(
@@ -599,6 +632,20 @@ function get_app_name_from_shim($shim) {
     return get_app_name $content
 }
 
+function Get-ShimTarget($ShimPath) {
+    if ($ShimPath) {
+        $shimTarget = if ($ShimPath.EndsWith('.shim')) {
+            (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
+        } else {
+            ((Select-String -Path $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
+        }
+        if (!$shimTarget) {
+            $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
+        }
+        $shimTarget | Convert-Path
+    }
+}
+
 function warn_on_overwrite($shim, $path) {
     if (!(Test-Path $shim)) {
         return
@@ -679,19 +726,11 @@ function shim($path, $global, $name, $arg) {
         @(
             "@rem $resolved_path",
             "@echo off",
-            "setlocal enabledelayedexpansion",
-            "set args=%*",
-            ":: replace problem characters in arguments",
-            "set args=%args:`"='%",
-            "set args=%args:(=``(%",
-            "set args=%args:)=``)%",
-            "set invalid=`"='",
-            "if !args! == !invalid! ( set args= )",
             "where /q pwsh.exe",
             "if %errorlevel% equ 0 (",
-            "    pwsh -noprofile -ex unrestricted -file `"$resolved_path`" $arg %args%",
+            "    pwsh -noprofile -ex unrestricted -file `"$resolved_path`" $arg %*",
             ") else (",
-            "    powershell -noprofile -ex unrestricted -file `"$resolved_path`" $arg %args%",
+            "    powershell -noprofile -ex unrestricted -file `"$resolved_path`" $arg %*",
             ")"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
@@ -734,7 +773,7 @@ function shim($path, $global, $name, $arg) {
     } else {
         warn_on_overwrite "$shim.cmd" $path
         # find path to Git's bash so that batch scripts can run bash scripts
-        $gitdir = (Get-Item (Get-Command git -CommandType:Application -ErrorAction:Stop).Source -ErrorAction:Stop).Directory.Parent
+        $gitdir = (Get-Item (Get-CommandPath git) -ErrorAction:Stop).Directory.Parent
         if ($gitdir.FullName -imatch 'mingw') {
             $gitdir = $gitdir.Parent
         }
@@ -902,11 +941,12 @@ function applist($apps, $global) {
     return ,@($apps | ForEach-Object { ,@($_, $global) })
 }
 
-function parse_app([string] $app) {
-    if($app -match '(?:(?<bucket>[a-zA-Z0-9-]+)\/)?(?<app>.*\.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?') {
-        return $matches['app'], $matches['bucket'], $matches['version']
+function parse_app([string]$app) {
+    if ($app -match '^(?:(?<bucket>[a-zA-Z0-9-_.]+)/)?(?<app>.*\.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?$') {
+        return $Matches['app'], $Matches['bucket'], $Matches['version']
+    } else {
+        return $app, $null, $null
     }
-    return $app, $null, $null
 }
 
 function show_app($app, $bucket, $version) {
@@ -1109,19 +1149,6 @@ function Out-UTF8File {
 #       for all communication with api.github.com
 Optimize-SecurityProtocol
 
-# Scoop root directory
-$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
-
-# Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
-
-# Scoop cache directory
-# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
-#       is experimental and untested. There may be concurrency issues when
-#       multiple users write and access cached files at the same time.
-#       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
-
 # Scoop config file migration
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
@@ -1134,6 +1161,19 @@ if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
 
 # Load Scoop config
 $scoopConfig = load_cfg $configFile
+
+# Scoop root directory
+$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+
+# Scoop global apps directory
+$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
+
+# Scoop cache directory
+# Note: Setting the SCOOP_CACHE environment variable to use a shared directory
+#       is experimental and untested. There may be concurrency issues when
+#       multiple users write and access cached files at the same time.
+#       Use at your own risk.
+$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
 
 # Setup proxy globally
 setup_proxy

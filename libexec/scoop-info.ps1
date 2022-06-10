@@ -4,7 +4,7 @@
 #   -v, --verbose       Show full paths and URLs
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'Find-Manifest' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
@@ -13,31 +13,21 @@ $verbose = $opt.v -or $opt.verbose
 
 if (!$app) { my_usage; exit 1 }
 
-if ($app -match '^(ht|f)tps?://|\\\\') {
-    # check if $app is a URL or UNC path
-    $url = $app
-    $app = appname_from_url $url
-    $global = installed $app $true
-    $status = app_status $app $global
-    $manifest = url_manifest $url
-    $manifest_file = $url
-} else {
-    # else $app is a normal app name
-    $global = installed $app $true
-    $app, $bucket, $null = parse_app $app
-    $status = app_status $app $global
-    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
-}
+$app, $manifest, $bucket, $url = Get-Manifest $app
 
 if (!$manifest) {
-    abort "Could not find manifest for '$(show_app $app $bucket)'."
+    abort "Could not find manifest for '$(show_app $app)' in local buckets."
 }
 
+$global = installed $app $true
+$status = app_status $app $global
 $install = install_info $app $status.version $global
 $status.installed = $bucket -and $install.bucket -eq $bucket
 $version_output = $manifest.version
-if (!$manifest_file) {
-    $manifest_file = if ($bucket) { manifest_path $app $bucket } else { $url }
+$manifest_file = if ($bucket) {
+    manifest_path $app $bucket
+} else {
+    $url
 }
 
 if ($verbose) {

@@ -72,43 +72,11 @@ function buckets {
     return Get-LocalBucket
 }
 
-function Find-Manifest($app, $bucket) {
-    $manifest, $url = $null, $null
-
-    # check if app is a URL or UNC path
-    if ($app -match '^(ht|f)tps?://|\\\\') {
-        $url = $app
-        $app = appname_from_url $url
-        $manifest = url_manifest $url
-    } else {
-        if ($bucket) {
-            $manifest = manifest $app $bucket
-        } else {
-            foreach ($bucket in Get-LocalBucket) {
-                $manifest = manifest $app $bucket
-                if ($manifest) { break }
-            }
-        }
-
-        if (!$manifest) {
-            # couldn't find app in buckets: check if it's a local path
-            $path = $app
-            if (!$path.endswith('.json')) { $path += '.json' }
-            if (Test-Path $path) {
-                $url = "$(Resolve-Path $path)"
-                $app = appname_from_url $url
-                $manifest, $bucket = url_manifest $url
-            }
-        }
-    }
-
-    return $app, $manifest, $bucket, $url
-}
-
 function Convert-RepositoryUri {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, Position = 0, ValueFromPipeline = $true)]
+        [AllowEmptyString()]
         [String] $Uri
     )
 
@@ -141,7 +109,7 @@ function list_buckets {
                 Measure-Object | Select-Object -ExpandProperty Count
         $buckets += [PSCustomObject]$bucket
     }
-    $buckets
+    ,$buckets
 }
 
 function add_bucket($name, $repo) {
@@ -161,10 +129,12 @@ function add_bucket($name, $repo) {
         return 1
     }
     foreach ($bucket in Get-LocalBucket) {
-        $remote = git -C "$bucketsdir\$bucket" config --get remote.origin.url
-        if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
-            warn "Bucket $bucket already exists for $repo"
-            return 2
+        if (Test-Path -Path "$bucketsdir\$bucket\.git") {
+            $remote = git -C "$bucketsdir\$bucket" config --get remote.origin.url
+            if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
+                warn "Bucket $bucket already exists for $repo"
+                return 2
+            }
         }
     }
 
@@ -174,11 +144,10 @@ function add_bucket($name, $repo) {
         error "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
         return 1
     }
-    Write-Host 'OK'
-
     ensure $bucketsdir | Out-Null
     $dir = ensure $dir
     git_cmd clone "$repo" "`"$dir`"" -q
+    Write-Host 'OK'
     success "The $name bucket was added successfully."
     return 0
 }
@@ -195,12 +164,12 @@ function rm_bucket($name) {
 }
 
 function new_issue_msg($app, $bucket, $title, $body) {
-    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
+    $app, $manifest, $bucket, $url = Get-Manifest "$bucket/$app"
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
     if (Test-Path $bucket_path) {
-        $remote = Invoke-Expression "git -C '$bucket_path' config --get remote.origin.url"
+        $remote = git -C "$bucket_path" config --get remote.origin.url
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
         # https://PROVIDER/USER/REPO.git

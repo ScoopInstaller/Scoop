@@ -22,13 +22,48 @@ function url_manifest($url) {
     $str | convertfrom-json
 }
 
+function Get-Manifest($app) {
+    $bucket, $manifest, $url = $null
+    # check if app is a URL or UNC path
+    if ($app -match '^(ht|f)tps?://|\\\\') {
+        $url = $app
+        $app = appname_from_url $url
+        $manifest = url_manifest $url
+    } else {
+        $app, $bucket, $version = parse_app $app
+        if ($bucket) {
+            $manifest = manifest $app $bucket
+        } else {
+            foreach ($bucket in Get-LocalBucket) {
+                $manifest = manifest $app $bucket
+                if ($manifest) {
+                    break
+                }
+            }
+        }
+        if (!$manifest) {
+            # couldn't find app in buckets: check if it's a local path
+            $appPath = $app
+            if (!$appPath.EndsWith('.json')) {
+                $appPath += '.json'
+            }
+            if (Test-Path $appPath) {
+                $url = Convert-Path $appPath
+                $app = appname_from_url $url
+                $manifest = url_manifest $url
+            }
+        }
+    }
+    return $app, $manifest, $bucket, $url
+}
+
 function manifest($app, $bucket, $url) {
-    if($url) { return url_manifest $url }
+    if ($url) { return url_manifest $url }
     parse_json (manifest_path $app $bucket)
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
-    if($url) {
+    if ($url) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $wc.downloadstring($url) > "$dir\manifest.json"
@@ -51,7 +86,7 @@ function save_install_info($info, $dir) {
 
 function install_info($app, $version, $global) {
     $path = "$(versiondir $app $version $global)\install.json"
-    if(!(test-path $path)) { return $null }
+    if (!(Test-Path $path)) { return $null }
     parse_json $path
 }
 
@@ -73,20 +108,21 @@ function default_architecture {
 }
 
 function arch_specific($prop, $manifest, $architecture) {
-    if($manifest.architecture) {
+    if ($manifest.architecture) {
         $val = $manifest.architecture.$architecture.$prop
-        if($val) { return $val } # else fallback to generic prop
+        if ($val) { return $val } # else fallback to generic prop
     }
 
-    if($manifest.$prop) { return $manifest.$prop }
+    if ($manifest.$prop) { return $manifest.$prop }
 }
 
 function supports_architecture($manifest, $architecture) {
     return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
 }
 
-function generate_user_manifest($app, $bucket, $version) { # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
-    $null, $manifest, $bucket, $null = Find-Manifest $app $bucket
+function generate_user_manifest($app, $bucket, $version) {
+    # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
+    $app, $manifest, $bucket, $null = Get-Manifest "$bucket/$app"
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket
     }
