@@ -25,7 +25,7 @@
 
 ### Code Refactoring
 
-- **manifest:** Rename 'Find-Manifest()' to 'Get-Manifest() ([#4966](https://github.com/ScoopInstaller/Scoop/issues/4966))
+- **manifest:** Rename 'Find-Manifest()' to 'Get-Manifest() ([#4966](https://github.com/ScoopInstaller/Scoop/issues/4966), [#4981](https://github.com/ScoopInstaller/Scoop/issues/4981))
 
 ### Documentation
 

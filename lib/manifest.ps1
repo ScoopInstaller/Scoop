@@ -43,11 +43,12 @@ function Get-Manifest($app) {
         }
         if (!$manifest) {
             # couldn't find app in buckets: check if it's a local path
-            if (!$app.EndsWith('.json')) {
-                $app += '.json'
+            $appPath = $app
+            if (!$appPath.EndsWith('.json')) {
+                $appPath += '.json'
             }
-            if (Test-Path $app) {
-                $url = Convert-Path $app
+            if (Test-Path $appPath) {
+                $url = Convert-Path $appPath
                 $app = appname_from_url $url
                 $manifest = url_manifest $url
             }
