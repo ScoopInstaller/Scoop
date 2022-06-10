@@ -109,7 +109,7 @@ function list_buckets {
                 Measure-Object | Select-Object -ExpandProperty Count
         $buckets += [PSCustomObject]$bucket
     }
-    $buckets
+    ,$buckets
 }
 
 function add_bucket($name, $repo) {

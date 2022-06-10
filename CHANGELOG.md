@@ -6,6 +6,7 @@
 
 ### Bug Fixes
 
+- **bucket:** Make sure `list_buckets` return array ([#4979](https://github.com/ScoopInstaller/Scoop/issues/4979))
 - **chore:** Deprecate tls1 and tls1.1 ([#4950](https://github.com/ScoopInstaller/Scoop/issues/4950))
 - **chore:** Update Nonportable bucket URL ([#4955](https://github.com/ScoopInstaller/Scoop/issues/4955))
 - **core:** Using `Invoke-Command` instead of `Invoke-Expression` ([#4941](https://github.com/ScoopInstaller/Scoop/issues/4941))
