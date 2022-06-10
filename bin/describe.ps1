@@ -44,8 +44,7 @@ $Queue | ForEach-Object {
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $data = $wc.DownloadData($manifest.homepage)
-        $home_html = (Get-Encoding($wc)).GetString($data)
+        $home_html = (Get-Encoding($wc)).GetString($wc.DownloadData($manifest.homepage))
     } catch {
         Write-Host "`n$($_.Exception.Message)" -ForegroundColor Red
         return
