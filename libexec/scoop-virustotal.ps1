@@ -1,28 +1,21 @@
 # Usage: scoop virustotal [* | app1 app2 ...] [options]
-# Summary: Look for app's hash on virustotal.com
-# Help: Look for app's hash (MD5, SHA1 or SHA256) on virustotal.com
+# Summary: Look for app's hash or url on virustotal.com
+# Help: Look for app's hash or url on virustotal.com
 #
 # Use a single '*' for app to check all installed apps.
 #
-# The download's hash is also a key to access VirusTotal's scan results.
-# This allows to check the safety of the files without even downloading
-# them in many cases.  If the hash is unknown to VirusTotal, the
-# download link is printed to submit it to VirusTotal.
-#
-# If you have signed up to VirusTotal's community, you have an API key
-# that this script can use to submit unknown packages for inspection
-# if you use the `--scan' flag.  Tell scoop about your API key with:
+# To use this command, you have to sign up to VirusTotal's community,
+# and get an API key. Then, tell scoop about your API key with:
 #
 #   scoop config virustotal_api_key <your API key: 64 lower case hex digits>
 #
 # Exit codes:
-# 0 -> success
-# 1 -> problem parsing arguments
-# 2 -> at least one package was marked unsafe by VirusTotal
-# 4 -> at least one exception was raised while looking for info
-# 8 -> at least one package couldn't be queried because its hash type
-#      isn't supported by VirusTotal, the manifest couldn't be found
-#      or didn't contain a hash
+#  0 -> success
+#  1 -> problem parsing arguments
+#  2 -> at least one package was marked unsafe by VirusTotal
+#  4 -> at least one exception was raised while looking for info
+#  8 -> at least one package couldn't be queried because the manifest couldn't be found
+# 16 -> VirusTotal API key is not configured
 # Note: the exit codes (2, 4 & 8) may be combined, e.g. 6 -> exit codes
 #       2 & 4 combined
 #
@@ -67,11 +60,17 @@ if (!$opt.n -and !$opt.'no-depends') {
 $_ERR_UNSAFE = 2
 $_ERR_EXCEPTION = 4
 $_ERR_NO_INFO = 8
+$_ERR_NO_API_KEY = 16
 
 $exit_code = 0
 
-# Global flag to warn only once about missing API key:
-$warned_no_api_key = $False
+# Global API key:
+$api_key = get_config virustotal_api_key
+if (!$api_key) {
+    Write-Warning ("VirusTotal API key is not configured`n`n" +
+        "`tscoop config virustotal_api_key <API key>")
+    exit $_ERR_NO_API_KEY
+}
 
 # Global flag to explain only once about sleep between requests
 $explained_rate_limit_sleeping = $False
@@ -80,65 +79,124 @@ $explained_rate_limit_sleeping = $False
 # script execution progresses
 $requests = 0
 
-Function Get-VirusTotalResult($hash, $app) {
-    $hash = $hash.ToLower()
-    $url = "https://www.virustotal.com/ui/files/$hash"
-    $wc = New-Object Net.Webclient
-    $wc.Headers.Add('User-Agent', (Get-UserAgent))
-    $result = $wc.downloadstring($url)
-    $stats = json_path $result '$.data.attributes.last_analysis_stats'
-    $malicious = json_path $stats '$.malicious'
-    $suspicious = json_path $stats '$.suspicious'
-    $undetected = json_path $stats '$.undetected'
-    $unsafe = [int]$malicious + [int]$suspicious
-    $see_url = "see https://www.virustotal.com/#/file/$hash/detection"
-    switch ($unsafe) {
-        0 { if ($undetected -eq 0) { $fg = 'Yellow' } else { $fg = 'DarkGreen' } }
-        1 { $fg = 'DarkYellow' }
-        2 { $fg = 'Yellow' }
-        default { $fg = 'Red' }
-    }
-    Write-Host -f $fg "$app`: $unsafe/$undetected, $see_url"
-    if ($unsafe -gt 0) {
-        return $_ERR_UNSAFE
-    }
-    return 0
+Function ConvertTo-VirusTotalUrlId ($url) {
+    $url_id = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($url))
+    $url_id = $url_id -replace '\+', '-'
+    $url_id = $url_id -replace '/', '_'
+    $url_id = $url_id -replace '=', ''
+    $url_id
 }
 
-Function Search-VirusTotal ($hash, $app) {
-    if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
-        $hash = $matches['hash']
-        if ($matches['algo'] -match '(md5|sha1|sha256)') {
-            return Get-VirusTotalResult $hash $app
-        } else {
-            warn "$app`: Unsupported hash $($matches['algo']). VirusTotal needs md5, sha1 or sha256."
-            return $_ERR_NO_INFO
+Function Get-RemoteFileSize ($url) {
+    $response = Invoke-WebRequest -Uri $url -Method HEAD -UseBasicParsing
+    $response.Headers.'Content-Length' | ForEach-Object {
+        ([System.Convert]::ToDouble($_) / 1048576)
+    }
+}
+
+Function Get-VirusTotalResultByHash ($hash, $app) {
+    $hash = $hash.ToLower()
+    $api_url = "https://www.virustotal.com/api/v3/files/$hash"
+    $headers = @{}
+    $headers.Add('Accept', 'application/json')
+    $headers.Add('x-apikey', $api_key)
+    $response = Invoke-WebRequest -Uri $api_url -Method GET -Headers $headers -UseBasicParsing
+    $result = $response.Content
+    $stats = json_path $result '$.data.attributes.last_analysis_stats'
+    [int]$malicious = json_path $stats '$.malicious'
+    [int]$suspicious = json_path $stats '$.suspicious'
+    [int]$timeout = json_path $stats '$.timeout'
+    [int]$undetected = json_path $stats '$.undetected'
+    [int]$unsafe = $malicious + $suspicious
+    [int]$total = $unsafe + $undetected
+    $report_url = "https://www.virustotal.com/gui/file/$hash"
+    if ($undetected -eq 0) {
+        Write-Information "INFO   : $app`: Analysis is in progress."
+        [PSCustomObject] @{
+            'App.Name' = $app
+            'App.Hash' = $hash
+            FileReport = $report_url
+        }
+    } else {
+        switch ($unsafe) {
+            0 {
+                Write-Information "$($PSStyle.Foreground.BrightGreen)INFO   : $app`: $unsafe / $total$($PSStyle.Reset)" -InformationAction 'Continue'
+            }
+            1 {
+                Write-Warning "$app`: $unsafe / $total"
+            }
+            2 {
+                Write-Warning "$app`: $unsafe / $total"
+            }
+            Default {
+                Write-Warning "$app`: $($PSStyle.Formatting.Error)$unsafe$($PSStyle.Formatting.Warning) / $total"
+            }
+        }
+        [PSCustomObject] @{
+            'App.Name' = $app
+            'App.Hash' = $hash
+            Malicious  = $malicious
+            Suspicious = $suspicious
+            Timeout    = $timeout
+            Undetected = $undetected
+            FileReport = $report_url
         }
     }
-
-    return Get-VirusTotalResult $hash $app
+    if ($unsafe -gt 0) {
+        $Script:exit_code = $exit_code -bor $_ERR_UNSAFE
+    }
 }
 
-Function Submit-RedirectedUrl {
-    # Follow up to one level of HTTP redirection
-    #
-    # Copied from http://www.powershellmagazine.com/2013/01/29/pstip-retrieve-a-redirected-url/
-    # Adapted according to Roy's response (January 23, 2014 at 11:59 am)
-    # Adapted to always return an URL
-    Param (
-        [Parameter(Mandatory = $true)]
-        [String]$URL
-    )
-    $request = [System.Net.WebRequest]::Create($url)
-    $request.AllowAutoRedirect = $false
-    $response = $request.GetResponse()
-    if (([int]$response.StatusCode -ge 300) -and ([int]$response.StatusCode -lt 400)) {
-        $redir = $response.GetResponseHeader('Location')
+Function Get-VirusTotalResultByUrl ($url, $app) {
+    $id = ConvertTo-VirusTotalUrlId $url
+    $api_url = "https://www.virustotal.com/api/v3/urls/$id"
+    $headers = @{}
+    $headers.Add('Accept', 'application/json')
+    $headers.Add('x-apikey', $api_key)
+    $response = Invoke-WebRequest -Uri $api_url -Method GET -Headers $headers -UseBasicParsing
+    $result = $response.Content
+    $id = json_path $result '$.data.id'
+    $hash = json_path $result '$.data.attributes.last_http_response_content_sha256' 6>$null
+    $url_report_url = "https://www.virustotal.com/gui/url/$id"
+    Write-Information "INFO   : $app`: Url report found: $url_report_url" -InformationAction 'Continue'
+    Write-Information "INFO   : $($PSStyle.Formatting.Warning)Url report is not accurate.$($PSStyle.Reset)" -InformationAction 'Continue'
+    if (!$hash) {
+        Write-Warning "$app`: File report not found. Manual file upload is required (instead of url submission)."
+        [PSCustomObject] @{
+            'App.Name' = $app
+            'App.Url'  = $url
+            UrlReport  = $url_report_url
+        }
     } else {
-        $redir = $URL
+        Write-Information "INFO   : $app`: Related file report found." -InformationAction 'Continue'
+        [PSCustomObject] @{
+            'App.Name' = $app
+            'App.Hash' = $hash
+            'App.Url'  = $url
+            UrlReport  = $url_report_url
+        }
     }
-    $response.Close()
-    return $redir
+}
+
+Function Get-VirusTotalResult ($hash, $url, $app) {
+    if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
+        $hash = $matches.hash
+        if ($matches.algo -match '(md5|sha1|sha256)') {
+            Get-VirusTotalResultByHash $hash $app
+            return
+        }
+        Write-Warning "$app`: Unsupported hash $($matches.algo), will search by url instead"
+    } elseif ($hash) {
+        Get-VirusTotalResultByHash $hash $app
+        return
+    } else {
+        Write-Warning "$app`: Can't find hash for $url, will search by url instead"
+    }
+    $result = Get-VirusTotalResultByUrl $url $app
+    $hash = $result.'App.Hash'
+    if ($hash) {
+        Get-VirusTotalResultByHash $result.'App.Hash' $app
+    }
 }
 
 # Submit-ToVirusTotal
@@ -152,32 +210,32 @@ Function Submit-RedirectedUrl {
 #              exceeded, without risking an infinite loop (as stack
 #              overflow) if the submission keeps failing.
 Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
-    $api_key = get_config virustotal_api_key
-    if ($do_scan -and !$api_key -and !$warned_no_api_key) {
-        $warned_no_api_key = $true
-        info 'Submitting unknown apps needs a VirusTotal API key. ' +
-        "Set it up with`n`tscoop config virustotal_api_key <API key>"
-
-    }
-    if (!$do_scan -or !$api_key) {
-        warn "$app`: not found`: manually submit $url"
+    if (!$do_scan) {
+        warn "$app`: not found`: you can manually submit $url"
         return
     }
 
     try {
-        # Follow redirections (for e.g. sourceforge URLs) because
-        # VirusTotal analyzes only "direct" download links
-        $url = $url.Split('#').GetValue(0)
-        $new_redir = $url
-        do {
-            $orig_redir = $new_redir
-            $new_redir = Submit-RedirectedUrl $orig_redir
-        } while ($orig_redir -ne $new_redir)
         $requests += 1
-        $result = Invoke-WebRequest -Uri 'https://www.virustotal.com/vtapi/v2/url/scan' -Body @{apikey = $api_key; url = $new_redir } -Method Post -UseBasicParsing
-        $submitted = $result.StatusCode -eq 200
-        if ($submitted) {
-            warn "$app`: not found`: submitted $url"
+
+        $encoded_url = [System.Web.HttpUtility]::UrlEncode($url)
+        $api_url = 'https://www.virustotal.com/api/v3/urls'
+        $content_type = 'application/x-www-form-urlencoded'
+        $headers = @{}
+        $headers.Add('Accept', 'application/json')
+        $headers.Add('x-apikey', $api_key)
+        $headers.Add('Content-Type', $content_type)
+        $body = "url=$encoded_url"
+        $result = Invoke-WebRequest -Uri $api_url -Method POST -Headers $headers -ContentType $content_type -Body $body -UseBasicParsing
+        if ($result.StatusCode -eq 200) {
+            $id = ((json_path $result '$.data.id') -split '-')[1]
+            $url_report_url = "https://www.virustotal.com/gui/url/$id"
+            $fileSize = Get-RemoteFileSize $url
+            Write-Information "INFO   : $app`: Remote file size: $($fileSize.ToString('0.00 MB'))" -InformationAction 'Continue'
+            if ($fileSize -gt 70) {
+                Write-Information "INFO   : $($PSStyle.Formatting.Warning)Large files might require manual file upload instead of url submission.$($PSStyle.Reset)"
+            }
+            Write-Information "INFO   : $app`: Analysis in progress." -InformationAction 'Continue'
             return
         }
 
@@ -185,26 +243,26 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
         if (!$retrying) {
             if (!$explained_rate_limit_sleeping) {
                 $explained_rate_limit_sleeping = $True
-                info "Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit"
+                Write-Information "INFO   : Sleeping 60+ seconds between requests due to VirusTotal's 4/min limit" -InformationAction 'Continue'
             }
             Start-Sleep -s (60 + $requests)
-            Submit-ToVirusTotal $new_redir $app $do_scan $True
+            Submit-ToVirusTotal $url $app $do_scan $True
         } else {
-            warn "$app`: VirusTotal submission of $url failed`:`n" +
+            Write-Warning "$app`: VirusTotal submission of $url failed`:`n" +
             "`tAPI returned $($result.StatusCode) after retrying"
         }
     } catch [Exception] {
-        warn "$app`: VirusTotal submission failed`: $($_.Exception.Message)"
+        Write-Warning "$app`: VirusTotal submission failed`: $($_.Exception.Message)"
         return
     }
 }
 
-foreach ($app in $apps) {
-    # write-host $app
+$apps | ForEach-Object {
+    $app = $_
     $null, $manifest, $bucket, $null = Get-Manifest $app
     if (!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
-        warn "$app`: manifest not found"
+        Write-Warning "$app`: manifest not found"
         continue
     }
 
@@ -214,20 +272,51 @@ foreach ($app in $apps) {
         $hash = hash_for_url $manifest $url $architecture
 
         try {
+            if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
+                $hash = $matches.hash
+                if ($matches.algo -notmatch '(md5|sha1|sha256)') {
+                    $hash = $null
+                    Write-Warning "$app`: Unsupported hash $($matches.algo). Will search by url instead."
+                }
+            }
             if ($hash) {
-                $exit_code = $exit_code -bor (Search-VirusTotal $hash $app)
+                $report = Get-VirusTotalResultByHash $hash $app
+                $report
+                return
             } else {
-                warn "$app`: Can't find hash for $url"
+                Write-Warning "$app`: Hash for $url not found. Will search by url instead."
             }
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
-            if ($_.Exception.Message -like '*(404)*') {
-                Submit-ToVirusTotal $url $app ($opt.scan -or $opt.s)
+            if ($_.Exception.Response.StatusCode -eq 404) {
+                Write-Warning "$app`: File report not found. Will search by url instead."
             } else {
-                if ($_.Exception.Message -match '\(204|429\)') {
+                if ($_.Exception.Response.StatusCode -in 204, 429) {
                     abort "$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code
                 }
-                warn "$app`: VirusTotal request failed`: $($_.Exception.Message)"
+                Write-Warning "$app`: VirusTotal request failed`: $($_.Exception.Message)"
+                return
+            }
+        }
+
+        try {
+            $url_report = Get-VirusTotalResultByUrl $url $app
+            $hash = $url_report.'App.Hash'
+            if ($hash) {
+                $report = Get-VirusTotalResultByHash $hash $app
+                $report
+            }
+        } catch [Exception] {
+            $exit_code = $exit_code -bor $_ERR_EXCEPTION
+            if ($_.Exception.Response.StatusCode -eq 404) {
+                Write-Warning "$app`: Url report not found. Will submit $url"
+                Submit-ToVirusTotal $url $app ($opt.scan -or $opt.s)
+            } else {
+                if ($_.Exception.Response.StatusCode -in 204, 429) {
+                    abort "$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code
+                }
+                Write-Warning "$app`: VirusTotal request failed`: $($_.Exception.Message)"
+                return
             }
         }
     }
