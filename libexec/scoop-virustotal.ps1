@@ -116,30 +116,36 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
             'App.Name' = $app
             'App.Hash' = $hash
             FileReport = $report_url
+            Malicious  = $null
+            Suspicious = $null
+            Timeout    = $null
+            Undetected = $null
+            UrlReport  = $null
         }
     } else {
         switch ($unsafe) {
             0 {
-                Write-Information "$($PSStyle.Foreground.BrightGreen)INFO   : $app`: $unsafe / $total$($PSStyle.Reset)" -InformationAction 'Continue'
+                Write-Information "$($PSStyle.Foreground.BrightGreen)INFO   : $app`: $unsafe/$total$($PSStyle.Reset)" -InformationAction 'Continue'
             }
             1 {
-                Write-Warning "$app`: $unsafe / $total"
+                Write-Warning "$app`: $unsafe/$total"
             }
             2 {
-                Write-Warning "$app`: $unsafe / $total"
+                Write-Warning "$app`: $unsafe $total"
             }
             Default {
-                Write-Warning "$app`: $($PSStyle.Formatting.Error)$unsafe$($PSStyle.Formatting.Warning) / $total"
+                Write-Warning "$app`: $($PSStyle.Formatting.Error)$unsafe$($PSStyle.Formatting.Warning)/$total"
             }
         }
         [PSCustomObject] @{
             'App.Name' = $app
             'App.Hash' = $hash
+            FileReport = $report_url
             Malicious  = $malicious
             Suspicious = $suspicious
             Timeout    = $timeout
             Undetected = $undetected
-            FileReport = $report_url
+            UrlReport  = $null
         }
     }
     if ($unsafe -gt 0) {
@@ -158,21 +164,29 @@ Function Get-VirusTotalResultByUrl ($url, $app) {
     $id = json_path $result '$.data.id'
     $hash = json_path $result '$.data.attributes.last_http_response_content_sha256' 6>$null
     $url_report_url = "https://www.virustotal.com/gui/url/$id"
-    Write-Information "INFO   : $app`: Url report found: $url_report_url" -InformationAction 'Continue'
-    Write-Information "INFO   : $($PSStyle.Formatting.Warning)Url report is not accurate.$($PSStyle.Reset)" -InformationAction 'Continue'
+    Write-Information "INFO   : $app`: Url report found."
     if (!$hash) {
-        Write-Warning "$app`: File report not found. Manual file upload is required (instead of url submission)."
+        Write-Information "INFO   : $app`: Related file report not found."
+        Write-Warning "$app`: Manual file upload is required (instead of url submission)."
         [PSCustomObject] @{
             'App.Name' = $app
-            'App.Url'  = $url
+            FileReport = $null
+            Malicious  = $null
+            Suspicious = $null
+            Timeout    = $null
+            Undetected = $null
             UrlReport  = $url_report_url
         }
     } else {
-        Write-Information "INFO   : $app`: Related file report found." -InformationAction 'Continue'
+        Write-Information "INFO   : $app`: Related file report found."
         [PSCustomObject] @{
             'App.Name' = $app
             'App.Hash' = $hash
-            'App.Url'  = $url
+            FileReport = $null
+            Malicious  = $null
+            Suspicious = $null
+            Timeout    = $null
+            Undetected = $null
             UrlReport  = $url_report_url
         }
     }
@@ -210,9 +224,8 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
             $id = ((json_path $result '$.data.id') -split '-')[1]
             $url_report_url = "https://www.virustotal.com/gui/url/$id"
             $fileSize = Get-RemoteFileSize $url
-            Write-Information "INFO   : $app`: Remote file size: $($fileSize.ToString('0.00 MB'))" -InformationAction 'Continue'
             if ($fileSize -gt 70) {
-                Write-Information "INFO   : $($PSStyle.Formatting.Warning)Large files might require manual file upload instead of url submission.$($PSStyle.Reset)"
+                Write-Information "INFO   : $app`: Remote file size: $($fileSize.ToString('0.00 MB')). Large files might require manual file upload instead of url submission." -InformationAction 'Continue'
             }
             Write-Information "INFO   : $app`: Analysis in progress." -InformationAction 'Continue'
             return
@@ -236,7 +249,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
     }
 }
 
-$apps | ForEach-Object {
+$reports = $apps | ForEach-Object {
     $app = $_
     $null, $manifest, $bucket, $null = Get-Manifest $app
     if (!$manifest) {
@@ -251,19 +264,21 @@ $apps | ForEach-Object {
         $hash = hash_for_url $manifest $url $architecture
 
         try {
+            $isHashUnsupported = $false
             if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
                 $hash = $matches.hash
                 if ($matches.algo -notmatch '(md5|sha1|sha256)') {
                     $hash = $null
+                    $isHashUnsupported = $true
                     Write-Warning "$app`: Unsupported hash $($matches.algo). Will search by url instead."
                 }
             }
             if ($hash) {
-                $report = Get-VirusTotalResultByHash $hash $app
-                $report
+                $file_report = Get-VirusTotalResultByHash $hash $app
+                $file_report
                 return
-            } else {
-                Write-Warning "$app`: Hash for $url not found. Will search by url instead."
+            } elseif (!$isHashUnsupported) {
+                Write-Warning "$app`: Hash not found. Will search by url instead."
             }
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
@@ -282,8 +297,11 @@ $apps | ForEach-Object {
             $url_report = Get-VirusTotalResultByUrl $url $app
             $hash = $url_report.'App.Hash'
             if ($hash) {
-                $report = Get-VirusTotalResultByHash $hash $app
-                $report
+                $file_report = Get-VirusTotalResultByHash $hash $app
+                $file_report.'UrlReport' = $url_report.'UrlReport'
+                $file_report
+            } else {
+                $url_report
             }
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
@@ -300,5 +318,6 @@ $apps | ForEach-Object {
         }
     }
 }
+$reports
 
 exit $exit_code
