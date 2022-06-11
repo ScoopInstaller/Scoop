@@ -131,7 +131,7 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
                 Write-Warning "$app`: $unsafe/$total"
             }
             2 {
-                Write-Warning "$app`: $unsafe $total"
+                Write-Warning "$app`: $unsafe/$total"
             }
             Default {
                 Write-Warning "$app`: $($PSStyle.Formatting.Error)$unsafe$($PSStyle.Formatting.Warning)/$total"
