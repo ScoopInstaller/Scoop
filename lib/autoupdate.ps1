@@ -6,7 +6,8 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        [xml]$xml = (Get-Encoding($wc)).GetString($wc.DownloadData($url))
+        $data = $wc.DownloadData($url)
+        [xml]$xml = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -35,7 +36,8 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $hashfile = (Get-Encoding($wc)).GetString($wc.DownloadData($url))
+        $data = $wc.DownloadData($url)
+        $hashfile = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -88,7 +90,8 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $json = (Get-Encoding($wc)).GetString($wc.DownloadData($url))
+        $data = $wc.DownloadData($url)
+        $json = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -108,7 +111,8 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $xml = [xml]((Get-Encoding($wc)).GetString($wc.DownloadData($url)))
+        $data = $wc.DownloadData($url)
+        $xml = [xml]((Get-Encoding($wc)).GetString($data))
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
