@@ -178,27 +178,6 @@ Function Get-VirusTotalResultByUrl ($url, $app) {
     }
 }
 
-Function Get-VirusTotalResult ($hash, $url, $app) {
-    if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
-        $hash = $matches.hash
-        if ($matches.algo -match '(md5|sha1|sha256)') {
-            Get-VirusTotalResultByHash $hash $app
-            return
-        }
-        Write-Warning "$app`: Unsupported hash $($matches.algo), will search by url instead"
-    } elseif ($hash) {
-        Get-VirusTotalResultByHash $hash $app
-        return
-    } else {
-        Write-Warning "$app`: Can't find hash for $url, will search by url instead"
-    }
-    $result = Get-VirusTotalResultByUrl $url $app
-    $hash = $result.'App.Hash'
-    if ($hash) {
-        Get-VirusTotalResultByHash $result.'App.Hash' $app
-    }
-}
-
 # Submit-ToVirusTotal
 # - $url: where file to check can be downloaded
 # - $app: Name of the application (used for reporting)
