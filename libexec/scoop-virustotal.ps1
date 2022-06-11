@@ -110,7 +110,7 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
     [int]$unsafe = $malicious + $suspicious
     [int]$total = $unsafe + $undetected
     $report_url = "https://www.virustotal.com/gui/file/$hash"
-    if ($undetected -eq 0) {
+    if ($total -eq 0) {
         Write-Information "INFO   : $app`: Analysis is in progress."
         [PSCustomObject] @{
             'App.Name' = $app
