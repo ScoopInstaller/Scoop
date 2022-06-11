@@ -242,7 +242,7 @@ $apps | ForEach-Object {
     if (!$manifest) {
         $exit_code = $exit_code -bor $_ERR_NO_INFO
         Write-Warning "$app`: manifest not found"
-        continue
+        return
     }
 
     $urls = script:url $manifest $architecture
