@@ -40,7 +40,7 @@ $architecture = ensure_architecture ($opt.a + $opt.arch)
 
 if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
-        warn 'Scoop is out of date.'
+        Write-Warning 'Scoop is out of date.'
     } else {
         scoop update
     }
@@ -109,18 +109,16 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
     [int]$undetected = json_path $stats '$.undetected'
     [int]$unsafe = $malicious + $suspicious
     [int]$total = $unsafe + $undetected
+    $fileSize = ([System.Convert]::ToDouble((json_path $result '$.data.attributes.size')) / 1048576)
     $report_url = "https://www.virustotal.com/gui/file/$hash"
     if ($total -eq 0) {
-        Write-Information "INFO   : $app`: Analysis is in progress."
+        Write-Information "INFO   : $app`: Analysis in progress." -InformationAction 'Continue'
         [PSCustomObject] @{
-            'App.Name' = $app
-            'App.Hash' = $hash
-            FileReport = $report_url
-            Malicious  = $null
-            Suspicious = $null
-            Timeout    = $null
-            Undetected = $null
-            UrlReport  = $null
+            'App.Name'      = $app
+            'App.Hash'      = $hash
+            'App.Size (MB)' = $fileSize.ToString('0.00')
+            FileReport      = $report_url
+            UrlReport       = $null
         }
     } else {
         switch ($unsafe) {
@@ -138,14 +136,15 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
             }
         }
         [PSCustomObject] @{
-            'App.Name' = $app
-            'App.Hash' = $hash
-            FileReport = $report_url
-            Malicious  = $malicious
-            Suspicious = $suspicious
-            Timeout    = $timeout
-            Undetected = $undetected
-            UrlReport  = $null
+            'App.Name'      = $app
+            'App.Hash'      = $hash
+            'App.Size (MB)' = $fileSize.ToString('0.00')
+            FileReport      = $report_url
+            Malicious       = $malicious
+            Suspicious      = $suspicious
+            Timeout         = $timeout
+            Undetected      = $undetected
+            UrlReport       = $null
         }
     }
     if ($unsafe -gt 0) {
@@ -170,11 +169,8 @@ Function Get-VirusTotalResultByUrl ($url, $app) {
         Write-Warning "$app`: Manual file upload is required (instead of url submission)."
         [PSCustomObject] @{
             'App.Name' = $app
+            'App.Hash' = $null
             FileReport = $null
-            Malicious  = $null
-            Suspicious = $null
-            Timeout    = $null
-            Undetected = $null
             UrlReport  = $url_report_url
         }
     } else {
@@ -183,10 +179,6 @@ Function Get-VirusTotalResultByUrl ($url, $app) {
             'App.Name' = $app
             'App.Hash' = $hash
             FileReport = $null
-            Malicious  = $null
-            Suspicious = $null
-            Timeout    = $null
-            Undetected = $null
             UrlReport  = $url_report_url
         }
     }
@@ -204,7 +196,7 @@ Function Get-VirusTotalResultByUrl ($url, $app) {
 #              overflow) if the submission keeps failing.
 Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
     if (!$do_scan) {
-        warn "$app`: not found`: you can manually submit $url"
+        Write-Warning "$app`: not found`: you can manually submit $url"
         return
     }
 
@@ -228,6 +220,12 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
                 Write-Information "INFO   : $app`: Remote file size: $($fileSize.ToString('0.00 MB')). Large files might require manual file upload instead of url submission." -InformationAction 'Continue'
             }
             Write-Information "INFO   : $app`: Analysis in progress." -InformationAction 'Continue'
+            [PSCustomObject] @{
+                'App.Name'      = $app
+                'App.Size (MB)' = $fileSize.ToString('0.00')
+                FileReport      = $null
+                UrlReport       = $url_report_url
+            }
             return
         }
 
@@ -286,7 +284,8 @@ $reports = $apps | ForEach-Object {
                 Write-Warning "$app`: File report not found. Will search by url instead."
             } else {
                 if ($_.Exception.Response.StatusCode -in 204, 429) {
-                    abort "$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code
+                    Write-Error "$app`: VirusTotal request failed`: $($_.Exception.Message)"
+                    exit $exit_code
                 }
                 Write-Warning "$app`: VirusTotal request failed`: $($_.Exception.Message)"
                 return
@@ -310,7 +309,8 @@ $reports = $apps | ForEach-Object {
                 Submit-ToVirusTotal $url $app ($opt.scan -or $opt.s)
             } else {
                 if ($_.Exception.Response.StatusCode -in 204, 429) {
-                    abort "$app`: VirusTotal request failed`: $($_.Exception.Message)", $exit_code
+                    Write-Error "$app`: VirusTotal request failed`: $($_.Exception.Message)"
+                    exit $exit_code
                 }
                 Write-Warning "$app`: VirusTotal request failed`: $($_.Exception.Message)"
                 return
