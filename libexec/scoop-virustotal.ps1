@@ -121,6 +121,7 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
             UrlReport       = $null
         }
     } else {
+        $vendorResults = (ConvertFrom-Json((json_path $result '$.data.attributes.last_analysis_results'))).PSObject.Properties.Value
         switch ($unsafe) {
             0 {
                 Write-Information "$($PSStyle.Foreground.BrightGreen)INFO   : $app`: $unsafe/$total$($PSStyle.Reset)" -InformationAction 'Continue'
@@ -135,13 +136,19 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
                 Write-Warning "$app`: $($PSStyle.Formatting.Error)$unsafe$($PSStyle.Formatting.Warning)/$total"
             }
         }
+        $maliciousResults = $vendorResults |
+            Where-Object -Property category -EQ 'malicious' |
+            Select-Object -ExpandProperty engine_name
+        $suspiciousResults = $vendorResults |
+            Where-Object -Property category -EQ 'suspicious' |
+            Select-Object -ExpandProperty engine_name
         [PSCustomObject] @{
             'App.Name'      = $app
             'App.Hash'      = $hash
             'App.Size (MB)' = $fileSize.ToString('0.00')
             FileReport      = $report_url
-            Malicious       = $malicious
-            Suspicious      = $suspicious
+            Malicious       = if ($maliciousResults) { $maliciousResults } else { 0 }
+            Suspicious      = if ($suspiciousResults) { $suspiciousResults } else { 0 }
             Timeout         = $timeout
             Undetected      = $undetected
             UrlReport       = $null
