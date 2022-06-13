@@ -166,11 +166,16 @@ Function Get-VirusTotalResultByUrl ($url, $app) {
     $result = $response.Content
     $id = json_path $result '$.data.id'
     $hash = json_path $result '$.data.attributes.last_http_response_content_sha256' 6>$null
+    $last_analysis_date = json_path $result '$.data.attributes.last_analysis_date' 6>$null
     $url_report_url = "https://www.virustotal.com/gui/url/$id"
     info "$app`: Url report found."
     if (!$hash) {
-        info "$app`: Related file report not found."
-        warn "$app`: Manual file upload is required (instead of url submission)."
+        if (!$last_analysis_date) {
+            info "$app`: Analysis in progress."
+        } else {
+            info "$app`: Related file report not found."
+            warn "$app`: Manual file upload is required (instead of url submission)."
+        }
         [PSCustomObject] @{
             'App.Name'       = $app
             'App.Hash'       = $null
@@ -285,6 +290,7 @@ $reports = $apps | ForEach-Object {
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
             if ($_.Exception.Response.StatusCode -eq 404) {
+                $file_report_not_found = $true
                 warn "$app`: File report not found. Will search by url instead."
             } else {
                 if ($_.Exception.Response.StatusCode -in 204, 429) {
@@ -298,7 +304,9 @@ $reports = $apps | ForEach-Object {
         try {
             $url_report = Get-VirusTotalResultByUrl $url $app
             $hash = $url_report.'App.Hash'
-            if ($hash) {
+            if ($hash -and ($file_report_not_found -eq $true)) {
+                error "$app`: Hash not matched"
+            } elseif ($hash) {
                 $file_report = Get-VirusTotalResultByHash $hash $app
                 $file_report.'UrlReport.Url' = $url_report.'UrlReport.Url'
                 $file_report
