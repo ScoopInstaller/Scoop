@@ -34,7 +34,7 @@
 . "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
-$opt, $apps, $err = getopt $args 'a:snu' @('arch=', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
+$opt, $apps, $err = getopt $args 'a:snup' @('arch=', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
 if ($err) { "scoop virustotal: $err"; exit 1 }
 if (!$apps) { my_usage; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
