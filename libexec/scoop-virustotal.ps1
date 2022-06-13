@@ -26,6 +26,7 @@
 #                             your virustotal_api_key.
 #   -n, --no-depends          By default, all dependencies are checked too. This flag avoids it.
 #   -u, --no-update-scoop     Don't update Scoop before checking if it's outdated
+#   -p, --passthru            Returns report
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
@@ -33,7 +34,7 @@
 . "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
-$opt, $apps, $err = getopt $args 'a:snu' @('arch=', 'scan', 'no-depends', 'no-update-scoop')
+$opt, $apps, $err = getopt $args 'a:snu' @('arch=', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
 if ($err) { "scoop virustotal: $err"; exit 1 }
 if (!$apps) { my_usage; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
@@ -121,16 +122,16 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
         $vendorResults = (ConvertFrom-Json((json_path $result '$.data.attributes.last_analysis_results'))).PSObject.Properties.Value
         switch ($unsafe) {
             0 {
-                success "$app`: $unsafe/$total"
+                success "$app`: $unsafe/$total, see $report_url"
             }
             1 {
-                warn "$app`: $unsafe/$total"
+                warn "$app`: $unsafe/$total, see $report_url"
             }
             2 {
-                warn "$app`: $unsafe/$total"
+                warn "$app`: $unsafe/$total, see $report_url"
             }
             Default {
-                warn "$app`: $unsafe/$total"
+                warn "`e[31m$app`: $unsafe/$total, see $report_url`e[0m"
             }
         }
         $maliciousResults = $vendorResults |
@@ -328,6 +329,8 @@ $reports = $apps | ForEach-Object {
         }
     }
 }
-$reports
+if ($opt.p -or $opt.'passthru') {
+    $reports
+}
 
 exit $exit_code
