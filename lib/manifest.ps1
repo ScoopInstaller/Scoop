@@ -24,6 +24,7 @@ function url_manifest($url) {
 
 function Get-Manifest($app) {
     $bucket, $manifest, $url = $null
+    $app = $app.TrimStart('/')
     # check if app is a URL or UNC path
     if ($app -match '^(ht|f)tps?://|\\\\') {
         $url = $app
@@ -44,6 +45,7 @@ function Get-Manifest($app) {
         if (!$manifest) {
             # couldn't find app in buckets: check if it's a local path
             $appPath = $app
+            $bucket = $null
             if (!$appPath.EndsWith('.json')) {
                 $appPath += '.json'
             }
