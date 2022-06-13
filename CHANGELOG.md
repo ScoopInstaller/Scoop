@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Features
+
+- **core:** Add `Get-Encoding` function to fix missing webclient encoding ([#4956](https://github.com/ScoopInstaller/Scoop/issues/4956))
+
 ## [v0.2.1](https://github.com/ScoopInstaller/Scoop/compare/v0.2.0...v0.2.1) - 2022-06-10
 
 ### Features
