@@ -26,7 +26,7 @@
 #                             your virustotal_api_key.
 #   -n, --no-depends          By default, all dependencies are checked too. This flag avoids it.
 #   -u, --no-update-scoop     Don't update Scoop before checking if it's outdated
-#   -p, --passthru            Returns report
+#   -p, --passthru            Returns reports as objects
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
@@ -92,7 +92,7 @@ Function Get-RemoteFileSize ($url) {
     $response.Headers.'Content-Length' | ForEach-Object { [System.Convert]::ToInt32($_) }
 }
 
-Function Get-VirusTotalResultByHash ($hash, $app) {
+Function Get-VirusTotalResultByHash ($hash, $url, $app) {
     $hash = $hash.ToLower()
     $api_url = "https://www.virustotal.com/api/v3/files/$hash"
     $headers = @{}
@@ -108,15 +108,19 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
     [int]$unsafe = $malicious + $suspicious
     [int]$total = $unsafe + $undetected
     [int]$fileSize = json_path $result '$.data.attributes.size'
-    $report_url = "https://www.virustotal.com/gui/file/$hash"
+    $report_hash = json_path $result '$.data.attributes.sha256'
+    $report_url = "https://www.virustotal.com/gui/file/$report_hash"
     if ($total -eq 0) {
         info "$app`: Analysis in progress."
         [PSCustomObject] @{
-            'App.Name'       = $app
-            'App.Hash'       = $hash
-            'App.Size'       = filesize $fileSize
-            'FileReport.Url' = $report_url
-            'UrlReport.Url'  = $null
+            'App.Name'        = $app
+            'App.Url'         = $url
+            'App.Hash'        = $hash
+            'App.HashType'    = $null
+            'App.Size'        = filesize $fileSize
+            'FileReport.Url'  = $report_url
+            'FileReport.Hash' = $report_hash
+            'UrlReport.Url'   = $null
         }
     } else {
         $vendorResults = (ConvertFrom-Json((json_path $result '$.data.attributes.last_analysis_results'))).PSObject.Properties.Value
@@ -142,9 +146,12 @@ Function Get-VirusTotalResultByHash ($hash, $app) {
             Select-Object -ExpandProperty engine_name
         [PSCustomObject] @{
             'App.Name'              = $app
+            'App.Url'               = $url
             'App.Hash'              = $hash
+            'App.HashType'          = $null
             'App.Size'              = filesize $fileSize
             'FileReport.Url'        = $report_url
+            'FileReport.Hash'       = $report_hash
             'FileReport.Malicious'  = if ($maliciousResults) { $maliciousResults } else { 0 }
             'FileReport.Suspicious' = if ($suspiciousResults) { $suspiciousResults } else { 0 }
             'FileReport.Timeout'    = $timeout
@@ -179,17 +186,23 @@ Function Get-VirusTotalResultByUrl ($url, $app) {
         }
         [PSCustomObject] @{
             'App.Name'       = $app
+            'App.Url'        = $url
             'App.Hash'       = $null
+            'App.HashType'   = $null
             'FileReport.Url' = $null
             'UrlReport.Url'  = $url_report_url
+            'UrlReport.Hash' = $null
         }
     } else {
         info "$app`: Related file report found."
         [PSCustomObject] @{
             'App.Name'       = $app
-            'App.Hash'       = $hash
+            'App.Url'        = $url
+            'App.Hash'       = $null
+            'App.HashType'   = $null
             'FileReport.Url' = $null
             'UrlReport.Url'  = $url_report_url
+            'UrlReport.Hash' = $hash
         }
     }
 }
@@ -232,6 +245,7 @@ Function Submit-ToVirusTotal ($url, $app, $do_scan, $retrying = $False) {
             info "$app`: Analysis in progress."
             [PSCustomObject] @{
                 'App.Name'       = $app
+                'App.Url'        = $url
                 'App.Size'       = filesize $fileSize
                 'FileReport.Url' = $null
                 'UrlReport.Url'  = $url_report_url
@@ -266,23 +280,32 @@ $reports = $apps | ForEach-Object {
         return
     }
 
+    [int]$index = 0
     $urls = script:url $manifest $architecture
     $urls | ForEach-Object {
         $url = $_
+        $index++
+        if ($urls.GetType().IsArray) {
+            info "$app`: url $index"
+        }
         $hash = hash_for_url $manifest $url $architecture
 
         try {
             $isHashUnsupported = $false
             if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
+                $algo = $matches.algo
                 $hash = $matches.hash
-                if ($matches.algo -notmatch '(md5|sha1|sha256)') {
+                if ($matches.algo -inotin 'md5', 'sha1', 'sha256') {
                     $hash = $null
                     $isHashUnsupported = $true
                     warn "$app`: Unsupported hash $($matches.algo). Will search by url instead."
                 }
+            } elseif ($hash) {
+                $algo = 'sha256'
             }
             if ($hash) {
-                $file_report = Get-VirusTotalResultByHash $hash $app
+                $file_report = Get-VirusTotalResultByHash $hash $url $app
+                $file_report.'App.HashType' = $algo
                 $file_report
                 return
             } elseif (!$isHashUnsupported) {
@@ -304,21 +327,52 @@ $reports = $apps | ForEach-Object {
 
         try {
             $url_report = Get-VirusTotalResultByUrl $url $app
-            $hash = $url_report.'App.Hash'
-            if ($hash -and ($file_report_not_found -eq $true)) {
-                error "$app`: Hash not matched"
-            } elseif ($hash) {
-                $file_report = Get-VirusTotalResultByHash $hash $app
-                $file_report.'UrlReport.Url' = $url_report.'UrlReport.Url'
-                $file_report
-            } else {
+            $url_report.'App.Hash' = $hash
+            $url_report.'App.HashType' = $algo
+            if ($url_report.'UrlReport.Hash' -and ($file_report_not_found -eq $true) -and $hash) {
+                if ($algo -eq 'sha256') {
+                    if ($url_report.'UrlReport.Hash' -eq $hash) {
+                        warn "$app`: Manual file upload is required (instead of url submission) for $url"
+                    } else {
+                        error "$app`: Hash not matched for $url"
+                    }
+                } else {
+                    error "$app`: Hash not matched or manual file upload is required (instead of url submission) for $url"
+                }
                 $url_report
+                return
+            }
+            if (!$url_report.'UrlReport.Hash') {
+                $url_report
+                return
             }
         } catch [Exception] {
             $exit_code = $exit_code -bor $_ERR_EXCEPTION
             if ($_.Exception.Response.StatusCode -eq 404) {
                 warn "$app`: Url report not found. Will submit $url"
                 Submit-ToVirusTotal $url $app ($opt.scan -or $opt.s)
+                return
+            } else {
+                if ($_.Exception.Response.StatusCode -in 204, 429) {
+                    abort "$app`: VirusTotal request failed`: $($_.Exception.Message)" $exit_code
+                }
+                warn "$app`: VirusTotal request failed`: $($_.Exception.Message)"
+                return
+            }
+        }
+
+        try {
+            $file_report = Get-VirusTotalResultByHash $url_report.'UrlReport.Hash' $url $app
+            $file_report.'App.Hash' = $hash
+            $file_report.'App.HashType' = $algo
+            $file_report.'UrlReport.Url' = $url_report.'UrlReport.Url'
+            $file_report
+            warn "$app`: Unable to check hash match for $url"
+        } catch [Exception] {
+            $exit_code = $exit_code -bor $_ERR_EXCEPTION
+            if ($_.Exception.Response.StatusCode -eq 404) {
+                warn "$app`: File report not found for unknown reason. Manual file upload is required (instead of url submission)."
+                $url_report
             } else {
                 if ($_.Exception.Response.StatusCode -in 204, 429) {
                     abort "$app`: VirusTotal request failed`: $($_.Exception.Message)" $exit_code
