@@ -51,7 +51,7 @@ foreach ($curr_app in $apps) {
     $bucket = $version = $app = $manifest = $url = $null
 
     $app, $bucket, $version = parse_app $curr_app
-    $app, $manifest, $bucket, $url = Get-Manifest $curr_app
+    $app, $manifest, $bucket, $url = Get-Manifest "$bucket/$app"
 
     info "Starting download for $app..."
 
