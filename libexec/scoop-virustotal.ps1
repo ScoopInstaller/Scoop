@@ -68,8 +68,9 @@ $exit_code = 0
 # Global API key:
 $api_key = get_config virustotal_api_key
 if (!$api_key) {
-    abort ("VirusTotal API key is not configured`n`n" +
-        "`tscoop config virustotal_api_key <API key>") $_ERR_NO_API_KEY
+    abort ("VirusTotal API key is not configured`n" +
+        "  You could get one from https://www.virustotal.com/gui/my-apikey and set with`n" +
+        "  scoop config virustotal_api_key <API key>") $_ERR_NO_API_KEY
 }
 
 # Global flag to explain only once about sleep between requests
