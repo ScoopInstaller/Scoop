@@ -1,10 +1,11 @@
 Param([Switch]$Fast)
 Push-Location $PSScriptRoot
+. "$PSScriptRoot\..\..\lib\core.ps1"
 . "$PSScriptRoot\..\..\lib\install.ps1"
 
 if (!$Fast) {
     Write-Host "Install dependencies ..."
-    Invoke-Expression "$PSScriptRoot\install.ps1"
+    & "$PSScriptRoot\install.ps1"
 }
 
 $output = "$PSScriptRoot\bin"

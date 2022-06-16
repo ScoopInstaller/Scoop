@@ -96,7 +96,7 @@ if (is_unix) {
 
 function execute($cmd) {
     Write-Host $cmd -ForegroundColor Green
-    $output = Invoke-Expression $cmd
+    $output = Invoke-Command ([scriptblock]::Create($cmd))
 
     if ($LASTEXITCODE -gt 0) {
         abort "^^^ Error! See above ^^^ (last command: $cmd)"

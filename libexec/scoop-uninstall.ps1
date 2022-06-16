@@ -7,7 +7,7 @@
 #   -p, --purge    Remove all persistent data
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
@@ -54,6 +54,12 @@ if (!$apps) { exit 0 }
         $dir = versiondir $app $version $global
         $persist_dir = persistdir $app $global
 
+        $manifest = installed_manifest $app $version $global
+        $install = install_info $app $version $global
+        $architecture = $install.architecture
+
+        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+
         #region Workaround for #2952
         if (test_running_process $app $global) {
             continue
@@ -66,10 +72,6 @@ if (!$apps) { exit 0 }
             error "Access denied: $dir. You might need to restart."
             continue
         }
-
-        $manifest = installed_manifest $app $version $global
-        $install = install_info $app $version $global
-        $architecture = $install.architecture
 
         run_uninstaller $manifest $architecture $dir
         rm_shims $app $manifest $global $architecture
@@ -95,6 +97,8 @@ if (!$apps) { exit 0 }
                 continue
             }
         }
+
+        Invoke-HookScript -HookType 'post_uninstall' -Manifest $manifest -Arch $architecture
     }
     # remove older versions
     $oldVersions = @(Get-ChildItem $appDir -Name -Exclude 'current')

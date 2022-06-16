@@ -32,9 +32,8 @@ function Get-Dependency {
         $Unresolved = @()
     )
     process {
-        $AppName, $bucket, $null = parse_app $AppName
+        $AppName, $manifest, $bucket, $url = Get-Manifest $AppName
         $Unresolved += $AppName
-        $null, $manifest, $null, $null = Find-Manifest $AppName $bucket
 
         if (!$manifest) {
             if (((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
@@ -58,7 +57,11 @@ function Get-Dependency {
         if ($bucket) {
             $Resolved += "$bucket/$AppName"
         } else {
-            $Resolved += $AppName
+            if ($url) {
+                $Resolved += $url
+            } else {
+                $Resolved += $AppName
+            }
         }
         if ($Unresolved.Length -eq 0) {
             return $Resolved
@@ -141,7 +144,7 @@ function Test-7zipRequirement {
         $Uri
     )
     return ($Uri | Where-Object {
-            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^.]+)?$'
+            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(001)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^\d.]+)?$'
         }).Count -gt 0
 }
 

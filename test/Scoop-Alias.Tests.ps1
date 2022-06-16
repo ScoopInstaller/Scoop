@@ -17,7 +17,7 @@ Describe 'add_alias' -Tag 'Scoop' {
             $alias_file | Should -Not -Exist
 
             add_alias 'rm' '"hello, world!"'
-            Invoke-Expression $alias_file | Should -Be 'hello, world!'
+            & $alias_file | Should -Be 'hello, world!'
         }
     }
 

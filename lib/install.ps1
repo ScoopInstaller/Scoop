@@ -7,8 +7,7 @@ function nightly_version($date, $quiet = $false) {
 }
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
-    $app, $bucket, $null = parse_app $app
-    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
+    $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if(!$manifest) {
         abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
@@ -51,7 +50,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    pre_install $manifest $architecture
+    Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -Arch $architecture
+
     run_installer $fname $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
@@ -65,7 +65,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     persist_data $manifest $original_dir $persist_dir
     persist_permission $manifest $global
 
-    post_install $manifest $architecture
+    Invoke-HookScript -HookType 'post_install' -Manifest $manifest -Arch $architecture
 
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
@@ -269,7 +269,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         $oriConsoleEncoding = [Console]::OutputEncoding
         [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
-        Invoke-Expression $aria2 | ForEach-Object {
+        Invoke-Command ([scriptblock]::Create($aria2)) | ForEach-Object {
             # Skip blank lines
             if ([String]::IsNullOrWhiteSpace($_)) { return }
 
@@ -718,7 +718,7 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
     $installer = installer $manifest $architecture
     if($installer.script) {
         write-output "Running installer script..."
-        Invoke-Expression (@($installer.script) -join "`r`n")
+        Invoke-Command ([scriptblock]::Create($installer.script -join "`r`n"))
         return
     }
 
@@ -798,7 +798,7 @@ function run_uninstaller($manifest, $architecture, $dir) {
     $version = $manifest.version
     if($uninstaller.script) {
         write-output "Running uninstaller script..."
-        Invoke-Expression (@($uninstaller.script) -join "`r`n")
+        Invoke-Command ([scriptblock]::Create($uninstaller.script -join "`r`n"))
         return
     }
 
@@ -1031,19 +1031,25 @@ function env_rm($manifest, $global, $arch) {
     }
 }
 
-function pre_install($manifest, $arch) {
-    $pre_install = arch_specific 'pre_install' $manifest $arch
-    if($pre_install) {
-        write-output "Running pre-install script..."
-        Invoke-Expression (@($pre_install) -join "`r`n")
-    }
-}
+function Invoke-HookScript {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('pre_install', 'post_install',
+                     'pre_uninstall', 'post_uninstall')]
+        [String] $HookType,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject] $Manifest,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('32bit', '64bit')]
+        [String] $Arch
+    )
 
-function post_install($manifest, $arch) {
-    $post_install = arch_specific 'post_install' $manifest $arch
-    if($post_install) {
-        write-output "Running post-install script..."
-        Invoke-Expression (@($post_install) -join "`r`n")
+    $script = arch_specific $HookType $Manifest $Arch
+    if ($script) {
+        Write-Output "Running $HookType script..."
+        Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
     }
 }
 
