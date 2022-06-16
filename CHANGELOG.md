@@ -3,6 +3,7 @@
 ### Features
 
 - **core:** Add `Get-Encoding` function to fix missing webclient encoding ([#4956](https://github.com/ScoopInstaller/Scoop/issues/4956))
+- **scoop-info:** Display a breakdown of an app's installation size, or download size if not installed (`--verbose` only) ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
 - **scoop-virustotal:** Migrate to virustotal api v3, improve flows, and ouput powershell objects ([#4983](https://github.com/ScoopInstaller/Scoop/pull/4983))
 
 ### Bug Fixes
@@ -48,7 +49,6 @@
 
 - **relicense:** Relicense to dual-license (Unlicense or MIT) ([#4903](https://github.com/ScoopInstaller/Scoop/issues/4903), [#4870](https://github.com/ScoopInstaller/Scoop/issues/4870))
 - **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4254))
-- **scoop-info:** Display a breakdown of an app's installation size, or download size if not installed (`--verbose` only) ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
 - **scoop-cleanup:** Add `-a/--all` switch to cleanup all apps ([#4906](https://github.com/ScoopInstaller/Scoop/issues/4906))
 
 ### Bug Fixes
