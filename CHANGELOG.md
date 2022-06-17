@@ -3,6 +3,7 @@
 ### Features
 
 - **core:** Add `Get-Encoding` function to fix missing webclient encoding ([#4956](https://github.com/ScoopInstaller/Scoop/issues/4956))
+- **scoop-update:** Support `scoop update scoop` ([#4992](https://github.com/ScoopInstaller/Scoop/issues/4992))
 - **scoop-virustotal:** Migrate to virustotal api v3, improve flows, and ouput powershell objects ([#4983](https://github.com/ScoopInstaller/Scoop/pull/4983))
 
 ### Bug Fixes
