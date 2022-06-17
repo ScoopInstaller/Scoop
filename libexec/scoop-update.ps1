@@ -306,11 +306,14 @@ if (-not ($apps -or $all)) {
         'ERROR: You need admin rights to update global apps.'; exit 1
     }
 
-    if (is_scoop_outdated) {
+    $outdated = @()
+    $updateScoop = $null -ne ($apps | Where-Object { $_ -eq 'scoop' }) -or (is_scoop_outdated)
+    $apps = $apps | Where-Object { $_ -ne 'scoop' }
+    $apps_param = $apps
+
+    if ($updateScoop) {
         update_scoop
     }
-    $outdated = @()
-    $apps_param = $apps
 
     if ($apps_param -eq '*' -or $all) {
         $apps = applist (installed_apps $false) $false
@@ -318,7 +321,9 @@ if (-not ($apps -or $all)) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        $apps = Confirm-InstallationStatus $apps_param -Global:$global
+        if ($apps_param) {
+            $apps = Confirm-InstallationStatus $apps_param -Global:$global
+        }
     }
     if ($apps) {
         $apps | ForEach-Object {
