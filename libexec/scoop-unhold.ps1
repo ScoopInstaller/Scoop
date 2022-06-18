@@ -1,11 +1,10 @@
 # Usage: scoop unhold <app>
 # Summary: Unhold an app to enable updates
 
-. "$PSScriptRoot\..\lib\help.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\json.ps1" # 'save_install_info' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'install_info' 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 
-reset_aliases
 $apps = $args
 
 if(!$apps) {

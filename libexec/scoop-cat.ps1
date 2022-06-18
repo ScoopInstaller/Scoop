@@ -3,16 +3,12 @@
 
 param($app)
 
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-
-reset_aliases
+. "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 
 if (!$app) { error '<app> missing'; my_usage; exit 1 }
 
-$app, $bucket, $null = parse_app $app
-$app, $manifest, $bucket, $url = Find-Manifest $app $bucket
+$null, $manifest, $bucket, $url = Get-Manifest $app
 
 if ($manifest) {
         $style = get_config cat_style

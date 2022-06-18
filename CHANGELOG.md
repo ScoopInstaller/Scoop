@@ -1,3 +1,79 @@
+## [v0.2.1](https://github.com/ScoopInstaller/Scoop/compare/v0.2.0...v0.2.1) - 2022-06-10
+
+### Features
+
+- **core:** Add pre_uninstall and post_uninstall hooks ([#4957](https://github.com/ScoopInstaller/Scoop/issues/4957), [#4962](https://github.com/ScoopInstaller/Scoop/issues/4962))
+
+### Bug Fixes
+
+- **bucket:** Make sure `list_buckets` return array ([#4979](https://github.com/ScoopInstaller/Scoop/issues/4979))
+- **chore:** Deprecate tls1 and tls1.1 ([#4950](https://github.com/ScoopInstaller/Scoop/issues/4950))
+- **chore:** Update Nonportable bucket URL ([#4955](https://github.com/ScoopInstaller/Scoop/issues/4955))
+- **core:** Using `Invoke-Command` instead of `Invoke-Expression` ([#4941](https://github.com/ScoopInstaller/Scoop/issues/4941))
+- **core:** Load config file before initialization ([#4932](https://github.com/ScoopInstaller/Scoop/issues/4932))
+- **core:** Allow to use '_' and '.' in bucket name ([#4952](https://github.com/ScoopInstaller/Scoop/issues/4952))
+- **depends:** Avoid digits in archive file extension (except for .7z and .001) ([#4915](https://github.com/ScoopInstaller/Scoop/issues/4915))
+- **bucket:** Don't check remote URL of non-git buckets ([#4923](https://github.com/ScoopInstaller/Scoop/issues/4923))
+- **bucket:** Don't write message OK before bucket is cloned ([#4925](https://github.com/ScoopInstaller/Scoop/issues/4925))
+- **shim:** Add 'Get-CommandPath()' to find git ([#4913](https://github.com/ScoopInstaller/Scoop/issues/4913))
+- **shim:** Remove character replacement in .cmd -> .ps1 shims ([#4914](https://github.com/ScoopInstaller/Scoop/issues/4914))
+- **scoop:** Pass CLI arguments as string objects ([#4931](https://github.com/ScoopInstaller/Scoop/issues/4931))
+- **scoop-info:** Fix error message when manifest is not found ([#4935](https://github.com/ScoopInstaller/Scoop/issues/4935))
+- **scoop-search:** Require files in 'bucket' dir for remote known buckets ([#4944](https://github.com/ScoopInstaller/Scoop/issues/4944))
+- **update:** Prevent uninstall when update ([#4949](https://github.com/ScoopInstaller/Scoop/issues/4949))
+- **scoop-download:** Use correct Args when calling `Get-Manifest` ([#4970](https://github.com/ScoopInstaller/Scoop/issues/4970))
+
+### Code Refactoring
+
+- **manifest:** Rename 'Find-Manifest()' to 'Get-Manifest() ([#4966](https://github.com/ScoopInstaller/Scoop/issues/4966), [#4981](https://github.com/ScoopInstaller/Scoop/issues/4981))
+
+### Documentation
+
+- **readme:** Update license badge ([#4929](https://github.com/ScoopInstaller/Scoop/issues/4929))
+
+## [v0.2.0](https://github.com/ScoopInstaller/Scoop/compare/v0.1.0...v0.2.0) - 2022-05-10
+
+### Features
+
+- **relicense:** Relicense to dual-license (Unlicense or MIT) ([#4903](https://github.com/ScoopInstaller/Scoop/issues/4903), [#4870](https://github.com/ScoopInstaller/Scoop/issues/4870))
+- **install:** Allow downloading from private repositories ([#4254](https://github.com/ScoopInstaller/Scoop/issues/4254))
+- **scoop-cleanup:** Add `-a/--all` switch to cleanup all apps ([#4906](https://github.com/ScoopInstaller/Scoop/issues/4906))
+
+### Bug Fixes
+
+- **bucket:** Return empty list correctly in `Get-LocalBucket` ([#4885](https://github.com/ScoopInstaller/Scoop/issues/4885))
+- **install:** Fix issue with installation inside containers ([#4837](https://github.com/ScoopInstaller/Scoop/issues/4837))
+- **installed:** If no `$global`, check both local and global installed ([#4798](https://github.com/ScoopInstaller/Scoop/issues/4798))
+- **shim:** Manipulating shims with UTF8 encoding ([#4791](https://github.com/ScoopInstaller/Scoop/issues/4791), [#4813](https://github.com/ScoopInstaller/Scoop/issues/4813))
+- **shim:** Correctly quote $@ in sh->ps1 shims ([#4809](https://github.com/ScoopInstaller/Scoop/issues/4809))
+- **update:** Skip logs starting with `(chore)` ([#4800](https://github.com/ScoopInstaller/Scoop/issues/4800))
+- **scoop-download:** Add failure check ([#4822](https://github.com/ScoopInstaller/Scoop/issues/4822))
+- **scoop-list:** Fix date in 'Updated' column showing the months in the place of minutes ([#4880](https://github.com/ScoopInstaller/Scoop/issues/4880))
+- **scoop-prefix:** Fix typo that breaks global installed apps ([#4795](https://github.com/ScoopInstaller/Scoop/issues/4795))
+
+### Performance Improvements
+
+- **scoop:** Load libs only once ([#4839](https://github.com/ScoopInstaller/Scoop/issues/4839), [#4884](https://github.com/ScoopInstaller/Scoop/issues/4884))
+
+### Code Refactoring
+
+- **bucket:** Move 'Find-Manifest' and 'list_buckets' to 'buckets' ([#4814](https://github.com/ScoopInstaller/Scoop/issues/4814))
+- **relpath:** Use `$PSScriptRoot` instead of `relpath` ([#4793](https://github.com/ScoopInstaller/Scoop/issues/4793))
+- **reset_aliases:** Move core function of `reset_aliases` to `scoop` ([#4794](https://github.com/ScoopInstaller/Scoop/issues/4794))
+- **config:** Rename checkver_token to gh_token and SCOOP_CHECKVER_TOKEN to SCOOP_GH_TOKEN ([#4832](https://github.com/ScoopInstaller/Scoop/issues/4832), [#4842](https://github.com/ScoopInstaller/Scoop/issues/4842))
+
+### Builds
+
+- **checkver:** Add option to throw error as exception ([#4867](https://github.com/ScoopInstaller/Scoop/issues/4867))
+- **schema:** Remove 'description' from required fields ([#4853](https://github.com/ScoopInstaller/Scoop/issues/4853), [#4874](https://github.com/ScoopInstaller/Scoop/issues/4874))
+
+### Documentation
+
+- **changelog:** Rearrange CHANGELOG ([#4897](https://github.com/ScoopInstaller/Scoop/issues/4897))
+- **readme:** Update installation instruction ([#4825](https://github.com/ScoopInstaller/Scoop/issues/4825))
+- **readme:** Fix badges for Gitter and CI Tests ([#4830](https://github.com/ScoopInstaller/Scoop/issues/4830))
+- **scoop-shim:** Fix typo ([#4836](https://github.com/ScoopInstaller/Scoop/issues/4836))
+
 ## [v0.1.0](https://github.com/ScoopInstaller/Scoop/compare/2021-12-26...v0.1.0) - 2022-03-01
 
 ### Features

@@ -2,7 +2,7 @@
 # Summary: Manipulate Scoop shims
 # Help: Manipulate Scoop shims: add, rm, list, info, alter, etc.
 #
-# To add a costom shim, use the 'add' subcommand:
+# To add a custom shim, use the 'add' subcommand:
 #
 #     scoop shim add <shim_name> <command_path> [<args>...]
 #
@@ -29,7 +29,6 @@
 
 param($SubCommand, $ShimName, [Switch]$global)
 
-. "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
 
 if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
@@ -106,20 +105,6 @@ function Get-ShimPath($ShimName, $Global) {
         if (Test-Path $shimPath) {
             return $shimPath
         }
-    }
-}
-
-function Get-ShimTarget($ShimPath) {
-    if ($ShimPath) {
-        $shimTarget = if ($ShimPath.EndsWith('.shim')) {
-            (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
-        } else {
-            ((Select-String -Path $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
-        }
-        if (!$shimTarget) {
-            $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
-        }
-        $shimTarget | Convert-Path
     }
 }
 

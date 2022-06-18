@@ -23,9 +23,7 @@ param(
     [Switch]$verbose = $false
 )
 
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\help.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\install.ps1" # shim related
 
 $script:config_alias = 'alias'
 
@@ -58,7 +56,7 @@ function add_alias($name, $command) {
 # Summary: $description
 $command
 "@
-    $script | Out-File "$shimdir\$alias_file.ps1" -Encoding ASCII
+    $script | Out-UTF8File "$shimdir\$alias_file.ps1"
 
     # add alias to config
     $aliases | Add-Member -MemberType NoteProperty -Name $name -Value $alias_file
@@ -96,7 +94,7 @@ function list_aliases {
     }
 
     if (!$aliases.count) {
-        warn 'No aliases founds.'
+        info "No alias found."
     }
     $aliases = $aliases.GetEnumerator() | Sort-Object Name
     if ($verbose) {

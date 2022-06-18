@@ -1,29 +1,53 @@
 #Requires -Version 5
-param($cmd)
-
-Set-StrictMode -off
+Set-StrictMode -Off
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\commands.ps1"
+. "$PSScriptRoot\..\lib\help.ps1"
 
-reset_aliases
+$subCommand = $Args[0]
 
-$commands = commands
-if ('--version' -contains $cmd -or (!$cmd -and '-v' -contains $args)) {
-    Write-Host "Current Scoop version:"
-    Invoke-Expression "git -C '$(versiondir 'scoop' 'current')' --no-pager log --oneline HEAD -n 1"
-    Write-Host ""
+# for aliases where there's a local function, re-alias so the function takes precedence
+$aliases = Get-Alias | Where-Object { $_.Options -notmatch 'ReadOnly|AllScope' } | ForEach-Object { $_.Name }
+Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForEach-Object {
+    Set-Alias -Name $_.Name -Value Local:$($_.Name) -Scope Script
+}
 
-    Get-LocalBucket | ForEach-Object {
-        $bucketLoc =  Find-BucketDirectory $_ -Root
-        if(Test-Path (Join-Path $bucketLoc '.git')) {
-            Write-Host "'$_' bucket:"
-            Invoke-Expression "git -C '$bucketLoc' --no-pager log --oneline HEAD -n 1"
-            Write-Host ""
+switch ($subCommand) {
+    ({ $subCommand -in @($null, '-h', '--help', '/?') }) {
+        exec 'help'
+    }
+    ({ $subCommand -in @('-v', '--version') }) {
+        Write-Host 'Current Scoop version:'
+        if ((Test-CommandAvailable git) -and (Test-Path "$PSScriptRoot\..\.git") -and (get_config SCOOP_BRANCH 'master') -ne 'master') {
+            git -C "$PSScriptRoot\.." --no-pager log --oneline HEAD -n 1
+        } else {
+            $version = Select-String -Pattern '^## \[(v[\d.]+)\].*?([\d-]+)$' -Path "$PSScriptRoot\..\CHANGELOG.md"
+            Write-Host $version.Matches.Groups[1].Value -ForegroundColor Cyan -NoNewline
+            Write-Host " - Released at $($version.Matches.Groups[2].Value)"
+        }
+        Write-Host ''
+
+        Get-LocalBucket | ForEach-Object {
+            $bucketLoc = Find-BucketDirectory $_ -Root
+            if ((Test-Path "$bucketLoc\.git") -and (Test-CommandAvailable git)) {
+                Write-Host "'$_' bucket:"
+                git -C "$bucketLoc" --no-pager log --oneline HEAD -n 1
+                Write-Host ''
+            }
         }
     }
+    ({ $subCommand -in (commands) }) {
+        [string[]]$arguments = $Args | Select-Object -Skip 1
+        if ($null -ne $arguments -and $arguments[0] -in @('-h', '--help', '/?')) {
+            exec 'help' @($subCommand)
+        } else {
+            exec $subCommand $arguments
+        }
+    }
+    default {
+        "scoop: '$subCommand' isn't a scoop command. See 'scoop help'."
+        exit 1
+    }
 }
-elseif (@($null, '--help', '/?') -contains $cmd -or $args[0] -contains '-h') { exec 'help' $args }
-elseif ($commands -contains $cmd) { exec $cmd $args }
-else { "scoop: '$cmd' isn't a scoop command. See 'scoop help'."; exit 1 }

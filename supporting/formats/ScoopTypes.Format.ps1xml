@@ -21,7 +21,7 @@
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Updated</PropertyName>
-                                <FormatString>yyyy-MM-dd HH:MM:ss</FormatString>
+                                <FormatString>yyyy-MM-dd HH:mm:ss</FormatString>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Info</PropertyName>
