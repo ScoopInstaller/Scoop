@@ -1,6 +1,6 @@
 {
     "recommendations": [
-        "EditorConfig.EditorConfig",
-        "ms-vscode.PowerShell"
+        "editorconfig.editorconfig",
+        "SonarSource.sonarlint-vscode"
     ]
 }
