@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 - **manifest:** Fix bugs in 'Get-Manifest()' ([#4986](https://github.com/ScoopInstaller/Scoop/issues/4986))
+- **decompress:** Handle splitted RAR archives ([#4994](https://github.com/ScoopInstaller/Scoop/pull/4994))
 
 ## [v0.2.1](https://github.com/ScoopInstaller/Scoop/compare/v0.2.0...v0.2.1) - 2022-06-10
 
