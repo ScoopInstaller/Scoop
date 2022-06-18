@@ -44,6 +44,9 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             $test5_1 = "$working_dir\7ZipTest5.7z.001"
             $test5_2 = "$working_dir\7ZipTest5.7z.002"
             $test5_3 = "$working_dir\7ZipTest5.7z.003"
+            $test6_1 = "$working_dir\7ZipTest6.part01.rar"
+            $test6_2 = "$working_dir\7ZipTest6.part02.rar"
+            $test6_3 = "$working_dir\7ZipTest6.part03.rar"
         }
 
         It 'extract normal compressed file' -Skip:$isUnix {
@@ -92,6 +95,10 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             $test5_1 | Should -Not -Exist
             $test5_2 | Should -Not -Exist
             $test5_3 | Should -Not -Exist
+            test_extract 'Expand-7zipArchive' $test6_1 $true
+            $test6_1 | Should -Not -Exist
+            $test6_2 | Should -Not -Exist
+            $test6_3 | Should -Not -Exist
         }
     }
 
