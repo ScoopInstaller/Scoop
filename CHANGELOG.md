@@ -10,6 +10,10 @@
 
 - **manifest:** Fix bugs in 'Get-Manifest()' ([#4986](https://github.com/ScoopInstaller/Scoop/issues/4986))
 
+### Code Refactoring
+
+- **scoop-search:** Output PSObject, use API token ([#4997](https://github.com/ScoopInstaller/Scoop/issues/4997))
+
 ## [v0.2.1](https://github.com/ScoopInstaller/Scoop/compare/v0.2.0...v0.2.1) - 2022-06-10
 
 ### Features
