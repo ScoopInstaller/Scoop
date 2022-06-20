@@ -1,11 +1,11 @@
-## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+## [v0.2.2](https://github.com/ScoopInstaller/Scoop/compare/v0.2.1...v0.2.2) - 2022-06-21
 
 ### Features
 
 - **core:** Add `Get-Encoding` function to fix missing webclient encoding ([#4956](https://github.com/ScoopInstaller/Scoop/issues/4956))
+- **scoop-(un)hold:** Add `-g`/`--global` flag ([#4991](https://github.com/ScoopInstaller/Scoop/issues/4991))
 - **scoop-update:** Support `scoop update scoop` ([#4992](https://github.com/ScoopInstaller/Scoop/issues/4992))
-- **scoop-virustotal:** Migrate to virustotal api v3, improve flows, and ouput powershell objects ([#4983](https://github.com/ScoopInstaller/Scoop/pull/4983))
-- **scoop-hold,scoop-unhold:** Support `-g`/`--global` flag ([#4991](https://github.com/ScoopInstaller/Scoop/issues/4991))
+- **scoop-virustotal:** Migrate to VirusTotal API v3 ([#4983](https://github.com/ScoopInstaller/Scoop/issues/4983))
 
 ### Bug Fixes
 
