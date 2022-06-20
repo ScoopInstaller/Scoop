@@ -47,7 +47,7 @@ switch ($subCommand) {
         }
     }
     default {
-        "scoop: '$subCommand' isn't a scoop command. See 'scoop help'."
+        Write-Host "scoop: '$subCommand' isn't a scoop command. See 'scoop help'."
         exit 1
     }
 }
