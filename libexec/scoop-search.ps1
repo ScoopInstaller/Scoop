@@ -63,7 +63,8 @@ function github_ratelimit_reached {
     $api_link = 'https://api.github.com/rate_limit'
     $ret = (download_json $api_link).rate.remaining -eq 0
     if ($ret) {
-        Write-Host "GitHub API rate limit reached. Please try again later or configure your API token using 'scoop config gh_token <your token>'."
+        Write-Host "GitHub API rate limit reached.
+Please try again later or configure your API token using 'scoop config gh_token <your token>'."
     }
     $ret
 }
@@ -91,7 +92,8 @@ function search_remotes($query) {
     } | Where-Object { $_.results }
 
     if ($results.count -gt 0) {
-        Write-Host "Results from other known buckets...`n(add them using 'scoop bucket add <bucket name>')"
+        Write-Host "Results from other known buckets...
+(add them using 'scoop bucket add <bucket name>')"
     }
 
     $results | ForEach-Object {
