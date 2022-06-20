@@ -1,3 +1,8 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Bug Fixes
+- **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002))
+
 ## [v0.2.2](https://github.com/ScoopInstaller/Scoop/compare/v0.2.1...v0.2.2) - 2022-06-21
 
 ### Features
