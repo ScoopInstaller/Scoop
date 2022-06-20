@@ -1,3 +1,8 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Bug Fixes
+- **shortcuts:** Fix network drive shortcut creation ([#4410](https://github.com/ScoopInstaller/Scoop/issues/4410))
+
 ## [v0.2.2](https://github.com/ScoopInstaller/Scoop/compare/v0.2.1...v0.2.2) - 2022-06-21
 
 ### Features
