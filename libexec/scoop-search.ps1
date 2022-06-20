@@ -133,7 +133,7 @@ if ($list.Length -gt 0) {
 if (!$local_results -and !(github_ratelimit_reached)) {
     $remote_results = search_remotes $query
     if (!$remote_results) {
-        [Console]::Error.WriteLine("No matches found.")
+        warn "No matches found."
         exit 1
     }
     $remote_results
