@@ -12,9 +12,9 @@ param($query)
 $list = @()
 
 try {
-    $query = New-Object regex $query, 'IgnoreCase'
+    $query = New-Object Regex $query, 'IgnoreCase'
 } catch {
-    abort "Invalid regular expression: $($_.exception.innerexception.message)"
+    abort "Invalid regular expression: $($_.Exception.InnerException.Message)"
 }
 
 $githubtoken = Get-GitHubToken

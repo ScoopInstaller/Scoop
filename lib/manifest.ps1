@@ -3,7 +3,7 @@ function manifest_path($app, $bucket) {
 }
 
 function parse_json($path) {
-    if(!(Test-Path $path)) { return $null }
+    if (!(Test-Path $path)) { return $null }
     try {
         Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     } catch {
