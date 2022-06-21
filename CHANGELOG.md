@@ -2,7 +2,7 @@
 
 ### Features
 
-- **scoop-info:** Show app installed/download size ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
+- **scoop-info:** Show app installed/download size ([#4886](https://github.com/ScoopInstaller/Scoop/issues/4886))
 
 ### Bug Fixes
 
