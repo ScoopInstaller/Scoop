@@ -52,10 +52,10 @@ function add_alias($name, $command) {
     # generate script
     $shimdir = shimdir $false
     $script =
-    @"
-# Summary: $description
-$command
-"@
+    @(
+        "# Summary: $description",
+        "$command"
+    ) -join "`r`n"
     $script | Out-UTF8File "$shimdir\$alias_file.ps1"
 
     # add alias to config
