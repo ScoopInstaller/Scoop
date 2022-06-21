@@ -2,7 +2,7 @@
 
 ### Features
 
-- **scoop-info:** Display a breakdown of an app's installation size, or download size if not installed (`--verbose` only) ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
+- **scoop-info:** Show app installed/download size ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
 
 ### Bug Fixes
 
