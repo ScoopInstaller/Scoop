@@ -160,14 +160,14 @@ if ($status.installed) {
         $totalPackage = 0
         foreach ($url in @(url $manifest (default_architecture))) {
             try {
-                [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
-                $totalPackage += $urlLength
-
                 if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
                     $cached = " (latest version is cached)"
                 } else {
                     $cached = $null
                 }
+
+                [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
+                $totalPackage += $urlLength
             } catch [System.Management.Automation.RuntimeException] {
                 $totalPackage = 0
                 $packageError = "the server at $(([System.Uri]$url).Host) did not send a Content-Length header"
@@ -181,7 +181,7 @@ if ($status.installed) {
         if ($totalPackage -ne 0) {
             $item.'Download size' = "$(filesize $totalPackage)$cached"
         } else {
-            $item.'Download size' = "Unknown ($packageError)"
+            $item.'Download size' = "Unknown ($packageError)$cached"
         }
     }
 }
