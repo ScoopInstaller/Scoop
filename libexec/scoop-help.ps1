@@ -17,7 +17,7 @@ function print_summaries {
 
     command_files | ForEach-Object {
         $command = [ordered]@{}
-        $command.Subcommand = command_name $_
+        $command.Command = command_name $_
         $command.Summary = summary (Get-Content (command_path $command.Subcommand))
         $commands += [PSCustomObject]$command
     }
@@ -37,7 +37,7 @@ Type 'scoop help <command>' to get more help for a specific command."
 } elseif($commands -contains $cmd) {
     print_help $cmd
 } else {
-    Write-Host "scoop help: no such command '$cmd'"
+    warn "scoop help: no such command '$cmd'"
     exit 1
 }
 
