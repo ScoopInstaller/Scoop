@@ -32,7 +32,7 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
 
     Context 'InstallationHelper function' {
         BeforeAll {
-            $working_dir = setup_working 'format/formated'
+            $working_dir = setup_working 'format/formatted'
             $manifest1 = parse_json (Join-Path $working_dir '3-array-with-single-and-multi.json')
             $manifest2 = parse_json (Join-Path $working_dir '4-script-block.json')
             Mock Test-HelperInstalled { $false }

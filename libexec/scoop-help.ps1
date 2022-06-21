@@ -3,41 +3,42 @@
 param($cmd)
 
 function print_help($cmd) {
-    $file = Get-Content (command_path $cmd) -raw
+    $file = Get-Content (command_path $cmd) -Raw
 
     $usage = usage $file
-    $summary = summary $file
     $help = scoop_help $file
 
-    if($usage) { "$usage`n" }
-    if($help) { $help }
+    if ($usage) { "$usage`n" }
+    if ($help) { $help }
 }
 
 function print_summaries {
-    $commands = @{}
+    $commands = @()
 
     command_files | ForEach-Object {
-        $command = command_name $_
-        $summary = summary (Get-Content (command_path $command) -raw)
-        if(!($summary)) { $summary = '' }
-        $commands.add("$command ", $summary) # add padding
+        $command = [ordered]@{}
+        $command.Command = command_name $_
+        $command.Summary = summary (Get-Content (command_path $command.Command))
+        $commands += [PSCustomObject]$command
     }
 
-    $commands.getenumerator() | Sort-Object name | Format-Table -hidetablehead -autosize -wrap
+    $commands
 }
 
 $commands = commands
 
 if(!($cmd)) {
-    "Usage: scoop <command> [<args>]
+    Write-Host "Usage: scoop <command> [<args>]
 
-Some useful commands are:"
+Available commands are listed below.
+
+Type 'scoop help <command>' to get more help for a specific command."
     print_summaries
-    "Type 'scoop help <command>' to get help for a specific command."
 } elseif($commands -contains $cmd) {
     print_help $cmd
 } else {
-    "scoop help: no such command '$cmd'"; exit 1
+    warn "scoop help: no such command '$cmd'"
+    exit 1
 }
 
 exit 0

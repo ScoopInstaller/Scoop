@@ -3,6 +3,10 @@
 # Help: e.g. The usual way to download an app, without installing it (uses your local 'buckets'):
 #      scoop download git
 #
+# To download a different version of the app
+# (note that this will auto-generate the manifest using current version):
+#      scoop download gh@2.7.0
+#
 # To download an app from a manifest at a URL:
 #      scoop download https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
 #
