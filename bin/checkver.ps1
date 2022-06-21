@@ -113,7 +113,7 @@ $Queue | ForEach-Object {
     } else {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
     }
-    Register-ObjectEvent $wc downloadstringcompleted -ErrorAction Stop | Out-Null
+    Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
 
     $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
 
@@ -190,7 +190,7 @@ $Queue | ForEach-Object {
     }
 
     $wc.Headers.Add('Referer', (strip_filename $url))
-    $wc.DownloadStringAsync($url, $state)
+    $wc.DownloadDataAsync($url, $state)
 }
 
 function next($er) {
@@ -218,7 +218,7 @@ while ($in_progress -gt 0) {
     $ver = $Version
 
     if (!$ver) {
-        $page = $ev.SourceEventArgs.Result
+        $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
         $err = $ev.SourceEventArgs.Error
         if ($json.checkver.script) {
             $page = Invoke-Command ([scriptblock]::Create($json.checkver.script -join "`r`n"))

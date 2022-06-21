@@ -12,7 +12,8 @@ function url_manifest($url) {
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $str = $wc.downloadstring($url)
+        $data = $wc.DownloadData($url)
+        $str = (Get-Encoding($wc)).GetString($data)
     } catch [system.management.automation.methodinvocationexception] {
         warn "error: $($_.exception.innerexception.message)"
     } catch {
@@ -24,6 +25,7 @@ function url_manifest($url) {
 
 function Get-Manifest($app) {
     $bucket, $manifest, $url = $null
+    $app = $app.TrimStart('/')
     # check if app is a URL or UNC path
     if ($app -match '^(ht|f)tps?://|\\\\') {
         $url = $app
@@ -44,6 +46,7 @@ function Get-Manifest($app) {
         if (!$manifest) {
             # couldn't find app in buckets: check if it's a local path
             $appPath = $app
+            $bucket = $null
             if (!$appPath.EndsWith('.json')) {
                 $appPath += '.json'
             }
@@ -66,7 +69,8 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
     if ($url) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $wc.downloadstring($url) > "$dir\manifest.json"
+        $data = $wc.DownloadData($url)
+        (Get-Encoding($wc)).GetString($data) | Out-UTF8File "$dir\manifest.json"
     } else {
         Copy-Item (manifest_path $app $bucket) "$dir\manifest.json"
     }
