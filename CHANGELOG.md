@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
 
+### Features
+
+- **scoop-info:** Show app installed/download size ([#4886](https://github.com/ScoopInstaller/Scoop/issues/4886))
+
 ### Bug Fixes
 
 - **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002))
