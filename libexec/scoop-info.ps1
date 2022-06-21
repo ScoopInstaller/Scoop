@@ -111,48 +111,43 @@ if ($status.installed) {
         $appsdir = appsdir $global
 
         # Collect file list from each location
-        $appFiles = Get-ChildItem $appsdir | Where-Object -Property Name -Value "^$app$" -Match
-        $currentFiles = Get-ChildItem $appFiles | Where-Object -Property Name -Value (Select-CurrentVersion $app $global) -Match
+        $appFiles = Get-ChildItem $appsdir -Filter $app
+        $currentFiles = Get-ChildItem $appFiles -Filter (Select-CurrentVersion $app $global)
         $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
-        $cacheFiles = Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match
+        $cacheFiles = Get-ChildItem $cachedir -Filter "$app#*"
 
-        # Get the sum of each file list and keep a total
-        $totalSize = 0
+        # Get the sum of each file list
         $fileTotals = @()
-        foreach ($fileType in ($appFiles, $persistFiles, $cacheFiles)) {
-            if ($fileType.Length -ne 0) {
+        foreach ($fileType in ($appFiles, $currentFiles, $persistFiles, $cacheFiles)) {
+            if ($null -ne $fileType) {
                 $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
-                $fileTotals += $fileSum
-                $totalSize += $fileSum
+                $fileTotals += coalesce $fileSum 0
             } else {
                 $fileTotals += 0
             }
         }
 
-        # This is separate so that current version size doesn't double count in $totalSize
-        $currentTotal = (Get-ChildItem $currentFiles -Recurse | Measure-Object -Property Length -Sum).Sum
-
         # Old versions = app total - current version size
-        $fileTotals += $fileTotals[0] - $currentTotal
+        $fileTotals += $fileTotals[0] - $fileTotals[1]
 
-        if ($currentTotal -eq $totalSize) {
+        if ($fileTotals[2] + $fileTotals[3] + $fileTotals[4] -eq 0) {
             # Simple app size output if no old versions, persisted data, cached downloads
-            $item.'Installed size' = filesize $currentTotal
+            $item.'Installed size' = filesize $fileTotals[1]
         } else {
             $fileSizes = [ordered] @{
-                "Current version:  " = $(filesize $currentTotal)
-                "Old versions:     " = $(filesize $fileTotals[3])
-                "Persisted data:   " = $(filesize $fileTotals[1])
-                "Cached downloads: " = $(filesize $fileTotals[2])
-                "Total:            " = $(filesize $totalSize)
+                'Current version:  ' = $fileTotals[1]
+                'Old versions:     ' = $fileTotals[4]
+                'Persisted data:   ' = $fileTotals[2]
+                'Cached downloads: ' = $fileTotals[3]
+                'Total:            ' = $fileTotals[0] + $fileTotals[2] + $fileTotals[3]
             }
 
             $fileSizeOutput = @()
 
             # Don't output empty categories
             $fileSizes.GetEnumerator() | ForEach-Object {
-                if ($_.value -ne "0 B") {
-                    $fileSizeOutput += $_.key + $_.value
+                if ($_.Value -ne 0) {
+                    $fileSizeOutput += $_.Key + (filesize $_.Value)
                 }
             }
 
@@ -162,23 +157,8 @@ if ($status.installed) {
 } else {
     if ($verbose) {
         # Get download size if app not installed
-        $architecture = default_architecture
-
-        if(!(supports_architecture $manifest $architecture)) {
-        # No available download for current architecture
-            continue
-        }
-
-        if ($null -eq $manifest.url) {
-            # use url for current architecture
-            $urls = url $manifest $architecture
-        } else {
-            # otherwise use non-architecture url
-            $urls = $manifest.url
-        }
-
         $totalPackage = 0
-        foreach($url in $urls) {
+        foreach ($url in @(url $manifest (default_architecture))) {
             try {
                 [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
                 $totalPackage += $urlLength
