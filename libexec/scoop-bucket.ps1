@@ -10,7 +10,7 @@
 #     scoop bucket add <name> [<repo>]
 #
 # e.g.:
-#     scoop bucket add extras https://github.com/lukesampson/scoop-extras.git
+#     scoop bucket add extras https://github.com/ScoopInstaller/Extras.git
 #
 # Since the 'extras' bucket is known to Scoop, this can be shortened to:
 #     scoop bucket add extras
@@ -19,22 +19,53 @@
 #     scoop bucket known
 param($cmd, $name, $repo)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\git.ps1"
+$usage_add = 'usage: scoop bucket add <name> [<repo>]'
+$usage_rm = 'usage: scoop bucket rm <name>'
 
-reset_aliases
-
-$usage_add = "usage: scoop bucket add <name> [<repo>]"
-$usage_rm = "usage: scoop bucket rm <name>"
-
-switch($cmd) {
-    'add' { add_bucket $name $repo }
-    'rm' { rm_bucket $name }
-    'list' { Get-LocalBucket }
-    'known' { known_buckets }
-    default { "scoop bucket: cmd '$cmd' not supported"; my_usage; exit 1 }
+switch ($cmd) {
+    'add' {
+        if (!$name) {
+            '<name> missing'
+            $usage_add
+            exit 1
+        }
+        if (!$repo) {
+            $repo = known_bucket_repo $name
+            if (!$repo) {
+                "Unknown bucket '$name'. Try specifying <repo>."
+                $usage_add
+                exit 1
+            }
+        }
+        $status = add_bucket $name $repo
+        exit $status
+    }
+    'rm' {
+        if (!$name) {
+            '<name> missing'
+            $usage_rm
+            exit 1
+        }
+        $status = rm_bucket $name
+        exit $status
+    }
+    'list' {
+        $buckets = list_buckets
+        if (!$buckets.Length) {
+            warn "No bucket found. Please run 'scoop bucket add main' to add the default 'main' bucket."
+            exit 2
+        } else {
+            $buckets
+            exit 0
+        }
+    }
+    'known' {
+        known_buckets
+        exit 0
+    }
+    default {
+        "scoop bucket: cmd '$cmd' not supported"
+        my_usage
+        exit 1
+    }
 }
-
-exit 0
