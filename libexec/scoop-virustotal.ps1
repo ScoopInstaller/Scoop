@@ -2,7 +2,7 @@
 # Summary: Look for app's hash or url on virustotal.com
 # Help: Look for app's hash or url on virustotal.com
 #
-# Use a single '*' for app to check all installed apps.
+# Use a single '*' or the '-e/--every' switch to check every installed app.
 #
 # To use this command, you have to sign up to VirusTotal's community,
 # and get an API key. Then, tell scoop about your API key with:
@@ -34,7 +34,7 @@
 . "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
-$opt, $apps, $err = getopt $args 'a:snup' @('arch=', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
+$opt, $apps, $err = getopt $args 'a:snupe' @('arch=', 'scan', 'no-depends', 'no-update-scoop', 'passthru', 'every')
 if ($err) { "scoop virustotal: $err"; exit 1 }
 if (!$apps) { my_usage; exit 1 }
 $architecture = ensure_architecture ($opt.a + $opt.arch)
@@ -49,7 +49,7 @@ if (is_scoop_outdated) {
 
 $apps_param = $apps
 
-if ($apps_param -eq '*') {
+if ($apps_param -eq '*' -or $opt.e -or $opt.every) {
     $apps = installed_apps $false
     $apps += installed_apps $true
 }
