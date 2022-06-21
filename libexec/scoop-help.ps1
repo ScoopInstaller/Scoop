@@ -18,7 +18,7 @@ function print_summaries {
     command_files | ForEach-Object {
         $command = [ordered]@{}
         $command.Command = command_name $_
-        $command.Summary = summary (Get-Content (command_path $command.Subcommand))
+        $command.Summary = summary (Get-Content (command_path $command.Command))
         $commands += [PSCustomObject]$command
     }
 
