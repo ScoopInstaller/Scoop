@@ -10,6 +10,8 @@
 #
 # To clear everything in your cache, use:
 #     scoop cache rm *
+# You can also use the `-a/--all` switch in place of `*` here
+
 param($cmd)
 
 function cacheinfo($file) {
@@ -36,7 +38,7 @@ function cacheremove($app) {
         'ERROR: <app(s)> missing'
         my_usage
         exit 1
-    } elseif ($app -eq '*') {
+    } elseif ($app -eq '*' -or $app -eq '-a' -or $app -eq '--all') {
         $files = @(Get-ChildItem $cachedir)
     } else {
         $app = '(' + ($app -join '|') + ')'
