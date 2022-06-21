@@ -15,6 +15,14 @@ function Optimize-SecurityProtocol {
     }
 }
 
+function Get-Encoding($wc) {
+    if ($null -ne $wc.ResponseHeaders -and $wc.ResponseHeaders['Content-Type'] -match 'charset=([^;]*)') {
+        return [System.Text.Encoding]::GetEncoding($Matches[1])
+    } else {
+        return [System.Text.Encoding]::GetEncoding('utf-8')
+    }
+}
+
 function Get-UserAgent() {
     return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
 }
@@ -847,7 +855,7 @@ function Confirm-InstallationStatus {
         $Global
     )
     $Installed = @()
-    $Apps | Select-Object -Unique | Where-Object { $_.Name -ne 'scoop' } | ForEach-Object {
+    $Apps | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
         $App, $null, $null = parse_app $_
         if ($Global) {
             if (Test-Path (appdir $App $true)) {
