@@ -25,7 +25,7 @@ function shortcut_folder($global) {
     } else {
         $startmenu = 'StartMenu'
     }
-    return Convert-Path $(ensure [System.IO.Path]::Combine([Environment]::GetFolderPath($startmenu), 'Programs', 'Scoop Apps'))
+    return Convert-Path (ensure ([System.IO.Path]::Combine([Environment]::GetFolderPath($startmenu), 'Programs', 'Scoop Apps')))
 }
 
 function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global) {
