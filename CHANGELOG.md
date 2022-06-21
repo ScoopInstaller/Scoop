@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
 
+### Features
+
+- **scoop-status:** Check bucket status, improve output ([#5011](https://github.com/ScoopInstaller/Scoop/issues/5011))
+
 ### Bug Fixes
 
 - **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002))
