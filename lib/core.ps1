@@ -855,7 +855,7 @@ function Confirm-InstallationStatus {
         $Global
     )
     $Installed = @()
-    $Apps | Select-Object -Unique | Where-Object { $_.Name -ne 'scoop' } | ForEach-Object {
+    $Apps | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
         $App, $null, $null = parse_app $_
         if ($Global) {
             if (Test-Path (appdir $App $true)) {
