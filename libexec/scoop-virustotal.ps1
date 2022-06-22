@@ -2,7 +2,7 @@
 # Summary: Look for app's hash or url on virustotal.com
 # Help: Look for app's hash or url on virustotal.com
 #
-# Use a single '*' for app to check all installed apps.
+# Use a single '*' or the '-a/--all' switch to check all installed apps.
 #
 # To use this command, you have to sign up to VirusTotal's community,
 # and get an API key. Then, tell scoop about your API key with:
@@ -20,7 +20,7 @@
 #       2 & 4 combined
 #
 # Options:
-#   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
+#   -a, --all                 Check for all installed apps
 #   -s, --scan                For packages where VirusTotal has no information, send download URL
 #                             for analysis (and future retrieval). This requires you to configure
 #                             your virustotal_api_key.
@@ -34,10 +34,10 @@
 . "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
-$opt, $apps, $err = getopt $args 'a:snup' @('arch=', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
+$opt, $apps, $err = getopt $args 'asnup' @('all', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
 if ($err) { "scoop virustotal: $err"; exit 1 }
 if (!$apps) { my_usage; exit 1 }
-$architecture = ensure_architecture ($opt.a + $opt.arch)
+$architecture = ensure_architecture
 
 if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
@@ -49,7 +49,7 @@ if (is_scoop_outdated) {
 
 $apps_param = $apps
 
-if ($apps_param -eq '*') {
+if ($apps_param -eq '*' -or $opt.a -or $opt.all) {
     $apps = installed_apps $false
     $apps += installed_apps $true
 }
