@@ -7,24 +7,40 @@
 # check if scoop needs updating
 $currentdir = fullpath $(versiondir 'scoop' 'current')
 $needs_update = $false
+$bucket_needs_update = $false
+$script:network_failure = $false
+$list = @()
+if (!(Get-FormatData ScoopStatus)) {
+    Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
+}
 
-if (Test-Path "$currentdir\.git") {
-    git_cmd -C "`"$currentdir`"" fetch -q origin
-    $commits = $(git -C $currentdir log "HEAD..origin/$(get_config SCOOP_BRANCH)" --oneline)
-    if ($commits) { $needs_update = $true }
-} else {
-    $needs_update = $true
+function Test-UpdateStatus($repopath) {
+    if (Test-Path "$repopath\.git") {
+        git_cmd -C "`"$repopath`"" fetch -q origin
+        $script:network_failure = 128 -eq $LASTEXITCODE
+        $branch  = git -C $repopath branch --show-current
+        $commits = git -C $repopath log "HEAD..origin/$branch" --oneline
+        if ($commits) { return $true }
+        else { return $false }
+    } else {
+        return $true
+    }
+}
+
+$needs_update = Test-UpdateStatus $currentdir
+foreach ($bucket in Get-LocalBucket) {
+    if (Test-UpdateStatus (Find-BucketDirectory $bucket -Root)) {
+        $bucket_needs_update = $true
+    }
 }
 
 if ($needs_update) {
-    warn "Scoop is out of date. Run 'scoop update' to get the latest changes."
-} else { success 'Scoop is up to date.' }
-
-$failed = @()
-$outdated = @()
-$removed = @()
-$missing_deps = @()
-$onhold = @()
+    warn "Scoop out of date. Run 'scoop update' to get the latest changes."
+} elseif ($bucket_needs_update) {
+    warn "Scoop bucket(s) out of date. Run 'scoop update' to get the latest changes."
+} elseif (!$script:network_failure) {
+    success 'Scoop is up to date.'
+}
 
 $true, $false | ForEach-Object { # local and global apps
     $global = $_
@@ -34,64 +50,26 @@ $true, $false | ForEach-Object { # local and global apps
     Get-ChildItem $dir | Where-Object name -NE 'scoop' | ForEach-Object {
         $app = $_.name
         $status = app_status $app $global
-        if ($status.failed) {
-            $failed += @{ $app = $status.version }
-        }
-        if ($status.removed) {
-            $removed += @{ $app = $status.version }
-        }
-        if ($status.outdated) {
-            $outdated += @{ $app = @($status.version, $status.latest_version) }
-            if ($status.hold) {
-                $onhold += @{ $app = @($status.version, $status.latest_version) }
-            }
-        }
-        if ($status.missing_deps) {
-            $missing_deps += , (@($app) + @($status.missing_deps))
-        }
+        if (!$status.outdated -and !$status.failed -and !$status.removed -and !$status.missing_deps) { return }
+
+        $item = [ordered]@{}
+        $item.Name = $app
+        $item.'Installed Version' = $status.version
+        $item.'Latest Version' = if ($status.outdated) { $status.latest_version } else { "" }
+        $item.'Missing Dependencies' = $status.missing_deps -Split ' ' -Join ' | '
+        $info = $()
+        if ($status.failed)  { $info += 'Install failed' }
+        if ($status.hold)    { $info += 'Held package' }
+        if ($status.removed) { $info += 'Manifest removed' }
+        $item.Info = $info -join ', '
+        $list += [PSCustomObject]$item
     }
 }
 
-if ($outdated) {
-    Write-Host -f DarkCyan 'Updates are available for:'
-    $outdated.keys | ForEach-Object {
-        $versions = $outdated.$_
-        "    $_`: $($versions[0]) -> $($versions[1])"
-    }
-}
-
-if ($onhold) {
-    Write-Host -f DarkCyan 'These apps are outdated and on hold:'
-    $onhold.keys | ForEach-Object {
-        $versions = $onhold.$_
-        "    $_`: $($versions[0]) -> $($versions[1])"
-    }
-}
-
-if ($removed) {
-    Write-Host -f DarkCyan 'These app manifests have been removed:'
-    $removed.keys | ForEach-Object {
-        "    $_"
-    }
-}
-
-if ($failed) {
-    Write-Host -f DarkCyan 'These apps failed to install:'
-    $failed.keys | ForEach-Object {
-        "    $_"
-    }
-}
-
-if ($missing_deps) {
-    Write-Host -f DarkCyan 'Missing runtime dependencies:'
-    $missing_deps | ForEach-Object {
-        $app, $deps = $_
-        "    '$app' requires '$([string]::join("', '", $deps))'"
-    }
-}
-
-if (!$old -and !$removed -and !$failed -and !$missing_deps -and !$needs_update) {
+if ($list.Length -eq 0 -and !$needs_update -and !$bucket_needs_update -and !$script:network_failure) {
     success 'Everything is ok!'
 }
+
+$list | Add-Member -TypeName ScoopStatus -PassThru
 
 exit 0
