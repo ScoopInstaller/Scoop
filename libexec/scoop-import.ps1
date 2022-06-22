@@ -1,4 +1,4 @@
-# Usage: scoop import <path to scoopfile.json>
+# Usage: scoop import <path/url to scoopfile.json>
 # Summary: Imports apps, buckets and configs from a Scoopfile in JSON format
 
 param([Parameter(Mandatory)][String]$scoopfile)
@@ -18,12 +18,12 @@ if (Test-Path $scoopfile) {
 if (!$import) { abort 'Input file not a valid JSON.' }
 
 $import.config.PSObject.Properties | ForEach-Object {
-    # set_config $_.Name $_.Value | Out-Null
+    set_config $_.Name $_.Value | Out-Null
     Write-Host "'$($_.Name)' has been set to '$($_.Value)'"
 }
 
 $import.buckets | ForEach-Object {
-    # add_bucket $_.Name $_.Source | Out-Null
+    add_bucket $_.Name $_.Source | Out-Null
     $bucket_names += $_.Name
 }
 
@@ -50,11 +50,9 @@ $import.apps | ForEach-Object {
         $_.Source
     }
 
-    Write-Host $app$global$arch
-    # & "$PSScriptRoot\scoop-install.ps1" $app$global$arch
+    & "$PSScriptRoot\scoop-install.ps1" $app$global$arch
 
     if ('Held package' -in $info) {
-        Write-Host $($_.Name)$global
-        # & "$PSScriptRoot\scoop-hold.ps1" $($_.Name)$global
+        & "$PSScriptRoot\scoop-hold.ps1" $($_.Name)$global
     }
 }
