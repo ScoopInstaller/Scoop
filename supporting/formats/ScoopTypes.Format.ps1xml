@@ -73,7 +73,7 @@
                                 <PropertyName>Name</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>Current Version</PropertyName>
+                                <PropertyName>Installed Version</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Latest Version</PropertyName>

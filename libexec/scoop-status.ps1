@@ -54,7 +54,7 @@ $true, $false | ForEach-Object { # local and global apps
 
         $item = [ordered]@{}
         $item.Name = $app
-        $item.'Current Version' = $status.version
+        $item.'Installed Version' = $status.version
         $item.'Latest Version' = if ($status.outdated) { $status.latest_version } else { "" }
         $item.'Missing Dependencies' = $status.missing_deps -Split ' ' -Join ' | '
         $info = $()
