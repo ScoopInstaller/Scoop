@@ -3,11 +3,12 @@
 ### Features
 
 - **chore:** Add missing -a/--all param to all commands ([#5004](https://github.com/ScoopInstaller/Scoop/issues/5004))
+- **scoop-info:** Show app installed/download size ([#4886](https://github.com/ScoopInstaller/Scoop/issues/4886))
 
 ### Bug Fixes
 
 - **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002))
-- **shortcuts:** Fix network drive shortcut creation ([#4410](https://github.com/ScoopInstaller/Scoop/issues/4410))
+- **shortcuts:** Fix network drive shortcut creation ([#4410](https://github.com/ScoopInstaller/Scoop/issues/4410)), ([#5006](https://github.com/ScoopInstaller/Scoop/issues/5006))
 
 ### Code Refactoring
 
