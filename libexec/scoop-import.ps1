@@ -1,13 +1,13 @@
 # Usage: scoop import <path/url to scoopfile.json>
 # Summary: Imports apps, buckets and configs from a Scoopfile in JSON format
 
-. "$PSScriptRoot\..\lib\manifest.ps1"
-
 param(
     [Parameter(Mandatory)]
     [String]
     $scoopfile
 )
+
+. "$PSScriptRoot\..\lib\manifest.ps1"
 
 $import = $null
 $bucket_names = @()
