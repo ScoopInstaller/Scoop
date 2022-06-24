@@ -43,7 +43,6 @@ param(
     [String] $Upstream,
     [String] $OriginBranch = 'master',
     [String] $App = '*',
-    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -52,6 +51,7 @@ param(
         }
     })]
     [String] $Dir,
+    [String] $File,
     [Switch] $Push,
     [Switch] $Request,
     [Switch] $Help,
@@ -64,7 +64,9 @@ param(
 . "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\unix.ps1"
 
-$Dir = Resolve-Path $Dir
+if (!$Dir -and !(Test-Path $File -Type Leaf)) {
+    throw "Valid '-File' parameter required in the absence of '-Dir'!"
+}
 
 if ((!$Push -and !$Request) -or $Help) {
     Write-Host @'
@@ -163,12 +165,17 @@ if ($Push) {
     execute "hub push origin $OriginBranch"
 }
 
-. "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update -SkipUpdated:$SkipUpdated -ThrowError:$ThrowError
-if ($SpecialSnowflakes) {
-    Write-Host "Forcing update on our special snowflakes: $($SpecialSnowflakes -join ',')" -ForegroundColor DarkCyan
-    $SpecialSnowflakes -split ',' | ForEach-Object {
-        . "$PSScriptRoot\checkver.ps1" $_ -Dir $Dir -ForceUpdate -ThrowError:$ThrowError
+if ($Dir) {
+    $Dir = Resolve-Path $Dir
+    . "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update -SkipUpdated:$SkipUpdated -ThrowError:$ThrowError
+    if ($SpecialSnowflakes) {
+        Write-Host "Forcing update on our special snowflakes: $($SpecialSnowflakes -join ',')" -ForegroundColor DarkCyan
+        $SpecialSnowflakes -split ',' | ForEach-Object {
+            . "$PSScriptRoot\checkver.ps1" $_ -Dir $Dir -ForceUpdate -ThrowError:$ThrowError
+        }
     }
+} else {
+    . "$PSScriptRoot\checkver.ps1" -File $File -Update -SkipUpdated:$SkipUpdated -ThrowError:$ThrowError
 }
 
 hub diff --name-only | ForEach-Object {

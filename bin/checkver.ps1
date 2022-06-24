@@ -8,6 +8,8 @@
     Placeholders are supported.
 .PARAMETER Dir
     Where to search for manifest(s).
+.PARAMETER File
+    Path to a local app manifest.
 .PARAMETER Update
     Update given manifest
 .PARAMETER ForceUpdate
@@ -49,10 +51,12 @@
 .EXAMPLE
     PS BUCKETROOT > .\bin\checkver.ps1 APP DIR -Update
     Check manifest APP.json inside ./DIR directory and update if there is newer version.
+.EXAMPLE
+    PS BUCKETROOT > .\bin\checkver.ps1 -File FILE
+    Check manifest pointed to by FILE path.
 #>
 param(
     [String] $App = '*',
-    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -61,6 +65,7 @@ param(
         }
     })]
     [String] $Dir,
+    [String] $File,
     [Switch] $Update,
     [Switch] $ForceUpdate,
     [Switch] $SkipUpdated,
@@ -77,7 +82,10 @@ param(
 . "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
 . "$PSScriptRoot\..\lib\unix.ps1"
 
-$Dir = Resolve-Path $Dir
+if (!$Dir -and !(Test-Path $File -Type Leaf)) {
+    throw "Valid '-File' parameter required in the absence of '-Dir'!"
+}
+
 $Search = $App
 $GitHubToken = Get-GitHubToken
 
@@ -89,10 +97,18 @@ if ($App -eq '*' -and $Version -ne '') {
 # get apps to check
 $Queue = @()
 $json = ''
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = parse_json "$Dir\$($_.Name)"
+if ($Dir) {
+    $Dir = Resolve-Path $Dir
+    Get-ChildItem $Dir "$App.json" | ForEach-Object {
+        $json = parse_json "$Dir\$($_.Name)"
+        if ($json.checkver) {
+            $Queue += , @($_.Name, $json)
+        }
+    }
+} else {
+    $json = parse_json $File
     if ($json.checkver) {
-        $Queue += , @($_.Name, $json)
+        $Queue += , @((Split-Path $File -Leaf), $json)
     }
 }
 
@@ -337,7 +353,12 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
-            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable # 'autoupdate.ps1'
+            if ($Dir) {
+                Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable # 'autoupdate.ps1'
+            } else {
+                Invoke-AutoUpdate $App (Split-Path $File) $json $ver $matchesHashtable # 'autoupdate.ps1'
+            }
+
         } catch {
             if ($ThrowError) {
                 throw $_
