@@ -105,6 +105,85 @@ if ($status.installed) {
         $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { " *global*" })" }
     }
     $item.Installed = $installed_output -join "`n"
+
+    if ($verbose) {
+        # Show size of installation
+        $appsdir = appsdir $global
+
+        # Collect file list from each location
+        $appFiles = Get-ChildItem $appsdir -Filter $app
+        $currentFiles = Get-ChildItem $appFiles -Filter (Select-CurrentVersion $app $global)
+        $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
+        $cacheFiles = Get-ChildItem $cachedir -Filter "$app#*"
+
+        # Get the sum of each file list
+        $fileTotals = @()
+        foreach ($fileType in ($appFiles, $currentFiles, $persistFiles, $cacheFiles)) {
+            if ($null -ne $fileType) {
+                $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
+                $fileTotals += coalesce $fileSum 0
+            } else {
+                $fileTotals += 0
+            }
+        }
+
+        # Old versions = app total - current version size
+        $fileTotals += $fileTotals[0] - $fileTotals[1]
+
+        if ($fileTotals[2] + $fileTotals[3] + $fileTotals[4] -eq 0) {
+            # Simple app size output if no old versions, persisted data, cached downloads
+            $item.'Installed size' = filesize $fileTotals[1]
+        } else {
+            $fileSizes = [ordered] @{
+                'Current version:  ' = $fileTotals[1]
+                'Old versions:     ' = $fileTotals[4]
+                'Persisted data:   ' = $fileTotals[2]
+                'Cached downloads: ' = $fileTotals[3]
+                'Total:            ' = $fileTotals[0] + $fileTotals[2] + $fileTotals[3]
+            }
+
+            $fileSizeOutput = @()
+
+            # Don't output empty categories
+            $fileSizes.GetEnumerator() | ForEach-Object {
+                if ($_.Value -ne 0) {
+                    $fileSizeOutput += $_.Key + (filesize $_.Value)
+                }
+            }
+
+            $item.'Installed size' = $fileSizeOutput -join "`n"
+        }
+    }
+} else {
+    if ($verbose) {
+        # Get download size if app not installed
+        $totalPackage = 0
+        foreach ($url in @(url $manifest (default_architecture))) {
+            try {
+                if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
+                    $cached = " (latest version is cached)"
+                } else {
+                    $cached = $null
+                }
+
+                [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
+                $totalPackage += $urlLength
+            } catch [System.Management.Automation.RuntimeException] {
+                $totalPackage = 0
+                $packageError = "the server at $(([System.Uri]$url).Host) did not send a Content-Length header"
+                break
+            } catch {
+                $totalPackage = 0
+                $packageError = "the server at $(([System.Uri]$url).Host) is down"
+                break
+            }
+        }
+        if ($totalPackage -ne 0) {
+            $item.'Download size' = "$(filesize $totalPackage)$cached"
+        } else {
+            $item.'Download size' = "Unknown ($packageError)$cached"
+        }
+    }
 }
 
 $binaries = @(arch_specific 'bin' $manifest $install.architecture)

@@ -2,14 +2,36 @@
 
 ### Features
 
+- **chore:** Add missing -a/--all param to all commands ([#5004](https://github.com/ScoopInstaller/Scoop/issues/5004))
+- **scoop-status:** Check bucket status, improve output ([#5011](https://github.com/ScoopInstaller/Scoop/issues/5011))
+- **scoop-info:** Show app installed/download size ([#4886](https://github.com/ScoopInstaller/Scoop/issues/4886))
+
+### Bug Fixes
+
+- **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002))
+- **decompress:** Handle splitted RAR archives ([#4994](https://github.com/ScoopInstaller/Scoop/issues/4994))
+- **shortcuts:** Fix network drive shortcut creation ([#4410](https://github.com/ScoopInstaller/Scoop/issues/4410)), ([#5006](https://github.com/ScoopInstaller/Scoop/issues/5006))
+
+### Code Refactoring
+
+- **scoop-search:** Output PSObject, use API token ([#4997](https://github.com/ScoopInstaller/Scoop/issues/4997))
+
+### Tests
+
+- **typo:** Fix typo ('formated' -> 'formatted') ([#4217](https://github.com/ScoopInstaller/Scoop/issues/4217))
+
+## [v0.2.2](https://github.com/ScoopInstaller/Scoop/compare/v0.2.1...v0.2.2) - 2022-06-21
+
+### Features
+
 - **core:** Add `Get-Encoding` function to fix missing webclient encoding ([#4956](https://github.com/ScoopInstaller/Scoop/issues/4956))
-- **scoop-virustotal:** Migrate to virustotal api v3, improve flows, and ouput powershell objects ([#4983](https://github.com/ScoopInstaller/Scoop/pull/4983))
-- **scoop-hold,scoop-unhold:** Support `-g`/`--global` flag ([#4991](https://github.com/ScoopInstaller/Scoop/issues/4991))
+- **scoop-(un)hold:** Add `-g`/`--global` flag ([#4991](https://github.com/ScoopInstaller/Scoop/issues/4991))
+- **scoop-update:** Support `scoop update scoop` ([#4992](https://github.com/ScoopInstaller/Scoop/issues/4992))
+- **scoop-virustotal:** Migrate to VirusTotal API v3 ([#4983](https://github.com/ScoopInstaller/Scoop/issues/4983))
 
 ### Bug Fixes
 
 - **manifest:** Fix bugs in 'Get-Manifest()' ([#4986](https://github.com/ScoopInstaller/Scoop/issues/4986))
-- **decompress:** Handle splitted RAR archives ([#4994](https://github.com/ScoopInstaller/Scoop/pull/4994))
 
 ## [v0.2.1](https://github.com/ScoopInstaller/Scoop/compare/v0.2.0...v0.2.1) - 2022-06-10
 
