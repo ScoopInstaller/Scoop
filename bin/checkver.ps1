@@ -86,7 +86,6 @@ if (!$Dir -and !(Test-Path $File -Type Leaf)) {
     throw "Valid '-File' parameter required in the absence of '-Dir'!"
 }
 
-$Search = $App
 $GitHubToken = Get-GitHubToken
 
 # don't use $Version with $App = '*'
@@ -97,7 +96,7 @@ if ($App -eq '*' -and $Version -ne '') {
 # get apps to check
 $Queue = @()
 $json = ''
-if ($Dir) {
+if (!$File) {
     $Dir = Resolve-Path $Dir
     Get-ChildItem $Dir "$App.json" | ForEach-Object {
         $json = parse_json "$Dir\$($_.Name)"
@@ -113,9 +112,8 @@ if ($Dir) {
 }
 
 # clear any existing events
-Get-Event | ForEach-Object {
-    Remove-Event $_.SourceIdentifier
-}
+Get-Event | Remove-Event
+Get-EventSubscriber | Unregister-Event
 
 # start all downloads
 $Queue | ForEach-Object {
@@ -353,7 +351,7 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
-            if ($Dir) {
+            if (!$File) {
                 Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable # 'autoupdate.ps1'
             } else {
                 Invoke-AutoUpdate $App (Split-Path $File) $json $ver $matchesHashtable # 'autoupdate.ps1'

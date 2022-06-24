@@ -165,7 +165,7 @@ if ($Push) {
     execute "hub push origin $OriginBranch"
 }
 
-if ($Dir) {
+if (!$File) {
     $Dir = Resolve-Path $Dir
     . "$PSScriptRoot\checkver.ps1" -App $App -Dir $Dir -Update -SkipUpdated:$SkipUpdated -ThrowError:$ThrowError
     if ($SpecialSnowflakes) {
