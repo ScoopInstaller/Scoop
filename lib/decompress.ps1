@@ -67,6 +67,9 @@ function Expand-7zipArchive {
         if (($Path -replace '.*\.([^\.]*)$', '$1') -eq '001') {
             # Remove splited 7-zip archive parts
             Get-ChildItem "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
+        } elseif (($Path -replace '.*\.part(\d+)\.rar$', '$1')[-1] -eq '1') {
+            # Remove splitted RAR archive parts
+            Get-ChildItem "$($Path -replace '\.part(\d+)\.rar$', '').part*.rar" | Remove-Item -Force
         } else {
             Remove-Item $Path -Force
         }
