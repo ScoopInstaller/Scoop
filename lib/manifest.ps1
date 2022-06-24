@@ -7,7 +7,7 @@ function parse_json($path) {
     try {
         Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        warn "Error parsing manifest at $path."
+        warn "Error parsing JSON at $path."
     }
 }
 
@@ -24,7 +24,11 @@ function url_manifest($url) {
         throw
     }
     if(!$str) { return $null }
-    $str | convertfrom-json
+    try {
+        $str | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        warn "Error parsing JSON at $url."
+    }
 }
 
 function Get-Manifest($app) {
