@@ -84,6 +84,13 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
+        It 'extract splited RAR archives (.part01.rar, .part02.rar, ...)' -Skip:$isUnix {
+            $to = test_extract 'Expand-7zipArchive' $test6_1
+            $to | Should -Exist
+            "$to\dummy" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
         It 'works with "-Removal" switch ($removal param)' -Skip:$isUnix {
             $test1 | Should -Exist
             test_extract 'Expand-7zipArchive' $test1 $true
@@ -95,6 +102,9 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             $test5_1 | Should -Not -Exist
             $test5_2 | Should -Not -Exist
             $test5_3 | Should -Not -Exist
+            $test6_1 | Should -Exist
+            $test6_2 | Should -Exist
+            $test6_3 | Should -Exist
             test_extract 'Expand-7zipArchive' $test6_1 $true
             $test6_1 | Should -Not -Exist
             $test6_2 | Should -Not -Exist
