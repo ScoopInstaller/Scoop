@@ -92,35 +92,47 @@ function ConvertToPrettyJson {
     }
 }
 
-function json_path([String] $json, [String] $jsonpath, [String] $basename) {
-    Add-Type -Path "$psscriptroot\..\supporting\validator\bin\Newtonsoft.Json.dll"
-    $jsonpath = $jsonpath.Replace('$basename', $basename)
+function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitutions, [Boolean] $reverse, [Boolean] $single) {
+    Add-Type -Path "$PSScriptRoot\..\supporting\validator\bin\Newtonsoft.Json.dll"
+    if ($null -ne $substitutions) {
+        $jsonpath = substitute $jsonpath $substitutions ($jsonpath -like "*=~*")
+    }
     try {
-        $obj = [Newtonsoft.Json.Linq.JObject]::Parse($json)
+        $obj = [Newtonsoft.Json.Linq.JValue]::Parse($json)
     } catch [Newtonsoft.Json.JsonReaderException] {
         return $null
     }
-
     try {
-        $result = $obj.SelectToken($jsonpath, $true)
-        return $result.ToString()
-    } catch [System.Management.Automation.MethodInvocationException] {
-        write-host -f DarkRed $_
-        return $null
+        $result = $obj.SelectTokens($jsonpath, $true)
+        if ($reverse) {
+            # Return versions in reverse order
+            $result = [System.Linq.Enumerable]::Reverse($result)
+        }
+        if ($single) {
+            # Extract First value
+            $result = [System.Linq.Enumerable]::First($result)
+            # Convert first value to string
+            $result = $result.ToString()
+        } else {
+            $result = "$([String]::Join('\n', $result))"
+        }
+        return $result
+    } catch [Exception] {
+        Write-Host $_ -ForegroundColor DarkRed
     }
 
     return $null
 }
 
-function json_path_legacy([String] $json, [String] $jsonpath, [String] $basename) {
+function json_path_legacy([String] $json, [String] $jsonpath, [Hashtable] $substitutions) {
     $result = $json | ConvertFrom-Json -ea stop
     $isJsonPath = $jsonpath.StartsWith('$')
     $jsonpath.split('.') | ForEach-Object {
         $el = $_
 
-        # substitute the base filename into the jsonpath
-        if ($el.Contains('$basename')) {
-            $el = $el.Replace('$basename', $basename)
+        # substitute the basename and version varibales into the jsonpath
+        if ($null -ne $substitutions) {
+            $el = substitute $el $substitutions
         }
 
         # skip $ if it's jsonpath format
@@ -150,7 +162,7 @@ function normalize_values([psobject] $json) {
         # Recursively edit psobjects
         # If the values is psobjects, its not normalized
         # For example if manifest have architecture and it's architecture have array with single value it's not formatted.
-        # @see https://github.com/lukesampson/scoop/pull/2642#issue-220506263
+        # @see https://github.com/ScoopInstaller/Scoop/pull/2642#issue-220506263
         if ($_.Value -is [System.Management.Automation.PSCustomObject]) {
             $_.Value = normalize_values $_.Value
         }

@@ -13,6 +13,7 @@
 #>
 param(
     [String] $App = '*',
+    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -20,14 +21,13 @@ param(
             $true
         }
     })]
-    [String] $Dir = "$PSScriptRoot\\..\bucket",
+    [String] $Dir,
     [Int] $Timeout = 5,
     [Switch] $SkipValid
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\config.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 
 $Dir = Resolve-Path $Dir
@@ -37,8 +37,6 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
     $manifest = parse_json "$Dir\$($_.Name)"
     $Queue += , @($_.Name, $manifest)
 }
-
-$original = use_any_https_protocol
 
 Write-Host '[' -NoNewLine
 Write-Host 'U' -NoNewLine -ForegroundColor Cyan
@@ -52,6 +50,9 @@ Write-Host ']ailed'
 Write-Host ' |  |  |'
 
 function test_dl([String] $url, $cookies) {
+    # Trim renaming suffix, prevent getting 40x response
+    $url = ($url -split '#/')[0]
+
     $wreq = [Net.WebRequest]::Create($url)
     $wreq.Timeout = $Timeout * 1000
     if ($wreq -is [Net.HttpWebRequest]) {
@@ -88,8 +89,8 @@ foreach ($man in $Queue) {
     if ($manifest.url) {
         $manifest.url | ForEach-Object { $urls += $_ }
     } else {
-        url $manifest '64bit' | ForEach-Object { $urls += $_ }
-        url $manifest '32bit' | ForEach-Object { $urls += $_ }
+        script:url $manifest '64bit' | ForEach-Object { $urls += $_ }
+        script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
     }
 
     $urls | ForEach-Object {
@@ -130,5 +131,3 @@ foreach ($man in $Queue) {
         Write-Host "       > $_" -ForegroundColor DarkRed
     }
 }
-
-set_https_protocols $original

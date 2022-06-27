@@ -1,7 +1,0 @@
-{
-    "version": "2.4",
-    "url": "https://github.com/ghuntley/cygwin-axel/raw/master/release/axel-2.4.zip",
-    "homepage": "https://github.com/ghuntley/cygwin-axel/",
-    "hash": "3cce621da5f17ea03e4fcf51916dd4f8928759766f88b4ca5643131d2dd3fed2",
-    "bin": "axel.exe"
-}

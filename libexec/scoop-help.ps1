@@ -2,18 +2,12 @@
 # Summary: Show help for a command
 param($cmd)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\commands.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-
-reset_aliases
-
 function print_help($cmd) {
     $file = Get-Content (command_path $cmd) -raw
 
     $usage = usage $file
     $summary = summary $file
-    $help = help $file
+    $help = scoop_help $file
 
     if($usage) { "$usage`n" }
     if($help) { $help }
@@ -47,4 +41,3 @@ Some useful commands are:"
 }
 
 exit 0
-

@@ -2,24 +2,22 @@
 # Summary: Opens the app homepage
 param($app)
 
-. "$psscriptroot\..\lib\core.ps1"
-. "$psscriptroot\..\lib\help.ps1"
-. "$psscriptroot\..\lib\manifest.ps1"
-. "$psscriptroot\..\lib\buckets.ps1"
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 
-reset_aliases
-
-if($app) {
-    $manifest, $bucket = find_manifest $app
-    if($manifest) {
-        if([string]::isnullorempty($manifest.homepage)) {
+if ($app) {
+    $null, $manifest, $bucket, $null = Get-Manifest $app
+    if ($manifest) {
+        if ($manifest.homepage) {
+            Start-Process $manifest.homepage
+        } else {
             abort "Could not find homepage in manifest for '$app'."
         }
-        Start-Process $manifest.homepage
-    }
-    else {
+    } else {
         abort "Could not find manifest for '$app'."
     }
-} else { my_usage }
+} else {
+    my_usage
+    exit 1
+}
 
 exit 0
