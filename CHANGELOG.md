@@ -6,7 +6,6 @@
 - **scoop-status:** Check bucket status, improve output ([#5011](https://github.com/ScoopInstaller/Scoop/issues/5011))
 - **scoop-info:** Show app installed/download size ([#4886](https://github.com/ScoopInstaller/Scoop/issues/4886))
 - **scoop-import:** Import a Scoop installation from JSON ([#5014](https://github.com/ScoopInstaller/Scoop/issues/5014))
-- **checkver,auto-pr:** Allow passing file path ([#5019](https://github.com/ScoopInstaller/Scoop/issues/5019))
 
 ### Bug Fixes
 
@@ -17,6 +16,10 @@
 ### Code Refactoring
 
 - **scoop-search:** Output PSObject, use API token ([#4997](https://github.com/ScoopInstaller/Scoop/issues/4997))
+
+### Builds
+
+- **checkver,auto-pr:** Allow passing file path ([#5019](https://github.com/ScoopInstaller/Scoop/issues/5019))
 
 ### Tests
 
