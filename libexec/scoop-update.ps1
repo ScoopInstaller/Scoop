@@ -336,7 +336,7 @@ if (-not ($apps -or $all)) {
                 } else {
                     warn "'$app' is held to version $($status.version)"
                 }
-            } elseif ($apps_param -ne '*') {
+            } elseif ($apps_param -ne '*' -and !$all) {
                 if ($status.installed) {
                     ensure_none_failed $app
                     Write-Host "$app`: $($status.version) (latest version)" -ForegroundColor Green
