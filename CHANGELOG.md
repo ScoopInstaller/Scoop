@@ -17,6 +17,10 @@
 
 - **scoop-search:** Output PSObject, use API token ([#4997](https://github.com/ScoopInstaller/Scoop/issues/4997))
 
+### Builds
+
+- **json:** Update Newton.Json to 13.0.1 ([#5026](https://github.com/ScoopInstaller/Scoop/issues/5026))
+
 ### Tests
 
 - **typo:** Fix typo ('formated' -> 'formatted') ([#4217](https://github.com/ScoopInstaller/Scoop/issues/4217))
