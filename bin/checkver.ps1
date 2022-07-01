@@ -218,20 +218,20 @@ while ($in_progress -gt 0) {
     $ver = $Version
 
     if (!$ver) {
-        $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
-        $err = $ev.SourceEventArgs.Error
-        if ($json.checkver.script) {
-            $page = Invoke-Command ([scriptblock]::Create($json.checkver.script -join "`r`n"))
+        if (!$regex -and $replace) {
+            next "'replace' requires 're' or 'regex'"
+            continue
         }
-
+        $err = $ev.SourceEventArgs.Error
         if ($err) {
             next "$($err.message)`r`nURL $url is not valid"
             continue
         }
 
-        if (!$regex -and $replace) {
-            next "'replace' requires 're' or 'regex'"
-            continue
+        if ($json.checkver.script) {
+            $page = Invoke-Command ([scriptblock]::Create($json.checkver.script -join "`r`n"))
+        } else {
+            $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
         }
 
         if ($jsonpath) {
