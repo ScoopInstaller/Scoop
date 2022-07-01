@@ -9,7 +9,7 @@
 
 ### Bug Fixes
 
-- **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002))
+- **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002)), ([#5029](https://github.com/ScoopInstaller/Scoop/issues/5029))
 - **decompress:** Handle split RAR archives ([#4994](https://github.com/ScoopInstaller/Scoop/issues/4994))
 - **shortcuts:** Fix network drive shortcut creation ([#4410](https://github.com/ScoopInstaller/Scoop/issues/4410)), ([#5006](https://github.com/ScoopInstaller/Scoop/issues/5006))
 
