@@ -20,6 +20,7 @@
 ### Builds
 
 - **checkver,auto-pr:** Allow passing file path ([#5019](https://github.com/ScoopInstaller/Scoop/issues/5019))
+- **checkver:** Exit routine earlier if error ([#5025](https://github.com/ScoopInstaller/Scoop/issues/5025))
 
 ### Tests
 
