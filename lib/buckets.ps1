@@ -1,4 +1,7 @@
 $bucketsdir = "$scoopdir\buckets"
+if (!(Test-Path $bucketsdir)) {
+    $bucketsdir = "$globaldir\buckets"
+}
 
 function Find-BucketDirectory {
     <#
