@@ -1,6 +1,6 @@
 # Usage: scoop export > scoopfile.json
 # Summary: Exports installed apps, buckets (and optionally configs) in JSON format
-# Options:
+# Help: Options:
 #   -c, --config       Export the Scoop configuration file too
 
 . "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
