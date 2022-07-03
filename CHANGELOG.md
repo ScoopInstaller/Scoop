@@ -8,6 +8,7 @@
 - **scoop-import:** Import a Scoop installation from JSON ([#5014](https://github.com/ScoopInstaller/Scoop/issues/5014))
 
 ### Bug Fixes
+- **scoop-import:** Add nullity check and is-already in bucket check ([#5034](https://github.com/ScoopInstaller/Scoop/pull/5034))
 
 - **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002)), ([#5029](https://github.com/ScoopInstaller/Scoop/issues/5029))
 - **decompress:** Handle split RAR archives ([#4994](https://github.com/ScoopInstaller/Scoop/issues/4994))
