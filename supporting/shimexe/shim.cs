@@ -70,7 +70,7 @@ namespace Scoop {
 
             var configPath = Path.Combine(dir, name + ".shim");
             if(!File.Exists(configPath)) {
-                Console.Error.WriteLine("Couldn't find " + Path.GetFileName(configPath) + " in " + dir);
+                Console.Error.WriteLine(-join @("Couldn't find ", Path.GetFileName(configPath), " in ", dir));
                 return 1;
             }
 
@@ -89,7 +89,7 @@ namespace Scoop {
                 cmd_args += pass_args;
             }
             if(!string.IsNullOrEmpty(cmd_args)) cmd_args = " " + cmd_args;
-            var cmd = "\"" + path + "\"" + cmd_args;
+            var cmd = -join @("\"", path, "\"", cmd_args);
 
             if(!CreateProcess(null, cmd, IntPtr.Zero, IntPtr.Zero,
                 bInheritHandles: true,
@@ -133,7 +133,7 @@ namespace Scoop {
 
         // now uses GetArgs instead
         static string Serialize(string[] args) {
-            return string.Join(" ", args.Select(a => a.Contains(' ') ? '"' + a + '"' : a));
+            return string.Join(" ", args.Select(a => a.Contains(' ') ? (-join @('"', a, '"')) : a));
         }
 
         // strips the program name from the command line, returns just the arguments

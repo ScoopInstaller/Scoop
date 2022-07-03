@@ -7,7 +7,6 @@
 #     scoop cache show
 # to see what's in the cache, and
 #     scoop cache rm <app> to remove downloads for a specific app.
-#
 # To clear everything in your cache, use:
 #     scoop cache rm *
 # You can also use the `-a/--all` switch in place of `*` here
@@ -23,7 +22,7 @@ function cacheshow($app) {
     if (!$app -or $app -eq '*') {
         $app = '.*?'
     } else {
-        $app = '(' + ($app -join '|') + ')'
+        $app = -join @('(', $app, '|', ')')
     }
     $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
@@ -41,7 +40,7 @@ function cacheremove($app) {
     } elseif ($app -eq '*' -or $app -eq '-a' -or $app -eq '--all') {
         $files = @(Get-ChildItem $cachedir)
     } else {
-        $app = '(' + ($app -join '|') + ')'
+        $app = -join @('(', $app, '|', ')')
         $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
     }
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
