@@ -1,5 +1,7 @@
 # Usage: scoop import <path/url to scoopfile.json>
 # Summary: Imports apps, buckets and configs from a Scoopfile in JSON format
+# Help: To replicate a Scoop installation from a file stored on Desktop, run
+#      scoop import Desktop\scoopfile.json
 
 param(
     [Parameter(Mandatory)]
