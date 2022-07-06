@@ -5,10 +5,9 @@
 - **chore:** Add missing -a/--all param to all commands ([#5004](https://github.com/ScoopInstaller/Scoop/issues/5004))
 - **scoop-status:** Check bucket status, improve output ([#5011](https://github.com/ScoopInstaller/Scoop/issues/5011))
 - **scoop-info:** Show app installed/download size ([#4886](https://github.com/ScoopInstaller/Scoop/issues/4886))
-- **scoop-import:** Import a Scoop installation from JSON ([#5014](https://github.com/ScoopInstaller/Scoop/issues/5014))
+- **scoop-import:** Import a Scoop installation from JSON ([#5014](https://github.com/ScoopInstaller/Scoop/issues/5014), [#5034](https://github.com/ScoopInstaller/Scoop/issues/5034))
 
 ### Bug Fixes
-- **scoop-import:** Add nullity check and is-already in bucket check ([#5034](https://github.com/ScoopInstaller/Scoop/pull/5034))
 
 - **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002)), ([#5029](https://github.com/ScoopInstaller/Scoop/issues/5029))
 - **decompress:** Handle split RAR archives ([#4994](https://github.com/ScoopInstaller/Scoop/issues/4994))
