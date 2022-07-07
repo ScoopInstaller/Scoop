@@ -3,8 +3,12 @@ function manifest_path($app, $bucket) {
 }
 
 function parse_json($path) {
-    if(!(test-path $path)) { return $null }
-    Get-Content $path -raw -Encoding UTF8 | convertfrom-json -ea stop
+    if (!(Test-Path $path)) { return $null }
+    try {
+        Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        warn "Error parsing JSON at $path."
+    }
 }
 
 function url_manifest($url) {
@@ -20,7 +24,11 @@ function url_manifest($url) {
         throw
     }
     if(!$str) { return $null }
-    $str | convertfrom-json
+    try {
+        $str | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        warn "Error parsing JSON at $url."
+    }
 }
 
 function Get-Manifest($app) {

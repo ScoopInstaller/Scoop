@@ -3,6 +3,8 @@
 # Help: Used to resolve conflicts in favor of a particular app. For example,
 # if you've installed 'python' and 'python27', you can use 'scoop reset' to switch between
 # using one or the other.
+#
+# You can use '*' in place of <app> or `-a`/`--all` switch to reset all apps.
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
@@ -10,12 +12,13 @@
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 
-$opt, $apps, $err = getopt $args
+$opt, $apps, $err = getopt $args 'a' 'all'
 if($err) { "scoop reset: $err"; exit 1 }
+$all = $opt.a -or $opt.all
 
-if(!$apps) { error '<app> missing'; my_usage; exit 1 }
+if(!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
 
-if($apps -eq '*') {
+if($apps -eq '*' -or $all) {
     $local = installed_apps $false | ForEach-Object { ,@($_, $false) }
     $global = installed_apps $true | ForEach-Object { ,@($_, $true) }
     $apps = @($local) + @($global)

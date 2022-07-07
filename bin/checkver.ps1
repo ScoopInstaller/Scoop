@@ -52,7 +52,6 @@
 #>
 param(
     [String] $App = '*',
-    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -77,8 +76,16 @@ param(
 . "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
 . "$PSScriptRoot\..\lib\unix.ps1"
 
-$Dir = Resolve-Path $Dir
-$Search = $App
+if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
+    $Dir = Split-Path $App
+    $files = Get-ChildItem $Dir (Split-Path $App -Leaf)
+} elseif ($Dir) {
+    $Dir = Resolve-Path $Dir
+    $files = Get-ChildItem $Dir "$App.json"
+} else {
+    throw "'-Dir' parameter required if '-App' is not a filepath!"
+}
+
 $GitHubToken = Get-GitHubToken
 
 # don't use $Version with $App = '*'
@@ -89,7 +96,7 @@ if ($App -eq '*' -and $Version -ne '') {
 # get apps to check
 $Queue = @()
 $json = ''
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
+$files | ForEach-Object {
     $json = parse_json "$Dir\$($_.Name)"
     if ($json.checkver) {
         $Queue += , @($_.Name, $json)
@@ -97,9 +104,8 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
 }
 
 # clear any existing events
-Get-Event | ForEach-Object {
-    Remove-Event $_.SourceIdentifier
-}
+Get-Event | Remove-Event
+Get-EventSubscriber | Unregister-Event
 
 # start all downloads
 $Queue | ForEach-Object {
@@ -218,20 +224,20 @@ while ($in_progress -gt 0) {
     $ver = $Version
 
     if (!$ver) {
-        $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
-        $err = $ev.SourceEventArgs.Error
-        if ($json.checkver.script) {
-            $page = Invoke-Command ([scriptblock]::Create($json.checkver.script -join "`r`n"))
+        if (!$regex -and $replace) {
+            next "'replace' requires 're' or 'regex'"
+            continue
         }
-
+        $err = $ev.SourceEventArgs.Error
         if ($err) {
             next "$($err.message)`r`nURL $url is not valid"
             continue
         }
 
-        if (!$regex -and $replace) {
-            next "'replace' requires 're' or 'regex'"
-            continue
+        if ($json.checkver.script) {
+            $page = Invoke-Command ([scriptblock]::Create($json.checkver.script -join "`r`n"))
+        } else {
+            $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
         }
 
         if ($jsonpath) {

@@ -1,5 +1,5 @@
 # Usage: scoop depends <app>
-# Summary: List dependencies for an app
+# Summary: List dependencies for an app, in the order they'll be installed
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
@@ -17,9 +17,12 @@ try {
     abort "ERROR: $_"
 }
 
-$deps = @(Get-Dependency $app $architecture) -ne $app
-if($deps) {
-    $deps[($deps.length - 1)..0]
+$deps = @()
+Get-Dependency $app $architecture | ForEach-Object {
+    $dep = [ordered]@{}
+    $dep.Source, $dep.Name = $_ -split '/'
+    $deps += [PSCustomObject]$dep
 }
+$deps
 
 exit 0

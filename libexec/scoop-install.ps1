@@ -3,6 +3,10 @@
 # Help: e.g. The usual way to install an app (uses your local 'buckets'):
 #      scoop install git
 #
+# To install a different version of the app
+# (note that this will auto-generate the manifest using current version):
+#      scoop install gh@2.7.0
+#
 # To install an app from a manifest at a URL:
 #      scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
 #

@@ -20,11 +20,12 @@ function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
 }
 
 function shortcut_folder($global) {
-    $directory = [System.IO.Path]::Combine([Environment]::GetFolderPath('startmenu'), 'Programs', 'Scoop Apps')
-    if($global) {
-        $directory = [System.IO.Path]::Combine([Environment]::GetFolderPath('commonstartmenu'), 'Programs', 'Scoop Apps')
+    if ($global) {
+        $startmenu = 'CommonStartMenu'
+    } else {
+        $startmenu = 'StartMenu'
     }
-    return $(ensure $directory)
+    return Convert-Path (ensure ([System.IO.Path]::Combine([Environment]::GetFolderPath($startmenu), 'Programs', 'Scoop Apps')))
 }
 
 function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global) {
@@ -66,19 +67,6 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
         write-host "Removing shortcut $(friendly_path $shortcut)"
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
-        }
-        # Before issue 1514 Startmenu shortcut removal
-        #
-        # Shortcuts that should have been installed globally would
-        # have been installed locally up until 27 June 2017.
-        #
-        # TODO: Remove this 'if' block and comment after
-        #       27 June 2018.
-        if($global) {
-            $shortcut = "$(shortcut_folder $false)\$name.lnk"
-            if(Test-Path -Path $shortcut) {
-                 Remove-Item $shortcut
-            }
         }
     }
 }

@@ -1,57 +1,23 @@
-# Usage: scoop export > filename
-# Summary: Exports (an importable) list of installed apps
-# Help: Lists all installed apps.
+# Usage: scoop export > scoopfile.json
+# Summary: Exports installed apps, buckets (and optionally configs) in JSON format
+# Help: Options:
+#   -c, --config       Export the Scoop configuration file too
 
-. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture' 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
 
-$def_arch = default_architecture
+$export = @{}
 
-$local = installed_apps $false | ForEach-Object { @{ name = $_; global = $false } }
-$global = installed_apps $true | ForEach-Object { @{ name = $_; global = $true } }
-
-$apps = @($local) + @($global)
-$count = 0
-
-# json
-# echo "{["
-
-if($apps) {
-    $apps | Sort-Object { $_.name } | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
-        $app = $_.name
-        $global = $_.global
-        $ver = Select-CurrentVersion -AppName $app -Global:$global
-        $global_display = $null; if($global) { $global_display = ' *global*'}
-
-        $install_info = install_info $app $ver $global
-        $bucket = ''
-        if ($install_info.bucket) {
-            $bucket = ' [' + $install_info.bucket + ']'
-        } elseif ($install_info.url) {
-            $bucket = ' [' + $install_info.url + ']'
-        }
-        if ($install_info.architecture -and $def_arch -ne $install_info.architecture) {
-            $arch = ' {' + $install_info.architecture + '}'
-        } else {
-            $arch = ''
-        }
-
-        # json
-        # $val = "{ 'name': '$app', 'version': '$ver', 'global': $($global.toString().tolower()) }"
-        # if($count -gt 0) {
-        #     " ," + $val
-        # } else {
-        #     "  " + $val
-        # }
-
-        # "$app (v:$ver) global:$($global.toString().tolower())"
-        "$app (v:$ver)$global_display$bucket$arch"
-
-        $count++
+if ($args[0] -eq '-c' -or $args[0] -eq '--config') {
+    $export.config = $scoopConfig
+    # Remove machine-specific properties
+    foreach ($prop in 'lastUpdate', 'rootPath', 'globalPath', 'cachePath', 'alias') {
+        $export.config.PSObject.Properties.Remove($prop)
     }
 }
 
-# json
-# echo "]}"
+$export.buckets = list_buckets
+$export.apps = @(& "$PSScriptRoot\scoop-list.ps1" 6>$null)
+
+$export | ConvertToPrettyJSON
 
 exit 0
