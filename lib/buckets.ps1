@@ -120,7 +120,7 @@ function add_bucket($name, $repo) {
 
     $dir = Find-BucketDirectory $name -Root
     if (Test-Path $dir) {
-        warn "The '$name' bucket already exists. Use 'scoop bucket rm $name' to remove it."
+        warn "The '$name' bucket already exists. To add this bucket again, first remove it by running 'scoop bucket rm $name'."
         return 2
     }
 
