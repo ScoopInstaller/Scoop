@@ -90,7 +90,11 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
     if (!($null -eq $to)) {
-        Copy-Item $cached $to
+        if ($use_cache) {
+            Copy-Item $cached $to
+        } else {
+            Move-Item $cached $to -Force
+        }
     }
 }
 
