@@ -1,11 +1,11 @@
 # Must included with 'json.ps1'
-function find_hash_in_rdf([String] $url, [String] $basename) {
+function find_hash_in_rdf([String] $url, [String] $useragent, [String] $basename) {
     $xml = $null
     try {
         # Download and parse RDF XML file
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $wc.Headers.Add('User-Agent', $(if($null -ne $useragent) { $useragent } else { (Get-UserAgent) }))
         $data = $wc.DownloadData($url)
         [xml]$xml = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
@@ -20,7 +20,7 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
     return format_hash $digest.sha256
 }
 
-function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [String] $regex) {
+function find_hash_in_textfile([String] $url, [String] $useragent, [Hashtable] $substitutions, [String] $regex) {
     $hashfile = $null
 
     $templates = @{
@@ -35,7 +35,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $wc.Headers.Add('User-Agent', $(if($null -ne $useragent) { $useragent } else { (Get-UserAgent) }))
         $data = $wc.DownloadData($url)
         $hashfile = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
@@ -83,13 +83,13 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     return format_hash $hash
 }
 
-function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $jsonpath) {
+function find_hash_in_json([String] $url, [String] $useragent, [Hashtable] $substitutions, [String] $jsonpath) {
     $json = $null
 
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $wc.Headers.Add('User-Agent', $(if($null -ne $useragent) { $useragent } else { (Get-UserAgent) }))
         $data = $wc.DownloadData($url)
         $json = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
@@ -104,13 +104,13 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
     return format_hash $hash
 }
 
-function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $xpath) {
+function find_hash_in_xml([String] $url, [String] $useragent, [Hashtable] $substitutions, [String] $xpath) {
     $xml = $null
 
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
+        $wc.Headers.Add('User-Agent', $(if($null -ne $useragent) { $useragent } else { (Get-UserAgent) }))
         $data = $wc.DownloadData($url)
         $xml = [xml]((Get-Encoding($wc)).GetString($data))
     } catch [system.net.webexception] {
@@ -137,14 +137,14 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
     return format_hash $hash
 }
 
-function find_hash_in_headers([String] $url) {
+function find_hash_in_headers([String] $url, [String] $useragent) {
     $hash = $null
 
     try {
         $req = [System.Net.WebRequest]::Create($url)
         $req.Referer = (strip_filename $url)
         $req.AllowAutoRedirect = $false
-        $req.UserAgent = (Get-UserAgent)
+        $req.UserAgent = $(if($null -ne $useragent) { $useragent } else { (Get-UserAgent) })
         $req.Timeout = 2000
         $req.Method = 'HEAD'
         $res = $req.GetResponse()
@@ -164,7 +164,7 @@ function find_hash_in_headers([String] $url) {
     return format_hash $hash
 }
 
-function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [Hashtable] $substitutions) {
+function get_hash_for_app([String] $app, $config, [String] $version, [String] $url, [String] $useragent, [Hashtable] $substitutions) {
     $hash = $null
 
     $hashmode = $config.mode
@@ -185,7 +185,9 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         write-host -f DarkYellow 'Searching hash for ' -NoNewline
         write-host -f Green $basename -NoNewline
         write-host -f DarkYellow ' in ' -NoNewline
-        write-host -f Green $hashfile_url
+        write-host -f Green $hashfile_url -NoNewline
+        write-host -f DarkYellow ' using useragent ' -NoNewline
+        write-host -f Green $useragent
     }
 
     if ($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
@@ -225,30 +227,30 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
 
     switch ($hashmode) {
         'extract' {
-            $hash = find_hash_in_textfile $hashfile_url $substitutions $regex
+            $hash = find_hash_in_textfile $hashfile_url $useragent $substitutions $regex
         }
         'json' {
-            $hash = find_hash_in_json $hashfile_url $substitutions $jsonpath
+            $hash = find_hash_in_json $hashfile_url $useragent $substitutions $jsonpath
         }
         'xpath' {
-            $hash = find_hash_in_xml $hashfile_url $substitutions $xpath
+            $hash = find_hash_in_xml $hashfile_url $useragent $substitutions $xpath
         }
         'rdf' {
-            $hash = find_hash_in_rdf $hashfile_url $basename
+            $hash = find_hash_in_rdf $hashfile_url $useragent $basename
         }
         'metalink' {
-            $hash = find_hash_in_headers $url
+            $hash = find_hash_in_headers $url $useragent
             if (!$hash) {
-                $hash = find_hash_in_textfile "$url.meta4" $substitutions
+                $hash = find_hash_in_textfile "$url.meta4" $useragent $substitutions
             }
         }
         'fosshub' {
-            $hash = find_hash_in_textfile $url $substitutions ($Matches.filename+'.*?"sha256":"([a-fA-F0-9]{64})"')
+            $hash = find_hash_in_textfile $url $useragent $substitutions ($Matches.filename+'.*?"sha256":"([a-fA-F0-9]{64})"')
         }
         'sourceforge' {
             # change the URL because downloads.sourceforge.net doesn't have checksums
             $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
-            $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
+            $hash = find_hash_in_textfile $hashfile_url $useragent $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
         }
     }
 
@@ -327,7 +329,8 @@ function Update-ManifestProperty {
                 if ($Manifest.hash) {
                     # Global
                     $newURL = substitute $Manifest.autoupdate.url $Substitutions
-                    $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction $Manifest.autoupdate.hash -URL $newURL -Substitutions $Substitutions
+                    $useragent = $(if($null -ne $Manifest.autoupdate.useragent) { $Manifest.autoupdate.useragent } else { if($null -ne $Manifest.checkver.useragent) { $Manifest.checkver.useragent } else { $null } })
+                    $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction $Manifest.autoupdate.hash -URL $newURL -useragent $useragent -Substitutions $Substitutions
                     $Manifest.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.hash -Value $newHash
                     $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
                 } else {
@@ -335,7 +338,9 @@ function Update-ManifestProperty {
                     $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
                         $arch = $_.Name
                         $newURL = substitute (arch_specific 'url' $Manifest.autoupdate $arch) $Substitutions
-                        $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction (arch_specific 'hash' $Manifest.autoupdate $arch) -URL $newURL -Substitutions $Substitutions
+                        $useragent = (arch_specific 'useragent' $Manifest.autoupdate.hash $arch)
+                        $useragent = $(if($null -ne $useragent) { $useragent } else { if($null -ne $Manifest.autoupdate.useragent) { $Manifest.autoupdate.useragent } else { if($null -ne $Manifest.checkver.useragent) { $Manifest.checkver.useragent } else { $null } }})
+                        $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction (arch_specific 'hash' $Manifest.autoupdate $arch) -URL $newURL -useragent $useragent -Substitutions $Substitutions
                         $Manifest.architecture.$arch.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.architecture.$arch.hash -Value $newHash
                         $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
                     }
@@ -561,6 +566,8 @@ function HashHelper {
         $HashExtraction,
         [String[]]
         $URL,
+        [String]
+        $useragent,
         [HashTable]
         $Substitutions
     )
@@ -571,7 +578,7 @@ function HashHelper {
         } else {
             $currentHashExtraction = $HashExtraction[$i], $HashExtraction[-1] | Select-Object -First 1
         }
-        $hash += get_hash_for_app $AppName $currentHashExtraction $Version $URL[$i] $Substitutions
+        $hash += get_hash_for_app $AppName $currentHashExtraction $Version $URL[$i] $useragent $Substitutions
         if ($null -eq $hash[$i]) {
             throw "Could not update $AppName, hash for $(url_remote_filename $URL[$i]) failed!"
         }
