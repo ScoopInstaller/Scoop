@@ -57,7 +57,7 @@ $true, $false | ForEach-Object { # local and global apps
         $item.'Installed Version' = $status.version
         $item.'Latest Version' = if ($status.outdated) { $status.latest_version } else { "" }
         $item.'Missing Dependencies' = $status.missing_deps -Split ' ' -Join ' | '
-        $info = $()
+        $info = @()
         if ($status.failed)  { $info += 'Install failed' }
         if ($status.hold)    { $info += 'Held package' }
         if ($status.removed) { $info += 'Manifest removed' }

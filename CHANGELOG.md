@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Bug Fixes
+
+- **scoop-status:** Correct formatting of `Info` output ([#5047](https://github.com/ScoopInstaller/Scoop/issues/5047))
+
 ## [v0.2.3](https://github.com/ScoopInstaller/Scoop/compare/v0.2.2...v0.2.3) - 2022-07-07
 
 ### Features
