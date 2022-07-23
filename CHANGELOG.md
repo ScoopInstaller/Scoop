@@ -1,5 +1,8 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
 
+### Features
+- **core:** Improve function `Invoke-ExternalCommand` ([#5061](https://github.com/ScoopInstaller/Scoop/issues/5061))
+
 ### Bug Fixes
 
 - **install:** Move from cache when `--no-cache` is specified ([#5039](https://github.com/ScoopInstaller/Scoop/issues/5039))
