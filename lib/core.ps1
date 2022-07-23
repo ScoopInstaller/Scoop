@@ -488,6 +488,9 @@ function Invoke-ExternalCommand {
         [Alias("Args")]
         [String[]]
         $ArgumentList,
+        [Parameter(ParameterSetName = "Default")]
+        [Switch]
+        $NoWindow,
         [Parameter(ParameterSetName = "UseShellExecute")]
         [Switch]
         $RunAs,
@@ -507,12 +510,13 @@ function Invoke-ExternalCommand {
     }
     $Process = New-Object System.Diagnostics.Process
     $Process.StartInfo.FileName = $FilePath
-    $Process.StartInfo.Arguments = ($ArgumentList | Select-Object -Unique) -join ' '
+    $Process.StartInfo.CreateNoWindow = $NoWindow
     $Process.StartInfo.UseShellExecute = $false
     if ($LogPath) {
-        if ($FilePath -match '(^|\W)msiexec($|\W)') {
-            $Process.StartInfo.Arguments += " /lwe `"$LogPath`""
+        if ($FilePath -match '^msiexec(.exe)?$') {
+            $ArgumentList += "/lwe `"$LogPath`""
         } else {
+            $redirectToLogFile = $true
             $Process.StartInfo.RedirectStandardOutput = $true
             $Process.StartInfo.RedirectStandardError = $true
         }
@@ -521,8 +525,29 @@ function Invoke-ExternalCommand {
         $Process.StartInfo.UseShellExecute = $true
         $Process.StartInfo.Verb = 'RunAs'
     }
+    if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
+        $Process.StartInfo.Arguments = $ArgumentList -join ' '
+    } elseif ($Process.StartInfo.ArgumentList.Add) {
+        # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
+        # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
+        # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
+        $ArgumentList | ForEach-Object -Process { $Process.StartInfo.ArgumentList.Add($_) }
+    } else {
+        # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
+        $escapedArgs = $ArgumentList | ForEach-Object {
+            # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
+            $s = $_ -replace '(\\+)"', '$1$1"'
+            # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
+            $s = $s -replace '(\\+)$', '$1$1'
+            # escape double quotes
+            $s = $s -replace '"', '\"'
+            # quote the argument
+            "`"$s`""
+        }
+        $Process.StartInfo.Arguments = $escapedArgs -join ' '
+    }
     try {
-        $Process.Start() | Out-Null
+        [void]$Process.Start()
     } catch {
         if ($Activity) {
             Write-Host "error." -ForegroundColor DarkRed
@@ -530,11 +555,17 @@ function Invoke-ExternalCommand {
         error $_.Exception.Message
         return $false
     }
-    if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
-        Out-UTF8File -FilePath $LogPath -Append -InputObject $Process.StandardOutput.ReadToEnd()
-        Out-UTF8File -FilePath $LogPath -Append -InputObject $Process.StandardError.ReadToEnd()
+    if ($redirectToLogFile) {
+        # we do this to remove a deadlock potential
+        # ref: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process.standardoutput?view=net-6.0#remarks
+        $stdoutTask = $Process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $Process.StandardError.ReadToEndAsync()
     }
-    $Process.WaitForExit()
+    [void]$Process.WaitForExit()
+    if ($redirectToLogFile) {
+        Out-UTF8File -FilePath $LogPath -Append -InputObject $stdoutTask.Result
+        Out-UTF8File -FilePath $LogPath -Append -InputObject $stderrTask.Result
+    }
     if ($Process.ExitCode -ne 0) {
         if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
             if ($Activity) {
@@ -604,12 +635,12 @@ function movedir($from, $to) {
     $proc.StartInfo.RedirectStandardError = $true
     $proc.StartInfo.UseShellExecute = $false
     $proc.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    $proc.Start()
-    $out = $proc.StandardOutput.ReadToEnd()
-    $proc.WaitForExit()
+    [void]$proc.Start()
+    $stdoutTask = $proc.StandardOutput.ReadToEndAsync()
+    [void]$proc.WaitForExit()
 
     if($proc.ExitCode -ge 8) {
-        debug $out
+        debug $stdoutTask.Result
         throw "Could not find '$(fname $from)'! (error $($proc.ExitCode))"
     }
 
