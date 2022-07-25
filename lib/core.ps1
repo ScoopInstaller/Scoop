@@ -520,6 +520,8 @@ function Invoke-ExternalCommand {
     if ($RunAs) {
         $Process.StartInfo.UseShellExecute = $true
         $Process.StartInfo.Verb = 'RunAs'
+    } else {
+        $Process.StartInfo.CreateNoWindow = $true
     }
     if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
         $Process.StartInfo.Arguments = $ArgumentList -join ' '
