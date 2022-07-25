@@ -613,7 +613,7 @@ function movedir($from, $to) {
     $proc.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     [void]$proc.Start()
     $stdoutTask = $proc.StandardOutput.ReadToEndAsync()
-    [void]$proc.WaitForExit()
+    $proc.WaitForExit()
 
     if($proc.ExitCode -ge 8) {
         debug $stdoutTask.Result
