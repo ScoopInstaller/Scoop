@@ -513,6 +513,7 @@ function Invoke-ExternalCommand {
         if ($FilePath -match '(^|\W)msiexec($|\W)') {
             $Process.StartInfo.Arguments += " /lwe `"$LogPath`""
         } else {
+            $redirectToLogFile = $true
             $Process.StartInfo.RedirectStandardOutput = $true
             $Process.StartInfo.RedirectStandardError = $true
         }
@@ -522,7 +523,7 @@ function Invoke-ExternalCommand {
         $Process.StartInfo.Verb = 'RunAs'
     }
     try {
-        $Process.Start() | Out-Null
+        [void]$Process.Start()
     } catch {
         if ($Activity) {
             Write-Host "error." -ForegroundColor DarkRed
@@ -530,11 +531,17 @@ function Invoke-ExternalCommand {
         error $_.Exception.Message
         return $false
     }
-    if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
-        Out-UTF8File -FilePath $LogPath -Append -InputObject $Process.StandardOutput.ReadToEnd()
-        Out-UTF8File -FilePath $LogPath -Append -InputObject $Process.StandardError.ReadToEnd()
+    if ($redirectToLogFile) {
+        # we do this to remove a deadlock potential
+        # ref: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process.standardoutput?view=netframework-4.5#remarks
+        $stdoutTask = $Process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $Process.StandardError.ReadToEndAsync()
     }
     $Process.WaitForExit()
+    if ($redirectToLogFile) {
+        Out-UTF8File -FilePath $LogPath -Append -InputObject $stdoutTask.Result
+        Out-UTF8File -FilePath $LogPath -Append -InputObject $stderrTask.Result
+    }
     if ($Process.ExitCode -ne 0) {
         if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
             if ($Activity) {
@@ -604,12 +611,12 @@ function movedir($from, $to) {
     $proc.StartInfo.RedirectStandardError = $true
     $proc.StartInfo.UseShellExecute = $false
     $proc.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    $proc.Start()
-    $out = $proc.StandardOutput.ReadToEnd()
+    [void]$proc.Start()
+    $stdoutTask = $proc.StandardOutput.ReadToEndAsync()
     $proc.WaitForExit()
 
     if($proc.ExitCode -ge 8) {
-        debug $out
+        debug $stdoutTask.Result
         throw "Could not find '$(fname $from)'! (error $($proc.ExitCode))"
     }
 
