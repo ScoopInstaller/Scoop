@@ -526,7 +526,7 @@ function Invoke-ExternalCommand {
         # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
         # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
         # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
-        $ArgumentList | ForEach-Object -Process { $Process.StartInfo.ArgumentList.Add($_) }
+        $ArgumentList | ForEach-Object { $Process.StartInfo.ArgumentList.Add($_) }
     } else {
         # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
         $escapedArgs = $ArgumentList | ForEach-Object {
