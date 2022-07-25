@@ -28,10 +28,10 @@ function Expand-7zipArchive {
         $7zPath = Get-HelperPath -Helper 7zip
     }
     $LogPath = "$(Split-Path $Path)\7zip.log"
-    $ArgList = @('x', "`"$Path`"", "-o`"$DestinationPath`"", '-y')
+    $ArgList = @('x', $Path, "-o$DestinationPath", '-y')
     $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
     if (!$IsTar -and $ExtractDir) {
-        $ArgList += "-ir!`"$ExtractDir\*`""
+        $ArgList += "-ir!$ExtractDir\*"
     }
     if ($Switches) {
         $ArgList += (-split $Switches)
@@ -53,7 +53,7 @@ function Expand-7zipArchive {
     }
     if ($IsTar) {
         # Check for tar
-        $Status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $LogPath
+        $Status = Invoke-ExternalCommand $7zPath @('l', $Path) -LogPath $LogPath
         if ($Status) {
             # get inner tar file name
             $TarFile = (Select-String -Path $LogPath -Pattern '[^ ]*tar$').Matches.Value
@@ -97,7 +97,7 @@ function Expand-ZstdArchive {
     $LogPath = Join-Path (Split-Path $Path) 'zstd.log'
     $DestinationPath = $DestinationPath.TrimEnd('\')
     ensure $DestinationPath | Out-Null
-    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"", '-f', '-v')
+    $ArgList = @('-d', $Path, '--output-dir-flat', $DestinationPath, '-f', '-v')
 
     if ($Switches) {
         $ArgList += (-split $Switches)
@@ -148,10 +148,10 @@ function Expand-MsiArchive {
     }
     if ((get_config MSIEXTRACT_USE_LESSMSI)) {
         $MsiPath = Get-HelperPath -Helper Lessmsi
-        $ArgList = @('x', "`"$Path`"", "`"$DestinationPath\\`"")
+        $ArgList = @('x', $Path, "$DestinationPath\")
     } else {
         $MsiPath = 'msiexec.exe'
-        $ArgList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath\\SourceDir`"")
+        $ArgList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath\SourceDir`"")
     }
     $LogPath = "$(Split-Path $Path)\msi.log"
     if ($Switches) {
@@ -200,7 +200,7 @@ function Expand-InnoArchive {
         $Removal
     )
     $LogPath = "$(Split-Path $Path)\innounp.log"
-    $ArgList = @('-x', "-d`"$DestinationPath`"", "`"$Path`"", '-y')
+    $ArgList = @('-x', "-d$DestinationPath", $Path, '-y')
     switch -Regex ($ExtractDir) {
         '^[^{].*' { $ArgList += "-c{app}\$ExtractDir" }
         '^{.*' { $ArgList += "-c$ExtractDir" }
@@ -267,7 +267,7 @@ function Expand-DarkArchive {
         $Removal
     )
     $LogPath = "$(Split-Path $Path)\dark.log"
-    $ArgList = @('-nologo', "-x `"$DestinationPath`"", "`"$Path`"")
+    $ArgList = @('-nologo', '-x', $DestinationPath, $Path)
     if ($Switches) {
         $ArgList += (-split $Switches)
     }
