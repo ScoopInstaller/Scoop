@@ -537,7 +537,7 @@ function Invoke-ExternalCommand {
         $stdoutTask = $Process.StandardOutput.ReadToEndAsync()
         $stderrTask = $Process.StandardError.ReadToEndAsync()
     }
-    [void]$Process.WaitForExit()
+    $Process.WaitForExit()
     if ($redirectToLogFile) {
         Out-UTF8File -FilePath $LogPath -Append -InputObject $stdoutTask.Result
         Out-UTF8File -FilePath $LogPath -Append -InputObject $stderrTask.Result
