@@ -4,6 +4,7 @@
 
 - **core:** Create no window by default in `Invoke-ExternalCommand` ([#5066](https://github.com/ScoopInstaller/Scoop/issues/5066))
 - **core:** Improve argument concatenation in `Invoke-ExternalCommand` ([#5065](https://github.com/ScoopInstaller/Scoop/issues/5065))
+- **scoop-status:** Add flag to disable remote checking ([#5073](https://github.com/ScoopInstaller/Scoop/issues/5073))
 
 ### Bug Fixes
 
