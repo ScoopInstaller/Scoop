@@ -1,5 +1,7 @@
 # Usage: scoop status
 # Summary: Show status and check for new app versions
+# Help: Options:
+#   -r, --no-remotes      Disables remote fetching/checking for Scoop and buckets
 
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest' 'parse_json' "install_info"
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
@@ -9,6 +11,7 @@ $currentdir = fullpath $(versiondir 'scoop' 'current')
 $needs_update = $false
 $bucket_needs_update = $false
 $script:network_failure = $false
+$no_remotes = $args[0] -eq '-r' -or $args[0] -eq '--no-remotes'
 $list = @()
 if (!(Get-FormatData ScoopStatus)) {
     Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
@@ -27,10 +30,12 @@ function Test-UpdateStatus($repopath) {
     }
 }
 
-$needs_update = Test-UpdateStatus $currentdir
-foreach ($bucket in Get-LocalBucket) {
-    if (Test-UpdateStatus (Find-BucketDirectory $bucket -Root)) {
-        $bucket_needs_update = $true
+if (!$no_remotes) {
+    $needs_update = Test-UpdateStatus $currentdir
+    foreach ($bucket in Get-LocalBucket) {
+        if (Test-UpdateStatus (Find-BucketDirectory $bucket -Root)) {
+            $bucket_needs_update = $true
+        }
     }
 }
 
@@ -38,7 +43,7 @@ if ($needs_update) {
     warn "Scoop out of date. Run 'scoop update' to get the latest changes."
 } elseif ($bucket_needs_update) {
     warn "Scoop bucket(s) out of date. Run 'scoop update' to get the latest changes."
-} elseif (!$script:network_failure) {
+} elseif (!$script:network_failure -and !$no_remotes) {
     success 'Scoop is up to date.'
 }
 
