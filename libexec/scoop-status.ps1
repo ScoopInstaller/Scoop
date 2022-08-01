@@ -35,6 +35,7 @@ if (!$no_remotes) {
     foreach ($bucket in Get-LocalBucket) {
         if (Test-UpdateStatus (Find-BucketDirectory $bucket -Root)) {
             $bucket_needs_update = $true
+            break
         }
     }
 }
