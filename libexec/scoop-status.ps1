@@ -1,7 +1,8 @@
 # Usage: scoop status
 # Summary: Show status and check for new app versions
 # Help: Options:
-#   -r, --no-remotes      Disables remote fetching/checking for Scoop and buckets
+#   -l, --local         Checks the status for only the locally installed apps,
+#                       and disables remote fetching/checking for Scoop and buckets
 
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest' 'parse_json' "install_info"
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
@@ -11,7 +12,8 @@ $currentdir = fullpath $(versiondir 'scoop' 'current')
 $needs_update = $false
 $bucket_needs_update = $false
 $script:network_failure = $false
-$no_remotes = $args[0] -eq '-r' -or $args[0] -eq '--no-remotes'
+$no_remotes = $args[0] -eq '-l' -or $args[0] -eq '--local'
+if (!(Get-Command git -ErrorAction SilentlyContinue)) { $no_remotes = $true }
 $list = @()
 if (!(Get-FormatData ScoopStatus)) {
     Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
