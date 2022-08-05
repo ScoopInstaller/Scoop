@@ -6,6 +6,7 @@
 - **core:** Improve argument concatenation in `Invoke-ExternalCommand` ([#5065](https://github.com/ScoopInstaller/Scoop/issues/5065))
 - **install:** Show bucket name while installing an app ([#5075](https://github.com/ScoopInstaller/Scoop/issues/5075))
 - **scoop-status:** Add flag to disable remote checking ([#5073](https://github.com/ScoopInstaller/Scoop/issues/5073))
+- **scoop-update:** Add support for `pre_uninstall` and `post_uninstall` ([#5085](https://github.com/ScoopInstaller/Scoop/issues/5085))
 
 ### Bug Fixes
 
