@@ -243,6 +243,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $dir = versiondir $app $old_version $global
     $persist_dir = persistdir $app $global
 
+    Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
+
     #region Workaround for #2952
     if (test_running_process $app $global) {
         return
@@ -271,6 +273,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
             Move-Item "$dir" "$dir/../_$version.old($i)"
         }
     }
+
+    Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
 
     if ($bucket) {
         # add bucket name it was installed from
