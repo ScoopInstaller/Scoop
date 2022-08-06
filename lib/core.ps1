@@ -225,8 +225,8 @@ function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -rep
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
-function installed($app, $global) {
-    if (-not $PSBoundParameters.ContainsKey('global')) {
+function installed($app, [Nullable[bool]]$global) {
+    if ($null -eq $global) {
         return (installed $app $false) -or (installed $app $true)
     }
     # Dependencies of the format "bucket/dependency" install in a directory of form
