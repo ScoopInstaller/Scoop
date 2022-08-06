@@ -39,6 +39,10 @@
 #       Could be used for testing specific functionalities before released into all users.
 #       If you want to receive updates earlier to test new functionalities use develop (see: 'https://github.com/ScoopInstaller/Scoop/issues/2939')
 #
+# SCOOP_HOLD: $true|$false
+#       Allow to disable Scoop itself updates.
+#       This configuration have the same function with 'scoop (un)hold scoop'.
+#
 # proxy: [username:password@]host:port
 #       By default, Scoop will use the proxy settings from Internet Options, but with anonymous authentication.
 #

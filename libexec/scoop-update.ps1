@@ -57,84 +57,94 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
 
 function update_scoop() {
     # check for git
-    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself and buckets. Run 'scoop install git' and try again." }
 
-    Write-Host "Updating Scoop..."
-    $last_update = $(last_scoop_update)
-    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
-    $last_update = $last_update.ToString('s')
-    $show_update_log = get_config 'show_update_log' $true
-    $currentdir = fullpath $(versiondir 'scoop' 'current')
-    if (!(Test-Path "$currentdir\.git")) {
-        $newdir = "$currentdir\..\new"
-        $olddir = "$currentdir\..\old"
+    $SCOOP_HOLD = get_config 'SCOOP_HOLD' $true
+    if($SCOOP_HOLD) {
+        warn "'SCOOP_HOLD' has been setting to '`$true' and skip updating Scoop..."
+        warn "If you want to update Scoop itself, use 'scoop config SCOOP_HOLD `$false' or 'scoop unhold scoop' to enable it."
+    } else {
+        Write-Host "Updating Scoop..."
+        $last_update = $(last_scoop_update)
+        if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
+        $last_update = $last_update.ToString('s')
+        $show_update_log = get_config 'show_update_log' $true
+        $currentdir = fullpath $(versiondir 'scoop' 'current')
+        if (!(Test-Path "$currentdir\.git")) {
+            $newdir = "$currentdir\..\new"
+            $olddir = "$currentdir\..\old"
 
-        # get git scoop
-        git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
+            # get git scoop
+            git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
 
-        # check if scoop was successful downloaded
-        if (!(Test-Path "$newdir\bin\scoop.ps1")) {
-            Remove-Item $newdir -Force -Recurse
-            abort "Scoop download failed. If this appears several times, try removing SCOOP_REPO by 'scoop config rm SCOOP_REPO'"
+            # check if scoop was successful downloaded
+            if (!(Test-Path "$newdir\bin\scoop.ps1")) {
+                Remove-Item $newdir -Force -Recurse
+                abort "Scoop download failed. If this appears several times, try removing SCOOP_REPO by 'scoop config rm SCOOP_REPO'"
+            } else {
+                # replace non-git scoop with the git version
+                try {
+                    Rename-Item $currentdir 'old' -ErrorAction Stop
+                    Rename-Item $newdir 'current' -ErrorAction Stop
+                } catch {
+                    Write-Warning $_
+                    abort "Scoop update failed. Folder in use. Paste $newdir into $currentdir."
+                }
+            }
         } else {
-            # replace non-git scoop with the git version
-            try {
-                Rename-Item $currentdir 'old' -ErrorAction Stop
-                Rename-Item $newdir 'current' -ErrorAction Stop
-            } catch {
-                Write-Warning $_
-                abort "Scoop update failed. Folder in use. Paste $newdir into $currentdir."
+            if (Test-Path "$currentdir\..\old") {
+                Remove-Item "$currentdir\..\old" -Recurse -Force -ErrorAction SilentlyContinue
+            }
+
+            $previousCommit = git -C "$currentdir" rev-parse HEAD
+            $currentRepo = git -C "$currentdir" config remote.origin.url
+            $currentBranch = git -C "$currentdir" branch
+
+            $isRepoChanged = !($currentRepo -match $configRepo)
+            $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
+
+            # Change remote url if the repo is changed
+            if ($isRepoChanged) {
+                git -C "$currentdir" config remote.origin.url "$configRepo"
+            }
+
+            # Fetch and reset local repo if the repo or the branch is changed
+            if ($isRepoChanged -or $isBranchChanged) {
+                # Reset git fetch refs, so that it can fetch all branches (GH-3368)
+                git -C "$currentdir" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+                # fetch remote branch
+                git_cmd -C "`"$currentdir`"" fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
+                # checkout and track the branch
+                git_cmd -C "`"$currentdir`"" checkout -B $configBranch -t origin/$configBranch -q
+                # reset branch HEAD
+                git -C "$currentdir" reset --hard origin/$configBranch -q
+            } else {
+                git_cmd -C "`"$currentdir`"" pull -q
+            }
+
+            $res = $lastexitcode
+            if ($show_update_log) {
+                git -C "$currentdir" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
+            }
+
+            if ($res -ne 0) {
+                abort 'Update failed.'
             }
         }
-    } else {
-        if (Test-Path "$currentdir\..\old") {
-            Remove-Item "$currentdir\..\old" -Recurse -Force -ErrorAction SilentlyContinue
-        }
 
-        $previousCommit = git -C "$currentdir" rev-parse HEAD
-        $currentRepo = git -C "$currentdir" config remote.origin.url
-        $currentBranch = git -C "$currentdir" branch
+        # This should have been deprecated after 2019-05-12
+        # if ((Get-LocalBucket) -notcontains 'main') {
+        #     info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
+        #     info "Adding main bucket..."
+        #     add_bucket 'main'
+        # }
 
-        $isRepoChanged = !($currentRepo -match $configRepo)
-        $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
+        shim "$currentdir\bin\scoop.ps1" $false
 
-        # Change remote url if the repo is changed
-        if ($isRepoChanged) {
-            git -C "$currentdir" config remote.origin.url "$configRepo"
-        }
+        set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+        success 'Scoop was updated successfully!'
 
-        # Fetch and reset local repo if the repo or the branch is changed
-        if ($isRepoChanged -or $isBranchChanged) {
-            # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-            git -C "$currentdir" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
-            # fetch remote branch
-            git_cmd -C "`"$currentdir`"" fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
-            # checkout and track the branch
-            git_cmd -C "`"$currentdir`"" checkout -B $configBranch -t origin/$configBranch -q
-            # reset branch HEAD
-            git -C "$currentdir" reset --hard origin/$configBranch -q
-        } else {
-            git_cmd -C "`"$currentdir`"" pull -q
-        }
-
-        $res = $lastexitcode
-        if ($show_update_log) {
-            git -C "$currentdir" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
-        }
-
-        if ($res -ne 0) {
-            abort 'Update failed.'
-        }
     }
-
-    # This should have been deprecated after 2019-05-12
-    # if ((Get-LocalBucket) -notcontains 'main') {
-    #     info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
-    #     info "Adding main bucket..."
-    #     add_bucket 'main'
-    # }
-
-    shim "$currentdir\bin\scoop.ps1" $false
 
     foreach ($bucket in Get-LocalBucket) {
         Write-Host "Updating '$bucket' bucket..."
@@ -164,10 +174,8 @@ function update_scoop() {
         if ($show_update_log) {
             git -C "$bucketLoc" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
         }
+        success "'$bucket' bucket was updated successfully!"
     }
-
-    set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
-    success 'Scoop was updated successfully!'
 }
 
 function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {

@@ -32,26 +32,30 @@ if ($global -and !(is_admin)) {
 $apps | ForEach-Object {
     $app = $_
 
-    if (!(installed $app $global)) {
-        if ($global) {
-            error "'$app' is not installed globally."
-        } else {
-            error "'$app' is not installed."
-        }
-        return
-    }
-
-    if (get_config NO_JUNCTIONS) {
-        $version = Select-CurrentVersion -App $app -Global:$global
+    if ($app -eq 'scoop') {
+        set_config 'SCOOP_HOLD' $false | Out-Null
     } else {
-        $version = 'current'
+        if (!(installed $app $global)) {
+            if ($global) {
+                error "'$app' is not installed globally."
+            } else {
+                error "'$app' is not installed."
+            }
+            return
+        }
+
+        if (get_config NO_JUNCTIONS) {
+            $version = Select-CurrentVersion -App $app -Global:$global
+        } else {
+            $version = 'current'
+        }
+        $dir = versiondir $app $version $global
+        $json = install_info $app $version $global
+        $install = @{}
+        $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
+        $install.hold = $null
+        save_install_info $install $dir
     }
-    $dir = versiondir $app $version $global
-    $json = install_info $app $version $global
-    $install = @{}
-    $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
-    $install.hold = $null
-    save_install_info $install $dir
     success "$app is no longer held and can be updated again."
 }
 
