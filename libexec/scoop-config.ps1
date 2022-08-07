@@ -147,7 +147,12 @@ if (!$name) {
     if($null -eq $value) {
         Write-Host "'$name' is not set"
     } else {
-        $value
+        # Since `scoop config <xxx> $null` is the same as `scoop config <xxx>`,
+        # so it only can remove <xxx> with `scoop config rm <xxx>`.
+        # https://github.com/ScoopInstaller/Scoop/pull/5090#issuecomment-1207389924
+        Write-Host "'$name' is '$value'."
+        Write-Host "-----"
+        Write-Host "Note: you can use 'scoop config rm $name' to remove '$name'."
     }
 }
 
