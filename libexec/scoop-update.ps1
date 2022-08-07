@@ -98,6 +98,12 @@ function update_scoop() {
         $isRepoChanged = !($currentRepo -match $configRepo)
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
+        # Stash uncommitted changes
+        if (git diff HEAD --name-only) {
+            warn "Uncommitted changes detected. Stashing..."
+            git stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
+        }
+
         # Change remote url if the repo is changed
         if ($isRepoChanged) {
             git -C "$currentdir" config remote.origin.url "$configRepo"
