@@ -34,28 +34,29 @@ $apps | ForEach-Object {
 
     if ($app -eq 'scoop') {
         set_config 'SCOOP_HOLD' $true | Out-Null
-    } else {
-        if (!(installed $app $global)) {
-            if ($global) {
-                error "'$app' is not installed globally."
-            } else {
-                error "'$app' is not installed."
-            }
-            return
-        }
-
-        if (get_config NO_JUNCTIONS) {
-            $version = Select-CurrentVersion -App $app -Global:$global
-        } else {
-            $version = 'current'
-        }
-        $dir = versiondir $app $version $global
-        $json = install_info $app $version $global
-        $install = @{}
-        $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
-        $install.hold = $true
-        save_install_info $install $dir
+        success "$app is now held and can not be updated anymore."
+        return
     }
+    if (!(installed $app $global)) {
+        if ($global) {
+            error "'$app' is not installed globally."
+        } else {
+            error "'$app' is not installed."
+        }
+        return
+    }
+
+    if (get_config NO_JUNCTIONS) {
+        $version = Select-CurrentVersion -App $app -Global:$global
+    } else {
+        $version = 'current'
+    }
+    $dir = versiondir $app $version $global
+    $json = install_info $app $version $global
+    $install = @{}
+    $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
+    $install.hold = $true
+    save_install_info $install $dir
     success "$app is now held and can not be updated anymore."
 }
 
