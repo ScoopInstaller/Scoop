@@ -33,7 +33,7 @@ $apps | ForEach-Object {
     $app = $_
 
     if ($app -eq 'scoop') {
-        set_config 'SCOOP_HOLD' 1 | Out-Null
+        set_config 'SCOOP_HOLD' $true | Out-Null
         success "$app is now held and might not be updated for one day."
         return
     }

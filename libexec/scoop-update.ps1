@@ -59,9 +59,12 @@ function update_scoop() {
     # check for git
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    $SCOOP_HOLD = get_config SCOOP_HOLD 0
-    if (((New-TimeSpan (get_config lastUpdate)).Days) -lt $SCOOP_HOLD) {
-        warn "'SCOOP_HOLD' has been setting to '$SCOOP_HOLD' and skip updating Scoop for $([int]$SCOOP_HOLD) day(s)..."
+    $SCOOP_HOLD = get_config SCOOP_HOLD $false
+    $last_update = $(last_scoop_update)
+    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
+    $last_update = $last_update.ToString('s')
+    if (((New-TimeSpan ($last_update)).Days) -lt $SCOOP_HOLD) {
+        warn "'SCOOP_HOLD' has been setting to '$SCOOP_HOLD' and skip updating Scoop for $([int]$SCOOP_HOLD) day$(if($SCOOP_HOLD -gt 1){'s'})..."
         warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
         return
     } else {
@@ -69,9 +72,6 @@ function update_scoop() {
     }
 
     Write-Host "Updating Scoop..."
-    $last_update = $(last_scoop_update)
-    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
-    $last_update = $last_update.ToString('s')
     $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if (!(Test-Path "$currentdir\.git")) {
@@ -148,7 +148,7 @@ function update_scoop() {
 
 function update_bucket() {
     # check for git
-    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update main bucket and others. Run 'scoop install git' and try again." }
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update main bucket and others. Run 'scoop install git' and try again." }
 
     foreach ($bucket in Get-LocalBucket) {
         Write-Host "Updating '$bucket' bucket..."
