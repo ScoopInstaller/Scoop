@@ -60,7 +60,7 @@ function update_scoop() {
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     $SCOOP_HOLD = get_config SCOOP_HOLD $false
-    $last_update = $(last_scoop_update)
+    $last_update = last_scoop_update
     if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
     $last_update = $last_update.ToString('s')
     if (((New-TimeSpan ($last_update)).Days) -lt $SCOOP_HOLD) {
