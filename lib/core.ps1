@@ -996,28 +996,15 @@ function show_app($app, $bucket, $version) {
     return $app
 }
 
-function last_scoop_update() {
-    # PowerShell 6 returns an DateTime Object
-    $last_update = get_config lastUpdate
-
-    if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
-        try {
-            $last_update = [System.DateTime]::Parse($last_update)
-        } catch {
-            $last_update = $null
-        }
-    }
-    return $last_update
-}
-
 function is_scoop_outdated() {
-    $last_update = last_scoop_update
-    if($null -eq $last_update) {
+    try{
+        $expireHour = (New-TimeSpan $(get_config lastUpdate)).TotalHours
+        return ($expireHour -ge 3)
+    } catch {
+        # If not System.DateTime
         set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
-        # enforce an update for the first time
         return $true
     }
-    return $last_update.AddHours(3) -lt [System.DateTime]::Now.ToLocalTime()
 }
 
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {

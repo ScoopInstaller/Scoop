@@ -60,17 +60,17 @@ function update_scoop() {
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     $SCOOP_HOLD = get_config SCOOP_HOLD $false
-    $last_update = last_scoop_update
-    if ($null -eq $last_update) {
-        $last_update = [System.DateTime]::Now.ToString('o')
-        set_config lastUpdate $last_update | Out-Null
+    try {
+        $update_until = ([System.DateTime]::Parse((get_config update_until)))
+    } catch {
+        $update_until = [System.DateTime]::now
     }
-    if (((New-TimeSpan ($last_update)).Days) -lt $SCOOP_HOLD) {
-        warn "Skipping self-update as 'SCOOP_HOLD' has been set to $([int]$SCOOP_HOLD) day$(if($SCOOP_HOLD -gt 1){'s'})..."
+    if ((New-TimeSpan $update_until).TotalSeconds -lt 0) {
+        warn "Skipping self-update until $($update_until.ToLocalTime())..."
         warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
         return
     } else {
-        set_config SCOOP_HOLD $null | Out-Null
+        set_config update_until $null | Out-Null
     }
 
     Write-Host "Updating Scoop..."
