@@ -57,7 +57,15 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
 
 function update_scoop() {
     # check for git
-    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+
+    $SCOOP_HOLD_DAYS = get_config 'SCOOP_HOLD_DAYS' 0
+    if (((New-TimeSpan (scoop config lastUpdate)).Days) -lt $SCOOP_HOLD_DAYS) {
+        warn "'SCOOP_HOLD_DAYS' has been setting to '$SCOOP_HOLD_DAYS' and skip updating Scoop..."
+        warn "If you want to update Scoop itself, use 'scoop unhold scoop' to enable it."
+        warn "If you want to change 'SCOOP_HOLD_DAYS', use 'scoop config SCOOP_HOLD_DAYS <days>' to set value."
+        return
+    }
 
     Write-Host "Updating Scoop..."
     $last_update = $(last_scoop_update)
@@ -301,8 +309,6 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
 }
 
-$SCOOP_HOLD = get_config 'SCOOP_HOLD' $true
-
 if (-not ($apps -or $all)) {
     if ($global) {
         error 'scoop update: --global is invalid when <app> is not specified.'
@@ -312,12 +318,7 @@ if (-not ($apps -or $all)) {
         error 'scoop update: --no-cache is invalid when <app> is not specified.'
         exit 1
     }
-    if($SCOOP_HOLD) {
-        warn "'SCOOP_HOLD' has been setting to '`$true' and skip updating Scoop..."
-        warn "If you want to update Scoop itself, use 'scoop config SCOOP_HOLD `$false' or 'scoop unhold scoop' to enable it."
-    } else {
-        update_scoop
-    }
+    update_scoop
     update_bucket
 } else {
     if ($global -and !(is_admin)) {
@@ -330,12 +331,7 @@ if (-not ($apps -or $all)) {
     $apps_param = $apps
 
     if ($updateScoop) {
-        if($SCOOP_HOLD) {
-            warn "'SCOOP_HOLD' has been setting to '`$true' and skip updating Scoop..."
-            warn "If you want to update Scoop itself, use 'scoop config SCOOP_HOLD `$false' or 'scoop unhold scoop' to enable it."
-        } else {
-            update_scoop
-        }
+        update_scoop
         update_bucket
     }
 
