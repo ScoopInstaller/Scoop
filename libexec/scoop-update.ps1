@@ -104,7 +104,8 @@ function update_scoop() {
                 warn "Uncommitted changes detected. Stashing..."
                 git -C "$currentdir" stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
             } else {
-                abort "Uncommitted changes detected. Updating Aborted."
+                warn "Uncommitted changes detected. Update aborted."
+                return
             }
         }
 
