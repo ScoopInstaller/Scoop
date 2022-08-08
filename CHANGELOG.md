@@ -7,7 +7,7 @@
 - **install:** Show bucket name while installing an app ([#5075](https://github.com/ScoopInstaller/Scoop/issues/5075))
 - **scoop-status:** Add flag to disable remote checking ([#5073](https://github.com/ScoopInstaller/Scoop/issues/5073))
 - **scoop-update:** Add support for `pre_uninstall` and `post_uninstall` ([#5085](https://github.com/ScoopInstaller/Scoop/issues/5085))
-- **scoop-config:** Add new configuration of `SCOOP_HOLD` ([#5089](https://github.com/ScoopInstaller/Scoop/issues/5089))
+- **scoop-(un)hold:** Support `scoop (un)hold scoop` ([#5089](https://github.com/ScoopInstaller/Scoop/issues/5089))
 
 ### Bug Fixes
 

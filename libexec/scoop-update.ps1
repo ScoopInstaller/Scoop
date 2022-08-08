@@ -59,7 +59,6 @@ function update_scoop() {
     # check for git
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    $SCOOP_HOLD = get_config SCOOP_HOLD $false
     try {
         $update_until = ([System.DateTime]::Parse((get_config update_until)))
     } catch {
