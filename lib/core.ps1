@@ -998,7 +998,7 @@ function show_app($app, $bucket, $version) {
 
 function last_scoop_update() {
     # PowerShell 6 returns an DateTime Object
-    $last_update = (get_config lastupdate)
+    $last_update = get_config lastUpdate
 
     if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
         try {
@@ -1011,14 +1011,13 @@ function last_scoop_update() {
 }
 
 function is_scoop_outdated() {
-    $last_update = $(last_scoop_update)
-    $now = [System.DateTime]::Now
+    $last_update = last_scoop_update
     if($null -eq $last_update) {
-        set_config lastupdate $now.ToString('o')
+        set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
         # enforce an update for the first time
         return $true
     }
-    return $last_update.AddHours(3) -lt $now.ToLocalTime()
+    return $last_update.AddHours(3) -lt [System.DateTime]::Now.ToLocalTime()
 }
 
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {

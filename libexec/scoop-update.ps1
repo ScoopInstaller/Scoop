@@ -61,8 +61,10 @@ function update_scoop() {
 
     $SCOOP_HOLD = get_config SCOOP_HOLD $false
     $last_update = last_scoop_update
-    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
-    $last_update = $last_update.ToString('s')
+    if ($null -eq $last_update) {
+        $last_update = [System.DateTime]::Now.ToString('o')
+        set_config lastUpdate $last_update | Out-Null
+    }
     if (((New-TimeSpan ($last_update)).Days) -lt $SCOOP_HOLD) {
         warn "Skipping self-update as 'SCOOP_HOLD' has been set to $([int]$SCOOP_HOLD) day$(if($SCOOP_HOLD -gt 1){'s'})..."
         warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
@@ -317,7 +319,7 @@ if (-not ($apps -or $all)) {
     }
     update_scoop
     update_bucket
-    set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+    set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
@@ -332,7 +334,7 @@ if (-not ($apps -or $all)) {
     if ($updateScoop) {
         update_scoop
         update_bucket
-        set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+        set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
         success 'Scoop was updated successfully!'
     }
 
