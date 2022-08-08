@@ -59,12 +59,13 @@ function update_scoop() {
     # check for git
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    $SCOOP_HOLD_DAYS = get_config 'SCOOP_HOLD_DAYS' 0
-    if (((New-TimeSpan (scoop config lastUpdate)).Days) -lt $SCOOP_HOLD_DAYS) {
-        warn "'SCOOP_HOLD_DAYS' has been setting to '$SCOOP_HOLD_DAYS' and skip updating Scoop..."
-        warn "If you want to update Scoop itself, use 'scoop unhold scoop' to enable it."
-        warn "If you want to change 'SCOOP_HOLD_DAYS', use 'scoop config SCOOP_HOLD_DAYS <days>' to set value."
+    $SCOOP_HOLD = get_config SCOOP_HOLD 0
+    if (((New-TimeSpan (get_config lastUpdate)).Days) -lt $SCOOP_HOLD) {
+        warn "'SCOOP_HOLD' has been setting to '$SCOOP_HOLD' and skip updating Scoop for $([int]$SCOOP_HOLD) day(s)..."
+        warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
         return
+    } else {
+        set_config SCOOP_HOLD $null | Out-Null
     }
 
     Write-Host "Updating Scoop..."
