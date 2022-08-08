@@ -64,7 +64,7 @@ function update_scoop() {
     if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
     $last_update = $last_update.ToString('s')
     if (((New-TimeSpan ($last_update)).Days) -lt $SCOOP_HOLD) {
-        warn "'SCOOP_HOLD' has been setting to '$SCOOP_HOLD' and skip updating Scoop for $([int]$SCOOP_HOLD) day$(if($SCOOP_HOLD -gt 1){'s'})..."
+        warn "Skipping self-update as 'SCOOP_HOLD' has been set to $([int]$SCOOP_HOLD) day$(if($SCOOP_HOLD -gt 1){'s'})..."
         warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
         return
     } else {
