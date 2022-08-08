@@ -39,8 +39,8 @@
 #       Could be used for testing specific functionalities before released into all users.
 #       If you want to receive updates earlier to test new functionalities use develop (see: 'https://github.com/ScoopInstaller/Scoop/issues/2939')
 #
-# SCOOP_HOLD_DAYS: 1
-#       Allow to disable Scoop itself updates for 'SCOOP_HOLD_DAYS' days.
+# SCOOP_HOLD: $true|$false|<n>
+#       Allow to disable Scoop itself updates, '$true' for 1 day, '$false' for reenable, '<n>' for n days.
 #       This configuration havs the same effect with 'scoop (un)hold scoop'.
 #
 # proxy: [username:password@]host:port
