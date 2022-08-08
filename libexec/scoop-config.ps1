@@ -40,8 +40,8 @@
 #       If you want to receive updates earlier to test new functionalities use develop (see: 'https://github.com/ScoopInstaller/Scoop/issues/2939')
 #
 # SCOOP_HOLD: $true|$false|<n>
-#       Allow to disable Scoop itself updates, '$true' for 1 day, '$false' for reenable, '<n>' for n days.
-#       This configuration havs the same effect with 'scoop (un)hold scoop'.
+#       Disables Scoop self-updates: '$true' for 1 day, '$false' for reenable, '<n>' for n days.
+#       This configuration has the same effect as 'scoop (un)hold scoop'.
 #
 # proxy: [username:password@]host:port
 #       By default, Scoop will use the proxy settings from Internet Options, but with anonymous authentication.
