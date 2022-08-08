@@ -99,9 +99,13 @@ function update_scoop() {
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
         # Stash uncommitted changes
-        if (git diff HEAD --name-only) {
-            warn "Uncommitted changes detected. Stashing..."
-            git stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
+        if (git -C "$currentdir" diff HEAD --name-only) {
+            if (get_config autostash_on_conflict) {
+                warn "Uncommitted changes detected. Stashing..."
+                git -C "$currentdir" stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
+            } else {
+                abort "Uncommitted changes detected. Updating Aborted."
+            }
         }
 
         # Change remote url if the repo is changed

@@ -47,6 +47,10 @@
 #       * An empty or unset value for proxy is equivalent to 'default' (with no username or password)
 #       * To bypass the system proxy and connect directly, use 'none' (with no username or password)
 #
+# autostash_on_conflict: $true|$false
+#       When a conflict is detected during updating, Scoop will auto-stash the uncommitted changes.
+#       (Default is $false, which will abort the update)
+#
 # default_architecture: 64bit|32bit
 #       Allow to configure preferred architecture for application installation.
 #       If not specified, architecture is determined be system.
