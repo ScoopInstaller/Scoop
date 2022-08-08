@@ -143,9 +143,6 @@ function update_scoop() {
     # }
 
     shim "$currentdir\bin\scoop.ps1" $false
-
-    set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
-    success 'Scoop was updated successfully!'
 }
 
 function update_bucket() {
@@ -180,7 +177,6 @@ function update_bucket() {
         if ($show_update_log) {
             git -C "$bucketLoc" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
         }
-        success "'$bucket' bucket was updated successfully!"
     }
 }
 
@@ -320,6 +316,8 @@ if (-not ($apps -or $all)) {
     }
     update_scoop
     update_bucket
+    set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+    success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
         'ERROR: You need admin rights to update global apps.'; exit 1
@@ -333,6 +331,8 @@ if (-not ($apps -or $all)) {
     if ($updateScoop) {
         update_scoop
         update_bucket
+        set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+        success 'Scoop was updated successfully!'
     }
 
     if ($apps_param -eq '*' -or $all) {

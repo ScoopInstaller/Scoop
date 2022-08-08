@@ -39,7 +39,7 @@
 #       Could be used for testing specific functionalities before released into all users.
 #       If you want to receive updates earlier to test new functionalities use develop (see: 'https://github.com/ScoopInstaller/Scoop/issues/2939')
 #
-# SCOOP_HOLD_DAYS: 30
+# SCOOP_HOLD_DAYS: 1
 #       Allow to disable Scoop itself updates for 'SCOOP_HOLD_DAYS' days.
 #       This configuration havs the same effect with 'scoop (un)hold scoop'.
 #

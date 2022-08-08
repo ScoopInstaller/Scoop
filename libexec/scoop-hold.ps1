@@ -33,8 +33,8 @@ $apps | ForEach-Object {
     $app = $_
 
     if ($app -eq 'scoop') {
-        set_config 'SCOOP_HOLD_DAYS' 30 | Out-Null
-        success "$app is now held and can not be updated for 30 days."
+        set_config 'SCOOP_HOLD_DAYS' 1 | Out-Null
+        success "$app is now held and can not be updated for one day."
         return
     }
     if (!(installed $app $global)) {
