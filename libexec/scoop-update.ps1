@@ -316,8 +316,8 @@ if (-not ($apps -or $all)) {
         error 'scoop update: --no-cache is invalid when <app> is not specified.'
         exit 1
     }
-    update_scoop
-    update_bucket
+    update_scoop $show_update_log
+    update_bucket $show_update_log
     set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
