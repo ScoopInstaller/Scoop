@@ -61,7 +61,7 @@ function update_scoop($show_update_log) {
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     try {
-        $update_until = ([System.DateTime]::Parse((get_config update_until)))
+        $update_until = [System.DateTime]::Parse((get_config update_until))
     } catch {
         $update_until = [System.DateTime]::now
     }
