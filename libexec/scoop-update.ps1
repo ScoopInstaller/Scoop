@@ -65,12 +65,14 @@ function update_scoop($show_update_log) {
     } catch {
         $update_until = $null
     }
-    if ((New-TimeSpan $update_until).TotalSeconds -lt 0) {
-        warn "Skipping self-update until $($update_until.ToLocalTime())..."
-        warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
-        return
-    } else {
-        set_config update_until $null | Out-Null
+    if ($null -ne $update_until) {
+        if ((New-TimeSpan $update_until).TotalSeconds -lt 0) {
+            warn "Skipping self-update until $($update_until.ToLocalTime())..."
+            warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
+            return
+        } else {
+            set_config update_until $null | Out-Null
+        }
     }
 
     Write-Host "Updating Scoop..."
