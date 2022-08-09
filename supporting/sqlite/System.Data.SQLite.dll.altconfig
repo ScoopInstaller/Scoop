@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+ *
+ * System.Data.SQLite.dll.altconfig -
+ *
+ * WARNING: This XML configuration file is intended for use within the NuGet
+ *          package directories only.  Please do not copy this file to any of
+ *          the build output directories because it could interfere with the
+ *          native library pre-loading feature.
+ *
+ * Written by Joe Mistachkin.
+ * Released to the public domain, use at your own risk!
+ *
+-->
+<configuration>
+  <appSettings>
+    <add key="PreLoadSQLite_BaseDirectory"
+         value="%PreLoadSQLite_AssemblyDirectory%\..\..\build\%PreLoadSQLite_TargetFramework%" />
+  </appSettings>
+
+  <dllmap dll="SQLite.Interop" target="SQLite.Interop.dll" />
+</configuration>
