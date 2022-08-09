@@ -147,7 +147,7 @@ function update_scoop($show_update_log) {
     shim "$currentdir\bin\scoop.ps1" $false
 }
 
-function update_bucket() {
+function update_bucket($show_update_log) {
     # check for git
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update main bucket and others. Run 'scoop install git' and try again." }
 
