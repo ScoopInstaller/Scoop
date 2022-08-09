@@ -63,7 +63,7 @@ function update_scoop($show_update_log) {
     try {
         $update_until = [System.DateTime]::Parse((get_config update_until))
     } catch {
-        $update_until = [System.DateTime]::now
+        $update_until = $null
     }
     if ((New-TimeSpan $update_until).TotalSeconds -lt 0) {
         warn "Skipping self-update until $($update_until.ToLocalTime())..."
