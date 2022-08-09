@@ -54,6 +54,7 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
     Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
     break
 }
+$show_update_log = get_config 'show_update_log' $true
 
 function update_scoop() {
     # check for git
