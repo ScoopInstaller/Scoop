@@ -997,12 +997,13 @@ function show_app($app, $bucket, $version) {
 }
 
 function is_scoop_outdated() {
+    $now = [System.DateTime]::Now
     try{
-        $expireHour = (New-TimeSpan $(get_config lastUpdate)).TotalHours
+        $expireHour = (New-TimeSpan (get_config lastUpdate) $now).TotalHours
         return ($expireHour -ge 3)
     } catch {
         # If not System.DateTime
-        set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+        set_config lastUpdate ($now.ToString('o')) | Out-Null
         return $true
     }
 }
