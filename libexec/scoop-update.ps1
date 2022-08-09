@@ -74,7 +74,6 @@ function update_scoop($show_update_log) {
     }
 
     Write-Host "Updating Scoop..."
-    $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
