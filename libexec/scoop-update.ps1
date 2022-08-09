@@ -56,7 +56,7 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
 }
 $show_update_log = get_config 'show_update_log' $true
 
-function update_scoop() {
+function update_scoop($show_update_log) {
     # check for git
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
