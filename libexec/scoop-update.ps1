@@ -61,15 +61,19 @@ function update_scoop($show_update_log) {
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     try {
-        $update_until = [System.DateTime]::Parse((get_config update_until))
-        if ((New-TimeSpan $update_until).TotalSeconds -lt 0) {
+        $now = [System.DateTime]::Now.ToString('o')
+        $update_until = [System.DateTime]::Parse((get_config update_until $now))
+        if ((New-TimeSpan $update_until $now).TotalSeconds -lt 0) {
             warn "Skipping self-update until $($update_until.ToLocalTime())..."
             warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
             return
         }
     } catch {
-        set_config update_until $null | Out-Null
+        warn "'update_until' has been set in the wrong format."
+        warn "If you want to disable Scoop self-update for a moment, use 'scoop hold scoop'."
     }
+
+    set_config update_until $null | Out-Null
 
     Write-Host "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
