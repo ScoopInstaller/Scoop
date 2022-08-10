@@ -1,3 +1,5 @@
 safe: true
 lsi: false
 highlighter: rouge 
+
+theme: jekyll-theme-cayman
