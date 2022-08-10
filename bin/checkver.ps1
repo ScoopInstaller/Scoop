@@ -218,6 +218,7 @@ while ($in_progress -gt 0) {
     $regexp = $state.regex
     $jsonpath = $state.jsonpath
     $xpath = $state.xpath
+    $script = $json.checkver.script
     $reverse = $state.reverse
     $replace = $state.replace
     $expected_ver = $json.version
@@ -234,10 +235,11 @@ while ($in_progress -gt 0) {
             continue
         }
 
-        if ($json.checkver.script) {
-            $page = Invoke-Command ([scriptblock]::Create($json.checkver.script -join "`r`n"))
-        } else {
+        if ($url) {
             $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
+        }
+        if ($script) {
+            $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
         }
 
         if ($jsonpath) {

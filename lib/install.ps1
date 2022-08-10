@@ -43,7 +43,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
             return
         }
     }
-    write-output "Installing '$app' ($version) [$architecture]"
+    Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from $bucket bucket" })"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
@@ -90,7 +90,11 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
     if (!($null -eq $to)) {
-        Copy-Item $cached $to
+        if ($use_cache) {
+            Copy-Item $cached $to
+        } else {
+            Move-Item $cached $to -Force
+        }
     }
 }
 
