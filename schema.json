@@ -224,6 +224,9 @@
                         }
                     }
                 },
+                "bin": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
                 "extract_dir": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
