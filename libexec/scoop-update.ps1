@@ -60,20 +60,22 @@ function update_scoop($show_update_log) {
     # check for git
     if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    try {
-        $now = [System.DateTime]::Now.ToString('o')
-        $update_until = [System.DateTime]::Parse((get_config update_until $now))
-        if ((New-TimeSpan $update_until $now).TotalSeconds -lt 0) {
-            warn "Skipping self-update until $($update_until.ToLocalTime())..."
-            warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
-            return
+    $hold_update_until = get_config hold_update_until
+    if ($null -ne $hold_update_until) {
+        try {
+            $hold_update_until = [System.DateTime]::Parse($hold_update_until, $null, [System.Globalization.DateTimeStyles]::AssumeLocal)
+            if ((New-TimeSpan $hold_update_until).TotalSeconds -lt 0) {
+                warn "Skipping self-update until $($hold_update_until.ToLocalTime())..."
+                warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
+                return
+            }
+        } catch {
+            warn "'hold_update_until' has been set in the wrong format and would be removed."
+            warn "If you want to disable Scoop self-update for a moment, use 'scoop hold scoop' or 'scoop config hold_update_until <YYYY-MM-DD>/<YYYY/MM/DD>'."
         }
-    } catch {
-        warn "'update_until' has been set in the wrong format."
-        warn "If you want to disable Scoop self-update for a moment, use 'scoop hold scoop'."
+        set_config hold_update_until $null | Out-Null
     }
 
-    set_config update_until $null | Out-Null
 
     Write-Host "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
