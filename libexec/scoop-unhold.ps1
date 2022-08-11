@@ -32,6 +32,11 @@ if ($global -and !(is_admin)) {
 $apps | ForEach-Object {
     $app = $_
 
+    if ($app -eq 'scoop') {
+        set_config 'update_until' $null | Out-Null
+        success "$app is no longer held and can be updated again."
+        return
+    }
     if (!(installed $app $global)) {
         if ($global) {
             error "'$app' is not installed globally."
