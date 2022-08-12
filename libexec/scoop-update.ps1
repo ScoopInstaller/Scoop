@@ -57,25 +57,13 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
 $show_update_log = get_config 'show_update_log' $true
 
 function update_scoop($show_update_log) {
-    # check for git
-    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
-
-    $hold_update_until = get_config hold_update_until
-    if ($null -ne $hold_update_until) {
-        try {
-            $hold_update_until = [System.DateTime]::Parse($hold_update_until, $null, [System.Globalization.DateTimeStyles]::AssumeLocal)
-            if ((New-TimeSpan $hold_update_until).TotalSeconds -lt 0) {
-                warn "Skipping self-update until $($hold_update_until.ToLocalTime())..."
-                warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
-                return
-            }
-        } catch {
-            warn "'hold_update_until' has been set in the wrong format and would be removed."
-            warn "If you want to disable Scoop self-update for a moment, use 'scoop hold scoop' or 'scoop config hold_update_until <YYYY-MM-DD>/<YYYY/MM/DD>'."
-        }
-        set_config hold_update_until $null | Out-Null
+    # Test if Scoop Core is hold
+    if(Test-ScoopCoreOnHold) {
+        return
     }
 
+    # check for git
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     Write-Host "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
