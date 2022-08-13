@@ -1236,9 +1236,11 @@ function test_running_process($app, $global) {
     if ($running_processes) {
         if (get_config 'ignore_running_processes') {
             warn "Application `"$app`" is still running. Scoop is configured to ignore this condition."
+            warn "running_processes: $running_processes"
             return $false
         } else {
             error "Application `"$app`" is still running. Close all instances and try again."
+            error "running_processes: $running_processes"
             return $true
         }
     } else {
