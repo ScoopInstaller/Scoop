@@ -1231,7 +1231,7 @@ function persist_permission($manifest, $global) {
 # test if there are running processes
 function test_running_process($app, $global) {
     $processdir = appdir $app $global | Convert-Path
-    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" }
+    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" } | Out-String
 
     if ($running_processes) {
         if (get_config 'ignore_running_processes') {
