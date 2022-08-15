@@ -714,7 +714,7 @@ function shim($path, $global, $name, $arg) {
     Push-Location $abs_shimdir
     $relative_path = Resolve-Path -Relative $path
     Pop-Location
-    $resolved_path = Resolve-Path $path
+    $resolved_path = Convert-Path $path
 
     if ($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell

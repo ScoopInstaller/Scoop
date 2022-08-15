@@ -26,7 +26,7 @@ param(
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 
-$Dir = Resolve-Path $Dir
+$Dir = Convert-Path $Dir
 
 Write-Host '[' -NoNewLine
 Write-Host 'C' -NoNewLine -ForegroundColor Green

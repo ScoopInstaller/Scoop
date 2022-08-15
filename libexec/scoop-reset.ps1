@@ -63,7 +63,7 @@ $apps | ForEach-Object {
 
     write-host "Resetting $app ($version)."
 
-    $dir = resolve-path (versiondir $app $version $global)
+    $dir = Convert-Path (versiondir $app $version $global)
     $original_dir = $dir
     $persist_dir = persistdir $app $global
 

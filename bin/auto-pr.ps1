@@ -66,7 +66,7 @@ param(
 if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
     $Dir = Split-Path $App
 } elseif ($Dir) {
-    $Dir = Resolve-Path $Dir
+    $Dir = Convert-Path $Dir
 } else {
     throw "'-Dir' parameter required if '-App' is not a filepath!"
 }
