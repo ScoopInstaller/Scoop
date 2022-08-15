@@ -50,7 +50,7 @@ function known_buckets {
 }
 
 function apps_in_bucket($dir) {
-    return Get-ChildItem $dir | Where-Object { $_.Name.EndsWith('.json') } | ForEach-Object { $_.Name -replace '.json$', '' }
+    return (Get-ChildItem $dir -Filter '*.json' -Recurse).BaseName
 }
 
 function Get-LocalBucket {
