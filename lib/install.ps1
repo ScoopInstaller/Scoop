@@ -1239,8 +1239,8 @@ function test_running_process($app, $global) {
             Write-Host $running_processes
             return $false
         } else {
-            error "Application `"$app`" is still running. Close all instances and try again."
-            error "running_processes: $running_processes"
+            error "The following instances of `"$app`" are still running. Close them and try again."
+            Write-Host $running_processes
             return $true
         }
     } else {
