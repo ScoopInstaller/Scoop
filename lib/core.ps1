@@ -1008,6 +1008,11 @@ function is_scoop_outdated() {
     }
 }
 
+function is_no_update_scoop() {
+    return get_config 'no_update_scoop'
+}
+
+
 function Test-ScoopCoreOnHold() {
     $hold_update_until = get_config hold_update_until
     if ($null -eq $hold_update_until) {

@@ -111,6 +111,11 @@
 #       Should be in the format 'YYYY-MM-DD', 'YYYY/MM/DD' or any other forms that accepted by '[System.DateTime]::Parse()'.
 #       Ref: https://docs.microsoft.com/dotnet/api/system.datetime.parse?view=netframework-4.5#StringToParse
 #
+# no_update_scoop: $true|$false
+#       When set to $true (default $false), Scoop would always skip update (scoop core and all scoop buckets)
+#       before install anything.
+#
+#
 # ARIA2 configuration
 # -------------------
 #

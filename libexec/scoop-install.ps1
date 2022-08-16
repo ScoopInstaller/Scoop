@@ -53,7 +53,7 @@ if ($global -and !(is_admin)) {
 }
 
 if (is_scoop_outdated) {
-    if ($opt.u -or $opt.'no-update-scoop') {
+    if ($opt.u -or $opt.'no-update-scoop' -or (is_no_update_scoop)) {
         warn "Scoop is out of date."
     } else {
         scoop update
