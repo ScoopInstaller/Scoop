@@ -1008,6 +1008,29 @@ function is_scoop_outdated() {
     }
 }
 
+function Test-ScoopCoreOnHold() {
+    $hold_update_until = get_config hold_update_until
+    if ($null -eq $hold_update_until) {
+        return $false
+    }
+    $parsed_date = New-Object -TypeName DateTime
+    if ([System.DateTime]::TryParse($hold_update_until, $null, [System.Globalization.DateTimeStyles]::AssumeLocal, [ref]$parsed_date)) {
+        if ((New-TimeSpan $parsed_date).TotalSeconds -lt 0) {
+            warn "Skipping self-update of Scoop Core until $($parsed_date.ToLocalTime())..."
+            warn "If you want to update Scoop Core immediately, use 'scoop unhold scoop; scoop update'."
+            return $true
+        } else {
+            warn 'Self-update of Scoop Core is enabled again!'
+        }
+    } else {
+        error "'hold_update_until' has been set in the wrong format and was removed."
+        error 'If you want to disable self-update of Scoop Core for a moment,'
+        error "use 'scoop hold scoop' or 'scoop config hold_update_until <YYYY-MM-DD>/<YYYY/MM/DD>'."
+    }
+    set_config hold_update_until $null | Out-Null
+    return $false
+}
+
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
     $newentity = $entity
     if ($null -ne $newentity) {

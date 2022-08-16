@@ -33,9 +33,9 @@ $apps | ForEach-Object {
     $app = $_
 
     if ($app -eq 'scoop') {
-        $update_until = [System.DateTime]::Now.AddDays(1)
-        set_config 'update_until' $update_until.ToString('o') | Out-Null
-        success "$app is now held and might not be updated until $($update_until.ToLocalTime())."
+        $hold_update_until = [System.DateTime]::Now.AddDays(1)
+        set_config 'hold_update_until' $hold_update_until.ToString('o') | Out-Null
+        success "$app is now held and might not be updated until $($hold_update_until.ToLocalTime())."
         return
     }
     if (!(installed $app $global)) {

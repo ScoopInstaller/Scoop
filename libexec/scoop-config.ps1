@@ -105,6 +105,12 @@
 #       For example, if you want to access a private GitHub repository,
 #       you need to add the host to this list with 'match' and 'headers' strings.
 #
+# hold_update_until:
+#       Disable/Hold Scoop self-updates, until the specified date.
+#       `scoop hold scoop` will set the value to one day later.
+#       Should be in the format 'YYYY-MM-DD', 'YYYY/MM/DD' or any other forms that accepted by '[System.DateTime]::Parse()'.
+#       Ref: https://docs.microsoft.com/dotnet/api/system.datetime.parse?view=netframework-4.5#StringToParse
+#
 # ARIA2 configuration
 # -------------------
 #
