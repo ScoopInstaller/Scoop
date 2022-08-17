@@ -121,15 +121,32 @@ $Queue | ForEach-Object {
     }
     Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
 
-    $githubRegex = '/releases/tag/(?:v|V)?([\d.]+)'
+    # Not Specified
+    if ($json.checkver.url) {
+        $url = $json.checkver.url
+    } else {
+        $url = $json.homepage
+    }
 
-    $url = $json.homepage
-    $regex = ''
+    if ($json.checkver.re) {
+        $regex = $json.checkver.re
+    } elseif ($json.checkver.regex) {
+        $regex = $json.checkver.regex
+    } else {
+        $regex = ''
+    }
+
     $jsonpath = ''
     $xpath = ''
     $replace = ''
     $useGithubAPI = $false
 
+    # GitHub
+    if ($regex) {
+        $githubRegex = $regex
+    } else {
+        $githubRegex = '/releases/tag/(?:v|V)?([\d.]+)'
+    }
     if ($json.checkver -eq 'github') {
         if (!$json.homepage.StartsWith('https://github.com/')) {
             error "$name checkver expects the homepage to be a github repository"
@@ -146,7 +163,11 @@ $Queue | ForEach-Object {
     }
 
     # SourceForge
-    $sourceforgeRegex = '(?:[^\d]*)?(\d[\d.]+\d)'
+    if ($regex) {
+        $sourceforgeRegex = $regex
+    } else {
+        $sourceforgeRegex = '(\d[\d.]*\d)'
+    }
     if ($json.checkver -eq 'sourceforge') {
         if ($json.homepage -match '//(sourceforge|sf)\.net/projects/(?<project>[\w-]+)(/files/(?<path>[\w-]+))?|//(?<project>[\w-]+)\.(sourceforge\.(net|io)|sf\.net)') {
             $project = $Matches['project']
@@ -158,7 +179,7 @@ $Queue | ForEach-Object {
         if ($path) {
             $url = $url + '?path=/' + $path.TrimStart('/')
         }
-        $regex = "CDATA\[/$path/$sourceforgeRegex/".Replace('//', '/')
+        $regex = "CDATA\[/$path/.*?$sourceforgeRegex.*?\]".Replace('//', '/')
     }
     if ($json.checkver.sourceforge) {
         if ($json.checkver.sourceforge.GetType() -eq [System.String] -and $json.checkver.sourceforge -match '(?<project>[\w-]*)(/(?<path>.*))?') {
@@ -172,19 +193,7 @@ $Queue | ForEach-Object {
         if ($path) {
             $url = $url + '?path=/' + $path.TrimStart('/')
         }
-        $regex = "CDATA\[/$path/$sourceforgeRegex/".Replace('//', '/')
-    }
-
-    # Not Specified
-    if ($json.checkver.url) {
-        $url = $json.checkver.url
-    }
-
-    if ($json.checkver.re) {
-        $regex = $json.checkver.re
-    }
-    if ($json.checkver.regex) {
-        $regex = $json.checkver.regex
+        $regex = "CDATA\[/$path/.*?$sourceforgeRegex.*?\]".Replace('//', '/')
     }
 
     if ($json.checkver.jp) {
