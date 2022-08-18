@@ -166,10 +166,10 @@ $Queue | ForEach-Object {
     if ($regex) {
         $sourceforgeRegex = $regex
     } else {
-        $sourceforgeRegex = '(\d[\d.]*\d)'
+        $sourceforgeRegex = '(?!\.)([\d.]+)(?<=\d)'
     }
     if ($json.checkver -eq 'sourceforge') {
-        if ($json.homepage -match '//(sourceforge|sf)\.net/projects/(?<project>[\w-]+)(/files/(?<path>[\w-]+))?|//(?<project>[\w-]+)\.(sourceforge\.(net|io)|sf\.net)') {
+        if ($json.homepage -match '//(sourceforge|sf)\.net/projects/(?<project>[^/]+)(/files/(?<path>[^/]+))?|//(?<project>[^.]+)\.(sourceforge\.(net|io)|sf\.net)') {
             $project = $Matches['project']
             $path = $Matches['path']
         } else {
