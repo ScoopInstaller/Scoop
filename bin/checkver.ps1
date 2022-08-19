@@ -182,7 +182,7 @@ $Queue | ForEach-Object {
         $regex = "CDATA\[/$path/.*?$sourceforgeRegex.*?\]".Replace('//', '/')
     }
     if ($json.checkver.sourceforge) {
-        if ($json.checkver.sourceforge.GetType() -eq [System.String] -and $json.checkver.sourceforge -match '(?<project>[\w-]*)(/(?<path>.*))?') {
+        if ($json.checkver.sourceforge -is [System.String] -and $json.checkver.sourceforge -match '(?<project>[\w-]*)(/(?<path>.*))?') {
             $project = $Matches['project']
             $path = $Matches['path']
         } else {
@@ -206,7 +206,7 @@ $Queue | ForEach-Object {
         $xpath = $json.checkver.xpath
     }
 
-    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
+    if ($json.checkver.replace -is [System.String]) { # If `checkver` is [System.String], it has a method called `Replace`
         $replace = $json.checkver.replace
     }
 
