@@ -7,6 +7,10 @@
 - **scoop-update:** Stash uncommitted changes before update ([#5091](https://github.com/ScoopInstaller/Scoop/issues/5091))
 - **install:** Show the running process ([#5102](https://github.com/ScoopInstaller/Scoop/issues/5102))
 
+### Bug Fixes
+
+- **config:** Change config option to snake_case in file and SCREAMING_CASE in code ([#5116](https://github.com/ScoopInstaller/Scoop/issues/5116))
+
 ## [v0.2.4](https://github.com/ScoopInstaller/Scoop/compare/v0.2.3...v0.2.4) - 2022-08-08
 
 ### Features
