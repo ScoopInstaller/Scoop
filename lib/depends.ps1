@@ -106,10 +106,10 @@ function Get-InstallationHelper {
         $installer = arch_specific 'installer' $Manifest $Architecture
         $post_install = arch_specific 'post_install' $Manifest $Architecture
         $script = $pre_install + $installer.script + $post_install
-        if (((Test-7zipRequirement -Uri $url) -or ($script -like '*Expand-7zipArchive *')) -and !(get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
+        if (((Test-7zipRequirement -Uri $url) -or ($script -like '*Expand-7zipArchive *')) -and !(get_config USE_EXTERNAL_7ZIP)) {
             $helper += '7zip'
         }
-        if (((Test-LessmsiRequirement -Uri $url) -or ($script -like '*Expand-MsiArchive *')) -and (get_config MSIEXTRACT_USE_LESSMSI)) {
+        if (((Test-LessmsiRequirement -Uri $url) -or ($script -like '*Expand-MsiArchive *')) -and (get_config USE_LESSMSI)) {
             $helper += 'lessmsi'
         }
         if ($Manifest.innosetup -or ($script -like '*Expand-InnoArchive *')) {
