@@ -11,7 +11,7 @@ if (!$app) { error '<app> missing'; my_usage; exit 1 }
 $null, $manifest, $bucket, $url = Get-Manifest $app
 
 if ($manifest) {
-        $style = get_config cat_style
+        $style = get_config CAT_STYLE
         if ($style) {
                 $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
         } else {

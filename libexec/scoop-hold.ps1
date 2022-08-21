@@ -34,7 +34,7 @@ $apps | ForEach-Object {
 
     if ($app -eq 'scoop') {
         $hold_update_until = [System.DateTime]::Now.AddDays(1)
-        set_config 'hold_update_until' $hold_update_until.ToString('o') | Out-Null
+        set_config HOLD_UPDATE_UNTIL $hold_update_until.ToString('o') | Out-Null
         success "$app is now held and might not be updated until $($hold_update_until.ToLocalTime())."
         return
     }
@@ -47,7 +47,7 @@ $apps | ForEach-Object {
         return
     }
 
-    if (get_config NO_JUNCTIONS) {
+    if (get_config NO_JUNCTION){
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'
