@@ -319,7 +319,6 @@
                         "sourceforge": {
                             "anyOf": [
                                 {
-                                    "format": "regex",
                                     "type": "string"
                                 },
                                 {
@@ -334,7 +333,8 @@
                                     },
                                     "type": "object"
                                 }
-                            ]
+                            ],
+                            "type": "object"
                         }
                     },
                     "type": "object"
