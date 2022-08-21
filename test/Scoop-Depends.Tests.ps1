@@ -46,14 +46,14 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
             Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should -Be @('7zip')
         }
         It 'Helpers reflect config changes' {
-            Mock get_config { $false } -ParameterFilter { $name -eq 'MSIEXTRACT_USE_LESSMSI' }
-            Mock get_config { $true } -ParameterFilter { $name -eq '7ZIPEXTRACT_USE_EXTERNAL' }
+            Mock get_config { $false } -ParameterFilter { $name -eq 'USE_LESSMSI' }
+            Mock get_config { $true } -ParameterFilter { $name -eq 'USE_EXTERNAL_7ZIP' }
             Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should -BeNullOrEmpty
             Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should -BeNullOrEmpty
         }
         It 'Not return installed helpers' {
-            Mock get_config { $true } -ParameterFilter { $name -eq 'MSIEXTRACT_USE_LESSMSI' }
-            Mock get_config { $false } -ParameterFilter { $name -eq '7ZIPEXTRACT_USE_EXTERNAL' }
+            Mock get_config { $true } -ParameterFilter { $name -eq 'USE_LESSMSI' }
+            Mock get_config { $false } -ParameterFilter { $name -eq 'USE_EXTERNAL_7ZIP' }
             Mock Test-HelperInstalled { $true }-ParameterFilter { $Helper -eq '7zip' }
             Mock Test-HelperInstalled { $false }-ParameterFilter { $Helper -eq 'Lessmsi' }
             Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should -Be @('lessmsi')
@@ -68,7 +68,7 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
     Context 'Dependencies resolution' {
         BeforeAll {
             Mock Test-HelperInstalled { $false }
-            Mock get_config { $true } -ParameterFilter { $name -eq 'MSIEXTRACT_USE_LESSMSI' }
+            Mock get_config { $true } -ParameterFilter { $name -eq 'USE_LESSMSI' }
             Mock Get-Manifest { 'lessmsi', @{}, $null, $null } -ParameterFilter { $app -eq 'lessmsi' }
             Mock Get-Manifest { '7zip', @{ url = 'test.msi' }, $null, $null } -ParameterFilter { $app -eq '7zip' }
             Mock Get-Manifest { 'innounp', @{}, $null, $null } -ParameterFilter { $app -eq 'innounp' }

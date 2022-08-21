@@ -54,26 +54,16 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
     Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
     break
 }
-$show_update_log = get_config 'show_update_log' $true
+$show_update_log = get_config SHOW_UPDATE_LOG $true
 
 function update_scoop($show_update_log) {
-    # check for git
-    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
-
-    try {
-        $now = [System.DateTime]::Now.ToString('o')
-        $update_until = [System.DateTime]::Parse((get_config update_until $now))
-        if ((New-TimeSpan $update_until $now).TotalSeconds -lt 0) {
-            warn "Skipping self-update until $($update_until.ToLocalTime())..."
-            warn "If you want to update Scoop itself immediately, use 'scoop unhold scoop; scoop update'."
-            return
-        }
-    } catch {
-        warn "'update_until' has been set in the wrong format."
-        warn "If you want to disable Scoop self-update for a moment, use 'scoop hold scoop'."
+    # Test if Scoop Core is hold
+    if(Test-ScoopCoreOnHold) {
+        return
     }
 
-    set_config update_until $null | Out-Null
+    # check for git
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     Write-Host "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
@@ -112,7 +102,7 @@ function update_scoop($show_update_log) {
 
         # Stash uncommitted changes
         if (git -C "$currentdir" diff HEAD --name-only) {
-            if (get_config autostash_on_conflict) {
+            if (get_config AUTOSTASH_ON_CONFLICT) {
                 warn "Uncommitted changes detected. Stashing..."
                 git -C "$currentdir" stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
             } else {
@@ -331,7 +321,7 @@ if (-not ($apps -or $all)) {
     }
     update_scoop $show_update_log
     update_bucket $show_update_log
-    set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+    set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
@@ -346,7 +336,7 @@ if (-not ($apps -or $all)) {
     if ($updateScoop) {
         update_scoop $show_update_log
         update_bucket $show_update_log
-        set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+        set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
         success 'Scoop was updated successfully!'
     }
 

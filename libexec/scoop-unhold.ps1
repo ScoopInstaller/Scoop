@@ -33,7 +33,7 @@ $apps | ForEach-Object {
     $app = $_
 
     if ($app -eq 'scoop') {
-        set_config 'update_until' $null | Out-Null
+        set_config HOLD_UPDATE_UNTIL $null | Out-Null
         success "$app is no longer held and can be updated again."
         return
     }
@@ -46,7 +46,7 @@ $apps | ForEach-Object {
         return
     }
 
-    if (get_config NO_JUNCTIONS) {
+    if (get_config NO_JUNCTION){
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'
