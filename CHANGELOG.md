@@ -7,7 +7,7 @@
 - **scoop-update:** Stash uncommitted changes before update ([#5091](https://github.com/ScoopInstaller/Scoop/issues/5091))
 - **install:** Show the running process ([#5102](https://github.com/ScoopInstaller/Scoop/issues/5102))
 
-### Bug Fixes
+### Builds
 
 - **schema**: Set manifest schema to be stricter ([#5093](https://github.com/ScoopInstaller/Scoop/issues/5093))
 
