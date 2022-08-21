@@ -54,7 +54,7 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
     Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
     break
 }
-$show_update_log = get_config 'show_update_log' $true
+$show_update_log = get_config SHOW_UPDATE_LOG $true
 
 function update_scoop($show_update_log) {
     # Test if Scoop Core is hold
@@ -102,7 +102,7 @@ function update_scoop($show_update_log) {
 
         # Stash uncommitted changes
         if (git -C "$currentdir" diff HEAD --name-only) {
-            if (get_config autostash_on_conflict) {
+            if (get_config AUTOSTASH_ON_CONFLICT) {
                 warn "Uncommitted changes detected. Stashing..."
                 git -C "$currentdir" stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
             } else {
@@ -321,7 +321,7 @@ if (-not ($apps -or $all)) {
     }
     update_scoop $show_update_log
     update_bucket $show_update_log
-    set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+    set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
@@ -336,7 +336,7 @@ if (-not ($apps -or $all)) {
     if ($updateScoop) {
         update_scoop $show_update_log
         update_bucket $show_update_log
-        set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+        set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
         success 'Scoop was updated successfully!'
     }
 

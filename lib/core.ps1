@@ -59,6 +59,7 @@ function load_cfg($file) {
 }
 
 function get_config($name, $default) {
+    $name = $name.ToLowerInvariant()
     if($null -eq $scoopConfig.$name -and $null -ne $default) {
         return $default
     }
@@ -71,6 +72,8 @@ function set_config {
         $name,
         $value
     )
+
+    $name = $name.ToLowerInvariant()
 
     if ($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
         ensure (Split-Path -Path $configFile) | Out-Null
@@ -98,7 +101,7 @@ function set_config {
 
 function setup_proxy() {
     # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
-    $proxy = get_config 'proxy'
+    $proxy = get_config PROXY
     if(!$proxy) {
         return
     }
@@ -126,7 +129,7 @@ function setup_proxy() {
 }
 
 function git_cmd {
-    $proxy = get_config 'proxy'
+    $proxy = get_config PROXY
     $cmd = "git $($args | ForEach-Object { "$_ " })"
     if ($proxy -and $proxy -ne 'none') {
         $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
@@ -153,7 +156,7 @@ function error($msg) { write-host "ERROR $msg" -f darkred }
 function warn($msg) {  write-host "WARN  $msg" -f darkyellow }
 function info($msg) {  write-host "INFO  $msg" -f darkgray }
 function debug($obj) {
-    if((get_config 'debug' $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
+    if ((get_config DEBUG $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
         return
     }
 
@@ -210,7 +213,7 @@ function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 function currentdir($app, $global) {
-    if (get_config NO_JUNCTIONS) {
+    if (get_config NO_JUNCTION) {
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'
@@ -246,7 +249,7 @@ function installed_apps($global) {
 function failed($app, $global) {
     $app = ($app -split '/|\\')[-1]
     $appPath = appdir $app $global
-    $hasCurrent = (get_config NO_JUNCTIONS) -or (Test-Path "$appPath\current")
+    $hasCurrent = (get_config NO_JUNCTION) -or (Test-Path "$appPath\current")
     return (Test-Path $appPath) -and !($hasCurrent -and (installed $app $global))
 }
 
@@ -394,7 +397,7 @@ function app_status($app, $global) {
 
     $status.outdated = $false
     if ($status.version -and $status.latest_version) {
-        if (get_config 'force_update' $false) {
+        if (get_config FORCE_UPDATE $false) {
             $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
         } else {
             $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)
@@ -830,7 +833,7 @@ function shim($path, $global, $name, $arg) {
 
 function get_shim_path() {
     $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"
-    $shim_version = get_config 'shim' 'default'
+    $shim_version = get_config SHIM 'default'
     switch ($shim_version) {
         '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
         'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
@@ -999,17 +1002,17 @@ function show_app($app, $bucket, $version) {
 function is_scoop_outdated() {
     $now = [System.DateTime]::Now
     try {
-        $expireHour = (New-TimeSpan (get_config lastUpdate) $now).TotalHours
+        $expireHour = (New-TimeSpan (get_config LAST_UPDATE) $now).TotalHours
         return ($expireHour -ge 3)
     } catch {
         # If not System.DateTime
-        set_config lastUpdate ($now.ToString('o')) | Out-Null
+        set_config LAST_UPDATE ($now.ToString('o')) | Out-Null
         return $true
     }
 }
 
 function Test-ScoopCoreOnHold() {
-    $hold_update_until = get_config hold_update_until
+    $hold_update_until = get_config HOLD_UPDATE_UNTIL
     if ($null -eq $hold_update_until) {
         return $false
     }
@@ -1027,7 +1030,7 @@ function Test-ScoopCoreOnHold() {
         error 'If you want to disable self-update of Scoop Core for a moment,'
         error "use 'scoop hold scoop' or 'scoop config hold_update_until <YYYY-MM-DD>/<YYYY/MM/DD>'."
     }
-    set_config hold_update_until $null | Out-Null
+    set_config HOLD_UPDATE_UNTIL $null | Out-Null
     return $false
 }
 
@@ -1096,7 +1099,7 @@ function get_hash([String] $multihash) {
 }
 
 function Get-GitHubToken {
-    return $env:SCOOP_GH_TOKEN, (get_config 'gh_token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN) | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
 }
 
 function handle_special_urls($url)
@@ -1196,31 +1199,53 @@ function Out-UTF8File {
 #       for all communication with api.github.com
 Optimize-SecurityProtocol
 
-# Scoop config file migration
+# Load Scoop config
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
-if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
-    New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
-    Move-Item "$env:USERPROFILE\.scoop" $configFile
-    write-host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
-    write-host "WARN  to '$configFile'" -f darkyellow
-}
-
-# Load Scoop config
 $scoopConfig = load_cfg $configFile
 
+# NOTE Scoop config file migration. Remove this after 2023/6/30
+if ($scoopConfig) {
+    $newConfigNames = @{
+        'lastUpdate'               = 'last_update'
+        'SCOOP_REPO'               = 'scoop_repo'
+        'SCOOP_BRANCH'             = 'scoop_branch'
+        '7ZIPEXTRACT_USE_EXTERNAL' = 'use_external_7zip'
+        'MSIEXTRACT_USE_LESSMSI'   = 'use_lessmsi'
+        'NO_JUNCTIONS'             = 'no_junction'
+        'manifest_review'          = 'show_manifest'
+        'rootPath'                 = 'root_path'
+        'globalPath'               = 'global_path'
+        'cachePath'                = 'cache_path'
+    }
+    $newConfigNames.GetEnumerator() | ForEach-Object {
+        if ($null -ne $scoopConfig.$($_.Key)) {
+            $value = $scoopConfig.$($_.Key)
+            $scoopConfig.PSObject.Properties.Remove($_.Key)
+            $scoopConfig | Add-Member -MemberType NoteProperty -Name $_.Value -Value $value
+            if ($_.Key -eq 'lastUpdate') {
+                $scoopConfigChg = $true
+            }
+        }
+    }
+    if ($scoopConfigChg) { # Only save config file if there was a change
+        ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
+    }
+}
+# END NOTE
+
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop cache directory
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
+$cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Setup proxy globally
 setup_proxy

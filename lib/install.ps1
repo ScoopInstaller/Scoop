@@ -30,9 +30,9 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         return
     }
 
-    if ((get_config 'manifest_review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+    if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
         Write-Host "Manifest: $app.json"
-        $style = get_config cat_style
+        $style = get_config CAT_STYLE
         if ($style) {
             $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
         } else {
@@ -214,7 +214,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         $options += "--header='Cookie: $(cookie_header $cookies)'"
     }
 
-    $proxy = get_config 'proxy'
+    $proxy = get_config PROXY
     if ($proxy -ne 'none') {
         if ([Net.Webrequest]::DefaultWebProxy.Address) {
             $options += "--all-proxy='$([Net.Webrequest]::DefaultWebProxy.Address.Authority)'"
@@ -371,7 +371,7 @@ function dl($url, $to, $cookies, $progress) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
 
-        get_config 'private_hosts' | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
+        get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
             (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
                 $wreq.Headers[$_.Key] = $_.Value
             }
@@ -588,7 +588,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             $extract_fn = 'Expand-InnoArchive'
         } elseif($fname -match '\.zip$') {
             # Use 7zip when available (more fast)
-            if (((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
+            if (((get_config USE_EXTERNAL_7ZIP) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
                 $extract_fn = 'Expand-7zipArchive'
             } else {
                 $extract_fn = 'Expand-ZipArchive'
@@ -909,7 +909,7 @@ function rm_shims($app, $manifest, $global, $arch) {
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
+    if (get_config NO_JUNCTION) { return $versiondir.ToString() }
 
     $currentdir = "$(Split-Path $versiondir)\current"
 
@@ -936,7 +936,7 @@ function link_current($versiondir) {
 # Returns the 'current' junction directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
-    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
+    if (get_config NO_JUNCTION) { return $versiondir.ToString() }
     $currentdir = "$(Split-Path $versiondir)\current"
 
     if (Test-Path $currentdir) {
@@ -1234,7 +1234,7 @@ function test_running_process($app, $global) {
     $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" } | Out-String
 
     if ($running_processes) {
-        if (get_config 'ignore_running_processes') {
+        if (get_config IGNORE_RUNNING_PROCESSES) {
             warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
             Write-Host $running_processes
             return $false

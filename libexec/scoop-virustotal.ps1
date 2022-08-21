@@ -66,7 +66,7 @@ $_ERR_NO_API_KEY = 16
 $exit_code = 0
 
 # Global API key:
-$api_key = get_config virustotal_api_key
+$api_key = get_config VIRUSTOTAL_API_KEY
 if (!$api_key) {
     abort ("VirusTotal API key is not configured`n" +
         "  You could get one from https://www.virustotal.com/gui/my-apikey and set with`n" +
