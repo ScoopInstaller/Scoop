@@ -1207,7 +1207,7 @@ $scoopConfig = load_cfg $configFile
 # NOTE Scoop config file migration. Remove this after 2023/6/30
 if ($scoopConfig) {
     $newConfigNames = @{
-        'lastupdate'               = 'last_update'
+        'lastUpdate'               = 'last_update'
         'SCOOP_REPO'               = 'scoop_repo'
         'SCOOP_BRANCH'             = 'scoop_branch'
         '7ZIPEXTRACT_USE_EXTERNAL' = 'use_external_7zip'
@@ -1223,9 +1223,14 @@ if ($scoopConfig) {
             $value = $scoopConfig.$($_.Key)
             $scoopConfig.PSObject.Properties.Remove($_.Key)
             $scoopConfig | Add-Member -MemberType NoteProperty -Name $_.Value -Value $value
+            if ($_.Key -eq 'lastUpdate') {
+                $scoopConfigChg = $true
+            }
         }
     }
-    ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
+    if ($scoopConfigChg) { # Only save config file if there was a change
+        ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
+    }
 }
 # END NOTE
 
