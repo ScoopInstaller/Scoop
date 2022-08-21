@@ -54,16 +54,18 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
     Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
     break
 }
+$show_update_log = get_config 'show_update_log' $true
 
-function update_scoop() {
+function update_scoop($show_update_log) {
+    # Test if Scoop Core is hold
+    if(Test-ScoopCoreOnHold) {
+        return
+    }
+
     # check for git
-    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     Write-Host "Updating Scoop..."
-    $last_update = $(last_scoop_update)
-    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
-    $last_update = $last_update.ToString('s')
-    $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
@@ -97,6 +99,17 @@ function update_scoop() {
 
         $isRepoChanged = !($currentRepo -match $configRepo)
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
+
+        # Stash uncommitted changes
+        if (git -C "$currentdir" diff HEAD --name-only) {
+            if (get_config autostash_on_conflict) {
+                warn "Uncommitted changes detected. Stashing..."
+                git -C "$currentdir" stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
+            } else {
+                warn "Uncommitted changes detected. Update aborted."
+                return
+            }
+        }
 
         # Change remote url if the repo is changed
         if ($isRepoChanged) {
@@ -135,6 +148,11 @@ function update_scoop() {
     # }
 
     shim "$currentdir\bin\scoop.ps1" $false
+}
+
+function update_bucket($show_update_log) {
+    # check for git
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update main bucket and others. Run 'scoop install git' and try again." }
 
     foreach ($bucket in Get-LocalBucket) {
         Write-Host "Updating '$bucket' bucket..."
@@ -165,9 +183,6 @@ function update_scoop() {
             git -C "$bucketLoc" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
         }
     }
-
-    set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
-    success 'Scoop was updated successfully!'
 }
 
 function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
@@ -304,7 +319,10 @@ if (-not ($apps -or $all)) {
         error 'scoop update: --no-cache is invalid when <app> is not specified.'
         exit 1
     }
-    update_scoop
+    update_scoop $show_update_log
+    update_bucket $show_update_log
+    set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+    success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
         'ERROR: You need admin rights to update global apps.'; exit 1
@@ -316,7 +334,10 @@ if (-not ($apps -or $all)) {
     $apps_param = $apps
 
     if ($updateScoop) {
-        update_scoop
+        update_scoop $show_update_log
+        update_bucket $show_update_log
+        set_config lastUpdate ([System.DateTime]::Now.ToString('o')) | Out-Null
+        success 'Scoop was updated successfully!'
     }
 
     if ($apps_param -eq '*' -or $all) {

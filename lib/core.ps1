@@ -996,29 +996,39 @@ function show_app($app, $bucket, $version) {
     return $app
 }
 
-function last_scoop_update() {
-    # PowerShell 6 returns an DateTime Object
-    $last_update = (get_config lastupdate)
-
-    if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
-        try {
-            $last_update = [System.DateTime]::Parse($last_update)
-        } catch {
-            $last_update = $null
-        }
-    }
-    return $last_update
-}
-
 function is_scoop_outdated() {
-    $last_update = $(last_scoop_update)
     $now = [System.DateTime]::Now
-    if($null -eq $last_update) {
-        set_config lastupdate $now.ToString('o')
-        # enforce an update for the first time
+    try {
+        $expireHour = (New-TimeSpan (get_config lastUpdate) $now).TotalHours
+        return ($expireHour -ge 3)
+    } catch {
+        # If not System.DateTime
+        set_config lastUpdate ($now.ToString('o')) | Out-Null
         return $true
     }
-    return $last_update.AddHours(3) -lt $now.ToLocalTime()
+}
+
+function Test-ScoopCoreOnHold() {
+    $hold_update_until = get_config hold_update_until
+    if ($null -eq $hold_update_until) {
+        return $false
+    }
+    $parsed_date = New-Object -TypeName DateTime
+    if ([System.DateTime]::TryParse($hold_update_until, $null, [System.Globalization.DateTimeStyles]::AssumeLocal, [ref]$parsed_date)) {
+        if ((New-TimeSpan $parsed_date).TotalSeconds -lt 0) {
+            warn "Skipping self-update of Scoop Core until $($parsed_date.ToLocalTime())..."
+            warn "If you want to update Scoop Core immediately, use 'scoop unhold scoop; scoop update'."
+            return $true
+        } else {
+            warn 'Self-update of Scoop Core is enabled again!'
+        }
+    } else {
+        error "'hold_update_until' has been set in the wrong format and was removed."
+        error 'If you want to disable self-update of Scoop Core for a moment,'
+        error "use 'scoop hold scoop' or 'scoop config hold_update_until <YYYY-MM-DD>/<YYYY/MM/DD>'."
+    }
+    set_config hold_update_until $null | Out-Null
+    return $false
 }
 
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {

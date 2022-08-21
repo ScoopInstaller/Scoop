@@ -47,6 +47,10 @@
 #       * An empty or unset value for proxy is equivalent to 'default' (with no username or password)
 #       * To bypass the system proxy and connect directly, use 'none' (with no username or password)
 #
+# autostash_on_conflict: $true|$false
+#       When a conflict is detected during updating, Scoop will auto-stash the uncommitted changes.
+#       (Default is $false, which will abort the update)
+#
 # default_architecture: 64bit|32bit
 #       Allow to configure preferred architecture for application installation.
 #       If not specified, architecture is determined be system.
@@ -100,6 +104,12 @@
 #       Array of private hosts that need additional authentication.
 #       For example, if you want to access a private GitHub repository,
 #       you need to add the host to this list with 'match' and 'headers' strings.
+#
+# hold_update_until:
+#       Disable/Hold Scoop self-updates, until the specified date.
+#       `scoop hold scoop` will set the value to one day later.
+#       Should be in the format 'YYYY-MM-DD', 'YYYY/MM/DD' or any other forms that accepted by '[System.DateTime]::Parse()'.
+#       Ref: https://docs.microsoft.com/dotnet/api/system.datetime.parse?view=netframework-4.5#StringToParse
 #
 # ARIA2 configuration
 # -------------------
