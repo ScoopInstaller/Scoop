@@ -3,7 +3,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; MaximumVersion = '4.99' }
 #Requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
-    [String] $TestPath = $(Resolve-Path "$PSScriptRoot\..\")
+    [String] $TestPath = $(Convert-Path "$PSScriptRoot\..\")
 )
 
 $splat = @{
@@ -21,7 +21,7 @@ if ($env:CI -eq $true) {
     $commitMessage = $env:BHCommitMessage
 
     # Check if tests are called from the Core itself, if so, adding excludes
-    if ($TestPath -eq $(Resolve-Path "$PSScriptRoot\..\")) {
+    if ($TestPath -eq $(Convert-Path "$PSScriptRoot\..\")) {
         if ($commitMessage -match '!linter') {
             Write-Warning "Skipping code linting per commit flag '!linter'"
             $excludes += 'Linter'

@@ -17,7 +17,7 @@ $cachedir = $env:SCOOP_CACHE, (get_config 'CACHE_PATH'), (Join-Path $scoopdir 'c
 # core.ps1
 function ensure($dir) {
     mkdir -p $dir > $null
-    return resolve-path $dir
+    return Convert-Path $dir
 }
 
 # install.ps1

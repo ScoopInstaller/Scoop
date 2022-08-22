@@ -31,7 +31,7 @@ param(
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
 
-$Dir = Resolve-Path $Dir
+$Dir = Convert-Path $Dir
 
 Get-ChildItem $Dir "$App.json" | ForEach-Object {
     if ($PSVersionTable.PSVersion.Major -gt 5) { $_ = $_.Name } # Fix for pwsh

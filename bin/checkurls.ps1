@@ -30,7 +30,7 @@ param(
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 
-$Dir = Resolve-Path $Dir
+$Dir = Convert-Path $Dir
 $Queue = @()
 
 Get-ChildItem $Dir "$App.json" | ForEach-Object {

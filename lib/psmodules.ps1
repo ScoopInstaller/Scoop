@@ -39,7 +39,7 @@ function uninstall_psmodule($manifest, $dir, $global) {
     $linkfrom = "$modulesdir\$module_name"
     if (Test-Path $linkfrom) {
         Write-Host "Removing $(friendly_path $linkfrom)"
-        $linkfrom = Resolve-Path $linkfrom
+        $linkfrom = Convert-Path $linkfrom
         Remove-Item -Path $linkfrom -Force -ErrorAction SilentlyContinue
     }
 }
