@@ -20,8 +20,8 @@ switch ($subCommand) {
     }
     ({ $subCommand -in @('-v', '--version') }) {
         Write-Host 'Current Scoop version:'
-        if ((Test-CommandAvailable git) -and (Test-Path "$PSScriptRoot\..\.git") -and (get_config SCOOP_BRANCH 'master') -ne 'master') {
-            git -C "$PSScriptRoot\.." --no-pager log --oneline HEAD -n 1
+        if (Test-GitAvailable -and (Test-Path "$PSScriptRoot\..\.git") -and (get_config SCOOP_BRANCH 'master') -ne 'master') {
+            Invoke-Git -Path "$PSScriptRoot\.." -ArgumentList "--no-pager log --oneline HEAD -n 1"
         } else {
             $version = Select-String -Pattern '^## \[(v[\d.]+)\].*?([\d-]+)$' -Path "$PSScriptRoot\..\CHANGELOG.md"
             Write-Host $version.Matches.Groups[1].Value -ForegroundColor Cyan -NoNewline
@@ -31,9 +31,9 @@ switch ($subCommand) {
 
         Get-LocalBucket | ForEach-Object {
             $bucketLoc = Find-BucketDirectory $_ -Root
-            if ((Test-Path "$bucketLoc\.git") -and (Test-CommandAvailable git)) {
+            if (Test-GitAvailable -and (Test-Path "$bucketLoc\.git")) {
                 Write-Host "'$_' bucket:"
-                git -C "$bucketLoc" --no-pager log --oneline HEAD -n 1
+                Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --oneline HEAD -n 1"
                 Write-Host ''
             }
         }

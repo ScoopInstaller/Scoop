@@ -63,7 +63,7 @@ function update_scoop($show_update_log) {
     }
 
     # check for git
-    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if (!(Test-GitAvailable)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     Write-Host "Updating Scoop..."
     $currentdir = fullpath $(versiondir 'scoop' 'current')
@@ -72,7 +72,7 @@ function update_scoop($show_update_log) {
         $olddir = "$currentdir\..\old"
 
         # get git scoop
-        git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
+        Invoke-Git -ArgumentList "clone -q $configRepo --branch $configBranch --single-branch `"$newdir`""
 
         # check if scoop was successful downloaded
         if (!(Test-Path "$newdir\bin\scoop.ps1")) {
@@ -93,18 +93,18 @@ function update_scoop($show_update_log) {
             Remove-Item "$currentdir\..\old" -Recurse -Force -ErrorAction SilentlyContinue
         }
 
-        $previousCommit = git -C "$currentdir" rev-parse HEAD
-        $currentRepo = git -C "$currentdir" config remote.origin.url
-        $currentBranch = git -C "$currentdir" branch
+        $previousCommit = Invoke-Git -Path $currentdir -ArgumentList "rev-parse HEAD"
+        $currentRepo = Invoke-Git -Path $currentdir -ArgumentList "config remote.origin.url"
+        $currentBranch = Invoke-Git -Path $currentdir -ArgumentList "branch"
 
         $isRepoChanged = !($currentRepo -match $configRepo)
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
         # Stash uncommitted changes
-        if (git -C "$currentdir" diff HEAD --name-only) {
+        if (Invoke-Git -Path $currentdir -ArgumentList "diff HEAD --name-only") {
             if (get_config AUTOSTASH_ON_CONFLICT) {
                 warn "Uncommitted changes detected. Stashing..."
-                git -C "$currentdir" stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
+                Invoke-Git -Path $currentdir -ArgumentList "stash push -m 'WIP at $([System.DateTime]::Now.ToString('o'))' -u -q"
             } else {
                 warn "Uncommitted changes detected. Update aborted."
                 return
@@ -113,26 +113,26 @@ function update_scoop($show_update_log) {
 
         # Change remote url if the repo is changed
         if ($isRepoChanged) {
-            git -C "$currentdir" config remote.origin.url "$configRepo"
+            Invoke-Git -Path $currentdir -ArgumentList "config remote.origin.url '$configRepo'"
         }
 
         # Fetch and reset local repo if the repo or the branch is changed
         if ($isRepoChanged -or $isBranchChanged) {
             # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-            git -C "$currentdir" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+            Invoke-Git -Path $currentdir -ArgumentList "config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'"
             # fetch remote branch
-            git_cmd -C "`"$currentdir`"" fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
+            Invoke-Git -Path $currentdir -ArgumentList "fetch --force origin 'refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch' -q"
             # checkout and track the branch
-            git_cmd -C "`"$currentdir`"" checkout -B $configBranch -t origin/$configBranch -q
+            Invoke-Git -Path $currentdir -ArgumentList "checkout -B $configBranch -t origin/$configBranch -q"
             # reset branch HEAD
-            git -C "$currentdir" reset --hard origin/$configBranch -q
+            Invoke-Git -Path $currentdir -ArgumentList "reset --hard origin/$configBranch -q"
         } else {
-            git_cmd -C "`"$currentdir`"" pull -q
+            Invoke-Git -Path $currentdir -ArgumentList "pull -q"
         }
 
         $res = $lastexitcode
         if ($show_update_log) {
-            git -C "$currentdir" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
+            Invoke-Git -Path $currentdir -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
         if ($res -ne 0) {
@@ -152,7 +152,7 @@ function update_scoop($show_update_log) {
 
 function update_bucket($show_update_log) {
     # check for git
-    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update main bucket and others. Run 'scoop install git' and try again." }
+    if (!(Test-GitAvailable)) { abort "Scoop uses Git to update main bucket and others. Run 'scoop install git' and try again." }
 
     foreach ($bucket in Get-LocalBucket) {
         Write-Host "Updating '$bucket' bucket..."
@@ -177,10 +177,10 @@ function update_bucket($show_update_log) {
             continue
         }
 
-        $previousCommit = git -C "$bucketLoc" rev-parse HEAD
-        git_cmd -C "`"$bucketLoc`"" pull -q
+        $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
+        Invoke-Git -Path $bucketLoc "pull -q"
         if ($show_update_log) {
-            git -C "$bucketLoc" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
+            Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h [$name]%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
     }
 }

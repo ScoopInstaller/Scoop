@@ -128,13 +128,35 @@ function setup_proxy() {
     }
 }
 
-function git_cmd {
+function Invoke-Git {
+    [CmdletBinding()]
+    [OutputType([String])]
+    param(
+        [String] $Path,
+        [PSObject[]] $ArgumentList
+    )
+
     $proxy = get_config PROXY
-    $cmd = "git $($args | ForEach-Object { "$_ " })"
-    if ($proxy -and $proxy -ne 'none') {
-        $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
+    $git = Get-HelperPath -Helper Git
+    $arguments = $ArgumentList -join ' '
+    if ($Path) {
+        $cmd = "`"$git`" -C `"$Path`" $arguments"
+    } else {
+        $cmd = "`"$git`" $arguments"
     }
-    cmd.exe /d /c $cmd
+
+    # invoke git if proxy is not set or not required
+    if ([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none' -or $arguments -NotMatch "\b(clone|checkout|pull|fetch|ls-remote)\b") {
+        return Invoke-Command ([scriptblock]::Create("& $cmd"))
+    }
+
+    # convert proxy setting for git
+    if ($proxy.StartsWith('currentuser@')) {
+        $proxy = $proxy.Replace("currentuser@",":@")
+    }
+
+    # use proxy with cmd.exe to prevent polluting PowerShell session
+    cmd.exe /d /c "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
 }
 
 # helper functions
@@ -293,12 +315,16 @@ Function Test-CommandAvailable {
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
+Function Test-GitAvailable {
+    Return [Boolean](Test-Path (Get-HelperPath -Helper Git) -ErrorAction Ignore)
+}
+
 function Get-HelperPath {
     [CmdletBinding()]
     [OutputType([String])]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
+        [ValidateSet('Git', '7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -307,6 +333,7 @@ function Get-HelperPath {
     }
     process {
         switch ($Helper) {
+            'Git' { $HelperPath = "$(versiondir 'git' 'current')\mingw64\bin\git.exe" }
             '7zip' {
                 $HelperPath = Get-AppFilePath '7zip' '7z.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
