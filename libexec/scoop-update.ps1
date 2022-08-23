@@ -56,7 +56,11 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
 }
 $show_update_log = get_config SHOW_UPDATE_LOG $true
 
-function update_scoop($show_update_log) {
+function Sync-Scoop {
+    [CmdletBinding()]
+    Param (
+        [Boolean]$OutputLog = $true
+    )
     # Test if Scoop Core is hold
     if(Test-ScoopCoreOnHold) {
         return
@@ -131,7 +135,7 @@ function update_scoop($show_update_log) {
         }
 
         $res = $lastexitcode
-        if ($show_update_log) {
+        if ($OutputLog) {
             Invoke-Git -Path $currentdir -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
@@ -140,48 +144,81 @@ function update_scoop($show_update_log) {
         }
     }
 
-    # This should have been deprecated after 2019-05-12
-    # if ((Get-LocalBucket) -notcontains 'main') {
-    #     info "The main bucket of Scoop has been separated to 'https://github.com/ScoopInstaller/Main'"
-    #     info "Adding main bucket..."
-    #     add_bucket 'main'
-    # }
-
     shim "$currentdir\bin\scoop.ps1" $false
 }
 
-function update_bucket($show_update_log) {
-    # check for git
-    if (!(Test-GitAvailable)) { abort "Scoop uses Git to update main bucket and others. Run 'scoop install git' and try again." }
+function Sync-Bucket {
+    [CmdletBinding()]
+    Param (
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [PSObject[]]$Name,
+        [Boolean]$OutputLog = $true
+    )
 
-    foreach ($bucket in Get-LocalBucket) {
-        Write-Host "Updating '$bucket' bucket..."
-
-        $bucketLoc = Find-BucketDirectory $bucket -Root
+    Process {
+        $bucketLoc = Find-BucketDirectory $Name -Root
 
         if (!(Test-Path (Join-Path $bucketLoc '.git'))) {
-            if ($bucket -eq 'main') {
-                # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
-                Write-Host " Converting 'main' bucket to git repo..."
-                $status = rm_bucket 'main'
-                if ($status -ne 0) {
-                    abort "Failed to remove local 'main' bucket."
-                }
-                $status = add_bucket 'main' (known_bucket_repo 'main')
-                if ($status -ne 0) {
-                    abort "Failed to add remote 'main' bucket."
-                }
-            } else {
-                Write-Host "'$bucket' is not a git repository. Skipped."
-            }
-            continue
+            warn "'$Name' is not a git repository. Skipped."
+            return
         }
+
+        Write-Host "Updating '$Name' bucket..."
 
         $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
         Invoke-Git -Path $bucketLoc "pull -q"
-        if ($show_update_log) {
-            Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h [$name]%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+        if ($OutputLog) {
+            Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset [$Name]' '$previousCommit..HEAD'"
         }
+    }
+}
+
+function Sync-Buckets {
+    Param (
+        [Boolean]$OutputLog = $true
+    )
+    Write-Host "Updating Buckets..."
+
+    if (!(Test-Path (Join-Path (Find-BucketDirectory 'main' -Root) '.git'))) {
+        info "Converting 'main' bucket to git repo..."
+        $status = rm_bucket 'main'
+        if ($status -ne 0) {
+            abort "Failed to remove local 'main' bucket."
+        }
+        $status = add_bucket 'main' (known_bucket_repo 'main')
+        if ($status -ne 0) {
+            abort "Failed to add remote 'main' bucket."
+        }
+    }
+
+
+    $buckets = Get-LocalBucket | ForEach-Object {
+        $path = Find-BucketDirectory $_ -Root
+        return @{
+            name = $_
+            valid = Test-Path (Join-Path $path '.git')
+            path = $path
+        }
+    }
+
+    $buckets | Where-Object { !$_.valid } | ForEach-Object { Write-Host "'$($_.name)' is not a git repository. Skipped." }
+
+    if($PSVersionTable.PSVersion.Major -ge 7) {
+        # Parallel parameter is available since PowerShell 7
+        $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
+            . "$using:PSScriptRoot\..\lib\core.ps1"
+
+            $bucketLoc = $_.path
+            $name = $_.name
+
+            $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
+            Invoke-Git -Path $bucketLoc -ArgumentList "pull -q"
+            if ($using:OutputLog) {
+                Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h [$name]%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            }
+        }
+    } else {
+        $buckets | Where-Object { $_.valid } | ForEach-Object { Sync-Bucket $_.name -OutputLog $OutputLog }
     }
 }
 
@@ -321,8 +358,8 @@ if (-not ($apps -or $all)) {
         error 'scoop update: --no-cache is invalid when <app> is not specified.'
         exit 1
     }
-    update_scoop $show_update_log
-    update_bucket $show_update_log
+    Sync-Scoop -OutputLog $show_update_log
+    Sync-Buckets -OutputLog $show_update_log
     set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
@@ -336,8 +373,8 @@ if (-not ($apps -or $all)) {
     $apps_param = $apps
 
     if ($updateScoop) {
-        update_scoop $show_update_log
-        update_bucket $show_update_log
+        Sync-Scoop -OutputLog $show_update_log
+        Sync-Buckets -OutputLog $show_update_log
         set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
         success 'Scoop was updated successfully!'
     }
