@@ -68,4 +68,12 @@ Describe 'getopt' -Tag 'Scoop' {
         $err | Should -BeNullOrEmpty
         $opt.'long-arg' | Should -Be 'test'
     }
+
+    It 'handles the option terminator' {
+        $opt, $rem, $err = getopt '--long-arg', 'test', '--', '-x' 'x' 'long-arg='
+        $err | Should -BeNullOrEmpty
+        $opt.'long-arg' | Should -Be 'test'
+        $opt.'x' | Should -BeNullOrEmpty
+        $rem[0] | Should -Be '-x'
+    }
 }

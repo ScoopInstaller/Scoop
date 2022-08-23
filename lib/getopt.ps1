@@ -8,6 +8,11 @@
 #    array of strings that are long-form options. options that take
 #    a parameter should end with '='
 # returns @(opts hash, remaining_args array, error string)
+# NOTES:
+#    The first "--" in $argv, if any, will terminate all options; any
+# following arguments are treated as non-option arguments, even if
+# they begin with a hyphen. The "--" itself will not be included in
+# the returned $opts. (POSIX-compatible)
 function getopt($argv, $shortopts, $longopts) {
     $opts = @{}; $rem = @()
 
@@ -23,22 +28,28 @@ function getopt($argv, $shortopts, $longopts) {
     $argv = @($argv)
     $longopts = @($longopts)
 
-    for($i = 0; $i -lt $argv.length; $i++) {
+    for ($i = 0; $i -lt $argv.Length; $i++) {
         $arg = $argv[$i]
-        if($null -eq $arg) { continue }
+        if ($null -eq $arg) { continue }
         # don't try to parse array arguments
-        if($arg -is [array]) { $rem += ,$arg; continue }
-        if($arg -is [int]) { $rem += $arg; continue }
-        if($arg -is [decimal]) { $rem += $arg; continue }
+        if ($arg -is [array]) { $rem += , $arg; continue }
+        if ($arg -is [int]) { $rem += $arg; continue }
+        if ($arg -is [decimal]) { $rem += $arg; continue }
 
-        if($arg.startswith('--')) {
-            $name = $arg.substring(2)
+        if ($arg.StartsWith('--')) {
+            $name = $arg.Substring(2)
+
+            if ($name.Length -eq 0) {
+                $rem += $argv[($i + 1)..($argv.Length - 1)]
+                return $opts, $rem
+            }
 
             $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
 
-            if($longopt) {
-                if($longopt.endswith('=')) { # requires arg
-                    if($i -eq $argv.length - 1) {
+            if ($longopt) {
+                if ($longopt.EndsWith('=')) {
+                    # requires arg
+                    if ($i -eq $argv.Length - 1) {
                         return err "Option --$name requires an argument."
                     }
                     $opts.$name = $argv[++$i]
@@ -48,14 +59,14 @@ function getopt($argv, $shortopts, $longopts) {
             } else {
                 return err "Option --$name not recognized."
             }
-        } elseif($arg.startswith('-') -and $arg -ne '-') {
-            for($j = 1; $j -lt $arg.length; $j++) {
+        } elseif ($arg.StartsWith('-') -and $arg -ne '-') {
+            for ($j = 1; $j -lt $arg.Length; $j++) {
                 $letter = $arg[$j].tostring()
 
-                if($shortopts -match "$(regex_escape $letter)`:?") {
+                if ($shortopts -match "$(regex_escape $letter)`:?") {
                     $shortopt = $matches[0]
-                    if($shortopt[1] -eq ':') {
-                        if($j -ne $arg.length -1 -or $i -eq $argv.length - 1) {
+                    if ($shortopt[1] -eq ':') {
+                        if ($j -ne $arg.Length - 1 -or $i -eq $argv.Length - 1) {
                             return err "Option -$letter requires an argument."
                         }
                         $opts.$letter = $argv[++$i]
