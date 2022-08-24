@@ -168,7 +168,7 @@ function Sync-Bucket {
         $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
         Invoke-Git -Path $bucketLoc "pull -q"
         if ($Log) {
-            Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset [$Name]' '$previousCommit..HEAD'"
+            Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset [$Name] %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
     }
 }
@@ -214,7 +214,7 @@ function Sync-Buckets {
             $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
             Invoke-Git -Path $bucketLoc -ArgumentList "pull -q"
             if ($using:Log) {
-                Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h [$name]%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+                Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset [$name] %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
             }
         }
     } else {
