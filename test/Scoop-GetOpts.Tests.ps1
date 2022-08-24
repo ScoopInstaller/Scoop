@@ -70,10 +70,16 @@ Describe 'getopt' -Tag 'Scoop' {
     }
 
     It 'handles the option terminator' {
-        $opt, $rem, $err = getopt '--long-arg', 'test', '--', '-x' 'x' 'long-arg='
+        $opt, $rem, $err = getopt '--long-arg', '--' '' 'long-arg'
         $err | Should -BeNullOrEmpty
-        $opt.'long-arg' | Should -Be 'test'
+        $opt.'long-arg' | Should -BeTrue
+        $rem[0] | Should -BeNullOrEmpty
+        $opt, $rem, $err = getopt '--long-arg', '--', '-x', '-y' 'xy' 'long-arg'
+        $err | Should -BeNullOrEmpty
+        $opt.'long-arg' | Should -BeTrue
         $opt.'x' | Should -BeNullOrEmpty
+        $opt.'y' | Should -BeNullOrEmpty
         $rem[0] | Should -Be '-x'
+        $rem[1] | Should -Be '-y'
     }
 }

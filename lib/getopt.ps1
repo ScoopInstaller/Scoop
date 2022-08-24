@@ -21,7 +21,7 @@ function getopt($argv, $shortopts, $longopts) {
     }
 
     function regex_escape($str) {
-        return [regex]::escape($str)
+        return [Regex]::Escape($str)
     }
 
     # ensure these are arrays
@@ -32,17 +32,17 @@ function getopt($argv, $shortopts, $longopts) {
         $arg = $argv[$i]
         if ($null -eq $arg) { continue }
         # don't try to parse array arguments
-        if ($arg -is [array]) { $rem += , $arg; continue }
-        if ($arg -is [int]) { $rem += $arg; continue }
-        if ($arg -is [decimal]) { $rem += $arg; continue }
+        if ($arg -is [Array]) { $rem += , $arg; continue }
+        if ($arg -is [Int]) { $rem += $arg; continue }
+        if ($arg -is [Decimal]) { $rem += $arg; continue }
 
-        if ($arg.StartsWith('--')) {
-            $name = $arg.Substring(2)
-
-            if ($name.Length -eq 0) {
+        if ($arg -eq '--') {
+            if ($i -lt $argv.Length - 1) {
                 $rem += $argv[($i + 1)..($argv.Length - 1)]
-                return $opts, $rem
             }
+            break
+        } elseif ($arg.StartsWith('--')) {
+            $name = $arg.Substring(2)
 
             $longopt = $longopts | Where-Object { $_ -match "^$name=?$" }
 
@@ -61,10 +61,10 @@ function getopt($argv, $shortopts, $longopts) {
             }
         } elseif ($arg.StartsWith('-') -and $arg -ne '-') {
             for ($j = 1; $j -lt $arg.Length; $j++) {
-                $letter = $arg[$j].tostring()
+                $letter = $arg[$j].ToString()
 
                 if ($shortopts -match "$(regex_escape $letter)`:?") {
-                    $shortopt = $matches[0]
+                    $shortopt = $Matches[0]
                     if ($shortopt[1] -eq ':') {
                         if ($j -ne $arg.Length - 1 -or $i -eq $argv.Length - 1) {
                             return err "Option -$letter requires an argument."
