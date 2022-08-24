@@ -333,7 +333,14 @@ function Get-HelperPath {
     }
     process {
         switch ($Helper) {
-            'Git' { $HelperPath = "$(versiondir 'git' 'current')\mingw64\bin\git.exe" }
+            'Git' {
+                $internalgit = "$(versiondir 'git' 'current')\mingw64\bin\git.exe"
+                if (Test-Path $internalgit) {
+                    $HelperPath = $internalgit
+                } else {
+                    $HelperPath = (Get-Command git -ErrorAction Ignore).Source
+                }
+            }
             '7zip' {
                 $HelperPath = Get-AppFilePath '7zip' '7z.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
