@@ -133,7 +133,7 @@ function Invoke-Git {
     [OutputType([String])]
     param(
         [String] $Path,
-        [PSObject[]] $ArgumentList
+        [String[]] $ArgumentList
     )
 
     $proxy = get_config PROXY

@@ -59,7 +59,7 @@ $show_update_log = get_config SHOW_UPDATE_LOG $true
 function Sync-Scoop {
     [CmdletBinding()]
     Param (
-        [Boolean]$OutputLog = $true
+        [Switch]$Log
     )
     # Test if Scoop Core is hold
     if(Test-ScoopCoreOnHold) {
@@ -135,7 +135,7 @@ function Sync-Scoop {
         }
 
         $res = $lastexitcode
-        if ($OutputLog) {
+        if ($Log) {
             Invoke-Git -Path $currentdir -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
         }
 
@@ -151,8 +151,8 @@ function Sync-Bucket {
     [CmdletBinding()]
     Param (
         [Parameter(Mandatory, ValueFromPipeline)]
-        [PSObject[]]$Name,
-        [Boolean]$OutputLog = $true
+        [String[]]$Name,
+        [Switch]$Log
     )
 
     Process {
@@ -167,7 +167,7 @@ function Sync-Bucket {
 
         $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
         Invoke-Git -Path $bucketLoc "pull -q"
-        if ($OutputLog) {
+        if ($Log) {
             Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset [$Name]' '$previousCommit..HEAD'"
         }
     }
@@ -175,7 +175,7 @@ function Sync-Bucket {
 
 function Sync-Buckets {
     Param (
-        [Boolean]$OutputLog = $true
+        [Switch]$Log
     )
     Write-Host "Updating Buckets..."
 
@@ -213,12 +213,12 @@ function Sync-Buckets {
 
             $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
             Invoke-Git -Path $bucketLoc -ArgumentList "pull -q"
-            if ($using:OutputLog) {
+            if ($using:Log) {
                 Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h [$name]%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
             }
         }
     } else {
-        $buckets | Where-Object { $_.valid } | ForEach-Object { Sync-Bucket $_.name -OutputLog $OutputLog }
+        $buckets | Where-Object { $_.valid } | ForEach-Object { Sync-Bucket $_.name -Log:$Log }
     }
 }
 
@@ -358,8 +358,8 @@ if (-not ($apps -or $all)) {
         error 'scoop update: --no-cache is invalid when <app> is not specified.'
         exit 1
     }
-    Sync-Scoop -OutputLog $show_update_log
-    Sync-Buckets -OutputLog $show_update_log
+    Sync-Scoop -Log:$show_update_log
+    Sync-Buckets -Log:$show_update_log
     set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
@@ -373,8 +373,8 @@ if (-not ($apps -or $all)) {
     $apps_param = $apps
 
     if ($updateScoop) {
-        Sync-Scoop -OutputLog $show_update_log
-        Sync-Buckets -OutputLog $show_update_log
+        Sync-Scoop -Log:$show_update_log
+        Sync-Buckets -Log:$show_update_log
         set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
         success 'Scoop was updated successfully!'
     }
