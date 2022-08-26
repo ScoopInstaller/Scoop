@@ -12,6 +12,8 @@
 
 - **config:** Change config option to snake_case in file and SCREAMING_CASE in code ([#5116](https://github.com/ScoopInstaller/Scoop/issues/5116))
 
+- **scoop-update:** Fix confirm required when updating PowerShell module apps ([#5126](https://github.com/ScoopInstaller/Scoop/issues/5126))
+
 ### Code Refactoring
 
 - **path:** Use 'Convert-Path()' instead of 'Resolve-Path()' ([#5109](https://github.com/ScoopInstaller/Scoop/issues/5109))
