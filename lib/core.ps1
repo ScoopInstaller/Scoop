@@ -132,31 +132,54 @@ function Invoke-Git {
     [CmdletBinding()]
     [OutputType([String])]
     param(
-        [String] $Path,
-        [String[]] $ArgumentList
+        [Parameter(Mandatory = $true, Position = 0)]
+        [Alias('PSPath', 'Path')]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $WorkingDirectory,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [Alias('Args')]
+        [String[]]
+        $ArgumentList
     )
 
     $proxy = get_config PROXY
     $git = Get-HelperPath -Helper Git
     $arguments = $ArgumentList -join ' '
-    if ($Path) {
-        $cmd = "`"$git`" -C `"$Path`" $arguments"
-    } else {
-        $cmd = "`"$git`" $arguments"
+    $cmd = "`"$git`" $arguments"
+
+    if ($WorkingDirectory) {
+        $cmd = "`"$git`" -C `"$WorkingDirectory`" $arguments"
+    }
+    $sb = [scriptblock]::Create("& $cmd")
+
+    if([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none')  {
+        return Invoke-Command $sb
     }
 
-    # invoke git if proxy is not set or not required
-    if ([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none' -or $arguments -NotMatch "\b(clone|checkout|pull|fetch|ls-remote)\b") {
-        return Invoke-Command ([scriptblock]::Create("& $cmd"))
+    if($arguments -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
+        $old_https = $env:HTTPS_PROXY
+        $old_http = $env:HTTP_PROXY
+        try {
+            # convert proxy setting for git
+            if ($proxy.StartsWith('currentuser@')) {
+                $proxy = $proxy.Replace('currentuser@', ':@')
+            }
+            $env:HTTPS_PROXY = $proxy
+            $env:HTTP_PROXY = $proxy
+            return Invoke-Command $sb
+        }
+        catch {
+            error $_
+            return
+        }
+        finally {
+            $env:HTTPS_PROXY = $old_https
+            $env:HTTP_PROXY = $old_http
+        }
     }
 
-    # convert proxy setting for git
-    if ($proxy.StartsWith('currentuser@')) {
-        $proxy = $proxy.Replace("currentuser@",":@")
-    }
-
-    # use proxy with cmd.exe to prevent polluting PowerShell session
-    cmd.exe /d /c "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
+    return Invoke-Command $sb
 }
 
 # helper functions

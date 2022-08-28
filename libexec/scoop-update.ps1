@@ -76,7 +76,7 @@ function Sync-Scoop {
         $olddir = "$currentdir\..\old"
 
         # get git scoop
-        Invoke-Git -ArgumentList "clone -q $configRepo --branch $configBranch --single-branch `"$newdir`""
+        Invoke-Git -ArgumentList @('clone', '-q', $configRepo, '--branch', $configBranch, '--single-branch', $newdir)
 
         # check if scoop was successful downloaded
         if (!(Test-Path "$newdir\bin\scoop.ps1")) {
@@ -97,18 +97,18 @@ function Sync-Scoop {
             Remove-Item "$currentdir\..\old" -Recurse -Force -ErrorAction SilentlyContinue
         }
 
-        $previousCommit = Invoke-Git -Path $currentdir -ArgumentList "rev-parse HEAD"
-        $currentRepo = Invoke-Git -Path $currentdir -ArgumentList "config remote.origin.url"
-        $currentBranch = Invoke-Git -Path $currentdir -ArgumentList "branch"
+        $previousCommit = Invoke-Git -Path $currentdir -ArgumentList @('rev-parse', 'HEAD')
+        $currentRepo = Invoke-Git -Path $currentdir -ArgumentList @('config', 'remote.origin.url')
+        $currentBranch = Invoke-Git -Path $currentdir -ArgumentList @('branch')
 
         $isRepoChanged = !($currentRepo -match $configRepo)
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
         # Stash uncommitted changes
-        if (Invoke-Git -Path $currentdir -ArgumentList "diff HEAD --name-only") {
+        if (Invoke-Git -Path $currentdir -ArgumentList @('diff', 'HEAD', '--name-only')) {
             if (get_config AUTOSTASH_ON_CONFLICT) {
                 warn "Uncommitted changes detected. Stashing..."
-                Invoke-Git -Path $currentdir -ArgumentList "stash push -m 'WIP at $([System.DateTime]::Now.ToString('o'))' -u -q"
+                Invoke-Git -Path $currentdir -ArgumentList @('stash', 'push', '-m', "WIP at $([System.DateTime]::Now.ToString('o'))", '-u', '-q')
             } else {
                 warn "Uncommitted changes detected. Update aborted."
                 return
@@ -117,26 +117,26 @@ function Sync-Scoop {
 
         # Change remote url if the repo is changed
         if ($isRepoChanged) {
-            Invoke-Git -Path $currentdir -ArgumentList "config remote.origin.url '$configRepo'"
+            Invoke-Git -Path $currentdir -ArgumentList @('config', 'remote.origin.url', $configRepo)
         }
 
         # Fetch and reset local repo if the repo or the branch is changed
         if ($isRepoChanged -or $isBranchChanged) {
             # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-            Invoke-Git -Path $currentdir -ArgumentList "config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'"
+            Invoke-Git -Path $currentdir -ArgumentList @('config', 'remote.origin.fetch', '+refs/heads/*:refs/remotes/origin/*')
             # fetch remote branch
-            Invoke-Git -Path $currentdir -ArgumentList "fetch --force origin 'refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch' -q"
+            Invoke-Git -Path $currentdir -ArgumentList @('fetch', '--force', 'origin', "refs/heads/$configBranch`:refs/remotes/origin/$configBranch", '-q')
             # checkout and track the branch
-            Invoke-Git -Path $currentdir -ArgumentList "checkout -B $configBranch -t origin/$configBranch -q"
+            Invoke-Git -Path $currentdir -ArgumentList @('checkout', '-B', $configBranch, '-t', "origin/$configBranch", '-q')
             # reset branch HEAD
-            Invoke-Git -Path $currentdir -ArgumentList "reset --hard origin/$configBranch -q"
+            Invoke-Git -Path $currentdir -ArgumentList @('reset', '--hard', "origin/$configBranch", '-q')
         } else {
-            Invoke-Git -Path $currentdir -ArgumentList "pull -q"
+            Invoke-Git -Path $currentdir -ArgumentList @('pull', '-q')
         }
 
         $res = $lastexitcode
         if ($Log) {
-            Invoke-Git -Path $currentdir -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            Invoke-Git -Path $currentdir -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
         }
 
         if ($res -ne 0) {
@@ -163,12 +163,10 @@ function Sync-Bucket {
             return
         }
 
-        Write-Host "Updating '$Name' bucket..."
-
-        $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
-        Invoke-Git -Path $bucketLoc "pull -q"
+        $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
+        Invoke-Git -Path $bucketLoc @('pull', '-q')
         if ($Log) {
-            Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset [$Name] %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            Invoke-Git -Path $bucketLoc -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %Cgreen$Name%Creset %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
         }
     }
 }
@@ -211,10 +209,10 @@ function Sync-Buckets {
             $bucketLoc = $_.path
             $name = $_.name
 
-            $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList "rev-parse HEAD"
-            Invoke-Git -Path $bucketLoc -ArgumentList "pull -q"
+            $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
+            Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
             if ($using:Log) {
-                Invoke-Git -Path $bucketLoc -ArgumentList "--no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset [$name] %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+                Invoke-Git -Path $bucketLoc -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %Cgreen$name%Creset %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
             }
         }
     } else {

@@ -99,8 +99,8 @@ function list_buckets {
         $bucket = [Ordered]@{ Name = $_ }
         $path = Find-BucketDirectory $_ -Root
         if ((Test-Path (Join-Path $path '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
-            $bucket.Source = Invoke-Git -Path $path -ArgumentList "config remote.origin.url"
-            $bucket.Updated = Invoke-Git -Path $path -ArgumentList "log --format='%aD' -n 1" | Get-Date
+            $bucket.Source = Invoke-Git -Path $path -ArgumentList @('config', 'remote.origin.url')
+            $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', "--format='%aD'", '-n', '1')
         } else {
             $bucket.Source = friendly_path $path
             $bucket.Updated = (Get-Item "$path\bucket").LastWriteTime
@@ -130,7 +130,7 @@ function add_bucket($name, $repo) {
     }
     foreach ($bucket in Get-LocalBucket) {
         if (Test-Path -Path "$bucketsdir\$bucket\.git") {
-            $remote = Invoke-Git -Path "$bucketsdir\$bucket" -ArgumentList "config --get remote.origin.url"
+            $remote = Invoke-Git -Path "$bucketsdir\$bucket" -ArgumentList @('config', '--get', 'remote.origin.url')
             if ((Convert-RepositoryUri -Uri $remote) -eq $uni_repo) {
                 warn "Bucket $bucket already exists for $repo"
                 return 2
@@ -139,14 +139,14 @@ function add_bucket($name, $repo) {
     }
 
     Write-Host 'Checking repo... ' -NoNewline
-    $out = Invoke-Git -ArgumentList "ls-remote $repo" 2>&1
+    $out = Invoke-Git -ArgumentList @('ls-remote', $repo) 2>&1
     if ($LASTEXITCODE -ne 0) {
         error "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
         return 1
     }
     ensure $bucketsdir | Out-Null
     $dir = ensure $dir
-    Invoke-Git -ArgumentList "clone $repo `"$dir`" -q"
+    Invoke-Git -ArgumentList @('clone', $repo, $dir, '-q')
     Write-Host 'OK'
     success "The $name bucket was added successfully."
     return 0
@@ -169,7 +169,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $bucket_path = "$bucketsdir\$bucket"
 
     if (Test-Path $bucket_path) {
-        $remote = Invoke-Git -Path $bucket_path -ArgumentList "config --get remote.origin.url"
+        $remote = Invoke-Git -Path $bucket_path -ArgumentList @('config', '--get', 'remote.origin.url')
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
         # https://PROVIDER/USER/REPO.git
