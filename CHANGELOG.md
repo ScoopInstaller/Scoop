@@ -11,8 +11,7 @@
 ### Bug Fixes
 
 - **config:** Change config option to snake_case in file and SCREAMING_CASE in code ([#5116](https://github.com/ScoopInstaller/Scoop/issues/5116))
-
-- **scoop-update:** Fix confirm required when updating PowerShell module apps ([#5126](https://github.com/ScoopInstaller/Scoop/issues/5126))
+- **psmodule:** Remove folder recursively when unlinking previous module path ([#5127](https://github.com/ScoopInstaller/Scoop/issues/5127))
 
 ### Code Refactoring
 
