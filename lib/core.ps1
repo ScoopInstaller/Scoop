@@ -833,14 +833,13 @@ function shim($path, $global, $name, $arg) {
 
 function get_shim_path() {
     $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"
-    $shim_version = get_config SHIM 'default'
+    $shim_version = get_config 'shim' 'kiennq'
     switch ($shim_version) {
-        '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
         'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
-        'kiennq' { Break } # for backward compatibility
         'default' { Break }
-        default { warn "Unknown shim version: '$shim_version'" }
+        default { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\$shim_version\shim.exe"; Break }
     }
+    if(!(Test-Path $shim_path)) { warn "Unknown shim version: '$shim_version'" }
     return $shim_path
 }
 
