@@ -277,6 +277,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # directory.
     $refdir = unlink_current $dir
 
+    uninstall_psmodule $old_manifest $refdir $global
+
     if ($force -and ($old_version -eq $version)) {
         if (!(Test-Path "$dir/../_$version.old")) {
             Move-Item "$dir" "$dir/../_$version.old"
