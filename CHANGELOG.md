@@ -11,6 +11,7 @@
 ### Bug Fixes
 
 - **config:** Change config option to snake_case in file and SCREAMING_CASE in code ([#5116](https://github.com/ScoopInstaller/Scoop/issues/5116))
+- **jsonpath:** Prevent converting date string to DateTime in JSONPath ([#5130](https://github.com/ScoopInstaller/Scoop/issues/5130))
 - **psmodule:** Remove folder recursively when unlinking previous module path ([#5127](https://github.com/ScoopInstaller/Scoop/issues/5127))
 
 ### Code Refactoring
