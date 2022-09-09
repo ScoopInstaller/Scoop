@@ -41,10 +41,10 @@ if (Get-Command -Name 'scoop' -ErrorAction SilentlyContinue) {
 $dir = ensure (versiondir 'scoop' 'current')
 
 # download scoop zip
-$zipurl = 'https://github.com/ScoopInstaller/Scoop/archive/master.zip'
-$zipfile = "$dir\scoop.zip"
+$zipUrl = "https://github.com/ScoopInstaller/Scoop/archive/master.zip"
+$zipFile = "$dir\scoop.zip"
 Write-Output 'Downloading scoop...'
-dl $zipurl $zipfile
+Invoke-WebDownload -Uri $zipUrl -OutFile $zipFile
 
 Write-Output 'Extracting...'
 Add-Type -Assembly "System.IO.Compression.FileSystem"
@@ -57,11 +57,11 @@ shim "$dir\bin\scoop.ps1" $false
 
 # download main bucket
 $dir = "$scoopdir\buckets\main"
-$zipurl = 'https://github.com/ScoopInstaller/Main/archive/master.zip'
-$zipfile = "$dir\main-bucket.zip"
-Write-Output 'Downloading main bucket...'
-New-Item $dir -Type Directory -Force | Out-Null
-dl $zipurl $zipfile
+$zipUrl = "https://github.com/ScoopInstaller/Main/archive/master.zip"
+$zipFile = "$dir\main-bucket.zip"
+Write-Output "Downloading main bucket..."
+New-Item -Path $dir -Type Directory -Force | Out-Null
+Invoke-WebDownload -Uri $zipUrl -OutFile $zipFile
 
 Write-Output 'Extracting...'
 [IO.Compression.ZipFile]::ExtractToDirectory($zipfile, "$dir\_tmp")

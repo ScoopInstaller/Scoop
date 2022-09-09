@@ -585,11 +585,22 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function dl($url,$to) {
-    $wc = New-Object Net.Webclient
-    $wc.headers.add('Referer', (strip_filename $url))
-    $wc.Headers.Add('User-Agent', (Get-UserAgent))
-    $wc.downloadFile($url,$to)
+function Invoke-WebDownload {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [Uri]
+        $Uri,
+
+        [Parameter(Mandatory)]
+        [string]
+        $OutFile
+    )
+
+    Invoke-WebRequest -UseBasicParsing -Uri $Uri -OutFile $OutFile -Headers @{
+        Referer      = (strip_filename $Uri);
+        "User-Agent" = Get-UserAgent
+    }
 }
 
 function env($name,$global,$val='__get') {
