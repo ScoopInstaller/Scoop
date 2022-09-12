@@ -1,3 +1,7 @@
+## [Unreleased]
+
+- **core:** Use better names for download functions ([[#3830](https://github.com/ScoopInstaller/Scoop/issues/3830)])
+
 ## [v0.2.4](https://github.com/ScoopInstaller/Scoop/compare/v0.2.3...v0.2.4) - 2022-08-08
 
 ### Features
