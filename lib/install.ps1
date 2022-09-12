@@ -49,7 +49,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $original_dir = $dir # keep reference to real (not linked) directory
     $persist_dir = persistdir $app $global
 
-    $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    $fname = Import-Url $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -Arch $architecture
 
     run_installer $fname $manifest $architecture $dir $global
@@ -80,12 +80,12 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     show_notes $manifest $dir $original_dir $persist_dir
 }
 
-function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
+function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
 
     if(!(test-path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
-        do_dl $url "$cached.download" $cookies
+        Start-WebDownload $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
@@ -98,13 +98,13 @@ function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache =
     }
 }
 
-function do_dl($url, $to, $cookies) {
+function Start-WebDownload ($url, $to, $cookies) {
     $progress = [console]::isoutputredirected -eq $false -and
         $host.name -ne 'Windows PowerShell ISE Host'
 
     try {
         $url = handle_special_urls $url
-        dl $url $to $cookies $progress
+        Invoke-WebDownload $url $to $cookies $progress
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
@@ -179,7 +179,7 @@ function get_filename_from_metalink($file) {
     return $filename
 }
 
-function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
+function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
     $data = @{}
     $urls = @(script:url $manifest $architecture)
 
@@ -355,7 +355,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 }
 
 # download with filesize and progress indicator
-function dl($url, $to, $cookies, $progress) {
+function Invoke-WebDownload ($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split '#')[0]
     $wreq = [Net.WebRequest]::Create($reqUrl)
     if ($wreq -is [Net.HttpWebRequest]) {
@@ -409,7 +409,7 @@ function dl($url, $to, $cookies, $progress) {
             $newUrl = "$newUrl#/$postfix"
         }
 
-        dl $newUrl $to $cookies $progress
+        Invoke-WebDownload $newUrl $to $cookies $progress
         return
     }
 
@@ -420,12 +420,12 @@ function dl($url, $to, $cookies, $progress) {
 
     if ($progress -and ($total -gt 0)) {
         [console]::CursorVisible = $false
-        function dl_onProgress($read) {
-            dl_progress $read $total $url
+        function Trace-DownloadProgress ($read) {
+            Write-DownloadProgress $read $total $url
         }
     } else {
         write-host "Downloading $url ($(filesize $total))..."
-        function dl_onProgress {
+        function Trace-DownloadProgress {
             #no op
         }
     }
@@ -437,17 +437,17 @@ function dl($url, $to, $cookies, $progress) {
         $totalRead = 0
         $sw = [diagnostics.stopwatch]::StartNew()
 
-        dl_onProgress $totalRead
+        Trace-DownloadProgress $totalRead
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
             if ($sw.elapsedmilliseconds -gt 100) {
                 $sw.restart()
-                dl_onProgress $totalRead
+                Trace-DownloadProgress $totalRead
             }
         }
         $sw.stop()
-        dl_onProgress $totalRead
+        Trace-DownloadProgress $totalRead
     } finally {
         if ($progress) {
             [console]::CursorVisible = $true
@@ -463,7 +463,7 @@ function dl($url, $to, $cookies, $progress) {
     }
 }
 
-function dl_progress_output($url, $read, $total, $console) {
+function Format-DownloadProgress ($url, $read, $total, $console) {
     $filename = url_remote_filename $url
 
     # calculate current percentage done
@@ -502,14 +502,14 @@ function dl_progress_output($url, $read, $total, $console) {
     "$left [$dashes$spaces] $right"
 }
 
-function dl_progress($read, $total, $url) {
+function Write-DownloadProgress ($read, $total, $url) {
     $console = $host.UI.RawUI;
     $left  = $console.CursorPosition.X;
     $top   = $console.CursorPosition.Y;
     $width = $console.BufferSize.Width;
 
     if($read -eq 0) {
-        $maxOutputLength = $(dl_progress_output $url 100 $total $console).length
+        $maxOutputLength = $(Format-DownloadProgress $url 100 $total $console).length
         if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
             # print on new line
@@ -520,11 +520,11 @@ function dl_progress($read, $total, $url) {
         }
     }
 
-    write-host $(dl_progress_output $url $read $total $console) -nonewline
+    write-host $(Format-DownloadProgress $url $read $total $console) -nonewline
     [console]::SetCursorPosition($left, $top)
 }
 
-function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+function Import-Url ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
 
@@ -545,13 +545,13 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
     # download first
     if(Test-Aria2Enabled) {
-        dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach($url in $urls) {
             $fname = url_filename $url
 
             try {
-                dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+                Invoke-CachedDownload $app $version $url "$dir\$fname" $cookies $use_cache
             } catch {
                 write-host -f darkred $_
                 abort "URL $url is not valid"

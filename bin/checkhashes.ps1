@@ -113,7 +113,7 @@ foreach ($current in $MANIFESTS) {
         $version = 'HASH_CHECK'
         $tmp = $expected_hash -split ':'
 
-        dl_with_cache $current.app $version $_ $null $null -use_cache:$UseCache
+        Invoke-CachedDownload $current.app $version $_ $null $null -use_cache:$UseCache
 
         $to_check = fullpath (cache_path $current.app $version $_)
         $actual_hash = compute_hash $to_check $algorithm

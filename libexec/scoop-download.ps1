@@ -95,11 +95,11 @@ foreach ($curr_app in $apps) {
     }
 
     if(Test-Aria2Enabled) {
-        dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash
     } else {
         foreach($url in script:url $manifest $architecture) {
             try {
-                dl_with_cache $app $version $url $null $manifest.cookie $use_cache
+                Invoke-CachedDownload $app $version $url $null $manifest.cookie $use_cache
             } catch {
                 write-host -f darkred $_
                 error "URL $url is not valid"
