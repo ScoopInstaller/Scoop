@@ -49,7 +49,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $original_dir = $dir # keep reference to real (not linked) directory
     $persist_dir = persistdir $app $global
 
-    $fname = Import-Url $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -Arch $architecture
 
     run_installer $fname $manifest $architecture $dir $global
@@ -524,7 +524,7 @@ function Write-DownloadProgress ($read, $total, $url) {
     [console]::SetCursorPosition($left, $top)
 }
 
-function Import-Url ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
 
