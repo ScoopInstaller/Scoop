@@ -49,7 +49,7 @@ param(
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\unix.ps1"
 
-$Dir = Resolve-Path $Dir
+$Dir = Convert-Path $Dir
 if ($ForceUpdate) { $Update = $true }
 # Cleanup
 if (!$UseCache) { Remove-Item "$cachedir\*HASH_CHECK*" -Force }
@@ -174,7 +174,7 @@ foreach ($current in $MANIFESTS) {
         Write-Host "Writing updated $($current.app) manifest" -ForegroundColor DarkGreen
 
         $current.manifest = $current.manifest | ConvertToPrettyJson
-        $path = Resolve-Path "$Dir\$($current.app).json"
+        $path = Convert-Path "$Dir\$($current.app).json"
         [System.IO.File]::WriteAllLines($path, $current.manifest)
     }
 }

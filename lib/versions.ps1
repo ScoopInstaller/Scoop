@@ -50,7 +50,7 @@ function Select-CurrentVersion { # 'manifest.ps1'
     )
     process {
         $currentPath = "$(appdir $AppName $Global)\current"
-        if (!(get_config NO_JUNCTIONS)) {
+        if (!(get_config NO_JUNCTION)) {
             $currentVersion = (parse_json "$currentPath\manifest.json").version
             if ($currentVersion -eq 'nightly') {
                 $currentVersion = (Get-Item $currentPath).Target | Split-Path -Leaf

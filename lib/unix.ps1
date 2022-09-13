@@ -10,14 +10,14 @@ if(!(is_unix)) {
 }
 
 # core.ps1
-$scoopdir = $env:SCOOP, (get_config 'rootPath'), (Join-Path $env:HOME "scoop") | Select-Object -first 1
-$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "/usr/local/scoop" | Select-Object -first 1
-$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), (Join-Path $scoopdir "cache") | Select-Object -first 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Join-Path $env:HOME 'scoop') | Select-Object -First 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config 'GLOBAL_PATH'), '/usr/local/scoop' | Select-Object -First 1
+$cachedir = $env:SCOOP_CACHE, (get_config 'CACHE_PATH'), (Join-Path $scoopdir 'cache') | Select-Object -First 1
 
 # core.ps1
 function ensure($dir) {
     mkdir -p $dir > $null
-    return resolve-path $dir
+    return Convert-Path $dir
 }
 
 # install.ps1

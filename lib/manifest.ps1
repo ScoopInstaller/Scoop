@@ -103,7 +103,7 @@ function install_info($app, $version, $global) {
 }
 
 function default_architecture {
-    $arch = get_config 'default_architecture'
+    $arch = get_config DEFAULT_ARCHITECTURE
     $system = if ([Environment]::Is64BitOperatingSystem) { '64bit' } else { '32bit' }
     if ($null -eq $arch) {
         $arch = $system
@@ -147,8 +147,8 @@ function generate_user_manifest($app, $bucket, $version) {
 
     ensure $(usermanifestsdir) | out-null
     try {
-        Invoke-AutoUpdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(@{ })
-        return "$(resolve-path $(usermanifest $app))"
+        Invoke-AutoUpdate $app "$(Convert-Path (usermanifestsdir))" $manifest $version $(@{ })
+        return "$(Convert-Path (usermanifest $app))"
     } catch {
         write-host -f darkred "Could not install $app@$version"
     }

@@ -18,11 +18,11 @@ function Expand-7zipArchive {
         [Switch]
         $Removal
     )
-    if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
+    if ((get_config USE_EXTERNAL_7ZIP)) {
         try {
             $7zPath = (Get-Command '7z' -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         } catch [System.Management.Automation.CommandNotFoundException] {
-            abort "`nCannot find external 7-Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7-Zip manually and try again."
+            abort "`nCannot find external 7-Zip (7z.exe) while 'use_external_7zip' is 'true'!`nRun 'scoop config use_external_7zip false' or install 7-Zip manually and try again."
         }
     } else {
         $7zPath = Get-HelperPath -Helper 7zip
@@ -146,7 +146,7 @@ function Expand-MsiArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    if ((get_config MSIEXTRACT_USE_LESSMSI)) {
+    if ((get_config USE_LESSMSI)) {
         $MsiPath = Get-HelperPath -Helper Lessmsi
         $ArgList = @('x', $Path, "$DestinationPath\")
     } else {
