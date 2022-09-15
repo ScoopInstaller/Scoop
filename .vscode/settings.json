@@ -4,6 +4,8 @@
     "powershell.codeFormatting.preset": "OTBS",
     "powershell.codeFormatting.alignPropertyValuePairs": true,
     "powershell.codeFormatting.ignoreOneLineBlock": true,
+    "powershell.codeFormatting.useConstantStrings": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
