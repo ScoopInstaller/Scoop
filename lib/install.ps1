@@ -85,7 +85,7 @@ function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $us
 
     if(!(test-path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
-        Start-WebDownload $url "$cached.download" $cookies
+        Start-Download $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
@@ -98,13 +98,13 @@ function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $us
     }
 }
 
-function Start-WebDownload ($url, $to, $cookies) {
+function Start-Download ($url, $to, $cookies) {
     $progress = [console]::isoutputredirected -eq $false -and
         $host.name -ne 'Windows PowerShell ISE Host'
 
     try {
         $url = handle_special_urls $url
-        Invoke-WebDownload $url $to $cookies $progress
+        Invoke-Download $url $to $cookies $progress
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
@@ -355,7 +355,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
 }
 
 # download with filesize and progress indicator
-function Invoke-WebDownload ($url, $to, $cookies, $progress) {
+function Invoke-Download ($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split '#')[0]
     $wreq = [Net.WebRequest]::Create($reqUrl)
     if ($wreq -is [Net.HttpWebRequest]) {
@@ -409,7 +409,7 @@ function Invoke-WebDownload ($url, $to, $cookies, $progress) {
             $newUrl = "$newUrl#/$postfix"
         }
 
-        Invoke-WebDownload $newUrl $to $cookies $progress
+        Invoke-Download $newUrl $to $cookies $progress
         return
     }
 
