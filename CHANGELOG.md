@@ -2,6 +2,7 @@
 
 ### Features
 
+- **checkurls**: Allow checking URLs from private_hosts ([#5152](https://github.com/ScoopInstaller/Scoop/pull/5152))
 - **getopt:** Support option terminator (`--`) ([#5121](https://github.com/ScoopInstaller/Scoop/issues/5121))
 - **scoop-(un)hold:** Support `scoop (un)hold scoop` ([#5089](https://github.com/ScoopInstaller/Scoop/issues/5089))
 - **scoop-config:** Allow 'hold_update_until' be set manually ([#5100](https://github.com/ScoopInstaller/Scoop/issues/5100))
