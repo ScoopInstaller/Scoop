@@ -41,7 +41,7 @@ if (Get-Command -Name 'scoop' -ErrorAction SilentlyContinue) {
 $dir = ensure (versiondir 'scoop' 'current')
 
 # download scoop zip
-$zipUrl = "https://github.com/ScoopInstaller/Scoop/archive/master.zip"
+$zipUrl = 'https://github.com/ScoopInstaller/Scoop/archive/master.zip'
 $zipFile = "$dir\scoop.zip"
 Write-Output 'Downloading scoop...'
 Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
@@ -57,9 +57,9 @@ shim "$dir\bin\scoop.ps1" $false
 
 # download main bucket
 $dir = "$scoopdir\buckets\main"
-$zipUrl = "https://github.com/ScoopInstaller/Main/archive/master.zip"
+$zipUrl = 'https://github.com/ScoopInstaller/Main/archive/master.zip'
 $zipFile = "$dir\main-bucket.zip"
-Write-Output "Downloading main bucket..."
+Write-Output 'Downloading main bucket...'
 New-Item -Path $dir -Type Directory -Force | Out-Null
 Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
 
