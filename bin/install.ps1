@@ -44,7 +44,7 @@ $dir = ensure (versiondir 'scoop' 'current')
 $zipUrl = "https://github.com/ScoopInstaller/Scoop/archive/master.zip"
 $zipFile = "$dir\scoop.zip"
 Write-Output 'Downloading scoop...'
-Invoke-WebDownload -Uri $zipUrl -OutFile $zipFile
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
 
 Write-Output 'Extracting...'
 Add-Type -Assembly "System.IO.Compression.FileSystem"
@@ -61,7 +61,7 @@ $zipUrl = "https://github.com/ScoopInstaller/Main/archive/master.zip"
 $zipFile = "$dir\main-bucket.zip"
 Write-Output "Downloading main bucket..."
 New-Item -Path $dir -Type Directory -Force | Out-Null
-Invoke-WebDownload -Uri $zipUrl -OutFile $zipFile
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
 
 Write-Output 'Extracting...'
 [IO.Compression.ZipFile]::ExtractToDirectory($zipfile, "$dir\_tmp")

@@ -588,24 +588,6 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function Invoke-WebDownload {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory)]
-        [Uri]
-        $Uri,
-
-        [Parameter(Mandatory)]
-        [string]
-        $OutFile
-    )
-
-    Invoke-WebRequest -UseBasicParsing -Uri $Uri -OutFile $OutFile -Headers @{
-        Referer      = (strip_filename $Uri);
-        "User-Agent" = Get-UserAgent
-    }
-}
-
 function env($name,$global,$val='__get') {
     $target = 'User'; if($global) {$target = 'Machine'}
     if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
