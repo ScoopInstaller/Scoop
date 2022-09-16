@@ -17,6 +17,7 @@
 
 ### Code Refactoring
 
+- **download:** Rename `dl()` to `Invoke-Download()` ([[#5143](https://github.com/ScoopInstaller/Scoop/issues/5143)])
 - **path:** Use 'Convert-Path()' instead of 'Resolve-Path()' ([#5109](https://github.com/ScoopInstaller/Scoop/issues/5109))
 - **scoop-shim:** Use `getopt` to parse arguments ([#5125](https://github.com/ScoopInstaller/Scoop/issues/5125))
 
