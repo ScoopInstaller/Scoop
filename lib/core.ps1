@@ -588,13 +588,6 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function dl($url,$to) {
-    $wc = New-Object Net.Webclient
-    $wc.headers.add('Referer', (strip_filename $url))
-    $wc.Headers.Add('User-Agent', (Get-UserAgent))
-    $wc.downloadFile($url,$to)
-}
-
 function env($name,$global,$val='__get') {
     $target = 'User'; if($global) {$target = 'Machine'}
     if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
