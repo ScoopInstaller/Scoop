@@ -62,6 +62,13 @@ function test_dl([String] $url, $cookies) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
     }
+
+    get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
+        (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
+            $wreq.Headers[$_.Key] = $_.Value
+        }
+    }
+
     $wres = $null
     try {
         $wres = $wreq.GetResponse()
