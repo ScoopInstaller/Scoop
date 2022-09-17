@@ -51,7 +51,7 @@
 #       When a conflict is detected during updating, Scoop will auto-stash the uncommitted changes.
 #       (Default is $false, which will abort the update)
 #
-# default_architecture: 64bit|32bit
+# default_architecture: 64bit|32bit|arm64
 #       Allow to configure preferred architecture for application installation.
 #       If not specified, architecture is determined be system.
 #

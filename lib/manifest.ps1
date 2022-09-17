@@ -104,7 +104,11 @@ function install_info($app, $version, $global) {
 
 function default_architecture {
     $arch = get_config DEFAULT_ARCHITECTURE
-    $system = if ([Environment]::Is64BitOperatingSystem) { '64bit' } else { '32bit' }
+    $system = if ([Environment]::Is64BitOperatingSystem) {
+        if ($env:PROCESSOR_IDENTIFIER -like 'ARMv*') { 'arm64' } else { '64bit' }
+    } else {
+        '32bit'
+    }
     if ($null -eq $arch) {
         $arch = $system
     } else {

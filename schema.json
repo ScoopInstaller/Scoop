@@ -227,6 +227,9 @@
                         },
                         "64bit": {
                             "$ref": "#/definitions/autoupdateArch"
+                        },
+                        "arm64": {
+                            "$ref": "#/definitions/autoupdateArch"
                         }
                     }
                 },
@@ -511,6 +514,9 @@
                 },
                 "64bit": {
                     "$ref": "#/definitions/architecture"
+                },
+                "arm64": {
+                    "$ref": "#/definitions/architecture"
                 }
             },
             "type": "object"
@@ -627,6 +633,11 @@
                         }
                     },
                     "32bit": {
+                        "properties": {
+                            "url": false
+                        }
+                    },
+                    "arm64": {
                         "properties": {
                             "url": false
                         }

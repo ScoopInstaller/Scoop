@@ -17,7 +17,8 @@
 #   -f, --force               Force download (overwrite cache)
 #   -h, --no-hash-check       Skip hash verification (use with caution!)
 #   -u, --no-update-scoop     Don't update Scoop before downloading if it's outdated
-#   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
+#   -a, --arch <32bit|64bit   Use the specified architecture,
+#               |arm64>       if the app supports it
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' (indirectly)

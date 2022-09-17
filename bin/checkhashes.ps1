@@ -79,6 +79,8 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
         hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
         script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
         hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
+        script:url $manifest 'arm64' | ForEach-Object { $urls += $_ }
+        hash $manifest 'arm64' | ForEach-Object { $hashes += $_ }
     } else {
         err $name 'Manifest does not contain URL property.'
         continue

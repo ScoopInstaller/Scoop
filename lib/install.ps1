@@ -1046,7 +1046,7 @@ function Invoke-HookScript {
         [ValidateNotNullOrEmpty()]
         [PSCustomObject] $Manifest,
         [Parameter(Mandatory = $true)]
-        [ValidateSet('32bit', '64bit')]
+        [ValidateSet('32bit', '64bit', 'arm64')]
         [String] $Arch
     )
 
