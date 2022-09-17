@@ -25,10 +25,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         $check_hash = $false
     }
 
-    if(!(supports_architecture $manifest $architecture)) {
-        write-host -f DarkRed "'$app' doesn't support $architecture architecture!"
-        return
-    }
+    $is_supported, $architecture = supports_architecture $manifest $architecture
+    if (!$is_supported) { return }
 
     if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
         Write-Host "Manifest: $app.json"

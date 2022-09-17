@@ -133,7 +133,42 @@ function arch_specific($prop, $manifest, $architecture) {
 }
 
 function supports_architecture($manifest, $architecture) {
-    return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
+    $man_arch = $manifest.architecture
+    switch ($architecture) {
+        'arm64' {
+            if ($man_arch -and $man_arch.arm64.url) {
+                return $true, 'arm64'
+            } elseif ($man_arch -and $man_arch.'64bit'.url) {
+                info "ARM64 architecture not available. Falling back to x86_64."
+                return $true, '64bit'
+            } elseif (($man_arch -and $man_arch.'32bit'.url) -or $manifest.url) {
+                info "ARM64 architecture not available. Falling back to x86_32."
+                return $true, '32bit'
+            } else {
+                error "No compatible URL found."
+                return $false, $architecture
+            }
+        }
+        '64bit' {
+            if ($man_arch -and $man_arch.'64bit'.url) {
+                return $true, '64bit'
+            } elseif (($man_arch -and $man_arch.'32bit'.url) -or $manifest.url) {
+                info "x86_64 architecture not available. Falling back to x86_32."
+                return $true, '32bit'
+            } else {
+                error "No compatible URL found."
+                return $false, $architecture
+            }
+        }
+        '32bit' {
+            if (($man_arch -and $man_arch.'32bit'.url) -or $manifest.url) {
+                return $true, '32bit'
+            } else {
+                error "No compatible URL found."
+                return $false, $architecture
+            }
+        }
+    }
 }
 
 function generate_user_manifest($app, $bucket, $version) {
