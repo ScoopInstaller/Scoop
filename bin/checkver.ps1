@@ -187,6 +187,7 @@ $Queue | ForEach-Object {
 
     $state = New-Object psobject @{
         app      = $name;
+        file     = $file;
         url      = $url;
         regex    = $regex;
         json     = $json;
@@ -214,6 +215,7 @@ while ($in_progress -gt 0) {
 
     $state = $ev.SourceEventArgs.UserState
     $app = $state.app
+    $file = $state.file
     $json = $state.json
     $url = $state.url
     $regexp = $state.regex
