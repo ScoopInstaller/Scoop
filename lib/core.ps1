@@ -402,6 +402,12 @@ function app_status($app, $global) {
         } else {
             $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)
         }
+        # If check_nightly_outdated is $true, checks for an outdated nightly app based on install datetime
+        # Date format is from nightly_version() in install.ps1
+        if (!($status.outdated) -and (get_config 'check_nightly_outdated' $false) -and ($status.version -like 'nightly-\d{8}')) {
+            $current_nightly_date = [datetime]::ParseExact($status.version.substring(8), 'yyyyMMdd', $null)
+            $status.outdated = $current_nightly_date -lt (Get-Date).AddDays(-1);
+        }
     }
 
     $status.missing_deps = @()

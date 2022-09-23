@@ -111,6 +111,10 @@
 #       Should be in the format 'YYYY-MM-DD', 'YYYY/MM/DD' or any other forms that accepted by '[System.DateTime]::Parse()'.
 #       Ref: https://docs.microsoft.com/dotnet/api/system.datetime.parse?view=netframework-4.5#StringToParse
 #
+# check_nightly_outdated:
+#       When set to $false (default), Scoop does not attempt to check if apps versioned as 'nightly' are outdated.
+#       When set to $true, Scoop attempts to check the installation date of apps versioned as 'nightly',
+#       and if it has been a day since that passed, Scoop will seek a new update for that app.
 # ARIA2 configuration
 # -------------------
 #
