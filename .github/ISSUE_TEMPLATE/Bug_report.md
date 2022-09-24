@@ -31,9 +31,9 @@ labels: "bug"
 
 ### System details
 
-**Windows version:** [e.g. 7, 8, 10]
+**Windows version:** [e.g. 7, 8, 10, 11]
 
-**OS architecture:** [e.g. 32bit, 64bit]
+**OS architecture:** [e.g. 32bit, 64bit, arm64]
 
 **PowerShell version:** [output of `"$($PSVersionTable.PSVersion)"`]
 

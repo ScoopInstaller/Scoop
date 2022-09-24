@@ -173,7 +173,7 @@ foreach ($current in $MANIFESTS) {
             }
             if ($platforms.Contains('arm64')) {
                 $arm64_count = $current.manifest.architecture.'arm64'.hash.Count
-                $current.manifest.architecture.'arm64'.hash = $actuals[($64bit_count + $32bit_count)..($64bit_count + $32bit_count + $arm64_count -1)]
+                $current.manifest.architecture.'arm64'.hash = $actuals[($64bit_count + $32bit_count)..($64bit_count + $32bit_count + $arm64_count - 1)]
             }
         }
 
