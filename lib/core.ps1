@@ -1263,5 +1263,8 @@ $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$env:ProgramData\scoo
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
+# OS information
+$WindowsBuild = [System.Environment]::OSVersion.Version.Build
+
 # Setup proxy globally
 setup_proxy

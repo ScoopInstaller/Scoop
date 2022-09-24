@@ -89,8 +89,11 @@ foreach ($curr_app in $apps) {
         $curr_check_hash = $false
     }
 
-    $is_supported, $architecture = supports_architecture $manifest $architecture
-    if (!$is_supported) { continue }
+    $architecture = Get-SupportedArchitecture $manifest $architecture
+    if ($null -eq $architecture) {
+        error "'$app' doesn't support current architecture!"
+        continue
+    }
 
     if(Test-Aria2Enabled) {
         Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash

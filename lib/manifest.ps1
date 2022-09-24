@@ -111,42 +111,21 @@ function arch_specific($prop, $manifest, $architecture) {
     if ($manifest.$prop) { return $manifest.$prop }
 }
 
-function supports_architecture($manifest, $architecture) {
-    $man_arch = $manifest.architecture
-    switch ($architecture) {
-        'arm64' {
-            if ($man_arch -and $man_arch.arm64.url) {
-                return $true, 'arm64'
-            } elseif ($man_arch -and $man_arch.'64bit'.url) {
-                info "ARM64 architecture not available. Falling back to x86_64."
-                return $true, '64bit'
-            } elseif (($man_arch -and $man_arch.'32bit'.url) -or $manifest.url) {
-                info "ARM64 architecture not available. Falling back to x86_32."
-                return $true, '32bit'
-            } else {
-                error "No compatible URL found."
-                return $false, $architecture
-            }
+function Get-SupportedArchitecture($manifest, $architecture) {
+    if ($architecture -eq 'arm64' -and ($manifest | ConvertToPrettyJson) -notmatch '[''"]arm64["'']') {
+        # Windows 10 enables existing unmodified x86 apps to run on Arm devices.
+        # Windows 11 adds the ability to run unmodified x64 Windows apps on Arm devices!
+        # Ref: https://learn.microsoft.com/en-us/windows/arm/overview
+        if ($WindowsBuild -ge 22000) {
+            # Windows 11
+            $architecture = '64bit'
+        } else {
+            # Windows 10
+            $architecture = '32bit'
         }
-        '64bit' {
-            if ($man_arch -and $man_arch.'64bit'.url) {
-                return $true, '64bit'
-            } elseif (($man_arch -and $man_arch.'32bit'.url) -or $manifest.url) {
-                info "x86_64 architecture not available. Falling back to x86_32."
-                return $true, '32bit'
-            } else {
-                error "No compatible URL found."
-                return $false, $architecture
-            }
-        }
-        '32bit' {
-            if (($man_arch -and $man_arch.'32bit'.url) -or $manifest.url) {
-                return $true, '32bit'
-            } else {
-                error "No compatible URL found."
-                return $false, $architecture
-            }
-        }
+    }
+    if (![String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))) {
+        return $architecture
     }
 }
 
