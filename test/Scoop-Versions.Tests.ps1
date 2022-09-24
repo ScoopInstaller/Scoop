@@ -1,7 +1,19 @@
 . "$PSScriptRoot\Scoop-TestLib.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
+. "$PSScriptRoot\..\lib\core.ps1"
 
 Describe 'versions comparison' -Tag 'Scoop' {
+
+    BeforeAll {
+        $configFile = "$env:TEMP\ScoopTestFixtures\config.json"
+        if (Test-Path $configFile) {
+            Remove-Item -Path $configFile -Force
+        }
+    }
+
+    BeforeEach {
+        $scoopConfig = $null
+    }
     Context 'semver compliant versions' {
         It 'handles major.minor.patch progressing' {
             Compare-Version '0.1.0' '0.1.1' | Should -Be 1
@@ -94,6 +106,14 @@ Describe 'versions comparison' -Tag 'Scoop' {
             Compare-Version '7.0.4-9' '7.0.4-9' | Should -Be 0
             Compare-Version 'nightly-20190801' 'nightly' | Should -Be 0
             Compare-Version 'nightly-20190801' 'nightly-20200801' | Should -Be 0
+            Compare-Version "nightly-$((Get-Date).AddDays(1).ToString("yyyyMMdd"))" 'nightly' | Should -Be 0
+            Compare-Version "nightly-$((Get-Date).AddDays(-1).ToString("yyyyMMdd"))" 'nightly' | Should -Be 0
+        }
+
+        It 'handles nightly versions when check_nightly_outdated is set' {
+            $scoopConfig = set_config 'check_nightly_outdated' $true
+            Compare-Version "nightly-$((Get-Date).AddDays(1).ToString("yyyyMMdd"))" 'nightly' | Should -Be 0
+            Compare-Version "nightly-$((Get-Date).AddDays(-1).ToString("yyyyMMdd"))" 'nightly' | Should -Be 1
         }
     }
 }
