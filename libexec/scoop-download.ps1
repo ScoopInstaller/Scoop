@@ -22,7 +22,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture' 'generate_user_manifest' 'Get-Manifest'
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'generate_user_manifest' 'Get-Manifest'
 . "$PSScriptRoot\..\lib\install.ps1"
 
 $opt, $apps, $err = getopt $args 'fhua:' 'force', 'no-hash-check', 'no-update-scoop', 'arch='
@@ -30,9 +30,9 @@ if ($err) { error "scoop download: $err"; exit 1 }
 
 $check_hash = !($opt.h -or $opt.'no-hash-check')
 $use_cache = !($opt.f -or $opt.force)
-$architecture = default_architecture
+$architecture = Get-DefaultArchitecture
 try {
-    $architecture = ensure_architecture ($opt.a + $opt.arch)
+    $architecture = Format-ArchitectureString ($opt.a + $opt.arch)
 } catch {
     abort "ERROR: $_"
 }

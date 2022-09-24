@@ -398,39 +398,39 @@ Describe 'app' -Tag 'Scoop' {
     }
 }
 
-Describe 'ensure_architecture' -Tag 'Scoop' {
+Describe 'Format Architecture String' -Tag 'Scoop' {
     It 'should keep correct architectures' {
-        ensure_architecture '32bit' | Should -Be '32bit'
-        ensure_architecture '32' | Should -Be '32bit'
-        ensure_architecture 'x86' | Should -Be '32bit'
-        ensure_architecture 'X86' | Should -Be '32bit'
-        ensure_architecture 'i386' | Should -Be '32bit'
-        ensure_architecture '386' | Should -Be '32bit'
-        ensure_architecture 'i686' | Should -Be '32bit'
+        Format-ArchitectureString '32bit' | Should -Be '32bit'
+        Format-ArchitectureString '32' | Should -Be '32bit'
+        Format-ArchitectureString 'x86' | Should -Be '32bit'
+        Format-ArchitectureString 'X86' | Should -Be '32bit'
+        Format-ArchitectureString 'i386' | Should -Be '32bit'
+        Format-ArchitectureString '386' | Should -Be '32bit'
+        Format-ArchitectureString 'i686' | Should -Be '32bit'
 
-        ensure_architecture '64bit' | Should -Be '64bit'
-        ensure_architecture '64' | Should -Be '64bit'
-        ensure_architecture 'x64' | Should -Be '64bit'
-        ensure_architecture 'X64' | Should -Be '64bit'
-        ensure_architecture 'amd64' | Should -Be '64bit'
-        ensure_architecture 'AMD64' | Should -Be '64bit'
-        ensure_architecture 'x86_64' | Should -Be '64bit'
-        ensure_architecture 'x86-64' | Should -Be '64bit'
+        Format-ArchitectureString '64bit' | Should -Be '64bit'
+        Format-ArchitectureString '64' | Should -Be '64bit'
+        Format-ArchitectureString 'x64' | Should -Be '64bit'
+        Format-ArchitectureString 'X64' | Should -Be '64bit'
+        Format-ArchitectureString 'amd64' | Should -Be '64bit'
+        Format-ArchitectureString 'AMD64' | Should -Be '64bit'
+        Format-ArchitectureString 'x86_64' | Should -Be '64bit'
+        Format-ArchitectureString 'x86-64' | Should -Be '64bit'
 
-        ensure_architecture 'arm64' | Should -Be 'arm64'
-        ensure_architecture 'arm' | Should -Be 'arm64'
-        ensure_architecture 'aarch64' | Should -Be 'arm64'
-        ensure_architecture 'ARM64' | Should -Be 'arm64'
-        ensure_architecture 'ARM' | Should -Be 'arm64'
-        ensure_architecture 'AARCH64' | Should -Be 'arm64'
+        Format-ArchitectureString 'arm64' | Should -Be 'arm64'
+        Format-ArchitectureString 'arm' | Should -Be 'arm64'
+        Format-ArchitectureString 'aarch64' | Should -Be 'arm64'
+        Format-ArchitectureString 'ARM64' | Should -Be 'arm64'
+        Format-ArchitectureString 'ARM' | Should -Be 'arm64'
+        Format-ArchitectureString 'AARCH64' | Should -Be 'arm64'
     }
 
     It 'should fallback to the default architecture on empty input' {
-        ensure_architecture '' | Should -Be $(default_architecture)
-        ensure_architecture $null | Should -Be $(default_architecture)
+        Format-ArchitectureString '' | Should -Be $(Get-DefaultArchitecture)
+        Format-ArchitectureString $null | Should -Be $(Get-DefaultArchitecture)
     }
 
     It 'should show an error with an invalid architecture' {
-        { ensure_architecture 'PPC' } | Should -Throw "Invalid architecture: 'ppc'"
+        { Format-ArchitectureString 'PPC' } | Should -Throw "Invalid architecture: 'ppc'"
     }
 }

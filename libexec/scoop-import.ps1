@@ -13,7 +13,7 @@ param(
 
 $import = $null
 $bucket_names = @()
-$def_arch = default_architecture
+$def_arch = Get-DefaultArchitecture
 
 if (Test-Path $scoopfile) {
     $import = parse_json $scoopfile

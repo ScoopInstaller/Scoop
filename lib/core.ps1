@@ -857,7 +857,7 @@ function ensure_in_path($dir, $global) {
     }
 }
 
-function default_architecture {
+function Get-DefaultArchitecture {
     $arch = get_config DEFAULT_ARCHITECTURE
     $system = if (${env:ProgramFiles(Arm)}) {
         'arm64'
@@ -870,7 +870,7 @@ function default_architecture {
         $arch = $system
     } else {
         try {
-            $arch = ensure_architecture $arch
+            $arch = Format-ArchitectureString $arch
         } catch {
             warn 'Invalid default architecture configured. Determining default system architecture'
             $arch = $system
@@ -879,16 +879,16 @@ function default_architecture {
     return $arch
 }
 
-function ensure_architecture($architecture_opt) {
-    if(!$architecture_opt) {
-        return default_architecture
+function Format-ArchitectureString($Architecture) {
+    if (!$Architecture) {
+        return Get-DefaultArchitecture
     }
-    $architecture_opt = $architecture_opt.ToString().ToLower()
-    switch($architecture_opt) {
-        { @('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64')  -contains $_ } { return '64bit' }
-        { @('32bit', '32', 'x86', 'i386', '386', 'i686')  -contains $_ } { return '32bit' }
-        { @('arm64', 'arm', 'aarch64')  -contains $_ } { return 'arm64' }
-        default { throw [System.ArgumentException] "Invalid architecture: '$architecture_opt'"}
+    $Architecture = $Architecture.ToString().ToLower()
+    switch ($Architecture) {
+        { @('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64') -contains $_ } { return '64bit' }
+        { @('32bit', '32', 'x86', 'i386', '386', 'i686') -contains $_ } { return '32bit' }
+        { @('arm64', 'arm', 'aarch64') -contains $_ } { return 'arm64' }
+        default { throw [System.ArgumentException] "Invalid architecture: '$Architecture'" }
     }
 }
 
