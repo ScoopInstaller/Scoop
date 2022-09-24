@@ -24,7 +24,7 @@ function Get-Encoding($wc) {
 }
 
 function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_IDENTIFIER -like 'ARMv*'){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
 }
 
 function Show-DeprecatedWarning {
@@ -857,6 +857,28 @@ function ensure_in_path($dir, $global) {
     }
 }
 
+function default_architecture {
+    $arch = get_config DEFAULT_ARCHITECTURE
+    $system = if (${env:ProgramFiles(Arm)}) {
+        'arm64'
+    } elseif ([System.Environment]::Is64BitOperatingSystem) {
+        '64bit'
+    } else {
+        '32bit'
+    }
+    if ($null -eq $arch) {
+        $arch = $system
+    } else {
+        try {
+            $arch = ensure_architecture $arch
+        } catch {
+            warn 'Invalid default architecture configured. Determining default system architecture'
+            $arch = $system
+        }
+    }
+    return $arch
+}
+
 function ensure_architecture($architecture_opt) {
     if(!$architecture_opt) {
         return default_architecture
@@ -865,7 +887,7 @@ function ensure_architecture($architecture_opt) {
     switch($architecture_opt) {
         { @('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64')  -contains $_ } { return '64bit' }
         { @('32bit', '32', 'x86', 'i386', '386', 'i686')  -contains $_ } { return '32bit' }
-        { @('arm64', 'armv8', 'aarch64')  -contains $_ } { return 'arm64' }
+        { @('arm64', 'arm', 'aarch64')  -contains $_ } { return 'arm64' }
         default { throw [System.ArgumentException] "Invalid architecture: '$architecture_opt'"}
     }
 }

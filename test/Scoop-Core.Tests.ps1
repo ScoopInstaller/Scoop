@@ -397,3 +397,40 @@ Describe 'app' -Tag 'Scoop' {
         $version | Should -Be '1.8.0-rc2'
     }
 }
+
+Describe 'ensure_architecture' -Tag 'Scoop' {
+    It 'should keep correct architectures' {
+        ensure_architecture '32bit' | Should -Be '32bit'
+        ensure_architecture '32' | Should -Be '32bit'
+        ensure_architecture 'x86' | Should -Be '32bit'
+        ensure_architecture 'X86' | Should -Be '32bit'
+        ensure_architecture 'i386' | Should -Be '32bit'
+        ensure_architecture '386' | Should -Be '32bit'
+        ensure_architecture 'i686' | Should -Be '32bit'
+
+        ensure_architecture '64bit' | Should -Be '64bit'
+        ensure_architecture '64' | Should -Be '64bit'
+        ensure_architecture 'x64' | Should -Be '64bit'
+        ensure_architecture 'X64' | Should -Be '64bit'
+        ensure_architecture 'amd64' | Should -Be '64bit'
+        ensure_architecture 'AMD64' | Should -Be '64bit'
+        ensure_architecture 'x86_64' | Should -Be '64bit'
+        ensure_architecture 'x86-64' | Should -Be '64bit'
+
+        ensure_architecture 'arm64' | Should -Be 'arm64'
+        ensure_architecture 'arm' | Should -Be 'arm64'
+        ensure_architecture 'aarch64' | Should -Be 'arm64'
+        ensure_architecture 'ARM64' | Should -Be 'arm64'
+        ensure_architecture 'ARM' | Should -Be 'arm64'
+        ensure_architecture 'AARCH64' | Should -Be 'arm64'
+    }
+
+    It 'should fallback to the default architecture on empty input' {
+        ensure_architecture '' | Should -Be $(default_architecture)
+        ensure_architecture $null | Should -Be $(default_architecture)
+    }
+
+    It 'should show an error with an invalid architecture' {
+        { ensure_architecture 'PPC' } | Should -Throw "Invalid architecture: 'ppc'"
+    }
+}

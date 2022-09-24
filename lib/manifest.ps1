@@ -102,27 +102,6 @@ function install_info($app, $version, $global) {
     parse_json $path
 }
 
-function default_architecture {
-    $arch = get_config DEFAULT_ARCHITECTURE
-    $system = if ([Environment]::Is64BitOperatingSystem) {
-        if ($env:PROCESSOR_IDENTIFIER -like 'ARMv*') { 'arm64' } else { '64bit' }
-    } else {
-        '32bit'
-    }
-    if ($null -eq $arch) {
-        $arch = $system
-    } else {
-        try {
-            $arch = ensure_architecture $arch
-        } catch {
-            warn 'Invalid default architecture configured. Determining default system architecture'
-            $arch = $system
-        }
-    }
-
-    return $arch
-}
-
 function arch_specific($prop, $manifest, $architecture) {
     if ($manifest.architecture) {
         $val = $manifest.architecture.$architecture.$prop
