@@ -114,6 +114,10 @@ if ($env:CI -eq $true) {
     }
 }
 
+if ($IsLinux -or $IsMacOS) {
+    $splat.ExcludeTag = 'Decompress'
+}
+
 # GitHub Actions / Local
 Write-Host 'Invoke-Pester' @splat
 $result = Invoke-Pester @splat
