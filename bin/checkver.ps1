@@ -121,18 +121,32 @@ $Queue | ForEach-Object {
     }
     Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
 
-    $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
-
-    $url = $json.homepage
+    # Not Specified
     if ($json.checkver.url) {
         $url = $json.checkver.url
+    } else {
+        $url = $json.homepage
     }
-    $regex = ''
+
+    if ($json.checkver.re) {
+        $regex = $json.checkver.re
+    } elseif ($json.checkver.regex) {
+        $regex = $json.checkver.regex
+    } else {
+        $regex = ''
+    }
+
     $jsonpath = ''
     $xpath = ''
     $replace = ''
     $useGithubAPI = $false
 
+    # GitHub
+    if ($regex) {
+        $githubRegex = $regex
+    } else {
+        $githubRegex = '/releases/tag/(?:v|V)?([\d.]+)'
+    }
     if ($json.checkver -eq 'github') {
         if (!$json.homepage.StartsWith('https://github.com/')) {
             error "$name checkver expects the homepage to be a github repository"
@@ -148,11 +162,38 @@ $Queue | ForEach-Object {
         if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
     }
 
-    if ($json.checkver.re) {
-        $regex = $json.checkver.re
+    # SourceForge
+    if ($regex) {
+        $sourceforgeRegex = $regex
+    } else {
+        $sourceforgeRegex = '(?!\.)([\d.]+)(?<=\d)'
     }
-    if ($json.checkver.regex) {
-        $regex = $json.checkver.regex
+    if ($json.checkver -eq 'sourceforge') {
+        if ($json.homepage -match '//(sourceforge|sf)\.net/projects/(?<project>[^/]+)(/files/(?<path>[^/]+))?|//(?<project>[^.]+)\.(sourceforge\.(net|io)|sf\.net)') {
+            $project = $Matches['project']
+            $path = $Matches['path']
+        } else {
+            $project = strip_ext $name
+        }
+        $url = "https://sourceforge.net/projects/$project/rss"
+        if ($path) {
+            $url = $url + '?path=/' + $path.TrimStart('/')
+        }
+        $regex = "CDATA\[/$path/.*?$sourceforgeRegex.*?\]".Replace('//', '/')
+    }
+    if ($json.checkver.sourceforge) {
+        if ($json.checkver.sourceforge -is [System.String] -and $json.checkver.sourceforge -match '(?<project>[\w-]*)(/(?<path>.*))?') {
+            $project = $Matches['project']
+            $path = $Matches['path']
+        } else {
+            $project = $json.checkver.sourceforge.project
+            $path = $json.checkver.sourceforge.path
+        }
+        $url = "https://sourceforge.net/projects/$project/rss"
+        if ($path) {
+            $url = $url + '?path=/' + $path.TrimStart('/')
+        }
+        $regex = "CDATA\[/$path/.*?$sourceforgeRegex.*?\]".Replace('//', '/')
     }
 
     if ($json.checkver.jp) {
@@ -165,7 +206,7 @@ $Queue | ForEach-Object {
         $xpath = $json.checkver.xpath
     }
 
-    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
+    if ($json.checkver.replace -is [System.String]) { # If `checkver` is [System.String], it has a method called `Replace`
         $replace = $json.checkver.replace
     }
 
