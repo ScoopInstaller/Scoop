@@ -23,7 +23,7 @@
 
 ### Builds
 
-- **checkver:** Implement SourceForge checkver functionality ([#5113](https://github.com/ScoopInstaller/Scoop/issues/5113))
+- **checkver:** Implement SourceForge checkver functionality ([#5113](https://github.com/ScoopInstaller/Scoop/issues/5113), [#5163](https://github.com/ScoopInstaller/Scoop/issues/5163))
 - **checkurls:** Allow checking URLs from private_hosts ([#5152](https://github.com/ScoopInstaller/Scoop/issues/5152))
 - **schema:** Set manifest schema to be stricter ([#5093](https://github.com/ScoopInstaller/Scoop/issues/5093))
 - **vscode:** Tweak VSCode setting ([#5149](https://github.com/ScoopInstaller/Scoop/issues/5149))
