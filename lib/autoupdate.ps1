@@ -267,7 +267,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     write-host -f Green $basename -NoNewline
     write-host -f DarkYellow ' to compute hashes!'
     try {
-        dl_with_cache $app $version $url $null $null $true
+        Invoke-CachedDownload $app $version $url $null $null $true
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"

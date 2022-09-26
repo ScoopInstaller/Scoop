@@ -588,13 +588,6 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function dl($url,$to) {
-    $wc = New-Object Net.Webclient
-    $wc.headers.add('Referer', (strip_filename $url))
-    $wc.Headers.Add('User-Agent', (Get-UserAgent))
-    $wc.downloadFile($url,$to)
-}
-
 function env($name,$global,$val='__get') {
     $target = 'User'; if($global) {$target = 'Machine'}
     if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
@@ -717,7 +710,7 @@ function shim($path, $global, $name, $arg) {
     Push-Location $abs_shimdir
     $relative_path = Resolve-Path -Relative $path
     Pop-Location
-    $resolved_path = Resolve-Path $path
+    $resolved_path = Convert-Path $path
 
     if ($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell

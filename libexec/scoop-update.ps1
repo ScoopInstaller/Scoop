@@ -225,12 +225,12 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # Remove and replace whole region after proper fix
     Write-Host "Downloading new version"
     if (Test-Aria2Enabled) {
-        dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
         $urls = script:url $manifest $architecture
 
         foreach ($url in $urls) {
-            dl_with_cache $app $version $url $null $manifest.cookie $true
+            Invoke-CachedDownload $app $version $url $null $manifest.cookie $true
 
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
@@ -276,6 +276,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # as the reference directory. Otherwise it will just be the version
     # directory.
     $refdir = unlink_current $dir
+
+    uninstall_psmodule $old_manifest $refdir $global
 
     if ($force -and ($old_version -eq $version)) {
         if (!(Test-Path "$dir/../_$version.old")) {

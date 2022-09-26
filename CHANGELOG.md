@@ -2,6 +2,7 @@
 
 ### Features
 
+- **getopt:** Support option terminator (`--`) ([#5121](https://github.com/ScoopInstaller/Scoop/issues/5121))
 - **scoop-(un)hold:** Support `scoop (un)hold scoop` ([#5089](https://github.com/ScoopInstaller/Scoop/issues/5089))
 - **scoop-config:** Allow 'hold_update_until' be set manually ([#5100](https://github.com/ScoopInstaller/Scoop/issues/5100))
 - **scoop-update:** Stash uncommitted changes before update ([#5091](https://github.com/ScoopInstaller/Scoop/issues/5091))
@@ -10,11 +11,22 @@
 ### Bug Fixes
 
 - **config:** Change config option to snake_case in file and SCREAMING_CASE in code ([#5116](https://github.com/ScoopInstaller/Scoop/issues/5116))
+- **jsonpath:** Prevent converting date string to DateTime in JSONPath ([#5130](https://github.com/ScoopInstaller/Scoop/issues/5130))
+- **psmodule:** Remove folder recursively when unlinking previous module path ([#5127](https://github.com/ScoopInstaller/Scoop/issues/5127))
+- **scoop-update:** Add `uninstall_psmodule` to update process ([#5136](https://github.com/ScoopInstaller/Scoop/pull/5136))
+
+### Code Refactoring
+
+- **download:** Rename `dl()` to `Invoke-Download()` ([[#5143](https://github.com/ScoopInstaller/Scoop/issues/5143)])
+- **path:** Use 'Convert-Path()' instead of 'Resolve-Path()' ([#5109](https://github.com/ScoopInstaller/Scoop/issues/5109))
+- **scoop-shim:** Use `getopt` to parse arguments ([#5125](https://github.com/ScoopInstaller/Scoop/issues/5125))
 
 ### Builds
 
 - **checkver:** Implement SourceForge checkver functionality ([#5113](https://github.com/ScoopInstaller/Scoop/issues/5113))
-- **schema**: Set manifest schema to be stricter ([#5093](https://github.com/ScoopInstaller/Scoop/issues/5093))
+- **checkurls:** Allow checking URLs from private_hosts ([#5152](https://github.com/ScoopInstaller/Scoop/issues/5152))
+- **schema:** Set manifest schema to be stricter ([#5093](https://github.com/ScoopInstaller/Scoop/issues/5093))
+- **vscode:** Tweak VSCode setting ([#5149](https://github.com/ScoopInstaller/Scoop/issues/5149))
 
 ## [v0.2.4](https://github.com/ScoopInstaller/Scoop/compare/v0.2.3...v0.2.4) - 2022-08-08
 
