@@ -114,7 +114,7 @@
 # check_nightly_outdated:
 #       When set to $false (default), Scoop does not attempt to check if apps versioned as 'nightly' are outdated.
 #       When set to $true, Scoop attempts to check the installation date of apps versioned as 'nightly',
-#       and if it has been a day since that passed, Scoop will seek a new update for that app.
+#       and if said date is a day old, Scoop will consider that app as outdated,.
 #
 # ARIA2 configuration
 # -------------------

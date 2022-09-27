@@ -9,6 +9,7 @@
 - **scoop-update:** Stash uncommitted changes before update ([#5091](https://github.com/ScoopInstaller/Scoop/issues/5091))
 - **install:** Show the running process ([#5102](https://github.com/ScoopInstaller/Scoop/issues/5102))
 - **subdir:** Allow subdir in 'bucket' ([#5119](https://github.com/ScoopInstaller/Scoop/issues/5119))
+- **scoop-config:** Allow Scoop to optionally check if a nightly program as outdated by checking if the version number is a date older than 1 day ([#4077](https://github.com/ScoopInstaller/Scoop/issues/4077))
 
 ### Bug Fixes
 
