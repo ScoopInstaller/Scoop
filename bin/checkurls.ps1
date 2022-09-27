@@ -98,6 +98,7 @@ foreach ($man in $Queue) {
     } else {
         script:url $manifest '64bit' | ForEach-Object { $urls += $_ }
         script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
+        script:url $manifest 'arm64' | ForEach-Object { $urls += $_ }
     }
 
     $urls | ForEach-Object {

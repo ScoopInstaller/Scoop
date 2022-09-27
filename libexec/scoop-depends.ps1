@@ -3,16 +3,16 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture'
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' (indirectly)
 
 $opt, $apps, $err = getopt $args 'a:' 'arch='
 $app = $apps[0]
 
 if(!$app) { error '<app> missing'; my_usage; exit 1 }
 
-$architecture = default_architecture
+$architecture = Get-DefaultArchitecture
 try {
-    $architecture = ensure_architecture ($opt.a + $opt.arch)
+    $architecture = Format-ArchitectureString ($opt.a + $opt.arch)
 } catch {
     abort "ERROR: $_"
 }

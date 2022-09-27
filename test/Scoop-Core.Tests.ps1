@@ -397,3 +397,40 @@ Describe 'app' -Tag 'Scoop' {
         $version | Should -Be '1.8.0-rc2'
     }
 }
+
+Describe 'Format Architecture String' -Tag 'Scoop' {
+    It 'should keep correct architectures' {
+        Format-ArchitectureString '32bit' | Should -Be '32bit'
+        Format-ArchitectureString '32' | Should -Be '32bit'
+        Format-ArchitectureString 'x86' | Should -Be '32bit'
+        Format-ArchitectureString 'X86' | Should -Be '32bit'
+        Format-ArchitectureString 'i386' | Should -Be '32bit'
+        Format-ArchitectureString '386' | Should -Be '32bit'
+        Format-ArchitectureString 'i686' | Should -Be '32bit'
+
+        Format-ArchitectureString '64bit' | Should -Be '64bit'
+        Format-ArchitectureString '64' | Should -Be '64bit'
+        Format-ArchitectureString 'x64' | Should -Be '64bit'
+        Format-ArchitectureString 'X64' | Should -Be '64bit'
+        Format-ArchitectureString 'amd64' | Should -Be '64bit'
+        Format-ArchitectureString 'AMD64' | Should -Be '64bit'
+        Format-ArchitectureString 'x86_64' | Should -Be '64bit'
+        Format-ArchitectureString 'x86-64' | Should -Be '64bit'
+
+        Format-ArchitectureString 'arm64' | Should -Be 'arm64'
+        Format-ArchitectureString 'arm' | Should -Be 'arm64'
+        Format-ArchitectureString 'aarch64' | Should -Be 'arm64'
+        Format-ArchitectureString 'ARM64' | Should -Be 'arm64'
+        Format-ArchitectureString 'ARM' | Should -Be 'arm64'
+        Format-ArchitectureString 'AARCH64' | Should -Be 'arm64'
+    }
+
+    It 'should fallback to the default architecture on empty input' {
+        Format-ArchitectureString '' | Should -Be $(Get-DefaultArchitecture)
+        Format-ArchitectureString $null | Should -Be $(Get-DefaultArchitecture)
+    }
+
+    It 'should show an error with an invalid architecture' {
+        { Format-ArchitectureString 'PPC' } | Should -Throw "Invalid architecture: 'ppc'"
+    }
+}

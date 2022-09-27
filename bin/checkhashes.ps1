@@ -79,6 +79,8 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
         hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
         script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
         hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
+        script:url $manifest 'arm64' | ForEach-Object { $urls += $_ }
+        hash $manifest 'arm64' | ForEach-Object { $hashes += $_ }
     } else {
         err $name 'Manifest does not contain URL property.'
         continue
@@ -158,16 +160,20 @@ foreach ($current in $MANIFESTS) {
             # Defaults to zero, don't know, which architecture is available
             $64bit_count = 0
             $32bit_count = 0
+            $arm64_count = 0
 
+            # 64bit is get, donwloaded and added first
             if ($platforms.Contains('64bit')) {
                 $64bit_count = $current.manifest.architecture.'64bit'.hash.Count
-                # 64bit is get, donwloaded and added first
                 $current.manifest.architecture.'64bit'.hash = $actuals[0..($64bit_count - 1)]
             }
             if ($platforms.Contains('32bit')) {
                 $32bit_count = $current.manifest.architecture.'32bit'.hash.Count
-                $max = $64bit_count + $32bit_count - 1 # Edge case if manifest contains 64bit and 32bit.
-                $current.manifest.architecture.'32bit'.hash = $actuals[($64bit_count)..$max]
+                $current.manifest.architecture.'32bit'.hash = $actuals[($64bit_count)..($64bit_count + $32bit_count - 1)]
+            }
+            if ($platforms.Contains('arm64')) {
+                $arm64_count = $current.manifest.architecture.'arm64'.hash.Count
+                $current.manifest.architecture.'arm64'.hash = $actuals[($64bit_count + $32bit_count)..($64bit_count + $32bit_count + $arm64_count - 1)]
             }
         }
 

@@ -25,8 +25,9 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         $check_hash = $false
     }
 
-    if(!(supports_architecture $manifest $architecture)) {
-        write-host -f DarkRed "'$app' doesn't support $architecture architecture!"
+    $architecture = Get-SupportedArchitecture $manifest $architecture
+    if ($null -eq $architecture) {
+        error "'$app' doesn't support current architecture!"
         return
     }
 
@@ -1046,7 +1047,7 @@ function Invoke-HookScript {
         [ValidateNotNullOrEmpty()]
         [PSCustomObject] $Manifest,
         [Parameter(Mandatory = $true)]
-        [ValidateSet('32bit', '64bit')]
+        [ValidateSet('32bit', '64bit', 'arm64')]
         [String] $Arch
     )
 

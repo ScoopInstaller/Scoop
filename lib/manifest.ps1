@@ -102,23 +102,6 @@ function install_info($app, $version, $global) {
     parse_json $path
 }
 
-function default_architecture {
-    $arch = get_config DEFAULT_ARCHITECTURE
-    $system = if ([Environment]::Is64BitOperatingSystem) { '64bit' } else { '32bit' }
-    if ($null -eq $arch) {
-        $arch = $system
-    } else {
-        try {
-            $arch = ensure_architecture $arch
-        } catch {
-            warn 'Invalid default architecture configured. Determining default system architecture'
-            $arch = $system
-        }
-    }
-
-    return $arch
-}
-
 function arch_specific($prop, $manifest, $architecture) {
     if ($manifest.architecture) {
         $val = $manifest.architecture.$architecture.$prop
@@ -128,8 +111,22 @@ function arch_specific($prop, $manifest, $architecture) {
     if ($manifest.$prop) { return $manifest.$prop }
 }
 
-function supports_architecture($manifest, $architecture) {
-    return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
+function Get-SupportedArchitecture($manifest, $architecture) {
+    if ($architecture -eq 'arm64' -and ($manifest | ConvertToPrettyJson) -notmatch '[''"]arm64["'']') {
+        # Windows 10 enables existing unmodified x86 apps to run on Arm devices.
+        # Windows 11 adds the ability to run unmodified x64 Windows apps on Arm devices!
+        # Ref: https://learn.microsoft.com/en-us/windows/arm/overview
+        if ($WindowsBuild -ge 22000) {
+            # Windows 11
+            $architecture = '64bit'
+        } else {
+            # Windows 10
+            $architecture = '32bit'
+        }
+    }
+    if (![String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))) {
+        return $architecture
+    }
 }
 
 function generate_user_manifest($app, $bucket, $version) {

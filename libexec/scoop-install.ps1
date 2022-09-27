@@ -14,17 +14,17 @@
 #      scoop install \path\to\app.json
 #
 # Options:
-#   -g, --global              Install the app globally
-#   -i, --independent         Don't install dependencies automatically
-#   -k, --no-cache            Don't use the download cache
-#   -u, --no-update-scoop     Don't update Scoop before installing if it's outdated
-#   -s, --skip                Skip hash validation (use with caution!)
-#   -a, --arch <32bit|64bit>  Use the specified architecture, if the app supports it
+#   -g, --global                    Install the app globally
+#   -i, --independent               Don't install dependencies automatically
+#   -k, --no-cache                  Don't use the download cache
+#   -u, --no-update-scoop           Don't update Scoop before installing if it's outdated
+#   -s, --skip                      Skip hash validation (use with caution!)
+#   -a, --arch <32bit|64bit|arm64>  Use the specified architecture, if the app supports it
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' 'manifest.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'default_architecture' 'generate_user_manifest' 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'generate_user_manifest' 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
@@ -39,9 +39,9 @@ $global = $opt.g -or $opt.global
 $check_hash = !($opt.s -or $opt.skip)
 $independent = $opt.i -or $opt.independent
 $use_cache = !($opt.k -or $opt.'no-cache')
-$architecture = default_architecture
+$architecture = Get-DefaultArchitecture
 try {
-    $architecture = ensure_architecture ($opt.a + $opt.arch)
+    $architecture = Format-ArchitectureString ($opt.a + $opt.arch)
 } catch {
     abort "ERROR: $_"
 }

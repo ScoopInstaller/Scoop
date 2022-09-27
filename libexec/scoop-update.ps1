@@ -191,7 +191,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $install = install_info $app $old_version $global
 
     # re-use architecture, bucket and url from first install
-    $architecture = ensure_architecture $install.architecture
+    $architecture = Format-ArchitectureString $install.architecture
     $bucket = $install.bucket
     if ($null -eq $bucket) {
         $bucket = 'main'
