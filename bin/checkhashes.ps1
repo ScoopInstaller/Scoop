@@ -60,9 +60,10 @@ function err ([String] $name, [String[]] $message) {
 }
 
 $MANIFESTS = @()
-foreach ($single in Get-ChildItem $Dir "$App.json") {
-    $name = (strip_ext $single.Name)
-    $manifest = parse_json "$Dir\$($single.Name)"
+foreach ($single in Get-ChildItem $Dir -Filter "$App.json" -Recurse) {
+    $name = $single.BaseName
+    $file = $single.FullName
+    $manifest = parse_json $file
 
     # Skip nighly manifests, since their hash validation is skipped
     if ($manifest.version -eq 'nightly') { continue }
@@ -94,6 +95,7 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
 
     $MANIFESTS += @{
         app      = $name
+        file     = $file
         manifest = $manifest
         urls     = $urls
         hashes   = $hashes
@@ -180,7 +182,7 @@ foreach ($current in $MANIFESTS) {
         Write-Host "Writing updated $($current.app) manifest" -ForegroundColor DarkGreen
 
         $current.manifest = $current.manifest | ConvertToPrettyJson
-        $path = Convert-Path "$Dir\$($current.app).json"
+        $path = Convert-Path $current.file
         [System.IO.File]::WriteAllLines($path, $current.manifest)
     }
 }

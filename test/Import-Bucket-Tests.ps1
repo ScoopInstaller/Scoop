@@ -82,7 +82,7 @@ Describe 'manifest validates against the schema' -Tag 'Manifests' {
             }
             $changed_manifests = (Get-GitChangedFile -Path $repo_dir -Include '*.json' -Commit $commit)
         }
-        $manifest_files = Get-ChildItem $bucketdir *.json
+        $manifest_files = Get-ChildItem $bucketdir -Filter '*.json' -Recurse
         $validator = New-Object Scoop.Validator($schema, $true)
     }
 

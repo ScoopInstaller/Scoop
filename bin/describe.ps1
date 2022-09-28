@@ -27,9 +27,9 @@ param(
 $Dir = Convert-Path $Dir
 $Queue = @()
 
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $manifest = parse_json "$Dir\$($_.Name)"
-    $Queue += , @(($_.Name -replace '\.json$', ''), $manifest)
+Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
+    $manifest = parse_json $_.FullName
+    $Queue += , @($_.BaseName, $manifest)
 }
 
 $Queue | ForEach-Object {

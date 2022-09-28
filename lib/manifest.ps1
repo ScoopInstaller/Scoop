@@ -1,9 +1,9 @@
 function manifest_path($app, $bucket) {
-    fullpath "$(Find-BucketDirectory $bucket)\$(sanitary_path $app).json"
+    (Get-ChildItem (Find-BucketDirectory $bucket) -Filter "$(sanitary_path $app).json" -Recurse).FullName
 }
 
 function parse_json($path) {
-    if (!(Test-Path $path)) { return $null }
+    if ($null -eq $path -or !(Test-Path $path)) { return $null }
     try {
         Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     } catch {
@@ -142,10 +142,10 @@ function generate_user_manifest($app, $bucket, $version) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
-    ensure $(usermanifestsdir) | out-null
+    ensure (usermanifestsdir) | out-null
     try {
-        Invoke-AutoUpdate $app "$(Convert-Path (usermanifestsdir))" $manifest $version $(@{ })
-        return "$(Convert-Path (usermanifest $app))"
+        Invoke-AutoUpdate $app "$(Convert-Path (usermanifestsdir))\$app.json" $manifest $version $(@{ })
+        return Convert-Path (usermanifest $app)
     } catch {
         write-host -f darkred "Could not install $app@$version"
     }

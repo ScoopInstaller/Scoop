@@ -33,9 +33,9 @@ param(
 $Dir = Convert-Path $Dir
 $Queue = @()
 
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $manifest = parse_json "$Dir\$($_.Name)"
-    $Queue += , @($_.Name, $manifest)
+Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
+    $manifest = parse_json $_.FullName
+    $Queue += , @($_.BaseName, $manifest)
 }
 
 Write-Host '[' -NoNewLine
@@ -133,7 +133,7 @@ foreach ($man in $Queue) {
         Write-Host $failed -NoNewLine -ForegroundColor Red
     }
     Write-Host '] ' -NoNewLine
-    Write-Host (strip_ext $name)
+    Write-Host $name
 
     $errors | ForEach-Object {
         Write-Host "       > $_" -ForegroundColor DarkRed

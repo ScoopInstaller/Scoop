@@ -78,10 +78,10 @@ param(
 
 if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
     $Dir = Split-Path $App
-    $files = Get-ChildItem $Dir (Split-Path $App -Leaf)
+    $files = Get-ChildItem $Dir -Filter (Split-Path $App -Leaf)
 } elseif ($Dir) {
     $Dir = Convert-Path $Dir
-    $files = Get-ChildItem $Dir "$App.json"
+    $files = Get-ChildItem $Dir -Filter "$App.json" -Recurse
 } else {
     throw "'-Dir' parameter required if '-App' is not a filepath!"
 }
@@ -97,9 +97,10 @@ if ($App -eq '*' -and $Version -ne '') {
 $Queue = @()
 $json = ''
 $files | ForEach-Object {
-    $json = parse_json "$Dir\$($_.Name)"
+    $file = $_.FullName
+    $json = parse_json $file
     if ($json.checkver) {
-        $Queue += , @($_.Name, $json)
+        $Queue += , @($_.BaseName, $json, $file)
     }
 }
 
@@ -109,7 +110,7 @@ Get-EventSubscriber | Unregister-Event
 
 # start all downloads
 $Queue | ForEach-Object {
-    $name, $json = $_
+    $name, $json, $file = $_
 
     $substitutions = Get-VersionSubstitution $json.version # 'autoupdate.ps1'
 
@@ -226,7 +227,8 @@ $Queue | ForEach-Object {
     $url = substitute $url $substitutions
 
     $state = New-Object psobject @{
-        app      = (strip_ext $name);
+        app      = $name;
+        file     = $file;
         url      = $url;
         regex    = $regex;
         json     = $json;
@@ -254,6 +256,7 @@ while ($in_progress -gt 0) {
 
     $state = $ev.SourceEventArgs.UserState
     $app = $state.app
+    $file = $state.file
     $json = $state.json
     $url = $state.url
     $regexp = $state.regex
@@ -360,7 +363,7 @@ while ($in_progress -gt 0) {
     # Skip actual only if versions are same and there is no -f
     if (($ver -eq $expected_ver) -and !$ForceUpdate -and $SkipUpdated) { continue }
 
-    Write-Host "$App`: " -NoNewline
+    Write-Host "$app`: " -NoNewline
 
     # version hasn't changed (step over if forced update)
     if ($ver -eq $expected_ver -and !$ForceUpdate) {
@@ -386,7 +389,7 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
-            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable # 'autoupdate.ps1'
+            Invoke-AutoUpdate $app $file $json $ver $matchesHashtable # 'autoupdate.ps1'
         } catch {
             if ($ThrowError) {
                 throw $_
