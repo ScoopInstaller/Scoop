@@ -106,14 +106,17 @@ Describe 'versions comparison' -Tag 'Scoop' {
             Compare-Version '7.0.4-9' '7.0.4-9' | Should -Be 0
             Compare-Version 'nightly-20190801' 'nightly' | Should -Be 0
             Compare-Version 'nightly-20190801' 'nightly-20200801' | Should -Be 0
-            Compare-Version "nightly-$((Get-Date).AddDays(1).ToString("yyyyMMdd"))" 'nightly' | Should -Be 0
-            Compare-Version "nightly-$((Get-Date).AddDays(-1).ToString("yyyyMMdd"))" 'nightly' | Should -Be 0
         }
 
-        It 'handles nightly versions when check_nightly_outdated is set' {
+        It 'handles nightly versions with check_nightly_outdated' {
+            $date = Get-Date
+            $today = $date.ToString("yyyyMMdd")
+            $yesterday = $date.AddDays(-1).ToString("yyyyMMdd")
+            Compare-Version "nightly-$($today)" 'nightly' | Should -Be 0
+            Compare-Version "nightly-$($yesterday)" 'nightly' | Should -Be 0
             $scoopConfig = set_config 'check_nightly_outdated' $true
-            Compare-Version "nightly-$((Get-Date).AddDays(1).ToString("yyyyMMdd"))" 'nightly' | Should -Be 0
-            Compare-Version "nightly-$((Get-Date).AddDays(-1).ToString("yyyyMMdd"))" 'nightly' | Should -Be 1
+            Compare-Version "nightly-$($today)" 'nightly' | Should -Be 0
+            Compare-Version "nightly-$($yesterday)" 'nightly' | Should -Be 1
         }
     }
 }
