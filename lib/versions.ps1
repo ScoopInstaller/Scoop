@@ -153,7 +153,7 @@ function Compare-Version {
             # Date format taken from nightly_version() in install.ps1
             if (get_config 'check_nightly_outdated' $false) {
                 if ($splitReferenceVersion.Length -gt 1 -and $splitReferenceVersion[1] -match '\d{8}') {
-                    $reference_nightly_date = [datetime]::ParseExact($splitReferenceVersion[1], 'yyyyMMdd', $null)
+                    $reference_nightly_date = [System.DateTime]::ParseExact($splitReferenceVersion[1], 'yyyyMMdd', $null)
                     if ( $reference_nightly_date -lt (Get-Date).AddDays(-1) ) {
                         return 1
                     }
