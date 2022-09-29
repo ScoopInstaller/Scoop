@@ -149,7 +149,7 @@ function Compare-Version {
 
         # Nightly versions are always equal unless check_nightly_outdated is set
         if ($splitReferenceVersion[0] -eq 'nightly' -and $splitDifferenceVersion[0] -eq 'nightly') {
-            # Checks if reference nightly version date is older than a day.
+            # Assume difference nightly is newer if reference nightly version date is older than a day.
             # Date format taken from nightly_version() in install.ps1
             if (get_config 'check_nightly_outdated' $false) {
                 if ($splitReferenceVersion.Length -gt 1 -and $splitReferenceVersion[1] -match '\d{8}') {
