@@ -89,6 +89,7 @@ Describe 'versions comparison' -Tag 'Scoop' {
         BeforeEach {
             $scoopConfig = $null
         }
+
         It 'handles plain text string' {
             Compare-Version 'latest' '20150405' | Should -Be -1
             Compare-Version '0.5alpha' '0.5' | Should -Be 1
