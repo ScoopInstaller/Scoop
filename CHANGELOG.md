@@ -3,7 +3,7 @@
 ### Features
 
 - **install:** Add support for ARM64 architecture ([#5154](https://github.com/ScoopInstaller/Scoop/issues/5154))
-- **config:** Allow Scoop to check if apps versioned as 'nightly' are outdated ([#5167](https://github.com/ScoopInstaller/Scoop/issues/5167))
+- **config:** Allow Scoop to check if apps versioned as 'nightly' are outdated ([#5166](https://github.com/ScoopInstaller/Scoop/issues/5166))
 - **getopt:** Support option terminator (`--`) ([#5121](https://github.com/ScoopInstaller/Scoop/issues/5121))
 - **scoop-(un)hold:** Support `scoop (un)hold scoop` ([#5089](https://github.com/ScoopInstaller/Scoop/issues/5089))
 - **scoop-config:** Allow 'hold_update_until' be set manually ([#5100](https://github.com/ScoopInstaller/Scoop/issues/5100))
