@@ -3,17 +3,6 @@
 . "$PSScriptRoot\..\lib\core.ps1"
 
 Describe 'versions comparison' -Tag 'Scoop' {
-
-    BeforeAll {
-        $configFile = "$env:TEMP\ScoopTestFixtures\config.json"
-        if (Test-Path $configFile) {
-            Remove-Item -Path $configFile -Force
-        }
-    }
-
-    BeforeEach {
-        $scoopConfig = $null
-    }
     Context 'semver compliant versions' {
         It 'handles major.minor.patch progressing' {
             Compare-Version '0.1.0' '0.1.1' | Should -Be 1
@@ -90,6 +79,16 @@ Describe 'versions comparison' -Tag 'Scoop' {
     }
 
     Context 'other misc versions' {
+        BeforeAll {
+            $configFile = "$env:TEMP\ScoopTestFixtures\config.json"
+            if (Test-Path $configFile) {
+                Remove-Item -Path $configFile -Force
+            }
+        }
+
+        BeforeEach {
+            $scoopConfig = $null
+        }
         It 'handles plain text string' {
             Compare-Version 'latest' '20150405' | Should -Be -1
             Compare-Version '0.5alpha' '0.5' | Should -Be 1
