@@ -114,8 +114,8 @@
 # check_nightly_outdated: $true|$false
 #       While checking if an app version is old (e.g. for `scoop update *`), Scoop will
 #       check the date on apps whose installed versions are formatted as 'nightly-yyyyMMdd'.
-#       (For apps versioned as 'nightly', Scoop automatically appends the current date to
-#       their installed version in that format.)
+#       (For apps versioned as 'nightly', Scoop already automatically appends the
+#       current date to their installed version in that format.)
 #       If that date was more than a day ago, then Scoop considers the app outdated.
 #       Date format ref: 'https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings'
 #

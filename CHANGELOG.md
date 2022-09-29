@@ -6,10 +6,10 @@
 - **getopt:** Support option terminator (`--`) ([#5121](https://github.com/ScoopInstaller/Scoop/issues/5121))
 - **scoop-(un)hold:** Support `scoop (un)hold scoop` ([#5089](https://github.com/ScoopInstaller/Scoop/issues/5089))
 - **scoop-config:** Allow 'hold_update_until' be set manually ([#5100](https://github.com/ScoopInstaller/Scoop/issues/5100))
+- **scoop-config:** Allow Scoop to check if apps versioned as 'nightly' are outdated ([#4077](https://github.com/ScoopInstaller/Scoop/issues/4077))
 - **scoop-update:** Stash uncommitted changes before update ([#5091](https://github.com/ScoopInstaller/Scoop/issues/5091))
 - **install:** Show the running process ([#5102](https://github.com/ScoopInstaller/Scoop/issues/5102))
 - **subdir:** Allow subdir in 'bucket' ([#5119](https://github.com/ScoopInstaller/Scoop/issues/5119))
-- **scoop-config:** Allow Scoop to check if apps versioned as 'nightly' are outdated ([#4077](https://github.com/ScoopInstaller/Scoop/issues/4077))
 
 ### Bug Fixes
 
