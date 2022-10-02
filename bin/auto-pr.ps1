@@ -13,7 +13,7 @@
     Placeholders are supported.
 .PARAMETER CommitMessageFormat
     The format of the commit message.
-    <app> will repalce with the name of the name of manifest.
+    <app> will be replaced with the name of manifest.
 .PARAMETER Dir
     The directory where to search for manifests.
 .PARAMETER Push
