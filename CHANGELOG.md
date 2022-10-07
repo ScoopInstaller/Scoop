@@ -31,7 +31,7 @@
 - **checkurls:** Allow checking URLs from private_hosts ([#5152](https://github.com/ScoopInstaller/Scoop/issues/5152))
 - **schema:** Set manifest schema to be stricter ([#5093](https://github.com/ScoopInstaller/Scoop/issues/5093))
 - **vscode:** Tweak VSCode setting ([#5149](https://github.com/ScoopInstaller/Scoop/issues/5149))
-- **auto-pr:** add `CommitMessageFormat` option ([#5171](https://github.com/ScoopInstaller/Scoop/issues/5171))
+- **auto-pr:** Add `CommitMessageFormat` option ([#5171](https://github.com/ScoopInstaller/Scoop/issues/5171))
 
 ## [v0.2.4](https://github.com/ScoopInstaller/Scoop/compare/v0.2.3...v0.2.4) - 2022-08-08
 
