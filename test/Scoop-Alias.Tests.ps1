@@ -3,54 +3,41 @@
 . "$PSScriptRoot\..\lib\help.ps1"
 . "$PSScriptRoot\..\libexec\scoop-alias.ps1" | Out-Null
 
-Describe 'add_alias' -Tag 'Scoop' {
-    Mock shimdir { "$env:TEMP\shims" }
-    Mock set_config { }
-    Mock get_config { @{} }
+Describe 'Manipulate Alias' -Tag 'Scoop' {
+    BeforeAll {
+        Mock shimdir { "$TestDrive\shims" }
+        Mock set_config { }
+        Mock get_config { @{} }
 
-    $shimdir = shimdir
-    ensure $shimdir
-
-    Context "alias doesn't exist" {
-        It 'creates a new alias' {
-            $alias_file = "$shimdir\scoop-rm.ps1"
-            $alias_file | Should -Not -Exist
-
-            add_alias 'rm' '"hello, world!"'
-            & $alias_file | Should -Be 'hello, world!'
-        }
+        $shimdir = shimdir
+        ensure $shimdir
     }
 
-    Context 'alias exists' {
-        It 'does not change existing alias' {
-            $alias_file = "$shimdir\scoop-rm.ps1"
-            New-Item $alias_file -Type File -Force
-            $alias_file | Should -Exist
+    It 'Creates a new alias if alias doesn''t exist' {
+        $alias_file = "$shimdir\scoop-rm.ps1"
+        $alias_file | Should -Not -Exist
 
-            add_alias 'rm' 'test'
-            $alias_file | Should -FileContentMatch ''
-        }
+        add_alias 'rm' '"hello, world!"'
+        & $alias_file | Should -Be 'hello, world!'
     }
-}
 
-Describe 'rm_alias' -Tag 'Scoop' {
-    Mock shimdir { "$env:TEMP\shims" }
-    Mock set_config { }
-    Mock get_config { @{} }
+    It 'Does not change existing alias if alias exists' {
+        $alias_file = "$shimdir\scoop-rm.ps1"
+        New-Item $alias_file -Type File -Force
+        $alias_file | Should -Exist
 
-    $shimdir = shimdir
-    ensure $shimdir
+        add_alias 'rm' 'test'
+        & $alias_file | Should -Not -Be 'test'
+    }
 
-    Context 'alias exists' {
-        It 'removes an existing alias' {
-            $alias_file = "$shimdir\scoop-rm.ps1"
-            add_alias 'rm' '"hello, world!"'
+    It 'Removes an existing alias' {
+        $alias_file = "$shimdir\scoop-rm.ps1"
+        add_alias 'rm' '"hello, world!"'
 
-            $alias_file | Should -Exist
-            Mock get_config { @(@{'rm' = 'scoop-rm' }) }
+        $alias_file | Should -Exist
+        Mock get_config { @(@{'rm' = 'scoop-rm' }) }
 
-            rm_alias 'rm'
-            $alias_file | Should -Not -Exist
-        }
+        rm_alias 'rm'
+        $alias_file | Should -Not -Exist
     }
 }

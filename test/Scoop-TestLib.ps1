@@ -73,11 +73,7 @@ function setup_working($name) {
     }
 
     # reset working dir
-    if ($PSVersionTable.Platform -eq 'Unix') {
-        $working_dir = "/tmp/ScoopTestFixtures/$name"
-    } else {
-        $working_dir = "$env:TEMP/ScoopTestFixtures/$name"
-    }
+    $working_dir = "$([IO.Path]::GetTempPath())ScoopTestFixtures/$name"
 
     if (Test-Path $working_dir) {
         Remove-Item -Recurse -Force $working_dir
