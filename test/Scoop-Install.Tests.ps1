@@ -6,37 +6,6 @@
 
 $isUnix = is_unix
 
-Describe 'ensure_architecture' -Tag 'Scoop' {
-    It 'should keep correct architectures' {
-        ensure_architecture '32bit' | Should -Be '32bit'
-        ensure_architecture '32' | Should -Be '32bit'
-        ensure_architecture 'x86' | Should -Be '32bit'
-        ensure_architecture 'X86' | Should -Be '32bit'
-        ensure_architecture 'i386' | Should -Be '32bit'
-        ensure_architecture '386' | Should -Be '32bit'
-        ensure_architecture 'i686' | Should -Be '32bit'
-
-        ensure_architecture '64bit' | Should -Be '64bit'
-        ensure_architecture '64' | Should -Be '64bit'
-        ensure_architecture 'x64' | Should -Be '64bit'
-        ensure_architecture 'X64' | Should -Be '64bit'
-        ensure_architecture 'amd64' | Should -Be '64bit'
-        ensure_architecture 'AMD64' | Should -Be '64bit'
-        ensure_architecture 'x86_64' | Should -Be '64bit'
-        ensure_architecture 'x86-64' | Should -Be '64bit'
-    }
-
-    It 'should fallback to the default architecture on empty input' {
-        ensure_architecture '' | Should -Be $(default_architecture)
-        ensure_architecture $null | Should -Be $(default_architecture)
-    }
-
-    It 'should show an error with an invalid architecture' {
-        { ensure_architecture 'PPC' } | Should -Throw
-        { ensure_architecture 'PPC' } | Should -Throw "Invalid architecture: 'ppc'"
-    }
-}
-
 Describe 'appname_from_url' -Tag 'Scoop' {
     It 'should extract the correct name' {
         appname_from_url 'https://example.org/directory/foobar.json' | Should -Be 'foobar'

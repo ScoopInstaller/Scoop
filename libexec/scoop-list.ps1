@@ -6,7 +6,7 @@ param($query)
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'parse_json' 'Select-CurrentVersion' (indirectly)
 
-$def_arch = default_architecture
+$def_arch = Get-DefaultArchitecture
 if (-not (Get-FormatData ScoopApps)) {
     Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
 }

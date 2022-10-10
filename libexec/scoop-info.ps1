@@ -4,7 +4,7 @@
 #   -v, --verbose       Show full paths and URLs
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1" # 'Find-Manifest' (indirectly)
+. "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
@@ -13,31 +13,21 @@ $verbose = $opt.v -or $opt.verbose
 
 if (!$app) { my_usage; exit 1 }
 
-if ($app -match '^(ht|f)tps?://|\\\\') {
-    # check if $app is a URL or UNC path
-    $url = $app
-    $app = appname_from_url $url
-    $global = installed $app $true
-    $status = app_status $app $global
-    $manifest = url_manifest $url
-    $manifest_file = $url
-} else {
-    # else $app is a normal app name
-    $global = installed $app $true
-    $app, $bucket, $null = parse_app $app
-    $status = app_status $app $global
-    $app, $manifest, $bucket, $url = Find-Manifest $app $bucket
-}
+$app, $manifest, $bucket, $url = Get-Manifest $app
 
 if (!$manifest) {
-    abort "Could not find manifest for '$(show_app $app $bucket)'."
+    abort "Could not find manifest for '$(show_app $app)' in local buckets."
 }
 
+$global = installed $app $true
+$status = app_status $app $global
 $install = install_info $app $status.version $global
 $status.installed = $bucket -and $install.bucket -eq $bucket
 $version_output = $manifest.version
-if (!$manifest_file) {
-    $manifest_file = if ($bucket) { manifest_path $app $bucket } else { $url }
+$manifest_file = if ($bucket) {
+    manifest_path $app $bucket
+} else {
+    $url
 }
 
 if ($verbose) {
@@ -115,6 +105,85 @@ if ($status.installed) {
         $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { " *global*" })" }
     }
     $item.Installed = $installed_output -join "`n"
+
+    if ($verbose) {
+        # Show size of installation
+        $appsdir = appsdir $global
+
+        # Collect file list from each location
+        $appFiles = Get-ChildItem $appsdir -Filter $app
+        $currentFiles = Get-ChildItem $appFiles -Filter (Select-CurrentVersion $app $global)
+        $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
+        $cacheFiles = Get-ChildItem $cachedir -Filter "$app#*"
+
+        # Get the sum of each file list
+        $fileTotals = @()
+        foreach ($fileType in ($appFiles, $currentFiles, $persistFiles, $cacheFiles)) {
+            if ($null -ne $fileType) {
+                $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
+                $fileTotals += coalesce $fileSum 0
+            } else {
+                $fileTotals += 0
+            }
+        }
+
+        # Old versions = app total - current version size
+        $fileTotals += $fileTotals[0] - $fileTotals[1]
+
+        if ($fileTotals[2] + $fileTotals[3] + $fileTotals[4] -eq 0) {
+            # Simple app size output if no old versions, persisted data, cached downloads
+            $item.'Installed size' = filesize $fileTotals[1]
+        } else {
+            $fileSizes = [ordered] @{
+                'Current version:  ' = $fileTotals[1]
+                'Old versions:     ' = $fileTotals[4]
+                'Persisted data:   ' = $fileTotals[2]
+                'Cached downloads: ' = $fileTotals[3]
+                'Total:            ' = $fileTotals[0] + $fileTotals[2] + $fileTotals[3]
+            }
+
+            $fileSizeOutput = @()
+
+            # Don't output empty categories
+            $fileSizes.GetEnumerator() | ForEach-Object {
+                if ($_.Value -ne 0) {
+                    $fileSizeOutput += $_.Key + (filesize $_.Value)
+                }
+            }
+
+            $item.'Installed size' = $fileSizeOutput -join "`n"
+        }
+    }
+} else {
+    if ($verbose) {
+        # Get download size if app not installed
+        $totalPackage = 0
+        foreach ($url in @(url $manifest (Get-DefaultArchitecture))) {
+            try {
+                if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
+                    $cached = " (latest version is cached)"
+                } else {
+                    $cached = $null
+                }
+
+                [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
+                $totalPackage += $urlLength
+            } catch [System.Management.Automation.RuntimeException] {
+                $totalPackage = 0
+                $packageError = "the server at $(([System.Uri]$url).Host) did not send a Content-Length header"
+                break
+            } catch {
+                $totalPackage = 0
+                $packageError = "the server at $(([System.Uri]$url).Host) is down"
+                break
+            }
+        }
+        if ($totalPackage -ne 0) {
+            $item.'Download size' = "$(filesize $totalPackage)$cached"
+        } else {
+            $item.'Download size' = "Unknown ($packageError)$cached"
+        }
+    }
 }
 
 $binaries = @(arch_specific 'bin' $manifest $install.architecture)

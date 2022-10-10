@@ -1,3 +1,132 @@
+## [v0.3.0](https://github.com/ScoopInstaller/Scoop/compare/v0.2.4...v0.3.0) - 2022-10-10
+
+### Features
+
+- **install:** Add support for ARM64 architecture ([#5154](https://github.com/ScoopInstaller/Scoop/issues/5154))
+- **install:** Show the running process ([#5102](https://github.com/ScoopInstaller/Scoop/issues/5102))
+- **getopt:** Support option terminator (`--`) ([#5121](https://github.com/ScoopInstaller/Scoop/issues/5121))
+- **subdir:** Allow subdir in 'bucket' ([#5119](https://github.com/ScoopInstaller/Scoop/issues/5119))
+- **scoop-config:** Allow 'hold_update_until' be set manually ([#5100](https://github.com/ScoopInstaller/Scoop/issues/5100))
+- **scoop-(un)hold:** Support `scoop (un)hold scoop` ([#5089](https://github.com/ScoopInstaller/Scoop/issues/5089))
+- **scoop-update:** Stash uncommitted changes before update ([#5091](https://github.com/ScoopInstaller/Scoop/issues/5091))
+
+### Bug Fixes
+
+- **config:** Change config option to snake_case in file and SCREAMING_CASE in code ([#5116](https://github.com/ScoopInstaller/Scoop/issues/5116))
+- **jsonpath:** Prevent converting date string to DateTime in JSONPath ([#5130](https://github.com/ScoopInstaller/Scoop/issues/5130))
+- **psmodule:** Remove folder recursively when unlinking previous module path ([#5127](https://github.com/ScoopInstaller/Scoop/issues/5127))
+- **scoop-update:** Add `uninstall_psmodule` to update process ([#5136](https://github.com/ScoopInstaller/Scoop/issues/5136))
+
+### Code Refactoring
+
+- **download:** Rename `dl()` to `Invoke-Download()` ([#5143](https://github.com/ScoopInstaller/Scoop/issues/5143))
+- **path:** Use 'Convert-Path()' instead of 'Resolve-Path()' ([#5109](https://github.com/ScoopInstaller/Scoop/issues/5109))
+- **scoop-shim:** Use `getopt` to parse arguments ([#5125](https://github.com/ScoopInstaller/Scoop/issues/5125))
+
+### Builds
+
+- **checkver:** Implement SourceForge checkver functionality ([#5113](https://github.com/ScoopInstaller/Scoop/issues/5113), [#5163](https://github.com/ScoopInstaller/Scoop/issues/5163))
+- **checkurls:** Allow checking URLs from private_hosts ([#5152](https://github.com/ScoopInstaller/Scoop/issues/5152))
+- **schema:** Set manifest schema to be stricter ([#5093](https://github.com/ScoopInstaller/Scoop/issues/5093))
+- **vscode:** Tweak VSCode setting ([#5149](https://github.com/ScoopInstaller/Scoop/issues/5149))
+
+## [v0.2.4](https://github.com/ScoopInstaller/Scoop/compare/v0.2.3...v0.2.4) - 2022-08-08
+
+### Features
+
+- **core:** Create no window by default in `Invoke-ExternalCommand` ([#5066](https://github.com/ScoopInstaller/Scoop/issues/5066))
+- **core:** Improve argument concatenation in `Invoke-ExternalCommand` ([#5065](https://github.com/ScoopInstaller/Scoop/issues/5065))
+- **install:** Show bucket name while installing an app ([#5075](https://github.com/ScoopInstaller/Scoop/issues/5075))
+- **scoop-status:** Add flag to disable remote checking ([#5073](https://github.com/ScoopInstaller/Scoop/issues/5073))
+- **scoop-update:** Add support for `pre_uninstall` and `post_uninstall` ([#5085](https://github.com/ScoopInstaller/Scoop/issues/5085))
+
+### Bug Fixes
+
+- **core:** Avoid deadlock in `Invoke-ExternalCommand` ([#5064](https://github.com/ScoopInstaller/Scoop/issues/5064))
+- **core:** Use 'System.Nullable<bool>' for param 'global' ([#5088](https://github.com/ScoopInstaller/Scoop/issues/5088))
+- **install:** Move from cache when `--no-cache` is specified ([#5039](https://github.com/ScoopInstaller/Scoop/issues/5039))
+- **scoop-status:** Correct formatting of `Info` output ([#5047](https://github.com/ScoopInstaller/Scoop/issues/5047))
+
+### Builds
+
+- **checkver:** Load page content before running 'script' ([#5080](https://github.com/ScoopInstaller/Scoop/issues/5080))
+- **json:** Update Newtonsoft.Json.Schema to 3.0.15-beta2 ([#5053](https://github.com/ScoopInstaller/Scoop/issues/5053))
+
+## [v0.2.3](https://github.com/ScoopInstaller/Scoop/compare/v0.2.2...v0.2.3) - 2022-07-07
+
+### Features
+
+- **chore:** Add missing -a/--all param to all commands ([#5004](https://github.com/ScoopInstaller/Scoop/issues/5004))
+- **scoop-status:** Check bucket status, improve output ([#5011](https://github.com/ScoopInstaller/Scoop/issues/5011))
+- **scoop-info:** Show app installed/download size ([#4886](https://github.com/ScoopInstaller/Scoop/issues/4886))
+- **scoop-import:** Import a Scoop installation from JSON ([#5014](https://github.com/ScoopInstaller/Scoop/issues/5014), [#5034](https://github.com/ScoopInstaller/Scoop/issues/5034))
+
+### Bug Fixes
+
+- **chore:** Update help documentation ([#5002](https://github.com/ScoopInstaller/Scoop/issues/5002), [#5029](https://github.com/ScoopInstaller/Scoop/issues/5029))
+- **decompress:** Handle split RAR archives ([#4994](https://github.com/ScoopInstaller/Scoop/issues/4994))
+- **shortcuts:** Fix network drive shortcut creation ([#4410](https://github.com/ScoopInstaller/Scoop/issues/4410), [#5006](https://github.com/ScoopInstaller/Scoop/issues/5006))
+
+### Code Refactoring
+
+- **scoop-search:** Output PSObject, use API token ([#4997](https://github.com/ScoopInstaller/Scoop/issues/4997))
+
+### Builds
+
+- **checkver,auto-pr:** Allow passing file path ([#5019](https://github.com/ScoopInstaller/Scoop/issues/5019))
+- **checkver:** Exit routine earlier if error ([#5025](https://github.com/ScoopInstaller/Scoop/issues/5025))
+- **json:** Update Newton.Json to 13.0.1 ([#5026](https://github.com/ScoopInstaller/Scoop/issues/5026))
+
+### Tests
+
+- **typo:** Fix typo ('formated' -> 'formatted') ([#4217](https://github.com/ScoopInstaller/Scoop/issues/4217))
+
+## [v0.2.2](https://github.com/ScoopInstaller/Scoop/compare/v0.2.1...v0.2.2) - 2022-06-21
+
+### Features
+
+- **core:** Add `Get-Encoding` function to fix missing webclient encoding ([#4956](https://github.com/ScoopInstaller/Scoop/issues/4956))
+- **scoop-(un)hold:** Add `-g`/`--global` flag ([#4991](https://github.com/ScoopInstaller/Scoop/issues/4991))
+- **scoop-update:** Support `scoop update scoop` ([#4992](https://github.com/ScoopInstaller/Scoop/issues/4992))
+- **scoop-virustotal:** Migrate to VirusTotal API v3 ([#4983](https://github.com/ScoopInstaller/Scoop/issues/4983))
+
+### Bug Fixes
+
+- **manifest:** Fix bugs in 'Get-Manifest()' ([#4986](https://github.com/ScoopInstaller/Scoop/issues/4986))
+
+## [v0.2.1](https://github.com/ScoopInstaller/Scoop/compare/v0.2.0...v0.2.1) - 2022-06-10
+
+### Features
+
+- **core:** Add pre_uninstall and post_uninstall hooks ([#4957](https://github.com/ScoopInstaller/Scoop/issues/4957), [#4962](https://github.com/ScoopInstaller/Scoop/issues/4962))
+
+### Bug Fixes
+
+- **bucket:** Make sure `list_buckets` return array ([#4979](https://github.com/ScoopInstaller/Scoop/issues/4979))
+- **chore:** Deprecate tls1 and tls1.1 ([#4950](https://github.com/ScoopInstaller/Scoop/issues/4950))
+- **chore:** Update Nonportable bucket URL ([#4955](https://github.com/ScoopInstaller/Scoop/issues/4955))
+- **core:** Using `Invoke-Command` instead of `Invoke-Expression` ([#4941](https://github.com/ScoopInstaller/Scoop/issues/4941))
+- **core:** Load config file before initialization ([#4932](https://github.com/ScoopInstaller/Scoop/issues/4932))
+- **core:** Allow to use '_' and '.' in bucket name ([#4952](https://github.com/ScoopInstaller/Scoop/issues/4952))
+- **depends:** Avoid digits in archive file extension (except for .7z and .001) ([#4915](https://github.com/ScoopInstaller/Scoop/issues/4915))
+- **bucket:** Don't check remote URL of non-git buckets ([#4923](https://github.com/ScoopInstaller/Scoop/issues/4923))
+- **bucket:** Don't write message OK before bucket is cloned ([#4925](https://github.com/ScoopInstaller/Scoop/issues/4925))
+- **shim:** Add 'Get-CommandPath()' to find git ([#4913](https://github.com/ScoopInstaller/Scoop/issues/4913))
+- **shim:** Remove character replacement in .cmd -> .ps1 shims ([#4914](https://github.com/ScoopInstaller/Scoop/issues/4914))
+- **scoop:** Pass CLI arguments as string objects ([#4931](https://github.com/ScoopInstaller/Scoop/issues/4931))
+- **scoop-info:** Fix error message when manifest is not found ([#4935](https://github.com/ScoopInstaller/Scoop/issues/4935))
+- **scoop-search:** Require files in 'bucket' dir for remote known buckets ([#4944](https://github.com/ScoopInstaller/Scoop/issues/4944))
+- **update:** Prevent uninstall when update ([#4949](https://github.com/ScoopInstaller/Scoop/issues/4949))
+- **scoop-download:** Use correct Args when calling `Get-Manifest` ([#4970](https://github.com/ScoopInstaller/Scoop/issues/4970))
+
+### Code Refactoring
+
+- **manifest:** Rename 'Find-Manifest()' to 'Get-Manifest() ([#4966](https://github.com/ScoopInstaller/Scoop/issues/4966), [#4981](https://github.com/ScoopInstaller/Scoop/issues/4981))
+
+### Documentation
+
+- **readme:** Update license badge ([#4929](https://github.com/ScoopInstaller/Scoop/issues/4929))
+
 ## [v0.2.0](https://github.com/ScoopInstaller/Scoop/compare/v0.1.0...v0.2.0) - 2022-05-10
 
 ### Features

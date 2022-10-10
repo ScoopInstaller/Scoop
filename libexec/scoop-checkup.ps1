@@ -35,13 +35,13 @@ if (!(Test-HelperInstalled -Helper Dark)) {
 
 $globaldir = New-Object System.IO.DriveInfo($globaldir)
 if ($globaldir.DriveFormat -ne 'NTFS') {
-    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP_GLOBAL or 'globalPath' variable in '~/.config/scoop/config.json' to another Drive."
+    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP_GLOBAL or 'global_path' variable in '~/.config/scoop/config.json' to another Drive."
     $issues++
 }
 
 $scoopdir = New-Object System.IO.DriveInfo($scoopdir)
 if ($scoopdir.DriveFormat -ne 'NTFS') {
-    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP or 'rootPath' variable in '~/.config/scoop/config.json' to another Drive."
+    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP or 'root_path' variable in '~/.config/scoop/config.json' to another Drive."
     $issues++
 }
 

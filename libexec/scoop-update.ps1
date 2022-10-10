@@ -54,61 +54,85 @@ if(($PSVersionTable.PSVersion.Major) -lt 5) {
     Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
     break
 }
+$show_update_log = get_config SHOW_UPDATE_LOG $true
 
-function update_scoop() {
+function update_scoop($show_update_log) {
+    # Test if Scoop Core is hold
+    if(Test-ScoopCoreOnHold) {
+        return
+    }
+
     # check for git
-    if(!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     Write-Host "Updating Scoop..."
-    $last_update = $(last_scoop_update)
-    if ($null -eq $last_update) {$last_update = [System.DateTime]::Now}
-    $last_update = $last_update.ToString('s')
-    $show_update_log = get_config 'show_update_log' $true
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if (!(Test-Path "$currentdir\.git")) {
-        $newdir = fullpath $(versiondir 'scoop' 'new')
+        $newdir = "$currentdir\..\new"
+        $olddir = "$currentdir\..\old"
 
         # get git scoop
         git_cmd clone -q $configRepo --branch $configBranch --single-branch "`"$newdir`""
 
         # check if scoop was successful downloaded
-        if (!(Test-Path "$newdir")) {
-            abort 'Scoop update failed.'
+        if (!(Test-Path "$newdir\bin\scoop.ps1")) {
+            Remove-Item $newdir -Force -Recurse
+            abort "Scoop download failed. If this appears several times, try removing SCOOP_REPO by 'scoop config rm SCOOP_REPO'"
+        } else {
+            # replace non-git scoop with the git version
+            try {
+                Rename-Item $currentdir 'old' -ErrorAction Stop
+                Rename-Item $newdir 'current' -ErrorAction Stop
+            } catch {
+                Write-Warning $_
+                abort "Scoop update failed. Folder in use. Paste $newdir into $currentdir."
+            }
+        }
+    } else {
+        if (Test-Path "$currentdir\..\old") {
+            Remove-Item "$currentdir\..\old" -Recurse -Force -ErrorAction SilentlyContinue
         }
 
-        # replace non-git scoop with the git version
-        Remove-Item -r -force $currentdir -ea stop
-        Move-Item $newdir $currentdir
-    } else {
-        $previousCommit = Invoke-Expression "git -C '$currentdir' rev-parse HEAD"
-        $currentRepo = Invoke-Expression "git -C '$currentdir' config remote.origin.url"
-        $currentBranch = Invoke-Expression "git -C '$currentdir' branch"
+        $previousCommit = git -C "$currentdir" rev-parse HEAD
+        $currentRepo = git -C "$currentdir" config remote.origin.url
+        $currentBranch = git -C "$currentdir" branch
 
         $isRepoChanged = !($currentRepo -match $configRepo)
         $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
 
+        # Stash uncommitted changes
+        if (git -C "$currentdir" diff HEAD --name-only) {
+            if (get_config AUTOSTASH_ON_CONFLICT) {
+                warn "Uncommitted changes detected. Stashing..."
+                git -C "$currentdir" stash push -m "WIP at $([System.DateTime]::Now.ToString('o'))" -u -q
+            } else {
+                warn "Uncommitted changes detected. Update aborted."
+                return
+            }
+        }
+
         # Change remote url if the repo is changed
         if ($isRepoChanged) {
-            Invoke-Expression "git -C '$currentdir' config remote.origin.url '$configRepo'"
+            git -C "$currentdir" config remote.origin.url "$configRepo"
         }
 
         # Fetch and reset local repo if the repo or the branch is changed
         if ($isRepoChanged -or $isBranchChanged) {
             # Reset git fetch refs, so that it can fetch all branches (GH-3368)
-            Invoke-Expression "git -C '$currentdir' config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'"
+            git -C "$currentdir" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
             # fetch remote branch
             git_cmd -C "`"$currentdir`"" fetch --force origin "refs/heads/`"$configBranch`":refs/remotes/origin/$configBranch" -q
             # checkout and track the branch
             git_cmd -C "`"$currentdir`"" checkout -B $configBranch -t origin/$configBranch -q
             # reset branch HEAD
-            Invoke-Expression "git -C '$currentdir' reset --hard origin/$configBranch -q"
+            git -C "$currentdir" reset --hard origin/$configBranch -q
         } else {
             git_cmd -C "`"$currentdir`"" pull -q
         }
 
         $res = $lastexitcode
         if ($show_update_log) {
-            Invoke-Expression "git -C '$currentdir' --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            git -C "$currentdir" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
         }
 
         if ($res -ne 0) {
@@ -124,6 +148,11 @@ function update_scoop() {
     # }
 
     shim "$currentdir\bin\scoop.ps1" $false
+}
+
+function update_bucket($show_update_log) {
+    # check for git
+    if (!(Test-CommandAvailable git)) { abort "Scoop uses Git to update main bucket and others. Run 'scoop install git' and try again." }
 
     foreach ($bucket in Get-LocalBucket) {
         Write-Host "Updating '$bucket' bucket..."
@@ -133,24 +162,27 @@ function update_scoop() {
         if (!(Test-Path (Join-Path $bucketLoc '.git'))) {
             if ($bucket -eq 'main') {
                 # Make sure main bucket, which was downloaded as zip, will be properly "converted" into git
-                Write-Host " Converting 'main' bucket to git..."
-                rm_bucket 'main'
-                add_bucket 'main'
+                Write-Host " Converting 'main' bucket to git repo..."
+                $status = rm_bucket 'main'
+                if ($status -ne 0) {
+                    abort "Failed to remove local 'main' bucket."
+                }
+                $status = add_bucket 'main' (known_bucket_repo 'main')
+                if ($status -ne 0) {
+                    abort "Failed to add remote 'main' bucket."
+                }
             } else {
                 Write-Host "'$bucket' is not a git repository. Skipped."
             }
             continue
         }
 
-        $previousCommit = (Invoke-Expression "git -C '$bucketLoc' rev-parse HEAD")
+        $previousCommit = git -C "$bucketLoc" rev-parse HEAD
         git_cmd -C "`"$bucketLoc`"" pull -q
         if ($show_update_log) {
-            Invoke-Expression "git -C '$bucketLoc' --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' '$previousCommit..HEAD'"
+            git -C "$bucketLoc" --no-pager log --no-decorate --grep='^(chore)' --invert-grep --format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset' "$previousCommit..HEAD"
         }
     }
-
-    set_config lastupdate ([System.DateTime]::Now.ToString('o')) | Out-Null
-    success 'Scoop was updated successfully!'
 }
 
 function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
@@ -159,7 +191,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $install = install_info $app $old_version $global
 
     # re-use architecture, bucket and url from first install
-    $architecture = ensure_architecture $install.architecture
+    $architecture = Format-ArchitectureString $install.architecture
     $bucket = $install.bucket
     if ($null -eq $bucket) {
         $bucket = 'main'
@@ -193,12 +225,12 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # Remove and replace whole region after proper fix
     Write-Host "Downloading new version"
     if (Test-Aria2Enabled) {
-        dl_with_cache_aria2 $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
         $urls = script:url $manifest $architecture
 
         foreach ($url in $urls) {
-            dl_with_cache $app $version $url $null $manifest.cookie $true
+            Invoke-CachedDownload $app $version $url $null $manifest.cookie $true
 
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
@@ -226,6 +258,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $dir = versiondir $app $old_version $global
     $persist_dir = persistdir $app $global
 
+    Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
+
     #region Workaround for #2952
     if (test_running_process $app $global) {
         return
@@ -243,6 +277,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # directory.
     $refdir = unlink_current $dir
 
+    uninstall_psmodule $old_manifest $refdir $global
+
     if ($force -and ($old_version -eq $version)) {
         if (!(Test-Path "$dir/../_$version.old")) {
             Move-Item "$dir" "$dir/../_$version.old"
@@ -254,6 +290,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
             Move-Item "$dir" "$dir/../_$version.old($i)"
         }
     }
+
+    Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
 
     if ($bucket) {
         # add bucket name it was installed from
@@ -283,17 +321,26 @@ if (-not ($apps -or $all)) {
         error 'scoop update: --no-cache is invalid when <app> is not specified.'
         exit 1
     }
-    update_scoop
+    update_scoop $show_update_log
+    update_bucket $show_update_log
+    set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
+    success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
         'ERROR: You need admin rights to update global apps.'; exit 1
     }
 
-    if (is_scoop_outdated) {
-        update_scoop
-    }
     $outdated = @()
+    $updateScoop = $null -ne ($apps | Where-Object { $_ -eq 'scoop' }) -or (is_scoop_outdated)
+    $apps = $apps | Where-Object { $_ -ne 'scoop' }
     $apps_param = $apps
+
+    if ($updateScoop) {
+        update_scoop $show_update_log
+        update_bucket $show_update_log
+        set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
+        success 'Scoop was updated successfully!'
+    }
 
     if ($apps_param -eq '*' -or $all) {
         $apps = applist (installed_apps $false) $false
@@ -301,7 +348,9 @@ if (-not ($apps -or $all)) {
             $apps += applist (installed_apps $true) $true
         }
     } else {
-        $apps = Confirm-InstallationStatus $apps_param -Global:$global
+        if ($apps_param) {
+            $apps = Confirm-InstallationStatus $apps_param -Global:$global
+        }
     }
     if ($apps) {
         $apps | ForEach-Object {
@@ -314,7 +363,7 @@ if (-not ($apps -or $all)) {
                 } else {
                     warn "'$app' is held to version $($status.version)"
                 }
-            } elseif ($apps_param -ne '*') {
+            } elseif ($apps_param -ne '*' -and !$all) {
                 if ($status.installed) {
                     ensure_none_failed $app
                     Write-Host "$app`: $($status.version) (latest version)" -ForegroundColor Green

@@ -9,40 +9,12 @@ if (!$command) {
     exit 1
 }
 
-try {
-    $gcm = Get-Command "$command" -ErrorAction Stop
-} catch {
-    abort "'$command' not found" 3
-}
+$path = Get-CommandPath $command
 
-$path = $gcm.Path
-$usershims = Convert-Path (shimdir $false)
-$globalshims = fullpath (shimdir $true) # don't resolve: may not exist
-
-if ($path -like "$usershims*" -or $path -like "$globalshims*") {
-    $exepath = if ($path.EndsWith('.exe') -or $path.EndsWith('.shim')) {
-        (Get-Content ($path -replace '\.exe$', '.shim') | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
-    } else {
-        ((Select-String -Path $path -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
-    }
-    if (!$exepath) {
-        $exepath = ((Select-String -Path $path -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
-    }
-
-    if (![System.IO.Path]::IsPathRooted($exepath)) {
-        # Expand relative path
-        $exepath = Convert-Path $exepath
-    }
-
-    friendly_path $exepath
-} elseif ($gcm.CommandType -eq 'Application') {
-    $gcm.Source
-} elseif ($gcm.CommandType -eq 'Alias') {
-    scoop which $gcm.ResolvedCommandName
-} else {
-    Write-Host 'Not a scoop shim.'
-    $path
+if ($null -eq $path) {
+    Write-Host "'$command' not found / not a scoop shim."
     exit 2
+} else {
+    friendly_path $path
+    exit 0
 }
-
-exit 0

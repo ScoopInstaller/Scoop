@@ -1,10 +1,14 @@
 function manifest_path($app, $bucket) {
-    fullpath "$(Find-BucketDirectory $bucket)\$(sanitary_path $app).json"
+    (Get-ChildItem (Find-BucketDirectory $bucket) -Filter "$(sanitary_path $app).json" -Recurse).FullName
 }
 
 function parse_json($path) {
-    if(!(test-path $path)) { return $null }
-    Get-Content $path -raw -Encoding UTF8 | convertfrom-json -ea stop
+    if ($null -eq $path -or !(Test-Path $path)) { return $null }
+    try {
+        Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        warn "Error parsing JSON at $path."
+    }
 }
 
 function url_manifest($url) {
@@ -12,26 +16,69 @@ function url_manifest($url) {
     try {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $str = $wc.downloadstring($url)
+        $data = $wc.DownloadData($url)
+        $str = (Get-Encoding($wc)).GetString($data)
     } catch [system.management.automation.methodinvocationexception] {
         warn "error: $($_.exception.innerexception.message)"
     } catch {
         throw
     }
     if(!$str) { return $null }
-    $str | convertfrom-json
+    try {
+        $str | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        warn "Error parsing JSON at $url."
+    }
+}
+
+function Get-Manifest($app) {
+    $bucket, $manifest, $url = $null
+    $app = $app.TrimStart('/')
+    # check if app is a URL or UNC path
+    if ($app -match '^(ht|f)tps?://|\\\\') {
+        $url = $app
+        $app = appname_from_url $url
+        $manifest = url_manifest $url
+    } else {
+        $app, $bucket, $version = parse_app $app
+        if ($bucket) {
+            $manifest = manifest $app $bucket
+        } else {
+            foreach ($bucket in Get-LocalBucket) {
+                $manifest = manifest $app $bucket
+                if ($manifest) {
+                    break
+                }
+            }
+        }
+        if (!$manifest) {
+            # couldn't find app in buckets: check if it's a local path
+            $appPath = $app
+            $bucket = $null
+            if (!$appPath.EndsWith('.json')) {
+                $appPath += '.json'
+            }
+            if (Test-Path $appPath) {
+                $url = Convert-Path $appPath
+                $app = appname_from_url $url
+                $manifest = url_manifest $url
+            }
+        }
+    }
+    return $app, $manifest, $bucket, $url
 }
 
 function manifest($app, $bucket, $url) {
-    if($url) { return url_manifest $url }
+    if ($url) { return url_manifest $url }
     parse_json (manifest_path $app $bucket)
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
-    if($url) {
+    if ($url) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $wc.downloadstring($url) > "$dir\manifest.json"
+        $data = $wc.DownloadData($url)
+        (Get-Encoding($wc)).GetString($data) | Out-UTF8File "$dir\manifest.json"
     } else {
         Copy-Item (manifest_path $app $bucket) "$dir\manifest.json"
     }
@@ -51,42 +98,40 @@ function save_install_info($info, $dir) {
 
 function install_info($app, $version, $global) {
     $path = "$(versiondir $app $version $global)\install.json"
-    if(!(test-path $path)) { return $null }
+    if (!(Test-Path $path)) { return $null }
     parse_json $path
 }
 
-function default_architecture {
-    $arch = get_config 'default_architecture'
-    $system = if ([Environment]::Is64BitOperatingSystem) { '64bit' } else { '32bit' }
-    if ($null -eq $arch) {
-        $arch = $system
-    } else {
-        try {
-            $arch = ensure_architecture $arch
-        } catch {
-            warn 'Invalid default architecture configured. Determining default system architecture'
-            $arch = $system
+function arch_specific($prop, $manifest, $architecture) {
+    if ($manifest.architecture) {
+        $val = $manifest.architecture.$architecture.$prop
+        if ($val) { return $val } # else fallback to generic prop
+    }
+
+    if ($manifest.$prop) { return $manifest.$prop }
+}
+
+function Get-SupportedArchitecture($manifest, $architecture) {
+    if ($architecture -eq 'arm64' -and ($manifest | ConvertToPrettyJson) -notmatch '[''"]arm64["'']') {
+        # Windows 10 enables existing unmodified x86 apps to run on Arm devices.
+        # Windows 11 adds the ability to run unmodified x64 Windows apps on Arm devices!
+        # Ref: https://learn.microsoft.com/en-us/windows/arm/overview
+        if ($WindowsBuild -ge 22000) {
+            # Windows 11
+            $architecture = '64bit'
+        } else {
+            # Windows 10
+            $architecture = '32bit'
         }
     }
-
-    return $arch
-}
-
-function arch_specific($prop, $manifest, $architecture) {
-    if($manifest.architecture) {
-        $val = $manifest.architecture.$architecture.$prop
-        if($val) { return $val } # else fallback to generic prop
+    if (![String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))) {
+        return $architecture
     }
-
-    if($manifest.$prop) { return $manifest.$prop }
 }
 
-function supports_architecture($manifest, $architecture) {
-    return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
-}
-
-function generate_user_manifest($app, $bucket, $version) { # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
-    $null, $manifest, $bucket, $null = Find-Manifest $app $bucket
+function generate_user_manifest($app, $bucket, $version) {
+    # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
+    $app, $manifest, $bucket, $null = Get-Manifest "$bucket/$app"
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket
     }
@@ -97,10 +142,10 @@ function generate_user_manifest($app, $bucket, $version) { # 'autoupdate.ps1' 'b
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
-    ensure $(usermanifestsdir) | out-null
+    ensure (usermanifestsdir) | out-null
     try {
-        Invoke-AutoUpdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(@{ })
-        return "$(resolve-path $(usermanifest $app))"
+        Invoke-AutoUpdate $app "$(Convert-Path (usermanifestsdir))\$app.json" $manifest $version $(@{ })
+        return Convert-Path (usermanifest $app)
     } catch {
         write-host -f darkred "Could not install $app@$version"
     }

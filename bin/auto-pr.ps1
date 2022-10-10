@@ -43,7 +43,6 @@ param(
     [String] $Upstream,
     [String] $OriginBranch = 'master',
     [String] $App = '*',
-    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -64,7 +63,13 @@ param(
 . "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\unix.ps1"
 
-$Dir = Resolve-Path $Dir
+if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
+    $Dir = Split-Path $App
+} elseif ($Dir) {
+    $Dir = Convert-Path $Dir
+} else {
+    throw "'-Dir' parameter required if '-App' is not a filepath!"
+}
 
 if ((!$Push -and !$Request) -or $Help) {
     Write-Host @'
@@ -96,7 +101,7 @@ if (is_unix) {
 
 function execute($cmd) {
     Write-Host $cmd -ForegroundColor Green
-    $output = Invoke-Expression $cmd
+    $output = Invoke-Command ([scriptblock]::Create($cmd))
 
     if ($LASTEXITCODE -gt 0) {
         abort "^^^ Error! See above ^^^ (last command: $cmd)"

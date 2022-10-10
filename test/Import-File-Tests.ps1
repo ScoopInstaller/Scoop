@@ -66,7 +66,7 @@ Describe 'Style constraints for non-binary project files' {
     It 'file newlines are CRLF' -Skip:$(-not $files_exist) {
         $badFiles = @(
             foreach ($file in $files) {
-                $content = Get-Content -Raw $file.FullName
+                $content = [System.IO.File]::ReadAllText($file.FullName)
                 if (!$content) {
                     throw "File contents are null: $($file.FullName)"
                 }

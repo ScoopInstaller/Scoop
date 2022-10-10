@@ -22,7 +22,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         It 'Decompression test cases should exist' {
             $testcases = "$working_dir\TestCases.zip"
             $testcases | Should -Exist
-            compute_hash $testcases 'sha256' | Should -Be '3a442e85b466833eeafbd08c57d8f51bf7ff041867ee0bdb7db1f12480b3624a'
+            compute_hash $testcases 'sha256' | Should -Be '791bfce192917a2ff225dcdd87d23ae5f720b20178d85e68e4b1b56139cf8e6a'
             if (!$isUnix) {
                 Microsoft.PowerShell.Archive\Expand-Archive $testcases $working_dir
             }
@@ -41,6 +41,12 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             $test2 = "$working_dir\7ZipTest2.tgz"
             $test3 = "$working_dir\7ZipTest3.tar.bz2"
             $test4 = "$working_dir\7ZipTest4.tar.gz"
+            $test5_1 = "$working_dir\7ZipTest5.7z.001"
+            $test5_2 = "$working_dir\7ZipTest5.7z.002"
+            $test5_3 = "$working_dir\7ZipTest5.7z.003"
+            $test6_1 = "$working_dir\7ZipTest6.part01.rar"
+            $test6_2 = "$working_dir\7ZipTest6.part02.rar"
+            $test6_3 = "$working_dir\7ZipTest6.part03.rar"
         }
 
         It 'extract normal compressed file' -Skip:$isUnix {
@@ -71,10 +77,38 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
+        It 'extract splited 7z archives (.001, .002, ...)' -Skip:$isUnix {
+            $to = test_extract 'Expand-7zipArchive' $test5_1
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'extract splited RAR archives (.part01.rar, .part02.rar, ...)' -Skip:$isUnix {
+            $to = test_extract 'Expand-7zipArchive' $test6_1
+            $to | Should -Exist
+            "$to\dummy" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
         It 'works with "-Removal" switch ($removal param)' -Skip:$isUnix {
             $test1 | Should -Exist
             test_extract 'Expand-7zipArchive' $test1 $true
             $test1 | Should -Not -Exist
+            $test5_1 | Should -Exist
+            $test5_2 | Should -Exist
+            $test5_3 | Should -Exist
+            test_extract 'Expand-7zipArchive' $test5_1 $true
+            $test5_1 | Should -Not -Exist
+            $test5_2 | Should -Not -Exist
+            $test5_3 | Should -Not -Exist
+            $test6_1 | Should -Exist
+            $test6_2 | Should -Exist
+            $test6_3 | Should -Exist
+            test_extract 'Expand-7zipArchive' $test6_1 $true
+            $test6_1 | Should -Not -Exist
+            $test6_2 | Should -Not -Exist
+            $test6_3 | Should -Not -Exist
         }
     }
 

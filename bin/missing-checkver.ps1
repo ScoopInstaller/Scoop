@@ -26,7 +26,7 @@ param(
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 
-$Dir = Resolve-Path $Dir
+$Dir = Convert-Path $Dir
 
 Write-Host '[' -NoNewLine
 Write-Host 'C' -NoNewLine -ForegroundColor Green
@@ -36,8 +36,8 @@ Write-Host 'A' -NoNewLine -ForegroundColor Cyan
 Write-Host ']utoupdate'
 Write-Host ' |  |'
 
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = parse_json "$Dir\$($_.Name)"
+Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
+    $json = parse_json $_.FullName
 
     if ($SkipSupported -and $json.checkver -and $json.autoupdate) { return }
 
@@ -48,5 +48,5 @@ Get-ChildItem $Dir "$App.json" | ForEach-Object {
     Write-Host '[' -NoNewLine
     Write-Host $(if ($json.autoupdate) { 'A' } else { ' ' }) -NoNewLine -ForegroundColor Cyan
     Write-Host '] ' -NoNewLine
-    Write-Host (strip_ext $_.Name)
+    Write-Host $_.BaseName
 }

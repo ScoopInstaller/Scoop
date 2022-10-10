@@ -52,7 +52,6 @@
 #>
 param(
     [String] $App = '*',
-    [Parameter(Mandatory = $true)]
     [ValidateScript( {
         if (!(Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
@@ -77,8 +76,16 @@ param(
 . "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
 . "$PSScriptRoot\..\lib\unix.ps1"
 
-$Dir = Resolve-Path $Dir
-$Search = $App
+if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
+    $Dir = Split-Path $App
+    $files = Get-ChildItem $Dir -Filter (Split-Path $App -Leaf)
+} elseif ($Dir) {
+    $Dir = Convert-Path $Dir
+    $files = Get-ChildItem $Dir -Filter "$App.json" -Recurse
+} else {
+    throw "'-Dir' parameter required if '-App' is not a filepath!"
+}
+
 $GitHubToken = Get-GitHubToken
 
 # don't use $Version with $App = '*'
@@ -89,21 +96,21 @@ if ($App -eq '*' -and $Version -ne '') {
 # get apps to check
 $Queue = @()
 $json = ''
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $json = parse_json "$Dir\$($_.Name)"
+$files | ForEach-Object {
+    $file = $_.FullName
+    $json = parse_json $file
     if ($json.checkver) {
-        $Queue += , @($_.Name, $json)
+        $Queue += , @($_.BaseName, $json, $file)
     }
 }
 
 # clear any existing events
-Get-Event | ForEach-Object {
-    Remove-Event $_.SourceIdentifier
-}
+Get-Event | Remove-Event
+Get-EventSubscriber | Unregister-Event
 
 # start all downloads
 $Queue | ForEach-Object {
-    $name, $json = $_
+    $name, $json, $file = $_
 
     $substitutions = Get-VersionSubstitution $json.version # 'autoupdate.ps1'
 
@@ -113,20 +120,34 @@ $Queue | ForEach-Object {
     } else {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
     }
-    Register-ObjectEvent $wc downloadstringcompleted -ErrorAction Stop | Out-Null
+    Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
 
-    $githubRegex = '\/releases\/tag\/(?:v|V)?([\d.]+)'
-
-    $url = $json.homepage
+    # Not Specified
     if ($json.checkver.url) {
         $url = $json.checkver.url
+    } else {
+        $url = $json.homepage
     }
-    $regex = ''
+
+    if ($json.checkver.re) {
+        $regex = $json.checkver.re
+    } elseif ($json.checkver.regex) {
+        $regex = $json.checkver.regex
+    } else {
+        $regex = ''
+    }
+
     $jsonpath = ''
     $xpath = ''
     $replace = ''
     $useGithubAPI = $false
 
+    # GitHub
+    if ($regex) {
+        $githubRegex = $regex
+    } else {
+        $githubRegex = '/releases/tag/(?:v|V)?([\d.]+)'
+    }
     if ($json.checkver -eq 'github') {
         if (!$json.homepage.StartsWith('https://github.com/')) {
             error "$name checkver expects the homepage to be a github repository"
@@ -142,11 +163,38 @@ $Queue | ForEach-Object {
         if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
     }
 
-    if ($json.checkver.re) {
-        $regex = $json.checkver.re
+    # SourceForge
+    if ($regex) {
+        $sourceforgeRegex = $regex
+    } else {
+        $sourceforgeRegex = '(?!\.)([\d.]+)(?<=\d)'
     }
-    if ($json.checkver.regex) {
-        $regex = $json.checkver.regex
+    if ($json.checkver -eq 'sourceforge') {
+        if ($json.homepage -match '//(sourceforge|sf)\.net/projects/(?<project>[^/]+)(/files/(?<path>[^/]+))?|//(?<project>[^.]+)\.(sourceforge\.(net|io)|sf\.net)') {
+            $project = $Matches['project']
+            $path = $Matches['path']
+        } else {
+            $project = strip_ext $name
+        }
+        $url = "https://sourceforge.net/projects/$project/rss"
+        if ($path) {
+            $url = $url + '?path=/' + $path.TrimStart('/')
+        }
+        $regex = "CDATA\[/$path/.*?$sourceforgeRegex.*?\]".Replace('//', '/')
+    }
+    if ($json.checkver.sourceforge) {
+        if ($json.checkver.sourceforge -is [System.String] -and $json.checkver.sourceforge -match '(?<project>[\w-]*)(/(?<path>.*))?') {
+            $project = $Matches['project']
+            $path = $Matches['path']
+        } else {
+            $project = $json.checkver.sourceforge.project
+            $path = $json.checkver.sourceforge.path
+        }
+        $url = "https://sourceforge.net/projects/$project/rss"
+        if ($path) {
+            $url = $url + '?path=/' + $path.TrimStart('/')
+        }
+        $regex = "CDATA\[/$path/.*?$sourceforgeRegex.*?\]".Replace('//', '/')
     }
 
     if ($json.checkver.jp) {
@@ -159,7 +207,7 @@ $Queue | ForEach-Object {
         $xpath = $json.checkver.xpath
     }
 
-    if ($json.checkver.replace -and $json.checkver.replace.GetType() -eq [System.String]) {
+    if ($json.checkver.replace -is [System.String]) { # If `checkver` is [System.String], it has a method called `Replace`
         $replace = $json.checkver.replace
     }
 
@@ -179,7 +227,8 @@ $Queue | ForEach-Object {
     $url = substitute $url $substitutions
 
     $state = New-Object psobject @{
-        app      = (strip_ext $name);
+        app      = $name;
+        file     = $file;
         url      = $url;
         regex    = $regex;
         json     = $json;
@@ -190,7 +239,7 @@ $Queue | ForEach-Object {
     }
 
     $wc.Headers.Add('Referer', (strip_filename $url))
-    $wc.DownloadStringAsync($url, $state)
+    $wc.DownloadDataAsync($url, $state)
 }
 
 function next($er) {
@@ -207,31 +256,34 @@ while ($in_progress -gt 0) {
 
     $state = $ev.SourceEventArgs.UserState
     $app = $state.app
+    $file = $state.file
     $json = $state.json
     $url = $state.url
     $regexp = $state.regex
     $jsonpath = $state.jsonpath
     $xpath = $state.xpath
+    $script = $json.checkver.script
     $reverse = $state.reverse
     $replace = $state.replace
     $expected_ver = $json.version
     $ver = $Version
 
     if (!$ver) {
-        $page = $ev.SourceEventArgs.Result
-        $err = $ev.SourceEventArgs.Error
-        if ($json.checkver.script) {
-            $page = $json.checkver.script -join "`r`n" | Invoke-Expression
+        if (!$regex -and $replace) {
+            next "'replace' requires 're' or 'regex'"
+            continue
         }
-
+        $err = $ev.SourceEventArgs.Error
         if ($err) {
             next "$($err.message)`r`nURL $url is not valid"
             continue
         }
 
-        if (!$regex -and $replace) {
-            next "'replace' requires 're' or 'regex'"
-            continue
+        if ($url) {
+            $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
+        }
+        if ($script) {
+            $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
         }
 
         if ($jsonpath) {
@@ -311,7 +363,7 @@ while ($in_progress -gt 0) {
     # Skip actual only if versions are same and there is no -f
     if (($ver -eq $expected_ver) -and !$ForceUpdate -and $SkipUpdated) { continue }
 
-    Write-Host "$App`: " -NoNewline
+    Write-Host "$app`: " -NoNewline
 
     # version hasn't changed (step over if forced update)
     if ($ver -eq $expected_ver -and !$ForceUpdate) {
@@ -337,7 +389,7 @@ while ($in_progress -gt 0) {
             Write-Host 'Forcing autoupdate!' -ForegroundColor DarkMagenta
         }
         try {
-            Invoke-AutoUpdate $App $Dir $json $ver $matchesHashtable # 'autoupdate.ps1'
+            Invoke-AutoUpdate $app $file $json $ver $matchesHashtable # 'autoupdate.ps1'
         } catch {
             if ($ThrowError) {
                 throw $_

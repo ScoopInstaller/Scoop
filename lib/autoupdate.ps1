@@ -1,12 +1,13 @@
 # Must included with 'json.ps1'
 function find_hash_in_rdf([String] $url, [String] $basename) {
-    $data = $null
+    $xml = $null
     try {
         # Download and parse RDF XML file
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        [xml]$data = $wc.downloadstring($url)
+        $data = $wc.DownloadData($url)
+        [xml]$xml = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -14,7 +15,7 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
     }
 
     # Find file content
-    $digest = $data.RDF.Content | Where-Object { [String]$_.about -eq $basename }
+    $digest = $xml.RDF.Content | Where-Object { [String]$_.about -eq $basename }
 
     return format_hash $digest.sha256
 }
@@ -35,7 +36,8 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $hashfile = $wc.downloadstring($url)
+        $data = $wc.DownloadData($url)
+        $hashfile = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -88,7 +90,8 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $json = $wc.downloadstring($url)
+        $data = $wc.DownloadData($url)
+        $json = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -108,7 +111,8 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $xml = [xml]$wc.downloadstring($url)
+        $data = $wc.DownloadData($url)
+        $xml = [xml]((Get-Encoding($wc)).GetString($data))
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -263,7 +267,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     write-host -f Green $basename -NoNewline
     write-host -f DarkYellow ' to compute hashes!'
     try {
-        dl_with_cache $app $version $url $null $null $true
+        Invoke-CachedDownload $app $version $url $null $null $true
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -445,7 +449,7 @@ function Invoke-AutoUpdate {
         # 'Set-Content -Encoding ASCII' don't works in PowerShell 5
         # Wait for 'UTF8NoBOM' Encoding in PowerShell 7
         # $Manifest | ConvertToPrettyJson | Set-Content -Path (Join-Path $Path "$AppName.json") -Encoding UTF8NoBOM
-        [System.IO.File]::WriteAllLines((Join-Path $Path "$AppName.json"), (ConvertToPrettyJson $Manifest))
+        [System.IO.File]::WriteAllLines($Path, (ConvertToPrettyJson $Manifest))
         # notes
         $note = "`nUpdating note:"
         if ($Manifest.autoupdate.note) {
@@ -453,7 +457,7 @@ function Invoke-AutoUpdate {
             $hasNote = $true
         }
         if ($Manifest.autoupdate.architecture) {
-            '64bit', '32bit' | ForEach-Object {
+            '64bit', '32bit', 'arm64' | ForEach-Object {
                 if ($Manifest.autoupdate.architecture.$_.note) {
                     $note += "`n$_-arch: $($Manifest.autoupdate.architecture.$_.note)"
                     $hasNote = $true
