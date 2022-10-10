@@ -115,7 +115,7 @@ if ($env:CI -eq $true) {
 }
 
 if ($IsLinux -or $IsMacOS) {
-    $splat.ExcludeTag = 'Decompress'
+    $splat.ExcludeTag = @('Decompress', 'Windows')
 }
 
 # GitHub Actions / Local
