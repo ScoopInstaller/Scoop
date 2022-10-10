@@ -1,9 +1,8 @@
-function nightly_version($date, $quiet = $false) {
-    $date_str = $date.tostring("yyyyMMdd")
+function nightly_version($quiet = $false) {
     if (!$quiet) {
         warn "This is a nightly version. Downloaded files won't be verified."
     }
-    "nightly-$date_str"
+    return "nightly-$(Get-Date -Format 'yyyyMMdd')"
 }
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
@@ -21,7 +20,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
-        $version = nightly_version $(get-date)
+        $version = nightly_version
         $check_hash = $false
     }
 

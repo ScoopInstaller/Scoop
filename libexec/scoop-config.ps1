@@ -111,13 +111,9 @@
 #       Should be in the format 'YYYY-MM-DD', 'YYYY/MM/DD' or any other forms that accepted by '[System.DateTime]::Parse()'.
 #       Ref: https://docs.microsoft.com/dotnet/api/system.datetime.parse?view=netframework-4.5#StringToParse
 #
-# check_nightly_outdated: $true|$false
-#       While checking if an app version is old (e.g. for `scoop update *`), Scoop will
-#       check the date on apps whose installed versions are formatted as 'nightly-yyyyMMdd'.
-#       (For apps versioned as 'nightly', Scoop already automatically appends the
-#       current date to their installed version in that format.)
-#       If that date was more than a day ago, then Scoop considers the app outdated.
-#       Date format ref: 'https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings'
+# update_nightly: $true|$false
+#       Nightly version is formatted as 'nightly-yyyyMMdd' and will be updated after one day if this is set to $true.
+#       Otherwise, nightly version will not be updated until manually.
 #
 # ARIA2 configuration
 # -------------------

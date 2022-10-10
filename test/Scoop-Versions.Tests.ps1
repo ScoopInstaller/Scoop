@@ -108,15 +108,14 @@ Describe 'versions comparison' -Tag 'Scoop' {
             Compare-Version 'nightly-20190801' 'nightly-20200801' | Should -Be 0
         }
 
-        It 'handles nightly versions with check_nightly_outdated' {
-            $date = Get-Date
-            $today = $date.ToString("yyyyMMdd")
-            $yesterday = $date.AddDays(-1).ToString("yyyyMMdd")
-            Compare-Version "nightly-$($today)" 'nightly' | Should -Be 0
-            Compare-Version "nightly-$($yesterday)" 'nightly' | Should -Be 0
-            $scoopConfig = set_config 'check_nightly_outdated' $true
-            Compare-Version "nightly-$($today)" 'nightly' | Should -Be 0
-            Compare-Version "nightly-$($yesterday)" 'nightly' | Should -Be 1
+        It 'handles nightly versions with `update_nightly`' {
+            Mock get_config { $true } -ParameterFilter { $name -eq 'update_nightly' }
+            Mock Get-Date { '20200801' }
+            Compare-Version 'nightly-20200801' 'nightly' | Should -Be 0
+            Compare-Version 'nightly-20200730' 'nightly' | Should -Be 1
+            Compare-Version 'nightly-20200730' 'nightly-20200801' | Should -Be 1
+            Compare-Version 'nightly-20200802' 'nightly' | Should -Be -1
+            Compare-Version 'nightly-20200802' 'nightly-20200801' | Should -Be -1
         }
     }
 }

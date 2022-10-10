@@ -147,19 +147,20 @@ function Compare-Version {
         $splitReferenceVersion = @(SplitVersion -Version $ReferenceVersion -Delimiter $Delimiter)
         $splitDifferenceVersion = @(SplitVersion -Version $DifferenceVersion -Delimiter $Delimiter)
 
-        # Nightly versions are always equal unless check_nightly_outdated is set
+        # Nightly versions are always equal unless UPDATE_NIGHTLY is $true
         if ($splitReferenceVersion[0] -eq 'nightly' -and $splitDifferenceVersion[0] -eq 'nightly') {
-            # Assume difference nightly is newer if reference nightly version date is older than a day.
-            # Date format taken from nightly_version() in install.ps1
-            if (get_config 'check_nightly_outdated' $false) {
-                if ($splitReferenceVersion.Length -gt 1 -and $splitReferenceVersion[1] -match '\d{8}') {
-                    $reference_nightly_date = [System.DateTime]::ParseExact($splitReferenceVersion[1], 'yyyyMMdd', $null)
-                    if ($reference_nightly_date -lt (Get-Date).AddDays(-1)) {
-                        return 1
-                    }
+            if (get_config UPDATE_NIGHTLY) {
+                # nightly versions will be compared by date if UPDATE_NIGHTLY is $true
+                if ($null -eq $splitReferenceVersion[1]) {
+                    $splitReferenceVersion += Get-Date -Format 'yyyyMMdd'
                 }
+                if ($null -eq $splitDifferenceVersion[1]) {
+                    $splitDifferenceVersion += Get-Date -Format 'yyyyMMdd'
+                }
+                return [Math]::Sign($splitDifferenceVersion[1] - $splitReferenceVersion[1])
+            } else {
+                return 0
             }
-            return 0
         }
 
         for ($i = 0; $i -lt [Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
