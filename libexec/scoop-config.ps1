@@ -113,7 +113,7 @@
 #
 # update_nightly: $true|$false
 #       Nightly version is formatted as 'nightly-yyyyMMdd' and will be updated after one day if this is set to $true.
-#       Otherwise, nightly version will not be updated until manually.
+#       Otherwise, nightly version will not be updated unless `--force` is used.
 #
 # ARIA2 configuration
 # -------------------
