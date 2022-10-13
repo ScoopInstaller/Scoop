@@ -1,6 +1,5 @@
 . "$PSScriptRoot\Scoop-TestLib.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
-. "$PSScriptRoot\..\lib\core.ps1"
 
 Describe 'versions comparison' -Tag 'Scoop' {
     Context 'semver compliant versions' {
@@ -79,17 +78,6 @@ Describe 'versions comparison' -Tag 'Scoop' {
     }
 
     Context 'other misc versions' {
-        BeforeAll {
-            $configFile = "$env:TEMP\ScoopTestFixtures\config.json"
-            if (Test-Path $configFile) {
-                Remove-Item -Path $configFile -Force
-            }
-        }
-
-        BeforeEach {
-            $scoopConfig = $null
-        }
-
         It 'handles plain text string' {
             Compare-Version 'latest' '20150405' | Should -Be -1
             Compare-Version '0.5alpha' '0.5' | Should -Be 1
@@ -102,6 +90,7 @@ Describe 'versions comparison' -Tag 'Scoop' {
         }
 
         It 'handles equal versions' {
+            function get_config { $null }
             Compare-Version '12.0' '12.0' | Should -Be 0
             Compare-Version '7.0.4-9' '7.0.4-9' | Should -Be 0
             Compare-Version 'nightly-20190801' 'nightly' | Should -Be 0
@@ -109,7 +98,7 @@ Describe 'versions comparison' -Tag 'Scoop' {
         }
 
         It 'handles nightly versions with `update_nightly`' {
-            Mock get_config { $true } -ParameterFilter { $name -eq 'update_nightly' }
+            function get_config { $true }
             Mock Get-Date { '20200801' }
             Compare-Version 'nightly-20200801' 'nightly' | Should -Be 0
             Compare-Version 'nightly-20200730' 'nightly' | Should -Be 1
