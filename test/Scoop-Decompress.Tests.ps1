@@ -23,7 +23,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
         }
         It 'Test cases should exist and hash should match' {
             $testcases | Should -Exist
-            compute_hash $testcases 'sha256' | Should -Be '791bfce192917a2ff225dcdd87d23ae5f720b20178d85e68e4b1b56139cf8e6a'
+            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be '791bfce192917a2ff225dcdd87d23ae5f720b20178d85e68e4b1b56139cf8e6a'
         }
         It 'Test cases should be extracted correctly' {
             { Expand-Archive -Path $testcases -DestinationPath $working_dir } | Should -Not -Throw
