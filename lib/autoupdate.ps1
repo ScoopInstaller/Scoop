@@ -267,7 +267,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     write-host -f Green $basename -NoNewline
     write-host -f DarkYellow ' to compute hashes!'
     try {
-        dl_with_cache $app $version $url $null $null $true
+        Invoke-CachedDownload $app $version $url $null $null $true
     } catch [system.net.webexception] {
         write-host -f darkred $_
         write-host -f darkred "URL $url is not valid"
@@ -449,7 +449,7 @@ function Invoke-AutoUpdate {
         # 'Set-Content -Encoding ASCII' don't works in PowerShell 5
         # Wait for 'UTF8NoBOM' Encoding in PowerShell 7
         # $Manifest | ConvertToPrettyJson | Set-Content -Path (Join-Path $Path "$AppName.json") -Encoding UTF8NoBOM
-        [System.IO.File]::WriteAllLines((Join-Path $Path "$AppName.json"), (ConvertToPrettyJson $Manifest))
+        [System.IO.File]::WriteAllLines($Path, (ConvertToPrettyJson $Manifest))
         # notes
         $note = "`nUpdating note:"
         if ($Manifest.autoupdate.note) {
@@ -457,7 +457,7 @@ function Invoke-AutoUpdate {
             $hasNote = $true
         }
         if ($Manifest.autoupdate.architecture) {
-            '64bit', '32bit' | ForEach-Object {
+            '64bit', '32bit', 'arm64' | ForEach-Object {
                 if ($Manifest.autoupdate.architecture.$_.note) {
                     $note += "`n$_-arch: $($Manifest.autoupdate.architecture.$_.note)"
                     $hasNote = $true

@@ -158,7 +158,7 @@ if ($status.installed) {
     if ($verbose) {
         # Get download size if app not installed
         $totalPackage = 0
-        foreach ($url in @(url $manifest (default_architecture))) {
+        foreach ($url in @(url $manifest (Get-DefaultArchitecture))) {
             try {
                 if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
                     $cached = " (latest version is cached)"

@@ -21,20 +21,20 @@
 # Settings
 # --------
 #
-# 7ZIPEXTRACT_USE_EXTERNAL: $true|$false
+# use_external_7zip: $true|$false
 #       External 7zip (from path) will be used for archives extraction.
 #
-# MSIEXTRACT_USE_LESSMSI: $true|$false
+# use_lessmsi: $true|$false
 #       Prefer lessmsi utility over native msiexec.
 #
-# NO_JUNCTIONS: $true|$false
+# no_junction: $true|$false
 #       The 'current' version alias will not be used. Shims and shortcuts will point to specific version instead.
 #
-# SCOOP_REPO: http://github.com/ScoopInstaller/Scoop
+# scoop_repo: http://github.com/ScoopInstaller/Scoop
 #       Git repository containining scoop source code.
 #       This configuration is useful for custom forks.
 #
-# SCOOP_BRANCH: master|develop
+# scoop_branch: master|develop
 #       Allow to use different branch than master.
 #       Could be used for testing specific functionalities before released into all users.
 #       If you want to receive updates earlier to test new functionalities use develop (see: 'https://github.com/ScoopInstaller/Scoop/issues/2939')
@@ -47,7 +47,11 @@
 #       * An empty or unset value for proxy is equivalent to 'default' (with no username or password)
 #       * To bypass the system proxy and connect directly, use 'none' (with no username or password)
 #
-# default_architecture: 64bit|32bit
+# autostash_on_conflict: $true|$false
+#       When a conflict is detected during updating, Scoop will auto-stash the uncommitted changes.
+#       (Default is $false, which will abort the update)
+#
+# default_architecture: 64bit|32bit|arm64
 #       Allow to configure preferred architecture for application installation.
 #       If not specified, architecture is determined be system.
 #
@@ -60,20 +64,20 @@
 # show_update_log: $true|$false
 #       Do not show changed commits on 'scoop update'
 #
-# manifest_review: $true|$false
+# show_manifest: $true|$false
 #       Displays the manifest of every app that's about to
 #       be installed, then asks user if they wish to proceed.
 #
 # shim: kiennq|scoopcs|71
 #       Choose scoop shim build.
 #
-# rootPath: $Env:UserProfile\scoop
+# root_path: $Env:UserProfile\scoop
 #       Path to Scoop root directory.
 #
-# globalPath: $Env:ProgramData\scoop
+# global_path: $Env:ProgramData\scoop
 #       Path to Scoop root directory for global apps.
 #
-# cachePath:
+# cache_path:
 #       For downloads, defaults to 'cache' folder under Scoop root directory.
 #
 # gh_token:
@@ -100,6 +104,12 @@
 #       Array of private hosts that need additional authentication.
 #       For example, if you want to access a private GitHub repository,
 #       you need to add the host to this list with 'match' and 'headers' strings.
+#
+# hold_update_until:
+#       Disable/Hold Scoop self-updates, until the specified date.
+#       `scoop hold scoop` will set the value to one day later.
+#       Should be in the format 'YYYY-MM-DD', 'YYYY/MM/DD' or any other forms that accepted by '[System.DateTime]::Parse()'.
+#       Ref: https://docs.microsoft.com/dotnet/api/system.datetime.parse?view=netframework-4.5#StringToParse
 #
 # ARIA2 configuration
 # -------------------
@@ -137,12 +147,30 @@ if (!$name) {
 } elseif ($name -like '--help') {
     my_usage
 } elseif ($name -like 'rm') {
+    # NOTE Scoop config file migration. Remove this after 2023/6/30
+    if ($value -notin 'SCOOP_REPO', 'SCOOP_BRANCH' -and $value -in $newConfigNames.Keys) {
+        warn ('Config option "{0}" is deprecated, please use "{1}" instead next time.' -f $value, $newConfigNames.$value)
+        $value = $newConfigNames.$value
+    }
+    # END NOTE
     set_config $value $null | Out-Null
     Write-Host "'$value' has been removed"
 } elseif ($null -ne $value) {
+    # NOTE Scoop config file migration. Remove this after 2023/6/30
+    if ($name -notin 'SCOOP_REPO', 'SCOOP_BRANCH' -and $name -in $newConfigNames.Keys) {
+        warn ('Config option "{0}" is deprecated, please use "{1}" instead next time.' -f $name, $newConfigNames.$name)
+        $name = $newConfigNames.$name
+    }
+    # END NOTE
     set_config $name $value | Out-Null
     Write-Host "'$name' has been set to '$value'"
 } else {
+    # NOTE Scoop config file migration. Remove this after 2023/6/30
+    if ($name -notin 'SCOOP_REPO', 'SCOOP_BRANCH' -and $name -in $newConfigNames.Keys) {
+        warn ('Config option "{0}" is deprecated, please use "{1}" instead next time.' -f $name, $newConfigNames.$name)
+        $name = $newConfigNames.$name
+    }
+    # END NOTE
     $value = get_config $name
     if($null -eq $value) {
         Write-Host "'$name' is not set"

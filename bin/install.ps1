@@ -41,10 +41,10 @@ if (Get-Command -Name 'scoop' -ErrorAction SilentlyContinue) {
 $dir = ensure (versiondir 'scoop' 'current')
 
 # download scoop zip
-$zipurl = 'https://github.com/ScoopInstaller/Scoop/archive/master.zip'
-$zipfile = "$dir\scoop.zip"
+$zipUrl = 'https://github.com/ScoopInstaller/Scoop/archive/master.zip'
+$zipFile = "$dir\scoop.zip"
 Write-Output 'Downloading scoop...'
-dl $zipurl $zipfile
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
 
 Write-Output 'Extracting...'
 Add-Type -Assembly "System.IO.Compression.FileSystem"
@@ -57,11 +57,11 @@ shim "$dir\bin\scoop.ps1" $false
 
 # download main bucket
 $dir = "$scoopdir\buckets\main"
-$zipurl = 'https://github.com/ScoopInstaller/Main/archive/master.zip'
-$zipfile = "$dir\main-bucket.zip"
+$zipUrl = 'https://github.com/ScoopInstaller/Main/archive/master.zip'
+$zipFile = "$dir\main-bucket.zip"
 Write-Output 'Downloading main bucket...'
-New-Item $dir -Type Directory -Force | Out-Null
-dl $zipurl $zipfile
+New-Item -Path $dir -Type Directory -Force | Out-Null
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
 
 Write-Output 'Extracting...'
 [IO.Compression.ZipFile]::ExtractToDirectory($zipfile, "$dir\_tmp")
@@ -70,7 +70,7 @@ Remove-Item "$dir\_tmp", $zipfile -Recurse -Force
 
 ensure_robocopy_in_path
 
-scoop config lastupdate ([System.DateTime]::Now.ToString('o'))
+set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
 success 'Scoop was installed successfully!'
 
 Write-Output "Type 'scoop help' for instructions."

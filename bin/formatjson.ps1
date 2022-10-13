@@ -31,15 +31,14 @@ param(
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
 
-$Dir = Resolve-Path $Dir
+$Dir = Convert-Path $Dir
 
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    if ($PSVersionTable.PSVersion.Major -gt 5) { $_ = $_.Name } # Fix for pwsh
-
+Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
+    $file = $_.FullName
     # beautify
-    $json = parse_json "$Dir\$_" | ConvertToPrettyJson
+    $json = parse_json $file | ConvertToPrettyJson
 
     # convert to 4 spaces
     $json = $json -replace "`t", '    '
-    [System.IO.File]::WriteAllLines("$Dir\$_", $json)
+    [System.IO.File]::WriteAllLines($file, $json)
 }
