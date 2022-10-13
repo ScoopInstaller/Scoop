@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Code Refactoring
+
+- **hash:** Use `Get-FileHash()` directly ([#5177](https://github.com/ScoopInstaller/Scoop/issues/5177))
+
 ## [v0.3.0](https://github.com/ScoopInstaller/Scoop/compare/v0.2.4...v0.3.0) - 2022-10-10
 
 ### Features
