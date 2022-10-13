@@ -120,7 +120,7 @@ foreach ($current in $MANIFESTS) {
         Invoke-CachedDownload $current.app $version $_ $null $null -use_cache:$UseCache
 
         $to_check = fullpath (cache_path $current.app $version $_)
-        $actual_hash = compute_hash $to_check $algorithm
+        $actual_hash = (Get-FileHash -Path $to_check -Algorithm $algorithm).Hash.ToLower()
 
         # Append type of algorithm to both expected and actual if it's not sha256
         if ($algorithm -ne 'sha256') {

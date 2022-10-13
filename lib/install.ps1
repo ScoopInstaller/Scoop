@@ -659,7 +659,7 @@ function hash_for_url($manifest, $url, $arch) {
 function check_hash($file, $hash, $app_name) {
     $file = fullpath $file
     if(!$hash) {
-        warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $(compute_hash $file 'sha256')"
+        warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
         return $true, $null
     }
 
@@ -671,7 +671,7 @@ function check_hash($file, $hash, $app_name) {
         return $false, "Hash type '$algorithm' isn't supported."
     }
 
-    $actual = compute_hash $file $algorithm
+    $actual = (Get-FileHash -Path $file -Algorithm $algorithm).Hash.ToLower()
     $expected = $expected.ToLower()
 
     if($actual -ne $expected) {
@@ -689,25 +689,6 @@ function check_hash($file, $hash, $app_name) {
     }
     Write-Host "ok." -f Green
     return $true, $null
-}
-
-function compute_hash($file, $algname) {
-    try {
-        if(Test-CommandAvailable Get-FileHash) {
-            return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
-        } else {
-            $fs = [system.io.file]::openread($file)
-            $alg = [system.security.cryptography.hashalgorithm]::create($algname)
-            $hexbytes = $alg.computehash($fs) | ForEach-Object { $_.tostring('x2') }
-            return [string]::join('', $hexbytes)
-        }
-    } catch {
-        error $_.exception.message
-    } finally {
-        if($fs) { $fs.dispose() }
-        if($alg) { $alg.dispose() }
-    }
-    return ''
 }
 
 # for dealing with installers
