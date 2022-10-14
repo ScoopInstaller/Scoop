@@ -240,7 +240,7 @@ function Expand-ZipArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+    Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
