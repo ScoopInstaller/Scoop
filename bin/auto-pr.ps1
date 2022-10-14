@@ -188,14 +188,13 @@ hub diff --name-only | ForEach-Object {
     }
 
     $app = ([System.IO.Path]::GetFileNameWithoutExtension($manifest))
-    $CommitMessage = $CommitMessageFormat -replace '<app>',$app -replace '<version>',$version
     $json = parse_json $manifest
     if (!$json.version) {
         error "Invalid manifest: $manifest ..."
         return
     }
     $version = $json.version
-
+    $CommitMessage = $CommitMessageFormat -replace '<app>',$app -replace '<version>',$version
     if ($Push) {
         Write-Host "Creating update $app ($version) ..." -ForegroundColor DarkCyan
         execute "hub add $manifest"
