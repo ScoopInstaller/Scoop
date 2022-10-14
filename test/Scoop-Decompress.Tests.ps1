@@ -5,7 +5,7 @@
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 
-Describe 'Decompression function' -Tag 'Scoop', 'Decompress' {
+Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
 
     BeforeAll {
         $working_dir = setup_working 'decompress'

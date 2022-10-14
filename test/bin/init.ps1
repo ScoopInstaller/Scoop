@@ -1,6 +1,5 @@
 #Requires -Version 5.1
 Write-Host "PowerShell: $($PSVersionTable.PSVersion)"
-Write-Host (7z.exe | Select-String -Pattern '7-Zip').ToString()
 Write-Host 'Check and install testsuite dependencies ...'
 if (Get-InstalledModule -Name Pester -MinimumVersion 4.0 -MaximumVersion 4.99 -ErrorAction SilentlyContinue) {
     Write-Host 'Pester 4 is already installed.'

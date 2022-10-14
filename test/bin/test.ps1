@@ -10,13 +10,17 @@ $splat = @{
     Path     = $TestPath
     PassThru = $true
 }
+$excludes = @()
+
+if ($IsLinux -or $IsMacOS) {
+    Write-Warning 'Skipping Windows-only tests on Linux/macOS'
+    $excludes += 'Windows'
+}
 
 if ($env:CI -eq $true) {
     Write-Host "Load 'BuildHelpers' environment variables ..."
     Set-BuildEnvironment -Force
-    $CI_WIN = (($env:RUNNER_OS -eq 'Windows') -or ($env:CI_WINDOWS -eq $true))
 
-    $excludes = @()
     $commit = $env:BHCommitHash
     $commitMessage = $env:BHCommitMessage
 
@@ -25,11 +29,6 @@ if ($env:CI -eq $true) {
         if ($commitMessage -match '!linter') {
             Write-Warning "Skipping code linting per commit flag '!linter'"
             $excludes += 'Linter'
-        }
-
-        if (!$CI_WIN) {
-            Write-Warning 'Skipping tests and code linting for decompress.ps1 because they only work on Windows'
-            $excludes += 'Decompress'
         }
 
         $changedScripts = (Get-GitChangedFile -Include '*.ps1' -Commit $commit)
@@ -44,8 +43,10 @@ if ($env:CI -eq $true) {
             $excludes += 'Decompress'
         }
 
-        if ('Decompress' -notin $excludes) {
+        if ('Decompress' -notin $excludes -and 'Windows' -notin $excludes) {
             Write-Host 'Install decompress dependencies ...'
+
+            Write-Host (7z.exe | Select-String -Pattern '7-Zip').ToString()
 
             $env:SCOOP_HELPERS_PATH = 'C:\projects\helpers'
             if (!(Test-Path $env:SCOOP_HELPERS_PATH)) {
@@ -83,10 +84,6 @@ if ($env:CI -eq $true) {
         }
     }
 
-    if ($excludes.Length -gt 0) {
-        $splat.ExcludeTag = $excludes
-    }
-
     # Display CI environment variables
     $buildVariables = ( Get-ChildItem -Path 'Env:' ).Where( { $_.Name -match '^(?:BH|CI(?:_|$)|APPVEYOR|GITHUB_|RUNNER_|SCOOP_)' } )
     $buildVariables += ( Get-Variable -Name 'CI_*' -Scope 'Script' )
@@ -97,28 +94,26 @@ if ($env:CI -eq $true) {
         Out-String
     Write-Host 'CI variables:'
     Write-Host $details -ForegroundColor DarkGray
+}
 
+if ($excludes.Length -gt 0) {
+    $splat.ExcludeTag = $excludes
+}
+
+if ($env:BHBuildSystem -eq 'AppVeyor') {
     # AppVeyor
-    if ($env:BHBuildSystem -eq "AppVeyor") {
-        $resultsXml = "$PSScriptRoot\TestResults.xml"
-        $splat += @{
-            OutputFile   = $resultsXml
-            OutputFormat = 'NUnitXML'
-        }
-
-        Write-Host 'Invoke-Pester' @splat
-        $result = Invoke-Pester @splat
-
-        (New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
-        exit $result.FailedCount
+    $resultsXml = "$PSScriptRoot\TestResults.xml"
+    $splat += @{
+        OutputFile   = $resultsXml
+        OutputFormat = 'NUnitXML'
     }
+    Write-Host 'Invoke-Pester' @splat
+    $result = Invoke-Pester @splat
+    (New-Object Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", $resultsXml)
+} else {
+    # GitHub Actions / Local
+    Write-Host 'Invoke-Pester' @splat
+    $result = Invoke-Pester @splat
 }
 
-if ($IsLinux -or $IsMacOS) {
-    $splat.ExcludeTag = @('Decompress', 'Windows')
-}
-
-# GitHub Actions / Local
-Write-Host 'Invoke-Pester' @splat
-$result = Invoke-Pester @splat
 exit $result.FailedCount
