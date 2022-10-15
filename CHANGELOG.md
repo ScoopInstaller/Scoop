@@ -4,6 +4,7 @@
 
 - **decompress:** Use PS's default 'Expand-Archive()' ([#5185](https://github.com/ScoopInstaller/Scoop/issues/5185))
 - **hash:** Fix SourceForge's hash extraction ([#5189](https://github.com/ScoopInstaller/Scoop/issues/5189))
+- **decompress:** Trim ending '/' ([#5195](https://github.com/ScoopInstaller/Scoop/issues/5195))
 
 ### Code Refactoring
 
