@@ -2,9 +2,6 @@
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\unix.ps1"
-
-$isUnix = is_unix
 
 Describe 'appname_from_url' -Tag 'Scoop' {
     It 'should extract the correct name' {
@@ -34,8 +31,8 @@ Describe 'url_remote_filename' -Tag 'Scoop' {
     }
 }
 
-Describe 'is_in_dir' -Tag 'Scoop' {
-    It 'should work correctly' -Skip:$isUnix {
+Describe 'is_in_dir' -Tag 'Scoop', 'Windows' {
+    It 'should work correctly' {
         is_in_dir 'C:\test' 'C:\foo' | Should -BeFalse
         is_in_dir 'C:\test' 'C:\test\foo\baz.zip' | Should -BeTrue
 
@@ -44,7 +41,7 @@ Describe 'is_in_dir' -Tag 'Scoop' {
     }
 }
 
-Describe 'env add and remove path' -Tag 'Scoop' {
+Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
     # test data
     $manifest = @{
         'env_add_path' = @('foo', 'bar')
@@ -55,7 +52,7 @@ Describe 'env add and remove path' -Tag 'Scoop' {
     # store the original path to prevent leakage of tests
     $origPath = $env:PATH
 
-    It 'should concat the correct path' -Skip:$isUnix {
+    It 'should concat the correct path' {
         Mock add_first_in_path {}
         Mock remove_from_path {}
 
