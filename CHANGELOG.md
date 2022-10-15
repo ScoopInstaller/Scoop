@@ -13,6 +13,7 @@
 ### Builds
 
 - **auto-pr:** Add `CommitMessageFormat` option ([#5171](https://github.com/ScoopInstaller/Scoop/issues/5171))
+- **checkver:** Support XML default namespace ([#5191](https://github.com/ScoopInstaller/Scoop/issues/5191))
 
 ## [v0.3.0](https://github.com/ScoopInstaller/Scoop/compare/v0.2.4...v0.3.0) - 2022-10-10
 
