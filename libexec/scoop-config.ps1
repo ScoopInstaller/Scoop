@@ -53,7 +53,7 @@
 #
 # default_architecture: 64bit|32bit|arm64
 #       Allow to configure preferred architecture for application installation.
-#       If not specified, architecture is determined be system.
+#       If not specified, architecture is determined by system.
 #
 # debug: $true|$false
 #       Additional and detailed output will be shown.
