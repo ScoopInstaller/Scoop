@@ -202,7 +202,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $version = $manifest.version
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
-        $version = nightly_version $(get-date) $quiet
+        $version = nightly_version $quiet
         $check_hash = $false
     }
 

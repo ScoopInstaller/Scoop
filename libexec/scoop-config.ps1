@@ -111,6 +111,10 @@
 #       Should be in the format 'YYYY-MM-DD', 'YYYY/MM/DD' or any other forms that accepted by '[System.DateTime]::Parse()'.
 #       Ref: https://docs.microsoft.com/dotnet/api/system.datetime.parse?view=netframework-4.5#StringToParse
 #
+# update_nightly: $true|$false
+#       Nightly version is formatted as 'nightly-yyyyMMdd' and will be updated after one day if this is set to $true.
+#       Otherwise, nightly version will not be updated unless `--force` is used.
+#
 # ARIA2 configuration
 # -------------------
 #
