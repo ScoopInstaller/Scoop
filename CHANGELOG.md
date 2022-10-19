@@ -21,6 +21,10 @@
 - **checkver:** Support XML default namespace ([#5191](https://github.com/ScoopInstaller/Scoop/issues/5191))
 - **pssa:** Remove unused 'ExcludeRules' ([#5201](https://github.com/ScoopInstaller/Scoop/issues/5201))
 
+### Continuous Integration
+
+- **module:** Update modules version ([#5209](https://github.com/ScoopInstaller/Scoop/issues/5209))
+
 ### Tests
 
 - **unix:** Fix tests in Linux and macOS ([#5179](https://github.com/ScoopInstaller/Scoop/issues/5179))
