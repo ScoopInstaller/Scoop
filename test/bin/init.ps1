@@ -1,11 +1,11 @@
 #Requires -Version 5.1
 Write-Host "PowerShell: $($PSVersionTable.PSVersion)"
 Write-Host 'Check and install testsuite dependencies ...'
-if (Get-InstalledModule -Name Pester -MinimumVersion 4.0 -MaximumVersion 4.99 -ErrorAction SilentlyContinue) {
-    Write-Host 'Pester 4 is already installed.'
+if (Get-InstalledModule -Name Pester -MinimumVersion 5.2 -MaximumVersion 5.99 -ErrorAction SilentlyContinue) {
+    Write-Host 'Pester 5 is already installed.'
 } else {
-    Write-Host 'Installing Pester 4 ...'
-    Install-Module -Repository PSGallery -Scope CurrentUser -Force -Name Pester -MinimumVersion 4.0 -MaximumVersion 4.99 -SkipPublisherCheck
+    Write-Host 'Installing Pester 5 ...'
+    Install-Module -Repository PSGallery -Scope CurrentUser -Force -Name Pester -MinimumVersion 5.2 -MaximumVersion 5.99 -SkipPublisherCheck
 }
 if (Get-InstalledModule -Name PSScriptAnalyzer -MinimumVersion 1.17 -ErrorAction SilentlyContinue) {
     Write-Host 'PSScriptAnalyzer is already installed.'
