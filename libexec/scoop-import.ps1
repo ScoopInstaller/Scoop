@@ -40,12 +40,14 @@ foreach ($item in $import.apps) {
     } else {
         ''
     }
-    $arch = if ('64bit' -in $info) {
+    $arch = if ('64bit' -in $info -and '64bit' -ne $def_arch) {
         ' --arch 64bit'
-    } elseif ('32bit' -in $info) {
+    } elseif ('32bit' -in $info -and '32bit' -ne $def_arch) {
         ' --arch 32bit'
-    } else {
+    } elseif ('arm64' -in $info -and 'arm64' -ne $def_arch) {
         ' --arch arm64'
+    } else {
+        ''
     }
 
     $app = if ($item.Source -in $bucket_names) {
