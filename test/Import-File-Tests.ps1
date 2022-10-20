@@ -44,6 +44,70 @@ Describe 'Style constraints for non-binary project files' {
         }
     }
 
+    It 'registry files should be UTF-16LE encoded' -Skip:$(-not $files_exist) {
+        # Unicode files with BOM
+        # UTF-7 == 0x2B 0x2F 0x76
+        # UTF-8 == 0xEF 0xBB 0xBF
+        # UTF-16LE == 0xFF 0xFE
+        # UTF-16BE == 0xFE 0xFF
+        # UTF-32LE == 0xFF 0xFE 0x00 0x00
+        # UTF-32BE == 0x00 0x00 0xFE 0xFF
+        # see https://gist.github.com/SalviaSage/8eba542dc27eea3379a1f7dad3f729a0
+        # see http://www.powershellmagazine.com/2012/12/17/pscxtip-how-to-determine-the-byte-order-mark-of-a-text-file @@ https://archive.is/RgT42
+        # see https://en.wikipedia.org/w/index.php?title=Windows_Registry&action=view&section=19#.REG_files
+        $badFiles = @(
+            foreach ($file in $files)
+            {
+                if ([regex]::match($file.FullName, '(?<=\.)reg$').success)){
+                    if((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+                        # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
+                        $byteContent = [byte[]](Get-Content $file.FullName -AsByteStream -ReadCount 4 -TotalCount 4)
+                    } else {
+                        $byteContent = [byte[]](Get-Content $file.FullName -Encoding byte -ReadCount 4 -TotalCount 4)
+                    }
+                    $content = [System.BitConverter]::ToString($byteContent)
+                    # note that all the detection is done based on BOM
+                    # all encodings which do not have BOM default
+                    switch ($content) {
+                        {$_ -match '^2B-2F-76'} { #endianless
+                            Write-Error -Message "[Error]: Your registry is *UTF7* encoded please, correct it to *UTF-16LE-BOM*!`r`n"; break
+                        }
+                        {$_ -match '^EF-BB-BF'} { #endianless
+                            Write-Warning -Message "[WARNING]: Your registry is *UTF8-BOM* encoded, please correct it to *UTF-16LE-BOM*!`r`n"; break
+                        }
+                        {$_ -match '^FF-FE'} { #little endian
+                            Write-Verbose -Message "[INFO]: Your registry file correctly encoded to *UTF-16LE-BOM*!`r`n" -Verbose
+                        }
+                        {$_ -match '^FE-FF'} { #big endian
+                            Write-Error -Message "[Error]: Your registry is *UTF16BE* encoded, please correct it to *UTF-16LE-BOM*!`r`n"; break
+                        }
+                        {$_ -match '^FF-FE-00-00'} { #little endian
+                            Write-Error -Message "[Error]: Your registry is *UTF-32-LE* encoded, please correct it to *UTF-16LE-BOM*!`r`n"; break
+                        }
+                        {$_ -match '^FF-FE-00-00'} { #big endian
+                            Write-Error -Message "[Error]: Your registry is *UTF-32-BE* encoded, please correct it to *UTF-16LE-BOM*!`r`n"; break
+                        }
+                        default { 
+                            Write-Warning -Message "[WARNING]: *Unrecognized* registry encoding, probably missing BOM (byte order mark), please correct it to *UTF-16LE-BOM*`r`n"; break
+                        }
+                    }
+
+                    if (([regex]::match($content, -match '^2B-2F-76')) -or # UTF-7
+                        ([regex]::match($content, -match '^FE-FF')) -or # UTF-16BE
+                        ([regex]::match($content, -match '^FF-FE-00-00')) -or # UTF-32LE
+                        ([regex]::match($content, -match '^00-00-FE-FF')) ) { #UTF-32BE
+                            $file.FullName
+                    }
+                }
+        )
+
+        if ($badFiles.Count -gt 0)
+        {
+            throw "The following registry files have incorrect encoding (fix it to *UTF-16LE-BOM*): `r`n`r`n$($badFiles -join "`r`n")"
+        }
+    }
+
+
     It 'files end with a newline' -Skip:$(-not $files_exist) {
         $badFiles = @(
             foreach ($file in $files) {
@@ -51,8 +115,9 @@ Describe 'Style constraints for non-binary project files' {
                 if ($file -match 'TestResults.xml') {
                     continue
                 }
-                $string = [System.IO.File]::ReadAllText($file.FullName)
-                if ($string.Length -gt 0 -and $string[-1] -ne "`n") {
+                $string = [System.IO.File]::ReadAllBytes($file.FullName)
+                if ($string.Length -gt 0 -and $string[-2] -ne 10) # Char(10) ... New Line
+                {
                     $file.FullName
                 }
             }
