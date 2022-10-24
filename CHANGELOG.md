@@ -21,6 +21,7 @@
 - **auto-pr:** Add `CommitMessageFormat` option ([#5171](https://github.com/ScoopInstaller/Scoop/issues/5171))
 - **checkver:** Support XML default namespace ([#5191](https://github.com/ScoopInstaller/Scoop/issues/5191))
 - **pssa:** Remove unused 'ExcludeRules' ([#5201](https://github.com/ScoopInstaller/Scoop/issues/5201))
+- **schema:** Add 'installer' and 'shortcuts' to 'autoupdate' ([#5220](https://github.com/ScoopInstaller/Scoop/issues/5220))
 
 ### Continuous Integration
 
