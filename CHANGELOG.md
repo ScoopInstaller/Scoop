@@ -28,6 +28,7 @@
 ### Tests
 
 - **unix:** Fix tests in Linux and macOS ([#5179](https://github.com/ScoopInstaller/Scoop/issues/5179))
+- **pester:** Update to Pester 5 ([#5222](https://github.com/ScoopInstaller/Scoop/issues/5222))
 
 ## [v0.3.0](https://github.com/ScoopInstaller/Scoop/compare/v0.2.4...v0.3.0) - 2022-10-10
 
