@@ -1,8 +1,8 @@
-. "$PSScriptRoot\Scoop-TestLib.ps1"
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
-
-$repo_dir = (Get-Item $MyInvocation.MyCommand.Path).directory.parent.FullName
+BeforeAll {
+    . "$PSScriptRoot\Scoop-TestLib.ps1"
+    . "$PSScriptRoot\..\lib\core.ps1"
+    . "$PSScriptRoot\..\lib\install.ps1"
+}
 
 Describe 'Get-AppFilePath' -Tag 'Scoop' {
     BeforeAll {
@@ -127,11 +127,10 @@ Describe 'is_directory' -Tag 'Scoop' {
 }
 
 Describe 'movedir' -Tag 'Scoop', 'Windows' {
-    $extract_dir = 'subdir'
-    $extract_to = $null
-
     BeforeAll {
         $working_dir = setup_working 'movedir'
+        $extract_dir = 'subdir'
+        $extract_to = $null
     }
 
     It 'moves directories with no spaces in path' {
@@ -184,15 +183,13 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
         shim-test | Should -Be 'Hello, world!'
     }
 
-    Context 'user with quote' {
-        It 'shims a file with quote in path' {
-            { Get-Command 'shim-test' -ea stop } | Should -Throw
-            { shim-test } | Should -Throw
+    It 'shims a file with quote in path' {
+        { Get-Command 'shim-test' -ea stop } | Should -Throw
+        { shim-test } | Should -Throw
 
-            shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
-            { Get-Command 'shim-test' -ea stop } | Should -Not -Throw
-            shim-test | Should -Be 'Hello, world!'
-        }
+        shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
+        { Get-Command 'shim-test' -ea stop } | Should -Not -Throw
+        shim-test | Should -Be 'Hello, world!'
     }
 
     AfterEach {
@@ -262,34 +259,32 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
 }
 
 Describe 'ensure_robocopy_in_path' -Tag 'Scoop', 'Windows' {
-    $shimdir = shimdir $false
-    Mock versiondir { $repo_dir }
-
-    Context 'robocopy is not in path' {
-        It 'shims robocopy when not on path' {
-            Mock Test-CommandAvailable { $false }
-            Test-CommandAvailable robocopy | Should -Be $false
-
-            ensure_robocopy_in_path
-
-            # "$shimdir/robocopy.ps1" | should -exist
-            "$shimdir/robocopy.exe" | Should -Exist
-
-            # clean up
-            rm_shim robocopy $(shimdir $false) | Out-Null
-        }
+    BeforeAll {
+        $shimdir = shimdir $false
+        Mock versiondir { "$PSScriptRoot\.." }
     }
 
-    Context 'robocopy is in path' {
-        It 'does not shim robocopy when it is in path' {
-            Mock Test-CommandAvailable { $true }
-            Test-CommandAvailable robocopy | Should -Be $true
+    It 'shims robocopy when not on path' {
+        Mock Test-CommandAvailable { $false }
+        Test-CommandAvailable robocopy | Should -Be $false
 
-            ensure_robocopy_in_path
+        ensure_robocopy_in_path
 
-            # "$shimdir/robocopy.ps1" | should -not -exist
-            "$shimdir/robocopy.exe" | Should -Not -Exist
-        }
+        # "$shimdir/robocopy.ps1" | should -exist
+        "$shimdir/robocopy.exe" | Should -Exist
+
+        # clean up
+        rm_shim robocopy $(shimdir $false) | Out-Null
+    }
+
+    It 'does not shim robocopy when it is in path' {
+        Mock Test-CommandAvailable { $true }
+        Test-CommandAvailable robocopy | Should -Be $true
+
+        ensure_robocopy_in_path
+
+        # "$shimdir/robocopy.ps1" | should -not -exist
+        "$shimdir/robocopy.exe" | Should -Not -Exist
     }
 }
 
