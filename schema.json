@@ -248,6 +248,15 @@
                 "hash": {
                     "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
                 },
+                "installer": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "file": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "license": {
                     "$ref": "#/definitions/license"
                 },
@@ -265,6 +274,9 @@
                             "type": "string"
                         }
                     }
+                },
+                "shortcuts": {
+                    "$ref": "#/definitions/shortcutsArray"
                 },
                 "url": {
                     "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
