@@ -1,8 +1,8 @@
-BeforeDiscovery {
-    $scriptDir = @('bin', 'lib', 'libexec', 'test')
-}
-
 Describe 'PSScriptAnalyzer' -Tag 'Linter' {
+    BeforeDiscovery {
+        $scriptDir = @('.', 'bin', 'lib', 'libexec', 'test')
+    }
+
     BeforeAll {
         $lintSettings = "$PSScriptRoot\..\PSScriptAnalyzerSettings.psd1"
     }
@@ -10,6 +10,7 @@ Describe 'PSScriptAnalyzer' -Tag 'Linter' {
     It 'PSScriptAnalyzerSettings.ps1 should exist' {
         $lintSettings | Should -Exist
     }
+
     Context 'Linting all *.psd1, *.psm1 and *.ps1 files' {
         BeforeEach {
             $analysis = Invoke-ScriptAnalyzer -Path "$PSScriptRoot\..\$_" -Settings $lintSettings
@@ -23,8 +24,8 @@ Describe 'PSScriptAnalyzer' -Tag 'Linter' {
                         '*.ps1' { $type = 'Script' }
                         '*.psd1' { $type = 'Manifest' }
                     }
-                    Write-Host -f Yellow "      [*] $($result.Severity): $($result.Message)"
-                    Write-Host -f Yellow "          $($result.RuleName) in $type`: $directory\$($result.ScriptName):$($result.Line)"
+                    Write-Warning "     [*] $($result.Severity): $($result.Message)"
+                    Write-Warning "         $($result.RuleName) in $type`: $directory\$($result.ScriptName):$($result.Line)"
                 }
             }
         }

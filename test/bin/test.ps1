@@ -3,7 +3,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.2.0' }
 #Requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
-    [String] $TestPath = $(Convert-Path "$PSScriptRoot\..\")
+    [String] $TestPath = (Convert-Path "$PSScriptRoot\..")
 )
 
 $pesterConfig = New-PesterConfiguration -Hashtable @{
@@ -30,7 +30,7 @@ if ($env:CI -eq $true) {
     $commitMessage = $env:BHCommitMessage
 
     # Check if tests are called from the Core itself, if so, adding excludes
-    if ($TestPath -eq $(Convert-Path "$PSScriptRoot\..\")) {
+    if ($TestPath -eq (Convert-Path "$PSScriptRoot\..")) {
         if ($commitMessage -match '!linter') {
             Write-Warning "Skipping code linting per commit flag '!linter'"
             $excludes += 'Linter'
@@ -90,7 +90,7 @@ if ($env:CI -eq $true) {
     }
 
     # Display CI environment variables
-    $buildVariables = ( Get-ChildItem -Path 'Env:' ).Where( { $_.Name -match '^(?:BH|CI(?:_|$)|APPVEYOR|GITHUB_|RUNNER_|SCOOP_)' } )
+    $buildVariables = (Get-ChildItem -Path 'Env:').Where({ $_.Name -match '^(?:BH|CI(?:_|$)|APPVEYOR|GITHUB_|RUNNER_|SCOOP_)' })
     $details = $buildVariables |
         Where-Object -FilterScript { $_.Name -notmatch 'EMAIL' } |
         Sort-Object -Property 'Name' |
