@@ -25,7 +25,7 @@ function getopt($argv, $shortopts, $longopts) {
     }
 
     # ensure these are arrays
-    $argv = @($argv)
+    $argv = @($argv -split ' ')
     $longopts = @($longopts)
 
     for ($i = 0; $i -lt $argv.Length; $i++) {

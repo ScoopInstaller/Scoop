@@ -9,6 +9,7 @@
 - **decompress:** Use PS's default 'Expand-Archive()' ([#5185](https://github.com/ScoopInstaller/Scoop/issues/5185))
 - **hash:** Fix SourceForge's hash extraction ([#5189](https://github.com/ScoopInstaller/Scoop/issues/5189))
 - **decompress:** Trim ending '/' ([#5195](https://github.com/ScoopInstaller/Scoop/issues/5195))
+- **scoop-import:** Add correct architecture argument ([#5210](https://github.com/ScoopInstaller/Scoop/issues/5210))
 
 ### Code Refactoring
 
@@ -20,6 +21,7 @@
 - **auto-pr:** Add `CommitMessageFormat` option ([#5171](https://github.com/ScoopInstaller/Scoop/issues/5171))
 - **checkver:** Support XML default namespace ([#5191](https://github.com/ScoopInstaller/Scoop/issues/5191))
 - **pssa:** Remove unused 'ExcludeRules' ([#5201](https://github.com/ScoopInstaller/Scoop/issues/5201))
+- **schema:** Add 'installer' and 'shortcuts' to 'autoupdate' ([#5220](https://github.com/ScoopInstaller/Scoop/issues/5220))
 
 ### Continuous Integration
 
@@ -29,6 +31,10 @@
 
 - **unix:** Fix tests in Linux and macOS ([#5179](https://github.com/ScoopInstaller/Scoop/issues/5179))
 - **pester:** Update to Pester 5 ([#5222](https://github.com/ScoopInstaller/Scoop/issues/5222))
+
+### Documentation
+
+- **scoop-cat:** Fix help message([#5224](https://github.com/ScoopInstaller/Scoop/issues/5224))
 
 ## [v0.3.0](https://github.com/ScoopInstaller/Scoop/compare/v0.2.4...v0.3.0) - 2022-10-10
 
