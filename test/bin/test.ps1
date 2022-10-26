@@ -55,7 +55,7 @@ if ($env:CI -eq $true) {
 
             $env:SCOOP_HELPERS_PATH = 'C:\projects\helpers'
             if (!(Test-Path $env:SCOOP_HELPERS_PATH)) {
-                New-Item -ItemType Directory -Path $env:SCOOP_HELPERS_PATH
+                New-Item -ItemType Directory -Path $env:SCOOP_HELPERS_PATH | Out-Null
             }
 
             $env:SCOOP_LESSMSI_PATH = "$env:SCOOP_HELPERS_PATH\lessmsi\lessmsi.exe"
