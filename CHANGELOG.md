@@ -32,6 +32,7 @@
 
 - **unix:** Fix tests in Linux and macOS ([#5179](https://github.com/ScoopInstaller/Scoop/issues/5179))
 - **pester:** Update to Pester 5 ([#5222](https://github.com/ScoopInstaller/Scoop/issues/5222))
+- **bucket:** Use BuildHelpers' EnvVars ([#5226](https://github.com/ScoopInstaller/Scoop/issues/5226))
 
 ### Documentation
 
