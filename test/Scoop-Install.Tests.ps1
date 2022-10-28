@@ -1,7 +1,9 @@
-. "$PSScriptRoot\Scoop-TestLib.ps1"
-. "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
+BeforeAll {
+    . "$PSScriptRoot\Scoop-TestLib.ps1"
+    . "$PSScriptRoot\..\lib\core.ps1"
+    . "$PSScriptRoot\..\lib\manifest.ps1"
+    . "$PSScriptRoot\..\lib\install.ps1"
+}
 
 Describe 'appname_from_url' -Tag 'Scoop' {
     It 'should extract the correct name' {
@@ -42,15 +44,17 @@ Describe 'is_in_dir' -Tag 'Scoop', 'Windows' {
 }
 
 Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
-    # test data
-    $manifest = @{
-        'env_add_path' = @('foo', 'bar')
-    }
-    $testdir = Join-Path $PSScriptRoot 'path-test-directory'
-    $global = $false
+    BeforeAll {
+        # test data
+        $manifest = @{
+            'env_add_path' = @('foo', 'bar')
+        }
+        $testdir = Join-Path $PSScriptRoot 'path-test-directory'
+        $global = $false
 
-    # store the original path to prevent leakage of tests
-    $origPath = $env:PATH
+        # store the original path to prevent leakage of tests
+        $origPath = $env:PATH
+    }
 
     It 'should concat the correct path' {
         Mock add_first_in_path {}
