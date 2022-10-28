@@ -26,17 +26,14 @@ if ($env:CI -eq $true) {
     Write-Host "Load 'BuildHelpers' environment variables ..."
     Set-BuildEnvironment -Force
 
-    $commit = $env:BHCommitHash
-    $commitMessage = $env:BHCommitMessage
-
     # Check if tests are called from the Core itself, if so, adding excludes
     if ($TestPath -eq (Convert-Path "$PSScriptRoot\..")) {
-        if ($commitMessage -match '!linter') {
+        if ($env:BHCommitMessage -match '!linter') {
             Write-Warning "Skipping code linting per commit flag '!linter'"
             $excludes += 'Linter'
         }
 
-        $changedScripts = (Get-GitChangedFile -Include '*.ps1', '*.psd1', '*.psm1' -Commit $commit)
+        $changedScripts = (Get-GitChangedFile -Include '*.ps1', '*.psd1', '*.psm1' -Commit $env:BHCommitHash)
         if (!$changedScripts) {
             Write-Warning "Skipping tests and code linting for PowerShell scripts because they didn't change"
             $excludes += 'Linter'

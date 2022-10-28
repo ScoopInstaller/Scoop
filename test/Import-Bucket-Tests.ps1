@@ -1,4 +1,5 @@
 #Requires -Version 5.1
+#Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.2.0' }
 param(
     [String] $BucketPath = $MyInvocation.PSScriptRoot
@@ -14,18 +15,8 @@ Describe 'Manifest validates against the schema' {
             $BucketPath
         }
         if ($env:CI -eq $true) {
-            $commit = if ($env:GITHUB_SHA) {
-                # GitHub Actions
-                $env:GITHUB_SHA
-            } elseif ($env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT) {
-                # AppVeyor
-                $env:APPVEYOR_PULL_REQUEST_HEAD_COMMIT
-            } else {
-                $env:APPVEYOR_REPO_COMMIT
-            }
-            if ($commit) {
-                $changedManifests = @(Get-GitChangedFile -Path $bucketDir -Include '*.json' -Commit $commit)
-            }
+            Set-BuildEnvironment -Force
+            $changedManifests = @(Get-GitChangedFile -Path $bucketDir -Include '*.json' -Commit $env:BHCommitHash)
         }
         $manifestFiles = (Get-ChildItem $bucketDir -Filter '*.json' -Recurse).FullName
         if ($changedManifests) {
