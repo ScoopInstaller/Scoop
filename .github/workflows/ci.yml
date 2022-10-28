@@ -32,7 +32,7 @@ jobs:
       - name: Init Test Suite
         uses: potatoqualitee/psmodulecache@v5.1
         with:
-          modules-to-cache: PSScriptAnalyzer, BuildHelpers, Pester
+          modules-to-cache: BuildHelpers
           shell: pwsh
       - name: Test Scoop Core
         shell: pwsh
