@@ -3,6 +3,7 @@
 ### Features
 
 - **config:** Allow Scoop to check if apps versioned as 'nightly' are outdated ([#5166](https://github.com/ScoopInstaller/Scoop/issues/5166))
+- **checkup:** Add Windows Developer Mode check ([#5233](https://github.com/ScoopInstaller/Scoop/issues/5233))
 
 ### Bug Fixes
 
