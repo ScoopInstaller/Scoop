@@ -1256,10 +1256,10 @@ if ($scoopConfig) {
 # END NOTE
 
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$([System.Environment]::GetFolderPath('LocalApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop cache directory
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory

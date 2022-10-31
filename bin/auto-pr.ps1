@@ -66,7 +66,6 @@ param(
 
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
-. "$PSScriptRoot\..\lib\unix.ps1"
 
 if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
     $Dir = Split-Path $App
@@ -92,7 +91,7 @@ Optional options:
     exit 0
 }
 
-if (is_unix) {
+if ($IsLinux -or $IsMacOS) {
     if (!(which hub)) {
         Write-Host "Please install hub ('brew install hub' or visit: https://hub.github.com/)" -ForegroundColor Yellow
         exit 1
