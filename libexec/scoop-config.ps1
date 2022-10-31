@@ -179,7 +179,11 @@ if (!$name) {
     if($null -eq $value) {
         Write-Host "'$name' is not set"
     } else {
-        $value
+        if ($value -is [System.DateTime]) {
+            $value.ToString('o')
+        } else {
+            $value
+        }
     }
 }
 
