@@ -53,3 +53,17 @@ function check_long_paths {
 
     return $true
 }
+
+function Get-WindowsDeveloperModeStatus {
+    $DevModRegistryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock"
+    if (!(Test-Path -Path $DevModRegistryPath) -or (Get-ItemProperty -Path `
+        $DevModRegistryPath -Name AllowDevelopmentWithoutDevLicense -ErrorAction `
+        SilentlyContinue).AllowDevelopmentWithoutDevLicense -ne 1) {
+        warn "Windows Developer Mode is not enabled. Operations relevant to symlinks may fail without proper rights."
+        Write-Host "  You may read more about the symlinks support here:"
+        Write-Host "  https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/"
+        return $false
+    }
+
+    return $true
+}
