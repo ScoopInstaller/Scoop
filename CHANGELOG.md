@@ -18,6 +18,7 @@
 
 - **hash:** Use `Get-FileHash()` directly ([#5177](https://github.com/ScoopInstaller/Scoop/issues/5177))
 - **installer:** Drop the old installer ([#5186](https://github.com/ScoopInstaller/Scoop/issues/5186))
+- **unix:** Remove `unix.ps1` ([#5235](https://github.com/ScoopInstaller/Scoop/issues/5235))
 
 ### Builds
 
