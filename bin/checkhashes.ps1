@@ -114,8 +114,11 @@ foreach ($current in $MANIFESTS) {
 
     $current.urls | ForEach-Object {
         $algorithm, $expected = get_hash $current.hashes[$count]
-        $version = 'HASH_CHECK'
-        $tmp = $expected_hash -split ':'
+        if ($UseCache) {
+            $version = $current.manifest.version
+        } else {
+            $version = 'HASH_CHECK'
+        }
 
         Invoke-CachedDownload $current.app $version $_ $null $null -use_cache:$UseCache
 
@@ -145,12 +148,12 @@ foreach ($current in $MANIFESTS) {
         Write-Host 'Mismatch found ' -ForegroundColor Red
         $mismatched | ForEach-Object {
             $file = fullpath (cache_path $current.app $version $current.urls[$_])
-            Write-Host  "`tURL:`t`t$($current.urls[$_])"
+            Write-Host "`tURL:`t`t$($current.urls[$_])"
             if (Test-Path $file) {
-                Write-Host  "`tFirst bytes:`t$((get_magic_bytes_pretty $file ' ').ToUpper())"
+                Write-Host "`tFirst bytes:`t$((get_magic_bytes_pretty $file ' ').ToUpper())"
             }
-            Write-Host  "`tExpected:`t$($current.hashes[$_])" -ForegroundColor Green
-            Write-Host  "`tActual:`t`t$($actuals[$_])" -ForegroundColor Red
+            Write-Host "`tExpected:`t$($current.hashes[$_])" -ForegroundColor Green
+            Write-Host "`tActual:`t`t$($actuals[$_])" -ForegroundColor Red
         }
     }
 
