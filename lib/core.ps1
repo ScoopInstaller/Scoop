@@ -538,8 +538,8 @@ function Invoke-ExternalCommand {
         $escapedArgs = $ArgumentList | ForEach-Object {
             # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
             $s = $_ -replace '(\\+)"', '$1$1"'
-            # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
-            $s = $s -replace '(\\+)$', '$1$1'
+            # escape N consecutive backslash(es) followed by end-of-string to single occurrence.
+            $s = $s -replace '(\\+)$', '$1'
             # escape double quotes
             $s = $s -replace '"', '\"'
             # quote the argument
