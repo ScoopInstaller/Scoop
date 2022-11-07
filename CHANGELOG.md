@@ -25,6 +25,7 @@
 - **checkver:** Support XML default namespace ([#5191](https://github.com/ScoopInstaller/Scoop/issues/5191))
 - **pssa:** Remove unused 'ExcludeRules' ([#5201](https://github.com/ScoopInstaller/Scoop/issues/5201))
 - **schema:** Add 'installer' and 'shortcuts' to 'autoupdate' ([#5220](https://github.com/ScoopInstaller/Scoop/issues/5220))
+- **checkhashes:** Use correct version number if `UseCache` ([#5240](https://github.com/ScoopInstaller/Scoop/issues/5240))
 
 ### Continuous Integration
 
