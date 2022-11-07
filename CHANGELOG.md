@@ -7,6 +7,7 @@
 
 ### Bug Fixes
 
+- **decompress:** postgresql@14.5: decompress error ([3816](https://github.com/ScoopInstaller/Main/issues/3816))
 - **decompress:** Use PS's default 'Expand-Archive()' ([#5185](https://github.com/ScoopInstaller/Scoop/issues/5185))
 - **hash:** Fix SourceForge's hash extraction ([#5189](https://github.com/ScoopInstaller/Scoop/issues/5189))
 - **decompress:** Trim ending '/' ([#5195](https://github.com/ScoopInstaller/Scoop/issues/5195))
