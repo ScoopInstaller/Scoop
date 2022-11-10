@@ -74,7 +74,6 @@ param(
 . "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
-. "$PSScriptRoot\..\lib\unix.ps1"
 
 if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
     $Dir = Split-Path $App

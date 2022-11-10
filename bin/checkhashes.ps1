@@ -47,7 +47,6 @@ param(
 . "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\unix.ps1"
 
 $Dir = Convert-Path $Dir
 if ($ForceUpdate) { $Update = $true }
