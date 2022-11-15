@@ -28,6 +28,7 @@ function Expand-7zipArchive {
         $7zPath = Get-HelperPath -Helper 7zip
     }
     $LogPath = "$(Split-Path $Path)\7zip.log"
+    $DestinationPath = $DestinationPath.TrimEnd('\')
     $ArgList = @('x', $Path, "-o$DestinationPath", '-y')
     $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
     if (!$IsTar -and $ExtractDir) {
@@ -240,7 +241,8 @@ function Expand-ZipArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+    # Compatible with Pscx v3 (https://github.com/Pscx/Pscx) ('Microsoft.PowerShell.Archive' is not needed for Pscx v4)
+    Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force

@@ -147,9 +147,20 @@ function Compare-Version {
         $splitReferenceVersion = @(SplitVersion -Version $ReferenceVersion -Delimiter $Delimiter)
         $splitDifferenceVersion = @(SplitVersion -Version $DifferenceVersion -Delimiter $Delimiter)
 
-        # Nightly versions are always equal
+        # Nightly versions are always equal unless UPDATE_NIGHTLY is $true
         if ($splitReferenceVersion[0] -eq 'nightly' -and $splitDifferenceVersion[0] -eq 'nightly') {
-            return 0
+            if (get_config UPDATE_NIGHTLY) {
+                # nightly versions will be compared by date if UPDATE_NIGHTLY is $true
+                if ($null -eq $splitReferenceVersion[1]) {
+                    $splitReferenceVersion += Get-Date -Format 'yyyyMMdd'
+                }
+                if ($null -eq $splitDifferenceVersion[1]) {
+                    $splitDifferenceVersion += Get-Date -Format 'yyyyMMdd'
+                }
+                return [Math]::Sign($splitDifferenceVersion[1] - $splitReferenceVersion[1])
+            } else {
+                return 0
+            }
         }
 
         for ($i = 0; $i -lt [Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {

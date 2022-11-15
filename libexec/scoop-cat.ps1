@@ -1,5 +1,8 @@
 # Usage: scoop cat <app>
-# Summary: Show content of specified manifest. If available, `bat` will be used to pretty-print the JSON.
+# Summary: Show content of specified manifest.
+# Help: Show content of specified manifest.
+# If configured, `bat` will be used to pretty-print the JSON.
+# See `cat_style` in `scoop help config` for further information.
 
 param($app)
 

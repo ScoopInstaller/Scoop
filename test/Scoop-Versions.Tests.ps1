@@ -1,5 +1,7 @@
-. "$PSScriptRoot\Scoop-TestLib.ps1"
-. "$PSScriptRoot\..\lib\versions.ps1"
+BeforeAll {
+    . "$PSScriptRoot\Scoop-TestLib.ps1"
+    . "$PSScriptRoot\..\lib\versions.ps1"
+}
 
 Describe 'versions comparison' -Tag 'Scoop' {
     Context 'semver compliant versions' {
@@ -90,10 +92,21 @@ Describe 'versions comparison' -Tag 'Scoop' {
         }
 
         It 'handles equal versions' {
+            function get_config { $null }
             Compare-Version '12.0' '12.0' | Should -Be 0
             Compare-Version '7.0.4-9' '7.0.4-9' | Should -Be 0
             Compare-Version 'nightly-20190801' 'nightly' | Should -Be 0
             Compare-Version 'nightly-20190801' 'nightly-20200801' | Should -Be 0
+        }
+
+        It 'handles nightly versions with `update_nightly`' {
+            function get_config { $true }
+            Mock Get-Date { '20200801' }
+            Compare-Version 'nightly-20200801' 'nightly' | Should -Be 0
+            Compare-Version 'nightly-20200730' 'nightly' | Should -Be 1
+            Compare-Version 'nightly-20200730' 'nightly-20200801' | Should -Be 1
+            Compare-Version 'nightly-20200802' 'nightly' | Should -Be -1
+            Compare-Version 'nightly-20200802' 'nightly-20200801' | Should -Be -1
         }
     }
 }

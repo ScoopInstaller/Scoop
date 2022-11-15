@@ -806,6 +806,11 @@ function shim($path, $global, $name, $arg) {
     } else {
         warn_on_overwrite "$shim.cmd" $path
         # find path to Git's bash so that batch scripts can run bash scripts
+        if (!(Get-CommandPath git)) {
+            error "Can't shim '$shim': 'git' is needed but not installed."
+            error "Please install git ('scoop install git') and try again."
+            exit 1
+        }
         $gitdir = (Get-Item (Get-CommandPath git) -ErrorAction:Stop).Directory.Parent
         if ($gitdir.FullName -imatch 'mingw') {
             $gitdir = $gitdir.Parent
@@ -1251,10 +1256,10 @@ if ($scoopConfig) {
 # END NOTE
 
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop cache directory
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory

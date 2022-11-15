@@ -74,7 +74,6 @@ param(
 . "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # needed for hash generation
-. "$PSScriptRoot\..\lib\unix.ps1"
 
 if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
     $Dir = Split-Path $App
@@ -310,12 +309,17 @@ while ($in_progress -gt 0) {
             # Then add them into the NamespaceManager
             $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
             $nsList | ForEach-Object {
-                $nsmgr.AddNamespace($_.LocalName, $_.Value)
+                if ($_.LocalName -eq 'xmlns') {
+                    $nsmgr.AddNamespace('ns', $_.Value)
+                    $xpath = $xpath -replace '/([^:/]+)((?=/)|(?=$))', '/ns:$1'
+                } else {
+                    $nsmgr.AddNamespace($_.LocalName, $_.Value)
+                }
             }
             # Getting version from XML, using XPath
             $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
             if (!$ver) {
-                next "couldn't find '$xpath' in $url"
+                next "couldn't find '$($xpath -replace 'ns:', '')' in $url"
                 continue
             }
         }

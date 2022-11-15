@@ -53,7 +53,7 @@
 #
 # default_architecture: 64bit|32bit|arm64
 #       Allow to configure preferred architecture for application installation.
-#       If not specified, architecture is determined be system.
+#       If not specified, architecture is determined by system.
 #
 # debug: $true|$false
 #       Additional and detailed output will be shown.
@@ -110,6 +110,10 @@
 #       `scoop hold scoop` will set the value to one day later.
 #       Should be in the format 'YYYY-MM-DD', 'YYYY/MM/DD' or any other forms that accepted by '[System.DateTime]::Parse()'.
 #       Ref: https://docs.microsoft.com/dotnet/api/system.datetime.parse?view=netframework-4.5#StringToParse
+#
+# update_nightly: $true|$false
+#       Nightly version is formatted as 'nightly-yyyyMMdd' and will be updated after one day if this is set to $true.
+#       Otherwise, nightly version will not be updated unless `--force` is used.
 #
 # ARIA2 configuration
 # -------------------
@@ -175,7 +179,11 @@ if (!$name) {
     if($null -eq $value) {
         Write-Host "'$name' is not set"
     } else {
-        $value
+        if ($value -is [System.DateTime]) {
+            $value.ToString('o')
+        } else {
+            $value
+        }
     }
 }
 
