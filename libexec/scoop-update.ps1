@@ -136,7 +136,7 @@ function Sync-Scoop {
 
         $res = $lastexitcode
         if ($Log) {
-            Invoke-Git -Path $currentdir -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
+            Invoke-Git -Path $currentdir -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
         }
 
         if ($res -ne 0) {
@@ -166,7 +166,7 @@ function Sync-Bucket {
         $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
         Invoke-Git -Path $bucketLoc @('pull', '-q')
         if ($Log) {
-            Invoke-Git -Path $bucketLoc -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %Cgreen$Name%Creset %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
+            Invoke-Git -Path $bucketLoc -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %Cgreen$Name%Creset %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
         }
     }
 }
@@ -212,7 +212,7 @@ function Sync-Buckets {
             $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
             Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
             if ($using:Log) {
-                Invoke-Git -Path $bucketLoc -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %Cgreen$name%Creset %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
+                Invoke-Git -Path $bucketLoc -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %Cgreen$name%Creset %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
             }
         }
     } else {
