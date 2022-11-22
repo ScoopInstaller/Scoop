@@ -147,7 +147,7 @@ function Sync-Scoop {
     shim "$currentdir\bin\scoop.ps1" $false
 }
 
-function Sync-Buckets {
+function Sync-Bucket {
     Param (
         [Switch]$Log
     )
@@ -342,7 +342,7 @@ if (-not ($apps -or $all)) {
         exit 1
     }
     Sync-Scoop -Log:$show_update_log
-    Sync-Buckets -Log:$show_update_log
+    Sync-Bucket -Log:$show_update_log
     set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
@@ -357,7 +357,7 @@ if (-not ($apps -or $all)) {
 
     if ($updateScoop) {
         Sync-Scoop -Log:$show_update_log
-        Sync-Buckets -Log:$show_update_log
+        Sync-Bucket -Log:$show_update_log
         set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
         success 'Scoop was updated successfully!'
     }
