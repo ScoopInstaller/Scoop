@@ -182,6 +182,23 @@ function Invoke-Git {
     return Invoke-Command $sb
 }
 
+function Invoke-GitLog {
+    [CmdletBinding()]
+    Param (
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Path,
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$CommitHash,
+        [String]$Name = ''
+    )
+    Process {
+        if($Name) {
+            $Name = "%Cgreen$($Name.PadRight(12, ' ').SubString(0, 12))%Creset "
+        }
+        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset'", "$CommitHash..HEAD")
+    }
+}
+
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 

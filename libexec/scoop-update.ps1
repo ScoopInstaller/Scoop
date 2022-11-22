@@ -136,7 +136,7 @@ function Sync-Scoop {
 
         $res = $lastexitcode
         if ($Log) {
-            Invoke-Git -Path $currentdir -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
+            Invoke-GitLog -Path $currentdir -CommitHash $previousCommit
         }
 
         if ($res -ne 0) {
@@ -145,30 +145,6 @@ function Sync-Scoop {
     }
 
     shim "$currentdir\bin\scoop.ps1" $false
-}
-
-function Sync-Bucket {
-    [CmdletBinding()]
-    Param (
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [String[]]$Name,
-        [Switch]$Log
-    )
-
-    Process {
-        $bucketLoc = Find-BucketDirectory $Name -Root
-
-        if (!(Test-Path (Join-Path $bucketLoc '.git'))) {
-            warn "'$Name' is not a git repository. Skipped."
-            return
-        }
-
-        $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
-        Invoke-Git -Path $bucketLoc @('pull', '-q')
-        if ($Log) {
-            Invoke-Git -Path $bucketLoc -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %Cgreen$Name%Creset %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
-        }
-    }
 }
 
 function Sync-Buckets {
@@ -201,7 +177,7 @@ function Sync-Buckets {
 
     $buckets | Where-Object { !$_.valid } | ForEach-Object { Write-Host "'$($_.name)' is not a git repository. Skipped." }
 
-    if($PSVersionTable.PSVersion.Major -ge 7) {
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
         # Parallel parameter is available since PowerShell 7
         $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
             . "$using:PSScriptRoot\..\lib\core.ps1"
@@ -212,11 +188,20 @@ function Sync-Buckets {
             $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
             Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
             if ($using:Log) {
-                Invoke-Git -Path $bucketLoc -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s %Cgreen$name%Creset %C(cyan)%cr%Creset'", "$previousCommit..HEAD")
+                Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
         }
     } else {
-        $buckets | Where-Object { $_.valid } | ForEach-Object { Sync-Bucket $_.name -Log:$Log }
+        $buckets | Where-Object { $_.valid } | ForEach-Object {
+            $bucketLoc = $_.path
+            $name = $_.name
+
+            $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
+            Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
+            if ($Log) {
+                Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
+            }
+        }
     }
 }
 
