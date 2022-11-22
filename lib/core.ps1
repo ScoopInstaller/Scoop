@@ -192,8 +192,11 @@ function Invoke-GitLog {
         [String]$Name = ''
     )
     Process {
-        if($Name) {
-            $Name = "%Cgreen$($Name.PadRight(12, ' ').SubString(0, 12))%Creset "
+        if ($Name) {
+            if ($Name.Length -gt 12) {
+                $Name = "$($Name.Substring(0, 10)).."
+            }
+            $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
         }
         Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset'", "$CommitHash..HEAD")
     }
