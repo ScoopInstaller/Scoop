@@ -132,7 +132,7 @@ function Invoke-Git {
     [CmdletBinding()]
     [OutputType([String])]
     param(
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Mandatory = $false, Position = 0)]
         [Alias('PSPath', 'Path')]
         [ValidateNotNullOrEmpty()]
         [String]
