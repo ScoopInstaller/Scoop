@@ -1,3 +1,11 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Features
+- **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/pull/5122))
+
+### Code Refactoring
+- **git:** Use Invoke-Git() with direct path to git.exe to prevent spawning shim subprocesses ([#5122](https://github.com/ScoopInstaller/Scoop/pull/5122))
+
 ## [v0.3.1](https://github.com/ScoopInstaller/Scoop/compare/v0.3.0...v0.3.1) - 2022-11-15
 
 ### Features
