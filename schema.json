@@ -61,12 +61,7 @@
                     ]
                 },
                 "type": {
-                    "enum": [
-                        "md5",
-                        "sha1",
-                        "sha256",
-                        "sha512"
-                    ],
+                    "enum": ["md5", "sha1", "sha256", "sha512"],
                     "description": "Deprecated, hash type is determined automatically"
                 },
                 "url": {
@@ -210,7 +205,7 @@
                     "$ref": "#/definitions/shortcutsArray"
                 },
                 "url": {
-                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             }
         },
@@ -279,7 +274,7 @@
                     "$ref": "#/definitions/shortcutsArray"
                 },
                 "url": {
-                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             }
         },
@@ -422,14 +417,10 @@
             },
             "oneOf": [
                 {
-                    "required": [
-                        "file"
-                    ]
+                    "required": ["file"]
                 },
                 {
-                    "required": [
-                        "script"
-                    ]
+                    "required": ["script"]
                 }
             ],
             "type": "object"
@@ -449,23 +440,6 @@
                         "not": {
                             "pattern": "(\\$)"
                         },
-                        "type": "string"
-                    },
-                    "minItems": 1,
-                    "type": "array",
-                    "uniqueItems": true
-                }
-            ]
-        },
-        "autoupdateUriOrArrayOfAutoupdateUris": {
-            "anyOf": [
-                {
-                    "format": "uri",
-                    "type": "string"
-                },
-                {
-                    "items": {
-                        "format": "uri",
                         "type": "string"
                     },
                     "minItems": 1,
@@ -516,9 +490,7 @@
                             "$ref": "#/definitions/licenseIdentifiers"
                         }
                     },
-                    "required": [
-                        "identifier"
-                    ],
+                    "required": ["identifier"],
                     "type": "object"
                 }
             ]
@@ -678,15 +650,9 @@
         }
     },
     "then": {
-        "required": [
-            "url"
-        ]
+        "required": ["url"]
     },
-    "required": [
-        "version",
-        "homepage",
-        "license"
-    ],
+    "required": ["version", "homepage", "license"],
     "title": "scoop app manifest schema",
     "type": "object"
 }
