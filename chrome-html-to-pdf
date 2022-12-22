@@ -1,0 +1,12 @@
+{
+    "version":  "2.6.5",
+    "license":  "MIT",
+    "extract_dir":  "ChromeHtmltoPdf_265",
+    "url":  "https://github.com/Sicos1977/ChromeHtmlToPdf/releases/download/2.6.5/ChromeHtmltoPdf_265.zip",
+    "depends":  ["dotnet-sdk", "googlechrome"],
+    "homepage":  "https://github.com/Sicos1977/ChromeHtmlToPdf",
+    "bin":  "ChromeHtmlToPdfConsole.exe",
+    "autoupdate": {
+        "url": "https://github.com/Sicos1977/ChromeHtmlToPdf/releases/download/$version/ChromeHtmltoPdf_265.zip"
+    }
+}
