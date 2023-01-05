@@ -16,11 +16,9 @@ Describe 'Manifest validates against the schema' {
         }
         if ($env:CI -eq $true) {
             Set-BuildEnvironment -Force
-            $changedManifests = @(Get-GitChangedFile -Path $bucketDir -Include '*.json' -Commit $env:BHCommitHash)
-        }
-        $manifestFiles = (Get-ChildItem $bucketDir -Filter '*.json' -Recurse).FullName
-        if ($changedManifests) {
-            $manifestFiles = $manifestFiles | Where-Object { $_ -in $changedManifests }
+            $manifestFiles = @(Get-GitChangedFile -Path $bucketDir -Include '*.json' -Commit $env:BHCommitHash)
+        } else {
+            $manifestFiles = (Get-ChildItem $bucketDir -Filter '*.json' -Recurse).FullName
         }
     }
     BeforeAll {
