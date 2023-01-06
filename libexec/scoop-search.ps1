@@ -9,7 +9,7 @@ param($query)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest'
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Get-LatestVersion'
 
-$list = @()
+$list = [System.Collections.Generic.List[PSCustomObject]]::new()
 
 try {
     $query = New-Object Regex $query, 'IgnoreCase'
@@ -37,19 +37,31 @@ function bin_match($manifest, $query) {
 }
 
 function search_bucket($bucket, $query) {
-    $apps = apps_in_bucket (Find-BucketDirectory $bucket) | ForEach-Object { @{ name = $_ } }
+    $bucket_dir = Find-BucketDirectory $bucket
+    $apps = apps_in_bucket $bucket_dir
 
-    if ($query) {
-        $apps = $apps | Where-Object {
-            if ($_.name -match $query) { return $true }
-            $bin = bin_match (manifest $_.name $bucket) $query
+    $apps | ForEach-Object {
+        $json = [System.IO.File]::ReadAllText("$bucket_dir\$_.json") | ConvertFrom-Json -ErrorAction Continue
+
+        if($app.name -match $query) {
+            $list.Add([PSCustomObject]@{
+                Name = $_
+                Version = $json.Version
+                Source = $bucket
+                Binaries = ""
+            })
+        } else {
+            $bin = bin_match $json $query
             if ($bin) {
-                $_.bin = $bin
-                return $true
+                $list.Add([PSCustomObject]@{
+                    Name = $_
+                    Version = $json.Version
+                    Source = $bucket
+                    Binaries = $bin -join ' | '
+                })
             }
         }
     }
-    $apps | ForEach-Object { $_.version = (Get-LatestVersion -AppName $_.name -Bucket $bucket); $_ }
 }
 
 function download_json($url) {
@@ -96,43 +108,29 @@ function search_remotes($query) {
 (add them using 'scoop bucket add <bucket name>')"
     }
 
+    $remote_list = @()
     $results | ForEach-Object {
-        $name = $_.bucket
+        $bucket = $_.bucket
         $_.results | ForEach-Object {
             $item = [ordered]@{}
             $item.Name = $_
-            $item.Source = $name
-            $list += [PSCustomObject]$item
+            $item.Source = $bucket
+            $remote_list += [PSCustomObject]$item
         }
     }
-
-    $list
+    $remote_list
 }
 
 Get-LocalBucket | ForEach-Object {
-    $res = search_bucket $_ $query
-    $local_results = $local_results -or $res
-    if ($res) {
-        $name = "$_"
-
-        $res | ForEach-Object {
-            $item = [ordered]@{}
-            $item.Name = $_.name
-            $item.Version = $_.version
-            $item.Source = $name
-            $item.Binaries = ""
-            if ($_.bin) { $item.Binaries = $_.bin -join ' | ' }
-            $list += [PSCustomObject]$item
-        }
-    }
+    search_bucket $_ $query
 }
 
-if ($list.Length -gt 0) {
+if ($list.Count -gt 0) {
     Write-Host "Results from local buckets..."
     $list
 }
 
-if (!$local_results -and !(github_ratelimit_reached)) {
+if ($list.Count -eq 0 -and !(github_ratelimit_reached)) {
     $remote_results = search_remotes $query
     if (!$remote_results) {
         warn "No matches found."
