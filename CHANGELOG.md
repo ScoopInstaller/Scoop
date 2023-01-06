@@ -8,6 +8,7 @@
 
 - **decompress:** Exclude '*.nsis' that may cause error ([#5294](https://github.com/ScoopInstaller/Scoop/issues/5294))
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
+- **shims parse:** Improve getops to split with quote and space ([#5313](Can't add a shim to an exe with spaces in it's filepath))
 
 ### Code Refactoring
 
