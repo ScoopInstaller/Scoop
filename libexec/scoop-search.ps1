@@ -78,8 +78,8 @@ function search_bucket($bucket, $query) {
                 Binaries = ""
             })
         } else {
-            $bin = bin_match $manifest $query
-            # $bin = bin_match_json $json $query
+            # $bin = bin_match $manifest $query
+            $bin = bin_match_json $json $query
             if ($bin) {
                 $list.Add([PSCustomObject]@{
                     Name = $name
