@@ -44,7 +44,7 @@ function search_bucket($bucket, $query) {
 
         if($app.name -match $query) {
             $list.Add([PSCustomObject]@{
-                Name = $_
+                Name = $_.BaseName
                 Version = $json.Version
                 Source = $bucket
                 Binaries = ""
