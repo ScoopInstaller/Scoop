@@ -54,7 +54,7 @@ function search_bucket($bucket, $query) {
             $bin = bin_match $json $query
             if ($bin) {
                 $list.Add([PSCustomObject]@{
-                    Name = $_.BaseName
+                    Name = $name
                     Version = $json.Version
                     Source = $bucket
                     Binaries = $bin -join ' | '
