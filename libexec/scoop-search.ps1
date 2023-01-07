@@ -40,7 +40,7 @@ function search_bucket($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
     $apps | ForEach-Object {
-        $json = [System.IO.File]::ReadAllText("$bucket_dir\$_.json") | ConvertFrom-Json -ErrorAction Continue
+        $json = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
 
         if($app.name -match $query) {
             $list.Add([PSCustomObject]@{
