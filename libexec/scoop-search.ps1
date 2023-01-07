@@ -65,7 +65,6 @@ function search_bucket($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
     $apps | ForEach-Object {
-        # $manifest = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
         $json = [System.Text.Json.JsonDocument]::Parse([System.IO.File]::ReadAllText($_.FullName))
         $name = $_.BaseName
 
@@ -73,18 +72,44 @@ function search_bucket($bucket, $query) {
             $list.Add([PSCustomObject]@{
                 Name = $name
                 Version = $json.RootElement.GetProperty("version")
-                # Version = $manifest.Version
                 Source = $bucket
                 Binaries = ""
             })
         } else {
-            # $bin = bin_match $manifest $query
             $bin = bin_match_json $json $query
             if ($bin) {
                 $list.Add([PSCustomObject]@{
                     Name = $name
                     Version = $json.RootElement.GetProperty("version")
-                    # Version = $manifest.Version
+                    Source = $bucket
+                    Binaries = $bin -join ' | '
+                })
+            }
+        }
+    }
+}
+
+# fallback function for PowerShell 5
+function search_bucket_legacy($bucket, $query) {
+    $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
+
+    $apps | ForEach-Object {
+        $manifest = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
+        $name = $_.BaseName
+
+        if ($name -match $query) {
+            $list.Add([PSCustomObject]@{
+                Name = $name
+                Version = $manifest.Version
+                Source = $bucket
+                Binaries = ""
+            })
+        } else {
+            $bin = bin_match $manifest $query
+            if ($bin) {
+                $list.Add([PSCustomObject]@{
+                    Name = $name
+                    Version = $manifest.Version
                     Source = $bucket
                     Binaries = $bin -join ' | '
                 })
@@ -151,7 +176,11 @@ function search_remotes($query) {
 }
 
 Get-LocalBucket | ForEach-Object {
-    search_bucket $_ $query
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        search_bucket $_ $query
+    } else {
+        search_bucket_legacy $_ $query
+    }
 }
 
 if ($list.Count -gt 0) {
