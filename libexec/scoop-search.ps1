@@ -41,10 +41,11 @@ function search_bucket($bucket, $query) {
 
     $apps | ForEach-Object {
         $json = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
+        $name = $_.BaseName
 
-        if($app.name -match $query) {
+        if ($name -match $query) {
             $list.Add([PSCustomObject]@{
-                Name = $_.BaseName
+                Name = $name
                 Version = $json.Version
                 Source = $bucket
                 Binaries = ""
