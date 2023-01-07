@@ -175,8 +175,10 @@ function search_remotes($query) {
     $remote_list
 }
 
+$jsonTextAvailable = [System.AppDomain]::CurrentDomain.GetAssemblies() | Where-object { [System.IO.Path]::GetFileNameWithoutExtension($_.Location) -eq "System.Text.Json" }
+
 Get-LocalBucket | ForEach-Object {
-    if ($PSVersionTable.PSVersion.Major -ge 7) {
+    if ($jsonTextAvailable) {
         search_bucket $_ $query
     } else {
         search_bucket_legacy $_ $query
