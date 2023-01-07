@@ -32,6 +32,31 @@ function bin_match($manifest, $query) {
         if ((strip_ext $fname) -match $query) { $fname }
         elseif ($alias -match $query) { $alias }
     }
+
+    if ($bins) { return $bins }
+    else { return $false }
+}
+
+function bin_match_json($json, $query) {
+    [System.Text.Json.JsonElement]$bin = [System.Text.Json.JsonElement]::new()
+    if (!$json.RootElement.TryGetProperty("bin", [ref] $bin)) { return $false }
+    $bins = @()
+    if($bin.ValueKind -eq [System.Text.Json.JsonValueKind]::String -and [System.IO.Path]::GetFileNameWithoutExtension($bin) -match $query) {
+        $bins += [System.IO.Path]::GetFileName($bin)
+    } elseif ($bin.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
+        foreach($subbin in $bin.EnumerateArray()) {
+            if($subbin.ValueKind -eq [System.Text.Json.JsonValueKind]::String -and [System.IO.Path]::GetFileNameWithoutExtension($subbin) -match $query) {
+                $bins += [System.IO.Path]::GetFileName($subbin)
+            } elseif ($subbin.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
+                if([System.IO.Path]::GetFileNameWithoutExtension($subbin[0]) -match $query) {
+                    $bins += [System.IO.Path]::GetFileName($subbin[0])
+                } elseif ($subbin.GetArrayLength() -gt 2 -and $subbin[1] -match $query) {
+                    $bins += $subbin[1]
+                }
+            }
+        }
+    }
+
     if ($bins) { return $bins }
     else { return $false }
 }
@@ -40,22 +65,26 @@ function search_bucket($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
     $apps | ForEach-Object {
-        $json = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
+        # $manifest = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
+        $json = [System.Text.Json.JsonDocument]::Parse([System.IO.File]::ReadAllText($_.FullName))
         $name = $_.BaseName
 
         if ($name -match $query) {
             $list.Add([PSCustomObject]@{
                 Name = $name
-                Version = $json.Version
+                Version = $json.RootElement.GetProperty("version")
+                # Version = $manifest.Version
                 Source = $bucket
                 Binaries = ""
             })
         } else {
-            $bin = bin_match $json $query
+            $bin = bin_match $manifest $query
+            # $bin = bin_match_json $json $query
             if ($bin) {
                 $list.Add([PSCustomObject]@{
                     Name = $name
-                    Version = $json.Version
+                    Version = $json.RootElement.GetProperty("version")
+                    # Version = $manifest.Version
                     Source = $bucket
                     Binaries = $bin -join ' | '
                 })
