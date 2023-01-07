@@ -3,6 +3,7 @@
 ### Features
 
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
+- **bucket:** Switch nirsoft bucket to ScoopInstaller/Nirsoft ([#5293](https://github.com/ScoopInstaller/Scoop/discussions/5293))
 
 ### Bug Fixes
 
