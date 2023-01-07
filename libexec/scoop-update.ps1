@@ -330,6 +330,9 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         ensure_none_failed $apps
         $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
+    if ($manifest.changelog) {
+        success "See what's new in this update: $($manifest.changelog)"
+    }
 }
 
 if (-not ($apps -or $all)) {
