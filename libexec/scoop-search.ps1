@@ -50,7 +50,7 @@ function bin_match_json($json, $query) {
             } elseif ($subbin.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
                 if([System.IO.Path]::GetFileNameWithoutExtension($subbin[0]) -match $query) {
                     $bins += [System.IO.Path]::GetFileName($subbin[0])
-                } elseif ($subbin.GetArrayLength() -gt 2 -and $subbin[1] -match $query) {
+                } elseif ($subbin.GetArrayLength() -ge 2 -and $subbin[1] -match $query) {
                     $bins += $subbin[1]
                 }
             }
