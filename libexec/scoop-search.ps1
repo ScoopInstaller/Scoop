@@ -37,8 +37,7 @@ function bin_match($manifest, $query) {
 }
 
 function search_bucket($bucket, $query) {
-    $bucket_dir = Find-BucketDirectory $bucket
-    $apps = apps_in_bucket $bucket_dir
+    $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
     $apps | ForEach-Object {
         $json = [System.IO.File]::ReadAllText("$bucket_dir\$_.json") | ConvertFrom-Json -ErrorAction Continue
