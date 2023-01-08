@@ -25,9 +25,8 @@ function getopt($argv, $shortopts, $longopts) {
     }
 
     # ensure these are arrays
-    $argv = @($argv -split ' (?=(?:[^"]|"[^"]*")*$)')
+    $argv = @($argv -split ' \\(?=(?:[^"]|"[^"]*")*$)')
     $longopts = @($longopts)
-
     for ($i = 0; $i -lt $argv.Length; $i++) {
         $arg = $argv[$i]
         if ($null -eq $arg) { continue }
@@ -81,6 +80,5 @@ function getopt($argv, $shortopts, $longopts) {
             $rem += $arg
         }
     }
-
     $opts, $rem
 }
