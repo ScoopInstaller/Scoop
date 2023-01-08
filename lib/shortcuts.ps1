@@ -63,7 +63,7 @@ function rm_startmenu_shortcuts($manifest, $global, $arch) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
     $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
         $name = $_.item(1)
-        $shortcut = "$(shortcut_folder $global)\$name.lnk"
+        $shortcut = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath("$(shortcut_folder $global)\$name.lnk")
         write-host "Removing shortcut $(friendly_path $shortcut)"
         if(Test-Path -Path $shortcut) {
              Remove-Item $shortcut
