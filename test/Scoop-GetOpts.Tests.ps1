@@ -18,9 +18,9 @@ Describe 'getopt' -Tag 'Scoop' {
     }
 
     It 'handle space in quote' {
-        $opt, $rem, $err = getopt '"c:\Program File (86)\test"'
+        $opt, $rem, $err = getopt '-x', 'space arg' 'x:' ''
         $err | Should -BeNullOrEmpty
-        $rem.length | Should -Be 1
+        $opt.x | Should -Be 'space arg'
     }
 
     It 'handle unrecognized short option' {
