@@ -3,7 +3,7 @@
 ### Features
 
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
-- **testing:** Add ability to test manifests inside a Windows sandbox ([#5347](https://github.com/(https://github.com/ScoopInstaller/Scoop/pulls/5347))
+- **testing:** Add ability to test manifests inside a Windows sandbox ([#5349](https://github.com/(https://github.com/ScoopInstaller/Scoop/pulls/5349))
 
 ### Bug Fixes
 
