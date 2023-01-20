@@ -60,8 +60,8 @@ if (-Not [String]::IsNullOrWhiteSpace($Manifest)) {
   Copy-Item -Path $Manifest -Recurse -Destination $tempFolder
 }
 
-# $env:USERPROFILE
-$scoopCache = 'C:\Users\ross\scoop\cache'
+if ($null -eq $env:SCOOP_HOME) { $env:SCOOP_HOME = "$env:USERPROFILE\scoop" }
+$scoopCache = $env:SCOOP_HOME + '\cache'
 
 Write-Host "Copying $scoopCache to $tempFolder\cache"
 
