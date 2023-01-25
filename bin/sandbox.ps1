@@ -109,11 +109,11 @@ Update-EnvironmentVariables
 
 xcopy /I /Q /Y $copiedCacheInSandbox\*.* $scoopCacheInSandbox\
 
-scoop install main/7zip
-scoop install main/git
-scoop install main/innounp
-scoop install main/dark
-scoop install main/lessmsi
+scoop install --no-update-scoop main/7zip
+scoop install --no-update-scoop main/git
+scoop install --no-update-scoop main/innounp
+scoop install --no-update-scoop main/dark
+scoop install --no-update-scoop main/lessmsi
 
 Write-Host @'
 Tip: you can type 'Update-EnvironmentVariables' to update your environment variables, such as after installing a new software.
