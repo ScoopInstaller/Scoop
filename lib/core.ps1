@@ -1298,8 +1298,14 @@ function Out-UTF8File {
 Optimize-SecurityProtocol
 
 # Load Scoop config
+$configFilename = 'config.json'
+# Portable config is located in root directory: .\lib\current\scoop\apps\<root>
+$configPortablePath = "$PSScriptRoot\..\..\..\..\$configFilename"
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
-$configFile = "$configHome\scoop\config.json"
+$configFile = "$configHome\scoop\$configFilename"
+if (Test-Path $configPortablePath) {
+    $configFile = $configPortablePath
+}
 $scoopConfig = load_cfg $configFile
 
 # NOTE Scoop config file migration. Remove this after 2023/6/30
