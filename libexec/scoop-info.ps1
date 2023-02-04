@@ -84,7 +84,7 @@ if ($manifest.depends) {
 
 if (Test-Path $manifest_file) {
     if (Get-Command git -ErrorAction Ignore) {
-        $gitinfo = (Invoke-Git -Path (Split-Path $manifest_file) -ArgumentList @('log', '-1', '-s', "--format='%aD#%an'", $manifest_file) 2> $null) -Split '#'
+        $gitinfo = (Invoke-Git -Path (Split-Path $manifest_file) -ArgumentList @('log', '-1', '-s', '--format=%aD#%an', $manifest_file) 2> $null) -Split '#'
     }
     if ($gitinfo) {
         $item.'Updated at' = $gitinfo[0] | Get-Date

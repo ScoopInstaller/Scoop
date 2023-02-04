@@ -100,7 +100,7 @@ function list_buckets {
         $path = Find-BucketDirectory $_ -Root
         if ((Test-Path (Join-Path $path '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
             $bucket.Source = Invoke-Git -Path $path -ArgumentList @('config', 'remote.origin.url')
-            $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', "--format='%aD'", '-n', '1')
+            $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', '--format=%aD', '-n', '1') | Get-Date
         } else {
             $bucket.Source = friendly_path $path
             $bucket.Updated = (Get-Item "$path\bucket").LastWriteTime
