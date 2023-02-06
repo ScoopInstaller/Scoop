@@ -17,7 +17,7 @@
 
 ### Continuous Integration
 
-- **dependabot** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/pull/5377))
+- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/pull/5377))
 
 ### Tests
 
