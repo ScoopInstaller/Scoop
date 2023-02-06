@@ -151,7 +151,7 @@ function Invoke-Git {
     }
 
     if([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none')  {
-        return & $git $ArgumentList
+        return & $git @ArgumentList
     }
 
     if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
@@ -164,7 +164,7 @@ function Invoke-Git {
             }
             $env:HTTPS_PROXY = $proxy
             $env:HTTP_PROXY = $proxy
-            return & $git $ArgumentList
+            return & $git @ArgumentList
         }
         catch {
             error $_
@@ -176,7 +176,7 @@ function Invoke-Git {
         }
     }
 
-    return & $git $ArgumentList
+    return & $git @ArgumentList
 }
 
 function Invoke-GitLog {
