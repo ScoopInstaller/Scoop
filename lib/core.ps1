@@ -145,19 +145,16 @@ function Invoke-Git {
 
     $proxy = get_config PROXY
     $git = Get-HelperPath -Helper Git
-    $arguments = $ArgumentList -join ' '
-    $cmd = "`"$git`" $arguments"
 
     if ($WorkingDirectory) {
-        $cmd = "`"$git`" -C `"$WorkingDirectory`" $arguments"
+        $ArgumentList = @('-C', $WorkingDirectory) + $ArgumentList
     }
-    $sb = [scriptblock]::Create("& $cmd")
 
     if([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none')  {
-        return Invoke-Command $sb
+        return & $git @ArgumentList
     }
 
-    if($arguments -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
+    if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
         $old_https = $env:HTTPS_PROXY
         $old_http = $env:HTTP_PROXY
         try {
@@ -167,7 +164,7 @@ function Invoke-Git {
             }
             $env:HTTPS_PROXY = $proxy
             $env:HTTP_PROXY = $proxy
-            return Invoke-Command $sb
+            return & $git @ArgumentList
         }
         catch {
             error $_
@@ -179,7 +176,7 @@ function Invoke-Git {
         }
     }
 
-    return Invoke-Command $sb
+    return & $git @ArgumentList
 }
 
 function Invoke-GitLog {
@@ -198,7 +195,7 @@ function Invoke-GitLog {
             }
             $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
         }
-        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset'", "$CommitHash..HEAD")
+        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
     }
 }
 
