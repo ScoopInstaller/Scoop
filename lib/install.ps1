@@ -632,7 +632,7 @@ function cookie_header($cookies) {
 function is_in_dir($dir, $check) {
     $check = "$(fullpath $check)"
     $dir = "$(fullpath $dir)"
-    $check -match "^$([regex]::escape("$dir"))(\\|`$)"
+    $check -match "^$([regex]::Escape("$dir"))([/\\]|$)"
 }
 
 function ftp_file_size($url) {
