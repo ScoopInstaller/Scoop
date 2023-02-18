@@ -223,24 +223,24 @@ $Queue | ForEach-Object {
         $wc.Headers.Add('Authorization', "token $GitHubToken")
     }
 
+    $url = substitute $url $substitutions
+
+    $state = New-Object psobject @{
+        app      = $name
+        file     = $file
+        url      = $url
+        regex    = $regex
+        json     = $json
+        jsonpath = $jsonpath
+        xpath    = $xpath
+        reverse  = $reverse
+        replace  = $replace
+    }
+
     get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
         (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
             $wc.Headers[$_.Key] = $_.Value
         }
-    }
-
-    $url = substitute $url $substitutions
-
-    $state = New-Object psobject @{
-        app      = $name;
-        file     = $file;
-        url      = $url;
-        regex    = $regex;
-        json     = $json;
-        jsonpath = $jsonpath;
-        xpath    = $xpath;
-        reverse  = $reverse;
-        replace  = $replace;
     }
 
     $wc.Headers.Add('Referer', (strip_filename $url))
