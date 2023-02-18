@@ -19,6 +19,10 @@
 
 - **checkver:** Read the private_host config variable ([#5381](https://github.com/ScoopInstaller/Scoop/issues/5381))
 
+### Continuous Integration
+
+- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/pull/5377))
+
 ### Tests
 
 - **bucket:** Skip manifest validation if no manifest changes ([#5270](https://github.com/ScoopInstaller/Scoop/issues/5270))
