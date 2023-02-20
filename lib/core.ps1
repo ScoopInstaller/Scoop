@@ -588,7 +588,7 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function env($name,$global,$val='__get') {
+function env($name, $global, $val='__get') {
     $target = 'User'
     $EnvironmentRegisterKey = 'HKCU:\Environment'
     if ($global) {
@@ -599,7 +599,7 @@ function env($name,$global,$val='__get') {
         (Get-Item -Path $EnvironmentRegisterKey).
             GetValue($name, '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
     } else {
-        [environment]::setEnvironmentVariable($name,$val,$target)
+        Set-ItemProperty -Path $EnvironmentRegisterKey -Name $name -Value $val -Type 'ExpandString'
     }
 }
 
