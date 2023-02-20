@@ -589,10 +589,8 @@ function Invoke-ExternalCommand {
 }
 
 function env($name, $global, $val='__get') {
-    $target = 'User'
     $EnvironmentRegisterKey = 'HKCU:\Environment'
     if ($global) {
-        $target = 'Machine'
         $EnvironmentRegisterKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment'
     }
     if ($val -eq '__get') {
