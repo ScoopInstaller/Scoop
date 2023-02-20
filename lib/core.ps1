@@ -589,9 +589,18 @@ function Invoke-ExternalCommand {
 }
 
 function env($name,$global,$val='__get') {
-    $target = 'User'; if($global) {$target = 'Machine'}
-    if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
-    else { [environment]::setEnvironmentVariable($name,$val,$target) }
+    $target = 'User'
+    $EnvironmentRegisterKey = 'HKCU:\Environment'
+    if ($global) {
+        $target = 'Machine'
+        $EnvironmentRegisterKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment'
+    }
+    if ($val -eq '__get') {
+        (Get-Item -Path $EnvironmentRegisterKey).
+            GetValue($name, '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+    } else {
+        [environment]::setEnvironmentVariable($name,$val,$target)
+    }
 }
 
 function isFileLocked([string]$path) {
