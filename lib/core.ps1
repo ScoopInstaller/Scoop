@@ -588,21 +588,23 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function env($name, $global, $val='__get') {
-    $RegisterKeyPath = 'HKCU:'
-    if ($global) {
-        $RegisterKeyPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
+function env($name, $global, $val = '__get') {
+    $RegisterKey = if ($global) {
+        Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
+    } else {
+        Get-Item -Path 'HKCU:'
     }
-    $RegisterKey = Get-Item -Path $RegisterKeyPath
-    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment')
+
     if ($val -eq '__get') {
-        $EnvRegisterKey.GetValue($name, $null,
-            [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment')
+        $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
+        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
     } else {
         $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $true)
-        $RegistryValueKind = [Microsoft.Win32.RegistryValueKind]::ExpandString
-        if ($EnvRegisterKey.GetValue($name)) {
-            $RegistryValueKind = $EnvRegisterKey.GetValueKind($name)
+        $RegistryValueKind = if ($EnvRegisterKey.GetValue($name)) {
+            $EnvRegisterKey.GetValueKind($name)
+        } else {
+            [Microsoft.Win32.RegistryValueKind]::ExpandString
         }
         $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
     }
