@@ -1304,7 +1304,20 @@ $configFile = "$configHome\scoop\config.json"
 $coreRoot = Split-Path $PSScriptRoot
 $pathExpected = ($coreRoot -replace '\\','/') -like '*apps/scoop/current*'
 if ($pathExpected) {
-    # Portable config is located in root directory: .\current\scoop\apps\<root>
+    # Portable config is located in root directory:
+    #    .\current\scoop\apps\<root>\config.json  <- a reversed path
+    # Imagine `<root>/apps/scoop/current/` in a reversed format,
+    # and the directory tree:
+    #
+    # ```
+    # <root>:
+    # ├─apps
+    # ├─buckets
+    # ├─cache
+    # ├─persist
+    # ├─shims
+    # ├─config.json
+    # ```
     $configPortablePath = fullpath "$coreRoot\..\..\..\config.json"
     if (Test-Path $configPortablePath) {
         $configFile = $configPortablePath
