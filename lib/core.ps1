@@ -589,15 +589,17 @@ function Invoke-ExternalCommand {
 }
 
 function env($name, $global, $val='__get') {
-    $EnvironmentRegisterKey = 'HKCU:\Environment'
+    $RegisterKeyPath = 'HKCU:'
     if ($global) {
-        $EnvironmentRegisterKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment'
+        $RegisterKeyPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
     }
+    $RegisterKey = Get-Item -Path $RegisterKeyPath
     if ($val -eq '__get') {
-        (Get-Item -Path $EnvironmentRegisterKey).
-            GetValue($name, '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        $RegisterKey.OpenSubKey('Environment').GetValue($name, $null,
+            [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
     } else {
-        Set-ItemProperty -Path $EnvironmentRegisterKey -Name $name -Value $val -Type 'ExpandString'
+        $RegisterKey.OpenSubKey('Environment', $true).SetValue($name, $val,
+            [Microsoft.Win32.RegistryValueKind]::ExpandString)
     }
 }
 
