@@ -594,12 +594,17 @@ function env($name, $global, $val='__get') {
         $RegisterKeyPath = 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
     }
     $RegisterKey = Get-Item -Path $RegisterKeyPath
+    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment')
     if ($val -eq '__get') {
-        $RegisterKey.OpenSubKey('Environment').GetValue($name, $null,
+        $EnvRegisterKey.GetValue($name, $null,
             [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
     } else {
-        $RegisterKey.OpenSubKey('Environment', $true).SetValue($name, $val,
-            [Microsoft.Win32.RegistryValueKind]::ExpandString)
+        $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $true)
+        $RegistryValueKind = [Microsoft.Win32.RegistryValueKind]::ExpandString
+        if ($EnvRegisterKey.GetValue($name)) {
+            $RegistryValueKind = $EnvRegisterKey.GetValueKind($name)
+        }
+        $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
     }
 }
 
