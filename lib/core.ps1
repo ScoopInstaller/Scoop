@@ -128,13 +128,75 @@ function setup_proxy() {
     }
 }
 
-function git_cmd {
+function Invoke-Git {
+    [CmdletBinding()]
+    [OutputType([String])]
+    param(
+        [Parameter(Mandatory = $false, Position = 0)]
+        [Alias('PSPath', 'Path')]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $WorkingDirectory,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [Alias('Args')]
+        [String[]]
+        $ArgumentList
+    )
+
     $proxy = get_config PROXY
-    $cmd = "git $($args | ForEach-Object { "$_ " })"
-    if ($proxy -and $proxy -ne 'none') {
-        $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
+    $git = Get-HelperPath -Helper Git
+
+    if ($WorkingDirectory) {
+        $ArgumentList = @('-C', $WorkingDirectory) + $ArgumentList
     }
-    cmd.exe /d /c $cmd
+
+    if([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none')  {
+        return & $git @ArgumentList
+    }
+
+    if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
+        $old_https = $env:HTTPS_PROXY
+        $old_http = $env:HTTP_PROXY
+        try {
+            # convert proxy setting for git
+            if ($proxy.StartsWith('currentuser@')) {
+                $proxy = $proxy.Replace('currentuser@', ':@')
+            }
+            $env:HTTPS_PROXY = $proxy
+            $env:HTTP_PROXY = $proxy
+            return & $git @ArgumentList
+        }
+        catch {
+            error $_
+            return
+        }
+        finally {
+            $env:HTTPS_PROXY = $old_https
+            $env:HTTP_PROXY = $old_http
+        }
+    }
+
+    return & $git @ArgumentList
+}
+
+function Invoke-GitLog {
+    [CmdletBinding()]
+    Param (
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Path,
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$CommitHash,
+        [String]$Name = ''
+    )
+    Process {
+        if ($Name) {
+            if ($Name.Length -gt 12) {
+                $Name = "$($Name.Substring(0, 10)).."
+            }
+            $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
+        }
+        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
+    }
 }
 
 # helper functions
@@ -293,12 +355,16 @@ Function Test-CommandAvailable {
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
+Function Test-GitAvailable {
+    Return [Boolean](Test-Path (Get-HelperPath -Helper Git) -ErrorAction Ignore)
+}
+
 function Get-HelperPath {
     [CmdletBinding()]
     [OutputType([String])]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
+        [ValidateSet('Git', '7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -307,6 +373,14 @@ function Get-HelperPath {
     }
     process {
         switch ($Helper) {
+            'Git' {
+                $internalgit = "$(versiondir 'git' 'current')\mingw64\bin\git.exe"
+                if (Test-Path $internalgit) {
+                    $HelperPath = $internalgit
+                } else {
+                    $HelperPath = (Get-Command git -ErrorAction Ignore).Source
+                }
+            }
             '7zip' {
                 $HelperPath = Get-AppFilePath '7zip' '7z.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
