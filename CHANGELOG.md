@@ -10,6 +10,7 @@
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
 - **shortcuts:** Output correctly formatted path ([#5333](https://github.com/ScoopInstaller/Scoop/issues/5333))
 - **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
+- **env:** Avoid automatic expansion of `%%` in env ([#5394](https://github.com/ScoopInstaller/Scoop/issues/5394))
 
 ### Code Refactoring
 
@@ -44,7 +45,6 @@
 - **shim:** Exit if shim creating failed 'cause no git ([#5225](https://github.com/ScoopInstaller/Scoop/issues/5225))
 - **scoop-import:** Add correct architecture argument ([#5210](https://github.com/ScoopInstaller/Scoop/issues/5210))
 - **scoop-config:** Output `[DateTime]` as `[String]` ([#5232](https://github.com/ScoopInstaller/Scoop/issues/5232))
-- **env:** Avoid automatic expansion of `%%` in env ([#5394](https://github.com/ScoopInstaller/Scoop/issues/5394))
 
 ### Code Refactoring
 
