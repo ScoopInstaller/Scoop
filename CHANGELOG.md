@@ -3,6 +3,7 @@
 ### Features
 
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
+- **scoop-install:** Add support for downloading GitHub workflow build's artifacts ([#5340](https://github.com/ScoopInstaller/Scoop/issues/5340))
 
 ### Bug Fixes
 
