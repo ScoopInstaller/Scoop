@@ -668,17 +668,20 @@ function env($name, $global, $val = '__get') {
     } else {
         Get-Item -Path 'HKCU:'
     }
+    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $val -ne '__get')
 
     if ($val -eq '__get') {
-        $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment')
         $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
         $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
+    } elseif ($val -eq $null) {
+        $EnvRegisterKey.DeleteValue($name)
     } else {
-        $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $true)
-        $RegistryValueKind = if ($EnvRegisterKey.GetValue($name)) {
+        $RegistryValueKind = if ($val.Contains('%')) {
+            [Microsoft.Win32.RegistryValueKind]::ExpandString
+        } elseif ($EnvRegisterKey.GetValue($name)) {
             $EnvRegisterKey.GetValueKind($name)
         } else {
-            [Microsoft.Win32.RegistryValueKind]::ExpandString
+            [Microsoft.Win32.RegistryValueKind]::String
         }
         $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
     }
