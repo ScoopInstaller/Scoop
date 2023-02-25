@@ -9,12 +9,21 @@
 - **decompress:** Exclude '*.nsis' that may cause error ([#5294](https://github.com/ScoopInstaller/Scoop/issues/5294))
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
 - **shortcuts:** Output correctly formatted path ([#5333](https://github.com/ScoopInstaller/Scoop/issues/5333))
+- **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
 - **install:** Fix download from private GitHub repositories ([#5357](https://github.com/ScoopInstaller/Scoop/issues/5357))
 
 ### Code Refactoring
 
-- **git:** Use Invoke-Git() with direct path to git.exe to prevent spawning shim subprocesses ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
+- **git:** Use Invoke-Git() with direct path to git.exe to prevent spawning shim subprocesses ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122), [#5375](https://github.com/ScoopInstaller/Scoop/issues/5375))
 - **scoop-download:** Output more detailed manifest information ([#5277](https://github.com/ScoopInstaller/Scoop/issues/5277))
+
+### Builds
+
+- **checkver:** Read the private_host config variable ([#5381](https://github.com/ScoopInstaller/Scoop/issues/5381))
+
+### Continuous Integration
+
+- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/pull/5377))
 
 ### Tests
 
