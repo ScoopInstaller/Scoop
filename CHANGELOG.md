@@ -3,6 +3,7 @@
 ### Features
 
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
+- **config:** Support portable config file ([#5369](https://github.com/ScoopInstaller/Scoop/issues/5369))
 
 ### Bug Fixes
 
@@ -10,7 +11,8 @@
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
 - **shortcuts:** Output correctly formatted path ([#5333](https://github.com/ScoopInstaller/Scoop/issues/5333))
 - **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
-- **env:** Avoid automatic expansion of `%%` in env ([#5394](https://github.com/ScoopInstaller/Scoop/issues/5394))
+- **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395))
+- **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))
 
 ### Code Refactoring
 
