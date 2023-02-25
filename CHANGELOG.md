@@ -3,6 +3,7 @@
 ### Features
 
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
+- **config:** Support portable config file ([#5369](https://github.com/ScoopInstaller/Scoop/issues/5369))
 
 ### Bug Fixes
 

@@ -1297,6 +1297,29 @@ Optimize-SecurityProtocol
 # Load Scoop config
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
+# Check if it's the expected install path for scoop: <root>/apps/scoop/current
+$coreRoot = Split-Path $PSScriptRoot
+$pathExpected = ($coreRoot -replace '\\','/') -like '*apps/scoop/current*'
+if ($pathExpected) {
+    # Portable config is located in root directory:
+    #    .\current\scoop\apps\<root>\config.json  <- a reversed path
+    # Imagine `<root>/apps/scoop/current/` in a reversed format,
+    # and the directory tree:
+    #
+    # ```
+    # <root>:
+    # ├─apps
+    # ├─buckets
+    # ├─cache
+    # ├─persist
+    # ├─shims
+    # ├─config.json
+    # ```
+    $configPortablePath = fullpath "$coreRoot\..\..\..\config.json"
+    if (Test-Path $configPortablePath) {
+        $configFile = $configPortablePath
+    }
+}
 $scoopConfig = load_cfg $configFile
 
 # NOTE Scoop config file migration. Remove this after 2023/6/30
