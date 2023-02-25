@@ -61,6 +61,9 @@ if ($bucket) {
 if ($manifest.homepage) {
     $item.Website = $manifest.homepage.TrimEnd('/')
 }
+if ($manifest.changelog) {
+    $item.Changelog = $manifest.changelog
+}
 # Show license
 if ($manifest.license) {
     $item.License = if ($manifest.license.identifier -and $manifest.license.url) {

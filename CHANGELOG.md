@@ -3,6 +3,9 @@
 ### Features
 
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
+- **manifest:** Add `changelog` property which is the changelog page for the program ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-update:** Show manifest changelog property if available when updating successfully ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-info:** Show manifest changelog property if available ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
 
 ### Bug Fixes
 
