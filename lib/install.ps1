@@ -365,7 +365,8 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
         }
         if ($url -match 'api\.github\.com/repos') {
             $wreq.Accept = 'application/octet-stream'
-            $wreq.Headers['Authorization'] = "token $(Get-GitHubToken)"
+            $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
+            $wreq.Headers['X-GitHub-Api-Version'] = "2022-11-28"
         }
         if ($cookies) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
@@ -632,7 +633,7 @@ function cookie_header($cookies) {
 function is_in_dir($dir, $check) {
     $check = "$(fullpath $check)"
     $dir = "$(fullpath $dir)"
-    $check -match "^$([regex]::escape("$dir"))(\\|`$)"
+    $check -match "^$([regex]::Escape("$dir"))([/\\]|`$)"
 }
 
 function ftp_file_size($url) {

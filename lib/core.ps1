@@ -145,19 +145,16 @@ function Invoke-Git {
 
     $proxy = get_config PROXY
     $git = Get-HelperPath -Helper Git
-    $arguments = $ArgumentList -join ' '
-    $cmd = "`"$git`" $arguments"
 
     if ($WorkingDirectory) {
-        $cmd = "`"$git`" -C `"$WorkingDirectory`" $arguments"
+        $ArgumentList = @('-C', $WorkingDirectory) + $ArgumentList
     }
-    $sb = [scriptblock]::Create("& $cmd")
 
     if([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none')  {
-        return Invoke-Command $sb
+        return & $git @ArgumentList
     }
 
-    if($arguments -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
+    if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
         $old_https = $env:HTTPS_PROXY
         $old_http = $env:HTTP_PROXY
         try {
@@ -167,7 +164,7 @@ function Invoke-Git {
             }
             $env:HTTPS_PROXY = $proxy
             $env:HTTP_PROXY = $proxy
-            return Invoke-Command $sb
+            return & $git @ArgumentList
         }
         catch {
             error $_
@@ -179,7 +176,7 @@ function Invoke-Git {
         }
     }
 
-    return Invoke-Command $sb
+    return & $git @ArgumentList
 }
 
 function Invoke-GitLog {
@@ -198,7 +195,7 @@ function Invoke-GitLog {
             }
             $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
         }
-        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format='tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset'", "$CommitHash..HEAD")
+        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
     }
 }
 
@@ -665,10 +662,29 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function env($name,$global,$val='__get') {
-    $target = 'User'; if($global) {$target = 'Machine'}
-    if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
-    else { [environment]::setEnvironmentVariable($name,$val,$target) }
+function env($name, $global, $val = '__get') {
+    $RegisterKey = if ($global) {
+        Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
+    } else {
+        Get-Item -Path 'HKCU:'
+    }
+    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $val -ne '__get')
+
+    if ($val -eq '__get') {
+        $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
+        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
+    } elseif ($val -eq $null) {
+        $EnvRegisterKey.DeleteValue($name)
+    } else {
+        $RegistryValueKind = if ($val.Contains('%')) {
+            [Microsoft.Win32.RegistryValueKind]::ExpandString
+        } elseif ($EnvRegisterKey.GetValue($name)) {
+            $EnvRegisterKey.GetValueKind($name)
+        } else {
+            [Microsoft.Win32.RegistryValueKind]::String
+        }
+        $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
+    }
 }
 
 function isFileLocked([string]$path) {
@@ -1300,6 +1316,29 @@ Optimize-SecurityProtocol
 # Load Scoop config
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
+# Check if it's the expected install path for scoop: <root>/apps/scoop/current
+$coreRoot = Split-Path $PSScriptRoot
+$pathExpected = ($coreRoot -replace '\\','/') -like '*apps/scoop/current*'
+if ($pathExpected) {
+    # Portable config is located in root directory:
+    #    .\current\scoop\apps\<root>\config.json  <- a reversed path
+    # Imagine `<root>/apps/scoop/current/` in a reversed format,
+    # and the directory tree:
+    #
+    # ```
+    # <root>:
+    # ├─apps
+    # ├─buckets
+    # ├─cache
+    # ├─persist
+    # ├─shims
+    # ├─config.json
+    # ```
+    $configPortablePath = fullpath "$coreRoot\..\..\..\config.json"
+    if (Test-Path $configPortablePath) {
+        $configFile = $configPortablePath
+    }
+}
 $scoopConfig = load_cfg $configFile
 
 # NOTE Scoop config file migration. Remove this after 2023/6/30
