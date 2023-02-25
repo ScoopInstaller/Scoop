@@ -662,10 +662,29 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function env($name,$global,$val='__get') {
-    $target = 'User'; if($global) {$target = 'Machine'}
-    if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
-    else { [environment]::setEnvironmentVariable($name,$val,$target) }
+function env($name, $global, $val = '__get') {
+    $RegisterKey = if ($global) {
+        Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
+    } else {
+        Get-Item -Path 'HKCU:'
+    }
+    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $val -ne '__get')
+
+    if ($val -eq '__get') {
+        $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
+        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
+    } elseif ($val -eq $null) {
+        $EnvRegisterKey.DeleteValue($name)
+    } else {
+        $RegistryValueKind = if ($val.Contains('%')) {
+            [Microsoft.Win32.RegistryValueKind]::ExpandString
+        } elseif ($EnvRegisterKey.GetValue($name)) {
+            $EnvRegisterKey.GetValueKind($name)
+        } else {
+            [Microsoft.Win32.RegistryValueKind]::String
+        }
+        $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
+    }
 }
 
 function isFileLocked([string]$path) {
