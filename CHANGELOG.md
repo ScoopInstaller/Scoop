@@ -10,6 +10,7 @@
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
 - **shortcuts:** Output correctly formatted path ([#5333](https://github.com/ScoopInstaller/Scoop/issues/5333))
 - **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
+- **install:** Fix download from private GitHub repositories ([#5357](https://github.com/ScoopInstaller/Scoop/issues/5357))
 
 ### Code Refactoring
 
