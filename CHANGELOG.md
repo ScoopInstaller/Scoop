@@ -10,6 +10,7 @@
 - **decompress:** Exclude '*.nsis' that may cause error ([#5294](https://github.com/ScoopInstaller/Scoop/issues/5294))
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
 - **shortcuts:** Output correctly formatted path ([#5333](https://github.com/ScoopInstaller/Scoop/issues/5333))
+- **core:** Fix scripts' calling parameters ([#5365](https://github.com/ScoopInstaller/Scoop/issues/5365))
 - **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
 - **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395))
 - **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))

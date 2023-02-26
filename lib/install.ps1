@@ -1067,13 +1067,18 @@ function ensure_none_failed($apps) {
     foreach ($app in $apps) {
         $app = ($app -split '/|\\')[-1] -replace '\.json$', ''
         foreach ($global in $true, $false) {
+            if ($global) {
+                $instArgs = @('--global')
+            } else {
+                $instArgs = @()
+            }
             if (failed $app $global) {
                 if (installed $app $global) {
                     info "Repair previous failed installation of $app."
-                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app$(if ($global) { ' --global' })
+                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app @instArgs
                 } else {
                     warn "Purging previous failed installation of $app."
-                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
+                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app @instArgs
                 }
             }
         }
