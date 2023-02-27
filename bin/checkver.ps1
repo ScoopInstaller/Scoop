@@ -291,8 +291,8 @@ while ($in_progress -gt 0) {
             $scriptJob = Start-Job -ScriptBlock ([scriptblock]::Create($script -join "`r`n"))
             $page = Receive-Job -Job $scriptJob -Wait
             if (!$page) {
-				next "'checkver.script' is not valid"
-				continue
+                next "'checkver.script' is not valid"
+                continue
             }
         }
 
