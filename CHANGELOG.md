@@ -7,6 +7,7 @@
 
 ### Bug Fixes
 
+- **decompress:** Disable progress bar to improve `Expand-Archive` performance ([#5410](https://github.com/ScoopInstaller/Scoop/issues/5410))
 - **decompress:** Exclude '*.nsis' that may cause error ([#5294](https://github.com/ScoopInstaller/Scoop/issues/5294))
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
 - **getopt:** Stop split arguments in `getopt()` and ensure array by explicit arguments type ([#5326](https://github.com/ScoopInstaller/Scoop/issues/5326))

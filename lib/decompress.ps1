@@ -241,8 +241,14 @@ function Expand-ZipArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
+    # Disable progress bar to gain performance
+    $oldProgressPreference = $ProgressPreference
+    $global:ProgressPreference = 'SilentlyContinue'
+
     # Compatible with Pscx v3 (https://github.com/Pscx/Pscx) ('Microsoft.PowerShell.Archive' is not needed for Pscx v4)
     Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+
+    $global:ProgressPreference = $oldProgressPreference
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
