@@ -288,7 +288,8 @@ while ($in_progress -gt 0) {
             $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
         }
         if ($script) {
-            $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+            $page = Start-Job ([scriptblock]::Create($script -join "`r`n"))
+            Wait-Job $page | Out-Null
         }
 
         if ($jsonpath) {
