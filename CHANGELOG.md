@@ -17,6 +17,10 @@
 - **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))
 - **scoop-info:** Fix errors in file size collection when `--verbose` ([#5352](https://github.com/ScoopInstaller/Scoop/pull/5352))
 
+### Performance Improvements
+
+- **decompress:** Disable progress bar to improve `Expand-Archive` performance ([#5410](https://github.com/ScoopInstaller/Scoop/issues/5410))
+
 ### Code Refactoring
 
 - **git:** Use Invoke-Git() with direct path to git.exe to prevent spawning shim subprocesses ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122), [#5375](https://github.com/ScoopInstaller/Scoop/issues/5375))
