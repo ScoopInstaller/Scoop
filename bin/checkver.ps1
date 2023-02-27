@@ -288,8 +288,12 @@ while ($in_progress -gt 0) {
             $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
         }
         if ($script) {
-            $page = Start-Job ([scriptblock]::Create($script -join "`r`n"))
-            Wait-Job $page | Out-Null
+            $scriptJob = Start-Job -ScriptBlock ([scriptblock]::Create($script -join "`r`n"))
+            $page = Receive-Job -Job $scriptJob -Wait
+            if (!$page) {
+				next "'checkver.script' is not valid"
+				continue
+            }
         }
 
         if ($jsonpath) {
