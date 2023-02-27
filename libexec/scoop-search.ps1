@@ -11,6 +11,11 @@ param($query)
 
 $list = [System.Collections.Generic.List[PSCustomObject]]::new()
 
+if(!$query -or $query -in @($null, '-h', '--help', '/?')) {
+    my_usage
+    exit 0
+}
+
 try {
     $query = New-Object Regex $query, 'IgnoreCase'
 } catch {
