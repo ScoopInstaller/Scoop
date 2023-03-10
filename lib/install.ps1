@@ -365,7 +365,8 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
         }
         if ($url -match 'api\.github\.com/repos') {
             $wreq.Accept = 'application/octet-stream'
-            $wreq.Headers['Authorization'] = "token $(Get-GitHubToken)"
+            $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
+            $wreq.Headers['X-GitHub-Api-Version'] = "2022-11-28"
         }
         if ($cookies) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
@@ -1066,13 +1067,18 @@ function ensure_none_failed($apps) {
     foreach ($app in $apps) {
         $app = ($app -split '/|\\')[-1] -replace '\.json$', ''
         foreach ($global in $true, $false) {
+            if ($global) {
+                $instArgs = @('--global')
+            } else {
+                $instArgs = @()
+            }
             if (failed $app $global) {
                 if (installed $app $global) {
                     info "Repair previous failed installation of $app."
-                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app$(if ($global) { ' --global' })
+                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app @instArgs
                 } else {
                     warn "Purging previous failed installation of $app."
-                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
+                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app @instArgs
                 }
             }
         }

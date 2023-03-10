@@ -112,7 +112,7 @@ if ($status.installed) {
 
         # Collect file list from each location
         $appFiles = Get-ChildItem $appsdir -Filter $app
-        $currentFiles = Get-ChildItem $appFiles -Filter (Select-CurrentVersion $app $global)
+        $currentFiles = Get-ChildItem $appFiles.FullName -Filter (Select-CurrentVersion $app $global)
         $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
         $cacheFiles = Get-ChildItem $cachedir -Filter "$app#*"
 
@@ -120,7 +120,7 @@ if ($status.installed) {
         $fileTotals = @()
         foreach ($fileType in ($appFiles, $currentFiles, $persistFiles, $cacheFiles)) {
             if ($null -ne $fileType) {
-                $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
+                $fileSum = (Get-ChildItem $fileType.FullName -Recurse -File | Measure-Object -Property Length -Sum).Sum
                 $fileTotals += coalesce $fileSum 0
             } else {
                 $fileTotals += 0
