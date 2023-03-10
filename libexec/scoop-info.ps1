@@ -84,7 +84,7 @@ if ($manifest.depends) {
 
 if (Test-Path $manifest_file) {
     if (Get-Command git -ErrorAction Ignore) {
-        $gitinfo = (Invoke-Git -Path (Split-Path $manifest_file) -ArgumentList @('log', '-1', '-s', "--format='%aD#%an'", $manifest_file) 2> $null) -Split '#'
+        $gitinfo = (Invoke-Git -Path (Split-Path $manifest_file) -ArgumentList @('log', '-1', '-s', '--format=%aD#%an', $manifest_file) 2> $null) -Split '#'
     }
     if ($gitinfo) {
         $item.'Updated at' = $gitinfo[0] | Get-Date
@@ -112,7 +112,7 @@ if ($status.installed) {
 
         # Collect file list from each location
         $appFiles = Get-ChildItem $appsdir -Filter $app
-        $currentFiles = Get-ChildItem $appFiles -Filter (Select-CurrentVersion $app $global)
+        $currentFiles = Get-ChildItem $appFiles.FullName -Filter (Select-CurrentVersion $app $global)
         $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
         $cacheFiles = Get-ChildItem $cachedir -Filter "$app#*"
 
@@ -120,7 +120,7 @@ if ($status.installed) {
         $fileTotals = @()
         foreach ($fileType in ($appFiles, $currentFiles, $persistFiles, $cacheFiles)) {
             if ($null -ne $fileType) {
-                $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
+                $fileSum = (Get-ChildItem $fileType.FullName -Recurse -File | Measure-Object -Property Length -Sum).Sum
                 $fileTotals += coalesce $fileSum 0
             } else {
                 $fileTotals += 0
