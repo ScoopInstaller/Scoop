@@ -905,19 +905,9 @@ function shim($path, $global, $name, $arg) {
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
-        # find path to Git's bash so that batch scripts can run bash scripts
-        if (!(Get-CommandPath git)) {
-            error "Can't shim '$shim': 'git' is needed but not installed."
-            error "Please install git ('scoop install git') and try again."
-            exit 1
-        }
-        $gitdir = (Get-Item (Get-CommandPath git) -ErrorAction:Stop).Directory.Parent
-        if ($gitdir.FullName -imatch 'mingw') {
-            $gitdir = $gitdir.Parent
-        }
         @(
             "@rem $resolved_path",
-            "@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*"
+            "@bash `"$resolved_path`" $arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
