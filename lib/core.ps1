@@ -155,25 +155,18 @@ function Invoke-Git {
     }
 
     if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
-        $old_https = $env:HTTPS_PROXY
-        $old_http = $env:HTTP_PROXY
-        try {
+        $j = Start-Job -ScriptBlock {
             # convert proxy setting for git
-            if ($proxy.StartsWith('currentuser@')) {
+            $proxy = $using:proxy
+            if ($proxy -and $proxy.StartsWith('currentuser@')) {
                 $proxy = $proxy.Replace('currentuser@', ':@')
             }
             $env:HTTPS_PROXY = $proxy
             $env:HTTP_PROXY = $proxy
-            return & $git @ArgumentList
+            & $using:git @using:ArgumentList
         }
-        catch {
-            error $_
-            return
-        }
-        finally {
-            $env:HTTPS_PROXY = $old_https
-            $env:HTTP_PROXY = $old_http
-        }
+        $o = $j | Receive-Job -Wait -AutoRemoveJob
+        return $o
     }
 
     return & $git @ArgumentList
