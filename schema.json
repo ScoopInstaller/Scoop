@@ -210,7 +210,7 @@
                     "$ref": "#/definitions/shortcutsArray"
                 },
                 "url": {
-                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             }
         },
@@ -279,7 +279,7 @@
                     "$ref": "#/definitions/shortcutsArray"
                 },
                 "url": {
-                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 }
             }
         },
@@ -449,23 +449,6 @@
                         "not": {
                             "pattern": "(\\$)"
                         },
-                        "type": "string"
-                    },
-                    "minItems": 1,
-                    "type": "array",
-                    "uniqueItems": true
-                }
-            ]
-        },
-        "autoupdateUriOrArrayOfAutoupdateUris": {
-            "anyOf": [
-                {
-                    "format": "uri",
-                    "type": "string"
-                },
-                {
-                    "items": {
-                        "format": "uri",
                         "type": "string"
                     },
                     "minItems": 1,
