@@ -44,6 +44,10 @@
 
 - **bucket:** Skip manifest validation if no manifest changes ([#5270](https://github.com/ScoopInstaller/Scoop/issues/5270))
 
+### Documentation
+
+- **scoop-info:** Fix help message([#5445](https://github.com/ScoopInstaller/Scoop/issues/5445))
+
 ## [v0.3.1](https://github.com/ScoopInstaller/Scoop/compare/v0.3.0...v0.3.1) - 2022-11-15
 
 ### Features
