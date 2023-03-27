@@ -1,7 +1,7 @@
-# Usage: scoop info <app> [--verbose]
+# Usage: scoop info <app> [options]
 # Summary: Display information about an app
-# Options:
-#   -v, --verbose       Show full paths and URLs
+# Help: Options:
+#   -v, --verbose   Show full paths and URLs
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
