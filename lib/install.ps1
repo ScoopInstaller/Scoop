@@ -376,6 +376,9 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
             (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
                 $wreq.Headers[$_.Key] = $_.Value
             }
+            if ($null -ne $_.Accept) {
+                $wreq.Accept = $_.Accept
+            }
         }
     }
 

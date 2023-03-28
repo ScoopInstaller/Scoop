@@ -1243,6 +1243,19 @@ function handle_special_urls($url)
         }
     }
 
+    # Github enterprise
+    get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
+        if ($url -match '(?<host>[^/]+)/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)') {
+            $headers = (ConvertFrom-StringData -StringData $_.Headers)
+            $privateUrl = "https://$($Matches.host)/api/v3/repos/$($Matches.owner)/$($Matches.repo)"
+            $assetUrl = "https://$($Matches.host)/api/v3/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
+
+            if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
+                $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
+            }
+        }
+    }
+
     return $url
 }
 
