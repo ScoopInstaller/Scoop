@@ -115,6 +115,9 @@
 #       Nightly version is formatted as 'nightly-yyyyMMdd' and will be updated after one day if this is set to $true.
 #       Otherwise, nightly version will not be updated unless `--force` is used.
 #
+# analytics_disable: $true|$false
+#       Set this to $true to disable sending anonymous usage analytics.
+#
 # ARIA2 configuration
 # -------------------
 #
