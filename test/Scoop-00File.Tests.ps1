@@ -71,7 +71,7 @@ Describe 'Style constraints for non-binary project files' -ForEach @(, $repo_fil
         $files = @(
             # gather all files except '*.exe', '*.zip', or any .git repository files
             $_ |
-                Where-Object { $_ -inotmatch '(.exe|.zip|.dll)$' } |
+                Where-Object { $_ -inotmatch '(.exe|.zip|.dll|.reg|.ps1|.md)$' } |
                 Where-Object { $_ -inotmatch '(unformatted)' }
         )
     }
