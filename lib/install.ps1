@@ -385,9 +385,9 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
     } catch [System.Net.WebException] {
         $exc = $_.Exception
         $handledCodes = @(
-            [System.Net.HttpStatusCode]::MovedPermanently, # HTTP 301
-            [System.Net.HttpStatusCode]::Found, # HTTP 302
-            [System.Net.HttpStatusCode]::SeeOther, # HTTP 303
+            [System.Net.HttpStatusCode]::MovedPermanently,  # HTTP 301
+            [System.Net.HttpStatusCode]::Found,             # HTTP 302
+            [System.Net.HttpStatusCode]::SeeOther,          # HTTP 303
             [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
         )
 
