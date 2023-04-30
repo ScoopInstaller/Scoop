@@ -64,6 +64,7 @@
 - **shim:** Exit if shim creating failed 'cause no git ([#5225](https://github.com/ScoopInstaller/Scoop/issues/5225))
 - **scoop-import:** Add correct architecture argument ([#5210](https://github.com/ScoopInstaller/Scoop/issues/5210))
 - **scoop-config:** Output `[DateTime]` as `[String]` ([#5232](https://github.com/ScoopInstaller/Scoop/issues/5232))
+- **shim:** fixed shim add bug related to Resolve-Path ([#5492](https://github.com/ScoopInstaller/Scoop/issues/5492))
 
 ### Code Refactoring
 
