@@ -1,17 +1,16 @@
-. "$PSScriptRoot\Scoop-TestLib.ps1"
-. "$PSScriptRoot\..\lib\core.ps1"
+BeforeAll {
+    . "$PSScriptRoot\Scoop-TestLib.ps1"
+    . "$PSScriptRoot\..\lib\core.ps1"
+}
 
 Describe 'config' -Tag 'Scoop' {
     BeforeAll {
-        $configFile = "$env:TEMP\ScoopTestFixtures\config.json"
-        if (Test-Path $configFile) {
-            Remove-Item -Path $configFile -Force
-        }
+        $configFile = [IO.Path]::GetTempFileName()
         $unicode = [Regex]::Unescape('\u4f60\u597d\u3053\u3093\u306b\u3061\u306f') # 你好こんにちは
     }
 
-    BeforeEach {
-        $scoopConfig = $null
+    AfterAll {
+        Remove-Item -Path $configFile -Force
     }
 
     It 'load_cfg should return null if config file does not exist' {

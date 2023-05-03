@@ -179,19 +179,11 @@
             "type": "array"
         },
         "autoupdateArch": {
+            "type": "object",
             "additionalProperties": false,
             "properties": {
-                "url": {
-                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
-                },
-                "hash": {
-                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
-                },
-                "extract_dir": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                },
-                "extract_to": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                "bin": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
                 },
                 "env_add_path": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -199,71 +191,97 @@
                 "env_set": {
                     "type": "object"
                 },
-                "bin": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                "extract_dir": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
-                "shortcuts": {
-                    "$ref": "#/definitions/shortcutsArray"
+                "hash": {
+                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
                 },
                 "installer": {
+                    "type": "object",
                     "additionalProperties": false,
                     "properties": {
                         "file": {
                             "type": "string"
                         }
-                    },
-                    "type": "object"
+                    }
                 },
-                "post_install": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                "shortcuts": {
+                    "$ref": "#/definitions/shortcutsArray"
                 },
-                "psmodule": {
+                "url": {
+                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
+                }
+            }
+        },
+        "autoupdate": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "architecture": {
+                    "type": "object",
                     "additionalProperties": false,
                     "properties": {
-                        "name": {
-                            "type": "string"
+                        "32bit": {
+                            "$ref": "#/definitions/autoupdateArch"
+                        },
+                        "64bit": {
+                            "$ref": "#/definitions/autoupdateArch"
+                        },
+                        "arm64": {
+                            "$ref": "#/definitions/autoupdateArch"
                         }
-                    },
+                    }
+                },
+                "bin": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "env_add_path": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "env_set": {
                     "type": "object"
                 },
-                "persist": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                "extract_dir": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
+                "hash": {
+                    "$ref": "#/definitions/hashExtractionOrArrayOfHashExtractions"
+                },
+                "installer": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "file": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "license": {
                     "$ref": "#/definitions/license"
                 },
                 "notes": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
-                }
-            },
-            "type": "object"
-        },
-        "autoupdate": {
-            "anyOf": [
-                {
-                    "$ref": "#/definitions/autoupdateArch"
                 },
-                {
+                "persist": {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                "psmodule": {
+                    "type": "object",
+                    "additionalProperties": false,
                     "properties": {
-                        "notes": {
-                            "$ref": "#/definitions/stringOrArrayOfStrings"
-                        },
-                        "architecture": {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                                "32bit": {
-                                    "$ref": "#/definitions/autoupdateArch"
-                                },
-                                "64bit": {
-                                    "$ref": "#/definitions/autoupdateArch"
-                                }
-                            }
+                        "name": {
+                            "type": "string"
                         }
                     }
+                },
+                "shortcuts": {
+                    "$ref": "#/definitions/shortcutsArray"
+                },
+                "url": {
+                    "$ref": "#/definitions/autoupdateUriOrArrayOfAutoupdateUris"
                 }
-            ],
-            "type": "object"
+            }
         },
         "checkver": {
             "anyOf": [
@@ -315,6 +333,25 @@
                         "script": {
                             "$ref": "#/definitions/stringOrArrayOfStrings",
                             "description": "Custom PowerShell script to retrieve application version using more complex approach."
+                        },
+                        "sourceforge": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "project": {
+                                            "type": "string"
+                                        },
+                                        "path": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            ]
                         }
                     },
                     "type": "object"
@@ -508,6 +545,9 @@
                 },
                 "64bit": {
                     "$ref": "#/definitions/architecture"
+                },
+                "arm64": {
+                    "$ref": "#/definitions/architecture"
                 }
             },
             "type": "object"
@@ -613,6 +653,34 @@
             "pattern": "^[\\w\\.\\-+_]+$",
             "type": "string"
         }
+    },
+    "if": {
+        "properties": {
+            "architecture": {
+                "properties": {
+                    "64bit": {
+                        "properties": {
+                            "url": false
+                        }
+                    },
+                    "32bit": {
+                        "properties": {
+                            "url": false
+                        }
+                    },
+                    "arm64": {
+                        "properties": {
+                            "url": false
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "then": {
+        "required": [
+            "url"
+        ]
     },
     "required": [
         "version",

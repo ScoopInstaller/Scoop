@@ -23,7 +23,7 @@ function install_psmodule($manifest, $dir, $global) {
 
     if (Test-Path $linkfrom) {
         warn "$(friendly_path $linkfrom) already exists. It will be replaced."
-        Remove-Item -Path $linkfrom -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path $linkfrom -Force -Recurse -ErrorAction SilentlyContinue
     }
 
     New-DirectoryJunction $linkfrom $dir | Out-Null
@@ -39,8 +39,8 @@ function uninstall_psmodule($manifest, $dir, $global) {
     $linkfrom = "$modulesdir\$module_name"
     if (Test-Path $linkfrom) {
         Write-Host "Removing $(friendly_path $linkfrom)"
-        $linkfrom = Resolve-Path $linkfrom
-        Remove-Item -Path $linkfrom -Force -ErrorAction SilentlyContinue
+        $linkfrom = Convert-Path $linkfrom
+        Remove-Item -Path $linkfrom -Force -Recurse -ErrorAction SilentlyContinue
     }
 }
 

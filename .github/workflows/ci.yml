@@ -10,13 +10,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 2
       - name: Init Test Suite
-        uses: potatoqualitee/psmodulecache@v4
+        uses: potatoqualitee/psmodulecache@v5.1
         with:
-          modules-to-cache: PSScriptAnalyzer, BuildHelpers, Pester:4.10.1
+          modules-to-cache: BuildHelpers
           shell: powershell
       - name: Test Scoop Core
         shell: powershell
@@ -26,13 +26,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 2
       - name: Init Test Suite
-        uses: potatoqualitee/psmodulecache@v4
+        uses: potatoqualitee/psmodulecache@v5.1
         with:
-          modules-to-cache: PSScriptAnalyzer, BuildHelpers, Pester:4.10.1
+          modules-to-cache: BuildHelpers
           shell: pwsh
       - name: Test Scoop Core
         shell: pwsh

@@ -18,20 +18,21 @@ function Expand-7zipArchive {
         [Switch]
         $Removal
     )
-    if ((get_config 7ZIPEXTRACT_USE_EXTERNAL)) {
+    if ((get_config USE_EXTERNAL_7ZIP)) {
         try {
             $7zPath = (Get-Command '7z' -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         } catch [System.Management.Automation.CommandNotFoundException] {
-            abort "`nCannot find external 7-Zip (7z.exe) while '7ZIPEXTRACT_USE_EXTERNAL' is 'true'!`nRun 'scoop config 7ZIPEXTRACT_USE_EXTERNAL false' or install 7-Zip manually and try again."
+            abort "`nCannot find external 7-Zip (7z.exe) while 'use_external_7zip' is 'true'!`nRun 'scoop config use_external_7zip false' or install 7-Zip manually and try again."
         }
     } else {
         $7zPath = Get-HelperPath -Helper 7zip
     }
     $LogPath = "$(Split-Path $Path)\7zip.log"
-    $ArgList = @('x', "`"$Path`"", "-o`"$DestinationPath`"", '-y')
+    $DestinationPath = $DestinationPath.TrimEnd('\')
+    $ArgList = @('x', $Path, "-o$DestinationPath", '-xr!*.nsis', '-y')
     $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
     if (!$IsTar -and $ExtractDir) {
-        $ArgList += "-ir!`"$ExtractDir\*`""
+        $ArgList += "-ir!$ExtractDir\*"
     }
     if ($Switches) {
         $ArgList += (-split $Switches)
@@ -53,7 +54,7 @@ function Expand-7zipArchive {
     }
     if ($IsTar) {
         # Check for tar
-        $Status = Invoke-ExternalCommand $7zPath @('l', "`"$Path`"") -LogPath $LogPath
+        $Status = Invoke-ExternalCommand $7zPath @('l', $Path) -LogPath $LogPath
         if ($Status) {
             # get inner tar file name
             $TarFile = (Select-String -Path $LogPath -Pattern '[^ ]*tar$').Matches.Value
@@ -97,7 +98,7 @@ function Expand-ZstdArchive {
     $LogPath = Join-Path (Split-Path $Path) 'zstd.log'
     $DestinationPath = $DestinationPath.TrimEnd('\')
     ensure $DestinationPath | Out-Null
-    $ArgList = @('-d', "`"$Path`"", '--output-dir-flat', "`"$DestinationPath`"", '-f', '-v')
+    $ArgList = @('-d', $Path, '--output-dir-flat', $DestinationPath, '-f', '-v')
 
     if ($Switches) {
         $ArgList += (-split $Switches)
@@ -146,12 +147,12 @@ function Expand-MsiArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    if ((get_config MSIEXTRACT_USE_LESSMSI)) {
+    if ((get_config USE_LESSMSI)) {
         $MsiPath = Get-HelperPath -Helper Lessmsi
-        $ArgList = @('x', "`"$Path`"", "`"$DestinationPath\\`"")
+        $ArgList = @('x', $Path, "$DestinationPath\")
     } else {
         $MsiPath = 'msiexec.exe'
-        $ArgList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath\\SourceDir`"")
+        $ArgList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath\SourceDir`"")
     }
     $LogPath = "$(Split-Path $Path)\msi.log"
     if ($Switches) {
@@ -200,7 +201,7 @@ function Expand-InnoArchive {
         $Removal
     )
     $LogPath = "$(Split-Path $Path)\innounp.log"
-    $ArgList = @('-x', "-d`"$DestinationPath`"", "`"$Path`"", '-y')
+    $ArgList = @('-x', "-d$DestinationPath", $Path, '-y')
     switch -Regex ($ExtractDir) {
         '^[^{].*' { $ArgList += "-c{app}\$ExtractDir" }
         '^{.*' { $ArgList += "-c$ExtractDir" }
@@ -240,7 +241,14 @@ function Expand-ZipArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+    # Disable progress bar to gain performance
+    $oldProgressPreference = $ProgressPreference
+    $global:ProgressPreference = 'SilentlyContinue'
+
+    # Compatible with Pscx v3 (https://github.com/Pscx/Pscx) ('Microsoft.PowerShell.Archive' is not needed for Pscx v4)
+    Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+
+    $global:ProgressPreference = $oldProgressPreference
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
@@ -267,7 +275,7 @@ function Expand-DarkArchive {
         $Removal
     )
     $LogPath = "$(Split-Path $Path)\dark.log"
-    $ArgList = @('-nologo', "-x `"$DestinationPath`"", "`"$Path`"")
+    $ArgList = @('-nologo', '-x', $DestinationPath, $Path)
     if ($Switches) {
         $ArgList += (-split $Switches)
     }

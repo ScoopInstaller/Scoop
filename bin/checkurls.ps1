@@ -30,12 +30,12 @@ param(
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 
-$Dir = Resolve-Path $Dir
+$Dir = Convert-Path $Dir
 $Queue = @()
 
-Get-ChildItem $Dir "$App.json" | ForEach-Object {
-    $manifest = parse_json "$Dir\$($_.Name)"
-    $Queue += , @($_.Name, $manifest)
+Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
+    $manifest = parse_json $_.FullName
+    $Queue += , @($_.BaseName, $manifest)
 }
 
 Write-Host '[' -NoNewLine
@@ -62,6 +62,13 @@ function test_dl([String] $url, $cookies) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
     }
+
+    get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
+        (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
+            $wreq.Headers[$_.Key] = $_.Value
+        }
+    }
+
     $wres = $null
     try {
         $wres = $wreq.GetResponse()
@@ -91,6 +98,7 @@ foreach ($man in $Queue) {
     } else {
         script:url $manifest '64bit' | ForEach-Object { $urls += $_ }
         script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
+        script:url $manifest 'arm64' | ForEach-Object { $urls += $_ }
     }
 
     $urls | ForEach-Object {
@@ -125,7 +133,7 @@ foreach ($man in $Queue) {
         Write-Host $failed -NoNewLine -ForegroundColor Red
     }
     Write-Host '] ' -NoNewLine
-    Write-Host (strip_ext $name)
+    Write-Host $name
 
     $errors | ForEach-Object {
         Write-Host "       > $_" -ForegroundColor DarkRed

@@ -1,18 +1,18 @@
-# Usage: scoop shim <subcommand> [<shim_names>] [<command_path> [<args>...]] [-g(lobal)]
+# Usage: scoop shim <subcommand> [<shim_name>...] [options] [other_args]
 # Summary: Manipulate Scoop shims
-# Help: Manipulate Scoop shims: add, rm, list, info, alter, etc.
+# Help: Available subcommands: add, rm, list, info, alter.
 #
 # To add a custom shim, use the 'add' subcommand:
 #
 #     scoop shim add <shim_name> <command_path> [<args>...]
 #
-# To remove a shim, use the 'rm' subcommand (CAUTION: this could remove shims added by an app manifest):
+# To remove shims, use the 'rm' subcommand: (CAUTION: this could remove shims added by an app manifest)
 #
-#     scoop shim rm <shim_names>
+#     scoop shim rm <shim_name> [<shim_name>...]
 #
 # To list all shims or matching shims, use the 'list' subcommand:
 #
-#     scoop shim list [<shim_names>]
+#     scoop shim list [<shim_name>/<pattern>...]
 #
 # To show a shim's information, use the 'info' subcommand:
 #
@@ -23,58 +23,38 @@
 #     scoop shim alter <shim_name>
 #
 # Options:
-#   -g(lobal)       Add/Remove/Info/Alter global shim(s)
-#                   (NOTICE: USING SINGLE DASH)
-#                   (HINT: To pass arguments like '-g' or '-global' to the shim, use quotes)
+#   -g, --global       Manipulate global shim(s)
+#
+# HINT: The FIRST double-hyphen '--', if any, will be treated as the POSIX-style command option terminator
+# and will NOT be included in arguments, so if you want to pass arguments like '-g' or '--global' to
+# the shim, put them after a '--'. Note that in PowerShell, you must use a QUOTED '--', e.g.,
+#
+#     scoop shim add myapp 'D:\path\myapp.exe' '--' myapp_args --global
 
-param($SubCommand, $ShimName, [Switch]$global)
+param($SubCommand)
 
+. "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
 
 if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
-    'ERROR: <subcommand> must be one of: add, rm, list, info, alter'
-    my_usage
-    exit 1
-}
-
-if ($SubCommand -ne 'list' -and !$ShimName) {
-    "ERROR: <shim_name> must be specified for subcommand '$SubCommand'"
-    my_usage
-    exit 1
-}
-
-if ($Args) {
-    switch ($SubCommand) {
-        'add' {
-            if ($Args[0] -like '-*') {
-                "ERROR: <command_path> must be specified for subcommand 'add'"
-                my_usage
-                exit 1
-            } else {
-                if (($Args -join ' ') -match "^'(.*?)'\s*(.*?)$") {
-                    $commandPath = $Matches[1]
-                    $commandArgs = $Matches[2]
-                } else {
-                    $commandPath = $Args[0]
-                    if ($Args.Length -gt 1) {
-                        $commandArgs = $Args[1..($Args.Length - 1)]
-                    }
-                }
-            }
-        }
-        'rm' {
-            $ShimName = @($ShimName) + $Args
-        }
-        'list' {
-            $ShimName = (@($ShimName) + $Args) -join '|'
-        }
-        default {
-            # For 'info' and 'alter'
-            "ERROR: Option $Args not recognized."
-            my_usage
-            exit 1
-        }
+    if (!$SubCommand) {
+        error '<subcommand> missing'
+    } else {
+        error "'$SubCommand' is not one of available subcommands: add, rm, list, info, alter"
     }
+    my_usage
+    exit 1
+}
+
+$opt, $other, $err = getopt $Args 'g' 'global'
+if ($err) { "scoop shim: $err"; exit 1 }
+
+$global = $opt.g -or $opt.global
+
+if ($SubCommand -ne 'list' -and $other.Length -eq 0) {
+    error "<shim_name> must be specified for subcommand '$SubCommand'"
+    my_usage
+    exit 1
 }
 
 if (-not (Get-FormatData ScoopShims)) {
@@ -110,6 +90,16 @@ function Get-ShimPath($ShimName, $Global) {
 
 switch ($SubCommand) {
     'add' {
+        if ($other.Length -lt 2 -or $other[1] -eq '') {
+            error "<command_path> must be specified for subcommand 'add'"
+            my_usage
+            exit 1
+        }
+        $shimName = $other[0]
+        $commandPath = $other[1]
+        if ($other.Length -gt 2) {
+            $commandArgs = $other[2..($other.Length - 1)]
+        }
         if ($commandPath -notmatch '[\\/]') {
             $shortPath = $commandPath
             $commandPath = Get-ShimTarget (Get-ShimPath $shortPath $global)
@@ -126,12 +116,14 @@ switch ($SubCommand) {
             Write-Host '...'
             shim $commandPath $global $shimName $commandArgs
         } else {
-            abort "ERROR: '$($Args[0])' does not exist" 3
+            Write-Host "ERROR: Command path does not exist: " -ForegroundColor Red -NoNewline
+            Write-Host $($other[1]) -ForegroundColor Cyan
+            exit 3
         }
     }
     'rm' {
         $failed = @()
-        $ShimName | ForEach-Object {
+        $other | ForEach-Object {
             if (Get-ShimPath $_ $global) {
                 rm_shim $_ (shimdir $global)
             } else {
@@ -139,61 +131,82 @@ switch ($SubCommand) {
             }
         }
         if ($failed) {
-            Write-Host 'Shims not found: ' -NoNewline
-            Write-Host $failed -ForegroundColor Cyan
+            $failed | ForEach-Object {
+                Write-Host "ERROR: $(if ($global) { 'Global' } else {'Local' }) shim not found: " -ForegroundColor Red -NoNewline
+                Write-Host $_ -ForegroundColor Cyan
+            }
             exit 3
         }
     }
     'list' {
-        $shims = Get-ChildItem -Path $localShimDir -Recurse -Include '*.shim', '*.ps1' |
-            Where-Object { !$ShimName -or ($_.BaseName -match $ShimName) } |
-            Select-Object -ExpandProperty FullName
+        $other = @($other) -ne '*'
+        # Validate all given patterns before matching.
+        $other | ForEach-Object {
+            try {
+                $pattern = $_
+                [Regex]::New($pattern)
+            } catch {
+                Write-Host "ERROR: Invalid pattern: " -ForegroundColor Red -NoNewline
+                Write-Host $pattern -ForegroundColor Magenta
+                exit 1
+            }
+        }
+        $pattern = $other -join '|'
+        $shims = @()
+        if (!$global) {
+            $shims += Get-ChildItem -Path $localShimDir -Recurse -Include '*.shim', '*.ps1' |
+                Where-Object { !$pattern -or ($_.BaseName -match $pattern) } |
+                Select-Object -ExpandProperty FullName
+        }
         if (Test-Path $globalShimDir) {
             $shims += Get-ChildItem -Path $globalShimDir -Recurse -Include '*.shim', '*.ps1' |
-                Where-Object { !$ShimName -or ($_.BaseName -match $ShimName) } |
+                Where-Object { !$pattern -or ($_.BaseName -match $pattern) } |
                 Select-Object -ExpandProperty FullName
         }
         $shims.ForEach({ Get-ShimInfo $_ }) | Add-Member -TypeName 'ScoopShims' -PassThru
     }
     'info' {
-        $shimPath = Get-ShimPath $ShimName $global
+        $shimName = $other[0]
+        $shimPath = Get-ShimPath $shimName $global
         if ($shimPath) {
             Get-ShimInfo $shimPath
         } else {
-            Write-Host "$(if ($global) { 'Global' } else { 'Local' }) shim not found: " -NoNewline
-            Write-Host $ShimName -ForegroundColor Cyan
-            if (Get-ShimPath $ShimName (!$global)) {
+            Write-Host "ERROR: $(if ($global) { 'Global' } else { 'Local' }) shim not found: " -ForegroundColor Red -NoNewline
+            Write-Host $shimName -ForegroundColor Cyan
+            if (Get-ShimPath $shimName (!$global)) {
                 Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, " -NoNewline
-                Write-Host "run 'scoop shim info $ShimName$(if (!$global) { ' -global' })' to show its info"
+                Write-Host "run 'scoop shim info $shimName$(if (!$global) { ' --global' })' to show its info"
                 exit 2
             }
             exit 3
         }
     }
     'alter' {
-        $shimPath = Get-ShimPath $ShimName $global
+        $shimName = $other[0]
+        $shimPath = Get-ShimPath $shimName $global
         if ($shimPath) {
             $shimInfo = Get-ShimInfo $shimPath
             if ($null -eq $shimInfo.Alternatives) {
-                Write-Host 'No alternatives of ' -NoNewline
-                Write-Host $ShimName -ForegroundColor Cyan -NoNewline
-                Write-Host ' found.'
+                Write-Host 'ERROR: No alternatives of ' -ForegroundColor Red -NoNewline
+                Write-Host $shimName -ForegroundColor Cyan -NoNewline
+                Write-Host ' found.' -ForegroundColor Red
                 exit 2
             }
             $shimInfo.Alternatives = $shimInfo.Alternatives.Split(' ')
             [System.Management.Automation.Host.ChoiceDescription[]]$altApps = 1..$shimInfo.Alternatives.Length | ForEach-Object {
-                New-Object System.Management.Automation.Host.ChoiceDescription "&$($_)`b$($shimInfo.Alternatives[$_ - 1])", "Sets '$ShimName' shim from $($shimInfo.Alternatives[$_ - 1])."
+                New-Object System.Management.Automation.Host.ChoiceDescription "&$($_)`b$($shimInfo.Alternatives[$_ - 1])", "Sets '$shimName' shim from $($shimInfo.Alternatives[$_ - 1])."
             }
-            $selected = $Host.UI.PromptForChoice("Alternatives of '$ShimName' command", "Please choose one that provides '$ShimName' as default:", $altApps, 0)
+            $selected = $Host.UI.PromptForChoice("Alternatives of '$shimName' command", "Please choose one that provides '$shimName' as default:", $altApps, 0)
             if ($selected -eq 0) {
-                Write-Host $ShimName -ForegroundColor Cyan -NoNewline
+                Write-Host 'INFO: ' -ForegroundColor Blue -NoNewline
+                Write-Host $shimName -ForegroundColor Cyan -NoNewline
                 Write-Host ' is already from ' -NoNewline
                 Write-Host $shimInfo.Source -ForegroundColor DarkYellow -NoNewline
                 Write-Host ', nothing changed.'
             } else {
                 $newApp = $shimInfo.Alternatives[$selected]
                 Write-Host 'Use ' -NoNewline
-                Write-Host $ShimName -ForegroundColor Cyan -NoNewline
+                Write-Host $shimName -ForegroundColor Cyan -NoNewline
                 Write-Host ' from ' -NoNewline
                 Write-Host $newApp -ForegroundColor DarkYellow -NoNewline
                 Write-Host ' as default...' -NoNewline
@@ -211,11 +224,11 @@ switch ($SubCommand) {
                 Write-Host 'done.'
             }
         } else {
-            Write-Host "$(if ($global) { 'Global' } else { 'Local' }) shim not found: " -NoNewline
-            Write-Host $ShimName -ForegroundColor Cyan
-            if (Get-ShimPath $ShimName (!$global)) {
+            Write-Host "ERROR: $(if ($global) { 'Global' } else { 'Local' }) shim not found: " -ForegroundColor Red -NoNewline
+            Write-Host $shimName -ForegroundColor Cyan
+            if (Get-ShimPath $shimName (!$global)) {
                 Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, " -NoNewline
-                Write-Host "run 'scoop shim alter $ShimName$(if (!$global) { ' -global' })' to alternate its source"
+                Write-Host "run 'scoop shim alter $shimName$(if (!$global) { ' --global' })' to alternate its source"
                 exit 2
             }
             exit 3

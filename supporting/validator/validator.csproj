@@ -19,7 +19,7 @@
             <Private>True</Private>
         </Reference>
         <Reference Include="Newtonsoft.Json.Schema, Version=3.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-            <HintPath>packages\Newtonsoft.Json.Schema.3.0.14\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
+            <HintPath>packages\Newtonsoft.Json.Schema.3.0.15-beta2\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
             <Private>True</Private>
         </Reference>
         <Reference Include="System" />

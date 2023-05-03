@@ -17,6 +17,7 @@ if ($adminPrivileges) {
 
 $issues += !(check_main_bucket)
 $issues += !(check_long_paths)
+$issues += !(Get-WindowsDeveloperModeStatus)
 
 if (!(Test-HelperInstalled -Helper 7zip)) {
     error "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip' or 'scoop install 7zip-zstd'."
@@ -35,13 +36,13 @@ if (!(Test-HelperInstalled -Helper Dark)) {
 
 $globaldir = New-Object System.IO.DriveInfo($globaldir)
 if ($globaldir.DriveFormat -ne 'NTFS') {
-    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP_GLOBAL or 'globalPath' variable in '~/.config/scoop/config.json' to another Drive."
+    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP_GLOBAL or 'global_path' variable in '~/.config/scoop/config.json' to another Drive."
     $issues++
 }
 
 $scoopdir = New-Object System.IO.DriveInfo($scoopdir)
 if ($scoopdir.DriveFormat -ne 'NTFS') {
-    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP or 'rootPath' variable in '~/.config/scoop/config.json' to another Drive."
+    error "Scoop requires an NTFS volume to work! Please point `$env:SCOOP or 'root_path' variable in '~/.config/scoop/config.json' to another Drive."
     $issues++
 }
 

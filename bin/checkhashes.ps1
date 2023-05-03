@@ -47,9 +47,8 @@ param(
 . "$PSScriptRoot\..\lib\json.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
-. "$PSScriptRoot\..\lib\unix.ps1"
 
-$Dir = Resolve-Path $Dir
+$Dir = Convert-Path $Dir
 if ($ForceUpdate) { $Update = $true }
 # Cleanup
 if (!$UseCache) { Remove-Item "$cachedir\*HASH_CHECK*" -Force }
@@ -60,9 +59,10 @@ function err ([String] $name, [String[]] $message) {
 }
 
 $MANIFESTS = @()
-foreach ($single in Get-ChildItem $Dir "$App.json") {
-    $name = (strip_ext $single.Name)
-    $manifest = parse_json "$Dir\$($single.Name)"
+foreach ($single in Get-ChildItem $Dir -Filter "$App.json" -Recurse) {
+    $name = $single.BaseName
+    $file = $single.FullName
+    $manifest = parse_json $file
 
     # Skip nighly manifests, since their hash validation is skipped
     if ($manifest.version -eq 'nightly') { continue }
@@ -79,6 +79,8 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
         hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
         script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
         hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
+        script:url $manifest 'arm64' | ForEach-Object { $urls += $_ }
+        hash $manifest 'arm64' | ForEach-Object { $hashes += $_ }
     } else {
         err $name 'Manifest does not contain URL property.'
         continue
@@ -92,6 +94,7 @@ foreach ($single in Get-ChildItem $Dir "$App.json") {
 
     $MANIFESTS += @{
         app      = $name
+        file     = $file
         manifest = $manifest
         urls     = $urls
         hashes   = $hashes
@@ -110,13 +113,16 @@ foreach ($current in $MANIFESTS) {
 
     $current.urls | ForEach-Object {
         $algorithm, $expected = get_hash $current.hashes[$count]
-        $version = 'HASH_CHECK'
-        $tmp = $expected_hash -split ':'
+        if ($UseCache) {
+            $version = $current.manifest.version
+        } else {
+            $version = 'HASH_CHECK'
+        }
 
-        dl_with_cache $current.app $version $_ $null $null -use_cache:$UseCache
+        Invoke-CachedDownload $current.app $version $_ $null $null -use_cache:$UseCache
 
         $to_check = fullpath (cache_path $current.app $version $_)
-        $actual_hash = compute_hash $to_check $algorithm
+        $actual_hash = (Get-FileHash -Path $to_check -Algorithm $algorithm).Hash.ToLower()
 
         # Append type of algorithm to both expected and actual if it's not sha256
         if ($algorithm -ne 'sha256') {
@@ -141,12 +147,12 @@ foreach ($current in $MANIFESTS) {
         Write-Host 'Mismatch found ' -ForegroundColor Red
         $mismatched | ForEach-Object {
             $file = fullpath (cache_path $current.app $version $current.urls[$_])
-            Write-Host  "`tURL:`t`t$($current.urls[$_])"
+            Write-Host "`tURL:`t`t$($current.urls[$_])"
             if (Test-Path $file) {
-                Write-Host  "`tFirst bytes:`t$((get_magic_bytes_pretty $file ' ').ToUpper())"
+                Write-Host "`tFirst bytes:`t$((get_magic_bytes_pretty $file ' ').ToUpper())"
             }
-            Write-Host  "`tExpected:`t$($current.hashes[$_])" -ForegroundColor Green
-            Write-Host  "`tActual:`t`t$($actuals[$_])" -ForegroundColor Red
+            Write-Host "`tExpected:`t$($current.hashes[$_])" -ForegroundColor Green
+            Write-Host "`tActual:`t`t$($actuals[$_])" -ForegroundColor Red
         }
     }
 
@@ -158,23 +164,27 @@ foreach ($current in $MANIFESTS) {
             # Defaults to zero, don't know, which architecture is available
             $64bit_count = 0
             $32bit_count = 0
+            $arm64_count = 0
 
+            # 64bit is get, donwloaded and added first
             if ($platforms.Contains('64bit')) {
                 $64bit_count = $current.manifest.architecture.'64bit'.hash.Count
-                # 64bit is get, donwloaded and added first
                 $current.manifest.architecture.'64bit'.hash = $actuals[0..($64bit_count - 1)]
             }
             if ($platforms.Contains('32bit')) {
                 $32bit_count = $current.manifest.architecture.'32bit'.hash.Count
-                $max = $64bit_count + $32bit_count - 1 # Edge case if manifest contains 64bit and 32bit.
-                $current.manifest.architecture.'32bit'.hash = $actuals[($64bit_count)..$max]
+                $current.manifest.architecture.'32bit'.hash = $actuals[($64bit_count)..($64bit_count + $32bit_count - 1)]
+            }
+            if ($platforms.Contains('arm64')) {
+                $arm64_count = $current.manifest.architecture.'arm64'.hash.Count
+                $current.manifest.architecture.'arm64'.hash = $actuals[($64bit_count + $32bit_count)..($64bit_count + $32bit_count + $arm64_count - 1)]
             }
         }
 
         Write-Host "Writing updated $($current.app) manifest" -ForegroundColor DarkGreen
 
         $current.manifest = $current.manifest | ConvertToPrettyJson
-        $path = Resolve-Path "$Dir\$($current.app).json"
+        $path = Convert-Path $current.file
         [System.IO.File]::WriteAllLines($path, $current.manifest)
     }
 }

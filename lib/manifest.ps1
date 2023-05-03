@@ -1,9 +1,9 @@
 function manifest_path($app, $bucket) {
-    fullpath "$(Find-BucketDirectory $bucket)\$(sanitary_path $app).json"
+    (Get-ChildItem (Find-BucketDirectory $bucket) -Filter "$(sanitary_path $app).json" -Recurse).FullName
 }
 
 function parse_json($path) {
-    if (!(Test-Path $path)) { return $null }
+    if ($null -eq $path -or !(Test-Path $path)) { return $null }
     try {
         Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     } catch {
@@ -102,23 +102,6 @@ function install_info($app, $version, $global) {
     parse_json $path
 }
 
-function default_architecture {
-    $arch = get_config 'default_architecture'
-    $system = if ([Environment]::Is64BitOperatingSystem) { '64bit' } else { '32bit' }
-    if ($null -eq $arch) {
-        $arch = $system
-    } else {
-        try {
-            $arch = ensure_architecture $arch
-        } catch {
-            warn 'Invalid default architecture configured. Determining default system architecture'
-            $arch = $system
-        }
-    }
-
-    return $arch
-}
-
 function arch_specific($prop, $manifest, $architecture) {
     if ($manifest.architecture) {
         $val = $manifest.architecture.$architecture.$prop
@@ -128,8 +111,22 @@ function arch_specific($prop, $manifest, $architecture) {
     if ($manifest.$prop) { return $manifest.$prop }
 }
 
-function supports_architecture($manifest, $architecture) {
-    return -not [String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))
+function Get-SupportedArchitecture($manifest, $architecture) {
+    if ($architecture -eq 'arm64' -and ($manifest | ConvertToPrettyJson) -notmatch '[''"]arm64["'']') {
+        # Windows 10 enables existing unmodified x86 apps to run on Arm devices.
+        # Windows 11 adds the ability to run unmodified x64 Windows apps on Arm devices!
+        # Ref: https://learn.microsoft.com/en-us/windows/arm/overview
+        if ($WindowsBuild -ge 22000) {
+            # Windows 11
+            $architecture = '64bit'
+        } else {
+            # Windows 10
+            $architecture = '32bit'
+        }
+    }
+    if (![String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))) {
+        return $architecture
+    }
 }
 
 function generate_user_manifest($app, $bucket, $version) {
@@ -145,10 +142,10 @@ function generate_user_manifest($app, $bucket, $version) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
-    ensure $(usermanifestsdir) | out-null
+    ensure (usermanifestsdir) | out-null
     try {
-        Invoke-AutoUpdate $app "$(resolve-path $(usermanifestsdir))" $manifest $version $(@{ })
-        return "$(resolve-path $(usermanifest $app))"
+        Invoke-AutoUpdate $app "$(Convert-Path (usermanifestsdir))\$app.json" $manifest $version $(@{ })
+        return Convert-Path (usermanifest $app)
     } catch {
         write-host -f darkred "Could not install $app@$version"
     }

@@ -24,7 +24,7 @@ function Get-Encoding($wc) {
 }
 
 function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -eq 'AMD64'){'WOW64; '})$PSEdition)"
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
 }
 
 function Show-DeprecatedWarning {
@@ -59,6 +59,7 @@ function load_cfg($file) {
 }
 
 function get_config($name, $default) {
+    $name = $name.ToLowerInvariant()
     if($null -eq $scoopConfig.$name -and $null -ne $default) {
         return $default
     }
@@ -71,6 +72,8 @@ function set_config {
         $name,
         $value
     )
+
+    $name = $name.ToLowerInvariant()
 
     if ($null -eq $scoopConfig -or $scoopConfig.Count -eq 0) {
         ensure (Split-Path -Path $configFile) | Out-Null
@@ -98,7 +101,7 @@ function set_config {
 
 function setup_proxy() {
     # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
-    $proxy = get_config 'proxy'
+    $proxy = get_config PROXY
     if(!$proxy) {
         return
     }
@@ -125,13 +128,68 @@ function setup_proxy() {
     }
 }
 
-function git_cmd {
-    $proxy = get_config 'proxy'
-    $cmd = "git $($args | ForEach-Object { "$_ " })"
-    if ($proxy -and $proxy -ne 'none') {
-        $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
+function Invoke-Git {
+    [CmdletBinding()]
+    [OutputType([String])]
+    param(
+        [Parameter(Mandatory = $false, Position = 0)]
+        [Alias('PSPath', 'Path')]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $WorkingDirectory,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [Alias('Args')]
+        [String[]]
+        $ArgumentList
+    )
+
+    $proxy = get_config PROXY
+    $git = Get-HelperPath -Helper Git
+
+    if ($WorkingDirectory) {
+        $ArgumentList = @('-C', $WorkingDirectory) + $ArgumentList
     }
-    cmd.exe /d /c $cmd
+
+    if([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none')  {
+        return & $git @ArgumentList
+    }
+
+    if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
+        $j = Start-Job -ScriptBlock {
+            # convert proxy setting for git
+            $proxy = $using:proxy
+            if ($proxy -and $proxy.StartsWith('currentuser@')) {
+                $proxy = $proxy.Replace('currentuser@', ':@')
+            }
+            $env:HTTPS_PROXY = $proxy
+            $env:HTTP_PROXY = $proxy
+            & $using:git @using:ArgumentList
+        }
+        $o = $j | Receive-Job -Wait -AutoRemoveJob
+        return $o
+    }
+
+    return & $git @ArgumentList
+}
+
+function Invoke-GitLog {
+    [CmdletBinding()]
+    Param (
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Path,
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$CommitHash,
+        [String]$Name = ''
+    )
+    Process {
+        if ($Name) {
+            if ($Name.Length -gt 12) {
+                $Name = "$($Name.Substring(0, 10)).."
+            }
+            $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
+        }
+        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
+    }
 }
 
 # helper functions
@@ -153,7 +211,7 @@ function error($msg) { write-host "ERROR $msg" -f darkred }
 function warn($msg) {  write-host "WARN  $msg" -f darkyellow }
 function info($msg) {  write-host "INFO  $msg" -f darkgray }
 function debug($obj) {
-    if((get_config 'debug' $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
+    if ((get_config DEBUG $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
         return
     }
 
@@ -210,7 +268,7 @@ function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 function currentdir($app, $global) {
-    if (get_config NO_JUNCTIONS) {
+    if (get_config NO_JUNCTION) {
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'
@@ -225,8 +283,8 @@ function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -rep
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
-function installed($app, $global) {
-    if (-not $PSBoundParameters.ContainsKey('global')) {
+function installed($app, [Nullable[bool]]$global) {
+    if ($null -eq $global) {
         return (installed $app $false) -or (installed $app $true)
     }
     # Dependencies of the format "bucket/dependency" install in a directory of form
@@ -246,7 +304,7 @@ function installed_apps($global) {
 function failed($app, $global) {
     $app = ($app -split '/|\\')[-1]
     $appPath = appdir $app $global
-    $hasCurrent = (get_config NO_JUNCTIONS) -or (Test-Path "$appPath\current")
+    $hasCurrent = (get_config NO_JUNCTION) -or (Test-Path "$appPath\current")
     return (Test-Path $appPath) -and !($hasCurrent -and (installed $app $global))
 }
 
@@ -290,12 +348,16 @@ Function Test-CommandAvailable {
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
+Function Test-GitAvailable {
+    Return [Boolean](Test-Path (Get-HelperPath -Helper Git) -ErrorAction Ignore)
+}
+
 function Get-HelperPath {
     [CmdletBinding()]
     [OutputType([String])]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
+        [ValidateSet('Git', '7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -304,6 +366,14 @@ function Get-HelperPath {
     }
     process {
         switch ($Helper) {
+            'Git' {
+                $internalgit = "$(versiondir 'git' 'current')\mingw64\bin\git.exe"
+                if (Test-Path $internalgit) {
+                    $HelperPath = $internalgit
+                } else {
+                    $HelperPath = (Get-Command git -ErrorAction Ignore).Source
+                }
+            }
             '7zip' {
                 $HelperPath = Get-AppFilePath '7zip' '7z.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
@@ -394,7 +464,7 @@ function app_status($app, $global) {
 
     $status.outdated = $false
     if ($status.version -and $status.latest_version) {
-        if (get_config 'force_update' $false) {
+        if (get_config FORCE_UPDATE $false) {
             $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
         } else {
             $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)
@@ -491,6 +561,9 @@ function Invoke-ExternalCommand {
         [Parameter(ParameterSetName = "UseShellExecute")]
         [Switch]
         $RunAs,
+        [Parameter(ParameterSetName = "UseShellExecute")]
+        [Switch]
+        $Quiet,
         [Alias("Msg")]
         [String]
         $Activity,
@@ -507,12 +580,12 @@ function Invoke-ExternalCommand {
     }
     $Process = New-Object System.Diagnostics.Process
     $Process.StartInfo.FileName = $FilePath
-    $Process.StartInfo.Arguments = ($ArgumentList | Select-Object -Unique) -join ' '
     $Process.StartInfo.UseShellExecute = $false
     if ($LogPath) {
-        if ($FilePath -match '(^|\W)msiexec($|\W)') {
-            $Process.StartInfo.Arguments += " /lwe `"$LogPath`""
+        if ($FilePath -match '^msiexec(.exe)?$') {
+            $ArgumentList += "/lwe `"$LogPath`""
         } else {
+            $redirectToLogFile = $true
             $Process.StartInfo.RedirectStandardOutput = $true
             $Process.StartInfo.RedirectStandardError = $true
         }
@@ -521,8 +594,35 @@ function Invoke-ExternalCommand {
         $Process.StartInfo.UseShellExecute = $true
         $Process.StartInfo.Verb = 'RunAs'
     }
+    if ($Quiet) {
+        $Process.StartInfo.UseShellExecute = $true
+        $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    }
+    if ($ArgumentList.Length -gt 0) {
+        if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
+            $Process.StartInfo.Arguments = $ArgumentList -join ' '
+        } elseif ($Process.StartInfo.ArgumentList.Add) {
+            # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
+            # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
+            # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
+            $ArgumentList | ForEach-Object { $Process.StartInfo.ArgumentList.Add($_) }
+        } else {
+            # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
+            $escapedArgs = $ArgumentList | ForEach-Object {
+                # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
+                $s = $_ -replace '(\\+)"', '$1$1"'
+                # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
+                $s = $s -replace '(\\+)$', '$1$1'
+                # escape double quotes
+                $s = $s -replace '"', '\"'
+                # quote the argument
+                "`"$s`""
+            }
+            $Process.StartInfo.Arguments = $escapedArgs -join ' '
+        }
+    }
     try {
-        $Process.Start() | Out-Null
+        [void]$Process.Start()
     } catch {
         if ($Activity) {
             Write-Host "error." -ForegroundColor DarkRed
@@ -530,11 +630,17 @@ function Invoke-ExternalCommand {
         error $_.Exception.Message
         return $false
     }
-    if ($LogPath -and ($FilePath -notmatch '(^|\W)msiexec($|\W)')) {
-        Out-UTF8File -FilePath $LogPath -Append -InputObject $Process.StandardOutput.ReadToEnd()
-        Out-UTF8File -FilePath $LogPath -Append -InputObject $Process.StandardError.ReadToEnd()
+    if ($redirectToLogFile) {
+        # we do this to remove a deadlock potential
+        # ref: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process.standardoutput?view=netframework-4.5#remarks
+        $stdoutTask = $Process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $Process.StandardError.ReadToEndAsync()
     }
     $Process.WaitForExit()
+    if ($redirectToLogFile) {
+        Out-UTF8File -FilePath $LogPath -Append -InputObject $stdoutTask.Result
+        Out-UTF8File -FilePath $LogPath -Append -InputObject $stderrTask.Result
+    }
     if ($Process.ExitCode -ne 0) {
         if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
             if ($Activity) {
@@ -556,17 +662,54 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function dl($url,$to) {
-    $wc = New-Object Net.Webclient
-    $wc.headers.add('Referer', (strip_filename $url))
-    $wc.Headers.Add('User-Agent', (Get-UserAgent))
-    $wc.downloadFile($url,$to)
+function Publish-Env {
+    if (-not ("Win32.NativeMethods" -as [Type])) {
+        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
+[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+public static extern IntPtr SendMessageTimeout(
+    IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
+    uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
+"@
+    }
+
+    $HWND_BROADCAST = [IntPtr] 0xffff;
+    $WM_SETTINGCHANGE = 0x1a;
+    $result = [UIntPtr]::Zero
+
+    [Win32.Nativemethods]::SendMessageTimeout($HWND_BROADCAST,
+        $WM_SETTINGCHANGE,
+        [UIntPtr]::Zero,
+        "Environment",
+        2,
+        5000,
+        [ref] $result
+    ) | Out-Null
 }
 
-function env($name,$global,$val='__get') {
-    $target = 'User'; if($global) {$target = 'Machine'}
-    if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
-    else { [environment]::setEnvironmentVariable($name,$val,$target) }
+function env($name, $global, $val = '__get') {
+    $RegisterKey = if ($global) {
+        Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
+    } else {
+        Get-Item -Path 'HKCU:'
+    }
+    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $val -ne '__get')
+
+    if ($val -eq '__get') {
+        $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
+        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
+    } elseif ($val -eq $null) {
+        $EnvRegisterKey.DeleteValue($name)
+    } else {
+        $RegistryValueKind = if ($val.Contains('%')) {
+            [Microsoft.Win32.RegistryValueKind]::ExpandString
+        } elseif ($EnvRegisterKey.GetValue($name)) {
+            $EnvRegisterKey.GetValueKind($name)
+        } else {
+            [Microsoft.Win32.RegistryValueKind]::String
+        }
+        $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
+        Publish-Env
+    }
 }
 
 function isFileLocked([string]$path) {
@@ -604,12 +747,12 @@ function movedir($from, $to) {
     $proc.StartInfo.RedirectStandardError = $true
     $proc.StartInfo.UseShellExecute = $false
     $proc.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    $proc.Start()
-    $out = $proc.StandardOutput.ReadToEnd()
+    [void]$proc.Start()
+    $stdoutTask = $proc.StandardOutput.ReadToEndAsync()
     $proc.WaitForExit()
 
     if($proc.ExitCode -ge 8) {
-        debug $out
+        debug $stdoutTask.Result
         throw "Could not find '$(fname $from)'! (error $($proc.ExitCode))"
     }
 
@@ -685,7 +828,7 @@ function shim($path, $global, $name, $arg) {
     Push-Location $abs_shimdir
     $relative_path = Resolve-Path -Relative $path
     Pop-Location
-    $resolved_path = Resolve-Path $path
+    $resolved_path = Convert-Path $path
 
     if ($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
@@ -780,14 +923,9 @@ function shim($path, $global, $name, $arg) {
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
-        # find path to Git's bash so that batch scripts can run bash scripts
-        $gitdir = (Get-Item (Get-CommandPath git) -ErrorAction:Stop).Directory.Parent
-        if ($gitdir.FullName -imatch 'mingw') {
-            $gitdir = $gitdir.Parent
-        }
         @(
             "@rem $resolved_path",
-            "@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*"
+            "@bash `"$resolved_path`" $arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
@@ -801,7 +939,7 @@ function shim($path, $global, $name, $arg) {
 
 function get_shim_path() {
     $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"
-    $shim_version = get_config 'shim' 'default'
+    $shim_version = get_config SHIM 'default'
     switch ($shim_version) {
         '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
         'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
@@ -832,15 +970,38 @@ function ensure_in_path($dir, $global) {
     }
 }
 
-function ensure_architecture($architecture_opt) {
-    if(!$architecture_opt) {
-        return default_architecture
+function Get-DefaultArchitecture {
+    $arch = get_config DEFAULT_ARCHITECTURE
+    $system = if (${env:ProgramFiles(Arm)}) {
+        'arm64'
+    } elseif ([System.Environment]::Is64BitOperatingSystem) {
+        '64bit'
+    } else {
+        '32bit'
     }
-    $architecture_opt = $architecture_opt.ToString().ToLower()
-    switch($architecture_opt) {
-        { @('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64')  -contains $_ } { return '64bit' }
-        { @('32bit', '32', 'x86', 'i386', '386', 'i686')  -contains $_ } { return '32bit' }
-        default { throw [System.ArgumentException] "Invalid architecture: '$architecture_opt'"}
+    if ($null -eq $arch) {
+        $arch = $system
+    } else {
+        try {
+            $arch = Format-ArchitectureString $arch
+        } catch {
+            warn 'Invalid default architecture configured. Determining default system architecture'
+            $arch = $system
+        }
+    }
+    return $arch
+}
+
+function Format-ArchitectureString($Architecture) {
+    if (!$Architecture) {
+        return Get-DefaultArchitecture
+    }
+    $Architecture = $Architecture.ToString().ToLower()
+    switch ($Architecture) {
+        { @('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64') -contains $_ } { return '64bit' }
+        { @('32bit', '32', 'x86', 'i386', '386', 'i686') -contains $_ } { return '32bit' }
+        { @('arm64', 'arm', 'aarch64') -contains $_ } { return 'arm64' }
+        default { throw [System.ArgumentException] "Invalid architecture: '$Architecture'" }
     }
 }
 
@@ -967,29 +1128,39 @@ function show_app($app, $bucket, $version) {
     return $app
 }
 
-function last_scoop_update() {
-    # PowerShell 6 returns an DateTime Object
-    $last_update = (get_config lastupdate)
-
-    if ($null -ne $last_update -and $last_update.GetType() -eq [System.String]) {
-        try {
-            $last_update = [System.DateTime]::Parse($last_update)
-        } catch {
-            $last_update = $null
-        }
-    }
-    return $last_update
-}
-
 function is_scoop_outdated() {
-    $last_update = $(last_scoop_update)
     $now = [System.DateTime]::Now
-    if($null -eq $last_update) {
-        set_config lastupdate $now.ToString('o')
-        # enforce an update for the first time
+    try {
+        $expireHour = (New-TimeSpan (get_config LAST_UPDATE) $now).TotalHours
+        return ($expireHour -ge 3)
+    } catch {
+        # If not System.DateTime
+        set_config LAST_UPDATE ($now.ToString('o')) | Out-Null
         return $true
     }
-    return $last_update.AddHours(3) -lt $now.ToLocalTime()
+}
+
+function Test-ScoopCoreOnHold() {
+    $hold_update_until = get_config HOLD_UPDATE_UNTIL
+    if ($null -eq $hold_update_until) {
+        return $false
+    }
+    $parsed_date = New-Object -TypeName DateTime
+    if ([System.DateTime]::TryParse($hold_update_until, $null, [System.Globalization.DateTimeStyles]::AssumeLocal, [ref]$parsed_date)) {
+        if ((New-TimeSpan $parsed_date).TotalSeconds -lt 0) {
+            warn "Skipping self-update of Scoop Core until $($parsed_date.ToLocalTime())..."
+            warn "If you want to update Scoop Core immediately, use 'scoop unhold scoop; scoop update'."
+            return $true
+        } else {
+            warn 'Self-update of Scoop Core is enabled again!'
+        }
+    } else {
+        error "'hold_update_until' has been set in the wrong format and was removed."
+        error 'If you want to disable self-update of Scoop Core for a moment,'
+        error "use 'scoop hold scoop' or 'scoop config hold_update_until <YYYY-MM-DD>/<YYYY/MM/DD>'."
+    }
+    set_config HOLD_UPDATE_UNTIL $null | Out-Null
+    return $false
 }
 
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
@@ -1057,7 +1228,7 @@ function get_hash([String] $multihash) {
 }
 
 function Get-GitHubToken {
-    return $env:SCOOP_GH_TOKEN, (get_config 'gh_token') | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN) | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
 }
 
 function handle_special_urls($url)
@@ -1157,31 +1328,74 @@ function Out-UTF8File {
 #       for all communication with api.github.com
 Optimize-SecurityProtocol
 
-# Scoop config file migration
+# Load Scoop config
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
-if ((Test-Path "$env:USERPROFILE\.scoop") -and !(Test-Path $configFile)) {
-    New-Item -ItemType Directory (Split-Path -Path $configFile) -ErrorAction Ignore | Out-Null
-    Move-Item "$env:USERPROFILE\.scoop" $configFile
-    write-host "WARN  Scoop configuration has been migrated from '~/.scoop'" -f darkyellow
-    write-host "WARN  to '$configFile'" -f darkyellow
+# Check if it's the expected install path for scoop: <root>/apps/scoop/current
+$coreRoot = Split-Path $PSScriptRoot
+$pathExpected = ($coreRoot -replace '\\','/') -like '*apps/scoop/current*'
+if ($pathExpected) {
+    # Portable config is located in root directory:
+    #    .\current\scoop\apps\<root>\config.json  <- a reversed path
+    # Imagine `<root>/apps/scoop/current/` in a reversed format,
+    # and the directory tree:
+    #
+    # ```
+    # <root>:
+    # ├─apps
+    # ├─buckets
+    # ├─cache
+    # ├─persist
+    # ├─shims
+    # ├─config.json
+    # ```
+    $configPortablePath = fullpath "$coreRoot\..\..\..\config.json"
+    if (Test-Path $configPortablePath) {
+        $configFile = $configPortablePath
+    }
 }
-
-# Load Scoop config
 $scoopConfig = load_cfg $configFile
 
+# NOTE Scoop config file migration. Remove this after 2023/6/30
+if ($scoopConfig -and $scoopConfig.PSObject.Properties.Name -contains 'lastUpdate') {
+    $newConfigNames = @{
+        'lastUpdate'               = 'last_update'
+        'SCOOP_REPO'               = 'scoop_repo'
+        'SCOOP_BRANCH'             = 'scoop_branch'
+        '7ZIPEXTRACT_USE_EXTERNAL' = 'use_external_7zip'
+        'MSIEXTRACT_USE_LESSMSI'   = 'use_lessmsi'
+        'NO_JUNCTIONS'             = 'no_junction'
+        'manifest_review'          = 'show_manifest'
+        'rootPath'                 = 'root_path'
+        'globalPath'               = 'global_path'
+        'cachePath'                = 'cache_path'
+    }
+    $newConfigNames.GetEnumerator() | ForEach-Object {
+        if ($null -ne $scoopConfig.$($_.Key)) {
+            $value = $scoopConfig.$($_.Key)
+            $scoopConfig.PSObject.Properties.Remove($_.Key)
+            $scoopConfig | Add-Member -MemberType NoteProperty -Name $_.Value -Value $value
+        }
+    }
+    ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
+}
+# END NOTE
+
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config 'rootPath'), "$env:USERPROFILE\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config 'globalPath'), "$env:ProgramData\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop cache directory
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config 'cachePath'), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -first 1
+$cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+
+# OS information
+$WindowsBuild = [System.Environment]::OSVersion.Version.Build
 
 # Setup proxy globally
 setup_proxy

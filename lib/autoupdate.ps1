@@ -8,9 +8,9 @@ function find_hash_in_rdf([String] $url, [String] $useragent, [String] $basename
         $wc.Headers.Add('User-Agent', $(if($null -ne $useragent) { $useragent } else { (Get-UserAgent) }))
         $data = $wc.DownloadData($url)
         [xml]$xml = (Get-Encoding($wc)).GetString($data)
-    } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+    } catch [System.Net.WebException] {
+        Write-Host $_ -ForegroundColor DarkRed
+        Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return $null
     }
 
@@ -24,12 +24,12 @@ function find_hash_in_textfile([String] $url, [String] $useragent, [Hashtable] $
     $hashfile = $null
 
     $templates = @{
-        '$md5' = '([a-fA-F0-9]{32})';
-        '$sha1' = '([a-fA-F0-9]{40})';
-        '$sha256' = '([a-fA-F0-9]{64})';
-        '$sha512' = '([a-fA-F0-9]{128})';
-        '$checksum' = '([a-fA-F0-9]{32,128})';
-        '$base64' = '([a-zA-Z0-9+\/=]{24,88})';
+        '$md5'      = '([a-fA-F0-9]{32})'
+        '$sha1'     = '([a-fA-F0-9]{40})'
+        '$sha256'   = '([a-fA-F0-9]{64})'
+        '$sha512'   = '([a-fA-F0-9]{128})'
+        '$checksum' = '([a-fA-F0-9]{32,128})'
+        '$base64'   = '([a-zA-Z0-9+\/=]{24,88})'
     }
 
     try {
@@ -39,8 +39,8 @@ function find_hash_in_textfile([String] $url, [String] $useragent, [Hashtable] $
         $data = $wc.DownloadData($url)
         $hashfile = (Get-Encoding($wc)).GetString($data)
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host $_ -ForegroundColor DarkRed
+        Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return
     }
 
@@ -50,15 +50,15 @@ function find_hash_in_textfile([String] $url, [String] $useragent, [Hashtable] $
 
     $regex = substitute $regex $templates $false
     $regex = substitute $regex $substitutions $true
-    debug $regex
     if ($hashfile -match $regex) {
-        $hash = $matches[1] -replace '\s',''
+        debug $regex
+        $hash = $matches[1] -replace '\s', ''
     }
 
     # convert base64 encoded hash values
     if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
         $base64 = $matches[0]
-        if(!($hash -match '^[a-fA-F0-9]+$') -and $hash.length -notin @(32, 40, 64, 128)) {
+        if (!($hash -match '^[a-fA-F0-9]+$') -and $hash.Length -notin @(32, 40, 64, 128)) {
             try {
                 $hash = ([System.Convert]::FromBase64String($base64) | ForEach-Object { $_.ToString('x2') }) -join ''
             } catch {
@@ -69,13 +69,15 @@ function find_hash_in_textfile([String] $url, [String] $useragent, [Hashtable] $
 
     # find hash with filename in $hashfile
     if ($hash.Length -eq 0) {
-        $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:[\x20\t]+\d+)?"
+        $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:\s|$)|`$basename[\x20\t]+.*?([a-fA-F0-9]{32,128})"
         $filenameRegex = substitute $filenameRegex $substitutions $true
         if ($hashfile -match $filenameRegex) {
+            debug $filenameRegex
             $hash = $matches[1]
         }
-        $metalinkRegex = "<hash[^>]+>([a-fA-F0-9]{64})"
+        $metalinkRegex = '<hash[^>]+>([a-fA-F0-9]{64})'
         if ($hashfile -match $metalinkRegex) {
+            debug $metalinkRegex
             $hash = $matches[1]
         }
     }
@@ -92,13 +94,14 @@ function find_hash_in_json([String] $url, [String] $useragent, [Hashtable] $subs
         $wc.Headers.Add('User-Agent', $(if($null -ne $useragent) { $useragent } else { (Get-UserAgent) }))
         $data = $wc.DownloadData($url)
         $json = (Get-Encoding($wc)).GetString($data)
-    } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+    } catch [System.Net.WebException] {
+        Write-Host $_ -ForegroundColor DarkRed
+        Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return
     }
+    debug $jsonpath
     $hash = json_path $json $jsonpath $substitutions
-    if(!$hash) {
+    if (!$hash) {
         $hash = json_path_legacy $json $jsonpath $substitutions
     }
     return format_hash $hash
@@ -114,8 +117,8 @@ function find_hash_in_xml([String] $url, [String] $useragent, [Hashtable] $subst
         $data = $wc.DownloadData($url)
         $xml = [xml]((Get-Encoding($wc)).GetString($data))
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host $_ -ForegroundColor DarkRed
+        Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return
     }
 
@@ -125,13 +128,15 @@ function find_hash_in_xml([String] $url, [String] $useragent, [Hashtable] $subst
     }
 
     # Find all `significant namespace declarations` from the XML file
-    $nsList = $xml.SelectNodes("//namespace::*[not(. = ../../namespace::*)]")
+    $nsList = $xml.SelectNodes('//namespace::*[not(. = ../../namespace::*)]')
     # Then add them into the NamespaceManager
     $nsmgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
     $nsList | ForEach-Object {
         $nsmgr.AddNamespace($_.LocalName, $_.Value)
     }
 
+    debug $xpath
+    debug $nsmgr
     # Getting hash from XML, using XPath
     $hash = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
     return format_hash $hash
@@ -148,16 +153,16 @@ function find_hash_in_headers([String] $url, [String] $useragent) {
         $req.Timeout = 2000
         $req.Method = 'HEAD'
         $res = $req.GetResponse()
-        if(([int]$res.StatusCode -ge 300) -and ([int]$res.StatusCode -lt 400)) {
-            if($res.Headers['Digest'] -match 'SHA-256=([^,]+)' -or $res.Headers['Digest'] -match 'SHA=([^,]+)' -or $res.Headers['Digest'] -match 'MD5=([^,]+)') {
+        if (([int]$res.StatusCode -ge 300) -and ([int]$res.StatusCode -lt 400)) {
+            if ($res.Headers['Digest'] -match 'SHA-256=([^,]+)' -or $res.Headers['Digest'] -match 'SHA=([^,]+)' -or $res.Headers['Digest'] -match 'MD5=([^,]+)') {
                 $hash = ([System.Convert]::FromBase64String($matches[1]) | ForEach-Object { $_.ToString('x2') }) -join ''
                 debug $hash
             }
         }
         $res.Close()
-    } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+    } catch [System.Net.WebException] {
+        Write-Host $_ -ForegroundColor DarkRed
+        Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return
     }
 
@@ -182,12 +187,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hashfile_url = substitute $config.url $substitutions
     debug $hashfile_url
     if ($hashfile_url) {
-        write-host -f DarkYellow 'Searching hash for ' -NoNewline
-        write-host -f Green $basename -NoNewline
-        write-host -f DarkYellow ' in ' -NoNewline
-        write-host -f Green $hashfile_url -NoNewline
-        write-host -f DarkYellow ' using useragent ' -NoNewline
-        write-host -f Green $useragent
+        Write-Host 'Searching hash for ' -ForegroundColor DarkYellow -NoNewline
+        Write-Host $basename -ForegroundColor Green -NoNewline
+        Write-Host ' in ' -ForegroundColor DarkYellow -NoNewline
+        Write-Host $hashfile_url -ForegroundColor Green -NoNewline
+        Write-Host -f DarkYellow ' using useragent ' -NoNewline
+        Write-Host -f Green $useragent
     }
 
     if ($hashmode.Length -eq 0 -and $config.url.Length -ne 0) {
@@ -217,11 +222,11 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'xpath'
     }
 
-    if (!$hashfile_url -and $url -match "^(?:.*fosshub.com\/).*(?:\/|\?dwl=)(?<filename>.*)$") {
+    if (!$hashfile_url -and $url -match '^(?:.*fosshub.com\/).*(?:\/|\?dwl=)(?<filename>.*)$') {
         $hashmode = 'fosshub'
     }
 
-    if (!$hashfile_url -and $url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)") {
+    if (!$hashfile_url -and $url -match '(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*)') {
         $hashmode = 'sourceforge'
     }
 
@@ -245,40 +250,40 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             }
         }
         'fosshub' {
-            $hash = find_hash_in_textfile $url $useragent $substitutions ($Matches.filename+'.*?"sha256":"([a-fA-F0-9]{64})"')
+            $hash = find_hash_in_textfile $url $useragent $substitutions ($matches.filename + '.*?"sha256":"([a-fA-F0-9]{64})"')
         }
         'sourceforge' {
             # change the URL because downloads.sourceforge.net doesn't have checksums
             $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
-            $hash = find_hash_in_textfile $hashfile_url $useragent $substitutions '"$basename":.*?"sha1":\s"([a-fA-F0-9]{40})"'
+            $hash = find_hash_in_textfile $hashfile_url $useragent $substitutions '"$basename":.*?"sha1":\s*"([a-fA-F0-9]{40})"'
         }
     }
 
     if ($hash) {
         # got one!
-        write-host -f DarkYellow 'Found: ' -NoNewline
-        write-host -f Green $hash -NoNewline
-        write-host -f DarkYellow ' using ' -NoNewline
-        write-host -f Green  "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode"
+        Write-Host 'Found: ' -ForegroundColor DarkYellow -NoNewline
+        Write-Host $hash -ForegroundColor Green -NoNewline
+        Write-Host ' using ' -ForegroundColor DarkYellow -NoNewline
+        Write-Host "$((Get-Culture).TextInfo.ToTitleCase($hashmode)) Mode" -ForegroundColor Green
         return $hash
     } elseif ($hashfile_url) {
-        write-host -f DarkYellow "Could not find hash in $hashfile_url"
+        Write-Host -f DarkYellow "Could not find hash in $hashfile_url"
     }
 
-    write-host -f DarkYellow 'Downloading ' -NoNewline
-    write-host -f Green $basename -NoNewline
-    write-host -f DarkYellow ' to compute hashes!'
+    Write-Host 'Downloading ' -ForegroundColor DarkYellow -NoNewline
+    Write-Host $basename -ForegroundColor Green -NoNewline
+    Write-Host ' to compute hashes!' -ForegroundColor DarkYellow
     try {
-        dl_with_cache $app $version $url $null $null $true
+        Invoke-CachedDownload $app $version $url $null $null $true
     } catch [system.net.webexception] {
-        write-host -f darkred $_
-        write-host -f darkred "URL $url is not valid"
+        Write-Host $_ -ForegroundColor DarkRed
+        Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return $null
     }
     $file = fullpath (cache_path $app $version $url)
-    $hash = compute_hash $file 'sha256'
-    write-host -f DarkYellow 'Computed hash: ' -NoNewline
-    write-host -f Green $hash
+    $hash = (Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower()
+    Write-Host 'Computed hash: ' -ForegroundColor DarkYellow -NoNewline
+    Write-Host $hash -ForegroundColor Green
     return $hash
 }
 
@@ -351,7 +356,7 @@ function Update-ManifestProperty {
                 $newValue = substitute $autoupdateProperty $Substitutions
                 if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
                     # Make sure it's an array
-                    $newValue = ,$newValue
+                    $newValue = , $newValue
                 }
                 $Manifest.$currentProperty, $hasPropertyChanged = PropertyHelper -Property $Manifest.$currentProperty -Value $newValue
                 $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
@@ -364,7 +369,7 @@ function Update-ManifestProperty {
                         $newValue = substitute $autoupdateProperty $Substitutions
                         if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
                             # Make sure it's an array
-                            $newValue = ,$newValue
+                            $newValue = , $newValue
                         }
                         $Manifest.architecture.$arch.$currentProperty, $hasPropertyChanged = PropertyHelper -Property $Manifest.architecture.$arch.$currentProperty -Value $newValue
                         $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
@@ -393,25 +398,25 @@ function Get-VersionSubstitution {
     $firstPart = $Version.Split('-') | Select-Object -First 1
     $lastPart = $Version.Split('-') | Select-Object -Last 1
     $versionVariables = @{
-        '$version' = $Version;
-        '$dotVersion' = ($Version -replace '[._-]', '.');
-        '$underscoreVersion' = ($Version -replace '[._-]', '_');
-        '$dashVersion' = ($Version -replace '[._-]', '-');
-        '$cleanVersion' = ($Version -replace '[._-]', '');
-        '$majorVersion' = $firstPart.Split('.') | Select-Object -First 1;
-        '$minorVersion' = $firstPart.Split('.') | Select-Object -Skip 1 -First 1;
-        '$patchVersion' = $firstPart.Split('.') | Select-Object -Skip 2 -First 1;
-        '$buildVersion' = $firstPart.Split('.') | Select-Object -Skip 3 -First 1;
-        '$preReleaseVersion' = $lastPart;
+        '$version'           = $Version
+        '$dotVersion'        = ($Version -replace '[._-]', '.')
+        '$underscoreVersion' = ($Version -replace '[._-]', '_')
+        '$dashVersion'       = ($Version -replace '[._-]', '-')
+        '$cleanVersion'      = ($Version -replace '[._-]', '')
+        '$majorVersion'      = $firstPart.Split('.') | Select-Object -First 1
+        '$minorVersion'      = $firstPart.Split('.') | Select-Object -Skip 1 -First 1
+        '$patchVersion'      = $firstPart.Split('.') | Select-Object -Skip 2 -First 1
+        '$buildVersion'      = $firstPart.Split('.') | Select-Object -Skip 3 -First 1
+        '$preReleaseVersion' = $lastPart
     }
-    if($Version -match "(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)") {
-        $versionVariables.Set_Item('$matchHead', $Matches['head'])
-        $versionVariables.Set_Item('$matchTail', $Matches['tail'])
+    if ($Version -match '(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)') {
+        $versionVariables.Add('$matchHead', $Matches['head'])
+        $versionVariables.Add('$matchTail', $Matches['tail'])
     }
-    if($CustomMatches) {
+    if ($CustomMatches) {
         $CustomMatches.GetEnumerator() | ForEach-Object {
-            if($_.Name -ne "0") {
-                $versionVariables.Set_Item('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
+            if ($_.Name -ne '0') {
+                $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
             }
         }
     }
@@ -454,7 +459,7 @@ function Invoke-AutoUpdate {
         # 'Set-Content -Encoding ASCII' don't works in PowerShell 5
         # Wait for 'UTF8NoBOM' Encoding in PowerShell 7
         # $Manifest | ConvertToPrettyJson | Set-Content -Path (Join-Path $Path "$AppName.json") -Encoding UTF8NoBOM
-        [System.IO.File]::WriteAllLines((Join-Path $Path "$AppName.json"), (ConvertToPrettyJson $Manifest))
+        [System.IO.File]::WriteAllLines($Path, (ConvertToPrettyJson $Manifest))
         # notes
         $note = "`nUpdating note:"
         if ($Manifest.autoupdate.note) {
@@ -462,7 +467,7 @@ function Invoke-AutoUpdate {
             $hasNote = $true
         }
         if ($Manifest.autoupdate.architecture) {
-            '64bit', '32bit' | ForEach-Object {
+            '64bit', '32bit', 'arm64' | ForEach-Object {
                 if ($Manifest.autoupdate.architecture.$_.note) {
                     $note += "`n$_-arch: $($Manifest.autoupdate.architecture.$_.note)"
                     $hasNote = $true

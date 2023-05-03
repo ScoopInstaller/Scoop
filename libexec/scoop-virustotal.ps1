@@ -37,7 +37,7 @@
 $opt, $apps, $err = getopt $args 'asnup' @('all', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
 if ($err) { "scoop virustotal: $err"; exit 1 }
 if (!$apps) { my_usage; exit 1 }
-$architecture = ensure_architecture
+$architecture = Format-ArchitectureString
 
 if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
@@ -66,7 +66,7 @@ $_ERR_NO_API_KEY = 16
 $exit_code = 0
 
 # Global API key:
-$api_key = get_config virustotal_api_key
+$api_key = get_config VIRUSTOTAL_API_KEY
 if (!$api_key) {
     abort ("VirusTotal API key is not configured`n" +
         "  You could get one from https://www.virustotal.com/gui/my-apikey and set with`n" +

@@ -98,7 +98,9 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
         $jsonpath = substitute $jsonpath $substitutions ($jsonpath -like "*=~*")
     }
     try {
-        $obj = [Newtonsoft.Json.Linq.JValue]::Parse($json)
+        $settings = New-Object -Type Newtonsoft.Json.JsonSerializerSettings
+        $settings.DateParseHandling = [Newtonsoft.Json.DateParseHandling]::None
+        $obj = [Newtonsoft.Json.JsonConvert]::DeserializeObject($json, $settings)
     } catch [Newtonsoft.Json.JsonReaderException] {
         return $null
     }

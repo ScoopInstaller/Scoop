@@ -1,5 +1,7 @@
-. "$PSScriptRoot\Scoop-TestLib.ps1"
-. "$PSScriptRoot\..\lib\getopt.ps1"
+BeforeAll {
+    . "$PSScriptRoot\Scoop-TestLib.ps1"
+    . "$PSScriptRoot\..\lib\getopt.ps1"
+}
 
 Describe 'getopt' -Tag 'Scoop' {
     It 'handle short option with required argument missing' {
@@ -13,6 +15,12 @@ Describe 'getopt' -Tag 'Scoop' {
     It 'handle long option with required argument missing' {
         $null, $null, $err = getopt '--arb' '' 'arb='
         $err | Should -Be 'Option --arb requires an argument.'
+    }
+
+    It 'handle space in quote' {
+        $opt, $rem, $err = getopt '-x', 'space arg' 'x:' ''
+        $err | Should -BeNullOrEmpty
+        $opt.x | Should -Be 'space arg'
     }
 
     It 'handle unrecognized short option' {
@@ -67,5 +75,19 @@ Describe 'getopt' -Tag 'Scoop' {
         $opt, $null, $err = getopt '--long-arg', 'test' '' 'long-arg='
         $err | Should -BeNullOrEmpty
         $opt.'long-arg' | Should -Be 'test'
+    }
+
+    It 'handles the option terminator' {
+        $opt, $rem, $err = getopt '--long-arg', '--' '' 'long-arg'
+        $err | Should -BeNullOrEmpty
+        $opt.'long-arg' | Should -BeTrue
+        $rem[0] | Should -BeNullOrEmpty
+        $opt, $rem, $err = getopt '--long-arg', '--', '-x', '-y' 'xy' 'long-arg'
+        $err | Should -BeNullOrEmpty
+        $opt.'long-arg' | Should -BeTrue
+        $opt.'x' | Should -BeNullOrEmpty
+        $opt.'y' | Should -BeNullOrEmpty
+        $rem[0] | Should -Be '-x'
+        $rem[1] | Should -Be '-y'
     }
 }

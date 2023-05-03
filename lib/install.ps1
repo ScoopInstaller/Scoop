@@ -1,9 +1,8 @@
-function nightly_version($date, $quiet = $false) {
-    $date_str = $date.tostring("yyyyMMdd")
+function nightly_version($quiet = $false) {
     if (!$quiet) {
         warn "This is a nightly version. Downloaded files won't be verified."
     }
-    "nightly-$date_str"
+    return "nightly-$(Get-Date -Format 'yyyyMMdd')"
 }
 
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
@@ -21,18 +20,19 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
-        $version = nightly_version $(get-date)
+        $version = nightly_version
         $check_hash = $false
     }
 
-    if(!(supports_architecture $manifest $architecture)) {
-        write-host -f DarkRed "'$app' doesn't support $architecture architecture!"
+    $architecture = Get-SupportedArchitecture $manifest $architecture
+    if ($null -eq $architecture) {
+        error "'$app' doesn't support current architecture!"
         return
     }
 
-    if ((get_config 'manifest_review' $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+    if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
         Write-Host "Manifest: $app.json"
-        $style = get_config cat_style
+        $style = get_config CAT_STYLE
         if ($style) {
             $manifest | ConvertToPrettyJson | bat --no-paging --style $style --language json
         } else {
@@ -43,13 +43,13 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
             return
         }
     }
-    write-output "Installing '$app' ($version) [$architecture]"
+    Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from $bucket bucket" })"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
     $persist_dir = persistdir $app $global
 
-    $fname = dl_urls $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -Arch $architecture
 
     run_installer $fname $manifest $architecture $dir $global
@@ -80,27 +80,31 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     show_notes $manifest $dir $original_dir $persist_dir
 }
 
-function dl_with_cache($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
+function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = fullpath (cache_path $app $version $url)
 
     if(!(test-path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
-        do_dl $url "$cached.download" $cookies
+        Start-Download $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -force
     } else { write-host "Loading $(url_remote_filename $url) from cache"}
 
     if (!($null -eq $to)) {
-        Copy-Item $cached $to
+        if ($use_cache) {
+            Copy-Item $cached $to
+        } else {
+            Move-Item $cached $to -Force
+        }
     }
 }
 
-function do_dl($url, $to, $cookies) {
+function Start-Download ($url, $to, $cookies) {
     $progress = [console]::isoutputredirected -eq $false -and
         $host.name -ne 'Windows PowerShell ISE Host'
 
     try {
         $url = handle_special_urls $url
-        dl $url $to $cookies $progress
+        Invoke-Download $url $to $cookies $progress
     } catch {
         $e = $_.exception
         if($e.innerexception) { $e = $e.innerexception }
@@ -175,7 +179,7 @@ function get_filename_from_metalink($file) {
     return $filename
 }
 
-function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
+function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
     $data = @{}
     $urls = @(script:url $manifest $architecture)
 
@@ -210,7 +214,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
         $options += "--header='Cookie: $(cookie_header $cookies)'"
     }
 
-    $proxy = get_config 'proxy'
+    $proxy = get_config PROXY
     if ($proxy -ne 'none') {
         if ([Net.Webrequest]::DefaultWebProxy.Address) {
             $options += "--all-proxy='$([Net.Webrequest]::DefaultWebProxy.Address.Authority)'"
@@ -351,7 +355,7 @@ function dl_with_cache_aria2($app, $version, $manifest, $architecture, $dir, $co
 }
 
 # download with filesize and progress indicator
-function dl($url, $to, $cookies, $progress) {
+function Invoke-Download ($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split '#')[0]
     $wreq = [Net.WebRequest]::Create($reqUrl)
     if ($wreq -is [Net.HttpWebRequest]) {
@@ -361,13 +365,14 @@ function dl($url, $to, $cookies, $progress) {
         }
         if ($url -match 'api\.github\.com/repos') {
             $wreq.Accept = 'application/octet-stream'
-            $wreq.Headers['Authorization'] = "token $(Get-GitHubToken)"
+            $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
+            $wreq.Headers['X-GitHub-Api-Version'] = "2022-11-28"
         }
         if ($cookies) {
             $wreq.Headers.Add('Cookie', (cookie_header $cookies))
         }
 
-        get_config 'private_hosts' | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
+        get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
             (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
                 $wreq.Headers[$_.Key] = $_.Value
             }
@@ -405,7 +410,7 @@ function dl($url, $to, $cookies, $progress) {
             $newUrl = "$newUrl#/$postfix"
         }
 
-        dl $newUrl $to $cookies $progress
+        Invoke-Download $newUrl $to $cookies $progress
         return
     }
 
@@ -416,12 +421,12 @@ function dl($url, $to, $cookies, $progress) {
 
     if ($progress -and ($total -gt 0)) {
         [console]::CursorVisible = $false
-        function dl_onProgress($read) {
-            dl_progress $read $total $url
+        function Trace-DownloadProgress ($read) {
+            Write-DownloadProgress $read $total $url
         }
     } else {
         write-host "Downloading $url ($(filesize $total))..."
-        function dl_onProgress {
+        function Trace-DownloadProgress {
             #no op
         }
     }
@@ -433,17 +438,17 @@ function dl($url, $to, $cookies, $progress) {
         $totalRead = 0
         $sw = [diagnostics.stopwatch]::StartNew()
 
-        dl_onProgress $totalRead
+        Trace-DownloadProgress $totalRead
         while(($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
             $fs.write($buffer, 0, $read)
             $totalRead += $read
             if ($sw.elapsedmilliseconds -gt 100) {
                 $sw.restart()
-                dl_onProgress $totalRead
+                Trace-DownloadProgress $totalRead
             }
         }
         $sw.stop()
-        dl_onProgress $totalRead
+        Trace-DownloadProgress $totalRead
     } finally {
         if ($progress) {
             [console]::CursorVisible = $true
@@ -459,7 +464,7 @@ function dl($url, $to, $cookies, $progress) {
     }
 }
 
-function dl_progress_output($url, $read, $total, $console) {
+function Format-DownloadProgress ($url, $read, $total, $console) {
     $filename = url_remote_filename $url
 
     # calculate current percentage done
@@ -498,14 +503,14 @@ function dl_progress_output($url, $read, $total, $console) {
     "$left [$dashes$spaces] $right"
 }
 
-function dl_progress($read, $total, $url) {
+function Write-DownloadProgress ($read, $total, $url) {
     $console = $host.UI.RawUI;
     $left  = $console.CursorPosition.X;
     $top   = $console.CursorPosition.Y;
     $width = $console.BufferSize.Width;
 
     if($read -eq 0) {
-        $maxOutputLength = $(dl_progress_output $url 100 $total $console).length
+        $maxOutputLength = $(Format-DownloadProgress $url 100 $total $console).length
         if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
             # print on new line
@@ -516,11 +521,11 @@ function dl_progress($read, $total, $url) {
         }
     }
 
-    write-host $(dl_progress_output $url $read $total $console) -nonewline
+    write-host $(Format-DownloadProgress $url $read $total $console) -nonewline
     [console]::SetCursorPosition($left, $top)
 }
 
-function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
     # we only want to show this warning once
     if(!$use_cache) { warn "Cache is being ignored." }
 
@@ -541,13 +546,13 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
 
     # download first
     if(Test-Aria2Enabled) {
-        dl_with_cache_aria2 $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach($url in $urls) {
             $fname = url_filename $url
 
             try {
-                dl_with_cache $app $version $url "$dir\$fname" $cookies $use_cache
+                Invoke-CachedDownload $app $version $url "$dir\$fname" $cookies $use_cache
             } catch {
                 write-host -f darkred $_
                 abort "URL $url is not valid"
@@ -584,7 +589,7 @@ function dl_urls($app, $version, $manifest, $bucket, $architecture, $dir, $use_c
             $extract_fn = 'Expand-InnoArchive'
         } elseif($fname -match '\.zip$') {
             # Use 7zip when available (more fast)
-            if (((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
+            if (((get_config USE_EXTERNAL_7ZIP) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
                 $extract_fn = 'Expand-7zipArchive'
             } else {
                 $extract_fn = 'Expand-ZipArchive'
@@ -628,7 +633,7 @@ function cookie_header($cookies) {
 function is_in_dir($dir, $check) {
     $check = "$(fullpath $check)"
     $dir = "$(fullpath $dir)"
-    $check -match "^$([regex]::escape("$dir"))(\\|`$)"
+    $check -match "^$([regex]::Escape("$dir"))([/\\]|`$)"
 }
 
 function ftp_file_size($url) {
@@ -655,7 +660,7 @@ function hash_for_url($manifest, $url, $arch) {
 function check_hash($file, $hash, $app_name) {
     $file = fullpath $file
     if(!$hash) {
-        warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $(compute_hash $file 'sha256')"
+        warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
         return $true, $null
     }
 
@@ -667,7 +672,7 @@ function check_hash($file, $hash, $app_name) {
         return $false, "Hash type '$algorithm' isn't supported."
     }
 
-    $actual = compute_hash $file $algorithm
+    $actual = (Get-FileHash -Path $file -Algorithm $algorithm).Hash.ToLower()
     $expected = $expected.ToLower()
 
     if($actual -ne $expected) {
@@ -685,25 +690,6 @@ function check_hash($file, $hash, $app_name) {
     }
     Write-Host "ok." -f Green
     return $true, $null
-}
-
-function compute_hash($file, $algname) {
-    try {
-        if(Test-CommandAvailable Get-FileHash) {
-            return (Get-FileHash -Path $file -Algorithm $algname).Hash.ToLower()
-        } else {
-            $fs = [system.io.file]::openread($file)
-            $alg = [system.security.cryptography.hashalgorithm]::create($algname)
-            $hexbytes = $alg.computehash($fs) | ForEach-Object { $_.tostring('x2') }
-            return [string]::join('', $hexbytes)
-        }
-    } catch {
-        error $_.exception.message
-    } finally {
-        if($fs) { $fs.dispose() }
-        if($alg) { $alg.dispose() }
-    }
-    return ''
 }
 
 # for dealing with installers
@@ -905,7 +891,7 @@ function rm_shims($app, $manifest, $global, $arch) {
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
+    if (get_config NO_JUNCTION) { return $versiondir.ToString() }
 
     $currentdir = "$(Split-Path $versiondir)\current"
 
@@ -932,7 +918,7 @@ function link_current($versiondir) {
 # Returns the 'current' junction directory (if it exists),
 # otherwise the normal version directory.
 function unlink_current($versiondir) {
-    if (get_config NO_JUNCTIONS) { return $versiondir.ToString() }
+    if (get_config NO_JUNCTION) { return $versiondir.ToString() }
     $currentdir = "$(Split-Path $versiondir)\current"
 
     if (Test-Path $currentdir) {
@@ -1042,7 +1028,7 @@ function Invoke-HookScript {
         [ValidateNotNullOrEmpty()]
         [PSCustomObject] $Manifest,
         [Parameter(Mandatory = $true)]
-        [ValidateSet('32bit', '64bit')]
+        [ValidateSet('32bit', '64bit', 'arm64')]
         [String] $Arch
     )
 
@@ -1081,13 +1067,18 @@ function ensure_none_failed($apps) {
     foreach ($app in $apps) {
         $app = ($app -split '/|\\')[-1] -replace '\.json$', ''
         foreach ($global in $true, $false) {
+            if ($global) {
+                $instArgs = @('--global')
+            } else {
+                $instArgs = @()
+            }
             if (failed $app $global) {
                 if (installed $app $global) {
                     info "Repair previous failed installation of $app."
-                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app$(if ($global) { ' --global' })
+                    & "$PSScriptRoot\..\libexec\scoop-reset.ps1" $app @instArgs
                 } else {
                     warn "Purging previous failed installation of $app."
-                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app$(if ($global) { ' --global' })
+                    & "$PSScriptRoot\..\libexec\scoop-uninstall.ps1" $app @instArgs
                 }
             }
         }
@@ -1227,14 +1218,16 @@ function persist_permission($manifest, $global) {
 # test if there are running processes
 function test_running_process($app, $global) {
     $processdir = appdir $app $global | Convert-Path
-    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" }
+    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" } | Out-String
 
     if ($running_processes) {
-        if (get_config 'ignore_running_processes') {
-            warn "Application `"$app`" is still running. Scoop is configured to ignore this condition."
+        if (get_config IGNORE_RUNNING_PROCESSES) {
+            warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
+            Write-Host $running_processes
             return $false
         } else {
-            error "Application `"$app`" is still running. Close all instances and try again."
+            error "The following instances of `"$app`" are still running. Close them and try again."
+            Write-Host $running_processes
             return $true
         }
     } else {
