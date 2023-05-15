@@ -280,17 +280,8 @@ function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 function cache_path($app, $version, $url) {
-    $filename = "$app#$version#$url"
-    if ($filename.Length -ge 260) {
-        $url = $url -replace '\?.*', ''
-        $filename = "$app#$version#$url"
-        if ($filename.Length -ge 260) {
-            $filename = "$app#$version#$(Split-Path $url -leaf)"
-        }
-    }
-    $filename = $filename -replace '[^\w\.\-\#]+', '_'
-    $path = Join-Path $SCOOP_CACHE_DIRECTORY $filename
-    return $path
+    $sha1 = (Get-FileHash -Algorithm SHA1 -InputStream ([System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url)))).Hash.ToLower()
+    return "$cachedir\$app#$version#$sha1"
 }
 
 # apps
