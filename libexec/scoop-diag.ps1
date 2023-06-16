@@ -49,6 +49,11 @@ Show-Value -Name 'Version' -Value $PSversionTable.PSVersion.ToString()
 Show-Value -Name 'Edition' -Value $PSversionTable.PSEdition
 Show-Value -Name 'Architecture' -Value (Get-DefaultArchitecture)
 Show-Value -Name 'RunAsAdmin' -Value (is_admin)
+$parent = [System.Diagnostics.Process]::GetCurrentProcess()
+while($parent.MainModule.ModuleName -ieq 'pwsh.exe' -or $parent.MainModule.ModuleName -ieq 'powershell.exe') {
+    $parent = $parent.Parent
+}
+Show-Value -Name 'Parent' -Value $parent.MainModule.ModuleName
 
 Write-Output "[Helpers]"
 Show-Value -Name 'GitPath' -Value (Get-HelperPath -Helper Git)
