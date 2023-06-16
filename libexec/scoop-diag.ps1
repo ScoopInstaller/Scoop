@@ -50,9 +50,15 @@ Show-Value -Name 'Edition' -Value $PSversionTable.PSEdition
 Show-Value -Name 'Architecture' -Value (Get-DefaultArchitecture)
 Show-Value -Name 'RunAsAdmin' -Value (is_admin)
 
-Write-Output "[Git]"
-Show-Value -Name 'Path' -Value (Get-HelperPath -Helper Git)
-Show-Value -Name 'Version' -Value (Invoke-Git -Path $PSScriptRoot -ArgumentList 'version')
+Write-Output "[Helpers]"
+Show-Value -Name 'GitPath' -Value (Get-HelperPath -Helper Git)
+Show-Value -Name 'GitVersion' -Value (Invoke-Git -Path $PSScriptRoot -ArgumentList 'version')
+Show-Value -Name 'Zip' -Value (Test-HelperInstalled -Helper '7zip')
+Show-Value -Name 'Lessmsi' -Value (Test-HelperInstalled -Helper 'Lessmsi')
+Show-Value -Name 'Innounp' -Value (Test-HelperInstalled -Helper 'Innounp')
+Show-Value -Name 'Dark' -Value (Test-HelperInstalled -Helper 'Dark')
+Show-Value -Name 'Aria2' -Value (Test-HelperInstalled -Helper 'Aria2')
+Show-Value -Name 'Zstd' -Value (Test-HelperInstalled -Helper 'Zstd')
 
 Write-Output "[Environment]"
 Show-Value -Name 'SCOOP' -Value $env:SCOOP
@@ -67,8 +73,8 @@ Show-Value -Name 'OnHold' -Value (Test-ScoopCoreOnHold)
 Show-Value -Name 'Config' -Value $configFile
 Show-Value -Name 'CoreRoot' -Value $coreRoot
 Show-Value -Name 'ScoopDir' -Value $scoopdir
-Show-Value -Name 'GlobalDir' -Value $globaldir
 Show-Value -Name 'CacheDir' -Value $cachedir
+Show-Value -Name 'GlobalDir' -Value $globaldir
 
 Write-Output "[Config]"
 $scoopConfig.PSObject.Properties | ForEach-Object {
