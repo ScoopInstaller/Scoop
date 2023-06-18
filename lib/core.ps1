@@ -349,7 +349,7 @@ Function Test-CommandAvailable {
 }
 
 Function Test-GitAvailable {
-    Return [Boolean](Test-Path (Get-HelperPath -Helper Git) -ErrorAction Ignore)
+    return [Boolean](Get-HelperPath -Helper Git)
 }
 
 function Get-HelperPath {
