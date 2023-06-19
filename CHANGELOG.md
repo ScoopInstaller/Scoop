@@ -23,7 +23,7 @@
 - **scoop-info:** Fix errors in file size collection when `--verbose` ([#5352](https://github.com/ScoopInstaller/Scoop/pull/5352))
 - **shim:** Use bash executable directly ([#5433](https://github.com/ScoopInstaller/Scoop/issues/5433))
 - **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519]https://github.com/ScoopInstaller/Scoop/issues/5519)
-- **fix(core):** Check if the envrionment variable exists before deletion ([#5547]https://github.com/ScoopInstaller/Scoop/issues/5547)
+- **fix(core):** Avoid error messages when deleting non-existent environment variable ([#5547]https://github.com/ScoopInstaller/Scoop/issues/5547)
 
 ### Performance Improvements
 
