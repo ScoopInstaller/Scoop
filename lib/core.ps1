@@ -368,7 +368,7 @@ function Get-HelperPath {
         switch ($Helper) {
             'Git' {
                 $internalgit = (Get-AppFilePath 'git' 'mingw64\bin\git.exe'), (Get-AppFilePath 'git' 'mingw32\bin\git.exe') | Where-Object { $_ -ne $null }
-                if ($internalgit -and (Test-Path $internalgit)) {
+                if ($internalgit) {
                     $HelperPath = $internalgit
                 } else {
                     $HelperPath = (Get-Command git -ErrorAction Ignore).Source
