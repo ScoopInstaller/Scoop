@@ -20,7 +20,7 @@ $issues += !(check_long_paths)
 $issues += !(Get-WindowsDeveloperModeStatus)
 
 if (!(Test-HelperInstalled -Helper 7zip)) {
-    error "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip' or 'scoop install 7zip-zstd'."
+    error "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip'."
     $issues++
 }
 
