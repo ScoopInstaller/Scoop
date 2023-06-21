@@ -47,7 +47,7 @@ $apps | ForEach-Object {
         return
     }
 
-    if (get_config NO_JUNCTION){
+    if (get_config NO_JUNCTION) {
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'
@@ -57,6 +57,9 @@ $apps | ForEach-Object {
     if (!$json) { abort "Failed to hold '$app'." }
     $install = @{}
     $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
+    if ($install.hold) {
+        abort "'$app' is already held."
+    }
     $install.hold = $true
     save_install_info $install $dir
     success "$app is now held and can not be updated anymore."
