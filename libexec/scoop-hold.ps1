@@ -54,6 +54,7 @@ $apps | ForEach-Object {
     }
     $dir = versiondir $app $version $global
     $json = install_info $app $version $global
+    if (!$json) { abort "Failed to hold '$app'." }
     $install = @{}
     $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
     $install.hold = $true
