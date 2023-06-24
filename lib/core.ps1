@@ -5,7 +5,7 @@ function Get-Subsystem($filePath) {
         $binaryReader = [System.IO.BinaryReader]::new($fileStream)
         $binaryWriter = [System.IO.BinaryWriter]::new($fileStream)
     } catch {
-        return -1
+        return -1  # leave the subsystem part silently
     }
 
     try {
@@ -46,8 +46,6 @@ function Change-Subsystem($filePath, $targetSubsystem) {
         $fileStream.Seek($fileHeaderOffset + 0x5C, [System.IO.SeekOrigin]::Begin) | Out-Null
 
         $binaryWriter.Write([System.Int16] $targetSubsystem)
-
-        Write-Output "Subsystem 3[current] -> $targetSubsystem[new]"
     } finally {
         $binaryReader.Close()
         $fileStream.Close()
@@ -779,7 +777,8 @@ function shim($path, $global, $name, $arg) {
 
         $target_subsystem = Get-Subsystem $resolved_path
 
-        if ($target_subsystem -ne 3) { # Subsystem 3 means `Console`
+        if (($target_subsystem -ne 3) -and ($target_subsystem -ge 0)) { # Subsystem -eq 3 means `Console`, -ge 0 to ignore
+            Write-Output "Changing Subsystem 3[current] to $target_subsystem[new] for $shim.exe"
             Change-Subsystem "$shim.exe" $target_subsystem
         }
     } elseif ($path -match '\.(bat|cmd)$') {
