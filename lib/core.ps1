@@ -777,7 +777,6 @@ function shim($path, $global, $name, $arg) {
             Write-Output "args = $arg" | Out-UTF8File "$shim.shim" -Append
         }
 
-        echo "Resolved path: $resolved_path | $path"
         $target_subsystem = Get-Subsystem $resolved_path
 
         if ($target_subsystem -ne 3) { # Subsystem 3 means `Console`
