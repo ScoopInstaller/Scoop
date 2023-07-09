@@ -1,16 +1,18 @@
-# Usage: scoop import <path/url to scoopfile.json>
+# Usage: scoop import <path/url to scoopfile.json> [options]
 # Summary: Imports apps, buckets and configs from a Scoopfile in JSON format
 # Help: To replicate a Scoop installation from a file stored on Desktop, run
 #      scoop import Desktop\scoopfile.json
+#
+# Options:
+#   -r, --reset                     Reset the app after installation
 
-param(
-    [Parameter(Mandatory)]
-    [String]
-    $scoopfile
-)
-
+. "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 
+$opt, $scoopfile, $err = getopt $args 'r' 'reset'
+if ($err) { "scoop import: $err"; exit 1 }
+
+$reset = $opt.r -or $opt.reset
 $import = $null
 $bucket_names = @()
 $def_arch = Get-DefaultArchitecture
@@ -58,6 +60,10 @@ foreach ($item in $import.apps) {
     }
 
     & "$PSScriptRoot\scoop-install.ps1" $app @instArgs
+
+    if ($reset) {
+        & "$PSScriptRoot\scoop-reset.ps1" $app
+    }
 
     if ('Held package' -in $info) {
         & "$PSScriptRoot\scoop-hold.ps1" $item.Name @holdArgs
