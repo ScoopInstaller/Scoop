@@ -51,6 +51,9 @@ function add_alias($name, $command) {
 
     # generate script
     $shimdir = shimdir $false
+    if (Test-Path "$shimdir\$alias_file.ps1") {
+        abort "File '$name' already exists in shims directory."
+    }
     $script =
     @(
         "# Summary: $description",
