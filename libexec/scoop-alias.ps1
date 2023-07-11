@@ -74,14 +74,14 @@ function rm_alias($name) {
     }
 
     if ($aliases.$name) {
-        info "Removing alias $name..."
+        info "Removing alias '$name'..."
 
         rm_shim $aliases.$name (shimdir $false)
 
         $aliases.PSObject.Properties.Remove($name)
         set_config $script:config_alias $aliases | Out-Null
     } else {
-        abort "Alias $name doesn't exist."
+        abort "Alias '$name' doesn't exist."
     }
 }
 
