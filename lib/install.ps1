@@ -9,7 +9,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if(!$manifest) {
-        abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
+        abort "Couldn't find manifest for '$app'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
     }
 
     $version = $manifest.version
