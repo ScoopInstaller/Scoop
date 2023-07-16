@@ -1,6 +1,6 @@
-<h1 style="text-align: center;">Scoop</h1>
+<h1 align="center">Scoop</h1>
 
-<p style="text-align: center; font-weight: bold;">
+<p align="center">
         <a href="https://github.com/ScoopInstaller/Scoop#what-does-scoop-do">Features</a>
         |
         <a href="https://github.com/ScoopInstaller/Scoop#installation">Installation</a>
@@ -10,7 +10,7 @@
 
 ---
 
-<p style="text-align: center;">
+<p align="center">
     <a href="https://github.com/ScoopInstaller/Scoop">
         <img src="https://img.shields.io/github/languages/code-size/ScoopInstaller/Scoop.svg" alt="Code Size" />
     </a>
@@ -44,7 +44,7 @@ Scoop installs apps from the command line with a minimal amount of friction. It:
 - Resolves and installs dependencies automatically.
 - Performs all the necessary steps to get an app to a working state.
 
-Scoop is very scriptable, so you can run repeatable setups to get your environment just the way you like. For example:
+Scoop is quite script-friendly. Your environment can become the way you like by using repeatable setups. For example:
 
 ```console
 scoop install sudo
@@ -99,7 +99,7 @@ You can tweak the following `aria2` settings with the `scoop config` command:
 
 ## What sort of apps can Scoop install?
 
-The apps that are most likely to get installed fine with Scoop are those referred to as "portable" apps. These are compressed app files which can run standalone after being extracted and which do not produce side effects like changing the Windows Registry or placing files outside the app directory.
+The apps that are most likely to get installed fine with Scoop are those referred to as "portable" apps. These are compressed app files which can run standalone after being extracted. This type of apps does not produce side effects like changing the Windows Registry or placing files outside the app directory.
 
 Scoop also supports installer files and their uninstallation methods. Likewise, it can handle single-file apps and PowerShell scripts. These do not even need to be compressed. See the [runat](https://github.com/ScoopInstaller/Main/blob/master/bucket/runat.json) package for an example: it is simply a GitHub gist.
 
