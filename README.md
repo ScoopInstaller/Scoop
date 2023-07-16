@@ -99,7 +99,7 @@ You can tweak the following `aria2` settings with the `scoop config` command:
 
 ## What sort of apps can Scoop install?
 
-The apps that install fine most often with Scoop are those referred to as "portable" apps. These are compressed app files which run standalone when extracted and which do not produce side effects like changing the Windows Registry or placing files outside the app directory.
+The apps that are most likely to get installed fine with Scoop are those referred to as "portable" apps. These are compressed app files which can run standalone after being extracted and which do not produce side effects like changing the Windows Registry or placing files outside the app directory.
 
 Scoop also supports installer files and their uninstallation methods. Likewise, it can handle single-file apps and PowerShell scripts. These do not even need to be compressed. See the [runat](https://github.com/ScoopInstaller/Main/blob/master/bucket/runat.json) package for an example: it is simply a GitHub gist.
 
