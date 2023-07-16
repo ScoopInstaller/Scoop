@@ -1,17 +1,16 @@
-<p align="center">
-<!--<img src="scoop.png" alt="Long live Scoop!"/>-->
-    <h1 align="center">Scoop</h1>
-</p>
-<p align="center">
-<b><a href="https://github.com/ScoopInstaller/Scoop#what-does-scoop-do">Features</a></b>
-|
-<b><a href="https://github.com/ScoopInstaller/Scoop#installation">Installation</a></b>
-|
-<b><a href="https://github.com/ScoopInstaller/Scoop/wiki">Documentation</a></b>
+<h1 style="text-align: center;">Scoop</h1>
+
+<p style="text-align: center; font-weight: bold;">
+        <a href="https://github.com/ScoopInstaller/Scoop#what-does-scoop-do">Features</a>
+        |
+        <a href="https://github.com/ScoopInstaller/Scoop#installation">Installation</a>
+        |
+        <a href="https://github.com/ScoopInstaller/Scoop/wiki">Documentation</a>
 </p>
 
-- - -
-<p align="center" >
+---
+
+<p style="text-align: center;">
     <a href="https://github.com/ScoopInstaller/Scoop">
         <img src="https://img.shields.io/github/languages/code-size/ScoopInstaller/Scoop.svg" alt="Code Size" />
     </a>
