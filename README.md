@@ -39,7 +39,7 @@ Scoop installs apps from the command line with a minimal amount of friction. It:
 
 - Eliminates [User Account Control](https://learn.microsoft.com/windows/security/application-security/application-control/user-account-control/) (UAC) prompt notifications.
 - Hides the graphical user interface (GUI) of wizard-style installers.
-- Prevents polluting the `PATH` environment variable which occurs when many apps are installed on the device.
+- Prevents polluting the `PATH` environment variable. Normally, this variable gets cluttered as different apps are installed on the device.
 - Avoids unexpected side effects from installing and uninstalling apps.
 - Resolves and installs dependencies automatically.
 - Performs all the necessary steps to get an app to a working state.
@@ -60,11 +60,11 @@ If you have built software that you would like others to use, Scoop is an altern
 Run the following commands from a regular (non-admin) PowerShell terminal to install Scoop:
 
 ```powershell
-# Change the execution policy to allow installing and managing Scoop
-# Windows 10 clients restrict execution of PowerShell scripts by default
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
 ```
+
+**Note**: The first command makes your device allow running the installation and management scripts. This is necessary because Windows 10 client devices restrict execution of any PowerShell scripts by default.
 
 It will install Scoop to its default location:
 
@@ -99,7 +99,7 @@ You can tweak the following `aria2` settings with the `scoop config` command:
 
 ## What sort of apps can Scoop install?
 
-The apps that are most likely to get installed fine with Scoop are those referred to as "portable" apps. These are compressed app files which can run standalone after being extracted. This type of apps does not produce side effects like changing the Windows Registry or placing files outside the app directory.
+The apps that are most likely to get installed fine with Scoop are those referred to as "portable" apps. These apps are compressed files which can run standalone after being extracted. This type of apps does not produce side effects like changing the Windows Registry or placing files outside the app directory.
 
 Scoop also supports installer files and their uninstallation methods. Likewise, it can handle single-file apps and PowerShell scripts. These do not even need to be compressed. See the [runat](https://github.com/ScoopInstaller/Main/blob/master/bucket/runat.json) package for an example: it is simply a GitHub gist.
 
