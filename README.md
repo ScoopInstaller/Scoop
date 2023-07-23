@@ -37,7 +37,7 @@ Scoop is a command-line installer for Windows.
 
 Scoop installs apps from the command line with a minimal amount of friction. It:
 
-- Avoids [User Account Control](https://learn.microsoft.com/windows/security/application-security/application-control/user-account-control/) (UAC) prompt notifications.
+- Eliminates [User Account Control](https://learn.microsoft.com/windows/security/application-security/application-control/user-account-control/) (UAC) prompt notifications.
 - Hides the graphical user interface (GUI) of wizard-style installers.
 - Prevents polluting the `PATH` environment variable which occurs when many apps are installed on the device.
 - Avoids unexpected side effects from installing and uninstalling apps.
