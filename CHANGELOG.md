@@ -7,6 +7,7 @@
 - **config:** Support portable config file ([#5369](https://github.com/ScoopInstaller/Scoop/issues/5369))
 - **bucket:** Make official buckets higher priority ([#5398](https://github.com/ScoopInstaller/Scoop/issues/5398))
 - **core:** Add `-Quiet` switch for `Invoke-ExternalCommand` ([#5346](https://github.com/ScoopInstaller/Scoop/issues/5346))
+- **core:** Allow global install of PowerShell modules ([#5611](https://github.com/ScoopInstaller/Scoop/issues/5611))
 
 ### Bug Fixes
 
