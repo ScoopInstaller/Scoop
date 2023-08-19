@@ -6,11 +6,11 @@ function install_psmodule($manifest, $dir, $global) {
     if (!$psmodule) { return }
 
     if ($global) {
-		$targetdir = ensure $globalmodulesdir
+        $targetdir = ensure $globalmodulesdir
     } else {
-		$targetdir = ensure $modulesdir;
-		ensure_in_psmodulepath $modulesdir $global
-	}
+        $targetdir = ensure $modulesdir;
+        ensure_in_psmodulepath $modulesdir $global
+    }
 
     $module_name = $psmodule.name
     if (!$module_name) {
@@ -37,11 +37,11 @@ function uninstall_psmodule($manifest, $dir, $global) {
     $module_name = $psmodule.name
     Write-Host "Uninstalling PowerShell module '$module_name'."
 
-    if ($global) { 
-		$targetdir = ensure $globalmodulesdir
+    if ($global) {
+        $targetdir = ensure $globalmodulesdir
     } else {
-		$targetdir = ensure $modulesdir;
-	}
+        $targetdir = ensure $modulesdir;
+    }
 
     $linkfrom = "$targetdir\$module_name"
     if (Test-Path $linkfrom) {
