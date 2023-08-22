@@ -1,16 +1,10 @@
-$modulesdir = "$scoopdir\modules"
-$globalmodulesdir = "$env:ProgramFiles\WindowsPowerShell\Modules" # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_psmodulepath
-
 function install_psmodule($manifest, $dir, $global) {
     $psmodule = $manifest.psmodule
     if (!$psmodule) { return }
 
-    if ($global) {
-        $targetdir = ensure $globalmodulesdir
-    } else {
-        $targetdir = ensure $modulesdir;
-        ensure_in_psmodulepath $modulesdir $global
-    }
+    $targetdir = ensure (modulesdir $global)
+
+    ensure_in_psmodulepath $targetdir $global
 
     $module_name = $psmodule.name
     if (!$module_name) {
@@ -37,11 +31,7 @@ function uninstall_psmodule($manifest, $dir, $global) {
     $module_name = $psmodule.name
     Write-Host "Uninstalling PowerShell module '$module_name'."
 
-    if ($global) {
-        $targetdir = ensure $globalmodulesdir
-    } else {
-        $targetdir = ensure $modulesdir;
-    }
+    $targetdir = modulesdir $global
 
     $linkfrom = "$targetdir\$module_name"
     if (Test-Path $linkfrom) {
