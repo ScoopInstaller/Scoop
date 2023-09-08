@@ -22,7 +22,8 @@
 - **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))
 - **scoop-info:** Fix errors in file size collection when `--verbose` ([#5352](https://github.com/ScoopInstaller/Scoop/pull/5352))
 - **shim:** Use bash executable directly ([#5433](https://github.com/ScoopInstaller/Scoop/issues/5433))
-- **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519]https://github.com/ScoopInstaller/Scoop/issues/5519)
+- **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
+- **buckets:** Avoid error messages for unexpected dir ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5549))
 - **scoop-search:** Improve performance for local search ([#5324](https://github.com/ScoopInstaller/Scoop/issues/5324))
 
 ### Performance Improvements
