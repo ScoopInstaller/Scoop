@@ -155,25 +155,18 @@ function Invoke-Git {
     }
 
     if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
-        $old_https = $env:HTTPS_PROXY
-        $old_http = $env:HTTP_PROXY
-        try {
+        $j = Start-Job -ScriptBlock {
             # convert proxy setting for git
-            if ($proxy.StartsWith('currentuser@')) {
+            $proxy = $using:proxy
+            if ($proxy -and $proxy.StartsWith('currentuser@')) {
                 $proxy = $proxy.Replace('currentuser@', ':@')
             }
             $env:HTTPS_PROXY = $proxy
             $env:HTTP_PROXY = $proxy
-            return & $git @ArgumentList
+            & $using:git @using:ArgumentList
         }
-        catch {
-            error $_
-            return
-        }
-        finally {
-            $env:HTTPS_PROXY = $old_https
-            $env:HTTP_PROXY = $old_http
-        }
+        $o = $j | Receive-Job -Wait -AutoRemoveJob
+        return $o
     }
 
     return & $git @ArgumentList
@@ -568,6 +561,9 @@ function Invoke-ExternalCommand {
         [Parameter(ParameterSetName = "UseShellExecute")]
         [Switch]
         $RunAs,
+        [Parameter(ParameterSetName = "UseShellExecute")]
+        [Switch]
+        $Quiet,
         [Alias("Msg")]
         [String]
         $Activity,
@@ -597,29 +593,33 @@ function Invoke-ExternalCommand {
     if ($RunAs) {
         $Process.StartInfo.UseShellExecute = $true
         $Process.StartInfo.Verb = 'RunAs'
-    } else {
-        $Process.StartInfo.CreateNoWindow = $true
     }
-    if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
-        $Process.StartInfo.Arguments = $ArgumentList -join ' '
-    } elseif ($Process.StartInfo.ArgumentList.Add) {
-        # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
-        # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
-        # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
-        $ArgumentList | ForEach-Object { $Process.StartInfo.ArgumentList.Add($_) }
-    } else {
-        # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
-        $escapedArgs = $ArgumentList | ForEach-Object {
-            # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
-            $s = $_ -replace '(\\+)"', '$1$1"'
-            # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
-            $s = $s -replace '(\\+)$', '$1$1'
-            # escape double quotes
-            $s = $s -replace '"', '\"'
-            # quote the argument
-            "`"$s`""
+    if ($Quiet) {
+        $Process.StartInfo.UseShellExecute = $true
+        $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    }
+    if ($ArgumentList.Length -gt 0) {
+        if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
+            $Process.StartInfo.Arguments = $ArgumentList -join ' '
+        } elseif ($Process.StartInfo.ArgumentList.Add) {
+            # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
+            # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
+            # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
+            $ArgumentList | ForEach-Object { $Process.StartInfo.ArgumentList.Add($_) }
+        } else {
+            # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
+            $escapedArgs = $ArgumentList | ForEach-Object {
+                # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
+                $s = $_ -replace '(\\+)"', '$1$1"'
+                # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
+                $s = $s -replace '(\\+)$', '$1$1'
+                # escape double quotes
+                $s = $s -replace '"', '\"'
+                # quote the argument
+                "`"$s`""
+            }
+            $Process.StartInfo.Arguments = $escapedArgs -join ' '
         }
-        $Process.StartInfo.Arguments = $escapedArgs -join ' '
     }
     try {
         [void]$Process.Start()
@@ -662,6 +662,30 @@ function Invoke-ExternalCommand {
     return $true
 }
 
+function Publish-Env {
+    if (-not ("Win32.NativeMethods" -as [Type])) {
+        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
+[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+public static extern IntPtr SendMessageTimeout(
+    IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
+    uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
+"@
+    }
+
+    $HWND_BROADCAST = [IntPtr] 0xffff;
+    $WM_SETTINGCHANGE = 0x1a;
+    $result = [UIntPtr]::Zero
+
+    [Win32.Nativemethods]::SendMessageTimeout($HWND_BROADCAST,
+        $WM_SETTINGCHANGE,
+        [UIntPtr]::Zero,
+        "Environment",
+        2,
+        5000,
+        [ref] $result
+    ) | Out-Null
+}
+
 function env($name, $global, $val = '__get') {
     $RegisterKey = if ($global) {
         Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
@@ -684,6 +708,7 @@ function env($name, $global, $val = '__get') {
             [Microsoft.Win32.RegistryValueKind]::String
         }
         $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
+        Publish-Env
     }
 }
 
@@ -898,19 +923,9 @@ function shim($path, $global, $name, $arg) {
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
-        # find path to Git's bash so that batch scripts can run bash scripts
-        if (!(Get-CommandPath git)) {
-            error "Can't shim '$shim': 'git' is needed but not installed."
-            error "Please install git ('scoop install git') and try again."
-            exit 1
-        }
-        $gitdir = (Get-Item (Get-CommandPath git) -ErrorAction:Stop).Directory.Parent
-        if ($gitdir.FullName -imatch 'mingw') {
-            $gitdir = $gitdir.Parent
-        }
         @(
             "@rem $resolved_path",
-            "@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*"
+            "@bash `"$resolved_path`" $arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
@@ -1342,7 +1357,7 @@ if ($pathExpected) {
 $scoopConfig = load_cfg $configFile
 
 # NOTE Scoop config file migration. Remove this after 2023/6/30
-if ($scoopConfig) {
+if ($scoopConfig -and $scoopConfig.PSObject.Properties.Name -contains 'lastUpdate') {
     $newConfigNames = @{
         'lastUpdate'               = 'last_update'
         'SCOOP_REPO'               = 'scoop_repo'
@@ -1360,14 +1375,9 @@ if ($scoopConfig) {
             $value = $scoopConfig.$($_.Key)
             $scoopConfig.PSObject.Properties.Remove($_.Key)
             $scoopConfig | Add-Member -MemberType NoteProperty -Name $_.Value -Value $value
-            if ($_.Key -eq 'lastUpdate') {
-                $scoopConfigChg = $true
-            }
         }
     }
-    if ($scoopConfigChg) { # Only save config file if there was a change
-        ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
-    }
+    ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
 }
 # END NOTE
 

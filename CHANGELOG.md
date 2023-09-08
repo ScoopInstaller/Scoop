@@ -3,7 +3,10 @@
 ### Features
 
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
+- **bucket:** Switch nirsoft bucket to ScoopInstaller/Nirsoft ([#5328](https://github.com/ScoopInstaller/Scoop/issues/5328))
 - **config:** Support portable config file ([#5369](https://github.com/ScoopInstaller/Scoop/issues/5369))
+- **bucket:** Make official buckets higher priority ([#5398](https://github.com/ScoopInstaller/Scoop/issues/5398))
+- **core:** Add `-Quiet` switch for `Invoke-ExternalCommand` ([#5346](https://github.com/ScoopInstaller/Scoop/issues/5346))
 
 ### Bug Fixes
 
@@ -13,9 +16,13 @@
 - **shortcuts:** Output correctly formatted path ([#5333](https://github.com/ScoopInstaller/Scoop/issues/5333))
 - **core:** Fix scripts' calling parameters ([#5365](https://github.com/ScoopInstaller/Scoop/issues/5365))
 - **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
-- **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395))
+- **core:** Rewrite config file when needed ([#5439](https://github.com/ScoopInstaller/Scoop/issues/5439))
+- **core:** Prevents leaking HTTP(S)_PROXY env vars to current sessions after Invoke-Git in parallel execution ([#5436](https://github.com/ScoopInstaller/Scoop/pull/5436))
+- **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395), [#5452](https://github.com/ScoopInstaller/Scoop/pull/5452))
 - **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))
 - **scoop-info:** Fix errors in file size collection when `--verbose` ([#5352](https://github.com/ScoopInstaller/Scoop/pull/5352))
+- **shim:** Use bash executable directly ([#5433](https://github.com/ScoopInstaller/Scoop/issues/5433))
+- **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519]https://github.com/ScoopInstaller/Scoop/issues/5519)
 
 ### Performance Improvements
 
@@ -37,6 +44,10 @@
 ### Tests
 
 - **bucket:** Skip manifest validation if no manifest changes ([#5270](https://github.com/ScoopInstaller/Scoop/issues/5270))
+
+### Documentation
+
+- **scoop-info:** Fix help message([#5445](https://github.com/ScoopInstaller/Scoop/issues/5445))
 
 ## [v0.3.1](https://github.com/ScoopInstaller/Scoop/compare/v0.3.0...v0.3.1) - 2022-11-15
 

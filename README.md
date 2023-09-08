@@ -119,10 +119,10 @@ The following buckets are known to scoop:
 - [extras](https://github.com/ScoopInstaller/Extras) - Apps that don't fit the main bucket's [criteria](https://github.com/ScoopInstaller/Scoop/wiki/Criteria-for-including-apps-in-the-main-bucket)
 - [games](https://github.com/Calinou/scoop-games) - Open source/freeware games and game-related tools
 - [nerd-fonts](https://github.com/matthewjberger/scoop-nerd-fonts) -  Nerd Fonts
-- [nirsoft](https://github.com/kodybrown/scoop-nirsoft) - Almost all of the [250+](https://rasa.github.io/scoop-directory/by-apps#kodybrown_scoop-nirsoft) apps from [Nirsoft](https://nirsoft.net)
-- [sysinternals](https://github.com/niheaven/scoop-sysinternals) - Sysinternals Suite and all individual application from [Microsoft](https://learn.microsoft.com/sysinternals/)
+- [nirsoft](https://github.com/ScoopInstaller/Nirsoft) - Almost all of the 280+ apps from [Nirsoft](https://nirsoft.net)
+- [sysinternals](https://github.com/niheaven/scoop-sysinternals) - Sysinternals Suite and all individual applications from [Microsoft](https://learn.microsoft.com/sysinternals/)
 - [java](https://github.com/ScoopInstaller/Java) - A collection of Java development kits (JDKs), Java runtime engines (JREs), Java's virtual machine debugging tools and Java based runtime engines.
-- [nonportable](https://github.com/ScoopInstaller/Nonportable) - Non-portable apps (may require UAC)
+- [nonportable](https://github.com/ScoopInstaller/Nonportable) - Non-portable apps (may require UAC/Administrator rights)
 - [php](https://github.com/ScoopInstaller/PHP) - Installers for most versions of PHP
 - [versions](https://github.com/ScoopInstaller/Versions) - Alternative versions of apps found in other buckets
 
