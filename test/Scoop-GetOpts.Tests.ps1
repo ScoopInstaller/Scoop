@@ -17,6 +17,12 @@ Describe 'getopt' -Tag 'Scoop' {
         $err | Should -Be 'Option --arb requires an argument.'
     }
 
+    It 'handle space in quote' {
+        $opt, $rem, $err = getopt '-x', 'space arg' 'x:' ''
+        $err | Should -BeNullOrEmpty
+        $opt.x | Should -Be 'space arg'
+    }
+
     It 'handle unrecognized short option' {
         $null, $null, $err = getopt '-az' 'a' ''
         $err | Should -Be 'Option -z not recognized.'

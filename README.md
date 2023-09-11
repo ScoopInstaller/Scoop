@@ -121,7 +121,7 @@ The following buckets are known to Scoop:
 - [extras](https://github.com/ScoopInstaller/Extras) - Apps that do not fit the main bucket's [criteria](https://github.com/ScoopInstaller/Scoop/wiki/Criteria-for-including-apps-in-the-main-bucket).
 - [games](https://github.com/Calinou/scoop-games) - Open-source and freeware video games and game-related tools.
 - [nerd-fonts](https://github.com/matthewjberger/scoop-nerd-fonts) -  Nerd Fonts.
-- [nirsoft](https://github.com/kodybrown/scoop-nirsoft) - A collection of over [250+](https://rasa.github.io/scoop-directory/by-apps#kodybrown_scoop-nirsoft) apps from [Nirsoft](https://nirsoft.net).
+- [nirsoft](https://github.com/ScoopInstaller/Nirsoft) - A collection of over 250+ apps from [Nirsoft](https://nirsoft.net).
 - [sysinternals](https://github.com/niheaven/scoop-sysinternals) - The Sysinternals suite from [Microsoft](https://learn.microsoft.com/sysinternals/).
 - [java](https://github.com/ScoopInstaller/Java) - A collection of Java development kits (JDKs) and Java runtime engines (JREs), Java's virtual machine debugging tools and Java based runtime engines.
 - [nonportable](https://github.com/ScoopInstaller/Nonportable) - Non-portable apps (may trigger UAC prompts).
