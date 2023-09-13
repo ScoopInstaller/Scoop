@@ -58,10 +58,18 @@ function Get-LocalBucket {
     .SYNOPSIS
         List all local buckets.
     #>
-    $bucketNames = (Get-ChildItem -Path $bucketsdir -Directory).Name
+    $bucketNames = [System.Collections.Generic.List[String]](Get-ChildItem -Path $bucketsdir -Directory).Name
     if ($null -eq $bucketNames) {
         return @() # Return a zero-length list instead of $null.
     } else {
+        $knownBuckets = known_buckets
+        for ($i = $knownBuckets.Count - 1; $i -ge 0 ; $i--) {
+            $name = $knownBuckets[$i]
+            if ($bucketNames.Contains($name)) {
+                [void]$bucketNames.Remove($name)
+                $bucketNames.Insert(0, $name)
+            }
+        }
         return $bucketNames
     }
 }
@@ -103,7 +111,7 @@ function list_buckets {
             $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', '--format=%aD', '-n', '1') | Get-Date
         } else {
             $bucket.Source = friendly_path $path
-            $bucket.Updated = (Get-Item "$path\bucket").LastWriteTime
+            $bucket.Updated = (Get-Item "$path\bucket" -ErrorAction SilentlyContinue).LastWriteTime
         }
         $bucket.Manifests = Get-ChildItem "$path\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
                 Measure-Object | Select-Object -ExpandProperty Count
