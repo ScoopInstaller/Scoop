@@ -140,6 +140,9 @@
                 "pre_install": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
+                "pre_update": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                },
                 "pre_uninstall": {
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
@@ -617,6 +620,9 @@
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "pre_install": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "pre_update": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "pre_uninstall": {
