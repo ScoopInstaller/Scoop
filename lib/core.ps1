@@ -1,9 +1,8 @@
 # Returns the subsystem of the EXE
 function Get-Subsystem($filePath) {
     try {
-        $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
+        $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
         $binaryReader = [System.IO.BinaryReader]::new($fileStream)
-        $binaryWriter = [System.IO.BinaryWriter]::new($fileStream)
     } catch {
         return -1  # leave the subsystem part silently
     }
@@ -896,7 +895,7 @@ function shim($path, $global, $name, $arg) {
         $target_subsystem = Get-Subsystem $resolved_path
 
         if (($target_subsystem -ne 3) -and ($target_subsystem -ge 0)) { # Subsystem -eq 3 means `Console`, -ge 0 to ignore
-            Write-Output "Changing Subsystem 3[current] to $target_subsystem[new] for $shim.exe"
+            Write-Output "Making $shim.exe a GUI binary."
             Change-Subsystem "$shim.exe" $target_subsystem
         }
     } elseif ($path -match '\.(bat|cmd)$') {
