@@ -10,7 +10,7 @@
 
 ### Bug Fixes
 
-- **gui-shim:** remove console window for GUI applications ([#1606](https://github.com/ScoopInstaller/Scoop/issues/1606))
+- **shim:** Remove console window for GUI applications ([#5559](https://github.com/ScoopInstaller/Scoop/issues/5559))
 - **decompress:** Exclude '*.nsis' that may cause error ([#5294](https://github.com/ScoopInstaller/Scoop/issues/5294))
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
 - **getopt:** Stop split arguments in `getopt()` and ensure array by explicit arguments type ([#5326](https://github.com/ScoopInstaller/Scoop/issues/5326))
