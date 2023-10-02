@@ -51,6 +51,7 @@
 ### Documentation
 
 - **scoop-info:** Fix help message([#5445](https://github.com/ScoopInstaller/Scoop/issues/5445))
+- **readme:** Improve documentation language ([#5638](https://github.com/ScoopInstaller/Scoop/issues/5638))
 
 ## [v0.3.1](https://github.com/ScoopInstaller/Scoop/compare/v0.3.0...v0.3.1) - 2022-11-15
 
