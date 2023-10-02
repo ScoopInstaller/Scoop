@@ -1,5 +1,6 @@
 <h1 align="center">Scoop</h1>
 
+<!--<img src="scoop.png" alt="Long live Scoop!"/>-->
 <p align="center">
         <a href="https://github.com/ScoopInstaller/Scoop#what-does-scoop-do">Features</a>
         |
@@ -60,7 +61,7 @@ If you have built software that you would like others to use, Scoop is an altern
 Run the following commands from a regular (non-admin) PowerShell terminal to install Scoop:
 
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
 ```
 
