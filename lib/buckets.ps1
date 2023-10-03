@@ -111,7 +111,7 @@ function list_buckets {
             $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', '--format=%aD', '-n', '1') | Get-Date
         } else {
             $bucket.Source = friendly_path $path
-            $bucket.Updated = (Get-Item "$path\bucket").LastWriteTime
+            $bucket.Updated = (Get-Item "$path\bucket" -ErrorAction SilentlyContinue).LastWriteTime
         }
         $bucket.Manifests = Get-ChildItem "$path\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
                 Measure-Object | Select-Object -ExpandProperty Count

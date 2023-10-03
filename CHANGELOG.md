@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+- **shim:** Remove console window for GUI applications ([#5559](https://github.com/ScoopInstaller/Scoop/issues/5559))
 - **decompress:** Exclude '*.nsis' that may cause error ([#5294](https://github.com/ScoopInstaller/Scoop/issues/5294))
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
 - **getopt:** Stop split arguments in `getopt()` and ensure array by explicit arguments type ([#5326](https://github.com/ScoopInstaller/Scoop/issues/5326))
@@ -18,12 +19,17 @@
 - **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
 - **core:** Rewrite config file when needed ([#5439](https://github.com/ScoopInstaller/Scoop/issues/5439))
 - **core:** Prevents leaking HTTP(S)_PROXY env vars to current sessions after Invoke-Git in parallel execution ([#5436](https://github.com/ScoopInstaller/Scoop/pull/5436))
-- **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395), [#5452](https://github.com/ScoopInstaller/Scoop/pull/5452))
+- **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395), [#5452](https://github.com/ScoopInstaller/Scoop/pull/5452), [#5631](https://github.com/ScoopInstaller/Scoop/pull/5631))
 - **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))
+- **install:** Avoid error when unlinking non-existent junction/hardlink ([#5552]https://github.com/ScoopInstaller/Scoop/issues/5552)
 - **scoop-info:** Fix errors in file size collection when `--verbose` ([#5352](https://github.com/ScoopInstaller/Scoop/pull/5352))
 - **shim:** Use bash executable directly ([#5433](https://github.com/ScoopInstaller/Scoop/issues/5433))
-- **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519]https://github.com/ScoopInstaller/Scoop/issues/5519)
-- **install:** Avoid error when unlinking non-existent junction/hardlink ([#5552]https://github.com/ScoopInstaller/Scoop/issues/5552)
+- **core:** Avoid error messages when deleting non-existent environment variable ([#5547](https://github.com/ScoopInstaller/Scoop/issues/5547))
+- **core:** Use relative path as fallback of `$scoopdir` ([#5544](https://github.com/ScoopInstaller/Scoop/issues/5544))
+- **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
+- **buckets:** Avoid error messages for unexpected dir ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5549))
+- **scoop-virustotal**: Fix `scoop-virustotal` when `--all' has been passed without app ([#5593](https://github.com/ScoopInstaller/Scoop/pull/5593))
+- **scoop-checkup:** Change the message level of helpers from ERROR to WARN ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5614))
 
 ### Performance Improvements
 
@@ -49,6 +55,7 @@
 ### Documentation
 
 - **scoop-info:** Fix help message([#5445](https://github.com/ScoopInstaller/Scoop/issues/5445))
+- **readme:** Improve documentation language ([#5638](https://github.com/ScoopInstaller/Scoop/issues/5638))
 
 ## [v0.3.1](https://github.com/ScoopInstaller/Scoop/compare/v0.3.0...v0.3.1) - 2022-11-15
 
