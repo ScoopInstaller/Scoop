@@ -1,3 +1,56 @@
+# Returns the subsystem of the EXE
+function Get-Subsystem($filePath) {
+    try {
+        $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+        $binaryReader = [System.IO.BinaryReader]::new($fileStream)
+    } catch {
+        return -1  # leave the subsystem part silently
+    }
+
+    try {
+        $fileStream.Seek(0x3C, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $peOffset = $binaryReader.ReadInt32()
+
+        $fileStream.Seek($peOffset, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $fileHeaderOffset = $fileStream.Position
+
+        $fileStream.Seek(18, [System.IO.SeekOrigin]::Current) | Out-Null
+        $fileStream.Seek($fileHeaderOffset + 0x5C, [System.IO.SeekOrigin]::Begin) | Out-Null
+
+        return $binaryReader.ReadInt16()
+    } finally {
+        $binaryReader.Close()
+        $fileStream.Close()
+    }
+}
+
+function Change-Subsystem($filePath, $targetSubsystem) {
+    try {
+        $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
+        $binaryReader = [System.IO.BinaryReader]::new($fileStream)
+        $binaryWriter = [System.IO.BinaryWriter]::new($fileStream)
+    } catch {
+        Write-Output "Error opening File:'$filePath'"
+        return
+    }
+
+    try {
+        $fileStream.Seek(0x3C, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $peOffset = $binaryReader.ReadInt32()
+
+        $fileStream.Seek($peOffset, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $fileHeaderOffset = $fileStream.Position
+
+        $fileStream.Seek(18, [System.IO.SeekOrigin]::Current) | Out-Null
+        $fileStream.Seek($fileHeaderOffset + 0x5C, [System.IO.SeekOrigin]::Begin) | Out-Null
+
+        $binaryWriter.Write([System.Int16] $targetSubsystem)
+    } finally {
+        $binaryReader.Close()
+        $fileStream.Close()
+    }
+}
+
 function Optimize-SecurityProtocol {
     # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
     # which allows the operating system to choose the best protocol to use.
@@ -701,7 +754,8 @@ function env($name, $global, $val = '__get') {
         $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
         $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
     } elseif ($val -eq $null) {
-        $EnvRegisterKey.DeleteValue($name)
+        try { $EnvRegisterKey.DeleteValue($name) } catch { }
+        Publish-Env
     } else {
         $RegistryValueKind = if ($val.Contains('%')) {
             [Microsoft.Win32.RegistryValueKind]::ExpandString
@@ -840,6 +894,13 @@ function shim($path, $global, $name, $arg) {
         Write-Output "path = `"$resolved_path`"" | Out-UTF8File "$shim.shim"
         if ($arg) {
             Write-Output "args = $arg" | Out-UTF8File "$shim.shim" -Append
+        }
+
+        $target_subsystem = Get-Subsystem $resolved_path
+
+        if (($target_subsystem -ne 3) -and ($target_subsystem -ge 0)) { # Subsystem -eq 3 means `Console`, -ge 0 to ignore
+            Write-Output "Making $shim.exe a GUI binary."
+            Change-Subsystem "$shim.exe" $target_subsystem
         }
     } elseif ($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
@@ -1385,7 +1446,7 @@ if ($scoopConfig -and $scoopConfig.PSObject.Properties.Name -contains 'lastUpdat
 # END NOTE
 
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Resolve-Path "$PSScriptRoot\..\..\..\.."), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop global apps directory
 $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
