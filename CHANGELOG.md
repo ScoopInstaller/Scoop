@@ -31,6 +31,7 @@
 - **buckets:** Avoid error messages for unexpected dir ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5549))
 - **scoop-virustotal**: Fix `scoop-virustotal` when `--all' has been passed without app ([#5593](https://github.com/ScoopInstaller/Scoop/pull/5593))
 - **scoop-checkup:** Change the message level of helpers from ERROR to WARN ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5614))
+- **scoop-(un)hold:** Correct output the messages when manifest not found, (already|not) held ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
 
 ### Performance Improvements
 
