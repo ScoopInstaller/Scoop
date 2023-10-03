@@ -469,7 +469,10 @@ function Get-CommandPath {
         } catch {
             return $null
         }
-        $commandPath = if ($comm.Path -like "$userShims*" -or $comm.Path -like "$globalShims*") {
+        $commandPath = if ($comm.Path -like "$userShims\scoop-*.ps1") {
+            # Scoop aliases
+            $comm.Source
+        } elseif ($comm.Path -like "$userShims*" -or $comm.Path -like "$globalShims*") {
             Get-ShimTarget ($comm.Path -replace '\.exe$', '.shim')
         } elseif ($comm.CommandType -eq 'Application') {
             $comm.Source
@@ -847,7 +850,7 @@ function Get-ShimTarget($ShimPath) {
         if (!$shimTarget) {
             $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
         }
-        $shimTarget | Convert-Path
+        $shimTarget | Convert-Path -ErrorAction SilentlyContinue
     }
 }
 

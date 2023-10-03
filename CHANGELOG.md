@@ -19,6 +19,7 @@
 - **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
 - **core:** Rewrite config file when needed ([#5439](https://github.com/ScoopInstaller/Scoop/issues/5439))
 - **core:** Prevents leaking HTTP(S)_PROXY env vars to current sessions after Invoke-Git in parallel execution ([#5436](https://github.com/ScoopInstaller/Scoop/pull/5436))
+- **core:** Handle scoop aliases and broken(edited,copied) shim ([#5551](https://github.com/ScoopInstaller/Scoop/issues/5551))
 - **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395), [#5452](https://github.com/ScoopInstaller/Scoop/pull/5452), [#5631](https://github.com/ScoopInstaller/Scoop/pull/5631))
 - **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))
 - **install:** Avoid error when unlinking non-existent junction/hardlink ([#5552](https://github.com/ScoopInstaller/Scoop/issues/5552))
