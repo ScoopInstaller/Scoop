@@ -751,7 +751,7 @@ function env($name, $global, $val = '__get') {
         $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
         $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
     } elseif ($val -eq $null) {
-        $EnvRegisterKey.DeleteValue($name)
+        try { $EnvRegisterKey.DeleteValue($name) } catch { }
         Publish-Env
     } else {
         $RegistryValueKind = if ($val.Contains('%')) {
