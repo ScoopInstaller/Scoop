@@ -53,11 +53,15 @@ $apps | ForEach-Object {
     }
     $dir = versiondir $app $version $global
     $json = install_info $app $version $global
-    if (!$json) { abort "Failed to unhold '$app'" }
+    if (!$json) {
+        error "Failed to unhold '$app'"
+        continue
+    }
     $install = @{}
     $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
     if (!$install.hold) {
-        abort "'$app' is not held."
+        info "'$app' is not held."
+        continue
     }
     $install.hold = $null
     save_install_info $install $dir
