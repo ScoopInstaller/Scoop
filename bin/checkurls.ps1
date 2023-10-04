@@ -88,23 +88,25 @@ function test_dl([String] $url, $cookies) {
 
 foreach ($man in $Queue) {
     $name, $manifest = $man
-    $urls = @()
-    $ok = 0
-    $failed = 0
-    $errors = @()
+    $urls = [System.Collections.ArrayList]::new()
+    $ok = $failed = 0
+    $errors = [System.Collections.ArrayList]::new()
 
     if ($manifest.url) {
-        $manifest.url | ForEach-Object { $urls += $_ }
+        $manifest.url | ForEach-Object { $urls.Add($_) }
     } else {
-        script:url $manifest '64bit' | ForEach-Object { $urls += $_ }
-        script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
-        script:url $manifest 'arm64' | ForEach-Object { $urls += $_ }
+        script:url $manifest '64bit' | ForEach-Object { $urls.Add($_) }
+        script:url $manifest '64bit-v2' | ForEach-Object { $urls.Add($_) }
+        script:url $manifest '64bit-v3' | ForEach-Object { $urls.Add($_) }
+        script:url $manifest '64bit-v4' | ForEach-Object { $urls.Add($_) }
+        script:url $manifest '32bit' | ForEach-Object { $urls.Add($_) }
+        script:url $manifest 'arm64' | ForEach-Object { $urls.Add($_) }
     }
 
     $urls | ForEach-Object {
         $url, $status, $msg = test_dl $_ $manifest.cookie
-        if ($msg) { $errors += "$msg ($url)" }
-        if ($status -eq 'OK' -or $status -eq 'OpeningData') { $ok += 1 } else { $failed += 1 }
+        if ($msg) { $errors.Add("$msg ($url)") }
+        if ($status -eq 'OK' -or $status -eq 'OpeningData') { ++$ok } else { ++$failed }
     }
 
     if (($ok -eq $urls.Length) -and $SkipValid) { continue }
