@@ -1039,28 +1039,30 @@ function get_shim_path() {
 
 function Get-DefaultArchitecture {
     $arch = get_config DEFAULT_ARCHITECTURE
-    $system = switch -Exact ([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture) {
-        'Arm64' { return 'arm64' }
-        'X64' {
-            $out = '64bit'
-            $kernel32 = Add-Type -MemberDefinition '[DllImport("kernel32.dll")] public static extern bool IsProcessorFeaturePresent(int ProcessorFeature);' -Name 'Kernel32' -Namespace 'Win32' -PassThru
-            return & {
-                # PF_AVX512F_INSTRUCTIONS_AVAILABLE
-                if ($kernel32::IsProcessorFeaturePresent(41)) {
-                    return $out + '-v4'
+    $system = & {
+        switch -Exact ([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture) {
+            'Arm64' { return 'arm64' }
+            'X64' {
+                $out = '64bit'
+                $kernel32 = Add-Type -MemberDefinition '[DllImport("kernel32.dll")] public static extern bool IsProcessorFeaturePresent(int ProcessorFeature);' -Name 'Kernel32' -Namespace 'Win32' -PassThru
+                return & {
+                    # PF_AVX512F_INSTRUCTIONS_AVAILABLE
+                    if ($kernel32::IsProcessorFeaturePresent(41)) {
+                        return $out + '-v4'
+                    }
+                    # PF_AVX2_INSTRUCTIONS_AVAILABLE
+                    if ($kernel32::IsProcessorFeaturePresent(40)) {
+                        return $out + '-v3'
+                    }
+                    # PF_SSE4_2_INSTRUCTIONS_AVAILABLE
+                    if ($kernel32::IsProcessorFeaturePresent(38)) {
+                        return $out + '-v2'
+                    }
+                    return $out
                 }
-                # PF_AVX2_INSTRUCTIONS_AVAILABLE
-                if ($kernel32::IsProcessorFeaturePresent(40)) {
-                    return $out + '-v3'
-                }
-                # PF_SSE4_2_INSTRUCTIONS_AVAILABLE
-                if ($kernel32::IsProcessorFeaturePresent(38)) {
-                    return $out + '-v2'
-                }
-                return $out
             }
+            'X32' { return '32bit' }
         }
-        'X32' { return '32bit' }
     }
     if ($null -eq $arch) {
         $arch = $system
