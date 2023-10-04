@@ -552,13 +552,13 @@
                     "$ref": "#/definitions/architecture"
                 },
                 "64bit-v2": {
-                    "$ref": "#/definitions/autoupdateArch"
+                    "$ref": "#/definitions/architecture"
                 },
                 "64bit-v3": {
-                    "$ref": "#/definitions/autoupdateArch"
+                    "$ref": "#/definitions/architecture"
                 },
                 "64bit-v4": {
-                    "$ref": "#/definitions/autoupdateArch"
+                    "$ref": "#/definitions/architecture"
                 },
                 "arm64": {
                     "$ref": "#/definitions/architecture"
