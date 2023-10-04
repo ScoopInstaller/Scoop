@@ -1047,15 +1047,15 @@ function Get-DefaultArchitecture {
             return & {
                 # PF_AVX512F_INSTRUCTIONS_AVAILABLE
                 if ($kernel32::IsProcessorFeaturePresent(41)) {
-                    return $out += '-v4'
+                    return $out + '-v4'
                 }
                 # PF_AVX2_INSTRUCTIONS_AVAILABLE
                 if ($kernel32::IsProcessorFeaturePresent(40)) {
-                    return $out += '-v3'
+                    return $out + '-v3'
                 }
                 # PF_SSE4_2_INSTRUCTIONS_AVAILABLE
                 if ($kernel32::IsProcessorFeaturePresent(38)) {
-                    return $out += '-v2'
+                    return $out + '-v2'
                 }
                 return $out
             }
