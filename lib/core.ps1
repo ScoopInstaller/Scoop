@@ -1083,9 +1083,9 @@ function Format-ArchitectureString($Architecture) {
     }
     $Architecture = $Architecture.ToString().ToLower()
     switch ($Architecture) {
-        { ([System.Collections.Generic.HashSet[String]][string[]]@('avx512', 'amd64-v4', 'amd64_v4', 'x64-v4', 'x64_v4', 'x86_64-v4', 'x86-64_v4')).Contains($_) } { return '64bit-v4' }
-        { ([System.Collections.Generic.HashSet[String]][string[]]@('avx2', 'amd64-v3', 'amd64_v3', 'x64-v3', 'x64_v3', 'x86_64-v3', 'x86-64_v3')).Contains($_) } { return '64bit-v3' }
-        { ([System.Collections.Generic.HashSet[String]][string[]]@('sse4.2', 'sse4_2', 'sse4-2', 'amd64-v2', 'amd64_v2', 'x64-v2', 'x64_v2', 'x86_64-v2', 'x86-64_v2')).Contains($_) } { return '64bit-v2' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('64bit-v4', '64bit_v4', 'avx512', 'amd64-v4', 'amd64_v4', 'x64-v4', 'x64_v4', 'x86_64-v4', 'x86-64_v4')).Contains($_) } { return '64bit-v4' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('64bit-v3', '64bit_v3', 'avx2', 'amd64-v3', 'amd64_v3', 'x64-v3', 'x64_v3', 'x86_64-v3', 'x86-64_v3')).Contains($_) } { return '64bit-v3' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('64bit-v2', '64bit_v2', 'sse4.2', 'sse4_2', 'sse4-2', 'amd64-v2', 'amd64_v2', 'x64-v2', 'x64_v2', 'x86_64-v2', 'x86-64_v2')).Contains($_) } { return '64bit-v2' }
         { ([System.Collections.Generic.HashSet[String]][string[]]@('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64')).Contains($_) } { return '64bit' }
         { ([System.Collections.Generic.HashSet[String]][string[]]@('32bit', '32', 'x86', 'i386', '386', 'i686')).Contains($_) } { return '32bit' }
         { ([System.Collections.Generic.HashSet[String]][string[]]@('arm64', 'arm', 'aarch64')).Contains($_) } { return 'arm64' }
