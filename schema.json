@@ -225,6 +225,15 @@
                         "64bit": {
                             "$ref": "#/definitions/autoupdateArch"
                         },
+                        "64bit-v2": {
+                            "$ref": "#/definitions/autoupdateArch"
+                        },
+                        "64bit-v3": {
+                            "$ref": "#/definitions/autoupdateArch"
+                        },
+                        "64bit-v4": {
+                            "$ref": "#/definitions/autoupdateArch"
+                        },
                         "arm64": {
                             "$ref": "#/definitions/autoupdateArch"
                         }
@@ -543,6 +552,15 @@
                 "64bit": {
                     "$ref": "#/definitions/architecture"
                 },
+                "64bit-v2": {
+                    "$ref": "#/definitions/autoupdateArch"
+                },
+                "64bit-v3": {
+                    "$ref": "#/definitions/autoupdateArch"
+                },
+                "64bit-v4": {
+                    "$ref": "#/definitions/autoupdateArch"
+                },
                 "arm64": {
                     "$ref": "#/definitions/architecture"
                 }
@@ -652,6 +670,21 @@
             "architecture": {
                 "properties": {
                     "64bit": {
+                        "properties": {
+                            "url": false
+                        }
+                    },
+                    "64bit-v2": {
+                        "properties": {
+                            "url": false
+                        }
+                    },
+                    "64bit-v3": {
+                        "properties": {
+                            "url": false
+                        }
+                    },
+                    "64bit-v4": {
                         "properties": {
                             "url": false
                         }
