@@ -367,6 +367,8 @@ Describe 'Format Architecture String' -Tag 'Scoop' {
         Format-ArchitectureString '386' | Should -Be '32bit'
         Format-ArchitectureString 'i686' | Should -Be '32bit'
 
+        Format-ArchitectureString '64bit-v4' | Should -Be '64bit-v4'
+        Format-ArchitectureString '64bit_v4' | Should -Be '64bit-v4'
         Format-ArchitectureString 'avx512' | Should -Be '64bit-v4'
         Format-ArchitectureString 'amd64-v4' | Should -Be '64bit-v4'
         Format-ArchitectureString 'amd64_v4' | Should -Be '64bit-v4'
@@ -375,6 +377,8 @@ Describe 'Format Architecture String' -Tag 'Scoop' {
         Format-ArchitectureString 'x86_64-v4' | Should -Be '64bit-v4'
         Format-ArchitectureString 'x86-64_v4' | Should -Be '64bit-v4'
 
+        Format-ArchitectureString '64bit_v3' | Should -Be '64bit-v3'
+        Format-ArchitectureString '64bit_v3' | Should -Be '64bit-v3'
         Format-ArchitectureString 'avx2' | Should -Be '64bit-v3'
         Format-ArchitectureString 'amd64-v3' | Should -Be '64bit-v3'
         Format-ArchitectureString 'amd64_v3' | Should -Be '64bit-v3'
@@ -383,6 +387,8 @@ Describe 'Format Architecture String' -Tag 'Scoop' {
         Format-ArchitectureString 'x86_64-v3' | Should -Be '64bit-v3'
         Format-ArchitectureString 'x86-64_v3' | Should -Be '64bit-v3'
 
+        Format-ArchitectureString '64bit-v2' | Should -Be '64bit-v2'
+        Format-ArchitectureString '64bit_v2' | Should -Be '64bit-v2'
         Format-ArchitectureString 'sse4.2' | Should -Be '64bit-v2'
         Format-ArchitectureString 'sse4_2' | Should -Be '64bit-v2'
         Format-ArchitectureString 'sse4-2' | Should -Be '64bit-v2'
