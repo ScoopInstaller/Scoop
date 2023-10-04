@@ -125,7 +125,7 @@ function Get-SupportedArchitecture($manifest, $architecture) {
             }
         } elseif ($architecture[-3] -eq '-') {
             $success = $false
-            for ($i = $architecture[-1] - [byte][char]'0'; $i > 1; --$i) {
+            for ($i = $architecture[-1] - [byte][char]'0'; $i -gt 1; --$i) {
                 $testArch = "64bit-v$i"
                 if ($manifest.architecture.$testArch) {
                     $success = $true
