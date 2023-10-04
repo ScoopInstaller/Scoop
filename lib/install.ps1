@@ -1185,7 +1185,7 @@ function unlink_persist_data($manifest, $dir) {
     if ($persist) {
         @($persist) | ForEach-Object {
             $source, $null = persist_def $_
-            $source = Get-Item "$dir\$source"
+            $source = Get-Item "$dir\$source" -ErrorAction SilentlyContinue
             if ($source.LinkType) {
                 $source_path = $source.FullName
                 # directory (junction)
