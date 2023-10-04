@@ -25,7 +25,7 @@
 #   -k, --no-cache                  Don't use the download cache
 #   -s, --skip-hash-check           Skip hash validation (use with caution!)
 #   -u, --no-update-scoop           Don't update Scoop before installing if it's outdated
-#   -a, --arch <32bit|64bit|arm64>  Use the specified architecture, if the app supports it
+#   -a, --arch <32bit|64bit-v4|64bit-v3|64bit-v2|64bit|arm64>  Use the specified architecture, if the app supports it
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' 'manifest.ps1' (indirectly)

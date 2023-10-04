@@ -1039,12 +1039,28 @@ function get_shim_path() {
 
 function Get-DefaultArchitecture {
     $arch = get_config DEFAULT_ARCHITECTURE
-    $system = if (${env:ProgramFiles(Arm)}) {
-        'arm64'
-    } elseif ([System.Environment]::Is64BitOperatingSystem) {
-        '64bit'
-    } else {
-        '32bit'
+    $system = switch -Exact ([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture) {
+        'Arm64' { return 'arm64' }
+        'X64' {
+            $out = '64bit'
+            $kernel32 = Add-Type -MemberDefinition '[DllImport("kernel32.dll")] public static extern bool IsProcessorFeaturePresent(int ProcessorFeature);' -Name 'Kernel32' -Namespace 'Win32' -PassThru
+            return & {
+                # PF_AVX512F_INSTRUCTIONS_AVAILABLE
+                if ($kernel32::IsProcessorFeaturePresent(41)) {
+                    return $out += '-v4'
+                }
+                # PF_AVX2_INSTRUCTIONS_AVAILABLE
+                if ($kernel32::IsProcessorFeaturePresent(40)) {
+                    return $out += '-v3'
+                }
+                # PF_SSE4_2_INSTRUCTIONS_AVAILABLE
+                if ($kernel32::IsProcessorFeaturePresent(38)) {
+                    return $out += '-v2'
+                }
+                return $out
+            }
+        }
+        'X32' { return '32bit' }
     }
     if ($null -eq $arch) {
         $arch = $system
@@ -1065,9 +1081,12 @@ function Format-ArchitectureString($Architecture) {
     }
     $Architecture = $Architecture.ToString().ToLower()
     switch ($Architecture) {
-        { @('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64') -contains $_ } { return '64bit' }
-        { @('32bit', '32', 'x86', 'i386', '386', 'i686') -contains $_ } { return '32bit' }
-        { @('arm64', 'arm', 'aarch64') -contains $_ } { return 'arm64' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('avx512', 'amd64-v4', 'amd64_v4', 'x64-v4', 'x64_v4', 'x86_64-v4', 'x86-64_v4')).Contains($_) } { return '64bit-v4' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('avx2', 'amd64-v3', 'amd64_v3', 'x64-v3', 'x64_v3', 'x86_64-v3', 'x86-64_v3')).Contains($_) } { return '64bit-v3' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('sse4.2', 'sse4_2', 'sse4-2', 'amd64-v2', 'amd64_v2', 'x64-v2', 'x64_v2', 'x86_64-v2', 'x86-64_v2')).Contains($_) } { return '64bit-v2' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('64bit', '64', 'x64', 'amd64', 'x86_64', 'x86-64')).Contains($_) } { return '64bit' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('32bit', '32', 'x86', 'i386', '386', 'i686')).Contains($_) } { return '32bit' }
+        { ([System.Collections.Generic.HashSet[String]][string[]]@('arm64', 'arm', 'aarch64')).Contains($_) } { return 'arm64' }
         default { throw [System.ArgumentException] "Invalid architecture: '$Architecture'" }
     }
 }
