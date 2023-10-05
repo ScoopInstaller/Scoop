@@ -27,6 +27,7 @@
 - **shim:** Use bash executable directly ([#5433](https://github.com/ScoopInstaller/Scoop/issues/5433))
 - **core:** Avoid error messages when deleting non-existent environment variable ([#5547](https://github.com/ScoopInstaller/Scoop/issues/5547))
 - **core:** Use relative path as fallback of `$scoopdir` ([#5544](https://github.com/ScoopInstaller/Scoop/issues/5544))
+- **core:** Fix detection of Git ([#5545](https://github.com/ScoopInstaller/Scoop/issues/5545))
 - **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
 - **buckets:** Avoid error messages for unexpected dir ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5549))
 - **scoop-virustotal:** Fix `scoop-virustotal` when `--all` has been passed without app ([#5593](https://github.com/ScoopInstaller/Scoop/pull/5593))

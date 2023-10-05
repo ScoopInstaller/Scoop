@@ -402,7 +402,7 @@ Function Test-CommandAvailable {
 }
 
 Function Test-GitAvailable {
-    Return [Boolean](Test-Path (Get-HelperPath -Helper Git) -ErrorAction Ignore)
+    return [Boolean](Get-HelperPath -Helper Git)
 }
 
 function Get-HelperPath {
@@ -420,8 +420,8 @@ function Get-HelperPath {
     process {
         switch ($Helper) {
             'Git' {
-                $internalgit = "$(versiondir 'git' 'current')\mingw64\bin\git.exe"
-                if (Test-Path $internalgit) {
+                $internalgit = (Get-AppFilePath 'git' 'mingw64\bin\git.exe'), (Get-AppFilePath 'git' 'mingw32\bin\git.exe') | Where-Object { $_ -ne $null }
+                if ($internalgit) {
                     $HelperPath = $internalgit
                 } else {
                     $HelperPath = (Get-Command git -ErrorAction Ignore).Source
