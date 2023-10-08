@@ -89,7 +89,7 @@ function Sync-Scoop {
                 Rename-Item $newdir 'current' -ErrorAction Stop
             } catch {
                 Write-Warning $_
-                abort "Scoop update failed. Folder in use. Paste $newdir into $currentdir."
+                abort "Scoop update failed. Folder in use. Please rename folders $currentdir to ``old`` and $newdir to ``current``."
             }
         }
     } else {
