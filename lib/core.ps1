@@ -883,10 +883,10 @@ function shim($path, $global, $name, $arg) {
     $shim = "$abs_shimdir\$($name.tolower())"
 
     # convert to relative path
-    Push-Location $abs_shimdir
-    $relative_path = Resolve-Path -Relative $path
-    Pop-Location
     $resolved_path = Convert-Path $path
+    Push-Location $abs_shimdir
+    $relative_path = Resolve-Path -Relative $resolved_path
+    Pop-Location
 
     if ($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
