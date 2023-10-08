@@ -24,6 +24,7 @@
 - **shim:** Use bash executable directly ([#5433](https://github.com/ScoopInstaller/Scoop/issues/5433))
 - **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519]https://github.com/ScoopInstaller/Scoop/issues/5519)
 - **buckets:** Avoid error messages for unexpected dir ([#5549]https://github.com/ScoopInstaller/Scoop/issues/5549)
+- **manifest:** Correct source of manifest ([#5575](https://github.com/ScoopInstaller/Scoop/issues/5575))
 
 ### Performance Improvements
 
