@@ -82,7 +82,7 @@ function Get-ShimInfo($ShimPath) {
 function Get-ShimPath($ShimName, $Global) {
     '.shim', '.ps1' | ForEach-Object {
         $shimPath = Join-Path (shimdir $Global) "$ShimName$_"
-        if (Test-Path $shimPath) {
+        if (Test-Path -LiteralPath $shimPath) {
             return $shimPath
         }
     }
