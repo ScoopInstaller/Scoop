@@ -26,6 +26,10 @@ function Invoke-WindowsDefenderCheck($global) {
     return $true
 }
 
+function Test-MainBucketAvailable {
+    return ((Get-LocalBucket) -contains 'main')
+}
+
 function Invoke-MainBucketCheck {
     if (!(Test-MainBucketAvailable)) {
         warn 'Main bucket is not added.'
@@ -35,6 +39,18 @@ function Invoke-MainBucketCheck {
     }
 
     return $true
+}
+
+function Test-WindowsLongPathsSupported {
+    return !([System.Environment]::OSVersion.Version.Major -lt 10 -or [System.Environment]::OSVersion.Version.Build -lt 1607)
+}
+
+function Test-WindowsLongPathsEnabled {
+    return ((Get-ItemProperty `
+        -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' `
+        -Name 'LongPathsEnabled' `
+        -ErrorAction SilentlyContinue
+    ).LongPathsEnabled -eq 1)
 }
 
 function Invoke-LongPathsCheck {
@@ -54,6 +70,13 @@ function Invoke-LongPathsCheck {
     return $true
 }
 
+function Test-WindowsDeveloperModeEnabled {
+    return ((Get-ItemProperty `
+        -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' `
+        -Name 'AllowDevelopmentWithoutDevLicense' `
+        -ErrorAction SilentlyContinue).AllowDevelopmentWithoutDevLicense -eq 1)
+}
+
 function Invoke-WindowsDeveloperModeCheck {
     if (!(Test-WindowsDeveloperModeEnabled)) {
         warn "Windows Developer Mode is not enabled. Operations relevant to symlinks may fail without proper rights."
@@ -64,29 +87,6 @@ function Invoke-WindowsDeveloperModeCheck {
 
     return $true
 }
-function Test-MainBucketAvailable {
-    return ((Get-LocalBucket) -contains 'main')
-}
-
-function Test-WindowsLongPathsSupported {
-    return !([System.Environment]::OSVersion.Version.Major -lt 10 -or [System.Environment]::OSVersion.Version.Build -lt 1607)
-}
-
-function Test-WindowsLongPathsEnabled {
-    return ((Get-ItemProperty `
-        -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' `
-        -Name 'LongPathsEnabled' `
-        -ErrorAction SilentlyContinue
-    ).LongPathsEnabled -eq 1)
-}
-
-function Test-WindowsDeveloperModeEnabled {
-    return ((Get-ItemProperty `
-        -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' `
-        -Name 'AllowDevelopmentWithoutDevLicense' `
-        -ErrorAction SilentlyContinue).AllowDevelopmentWithoutDevLicense -eq 1)
-}
-
 
 function Show-Value {
     [CmdletBinding()]
