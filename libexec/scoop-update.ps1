@@ -346,7 +346,7 @@ if (-not ($apps -or $all)) {
     set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
-    if ($global -and !(is_admin)) {
+    if ($global -and !(Test-IsAdmin)) {
         'ERROR: You need admin rights to update global apps.'; exit 1
     }
 

@@ -253,9 +253,14 @@ function format($str, $hash) {
     $executionContext.invokeCommand.expandString($str)
 }
 function is_admin {
+    Show-DeprecatedWarning $MyInvocation 'Test-IsAdmin'
     $admin = [security.principal.windowsbuiltinrole]::administrator
     $id = [security.principal.windowsidentity]::getcurrent()
     ([security.principal.windowsprincipal]($id)).isinrole($admin)
+}
+
+function Test-IsAdmin {
+    return ([System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
 # messages

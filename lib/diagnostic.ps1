@@ -173,7 +173,7 @@ function Show-Diag {
     Show-Value -Color:$Color -Name 'Version' -Value $PSversionTable.PSVersion.ToString()
     Show-Value -Color:$Color -Name 'Edition' -Value $PSversionTable.PSEdition
     Show-Value -Color:$Color -Name 'Architecture' -Value (Get-DefaultArchitecture)
-    Show-Value -Color:$Color -Name 'RunAsAdmin' -Value (is_admin)
+    Show-Value -Color:$Color -Name 'RunAsAdmin' -Value (Test-IsAdmin)
     Show-Value -Color:$Color -Name 'Parent' -Value (Get-ParentProcess)
 
     Show-Header -Color:$Color -Value 'Helpers'

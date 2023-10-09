@@ -8,9 +8,9 @@
 $issues = 0
 $defenderIssues = 0
 
-$adminPrivileges = ([System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
-if ($adminPrivileges -and $env:USERNAME -ne 'WDAGUtilityAccount') {
+
+if (Test-IsAdmin -and $env:USERNAME -ne 'WDAGUtilityAccount') {
     $defenderIssues += !(check_windows_defender $false)
     $defenderIssues += !(check_windows_defender $true)
 }

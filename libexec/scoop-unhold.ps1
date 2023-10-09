@@ -24,7 +24,7 @@ if (!$apps) {
     exit 1
 }
 
-if ($global -and !(is_admin)) {
+if ($global -and !(Test-IsAdmin)) {
     error 'You need admin rights to unhold a global app.'
     exit 1
 }
