@@ -41,13 +41,19 @@ function do_uninstall($app, $global) {
     $architecture = $install.architecture
 
     Write-Output "Uninstalling '$app'"
+
+    Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+
     run_uninstaller $manifest $architecture $dir
     rm_shims $app $manifest $global $architecture
+    rm_startmenu_shortcuts $manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Othewise it will just be the version
     # directory.
-    $refdir = unlink_current (appdir $app $global)
+    $refdir = unlink_current $dir
+
+    uninstall_psmodule $manifest $refdir $global
 
     env_rm_path $manifest $refdir $global $architecture
     env_rm $manifest $global $architecture
@@ -59,6 +65,8 @@ function do_uninstall($app, $global) {
         $errors = $true
         warn "Couldn't remove $(friendly_path $appdir): $_.Exception"
     }
+
+    Invoke-HookScript -HookType 'post_uninstall' -Manifest $manifest -Arch $architecture
 }
 
 function rm_dir($dir) {
@@ -99,6 +107,6 @@ if ($purge) {
 }
 
 remove_from_path (shimdir $false)
-if ($global) { remove_from_path (shimdir $true) }
+if ($global) { remove_from_path (shimdir $true) $true }
 
 success 'Scoop has been uninstalled.'
