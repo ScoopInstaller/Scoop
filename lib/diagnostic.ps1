@@ -3,7 +3,7 @@ Diagnostic tests.
 Return $true if the test passed, otherwise $false.
 Use 'warn' to highlight the issue, and follow up with the recommended actions to rectify.
 #>
-function check_windows_defender($global) {
+function Invoke-WindowsDefenderCheck($global) {
     $defender = Get-Service -Name WinDefend -ErrorAction SilentlyContinue
     if (Test-CommandAvailable Get-MpPreference) {
         if ((Get-MpPreference).DisableRealtimeMonitoring) { return $true }
@@ -26,8 +26,8 @@ function check_windows_defender($global) {
     return $true
 }
 
-function check_main_bucket {
-    if ((Get-LocalBucket) -notcontains 'main') {
+function Invoke-MainBucketCheck {
+    if (!(Test-MainBucketAvailable)) {
         warn 'Main bucket is not added.'
         Write-Host "  run 'scoop bucket add main'"
 
@@ -37,13 +37,13 @@ function check_main_bucket {
     return $true
 }
 
-function check_long_paths {
-    if ([System.Environment]::OSVersion.Version.Major -lt 10 -or [System.Environment]::OSVersion.Version.Build -lt 1607) {
+function Invoke-LongPathsCheck {
+    if (!(Test-WindowsLongPathsSupported)) {
         warn 'This version of Windows does not support configuration of LongPaths.'
         return $false
     }
-    $key = Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -ErrorAction SilentlyContinue -Name 'LongPathsEnabled'
-    if (!$key -or ($key.LongPathsEnabled -eq 0)) {
+
+    if (!(Test-WindowsLongPathsEnabled)) {
         warn 'LongPaths support is not enabled.'
         Write-Host "  You can enable it by running:"
         Write-Host "    sudo Set-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -Value 1"
@@ -54,11 +54,8 @@ function check_long_paths {
     return $true
 }
 
-function Get-WindowsDeveloperModeStatus {
-    $DevModRegistryPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock"
-    if (!(Test-Path -Path $DevModRegistryPath) -or (Get-ItemProperty -Path `
-        $DevModRegistryPath -Name AllowDevelopmentWithoutDevLicense -ErrorAction `
-        SilentlyContinue).AllowDevelopmentWithoutDevLicense -ne 1) {
+function Invoke-WindowsDeveloperModeCheck {
+    if (!(Test-WindowsDeveloperModeEnabled)) {
         warn "Windows Developer Mode is not enabled. Operations relevant to symlinks may fail without proper rights."
         Write-Host "  You may read more about the symlinks support here:"
         Write-Host "  https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/"
@@ -66,6 +63,28 @@ function Get-WindowsDeveloperModeStatus {
     }
 
     return $true
+}
+function Test-MainBucketAvailable {
+    return ((Get-LocalBucket) -contains 'main')
+}
+
+function Test-WindowsLongPathsSupported {
+    return !([System.Environment]::OSVersion.Version.Major -lt 10 -or [System.Environment]::OSVersion.Version.Build -lt 1607)
+}
+
+function Test-WindowsLongPathsEnabled {
+    return ((Get-ItemProperty `
+        -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' `
+        -Name 'LongPathsEnabled' `
+        -ErrorAction SilentlyContinue
+    ).LongPathsEnabled -eq 1)
+}
+
+function Test-WindowsDeveloperModeEnabled {
+    return ((Get-ItemProperty `
+        -Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock' `
+        -Name 'AllowDevelopmentWithoutDevLicense' `
+        -ErrorAction SilentlyContinue).AllowDevelopmentWithoutDevLicense -eq 1)
 }
 
 
@@ -207,6 +226,13 @@ function Show-Diag {
     $scoopConfig.PSObject.Properties | ForEach-Object {
         Show-Value -Color:$Color -Name $_.Name -Value $_.Value -PadRight $pad -Redacted:($redactedConfigValues.Contains($_.Name))
     }
+
+    Show-Header -Color:$Color -Value 'Windows'
+    Show-Value -Color:$Color -Name 'Developer Mode' -PadRight 17 -Value (Test-WindowsDeveloperModeEnabled)
+    Show-Value -Color:$Color -Name 'LongPaths enabled' -PadRight 17 -Value (Test-WindowsLongPathsEnabled)
+    Show-Value -Color:$Color -Name 'ScoopDir Format' -PadRight 17 -Value ((New-Object System.IO.DriveInfo($scoopdir)).DriveFormat)
+    Show-Value -Color:$Color -Name 'GlobalDir Format' -PadRight 17 -Value ((New-Object System.IO.DriveInfo($globaldir)).DriveFormat)
+    Show-Value -Color:$Color -Name 'Windows Defender' -PadRight 17 -Value ((Get-Service -Name WinDefend -ErrorAction SilentlyContinue).Status)
 
     if ($Markdown) {
         Write-Output '```'
