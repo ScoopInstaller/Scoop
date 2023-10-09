@@ -12,7 +12,7 @@
 #
 # To list all shims or matching shims, use the 'list' subcommand:
 #
-#     scoop shim list [<shim_name>/<regex_pattern>...]
+#     scoop shim list [<regex_pattern>...]
 #
 # To show a shim's information, use the 'info' subcommand:
 #
