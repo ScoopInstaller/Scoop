@@ -20,17 +20,17 @@ $issues += !(check_long_paths)
 $issues += !(Get-WindowsDeveloperModeStatus)
 
 if (!(Test-HelperInstalled -Helper 7zip)) {
-    error "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip'."
+    warn "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip'."
     $issues++
 }
 
 if (!(Test-HelperInstalled -Helper Innounp)) {
-    error "'Inno Setup Unpacker' is not installed! It's required for unpacking InnoSetup files. Please run 'scoop install innounp'."
+    warn "'Inno Setup Unpacker' is not installed! It's required for unpacking InnoSetup files. Please run 'scoop install innounp'."
     $issues++
 }
 
 if (!(Test-HelperInstalled -Helper Dark)) {
-    error "'dark' is not installed! It's required for unpacking installers created with the WiX Toolset. Please run 'scoop install dark' or 'scoop install wixtoolset'."
+    warn "'dark' is not installed! It's required for unpacking installers created with the WiX Toolset. Please run 'scoop install dark' or 'scoop install wixtoolset'."
     $issues++
 }
 
