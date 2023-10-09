@@ -228,11 +228,12 @@ function Show-Diag {
     }
 
     Show-Header -Color:$Color -Value 'Windows'
-    Show-Value -Color:$Color -Name 'Developer Mode' -PadRight 17 -Value (Test-WindowsDeveloperModeEnabled)
-    Show-Value -Color:$Color -Name 'LongPaths enabled' -PadRight 17 -Value (Test-WindowsLongPathsEnabled)
-    Show-Value -Color:$Color -Name 'ScoopDir Format' -PadRight 17 -Value ((New-Object System.IO.DriveInfo($scoopdir)).DriveFormat)
-    Show-Value -Color:$Color -Name 'GlobalDir Format' -PadRight 17 -Value ((New-Object System.IO.DriveInfo($globaldir)).DriveFormat)
-    Show-Value -Color:$Color -Name 'Windows Defender' -PadRight 17 -Value ((Get-Service -Name WinDefend -ErrorAction SilentlyContinue).Status)
+    $pad = 16
+    Show-Value -Color:$Color -Name 'DeveloperMode' -PadRight $pad -Value (Test-WindowsDeveloperModeEnabled)
+    Show-Value -Color:$Color -Name 'LongPathsEnabled' -PadRight $pad -Value (Test-WindowsLongPathsEnabled)
+    Show-Value -Color:$Color -Name 'ScoopDirFormat' -PadRight $pad -Value ((New-Object System.IO.DriveInfo($scoopdir)).DriveFormat)
+    Show-Value -Color:$Color -Name 'GlobalDirFormat' -PadRight $pad -Value ((New-Object System.IO.DriveInfo($globaldir)).DriveFormat)
+    Show-Value -Color:$Color -Name 'WindowsDefender' -PadRight $pad -Value ((Get-Service -Name WinDefend -ErrorAction SilentlyContinue).Status)
 
     if ($Markdown) {
         Write-Output '```'
