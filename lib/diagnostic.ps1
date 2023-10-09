@@ -82,7 +82,9 @@ function Show-Value {
         [Switch]
         $Redacted,
         [Switch]
-        $Color
+        $Color,
+        [Int]
+        $PadRight = 12
     )
 
     if ([String]::IsNullOrEmpty($Value)) {
@@ -105,7 +107,7 @@ function Show-Value {
     $Value = "$Value".Replace($env:USERPROFILE, "$Green`$env:USERPROFILE$End")
     $Value = "$Value".Replace($env:USERNAME, "$Green<username>$End")
 
-    $Name = $Name.PadRight(12, ' ')
+    $Name = $Name.PadRight($PadRight, ' ')
 
     if ($Value -eq $True) {
         $Value = "$Green$Value$End"
@@ -172,8 +174,7 @@ function Show-Diag {
     Show-Value -Color:$Color -Name 'Edition' -Value $PSversionTable.PSEdition
     Show-Value -Color:$Color -Name 'Architecture' -Value (Get-DefaultArchitecture)
     Show-Value -Color:$Color -Name 'RunAsAdmin' -Value (is_admin)
-    $parent = Get-ParentProcess
-    Show-Value -Color:$Color -Name 'Parent' -Value $parent
+    Show-Value -Color:$Color -Name 'Parent' -Value (Get-ParentProcess)
 
     Show-Header -Color:$Color -Value 'Helpers'
     Show-Value -Color:$Color -Name 'GitPath' -Value (Get-HelperPath -Helper Git)
@@ -202,8 +203,9 @@ function Show-Diag {
     Show-Value -Color:$Color -Name 'GlobalDir' -Value $globaldir
 
     Show-Header -Color:$Color -Value 'Config'
+    $pad = ($scoopConfig.PSObject.Properties.Name | Measure-Object -Maximum -Property Length).Maximum
     $scoopConfig.PSObject.Properties | ForEach-Object {
-        Show-Value -Color:$Color -Name $_.Name -Value $_.Value -Redacted:($redactedConfigValues.Contains($_.Name))
+        Show-Value -Color:$Color -Name $_.Name -Value $_.Value -PadRight $pad -Redacted:($redactedConfigValues.Contains($_.Name))
     }
 
     if ($Markdown) {
