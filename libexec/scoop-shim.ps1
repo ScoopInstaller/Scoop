@@ -12,7 +12,7 @@
 #
 # To list all shims or matching shims, use the 'list' subcommand:
 #
-#     scoop shim list [<shim_name>/<pattern>...]
+#     scoop shim list [<regex_pattern>...]
 #
 # To show a shim's information, use the 'info' subcommand:
 #
@@ -144,7 +144,7 @@ switch ($SubCommand) {
         $other | ForEach-Object {
             try {
                 $pattern = $_
-                [Regex]::New($pattern)
+                [void][Regex]::New($pattern)
             } catch {
                 Write-Host "ERROR: Invalid pattern: " -ForegroundColor Red -NoNewline
                 Write-Host $pattern -ForegroundColor Magenta
