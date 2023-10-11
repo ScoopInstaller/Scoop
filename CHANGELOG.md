@@ -37,6 +37,7 @@
 - **scoop-update:** Change error message to a better instruction ([#5677](https://github.com/ScoopInstaller/Scoop/issues/5677))
 - **shim:** Check literal path in `Get-ShimPath` ([#5680](https://github.com/ScoopInstaller/Scoop/issues/5680))
 - **shim:** Avoid unexpected output of `list` subcommand ([#5681](https://github.com/ScoopInstaller/Scoop/issues/5681))
+- **scoop-reset:** Fix that `scoop reset` will abort when multiple apps are passed and a app is running ([#5687](https://github.com/ScoopInstaller/Scoop/issues/5687))
 
 ### Performance Improvements
 
