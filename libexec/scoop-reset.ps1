@@ -69,7 +69,7 @@ $apps | ForEach-Object {
 
     #region Workaround for #2952
     if (test_running_process $app $global) {
-        continue
+        return
     }
     #endregion Workaround for #2952
 
