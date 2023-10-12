@@ -43,7 +43,6 @@ function Set-PESubsystem($filePath, $targetSubsystem) {
         $binaryReader.Close()
         $fileStream.Close()
     }
-    
     return $true
 }
 
