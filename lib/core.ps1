@@ -21,7 +21,7 @@ function Get-PESubsystem($filePath) {
     }
 }
 
-function Change-PESubsystem($filePath, $targetSubsystem) {
+function Set-PESubsystem($filePath, $targetSubsystem) {
     try {
         $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
         $binaryReader = [System.IO.BinaryReader]::new($fileStream)
@@ -37,6 +37,7 @@ function Change-PESubsystem($filePath, $targetSubsystem) {
         $fileStream.Seek($fileHeaderOffset + 0x5C, [System.IO.SeekOrigin]::Begin) | Out-Null
 
         $binaryWriter.Write([System.Int16] $targetSubsystem)
+    } catch {
     } finally {
         $binaryReader.Close()
         $fileStream.Close()
@@ -892,7 +893,7 @@ function shim($path, $global, $name, $arg) {
         $target_subsystem = Get-PESubsystem $resolved_path
         if ($target_subsystem -eq 2) { # we only want to make shims GUI
             Write-Output "Making $shim.exe a GUI binary."
-            Change-PESubsystem "$shim.exe" $target_subsystem
+            Set-PESubsystem "$shim.exe" $target_subsystem
         }
     } elseif ($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
