@@ -37,7 +37,7 @@
 - **scoop-update:** Change error message to a better instruction ([#5677](https://github.com/ScoopInstaller/Scoop/issues/5677))
 - **shim:** Check literal path in `Get-ShimPath` ([#5680](https://github.com/ScoopInstaller/Scoop/issues/5680))
 - **shim:** Avoid unexpected output of `list` subcommand ([#5681](https://github.com/ScoopInstaller/Scoop/issues/5681))
-- **scoop** Do not call `scoop` externally from inside the code ([#5695](https://github.com/ScoopInstaller/Scoop/issues/5695))
+- **scoop:** Do not call `scoop` externally from inside the code ([#5695](https://github.com/ScoopInstaller/Scoop/issues/5695))
 
 ### Performance Improvements
 
