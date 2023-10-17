@@ -116,12 +116,12 @@ function Get-SupportedArchitecture($manifest, $architecture) {
             # Windows 10 enables existing unmodified x86 apps to run on Arm devices.
             # Windows 11 adds the ability to run unmodified x64 Windows apps on Arm devices!
             # Ref: https://learn.microsoft.com/en-us/windows/arm/overview
-            if ($WindowsBuild -ge 22000) {
+            $architecture = if ($WindowsBuild -ge 22000) {
                 # Windows 11
-                $architecture = '64bit'
+                '64bit'
             } else {
                 # Windows 10
-                $architecture = '32bit'
+                '32bit'
             }
         } elseif ($architecture[-3] -eq '-') {
             $success = $false
