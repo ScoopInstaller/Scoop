@@ -43,7 +43,7 @@ if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
         warn "Scoop is out of date."
     } else {
-        scoop update
+        & "$PSScriptRoot\scoop-update.ps1"
     }
 }
 

@@ -1,13 +1,8 @@
-# Returns the subsystem of the EXE
-function Get-Subsystem($filePath) {
+function Get-PESubsystem($filePath) {
     try {
         $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
         $binaryReader = [System.IO.BinaryReader]::new($fileStream)
-    } catch {
-        return -1  # leave the subsystem part silently
-    }
 
-    try {
         $fileStream.Seek(0x3C, [System.IO.SeekOrigin]::Begin) | Out-Null
         $peOffset = $binaryReader.ReadInt32()
 
@@ -18,23 +13,20 @@ function Get-Subsystem($filePath) {
         $fileStream.Seek($fileHeaderOffset + 0x5C, [System.IO.SeekOrigin]::Begin) | Out-Null
 
         return $binaryReader.ReadInt16()
+    } catch {
+        return -1
     } finally {
         $binaryReader.Close()
         $fileStream.Close()
     }
 }
 
-function Change-Subsystem($filePath, $targetSubsystem) {
+function Set-PESubsystem($filePath, $targetSubsystem) {
     try {
         $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
         $binaryReader = [System.IO.BinaryReader]::new($fileStream)
         $binaryWriter = [System.IO.BinaryWriter]::new($fileStream)
-    } catch {
-        Write-Output "Error opening File:'$filePath'"
-        return
-    }
 
-    try {
         $fileStream.Seek(0x3C, [System.IO.SeekOrigin]::Begin) | Out-Null
         $peOffset = $binaryReader.ReadInt32()
 
@@ -45,10 +37,13 @@ function Change-Subsystem($filePath, $targetSubsystem) {
         $fileStream.Seek($fileHeaderOffset + 0x5C, [System.IO.SeekOrigin]::Begin) | Out-Null
 
         $binaryWriter.Write([System.Int16] $targetSubsystem)
+    } catch {
+        return $false
     } finally {
         $binaryReader.Close()
         $fileStream.Close()
     }
+    return $true
 }
 
 function Optimize-SecurityProtocol {
@@ -897,11 +892,10 @@ function shim($path, $global, $name, $arg) {
             Write-Output "args = $arg" | Out-UTF8File "$shim.shim" -Append
         }
 
-        $target_subsystem = Get-Subsystem $resolved_path
-
-        if (($target_subsystem -ne 3) -and ($target_subsystem -ge 0)) { # Subsystem -eq 3 means `Console`, -ge 0 to ignore
+        $target_subsystem = Get-PESubsystem $resolved_path
+        if ($target_subsystem -eq 2) { # we only want to make shims GUI
             Write-Output "Making $shim.exe a GUI binary."
-            Change-Subsystem "$shim.exe" $target_subsystem
+            Set-PESubsystem "$shim.exe" $target_subsystem | Out-Null
         }
     } elseif ($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
