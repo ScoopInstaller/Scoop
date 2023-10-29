@@ -332,7 +332,9 @@ function Update-ManifestProperty {
                     $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
                 } else {
                     # Arch-spec
-                    $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
+                    $Manifest.architecture | Get-Member -MemberType NoteProperty | Where-Object {
+    $_.Name -eq (Get-DefaultArchitecture)
+} | ForEach-Object {
                         $arch = $_.Name
                         $newURL = substitute (arch_specific 'url' $Manifest.autoupdate $arch) $Substitutions
                         $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction (arch_specific 'hash' $Manifest.autoupdate $arch) -URL $newURL -Substitutions $Substitutions
@@ -352,7 +354,9 @@ function Update-ManifestProperty {
                 $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
             } elseif ($Manifest.architecture) {
                 # Update other property (arch-spec)
-                $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
+                $Manifest.architecture | Get-Member -MemberType NoteProperty | Where-Object {
+    $_.Name -eq (Get-DefaultArchitecture)
+} | ForEach-Object {
                     $arch = $_.Name
                     if ($Manifest.architecture.$arch.$currentProperty -and ($Manifest.autoupdate.architecture.$arch.$currentProperty -or $Manifest.autoupdate.$currentProperty)) {
                         $autoupdateProperty = @(arch_specific $currentProperty $Manifest.autoupdate $arch)
