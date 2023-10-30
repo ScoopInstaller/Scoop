@@ -39,13 +39,19 @@ if ($apps -eq 'scoop') {
     & "$PSScriptRoot\..\bin\uninstall.ps1" $global $purge
     exit
 }
-
+if ("$apps" -match '^(?:(?<bucket>[a-zA-Z0-9-_.]+)/)?(?<app>.*\.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?$') {
+    $version = $Matches['version']
+}
 $apps = Confirm-InstallationStatus $apps -Global:$global
 if (!$apps) { exit 0 }
 
 :app_loop foreach ($_ in $apps) {
     ($app, $global) = $_
-
+    if ($version) {
+        $dir = versiondir $app $version $global
+        &cmd.exe /c rd /q/s $dir
+        return
+    }
     $version = Select-CurrentVersion -AppName $app -Global:$global
     $appDir = appdir $app $global
     if ($version) {
