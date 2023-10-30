@@ -47,16 +47,17 @@ if (!$apps) { exit 0 }
 
 :app_loop foreach ($_ in $apps) {
     ($app, $global) = $_
-    if ($version) {
+    $oldVersions = @(Get-ChildItem $appDir -Name -Exclude "current,$version")
+    if ($version -and $oldVersions) {
         $dir = versiondir $app $version $global
         &cmd.exe /c rd /q/s $dir
+        &cmd.exe /c scoop reset $app
         return
     }
     $version = Select-CurrentVersion -AppName $app -Global:$global
     $appDir = appdir $app $global
     if ($version) {
         Write-Host "Uninstalling '$app' ($version)."
-
         $dir = versiondir $app $version $global
         $persist_dir = persistdir $app $global
 
