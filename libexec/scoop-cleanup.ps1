@@ -9,16 +9,18 @@
 #   -a, --all          Cleanup all apps (alternative to '*')
 #   -g, --global       Cleanup a globally installed app
 #   -k, --cache        Remove outdated download cache
+#   -p, --purge        Remove persistent data
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\install.ps1" # persist related
 
-$opt, $apps, $err = getopt $args 'agk' 'all', 'global', 'cache'
+$opt, $apps, $err = getopt $args 'agkp' 'all', 'global', 'cache', 'purge'
 if ($err) { "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
+$purge = $opt.p -or $opt.purge
 $all = $opt.a -or $opt.all
 
 if (!$apps -and !$all) { 'ERROR: <app> missing'; my_usage; exit 1 }
@@ -27,7 +29,14 @@ if ($global -and !(is_admin)) {
     'ERROR: you need admin rights to cleanup global apps'; exit 1
 }
 
-function cleanup($app, $global, $verbose, $cache) {
+function cleanup {
+    param(
+        [String]$app,
+        $global,
+        $verbose,
+        $cache
+    )
+
     $current_version = Select-CurrentVersion -AppName $app -Global:$global
     if ($cache) {
         Remove-Item "$cachedir\$app#*" -Exclude "$app#$current_version#*"
@@ -61,20 +70,34 @@ function cleanup($app, $global, $verbose, $cache) {
     Write-Host ''
 }
 
+$installedApps = @()
+$persistentApps = @()
+
 if ($apps -or $all) {
     if ($apps -eq '*' -or $all) {
         $verbose = $false
-        $apps = applist (installed_apps $false) $false
+        $installedApps = applist (installed_apps $false) $false
+        $persistentApps = applist (persistent_apps $false) $false
         if ($global) {
-            $apps += applist (installed_apps $true) $true
+            $installedApps += applist (installed_apps $true) $true
+            $persistentApps += applist (persistent_apps $true) $true
         }
     } else {
         $verbose = $true
-        $apps = Confirm-InstallationStatus $apps -Global:$global
+        $installedApps = Confirm-InstallationStatus $apps -Global:$global
+        $persistentApps = applist $apps $global
     }
 
-    # $apps is now a list of ($app, $global) tuples
-    $apps | ForEach-Object { cleanup @_ $verbose $cache }
+    # $installedApps is a list of ($app, $global) tuples
+    foreach ($_ in $installedApps) {
+        cleanup -app $_[0] -global $_[1] -verbose $verbose -cache $cache -purge $purge
+    }
+
+    if ($purge -and $persistentApps.Count -gt 0) {
+        foreach ($_ in $persistentApps) {
+            Remove-PersistentData -App $_[0] -Global $_[1]
+        }
+    }
 
     if ($cache) {
         Remove-Item "$cachedir\*.download" -ErrorAction Ignore

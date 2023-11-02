@@ -325,7 +325,14 @@ function currentdir($app, $global) {
     "$(appdir $app $global)\$version"
 }
 
-function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
+function persistdir($app, $global) {
+    $persistBaseDir = "$(basedir $global)\persist"
+    if ($app) {
+        return Join-Path $persistBaseDir $app
+    } else {
+        return $persistBaseDir
+    }
+}
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
@@ -1076,31 +1083,59 @@ function Confirm-InstallationStatus {
     )
     $Installed = @()
     $Apps | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
-        $App, $null, $null = parse_app $_
-        if ($Global) {
-            if (Test-Path (appdir $App $true)) {
-                $Installed += , @($App, $true)
-            } elseif (Test-Path (appdir $App $false)) {
-                error "'$App' isn't installed globally, but it may be installed locally."
-                warn "Try again without the --global (or -g) flag instead."
-            } else {
-                error "'$App' isn't installed."
-            }
+
+        $Status = Get-AppStatus -App $_ -Global $Global
+        $App = $Status.App;
+
+        if ($Status.Installed -and ($Global -eq $Status.Global)) {
+            # Add installed
+            $Installed += , @($App, $Global);
         } else {
-            if (Test-Path (appdir $App $false)) {
-                $Installed += , @($App, $false)
-            } elseif (Test-Path (appdir $App $true)) {
-                error "'$App' isn't installed locally, but it may be installed globally."
-                warn "Try again with the --global (or -g) flag instead."
+            if ($Status.Installed) {
+                if ($Status.Global) {
+                    error "'$App' isn't installed locally, but it may be installed globally."
+                    warn 'Try again with the --global (or -g) flag instead.'
+                } else {
+                    error "'$App' isn't installed globally, but it may be installed locally."
+                    warn 'Try again without the --global (or -g) flag instead.'
+                }
             } else {
                 error "'$App' isn't installed."
             }
         }
+
         if (failed $App $Global) {
             error "'$App' isn't installed correctly."
         }
     }
     return , $Installed
+}
+
+Function Get-AppStatus {
+    [OutputType([Object[]])]
+    param(
+        [String]$App,
+        [Switch]$Global
+    )
+    $App, $null, $null = parse_app $App
+    $IsInstalled = Test-Path (appdir $App $Global)
+
+    $Status = [PSCustomObject]@{
+        App       = $App
+        Installed = $IsInstalled
+        Global    = $Global
+    }
+
+    if (!$IsInstalled) {
+        # Check if installed somewhere else
+        $Global = !$Global;
+        $Status.Installed = Test-Path (appdir $App $Global);
+        if ($Status.Installed) {
+            $Status.Global = $Global
+        }
+    }
+
+    return $Status;
 }
 
 function strip_path($orig_path, $dir) {

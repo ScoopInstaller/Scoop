@@ -40,10 +40,22 @@ if ($apps -eq 'scoop') {
     exit
 }
 
-$apps = Confirm-InstallationStatus $apps -Global:$global
-if (!$apps) { exit 0 }
 
-:app_loop foreach ($_ in $apps) {
+$installedApps = Confirm-InstallationStatus $apps -Global:$global
+if (!$installedApps) {
+
+    if ($purge) {
+        # make it possible to remove persintent data of already uninstalled apps
+        :app_loop foreach ($_ in $apps) {
+            ($app, $global) = $_
+            Remove-PersistentData -App $app -Global:$global
+        }
+    }
+
+    exit 0
+}
+
+:app_loop foreach ($_ in $installedApps) {
     ($app, $global) = $_
 
     $version = Select-CurrentVersion -AppName $app -Global:$global
@@ -52,7 +64,6 @@ if (!$apps) { exit 0 }
         Write-Host "Uninstalling '$app' ($version)."
 
         $dir = versiondir $app $version $global
-        $persist_dir = persistdir $app $global
 
         $manifest = installed_manifest $app $version $global
         $install = install_info $app $version $global
@@ -128,19 +139,9 @@ if (!$apps) { exit 0 }
         }
     }
 
-    # purge persistant data
+    # purge persistent data
     if ($purge) {
-        Write-Host 'Removing persisted data.'
-        $persist_dir = persistdir $app $global
-
-        if (Test-Path $persist_dir) {
-            try {
-                Remove-Item $persist_dir -Recurse -Force -ErrorAction Stop
-            } catch {
-                error "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use."
-                continue
-            }
-        }
+        Remove-PersistentData -App $app -Global $global
     }
 
     success "'$app' was uninstalled."

@@ -1203,6 +1203,33 @@ function unlink_persist_data($manifest, $dir) {
     }
 }
 
+Function Remove-PersistentData {
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param(
+        [string]$App,
+        $Global
+    )
+
+    $Status = Get-AppStatus -App $App -Global:$Global
+    $App = $Status.App;
+
+    if (!$Status.Installed) {
+        # remove persistend data if app not installed
+        Write-Host 'Removing persisted data.'
+        $persistDir = persistdir $App $Global
+
+        if (Test-Path $persistDir) {
+            try {
+                Remove-Item $persistDir -Recurse -Force -ErrorAction Stop
+            } catch {
+                error "Couldn't remove '$(friendly_path $persistDir)'; it may be in use."
+                continue
+            }
+        }
+    }
+}
+
+
 # check whether write permission for Users usergroup is set to global persist dir, if not then set
 function persist_permission($manifest, $global) {
     if($global -and $manifest.persist -and (is_admin)) {
