@@ -67,10 +67,12 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     Invoke-HookScript -HookType 'post_install' -Manifest $manifest -Arch $architecture
 
-    foreach ($bucket in Get-LocalBucket) {
-        $manifest = manifest $app $bucket
-        if ($manifest) {
-            break
+    if (!$bucket) {
+        foreach ($bucket in Get-LocalBucket) {
+            $manifest = manifest $app $bucket
+            if ($manifest) {
+                break
+            }
         }
     }
     # save info for uninstall
