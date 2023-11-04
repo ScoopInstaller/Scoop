@@ -89,6 +89,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 }
 
 function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
+    $url = $url -replace "https://ghproxy.(com|net)/", ""
     $cached = fullpath (cache_path $app $version $url)
 
     if(!(test-path $cached) -or !$use_cache) {
@@ -189,8 +190,7 @@ function get_filename_from_metalink($file) {
 
 function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
     $data = @{}
-    $urls = @(script:url $manifest $architecture)
-
+    $urls = @(script:url $manifest $architecture) -replace "https://ghproxy.(com|net)/", ""
     # aria2 input file
     $urlstxt = Join-Path $cachedir "$app.txt"
     $urlstxt_content = ''
