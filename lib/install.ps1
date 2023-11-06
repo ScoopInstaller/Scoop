@@ -529,7 +529,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
     # we only want to show this warning once
     if (!$use_cache) { warn 'Cache is being ignored.' }
 
-    # can be multiple urls: if there are, then msi or installer should go last,
+    # can be multiple urls: if there are, then installer should go last,
     # so that $fname is set properly
     $urls = @(script:url $manifest $architecture)
 
@@ -595,12 +595,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                 $extract_fn = 'Expand-ZipArchive'
             }
         } elseif ($fname -match '\.msi$') {
-            # check manifest doesn't use deprecated install method
-            if (msi $manifest $architecture) {
-                warn 'MSI install is deprecated. If you maintain this manifest, please refer to the manifest reference docs.'
-            } else {
-                $extract_fn = 'Expand-MsiArchive'
-            }
+            $extract_fn = 'Expand-MsiArchive'
         } elseif (Test-ZstdRequirement -Uri $fname) {
             # Zstd first
             $extract_fn = 'Expand-ZstdArchive'
@@ -701,61 +696,13 @@ function args($config, $dir, $global) {
 }
 
 function run_installer($fname, $manifest, $architecture, $dir, $global) {
-    # MSI or other installer
-    $msi = msi $manifest $architecture
     $installer = installer $manifest $architecture
     if ($installer.script) {
         Write-Output 'Running installer script...'
         Invoke-Command ([scriptblock]::Create($installer.script -join "`r`n"))
         return
     }
-
-    if ($msi) {
-        install_msi $fname $dir $msi
-    } elseif ($installer) {
-        install_prog $fname $dir $installer $global
-    }
-}
-
-# deprecated (see also msi_installed)
-function install_msi($fname, $dir, $msi) {
-    $msifile = "$dir\$(coalesce $msi.file "$fname")"
-    if (!(is_in_dir $dir $msifile)) {
-        abort "Error in manifest: MSI file $msifile is outside the app directory."
-    }
-    if (!($msi.code)) { abort "Error in manifest: Couldn't find MSI code." }
-    if (msi_installed $msi.code) { abort 'The MSI package is already installed on this system.' }
-
-    $logfile = "$dir\install.log"
-
-    $arg = @("/i `"$msifile`"", '/norestart', "/lvp `"$logfile`"", "TARGETDIR=`"$dir`"",
-        "INSTALLDIR=`"$dir`"") + @(args $msi.args $dir)
-
-    if ($msi.silent) { $arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1' }
-    else { $arg += '/qb-!' }
-
-    $continue_exit_codes = @{ 3010 = 'a restart is required to complete installation' }
-
-    $installed = Invoke-ExternalCommand 'msiexec' $arg -Activity 'Running installer...' -ContinueExitCodes $continue_exit_codes
-    if (!$installed) {
-        abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
-    }
-    Remove-Item $logfile
-    Remove-Item $msifile
-}
-
-# deprecated
-# get-wmiobject win32_product is slow and checks integrity of each installed program,
-# so this uses the [wmi] type accelerator instead
-# http://blogs.technet.com/b/heyscriptingguy/archive/2011/12/14/use-powershell-to-find-and-uninstall-software.aspx
-function msi_installed($code) {
-    $path = "hklm:\software\microsoft\windows\currentversion\uninstall\$code"
-    if (!(Test-Path $path)) { return $false }
-    $key = Get-Item $path
-    $name = $key.getvalue('displayname')
-    $version = $key.getvalue('displayversion')
-    $classkey = "IdentifyingNumber=`"$code`",Name=`"$name`",Version=`"$version`""
-    try { $wmi = [wmi]"Win32_Product.$classkey"; $true } catch { $false }
+    install_prog $fname $dir $installer $global
 }
 
 function install_prog($fname, $dir, $installer, $global) {
@@ -781,7 +728,6 @@ function install_prog($fname, $dir, $installer, $global) {
 }
 
 function run_uninstaller($manifest, $architecture, $dir) {
-    $msi = msi $manifest $architecture
     $uninstaller = uninstaller $manifest $architecture
     $version = $manifest.version
     if ($uninstaller.script) {
@@ -790,39 +736,25 @@ function run_uninstaller($manifest, $architecture, $dir) {
         return
     }
 
-    if ($msi -or $uninstaller) {
-        $exe = $null; $arg = $null; $continue_exit_codes = @{}
-
-        if ($msi) {
-            $code = $msi.code
-            $exe = 'msiexec'
-            $arg = @('/norestart', "/x $code")
-            if ($msi.silent) {
-                $arg += '/qn', 'ALLUSERS=2', 'MSIINSTALLPERUSER=1'
-            } else {
-                $arg += '/qb-!'
-            }
-
-            $continue_exit_codes.1605 = 'not installed, skipping'
-            $continue_exit_codes.3010 = 'restart required'
-        } elseif ($uninstaller) {
-            $exe = "$dir\$($uninstaller.file)"
-            $arg = args $uninstaller.args
-            if (!(is_in_dir $dir $exe)) {
-                warn "Error in manifest: Installer $exe is outside the app directory, skipping."
-                $exe = $null
-            } elseif (!(Test-Path $exe)) {
-                warn "Uninstaller $exe is missing, skipping."
-                $exe = $null
-            }
+    if ($uninstaller.file) {
+        $exe = "$dir\$($uninstaller.file)"
+        $arg = args $uninstaller.args
+        if (!(is_in_dir $dir $exe)) {
+            warn "Error in manifest: Installer $exe is outside the app directory, skipping."
+            $exe = $null
+        } elseif (!(Test-Path $exe)) {
+            warn "Uninstaller $exe is missing, skipping."
+            $exe = $null
         }
 
         if ($exe) {
             if ($exe.endswith('.ps1')) {
                 & $exe @arg
             } else {
-                $uninstalled = Invoke-ExternalCommand $exe $arg -Activity 'Running uninstaller...' -ContinueExitCodes $continue_exit_codes
-                if (!$uninstalled) { abort 'Uninstallation aborted.' }
+                $uninstalled = Invoke-ExternalCommand $exe $arg -Activity 'Running uninstaller...'
+                if (!$uninstalled) {
+                    abort 'Uninstallation aborted.'
+                }
             }
         }
     }
