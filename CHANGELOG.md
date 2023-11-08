@@ -36,6 +36,11 @@
 - **scoop-(un)hold:** Correct output the messages when manifest not found, (already|not) held ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
 - **scoop-update:** Change error message to a better instruction ([#5677](https://github.com/ScoopInstaller/Scoop/issues/5677))
 - **decompress:** Remove unused parent dir w/ 'extract_dir' ([#5682](https://github.com/ScoopInstaller/Scoop/issues/5682))
+- **shim:** Check literal path in `Get-ShimPath` ([#5680](https://github.com/ScoopInstaller/Scoop/issues/5680))
+- **shim:** Avoid unexpected output of `list` subcommand ([#5681](https://github.com/ScoopInstaller/Scoop/issues/5681))
+- **scoop-reset:** Don't abort when multiple apps are passed and an app is running ([#5687](https://github.com/ScoopInstaller/Scoop/issues/5687))
+- **core:** Do not call `scoop` externally from inside the code ([#5695](https://github.com/ScoopInstaller/Scoop/issues/5695))
+- **scoop-checkup:** Don't throw 7zip error when external 7zip is used ([#5703](https://github.com/ScoopInstaller/Scoop/issues/5703))
 
 ### Performance Improvements
 
