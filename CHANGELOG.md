@@ -35,6 +35,7 @@
 - **scoop-checkup:** Change the message level of helpers from ERROR to WARN ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5614))
 - **scoop-(un)hold:** Correct output the messages when manifest not found, (already|not) held ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
 - **scoop-update:** Change error message to a better instruction ([#5677](https://github.com/ScoopInstaller/Scoop/issues/5677))
+- **decompress:** Remove unused parent dir w/ 'extract_dir' ([#5682](https://github.com/ScoopInstaller/Scoop/issues/5682))
 
 ### Performance Improvements
 
