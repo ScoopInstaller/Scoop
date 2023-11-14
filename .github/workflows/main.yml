@@ -14,9 +14,9 @@ jobs:
           git config --global user.name 'tianlong.jiang'
           git config --global user.email 'tianlong.jiang@foxmail.com'
           git config --global credential.helper store
-          git clone https://${{secrets.PAT_TOKEN}}@github.com/ScoopInstaller/Scoop.git tmp
+          git clone https://${{secrets.PAT_TOKEN}}@github.com/tianlongJ/Scoop.git tmp
           cd tmp
-          git remote add upstream https://${{secrets.PAT_TOKEN}}@github.com/tianlongJ/Scoop.git
+          git remote add upstream  https://${{secrets.PAT_TOKEN}}@github.com/ScoopInstaller/Scoop.git
           git fetch upstream
           git merge upstream/master
           git push origin master          
