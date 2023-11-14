@@ -1,0 +1,22 @@
+# .github/workflows/fetch.yml
+
+name: Merge upstream branches
+on:
+  schedule:
+    - cron: 0 0 15 * *
+  workflow_dispatch:
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge upstream
+        run: |
+          git config --global user.name 'tianlong.jiang'
+          git config --global user.email 'tianlong.jiang@foxmail.com'
+          git config --global credential.helper store
+          git clone https://${{ secrets.PAT_TOKEN }}@github.com/ScoopInstaller/Scoop.git tmp
+          cd tmp
+          git remote add upstream https://${{ secrets.PAT_TOKEN }}@github.com/tianlongJ/Scoop.git
+          git fetch upstream
+          git merge upstream/master
+          git push origin master          
