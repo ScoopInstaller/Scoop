@@ -1,11 +1,37 @@
+$bucket_manifest_files = @{}
+
+function get_app_key([string] $app) {
+    sanitary_path $app
+}
+
+function gen_bucket_cache([string] $bucket) {
+    $bucket_manifest_files[$bucket] = @{}
+    $bucket_dir = Find-BucketDirectory $bucket
+    $apps = apps_in_bucket $bucket_dir
+
+    foreach ($app in $apps) {
+        $app_key = get_app_key $app
+        $bucket_manifest_files[$bucket][$app_key] = Join-Path $bucket_dir "$($app_key).json"
+    }
+
+    $bucket_manifest_files[$bucket]
+}
+
 function manifest_path($app, $bucket) {
-    (Get-ChildItem (Find-BucketDirectory $bucket) -Filter "$(sanitary_path $app).json" -Recurse).FullName
+    $manifest_files = $bucket_manifest_files[$bucket]
+
+    if ($null -eq $manifest_files) {
+        $manifest_files = gen_bucket_cache $bucket
+    }
+
+    $manifest_files["$(get_app_key $app)"]
 }
 
 function parse_json($path) {
     if ($null -eq $path -or !(Test-Path $path)) { return $null }
     try {
-        Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+        $content = Get-Content $path -Raw -Encoding UTF8
+        ConvertFrom-Json -ErrorAction Stop -InputObject $content
     } catch {
         warn "Error parsing JSON at $path."
     }
@@ -70,7 +96,8 @@ function Get-Manifest($app) {
 
 function manifest($app, $bucket, $url) {
     if ($url) { return url_manifest $url }
-    parse_json (manifest_path $app $bucket)
+    $manifest_path = manifest_path $app $bucket
+    parse_json $manifest_path
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {

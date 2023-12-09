@@ -227,7 +227,16 @@ function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
 
 # apps
-function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
+$sanitary_path_cache = @{}
+
+function sanitary_path($path) {
+    if ($sanitary_path_cache.ContainsKey($path) -eq $false) {
+        $sanitary_path_cache[$path] = [regex]::replace($path, "[/\\?:*<>|]", "")
+    }
+
+    $sanitary_path_cache[$path]
+}
+
 function installed($app, [Nullable[bool]]$global) {
     if ($null -eq $global) {
         return (installed $app $false) -or (installed $app $true)

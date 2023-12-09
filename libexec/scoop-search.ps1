@@ -42,14 +42,19 @@ function search_bucket($bucket, $query) {
     if ($query) {
         $apps = $apps | Where-Object {
             if ($_.name -match $query) { return $true }
-            $bin = bin_match (manifest $_.name $bucket) $query
+            $manifest = manifest $_.name $bucket
+            $bin = bin_match $manifest $query
             if ($bin) {
                 $_.bin = $bin
                 return $true
             }
         }
     }
-    $apps | ForEach-Object { $_.version = (Get-LatestVersion -AppName $_.name -Bucket $bucket); $_ }
+
+    $apps | ForEach-Object {
+        $_.version = (Get-LatestVersion -AppName $_.name -Bucket $bucket);
+        $_
+    }
 }
 
 function download_json($url) {
@@ -111,6 +116,7 @@ function search_remotes($query) {
 
 Get-LocalBucket | ForEach-Object {
     $res = search_bucket $_ $query
+
     $local_results = $local_results -or $res
     if ($res) {
         $name = "$_"

@@ -1,5 +1,7 @@
 $bucketsdir = "$scoopdir\buckets"
 
+$cache = @{}
+
 function Find-BucketDirectory {
     <#
     .DESCRIPTION
@@ -15,6 +17,10 @@ function Find-BucketDirectory {
         [switch] $Root
     )
 
+    if ($cache.ContainsKey($Name)) {
+        return $cache[$Name]
+    }
+
     # Handle info passing empty string as bucket ($install.bucket)
     if (($null -eq $Name) -or ($Name -eq '')) {
         $Name = 'main'
@@ -24,6 +30,8 @@ function Find-BucketDirectory {
     if ((Test-Path "$bucket\bucket") -and !$Root) {
         $bucket = "$bucket\bucket"
     }
+
+    $cache[$Name] = $bucket
 
     return $bucket
 }
