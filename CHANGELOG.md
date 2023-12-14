@@ -40,6 +40,7 @@
 - **scoop-reset:** Don't abort when multiple apps are passed and an app is running ([#5687](https://github.com/ScoopInstaller/Scoop/issues/5687))
 - **core:** Do not call `scoop` externally from inside the code ([#5695](https://github.com/ScoopInstaller/Scoop/issues/5695))
 - **scoop-checkup:** Don't throw 7zip error when external 7zip is used ([#5703](https://github.com/ScoopInstaller/Scoop/issues/5703))
+- **install:** Limit HTTP redirects ([#5757](https://github.com/ScoopInstaller/Scoop/issues/5757))
 
 ### Performance Improvements
 

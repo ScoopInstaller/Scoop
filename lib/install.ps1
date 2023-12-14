@@ -1,3 +1,5 @@
+$MaxRedirectCount = 20
+
 function nightly_version($quiet = $false) {
     if (!$quiet) {
         warn "This is a nightly version. Downloaded files won't be verified."
@@ -355,7 +357,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
 }
 
 # download with filesize and progress indicator
-function Invoke-Download ($url, $to, $cookies, $progress) {
+function Invoke-Download ($url, $to, $cookies, $progress, $redirectCount = 0) {
     $reqUrl = ($url -split '#')[0]
     $wreq = [Net.WebRequest]::Create($reqUrl)
     if ($wreq -is [Net.HttpWebRequest]) {
@@ -396,6 +398,10 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
             throw $exc
         }
 
+        if ($redirectCount++ -ge $MaxRedirectCount) {
+            throw "Exceeded maximum redirect limit. Aborting."
+        }
+
         # Get the new location of the file
         if ((-not $redirectRes.Headers) -or ($redirectRes.Headers -notcontains 'Location')) {
             throw $exc
@@ -410,7 +416,7 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
             $newUrl = "$newUrl#/$postfix"
         }
 
-        Invoke-Download $newUrl $to $cookies $progress
+        Invoke-Download $newUrl $to $cookies $progress $redirectCount
         return
     }
 
