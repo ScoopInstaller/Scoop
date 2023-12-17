@@ -65,7 +65,12 @@ function Optimize-SecurityProtocol {
 
 function Get-Encoding($wc) {
     if ($null -ne $wc.ResponseHeaders -and $wc.ResponseHeaders['Content-Type'] -match 'charset=([^;]*)') {
-        return [System.Text.Encoding]::GetEncoding($Matches[1])
+        try{
+            return [System.Text.Encoding]::GetEncoding($Matches[1])
+        }
+        catch{
+            return [System.Text.Encoding]::GetEncoding('utf-8')
+        }
     } else {
         return [System.Text.Encoding]::GetEncoding('utf-8')
     }
