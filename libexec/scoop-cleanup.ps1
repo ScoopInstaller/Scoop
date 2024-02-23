@@ -23,7 +23,7 @@ $all = $opt.a -or $opt.all
 
 if (!$apps -and !$all) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
-if ($global -and !(is_admin)) {
+if ($global -and !(Test-IsAdmin)) {
     'ERROR: you need admin rights to cleanup global apps'; exit 1
 }
 

@@ -30,7 +30,7 @@ if (!$apps) {
     exit 1
 }
 
-if ($global -and !(is_admin)) {
+if ($global -and !(Test-IsAdmin)) {
     error 'You need admin rights to uninstall global apps.'
     exit 1
 }

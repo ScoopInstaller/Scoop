@@ -56,7 +56,7 @@ $apps | ForEach-Object {
         return
     }
 
-    if($global -and !(is_admin)) {
+    if($global -and !(Test-IsAdmin)) {
         warn "'$app' ($version) is a global app. You need admin rights to reset it. Skipping."
         return
     }

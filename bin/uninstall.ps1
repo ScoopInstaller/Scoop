@@ -17,7 +17,7 @@ param(
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 
-if ($global -and !(is_admin)) {
+if ($global -and !(Test-IsAdmin)) {
     error 'You need admin rights to uninstall globally.'
     exit 1
 }

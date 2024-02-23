@@ -8,16 +8,15 @@
 $issues = 0
 $defenderIssues = 0
 
-$adminPrivileges = ([System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
-if ($adminPrivileges -and $env:USERNAME -ne 'WDAGUtilityAccount') {
-    $defenderIssues += !(check_windows_defender $false)
-    $defenderIssues += !(check_windows_defender $true)
+if (Test-IsAdmin -and $env:USERNAME -ne 'WDAGUtilityAccount') {
+    $defenderIssues += !(Invoke-WindowsDefenderCheck $false)
+    $defenderIssues += !(Invoke-WindowsDefenderCheck $true)
 }
 
-$issues += !(check_main_bucket)
-$issues += !(check_long_paths)
-$issues += !(Get-WindowsDeveloperModeStatus)
+$issues += !(Invoke-MainBucketCheck)
+$issues += !(Invoke-LongPathsCheck)
+$issues += !(Invoke-WindowsDeveloperModeCheck)
 
 if (!(Test-HelperInstalled -Helper 7zip) -and !(get_config USE_EXTERNAL_7ZIP)) {
     warn "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip' or 'scoop install 7zip-zstd'."

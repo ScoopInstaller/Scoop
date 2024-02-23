@@ -48,7 +48,7 @@ try {
 
 if (!$apps) { error '<app> missing'; my_usage; exit 1 }
 
-if ($global -and !(is_admin)) {
+if ($global -and !(Test-IsAdmin)) {
     abort 'ERROR: you need admin rights to install global apps'
 }
 

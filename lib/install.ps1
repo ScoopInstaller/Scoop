@@ -1215,7 +1215,7 @@ function unlink_persist_data($manifest, $dir) {
 
 # check whether write permission for Users usergroup is set to global persist dir, if not then set
 function persist_permission($manifest, $global) {
-    if($global -and $manifest.persist -and (is_admin)) {
+    if($global -and $manifest.persist -and (Test-IsAdmin)) {
         $path = persistdir $null $global
         $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
         $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
