@@ -9,7 +9,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if(!$manifest) {
-        abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
+        abort "Couldn't find manifest for '$app'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
     }
 
     $version = $manifest.version
@@ -43,7 +43,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
             return
         }
     }
-    Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from $bucket bucket" })"
+    Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from '$bucket' bucket" } else { " from '$url'" })"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
