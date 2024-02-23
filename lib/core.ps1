@@ -592,65 +592,116 @@ function is_local($path) {
 # operations
 
 function run($exe, $arg, $msg, $continue_exit_codes) {
-    Show-DeprecatedWarning $MyInvocation 'Invoke-ExternalCommand'
-    Invoke-ExternalCommand -FilePath $exe -ArgumentList $arg -Activity $msg -ContinueExitCodes $continue_exit_codes
+    Show-DeprecatedWarning $MyInvocation 'Start-ExternalProcess'
+    Start-ExternalProcess -FilePath $exe -ArgumentList $arg -Prompt $msg -ContinueExitCodes $continue_exit_codes
 }
 
 function Invoke-ExternalCommand {
-    [CmdletBinding(DefaultParameterSetName = "Default")]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true,
-                   Position = 0)]
-        [Alias("Path")]
+        [Parameter(Mandatory = $true, Position = 0)]
+        [Alias('Path')]
         [ValidateNotNullOrEmpty()]
         [String]
         $FilePath,
         [Parameter(Position = 1)]
-        [Alias("Args")]
+        [Alias('Args')]
         [String[]]
         $ArgumentList,
-        [Parameter(ParameterSetName = "UseShellExecute")]
+        [Parameter(ParameterSetName = 'UseShellExecute')]
         [Switch]
         $RunAs,
-        [Parameter(ParameterSetName = "UseShellExecute")]
+        [Parameter(ParameterSetName = 'UseShellExecute')]
         [Switch]
         $Quiet,
-        [Alias("Msg")]
+        [Alias('Msg')]
         [String]
         $Activity,
-        [Alias("cec")]
+        [Alias('cec')]
         [Hashtable]
         $ContinueExitCodes,
-        [Parameter(ParameterSetName = "Default")]
-        [Alias("Log")]
+        [Parameter(ParameterSetName = 'Default')]
+        [Alias('Log')]
         [String]
         $LogPath
     )
-    if ($Activity) {
-        Write-Host "$Activity " -NoNewline
+    Show-DeprecatedWarning $MyInvocation 'Start-ExternalProcess'
+    if ($RunAs) {
+        Start-ExternalProcess -FilePath $FilePath -ArgumentList $ArgumentList -Prompt $Activity -ContinueExitCodes $ContinueExitCodes -RunAs -Quiet:$Quiet
+    } else {
+        Start-ExternalProcess -FilePath $FilePath -ArgumentList $ArgumentList -Prompt $Activity -ContinueExitCodes $ContinueExitCodes -LogName $LogPath
+    }
+}
+
+function Start-ExternalProcess {
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
+    [OutputType([Boolean])]
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [Alias('PSPath', 'Path')]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $FilePath,
+        [Parameter(Position = 1)]
+        [Alias('Args')]
+        [String[]]
+        $ArgumentList,
+        [Parameter(ParameterSetName = 'Default')]
+        [String]
+        $WorkingDirectory,
+        [Parameter(ParameterSetName = 'UseShellExecute')]
+        [Switch]
+        $RunAs,
+        [Parameter(ParameterSetName = 'UseShellExecute')]
+        [Switch]
+        $Quiet,
+        [Alias('Msg')]
+        [String]
+        $Prompt,
+        [Alias('cec')]
+        [Hashtable]
+        $ContinueExitCodes,
+        [Parameter(ParameterSetName = 'Default')]
+        [Alias('EnvVar')]
+        [Hashtable]
+        $EnvironmentVariables,
+        [Parameter(ParameterSetName = 'Default')]
+        [Alias('LogPath')]
+        [String]
+        $LogName
+    )
+    if ($Prompt) {
+        Write-Host "$Prompt " -NoNewline
     }
     $Process = New-Object System.Diagnostics.Process
     $Process.StartInfo.FileName = $FilePath
     $Process.StartInfo.UseShellExecute = $false
-    if ($LogPath) {
+    if ($LogName) {
         if ($FilePath -match '^msiexec(.exe)?$') {
-            $ArgumentList += "/lwe `"$LogPath`""
+            $ArgumentList += "/lwe `"$LogName`""
         } else {
             $redirectToLogFile = $true
-            $Process.StartInfo.RedirectStandardOutput = $true
-            $Process.StartInfo.RedirectStandardError = $true
         }
     }
     if ($RunAs) {
         $Process.StartInfo.UseShellExecute = $true
         $Process.StartInfo.Verb = 'RunAs'
+    } else {
+        $Process.StartInfo.RedirectStandardOutput = $true
+        $Process.StartInfo.RedirectStandardError = $true
+        if ($WorkingDirectory) {
+            $Process.StartInfo.WorkingDirectory = ensure $WorkingDirectory
+        }
     }
     if ($Quiet) {
         $Process.StartInfo.UseShellExecute = $true
         $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     }
-    if ($ArgumentList.Length -gt 0) {
+    if ($EnvironmentVariables) {
+        $EnvironmentVariables.GetEnumerator() | ForEach-Object { $Process.StartInfo.EnvironmentVariables.Add($_.Key, $_.Value) }
+    }
+    if ($ArgumentList) {
         if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
             $Process.StartInfo.Arguments = $ArgumentList -join ' '
         } elseif ($Process.StartInfo.ArgumentList.Add) {
@@ -676,40 +727,45 @@ function Invoke-ExternalCommand {
     try {
         [void]$Process.Start()
     } catch {
-        if ($Activity) {
-            Write-Host "error." -ForegroundColor DarkRed
+        if ($Prompt) {
+            Write-Host 'error.' -ForegroundColor DarkRed
         }
         error $_.Exception.Message
         return $false
     }
-    if ($redirectToLogFile) {
-        # we do this to remove a deadlock potential
-        # ref: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process.standardoutput?view=netframework-4.5#remarks
-        $stdoutTask = $Process.StandardOutput.ReadToEndAsync()
-        $stderrTask = $Process.StandardError.ReadToEndAsync()
-    }
+    # we do this to remove a deadlock potential
+    # ref: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process.standardoutput?view=netframework-4.5#remarks
+    $stdoutTask = $Process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $Process.StandardError.ReadToEndAsync()
     $Process.WaitForExit()
     if ($redirectToLogFile) {
-        Out-UTF8File -FilePath $LogPath -Append -InputObject $stdoutTask.Result
-        Out-UTF8File -FilePath $LogPath -Append -InputObject $stderrTask.Result
+        Out-UTF8File -FilePath $LogName -Append -InputObject $stdoutTask.Result.Trim()
+        Out-UTF8File -FilePath $LogName -Append -InputObject $stderrTask.Result.Trim()
+    } else {
+        if ($stdoutTask.Result) {
+            $stdoutTask.Result.Trim() | Out-Default
+        }
+        if ($stderrTask.Result) {
+            $stderrTask.Result.Trim() | Out-Default
+        }
     }
     if ($Process.ExitCode -ne 0) {
         if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
-            if ($Activity) {
-                Write-Host "done." -ForegroundColor DarkYellow
+            if ($Prompt) {
+                Write-Host 'done.' -ForegroundColor DarkYellow
             }
             warn $ContinueExitCodes[$Process.ExitCode]
             return $true
         } else {
-            if ($Activity) {
-                Write-Host "error." -ForegroundColor DarkRed
+            if ($Prompt) {
+                Write-Host 'error.' -ForegroundColor DarkRed
             }
             error "Exit code was $($Process.ExitCode)!"
             return $false
         }
     }
-    if ($Activity) {
-        Write-Host "done." -ForegroundColor Green
+    if ($Prompt) {
+        Write-Host 'done.' -ForegroundColor Green
     }
     return $true
 }
