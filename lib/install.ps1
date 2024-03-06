@@ -8,8 +8,8 @@ function nightly_version($quiet = $false) {
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
-    if(!$manifest) {
-        abort "Couldn't find manifest for '$app'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
+    if (!$manifest) {
+        abort "Couldn't find manifest for '$app'$(if ($bucket) { " from '$bucket' bucket" } elseif ($url) { " at '$url'" })."
     }
 
     $version = $manifest.version
@@ -108,9 +108,9 @@ function Start-Download ($url, $to, $cookies) {
     } catch {
         $e = $_.exception
         if ($e.Response.StatusCode -eq 'Unauthorized') {
-            warn "Token might be misconfigured."
+            warn 'Token might be misconfigured.'
         }
-        if($e.innerexception) { $e = $e.innerexception }
+        if ($e.innerexception) { $e = $e.innerexception }
         throw $e
     }
 }
@@ -253,7 +253,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 $try_url = handle_special_urls $url
             } catch {
                 if ($_.Exception.Response.StatusCode -eq 'Unauthorized') {
-                    warn "Token might be misconfigured."
+                    warn 'Token might be misconfigured.'
                 }
             }
             $urlstxt_content += "$try_url`n"
