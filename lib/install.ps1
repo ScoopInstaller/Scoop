@@ -8,8 +8,8 @@ function nightly_version($quiet = $false) {
 function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
-    if (!$manifest) {
-        abort "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
+    if(!$manifest) {
+        abort "Couldn't find manifest for '$app'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
     }
 
     $version = $manifest.version
@@ -43,7 +43,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
             return
         }
     }
-    Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from $bucket bucket" })"
+    Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from '$bucket' bucket" } else { " from '$url'" })"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
@@ -107,7 +107,10 @@ function Start-Download ($url, $to, $cookies) {
         Invoke-Download $url $to $cookies $progress
     } catch {
         $e = $_.exception
-        if ($e.innerexception) { $e = $e.innerexception }
+        if ($e.Response.StatusCode -eq 'Unauthorized') {
+            warn "Token might be misconfigured."
+        }
+        if($e.innerexception) { $e = $e.innerexception }
         throw $e
     }
 }
@@ -246,7 +249,14 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         } else {
             $download_finished = $false
             # create aria2 input file content
-            $urlstxt_content += "$(handle_special_urls $url)`n"
+            try {
+                $try_url = handle_special_urls $url
+            } catch {
+                if ($_.Exception.Response.StatusCode -eq 'Unauthorized') {
+                    warn "Token might be misconfigured."
+                }
+            }
+            $urlstxt_content += "$try_url`n"
             if (!$url.Contains('sourceforge.net')) {
                 $urlstxt_content += "    referer=$(strip_filename $url)`n"
             }
