@@ -52,7 +52,7 @@
 
 - **git:** Use Invoke-Git() with direct path to git.exe to prevent spawning shim subprocesses ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122), [#5375](https://github.com/ScoopInstaller/Scoop/issues/5375))
 - **scoop-download:** Output more detailed manifest information ([#5277](https://github.com/ScoopInstaller/Scoop/issues/5277))
-- **core:** Cleanup some old codes, e.g., msi section and config migration ([#5715](https://github.com/ScoopInstaller/Scoop/issues/5715))
+- **core:** Cleanup some old codes, e.g., msi section and config migration ([#5715](https://github.com/ScoopInstaller/Scoop/issues/5715), [#5824](https://github.com/ScoopInstaller/Scoop/issues/5824))
 
 ### Builds
 
