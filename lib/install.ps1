@@ -712,27 +712,23 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
         Invoke-Command ([scriptblock]::Create($installer.script -join "`r`n"))
         return
     }
-    install_prog $fname $dir $installer $global
-}
-
-function install_prog($fname, $dir, $installer, $global) {
-    $prog = "$dir\$(coalesce $installer.file "$fname")"
-    if (!(is_in_dir $dir $prog)) {
-        abort "Error in manifest: Installer $prog is outside the app directory."
-    }
-    $arg = @(args $installer.args $dir $global)
-
-    if ($prog.endswith('.ps1')) {
-        & $prog @arg
-    } else {
-        $installed = Invoke-ExternalCommand $prog $arg -Activity 'Running installer...'
-        if (!$installed) {
-            abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
+    if ($installer) {
+        $prog = "$dir\$(coalesce $installer.file "$fname")"
+        if (!(is_in_dir $dir $prog)) {
+            abort "Error in manifest: Installer $prog is outside the app directory."
         }
-
-        # Don't remove installer if "keep" flag is set to true
-        if (!($installer.keep -eq 'true')) {
-            Remove-Item $prog
+        $arg = @(args $installer.args $dir $global)
+        if ($prog.endswith('.ps1')) {
+            & $prog @arg
+        } else {
+            $installed = Invoke-ExternalCommand $prog $arg -Activity 'Running installer...'
+            if (!$installed) {
+                abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
+            }
+            # Don't remove installer if "keep" flag is set to true
+            if (!($installer.keep -eq 'true')) {
+                Remove-Item $prog
+            }
         }
     }
 }
@@ -747,21 +743,21 @@ function run_uninstaller($manifest, $architecture, $dir) {
     }
 
     if ($uninstaller.file) {
-        $exe = "$dir\$($uninstaller.file)"
+        $prog = "$dir\$($uninstaller.file)"
         $arg = args $uninstaller.args
-        if (!(is_in_dir $dir $exe)) {
-            warn "Error in manifest: Installer $exe is outside the app directory, skipping."
-            $exe = $null
-        } elseif (!(Test-Path $exe)) {
-            warn "Uninstaller $exe is missing, skipping."
-            $exe = $null
+        if (!(is_in_dir $dir $prog)) {
+            warn "Error in manifest: Installer $prog is outside the app directory, skipping."
+            $prog = $null
+        } elseif (!(Test-Path $prog)) {
+            warn "Uninstaller $prog is missing, skipping."
+            $prog = $null
         }
 
-        if ($exe) {
-            if ($exe.endswith('.ps1')) {
-                & $exe @arg
+        if ($prog) {
+            if ($prog.endswith('.ps1')) {
+                & $prog @arg
             } else {
-                $uninstalled = Invoke-ExternalCommand $exe $arg -Activity 'Running uninstaller...'
+                $uninstalled = Invoke-ExternalCommand $prog $arg -Activity 'Running uninstaller...'
                 if (!$uninstalled) {
                     abort 'Uninstallation aborted.'
                 }
