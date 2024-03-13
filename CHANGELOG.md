@@ -60,7 +60,8 @@
 
 ### Continuous Integration
 
-- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/pull/5377))
+- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/issues/5377))
+- **module:** Update 'psmodulecache' version to 'main' ([#5828](https://github.com/ScoopInstaller/Scoop/issues/5828))
 
 ### Tests
 
