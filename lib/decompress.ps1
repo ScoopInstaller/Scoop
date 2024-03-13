@@ -60,7 +60,7 @@ function Expand-7zipArchive {
     if (!$IsTar -and $ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
         # Remove temporary directory
-        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force
+        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force -ErrorAction Ignore
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
@@ -122,7 +122,7 @@ function Expand-ZstdArchive {
     if (!$IsTar -and $ExtractDir) {
         movedir (Join-Path $DestinationPath $ExtractDir) $DestinationPath | Out-Null
         # Remove temporary directory
-        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force
+        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force -ErrorAction Ignore
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
