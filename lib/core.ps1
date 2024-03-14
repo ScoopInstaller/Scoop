@@ -739,6 +739,13 @@ public static extern IntPtr SendMessageTimeout(
 }
 
 function env($name, $global, $val = '__get') {
+    if(-not $name) {
+        $name = [environment]::getEnvironmentVariable("SCOOP_ENV", "User")
+        if(-not $name) {
+            $name = 'PATH'
+        }
+    }
+
     $RegisterKey = if ($global) {
         Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
     } else {
@@ -1010,7 +1017,7 @@ function get_shim_path() {
 }
 
 function search_in_path($target) {
-    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
+    $path = (env $Null $false) + ";" + (env $Null $true)
     foreach($dir in $path.split(';')) {
         if(test-path "$dir\$target" -pathType leaf) {
             return "$dir\$target"
@@ -1019,12 +1026,12 @@ function search_in_path($target) {
 }
 
 function ensure_in_path($dir, $global) {
-    $path = env 'PATH' $global
+    $path = env $Null $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
         write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
 
-        env 'PATH' $global "$dir;$path" # for future sessions...
+        env $Null $global "$dir;$path" # for future sessions...
         $env:PATH = "$dir;$env:PATH" # for this session
     }
 }
@@ -1113,8 +1120,8 @@ function add_first_in_path($dir, $global) {
     $dir = fullpath $dir
 
     # future sessions
-    $null, $currpath = strip_path (env 'path' $global) $dir
-    env 'path' $global "$dir;$currpath"
+    $null, $currpath = strip_path (env $Null $global) $dir
+    env $Null $global "$dir;$currpath"
 
     # this session
     $null, $env:PATH = strip_path $env:PATH $dir
@@ -1125,10 +1132,10 @@ function remove_from_path($dir, $global) {
     $dir = fullpath $dir
 
     # future sessions
-    $was_in_path, $newpath = strip_path (env 'path' $global) $dir
+    $was_in_path, $newpath = strip_path (env $Null $global) $dir
     if($was_in_path) {
         Write-Output "Removing $(friendly_path $dir) from your path."
-        env 'path' $global $newpath
+        env $Null $global $newpath
     }
 
     # current session
