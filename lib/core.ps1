@@ -740,10 +740,11 @@ public static extern IntPtr SendMessageTimeout(
 
 function env($name, $global, $val = '__get') {
     if(-not $name) {
-        $name = [environment]::getEnvironmentVariable("SCOOP_ENV", "User")
-        if(-not $name) {
-            $name = 'PATH'
-        }
+        $name = $scoop_path_env
+    }
+
+    if(-not $name) {
+        throw "Unable to evaluate path environment variable. Please set or remove PATH_ENV in your config.json."
     }
 
     $RegisterKey = if ($global) {
@@ -755,7 +756,7 @@ function env($name, $global, $val = '__get') {
 
     if ($val -eq '__get') {
         $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
-        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
+        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption) + ""
     } elseif ($val -eq $null) {
         try { $EnvRegisterKey.DeleteValue($name) } catch { }
         Publish-Env
@@ -1421,6 +1422,8 @@ if ($pathExpected) {
     }
 }
 $scoopConfig = load_cfg $configFile
+
+$scoop_path_env = get_config PATH_ENV 'PATH'
 
 # Scoop root directory
 $scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Resolve-Path "$PSScriptRoot\..\..\..\.."), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
