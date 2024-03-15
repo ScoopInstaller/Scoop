@@ -581,9 +581,10 @@ function fullpath($path) {
     $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
 }
 function friendly_path($path) {
-    $h = (Get-PsProvider 'FileSystem').home; if(!$h.endswith('\')) { $h += '\' }
-    if($h -eq '\') { return $path }
-    return "$path" -replace ([regex]::escape($h)), "~\"
+    $uhome = "$([System.Environment]::GetFolderPath('UserProfile'))"
+    if ($uhome -eq $path) { return $uhome } # Original Case of pach
+    if ($uhome -eq '\') { return $path }
+    return "$($path.Replace($uhome, '~'))"
 }
 function is_local($path) {
     ($path -notmatch '^https?://') -and (test-path $path)
