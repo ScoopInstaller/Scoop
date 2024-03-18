@@ -258,36 +258,6 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'ensure_robocopy_in_path' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $shimdir = shimdir $false
-        Mock versiondir { "$PSScriptRoot\.." }
-    }
-
-    It 'shims robocopy when not on path' {
-        Mock Test-CommandAvailable { $false }
-        Test-CommandAvailable robocopy | Should -Be $false
-
-        ensure_robocopy_in_path
-
-        # "$shimdir/robocopy.ps1" | should -exist
-        "$shimdir/robocopy.exe" | Should -Exist
-
-        # clean up
-        rm_shim robocopy $(shimdir $false) | Out-Null
-    }
-
-    It 'does not shim robocopy when it is in path' {
-        Mock Test-CommandAvailable { $true }
-        Test-CommandAvailable robocopy | Should -Be $true
-
-        ensure_robocopy_in_path
-
-        # "$shimdir/robocopy.ps1" | should -not -exist
-        "$shimdir/robocopy.exe" | Should -Not -Exist
-    }
-}
-
 Describe 'sanitary_path' -Tag 'Scoop' {
     It 'removes invalid path characters from a string' {
         $path = 'test?.json'

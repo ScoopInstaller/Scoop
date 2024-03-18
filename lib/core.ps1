@@ -1136,12 +1136,6 @@ function remove_from_path($dir, $global) {
     if($was_in_path) { $env:PATH = $newpath }
 }
 
-function ensure_robocopy_in_path {
-    if(!(Test-CommandAvailable robocopy)) {
-        shim "C:\Windows\System32\Robocopy.exe" $false
-    }
-}
-
 function wraptext($text, $width) {
     if(!$width) { $width = $host.ui.rawui.buffersize.width };
     $width -= 1 # be conservative: doesn't seem to print the last char
