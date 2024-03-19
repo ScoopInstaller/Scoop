@@ -71,15 +71,6 @@ function Set-EnvVar {
     Publish-EnvVar
 }
 
-function search_in_path($target) {
-    $path = (Get-EnvVar -Name 'PATH' -Global) + ';' + (Get-EnvVar -Name 'PATH')
-    foreach ($dir in $path.split(';')) {
-        if (Test-Path "$dir\$target" -PathType leaf) {
-            return "$dir\$target"
-        }
-    }
-}
-
 function ensure_in_path($dir, $global) {
     $path = Get-EnvVar -Name 'PATH' -Global:$global
     $dir = fullpath $dir

@@ -783,7 +783,7 @@ function create_shims($manifest, $dir, $global, $arch) {
         } elseif (Test-Path $target -PathType leaf) {
             $bin = $target
         } else {
-            $bin = search_in_path $target
+            $bin = (Get-Command $target).Source
         }
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
