@@ -289,15 +289,14 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     Write-Host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $app $old_manifest $global $architecture
-    env_rm_path $old_manifest $dir $global $architecture
-    env_rm $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
     # directory.
     $refdir = unlink_current $dir
-
     uninstall_psmodule $old_manifest $refdir $global
+    env_rm_path $old_manifest $refdir $global $architecture
+    env_rm $old_manifest $global $architecture
 
     if ($force -and ($old_version -eq $version)) {
         if (!(Test-Path "$dir/../_$version.old")) {
