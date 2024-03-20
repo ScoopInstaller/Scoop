@@ -651,6 +651,7 @@ function Invoke-ExternalCommand {
         $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     }
     if ($ArgumentList.Length -gt 0) {
+        $ArgumentList = $ArgumentList | ForEach-Object { [regex]::Split($_.Replace('"', ''), '(?<=(?<![:\w])[/-][^\\/ ]+) | (?=[/-])') }
         if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
             $Process.StartInfo.Arguments = $ArgumentList -join ' '
         } elseif ($Process.StartInfo.ArgumentList.Add) {
@@ -665,10 +666,12 @@ function Invoke-ExternalCommand {
                 $s = $_ -replace '(\\+)"', '$1$1"'
                 # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
                 $s = $s -replace '(\\+)$', '$1$1'
-                # escape double quotes
-                $s = $s -replace '"', '\"'
                 # quote the argument
-                "`"$s`""
+                if ($s -match ' ') {
+                    "`"$s`""
+                } else {
+                    $s
+                }
             }
             $Process.StartInfo.Arguments = $escapedArgs -join ' '
         }
