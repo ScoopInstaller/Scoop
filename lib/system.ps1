@@ -1,10 +1,15 @@
-function Publish-Env {
+# System-related functions
+
+## Environment Variables
+
+function Publish-EnvVar {
     if (-not ('Win32.NativeMethods' -as [Type])) {
         Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @'
 [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
 public static extern IntPtr SendMessageTimeout(
     IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
-    uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
+    uint fuFlags, uint uTimeout, out UIntPtr lpdwResult
+);
 '@
     }
 
@@ -12,7 +17,7 @@ public static extern IntPtr SendMessageTimeout(
     $WM_SETTINGCHANGE = 0x1a
     $result = [UIntPtr]::Zero
 
-    [Win32.Nativemethods]::SendMessageTimeout($HWND_BROADCAST,
+    [Win32.NativeMethods]::SendMessageTimeout($HWND_BROADCAST,
         $WM_SETTINGCHANGE,
         [UIntPtr]::Zero,
         'Environment',
@@ -22,35 +27,52 @@ public static extern IntPtr SendMessageTimeout(
     ) | Out-Null
 }
 
-function env($name, $global, $val = '__get') {
-    $RegisterKey = if ($global) {
+function Get-EnvVar {
+    param(
+        [string]$Name,
+        [switch]$Global
+    )
+
+    $registerKey = if ($Global) {
         Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
     } else {
         Get-Item -Path 'HKCU:'
     }
-    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $val -ne '__get')
+    $envRegisterKey = $registerKey.OpenSubKey('Environment')
+    $registryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
+    $envRegisterKey.GetValue($Name, $null, $registryValueOption)
+}
 
-    if ($val -eq '__get') {
-        $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
-        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
-    } elseif ($val -eq $null) {
-        try { $EnvRegisterKey.DeleteValue($name) } catch { }
-        Publish-Env
+function Set-EnvVar {
+    param(
+        [string]$Name,
+        [string]$Value,
+        [switch]$Global
+    )
+
+    $registerKey = if ($Global) {
+        Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
     } else {
-        $RegistryValueKind = if ($val.Contains('%')) {
+        Get-Item -Path 'HKCU:'
+    }
+    $envRegisterKey = $registerKey.OpenSubKey('Environment', $true)
+    if ($null -eq $Value -or $Value -eq '') {
+        $envRegisterKey.DeleteValue($Name)
+    } else {
+        $registryValueKind = if ($Value.Contains('%')) {
             [Microsoft.Win32.RegistryValueKind]::ExpandString
-        } elseif ($EnvRegisterKey.GetValue($name)) {
-            $EnvRegisterKey.GetValueKind($name)
+        } elseif ($envRegisterKey.GetValue($Name)) {
+            $envRegisterKey.GetValueKind($Name)
         } else {
             [Microsoft.Win32.RegistryValueKind]::String
         }
-        $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
-        Publish-Env
+        $envRegisterKey.SetValue($Name, $Value, $registryValueKind)
     }
+    Publish-EnvVar
 }
 
 function search_in_path($target) {
-    $path = (env 'PATH' $false) + ';' + (env 'PATH' $true)
+    $path = (Get-EnvVar -Name 'PATH' -Global) + ';' + (Get-EnvVar -Name 'PATH')
     foreach ($dir in $path.split(';')) {
         if (Test-Path "$dir\$target" -PathType leaf) {
             return "$dir\$target"
@@ -59,13 +81,12 @@ function search_in_path($target) {
 }
 
 function ensure_in_path($dir, $global) {
-    $path = env 'PATH' $global
+    $path = Get-EnvVar -Name 'PATH' -Global:$global
     $dir = fullpath $dir
     if ($path -notmatch [regex]::escape($dir)) {
         Write-Output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
-
-        env 'PATH' $global "$dir;$path" # for future sessions...
-        $env:PATH = "$dir;$env:PATH" # for this session
+        Set-EnvVar -Name 'PATH' -Value "$dir;$path" -Global:$global # future sessions
+        $env:PATH = "$dir;$env:PATH" # current session
     }
 }
 
@@ -77,27 +98,37 @@ function strip_path($orig_path, $dir) {
 
 function add_first_in_path($dir, $global) {
     $dir = fullpath $dir
-
     # future sessions
-    $null, $currpath = strip_path (env 'path' $global) $dir
-    env 'path' $global "$dir;$currpath"
-
-    # this session
+    $null, $currpath = strip_path (Get-EnvVar -Name 'PATH' -Global:$global) $dir
+    Set-EnvVar -Name 'PATH' -Value "$dir;$currpath" -Global:$global
+    # current session
     $null, $env:PATH = strip_path $env:PATH $dir
     $env:PATH = "$dir;$env:PATH"
 }
 
 function remove_from_path($dir, $global) {
     $dir = fullpath $dir
-
     # future sessions
-    $was_in_path, $newpath = strip_path (env 'path' $global) $dir
+    $was_in_path, $newpath = strip_path (Get-EnvVar -Name 'PATH' -Global:$global) $dir
     if ($was_in_path) {
         Write-Output "Removing $(friendly_path $dir) from your path."
-        env 'path' $global $newpath
+        Set-EnvVar -Name 'PATH' -Value $newpath -Global:$global
     }
-
     # current session
     $was_in_path, $newpath = strip_path $env:PATH $dir
-    if ($was_in_path) { $env:PATH = $newpath }
+    if ($was_in_path) {
+        $env:PATH = $newpath
+    }
+}
+
+## Deprecated functions
+
+function env($name, $global, $val) {
+    if ($PSBoundParameters.ContainsKey('val')) {
+        Show-DeprecatedWarning $MyInvocation 'Set-EnvVar'
+        Set-EnvVar -Name $name -Value $val -Global:$global
+    } else {
+        Show-DeprecatedWarning $MyInvocation 'Get-EnvVar'
+        Get-EnvVar -Name $name -Global:$global
+    }
 }
