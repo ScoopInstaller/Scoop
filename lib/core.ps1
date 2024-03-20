@@ -1415,31 +1415,6 @@ if ($pathExpected) {
 }
 $scoopConfig = load_cfg $configFile
 
-# NOTE Scoop config file migration. Remove this after 2023/6/30
-if ($scoopConfig -and $scoopConfig.PSObject.Properties.Name -contains 'lastUpdate') {
-    $newConfigNames = @{
-        'lastUpdate'               = 'last_update'
-        'SCOOP_REPO'               = 'scoop_repo'
-        'SCOOP_BRANCH'             = 'scoop_branch'
-        '7ZIPEXTRACT_USE_EXTERNAL' = 'use_external_7zip'
-        'MSIEXTRACT_USE_LESSMSI'   = 'use_lessmsi'
-        'NO_JUNCTIONS'             = 'no_junction'
-        'manifest_review'          = 'show_manifest'
-        'rootPath'                 = 'root_path'
-        'globalPath'               = 'global_path'
-        'cachePath'                = 'cache_path'
-    }
-    $newConfigNames.GetEnumerator() | ForEach-Object {
-        if ($null -ne $scoopConfig.$($_.Key)) {
-            $value = $scoopConfig.$($_.Key)
-            $scoopConfig.PSObject.Properties.Remove($_.Key)
-            $scoopConfig | Add-Member -MemberType NoteProperty -Name $_.Value -Value $value
-        }
-    }
-    ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
-}
-# END NOTE
-
 # Scoop root directory
 $scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Resolve-Path "$PSScriptRoot\..\..\..\.."), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
