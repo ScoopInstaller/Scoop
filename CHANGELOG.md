@@ -43,6 +43,7 @@
 - **core:** Do not call `scoop` externally from inside the code ([#5695](https://github.com/ScoopInstaller/Scoop/issues/5695))
 - **scoop-checkup:** Don't throw 7zip error when external 7zip is used ([#5703](https://github.com/ScoopInstaller/Scoop/issues/5703))
 - **config:** Warn users about misconfigured GitHub token ([#5777](https://github.com/ScoopInstaller/Scoop/issues/5777))
+- **update/uninstall:** Remove items from PATH correctly ([#5833](https://github.com/ScoopInstaller/Scoop/issues/5833))
 
 ### Performance Improvements
 
