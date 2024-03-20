@@ -1,6 +1,7 @@
 BeforeAll {
     . "$PSScriptRoot\Scoop-TestLib.ps1"
     . "$PSScriptRoot\..\lib\core.ps1"
+    . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
 }

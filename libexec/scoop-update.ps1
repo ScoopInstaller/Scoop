@@ -16,6 +16,7 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'save_install_info' in 'manifest.ps1' (indirectly)
+. "$PSScriptRoot\..\lib\system.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"

@@ -12,6 +12,7 @@ param(
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\system.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
