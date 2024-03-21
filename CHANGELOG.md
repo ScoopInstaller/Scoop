@@ -60,6 +60,7 @@
 ### Builds
 
 - **checkver:** Read the private_host config variable ([#5381](https://github.com/ScoopInstaller/Scoop/issues/5381))
+- **supporting:** Update Json to 13.0.3, Json.Schema to 3.0.15 ([#5835](https://github.com/ScoopInstaller/Scoop/issues/5835))
 
 ### Continuous Integration
 
