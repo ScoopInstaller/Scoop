@@ -50,6 +50,7 @@
 
 - **decompress:** Disable progress bar to improve `Expand-Archive` performance ([#5410](https://github.com/ScoopInstaller/Scoop/issues/5410))
 - **scoop-search:** Improve performance for local search ([#5324](https://github.com/ScoopInstaller/Scoop/issues/5324))
+- **shim:** Update kiennq-shim to v3.1 ([#5841](https://github.com/ScoopInstaller/Scoop/issues/5841))
 
 ### Code Refactoring
 
