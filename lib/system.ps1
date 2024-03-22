@@ -71,44 +71,62 @@ function Set-EnvVar {
     Publish-EnvVar
 }
 
-function ensure_in_path($dir, $global) {
-    $path = Get-EnvVar -Name 'PATH' -Global:$global
-    $dir = fullpath $dir
-    if ($path -notmatch [regex]::escape($dir)) {
-        Write-Output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
-        Set-EnvVar -Name 'PATH' -Value "$dir;$path" -Global:$global # future sessions
-        $env:PATH = "$dir;$env:PATH" # current session
+function Find-Path {
+    param(
+        [string]$Name,
+        [string]$Path
+    )
+
+    if ($null -eq $Path -and $Path -eq '') {
+        return $false, $null
+    } else {
+        $strippedPath = $Path.Split(';', [System.StringSplitOptions]::RemoveEmptyEntries).Where({ $_ -ne $Name }) -join ';'
+        return ($strippedPath -ne $Path), $strippedPath
     }
 }
 
-function strip_path($orig_path, $dir) {
-    if ($null -eq $orig_path) { $orig_path = '' }
-    $stripped = [string]::join(';', @( $orig_path.split(';') | Where-Object { $_ -and $_ -ne $dir } ))
-    return ($stripped -ne $orig_path), $stripped
-}
+function Add-Path {
+    param(
+        [string]$Path,
+        [switch]$Global,
+        [switch]$Force
+    )
 
-function add_first_in_path($dir, $global) {
-    $dir = fullpath $dir
+    if (!$Path.Contains('%')) {
+        $Path = fullpath $Path
+    }
     # future sessions
-    $null, $currpath = strip_path (Get-EnvVar -Name 'PATH' -Global:$global) $dir
-    Set-EnvVar -Name 'PATH' -Value "$dir;$currpath" -Global:$global
-    # current session
-    $null, $env:PATH = strip_path $env:PATH $dir
-    $env:PATH = "$dir;$env:PATH"
-}
-
-function remove_from_path($dir, $global) {
-    $dir = fullpath $dir
-    # future sessions
-    $was_in_path, $newpath = strip_path (Get-EnvVar -Name 'PATH' -Global:$global) $dir
-    if ($was_in_path) {
-        Write-Output "Removing $(friendly_path $dir) from your path."
-        Set-EnvVar -Name 'PATH' -Value $newpath -Global:$global
+    $inPath, $strippedPath = Find-Path $Path (Get-EnvVar -Name 'PATH' -Global:$Global)
+    if (!$inPath -or $Force) {
+        Write-Output "Adding $(friendly_path $Path) to $(if ($Global) {'global'} else {'your'}) path."
+        Set-EnvVar -Name 'PATH' -Value (@($Path, $strippedPath) -join ';') -Global:$Global
     }
     # current session
-    $was_in_path, $newpath = strip_path $env:PATH $dir
-    if ($was_in_path) {
-        $env:PATH = $newpath
+    $inPath, $strippedPath = Find-Path $Path $env:PATH
+    if (!$inPath -or $Force) {
+        $env:PATH = @($Path, $strippedPath) -join ';'
+    }
+}
+
+function Remove-Path {
+    param(
+        [string]$Path,
+        [switch]$Global
+    )
+
+    if (!$Path.Contains('%')) {
+        $Path = fullpath $Path
+    }
+    # future sessions
+    $inPath, $strippedPath = Find-Path $Path (Get-EnvVar -Name 'PATH' -Global:$Global)
+    if ($inPath) {
+        Write-Output "Removing $(friendly_path $Path) from $(if ($Global) {'global'} else {'your'}) path."
+        Set-EnvVar -Name 'PATH' -Value $strippedPath -Global:$Global
+    }
+    # current session
+    $inPath, $strippedPath = Find-Path $Path $env:PATH
+    if ($inPath) {
+        $env:PATH = $strippedPath
     }
 }
 
@@ -122,4 +140,19 @@ function env($name, $global, $val) {
         Show-DeprecatedWarning $MyInvocation 'Get-EnvVar'
         Get-EnvVar -Name $name -Global:$global
     }
+}
+
+function strip_path($orig_path, $dir) {
+    Show-DeprecatedWarning $MyInvocation 'Find-Path'
+    Find-Path -Name $dir -Path $orig_path
+}
+
+function add_first_in_path($dir, $global) {
+    Show-DeprecatedWarning $MyInvocation 'Add-Path'
+    Add-Path -Path $dir -Global:$global -Force
+}
+
+function remove_from_path($dir, $global) {
+    Show-DeprecatedWarning $MyInvocation 'Remove-Path'
+    Remove-Path -Path $dir -Global:$global
 }

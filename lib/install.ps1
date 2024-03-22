@@ -920,7 +920,7 @@ function env_add_path($manifest, $dir, $global, $arch) {
             if (!(is_in_dir $dir $path_dir)) {
                 abort "Error in manifest: env_add_path '$_' is outside the app directory."
             }
-            add_first_in_path $path_dir $global
+            Add-Path -Path $path_dir -Global:$global -Force
         }
     }
 }
@@ -935,7 +935,7 @@ function env_rm_path($manifest, $dir, $global, $arch) {
             } else {
                 $path_dir = Join-Path $dir $_
             }
-            remove_from_path $path_dir $global
+            Remove-Path -Path $path_dir -Global:$global
         }
     }
 }

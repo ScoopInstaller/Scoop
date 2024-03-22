@@ -581,12 +581,18 @@ function fullpath($path) {
     $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
 }
 function friendly_path($path) {
-    $h = (Get-PsProvider 'FileSystem').home; if(!$h.endswith('\')) { $h += '\' }
-    if($h -eq '\') { return $path }
-    return "$path" -replace ([regex]::escape($h)), "~\"
+    $h = (Get-PSProvider 'FileSystem').Home
+    if (!$h.EndsWith('\')) {
+        $h += '\'
+    }
+    if ($h -eq '\') {
+        return $path
+    } else {
+        return $path -replace ([Regex]::Escape($h)), '~\'
+    }
 }
 function is_local($path) {
-    ($path -notmatch '^https?://') -and (test-path $path)
+    ($path -notmatch '^https?://') -and (Test-Path $path)
 }
 
 # operations
@@ -821,7 +827,7 @@ function warn_on_overwrite($shim, $path) {
 function shim($path, $global, $name, $arg) {
     if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
-    ensure_in_path $abs_shimdir $global
+    Add-Path -Path $abs_shimdir -Global:$global
     if (!$name) { $name = strip_ext (fname $path) }
 
     $shim = "$abs_shimdir\$($name.tolower())"

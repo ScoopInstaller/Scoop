@@ -58,17 +58,17 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
     }
 
     It 'should concat the correct path' {
-        Mock add_first_in_path {}
-        Mock remove_from_path {}
+        Mock Add-Path {}
+        Mock Remove-Path {}
 
         # adding
         env_add_path $manifest $testdir $global
-        Assert-MockCalled add_first_in_path -Times 1 -ParameterFilter { $dir -like "$testdir\foo" }
-        Assert-MockCalled add_first_in_path -Times 1 -ParameterFilter { $dir -like "$testdir\bar" }
+        Assert-MockCalled Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\foo" }
+        Assert-MockCalled Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
 
         env_rm_path $manifest $testdir $global
-        Assert-MockCalled remove_from_path -Times 1 -ParameterFilter { $dir -like "$testdir\foo" }
-        Assert-MockCalled remove_from_path -Times 1 -ParameterFilter { $dir -like "$testdir\bar" }
+        Assert-MockCalled Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\foo" }
+        Assert-MockCalled Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
     }
 }
 

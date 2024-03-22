@@ -168,7 +168,7 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
     }
 
     It "links a file onto the user's path" {
@@ -202,7 +202,7 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
     }
 
     It 'removes shim from path' {
@@ -221,7 +221,7 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
         Mock appsdir { $working_dir }
     }
 

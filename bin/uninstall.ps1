@@ -99,7 +99,6 @@ if ($purge) {
     if ($global) { keep_onlypersist $globaldir }
 }
 
-remove_from_path (shimdir $false)
-if ($global) { remove_from_path (shimdir $true) }
+Remove-Path -Path (shimdir $global) -Global:$global
 
 success 'Scoop has been uninstalled.'
