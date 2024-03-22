@@ -651,7 +651,7 @@ function Invoke-ExternalCommand {
         $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     }
     if ($ArgumentList.Length -gt 0) {
-        $ArgumentList = $ArgumentList | ForEach-Object { [regex]::Split($_.Replace('"', ''), '(?<=(?<![:\w])[/-][^\\/ ]+) | (?=[/-])') }
+        $ArgumentList = $ArgumentList | ForEach-Object { [regex]::Split($_.Replace('"', ''), '(?<=(?<![:\w])[/-]\w+) | (?=[/-])') }
         if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
             $Process.StartInfo.Arguments = $ArgumentList -join ' '
         } elseif ($Process.StartInfo.ArgumentList.Add) {
