@@ -662,13 +662,11 @@ function Invoke-ExternalCommand {
         } else {
             # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
             $escapedArgs = $ArgumentList | ForEach-Object {
-                # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
-                $s = $_ -replace '(\\+)"', '$1$1"'
-                # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
-                $s = $s -replace '(\\+)$', '$1$1'
-                # quote the argument
+                # escape N consecutive backslash(es), which are followed by a double quote or at the end of the string, to 2N consecutive ones
+                $s = $_ -replace '(\\+)(""|$)', '$1$1$2'
+                # quote the path if it contains spaces
                 if ($s -match ' ') {
-                    "`"$s`""
+                    $s = $s -replace '([A-Za-z]:[\\/].*)', '`"$1`"'
                 } else {
                     $s
                 }
