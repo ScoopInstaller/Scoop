@@ -666,7 +666,7 @@ function Invoke-ExternalCommand {
                 # quote the path if it contains spaces and is not NSIS's '/D' argument
                 # ref: https://nsis.sourceforge.io/Docs/Chapter3.html
                 if ($s -match ' ' -and $s -notmatch '/D=[A-Z]:[\\/].*') {
-                    $s = $s -replace '([A-Z]:[\\/].*)', '`"$1`"'
+                    $s -replace '([A-Z]:[\\/].*)', '"$1"'
                 } else {
                     $s
                 }
