@@ -740,6 +740,14 @@ public static extern IntPtr SendMessageTimeout(
 }
 
 function env($name, $global, $val = '__get') {
+    if(-not $name) {
+        $name = $scoop_path_env
+    }
+
+    if(-not $name) {
+        throw "Unable to evaluate path environment variable. Please set or remove PATH_ENV in your config.json."
+    }
+
     $RegisterKey = if ($global) {
         Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
     } else {
@@ -749,7 +757,7 @@ function env($name, $global, $val = '__get') {
 
     if ($val -eq '__get') {
         $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
-        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
+        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption) + ""
     } elseif ($val -eq $null) {
         try { $EnvRegisterKey.DeleteValue($name) } catch { }
         Publish-Env
@@ -1011,7 +1019,7 @@ function get_shim_path() {
 }
 
 function search_in_path($target) {
-    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
+    $path = (env $Null $false) + ";" + (env $Null $true)
     foreach($dir in $path.split(';')) {
         if(test-path "$dir\$target" -pathType leaf) {
             return "$dir\$target"
@@ -1020,12 +1028,12 @@ function search_in_path($target) {
 }
 
 function ensure_in_path($dir, $global) {
-    $path = env 'PATH' $global
+    $path = env $Null $global
     $dir = fullpath $dir
     if($path -notmatch [regex]::escape($dir)) {
         write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
 
-        env 'PATH' $global "$dir;$path" # for future sessions...
+        env $Null $global "$dir;$path" # for future sessions...
         $env:PATH = "$dir;$env:PATH" # for this session
     }
 }
@@ -1114,8 +1122,8 @@ function add_first_in_path($dir, $global) {
     $dir = fullpath $dir
 
     # future sessions
-    $null, $currpath = strip_path (env 'path' $global) $dir
-    env 'path' $global "$dir;$currpath"
+    $null, $currpath = strip_path (env $Null $global) $dir
+    env $Null $global "$dir;$currpath"
 
     # this session
     $null, $env:PATH = strip_path $env:PATH $dir
@@ -1126,10 +1134,10 @@ function remove_from_path($dir, $global) {
     $dir = fullpath $dir
 
     # future sessions
-    $was_in_path, $newpath = strip_path (env 'path' $global) $dir
+    $was_in_path, $newpath = strip_path (env $Null $global) $dir
     if($was_in_path) {
         Write-Output "Removing $(friendly_path $dir) from your path."
-        env 'path' $global $newpath
+        env $Null $global $newpath
     }
 
     # current session
@@ -1415,6 +1423,8 @@ if ($pathExpected) {
     }
 }
 $scoopConfig = load_cfg $configFile
+
+$scoop_path_env = get_config PATH_ENV 'PATH'
 
 # Scoop root directory
 $scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Resolve-Path "$PSScriptRoot\..\..\..\.."), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1

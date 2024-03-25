@@ -876,16 +876,16 @@ function unlink_current($versiondir) {
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead
 function ensure_install_dir_not_in_path($dir, $global) {
-    $path = (env 'path' $global)
+    $path = (env $Null $global)
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if ($removed) {
         $removed | ForEach-Object { "Installer added '$(friendly_path $_)' to path. Removing." }
-        env 'path' $global $fixed
+        env $Null $global $fixed
     }
 
     if (!$global) {
-        $fixed, $removed = find_dir_or_subdir (env 'path' $true) "$dir"
+        $fixed, $removed = find_dir_or_subdir (env $Null $true) "$dir"
         if ($removed) {
             $removed | ForEach-Object { warn "Installer added '$_' to system path. You might want to remove this manually (requires admin permission)." }
         }
