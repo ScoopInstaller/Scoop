@@ -37,21 +37,21 @@ $all = $opt.a -or $opt.all
 # load config
 $configRepo = get_config SCOOP_REPO
 if (!$configRepo) {
-    $configRepo = "https://github.com/ScoopInstaller/Scoop"
+    $configRepo = 'https://github.com/ScoopInstaller/Scoop'
     set_config SCOOP_REPO $configRepo | Out-Null
 }
 
 # Find current update channel from config
 $configBranch = get_config SCOOP_BRANCH
 if (!$configBranch) {
-    $configBranch = "master"
+    $configBranch = 'master'
     set_config SCOOP_BRANCH $configBranch | Out-Null
 }
 
-if(($PSVersionTable.PSVersion.Major) -lt 5) {
+if (($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
-    Write-Output "PowerShell 5 or later is required to run Scoop."
-    Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
+    Write-Output 'PowerShell 5 or later is required to run Scoop.'
+    Write-Output 'Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows'
     break
 }
 $show_update_log = get_config SHOW_UPDATE_LOG $true
@@ -62,14 +62,14 @@ function Sync-Scoop {
         [Switch]$Log
     )
     # Test if Scoop Core is hold
-    if(Test-ScoopCoreOnHold) {
+    if (Test-ScoopCoreOnHold) {
         return
     }
 
     # check for git
     if (!(Test-GitAvailable)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    Write-Host "Updating Scoop..."
+    Write-Host 'Updating Scoop...'
     $currentdir = fullpath $(versiondir 'scoop' 'current')
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
@@ -107,10 +107,10 @@ function Sync-Scoop {
         # Stash uncommitted changes
         if (Invoke-Git -Path $currentdir -ArgumentList @('diff', 'HEAD', '--name-only')) {
             if (get_config AUTOSTASH_ON_CONFLICT) {
-                warn "Uncommitted changes detected. Stashing..."
+                warn 'Uncommitted changes detected. Stashing...'
                 Invoke-Git -Path $currentdir -ArgumentList @('stash', 'push', '-m', "WIP at $([System.DateTime]::Now.ToString('o'))", '-u', '-q')
             } else {
-                warn "Uncommitted changes detected. Update aborted."
+                warn 'Uncommitted changes detected. Update aborted.'
                 return
             }
         }
@@ -151,7 +151,7 @@ function Sync-Bucket {
     Param (
         [Switch]$Log
     )
-    Write-Host "Updating Buckets..."
+    Write-Host 'Updating Buckets...'
 
     if (!(Test-Path (Join-Path (Find-BucketDirectory 'main' -Root) '.git'))) {
         info "Converting 'main' bucket to git repo..."
@@ -169,9 +169,9 @@ function Sync-Bucket {
     $buckets = Get-LocalBucket | ForEach-Object {
         $path = Find-BucketDirectory $_ -Root
         return @{
-            name = $_
+            name  = $_
             valid = Test-Path (Join-Path $path '.git')
-            path = $path
+            path  = $path
         }
     }
 
@@ -243,7 +243,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # region Workaround
     # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
-    Write-Host "Downloading new version"
+    Write-Host 'Downloading new version'
     if (Test-Aria2Enabled) {
         Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
@@ -261,12 +261,12 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
                     error $err
                     if (Test-Path $source) {
                         # rm cached file
-                        Remove-Item -force $source
+                        Remove-Item -Force $source
                     }
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    abort $(new_issue_msg $app $bucket "hash check failed")
+                    abort $(new_issue_msg $app $bucket 'hash check failed')
                 }
             }
         }
@@ -402,11 +402,11 @@ if (-not ($apps -or $all)) {
         } elseif ($outdated.Length -eq 0) {
             Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
         } else {
-            Write-Host -f DarkCyan "Updating one outdated app:"
+            Write-Host -f DarkCyan 'Updating one outdated app:'
         }
     }
 
-    $suggested = @{};
+    $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }
