@@ -45,6 +45,7 @@
 - **config:** Warn users about misconfigured GitHub token ([#5777](https://github.com/ScoopInstaller/Scoop/issues/5777))
 - **update/uninstall:** Remove items from PATH correctly ([#5833](https://github.com/ScoopInstaller/Scoop/issues/5833))
 - **shim:** Allow GUI applications to attach to the shell's console when launched using the GUI shim ([#5721](https://github.com/ScoopInstaller/Scoop/issues/5721))
+- **core:** Fix arguments parsing method of `Invoke-ExternalCommand()` ([#5839](https://github.com/ScoopInstaller/Scoop/issues/5839))
 
 ### Performance Improvements
 

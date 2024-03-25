@@ -600,8 +600,7 @@ function Invoke-ExternalCommand {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true,
-                   Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [Alias("Path")]
         [ValidateNotNullOrEmpty()]
         [String]
@@ -651,6 +650,7 @@ function Invoke-ExternalCommand {
         $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     }
     if ($ArgumentList.Length -gt 0) {
+        $ArgumentList = $ArgumentList | ForEach-Object { [regex]::Split($_.Replace('"', ''), '(?<=(?<![:\w])[/-]\w+) | (?=[/-])') }
         if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
             $Process.StartInfo.Arguments = $ArgumentList -join ' '
         } elseif ($Process.StartInfo.ArgumentList.Add) {
@@ -661,14 +661,15 @@ function Invoke-ExternalCommand {
         } else {
             # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
             $escapedArgs = $ArgumentList | ForEach-Object {
-                # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
-                $s = $_ -replace '(\\+)"', '$1$1"'
-                # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
-                $s = $s -replace '(\\+)$', '$1$1'
-                # escape double quotes
-                $s = $s -replace '"', '\"'
-                # quote the argument
-                "`"$s`""
+                # escape N consecutive backslash(es), which are followed by a double quote or at the end of the string, to 2N consecutive ones
+                $s = $_ -replace '(\\+)(""|$)', '$1$1$2'
+                # quote the path if it contains spaces and is not NSIS's '/D' argument
+                # ref: https://nsis.sourceforge.io/Docs/Chapter3.html
+                if ($s -match ' ' -and $s -notmatch '/D=[A-Z]:[\\/].*') {
+                    $s -replace '([A-Z]:[\\/].*)', '"$1"'
+                } else {
+                    $s
+                }
             }
             $Process.StartInfo.Arguments = $escapedArgs -join ' '
         }
