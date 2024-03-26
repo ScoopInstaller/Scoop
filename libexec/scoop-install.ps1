@@ -31,6 +31,9 @@
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
+if (get_config USE_SQLITE_CACHE $false) {
+    . "$PSScriptRoot\..\lib\database.ps1"
+}
 
 $opt, $apps, $err = getopt $args 'gikusa:' 'global', 'independent', 'no-cache', 'no-update-scoop', 'skip', 'arch='
 if ($err) { "scoop install: $err"; exit 1 }

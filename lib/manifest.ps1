@@ -137,14 +137,24 @@ function generate_user_manifest($app, $bucket, $version) {
     warn "Given version ($version) does not match manifest ($($manifest.version))"
     warn "Attempting to generate manifest for '$app' ($version)"
 
+    ensure (usermanifestsdir) | Out-Null
+    $manifest_path = fullpath "$(usermanifestsdir)\$app.json"
+
+    if (get_config USE_SQLITE_CACHE $false) {
+        $cached_manifest = (Get-ScoopDBItem -Name $app -Bucket $bucket -Version $version).manifest
+        if ($cached_manifest) {
+            $cached_manifest | Out-UTF8File $manifest_path
+            return $manifest_path
+        }
+    }
+
     if (!($manifest.autoupdate)) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
-    ensure (usermanifestsdir) | out-null
     try {
-        Invoke-AutoUpdate $app "$(Convert-Path (usermanifestsdir))\$app.json" $manifest $version $(@{ })
-        return Convert-Path (usermanifest $app)
+        Invoke-AutoUpdate $app $manifest_path $manifest $version $(@{ })
+        return $manifest_path
     } catch {
         write-host -f darkred "Could not install $app@$version"
     }
