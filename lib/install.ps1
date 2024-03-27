@@ -783,7 +783,7 @@ function create_shims($manifest, $dir, $global, $arch) {
         } elseif (Test-Path $target -PathType leaf) {
             $bin = $target
         } else {
-            $bin = search_in_path $target
+            $bin = (Get-Command $target).Source
         }
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
@@ -876,16 +876,16 @@ function unlink_current($versiondir) {
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead
 function ensure_install_dir_not_in_path($dir, $global) {
-    $path = (env 'path' $global)
+    $path = (Get-EnvVar -Name 'PATH' -Global:$global)
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if ($removed) {
         $removed | ForEach-Object { "Installer added '$(friendly_path $_)' to path. Removing." }
-        env 'path' $global $fixed
+        Set-EnvVar -Name 'PATH' -Value $fixed -Global:$global
     }
 
     if (!$global) {
-        $fixed, $removed = find_dir_or_subdir (env 'path' $true) "$dir"
+        $fixed, $removed = find_dir_or_subdir (Get-EnvVar -Name 'PATH' -Global) "$dir"
         if ($removed) {
             $removed | ForEach-Object { warn "Installer added '$_' to system path. You might want to remove this manually (requires admin permission)." }
         }
@@ -920,7 +920,7 @@ function env_add_path($manifest, $dir, $global, $arch) {
             if (!(is_in_dir $dir $path_dir)) {
                 abort "Error in manifest: env_add_path '$_' is outside the app directory."
             }
-            add_first_in_path $path_dir $global
+            Add-Path -Path $path_dir -Global:$global -Force
         }
     }
 }
@@ -935,7 +935,7 @@ function env_rm_path($manifest, $dir, $global, $arch) {
             } else {
                 $path_dir = Join-Path $dir $_
             }
-            remove_from_path $path_dir $global
+            Remove-Path -Path $path_dir -Global:$global
         }
     }
 }
@@ -946,7 +946,7 @@ function env_set($manifest, $dir, $global, $arch) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
             $name = $_.name
             $val = format $env_set.$($_.name) @{ 'dir' = $dir }
-            env $name $global $val
+            Set-EnvVar -Name $name -Value $val -Global:$global
             Set-Content env:\$name $val
         }
     }
@@ -956,7 +956,7 @@ function env_rm($manifest, $global, $arch) {
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
             $name = $_.name
-            env $name $global $null
+            Set-EnvVar -Name $name -Value $null -Global:$global
             if (Test-Path env:\$name) { Remove-Item env:\$name }
         }
     }
