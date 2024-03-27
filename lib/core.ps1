@@ -157,7 +157,7 @@ function Complete-ConfigChange {
         [string]
         $Name,
         [Parameter(Mandatory, Position = 1)]
-        [AllowNull()]
+        [AllowEmptyString()]
         [string]
         $Value
     )
