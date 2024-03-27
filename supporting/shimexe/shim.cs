@@ -21,6 +21,12 @@ namespace Scoop {
             out PROCESS_INFORMATION lpProcessInformation);
         const int ERROR_ELEVATION_REQUIRED = 740;
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AttachConsole(int dwProcessId);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetConsoleWindow();
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         struct STARTUPINFO {
             public Int32 cb;
@@ -89,7 +95,12 @@ namespace Scoop {
                 cmd_args += pass_args;
             }
             if(!string.IsNullOrEmpty(cmd_args)) cmd_args = " " + cmd_args;
-            var cmd = "\"" + path + "\"" + cmd_args;
+            var cmd = path + cmd_args;
+
+            // Fix when GUI applications want to write to a console
+            if (GetConsoleWindow() == IntPtr.Zero) {
+                AttachConsole(-1);
+            }
 
             if(!CreateProcess(null, cmd, IntPtr.Zero, IntPtr.Zero,
                 bInheritHandles: true,
