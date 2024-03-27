@@ -6,3 +6,4 @@ test/installer/tmp/*
 test/tmp/*
 *~
 TestResults.xml
+supporting/sqlite/*
