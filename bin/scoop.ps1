@@ -44,6 +44,19 @@ switch ($subCommand) {
             exec 'help' @($subCommand)
         } else {
             exec $subCommand $arguments
+
+            # Run analytics
+            $anltcs_time = get_config ANALYTICS_TIMESTAMP
+            if ($subCommand -ne 'analytics' -and
+                -not (get_config ANALYTICS_DISABLE) -and
+                -not (Get-CIEnvironment) -and
+                ([String]::IsNullOrEmpty($anltcs_time) -or (New-TimeSpan $anltcs_time ([System.DateTime]::Now)).TotalDays -ge 7)) {
+                # Start-Process -NoNewWindow `
+                #     -FilePath $(if ($PSEdition -eq 'Core') { 'pwsh.exe' } else { 'powershell.exe' }) `
+                #     -ArgumentList "-NoProfile", "-File $PSScriptRoot\scoop.ps1", "analytics" `
+                #     -RedirectStandardOutput "$Env:TEMP\scoop_analytics_out.txt" `
+                #     -RedirectStandardError  "$Env:TEMP\scoop_analytics_err.txt"
+            }
         }
     }
     default {
