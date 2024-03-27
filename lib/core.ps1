@@ -142,9 +142,34 @@ function set_config {
         $scoopConfig.PSObject.Properties.Remove($name)
     }
 
+    # Initialize config's change
+    Complete-ConfigChange -Name $name -Value $value
+
     # Save config with UTF8NoBOM encoding
     ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
     return $scoopConfig
+}
+
+function Complete-ConfigChange {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, Position = 0)]
+        [string]
+        $Name,
+        [Parameter(Mandatory, Position = 1)]
+        [AllowNull()]
+        [string]
+        $Value
+    )
+
+    if ($Name -eq 'use_sqlite_cache' -and $Value) {
+        . "$PSScriptRoot\..\lib\database.ps1"
+        . "$PSScriptRoot\..\lib\manifest.ps1"
+        info 'SQLite cache is enabled.'
+        New-ScoopDB
+        info 'Initializing cache in progress... This may take a while, please wait.'
+        Set-ScoopDB
+    }
 }
 
 function setup_proxy() {

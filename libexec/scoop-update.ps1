@@ -23,6 +23,9 @@
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+if (get_config USE_SQLITE_CACHE $false) {
+    . "$PSScriptRoot\..\lib\database.ps1"
+}
 
 $opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
 if ($err) { "scoop update: $err"; exit 1 }
@@ -177,6 +180,7 @@ function Sync-Bucket {
 
     $buckets | Where-Object { !$_.valid } | ForEach-Object { Write-Host "'$($_.name)' is not a git repository. Skipped." }
 
+    $updatedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
     if ($PSVersionTable.PSVersion.Major -ge 7) {
         # Parallel parameter is available since PowerShell 7
         $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
@@ -190,6 +194,13 @@ function Sync-Bucket {
             if ($using:Log) {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
+            if (get_config USE_SQLITE_CACHE $false) {
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', "$previousCommit..HEAD") | Where-Object {
+                    $_ -match '^[^.].*\.json$'
+                } | ForEach-Object {
+                    [void]($using:updatedFiles).Add($(Join-Path $bucketLoc $_))
+                }
+            }
         }
     } else {
         $buckets | Where-Object { $_.valid } | ForEach-Object {
@@ -201,7 +212,18 @@ function Sync-Bucket {
             if ($Log) {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
+            if (get_config USE_SQLITE_CACHE $false) {
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', "$previousCommit..HEAD") | Where-Object {
+                    $_ -match '^[^.].*\.json$'
+                } | ForEach-Object {
+                    [void]($updatedFiles).Add($(Join-Path $bucketLoc $_))
+                }
+            }
         }
+    }
+    if ((get_config USE_SQLITE_CACHE $false) -and ($updatedFiles.Count -gt 0)) {
+        info 'Updating cache...'
+        Set-ScoopDB -Path $updatedFiles
     }
 }
 

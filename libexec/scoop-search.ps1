@@ -11,12 +11,6 @@ param($query)
 
 $list = [System.Collections.Generic.List[PSCustomObject]]::new()
 
-try {
-    $query = New-Object Regex $query, 'IgnoreCase'
-} catch {
-    abort "Invalid regular expression: $($_.Exception.InnerException.Message)"
-}
-
 $githubtoken = Get-GitHubToken
 $authheader = @{}
 if ($githubtoken) {
@@ -175,13 +169,33 @@ function search_remotes($query) {
     $remote_list
 }
 
-$jsonTextAvailable = [System.AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.Location) -eq 'System.Text.Json' }
+if (get_config USE_SQLITE_CACHE $false) {
+    . "$PSScriptRoot\..\lib\database.ps1"
+    Select-ScoopDBItem $query -From @('name', 'binary', 'shortcut') |
+        Select-Object -Property name, version, bucket, binary |
+        ForEach-Object {
+            $list.Add([PSCustomObject]@{
+                    Name     = $_.name
+                    Version  = $_.version
+                    Source   = $_.bucket
+                    Binaries = $_.binary
+                })
+        }
+} else {
+    try {
+        $query = New-Object Regex $query, 'IgnoreCase'
+    } catch {
+        abort "Invalid regular expression: $($_.Exception.InnerException.Message)"
+    }
 
-Get-LocalBucket | ForEach-Object {
-    if ($jsonTextAvailable) {
-        search_bucket $_ $query
-    } else {
-        search_bucket_legacy $_ $query
+    $jsonTextAvailable = [System.AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.Location) -eq 'System.Text.Json' }
+
+    Get-LocalBucket | ForEach-Object {
+        if ($jsonTextAvailable) {
+            search_bucket $_ $query
+        } else {
+            search_bucket_legacy $_ $query
+        }
     }
 }
 
