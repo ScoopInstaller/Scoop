@@ -328,7 +328,11 @@ function currentdir($app, $global) {
 function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
-function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
+function cache_path($app, $version, $url) {
+    $sha256 = (Get-FileHash -Algorithm SHA256 -InputStream ([System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url)))).Hash.ToLower()
+    $extension = [System.IO.Path]::GetExtension($url)
+    return "$cachedir\$app#$version#$sha256$extension"
+}
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
