@@ -45,11 +45,14 @@
 - **scoop-checkup:** Don't throw 7zip error when external 7zip is used ([#5703](https://github.com/ScoopInstaller/Scoop/issues/5703))
 - **config:** Warn users about misconfigured GitHub token ([#5777](https://github.com/ScoopInstaller/Scoop/issues/5777))
 - **update/uninstall:** Remove items from PATH correctly ([#5833](https://github.com/ScoopInstaller/Scoop/issues/5833))
+- **shim:** Allow GUI applications to attach to the shell's console when launched using the GUI shim ([#5721](https://github.com/ScoopInstaller/Scoop/issues/5721))
+- **core:** Fix arguments parsing method of `Invoke-ExternalCommand()` ([#5839](https://github.com/ScoopInstaller/Scoop/issues/5839))
 
 ### Performance Improvements
 
 - **decompress:** Disable progress bar to improve `Expand-Archive` performance ([#5410](https://github.com/ScoopInstaller/Scoop/issues/5410))
 - **scoop-search:** Improve performance for local search ([#5324](https://github.com/ScoopInstaller/Scoop/issues/5324))
+- **shim:** Update kiennq-shim to v3.1.1 ([#5841](https://github.com/ScoopInstaller/Scoop/issues/5841), ([#5847](https://github.com/ScoopInstaller/Scoop/issues/5847)))
 
 ### Code Refactoring
 
@@ -61,6 +64,7 @@
 ### Builds
 
 - **checkver:** Read the private_host config variable ([#5381](https://github.com/ScoopInstaller/Scoop/issues/5381))
+- **supporting:** Update Json to 13.0.3, Json.Schema to 3.0.15 ([#5835](https://github.com/ScoopInstaller/Scoop/issues/5835))
 
 ### Continuous Integration
 

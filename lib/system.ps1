@@ -71,7 +71,7 @@ function Set-EnvVar {
     Publish-EnvVar
 }
 
-function Find-Path {
+function Test-PathLikeEnvVar {
     param(
         [string]$Name,
         [string]$Path
@@ -97,13 +97,13 @@ function Add-Path {
         $Path = fullpath $Path
     }
     # future sessions
-    $inPath, $strippedPath = Find-Path $Path (Get-EnvVar -Name $Scope -Global:$Global)
+    $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name $Scope -Global:$Global)
     if (!$inPath -or $Force) {
         Write-Output "Adding $(friendly_path $Path) to $(if ($Global) {'global'} else {'your'}) path."
         Set-EnvVar -Name $Scope -Value (@($Path, $strippedPath) -join ';') -Global:$Global
     }
     # current session
-    $inPath, $strippedPath = Find-Path $Path $env:PATH
+    $inPath, $strippedPath = Test-PathLikeEnvVar $Path $env:PATH
     if (!$inPath -or $Force) {
         $env:PATH = @($Path, $strippedPath) -join ';'
     }
@@ -120,13 +120,13 @@ function Remove-Path {
         $Path = fullpath $Path
     }
     # future sessions
-    $inPath, $strippedPath = Find-Path $Path (Get-EnvVar -Name $Scope -Global:$Global)
+    $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name $Scope -Global:$Global)
     if ($inPath) {
         Write-Output "Removing $(friendly_path $Path) from $(if ($Global) {'global'} else {'your'}) path."
         Set-EnvVar -Name $Scope -Value $strippedPath -Global:$Global
     }
     # current session
-    $inPath, $strippedPath = Find-Path $Path $env:PATH
+    $inPath, $strippedPath = Test-PathLikeEnvVar $Path $env:PATH
     if ($inPath) {
         $env:PATH = $strippedPath
     }
@@ -145,8 +145,8 @@ function env($name, $global, $val) {
 }
 
 function strip_path($orig_path, $dir) {
-    Show-DeprecatedWarning $MyInvocation 'Find-Path'
-    Find-Path -Name $dir -Path $orig_path
+    Show-DeprecatedWarning $MyInvocation 'Test-PathLikeEnvVar'
+    Test-PathLikeEnvVar -Name $dir -Path $orig_path
 }
 
 function add_first_in_path($dir, $global) {
