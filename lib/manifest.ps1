@@ -140,7 +140,7 @@ function generate_user_manifest($app, $bucket, $version) {
     ensure (usermanifestsdir) | Out-Null
     $manifest_path = fullpath "$(usermanifestsdir)\$app.json"
 
-    if (get_config USE_SQLITE_CACHE $false) {
+    if (get_config USE_SQLITE_CACHE) {
         $cached_manifest = (Get-ScoopDBItem -Name $app -Bucket $bucket -Version $version).manifest
         if ($cached_manifest) {
             $cached_manifest | Out-UTF8File $manifest_path

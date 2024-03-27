@@ -31,7 +31,7 @@
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
-if (get_config USE_SQLITE_CACHE $false) {
+if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
 

@@ -23,7 +23,7 @@
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
-if (get_config USE_SQLITE_CACHE $false) {
+if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
 
@@ -194,7 +194,7 @@ function Sync-Bucket {
             if ($using:Log) {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
-            if (get_config USE_SQLITE_CACHE $false) {
+            if (get_config USE_SQLITE_CACHE) {
                 Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', "$previousCommit..HEAD") | Where-Object {
                     $_ -match '^[^.].*\.json$'
                 } | ForEach-Object {
@@ -212,7 +212,7 @@ function Sync-Bucket {
             if ($Log) {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
-            if (get_config USE_SQLITE_CACHE $false) {
+            if (get_config USE_SQLITE_CACHE) {
                 Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', "$previousCommit..HEAD") | Where-Object {
                     $_ -match '^[^.].*\.json$'
                 } | ForEach-Object {
@@ -221,7 +221,7 @@ function Sync-Bucket {
             }
         }
     }
-    if ((get_config USE_SQLITE_CACHE $false) -and ($updatedFiles.Count -gt 0)) {
+    if ((get_config USE_SQLITE_CACHE) -and ($updatedFiles.Count -gt 0)) {
         info 'Updating cache...'
         Set-ScoopDB -Path $updatedFiles
     }
