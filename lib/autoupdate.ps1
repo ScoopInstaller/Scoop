@@ -228,6 +228,12 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'sourceforge'
     }
 
+    $string = ''
+    if ($config.GetType().Name -eq 'String') {
+        $string = $config
+        $hashmode = 'match'
+    }
+
     switch ($hashmode) {
         'extract' {
             $hash = find_hash_in_textfile $hashfile_url $substitutions $regex
@@ -254,6 +260,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             # change the URL because downloads.sourceforge.net doesn't have checksums
             $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
             $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s*"([a-fA-F0-9]{40})"'
+        }
+        'match' {
+            $hash = substitute $string $substitutions
+            $hash = format_hash $hash
         }
     }
 
