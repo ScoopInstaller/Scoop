@@ -2,6 +2,7 @@
 
 ### Features
 
+- **install:** Add support for x64 microarchitectures ([#5674](https://github.com/ScoopInstaller/Scoop/pull/5674))
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
 - **bucket:** Switch nirsoft bucket to ScoopInstaller/Nirsoft ([#5328](https://github.com/ScoopInstaller/Scoop/issues/5328))
 - **config:** Support portable config file ([#5369](https://github.com/ScoopInstaller/Scoop/issues/5369))
