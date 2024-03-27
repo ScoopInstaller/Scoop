@@ -7,7 +7,7 @@ function parse_json($path) {
     try {
         Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        warn "Error parsing JSON at $path."
+        warn "Error parsing JSON at '$path'."
     }
 }
 
@@ -27,7 +27,7 @@ function url_manifest($url) {
     try {
         $str | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        warn "Error parsing JSON at $url."
+        warn "Error parsing JSON at '$url'."
     }
 }
 
@@ -44,24 +44,23 @@ function Get-Manifest($app) {
         if ($bucket) {
             $manifest = manifest $app $bucket
         } else {
-            foreach ($bucket in Get-LocalBucket) {
-                $manifest = manifest $app $bucket
+            foreach ($tekcub in Get-LocalBucket) {
+                $manifest = manifest $app $tekcub
                 if ($manifest) {
+                    $bucket = $tekcub
                     break
                 }
             }
         }
         if (!$manifest) {
             # couldn't find app in buckets: check if it's a local path
-            $appPath = $app
-            $bucket = $null
-            if (!$appPath.EndsWith('.json')) {
-                $appPath += '.json'
-            }
-            if (Test-Path $appPath) {
-                $url = Convert-Path $appPath
+            if (Test-Path $app) {
+                $url = Convert-Path $app
                 $app = appname_from_url $url
                 $manifest = url_manifest $url
+            } else {
+                if (($app -match '\\/') -or $app.EndsWith('.json')) { $url = $app }
+                $app = appname_from_url $app
             }
         }
     }
@@ -156,7 +155,6 @@ function generate_user_manifest($app, $bucket, $version) {
 function url($manifest, $arch) { arch_specific 'url' $manifest $arch }
 function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch }
 function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
-function msi($manifest, $arch) { arch_specific 'msi' $manifest $arch }
 function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
 function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch}
 function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch}

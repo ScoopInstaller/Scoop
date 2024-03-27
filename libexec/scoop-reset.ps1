@@ -8,6 +8,7 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\system.ps1" # 'env_add_path' (indirectly)
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
@@ -69,7 +70,7 @@ $apps | ForEach-Object {
 
     #region Workaround for #2952
     if (test_running_process $app $global) {
-        continue
+        return
     }
     #endregion Workaround for #2952
 

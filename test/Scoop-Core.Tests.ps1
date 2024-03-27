@@ -1,6 +1,7 @@
 BeforeAll {
     . "$PSScriptRoot\Scoop-TestLib.ps1"
     . "$PSScriptRoot\..\lib\core.ps1"
+    . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
 }
 
@@ -167,7 +168,7 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
     }
 
     It "links a file onto the user's path" {
@@ -201,7 +202,7 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
     }
 
     It 'removes shim from path' {
@@ -220,7 +221,7 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
         Mock appsdir { $working_dir }
     }
 
@@ -255,36 +256,6 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
         }
         Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
         Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/moch-shim.ps1"
-    }
-}
-
-Describe 'ensure_robocopy_in_path' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $shimdir = shimdir $false
-        Mock versiondir { "$PSScriptRoot\.." }
-    }
-
-    It 'shims robocopy when not on path' {
-        Mock Test-CommandAvailable { $false }
-        Test-CommandAvailable robocopy | Should -Be $false
-
-        ensure_robocopy_in_path
-
-        # "$shimdir/robocopy.ps1" | should -exist
-        "$shimdir/robocopy.exe" | Should -Exist
-
-        # clean up
-        rm_shim robocopy $(shimdir $false) | Out-Null
-    }
-
-    It 'does not shim robocopy when it is in path' {
-        Mock Test-CommandAvailable { $true }
-        Test-CommandAvailable robocopy | Should -Be $true
-
-        ensure_robocopy_in_path
-
-        # "$shimdir/robocopy.ps1" | should -not -exist
-        "$shimdir/robocopy.exe" | Should -Not -Exist
     }
 }
 

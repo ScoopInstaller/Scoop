@@ -34,20 +34,19 @@ foreach ($item in $import.buckets) {
 }
 
 foreach ($item in $import.apps) {
+    $instArgs = @()
+    $holdArgs = @()
     $info = $item.Info -Split ', '
-    $global = if ('Global install' -in $info) {
-        ' --global'
-    } else {
-        ''
+    if ('Global install' -in $info) {
+        $instArgs += '--global'
+        $holdArgs += '--global'
     }
-    $arch = if ('64bit' -in $info -and '64bit' -ne $def_arch) {
-        ' --arch 64bit'
+    if ('64bit' -in $info -and '64bit' -ne $def_arch) {
+        $instArgs += '--arch', '64bit'
     } elseif ('32bit' -in $info -and '32bit' -ne $def_arch) {
-        ' --arch 32bit'
+        $instArgs += '--arch', '32bit'
     } elseif ('arm64' -in $info -and 'arm64' -ne $def_arch) {
-        ' --arch arm64'
-    } else {
-        ''
+        $instArgs += '--arch', 'arm64'
     }
 
     $app = if ($item.Source -in $bucket_names) {
@@ -58,9 +57,9 @@ foreach ($item in $import.apps) {
         $item.Source
     }
 
-    & "$PSScriptRoot\scoop-install.ps1" $app$global$arch
+    & "$PSScriptRoot\scoop-install.ps1" $app @instArgs
 
     if ('Held package' -in $info) {
-        & "$PSScriptRoot\scoop-hold.ps1" $($item.Name)$global
+        & "$PSScriptRoot\scoop-hold.ps1" $item.Name @holdArgs
     }
 }

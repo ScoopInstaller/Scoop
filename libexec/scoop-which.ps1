@@ -4,7 +4,7 @@
 param($command)
 
 if (!$command) {
-    'ERROR: <command> missing'
+    error '<command> missing'
     my_usage
     exit 1
 }
@@ -12,7 +12,7 @@ if (!$command) {
 $path = Get-CommandPath $command
 
 if ($null -eq $path) {
-    Write-Host "'$command' not found / not a scoop shim."
+    warn "'$command' not found, not a scoop shim, or a broken shim."
     exit 2
 } else {
     friendly_path $path

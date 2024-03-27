@@ -1,3 +1,51 @@
+function Get-PESubsystem($filePath) {
+    try {
+        $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+        $binaryReader = [System.IO.BinaryReader]::new($fileStream)
+
+        $fileStream.Seek(0x3C, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $peOffset = $binaryReader.ReadInt32()
+
+        $fileStream.Seek($peOffset, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $fileHeaderOffset = $fileStream.Position
+
+        $fileStream.Seek(18, [System.IO.SeekOrigin]::Current) | Out-Null
+        $fileStream.Seek($fileHeaderOffset + 0x5C, [System.IO.SeekOrigin]::Begin) | Out-Null
+
+        return $binaryReader.ReadInt16()
+    } catch {
+        return -1
+    } finally {
+        $binaryReader.Close()
+        $fileStream.Close()
+    }
+}
+
+function Set-PESubsystem($filePath, $targetSubsystem) {
+    try {
+        $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
+        $binaryReader = [System.IO.BinaryReader]::new($fileStream)
+        $binaryWriter = [System.IO.BinaryWriter]::new($fileStream)
+
+        $fileStream.Seek(0x3C, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $peOffset = $binaryReader.ReadInt32()
+
+        $fileStream.Seek($peOffset, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $fileHeaderOffset = $fileStream.Position
+
+        $fileStream.Seek(18, [System.IO.SeekOrigin]::Current) | Out-Null
+        $fileStream.Seek($fileHeaderOffset + 0x5C, [System.IO.SeekOrigin]::Begin) | Out-Null
+
+        $binaryWriter.Write([System.Int16] $targetSubsystem)
+    } catch {
+        return $false
+    } finally {
+        $binaryReader.Close()
+        $fileStream.Close()
+    }
+    return $true
+}
+
 function Optimize-SecurityProtocol {
     # .NET Framework 4.7+ has a default security protocol called 'SystemDefault',
     # which allows the operating system to choose the best protocol to use.
@@ -128,13 +176,68 @@ function setup_proxy() {
     }
 }
 
-function git_cmd {
+function Invoke-Git {
+    [CmdletBinding()]
+    [OutputType([String])]
+    param(
+        [Parameter(Mandatory = $false, Position = 0)]
+        [Alias('PSPath', 'Path')]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        $WorkingDirectory,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [Alias('Args')]
+        [String[]]
+        $ArgumentList
+    )
+
     $proxy = get_config PROXY
-    $cmd = "git $($args | ForEach-Object { "$_ " })"
-    if ($proxy -and $proxy -ne 'none') {
-        $cmd = "SET HTTPS_PROXY=$proxy&&SET HTTP_PROXY=$proxy&&$cmd"
+    $git = Get-HelperPath -Helper Git
+
+    if ($WorkingDirectory) {
+        $ArgumentList = @('-C', $WorkingDirectory) + $ArgumentList
     }
-    cmd.exe /d /c $cmd
+
+    if([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none')  {
+        return & $git @ArgumentList
+    }
+
+    if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
+        $j = Start-Job -ScriptBlock {
+            # convert proxy setting for git
+            $proxy = $using:proxy
+            if ($proxy -and $proxy.StartsWith('currentuser@')) {
+                $proxy = $proxy.Replace('currentuser@', ':@')
+            }
+            $env:HTTPS_PROXY = $proxy
+            $env:HTTP_PROXY = $proxy
+            & $using:git @using:ArgumentList
+        }
+        $o = $j | Receive-Job -Wait -AutoRemoveJob
+        return $o
+    }
+
+    return & $git @ArgumentList
+}
+
+function Invoke-GitLog {
+    [CmdletBinding()]
+    Param (
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$Path,
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String]$CommitHash,
+        [String]$Name = ''
+    )
+    Process {
+        if ($Name) {
+            if ($Name.Length -gt 12) {
+                $Name = "$($Name.Substring(0, 10)).."
+            }
+            $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
+        }
+        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
+    }
 }
 
 # helper functions
@@ -209,6 +312,7 @@ function filesize($length) {
 function basedir($global) { if($global) { return $globaldir } $scoopdir }
 function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
+function modulesdir($global) { "$(basedir $global)\modules" }
 function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
@@ -293,12 +397,16 @@ Function Test-CommandAvailable {
     Return [Boolean](Get-Command $Name -ErrorAction Ignore)
 }
 
+Function Test-GitAvailable {
+    return [Boolean](Get-HelperPath -Helper Git)
+}
+
 function Get-HelperPath {
     [CmdletBinding()]
     [OutputType([String])]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
+        [ValidateSet('Git', '7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
         [String]
         $Helper
     )
@@ -307,6 +415,14 @@ function Get-HelperPath {
     }
     process {
         switch ($Helper) {
+            'Git' {
+                $internalgit = (Get-AppFilePath 'git' 'mingw64\bin\git.exe'), (Get-AppFilePath 'git' 'mingw32\bin\git.exe') | Where-Object { $_ -ne $null }
+                if ($internalgit) {
+                    $HelperPath = $internalgit
+                } else {
+                    $HelperPath = (Get-Command git -ErrorAction Ignore).Source
+                }
+            }
             '7zip' {
                 $HelperPath = Get-AppFilePath '7zip' '7z.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
@@ -349,7 +465,10 @@ function Get-CommandPath {
         } catch {
             return $null
         }
-        $commandPath = if ($comm.Path -like "$userShims*" -or $comm.Path -like "$globalShims*") {
+        $commandPath = if ($comm.Path -like "$userShims\scoop-*.ps1") {
+            # Scoop aliases
+            $comm.Source
+        } elseif ($comm.Path -like "$userShims*" -or $comm.Path -like "$globalShims*") {
             Get-ShimTarget ($comm.Path -replace '\.exe$', '.shim')
         } elseif ($comm.CommandType -eq 'Application') {
             $comm.Source
@@ -462,12 +581,18 @@ function fullpath($path) {
     $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
 }
 function friendly_path($path) {
-    $h = (Get-PsProvider 'FileSystem').home; if(!$h.endswith('\')) { $h += '\' }
-    if($h -eq '\') { return $path }
-    return "$path" -replace ([regex]::escape($h)), "~\"
+    $h = (Get-PSProvider 'FileSystem').Home
+    if (!$h.EndsWith('\')) {
+        $h += '\'
+    }
+    if ($h -eq '\') {
+        return $path
+    } else {
+        return $path -replace ([Regex]::Escape($h)), '~\'
+    }
 }
 function is_local($path) {
-    ($path -notmatch '^https?://') -and (test-path $path)
+    ($path -notmatch '^https?://') -and (Test-Path $path)
 }
 
 # operations
@@ -481,8 +606,7 @@ function Invoke-ExternalCommand {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true,
-                   Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [Alias("Path")]
         [ValidateNotNullOrEmpty()]
         [String]
@@ -494,6 +618,9 @@ function Invoke-ExternalCommand {
         [Parameter(ParameterSetName = "UseShellExecute")]
         [Switch]
         $RunAs,
+        [Parameter(ParameterSetName = "UseShellExecute")]
+        [Switch]
+        $Quiet,
         [Alias("Msg")]
         [String]
         $Activity,
@@ -523,29 +650,35 @@ function Invoke-ExternalCommand {
     if ($RunAs) {
         $Process.StartInfo.UseShellExecute = $true
         $Process.StartInfo.Verb = 'RunAs'
-    } else {
-        $Process.StartInfo.CreateNoWindow = $true
     }
-    if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
-        $Process.StartInfo.Arguments = $ArgumentList -join ' '
-    } elseif ($Process.StartInfo.ArgumentList.Add) {
-        # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
-        # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
-        # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
-        $ArgumentList | ForEach-Object { $Process.StartInfo.ArgumentList.Add($_) }
-    } else {
-        # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
-        $escapedArgs = $ArgumentList | ForEach-Object {
-            # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
-            $s = $_ -replace '(\\+)"', '$1$1"'
-            # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
-            $s = $s -replace '(\\+)$', '$1$1'
-            # escape double quotes
-            $s = $s -replace '"', '\"'
-            # quote the argument
-            "`"$s`""
+    if ($Quiet) {
+        $Process.StartInfo.UseShellExecute = $true
+        $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    }
+    if ($ArgumentList.Length -gt 0) {
+        $ArgumentList = $ArgumentList | ForEach-Object { [regex]::Split($_.Replace('"', ''), '(?<=(?<![:\w])[/-]\w+) | (?=[/-])') }
+        if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
+            $Process.StartInfo.Arguments = $ArgumentList -join ' '
+        } elseif ($Process.StartInfo.ArgumentList.Add) {
+            # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
+            # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
+            # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
+            $ArgumentList | ForEach-Object { $Process.StartInfo.ArgumentList.Add($_) }
+        } else {
+            # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
+            $escapedArgs = $ArgumentList | ForEach-Object {
+                # escape N consecutive backslash(es), which are followed by a double quote or at the end of the string, to 2N consecutive ones
+                $s = $_ -replace '(\\+)(""|$)', '$1$1$2'
+                # quote the path if it contains spaces and is not NSIS's '/D' argument
+                # ref: https://nsis.sourceforge.io/Docs/Chapter3.html
+                if ($s -match ' ' -and $s -notmatch '/D=[A-Z]:[\\/].*') {
+                    $s -replace '([A-Z]:[\\/].*)', '"$1"'
+                } else {
+                    $s
+                }
+            }
+            $Process.StartInfo.Arguments = $escapedArgs -join ' '
         }
-        $Process.StartInfo.Arguments = $escapedArgs -join ' '
     }
     try {
         [void]$Process.Start()
@@ -586,12 +719,6 @@ function Invoke-ExternalCommand {
         Write-Host "done." -ForegroundColor Green
     }
     return $true
-}
-
-function env($name,$global,$val='__get') {
-    $target = 'User'; if($global) {$target = 'Machine'}
-    if($val -eq '__get') { [environment]::getEnvironmentVariable($name,$target) }
-    else { [environment]::setEnvironmentVariable($name,$val,$target) }
 }
 
 function isFileLocked([string]$path) {
@@ -675,7 +802,7 @@ function Get-ShimTarget($ShimPath) {
         if (!$shimTarget) {
             $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
         }
-        $shimTarget | Convert-Path
+        $shimTarget | Convert-Path -ErrorAction SilentlyContinue
     }
 }
 
@@ -701,16 +828,16 @@ function warn_on_overwrite($shim, $path) {
 function shim($path, $global, $name, $arg) {
     if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
-    ensure_in_path $abs_shimdir $global
+    Add-Path -Path $abs_shimdir -Global:$global
     if (!$name) { $name = strip_ext (fname $path) }
 
     $shim = "$abs_shimdir\$($name.tolower())"
 
     # convert to relative path
-    Push-Location $abs_shimdir
-    $relative_path = Resolve-Path -Relative $path
-    Pop-Location
     $resolved_path = Convert-Path $path
+    Push-Location $abs_shimdir
+    $relative_path = Resolve-Path -Relative $resolved_path
+    Pop-Location
 
     if ($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
@@ -719,6 +846,12 @@ function shim($path, $global, $name, $arg) {
         Write-Output "path = `"$resolved_path`"" | Out-UTF8File "$shim.shim"
         if ($arg) {
             Write-Output "args = $arg" | Out-UTF8File "$shim.shim" -Append
+        }
+
+        $target_subsystem = Get-PESubsystem $resolved_path
+        if ($target_subsystem -eq 2) { # we only want to make shims GUI
+            Write-Output "Making $shim.exe a GUI binary."
+            Set-PESubsystem "$shim.exe" $target_subsystem | Out-Null
         }
     } elseif ($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
@@ -805,19 +938,9 @@ function shim($path, $global, $name, $arg) {
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
-        # find path to Git's bash so that batch scripts can run bash scripts
-        if (!(Get-CommandPath git)) {
-            error "Can't shim '$shim': 'git' is needed but not installed."
-            error "Please install git ('scoop install git') and try again."
-            exit 1
-        }
-        $gitdir = (Get-Item (Get-CommandPath git) -ErrorAction:Stop).Directory.Parent
-        if ($gitdir.FullName -imatch 'mingw') {
-            $gitdir = $gitdir.Parent
-        }
         @(
             "@rem $resolved_path",
-            "@`"$(Join-Path (Join-Path $gitdir.FullName 'bin') 'bash.exe')`" `"$resolved_path`" $arg %*"
+            "@bash `"$resolved_path`" $arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
@@ -840,26 +963,6 @@ function get_shim_path() {
         default { warn "Unknown shim version: '$shim_version'" }
     }
     return $shim_path
-}
-
-function search_in_path($target) {
-    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
-    foreach($dir in $path.split(';')) {
-        if(test-path "$dir\$target" -pathType leaf) {
-            return "$dir\$target"
-        }
-    }
-}
-
-function ensure_in_path($dir, $global) {
-    $path = env 'PATH' $global
-    $dir = fullpath $dir
-    if($path -notmatch [regex]::escape($dir)) {
-        write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
-
-        env 'PATH' $global "$dir;$path" # for future sessions...
-        $env:PATH = "$dir;$env:PATH" # for this session
-    }
 }
 
 function Get-DefaultArchitecture {
@@ -934,45 +1037,6 @@ function Confirm-InstallationStatus {
         }
     }
     return , $Installed
-}
-
-function strip_path($orig_path, $dir) {
-    if($null -eq $orig_path) { $orig_path = '' }
-    $stripped = [string]::join(';', @( $orig_path.split(';') | Where-Object { $_ -and $_ -ne $dir } ))
-    return ($stripped -ne $orig_path), $stripped
-}
-
-function add_first_in_path($dir, $global) {
-    $dir = fullpath $dir
-
-    # future sessions
-    $null, $currpath = strip_path (env 'path' $global) $dir
-    env 'path' $global "$dir;$currpath"
-
-    # this session
-    $null, $env:PATH = strip_path $env:PATH $dir
-    $env:PATH = "$dir;$env:PATH"
-}
-
-function remove_from_path($dir, $global) {
-    $dir = fullpath $dir
-
-    # future sessions
-    $was_in_path, $newpath = strip_path (env 'path' $global) $dir
-    if($was_in_path) {
-        Write-Output "Removing $(friendly_path $dir) from your path."
-        env 'path' $global $newpath
-    }
-
-    # current session
-    $was_in_path, $newpath = strip_path $env:PATH $dir
-    if($was_in_path) { $env:PATH = $newpath }
-}
-
-function ensure_robocopy_in_path {
-    if(!(Test-CommandAvailable robocopy)) {
-        shim "C:\Windows\System32\Robocopy.exe" $false
-    }
 }
 
 function wraptext($text, $width) {
@@ -1223,40 +1287,33 @@ Optimize-SecurityProtocol
 # Load Scoop config
 $configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
 $configFile = "$configHome\scoop\config.json"
-$scoopConfig = load_cfg $configFile
-
-# NOTE Scoop config file migration. Remove this after 2023/6/30
-if ($scoopConfig) {
-    $newConfigNames = @{
-        'lastUpdate'               = 'last_update'
-        'SCOOP_REPO'               = 'scoop_repo'
-        'SCOOP_BRANCH'             = 'scoop_branch'
-        '7ZIPEXTRACT_USE_EXTERNAL' = 'use_external_7zip'
-        'MSIEXTRACT_USE_LESSMSI'   = 'use_lessmsi'
-        'NO_JUNCTIONS'             = 'no_junction'
-        'manifest_review'          = 'show_manifest'
-        'rootPath'                 = 'root_path'
-        'globalPath'               = 'global_path'
-        'cachePath'                = 'cache_path'
-    }
-    $newConfigNames.GetEnumerator() | ForEach-Object {
-        if ($null -ne $scoopConfig.$($_.Key)) {
-            $value = $scoopConfig.$($_.Key)
-            $scoopConfig.PSObject.Properties.Remove($_.Key)
-            $scoopConfig | Add-Member -MemberType NoteProperty -Name $_.Value -Value $value
-            if ($_.Key -eq 'lastUpdate') {
-                $scoopConfigChg = $true
-            }
-        }
-    }
-    if ($scoopConfigChg) { # Only save config file if there was a change
-        ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
+# Check if it's the expected install path for scoop: <root>/apps/scoop/current
+$coreRoot = Split-Path $PSScriptRoot
+$pathExpected = ($coreRoot -replace '\\','/') -like '*apps/scoop/current*'
+if ($pathExpected) {
+    # Portable config is located in root directory:
+    #    .\current\scoop\apps\<root>\config.json  <- a reversed path
+    # Imagine `<root>/apps/scoop/current/` in a reversed format,
+    # and the directory tree:
+    #
+    # ```
+    # <root>:
+    # ├─apps
+    # ├─buckets
+    # ├─cache
+    # ├─persist
+    # ├─shims
+    # ├─config.json
+    # ```
+    $configPortablePath = fullpath "$coreRoot\..\..\..\config.json"
+    if (Test-Path $configPortablePath) {
+        $configFile = $configPortablePath
     }
 }
-# END NOTE
+$scoopConfig = load_cfg $configFile
 
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Resolve-Path "$PSScriptRoot\..\..\..\.."), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
 
 # Scoop global apps directory
 $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1

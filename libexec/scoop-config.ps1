@@ -151,30 +151,12 @@ if (!$name) {
 } elseif ($name -like '--help') {
     my_usage
 } elseif ($name -like 'rm') {
-    # NOTE Scoop config file migration. Remove this after 2023/6/30
-    if ($value -notin 'SCOOP_REPO', 'SCOOP_BRANCH' -and $value -in $newConfigNames.Keys) {
-        warn ('Config option "{0}" is deprecated, please use "{1}" instead next time.' -f $value, $newConfigNames.$value)
-        $value = $newConfigNames.$value
-    }
-    # END NOTE
     set_config $value $null | Out-Null
     Write-Host "'$value' has been removed"
 } elseif ($null -ne $value) {
-    # NOTE Scoop config file migration. Remove this after 2023/6/30
-    if ($name -notin 'SCOOP_REPO', 'SCOOP_BRANCH' -and $name -in $newConfigNames.Keys) {
-        warn ('Config option "{0}" is deprecated, please use "{1}" instead next time.' -f $name, $newConfigNames.$name)
-        $name = $newConfigNames.$name
-    }
-    # END NOTE
     set_config $name $value | Out-Null
     Write-Host "'$name' has been set to '$value'"
 } else {
-    # NOTE Scoop config file migration. Remove this after 2023/6/30
-    if ($name -notin 'SCOOP_REPO', 'SCOOP_BRANCH' -and $name -in $newConfigNames.Keys) {
-        warn ('Config option "{0}" is deprecated, please use "{1}" instead next time.' -f $name, $newConfigNames.$name)
-        $name = $newConfigNames.$name
-    }
-    # END NOTE
     $value = get_config $name
     if($null -eq $value) {
         Write-Host "'$name' is not set"

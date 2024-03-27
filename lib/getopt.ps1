@@ -13,7 +13,7 @@
 # following arguments are treated as non-option arguments, even if
 # they begin with a hyphen. The "--" itself will not be included in
 # the returned $opts. (POSIX-compatible)
-function getopt($argv, $shortopts, $longopts) {
+function getopt([String[]]$argv, [String]$shortopts, [String[]]$longopts) {
     $opts = @{}; $rem = @()
 
     function err($msg) {
@@ -23,10 +23,6 @@ function getopt($argv, $shortopts, $longopts) {
     function regex_escape($str) {
         return [Regex]::Escape($str)
     }
-
-    # ensure these are arrays
-    $argv = @($argv -split ' ')
-    $longopts = @($longopts)
 
     for ($i = 0; $i -lt $argv.Length; $i++) {
         $arg = $argv[$i]
@@ -81,6 +77,5 @@ function getopt($argv, $shortopts, $longopts) {
             $rem += $arg
         }
     }
-
     $opts, $rem
 }
