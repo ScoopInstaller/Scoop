@@ -88,7 +88,7 @@ function Test-PathLikeEnvVar {
 function Add-Path {
     param(
         [string]$Path,
-        [string]$Scope = 'PATH',
+        [string]$TargetEnvVar = 'PATH',
         [switch]$Global,
         [switch]$Force
     )
@@ -97,10 +97,10 @@ function Add-Path {
         $Path = fullpath $Path
     }
     # future sessions
-    $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name $Scope -Global:$Global)
+    $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name $TargetEnvVar -Global:$Global)
     if (!$inPath -or $Force) {
         Write-Output "Adding $(friendly_path $Path) to $(if ($Global) {'global'} else {'your'}) path."
-        Set-EnvVar -Name $Scope -Value (@($Path, $strippedPath) -join ';') -Global:$Global
+        Set-EnvVar -Name $TargetEnvVar -Value (@($Path, $strippedPath) -join ';') -Global:$Global
     }
     # current session
     $inPath, $strippedPath = Test-PathLikeEnvVar $Path $env:PATH
@@ -112,7 +112,7 @@ function Add-Path {
 function Remove-Path {
     param(
         [string]$Path,
-        [string]$Scope = 'PATH',
+        [string]$TargetEnvVar = 'PATH',
         [switch]$Global
     )
 
@@ -120,10 +120,10 @@ function Remove-Path {
         $Path = fullpath $Path
     }
     # future sessions
-    $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name $Scope -Global:$Global)
+    $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name $TargetEnvVar -Global:$Global)
     if ($inPath) {
         Write-Output "Removing $(friendly_path $Path) from $(if ($Global) {'global'} else {'your'}) path."
-        Set-EnvVar -Name $Scope -Value $strippedPath -Global:$Global
+        Set-EnvVar -Name $TargetEnvVar -Value $strippedPath -Global:$Global
     }
     # current session
     $inPath, $strippedPath = Test-PathLikeEnvVar $Path $env:PATH
