@@ -909,7 +909,7 @@ function env_add_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        if (get_config USE_ISOLATED_PATH $false) {
+        if (get_config USE_ISOLATED_PATH) {
             Add-Path -Path '%SCOOP_PATH%' -Global:$global
             $target_path = 'SCOOP_PATH'
         } else {
@@ -935,7 +935,7 @@ function env_rm_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        if (get_config USE_ISOLATED_PATH $false) {
+        if (get_config USE_ISOLATED_PATH) {
             $target_path = 'SCOOP_PATH'
         } else {
             $target_path = 'PATH'
