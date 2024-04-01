@@ -162,7 +162,7 @@ function Complete-ConfigChange {
         $Value
     )
 
-    if ($Name -eq 'use_sqlite_cache' -and $Value) {
+    if ($Name -eq 'use_sqlite_cache' -and $Value -eq $true) {
         . "$PSScriptRoot\..\lib\database.ps1"
         . "$PSScriptRoot\..\lib\manifest.ps1"
         info 'SQLite cache is enabled.'
