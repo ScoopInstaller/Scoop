@@ -202,44 +202,46 @@ function Set-ScoopDB {
     process {
         if ($Path.Count -eq 0) {
             $bucketPath = Get-LocalBucket | ForEach-Object { Join-Path $bucketsdir $_ }
-            $Path = (Get-ChildItem $bucketPath -Filter '*.json' -Recurse | Where-Object { $_.FullName -notmatch '[\\/]\.' }).FullName
+            $Path = (Get-ChildItem $bucketPath -Filter '*.json' -Recurse).FullName
         }
         $Path | ForEach-Object {
             $manifestRaw = [System.IO.File]::ReadAllText($_)
             $manifest = $manifestRaw | ConvertFrom-Json -ErrorAction Continue
-            $list.Add([pscustomobject]@{
-                    name        = $($_ -replace '.*[\\/]([^\\/]+)\.json$', '$1')
-                    description = if ($manifest.description) { $manifest.description } else { '' }
-                    version     = $manifest.version
-                    bucket      = $($_ -replace '.*buckets[\\/]([^\\/]+)(?:[\\/].*)', '$1')
-                    manifest    = $manifestRaw
-                    binary      = $(
-                        $result = @()
-                        @(arch_specific 'bin' $manifest $arch) | ForEach-Object {
-                            if ($_ -is [System.Array]) {
-                                $result += "$($_[1]).$($_[0].Split('.')[-1])"
-                            } else {
-                                $result += $_
+            if ($null -ne $manifest.version) {
+                $list.Add([pscustomobject]@{
+                        name        = $($_ -replace '.*[\\/]([^\\/]+)\.json$', '$1')
+                        description = if ($manifest.description) { $manifest.description } else { '' }
+                        version     = $manifest.version
+                        bucket      = $($_ -replace '.*buckets[\\/]([^\\/]+)(?:[\\/].*)', '$1')
+                        manifest    = $manifestRaw
+                        binary      = $(
+                            $result = @()
+                            @(arch_specific 'bin' $manifest $arch) | ForEach-Object {
+                                if ($_ -is [System.Array]) {
+                                    $result += "$($_[1]).$($_[0].Split('.')[-1])"
+                                } else {
+                                    $result += $_
+                                }
                             }
-                        }
-                        $result -replace '.*?([^\\/]+)?(\.(exe|bat|cmd|ps1|jar|py))$', '$1' -join ' | '
-                    )
-                    shortcut    = $(
-                        $result = @()
-                        @(arch_specific 'shortcuts' $manifest $arch) | ForEach-Object {
-                            $result += $_[1]
-                        }
-                        $result -replace '.*?([^\\/]+$)', '$1' -join ' | '
-                    )
-                    dependency  = $manifest.depends -join ' | '
-                    suggest     = $(
-                        $suggest_output = @()
-                        $manifest.suggest.PSObject.Properties | ForEach-Object {
-                            $suggest_output += $_.Value -join ' | '
-                        }
-                        $suggest_output -join ' | '
-                    )
-                })
+                            $result -replace '.*?([^\\/]+)?(\.(exe|bat|cmd|ps1|jar|py))$', '$1' -join ' | '
+                        )
+                        shortcut    = $(
+                            $result = @()
+                            @(arch_specific 'shortcuts' $manifest $arch) | ForEach-Object {
+                                $result += $_[1]
+                            }
+                            $result -replace '.*?([^\\/]+$)', '$1' -join ' | '
+                        )
+                        dependency  = $manifest.depends -join ' | '
+                        suggest     = $(
+                            $suggest_output = @()
+                            $manifest.suggest.PSObject.Properties | ForEach-Object {
+                                $suggest_output += $_.Value -join ' | '
+                            }
+                            $suggest_output -join ' | '
+                        )
+                    })
+            }
         }
     }
     end {
