@@ -3,6 +3,8 @@
 # Help: Searches for apps that are available to install.
 #
 # If used with [query], shows app names that match the query.
+#   - With 'use_sqlite_cache' enabled, [query] is partially matched against app names, binaries, and shortcuts.
+#   - Without 'use_sqlite_cache', [query] can be a regular expression to match against app names and binaries.
 # Without [query], shows all the available apps.
 param($query)
 
