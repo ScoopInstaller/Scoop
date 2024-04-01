@@ -57,7 +57,9 @@ function Set-EnvVar {
     }
     $envRegisterKey = $registerKey.OpenSubKey('Environment', $true)
     if ($null -eq $Value -or $Value -eq '') {
-        $envRegisterKey.DeleteValue($Name)
+        if ($envRegisterKey.GetValue($Name)) {
+            $envRegisterKey.DeleteValue($Name)
+        }
     } else {
         $registryValueKind = if ($Value.Contains('%')) {
             [Microsoft.Win32.RegistryValueKind]::ExpandString
