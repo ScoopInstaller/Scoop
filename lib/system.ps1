@@ -73,64 +73,91 @@ function Set-EnvVar {
     Publish-EnvVar
 }
 
-function Test-PathLikeEnvVar {
+function Split-PathLikeEnvVar {
     param(
-        [string]$Name,
+        [string[]]$Pattern,
         [string]$Path
     )
 
     if ($null -eq $Path -and $Path -eq '') {
-        return $false, $null
+        return $null, $null
     } else {
-        $strippedPath = $Path.Split(';', [System.StringSplitOptions]::RemoveEmptyEntries).Where({ $_ -ne $Name }) -join ';'
-        return ($strippedPath -ne $Path), $strippedPath
+        $splitPattern = $Pattern.Split(';', [System.StringSplitOptions]::RemoveEmptyEntries)
+        $splitPath = $Path.Split(';', [System.StringSplitOptions]::RemoveEmptyEntries)
+        $inPath = @()
+        foreach ($p in $splitPattern) {
+            $inPath += $splitPath.Where({ $_ -like $p })
+            $splitPath = $splitPath.Where({ $_ -notlike $p })
+        }
+        return ($inPath -join ';'), ($splitPath -join ';')
     }
 }
 
 function Add-Path {
     param(
-        [string]$Path,
+        [string[]]$Path,
         [string]$TargetEnvVar = 'PATH',
         [switch]$Global,
-        [switch]$Force
+        [switch]$Force,
+        [switch]$Quiet
     )
-
-    if (!$Path.Contains('%')) {
-        $Path = fullpath $Path
+    $Path = $Path | ForEach-Object {
+        if (!$_.Contains('%')) {
+            fullpath $_
+        } else {
+            $_
+        }
     }
     # future sessions
-    $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name $TargetEnvVar -Global:$Global)
+    $inPath, $strippedPath = Split-PathLikeEnvVar $Path (Get-EnvVar -Name $TargetEnvVar -Global:$Global)
     if (!$inPath -or $Force) {
-        Write-Output "Adding $(friendly_path $Path) to $(if ($Global) {'global'} else {'your'}) path."
-        Set-EnvVar -Name $TargetEnvVar -Value (@($Path, $strippedPath) -join ';') -Global:$Global
+        if (!$Quiet) {
+            $Path | ForEach-Object {
+                Write-Host "Adding $(friendly_path $_) to $(if ($Global) {'global'} else {'your'}) path."
+            }
+        }
+        Set-EnvVar -Name $TargetEnvVar -Value ((@($Path) + $strippedPath) -join ';') -Global:$Global
     }
     # current session
-    $inPath, $strippedPath = Test-PathLikeEnvVar $Path $env:PATH
+    $inPath, $strippedPath = Split-PathLikeEnvVar $Path $env:PATH
     if (!$inPath -or $Force) {
-        $env:PATH = @($Path, $strippedPath) -join ';'
+        $env:PATH = (@($Path) + $strippedPath) -join ';'
     }
 }
 
 function Remove-Path {
     param(
-        [string]$Path,
+        [string[]]$Path,
         [string]$TargetEnvVar = 'PATH',
-        [switch]$Global
+        [switch]$Global,
+        [switch]$Quiet,
+        [switch]$PassThru
     )
 
-    if (!$Path.Contains('%')) {
-        $Path = fullpath $Path
+    $Path = $Path | ForEach-Object {
+        if (!$_.Contains('%')) {
+            fullpath $_
+        } else {
+            $_
+        }
     }
     # future sessions
-    $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name $TargetEnvVar -Global:$Global)
+    $inPath, $strippedPath = Split-PathLikeEnvVar $Path (Get-EnvVar -Name $TargetEnvVar -Global:$Global)
     if ($inPath) {
-        Write-Output "Removing $(friendly_path $Path) from $(if ($Global) {'global'} else {'your'}) path."
+        if (!$Quiet) {
+            $Path | ForEach-Object {
+                Write-Host "Removing $(friendly_path $_) from $(if ($Global) {'global'} else {'your'}) path."
+            }
+        }
         Set-EnvVar -Name $TargetEnvVar -Value $strippedPath -Global:$Global
     }
     # current session
-    $inPath, $strippedPath = Test-PathLikeEnvVar $Path $env:PATH
-    if ($inPath) {
+    $inSessionPath, $strippedPath = Split-PathLikeEnvVar $Path $env:PATH
+    if ($inSessionPath) {
         $env:PATH = $strippedPath
+    }
+    if ($PassThru) {
+        return $inPath
     }
 }
 
@@ -147,8 +174,8 @@ function env($name, $global, $val) {
 }
 
 function strip_path($orig_path, $dir) {
-    Show-DeprecatedWarning $MyInvocation 'Test-PathLikeEnvVar'
-    Test-PathLikeEnvVar -Name $dir -Path $orig_path
+    Show-DeprecatedWarning $MyInvocation 'Split-PathLikeEnvVar'
+    Split-PathLikeEnvVar -Name $dir -Path $orig_path
 }
 
 function add_first_in_path($dir, $global) {
