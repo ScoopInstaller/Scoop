@@ -165,9 +165,7 @@ function Complete-ConfigChange {
     if ($Name -eq 'use_sqlite_cache' -and $Value -eq $true) {
         . "$PSScriptRoot\..\lib\database.ps1"
         . "$PSScriptRoot\..\lib\manifest.ps1"
-        info 'SQLite cache is enabled.'
-        New-ScoopDB
-        info 'Initializing cache in progress... This may take a while, please wait.'
+        info 'Initializing SQLite cache in progress... This may take a while, please wait.'
         Set-ScoopDB
     }
 }

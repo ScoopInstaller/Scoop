@@ -82,12 +82,10 @@ function Close-ScoopDB {
 #>
 function New-ScoopDB ([switch]$PassThru) {
     # Load System.Data.SQLite
-    try {
-        [Void][System.Data.SQLite.SQLiteConnection]
-    } catch {
+    if (!('System.Data.SQLite.SQLiteConnection' -as [Type])) {
         try {
             if (!(Test-Path -Path "$PSScriptRoot\..\supporting\sqlite\System.Data.SQLite.dll")) {
-                Get-SQLite
+                Get-SQLite | Out-Null
             }
             Add-Type -Path "$PSScriptRoot\..\supporting\sqlite\System.Data.SQLite.dll"
         } catch {
