@@ -59,7 +59,7 @@ function choose_item($list, $query) {
 }
 
 if (!$url) {
-    scoop help create
+    & "$PSScriptRoot\scoop-help.ps1" create
 } else {
     create_manifest $url
 }

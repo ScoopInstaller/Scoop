@@ -35,25 +35,42 @@
 - **scoop-checkup:** Change the message level of helpers from ERROR to WARN ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5614))
 - **scoop-(un)hold:** Correct output the messages when manifest not found, (already|not) held ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
 - **scoop-update:** Change error message to a better instruction ([#5677](https://github.com/ScoopInstaller/Scoop/issues/5677))
+- **manifest:** Correct source of manifest ([#5575](https://github.com/ScoopInstaller/Scoop/issues/5575))
+- **decompress:** Remove unused parent dir w/ 'extract_dir' ([#5682](https://github.com/ScoopInstaller/Scoop/issues/5682))
+- **shim:** Check literal path in `Get-ShimPath` ([#5680](https://github.com/ScoopInstaller/Scoop/issues/5680))
+- **shim:** Avoid unexpected output of `list` subcommand ([#5681](https://github.com/ScoopInstaller/Scoop/issues/5681))
+- **scoop-reset:** Don't abort when multiple apps are passed and an app is running ([#5687](https://github.com/ScoopInstaller/Scoop/issues/5687))
+- **core:** Do not call `scoop` externally from inside the code ([#5695](https://github.com/ScoopInstaller/Scoop/issues/5695))
+- **scoop-checkup:** Don't throw 7zip error when external 7zip is used ([#5703](https://github.com/ScoopInstaller/Scoop/issues/5703))
+- **config:** Warn users about misconfigured GitHub token ([#5777](https://github.com/ScoopInstaller/Scoop/issues/5777))
+- **update/uninstall:** Remove items from PATH correctly ([#5833](https://github.com/ScoopInstaller/Scoop/issues/5833))
+- **shim:** Allow GUI applications to attach to the shell's console when launched using the GUI shim ([#5721](https://github.com/ScoopInstaller/Scoop/issues/5721))
+- **core:** Fix arguments parsing method of `Invoke-ExternalCommand()` ([#5839](https://github.com/ScoopInstaller/Scoop/issues/5839))
 
 ### Performance Improvements
 
 - **decompress:** Disable progress bar to improve `Expand-Archive` performance ([#5410](https://github.com/ScoopInstaller/Scoop/issues/5410))
 - **scoop-search:** Improve performance for local search ([#5324](https://github.com/ScoopInstaller/Scoop/issues/5324))
+- **scoop-update:** Check for running process before wasting time on download ([#5799](https://github.com/ScoopInstaller/Scoop/issues/5799))
+- **shim:** Update kiennq-shim to v3.1.1 ([#5841](https://github.com/ScoopInstaller/Scoop/issues/5841), ([#5847](https://github.com/ScoopInstaller/Scoop/issues/5847)))
 
 ### Code Refactoring
 
 - **git:** Use Invoke-Git() with direct path to git.exe to prevent spawning shim subprocesses ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122), [#5375](https://github.com/ScoopInstaller/Scoop/issues/5375))
 - **scoop-download:** Output more detailed manifest information ([#5277](https://github.com/ScoopInstaller/Scoop/issues/5277))
 - **helper:** Remove 7zip's fallback '7zip-zstd' ([#5548](https://github.com/ScoopInstaller/Scoop/issues/5548))
+- **core:** Cleanup some old codes, e.g., msi section and config migration ([#5715](https://github.com/ScoopInstaller/Scoop/issues/5715), [#5824](https://github.com/ScoopInstaller/Scoop/issues/5824))
+- **core:** Rewrite and separate path-related functions to `system.ps1` ([#5836](https://github.com/ScoopInstaller/Scoop/issues/5836), [#5858](https://github.com/ScoopInstaller/Scoop/issues/5858), [#5864](https://github.com/ScoopInstaller/Scoop/issues/5864))
 
 ### Builds
 
 - **checkver:** Read the private_host config variable ([#5381](https://github.com/ScoopInstaller/Scoop/issues/5381))
+- **supporting:** Update Json to 13.0.3, Json.Schema to 3.0.15 ([#5835](https://github.com/ScoopInstaller/Scoop/issues/5835))
 
 ### Continuous Integration
 
-- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/pull/5377))
+- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/issues/5377))
+- **module:** Update 'psmodulecache' version to 'main' ([#5828](https://github.com/ScoopInstaller/Scoop/issues/5828))
 
 ### Tests
 
@@ -80,6 +97,7 @@
 - **shim:** Exit if shim creating failed 'cause no git ([#5225](https://github.com/ScoopInstaller/Scoop/issues/5225))
 - **scoop-import:** Add correct architecture argument ([#5210](https://github.com/ScoopInstaller/Scoop/issues/5210))
 - **scoop-config:** Output `[DateTime]` as `[String]` ([#5232](https://github.com/ScoopInstaller/Scoop/issues/5232))
+- **shim:** fixed shim add bug related to Resolve-Path ([#5492](https://github.com/ScoopInstaller/Scoop/issues/5492))
 
 ### Code Refactoring
 

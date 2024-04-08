@@ -43,7 +43,7 @@ if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
         warn "Scoop is out of date."
     } else {
-        scoop update
+        & "$PSScriptRoot\scoop-update.ps1"
     }
 }
 
@@ -70,7 +70,7 @@ foreach ($curr_app in $apps) {
     }
 
     if(!$manifest) {
-        error "Couldn't find manifest for '$app'$(if($url) { " at the URL $url" })."
+        error "Couldn't find manifest for '$app'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
         continue
     }
     $version = $manifest.version
