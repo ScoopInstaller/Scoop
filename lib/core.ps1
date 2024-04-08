@@ -423,12 +423,7 @@ function Get-HelperPath {
                     $HelperPath = (Get-Command git -ErrorAction Ignore).Source
                 }
             }
-            '7zip' {
-                $HelperPath = Get-AppFilePath '7zip' '7z.exe'
-                if ([String]::IsNullOrEmpty($HelperPath)) {
-                    $HelperPath = Get-AppFilePath '7zip-zstd' '7z.exe'
-                }
-            }
+            '7zip' { $HelperPath = Get-AppFilePath '7zip' '7z.exe' }
             'Lessmsi' { $HelperPath = Get-AppFilePath 'lessmsi' 'lessmsi.exe' }
             'Innounp' { $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe' }
             'Dark' {
