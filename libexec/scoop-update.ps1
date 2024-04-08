@@ -195,7 +195,7 @@ function Sync-Bucket {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
             if (get_config USE_SQLITE_CACHE) {
-                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', "$previousCommit..HEAD") | Where-Object {
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', '--diff-filter=d', $previousCommit) | Where-Object {
                     $_ -match '^[^.].*\.json$'
                 } | ForEach-Object {
                     [void]($using:updatedFiles).Add($(Join-Path $bucketLoc $_))
@@ -213,7 +213,7 @@ function Sync-Bucket {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
             if (get_config USE_SQLITE_CACHE) {
-                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', "$previousCommit..HEAD") | Where-Object {
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', '--diff-filter=d', $previousCommit) | Where-Object {
                     $_ -match '^[^.].*\.json$'
                 } | ForEach-Object {
                     [void]($updatedFiles).Add($(Join-Path $bucketLoc $_))
