@@ -16,6 +16,7 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'save_install_info' in 'manifest.ps1' (indirectly)
+. "$PSScriptRoot\..\lib\system.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"
@@ -89,7 +90,7 @@ function Sync-Scoop {
                 Rename-Item $newdir 'current' -ErrorAction Stop
             } catch {
                 Write-Warning $_
-                abort "Scoop update failed. Folder in use. Paste $newdir into $currentdir."
+                abort "Scoop update failed. Folder in use. Please rename folders $currentdir to ``old`` and $newdir to ``current``."
             }
         }
     } else {
@@ -240,6 +241,13 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     Write-Host "Updating '$app' ($old_version -> $version)"
 
+    #region Workaround for #2952
+    if (test_running_process $app $global) {
+        Write-Host 'Running process detected, skip updating.'
+        return
+    }
+    #endregion Workaround for #2952
+
     # region Workaround
     # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
@@ -280,24 +288,17 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
-    #region Workaround for #2952
-    if (test_running_process $app $global) {
-        return
-    }
-    #endregion Workaround for #2952
-
     Write-Host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir
     rm_shims $app $old_manifest $global $architecture
-    env_rm_path $old_manifest $dir $global $architecture
-    env_rm $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
     # directory.
     $refdir = unlink_current $dir
-
     uninstall_psmodule $old_manifest $refdir $global
+    env_rm_path $old_manifest $refdir $global $architecture
+    env_rm $old_manifest $global $architecture
 
     if ($force -and ($old_version -eq $version)) {
         if (!(Test-Path "$dir/../_$version.old")) {
