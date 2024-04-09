@@ -294,6 +294,16 @@ function Expand-DarkArchive {
     }
     if (Test-Path "$DestinationPath\WixAttachedContainer") {
         Rename-Item "$DestinationPath\WixAttachedContainer" 'AttachedContainer' -ErrorAction Ignore
+    } else {
+        if (Test-Path "$DestinationPath\AttachedContainer\a0") {
+            $Xml = [xml](Get-Content -Raw "$DestinationPath\UX\manifest.xml" -Encoding utf8)
+            $Xml.BurnManifest.UX.Payload | ForEach-Object {
+                Rename-Item "$DestinationPath\UX\$($_.SourcePath)" $_.FilePath -ErrorAction Ignore
+            }
+            $Xml.BurnManifest.Payload | ForEach-Object {
+                Rename-Item "$DestinationPath\AttachedContainer\$($_.SourcePath)" $_.FilePath -ErrorAction Ignore
+            }
+        }
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
