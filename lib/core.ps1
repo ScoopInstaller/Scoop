@@ -909,6 +909,7 @@ function shim($path, $global, $name, $arg) {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
+            "@cd /d $(Split-Path $resolved_path -Parent)"
             "@java -jar `"$resolved_path`" $arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
@@ -916,6 +917,12 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
+            "if [ `$(echo `$WSL_DISTRO_NAME) ]",
+            'then',
+            "  cd `$(wslpath -u '$(Split-Path $resolved_path -Parent)')",
+            'else',
+            "  cd `"$((Split-Path $resolved_path -Parent).Replace('\', '/'))`"",
+            'fi',
             "java.exe -jar `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.py$') {
