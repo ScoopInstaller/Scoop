@@ -95,7 +95,7 @@ function Add-Path {
     )
 
     if (!$Path.Contains('%')) {
-        $Path = fullpath $Path
+        $Path = Get-AbsolutePath $Path
     }
     # future sessions
     $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name 'PATH' -Global:$Global)
@@ -117,7 +117,7 @@ function Remove-Path {
     )
 
     if (!$Path.Contains('%')) {
-        $Path = fullpath $Path
+        $Path = Get-AbsolutePath $Path
     }
     # future sessions
     $inPath, $strippedPath = Test-PathLikeEnvVar $Path (Get-EnvVar -Name 'PATH' -Global:$Global)

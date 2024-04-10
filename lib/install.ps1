@@ -81,7 +81,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 }
 
 function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
-    $cached = fullpath (cache_path $app $version $url)
+    $cached = cache_path $app $version $url
 
     if (!(Test-Path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
@@ -239,7 +239,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         $data.$url = @{
             'target'    = "$dir\$(url_filename $url)"
             'cachename' = fname (cache_path $app $version $url)
-            'source'    = fullpath (cache_path $app $version $url)
+            'source'    = cache_path $app $version $url
         }
 
         if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
@@ -638,9 +638,7 @@ function cookie_header($cookies) {
 }
 
 function is_in_dir($dir, $check) {
-    $check = "$(fullpath $check)"
-    $dir = "$(fullpath $dir)"
-    $check -match "^$([regex]::Escape("$dir"))([/\\]|`$)"
+    $check -match "^$([regex]::Escape("$dir"))([/\\]|$)"
 }
 
 function ftp_file_size($url) {
@@ -665,7 +663,6 @@ function hash_for_url($manifest, $url, $arch) {
 
 # returns (ok, err)
 function check_hash($file, $hash, $app_name) {
-    $file = fullpath $file
     if (!$hash) {
         warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
         return $true, $null
@@ -1088,8 +1085,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             $source = $source.TrimEnd('/').TrimEnd('\\')
 
-            $source = fullpath "$dir\$source"
-            $target = fullpath "$persist_dir\$target"
+            $source = "$dir\$source"
+            $target = "$persist_dir\$target"
 
             # if we have had persist data in the store, just create link and go
             if (Test-Path $target) {
