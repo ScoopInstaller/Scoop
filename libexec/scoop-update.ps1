@@ -71,7 +71,7 @@ function Sync-Scoop {
     if (!(Test-GitAvailable)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     Write-Host "Updating Scoop..."
-    $currentdir = fullpath $(versiondir 'scoop' 'current')
+    $currentdir = versiondir 'scoop' 'current'
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
         $olddir = "$currentdir\..\old"
@@ -241,6 +241,13 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
     Write-Host "Updating '$app' ($old_version -> $version)"
 
+    #region Workaround for #2952
+    if (test_running_process $app $global) {
+        Write-Host 'Running process detected, skip updating.'
+        return
+    }
+    #endregion Workaround for #2952
+
     # region Workaround
     # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
@@ -255,7 +262,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
 
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
-                $source = fullpath (cache_path $app $version $url)
+                $source = cache_path $app $version $url
                 $ok, $err = check_hash $source $manifest_hash $(show_app $app $bucket)
 
                 if (!$ok) {
@@ -280,12 +287,6 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $persist_dir = persistdir $app $global
 
     Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
-
-    #region Workaround for #2952
-    if (test_running_process $app $global) {
-        return
-    }
-    #endregion Workaround for #2952
 
     Write-Host "Uninstalling '$app' ($old_version)"
     run_uninstaller $old_manifest $architecture $dir

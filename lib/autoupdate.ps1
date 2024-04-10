@@ -278,7 +278,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return $null
     }
-    $file = fullpath (cache_path $app $version $url)
+    $file = cache_path $app $version $url
     $hash = (Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower()
     Write-Host 'Computed hash: ' -ForegroundColor DarkYellow -NoNewline
     Write-Host $hash -ForegroundColor Green

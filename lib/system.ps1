@@ -103,7 +103,7 @@ function Add-Path {
     )
     $Path = $Path | ForEach-Object {
         if (!$_.Contains('%')) {
-            fullpath $_
+            Get-AbsolutePath $_
         } else {
             $_
         }
@@ -136,7 +136,7 @@ function Remove-Path {
 
     $Path = $Path | ForEach-Object {
         if (!$_.Contains('%')) {
-            fullpath $_
+            Get-AbsolutePath $_
         } else {
             $_
         }

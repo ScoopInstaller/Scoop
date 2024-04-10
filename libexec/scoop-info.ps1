@@ -160,7 +160,7 @@ if ($status.installed) {
         $totalPackage = 0
         foreach ($url in @(url $manifest (Get-DefaultArchitecture))) {
             try {
-                if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
+                if (Test-Path (cache_path $app $manifest.version $url)) {
                     $cached = " (latest version is cached)"
                 } else {
                     $cached = $null

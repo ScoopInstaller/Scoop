@@ -136,7 +136,7 @@ Function Get-VirusTotalResultByHash ($hash, $url, $app) {
                 warn "$app`: $unsafe/$total, see $report_url"
             }
             Default {
-                warn "`e[31m$app`: $unsafe/$total, see $report_url`e[0m"
+                warn "$([char]0x1b)[31m$app`: $unsafe/$total, see $report_url$([char]0x1b)[0m"
             }
         }
         $maliciousResults = $vendorResults |
