@@ -113,7 +113,7 @@ function New-ScoopDB ([switch]$PassThru) {
     $tableCommand.ExecuteNonQuery() | Out-Null
     $tableCommand.Dispose()
     if ($PassThru) {
-        $db
+        return $db
     } else {
         $db.Dispose()
     }
