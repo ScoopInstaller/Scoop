@@ -48,6 +48,7 @@
 - **core:** Fix arguments parsing method of `Invoke-ExternalCommand()` ([#5839](https://github.com/ScoopInstaller/Scoop/issues/5839))
 - **scoop-alias:** Prevent overwrite existing file when adding alias ([#5577](https://github.com/ScoopInstaller/Scoop/issues/5577))
 - **scoop-virustotal:** Fix the issue that escape character not available in PowerShell 5.1 ([#5870](https://github.com/ScoopInstaller/Scoop/issues/5870))
+- **shim:** Run JAR file from app's root directory ([#5872](https://github.com/ScoopInstaller/Scoop/issues/5872))
 
 ### Performance Improvements
 
