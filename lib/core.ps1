@@ -450,8 +450,8 @@ function Get-CommandPath {
     )
 
     begin {
-        $userShims = Convert-Path (shimdir $false)
-        $globalShims = fullpath (shimdir $true) # don't resolve: may not exist
+        $userShims = shimdir $false
+        $globalShims = shimdir $true
     }
 
     process {
@@ -571,9 +571,33 @@ function ensure($dir) {
     }
     Convert-Path -Path $dir
 }
+function Get-AbsolutePath {
+    <#
+    .SYNOPSIS
+        Get absolute path
+    .DESCRIPTION
+        Get absolute path, even if not existed
+    .PARAMETER Path
+        Path to manipulate
+    .OUTPUTS
+        System.String
+            Absolute path, may or maynot existed
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]
+        $Path
+    )
+    process {
+        return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+    }
+}
+
 function fullpath($path) {
-    # should be ~ rooted
-    $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
+    Show-DeprecatedWarning $MyInvocation 'Get-AbsolutePath'
+    return Get-AbsolutePath -Path $path
 }
 function friendly_path($path) {
     $h = (Get-PSProvider 'FileSystem').Home
@@ -909,6 +933,7 @@ function shim($path, $global, $name, $arg) {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
+            "@cd /d $(Split-Path $resolved_path -Parent)"
             "@java -jar `"$resolved_path`" $arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
@@ -916,6 +941,12 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
+            "if [ `$(echo `$WSL_DISTRO_NAME) ]",
+            'then',
+            "  cd `$(wslpath -u '$(Split-Path $resolved_path -Parent)')",
+            'else',
+            "  cd `"$((Split-Path $resolved_path -Parent).Replace('\', '/'))`"",
+            'fi',
             "java.exe -jar `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.py$') {
@@ -1300,7 +1331,7 @@ if ($pathExpected) {
     # ├─shims
     # ├─config.json
     # ```
-    $configPortablePath = fullpath "$coreRoot\..\..\..\config.json"
+    $configPortablePath = Get-AbsolutePath "$coreRoot\..\..\..\config.json"
     if (Test-Path $configPortablePath) {
         $configFile = $configPortablePath
     }
@@ -1308,17 +1339,17 @@ if ($pathExpected) {
 $scoopConfig = load_cfg $configFile
 
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Resolve-Path "$PSScriptRoot\..\..\..\.."), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop cache directory
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # OS information
 $WindowsBuild = [System.Environment]::OSVersion.Version.Build
