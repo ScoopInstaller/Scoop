@@ -906,11 +906,10 @@ function env_add_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
+        $target_path = 'PATH'
         if (get_config USE_ISOLATED_PATH) {
             Add-Path -Path '%SCOOP_PATH%' -Global:$global
             $target_path = 'SCOOP_PATH'
-        } else {
-            $target_path = 'PATH'
         }
         Add-Path -Path ($env_add_path.Where({ $_ -and !$_.Contains(':') }).ForEach({ Join-Path $dir $_ })) -TargetEnvVar $target_path -Global:$global -Force
     }
