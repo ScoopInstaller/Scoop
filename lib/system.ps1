@@ -101,13 +101,7 @@ function Add-Path {
         [switch]$Force,
         [switch]$Quiet
     )
-    $Path = $Path | ForEach-Object {
-        if (!$_.Contains('%')) {
-            Get-AbsolutePath $_
-        } else {
-            $_
-        }
-    }
+
     # future sessions
     $inPath, $strippedPath = Split-PathLikeEnvVar $Path (Get-EnvVar -Name $TargetEnvVar -Global:$Global)
     if (!$inPath -or $Force) {
@@ -134,13 +128,6 @@ function Remove-Path {
         [switch]$PassThru
     )
 
-    $Path = $Path | ForEach-Object {
-        if (!$_.Contains('%')) {
-            Get-AbsolutePath $_
-        } else {
-            $_
-        }
-    }
     # future sessions
     $inPath, $strippedPath = Split-PathLikeEnvVar $Path (Get-EnvVar -Name $TargetEnvVar -Global:$Global)
     if ($inPath) {

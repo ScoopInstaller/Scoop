@@ -46,13 +46,10 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         # test data
         $manifest = @{
-            'env_add_path' = @('foo', 'bar')
+            'env_add_path' = @('foo', 'bar', '.', '..')
         }
         $testdir = Join-Path $PSScriptRoot 'path-test-directory'
         $global = $false
-
-        # store the original path to prevent leakage of tests
-        $origPath = $env:PATH
     }
 
     It 'should concat the correct path' {
@@ -61,12 +58,16 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
 
         # adding
         env_add_path $manifest $testdir $global
-        Assert-MockCalled Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\foo" }
-        Assert-MockCalled Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
+        Should -Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\foo" }
+        Should -Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
+        Should -Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like $testdir }
+        Should -Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -like $PSScriptRoot }
 
         env_rm_path $manifest $testdir $global
-        Assert-MockCalled Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\foo" }
-        Assert-MockCalled Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
+        Should -Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\foo" }
+        Should -Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
+        Should -Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like $testdir }
+        Should -Invoke -CommandName Remove-Path -Times 0 -ParameterFilter { $Path -like $PSScriptRoot }
     }
 }
 

@@ -911,7 +911,8 @@ function env_add_path($manifest, $dir, $global, $arch) {
             Add-Path -Path '%SCOOP_PATH%' -Global:$global
             $target_path = 'SCOOP_PATH'
         }
-        Add-Path -Path ($env_add_path.Where({ $_ -and !$_.Contains(':') }).ForEach({ Join-Path $dir $_ })) -TargetEnvVar $target_path -Global:$global -Force
+        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        Add-Path -Path $path -TargetEnvVar $target_path -Global:$global -Force
     }
 }
 
@@ -919,15 +920,9 @@ function env_rm_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        $env_add_path | Where-Object { $_ } | ForEach-Object {
-            if ($_ -eq '.') {
-                $path_dir = $dir
-            } else {
-                $path_dir = Join-Path $dir $_
-            }
-            Remove-Path -Path $path_dir -Global:$global
-            Remove-Path -Path $path_dir -TargetEnvVar 'SCOOP_PATH' -Global:$global
-        }
+        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        Remove-Path -Path $path -Global:$global
+        Remove-Path -Path $path -TargetEnvVar 'SCOOP_PATH' -Global:$global
     }
 }
 
