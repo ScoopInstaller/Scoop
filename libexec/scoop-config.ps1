@@ -115,10 +115,6 @@
 #       Nightly version is formatted as 'nightly-yyyyMMdd' and will be updated after one day if this is set to $true.
 #       Otherwise, nightly version will not be updated unless `--force` is used.
 #
-# use_isolated_path: $true|$false
-#       When set to $true, Scoop will use `SCOOP_PATH` environment variable to store apps' `PATH`s.
-#       This is useful when you want to isolate Scoop from the system `PATH`.
-#
 # ARIA2 configuration
 # -------------------
 #

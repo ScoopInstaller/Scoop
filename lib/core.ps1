@@ -142,61 +142,9 @@ function set_config {
         $scoopConfig.PSObject.Properties.Remove($name)
     }
 
-    # Initialize config's change
-    Complete-ConfigChange -Name $name -Value $value
-
     # Save config with UTF8NoBOM encoding
     ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
     return $scoopConfig
-}
-
-function Complete-ConfigChange {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory, Position = 0)]
-        [string]
-        $Name,
-        [Parameter(Mandatory, Position = 1)]
-        [AllowEmptyString()]
-        [string]
-        $Value
-    )
-
-    if ($Name -eq 'use_isolated_path') {
-        . "$PSScriptRoot\..\lib\system.ps1"
-
-        if ($Value -eq $true) {
-            info 'Switching to isolated path... This may take a while, please wait.'
-            $movedPath = Remove-Path -Path "$scoopdir\apps\*" -Quiet -PassThru
-            if ($movedPath) {
-                Add-Path -Path $movedPath -TargetEnvVar 'SCOOP_PATH' -Quiet
-                Add-Path -Path '%SCOOP_PATH%' -Quiet
-            }
-            if (is_admin) {
-                $movedPath = Remove-Path -Path "$globaldir\apps\*" -Global -Quiet -PassThru
-                if ($movedPath) {
-                    Add-Path -Path $movedPath -TargetEnvVar 'SCOOP_PATH' -Global -Quiet
-                    Add-Path -Path '%SCOOP_PATH%' -Global -Quiet
-                }
-            }
-        } else {
-            info 'Switching to shared path... This may take a while, please wait.'
-            $movedPath = Get-EnvVar -Name 'SCOOP_PATH'
-            if ($movedPath) {
-                Add-Path -Path $movedPath -Quiet
-                Remove-Path -Path '%SCOOP_PATH%' -Quiet
-                Set-EnvVar -Name 'SCOOP_PATH' -Quiet
-            }
-            if (is_admin) {
-                $movedPath = Get-EnvVar -Name 'SCOOP_PATH' -Global
-                if ($movedPath) {
-                    Add-Path -Path $movedPath -Global -Quiet
-                    Remove-Path -Path '%SCOOP_PATH%' -Global -Quiet
-                    Set-EnvVar -Name 'SCOOP_PATH' -Global -Quiet
-                }
-            }
-        }
-    }
 }
 
 function setup_proxy() {
