@@ -427,9 +427,9 @@ function Get-HelperPath {
             'Lessmsi' { $HelperPath = Get-AppFilePath 'lessmsi' 'lessmsi.exe' }
             'Innounp' { $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe' }
             'Dark' {
-                $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
+                $HelperPath = Get-AppFilePath 'wixtoolset' 'wix.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
-                    $HelperPath = Get-AppFilePath 'wixtoolset' 'dark.exe'
+                    $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
                 }
             }
             'Aria2' { $HelperPath = Get-AppFilePath 'aria2' 'aria2c.exe' }
