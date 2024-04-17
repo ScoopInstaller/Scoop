@@ -50,6 +50,7 @@
 - **scoop-virustotal:** Fix the issue that escape character not available in PowerShell 5.1 ([#5870](https://github.com/ScoopInstaller/Scoop/issues/5870))
 - **decompress:** Use `wix.exe` in WiX Toolset v4+ as primary extractor of `Expand-DarkArchive()` ([#5871](https://github.com/ScoopInstaller/Scoop/issues/5871))
 - **shim:** Run JAR file from app's root directory ([#5872](https://github.com/ScoopInstaller/Scoop/issues/5872))
+- **autoupdate:** Fix bug that 'WebClient' doesn't auto-extract 'gzip' ([#5901](https://github.com/ScoopInstaller/Scoop/issues/5901))
 
 ### Performance Improvements
 
