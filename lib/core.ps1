@@ -1302,6 +1302,34 @@ function Out-UTF8File {
     }
 }
 
+function Get-CIEnvironment {
+    foreach ($ci_env in @{
+        'APPVEYOR'           = 'AppVeyor'
+        'TF_BUILD'           = 'Azure Pipelines'
+        'bamboo.buildKey'    = 'Bamboo'
+        'BUILDKITE'          = 'Buildkite'
+        'CIRCLECI'           = 'Circle CI'
+        'CIRRUS_CI'          = 'Cirrus CI'
+        'CODEBUILD_BUILD_ID' = 'CodeBuild'
+        'GITHUB_ACTIONS'     = 'Github Actions'
+        'GITLAB_CI'          = 'GitLab CI'
+        'HEROKU_TEST_RUN_ID' = 'Heroku CI'
+        'TEAMCITY_VERSION'   = 'TeamCity'
+        'TRAVIS'             = 'Travis CI'
+    }.GetEnumerator()) {
+        if (-not [String]::IsNullOrEmpty((Get-Item "Env:/$($ci_env.Key)" -ErrorAction Ignore).Value)) {
+            return $ci_env.Value
+        }
+    }
+    foreach ($ci_env in 'BUILD_ID', 'CI') {
+        if (-not [String]::IsNullOrEmpty((Get-Item "Env:/$($ci_env)" -ErrorAction Ignore).Value)) {
+            return 'generic'
+        }
+    }
+
+    return ""
+}
+
 ##################
 # Core Bootstrap #
 ##################
