@@ -23,7 +23,7 @@ function url_manifest($url) {
     } catch {
         throw
     }
-    if(!$str) { return $null }
+    if (!$str) { return $null }
     try {
         $str | ConvertFrom-Json -ErrorAction Stop
     } catch {
@@ -138,7 +138,7 @@ function generate_user_manifest($app, $bucket, $version) {
     warn "Attempting to generate manifest for '$app' ($version)"
 
     ensure (usermanifestsdir) | Out-Null
-    $manifest_path = fullpath "$(usermanifestsdir)\$app.json"
+    $manifest_path = "$(usermanifestsdir)\$app.json"
 
     if (get_config USE_SQLITE_CACHE) {
         $cached_manifest = (Get-ScoopDBItem -Name $app -Bucket $bucket -Version $version).manifest
@@ -156,7 +156,7 @@ function generate_user_manifest($app, $bucket, $version) {
         Invoke-AutoUpdate $app $manifest_path $manifest $version $(@{ })
         return $manifest_path
     } catch {
-        write-host -f darkred "Could not install $app@$version"
+        Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
     }
 
     return $null
@@ -166,5 +166,5 @@ function url($manifest, $arch) { arch_specific 'url' $manifest $arch }
 function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch }
 function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
 function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
-function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch}
-function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch}
+function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch }
+function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch }

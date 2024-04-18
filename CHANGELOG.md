@@ -65,7 +65,6 @@
 - **scoop-update:** Check for running process before wasting time on download ([#5799](https://github.com/ScoopInstaller/Scoop/issues/5799))
 - **decompress:** Disable progress bar to improve `Expand-Archive` performance ([#5410](https://github.com/ScoopInstaller/Scoop/issues/5410))
 - **shim:** Update kiennq-shim to v3.1.1 ([#5841](https://github.com/ScoopInstaller/Scoop/issues/5841), [#5847](https://github.com/ScoopInstaller/Scoop/issues/5847))
-- **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851))
 
 ### Code Refactoring
 

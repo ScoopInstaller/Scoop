@@ -145,9 +145,6 @@ function set_config {
         $scoopConfig.PSObject.Properties.Remove($name)
     }
 
-    # Initialize config's change
-    Complete-ConfigChange -Name $name -Value $value
-
     # Save config with UTF8NoBOM encoding
     ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
     return $scoopConfig
