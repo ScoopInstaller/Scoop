@@ -132,6 +132,9 @@ function set_config {
         $value = [System.Convert]::ToBoolean($value)
     }
 
+    # Initialize config's change
+    Complete-ConfigChange -Name $name -Value $value
+
     if ($null -eq $scoopConfig.$name) {
         $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
     } else {
@@ -161,6 +164,61 @@ function Complete-ConfigChange {
         [string]
         $Value
     )
+
+    if ($Name -eq 'use_isolated_path') {
+        $oldValue = get_config USE_ISOLATED_PATH
+        if ($Value -eq $oldValue) {
+            return
+        } else {
+            $currPathEnvVar = $scoopPathEnvVar
+        }
+        . "$PSScriptRoot\..\lib\system.ps1"
+
+        if ($Value -eq $false -or $Value -eq '') {
+            info 'Turn off Scoop isolated path... This may take a while, please wait.'
+            $movedPath = Get-EnvVar -Name $currPathEnvVar
+            if ($movedPath) {
+                Add-Path -Path $movedPath -Quiet
+                Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
+                Set-EnvVar -Name $currPathEnvVar -Quiet
+            }
+            if (is_admin) {
+                $movedPath = Get-EnvVar -Name $currPathEnvVar -Global
+                if ($movedPath) {
+                    Add-Path -Path $movedPath -Global -Quiet
+                    Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet
+                    Set-EnvVar -Name $currPathEnvVar -Global -Quiet
+                }
+            }
+        } else {
+            $newPathEnvVar = if ($Value -eq $true) {
+                'SCOOP_PATH'
+            } else {
+                $Value.ToUpperInvariant()
+            }
+            info "Turn on Scoop isolated path ('$newPathEnvVar')... This may take a while, please wait."
+            $movedPath = Remove-Path -Path "$scoopdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
+            if ($movedPath) {
+                Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Quiet
+                Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
+                if ($currPathEnvVar -ne 'PATH') {
+                    Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
+                    Set-EnvVar -Name $currPathEnvVar -Quiet
+                }
+            }
+            if (is_admin) {
+                $movedPath = Remove-Path -Path "$globaldir\apps\*" -TargetEnvVar $currPathEnvVar -Global -Quiet -PassThru
+                if ($movedPath) {
+                    Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Global -Quiet
+                    Add-Path -Path ('%' + $newPathEnvVar + '%') -Global -Quiet
+                    if ($currPathEnvVar -ne 'PATH') {
+                        Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet
+                        Set-EnvVar -Name $currPathEnvVar -Global -Quiet
+                    }
+                }
+            }
+        }
+    }
 
     if ($Name -eq 'use_sqlite_cache' -and $Value -eq $true) {
         . "$PSScriptRoot\..\lib\database.ps1"
@@ -326,7 +384,7 @@ function filesize($length) {
     } else {
         if ($null -eq $length) {
             $length = 0
-       }
+        }
         "$($length) B"
     }
 }
@@ -446,18 +504,13 @@ function Get-HelperPath {
                     $HelperPath = (Get-Command git -ErrorAction Ignore).Source
                 }
             }
-            '7zip' {
-                $HelperPath = Get-AppFilePath '7zip' '7z.exe'
-                if ([String]::IsNullOrEmpty($HelperPath)) {
-                    $HelperPath = Get-AppFilePath '7zip-zstd' '7z.exe'
-                }
-            }
+            '7zip' { $HelperPath = Get-AppFilePath '7zip' '7z.exe' }
             'Lessmsi' { $HelperPath = Get-AppFilePath 'lessmsi' 'lessmsi.exe' }
             'Innounp' { $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe' }
             'Dark' {
-                $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
+                $HelperPath = Get-AppFilePath 'wixtoolset' 'wix.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
-                    $HelperPath = Get-AppFilePath 'wixtoolset' 'dark.exe'
+                    $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
                 }
             }
             'Aria2' { $HelperPath = Get-AppFilePath 'aria2' 'aria2c.exe' }
@@ -478,8 +531,8 @@ function Get-CommandPath {
     )
 
     begin {
-        $userShims = Convert-Path (shimdir $false)
-        $globalShims = fullpath (shimdir $true) # don't resolve: may not exist
+        $userShims = shimdir $false
+        $globalShims = shimdir $true
     }
 
     process {
@@ -599,17 +652,47 @@ function ensure($dir) {
     }
     Convert-Path -Path $dir
 }
+function Get-AbsolutePath {
+    <#
+    .SYNOPSIS
+        Get absolute path
+    .DESCRIPTION
+        Get absolute path, even if not existed
+    .PARAMETER Path
+        Path to manipulate
+    .OUTPUTS
+        System.String
+            Absolute path, may or maynot existed
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]
+        $Path
+    )
+    process {
+        return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+    }
+}
+
 function fullpath($path) {
-    # should be ~ rooted
-    $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
+    Show-DeprecatedWarning $MyInvocation 'Get-AbsolutePath'
+    return Get-AbsolutePath -Path $path
 }
 function friendly_path($path) {
-    $h = (Get-PsProvider 'FileSystem').home; if(!$h.endswith('\')) { $h += '\' }
-    if($h -eq '\') { return $path }
-    return "$path" -replace ([regex]::escape($h)), "~\"
+    $h = (Get-PSProvider 'FileSystem').Home
+    if (!$h.EndsWith('\')) {
+        $h += '\'
+    }
+    if ($h -eq '\') {
+        return $path
+    } else {
+        return $path -replace ([Regex]::Escape($h)), '~\'
+    }
 }
 function is_local($path) {
-    ($path -notmatch '^https?://') -and (test-path $path)
+    ($path -notmatch '^https?://') -and (Test-Path $path)
 }
 
 # operations
@@ -738,57 +821,6 @@ function Invoke-ExternalCommand {
     return $true
 }
 
-function Publish-Env {
-    if (-not ("Win32.NativeMethods" -as [Type])) {
-        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
-[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-public static extern IntPtr SendMessageTimeout(
-    IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
-    uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
-"@
-    }
-
-    $HWND_BROADCAST = [IntPtr] 0xffff;
-    $WM_SETTINGCHANGE = 0x1a;
-    $result = [UIntPtr]::Zero
-
-    [Win32.Nativemethods]::SendMessageTimeout($HWND_BROADCAST,
-        $WM_SETTINGCHANGE,
-        [UIntPtr]::Zero,
-        "Environment",
-        2,
-        5000,
-        [ref] $result
-    ) | Out-Null
-}
-
-function env($name, $global, $val = '__get') {
-    $RegisterKey = if ($global) {
-        Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
-    } else {
-        Get-Item -Path 'HKCU:'
-    }
-    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $val -ne '__get')
-
-    if ($val -eq '__get') {
-        $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
-        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
-    } elseif ($val -eq $null) {
-        try { $EnvRegisterKey.DeleteValue($name) } catch { }
-        Publish-Env
-    } else {
-        $RegistryValueKind = if ($val.Contains('%')) {
-            [Microsoft.Win32.RegistryValueKind]::ExpandString
-        } elseif ($EnvRegisterKey.GetValue($name)) {
-            $EnvRegisterKey.GetValueKind($name)
-        } else {
-            [Microsoft.Win32.RegistryValueKind]::String
-        }
-        $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
-        Publish-Env
-    }
-}
-
 function isFileLocked([string]$path) {
     $file = New-Object System.IO.FileInfo $path
 
@@ -896,7 +928,7 @@ function warn_on_overwrite($shim, $path) {
 function shim($path, $global, $name, $arg) {
     if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
-    ensure_in_path $abs_shimdir $global
+    Add-Path -Path $abs_shimdir -Global:$global
     if (!$name) { $name = strip_ext (fname $path) }
 
     $shim = "$abs_shimdir\$($name.tolower())"
@@ -982,6 +1014,7 @@ function shim($path, $global, $name, $arg) {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
+            "@cd /d $(Split-Path $resolved_path -Parent)"
             "@java -jar `"$resolved_path`" $arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
@@ -989,6 +1022,12 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
+            "if [ `$(echo `$WSL_DISTRO_NAME) ]",
+            'then',
+            "  cd `$(wslpath -u '$(Split-Path $resolved_path -Parent)')",
+            'else',
+            "  cd `"$((Split-Path $resolved_path -Parent).Replace('\', '/'))`"",
+            'fi',
             "java.exe -jar `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.py$') {
@@ -1021,36 +1060,15 @@ function shim($path, $global, $name, $arg) {
 }
 
 function get_shim_path() {
-    $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"
-    $shim_version = get_config SHIM 'default'
-    switch ($shim_version) {
-        '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
-        'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
-        'kiennq' { Break } # for backward compatibility
-        'default' { Break }
+    $shim_version = get_config SHIM 'kiennq'
+    $shim_path = switch ($shim_version) {
+        'scoopcs' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
+        '71' { "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe" }
+        'kiennq' { "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe" }
+        'default' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
         default { warn "Unknown shim version: '$shim_version'" }
     }
     return $shim_path
-}
-
-function search_in_path($target) {
-    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
-    foreach($dir in $path.split(';')) {
-        if(test-path "$dir\$target" -pathType leaf) {
-            return "$dir\$target"
-        }
-    }
-}
-
-function ensure_in_path($dir, $global) {
-    $path = env 'PATH' $global
-    $dir = fullpath $dir
-    if($path -notmatch [regex]::escape($dir)) {
-        write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
-
-        env 'PATH' $global "$dir;$path" # for future sessions...
-        $env:PATH = "$dir;$env:PATH" # for this session
-    }
 }
 
 function Get-DefaultArchitecture {
@@ -1125,45 +1143,6 @@ function Confirm-InstallationStatus {
         }
     }
     return , $Installed
-}
-
-function strip_path($orig_path, $dir) {
-    if($null -eq $orig_path) { $orig_path = '' }
-    $stripped = [string]::join(';', @( $orig_path.split(';') | Where-Object { $_ -and $_ -ne $dir } ))
-    return ($stripped -ne $orig_path), $stripped
-}
-
-function add_first_in_path($dir, $global) {
-    $dir = fullpath $dir
-
-    # future sessions
-    $null, $currpath = strip_path (env 'path' $global) $dir
-    env 'path' $global "$dir;$currpath"
-
-    # this session
-    $null, $env:PATH = strip_path $env:PATH $dir
-    $env:PATH = "$dir;$env:PATH"
-}
-
-function remove_from_path($dir, $global) {
-    $dir = fullpath $dir
-
-    # future sessions
-    $was_in_path, $newpath = strip_path (env 'path' $global) $dir
-    if($was_in_path) {
-        Write-Output "Removing $(friendly_path $dir) from your path."
-        env 'path' $global $newpath
-    }
-
-    # current session
-    $was_in_path, $newpath = strip_path $env:PATH $dir
-    if($was_in_path) { $env:PATH = $newpath }
-}
-
-function ensure_robocopy_in_path {
-    if(!(Test-CommandAvailable robocopy)) {
-        shim "C:\Windows\System32\Robocopy.exe" $false
-    }
 }
 
 function wraptext($text, $width) {
@@ -1432,7 +1411,7 @@ if ($pathExpected) {
     # ├─shims
     # ├─config.json
     # ```
-    $configPortablePath = fullpath "$coreRoot\..\..\..\config.json"
+    $configPortablePath = Get-AbsolutePath "$coreRoot\..\..\..\config.json"
     if (Test-Path $configPortablePath) {
         $configFile = $configPortablePath
     }
@@ -1440,17 +1419,24 @@ if ($pathExpected) {
 $scoopConfig = load_cfg $configFile
 
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Resolve-Path "$PSScriptRoot\..\..\..\.."), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop cache directory
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+
+# Scoop apps' PATH Environment Variable
+$scoopPathEnvVar = switch (get_config USE_ISOLATED_PATH) {
+    { $_ -is [string] } { $_.ToUpperInvariant() }
+    $true { 'SCOOP_PATH' }
+    default { 'PATH' }
+}
 
 # OS information
 $WindowsBuild = [System.Environment]::OSVersion.Version.Build

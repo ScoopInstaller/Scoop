@@ -81,7 +81,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 }
 
 function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
-    $cached = fullpath (cache_path $app $version $url)
+    $cached = cache_path $app $version $url
 
     if (!(Test-Path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
@@ -239,7 +239,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         $data.$url = @{
             'target'    = "$dir\$(url_filename $url)"
             'cachename' = fname (cache_path $app $version $url)
-            'source'    = fullpath (cache_path $app $version $url)
+            'source'    = cache_path $app $version $url
         }
 
         if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
@@ -638,9 +638,7 @@ function cookie_header($cookies) {
 }
 
 function is_in_dir($dir, $check) {
-    $check = "$(fullpath $check)"
-    $dir = "$(fullpath $dir)"
-    $check -match "^$([regex]::Escape("$dir"))([/\\]|`$)"
+    $check -match "^$([regex]::Escape("$dir"))([/\\]|$)"
 }
 
 function ftp_file_size($url) {
@@ -665,7 +663,6 @@ function hash_for_url($manifest, $url, $arch) {
 
 # returns (ok, err)
 function check_hash($file, $hash, $app_name) {
-    $file = fullpath $file
     if (!$hash) {
         warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
         return $true, $null
@@ -783,7 +780,7 @@ function create_shims($manifest, $dir, $global, $arch) {
         } elseif (Test-Path $target -PathType leaf) {
             $bin = $target
         } else {
-            $bin = search_in_path $target
+            $bin = (Get-Command $target).Source
         }
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
@@ -876,16 +873,16 @@ function unlink_current($versiondir) {
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead
 function ensure_install_dir_not_in_path($dir, $global) {
-    $path = (env 'path' $global)
+    $path = (Get-EnvVar -Name 'PATH' -Global:$global)
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if ($removed) {
         $removed | ForEach-Object { "Installer added '$(friendly_path $_)' to path. Removing." }
-        env 'path' $global $fixed
+        Set-EnvVar -Name 'PATH' -Value $fixed -Global:$global
     }
 
     if (!$global) {
-        $fixed, $removed = find_dir_or_subdir (env 'path' $true) "$dir"
+        $fixed, $removed = find_dir_or_subdir (Get-EnvVar -Name 'PATH' -Global) "$dir"
         if ($removed) {
             $removed | ForEach-Object { warn "Installer added '$_' to system path. You might want to remove this manually (requires admin permission)." }
         }
@@ -909,19 +906,11 @@ function env_add_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        # GH-3785: Add path in ascending order.
-        [Array]::Reverse($env_add_path)
-        $env_add_path | Where-Object { $_ } | ForEach-Object {
-            if ($_ -eq '.') {
-                $path_dir = $dir
-            } else {
-                $path_dir = Join-Path $dir $_
-            }
-            if (!(is_in_dir $dir $path_dir)) {
-                abort "Error in manifest: env_add_path '$_' is outside the app directory."
-            }
-            add_first_in_path $path_dir $global
+        if (get_config USE_ISOLATED_PATH) {
+            Add-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
         }
+        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        Add-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global -Force
     }
 }
 
@@ -929,14 +918,9 @@ function env_rm_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        $env_add_path | Where-Object { $_ } | ForEach-Object {
-            if ($_ -eq '.') {
-                $path_dir = $dir
-            } else {
-                $path_dir = Join-Path $dir $_
-            }
-            remove_from_path $path_dir $global
-        }
+        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
+        Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global
     }
 }
 
@@ -946,7 +930,7 @@ function env_set($manifest, $dir, $global, $arch) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
             $name = $_.name
             $val = format $env_set.$($_.name) @{ 'dir' = $dir }
-            env $name $global $val
+            Set-EnvVar -Name $name -Value $val -Global:$global
             Set-Content env:\$name $val
         }
     }
@@ -956,7 +940,7 @@ function env_rm($manifest, $global, $arch) {
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
             $name = $_.name
-            env $name $global $null
+            Set-EnvVar -Name $name -Value $null -Global:$global
             if (Test-Path env:\$name) { Remove-Item env:\$name }
         }
     }
@@ -1088,8 +1072,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 
             $source = $source.TrimEnd('/').TrimEnd('\\')
 
-            $source = fullpath "$dir\$source"
-            $target = fullpath "$persist_dir\$target"
+            $source = "$dir\$source"
+            $target = "$persist_dir\$target"
 
             # if we have had persist data in the store, just create link and go
             if (Test-Path $target) {

@@ -44,13 +44,16 @@ function add_alias($name, $command) {
     # get current aliases from config
     $aliases = init_alias_config
     if ($aliases.$name) {
-        abort "Alias $name already exists."
+        abort "Alias '$name' already exists."
     }
 
     $alias_file = "scoop-$name"
 
     # generate script
     $shimdir = shimdir $false
+    if (Test-Path "$shimdir\$alias_file.ps1") {
+        abort "File '$alias_file.ps1' already exists in shims directory."
+    }
     $script =
     @(
         "# Summary: $description",
@@ -67,18 +70,18 @@ function add_alias($name, $command) {
 function rm_alias($name) {
     $aliases = init_alias_config
     if (!$name) {
-        abort 'Which alias should be removed?'
+        abort 'Alias to be removed has not been specified!'
     }
 
     if ($aliases.$name) {
-        "Removing alias $name..."
+        info "Removing alias '$name'..."
 
         rm_shim $aliases.$name (shimdir $false)
 
         $aliases.PSObject.Properties.Remove($name)
         set_config $script:config_alias $aliases | Out-Null
     } else {
-        abort "Alias $name doesn't exist."
+        abort "Alias '$name' doesn't exist."
     }
 }
 

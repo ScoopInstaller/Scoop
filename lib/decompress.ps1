@@ -279,13 +279,31 @@ function Expand-DarkArchive {
         $Removal
     )
     $LogPath = "$(Split-Path $Path)\dark.log"
-    $ArgList = @('-nologo', '-x', $DestinationPath, $Path)
+    $DarkPath = Get-HelperPath -Helper Dark
+    if ((Split-Path $DarkPath -Leaf) -eq 'wix.exe') {
+        $ArgList = @('burn', 'extract', $Path, '-out', $DestinationPath, '-outba', "$DestinationPath\UX")
+    } else {
+        $ArgList = @('-nologo', '-x', $DestinationPath, $Path)
+    }
     if ($Switches) {
         $ArgList += (-split $Switches)
     }
-    $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Dark) $ArgList -LogPath $LogPath
+    $Status = Invoke-ExternalCommand $DarkPath $ArgList -LogPath $LogPath
     if (!$Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    }
+    if (Test-Path "$DestinationPath\WixAttachedContainer") {
+        Rename-Item "$DestinationPath\WixAttachedContainer" 'AttachedContainer' -ErrorAction Ignore
+    } else {
+        if (Test-Path "$DestinationPath\AttachedContainer\a0") {
+            $Xml = [xml](Get-Content -Raw "$DestinationPath\UX\manifest.xml" -Encoding utf8)
+            $Xml.BurnManifest.UX.Payload | ForEach-Object {
+                Rename-Item "$DestinationPath\UX\$($_.SourcePath)" $_.FilePath -ErrorAction Ignore
+            }
+            $Xml.BurnManifest.Payload | ForEach-Object {
+                Rename-Item "$DestinationPath\AttachedContainer\$($_.SourcePath)" $_.FilePath -ErrorAction Ignore
+            }
+        }
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
