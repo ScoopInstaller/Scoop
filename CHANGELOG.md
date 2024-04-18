@@ -67,6 +67,7 @@
 - **core:** Cleanup some old codes, e.g., msi section and config migration ([#5715](https://github.com/ScoopInstaller/Scoop/issues/5715), [#5824](https://github.com/ScoopInstaller/Scoop/issues/5824))
 - **core:** Rewrite and separate path-related functions to `system.ps1` ([#5836](https://github.com/ScoopInstaller/Scoop/issues/5836), [#5858](https://github.com/ScoopInstaller/Scoop/issues/5858), [#5864](https://github.com/ScoopInstaller/Scoop/issues/5864))
 - **core:** Get rid of 'fullpath' ([#3533](https://github.com/ScoopInstaller/Scoop/issues/3533))
+- **shim:** Remove CS shim codebase ([#5903](https://github.com/ScoopInstaller/Scoop/issues/5903))
 
 ### Builds
 
