@@ -8,6 +8,7 @@
 - **bucket:** Make official buckets higher priority ([#5398](https://github.com/ScoopInstaller/Scoop/issues/5398))
 - **core:** Add `-Quiet` switch for `Invoke-ExternalCommand` ([#5346](https://github.com/ScoopInstaller/Scoop/issues/5346))
 - **core:** Allow global install of PowerShell modules ([#5611](https://github.com/ScoopInstaller/Scoop/issues/5611))
+- **path:** Isolate Scoop apps' PATH ([#5840](https://github.com/ScoopInstaller/Scoop/issues/5840))
 
 ### Bug Fixes
 

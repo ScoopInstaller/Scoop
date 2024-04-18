@@ -906,19 +906,11 @@ function env_add_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        # GH-3785: Add path in ascending order.
-        [Array]::Reverse($env_add_path)
-        $env_add_path | Where-Object { $_ } | ForEach-Object {
-            if ($_ -eq '.') {
-                $path_dir = $dir
-            } else {
-                $path_dir = Join-Path $dir $_
-            }
-            if (!(is_in_dir $dir $path_dir)) {
-                abort "Error in manifest: env_add_path '$_' is outside the app directory."
-            }
-            Add-Path -Path $path_dir -Global:$global -Force
+        if (get_config USE_ISOLATED_PATH) {
+            Add-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
         }
+        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        Add-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global -Force
     }
 }
 
@@ -926,14 +918,9 @@ function env_rm_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        $env_add_path | Where-Object { $_ } | ForEach-Object {
-            if ($_ -eq '.') {
-                $path_dir = $dir
-            } else {
-                $path_dir = Join-Path $dir $_
-            }
-            Remove-Path -Path $path_dir -Global:$global
-        }
+        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
+        Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global
     }
 }
 
