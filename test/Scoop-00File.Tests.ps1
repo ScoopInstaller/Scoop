@@ -7,8 +7,7 @@ BeforeDiscovery {
         '[\\/]\.git[\\/]',
         '\.sublime-workspace$',
         '\.DS_Store$',
-        'supporting(\\|/)validator(\\|/)packages(\\|/)*',
-        'supporting(\\|/)shimexe(\\|/)packages(\\|/)*'
+        'supporting(\\|/)validator(\\|/)packages(\\|/)*'
     )
     $repo_files = (Get-ChildItem $TestPath -File -Recurse).FullName |
         Where-Object { $_ -inotmatch $($project_file_exclusions -join '|') }

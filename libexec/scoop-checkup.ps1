@@ -10,7 +10,7 @@ $defenderIssues = 0
 
 $adminPrivileges = ([System.Security.Principal.WindowsPrincipal] [System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 
-if ($adminPrivileges) {
+if ($adminPrivileges -and $env:USERNAME -ne 'WDAGUtilityAccount') {
     $defenderIssues += !(check_windows_defender $false)
     $defenderIssues += !(check_windows_defender $true)
 }
@@ -19,18 +19,18 @@ $issues += !(check_main_bucket)
 $issues += !(check_long_paths)
 $issues += !(Get-WindowsDeveloperModeStatus)
 
-if (!(Test-HelperInstalled -Helper 7zip)) {
-    error "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip' or 'scoop install 7zip-zstd'."
+if (!(Test-HelperInstalled -Helper 7zip) -and !(get_config USE_EXTERNAL_7ZIP)) {
+    warn "'7-Zip' is not installed! It's required for unpacking most programs. Please Run 'scoop install 7zip'."
     $issues++
 }
 
 if (!(Test-HelperInstalled -Helper Innounp)) {
-    error "'Inno Setup Unpacker' is not installed! It's required for unpacking InnoSetup files. Please run 'scoop install innounp'."
+    warn "'Inno Setup Unpacker' is not installed! It's required for unpacking InnoSetup files. Please run 'scoop install innounp'."
     $issues++
 }
 
 if (!(Test-HelperInstalled -Helper Dark)) {
-    error "'dark' is not installed! It's required for unpacking installers created with the WiX Toolset. Please run 'scoop install dark' or 'scoop install wixtoolset'."
+    warn "'dark' is not installed! It's required for unpacking installers created with the WiX Toolset. Please run 'scoop install dark' or 'scoop install wixtoolset'."
     $issues++
 }
 

@@ -8,7 +8,7 @@ BeforeAll {
 Describe 'Manipulate Alias' -Tag 'Scoop' {
     BeforeAll {
         Mock shimdir { "$TestDrive\shims" }
-        Mock set_config { }
+        Mock set_config {}
         Mock get_config { @{} }
 
         $shimdir = shimdir
@@ -23,23 +23,24 @@ Describe 'Manipulate Alias' -Tag 'Scoop' {
         & $alias_file | Should -Be 'hello, world!'
     }
 
-    It 'Does not change existing alias if alias exists' {
+    It 'Does not change existing file if its filename same as alias name' {
         $alias_file = "$shimdir\scoop-rm.ps1"
+        Mock abort {}
         New-Item $alias_file -Type File -Force
         $alias_file | Should -Exist
 
-        add_alias 'rm' 'test'
-        & $alias_file | Should -Not -Be 'test'
+        add_alias 'rm' '"test"'
+        Should -Invoke -CommandName abort -Times 1 -ParameterFilter { $msg -eq "File 'scoop-rm.ps1' already exists in shims directory." }
     }
 
     It 'Removes an existing alias' {
         $alias_file = "$shimdir\scoop-rm.ps1"
-        add_alias 'rm' '"hello, world!"'
-
         $alias_file | Should -Exist
         Mock get_config { @(@{'rm' = 'scoop-rm' }) }
+        Mock info {}
 
         rm_alias 'rm'
         $alias_file | Should -Not -Exist
+        Should -Invoke -CommandName info -Times 1 -ParameterFilter { $msg -eq "Removing alias 'rm'..." }
     }
 }

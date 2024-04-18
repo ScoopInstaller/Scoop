@@ -226,15 +226,21 @@ $Queue | ForEach-Object {
     $url = substitute $url $substitutions
 
     $state = New-Object psobject @{
-        app      = $name;
-        file     = $file;
-        url      = $url;
-        regex    = $regex;
-        json     = $json;
-        jsonpath = $jsonpath;
-        xpath    = $xpath;
-        reverse  = $reverse;
-        replace  = $replace;
+        app      = $name
+        file     = $file
+        url      = $url
+        regex    = $regex
+        json     = $json
+        jsonpath = $jsonpath
+        xpath    = $xpath
+        reverse  = $reverse
+        replace  = $replace
+    }
+
+    get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
+        (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
+            $wc.Headers[$_.Key] = $_.Value
+        }
     }
 
     $wc.Headers.Add('Referer', (strip_filename $url))
@@ -254,6 +260,7 @@ while ($in_progress -gt 0) {
     $in_progress--
 
     $state = $ev.SourceEventArgs.UserState
+    $result = $ev.SourceEventArgs.Result
     $app = $state.app
     $file = $state.file
     $json = $state.json
@@ -279,7 +286,13 @@ while ($in_progress -gt 0) {
         }
 
         if ($url) {
-            $page = (Get-Encoding($wc)).GetString($ev.SourceEventArgs.Result)
+            $ms = New-Object System.IO.MemoryStream
+            $ms.Write($result, 0, $result.Length)
+            $ms.Seek(0, 0) | Out-Null
+            if ($result[0] -eq 0x1F -and $result[1] -eq 0x8B) {
+                $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
+            }
+            $page = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
         }
         if ($script) {
             $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))

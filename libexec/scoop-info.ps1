@@ -1,7 +1,7 @@
-# Usage: scoop info <app> [--verbose]
+# Usage: scoop info <app> [options]
 # Summary: Display information about an app
-# Options:
-#   -v, --verbose       Show full paths and URLs
+# Help: Options:
+#   -v, --verbose   Show full paths and URLs
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
@@ -84,7 +84,7 @@ if ($manifest.depends) {
 
 if (Test-Path $manifest_file) {
     if (Get-Command git -ErrorAction Ignore) {
-        $gitinfo = (git -C (Split-Path $manifest_file) log -1 -s --format='%aD#%an' $manifest_file 2> $null) -Split '#'
+        $gitinfo = (Invoke-Git -Path (Split-Path $manifest_file) -ArgumentList @('log', '-1', '-s', '--format=%aD#%an', $manifest_file) 2> $null) -Split '#'
     }
     if ($gitinfo) {
         $item.'Updated at' = $gitinfo[0] | Get-Date
@@ -112,7 +112,7 @@ if ($status.installed) {
 
         # Collect file list from each location
         $appFiles = Get-ChildItem $appsdir -Filter $app
-        $currentFiles = Get-ChildItem $appFiles -Filter (Select-CurrentVersion $app $global)
+        $currentFiles = Get-ChildItem $appFiles.FullName -Filter (Select-CurrentVersion $app $global)
         $persistFiles = Get-ChildItem $persist_dir -ErrorAction Ignore # Will fail if app does not persist data
         $cacheFiles = Get-ChildItem $cachedir -Filter "$app#*"
 
@@ -120,7 +120,7 @@ if ($status.installed) {
         $fileTotals = @()
         foreach ($fileType in ($appFiles, $currentFiles, $persistFiles, $cacheFiles)) {
             if ($null -ne $fileType) {
-                $fileSum = (Get-ChildItem $fileType -Recurse | Measure-Object -Property Length -Sum).Sum
+                $fileSum = (Get-ChildItem $fileType.FullName -Recurse -File | Measure-Object -Property Length -Sum).Sum
                 $fileTotals += coalesce $fileSum 0
             } else {
                 $fileTotals += 0
@@ -160,7 +160,7 @@ if ($status.installed) {
         $totalPackage = 0
         foreach ($url in @(url $manifest (Get-DefaultArchitecture))) {
             try {
-                if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
+                if (Test-Path (cache_path $app $manifest.version $url)) {
                     $cached = " (latest version is cached)"
                 } else {
                     $cached = $null

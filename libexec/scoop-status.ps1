@@ -8,7 +8,7 @@
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 
 # check if scoop needs updating
-$currentdir = fullpath $(versiondir 'scoop' 'current')
+$currentdir = versiondir 'scoop' 'current'
 $needs_update = $false
 $bucket_needs_update = $false
 $script:network_failure = $false
@@ -21,10 +21,10 @@ if (!(Get-FormatData ScoopStatus)) {
 
 function Test-UpdateStatus($repopath) {
     if (Test-Path "$repopath\.git") {
-        git_cmd -C "`"$repopath`"" fetch -q origin
+        Invoke-Git -Path $repopath -ArgumentList @('fetch', '-q', 'origin')
         $script:network_failure = 128 -eq $LASTEXITCODE
-        $branch  = git -C $repopath branch --show-current
-        $commits = git -C $repopath log "HEAD..origin/$branch" --oneline
+        $branch  = Invoke-Git -Path $repopath -ArgumentList @('branch', '--show-current')
+        $commits = Invoke-Git -Path $repopath -ArgumentList @('log', "HEAD..origin/$branch", '--oneline')
         if ($commits) { return $true }
         else { return $false }
     } else {

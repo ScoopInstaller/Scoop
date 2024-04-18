@@ -29,7 +29,7 @@ function Expand-7zipArchive {
     }
     $LogPath = "$(Split-Path $Path)\7zip.log"
     $DestinationPath = $DestinationPath.TrimEnd('\')
-    $ArgList = @('x', $Path, "-o$DestinationPath", '-y')
+    $ArgList = @('x', $Path, "-o$DestinationPath", '-xr!*.nsis', '-y')
     $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
     if (!$IsTar -and $ExtractDir) {
         $ArgList += "-ir!$ExtractDir\*"
@@ -46,12 +46,6 @@ function Expand-7zipArchive {
     if (!$Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
-    if (!$IsTar -and $ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
-    }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
-    }
     if ($IsTar) {
         # Check for tar
         $Status = Invoke-ExternalCommand $7zPath @('l', $Path) -LogPath $LogPath
@@ -63,8 +57,15 @@ function Expand-7zipArchive {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
     }
+    if (!$IsTar -and $ExtractDir) {
+        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
+        # Remove temporary directory
+        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force -ErrorAction Ignore
+    }
+    if (Test-Path $LogPath) {
+        Remove-Item $LogPath -Force
+    }
     if ($Removal) {
-        # Remove original archive file
         if (($Path -replace '.*\.([^\.]*)$', '$1') -eq '001') {
             # Remove splited 7-zip archive parts
             Get-ChildItem "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
@@ -72,6 +73,7 @@ function Expand-7zipArchive {
             # Remove splitted RAR archive parts
             Get-ChildItem "$($Path -replace '\.part(\d+)\.rar$', '').part*.rar" | Remove-Item -Force
         } else {
+            # Remove original archive file
             Remove-Item $Path -Force
         }
     }
@@ -112,16 +114,18 @@ function Expand-ZstdArchive {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     $IsTar = (strip_ext $Path) -match '\.tar$'
-    if (!$IsTar -and $ExtractDir) {
-        movedir (Join-Path $DestinationPath $ExtractDir) $DestinationPath | Out-Null
-    }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
-    }
     if ($IsTar) {
         # Check for tar
         $TarFile = Join-Path $DestinationPath (strip_ext (fname $Path))
         Expand-7zipArchive -Path $TarFile -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
+    }
+    if (!$IsTar -and $ExtractDir) {
+        movedir (Join-Path $DestinationPath $ExtractDir) $DestinationPath | Out-Null
+        # Remove temporary directory
+        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force -ErrorAction Ignore
+    }
+    if (Test-Path $LogPath) {
+        Remove-Item $LogPath -Force
     }
 }
 
@@ -241,8 +245,14 @@ function Expand-ZipArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
+    # Disable progress bar to gain performance
+    $oldProgressPreference = $ProgressPreference
+    $global:ProgressPreference = 'SilentlyContinue'
+
     # Compatible with Pscx v3 (https://github.com/Pscx/Pscx) ('Microsoft.PowerShell.Archive' is not needed for Pscx v4)
     Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+
+    $global:ProgressPreference = $oldProgressPreference
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
@@ -269,13 +279,31 @@ function Expand-DarkArchive {
         $Removal
     )
     $LogPath = "$(Split-Path $Path)\dark.log"
-    $ArgList = @('-nologo', '-x', $DestinationPath, $Path)
+    $DarkPath = Get-HelperPath -Helper Dark
+    if ((Split-Path $DarkPath -Leaf) -eq 'wix.exe') {
+        $ArgList = @('burn', 'extract', $Path, '-out', $DestinationPath, '-outba', "$DestinationPath\UX")
+    } else {
+        $ArgList = @('-nologo', '-x', $DestinationPath, $Path)
+    }
     if ($Switches) {
         $ArgList += (-split $Switches)
     }
-    $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Dark) $ArgList -LogPath $LogPath
+    $Status = Invoke-ExternalCommand $DarkPath $ArgList -LogPath $LogPath
     if (!$Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    }
+    if (Test-Path "$DestinationPath\WixAttachedContainer") {
+        Rename-Item "$DestinationPath\WixAttachedContainer" 'AttachedContainer' -ErrorAction Ignore
+    } else {
+        if (Test-Path "$DestinationPath\AttachedContainer\a0") {
+            $Xml = [xml](Get-Content -Raw "$DestinationPath\UX\manifest.xml" -Encoding utf8)
+            $Xml.BurnManifest.UX.Payload | ForEach-Object {
+                Rename-Item "$DestinationPath\UX\$($_.SourcePath)" $_.FilePath -ErrorAction Ignore
+            }
+            $Xml.BurnManifest.Payload | ForEach-Object {
+                Rename-Item "$DestinationPath\AttachedContainer\$($_.SourcePath)" $_.FilePath -ErrorAction Ignore
+            }
+        }
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force

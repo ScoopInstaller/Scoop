@@ -12,6 +12,7 @@ param(
 )
 
 . "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\system.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
@@ -98,7 +99,9 @@ if ($purge) {
     if ($global) { keep_onlypersist $globaldir }
 }
 
-remove_from_path (shimdir $false)
-if ($global) { remove_from_path (shimdir $true) }
+Remove-Path -Path (shimdir $global) -Global:$global
+if (get_config USE_ISOLATED_PATH) {
+    Remove-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
+}
 
 success 'Scoop has been uninstalled.'
