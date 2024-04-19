@@ -216,6 +216,13 @@ function Complete-ConfigChange {
             }
         }
     }
+
+    if ($Name -eq 'use_sqlite_cache' -and $Value -eq $true) {
+        . "$PSScriptRoot\..\lib\database.ps1"
+        . "$PSScriptRoot\..\lib\manifest.ps1"
+        info 'Initializing SQLite cache in progress... This may take a while, please wait.'
+        Set-ScoopDB
+    }
 }
 
 function setup_proxy() {

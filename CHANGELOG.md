@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Features
+
+- **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851))
+
 ## [v0.4.0](https://github.com/ScoopInstaller/Scoop/compare/v0.3.1...v0.4.0) - 2024-04-18
 
 ### Features
