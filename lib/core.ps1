@@ -218,6 +218,9 @@ function Complete-ConfigChange {
     }
 
     if ($Name -eq 'use_sqlite_cache' -and $Value -eq $true) {
+        if ((Get-DefaultArchitecture) -eq 'arm64') {
+            abort 'SQLite cache is not supported on ARM64 platform.'
+        }
         . "$PSScriptRoot\..\lib\database.ps1"
         . "$PSScriptRoot\..\lib\manifest.ps1"
         info 'Initializing SQLite cache in progress... This may take a while, please wait.'
