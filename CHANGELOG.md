@@ -1,3 +1,9 @@
+## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
+
+### Bug Fixes
+
+- **core:** Fix `Invoke-ExternalCommand` regression ([#5923](https://github.com/ScoopInstaller/Scoop/issues/5923))
+
 ## [v0.4.0](https://github.com/ScoopInstaller/Scoop/compare/v0.3.1...v0.4.0) - 2024-04-18
 
 ### Features
