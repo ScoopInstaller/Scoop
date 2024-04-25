@@ -158,11 +158,13 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             } elseif (!(installed lessmsi)) {
                 scoop install lessmsi
             }
+            Copy-Item "$working_dir\MSITest.msi" "$working_dir\MSI Test.msi"
             $test1 = "$working_dir\MSITest.msi"
-            $test2 = "$working_dir\MSITestNull.msi"
+            $test2 = "$working_dir\MSI Test.msi"
+            $test3 = "$working_dir\MSITestNull.msi"
         }
 
-        It 'extract normal MSI file' {
+        It 'extract normal MSI file using msiexec' {
             Mock get_config { $false }
             $to = test_extract 'Expand-MsiArchive' $test1
             $to | Should -Exist
@@ -170,9 +172,29 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             (Get-ChildItem "$to\MSITest").Count | Should -Be 1
         }
 
-        It 'extract empty MSI file using lessmsi' {
+        It 'extract normal MSI file with whitespace in path using msiexec' {
+            Mock get_config { $false }
+            $to = test_extract 'Expand-MsiArchive' $test2
+            $to | Should -Exist
+            "$to\MSITest\empty" | Should -Exist
+            (Get-ChildItem "$to\MSITest").Count | Should -Be 1
+        }
+
+        It 'extract normal MSI file using lessmsi' {
+            Mock get_config { $true }
+            $to = test_extract 'Expand-MsiArchive' $test1
+            $to | Should -Exist
+        }
+
+        It 'extract normal MSI file with whitespace in path using lessmsi' {
             Mock get_config { $true }
             $to = test_extract 'Expand-MsiArchive' $test2
+            $to | Should -Exist
+        }
+
+        It 'extract empty MSI file using lessmsi' {
+            Mock get_config { $true }
+            $to = test_extract 'Expand-MsiArchive' $test3
             $to | Should -Exist
         }
 
