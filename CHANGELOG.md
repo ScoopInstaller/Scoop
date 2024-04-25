@@ -1,4 +1,4 @@
-## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 
 ### Bug Fixes
 
