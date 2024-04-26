@@ -2,7 +2,13 @@
 
 ### Features
 
-- **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851))
+- **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851), [#5918](https://github.com/ScoopInstaller/Scoop/issues/5918))
+
+## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
+
+### Bug Fixes
+
+- **core:** Fix `Invoke-ExternalCommand` regression ([#5923](https://github.com/ScoopInstaller/Scoop/issues/5923))
 
 ### Bug Fixes
 

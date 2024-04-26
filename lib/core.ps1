@@ -218,6 +218,9 @@ function Complete-ConfigChange {
     }
 
     if ($Name -eq 'use_sqlite_cache' -and $Value -eq $true) {
+        if ((Get-DefaultArchitecture) -eq 'arm64') {
+            abort 'SQLite cache is not supported on ARM64 platform.'
+        }
         . "$PSScriptRoot\..\lib\database.ps1"
         . "$PSScriptRoot\..\lib\manifest.ps1"
         info 'Initializing SQLite cache in progress... This may take a while, please wait.'
@@ -754,9 +757,14 @@ function Invoke-ExternalCommand {
     }
     if ($ArgumentList.Length -gt 0) {
         $ArgumentList = $ArgumentList | ForEach-Object { [regex]::Split($_.Replace('"', ''), '(?<=(?<![:\w])[/-]\w+) | (?=[/-])') }
-        if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
-            $Process.StartInfo.Arguments = $ArgumentList -join ' '
-        } elseif ($Process.StartInfo.ArgumentList.Add) {
+        # Use legacy argument escaping for commands having non-standard behavior
+        # with regard to argument passing. `msiexec` requires some args like
+        # `TARGETDIR="C:\Program Files"`, which is non-standard, therefore we
+        # treat it as a legacy command.
+        # ref-1: https://learn.microsoft.com/en-us/powershell/scripting/learn/experimental-features?view=powershell-7.4#psnativecommandargumentpassing
+        $LegacyCommand = $FilePath -match '^((cmd|cscript|find|sqlcmd|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$'
+        $SupportArgumentList = $Process.StartInfo.PSObject.Properties.Name -contains 'ArgumentList'
+        if ((-not $LegacyCommand) -and $SupportArgumentList) {
             # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
             # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
             # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
