@@ -409,7 +409,22 @@ function currentdir($app, $global) {
 function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
-function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
+function cache_path($app, $version, $url) {
+    $underscoredUrl = $url -replace '[^\w\.\-]+', '_'
+    $filePath = "$cachedir\$app#$version#$underscoredUrl"
+
+    # NOTE: Scoop cache files migration. Remove this 6 months after it ships.
+    if (Test-Path $filePath) {
+        return $filePath
+    }
+
+    $urlStream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url))
+    $sha = (Get-FileHash -Algorithm SHA1 -InputStream $urlStream).Hash.ToLower()
+    $extension = [System.IO.Path]::GetExtension($url)
+    $filePath = $filePath -replace "$underscoredUrl", "$sha$extension"
+
+    return $filePath
+}
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
