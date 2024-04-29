@@ -268,7 +268,7 @@ Describe 'cache_path' -Tag 'Scoop' {
         $url = 'https://example.com/git.zip'
         $ret = cache_path 'git' '2.44.0' $url
         $inputStream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url))
-        $sha = (Get-FileHash -Algorithm SHA1 -InputStream $inputStream).Hash.ToLower()
+        $sha = (Get-FileHash -Algorithm SHA256 -InputStream $inputStream).Hash.ToLower().Substring(0, 7)
         $ret | Should -Be "$cachedir\git#2.44.0#$sha.zip"
     }
 
