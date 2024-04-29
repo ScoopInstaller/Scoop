@@ -272,8 +272,7 @@ Describe 'cache_path' -Tag 'Scoop' {
     It 'returns the old format cache path for a given input' {
         Mock Test-Path { $true }
         $ret = cache_path 'git' '2.44.0' 'https://example.com/git.zip'
-        $ret | Should -Be $fixture
-        Remove-Item -Path $fixture -Force
+        $ret | Should -Be "$cachedir\git#2.44.0#https_example.com_git.zip"
     }
 }
 
