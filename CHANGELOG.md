@@ -3,6 +3,7 @@
 ### Features
 
 - **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851), [#5918](https://github.com/ScoopInstaller/Scoop/issues/5918))
+- **core:** New cache filename format ([#5929](https://github.com/ScoopInstaller/Scoop/issues/5929)
 
 ### Bug Fixes
 
