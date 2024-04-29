@@ -413,7 +413,7 @@ function cache_path($app, $version, $url) {
     $underscoredUrl = $url -replace '[^\w\.\-]+', '_'
     $filePath = "$cachedir\$app#$version#$underscoredUrl"
 
-    # NOTE: Scoop cache files migration. Remove this 6 months after it ships.
+    # NOTE: Scoop cache files migration. Remove this 6 months after the feature ships.
     if (Test-Path $filePath) {
         return $filePath
     }
