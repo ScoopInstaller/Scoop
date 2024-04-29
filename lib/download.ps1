@@ -1,5 +1,81 @@
 # Description: Functions for downloading files
 
+function Get-RemoteFile {
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param (
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [uri]
+        $Uri,
+        [Parameter(Position = 1, ValueFromPipelineByPropertyName)]
+        [string]
+        $OutFile,
+        [hashtable]
+        $Cookies,
+        [string]
+        $UserAgent,
+        [int]
+        $TimeoutSec,
+        [Microsoft.PowerShell.Commands.WebRequestMethod]
+        [ValidateSet('Get', 'Head', 'Post')]
+        $Method
+    )
+
+    begin {
+        $session = [Microsoft.PowerShell.Commands.WebRequestSession]::new()
+        $webRequestArgs = @{
+            UseBasicParsing = $true
+            WebSession      = $session
+        }
+        $session.UserAgent = if ($UserAgent) { $UserAgent } else { Get-UserAgent }
+        if ($Cookies) {
+            $session.Headers.Add('Cookie', (cookie_header $Cookies))
+        }
+        if ($TimeoutSec) {
+            $webRequestArgs.Add('TimeoutSec', $TimeoutSec)
+        }
+        if ($Method -notin @($null, 'Get')) {
+            $webRequestArgs.Add('Method', $Method)
+        }
+    }
+
+    process {
+        $session.Headers.Add('Referer', $Uri.GetComponents([System.UriComponents]::SchemeAndServer, [System.UriFormat]::UriEscaped))
+        # if (-not ($Uri -match 'sourceforge\.net' -or $Uri -match 'portableapps\.com')) {
+        #     $session.Referer = strip_filename $Uri
+        # }
+        get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $Uri -match $_.match } | ForEach-Object {
+            (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
+                $session.Headers.Add($_.Key, $_.Value)
+            }
+        }
+        $GitHubToken = Get-GitHubToken
+        if ($Uri.Host -eq 'api.github.com' -and $GitHubToken) {
+            $session.Headers.Add('Authorization', "Bearer $GitHubToken")
+            $session.Headers.Add('X-GitHub-Api-Version', '2022-11-28')
+        }
+        if ($OutFile) {
+            $webRequestArgs.Add('OutFile', $OutFile)
+            $webRequestArgs.Add('PassThru', $true)
+        }
+        $ProgressPreference = 'SilentlyContinue'
+        try {
+            $response = Invoke-WebRequest -UseBasicParsing -Uri $Uri @webRequestArgs
+            $result = switch ($Method) {
+                'Head' { $response.Headers }
+                Default { $response.Content }
+            }
+            return $response.Content
+        } catch {
+            $result = @{
+                StatusCode   = $_.Exception.Response.StatusCode.value__
+                ReasonPhrase = $_.Exception.Response.ReasonPhrase
+            }
+        }
+        return $result
+    }
+}
+
 function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = cache_path $app $version $url
 
@@ -502,13 +578,9 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
 }
 
 function cookie_header($cookies) {
-    if (!$cookies) { return }
-
-    $vals = $cookies.psobject.properties | ForEach-Object {
-        "$($_.name)=$($_.value)"
+    if ($cookies) {
+        return $cookies.PSObject.Properties.ForEach({ "$($_.Name)=$($_.Value)" }) -join ';'
     }
-
-    [string]::join(';', $vals)
 }
 
 function ftp_file_size($url) {
@@ -584,21 +656,9 @@ function Get-GitHubToken {
     return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN) | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
 }
 
-function download_json($url) {
-    $githubtoken = Get-GitHubToken
-    $authheader = @{}
-    if ($githubtoken) {
-        $authheader = @{'Authorization' = "token $githubtoken" }
-    }
-    $ProgressPreference = 'SilentlyContinue'
-    $result = Invoke-WebRequest $url -UseBasicParsing -Headers $authheader | Select-Object -ExpandProperty content | ConvertFrom-Json
-    $ProgressPreference = 'Continue'
-    $result
-}
-
 function github_ratelimit_reached {
     $api_link = 'https://api.github.com/rate_limit'
-    $ret = (download_json $api_link).rate.remaining -eq 0
+    $ret = (Get-RemoteFile $api_link | ConvertFrom-Json).rate.remaining -eq 0
     if ($ret) {
         Write-Host "GitHub API rate limit reached.`r`nPlease try again later or configure your API token using 'scoop config gh_token <your token>'."
     }
