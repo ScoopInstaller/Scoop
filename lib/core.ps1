@@ -419,7 +419,7 @@ function cache_path($app, $version, $url) {
     }
 
     $urlStream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url))
-    $sha = (Get-FileHash -Algorithm SHA1 -InputStream $urlStream).Hash.ToLower()
+    $sha = (Get-FileHash -Algorithm SHA256 -InputStream $urlStream).Hash.ToLower().Substring(0, 7)
     $extension = [System.IO.Path]::GetExtension($url)
     $filePath = $filePath -replace "$underscoredUrl", "$sha$extension"
 
