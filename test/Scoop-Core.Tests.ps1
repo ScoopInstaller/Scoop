@@ -270,8 +270,7 @@ Describe 'cache_path' -Tag 'Scoop' {
 
     # # NOTE: Remove this 6 months after the feature ships.
     It 'returns the old format cache path for a given input' {
-        $fixture = "$cachedir\git#2.44.0#https_example.com_git.zip"
-        New-Item -ItemType File -Path $fixture -Force
+        Mock Test-Path { $true }
         $ret = cache_path 'git' '2.44.0' 'https://example.com/git.zip'
         $ret | Should -Be $fixture
         Remove-Item -Path $fixture -Force
