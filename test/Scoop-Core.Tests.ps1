@@ -260,10 +260,6 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
 }
 
 Describe 'cache_path' -Tag 'Scoop' {
-    BeforeAll {
-        $cachedir = "$([IO.Path]::GetTempPath())ScoopTestFixtures\cache"
-    }
-
     It 'returns the correct cache path for a given input' {
         $url = 'https://example.com/git.zip'
         $ret = cache_path 'git' '2.44.0' $url
