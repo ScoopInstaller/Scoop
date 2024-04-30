@@ -61,7 +61,15 @@ function search_bucket($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
     $apps | ForEach-Object {
-        $json = [System.Text.Json.JsonDocument]::Parse([System.IO.File]::ReadAllText($_.FullName))
+        $filepath = $_.FullName
+
+        $json = try {
+            [System.Text.Json.JsonDocument]::Parse([System.IO.File]::ReadAllText($filepath))
+        } catch {
+            debug "Failed to parse manifest file: $filepath (error: $_)"
+            return
+        }
+
         $name = $_.BaseName
 
         if ($name -match $query) {
