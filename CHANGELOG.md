@@ -9,7 +9,7 @@
 
 - **json:** Serialize jsonpath return ([#5921](https://github.com/ScoopInstaller/Scoop/issues/5921))
 - **scoop-search:** Catch error of parsing invalid manifest ([#5930](https://github.com/ScoopInstaller/Scoop/issues/5930))
-- **autoupdate:** Function `Update-ManifestProperty` rewrites fields in `autoupdate` if it is a PSCustomObject ([#5933](https://github.com/ScoopInstaller/Scoop/issues/5933))
+- **autoupdate:** Copy `PSCustomObject`-type properties within `autoupdate` to prevent reference changes. ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934))
 
 ## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 
