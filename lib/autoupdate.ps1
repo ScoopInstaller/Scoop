@@ -365,7 +365,7 @@ function Update-ManifestProperty {
                 }
             } elseif ($Manifest.$currentProperty -and $Manifest.autoupdate.$currentProperty) {
                 # Update other property (global)
-                $autoupdateProperty = $Manifest.autoupdate.$currentProperty
+                $autoupdateProperty = $Manifest.autoupdate.$currentProperty.PSObject.Copy()
                 $newValue = substitute $autoupdateProperty $Substitutions
                 if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
                     # Make sure it's an array

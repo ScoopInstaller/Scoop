@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Bug Fixes
+
+- **autoupdate:** Copy `PSCustomObject`-type properties within `autoupdate` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934))
+
 ## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 
 ### Bug Fixes
