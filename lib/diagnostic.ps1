@@ -9,7 +9,7 @@ function check_windows_defender($global) {
         if ((Get-MpPreference).DisableRealtimeMonitoring) { return $true }
         if ($defender -and $defender.Status) {
             if ($defender.Status -eq [System.ServiceProcess.ServiceControllerStatus]::Running) {
-                $installPath = $scoopdir;
+                $installPath = $localdir;
                 if ($global) { $installPath = $globaldir; }
 
                 $exclusionPath = (Get-MpPreference).ExclusionPath

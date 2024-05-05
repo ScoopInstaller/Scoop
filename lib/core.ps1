@@ -194,7 +194,7 @@ function Complete-ConfigChange {
                 $Value.ToUpperInvariant()
             }
             info "Turn on Scoop isolated path ('$newPathEnvVar')... This may take a while, please wait."
-            $movedPath = Remove-Path -Path "$scoopdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
+            $movedPath = Remove-Path -Path "$localdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
             if ($movedPath) {
                 Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Quiet
                 Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
@@ -380,7 +380,7 @@ function filesize($length) {
 }
 
 # dirs
-function basedir($global) { if($global) { return $globaldir } $scoopdir }
+function basedir($global) { if($global) { return $globaldir } $localdir }
 function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
 function modulesdir($global) { "$(basedir $global)\modules" }
@@ -1414,7 +1414,10 @@ if ($pathExpected) {
 $scoopConfig = load_cfg $configFile
 
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+$scoopdir = "$PSScriptRoot\..\..\..\.."
+
+# Scoop local directory
+$localdir = $env:SCOOP_LOCAL, (get_config LOCAL_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('LocalAppData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop global apps directory
 $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
