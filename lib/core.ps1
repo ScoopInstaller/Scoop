@@ -1417,7 +1417,7 @@ $scoopConfig = load_cfg $configFile
 $scoopdir = "$PSScriptRoot\..\..\..\.."
 
 # Scoop local directory
-$localdir = $env:SCOOP_LOCAL, (get_config LOCAL_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('LocalAppData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+$localdir = $env:SCOOP_LOCAL, (get_config LOCAL_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('LocalApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop global apps directory
 $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
