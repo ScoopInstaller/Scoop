@@ -1057,10 +1057,10 @@ function shim($path, $global, $name, $arg) {
 function get_shim_path() {
     $shim_version = get_config SHIM 'kiennq'
     $shim_path = switch ($shim_version) {
-        'scoopcs' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
-        '71' { "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe" }
-        'kiennq' { "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe" }
-        'default' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
+        'scoopcs' { "$($scoopdir)\apps\scoop\current\supporting\shims\scoopcs\shim.exe" }
+        '71' { "$($scoopdir)\apps\scoop\current\supporting\shims\71\shim.exe" }
+        'kiennq' { "$($scoopdir)\apps\scoop\current\supporting\shims\kiennq\shim.exe" }
+        'default' { "$($scoopdir)\apps\scoop\current\supporting\shims\scoopcs\shim.exe" }
         default { warn "Unknown shim version: '$shim_version'" }
     }
     return $shim_path
@@ -1417,7 +1417,7 @@ $scoopConfig = load_cfg $configFile
 $scoopdir = "$PSScriptRoot\..\..\..\.."
 
 # Scoop local directory
-$localdir = $env:SCOOP_LOCAL, (get_config LOCAL_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('LocalApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+$localdir = $env:SCOOP_LOCAL, (get_config LOCAL_PATH), "$([System.Environment]::GetFolderPath('LocalApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop global apps directory
 $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
