@@ -1,15 +1,8 @@
-## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+## [develop](https://github.com/DelofJ/Scoop/tree/master) - 2024-05-06
 
 ### Features
 
-- **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851), [#5918](https://github.com/ScoopInstaller/Scoop/issues/5918))
-- **core:** New cache filename format ([#5929](https://github.com/ScoopInstaller/Scoop/issues/5929)
-
-### Bug Fixes
-
-- **json:** Serialize jsonpath return ([#5921](https://github.com/ScoopInstaller/Scoop/issues/5921))
-- **scoop-search:** Catch error of parsing invalid manifest ([#5930](https://github.com/ScoopInstaller/Scoop/issues/5930))
-- **autoupdate:** Copy `PSCustomObject`-type properties within `autoupdate` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934))
+- **scoop-install** Add support for Scoop to be installed in the global directory when running the installer with -RunAsAdmin
 
 ## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 
