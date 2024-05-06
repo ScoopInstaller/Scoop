@@ -24,6 +24,9 @@
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'generate_user_manifest' 'Get-Manifest'
 . "$PSScriptRoot\..\lib\install.ps1"
+if (get_config USE_SQLITE_CACHE) {
+    . "$PSScriptRoot\..\lib\database.ps1"
+}
 
 $opt, $apps, $err = getopt $args 'fhua:' 'force', 'no-hash-check', 'no-update-scoop', 'arch='
 if ($err) { error "scoop download: $err"; exit 1 }

@@ -116,7 +116,7 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
             # Convert first value to string
             $result = $result.ToString()
         } else {
-            $result = "$([String]::Join('\n', $result))"
+            $result = [Newtonsoft.Json.JsonConvert]::SerializeObject($result)
         }
         return $result
     } catch [Exception] {

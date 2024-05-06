@@ -216,6 +216,16 @@ function Complete-ConfigChange {
             }
         }
     }
+
+    if ($Name -eq 'use_sqlite_cache' -and $Value -eq $true) {
+        if ((Get-DefaultArchitecture) -eq 'arm64') {
+            abort 'SQLite cache is not supported on ARM64 platform.'
+        }
+        . "$PSScriptRoot\..\lib\database.ps1"
+        . "$PSScriptRoot\..\lib\manifest.ps1"
+        info 'Initializing SQLite cache in progress... This may take a while, please wait.'
+        Set-ScoopDB
+    }
 }
 
 function setup_proxy() {
@@ -399,7 +409,22 @@ function currentdir($app, $global) {
 function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
-function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
+function cache_path($app, $version, $url) {
+    $underscoredUrl = $url -replace '[^\w\.\-]+', '_'
+    $filePath = "$cachedir\$app#$version#$underscoredUrl"
+
+    # NOTE: Scoop cache files migration. Remove this 6 months after the feature ships.
+    if (Test-Path $filePath) {
+        return $filePath
+    }
+
+    $urlStream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url))
+    $sha = (Get-FileHash -Algorithm SHA256 -InputStream $urlStream).Hash.ToLower().Substring(0, 7)
+    $extension = [System.IO.Path]::GetExtension($url)
+    $filePath = $filePath -replace "$underscoredUrl", "$sha$extension"
+
+    return $filePath
+}
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
