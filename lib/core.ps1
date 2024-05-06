@@ -771,7 +771,8 @@ function Invoke-ExternalCommand {
         $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     }
     if ($ArgumentList.Length -gt 0) {
-        $ArgumentList = $ArgumentList | ForEach-Object { [regex]::Split($_.Replace('"', ''), '(?<=(?<![:\w])[/-]\w+) | (?=[/-])') }
+        # Remove existing double quotes and split arguments
+        $ArgumentList = $ArgumentList.ForEach({ $_ -replace '"' -split '(?<=(?<![:\w])[/-]\w+) | (?=[/-])' })
         # Use legacy argument escaping for commands having non-standard behavior
         # with regard to argument passing. `msiexec` requires some args like
         # `TARGETDIR="C:\Program Files"`, which is non-standard, therefore we
@@ -783,19 +784,18 @@ function Invoke-ExternalCommand {
             # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
             # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
             # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
-            $ArgumentList | ForEach-Object { $Process.StartInfo.ArgumentList.Add($_) }
+            $ArgumentList.ForEach({ $Process.StartInfo.ArgumentList.Add($_) })
         } else {
-            # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
-            $escapedArgs = $ArgumentList | ForEach-Object {
-                # escape N consecutive backslash(es), which are followed by a double quote or at the end of the string, to 2N consecutive ones
-                $s = $_ -replace '(\\+)(""|$)', '$1$1$2'
-                # quote the path if it contains spaces and is not NSIS's '/D' argument
+            # Escape arguments manually in lower versions
+            $escapedArgs = switch -regex ($ArgumentList) {
+                # Quote paths starting with a drive letter
+                '(?<!/D=)[A-Z]:[\\/].*' { $_ -replace '([A-Z]:[\\/].*)', '"$1"'; continue }
+                # Do not quote paths if it is NSIS's '/D' argument
                 # ref: https://nsis.sourceforge.io/Docs/Chapter3.html
-                if ($s -match ' ' -and $s -notmatch '/D=[A-Z]:[\\/].*') {
-                    $s -replace '([A-Z]:[\\/].*)', '"$1"'
-                } else {
-                    $s
-                }
+                '/D=[A-Z]:[\\/].*' { $_; continue }
+                # Quote args with spaces
+                ' ' { "`"$_`""; continue }
+                default { $_; continue }
             }
             $Process.StartInfo.Arguments = $escapedArgs -join ' '
         }
