@@ -1402,6 +1402,20 @@ function Out-UTF8File {
     }
 }
 
+function getOldRootPath() {
+    $configRootPath = (get_config ROOT_PATH)
+    if (configRootPath -ne $null) {
+        (set_config ROOT_PATH $null)
+        (set_config LOCAL_PATH $configRootPath)
+        return $configRootPath
+    }
+    $userProfileScoop = "$([System.Environment]::GetFolderPath('UserProfile'))\scoop"
+    if (Test-Path -Path $userProfileScoop) {
+        return $userProfileScoop
+    }
+    return $null
+}
+
 ##################
 # Core Bootstrap #
 ##################
@@ -1410,9 +1424,11 @@ function Out-UTF8File {
 #       for all communication with api.github.com
 Optimize-SecurityProtocol
 
+# Scoop root directory
+$scoopdir = "$PSScriptRoot\..\..\..\.."
+
 # Load Scoop config
-$configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
-$configFile = "$configHome\scoop\config.json"
+$configFile = "$scoopdir\scoop\config.json"
 # Check if it's the expected install path for scoop: <root>/apps/scoop/current
 $coreRoot = Split-Path $PSScriptRoot
 $pathExpected = ($coreRoot -replace '\\','/') -like '*apps/scoop/current*'
@@ -1438,11 +1454,8 @@ if ($pathExpected) {
 }
 $scoopConfig = load_cfg $configFile
 
-# Scoop root directory
-$scoopdir = "$PSScriptRoot\..\..\..\.."
-
 # Scoop local directory
-$localdir = $env:SCOOP_LOCAL, (get_config LOCAL_PATH), "$([System.Environment]::GetFolderPath('LocalApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+$localdir = $env:SCOOP_LOCAL, (get_config LOCAL_PATH), "$([System.Environment]::GetFolderPath('LocalApplicationData'))\scoop", (getOldRootPath) | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop global apps directory
 $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
