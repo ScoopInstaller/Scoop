@@ -1404,7 +1404,7 @@ function Out-UTF8File {
 
 function getOldRootPath() {
     $configRootPath = (get_config ROOT_PATH)
-    if (configRootPath -ne $null) {
+    if ($configRootPath -ne $null) {
         (set_config ROOT_PATH $null)
         (set_config LOCAL_PATH $configRootPath)
         return $configRootPath
