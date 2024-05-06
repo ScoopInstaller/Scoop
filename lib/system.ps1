@@ -162,7 +162,7 @@ function env($name, $global, $val) {
 
 function strip_path($orig_path, $dir) {
     Show-DeprecatedWarning $MyInvocation 'Split-PathLikeEnvVar'
-    Split-PathLikeEnvVar -Name $dir -Path $orig_path
+    Split-PathLikeEnvVar -Pattern @($dir) -Path $orig_path
 }
 
 function add_first_in_path($dir, $global) {
