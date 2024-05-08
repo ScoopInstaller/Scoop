@@ -11,6 +11,7 @@
 - **scoop-search:** Catch error of parsing invalid manifest ([#5930](https://github.com/ScoopInstaller/Scoop/issues/5930))
 - **autoupdate:** Copy `PSCustomObject`-type properties within `autoupdate` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934))
 - **system:** Fix argument passing to `Split-PathLikeEnvVar()` in deprecated `strip_path()` ([#5937](https://github.com/ScoopInstaller/Scoop/issues/5937))
+- **scoop-cache:** Fix regression in 36026f18 ([#5944](https://github.com/ScoopInstaller/Scoop/issues/5944))
 
 ## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 
