@@ -48,7 +48,7 @@ function cacheremove($app) {
 
     $files | ForEach-Object {
         $curr = cacheinfo $_
-        Write-Host "Removing $($curr.URL)..."
+        Write-Host "Removing $($_.Name)..."
         Remove-Item $_.FullName
         if(Test-Path "$cachedir\$($curr.Name).txt") {
             Remove-Item "$cachedir\$($curr.Name).txt"
