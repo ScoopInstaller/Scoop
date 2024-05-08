@@ -156,6 +156,10 @@ function add_bucket($name, $repo) {
     $dir = ensure $dir
     Invoke-Git -ArgumentList @('clone', $repo, $dir, '-q')
     Write-Host 'OK'
+    if (get_config USE_SQLITE_CACHE) {
+        info 'Updating cache...'
+        Set-ScoopDB -Path (Get-ChildItem -Path $dir -Filter '*.json' -Recurse).FullName
+    }
     success "The $name bucket was added successfully."
     return 0
 }

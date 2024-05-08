@@ -202,9 +202,9 @@ function Set-ScoopDB {
             $bucketPath = Get-LocalBucket | ForEach-Object { Join-Path $bucketsdir $_ }
             $Path = (Get-ChildItem $bucketPath -Filter '*.json' -Recurse).FullName
         }
-        $Path | ForEach-Object {
+        $Path | Where-Object { $_ -notmatch '[\\/]\.' } | ForEach-Object {
             $manifestRaw = [System.IO.File]::ReadAllText($_)
-            $manifest = $manifestRaw | ConvertFrom-Json -ErrorAction Continue
+            $manifest = ConvertFrom-Json $manifestRaw -ErrorAction SilentlyContinue
             if ($null -ne $manifest.version) {
                 $list.Add([pscustomobject]@{
                         name        = $($_ -replace '.*[\\/]([^\\/]+)\.json$', '$1')
