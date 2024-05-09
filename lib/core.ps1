@@ -777,12 +777,13 @@ function Invoke-ExternalCommand {
         # so that it must be a command line switch, otherwise, it would be a path (e.g. 'C:/Program Files') or other word (e.g. 'some-arg')
         # ' (?=[/-])' matches a space followed by a slash ('/') or a hyphen ('-'), i.e. the space before a command line switch
         $ArgumentList = $ArgumentList.ForEach({ $_ -replace '"' -split '(?<=(?<![:\w])[/-]\w+) | (?=[/-])' })
-        # Use legacy argument escaping for commands having non-standard behavior
-        # with regard to argument passing. `msiexec` requires some args like
-        # `TARGETDIR="C:\Program Files"`, which is non-standard, therefore we
-        # treat it as a legacy command.
+        # Use legacy argument escaping for commands having non-standard behavior with regard to argument passing.
+        # `msiexec` requires some args like `TARGETDIR="C:\Program Files"`, which is non-standard, therefore we treat it as a legacy command.
+        # NSIS installer's '/D' param may not work with the ArgumentList property, so we need to escape arguments manually.
         # ref-1: https://learn.microsoft.com/en-us/powershell/scripting/learn/experimental-features?view=powershell-7.4#psnativecommandargumentpassing
-        $LegacyCommand = $FilePath -match '^((cmd|cscript|find|sqlcmd|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$'
+        # ref-2: https://nsis.sourceforge.io/Docs/Chapter3.html
+        $LegacyCommand = $FilePath -match '^((cmd|cscript|find|sqlcmd|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$' -or
+            ($ArgumentList -match '^/S$|^/D=[A-Z]:[\\/].*$').Length -eq 2
         $SupportArgumentList = $Process.StartInfo.PSObject.Properties.Name -contains 'ArgumentList'
         if ((-not $LegacyCommand) -and $SupportArgumentList) {
             # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
@@ -795,7 +796,6 @@ function Invoke-ExternalCommand {
                 # Quote paths starting with a drive letter
                 '(?<!/D=)[A-Z]:[\\/].*' { $_ -replace '([A-Z]:[\\/].*)', '"$1"'; continue }
                 # Do not quote paths if it is NSIS's '/D' argument
-                # ref: https://nsis.sourceforge.io/Docs/Chapter3.html
                 '/D=[A-Z]:[\\/].*' { $_; continue }
                 # Quote args with spaces
                 ' ' { "`"$_`""; continue }
