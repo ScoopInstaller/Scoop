@@ -25,7 +25,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
         }
         It 'Test cases should exist and hash should match' {
             $testcases | Should -Exist
-            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be 'ba6f14687d1c9ec785dc2030416ff4e456358a7b3a403982c4b7baa247477146'
+            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be '23a23a63e89ff95f5ef27f0cacf08055c2779cf41932266d8f509c2e200b8b63'
         }
         It 'Test cases should be extracted correctly' {
             { Microsoft.PowerShell.Archive\Expand-Archive -Path $testcases -DestinationPath $working_dir } | Should -Not -Throw
@@ -50,6 +50,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $test6_1 = "$working_dir\7ZipTest6.part01.rar"
             $test6_2 = "$working_dir\7ZipTest6.part02.rar"
             $test6_3 = "$working_dir\7ZipTest6.part03.rar"
+            $test7 = "$working_dir\NSISTest.exe"
         }
 
         AfterEach {
@@ -109,6 +110,21 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $to = test_extract 'Expand-7zipArchive' $test6_1
             $to | Should -Exist
             "$to\dummy" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'extract NSIS installer' {
+            $to = test_extract 'Expand-7zipArchive' $test7
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'self-extract NSIS installer' {
+            $to = "$working_dir\NSIS Test"
+            $null = Invoke-ExternalCommand -FilePath $test7 -ArgumentList @('/S', '/NCRC', "/D=$to")
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
