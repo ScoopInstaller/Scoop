@@ -202,7 +202,7 @@ function Set-ScoopDB {
             $bucketPath = Get-LocalBucket | ForEach-Object { Join-Path $bucketsdir $_ }
             $Path = (Get-ChildItem $bucketPath -Filter '*.json' -Recurse).FullName
         }
-        $Path | Where-Object { $_ -notmatch '[\\/]\.' } | ForEach-Object {
+        $Path | Where-Object { $_ -notmatch '[\\/]\.|[\\/]deprecated[\\/]' } | ForEach-Object {
             $manifestRaw = [System.IO.File]::ReadAllText($_)
             $manifest = ConvertFrom-Json $manifestRaw -ErrorAction SilentlyContinue
             if ($null -ne $manifest.version) {
