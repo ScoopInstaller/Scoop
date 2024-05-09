@@ -50,9 +50,10 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -Arch $architecture
 
-    run_installer $fname $manifest $architecture $dir $global
+    run_installer $fname[-1] $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
@@ -539,20 +540,11 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
     # we only want to show this warning once
     if (!$use_cache) { warn 'Cache is being ignored.' }
 
-    # can be multiple urls: if there are, then installer should go last,
-    # so that $fname is set properly
+    # can be multiple urls: if there are, then installer should go last to make 'installer.args' section work
     $urls = @(script:url $manifest $architecture)
 
     # can be multiple cookies: they will be used for all HTTP requests.
     $cookies = $manifest.cookie
-
-    $fname = $null
-
-    # extract_dir and extract_to in manifest are like queues: for each url that
-    # needs to be extracted, will get the next dir from the queue
-    $extract_dirs = @(extract_dir $manifest $architecture)
-    $extract_tos = @(extract_to $manifest $architecture)
-    $extracted = 0
 
     # download first
     if (Test-Aria2Enabled) {
@@ -587,44 +579,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
         }
     }
 
-    foreach ($url in $urls) {
-        $fname = url_filename $url
-
-        $extract_dir = $extract_dirs[$extracted]
-        $extract_to = $extract_tos[$extracted]
-
-        # work out extraction method, if applicable
-        $extract_fn = $null
-        if ($manifest.innosetup) {
-            $extract_fn = 'Expand-InnoArchive'
-        } elseif ($fname -match '\.zip$') {
-            # Use 7zip when available (more fast)
-            if (((get_config USE_EXTERNAL_7ZIP) -and (Test-CommandAvailable 7z)) -or (Test-HelperInstalled -Helper 7zip)) {
-                $extract_fn = 'Expand-7zipArchive'
-            } else {
-                $extract_fn = 'Expand-ZipArchive'
-            }
-        } elseif ($fname -match '\.msi$') {
-            $extract_fn = 'Expand-MsiArchive'
-        } elseif (Test-ZstdRequirement -Uri $fname) {
-            # Zstd first
-            $extract_fn = 'Expand-ZstdArchive'
-        } elseif (Test-7zipRequirement -Uri $fname) {
-            # 7zip
-            $extract_fn = 'Expand-7zipArchive'
-        }
-
-        if ($extract_fn) {
-            Write-Host 'Extracting ' -NoNewline
-            Write-Host $fname -f Cyan -NoNewline
-            Write-Host ' ... ' -NoNewline
-            & $extract_fn -Path "$dir\$fname" -DestinationPath "$dir\$extract_to" -ExtractDir $extract_dir -Removal
-            Write-Host 'done.' -f Green
-            $extracted++
-        }
-    }
-
-    $fname # returns the last downloaded file
+    return $urls.ForEach({ url_filename $_ })
 }
 
 function cookie_header($cookies) {
@@ -710,7 +665,7 @@ function run_installer($fname, $manifest, $architecture, $dir, $global) {
         return
     }
     if ($installer) {
-        $prog = "$dir\$(coalesce $installer.file "$fname")"
+        $prog = "$dir\$(coalesce $installer.file $fname)"
         if (!(is_in_dir $dir $prog)) {
             abort "Error in manifest: Installer $prog is outside the app directory."
         }
