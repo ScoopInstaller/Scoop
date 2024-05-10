@@ -6,13 +6,13 @@
 # You can use '*' in place of <app> to update all apps.
 #
 # Options:
-#   -f, --force               Force update even when there isn't a newer version
-#   -g, --global              Update a globally installed app
-#   -i, --independent         Don't install dependencies automatically
-#   -k, --no-cache            Don't use the download cache
-#   -s, --skip                Skip hash validation (use with caution!)
-#   -q, --quiet               Hide extraneous messages
-#   -a, --all                 Update all apps (alternative to '*')
+#   -f, --force            Force update even when there isn't a newer version
+#   -g, --global           Update a globally installed app
+#   -i, --independent      Don't install dependencies automatically
+#   -k, --no-cache         Don't use the download cache
+#   -s, --skip-hash-check  Skip hash validation (use with caution!)
+#   -q, --quiet            Hide extraneous messages
+#   -a, --all              Update all apps (alternative to '*')
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'save_install_info' in 'manifest.ps1' (indirectly)
@@ -28,11 +28,11 @@ if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
 
-$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
+$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip-hash-check', 'quiet', 'all'
 if ($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
-$check_hash = !($opt.s -or $opt.skip)
+$check_hash = !($opt.s -or $opt.'skip-hash-check')
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
