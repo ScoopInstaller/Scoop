@@ -65,7 +65,6 @@ function Get-RemoteFile {
                 'Head' { $response.Headers }
                 Default { $response.Content }
             }
-            return $response.Content
         } catch {
             $result = @{
                 StatusCode   = $_.Exception.Response.StatusCode.value__
@@ -73,6 +72,13 @@ function Get-RemoteFile {
             }
         }
         return $result
+    }
+}
+
+function Get-RemoteFileSize ($Uri) {
+    $result = Get-RemoteFile -Uri $Uri -Method Head
+    if (!$result.StatusCode) {
+        $result.'Content-Length' | ForEach-Object { [int]$_ }
     }
 }
 

@@ -88,11 +88,6 @@ Function ConvertTo-VirusTotalUrlId ($url) {
     $url_id
 }
 
-Function Get-RemoteFileSize ($url) {
-    $response = Invoke-WebRequest -Uri $url -Method HEAD -UseBasicParsing
-    $response.Headers.'Content-Length' | ForEach-Object { [System.Convert]::ToInt32($_) }
-}
-
 Function Get-VirusTotalResultByHash ($hash, $url, $app) {
     $hash = $hash.ToLower()
     $api_url = "https://www.virustotal.com/api/v3/files/$hash"
