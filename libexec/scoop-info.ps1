@@ -166,7 +166,7 @@ if ($status.installed) {
                     $cached = $null
                 }
 
-                [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
+                $urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length' | ForEach-Object { [int]$_ }
                 $totalPackage += $urlLength
             } catch [System.Management.Automation.RuntimeException] {
                 $totalPackage = 0
