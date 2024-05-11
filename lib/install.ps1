@@ -53,7 +53,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -Arch $architecture
 
-    run_installer $fname[-1] $manifest $architecture $dir $global
+    run_installer @($fname)[-1] $manifest $architecture $dir $global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
