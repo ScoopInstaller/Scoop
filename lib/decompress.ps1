@@ -156,7 +156,7 @@ function Expand-MsiArchive {
         $ArgList = @('x', $Path, "$DestinationPath\")
     } else {
         $MsiPath = 'msiexec.exe'
-        $ArgList = @('/a', "`"$Path`"", '/qn', "TARGETDIR=`"$DestinationPath\SourceDir`"")
+        $ArgList = @('/a', $Path, '/qn', "TARGETDIR=$DestinationPath\SourceDir")
     }
     $LogPath = "$(Split-Path $Path)\msi.log"
     if ($Switches) {

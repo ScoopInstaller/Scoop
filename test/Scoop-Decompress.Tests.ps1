@@ -14,7 +14,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
 
         function test_extract($extract_fn, $from, $removal) {
             $to = (strip_ext $from) -replace '\.tar$', ''
-            & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal
+            & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal -ExtractDir $args[0]
             return $to
         }
 
@@ -25,7 +25,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
         }
         It 'Test cases should exist and hash should match' {
             $testcases | Should -Exist
-            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be '791bfce192917a2ff225dcdd87d23ae5f720b20178d85e68e4b1b56139cf8e6a'
+            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be '23a23a63e89ff95f5ef27f0cacf08055c2779cf41932266d8f509c2e200b8b63'
         }
         It 'Test cases should be extracted correctly' {
             { Microsoft.PowerShell.Archive\Expand-Archive -Path $testcases -DestinationPath $working_dir } | Should -Not -Throw
@@ -50,10 +50,29 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $test6_1 = "$working_dir\7ZipTest6.part01.rar"
             $test6_2 = "$working_dir\7ZipTest6.part02.rar"
             $test6_3 = "$working_dir\7ZipTest6.part03.rar"
+            $test7 = "$working_dir\NSISTest.exe"
+        }
+
+        AfterEach {
+            Remove-Item -Path $to -Recurse -Force
         }
 
         It 'extract normal compressed file' {
             $to = test_extract 'Expand-7zipArchive' $test1
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 3
+        }
+
+        It 'extract "extract_dir" correctly' {
+            $to = test_extract 'Expand-7zipArchive' $test1 $false 'tmp'
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'extract "extract_dir" with spaces correctly' {
+            $to = test_extract 'Expand-7zipArchive' $test1 $false 'tmp 2'
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
@@ -94,21 +113,39 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
+        It 'extract NSIS installer' {
+            $to = test_extract 'Expand-7zipArchive' $test7
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'self-extract NSIS installer' {
+            $to = "$working_dir\NSIS Test"
+            $null = Invoke-ExternalCommand -FilePath $test7 -ArgumentList @('/S', '/NCRC', "/D=$to")
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
         It 'works with "-Removal" switch ($removal param)' {
             $test1 | Should -Exist
-            test_extract 'Expand-7zipArchive' $test1 $true
+            $to = test_extract 'Expand-7zipArchive' $test1 $true
+            $to | Should -Exist
             $test1 | Should -Not -Exist
             $test5_1 | Should -Exist
             $test5_2 | Should -Exist
             $test5_3 | Should -Exist
-            test_extract 'Expand-7zipArchive' $test5_1 $true
+            $to = test_extract 'Expand-7zipArchive' $test5_1 $true
+            $to | Should -Exist
             $test5_1 | Should -Not -Exist
             $test5_2 | Should -Not -Exist
             $test5_3 | Should -Not -Exist
             $test6_1 | Should -Exist
             $test6_2 | Should -Exist
             $test6_3 | Should -Exist
-            test_extract 'Expand-7zipArchive' $test6_1 $true
+            $to = test_extract 'Expand-7zipArchive' $test6_1 $true
+            $to | Should -Exist
             $test6_1 | Should -Not -Exist
             $test6_2 | Should -Not -Exist
             $test6_3 | Should -Not -Exist
