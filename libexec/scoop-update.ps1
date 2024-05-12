@@ -316,7 +316,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
     Write-Host "Uninstalling '$app' ($old_version)"
-    run_uninstaller $old_manifest $architecture $dir
+    Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Uninstall
     rm_shims $app $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used

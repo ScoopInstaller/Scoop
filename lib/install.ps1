@@ -51,9 +51,9 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
-    Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -Arch $architecture
+    Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
-    run_installer @($fname)[-1] $manifest $architecture $dir $global
+    Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
@@ -66,7 +66,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     persist_data $manifest $original_dir $persist_dir
     persist_permission $manifest $global
 
-    Invoke-HookScript -HookType 'post_install' -Manifest $manifest -Arch $architecture
+    Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
@@ -540,7 +540,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
     # we only want to show this warning once
     if (!$use_cache) { warn 'Cache is being ignored.' }
 
-    # can be multiple urls: if there are, then installer should go last to make 'installer.args' section work
+    # can be multiple urls: if there are, then installer should go first to make 'installer.args' section work
     $urls = @(script:url $manifest $architecture)
 
     # can be multiple cookies: they will be used for all HTTP requests.
@@ -657,64 +657,79 @@ function args($config, $dir, $global) {
     @()
 }
 
-function run_installer($fname, $manifest, $architecture, $dir, $global) {
-    $installer = installer $manifest $architecture
-    if ($installer.script) {
-        Write-Output 'Running installer script...'
-        Invoke-Command ([scriptblock]::Create($installer.script -join "`r`n"))
-        return
-    }
-    if ($installer) {
-        $prog = "$dir\$(coalesce $installer.file $fname)"
-        if (!(is_in_dir $dir $prog)) {
-            abort "Error in manifest: Installer $prog is outside the app directory."
+function Invoke-Installer {
+    [CmdletBinding()]
+    param (
+        [string]
+        $Path,
+        [psobject]
+        $Manifest,
+        [Alias('Arch', 'Architecture')]
+        [ValidateSet('32bit', '64bit', 'arm64')]
+        [string]
+        $ProcessorArchitecture,
+        [string]
+        $AppName,
+        [switch]
+        $Global,
+        [switch]
+        $Uninstall
+    )
+    $type = if ($Uninstall) { 'uninstaller' } else { 'installer' }
+    $installer = arch_specific $type $Manifest $ProcessorArchitecture
+    if ($installer.file -or $installer.args) {
+        # Installer filename is either explicit defined ('installer.file') or file name in the first URL
+        $progName = "$Path\$(coalesce $installer.file (url_filename @(url $manifest $architecture)[0]))"
+        if (!(is_in_dir $Path $progName)) {
+            abort "Error in manifest: $((Get-Culture).TextInfo.ToTitleCase($type)) $progName is outside the app directory."
+        } elseif (!(Test-Path $progName)) {
+            abort "$((Get-Culture).TextInfo.ToTitleCase($type)) $progName is missing."
         }
-        $arg = @(args $installer.args $dir $global)
-        if ($prog.endswith('.ps1')) {
-            & $prog @arg
+        $fnArgs = @(args $installer.args $Path $Global)
+        if ($progName.EndsWith('.ps1')) {
+            & $progName @fnArgs
         } else {
-            $installed = Invoke-ExternalCommand $prog $arg -Activity 'Running installer...'
-            if (!$installed) {
-                abort "Installation aborted. You might need to run 'scoop uninstall $app' before trying again."
-            }
-            # Don't remove installer if "keep" flag is set to true
-            if (!($installer.keep -eq 'true')) {
-                Remove-Item $prog
-            }
-        }
-    }
-}
-
-function run_uninstaller($manifest, $architecture, $dir) {
-    $uninstaller = uninstaller $manifest $architecture
-    $version = $manifest.version
-    if ($uninstaller.script) {
-        Write-Output 'Running uninstaller script...'
-        Invoke-Command ([scriptblock]::Create($uninstaller.script -join "`r`n"))
-        return
-    }
-
-    if ($uninstaller.file) {
-        $prog = "$dir\$($uninstaller.file)"
-        $arg = args $uninstaller.args
-        if (!(is_in_dir $dir $prog)) {
-            warn "Error in manifest: Installer $prog is outside the app directory, skipping."
-            $prog = $null
-        } elseif (!(Test-Path $prog)) {
-            warn "Uninstaller $prog is missing, skipping."
-            $prog = $null
-        }
-
-        if ($prog) {
-            if ($prog.endswith('.ps1')) {
-                & $prog @arg
-            } else {
-                $uninstalled = Invoke-ExternalCommand $prog $arg -Activity 'Running uninstaller...'
-                if (!$uninstalled) {
+            $status = Invoke-ExternalCommand $progName -ArgumentList $fnArgs -Activity "Running $type ..."
+            if (!$status) {
+                if ($Uninstall) {
                     abort 'Uninstallation aborted.'
+                } else {
+                    abort "Installation aborted. You might need to run 'scoop uninstall $AppName' before trying again."
                 }
             }
+            # Don't remove installer if "keep" flag is set to true
+            if (!$installer.keep) {
+                Remove-Item $progName
+            }
         }
+    }
+    Invoke-HookScript -HookType $type -Manifest $Manifest -ProcessorArchitecture $ProcessorArchitecture
+}
+
+function Invoke-HookScript {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('installer', 'pre_install', 'post_install', 'uninstaller', 'pre_uninstall', 'post_uninstall')]
+        [String] $HookType,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject] $Manifest,
+        [Parameter(Mandatory = $true)]
+        [Alias('Arch', 'Architecture')]
+        [ValidateSet('32bit', '64bit', 'arm64')]
+        [string]
+        $ProcessorArchitecture
+    )
+
+    $script = arch_specific $HookType $Manifest $ProcessorArchitecture
+    if ($HookType -in @('installer', 'uninstaller')) {
+        $script = $script.script
+    }
+    if ($script) {
+        Write-Host "Running $HookType script..." -NoNewline
+        Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+        Write-Host 'done.' -ForegroundColor Green
     }
 }
 
@@ -898,28 +913,6 @@ function env_rm($manifest, $global, $arch) {
             Set-EnvVar -Name $name -Value $null -Global:$global
             if (Test-Path env:\$name) { Remove-Item env:\$name }
         }
-    }
-}
-
-function Invoke-HookScript {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateSet('pre_install', 'post_install',
-            'pre_uninstall', 'post_uninstall')]
-        [String] $HookType,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [PSCustomObject] $Manifest,
-        [Parameter(Mandatory = $true)]
-        [ValidateSet('32bit', '64bit', 'arm64')]
-        [String] $Arch
-    )
-
-    $script = arch_specific $HookType $Manifest $Arch
-    if ($script) {
-        Write-Output "Running $HookType script..."
-        Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
     }
 }
 
