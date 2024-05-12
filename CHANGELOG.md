@@ -15,6 +15,10 @@
 - **core:** Fix "Invoke-ExternalCommand" quoting rules ([#5945](https://github.com/ScoopInstaller/Scoop/issues/5945))
 - **scoop-info:** Fix download size estimating ([#5958](https://github.com/ScoopInstaller/Scoop/issues/5958))
 
+### Code Refactoring
+
+- **install:** Separate archive extraction from downloader ([#5951](https://github.com/ScoopInstaller/Scoop/issues/5951))
+
 ## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 
 ### Bug Fixes

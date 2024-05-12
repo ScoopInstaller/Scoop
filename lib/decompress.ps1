@@ -1,3 +1,71 @@
+# Description: Functions for decompressing archives or installers
+
+function Invoke-Extraction {
+    param (
+        [string]
+        $Path,
+        [string[]]
+        $Name,
+        [psobject]
+        $Manifest,
+        [Alias('Arch', 'Architecture')]
+        [string]
+        $ProcessorArchitecture
+    )
+
+    # 'url', 'extract_dir' and 'extract_to' are paired
+    $uri = @(url $Manifest $ProcessorArchitecture)
+    $extractDir = @(extract_dir $Manifest $ProcessorArchitecture)
+    $extractTo = @(extract_to $Manifest $ProcessorArchitecture)
+
+    for ($i = 0; $i -lt $Name.Length; $i++) {
+        $fnArgs = @{
+            Path            = Join-Path $Path $Name[$i]
+            DestinationPath = Join-Path $Path $extractTo[$i]
+            ExtractDir      = $extractDir[$i]
+        }
+        # work out extraction method, if applicable
+        $extractFn = $null
+        switch -regex ($fnArgs.Path) {
+            '\.zip$' {
+                if ((Test-HelperInstalled -Helper 7zip) -or ((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z))) {
+                    $extractFn = 'Expand-7zipArchive'
+                } else {
+                    $extractFn = 'Expand-ZipArchive'
+                }
+                continue
+            }
+            '\.msi$' {
+                $extractFn = 'Expand-MsiArchive'
+                continue
+            }
+            '\.exe$' {
+                if ($Manifest.innosetup) {
+                    $extractFn = 'Expand-InnoArchive'
+                }
+                continue
+            }
+            { Test-ZstdRequirement -Uri $_ } {
+                # Check Zstd first
+                $extractFn = 'Expand-ZstdArchive'
+                continue
+            }
+            { Test-7zipRequirement -Uri $_ } {
+                # Then check 7zip
+                $extractFn = 'Expand-7zipArchive'
+                continue
+            }
+        }
+        if ($extractFn) {
+            Write-Host 'Extracting ' -NoNewline
+            Write-Host $(url_remote_filename $uri[$i]) -ForegroundColor Cyan -NoNewline
+            Write-Host ' ... ' -NoNewline
+            & $extractFn @fnArgs -Removal
+            Write-Host 'done.' -ForegroundColor Green
+        }
+    }
+}
+
 function Expand-7zipArchive {
     [CmdletBinding()]
     param (
