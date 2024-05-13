@@ -40,31 +40,6 @@ function Get-SQLite {
 
 <#
 .SYNOPSIS
-    Close a SQLite database.
-.DESCRIPTION
-    Close a SQLite database connection.
-.PARAMETER InputObject
-    System.Data.SQLite.SQLiteConnection
-    The SQLite database connection to close.
-.INPUTS
-    System.Data.SQLite.SQLiteConnection
-.OUTPUTS
-    None
-#>
-function Close-ScoopDB {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [System.Data.SQLite.SQLiteConnection]
-        $InputObject
-    )
-    process {
-        $InputObject.Dispose()
-    }
-}
-
-<#
-.SYNOPSIS
     Create a new SQLite database.
 .DESCRIPTION
     Create a new SQLite database connection and create the necessary tables.
@@ -164,6 +139,8 @@ function Set-ScoopDBItem {
             $dbTrans.Rollback()
             throw $_
         } finally {
+            $dbCommand.Dispose()
+            $dbTrans.Dispose()
             $db.Dispose()
         }
     }
@@ -292,6 +269,7 @@ function Select-ScoopDBItem {
         [void]$dbAdapter.Fill($result)
     }
     end {
+        $dbAdapter.Dispose()
         $db.Dispose()
         return $result
     }
@@ -353,6 +331,7 @@ function Get-ScoopDBItem {
         [void]$dbAdapter.Fill($result)
     }
     end {
+        $dbAdapter.Dispose()
         $db.Dispose()
         return $result
     }
