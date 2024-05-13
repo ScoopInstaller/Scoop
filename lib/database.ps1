@@ -40,22 +40,16 @@ function Get-SQLite {
 
 <#
 .SYNOPSIS
-    Create a new SQLite database.
+    Open Scoop SQLite database.
 .DESCRIPTION
-    Create a new SQLite database connection and create the necessary tables.
-.PARAMETER PassThru
-    System.Management.Automation.SwitchParameter
-    Return the SQLite database connection.
+    Open Scoop SQLite database connection and create the necessary tables if not exists.
 .INPUTS
     None
 .OUTPUTS
-    None
-    Default
-
     System.Data.SQLite.SQLiteConnection
     The SQLite database connection if **PassThru** is used.
 #>
-function New-ScoopDB ([switch]$PassThru) {
+function Open-ScoopDB {
     # Load System.Data.SQLite
     if (!('System.Data.SQLite.SQLiteConnection' -as [Type])) {
         try {
@@ -87,11 +81,7 @@ function New-ScoopDB ([switch]$PassThru) {
     )"
     $tableCommand.ExecuteNonQuery() | Out-Null
     $tableCommand.Dispose()
-    if ($PassThru) {
-        return $db
-    } else {
-        $db.Dispose()
-    }
+    return $db
 }
 
 <#
@@ -116,7 +106,7 @@ function Set-ScoopDBItem {
     )
 
     begin {
-        $db = New-ScoopDB -PassThru
+        $db = Open-ScoopDB
         $dbTrans = $db.BeginTransaction()
         # TODO Support [hashtable]$InputObject
         $colName = @($InputObject | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name)
@@ -254,7 +244,7 @@ function Select-ScoopDBItem {
     )
 
     begin {
-        $db = New-ScoopDB -PassThru
+        $db = Open-ScoopDB
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
         $result = New-Object System.Data.DataTable
         $dbQuery = "SELECT * FROM app WHERE $(($From -join ' LIKE @Pattern OR ') + ' LIKE @Pattern')"
@@ -310,7 +300,7 @@ function Get-ScoopDBItem {
     )
 
     begin {
-        $db = New-ScoopDB -PassThru
+        $db = Open-ScoopDB
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
         $result = New-Object System.Data.DataTable
         $dbQuery = 'SELECT * FROM app WHERE name = @Name AND bucket = @Bucket'
