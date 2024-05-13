@@ -2,7 +2,7 @@
 
 ### Bug Fixes
 
-- **autoupdate:** Copy `PSCustomObject`-type properties within `autoupdate` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934))
+- **autoupdate:** Copy `PSCustomObject`-type properties within `substitute()` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934), [#5962](https://github.com/ScoopInstaller/Scoop/issues/5962))
 - **system:** Fix argument passing to `Split-PathLikeEnvVar()` in deprecated `strip_path()` ([#5937](https://github.com/ScoopInstaller/Scoop/issues/5937))
 - **core:** Fix "Invoke-ExternalCommand" quoting rules ([#5945](https://github.com/ScoopInstaller/Scoop/issues/5945))
 
