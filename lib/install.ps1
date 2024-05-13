@@ -651,12 +651,6 @@ function check_hash($file, $hash, $app_name) {
     return $true, $null
 }
 
-# for dealing with installers
-function args($config, $dir, $global) {
-    if ($config) { return $config | ForEach-Object { (format $_ @{'dir' = $dir; 'global' = $global }) } }
-    @()
-}
-
 function Invoke-Installer {
     [CmdletBinding()]
     param (
@@ -685,7 +679,12 @@ function Invoke-Installer {
         } elseif (!(Test-Path $progName)) {
             abort "$((Get-Culture).TextInfo.ToTitleCase($type)) $progName is missing."
         }
-        $fnArgs = @(args $installer.args $Path $Global)
+        $substitutions = @{
+            '$dir'     = $Path
+            '$global'  = $Global
+            '$version' = $Manifest.version
+        }
+        $fnArgs = substitute $installer.args $substitutions
         if ($progName.EndsWith('.ps1')) {
             & $progName @fnArgs
         } else {
@@ -899,7 +898,7 @@ function env_set($manifest, $dir, $global, $arch) {
     if ($env_set) {
         $env_set | Get-Member -Member NoteProperty | ForEach-Object {
             $name = $_.name
-            $val = format $env_set.$($_.name) @{ 'dir' = $dir }
+            $val = substitute $env_set.$($_.name) @{ '$dir' = $dir }
             Set-EnvVar -Name $name -Value $val -Global:$global
             Set-Content env:\$name $val
         }

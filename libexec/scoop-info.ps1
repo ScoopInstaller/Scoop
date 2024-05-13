@@ -210,7 +210,7 @@ $env_set = arch_specific 'env_set' $manifest $install.architecture
 if ($env_set) {
     $env_vars = @()
     $env_set | Get-Member -member noteproperty | ForEach-Object {
-        $env_vars += "$($_.name) = $(format $env_set.$($_.name) @{ "dir" = $dir })"
+        $env_vars += "$($_.name) = $(substitute $env_set.$($_.name) @{ '$dir' = $dir })"
     }
     $item.Environment = $env_vars -join "`n"
 }
