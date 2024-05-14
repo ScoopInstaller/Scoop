@@ -172,6 +172,11 @@ function rm_bucket($name) {
     }
 
     Remove-Item $dir -Recurse -Force -ErrorAction Stop
+    if (get_config USE_SQLITE_CACHE) {
+        info 'Updating cache...'
+        Remove-ScoopDBItem -Bucket $name
+    }
+    success "The $name bucket was removed successfully."
     return 0
 }
 

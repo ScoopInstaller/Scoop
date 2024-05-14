@@ -326,3 +326,60 @@ function Get-ScoopDBItem {
         return $result
     }
 }
+
+<#
+.SYNOPSIS
+    Remove Scoop database item(s).
+.DESCRIPTION
+    Remove item(s) from the Scoop SQLite database.
+.PARAMETER Name
+    System.String
+    The name of the item to remove.
+.PARAMETER Bucket
+    System.String
+    The bucket of the item to remove.
+.INPUTS
+    System.String
+.OUTPUTS
+    None
+#>
+function Remove-ScoopDBItem {
+    [CmdletBinding()]
+    param (
+        [Parameter(Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [string]
+        $Name,
+        [Parameter(Mandatory, Position = 1, ValueFromPipelineByPropertyName)]
+        [string]
+        $Bucket
+    )
+
+    begin {
+        $db = Open-ScoopDB
+        $dbTrans = $db.BeginTransaction()
+        $dbQuery = 'DELETE FROM app WHERE bucket = @Bucket'
+        $dbCommand = $db.CreateCommand()
+        $dbCommand.CommandText = $dbQuery
+        $dbCommand.CommandType = [System.Data.CommandType]::Text
+    }
+    process {
+        $dbCommand.Parameters.AddWithValue('@Bucket', $Bucket) | Out-Null
+        if ($Name) {
+            $dbCommand.CommandText = $dbQuery + ' AND name = @Name'
+            $dbCommand.Parameters.AddWithValue('@Name', $Name) | Out-Null
+        }
+        $dbCommand.ExecuteNonQuery() | Out-Null
+    }
+    end {
+        try {
+            $dbTrans.Commit()
+        } catch {
+            $dbTrans.Rollback()
+            throw $_
+        } finally {
+            $dbCommand.Dispose()
+            $dbTrans.Dispose()
+            $db.Dispose()
+        }
+    }
+}
