@@ -40,47 +40,16 @@ function Get-SQLite {
 
 <#
 .SYNOPSIS
-    Close a SQLite database.
+    Open Scoop SQLite database.
 .DESCRIPTION
-    Close a SQLite database connection.
-.PARAMETER InputObject
-    System.Data.SQLite.SQLiteConnection
-    The SQLite database connection to close.
-.INPUTS
-    System.Data.SQLite.SQLiteConnection
-.OUTPUTS
-    None
-#>
-function Close-ScoopDB {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory, ValueFromPipeline)]
-        [System.Data.SQLite.SQLiteConnection]
-        $InputObject
-    )
-    process {
-        $InputObject.Dispose()
-    }
-}
-
-<#
-.SYNOPSIS
-    Create a new SQLite database.
-.DESCRIPTION
-    Create a new SQLite database connection and create the necessary tables.
-.PARAMETER PassThru
-    System.Management.Automation.SwitchParameter
-    Return the SQLite database connection.
+    Open Scoop SQLite database connection and create the necessary tables if not exists.
 .INPUTS
     None
 .OUTPUTS
-    None
-    Default
-
     System.Data.SQLite.SQLiteConnection
     The SQLite database connection if **PassThru** is used.
 #>
-function New-ScoopDB ([switch]$PassThru) {
+function Open-ScoopDB {
     # Load System.Data.SQLite
     if (!('System.Data.SQLite.SQLiteConnection' -as [Type])) {
         try {
@@ -112,11 +81,7 @@ function New-ScoopDB ([switch]$PassThru) {
     )"
     $tableCommand.ExecuteNonQuery() | Out-Null
     $tableCommand.Dispose()
-    if ($PassThru) {
-        return $db
-    } else {
-        $db.Dispose()
-    }
+    return $db
 }
 
 <#
@@ -141,7 +106,7 @@ function Set-ScoopDBItem {
     )
 
     begin {
-        $db = New-ScoopDB -PassThru
+        $db = Open-ScoopDB
         $dbTrans = $db.BeginTransaction()
         # TODO Support [hashtable]$InputObject
         $colName = @($InputObject | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name)
@@ -164,6 +129,8 @@ function Set-ScoopDBItem {
             $dbTrans.Rollback()
             throw $_
         } finally {
+            $dbCommand.Dispose()
+            $dbTrans.Dispose()
             $db.Dispose()
         }
     }
@@ -199,10 +166,10 @@ function Set-ScoopDB {
     }
     process {
         if ($Path.Count -eq 0) {
-            $bucketPath = Get-LocalBucket | ForEach-Object { Join-Path $bucketsdir $_ }
+            $bucketPath = Get-LocalBucket | ForEach-Object { Find-BucketDirectory $_ }
             $Path = (Get-ChildItem $bucketPath -Filter '*.json' -Recurse).FullName
         }
-        $Path | Where-Object { $_ -notmatch '[\\/]\.|[\\/]deprecated[\\/]' } | ForEach-Object {
+        $Path | ForEach-Object {
             $manifestRaw = [System.IO.File]::ReadAllText($_)
             $manifest = ConvertFrom-Json $manifestRaw -ErrorAction SilentlyContinue
             if ($null -ne $manifest.version) {
@@ -277,7 +244,7 @@ function Select-ScoopDBItem {
     )
 
     begin {
-        $db = New-ScoopDB -PassThru
+        $db = Open-ScoopDB
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
         $result = New-Object System.Data.DataTable
         $dbQuery = "SELECT * FROM app WHERE $(($From -join ' LIKE @Pattern OR ') + ' LIKE @Pattern')"
@@ -292,6 +259,7 @@ function Select-ScoopDBItem {
         [void]$dbAdapter.Fill($result)
     }
     end {
+        $dbAdapter.Dispose()
         $db.Dispose()
         return $result
     }
@@ -332,7 +300,7 @@ function Get-ScoopDBItem {
     )
 
     begin {
-        $db = New-ScoopDB -PassThru
+        $db = Open-ScoopDB
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
         $result = New-Object System.Data.DataTable
         $dbQuery = 'SELECT * FROM app WHERE name = @Name AND bucket = @Bucket'
@@ -353,6 +321,7 @@ function Get-ScoopDBItem {
         [void]$dbAdapter.Fill($result)
     }
     end {
+        $dbAdapter.Dispose()
         $db.Dispose()
         return $result
     }

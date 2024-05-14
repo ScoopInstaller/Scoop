@@ -186,9 +186,11 @@ function Sync-Bucket {
         # Parallel parameter is available since PowerShell 7
         $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
             . "$using:PSScriptRoot\..\lib\core.ps1"
+            . "$using:PSScriptRoot\..\lib\buckets.ps1"
 
-            $bucketLoc = $_.path
             $name = $_.name
+            $bucketLoc = $_.path
+            $innerBucketLoc = Find-BucketDirectory $name
 
             $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
             Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
@@ -196,17 +198,19 @@ function Sync-Bucket {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
             if (get_config USE_SQLITE_CACHE) {
-                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', '--diff-filter=d', $previousCommit) | Where-Object {
-                    $_ -match '^[^.].*\.json$'
-                } | ForEach-Object {
-                    [void]($using:updatedFiles).Add($(Join-Path $bucketLoc $_))
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', '--diff-filter=d', $previousCommit) | ForEach-Object {
+                    $filePath = Join-Path $bucketLoc $_
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                        [void]($using:updatedFiles).Add($filePath)
+                    }
                 }
             }
         }
     } else {
         $buckets | Where-Object { $_.valid } | ForEach-Object {
-            $bucketLoc = $_.path
             $name = $_.name
+            $bucketLoc = $_.path
+            $innerBucketLoc = Find-BucketDirectory $name
 
             $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
             Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
@@ -214,10 +218,11 @@ function Sync-Bucket {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
             if (get_config USE_SQLITE_CACHE) {
-                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', '--diff-filter=d', $previousCommit) | Where-Object {
-                    $_ -match '^[^.].*\.json$'
-                } | ForEach-Object {
-                    [void]($updatedFiles).Add($(Join-Path $bucketLoc $_))
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-only', '--diff-filter=d', $previousCommit) | ForEach-Object {
+                    $filePath = Join-Path $bucketLoc $_
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                        [void]($updatedFiles).Add($filePath)
+                    }
                 }
             }
         }

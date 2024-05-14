@@ -2,17 +2,23 @@
 
 ### Features
 
-- **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851), [#5918](https://github.com/ScoopInstaller/Scoop/issues/5918), [#5946](https://github.com/ScoopInstaller/Scoop/issues/5946), [#5948](https://github.com/ScoopInstaller/Scoop/issues/5948))
+- **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851), [#5918](https://github.com/ScoopInstaller/Scoop/issues/5918), [#5946](https://github.com/ScoopInstaller/Scoop/issues/5946), [#5949](https://github.com/ScoopInstaller/Scoop/issues/5949), [#5955](https://github.com/ScoopInstaller/Scoop/issues/5955), [#5966](https://github.com/ScoopInstaller/Scoop/issues/5966))
 - **core:** New cache filename format ([#5929](https://github.com/ScoopInstaller/Scoop/issues/5929))
 
 ### Bug Fixes
 
 - **json:** Serialize jsonpath return ([#5921](https://github.com/ScoopInstaller/Scoop/issues/5921))
 - **scoop-search:** Catch error of parsing invalid manifest ([#5930](https://github.com/ScoopInstaller/Scoop/issues/5930))
-- **autoupdate:** Copy `PSCustomObject`-type properties within `autoupdate` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934))
+- **autoupdate:** Copy `PSCustomObject`-type properties within `substitute()` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934), [#5962](https://github.com/ScoopInstaller/Scoop/issues/5962))
 - **system:** Fix argument passing to `Split-PathLikeEnvVar()` in deprecated `strip_path()` ([#5937](https://github.com/ScoopInstaller/Scoop/issues/5937))
 - **scoop-cache:** Fix regression in 36026f18 ([#5944](https://github.com/ScoopInstaller/Scoop/issues/5944))
 - **scoop-download|install|update:** Use consistent options ([#5956](https://github.com/ScoopInstaller/Scoop/issues/5956))
+- **core:** Fix "Invoke-ExternalCommand" quoting rules ([#5945](https://github.com/ScoopInstaller/Scoop/issues/5945))
+- **scoop-info:** Fix download size estimating ([#5958](https://github.com/ScoopInstaller/Scoop/issues/5958))
+
+### Code Refactoring
+
+- **install:** Separate archive extraction from downloader ([#5951](https://github.com/ScoopInstaller/Scoop/issues/5951))
 
 ## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 
