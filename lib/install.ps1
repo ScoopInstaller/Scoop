@@ -53,7 +53,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
-    Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
+    Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
@@ -656,6 +656,8 @@ function Invoke-Installer {
     param (
         [string]
         $Path,
+        [string[]]
+        $Name,
         [psobject]
         $Manifest,
         [Alias('Arch', 'Architecture')]
@@ -673,7 +675,10 @@ function Invoke-Installer {
     $installer = arch_specific $type $Manifest $ProcessorArchitecture
     if ($installer.file -or $installer.args) {
         # Installer filename is either explicit defined ('installer.file') or file name in the first URL
-        $progName = "$Path\$(coalesce $installer.file (url_filename @(url $manifest $architecture)[0]))"
+        if (!$Name) {
+            $Name = url_filename @(url $manifest $architecture)
+        }
+        $progName = "$Path\$(coalesce $installer.file $Name[0])"
         if (!(is_in_dir $Path $progName)) {
             abort "Error in manifest: $((Get-Culture).TextInfo.ToTitleCase($type)) $progName is outside the app directory."
         } elseif (!(Test-Path $progName)) {
