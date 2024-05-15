@@ -28,7 +28,7 @@ param(
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\download.ps1"
 
 $Dir = Convert-Path $Dir
 $Queue = @()
