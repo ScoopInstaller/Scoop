@@ -79,6 +79,7 @@ function Open-ScoopDB {
         suggest TEXT,
         PRIMARY KEY (name, version, bucket)
     )"
+    $tableCommand.CommandType = [System.Data.CommandType]::Text
     $tableCommand.ExecuteNonQuery() | Out-Null
     $tableCommand.Dispose()
     return $db
@@ -88,7 +89,7 @@ function Open-ScoopDB {
 .SYNOPSIS
     Set Scoop database item(s).
 .DESCRIPTION
-    Insert or replace Scoop database item(s) into the database.
+    Insert or replace item(s) into the Scoop SQLite database.
 .PARAMETER InputObject
     System.Object[]
     The database item(s) to insert or replace.
@@ -113,6 +114,7 @@ function Set-ScoopDBItem {
         $dbQuery = "INSERT OR REPLACE INTO app ($($colName -join ', ')) VALUES ($('@' + ($colName -join ', @')))"
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
+        $dbCommand.CommandType = [System.Data.CommandType]::Text
     }
     process {
         foreach ($item in $InputObject) {
@@ -161,7 +163,7 @@ function Set-ScoopDB {
     )
 
     begin {
-        $list = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $list = [System.Collections.Generic.List[psobject]]::new()
         $arch = Get-DefaultArchitecture
     }
     process {
@@ -220,11 +222,14 @@ function Set-ScoopDB {
 .SYNOPSIS
     Select Scoop database item(s).
 .DESCRIPTION
-    Select Scoop database item(s) from the database.
+    Select item(s) from the Scoop SQLite database.
     The pattern is matched against the name, binaries, and shortcuts columns for apps.
 .PARAMETER Pattern
     System.String
     The pattern to search for. If is an empty string, all items will be returned.
+.PARAMETER From
+    System.String[]
+    The fields to search from.
 .INPUTS
     System.String
 .OUTPUTS
@@ -239,6 +244,7 @@ function Select-ScoopDBItem {
         [string]
         $Pattern,
         [Parameter(Mandatory, Position = 1)]
+        [ValidateNotNullOrEmpty()]
         [string[]]
         $From
     )
@@ -252,10 +258,10 @@ function Select-ScoopDBItem {
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
         $dbCommand.CommandType = [System.Data.CommandType]::Text
+        $dbAdapter.SelectCommand = $dbCommand
     }
     process {
         $dbCommand.Parameters.AddWithValue('@Pattern', $(if ($Pattern -eq '') { '%' } else { '%' + $Pattern + '%' })) | Out-Null
-        $dbAdapter.SelectCommand = $dbCommand
         [void]$dbAdapter.Fill($result)
     }
     end {
@@ -269,7 +275,7 @@ function Select-ScoopDBItem {
 .SYNOPSIS
     Get Scoop database item.
 .DESCRIPTION
-    Get Scoop database item from the database.
+    Get item from the Scoop SQLite database.
 .PARAMETER Name
     System.String
     The name of the item to get.
@@ -312,17 +318,74 @@ function Get-ScoopDBItem {
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
         $dbCommand.CommandType = [System.Data.CommandType]::Text
+        $dbAdapter.SelectCommand = $dbCommand
     }
     process {
         $dbCommand.Parameters.AddWithValue('@Name', $Name) | Out-Null
         $dbCommand.Parameters.AddWithValue('@Bucket', $Bucket) | Out-Null
         $dbCommand.Parameters.AddWithValue('@Version', $Version) | Out-Null
-        $dbAdapter.SelectCommand = $dbCommand
         [void]$dbAdapter.Fill($result)
     }
     end {
         $dbAdapter.Dispose()
         $db.Dispose()
         return $result
+    }
+}
+
+<#
+.SYNOPSIS
+    Remove Scoop database item(s).
+.DESCRIPTION
+    Remove item(s) from the Scoop SQLite database.
+.PARAMETER Name
+    System.String
+    The name of the item to remove.
+.PARAMETER Bucket
+    System.String
+    The bucket of the item to remove.
+.INPUTS
+    System.String
+.OUTPUTS
+    None
+#>
+function Remove-ScoopDBItem {
+    [CmdletBinding()]
+    param (
+        [Parameter(Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [string]
+        $Name,
+        [Parameter(Mandatory, Position = 1, ValueFromPipelineByPropertyName)]
+        [string]
+        $Bucket
+    )
+
+    begin {
+        $db = Open-ScoopDB
+        $dbTrans = $db.BeginTransaction()
+        $dbQuery = 'DELETE FROM app WHERE bucket = @Bucket'
+        $dbCommand = $db.CreateCommand()
+        $dbCommand.CommandText = $dbQuery
+        $dbCommand.CommandType = [System.Data.CommandType]::Text
+    }
+    process {
+        $dbCommand.Parameters.AddWithValue('@Bucket', $Bucket) | Out-Null
+        if ($Name) {
+            $dbCommand.CommandText = $dbQuery + ' AND name = @Name'
+            $dbCommand.Parameters.AddWithValue('@Name', $Name) | Out-Null
+        }
+        $dbCommand.ExecuteNonQuery() | Out-Null
+    }
+    end {
+        try {
+            $dbTrans.Commit()
+        } catch {
+            $dbTrans.Rollback()
+            throw $_
+        } finally {
+            $dbCommand.Dispose()
+            $dbTrans.Dispose()
+            $db.Dispose()
+        }
     }
 }
