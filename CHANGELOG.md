@@ -19,6 +19,7 @@
 ### Code Refactoring
 
 - **install:** Separate archive extraction from downloader ([#5951](https://github.com/ScoopInstaller/Scoop/issues/5951))
+- **install:** Replace 'run_(un)installer()' with 'Invoke-Installer()' ([#5968](https://github.com/ScoopInstaller/Scoop/issues/5968))
 
 ## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 

@@ -324,10 +324,6 @@ function Invoke-GitLog {
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 
-function format($str, $hash) {
-    $hash.keys | ForEach-Object { set-variable $_ $hash[$_] }
-    $executionContext.invokeCommand.expandString($str)
-}
 function is_admin {
     $admin = [security.principal.windowsbuiltinrole]::administrator
     $id = [security.principal.windowsidentity]::getcurrent()
