@@ -18,6 +18,7 @@
 
 ### Code Refactoring
 
+- **decompress:** Use 7zip to extract Zstd archive ([#5973](https://github.com/ScoopInstaller/Scoop/issues/5973))
 - **install:** Separate archive extraction from downloader ([#5951](https://github.com/ScoopInstaller/Scoop/issues/5951))
 - **install:** Replace 'run_(un)installer()' with 'Invoke-Installer()' ([#5968](https://github.com/ScoopInstaller/Scoop/issues/5968), [#5971](https://github.com/ScoopInstaller/Scoop/issues/5971))
 
