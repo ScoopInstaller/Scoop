@@ -25,7 +25,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
         }
         It 'Test cases should exist and hash should match' {
             $testcases | Should -Exist
-            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be '23a23a63e89ff95f5ef27f0cacf08055c2779cf41932266d8f509c2e200b8b63'
+            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be 'afb86b0552187b8d630ce25d02835fb809af81c584f07e54cb049fb74ca134b6'
         }
         It 'Test cases should be extracted correctly' {
             { Microsoft.PowerShell.Archive\Expand-Archive -Path $testcases -DestinationPath $working_dir } | Should -Not -Throw
@@ -149,41 +149,6 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $test6_1 | Should -Not -Exist
             $test6_2 | Should -Not -Exist
             $test6_3 | Should -Not -Exist
-        }
-    }
-
-    Context 'zstd extraction' {
-
-        BeforeAll {
-            if ($env:CI) {
-                Mock Get-AppFilePath { $env:SCOOP_ZSTD_PATH } -ParameterFilter { $Helper -eq 'zstd' }
-                Mock Get-AppFilePath { '7z.exe' } -ParameterFilter { $Helper -eq '7zip' }
-            } elseif (!(installed zstd)) {
-                scoop install zstd
-            }
-
-            $test1 = "$working_dir\ZstdTest.zst"
-            $test2 = "$working_dir\ZstdTest.tar.zst"
-        }
-
-        It 'extract normal compressed file' {
-            $to = test_extract 'Expand-ZstdArchive' $test1
-            $to | Should -Exist
-            "$to\ZstdTest" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
-        }
-
-        It 'extract nested compressed file' {
-            $to = test_extract 'Expand-ZstdArchive' $test2
-            $to | Should -Exist
-            "$to\ZstdTest" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
-        }
-
-        It 'works with "-Removal" switch ($removal param)' {
-            $test1 | Should -Exist
-            test_extract 'Expand-ZstdArchive' $test1 $true
-            $test1 | Should -Not -Exist
         }
     }
 

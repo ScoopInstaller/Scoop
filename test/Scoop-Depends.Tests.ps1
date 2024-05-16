@@ -14,11 +14,6 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
             Test-7zipRequirement -Uri 'test.bin' | Should -BeFalse
             Test-7zipRequirement -Uri @('test.xz', 'test.bin') | Should -BeTrue
         }
-        It 'Test Zstd requirement' {
-            Test-ZstdRequirement -Uri 'test.zst' | Should -BeTrue
-            Test-ZstdRequirement -Uri 'test.bin' | Should -BeFalse
-            Test-ZstdRequirement -Uri @('test.zst', 'test.bin') | Should -BeTrue
-        }
         It 'Test lessmsi requirement' {
             Mock get_config { $true }
             Test-LessmsiRequirement -Uri 'test.msi' | Should -BeTrue
@@ -27,7 +22,6 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
         }
         It 'Allow $Uri be $null' {
             Test-7zipRequirement -Uri $null | Should -BeFalse
-            Test-ZstdRequirement -Uri $null | Should -BeFalse
             Test-LessmsiRequirement -Uri $null | Should -BeFalse
         }
     }
