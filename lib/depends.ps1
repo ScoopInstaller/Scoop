@@ -118,11 +118,8 @@ function Get-InstallationHelper {
         if ($script -like '*Expand-DarkArchive *') {
             $helper += 'dark'
         }
-        if ((Test-ZstdRequirement -Uri $url) -or ($script -like '*Expand-ZstdArchive *')) {
-            $helper += 'zstd'
-        }
         if (!$All) {
-            '7zip', 'lessmsi', 'innounp', 'dark', 'zstd' | ForEach-Object {
+            '7zip', 'lessmsi', 'innounp', 'dark' | ForEach-Object {
                 if (Test-HelperInstalled -Helper $_) {
                     $helper = $helper -ne $_
                 }
@@ -144,20 +141,8 @@ function Test-7zipRequirement {
         $Uri
     )
     return ($Uri | Where-Object {
-            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(001)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^\d.]+)?$'
+            $_ -match '\.(001|7z|bz(ip)?2?|gz|img|iso|lzma|lzh|nupkg|rar|tar|t[abgpx]z2?|t?zst|xz)(\.[^\d.]+)?$'
         }).Count -gt 0
-}
-
-function Test-ZstdRequirement {
-    [CmdletBinding()]
-    [OutputType([Boolean])]
-    param (
-        [Parameter(Mandatory = $true)]
-        [AllowNull()]
-        [String[]]
-        $Uri
-    )
-    return ($Uri | Where-Object { $_ -match '\.zst$' }).Count -gt 0
 }
 
 function Test-LessmsiRequirement {

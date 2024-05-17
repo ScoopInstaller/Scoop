@@ -45,13 +45,7 @@ function Invoke-Extraction {
                 }
                 continue
             }
-            { Test-ZstdRequirement -Uri $_ } {
-                # Check Zstd first
-                $extractFn = 'Expand-ZstdArchive'
-                continue
-            }
             { Test-7zipRequirement -Uri $_ } {
-                # Then check 7zip
                 $extractFn = 'Expand-7zipArchive'
                 continue
             }
@@ -164,37 +158,9 @@ function Expand-ZstdArchive {
         [Switch]
         $Removal
     )
-    $ZstdPath = Get-HelperPath -Helper Zstd
-    $LogPath = Join-Path (Split-Path $Path) 'zstd.log'
-    $DestinationPath = $DestinationPath.TrimEnd('\')
-    ensure $DestinationPath | Out-Null
-    $ArgList = @('-d', $Path, '--output-dir-flat', $DestinationPath, '-f', '-v')
-
-    if ($Switches) {
-        $ArgList += (-split $Switches)
-    }
-    if ($Removal) {
-        # Remove original archive file
-        $ArgList += '--rm'
-    }
-    $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
-    if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
-    }
-    $IsTar = (strip_ext $Path) -match '\.tar$'
-    if ($IsTar) {
-        # Check for tar
-        $TarFile = Join-Path $DestinationPath (strip_ext (fname $Path))
-        Expand-7zipArchive -Path $TarFile -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
-    }
-    if (!$IsTar -and $ExtractDir) {
-        movedir (Join-Path $DestinationPath $ExtractDir) $DestinationPath | Out-Null
-        # Remove temporary directory
-        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force -ErrorAction Ignore
-    }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
-    }
+    # TODO: Remove this function after 2024/12/31
+    Show-DeprecatedWarning $MyInvocation 'Expand-7zipArchive'
+    Expand-7zipArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Switches $Switches -Removal:$Removal
 }
 
 function Expand-MsiArchive {
