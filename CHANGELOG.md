@@ -15,6 +15,7 @@
 - **scoop-download|install|update:** Use consistent options ([#5956](https://github.com/ScoopInstaller/Scoop/issues/5956))
 - **core:** Fix "Invoke-ExternalCommand" quoting rules ([#5945](https://github.com/ScoopInstaller/Scoop/issues/5945))
 - **scoop-info:** Fix download size estimating ([#5958](https://github.com/ScoopInstaller/Scoop/issues/5958))
+- **core:** Search for Git executable instead of any cmdlet ([#5979](https://github.com/ScoopInstaller/Scoop/pull/5979))
 
 ### Code Refactoring
 
