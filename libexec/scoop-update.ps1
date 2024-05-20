@@ -73,7 +73,7 @@ function Sync-Scoop {
     # check for git
     if (!(Test-GitAvailable)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    Write-Host "Updating Scoop..."
+    Write-Host 'Updating Scoop...'
     $currentdir = versiondir 'scoop' 'current'
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
@@ -181,8 +181,8 @@ function Sync-Bucket {
 
     $buckets | Where-Object { !$_.valid } | ForEach-Object { Write-Host "'$($_.name)' is not a git repository. Skipped." }
 
-    $updatedFiles = [System.Collections.Generic.SynchronizedCollection[string]]::new()
-    $removedFiles = [System.Collections.Generic.SynchronizedCollection[psobject]]::new()
+    $updatedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
+    $removedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
     if ($PSVersionTable.PSVersion.Major -ge 7) {
         # Parallel parameter is available since PowerShell 7
         $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
