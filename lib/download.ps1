@@ -87,33 +87,30 @@ function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $us
 
     if (!(Test-Path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
-        Start-Download $url "$cached.download" $cookies
+        $progress = [System.Console]::IsOutputRedirected -eq $false -and
+        $host.Name -ne 'Windows PowerShell ISE Host'
+        try {
+            $url = handle_special_urls $url
+            Invoke-Download $url "$cached.download" $cookies $progress
+        } catch {
+            $e = $_.Exception
+            if ($e.Response.StatusCode -eq 'Unauthorized') {
+                warn 'Token might be misconfigured.'
+            }
+            if ($e.InnerException) { $e = $e.InnerException }
+            throw $e
+        }
         Move-Item "$cached.download" $cached -Force
-    } else { Write-Host "Loading $(url_remote_filename $url) from cache" }
+    } else {
+        Write-Host "Loading $(url_remote_filename $url) from cache"
+    }
 
-    if (!($null -eq $to)) {
+    if ($null -ne $to) {
         if ($use_cache) {
             Copy-Item $cached $to
         } else {
             Move-Item $cached $to -Force
         }
-    }
-}
-
-function Start-Download ($url, $to, $cookies) {
-    $progress = [console]::isoutputredirected -eq $false -and
-    $host.name -ne 'Windows PowerShell ISE Host'
-
-    try {
-        $url = handle_special_urls $url
-        Invoke-Download $url $to $cookies $progress
-    } catch {
-        $e = $_.exception
-        if ($e.Response.StatusCode -eq 'Unauthorized') {
-            warn 'Token might be misconfigured.'
-        }
-        if ($e.innerexception) { $e = $e.innerexception }
-        throw $e
     }
 }
 
@@ -221,14 +218,14 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
 
     $proxy = get_config PROXY
     if ($proxy -ne 'none') {
-        if ([Net.Webrequest]::DefaultWebProxy.Address) {
-            $options += "--all-proxy='$([Net.Webrequest]::DefaultWebProxy.Address.Authority)'"
+        if ([System.Net.WebRequest]::DefaultWebProxy.Address) {
+            $options += "--all-proxy='$([System.Net.WebRequest]::DefaultWebProxy.Address.Authority)'"
         }
-        if ([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
-            $options += "--all-proxy-user='$([Net.Webrequest]::DefaultWebProxy.Credentials.UserName)'"
+        if ([System.Net.WebRequest]::DefaultWebProxy.Credentials.UserName) {
+            $options += "--all-proxy-user='$([System.Net.WebRequest]::DefaultWebProxy.Credentials.UserName)'"
         }
-        if ([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
-            $options += "--all-proxy-passwd='$([Net.Webrequest]::DefaultWebProxy.Credentials.Password)'"
+        if ([System.Net.WebRequest]::DefaultWebProxy.Credentials.Password) {
+            $options += "--all-proxy-passwd='$([System.Net.WebRequest]::DefaultWebProxy.Credentials.Password)'"
         }
     }
 
@@ -246,7 +243,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
 
         if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
             Write-Host 'Loading ' -NoNewline
-            Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+            Write-Host $(url_remote_filename $url) -ForegroundColor Cyan -NoNewline
             Write-Host ' from cache.'
         } else {
             $download_finished = $false
@@ -282,12 +279,12 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         Write-Host 'Starting download with aria2 ...'
 
         # Set console output encoding to UTF8 for non-ASCII characters printing
-        $oriConsoleEncoding = [Console]::OutputEncoding
-        [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
+        $oriConsoleEncoding = [System.Console]::OutputEncoding
+        [System.Console]::OutputEncoding = New-Object Text.UTF8Encoding
 
         Invoke-Command ([scriptblock]::Create($aria2)) | ForEach-Object {
             # Skip blank lines
-            if ([String]::IsNullOrWhiteSpace($_)) { return }
+            if ([string]::IsNullOrWhiteSpace($_)) { return }
 
             # Prevent potential overlaping of text when one line is shorter
             $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
@@ -322,7 +319,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         }
 
         # Revert console encoding
-        [Console]::OutputEncoding = $oriConsoleEncoding
+        [System.Console]::OutputEncoding = $oriConsoleEncoding
     }
 
     foreach ($url in $urls) {
@@ -369,8 +366,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
 # download with filesize and progress indicator
 function Invoke-Download ($url, $to, $cookies, $progress) {
     $reqUrl = ($url -split '#')[0]
-    $wreq = [Net.WebRequest]::Create($reqUrl)
-    if ($wreq -is [Net.HttpWebRequest]) {
+    $wreq = [System.Net.WebRequest]::Create($reqUrl)
+    if ($wreq -is [System.Net.HttpWebRequest]) {
         $wreq.UserAgent = Get-UserAgent
         if (-not ($url -match 'sourceforge\.net' -or $url -match 'portableapps\.com')) {
             $wreq.Referer = strip_filename $url
@@ -427,12 +424,12 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
     }
 
     $total = $wres.ContentLength
-    if ($total -eq -1 -and $wreq -is [net.ftpwebrequest]) {
+    if ($total -eq -1 -and $wreq -is [System.Net.FtpWebRequest]) {
         $total = ftp_file_size($url)
     }
 
     if ($progress -and ($total -gt 0)) {
-        [console]::CursorVisible = $false
+        [System.Console]::CursorVisible = $false
         function Trace-DownloadProgress ($read) {
             Write-DownloadProgress $read $total $url
         }
@@ -444,35 +441,35 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
     }
 
     try {
-        $s = $wres.getresponsestream()
-        $fs = [io.file]::openwrite($to)
+        $s = $wres.GetResponseStream()
+        $fs = [System.IO.File]::OpenWrite($to)
         $buffer = New-Object byte[] 2048
         $totalRead = 0
-        $sw = [diagnostics.stopwatch]::StartNew()
+        $sw = [System.Diagnostics.Stopwatch]::StartNew()
 
         Trace-DownloadProgress $totalRead
-        while (($read = $s.read($buffer, 0, $buffer.length)) -gt 0) {
-            $fs.write($buffer, 0, $read)
+        while (($read = $s.Read($buffer, 0, $buffer.Length)) -gt 0) {
+            $fs.Write($buffer, 0, $read)
             $totalRead += $read
-            if ($sw.elapsedmilliseconds -gt 100) {
-                $sw.restart()
+            if ($sw.ElapsedMilliseconds -gt 100) {
+                $sw.Restart()
                 Trace-DownloadProgress $totalRead
             }
         }
-        $sw.stop()
+        $sw.Stop()
         Trace-DownloadProgress $totalRead
     } finally {
         if ($progress) {
-            [console]::CursorVisible = $true
+            [System.Console]::CursorVisible = $true
             Write-Host
         }
         if ($fs) {
-            $fs.close()
+            $fs.Close()
         }
         if ($s) {
-            $s.close()
+            $s.Close()
         }
-        $wres.close()
+        $wres.Close()
     }
 }
 
@@ -480,7 +477,7 @@ function Format-DownloadProgress ($url, $read, $total, $console) {
     $filename = url_remote_filename $url
 
     # calculate current percentage done
-    $p = [math]::Round($read / $total * 100, 0)
+    $p = [System.Math]::Round($read / $total * 100, 0)
 
     # pre-generate LHS and RHS of progress string
     # so we know how much space we have
@@ -491,7 +488,7 @@ function Format-DownloadProgress ($url, $read, $total, $console) {
     $midwidth = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
 
     # calculate how many characters are completed
-    $completed = [math]::Abs([math]::Round(($p / 100) * $midwidth, 0) - 1)
+    $completed = [System.Math]::Abs([System.Math]::Round(($p / 100) * $midwidth, 0) - 1)
 
     # generate dashes to symbolise completed
     if ($completed -gt 1) {
@@ -516,13 +513,13 @@ function Format-DownloadProgress ($url, $read, $total, $console) {
 }
 
 function Write-DownloadProgress ($read, $total, $url) {
-    $console = $host.UI.RawUI
+    $console = $Host.UI.RawUI
     $left = $console.CursorPosition.X
     $top = $console.CursorPosition.Y
     $width = $console.BufferSize.Width
 
     if ($read -eq 0) {
-        $maxOutputLength = $(Format-DownloadProgress $url 100 $total $console).length
+        $maxOutputLength = $(Format-DownloadProgress $url 100 $total $console).Length
         if (($left + $maxOutputLength) -gt $width) {
             # not enough room to print progress on this line
             # print on new line
@@ -534,7 +531,7 @@ function Write-DownloadProgress ($read, $total, $url) {
     }
 
     Write-Host $(Format-DownloadProgress $url $read $total $console) -NoNewline
-    [console]::SetCursorPosition($left, $top)
+    [System.Console]::SetCursorPosition($left, $top)
 }
 
 function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
@@ -557,7 +554,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
             try {
                 Invoke-CachedDownload $app $version $url "$dir\$fname" $cookies $use_cache
             } catch {
-                Write-Host -f darkred $_
+                Write-Host -ForegroundColor DarkRed $_
                 abort "URL $url is not valid"
             }
 
@@ -572,7 +569,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                         Remove-Item -Force $cached
                     }
                     if ($url.Contains('sourceforge.net')) {
-                        Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                        Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     abort $(new_issue_msg $app $bucket 'hash check failed')
                 }
@@ -590,9 +587,9 @@ function cookie_header($cookies) {
 }
 
 function ftp_file_size($url) {
-    $request = [net.ftpwebrequest]::create($url)
-    $request.method = [net.webrequestmethods+ftp]::getfilesize
-    $request.getresponse().contentlength
+    $request = [System.Net.FtpWebRequest]::Create($url)
+    $request.Method = [System.Net.WebRequestMethods+Ftp]::GetFileSize
+    $request.GetResponse().ContentLength
 }
 
 # hashes
@@ -603,7 +600,7 @@ function hash_for_url($manifest, $url, $arch) {
 
     $urls = @(script:url $manifest $arch)
 
-    $index = [array]::indexof($urls, $url)
+    $index = [array]::IndexOf($urls, $url)
     if ($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
 
     @($hashes)[$index]
@@ -617,7 +614,7 @@ function check_hash($file, $hash, $app_name) {
     }
 
     Write-Host 'Checking hash of ' -NoNewline
-    Write-Host $(url_remote_filename $url) -f Cyan -NoNewline
+    Write-Host $(url_remote_filename $url) -ForegroundColor Cyan -NoNewline
     Write-Host ' ... ' -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
@@ -715,7 +712,7 @@ function get_magic_bytes($file) {
         return ''
     }
 
-    if ((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+    if ((Get-Command Get-Content).Parameters.ContainsKey('AsByteStream')) {
         # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
         return Get-Content $file -AsByteStream -TotalCount 8
     } else {
@@ -740,7 +737,7 @@ function Get-Encoding($wc) {
 }
 
 function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([Environment]::OSVersion.Version.Major).$([Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
 }
 
 function setup_proxy() {
@@ -756,19 +753,19 @@ function setup_proxy() {
         }
 
         if ($address -eq 'none') {
-            [net.webrequest]::defaultwebproxy = $null
+            [System.Net.WebRequest]::DefaultWebProxy = $null
         } elseif ($address -ne 'default') {
-            [net.webrequest]::defaultwebproxy = New-Object net.webproxy "http://$address"
+            [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebRequest "http://$address"
         }
 
         if ($credentials -eq 'currentuser') {
-            [net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
+            [System.Net.WebRequest]::DefaultWebProxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
         } elseif ($credentials) {
             $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])', '$1' }
-            [net.webrequest]::defaultwebproxy.credentials = New-Object net.networkcredential($username, $password)
+            [System.Net.WebRequest]::DefaultWebProxy.Credentials = New-Object System.Net.NetworkCredential($username, $password)
         }
     } catch {
-        warn "Failed to use proxy '$proxy': $($_.exception.message)"
+        warn "Failed to use proxy '$proxy': $($_.Exception.Message)"
     }
 }
 
@@ -777,14 +774,14 @@ function Test-Aria2Enabled {
 }
 
 function url_filename($url) {
-    (Split-Path $url -Leaf).split('?') | Select-Object -First 1
+    (Split-Path $url -Leaf).Split('?') | Select-Object -First 1
 }
 
 # Unlike url_filename which can be tricked by appending a
 # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
 # this function extracts the original filename from the URL.
 function url_remote_filename($url) {
-    $uri = (New-Object URI $url)
+    $uri = [uri]$url
     $basename = Split-Path $uri.PathAndQuery -Leaf
     If ($basename -match '.*[?=]+([\w._-]+)') {
         $basename = $matches[1]
