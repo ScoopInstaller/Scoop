@@ -75,11 +75,50 @@ function Get-RemoteFile {
     }
 }
 
-function Get-RemoteFileSize ($Uri) {
-    $result = Get-RemoteFile -Uri $Uri -Method Head
-    if (!$result.StatusCode) {
-        $result.'Content-Length' | ForEach-Object { [int]$_ }
+function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+    # we only want to show this warning once
+    if (!$use_cache) { warn 'Cache is being ignored.' }
+
+    # can be multiple urls: if there are, then installer should go first to make 'installer.args' section work
+    $urls = @(script:url $manifest $architecture)
+
+    # can be multiple cookies: they will be used for all HTTP requests.
+    $cookies = $manifest.cookie
+
+    # download first
+    if (Test-Aria2Enabled) {
+        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+    } else {
+        foreach ($url in $urls) {
+            $fname = url_filename $url
+
+            try {
+                Invoke-CachedDownload $app $version $url "$dir\$fname" $cookies $use_cache
+            } catch {
+                Write-Host -ForegroundColor DarkRed $_
+                abort "URL $url is not valid"
+            }
+
+            if ($check_hash) {
+                $manifest_hash = hash_for_url $manifest $url $architecture
+                $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
+                if (!$ok) {
+                    error $err
+                    $cached = cache_path $app $version $url
+                    if (Test-Path $cached) {
+                        # rm cached file
+                        Remove-Item -Force $cached
+                    }
+                    if ($url.Contains('sourceforge.net')) {
+                        Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
+                    }
+                    abort $(new_issue_msg $app $bucket 'hash check failed')
+                }
+            }
+        }
     }
+
+    return $urls.ForEach({ url_filename $_ })
 }
 
 function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
@@ -112,6 +151,183 @@ function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $us
             Move-Item $cached $to -Force
         }
     }
+}
+
+function Invoke-Download ($url, $to, $cookies, $progress) {
+    # download with filesize and progress indicator
+    $reqUrl = ($url -split '#')[0]
+    $wreq = [System.Net.WebRequest]::Create($reqUrl)
+    if ($wreq -is [System.Net.HttpWebRequest]) {
+        $wreq.UserAgent = Get-UserAgent
+        if (-not ($url -match 'sourceforge\.net' -or $url -match 'portableapps\.com')) {
+            $wreq.Referer = strip_filename $url
+        }
+        if ($url -match 'api\.github\.com/repos') {
+            $wreq.Accept = 'application/octet-stream'
+            $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
+            $wreq.Headers['X-GitHub-Api-Version'] = '2022-11-28'
+        }
+        if ($cookies) {
+            $wreq.Headers.Add('Cookie', (cookie_header $cookies))
+        }
+
+        get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
+            (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
+                $wreq.Headers[$_.Key] = $_.Value
+            }
+        }
+    }
+
+    try {
+        $wres = $wreq.GetResponse()
+    } catch [System.Net.WebException] {
+        $exc = $_.Exception
+        $handledCodes = @(
+            [System.Net.HttpStatusCode]::MovedPermanently, # HTTP 301
+            [System.Net.HttpStatusCode]::Found, # HTTP 302
+            [System.Net.HttpStatusCode]::SeeOther, # HTTP 303
+            [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
+        )
+
+        # Only handle redirection codes
+        $redirectRes = $exc.Response
+        if ($handledCodes -notcontains $redirectRes.StatusCode) {
+            throw $exc
+        }
+
+        # Get the new location of the file
+        if ((-not $redirectRes.Headers) -or ($redirectRes.Headers -notcontains 'Location')) {
+            throw $exc
+        }
+
+        $newUrl = $redirectRes.Headers['Location']
+        info "Following redirect to $newUrl..."
+
+        # Handle manual file rename
+        if ($url -like '*#/*') {
+            $null, $postfix = $url -split '#/'
+            $newUrl = "$newUrl#/$postfix"
+        }
+
+        Invoke-Download $newUrl $to $cookies $progress
+        return
+    }
+
+    $total = $wres.ContentLength
+    if ($total -eq -1 -and $wreq -is [System.Net.FtpWebRequest]) {
+        $total = ftp_file_size($url)
+    }
+
+    if ($progress -and ($total -gt 0)) {
+        [System.Console]::CursorVisible = $false
+        function Trace-DownloadProgress ($read) {
+            Write-DownloadProgress $read $total $url
+        }
+    } else {
+        Write-Host "Downloading $url ($(filesize $total))..."
+        function Trace-DownloadProgress {
+            #no op
+        }
+    }
+
+    try {
+        $s = $wres.GetResponseStream()
+        $fs = [System.IO.File]::OpenWrite($to)
+        $buffer = New-Object byte[] 2048
+        $totalRead = 0
+        $sw = [System.Diagnostics.Stopwatch]::StartNew()
+
+        Trace-DownloadProgress $totalRead
+        while (($read = $s.Read($buffer, 0, $buffer.Length)) -gt 0) {
+            $fs.Write($buffer, 0, $read)
+            $totalRead += $read
+            if ($sw.ElapsedMilliseconds -gt 100) {
+                $sw.Restart()
+                Trace-DownloadProgress $totalRead
+            }
+        }
+        $sw.Stop()
+        Trace-DownloadProgress $totalRead
+    } finally {
+        if ($progress) {
+            [System.Console]::CursorVisible = $true
+            Write-Host
+        }
+        if ($fs) {
+            $fs.Close()
+        }
+        if ($s) {
+            $s.Close()
+        }
+        $wres.Close()
+    }
+}
+
+function Format-DownloadProgress ($url, $read, $total, $console) {
+    $filename = url_remote_filename $url
+
+    # calculate current percentage done
+    $p = [System.Math]::Round($read / $total * 100, 0)
+
+    # pre-generate LHS and RHS of progress string
+    # so we know how much space we have
+    $left = "$filename ($(filesize $total))"
+    $right = [string]::Format('{0,3}%', $p)
+
+    # calculate remaining width for progress bar
+    $midwidth = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
+
+    # calculate how many characters are completed
+    $completed = [System.Math]::Abs([System.Math]::Round(($p / 100) * $midwidth, 0) - 1)
+
+    # generate dashes to symbolise completed
+    if ($completed -gt 1) {
+        $dashes = [string]::Join('', ((1..$completed) | ForEach-Object { '=' }))
+    }
+
+    # this is why we calculate $completed - 1 above
+    $dashes += switch ($p) {
+        100 { '=' }
+        default { '>' }
+    }
+
+    # the remaining characters are filled with spaces
+    $spaces = switch ($dashes.Length) {
+        $midwidth { [string]::Empty }
+        default {
+            [string]::Join('', ((1..($midwidth - $dashes.Length)) | ForEach-Object { ' ' }))
+        }
+    }
+
+    "$left [$dashes$spaces] $right"
+}
+
+function Write-DownloadProgress ($read, $total, $url) {
+    $console = $Host.UI.RawUI
+    $left = $console.CursorPosition.X
+    $top = $console.CursorPosition.Y
+    $width = $console.BufferSize.Width
+
+    if ($read -eq 0) {
+        $maxOutputLength = $(Format-DownloadProgress $url 100 $total $console).Length
+        if (($left + $maxOutputLength) -gt $width) {
+            # not enough room to print progress on this line
+            # print on new line
+            Write-Host
+            $left = 0
+            $top = $top + 1
+            if ($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
+        }
+    }
+
+    Write-Host $(Format-DownloadProgress $url $read $total $console) -NoNewline
+    [System.Console]::SetCursorPosition($left, $top)
+}
+
+## Aria2 downloader
+
+function Test-Aria2Enabled {
+    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
 function aria_exit_code($exitcode) {
@@ -154,31 +370,6 @@ function aria_exit_code($exitcode) {
         return 'An unknown error occurred'
     }
     return $codes[$exitcode]
-}
-
-function get_filename_from_metalink($file) {
-    $bytes = get_magic_bytes_pretty $file ''
-    # check if file starts with '<?xml'
-    if (!($bytes.StartsWith('3c3f786d6c'))) {
-        return $null
-    }
-
-    # Add System.Xml for reading metalink files
-    Add-Type -AssemblyName 'System.Xml'
-    $xr = [System.Xml.XmlReader]::Create($file)
-    $filename = $null
-    try {
-        $xr.ReadStartElement('metalink')
-        if ($xr.ReadToFollowing('file') -and $xr.MoveToFirstAttribute()) {
-            $filename = $xr.Value
-        }
-    } catch [System.Xml.XmlException] {
-        return $null
-    } finally {
-        $xr.Close()
-    }
-
-    return $filename
 }
 
 function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
@@ -363,226 +554,156 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
     }
 }
 
-# download with filesize and progress indicator
-function Invoke-Download ($url, $to, $cookies, $progress) {
-    $reqUrl = ($url -split '#')[0]
-    $wreq = [System.Net.WebRequest]::Create($reqUrl)
-    if ($wreq -is [System.Net.HttpWebRequest]) {
-        $wreq.UserAgent = Get-UserAgent
-        if (-not ($url -match 'sourceforge\.net' -or $url -match 'portableapps\.com')) {
-            $wreq.Referer = strip_filename $url
-        }
-        if ($url -match 'api\.github\.com/repos') {
-            $wreq.Accept = 'application/octet-stream'
-            $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
-            $wreq.Headers['X-GitHub-Api-Version'] = '2022-11-28'
-        }
-        if ($cookies) {
-            $wreq.Headers.Add('Cookie', (cookie_header $cookies))
-        }
+## Helper functions
 
-        get_config PRIVATE_HOSTS | Where-Object { $_ -ne $null -and $url -match $_.match } | ForEach-Object {
-            (ConvertFrom-StringData -StringData $_.Headers).GetEnumerator() | ForEach-Object {
-                $wreq.Headers[$_.Key] = $_.Value
-            }
-        }
-    }
-
-    try {
-        $wres = $wreq.GetResponse()
-    } catch [System.Net.WebException] {
-        $exc = $_.Exception
-        $handledCodes = @(
-            [System.Net.HttpStatusCode]::MovedPermanently, # HTTP 301
-            [System.Net.HttpStatusCode]::Found, # HTTP 302
-            [System.Net.HttpStatusCode]::SeeOther, # HTTP 303
-            [System.Net.HttpStatusCode]::TemporaryRedirect  # HTTP 307
-        )
-
-        # Only handle redirection codes
-        $redirectRes = $exc.Response
-        if ($handledCodes -notcontains $redirectRes.StatusCode) {
-            throw $exc
-        }
-
-        # Get the new location of the file
-        if ((-not $redirectRes.Headers) -or ($redirectRes.Headers -notcontains 'Location')) {
-            throw $exc
-        }
-
-        $newUrl = $redirectRes.Headers['Location']
-        info "Following redirect to $newUrl..."
-
-        # Handle manual file rename
-        if ($url -like '*#/*') {
-            $null, $postfix = $url -split '#/'
-            $newUrl = "$newUrl#/$postfix"
-        }
-
-        Invoke-Download $newUrl $to $cookies $progress
-        return
-    }
-
-    $total = $wres.ContentLength
-    if ($total -eq -1 -and $wreq -is [System.Net.FtpWebRequest]) {
-        $total = ftp_file_size($url)
-    }
-
-    if ($progress -and ($total -gt 0)) {
-        [System.Console]::CursorVisible = $false
-        function Trace-DownloadProgress ($read) {
-            Write-DownloadProgress $read $total $url
-        }
-    } else {
-        Write-Host "Downloading $url ($(filesize $total))..."
-        function Trace-DownloadProgress {
-            #no op
-        }
-    }
-
-    try {
-        $s = $wres.GetResponseStream()
-        $fs = [System.IO.File]::OpenWrite($to)
-        $buffer = New-Object byte[] 2048
-        $totalRead = 0
-        $sw = [System.Diagnostics.Stopwatch]::StartNew()
-
-        Trace-DownloadProgress $totalRead
-        while (($read = $s.Read($buffer, 0, $buffer.Length)) -gt 0) {
-            $fs.Write($buffer, 0, $read)
-            $totalRead += $read
-            if ($sw.ElapsedMilliseconds -gt 100) {
-                $sw.Restart()
-                Trace-DownloadProgress $totalRead
-            }
-        }
-        $sw.Stop()
-        Trace-DownloadProgress $totalRead
-    } finally {
-        if ($progress) {
-            [System.Console]::CursorVisible = $true
-            Write-Host
-        }
-        if ($fs) {
-            $fs.Close()
-        }
-        if ($s) {
-            $s.Close()
-        }
-        $wres.Close()
-    }
-}
-
-function Format-DownloadProgress ($url, $read, $total, $console) {
-    $filename = url_remote_filename $url
-
-    # calculate current percentage done
-    $p = [System.Math]::Round($read / $total * 100, 0)
-
-    # pre-generate LHS and RHS of progress string
-    # so we know how much space we have
-    $left = "$filename ($(filesize $total))"
-    $right = [string]::Format('{0,3}%', $p)
-
-    # calculate remaining width for progress bar
-    $midwidth = $console.BufferSize.Width - ($left.Length + $right.Length + 8)
-
-    # calculate how many characters are completed
-    $completed = [System.Math]::Abs([System.Math]::Round(($p / 100) * $midwidth, 0) - 1)
-
-    # generate dashes to symbolise completed
-    if ($completed -gt 1) {
-        $dashes = [string]::Join('', ((1..$completed) | ForEach-Object { '=' }))
-    }
-
-    # this is why we calculate $completed - 1 above
-    $dashes += switch ($p) {
-        100 { '=' }
-        default { '>' }
-    }
-
-    # the remaining characters are filled with spaces
-    $spaces = switch ($dashes.Length) {
-        $midwidth { [string]::Empty }
-        default {
-            [string]::Join('', ((1..($midwidth - $dashes.Length)) | ForEach-Object { ' ' }))
-        }
-    }
-
-    "$left [$dashes$spaces] $right"
-}
-
-function Write-DownloadProgress ($read, $total, $url) {
-    $console = $Host.UI.RawUI
-    $left = $console.CursorPosition.X
-    $top = $console.CursorPosition.Y
-    $width = $console.BufferSize.Width
-
-    if ($read -eq 0) {
-        $maxOutputLength = $(Format-DownloadProgress $url 100 $total $console).Length
-        if (($left + $maxOutputLength) -gt $width) {
-            # not enough room to print progress on this line
-            # print on new line
-            Write-Host
-            $left = 0
-            $top = $top + 1
-            if ($top -gt $console.CursorPosition.Y) { $top = $console.CursorPosition.Y }
-        }
-    }
-
-    Write-Host $(Format-DownloadProgress $url $read $total $console) -NoNewline
-    [System.Console]::SetCursorPosition($left, $top)
-}
-
-function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
-    # we only want to show this warning once
-    if (!$use_cache) { warn 'Cache is being ignored.' }
-
-    # can be multiple urls: if there are, then installer should go first to make 'installer.args' section work
-    $urls = @(script:url $manifest $architecture)
-
-    # can be multiple cookies: they will be used for all HTTP requests.
-    $cookies = $manifest.cookie
-
-    # download first
-    if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
-    } else {
-        foreach ($url in $urls) {
-            $fname = url_filename $url
-
-            try {
-                Invoke-CachedDownload $app $version $url "$dir\$fname" $cookies $use_cache
-            } catch {
-                Write-Host -ForegroundColor DarkRed $_
-                abort "URL $url is not valid"
-            }
-
-            if ($check_hash) {
-                $manifest_hash = hash_for_url $manifest $url $architecture
-                $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
-                if (!$ok) {
-                    error $err
-                    $cached = cache_path $app $version $url
-                    if (Test-Path $cached) {
-                        # rm cached file
-                        Remove-Item -Force $cached
-                    }
-                    if ($url.Contains('sourceforge.net')) {
-                        Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
-                    }
-                    abort $(new_issue_msg $app $bucket 'hash check failed')
-                }
-            }
-        }
-    }
-
-    return $urls.ForEach({ url_filename $_ })
-}
+### Downloader parameters
 
 function cookie_header($cookies) {
     if ($cookies) {
         return $cookies.PSObject.Properties.ForEach({ "$($_.Name)=$($_.Value)" }) -join ';'
+    }
+}
+
+function Get-GitHubToken {
+    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN) | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+}
+
+function github_ratelimit_reached {
+    $api_link = 'https://api.github.com/rate_limit'
+    $ret = (Get-RemoteFile $api_link | ConvertFrom-Json).rate.remaining -eq 0
+    if ($ret) {
+        Write-Host "GitHub API rate limit reached.`r`nPlease try again later or configure your API token using 'scoop config gh_token <your token>'."
+    }
+    $ret
+}
+
+function Get-Encoding($wc) {
+    if ($null -ne $wc.ResponseHeaders -and $wc.ResponseHeaders['Content-Type'] -match 'charset=([^;]*)') {
+        return [System.Text.Encoding]::GetEncoding($Matches[1])
+    } else {
+        return [System.Text.Encoding]::GetEncoding('utf-8')
+    }
+}
+
+function Get-UserAgent() {
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([Environment]::OSVersion.Version.Major).$([Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
+}
+
+function setup_proxy() {
+    # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
+    $proxy = get_config PROXY
+    if (!$proxy) {
+        return
+    }
+    try {
+        $credentials, $address = $proxy -split '(?<!\\)@'
+        if (!$address) {
+            $address, $credentials = $credentials, $null # no credentials supplied
+        }
+
+        if ($address -eq 'none') {
+            [System.Net.WebRequest]::DefaultWebProxy = $null
+        } elseif ($address -ne 'default') {
+            [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebRequest "http://$address"
+        }
+
+        if ($credentials -eq 'currentuser') {
+            [System.Net.WebRequest]::DefaultWebProxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
+        } elseif ($credentials) {
+            $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])', '$1' }
+            [System.Net.WebRequest]::DefaultWebProxy.Credentials = New-Object System.Net.NetworkCredential($username, $password)
+        }
+    } catch {
+        warn "Failed to use proxy '$proxy': $($_.Exception.Message)"
+    }
+}
+
+
+### URL redirections
+
+function handle_special_urls($url) {
+    # FossHub.com
+    if ($url -match '^(?:.*fosshub.com\/)(?<name>.*)(?:\/|\?dwl=)(?<filename>.*)$') {
+        $Body = @{
+            projectUri      = $Matches.name
+            fileName        = $Matches.filename
+            source          = 'CF'
+            isLatestVersion = $true
+        }
+        if ((Invoke-RestMethod -Uri $url) -match '"p":"(?<pid>[a-f0-9]{24}).*?"r":"(?<rid>[a-f0-9]{24})') {
+            $Body.Add('projectId', $Matches.pid)
+            $Body.Add('releaseId', $Matches.rid)
+        }
+        $url = Invoke-RestMethod -Method Post -Uri 'https://api.fosshub.com/download/' -ContentType 'application/json' -Body (ConvertTo-Json $Body -Compress)
+        if ($null -eq $url.error) {
+            $url = $url.data.url
+        }
+    }
+
+    # Sourceforge.net
+    if ($url -match '(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*?)(?:$|\/download|\?)') {
+        # Reshapes the URL to avoid redirections
+        $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
+    }
+
+    # Github.com
+    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = Get-GitHubToken)) {
+        $headers = @{ 'Authorization' = "token $token" }
+        $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
+        $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
+
+        if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
+            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
+        }
+    }
+
+    return $url
+}
+
+### Remote file information
+
+function get_magic_bytes($file) {
+    if (!(Test-Path $file)) {
+        return ''
+    }
+
+    if ((Get-Command Get-Content).Parameters.ContainsKey('AsByteStream')) {
+        # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
+        return Get-Content $file -AsByteStream -TotalCount 8
+    } else {
+        return Get-Content $file -Encoding byte -TotalCount 8
+    }
+}
+
+function get_magic_bytes_pretty($file, $glue = ' ') {
+    if (!(Test-Path $file)) {
+        return ''
+    }
+
+    return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
+}
+
+function get_filename_from_metalink($file) {
+    $bytes = get_magic_bytes_pretty $file ''
+    # check if file starts with '<?xml'
+    if (!($bytes.StartsWith('3c3f786d6c'))) {
+        return $null
+    }
+
+    $xr = [xml](Get-Content $file -Raw)
+    $filename = if ($xr.metalink.files) {
+        $xr.metalink.files.file.name
+    } else {
+        $xr.metalink.file.name
+    }
+
+    return $filename
+}
+
+function Get-RemoteFileSize ($Uri) {
+    $result = Get-RemoteFile -Uri $Uri -Method Head
+    if (!$result.StatusCode) {
+        $result.'Content-Length' | ForEach-Object { [int]$_ }
     }
 }
 
@@ -592,7 +713,28 @@ function ftp_file_size($url) {
     $request.GetResponse().ContentLength
 }
 
-# hashes
+function url_filename($url) {
+    (Split-Path $url -Leaf).Split('?') | Select-Object -First 1
+}
+
+function url_remote_filename($url) {
+    # Unlike url_filename which can be tricked by appending a
+    # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
+    # this function extracts the original filename from the URL.
+    $uri = [uri]$url
+    $basename = Split-Path $uri.PathAndQuery -Leaf
+    If ($basename -match '.*[?=]+([\w._-]+)') {
+        $basename = $matches[1]
+    }
+    If (($basename -notlike '*.*') -or ($basename -match '^[v.\d]+$')) {
+        $basename = Split-Path $uri.AbsolutePath -Leaf
+    }
+    If (($basename -notlike '*.*') -and ($uri.Fragment -ne '')) {
+        $basename = $uri.Fragment.Trim('/', '#')
+    }
+    return $basename
+}
+
 function hash_for_url($manifest, $url, $arch) {
     $hashes = @(hash $manifest $arch) | Where-Object { $_ -ne $null }
 
@@ -606,8 +748,8 @@ function hash_for_url($manifest, $url, $arch) {
     @($hashes)[$index]
 }
 
-# returns (ok, err)
 function check_hash($file, $hash, $app_name) {
+    # returns (ok, err)
     if (!$hash) {
         warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
         return $true, $null
@@ -653,146 +795,6 @@ function get_hash([String] $multihash) {
     }
 
     return $type, $hash.ToLower()
-}
-
-function Get-GitHubToken {
-    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN) | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
-}
-
-function github_ratelimit_reached {
-    $api_link = 'https://api.github.com/rate_limit'
-    $ret = (Get-RemoteFile $api_link | ConvertFrom-Json).rate.remaining -eq 0
-    if ($ret) {
-        Write-Host "GitHub API rate limit reached.`r`nPlease try again later or configure your API token using 'scoop config gh_token <your token>'."
-    }
-    $ret
-}
-
-function handle_special_urls($url) {
-    # FossHub.com
-    if ($url -match '^(?:.*fosshub.com\/)(?<name>.*)(?:\/|\?dwl=)(?<filename>.*)$') {
-        $Body = @{
-            projectUri      = $Matches.name
-            fileName        = $Matches.filename
-            source          = 'CF'
-            isLatestVersion = $true
-        }
-        if ((Invoke-RestMethod -Uri $url) -match '"p":"(?<pid>[a-f0-9]{24}).*?"r":"(?<rid>[a-f0-9]{24})') {
-            $Body.Add('projectId', $Matches.pid)
-            $Body.Add('releaseId', $Matches.rid)
-        }
-        $url = Invoke-RestMethod -Method Post -Uri 'https://api.fosshub.com/download/' -ContentType 'application/json' -Body (ConvertTo-Json $Body -Compress)
-        if ($null -eq $url.error) {
-            $url = $url.data.url
-        }
-    }
-
-    # Sourceforge.net
-    if ($url -match '(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*?)(?:$|\/download|\?)') {
-        # Reshapes the URL to avoid redirections
-        $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
-    }
-
-    # Github.com
-    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = Get-GitHubToken)) {
-        $headers = @{ 'Authorization' = "token $token" }
-        $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
-        $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
-
-        if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
-            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
-        }
-    }
-
-    return $url
-}
-
-function get_magic_bytes($file) {
-    if (!(Test-Path $file)) {
-        return ''
-    }
-
-    if ((Get-Command Get-Content).Parameters.ContainsKey('AsByteStream')) {
-        # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
-        return Get-Content $file -AsByteStream -TotalCount 8
-    } else {
-        return Get-Content $file -Encoding byte -TotalCount 8
-    }
-}
-
-function get_magic_bytes_pretty($file, $glue = ' ') {
-    if (!(Test-Path $file)) {
-        return ''
-    }
-
-    return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
-}
-
-function Get-Encoding($wc) {
-    if ($null -ne $wc.ResponseHeaders -and $wc.ResponseHeaders['Content-Type'] -match 'charset=([^;]*)') {
-        return [System.Text.Encoding]::GetEncoding($Matches[1])
-    } else {
-        return [System.Text.Encoding]::GetEncoding('utf-8')
-    }
-}
-
-function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([Environment]::OSVersion.Version.Major).$([Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
-}
-
-function setup_proxy() {
-    # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
-    $proxy = get_config PROXY
-    if (!$proxy) {
-        return
-    }
-    try {
-        $credentials, $address = $proxy -split '(?<!\\)@'
-        if (!$address) {
-            $address, $credentials = $credentials, $null # no credentials supplied
-        }
-
-        if ($address -eq 'none') {
-            [System.Net.WebRequest]::DefaultWebProxy = $null
-        } elseif ($address -ne 'default') {
-            [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebRequest "http://$address"
-        }
-
-        if ($credentials -eq 'currentuser') {
-            [System.Net.WebRequest]::DefaultWebProxy.Credentials = [System.Net.CredentialCache]::DefaultCredentials
-        } elseif ($credentials) {
-            $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])', '$1' }
-            [System.Net.WebRequest]::DefaultWebProxy.Credentials = New-Object System.Net.NetworkCredential($username, $password)
-        }
-    } catch {
-        warn "Failed to use proxy '$proxy': $($_.Exception.Message)"
-    }
-}
-
-function Test-Aria2Enabled {
-    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
-}
-
-function url_filename($url) {
-    (Split-Path $url -Leaf).Split('?') | Select-Object -First 1
-}
-
-# Unlike url_filename which can be tricked by appending a
-# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
-# this function extracts the original filename from the URL.
-function url_remote_filename($url) {
-    $uri = [uri]$url
-    $basename = Split-Path $uri.PathAndQuery -Leaf
-    If ($basename -match '.*[?=]+([\w._-]+)') {
-        $basename = $matches[1]
-    }
-    If (($basename -notlike '*.*') -or ($basename -match '^[v.\d]+$')) {
-        $basename = Split-Path $uri.AbsolutePath -Leaf
-    }
-    If (($basename -notlike '*.*') -and ($uri.Fragment -ne '')) {
-        $basename = $uri.Fragment.Trim('/', '#')
-    }
-    return $basename
 }
 
 # Setup proxy globally
