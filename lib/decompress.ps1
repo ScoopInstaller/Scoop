@@ -13,20 +13,16 @@ function Invoke-Extraction {
         $ProcessorArchitecture
     )
 
-    # 'url', 'extract_dir' and 'extract_to' are paired
     $uri = @(url $Manifest $ProcessorArchitecture)
+    # 'extract_dir' and 'extract_to' are paired
     $extractDir = @(extract_dir $Manifest $ProcessorArchitecture)
     $extractTo = @(extract_to $Manifest $ProcessorArchitecture)
+    $extracted = 0
 
     for ($i = 0; $i -lt $Name.Length; $i++) {
-        $fnArgs = @{
-            Path            = Join-Path $Path $Name[$i]
-            DestinationPath = Join-Path $Path $extractTo[$i]
-            ExtractDir      = $extractDir[$i]
-        }
         # work out extraction method, if applicable
         $extractFn = $null
-        switch -regex ($fnArgs.Path) {
+        switch -regex ($Name[$i]) {
             '\.zip$' {
                 if ((Test-HelperInstalled -Helper 7zip) -or ((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z))) {
                     $extractFn = 'Expand-7zipArchive'
@@ -51,11 +47,17 @@ function Invoke-Extraction {
             }
         }
         if ($extractFn) {
+            $fnArgs = @{
+                Path            = Join-Path $Path $Name[$i]
+                DestinationPath = Join-Path $Path $extractTo[$extracted]
+                ExtractDir      = $extractDir[$extracted]
+            }
             Write-Host 'Extracting ' -NoNewline
             Write-Host $(url_remote_filename $uri[$i]) -ForegroundColor Cyan -NoNewline
             Write-Host ' ... ' -NoNewline
             & $extractFn @fnArgs -Removal
             Write-Host 'done.' -ForegroundColor Green
+            $extracted++
         }
     }
 }
