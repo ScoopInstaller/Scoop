@@ -10,8 +10,14 @@
 # To install an app from a manifest at a URL:
 #      scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
 #
+# To install a different version of the app from a URL:
+#       scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/neovim.json@0.9.0
+#
 # To install an app from a manifest on your computer
 #      scoop install \path\to\app.json
+#
+# To install an app from a manifest on your computer
+#      scoop install \path\to\app.json@version
 #
 # Options:
 #   -g, --global                    Install the app globally
