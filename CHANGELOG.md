@@ -4,7 +4,7 @@
 
 - **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851), [#5918](https://github.com/ScoopInstaller/Scoop/issues/5918), [#5946](https://github.com/ScoopInstaller/Scoop/issues/5946), [#5949](https://github.com/ScoopInstaller/Scoop/issues/5949), [#5955](https://github.com/ScoopInstaller/Scoop/issues/5955), [#5966](https://github.com/ScoopInstaller/Scoop/issues/5966), [#5967](https://github.com/ScoopInstaller/Scoop/issues/5967), [#5981](https://github.com/ScoopInstaller/Scoop/issues/5981))
 - **core:** New cache filename format ([#5929](https://github.com/ScoopInstaller/Scoop/issues/5929))
-- **core:** Added the ability to install specific version of app from URL/file link ([#5977](https://github.com/ScoopInstaller/Scoop/issues/5977))
+- **core:** Added the ability to install specific version of app from URL/file link ([#5988](https://github.com/ScoopInstaller/Scoop/issues/5988))
 
 ### Bug Fixes
 
