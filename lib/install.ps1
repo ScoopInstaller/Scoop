@@ -95,7 +95,7 @@ function Invoke-Installer {
         [psobject]
         $Manifest,
         [Alias('Arch', 'Architecture')]
-        [ValidateSet('32bit', '64bit', 'arm64')]
+        [ValidateSet('32bit', '64bit-v4', '64bit-v3', '64bit-v2', '64bit', 'arm64')]
         [string]
         $ProcessorArchitecture,
         [string]
