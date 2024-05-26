@@ -1192,7 +1192,7 @@ function applist($apps, $global) {
 }
 
 function parse_app([string]$app) {
-    if ($app -match '^(?:(?<bucket>[a-zA-Z0-9-_.]+)/)?(?<app>.*\.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?$') {
+    if ($app -match '^(?:(?<bucket>[a-zA-Z0-9-_.]+)/)?(?<app>.*\.json|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?$') {
         return $Matches['app'], $Matches['bucket'], $Matches['version']
     } else {
         return $app, $null, $null
