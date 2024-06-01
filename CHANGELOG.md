@@ -36,6 +36,7 @@
 
 ### Features
 
+- **install:** Add support for x64 microarchitectures ([#5674](https://github.com/ScoopInstaller/Scoop/pull/5674))
 - **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851), [#5918](https://github.com/ScoopInstaller/Scoop/issues/5918), [#5946](https://github.com/ScoopInstaller/Scoop/issues/5946), [#5949](https://github.com/ScoopInstaller/Scoop/issues/5949), [#5955](https://github.com/ScoopInstaller/Scoop/issues/5955), [#5966](https://github.com/ScoopInstaller/Scoop/issues/5966), [#5967](https://github.com/ScoopInstaller/Scoop/issues/5967), [#5981](https://github.com/ScoopInstaller/Scoop/issues/5981))
 - **core:** New cache filename format ([#5929](https://github.com/ScoopInstaller/Scoop/issues/5929), [#5944](https://github.com/ScoopInstaller/Scoop/issues/5944))
 - **decompress:** Use innounp-unicode as default Inno Setup Unpacker ([#6028](https://github.com/ScoopInstaller/Scoop/issues/6028))
