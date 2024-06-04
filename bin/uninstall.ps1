@@ -93,9 +93,11 @@ if ($errors) {
 
 if ($purge) {
     rm_dir $scoopdir
+    rm_dir $localdir
     if ($global) { rm_dir $globaldir }
 } else {
     keep_onlypersist $scoopdir
+    keep_onlypersist $localdir
     if ($global) { keep_onlypersist $globaldir }
 }
 

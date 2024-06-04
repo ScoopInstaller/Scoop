@@ -194,7 +194,7 @@ function Complete-ConfigChange {
                 $Value.ToUpperInvariant()
             }
             info "Turn on Scoop isolated path ('$newPathEnvVar')... This may take a while, please wait."
-            $movedPath = Remove-Path -Path "$scoopdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
+            $movedPath = Remove-Path -Path "$localdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
             if ($movedPath) {
                 Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Quiet
                 Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
@@ -386,7 +386,7 @@ function filesize($length) {
 }
 
 # dirs
-function basedir($global) { if($global) { return $globaldir } $scoopdir }
+function basedir($global) { if($global) { return $globaldir } $localdir }
 function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
 function modulesdir($global) { "$(basedir $global)\modules" }
@@ -1081,10 +1081,10 @@ function shim($path, $global, $name, $arg) {
 function get_shim_path() {
     $shim_version = get_config SHIM 'kiennq'
     $shim_path = switch ($shim_version) {
-        'scoopcs' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
-        '71' { "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe" }
-        'kiennq' { "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe" }
-        'default' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
+        'scoopcs' { "$($scoopdir)\apps\scoop\current\supporting\shims\scoopcs\shim.exe" }
+        '71' { "$($scoopdir)\apps\scoop\current\supporting\shims\71\shim.exe" }
+        'kiennq' { "$($scoopdir)\apps\scoop\current\supporting\shims\kiennq\shim.exe" }
+        'default' { "$($scoopdir)\apps\scoop\current\supporting\shims\scoopcs\shim.exe" }
         default { warn "Unknown shim version: '$shim_version'" }
     }
     return $shim_path
@@ -1401,6 +1401,20 @@ function Out-UTF8File {
     }
 }
 
+function getOldRootPath() {
+    $configRootPath = (get_config ROOT_PATH)
+    if ($configRootPath -ne $null) {
+        (set_config ROOT_PATH $null)
+        (set_config LOCAL_PATH $configRootPath)
+        return $configRootPath
+    }
+    $userProfileScoop = "$([System.Environment]::GetFolderPath('UserProfile'))\scoop"
+    if (Test-Path -Path $userProfileScoop) {
+        return $userProfileScoop
+    }
+    return $null
+}
+
 ##################
 # Core Bootstrap #
 ##################
@@ -1409,36 +1423,15 @@ function Out-UTF8File {
 #       for all communication with api.github.com
 Optimize-SecurityProtocol
 
+# Scoop root directory
+$scoopdir = "$PSScriptRoot\..\..\..\.."
+
 # Load Scoop config
-$configHome = $env:XDG_CONFIG_HOME, "$env:USERPROFILE\.config" | Select-Object -First 1
-$configFile = "$configHome\scoop\config.json"
-# Check if it's the expected install path for scoop: <root>/apps/scoop/current
-$coreRoot = Split-Path $PSScriptRoot
-$pathExpected = ($coreRoot -replace '\\','/') -like '*apps/scoop/current*'
-if ($pathExpected) {
-    # Portable config is located in root directory:
-    #    .\current\scoop\apps\<root>\config.json  <- a reversed path
-    # Imagine `<root>/apps/scoop/current/` in a reversed format,
-    # and the directory tree:
-    #
-    # ```
-    # <root>:
-    # ├─apps
-    # ├─buckets
-    # ├─cache
-    # ├─persist
-    # ├─shims
-    # ├─config.json
-    # ```
-    $configPortablePath = Get-AbsolutePath "$coreRoot\..\..\..\config.json"
-    if (Test-Path $configPortablePath) {
-        $configFile = $configPortablePath
-    }
-}
+$configFile = "$scoopdir\config.json"
 $scoopConfig = load_cfg $configFile
 
-# Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+# Scoop local directory
+$localdir = $env:SCOOP_LOCAL, (get_config LOCAL_PATH), "$([System.Environment]::GetFolderPath('LocalApplicationData'))\scoop", (getOldRootPath) | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop global apps directory
 $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
