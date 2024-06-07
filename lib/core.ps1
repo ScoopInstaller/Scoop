@@ -512,7 +512,7 @@ function Get-HelperPath {
                 if ($internalgit) {
                     $HelperPath = $internalgit
                 } else {
-                    $HelperPath = (Get-Command git -ErrorAction Ignore).Source
+                    $HelperPath = (Get-Command git -CommandType Application -ErrorAction Ignore).Source
                 }
             }
             '7zip' { $HelperPath = Get-AppFilePath '7zip' '7z.exe' }

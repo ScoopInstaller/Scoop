@@ -18,6 +18,7 @@
 - **scoop-info:** Fix download size estimating ([#5958](https://github.com/ScoopInstaller/Scoop/issues/5958))
 - **decompress:** Match `extract_dir`/`extract_to` and archives ([#5983](https://github.com/ScoopInstaller/Scoop/issues/5983))
 - **checkver:** Correct variable 'regex' to 'regexp' ([#5993](https://github.com/ScoopInstaller/Scoop/issues/5993))
+- **core:** Search for Git executable instead of any cmdlet ([#5998](https://github.com/ScoopInstaller/Scoop/pull/5998))
 
 ### Code Refactoring
 
