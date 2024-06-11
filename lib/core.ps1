@@ -1041,11 +1041,11 @@ function shim($path, $global, $name, $arg) {
         @(
             "#!/bin/sh",
             "# $resolved_path",
-            "if [ `$(echo `$WSL_DISTRO_NAME) ]",
+            "if [ `$WSL_INTEROP ]",
             'then',
             "  cd `$(wslpath -u '$(Split-Path $resolved_path -Parent)')",
             'else',
-            "  cd `"$((Split-Path $resolved_path -Parent).Replace('\', '/'))`"",
+            "  cd `$(cygpath -u '$(Split-Path $resolved_path -Parent)')",
             'fi',
             "java.exe -jar `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
@@ -1058,7 +1058,7 @@ function shim($path, $global, $name, $arg) {
 
         warn_on_overwrite $shim $path
         @(
-            "#!/bin/sh",
+            '#!/bin/sh',
             "# $resolved_path",
             "python.exe `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
@@ -1066,14 +1066,22 @@ function shim($path, $global, $name, $arg) {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
-            "@bash `"$resolved_path`" $arg %*"
+            "@bash `"`$(wslpath -u '$resolved_path')`" $arg %* 2>nul",
+            '@if %errorlevel% neq 0 (',
+            "  @bash `"`$(cygpath -u '$resolved_path')`" $arg %* 2>nul",
+            ')'
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
         @(
-            "#!/bin/sh",
+            '#!/bin/sh',
             "# $resolved_path",
-            "`"$resolved_path`" $arg `"$@`""
+            "if [ `$WSL_INTEROP ]",
+            'then',
+            "  `"`$(wslpath -u '$resolved_path')`" $arg `"$@`"",
+            'else',
+            "  `"`$(cygpath -u '$resolved_path')`" $arg `"$@`"",
+            'fi'
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     }
 }
