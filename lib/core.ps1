@@ -517,7 +517,12 @@ function Get-HelperPath {
             }
             '7zip' { $HelperPath = Get-AppFilePath '7zip' '7z.exe' }
             'Lessmsi' { $HelperPath = Get-AppFilePath 'lessmsi' 'lessmsi.exe' }
-            'Innounp' { $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe' }
+            'Innounp' {
+                $HelperPath = Get-AppFilePath 'innounp-unicode' 'innounp.exe'
+                if ([String]::IsNullOrEmpty($HelperPath)) {
+                    $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe'
+                }
+            }
             'Dark' {
                 $HelperPath = Get-AppFilePath 'wixtoolset' 'wix.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
