@@ -294,8 +294,10 @@ while ($in_progress -gt 0) {
             }
             $page = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
         }
+        $source = $url
         if ($script) {
             $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+            $source = 'the output of script'
         }
 
         if ($jsonpath) {
@@ -310,7 +312,7 @@ while ($in_progress -gt 0) {
                 $ver = json_path_legacy $page $jsonpath
             }
             if (!$ver) {
-                next "couldn't find '$jsonpath' in $url"
+                next "couldn't find '$jsonpath' in $source"
                 continue
             }
         }
@@ -332,7 +334,7 @@ while ($in_progress -gt 0) {
             # Getting version from XML, using XPath
             $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
             if (!$ver) {
-                next "couldn't find '$($xpath -replace 'ns:', '')' in $url"
+                next "couldn't find '$($xpath -replace 'ns:', '')' in $source"
                 continue
             }
         }
@@ -366,13 +368,13 @@ while ($in_progress -gt 0) {
                     $ver = $matchesHashtable['version']
                 }
             } else {
-                next "couldn't match '$regexp' in $url"
+                next "couldn't match '$regexp' in $source"
                 continue
             }
         }
 
         if (!$ver) {
-            next "couldn't find new version in $url"
+            next "couldn't find new version in $source"
             continue
         }
     }
