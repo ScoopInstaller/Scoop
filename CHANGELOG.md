@@ -22,6 +22,7 @@
 - **core:** Search for Git executable instead of any cmdlet ([#5998](https://github.com/ScoopInstaller/Scoop/issues/5998))
 - **core:** Use correct path in 'bash' ([#6006](https://github.com/ScoopInstaller/Scoop/issues/6006))
 - **core:** Limit the number of commands to get when search for git executable ([#6013](https://github.com/ScoopInstaller/Scoop/pull/6013))
+- **checkver:** Correct error messages ([#6024](https://github.com/ScoopInstaller/Scoop/issues/6024))
 
 ### Code Refactoring
 
