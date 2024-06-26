@@ -1038,8 +1038,9 @@ function shim($path, $global, $name, $arg) {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
-            "@cd /d $(Split-Path $resolved_path -Parent)"
-            "@java -jar `"$resolved_path`" $arg %*"
+            "@pushd $(Split-Path $resolved_path -Parent)",
+            "@java -jar `"$resolved_path`" $arg %*",
+            "@popd"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
