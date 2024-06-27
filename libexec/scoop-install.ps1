@@ -24,6 +24,7 @@
 #   -i, --independent               Don't install dependencies automatically
 #   -k, --no-cache                  Don't use the download cache
 #   -s, --skip-hash-check           Skip hash validation (use with caution!)
+#   -m, --no-startmenu              Don't add the shortcut to the startmenu
 #   -u, --no-update-scoop           Don't update Scoop before installing if it's outdated
 #   -a, --arch <32bit|64bit|arm64>  Use the specified architecture, if the app supports it
 
@@ -42,13 +43,14 @@ if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
 
-$opt, $apps, $err = getopt $args 'giksua:' 'global', 'independent', 'no-cache', 'skip-hash-check', 'no-update-scoop', 'arch='
+$opt, $apps, $err = getopt $args 'giksmua:' 'global', 'independent', 'no-cache', 'skip-hash-check', 'no-startmenu', 'no-update-scoop', 'arch='
 if ($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 $check_hash = !($opt.s -or $opt.'skip-hash-check')
 $independent = $opt.i -or $opt.independent
 $use_cache = !($opt.k -or $opt.'no-cache')
+$add_startmenu = !($opt.m -or $opt.'no-startmenu')
 $architecture = Get-DefaultArchitecture
 try {
     $architecture = Format-ArchitectureString ($opt.a + $opt.arch)
@@ -131,7 +133,7 @@ if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
     warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
-$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash $add_startmenu }
 
 show_suggestions $suggested
 
