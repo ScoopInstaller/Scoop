@@ -72,7 +72,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
-    save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
+    save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket; 'no_add_startmenu' = !($add_startmenu) } $dir
 
     if ($manifest.suggest) {
         $suggested[$app] = $manifest.suggest
