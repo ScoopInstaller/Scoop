@@ -36,8 +36,9 @@
 
 $opt, $apps, $err = getopt $args 'asnup' @('all', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
 if ($err) { "scoop virustotal: $err"; exit 1 }
-if (!$apps -and -$all) { my_usage; exit 1 }
-$architecture = Format-ArchitectureString
+$all = $apps -eq '*' -or $opt.a -or $opt.all
+if (!$apps -and !$all) { my_usage; exit 1 }
+$architecture = Get-DefaultArchitecture
 
 if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
@@ -47,11 +48,8 @@ if (is_scoop_outdated) {
     }
 }
 
-$apps_param = $apps
-
-if ($apps_param -eq '*' -or $opt.a -or $opt.all) {
-    $apps = installed_apps $false
-    $apps += installed_apps $true
+if ($all) {
+    $apps = (installed_apps $false) + (installed_apps $true)
 }
 
 if (!$opt.n -and !$opt.'no-depends') {
