@@ -375,12 +375,12 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
 
     if ($independent) {
-        install_app $app $architecture $global $suggested $use_cache $check_hash
+        install_app $app $architecture $global $suggested $use_cache $check_hash ($True -ne $install.no_add_startmenu)
     } else {
         # Also add missing dependencies
         $apps = @(Get-Dependency $app $architecture) -ne $app
         ensure_none_failed $apps
-        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash ($True -ne $install.no_add_startmenu) }
     }
 }
 
