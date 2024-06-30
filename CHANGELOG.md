@@ -11,11 +11,8 @@
 
 - **json:** Serialize jsonpath return ([#5921](https://github.com/ScoopInstaller/Scoop/issues/5921))
 - **scoop-search:** Catch error of parsing invalid manifest ([#5930](https://github.com/ScoopInstaller/Scoop/issues/5930))
-- **autoupdate:** Copy `PSCustomObject`-type properties within `substitute()` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934), [#5962](https://github.com/ScoopInstaller/Scoop/issues/5962))
-- **system:** Fix argument passing to `Split-PathLikeEnvVar()` in deprecated `strip_path()` ([#5937](https://github.com/ScoopInstaller/Scoop/issues/5937))
 - **scoop-cache:** Fix regression in 36026f18 ([#5944](https://github.com/ScoopInstaller/Scoop/issues/5944))
 - **scoop-download|install|update:** Use consistent options ([#5956](https://github.com/ScoopInstaller/Scoop/issues/5956))
-- **core:** Fix "Invoke-ExternalCommand" quoting rules ([#5945](https://github.com/ScoopInstaller/Scoop/issues/5945))
 - **scoop-info:** Fix download size estimating ([#5958](https://github.com/ScoopInstaller/Scoop/issues/5958))
 - **decompress:** Match `extract_dir`/`extract_to` and archives ([#5983](https://github.com/ScoopInstaller/Scoop/issues/5983))
 - **checkver:** Correct variable 'regex' to 'regexp' ([#5993](https://github.com/ScoopInstaller/Scoop/issues/5993))
@@ -30,6 +27,14 @@
 - **decompress:** Use 7zip to extract Zstd archive ([#5973](https://github.com/ScoopInstaller/Scoop/issues/5973))
 - **install:** Separate archive extraction from downloader ([#5951](https://github.com/ScoopInstaller/Scoop/issues/5951))
 - **install:** Replace 'run_(un)installer()' with 'Invoke-Installer()' ([#5968](https://github.com/ScoopInstaller/Scoop/issues/5968), [#5971](https://github.com/ScoopInstaller/Scoop/issues/5971))
+
+## [v0.4.2](https://github.com/ScoopInstaller/Scoop/compare/v0.4.1...v0.4.2) - 2024-05-14
+
+### Bug Fixes
+
+- **autoupdate:** Copy `PSCustomObject`-type properties within `substitute()` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934), [#5962](https://github.com/ScoopInstaller/Scoop/issues/5962))
+- **core:** Fix `Invoke-ExternalCommand` quoting rules ([#5945](https://github.com/ScoopInstaller/Scoop/issues/5945))
+- **system:** Fix argument passing to `Split-PathLikeEnvVar()` in deprecated `strip_path()` ([#5937](https://github.com/ScoopInstaller/Scoop/issues/5937))
 
 ## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
 
