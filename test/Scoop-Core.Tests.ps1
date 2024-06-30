@@ -259,6 +259,23 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     }
 }
 
+Describe 'cache_path' -Tag 'Scoop' {
+    It 'returns the correct cache path for a given input' {
+        $url = 'https://example.com/git.zip'
+        $ret = cache_path 'git' '2.44.0' $url
+        $inputStream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url))
+        $sha = (Get-FileHash -Algorithm SHA256 -InputStream $inputStream).Hash.ToLower().Substring(0, 7)
+        $ret | Should -Be "$cachedir\git#2.44.0#$sha.zip"
+    }
+
+    # # NOTE: Remove this 6 months after the feature ships.
+    It 'returns the old format cache path for a given input' {
+        Mock Test-Path { $true }
+        $ret = cache_path 'git' '2.44.0' 'https://example.com/git.zip'
+        $ret | Should -Be "$cachedir\git#2.44.0#https_example.com_git.zip"
+    }
+}
+
 Describe 'sanitary_path' -Tag 'Scoop' {
     It 'removes invalid path characters from a string' {
         $path = 'test?.json'

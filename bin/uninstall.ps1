@@ -42,7 +42,7 @@ function do_uninstall($app, $global) {
     $architecture = $install.architecture
 
     Write-Output "Uninstalling '$app'"
-    run_uninstaller $manifest $architecture $dir
+    Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Uninstall
     rm_shims $app $manifest $global $architecture
 
     # If a junction was used during install, that will have been used

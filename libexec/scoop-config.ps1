@@ -27,6 +27,9 @@
 # use_lessmsi: $true|$false
 #       Prefer lessmsi utility over native msiexec.
 #
+# use_sqlite_cache: $true|$false
+#       Use SQLite database for caching. This is useful for speeding up 'scoop search' and 'scoop shim' commands.
+#
 # no_junction: $true|$false
 #       The 'current' version alias will not be used. Shims and shortcuts will point to specific version instead.
 #
