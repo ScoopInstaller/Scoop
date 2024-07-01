@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+- **scoop-alias:** Pass options correctly ([#6003](https://github.com/ScoopInstaller/Scoop/issues/6003))
 - **scoop-download|install|update:** Use consistent options ([#5956](https://github.com/ScoopInstaller/Scoop/issues/5956))
 - **scoop-info:** Fix download size estimating ([#5958](https://github.com/ScoopInstaller/Scoop/issues/5958))
 - **scoop-search:** Catch error of parsing invalid manifest ([#5930](https://github.com/ScoopInstaller/Scoop/issues/5930))
