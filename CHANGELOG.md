@@ -20,6 +20,7 @@
 - **decompress:** Match `extract_dir`/`extract_to` and archives ([#5983](https://github.com/ScoopInstaller/Scoop/issues/5983))
 - **json:** Serialize jsonpath return ([#5921](https://github.com/ScoopInstaller/Scoop/issues/5921))
 - **shim:** Restore original path for JAR cmd ([#6030](https://github.com/ScoopInstaller/Scoop/issues/6030))
+- **install:** Force the result to be an array ([#6039](https://github.com/ScoopInstaller/Scoop/pull/6039))
 
 ### Code Refactoring
 
