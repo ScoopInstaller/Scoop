@@ -275,7 +275,7 @@ while ($in_progress -gt 0) {
     $ver = $Version
 
     if (!$ver) {
-        if (!$regex -and $replace) {
+        if (!$regexp -and $replace) {
             next "'replace' requires 're' or 'regex'"
             continue
         }
@@ -294,13 +294,15 @@ while ($in_progress -gt 0) {
             }
             $page = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
         }
+        $source = $url
         if ($script) {
             $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+            $source = 'the output of script'
         }
 
         if ($jsonpath) {
             # Return only a single value if regex is absent
-            $noregex = [String]::IsNullOrEmpty($regex)
+            $noregex = [String]::IsNullOrEmpty($regexp)
             # If reverse is ON and regex is ON,
             # Then reverse would have no effect because regex handles reverse
             # on its own
@@ -310,7 +312,7 @@ while ($in_progress -gt 0) {
                 $ver = json_path_legacy $page $jsonpath
             }
             if (!$ver) {
-                next "couldn't find '$jsonpath' in $url"
+                next "couldn't find '$jsonpath' in $source"
                 continue
             }
         }
@@ -332,7 +334,7 @@ while ($in_progress -gt 0) {
             # Getting version from XML, using XPath
             $ver = $xml.SelectSingleNode($xpath, $nsmgr).'#text'
             if (!$ver) {
-                next "couldn't find '$($xpath -replace 'ns:', '')' in $url"
+                next "couldn't find '$($xpath -replace 'ns:', '')' in $source"
                 continue
             }
         }
@@ -348,31 +350,31 @@ while ($in_progress -gt 0) {
         }
 
         if ($regexp) {
-            $regex = New-Object System.Text.RegularExpressions.Regex($regexp)
+            $re = New-Object System.Text.RegularExpressions.Regex($regexp)
             if ($reverse) {
-                $match = $regex.Matches($page) | Select-Object -Last 1
+                $match = $re.Matches($page) | Select-Object -Last 1
             } else {
-                $match = $regex.Matches($page) | Select-Object -First 1
+                $match = $re.Matches($page) | Select-Object -First 1
             }
 
             if ($match -and $match.Success) {
                 $matchesHashtable = @{}
-                $regex.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
+                $re.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
                 $ver = $matchesHashtable['1']
                 if ($replace) {
-                    $ver = $regex.Replace($match.Value, $replace)
+                    $ver = $re.Replace($match.Value, $replace)
                 }
                 if (!$ver) {
                     $ver = $matchesHashtable['version']
                 }
             } else {
-                next "couldn't match '$regexp' in $url"
+                next "couldn't match '$regexp' in $source"
                 continue
             }
         }
 
         if (!$ver) {
-            next "couldn't find new version in $url"
+            next "couldn't find new version in $source"
             continue
         }
     }

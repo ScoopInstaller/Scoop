@@ -70,19 +70,6 @@ if ($env:CI -eq $true) {
                 Invoke-WebRequest -Uri $source -OutFile $destination
                 & 7z.exe x "$env:SCOOP_HELPERS_PATH\innounp.rar" -o"$env:SCOOP_HELPERS_PATH\innounp" -y | Out-Null
             }
-
-            # Only download zstd for AppVeyor, GitHub Actions has zstd installed by default
-            if ($env:BHBuildSystem -eq 'AppVeyor') {
-                $env:SCOOP_ZSTD_PATH = "$env:SCOOP_HELPERS_PATH\zstd\zstd.exe"
-                if (!(Test-Path $env:SCOOP_ZSTD_PATH)) {
-                    $source = 'https://github.com/facebook/zstd/releases/download/v1.5.1/zstd-v1.5.1-win32.zip'
-                    $destination = "$env:SCOOP_HELPERS_PATH\zstd.zip"
-                    Invoke-WebRequest -Uri $source -OutFile $destination
-                    & 7z.exe x "$env:SCOOP_HELPERS_PATH\zstd.zip" -o"$env:SCOOP_HELPERS_PATH\zstd" -y | Out-Null
-                }
-            } else {
-                $env:SCOOP_ZSTD_PATH = (Get-Command zstd.exe).Path
-            }
         }
     }
 

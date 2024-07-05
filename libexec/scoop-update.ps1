@@ -6,13 +6,13 @@
 # You can use '*' in place of <app> to update all apps.
 #
 # Options:
-#   -f, --force               Force update even when there isn't a newer version
-#   -g, --global              Update a globally installed app
-#   -i, --independent         Don't install dependencies automatically
-#   -k, --no-cache            Don't use the download cache
-#   -s, --skip                Skip hash validation (use with caution!)
-#   -q, --quiet               Hide extraneous messages
-#   -a, --all                 Update all apps (alternative to '*')
+#   -f, --force            Force update even when there isn't a newer version
+#   -g, --global           Update a globally installed app
+#   -i, --independent      Don't install dependencies automatically
+#   -k, --no-cache         Don't use the download cache
+#   -s, --skip-hash-check  Skip hash validation (use with caution!)
+#   -q, --quiet            Hide extraneous messages
+#   -a, --all              Update all apps (alternative to '*')
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'save_install_info' in 'manifest.ps1' (indirectly)
@@ -24,12 +24,15 @@
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+if (get_config USE_SQLITE_CACHE) {
+    . "$PSScriptRoot\..\lib\database.ps1"
+}
 
-$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip', 'quiet', 'all'
+$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip-hash-check', 'quiet', 'all'
 if ($err) { "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
-$check_hash = !($opt.s -or $opt.skip)
+$check_hash = !($opt.s -or $opt.'skip-hash-check')
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
@@ -38,21 +41,21 @@ $all = $opt.a -or $opt.all
 # load config
 $configRepo = get_config SCOOP_REPO
 if (!$configRepo) {
-    $configRepo = "https://github.com/ScoopInstaller/Scoop"
+    $configRepo = 'https://github.com/ScoopInstaller/Scoop'
     set_config SCOOP_REPO $configRepo | Out-Null
 }
 
 # Find current update channel from config
 $configBranch = get_config SCOOP_BRANCH
 if (!$configBranch) {
-    $configBranch = "master"
+    $configBranch = 'master'
     set_config SCOOP_BRANCH $configBranch | Out-Null
 }
 
-if(($PSVersionTable.PSVersion.Major) -lt 5) {
+if (($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
-    Write-Output "PowerShell 5 or later is required to run Scoop."
-    Write-Output "Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows"
+    Write-Output 'PowerShell 5 or later is required to run Scoop.'
+    Write-Output 'Upgrade PowerShell: https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-windows'
     break
 }
 $show_update_log = get_config SHOW_UPDATE_LOG $true
@@ -63,14 +66,14 @@ function Sync-Scoop {
         [Switch]$Log
     )
     # Test if Scoop Core is hold
-    if(Test-ScoopCoreOnHold) {
+    if (Test-ScoopCoreOnHold) {
         return
     }
 
     # check for git
     if (!(Test-GitAvailable)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
-    Write-Host "Updating Scoop..."
+    Write-Host 'Updating Scoop...'
     $currentdir = versiondir 'scoop' 'current'
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
@@ -108,10 +111,10 @@ function Sync-Scoop {
         # Stash uncommitted changes
         if (Invoke-Git -Path $currentdir -ArgumentList @('diff', 'HEAD', '--name-only')) {
             if (get_config AUTOSTASH_ON_CONFLICT) {
-                warn "Uncommitted changes detected. Stashing..."
+                warn 'Uncommitted changes detected. Stashing...'
                 Invoke-Git -Path $currentdir -ArgumentList @('stash', 'push', '-m', "WIP at $([System.DateTime]::Now.ToString('o'))", '-u', '-q')
             } else {
-                warn "Uncommitted changes detected. Update aborted."
+                warn 'Uncommitted changes detected. Update aborted.'
                 return
             }
         }
@@ -152,7 +155,7 @@ function Sync-Bucket {
     Param (
         [Switch]$Log
     )
-    Write-Host "Updating Buckets..."
+    Write-Host 'Updating Buckets...'
 
     if (!(Test-Path (Join-Path (Find-BucketDirectory 'main' -Root) '.git'))) {
         info "Converting 'main' bucket to git repo..."
@@ -170,39 +173,87 @@ function Sync-Bucket {
     $buckets = Get-LocalBucket | ForEach-Object {
         $path = Find-BucketDirectory $_ -Root
         return @{
-            name = $_
+            name  = $_
             valid = Test-Path (Join-Path $path '.git')
-            path = $path
+            path  = $path
         }
     }
 
     $buckets | Where-Object { !$_.valid } | ForEach-Object { Write-Host "'$($_.name)' is not a git repository. Skipped." }
 
+    $updatedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
+    $removedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
     if ($PSVersionTable.PSVersion.Major -ge 7) {
         # Parallel parameter is available since PowerShell 7
         $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
             . "$using:PSScriptRoot\..\lib\core.ps1"
+            . "$using:PSScriptRoot\..\lib\buckets.ps1"
 
-            $bucketLoc = $_.path
             $name = $_.name
+            $bucketLoc = $_.path
+            $innerBucketLoc = Find-BucketDirectory $name
 
             $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
             Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
             if ($using:Log) {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
+            if (get_config USE_SQLITE_CACHE) {
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
+                    $status, $file = $_ -split '\s+', 2
+                    $filePath = Join-Path $bucketLoc $file
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                        switch ($status) {
+                            { $_ -in 'A', 'M', 'R' } {
+                                [void]($using:updatedFiles).Add($filePath)
+                            }
+                            'D' {
+                                [void]($using:removedFiles).Add([pscustomobject]@{
+                                        Name   = ([System.IO.FileInfo]$file).BaseName
+                                        Bucket = $name
+                                    })
+                            }
+                        }
+                    }
+                }
+            }
         }
     } else {
         $buckets | Where-Object { $_.valid } | ForEach-Object {
-            $bucketLoc = $_.path
             $name = $_.name
+            $bucketLoc = $_.path
+            $innerBucketLoc = Find-BucketDirectory $name
 
             $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
             Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
             if ($Log) {
                 Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
             }
+            if (get_config USE_SQLITE_CACHE) {
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
+                    $status, $file = $_ -split '\s+', 2
+                    $filePath = Join-Path $bucketLoc $file
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                        switch ($status) {
+                            { $_ -in 'A', 'M', 'R' } {
+                                [void]($updatedFiles).Add($filePath)
+                            }
+                            'D' {
+                                [void]($removedFiles).Add([pscustomobject]@{
+                                        Name   = ([System.IO.FileInfo]$file).BaseName
+                                        Bucket = $name
+                                    })
+                            }
+                        }
+                    }
+                }
+            }
         }
+    }
+    if ((get_config USE_SQLITE_CACHE) -and ($updatedFiles.Count -gt 0 -or $removedFiles.Count -gt 0)) {
+        info 'Updating cache...'
+        Set-ScoopDB -Path $updatedFiles
+        $removedFiles | Remove-ScoopDBItem
     }
 }
 
@@ -251,7 +302,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # region Workaround
     # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
-    Write-Host "Downloading new version"
+    Write-Host 'Downloading new version'
     if (Test-Aria2Enabled) {
         Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
     } else {
@@ -269,12 +320,12 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
                     error $err
                     if (Test-Path $source) {
                         # rm cached file
-                        Remove-Item -force $source
+                        Remove-Item -Force $source
                     }
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    abort $(new_issue_msg $app $bucket "hash check failed")
+                    abort $(new_issue_msg $app $bucket 'hash check failed')
                 }
             }
         }
@@ -289,7 +340,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
     Write-Host "Uninstalling '$app' ($old_version)"
-    run_uninstaller $old_manifest $architecture $dir
+    Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Uninstall
     rm_shims $app $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
@@ -404,11 +455,11 @@ if (-not ($apps -or $all)) {
         } elseif ($outdated.Length -eq 0) {
             Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
         } else {
-            Write-Host -f DarkCyan "Updating one outdated app:"
+            Write-Host -f DarkCyan 'Updating one outdated app:'
         }
     }
 
-    $suggested = @{};
+    $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
 }

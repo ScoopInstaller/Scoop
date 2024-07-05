@@ -23,7 +23,7 @@ function url_manifest($url) {
     } catch {
         throw
     }
-    if(!$str) { return $null }
+    if (!$str) { return $null }
     try {
         $str | ConvertFrom-Json -ErrorAction Stop
     } catch {
@@ -137,16 +137,26 @@ function generate_user_manifest($app, $bucket, $version) {
     warn "Given version ($version) does not match manifest ($($manifest.version))"
     warn "Attempting to generate manifest for '$app' ($version)"
 
+    ensure (usermanifestsdir) | Out-Null
+    $manifest_path = "$(usermanifestsdir)\$app.json"
+
+    if (get_config USE_SQLITE_CACHE) {
+        $cached_manifest = (Get-ScoopDBItem -Name $app -Bucket $bucket -Version $version).manifest
+        if ($cached_manifest) {
+            $cached_manifest | Out-UTF8File $manifest_path
+            return $manifest_path
+        }
+    }
+
     if (!($manifest.autoupdate)) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
-    ensure (usermanifestsdir) | out-null
     try {
-        Invoke-AutoUpdate $app "$(Convert-Path (usermanifestsdir))\$app.json" $manifest $version $(@{ })
-        return Convert-Path (usermanifest $app)
+        Invoke-AutoUpdate $app $manifest_path $manifest $version $(@{ })
+        return $manifest_path
     } catch {
-        write-host -f darkred "Could not install $app@$version"
+        Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
     }
 
     return $null
@@ -156,5 +166,5 @@ function url($manifest, $arch) { arch_specific 'url' $manifest $arch }
 function installer($manifest, $arch) { arch_specific 'installer' $manifest $arch }
 function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $arch }
 function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
-function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch}
-function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch}
+function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch }
+function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch }

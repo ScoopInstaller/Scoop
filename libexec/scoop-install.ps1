@@ -10,15 +10,21 @@
 # To install an app from a manifest at a URL:
 #      scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json
 #
+# To install a different version of the app from a URL:
+#       scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/neovim.json@0.9.0
+#
 # To install an app from a manifest on your computer
 #      scoop install \path\to\app.json
+#
+# To install an app from a manifest on your computer
+#      scoop install \path\to\app.json@version
 #
 # Options:
 #   -g, --global                    Install the app globally
 #   -i, --independent               Don't install dependencies automatically
 #   -k, --no-cache                  Don't use the download cache
+#   -s, --skip-hash-check           Skip hash validation (use with caution!)
 #   -u, --no-update-scoop           Don't update Scoop before installing if it's outdated
-#   -s, --skip                      Skip hash validation (use with caution!)
 #   -a, --arch <32bit|64bit|arm64>  Use the specified architecture, if the app supports it
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
@@ -32,12 +38,15 @@
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
+if (get_config USE_SQLITE_CACHE) {
+    . "$PSScriptRoot\..\lib\database.ps1"
+}
 
-$opt, $apps, $err = getopt $args 'gikusa:' 'global', 'independent', 'no-cache', 'no-update-scoop', 'skip', 'arch='
+$opt, $apps, $err = getopt $args 'giksua:' 'global', 'independent', 'no-cache', 'skip-hash-check', 'no-update-scoop', 'arch='
 if ($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
-$check_hash = !($opt.s -or $opt.skip)
+$check_hash = !($opt.s -or $opt.'skip-hash-check')
 $independent = $opt.i -or $opt.independent
 $use_cache = !($opt.k -or $opt.'no-cache')
 $architecture = Get-DefaultArchitecture

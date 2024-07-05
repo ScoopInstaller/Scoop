@@ -1,3 +1,67 @@
+# Description: Functions for decompressing archives or installers
+
+function Invoke-Extraction {
+    param (
+        [string]
+        $Path,
+        [string[]]
+        $Name,
+        [psobject]
+        $Manifest,
+        [Alias('Arch', 'Architecture')]
+        [string]
+        $ProcessorArchitecture
+    )
+
+    $uri = @(url $Manifest $ProcessorArchitecture)
+    # 'extract_dir' and 'extract_to' are paired
+    $extractDir = @(extract_dir $Manifest $ProcessorArchitecture)
+    $extractTo = @(extract_to $Manifest $ProcessorArchitecture)
+    $extracted = 0
+
+    for ($i = 0; $i -lt $Name.Length; $i++) {
+        # work out extraction method, if applicable
+        $extractFn = $null
+        switch -regex ($Name[$i]) {
+            '\.zip$' {
+                if ((Test-HelperInstalled -Helper 7zip) -or ((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z))) {
+                    $extractFn = 'Expand-7zipArchive'
+                } else {
+                    $extractFn = 'Expand-ZipArchive'
+                }
+                continue
+            }
+            '\.msi$' {
+                $extractFn = 'Expand-MsiArchive'
+                continue
+            }
+            '\.exe$' {
+                if ($Manifest.innosetup) {
+                    $extractFn = 'Expand-InnoArchive'
+                }
+                continue
+            }
+            { Test-7zipRequirement -Uri $_ } {
+                $extractFn = 'Expand-7zipArchive'
+                continue
+            }
+        }
+        if ($extractFn) {
+            $fnArgs = @{
+                Path            = Join-Path $Path $Name[$i]
+                DestinationPath = Join-Path $Path $extractTo[$extracted]
+                ExtractDir      = $extractDir[$extracted]
+            }
+            Write-Host 'Extracting ' -NoNewline
+            Write-Host $(url_remote_filename $uri[$i]) -ForegroundColor Cyan -NoNewline
+            Write-Host ' ... ' -NoNewline
+            & $extractFn @fnArgs -Removal
+            Write-Host 'done.' -ForegroundColor Green
+            $extracted++
+        }
+    }
+}
+
 function Expand-7zipArchive {
     [CmdletBinding()]
     param (
@@ -96,37 +160,9 @@ function Expand-ZstdArchive {
         [Switch]
         $Removal
     )
-    $ZstdPath = Get-HelperPath -Helper Zstd
-    $LogPath = Join-Path (Split-Path $Path) 'zstd.log'
-    $DestinationPath = $DestinationPath.TrimEnd('\')
-    ensure $DestinationPath | Out-Null
-    $ArgList = @('-d', $Path, '--output-dir-flat', $DestinationPath, '-f', '-v')
-
-    if ($Switches) {
-        $ArgList += (-split $Switches)
-    }
-    if ($Removal) {
-        # Remove original archive file
-        $ArgList += '--rm'
-    }
-    $Status = Invoke-ExternalCommand $ZstdPath $ArgList -LogPath $LogPath
-    if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
-    }
-    $IsTar = (strip_ext $Path) -match '\.tar$'
-    if ($IsTar) {
-        # Check for tar
-        $TarFile = Join-Path $DestinationPath (strip_ext (fname $Path))
-        Expand-7zipArchive -Path $TarFile -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
-    }
-    if (!$IsTar -and $ExtractDir) {
-        movedir (Join-Path $DestinationPath $ExtractDir) $DestinationPath | Out-Null
-        # Remove temporary directory
-        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force -ErrorAction Ignore
-    }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
-    }
+    # TODO: Remove this function after 2024/12/31
+    Show-DeprecatedWarning $MyInvocation 'Expand-7zipArchive'
+    Expand-7zipArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Switches $Switches -Removal:$Removal
 }
 
 function Expand-MsiArchive {
