@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Bug Fixes
+
+- **sqlite:** Fix compatibility with Windows PowerShell ([#6045](https://github.com/ScoopInstaller/Scoop/issues/6045))
+
 ## [v0.5.0](https://github.com/ScoopInstaller/Scoop/compare/v0.4.2...v0.5.0) - 2024-07-01
 
 ### Features
