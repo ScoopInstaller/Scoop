@@ -3,7 +3,8 @@
 ### Bug Fixes
 
 - **sqlite:** Fix compatibility with Windows PowerShell ([#6045](https://github.com/ScoopInstaller/Scoop/issues/6045))
-- **install:** Force the result to be an array ([#6039](https://github.com/ScoopInstaller/Scoop/pull/6039))
+- **install:** Expand `env_set` items before setting Environment Variables ([#6050](https://github.com/ScoopInstaller/Scoop/issues/6050))
+- **install:** Fix parsing error when installing multiple apps w/ specific version ([#6039](https://github.com/ScoopInstaller/Scoop/pull/6039))
 
 ## [v0.5.0](https://github.com/ScoopInstaller/Scoop/compare/v0.4.2...v0.5.0) - 2024-07-01
 

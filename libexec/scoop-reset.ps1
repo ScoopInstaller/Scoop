@@ -84,7 +84,7 @@ $apps | ForEach-Object {
     env_rm_path $manifest $dir $global $architecture
     env_rm $manifest $global $architecture
     env_add_path $manifest $dir $global $architecture
-    env_set $manifest $dir $global $architecture
+    env_set $manifest $global $architecture
     # unlink all potential old link before re-persisting
     unlink_persist_data $manifest $original_dir
     persist_data $manifest $original_dir $persist_dir
