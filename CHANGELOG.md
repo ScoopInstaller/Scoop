@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 - **sqlite:** Fix compatibility with Windows PowerShell ([#6045](https://github.com/ScoopInstaller/Scoop/issues/6045))
+- **install:** Expand `env_set` items before setting Environment Variables ([#6050](https://github.com/ScoopInstaller/Scoop/issues/6050))
 
 ## [v0.5.0](https://github.com/ScoopInstaller/Scoop/compare/v0.4.2...v0.5.0) - 2024-07-01
 
