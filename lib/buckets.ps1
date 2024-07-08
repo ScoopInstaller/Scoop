@@ -154,7 +154,12 @@ function add_bucket($name, $repo) {
     }
     ensure $bucketsdir | Out-Null
     $dir = ensure $dir
-    Invoke-Git -ArgumentList @('clone', $repo, $dir, '-q')
+    $out = Invoke-Git -ArgumentList @('clone', $repo, $dir, '-q')
+    if ($LASTEXITCODE -ne 0) {
+        error "Failed to clone '$repo' to '$dir'.`n`nError given:`n$out`n`nPlease check the repository URL or network connection and try again."
+        Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
+        return 1
+    }
     Write-Host 'OK'
     if (get_config USE_SQLITE_CACHE) {
         info 'Updating cache...'
