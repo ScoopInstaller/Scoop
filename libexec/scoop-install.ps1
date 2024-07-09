@@ -91,7 +91,7 @@ $specific_versions = $apps | Where-Object {
 }
 
 # compare object does not like nulls
-if ($specific_versions.length -gt 0) {
+if ($specific_versions.Count -gt 0) {
     $difference = Compare-Object -ReferenceObject $apps -DifferenceObject $specific_versions -PassThru
 } else {
     $difference = $apps
@@ -100,13 +100,13 @@ if ($specific_versions.length -gt 0) {
 $specific_versions_paths = $specific_versions | ForEach-Object {
     $app, $bucket, $version = parse_app $_
     if (installed_manifest $app $version) {
-        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { " --global" })' to install a new version."
+        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
         continue
     }
 
     generate_user_manifest $app $bucket $version
 }
-$apps = @(($specific_versions_paths + $difference) | Where-Object { $_ } | Sort-Object -Unique)
+$apps = @((@($specific_versions_paths) + $difference) | Where-Object { $_ } | Select-Object -Unique)
 
 # remember which were explictly requested so that we can
 # differentiate after dependencies are added
