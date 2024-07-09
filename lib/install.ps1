@@ -1120,9 +1120,21 @@ function test_running_process($app, $global) {
 # Required to handle docker/for-win#12240
 function New-DirectoryJunction($source, $target) {
     # test if this script is being executed inside a docker container
-    if (Get-Service -Name cexecsvc -ErrorAction SilentlyContinue) {
-        cmd.exe /d /c "mklink /j `"$source`" `"$target`""
-    } else {
-        New-Item -Path $source -ItemType Junction -Value $target
+    try {
+        if (Get-Service -Name cexecsvc -ErrorAction SilentlyContinue) {
+            cmd.exe /d /c "mklink /j `"$source`" `"$target`""
+            if ($lastexitcode -gt 0) {
+                throw System.ComponentModel.Win32Exception
+            }
+        } else {
+            New-Item -Path $source -ItemType Junction -Value $target -ErrorAction Stop
+        }
+    }
+    catch [System.ComponentModel.Win32Exception] {
+        # for non-NTFS filesystem, Junction creation may fail; in this case, showing FileSystemType helps to locate the issue
+        $target_path = Resolve-Path $target
+        $drive_letter = (Split-Path -Path $target_path -Qualifier).Trim(":")
+        warn "FileSystemType of target path $($target_path): $((Get-Volume -DriveLetter $drive_letter).FileSystemType)"
+        abort "Cannot link $(friendly_path $source) => $(friendly_path $target)"
     }
 }
