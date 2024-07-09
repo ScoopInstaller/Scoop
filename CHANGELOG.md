@@ -7,6 +7,7 @@
 - **bucket:** Implement error handling for failed bucket addition ([#6051](https://github.com/ScoopInstaller/Scoop/issues/6051))
 - **scoop-virustotal:** Adjust `json_path` parameters to retrieve correct analysis stats ([#6044](https://github.com/ScoopInstaller/Scoop/issues/6044))
 - **install:** Fix parsing error when installing multiple apps w/ specific version ([#6039](https://github.com/ScoopInstaller/Scoop/issues/6039))
+- **scoop-alias:** Pass options correctly ([#6003](https://github.com/ScoopInstaller/Scoop/issues/6003))
 
 ## [v0.5.0](https://github.com/ScoopInstaller/Scoop/compare/v0.4.2...v0.5.0) - 2024-07-01
 
