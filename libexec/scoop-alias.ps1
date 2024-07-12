@@ -27,8 +27,6 @@
 param($SubCommand)
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\alias.ps1"
-. "$PSScriptRoot\..\lib\install.ps1"
 
 $SubCommands = @('add', 'rm', 'list')
 if ($SubCommand -notin $SubCommands) {
@@ -41,7 +39,7 @@ if ($SubCommand -notin $SubCommands) {
     exit 1
 }
 
-$opt, $other, $err = getopt $args 'v' , 'verbose'
+$opt, $other, $err = getopt $Args 'v' , 'verbose'
 if ($err) { "scoop alias: $err"; exit 1 }
 
 $name, $command, $description = $other
