@@ -99,7 +99,7 @@ function list_aliases {
     $aliases = get_config ALIAS ([PSCustomObject]@{})
     $alias_info = $aliases.PSObject.Properties.Name | Where-Object { $_ } | ForEach-Object {
         $content = Get-Content (command_path $_)
-        @{
+        [PSCustomObject]@{
             Name    = $_
             Summary = (summary $content).Trim()
             Command = ($content | Select-Object -Skip 1).Trim()
