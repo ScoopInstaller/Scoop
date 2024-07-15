@@ -4,6 +4,7 @@
 
 - **sqlite:** Fix compatibility with Windows PowerShell ([#6045](https://github.com/ScoopInstaller/Scoop/issues/6045))
 - **install:** Expand `env_set` items before setting Environment Variables ([#6050](https://github.com/ScoopInstaller/Scoop/issues/6050))
+- **install:** Show filesystem type and abort if Junction creation fails ([#5367](https://github.com/ScoopInstaller/Scoop/discussions/5367))
 - **bucket:** Implement error handling for failed bucket addition ([#6051](https://github.com/ScoopInstaller/Scoop/issues/6051))
 - **scoop-virustotal:** Adjust `json_path` parameters to retrieve correct analysis stats ([#6044](https://github.com/ScoopInstaller/Scoop/issues/6044))
 - **install:** Fix parsing error when installing multiple apps w/ specific version ([#6039](https://github.com/ScoopInstaller/Scoop/issues/6039))
