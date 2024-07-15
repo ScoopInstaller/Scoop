@@ -1,8 +1,7 @@
 BeforeAll {
     . "$PSScriptRoot\Scoop-TestLib.ps1"
     . "$PSScriptRoot\..\lib\core.ps1"
-    . "$PSScriptRoot\..\lib\help.ps1"
-    . "$PSScriptRoot\..\libexec\scoop-alias.ps1" | Out-Null
+    . "$PSScriptRoot\..\lib\commands.ps1"
 }
 
 Describe 'Manipulate Alias' -Tag 'Scoop' {
@@ -15,32 +14,32 @@ Describe 'Manipulate Alias' -Tag 'Scoop' {
         ensure $shimdir
     }
 
-    It 'Creates a new alias if alias doesn''t exist' {
-        $alias_file = "$shimdir\scoop-rm.ps1"
-        $alias_file | Should -Not -Exist
+    It 'Creates a new alias if it does not exist' {
+        $alias_script = "$shimdir\scoop-rm.ps1"
+        $alias_script | Should -Not -Exist
 
         add_alias 'rm' '"hello, world!"'
-        & $alias_file | Should -Be 'hello, world!'
+        & $alias_script | Should -Be 'hello, world!'
     }
 
-    It 'Does not change existing file if its filename same as alias name' {
-        $alias_file = "$shimdir\scoop-rm.ps1"
+    It 'Skips an existing alias' {
+        $alias_script = "$shimdir\scoop-rm.ps1"
         Mock abort {}
-        New-Item $alias_file -Type File -Force
-        $alias_file | Should -Exist
+        New-Item $alias_script -Type File -Force
+        $alias_script | Should -Exist
 
         add_alias 'rm' '"test"'
         Should -Invoke -CommandName abort -Times 1 -ParameterFilter { $msg -eq "File 'scoop-rm.ps1' already exists in shims directory." }
     }
 
     It 'Removes an existing alias' {
-        $alias_file = "$shimdir\scoop-rm.ps1"
-        $alias_file | Should -Exist
+        $alias_script = "$shimdir\scoop-rm.ps1"
+        $alias_script | Should -Exist
         Mock get_config { @(@{'rm' = 'scoop-rm' }) }
         Mock info {}
 
         rm_alias 'rm'
-        $alias_file | Should -Not -Exist
+        $alias_script | Should -Not -Exist
         Should -Invoke -CommandName info -Times 1 -ParameterFilter { $msg -eq "Removing alias 'rm'..." }
     }
 }
