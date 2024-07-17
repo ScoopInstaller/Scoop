@@ -60,7 +60,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
     env_add_path $manifest $dir $global $architecture
-    env_set $manifest $dir $global $architecture
+    env_set $manifest $global $architecture
 
     # persist data
     persist_data $manifest $original_dir $persist_dir
@@ -898,12 +898,12 @@ function env_rm_path($manifest, $dir, $global, $arch) {
     }
 }
 
-function env_set($manifest, $dir, $global, $arch) {
+function env_set($manifest, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
-        $env_set | Get-Member -Member NoteProperty | ForEach-Object {
-            $name = $_.name
-            $val = substitute $env_set.$($_.name) @{ '$dir' = $dir }
+        $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
+            $name = $_.Name
+            $val = $ExecutionContext.InvokeCommand.ExpandString($env_set.$($name))
             Set-EnvVar -Name $name -Value $val -Global:$global
             Set-Content env:\$name $val
         }
@@ -912,8 +912,8 @@ function env_set($manifest, $dir, $global, $arch) {
 function env_rm($manifest, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
-        $env_set | Get-Member -Member NoteProperty | ForEach-Object {
-            $name = $_.name
+        $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
+            $name = $_.Name
             Set-EnvVar -Name $name -Value $null -Global:$global
             if (Test-Path env:\$name) { Remove-Item env:\$name }
         }

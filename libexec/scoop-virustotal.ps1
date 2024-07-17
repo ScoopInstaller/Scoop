@@ -102,14 +102,14 @@ Function Get-VirusTotalResultByHash ($hash, $url, $app) {
     $response = Invoke-WebRequest -Uri $api_url -Method GET -Headers $headers -UseBasicParsing
     $result = $response.Content
     $stats = json_path $result '$.data.attributes.last_analysis_stats'
-    [int]$malicious = json_path $stats '$.malicious'
-    [int]$suspicious = json_path $stats '$.suspicious'
-    [int]$timeout = json_path $stats '$.timeout'
-    [int]$undetected = json_path $stats '$.undetected'
+    [int]$malicious = json_path $stats '$[0].malicious' $null $false $true
+    [int]$suspicious = json_path $stats '$[0].suspicious' $null $false $true
+    [int]$timeout = json_path $stats '$[0].timeout' $null $false $true
+    [int]$undetected = json_path $stats '$[0].undetected' $null $false $true
     [int]$unsafe = $malicious + $suspicious
     [int]$total = $unsafe + $undetected
-    [int]$fileSize = json_path $result '$.data.attributes.size'
-    $report_hash = json_path $result '$.data.attributes.sha256'
+    [int]$fileSize = json_path $result '$.data.attributes.size' $null $false $true
+    $report_hash = json_path $result '$.data.attributes.sha256' $null $false $true
     $report_url = "https://www.virustotal.com/gui/file/$report_hash"
     if ($total -eq 0) {
         info "$app`: Analysis in progress."

@@ -21,15 +21,14 @@ function Get-SQLite {
     # Install SQLite
     try {
         Write-Host "Downloading SQLite $Version..." -ForegroundColor DarkYellow
-        $sqlitePkgPath = "$env:TEMP\sqlite.nupkg"
+        $sqlitePkgPath = "$env:TEMP\sqlite.zip"
         $sqliteTempPath = "$env:TEMP\sqlite"
         $sqlitePath = "$PSScriptRoot\..\supporting\sqlite"
         Invoke-WebRequest -Uri "https://api.nuget.org/v3-flatcontainer/stub.system.data.sqlite.core.netframework/$version/stub.system.data.sqlite.core.netframework.$version.nupkg" -OutFile $sqlitePkgPath
         Write-Host "Extracting SQLite $Version..." -ForegroundColor DarkYellow -NoNewline
         Expand-Archive -Path $sqlitePkgPath -DestinationPath $sqliteTempPath -Force
         New-Item -Path $sqlitePath -ItemType Directory -Force | Out-Null
-        Move-Item -Path "$sqliteTempPath\build\net45\*" -Destination $sqlitePath -Exclude '*.targets' -Force
-        Move-Item -Path "$sqliteTempPath\lib\net45\System.Data.SQLite.dll" -Destination $sqlitePath -Force
+        Move-Item -Path "$sqliteTempPath\build\net451\*", "$sqliteTempPath\lib\net451\System.Data.SQLite.dll" -Destination $sqlitePath -Force
         Remove-Item -Path $sqlitePkgPath, $sqliteTempPath -Recurse -Force
         Write-Host ' Done' -ForegroundColor DarkYellow
         return $true
