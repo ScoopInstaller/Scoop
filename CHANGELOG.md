@@ -3,7 +3,7 @@
 ### Bug Fixes
 
 - **scoop-alias:** Fix 'Option --verbose not recognized.' ([#6062](https://github.com/ScoopInstaller/Scoop/issues/6062))
-- **json:** Don't serialize jsonpath return if only one result ([#6066](https://github.com/ScoopInstaller/Scoop/issues/6066))
+- **json:** Don't serialize jsonpath return if only one result ([#6066](https://github.com/ScoopInstaller/Scoop/issues/6066), [#6073](https://github.com/ScoopInstaller/Scoop/issues/6073))
 
 ### Builds
 
