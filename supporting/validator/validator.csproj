@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <Import
-        Project="packages\Microsoft.Net.Compilers.Toolset.4.9.2\build\Microsoft.Net.Compilers.Toolset.props"
-        Condition="Exists('packages\Microsoft.Net.Compilers.Toolset.4.9.2\build\Microsoft.Net.Compilers.Toolset.props')" />
+        Project="packages\Microsoft.Net.Compilers.Toolset.4.10.0\build\Microsoft.Net.Compilers.Toolset.props"
+        Condition="Exists('packages\Microsoft.Net.Compilers.Toolset.4.10.0\build\Microsoft.Net.Compilers.Toolset.props')" />
     <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
         Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
     <PropertyGroup>
@@ -23,9 +23,8 @@
             <Private>True</Private>
         </Reference>
         <Reference
-            Include="Newtonsoft.Json.Schema, Version=3.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-            <HintPath>
-                packages\Newtonsoft.Json.Schema.3.0.15\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
+            Include="Newtonsoft.Json.Schema, Version=4.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+            <HintPath>packages\Newtonsoft.Json.Schema.4.0.1\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
             <Private>True</Private>
         </Reference>
         <Reference Include="System" />
@@ -52,7 +51,7 @@
                 http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
         </PropertyGroup>
         <Error
-            Condition="!Exists('packages\Microsoft.Net.Compilers.Toolset.4.9.2\build\Microsoft.Net.Compilers.Toolset.props')"
-            Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Net.Compilers.Toolset.4.9.2\build\Microsoft.Net.Compilers.Toolset.props'))" />
+            Condition="!Exists('packages\Microsoft.Net.Compilers.Toolset.4.10.0\build\Microsoft.Net.Compilers.Toolset.props')"
+            Text="$([System.String]::Format('$(ErrorText)', 'packages\Microsoft.Net.Compilers.Toolset.4.10.0\build\Microsoft.Net.Compilers.Toolset.props'))" />
     </Target>
 </Project>
