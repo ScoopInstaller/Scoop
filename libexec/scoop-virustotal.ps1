@@ -31,7 +31,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\json.ps1" # 'json_path'
-. "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\download.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
 $opt, $apps, $err = getopt $args 'asnup' @('all', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
