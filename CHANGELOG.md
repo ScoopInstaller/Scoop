@@ -4,6 +4,7 @@
 
 - **scoop-alias:** Fix 'Option --verbose not recognized.' ([#6062](https://github.com/ScoopInstaller/Scoop/issues/6062))
 - **scoop-hold:** Use 'foreach' loop to allow 'continue' statement ([#6078](https://github.com/ScoopInstaller/Scoop/issues/6078))
+- **core:** Use 'Join-Path' to construct cache file path ([#6079](https://github.com/ScoopInstaller/Scoop/issues/6079))
 - **json:** Don't serialize jsonpath return if only one result ([#6066](https://github.com/ScoopInstaller/Scoop/issues/6066), [#6073](https://github.com/ScoopInstaller/Scoop/issues/6073))
 
 ### Builds
