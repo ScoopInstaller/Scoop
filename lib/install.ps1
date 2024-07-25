@@ -238,7 +238,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
 
     foreach ($url in $urls) {
         $data.$url = @{
-            'target'    = "$dir\$(url_filename $url)"
+            'target'    = Join-Path $dir (url_filename $url)
             'cachename' = fname (cache_path $app $version $url)
             'source'    = cache_path $app $version $url
         }
