@@ -36,8 +36,9 @@
 
 $opt, $apps, $err = getopt $args 'asnup' @('all', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
 if ($err) { "scoop virustotal: $err"; exit 1 }
-if (!$apps -and -$all) { my_usage; exit 1 }
-$architecture = Format-ArchitectureString
+$all = $apps -eq '*' -or $opt.a -or $opt.all
+if (!$apps -and !$all) { my_usage; exit 1 }
+$architecture = Get-DefaultArchitecture
 
 if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
@@ -47,11 +48,8 @@ if (is_scoop_outdated) {
     }
 }
 
-$apps_param = $apps
-
-if ($apps_param -eq '*' -or $opt.a -or $opt.all) {
-    $apps = installed_apps $false
-    $apps += installed_apps $true
+if ($all) {
+    $apps = (installed_apps $false) + (installed_apps $true)
 }
 
 if (!$opt.n -and !$opt.'no-depends') {
@@ -102,14 +100,14 @@ Function Get-VirusTotalResultByHash ($hash, $url, $app) {
     $response = Invoke-WebRequest -Uri $api_url -Method GET -Headers $headers -UseBasicParsing
     $result = $response.Content
     $stats = json_path $result '$.data.attributes.last_analysis_stats'
-    [int]$malicious = json_path $stats '$[0].malicious' $null $false $true
-    [int]$suspicious = json_path $stats '$[0].suspicious' $null $false $true
-    [int]$timeout = json_path $stats '$[0].timeout' $null $false $true
-    [int]$undetected = json_path $stats '$[0].undetected' $null $false $true
+    [int]$malicious = json_path $stats '$.malicious'
+    [int]$suspicious = json_path $stats '$.suspicious'
+    [int]$timeout = json_path $stats '$.timeout'
+    [int]$undetected = json_path $stats '$.undetected'
     [int]$unsafe = $malicious + $suspicious
     [int]$total = $unsafe + $undetected
-    [int]$fileSize = json_path $result '$.data.attributes.size' $null $false $true
-    $report_hash = json_path $result '$.data.attributes.sha256' $null $false $true
+    [int]$fileSize = json_path $result '$.data.attributes.size'
+    $report_hash = json_path $result '$.data.attributes.sha256'
     $report_url = "https://www.virustotal.com/gui/file/$report_hash"
     if ($total -eq 0) {
         info "$app`: Analysis in progress."

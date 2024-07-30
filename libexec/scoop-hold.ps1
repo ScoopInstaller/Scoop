@@ -29,14 +29,13 @@ if ($global -and !(is_admin)) {
     exit 1
 }
 
-$apps | ForEach-Object {
-    $app = $_
+foreach ($app in $apps) {
 
     if ($app -eq 'scoop') {
         $hold_update_until = [System.DateTime]::Now.AddDays(1)
         set_config HOLD_UPDATE_UNTIL $hold_update_until.ToString('o') | Out-Null
         success "$app is now held and might not be updated until $($hold_update_until.ToLocalTime())."
-        return
+        continue
     }
     if (!(installed $app $global)) {
         if ($global) {
@@ -44,7 +43,7 @@ $apps | ForEach-Object {
         } else {
             error "'$app' is not installed."
         }
-        return
+        continue
     }
 
     if (get_config NO_JUNCTION) {

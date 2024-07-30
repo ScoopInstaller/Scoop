@@ -110,7 +110,7 @@ function json_path([String] $json, [String] $jsonpath, [Hashtable] $substitution
             # Return versions in reverse order
             $result = [System.Linq.Enumerable]::Reverse($result)
         }
-        if ($single) {
+        if ([System.Linq.Enumerable]::Count($result) -eq 1 -or $single) {
             # Extract First value
             $result = [System.Linq.Enumerable]::First($result)
             # Convert first value to string
