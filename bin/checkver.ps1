@@ -279,25 +279,26 @@ while ($in_progress -gt 0) {
             next "'replace' requires 're' or 'regex'"
             continue
         }
-        $err = $ev.SourceEventArgs.Error
-        if ($err) {
-            next "$($err.message)`r`nURL $url is not valid"
-            continue
-        }
-
-        if ($url) {
-            $ms = New-Object System.IO.MemoryStream
-            $ms.Write($result, 0, $result.Length)
-            $ms.Seek(0, 0) | Out-Null
-            if ($result[0] -eq 0x1F -and $result[1] -eq 0x8B) {
-                $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
-            }
-            $page = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
-        }
-        $source = $url
         if ($script) {
             $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
             $source = 'the output of script'
+        } else {
+            $err = $ev.SourceEventArgs.Error
+            if ($err) {
+                next "$($err.message)`r`nURL $url is not valid"
+                continue
+            }
+
+            if ($url) {
+                $ms = New-Object System.IO.MemoryStream
+                $ms.Write($result, 0, $result.Length)
+                $ms.Seek(0, 0) | Out-Null
+                if ($result[0] -eq 0x1F -and $result[1] -eq 0x8B) {
+                    $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
+                }
+                $page = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
+            }
+            $source = $url
         }
 
         if ($jsonpath) {
