@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Bug Fixes
+
+- **decompress**: Don't delete temp dir / `$extractDir` unless it's empty ([#6011](https://github.com/ScoopInstaller/Scoop/issues/6011))
+
 ## [v0.5.2](https://github.com/ScoopInstaller/Scoop/compare/v0.5.1...v0.5.2) - 2024-07-26
 
 ### Bug Fixes
