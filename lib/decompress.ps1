@@ -125,7 +125,7 @@ function Expand-7zipArchive {
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
         # Remove temporary directory if empty
         $ExtractDirFullPath = [string] "$DestinationPath\$($ExtractDir -replace '[\\/].*')"
-        if ((Get-ChildItem -Path $ExtractDirFullPath -Force).Count -le 0) {
+        if ((Get-ChildItem -Path $ExtractDirFullPath -Force).Count -eq 0) {
             Remove-Item -Path $ExtractDirFullPath -Recurse -Force -ErrorAction Ignore
         }
     }
