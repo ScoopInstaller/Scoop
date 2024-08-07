@@ -2,7 +2,7 @@
 
 ### Bug Fixes
 
-- **decompress**: Don't delete temp dir / `$extractDir` unless it's empty ([#6011](https://github.com/ScoopInstaller/Scoop/issues/6011))
+- **decompress**: `Expand-7zipArchive` Only delete temp dir / `$extractDir` if it exists and is empty ([#6011](https://github.com/ScoopInstaller/Scoop/issues/6011))
 
 ## [v0.5.2](https://github.com/ScoopInstaller/Scoop/compare/v0.5.1...v0.5.2) - 2024-07-26
 
