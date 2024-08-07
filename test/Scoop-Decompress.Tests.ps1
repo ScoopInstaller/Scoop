@@ -25,7 +25,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
         }
         It 'Test cases should exist and hash should match' {
             $testcases | Should -Exist
-            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be 'afb86b0552187b8d630ce25d02835fb809af81c584f07e54cb049fb74ca134b6'
+            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be 'af743435dd11e4014d908b1b685104e1ff7a421af2396c7966d6f734ca61c90c'
         }
         It 'Test cases should be extracted correctly' {
             { Microsoft.PowerShell.Archive\Expand-Archive -Path $testcases -DestinationPath $working_dir } | Should -Not -Throw
@@ -61,7 +61,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $to = test_extract 'Expand-7zipArchive' $test1
             $to | Should -Exist
             "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 3
+            (Get-ChildItem $to).Count | Should -Be 4
         }
 
         It 'extract "extract_dir" correctly' {
@@ -76,6 +76,13 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'extract "extract_dir" with nested folder with same name' {
+            $to = test_extract 'Expand-7zipArchive' $test1 $false 'keep'
+            $to | Should -Exist
+            "$to\keep\empty" | Should -Exist
+            (Get-ChildItem "$to\keep").Count | Should -Be 1
         }
 
         It 'extract nested compressed file' {
