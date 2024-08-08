@@ -124,9 +124,9 @@ function Expand-7zipArchive {
     if (!$IsTar -and $ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
         # Remove temporary directory if it still exists and is empty
-        $ExtractDirFullPath = [string] "$DestinationPath\$($ExtractDir -replace '[\\/].*')"
-        if ((Get-ChildItem -Path $ExtractDirFullPath -Force -ErrorAction Ignore).Count -eq 0) {
-            Remove-Item -Path $ExtractDirFullPath -Recurse -Force -ErrorAction Ignore
+        $ExtractDirTopPath = [string] "$DestinationPath\$($ExtractDir -replace '[\\/].*')"
+        if ((Get-ChildItem -Path $ExtractDirTopPath -Force -ErrorAction Ignore).Count -eq 0) {
+            Remove-Item -Path $ExtractDirTopPath -Recurse -Force -ErrorAction Ignore
         }
     }
     if (Test-Path $LogPath) {
