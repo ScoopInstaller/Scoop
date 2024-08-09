@@ -2,7 +2,11 @@
 
 ### Bug Fixes
 
-- **decompress**: `Expand-7zipArchive` Only delete temp dir / `$extractDir` if it is empty ([#6092](https://github.com/ScoopInstaller/Scoop/issues/6092))
+- **decompress**: `Expand-7zipArchive` only delete temp dir / `$extractDir` if it is empty ([#6092](https://github.com/ScoopInstaller/Scoop/issues/6092))
+
+### Code Refactoring
+
+- **download:** Move download-related functions to 'download.ps1' ([#6095](https://github.com/ScoopInstaller/Scoop/issues/6095))
 
 ## [v0.5.2](https://github.com/ScoopInstaller/Scoop/compare/v0.5.1...v0.5.2) - 2024-07-26
 

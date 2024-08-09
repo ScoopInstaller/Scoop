@@ -31,7 +31,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\json.ps1" # 'json_path'
-. "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\download.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
 $opt, $apps, $err = getopt $args 'asnup' @('all', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
@@ -84,11 +84,6 @@ Function ConvertTo-VirusTotalUrlId ($url) {
     $url_id = $url_id -replace '/', '_'
     $url_id = $url_id -replace '=', ''
     $url_id
-}
-
-Function Get-RemoteFileSize ($url) {
-    $response = Invoke-WebRequest -Uri $url -Method HEAD -UseBasicParsing
-    $response.Headers.'Content-Length' | ForEach-Object { [System.Convert]::ToInt32($_) }
 }
 
 Function Get-VirusTotalResultByHash ($hash, $url, $app) {

@@ -23,7 +23,7 @@
 . "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'generate_user_manifest' 'Get-Manifest'
-. "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\download.ps1"
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
