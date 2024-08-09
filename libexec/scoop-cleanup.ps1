@@ -1,7 +1,8 @@
 # Usage: scoop cleanup <app> [options]
 # Summary: Cleanup apps by removing old versions
 # Help: 'scoop cleanup' cleans Scoop apps by removing old versions.
-# 'scoop cleanup <app>' cleans up the old versions of that app if said versions exist.
+# 'scoop cleanup <app> -n:1' cleans up the old versions of that app if said versions exist,
+# but keeps n versions, default 1
 #
 # You can use '*' in place of <app> or `-a`/`--all` switch to cleanup all apps.
 #
@@ -9,17 +10,25 @@
 #   -a, --all          Cleanup all apps (alternative to '*')
 #   -g, --global       Cleanup a globally installed app
 #   -k, --cache        Remove outdated download cache
+#   -n, --keep         Option to keep more than one version
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\install.ps1" # persist related
 
-$opt, $apps, $err = getopt $args 'agk' 'all', 'global', 'cache'
+$opt, $apps, $err = getopt $args 'agkn:' 'all', 'global', 'cache', 'keep='
 if ($err) { "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
 $all = $opt.a -or $opt.all
+$keep = 1
+if ($opt.n -gt 1) {
+    $keep = $opt.n
+}
+if ($opt.keep -gt 1) {
+    $keep = $opt.keep
+}
 
 if (!$apps -and !$all) { 'ERROR: <app> missing'; my_usage; exit 1 }
 
@@ -35,6 +44,7 @@ function cleanup($app, $global, $verbose, $cache) {
     $appDir = appdir $app $global
     $versions = Get-ChildItem $appDir -Name
     $versions = $versions | Where-Object { $current_version -ne $_ -and $_ -ne 'current' }
+    $versions = $versions | Select-Object -first ([math]::max($versions.count - $keep + 1, 0))
     if (!$versions) {
         if ($verbose) { success "$app is already clean" }
         return
