@@ -6,6 +6,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion'
+. "$PSScriptRoot\..\lib\download.ps1" # 'Get-RemoteFileSize'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
 if ($err) { error "scoop info: $err"; exit 1 }
@@ -166,7 +167,7 @@ if ($status.installed) {
                     $cached = $null
                 }
 
-                $urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length' | ForEach-Object { [int]$_ }
+                $urlLength = Get-RemoteFileSize $url
                 $totalPackage += $urlLength
             } catch [System.Management.Automation.RuntimeException] {
                 $totalPackage = 0
