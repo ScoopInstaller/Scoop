@@ -123,15 +123,18 @@ function Expand-7zipArchive {
     }
     if (!$IsTar -and $ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
-        # Remove temporary directory
-        Remove-Item "$DestinationPath\$($ExtractDir -replace '[\\/].*')" -Recurse -Force -ErrorAction Ignore
+        # Remove temporary directory if it is empty
+        $ExtractDirTopPath = [string] "$DestinationPath\$($ExtractDir -replace '[\\/].*')"
+        if ((Get-ChildItem -Path $ExtractDirTopPath -Force -ErrorAction Ignore).Count -eq 0) {
+            Remove-Item -Path $ExtractDirTopPath -Recurse -Force -ErrorAction Ignore
+        }
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
     }
     if ($Removal) {
         if (($Path -replace '.*\.([^\.]*)$', '$1') -eq '001') {
-            # Remove splited 7-zip archive parts
+            # Remove splitted 7-zip archive parts
             Get-ChildItem "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
         } elseif (($Path -replace '.*\.part(\d+)\.rar$', '$1')[-1] -eq '1') {
             # Remove splitted RAR archive parts
