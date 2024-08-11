@@ -73,28 +73,6 @@ Describe 'Test-HelperInstalled' -Tag 'Scoop' {
     }
 }
 
-Describe 'Test-Aria2Enabled' -Tag 'Scoop' {
-    It 'should return true if aria2 is installed' {
-        Mock Test-HelperInstalled { $true }
-        Mock get_config { $true }
-        Test-Aria2Enabled | Should -BeTrue
-    }
-
-    It 'should return false if aria2 is not installed' {
-        Mock Test-HelperInstalled { $false }
-        Mock get_config { $false }
-        Test-Aria2Enabled | Should -BeFalse
-
-        Mock Test-HelperInstalled { $false }
-        Mock get_config { $true }
-        Test-Aria2Enabled | Should -BeFalse
-
-        Mock Test-HelperInstalled { $true }
-        Mock get_config { $false }
-        Test-Aria2Enabled | Should -BeFalse
-    }
-}
-
 Describe 'Test-CommandAvailable' -Tag 'Scoop' {
     It 'should return true if command exists' {
         Test-CommandAvailable 'Write-Host' | Should -BeTrue
