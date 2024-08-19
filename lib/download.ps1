@@ -466,7 +466,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                     Invoke-CachedDownload $app $version $url "$($data.$url.target)" $cookies $use_cache
                 }
             } catch {
-                write-host -f darkred $_
+                Write-Host $_ -ForegroundColor DarkRed
                 abort "URL $url is not valid"
             }
         }
