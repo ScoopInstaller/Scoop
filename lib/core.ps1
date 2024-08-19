@@ -1005,14 +1005,12 @@ function shim($path, $global, $name, $arg) {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
-            '@bash -c "command -v wslpath >/dev/null 2>&1"',
-            '@if %errorlevel% equ 0 (',
-            "  @bash `"`$(wslpath -u '$resolved_path')`" $arg %*",
+            '@echo off',
+            'bash -c "command -v wslpath >/dev/null"',
+            'if %errorlevel% equ 0 (',
+            "  bash `"`$(wslpath -u '$resolved_path')`" $arg %*",
             ') else (',
-            '  @bash -c "command -v cygpath >/dev/null 2>&1"',
-            '  @if %errorlevel% equ 0 (',
-            "    @bash `"`$(cygpath -u '$resolved_path')`" $arg %*",
-            '  )',
+            "  bash `"`$(cygpath -u '$resolved_path')`" $arg %*",
             ')'
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
