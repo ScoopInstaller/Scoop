@@ -2,6 +2,7 @@
 
 ### Bug Fixes
 
+- **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
 - **decompress**: `Expand-7zipArchive` only delete temp dir / `$extractDir` if it is empty ([#6092](https://github.com/ScoopInstaller/Scoop/issues/6092))
 
 ### Code Refactoring
