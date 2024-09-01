@@ -183,71 +183,87 @@ function Sync-Bucket {
 
     $updatedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
     $removedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
-    if ($PSVersionTable.PSVersion.Major -ge 7) {
-        # Parallel parameter is available since PowerShell 7
-        $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
-            . "$using:PSScriptRoot\..\lib\core.ps1"
-            . "$using:PSScriptRoot\..\lib\buckets.ps1"
 
-            $name = $_.name
-            $bucketLoc = $_.path
-            $innerBucketLoc = Find-BucketDirectory $name
+    # This cannot be used within -Parallel block
+    function update-bucket-inner {
+        $name = $_.name
+        $bucketLoc = $_.path
+        $innerBucketLoc = Find-BucketDirectory $name
 
-            $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
-            Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
-            if ($using:Log) {
-                Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
-            }
-            if (get_config USE_SQLITE_CACHE) {
-                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
-                    $status, $file = $_ -split '\s+', 2
-                    $filePath = Join-Path $bucketLoc $file
-                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
-                        switch ($status) {
-                            { $_ -in 'A', 'M', 'R' } {
-                                [void]($using:updatedFiles).Add($filePath)
-                            }
-                            'D' {
-                                [void]($using:removedFiles).Add([pscustomobject]@{
-                                        Name   = ([System.IO.FileInfo]$file).BaseName
-                                        Bucket = $name
-                                    })
-                            }
+        $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
+        Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
+        if ($Log) {
+            Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
+        }
+        if (get_config USE_SQLITE_CACHE) {
+            Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
+                $status, $file = $_ -split '\s+', 2
+                $filePath = Join-Path $bucketLoc $file
+                if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                    switch ($status) {
+                        { $_ -in 'A', 'M', 'R' } {
+                            [void]($updatedFiles).Add($filePath)
+                        }
+                        'D' {
+                            [void]($removedFiles).Add([pscustomobject]@{
+                                    Name   = ([System.IO.FileInfo]$file).BaseName
+                                    Bucket = $name
+                                })
                         }
                     }
                 }
             }
         }
-    } else {
-        $buckets | Where-Object { $_.valid } | ForEach-Object {
-            $name = $_.name
-            $bucketLoc = $_.path
-            $innerBucketLoc = Find-BucketDirectory $name
+    }
 
-            $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
-            Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
-            if ($Log) {
-                Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
-            }
-            if (get_config USE_SQLITE_CACHE) {
-                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
-                    $status, $file = $_ -split '\s+', 2
-                    $filePath = Join-Path $bucketLoc $file
-                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
-                        switch ($status) {
-                            { $_ -in 'A', 'M', 'R' } {
-                                [void]($updatedFiles).Add($filePath)
-                            }
-                            'D' {
-                                [void]($removedFiles).Add([pscustomobject]@{
-                                        Name   = ([System.IO.FileInfo]$file).BaseName
-                                        Bucket = $name
-                                    })
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+
+        # Parallel parameter is available since PowerShell 7
+        try {
+            $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
+                . "$using:PSScriptRoot\..\lib\core.ps1"
+                . "$using:PSScriptRoot\..\lib\buckets.ps1"
+
+                $name = $_.name
+                $bucketLoc = $_.path
+                $innerBucketLoc = Find-BucketDirectory $name
+
+                $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
+                Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
+                if ($using:Log) {
+                    Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
+                }
+                if (get_config USE_SQLITE_CACHE) {
+                    Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
+                        $status, $file = $_ -split '\s+', 2
+                        $filePath = Join-Path $bucketLoc $file
+                        if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                            switch ($status) {
+                                { $_ -in 'A', 'M', 'R' } {
+                                    [void]($using:updatedFiles).Add($filePath)
+                                }
+                                'D' {
+                                    [void]($using:removedFiles).Add([pscustomobject]@{
+                                            Name   = ([System.IO.FileInfo]$file).BaseName
+                                            Bucket = $name
+                                        })
+                                }
                             }
                         }
                     }
                 }
             }
+        } catch {
+            # Catches problems from Foreach-Object -Parallel, does not catch errors thrown within parallel block
+            #   >> TerminatingError(ForEach-Object): "The following common parameters are not currently supported in the Parallel parameter set:
+            #    ErrorAction, WarningAction, InformationAction, PipelineVariable"
+            $buckets | Where-Object { $_.valid } | ForEach-Object {
+               update-bucket-inner
+            }
+        }
+    } else {
+        $buckets | Where-Object { $_.valid } | ForEach-Object {
+            update-bucket-inner
         }
     }
     if ((get_config USE_SQLITE_CACHE) -and ($updatedFiles.Count -gt 0 -or $removedFiles.Count -gt 0)) {
