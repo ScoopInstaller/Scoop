@@ -86,7 +86,7 @@ function rm_alias {
     }
 
     info "Removing alias '$name'..."
-    Remove-Item "$(shimdir $false)\scoop-$name.ps1"
+    Remove-Item "$(shimdir $false)\scoop-$name.ps1" -ErrorAction SilentlyContinue
     $aliases.PSObject.Properties.Remove($name)
     set_config ALIAS $aliases | Out-Null
 }
