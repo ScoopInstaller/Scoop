@@ -5,7 +5,7 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
-. "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion'
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion', 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\download.ps1" # 'Get-RemoteFileSize'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
@@ -23,7 +23,7 @@ if (!$manifest) {
 $global = installed $app $true
 $status = app_status $app $global
 $install = install_info $app $status.version $global
-$status.installed = $bucket -and $install.bucket -eq $bucket
+$status.installed = installed $app
 $version_output = $manifest.version
 $manifest_file = if ($bucket) {
     manifest_path $app $bucket

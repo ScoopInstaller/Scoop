@@ -53,6 +53,16 @@ function Get-Manifest($app) {
             }
         }
         if (!$manifest) {
+            if (installed $app) {
+                $global = installed $app $true
+                $ver = Select-CurrentVersion -AppName $app -Global:$global
+                $install_info_path = "$(versiondir $app $ver $global)\install.json"
+                if (Test-Path $install_info_path) {
+                    $install_info = parse_json $install_info_path
+                    $url = $install_info.url
+                }
+                $manifest = if (Test-Path $url) { parse_json $url } else { installed_manifest $app $ver $global }
+            }
             # couldn't find app in buckets: check if it's a local path
             if (Test-Path $app) {
                 $url = Convert-Path $app
