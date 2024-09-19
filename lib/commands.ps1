@@ -4,7 +4,7 @@
 
 function command_files {
     (Get-ChildItem "$PSScriptRoot\..\libexec") + (Get-ChildItem "$scoopdir\shims") |
-        Where-Object 'scoop-.*?\.ps1$' -Property Name -Match
+    Where-Object 'scoop-.*?\.ps1$' -Property Name -Match
 }
 
 function commands {
@@ -98,11 +98,19 @@ function list_aliases {
 
     $aliases = get_config ALIAS ([PSCustomObject]@{})
     $alias_info = $aliases.PSObject.Properties.Name | Where-Object { $_ } | ForEach-Object {
+        # Mark the alias as <BROKEN>, if the alias script file does NOT exist.
+        if (!(Test-Path "$(shimdir $false)\scoop-$_.ps1")) {
+            [PSCustomObject]@{
+                Name    = $_
+                Command = '<BROKEN>'
+            }
+            return
+        }
         $content = Get-Content (command_path $_)
         [PSCustomObject]@{
             Name    = $_
-            Summary = (summary $content).Trim()
             Command = ($content | Select-Object -Skip 1).Trim()
+            Summary = (summary $content).Trim()
         }
     }
     if (!$alias_info) {
