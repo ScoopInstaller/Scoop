@@ -36,7 +36,7 @@ if ($verbose) {
     $original_dir = versiondir $app $manifest.version $global
     $persist_dir = persistdir $app $global
 } else {
-    $dir, $original_dir, $persist_dir = "<root>", "<root>", "<root>"
+    $dir, $original_dir, $persist_dir = '<root>', '<root>', '<root>'
 }
 
 if ($status.installed) {
@@ -44,14 +44,20 @@ if ($status.installed) {
     if ($install.url) {
         $manifest_file = $install.url
     }
-    if ($status.version -eq $manifest.version) {
+    if ($status.deprecated) {
+        $manifest_file = $status.deprecated
+    } elseif ($status.version -eq $manifest.version) {
         $version_output = $status.version
     } else {
         $version_output = "$($status.version) (Update to $($manifest.version) available)"
     }
+
 }
 
 $item = [ordered]@{ Name = $app }
+if ($status.deprecated) {
+    $item.Name += ' (DEPRECATED)'
+}
 if ($manifest.description) {
     $item.Description = $manifest.description
 }
@@ -70,7 +76,7 @@ if ($manifest.license) {
         $manifest.license
     } elseif ($manifest.license -match '[|,]') {
         if ($verbose) {
-            "$($manifest.license) ($(($manifest.license -Split "\||," | ForEach-Object { "https://spdx.org/licenses/$_.html" }) -join ', '))"
+            "$($manifest.license) ($(($manifest.license -Split '\||,' | ForEach-Object { "https://spdx.org/licenses/$_.html" }) -join ', '))"
         } else {
             $manifest.license
         }
@@ -103,7 +109,7 @@ if ($status.installed) {
     # Show installed versions
     $installed_output = @()
     Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
-        $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { " *global*" })" }
+        $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { ' *global*' })" }
     }
     $item.Installed = $installed_output -join "`n"
 
@@ -162,7 +168,7 @@ if ($status.installed) {
         foreach ($url in @(url $manifest (Get-DefaultArchitecture))) {
             try {
                 if (Test-Path (cache_path $app $manifest.version $url)) {
-                    $cached = " (latest version is cached)"
+                    $cached = ' (latest version is cached)'
                 } else {
                     $cached = $null
                 }
@@ -197,7 +203,7 @@ if ($binaries) {
             $binary_output += $_
         }
     }
-    $item.Binaries = $binary_output -join " | "
+    $item.Binaries = $binary_output -join ' | '
 }
 $shortcuts = @(arch_specific 'shortcuts' $manifest $install.architecture)
 if ($shortcuts) {
@@ -205,7 +211,7 @@ if ($shortcuts) {
     $shortcuts | ForEach-Object {
         $shortcut_output += $_[1]
     }
-    $item.Shortcuts = $shortcut_output -join " | "
+    $item.Shortcuts = $shortcut_output -join ' | '
 }
 $env_set = arch_specific 'env_set' $manifest $install.architecture
 if ($env_set) {

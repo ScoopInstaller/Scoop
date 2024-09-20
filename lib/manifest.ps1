@@ -32,7 +32,7 @@ function url_manifest($url) {
 }
 
 function Get-Manifest($app) {
-    $bucket, $manifest, $url = $null
+    $bucket, $manifest, $url, $deprecated = $null
     $app = $app.TrimStart('/')
     # check if app is a URL or UNC path
     if ($app -match '^(ht|f)tps?://|\\\\') {
@@ -63,6 +63,10 @@ function Get-Manifest($app) {
                     }
                 } else {
                     $manifest = manifest $app $bucket
+                    if (!$manifest) {
+                        $deprecated_dir = (Find-BucketDirectory -Name $bucket -Root) + "\deprecated"
+                        $manifest = parse_json (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
+                    }
                 }
             }
         } else {
