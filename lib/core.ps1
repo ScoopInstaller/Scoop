@@ -1140,19 +1140,7 @@ function applist($apps, $global) {
 
 function parse_app([string]$app) {
     if ($app -match '^(?:(?<bucket>[a-zA-Z0-9-_.]+)/)?(?<app>.*\.json|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?$') {
-        $app = $Matches['app']
-        $bucket = $Matches['bucket']
-        $version = $Matches['version']
-        if (installed $app) {
-            $global = installed $app $true
-            $ver = Select-CurrentVersion -AppName $app -Global:$global
-            $install_info_path = "$(versiondir $app $ver $global)\install.json"
-            if (Test-Path $install_info_path) {
-                $install_info = parse_json $install_info_path
-                $bucket = $install_info.bucket
-            }
-        }
-        return $app, $bucket, $version
+        return $Matches['app'], $Matches['bucket'], $Matches['version']
     } else {
         return $app, $null, $null
     }
