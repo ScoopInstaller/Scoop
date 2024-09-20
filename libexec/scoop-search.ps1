@@ -30,7 +30,6 @@ function bin_match($manifest, $query) {
 
 function bin_match_json($json, $query) {
     [System.Text.Json.JsonElement]$bin = [System.Text.Json.JsonElement]::new()
-
     # check if RootElement is object type
     if ($json.RootElement.ValueKind -eq [System.Text.Json.JsonValueKind]::Object) {
         # try to get 'bin' attribute
