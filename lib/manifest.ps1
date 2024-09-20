@@ -50,11 +50,18 @@ function Get-Manifest($app) {
                 $bucket = $install_info.bucket
                 if (!$bucket) {
                     $url = $install_info.url
-                    if ($url -and (Test-Path $url)) {
-                        $manifest = parse_json $url
-                    } else {
-                        # Fallback to installed manifest
-                        $manifest = installed_manifest $app $ver $global
+                    if ($url) {
+                        if ($url -match '^(ht|f)tps?://|\\\\') {
+                            $manifest = url_manifest $url
+                        }
+                    }
+                    if (!$manifest) {
+                        if (Test-Path $url) {
+                            $manifest = parse_json $url
+                        } else {
+                            # Fallback to installed manifest
+                            $manifest = installed_manifest $app $ver $global
+                        }
                     }
                 } else {
                     $manifest = manifest $app $bucket
