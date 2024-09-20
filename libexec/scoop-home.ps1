@@ -2,6 +2,7 @@
 # Summary: Opens the app homepage
 param($app)
 
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 
 if ($app) {

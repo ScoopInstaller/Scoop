@@ -3,6 +3,7 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' (indirectly)
 
 $opt, $apps, $err = getopt $args 'a:' 'arch='
