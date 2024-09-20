@@ -60,26 +60,38 @@ function search_bucket($bucket, $query) {
 
         $json = try {
             [System.Text.Json.JsonDocument]::Parse([System.IO.File]::ReadAllText($filepath))
-        } catch {
+        }
+        catch {
             debug "Failed to parse manifest file: $filepath (error: $_)"
             return
         }
 
         $name = $_.BaseName
+        $versionValue = "Unknown"  # a default value
+
+        # check type of RootElement
+        if ($json.RootElement.ValueKind -eq [System.Text.Json.JsonValueKind]::Object) {
+            # try to get 'version' attribute
+            $version = [System.Text.Json.JsonElement]::new()
+            if ($json.RootElement.TryGetProperty('version', [ref] $version)) {
+                $versionValue = $version
+            }
+        }
 
         if ($name -match $query) {
             $list.Add([PSCustomObject]@{
                     Name     = $name
-                    Version  = $json.RootElement.GetProperty('version')
+                    Version  = $versionValue
                     Source   = $bucket
                     Binaries = ''
                 })
-        } else {
+        }
+        else {
             $bin = bin_match_json $json $query
             if ($bin) {
                 $list.Add([PSCustomObject]@{
                         Name     = $name
-                        Version  = $json.RootElement.GetProperty('version')
+                        Version  = $versionValue
                         Source   = $bucket
                         Binaries = $bin -join ' | '
                     })
