@@ -32,7 +32,7 @@ function url_manifest($url) {
 }
 
 function Get-Manifest($app) {
-    $bucket, $manifest, $url, $deprecated = $null
+    $bucket, $manifest, $url = $null
     $app = $app.TrimStart('/')
     # check if app is a URL or UNC path
     if ($app -match '^(ht|f)tps?://|\\\\') {
