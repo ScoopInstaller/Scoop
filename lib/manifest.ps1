@@ -50,10 +50,8 @@ function Get-Manifest($app) {
                 $bucket = $install_info.bucket
                 if (!$bucket) {
                     $url = $install_info.url
-                    if ($url) {
-                        if ($url -match '^(ht|f)tps?://|\\\\') {
-                            $manifest = url_manifest $url
-                        }
+                    if ($url -match '^(ht|f)tps?://|\\\\') {
+                        $manifest = url_manifest $url
                     }
                     if (!$manifest) {
                         if (Test-Path $url) {
