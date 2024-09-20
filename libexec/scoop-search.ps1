@@ -30,7 +30,23 @@ function bin_match($manifest, $query) {
 
 function bin_match_json($json, $query) {
     [System.Text.Json.JsonElement]$bin = [System.Text.Json.JsonElement]::new()
-    if (!$json.RootElement.TryGetProperty('bin', [ref] $bin)) { return $false }
+
+    # check if RootElement is object type
+    if ($json.RootElement.ValueKind -eq [System.Text.Json.JsonValueKind]::Object) {
+        # try to get 'bin' attribute
+        if (!$json.RootElement.TryGetProperty('bin', [ref] $bin)) { return $false }
+    } elseif ($json.RootElement.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
+        # or if RootElement is an array, then do not use TryGetProperty
+        foreach ($item in $json.RootElement.EnumerateArray()) {
+            if ($item.ValueKind -eq [System.Text.Json.JsonValueKind]::Object -and $item.TryGetProperty('bin', [ref] $bin)) {
+                break
+            }
+        }
+        if ($bin.ValueKind -eq [System.Text.Json.JsonValueKind]::Undefined) { return $false }
+    } else {
+        return $false
+    }
+
     $bins = @()
     if ($bin.ValueKind -eq [System.Text.Json.JsonValueKind]::String -and [System.IO.Path]::GetFileNameWithoutExtension($bin) -match $query) {
         $bins += [System.IO.Path]::GetFileName($bin)
