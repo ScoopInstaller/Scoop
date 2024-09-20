@@ -32,19 +32,22 @@ $manifest_file = if ($bucket) {
     $url
 }
 
-if ($install.url -and (Test-Path $original_app) -or ($original_app -match '^(ht|f)tps?://|\\\\')) {
+# Standalone and Source detection
+if ((Test-Path $original_app) -or ($original_app -match '^(ht|f)tps?://|\\\\')) {
     $standalone = $true
     if (Test-Path $original_app) {
         $original_app = (Get-AbsolutePath "$original_app")
     }
-    if (Test-Path $install.url) {
-        $install_url = (Get-AbsolutePath $install.url)
-    } else {
-        $install_url = $install.url
+    if ($install.url) {
+        if (Test-Path $install.url) {
+            $install_url = (Get-AbsolutePath $install.url)
+        } else {
+            $install_url = $install.url
+        }
     }
-}
-if ($original_app -eq $install_url) {
-    $same_source = $true
+    if ($original_app -eq $install_url) {
+        $same_source = $true
+    }
 }
 
 if ($verbose) {

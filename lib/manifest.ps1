@@ -87,7 +87,7 @@ function Get-Manifest($app) {
                 if (Test-Path $app) {
                     $url = Convert-Path $app
                     $app = appname_from_url $url
-                    $manifest = url_manifest $url
+                    $manifest = parse_json $url
                 } else {
                     if (($app -match '\\/') -or $app.EndsWith('.json')) { $url = $app }
                     $app = appname_from_url $app
