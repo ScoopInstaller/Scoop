@@ -9,6 +9,7 @@
 . "$PSScriptRoot\..\lib\download.ps1" # 'Get-RemoteFileSize'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
+$original_app = $app
 if ($err) { error "scoop info: $err"; exit 1 }
 $verbose = $opt.v -or $opt.verbose
 
@@ -31,6 +32,21 @@ $manifest_file = if ($bucket) {
     $url
 }
 
+if ($install.url -and (Test-Path $original_app) -or ($original_app -match '^(ht|f)tps?://|\\\\')) {
+    $standalone = $true
+    if (Test-Path $original_app) {
+        $original_app = (Get-AbsolutePath "$original_app")
+    }
+    if (Test-Path $install.url) {
+        $install_url = (Get-AbsolutePath $install.url)
+    } else {
+        $install_url = $install.url
+    }
+}
+if ($original_app -eq $install_url) {
+    $same_source = $true
+}
+
 if ($verbose) {
     $dir = currentdir $app $global
     $original_dir = versiondir $app $manifest.version $global
@@ -46,6 +62,8 @@ if ($status.installed) {
     }
     if ($status.deprecated) {
         $manifest_file = $status.deprecated
+    } elseif ($standalone -and !$same_source) {
+        $version_output = $manifest.version
     } elseif ($status.version -eq $manifest.version) {
         $version_output = $status.version
     } else {
@@ -63,7 +81,15 @@ if ($manifest.description) {
 }
 $item.Version = $version_output
 
-$item.Source = if ($install.bucket) { $install.bucket } else { $install.url }
+$item.Source = if ($standalone) {
+    $original_app
+} else {
+    if ($install.bucket) {
+        $install.bucket
+    } elseif ($install.url) {
+        $install.url
+    }
+}
 
 if ($manifest.homepage) {
     $item.Website = $manifest.homepage.TrimEnd('/')
@@ -107,11 +133,13 @@ if ($verbose) { $item.Manifest = $manifest_file }
 
 if ($status.installed) {
     # Show installed versions
-    $installed_output = @()
-    Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
-        $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { ' *global*' })" }
+    if (!$standalone -or $same_source) {
+        $installed_output = @()
+        Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
+            $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { ' *global*' })" }
+        }
+        $item.Installed = $installed_output -join "`n"
     }
-    $item.Installed = $installed_output -join "`n"
 
     if ($verbose) {
         # Show size of installation
