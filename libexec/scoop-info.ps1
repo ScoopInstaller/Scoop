@@ -62,9 +62,9 @@ if ($manifest.description) {
     $item.Description = $manifest.description
 }
 $item.Version = $version_output
-if ($bucket) {
-    $item.Bucket = $bucket
-}
+
+$item.Source = if ($install.bucket) { $install.bucket } else { $install.url }
+
 if ($manifest.homepage) {
     $item.Website = $manifest.homepage.TrimEnd('/')
 }
