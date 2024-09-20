@@ -88,6 +88,8 @@ $item.Source = if ($standalone) {
         $install.bucket
     } elseif ($install.url) {
         $install.url
+    } else {
+        $bucket
     }
 }
 
