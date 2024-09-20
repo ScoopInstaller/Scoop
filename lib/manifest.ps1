@@ -44,6 +44,10 @@ function Get-Manifest($app) {
         if (installed $app) {
             $global = installed $app $true
             $ver = Select-CurrentVersion -AppName $app -Global:$global
+            if (!$ver) {
+                $app, $bucket, $ver = parse_app $app
+                $ver = Select-CurrentVersion -AppName $app -Global:$global
+            }
             $install_info_path = "$(versiondir $app $ver $global)\install.json"
             if (Test-Path $install_info_path) {
                 $install_info = parse_json $install_info_path
@@ -64,7 +68,7 @@ function Get-Manifest($app) {
                 } else {
                     $manifest = manifest $app $bucket
                     if (!$manifest) {
-                        $deprecated_dir = (Find-BucketDirectory -Name $bucket -Root) + "\deprecated"
+                        $deprecated_dir = (Find-BucketDirectory -Name $bucket -Root) + '\deprecated'
                         $manifest = parse_json (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
                     }
                 }
