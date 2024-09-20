@@ -40,27 +40,49 @@ function Get-Manifest($app) {
         $app = appname_from_url $url
         $manifest = url_manifest $url
     } else {
-        $app, $bucket, $version = parse_app $app
-        if ($bucket) {
-            $manifest = manifest $app $bucket
-        } else {
-            foreach ($tekcub in Get-LocalBucket) {
-                $manifest = manifest $app $tekcub
-                if ($manifest) {
-                    $bucket = $tekcub
-                    break
+        # Check if the manifest is already installed
+        if (installed $app) {
+            $global = installed $app $true
+            $ver = Select-CurrentVersion -AppName $app -Global:$global
+            $install_info_path = "$(versiondir $app $ver $global)\install.json"
+            if (Test-Path $install_info_path) {
+                $install_info = parse_json $install_info_path
+                $bucket = $install_info.bucket
+                if (!$bucket) {
+                    $url = $install_info.url
+                    if ($url -and (Test-Path $url)) {
+                        $manifest = parse_json $url
+                    } else {
+                        # Fallback to installed manifest
+                        $manifest = installed_manifest $app $ver $global
+                    }
+                } else {
+                    $manifest = manifest $app $bucket
                 }
             }
-        }
-        if (!$manifest) {
-            # couldn't find app in buckets: check if it's a local path
-            if (Test-Path $app) {
-                $url = Convert-Path $app
-                $app = appname_from_url $url
-                $manifest = url_manifest $url
+        } else {
+            $app, $bucket, $version = parse_app $app
+            if ($bucket) {
+                $manifest = manifest $app $bucket
             } else {
-                if (($app -match '\\/') -or $app.EndsWith('.json')) { $url = $app }
-                $app = appname_from_url $app
+                foreach ($tekcub in Get-LocalBucket) {
+                    $manifest = manifest $app $tekcub
+                    if ($manifest) {
+                        $bucket = $tekcub
+                        break
+                    }
+                }
+            }
+            if (!$manifest) {
+                # couldn't find app in buckets: check if it's a local path
+                if (Test-Path $app) {
+                    $url = Convert-Path $app
+                    $app = appname_from_url $url
+                    $manifest = url_manifest $url
+                } else {
+                    if (($app -match '\\/') -or $app.EndsWith('.json')) { $url = $app }
+                    $app = appname_from_url $app
+                }
             }
         }
     }
