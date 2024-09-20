@@ -54,7 +54,6 @@ function bin_match_json($json, $query) {
 
 function search_bucket($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
-
     $apps | ForEach-Object {
         $filepath = $_.FullName
 
