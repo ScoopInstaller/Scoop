@@ -78,11 +78,16 @@ function Get-Manifest($app) {
             if ($bucket) {
                 $manifest = manifest $app $bucket
             } else {
+                $count = 0
                 foreach ($tekcub in Get-LocalBucket) {
-                    $manifest = manifest $app $tekcub
+                    if (!$manifest) {
+                        $manifest = manifest $app $tekcub
+                    }
                     if ($manifest) {
-                        $bucket = $tekcub
-                        break
+                        if (!$bucket) {
+                            $bucket = $tekcub
+                        }
+                        $count++
                     }
                 }
             }
@@ -99,6 +104,13 @@ function Get-Manifest($app) {
             }
         }
     }
+
+    if ($count) {
+        if ($count -gt 1) {
+            warn "Multiple buckets contain '$app', selected manifest are '$bucket/$app'."
+        }
+    }
+
     return $app, $manifest, $bucket, $url
 }
 
