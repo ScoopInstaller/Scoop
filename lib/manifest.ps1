@@ -107,7 +107,7 @@ function Get-Manifest($app) {
 
     if ($count) {
         if ($count -gt 1) {
-            warn "Multiple buckets contain '$app', selected manifest are '$bucket/$app'."
+            warn "Multiple buckets contain manifest '$app', the current selection is '$bucket/$app'."
         }
     }
 
