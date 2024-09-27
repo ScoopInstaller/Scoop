@@ -104,7 +104,7 @@ function Get-Manifest($app) {
         }
     }
 
-    if ($matched_buckets -gt 1) {
+    if ($matched_buckets.Length -gt 1) {
         warn "Multiple buckets contain manifest '$app', the current selection is '$bucket/$app'."
     }
 
