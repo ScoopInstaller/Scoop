@@ -59,6 +59,13 @@ try {
 
 if (!$apps) { error '<app> missing'; my_usage; exit 1 }
 
+# Prevent installation of Scoop itself
+foreach ($app in $apps) {
+    if (($app -eq 'scoop') -or ($app -match '.*/scoop$')) {
+        abort "ERROR: You cannot install Scoop via 'scoop install'"
+    }
+}
+
 if ($global -and !(is_admin)) {
     abort 'ERROR: you need admin rights to install global apps'
 }
