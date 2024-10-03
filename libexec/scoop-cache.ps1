@@ -25,7 +25,7 @@ function cacheshow($app) {
     } else {
         $app = '(' + ($app -join '|') + ')'
     }
-    $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+    $files = @(Get-ChildItem (ensure $cachedir) | Where-Object -Property Name -Value "^$app#" -Match)
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
     $files | ForEach-Object { cacheinfo $_ } | Select-Object Name, Version, Length
