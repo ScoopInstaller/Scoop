@@ -2,7 +2,14 @@
 function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
     $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target = [System.IO.Path]::Combine($dir, $_.item(0))
+        $target = $_.item(0)
+        $substitute_args = @{'$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir }
+        $target = (substitute $target $substitute_args)
+
+        if (![System.IO.Path]::IsPathRooted($target)) {
+            $target = [System.IO.Path]::Combine($dir, $_.item(0))
+        }
+
         $target = New-Object System.IO.FileInfo($target)
         $name = $_.item(1)
         $arguments = ''
@@ -14,7 +21,7 @@ function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
             $icon = [System.IO.Path]::Combine($dir, $_.item(3))
             $icon = New-Object System.IO.FileInfo($icon)
         }
-        $arguments = (substitute $arguments @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
+        $arguments = (substitute $arguments $substitute_args)
         startmenu_shortcut $target $name $arguments $icon $global
     }
 }
