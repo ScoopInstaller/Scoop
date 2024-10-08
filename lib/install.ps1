@@ -5,7 +5,8 @@ function nightly_version($quiet = $false) {
     return "nightly-$(Get-Date -Format 'yyyyMMdd')"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
+function install_app($app, $architecture, $global, $suggested,
+    $use_cache = $true, $check_hash = $true, $shortcut_original = $false) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if (!$manifest) {
@@ -57,7 +58,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global $architecture
+    create_startmenu_shortcuts $manifest $dir $global $architecture $shortcut_original
     install_psmodule $manifest $dir $global
     env_add_path $manifest $dir $global $architecture
     env_set $manifest $global $architecture
@@ -70,7 +71,12 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
 
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
-    save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
+    save_install_info @{
+        'architecture'      = $architecture;
+        'url'               = $url;
+        'bucket'            = $bucket;
+        'shortcut_original' = if ($shortcut_original) { $true } else { $null }
+    } $dir
 
     if ($manifest.suggest) {
         $suggested[$app] = $manifest.suggest

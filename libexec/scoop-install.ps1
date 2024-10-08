@@ -26,6 +26,7 @@
 #   -s, --skip-hash-check           Skip hash validation (use with caution!)
 #   -u, --no-update-scoop           Don't update Scoop before installing if it's outdated
 #   -a, --arch <32bit|64bit|arm64>  Use the specified architecture, if the app supports it
+#       --shortcut-original         Change the shortcut target to "original" directory
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' 'manifest.ps1' (indirectly)
@@ -43,7 +44,7 @@ if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
 
-$opt, $apps, $err = getopt $args 'giksua:' 'global', 'independent', 'no-cache', 'skip-hash-check', 'no-update-scoop', 'arch='
+$opt, $apps, $err = getopt $args 'giksua:' 'global', 'independent', 'no-cache', 'skip-hash-check', 'no-update-scoop', 'arch=', 'shortcut-original'
 if ($err) { "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
@@ -57,6 +58,8 @@ try {
     abort "ERROR: $_"
 }
 
+$shortcut_original= $opt.'shortcut-original'
+
 if (!$apps) { error '<app> missing'; my_usage; exit 1 }
 
 if ($global -and !(is_admin)) {
@@ -65,7 +68,7 @@ if ($global -and !(is_admin)) {
 
 if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
-        warn "Scoop is out of date."
+        warn 'Scoop is out of date.'
     } else {
         & "$PSScriptRoot\scoop-update.ps1"
     }
@@ -132,7 +135,7 @@ if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
     warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
-$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash $shortcut_original }
 
 show_suggestions $suggested
 

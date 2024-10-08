@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
 
+### Features
+
+- **install** New install option `--shortcut-original` to change create shortcut to original directory ([#3271](https://github.com/ScoopInstaller/Scoop/issues/3271), [#6054](https://github.com/ScoopInstaller/Scoop/issues/6054))
+
 ### Bug Fixes
 
 - **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))

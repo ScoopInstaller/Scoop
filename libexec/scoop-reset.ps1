@@ -79,7 +79,7 @@ $apps | ForEach-Object {
 
     $dir = link_current $dir
     create_shims $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global $architecture
+    create_startmenu_shortcuts $manifest $dir $global $architecture $install.'shortcut_original'
     # unset all potential old env before re-adding
     env_rm_path $manifest $dir $global $architecture
     env_rm $manifest $global $architecture

@@ -1,8 +1,14 @@
 # Creates shortcut for the app in the start menu
-function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
+function create_startmenu_shortcuts($manifest, $dir, $global, $arch, $shortcut_original = $false) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
     $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target = [System.IO.Path]::Combine($dir, $_.item(0))
+        $target = $_.item(0)
+        if ($shortcut_original) {
+            $target = [System.IO.Path]::Combine($original_dir, $target)
+        } else {
+            $target = [System.IO.Path]::Combine($dir, $target)
+        }
+
         $target = New-Object System.IO.FileInfo($target)
         $name = $_.item(1)
         $arguments = ''
