@@ -1003,11 +1003,18 @@ function shim($path, $global, $name, $arg) {
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
+        $quoted_arg = if ($arg.Count -gt 0) { $arg | ForEach-Object { "`"$_`"" } }
         @(
             "@rem $resolved_path",
-            "@bash `"`$(wslpath -u '$resolved_path')`" $arg %* 2>nul",
-            '@if %errorlevel% neq 0 (',
-            "  @bash `"`$(cygpath -u '$resolved_path')`" $arg %* 2>nul",
+            '@echo off',
+            'bash -c "command -v wslpath >/dev/null"',
+            'if %errorlevel% equ 0 (',
+            "  bash `"`$(wslpath -u '$resolved_path')`" $quoted_arg %*",
+            ') else (',
+            "  set args=$quoted_arg %*",
+            '  setlocal enabledelayedexpansion',
+            '  if not "!args!"=="" set args=!args:"=""!',
+            "  bash -c `"`$(cygpath -u '$resolved_path') !args!`"",
             ')'
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
