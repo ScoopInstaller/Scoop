@@ -19,6 +19,10 @@
 #     scoop bucket known
 param($cmd, $name, $repo)
 
+if (get_config NO_JUNCTION) {
+    . "$PSScriptRoot\..\lib\versions.ps1"
+}
+
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\manifest.ps1"
     . "$PSScriptRoot\..\lib\database.ps1"
