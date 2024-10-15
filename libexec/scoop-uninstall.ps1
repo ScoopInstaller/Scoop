@@ -129,7 +129,7 @@ if (!$apps) { exit 0 }
         }
     }
 
-    # purge persistant data
+    # purge persistent data
     if ($purge) {
         Write-Host 'Removing persisted data.'
         $persist_dir = persistdir $app $global

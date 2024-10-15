@@ -205,7 +205,7 @@ Function Get-VirusTotalResultByUrl ($url, $app) {
 # - $url: where file to check can be downloaded
 # - $app: Name of the application (used for reporting)
 # - $do_scan: [boolean flag] whether to actually submit to VirusTotal
-#             This is a parameter instead of conditionnally calling
+#             This is a parameter instead of conditionally calling
 #             the function to consolidate the warning message
 # - $retrying: [boolean] Optional, for internal use to retry
 #              submitting the file after a delay if the rate limit is

@@ -434,7 +434,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             # Skip blank lines
             if ([String]::IsNullOrWhiteSpace($_)) { return }
 
-            # Prevent potential overlaping of text when one line is shorter
+            # Prevent potential overlapping of text when one line is shorter
             $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
             $blank = if ($len -gt 0) { ' ' * $len } else { '' }
             $color = 'Gray'

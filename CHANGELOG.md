@@ -472,7 +472,7 @@
 
 ### Documentation
 
-- **changelog:** Add 'CHANGLOG.md' ([#4600](https://github.com/ScoopInstaller/Scoop/issues/4600))
+- **changelog:** Add 'CHANGELOG.md' ([#4600](https://github.com/ScoopInstaller/Scoop/issues/4600))
 - **changelog:** Rearrange CHANGELOG ([#4729](https://github.com/ScoopInstaller/Scoop/issues/4729))
 - **changelog:** Link CHANGELOG headers to 'releases/tag' ([#4730](https://github.com/ScoopInstaller/Scoop/issues/4730))
 
@@ -573,7 +573,7 @@
 - **autoupdate:** Add $urlNoExt and $basenameNoExt substitutions ([#3742](https://github.com/ScoopInstaller/Scoop/issues/3742))
 - **config:** Add configuration option for default architecture ([#3778](https://github.com/ScoopInstaller/Scoop/issues/3778))
 - **install:** Follow HTTP redirections when downloading a file ([#3902](https://github.com/ScoopInstaller/Scoop/issues/3902))
-- **install:** Let pathes in 'env_add_path' be added ascendantly ([#3788](https://github.com/ScoopInstaller/Scoop/issues/3788), [#3976](https://github.com/ScoopInstaller/Scoop/issues/3976))
+- **install:** Let paths in 'env_add_path' be added ascendantly ([#3788](https://github.com/ScoopInstaller/Scoop/issues/3788), [#3976](https://github.com/ScoopInstaller/Scoop/issues/3976))
 - **list:** Display main bucket name ([#3759](https://github.com/ScoopInstaller/Scoop/issues/3759))
 - **shim:** Add alt-shim support ([#3998](https://github.com/ScoopInstaller/Scoop/issues/3998))
 - **scoop-checkup:** Add check_envs_requirements ([#3860](https://github.com/ScoopInstaller/Scoop/issues/3860))
