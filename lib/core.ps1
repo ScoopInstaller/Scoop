@@ -1355,7 +1355,7 @@ function handle_special_urls($url)
     # Github.com
     if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)') {
         if ($gh = $env:GITHUB) {
-            $url = $url -replace "github.com", $gh
+            $url = $url -replace "github.com/", "$gh/"
         }
         if ($token = Get-GitHubToken) {
             $headers = @{ "Authorization" = "token $token" }
