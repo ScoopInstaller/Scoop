@@ -4,6 +4,14 @@
 
 **autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
 
+### BREAKING CHANGE
+
+- **scoop-install|update**: `-k`option that skipped cache and forced redownload is replaced by `-d`. `-k` now keeps older cache after app update
+
+### Features
+
+- **scoop-cache|update**: New tidy command that removes older packages from cache. Automatically run it after app update ([#6068](https://github.com/ScoopInstaller/Scoop/issues/6068))
+
 ### Bug Fixes
 
 - **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
