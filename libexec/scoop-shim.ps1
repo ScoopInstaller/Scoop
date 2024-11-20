@@ -76,7 +76,7 @@ function Get-ShimInfo($ShimPath) {
         $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
     }
     $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
-    $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
+    $info.IsHidden = -not ((Get-Command -Name $info.Name -ErrorAction 'Ignore').Path -eq $info.Path)
     [PSCustomObject]$info
 }
 
