@@ -10,14 +10,9 @@ param($query)
 
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest'
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Get-LatestVersion'
+. "$PSScriptRoot\..\lib\download.ps1"
 
 $list = [System.Collections.Generic.List[PSCustomObject]]::new()
-
-$githubtoken = Get-GitHubToken
-$authheader = @{}
-if ($githubtoken) {
-    $authheader = @{'Authorization' = "token $githubtoken" }
-}
 
 function bin_match($manifest, $query) {
     if (!$manifest.bin) { return $false }
@@ -120,23 +115,6 @@ function search_bucket_legacy($bucket, $query) {
             }
         }
     }
-}
-
-function download_json($url) {
-    $ProgressPreference = 'SilentlyContinue'
-    $result = Invoke-WebRequest $url -UseBasicParsing -Headers $authheader | Select-Object -ExpandProperty content | ConvertFrom-Json
-    $ProgressPreference = 'Continue'
-    $result
-}
-
-function github_ratelimit_reached {
-    $api_link = 'https://api.github.com/rate_limit'
-    $ret = (download_json $api_link).rate.remaining -eq 0
-    if ($ret) {
-        Write-Host "GitHub API rate limit reached.
-Please try again later or configure your API token using 'scoop config gh_token <your token>'."
-    }
-    $ret
 }
 
 function search_remote($bucket, $query) {
