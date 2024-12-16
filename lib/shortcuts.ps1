@@ -2,9 +2,19 @@
 function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
     $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target = [System.IO.Path]::Combine($dir, $_.item(0))
-        $target = New-Object System.IO.FileInfo($target)
         $name = $_.item(1)
+        $executable = $_.item(0)
+        if (Test-Path "$dir\$executable" -PathType leaf) {
+            $target = "$dir\$executable"
+        } elseif (Test-Path $executable -PathType leaf) {
+            $target = $executable
+        } else {
+            $target = (Get-Command $executable).Source
+        }
+        if (!$target) {
+            Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $executable)) failed: Couldn't find $executable"
+            return
+        }
         $arguments = ''
         $icon = $null
         if ($_.length -ge 3) {
@@ -15,7 +25,7 @@ function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
             $icon = New-Object System.IO.FileInfo($icon)
         }
         $arguments = (substitute $arguments @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
-        startmenu_shortcut $target $name $arguments $icon $global
+        startmenu_shortcut $target $name $arguments $icon $global $dir
     }
 }
 
@@ -28,7 +38,7 @@ function shortcut_folder($global) {
     return Convert-Path (ensure ([System.IO.Path]::Combine([Environment]::GetFolderPath($startmenu), 'Programs', 'Scoop Apps')))
 }
 
-function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global) {
+function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $arguments, [System.IO.FileInfo]$icon, $global, $workingdir) {
     if (!$target.Exists) {
         Write-Host -f DarkRed "Creating shortcut for $shortcutName ($(fname $target)) failed: Couldn't find $target"
         return
@@ -47,7 +57,7 @@ function startmenu_shortcut([System.IO.FileInfo] $target, $shortcutName, $argume
     $wsShell = New-Object -ComObject WScript.Shell
     $wsShell = $wsShell.CreateShortcut("$scoop_startmenu_folder\$shortcutName.lnk")
     $wsShell.TargetPath = $target.FullName
-    $wsShell.WorkingDirectory = $target.DirectoryName
+    $wsShell.WorkingDirectory = $workingdir
     if ($arguments) {
         $wsShell.Arguments = $arguments
     }
