@@ -1054,7 +1054,12 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 attrib $source +R /L
             } else {
                 # target is a file, create hard link
-                New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
+                try {
+                    New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
+                } catch {
+                    warn "Failed to create HardLink for $source. Falling back to SymbolicLink."
+                    New-Item -Path $source -ItemType SymbolicLink -Value $target | Out-Null
+                }
             }
         }
     }
@@ -1121,7 +1126,7 @@ function test_running_process($app, $global) {
 function New-DirectoryJunction($source, $target) {
     # test if this script is being executed inside a docker container
     if (Get-Service -Name cexecsvc -ErrorAction SilentlyContinue) {
-        cmd.exe /d /c "mklink /j `"$source`" `"$target`""
+        cmd.exe /d /c "mklink /j `"$source`" `"$target`"" 
     } else {
         New-Item -Path $source -ItemType Junction -Value $target
     }
