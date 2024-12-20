@@ -14,6 +14,9 @@ function parse_json($path) {
 function url_manifest($url) {
     $str = $null
     try {
+        if (!(Get-Command Get-UserAgent -ErrorAction SilentlyContinue)) {
+            Import-Module "$PSScriptRoot/download.ps1" -Function 'Get-UserAgent'
+        }
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $data = $wc.DownloadData($url)
