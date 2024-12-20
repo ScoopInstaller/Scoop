@@ -544,6 +544,9 @@ function Test-HelperInstalled {
 }
 
 function app_status($app, $global) {
+    if ([string]::IsNullOrWhiteSpace($app)) {
+        throw 'The value of $app may not be null, empty, or whitespace!'
+    }
     $status = @{}
     $status.installed = installed $app $global
     $status.version = Select-CurrentVersion -AppName $app -Global:$global
