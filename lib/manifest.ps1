@@ -68,6 +68,9 @@ function Get-Manifest($app) {
 }
 
 function manifest($app, $bucket, $url) {
+    if ([string]::IsNullOrWhiteSpace($app)) {
+        throw [System.ArgumentException]::new('The value of $app may not be null, empty, or whitespace!')
+    }
     if ($url) { return url_manifest $url }
     parse_json (manifest_path $app $bucket)
 }
