@@ -23,8 +23,6 @@ function url_manifest($url) {
         $str = (Get-Encoding($wc)).GetString($data)
     } catch [System.Management.Automation.MethodInvocationException] {
         warn "error: $($_.Exception.InnerException.Message)"
-    } catch {
-        throw
     }
     if (!$str) { return $null }
     try {
