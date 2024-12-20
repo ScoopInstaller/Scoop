@@ -55,8 +55,10 @@ $true, $false | ForEach-Object { # local and global apps
     $dir = appsdir $global
     if (!(Test-Path $dir)) { return }
 
-    Get-ChildItem $dir | Where-Object name -NE 'scoop' | ForEach-Object {
-        $app = $_.name
+    [string[]] $appNames = Get-ChildItem $dir -Directory -Name -Exclude 'scoop' | Where-Object Length -GT 0
+    if ($appNames.Length -eq 0) { return }
+
+    foreach ($app in $appNames) {
         $status = app_status $app $global
         if (!$status.outdated -and !$status.failed -and !$status.removed -and !$status.missing_deps) { return }
 
