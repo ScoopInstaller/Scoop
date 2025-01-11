@@ -60,7 +60,7 @@ $true, $false | ForEach-Object { # local and global apps
 
     foreach ($app in $appNames) {
         $status = app_status $app $global
-        if (!$status.outdated -and !$status.failed -and !$status.removed -and !$status.missing_deps) { continue }
+        if (-not ($status.outdated -or $status.failed -or $status.removed -or $status.missing_deps)) { continue }
 
         $item = [ordered]@{}
         $item.Name = $app
