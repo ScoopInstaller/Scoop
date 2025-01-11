@@ -457,9 +457,9 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             warn $urlstxt_content
             warn $aria2
-            warn $(new_issue_msg $app $bucket "download via aria2 failed")
+            warn $(new_issue_msg $app $bucket 'download via aria2 failed')
 
-            Write-Host "Fallback to default downloader ..."
+            Write-Host 'Fallback to default downloader ...'
 
             try {
                 foreach ($url in $urls) {
@@ -550,6 +550,9 @@ function Get-UserAgent() {
 
 function setup_proxy() {
     # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
+    if (-not (Test-Path Function:/get_config)) {
+        . "$PSScriptRoot/core.ps1"
+    }
     $proxy = get_config PROXY
     if (!$proxy) {
         return
