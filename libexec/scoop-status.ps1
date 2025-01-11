@@ -53,10 +53,10 @@ if ($needs_update) {
 $true, $false | ForEach-Object { # local and global apps
     $global = $_
     $dir = appsdir $global
-    if (!(Test-Path $dir)) { continue }
+    if (!(Test-Path $dir)) { return }
 
     [string[]] $appNames = (Get-ChildItem $dir -Directory -Name -Exclude 'scoop' | Where-Object Length -GT 0) ?? @()
-    if ($appNames.Length -eq 0) { continue }
+    if ($appNames.Length -eq 0) { return }
 
     foreach ($app in $appNames) {
         $status = app_status $app $global
