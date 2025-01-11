@@ -23,7 +23,7 @@ function Test-UpdateStatus($repopath) {
     if (Test-Path "$repopath\.git") {
         Invoke-Git -Path $repopath -ArgumentList @('fetch', '-q', 'origin')
         $script:network_failure = 128 -eq $LASTEXITCODE
-        $branch  = Invoke-Git -Path $repopath -ArgumentList @('branch', '--show-current')
+        $branch = Invoke-Git -Path $repopath -ArgumentList @('branch', '--show-current')
         $commits = Invoke-Git -Path $repopath -ArgumentList @('log', "HEAD..origin/$branch", '--oneline')
         if ($commits) { return $true }
         else { return $false }
@@ -53,23 +53,23 @@ if ($needs_update) {
 $true, $false | ForEach-Object { # local and global apps
     $global = $_
     $dir = appsdir $global
-    if (!(Test-Path $dir)) { return }
+    if (!(Test-Path $dir)) { continue }
 
     [string[]] $appNames = Get-ChildItem $dir -Directory -Name -Exclude 'scoop' | Where-Object Length -GT 0
-    if ($appNames.Length -eq 0) { return }
+    if ($appNames.Length -eq 0) { continue }
 
     foreach ($app in $appNames) {
         $status = app_status $app $global
-        if (!$status.outdated -and !$status.failed -and !$status.removed -and !$status.missing_deps) { return }
+        if (!$status.outdated -and !$status.failed -and !$status.removed -and !$status.missing_deps) { continue }
 
         $item = [ordered]@{}
         $item.Name = $app
         $item.'Installed Version' = $status.version
-        $item.'Latest Version' = if ($status.outdated) { $status.latest_version } else { "" }
+        $item.'Latest Version' = if ($status.outdated) { $status.latest_version } else { '' }
         $item.'Missing Dependencies' = $status.missing_deps -Split ' ' -Join ' | '
         $info = @()
-        if ($status.failed)  { $info += 'Install failed' }
-        if ($status.hold)    { $info += 'Held package' }
+        if ($status.failed) { $info += 'Install failed' }
+        if ($status.hold) { $info += 'Held package' }
         if ($status.removed) { $info += 'Manifest removed' }
         $item.Info = $info -join ', '
         $list += [PSCustomObject]$item
