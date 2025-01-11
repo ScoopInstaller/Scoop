@@ -55,7 +55,7 @@ $true, $false | ForEach-Object { # local and global apps
     $dir = appsdir $global
     if (!(Test-Path $dir)) { continue }
 
-    [string[]] $appNames = Get-ChildItem $dir -Directory -Name -Exclude 'scoop' | Where-Object Length -GT 0
+    [string[]] $appNames = (Get-ChildItem $dir -Directory -Name -Exclude 'scoop' | Where-Object Length -GT 0) ?? @()
     if ($appNames.Length -eq 0) { continue }
 
     foreach ($app in $appNames) {
