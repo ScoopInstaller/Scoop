@@ -136,6 +136,19 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
     if (!$hash) {
         $hash = json_path_legacy $json $jsonpath $substitutions
     }
+
+    # convert base64 encoded hash values
+    if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
+        $base64 = $matches[0]
+        if (!($hash -match '^[a-fA-F0-9]+$') -and $hash.Length -notin @(32, 40, 64, 128)) {
+            try {
+                $hash = ([System.Convert]::FromBase64String($base64) | ForEach-Object { $_.ToString('x2') }) -join ''
+            } catch {
+                $hash = $hash
+            }
+        }
+    }
+
     return format_hash $hash
 }
 
