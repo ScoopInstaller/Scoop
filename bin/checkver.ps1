@@ -170,7 +170,7 @@ $Queue | ForEach-Object {
             error "$name checkver expects the homepage to be an Apache project page"
         }
         $url = "https://projects.apache.org/json/projects/$project.json"
-        $jsonpath = '$.release[*].revision'
+        $jsonpath = '$.release[0].revision'
     }
 
     # SourceForge
