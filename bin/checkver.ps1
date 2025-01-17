@@ -164,10 +164,10 @@ $Queue | ForEach-Object {
 
     # Apache
     if ($json.checkver -eq 'apache') {
-        if ($json.homepage -match '//(?<project>[^.]+)\.apache\.org') {
+        if ($json.homepage.TrimEnd('/') -match '//(?<project>[^.]+)\.apache\.org') {
             $project = $Matches['project']
         } else {
-            error "$name checkver expects the homepage to be a apache project page"
+            error "$name checkver expects the homepage to be an Apache project page"
         }
         $url = "https://projects.apache.org/json/projects/$project.json"
         $jsonpath = '$.release[*].revision'
