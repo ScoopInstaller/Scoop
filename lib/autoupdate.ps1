@@ -1,4 +1,17 @@
 # Must included with 'json.ps1'
+
+function format_hash([String] $hash) {
+    $hash = $hash.toLower()
+    switch ($hash.Length) {
+        32 { $hash = "md5:$hash" } # md5
+        40 { $hash = "sha1:$hash" } # sha1
+        64 { $hash = $hash } # sha256
+        128 { $hash = "sha512:$hash" } # sha512
+        default { $hash = $null }
+    }
+    return $hash
+}
+
 function find_hash_in_rdf([String] $url, [String] $basename) {
     $xml = $null
     try {
