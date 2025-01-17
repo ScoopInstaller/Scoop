@@ -23,7 +23,7 @@
 - **shim:** Update kiennq-shim to v3.1.2 ([#6261](https://github.com/ScoopInstaller/Scoop/issues/6261))
 
 ## [v0.5.2](https://github.com/ScoopInstaller/Scoop/compare/v0.5.1...v0.5.2) - 2024-07-26
- 
+
 ### Bug Fixes
 
 - **scoop-alias:** Fix 'Option --verbose not recognized.' ([#6062](https://github.com/ScoopInstaller/Scoop/issues/6062))
