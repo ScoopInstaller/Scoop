@@ -162,6 +162,17 @@ $Queue | ForEach-Object {
         if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
     }
 
+    # Apache
+    if ($json.checkver -eq 'apache') {
+        if ($json.homepage -match '//(?<project>[^.]+)\.apache\.org') {
+            $project = $Matches['project']
+        } else {
+            error "$name checkver expects the homepage to be a apache project page"
+        }
+        $url = "https://projects.apache.org/json/projects/$project.json"
+        $jsonpath = '$.release[*].revision'
+    }
+
     # SourceForge
     if ($regex) {
         $sourceforgeRegex = $regex
