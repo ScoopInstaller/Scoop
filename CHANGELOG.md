@@ -1,3 +1,5 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
 ### Features
 
 - **checkver:** Implement SourceForge checkver functionality ([#6273](https://github.com/ScoopInstaller/Scoop/pull/6273))
