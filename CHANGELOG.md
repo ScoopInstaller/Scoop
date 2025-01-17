@@ -2,7 +2,7 @@
 
 ### Features
 
-- **checkver:** Implement SourceForge checkver functionality ([#6273](https://github.com/ScoopInstaller/Scoop/pull/6273))
+- **checkver:** Implement Apache checkver functionality ([#6273](https://github.com/ScoopInstaller/Scoop/pull/6273))
 
 ## [v0.5.2](https://github.com/ScoopInstaller/Scoop/compare/v0.5.1...v0.5.2) - 2024-07-26
  
