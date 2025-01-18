@@ -1,6 +1,21 @@
 # Must included with 'json.ps1'
 
 function format_hash([String] $hash) {
+
+    # convert base64 encoded hash values to hex string
+    if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
+        $base64 = $matches[0]
+        if (!($hash -match '^[a-fA-F0-9]+$') -and $hash.Length -notin @(32, 40, 64, 128)) {
+            try {
+                $hash = ([System.Convert]::FromBase64String($base64) | ForEach-Object { $_.ToString('x2') }) -join ''
+            } catch {
+                $hash = $hash
+            }
+        }
+    }
+
+    debug $hash
+
     $hash = $hash.toLower()
 
     # Workaround for GitHub API:
@@ -81,18 +96,6 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $hash = $matches[1] -replace '\s', ''
     }
 
-    # convert base64 encoded hash values
-    if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
-        $base64 = $matches[0]
-        if (!($hash -match '^[a-fA-F0-9]+$') -and $hash.Length -notin @(32, 40, 64, 128)) {
-            try {
-                $hash = ([System.Convert]::FromBase64String($base64) | ForEach-Object { $_.ToString('x2') }) -join ''
-            } catch {
-                $hash = $hash
-            }
-        }
-    }
-
     # find hash with filename in $hashfile
     if ($hash.Length -eq 0) {
         $filenameRegex = "([a-fA-F0-9]{32,128})[\x20\t]+.*`$basename(?:\s|$)|`$basename[\x20\t]+.*?([a-fA-F0-9]{32,128})"
@@ -135,18 +138,6 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
     $hash = json_path $json $jsonpath $substitutions
     if (!$hash) {
         $hash = json_path_legacy $json $jsonpath $substitutions
-    }
-
-    # convert base64 encoded hash values
-    if ($hash -match '^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=|[A-Za-z0-9+\/]{4})$') {
-        $base64 = $matches[0]
-        if (!($hash -match '^[a-fA-F0-9]+$') -and $hash.Length -notin @(32, 40, 64, 128)) {
-            try {
-                $hash = ([System.Convert]::FromBase64String($base64) | ForEach-Object { $_.ToString('x2') }) -join ''
-            } catch {
-                $hash = $hash
-            }
-        }
     }
 
     return format_hash $hash
@@ -206,8 +197,7 @@ function find_hash_in_headers([String] $url) {
         $res = $req.GetResponse()
         if (([int]$res.StatusCode -ge 300) -and ([int]$res.StatusCode -lt 400)) {
             if ($res.Headers['Digest'] -match 'SHA-256=([^,]+)' -or $res.Headers['Digest'] -match 'SHA=([^,]+)' -or $res.Headers['Digest'] -match 'MD5=([^,]+)') {
-                $hash = ([System.Convert]::FromBase64String($matches[1]) | ForEach-Object { $_.ToString('x2') }) -join ''
-                debug $hash
+                $hash = $matches[1]
             }
         }
         $res.Close()
