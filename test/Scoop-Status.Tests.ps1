@@ -2,9 +2,7 @@
 Describe -Skip 'Show status and check for new app versions' -Tag 'Scoop' {
     # scoop-status.ps1 is not structured in a way that makes this easy to test
     # todo: refactor scoop-status.ps1's loop bodies to functions for easier testing
-    It 'throws when Global or User appdir is empty or does not exist' -Skip {
-
-    }
+    It 'throws when Global or User appdir is empty or does not exist' -Skip { }
 }
 
 Describe 'Test-UpdateStatus' -Tag 'Scoop' {
@@ -12,13 +10,9 @@ Describe 'Test-UpdateStatus' -Tag 'Scoop' {
         . "$PSScriptRoot/../libexec/scoop-status.ps1"
     }
     # todo
-    It -Skip 'should return $true if $commits is falsy' {
-
-    }
+    It -Skip 'should return $true if $commits is falsy' {}
     # todo
-    It -Skip 'should return $false if $commits is truthy' {
-
-    }
+    It -Skip 'should return $false if $commits is truthy' {}
     It 'should return $true if "$repopath\.git`" does not exist' {
         function makeTmpDir {
             [OutputType([System.IO.DirectoryInfo])]
