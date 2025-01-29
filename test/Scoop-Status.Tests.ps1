@@ -5,7 +5,8 @@ Describe -Skip 'Show status and check for new app versions' -Tag 'Scoop' {
     It 'throws when Global or User appdir is empty or does not exist' -Skip { }
 }
 
-Describe 'Test-UpdateStatus' -Tag 'Scoop' {
+# todo: add bucket fixtures for CI tests
+Describe 'Test-UpdateStatus' -Tag 'Scoop' -Skip:($env:CI -eq $true) {
     BeforeAll {
         . "$PSScriptRoot/../libexec/scoop-status.ps1"
     }
