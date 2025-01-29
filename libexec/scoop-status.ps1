@@ -6,6 +6,7 @@
 
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest' 'parse_json' "install_info"
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\buckets.ps1" # 'Get-LocalBucket'
 
 # check if scoop needs updating
 $currentdir = versiondir 'scoop' 'current'
