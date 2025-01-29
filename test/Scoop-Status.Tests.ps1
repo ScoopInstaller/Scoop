@@ -1,11 +1,3 @@
-# copied from scoop-status.ps1 and modified
-BeforeAll {
-    . "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest' 'parse_json' "install_info"
-    . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
-    . "$PSScriptRoot\..\lib\core.ps1" # 'versiondir'
-}
-
-# script-level content
 # todo
 Describe -Skip 'Show status and check for new app versions' -Tag 'Scoop' {
     # scoop-status.ps1 is not structured in a way that makes this easy to test
