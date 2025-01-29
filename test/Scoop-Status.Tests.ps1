@@ -51,9 +51,7 @@ Describe 'Test-UpdateStatus' -Tag 'Scoop' {
                 $tmpDirPath = Join-Path $env:TEMP $(New-Guid)
             }
 
-            [System.IO.DirectoryInfo] $TmpDirInfo = New-Item $tmpDirPath -ItemType Directory
-            return $TmpDirInfo
-
+            return (New-Item $tmpDirPath -ItemType Directory)
         }
         [System.IO.DirectoryInfo] $emptyDir = makeTmpDir
         Test-UpdateStatus $emptyDir.FullName | Should -Be $true
