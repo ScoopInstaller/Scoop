@@ -3,19 +3,6 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\manifest.ps1" # 'manifest' 'parse_json' "install_info"
     . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
     . "$PSScriptRoot\..\lib\core.ps1" # 'versiondir'
-    Import-Module "$PSScriptRoot\..\lib\core.ps1" -Function 'versiondir'
-
-    # check if scoop needs updating
-    $currentdir = versiondir 'scoop' 'current'
-    $needs_update = $false
-    $bucket_needs_update = $false
-    $script:network_failure = $false
-    $no_remotes = $args[0] -eq '-l' -or $args[0] -eq '--local'
-    if (!(Get-Command git -ErrorAction SilentlyContinue)) { $no_remotes = $true }
-    $list = @()
-    if (!(Get-FormatData ScoopStatus)) {
-        Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
-    }
 }
 
 # script-level content
@@ -30,7 +17,7 @@ Describe -Skip 'Show status and check for new app versions' -Tag 'Scoop' {
 
 Describe 'Test-UpdateStatus' -Tag 'Scoop' {
     BeforeAll {
-        Import-Module "$PSScriptRoot/../libexec/scoop-status.ps1" -Function 'Test-UpdateStatus'
+        . "$PSScriptRoot/../libexec/scoop-status.ps1"
     }
     # todo
     It -Skip 'should return $true if $commits is falsy' {
