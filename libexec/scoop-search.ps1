@@ -93,7 +93,9 @@ function search_bucket_legacy($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
     $apps | ForEach-Object {
-        $manifest = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
+        $content = [System.IO.File]::ReadAllText($_.FullName)
+        if ($content -notmatch $query) { return }
+        $manifest = ConvertFrom-Json $content -ErrorAction Continue
         $name = $_.BaseName
 
         if ($name -match $query) {
