@@ -28,67 +28,6 @@ function bin_match($manifest, $query) {
     else { return $false }
 }
 
-function bin_match_json($json, $query) {
-    [System.Text.Json.JsonElement]$bin = [System.Text.Json.JsonElement]::new()
-    if (!$json.RootElement.TryGetProperty('bin', [ref] $bin)) { return $false }
-    $bins = @()
-    if ($bin.ValueKind -eq [System.Text.Json.JsonValueKind]::String -and [System.IO.Path]::GetFileNameWithoutExtension($bin) -match $query) {
-        $bins += [System.IO.Path]::GetFileName($bin)
-    } elseif ($bin.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
-        foreach ($subbin in $bin.EnumerateArray()) {
-            if ($subbin.ValueKind -eq [System.Text.Json.JsonValueKind]::String -and [System.IO.Path]::GetFileNameWithoutExtension($subbin) -match $query) {
-                $bins += [System.IO.Path]::GetFileName($subbin)
-            } elseif ($subbin.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
-                if ([System.IO.Path]::GetFileNameWithoutExtension($subbin[0]) -match $query) {
-                    $bins += [System.IO.Path]::GetFileName($subbin[0])
-                } elseif ($subbin.GetArrayLength() -ge 2 -and $subbin[1] -match $query) {
-                    $bins += $subbin[1]
-                }
-            }
-        }
-    }
-
-    if ($bins) { return $bins }
-    else { return $false }
-}
-
-function search_bucket($bucket, $query) {
-    $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
-
-    $apps | ForEach-Object {
-        $filepath = $_.FullName
-
-        $json = try {
-            [System.Text.Json.JsonDocument]::Parse([System.IO.File]::ReadAllText($filepath))
-        } catch {
-            debug "Failed to parse manifest file: $filepath (error: $_)"
-            return
-        }
-
-        $name = $_.BaseName
-
-        if ($name -match $query) {
-            $list.Add([PSCustomObject]@{
-                    Name     = $name
-                    Version  = $json.RootElement.GetProperty('version')
-                    Source   = $bucket
-                    Binaries = ''
-                })
-        } else {
-            $bin = bin_match_json $json $query
-            if ($bin) {
-                $list.Add([PSCustomObject]@{
-                        Name     = $name
-                        Version  = $json.RootElement.GetProperty('version')
-                        Source   = $bucket
-                        Binaries = $bin -join ' | '
-                    })
-            }
-        }
-    }
-}
-
-# fallback function for PowerShell 5
 function search_bucket_legacy($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
@@ -178,15 +117,7 @@ if (get_config USE_SQLITE_CACHE) {
         abort "Invalid regular expression: $($_.Exception.InnerException.Message)"
     }
 
-    $jsonTextAvailable = [System.AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.Location) -eq 'System.Text.Json' }
-
-    Get-LocalBucket | ForEach-Object {
-        if ($jsonTextAvailable) {
-            search_bucket $_ $query
-        } else {
-            search_bucket_legacy $_ $query
-        }
-    }
+    Get-LocalBucket | ForEach-Object {search_bucket_legacy $_ $query}
 }
 
 if ($list.Count -gt 0) {
