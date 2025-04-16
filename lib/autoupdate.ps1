@@ -476,6 +476,13 @@ function Invoke-AutoUpdate {
     }
     $updatedProperties = $updatedProperties | Select-Object -Unique
     debug [$updatedProperties]
+
+    # Remove unnecessary architectures to prevent download errors and improve hash speed.
+    $archlessManifest = [PSCustomObject]@{}
+    $targetArch = Get-DefaultArchitecture
+    Get-ArchlessManifest $Manifest $archlessManifest $targetArch
+    $Manifest = $archlessManifest
+
     $hasChanged = Update-ManifestProperty -Manifest $Manifest -Property $updatedProperties -AppName $AppName -Version $Version -Substitutions $substitutions
 
     if ($hasChanged) {
@@ -506,6 +513,32 @@ function Invoke-AutoUpdate {
     } else {
         # This if-else branch may not be in use.
         Write-Host "No updates for $AppName" -ForegroundColor DarkGray
+    }
+}
+
+function Get-ArchlessManifest {
+    param (
+        [PSObject]
+        $Manifest,
+        [PSObject]
+        $targetManifest,
+        [String]
+        $targetArch
+    )
+
+    $Manifest.PSObject.Properties | ForEach-Object {
+        $propertyName = $_.Name
+        if ($propertyName -eq 'architecture') {
+            $Manifest.architecture.$targetArch.PSObject.Properties | ForEach-Object {
+                $archPropertyName = $_.Name
+                $targetManifest | Add-Member -MemberType NoteProperty -Name $archPropertyName -Value $Manifest.architecture.$targetArch.$archPropertyName -Force
+            }
+        } elseif ($propertyName -eq 'autoupdate') {
+            $targetManifest | Add-Member -MemberType NoteProperty -Name 'autoupdate' -Value ([PSCustomObject]@{}) -Force
+            Get-ArchlessManifest $Manifest.autoupdate $targetManifest.autoupdate $targetArch
+        } else {
+            $targetManifest | Add-Member -MemberType NoteProperty -Name $propertyName -Value $Manifest.$propertyName -Force
+        }
     }
 }
 
