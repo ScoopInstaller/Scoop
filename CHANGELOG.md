@@ -1,14 +1,10 @@
-## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
-
-### Bug Fixes
-- **decompress**: replace deprecated 7ZIPEXTRACT_USE_EXTERNAL config with USE_EXTERNAL_7ZIP
-
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
 
 ### Bug Fixes
 
 - **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
 - **decompress**: `Expand-7zipArchive` only delete temp dir / `$extractDir` if it is empty ([#6092](https://github.com/ScoopInstaller/Scoop/issues/6092))
+- **decompress**: Replace deprecated 7ZIPEXTRACT_USE_EXTERNAL config with USE_EXTERNAL_7ZIP ([#6327](https://github.com/ScoopInstaller/Scoop/issues/6327))
 - **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
 - **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
 - **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
