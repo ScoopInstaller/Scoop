@@ -14,14 +14,15 @@ function parse_json($path) {
 function url_manifest($url) {
     $str = $null
     try {
+        if (-not (Test-Path Function:/Get-UserAgent)) {
+            . "$PSScriptRoot/download.ps1"
+        }
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $data = $wc.DownloadData($url)
         $str = (Get-Encoding($wc)).GetString($data)
-    } catch [system.management.automation.methodinvocationexception] {
-        warn "error: $($_.exception.innerexception.message)"
-    } catch {
-        throw
+    } catch [System.Management.Automation.MethodInvocationException] {
+        warn "error: $($_.Exception.InnerException.Message)"
     }
     if (!$str) { return $null }
     try {
@@ -68,6 +69,9 @@ function Get-Manifest($app) {
 }
 
 function manifest($app, $bucket, $url) {
+    if ([string]::IsNullOrWhiteSpace($app)) {
+        throw [System.ArgumentException]::new('The value of $app may not be null, empty, or whitespace!')
+    }
     if ($url) { return url_manifest $url }
     parse_json (manifest_path $app $bucket)
 }
