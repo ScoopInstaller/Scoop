@@ -473,11 +473,13 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
                 # we don't have neither source nor target data! we need to create an empty target,
-                # but we can't make a judgement that the data should be a file or directory...
-                # so we create a directory by default. to avoid this, use pre_install
+                # if target has an extension, it's a file, otherwise it's a directory...
+                # To avoid this heuristic, use pre_install
                 # to create the source file before persisting (DON'T use post_install)
             } else {
-                $target = New-Object System.IO.DirectoryInfo($target)
+                $ext = [IO.Path]::GetExtension($target)
+                if ($ext -eq "" ){$target = New-Object System.IO.DirectoryInfo($target)
+                } else           {$target = New-Item -Path $target -ItemType "file"}
                 ensure $target | Out-Null
             }
 
