@@ -610,7 +610,7 @@ function Get-AbsolutePath {
         Path to manipulate
     .OUTPUTS
         System.String
-            Absolute path, may or maynot existed
+            Absolute path, may or may not existed
     #>
     [CmdletBinding()]
     [OutputType([string])]

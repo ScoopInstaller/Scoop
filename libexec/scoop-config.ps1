@@ -34,7 +34,7 @@
 #       The 'current' version alias will not be used. Shims and shortcuts will point to specific version instead.
 #
 # scoop_repo: http://github.com/ScoopInstaller/Scoop
-#       Git repository containining scoop source code.
+#       Git repository containing scoop source code.
 #       This configuration is useful for custom forks.
 #
 # scoop_branch: master|develop
@@ -137,7 +137,7 @@
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-retry-wait'
 #
 # aria2-split: 5
-#       Number of connections used for downlaod.
+#       Number of connections used for download.
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-s'
 #
 # aria2-max-connection-per-server: 5
@@ -145,7 +145,7 @@
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-x'
 #
 # aria2-min-split-size: 5M
-#       Downloaded files will be splitted by this configured size and downloaded using multiple connections.
+#       Downloaded files will be split by this configured size and downloaded using multiple connections.
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-k'
 #
 # aria2-options:
