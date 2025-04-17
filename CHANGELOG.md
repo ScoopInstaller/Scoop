@@ -8,6 +8,7 @@
 - **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
 - **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
 - **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
+- **shortcuts**: Add target match in Path and correctly set working directory ([#6243](https://github.com/ScoopInstaller/Scoop/issues/6243))
 
 ### Code Refactoring
 
