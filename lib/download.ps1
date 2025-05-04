@@ -55,6 +55,12 @@ function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $us
 
     if (!(Test-Path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
+
+        # ensure cachedir is marked as a cache directory
+        if (!(Test-TaggedAsCacheDir -Path $cachedir)) {
+            Set-CacheDirTag -Path $cachedir
+        }
+
         Start-Download $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -Force
     } else { Write-Host "Loading $(url_remote_filename $url) from cache" }
@@ -416,6 +422,12 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         # write aria2 input file
         if ($urlstxt_content -ne '') {
             ensure $cachedir | Out-Null
+
+            # ensure cachedir is marked as a cache directory
+            if (!(Test-TaggedAsCacheDir -Path $cachedir)) {
+                Set-CacheDirTag -Path $cachedir
+            }
+
             # Write aria2 input-file with UTF8NoBOM encoding
             $urlstxt_content | Out-UTF8File -FilePath $urlstxt
         }

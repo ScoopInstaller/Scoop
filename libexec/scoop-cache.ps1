@@ -25,7 +25,7 @@ function cacheshow($app) {
     } else {
         $app = '(' + ($app -join '|') + ')'
     }
-    $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+    $files = @(Get-ChildItem $cachedir -Exclude $cachedirTagFilename | Where-Object -Property Name -Value "^$app#" -Match)
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
     $files | ForEach-Object { cacheinfo $_ } | Select-Object Name, Version, Length
@@ -39,10 +39,10 @@ function cacheremove($app) {
         my_usage
         exit 1
     } elseif ($app -eq '*' -or $app -eq '-a' -or $app -eq '--all') {
-        $files = @(Get-ChildItem $cachedir)
+        $files = @(Get-ChildItem $cachedir -Exclude $cachedirTagFilename)
     } else {
         $app = '(' + ($app -join '|') + ')'
-        $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+        $files = @(Get-ChildItem $cachedir -Exclude $cachedirTagFilename | Where-Object -Property Name -Value "^$app#" -Match)
     }
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
@@ -53,6 +53,11 @@ function cacheremove($app) {
         if(Test-Path "$cachedir\$($curr.Name).txt") {
             Remove-Item "$cachedir\$($curr.Name).txt"
         }
+    }
+
+    # ensure cachedir is marked as a cache directory
+    if (!(Test-TaggedAsCacheDir -Path $cachedir)) {
+        Set-CacheDirTag -Path $cachedir
     }
 
     Write-Host "Deleted: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
