@@ -413,6 +413,73 @@ function file_path($app, $file) {
     Get-AppFilePath -App $app -File $file
 }
 
+# marks a directory as a cache
+function Set-CacheDirTag {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $Path,
+        [Parameter()]
+        [String]
+        $Application = "Scoop"
+    )
+
+    $FileInfo = New-Object System.IO.FileInfo (Join-Path $Path $cachedirTagFilename)
+
+    if ($FileInfo.Exists) {
+        $FileInfo.Delete()
+    }
+
+    $Content = "$cachedirTagSignature`r`n$cachedirTagTemplate" -f $Application
+
+    $Content | Out-File -FilePath $FileInfo -Encoding ASCII
+}
+
+# checks if a directory is marked as a cache
+function Test-TaggedAsCacheDir {
+    [CmdletBinding()]
+    [OutputType([Bool])]
+    param(
+        [Parameter(Mandatory = $true, Position = 1)]
+        [String]
+        $Path
+    )
+
+    $FileInfo = New-Object System.IO.FileInfo (Join-Path $Path $cachedirTagFilename)
+
+    # should exist
+    if ($FileInfo.Exists -eq $False) {
+        return $False
+    }
+
+    # ignore symlink
+    if ($FileInfo.Attributes.HasFlag([System.IO.FileAttributes]::ReparsePoint)) {
+        return $False
+    }
+
+    # should not be a directory
+    if ($FileInfo.Attributes.HasFlag([System.IO.FileAttributes]::Directory)) {
+        return $False
+    }
+
+    # should contain signature
+    try {
+        if ((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
+            # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
+            $Bytes = Get-Content $FileInfo -AsByteStream -TotalCount $cachedirTagSignature.Length
+        } else {
+            $Bytes = Get-Content $FileInfo -Encoding byte -TotalCount $cachedirTagSignature.Length
+        }
+        $ReadSignature = [System.Text.Encoding]::UTF8.GetString($Bytes)
+        return $ReadSignature -eq $cachedirTagSignature
+    } catch {
+        return $False
+    }
+
+    return $False
+}
+
 function Get-AppFilePath {
     [CmdletBinding()]
     [OutputType([String])]
@@ -1297,6 +1364,12 @@ $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+
+$cachedirTagFilename = 'CACHEDIR.TAG'
+$cachedirTagSignature = 'Signature: 8a477f597d28d172789f06886806bc55'
+$cachedirTagTemplate  = "# This file is a cache directory tag created by ({0}).`r`n"
+$cachedirTagTemplate += "# For information about cache directory tags, see:`r`n"
+$cachedirTagTemplate += "#`thttps://bford.info/cachedir/"
 
 # Scoop apps' PATH Environment Variable
 $scoopPathEnvVar = switch (get_config USE_ISOLATED_PATH) {
