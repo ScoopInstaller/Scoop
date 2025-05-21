@@ -1040,7 +1040,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 Move-Item $source $target
                 # we don't have neither source nor target data! we need to create an empty target. decide target type by extension
             } else {
-                if ($source -match '\.[^\\\/]+$') {
+                if ($source -match '\.[A-Za-z0-9]{2,4}$') {
                     # treat as file: ensure parent dir, then create empty file
                     $parent = Split-Path -Path $target
                     ensure (New-Object System.IO.DirectoryInfo($parent)) | Out-Null
