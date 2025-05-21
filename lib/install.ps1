@@ -1038,21 +1038,19 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 # ensure target parent folder exist
                 ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
-                # we don't have neither source nor target data! we need to create an empty target. decide target type by extension
+                # we don't have neither source nor target data! we need to create an empty target,
+                # infer target type from extension
+            } elseif ($source -match '\.(ini|cfg|xml|txt|dat|log|key|yml|ps1|lua|pem)$') {
+                # treat as file: ensure parent dir, then create empty file
+                $parent = Split-Path -Path $target
+                ensure (New-Object System.IO.DirectoryInfo($parent)) | Out-Null
+                New-Item -Path $target -ItemType File -Force | Out-Null
+                # represent it as a FileInfo object for later linking
+                $target = New-Object System.IO.FileInfo($target)
             } else {
-                if ($source -match '\.[A-Za-z0-9]{2,4}$') {
-                    # treat as file: ensure parent dir, then create empty file
-                    $parent = Split-Path -Path $target
-                    ensure (New-Object System.IO.DirectoryInfo($parent)) | Out-Null
-                    New-Item -Path $target -ItemType File -Force | Out-Null
-                    # represent it as a FileInfo object for later linking
-                    $target = New-Object System.IO.FileInfo($target)
-                }
-                else {
-                    # treat as directory
-                    $target = New-Object System.IO.DirectoryInfo($target)
-                    ensure $target | Out-Null
-                }
+                # treat as directory
+                $target = New-Object System.IO.DirectoryInfo($target)
+                ensure $target | Out-Null
             }
 
             # create link
