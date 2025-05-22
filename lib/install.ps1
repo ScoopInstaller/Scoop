@@ -497,6 +497,10 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                     if (Test-Path $source) {
                         # if there is also a source data, rename it (to keep a original backup)
                         Move-Item -Force $source "$source.original"
+                    } else {
+                        # file that in subdirectory
+                        # ensure target parent folder exist
+                        ensure (Split-Path -Path $source) | Out-Null
                     }
                 } elseif (Test-Path $source) {
                     # we don't have persist data in the store, move the source to target
@@ -506,9 +510,9 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 } else {
                     ensure (Split-Path -Path $source) | Out-Null
                     ensure (Split-Path -Path $target) | Out-Null
-                    $target = New-Object System.IO.DirectoryInfo($target)
                     # Create empty target with defined type
                     if ($type -eq 'Directory') {
+                        $target = New-Object System.IO.DirectoryInfo($target)
                         ensure $target | Out-Null
                     } else {
                         New-Item -Path $target | Out-Null
