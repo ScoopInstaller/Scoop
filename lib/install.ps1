@@ -504,6 +504,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                     ensure (Split-Path -Path $target) | Out-Null
                     Move-Item $source $target
                 } else {
+                    ensure (Split-Path -Path $source) | Out-Null
+                    ensure (Split-Path -Path $target) | Out-Null
                     $target = New-Object System.IO.DirectoryInfo($target)
                     # Create empty target with defined type
                     if ($type -eq 'Directory') {
@@ -531,8 +533,23 @@ function persist_data($manifest, $original_dir, $persist_dir) {
 function unlink_persist_data($manifest, $dir) {
     $persist = $manifest.persist
     # unlink all junction / hard link in the directory
-    if ($persist) {
-        @($persist) | ForEach-Object {
+
+    $persisted = [System.Collections.ArrayList]@()
+
+    if ($persist -is [PSCustomObject]) {
+        foreach ($item in $persist.file) {
+            $persisted.Add($item) | Out-Null
+        }
+        foreach ($item in $persist.Directory) {
+            $persisted.Add($item) | Out-Null
+        }
+    } else {
+        # Support for old style persist
+        $persisted = @($persist)
+    }
+
+    if ($persisted) {
+        $persisted | ForEach-Object {
             $source, $null = persist_def $_
             $source = Get-Item "$dir\$source" -ErrorAction SilentlyContinue
             if ($source.LinkType) {
