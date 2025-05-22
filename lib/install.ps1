@@ -447,48 +447,80 @@ function persist_data($manifest, $original_dir, $persist_dir) {
     if ($persist) {
         $persist_dir = ensure $persist_dir
 
-        if ($persist -is [String]) {
-            $persist = @($persist)
+        $persistence = [PSCustomObject]@{
+            File      = [System.Collections.ArrayList]@()
+            Directory = [System.Collections.ArrayList]@()
         }
 
-        $persist | ForEach-Object {
-            $source, $target = persist_def $_
-
-            Write-Host "Persisting $source"
-
-            $source = $source.TrimEnd('/').TrimEnd('\\')
-
-            $source = "$dir\$source"
-            $target = "$persist_dir\$target"
-
-            # if we have had persist data in the store, just create link and go
-            if (Test-Path $target) {
-                # if there is also a source data, rename it (to keep a original backup)
-                if (Test-Path $source) {
-                    Move-Item -Force $source "$source.original"
-                }
-                # we don't have persist data in the store, move the source to target, then create link
-            } elseif (Test-Path $source) {
-                # ensure target parent folder exist
-                ensure (Split-Path -Path $target) | Out-Null
-                Move-Item $source $target
-                # we don't have neither source nor target data! we need to create an empty target,
-                # but we can't make a judgement that the data should be a file or directory...
-                # so we create a directory by default. to avoid this, use pre_install
-                # to create the source file before persisting (DON'T use post_install)
-            } else {
-                $target = New-Object System.IO.DirectoryInfo($target)
-                ensure $target | Out-Null
+        if ($persist -is [PSCustomObject]) {
+            foreach ($item in $persist.file) {
+                $persistence.File.Add($item) | Out-Null
             }
+            foreach ($item in $persist.Directory) {
+                $persistence.Directory.Add($item) | Out-Null
+            }
+        } else {
+            # Support for old style persist
+            if ($persist -is [String]) {
+                $persist = @($persist)
+            }
+            foreach ($item in $persist) {
+                $source = $item
+                if ($item -isnot [String]) {
+                    $source = $item[0]
+                }
+                if ((is_directory "$original_dir\$source") -or (!(Test-Path "$original_dir\$source"))) {
+                    $persistence.Directory.Add($item) | Out-Null
+                } else {
+                    $persistence.File.Add($item) | Out-Null
+                }
+            }
+        }
 
-            # create link
-            if (is_directory $target) {
-                # target is a directory, create junction
-                New-DirectoryJunction $source $target | Out-Null
-                attrib $source +R /L
-            } else {
-                # target is a file, create hard link
-                New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
+        foreach ($property in $persistence.PSObject.Properties) {
+            $type = $property.Name
+            $items = $property.Value
+
+            foreach ($item in $items) {
+                warn $item
+                $source, $target = persist_def $item
+                Write-Host "Persisting $($type.ToLower()) $source"
+                $source = $source.TrimEnd('/').TrimEnd('\\')
+                $source = "$dir\$source"
+                $target = "$persist_dir\$target"
+
+                # TODO: maybe we should check if the target is wrong type then remove it, or rename it (for avoiding data loss)
+
+                if (Test-Path $target) {
+                    # if we have had persist data in the store, just create link and go
+                    if (Test-Path $source) {
+                        # if there is also a source data, rename it (to keep a original backup)
+                        Move-Item -Force $source "$source.original"
+                    }
+                } elseif (Test-Path $source) {
+                    # we don't have persist data in the store, move the source to target
+                    # ensure target parent folder exist
+                    ensure (Split-Path -Path $target) | Out-Null
+                    Move-Item $source $target
+                } else {
+                    $target = New-Object System.IO.DirectoryInfo($target)
+                    # Create empty target with defined type
+                    if ($type -eq 'Directory') {
+                        ensure $target | Out-Null
+                    } else {
+                        New-Item -Path $target | Out-Null
+                    }
+                }
+
+                # create link
+                if (is_directory $target) {
+                    # target is a directory, create junction
+                    New-DirectoryJunction $source $target | Out-Null
+                    attrib $source +R /L
+                } else {
+                    # target is a file, create hard link
+                    New-Item -Path $source -ItemType HardLink -Value $target | Out-Null
+                }
             }
         }
     }
