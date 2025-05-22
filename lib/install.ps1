@@ -453,14 +453,10 @@ function persist_data($manifest, $original_dir, $persist_dir) {
         }
 
         if ($persist -is [PSCustomObject]) {
-            foreach ($item in $persist.file) {
-                $persistence.File.Add($item) | Out-Null
-            }
-            foreach ($item in $persist.Directory) {
-                $persistence.Directory.Add($item) | Out-Null
-            }
+            $persistence.File.AddRange(@($persist.file)) | Out-Null
+            $persistence.Directory.AddRange(@($persist.directory)) | Out-Null
         } else {
-            # Support for old style persist
+            # legacy persist format support
             if ($persist -is [String]) {
                 $persist = @($persist)
             }
@@ -470,7 +466,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                     $source = $item[0]
                 }
                 if ((is_directory "$original_dir\$source") -or (!(Test-Path "$original_dir\$source"))) {
-                    # non-existing path will be categorized as directory
+                    # Non-existent paths will be categorized as Directory
                     $persistence.Directory.Add($item) | Out-Null
                 } else {
                     $persistence.File.Add($item) | Out-Null
@@ -489,7 +485,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 $source = "$dir\$source"
                 $target = "$persist_dir\$target"
 
-                # TODO: maybe we should check if the target is wrong type then remove it, or rename it (for avoiding data loss)
+                #? maybe we should check if the target is wrong type then remove it, or rename it (for avoiding data loss)
 
                 if (Test-Path $target) {
                     # if we have had persist data in the store, just create link and go
@@ -518,7 +514,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                     }
                 }
 
-                # TODO: while we categorized persist items, we could make some changes here.
+                #? while persistent items have been categorized, we could make some changes here
                 # create link
                 if (is_directory $target) {
                     # target is a directory, create junction
@@ -547,8 +543,8 @@ function unlink_persist_data($manifest, $dir) {
             $persisted.Add($item) | Out-Null
         }
     } else {
-        # Support for old style persist
-        $persisted = @($persist)
+        # legacy persist format support
+        $persisted.AddRange(@($persist))
     }
 
     if ($persisted) {
