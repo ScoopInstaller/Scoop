@@ -483,9 +483,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             $items = $property.Value
 
             foreach ($item in $items) {
-                warn $item
                 $source, $target = persist_def $item
-                Write-Host "Persisting $($type.ToLower()) $source"
+                Write-Host "Persisting $($type.ToLower()) '$source'"
                 $source = $source.TrimEnd('/').TrimEnd('\\')
                 $source = "$dir\$source"
                 $target = "$persist_dir\$target"
