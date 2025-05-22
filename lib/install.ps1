@@ -456,6 +456,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             $persistence.File.AddRange(@($persist.file)) | Out-Null
             $persistence.Directory.AddRange(@($persist.directory)) | Out-Null
         } else {
+            $legacy = $true
             # legacy persist format support
             if ($persist -is [String]) {
                 $persist = @($persist)
@@ -479,11 +480,11 @@ function persist_data($manifest, $original_dir, $persist_dir) {
             $items = $property.Value
 
             foreach ($item in $items) {
-                $source, $target = persist_def $item
-                Write-Host "Persisting $($type.ToLower()) '$source'"
-                $source = $source.TrimEnd('/').TrimEnd('\\')
+                $s, $t = persist_def $item
+                Write-Host 'Persisting' -NoNewline
+                $source = $s.TrimEnd('/').TrimEnd('\\')
                 $source = "$dir\$source"
-                $target = "$persist_dir\$target"
+                $target = "$persist_dir\$t"
 
                 #? maybe we should check if the target is wrong type then remove it, or rename it (for avoiding data loss)
 
@@ -496,6 +497,13 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                         # file that in subdirectory
                         # ensure target parent folder exist
                         ensure (Split-Path -Path $source) | Out-Null
+                    }
+
+                    # type check for legacy persist (for correctly showing type in output message)
+                    if ($legacy -and (is_directory $target)) {
+                        $type = 'Directory'
+                    } else {
+                        $type = 'File'
                     }
                 } elseif (Test-Path $source) {
                     # we don't have persist data in the store, move the source to target
@@ -513,6 +521,8 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                         New-Item -Path $target -ItemType File | Out-Null
                     }
                 }
+
+                Write-Host " $($type.ToLower()) '$s'$(if ($item -is [Array]) { " as '$t'" })"
 
                 #? while persistent items have been categorized, we could make some changes here
                 # create link
