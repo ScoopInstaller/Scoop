@@ -510,7 +510,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                         $target = New-Object System.IO.DirectoryInfo($target)
                         ensure $target | Out-Null
                     } else {
-                        New-Item -Path $target | Out-Null
+                        New-Item -Path $target -ItemType File | Out-Null
                     }
                 }
 
