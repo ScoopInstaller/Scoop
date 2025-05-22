@@ -260,7 +260,7 @@
                     "$ref": "#/definitions/stringOrArrayOfStrings"
                 },
                 "persist": {
-                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                    "$ref": "#/definitions/persist"
                 },
                 "psmodule": {
                     "type": "object",
@@ -401,6 +401,37 @@
                     },
                     "minItems": 1,
                     "type": "array"
+                }
+            ]
+        },
+        "persist": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "file": {
+                            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                        },
+                        "directory": {
+                            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": [
+                                "file"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "directory"
+                            ]
+                        }
+                    ],
+                    "type": "object"
                 }
             ]
         },
@@ -555,7 +586,7 @@
             "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
         },
         "persist": {
-            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+            "$ref": "#/definitions/persist"
         },
         "checkver": {
             "$ref": "#/definitions/checkver"
