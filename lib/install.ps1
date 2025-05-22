@@ -470,6 +470,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                     $source = $item[0]
                 }
                 if ((is_directory "$original_dir\$source") -or (!(Test-Path "$original_dir\$source"))) {
+                    # non-existing path will be categorized as directory
                     $persistence.Directory.Add($item) | Out-Null
                 } else {
                     $persistence.File.Add($item) | Out-Null
@@ -512,6 +513,7 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                     }
                 }
 
+                # TODO: while we categorized persist items, we could make some changes here.
                 # create link
                 if (is_directory $target) {
                     # target is a directory, create junction
