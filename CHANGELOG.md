@@ -12,6 +12,7 @@
 ### Code Refactoring
 
 - **download:** Move download-related functions to 'download.ps1' ([#6095](https://github.com/ScoopInstaller/Scoop/issues/6095))
+- **persist:** Allow explicit declaration of persistent item types ([#6095](https://github.com/ScoopInstaller/Scoop/issues/6367))
 
 ### Performance Improvements
 
