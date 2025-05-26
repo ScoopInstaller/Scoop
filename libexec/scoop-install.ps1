@@ -4,8 +4,9 @@
 #      scoop install git
 #
 # To install a different version of the app
-# (note that this will auto-generate the manifest using current version):
+# (will search git history first, then auto-generate manifest as fallback):
 #      scoop install gh@2.7.0
+#      scoop install python@3.12     # Install latest 3.7.x version if available
 #
 # To install an app from a manifest at a URL:
 #      scoop install https://raw.githubusercontent.com/ScoopInstaller/Main/master/bucket/runat.json

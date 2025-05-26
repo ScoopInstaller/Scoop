@@ -30,6 +30,11 @@
 # use_sqlite_cache: $true|$false
 #       Use SQLite database for caching. This is useful for speeding up 'scoop search' and 'scoop shim' commands.
 #
+# use_git_history: $true|$false
+#       Enable searching for specific versions in git history when installing apps with version specifiers.
+#       When enabled, Scoop will first search the bucket's git history for the exact version before falling back to autoupdate.
+#       (Default is $true)
+#
 # no_junction: $true|$false
 #       The 'current' version alias will not be used. Shims and shortcuts will point to specific version instead.
 #
@@ -166,7 +171,7 @@ if (!$name) {
     Write-Host "'$name' has been set to '$value'"
 } else {
     $value = get_config $name
-    if($null -eq $value) {
+    if ($null -eq $value) {
         Write-Host "'$name' is not set"
     } else {
         if ($value -is [System.DateTime]) {
