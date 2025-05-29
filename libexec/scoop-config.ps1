@@ -74,6 +74,9 @@
 # shim: kiennq|scoopcs|71
 #       Choose scoop shim build.
 #
+# shim_with_link: $true|$false
+#       When set to $true, Scoop will use 'mklink' to create shims without arguments. Default is $false.
+#
 # root_path: $Env:UserProfile\scoop
 #       Path to Scoop root directory.
 #
