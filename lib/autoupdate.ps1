@@ -366,7 +366,7 @@ function Update-ManifestProperty {
                     $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction $Manifest.autoupdate.hash -URL $newURL -Substitutions $Substitutions
                     $Manifest.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.hash -Value $newHash
                     $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
-                } else {
+                } elseif ($Manifest.architecture.hash) {
                     # Arch-spec
                     $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
                         $arch = $_.Name
@@ -375,6 +375,8 @@ function Update-ManifestProperty {
                         $Manifest.architecture.$arch.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.architecture.$arch.hash -Value $newHash
                         $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
                     }
+                } else {
+                    Write-Warning "Manifest for $AppName does not contain a 'hash' field, skipping hash update."
                 }
             } elseif ($Manifest.$currentProperty -and $Manifest.autoupdate.$currentProperty) {
                 # Update other property (global)
