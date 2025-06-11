@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Bug Fixes
+
+- **download**: Fix function `nightly_version` not defined error in scoop-download ([#6385](https://github.com/ScoopInstaller/Scoop/issues/6385))
+
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
 
 ### Bug Fixes
