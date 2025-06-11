@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+
+### Features
+
+- **download**: Block apps without file hash by default for security reasons ([#6387](https://github.com/ScoopInstaller/Scoop/issues/6387))
+
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
 
 ### Bug Fixes
