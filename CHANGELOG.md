@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...develop)
 
+### Features
+
+- **autoupdate**: Add new hash mode `none` ([#6389](https://github.com/ScoopInstaller/Scoop/issues/6389))
+
 ### Bug Fixes
 
 - **scoop-download**: Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
