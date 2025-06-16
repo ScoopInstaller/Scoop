@@ -69,26 +69,20 @@ foreach ($single in Get-ChildItem $Dir -Filter "$App.json" -Recurse) {
 
     $urls = @()
     $hashes = @()
+    [bool]$manifesthasurl = $false
 
-    if ($manifest.url) {
-        # Skip manifests for hash mode set to 'none'
-        if ($manifest.autoupdate.hash.mode -and ($manifest.autoupdate.hash.mode -eq 'none')) {
-            if ($manifest.hash) {
-                err "$name" 'Manifest should not contain a hash property.'
-            }
-            continue
-        }
-        $manifest.url | ForEach-Object { $urls += $_ }
-        $manifest.hash | ForEach-Object { $hashes += $_ }
-    } elseif ($manifest.architecture) {
+    if ($manifest.architecture) {
         $arches = @('64bit', '32bit', 'arm64')
         [bool]$errorinarches = $false
         foreach ($currentarch in $arches) {
-            # Skip architecture for hash mode set to 'none'
-            if ($manifest.autoupdate.architecture.$currentarch.hash.mode -and ($manifest.autoupdate.architecture.$currentarch.hash.mode -eq 'none')) {
+            if ($manifest.architecture.$currentarch.url) {
+                $manifesthasurl = $true
+            } else { continue }
+            # Skip architecture with hash mode set to 'none'
+            if ($manifest.autoupdate.architecture.$currentarch.hash.mode -eq 'none') {
                 if ($manifest.architecture.$currentarch.hash) {
                     $errorinarches = $true
-                    err "$name" "Manifest should not contain a hash property in '$currentarch' architecture."
+                    err $name "Manifest should not contain a hash property in '$currentarch' architecture."
                 }
                 continue
             }
@@ -97,12 +91,32 @@ foreach ($single in Get-ChildItem $Dir -Filter "$App.json" -Recurse) {
         }
         # Skip if errors found in architecture
         if ($errorinarches) { continue }
-    } else {
-        err $name 'Manifest does not contain valid URL property.'
     }
 
-    # Skip manifests with no hashes to check
+    if ($manifest.url) {
+        # Check URL conflicts
+        if ($manifesthasurl) {
+            err $name 'Manifest should not contain global and architecture specific URLs at the same time.'
+            continue
+        } else {
+            $manifesthasurl = $true
+        }
+        # Skip manifests with hash mode set to 'none'
+        if ($manifest.autoupdate.hash.mode -eq 'none') {
+            if ($manifest.hash) {
+                err $name 'Manifest should not contain a hash property.'
+            }
+            continue
+        }
+        $manifest.url | ForEach-Object { $urls += $_ }
+        $manifest.hash | ForEach-Object { $hashes += $_ }
+    }
+
+    # Skip manifests with no hash to check
     if ($urls.Length -eq 0) {
+        if (!$manifesthasurl) {
+            err $name 'Manifest does not contain valid URL property.'
+        }
         continue
     }
 
