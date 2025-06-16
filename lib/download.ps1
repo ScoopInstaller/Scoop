@@ -40,7 +40,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                         Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     if ($err.Contains('No-hash apps')) {
-                        abort "Please run 'scoop config allow-no-hash true' if you want to continue anyway."
+                        abort "Please run 'scoop config allow_no_hash true' if you want to continue anyway."
                     }
                     abort $(new_issue_msg $app $bucket 'hash check failed')
                 }
@@ -507,7 +507,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                     Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
                 if ($err.Contains('No-hash apps')) {
-                    abort "Please run 'scoop config allow-no-hash true' if you want to continue anyway."
+                    abort "Please run 'scoop config allow_no_hash true' if you want to continue anyway."
                 }
                 abort $(new_issue_msg $app $bucket 'hash check failed')
             }
@@ -725,10 +725,10 @@ function hash_for_url($manifest, $url, $arch) {
 function check_hash($file, $hash, $app_name) {
     # returns (ok, err)
     if (!$hash) {
-        if (get_config 'allow-no-hash' $false){
+        if (get_config 'allow_no_hash' $false){
             warn "No hash provided in manifest. SHA256 for '$(fname $file)' is:"
             warn "$((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
-            warn "To block no-hash apps for security reasons, run 'scoop config allow-no-hash false'."
+            warn "To block no-hash apps for security reasons, run 'scoop config allow_no_hash false'."
             return $true, $null
         } else {
             $msg = "No hash provided in manifest.`nERROR No-hash apps are blocked by default for security reasons, except for nightly builds."
