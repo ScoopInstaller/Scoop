@@ -125,7 +125,7 @@
 #
 # allow_no_hash: $true|$false
 #       Allow to download or install apps with no hash provided in manifest.
-#       Using this option is not recommended, as it may lead to security issues.
+#       This option is NOT RECOMMENDED as it may cause security issues.
 #
 # ARIA2 configuration
 # -------------------
