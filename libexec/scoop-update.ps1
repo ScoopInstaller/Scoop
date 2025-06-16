@@ -327,7 +327,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     if ($err.Contains('No-hash apps')) {
-                        abort "Please run 'scoop config allow-no-hash true' if you want to continue anyway."
+                        abort "Please run 'scoop config allow_no_hash true' if you want to continue anyway."
                     }
                     abort $(new_issue_msg $app $bucket 'hash check failed')
                 }
