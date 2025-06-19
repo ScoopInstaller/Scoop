@@ -1,5 +1,9 @@
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
 
+### Features
+
+- **scoop-uninstall**: Allow access to `$bucket` in uninstall scripts ([#6379](https://github.com/ScoopInstaller/Scoop/issues/6379))
+
 ### Bug Fixes
 
 - **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
