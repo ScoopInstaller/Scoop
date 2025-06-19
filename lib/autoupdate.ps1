@@ -116,7 +116,7 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
     if (!$hash) {
         $hash = json_path_legacy $json $jsonpath $substitutions
     }
-    if ($hash -match '[md5|sha1|sha256|sha512]:(?<hash>[a-fA-F0-9]{32}|[a-fA-F0-9]{40}|[a-fA-F0-9]{64}|[a-fA-F0-9]{128})') {
+    if ($hash -match '[sha256]:(?<hash>[a-fA-F0-9]{64})') {
         $hash = $matches.hash
     }
     return format_hash $hash
