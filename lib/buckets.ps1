@@ -106,9 +106,9 @@ function list_buckets {
     Get-LocalBucket | ForEach-Object {
         $bucket = [Ordered]@{ Name = $_ }
         $path = Find-BucketDirectory $_ -Root
-        if ((Test-Path (Join-Path $path '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
-            $bucket.Source = Invoke-Git -Path $path -ArgumentList @('config', 'remote.origin.url')
-            $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', '--format=%aD', '-n', '1') | Get-Date
+        if ((Test-Path (Join-Path "$path" '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
+            $bucket.Source = Invoke-Git -Path "$path" -ArgumentList @('config', 'remote.origin.url')
+            $bucket.Updated = Invoke-Git -Path "$path" -ArgumentList @('log', '--format=%aD', '-n', '1') | Get-Date
         } else {
             $bucket.Source = friendly_path $path
             $bucket.Updated = (Get-Item "$path\bucket" -ErrorAction SilentlyContinue).LastWriteTime
@@ -190,8 +190,8 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
-    if (Test-Path $bucket_path) {
-        $remote = Invoke-Git -Path $bucket_path -ArgumentList @('config', '--get', 'remote.origin.url')
+    if (Test-Path "$bucket_path") {
+        $remote = Invoke-Git -Path "$bucket_path" -ArgumentList @('config', '--get', 'remote.origin.url')
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
         # https://PROVIDER/USER/REPO.git
