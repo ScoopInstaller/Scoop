@@ -1,5 +1,10 @@
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
 
+### Features
+
+- **autoupdate:** Remove `sha256:` prefix in `format_hash()` ([#6381](https://github.com/ScoopInstaller/Scoop/issues/6381))
+- **autoupdate:** Add GitHub support in `get_hash_for_app()` ([#6381](https://github.com/ScoopInstaller/Scoop/issues/6381))
+
 ### Bug Fixes
 
 - **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
