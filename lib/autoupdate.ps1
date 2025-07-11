@@ -2,11 +2,15 @@
 
 function format_hash([String] $hash) {
     $hash = $hash.toLower()
+
+    if ($hash -like 'sha256:*') {
+        $hash = $hash.Substring(7)  # Remove prefix 'sha256:'
+    }
+
     switch ($hash.Length) {
         32 { $hash = "md5:$hash" } # md5
         40 { $hash = "sha1:$hash" } # sha1
         64 { $hash = $hash } # sha256
-        71 { $hash = $hash -replace 'sha256:', '' } # sha256
         128 { $hash = "sha512:$hash" } # sha512
         default { $hash = $null }
     }
