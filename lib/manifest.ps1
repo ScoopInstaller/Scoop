@@ -274,6 +274,9 @@ function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
                 info "Potential exact match '$versionFromMessage' found in commit message for $app (hash $hash). Verifying manifest..."
                 $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$hash`:$relativeManifestPath")
                 if ($manifestContent -and ($LASTEXITCODE -eq 0)) {
+                    if ($manifestContent -is [Array]) {
+                        $manifestContent = $manifestContent -join "`n"
+                    }
                     $manifestObj = $null; try { $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop } catch {}
                     if ($manifestObj -and $manifestObj.version -eq $requestedVersion) {
                         info "Exact version '$requestedVersion' for '$app' confirmed from manifest in commit $hash."
@@ -287,6 +290,9 @@ function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
 
             $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$hash`:$relativeManifestPath")
             if ($manifestContent -and ($LASTEXITCODE -eq 0)) {
+                if ($manifestContent -is [Array]) {
+                    $manifestContent = $manifestContent -join "`n"
+                }
                 $manifestObj = $null;
                 try {
                     $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop
