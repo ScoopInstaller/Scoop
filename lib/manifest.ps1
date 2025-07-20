@@ -163,6 +163,11 @@ function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
         return $null
     }
 
+    # Return null if bucket is null or empty
+    if (!$bucket) {
+        return $null
+    }
+
     # Import database functions if not already loaded
     if (!(Get-Command 'Get-ScoopDBItem' -ErrorAction SilentlyContinue)) {
         . "$PSScriptRoot\database.ps1"

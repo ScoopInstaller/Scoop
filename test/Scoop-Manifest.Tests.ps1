@@ -1,17 +1,72 @@
 BeforeAll {
+    . "$PSScriptRoot\..\lib\core.ps1"
     . "$PSScriptRoot\..\lib\json.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1"
+    . "$PSScriptRoot\..\lib\database.ps1"
 }
-
 Describe 'JSON parse and beautify' -Tag 'Scoop' {
     Context 'Parse JSON' {
         It 'success with valid json' {
             { parse_json "$PSScriptRoot\fixtures\manifest\wget.json" } | Should -Not -Throw
         }
-        It 'fails with invalid json' {
-            { parse_json "$PSScriptRoot\fixtures\manifest\broken_wget.json" } | Should -Throw
+    It 'fails with invalid json' {
+        Mock warn {}
+        Mock ConvertFrom-Json { throw "Invalid JSON" }
+        $result = parse_json "$PSScriptRoot\fixtures\manifest\broken_wget.json"
+        $result | Should -BeNullOrEmpty
+        Should -Invoke -CommandName warn -Times 1 -ParameterFilter {
+            $args[0] -like "*Error parsing JSON*"
         }
     }
+    }
+}
+Describe 'Get-RelativePathCompat' -Tag 'Scoop' {
+    It 'should return relative path for valid URIs' {
+        Get-RelativePathCompat "C:\\path\from" "C:\\path\from\to" | Should -Be "to"
+    }
+    It 'should return absolute path for different schemes' {
+        $result = Get-RelativePathCompat "C:\\path\from" "D:\\path\to"
+        $result | Should -Be "D:\path\to"
+    }
+}
+Describe 'Get-HistoricalManifestFromDB' -Tag 'Scoop' {
+    BeforeAll {
+        Mock ensure { return "C:\\test\\dir" }
+        Mock usermanifestsdir { return "C:\\test\\manifests" }
+        Mock Out-UTF8File {}
+        Mock get_config { return $true }
+    }
+    It 'should return manifest from database if available' {
+        Mock Get-ScoopDBItem { $mockDbResult = [PSCustomObject] @{ Rows = @( [PSCustomObject] @{ manifest = '{"version": "1.2.3"}' }) } ; return $mockDbResult }
+        $result = Get-HistoricalManifestFromDB 'testapp' 'testbucket' '1.2.3'
+        $result.path | Should -Match 'testapp.json'
+        $result.source | Should -Be "sqlite_exact_match"
+    }
+    It 'should return null if database disabled' {
+        Mock get_config { return $false }
+        $result = Get-HistoricalManifestFromDB 'testapp' 'testbucket' '1.2.3'
+        $result | Should -BeNullOrEmpty
+    }
+}
+Describe 'Get-HistoricalManifest' -Tag 'Scoop' {
+    BeforeAll {
+        Mock ensure { return "C:\\test\\dir" }
+        Mock usermanifestsdir { return "C:\\test\\manifests" }
+        Mock Out-UTF8File {}
+        Mock get_config { return $true }
+    }
+    It 'should return manifest using database if available' {
+        Mock Get-ScoopDBItem { $mockDbResult = [PSCustomObject] @{ Rows = @( [PSCustomObject] @{ manifest = '{"version": "2.3.4"}' }) } ; return $mockDbResult }
+        $result = Get-HistoricalManifest 'testapp' 'testbucket' '2.3.4'
+        $result.path | Should -Match 'testapp.json'
+        $result.source | Should -Be "sqlite_exact_match"
+    }
+    It 'should return null if no bucket provided' {
+        $result = Get-HistoricalManifest 'testapp' $null '2.3.4'
+        $result | Should -BeNullOrEmpty
+    }
+}
+Describe 'JSON parse and beautify' -Tag 'Scoop' {
     Context 'Beautify JSON' {
         BeforeDiscovery {
             $manifests = (Get-ChildItem "$PSScriptRoot\fixtures\format\formatted" -File -Filter '*.json').Name
@@ -26,7 +81,6 @@ Describe 'JSON parse and beautify' -Tag 'Scoop' {
         }
     }
 }
-
 Describe 'Handle ARM64 and correctly fallback' -Tag 'Scoop' {
     It 'Should return "arm64" if supported' {
         $manifest1 = @{ url = 'test'; architecture = @{ 'arm64' = @{ pre_install = 'test' } } }
@@ -53,14 +107,12 @@ Describe 'Handle ARM64 and correctly fallback' -Tag 'Scoop' {
         Get-SupportedArchitecture $manifest3 'arm64' | Should -BeNullOrEmpty
     }
 }
-
 Describe 'Manifest Validator' -Tag 'Validator' {
     # Could not use backslash '\' in Linux/macOS for .NET object 'Scoop.Validator'
     BeforeAll {
         Add-Type -Path "$PSScriptRoot\..\supporting\validator\bin\Scoop.Validator.dll"
         $schema = "$PSScriptRoot/../schema.json"
     }
-
     It 'Scoop.Validator is available' {
             ([System.Management.Automation.PSTypeName]'Scoop.Validator').Type | Should -Be 'Scoop.Validator'
     }
