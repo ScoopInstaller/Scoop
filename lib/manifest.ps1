@@ -128,6 +128,36 @@ function Get-SupportedArchitecture($manifest, $architecture) {
     }
 }
 
+function Get-RelativePathCompat($from, $to) {
+    <#
+    .SYNOPSIS
+        Cross-platform compatible relative path function
+    .DESCRIPTION
+        Falls back to custom implementation for Windows PowerShell compatibility
+    #>
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+        # PowerShell Core/7+ - use built-in method
+        try {
+            return [System.IO.Path]::GetRelativePath($from, $to)
+        } catch {
+            # Fallback if method fails
+        }
+    }
+
+    # Windows PowerShell compatible implementation
+    $fromUri = New-Object System.Uri($from.TrimEnd('\') + '\')
+    $toUri = New-Object System.Uri($to)
+
+    if ($fromUri.Scheme -ne $toUri.Scheme) {
+        return $to  # Cannot make relative path between different schemes
+    }
+
+    $relativeUri = $fromUri.MakeRelativeUri($toUri)
+    $relativePath = [System.Uri]::UnescapeDataString($relativeUri.ToString())
+
+    return $relativePath -replace '/', '\'
+}
+
 function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
     if (!(get_config USE_GIT_HISTORY $true)) {
         return $null
@@ -150,7 +180,7 @@ function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
         warn "Could not find inner bucket directory for '$bucket' at '$innerBucketDir'."
         return $null
     }
-    $relativeManifestPath = [System.IO.Path]::GetRelativePath($bucketDir, (Join-Path $innerBucketDir $manifestPath))
+    $relativeManifestPath = Get-RelativePathCompat $bucketDir (Join-Path $innerBucketDir $manifestPath)
     $relativeManifestPath = $relativeManifestPath -replace '\\', '/'
 
     try {
