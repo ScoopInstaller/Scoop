@@ -57,12 +57,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
     } catch {
         error "Installation failed for '$app' ($version): $($_.Exception.Message)"
-
-        # If this was from git history and failed, try autoupdate as fallback
-        if ($url -and $url.StartsWith("$(usermanifestsdir)\")) {
-            warn 'Historical manifest installation failed. This version may no longer be available.'
-            warn "Please try installing the latest version or use 'scoop search $app' to find alternatives."
-        }
         throw
     }
     ensure_install_dir_not_in_path $dir $global
