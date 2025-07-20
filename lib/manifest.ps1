@@ -301,8 +301,13 @@ function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
                         info "Exact version '$requestedVersion' for '$app' found in manifest (commit $hash)."
                         ensure (usermanifestsdir) | Out-Null
                         $tempManifestPath = "$(usermanifestsdir)\$app.json"
-                        $utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
-                        Set-Content -Path $tempManifestPath -Value $manifestContent -Encoding $utf8NoBomEncoding -NoNewline:$false
+                        if ($PSVersionTable.PSVersion.Major -ge 6) {
+                            $utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+                            Set-Content -Path $tempManifestPath -Value $manifestContent -Encoding $utf8NoBomEncoding -NoNewline:$false
+                        } else {
+                            # PowerShell 5 compatibility
+                            $manifestContent | Out-UTF8File -FilePath $tempManifestPath
+                        }
                         return @{ path = $tempManifestPath; version = $requestedVersion; source = "git_manifest:$hash" }
                     }
                     $foundVersions.Add(@{
@@ -348,8 +353,13 @@ function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
             info "Best match for '$requestedVersion' is '$($matchedVersionData.version)' (commit $($matchedVersionData.hash))."
             ensure (usermanifestsdir) | Out-Null
             $tempManifestPath = "$(usermanifestsdir)\$app.json"
-            $utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
-            Set-Content -Path $tempManifestPath -Value $matchedVersionData.manifest -Encoding $utf8NoBomEncoding -NoNewline:$false
+            if ($PSVersionTable.PSVersion.Major -ge 6) {
+                $utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+                Set-Content -Path $tempManifestPath -Value $matchedVersionData.manifest -Encoding $utf8NoBomEncoding -NoNewline:$false
+            } else {
+                # PowerShell 5 compatibility
+                $matchedVersionData.manifest | Out-UTF8File -FilePath $tempManifestPath
+            }
             return @{
                 path    = $tempManifestPath
                 version = $matchedVersionData.version
