@@ -158,7 +158,52 @@ function Get-RelativePathCompat($from, $to) {
     return $relativePath -replace '/', '\'
 }
 
+function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
+    if (!(get_config USE_SQLITE_CACHE)) {
+        return $null
+    }
+    
+    # Import database functions if not already loaded
+    if (!(Get-Command 'Get-ScoopDBItem' -ErrorAction SilentlyContinue)) {
+        . "$PSScriptRoot\database.ps1"
+    }
+
+    # First try exact match
+    $dbResult = Get-ScoopDBItem -Name $app -Bucket $bucket -Version $requestedVersion
+    if ($dbResult.Rows.Count -gt 0) {
+        $row = $dbResult.Rows[0]
+        ensure (usermanifestsdir) | Out-Null
+        $tempManifestPath = "$(usermanifestsdir)\$app.json"
+        $row.manifest | Out-UTF8File -FilePath $tempManifestPath
+        return @{ path = $tempManifestPath; version = $requestedVersion; source = "sqlite_exact_match" }
+    }
+
+    # If no exact match, try to find best match from all versions of this app
+    $allVersionsResult = Get-ScoopDBItem -Name $app -Bucket $bucket
+    if ($allVersionsResult.Rows.Count -gt 0) {
+        $availableVersions = $allVersionsResult.Rows | ForEach-Object { $_.version }
+        $bestMatch = Find-BestVersionMatch -RequestedVersion $requestedVersion -AvailableVersions $availableVersions
+        
+        if ($bestMatch) {
+            $matchedRow = $allVersionsResult.Rows | Where-Object { $_.version -eq $bestMatch } | Select-Object -First 1
+            ensure (usermanifestsdir) | Out-Null
+            $tempManifestPath = "$(usermanifestsdir)\$app.json"
+            $matchedRow.manifest | Out-UTF8File -FilePath $tempManifestPath
+            return @{ path = $tempManifestPath; version = $bestMatch; source = "sqlite_best_match" }
+        }
+    }
+
+    return $null
+}
+
 function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
+    # First try to get historical manifest from SQLite
+    $manifestFromDB = Get-HistoricalManifestFromDB $app $bucket $requestedVersion
+    if ($manifestFromDB) {
+        return $manifestFromDB
+    }
+
+    # Fall back to git history if not found in SQLite
     if (!(get_config USE_GIT_HISTORY $true)) {
         return $null
     }
@@ -400,12 +445,21 @@ function generate_user_manifest($app, $bucket, $version) {
 
     warn "Given version ($version) does not match manifest ($($manifest.version))"
 
-    # First try to find the version in git history
-    info "Searching for version '$version' in git history..."
+    # Try to find the version using SQLite cache first, then git history
+    if (get_config USE_SQLITE_CACHE) {
+        info "Searching for version '$version' in cache..."
+    } else {
+        info "Searching for version '$version' in git history..."
+    }
+    
     $historicalResult = Get-HistoricalManifest $app $bucket $version
 
     if ($historicalResult) {
-        info "Using historical manifest for '$app' version '$($historicalResult.version)' from $($historicalResult.source)"
+        if ($historicalResult.source -match '^sqlite') {
+            info "Found version '$($historicalResult.version)' for '$app' in cache."
+        } else {
+            info "Found version '$($historicalResult.version)' for '$app' in git history (source: $($historicalResult.source))."
+        }
         return $historicalResult.path
     }
 
