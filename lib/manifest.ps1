@@ -162,7 +162,7 @@ function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
     if (!(get_config USE_SQLITE_CACHE)) {
         return $null
     }
-    
+
     # Import database functions if not already loaded
     if (!(Get-Command 'Get-ScoopDBItem' -ErrorAction SilentlyContinue)) {
         . "$PSScriptRoot\database.ps1"
@@ -183,7 +183,7 @@ function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
     if ($allVersionsResult.Rows.Count -gt 0) {
         $availableVersions = $allVersionsResult.Rows | ForEach-Object { $_.version }
         $bestMatch = Find-BestVersionMatch -RequestedVersion $requestedVersion -AvailableVersions $availableVersions
-        
+
         if ($bestMatch) {
             $matchedRow = $allVersionsResult.Rows | Where-Object { $_.version -eq $bestMatch } | Select-Object -First 1
             ensure (usermanifestsdir) | Out-Null
@@ -451,7 +451,7 @@ function generate_user_manifest($app, $bucket, $version) {
     } else {
         info "Searching for version '$version' in git history..."
     }
-    
+
     $historicalResult = Get-HistoricalManifest $app $bucket $version
 
     if ($historicalResult) {
