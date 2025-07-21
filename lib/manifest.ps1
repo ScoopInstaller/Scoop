@@ -192,14 +192,8 @@ function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
     return $null
 }
 
-function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
-    # First try to get historical manifest from SQLite
-    $manifestFromDB = Get-HistoricalManifestFromDB $app $bucket $requestedVersion
-    if ($manifestFromDB) {
-        return $manifestFromDB
-    }
-
-    # Fall back to git history if not found in SQLite
+function Get-HistoricalManifestFromGitHistory($app, $bucket, $requestedVersion) {
+    # Only proceed if git history is enabled
     if (!(get_config USE_GIT_HISTORY $true)) {
         return $null
     }
@@ -342,11 +336,29 @@ function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
             return $null
         }
 
-        # Only return exact matches - no compatibility matching
-        $availableVersionsForLog = ($foundVersions | Sort-Object {
+        # No exact match found - display all available versions to help user choose
+        $allAvailableVersions = ($foundVersions | Sort-Object {
                 try { [version]($_.version -replace '[^\d\.].*$', '') } catch { $_.version }
-            } -Descending | Select-Object -First 10).version
-        info "No exact match found for '$requestedVersion' for app '$app'. Available (latest 10): $($availableVersionsForLog -join ', ')"
+            } -Descending).version
+
+        Write-Host ""
+        Write-Host "No exact match found for version '$requestedVersion' for app '$app'."
+        Write-Host "Available versions in git history (newest to oldest):"
+        Write-Host ""
+
+        # Group versions for better display
+        $displayCount = [Math]::Min(50, $allAvailableVersions.Count)  # Show up to 50 versions
+        for ($i = 0; $i -lt $displayCount; $i++) {
+            Write-Host "  $($allAvailableVersions[$i])"
+        }
+
+        if ($allAvailableVersions.Count -gt $displayCount) {
+            Write-Host "  ... and $($allAvailableVersions.Count - $displayCount) more versions"
+        }
+
+        Write-Host ""
+        Write-Host "To install a specific version, use: scoop install $app@<version>"
+        Write-Host ""
 
         return $null
 
@@ -366,22 +378,49 @@ function generate_user_manifest($app, $bucket, $version) {
 
     warn "Given version ($version) does not match manifest ($($manifest.version))"
 
-    # Try to find the version using SQLite cache first, then git history
+    $historicalResult = $null
+    
+    # Try SQLite cache first if enabled
     if (get_config USE_SQLITE_CACHE) {
         info "Searching for version '$version' in cache..."
-    } else {
-        info "Searching for version '$version' in git history..."
+        $historicalResult = Get-HistoricalManifestFromDB $app $bucket $version
+        if ($historicalResult) {
+            info "Found version '$($historicalResult.version)' for '$app' in cache."
+            return $historicalResult.path
+        }
     }
 
-    $historicalResult = Get-HistoricalManifest $app $bucket $version
-
-    if ($historicalResult) {
-        if ($historicalResult.source -match '^sqlite') {
-            info "Found version '$($historicalResult.version)' for '$app' in cache."
-        } else {
+    # Try git history if cache didn't find it
+    if (!$historicalResult) {
+        info "Searching for version '$version' in git history..."
+        $historicalResult = Get-HistoricalManifestFromGitHistory $app $bucket $version
+        if ($historicalResult) {
             info "Found version '$($historicalResult.version)' for '$app' in git history (source: $($historicalResult.source))."
+            return $historicalResult.path
         }
-        return $historicalResult.path
+    }
+
+    # If no historical version found, provide helpful guidance
+    if (!$historicalResult) {
+        # Try to provide additional context about what versions are available
+        $currentVersion = $manifest.version
+        if ($currentVersion) {
+            info "Current version available: $currentVersion"
+            info "To install the current version, use: scoop install $app"
+        }
+        
+        # Check if we have autoupdate capability for fallback
+        if ($manifest.autoupdate) {
+            info "This app supports autoupdate - attempting to generate manifest for version $version"
+        } else {
+            warn "'$app' does not have autoupdate capability."
+            Write-Host "Available options:"
+            Write-Host "  1. Install current version: scoop install $app"
+            Write-Host "  2. Check if the requested version exists in other buckets"
+            Write-Host "  3. Contact the bucket maintainer to add historical version support"
+            Write-Host ""
+            abort "Could not find manifest for '$app@$version' and no autoupdate available"
+        }
     }
 
     # Fallback to autoupdate generation
@@ -390,6 +429,7 @@ function generate_user_manifest($app, $bucket, $version) {
     ensure (usermanifestsdir) | Out-Null
     $manifest_path = "$(usermanifestsdir)\$app.json"
 
+    # Check SQLite cache for exact cached manifest (this is different from historical search)
     if (get_config USE_SQLITE_CACHE) {
         $cached_manifest = (Get-ScoopDBItem -Name $app -Bucket $bucket -Version $version).manifest
         if ($cached_manifest) {
@@ -407,16 +447,33 @@ function generate_user_manifest($app, $bucket, $version) {
         return $manifest_path
     } catch {
         Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
+        Write-Host -ForegroundColor Yellow "Autoupdate failed for version $version"
+        
+        # Provide helpful guidance when autoupdate fails
+        Write-Host "Possible reasons:"
+        Write-Host "  - Version $version may not exist or be available for download"
+        Write-Host "  - Download URLs may have changed or be inaccessible"
+        Write-Host "  - The version format may be incompatible with autoupdate patterns"
+        Write-Host ""
+        Write-Host "Suggestions:"
+        Write-Host "  1. Install current version: scoop install $app"
+        Write-Host "  2. Try a different version that was shown in the available list"
+        Write-Host "  3. Check the app's official releases or download page"
+        Write-Host ""
 
         # If autoupdate fails and we haven't tried git history yet, try it as final fallback
-        if (!$historicalResult) {
+        if (!$historicalResult -and !(get_config USE_SQLITE_CACHE)) {
             warn 'Autoupdate failed. Trying git history as final fallback...'
-            $historicalResult = Get-HistoricalManifest $app $bucket $version
-            if ($historicalResult) {
-                warn "Using historical manifest as fallback for '$app' version '$($historicalResult.version)'"
-                return $historicalResult.path
+            $fallbackResult = Get-HistoricalManifestFromGitHistory $app $bucket $version
+            if ($fallbackResult) {
+                warn "Using historical manifest as fallback for '$app' version '$($fallbackResult.version)'"
+                return $fallbackResult.path
             }
         }
+        
+        # Final failure - provide comprehensive guidance
+        Write-Host -ForegroundColor Red "All attempts to find or generate manifest for '$app@$version' failed."
+        abort "Installation of '$app@$version' is not possible"
     }
 
     return $null
