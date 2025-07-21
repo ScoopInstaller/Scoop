@@ -180,23 +180,14 @@ function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
         ensure (usermanifestsdir) | Out-Null
         $tempManifestPath = "$(usermanifestsdir)\$app.json"
         $row.manifest | Out-UTF8File -FilePath $tempManifestPath
-        return @{ path = $tempManifestPath; version = $requestedVersion; source = "sqlite_exact_match" }
+
+        # Parse the manifest to get its actual version
+        $manifest = $row.manifest | ConvertFrom-Json
+        $manifestVersion = if ($manifest.version) { $manifest.version } else { $requestedVersion }
+        return @{ path = $tempManifestPath; version = $manifestVersion; source = "sqlite_exact_match" }
     }
 
-    # If no exact match, try to find best match from all versions of this app
-    $allVersionsResult = Get-ScoopDBItem -Name $app -Bucket $bucket
-    if ($allVersionsResult.Rows.Count -gt 0) {
-        $availableVersions = $allVersionsResult.Rows | ForEach-Object { $_.version }
-        $bestMatch = Find-BestVersionMatch -RequestedVersion $requestedVersion -AvailableVersions $availableVersions
-
-        if ($bestMatch) {
-            $matchedRow = $allVersionsResult.Rows | Where-Object { $_.version -eq $bestMatch } | Select-Object -First 1
-            ensure (usermanifestsdir) | Out-Null
-            $tempManifestPath = "$(usermanifestsdir)\$app.json"
-            $matchedRow.manifest | Out-UTF8File -FilePath $tempManifestPath
-            return @{ path = $tempManifestPath; version = $bestMatch; source = "sqlite_best_match" }
-        }
-    }
+    # No exact match found, return null (no compatibility matching)
 
     return $null
 }
@@ -351,37 +342,11 @@ function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
             return $null
         }
 
-        info "Found $($foundVersions.Count) distinct historical versions for '$app'. Finding best match for '$requestedVersion'..."
-
-        $matchedVersionData = $null
-        $bestMatchVersionString = Find-BestVersionMatch -RequestedVersion $requestedVersion -AvailableVersions ($foundVersions.version)
-
-        if ($bestMatchVersionString) {
-            $matchedVersionData = $foundVersions | Where-Object { $_.version -eq $bestMatchVersionString } | Select-Object -First 1
-        }
-
-        if ($matchedVersionData) {
-            info "Best match for '$requestedVersion' is '$($matchedVersionData.version)' (commit $($matchedVersionData.hash))."
-            ensure (usermanifestsdir) | Out-Null
-            $tempManifestPath = "$(usermanifestsdir)\$app.json"
-            if ($PSVersionTable.PSVersion.Major -ge 6) {
-                $utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
-                Set-Content -Path $tempManifestPath -Value $matchedVersionData.manifest -Encoding $utf8NoBomEncoding -NoNewline:$false
-            } else {
-                # PowerShell 5 compatibility
-                $matchedVersionData.manifest | Out-UTF8File -FilePath $tempManifestPath
-            }
-            return @{
-                path    = $tempManifestPath
-                version = $matchedVersionData.version
-                source  = "git_best_match:$($matchedVersionData.hash)"
-            }
-        } else {
-            $availableVersionsForLog = ($foundVersions | Sort-Object {
-                    try { [version]($_.version -replace '[^\d\.].*$', '') } catch { $_.version }
-                } -Descending | Select-Object -First 10).version
-            info "Could not find a suitable match for '$requestedVersion' for app '$app'. Available (latest 10): $($availableVersionsForLog -join ', ')"
-        }
+        # Only return exact matches - no compatibility matching
+        $availableVersionsForLog = ($foundVersions | Sort-Object {
+                try { [version]($_.version -replace '[^\d\.].*$', '') } catch { $_.version }
+            } -Descending | Select-Object -First 10).version
+        info "No exact match found for '$requestedVersion' for app '$app'. Available (latest 10): $($availableVersionsForLog -join ', ')"
 
         return $null
 
@@ -391,71 +356,6 @@ function Get-HistoricalManifest($app, $bucket, $requestedVersion) {
     }
 }
 
-function Find-BestVersionMatch($requestedVersion, $availableVersions) {
-    <#
-    .SYNOPSIS
-        Find the best matching version from available versions
-    .PARAMETER requestedVersion
-        The version requested by user (e.g., "3.7", "3.7.4")
-    .PARAMETER availableVersions
-        Array of available version strings
-    .RETURNS
-        Best matching version string, or $null if no match
-    #>
-
-    if (!$availableVersions -or $availableVersions.Count -eq 0) {
-        return $null
-    }
-
-    debug "Searching for version '$requestedVersion' among available versions: $($availableVersions -join ', ')"
-
-    # First try exact match
-    if ($availableVersions -contains $requestedVersion) {
-        debug "Found exact match for version '$requestedVersion'"
-        return $requestedVersion
-    }
-
-    # If no exact match, try to find compatible versions
-    # Split requested version into parts
-    $requestedParts = $requestedVersion -split '\.'
-
-    # Filter versions that start with the requested version pattern
-    $compatibleVersions = $availableVersions | Where-Object {
-        $versionParts = $_ -split '\.'
-        $isCompatible = $true
-
-        for ($i = 0; $i -lt $requestedParts.Count; $i++) {
-            if ($i -ge $versionParts.Count -or $versionParts[$i] -ne $requestedParts[$i]) {
-                $isCompatible = $false
-                break
-            }
-        }
-
-        return $isCompatible
-    }
-
-    debug "Found $($compatibleVersions.Count) compatible versions: $($compatibleVersions -join ', ')"
-
-    if ($compatibleVersions.Count -eq 0) {
-        debug "No compatible versions found for '$requestedVersion'"
-        return $null
-    }
-
-    # Sort compatible versions and return the highest one
-    $sortedVersions = $compatibleVersions | Sort-Object {
-        # Convert to version object for proper sorting
-        try {
-            [version]($_ -replace '[^\d\.].*$', '')  # Remove non-numeric suffixes for sorting
-        } catch {
-            $_  # Fallback to string sorting
-        }
-    } -Descending
-
-    $selectedVersion = $sortedVersions[0]
-    debug "Selected best match: '$selectedVersion' for requested version '$requestedVersion'"
-
-    return $selectedVersion
-}
 
 function generate_user_manifest($app, $bucket, $version) {
     # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
