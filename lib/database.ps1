@@ -264,9 +264,11 @@ function Select-ScoopDBItem {
         [void]$dbAdapter.Fill($result)
     }
     end {
+        $resultCopy = $result.Copy()
         $dbAdapter.Dispose()
         $db.Dispose()
-        return $result
+        # Use Write-Output to ensure PowerShell properly returns the DataTable
+        Write-Output $resultCopy -NoEnumerate
     }
 }
 
@@ -293,13 +295,13 @@ function Select-ScoopDBItem {
 function Get-ScoopDBItem {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [string]
         $Name,
-        [Parameter(Mandatory, Position = 1)]
+        [Parameter(Mandatory, Position = 1, ValueFromPipelineByPropertyName)]
         [string]
         $Bucket,
-        [Parameter(Position = 2)]
+        [Parameter(Position = 2, ValueFromPipelineByPropertyName)]
         [string]
         $Version
     )
@@ -307,28 +309,46 @@ function Get-ScoopDBItem {
     begin {
         $db = Open-ScoopDB
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
+        $dbCommand = $db.CreateCommand()
+        $dbCommand.CommandType = [System.Data.CommandType]::Text
+        $dbAdapter.SelectCommand = $dbCommand
+    }
+
+    process {
         $result = New-Object System.Data.DataTable
+
+        # Build query based on whether version is specified
         $dbQuery = 'SELECT * FROM app WHERE name = @Name AND bucket = @Bucket'
         if ($Version) {
             $dbQuery += ' AND version = @Version'
         } else {
             $dbQuery += ' ORDER BY version DESC LIMIT 1'
         }
-        $dbCommand = $db.CreateCommand()
+
         $dbCommand.CommandText = $dbQuery
-        $dbCommand.CommandType = [System.Data.CommandType]::Text
-        $dbAdapter.SelectCommand = $dbCommand
-    }
-    process {
+        $dbCommand.Parameters.Clear()
+
+        # Add parameters for this specific query
         $dbCommand.Parameters.AddWithValue('@Name', $Name) | Out-Null
         $dbCommand.Parameters.AddWithValue('@Bucket', $Bucket) | Out-Null
-        $dbCommand.Parameters.AddWithValue('@Version', $Version) | Out-Null
+        if ($Version) {
+            $dbCommand.Parameters.AddWithValue('@Version', $Version) | Out-Null
+        }
+
         [void]$dbAdapter.Fill($result)
+
+        # Create a copy of the DataTable to avoid disposal issues
+        $resultCopy = $result.Copy()
+
+        # Use Write-Output to ensure PowerShell properly returns the DataTable
+        Write-Output $resultCopy -NoEnumerate
     }
+
     end {
+        # Clean up all resources
         $dbAdapter.Dispose()
+        $dbCommand.Dispose()
         $db.Dispose()
-        return $result
     }
 }
 
