@@ -379,7 +379,7 @@ function generate_user_manifest($app, $bucket, $version) {
     warn "Given version ($version) does not match manifest ($($manifest.version))"
 
     $historicalResult = $null
-    
+
     # Try SQLite cache first if enabled
     if (get_config USE_SQLITE_CACHE) {
         info "Searching for version '$version' in cache..."
@@ -395,7 +395,6 @@ function generate_user_manifest($app, $bucket, $version) {
         info "Searching for version '$version' in git history..."
         $historicalResult = Get-HistoricalManifestFromGitHistory $app $bucket $version
         if ($historicalResult) {
-            info "Found version '$($historicalResult.version)' for '$app' in git history (source: $($historicalResult.source))."
             return $historicalResult.path
         }
     }
@@ -408,7 +407,7 @@ function generate_user_manifest($app, $bucket, $version) {
             info "Current version available: $currentVersion"
             info "To install the current version, use: scoop install $app"
         }
-        
+
         # Check if we have autoupdate capability for fallback
         if ($manifest.autoupdate) {
             info "This app supports autoupdate - attempting to generate manifest for version $version"
@@ -448,7 +447,7 @@ function generate_user_manifest($app, $bucket, $version) {
     } catch {
         Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
         Write-Host -ForegroundColor Yellow "Autoupdate failed for version $version"
-        
+
         # Provide helpful guidance when autoupdate fails
         Write-Host "Possible reasons:"
         Write-Host "  - Version $version may not exist or be available for download"
@@ -470,7 +469,7 @@ function generate_user_manifest($app, $bucket, $version) {
                 return $fallbackResult.path
             }
         }
-        
+
         # Final failure - provide comprehensive guidance
         Write-Host -ForegroundColor Red "All attempts to find or generate manifest for '$app@$version' failed."
         abort "Installation of '$app@$version' is not possible"
