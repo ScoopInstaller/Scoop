@@ -70,6 +70,16 @@ Describe 'config' -Tag 'Scoop' {
         (get_config 'unicode') | Should -Be $unicode
     }
 
+    It 'get_config should return correct default values' {
+        $scoopConfig = load_cfg $configFile
+        (get_config 'this_is_null') | Should -BeNullOrEmpty
+        (get_config 'this_is_null' $true) | Should -BeTrue
+        (get_config 'this_is_null' $false) | Should -BeFalse
+        (get_config 'this_is_null' 'zero') | Should -BeExactly 'zero'
+        (get_config 'this_is_null' 1) | Should -BeExactly 1
+        (get_config 'this_is_null' $unicode) | Should -Be $unicode
+    }
+
     It 'set_config should remove a value if being set to $null' {
         $scoopConfig = load_cfg $configFile
         $scoopConfig = set_config 'five' $null
