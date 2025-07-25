@@ -42,15 +42,13 @@ function uninstall_psmodule($manifest, $dir, $global) {
 }
 
 function ensure_in_psmodulepath($dir, $global) {
-    $path = env 'psmodulepath' $global
+    $path = Get-EnvVar -Name 'PSModulePath' -Global:$global
     if (!$global -and $null -eq $path) {
         $path = "$env:USERPROFILE\Documents\WindowsPowerShell\Modules"
     }
-    $dir = fullpath $dir
     if ($path -notmatch [Regex]::Escape($dir)) {
         Write-Output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) PowerShell module path."
 
-        env 'psmodulepath' $global "$dir;$path" # for future sessions...
-        $env:psmodulepath = "$dir;$env:psmodulepath" # for this session
+        Set-EnvVar -Name 'PSModulePath' -Value "$dir;$path" -Global:$global
     }
 }

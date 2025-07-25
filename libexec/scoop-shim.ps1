@@ -35,6 +35,7 @@ param($SubCommand)
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
+. "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
 
 if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
     if (!$SubCommand) {

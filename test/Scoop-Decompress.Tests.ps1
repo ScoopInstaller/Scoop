@@ -14,7 +14,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
 
         function test_extract($extract_fn, $from, $removal) {
             $to = (strip_ext $from) -replace '\.tar$', ''
-            & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal
+            & $extract_fn ($from -replace '/', '\') ($to -replace '/', '\') -Removal:$removal -ExtractDir $args[0]
             return $to
         }
 
@@ -25,7 +25,7 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
         }
         It 'Test cases should exist and hash should match' {
             $testcases | Should -Exist
-            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be '791bfce192917a2ff225dcdd87d23ae5f720b20178d85e68e4b1b56139cf8e6a'
+            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be '591072faabd419b77932b7023e5899b4e05c0bf8e6859ad367398e6bfe1eb203'
         }
         It 'Test cases should be extracted correctly' {
             { Microsoft.PowerShell.Archive\Expand-Archive -Path $testcases -DestinationPath $working_dir } | Should -Not -Throw
@@ -50,13 +50,40 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $test6_1 = "$working_dir\7ZipTest6.part01.rar"
             $test6_2 = "$working_dir\7ZipTest6.part02.rar"
             $test6_3 = "$working_dir\7ZipTest6.part03.rar"
+            $test7 = "$working_dir\NSISTest.exe"
+        }
+
+        AfterEach {
+            Remove-Item -Path $to -Recurse -Force
         }
 
         It 'extract normal compressed file' {
             $to = test_extract 'Expand-7zipArchive' $test1
             $to | Should -Exist
             "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 4
+        }
+
+        It 'extract "extract_dir" correctly' {
+            $to = test_extract 'Expand-7zipArchive' $test1 $false 'tmp'
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'extract "extract_dir" with spaces correctly' {
+            $to = test_extract 'Expand-7zipArchive' $test1 $false 'tmp 2'
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'extract "extract_dir" with nested folder with same name' {
+            $to = test_extract 'Expand-7zipArchive' $test1 $false 'keep\sub'
+            $to | Should -Exist
+            "$to\keep\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+            (Get-ChildItem "$to\keep").Count | Should -Be 1
         }
 
         It 'extract nested compressed file' {
@@ -94,59 +121,42 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
+        It 'extract NSIS installer' {
+            $to = test_extract 'Expand-7zipArchive' $test7
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
+        It 'self-extract NSIS installer' {
+            $to = "$working_dir\NSIS Test"
+            $null = Invoke-ExternalCommand -FilePath $test7 -ArgumentList @('/S', '/NCRC', "/D=$to")
+            $to | Should -Exist
+            "$to\empty" | Should -Exist
+            (Get-ChildItem $to).Count | Should -Be 1
+        }
+
         It 'works with "-Removal" switch ($removal param)' {
             $test1 | Should -Exist
-            test_extract 'Expand-7zipArchive' $test1 $true
+            $to = test_extract 'Expand-7zipArchive' $test1 $true
+            $to | Should -Exist
             $test1 | Should -Not -Exist
             $test5_1 | Should -Exist
             $test5_2 | Should -Exist
             $test5_3 | Should -Exist
-            test_extract 'Expand-7zipArchive' $test5_1 $true
+            $to = test_extract 'Expand-7zipArchive' $test5_1 $true
+            $to | Should -Exist
             $test5_1 | Should -Not -Exist
             $test5_2 | Should -Not -Exist
             $test5_3 | Should -Not -Exist
             $test6_1 | Should -Exist
             $test6_2 | Should -Exist
             $test6_3 | Should -Exist
-            test_extract 'Expand-7zipArchive' $test6_1 $true
+            $to = test_extract 'Expand-7zipArchive' $test6_1 $true
+            $to | Should -Exist
             $test6_1 | Should -Not -Exist
             $test6_2 | Should -Not -Exist
             $test6_3 | Should -Not -Exist
-        }
-    }
-
-    Context 'zstd extraction' {
-
-        BeforeAll {
-            if ($env:CI) {
-                Mock Get-AppFilePath { $env:SCOOP_ZSTD_PATH } -ParameterFilter { $Helper -eq 'zstd' }
-                Mock Get-AppFilePath { '7z.exe' } -ParameterFilter { $Helper -eq '7zip' }
-            } elseif (!(installed zstd)) {
-                scoop install zstd
-            }
-
-            $test1 = "$working_dir\ZstdTest.zst"
-            $test2 = "$working_dir\ZstdTest.tar.zst"
-        }
-
-        It 'extract normal compressed file' {
-            $to = test_extract 'Expand-ZstdArchive' $test1
-            $to | Should -Exist
-            "$to\ZstdTest" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
-        }
-
-        It 'extract nested compressed file' {
-            $to = test_extract 'Expand-ZstdArchive' $test2
-            $to | Should -Exist
-            "$to\ZstdTest" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
-        }
-
-        It 'works with "-Removal" switch ($removal param)' {
-            $test1 | Should -Exist
-            test_extract 'Expand-ZstdArchive' $test1 $true
-            $test1 | Should -Not -Exist
         }
     }
 
@@ -158,11 +168,13 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             } elseif (!(installed lessmsi)) {
                 scoop install lessmsi
             }
+            Copy-Item "$working_dir\MSITest.msi" "$working_dir\MSI Test.msi"
             $test1 = "$working_dir\MSITest.msi"
-            $test2 = "$working_dir\MSITestNull.msi"
+            $test2 = "$working_dir\MSI Test.msi"
+            $test3 = "$working_dir\MSITestNull.msi"
         }
 
-        It 'extract normal MSI file' {
+        It 'extract normal MSI file using msiexec' {
             Mock get_config { $false }
             $to = test_extract 'Expand-MsiArchive' $test1
             $to | Should -Exist
@@ -170,9 +182,29 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             (Get-ChildItem "$to\MSITest").Count | Should -Be 1
         }
 
-        It 'extract empty MSI file using lessmsi' {
+        It 'extract normal MSI file with whitespace in path using msiexec' {
+            Mock get_config { $false }
+            $to = test_extract 'Expand-MsiArchive' $test2
+            $to | Should -Exist
+            "$to\MSITest\empty" | Should -Exist
+            (Get-ChildItem "$to\MSITest").Count | Should -Be 1
+        }
+
+        It 'extract normal MSI file using lessmsi' {
+            Mock get_config { $true }
+            $to = test_extract 'Expand-MsiArchive' $test1
+            $to | Should -Exist
+        }
+
+        It 'extract normal MSI file with whitespace in path using lessmsi' {
             Mock get_config { $true }
             $to = test_extract 'Expand-MsiArchive' $test2
+            $to | Should -Exist
+        }
+
+        It 'extract empty MSI file using lessmsi' {
+            Mock get_config { $true }
+            $to = test_extract 'Expand-MsiArchive' $test3
             $to | Should -Exist
         }
 

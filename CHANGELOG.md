@@ -1,63 +1,170 @@
-## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
+## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
+
+### Bug Fixes
+
+- **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
+- **decompress**: `Expand-7zipArchive` only delete temp dir / `$extractDir` if it is empty ([#6092](https://github.com/ScoopInstaller/Scoop/issues/6092))
+- **decompress**: Replace deprecated 7ZIPEXTRACT_USE_EXTERNAL config with USE_EXTERNAL_7ZIP ([#6327](https://github.com/ScoopInstaller/Scoop/issues/6327))
+- **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
+- **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
+- **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
+
+### Code Refactoring
+
+- **download:** Move download-related functions to 'download.ps1' ([#6095](https://github.com/ScoopInstaller/Scoop/issues/6095))
+
+### Performance Improvements
+
+- **shim:** Update kiennq-shim to v3.1.2 ([#6261](https://github.com/ScoopInstaller/Scoop/issues/6261))
+
+## [v0.5.2](https://github.com/ScoopInstaller/Scoop/compare/v0.5.1...v0.5.2) - 2024-07-26
+
+### Bug Fixes
+
+- **scoop-alias:** Fix 'Option --verbose not recognized.' ([#6062](https://github.com/ScoopInstaller/Scoop/issues/6062))
+- **scoop-hold:** Use 'foreach' loop to allow 'continue' statement ([#6078](https://github.com/ScoopInstaller/Scoop/issues/6078))
+- **core:** Use 'Join-Path' to construct cache file path ([#6079](https://github.com/ScoopInstaller/Scoop/issues/6079))
+- **json:** Don't serialize jsonpath return if only one result ([#6066](https://github.com/ScoopInstaller/Scoop/issues/6066), [#6073](https://github.com/ScoopInstaller/Scoop/issues/6073))
+
+### Builds
+
+- **supporting:** Update Json.Schema to 4.0.1 ([#6072](https://github.com/ScoopInstaller/Scoop/issues/6072))
+
+## [v0.5.1](https://github.com/ScoopInstaller/Scoop/compare/v0.5.0...v0.5.1) - 2024-07-16
+
+### Bug Fixes
+
+- **scoop-alias:** Pass options correctly ([#6003](https://github.com/ScoopInstaller/Scoop/issues/6003))
+- **scoop-virustotal:** Adjust `json_path` parameters to retrieve correct analysis stats ([#6044](https://github.com/ScoopInstaller/Scoop/issues/6044))
+- **bucket:** Implement error handling for failed bucket addition ([#6051](https://github.com/ScoopInstaller/Scoop/issues/6051))
+- **database:** Fix compatibility with Windows PowerShell ([#6045](https://github.com/ScoopInstaller/Scoop/issues/6045))
+- **install:** Expand `env_set` items before setting Environment Variables ([#6050](https://github.com/ScoopInstaller/Scoop/issues/6050))
+- **install:** Fix parsing error when installing multiple apps w/ specific version ([#6039](https://github.com/ScoopInstaller/Scoop/issues/6039))
+
+## [v0.5.0](https://github.com/ScoopInstaller/Scoop/compare/v0.4.2...v0.5.0) - 2024-07-01
+
+### Features
+
+- **scoop-search:** Use SQLite for caching apps to speed up local search ([#5851](https://github.com/ScoopInstaller/Scoop/issues/5851), [#5918](https://github.com/ScoopInstaller/Scoop/issues/5918), [#5946](https://github.com/ScoopInstaller/Scoop/issues/5946), [#5949](https://github.com/ScoopInstaller/Scoop/issues/5949), [#5955](https://github.com/ScoopInstaller/Scoop/issues/5955), [#5966](https://github.com/ScoopInstaller/Scoop/issues/5966), [#5967](https://github.com/ScoopInstaller/Scoop/issues/5967), [#5981](https://github.com/ScoopInstaller/Scoop/issues/5981))
+- **core:** New cache filename format ([#5929](https://github.com/ScoopInstaller/Scoop/issues/5929), [#5944](https://github.com/ScoopInstaller/Scoop/issues/5944))
+- **decompress:** Use innounp-unicode as default Inno Setup Unpacker ([#6028](https://github.com/ScoopInstaller/Scoop/issues/6028))
+- **install:** Added the ability to install specific version of app from URL/file link ([#5988](https://github.com/ScoopInstaller/Scoop/issues/5988))
+
+### Bug Fixes
+
+- **scoop-download|install|update:** Use consistent options ([#5956](https://github.com/ScoopInstaller/Scoop/issues/5956))
+- **scoop-info:** Fix download size estimating ([#5958](https://github.com/ScoopInstaller/Scoop/issues/5958))
+- **scoop-search:** Catch error of parsing invalid manifest ([#5930](https://github.com/ScoopInstaller/Scoop/issues/5930))
+- **checkver:** Correct variable 'regex' to 'regexp' ([#5993](https://github.com/ScoopInstaller/Scoop/issues/5993))
+- **checkver:** Correct error messages ([#6024](https://github.com/ScoopInstaller/Scoop/issues/6024))
+- **core:** Search for Git executable instead of any cmdlet ([#5998](https://github.com/ScoopInstaller/Scoop/issues/5998))
+- **core:** Use correct path in 'bash' ([#6006](https://github.com/ScoopInstaller/Scoop/issues/6006))
+- **core:** Limit the number of commands to get when search for git executable ([#6013](https://github.com/ScoopInstaller/Scoop/issues/6013))
+- **decompress:** Match `extract_dir`/`extract_to` and archives ([#5983](https://github.com/ScoopInstaller/Scoop/issues/5983))
+- **json:** Serialize jsonpath return ([#5921](https://github.com/ScoopInstaller/Scoop/issues/5921))
+- **shim:** Restore original path for JAR cmd ([#6030](https://github.com/ScoopInstaller/Scoop/issues/6030))
+
+### Code Refactoring
+
+- **decompress:** Use 7zip to extract Zstd archive ([#5973](https://github.com/ScoopInstaller/Scoop/issues/5973))
+- **install:** Separate archive extraction from downloader ([#5951](https://github.com/ScoopInstaller/Scoop/issues/5951))
+- **install:** Replace 'run_(un)installer()' with 'Invoke-Installer()' ([#5968](https://github.com/ScoopInstaller/Scoop/issues/5968), [#5971](https://github.com/ScoopInstaller/Scoop/issues/5971))
+
+## [v0.4.2](https://github.com/ScoopInstaller/Scoop/compare/v0.4.1...v0.4.2) - 2024-05-14
+
+### Bug Fixes
+
+- **autoupdate:** Copy `PSCustomObject`-type properties within `substitute()` to prevent reference changes ([#5934](https://github.com/ScoopInstaller/Scoop/issues/5934), [#5962](https://github.com/ScoopInstaller/Scoop/issues/5962))
+- **core:** Fix `Invoke-ExternalCommand` quoting rules ([#5945](https://github.com/ScoopInstaller/Scoop/issues/5945))
+- **system:** Fix argument passing to `Split-PathLikeEnvVar()` in deprecated `strip_path()` ([#5937](https://github.com/ScoopInstaller/Scoop/issues/5937))
+
+## [v0.4.1](https://github.com/ScoopInstaller/Scoop/compare/v0.4.0...v0.4.1) - 2024-04-25
+
+### Bug Fixes
+
+- **core:** Fix `Invoke-ExternalCommand` regression ([#5923](https://github.com/ScoopInstaller/Scoop/issues/5923))
+
+## [v0.4.0](https://github.com/ScoopInstaller/Scoop/compare/v0.3.1...v0.4.0) - 2024-04-18
 
 ### Features
 
 - **scoop-update:** Add support for parallel syncing buckets in PowerShell 7 and improve output ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122))
 - **bucket:** Switch nirsoft bucket to ScoopInstaller/Nirsoft ([#5328](https://github.com/ScoopInstaller/Scoop/issues/5328))
-- **config:** Support portable config file ([#5369](https://github.com/ScoopInstaller/Scoop/issues/5369))
 - **bucket:** Make official buckets higher priority ([#5398](https://github.com/ScoopInstaller/Scoop/issues/5398))
+- **config:** Support portable config file ([#5369](https://github.com/ScoopInstaller/Scoop/issues/5369))
 - **core:** Add `-Quiet` switch for `Invoke-ExternalCommand` ([#5346](https://github.com/ScoopInstaller/Scoop/issues/5346))
 - **core:** Allow global install of PowerShell modules ([#5611](https://github.com/ScoopInstaller/Scoop/issues/5611))
+- **path:** Isolate Scoop apps' PATH ([#5840](https://github.com/ScoopInstaller/Scoop/issues/5840))
 
 ### Bug Fixes
 
-- **shim:** Remove console window for GUI applications ([#5559](https://github.com/ScoopInstaller/Scoop/issues/5559))
-- **decompress:** Exclude '*.nsis' that may cause error ([#5294](https://github.com/ScoopInstaller/Scoop/issues/5294))
+- **scoop-alias:** Prevent overwrite existing file when adding alias ([#5577](https://github.com/ScoopInstaller/Scoop/issues/5577))
+- **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
+- **scoop-checkup:** Change the message level of helpers from ERROR to WARN ([#5614](https://github.com/ScoopInstaller/Scoop/issues/5614))
+- **scoop-checkup:** Don't throw 7zip error when external 7zip is used ([#5703](https://github.com/ScoopInstaller/Scoop/issues/5703))
+- **scoop-(un)hold:** Correct output the messages when manifest not found, (already|not) held ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
+- **scoop-info:** Fix errors in file size collection when `--verbose` ([#5352](https://github.com/ScoopInstaller/Scoop/issues/5352))
+- **scoop-reset:** Don't abort when multiple apps are passed and an app is running ([#5687](https://github.com/ScoopInstaller/Scoop/issues/5687))
+- **scoop-update:** Change error message to a better instruction ([#5677](https://github.com/ScoopInstaller/Scoop/issues/5677))
+- **scoop-virustotal:** Fix `scoop-virustotal` when `--all` has been passed without app ([#5593](https://github.com/ScoopInstaller/Scoop/issues/5593))
+- **scoop-virustotal:** Fix the issue that escape character not available in PowerShell 5.1 ([#5870](https://github.com/ScoopInstaller/Scoop/issues/5870))
 - **autoupdate:** Fix file hash extraction ([#5295](https://github.com/ScoopInstaller/Scoop/issues/5295))
-- **getopt:** Stop split arguments in `getopt()` and ensure array by explicit arguments type ([#5326](https://github.com/ScoopInstaller/Scoop/issues/5326))
-- **shortcuts:** Output correctly formatted path ([#5333](https://github.com/ScoopInstaller/Scoop/issues/5333))
+- **autoupdate:** Fix bug that 'WebClient' doesn't auto-extract 'gzip' ([#5901](https://github.com/ScoopInstaller/Scoop/issues/5901))
+- **buckets:** Avoid error messages for unexpected dir ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5549))
+- **config:** Warn users about misconfigured GitHub token ([#5777](https://github.com/ScoopInstaller/Scoop/issues/5777))
 - **core:** Fix scripts' calling parameters ([#5365](https://github.com/ScoopInstaller/Scoop/issues/5365))
 - **core:** Fix `is_in_dir` under Unix ([#5391](https://github.com/ScoopInstaller/Scoop/issues/5391))
 - **core:** Rewrite config file when needed ([#5439](https://github.com/ScoopInstaller/Scoop/issues/5439))
-- **core:** Prevents leaking HTTP(S)_PROXY env vars to current sessions after Invoke-Git in parallel execution ([#5436](https://github.com/ScoopInstaller/Scoop/pull/5436))
+- **core:** Prevents leaking HTTP(S)_PROXY env vars to current sessions after Invoke-Git in parallel execution ([#5436](https://github.com/ScoopInstaller/Scoop/issues/5436))
 - **core:** Handle scoop aliases and broken(edited,copied) shim ([#5551](https://github.com/ScoopInstaller/Scoop/issues/5551))
-- **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395), [#5452](https://github.com/ScoopInstaller/Scoop/pull/5452), [#5631](https://github.com/ScoopInstaller/Scoop/pull/5631))
-- **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))
-- **install:** Avoid error when unlinking non-existent junction/hardlink ([#5552](https://github.com/ScoopInstaller/Scoop/issues/5552))
-- **scoop-info:** Fix errors in file size collection when `--verbose` ([#5352](https://github.com/ScoopInstaller/Scoop/pull/5352))
-- **shim:** Use bash executable directly ([#5433](https://github.com/ScoopInstaller/Scoop/issues/5433))
 - **core:** Avoid error messages when deleting non-existent environment variable ([#5547](https://github.com/ScoopInstaller/Scoop/issues/5547))
 - **core:** Use relative path as fallback of `$scoopdir` ([#5544](https://github.com/ScoopInstaller/Scoop/issues/5544))
 - **core:** Fix detection of Git ([#5545](https://github.com/ScoopInstaller/Scoop/issues/5545))
-- **scoop-checkup:** Skip defender check in Windows Sandbox ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
-- **buckets:** Avoid error messages for unexpected dir ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5549))
-- **scoop-virustotal:** Fix `scoop-virustotal` when `--all` has been passed without app ([#5593](https://github.com/ScoopInstaller/Scoop/pull/5593))
-- **scoop-checkup:** Change the message level of helpers from ERROR to WARN ([#5549](https://github.com/ScoopInstaller/Scoop/issues/5614))
-- **scoop-(un)hold:** Correct output the messages when manifest not found, (already|not) held ([#5519](https://github.com/ScoopInstaller/Scoop/issues/5519))
-- **scoop-update:** Change error message to a better instruction ([#5677](https://github.com/ScoopInstaller/Scoop/issues/5677))
+- **core:** Do not call `scoop` externally from inside the code ([#5695](https://github.com/ScoopInstaller/Scoop/issues/5695))
+- **core:** Fix arguments parsing method of `Invoke-ExternalCommand()` ([#5839](https://github.com/ScoopInstaller/Scoop/issues/5839))
+- **decompress:** Exclude '*.nsis' that may cause error ([#5294](https://github.com/ScoopInstaller/Scoop/issues/5294))
+- **decompress:** Remove unused parent dir w/ 'extract_dir' ([#5682](https://github.com/ScoopInstaller/Scoop/issues/5682))
+- **decompress:** Use `wix.exe` in WiX Toolset v4+ as primary extractor of `Expand-DarkArchive()` ([#5871](https://github.com/ScoopInstaller/Scoop/issues/5871))
+- **env:** Avoid automatic expansion of `%%` in env ([#5395](https://github.com/ScoopInstaller/Scoop/issues/5395), [#5452](https://github.com/ScoopInstaller/Scoop/issues/5452), [#5631](https://github.com/ScoopInstaller/Scoop/issues/5631))
+- **getopt:** Stop split arguments in `getopt()` and ensure array by explicit arguments type ([#5326](https://github.com/ScoopInstaller/Scoop/issues/5326))
+- **install:** Fix download from private GitHub repositories ([#5361](https://github.com/ScoopInstaller/Scoop/issues/5361))
+- **install:** Avoid error when unlinking non-existent junction/hardlink ([#5552](https://github.com/ScoopInstaller/Scoop/issues/5552))
+- **manifest:** Correct source of manifest ([#5575](https://github.com/ScoopInstaller/Scoop/issues/5575))
+- **shim:** Remove console window for GUI applications ([#5559](https://github.com/ScoopInstaller/Scoop/issues/5559))
+- **shim:** Use bash executable directly ([#5433](https://github.com/ScoopInstaller/Scoop/issues/5433))
 - **shim:** Check literal path in `Get-ShimPath` ([#5680](https://github.com/ScoopInstaller/Scoop/issues/5680))
 - **shim:** Avoid unexpected output of `list` subcommand ([#5681](https://github.com/ScoopInstaller/Scoop/issues/5681))
-- **scoop-reset:** Don't abort when multiple apps are passed and an app is running ([#5687](https://github.com/ScoopInstaller/Scoop/issues/5687))
-- **core:** Do not call `scoop` externally from inside the code ([#5695](https://github.com/ScoopInstaller/Scoop/issues/5695))
-- **scoop-checkup:** Don't throw 7zip error when external 7zip is used ([#5703](https://github.com/ScoopInstaller/Scoop/issues/5703))
+- **shim:** Allow GUI applications to attach to the shell's console when launched using the GUI shim ([#5721](https://github.com/ScoopInstaller/Scoop/issues/5721))
+- **shim:** Run JAR file from app's root directory ([#5872](https://github.com/ScoopInstaller/Scoop/issues/5872))
+- **shortcuts:** Output correctly formatted path ([#5333](https://github.com/ScoopInstaller/Scoop/issues/5333))
+- **update/uninstall:** Remove items from PATH correctly ([#5833](https://github.com/ScoopInstaller/Scoop/issues/5833))
 
 ### Performance Improvements
 
+- **scoop-search:** Improve performance for local search ([#5644](https://github.com/ScoopInstaller/Scoop/issues/5644))
+- **scoop-update:** Check for running process before wasting time on download ([#5799](https://github.com/ScoopInstaller/Scoop/issues/5799))
 - **decompress:** Disable progress bar to improve `Expand-Archive` performance ([#5410](https://github.com/ScoopInstaller/Scoop/issues/5410))
-- **scoop-search:** Improve performance for local search ([#5324](https://github.com/ScoopInstaller/Scoop/issues/5324))
+- **shim:** Update kiennq-shim to v3.1.1 ([#5841](https://github.com/ScoopInstaller/Scoop/issues/5841), [#5847](https://github.com/ScoopInstaller/Scoop/issues/5847))
 
 ### Code Refactoring
 
-- **git:** Use Invoke-Git() with direct path to git.exe to prevent spawning shim subprocesses ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122), [#5375](https://github.com/ScoopInstaller/Scoop/issues/5375))
 - **scoop-download:** Output more detailed manifest information ([#5277](https://github.com/ScoopInstaller/Scoop/issues/5277))
+- **core:** Cleanup some old codes, e.g., msi section and config migration ([#5715](https://github.com/ScoopInstaller/Scoop/issues/5715), [#5824](https://github.com/ScoopInstaller/Scoop/issues/5824))
+- **core:** Rewrite and separate path-related functions to `system.ps1` ([#5836](https://github.com/ScoopInstaller/Scoop/issues/5836), [#5858](https://github.com/ScoopInstaller/Scoop/issues/5858), [#5864](https://github.com/ScoopInstaller/Scoop/issues/5864))
+- **core:** Get rid of 'fullpath' ([#3533](https://github.com/ScoopInstaller/Scoop/issues/3533))
+- **git:** Use Invoke-Git() with direct path to git.exe to prevent spawning shim subprocesses ([#5122](https://github.com/ScoopInstaller/Scoop/issues/5122), [#5375](https://github.com/ScoopInstaller/Scoop/issues/5375))
+- **helper:** Remove 7zip's fallback '7zip-zstd' ([#5548](https://github.com/ScoopInstaller/Scoop/issues/5548))
+- **shim:** Remove CS shim codebase ([#5903](https://github.com/ScoopInstaller/Scoop/issues/5903))
 
 ### Builds
 
 - **checkver:** Read the private_host config variable ([#5381](https://github.com/ScoopInstaller/Scoop/issues/5381))
+- **supporting:** Update Json to 13.0.3, Json.Schema to 3.0.15 ([#5835](https://github.com/ScoopInstaller/Scoop/issues/5835))
 
 ### Continuous Integration
 
-- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/pull/5377))
+- **dependabot:** Add dependabot.yml for GitHub Actions ([#5377](https://github.com/ScoopInstaller/Scoop/issues/5377))
+- **module:** Update 'psmodulecache' version to 'main' ([#5828](https://github.com/ScoopInstaller/Scoop/issues/5828))
 
 ### Tests
 

@@ -6,6 +6,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion'
+. "$PSScriptRoot\..\lib\download.ps1" # 'Get-RemoteFileSize'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
 if ($err) { error "scoop info: $err"; exit 1 }
@@ -160,13 +161,13 @@ if ($status.installed) {
         $totalPackage = 0
         foreach ($url in @(url $manifest (Get-DefaultArchitecture))) {
             try {
-                if (Test-Path (fullpath (cache_path $app $manifest.version $url))) {
+                if (Test-Path (cache_path $app $manifest.version $url)) {
                     $cached = " (latest version is cached)"
                 } else {
                     $cached = $null
                 }
 
-                [int]$urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length'[0]
+                $urlLength = Get-RemoteFileSize $url
                 $totalPackage += $urlLength
             } catch [System.Management.Automation.RuntimeException] {
                 $totalPackage = 0
@@ -210,7 +211,7 @@ $env_set = arch_specific 'env_set' $manifest $install.architecture
 if ($env_set) {
     $env_vars = @()
     $env_set | Get-Member -member noteproperty | ForEach-Object {
-        $env_vars += "$($_.name) = $(format $env_set.$($_.name) @{ "dir" = $dir })"
+        $env_vars += "$($_.name) = $(substitute $env_set.$($_.name) @{ '$dir' = $dir })"
     }
     $item.Environment = $env_vars -join "`n"
 }

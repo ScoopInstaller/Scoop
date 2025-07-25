@@ -31,13 +31,14 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\json.ps1" # 'json_path'
-. "$PSScriptRoot\..\lib\install.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\download.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
 $opt, $apps, $err = getopt $args 'asnup' @('all', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
 if ($err) { "scoop virustotal: $err"; exit 1 }
-if (!$apps -and -$all) { my_usage; exit 1 }
-$architecture = Format-ArchitectureString
+$all = $apps -eq '*' -or $opt.a -or $opt.all
+if (!$apps -and !$all) { my_usage; exit 1 }
+$architecture = Get-DefaultArchitecture
 
 if (is_scoop_outdated) {
     if ($opt.u -or $opt.'no-update-scoop') {
@@ -47,11 +48,8 @@ if (is_scoop_outdated) {
     }
 }
 
-$apps_param = $apps
-
-if ($apps_param -eq '*' -or $opt.a -or $opt.all) {
-    $apps = installed_apps $false
-    $apps += installed_apps $true
+if ($all) {
+    $apps = (installed_apps $false) + (installed_apps $true)
 }
 
 if (!$opt.n -and !$opt.'no-depends') {
@@ -86,11 +84,6 @@ Function ConvertTo-VirusTotalUrlId ($url) {
     $url_id = $url_id -replace '/', '_'
     $url_id = $url_id -replace '=', ''
     $url_id
-}
-
-Function Get-RemoteFileSize ($url) {
-    $response = Invoke-WebRequest -Uri $url -Method HEAD -UseBasicParsing
-    $response.Headers.'Content-Length' | ForEach-Object { [System.Convert]::ToInt32($_) }
 }
 
 Function Get-VirusTotalResultByHash ($hash, $url, $app) {
@@ -136,7 +129,7 @@ Function Get-VirusTotalResultByHash ($hash, $url, $app) {
                 warn "$app`: $unsafe/$total, see $report_url"
             }
             Default {
-                warn "`e[31m$app`: $unsafe/$total, see $report_url`e[0m"
+                warn "$([char]0x1b)[31m$app`: $unsafe/$total, see $report_url$([char]0x1b)[0m"
             }
         }
         $maliciousResults = $vendorResults |

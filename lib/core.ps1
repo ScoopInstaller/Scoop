@@ -63,18 +63,6 @@ function Optimize-SecurityProtocol {
     }
 }
 
-function Get-Encoding($wc) {
-    if ($null -ne $wc.ResponseHeaders -and $wc.ResponseHeaders['Content-Type'] -match 'charset=([^;]*)') {
-        return [System.Text.Encoding]::GetEncoding($Matches[1])
-    } else {
-        return [System.Text.Encoding]::GetEncoding('utf-8')
-    }
-}
-
-function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
-}
-
 function Show-DeprecatedWarning {
     <#
     .SYNOPSIS
@@ -132,6 +120,9 @@ function set_config {
         $value = [System.Convert]::ToBoolean($value)
     }
 
+    # Initialize config's change
+    Complete-ConfigChange -Name $name -Value $value
+
     if ($null -eq $scoopConfig.$name) {
         $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
     } else {
@@ -147,32 +138,81 @@ function set_config {
     return $scoopConfig
 }
 
-function setup_proxy() {
-    # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
-    $proxy = get_config PROXY
-    if(!$proxy) {
-        return
+function Complete-ConfigChange {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory, Position = 0)]
+        [string]
+        $Name,
+        [Parameter(Mandatory, Position = 1)]
+        [AllowEmptyString()]
+        [string]
+        $Value
+    )
+
+    if ($Name -eq 'use_isolated_path') {
+        $oldValue = get_config USE_ISOLATED_PATH
+        if ($Value -eq $oldValue) {
+            return
+        } else {
+            $currPathEnvVar = $scoopPathEnvVar
+        }
+        . "$PSScriptRoot\..\lib\system.ps1"
+
+        if ($Value -eq $false -or $Value -eq '') {
+            info 'Turn off Scoop isolated path... This may take a while, please wait.'
+            $movedPath = Get-EnvVar -Name $currPathEnvVar
+            if ($movedPath) {
+                Add-Path -Path $movedPath -Quiet
+                Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
+                Set-EnvVar -Name $currPathEnvVar -Quiet
+            }
+            if (is_admin) {
+                $movedPath = Get-EnvVar -Name $currPathEnvVar -Global
+                if ($movedPath) {
+                    Add-Path -Path $movedPath -Global -Quiet
+                    Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet
+                    Set-EnvVar -Name $currPathEnvVar -Global -Quiet
+                }
+            }
+        } else {
+            $newPathEnvVar = if ($Value -eq $true) {
+                'SCOOP_PATH'
+            } else {
+                $Value.ToUpperInvariant()
+            }
+            info "Turn on Scoop isolated path ('$newPathEnvVar')... This may take a while, please wait."
+            $movedPath = Remove-Path -Path "$scoopdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
+            if ($movedPath) {
+                Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Quiet
+                Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
+                if ($currPathEnvVar -ne 'PATH') {
+                    Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
+                    Set-EnvVar -Name $currPathEnvVar -Quiet
+                }
+            }
+            if (is_admin) {
+                $movedPath = Remove-Path -Path "$globaldir\apps\*" -TargetEnvVar $currPathEnvVar -Global -Quiet -PassThru
+                if ($movedPath) {
+                    Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Global -Quiet
+                    Add-Path -Path ('%' + $newPathEnvVar + '%') -Global -Quiet
+                    if ($currPathEnvVar -ne 'PATH') {
+                        Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet
+                        Set-EnvVar -Name $currPathEnvVar -Global -Quiet
+                    }
+                }
+            }
+        }
     }
-    try {
-        $credentials, $address = $proxy -split '(?<!\\)@'
-        if(!$address) {
-            $address, $credentials = $credentials, $null # no credentials supplied
-        }
 
-        if($address -eq 'none') {
-            [net.webrequest]::defaultwebproxy = $null
-        } elseif($address -ne 'default') {
-            [net.webrequest]::defaultwebproxy = new-object net.webproxy "http://$address"
+    if ($Name -eq 'use_sqlite_cache' -and $Value -eq $true) {
+        if ((Get-DefaultArchitecture) -eq 'arm64') {
+            abort 'SQLite cache is not supported on ARM64 platform.'
         }
-
-        if($credentials -eq 'currentuser') {
-            [net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
-        } elseif($credentials) {
-            $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])','$1' }
-            [net.webrequest]::defaultwebproxy.credentials = new-object net.networkcredential($username, $password)
-        }
-    } catch {
-        warn "Failed to use proxy '$proxy': $($_.exception.message)"
+        . "$PSScriptRoot\..\lib\database.ps1"
+        . "$PSScriptRoot\..\lib\manifest.ps1"
+        info 'Initializing SQLite cache in progress... This may take a while, please wait.'
+        Set-ScoopDB
     }
 }
 
@@ -243,10 +283,6 @@ function Invoke-GitLog {
 # helper functions
 function coalesce($a, $b) { if($a) { return $a } $b }
 
-function format($str, $hash) {
-    $hash.keys | ForEach-Object { set-variable $_ $hash[$_] }
-    $executionContext.invokeCommand.expandString($str)
-}
 function is_admin {
     $admin = [security.principal.windowsbuiltinrole]::administrator
     $id = [security.principal.windowsidentity]::getcurrent()
@@ -303,7 +339,7 @@ function filesize($length) {
     } else {
         if ($null -eq $length) {
             $length = 0
-       }
+        }
         "$($length) B"
     }
 }
@@ -335,7 +371,22 @@ function persistdir($app, $global) {
 }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
-function cache_path($app, $version, $url) { "$cachedir\$app#$version#$($url -replace '[^\w\.\-]+', '_')" }
+function cache_path($app, $version, $url) {
+    $underscoredUrl = $url -replace '[^\w\.\-]+', '_'
+    $filePath = Join-Path $cachedir "$app#$version#$underscoredUrl"
+
+    # NOTE: Scoop cache files migration. Remove this 6 months after the feature ships.
+    if (Test-Path $filePath) {
+        return $filePath
+    }
+
+    $urlStream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url))
+    $sha = (Get-FileHash -Algorithm SHA256 -InputStream $urlStream).Hash.ToLower().Substring(0, 7)
+    $extension = [System.IO.Path]::GetExtension($url)
+    $filePath = $filePath -replace "$underscoredUrl", "$sha$extension"
+
+    return $filePath
+}
 
 # apps
 function sanitary_path($path) { return [regex]::replace($path, "[/\\?:*<>|]", "") }
@@ -413,7 +464,7 @@ function Get-HelperPath {
     [OutputType([String])]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('Git', '7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
+        [ValidateSet('Git', '7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
         [String]
         $Helper
     )
@@ -427,25 +478,24 @@ function Get-HelperPath {
                 if ($internalgit) {
                     $HelperPath = $internalgit
                 } else {
-                    $HelperPath = (Get-Command git -ErrorAction Ignore).Source
+                    $HelperPath = (Get-Command git -CommandType Application -TotalCount 1 -ErrorAction Ignore).Source
                 }
             }
-            '7zip' {
-                $HelperPath = Get-AppFilePath '7zip' '7z.exe'
-                if ([String]::IsNullOrEmpty($HelperPath)) {
-                    $HelperPath = Get-AppFilePath '7zip-zstd' '7z.exe'
-                }
-            }
+            '7zip' { $HelperPath = Get-AppFilePath '7zip' '7z.exe' }
             'Lessmsi' { $HelperPath = Get-AppFilePath 'lessmsi' 'lessmsi.exe' }
-            'Innounp' { $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe' }
-            'Dark' {
-                $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
+            'Innounp' {
+                $HelperPath = Get-AppFilePath 'innounp-unicode' 'innounp.exe'
                 if ([String]::IsNullOrEmpty($HelperPath)) {
-                    $HelperPath = Get-AppFilePath 'wixtoolset' 'dark.exe'
+                    $HelperPath = Get-AppFilePath 'innounp' 'innounp.exe'
+                }
+            }
+            'Dark' {
+                $HelperPath = Get-AppFilePath 'wixtoolset' 'wix.exe'
+                if ([String]::IsNullOrEmpty($HelperPath)) {
+                    $HelperPath = Get-AppFilePath 'dark' 'dark.exe'
                 }
             }
             'Aria2' { $HelperPath = Get-AppFilePath 'aria2' 'aria2c.exe' }
-            'Zstd' { $HelperPath = Get-AppFilePath 'zstd' 'zstd.exe' }
         }
 
         return $HelperPath
@@ -462,8 +512,8 @@ function Get-CommandPath {
     )
 
     begin {
-        $userShims = Convert-Path (shimdir $false)
-        $globalShims = fullpath (shimdir $true) # don't resolve: may not exist
+        $userShims = shimdir $false
+        $globalShims = shimdir $true
     }
 
     process {
@@ -492,16 +542,12 @@ function Test-HelperInstalled {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2', 'Zstd')]
+        [ValidateSet('7zip', 'Lessmsi', 'Innounp', 'Dark', 'Aria2')]
         [String]
         $Helper
     )
 
     return ![String]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
-}
-
-function Test-Aria2Enabled {
-    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
 function app_status($app, $global) {
@@ -555,45 +601,53 @@ function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
 function strip_fragment($url) { $url -replace (new-object uri $url).fragment }
-
-function url_filename($url) {
-    (split-path $url -leaf).split('?') | Select-Object -First 1
-}
-# Unlike url_filename which can be tricked by appending a
-# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
-# this function extracts the original filename from the URL.
-function url_remote_filename($url) {
-    $uri = (New-Object URI $url)
-    $basename = Split-Path $uri.PathAndQuery -Leaf
-    If ($basename -match ".*[?=]+([\w._-]+)") {
-        $basename = $matches[1]
-    }
-    If (($basename -notlike "*.*") -or ($basename -match "^[v.\d]+$")) {
-        $basename = Split-Path $uri.AbsolutePath -Leaf
-    }
-    If (($basename -notlike "*.*") -and ($uri.Fragment -ne "")) {
-        $basename = $uri.Fragment.Trim('/', '#')
-    }
-    return $basename
-}
-
 function ensure($dir) {
     if (!(Test-Path -Path $dir)) {
         New-Item -Path $dir -ItemType Directory | Out-Null
     }
     Convert-Path -Path $dir
 }
+function Get-AbsolutePath {
+    <#
+    .SYNOPSIS
+        Get absolute path
+    .DESCRIPTION
+        Get absolute path, even if not existed
+    .PARAMETER Path
+        Path to manipulate
+    .OUTPUTS
+        System.String
+            Absolute path, may or maynot existed
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]
+        $Path
+    )
+    process {
+        return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+    }
+}
+
 function fullpath($path) {
-    # should be ~ rooted
-    $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
+    Show-DeprecatedWarning $MyInvocation 'Get-AbsolutePath'
+    return Get-AbsolutePath -Path $path
 }
 function friendly_path($path) {
-    $h = (Get-PsProvider 'FileSystem').home; if(!$h.endswith('\')) { $h += '\' }
-    if($h -eq '\') { return $path }
-    return "$path" -replace ([regex]::escape($h)), "~\"
+    $h = (Get-PSProvider 'FileSystem').Home
+    if (!$h.EndsWith('\')) {
+        $h += '\'
+    }
+    if ($h -eq '\') {
+        return $path
+    } else {
+        return $path -replace ([Regex]::Escape($h)), '~\'
+    }
 }
 function is_local($path) {
-    ($path -notmatch '^https?://') -and (test-path $path)
+    ($path -notmatch '^https?://') -and (Test-Path $path)
 }
 
 # operations
@@ -607,8 +661,7 @@ function Invoke-ExternalCommand {
     [CmdletBinding(DefaultParameterSetName = "Default")]
     [OutputType([Boolean])]
     param (
-        [Parameter(Mandatory = $true,
-                   Position = 0)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [Alias("Path")]
         [ValidateNotNullOrEmpty()]
         [String]
@@ -658,24 +711,35 @@ function Invoke-ExternalCommand {
         $Process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
     }
     if ($ArgumentList.Length -gt 0) {
-        if ($FilePath -match '^((cmd|cscript|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$') {
-            $Process.StartInfo.Arguments = $ArgumentList -join ' '
-        } elseif ($Process.StartInfo.ArgumentList.Add) {
+        # Remove existing double quotes and split arguments
+        # '(?<=(?<![:\w])[/-]\w+) ' matches a space after a command line switch starting with a slash ('/') or a hyphen ('-')
+        # The inner item '(?<![:\w])[/-]' matches a slash ('/') or a hyphen ('-') not preceded by a colon (':') or a word character ('\w')
+        # so that it must be a command line switch, otherwise, it would be a path (e.g. 'C:/Program Files') or other word (e.g. 'some-arg')
+        # ' (?=[/-])' matches a space followed by a slash ('/') or a hyphen ('-'), i.e. the space before a command line switch
+        $ArgumentList = $ArgumentList.ForEach({ $_ -replace '"' -split '(?<=(?<![:\w])[/-]\w+) | (?=[/-])' })
+        # Use legacy argument escaping for commands having non-standard behavior with regard to argument passing.
+        # `msiexec` requires some args like `TARGETDIR="C:\Program Files"`, which is non-standard, therefore we treat it as a legacy command.
+        # NSIS installer's '/D' param may not work with the ArgumentList property, so we need to escape arguments manually.
+        # ref-1: https://learn.microsoft.com/en-us/powershell/scripting/learn/experimental-features?view=powershell-7.4#psnativecommandargumentpassing
+        # ref-2: https://nsis.sourceforge.io/Docs/Chapter3.html
+        $LegacyCommand = $FilePath -match '^((cmd|cscript|find|sqlcmd|wscript|msiexec)(\.exe)?|.*\.(bat|cmd|js|vbs|wsf))$' -or
+            ($ArgumentList -match '^/S$|^/D=[A-Z]:[\\/].*$').Length -eq 2
+        $SupportArgumentList = $Process.StartInfo.PSObject.Properties.Name -contains 'ArgumentList'
+        if ((-not $LegacyCommand) -and $SupportArgumentList) {
             # ArgumentList is supported in PowerShell 6.1 and later (built on .NET Core 2.1+)
             # ref-1: https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.argumentlist?view=net-6.0
             # ref-2: https://docs.microsoft.com/en-us/powershell/scripting/whats-new/differences-from-windows-powershell?view=powershell-7.2#net-framework-vs-net-core
-            $ArgumentList | ForEach-Object { $Process.StartInfo.ArgumentList.Add($_) }
+            $ArgumentList.ForEach({ $Process.StartInfo.ArgumentList.Add($_) })
         } else {
-            # escape arguments manually in lower versions, refer to https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85)
-            $escapedArgs = $ArgumentList | ForEach-Object {
-                # escape N consecutive backslash(es), which are followed by a double quote, to 2N consecutive ones
-                $s = $_ -replace '(\\+)"', '$1$1"'
-                # escape N consecutive backslash(es), which are at the end of the string, to 2N consecutive ones
-                $s = $s -replace '(\\+)$', '$1$1'
-                # escape double quotes
-                $s = $s -replace '"', '\"'
-                # quote the argument
-                "`"$s`""
+            # Escape arguments manually in lower versions
+            $escapedArgs = switch -regex ($ArgumentList) {
+                # Quote paths starting with a drive letter
+                '(?<!/D=)[A-Z]:[\\/].*' { $_ -replace '([A-Z]:[\\/].*)', '"$1"'; continue }
+                # Do not quote paths if it is NSIS's '/D' argument
+                '/D=[A-Z]:[\\/].*' { $_; continue }
+                # Quote args with spaces
+                ' ' { "`"$_`""; continue }
+                default { $_; continue }
             }
             $Process.StartInfo.Arguments = $escapedArgs -join ' '
         }
@@ -719,57 +783,6 @@ function Invoke-ExternalCommand {
         Write-Host "done." -ForegroundColor Green
     }
     return $true
-}
-
-function Publish-Env {
-    if (-not ("Win32.NativeMethods" -as [Type])) {
-        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @"
-[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-public static extern IntPtr SendMessageTimeout(
-    IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
-    uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
-"@
-    }
-
-    $HWND_BROADCAST = [IntPtr] 0xffff;
-    $WM_SETTINGCHANGE = 0x1a;
-    $result = [UIntPtr]::Zero
-
-    [Win32.Nativemethods]::SendMessageTimeout($HWND_BROADCAST,
-        $WM_SETTINGCHANGE,
-        [UIntPtr]::Zero,
-        "Environment",
-        2,
-        5000,
-        [ref] $result
-    ) | Out-Null
-}
-
-function env($name, $global, $val = '__get') {
-    $RegisterKey = if ($global) {
-        Get-Item -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager'
-    } else {
-        Get-Item -Path 'HKCU:'
-    }
-    $EnvRegisterKey = $RegisterKey.OpenSubKey('Environment', $val -ne '__get')
-
-    if ($val -eq '__get') {
-        $RegistryValueOption = [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
-        $EnvRegisterKey.GetValue($name, $null, $RegistryValueOption)
-    } elseif ($val -eq $null) {
-        try { $EnvRegisterKey.DeleteValue($name) } catch { }
-        Publish-Env
-    } else {
-        $RegistryValueKind = if ($val.Contains('%')) {
-            [Microsoft.Win32.RegistryValueKind]::ExpandString
-        } elseif ($EnvRegisterKey.GetValue($name)) {
-            $EnvRegisterKey.GetValueKind($name)
-        } else {
-            [Microsoft.Win32.RegistryValueKind]::String
-        }
-        $EnvRegisterKey.SetValue($name, $val, $RegistryValueKind)
-        Publish-Env
-    }
 }
 
 function isFileLocked([string]$path) {
@@ -879,7 +892,7 @@ function warn_on_overwrite($shim, $path) {
 function shim($path, $global, $name, $arg) {
     if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
-    ensure_in_path $abs_shimdir $global
+    Add-Path -Path $abs_shimdir -Global:$global
     if (!$name) { $name = strip_ext (fname $path) }
 
     $shim = "$abs_shimdir\$($name.tolower())"
@@ -965,13 +978,21 @@ function shim($path, $global, $name, $arg) {
         warn_on_overwrite "$shim.cmd" $path
         @(
             "@rem $resolved_path",
-            "@java -jar `"$resolved_path`" $arg %*"
+            "@pushd $(Split-Path $resolved_path -Parent)",
+            "@java -jar `"$resolved_path`" $arg %*",
+            "@popd"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
         @(
             "#!/bin/sh",
             "# $resolved_path",
+            "if [ `$WSL_INTEROP ]",
+            'then',
+            "  cd `$(wslpath -u '$(Split-Path $resolved_path -Parent)')",
+            'else',
+            "  cd `$(cygpath -u '$(Split-Path $resolved_path -Parent)')",
+            'fi',
             "java.exe -jar `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } elseif ($path -match '\.py$') {
@@ -983,57 +1004,51 @@ function shim($path, $global, $name, $arg) {
 
         warn_on_overwrite $shim $path
         @(
-            "#!/bin/sh",
+            '#!/bin/sh',
             "# $resolved_path",
             "python.exe `"$resolved_path`" $arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
+        $quoted_arg = if ($arg.Count -gt 0) { $arg | ForEach-Object { "`"$_`"" } }
         @(
             "@rem $resolved_path",
-            "@bash `"$resolved_path`" $arg %*"
+            '@echo off',
+            'bash -c "command -v wslpath >/dev/null"',
+            'if %errorlevel% equ 0 (',
+            "  bash `"`$(wslpath -u '$resolved_path')`" $quoted_arg %*",
+            ') else (',
+            "  set args=$quoted_arg %*",
+            '  setlocal enabledelayedexpansion',
+            '  if not "!args!"=="" set args=!args:"=""!',
+            "  bash -c `"`$(cygpath -u '$resolved_path') !args!`"",
+            ')'
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
         warn_on_overwrite $shim $path
         @(
-            "#!/bin/sh",
+            '#!/bin/sh',
             "# $resolved_path",
-            "`"$resolved_path`" $arg `"$@`""
+            "if [ `$WSL_INTEROP ]",
+            'then',
+            "  `"`$(wslpath -u '$resolved_path')`" $arg `"$@`"",
+            'else',
+            "  `"`$(cygpath -u '$resolved_path')`" $arg `"$@`"",
+            'fi'
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     }
 }
 
 function get_shim_path() {
-    $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe"
-    $shim_version = get_config SHIM 'default'
-    switch ($shim_version) {
-        '71' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe"; Break }
-        'scoopcs' { $shim_path = "$(versiondir 'scoop' 'current')\supporting\shimexe\bin\shim.exe"; Break }
-        'kiennq' { Break } # for backward compatibility
-        'default' { Break }
+    $shim_version = get_config SHIM 'kiennq'
+    $shim_path = switch ($shim_version) {
+        'scoopcs' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
+        '71' { "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe" }
+        'kiennq' { "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe" }
+        'default' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
         default { warn "Unknown shim version: '$shim_version'" }
     }
     return $shim_path
-}
-
-function search_in_path($target) {
-    $path = (env 'PATH' $false) + ";" + (env 'PATH' $true)
-    foreach($dir in $path.split(';')) {
-        if(test-path "$dir\$target" -pathType leaf) {
-            return "$dir\$target"
-        }
-    }
-}
-
-function ensure_in_path($dir, $global) {
-    $path = env 'PATH' $global
-    $dir = fullpath $dir
-    if($path -notmatch [regex]::escape($dir)) {
-        write-output "Adding $(friendly_path $dir) to $(if($global){'global'}else{'your'}) path."
-
-        env 'PATH' $global "$dir;$path" # for future sessions...
-        $env:PATH = "$dir;$env:PATH" # for this session
-    }
 }
 
 function Get-DefaultArchitecture {
@@ -1205,7 +1220,7 @@ function applist($apps, $global) {
 }
 
 function parse_app([string]$app) {
-    if ($app -match '^(?:(?<bucket>[a-zA-Z0-9-_.]+)/)?(?<app>.*\.json$|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?$') {
+    if ($app -match '^(?:(?<bucket>[a-zA-Z0-9-_.]+)/)?(?<app>.*\.json|[a-zA-Z0-9-_.]+)(?:@(?<version>.*))?$') {
         return $Matches['app'], $Matches['bucket'], $Matches['version']
     } else {
         return $app, $null, $null
@@ -1258,8 +1273,8 @@ function Test-ScoopCoreOnHold() {
 }
 
 function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
-    $newentity = $entity
-    if ($null -ne $newentity) {
+    if ($null -ne $entity) {
+        $newentity = $entity.PSObject.Copy()
         switch ($entity.GetType().Name) {
             'String' {
                 $params.GetEnumerator() | ForEach-Object {
@@ -1271,7 +1286,7 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
                 }
             }
             'Object[]' {
-                $newentity = $entity | ForEach-Object { ,(substitute $_ $params $regexEscape) }
+                $newentity = $entity | ForEach-Object { , (substitute $_ $params $regexEscape) }
             }
             'PSCustomObject' {
                 $newentity.PSObject.Properties | ForEach-Object { $_.Value = substitute $_.Value $params $regexEscape }
@@ -1279,112 +1294,6 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
         }
     }
     return $newentity
-}
-
-function format_hash([String] $hash) {
-    $hash = $hash.toLower()
-    switch ($hash.Length)
-    {
-        32 { $hash = "md5:$hash" } # md5
-        40 { $hash = "sha1:$hash" } # sha1
-        64 { $hash = $hash } # sha256
-        128 { $hash = "sha512:$hash" } # sha512
-        default { $hash = $null }
-    }
-    return $hash
-}
-
-function format_hash_aria2([String] $hash) {
-    $hash = $hash -split ':' | Select-Object -Last 1
-    switch ($hash.Length)
-    {
-        32 { $hash = "md5=$hash" } # md5
-        40 { $hash = "sha-1=$hash" } # sha1
-        64 { $hash = "sha-256=$hash" } # sha256
-        128 { $hash = "sha-512=$hash" } # sha512
-        default { $hash = $null }
-    }
-    return $hash
-}
-
-function get_hash([String] $multihash) {
-    $type, $hash = $multihash -split ':'
-    if(!$hash) {
-        # no type specified, assume sha256
-        $type, $hash = 'sha256', $multihash
-    }
-
-    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
-        return $null, "Hash type '$type' isn't supported."
-    }
-
-    return $type, $hash.ToLower()
-}
-
-function Get-GitHubToken {
-    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN) | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
-}
-
-function handle_special_urls($url)
-{
-    # FossHub.com
-    if ($url -match "^(?:.*fosshub.com\/)(?<name>.*)(?:\/|\?dwl=)(?<filename>.*)$") {
-        $Body = @{
-            projectUri      = $Matches.name;
-            fileName        = $Matches.filename;
-            source          = 'CF';
-            isLatestVersion = $true
-        }
-        if ((Invoke-RestMethod -Uri $url) -match '"p":"(?<pid>[a-f0-9]{24}).*?"r":"(?<rid>[a-f0-9]{24})') {
-            $Body.Add("projectId", $Matches.pid)
-            $Body.Add("releaseId", $Matches.rid)
-        }
-        $url = Invoke-RestMethod -Method Post -Uri "https://api.fosshub.com/download/" -ContentType "application/json" -Body (ConvertTo-Json $Body -Compress)
-        if ($null -eq $url.error) {
-            $url = $url.data.url
-        }
-    }
-
-    # Sourceforge.net
-    if ($url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*?)(?:$|\/download|\?)") {
-        # Reshapes the URL to avoid redirections
-        $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
-    }
-
-    # Github.com
-    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = Get-GitHubToken)) {
-        $headers = @{ "Authorization" = "token $token" }
-        $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
-        $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
-
-        if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
-            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
-        }
-    }
-
-    return $url
-}
-
-function get_magic_bytes($file) {
-    if(!(Test-Path $file)) {
-        return ''
-    }
-
-    if((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
-        # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
-        return Get-Content $file -AsByteStream -TotalCount 8
-    }
-    else {
-        return Get-Content $file -Encoding byte -TotalCount 8
-    }
-}
-
-function get_magic_bytes_pretty($file, $glue = ' ') {
-    if(!(Test-Path $file)) {
-        return ''
-    }
-
-    return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }
 
 function Out-UTF8File {
@@ -1443,53 +1352,32 @@ if ($pathExpected) {
     # ├─shims
     # ├─config.json
     # ```
-    $configPortablePath = fullpath "$coreRoot\..\..\..\config.json"
+    $configPortablePath = Get-AbsolutePath "$coreRoot\..\..\..\config.json"
     if (Test-Path $configPortablePath) {
         $configFile = $configPortablePath
     }
 }
 $scoopConfig = load_cfg $configFile
 
-# NOTE Scoop config file migration. Remove this after 2023/6/30
-if ($scoopConfig -and $scoopConfig.PSObject.Properties.Name -contains 'lastUpdate') {
-    $newConfigNames = @{
-        'lastUpdate'               = 'last_update'
-        'SCOOP_REPO'               = 'scoop_repo'
-        'SCOOP_BRANCH'             = 'scoop_branch'
-        '7ZIPEXTRACT_USE_EXTERNAL' = 'use_external_7zip'
-        'MSIEXTRACT_USE_LESSMSI'   = 'use_lessmsi'
-        'NO_JUNCTIONS'             = 'no_junction'
-        'manifest_review'          = 'show_manifest'
-        'rootPath'                 = 'root_path'
-        'globalPath'               = 'global_path'
-        'cachePath'                = 'cache_path'
-    }
-    $newConfigNames.GetEnumerator() | ForEach-Object {
-        if ($null -ne $scoopConfig.$($_.Key)) {
-            $value = $scoopConfig.$($_.Key)
-            $scoopConfig.PSObject.Properties.Remove($_.Key)
-            $scoopConfig | Add-Member -MemberType NoteProperty -Name $_.Value -Value $value
-        }
-    }
-    ConvertTo-Json $scoopConfig | Out-UTF8File -FilePath $configFile
-}
-# END NOTE
-
 # Scoop root directory
-$scoopdir = $env:SCOOP, (get_config ROOT_PATH), (Resolve-Path "$PSScriptRoot\..\..\..\.."), "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$scoopdir = $env:SCOOP, (get_config ROOT_PATH), "$PSScriptRoot\..\..\..\..", "$([System.Environment]::GetFolderPath('UserProfile'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop global apps directory
-$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment]::GetFolderPath('CommonApplicationData'))\scoop" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop cache directory
 # Note: Setting the SCOOP_CACHE environment variable to use a shared directory
 #       is experimental and untested. There may be concurrency issues when
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
-$cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { -not [String]::IsNullOrEmpty($_) } | Select-Object -First 1
+$cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+
+# Scoop apps' PATH Environment Variable
+$scoopPathEnvVar = switch (get_config USE_ISOLATED_PATH) {
+    { $_ -is [string] } { $_.ToUpperInvariant() }
+    $true { 'SCOOP_PATH' }
+    default { 'PATH' }
+}
 
 # OS information
 $WindowsBuild = [System.Environment]::OSVersion.Version.Build
-
-# Setup proxy globally
-setup_proxy

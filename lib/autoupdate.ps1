@@ -1,4 +1,17 @@
 # Must included with 'json.ps1'
+
+function format_hash([String] $hash) {
+    $hash = $hash.toLower()
+    switch ($hash.Length) {
+        32 { $hash = "md5:$hash" } # md5
+        40 { $hash = "sha1:$hash" } # sha1
+        64 { $hash = $hash } # sha256
+        128 { $hash = "sha512:$hash" } # sha512
+        default { $hash = $null }
+    }
+    return $hash
+}
+
 function find_hash_in_rdf([String] $url, [String] $basename) {
     $xml = $null
     try {
@@ -37,7 +50,13 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $data = $wc.DownloadData($url)
-        $hashfile = (Get-Encoding($wc)).GetString($data)
+        $ms = New-Object System.IO.MemoryStream
+        $ms.Write($data, 0, $data.Length)
+        $ms.Seek(0, 0) | Out-Null
+        if ($data[0] -eq 0x1F -and $data[1] -eq 0x8B) {
+            $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
+        }
+        $hashfile = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
     } catch [system.net.webexception] {
         Write-Host $_ -ForegroundColor DarkRed
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed
@@ -93,7 +112,13 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $data = $wc.DownloadData($url)
-        $json = (Get-Encoding($wc)).GetString($data)
+        $ms = New-Object System.IO.MemoryStream
+        $ms.Write($data, 0, $data.Length)
+        $ms.Seek(0, 0) | Out-Null
+        if ($data[0] -eq 0x1F -and $data[1] -eq 0x8B) {
+            $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
+        }
+        $json = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
     } catch [System.Net.WebException] {
         Write-Host $_ -ForegroundColor DarkRed
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed
@@ -115,7 +140,13 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $data = $wc.DownloadData($url)
-        $xml = [xml]((Get-Encoding($wc)).GetString($data))
+        $ms = New-Object System.IO.MemoryStream
+        $ms.Write($data, 0, $data.Length)
+        $ms.Seek(0, 0) | Out-Null
+        if ($data[0] -eq 0x1F -and $data[1] -eq 0x8B) {
+            $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
+        }
+        $xml = [xml]((New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd())
     } catch [system.net.webexception] {
         Write-Host $_ -ForegroundColor DarkRed
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed
@@ -278,7 +309,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return $null
     }
-    $file = fullpath (cache_path $app $version $url)
+    $file = cache_path $app $version $url
     $hash = (Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower()
     Write-Host 'Computed hash: ' -ForegroundColor DarkYellow -NoNewline
     Write-Host $hash -ForegroundColor Green

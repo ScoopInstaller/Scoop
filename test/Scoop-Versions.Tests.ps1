@@ -99,7 +99,7 @@ Describe 'versions comparison' -Tag 'Scoop' {
             Compare-Version 'nightly-20190801' 'nightly-20200801' | Should -Be 0
         }
 
-        It 'handles nightly versions with `update_nightly`' {
+        It "handles nightly versions with 'update_nightly'" {
             function get_config { $true }
             Mock Get-Date { '20200801' }
             Compare-Version 'nightly-20200801' 'nightly' | Should -Be 0

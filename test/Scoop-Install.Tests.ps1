@@ -1,6 +1,7 @@
 BeforeAll {
     . "$PSScriptRoot\Scoop-TestLib.ps1"
     . "$PSScriptRoot\..\lib\core.ps1"
+    . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
 }
@@ -11,34 +12,10 @@ Describe 'appname_from_url' -Tag 'Scoop' {
     }
 }
 
-Describe 'url_filename' -Tag 'Scoop' {
-    It 'should extract the real filename from an url' {
-        url_filename 'http://example.org/foo.txt' | Should -Be 'foo.txt'
-        url_filename 'http://example.org/foo.txt?var=123' | Should -Be 'foo.txt'
-    }
-
-    It 'can be tricked with a hash to override the real filename' {
-        url_filename 'http://example.org/foo-v2.zip#/foo.zip' | Should -Be 'foo.zip'
-    }
-}
-
-Describe 'url_remote_filename' -Tag 'Scoop' {
-    It 'should extract the real filename from an url' {
-        url_remote_filename 'http://example.org/foo.txt' | Should -Be 'foo.txt'
-        url_remote_filename 'http://example.org/foo.txt?var=123' | Should -Be 'foo.txt'
-    }
-
-    It 'can not be tricked with a hash to override the real filename' {
-        url_remote_filename 'http://example.org/foo-v2.zip#/foo.zip' | Should -Be 'foo-v2.zip'
-    }
-}
-
 Describe 'is_in_dir' -Tag 'Scoop', 'Windows' {
     It 'should work correctly' {
         is_in_dir 'C:\test' 'C:\foo' | Should -BeFalse
         is_in_dir 'C:\test' 'C:\test\foo\baz.zip' | Should -BeTrue
-
-        is_in_dir 'test' "$PSScriptRoot" | Should -BeTrue
         is_in_dir "$PSScriptRoot\..\" "$PSScriptRoot" | Should -BeFalse
     }
 }
@@ -47,27 +24,28 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         # test data
         $manifest = @{
-            'env_add_path' = @('foo', 'bar')
+            'env_add_path' = @('foo', 'bar', '.', '..')
         }
         $testdir = Join-Path $PSScriptRoot 'path-test-directory'
         $global = $false
-
-        # store the original path to prevent leakage of tests
-        $origPath = $env:PATH
     }
 
     It 'should concat the correct path' {
-        Mock add_first_in_path {}
-        Mock remove_from_path {}
+        Mock Add-Path {}
+        Mock Remove-Path {}
 
         # adding
         env_add_path $manifest $testdir $global
-        Assert-MockCalled add_first_in_path -Times 1 -ParameterFilter { $dir -like "$testdir\foo" }
-        Assert-MockCalled add_first_in_path -Times 1 -ParameterFilter { $dir -like "$testdir\bar" }
+        Should -Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\foo" }
+        Should -Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
+        Should -Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like $testdir }
+        Should -Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -like $PSScriptRoot }
 
         env_rm_path $manifest $testdir $global
-        Assert-MockCalled remove_from_path -Times 1 -ParameterFilter { $dir -like "$testdir\foo" }
-        Assert-MockCalled remove_from_path -Times 1 -ParameterFilter { $dir -like "$testdir\bar" }
+        Should -Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\foo" }
+        Should -Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
+        Should -Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like $testdir }
+        Should -Invoke -CommandName Remove-Path -Times 0 -ParameterFilter { $Path -like $PSScriptRoot }
     }
 }
 

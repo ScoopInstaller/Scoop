@@ -4,7 +4,7 @@ Push-Location $PSScriptRoot
 . "$PSScriptRoot\..\..\lib\install.ps1"
 
 if (!$Fast) {
-    Write-Host "Install dependencies ..."
+    Write-Host 'Install dependencies ...'
     & "$PSScriptRoot\install.ps1"
 }
 

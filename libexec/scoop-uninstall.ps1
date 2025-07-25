@@ -8,6 +8,7 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\system.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
@@ -84,7 +85,7 @@ if (!$installedApps) {
             continue
         }
 
-        run_uninstaller $manifest $architecture $dir
+        Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Uninstall
         rm_shims $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 

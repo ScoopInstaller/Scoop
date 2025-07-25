@@ -37,9 +37,9 @@ function Get-Dependency {
 
         if (!$manifest) {
             if (((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
-                warn "Bucket '$bucket' not installed. Add it with 'scoop bucket add $bucket' or 'scoop bucket add $bucket <repo>'."
+                warn "Bucket '$bucket' not added. Add it with $(if($bucket -in (known_buckets)) { "'scoop bucket add $bucket' or " })'scoop bucket add $bucket <repo>'."
             }
-            abort "Couldn't find manifest for '$AppName'$(if(!$bucket) { '.' } else { " from '$bucket' bucket." })"
+            abort "Couldn't find manifest for '$AppName'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
         }
 
         $deps = @(Get-InstallationHelper $manifest $Architecture) + @($manifest.depends) | Select-Object -Unique
@@ -118,11 +118,8 @@ function Get-InstallationHelper {
         if ($script -like '*Expand-DarkArchive *') {
             $helper += 'dark'
         }
-        if ((Test-ZstdRequirement -Uri $url) -or ($script -like '*Expand-ZstdArchive *')) {
-            $helper += 'zstd'
-        }
         if (!$All) {
-            '7zip', 'lessmsi', 'innounp', 'dark', 'zstd' | ForEach-Object {
+            '7zip', 'lessmsi', 'innounp', 'dark' | ForEach-Object {
                 if (Test-HelperInstalled -Helper $_) {
                     $helper = $helper -ne $_
                 }
@@ -144,20 +141,8 @@ function Test-7zipRequirement {
         $Uri
     )
     return ($Uri | Where-Object {
-            $_ -match '\.((gz)|(tar)|(t[abgpx]z2?)|(lzma)|(bz2?)|(7z)|(001)|(rar)|(iso)|(xz)|(lzh)|(nupkg))(\.[^\d.]+)?$'
+            $_ -match '\.(001|7z|bz(ip)?2?|gz|img|iso|lzma|lzh|nupkg|rar|tar|t[abgpx]z2?|t?zst|xz)(\.[^\d.]+)?$'
         }).Count -gt 0
-}
-
-function Test-ZstdRequirement {
-    [CmdletBinding()]
-    [OutputType([Boolean])]
-    param (
-        [Parameter(Mandatory = $true)]
-        [AllowNull()]
-        [String[]]
-        $Uri
-    )
-    return ($Uri | Where-Object { $_ -match '\.zst$' }).Count -gt 0
 }
 
 function Test-LessmsiRequirement {

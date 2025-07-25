@@ -1,6 +1,7 @@
 BeforeAll {
     . "$PSScriptRoot\Scoop-TestLib.ps1"
     . "$PSScriptRoot\..\lib\core.ps1"
+    . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
 }
 
@@ -69,28 +70,6 @@ Describe 'Test-HelperInstalled' -Tag 'Scoop' {
     It 'should throw if parameter is wrong or missing' {
         { Test-HelperInstalled -Helper } | Should -Throw
         { Test-HelperInstalled -Helper Wrong } | Should -Throw
-    }
-}
-
-Describe 'Test-Aria2Enabled' -Tag 'Scoop' {
-    It 'should return true if aria2 is installed' {
-        Mock Test-HelperInstalled { $true }
-        Mock get_config { $true }
-        Test-Aria2Enabled | Should -BeTrue
-    }
-
-    It 'should return false if aria2 is not installed' {
-        Mock Test-HelperInstalled { $false }
-        Mock get_config { $false }
-        Test-Aria2Enabled | Should -BeFalse
-
-        Mock Test-HelperInstalled { $false }
-        Mock get_config { $true }
-        Test-Aria2Enabled | Should -BeFalse
-
-        Mock Test-HelperInstalled { $true }
-        Mock get_config { $false }
-        Test-Aria2Enabled | Should -BeFalse
     }
 }
 
@@ -167,7 +146,7 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
     }
 
     It "links a file onto the user's path" {
@@ -201,7 +180,7 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
     }
 
     It 'removes shim from path' {
@@ -220,7 +199,7 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
-        $(ensure_in_path $shimdir) | Out-Null
+        Add-Path $shimdir
         Mock appsdir { $working_dir }
     }
 
@@ -258,33 +237,20 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'ensure_robocopy_in_path' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $shimdir = shimdir $false
-        Mock versiondir { "$PSScriptRoot\.." }
+Describe 'cache_path' -Tag 'Scoop' {
+    It 'returns the correct cache path for a given input' {
+        $url = 'https://example.com/git.zip'
+        $ret = cache_path 'git' '2.44.0' $url
+        $inputStream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url))
+        $sha = (Get-FileHash -Algorithm SHA256 -InputStream $inputStream).Hash.ToLower().Substring(0, 7)
+        $ret | Should -Be "$cachedir\git#2.44.0#$sha.zip"
     }
 
-    It 'shims robocopy when not on path' {
-        Mock Test-CommandAvailable { $false }
-        Test-CommandAvailable robocopy | Should -Be $false
-
-        ensure_robocopy_in_path
-
-        # "$shimdir/robocopy.ps1" | should -exist
-        "$shimdir/robocopy.exe" | Should -Exist
-
-        # clean up
-        rm_shim robocopy $(shimdir $false) | Out-Null
-    }
-
-    It 'does not shim robocopy when it is in path' {
-        Mock Test-CommandAvailable { $true }
-        Test-CommandAvailable robocopy | Should -Be $true
-
-        ensure_robocopy_in_path
-
-        # "$shimdir/robocopy.ps1" | should -not -exist
-        "$shimdir/robocopy.exe" | Should -Not -Exist
+    # # NOTE: Remove this 6 months after the feature ships.
+    It 'returns the old format cache path for a given input' {
+        Mock Test-Path { $true }
+        $ret = cache_path 'git' '2.44.0' 'https://example.com/git.zip'
+        $ret | Should -Be "$cachedir\git#2.44.0#https_example.com_git.zip"
     }
 }
 
