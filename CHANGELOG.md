@@ -14,6 +14,7 @@
 - **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
 - **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
 - **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
+- **scoop-depends-tests:** Mocking `USE_EXTERNAL_7ZIP` as $false to avoding error when it is $true ([#6431](https://github.com/ScoopInstaller/Scoop/issues/6431))
 
 ### Code Refactoring
 
