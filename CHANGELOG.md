@@ -1,15 +1,8 @@
-## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/master...develop)
-
-### Bug Fixes
-
-- **scoop-uninstall:** Fix uninstaller does not gain Global state ([#6430](https://github.com/ScoopInstaller/Scoop/issues/6430))
-
-## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
+## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
 ### Features
 
-- **autoupdate:** Remove `sha256:` prefix in `format_hash()` ([#6381](https://github.com/ScoopInstaller/Scoop/issues/6381))
-- **autoupdate:** Add GitHub support in `get_hash_for_app()` ([#6381](https://github.com/ScoopInstaller/Scoop/issues/6381))
+**autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416))
 
 ### Bug Fixes
 
@@ -19,11 +12,13 @@
 - **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
 - **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
 - **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
+- **scoop-uninstall:** Fix uninstaller does not gain Global state ([#6430](https://github.com/ScoopInstaller/Scoop/issues/6430))
 - **scoop-depends-tests:** Mocking `USE_EXTERNAL_7ZIP` as $false to avoding error when it is $true ([#6431](https://github.com/ScoopInstaller/Scoop/issues/6431))
 
 ### Code Refactoring
 
 - **download:** Move download-related functions to 'download.ps1' ([#6095](https://github.com/ScoopInstaller/Scoop/issues/6095))
+- **Get-Manifest:** Select actual source for manifest ([#6142](https://github.com/ScoopInstaller/Scoop/issues/6142))
 
 ### Performance Improvements
 
