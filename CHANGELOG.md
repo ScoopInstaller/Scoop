@@ -1,5 +1,9 @@
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
 
+### Features
+
+**autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416))
+
 ### Bug Fixes
 
 - **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
