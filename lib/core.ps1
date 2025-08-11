@@ -63,18 +63,6 @@ function Optimize-SecurityProtocol {
     }
 }
 
-function Get-Encoding($wc) {
-    if ($null -ne $wc.ResponseHeaders -and $wc.ResponseHeaders['Content-Type'] -match 'charset=([^;]*)') {
-        return [System.Text.Encoding]::GetEncoding($Matches[1])
-    } else {
-        return [System.Text.Encoding]::GetEncoding('utf-8')
-    }
-}
-
-function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
-}
-
 function Show-DeprecatedWarning {
     <#
     .SYNOPSIS
@@ -225,35 +213,6 @@ function Complete-ConfigChange {
         . "$PSScriptRoot\..\lib\manifest.ps1"
         info 'Initializing SQLite cache in progress... This may take a while, please wait.'
         Set-ScoopDB
-    }
-}
-
-function setup_proxy() {
-    # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
-    $proxy = get_config PROXY
-    if(!$proxy) {
-        return
-    }
-    try {
-        $credentials, $address = $proxy -split '(?<!\\)@'
-        if(!$address) {
-            $address, $credentials = $credentials, $null # no credentials supplied
-        }
-
-        if($address -eq 'none') {
-            [net.webrequest]::defaultwebproxy = $null
-        } elseif($address -ne 'default') {
-            [net.webrequest]::defaultwebproxy = new-object net.webproxy "http://$address"
-        }
-
-        if($credentials -eq 'currentuser') {
-            [net.webrequest]::defaultwebproxy.credentials = [net.credentialcache]::defaultcredentials
-        } elseif($credentials) {
-            $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])','$1' }
-            [net.webrequest]::defaultwebproxy.credentials = new-object net.networkcredential($username, $password)
-        }
-    } catch {
-        warn "Failed to use proxy '$proxy': $($_.exception.message)"
     }
 }
 
@@ -584,10 +543,6 @@ function Test-HelperInstalled {
     return ![String]::IsNullOrWhiteSpace((Get-HelperPath -Helper $Helper))
 }
 
-function Test-Aria2Enabled {
-    return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
-}
-
 function app_status($app, $global) {
     $status = @{}
     $status.installed = installed $app $global
@@ -598,6 +553,9 @@ function app_status($app, $global) {
 
     $status.failed = failed $app $global
     $status.hold = ($install_info.hold -eq $true)
+
+    $deprecated_dir = (Find-BucketDirectory -Name $install_info.bucket -Root) + "\deprecated"
+    $status.deprecated = (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
 
     $manifest = manifest $app $install_info.bucket $install_info.url
     $status.removed = (!$manifest)
@@ -626,7 +584,6 @@ function app_status($app, $global) {
     if ($deps) {
         $status.missing_deps += , $deps
     }
-
     return $status
 }
 
@@ -639,28 +596,6 @@ function fname($path) { split-path $path -leaf }
 function strip_ext($fname) { $fname -replace '\.[^\.]*$', '' }
 function strip_filename($path) { $path -replace [regex]::escape((fname $path)) }
 function strip_fragment($url) { $url -replace (new-object uri $url).fragment }
-
-function url_filename($url) {
-    (split-path $url -leaf).split('?') | Select-Object -First 1
-}
-# Unlike url_filename which can be tricked by appending a
-# URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
-# this function extracts the original filename from the URL.
-function url_remote_filename($url) {
-    $uri = (New-Object URI $url)
-    $basename = Split-Path $uri.PathAndQuery -Leaf
-    If ($basename -match ".*[?=]+([\w._-]+)") {
-        $basename = $matches[1]
-    }
-    If (($basename -notlike "*.*") -or ($basename -match "^[v.\d]+$")) {
-        $basename = Split-Path $uri.AbsolutePath -Leaf
-    }
-    If (($basename -notlike "*.*") -and ($uri.Fragment -ne "")) {
-        $basename = $uri.Fragment.Trim('/', '#')
-    }
-    return $basename
-}
-
 function ensure($dir) {
     if (!(Test-Path -Path $dir)) {
         New-Item -Path $dir -ItemType Directory | Out-Null
@@ -1070,11 +1005,18 @@ function shim($path, $global, $name, $arg) {
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
         warn_on_overwrite "$shim.cmd" $path
+        $quoted_arg = if ($arg.Count -gt 0) { $arg | ForEach-Object { "`"$_`"" } }
         @(
             "@rem $resolved_path",
-            "@bash `"`$(wslpath -u '$resolved_path')`" $arg %* 2>nul",
-            '@if %errorlevel% neq 0 (',
-            "  @bash `"`$(cygpath -u '$resolved_path')`" $arg %* 2>nul",
+            '@echo off',
+            'bash -c "command -v wslpath >/dev/null"',
+            'if %errorlevel% equ 0 (',
+            "  bash `"`$(wslpath -u '$resolved_path')`" $quoted_arg %*",
+            ') else (',
+            "  set args=$quoted_arg %*",
+            '  setlocal enabledelayedexpansion',
+            '  if not "!args!"=="" set args=!args:"=""!',
+            "  bash -c `"`$(cygpath -u '$resolved_path') !args!`"",
             ')'
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
@@ -1282,112 +1224,6 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
     return $newentity
 }
 
-function format_hash([String] $hash) {
-    $hash = $hash.toLower()
-    switch ($hash.Length)
-    {
-        32 { $hash = "md5:$hash" } # md5
-        40 { $hash = "sha1:$hash" } # sha1
-        64 { $hash = $hash } # sha256
-        128 { $hash = "sha512:$hash" } # sha512
-        default { $hash = $null }
-    }
-    return $hash
-}
-
-function format_hash_aria2([String] $hash) {
-    $hash = $hash -split ':' | Select-Object -Last 1
-    switch ($hash.Length)
-    {
-        32 { $hash = "md5=$hash" } # md5
-        40 { $hash = "sha-1=$hash" } # sha1
-        64 { $hash = "sha-256=$hash" } # sha256
-        128 { $hash = "sha-512=$hash" } # sha512
-        default { $hash = $null }
-    }
-    return $hash
-}
-
-function get_hash([String] $multihash) {
-    $type, $hash = $multihash -split ':'
-    if(!$hash) {
-        # no type specified, assume sha256
-        $type, $hash = 'sha256', $multihash
-    }
-
-    if(@('md5','sha1','sha256', 'sha512') -notcontains $type) {
-        return $null, "Hash type '$type' isn't supported."
-    }
-
-    return $type, $hash.ToLower()
-}
-
-function Get-GitHubToken {
-    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN) | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
-}
-
-function handle_special_urls($url)
-{
-    # FossHub.com
-    if ($url -match "^(?:.*fosshub.com\/)(?<name>.*)(?:\/|\?dwl=)(?<filename>.*)$") {
-        $Body = @{
-            projectUri      = $Matches.name;
-            fileName        = $Matches.filename;
-            source          = 'CF';
-            isLatestVersion = $true
-        }
-        if ((Invoke-RestMethod -Uri $url) -match '"p":"(?<pid>[a-f0-9]{24}).*?"r":"(?<rid>[a-f0-9]{24})') {
-            $Body.Add("projectId", $Matches.pid)
-            $Body.Add("releaseId", $Matches.rid)
-        }
-        $url = Invoke-RestMethod -Method Post -Uri "https://api.fosshub.com/download/" -ContentType "application/json" -Body (ConvertTo-Json $Body -Compress)
-        if ($null -eq $url.error) {
-            $url = $url.data.url
-        }
-    }
-
-    # Sourceforge.net
-    if ($url -match "(?:downloads\.)?sourceforge.net\/projects?\/(?<project>[^\/]+)\/(?:files\/)?(?<file>.*?)(?:$|\/download|\?)") {
-        # Reshapes the URL to avoid redirections
-        $url = "https://downloads.sourceforge.net/project/$($matches['project'])/$($matches['file'])"
-    }
-
-    # Github.com
-    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = Get-GitHubToken)) {
-        $headers = @{ "Authorization" = "token $token" }
-        $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
-        $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
-
-        if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
-            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
-        }
-    }
-
-    return $url
-}
-
-function get_magic_bytes($file) {
-    if(!(Test-Path $file)) {
-        return ''
-    }
-
-    if((Get-Command Get-Content).parameters.ContainsKey('AsByteStream')) {
-        # PowerShell Core (6.0+) '-Encoding byte' is replaced by '-AsByteStream'
-        return Get-Content $file -AsByteStream -TotalCount 8
-    }
-    else {
-        return Get-Content $file -Encoding byte -TotalCount 8
-    }
-}
-
-function get_magic_bytes_pretty($file, $glue = ' ') {
-    if(!(Test-Path $file)) {
-        return ''
-    }
-
-    return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
-}
-
 function Out-UTF8File {
     param(
         [Parameter(Mandatory = $True, Position = 0)]
@@ -1473,6 +1309,3 @@ $scoopPathEnvVar = switch (get_config USE_ISOLATED_PATH) {
 
 # OS information
 $WindowsBuild = [System.Environment]::OSVersion.Version.Build
-
-# Setup proxy globally
-setup_proxy

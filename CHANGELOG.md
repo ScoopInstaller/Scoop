@@ -1,3 +1,29 @@
+## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
+
+### Features
+
+**autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416))
+
+### Bug Fixes
+
+- **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
+- **decompress**: `Expand-7zipArchive` only delete temp dir / `$extractDir` if it is empty ([#6092](https://github.com/ScoopInstaller/Scoop/issues/6092))
+- **decompress**: Replace deprecated 7ZIPEXTRACT_USE_EXTERNAL config with USE_EXTERNAL_7ZIP ([#6327](https://github.com/ScoopInstaller/Scoop/issues/6327))
+- **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
+- **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
+- **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
+- **scoop-uninstall:** Fix uninstaller does not gain Global state ([#6430](https://github.com/ScoopInstaller/Scoop/issues/6430))
+- **scoop-depends-tests:** Mocking `USE_EXTERNAL_7ZIP` as $false to avoding error when it is $true ([#6431](https://github.com/ScoopInstaller/Scoop/issues/6431))
+
+### Code Refactoring
+
+- **download:** Move download-related functions to 'download.ps1' ([#6095](https://github.com/ScoopInstaller/Scoop/issues/6095))
+- **Get-Manifest:** Select actual source for manifest ([#6142](https://github.com/ScoopInstaller/Scoop/issues/6142))
+
+### Performance Improvements
+
+- **shim:** Update kiennq-shim to v3.1.2 ([#6261](https://github.com/ScoopInstaller/Scoop/issues/6261))
+
 ## [v0.5.2](https://github.com/ScoopInstaller/Scoop/compare/v0.5.1...v0.5.2) - 2024-07-26
 
 ### Bug Fixes
@@ -40,7 +66,7 @@
 - **checkver:** Correct error messages ([#6024](https://github.com/ScoopInstaller/Scoop/issues/6024))
 - **core:** Search for Git executable instead of any cmdlet ([#5998](https://github.com/ScoopInstaller/Scoop/issues/5998))
 - **core:** Use correct path in 'bash' ([#6006](https://github.com/ScoopInstaller/Scoop/issues/6006))
-- **core:** Limit the number of commands to get when search for git executable ([#6013](https://github.com/ScoopInstaller/Scoop/pull/6013))
+- **core:** Limit the number of commands to get when search for git executable ([#6013](https://github.com/ScoopInstaller/Scoop/issues/6013))
 - **decompress:** Match `extract_dir`/`extract_to` and archives ([#5983](https://github.com/ScoopInstaller/Scoop/issues/5983))
 - **json:** Serialize jsonpath return ([#5921](https://github.com/ScoopInstaller/Scoop/issues/5921))
 - **shim:** Restore original path for JAR cmd ([#6030](https://github.com/ScoopInstaller/Scoop/issues/6030))

@@ -5,9 +5,11 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
-. "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion'
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion', 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\download.ps1" # 'Get-RemoteFileSize'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
+$original_app = $app
 if ($err) { error "scoop info: $err"; exit 1 }
 $verbose = $opt.v -or $opt.verbose
 
@@ -22,7 +24,7 @@ if (!$manifest) {
 $global = installed $app $true
 $status = app_status $app $global
 $install = install_info $app $status.version $global
-$status.installed = $bucket -and $install.bucket -eq $bucket
+$status.installed = ($bucket -and $install.bucket -eq $bucket) -or (installed $app)
 $version_output = $manifest.version
 $manifest_file = if ($bucket) {
     manifest_path $app $bucket
@@ -30,12 +32,30 @@ $manifest_file = if ($bucket) {
     $url
 }
 
+# Standalone and Source detection
+if ((Test-Path $original_app) -or ($original_app -match '^(ht|f)tps?://|\\\\')) {
+    $standalone = $true
+    if (Test-Path $original_app) {
+        $original_app = (Get-AbsolutePath "$original_app")
+    }
+    if ($install.url) {
+        if (Test-Path $install.url) {
+            $install_url = (Get-AbsolutePath $install.url)
+        } else {
+            $install_url = $install.url
+        }
+    }
+    if ($original_app -eq $install_url) {
+        $same_source = $true
+    }
+}
+
 if ($verbose) {
     $dir = currentdir $app $global
     $original_dir = versiondir $app $manifest.version $global
     $persist_dir = persistdir $app $global
 } else {
-    $dir, $original_dir, $persist_dir = "<root>", "<root>", "<root>"
+    $dir, $original_dir, $persist_dir = '<root>', '<root>', '<root>'
 }
 
 if ($status.installed) {
@@ -43,21 +63,39 @@ if ($status.installed) {
     if ($install.url) {
         $manifest_file = $install.url
     }
-    if ($status.version -eq $manifest.version) {
+    if ($status.deprecated) {
+        $manifest_file = $status.deprecated
+    } elseif ($standalone -and !$same_source) {
+        $version_output = $manifest.version
+    } elseif ($status.version -eq $manifest.version) {
         $version_output = $status.version
     } else {
         $version_output = "$($status.version) (Update to $($manifest.version) available)"
     }
+
 }
 
 $item = [ordered]@{ Name = $app }
+if ($status.deprecated) {
+    $item.Name += ' (DEPRECATED)'
+}
 if ($manifest.description) {
     $item.Description = $manifest.description
 }
 $item.Version = $version_output
-if ($bucket) {
-    $item.Bucket = $bucket
+
+$item.Source = if ($standalone) {
+    $original_app
+} else {
+    if ($install.bucket) {
+        $install.bucket
+    } elseif ($install.url) {
+        $install.url
+    } else {
+        $bucket
+    }
 }
+
 if ($manifest.homepage) {
     $item.Website = $manifest.homepage.TrimEnd('/')
 }
@@ -69,7 +107,7 @@ if ($manifest.license) {
         $manifest.license
     } elseif ($manifest.license -match '[|,]') {
         if ($verbose) {
-            "$($manifest.license) ($(($manifest.license -Split "\||," | ForEach-Object { "https://spdx.org/licenses/$_.html" }) -join ', '))"
+            "$($manifest.license) ($(($manifest.license -Split '\||,' | ForEach-Object { "https://spdx.org/licenses/$_.html" }) -join ', '))"
         } else {
             $manifest.license
         }
@@ -100,11 +138,13 @@ if ($verbose) { $item.Manifest = $manifest_file }
 
 if ($status.installed) {
     # Show installed versions
-    $installed_output = @()
-    Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
-        $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { " *global*" })" }
+    if (!$standalone -or $same_source) {
+        $installed_output = @()
+        Get-InstalledVersion -AppName $app -Global:$global | ForEach-Object {
+            $installed_output += if ($verbose) { versiondir $app $_ $global } else { "$_$(if ($global) { ' *global*' })" }
+        }
+        $item.Installed = $installed_output -join "`n"
     }
-    $item.Installed = $installed_output -join "`n"
 
     if ($verbose) {
         # Show size of installation
@@ -161,12 +201,12 @@ if ($status.installed) {
         foreach ($url in @(url $manifest (Get-DefaultArchitecture))) {
             try {
                 if (Test-Path (cache_path $app $manifest.version $url)) {
-                    $cached = " (latest version is cached)"
+                    $cached = ' (latest version is cached)'
                 } else {
                     $cached = $null
                 }
 
-                $urlLength = (Invoke-WebRequest $url -Method Head).Headers.'Content-Length' | ForEach-Object { [int]$_ }
+                $urlLength = Get-RemoteFileSize $url
                 $totalPackage += $urlLength
             } catch [System.Management.Automation.RuntimeException] {
                 $totalPackage = 0
@@ -196,7 +236,7 @@ if ($binaries) {
             $binary_output += $_
         }
     }
-    $item.Binaries = $binary_output -join " | "
+    $item.Binaries = $binary_output -join ' | '
 }
 $shortcuts = @(arch_specific 'shortcuts' $manifest $install.architecture)
 if ($shortcuts) {
@@ -204,7 +244,7 @@ if ($shortcuts) {
     $shortcuts | ForEach-Object {
         $shortcut_output += $_[1]
     }
-    $item.Shortcuts = $shortcut_output -join " | "
+    $item.Shortcuts = $shortcut_output -join ' | '
 }
 $env_set = arch_specific 'env_set' $manifest $install.architecture
 if ($env_set) {
