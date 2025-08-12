@@ -172,18 +172,307 @@ function Get-SupportedArchitecture($manifest, $architecture) {
     }
 }
 
+function Get-RelativePathCompat($from, $to) {
+    <#
+    .SYNOPSIS
+        Cross-platform compatible relative path function
+    .DESCRIPTION
+        Falls back to custom implementation for Windows PowerShell compatibility
+    #>
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+        # PowerShell Core/7+ - use built-in method
+        try {
+            return [System.IO.Path]::GetRelativePath($from, $to)
+        } catch {
+            # Fallback if method fails
+        }
+    }
+
+    # Windows PowerShell compatible implementation
+    $fromUri = New-Object System.Uri($from.TrimEnd('\') + '\')
+    $toUri = New-Object System.Uri($to)
+
+    if ($fromUri.Scheme -ne $toUri.Scheme) {
+        return $to  # Cannot make relative path between different schemes
+    }
+
+    $relativeUri = $fromUri.MakeRelativeUri($toUri)
+    $relativePath = [System.Uri]::UnescapeDataString($relativeUri.ToString())
+
+    return $relativePath -replace '/', '\'
+}
+
+function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
+    if (!(get_config USE_SQLITE_CACHE)) {
+        return $null
+    }
+
+    # Return null if bucket is null or empty
+    if (!$bucket) {
+        return $null
+    }
+
+    # Import database functions if not already loaded
+    if (!(Get-Command 'Get-ScoopDBItem' -ErrorAction SilentlyContinue)) {
+        . "$PSScriptRoot\database.ps1"
+    }
+
+    # First try exact match
+    $dbResult = Get-ScoopDBItem -Name $app -Bucket $bucket -Version $requestedVersion
+    if ($dbResult.Rows.Count -gt 0) {
+        $row = $dbResult.Rows[0]
+        ensure (usermanifestsdir) | Out-Null
+        $tempManifestPath = "$(usermanifestsdir)\$app.json"
+        $row.manifest | Out-UTF8File -FilePath $tempManifestPath
+
+        # Parse the manifest to get its actual version
+        $manifest = $row.manifest | ConvertFrom-Json
+        $manifestVersion = if ($manifest.version) { $manifest.version } else { $requestedVersion }
+        return @{ path = $tempManifestPath; version = $manifestVersion; source = "sqlite_exact_match" }
+    }
+
+    # No exact match found, return null (no compatibility matching)
+
+    return $null
+}
+
+function Get-HistoricalManifestFromGitHistory($app, $bucket, $requestedVersion) {
+    # Only proceed if git history is enabled
+    if (!(get_config USE_GIT_HISTORY $true)) {
+        return $null
+    }
+
+    if (!$bucket) {
+        return $null
+    }
+
+    $bucketDir = Find-BucketDirectory $bucket -Root
+    if (!(Test-Path "$bucketDir\.git")) {
+        warn "Bucket '$bucket' is not a git repository. Cannot search historical versions."
+        return $null
+    }
+
+    $manifestPath = "$app.json"
+    $innerBucketDir = Find-BucketDirectory $bucket # Non-root path
+
+    if (-not (Test-Path $innerBucketDir -PathType Container)) {
+        warn "Could not find inner bucket directory for '$bucket' at '$innerBucketDir'."
+        return $null
+    }
+    $relativeManifestPath = Get-RelativePathCompat $bucketDir (Join-Path $innerBucketDir $manifestPath)
+    $relativeManifestPath = $relativeManifestPath -replace '\\', '/'
+
+    try {
+        $gitLogOutput = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '--format=format:%H%n%s', '--', $relativeManifestPath) # Removed 2>$null to see git errors
+
+        if (!$gitLogOutput) {
+            warn "No git history found for '$app' in bucket '$bucket' (file: $relativeManifestPath)."
+            return $null
+        }
+
+        $foundVersions = [System.Collections.Generic.List[hashtable]]::new()
+        $processedHashes = [System.Collections.Generic.HashSet[string]]::new()
+
+        $versionsFoundForPreviousMinor = @{}
+        $limitPreviousMinorCount = 5
+        $requestedVersionParts = $requestedVersion -split '\.'
+        $previousMinorVersionString = ''
+        if ($requestedVersionParts.Count -ge 2 -and $requestedVersionParts[1] -match '^\d+$') {
+            $currentMinor = [int]$requestedVersionParts[1]
+            if ($currentMinor -gt 0) {
+                $previousMinorVersionString = "$($requestedVersionParts[0]).$($currentMinor - 1)"
+            }
+        }
+
+        $maxCommitsToProcess = 200 # Hard cap to prevent excessive runtimes
+
+        for ($i = 0; $i -lt $gitLogOutput.Count; $i += 2) {
+            if ($processedHashes.Count -ge $maxCommitsToProcess) {
+                info "Processed $maxCommitsToProcess commits for $app. Stopping search to prevent excessive runtime."
+                break
+            }
+
+            $hash = $gitLogOutput[$i]
+            $subject = if (($i + 1) -lt $gitLogOutput.Count) { $gitLogOutput[$i + 1] } else { '' }
+
+            if ([string]::IsNullOrWhiteSpace($hash) -or !$processedHashes.Add($hash)) {
+                continue
+            }
+
+            $versionFromMessage = $null
+            if ($subject -match "(?:'$app': Update to version |Update to |Release |Tag |v)($([char]34)?([0-9]+\.[0-9]+(?:\.[0-9]+){0,2}(?:[a-zA-Z0-9._+-]*))\1?)") {
+                $versionFromMessage = $Matches[2]
+            }
+
+            if ($versionFromMessage -eq $requestedVersion) {
+                info "Potential exact match '$versionFromMessage' found in commit message for $app (hash $hash). Verifying manifest..."
+                $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$hash`:$relativeManifestPath")
+                if ($manifestContent -and ($LASTEXITCODE -eq 0)) {
+                    if ($manifestContent -is [Array]) {
+                        $manifestContent = $manifestContent -join "`n"
+                    }
+                    $manifestObj = $null; try { $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop } catch {}
+                    if ($manifestObj -and $manifestObj.version -eq $requestedVersion) {
+                        info "Exact version '$requestedVersion' for '$app' confirmed from manifest in commit $hash."
+                        ensure (usermanifestsdir) | Out-Null
+                        $tempManifestPath = "$(usermanifestsdir)\$app.json"
+                        $manifestContent | Out-UTF8File -FilePath $tempManifestPath
+                        return @{ path = $tempManifestPath; version = $requestedVersion; source = "git_commit_message:$hash" }
+                    }
+                }
+            }
+
+            $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$hash`:$relativeManifestPath")
+            if ($manifestContent -and ($LASTEXITCODE -eq 0)) {
+                if ($manifestContent -is [Array]) {
+                    $manifestContent = $manifestContent -join "`n"
+                }
+                $manifestObj = $null;
+                try {
+                    $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop
+                } catch {
+                    warn "Failed to parse manifest content from commit $hash for app $app. Skipping this commit."
+                    # Consider logging $manifestContent if debugging is needed
+                    continue # Skip to the next commit
+                }
+
+                if ($manifestObj -and $manifestObj.version) {
+                    if ($manifestObj.version -eq $requestedVersion) {
+                        info "Exact version '$requestedVersion' for '$app' found in manifest (commit $hash)."
+                        ensure (usermanifestsdir) | Out-Null
+                        $tempManifestPath = "$(usermanifestsdir)\$app.json"
+                        if ($PSVersionTable.PSVersion.Major -ge 6) {
+                            $utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+                            Set-Content -Path $tempManifestPath -Value $manifestContent -Encoding $utf8NoBomEncoding -NoNewline:$false
+                        } else {
+                            # PowerShell 5 compatibility
+                            $manifestContent | Out-UTF8File -FilePath $tempManifestPath
+                        }
+                        return @{ path = $tempManifestPath; version = $requestedVersion; source = "git_manifest:$hash" }
+                    }
+                    $foundVersions.Add(@{
+                            version  = $manifestObj.version
+                            hash     = $hash
+                            manifest = $manifestContent
+                        })
+
+                    if ($previousMinorVersionString -ne '' -and $manifestObj.version.StartsWith($previousMinorVersionString)) {
+                        if (!$versionsFoundForPreviousMinor.ContainsKey($previousMinorVersionString)) {
+                            $versionsFoundForPreviousMinor[$previousMinorVersionString] = 0
+                        }
+                        $versionsFoundForPreviousMinor[$previousMinorVersionString]++
+                        if ($versionsFoundForPreviousMinor[$previousMinorVersionString] -ge $limitPreviousMinorCount) {
+                            info "Reached limit of $limitPreviousMinorCount versions for previous minor '$previousMinorVersionString' while checking $app. Stopping search."
+                            break
+                        }
+                    }
+                    if ($foundVersions.Count % 20 -eq 0 -and $foundVersions.Count -gt 0) {
+                        info "Found $($foundVersions.Count) historical versions for $app so far..."
+                    }
+                }
+            } elseif ($LASTEXITCODE -ne 0) {
+                warn "git show $hash`:$relativeManifestPath failed for $app."
+            }
+        }
+
+        if ($foundVersions.Count -eq 0) {
+            warn "No valid historical versions found for '$app' in bucket '$bucket'."
+            return $null
+        }
+
+        # No exact match found - display all available versions to help user choose
+        $allAvailableVersions = ($foundVersions | Sort-Object {
+                try { [version]($_.version -replace '[^\d\.].*$', '') } catch { $_.version }
+            } -Descending).version
+
+        Write-Host ""
+        Write-Host "No exact match found for version '$requestedVersion' for app '$app'."
+        Write-Host "Available versions in git history (newest to oldest):"
+        Write-Host ""
+
+        # Group versions for better display
+        $displayCount = [Math]::Min(50, $allAvailableVersions.Count)  # Show up to 50 versions
+        for ($i = 0; $i -lt $displayCount; $i++) {
+            Write-Host "  $($allAvailableVersions[$i])"
+        }
+
+        if ($allAvailableVersions.Count -gt $displayCount) {
+            Write-Host "  ... and $($allAvailableVersions.Count - $displayCount) more versions"
+        }
+
+        Write-Host ""
+        Write-Host "To install a specific version, use: scoop install $app@<version>"
+        Write-Host ""
+
+        return $null
+
+    } catch {
+        warn "Error searching git history for '$app': $($_.Exception.Message)"
+        return $null
+    }
+}
+
+
 function generate_user_manifest($app, $bucket, $version) {
     # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
     $app, $manifest, $bucket, $null = Get-Manifest "$bucket/$app"
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket
     }
+
     warn "Given version ($version) does not match manifest ($($manifest.version))"
-    warn "Attempting to generate manifest for '$app' ($version)"
+
+    $historicalResult = $null
+
+    # Try SQLite cache first if enabled
+    if (get_config USE_SQLITE_CACHE) {
+        info "Searching for version '$version' in cache..."
+        $historicalResult = Get-HistoricalManifestFromDB $app $bucket $version
+        if ($historicalResult) {
+            info "Found version '$($historicalResult.version)' for '$app' in cache."
+            return $historicalResult.path
+        }
+    }
+
+    # Try git history if cache didn't find it
+    if (!$historicalResult) {
+        info "Searching for version '$version' in git history..."
+        $historicalResult = Get-HistoricalManifestFromGitHistory $app $bucket $version
+        if ($historicalResult) {
+            return $historicalResult.path
+        }
+    }
+
+    # If no historical version found, provide helpful guidance
+    if (!$historicalResult) {
+        # Try to provide additional context about what versions are available
+        $currentVersion = $manifest.version
+        if ($currentVersion) {
+            info "Current version available: $currentVersion"
+            info "To install the current version, use: scoop install $app"
+        }
+
+        # Check if we have autoupdate capability for fallback
+        if ($manifest.autoupdate) {
+            info "This app supports autoupdate - attempting to generate manifest for version $version"
+        } else {
+            warn "'$app' does not have autoupdate capability."
+            Write-Host "Available options:"
+            Write-Host "  1. Install current version: scoop install $app"
+            Write-Host "  2. Check if the requested version exists in other buckets"
+            Write-Host "  3. Contact the bucket maintainer to add historical version support"
+            Write-Host ""
+            abort "Could not find manifest for '$app@$version' and no autoupdate available"
+        }
+    }
+
+    # Fallback to autoupdate generation
+    warn "No historical version found. Attempting to generate manifest for '$app' ($version)"
 
     ensure (usermanifestsdir) | Out-Null
     $manifest_path = "$(usermanifestsdir)\$app.json"
 
+    # Check SQLite cache for exact cached manifest (this is different from historical search)
     if (get_config USE_SQLITE_CACHE) {
         $cached_manifest = (Get-ScoopDBItem -Name $app -Bucket $bucket -Version $version).manifest
         if ($cached_manifest) {
@@ -193,7 +482,7 @@ function generate_user_manifest($app, $bucket, $version) {
     }
 
     if (!($manifest.autoupdate)) {
-        abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
+        abort "'$app' does not have autoupdate capability and no historical version found`r`ncouldn't find manifest for '$app@$version'"
     }
 
     try {
@@ -201,6 +490,33 @@ function generate_user_manifest($app, $bucket, $version) {
         return $manifest_path
     } catch {
         Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
+        Write-Host -ForegroundColor Yellow "Autoupdate failed for version $version"
+
+        # Provide helpful guidance when autoupdate fails
+        Write-Host "Possible reasons:"
+        Write-Host "  - Version $version may not exist or be available for download"
+        Write-Host "  - Download URLs may have changed or be inaccessible"
+        Write-Host "  - The version format may be incompatible with autoupdate patterns"
+        Write-Host ""
+        Write-Host "Suggestions:"
+        Write-Host "  1. Install current version: scoop install $app"
+        Write-Host "  2. Try a different version that was shown in the available list"
+        Write-Host "  3. Check the app's official releases or download page"
+        Write-Host ""
+
+        # If autoupdate fails and we haven't tried git history yet, try it as final fallback
+        if (!$historicalResult -and !(get_config USE_SQLITE_CACHE)) {
+            warn 'Autoupdate failed. Trying git history as final fallback...'
+            $fallbackResult = Get-HistoricalManifestFromGitHistory $app $bucket $version
+            if ($fallbackResult) {
+                warn "Using historical manifest as fallback for '$app' version '$($fallbackResult.version)'"
+                return $fallbackResult.path
+            }
+        }
+
+        # Final failure - provide comprehensive guidance
+        Write-Host -ForegroundColor Red "All attempts to find or generate manifest for '$app@$version' failed."
+        abort "Installation of '$app@$version' is not possible"
     }
 
     return $null

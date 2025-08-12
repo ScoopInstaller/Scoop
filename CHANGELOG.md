@@ -1,8 +1,14 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...develop)
+
+### Features
+
+- **install:** Add support for historical manifests ([#6370](https://github.com/ScoopInstaller/Scoop/issues/6370))
+
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
 ### Features
 
-**autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
+- **autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
 
 ### Bug Fixes
 

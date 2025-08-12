@@ -4,7 +4,7 @@
 #      scoop install git
 #
 # To install a different version of the app
-# (note that this will auto-generate the manifest using current version):
+# (will search sqlite cache if enabled, then git history (if use_git_history is $true), then auto-generate manifest as fallback):
 #      scoop install gh@2.7.0
 #
 # To install an app from a manifest at a URL:
