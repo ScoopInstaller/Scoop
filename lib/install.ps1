@@ -473,10 +473,16 @@ function persist_data($manifest, $original_dir, $persist_dir) {
                 ensure (Split-Path -Path $target) | Out-Null
                 Move-Item $source $target
                 # we don't have neither source nor target data! we need to create an empty target,
-                # but we can't make a judgement that the data should be a file or directory...
-                # so we create a directory by default. to avoid this, use pre_install
-                # to create the source file before persisting (DON'T use post_install)
+                # infer target type from extension
+            } elseif ($source -match '\.(ini|cfg|xml|txt|dat|log|key|yml|ps1|lua|pem)$') {
+                # treat as file: ensure parent dir, then create empty file
+                $parent = Split-Path -Path $target
+                ensure (New-Object System.IO.DirectoryInfo($parent)) | Out-Null
+                New-Item -Path $target -ItemType File -Force | Out-Null
+                # represent it as a FileInfo object for later linking
+                $target = New-Object System.IO.FileInfo($target)
             } else {
+                # treat as directory
                 $target = New-Object System.IO.DirectoryInfo($target)
                 ensure $target | Out-Null
             }
