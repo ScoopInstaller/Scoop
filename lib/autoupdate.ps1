@@ -264,7 +264,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'sourceforge'
     }
 
-    if ($url -match 'https:\/\/github\.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/[^\/]+\/[^\/]+') {
+    if (!$hashfile_url -and $url -match 'https:\/\/github\.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/[^\/]+\/[^\/]+') {
         $hashmode = 'github'
     }
 
