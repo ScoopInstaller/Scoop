@@ -239,7 +239,11 @@ function Invoke-Git {
     }
 
     if([String]::IsNullOrEmpty($proxy) -or $proxy -eq 'none')  {
-        return & $git @ArgumentList
+        $result = & $git @ArgumentList
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Git failed in $WorkingDirectory"
+        }
+        return $result
     }
 
     if($ArgumentList -Match '\b(clone|checkout|pull|fetch|ls-remote)\b') {
@@ -254,10 +258,17 @@ function Invoke-Git {
             & $using:git @using:ArgumentList
         }
         $o = $j | Receive-Job -Wait -AutoRemoveJob
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Git job failed in $WorkingDirectory"
+        }
         return $o
     }
 
-    return & $git @ArgumentList
+    $result = & $git @ArgumentList
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "Git failed in $WorkingDirectory"
+    }
+    return $result
 }
 
 function Invoke-GitLog {
