@@ -136,7 +136,7 @@ function Sync-Scoop {
             # reset branch HEAD
             Invoke-Git -Path $currentdir -ArgumentList @('reset', '--hard', "origin/$configBranch", '-q')
         } else {
-            Invoke-Git -Path $currentdir -ArgumentList @('pull', '-q')
+            Invoke-Git -Path $currentdir -ArgumentList @('pull', '--tags', '--force', '-q')
         }
 
         $res = $lastexitcode
