@@ -22,7 +22,7 @@
 # Options:
 #   -g, --global                    Install the app globally
 #   -i, --independent               Don't install dependencies automatically
-#   -k, --no-cache                  Don't use the download cache
+#   -d, --no-cache                  Force redownload by not using the download cache
 #   -s, --skip-hash-check           Skip hash validation (use with caution!)
 #   -u, --no-update-scoop           Don't update Scoop before installing if it's outdated
 #   -a, --arch <32bit|64bit|arm64>  Use the specified architecture, if the app supports it
@@ -49,7 +49,7 @@ if ($err) { "scoop install: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $check_hash = !($opt.s -or $opt.'skip-hash-check')
 $independent = $opt.i -or $opt.independent
-$use_cache = !($opt.k -or $opt.'no-cache')
+$use_cache = !($opt.d -or $opt.'no-cache')
 $architecture = Get-DefaultArchitecture
 try {
     $architecture = Format-ArchitectureString ($opt.a + $opt.arch)
