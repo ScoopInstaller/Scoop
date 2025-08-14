@@ -127,7 +127,7 @@ foreach ($curr_app in $apps) {
                     if ($url -like '*sourceforge.net*') {
                         warn 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    error (new_issue_msg $app $bucket "hash check failed")
+                    abort $(new_issue_msg $app $bucket "hash check failed")
                     continue
                 }
             } else {
