@@ -123,6 +123,11 @@
 #       When set to arbitrary non-empty string, Scoop will use that string as the environment variable name instead.
 #       This is useful when you want to isolate Scoop from the system `PATH`.
 #
+# start_menu_root: $true|$false
+#       By default, shortcuts are created in 'Scoop Apps' folder under 'Programs'.
+#       Set this to $true to create shortcuts in the root of 'Programs'.
+#       Move all application shortcuts you installed manually after changing this config.
+#
 # ARIA2 configuration
 # -------------------
 #
