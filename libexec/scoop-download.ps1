@@ -22,6 +22,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\json.ps1" # 'autoupdate.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'generate_user_manifest' 'Get-Manifest'
 . "$PSScriptRoot\..\lib\download.ps1"
 . "$PSScriptRoot\..\lib\install.ps1" # 'nightly_version'
