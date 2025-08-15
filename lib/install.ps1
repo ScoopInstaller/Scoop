@@ -197,7 +197,7 @@ function create_shims($manifest, $dir, $global, $arch) {
 }
 
 function rm_shim($name, $shimdir, $app) {
-    '', '.shim', '.cmd', '.ps1' | ForEach-Object {
+    '.shim', '.ps1', '.cmd', '' | ForEach-Object {
         $shimPath = "$shimdir\$name$_"
         $altShimPath = "$shimPath.$app"
         if ($app -and (Test-Path -Path $altShimPath -PathType Leaf)) {

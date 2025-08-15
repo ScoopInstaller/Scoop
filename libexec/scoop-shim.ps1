@@ -212,7 +212,7 @@ switch ($SubCommand) {
                 Write-Host $newApp -ForegroundColor DarkYellow -NoNewline
                 Write-Host ' as default...' -NoNewline
                 $pathNoExt = strip_ext $shimPath
-                '', '.shim', '.cmd', '.ps1' | ForEach-Object {
+                '.shim', '.ps1', '.cmd', '' | ForEach-Object {
                     $oldShimPath = "$pathNoExt$_"
                     $newShimPath = "$oldShimPath.$newApp"
                     if (Test-Path -Path $oldShimPath -PathType Leaf) {
