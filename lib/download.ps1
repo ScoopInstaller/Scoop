@@ -680,7 +680,9 @@ function ftp_file_size($url) {
 }
 
 function url_filename($url) {
-    (Split-Path $url -Leaf).split('?') | Select-Object -First 1
+    # eclipse-mat mirror auto selected parameter "&r=1"
+    # regularly, "&" should be a part of URL
+    (Split-Path $url -Leaf).split('?').Split('&') | Select-Object -First 1
 }
 
 function url_remote_filename($url) {
@@ -688,7 +690,7 @@ function url_remote_filename($url) {
     # URL fragment (e.g. #/dl.7z, useful for coercing a local filename),
     # this function extracts the original filename from the URL.
     $uri = (New-Object URI $url)
-    $basename = Split-Path $uri.PathAndQuery -Leaf
+    $basename = url_filename $url
     If ($basename -match '.*[?=]+([\w._-]+)') {
         $basename = $matches[1]
     }
