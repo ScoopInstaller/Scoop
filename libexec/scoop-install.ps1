@@ -109,7 +109,7 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
 }
 $apps = @((@($specific_versions_paths) + $difference) | Where-Object { $_ } | Select-Object -Unique)
 
-# remember which were explictly requested so that we can
+# remember which were explicitly requested so that we can
 # differentiate after dependencies are added
 $explicit_apps = $apps
 
