@@ -628,6 +628,31 @@ function handle_special_urls($url) {
         }
     }
 
+    # Github.com build artifacts
+    if ($url -match 'api.github.com/repos/(?<owner>[^/]+)/(?<repo>[^/]+)/actions/artifacts/(?<artifact_id>[\d]+)/zip') {
+        if ($token = Get-GitHubToken) {
+            $headers = @{
+                "Accept"               = "application/vnd.github+json"
+                "Authorization"        = "Bearer $($token)"
+                "X-GitHub-Api-Version" = "2022-11-28"
+            }
+            $assetUrl   = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/actions/artifacts/$($Matches.artifact_id)/zip"
+
+            $response = Invoke-WebRequest -Method 'Get' -Uri $assetUrl -Headers $headers -MaximumRedirection 0 2>$null #-SkipHttpErrorCheck # (since v7)
+            $status = $response.StatusCode
+            if ($status -eq 302) {
+              $url  = $response.Headers.Location
+            }
+            # switch ↑ to ↓ when min PowerShell is 7
+            # Invoke-RestMethod -Method 'Get' -Uri $assetUrl -Headers $headers -MaximumRedirection 0 -ResponseHeadersVariable rHeader -SkipHttpErrorCheck -StatusCodeVariable rStatus #2>$null
+            # if ($rStatus -eq 302) {
+                # $url = $rHeader.Location
+            # }
+        } else {
+            warn ("↓ url needs GitHub API token to be set via 'scoop config gh_token `"<YOUR_GH_TOKEN>`"`n", $url)
+        }
+    }
+
     return $url
 }
 
