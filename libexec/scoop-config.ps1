@@ -83,6 +83,12 @@
 # cache_path:
 #       For downloads, defaults to 'cache' folder under Scoop root directory.
 #
+# persist_path:
+#       Directories persisted during installation of new versions , defaults to 'persist' folder under Scoop root directory.
+#
+# global_persist_path:
+#       Directories persisted during installation of new versions , defaults to 'persist' folder under Scoop global directory.
+#
 # gh_token:
 #       GitHub API token used to make authenticated requests.
 #       This is essential for checkver and similar functions to run without
