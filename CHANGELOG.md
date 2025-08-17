@@ -1,4 +1,15 @@
-## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...develop)
+
+### Bug Fixes
+
+- **scoop-download**: Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
+- **core**: fix the grep parameter in the `Invoke-GitLog` function ([#6406](https://github.com/ScoopInstaller/Scoop/issues/6406))
+
+## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
+
+### Features
+
+**autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
 
 ### Bug Fixes
 
@@ -8,11 +19,13 @@
 - **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
 - **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
 - **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
-- **Invoke-GitLog**: fix the grep parameter in the `Invoke-GitLog` function ([#6406](https://github.com/ScoopInstaller/Scoop/issues/6406))
+- **scoop-uninstall:** Fix uninstaller does not gain Global state ([#6430](https://github.com/ScoopInstaller/Scoop/issues/6430))
+- **scoop-depends-tests:** Mocking `USE_EXTERNAL_7ZIP` as $false to avoding error when it is $true ([#6431](https://github.com/ScoopInstaller/Scoop/issues/6431))
 
 ### Code Refactoring
 
 - **download:** Move download-related functions to 'download.ps1' ([#6095](https://github.com/ScoopInstaller/Scoop/issues/6095))
+- **Get-Manifest:** Select actual source for manifest ([#6142](https://github.com/ScoopInstaller/Scoop/issues/6142))
 
 ### Performance Improvements
 
