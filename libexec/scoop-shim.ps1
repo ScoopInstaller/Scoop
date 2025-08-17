@@ -48,7 +48,7 @@ if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
 }
 
 $opt, $other, $err = getopt $Args 'g' 'global'
-if ($err) { "scoop shim: $err"; exit 1 }
+if ($err) { error "scoop shim: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 
