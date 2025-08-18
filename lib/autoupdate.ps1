@@ -211,7 +211,7 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hash = $null
 
     $hashmode = $config.mode
-    $originurl = (strip_fragment $url)
+    $originurl = strip_fragment $url
     $basename = [System.Web.HttpUtility]::UrlDecode((url_remote_filename($url)))
 
     $substitutions = $substitutions.Clone()
