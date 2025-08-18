@@ -3,6 +3,8 @@
 function format_hash([String] $hash) {
     $hash = $hash.toLower()
 
+    # Workaround for GitHub API:
+    # `"digest": "sha256:<SHA256_STRING>"`
     if ($hash -like 'sha256:*') {
         $hash = $hash.Substring(7)  # Remove prefix 'sha256:'
     }
