@@ -147,8 +147,7 @@ switch ($SubCommand) {
                 $pattern = $_
                 [void][Regex]::New($pattern)
             } catch {
-                Write-Host "ERROR: Invalid pattern: " -ForegroundColor Red -NoNewline
-                Write-Host $pattern -ForegroundColor Magenta
+                error "Invalid pattern: `e[35m$pattern"
                 exit 1
             }
         }

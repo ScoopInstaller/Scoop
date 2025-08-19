@@ -35,7 +35,7 @@ function cacheshow($app) {
 
 function cacheremove($app) {
     if (!$app) {
-        'ERROR: <app(s)> missing'
+        error '<app(s)> missing'
         my_usage
         exit 1
     } elseif ($app -eq '*' -or $app -eq '-a' -or $app -eq '--all') {

@@ -17,7 +17,7 @@ $global = installed_apps $true | ForEach-Object { @{ name = $_; global = $true }
 
 $apps = @($local) + @($global)
 if (-not $apps) {
-    Write-Host "There aren't any apps installed."
+    warn "There aren't any apps installed."
     exit 1
 }
 
@@ -48,7 +48,7 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $item.Updated = $updated
 
     $info = @()
-    if ((app_status $app $global).deprecated) { $info += 'Deprecated package'}
+    if ((app_status $app $global).deprecated) { $info += 'Deprecated package' }
     if ($global) { $info += 'Global install' }
     if (failed $app $global) { $info += 'Install failed' }
     if ($install_info.hold) { $info += 'Held package' }
