@@ -90,7 +90,7 @@ function load_cfg($file) {
         $content = [System.IO.File]::ReadAllLines($file)
         return ($content | ConvertFrom-Json -ErrorAction Stop)
     } catch {
-        Write-Host "ERROR loading $file`: $($_.exception.message)"
+        error "loading $file`: $($_.exception.message)"
     }
 }
 

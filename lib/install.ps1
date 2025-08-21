@@ -285,7 +285,7 @@ function ensure_install_dir_not_in_path($dir, $global) {
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if ($removed) {
-        $removed | ForEach-Object { "Installer added '$(friendly_path $_)' to path. Removing." }
+        $removed | ForEach-Object { Write-Output "Installer added '$(friendly_path $_)' to path. Removing." }
         Set-EnvVar -Name 'PATH' -Value $fixed -Global:$global
     }
 

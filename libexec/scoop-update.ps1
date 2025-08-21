@@ -30,7 +30,7 @@ if (get_config USE_SQLITE_CACHE) {
 }
 
 $opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip-hash-check', 'quiet', 'all'
-if ($err) { "scoop update: $err"; exit 1 }
+if ($err) { error "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
 $check_hash = !($opt.s -or $opt.'skip-hash-check')
@@ -400,7 +400,7 @@ if (-not ($apps -or $all)) {
     success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
-        'ERROR: You need admin rights to update global apps.'; exit 1
+        error 'You need admin rights to update global apps.'; exit 1
     }
 
     $outdated = @()

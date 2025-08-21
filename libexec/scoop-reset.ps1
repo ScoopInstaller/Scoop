@@ -14,7 +14,7 @@
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 
 $opt, $apps, $err = getopt $args 'a' 'all'
-if($err) { "scoop reset: $err"; exit 1 }
+if($err) { error "scoop reset: $err"; exit 1 }
 $all = $opt.a -or $opt.all
 
 if(!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
