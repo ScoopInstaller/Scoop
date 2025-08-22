@@ -14,6 +14,7 @@ param(
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\system.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\uninstall.ps1" # 'uninstall_app'
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
@@ -31,77 +32,115 @@ if ($purge) {
 $yn = Read-Host 'Are you sure? (yN)'
 if ($yn -notlike 'y*') { exit }
 
-$errors = $false
-
-# Uninstall given app
-function do_uninstall($app, $global) {
-    $version = Select-CurrentVersion -AppName $app -Global:$global
-    $dir = versiondir $app $version $global
-    $manifest = installed_manifest $app $version $global
-    $install = install_info $app $version $global
-    $architecture = $install.architecture
-
-    Write-Output "Uninstalling '$app'"
-    Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Uninstall
-    rm_shims $app $manifest $global $architecture
-
-    # If a junction was used during install, that will have been used
-    # as the reference directory. Othewise it will just be the version
-    # directory.
-    $refdir = unlink_current (appdir $app $global)
-
-    env_rm_path $manifest $refdir $global $architecture
-    env_rm $manifest $global $architecture
-
-    $appdir = appdir $app $global
-    try {
-        Remove-Item $appdir -Recurse -Force -ErrorAction Stop
-    } catch {
-        $errors = $true
-        warn "Couldn't remove $(friendly_path $appdir): $_.Exception"
-    }
-}
-
-function rm_dir($dir) {
-    try {
-        Remove-Item $dir -Recurse -Force -ErrorAction Stop
-    } catch {
-        abort "Couldn't remove $(friendly_path $dir): $_"
-    }
-}
-
-# Remove all folders (except persist) inside given scoop directory.
-function keep_onlypersist($directory) {
-    Get-ChildItem $directory -Exclude 'persist' | ForEach-Object { rm_dir $_ }
-}
 
 # Run uninstallation for each app if necessary, continuing if there's
 # a problem deleting a directory (which is quite likely)
-if ($global) {
-    installed_apps $true | ForEach-Object { # global apps
-        do_uninstall $_ $true
+function UninstallApps {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [bool]$global,
+        [Parameter(Mandatory = $true)]
+        [bool]$purge
+    )
+
+    $allDone = $true
+
+    foreach ($app in installed_apps $global) {
+        try {
+            $succ = uninstall_app -app $app -global $global -purge $purge
+            $errMsg = "Failed to uninstall $app."
+        } catch {
+            $succ = $false
+            $errMsg = "Failed to uninstall $app : $($_.Exception.Message)."
+        }
+
+        if (-not $succ) {
+            $allDone = $false
+            error $errMsg
+        }
+    }
+
+    if (-not $allDone) {
+        abort 'Not all apps were uninstalled. Please try again or restart.'
     }
 }
 
-installed_apps $false | ForEach-Object { # local apps
-    do_uninstall $_ $false
+function RemoveDirs {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [bool]$global,
+        [Parameter(Mandatory = $true)]
+        [bool]$purge
+    )
+
+    $dirs = @()
+
+    # Remove the shortcut directory
+    $dirs += (shortcut_folder $global)
+
+    # Remove the scoop root directory
+    $scoopDir = basedir $global
+    $persistDir = "$scoopDir\persist"
+
+    $dirs += (Get-ChildItem $scoopDir -Exclude @('persist', 'apps', 'shims') | Select-Object -ExpandProperty FullName)
+
+    # Remove the persist directory if purge is specified or if it's empty
+    $rmPersist = $purge -or
+                ((Get-ChildItem -Path $persistDir -Force -ErrorAction SilentlyContinue).Count -eq 0)
+
+    # Ensure shims dir and apps dir are removed last
+    if ($rmPersist) {
+        $dirs += @($persistDir, "$scoopDir\shims", "$scoopDir\apps", $scoopDir)
+    } else {
+        $dirs += @("$scoopDir\shims", "$scoopDir\apps")
+    }
+
+    foreach ($dir in $dirs) {
+        try {
+            if (($null -ne $dir) -and (Test-Path -Path $dir)) {
+                Write-Host "Removing $(friendly_path $dir)..."
+
+                Remove-Item -Path "$dir" -Recurse -Force -ErrorAction Stop
+            }
+        } catch {
+            abort "Couldn't remove $(friendly_path $dir): $($_.Exception.Message)"
+        }
+    }
 }
 
-if ($errors) {
-    abort 'Not all apps could be deleted. Try again or restart.'
+function RemoveEnvVars {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [bool]$global
+    )
+
+    # Remove environment variable "$scoopPathEnvVar"
+    if (get_config USE_ISOLATED_PATH) {
+        Remove-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global -PassThru:$false
+    }
 }
 
-if ($purge) {
-    rm_dir $scoopdir
-    if ($global) { rm_dir $globaldir }
-} else {
-    keep_onlypersist $scoopdir
-    if ($global) { keep_onlypersist $globaldir }
+function Invoke-SelfUninstall{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [bool]$global,
+        [Parameter(Mandatory = $true)]
+        [bool]$purge
+    )
+
+    UninstallApps -global $global -purge $purge
+    RemoveDirs    -global $global -purge $purge
+    RemoveEnvVars -global $global
 }
 
-Remove-Path -Path (shimdir $global) -Global:$global
-if (get_config USE_ISOLATED_PATH) {
-    Remove-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
+if($global) {
+    Invoke-SelfUninstall -global $true -purge $purge
 }
+
+Invoke-SelfUninstall -global $false -purge $purge
 
 success 'Scoop has been uninstalled.'
