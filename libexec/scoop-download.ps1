@@ -127,6 +127,10 @@ foreach ($curr_app in $apps) {
                     if ($url -like '*sourceforge.net*') {
                         warn 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
+                    if ($err.Contains('No-hash apps')) {
+                        error "If you want to allow no-hash apps, run 'scoop config allow_no_hash true', or use the parameter '--skip-hash-check' in a single download."
+                        continue
+                    }
                     error (new_issue_msg $app $bucket "hash check failed")
                     continue
                 }

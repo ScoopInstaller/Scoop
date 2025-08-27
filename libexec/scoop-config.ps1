@@ -123,6 +123,10 @@
 #       When set to arbitrary non-empty string, Scoop will use that string as the environment variable name instead.
 #       This is useful when you want to isolate Scoop from the system `PATH`.
 #
+# allow_no_hash: $true|$false
+#       Allow to download or install apps with no hash provided in manifest.
+#       This option is NOT RECOMMENDED as it may cause security issues.
+#
 # ARIA2 configuration
 # -------------------
 #
