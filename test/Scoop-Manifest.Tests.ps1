@@ -143,6 +143,8 @@ Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
         Mock Find-BucketDirectory -ParameterFilter { -not $Root } { $innerBucket }
         Mock Test-Path -ParameterFilter { $Path -eq (Join-Path $bucketRoot '.git') } { $true }
         Mock Test-Path -ParameterFilter { $Path -eq $innerBucket -and $PathType -eq 'Container' } { $true }
+        # Behavior-oriented mocks: using HEAD should yield a wrong version
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { $global:LASTEXITCODE = 0; return '{"version":"2.0.0"}' }
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' } { $global:LASTEXITCODE = 0; return '{"version":"1.0.0"}' }
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } { @('abcdef0123456789') }
 
