@@ -93,7 +93,15 @@ function search_bucket_legacy($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
     $apps | ForEach-Object {
-        $manifest = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
+        $filepath = $_.FullName
+
+        $manifest = try {
+            [System.IO.File]::ReadAllText($filepath) | ConvertFrom-Json
+        } catch {
+            debug "Failed to parse manifest file: $filepath (error: $_)"
+            return
+        }
+
         $name = $_.BaseName
 
         if ($name -match $query) {
@@ -124,8 +132,8 @@ function search_remote($bucket, $query) {
         $repo_name = $Matches[2]
         $api_link = "https://api.github.com/repos/$user/$repo_name/git/trees/HEAD?recursive=1"
         $result = download_json $api_link | Select-Object -ExpandProperty tree |
-            Where-Object -Value "^bucket/(.*$query.*)\.json$" -Property Path -Match |
-            ForEach-Object { $Matches[1] }
+        Where-Object -Value "^bucket/(.*$query.*)\.json$" -Property Path -Match |
+        ForEach-Object { $Matches[1] }
     }
 
     $result
@@ -160,15 +168,15 @@ function search_remotes($query) {
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
     Select-ScoopDBItem $query -From @('name', 'binary', 'shortcut') |
-        Select-Object -Property name, version, bucket, binary |
-        ForEach-Object {
-            $list.Add([PSCustomObject]@{
-                    Name     = $_.name
-                    Version  = $_.version
-                    Source   = $_.bucket
-                    Binaries = $_.binary
-                })
-        }
+    Select-Object -Property name, version, bucket, binary |
+    ForEach-Object {
+        $list.Add([PSCustomObject]@{
+                Name     = $_.name
+                Version  = $_.version
+                Source   = $_.bucket
+                Binaries = $_.binary
+            })
+    }
 } else {
     try {
         $query = New-Object Regex $query, 'IgnoreCase'
