@@ -40,7 +40,7 @@ if ($SubCommand -notin $SubCommands) {
 }
 
 $opt, $other, $err = getopt $Args 'v' 'verbose'
-if ($err) { "scoop alias: $err"; exit 1 }
+if ($err) { error "scoop alias: $err"; exit 1 }
 
 $name, $command, $description = $other
 $verbose = $opt.v -or $opt.verbose
