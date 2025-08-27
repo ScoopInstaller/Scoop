@@ -509,7 +509,7 @@ function Invoke-AutoUpdate {
             $hasNote = $true
         }
         if ($Manifest.autoupdate.architecture) {
-            '64bit', '32bit', 'arm64' | ForEach-Object {
+            '64bit-v4', '64bit-v3', '64bit-v2', '64bit', '32bit', 'arm64' | ForEach-Object {
                 if ($Manifest.autoupdate.architecture.$_.note) {
                     $note += "`n$_-arch: $($Manifest.autoupdate.architecture.$_.note)"
                     $hasNote = $true

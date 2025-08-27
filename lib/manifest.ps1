@@ -155,16 +155,28 @@ function arch_specific($prop, $manifest, $architecture) {
 }
 
 function Get-SupportedArchitecture($manifest, $architecture) {
-    if ($architecture -eq 'arm64' -and ($manifest | ConvertToPrettyJson) -notmatch '[''"]arm64["'']') {
-        # Windows 10 enables existing unmodified x86 apps to run on Arm devices.
-        # Windows 11 adds the ability to run unmodified x64 Windows apps on Arm devices!
-        # Ref: https://learn.microsoft.com/en-us/windows/arm/overview
-        if ($WindowsBuild -ge 22000) {
-            # Windows 11
-            $architecture = '64bit'
-        } else {
-            # Windows 10
-            $architecture = '32bit'
+    if (!$manifest.architecture.$architecture) {
+        if ($architecture -eq 'arm64') {
+            # Windows 10 enables existing unmodified x86 apps to run on Arm devices.
+            # Windows 11 adds the ability to run unmodified x64 Windows apps on Arm devices!
+            # Ref: https://learn.microsoft.com/en-us/windows/arm/overview
+            $architecture = if ($WindowsBuild -ge 22000) {
+                # Windows 11
+                '64bit'
+            } else {
+                # Windows 10
+                '32bit'
+            }
+        } elseif ($architecture[-3] -eq '-') {
+            $success = $false
+            for ($i = $architecture[-1] - [byte][char]'0'; $i -gt 1; --$i) {
+                $testArch = "64bit-v$i"
+                if ($manifest.architecture.$testArch) {
+                    $success = $true
+                    break
+                }
+            }
+            $architecture = if ($success) { $testArch } else { '64bit' }
         }
     }
     if (![String]::IsNullOrEmpty((arch_specific 'url' $manifest $architecture))) {
