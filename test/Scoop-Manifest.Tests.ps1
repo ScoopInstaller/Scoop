@@ -118,7 +118,14 @@ Describe 'Find-HistoricalManifestInCache' -Tag 'Scoop' {
     It 'returns manifest text and version when cache has exact match' {
         $tempUM = Join-Path $env:TEMP 'ScoopTestsUM'
         Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
-        Mock Get-ScoopDBItem { [pscustomobject]@{ Rows = @([pscustomobject]@{ manifest = '{"version":"1.2.3"}' }) } }
+        Mock Get-ScoopDBItem {
+            $dt = New-Object System.Data.DataTable
+            [void]$dt.Columns.Add('manifest')
+            $row = $dt.NewRow()
+            $row['manifest'] = '{"version":"1.2.3"}'
+            [void]$dt.Rows.Add($row)
+            Write-Output $dt -NoEnumerate
+        }
         Mock ensure {}
         $result = Find-HistoricalManifestInCache 'foo' 'main' '1.2.3'
         $result | Should -Not -BeNullOrEmpty
@@ -227,3 +234,4 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         { generate_user_manifest 'foo' 'main' '1.0.0' } | Should -Throw
     }
 }
+

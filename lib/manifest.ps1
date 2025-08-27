@@ -386,3 +386,4 @@ function Write-ManifestToUserCache {
     $ManifestText | Out-UTF8File -FilePath $tempManifestPath
     return $tempManifestPath
 }
+
