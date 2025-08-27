@@ -341,13 +341,7 @@ function Get-HistoricalManifestFromGitHistory($app, $bucket, $requestedVersion) 
                         info "Exact version '$requestedVersion' for '$app' found in manifest (commit $hash)."
                         ensure (usermanifestsdir) | Out-Null
                         $tempManifestPath = "$(usermanifestsdir)\$app.json"
-                        if ($PSVersionTable.PSVersion.Major -ge 6) {
-                            $utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
-                            Set-Content -Path $tempManifestPath -Value $manifestContent -Encoding $utf8NoBomEncoding -NoNewline:$false
-                        } else {
-                            # PowerShell 5 compatibility
-                            $manifestContent | Out-UTF8File -FilePath $tempManifestPath
-                        }
+                        $manifestContent | Out-UTF8File -FilePath $tempManifestPath
                         return @{ path = $tempManifestPath; version = $requestedVersion; source = "git_manifest:$hash" }
                     }
                     $foundVersions.Add(@{
