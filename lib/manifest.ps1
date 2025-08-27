@@ -218,15 +218,19 @@ function Find-HistoricalManifestInCache($app, $bucket, $requestedVersion) {
     }
 
     $dbResult = Get-ScoopDBItem -Name $app -Bucket $bucket -Version $requestedVersion
-    if ($dbResult.Rows.Count -gt 0) {
-        $row = $dbResult.Rows[0]
-        $manifestText = $row.manifest
-        $manifestObj = $null
-        try { $manifestObj = $manifestText | ConvertFrom-Json -ErrorAction Stop } catch {}
-        $manifestVersion = if ($manifestObj -and $manifestObj.version) { $manifestObj.version } else { $requestedVersion }
 
-        return @{ ManifestText = $manifestText; version = $manifestVersion; source = "sqlite_exact_match" }
-    }
+    # Strictly follow DB contract: must be DataTable with at least one row
+    if (-not ($dbResult -is [System.Data.DataTable])) { return $null }
+    if ($dbResult.Rows.Count -eq 0) { return $null }
+
+    $manifestText = $dbResult.Rows[0]['manifest']
+    if ([string]::IsNullOrWhiteSpace($manifestText)) { return $null }
+
+    $manifestObj = $null
+    try { $manifestObj = $manifestText | ConvertFrom-Json -ErrorAction Stop } catch {}
+    $manifestVersion = if ($manifestObj -and $manifestObj.version) { $manifestObj.version } else { $requestedVersion }
+
+    return @{ ManifestText = $manifestText; version = $manifestVersion; source = "sqlite_exact_match" }
 
     return $null
 }
@@ -258,35 +262,52 @@ function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
     $relativeManifestPath = $relativeManifestPath -replace '\\', '/'
 
     try {
-        # Collect commits that add/remove the requested version string
+        # Prefer precise regex match on version line, fallback to -S literal
+        $pattern = '"version"\s*:\s*"' + [regex]::Escape($requestedVersion) + '"'
         $commits = @()
-        $searchLiteral = '"version": "' + $requestedVersion + '"'
-        $outS = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','--format=%H','-S',$searchLiteral,'--',$relativeManifestPath)
-        if ($outS) { $commits = @($outS | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
+        $outG = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','-n','1','--format=%H','-G',$pattern,'--',$relativeManifestPath)
+        if ($outG) { $commits = @($outG | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
 
         if ($commits.Count -eq 0) {
-            $pattern = '"version"\s*:\s*"' + [regex]::Escape($requestedVersion) + '"'
-            $outG = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','--format=%H','-G',$pattern,'--',$relativeManifestPath)
-            if ($outG) { $commits = @($outG | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
+            $searchLiteral = '"version": "' + $requestedVersion + '"'
+            $outS = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','-n','1','--format=%H','-S',$searchLiteral,'--',$relativeManifestPath)
+            if ($outS) { $commits = @($outS | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
         }
 
         if ($commits.Count -eq 0) { return $null }
 
-        $targetSpec = if ($commits.Count -ge 2) { "$($commits[0])^" } else { 'HEAD' }
+        $h = $commits[0]
 
-        $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$targetSpec`:$relativeManifestPath")
-        if (-not $manifestContent -or ($LASTEXITCODE -ne 0)) { return $null }
-        if ($manifestContent -is [Array]) { $manifestContent = $manifestContent -join "`n" }
+        # First try parent snapshot (latest state before change), then the change itself
+        foreach ($spec in @("$h^","$h")) {
+            $content = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$spec`:$relativeManifestPath")
+            if (-not $content -or ($LASTEXITCODE -ne 0)) { continue }
+            if ($content -is [Array]) { $content = $content -join "`n" }
+            try {
+                $obj = $content | ConvertFrom-Json -ErrorAction Stop
+            } catch { continue }
+            if ($obj -and $obj.version -eq $requestedVersion) {
+                return @{ ManifestText = $content; version = $requestedVersion; source = "git_manifest:$spec" }
+            }
+        }
 
-        $manifestObj = $null
-        try { $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop } catch { return $null }
-        if (-not $manifestObj -or $manifestObj.version -ne $requestedVersion) { return $null }
+        # Fallback: iterate recent commits that touched the version string and validate
+        $outAll = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','--format=%H','-G',$pattern,'--',$relativeManifestPath)
+        $allCommits = @()
+        if ($outAll) { $allCommits = @($outAll | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
 
-        return @{ ManifestText = $manifestContent; version = $requestedVersion; source = "git_manifest:$targetSpec" }
+        foreach ($c in $allCommits) {
+            $content = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$c`:$relativeManifestPath")
+            if (-not $content -or ($LASTEXITCODE -ne 0)) { continue }
+            if ($content -is [Array]) { $content = $content -join "`n" }
+            try { $obj = $content | ConvertFrom-Json -ErrorAction Stop } catch { continue }
+            if ($obj -and $obj.version -eq $requestedVersion) {
+                return @{ ManifestText = $content; version = $requestedVersion; source = "git_manifest:$c" }
+            }
+        }
 
-    } catch {
         return $null
-    }
+    } catch { return $null }
 }
 
 function Find-HistoricalManifest($app, $bucket, $version) {
