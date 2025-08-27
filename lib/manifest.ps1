@@ -202,7 +202,7 @@ function Get-RelativePathCompat($from, $to) {
     return $relativePath -replace '/', '\'
 }
 
-function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
+function Find-HistoricalManifestInCache($app, $bucket, $requestedVersion) {
     if (!(get_config USE_SQLITE_CACHE)) {
         return $null
     }
@@ -217,7 +217,6 @@ function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
         . "$PSScriptRoot\database.ps1"
     }
 
-    # First try exact match
     $dbResult = Get-ScoopDBItem -Name $app -Bucket $bucket -Version $requestedVersion
     if ($dbResult.Rows.Count -gt 0) {
         $row = $dbResult.Rows[0]
@@ -226,16 +225,13 @@ function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
         try { $manifestObj = $manifestText | ConvertFrom-Json -ErrorAction Stop } catch {}
         $manifestVersion = if ($manifestObj -and $manifestObj.version) { $manifestObj.version } else { $requestedVersion }
 
-        $tempManifestPath = Write-ManifestToUserCache -App $app -ManifestText $manifestText
-        return @{ path = $tempManifestPath; version = $manifestVersion; source = "sqlite_exact_match" }
+        return @{ ManifestText = $manifestText; version = $manifestVersion; source = "sqlite_exact_match" }
     }
-
-    # No exact match found, return null (no compatibility matching)
 
     return $null
 }
 
-function Get-HistoricalManifestFromGitHistory($app, $bucket, $requestedVersion) {
+function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
     # Only proceed if git history is enabled
     if (!(get_config USE_GIT_HISTORY $true)) {
         return $null
@@ -262,34 +258,64 @@ function Get-HistoricalManifestFromGitHistory($app, $bucket, $requestedVersion) 
     $relativeManifestPath = $relativeManifestPath -replace '\\', '/'
 
     try {
-        # Fast path: search commit that introduced the requested version using -S (literal) then -G (regex)
+        # Collect commits that add/remove the requested version string
+        $commits = @()
         $searchLiteral = '"version": "' + $requestedVersion + '"'
-        $hash = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','-n','1','--format=%H','-S',$searchLiteral,'--',$relativeManifestPath)
-        if ($hash -is [Array]) { $hash = ($hash | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -First 1) }
+        $outS = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','--format=%H','-S',$searchLiteral,'--',$relativeManifestPath)
+        if ($outS) { $commits = @($outS | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
 
-        if (-not $hash) {
+        if ($commits.Count -eq 0) {
             $pattern = '"version"\s*:\s*"' + [regex]::Escape($requestedVersion) + '"'
-            $hash = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','-n','1','--format=%H','-G',$pattern,'--',$relativeManifestPath)
-            if ($hash -is [Array]) { $hash = ($hash | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -First 1) }
+            $outG = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','--format=%H','-G',$pattern,'--',$relativeManifestPath)
+            if ($outG) { $commits = @($outG | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
         }
 
-        if ($hash) {
-            $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$hash`:$relativeManifestPath")
-            if ($manifestContent -and ($LASTEXITCODE -eq 0)) {
-                if ($manifestContent -is [Array]) { $manifestContent = $manifestContent -join "`n" }
-                $manifestObj = $null; try { $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop } catch {}
-                if ($manifestObj -and $manifestObj.version -eq $requestedVersion) {
-                    $tempManifestPath = Write-ManifestToUserCache -App $app -ManifestText $manifestContent
-                    return @{ path = $tempManifestPath; version = $requestedVersion; source = "git_manifest:$hash" }
-                }
-            }
-        }
+        if ($commits.Count -eq 0) { return $null }
 
-        return $null
+        $targetSpec = if ($commits.Count -ge 2) { "$($commits[0])^" } else { 'HEAD' }
+
+        $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$targetSpec`:$relativeManifestPath")
+        if (-not $manifestContent -or ($LASTEXITCODE -ne 0)) { return $null }
+        if ($manifestContent -is [Array]) { $manifestContent = $manifestContent -join "`n" }
+
+        $manifestObj = $null
+        try { $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop } catch { return $null }
+        if (-not $manifestObj -or $manifestObj.version -ne $requestedVersion) { return $null }
+
+        return @{ ManifestText = $manifestContent; version = $requestedVersion; source = "git_manifest:$targetSpec" }
+
     } catch {
-        warn "Error searching git history for '$app': $($_.Exception.Message)"
         return $null
     }
+}
+
+function Find-HistoricalManifest($app, $bucket, $version) {
+    # Orchestrates historical manifest lookup using available providers (DB → Git)
+    $result = $null
+
+    if (get_config USE_SQLITE_CACHE) {
+        $result = Find-HistoricalManifestInCache $app $bucket $version
+        if ($result) {
+            if ($result.ManifestText) {
+                $path = Write-ManifestToUserCache -App $app -ManifestText $result.ManifestText
+                return @{ path = $path; version = $result.version; source = $result.source }
+            }
+            return $result
+        }
+    }
+
+    if (get_config USE_GIT_HISTORY $true) {
+        $result = Find-HistoricalManifestInGit $app $bucket $version
+        if ($result) {
+            if ($result.ManifestText) {
+                $path = Write-ManifestToUserCache -App $app -ManifestText $result.ManifestText
+                return @{ path = $path; version = $result.version; source = $result.source }
+            }
+            return $result
+        }
+    }
+
+    return $null
 }
 
 
@@ -300,106 +326,25 @@ function generate_user_manifest($app, $bucket, $version) {
         return manifest_path $app $bucket
     }
 
-    warn "Given version ($version) does not match manifest ($($manifest.version))"
+    # Try historical providers via orchestrator
+    $historicalResult = Find-HistoricalManifest $app $bucket $version
+    if ($historicalResult) { return $historicalResult.path }
 
-    $historicalResult = $null
-
-    # Try SQLite cache first if enabled
-    if (get_config USE_SQLITE_CACHE) {
-        info "Searching for version '$version' in cache..."
-        $historicalResult = Get-HistoricalManifestFromDB $app $bucket $version
-        if ($historicalResult) {
-            info "Found version '$($historicalResult.version)' for '$app' in cache."
-            return $historicalResult.path
-        }
+    # No historical manifest; try autoupdate if available
+    if (!($manifest.autoupdate)) {
+        abort "Could not find manifest for '$app@$version' and no autoupdate is available"
     }
-
-    # Try git history if cache didn't find it
-    if (!$historicalResult) {
-        info "Searching for version '$version' in git history..."
-        $historicalResult = Get-HistoricalManifestFromGitHistory $app $bucket $version
-        if ($historicalResult) {
-            return $historicalResult.path
-        }
-    }
-
-    # If no historical version found, provide helpful guidance
-    if (!$historicalResult) {
-        # Try to provide additional context about what versions are available
-        $currentVersion = $manifest.version
-        if ($currentVersion) {
-            info "Current version available: $currentVersion"
-            info "To install the current version, use: scoop install $app"
-        }
-
-        # Check if we have autoupdate capability for fallback
-        if ($manifest.autoupdate) {
-            info "This app supports autoupdate - attempting to generate manifest for version $version"
-        } else {
-            warn "'$app' does not have autoupdate capability."
-            Write-Host "Available options:"
-            Write-Host "  1. Install current version: scoop install $app"
-            Write-Host "  2. Check if the requested version exists in other buckets"
-            Write-Host "  3. Contact the bucket maintainer to add historical version support"
-            Write-Host ""
-            abort "Could not find manifest for '$app@$version' and no autoupdate available"
-        }
-    }
-
-    # Fallback to autoupdate generation
-    warn "No historical version found. Attempting to generate manifest for '$app' ($version)"
 
     ensure (usermanifestsdir) | Out-Null
     $manifest_path = "$(usermanifestsdir)\$app.json"
-
-    # Check SQLite cache for exact cached manifest (this is different from historical search)
-    if (get_config USE_SQLITE_CACHE) {
-        $cached_manifest = (Get-ScoopDBItem -Name $app -Bucket $bucket -Version $version).manifest
-        if ($cached_manifest) {
-            $manifest_path = Write-ManifestToUserCache -App $app -ManifestText $cached_manifest
-            return $manifest_path
-        }
-    }
-
-    if (!($manifest.autoupdate)) {
-        abort "'$app' does not have autoupdate capability and no historical version found`r`ncouldn't find manifest for '$app@$version'"
-    }
 
     try {
         Invoke-AutoUpdate $app $manifest_path $manifest $version $(@{ })
         return $manifest_path
     } catch {
-        Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
-        Write-Host -ForegroundColor Yellow "Autoupdate failed for version $version"
-
-        # Provide helpful guidance when autoupdate fails
-        Write-Host "Possible reasons:"
-        Write-Host "  - Version $version may not exist or be available for download"
-        Write-Host "  - Download URLs may have changed or be inaccessible"
-        Write-Host "  - The version format may be incompatible with autoupdate patterns"
-        Write-Host ""
-        Write-Host "Suggestions:"
-        Write-Host "  1. Install current version: scoop install $app"
-        Write-Host "  2. Try a different version that was shown in the available list"
-        Write-Host "  3. Check the app's official releases or download page"
-        Write-Host ""
-
-        # If autoupdate fails and we haven't tried git history yet, try it as final fallback
-        if (!$historicalResult -and !(get_config USE_SQLITE_CACHE)) {
-            warn 'Autoupdate failed. Trying git history as final fallback...'
-            $fallbackResult = Get-HistoricalManifestFromGitHistory $app $bucket $version
-            if ($fallbackResult) {
-                warn "Using historical manifest as fallback for '$app' version '$($fallbackResult.version)'"
-                return $fallbackResult.path
-            }
-        }
-
-        # Final failure - provide comprehensive guidance
-        Write-Host -ForegroundColor Red "All attempts to find or generate manifest for '$app@$version' failed."
+        warn "Autoupdate failed for '$app@$version'"
         abort "Installation of '$app@$version' is not possible"
     }
-
-    return $null
 }
 
 function url($manifest, $arch) { arch_specific 'url' $manifest $arch }

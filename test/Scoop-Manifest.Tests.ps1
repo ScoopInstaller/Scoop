@@ -108,37 +108,33 @@ Describe 'Get-RelativePathCompat' -Tag 'Scoop' {
     }
 }
 
-Describe 'Get-HistoricalManifestFromDB' -Tag 'Scoop' {
+Describe 'Find-HistoricalManifestInCache' -Tag 'Scoop' {
     It 'returns $null when sqlite cache disabled' {
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
-        $result = Get-HistoricalManifestFromDB 'foo' 'main' '1.0.0'
+        $result = Find-HistoricalManifestInCache 'foo' 'main' '1.0.0'
         $result | Should -Be $null
     }
 
-    It 'returns path and version when cache has exact match' {
+    It 'returns manifest text and version when cache has exact match' {
         $tempUM = Join-Path $env:TEMP 'ScoopTestsUM'
-        Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $true }
+        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
         Mock Get-ScoopDBItem { [pscustomobject]@{ Rows = @([pscustomobject]@{ manifest = '{"version":"1.2.3"}' }) } }
         Mock ensure {}
-        Mock usermanifestsdir { $tempUM }
-        Mock Out-UTF8File {}
-
-        $result = Get-HistoricalManifestFromDB 'foo' 'main' '1.2.3'
+        $result = Find-HistoricalManifestInCache 'foo' 'main' '1.2.3'
         $result | Should -Not -BeNullOrEmpty
         $result.version | Should -Be '1.2.3'
-        $result.path | Should -Match '\\foo\.json$'
-        Should -Invoke -CommandName Out-UTF8File -Times 1
+        $result.ManifestText | Should -Match '"version":"1.2.3"'
     }
 }
 
-Describe 'Get-HistoricalManifestFromGitHistory' -Tag 'Scoop' {
+Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
     It 'returns $null when git history search disabled' {
         Mock get_config -ParameterFilter { $name -eq 'use_git_history' } { $false }
-        $result = Get-HistoricalManifestFromGitHistory 'foo' 'main' '1.0.0'
+        $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
         $result | Should -Be $null
     }
 
-    It 'returns manifest path on commit message exact match' {
+    It 'returns manifest text on version match' {
         $bucketRoot = 'C:\b\root'
         $innerBucket = 'C:\b\root\bucket'
         $umdir = Join-Path $env:TEMP 'ScoopTestsUM'
@@ -147,16 +143,13 @@ Describe 'Get-HistoricalManifestFromGitHistory' -Tag 'Scoop' {
         Mock Find-BucketDirectory -ParameterFilter { -not $Root } { $innerBucket }
         Mock Test-Path -ParameterFilter { $Path -eq (Join-Path $bucketRoot '.git') } { $true }
         Mock Test-Path -ParameterFilter { $Path -eq $innerBucket -and $PathType -eq 'Container' } { $true }
-        Mock usermanifestsdir { $umdir }
-        Mock Out-UTF8File {}
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' } { $global:LASTEXITCODE = 0; return '{"version":"1.0.0"}' }
-        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } { @('abcdef0123456789','foo: Update to version 1.0.0') }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } { @('abcdef0123456789') }
 
-        $result = Get-HistoricalManifestFromGitHistory 'foo' 'main' '1.0.0'
+        $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
         $result | Should -Not -BeNullOrEmpty
-        $result.path | Should -Match '\\foo\.json$'
         $result.version | Should -Be '1.0.0'
-        Should -Invoke -CommandName Out-UTF8File -Times 1
+        $result.ManifestText | Should -Match '"version":"1.0.0"'
     }
 }
 
@@ -168,38 +161,37 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         $p | Should -Be 'C:\path\foo.json'
     }
 
-    It 'prefers sqlite cache when enabled and hit' {
+    It 'prefers history orchestrator hit (cache) when enabled' {
         Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0' }, 'main', $null }
-        Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $true }
-        Mock Get-HistoricalManifestFromDB { @{ path = 'C:\cache\foo.json'; version = '1.0.0'; source='sqlite_exact_match' } }
-        Mock Get-HistoricalManifestFromGitHistory { $null }
+        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
+        Mock Find-HistoricalManifest { @{ path = 'C:\cache\foo.json'; version = '1.0.0'; source='sqlite_exact_match' } }
+
         Mock info {}
         Mock warn {}
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
         $p | Should -Be 'C:\cache\foo.json'
-        Should -Invoke -CommandName Get-HistoricalManifestFromDB -Times 1
-        Should -Invoke -CommandName Get-HistoricalManifestFromGitHistory -Times 0
+        Should -Invoke -CommandName Find-HistoricalManifest -Times 1
+
     }
 
     It 'falls back to git history when cache misses' {
         Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0' }, 'main', $null }
-        Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $true }
-        Mock Get-HistoricalManifestFromDB { $null }
-        Mock Get-HistoricalManifestFromGitHistory { @{ path = 'C:\git\foo.json'; version = '1.0.0'; source='git_manifest:hash' } }
+        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
+        Mock Find-HistoricalManifest { @{ path = 'C:\git\foo.json'; version = '1.0.0'; source='git_manifest:hash' } }
         Mock info {}
         Mock warn {}
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
         $p | Should -Be 'C:\git\foo.json'
-        Should -Invoke -CommandName Get-HistoricalManifestFromDB -Times 1
-        Should -Invoke -CommandName Get-HistoricalManifestFromGitHistory -Times 1
+        Should -Invoke -CommandName Find-HistoricalManifest -Times 1
+
     }
 
     It 'uses autoupdate when no history found and autoupdate exists' {
         $umdir = Join-Path $env:TEMP 'ScoopTestsUM'
         Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0'; autoupdate=@{} }, 'main', $null }
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
-        Mock Get-HistoricalManifestFromDB { $null }
-        Mock Get-HistoricalManifestFromGitHistory { $null }
+        Mock Find-HistoricalManifest { $null }
+
         Mock ensure {}
         Mock usermanifestsdir { $umdir }
         Mock Invoke-AutoUpdate {}
@@ -207,32 +199,29 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         $p | Should -Be (Join-Path $umdir 'foo.json')
     }
 
-    It 'on autoupdate failure retries git and returns when found' {
+    It 'on autoupdate failure aborts with concise message' {
         $umdir = Join-Path $env:TEMP 'ScoopTestsUM'
-        $call = 0
         Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0'; autoupdate=@{} }, 'main', $null }
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
-        Mock Get-HistoricalManifestFromDB { $null }
-        Mock Get-HistoricalManifestFromGitHistory { $script:call += 1; if ($script:call -eq 1) { $null } else { @{ path = 'C:\git\foo.json'; version='1.0.0' } } }
+        Mock Find-HistoricalManifest { $null }
         Mock ensure {}
         Mock usermanifestsdir { $umdir }
         Mock Invoke-AutoUpdate { throw 'fail' }
         Mock warn {}
         Mock info {}
         Mock Write-Host {}
-        $p = generate_user_manifest 'foo' 'main' '1.0.0'
-        $p | Should -Be 'C:\git\foo.json'
+        Mock abort { throw 'aborted' }
+        { generate_user_manifest 'foo' 'main' '1.0.0' } | Should -Throw
     }
 
     It 'aborts when no history and no autoupdate' {
         Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0' }, 'main', $null }
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
-        Mock Get-HistoricalManifestFromDB { $null }
-        Mock Get-HistoricalManifestFromGitHistory { $null }
+        Mock Find-HistoricalManifest { $null }
+
         Mock warn {}
         Mock info {}
         Mock abort { throw 'aborted' }
         { generate_user_manifest 'foo' 'main' '1.0.0' } | Should -Throw
     }
 }
-
