@@ -2,6 +2,13 @@
 
 function format_hash([String] $hash) {
     $hash = $hash.toLower()
+
+    # Workaround for GitHub API:
+    # `"digest": "sha256:<SHA256_STRING>"`
+    if ($hash -like 'sha256:*') {
+        $hash = $hash.Substring(7)  # Remove prefix 'sha256:'
+    }
+
     switch ($hash.Length) {
         32 { $hash = "md5:$hash" } # md5
         40 { $hash = "sha1:$hash" } # sha1
@@ -204,13 +211,14 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
     $hash = $null
 
     $hashmode = $config.mode
+    $originurl = strip_fragment $url
     $basename = [System.Web.HttpUtility]::UrlDecode((url_remote_filename($url)))
 
     $substitutions = $substitutions.Clone()
-    $substitutions.Add('$url', (strip_fragment $url))
-    $substitutions.Add('$baseurl', (strip_filename (strip_fragment $url)).TrimEnd('/'))
+    $substitutions.Add('$url', $originurl)
+    $substitutions.Add('$baseurl', (strip_filename $originurl).TrimEnd('/'))
     $substitutions.Add('$basename', $basename)
-    $substitutions.Add('$urlNoExt', (strip_ext (strip_fragment $url)))
+    $substitutions.Add('$urlNoExt', (strip_ext $originurl))
     $substitutions.Add('$basenameNoExt', (strip_ext $basename))
 
     debug $substitutions
@@ -259,6 +267,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
         $hashmode = 'sourceforge'
     }
 
+    if (!$hashfile_url -and $url -match 'https:\/\/github\.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)\/releases\/download\/[^\/]+\/[^\/]+') {
+        $hashmode = 'github'
+    }
+
     switch ($hashmode) {
         'extract' {
             $hash = find_hash_in_textfile $hashfile_url $substitutions $regex
@@ -285,6 +297,10 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             # change the URL because downloads.sourceforge.net doesn't have checksums
             $hashfile_url = (strip_filename (strip_fragment "https://sourceforge.net/projects/$($matches['project'])/files/$($matches['file'])")).TrimEnd('/')
             $hash = find_hash_in_textfile $hashfile_url $substitutions '"$basename":.*?"sha1":\s*"([a-fA-F0-9]{40})"'
+        }
+        'github' {
+            $hashfile_url = "https://api.github.com/repos/$($matches['owner'])/$($matches['repo'])/releases"
+            $hash = find_hash_in_json $hashfile_url $substitutions ("$..assets[?(@.browser_download_url == '" + $originurl + "')].digest")
         }
     }
 
