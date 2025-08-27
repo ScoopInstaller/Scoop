@@ -221,13 +221,12 @@ function Get-HistoricalManifestFromDB($app, $bucket, $requestedVersion) {
     $dbResult = Get-ScoopDBItem -Name $app -Bucket $bucket -Version $requestedVersion
     if ($dbResult.Rows.Count -gt 0) {
         $row = $dbResult.Rows[0]
-        ensure (usermanifestsdir) | Out-Null
-        $tempManifestPath = "$(usermanifestsdir)\$app.json"
-        $row.manifest | Out-UTF8File -FilePath $tempManifestPath
+        $manifestText = $row.manifest
+        $manifestObj = $null
+        try { $manifestObj = $manifestText | ConvertFrom-Json -ErrorAction Stop } catch {}
+        $manifestVersion = if ($manifestObj -and $manifestObj.version) { $manifestObj.version } else { $requestedVersion }
 
-        # Parse the manifest to get its actual version
-        $manifest = $row.manifest | ConvertFrom-Json
-        $manifestVersion = if ($manifest.version) { $manifest.version } else { $requestedVersion }
+        $tempManifestPath = Write-ManifestToUserCache -App $app -ManifestText $manifestText
         return @{ path = $tempManifestPath; version = $manifestVersion; source = "sqlite_exact_match" }
     }
 
@@ -263,143 +262,30 @@ function Get-HistoricalManifestFromGitHistory($app, $bucket, $requestedVersion) 
     $relativeManifestPath = $relativeManifestPath -replace '\\', '/'
 
     try {
-        $gitLogOutput = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '--format=format:%H%n%s', '--', $relativeManifestPath) # Removed 2>$null to see git errors
+        # Fast path: search commit that introduced the requested version using -S (literal) then -G (regex)
+        $searchLiteral = '"version": "' + $requestedVersion + '"'
+        $hash = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','-n','1','--format=%H','-S',$searchLiteral,'--',$relativeManifestPath)
+        if ($hash -is [Array]) { $hash = ($hash | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -First 1) }
 
-        if (!$gitLogOutput) {
-            warn "No git history found for '$app' in bucket '$bucket' (file: $relativeManifestPath)."
-            return $null
+        if (-not $hash) {
+            $pattern = '"version"\s*:\s*"' + [regex]::Escape($requestedVersion) + '"'
+            $hash = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','-n','1','--format=%H','-G',$pattern,'--',$relativeManifestPath)
+            if ($hash -is [Array]) { $hash = ($hash | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -First 1) }
         }
 
-        $foundVersions = [System.Collections.Generic.List[hashtable]]::new()
-        $processedHashes = [System.Collections.Generic.HashSet[string]]::new()
-
-        $versionsFoundForPreviousMinor = @{}
-        $limitPreviousMinorCount = 5
-        $requestedVersionParts = $requestedVersion -split '\.'
-        $previousMinorVersionString = ''
-        if ($requestedVersionParts.Count -ge 2 -and $requestedVersionParts[1] -match '^\d+$') {
-            $currentMinor = [int]$requestedVersionParts[1]
-            if ($currentMinor -gt 0) {
-                $previousMinorVersionString = "$($requestedVersionParts[0]).$($currentMinor - 1)"
-            }
-        }
-
-        $maxCommitsToProcess = 200 # Hard cap to prevent excessive runtimes
-
-        for ($i = 0; $i -lt $gitLogOutput.Count; $i += 2) {
-            if ($processedHashes.Count -ge $maxCommitsToProcess) {
-                info "Processed $maxCommitsToProcess commits for $app. Stopping search to prevent excessive runtime."
-                break
-            }
-
-            $hash = $gitLogOutput[$i]
-            $subject = if (($i + 1) -lt $gitLogOutput.Count) { $gitLogOutput[$i + 1] } else { '' }
-
-            if ([string]::IsNullOrWhiteSpace($hash) -or !$processedHashes.Add($hash)) {
-                continue
-            }
-
-            $versionFromMessage = $null
-            if ($subject -match "(?:'$app': Update to version |Update to |Release |Tag |v)($([char]34)?([0-9]+\.[0-9]+(?:\.[0-9]+){0,2}(?:[a-zA-Z0-9._+-]*))\1?)") {
-                $versionFromMessage = $Matches[2]
-            }
-
-            if ($versionFromMessage -eq $requestedVersion) {
-                info "Potential exact match '$versionFromMessage' found in commit message for $app (hash $hash). Verifying manifest..."
-                $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$hash`:$relativeManifestPath")
-                if ($manifestContent -and ($LASTEXITCODE -eq 0)) {
-                    if ($manifestContent -is [Array]) {
-                        $manifestContent = $manifestContent -join "`n"
-                    }
-                    $manifestObj = $null; try { $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop } catch {}
-                    if ($manifestObj -and $manifestObj.version -eq $requestedVersion) {
-                        info "Exact version '$requestedVersion' for '$app' confirmed from manifest in commit $hash."
-                        ensure (usermanifestsdir) | Out-Null
-                        $tempManifestPath = "$(usermanifestsdir)\$app.json"
-                        $manifestContent | Out-UTF8File -FilePath $tempManifestPath
-                        return @{ path = $tempManifestPath; version = $requestedVersion; source = "git_commit_message:$hash" }
-                    }
-                }
-            }
-
+        if ($hash) {
             $manifestContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$hash`:$relativeManifestPath")
             if ($manifestContent -and ($LASTEXITCODE -eq 0)) {
-                if ($manifestContent -is [Array]) {
-                    $manifestContent = $manifestContent -join "`n"
+                if ($manifestContent -is [Array]) { $manifestContent = $manifestContent -join "`n" }
+                $manifestObj = $null; try { $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop } catch {}
+                if ($manifestObj -and $manifestObj.version -eq $requestedVersion) {
+                    $tempManifestPath = Write-ManifestToUserCache -App $app -ManifestText $manifestContent
+                    return @{ path = $tempManifestPath; version = $requestedVersion; source = "git_manifest:$hash" }
                 }
-                $manifestObj = $null;
-                try {
-                    $manifestObj = $manifestContent | ConvertFrom-Json -ErrorAction Stop
-                } catch {
-                    warn "Failed to parse manifest content from commit $hash for app $app. Skipping this commit."
-                    # Consider logging $manifestContent if debugging is needed
-                    continue # Skip to the next commit
-                }
-
-                if ($manifestObj -and $manifestObj.version) {
-                    if ($manifestObj.version -eq $requestedVersion) {
-                        info "Exact version '$requestedVersion' for '$app' found in manifest (commit $hash)."
-                        ensure (usermanifestsdir) | Out-Null
-                        $tempManifestPath = "$(usermanifestsdir)\$app.json"
-                        $manifestContent | Out-UTF8File -FilePath $tempManifestPath
-                        return @{ path = $tempManifestPath; version = $requestedVersion; source = "git_manifest:$hash" }
-                    }
-                    $foundVersions.Add(@{
-                            version  = $manifestObj.version
-                            hash     = $hash
-                            manifest = $manifestContent
-                        })
-
-                    if ($previousMinorVersionString -ne '' -and $manifestObj.version.StartsWith($previousMinorVersionString)) {
-                        if (!$versionsFoundForPreviousMinor.ContainsKey($previousMinorVersionString)) {
-                            $versionsFoundForPreviousMinor[$previousMinorVersionString] = 0
-                        }
-                        $versionsFoundForPreviousMinor[$previousMinorVersionString]++
-                        if ($versionsFoundForPreviousMinor[$previousMinorVersionString] -ge $limitPreviousMinorCount) {
-                            info "Reached limit of $limitPreviousMinorCount versions for previous minor '$previousMinorVersionString' while checking $app. Stopping search."
-                            break
-                        }
-                    }
-                    if ($foundVersions.Count % 20 -eq 0 -and $foundVersions.Count -gt 0) {
-                        info "Found $($foundVersions.Count) historical versions for $app so far..."
-                    }
-                }
-            } elseif ($LASTEXITCODE -ne 0) {
-                warn "git show $hash`:$relativeManifestPath failed for $app."
             }
         }
 
-        if ($foundVersions.Count -eq 0) {
-            warn "No valid historical versions found for '$app' in bucket '$bucket'."
-            return $null
-        }
-
-        # No exact match found - display all available versions to help user choose
-        $allAvailableVersions = ($foundVersions | Sort-Object {
-                try { [version]($_.version -replace '[^\d\.].*$', '') } catch { $_.version }
-            } -Descending).version
-
-        Write-Host ""
-        Write-Host "No exact match found for version '$requestedVersion' for app '$app'."
-        Write-Host "Available versions in git history (newest to oldest):"
-        Write-Host ""
-
-        # Group versions for better display
-        $displayCount = [Math]::Min(50, $allAvailableVersions.Count)  # Show up to 50 versions
-        for ($i = 0; $i -lt $displayCount; $i++) {
-            Write-Host "  $($allAvailableVersions[$i])"
-        }
-
-        if ($allAvailableVersions.Count -gt $displayCount) {
-            Write-Host "  ... and $($allAvailableVersions.Count - $displayCount) more versions"
-        }
-
-        Write-Host ""
-        Write-Host "To install a specific version, use: scoop install $app@<version>"
-        Write-Host ""
-
         return $null
-
     } catch {
         warn "Error searching git history for '$app': $($_.Exception.Message)"
         return $null
@@ -470,7 +356,7 @@ function generate_user_manifest($app, $bucket, $version) {
     if (get_config USE_SQLITE_CACHE) {
         $cached_manifest = (Get-ScoopDBItem -Name $app -Bucket $bucket -Version $version).manifest
         if ($cached_manifest) {
-            $cached_manifest | Out-UTF8File $manifest_path
+            $manifest_path = Write-ManifestToUserCache -App $app -ManifestText $cached_manifest
             return $manifest_path
         }
     }
@@ -522,3 +408,15 @@ function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $
 function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
 function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch }
 function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch }
+
+# Helper: write manifest text to user manifests cache directory and return path
+function Write-ManifestToUserCache {
+    param(
+        [Parameter(Mandatory=$true, Position=0)][string]$App,
+        [Parameter(Mandatory=$true, Position=1)][string]$ManifestText
+    )
+    ensure (usermanifestsdir) | Out-Null
+    $tempManifestPath = "$(usermanifestsdir)\$App.json"
+    $ManifestText | Out-UTF8File -FilePath $tempManifestPath
+    return $tempManifestPath
+}
