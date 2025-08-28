@@ -69,20 +69,54 @@ foreach ($single in Get-ChildItem $Dir -Filter "$App.json" -Recurse) {
 
     $urls = @()
     $hashes = @()
+    [bool]$manifesthasurl = $false
+
+    if ($manifest.architecture) {
+        $arches = @('64bit', '32bit', 'arm64')
+        [bool]$errorinarches = $false
+        foreach ($currentarch in $arches) {
+            if ($manifest.architecture.$currentarch.url) {
+                $manifesthasurl = $true
+            } else { continue }
+            # Skip architecture with hash mode set to 'none'
+            if ($manifest.autoupdate.architecture.$currentarch.hash.mode -eq 'none') {
+                if ($manifest.architecture.$currentarch.hash) {
+                    $errorinarches = $true
+                    err $name "Manifest should not contain a hash property in '$currentarch' architecture."
+                }
+                continue
+            }
+            script:url $manifest $currentarch | ForEach-Object { $urls += $_ }
+            hash $manifest $currentarch | ForEach-Object { $hashes += $_ }
+        }
+        # Skip if errors found in architecture
+        if ($errorinarches) { continue }
+    }
 
     if ($manifest.url) {
+        # Check URL conflicts
+        if ($manifesthasurl) {
+            err $name 'Manifest should not contain global and architecture specific URLs at the same time.'
+            continue
+        } else {
+            $manifesthasurl = $true
+        }
+        # Skip manifests with hash mode set to 'none'
+        if ($manifest.autoupdate.hash.mode -eq 'none') {
+            if ($manifest.hash) {
+                err $name 'Manifest should not contain a hash property.'
+            }
+            continue
+        }
         $manifest.url | ForEach-Object { $urls += $_ }
         $manifest.hash | ForEach-Object { $hashes += $_ }
-    } elseif ($manifest.architecture) {
-        # First handle 64bit
-        script:url $manifest '64bit' | ForEach-Object { $urls += $_ }
-        hash $manifest '64bit' | ForEach-Object { $hashes += $_ }
-        script:url $manifest '32bit' | ForEach-Object { $urls += $_ }
-        hash $manifest '32bit' | ForEach-Object { $hashes += $_ }
-        script:url $manifest 'arm64' | ForEach-Object { $urls += $_ }
-        hash $manifest 'arm64' | ForEach-Object { $hashes += $_ }
-    } else {
-        err $name 'Manifest does not contain URL property.'
+    }
+
+    # Skip manifests with no hash to check
+    if ($urls.Length -eq 0) {
+        if (!$manifesthasurl) {
+            err $name 'Manifest does not contain valid URL property.'
+        }
         continue
     }
 
