@@ -10,11 +10,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Init Test Suite
-        uses: potatoqualitee/psmodulecache@main
+        uses: potatoqualitee/psmodulecache@v6.0
         with:
           modules-to-cache: BuildHelpers
           shell: powershell
@@ -26,11 +26,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Init Test Suite
-        uses: potatoqualitee/psmodulecache@main
+        uses: potatoqualitee/psmodulecache@v6.0
         with:
           modules-to-cache: BuildHelpers
           shell: pwsh
