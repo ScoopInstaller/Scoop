@@ -1,24 +1,18 @@
-# Changelog
-
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
-
-## [](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...v) (2025-06-19)
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...develop)
 
 ### Bug Fixes
 
-- **commands:** Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141)) ([3577f91](https://github.com/ScoopInstaller/Scoop/commit/3577f91d82082f2a6e5467539c319ab4e11fde0c))
-- **decompress:** Replace deprecated 7ZIPEXTRACT_USE_EXTERNAL config ([#6327](https://github.com/ScoopInstaller/Scoop/issues/6327)) ([4e528e1](https://github.com/ScoopInstaller/Scoop/commit/4e528e1655db9a4f6840e4b860e10b1cb9b9299c))
-- **download:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292)) ([e0c682d](https://github.com/ScoopInstaller/Scoop/commit/e0c682de7c1f36ec8ea17b3f9eea27184d398854))
+- **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
+- **autoupdate:** Use origin URL to handle URLs with fragment in GitHub mode ([#6455](https://github.com/ScoopInstaller/Scoop/issues/6455))
+- **buckets|scoop-info:** Switch git log date format to ISO 8601 to avoid locale issues ([#6446](https://github.com/ScoopInstaller/Scoop/issues/6446))
+- **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
 - **import-bucket-tests:** fix `Get-GitChangedFile` `Include` pattern for CI ([93b9bae](https://github.com/ScoopInstaller/Scoop/commit/93b9bae33a88ccde6590c4df3f589f47c58a527e))
-- **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181)) ([84e00fd](https://github.com/ScoopInstaller/Scoop/commit/84e00fdb77f84389c1b62b9715a20faa77ef3a94))
-- **shim:** properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114)) ([7a309a1](https://github.com/ScoopInstaller/Scoop/commit/7a309a1b003a583244aa6e08ab6a9cfe66228e17))
 
-### Performance Improvements
+## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
-- **shim:** Update kiennq-shim to v3.1.2 ([#6261](https://github.com/ScoopInstaller/Scoop/issues/6261)) ([ac6f1ba](https://github.com/ScoopInstaller/Scoop/commit/ac6f1baaf4b4fa50e46d6aaf0b6400a3a84cc910))
+### Features
 
-## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2024-12-31
+**autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
 
 ### Bug Fixes
 
@@ -28,10 +22,13 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
 - **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
 - **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
+- **scoop-uninstall:** Fix uninstaller does not gain Global state ([#6430](https://github.com/ScoopInstaller/Scoop/issues/6430))
+- **scoop-depends-tests:** Mocking `USE_EXTERNAL_7ZIP` as $false to avoding error when it is $true ([#6431](https://github.com/ScoopInstaller/Scoop/issues/6431))
 
 ### Code Refactoring
 
 - **download:** Move download-related functions to 'download.ps1' ([#6095](https://github.com/ScoopInstaller/Scoop/issues/6095))
+- **Get-Manifest:** Select actual source for manifest ([#6142](https://github.com/ScoopInstaller/Scoop/issues/6142))
 
 ### Performance Improvements
 
