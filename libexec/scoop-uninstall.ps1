@@ -76,7 +76,9 @@ if (!$apps) { exit 0 }
 
         Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global $global -Uninstall
         rm_shims $app $manifest $global $architecture
-        rm_startmenu_shortcuts $manifest $global $architecture
+        if (!$install.no_add_startmenu){
+            rm_startmenu_shortcuts $manifest $global $architecture
+        }
 
         # If a junction was used during install, that will have been used
         # as the reference directory. Otherwise it will just be the version

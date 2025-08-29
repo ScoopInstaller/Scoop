@@ -65,6 +65,7 @@
 - **core:** New cache filename format ([#5929](https://github.com/ScoopInstaller/Scoop/issues/5929), [#5944](https://github.com/ScoopInstaller/Scoop/issues/5944))
 - **decompress:** Use innounp-unicode as default Inno Setup Unpacker ([#6028](https://github.com/ScoopInstaller/Scoop/issues/6028))
 - **install:** Added the ability to install specific version of app from URL/file link ([#5988](https://github.com/ScoopInstaller/Scoop/issues/5988))
+- **install** Option to not add shortcuts to startmenu when installing a package ([#6031](https://github.com/ScoopInstaller/Scoop/issues/6031))
 
 ### Bug Fixes
 
