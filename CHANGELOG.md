@@ -6,6 +6,7 @@
 - **autoupdate:** Use origin URL to handle URLs with fragment in GitHub mode ([#6455](https://github.com/ScoopInstaller/Scoop/issues/6455))
 - **buckets|scoop-info:** Switch git log date format to ISO 8601 to avoid locale issues ([#6446](https://github.com/ScoopInstaller/Scoop/issues/6446))
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
+- **import-bucket-tests:** fix `Get-GitChangedFile` `Include` pattern for CI ([93b9bae](https://github.com/ScoopInstaller/Scoop/commit/93b9bae33a88ccde6590c4df3f589f47c58a527e))
 
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
