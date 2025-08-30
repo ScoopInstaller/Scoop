@@ -361,7 +361,7 @@ function currentdir($app, $global) {
     "$(appdir $app $global)\$version"
 }
 
-function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
+function persistdir($app, $global) { if($global) { return "$globalpersistdir\$app" } "$persistdir\$app" }
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 function cache_path($app, $version, $url) {
@@ -1299,6 +1299,13 @@ $globaldir = $env:SCOOP_GLOBAL, (get_config GLOBAL_PATH), "$([System.Environment
 #       multiple users write and access cached files at the same time.
 #       Use at your own risk.
 $cachedir = $env:SCOOP_CACHE, (get_config CACHE_PATH), "$scoopdir\cache" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+
+# Scoop persist directory
+# Note: Setting the SCOOP_PERSIST environment variable to use a shared directory
+#       may cause problems depending on the app.
+#       Use at your own risk.
+$persistdir = $env:SCOOP_PERSIST, (get_config PERSIST_PATH), "$scoopdir\persist" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
+$globalpersistdir = $env:SCOOP_PERSIST_GLOBAL, (get_config GLOBAL_PERSIST_PATH), "$globaldir\persist" | Where-Object { $_ } | Select-Object -First 1 | Get-AbsolutePath
 
 # Scoop apps' PATH Environment Variable
 $scoopPathEnvVar = switch (get_config USE_ISOLATED_PATH) {
