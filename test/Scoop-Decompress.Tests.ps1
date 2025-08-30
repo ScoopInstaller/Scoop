@@ -107,14 +107,14 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It 'extract splited 7z archives (.001, .002, ...)' {
+        It 'extract split 7z archives (.001, .002, ...)' {
             $to = test_extract 'Expand-7zipArchive' $test5_1
             $to | Should -Exist
             "$to\empty" | Should -Exist
             (Get-ChildItem $to).Count | Should -Be 1
         }
 
-        It 'extract splited RAR archives (.part01.rar, .part02.rar, ...)' {
+        It 'extract split RAR archives (.part01.rar, .part02.rar, ...)' {
             $to = test_extract 'Expand-7zipArchive' $test6_1
             $to | Should -Exist
             "$to\dummy" | Should -Exist
