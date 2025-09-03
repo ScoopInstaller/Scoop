@@ -4,7 +4,7 @@
 #
 # To add a custom shim, use the 'add' subcommand:
 #
-#     scoop shim add <shim_name> <command_path> [<args>...]
+#     scoop shim add <shim_name> <command_path> [--%] [<args>...]
 #
 # To remove shims, use the 'rm' subcommand: (CAUTION: this could remove shims added by an app manifest)
 #
