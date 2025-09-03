@@ -11,8 +11,8 @@
 # NOTES:
 #    The first "--" or "--%" in $argv, if any, will terminate all options; any
 # following arguments are treated as non-option arguments, even if
-# they begin with a hyphen. The "--" itself will not be included in
-# the returned $opts. (POSIX-compatible)
+# they begin with a hyphen. The terminator token itself ("--" or "--%") will not be included.
+# (POSIX-compatible)function getopt([String[]]$argv, [String]$shortopts, [String[]]$longopts) {
 function getopt([String[]]$argv, [String]$shortopts, [String[]]$longopts) {
     $opts = @{}; $rem = @()
 
@@ -32,7 +32,7 @@ function getopt([String[]]$argv, [String]$shortopts, [String[]]$longopts) {
         if ($arg -is [Int]) { $rem += $arg; continue }
         if ($arg -is [Decimal]) { $rem += $arg; continue }
 
-        if ($arg -match '^--%?$') {
+        if ($arg -eq '--' -or $arg -eq '--%') {
             if ($i -lt $argv.Length - 1) {
                 $rem += $argv[($i + 1)..($argv.Length - 1)]
             }

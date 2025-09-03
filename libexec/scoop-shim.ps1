@@ -4,7 +4,7 @@
 #
 # To add a custom shim, use the 'add' subcommand:
 #
-#     scoop shim add <shim_name> <command_path> [--%] [<args>...]
+#     scoop shim add <shim_name> <command_path> [[--|--%] <args>...]
 #
 # To remove shims, use the 'rm' subcommand: (CAUTION: this could remove shims added by an app manifest)
 #
@@ -25,11 +25,14 @@
 # Options:
 #   -g, --global       Manipulate global shim(s)
 #
-# HINT: The FIRST double-hyphen '--', if any, will be treated as the POSIX-style command option terminator
-# and will NOT be included in arguments, so if you want to pass arguments like '-g' or '--global' to
-# the shim, put them after a '--'. Note that in PowerShell, you must use a QUOTED '--', e.g.,
-#
-#     scoop shim add myapp 'D:\path\myapp.exe' '--' myapp_args --global
+# HINT: The FIRST terminator token ('--' or PowerShell '--%'), if any, is treated as the option
+# terminator and will NOT be included; everything after it is passed to the shim.
+# Examples:
+#     POSIX-style:    scoop shim add myapp 'D:\path\myapp.exe' '--' myapp_args --global
+#     PowerShell:     scoop shim add myapp D:\path\myapp.exe --% myapp_args --global
+# Notes:
+#   - In PowerShell, '--' should be quoted to avoid parsing.
+#   - '--%' disables PowerShell parsing of the remainder; pass literals as needed.
 
 param($SubCommand)
 
