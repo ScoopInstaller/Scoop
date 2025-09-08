@@ -3,7 +3,9 @@
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' (indirectly)
+. "$PSScriptRoot\..\lib\download.ps1" # 'Get-UserAgent'
 
 $opt, $apps, $err = getopt $args 'a:' 'arch='
 $app = $apps[0]
@@ -20,7 +22,14 @@ try {
 $deps = @()
 Get-Dependency $app $architecture | ForEach-Object {
     $dep = [ordered]@{}
-    $dep.Source, $dep.Name = $_ -split '/'
+
+    $app, $null, $bucket, $url = Get-Manifest $_
+    if (!$url) {
+        $bucket, $app = $_ -split '/'
+    }
+    $dep.Source = if ($url) { $url } else { $bucket }
+    $dep.Name = $app
+
     $deps += [PSCustomObject]$dep
 }
 $deps

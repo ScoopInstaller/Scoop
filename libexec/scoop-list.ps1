@@ -5,8 +5,9 @@ param($query)
 
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'parse_json' 'Select-CurrentVersion' (indirectly)
+. "$PSScriptRoot\..\lib\download.ps1" # 'Get-UserAgent'
 
-$def_arch = Get-DefaultArchitecture
+$defaultArchitecture = Get-DefaultArchitecture
 if (-not (Get-FormatData ScoopApps)) {
     Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
 }
@@ -47,10 +48,11 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $item.Updated = $updated
 
     $info = @()
+    if ((app_status $app $global).deprecated) { $info += 'Deprecated package'}
     if ($global) { $info += 'Global install' }
     if (failed $app $global) { $info += 'Install failed' }
     if ($install_info.hold) { $info += 'Held package' }
-    if ($install_info.architecture -and $def_arch -ne $install_info.architecture) {
+    if ($install_info.architecture -and $defaultArchitecture -ne $install_info.architecture) {
         $info += $install_info.architecture
     }
     $item.Info = $info -join ', '

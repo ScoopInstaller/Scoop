@@ -65,6 +65,7 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
         BeforeAll {
             Mock Test-HelperInstalled { $false }
             Mock get_config { $true } -ParameterFilter { $name -eq 'USE_LESSMSI' }
+            Mock get_config { $false } -ParameterFilter { $name -eq 'USE_EXTERNAL_7ZIP' }
             Mock Get-Manifest { 'lessmsi', @{}, $null, $null } -ParameterFilter { $app -eq 'lessmsi' }
             Mock Get-Manifest { '7zip', @{ url = 'test.msi' }, $null, $null } -ParameterFilter { $app -eq '7zip' }
             Mock Get-Manifest { 'innounp', @{}, $null, $null } -ParameterFilter { $app -eq 'innounp' }

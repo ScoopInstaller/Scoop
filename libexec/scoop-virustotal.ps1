@@ -29,6 +29,7 @@
 #   -p, --passthru            Return reports as objects
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\json.ps1" # 'json_path'
 . "$PSScriptRoot\..\lib\download.ps1" # 'hash_for_url'

@@ -74,7 +74,7 @@ if (!$apps) { exit 0 }
             continue
         }
 
-        Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Uninstall
+        Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global $global -Uninstall
         rm_shims $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 

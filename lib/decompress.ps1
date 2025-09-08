@@ -24,7 +24,7 @@ function Invoke-Extraction {
         $extractFn = $null
         switch -regex ($Name[$i]) {
             '\.zip$' {
-                if ((Test-HelperInstalled -Helper 7zip) -or ((get_config 7ZIPEXTRACT_USE_EXTERNAL) -and (Test-CommandAvailable 7z))) {
+                if ((Test-HelperInstalled -Helper 7zip) -or ((get_config USE_EXTERNAL_7ZIP) -and (Test-CommandAvailable 7z))) {
                     $extractFn = 'Expand-7zipArchive'
                 } else {
                     $extractFn = 'Expand-ZipArchive'
