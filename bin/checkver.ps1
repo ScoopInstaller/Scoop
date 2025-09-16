@@ -162,6 +162,24 @@ $Queue | ForEach-Object {
         if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
     }
 
+    # GitLab
+    if ($regex) {
+        $gitlabRegex = $regex
+    } else {
+        $regex = '/-/tags/(?:v|V)?([\d.]+)'
+    }
+    if ($json.checkver -eq 'gitlab') {
+        if (!$json.homepage.StartsWith('https://gitlab.com/')) {
+            error "$name checkvar expects the homepage to be a GitLab"
+        }
+        $url = $json.checkver.gitlab.TrimEnd('/') + '/-/tags?format=atom'
+        $regex = $gitlabRegex
+    }
+    if ($json.checkver.gitlab) {
+        $url = $json.checkver.gitlab.TrimEnd('/') + '/-/tags?format=atom'
+        $regex = $gitlabRegex
+    }
+
     # SourceForge
     if ($regex) {
         $sourceforgeRegex = $regex

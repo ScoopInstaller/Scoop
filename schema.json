@@ -292,6 +292,10 @@
                             "format": "uri",
                             "type": "string"
                         },
+                        "gitlab": {
+                            "format": "url",
+                            "type": "string"
+                        },
                         "re": {
                             "format": "regex",
                             "type": "string",
