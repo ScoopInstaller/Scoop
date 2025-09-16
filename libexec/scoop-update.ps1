@@ -75,7 +75,7 @@ function Sync-Scoop {
     if (!(Test-GitAvailable)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
 
     Write-Host 'Updating Scoop...'
-    $currentdir = versiondir 'scoop' 'current'
+    $currentdir = Convert-Path (versiondir 'scoop' 'current')
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
         $olddir = "$currentdir\..\old"
