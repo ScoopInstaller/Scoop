@@ -293,7 +293,7 @@
                             "type": "string"
                         },
                         "gitlab": {
-                            "format": "url",
+                            "format": "uri",
                             "type": "string"
                         },
                         "re": {
