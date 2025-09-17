@@ -274,6 +274,9 @@ while ($in_progress -gt 0) {
     $expected_ver = $json.version
     $ver = $Version
 
+    # Prevent per-iteration state leakage
+    $page, $match, $matchesHashtable = $null
+
     if (!$ver) {
         if (!$regexp -and $replace) {
             next "'replace' requires 're' or 'regex'"
@@ -284,9 +287,6 @@ while ($in_progress -gt 0) {
             next "$($err.message)`r`nURL $url is not valid"
             continue
         }
-
-        # Prevent variable leakage from previous iteration
-        $page, $match = $null
 
         if ($url) {
             $ms = New-Object System.IO.MemoryStream
