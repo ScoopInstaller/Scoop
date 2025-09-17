@@ -170,7 +170,7 @@ $Queue | ForEach-Object {
     }
     if ($json.checkver -eq 'gitlab') {
         if (!$json.homepage.StartsWith('https://gitlab.com/')) {
-            error "$name checkver expects the homepage to be a GitLab"
+            error "$name checkver expects the homepage to be a GitLab repository"
         }
         $url = $json.checkver.gitlab.TrimEnd('/') + '/-/releases?format=atom'
         $regex = $gitlabRegex
