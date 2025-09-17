@@ -166,17 +166,17 @@ $Queue | ForEach-Object {
     if ($regex) {
         $gitlabRegex = $regex
     } else {
-        $regex = '/-/tags/(?:v|V)?([\d.]+)'
+        $gitlabRegex = '/-/releases/(?:v|V)?([\d.]+)'
     }
     if ($json.checkver -eq 'gitlab') {
         if (!$json.homepage.StartsWith('https://gitlab.com/')) {
             error "$name checkvar expects the homepage to be a GitLab"
         }
-        $url = $json.checkver.gitlab.TrimEnd('/') + '/-/tags?format=atom'
+        $url = $json.checkver.gitlab.TrimEnd('/') + '/-/releases?format=atom'
         $regex = $gitlabRegex
     }
     if ($json.checkver.gitlab) {
-        $url = $json.checkver.gitlab.TrimEnd('/') + '/-/tags?format=atom'
+        $url = $json.checkver.gitlab.TrimEnd('/') + '/-/releases?format=atom'
         $regex = $gitlabRegex
     }
 
