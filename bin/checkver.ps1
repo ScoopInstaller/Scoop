@@ -285,6 +285,9 @@ while ($in_progress -gt 0) {
             continue
         }
 
+        # Prevent variable leakage from previous iteration
+        $page, $match = $null
+
         if ($url) {
             $ms = New-Object System.IO.MemoryStream
             $ms.Write($result, 0, $result.Length)
