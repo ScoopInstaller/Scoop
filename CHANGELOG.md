@@ -1,5 +1,11 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...develop)
 
+### Features
+
+- **schema**: Reorder root properties to match the wanted order.
+- **json**: Add function `Sort-ScoopManifestRootProperties` which orders a manifest's root properties to match `schema.json`.
+- **formatjson**: Use `Sort-ScoopManifestRootProperties` to sort manifests root properties.
+
 ### Bug Fixes
 
 - **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
