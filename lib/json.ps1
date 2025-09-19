@@ -231,7 +231,7 @@ function Sort-ScoopManifestRootProperties {
     )
 
     # Create empty new object where properties will be added to
-    $Sorted = [PSCustomObject]::new()
+    $SortedObject = [PSCustomObject]::new()
 
     # Add properties from $Current to $Sorted ordered by $WantedOrder
     $JsonAsObject.'PSObject'.'Properties'.'Name' |
@@ -240,9 +240,9 @@ function Sort-ScoopManifestRootProperties {
                 [byte]($WantedOrder.IndexOf($_))
             }
         } | ForEach-Object -Process {
-            $null = Add-Member -InputObject $Sorted -NotePropertyName $_ -NotePropertyValue $JsonAsObject.$_
+            $null = Add-Member -InputObject $SortedObject -NotePropertyName $_ -NotePropertyValue $JsonAsObject.$_
         }
 
     # Return the sorted object
-    $Sorted
+    $SortedObject
 }
