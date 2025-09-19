@@ -212,3 +212,44 @@ function normalize_values([psobject] $json) {
 
     return $json
 }
+
+function Sort-ScoopManifestRootProperties {
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateScript({[System.IO.File]::Exists($_)})]
+        [string] $File
+    )
+
+    # Get wanted order from Scoop manifest schema
+    $WantedOrder = [string[]](
+        (
+            ConvertFrom-Json -InputObject (
+                '{0}\..\schema.json' -f $PSScriptRoot
+            )
+        ).'properties'.'PSObject'.'Properties'.'Name'
+    )
+
+    # Store current JSON as an object for further processing
+    $Current = [PSCustomObject](
+        ConvertFrom-Json -InputObject (
+            Get-Content -Raw -Path $File
+        )
+    )
+
+    # Create empty new object where properties will be added to
+    $Sorted = [PSCustomObject]::new()
+
+    # Add properties from $Current to $Sorted ordered by $WantedOrder
+    $Current.'PSObject'.'Properties'.'Name' |
+        Sort-Object -Property @{
+            'Expression' = {
+                [byte]($WantedOrder.IndexOf($_))
+            }
+        } | ForEach-Object -Process {
+            $null = Add-Member -InputObject $Sorted -NotePropertyName $_ -NotePropertyValue $Current.$_
+        }
+
+    # Return the sorted object
+    ConvertTo-Json -Depth 8 -InputObject $Sorted
+}
