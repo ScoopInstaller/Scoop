@@ -34,11 +34,21 @@ param(
 $Dir = Convert-Path $Dir
 
 Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
-    $file = $_.FullName
-    # beautify
-    $json = parse_json $file | ConvertToPrettyJson
+    # Path of file
+    $file = [string] $_.'FullName'
 
-    # convert to 4 spaces
-    $json = $json -replace "`t", '    '
+    # Parse JSON
+    $json = [PSCustomObject](parse_json -path $file)
+
+    # Sort JSON root properties
+    $json = [PSCustomObject](Sort-ScoopManifestRootProperties -JsonAsObject $json)
+
+    # Beautify
+    $json = [string](ConvertToPrettyJson -data $json)
+
+    # Convert to 4 spaces
+    $json = [string]($json -replace "`t", '    ')
+
+    # Overwrite file content
     [System.IO.File]::WriteAllLines($file, $json)
 }
