@@ -7,7 +7,7 @@ function parse_json {
         [Parameter(Mandatory)]
         [string] $path
     )
-    if ([string]::IsNullOrWhiteSpace($path) -or -not [System.IO.Path]::Exists($path)) {
+    if ([string]::IsNullOrWhiteSpace($path) -or -not [System.IO.File]::Exists($path)) {
         return $null
     }
     try {
