@@ -222,9 +222,10 @@ function Sort-ScoopManifestRootProperties {
     )
 
     # Get wanted order from Scoop manifest schema
+    Write-Debug -Message ('{0}\..\schema.json' -f $PSScriptRoot)
     $WantedOrder = [string[]](
         (
-            ConvertFrom-Json -InputObject (
+            parse_json -path (
                 '{0}\..\schema.json' -f $PSScriptRoot
             )
         ).'properties'.'PSObject'.'Properties'.'Name'
