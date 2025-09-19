@@ -2,10 +2,16 @@ function manifest_path($app, $bucket) {
     (Get-ChildItem (Find-BucketDirectory $bucket) -Filter "$(sanitary_path $app).json" -Recurse).FullName
 }
 
-function parse_json($path) {
-    if ($null -eq $path -or !(Test-Path $path)) { return $null }
+function parse_json {
+    Param(
+        [Parameter(Mandatory)]
+        [string] $path
+    )
+    if ([string]::IsNullOrWhiteSpace($path) -or -not [System.IO.Path]::Exists($path)) {
+        return $null
+    }
     try {
-        Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+        Get-Content -Path $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     } catch {
         warn "Error parsing JSON at '$path'."
     }
