@@ -18,7 +18,7 @@ param(
     [String] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
-        if (!(Test-Path $_ -Type Container)) {
+        if (-not (Test-Path $_ -Type Container)) {
             throw "$_ is not a directory!"
         } else {
             $true
