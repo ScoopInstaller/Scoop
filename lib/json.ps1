@@ -253,6 +253,20 @@ function Sort-ScoopManifestRootProperties {
             $null = Add-Member -InputObject $SortedObject -NotePropertyName $_ -NotePropertyValue $JsonAsObject.$_
         }
 
+    # Order childs alphabetically if parent key is of type PSCustomObject
+    foreach (
+        $Key in $SortedObject.'PSObject'.'Properties'.Where{
+            $_.'TypeNameOfValue' -eq 'System.Management.Automation.PSCustomObject'
+        }.'Name'
+    ) {
+        $ChildKeys = [string[]]($SortedObject.$Key.'PSObject'.'Properties'.'Name' | Sort-Object)
+        $ChildObject = [PSCustomObject]::new()
+        $ChildKeys.ForEach{
+            $null = Add-Member -InputObject $ChildObject -NotePropertyName $_ -NotePropertyValue $SortedObject.$Key.$_
+        }
+        $SortedObject.$Key = $ChildObject
+    }
+
     # Return the sorted object
     $SortedObject
 }
