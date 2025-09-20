@@ -213,7 +213,11 @@ function normalize_values([psobject] $json) {
     return $json
 }
 
-function Sort-ScoopManifestRootProperties {
+function Sort-ScoopManifestProperties {
+    <#
+        .SYNOPSIS
+            Sort JSON root properties according to schema.json, and level one child properties alphabetically.
+    #>
     [OutputType([PSCustomObject])]
 
     Param(

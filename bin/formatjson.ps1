@@ -40,8 +40,8 @@ Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
     # Parse JSON
     $json = [PSCustomObject](parse_json -path $file)
 
-    # Sort JSON root properties
-    $json = [PSCustomObject](Sort-ScoopManifestRootProperties -JsonAsObject $json)
+    # Sort JSON root properties according to schema.json, and level one child properties alphabetically
+    $json = [PSCustomObject](Sort-ScoopManifestProperties -JsonAsObject $json)
 
     # Beautify
     $json = [string](ConvertToPrettyJson -data $json)
