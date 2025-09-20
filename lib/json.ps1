@@ -241,7 +241,7 @@ function Sort-ScoopManifestProperties {
         $JsonAsObject.'PSObject'.'Properties'.'Name'.Where{$_ -cnotin $WantedOrder}
     )
     if ($KeysNotInSchema.'Count' -gt 0) {
-        Throw ('Manifest contains keys not defined in schema.json: "{0}".' -f ($KeysNotInSchema -join ", "))
+        abort ('Manifest contains keys not defined in schema.json: "{0}".' -f ($KeysNotInSchema -join ", "))
     }
 
     # Create empty new object where properties will be added to
