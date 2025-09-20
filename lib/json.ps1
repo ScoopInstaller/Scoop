@@ -223,7 +223,6 @@ function Sort-ScoopManifestRootProperties {
 
     # Get wanted order from Scoop manifest schema
     if ([string]::IsNullOrWhiteSpace($Script:WantedOrder)) {
-        Write-Debug -Message ('{0}\..\schema.json' -f $PSScriptRoot)
         $Script:WantedOrder = [string[]](
             (
                 parse_json -path (
