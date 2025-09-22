@@ -290,7 +290,7 @@ function Sort-ScoopManifestProperties {
 
     # Failproof - Make sure input does not have keys not defined in schema.json
     $KeysNotInSchema = [string[]](
-        $JsonAsObject.'PSObject'.'Properties'.'Name'.Where{$_ -cnotin $WantedOrder}
+        $JsonAsObject.'PSObject'.'Properties'.'Name'.Where{$_ -cnotin $Script:WantedOrder}
     )
     if ($KeysNotInSchema.'Count' -gt 0) {
         abort ('Manifest contains keys not defined in schema.json: "{0}".' -f ($KeysNotInSchema -join ", "))
@@ -303,7 +303,7 @@ function Sort-ScoopManifestProperties {
     $JsonAsObject.'PSObject'.'Properties'.'Name' |
         Sort-Object -Property @{
             'Expression' = {
-                [uint16]($WantedOrder.IndexOf($_))
+                [uint16]($Script:WantedOrder.IndexOf($_))
             }
         } | ForEach-Object -Process {
             $null = Add-Member -InputObject $SortedObject -NotePropertyName $_ -NotePropertyValue $JsonAsObject.$_
