@@ -3,8 +3,8 @@
 ### Features
 
 - **schema**: Reorder root properties to match the wanted order.
-- **json**: Add function `Sort-ScoopManifestRootProperties` which orders a manifest's root properties to match `schema.json`.
-- **formatjson**: Use `Sort-ScoopManifestRootProperties` to sort manifests root properties.
+- **json**: Add function `Sort-ScoopManifestProperties` which orders a manifest's root properties to match `schema.json`.
+- **formatjson**: Use `Sort-ScoopManifestProperties` to sort manifests root properties.
 
 ### Bug Fixes
 
