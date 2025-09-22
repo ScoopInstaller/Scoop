@@ -4,6 +4,7 @@
 # Still needed in normal powershell
 
 function ConvertToPrettyJson {
+    [OutputType([string])]
     [CmdletBinding()]
 
     Param (
