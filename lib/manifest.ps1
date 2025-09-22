@@ -222,7 +222,7 @@ function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $ar
 function Sort-PSCustomObjectKeysRecursively {
     <#
         .SYNOPSIS
-            Sort PSCustomObject keys recurseively.
+            Sort PSCustomObject keys recursively.
     #>
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
@@ -233,7 +233,7 @@ function Sort-PSCustomObjectKeysRecursively {
     )
 
     Process {
-        function Convert-Node {
+        function local:Convert-Node {
             <#
                 .SYNOPSIS
                     Helper function that will be called recursively.
