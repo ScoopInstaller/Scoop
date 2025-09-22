@@ -51,6 +51,6 @@ Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
 
     # Overwrite file content
     if (-not [string]::IsNullOrWhiteSpace($json)) {
-        [System.IO.File]::WriteAllText($file, $json)
+        [System.IO.File]::WriteAllLines($file, $json)
     }
 }
