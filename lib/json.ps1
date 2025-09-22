@@ -252,7 +252,7 @@ function Sort-ScoopManifestProperties {
     $JsonAsObject.'PSObject'.'Properties'.'Name' |
         Sort-Object -Property @{
             'Expression' = {
-                [byte]($WantedOrder.IndexOf($_))
+                [uint16]($WantedOrder.IndexOf($_))
             }
         } | ForEach-Object -Process {
             $null = Add-Member -InputObject $SortedObject -NotePropertyName $_ -NotePropertyValue $JsonAsObject.$_
