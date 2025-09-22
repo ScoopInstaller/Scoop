@@ -223,6 +223,7 @@ function Sort-ScoopManifestProperties {
 
     Param(
         [Parameter(Mandatory)]
+        [ValidateScript({$null -ne $_ -and $_ -ne [PSCustomObject]::new()})]
         [PSCustomObject] $JsonAsObject
     )
 
