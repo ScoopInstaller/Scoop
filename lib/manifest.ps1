@@ -4,7 +4,7 @@ function manifest_path($app, $bucket) {
 
 function parse_json {
     Param(
-        [Parameter(Mandatory)]
+        [Parameter()]
         [string] $path
     )
     if ([string]::IsNullOrWhiteSpace($path) -or -not [System.IO.File]::Exists($path)) {
