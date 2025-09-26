@@ -361,7 +361,14 @@ function currentdir($app, $global) {
     "$(appdir $app $global)\$version"
 }
 
-function persistdir($app, $global) { "$(basedir $global)\persist\$app" }
+function persistdir($app, $global) {
+    $persistBaseDir = "$(basedir $global)\persist"
+    if ($app) {
+        return Join-Path $persistBaseDir $app
+    } else {
+        return $persistBaseDir
+    }
+}
 function usermanifestsdir { "$(basedir)\workspace" }
 function usermanifest($app) { "$(usermanifestsdir)\$app.json" }
 function cache_path($app, $version, $url) {
@@ -1093,31 +1100,98 @@ function Confirm-InstallationStatus {
     )
     $Installed = @()
     $Apps | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
-        $App, $null, $null = parse_app $_
-        if ($Global) {
-            if (Test-Path (appdir $App $true)) {
-                $Installed += , @($App, $true)
-            } elseif (Test-Path (appdir $App $false)) {
-                error "'$App' isn't installed globally, but it may be installed locally."
-                warn "Try again without the --global (or -g) flag instead."
-            } else {
-                error "'$App' isn't installed."
-            }
+
+        $Status = Get-AppStatus -App $_ -Global $Global
+        $App = $Status.App;
+
+        if ($Status.Installed -and ($Global -eq $Status.Global)) {
+            # Add installed
+            $Installed += , @($App, $Global);
         } else {
-            if (Test-Path (appdir $App $false)) {
-                $Installed += , @($App, $false)
-            } elseif (Test-Path (appdir $App $true)) {
-                error "'$App' isn't installed locally, but it may be installed globally."
-                warn "Try again with the --global (or -g) flag instead."
+            if ($Status.Installed) {
+                if ($Status.Global) {
+                    error "'$App' isn't installed locally, but it may be installed globally."
+                    warn 'Try again with the --global (or -g) flag instead.'
+                } else {
+                    error "'$App' isn't installed globally, but it may be installed locally."
+                    warn 'Try again without the --global (or -g) flag instead.'
+                }
             } else {
                 error "'$App' isn't installed."
             }
         }
+
         if (failed $App $Global) {
             error "'$App' isn't installed correctly."
         }
     }
     return , $Installed
+}
+
+Function Get-AppStatus {
+    [OutputType([Object[]])]
+    param(
+        [String]$App,
+        [Switch]$Global
+    )
+    $App, $null, $null = parse_app $App
+    $IsInstalled = Test-Path (appdir $App $Global)
+
+    $Status = [PSCustomObject]@{
+        App       = $App
+        Installed = $IsInstalled
+        Global    = $Global
+    }
+
+    if (!$IsInstalled) {
+        # Check if installed somewhere else
+        $Global = !$Global;
+        $Status.Installed = Test-Path (appdir $App $Global);
+        if ($Status.Installed) {
+            $Status.Global = $Global
+        }
+    }
+
+    return $Status;
+}
+
+function strip_path($orig_path, $dir) {
+    if($null -eq $orig_path) { $orig_path = '' }
+    $stripped = [string]::join(';', @( $orig_path.split(';') | Where-Object { $_ -and $_ -ne $dir } ))
+    return ($stripped -ne $orig_path), $stripped
+}
+
+function add_first_in_path($dir, $global) {
+    $dir = fullpath $dir
+
+    # future sessions
+    $null, $currpath = strip_path (env 'path' $global) $dir
+    env 'path' $global "$dir;$currpath"
+
+    # this session
+    $null, $env:PATH = strip_path $env:PATH $dir
+    $env:PATH = "$dir;$env:PATH"
+}
+
+function remove_from_path($dir, $global) {
+    $dir = fullpath $dir
+
+    # future sessions
+    $was_in_path, $newpath = strip_path (env 'path' $global) $dir
+    if($was_in_path) {
+        Write-Output "Removing $(friendly_path $dir) from your path."
+        env 'path' $global $newpath
+    }
+
+    # current session
+    $was_in_path, $newpath = strip_path $env:PATH $dir
+    if($was_in_path) { $env:PATH = $newpath }
+}
+
+function ensure_robocopy_in_path {
+    if(!(Test-CommandAvailable robocopy)) {
+        shim "C:\Windows\System32\Robocopy.exe" $false
+    }
 }
 
 function wraptext($text, $width) {

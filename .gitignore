@@ -6,4 +6,5 @@ test/installer/tmp/*
 test/tmp/*
 *~
 TestResults.xml
+.vscode
 supporting/sqlite/*
