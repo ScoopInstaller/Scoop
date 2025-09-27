@@ -55,6 +55,7 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     if ($install_info.architecture -and $defaultArchitecture -ne $install_info.architecture) {
         $info += $install_info.architecture
     }
+    if ($install_info.no_add_startmenu) { $info += "No start menu" }
     $item.Info = $info -join ', '
 
     $list += [PSCustomObject]$item

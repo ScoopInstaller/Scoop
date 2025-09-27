@@ -48,6 +48,9 @@ foreach ($item in $import.apps) {
     } elseif ('arm64' -in $info -and 'arm64' -ne $def_arch) {
         $instArgs += '--arch', 'arm64'
     }
+    if ('No start menu' -in $info) {
+        $instArgs += '--no-startmenu'
+    }
 
     $app = if ($item.Source -in $bucket_names) {
         "$($item.Source)/$($item.Name)"
