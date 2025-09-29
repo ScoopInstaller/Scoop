@@ -17,7 +17,7 @@
 
 ### Code Refactoring
 
-- **output**: Replace raw prints with functions for standardized output ([#6450](https://github.com/ScoopInstaller/Scoop/issues/6450))
+- **output**: Replace raw prints with functions for standardized output ([#6449](https://github.com/ScoopInstaller/Scoop/issues/6449))
 
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
