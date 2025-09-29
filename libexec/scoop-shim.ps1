@@ -147,7 +147,7 @@ switch ($SubCommand) {
                 $pattern = $_
                 [void][Regex]::New($pattern)
             } catch {
-                error "Invalid pattern: `e[35m$pattern"
+                error "Invalid pattern: $([char]0x1b)[35m$pattern$([char]0x1b)[0m"
                 exit 1
             }
         }
