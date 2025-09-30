@@ -8,3 +8,4 @@ test/tmp/*
 TestResults.xml
 supporting/sqlite/*
 .vscode/*
+*.sln

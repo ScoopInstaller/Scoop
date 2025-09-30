@@ -37,10 +37,10 @@
 
 param($SubCommand)
 
-. "$PSScriptRoot\..\apps\scoop\current\lib\getopt.ps1"
-. "$PSScriptRoot\..\apps\scoop\current\lib\core.ps1" # for config related ops
-. "$PSScriptRoot\..\apps\scoop\current\lib\install.ps1" # for rm_shim
-. "$PSScriptRoot\..\apps\scoop\current\lib\system.ps1" # 'Add-Path' (indirectly)
+. "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\core.ps1" # for config related ops
+. "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
+. "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
 
 
 # Read the configuration of manually added shims
