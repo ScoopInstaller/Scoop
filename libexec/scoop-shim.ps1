@@ -10,9 +10,9 @@
 #
 #     scoop shim rm <shim_name> [<shim_name>...]
 #
-# To list all shims or matching shims, use the 'list' subcommand (`-added` to show shims added by user in config):
+# To list all shims or matching shims, use the 'list' subcommand (`--added` to show shims added by user in config):
 #
-#     scoop shim list  -added [<regex_pattern>...]
+#     scoop shim list --added [<regex_pattern>...]
 #
 # To show a shim's information, use the 'info' subcommand:
 #
@@ -117,7 +117,7 @@ if ($SubCommand -ne 'list' -and $other.Length -eq 0) {
 }
 
 if (-not (Get-FormatData ScoopShims)) {
-    Update-FormatData "$PSScriptRoot\..\apps\scoop\current\supporting\formats\ScoopTypes.Format.ps1xml"
+    Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
 }
 
 $localShimDir = shimdir $false
