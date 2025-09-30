@@ -835,8 +835,13 @@ function get_app_name($path) {
         $appName = $Matches[1].ToLower()
     } elseif ((Test-Path (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $true))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
+    } elseif ($path -match '[/\\]([^/\\]+?)(?:\.[^/\\"]+?)') {
+        # Fallback: extract the executable file name (with extension if present): [/\\]([^/\\]+?)(?:\.?[^./\\]+?)`"
+        $appName = $Matches[1].ToLower()
+        Write-Host $path + '1' + $appName
     } else {
         $appName = ''
+        Write-Host $path + '2' + $appName
     }
     return $appName
 }

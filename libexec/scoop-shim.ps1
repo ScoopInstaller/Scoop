@@ -10,9 +10,9 @@
 #
 #     scoop shim rm <shim_name> [<shim_name>...]
 #
-# To list all shims or matching shims, use the 'list' subcommand:
+# To list all shims or matching shims, use the 'list' subcommand (`-added` to show shims added by user in config):
 #
-#     scoop shim list [<regex_pattern>...]
+#     scoop shim list  -added [<regex_pattern>...]
 #
 # To show a shim's information, use the 'info' subcommand:
 #
@@ -31,11 +31,67 @@
 #
 #     scoop shim add myapp 'D:\path\myapp.exe' '--' myapp_args --global
 
+# Main updated features:
+# 1) `scoop shim add/rm` persist shims in the config file,
+# 2) `scoop shim list` supports the --added [pattern|optional] option to display or search only user-added shims.
+
 param($SubCommand)
 
-. "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
-. "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
+. "$PSScriptRoot\..\apps\scoop\current\lib\getopt.ps1"
+. "$PSScriptRoot\..\apps\scoop\current\lib\core.ps1" # for config related ops
+. "$PSScriptRoot\..\apps\scoop\current\lib\install.ps1" # for rm_shim
+. "$PSScriptRoot\..\apps\scoop\current\lib\system.ps1" # 'Add-Path' (indirectly)
+
+
+# Read the configuration of manually added shims
+function Get-AddedShimsConfig {
+    $added = get_config 'added'
+    if ($null -eq $added) {
+        return [PSCustomObject]@{}
+    }
+    return $added
+}
+
+# Add shim to config
+function Add-ShimToConfig($shimName, $global, $commandPath, $commandArgs) {
+    $added = Get-AddedShimsConfig
+
+    # Use new structure: shimName as key, global as a boolean field
+    $shimInfo = [PSCustomObject]@{
+        CommandPath = $commandPath
+        CommandArgs = $commandArgs -join ' '
+        AddedDate = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
+        global = $global
+    }
+
+    # If shimName does not exist, add it
+    if (-not $added.PSObject.Properties[$shimName]) {
+        $added | Add-Member -MemberType NoteProperty -Name $shimName -Value $shimInfo
+    } else {
+        $added.$shimName = $shimInfo
+    }
+
+    set_config 'added' $added | Out-Null
+}
+
+# Remove shim from config
+function Remove-ShimFromConfig($shimName, $global) {
+    $added = Get-AddedShimsConfig
+
+    # Check if shim exists and matches global flag
+    if ($added.PSObject.Properties[$shimName] -and $added.$shimName.global -eq $global) {
+        $added.PSObject.Properties.Remove($shimName)
+        set_config 'added' $added | Out-Null
+    }
+}
+
+# Test if shim is manually added
+function Test-ShimAdded($shimName, $gqlobal) {
+    $added = Get-AddedShimsConfig
+
+    # Check if shim exists and matches global flag
+    return ($added.PSObject.Properties[$shimName] -and $added.$shimName.global -eq $global)
+}
 
 if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
     if (!$SubCommand) {
@@ -47,19 +103,21 @@ if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
     exit 1
 }
 
-$opt, $other, $err = getopt $Args 'g' 'global'
+# Update getopt parsing to support --added option
+$opt, $other, $err = getopt $Args 'ga' 'global', 'added'
 if ($err) { "scoop shim: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
+$showOnlyAdded = $opt.a -or $opt.added
 
 if ($SubCommand -ne 'list' -and $other.Length -eq 0) {
     error "<shim_name> must be specified for subcommand '$SubCommand'"
-    my_usage
+    my_usages
     exit 1
 }
 
 if (-not (Get-FormatData ScoopShims)) {
-    Update-FormatData "$PSScriptRoot\..\supporting\formats\ScoopTypes.Format.ps1xml"
+    Update-FormatData "$PSScriptRoot\..\apps\scoop\current\supporting\formats\ScoopTypes.Format.ps1xml"
 }
 
 $localShimDir = shimdir $false
@@ -77,6 +135,8 @@ function Get-ShimInfo($ShimPath) {
     }
     $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
     $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
+    # Add "Added" field
+    $info.IsAdded = Test-ShimAdded $info.Name $info.IsGlobal
     [PSCustomObject]$info
 }
 
@@ -95,7 +155,7 @@ switch ($SubCommand) {
             error "<command_path> must be specified for subcommand 'add'"
             my_usage
             exit 1
-        }
+            }
         $shimName = $other[0]
         $commandPath = $other[1]
         if ($other.Length -gt 2) {
@@ -108,7 +168,7 @@ switch ($SubCommand) {
                 $exCommand = Get-Command $shortPath -ErrorAction SilentlyContinue
                 if ($exCommand -and $exCommand.CommandType -eq 'Application') {
                     $commandPath = $exCommand.Path
-                } # TODO - add support for more command types: Alias, Cmdlet, ExternalScript, Filter, Function, Script, and Workflow
+                }
             }
         }
         if ($commandPath -and (Test-Path $commandPath)) {
@@ -116,6 +176,8 @@ switch ($SubCommand) {
             Write-Host $shimName -ForegroundColor Cyan -NoNewline
             Write-Host '...'
             shim $commandPath $global $shimName $commandArgs
+            # Save shim to config
+            Add-ShimToConfig $shimName $global $commandPath $commandArgs
         } else {
             Write-Host "ERROR: Command path does not exist: " -ForegroundColor Red -NoNewline
             Write-Host $($other[1]) -ForegroundColor Cyan
@@ -127,6 +189,8 @@ switch ($SubCommand) {
         $other | ForEach-Object {
             if (Get-ShimPath $_ $global) {
                 rm_shim $_ (shimdir $global)
+                # Remove shim from config
+                Remove-ShimFromConfig $_ $global
             } else {
                 $failed += $_
             }
@@ -140,9 +204,11 @@ switch ($SubCommand) {
         }
     }
     'list' {
-        $other = @($other) -ne '*'
-        # Validate all given patterns before matching.
-        $other | ForEach-Object {
+        # Handle pattern matching
+        $patterns = @($other) -ne '*'
+
+        # Validate regex patterns
+        $patterns | ForEach-Object {
             try {
                 $pattern = $_
                 [void][Regex]::New($pattern)
@@ -152,19 +218,48 @@ switch ($SubCommand) {
                 exit 1
             }
         }
-        $pattern = $other -join '|'
-        $shims = @()
-        if (!$global) {
-            $shims += Get-ChildItem -Path $localShimDir -Recurse -Include '*.shim', '*.ps1' |
-                Where-Object { !$pattern -or ($_.BaseName -match $pattern) } |
-                Select-Object -ExpandProperty FullName
+
+        $pattern = $patterns -join '|'
+        $shimInfos = @()
+
+        if ($showOnlyAdded) {
+            # When --added option is used, read from config directly
+            $added = Get-AddedShimsConfig
+
+            # Iterate over each shim in config
+            $added.PSObject.Properties | ForEach-Object {
+                $shimName = $_.Name
+                $shimConfig = $_.Value
+
+                # Apply regex filter
+                if (!$pattern -or ($shimName -match $pattern)) {
+                    # Determine shim path based on global flag
+                    $shimPath = Get-ShimPath $shimName $shimConfig.global
+
+                    if ($shimPath) {
+                        $shimInfos += Get-ShimInfo $shimPath
+                    }
+                }
+            }
+        } else {
+            # Original logic: scan file system
+            $shims = @()
+
+            if (!$global) {
+                $shims += Get-ChildItem -Path $localShimDir -Recurse -Include '*.shim', '*.ps1' |
+                    Where-Object { !$pattern -or ($_.BaseName -match $pattern) } |
+                    Select-Object -ExpandProperty FullName
+            }
+            if (Test-Path $globalShimDir) {
+                $shims += Get-ChildItem -Path $globalShimDir -Recurse -Include '*.shim', '*.ps1' |
+                    Where-Object { !$pattern -or ($_.BaseName -match $pattern) } |
+                    Select-Object -ExpandProperty FullName
+            }
+
+            $shimInfos = $shims.ForEach({ Get-ShimInfo $_ })
         }
-        if (Test-Path $globalShimDir) {
-            $shims += Get-ChildItem -Path $globalShimDir -Recurse -Include '*.shim', '*.ps1' |
-                Where-Object { !$pattern -or ($_.BaseName -match $pattern) } |
-                Select-Object -ExpandProperty FullName
-        }
-        $shims.ForEach({ Get-ShimInfo $_ }) | Add-Member -TypeName 'ScoopShims' -PassThru
+
+        $shimInfos | Format-Table -Property * -AutoSize
     }
     'info' {
         $shimName = $other[0]
@@ -232,7 +327,7 @@ switch ($SubCommand) {
                 Write-Host "run 'scoop shim alter $shimName$(if (!$global) { ' --global' })' to alternate its source"
                 exit 2
             }
-            exit 3
+            exit
         }
     }
 }
