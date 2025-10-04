@@ -7,6 +7,7 @@
 
 ### Bug Fixes
 
+- **buckets:** Fix the filtering condition when retrieving the number of manifests ([#6508](https://github.com/ScoopInstaller/Scoop/issues/6508))
 - **scoop-download**: Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
 - **scoop-uninstall:**: Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
 - **scoop-update**: Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
