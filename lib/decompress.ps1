@@ -107,7 +107,7 @@ function Expand-7zipArchive {
         'Rename' { $ArgList += '-aou' }
     }
     $Status = Invoke-ExternalCommand -FilePath $7zPath -ArgumentList $ArgList -LogPath $LogPath
-    if (!$Status) {
+    if (-not $Status) {
         abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path -path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if ($IsTar) {
