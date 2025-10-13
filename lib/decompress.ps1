@@ -122,12 +122,26 @@ function Expand-7zipArchive {
         }
     }
     if (-not $IsTar -and $ExtractDir) {
-        $null = movedir "$DestinationPath\$ExtractDir" $DestinationPath
-        # Remove temporary directory if it is empty
-        $ExtractDirTopPath = [string] "$DestinationPath\$($ExtractDir -replace '[\\/].*')"
-        if ((Get-ChildItem -Path $ExtractDirTopPath -Force -ErrorAction Ignore).Count -eq 0) {
-            Remove-Item -Path $ExtractDirTopPath -Recurse -Force -ErrorAction Ignore
+        # Move content from $ExtractDir to destination
+        $null = movedir -from "$DestinationPath\$ExtractDir" -to $DestinationPath
+        # Remove temporary directories if not empty
+        $ExtractDirs = [string[]]($ExtractDir -split '[\\/]' | Where-Object -FilterScript {-not [string]::IsNullOrWhiteSpace($_)})
+        $Depth = [byte]($ExtractDirs.'Count')
+        do {
+            $CurrentDir = [string] [System.IO.Path]::Combine(
+                $DestinationPath, (
+                    ($ExtractDirs | Select-Object -First $Depth) -join [System.IO.Path]::DirectorySeparatorChar
+                )
+            )
+            if ((Get-ChildItem -Path $CurrentDir -Force -ErrorAction 'Ignore').'Count' -gt 0) {
+                $Depth = 0
+            }
+            else {
+                Remove-Item -Path $CurrentDir -Recurse -Force -ErrorAction 'Ignore'
+            }
+            $Depth--
         }
+        while ($Depth -gt 0)
     }
     if (Test-Path -Path $LogPath -PathType 'Leaf') {
         Remove-Item -Path $LogPath -Force
