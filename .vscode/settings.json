@@ -11,7 +11,7 @@
         "**/tmp": true
     },
     // Configure PSScriptAnalyzer settings
-    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+    "powershell.scriptAnalysis.settingsPath": "../PSScriptAnalyzerSettings.psd1",
     "powershell.codeFormatting.preset": "OTBS",
     "powershell.codeFormatting.alignPropertyValuePairs": true,
     "powershell.codeFormatting.ignoreOneLineBlock": true,
