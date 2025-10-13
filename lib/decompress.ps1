@@ -298,12 +298,12 @@ function Expand-ZipArchive {
 
     $global:ProgressPreference = $oldProgressPreference
     if ($ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
-        Remove-Item $DestinationPath -Recurse -Force
+        $null = movedir "$DestinationPath\$ExtractDir" $OriDestinationPath
+        Remove-Item -Path $DestinationPath -Recurse -Force
     }
     if ($Removal) {
         # Remove original archive file
-        Remove-Item $Path -Force
+        Remove-Item -Path $Path -Force
     }
 }
 
