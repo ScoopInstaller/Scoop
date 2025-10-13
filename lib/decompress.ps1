@@ -95,7 +95,7 @@ function Expand-7zipArchive {
     $IsTar = ((strip_ext -fname $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
     $DestinationPath = $DestinationPath.TrimEnd('\')
     if ($ExtractDir) {
-        $DestinationPathTemp = [System.IO.Path]::Combine($DestinationPath, [guid]::NewGuid().'Guid')
+        $DestinationPathTemp = [System.IO.Path]::Combine($DestinationPath, '_tmp')
         $ArgList = @('x', $Path, "-o$DestinationPathTemp", '-xr!*.nsis', '-y')
         if (-not $IsTar) {
             $ArgList += "-ir!$ExtractDir\*"
