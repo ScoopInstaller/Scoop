@@ -126,7 +126,7 @@ function Expand-7zipArchive {
         $null = movedir -from "$DestinationPath\$ExtractDir" -to $DestinationPath
         # Remove temporary directories if not empty
         $ExtractDirs = [string[]]($ExtractDir -split '[\\/]' | Where-Object -FilterScript {-not [string]::IsNullOrWhiteSpace($_)})
-        $Depth = [byte]($ExtractDirs.'Count')
+        $Depth = [byte] $ExtractDirs.'Count'
         do {
             $CurrentDir = [string] [System.IO.Path]::Combine(
                 $DestinationPath, (
