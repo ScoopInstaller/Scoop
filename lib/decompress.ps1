@@ -93,16 +93,14 @@ function Expand-7zipArchive {
     }
     $LogPath = "$(Split-Path -Path $Path)\7zip.log"
     $IsTar = ((strip_ext -fname $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
-    $DestinationPath = $DestinationPath.TrimEnd('\')
+    $DestinationPath = [string] $DestinationPath.TrimEnd('\')
     if ($ExtractDir) {
-        $DestinationPathTemp = [System.IO.Path]::Combine($env:TEMP, [guid]::NewGuid().'Guid')
-        $ArgList = @('x', $Path, "-o$DestinationPathTemp", '-xr!*.nsis', '-y')
-        if (-not $IsTar) {
-            $ArgList += "-ir!$ExtractDir\*"
-        }
+        $OriDestinationPath = [string] $DestinationPath
+        $DestinationPath = [System.IO.Path]::Combine($env:TEMP, [guid]::NewGuid().'Guid')
     }
-    else {
-        $ArgList = @('x', $Path, "-o$DestinationPath", '-xr!*.nsis', '-y')
+    $ArgList = @('x', $Path, "-o$DestinationPath", '-xr!*.nsis', '-y')
+    if ($ExtractDir -and -not $IsTar) {
+        $ArgList += "-ir!$ExtractDir\*"
     }
     if ($Switches) {
         $ArgList += (-split $Switches)
@@ -118,7 +116,7 @@ function Expand-7zipArchive {
     }
     if ($IsTar) {
         # Check for tar
-        $Status = Invoke-ExternalCommand -FilePath $7zPath  -ArgumentList @('l', $Path) -LogPath $LogPath
+        $Status = Invoke-ExternalCommand -FilePath $7zPath -ArgumentList @('l', $Path) -LogPath $LogPath
         if ($Status) {
             # Get inner tar file name
             $TarFile = (Select-String -Path $LogPath -Pattern '[^ ]*tar$').Matches.Value
@@ -128,10 +126,10 @@ function Expand-7zipArchive {
         }
     }
     if ($ExtractDir -and -not $IsTar) {
-        # Move content to destination path
-        $null = movedir -from "$DestinationPathTemp\$ExtractDir" -to $DestinationPath
+        # Move content to original destination path
+        $null = movedir -from "$DestinationPath\$ExtractDir" -to $OriDestinationPath
         # Remove temporary directory
-        Remove-Item -Path $DestinationPathTemp -Recurse -Force -ErrorAction Ignore
+        Remove-Item -Path $DestinationPath -Recurse -Force -ErrorAction Ignore
     }
     if (Test-Path -Path $LogPath -PathType 'Leaf') {
         Remove-Item -Path $LogPath -Force
