@@ -15,6 +15,7 @@
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
 - **core|manifest:** Avoid error messages when searching non-existent 'deprecated' directory ([#6471](https://github.com/ScoopInstaller/Scoop/issues/6471))
 - **checkver:** Allow script to run when URL fetch fails but script exists ([#6490](https://github.com/ScoopInstaller/Scoop/issues/6490))
+- **decompress:** Fix `Expand-7zipArchive` won't remove top folder if $ExtractDir depth exceeds 2 ([#6515](https://github.com/ScoopInstaller/Scoop/issues/6515))
 
 ### Code Refactoring
 
