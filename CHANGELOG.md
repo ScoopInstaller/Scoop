@@ -15,7 +15,11 @@
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
 - **core|manifest:** Avoid error messages when searching non-existent 'deprecated' directory ([#6471](https://github.com/ScoopInstaller/Scoop/issues/6471))
 - **checkver:** Allow script to run when URL fetch fails but script exists ([#6490](https://github.com/ScoopInstaller/Scoop/issues/6490))
+
+### BREAKING CHANGE
+
 - **decompress:** Expand to temp directory if `$ExtractDir` is specified with `Expand-7zipArchive` and `Expand-ZipArchive`, to make it more robust ([#6515](https://github.com/ScoopInstaller/Scoop/issues/6515))
+  - Changes extraction semantics when `extract_dir` is used; manifests relying on post-extraction cleanup workarounds may need updates.
 
 ### Code Refactoring
 
