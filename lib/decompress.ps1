@@ -125,7 +125,7 @@ function Expand-7zipArchive {
         # Move content from $ExtractDir to destination
         $null = movedir -from "$DestinationPath\$ExtractDir" -to $DestinationPath
         # Remove temporary directories if not empty
-        $ExtractDirs = [string[]]($ExtractDir -split '[\\/]' | Where-Object -FilterScript {-not [string]::IsNullOrWhiteSpace($_)})
+        $ExtractDirs = [string[]]($ExtractDir -split '[\\/]' | Where-Object -FilterScript { -not [string]::IsNullOrWhiteSpace($_) })
         $Depth = [byte] $ExtractDirs.'Count'
         do {
             $CurrentDir = [string] [System.IO.Path]::Combine(
@@ -135,8 +135,7 @@ function Expand-7zipArchive {
             )
             if ((Get-ChildItem -Path $CurrentDir -Force -ErrorAction 'Ignore').'Count' -gt 0) {
                 $Depth = 0
-            }
-            else {
+            } else {
                 Remove-Item -Path $CurrentDir -Recurse -Force -ErrorAction 'Ignore'
             }
             $Depth--
@@ -262,7 +261,7 @@ function Expand-InnoArchive {
     switch -Regex ($ExtractDir) {
         '^[^{].*' { $ArgList += "-c{app}\$ExtractDir" }
         '^{.*' { $ArgList += "-c$ExtractDir" }
-        Default { $ArgList += '-c{app}' }
+        default { $ArgList += '-c{app}' }
     }
     if ($Switches) {
         $ArgList += (-split $Switches)
