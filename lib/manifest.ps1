@@ -69,7 +69,7 @@ function Get-Manifest($app) {
                     $manifest = manifest $app $bucket
                     if (!$manifest) {
                         $deprecated_dir = (Find-BucketDirectory -Name $bucket -Root) + '\deprecated'
-                        $manifest = parse_json (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
+                        $manifest = parse_json (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse -ErrorAction Ignore).FullName
                     }
                 }
             }

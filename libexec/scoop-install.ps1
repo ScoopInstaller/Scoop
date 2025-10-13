@@ -44,7 +44,7 @@ if (get_config USE_SQLITE_CACHE) {
 }
 
 $opt, $apps, $err = getopt $args 'giksua:' 'global', 'independent', 'no-cache', 'skip-hash-check', 'no-update-scoop', 'arch='
-if ($err) { "scoop install: $err"; exit 1 }
+if ($err) { error "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 $check_hash = !($opt.s -or $opt.'skip-hash-check')
