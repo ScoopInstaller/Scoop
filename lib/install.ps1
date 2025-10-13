@@ -555,7 +555,7 @@ function test_running_process($app, $global) {
 # Required to handle docker/for-win#12240
 function New-DirectoryJunction($source, $target) {
     # test if this script is being executed inside a docker container
-    if (Get-Service -Name cexecsvc -ErrorAction SilentlyContinue) {
+    if (Get-Service -Name cexecsvc -ErrorAction Ignore) {
         cmd.exe /d /c "mklink /j `"$source`" `"$target`""
     } else {
         New-Item -Path $source -ItemType Junction -Value $target
