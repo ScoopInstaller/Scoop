@@ -95,7 +95,7 @@ function Expand-7zipArchive {
     $IsTar = ((strip_ext -fname $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
     $DestinationPath = $DestinationPath.TrimEnd('\')
     if ($ExtractDir) {
-        $DestinationPathTemp = [System.IO.Path]::Combine($DestinationPath, '_tmp')
+        $DestinationPathTemp = [System.IO.Path]::Combine($env:TEMP, [guid]::NewGuid().'Guid')
         $ArgList = @('x', $Path, "-o$DestinationPathTemp", '-xr!*.nsis', '-y')
         if (-not $IsTar) {
             $ArgList += "-ir!$ExtractDir\*"
@@ -128,12 +128,13 @@ function Expand-7zipArchive {
         }
     }
     if ($ExtractDir -and -not $IsTar) {
+        # Move content to destination path
         $null = movedir -from "$DestinationPathTemp\$ExtractDir" -to $DestinationPath
-        # Remove temporary directory if it is empty
+        # Remove temporary directory
         Remove-Item -Path $DestinationPathTemp -Recurse -Force -ErrorAction Ignore
     }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
+    if (Test-Path -Path $LogPath -PathType 'Leaf') {
+        Remove-Item -Path $LogPath -Force
     }
     if ($Removal) {
         if (($Path -replace '.*\.([^\.]*)$', '$1') -eq '001') {
@@ -283,9 +284,10 @@ function Expand-ZipArchive {
         [Switch]
         $Removal
     )
+    $DestinationPath = [string] $DestinationPath.TrimEnd('\')
     if ($ExtractDir) {
-        $OriDestinationPath = $DestinationPath
-        $DestinationPath = "$DestinationPath\_tmp"
+        $OriDestinationPath = [string] $DestinationPath
+        $DestinationPath = [string] [System.IO.Path]::Combine($env:TEMP, [guid]::NewGuid().'Guid')
     }
     # Disable progress bar to gain performance
     $oldProgressPreference = $ProgressPreference
