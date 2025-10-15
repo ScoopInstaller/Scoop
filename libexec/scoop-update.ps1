@@ -11,6 +11,7 @@
 #   -i, --independent      Don't install dependencies automatically
 #   -k, --no-cache         Don't use the download cache
 #   -s, --skip-hash-check  Skip hash validation (use with caution!)
+#   -w, --virustotal-check Check the download against VirusTotal (may be slow)
 #   -q, --quiet            Hide extraneous messages
 #   -a, --all              Update all apps (alternative to '*')
 
@@ -29,11 +30,12 @@ if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
 
-$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip-hash-check', 'quiet', 'all'
+$opt, $apps, $err = getopt $args 'gfikswqa' 'global', 'force', 'independent', 'no-cache', 'skip-hash-check', 'virustotal-check', 'quiet', 'all'
 if ($err) { error "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
 $check_hash = !($opt.s -or $opt.'skip-hash-check')
+$check_virustotal = $opt.w -or $opt.'virustotal-check' -or (get_config USE_VIRUSTOTAL $false)
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
@@ -258,7 +260,7 @@ function Sync-Bucket {
     }
 }
 
-function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
+function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true, $check_virustotal = $false) {
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -300,6 +302,38 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
     #endregion Workaround for #2952
 
+    # can be multiple urls: if there are, then installer should go first to make 'installer.args' section work
+    $urls = @(script:url $manifest $architecture)
+
+    # Pre-check all URLs with VirusTotal before downloading
+    $api_key = Get-VirusTotalApiKey
+
+    $safe_urls = @()
+    if ($check_virustotal) {
+        foreach ($url in $urls) {
+            $hash = hash_for_url $manifest $url $architecture
+            $reports = Check-VirusTotalUrl $app $url $hash $api_key $false
+            $reports | ForEach-Object {
+                $file_report = $_
+                $url = $file_report.'App.Url'
+
+                $maliciousResults = $file_report.'FileReport.Malicious'
+                $suspiciousResults = $file_report.'FileReport.Suspicious'
+                if ($maliciousResults -gt 0 -or $suspiciousResults -gt 0) {
+                    warn "$app`: One or more VirusTotal checks failed. Aborting before download."
+                } else {
+                    info "$app`: Safe URL: $url"
+                    $safe_urls += $url
+                }
+            }
+        }
+        if ($safe_urls.Count -eq 0) {
+            abort "No URL passed VirusTotal check for $app. Aborting before download."
+        }
+    } else {
+        $safe_urls = $urls
+    }
+
     # region Workaround
     # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
@@ -309,7 +343,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     } else {
         $urls = script:url $manifest $architecture
 
-        foreach ($url in $urls) {
+        foreach ($url in $safe_urls) {
             Invoke-CachedDownload $app $version $url $null $manifest.cookie $true
 
             if ($check_hash) {
@@ -376,12 +410,12 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
 
     if ($independent) {
-        install_app $app $architecture $global $suggested $use_cache $check_hash
+        install_app $app $architecture $global $suggested $use_cache $check_hash $check_virustotal
     } else {
         # Also add missing dependencies
         $apps = @(Get-Dependency $app $architecture) -ne $app
         ensure_none_failed $apps
-        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash $check_virustotal}
     }
 }
 
@@ -462,7 +496,7 @@ if (-not ($apps -or $all)) {
 
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
+    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash $check_virustotal }
 }
 
 exit 0

@@ -1,8 +1,11 @@
 # Description: Functions for downloading files
 
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\virustotal.ps1"
+
 ## Meta downloader
 
-function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true, $check_virustotal = $false) {
     # we only want to show this warning once
     if (!$use_cache) { warn 'Cache is being ignored.' }
 
@@ -12,11 +15,40 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
     # can be multiple cookies: they will be used for all HTTP requests.
     $cookies = $manifest.cookie
 
+    # Pre-check all URLs with VirusTotal before downloading
+    $api_key = Get-VirusTotalApiKey
+
+    $safe_urls = @()
+    if ($check_virustotal) {
+        foreach ($url in $urls) {
+            $hash = hash_for_url $manifest $url $architecture
+            $reports = Check-VirusTotalUrl $app $url $hash $api_key $false
+            $reports | ForEach-Object {
+                $file_report = $_
+                $url = $file_report.'App.Url'
+
+                $maliciousResults = $file_report.'FileReport.Malicious'
+                $suspiciousResults = $file_report.'FileReport.Suspicious'
+                if ($maliciousResults -gt 0 -or $suspiciousResults -gt 0) {
+                    warn "$app`: One or more VirusTotal checks failed. Aborting before download."
+                } else {
+                    info "$app`: Safe URL: $url"
+                    $safe_urls += $url
+                }
+            }
+        }
+        if ($safe_urls.Count -eq 0) {
+            abort "No URL passed VirusTotal check for $app. Aborting before download."
+        }
+    } else {
+        $safe_urls = $urls
+    }
+
     # download first
     if (Test-Aria2Enabled) {
         Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
-        foreach ($url in $urls) {
+        foreach ($url in $safe_urls) {
             $fname = url_filename $url
 
             try {
@@ -45,7 +77,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
         }
     }
 
-    return $urls.ForEach({ url_filename $_ })
+    return $safe_urls.ForEach({ url_filename $_ })
 }
 
 ## [System.Net] downloader
@@ -457,9 +489,9 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             warn $urlstxt_content
             warn $aria2
-            warn $(new_issue_msg $app $bucket "download via aria2 failed")
+            warn $(new_issue_msg $app $bucket 'download via aria2 failed')
 
-            Write-Host "Fallback to default downloader ..."
+            Write-Host 'Fallback to default downloader ...'
 
             try {
                 foreach ($url in $urls) {
@@ -666,7 +698,7 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }
 
-Function Get-RemoteFileSize ($Uri) {
+function Get-RemoteFileSize ($Uri) {
     $response = Invoke-WebRequest -Uri $Uri -Method HEAD -UseBasicParsing
     if (!$response.Headers.StatusCode) {
         $response.Headers.'Content-Length' | ForEach-Object { [int]$_ }
@@ -689,13 +721,13 @@ function url_remote_filename($url) {
     # this function extracts the original filename from the URL.
     $uri = (New-Object URI $url)
     $basename = Split-Path $uri.PathAndQuery -Leaf
-    If ($basename -match '.*[?=]+([\w._-]+)') {
+    if ($basename -match '.*[?=]+([\w._-]+)') {
         $basename = $matches[1]
     }
-    If (($basename -notlike '*.*') -or ($basename -match '^[v.\d]+$')) {
+    if (($basename -notlike '*.*') -or ($basename -match '^[v.\d]+$')) {
         $basename = Split-Path $uri.AbsolutePath -Leaf
     }
-    If (($basename -notlike '*.*') -and ($uri.Fragment -ne '')) {
+    if (($basename -notlike '*.*') -and ($uri.Fragment -ne '')) {
         $basename = $uri.Fragment.Trim('/', '#')
     }
     return $basename

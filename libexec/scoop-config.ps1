@@ -92,6 +92,9 @@
 #       API key used for uploading/scanning files using virustotal.
 #       See: 'https://support.virustotal.com/hc/en-us/articles/115002088769-Please-give-me-an-API-key'
 #
+# use_virustotal: $true|$false
+#       When set to $true, Scoop will always use VirusTotal to scan files after downloading.
+#
 # cat_style:
 #       When set to a non-empty string, Scoop will use 'bat' to display the manifest for
 #       the `scoop cat` command and while doing manifest review. This requires 'bat' to be
