@@ -207,6 +207,100 @@ function Get-VirusTotalApiKey {
     return $api_key
 }
 
+function Check-VirusTotalUrl($app, $url, $hash, $api_key, $scan) {
+    $isHashUnsupported = $false
+    $algo = $null
+
+    if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
+        $algo = $matches.algo
+        $hash = $matches.hash
+        if ($matches.algo -inotin 'md5', 'sha1', 'sha256') {
+            $hash = $null
+            $isHashUnsupported = $true
+            warn "$app`: Unsupported hash $($matches.algo). Will search by url instead."
+        }
+    } elseif ($hash) {
+        $algo = 'sha256'
+    }
+
+    try {
+        if ($hash) {
+            $file_report = Get-VirusTotalResultByHash $hash $url $app $api_key
+            $file_report.'App.HashType' = $algo
+            return $file_report
+        } elseif (!$isHashUnsupported) {
+            warn "$app`: Hash not found. Will search by url instead."
+        }
+    } catch [Exception] {
+        $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
+        if ($_.Exception.Response.StatusCode -eq 404) {
+            $file_report_not_found = $true
+            warn "$app`: File report not found. Will search by url instead."
+        } else {
+            warn "$app`: VirusTotal file report query failed`: $($_.Exception.Message)"
+            if ($_.Exception.Response) {
+                warn "`tAPI returned $($_.Exception.Response.StatusCode)"
+            }
+            return
+        }
+    }
+
+    try {
+        $url_report = Get-VirusTotalResultByUrl $url $app $api_key
+        $url_report.'App.Hash' = $hash
+        $url_report.'App.HashType' = $algo
+        if ($url_report.'UrlReport.Hash' -and ($file_report_not_found -eq $true) -and $hash) {
+            try {
+                $file_report = Get-VirusTotalResultByHash $url_report.'UrlReport.Hash' $url $app $api_key
+                if ($file_report.'FileReport.Hash' -ieq $matches['hash']) {
+                    $file_report.'App.HashType' = $algo
+                    $file_report.'UrlReport.Url' = $url_report.'UrlReport.Url'
+                    return $file_report
+                }
+            } catch {
+                warn "$app`: Unable to get file report for $($url_report.'UrlReport.Hash')"
+            }
+        }
+        if (!$url_report.'UrlReport.Hash') {
+            Submit-ToVirusTotal $url $app $scan $api_key
+            return $url_report
+        }
+    } catch [Exception] {
+        $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
+        if ($_.Exception.Response.StatusCode -eq 404) {
+            Submit-ToVirusTotal $url $app $scan $api_key
+            return
+        } else {
+            warn "$app`: VirusTotal URL report query failed`: $($_.Exception.Message)"
+            if ($_.Exception.Response) {
+                warn "`tAPI returned $($_.Exception.Response.StatusCode)"
+            }
+            return
+        }
+    }
+
+    try {
+        $file_report = Get-VirusTotalResultByHash $url_report.'UrlReport.Hash' $url $app $api_key
+        $file_report.'App.Hash' = $hash
+        $file_report.'App.HashType' = $algo
+        $file_report.'UrlReport.Url' = $url_report.'UrlReport.Url'
+        $file_report
+        warn "$app`: Unable to check hash match for $url"
+    } catch [Exception] {
+        $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
+        if ($_.Exception.Response.StatusCode -eq 404) {
+            Submit-ToVirusTotal $url $app $scan $api_key
+            $url_report
+        } else {
+            warn "$app`: VirusTotal file report query failed`: $($_.Exception.Message)"
+            if ($_.Exception.Response) {
+                warn "`tAPI returned $($_.Exception.Response.StatusCode)"
+            }
+            return
+        }
+    }
+}
+
 function virustotal_check_app($app, $manifest, $architecture, $api_key, $scan) {
     [int]$index = 0
     $urls = script:url $manifest $architecture
@@ -217,95 +311,6 @@ function virustotal_check_app($app, $manifest, $architecture, $api_key, $scan) {
             info "$app`: url $index"
         }
         $hash = hash_for_url $manifest $url $architecture
-
-        try {
-            $isHashUnsupported = $false
-            if ($hash -match '(?<algo>[^:]+):(?<hash>.*)') {
-                $algo = $matches.algo
-                $hash = $matches.hash
-                if ($matches.algo -inotin 'md5', 'sha1', 'sha256') {
-                    $hash = $null
-                    $isHashUnsupported = $true
-                    warn "$app`: Unsupported hash $($matches.algo). Will search by url instead."
-                }
-            } elseif ($hash) {
-                $algo = 'sha256'
-            }
-            if ($hash) {
-                $file_report = Get-VirusTotalResultByHash $hash $url $app $api_key
-                $file_report.'App.HashType' = $algo
-                $file_report
-                return
-            } elseif (!$isHashUnsupported) {
-                warn "$app`: Hash not found. Will search by url instead."
-            }
-        } catch [Exception] {
-            $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
-            if ($_.Exception.Response.StatusCode -eq 404) {
-                $file_report_not_found = $true
-                warn "$app`: File report not found. Will search by url instead."
-            } else {
-                warn "$app`: VirusTotal file report query failed`: $($_.Exception.Message)"
-                if ($_.Exception.Response) {
-                    warn "`tAPI returned $($_.Exception.Response.StatusCode)"
-                }
-                return
-            }
-        }
-
-        try {
-            $url_report = Get-VirusTotalResultByUrl $url $app $api_key
-            $url_report.'App.Hash' = $hash
-            $url_report.'App.HashType' = $matches['algo']
-            if ($url_report.'UrlReport.Hash' -and ($file_report_not_found -eq $true) -and $hash) {
-                try {
-                    $file_report = Get-VirusTotalResultByHash $url_report.'UrlReport.Hash' $url $app $api_key
-                    if ($file_report.'FileReport.Hash' -ieq $matches['hash']) {
-                        $file_report.'App.HashType' = $matches['algo']
-                        $file_report.'UrlReport.Url' = $url_report.'UrlReport.Url'
-                        return $file_report
-                    }
-                } catch {
-                    warn "$app`: Unable to get file report for $($url_report.'UrlReport.Hash')"
-                }
-            }
-            if (!$url_report.'UrlReport.Hash') {
-                Submit-ToVirusTotal $url $app $scan $api_key
-                return $url_report
-            }
-        } catch [Exception] {
-            $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
-            if ($_.Exception.Response.StatusCode -eq 404) {
-                Submit-ToVirusTotal $url $app $scan $api_key
-                return
-            } else {
-                warn "$app`: VirusTotal URL report query failed`: $($_.Exception.Message)"
-                if ($_.Exception.Response) {
-                    warn "`tAPI returned $($_.Exception.Response.StatusCode)"
-                }
-                return
-            }
-        }
-
-        try {
-            $file_report = Get-VirusTotalResultByHash $url_report.'UrlReport.Hash' $url $app $api_key
-            $file_report.'App.Hash' = $hash
-            $file_report.'App.HashType' = $matches['algo']
-            $file_report.'UrlReport.Url' = $url_report.'UrlReport.Url'
-            $file_report
-            warn "$app`: Unable to check hash match for $url"
-        } catch [Exception] {
-            $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
-            if ($_.Exception.Response.StatusCode -eq 404) {
-                Submit-ToVirusTotal $url $app $scan $api_key
-                $url_report
-            } else {
-                warn "$app`: VirusTotal file report query failed`: $($_.Exception.Message)"
-                if ($_.Exception.Response) {
-                    warn "`tAPI returned $($_.Exception.Response.StatusCode)"
-                }
-                return
-            }
-        }
+        Check-VirusTotalUrl $app $url $hash $api_key $scan
     }
 }
