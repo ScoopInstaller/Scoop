@@ -306,44 +306,21 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # can be multiple urls: if there are, then installer should go first to make 'installer.args' section work
     $urls = @(script:url $manifest $architecture)
 
-    # Pre-check all URLs with VirusTotal before downloading
-    $safe_urls = @()
-    if ($check_virustotal) {
-        $api_key = Get-VirusTotalApiKey
-        foreach ($url in $urls) {
-            $hash = hash_for_url $manifest $url $architecture
-            $reports = Check-VirusTotalUrl $app $url $hash $api_key $false
-            $reports | ForEach-Object {
-                $file_report = $_
-                $url = $file_report.'App.Url'
-
-                $maliciousResults = $file_report.'FileReport.Malicious'
-                $suspiciousResults = $file_report.'FileReport.Suspicious'
-                if ($maliciousResults -gt 0 -or $suspiciousResults -gt 0) {
-                    warn "$app`: One or more VirusTotal checks failed. Aborting before download."
-                } else {
-                    info "$app`: Safe URL: $url"
-                    $safe_urls += $url
-                }
-            }
-        }
-        if ($safe_urls.Count -eq 0) {
-            abort "No URL passed VirusTotal check for $app. Aborting before download."
-        }
-    } else {
-        $safe_urls = $urls
-    }
-
     # region Workaround
     # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
     Write-Host 'Downloading new version'
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash $check_virustotal
     } else {
         $urls = script:url $manifest $architecture
+        $urls = if ($check_virustotal) {
+            Test-UrlsWithVirusTotal $app $urls $manifest $architecture
+        } else {
+            $urls
+        }
 
-        foreach ($url in $safe_urls) {
+        foreach ($url in $urls) {
             Invoke-CachedDownload $app $version $url $null $manifest.cookie $true
 
             if ($check_hash) {

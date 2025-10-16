@@ -314,3 +314,35 @@ function virustotal_check_app($app, $manifest, $architecture, $api_key, $scan) {
         Check-VirusTotalUrl $app $url $hash $api_key $scan
     }
 }
+
+# return only the URLs that passed VirusTotal checks
+function Test-UrlsWithVirusTotal($app, $urls, $manifest, $architecture) {
+    $safe_urls = @()
+    $api_key = Get-VirusTotalApiKey
+
+    foreach ($url in $urls) {
+        $hash = hash_for_url $manifest $url $architecture
+        $reports = Check-VirusTotalUrl $app $url $hash $api_key $false
+
+        $reports | ForEach-Object {
+            $file_report = $_
+            $url = $file_report.'App.Url'
+
+            $maliciousResults = $file_report.'FileReport.Malicious'
+            $suspiciousResults = $file_report.'FileReport.Suspicious'
+
+            if ($maliciousResults -eq 0 -and $suspiciousResults -eq 0) {
+                info "$app`: Safe URL: $url"
+                $safe_urls += $url
+            } else {
+                warn "$app`: One or more VirusTotal checks failed. Aborting before download."
+            }
+        }
+    }
+
+    if ($safe_urls.Count -eq 0) {
+        abort "No URL passed VirusTotal check for $app. Aborting before download."
+    }
+
+    return $safe_urls
+}

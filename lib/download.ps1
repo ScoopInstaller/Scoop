@@ -16,39 +16,17 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
     # can be multiple cookies: they will be used for all HTTP requests.
     $cookies = $manifest.cookie
 
-    # Pre-check all URLs with VirusTotal before downloading
-    $safe_urls = @()
-    if ($check_virustotal) {
-        $api_key = Get-VirusTotalApiKey
-        foreach ($url in $urls) {
-            $hash = hash_for_url $manifest $url $architecture
-            $reports = Check-VirusTotalUrl $app $url $hash $api_key $false
-            $reports | ForEach-Object {
-                $file_report = $_
-                $url = $file_report.'App.Url'
-
-                $maliciousResults = $file_report.'FileReport.Malicious'
-                $suspiciousResults = $file_report.'FileReport.Suspicious'
-                if ($maliciousResults -gt 0 -or $suspiciousResults -gt 0) {
-                    warn "$app`: One or more VirusTotal checks failed. Aborting before download."
-                } else {
-                    info "$app`: Safe URL: $url"
-                    $safe_urls += $url
-                }
-            }
-        }
-        if ($safe_urls.Count -eq 0) {
-            abort "No URL passed VirusTotal check for $app. Aborting before download."
-        }
-    } else {
-        $safe_urls = $urls
-    }
-
     # download first
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash $check_virustotal
     } else {
-        foreach ($url in $safe_urls) {
+        $urls = if ($check_virustotal) {
+            Test-UrlsWithVirusTotal $app $urls $manifest $architecture
+        } else {
+            $urls
+        }
+
+        foreach ($url in $urls) {
             $fname = url_filename $url
 
             try {
@@ -77,7 +55,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
         }
     }
 
-    return $safe_urls.ForEach({ url_filename $_ })
+    return $urls.ForEach({ url_filename $_ })
 }
 
 ## [System.Net] downloader
@@ -361,9 +339,14 @@ function get_filename_from_metalink($file) {
     return $filename
 }
 
-function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
+function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true, $check_virustotal = $false) {
     $data = @{}
     $urls = @(script:url $manifest $architecture)
+    $urls = if ($check_virustotal) {
+        Test-UrlsWithVirusTotal $app $urls $manifest $architecture
+    } else {
+        $urls
+    }
 
     # aria2 input file
     $urlstxt = Join-Path $cachedir "$app.txt"
