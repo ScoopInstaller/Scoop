@@ -93,7 +93,7 @@
 #       See: 'https://support.virustotal.com/hc/en-us/articles/115002088769-Please-give-me-an-API-key'
 #
 # use_virustotal: $true|$false
-#       When set to $true, Scoop will always use VirusTotal to scan files after downloading.
+#       When set to $true, Scoop will always use VirusTotal to scan files before downloading.
 #
 # cat_style:
 #       When set to a non-empty string, Scoop will use 'bat' to display the manifest for
