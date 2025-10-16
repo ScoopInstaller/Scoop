@@ -307,10 +307,9 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     $urls = @(script:url $manifest $architecture)
 
     # Pre-check all URLs with VirusTotal before downloading
-    $api_key = Get-VirusTotalApiKey
-
     $safe_urls = @()
     if ($check_virustotal) {
+        $api_key = Get-VirusTotalApiKey
         foreach ($url in $urls) {
             $hash = hash_for_url $manifest $url $architecture
             $reports = Check-VirusTotalUrl $app $url $hash $api_key $false
