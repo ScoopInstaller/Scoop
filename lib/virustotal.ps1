@@ -1,5 +1,5 @@
 . "$PSScriptRoot\json.ps1" # 'json_path'
-# . "$PSScriptRoot\download.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\hash.ps1" # 'hash_for_url'
 
 # Error codes
 $script:_ERR_UNSAFE = 2
@@ -313,17 +313,4 @@ function virustotal_check_app($app, $manifest, $architecture, $api_key, $scan) {
         $hash = hash_for_url $manifest $url $architecture
         Check-VirusTotalUrl $app $url $hash $api_key $scan
     }
-}
-
-function hash_for_url($manifest, $url, $arch) {
-    $hashes = @(hash $manifest $arch) | Where-Object { $_ -ne $null }
-
-    if ($hashes.length -eq 0) { return $null }
-
-    $urls = @(script:url $manifest $arch)
-
-    $index = [array]::IndexOf($urls, $url)
-    if ($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
-
-    @($hashes)[$index]
 }

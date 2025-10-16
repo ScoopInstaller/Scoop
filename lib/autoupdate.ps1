@@ -1,5 +1,7 @@
 # Must included with 'json.ps1'
 
+. "$PSScriptRoot\..\lib\hash.ps1" # 'get_hash'
+
 function format_hash([String] $hash) {
     $hash = $hash.toLower()
 

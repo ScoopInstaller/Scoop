@@ -22,6 +22,7 @@
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\hash.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"

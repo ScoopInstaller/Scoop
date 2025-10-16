@@ -42,6 +42,7 @@ param(
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\hash.ps1" # 'get_hash'
 . "$PSScriptRoot\..\lib\buckets.ps1"
 . "$PSScriptRoot\..\lib\autoupdate.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
