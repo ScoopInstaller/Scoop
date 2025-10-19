@@ -80,7 +80,7 @@ function Get-VirusTotalResultByHash ($hash, $url, $app, $api_key) {
             'FileReport.Timeout'    = $timeout
             'FileReport.Undetected' = $undetected
             'FileReport.Unsafe'     = $unsafe
-            'FileReort.Total'       = $total
+            'FileReport.Total'       = $total
             'UrlReport.Url'         = $null
         }
     }
