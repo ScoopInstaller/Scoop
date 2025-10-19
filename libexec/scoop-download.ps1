@@ -106,6 +106,7 @@ foreach ($curr_app in $apps) {
     if(Test-Aria2Enabled) {
         Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash $check_virustotal
     } else {
+        $urls = @(script:url $manifest $architecture)
         $urls = if ($check_virustotal) {
             Test-UrlsWithVirusTotal $app $urls $manifest $architecture
         } else {
