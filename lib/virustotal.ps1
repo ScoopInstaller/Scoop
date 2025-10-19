@@ -73,10 +73,14 @@ function Get-VirusTotalResultByHash ($hash, $url, $app, $api_key) {
             'App.Size'              = filesize $fileSize
             'FileReport.Url'        = $report_url
             'FileReport.Hash'       = $report_hash
-            'FileReport.Malicious'  = if ($maliciousResults) { $maliciousResults } else { 0 }
-            'FileReport.Suspicious' = if ($suspiciousResults) { $suspiciousResults } else { 0 }
+            'FileReport.MaliciousResults'  = if ($maliciousResults) { $maliciousResults } else { @() }
+            'FileReport.SuspiciousResults' = if ($suspiciousResults) { $suspiciousResults } else { @() }
+            'FileReport.Malicious' = $malicious
+            'FileReport.Suspicious' = $suspicious
             'FileReport.Timeout'    = $timeout
             'FileReport.Undetected' = $undetected
+            'FileReport.Unsafe'     = $unsafe
+            'FileReort.Total'       = $total
             'UrlReport.Url'         = $null
         }
     }
@@ -328,20 +332,17 @@ function Test-UrlsWithVirusTotal($app, $urls, $manifest, $architecture) {
             $file_report = $_
             $url = $file_report.'App.Url'
 
-            $maliciousResults = $file_report.'FileReport.Malicious'
-            $suspiciousResults = $file_report.'FileReport.Suspicious'
-
-            if ($maliciousResults -eq 0 -and $suspiciousResults -eq 0) {
+            if ($file_report.'FileReport.Unsafe' -eq 0) {
                 info "$app`: Safe URL: $url"
                 $safe_urls += $url
             } else {
-                warn "$app`: One or more VirusTotal checks failed. Aborting before download."
+                warn "$app`: Unsafe URL: $url"
             }
         }
     }
 
-    if ($safe_urls.Count -eq 0) {
-        abort "No URL passed VirusTotal check for $app. Aborting before download."
+    if ($safe_urls.Count -ne $urls.Count) {
+        abort "VirusTotal check for $app failed. Aborting before download."
     }
 
     return $safe_urls
