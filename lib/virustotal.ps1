@@ -1,5 +1,6 @@
 . "$PSScriptRoot\json.ps1" # 'json_path'
-. "$PSScriptRoot\..\lib\hash.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\helper\hash.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\helper\file-information.ps1" # 'Get-RemoteFileSize'
 
 # Error codes
 $script:_ERR_UNSAFE = 2

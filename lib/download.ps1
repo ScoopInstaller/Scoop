@@ -1,7 +1,8 @@
 # Description: Functions for downloading files
 
 . "$PSScriptRoot\..\lib\core.ps1"
-. "$PSScriptRoot\..\lib\hash.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\helper\hash.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\helper\file-information.ps1" # 'Get-RemoteFileSize'
 . "$PSScriptRoot\..\lib\virustotal.ps1"
 
 ## Meta downloader
@@ -681,12 +682,6 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }
 
-function Get-RemoteFileSize ($Uri) {
-    $response = Invoke-WebRequest -Uri $Uri -Method HEAD -UseBasicParsing
-    if (!$response.Headers.StatusCode) {
-        $response.Headers.'Content-Length' | ForEach-Object { [int]$_ }
-    }
-}
 
 function ftp_file_size($url) {
     $request = [net.ftpwebrequest]::create($url)

@@ -7,6 +7,7 @@
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest'
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Get-InstalledVersion', 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\download.ps1" # 'Get-RemoteFileSize'
+. "$PSScriptRoot\..\lib\helper\file-information.ps1" # 'Get-RemoteFileSize'
 
 $opt, $app, $err = getopt $args 'v' 'verbose'
 $original_app = $app
