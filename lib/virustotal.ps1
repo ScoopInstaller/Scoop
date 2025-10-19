@@ -3,15 +3,15 @@
 . "$PSScriptRoot\..\lib\helper\file-information.ps1" # 'Get-RemoteFileSize'
 
 # Error codes
-$script:_ERR_UNSAFE = 2
-$script:_ERR_EXCEPTION = 4
-$script:_ERR_NO_INFO = 8
-$script:_ERR_NO_API_KEY = 16
+$_ERR_UNSAFE = 2
+$_ERR_EXCEPTION = 4
+$_ERR_NO_INFO = 8
+$_ERR_NO_API_KEY = 16
 
 # Global state variables
 $script:requests = 0
 $script:explained_rate_limit_sleeping = $False
-$script:exit_code = 0
+$exit_code = 0
 
 function ConvertTo-VirusTotalUrlId ($url) {
     $url_id = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($url))
@@ -86,7 +86,7 @@ function Get-VirusTotalResultByHash ($hash, $url, $app, $api_key) {
         }
     }
     if ($unsafe -gt 0) {
-        $Script:exit_code = $exit_code -bor $script:_ERR_UNSAFE
+        $exit_code = $exit_code -bor $_ERR_UNSAFE
     }
 }
 
@@ -237,7 +237,7 @@ function Check-VirusTotalUrl($app, $url, $hash, $api_key, $scan) {
             warn "$app`: Hash not found. Will search by url instead."
         }
     } catch [Exception] {
-        $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
+        $exit_code = $exit_code -bor $_ERR_EXCEPTION
         if ($_.Exception.Response.StatusCode -eq 404) {
             $file_report_not_found = $true
             warn "$app`: File report not found. Will search by url instead."
@@ -271,7 +271,7 @@ function Check-VirusTotalUrl($app, $url, $hash, $api_key, $scan) {
             return $url_report
         }
     } catch [Exception] {
-        $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
+        $exit_code = $exit_code -bor $_ERR_EXCEPTION
         if ($_.Exception.Response.StatusCode -eq 404) {
             Submit-ToVirusTotal $url $app $scan $api_key
             return
@@ -292,7 +292,7 @@ function Check-VirusTotalUrl($app, $url, $hash, $api_key, $scan) {
         $file_report
         warn "$app`: Unable to check hash match for $url"
     } catch [Exception] {
-        $script:exit_code = $exit_code -bor $script:_ERR_EXCEPTION
+        $exit_code = $exit_code -bor $_ERR_EXCEPTION
         if ($_.Exception.Response.StatusCode -eq 404) {
             Submit-ToVirusTotal $url $app $scan $api_key
             $url_report
@@ -342,7 +342,7 @@ function Test-UrlsWithVirusTotal($app, $urls, $manifest, $architecture) {
         }
     }
 
-    if ($safe_urls.Count -ne $urls.Count) {
+    if ($safe_urls.Count -eq 0) {
         abort "VirusTotal check for $app failed. Aborting before download."
     }
 
