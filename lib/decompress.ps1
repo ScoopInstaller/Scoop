@@ -91,7 +91,7 @@ function Expand-7zipArchive {
     } else {
         $7zPath = Get-HelperPath -Helper 7zip
     }
-    $LogPath = "$(Split-Path $Path)\7zip.log"
+    $LogPath = "$(Split-Path -Path $Path)\7zip.log"
     $DestinationPath = $DestinationPath.TrimEnd('\')
     $ArgList = @('x', $Path, "-o$DestinationPath", '-xr!*.nsis', '-y')
     $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
@@ -106,13 +106,13 @@ function Expand-7zipArchive {
         'Skip' { $ArgList += '-aos' }
         'Rename' { $ArgList += '-aou' }
     }
-    $Status = Invoke-ExternalCommand $7zPath $ArgList -LogPath $LogPath
-    if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    $Status = Invoke-ExternalCommand -FilePath $7zPath -ArgumentList $ArgList -LogPath $LogPath
+    if (-not $Status) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path -path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if ($IsTar) {
         # Check for tar
-        $Status = Invoke-ExternalCommand $7zPath @('l', $Path) -LogPath $LogPath
+        $Status = Invoke-ExternalCommand -FilePath $7zPath -ArgumentList @('l', $Path) -LogPath $LogPath
         if ($Status) {
             # get inner tar file name
             $TarFile = (Select-String -Path $LogPath -Pattern '[^ ]*tar$').Matches.Value
@@ -121,27 +121,40 @@ function Expand-7zipArchive {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
     }
-    if (!$IsTar -and $ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
-        # Remove temporary directory if it is empty
-        $ExtractDirTopPath = [string] "$DestinationPath\$($ExtractDir -replace '[\\/].*')"
-        if ((Get-ChildItem -Path $ExtractDirTopPath -Force -ErrorAction Ignore).Count -eq 0) {
-            Remove-Item -Path $ExtractDirTopPath -Recurse -Force -ErrorAction Ignore
+    if (-not $IsTar -and $ExtractDir) {
+        # Move content from $ExtractDir to destination
+        $null = movedir -from "$DestinationPath\$ExtractDir" -to $DestinationPath
+        # Remove temporary directories if not empty
+        $ExtractDirs = [string[]]($ExtractDir -split '[\\/]' | Where-Object -FilterScript { -not [string]::IsNullOrWhiteSpace($_) })
+        $Depth = [byte] $ExtractDirs.'Count'
+        do {
+            $CurrentDir = [string] [System.IO.Path]::Combine(
+                $DestinationPath, (
+                    ($ExtractDirs | Select-Object -First $Depth) -join [System.IO.Path]::DirectorySeparatorChar
+                )
+            )
+            if ((Get-ChildItem -Path $CurrentDir -Force -ErrorAction 'Ignore').'Count' -gt 0) {
+                $Depth = 0
+            } else {
+                Remove-Item -Path $CurrentDir -Recurse -Force -ErrorAction 'Ignore'
+            }
+            $Depth--
         }
+        while ($Depth -gt 0)
     }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
+    if (Test-Path -Path $LogPath -PathType 'Leaf') {
+        Remove-Item -Path $LogPath -Force
     }
     if ($Removal) {
         if (($Path -replace '.*\.([^\.]*)$', '$1') -eq '001') {
             # Remove splitted 7-zip archive parts
-            Get-ChildItem "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
+            Get-ChildItem -Path "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
         } elseif (($Path -replace '.*\.part(\d+)\.rar$', '$1')[-1] -eq '1') {
             # Remove splitted RAR archive parts
-            Get-ChildItem "$($Path -replace '\.part(\d+)\.rar$', '').part*.rar" | Remove-Item -Force
+            Get-ChildItem -Path "$($Path -replace '\.part(\d+)\.rar$', '').part*.rar" | Remove-Item -Force
         } else {
             # Remove original archive file
-            Remove-Item $Path -Force
+            Remove-Item -Path $Path -Force
         }
     }
 }
@@ -248,7 +261,7 @@ function Expand-InnoArchive {
     switch -Regex ($ExtractDir) {
         '^[^{].*' { $ArgList += "-c{app}\$ExtractDir" }
         '^{.*' { $ArgList += "-c$ExtractDir" }
-        Default { $ArgList += '-c{app}' }
+        default { $ArgList += '-c{app}' }
     }
     if ($Switches) {
         $ArgList += (-split $Switches)
