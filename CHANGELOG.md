@@ -14,6 +14,7 @@
 - **buckets|scoop-info:** Switch git log date format to ISO 8601 to avoid locale issues ([#6446](https://github.com/ScoopInstaller/Scoop/issues/6446))
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
 - **core|manifest:** Avoid error messages when searching non-existent 'deprecated' directory ([#6471](https://github.com/ScoopInstaller/Scoop/issues/6471))
+- **schema:** Add `github` to the `mode` of `hash` to avoid pr validation to fail ([#6533](https://github.com/ScoopInstaller/Scoop/issues/6533))
 
 ### Code Refactoring
 
