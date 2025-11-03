@@ -454,6 +454,13 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         Write-Host ''
 
         if ($lastexitcode -gt 0) {
+            if (get_config ARIA2-FALLBACK-DISABLED) {
+                error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
+                error $urlstxt_content
+                error $aria2
+                abort $(new_issue_msg $app $bucket 'download via aria2 failed')
+            }
+
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             warn $urlstxt_content
             warn $aria2
