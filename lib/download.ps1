@@ -23,7 +23,8 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                 Invoke-CachedDownload $app $version $url "$dir\$fname" $cookies $use_cache
             } catch {
                 Write-Host -ForegroundColor DarkRed $_
-                abort "URL $url is not valid"
+                error "URL $url is not valid"
+                abort $(new_issue_msg $app $bucket 'download failed')
             }
 
             if ($check_hash) {
@@ -457,9 +458,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             warn $urlstxt_content
             warn $aria2
-            warn $(new_issue_msg $app $bucket "download via aria2 failed")
 
-            Write-Host "Fallback to default downloader ..."
+            Write-Host 'Fallback to default downloader ...'
 
             try {
                 foreach ($url in $urls) {
@@ -467,7 +467,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 }
             } catch {
                 Write-Host $_ -ForegroundColor DarkRed
-                abort "URL $url is not valid"
+                error "URL $url is not valid"
+                abort $(new_issue_msg $app $bucket 'download failed')
             }
         }
 
