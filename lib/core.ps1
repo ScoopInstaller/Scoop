@@ -622,7 +622,14 @@ function Get-AbsolutePath {
         $Path
     )
     process {
-        return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+        $resolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+        if ($resolvedPath -match '[\\/]$') {
+            $root = [System.IO.Path]::GetPathRoot($resolvedPath)
+            if ($resolvedPath -ine $root) {
+                $resolvedPath = $resolvedPath.TrimEnd([char[]]@('\', '/'))
+            }
+        }
+        return $resolvedPath
     }
 }
 
