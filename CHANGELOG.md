@@ -2,23 +2,26 @@
 
 ### Features
 
-- **scoop-uninstall**: Allow access to `$bucket` in uninstall scripts ([#6380](https://github.com/ScoopInstaller/Scoop/issues/6380))
+- **scoop-uninstall:** Allow access to `$bucket` in uninstall scripts ([#6380](https://github.com/ScoopInstaller/Scoop/issues/6380))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
 
 ### Bug Fixes
 
 - **buckets:** Fix the filtering condition when retrieving the number of manifests ([#6508](https://github.com/ScoopInstaller/Scoop/issues/6508))
-- **scoop-download**: Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
-- **scoop-uninstall:**: Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
-- **scoop-update**: Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
+- **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
+- **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
+- **scoop-update:** Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
 - **autoupdate:** Use origin URL to handle URLs with fragment in GitHub mode ([#6455](https://github.com/ScoopInstaller/Scoop/issues/6455))
 - **buckets|scoop-info:** Switch git log date format to ISO 8601 to avoid locale issues ([#6446](https://github.com/ScoopInstaller/Scoop/issues/6446))
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
 - **core|manifest:** Avoid error messages when searching non-existent 'deprecated' directory ([#6471](https://github.com/ScoopInstaller/Scoop/issues/6471))
+- **path:** Trim ending slash when initializing paths ([#6501](https://github.com/ScoopInstaller/Scoop/issues/6501))
+- **checkver:** Allow script to run when URL fetch fails but script exists ([#6490](https://github.com/ScoopInstaller/Scoop/issues/6490))
+- **schema:** Add missing `hash.mode` value `github` ([#6533](https://github.com/ScoopInstaller/Scoop/issues/6533))
 
 ### Code Refactoring
 
-- **output**: Replace raw prints with functions for standardized output ([#6449](https://github.com/ScoopInstaller/Scoop/issues/6449))
+- **output:** Replace raw prints with functions for standardized output ([#6449](https://github.com/ScoopInstaller/Scoop/issues/6449))
 
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
