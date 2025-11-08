@@ -11,6 +11,7 @@
 #   -i, --independent      Don't install dependencies automatically
 #   -k, --no-cache         Don't use the download cache
 #   -s, --skip-hash-check  Skip hash validation (use with caution!)
+#   -w, --virustotal-check Check the download against VirusTotal (may be slow)
 #   -q, --quiet            Hide extraneous messages
 #   -a, --all              Update all apps (alternative to '*')
 
@@ -21,6 +22,7 @@
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\helper\hash.ps1" # 'hash_for_url'
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
@@ -29,11 +31,12 @@ if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
 
-$opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip-hash-check', 'quiet', 'all'
+$opt, $apps, $err = getopt $args 'gfikswqa' 'global', 'force', 'independent', 'no-cache', 'skip-hash-check', 'virustotal-check', 'quiet', 'all'
 if ($err) { error "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
 $check_hash = !($opt.s -or $opt.'skip-hash-check')
+$check_virustotal = $opt.w -or $opt.'virustotal-check' -or (get_config USE_VIRUSTOTAL $false)
 $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
@@ -258,7 +261,7 @@ function Sync-Bucket {
     }
 }
 
-function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
+function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true, $check_virustotal = $false) {
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -300,14 +303,22 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
     #endregion Workaround for #2952
 
+    # can be multiple urls: if there are, then installer should go first to make 'installer.args' section work
+    $urls = @(script:url $manifest $architecture)
+
     # region Workaround
     # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
     # Remove and replace whole region after proper fix
     Write-Host 'Downloading new version'
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash $check_virustotal
     } else {
         $urls = script:url $manifest $architecture
+        $urls = if ($check_virustotal) {
+            Test-UrlsWithVirusTotal $app $urls $manifest $architecture
+        } else {
+            $urls
+        }
 
         foreach ($url in $urls) {
             Invoke-CachedDownload $app $version $url $null $manifest.cookie $true
@@ -376,12 +387,12 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
 
     if ($independent) {
-        install_app $app $architecture $global $suggested $use_cache $check_hash
+        install_app $app $architecture $global $suggested $use_cache $check_hash $check_virustotal
     } else {
         # Also add missing dependencies
         $apps = @(Get-Dependency $app $architecture) -ne $app
         ensure_none_failed $apps
-        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash $check_virustotal}
     }
 }
 
@@ -462,7 +473,7 @@ if (-not ($apps -or $all)) {
 
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
+    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash $check_virustotal }
 }
 
 exit 0

@@ -4,6 +4,8 @@
 
 - **scoop-uninstall:** Allow access to `$bucket` in uninstall scripts ([#6380](https://github.com/ScoopInstaller/Scoop/issues/6380))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
+- **virustotal:** Refactor into lib and integrate pre-download checks for install and update ([#6525](https://github.com/ScoopInstaller/Scoop/issues/6525))
+
 
 ### Bug Fixes
 

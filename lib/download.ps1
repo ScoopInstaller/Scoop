@@ -1,8 +1,13 @@
 # Description: Functions for downloading files
 
+. "$PSScriptRoot\..\lib\core.ps1"
+. "$PSScriptRoot\..\lib\helper\hash.ps1" # 'hash_for_url'
+. "$PSScriptRoot\..\lib\helper\file-information.ps1" # 'Get-RemoteFileSize'
+. "$PSScriptRoot\..\lib\virustotal.ps1"
+
 ## Meta downloader
 
-function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true) {
+function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture, $dir, $use_cache = $true, $check_hash = $true, $check_virustotal = $false) {
     # we only want to show this warning once
     if (!$use_cache) { warn 'Cache is being ignored.' }
 
@@ -14,8 +19,14 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
 
     # download first
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash $check_virustotal
     } else {
+        $urls = if ($check_virustotal) {
+            Test-UrlsWithVirusTotal $app $urls $manifest $architecture
+        } else {
+            $urls
+        }
+
         foreach ($url in $urls) {
             $fname = url_filename $url
 
@@ -329,9 +340,14 @@ function get_filename_from_metalink($file) {
     return $filename
 }
 
-function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
+function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true, $check_virustotal = $false) {
     $data = @{}
     $urls = @(script:url $manifest $architecture)
+    $urls = if ($check_virustotal) {
+        Test-UrlsWithVirusTotal $app $urls $manifest $architecture
+    } else {
+        $urls
+    }
 
     # aria2 input file
     $urlstxt = Join-Path $cachedir "$app.txt"
@@ -457,9 +473,9 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             warn $urlstxt_content
             warn $aria2
-            warn $(new_issue_msg $app $bucket "download via aria2 failed")
+            warn $(new_issue_msg $app $bucket 'download via aria2 failed')
 
-            Write-Host "Fallback to default downloader ..."
+            Write-Host 'Fallback to default downloader ...'
 
             try {
                 foreach ($url in $urls) {
@@ -666,12 +682,6 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }
 
-Function Get-RemoteFileSize ($Uri) {
-    $response = Invoke-WebRequest -Uri $Uri -Method HEAD -UseBasicParsing
-    if (!$response.Headers.StatusCode) {
-        $response.Headers.'Content-Length' | ForEach-Object { [int]$_ }
-    }
-}
 
 function ftp_file_size($url) {
     $request = [net.ftpwebrequest]::create($url)
@@ -689,31 +699,16 @@ function url_remote_filename($url) {
     # this function extracts the original filename from the URL.
     $uri = (New-Object URI $url)
     $basename = Split-Path $uri.PathAndQuery -Leaf
-    If ($basename -match '.*[?=]+([\w._-]+)') {
+    if ($basename -match '.*[?=]+([\w._-]+)') {
         $basename = $matches[1]
     }
-    If (($basename -notlike '*.*') -or ($basename -match '^[v.\d]+$')) {
+    if (($basename -notlike '*.*') -or ($basename -match '^[v.\d]+$')) {
         $basename = Split-Path $uri.AbsolutePath -Leaf
     }
-    If (($basename -notlike '*.*') -and ($uri.Fragment -ne '')) {
+    if (($basename -notlike '*.*') -and ($uri.Fragment -ne '')) {
         $basename = $uri.Fragment.Trim('/', '#')
     }
     return $basename
-}
-
-### Hash-related functions
-
-function hash_for_url($manifest, $url, $arch) {
-    $hashes = @(hash $manifest $arch) | Where-Object { $_ -ne $null }
-
-    if ($hashes.length -eq 0) { return $null }
-
-    $urls = @(script:url $manifest $arch)
-
-    $index = [array]::IndexOf($urls, $url)
-    if ($index -eq -1) { abort "Couldn't find hash in manifest for '$url'." }
-
-    @($hashes)[$index]
 }
 
 function check_hash($file, $hash, $app_name) {
@@ -749,20 +744,6 @@ function check_hash($file, $hash, $app_name) {
     }
     Write-Host 'ok.' -f Green
     return $true, $null
-}
-
-function get_hash([String] $multihash) {
-    $type, $hash = $multihash -split ':'
-    if (!$hash) {
-        # no type specified, assume sha256
-        $type, $hash = 'sha256', $multihash
-    }
-
-    if (@('md5', 'sha1', 'sha256', 'sha512') -notcontains $type) {
-        return $null, "Hash type '$type' isn't supported."
-    }
-
-    return $type, $hash.ToLower()
 }
 
 # Setup proxy globally

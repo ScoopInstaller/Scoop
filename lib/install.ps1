@@ -1,3 +1,4 @@
+
 function nightly_version($quiet = $false) {
     if (!$quiet) {
         warn "This is a nightly version. Downloaded files won't be verified."
@@ -5,7 +6,7 @@ function nightly_version($quiet = $false) {
     return "nightly-$(Get-Date -Format 'yyyyMMdd')"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
+function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true,  $check_virustotal = $false) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if (!$manifest) {
@@ -49,7 +50,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $original_dir = $dir # keep reference to real (not linked) directory
     $persist_dir = persistdir $app $global
 
-    $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash $check_virustotal
     Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
