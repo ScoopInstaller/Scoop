@@ -353,7 +353,7 @@ function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 function currentdir($app, $global) {
-    if (get_config NO_JUNCTION) {
+    if ((get_config NO_JUNCTION) -and ($app -ne 'scoop')) {
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'

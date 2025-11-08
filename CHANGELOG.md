@@ -19,6 +19,7 @@
 - **path:** Trim ending slash when initializing paths ([#6501](https://github.com/ScoopInstaller/Scoop/issues/6501))
 - **checkver:** Allow script to run when URL fetch fails but script exists ([#6490](https://github.com/ScoopInstaller/Scoop/issues/6490))
 - **schema:** Add missing `hash.mode` value `github` ([#6533](https://github.com/ScoopInstaller/Scoop/issues/6533))
+- **core:** Skip NO_JUNCTION logic when $app is 'scoop' in `currentdir` function ([#6541](https://github.com/ScoopInstaller/Scoop/issues/6541))
 
 ### Code Refactoring
 
