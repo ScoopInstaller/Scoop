@@ -132,6 +132,9 @@
 # aria2-warning-enabled: $true|$false
 #       Disable Aria2c warning which is shown while downloading.
 #
+# aria2-fallback-disabled: $true|$false
+#       Disable automatic fallback to the default downloader when Aria2c download fails.
+#
 # aria2-retry-wait: 2
 #       Number of seconds to wait between retries.
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-retry-wait'

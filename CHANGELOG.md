@@ -5,9 +5,11 @@
 - **scoop-uninstall:** Allow access to `$bucket` in uninstall scripts ([#6380](https://github.com/ScoopInstaller/Scoop/issues/6380))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
 - **download|scoop-download:** Add GitHub issue prompt when the default downloader fails ([#6539](https://github.com/ScoopInstaller/Scoop/issues/6539))
+- **download|scoop-config:** Allow disabling automatic fallback to the default downloader when Aria2c download fails ([#6538](https://github.com/ScoopInstaller/Scoop/issues/6538))
 
 ### Bug Fixes
 
+- **buckets:** Fix the filtering condition when retrieving the number of manifests ([#6509](https://github.com/ScoopInstaller/Scoop/issues/6509))
 - **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
 - **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
 - **scoop-update:** Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
