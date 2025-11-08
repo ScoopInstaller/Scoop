@@ -11,6 +11,9 @@ Describe 'JSON parse and beautify' -Tag 'Scoop' {
         It 'fails with invalid json' {
             { parse_json "$PSScriptRoot\fixtures\manifest\broken_wget.json" } | Should -Throw
         }
+        It 'should not throw if provided an empty string' {
+            { parse_json '' } | Should -Not -Throw
+        }
     }
     Context 'Beautify JSON' {
         BeforeDiscovery {

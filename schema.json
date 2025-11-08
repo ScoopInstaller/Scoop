@@ -534,6 +534,41 @@
             "description": "A comment.",
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
+        "version": {
+            "pattern": "^[\\w\\.\\-+_]+$",
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "homepage": {
+            "format": "uri",
+            "type": "string"
+        },
+        "license": {
+            "$ref": "#/definitions/license"
+        },
+        "notes": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "depends": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "suggest": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "^(.*)$": {
+                    "$ref": "#/definitions/stringOrArrayOfStrings"
+                }
+            },
+            "type": "object"
+        },
+        "url": {
+            "$ref": "#/definitions/uriOrArrayOfUris"
+        },
+        "hash": {
+            "$ref": "#/definitions/hash"
+        },
         "architecture": {
             "additionalProperties": false,
             "properties": {
@@ -549,33 +584,9 @@
             },
             "type": "object"
         },
-        "autoupdate": {
-            "$ref": "#/definitions/autoupdate"
-        },
-        "bin": {
-            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
-        },
-        "persist": {
-            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
-        },
-        "checkver": {
-            "$ref": "#/definitions/checkver"
-        },
-        "cookie": {
-            "description": "Undocumented: Found at https://github.com/se35710/scoop-java/search?l=JSON&q=cookie",
-            "type": "object"
-        },
-        "depends": {
-            "$ref": "#/definitions/stringOrArrayOfStrings"
-        },
-        "description": {
-            "type": "string"
-        },
-        "env_add_path": {
-            "$ref": "#/definitions/stringOrArrayOfStrings"
-        },
-        "env_set": {
-            "type": "object"
+        "innosetup": {
+            "description": "True if the installer InnoSetup based. Found in https://github.com/ScoopInstaller/Main/search?l=JSON&q=innosetup",
+            "type": "boolean"
         },
         "extract_dir": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
@@ -583,36 +594,37 @@
         "extract_to": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
-        "hash": {
-            "$ref": "#/definitions/hash"
-        },
-        "homepage": {
-            "format": "uri",
-            "type": "string"
-        },
-        "innosetup": {
-            "description": "True if the installer InnoSetup based. Found in https://github.com/ScoopInstaller/Main/search?l=JSON&q=innosetup",
-            "type": "boolean"
+        "pre_install": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "installer": {
             "$ref": "#/definitions/installer"
         },
-        "license": {
-            "$ref": "#/definitions/license"
-        },
-        "notes": {
-            "$ref": "#/definitions/stringOrArrayOfStrings"
-        },
         "post_install": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
-        "post_uninstall": {
+        "env_add_path": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
-        "pre_install": {
-            "$ref": "#/definitions/stringOrArrayOfStrings"
+        "env_set": {
+            "type": "object"
+        },
+        "bin": {
+            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
+        },
+        "shortcuts": {
+            "$ref": "#/definitions/shortcutsArray"
+        },
+        "persist": {
+            "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
         },
         "pre_uninstall": {
+            "$ref": "#/definitions/stringOrArrayOfStrings"
+        },
+        "uninstaller": {
+            "$ref": "#/definitions/uninstaller"
+        },
+        "post_uninstall": {
             "$ref": "#/definitions/stringOrArrayOfStrings"
         },
         "psmodule": {
@@ -624,27 +636,15 @@
             },
             "type": "object"
         },
-        "shortcuts": {
-            "$ref": "#/definitions/shortcutsArray"
+        "checkver": {
+            "$ref": "#/definitions/checkver"
         },
-        "suggest": {
-            "additionalProperties": false,
-            "patternProperties": {
-                "^(.*)$": {
-                    "$ref": "#/definitions/stringOrArrayOfStrings"
-                }
-            },
+        "autoupdate": {
+            "$ref": "#/definitions/autoupdate"
+        },
+        "cookie": {
+            "description": "Undocumented: Found at https://github.com/se35710/scoop-java/search?l=JSON&q=cookie",
             "type": "object"
-        },
-        "uninstaller": {
-            "$ref": "#/definitions/uninstaller"
-        },
-        "url": {
-            "$ref": "#/definitions/uriOrArrayOfUris"
-        },
-        "version": {
-            "pattern": "^[\\w\\.\\-+_]+$",
-            "type": "string"
         }
     },
     "if": {

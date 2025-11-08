@@ -4,6 +4,10 @@
 
 - **scoop-uninstall:** Allow access to `$bucket` in uninstall scripts ([#6380](https://github.com/ScoopInstaller/Scoop/issues/6380))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
+- **schema**: Reorder root properties to match the wanted order.
+- **manifest**: Add function `Sort-ScoopManifestProperties` which orders a manifest's root properties to match `schema.json`.
+- **manifest**: Add function `Sort-PSCustomObjectKeysRecursively` which orders `[PSCustomObject]` keys recursively.
+- **formatjson**: Use `Sort-ScoopManifestProperties` to sort manifests root properties.
 
 ### Bug Fixes
 

@@ -2,10 +2,16 @@ function manifest_path($app, $bucket) {
     (Get-ChildItem (Find-BucketDirectory $bucket) -Filter "$(sanitary_path $app).json" -Recurse).FullName
 }
 
-function parse_json($path) {
-    if ($null -eq $path -or !(Test-Path $path)) { return $null }
+function parse_json {
+    Param(
+        [Parameter()]
+        [string] $path
+    )
+    if ([string]::IsNullOrWhiteSpace($path) -or -not [System.IO.File]::Exists($path)) {
+        return $null
+    }
     try {
-        Get-Content $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+        Get-Content -Path $path -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
     } catch {
         warn "Error parsing JSON at '$path'."
     }
@@ -212,3 +218,106 @@ function uninstaller($manifest, $arch) { arch_specific 'uninstaller' $manifest $
 function hash($manifest, $arch) { arch_specific 'hash' $manifest $arch }
 function extract_dir($manifest, $arch) { arch_specific 'extract_dir' $manifest $arch }
 function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $arch }
+
+function Sort-PSCustomObjectKeysRecursively {
+    <#
+        .SYNOPSIS
+            Sort PSCustomObject keys recursively.
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
+    param (
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [ValidateScript({$_ -is [System.Management.Automation.PSCustomObject]})]
+        [object] $InputObject
+    )
+
+    Process {
+        function local:Convert-Node {
+            <#
+                .SYNOPSIS
+                    Helper function that will be called recursively.
+            #>
+            param (
+                [Parameter(Mandatory)]
+                [object] $Node
+            )
+            # Recurse if node value is of type [PSCustomObject]
+            if ($Node -is [System.Management.Automation.PSCustomObject]) {
+                $OrderedPSCustomObject = [PSCustomObject]::new()
+                $SortedProperties = $Node.PSObject.Properties | Sort-Object -Property Name
+                foreach ($Property in $SortedProperties) {
+                    $null = Add-Member -InputObject $OrderedPSCustomObject -NotePropertyName $Property.Name -NotePropertyValue (
+                        Convert-Node -Node $Property.Value
+                    )
+                }
+                return $OrderedPSCustomObject
+            }
+            # Else return the value as is
+            else {
+                return $Node
+            }
+        }
+
+        # Start the recursive sorting process on the initial input object
+        return Convert-Node -Node $InputObject
+    }
+}
+
+function Sort-ScoopManifestProperties {
+    <#
+        .SYNOPSIS
+            Sort JSON root properties according to schema.json, and level one child properties alphabetically.
+    #>
+    [OutputType([PSCustomObject])]
+
+    Param(
+        [Parameter(Mandatory)]
+        [ValidateScript({$null -ne $_ -and $_ -ne [PSCustomObject]::new()})]
+        [PSCustomObject] $JsonAsObject
+    )
+
+    # Get wanted order from Scoop manifest schema
+    if ([string]::IsNullOrWhiteSpace($Script:WantedOrder)) {
+        $Script:WantedOrder = [string[]](
+            (
+                parse_json -path (
+                    '{0}\..\schema.json' -f $PSScriptRoot
+                )
+            ).'properties'.'PSObject'.'Properties'.'Name'
+        )
+    }
+
+    # Failproof - Make sure input does not have keys not defined in schema.json
+    $KeysNotInSchema = [string[]](
+        $JsonAsObject.'PSObject'.'Properties'.'Name'.Where{$_ -cnotin $Script:WantedOrder}
+    )
+    if ($KeysNotInSchema.'Count' -gt 0) {
+        abort ('Manifest contains keys not defined in schema.json: "{0}".' -f ($KeysNotInSchema -join ", "))
+    }
+
+    # Create empty new object where properties will be added to
+    $SortedObject = [PSCustomObject]::new()
+
+    # Add properties from $Current to $Sorted ordered by $WantedOrder
+    $JsonAsObject.'PSObject'.'Properties'.'Name' |
+        Sort-Object -Property @{
+            'Expression' = {
+                [uint16]($Script:WantedOrder.IndexOf($_))
+            }
+        } | ForEach-Object -Process {
+            $null = Add-Member -InputObject $SortedObject -NotePropertyName $_ -NotePropertyValue $JsonAsObject.$_
+        }
+
+    # Order childs alphabetically recursively, if parent key is of type PSCustomObject
+    foreach (
+        $Key in $SortedObject.'PSObject'.'Properties'.Where{
+            $_.'TypeNameOfValue' -eq 'System.Management.Automation.PSCustomObject'
+        }.'Name'
+    ) {
+        $SortedObject.$Key = [PSCustomObject](Sort-PSCustomObjectKeysRecursively -InputObject $SortedObject.$Key)
+    }
+
+    # Return the sorted object
+    $SortedObject
+}
