@@ -9,7 +9,7 @@
 ### Features
 
 - **autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
-- **install:** Add output for the setting and removal of environment variables ([#6459](https://github.com/ScoopInstaller/Scoop/issues/6459))
+- **install:** Add output for the setting and removal of environment variables ([#6460](https://github.com/ScoopInstaller/Scoop/issues/6460))
 
 ### Bug Fixes
 
