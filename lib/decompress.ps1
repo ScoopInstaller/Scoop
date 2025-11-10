@@ -52,9 +52,7 @@ function Invoke-Extraction {
                 DestinationPath = Join-Path $Path $extractTo[$extracted]
                 ExtractDir      = $extractDir[$extracted]
             }
-            Write-Host 'Extracting ' -NoNewline
-            Write-Host $(url_remote_filename $uri[$i]) -ForegroundColor Cyan -NoNewline
-            Write-Host ' ... ' -NoNewline
+            Write-Output "Extracting $([char]0x1b)[36m$(url_remote_filename $uri[$i])$([char]0x1b)[0m ... "
             & $extractFn @fnArgs -Removal
             Write-Host 'done.' -ForegroundColor Green
             $extracted++

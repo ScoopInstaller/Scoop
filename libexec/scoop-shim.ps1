@@ -112,9 +112,7 @@ switch ($SubCommand) {
             }
         }
         if ($commandPath -and (Test-Path $commandPath)) {
-            Write-Host "Adding $(if ($global) { 'global' } else { 'local' }) shim " -NoNewline
-            Write-Host $shimName -ForegroundColor Cyan -NoNewline
-            Write-Host '...'
+            Write-Output "Adding $(if ($global) {'global'} else {'local'}) shim $([char]0x1b)[36m$shimName$([char]0x1b)[0m ..."
             shim $commandPath $global $shimName $commandArgs
         } else {
             Write-Host "ERROR: Command path does not exist: " -ForegroundColor Red -NoNewline
@@ -174,8 +172,7 @@ switch ($SubCommand) {
             Write-Host "ERROR: $(if ($global) { 'Global' } else { 'Local' }) shim not found: " -ForegroundColor Red -NoNewline
             Write-Host $shimName -ForegroundColor Cyan
             if (Get-ShimPath $shimName (!$global)) {
-                Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, " -NoNewline
-                Write-Host "run 'scoop shim info $shimName$(if (!$global) { ' --global' })' to show its info"
+                Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, run 'scoop shim info $shimName$(if (!$global) { ' --global' })' to show its info"
                 exit 2
             }
             exit 3
@@ -187,9 +184,7 @@ switch ($SubCommand) {
         if ($shimPath) {
             $shimInfo = Get-ShimInfo $shimPath
             if ($null -eq $shimInfo.Alternatives) {
-                Write-Host 'ERROR: No alternatives of ' -ForegroundColor Red -NoNewline
-                Write-Host $shimName -ForegroundColor Cyan -NoNewline
-                Write-Host ' found.' -ForegroundColor Red
+                Write-Output "$([char]0x1b)[31mERROR: No alternatives of $([char]0x1b)[36m$shimName$([char]0x1b)[31m found.$([char]0x1b)[0m"
                 exit 2
             }
             $shimInfo.Alternatives = $shimInfo.Alternatives.Split(' ')
@@ -198,18 +193,10 @@ switch ($SubCommand) {
             }
             $selected = $Host.UI.PromptForChoice("Alternatives of '$shimName' command", "Please choose one that provides '$shimName' as default:", $altApps, 0)
             if ($selected -eq 0) {
-                Write-Host 'INFO: ' -ForegroundColor Blue -NoNewline
-                Write-Host $shimName -ForegroundColor Cyan -NoNewline
-                Write-Host ' is already from ' -NoNewline
-                Write-Host $shimInfo.Source -ForegroundColor DarkYellow -NoNewline
-                Write-Host ', nothing changed.'
+                Write-Output "$([char]0x1b)[34mINFO: $([char]0x1b)[36m$shimName$([char]0x1b)[0m is already from $([char]0x1b)[33m$($shimInfo.Source)$([char]0x1b)[0m, nothing changed."
             } else {
                 $newApp = $shimInfo.Alternatives[$selected]
-                Write-Host 'Use ' -NoNewline
-                Write-Host $shimName -ForegroundColor Cyan -NoNewline
-                Write-Host ' from ' -NoNewline
-                Write-Host $newApp -ForegroundColor DarkYellow -NoNewline
-                Write-Host ' as default...' -NoNewline
+                Write-Output "Use $([char]0x1b)[36m$shimName$([char]0x1b)[0m from $([char]0x1b)[33m$newApp$([char]0x1b)[0m as default..."
                 $pathNoExt = strip_ext $shimPath
                 '', '.shim', '.cmd', '.ps1' | ForEach-Object {
                     $oldShimPath = "$pathNoExt$_"
@@ -227,8 +214,7 @@ switch ($SubCommand) {
             Write-Host "ERROR: $(if ($global) { 'Global' } else { 'Local' }) shim not found: " -ForegroundColor Red -NoNewline
             Write-Host $shimName -ForegroundColor Cyan
             if (Get-ShimPath $shimName (!$global)) {
-                Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, " -NoNewline
-                Write-Host "run 'scoop shim alter $shimName$(if (!$global) { ' --global' })' to alternate its source"
+                Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, run 'scoop shim alter $shimName$(if (!$global) { ' --global' })' to alternate its source"
                 exit 2
             }
             exit 3
