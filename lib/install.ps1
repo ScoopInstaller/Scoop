@@ -165,9 +165,9 @@ function Invoke-HookScript {
         $script = $script.script
     }
     if ($script) {
-        Write-Host "Running $HookType script..." -NoNewline
+        Write-Host "Running $HookType script... " -NoNewline
         Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
-        Write-Host 'done.' -ForegroundColor Green
+        Write-Host 'Done.' -ForegroundColor Green
     }
 }
 

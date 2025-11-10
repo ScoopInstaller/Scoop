@@ -19,7 +19,7 @@ function url_manifest($url) {
         $data = $wc.DownloadData($url)
         $str = (Get-Encoding($wc)).GetString($data)
     } catch [system.management.automation.methodinvocationexception] {
-        warn "error: $($_.exception.innerexception.message)"
+        warn "Error: $($_.exception.innerexception.message)"
     } catch {
         throw
     }

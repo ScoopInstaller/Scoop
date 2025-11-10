@@ -208,7 +208,7 @@ switch ($SubCommand) {
                         }
                     }
                 }
-                Write-Host 'done.'
+                Write-Host 'Done.'
             }
         } else {
             Write-Host "ERROR: $(if ($global) { 'Global' } else { 'Local' }) shim not found: " -ForegroundColor Red -NoNewline

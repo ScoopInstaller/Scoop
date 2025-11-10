@@ -160,7 +160,7 @@ function add_bucket($name, $repo) {
         Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
         return 1
     }
-    Write-Host 'OK'
+    Write-Host 'OK.'
     if (get_config USE_SQLITE_CACHE) {
         info 'Updating cache...'
         Set-ScoopDB -Path (Get-ChildItem (Find-BucketDirectory $name) -Filter '*.json' -Recurse).FullName

@@ -750,7 +750,7 @@ function Invoke-ExternalCommand {
         [void]$Process.Start()
     } catch {
         if ($Activity) {
-            Write-Host "error." -ForegroundColor DarkRed
+            Write-Host "Error." -ForegroundColor DarkRed
         }
         error $_.Exception.Message
         return $false
@@ -769,20 +769,20 @@ function Invoke-ExternalCommand {
     if ($Process.ExitCode -ne 0) {
         if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
             if ($Activity) {
-                Write-Host "done." -ForegroundColor DarkYellow
+                Write-Host "Done." -ForegroundColor DarkYellow
             }
             warn $ContinueExitCodes[$Process.ExitCode]
             return $true
         } else {
             if ($Activity) {
-                Write-Host "error." -ForegroundColor DarkRed
+                Write-Host "Error." -ForegroundColor DarkRed
             }
             error "Exit code was $($Process.ExitCode)!"
             return $false
         }
     }
     if ($Activity) {
-        Write-Host "done." -ForegroundColor Green
+        Write-Host "Done." -ForegroundColor Green
     }
     return $true
 }
