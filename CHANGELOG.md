@@ -27,6 +27,7 @@
 ### Code Refactoring
 
 - **output:** Replace raw prints with functions for standardized output ([#6449](https://github.com/ScoopInstaller/Scoop/issues/6449))
+- **output:** Combine the separated outputs into a single output ([#6545](https://github.com/ScoopInstaller/Scoop/issues/6545))
 
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
