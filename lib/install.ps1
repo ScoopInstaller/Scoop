@@ -285,7 +285,7 @@ function ensure_install_dir_not_in_path($dir, $global) {
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if ($removed) {
-        $removed | ForEach-Object { "Installer added '$(friendly_path $_)' to path. Removing." }
+        $removed | ForEach-Object { Write-Output "Installer added '$(friendly_path $_)' to path. Removing." }
         Set-EnvVar -Name 'PATH' -Value $fixed -Global:$global
     }
 
@@ -361,6 +361,7 @@ function show_notes($manifest, $dir, $original_dir, $persist_dir) {
         Write-Output 'Notes'
         Write-Output '-----'
         Write-Output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir }))
+        Write-Output '-----'
     }
 }
 
@@ -421,7 +422,7 @@ function show_suggestions($suggested) {
             }
 
             if (!$fulfilled) {
-                Write-Host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
+                Write-Host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'." -ForegroundColor DarkYellow
             }
         }
     }

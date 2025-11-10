@@ -90,7 +90,7 @@ function load_cfg($file) {
         $content = [System.IO.File]::ReadAllLines($file)
         return ($content | ConvertFrom-Json -ErrorAction Stop)
     } catch {
-        Write-Host "ERROR loading $file`: $($_.exception.message)"
+        error "loading $file`: $($_.exception.message)"
     }
 }
 
@@ -276,7 +276,7 @@ function Invoke-GitLog {
             }
             $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
         }
-        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
+        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', '--grep=^(chore)', '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
     }
 }
 
@@ -353,7 +353,7 @@ function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 function currentdir($app, $global) {
-    if (get_config NO_JUNCTION) {
+    if ((get_config NO_JUNCTION) -and ($app -ne 'scoop')) {
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'
@@ -555,7 +555,7 @@ function app_status($app, $global) {
     $status.hold = ($install_info.hold -eq $true)
 
     $deprecated_dir = (Find-BucketDirectory -Name $install_info.bucket -Root) + "\deprecated"
-    $status.deprecated = (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
+    $status.deprecated = (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse -ErrorAction Ignore).FullName
 
     $manifest = manifest $app $install_info.bucket $install_info.url
     $status.removed = (!$manifest)
@@ -622,7 +622,14 @@ function Get-AbsolutePath {
         $Path
     )
     process {
-        return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+        $resolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+        if ($resolvedPath -match '[\\/]$') {
+            $root = [System.IO.Path]::GetPathRoot($resolvedPath)
+            if ($resolvedPath -ine $root) {
+                $resolvedPath = $resolvedPath.TrimEnd([char[]]@('\', '/'))
+            }
+        }
+        return $resolvedPath
     }
 }
 

@@ -48,7 +48,7 @@ if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
 }
 
 $opt, $other, $err = getopt $Args 'g' 'global'
-if ($err) { "scoop shim: $err"; exit 1 }
+if ($err) { error "scoop shim: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 
@@ -147,8 +147,7 @@ switch ($SubCommand) {
                 $pattern = $_
                 [void][Regex]::New($pattern)
             } catch {
-                Write-Host "ERROR: Invalid pattern: " -ForegroundColor Red -NoNewline
-                Write-Host $pattern -ForegroundColor Magenta
+                error "Invalid pattern: $([char]0x1b)[35m$pattern$([char]0x1b)[0m"
                 exit 1
             }
         }
