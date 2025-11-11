@@ -391,7 +391,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         }
 
         if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
-            Write-Output "Loading $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m from cache."
+            Write-Host "Loading $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m from cache."
         } else {
             $download_finished = $false
             # create aria2 input file content
@@ -729,7 +729,7 @@ function check_hash($file, $hash, $app_name) {
         return $true, $null
     }
 
-    Write-Output "Checking hash of $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m..."
+    Write-Host "Checking hash of $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m... " -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
         return $false, "Hash type '$algorithm' isn't supported."
