@@ -112,7 +112,7 @@ switch ($SubCommand) {
             }
         }
         if ($commandPath -and (Test-Path $commandPath)) {
-            Write-Host "Adding $(if ($global) {'global'} else {'local'}) shim $([char]0x1b)[36m$shimName$([char]0x1b)[0m..."
+            Write-Host "Adding $(if ($global) { 'global' } else { 'local' }) shim $([char]0x1b)[36m$shimName$([char]0x1b)[0m..."
             shim $commandPath $global $shimName $commandArgs
         } else {
             error "Command path does not exist: $([char]0x1b)[36m$($other[1])$([char]0x1b)[31m"
@@ -130,7 +130,7 @@ switch ($SubCommand) {
         }
         if ($failed) {
             $failed | ForEach-Object {
-                error "$(if ($global) { 'Global' } else {'Local' }) shim not found: $([char]0x1b)[36m$_$([char]0x1b)[31m"
+                error "$(if ($global) { 'Global' } else { 'Local' }) shim not found: $([char]0x1b)[36m$_$([char]0x1b)[31m"
             }
             exit 3
         }
@@ -169,7 +169,7 @@ switch ($SubCommand) {
         } else {
             error "$(if ($global) { 'Global' } else { 'Local' }) shim not found: $([char]0x1b)[36m$shimName$([char]0x1b)[31m"
             if (Get-ShimPath $shimName (!$global)) {
-                Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, run 'scoop shim info $shimName$(if (!$global) { ' --global' })' to show its info."
+                Write-Host "But a $(if ($global) { 'local' } else { 'global' }) shim exists, run 'scoop shim info $shimName$(if (!$global) { ' --global' })' to show its info."
                 exit 2
             }
             exit 3
@@ -210,7 +210,7 @@ switch ($SubCommand) {
         } else {
             error "$(if ($global) { 'Global' } else { 'Local' }) shim not found: $([char]0x1b)[36m$shimName$([char]0x1b)[31m"
             if (Get-ShimPath $shimName (!$global)) {
-                Write-Host "But a $(if ($global) { 'local' } else {'global' }) shim exists, run 'scoop shim alter $shimName$(if (!$global) { ' --global' })' to alternate its source."
+                Write-Host "But a $(if ($global) { 'local' } else { 'global' }) shim exists, run 'scoop shim alter $shimName$(if (!$global) { ' --global' })' to alternate its source."
                 exit 2
             }
             exit 3
