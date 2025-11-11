@@ -2,11 +2,16 @@
 
 ### Features
 
+- **install:** Add output for the setting and removal of environment variables ([#6460](https://github.com/ScoopInstaller/Scoop/issues/6460))
 - **scoop-uninstall:** Allow access to `$bucket` in uninstall scripts ([#6380](https://github.com/ScoopInstaller/Scoop/issues/6380))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
+- **download|scoop-download:** Add GitHub issue prompt when the default downloader fails ([#6539](https://github.com/ScoopInstaller/Scoop/issues/6539))
+- **download|scoop-config:** Allow disabling automatic fallback to the default downloader when Aria2c download fails ([#6538](https://github.com/ScoopInstaller/Scoop/issues/6538))
 
 ### Bug Fixes
 
+- **core:** Fix the grep parameter in the `Invoke-GitLog` function ([#6407](https://github.com/ScoopInstaller/Scoop/issues/6407))
+- **buckets:** Fix the filtering condition when retrieving the number of manifests ([#6509](https://github.com/ScoopInstaller/Scoop/issues/6509))
 - **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
 - **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
 - **scoop-update:** Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
@@ -17,6 +22,8 @@
 - **path:** Trim ending slash when initializing paths ([#6501](https://github.com/ScoopInstaller/Scoop/issues/6501))
 - **checkver:** Allow script to run when URL fetch fails but script exists ([#6490](https://github.com/ScoopInstaller/Scoop/issues/6490))
 - **uninstall:** Import `url_filename` from `download.ps1` ([#6530](https://github.com/ScoopInstaller/Scoop/issues/6530))
+- **schema:** Add missing `hash.mode` value `github` ([#6533](https://github.com/ScoopInstaller/Scoop/issues/6533))
+- **core:** Skip NO_JUNCTION logic when $app is 'scoop' in `currentdir` function ([#6541](https://github.com/ScoopInstaller/Scoop/issues/6541))
 
 ### Code Refactoring
 
@@ -26,14 +33,14 @@
 
 ### Features
 
-**autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
+- **autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
 
 ### Bug Fixes
 
 - **scoop-download|install|update:** Fallback to default downloader when aria2 fails ([#4292](https://github.com/ScoopInstaller/Scoop/issues/4292))
-- **decompress**: `Expand-7zipArchive` only delete temp dir / `$extractDir` if it is empty ([#6092](https://github.com/ScoopInstaller/Scoop/issues/6092))
-- **decompress**: Replace deprecated 7ZIPEXTRACT_USE_EXTERNAL config with USE_EXTERNAL_7ZIP ([#6327](https://github.com/ScoopInstaller/Scoop/issues/6327))
-- **commands**: Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
+- **decompress:** `Expand-7zipArchive` only delete temp dir / `$extractDir` if it is empty ([#6092](https://github.com/ScoopInstaller/Scoop/issues/6092))
+- **decompress:** Replace deprecated 7ZIPEXTRACT_USE_EXTERNAL config with USE_EXTERNAL_7ZIP ([#6327](https://github.com/ScoopInstaller/Scoop/issues/6327))
+- **commands:** Handling broken aliases ([#6141](https://github.com/ScoopInstaller/Scoop/issues/6141))
 - **shim:** Do not suppress `stderr`, properly check `wslpath`/`cygpath` command first ([#6114](https://github.com/ScoopInstaller/Scoop/issues/6114))
 - **scoop-bucket:** Add missing import for `no_junction` envs ([#6181](https://github.com/ScoopInstaller/Scoop/issues/6181))
 - **scoop-uninstall:** Fix uninstaller does not gain Global state ([#6430](https://github.com/ScoopInstaller/Scoop/issues/6430))

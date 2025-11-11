@@ -338,6 +338,7 @@ function env_set($manifest, $global, $arch) {
         $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
             $name = $_.Name
             $val = $ExecutionContext.InvokeCommand.ExpandString($env_set.$($name))
+            Write-Output "Setting $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m = $([char]0x1b)[35m$val$([char]0x1b)[0m"
             Set-EnvVar -Name $name -Value $val -Global:$global
             Set-Content env:\$name $val
         }
@@ -348,6 +349,7 @@ function env_rm($manifest, $global, $arch) {
     if ($env_set) {
         $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
             $name = $_.Name
+            Write-Output "Removing $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m"
             Set-EnvVar -Name $name -Value $null -Global:$global
             if (Test-Path env:\$name) { Remove-Item env:\$name }
         }
