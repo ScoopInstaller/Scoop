@@ -574,7 +574,7 @@ function setup_proxy() {
             [net.webrequest]::defaultwebproxy.credentials = New-Object net.networkcredential($username, $password)
         }
         if ($no_proxy) {
-            $bypass_list = $no_proxy -split "\s*,\s*"
+            $bypass_list = $no_proxy.Trim() -split "\s*,\s*" | Where-Object { $_ -ne '' }
             [net.webrequest]::defaultwebproxy.BypassList = $bypass_list
         }
     } catch {
