@@ -281,11 +281,16 @@ while ($in_progress -gt 0) {
         }
         $err = $ev.SourceEventArgs.Error
         if ($err) {
-            next "$($err.message)`r`nURL $url is not valid"
-            continue
+            if (!$script) {
+                next "$($err.message)`r`nURL $url is not valid"
+                continue
+            } else {
+                # Run script despite URL download failure
+                Write-Host "$($err.message)`r`nURL $url is not valid. Falling back to checkver.script ..."
+            }
         }
 
-        if ($url) {
+        if ($url -and !$err) {
             $ms = New-Object System.IO.MemoryStream
             $ms.Write($result, 0, $result.Length)
             $ms.Seek(0, 0) | Out-Null

@@ -23,7 +23,8 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                 Invoke-CachedDownload $app $version $url "$dir\$fname" $cookies $use_cache
             } catch {
                 Write-Host -ForegroundColor DarkRed $_
-                abort "URL $url is not valid"
+                error "URL $url is not valid"
+                abort $(new_issue_msg $app $bucket 'download failed')
             }
 
             if ($check_hash) {
@@ -390,9 +391,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         }
 
         if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
-            Write-Host 'Loading ' -NoNewline
-            Write-Host $(url_remote_filename $url) -ForegroundColor Cyan -NoNewline
-            Write-Host ' from cache.'
+            Write-Host "Loading $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m from cache."
         } else {
             $download_finished = $false
             # create aria2 input file content
@@ -424,7 +423,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
-        Write-Host 'Starting download with aria2 ...'
+        Write-Host 'Starting download with aria2...'
 
         # Set console output encoding to UTF8 for non-ASCII characters printing
         $oriConsoleEncoding = [Console]::OutputEncoding
@@ -454,12 +453,18 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         Write-Host ''
 
         if ($lastexitcode -gt 0) {
+            if (get_config ARIA2-FALLBACK-DISABLED) {
+                error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
+                error $urlstxt_content
+                error $aria2
+                abort $(new_issue_msg $app $bucket 'download via aria2 failed')
+            }
+
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
             warn $urlstxt_content
             warn $aria2
-            warn $(new_issue_msg $app $bucket "download via aria2 failed")
 
-            Write-Host "Fallback to default downloader ..."
+            Write-Host 'Fallback to default downloader...'
 
             try {
                 foreach ($url in $urls) {
@@ -467,7 +472,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 }
             } catch {
                 Write-Host $_ -ForegroundColor DarkRed
-                abort "URL $url is not valid"
+                error "URL $url is not valid"
+                abort $(new_issue_msg $app $bucket 'download failed')
             }
         }
 
@@ -723,9 +729,7 @@ function check_hash($file, $hash, $app_name) {
         return $true, $null
     }
 
-    Write-Host 'Checking hash of ' -NoNewline
-    Write-Host $(url_remote_filename $url) -ForegroundColor Cyan -NoNewline
-    Write-Host ' ... ' -NoNewline
+    Write-Host "Checking hash of $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m... " -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
         return $false, "Hash type '$algorithm' isn't supported."
@@ -747,7 +751,7 @@ function check_hash($file, $hash, $app_name) {
         }
         return $false, $msg
     }
-    Write-Host 'ok.' -f Green
+    Write-Host 'OK.' -f Green
     return $true, $null
 }
 

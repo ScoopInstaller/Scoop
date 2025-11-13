@@ -113,7 +113,7 @@ function list_buckets {
             $bucket.Source = friendly_path $path
             $bucket.Updated = (Get-Item "$path\bucket" -ErrorAction SilentlyContinue).LastWriteTime
         }
-        $bucket.Manifests = Get-ChildItem "$path\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
+        $bucket.Manifests = Get-ChildItem -Path "$path\bucket" -Filter "*.json" -File -Force -Recurse -ErrorAction SilentlyContinue |
                 Measure-Object | Select-Object -ExpandProperty Count
         $buckets += [PSCustomObject]$bucket
     }
@@ -160,7 +160,7 @@ function add_bucket($name, $repo) {
         Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
         return 1
     }
-    Write-Host 'OK'
+    Write-Host 'OK.'
     if (get_config USE_SQLITE_CACHE) {
         info 'Updating cache...'
         Set-ScoopDB -Path (Get-ChildItem (Find-BucketDirectory $name) -Filter '*.json' -Recurse).FullName

@@ -109,6 +109,7 @@ foreach ($curr_app in $apps) {
             } catch {
                 write-host -f darkred $_
                 error "URL $url is not valid"
+                error $(new_issue_msg $app $bucket 'download failed')
                 $dl_failure = $true
                 continue
             }
