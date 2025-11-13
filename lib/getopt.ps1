@@ -10,9 +10,9 @@
 # returns @(opts hash, remaining_args array, error string)
 # NOTES:
 #    The first "--" or "--%" in $argv, if any, will terminate all options; any
-# following arguments are treated as non-option arguments, even if
-# they begin with a hyphen. The terminator token itself ("--" or "--%") will not be included.
-# (POSIX-compatible)function getopt([String[]]$argv, [String]$shortopts, [String[]]$longopts) {
+#    following arguments are treated as non-option arguments, even if
+#    they begin with a hyphen. The terminator token itself ("--" or "--%")
+#    will not be included. (POSIX-compatible)
 function getopt([String[]]$argv, [String]$shortopts, [String[]]$longopts) {
     $opts = @{}; $rem = @()
 

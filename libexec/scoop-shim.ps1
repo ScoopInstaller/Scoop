@@ -27,6 +27,7 @@
 #
 # HINT: The FIRST terminator token ('--' or PowerShell '--%'), if any, is treated as the option
 # terminator and will NOT be included; everything after it is passed to the shim.
+# So if you want to pass arguments like '-g' or '--global' to the shim, put them after a '--' or '--%'.
 # Examples:
 #     POSIX-style:    scoop shim add myapp 'D:\path\myapp.exe' '--' myapp_args --global
 #     PowerShell:     scoop shim add myapp D:\path\myapp.exe --% myapp_args --global
