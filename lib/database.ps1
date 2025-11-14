@@ -266,6 +266,7 @@ function Select-ScoopDBItem {
     end {
         $resultCopy = $result.Copy()
         $dbAdapter.Dispose()
+        $dbCommand.Dispose()
         $db.Dispose()
         # Use Write-Output to ensure PowerShell properly returns the DataTable
         Write-Output $resultCopy -NoEnumerate
@@ -295,13 +296,13 @@ function Select-ScoopDBItem {
 function Get-ScoopDBItem {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory, Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
         [string]
         $Name,
-        [Parameter(Mandatory, Position = 1, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, Position = 1)]
         [string]
         $Bucket,
-        [Parameter(Position = 2, ValueFromPipelineByPropertyName)]
+        [Parameter(Position = 2)]
         [string]
         $Version
     )
