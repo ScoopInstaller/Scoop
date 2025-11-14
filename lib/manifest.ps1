@@ -219,8 +219,6 @@ function Find-HistoricalManifestInCache($app, $bucket, $requestedVersion) {
 
     $dbResult = Get-ScoopDBItem -Name $app -Bucket $bucket -Version $requestedVersion
 
-    # Strictly follow DB contract: must be DataTable with at least one row
-    if (-not ($dbResult -is [System.Data.DataTable])) { return $null }
     if ($dbResult.Rows.Count -eq 0) { return $null }
 
     $manifestText = $dbResult.Rows[0]['manifest']
@@ -231,8 +229,6 @@ function Find-HistoricalManifestInCache($app, $bucket, $requestedVersion) {
     $manifestVersion = if ($manifestObj -and $manifestObj.version) { $manifestObj.version } else { $requestedVersion }
 
     return @{ ManifestText = $manifestText; version = $manifestVersion; source = "sqlite_exact_match" }
-
-    return $null
 }
 
 function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
@@ -265,12 +261,12 @@ function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
         # Prefer precise regex match on version line, fallback to -S literal
         $pattern = '"version"\s*:\s*"' + [regex]::Escape($requestedVersion) + '"'
         $commits = @()
-        $outG = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','-n','1','--format=%H','-G',$pattern,'--',$relativeManifestPath)
+        $outG = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '-n', '1', '--format=%H', '-G', $pattern, '--', $relativeManifestPath)
         if ($outG) { $commits = @($outG | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
 
         if ($commits.Count -eq 0) {
             $searchLiteral = '"version": "' + $requestedVersion + '"'
-            $outS = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','-n','1','--format=%H','-S',$searchLiteral,'--',$relativeManifestPath)
+            $outS = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '-n', '1', '--format=%H', '-S', $searchLiteral, '--', $relativeManifestPath)
             if ($outS) { $commits = @($outS | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
         }
 
@@ -279,7 +275,7 @@ function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
         $h = $commits[0]
 
         # First try parent snapshot (latest state before change), then the change itself
-        foreach ($spec in @("$h^","$h")) {
+        foreach ($spec in @("$h^", "$h")) {
             $content = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$spec`:$relativeManifestPath")
             if (-not $content -or ($LASTEXITCODE -ne 0)) { continue }
             if ($content -is [Array]) { $content = $content -join "`n" }
@@ -292,7 +288,7 @@ function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
         }
 
         # Fallback: iterate recent commits that touched the version string and validate
-        $outAll = Invoke-Git -Path $bucketDir -ArgumentList @('log','--follow','--format=%H','-G',$pattern,'--',$relativeManifestPath)
+        $outAll = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '--format=%H', '-G', $pattern, '--', $relativeManifestPath)
         $allCommits = @()
         if ($outAll) { $allCommits = @($outAll | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
 
@@ -335,8 +331,6 @@ function Find-HistoricalManifest($app, $bucket, $version) {
             return $result
         }
     }
-
-    return $null
 }
 
 
@@ -378,12 +372,11 @@ function extract_to($manifest, $arch) { arch_specific 'extract_to' $manifest $ar
 # Helper: write manifest text to user manifests cache directory and return path
 function Write-ManifestToUserCache {
     param(
-        [Parameter(Mandatory=$true, Position=0)][string]$App,
-        [Parameter(Mandatory=$true, Position=1)][string]$ManifestText
+        [Parameter(Mandatory = $true, Position = 0)][string]$App,
+        [Parameter(Mandatory = $true, Position = 1)][string]$ManifestText
     )
     ensure (usermanifestsdir) | Out-Null
     $tempManifestPath = "$(usermanifestsdir)\$App.json"
     $ManifestText | Out-UTF8File -FilePath $tempManifestPath
     return $tempManifestPath
 }
-
