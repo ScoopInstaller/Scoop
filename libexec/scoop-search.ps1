@@ -158,7 +158,7 @@ function search_remotes($query) {
 
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
-    Select-ScoopDBItem $query -From @('name', 'binary', 'shortcut') |
+    Find-ScoopDBItem $query -From @('name', 'binary', 'shortcut') |
         Select-Object -Property name, version, bucket, binary |
         ForEach-Object {
             $list.Add([PSCustomObject]@{

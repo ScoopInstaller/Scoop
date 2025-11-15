@@ -219,9 +219,9 @@ function Set-ScoopDB {
 
 <#
 .SYNOPSIS
-    Select Scoop database item(s).
+    Find Scoop database item(s).
 .DESCRIPTION
-    Select item(s) from the Scoop SQLite database.
+    Find item(s) from the Scoop SQLite database.
     The pattern is matched against the name, binaries, and shortcuts columns for apps.
 .PARAMETER Pattern
     System.String
@@ -233,9 +233,9 @@ function Set-ScoopDB {
     System.String
 .OUTPUTS
     System.Data.DataTable
-    The selected database item(s).
+    The found database item(s).
 #>
-function Select-ScoopDBItem {
+function Find-ScoopDBItem {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
