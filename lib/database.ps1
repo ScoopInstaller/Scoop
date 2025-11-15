@@ -264,6 +264,7 @@ function Find-ScoopDBItem {
         [void]$dbAdapter.Fill($result)
     }
     end {
+        $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
         return $result
@@ -326,6 +327,7 @@ function Get-ScoopDBItem {
         [void]$dbAdapter.Fill($result)
     }
     end {
+        $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
         return $result
