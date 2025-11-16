@@ -292,6 +292,9 @@ while ($in_progress -gt 0) {
             }
         }
 
+        $page = $null
+        $source = $url
+
         if ($url -and !$err) {
             $ms = New-Object System.IO.MemoryStream
             $ms.Write($result, 0, $result.Length)
@@ -301,7 +304,7 @@ while ($in_progress -gt 0) {
             }
             $page = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
         }
-        $source = $url
+
         if ($script) {
             $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
             $source = 'the output of script'
