@@ -32,6 +32,10 @@
 - **output:** Replace raw prints with functions for standardized output ([#6449](https://github.com/ScoopInstaller/Scoop/issues/6449))
 - **output:** Combine the separated outputs into a single output ([#6545](https://github.com/ScoopInstaller/Scoop/issues/6545))
 
+### Builds
+
+- **supporting:** Update System.Data.SQLite to 2.0.2 ([#6555](https://github.com/ScoopInstaller/Scoop/issues/6555))
+
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
 ### Features
