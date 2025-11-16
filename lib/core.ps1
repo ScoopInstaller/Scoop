@@ -276,7 +276,7 @@ function Invoke-GitLog {
             }
             $Name = "%Cgreen$($Name.PadRight(12, ' ').Substring(0, 12))%Creset "
         }
-        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', "--grep='^(chore)'", '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
+        Invoke-Git -Path $Path -ArgumentList @('--no-pager', 'log', '--color', '--no-decorate', '--grep=^(chore)', '--invert-grep', '--abbrev=12', "--format=tformat: * %C(yellow)%h%Creset %<|(72,trunc)%s $Name%C(cyan)%cr%Creset", "$CommitHash..HEAD")
     }
 }
 
@@ -353,7 +353,7 @@ function appdir($app, $global) { "$(appsdir $global)\$app" }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 function currentdir($app, $global) {
-    if (get_config NO_JUNCTION) {
+    if ((get_config NO_JUNCTION) -and ($app -ne 'scoop')) {
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'
@@ -622,7 +622,14 @@ function Get-AbsolutePath {
         $Path
     )
     process {
-        return $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+        $resolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+        if ($resolvedPath -match '[\\/]$') {
+            $root = [System.IO.Path]::GetPathRoot($resolvedPath)
+            if ($resolvedPath -ine $root) {
+                $resolvedPath = $resolvedPath.TrimEnd([char[]]@('\', '/'))
+            }
+        }
+        return $resolvedPath
     }
 }
 
@@ -743,7 +750,7 @@ function Invoke-ExternalCommand {
         [void]$Process.Start()
     } catch {
         if ($Activity) {
-            Write-Host "error." -ForegroundColor DarkRed
+            Write-Host "Error." -ForegroundColor DarkRed
         }
         error $_.Exception.Message
         return $false
@@ -762,20 +769,20 @@ function Invoke-ExternalCommand {
     if ($Process.ExitCode -ne 0) {
         if ($ContinueExitCodes -and ($ContinueExitCodes.ContainsKey($Process.ExitCode))) {
             if ($Activity) {
-                Write-Host "done." -ForegroundColor DarkYellow
+                Write-Host "Done." -ForegroundColor DarkYellow
             }
             warn $ContinueExitCodes[$Process.ExitCode]
             return $true
         } else {
             if ($Activity) {
-                Write-Host "error." -ForegroundColor DarkRed
+                Write-Host "Error." -ForegroundColor DarkRed
             }
             error "Exit code was $($Process.ExitCode)!"
             return $false
         }
     }
     if ($Activity) {
-        Write-Host "done." -ForegroundColor Green
+        Write-Host "Done." -ForegroundColor Green
     }
     return $true
 }

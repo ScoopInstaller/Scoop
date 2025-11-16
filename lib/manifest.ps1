@@ -18,8 +18,8 @@ function url_manifest($url) {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $data = $wc.DownloadData($url)
         $str = (Get-Encoding($wc)).GetString($data)
-    } catch [system.management.automation.methodinvocationexception] {
-        warn "error: $($_.exception.innerexception.message)"
+    } catch [System.Management.Automation.MethodInvocationException] {
+        error $_.Exception.InnerException.Message
     } catch {
         throw
     }

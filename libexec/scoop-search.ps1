@@ -140,8 +140,7 @@ function search_remotes($query) {
     } | Where-Object { $_.results }
 
     if ($results.count -gt 0) {
-        Write-Host "Results from other known buckets...
-(add them using 'scoop bucket add <bucket name>')"
+        Write-Host "Results from other known buckets...`n(add them using 'scoop bucket add <bucket name>')"
     }
 
     $remote_list = @()
