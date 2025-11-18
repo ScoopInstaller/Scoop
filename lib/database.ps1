@@ -323,7 +323,9 @@ function Get-ScoopDBItem {
     process {
         $dbCommand.Parameters.AddWithValue('@Name', $Name) | Out-Null
         $dbCommand.Parameters.AddWithValue('@Bucket', $Bucket) | Out-Null
-        $dbCommand.Parameters.AddWithValue('@Version', $Version) | Out-Null
+        if ($Version) {
+            $dbCommand.Parameters.AddWithValue('@Version', $Version) | Out-Null
+        }
         [void]$dbAdapter.Fill($result)
     }
     end {
