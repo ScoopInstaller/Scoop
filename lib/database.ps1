@@ -4,10 +4,11 @@
 .SYNOPSIS
     Get SQLite .NET driver
 .DESCRIPTION
-    Download and extract the SQLite .NET driver from NuGet.
+    Download and extract the SQLite .NET driver and SQLite precompiled binaries.
+    The SQLite version is automatically detected from the download page.
 .PARAMETER Version
     System.String
-    The version of the SQLite .NET driver to download.
+    The version of the System.Data.SQLite NuGet package to download. (require version 2.0.0 or higher)
 .INPUTS
     None
 .OUTPUTS
@@ -18,18 +19,41 @@ function Get-SQLite {
     param (
         [string]$Version = '2.0.2'
     )
-    # Install SQLite
     try {
-        Write-Host "Downloading System.Data.SQLite $Version..." -ForegroundColor DarkYellow
-        $sqlitePkgPath = "$env:TEMP\sqlite.zip"
+        $sqliteNetPath = "$env:TEMP\sqlite.net.zip"
+        $sqliteDllPath = "$env:TEMP\sqlite.dll.zip"
         $sqliteTempPath = "$env:TEMP\sqlite"
         $sqlitePath = "$PSScriptRoot\..\supporting\sqlite"
-        Invoke-WebRequest -Uri "https://globalcdn.nuget.org/packages/system.data.sqlite.$version.nupkg" -OutFile $sqlitePkgPath
-        Write-Host "Extracting System.Data.SQLite $Version... " -ForegroundColor DarkYellow -NoNewline
-        Expand-Archive -Path $sqlitePkgPath -DestinationPath $sqliteTempPath -Force
-        New-Item -Path $sqlitePath -ItemType Directory -Force | Out-Null
+
+        $arch = switch (Get-DefaultArchitecture) {
+            '32bit' { 'x86' }
+            '64bit' { 'x64' }
+            'arm64' { 'arm64' }
+            default { Write-Warning "Unknown architecture, using x64 as fallback"; 'x64' }
+        }
+
+        Write-Host "Downloading System.Data.SQLite $Version..." -ForegroundColor DarkYellow
+        Invoke-WebRequest -Uri "https://globalcdn.nuget.org/packages/system.data.sqlite.$Version.nupkg" -OutFile $sqliteNetPath
+
+        $downloadPage = Invoke-WebRequest -Uri 'https://sqlite.org/download.html' -UseBasicParsing
+        if ($downloadPage.Content -match '(?s)<!-- Download product data.*?(PRODUCT,.+?)-->') {
+            $productData = $Matches[1] | ConvertFrom-Csv
+        } else {
+            throw "Failed to parse SQLite download page product data"
+        }
+        $matchRow = $productData | Where-Object { $_.'RELATIVE-URL' -match "sqlite-dll-win-$arch-" }
+        if (-not $matchRow) {
+            throw "SQLite DLL for architecture $arch not found"
+        }
+        Write-Host "Downloading SQLite DLL $($matchRow.VERSION)..." -ForegroundColor DarkYellow
+        Invoke-WebRequest -Uri "https://sqlite.org/$($matchRow.'RELATIVE-URL')" -OutFile $sqliteDllPath
+
+        Write-Host "Extracting libraries... " -ForegroundColor DarkYellow -NoNewline
+        $sqliteNetPath, $sqliteDllPath | Expand-Archive -DestinationPath $sqliteTempPath -Force
+        $null = New-Item -Path "$sqlitePath\$arch" -ItemType Directory -Force
         Move-Item -Path "$sqliteTempPath\lib\netstandard2.0\System.Data.SQLite.dll" -Destination $sqlitePath -Force
-        Remove-Item -Path $sqlitePkgPath, $sqliteTempPath -Recurse -Force
+        Move-Item -Path "$sqliteTempPath\sqlite3.dll" -Destination "$sqlitePath\$arch\e_sqlite3.dll" -Force
+        Remove-Item -Path $sqliteNetPath, $sqliteDllPath, $sqliteTempPath -Recurse -Force
         Write-Host 'Done.' -ForegroundColor DarkYellow
         return $true
     } catch {
