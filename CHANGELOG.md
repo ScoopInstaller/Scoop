@@ -35,7 +35,7 @@
 
 ### Builds
 
-- **supporting:** Update System.Data.SQLite to 2.0.2 ([#6555](https://github.com/ScoopInstaller/Scoop/issues/6555))
+- **supporting:** Update System.Data.SQLite to 2.0.2 ([#6555](https://github.com/ScoopInstaller/Scoop/issues/6555), [#6560](https://github.com/ScoopInstaller/Scoop/issues/6560))
 
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
