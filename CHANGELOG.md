@@ -27,6 +27,7 @@
 - **uninstall:** Import `url_filename` from `download.ps1` ([#6530](https://github.com/ScoopInstaller/Scoop/issues/6530))
 - **schema:** Add missing `hash.mode` value `github` ([#6533](https://github.com/ScoopInstaller/Scoop/issues/6533))
 - **core:** Skip NO_JUNCTION logic when $app is 'scoop' in `currentdir` function ([#6541](https://github.com/ScoopInstaller/Scoop/issues/6541))
+- **core:** Fix substitute handling of substring keys ([#6561](https://github.com/ScoopInstaller/Scoop/issues/6561))
 
 ### Code Refactoring
 

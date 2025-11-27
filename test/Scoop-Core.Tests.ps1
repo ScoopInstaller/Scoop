@@ -393,3 +393,17 @@ Describe 'Format Architecture String' -Tag 'Scoop' {
         { Format-ArchitectureString 'PPC' } | Should -Throw "Invalid architecture: 'ppc'"
     }
 }
+
+Describe 'substitute' -Tag 'Scoop' {
+    It 'should properly handle keys that are substrings of other keys' {
+        $params = @{}
+
+        # Run repeatedly (10 times) to reduce the likelihood of accidental correct ordering.
+        1 .. 10 | ForEach-Object {
+            $params["`$name$($_)"] = "$($_).exe"
+            $params["`$name$($_)NoExt"] = "$_"
+
+            substitute ("`$name$($_)NoExt") $params $false | Should -Be "$_"
+        }
+    }
+}
