@@ -36,7 +36,7 @@
 . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
 
 $opt, $apps, $err = getopt $args 'asnup' @('all', 'scan', 'no-depends', 'no-update-scoop', 'passthru')
-if ($err) { "scoop virustotal: $err"; exit 1 }
+if ($err) { error "scoop virustotal: $err"; exit 1 }
 $all = $apps -eq '*' -or $opt.a -or $opt.all
 if (!$apps -and !$all) { my_usage; exit 1 }
 $architecture = Get-DefaultArchitecture

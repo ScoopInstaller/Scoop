@@ -25,6 +25,7 @@
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'generate_user_manifest' 'Get-Manifest'
 . "$PSScriptRoot\..\lib\download.ps1"
+. "$PSScriptRoot\..\lib\install.ps1" # 'nightly_version'
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
@@ -108,6 +109,7 @@ foreach ($curr_app in $apps) {
             } catch {
                 write-host -f darkred $_
                 error "URL $url is not valid"
+                error $(new_issue_msg $app $bucket 'download failed')
                 $dl_failure = $true
                 continue
             }

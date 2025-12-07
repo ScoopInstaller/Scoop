@@ -140,8 +140,7 @@ function search_remotes($query) {
     } | Where-Object { $_.results }
 
     if ($results.count -gt 0) {
-        Write-Host "Results from other known buckets...
-(add them using 'scoop bucket add <bucket name>')"
+        Write-Host "Results from other known buckets...`n(add them using 'scoop bucket add <bucket name>')"
     }
 
     $remote_list = @()
@@ -159,7 +158,7 @@ function search_remotes($query) {
 
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
-    Select-ScoopDBItem $query -From @('name', 'binary', 'shortcut') |
+    Find-ScoopDBItem $query -From @('name', 'binary', 'shortcut') |
         Select-Object -Property name, version, bucket, binary |
         ForEach-Object {
             $list.Add([PSCustomObject]@{
