@@ -159,7 +159,7 @@ $Queue | ForEach-Object {
     if ($json.checkver.github) {
         $url = $json.checkver.github.TrimEnd('/') + '/releases/latest'
         $regex = $githubRegex
-        if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
+        $useGithubAPI = $true
     }
 
     # SourceForge
