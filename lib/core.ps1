@@ -1209,11 +1209,12 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
         $newentity = $entity.PSObject.Copy()
         switch ($entity.GetType().Name) {
             'String' {
-                $params.GetEnumerator() | ForEach-Object {
-                    if ($regexEscape -eq $false -or $null -eq $_.Value) {
-                        $newentity = $newentity.Replace($_.Name, $_.Value)
+                $params.Keys | Sort-Object Length -Descending | ForEach-Object {
+                    $value = $params[$_]
+                    if ($regexEscape -eq $false -or $null -eq $value) {
+                        $newentity = $newentity.Replace($_, $value)
                     } else {
-                        $newentity = $newentity.Replace($_.Name, [Regex]::Escape($_.Value))
+                        $newentity = $newentity.Replace($_, [Regex]::Escape($value))
                     }
                 }
             }
