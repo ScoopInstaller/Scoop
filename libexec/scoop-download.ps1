@@ -42,6 +42,8 @@ try {
     abort "ERROR: $_"
 }
 
+$apps = $apps | Select-Object -Unique
+
 if (!$apps) { error '<app> missing'; my_usage; exit 1 }
 
 if (is_scoop_outdated) {
@@ -100,6 +102,8 @@ foreach ($curr_app in $apps) {
         continue
     }
 
+    $dl_failure = $false
+
     if(Test-Aria2Enabled) {
         Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash
     } else {
@@ -129,6 +133,7 @@ foreach ($curr_app in $apps) {
                         warn 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     error (new_issue_msg $app $bucket "hash check failed")
+                    $dl_failure = $true
                     continue
                 }
             } else {
