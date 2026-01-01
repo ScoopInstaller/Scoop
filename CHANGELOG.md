@@ -17,6 +17,7 @@
 - **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
 - **scoop-update:** Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
 - **autoupdate:** Use origin URL to handle URLs with fragment in GitHub mode ([#6455](https://github.com/ScoopInstaller/Scoop/issues/6455))
+- **autoupdate:** Ensure GitHub API requests use token ([#6535](https://github.com/ScoopInstaller/Scoop/issues/6535))
 - **buckets|scoop-info:** Switch git log date format to ISO 8601 to avoid locale issues ([#6446](https://github.com/ScoopInstaller/Scoop/issues/6446))
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
 - **getopt:** Teach getopt to respect the `--%` token ([#6477](https://github.com/ScoopInstaller/Scoop/issues/6477))
