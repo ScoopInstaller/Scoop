@@ -557,7 +557,9 @@ function app_status($app, $global) {
     $status.hold = ($install_info.hold -eq $true)
 
     $deprecated_dir = (Find-BucketDirectory -Name $install_info.bucket -Root) + "\deprecated"
-    $status.deprecated = (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse -ErrorAction Ignore).FullName
+    if (Test-Path $deprecated_dir) {
+        $status.deprecated = (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
+    }
 
     $manifest = manifest $app $install_info.bucket $install_info.url
     $status.removed = (!$manifest)
@@ -1214,11 +1216,12 @@ function substitute($entity, [Hashtable] $params, [Bool]$regexEscape = $false) {
         $newentity = $entity.PSObject.Copy()
         switch ($entity.GetType().Name) {
             'String' {
-                $params.GetEnumerator() | ForEach-Object {
-                    if ($regexEscape -eq $false -or $null -eq $_.Value) {
-                        $newentity = $newentity.Replace($_.Name, $_.Value)
+                $params.Keys | Sort-Object Length -Descending | ForEach-Object {
+                    $value = $params[$_]
+                    if ($regexEscape -eq $false -or $null -eq $value) {
+                        $newentity = $newentity.Replace($_, $value)
                     } else {
-                        $newentity = $newentity.Replace($_.Name, [Regex]::Escape($_.Value))
+                        $newentity = $newentity.Replace($_, [Regex]::Escape($value))
                     }
                 }
             }
