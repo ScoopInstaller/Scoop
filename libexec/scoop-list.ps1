@@ -48,7 +48,10 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $item.Updated = $updated
 
     $info = @()
-    if ((app_status $app $global).deprecated) { $info += 'Deprecated package' }
+    $deprecated_dir = (Find-BucketDirectory -Name $install_info.bucket -Root) + "\deprecated"
+    if ((Test-Path $deprecated_dir) -and (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse)) {
+        $info += 'Deprecated package'
+    }
     if ($global) { $info += 'Global install' }
     if (failed $app $global) { $info += 'Install failed' }
     if ($install_info.hold) { $info += 'Held package' }
