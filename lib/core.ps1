@@ -1309,3 +1309,6 @@ $scoopPathEnvVar = switch (get_config USE_ISOLATED_PATH) {
 
 # OS information
 $WindowsBuild = [System.Environment]::OSVersion.Version.Build
+
+# Ensure .git folder exists to prevent Windows Search indexing
+ensure "$scoopdir\.git" | Out-Null
