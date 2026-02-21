@@ -377,7 +377,7 @@ Describe 'Format Architecture String' -Tag 'Scoop' {
         Format-ArchitectureString 'x86_64-v4' | Should -Be '64bit-v4'
         Format-ArchitectureString 'x86-64_v4' | Should -Be '64bit-v4'
 
-        Format-ArchitectureString '64bit_v3' | Should -Be '64bit-v3'
+        Format-ArchitectureString '64bit-v3' | Should -Be '64bit-v3'
         Format-ArchitectureString '64bit_v3' | Should -Be '64bit-v3'
         Format-ArchitectureString 'avx2' | Should -Be '64bit-v3'
         Format-ArchitectureString 'amd64-v3' | Should -Be '64bit-v3'
