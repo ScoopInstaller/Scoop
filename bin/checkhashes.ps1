@@ -26,12 +26,12 @@ param(
     [String] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
-        if (!(Test-Path $_ -Type Container)) {
-            throw "$_ is not a directory!"
-        } else {
-            $true
-        }
-    })]
+            if (!(Test-Path $_ -Type Container)) {
+                throw "$_ is not a directory!"
+            } else {
+                $true
+            }
+        })]
     [String] $Dir,
     [Switch] $Update,
     [Switch] $ForceUpdate,
@@ -70,7 +70,7 @@ foreach ($single in Get-ChildItem $Dir -Filter "$App.json" -Recurse) {
     $urls = [System.Collections.ArrayList]::new()
     $hashes = [System.Collections.ArrayList]::new()
 
-    if ($manifest.url) {
+    $null = if ($manifest.url) {
         $manifest.url | ForEach-Object { $urls.Add($_) }
         $manifest.hash | ForEach-Object { $hashes.Add($_) }
     } elseif ($manifest.architecture) {

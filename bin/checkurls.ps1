@@ -15,12 +15,12 @@ param(
     [String] $App = '*',
     [Parameter(Mandatory = $true)]
     [ValidateScript( {
-        if (!(Test-Path $_ -Type Container)) {
-            throw "$_ is not a directory!"
-        } else {
-            $true
-        }
-    })]
+            if (!(Test-Path $_ -Type Container)) {
+                throw "$_ is not a directory!"
+            } else {
+                $true
+            }
+        })]
     [String] $Dir,
     [Int] $Timeout = 5,
     [Switch] $SkipValid
@@ -92,7 +92,7 @@ foreach ($man in $Queue) {
     $ok = $failed = 0
     $errors = [System.Collections.ArrayList]::new()
 
-    if ($manifest.url) {
+    $null = if ($manifest.url) {
         $manifest.url | ForEach-Object { $urls.Add($_) }
     } else {
         script:url $manifest '64bit' | ForEach-Object { $urls.Add($_) }
@@ -105,7 +105,7 @@ foreach ($man in $Queue) {
 
     $urls | ForEach-Object {
         $url, $status, $msg = test_dl $_ $manifest.cookie
-        if ($msg) { $errors.Add("$msg ($url)") }
+        $null = if ($msg) { $errors.Add("$msg ($url)") }
         if ($status -eq 'OK' -or $status -eq 'OpeningData') { ++$ok } else { ++$failed }
     }
 
