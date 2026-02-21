@@ -1076,7 +1076,7 @@ function Get-DefaultArchitecture {
                     return $out
                 }
             }
-            'X32' { return '32bit' }
+            'X86' { return '32bit' }
         }
     }
     if ($null -eq $arch) {
