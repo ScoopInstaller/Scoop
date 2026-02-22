@@ -555,7 +555,7 @@ function check_running_process($app, $global) {
     
     $servicesToStop = @()
     if ($forcekill) {
-        $wmi_dir = $processdir -replace '\\', '\\' -replace "'", "\'"
+        $wmi_dir = $processdir -replace '\\', '\\' -replace '_', '[_]' -replace "'", "''"
         $filter = "PathName LIKE '%$wmi_dir%'"
         $foundServices = @(Get-CimInstance -ClassName Win32_Service -Filter $filter)
         if ($foundServices) {
@@ -598,41 +598,52 @@ function stop_running_process($test_result) {
     $stopped_processes = @()
     $blocked = $test_result.Blocked
 
-    if ($running_processes.Count -gt 0) {
-        if ($forcekill) {
-            warn "The following instances of `"$app`" are still running. Scoop is configured to force kill them."
-            Write-Host ($running_processes | Out-String)
-            $stopped_processes = @($running_processes | Where-Object Path | Select-Object -ExpandProperty Path | Select-Object -Unique)
-            
-            foreach ($proc in $running_processes) {
-                try {
-                    Stop-Process -Id $proc.Id -Force -ErrorAction Stop
-                } catch {
-                    warn "Failed to stop process $($proc.Name) (ID $($proc.Id)): $($_.Exception.Message)"
+    if ($forcekill -and $servicesToStop.Count -gt 0 -and -not (is_admin)) {
+        warn 'Administrative privileges are required to stop the associated services. Aborting forcekill.'
+        $blocked = $true
+    } else {
+        if ($running_processes.Count -gt 0) {
+            if ($forcekill) {
+                warn "The following instances of `"$app`" are still running. Scoop is configured to force kill them."
+                Write-Host ($running_processes | Out-String)
+                
+                # Add all processes to the restart list. Warn admin if some can't be reliably restarted due to missing Paths.
+                foreach ($proc in $running_processes) {
+                    if ($proc.Path) {
+                        $stopped_processes += $proc.Path
+                    } else {
+                        warn "Process $($proc.Name) (ID $($proc.Id)) cannot be reliably restarted because its executable path is unreadable."
+                    }
                 }
-            }
-            
-            $still_running = @(Get-Process | Where-Object { $_.Path -like "$processdir\*" })
-            if ($still_running.Count -gt 0) {
-                warn "Some instances of `"$app`" could not be stopped."
+                if ($stopped_processes.Count -gt 0) {
+                    $stopped_processes = @($stopped_processes | Select-Object -Unique)
+                }
+                
+                foreach ($proc in $running_processes) {
+                    try {
+                        Stop-Process -Id $proc.Id -Force -ErrorAction Stop
+                    } catch {
+                        warn "Failed to stop process $($proc.Name) (ID $($proc.Id)): $($_.Exception.Message)"
+                    }
+                }
+                
+                $still_running = @(Get-Process | Where-Object { $_.Path -like "$processdir\*" })
+                if ($still_running.Count -gt 0) {
+                    warn "Some instances of `"$app`" could not be stopped."
+                    $blocked = $true
+                }
+
+            } elseif (get_config IGNORE_RUNNING_PROCESSES) {
+                warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
+                Write-Host ($running_processes | Out-String)
+            } else {
+                error "The following instances of `"$app`" are still running. Close them and try again."
+                Write-Host ($running_processes | Out-String)
                 $blocked = $true
             }
-
-        } elseif (get_config IGNORE_RUNNING_PROCESSES) {
-            warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
-            Write-Host ($running_processes | Out-String)
-        } else {
-            error "The following instances of `"$app`" are still running. Close them and try again."
-            Write-Host ($running_processes | Out-String)
-            $blocked = $true
         }
-    }
 
-    if ($forcekill -and $servicesToStop.Count -gt 0) {
-        if (-not (is_admin)) {
-            warn 'Administrative privileges are required to stop services.'
-            $blocked = $true
-        } else {
+        if ($forcekill -and $servicesToStop.Count -gt 0) {
             foreach ($svc in $servicesToStop) {
                 $status = (Get-Service -Name $svc -ErrorAction SilentlyContinue).Status
                 if ($status -eq 'Running') {

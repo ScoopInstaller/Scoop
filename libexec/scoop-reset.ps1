@@ -87,10 +87,42 @@ $apps | ForEach-Object {
     env_rm $manifest $global $architecture
     env_add_path $manifest $dir $global $architecture
     env_set $manifest $global $architecture
-    # unlink all potential old link before re-persisting
     unlink_persist_data $manifest $original_dir
     persist_data $manifest $original_dir $persist_dir
     persist_permission $manifest $global
+
+    $stopped_services = $stop_ret.ServicesToRestart
+    $stopped_processes = $stop_ret.ProcessesToRestart
+
+    if ($stopped_services.Count -gt 0) {
+        foreach ($svc in $stopped_services) {
+            warn "Restarting service '$svc' associated with '$app'..."
+            try {
+                Start-Service -Name $svc -ErrorAction Stop
+            } catch {
+                warn "Failed to restart service '$svc': $($_.Exception.Message)"
+            }
+        }
+    }
+
+    if ($stopped_processes.Count -gt 0) {
+        $new_processdir = appdir $app $global | Convert-Path
+        foreach ($proc in $stopped_processes) {
+            if ($proc.StartsWith($original_dir)) {
+                $proc = $proc.Replace($original_dir, $new_processdir)
+            }
+            warn "Restarting process '$(Split-Path $proc -Leaf)' associated with '$app'..."
+            if (Test-Path $proc) {
+                try {
+                    Start-Process -FilePath $proc -ErrorAction Stop
+                } catch {
+                    warn "Failed to restart process '$(Split-Path $proc -Leaf)': $($_.Exception.Message)"
+                }
+            } else {
+                warn "Process executable no longer exists at '$proc'."
+            }
+        }
+    }
 }
 
 exit 0
