@@ -294,9 +294,19 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     Write-Host "Updating '$app' ($old_version -> $version)"
 
     #region Workaround for #2952
-    if (test_running_process $app $global) {
+    $running_ret = test_running_process $app $global
+    $stopped_services = @()
+    $stopped_processes = @()
+    if ($running_ret -eq $true) {
         Write-Host 'Running process detected, skip updating.'
         return
+    } elseif ($running_ret -is [hashtable]) {
+        if ($running_ret.ServicesToRestart) {
+            $stopped_services = $running_ret.ServicesToRestart
+        }
+        if ($running_ret.ProcessesToRestart) {
+            $stopped_processes = $running_ret.ProcessesToRestart
+        }
     }
     #endregion Workaround for #2952
 
@@ -382,6 +392,22 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         $apps = @(Get-Dependency $app $architecture) -ne $app
         ensure_none_failed $apps
         $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+    }
+
+    if ($stopped_services.Count -gt 0) {
+        foreach ($svc in $stopped_services) {
+            warn "Restarting service '$svc' associated with '$app'..."
+            Start-Service -Name $svc -ErrorAction SilentlyContinue
+        }
+    }
+
+    if ($stopped_processes.Count -gt 0) {
+        foreach ($proc in $stopped_processes) {
+            warn "Restarting process '$(Split-Path $proc -Leaf)' associated with '$app'..."
+            if (Test-Path $proc) {
+                Start-Process -FilePath $proc -ErrorAction SilentlyContinue
+            }
+        }
     }
 }
 
