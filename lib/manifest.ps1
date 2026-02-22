@@ -18,8 +18,8 @@ function url_manifest($url) {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $data = $wc.DownloadData($url)
         $str = (Get-Encoding($wc)).GetString($data)
-    } catch [system.management.automation.methodinvocationexception] {
-        warn "error: $($_.exception.innerexception.message)"
+    } catch [System.Management.Automation.MethodInvocationException] {
+        error $_.Exception.InnerException.Message
     } catch {
         throw
     }
@@ -69,7 +69,7 @@ function Get-Manifest($app) {
                     $manifest = manifest $app $bucket
                     if (!$manifest) {
                         $deprecated_dir = (Find-BucketDirectory -Name $bucket -Root) + '\deprecated'
-                        $manifest = parse_json (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
+                        $manifest = parse_json (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse -ErrorAction Ignore).FullName
                     }
                 }
             }

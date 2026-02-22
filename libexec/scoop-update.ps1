@@ -30,7 +30,7 @@ if (get_config USE_SQLITE_CACHE) {
 }
 
 $opt, $apps, $err = getopt $args 'gfiksqa' 'global', 'force', 'independent', 'no-cache', 'skip-hash-check', 'quiet', 'all'
-if ($err) { "scoop update: $err"; exit 1 }
+if ($err) { error "scoop update: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $force = $opt.f -or $opt.force
 $check_hash = !($opt.s -or $opt.'skip-hash-check')
@@ -136,7 +136,7 @@ function Sync-Scoop {
             # reset branch HEAD
             Invoke-Git -Path $currentdir -ArgumentList @('reset', '--hard', "origin/$configBranch", '-q')
         } else {
-            Invoke-Git -Path $currentdir -ArgumentList @('pull', '-q')
+            Invoke-Git -Path $currentdir -ArgumentList @('pull', '--tags', '--force', '-q')
         }
 
         $res = $lastexitcode
@@ -356,7 +356,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
     Write-Host "Uninstalling '$app' ($old_version)"
-    Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Uninstall
+    Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
     rm_shims $app $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
@@ -445,7 +445,7 @@ if (-not ($apps -or $all)) {
     success 'Scoop was updated successfully!'
 } else {
     if ($global -and !(is_admin)) {
-        'ERROR: You need admin rights to update global apps.'; exit 1
+        error 'You need admin rights to update global apps.'; exit 1
     }
 
     $outdated = @()
