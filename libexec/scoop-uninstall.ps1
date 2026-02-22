@@ -62,7 +62,9 @@ if (!$apps) { exit 0 }
         Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
 
         #region Workaround for #2952
-        if (test_running_process $app $global) {
+        $running_ret = check_running_process $app $global
+        $stop_ret = stop_running_process $running_ret
+        if ($stop_ret.Blocked) {
             continue
         }
         #endregion Workaround for #2952

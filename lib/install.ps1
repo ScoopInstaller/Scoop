@@ -530,8 +530,8 @@ function persist_permission($manifest, $global) {
     }
 }
 
-# test if there are running processes
-function test_running_process($app, $global) {
+# check if there are running processes
+function check_running_process($app, $global) {
     if (get_config NO_JUNCTION) {
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
@@ -544,15 +544,16 @@ function test_running_process($app, $global) {
 
     if ($json) {
         if ($json.forcekill) { $forcekill = $true }
-        if ($json.forcekill_services) { $forcekill_services = $json.forcekill_services }
+        if ($json.forcekill_services) { $forcekill_services = @($json.forcekill_services) }
     }
 
     $processdir = appdir $app $global | Convert-Path
     
-    # Try finding services related to this path
     $servicesToStop = @()
     if ($forcekill) {
-        $foundServices = Get-CimInstance Win32_Service | Where-Object { $_.PathName -and $_.PathName -like "*$processdir*" }
+        $wmi_dir = $processdir -replace '\\', '\\' -replace "'", "\'"
+        $filter = "PathName LIKE '%$wmi_dir%'"
+        $foundServices = @(Get-CimInstance -ClassName Win32_Service -Filter $filter)
         if ($foundServices) {
             $servicesToStop += $foundServices.Name
         }
@@ -560,50 +561,100 @@ function test_running_process($app, $global) {
             $servicesToStop += $forcekill_services
         }
 
-        $servicesToStop = $servicesToStop | Select-Object -Unique
+        if ($servicesToStop.Count -gt 0) {
+            $servicesToStop = @($servicesToStop | Select-Object -Unique)
+        }
+    }
 
-        foreach ($svc in $servicesToStop) {
-            if (Get-Service -Name $svc -ErrorAction SilentlyContinue | Where-Object { $_.Status -eq 'Running' }) {
-                warn "Stopping service '$svc' associated with '$app'..."
-                Stop-Service -Name $svc -Force -ErrorAction SilentlyContinue
+    $running_processes = @(Get-Process | Where-Object { $_.Path -like "$processdir\*" })
+
+    $blocked = $false
+    if ($running_processes -and !$forcekill -and !(get_config IGNORE_RUNNING_PROCESSES)) {
+        $blocked = $true
+    }
+
+    return @{
+        Blocked          = $blocked
+        Forcekill        = $forcekill
+        App              = $app
+        RunningProcesses = @($running_processes)
+        ServicesToStop   = @($servicesToStop)
+        ProcessDir       = $processdir
+    }
+}
+
+function stop_running_process($test_result) {
+    $forcekill = $test_result.Forcekill
+    $app = $test_result.App
+    $running_processes = $test_result.RunningProcesses
+    $servicesToStop = $test_result.ServicesToStop
+    $processdir = $test_result.ProcessDir
+
+    $stopped_services = @()
+    $stopped_processes = @()
+    $blocked = $test_result.Blocked
+
+    if ($running_processes.Count -gt 0) {
+        if ($forcekill) {
+            warn "The following instances of `"$app`" are still running. Scoop is configured to force kill them."
+            Write-Host ($running_processes | Out-String)
+            $stopped_processes = @($running_processes | Where-Object Path | Select-Object -ExpandProperty Path | Select-Object -Unique)
+            
+            foreach ($proc in $running_processes) {
+                try {
+                    Stop-Process -Id $proc.Id -Force -ErrorAction Stop
+                } catch {
+                    warn "Failed to stop process $($proc.Name) (ID $($proc.Id)): $($_.Exception.Message)"
+                }
+            }
+            
+            $still_running = @(Get-Process | Where-Object { $_.Path -like "$processdir\*" })
+            if ($still_running.Count -gt 0) {
+                warn "Some instances of `"$app`" could not be stopped."
+                $blocked = $true
+            }
+
+        } elseif (get_config IGNORE_RUNNING_PROCESSES) {
+            warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
+            Write-Host ($running_processes | Out-String)
+        } else {
+            error "The following instances of `"$app`" are still running. Close them and try again."
+            Write-Host ($running_processes | Out-String)
+            $blocked = $true
+        }
+    }
+
+    if ($forcekill -and $servicesToStop.Count -gt 0) {
+        if (-not (is_admin)) {
+            warn 'Administrative privileges are required to stop services.'
+            $blocked = $true
+        } else {
+            foreach ($svc in $servicesToStop) {
+                $status = (Get-Service -Name $svc -ErrorAction SilentlyContinue).Status
+                if ($status -eq 'Running') {
+                    warn "Stopping service '$svc' associated with '$app'..."
+                    try {
+                        Stop-Service -Name $svc -Force -ErrorAction Stop
+                        $stopped_services += $svc
+                    } catch {
+                        warn "Failed to stop service '$svc': $($_.Exception.Message)"
+                    }
+                    
+                    if ((Get-Service -Name $svc -ErrorAction SilentlyContinue).Status -eq 'Running') {
+                        warn "Service '$svc' is still running."
+                        $blocked = $true
+                    }
+                } elseif ($status) {
+                    $stopped_services += $svc
+                }
             }
         }
     }
 
-    $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" }
-
-    if ($running_processes) {
-        if ($forcekill) {
-            warn "The following instances of `"$app`" are still running. Scoop is configured to force kill them."
-            Write-Host ($running_processes | Out-String)
-            $processesToRestart = $running_processes | Where-Object Path | Select-Object -ExpandProperty Path | Select-Object -Unique
-            $running_processes | Stop-Process -Force -ErrorAction SilentlyContinue
-            
-            $result = @{
-                ServicesToRestart = @($servicesToStop)
-                ProcessesToRestart = @($processesToRestart)
-            }
-            if ($result.ServicesToRestart.Count -gt 0 -or $result.ProcessesToRestart.Count -gt 0) {
-                return $result
-            }
-            return $false
-        } elseif (get_config IGNORE_RUNNING_PROCESSES) {
-            warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
-            Write-Host ($running_processes | Out-String)
-            return $false
-        } else {
-            error "The following instances of `"$app`" are still running. Close them and try again."
-            Write-Host ($running_processes | Out-String)
-            return $true
-        }
-    } else {
-        if ($forcekill -and $servicesToStop.Count -gt 0) {
-            return @{
-                ServicesToRestart = @($servicesToStop)
-                ProcessesToRestart = @()
-            }
-        }
-        return $false
+    return @{
+        Blocked            = $blocked
+        ServicesToRestart  = @($stopped_services)
+        ProcessesToRestart = @($stopped_processes)
     }
 }
 
