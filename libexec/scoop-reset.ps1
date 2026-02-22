@@ -106,7 +106,8 @@ $apps | ForEach-Object {
     }
 
     if ($stopped_processes.Count -gt 0) {
-        $new_processdir = appdir $app $global | Convert-Path
+        $new_version = current_version $app $global
+        $new_processdir = versiondir $app $new_version $global | Convert-Path
         foreach ($proc in $stopped_processes) {
             if ($proc.StartsWith($original_dir)) {
                 $proc = $proc.Replace($original_dir, $new_processdir)

@@ -608,15 +608,21 @@ function stop_running_process($test_result) {
                 Write-Host ($running_processes | Out-String)
                 
                 # Add all processes to the restart list. Warn admin if some can't be reliably restarted due to missing Paths.
-                foreach ($proc in $running_processes) {
-                    if ($proc.Path) {
-                        $stopped_processes += $proc.Path
-                    } else {
-                        warn "Process $($proc.Name) (ID $($proc.Id)) cannot be reliably restarted because its executable path is unreadable."
+                $has_visible_window = @($running_processes | Where-Object MainWindowHandle -NE 0).Count -gt 0
+                
+                if ($has_visible_window) {
+                    warn "Some instances of `"$app`" had visible windows. They will NOT be automatically restarted."
+                } else {
+                    foreach ($proc in $running_processes) {
+                        if ($proc.Path) {
+                            $stopped_processes += $proc.Path
+                        } else {
+                            warn "Process $($proc.Name) (ID $($proc.Id)) cannot be reliably restarted because its executable path is unreadable."
+                        }
                     }
-                }
-                if ($stopped_processes.Count -gt 0) {
-                    $stopped_processes = @($stopped_processes | Select-Object -Unique)
+                    if ($stopped_processes.Count -gt 0) {
+                        $stopped_processes = @($stopped_processes | Select-Object -Unique)
+                    }
                 }
                 
                 foreach ($proc in $running_processes) {

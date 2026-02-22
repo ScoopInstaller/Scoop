@@ -411,7 +411,8 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     }
 
     if ($stopped_processes.Count -gt 0) {
-        $new_processdir = appdir $originalAppName $global | Convert-Path
+        $new_version = current_version $originalAppName $global
+        $new_processdir = versiondir $originalAppName $new_version $global | Convert-Path
         foreach ($proc in $stopped_processes) {
             if ($proc.StartsWith($old_processdir)) {
                 $proc = $proc.Replace($old_processdir, $new_processdir)
