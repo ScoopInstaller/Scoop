@@ -61,7 +61,7 @@ foreach ($app in $apps) {
         continue
     }
     $install = @{}
-    $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
+    $json.PSObject.Properties | ForEach-Object { $install[$_.Name] = $_.Value }
     
     $install.forcekill = $true
 

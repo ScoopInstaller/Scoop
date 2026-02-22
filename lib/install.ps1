@@ -550,7 +550,8 @@ function check_running_process($app, $global) {
         if ($json.forcekill_services) { $forcekill_services = @($json.forcekill_services) }
     }
 
-    $processdir = appdir $app $global | Convert-Path
+    $processdir = if (get_config NO_JUNCTION) { versiondir $app $version $global } else { versiondir $app 'current' $global }
+    $processdir = $processdir | Convert-Path
     
     $servicesToStop = @()
     if ($forcekill) {
@@ -647,8 +648,6 @@ function stop_running_process($test_result) {
                         warn "Service '$svc' is still running."
                         $blocked = $true
                     }
-                } elseif ($status) {
-                    $stopped_services += $svc
                 }
             }
         }
