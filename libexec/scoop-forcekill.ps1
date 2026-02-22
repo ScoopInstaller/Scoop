@@ -20,8 +20,10 @@
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 
-$opt, $apps, $err = getopt $args 'g' 'global', 'service='
+$opt, $apps, $err = getopt $args 'gs:' 'global', 'service='
 if ($err) { "scoop forcekill: $err"; exit 1 }
+
+$exitcode = 0
 
 $global = $opt.g -or $opt.global
 
@@ -42,6 +44,7 @@ foreach ($app in $apps) {
         } else {
             error "'$app' is not installed."
         }
+        $exitcode = 1
         continue
     }
 
@@ -54,6 +57,7 @@ foreach ($app in $apps) {
     $json = install_info $app $version $global
     if (!$json) {
         error "Failed to configure forcekill for '$app'."
+        $exitcode = 1
         continue
     }
     $install = @{}
@@ -63,7 +67,18 @@ foreach ($app in $apps) {
 
     if ($opt.service) {
         $services = $opt.service -split ',' | ForEach-Object { $_.Trim() }
-        $install.forcekill_services = @($services)
+        $valid_services = @()
+        foreach ($svc in $services) {
+            if (Get-Service -Name $svc -ErrorAction SilentlyContinue) {
+                $valid_services += $svc
+            } else {
+                warn "Could not find service '$svc'. Skipping."
+                $exitcode = 1
+            }
+        }
+        if ($valid_services.Count -gt 0) {
+            $install.forcekill_services = @($valid_services | Select-Object -Unique)
+        }
     }
 
     save_install_info $install $dir
