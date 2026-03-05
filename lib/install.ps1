@@ -533,14 +533,14 @@ function persist_permission($manifest, $global) {
     }
 }
 
-# check if there are running processes
+# check if there are running processes locking app files
 function check_running_process($app, $global) {
     if (get_config NO_JUNCTION) {
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'
     }
-    
+
     $json = install_info $app $version $global
     $forcekill = $false
     $forcekill_services = @()
@@ -552,15 +552,25 @@ function check_running_process($app, $global) {
 
     $processdir = if (get_config NO_JUNCTION) { versiondir $app $version $global } else { versiondir $app 'current' $global }
     $processdir = $processdir | Convert-Path
-    
+
+    # Use Restart Manager to detect which processes are locking files in the app directory
+    $locking_processes = @(Get-LockingProcesses $processdir)
+
+    # Filter out Explorer and Critical system processes (should never be killed)
+    $running_processes = @($locking_processes | Where-Object {
+            $_.ApplicationType -notin @('Explorer', 'Critical')
+        })
+
+    # Extract services detected by the Restart Manager
     $servicesToStop = @()
     if ($forcekill) {
-        $wmi_dir = $processdir -replace '\\', '\\' -replace '_', '[_]' -replace "'", "''"
-        $filter = "PathName LIKE '%$wmi_dir%'"
-        $foundServices = @(Get-CimInstance -ClassName Win32_Service -Filter $filter)
-        if ($foundServices) {
-            $servicesToStop += $foundServices.Name
-        }
+        $rm_services = @($locking_processes | Where-Object {
+                $_.ApplicationType -eq 'Service' -and $_.ServiceName
+            } | ForEach-Object { $_.ServiceName })
+
+        $servicesToStop = @($rm_services)
+
+        # Add manual forcekill_services as fallback
         if ($forcekill_services) {
             $servicesToStop += $forcekill_services
         }
@@ -570,10 +580,8 @@ function check_running_process($app, $global) {
         }
     }
 
-    $running_processes = @(Get-Process | Where-Object { $_.Path -like "$processdir\*" })
-
     $blocked = $false
-    if ($running_processes -and !$forcekill -and !(get_config IGNORE_RUNNING_PROCESSES)) {
+    if ($running_processes.Count -gt 0 -and !$forcekill -and !(get_config IGNORE_RUNNING_PROCESSES)) {
         $blocked = $true
     }
 
@@ -602,49 +610,66 @@ function stop_running_process($test_result) {
         warn 'Administrative privileges are required to stop the associated services. Aborting forcekill.'
         $blocked = $true
     } else {
-        if ($running_processes.Count -gt 0) {
+        # Filter to only non-service processes for the process-kill step
+        $killable_processes = @($running_processes | Where-Object { $_.ApplicationType -ne 'Service' })
+
+        if ($killable_processes.Count -gt 0) {
             if ($forcekill) {
                 warn "The following instances of `"$app`" are still running. Scoop is configured to force kill them."
-                Write-Host ($running_processes | Out-String)
-                
-                # Add all processes to the restart list. Warn admin if some can't be reliably restarted due to missing Paths.
-                $has_visible_window = @($running_processes | Where-Object MainWindowHandle -NE 0).Count -gt 0
-                
+                $killable_processes | ForEach-Object {
+                    $path_info = if ($_.Path) { " ($($_.Path))" } else { '' }
+                    Write-Host "  - $($_.Name) [$($_.ApplicationType)] (PID $($_.Id))$path_info"
+                }
+
+                # Decide which processes should be auto-restarted after update
+                $has_visible_window = @($killable_processes | Where-Object {
+                        $_.ApplicationType -eq 'MainWindow'
+                    }).Count -gt 0
+
                 if ($has_visible_window) {
                     warn "Some instances of `"$app`" had visible windows. They will NOT be automatically restarted."
                 } else {
-                    foreach ($proc in $running_processes) {
+                    foreach ($proc in $killable_processes) {
                         if ($proc.Path) {
                             $stopped_processes += $proc.Path
                         } else {
-                            warn "Process $($proc.Name) (ID $($proc.Id)) cannot be reliably restarted because its executable path is unreadable."
+                            warn "Process $($proc.Name) (PID $($proc.Id)) cannot be reliably restarted because its executable path is unreadable."
                         }
                     }
                     if ($stopped_processes.Count -gt 0) {
                         $stopped_processes = @($stopped_processes | Select-Object -Unique)
                     }
                 }
-                
-                foreach ($proc in $running_processes) {
+
+                foreach ($proc in $killable_processes) {
                     try {
                         Stop-Process -Id $proc.Id -Force -ErrorAction Stop
                     } catch {
-                        warn "Failed to stop process $($proc.Name) (ID $($proc.Id)): $($_.Exception.Message)"
+                        warn "Failed to stop process $($proc.Name) (PID $($proc.Id)): $($_.Exception.Message)"
                     }
                 }
-                
-                $still_running = @(Get-Process | Where-Object { $_.Path -like "$processdir\*" })
-                if ($still_running.Count -gt 0) {
+
+                # Re-check using Restart Manager to verify all processes were stopped
+                $still_locking = @(Get-LockingProcesses $processdir | Where-Object {
+                        $_.ApplicationType -notin @('Explorer', 'Critical', 'Service')
+                    })
+                if ($still_locking.Count -gt 0) {
                     warn "Some instances of `"$app`" could not be stopped."
                     $blocked = $true
                 }
 
             } elseif (get_config IGNORE_RUNNING_PROCESSES) {
                 warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
-                Write-Host ($running_processes | Out-String)
+                $killable_processes | ForEach-Object {
+                    $path_info = if ($_.Path) { " ($($_.Path))" } else { '' }
+                    Write-Host "  - $($_.Name) [$($_.ApplicationType)] (PID $($_.Id))$path_info"
+                }
             } else {
                 error "The following instances of `"$app`" are still running. Close them and try again."
-                Write-Host ($running_processes | Out-String)
+                $killable_processes | ForEach-Object {
+                    $path_info = if ($_.Path) { " ($($_.Path))" } else { '' }
+                    Write-Host "  - $($_.Name) [$($_.ApplicationType)] (PID $($_.Id))$path_info"
+                }
                 $blocked = $true
             }
         }
@@ -660,7 +685,7 @@ function stop_running_process($test_result) {
                     } catch {
                         warn "Failed to stop service '$svc': $($_.Exception.Message)"
                     }
-                    
+
                     if ((Get-Service -Name $svc -ErrorAction SilentlyContinue).Status -eq 'Running') {
                         warn "Service '$svc' is still running."
                         $blocked = $true
