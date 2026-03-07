@@ -37,6 +37,7 @@
 
 - **output:** Replace raw prints with functions for standardized output ([#6449](https://github.com/ScoopInstaller/Scoop/issues/6449))
 - **output:** Combine the separated outputs into a single output ([#6545](https://github.com/ScoopInstaller/Scoop/issues/6545))
+- **scoop-list:** Use simpler method to check the deprecated status of the manifest to improve performance ([#6599](https://github.com/ScoopInstaller/Scoop/issues/6599))
 
 ### Builds
 
