@@ -94,9 +94,22 @@ $rmAppTypeNames = @{
     1000 = 'Critical'
 }
 
+function Get-SafeProcessPath($procObj) {
+    $procPath = $null
+    if ($procObj) {
+        try {
+            $procPath = $procObj.Path
+        } catch {
+            $procPath = $null
+        }
+    }
+
+    return $procPath
+}
+
 function Get-LockingProcesses($appDir) {
-    $files = @(Get-ChildItem -Path $appDir -Recurse -Include '*.exe', '*.dll' -ErrorAction SilentlyContinue |
-        Select-Object -ExpandProperty FullName -First 100)
+    $files = @(Get-ChildItem -Path $appDir -Recurse -File -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty FullName)
 
     if ($files.Count -eq 0) { return @() }
 
@@ -112,7 +125,7 @@ function Get-LockingProcesses($appDir) {
         $seenPids[$procId] = $true
 
         $procObj = Get-Process -Id $procId -ErrorAction SilentlyContinue
-        $procPath = if ($procObj -and $procObj.Path) { $procObj.Path } else { $null }
+        $procPath = Get-SafeProcessPath $procObj
 
         $appType = $rmAppTypeNames[[int]$rm.ApplicationType]
         if (-not $appType) { $appType = 'Unknown' }
@@ -126,6 +139,30 @@ function Get-LockingProcesses($appDir) {
             ServiceName      = $rm.strServiceShortName
             Restartable      = $rm.bRestartable
             MainWindowHandle = if ($procObj) { $procObj.MainWindowHandle } else { [IntPtr]::Zero }
+        }
+    }
+
+    return @($output)
+}
+
+function Get-RunningProcessesInDir($appDir) {
+    $pathPattern = "$appDir\*"
+    $output = @()
+
+    $allProcesses = @(Get-Process -ErrorAction SilentlyContinue)
+    foreach ($procObj in $allProcesses) {
+        $procPath = Get-SafeProcessPath $procObj
+        if ($procPath -like $pathPattern) {
+            $output += [PSCustomObject]@{
+                Id               = $procObj.Id
+                Name             = $procObj.Name
+                AppName          = $procObj.Name
+                Path             = $procPath
+                ApplicationType  = 'Unknown'
+                ServiceName      = $null
+                Restartable      = $false
+                MainWindowHandle = $procObj.MainWindowHandle
+            }
         }
     }
 
