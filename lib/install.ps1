@@ -533,6 +533,115 @@ function persist_permission($manifest, $global) {
     }
 }
 
+function New-TrackedProcessEntry($proc) {
+    $mainWindowHandle = [IntPtr]::Zero
+    if ($proc.PSObject.Properties.Match('MainWindowHandle').Count -gt 0) {
+        $mainWindowHandle = $proc.MainWindowHandle
+    }
+
+    return [PSCustomObject]@{
+        Id               = $proc.Id
+        Name             = $proc.Name
+        AppName          = if ($proc.PSObject.Properties.Match('AppName').Count -gt 0) { $proc.AppName } else { $null }
+        Path             = if ($proc.PSObject.Properties.Match('Path').Count -gt 0) { $proc.Path } else { $null }
+        ApplicationType  = if ($proc.PSObject.Properties.Match('ApplicationType').Count -gt 0) { $proc.ApplicationType } else { 'Unknown' }
+        ServiceName      = if ($proc.PSObject.Properties.Match('ServiceName').Count -gt 0) { $proc.ServiceName } else { $null }
+        Restartable      = if ($proc.PSObject.Properties.Match('Restartable').Count -gt 0) { $proc.Restartable } else { $false }
+        MainWindowHandle = $mainWindowHandle
+    }
+}
+
+function Merge-TrackedProcesses($primary_processes, $fallback_processes) {
+    $merged = @()
+    $process_index = @{}
+
+    foreach ($proc in @($primary_processes)) {
+        $entry = New-TrackedProcessEntry $proc
+        $merged += $entry
+        $process_index[[string]$entry.Id] = $entry
+    }
+
+    foreach ($proc in @($fallback_processes)) {
+        $entry = New-TrackedProcessEntry $proc
+        $key = [string]$entry.Id
+
+        if ($process_index.ContainsKey($key)) {
+            $existing = $process_index[$key]
+
+            if ((-not $existing.Path) -and ($entry.Path)) {
+                $existing.Path = $entry.Path
+            }
+
+            if ((-not $existing.Name) -and ($entry.Name)) {
+                $existing.Name = $entry.Name
+            }
+
+            if ((-not $existing.AppName) -and ($entry.AppName)) {
+                $existing.AppName = $entry.AppName
+            }
+
+            if (((-not $existing.ApplicationType) -or ($existing.ApplicationType -eq 'Unknown')) -and ($entry.ApplicationType)) {
+                $existing.ApplicationType = $entry.ApplicationType
+            }
+
+            if ((-not $existing.ServiceName) -and ($entry.ServiceName)) {
+                $existing.ServiceName = $entry.ServiceName
+            }
+
+            if ((-not $existing.Restartable) -and ($entry.Restartable)) {
+                $existing.Restartable = $entry.Restartable
+            }
+
+            if (([Int64]$existing.MainWindowHandle -eq 0) -and ([Int64]$entry.MainWindowHandle -ne 0)) {
+                $existing.MainWindowHandle = $entry.MainWindowHandle
+            }
+        } else {
+            $merged += $entry
+            $process_index[$key] = $entry
+        }
+    }
+
+    return @($merged)
+}
+
+function Write-TrackedProcessDetails($processes) {
+    foreach ($proc in @($processes)) {
+        $path_info = if ($proc.Path) { " ($($proc.Path))" } else { '' }
+        Write-Host "  - $($proc.Name) [$($proc.ApplicationType)] (PID $($proc.Id))$path_info"
+    }
+}
+
+function Write-ServiceDetails($service_processes, $service_names) {
+    $shown_services = @{}
+
+    foreach ($proc in @($service_processes)) {
+        $service_name = if ($proc.ServiceName) { $proc.ServiceName } else { $proc.Name }
+        $path_info = if ($proc.Path) { " ($($proc.Path))" } else { '' }
+
+        $shown_services[$service_name] = $true
+        Write-Host "  - $service_name [Service] (PID $($proc.Id))$path_info"
+    }
+
+    foreach ($service_name in @($service_names)) {
+        if (-not $shown_services.ContainsKey($service_name)) {
+            Write-Host "  - $service_name [Service]"
+        }
+    }
+}
+
+function Test-TrackedProcessHasVisibleWindow($proc) {
+    $has_window_handle = $false
+    if ($null -ne $proc.MainWindowHandle) {
+        try {
+            $has_window_handle = ([Int64]$proc.MainWindowHandle) -ne 0
+        } catch {
+            $has_window_handle = $false
+        }
+    }
+
+    return ($has_window_handle -or ($proc.ApplicationType -eq 'MainWindow') -or ($proc.ApplicationType -eq 'OtherWindow'))
+}
+
 # check if there are running processes locking app files
 function check_running_process($app, $global) {
     if (get_config NO_JUNCTION) {
@@ -553,24 +662,31 @@ function check_running_process($app, $global) {
     $processdir = if (get_config NO_JUNCTION) { versiondir $app $version $global } else { versiondir $app 'current' $global }
     $processdir = $processdir | Convert-Path
 
-    # Use Restart Manager to detect which processes are locking files in the app directory
     $locking_processes = @(Get-LockingProcesses $processdir)
+    $path_processes = @(Get-RunningProcessesInDir $processdir)
+    $tracked_processes = @(Merge-TrackedProcesses $locking_processes $path_processes)
 
-    # Filter out Explorer and Critical system processes (should never be killed)
-    $running_processes = @($locking_processes | Where-Object {
+    # Filter out Explorer and Critical system processes (should never be killed).
+    # Keep service entries so service-only blockers remain visible to the caller.
+    $running_processes = @($tracked_processes | Where-Object {
             $_.ApplicationType -notin @('Explorer', 'Critical')
         })
 
-    # Extract services detected by the Restart Manager
     $servicesToStop = @()
     if ($forcekill) {
-        $rm_services = @($locking_processes | Where-Object {
+        $rm_services = @($running_processes | Where-Object {
                 $_.ApplicationType -eq 'Service' -and $_.ServiceName
             } | ForEach-Object { $_.ServiceName })
 
         $servicesToStop = @($rm_services)
 
-        # Add manual forcekill_services as fallback
+        $wmi_dir = $processdir -replace '\\', '\\' -replace '_', '[_]' -replace "'", "''"
+        $filter = "PathName LIKE '%$wmi_dir%'"
+        $foundServices = @(Get-CimInstance -ClassName Win32_Service -Filter $filter -ErrorAction SilentlyContinue)
+        if ($foundServices.Count -gt 0) {
+            $servicesToStop += @($foundServices | ForEach-Object { $_.Name })
+        }
+
         if ($forcekill_services) {
             $servicesToStop += $forcekill_services
         }
@@ -605,25 +721,42 @@ function stop_running_process($test_result) {
     $stopped_services = @()
     $stopped_processes = @()
     $blocked = $test_result.Blocked
+    $killable_processes = @($running_processes | Where-Object { $_.ApplicationType -ne 'Service' })
+    $service_processes = @($running_processes | Where-Object { $_.ApplicationType -eq 'Service' })
+    $running_services_to_stop = @()
 
-    if ($forcekill -and $servicesToStop.Count -gt 0 -and -not (is_admin)) {
+    foreach ($svc in @($servicesToStop)) {
+        $service = Get-Service -Name $svc -ErrorAction SilentlyContinue
+        if ($service -and ($service.Status -eq 'Running')) {
+            $running_services_to_stop += $svc
+        }
+    }
+
+    if ($running_services_to_stop.Count -gt 0) {
+        $running_services_to_stop = @($running_services_to_stop | Select-Object -Unique)
+    }
+
+    if ($forcekill -and ($running_services_to_stop.Count -gt 0) -and (-not (is_admin))) {
         warn 'Administrative privileges are required to stop the associated services. Aborting forcekill.'
+        Write-ServiceDetails $service_processes $running_services_to_stop
         $blocked = $true
     } else {
-        # Filter to only non-service processes for the process-kill step
-        $killable_processes = @($running_processes | Where-Object { $_.ApplicationType -ne 'Service' })
-
-        if ($killable_processes.Count -gt 0) {
+        $has_running_entries = ($killable_processes.Count -gt 0) -or ($service_processes.Count -gt 0)
+        if ($has_running_entries) {
             if ($forcekill) {
-                warn "The following instances of `"$app`" are still running. Scoop is configured to force kill them."
-                $killable_processes | ForEach-Object {
-                    $path_info = if ($_.Path) { " ($($_.Path))" } else { '' }
-                    Write-Host "  - $($_.Name) [$($_.ApplicationType)] (PID $($_.Id))$path_info"
+                if ($killable_processes.Count -gt 0) {
+                    warn "The following instances of `"$app`" are still running. Scoop is configured to force kill them."
+                    Write-TrackedProcessDetails $killable_processes
                 }
 
-                # Decide which processes should be auto-restarted after update
+                if ($service_processes.Count -gt 0) {
+                    warn "The following associated services for `"$app`" are still running."
+                    Write-ServiceDetails $service_processes $running_services_to_stop
+                }
+
+                # Only restart processes that were running headlessly before forcekill.
                 $has_visible_window = @($killable_processes | Where-Object {
-                        $_.ApplicationType -eq 'MainWindow'
+                        Test-TrackedProcessHasVisibleWindow $_
                     }).Count -gt 0
 
                 if ($has_visible_window) {
@@ -649,35 +782,44 @@ function stop_running_process($test_result) {
                     }
                 }
 
-                # Re-check using Restart Manager to verify all processes were stopped
-                $still_locking = @(Get-LockingProcesses $processdir | Where-Object {
+                $still_locking = @((Merge-TrackedProcesses @(Get-LockingProcesses $processdir) @(Get-RunningProcessesInDir $processdir)) | Where-Object {
                         $_.ApplicationType -notin @('Explorer', 'Critical', 'Service')
                     })
                 if ($still_locking.Count -gt 0) {
                     warn "Some instances of `"$app`" could not be stopped."
+                    Write-TrackedProcessDetails $still_locking
                     $blocked = $true
                 }
 
             } elseif (get_config IGNORE_RUNNING_PROCESSES) {
-                warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
-                $killable_processes | ForEach-Object {
-                    $path_info = if ($_.Path) { " ($($_.Path))" } else { '' }
-                    Write-Host "  - $($_.Name) [$($_.ApplicationType)] (PID $($_.Id))$path_info"
+                if ($killable_processes.Count -gt 0) {
+                    warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
+                    Write-TrackedProcessDetails $killable_processes
+                }
+
+                if ($service_processes.Count -gt 0) {
+                    warn "The following associated services for `"$app`" are still running. Scoop is configured to ignore this condition."
+                    Write-ServiceDetails $service_processes $running_services_to_stop
                 }
             } else {
-                error "The following instances of `"$app`" are still running. Close them and try again."
-                $killable_processes | ForEach-Object {
-                    $path_info = if ($_.Path) { " ($($_.Path))" } else { '' }
-                    Write-Host "  - $($_.Name) [$($_.ApplicationType)] (PID $($_.Id))$path_info"
+                if ($killable_processes.Count -gt 0) {
+                    error "The following instances of `"$app`" are still running. Close them and try again."
+                    Write-TrackedProcessDetails $killable_processes
                 }
+
+                if ($service_processes.Count -gt 0) {
+                    error "The following associated services for `"$app`" are still running. Stop them and try again."
+                    Write-ServiceDetails $service_processes $running_services_to_stop
+                }
+
                 $blocked = $true
             }
         }
 
-        if ($forcekill -and $servicesToStop.Count -gt 0) {
-            foreach ($svc in $servicesToStop) {
-                $status = (Get-Service -Name $svc -ErrorAction SilentlyContinue).Status
-                if ($status -eq 'Running') {
+        if ($forcekill -and ($running_services_to_stop.Count -gt 0)) {
+            foreach ($svc in $running_services_to_stop) {
+                $service = Get-Service -Name $svc -ErrorAction SilentlyContinue
+                if ($service -and ($service.Status -eq 'Running')) {
                     warn "Stopping service '$svc' associated with '$app'..."
                     try {
                         Stop-Service -Name $svc -Force -ErrorAction Stop
