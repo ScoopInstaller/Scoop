@@ -112,6 +112,8 @@ Describe 'check_running_process' -Tag 'Scoop', 'Windows' {
         Mock get_config { return $false }
         Mock versiondir { return 'C:\test\app\current' }
         Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-RunningProcessesInDir { return @() }
+        Mock Get-CimInstance { return @() }
         Mock Get-LockingProcesses {
             return @(
                 [PSCustomObject]@{ Id = 123; Name = 'app'; AppName = 'app'; Path = 'C:\test\app\current\app.exe'; ApplicationType = 'Console'; ServiceName = ''; Restartable = $false; MainWindowHandle = [IntPtr]::Zero },
@@ -133,6 +135,7 @@ Describe 'check_running_process' -Tag 'Scoop', 'Windows' {
         Mock get_config { return $false }
         Mock versiondir { return 'C:\test\app\current' }
         Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-RunningProcessesInDir { return @() }
         Mock Get-LockingProcesses {
             return @(
                 [PSCustomObject]@{ Id = 123; Name = 'app'; AppName = 'app'; Path = 'C:\test\app\current\app.exe'; ApplicationType = 'Console'; ServiceName = ''; Restartable = $false; MainWindowHandle = [IntPtr]::Zero }
@@ -150,6 +153,7 @@ Describe 'check_running_process' -Tag 'Scoop', 'Windows' {
         Mock get_config { return $false }
         Mock versiondir { return 'C:\test\app\current' }
         Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-RunningProcessesInDir { return @() }
         Mock Get-LockingProcesses {
             return @(
                 [PSCustomObject]@{ Id = 100; Name = 'app'; AppName = 'app'; Path = 'C:\test\app\current\app.exe'; ApplicationType = 'Console'; ServiceName = ''; Restartable = $false; MainWindowHandle = [IntPtr]::Zero },
@@ -161,6 +165,40 @@ Describe 'check_running_process' -Tag 'Scoop', 'Windows' {
         $result = check_running_process 'testapp' $global
         $result.RunningProcesses.Count | Should -Be 1
         $result.RunningProcesses[0].Id | Should -Be 100
+    }
+
+    It 'falls back to executable-path scan when Restart Manager misses a process' {
+        Mock install_info { return $null }
+        Mock get_config { return $false }
+        Mock versiondir { return 'C:\test\app\current' }
+        Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-LockingProcesses { return @() }
+        Mock Get-RunningProcessesInDir {
+            return @(
+                [PSCustomObject]@{ Id = 321; Name = 'fallback_app'; AppName = 'fallback_app'; Path = 'C:\test\app\current\fallback.exe'; ApplicationType = 'Unknown'; ServiceName = $null; Restartable = $false; MainWindowHandle = [IntPtr]::Zero }
+            )
+        }
+
+        $result = check_running_process 'testapp' $global
+        $result.Blocked | Should -BeTrue
+        $result.RunningProcesses.Count | Should -Be 1
+        $result.RunningProcesses[0].Id | Should -Be 321
+    }
+
+    It 'includes WMI-discovered services when forcekill is enabled' {
+        Mock install_info { return @{ forcekill = $true } }
+        Mock get_config { return $false }
+        Mock versiondir { return 'C:\test\app\current' }
+        Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-LockingProcesses { return @() }
+        Mock Get-RunningProcessesInDir { return @() }
+        Mock Get-CimInstance { return @([PSCustomObject]@{ Name = 'wmi_svc' }) }
+
+        $result = check_running_process 'testapp' $global
+        $result.Blocked | Should -BeFalse
+        $result.Forcekill | Should -BeTrue
+        $result.ServicesToStop.Count | Should -Be 1
+        $result.ServicesToStop[0] | Should -Be 'wmi_svc'
     }
 }
 
@@ -185,6 +223,7 @@ Describe 'stop_running_process' -Tag 'Scoop', 'Windows' {
 
         Mock Stop-Process {}
         Mock Get-LockingProcesses { return @() } # No processes still locking after kill
+        Mock Get-RunningProcessesInDir { return @() }
 
         $result = stop_running_process $test_result
 
@@ -195,13 +234,13 @@ Describe 'stop_running_process' -Tag 'Scoop', 'Windows' {
         Should -Invoke -CommandName Stop-Process -Times 1 -ParameterFilter { $Id -eq 123 }
     }
 
-    It 'kills MainWindow process but does NOT add to restart list' {
+    It 'does NOT restart processes that had visible windows' {
         $test_result = @{
             Blocked          = $false
             Forcekill        = $true
             App              = 'testapp'
             RunningProcesses = @(
-                [PSCustomObject]@{ Path = 'C:\test\app\current\app.exe'; Id = 124; Name = 'app'; ApplicationType = 'MainWindow'; MainWindowHandle = [IntPtr]::Zero }
+                [PSCustomObject]@{ Path = 'C:\test\app\current\app.exe'; Id = 124; Name = 'app'; ApplicationType = 'Console'; MainWindowHandle = [IntPtr]1 }
             )
             ServicesToStop   = @()
             ProcessDir       = 'C:\test\app\current'
@@ -209,6 +248,7 @@ Describe 'stop_running_process' -Tag 'Scoop', 'Windows' {
 
         Mock Stop-Process {}
         Mock Get-LockingProcesses { return @() }
+        Mock Get-RunningProcessesInDir { return @() }
 
         $result = stop_running_process $test_result
 
@@ -281,10 +321,31 @@ Describe 'stop_running_process' -Tag 'Scoop', 'Windows' {
         }
 
         Mock is_admin { return $false }
+        Mock Get-Service { return [PSCustomObject]@{ Status = 'Running' } } -ParameterFilter { $Name -eq 'test_svc' }
 
         $result = stop_running_process $test_result
 
         $result.Blocked | Should -BeTrue
+    }
+
+    It 'reports service-only blockers when forcekill is disabled' {
+        $test_result = @{
+            Blocked          = $true
+            Forcekill        = $false
+            App              = 'testapp'
+            RunningProcesses = @(
+                [PSCustomObject]@{ Path = 'C:\test\app\current\svc.exe'; Id = 700; Name = 'svc_host'; ApplicationType = 'Service'; ServiceName = 'test_svc'; MainWindowHandle = [IntPtr]::Zero }
+            )
+            ServicesToStop   = @()
+            ProcessDir       = 'C:\test\app\current'
+        }
+
+        Mock get_config { return $false }
+
+        $result = stop_running_process $test_result
+
+        $result.Blocked | Should -BeTrue
+        Should -Invoke -CommandName error -Times 1
     }
 }
 
