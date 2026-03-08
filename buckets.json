@@ -5,6 +5,7 @@
     "nirsoft": "https://github.com/ScoopInstaller/Nirsoft",
     "sysinternals": "https://github.com/niheaven/scoop-sysinternals",
     "php": "https://github.com/ScoopInstaller/PHP",
+    "pdfzus": "https://github.com/wsgtcyx/PDF-zusammenfuegen-scoop",
     "nerd-fonts": "https://github.com/matthewjberger/scoop-nerd-fonts",
     "nonportable": "https://github.com/ScoopInstaller/Nonportable",
     "java": "https://github.com/ScoopInstaller/Java",
