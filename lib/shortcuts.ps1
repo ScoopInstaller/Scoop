@@ -2,9 +2,11 @@
 function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
     $shortcuts = @(arch_specific 'shortcuts' $manifest $arch)
     $shortcuts | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target = $ExecutionContext.InvokeCommand.ExpandString($_.item(0))
-        if($target -eq $_.item(0)){
-            $target = [System.IO.Path]::Combine($dir, $_.item(0))
+        $target = $_.item(0)
+        if($target -like '$*'){
+            $target = $ExecutionContext.InvokeCommand.ExpandString($target)
+        }else{
+            $target = [System.IO.Path]::Combine($dir, $target)
         }
         $target = New-Object System.IO.FileInfo($target)
         $name = $_.item(1)
@@ -14,9 +16,11 @@ function create_startmenu_shortcuts($manifest, $dir, $global, $arch) {
             $arguments = $_.item(2)
         }
         if ($_.length -ge 4) {
-            $icon = $ExecutionContext.InvokeCommand.ExpandString($_.item(3))
-            if($icon -eq $_.item(3)){
-                $icon = [System.IO.Path]::Combine($dir, $_.item(3))
+            $icon = $_.item(3)
+            if($icon -like '$*'){
+                $icon = $ExecutionContext.InvokeCommand.ExpandString($icon)
+            }else{
+                $icon = [System.IO.Path]::Combine($dir, $icon)
             }
             $icon = New-Object System.IO.FileInfo($icon)
         }
