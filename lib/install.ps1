@@ -317,7 +317,14 @@ function env_add_path($manifest, $dir, $global, $arch) {
         if (get_config USE_ISOLATED_PATH) {
             Add-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
         }
-        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        $path = $env_add_path.Where({ $_ }) | ForEach-Object {
+            $path_expand = $ExecutionContext.InvokeCommand.ExpandString($_)
+            if($path_expand -eq $_){
+                Join-Path $dir $_ | Get-AbsolutePath | Where-Object { is_in_dir $dir $_ }
+            }else{
+                $path_expand
+            }
+        }
         Add-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global -Force
     }
 }
@@ -326,7 +333,14 @@ function env_rm_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        $path = $env_add_path.Where({ $_ }) | ForEach-Object {
+            $path_expand = $ExecutionContext.InvokeCommand.ExpandString($_)
+            if($path_expand -eq $_){
+                Join-Path $dir $_ | Get-AbsolutePath | Where-Object { is_in_dir $dir $_ }
+            }else{
+                $path_expand
+            }
+        }
         Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
         Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global
     }
