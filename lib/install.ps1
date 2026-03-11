@@ -59,8 +59,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
-    env_add_path $manifest $dir $global $architecture
     env_set $manifest $global $architecture
+    env_add_path $manifest $dir $global $architecture
 
     # persist data
     persist_data $manifest $original_dir $persist_dir
