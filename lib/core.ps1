@@ -1055,7 +1055,7 @@ function get_shim_path() {
 function Get-DefaultArchitecture {
     $arch = get_config DEFAULT_ARCHITECTURE
     $system = & {
-        switch -Exact ([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture) {
+        switch -Exact ([System.Runtime.InteropServices.RuntimeInformation,mscorlib]::OSArchitecture) {
             'Arm64' { return 'arm64' }
             'X64' {
                 $out = '64bit'
