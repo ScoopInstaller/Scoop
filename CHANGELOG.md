@@ -1,3 +1,9 @@
+## [Unreleased]
+
+### Bug Fixes
+
+- **shim:** Fix WoW64 file system redirection for x86 shim executables on x64 OS by rewriting System32/SysWOW64 paths in `.shim` config
+
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
 ### Features
