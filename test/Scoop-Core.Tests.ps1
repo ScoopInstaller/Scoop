@@ -357,7 +357,7 @@ Describe 'app' -Tag 'Scoop' {
     }
 }
 
-Describe 'Get-PEMachine' -Tag 'Scoop' {
+Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     It 'returns machine type for a valid PE file' {
         $shim_path = get_shim_path
         if ($shim_path -and (Test-Path $shim_path)) {
