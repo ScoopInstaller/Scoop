@@ -212,6 +212,8 @@ hub diff --name-only | ForEach-Object {
 }
 
 if ($Push) {
+    Write-Host 'Rebasing local branch before push ...' -ForegroundColor DarkCyan
+    execute "hub pull --rebase origin $OriginBranch"
     Write-Host 'Pushing updates ...' -ForegroundColor DarkCyan
     execute "hub push origin $OriginBranch"
 } else {
