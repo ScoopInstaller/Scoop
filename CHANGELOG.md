@@ -31,7 +31,8 @@
 - **core:** Skip NO_JUNCTION logic when $app is 'scoop' in `currentdir` function ([#6541](https://github.com/ScoopInstaller/Scoop/issues/6541))
 - **core:** Fix substitute handling of substring keys ([#6561](https://github.com/ScoopInstaller/Scoop/issues/6561))
 - **core:** Check `$deprecated_dir` exists before accessing it ([#6574](https://github.com/ScoopInstaller/Scoop/issues/6574))
-- **checkver:** Remove redundant always-true condition in GitHub checkver logic ([#6571](https://github.com/ScoopInstaller/Scoop/issue- **shim:** Fix WoW64 file system redirection for x86 shim executables on x64 OS by rewriting System32/SysWOW64 paths in `.shim` config ([#6619](https://github.com/ScoopInstaller/Scoop/issues/6619))
+- **checkver:** Remove redundant always-true condition in GitHub checkver logic ([#6571](https://github.com/ScoopInstaller/Scoop/issues/6571))
+- **shim:** Fix WoW64 file system redirection for x86 shim executables on x64 OS by rewriting System32/SysWOW64 paths in `.shim` config ([#6619](https://github.com/ScoopInstaller/Scoop/issues/6619))
 
 ### Code Refactoring
 
