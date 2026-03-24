@@ -380,7 +380,7 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'WoW64 path rewriting in shim' -Tag 'Scoop' {
+Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
     It 'rewrites System32 to Sysnative for x86 shim on x64 OS' {
         $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
         $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
