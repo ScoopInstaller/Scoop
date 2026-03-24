@@ -36,8 +36,8 @@ function Get-PEMachine($filePath) {
     } catch {
         return 0
     } finally {
-        $binaryReader.Close()
-        $fileStream.Close()
+        if ($null -ne $binaryReader) { $binaryReader.Close() }
+        if ($null -ne $fileStream) { $fileStream.Close() }
     }
 }
 
