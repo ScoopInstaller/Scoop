@@ -1,39 +1,29 @@
-name: Scoop Core CI Tests
+name: CI
 
 on:
   pull_request:
   workflow_dispatch:
 
 jobs:
-  test_powershell:
-    name: WindowsPowerShell
+  test:
+    name: Test
     runs-on: windows-latest
+    strategy:
+      matrix:
+        shell: [powershell, pwsh]
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
+          # Need at least 2 commits to properly gather changed files for linting
           fetch-depth: 2
-      - name: Init Test Suite
-        uses: potatoqualitee/psmodulecache@main
+      - name: Install and cache test dependencies
+        uses: potatoqualitee/psmodulecache@ee5e9494714abf56f6efbfa51527b2aec5c761b8 # v6.2.1
         with:
-          modules-to-cache: BuildHelpers
-          shell: powershell
-      - name: Test Scoop Core
-        shell: powershell
-        run: ./test/bin/test.ps1
-  test_pwsh:
-    name: PowerShell
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@main
-        with:
-          fetch-depth: 2
-      - name: Init Test Suite
-        uses: potatoqualitee/psmodulecache@main
-        with:
-          modules-to-cache: BuildHelpers
-          shell: pwsh
-      - name: Test Scoop Core
-        shell: pwsh
+          modules-to-cache: PSScriptAnalyzer, BuildHelpers, Pester
+          shell: ${{ matrix.shell }}
+      - name: Run tests
         run: ./test/bin/test.ps1
