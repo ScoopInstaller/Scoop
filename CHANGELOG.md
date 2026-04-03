@@ -32,6 +32,7 @@
 - **core:** Fix substitute handling of substring keys ([#6561](https://github.com/ScoopInstaller/Scoop/issues/6561))
 - **core:** Check `$deprecated_dir` exists before accessing it ([#6574](https://github.com/ScoopInstaller/Scoop/issues/6574))
 - **checkver:** Remove redundant always-true condition in GitHub checkver logic ([#6571](https://github.com/ScoopInstaller/Scoop/issues/6571))
+- **auto-pr** Rebase before pushing in `auto-pr.ps1` to prevent push conflicts ([#6624](https://github.com/ScoopInstaller/Scoop/issues/6624))
 
 ### Code Refactoring
 
