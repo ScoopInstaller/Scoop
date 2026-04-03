@@ -8,5 +8,6 @@
     "nerd-fonts": "https://github.com/matthewjberger/scoop-nerd-fonts",
     "nonportable": "https://github.com/ScoopInstaller/Nonportable",
     "java": "https://github.com/ScoopInstaller/Java",
-    "games": "https://github.com/Calinou/scoop-games"
+    "games": "https://github.com/Calinou/scoop-games",
+    "arnica": "https://github.com/arnica/scoop-depsguard"
 }
