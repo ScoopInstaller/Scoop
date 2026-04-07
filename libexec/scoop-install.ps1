@@ -80,7 +80,7 @@ if ($apps.length -eq 1) {
     }
     $curVersion = Select-CurrentVersion -AppName $app -Global:$global
     if ($null -eq $version -and $curVersion) {
-        warn "'$app' ($curVersion) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
+        warn "'$app' ($curVersion) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version.`n`tscoop update $app$(if ($global) { ' --global' })"
         exit 0
     }
 }
@@ -101,7 +101,7 @@ if ($specific_versions.Count -gt 0) {
 $specific_versions_paths = $specific_versions | ForEach-Object {
     $app, $bucket, $version = parse_app $_
     if (installed_manifest $app $version) {
-        warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
+        warn "'$app' ($curVersion) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version.`n`tscoop update $app$(if ($global) { ' --global' })"
         continue
     }
 
