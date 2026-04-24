@@ -156,7 +156,7 @@ $Queue | ForEach-Object {
     # }
     # ```
     if (($json.checkver -eq 'github') -or $json.checkver.github) {
-        $githubUrlPattern = '^https://((www\.)?github\.com/[\w.-]+/[\w.-]+/?|api\.github\.com/repos/[\w.-]+/[\w.-]+(/.*)?)$'
+        $githubUrlPattern = '^https://((www\.)?github\.com/[\w.-]+/[\w.-]+/?|api\.github\.com/repos/[\w.-]+/[\w.-]+/.+)$'
         $regex = if ($regex) { $regex } else { '/releases/tag/(?:v|V)?([\d.]+)' }
 
         $inputGithubUrl = $json.homepage
