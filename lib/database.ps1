@@ -1,5 +1,52 @@
 # Description: Functions for interacting with the Scoop database cache
 
+if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
+    . "$PSScriptRoot\versions.ps1"
+}
+
+function Get-LatestScoopDBRow {
+    param(
+        [Parameter(Mandatory)]
+        [object[]]
+        $Rows
+    )
+
+    $latest = $Rows[0]
+    foreach ($row in ($Rows | Select-Object -Skip 1)) {
+        if ((Compare-Version -ReferenceVersion $latest.version -DifferenceVersion $row.version) -gt 0) {
+            $latest = $row
+        }
+    }
+
+    return $latest
+}
+
+function Select-LatestScoopDBRows {
+    param(
+        [Parameter(Mandatory)]
+        [System.Data.DataTable]
+        $Table,
+        [string[]]
+        $GroupBy
+    )
+
+    $latestRows = $Table.Clone()
+    $rows = @($Table.Rows)
+    if ($rows.Count -eq 0) {
+        return $latestRows
+    }
+
+    if ($GroupBy -and $GroupBy.Count -gt 0) {
+        foreach ($group in ($rows | Group-Object -Property $GroupBy)) {
+            $latestRows.ImportRow((Get-LatestScoopDBRow -Rows @($group.Group)))
+        }
+    } else {
+        $latestRows.ImportRow((Get-LatestScoopDBRow -Rows $rows))
+    }
+
+    return $latestRows
+}
+
 <#
 .SYNOPSIS
     Get SQLite .NET driver
@@ -277,7 +324,6 @@ function Find-ScoopDBItem {
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
         $result = New-Object System.Data.DataTable
         $dbQuery = "SELECT * FROM app WHERE $(($From -join ' LIKE @Pattern OR ') + ' LIKE @Pattern')"
-        $dbQuery = "SELECT * FROM ($($dbQuery + ' ORDER BY version DESC')) GROUP BY name, bucket"
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
         $dbCommand.CommandType = [System.Data.CommandType]::Text
@@ -291,7 +337,7 @@ function Find-ScoopDBItem {
         $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
-        return $result
+        return Select-LatestScoopDBRows -Table $result -GroupBy @('name', 'bucket')
     }
 }
 
@@ -336,8 +382,6 @@ function Get-ScoopDBItem {
         $dbQuery = 'SELECT * FROM app WHERE name = @Name AND bucket = @Bucket'
         if ($Version) {
             $dbQuery += ' AND version = @Version'
-        } else {
-            $dbQuery += ' ORDER BY version DESC LIMIT 1'
         }
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
@@ -356,7 +400,11 @@ function Get-ScoopDBItem {
         $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
-        return $result
+        if ($Version) {
+            return $result
+        }
+
+        return Select-LatestScoopDBRows -Table $result
     }
 }
 
