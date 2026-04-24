@@ -139,7 +139,6 @@ $Queue | ForEach-Object {
     $jsonpath = ''
     $xpath = ''
     $replace = ''
-    $useGithubAPI = $false
 
     ## GitHub
     #
@@ -178,7 +177,7 @@ $Queue | ForEach-Object {
 
         if ($GitHubToken) {
             $url = $url -replace '//(www\.)?github.com/', '//api.github.com/repos/'
-            $useGithubAPI = $true
+            $wc.Headers.Add('Authorization', "token $GitHubToken")
         }
     }
 
@@ -235,10 +234,6 @@ $Queue | ForEach-Object {
     }
 
     $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq 'true'
-
-    if ($useGithubAPI) {
-        $wc.Headers.Add('Authorization', "token $GitHubToken")
-    }
 
     $url = substitute $url $substitutions
 
