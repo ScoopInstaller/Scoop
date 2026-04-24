@@ -141,25 +141,44 @@ $Queue | ForEach-Object {
     $replace = ''
     $useGithubAPI = $false
 
-    # GitHub
-    if ($regex) {
-        $githubRegex = $regex
-    } else {
-        $githubRegex = '/releases/tag/(?:v|V)?([\d.]+)'
-    }
-    if ($json.checkver -eq 'github') {
-        if (!$json.homepage.StartsWith('https://github.com/')) {
-            error "$name checkver expects the homepage to be a github repository"
-        }
-        $url = $json.homepage.TrimEnd('/') + '/releases/latest'
-        $regex = $githubRegex
-        $useGithubAPI = $true
-    }
+    ## GitHub
+    #
+    # ```json
+    # "homepage": "<valid-repository-url>",
+    # "checkver": "github"
+    # ```
+    #
+    # or
+    #
+    # ```json
+    # "checkver": {
+    #     "github": "<valid-repository-url-or-repository-api-url>"
+    # }
+    # ```
+    if (($json.checkver -eq 'github') -or $json.checkver.github) {
+        $githubUrlPattern = '^https://((www\.)?github\.com/[\w.-]+/[\w.-]+/?|api\.github\.com/repos/[\w.-]+/[\w.-]+(/.*)?)$'
+        $regex = if ($regex) { $regex } else { '/releases/tag/(?:v|V)?([\d.]+)' }
 
-    if ($json.checkver.github) {
-        $url = $json.checkver.github.TrimEnd('/') + '/releases/latest'
-        $regex = $githubRegex
-        $useGithubAPI = $true
+        $inputGithubUrl = $json.homepage
+        $fieldUsed = 'homepage'
+        if ($json.checkver.github) {
+            $inputGithubUrl = $json.checkver.github
+            $fieldUsed = 'checkver.github'
+        }
+
+        if ($inputGithubUrl -notmatch $githubUrlPattern) {
+            error "$name checkver expects $fieldUsed to be a valid GitHub repository URL"
+        }
+
+        $url = $inputGithubUrl.TrimEnd('/')
+        if ($url -notlike 'https://api.github.com*') {
+            $url = $url + '/releases/latest'
+        }
+
+        if ($GitHubToken) {
+            $url = $url -replace '//(www\.)?github.com/', '//api.github.com/repos/'
+            $useGithubAPI = $true
+        }
     }
 
     # SourceForge
@@ -216,10 +235,7 @@ $Queue | ForEach-Object {
 
     $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq 'true'
 
-    if ($url -like '*api.github.com/*') { $useGithubAPI = $true }
-
-    if ($useGithubAPI -and ($null -ne $GitHubToken)) {
-        $url = $url -replace '//(www\.)?github.com/', '//api.github.com/repos/'
+    if ($useGithubAPI) {
         $wc.Headers.Add('Authorization', "token $GitHubToken")
     }
 
