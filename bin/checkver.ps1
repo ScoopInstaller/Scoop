@@ -108,6 +108,7 @@ Get-Event | Remove-Event
 Get-EventSubscriber | Unregister-Event
 
 # start all downloads
+$in_progress = 0
 $Queue | ForEach-Object {
     $name, $json, $file = $_
 
@@ -119,7 +120,6 @@ $Queue | ForEach-Object {
     } else {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
     }
-    Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
 
     # Not Specified
     if ($json.checkver.url) {
@@ -168,6 +168,7 @@ $Queue | ForEach-Object {
 
         if ($inputGithubUrl -notmatch $githubUrlPattern) {
             error "$name checkver expects $fieldUsed to be a valid GitHub repository URL"
+            return
         }
 
         $url = $inputGithubUrl.TrimEnd('/')
@@ -260,6 +261,8 @@ $Queue | ForEach-Object {
     }
 
     $wc.Headers.Add('Referer', (strip_filename $url))
+    Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
+    $in_progress++
     $wc.DownloadDataAsync($url, $state)
 }
 
@@ -269,7 +272,6 @@ function next($er) {
 }
 
 # wait for all to complete
-$in_progress = $Queue.length
 while ($in_progress -gt 0) {
     $ev = Wait-Event
     Remove-Event $ev.SourceIdentifier
