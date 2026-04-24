@@ -34,6 +34,7 @@
 - **core:** Check `$deprecated_dir` exists before accessing it ([#6574](https://github.com/ScoopInstaller/Scoop/issues/6574))
 - **checkver:** Remove redundant always-true condition in GitHub checkver logic ([#6571](https://github.com/ScoopInstaller/Scoop/issues/6571))
 - **core:** Give `dark` higher priority when use `Extract-DarkArchive` ([#6637](https://github.com/ScoopInstaller/Scoop/issues/6637))
+- **checkver:** Harden github checkver ([#6641](https://github.com/ScoopInstaller/Scoop/issues/6641))
 
 ### Code Refactoring
 
