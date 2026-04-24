@@ -257,8 +257,8 @@ $Queue | ForEach-Object {
 
     $wc.Headers.Add('Referer', (strip_filename $url))
     Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
-    $in_progress++
     $wc.DownloadDataAsync($url, $state)
+    $in_progress++
 }
 
 function next($er) {
