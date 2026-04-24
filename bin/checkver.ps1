@@ -176,7 +176,7 @@ $Queue | ForEach-Object {
         }
 
         if ($GitHubToken) {
-            $url = $url -replace '//(www\.)?github.com/', '//api.github.com/repos/'
+            $url = $url -replace '//(www\.)?github\.com/', '//api.github.com/repos/'
             $wc.Headers.Add('Authorization', "token $GitHubToken")
         }
     }
