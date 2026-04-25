@@ -21,7 +21,7 @@ function Get-LatestScoopDBRow {
     return $latest
 }
 
-function Select-LatestScoopDBRows {
+function Select-LatestScoopDBRow {
     param(
         [Parameter(Mandatory)]
         [System.Data.DataTable]
@@ -337,7 +337,7 @@ function Find-ScoopDBItem {
         $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
-        return Select-LatestScoopDBRows -Table $result -GroupBy @('name', 'bucket')
+        return Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket')
     }
 }
 
@@ -404,7 +404,7 @@ function Get-ScoopDBItem {
             return $result
         }
 
-        return Select-LatestScoopDBRows -Table $result
+        return Select-LatestScoopDBRow -Table $result
     }
 }
 

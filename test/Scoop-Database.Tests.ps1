@@ -28,7 +28,7 @@ Describe 'database version selection' -Tag 'Scoop' {
         [void]$result.Rows.Add('zotero', '7.0.9', 'he0119', 'zotero')
         [void]$result.Rows.Add('zotero', '7.0.20', 'he0119', 'zotero')
 
-        $latest = @(Select-LatestScoopDBRows -Table $result -GroupBy @('name', 'bucket'))
+        $latest = @(Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket'))
 
         $latest.Count | Should -Be 3
         (@($latest | Where-Object { $_.name -eq 'copilot-cli' -and $_.bucket -eq 'main' })[0]).version | Should -Be '1.0.31'
@@ -45,7 +45,7 @@ Describe 'database version selection' -Tag 'Scoop' {
         [void]$result.Rows.Add('zotero', '7.0.9', 'extras', 'zotero')
         [void]$result.Rows.Add('zotero', '7.0.20', 'extras', 'zotero')
 
-        $latest = @(Select-LatestScoopDBRows -Table $result)
+        $latest = @(Select-LatestScoopDBRow -Table $result)
 
         $latest.Count | Should -Be 1
         $latest[0].version | Should -Be '7.0.20'
