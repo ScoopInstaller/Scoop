@@ -15,6 +15,10 @@ Describe 'database version selection' -Tag 'Scoop' {
         (Get-LatestScoopDBRow -Rows $rows).version | Should -Be '1.0.31'
     }
 
+    It 'returns null when no rows are provided' {
+        Get-LatestScoopDBRow -Rows @() | Should -Be $null
+    }
+
     It 'returns the latest semantic version per name and bucket' {
         $result = New-Object System.Data.DataTable
         [void]$result.Columns.Add('name', [string])

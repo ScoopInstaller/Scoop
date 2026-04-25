@@ -4,12 +4,23 @@ if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
     . "$PSScriptRoot\versions.ps1"
 }
 
+<#
+.SYNOPSIS
+    Get the latest row from a set of Scoop database rows.
+.DESCRIPTION
+    Compares the `version` property of each row semantically and returns the
+    latest row. Returns `$null` when no rows are provided.
+#>
 function Get-LatestScoopDBRow {
     param(
         [Parameter(Mandatory)]
         [object[]]
         $Rows
     )
+
+    if (-not $Rows -or $Rows.Count -eq 0) {
+        return $null
+    }
 
     $latest = $Rows[0]
     foreach ($row in ($Rows | Select-Object -Skip 1)) {
