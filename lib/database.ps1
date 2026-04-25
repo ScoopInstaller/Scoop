@@ -14,6 +14,7 @@ if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
 function Get-LatestScoopDBRow {
     param(
         [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
         [object[]]
         $Rows
     )
@@ -23,7 +24,8 @@ function Get-LatestScoopDBRow {
     }
 
     $latest = $Rows[0]
-    foreach ($row in ($Rows | Select-Object -Skip 1)) {
+    for ($i = 1; $i -lt $Rows.Count; $i++) {
+        $row = $Rows[$i]
         if ((Compare-Version -ReferenceVersion $latest.version -DifferenceVersion $row.version) -gt 0) {
             $latest = $row
         }
@@ -32,6 +34,21 @@ function Get-LatestScoopDBRow {
     return $latest
 }
 
+<#
+.SYNOPSIS
+    Return the semantically latest row or rows from a Scoop database result set.
+.DESCRIPTION
+    Clones the schema of `Table` and imports the latest row per group when
+    `GroupBy` is supplied, or the single latest row across the whole table when
+    it is omitted. Returns an empty cloned table when the source table has no rows.
+.PARAMETER Table
+    The source `System.Data.DataTable` returned from a Scoop database query.
+.PARAMETER GroupBy
+    Optional column names used to group rows before semantic latest-row selection.
+.OUTPUTS
+    System.Data.DataTable
+    A cloned table containing the latest matching row for each requested scope.
+#>
 function Select-LatestScoopDBRow {
     param(
         [Parameter(Mandatory)]
@@ -411,6 +428,8 @@ function Get-ScoopDBItem {
         $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
+        # With $Version, the PRIMARY KEY guarantees at most one row; without it, the
+        # query is already limited to one name+bucket pair, so selecting latest needs no -GroupBy.
         if ($Version) {
             return $result
         }
