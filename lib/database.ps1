@@ -1,80 +1,5 @@
 # Description: Functions for interacting with the Scoop database cache
 
-if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
-    . "$PSScriptRoot\versions.ps1"
-}
-
-<#
-.SYNOPSIS
-    Get the latest row from a set of Scoop database rows.
-.DESCRIPTION
-    Compares the `version` property of each row semantically and returns the
-    latest row. Returns `$null` when no rows are provided.
-#>
-function Get-LatestScoopDBRow {
-    param(
-        [Parameter(Mandatory)]
-        [AllowEmptyCollection()]
-        [object[]]
-        $Rows
-    )
-
-    if (-not $Rows -or $Rows.Count -eq 0) {
-        return $null
-    }
-
-    $latest = $Rows[0]
-    for ($i = 1; $i -lt $Rows.Count; $i++) {
-        $row = $Rows[$i]
-        if ((Compare-Version -ReferenceVersion $latest.version -DifferenceVersion $row.version) -gt 0) {
-            $latest = $row
-        }
-    }
-
-    return $latest
-}
-
-<#
-.SYNOPSIS
-    Return the semantically latest row or rows from a Scoop database result set.
-.DESCRIPTION
-    Clones the schema of `Table` and imports the latest row per group when
-    `GroupBy` is supplied, or the single latest row across the whole table when
-    it is omitted. Returns an empty cloned table when the source table has no rows.
-.PARAMETER Table
-    The source `System.Data.DataTable` returned from a Scoop database query.
-.PARAMETER GroupBy
-    Optional column names used to group rows before semantic latest-row selection.
-.OUTPUTS
-    System.Data.DataTable
-    A cloned table containing the latest matching row for each requested scope.
-#>
-function Select-LatestScoopDBRow {
-    param(
-        [Parameter(Mandatory)]
-        [System.Data.DataTable]
-        $Table,
-        [string[]]
-        $GroupBy
-    )
-
-    $latestRows = $Table.Clone()
-    $rows = @($Table.Rows)
-    if ($rows.Count -eq 0) {
-        return $latestRows
-    }
-
-    if ($GroupBy -and $GroupBy.Count -gt 0) {
-        foreach ($group in ($rows | Group-Object -Property $GroupBy)) {
-            $latestRows.ImportRow((Get-LatestScoopDBRow -Rows @($group.Group)))
-        }
-    } else {
-        $latestRows.ImportRow((Get-LatestScoopDBRow -Rows $rows))
-    }
-
-    return $latestRows
-}
-
 <#
 .SYNOPSIS
     Get SQLite .NET driver
@@ -436,6 +361,91 @@ function Get-ScoopDBItem {
 
         return Select-LatestScoopDBRow -Table $result
     }
+}
+
+<#
+.SYNOPSIS
+    Get the latest row from a set of Scoop database rows.
+.DESCRIPTION
+    Compares the `version` property of each row semantically and returns the
+    latest row. Returns `$null` when no rows are provided.
+.PARAMETER Rows
+    System.Object[]
+    The rows to evaluate for the latest version. Each row must have a `version` property.
+.INPUTS
+    System.Object[]
+.OUTPUTS
+    System.Object
+    The latest row based on semantic versioning, or `$null` if no rows are provided.
+#>
+function Get-LatestScoopDBRow {
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [object[]]
+        $Rows
+    )
+
+    if (-not $Rows -or $Rows.Count -eq 0) {
+        return $null
+    }
+
+    if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
+        . "$PSScriptRoot\versions.ps1"
+    }
+
+    $latest = $Rows[0]
+    for ($i = 1; $i -lt $Rows.Count; $i++) {
+        $row = $Rows[$i]
+        if ((Compare-Version -ReferenceVersion $latest.version -DifferenceVersion $row.version) -gt 0) {
+            $latest = $row
+        }
+    }
+
+    return $latest
+}
+
+<#
+.SYNOPSIS
+    Return the semantically latest row or rows from a Scoop database result set.
+.DESCRIPTION
+    Clones the schema of `Table` and imports the latest row per group when
+    `GroupBy` is supplied, or the single latest row across the whole table when
+    it is omitted. Returns an empty cloned table when the source table has no rows.
+.PARAMETER Table
+    System.Data.DataTable
+    The source table returned from a Scoop database query.
+.PARAMETER GroupBy
+    System.String[]
+    Optional column names used to group rows before semantic latest-row selection.
+.OUTPUTS
+    System.Data.DataTable
+    A cloned table containing the latest matching row for each requested scope.
+#>
+function Select-LatestScoopDBRow {
+    param(
+        [Parameter(Mandatory)]
+        [System.Data.DataTable]
+        $Table,
+        [string[]]
+        $GroupBy
+    )
+
+    $latestRows = $Table.Clone()
+    $rows = @($Table.Rows)
+    if ($rows.Count -eq 0) {
+        return $latestRows
+    }
+
+    if ($GroupBy -and $GroupBy.Count -gt 0) {
+        foreach ($group in ($rows | Group-Object -Property $GroupBy)) {
+            $latestRows.ImportRow((Get-LatestScoopDBRow -Rows @($group.Group)))
+        }
+    } else {
+        $latestRows.ImportRow((Get-LatestScoopDBRow -Rows $rows))
+    }
+
+    return $latestRows
 }
 
 <#
