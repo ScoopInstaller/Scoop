@@ -59,8 +59,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     create_shims $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
-    env_add_path $manifest $dir $global $architecture
     env_set $manifest $global $architecture
+    env_add_path $manifest $dir $global $architecture
 
     # persist data
     persist_data $manifest $original_dir $persist_dir
@@ -317,7 +317,13 @@ function env_add_path($manifest, $dir, $global, $arch) {
         if (get_config USE_ISOLATED_PATH) {
             Add-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
         }
-        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        $path = $env_add_path.Where({ $_ }) | ForEach-Object {
+            if ($_ -like '$*'){
+                $ExecutionContext.InvokeCommand.ExpandString($_)
+            }else{
+                Join-Path $dir $_ | Get-AbsolutePath | Where-Object { is_in_dir $dir $_ }
+            }
+        }
         Add-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global -Force
     }
 }
@@ -326,7 +332,13 @@ function env_rm_path($manifest, $dir, $global, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     $dir = $dir.TrimEnd('\')
     if ($env_add_path) {
-        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+        $path = $env_add_path.Where({ $_ }) | ForEach-Object {
+            if ($_ -like '$*'){
+                $ExecutionContext.InvokeCommand.ExpandString($_)
+            }else{
+                Join-Path $dir $_ | Get-AbsolutePath | Where-Object { is_in_dir $dir $_ }
+            }
+        }
         Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
         Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global
     }
