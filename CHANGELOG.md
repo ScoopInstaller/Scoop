@@ -7,6 +7,7 @@
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
 - **download|scoop-download:** Add GitHub issue prompt when the default downloader fails ([#6539](https://github.com/ScoopInstaller/Scoop/issues/6539))
 - **download|scoop-config:** Allow disabling automatic fallback to the default downloader when Aria2c download fails ([#6538](https://github.com/ScoopInstaller/Scoop/issues/6538))
+- **checkver:** Set GitHub mode default jsonpath and regex ([#6653](https://github.com/ScoopInstaller/Scoop/issues/6653))
 
 ### Bug Fixes
 
