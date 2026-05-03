@@ -277,7 +277,6 @@ function Find-ScoopDBItem {
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
         $result = New-Object System.Data.DataTable
         $dbQuery = "SELECT * FROM app WHERE $(($From -join ' LIKE @Pattern OR ') + ' LIKE @Pattern')"
-        $dbQuery = "SELECT * FROM ($($dbQuery + ' ORDER BY version DESC')) GROUP BY name, bucket"
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
         $dbCommand.CommandType = [System.Data.CommandType]::Text
@@ -291,7 +290,7 @@ function Find-ScoopDBItem {
         $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
-        return $result
+        return Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket')
     }
 }
 
@@ -336,8 +335,6 @@ function Get-ScoopDBItem {
         $dbQuery = 'SELECT * FROM app WHERE name = @Name AND bucket = @Bucket'
         if ($Version) {
             $dbQuery += ' AND version = @Version'
-        } else {
-            $dbQuery += ' ORDER BY version DESC LIMIT 1'
         }
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
@@ -356,8 +353,99 @@ function Get-ScoopDBItem {
         $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
-        return $result
+        # With $Version, the PRIMARY KEY guarantees at most one row; without it, the
+        # query is already limited to one name+bucket pair, so selecting latest needs no -GroupBy.
+        if ($Version) {
+            return $result
+        }
+
+        return Select-LatestScoopDBRow -Table $result
     }
+}
+
+<#
+.SYNOPSIS
+    Get the latest row from a set of Scoop database rows.
+.DESCRIPTION
+    Compares the `version` property of each row semantically and returns the
+    latest row. Returns `$null` when no rows are provided.
+.PARAMETER Rows
+    System.Object[]
+    The rows to evaluate for the latest version. Each row must have a `version` property.
+.INPUTS
+    System.Object[]
+.OUTPUTS
+    System.Object
+    The latest row based on semantic versioning, or `$null` if no rows are provided.
+#>
+function Get-LatestScoopDBRow {
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [object[]]
+        $Rows
+    )
+
+    if (-not $Rows -or $Rows.Count -eq 0) {
+        return $null
+    }
+
+    if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
+        . "$PSScriptRoot\versions.ps1"
+    }
+
+    $latest = $Rows[0]
+    for ($i = 1; $i -lt $Rows.Count; $i++) {
+        $row = $Rows[$i]
+        if ((Compare-Version -ReferenceVersion $latest.version -DifferenceVersion $row.version) -gt 0) {
+            $latest = $row
+        }
+    }
+
+    return $latest
+}
+
+<#
+.SYNOPSIS
+    Return the semantically latest row or rows from a Scoop database result set.
+.DESCRIPTION
+    Clones the schema of `Table` and imports the latest row per group when
+    `GroupBy` is supplied, or the single latest row across the whole table when
+    it is omitted. Returns an empty cloned table when the source table has no rows.
+.PARAMETER Table
+    System.Data.DataTable
+    The source table returned from a Scoop database query.
+.PARAMETER GroupBy
+    System.String[]
+    Optional column names used to group rows before semantic latest-row selection.
+.OUTPUTS
+    System.Data.DataTable
+    A cloned table containing the latest matching row for each requested scope.
+#>
+function Select-LatestScoopDBRow {
+    param(
+        [Parameter(Mandatory)]
+        [System.Data.DataTable]
+        $Table,
+        [string[]]
+        $GroupBy
+    )
+
+    $latestRows = $Table.Clone()
+    $rows = @($Table.Rows)
+    if ($rows.Count -eq 0) {
+        return $latestRows
+    }
+
+    if ($GroupBy -and $GroupBy.Count -gt 0) {
+        foreach ($group in ($rows | Group-Object -Property $GroupBy)) {
+            $latestRows.ImportRow((Get-LatestScoopDBRow -Rows @($group.Group)))
+        }
+    } else {
+        $latestRows.ImportRow((Get-LatestScoopDBRow -Rows $rows))
+    }
+
+    return $latestRows
 }
 
 <#

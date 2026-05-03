@@ -190,7 +190,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
-    if (Test-Path $bucket_path) {
+    if ((Test-Path $bucket_path) -and (Test-GitAvailable)) {
         $remote = Invoke-Git -Path $bucket_path -ArgumentList @('config', '--get', 'remote.origin.url')
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
