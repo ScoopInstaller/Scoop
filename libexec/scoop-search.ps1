@@ -1,10 +1,11 @@
 # Usage: scoop search <query>
 # Summary: Search available apps
 # Help: Searches for apps that are available to install.
-#
-# If used with [query], shows app names that match the query.
 #   - With 'use_sqlite_cache' enabled, [query] is partially matched against app names, binaries, and shortcuts.
-#   - Without 'use_sqlite_cache', [query] can be a regular expression to match against app names and binaries.
+#   - Without 'use_sqlite_cache', [query] is matched against app names and binaries via:
+#       * A JSON-based binary-index cache (when fresh) for fast substring matching (~200ms), or
+#       * The original regex full-scan as fallback (~3s).
+#   - Queries containing regex metacharacters (.+*?|[](){}^$\ ) skip the cache and use regex directly.
 # Without [query], shows all the available apps.
 param($query)
 
@@ -13,6 +14,160 @@ param($query)
 . "$PSScriptRoot\..\lib\download.ps1"
 
 $list = [System.Collections.Generic.List[PSCustomObject]]::new()
+
+# === Search index cache (JSON-based, faster than SQLite) ===
+$searchCachePath = Join-Path $scoopdir 'search-cache.json'
+$searchIndexApps = $null
+$searchIndexBins = $null
+
+function init_search_cache {
+    if (-not (Test-Path $searchCachePath)) { return $false }
+    try {
+        $cache = Get-Content $searchCachePath -Raw | ConvertFrom-Json -ErrorAction Stop
+        $cacheAge = (Get-Date) - [datetime]::Parse($cache.timestamp)
+        if ($cacheAge.TotalHours -ge 24) { return $false }
+        # Cross-check file count and last-write fingerprint for staleness
+        $currentCount = 0; $currentMaxWrite = [datetime]::MinValue
+        Get-LocalBucket | ForEach-Object {
+            $dir = Find-BucketDirectory $_
+            $items = Get-ChildItem $dir -Filter '*.json' -Recurse -ErrorAction SilentlyContinue
+            $currentCount += $items.Count
+            foreach ($item in $items) {
+                if ($item.LastWriteTimeUtc -gt $currentMaxWrite) { $currentMaxWrite = $item.LastWriteTimeUtc }
+            }
+        }
+        if ($cache.fileCount -ne $currentCount) { return $false }
+        if ($cache.maxWriteUtc -ne $currentMaxWrite.ToString('o')) { return $false }
+        $script:searchIndexApps = @{}
+        foreach ($prop in $cache.apps.PSObject.Properties) {
+            $entries = @()
+            foreach ($entry in $prop.Value) {
+                $entries += @{ path = $entry.path; bucket = $entry.bucket }
+            }
+            $script:searchIndexApps[$prop.Name] = $entries
+        }
+        $script:searchIndexBins = @{}
+        foreach ($prop in $cache.bins.PSObject.Properties) {
+            $script:searchIndexBins[$prop.Name] = @($prop.Value)
+        }
+        return $true
+    } catch { return $false }
+}
+
+function build_search_cache {
+    $allPathsByBucket = @{}
+    $maxWriteUtc = [datetime]::MinValue
+    Get-LocalBucket | ForEach-Object {
+        $dir = Find-BucketDirectory $_
+        $items = Get-ChildItem $dir -Filter '*.json' -Recurse -ErrorAction SilentlyContinue
+        $paths = @($items | ForEach-Object { $_.FullName })
+        foreach ($item in $items) {
+            if ($item.LastWriteTimeUtc -gt $maxWriteUtc) { $maxWriteUtc = $item.LastWriteTimeUtc }
+        }
+        if ($paths.Count -gt 0) { $allPathsByBucket[$_] = $paths }
+    }
+    $totalCount = ($allPathsByBucket.Values | ForEach-Object { $_.Count } | Measure-Object -Sum).Sum
+    $newApps = @{}
+    $newBins = @{}
+
+    foreach ($bucket in $allPathsByBucket.Keys) {
+        foreach ($filePath in $allPathsByBucket[$bucket]) {
+            $appName = [System.IO.Path]::GetFileNameWithoutExtension($filePath)
+            if (-not $newApps.ContainsKey($appName)) { $newApps[$appName] = @() }
+            $newApps[$appName] += @{ path = $filePath; bucket = $bucket }
+            try {
+                $manifest = Get-Content -Path $filePath -Raw | ConvertFrom-Json -ErrorAction Stop
+                if (-not $manifest.bin) { continue }
+                foreach ($binEntry in $manifest.bin) {
+                    $exe = $null; $alias = $null
+                    if ($binEntry -is [System.Object[]]) {
+                        $exe = $binEntry[0]
+                        $alias = if ($binEntry.Count -gt 1) { $binEntry[1] } else { $null }
+                    } else { $exe = $binEntry }
+                    $exeName = [System.IO.Path]::GetFileNameWithoutExtension([string]$exe).ToLower()
+                    if ($exeName) {
+                        if (-not $newBins.ContainsKey($exeName)) { $newBins[$exeName] = @() }
+                        if ($appName -notin $newBins[$exeName]) { $newBins[$exeName] += $appName }
+                    }
+                    if ($alias) {
+                        $aliasName = $alias.ToLower()
+                        if ($aliasName) {
+                            if (-not $newBins.ContainsKey($aliasName)) { $newBins[$aliasName] = @() }
+                            if ($appName -notin $newBins[$aliasName]) { $newBins[$aliasName] += $appName }
+                        }
+                    }
+                }
+            } catch { Write-Debug "cache-build parse failed for $($filePath): $($_.Exception.Message)" }
+        }
+    }
+    $cacheData = [PSCustomObject]@{ timestamp = (Get-Date).ToString('o'); fileCount = $totalCount; maxWriteUtc = $maxWriteUtc.ToString('o'); apps = [PSCustomObject]$newApps; bins = [PSCustomObject]$newBins }
+    $cacheData | ConvertTo-Json -Compress -Depth 4 | Set-Content $searchCachePath -Encoding UTF8
+    $script:searchIndexApps = $newApps
+    $script:searchIndexBins = $newBins
+    return $true
+}
+
+function search_by_index($query) {
+    if (-not $query) { return }
+    $matchedByName = @{}
+    $matchedByBin = @{}
+
+    # Phase 1: Search app names (case-insensitive substring)
+    foreach ($appName in $searchIndexApps.Keys) {
+        if ($appName.IndexOf($query, [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+            $matchedByName[$appName] = $true
+        }
+    }
+
+    # Phase 2: Search binary names — only for apps not already matched by name
+    foreach ($binName in $searchIndexBins.Keys) {
+        if ($binName.IndexOf($query, [StringComparison]::OrdinalIgnoreCase) -ge 0) {
+            foreach ($appName in $searchIndexBins[$binName]) {
+                if (-not $matchedByName.ContainsKey($appName) -and -not $matchedByBin.ContainsKey($appName)) {
+                    $matchedByBin[$appName] = $true
+                }
+            }
+        }
+    }
+
+    # Display: name-matched apps get empty binaries (matching stock), binary-only get matching binaries
+    foreach ($appName in $matchedByName.Keys) {
+        foreach ($entry in $searchIndexApps[$appName]) {
+            try {
+                $manifest = Get-Content -Path $entry.path -Raw | ConvertFrom-Json -ErrorAction Stop
+                if (-not $manifest) { continue }
+                $list.Add([PSCustomObject]@{ Name = $appName; Version = $manifest.version; Source = $entry.bucket; Binaries = '' })
+            } catch { Write-Debug "index search parse failed for $($entry.path): $($_.Exception.Message)" }
+        }
+    }
+
+    foreach ($appName in $matchedByBin.Keys) {
+        foreach ($entry in $searchIndexApps[$appName]) {
+            try {
+                $manifest = Get-Content -Path $entry.path -Raw | ConvertFrom-Json -ErrorAction Stop
+                $binaries = ''
+                $binMatches = @()
+                if (-not $manifest) { continue }
+                if ($manifest.bin) {
+                    foreach ($binEntry in $manifest.bin) {
+                        $exe = $null; $alias = $null
+                        if ($binEntry -is [System.Object[]]) {
+                            $exe = $binEntry[0]
+                            $alias = if ($binEntry.Count -gt 1) { $binEntry[1] } else { $null }
+                        } else { $exe = $binEntry }
+                        $exeName = [System.IO.Path]::GetFileNameWithoutExtension([string]$exe)
+                        if ($exeName.IndexOf($query, [StringComparison]::OrdinalIgnoreCase) -ge 0 -or
+                            ($alias -and $alias.IndexOf($query, [StringComparison]::OrdinalIgnoreCase) -ge 0)) {
+                            $binMatches += [System.IO.Path]::GetFileName([string]$exe)
+                        }
+                    }
+                    if ($binMatches) { $binaries = $binMatches -join ' | ' }
+                }
+                $list.Add([PSCustomObject]@{ Name = $appName; Version = $manifest.version; Source = $entry.bucket; Binaries = $binaries })
+            } catch { Write-Debug "index search parse failed for $($entry.path): $($_.Exception.Message)" }
+        }
+    }
+}
 
 function bin_match($manifest, $query) {
     if (!$manifest.bin) { return $false }
@@ -169,20 +324,34 @@ if (get_config USE_SQLITE_CACHE) {
                 })
         }
 } else {
-    try {
-        $query = New-Object Regex $query, 'IgnoreCase'
-    } catch {
-        abort "Invalid regular expression: $($_.Exception.InnerException.Message)"
+    # Try search index cache first for literal queries (fast, substring matching).
+    # Queries with regex metacharacters skip the cache and go straight to regex.
+    $cacheWasFresh = $false
+    if ($query -notmatch '[.+*?|\[\](){}^$\\]') {
+        $cacheWasFresh = init_search_cache
+        if ($cacheWasFresh) { search_by_index $query }
     }
 
-    $jsonTextAvailable = [System.AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.Location) -eq 'System.Text.Json' }
-
-    Get-LocalBucket | ForEach-Object {
-        if ($jsonTextAvailable) {
-            search_bucket $_ $query
-        } else {
-            search_bucket_legacy $_ $query
+    # Fall back to regex full-scan when cache produced no results
+    if ($list.Count -eq 0) {
+        try {
+            $regex = New-Object Regex $query, 'IgnoreCase'
+        } catch {
+            abort "Invalid regular expression: $($_.Exception.InnerException.Message)"
         }
+
+        $jsonTextAvailable = [System.AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.Location) -eq 'System.Text.Json' }
+
+        Get-LocalBucket | ForEach-Object {
+            if ($jsonTextAvailable) {
+                search_bucket $_ $regex
+            } else {
+                search_bucket_legacy $_ $regex
+            }
+        }
+
+        # Build cache for next time only if it wasn't already fresh
+        if (-not $cacheWasFresh) { build_search_cache }
     }
 }
 
