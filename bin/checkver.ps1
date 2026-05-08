@@ -122,23 +122,21 @@ $Queue | ForEach-Object {
     }
 
     # Not Specified
+    $url = $json.homepage
+    $regex = ''
+    $jsonpath = ''
+    $xpath = ''
+    $replace = ''
+
     if ($json.checkver.url) {
         $url = $json.checkver.url
-    } else {
-        $url = $json.homepage
     }
 
     if ($json.checkver.re) {
         $regex = $json.checkver.re
     } elseif ($json.checkver.regex) {
         $regex = $json.checkver.regex
-    } else {
-        $regex = ''
     }
-
-    $jsonpath = ''
-    $xpath = ''
-    $replace = ''
 
     ## GitHub
     #
@@ -156,7 +154,6 @@ $Queue | ForEach-Object {
     # ```
     if (($json.checkver -eq 'github') -or $json.checkver.github) {
         $githubUrlPattern = '^https://((www\.)?github\.com/[\w.-]+/[\w.-]+/?|api\.github\.com/repos/[\w.-]+/[\w.-]+/.+)$'
-        $regex = if ($regex) { $regex } else { '/releases/tag/(?:v|V)?([\d.]+)' }
 
         $inputGithubUrl = $json.homepage
         $fieldUsed = 'homepage'
@@ -178,6 +175,17 @@ $Queue | ForEach-Object {
         if ($GitHubToken) {
             $url = $url -replace '//(www\.)?github\.com/', '//api.github.com/repos/'
             $wc.Headers.Add('Authorization', "token $GitHubToken")
+        }
+
+        if ($url -like 'https://api.github.com*') {
+            # Default jsonpath/regex in GitHub API mode
+            $jsonpath = '$.tag_name'
+            if (-not $regex) {
+                $regex = '(?:v|V)?([\d.-]+)'
+            }
+        } elseif (-not $regex) {
+            # Default regex in GitHub HTML mode
+            $regex = '/releases/tag/(?:v|V)?([\d.-]+)'
         }
     }
 
