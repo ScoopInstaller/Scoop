@@ -444,4 +444,13 @@ Describe 'format_installed_size' -Tag 'Scoop' {
             'Total:            923.6 MB'
         )
     }
+
+    It 'all output lines use the expected label:value format' {
+        $lines = format_installed_size 692479180 3113851289 223556812 52428800 -split "\r?\n"
+
+        # Every line should start with a label followed by ':'
+        $lines | ForEach-Object { $_ | Should -MatchExactly '^[A-Za-z ]+:\s+' }
+        # The final line should always be Total
+        $lines[-1] | Should -MatchExactly '^Total:\s+[\d.]+\s+\w+'
+    }
 }
