@@ -446,7 +446,8 @@ Describe 'format_installed_size' -Tag 'Scoop' {
     }
 
     It 'all output lines use the expected label:value format' {
-        $lines = format_installed_size 692479180 3113851289 223556812 52428800 -split "\r?\n"
+        $result = format_installed_size 692479180 3113851289 223556812 52428800
+        $lines = $result -split "\r?\n"
 
         # Every line should start with a label followed by ':'
         $lines | ForEach-Object { $_ | Should -MatchExactly '^[A-Za-z ]+:\s+' }
