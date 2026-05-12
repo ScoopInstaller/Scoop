@@ -341,6 +341,42 @@ function filesize($length) {
     }
 }
 
+function format_installed_size_line($label, $size, $suffix = '') {
+    "$($label.PadRight(16))$((filesize $size).PadLeft(10))$suffix"
+}
+
+function format_installed_size($currentSize, $persistedSize, $cacheSize, $oldVersionsSize) {
+    $currentSize = coalesce $currentSize 0
+    $persistedSize = coalesce $persistedSize 0
+    $cacheSize = coalesce $cacheSize 0
+    $oldVersionsSize = coalesce $oldVersionsSize 0
+
+    if ($persistedSize + $cacheSize + $oldVersionsSize -eq 0) {
+        return filesize $currentSize
+    }
+
+    $appSize = $currentSize + $persistedSize
+    $output = @()
+    $applicationSuffix = if ($persistedSize -gt 0) {
+        " ($(filesize $currentSize) app + $(filesize $persistedSize) user data)"
+    } else {
+        ''
+    }
+    $output += format_installed_size_line 'Application:' $appSize $applicationSuffix
+
+    if ($oldVersionsSize -ne 0) {
+        $output += format_installed_size_line 'Old versions:' $oldVersionsSize
+    }
+
+    if ($cacheSize -ne 0) {
+        $output += format_installed_size_line 'Download cache:' $cacheSize
+    }
+
+    $output += format_installed_size_line 'Total:' ($appSize + $cacheSize + $oldVersionsSize)
+
+    return $output -join "`n"
+}
+
 # dirs
 function basedir($global) { if ($global) { return $globaldir } $scoopdir }
 function appsdir($global) { "$(basedir $global)\apps" }

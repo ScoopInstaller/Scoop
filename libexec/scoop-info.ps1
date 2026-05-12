@@ -160,7 +160,7 @@ if ($status.installed) {
         $fileTotals = @()
         foreach ($fileType in ($appFiles, $currentFiles, $persistFiles, $cacheFiles)) {
             if ($null -ne $fileType) {
-                $fileSum = (Get-ChildItem $fileType.FullName -Recurse -File | Measure-Object -Property Length -Sum).Sum
+                $fileSum = (Get-ChildItem $fileType.FullName -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
                 $fileTotals += coalesce $fileSum 0
             } else {
                 $fileTotals += 0
@@ -170,29 +170,7 @@ if ($status.installed) {
         # Old versions = app total - current version size
         $fileTotals += $fileTotals[0] - $fileTotals[1]
 
-        if ($fileTotals[2] + $fileTotals[3] + $fileTotals[4] -eq 0) {
-            # Simple app size output if no old versions, persisted data, cached downloads
-            $item.'Installed size' = filesize $fileTotals[1]
-        } else {
-            $fileSizes = [ordered] @{
-                'Current version:  ' = $fileTotals[1]
-                'Old versions:     ' = $fileTotals[4]
-                'Persisted data:   ' = $fileTotals[2]
-                'Cached downloads: ' = $fileTotals[3]
-                'Total:            ' = $fileTotals[0] + $fileTotals[2] + $fileTotals[3]
-            }
-
-            $fileSizeOutput = @()
-
-            # Don't output empty categories
-            $fileSizes.GetEnumerator() | ForEach-Object {
-                if ($_.Value -ne 0) {
-                    $fileSizeOutput += $_.Key + (filesize $_.Value)
-                }
-            }
-
-            $item.'Installed size' = $fileSizeOutput -join "`n"
-        }
+        $item.'Installed size' = format_installed_size $fileTotals[1] $fileTotals[2] $fileTotals[3] $fileTotals[4]
     }
 } else {
     if ($verbose) {

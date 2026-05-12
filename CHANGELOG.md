@@ -11,6 +11,7 @@
 
 ### Bug Fixes
 
+- **scoop-info:** Clarify verbose installed size output by combining application files and persisted data into a single "Application" line with breakdown, rename "Cached downloads" to "Download cache", and suppress filesystem errors ([#4840](https://github.com/ScoopInstaller/Scoop/issues/4840))
 - **core:** Fix the grep parameter in the `Invoke-GitLog` function ([#6407](https://github.com/ScoopInstaller/Scoop/issues/6407))
 - **buckets:** Skip Git invocation if unavailable in `new_issue_msg` ([#6591](https://github.com/ScoopInstaller/Scoop/issues/6591))
 - **buckets:** Fix the filtering condition when retrieving the number of manifests ([#6509](https://github.com/ScoopInstaller/Scoop/issues/6509))

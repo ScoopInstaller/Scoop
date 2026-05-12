@@ -407,3 +407,41 @@ Describe 'substitute' -Tag 'Scoop' {
         }
     }
 }
+
+Describe 'format_installed_size' -Tag 'Scoop' {
+    It 'returns the simple current-size value when no extra sections are present' {
+        format_installed_size 692479180 0 0 0 | Should -BeExactly '660.4 MB'
+    }
+
+    It 'formats the verbose installed-size output with aligned values and optional sections' {
+        $result = format_installed_size 692479180 3113851289 223556812 0
+
+        ($result -split "\r?\n") | Should -Be @(
+            'Application:        3.5 GB (660.4 MB app + 2.9 GB user data)'
+            'Download cache:   213.2 MB'
+            'Total:              3.8 GB'
+        )
+    }
+
+    It 'shows old versions only when present and keeps the size column aligned' {
+        $result = format_installed_size 692479180 3113851289 223556812 52428800
+
+        ($result -split "\r?\n") | Should -Be @(
+            'Application:        3.5 GB (660.4 MB app + 2.9 GB user data)'
+            'Old versions:      50.0 MB'
+            'Download cache:   213.2 MB'
+            'Total:              3.8 GB'
+        )
+    }
+
+    It 'omits the persisted-data suffix when user data is zero' {
+        $result = format_installed_size 692479180 0 223556812 52428800
+
+        ($result -split "\r?\n") | Should -Be @(
+            'Application:      660.4 MB'
+            'Old versions:      50.0 MB'
+            'Download cache:   213.2 MB'
+            'Total:            923.6 MB'
+        )
+    }
+}
