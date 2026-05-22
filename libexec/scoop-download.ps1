@@ -134,6 +134,7 @@ foreach ($curr_app in $apps) {
                     }
                     if ($err.Contains('No-hash apps')) {
                         error "If you want to allow no-hash apps, run 'scoop config allow_no_hash true', or use the parameter '--skip-hash-check' in a single download."
+                        $dl_failure = $true
                         continue
                     }
                     error (new_issue_msg $app $bucket "hash check failed")
