@@ -384,14 +384,15 @@ function Update-ManifestProperty {
                 # Update hash
                 if ($Manifest.hash) {
                     # Global
+                    if ($Manifest.autoupdate.hash.mode -eq 'none') {
+                        # Skip global hash update
+                        Write-Host "Skipping hash update for $AppName according to manifest property" -ForegroundColor DarkYellow
+                        continue
+                    }
                     $newURL = substitute $Manifest.autoupdate.url $Substitutions
                     $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction $Manifest.autoupdate.hash -URL $newURL -Substitutions $Substitutions
                     $Manifest.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.hash -Value $newHash
                     $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
-                } elseif ($Manifest.autoupdate.hash.mode -eq 'none') {
-                    # Skip global hash update
-                    Write-Host "Skipping hash update for $AppName according to manifest property" -ForegroundColor DarkYellow
-                    continue
                 } else {
                     # Arch-spec
                     $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
