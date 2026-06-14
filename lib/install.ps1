@@ -167,65 +167,6 @@ function Invoke-HookScript {
     }
 }
 
-# get target, name, arguments for shim
-function shim_def($item) {
-    if ($item -is [array]) { return $item }
-    return $item, (strip_ext (fname $item)), $null
-}
-
-function create_shims($manifest, $dir, $global, $arch) {
-    $shims = @(arch_specific 'bin' $manifest $arch)
-    $shims | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target, $name, $arg = shim_def $_
-        Write-Output "Creating shim for '$name'."
-
-        if (Test-Path "$dir\$target" -PathType leaf) {
-            $bin = "$dir\$target"
-        } elseif (Test-Path $target -PathType leaf) {
-            $bin = $target
-        } else {
-            $bin = (Get-Command $target).Source
-        }
-        if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
-
-        shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
-    }
-}
-
-function rm_shim($name, $shimdir, $app) {
-    '', '.shim', '.cmd', '.ps1' | ForEach-Object {
-        $shimPath = "$shimdir\$name$_"
-        $altShimPath = "$shimPath.$app"
-        if ($app -and (Test-Path -Path $altShimPath -PathType Leaf)) {
-            Write-Output "Removing shim '$name$_.$app'."
-            Remove-Item $altShimPath
-        } elseif (Test-Path -Path $shimPath -PathType Leaf) {
-            Write-Output "Removing shim '$name$_'."
-            Remove-Item $shimPath
-            $oldShims = Get-Item -Path "$shimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
-            if ($null -eq $oldShims) {
-                if ($_ -eq '.shim') {
-                    Write-Output "Removing shim '$name.exe'."
-                    Remove-Item -Path "$shimdir\$name.exe"
-                }
-            } else {
-                (@($oldShims) | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
-            }
-        }
-    }
-}
-
-function rm_shims($app, $manifest, $global, $arch) {
-    $shims = @(arch_specific 'bin' $manifest $arch)
-
-    $shims | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target, $name, $null = shim_def $_
-        $shimdir = shimdir $global
-
-        rm_shim $name $shimdir $app
-    }
-}
-
 # Creates or updates the directory junction for [app]/current,
 # pointing to the specified version directory for the app.
 #

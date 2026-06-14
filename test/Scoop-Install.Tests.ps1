@@ -3,6 +3,7 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\core.ps1"
     . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1"
+    . "$PSScriptRoot\..\lib\shim.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
 }
 
@@ -38,27 +39,6 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
         Should -Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
         Should -Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like $testdir }
         Should -Invoke -CommandName Remove-Path -Times 0 -ParameterFilter { $Path -like $PSScriptRoot }
-    }
-}
-
-Describe 'shim_def' -Tag 'Scoop' {
-    It 'should use strings correctly' {
-        $target, $name, $shimArgs = shim_def 'command.exe'
-        $target | Should -Be 'command.exe'
-        $name | Should -Be 'command'
-        $shimArgs | Should -BeNullOrEmpty
-    }
-
-    It 'should expand the array correctly' {
-        $target, $name, $shimArgs = shim_def @('foo.exe', 'bar')
-        $target | Should -Be 'foo.exe'
-        $name | Should -Be 'bar'
-        $shimArgs | Should -BeNullOrEmpty
-
-        $target, $name, $shimArgs = shim_def @('foo.exe', 'bar', '--test')
-        $target | Should -Be 'foo.exe'
-        $name | Should -Be 'bar'
-        $shimArgs | Should -Be '--test'
     }
 }
 
