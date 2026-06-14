@@ -38,7 +38,7 @@
 param($SubCommand)
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
+. "$PSScriptRoot\..\lib\shim.ps1" # for shim functions
 . "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
 
 if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
@@ -68,30 +68,6 @@ if (-not (Get-FormatData ScoopShims)) {
 
 $localShimDir = shimdir $false
 $globalShimDir = shimdir $true
-
-function Get-ShimInfo($ShimPath) {
-    $info = [Ordered]@{}
-    $info.Name = strip_ext (fname $ShimPath)
-    $info.Path = $ShimPath -replace 'shim$', 'exe'
-    $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
-    $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
-    $altShims = Get-Item -Path "$ShimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
-    if ($altShims) {
-        $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
-    }
-    $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
-    $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
-    [PSCustomObject]$info
-}
-
-function Get-ShimPath($ShimName, $Global) {
-    '.shim', '.ps1' | ForEach-Object {
-        $shimPath = Join-Path (shimdir $Global) "$ShimName$_"
-        if (Test-Path -LiteralPath $shimPath) {
-            return $shimPath
-        }
-    }
-}
 
 switch ($SubCommand) {
     'add' {
