@@ -56,7 +56,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
-    create_shims $manifest $dir $global $architecture
+    create_shims $manifest $dir $global $architecture $original_dir
     create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
     env_add_path $manifest $dir $global $architecture
@@ -177,19 +177,40 @@ function shim_def($item) {
     return $item, (strip_ext (fname $item)), $null
 }
 
-function create_shims($manifest, $dir, $global, $arch) {
+function resolve_shim_target($dir, $target, $original_dir = $null) {
+    $paths = @()
+
+    if ([IO.Path]::IsPathRooted($target)) {
+        $paths += $target
+    } else {
+        $paths += Join-Path $dir $target
+        if ($original_dir) {
+            $paths += Join-Path $original_dir $target
+        }
+        $paths += $target
+    }
+
+    foreach ($path in ($paths | Select-Object -Unique)) {
+        if (Test-Path -LiteralPath $path -PathType Leaf) {
+            return $path
+        }
+    }
+
+    $command = Get-Command $target -CommandType Application -ErrorAction Ignore | Select-Object -First 1
+    if ($command) {
+        return $command.Source
+    }
+
+    return $null
+}
+
+function create_shims($manifest, $dir, $global, $arch, $original_dir = $null) {
     $shims = @(arch_specific 'bin' $manifest $arch)
     $shims | Where-Object { $_ -ne $null } | ForEach-Object {
         $target, $name, $arg = shim_def $_
         Write-Output "Creating shim for '$name'."
 
-        if (Test-Path "$dir\$target" -PathType leaf) {
-            $bin = "$dir\$target"
-        } elseif (Test-Path $target -PathType leaf) {
-            $bin = $target
-        } else {
-            $bin = (Get-Command $target).Source
-        }
+        $bin = resolve_shim_target $dir $target $original_dir
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
         shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
