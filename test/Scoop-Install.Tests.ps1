@@ -70,6 +70,34 @@ Describe 'shim_def' -Tag 'Scoop' {
     }
 }
 
+Describe 'resolve_shim_target' -Tag 'Scoop', 'Windows' {
+    BeforeEach {
+        $testdir = Join-Path ([IO.Path]::GetTempPath()) "scoop-shim-target-$([Guid]::NewGuid())"
+        $currentdir = Join-Path $testdir 'current'
+        $originaldir = Join-Path $testdir '1.0.0'
+        New-Item -ItemType Directory -Path $currentdir, $originaldir | Out-Null
+    }
+
+    It 'falls back to the original version directory when current does not expose the binary yet' {
+        $expected = Join-Path $originaldir 'command.exe'
+        New-Item -ItemType File -Path $expected | Out-Null
+
+        resolve_shim_target $currentdir 'command.exe' $originaldir | Should -Be $expected
+    }
+
+    It 'does not emit a Get-Command error when the target is not found' {
+        $Error.Clear()
+
+        resolve_shim_target $currentdir 'missing-shim-target.exe' $null | Should -BeNullOrEmpty
+
+        $Error | Should -BeNullOrEmpty
+    }
+
+    AfterEach {
+        Remove-Item -Recurse -Force $testdir -ErrorAction SilentlyContinue
+    }
+}
+
 Describe 'persist_def' -Tag 'Scoop' {
     It 'parses string correctly' {
         $source, $target = persist_def 'test'
