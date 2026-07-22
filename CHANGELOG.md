@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+- **checkver:** Skip default GitHub JSONPath when using custom script ([#6681](https://github.com/ScoopInstaller/Scoop/issues/6681))
 - **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
 - **scoop-download:** Fix incorrect download success state ([#6473](https://github.com/ScoopInstaller/Scoop/issues/6473))
 - **scoop-download:** Exit with non-zero status when downloads fail ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
