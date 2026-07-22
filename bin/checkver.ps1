@@ -179,7 +179,9 @@ $Queue | ForEach-Object {
 
         if ($url -like 'https://api.github.com*') {
             # Default jsonpath/regex in GitHub API mode
-            $jsonpath = '$.tag_name'
+            if (-not $json.checkver.script) {
+                $jsonpath = '$.tag_name'
+            }
             if (-not $regex) {
                 $regex = '(?:v|V)?([\d.-]+)'
             }
