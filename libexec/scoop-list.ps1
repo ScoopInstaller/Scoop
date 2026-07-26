@@ -26,7 +26,7 @@ Write-Host "Installed apps$(if($query) { `" matching '$query'`"}):"
 $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $app = $_.name
     $global = $_.global
-    $item = @{}
+    $item = [ordered]@{}
     $ver = Select-CurrentVersion -AppName $app -Global:$global
     $item.Name = $app
     $item.Version = $ver
