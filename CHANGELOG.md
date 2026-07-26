@@ -37,6 +37,7 @@
 - **core:** Give `dark` higher priority when use `Extract-DarkArchive` ([#6637](https://github.com/ScoopInstaller/Scoop/issues/6637))
 - **checkver:** Harden github checkver ([#6641](https://github.com/ScoopInstaller/Scoop/issues/6641))
 - **scoop-search:** Select latest search result semantically ([#6643](https://github.com/ScoopInstaller/Scoop/issues/6643))
+- **scoop-export|scoop-list:** Make exported JSON key order deterministic ([#6697](https://github.com/ScoopInstaller/Scoop/issues/6697))
 
 ### Code Refactoring
 
