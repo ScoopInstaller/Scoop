@@ -38,6 +38,7 @@
 - **core:** Give `dark` higher priority when use `Extract-DarkArchive` ([#6637](https://github.com/ScoopInstaller/Scoop/issues/6637))
 - **checkver:** Harden github checkver ([#6641](https://github.com/ScoopInstaller/Scoop/issues/6641))
 - **scoop-search:** Select latest search result semantically ([#6643](https://github.com/ScoopInstaller/Scoop/issues/6643))
+- **checkver:** Don't downgrade manifest to older version ([#6717](https://github.com/ScoopInstaller/Scoop/issues/6717))
 
 ### Code Refactoring
 
