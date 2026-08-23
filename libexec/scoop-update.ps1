@@ -38,6 +38,7 @@ $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
 $all = $opt.a -or $opt.all
+$allowRunning = $opt.r -or $opt.'allow-running'
 
 # load config
 $configRepo = get_config SCOOP_REPO
@@ -399,11 +400,19 @@ if (-not ($apps -or $all)) {
     set_config LAST_UPDATE ([System.DateTime]::Now.ToString('o')) | Out-Null
     success 'Scoop was updated successfully!'
 } else {
-    if ($global -and !(is_admin)) {
-        error 'You need admin rights to update global apps.'; exit 1
+    # --allow-running: temporarily bypass running-process check.
+    # Scoop uses versioned directories (e.g., pwsh 7.6.1/ -> 7.6.2/),
+    # so the update creates a new directory without touching the running binary.
+    if ($allowRunning) {
+        $savedIgnoreRunning = get_config IGNORE_RUNNING_PROCESSES
+        set_config IGNORE_RUNNING_PROCESSES $true | Out-Null
     }
+    try {
+        if ($global -and !(is_admin)) {
+            error 'You need admin rights to update global apps.'; exit 1
+        }
 
-    $outdated = @()
+        $outdated = @()
     $updateScoop = $null -ne ($apps | Where-Object { $_ -eq 'scoop' }) -or (is_scoop_outdated)
     $apps = $apps | Where-Object { $_ -ne 'scoop' }
     $apps_param = $apps
@@ -463,6 +472,15 @@ if (-not ($apps -or $all)) {
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
+    } finally {
+        if ($allowRunning) {
+            if ($null -ne $savedIgnoreRunning) {
+                set_config IGNORE_RUNNING_PROCESSES $savedIgnoreRunning | Out-Null
+            } else {
+                set_config IGNORE_RUNNING_PROCESSES $false | Out-Null
+            }
+        }
+    }
 }
 
 exit 0
