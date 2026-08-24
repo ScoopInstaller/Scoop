@@ -81,10 +81,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     show_notes $manifest $dir $original_dir $persist_dir
 }
 
-function is_in_dir($dir, $check) {
-    $check -match "^$([regex]::Escape("$dir"))([/\\]|$)"
-}
-
 function Invoke-Installer {
     [CmdletBinding()]
     param (

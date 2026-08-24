@@ -105,7 +105,11 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
         continue
     }
 
-    generate_user_manifest $app $bucket $version
+    $path = generate_user_manifest $app $bucket $version
+    if (!$path) {
+        warn "Could not find manifest for '$app@$version'"
+    }
+    $path
 }
 $apps = @((@($specific_versions_paths) + $difference) | Where-Object { $_ } | Select-Object -Unique)
 

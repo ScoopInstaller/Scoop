@@ -95,19 +95,6 @@ Describe 'Manifest Validator' -Tag 'Validator' {
     }
 }
 
-Describe 'Get-RelativePathCompat' -Tag 'Scoop' {
-    It 'returns relative path for child path' {
-        $from = 'C:\root\bucket'
-        $to = 'C:\root\bucket\foo\bar.json'
-        Get-RelativePathCompat $from $to | Should -Be 'foo\bar.json'
-    }
-    It 'returns original when different drive/scheme' {
-        $from = 'C:\root\bucket'
-        $to = 'D:\other\file.json'
-        Get-RelativePathCompat $from $to | Should -Be $to
-    }
-}
-
 Describe 'Find-HistoricalManifestInCache' -Tag 'Scoop' {
     It 'returns $null when sqlite cache disabled' {
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
@@ -135,6 +122,16 @@ Describe 'Find-HistoricalManifestInCache' -Tag 'Scoop' {
 }
 
 Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
+    BeforeEach {
+        $bucketRoot = 'C:\b\root'
+        $innerBucket = 'C:\b\root\bucket'
+        Mock get_config -ParameterFilter { $name -eq 'use_git_history' } { $true }
+        Mock Find-BucketDirectory -ParameterFilter { $Root } { $bucketRoot }
+        Mock Find-BucketDirectory -ParameterFilter { -not $Root } { $innerBucket }
+        Mock Test-Path -ParameterFilter { $Path -eq (Join-Path $bucketRoot '.git') } { $true }
+        Mock Test-Path -ParameterFilter { $Path -eq $innerBucket -and $PathType -eq 'Container' } { $true }
+    }
+
     It 'returns $null when git history search disabled' {
         Mock get_config -ParameterFilter { $name -eq 'use_git_history' } { $false }
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
@@ -142,23 +139,74 @@ Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
     }
 
     It 'returns manifest text on version match' {
-        $bucketRoot = 'C:\b\root'
-        $innerBucket = 'C:\b\root\bucket'
-        $umdir = Join-Path $env:TEMP 'ScoopTestsUM'
-        Mock get_config -ParameterFilter { $name -eq 'use_git_history' } { $true }
-        Mock Find-BucketDirectory -ParameterFilter { $Root } { $bucketRoot }
-        Mock Find-BucketDirectory -ParameterFilter { -not $Root } { $innerBucket }
-        Mock Test-Path -ParameterFilter { $Path -eq (Join-Path $bucketRoot '.git') } { $true }
-        Mock Test-Path -ParameterFilter { $Path -eq $innerBucket -and $PathType -eq 'Container' } { $true }
-        # Behavior-oriented mocks: using HEAD should yield a wrong version
-        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { $global:LASTEXITCODE = 0; return '{"version":"2.0.0"}' }
-        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' } { $global:LASTEXITCODE = 0; return '{"version":"1.0.0"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"2.0.0"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' } { return '{"version":"1.0.0"}' }
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } { @('abcdef0123456789') }
 
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
         $result | Should -Not -BeNullOrEmpty
         $result.version | Should -Be '1.0.0'
         $result.ManifestText | Should -Match '"version":"1.0.0"'
+    }
+
+    It 'short-circuits via HEAD fast-path when HEAD already has the requested version' {
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"1.0.0"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } { @('shouldnotbeused') }
+
+        $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
+        $result | Should -Not -BeNullOrEmpty
+        $result.version | Should -Be '1.0.0'
+        $result.source | Should -Be 'git_manifest:HEAD'
+        Should -Invoke -CommandName Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } -Times 0
+    }
+
+    It 'falls back to -S pickaxe when -G yields no commits' {
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"2.0.0"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-G' } { return @() }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-S' } { return @('feedface') }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -notlike 'HEAD*' } { return '{"version":"1.0.0"}' }
+
+        $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
+        $result | Should -Not -BeNullOrEmpty
+        $result.version | Should -Be '1.0.0'
+        $result.source | Should -Be 'git_manifest:feedface^'
+    }
+
+    It 'returns $null when $h / $h^ walk yields no manifest' {
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"9.9.9"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -match '^[a-f0-9]+\^?:' } { return '{"version":"9.9.9"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-n' } { return @('aaaa1111') }
+
+        $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
+        $result | Should -Be $null
+    }
+
+    It 'returns $null when inner bucket directory cannot be found' {
+        Mock Test-Path -ParameterFilter { $Path -eq $innerBucket -and $PathType -eq 'Container' } { $false }
+        Mock warn {}
+        $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
+        $result | Should -Be $null
+    }
+}
+
+Describe 'Find-HistoricalManifest (orchestrator)' -Tag 'Scoop' {
+    It 'returns $null when both cache and git miss' {
+        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
+        Mock Find-HistoricalManifestInCache { $null }
+        Mock Find-HistoricalManifestInGit { $null }
+        $result = Find-HistoricalManifest 'foo' 'main' '1.0.0'
+        $result | Should -Be $null
+    }
+}
+
+Describe 'Write-ManifestToUserCache' -Tag 'Scoop' {
+    It 'writes to $App.json (no version suffix) so downstream install path does not duplicate version' {
+        $umdir = Join-Path $env:TEMP ("ScoopUM_" + [guid]::NewGuid().ToString('N'))
+        Mock usermanifestsdir { $umdir }
+        $p = Write-ManifestToUserCache -App 'foo' -ManifestText '{"version":"1.0.0"}'
+        $p | Should -Be (Join-Path $umdir 'foo.json')
+        Test-Path $p | Should -Be $true
+        Remove-Item -Recurse -Force $umdir -ErrorAction SilentlyContinue
     }
 }
 
@@ -204,11 +252,13 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         Mock ensure {}
         Mock usermanifestsdir { $umdir }
         Mock Invoke-AutoUpdate {}
+        Mock warn {}
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
         $p | Should -Be (Join-Path $umdir 'foo.json')
+        Should -Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -match "No historical manifest found for 'foo@1\.0\.0'; attempting autoupdate" }
     }
 
-    It 'on autoupdate failure aborts with concise message' {
+    It 'returns $null when autoupdate fails (caller surfaces the error)' {
         $umdir = Join-Path $env:TEMP 'ScoopTestsUM'
         Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0'; autoupdate=@{} }, 'main', $null }
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
@@ -218,9 +268,10 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         Mock Invoke-AutoUpdate { throw 'fail' }
         Mock warn {}
         Mock info {}
-        Mock Write-Host {}
         Mock abort { throw 'aborted' }
-        { generate_user_manifest 'foo' 'main' '1.0.0' } | Should -Throw
+        $p = generate_user_manifest 'foo' 'main' '1.0.0'
+        $p | Should -Be $null
+        Should -Invoke -CommandName abort -Times 0
     }
 
     It 'aborts when no history and no autoupdate' {

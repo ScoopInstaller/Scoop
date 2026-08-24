@@ -647,8 +647,31 @@ function friendly_path($path) {
         return $path -replace ([Regex]::Escape($h)), '~\'
     }
 }
+
+# Returns the relative path from $from to $to. Callers pass absolute paths
+# (see Find-BucketDirectory); PS 7+ uses [System.IO.Path]::GetRelativePath.
+function Get-RelativePath($from, $to) {
+    if ($PSVersionTable.PSVersion.Major -ge 6) {
+        try {
+            return [System.IO.Path]::GetRelativePath($from, $to)
+        } catch {}
+    }
+
+    # PS 5.1 fallback: strip $from prefix if $to is under $from.
+    $fromNorm = $from.TrimEnd('\', '/')
+    if (is_in_dir $fromNorm $to) {
+        return ($to.Substring($fromNorm.Length).TrimStart('\', '/') -replace '/', '\')
+    }
+
+    return $to
+}
 function is_local($path) {
     ($path -notmatch '^https?://') -and (Test-Path $path)
+}
+
+# True if $check equals $dir or sits under $dir.
+function is_in_dir($dir, $check) {
+    $check -match "^$([regex]::Escape("$dir"))([/\\]|$)"
 }
 
 # operations
