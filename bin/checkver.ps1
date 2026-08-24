@@ -108,6 +108,7 @@ Get-Event | Remove-Event
 Get-EventSubscriber | Unregister-Event
 
 # start all downloads
+$in_progress = 0
 $Queue | ForEach-Object {
     $name, $json, $file = $_
 
@@ -119,47 +120,73 @@ $Queue | ForEach-Object {
     } else {
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
     }
-    Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
 
     # Not Specified
+    $url = $json.homepage
+    $regex = ''
+    $jsonpath = ''
+    $xpath = ''
+    $replace = ''
+
     if ($json.checkver.url) {
         $url = $json.checkver.url
-    } else {
-        $url = $json.homepage
     }
 
     if ($json.checkver.re) {
         $regex = $json.checkver.re
     } elseif ($json.checkver.regex) {
         $regex = $json.checkver.regex
-    } else {
-        $regex = ''
     }
 
-    $jsonpath = ''
-    $xpath = ''
-    $replace = ''
-    $useGithubAPI = $false
+    ## GitHub
+    #
+    # ```json
+    # "homepage": "<valid-repository-url>",
+    # "checkver": "github"
+    # ```
+    #
+    # or
+    #
+    # ```json
+    # "checkver": {
+    #     "github": "<valid-repository-url-or-repository-api-url>"
+    # }
+    # ```
+    if (($json.checkver -eq 'github') -or $json.checkver.github) {
+        $githubUrlPattern = '^https://((www\.)?github\.com/[\w.-]+/[\w.-]+/?|api\.github\.com/repos/[\w.-]+/[\w.-]+/.+)$'
 
-    # GitHub
-    if ($regex) {
-        $githubRegex = $regex
-    } else {
-        $githubRegex = '/releases/tag/(?:v|V)?([\d.]+)'
-    }
-    if ($json.checkver -eq 'github') {
-        if (!$json.homepage.StartsWith('https://github.com/')) {
-            error "$name checkver expects the homepage to be a github repository"
+        $inputGithubUrl = $json.homepage
+        $fieldUsed = 'homepage'
+        if ($json.checkver.github) {
+            $inputGithubUrl = $json.checkver.github
+            $fieldUsed = 'checkver.github'
         }
-        $url = $json.homepage.TrimEnd('/') + '/releases/latest'
-        $regex = $githubRegex
-        $useGithubAPI = $true
-    }
 
-    if ($json.checkver.github) {
-        $url = $json.checkver.github.TrimEnd('/') + '/releases/latest'
-        $regex = $githubRegex
-        if ($json.checkver.PSObject.Properties.Count -eq 1) { $useGithubAPI = $true }
+        if ($inputGithubUrl -notmatch $githubUrlPattern) {
+            error "$name checkver expects $fieldUsed to be a valid GitHub repository URL"
+            return
+        }
+
+        $url = $inputGithubUrl.TrimEnd('/')
+        if ($url -notlike 'https://api.github.com*') {
+            $url = $url + '/releases/latest'
+        }
+
+        if ($GitHubToken) {
+            $url = $url -replace '//(www\.)?github\.com/', '//api.github.com/repos/'
+            $wc.Headers.Add('Authorization', "token $GitHubToken")
+        }
+
+        if ($url -like 'https://api.github.com*') {
+            # Default jsonpath/regex in GitHub API mode
+            $jsonpath = '$.tag_name'
+            if (-not $regex) {
+                $regex = '(?:v|V)?([\d.-]+)'
+            }
+        } elseif (-not $regex) {
+            # Default regex in GitHub HTML mode
+            $regex = '/releases/tag/(?:v|V)?([\d.-]+)'
+        }
     }
 
     # SourceForge
@@ -216,13 +243,6 @@ $Queue | ForEach-Object {
 
     $reverse = $json.checkver.reverse -and $json.checkver.reverse -eq 'true'
 
-    if ($url -like '*api.github.com/*') { $useGithubAPI = $true }
-
-    if ($useGithubAPI -and ($null -ne $GitHubToken)) {
-        $url = $url -replace '//(www\.)?github.com/', '//api.github.com/repos/'
-        $wc.Headers.Add('Authorization', "token $GitHubToken")
-    }
-
     $url = substitute $url $substitutions
 
     $state = New-Object psobject @{
@@ -244,7 +264,9 @@ $Queue | ForEach-Object {
     }
 
     $wc.Headers.Add('Referer', (strip_filename $url))
+    Register-ObjectEvent $wc downloadDataCompleted -ErrorAction Stop | Out-Null
     $wc.DownloadDataAsync($url, $state)
+    $in_progress++
 }
 
 function next($er) {
@@ -253,7 +275,6 @@ function next($er) {
 }
 
 # wait for all to complete
-$in_progress = $Queue.length
 while ($in_progress -gt 0) {
     $ev = Wait-Event
     Remove-Event $ev.SourceIdentifier
@@ -274,6 +295,8 @@ while ($in_progress -gt 0) {
     $expected_ver = $json.version
     $ver = $Version
 
+    $matchesHashtable = @{}
+
     if (!$ver) {
         if (!$regexp -and $replace) {
             next "'replace' requires 're' or 'regex'"
@@ -290,6 +313,9 @@ while ($in_progress -gt 0) {
             }
         }
 
+        $page = $null
+        $source = $url
+
         if ($url -and !$err) {
             $ms = New-Object System.IO.MemoryStream
             $ms.Write($result, 0, $result.Length)
@@ -299,10 +325,15 @@ while ($in_progress -gt 0) {
             }
             $page = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
         }
-        $source = $url
+
         if ($script) {
             $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
             $source = 'the output of script'
+        }
+
+        if ($null -eq $page) {
+            next "couldn't retrieve content from $source"
+            continue
         }
 
         if ($jsonpath) {
@@ -363,7 +394,6 @@ while ($in_progress -gt 0) {
             }
 
             if ($match -and $match.Success) {
-                $matchesHashtable = @{}
                 $re.GetGroupNames() | ForEach-Object { $matchesHashtable.Add($_, $match.Groups[$_].Value) }
                 $ver = $matchesHashtable['1']
                 if ($replace) {

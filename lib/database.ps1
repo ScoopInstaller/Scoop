@@ -4,10 +4,11 @@
 .SYNOPSIS
     Get SQLite .NET driver
 .DESCRIPTION
-    Download and extract the SQLite .NET driver from NuGet.
+    Download and extract the SQLite .NET driver and SQLite precompiled binaries.
+    The SQLite version is automatically detected from the download page.
 .PARAMETER Version
     System.String
-    The version of the SQLite .NET driver to download.
+    The version of the System.Data.SQLite NuGet package to download. (require version 2.0.0 or higher)
 .INPUTS
     None
 .OUTPUTS
@@ -16,21 +17,44 @@
 #>
 function Get-SQLite {
     param (
-        [string]$Version = '1.0.118'
+        [string]$Version = '2.0.2'
     )
-    # Install SQLite
     try {
-        Write-Host "Downloading SQLite $Version..." -ForegroundColor DarkYellow
-        $sqlitePkgPath = "$env:TEMP\sqlite.zip"
+        $sqliteNetPath = "$env:TEMP\sqlite.net.zip"
+        $sqliteDllPath = "$env:TEMP\sqlite.dll.zip"
         $sqliteTempPath = "$env:TEMP\sqlite"
         $sqlitePath = "$PSScriptRoot\..\supporting\sqlite"
-        Invoke-WebRequest -Uri "https://api.nuget.org/v3-flatcontainer/stub.system.data.sqlite.core.netframework/$version/stub.system.data.sqlite.core.netframework.$version.nupkg" -OutFile $sqlitePkgPath
-        Write-Host "Extracting SQLite $Version..." -ForegroundColor DarkYellow -NoNewline
-        Expand-Archive -Path $sqlitePkgPath -DestinationPath $sqliteTempPath -Force
-        New-Item -Path $sqlitePath -ItemType Directory -Force | Out-Null
-        Move-Item -Path "$sqliteTempPath\build\net451\*", "$sqliteTempPath\lib\net451\System.Data.SQLite.dll" -Destination $sqlitePath -Force
-        Remove-Item -Path $sqlitePkgPath, $sqliteTempPath -Recurse -Force
-        Write-Host ' Done' -ForegroundColor DarkYellow
+
+        $arch = switch (Get-DefaultArchitecture) {
+            '32bit' { 'x86' }
+            '64bit' { 'x64' }
+            'arm64' { 'arm64' }
+            default { Write-Warning "Unknown architecture, using x64 as fallback"; 'x64' }
+        }
+
+        Write-Host "Downloading System.Data.SQLite $Version..." -ForegroundColor DarkYellow
+        Invoke-WebRequest -Uri "https://globalcdn.nuget.org/packages/system.data.sqlite.$Version.nupkg" -OutFile $sqliteNetPath
+
+        $downloadPage = Invoke-WebRequest -Uri 'https://sqlite.org/download.html' -UseBasicParsing
+        if ($downloadPage.Content -match '(?s)<!-- Download product data.*?(PRODUCT,.+?)-->') {
+            $productData = $Matches[1] | ConvertFrom-Csv
+        } else {
+            throw "Failed to parse SQLite download page product data"
+        }
+        $matchRow = $productData | Where-Object { $_.'RELATIVE-URL' -match "sqlite-dll-win-$arch-" }
+        if (-not $matchRow) {
+            throw "SQLite DLL for architecture $arch not found"
+        }
+        Write-Host "Downloading SQLite DLL $($matchRow.VERSION)..." -ForegroundColor DarkYellow
+        Invoke-WebRequest -Uri "https://sqlite.org/$($matchRow.'RELATIVE-URL')" -OutFile $sqliteDllPath
+
+        Write-Host "Extracting libraries... " -ForegroundColor DarkYellow -NoNewline
+        $sqliteNetPath, $sqliteDllPath | Expand-Archive -DestinationPath $sqliteTempPath -Force
+        $null = New-Item -Path "$sqlitePath\$arch" -ItemType Directory -Force
+        Move-Item -Path "$sqliteTempPath\lib\netstandard2.0\System.Data.SQLite.dll" -Destination $sqlitePath -Force
+        Move-Item -Path "$sqliteTempPath\sqlite3.dll" -Destination "$sqlitePath\$arch\e_sqlite3.dll" -Force
+        Remove-Item -Path $sqliteNetPath, $sqliteDllPath, $sqliteTempPath -Recurse -Force
+        Write-Host 'Done.' -ForegroundColor DarkYellow
         return $true
     } catch {
         return $false
@@ -219,9 +243,9 @@ function Set-ScoopDB {
 
 <#
 .SYNOPSIS
-    Select Scoop database item(s).
+    Find Scoop database item(s).
 .DESCRIPTION
-    Select item(s) from the Scoop SQLite database.
+    Find item(s) from the Scoop SQLite database.
     The pattern is matched against the name, binaries, and shortcuts columns for apps.
 .PARAMETER Pattern
     System.String
@@ -233,9 +257,9 @@ function Set-ScoopDB {
     System.String
 .OUTPUTS
     System.Data.DataTable
-    The selected database item(s).
+    The found database item(s).
 #>
-function Select-ScoopDBItem {
+function Find-ScoopDBItem {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
@@ -253,7 +277,6 @@ function Select-ScoopDBItem {
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
         $result = New-Object System.Data.DataTable
         $dbQuery = "SELECT * FROM app WHERE $(($From -join ' LIKE @Pattern OR ') + ' LIKE @Pattern')"
-        $dbQuery = "SELECT * FROM ($($dbQuery + ' ORDER BY version DESC')) GROUP BY name, bucket"
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
         $dbCommand.CommandType = [System.Data.CommandType]::Text
@@ -264,12 +287,10 @@ function Select-ScoopDBItem {
         [void]$dbAdapter.Fill($result)
     }
     end {
-        $resultCopy = $result.Copy()
-        $dbAdapter.Dispose()
         $dbCommand.Dispose()
+        $dbAdapter.Dispose()
         $db.Dispose()
-        # Use Write-Output to ensure PowerShell properly returns the DataTable
-        Write-Output $resultCopy -NoEnumerate
+        return Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket')
     }
 }
 
@@ -310,47 +331,121 @@ function Get-ScoopDBItem {
     begin {
         $db = Open-ScoopDB
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
-        $dbCommand = $db.CreateCommand()
-        $dbCommand.CommandType = [System.Data.CommandType]::Text
-        $dbAdapter.SelectCommand = $dbCommand
-    }
-
-    process {
         $result = New-Object System.Data.DataTable
-
-        # Build query based on whether version is specified
         $dbQuery = 'SELECT * FROM app WHERE name = @Name AND bucket = @Bucket'
         if ($Version) {
             $dbQuery += ' AND version = @Version'
-        } else {
-            $dbQuery += ' ORDER BY version DESC LIMIT 1'
         }
-
+        $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
-        $dbCommand.Parameters.Clear()
-
-        # Add parameters for this specific query
+        $dbCommand.CommandType = [System.Data.CommandType]::Text
+        $dbAdapter.SelectCommand = $dbCommand
+    }
+    process {
         $dbCommand.Parameters.AddWithValue('@Name', $Name) | Out-Null
         $dbCommand.Parameters.AddWithValue('@Bucket', $Bucket) | Out-Null
         if ($Version) {
             $dbCommand.Parameters.AddWithValue('@Version', $Version) | Out-Null
         }
-
         [void]$dbAdapter.Fill($result)
-
-        # Create a copy of the DataTable to avoid disposal issues
-        $resultCopy = $result.Copy()
-
-        # Use Write-Output to ensure PowerShell properly returns the DataTable
-        Write-Output $resultCopy -NoEnumerate
     }
-
     end {
-        # Clean up all resources
-        $dbAdapter.Dispose()
         $dbCommand.Dispose()
+        $dbAdapter.Dispose()
         $db.Dispose()
+        # With $Version, the PRIMARY KEY guarantees at most one row; without it, the
+        # query is already limited to one name+bucket pair, so selecting latest needs no -GroupBy.
+        if ($Version) {
+            return $result
+        }
+
+        return Select-LatestScoopDBRow -Table $result
     }
+}
+
+<#
+.SYNOPSIS
+    Get the latest row from a set of Scoop database rows.
+.DESCRIPTION
+    Compares the `version` property of each row semantically and returns the
+    latest row. Returns `$null` when no rows are provided.
+.PARAMETER Rows
+    System.Object[]
+    The rows to evaluate for the latest version. Each row must have a `version` property.
+.INPUTS
+    System.Object[]
+.OUTPUTS
+    System.Object
+    The latest row based on semantic versioning, or `$null` if no rows are provided.
+#>
+function Get-LatestScoopDBRow {
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [object[]]
+        $Rows
+    )
+
+    if (-not $Rows -or $Rows.Count -eq 0) {
+        return $null
+    }
+
+    if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
+        . "$PSScriptRoot\versions.ps1"
+    }
+
+    $latest = $Rows[0]
+    for ($i = 1; $i -lt $Rows.Count; $i++) {
+        $row = $Rows[$i]
+        if ((Compare-Version -ReferenceVersion $latest.version -DifferenceVersion $row.version) -gt 0) {
+            $latest = $row
+        }
+    }
+
+    return $latest
+}
+
+<#
+.SYNOPSIS
+    Return the semantically latest row or rows from a Scoop database result set.
+.DESCRIPTION
+    Clones the schema of `Table` and imports the latest row per group when
+    `GroupBy` is supplied, or the single latest row across the whole table when
+    it is omitted. Returns an empty cloned table when the source table has no rows.
+.PARAMETER Table
+    System.Data.DataTable
+    The source table returned from a Scoop database query.
+.PARAMETER GroupBy
+    System.String[]
+    Optional column names used to group rows before semantic latest-row selection.
+.OUTPUTS
+    System.Data.DataTable
+    A cloned table containing the latest matching row for each requested scope.
+#>
+function Select-LatestScoopDBRow {
+    param(
+        [Parameter(Mandatory)]
+        [System.Data.DataTable]
+        $Table,
+        [string[]]
+        $GroupBy
+    )
+
+    $latestRows = $Table.Clone()
+    $rows = @($Table.Rows)
+    if ($rows.Count -eq 0) {
+        return $latestRows
+    }
+
+    if ($GroupBy -and $GroupBy.Count -gt 0) {
+        foreach ($group in ($rows | Group-Object -Property $GroupBy)) {
+            $latestRows.ImportRow((Get-LatestScoopDBRow -Rows @($group.Group)))
+        }
+    } else {
+        $latestRows.ImportRow((Get-LatestScoopDBRow -Rows $rows))
+    }
+
+    return $latestRows
 }
 
 <#

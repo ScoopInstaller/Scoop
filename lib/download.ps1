@@ -391,9 +391,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         }
 
         if ((Test-Path $data.$url.source) -and -not((Test-Path "$($data.$url.source).aria2") -or (Test-Path $urlstxt)) -and $use_cache) {
-            Write-Host 'Loading ' -NoNewline
-            Write-Host $(url_remote_filename $url) -ForegroundColor Cyan -NoNewline
-            Write-Host ' from cache.'
+            Write-Host "Loading $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m from cache."
         } else {
             $download_finished = $false
             # create aria2 input file content
@@ -425,7 +423,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
 
         # handle aria2 console output
-        Write-Host 'Starting download with aria2 ...'
+        Write-Host 'Starting download with aria2...'
 
         # Set console output encoding to UTF8 for non-ASCII characters printing
         $oriConsoleEncoding = [Console]::OutputEncoding
@@ -466,7 +464,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             warn $urlstxt_content
             warn $aria2
 
-            Write-Host 'Fallback to default downloader ...'
+            Write-Host 'Fallback to default downloader...'
 
             try {
                 foreach ($url in $urls) {
@@ -586,7 +584,7 @@ function setup_proxy() {
 }
 
 function Get-GitHubToken {
-    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN) | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN), $env:GH_TOKEN, $env:GITHUB_TOKEN | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
 }
 
 function github_ratelimit_reached {
@@ -731,9 +729,7 @@ function check_hash($file, $hash, $app_name) {
         return $true, $null
     }
 
-    Write-Host 'Checking hash of ' -NoNewline
-    Write-Host $(url_remote_filename $url) -ForegroundColor Cyan -NoNewline
-    Write-Host ' ... ' -NoNewline
+    Write-Host "Checking hash of $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m... " -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
         return $false, "Hash type '$algorithm' isn't supported."
@@ -755,7 +751,7 @@ function check_hash($file, $hash, $app_name) {
         }
         return $false, $msg
     }
-    Write-Host 'ok.' -f Green
+    Write-Host 'OK.' -f Green
     return $true, $null
 }
 
