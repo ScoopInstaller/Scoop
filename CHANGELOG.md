@@ -53,6 +53,10 @@
 
 - **workflow:** Drop Appveyor support and refactor GitHub Actions workflow ([#6626](https://github.com/ScoopInstaller/Scoop/issues/6626))
 
+### Tests
+
+- **bucket:** Compatible with Pester v6 ([#6724](https://github.com/ScoopInstaller/Scoop/issues/6724))
+
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
 ### Features
