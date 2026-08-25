@@ -2,6 +2,7 @@
 
 ### Features
 
+- **download**: Block apps without file hash by default for security reasons ([#6387](https://github.com/ScoopInstaller/Scoop/issues/6387))
 - **install:** Add output for the setting and removal of environment variables ([#6460](https://github.com/ScoopInstaller/Scoop/issues/6460))
 - **scoop-uninstall:** Allow access to `$bucket` in uninstall scripts ([#6380](https://github.com/ScoopInstaller/Scoop/issues/6380))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))

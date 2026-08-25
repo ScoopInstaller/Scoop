@@ -40,6 +40,9 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
+                    if ($err.Contains('No-hash apps')) {
+                        abort "If you want to allow no-hash apps, run 'scoop config allow_no_hash true', or use the parameter '--skip-hash-check' in a single download."
+                    }
                     abort $(new_issue_msg $app $bucket 'hash check failed')
                 }
             }
@@ -509,6 +512,9 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 if ($url.Contains('sourceforge.net')) {
                     Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
+                if ($err.Contains('No-hash apps')) {
+                    abort "If you want to allow no-hash apps, run 'scoop config allow_no_hash true', or use the parameter '--skip-hash-check' in a single download."
+                }
                 abort $(new_issue_msg $app $bucket 'hash check failed')
             }
         }
@@ -725,8 +731,15 @@ function hash_for_url($manifest, $url, $arch) {
 function check_hash($file, $hash, $app_name) {
     # returns (ok, err)
     if (!$hash) {
-        warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
-        return $true, $null
+        if (get_config 'allow_no_hash' $false){
+            warn "No hash provided in manifest. SHA256 for '$(fname $file)' is:"
+            warn "$((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
+            warn "To block no-hash apps for security reasons, run 'scoop config allow_no_hash false'."
+            return $true, $null
+        } else {
+            $msg = "No hash provided in manifest.`nERROR No-hash apps are blocked by default for security reasons, except for nightly builds."
+            return $false, $msg
+        }
     }
 
     Write-Host "Checking hash of $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m... " -NoNewline
