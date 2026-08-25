@@ -223,7 +223,7 @@ function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
 
     try {
         # HEAD fast-path: skip pickaxe if HEAD already has the requested version.
-        $headContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "HEAD`:$relativeManifestPath")
+        $headContent = Invoke-Git -Path $bucketDir -ArgumentList @('show', "HEAD`:$relativeManifestPath") 2>$null
         if ($headContent) {
             if ($headContent -is [Array]) { $headContent = $headContent -join "`n" }
             try {
@@ -252,7 +252,7 @@ function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
 
         $h = $commits[0]
         foreach ($spec in @("$h^", "$h")) {
-            $content = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$spec`:$relativeManifestPath")
+            $content = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$spec`:$relativeManifestPath") 2>$null
             if (-not $content) { continue }
             if ($content -is [Array]) { $content = $content -join "`n" }
             try {

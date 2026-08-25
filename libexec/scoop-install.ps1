@@ -111,6 +111,13 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
     }
     $path
 }
+# If any specific version failed to resolve, abort — but only after processing
+# all of them so the user sees every failure in one go.
+$resolved = $specific_versions_paths | Where-Object { $_ }
+if ($resolved.Count -lt $specific_versions.Count) {
+    $missing = $specific_versions | Where-Object { $_ -notin $resolved }
+    abort "Could not install: $($missing -join ', ')"
+}
 $apps = @((@($specific_versions_paths) + $difference) | Where-Object { $_ } | Select-Object -Unique)
 
 # remember which were explictly requested so that we can
