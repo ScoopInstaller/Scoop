@@ -384,6 +384,11 @@ function Update-ManifestProperty {
                 # Update hash
                 if ($Manifest.hash) {
                     # Global
+                    if ($Manifest.autoupdate.hash.mode -eq 'none') {
+                        # Skip global hash update
+                        Write-Host "Skipping hash update for $AppName according to manifest property" -ForegroundColor DarkYellow
+                        continue
+                    }
                     $newURL = substitute $Manifest.autoupdate.url $Substitutions
                     $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction $Manifest.autoupdate.hash -URL $newURL -Substitutions $Substitutions
                     $Manifest.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.hash -Value $newHash
@@ -392,6 +397,11 @@ function Update-ManifestProperty {
                     # Arch-spec
                     $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
                         $arch = $_.Name
+                        if ($Manifest.autoupdate.architecture.$arch.hash.mode -eq 'none') {
+                            # Skip arch-specific hash update
+                            Write-Host "Skipping hash update for $AppName ($arch) according to manifest property" -ForegroundColor DarkYellow
+                            return
+                        }
                         $newURL = substitute (arch_specific 'url' $Manifest.autoupdate $arch) $Substitutions
                         $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction (arch_specific 'hash' $Manifest.autoupdate $arch) -URL $newURL -Substitutions $Substitutions
                         $Manifest.architecture.$arch.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.architecture.$arch.hash -Value $newHash
