@@ -2,6 +2,7 @@
 
 ### Features
 
+- **autoupdate**: Try decoding base64 encoded hash values in `format_hash` ([#6271](https://github.com/ScoopInstaller/Scoop/issues/6271))
 - **install:** Add output for the setting and removal of environment variables ([#6460](https://github.com/ScoopInstaller/Scoop/issues/6460))
 - **scoop-uninstall:** Allow access to `$bucket` in uninstall scripts ([#6380](https://github.com/ScoopInstaller/Scoop/issues/6380))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
