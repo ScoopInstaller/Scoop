@@ -100,6 +100,10 @@
 #       GitHub API token used to make authenticated requests.
 #       This is essential for checkver and similar functions to run without
 #       incurring rate limits and download from private repositories.
+#       When not set, Scoop uses the token of the GitHub CLI ('gh auth token'), if
+#       'gh' is installed and logged in to github.com, and then the GH_TOKEN and
+#       GITHUB_TOKEN environment variables.
+#       Set to an empty string ('') to skip those and not use a token.
 #
 # virustotal_api_key:
 #       API key used for uploading/scanning files using virustotal.
