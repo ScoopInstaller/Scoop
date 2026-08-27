@@ -98,22 +98,24 @@ if ($specific_versions.Count -gt 0) {
     $difference = $apps
 }
 
+$resolved = @()
 $specific_versions_paths = $specific_versions | ForEach-Object {
-    $app, $bucket, $version = parse_app $_
+    $spec = $_
+    $app, $bucket, $version = parse_app $spec
     if (installed_manifest $app $version) {
         warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
+        $resolved += $spec
         continue
     }
 
     $path = generate_user_manifest $app $bucket $version
     if (!$path) {
-        warn "Could not find manifest for '$app@$version'"
+        warn "Could not find manifest for '$spec'"
+        return
     }
+    $resolved += $spec
     $path
 }
-# If any specific version failed to resolve, abort — but only after processing
-# all of them so the user sees every failure in one go.
-$resolved = $specific_versions_paths | Where-Object { $_ }
 if ($resolved.Count -lt $specific_versions.Count) {
     $missing = $specific_versions | Where-Object { $_ -notin $resolved }
     abort "Could not install: $($missing -join ', ')"
