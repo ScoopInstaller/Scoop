@@ -21,6 +21,26 @@ function Get-PESubsystem($filePath) {
     }
 }
 
+function Get-PEMachine($filePath) {
+    try {
+        $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read)
+        $binaryReader = [System.IO.BinaryReader]::new($fileStream)
+
+        $fileStream.Seek(0x3C, [System.IO.SeekOrigin]::Begin) | Out-Null
+        $peOffset = $binaryReader.ReadInt32()
+
+        # Machine field is at PE signature (4 bytes) + offset 0 of COFF header
+        $fileStream.Seek($peOffset + 4, [System.IO.SeekOrigin]::Begin) | Out-Null
+
+        return $binaryReader.ReadUInt16()
+    } catch {
+        return 0
+    } finally {
+        if ($null -ne $binaryReader) { $binaryReader.Close() }
+        if ($null -ne $fileStream) { $fileStream.Close() }
+    }
+}
+
 function Set-PESubsystem($filePath, $targetSubsystem) {
     try {
         $fileStream = [System.IO.FileStream]::new($filePath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite)
@@ -887,7 +907,12 @@ function Get-ShimTarget($ShimPath) {
         if (!$shimTarget) {
             $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
         }
-        $shimTarget | Convert-Path -ErrorAction SilentlyContinue
+        $shimTargetConverted = $shimTarget | Convert-Path -ErrorAction SilentlyContinue
+        if (!$shimTargetConverted -and $shimTarget.Contains('\Sysnative\')) {
+            $shimTarget.Replace('\Sysnative\', '\System32\') | Convert-Path -ErrorAction SilentlyContinue
+        } else {
+            return $shimTargetConverted
+        }
     }
 }
 
@@ -928,7 +953,27 @@ function shim($path, $global, $name, $arg) {
         # for programs with no awareness of any shell
         warn_on_overwrite "$shim.shim" $path
         Copy-Item (get_shim_path) "$shim.exe" -Force
-        Write-Output "path = `"$resolved_path`"" | Out-UTF8File "$shim.shim"
+
+        $rewrote_path = $resolved_path
+
+        # If the shim exe is x86 on a x64 OS, rewrite paths so the shim resolves correctly:
+        #   System32 -> Sysnative  (x64 resolve x64 program in System32, and it should be Sysnative in x86 program)
+        #   SysWOW64 -> System32   (x64 resolve x86 program in SysWOW64, and it should be System32 in x86 program)
+        $shim_machine = Get-PEMachine "$shim.exe"
+        # 0x014c is IMAGE_FILE_MACHINE_I386
+        # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
+        if ($shim_machine -eq 0x014c -and [System.Environment]::Is64BitOperatingSystem) {
+            $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
+            $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
+            $syswow = [System.IO.Path]::Combine($env:SystemRoot, 'SysWOW64')
+            if ($rewrote_path -like "$sysdir\*") {
+                $rewrote_path = $rewrote_path -replace [regex]::Escape($sysdir), $sysnative
+            } elseif ($rewrote_path -like "$syswow\*") {
+                $rewrote_path = $rewrote_path -replace [regex]::Escape($syswow), $sysdir
+            }
+        }
+
+        Write-Output "path = `"$rewrote_path`"" | Out-UTF8File "$shim.shim"
         if ($arg) {
             Write-Output "args = $arg" | Out-UTF8File "$shim.shim" -Append
         }

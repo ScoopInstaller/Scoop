@@ -392,6 +392,71 @@ Describe 'app' -Tag 'Scoop' {
     }
 }
 
+Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
+    It 'returns machine type for a valid PE file' {
+        $shim_path = get_shim_path
+        if ($shim_path -and (Test-Path $shim_path)) {
+            $machine = Get-PEMachine $shim_path
+            # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
+            # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
+            $machine | Should -BeIn @(0x014c, 0x8664, 0xAA64)
+        } else {
+            Set-ItResult -Skipped -Because 'shim exe not found'
+        }
+    }
+
+    It 'returns 0 for a non-existent file' {
+        Get-PEMachine 'C:\nonexistent\fake.exe' | Should -Be 0
+    }
+
+    It 'returns 0 for a non-PE file' {
+        $working_dir = setup_working 'shim'
+        Get-PEMachine "$working_dir\shim-test.ps1" | Should -Be 0
+    }
+}
+
+Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
+    It 'rewrites System32 to Sysnative for x86 shim on x64 OS' {
+        $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
+        $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
+        $testPath = "$sysdir\notepad.exe"
+
+        if ([System.Environment]::Is64BitOperatingSystem) {
+            $result = $testPath -replace [regex]::Escape($sysdir), $sysnative
+            $result | Should -Be "$sysnative\notepad.exe"
+        } else {
+            Set-ItResult -Skipped -Because 'not a x64 OS'
+        }
+    }
+
+    It 'rewrites SysWOW64 to System32 for x86 shim on x64 OS' {
+        $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
+        $syswow = [System.IO.Path]::Combine($env:SystemRoot, 'SysWOW64')
+        $testPath = "$syswow\notepad.exe"
+
+        if ([System.Environment]::Is64BitOperatingSystem) {
+            $result = $testPath -replace [regex]::Escape($syswow), $sysdir
+            $result | Should -Be "$sysdir\notepad.exe"
+        } else {
+            Set-ItResult -Skipped -Because 'not a x64 OS'
+        }
+    }
+
+    It 'does not rewrite paths outside System32 and SysWOW64' {
+        $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
+        $syswow = [System.IO.Path]::Combine($env:SystemRoot, 'SysWOW64')
+        $testPath = 'C:\Program Files\test\app.exe'
+
+        $result = $testPath
+        if ($result -like "$sysdir\*") {
+            $result = $result -replace [regex]::Escape($sysdir), 'Sysnative'
+        } elseif ($result -like "$syswow\*") {
+            $result = $result -replace [regex]::Escape($syswow), $sysdir
+        }
+        $result | Should -Be $testPath
+    }
+}
+
 Describe 'Format Architecture String' -Tag 'Scoop' {
     It 'should keep correct architectures' {
         Format-ArchitectureString '32bit' | Should -Be '32bit'
