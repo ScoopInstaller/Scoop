@@ -49,6 +49,7 @@
 ### Builds
 
 - **supporting:** Update System.Data.SQLite to 2.0.2 ([#6555](https://github.com/ScoopInstaller/Scoop/issues/6555), [#6560](https://github.com/ScoopInstaller/Scoop/issues/6560))
+- **supporting:** Update Newtonsoft.Json to 13.0.4 ([#6731](https://github.com/ScoopInstaller/Scoop/issues/6731))
 
 ### Continuous Integration
 
