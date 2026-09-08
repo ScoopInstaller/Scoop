@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+- **scoop-update:** `scoop update -f` on an `@version` pin now upgrades to the bucket HEAD ([#6730](https://github.com/ScoopInstaller/Scoop/issues/6730))
 - **core:** Fix the grep parameter in the `Invoke-GitLog` function ([#6407](https://github.com/ScoopInstaller/Scoop/issues/6407))
 - **buckets:** Skip Git invocation if unavailable in `new_issue_msg` ([#6591](https://github.com/ScoopInstaller/Scoop/issues/6591))
 - **buckets:** Fix the filtering condition when retrieving the number of manifests ([#6509](https://github.com/ScoopInstaller/Scoop/issues/6509))
