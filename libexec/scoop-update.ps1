@@ -276,7 +276,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
             $manifest = $scanned
             $url = $null
         } else {
-            $manifest = manifest $app 'main' $url
+            $manifest = manifest $app $null $url
         }
     } else {
         if ($null -eq $bucket) { $bucket = 'main' }
@@ -380,7 +380,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
         # add bucket name it was installed from
         $app = "$bucket/$app"
     }
-    if ($install.url -and !$pin_broken) {
+    if ($install.url -and (!$pin_broken -or !$bucket)) {
         # use the url of the install json if the application was installed through url
         $app = $install.url
     }
