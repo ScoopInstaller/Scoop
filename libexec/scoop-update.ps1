@@ -258,7 +258,7 @@ function Sync-Bucket {
     }
 }
 
-function update($app, $global, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
+function update($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -266,12 +266,22 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     # re-use architecture, bucket and url from first install
     $architecture = Format-ArchitectureString $install.architecture
     $bucket = $install.bucket
-    if ($null -eq $bucket) {
-        $bucket = 'main'
-    }
     $url = $install.url
 
-    $manifest = manifest $app $bucket $url
+    # -f on an @version pin re-resolves against the bucket HEAD
+    $pin_broken = $force -and $null -eq $bucket -and $url
+    if ($pin_broken) {
+        $scanned, $bucket = Find-AppBucket $app
+        if ($scanned) {
+            $manifest = $scanned
+            $url = $null
+        } else {
+            $manifest = manifest $app 'main' $url
+        }
+    } else {
+        if ($null -eq $bucket) { $bucket = 'main' }
+        $manifest = manifest $app $bucket $url
+    }
     $version = $manifest.version
     $is_nightly = $version -eq 'nightly'
     if ($is_nightly) {
@@ -370,7 +380,7 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
         # add bucket name it was installed from
         $app = "$bucket/$app"
     }
-    if ($install.url) {
+    if ($install.url -and !$pin_broken) {
         # use the url of the install json if the application was installed through url
         $app = $install.url
     }
@@ -380,7 +390,6 @@ function update($app, $global, $quiet = $false, $independent, $suggested, $use_c
     } else {
         # Also add missing dependencies
         $apps = @(Get-Dependency $app $architecture) -ne $app
-        ensure_none_failed $apps
         $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
 }
@@ -429,10 +438,16 @@ if (-not ($apps -or $all)) {
         $apps | ForEach-Object {
             ($app, $global) = $_
             $status = app_status $app $global
+            # -f on an @version pin upgrades to the bucket HEAD; the target
+            # version is resolved (and warned) by update(), not guessed here
+            $ver = Select-CurrentVersion -AppName $app -Global:$global
+            $pin = install_info $app $ver $global
+            $is_pin = $force -and !$pin.bucket -and $pin.url
             if ($status.installed -and ($force -or $status.outdated)) {
                 if (!$status.hold) {
                     $outdated += applist $app $global
-                    Write-Host -f yellow ("$app`: $($status.version) -> $($status.latest_version){0}" -f ('', ' (global)')[$global])
+                    $latest = if ($is_pin) { 'HEAD (forced)' } else { $status.latest_version }
+                    Write-Host -f yellow ("$app`: $($status.version) -> $latest{0}" -f ('', ' (global)')[$global])
                 } else {
                     warn "'$app' is held to version $($status.version)"
                 }
@@ -462,7 +477,7 @@ if (-not ($apps -or $all)) {
 
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update @_ $quiet $independent $suggested $use_cache $check_hash }
+    $outdated | ForEach-Object { update @_ $force $quiet $independent $suggested $use_cache $check_hash }
 }
 
 exit 0
