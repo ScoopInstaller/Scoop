@@ -40,8 +40,9 @@ function Get-Manifest($app) {
         $app = appname_from_url $url
         $manifest = url_manifest $url
     } else {
-        # Check if the manifest is already installed
-        if (installed $app) {
+        # 'bucket/app' form is an explicit bucket request; honor it instead of
+        # reading install.json (which may carry a stale pin from a prior install)
+        if ($app -notmatch '^[^/]+/' -and (installed $app)) {
             $global = installed $app $true
             $ver = Select-CurrentVersion -AppName $app -Global:$global
             if (!$ver) {
@@ -78,42 +79,46 @@ function Get-Manifest($app) {
             if ($bucket) {
                 $manifest = manifest $app $bucket
             } else {
-                $matched_buckets = @()
-                foreach ($tekcub in Get-LocalBucket) {
-                    $current_manifest = manifest $app $tekcub
-                    if (!$manifest -and $current_manifest) {
-                        $manifest = $current_manifest
-                        $bucket = $tekcub
+                $manifest, $bucket = Find-AppBucket $app
+                if (!$manifest) {
+                    # couldn't find app in buckets: check if it's a local path
+                    if (Test-Path $app) {
+                        $url = Convert-Path $app
+                        $app = appname_from_url $url
+                        $manifest = parse_json $url
+                    } else {
+                        if (($app -match '\\/') -or $app.EndsWith('.json')) { $url = $app }
+                        $app = appname_from_url $app
                     }
-                    if ($current_manifest) {
-                        $matched_buckets += $tekcub
-                    }
-                }
-            }
-            if (!$manifest) {
-                # couldn't find app in buckets: check if it's a local path
-                if (Test-Path $app) {
-                    $url = Convert-Path $app
-                    $app = appname_from_url $url
-                    $manifest = parse_json $url
-                } else {
-                    if (($app -match '\\/') -or $app.EndsWith('.json')) { $url = $app }
-                    $app = appname_from_url $app
                 }
             }
         }
     }
 
-    if ($matched_buckets.Length -gt 1) {
-        warn "Multiple buckets contain manifest '$app', the current selection is '$bucket/$app'."
-    }
-
     return $app, $manifest, $bucket, $url
 }
 
+function Find-AppBucket($app) {
+    $matched_buckets = @()
+    $manifest = $null
+    foreach ($tekcub in Get-LocalBucket) {
+        $current_manifest = parse_json (manifest_path $app $tekcub)
+        if (!$current_manifest) { continue }
+        $matched_buckets += $tekcub
+        if (!$manifest) { $manifest = $current_manifest }
+    }
+    if ($matched_buckets.Length -gt 1) {
+        warn "Multiple buckets contain manifest '$app', the current selection is '$($matched_buckets[0])/$app'."
+    }
+    return $manifest, $matched_buckets[0]
+}
+
 function manifest($app, $bucket, $url) {
-    if ($url) { return url_manifest $url }
-    parse_json (manifest_path $app $bucket)
+    # bucket HEAD wins; url is only the source for URL/pinned installs
+    if ($bucket) { return parse_json (manifest_path $app $bucket) }
+    $manifest = if ($url -match '^(ht|f)tps?://|\\\\') { url_manifest $url }
+    if (!$manifest -and $url) { $manifest = parse_json $url } # local path or failed remote
+    $manifest
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
@@ -303,7 +308,7 @@ function generate_user_manifest($app, $bucket, $version) {
     }
 
     # Try historical providers via orchestrator
-    info "Attempting to find historical manifest for '$app' ($version)"
+    info "Resolving historical manifest for '$app' ($version)"
     $historicalResult = Find-HistoricalManifest $app $bucket $version
     if ($historicalResult) { return $historicalResult.path }
 

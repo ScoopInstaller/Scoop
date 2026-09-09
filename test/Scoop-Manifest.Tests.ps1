@@ -72,7 +72,7 @@ Describe 'Manifest Validator' -Tag 'Validator' {
     }
 
     It 'Scoop.Validator is available' {
-            ([System.Management.Automation.PSTypeName]'Scoop.Validator').Type | Should -Be 'Scoop.Validator'
+        ([System.Management.Automation.PSTypeName]'Scoop.Validator').Type | Should -Be 'Scoop.Validator'
     }
     It 'fails with broken schema' {
         $validator = New-Object Scoop.Validator("$PSScriptRoot/fixtures/manifest/broken_schema.json", $true)
@@ -104,7 +104,7 @@ Describe 'Find-HistoricalManifestInCache' -Tag 'Scoop' {
 
     It 'returns manifest text and version when cache has exact match' {
         $tempUM = Join-Path $env:TEMP 'ScoopTestsUM'
-        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
+        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache', 'use_git_history') } { $true }
         Mock Get-ScoopDBItem {
             $dt = New-Object System.Data.DataTable
             [void]$dt.Columns.Add('manifest')
@@ -191,7 +191,7 @@ Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
 
 Describe 'Find-HistoricalManifest (orchestrator)' -Tag 'Scoop' {
     It 'returns $null when both cache and git miss' {
-        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
+        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache', 'use_git_history') } { $true }
         Mock Find-HistoricalManifestInCache { $null }
         Mock Find-HistoricalManifestInGit { $null }
         $result = Find-HistoricalManifest 'foo' 'main' '1.0.0'
@@ -212,16 +212,16 @@ Describe 'Write-ManifestToUserCache' -Tag 'Scoop' {
 
 Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
     It 'returns manifest_path when versions match' {
-        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='1.0.0' }, 'main', $null }
+        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version = '1.0.0' }, 'main', $null }
         Mock manifest_path { 'C:\path\foo.json' }
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
         $p | Should -Be 'C:\path\foo.json'
     }
 
     It 'prefers history orchestrator hit (cache) when enabled' {
-        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0' }, 'main', $null }
-        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
-        Mock Find-HistoricalManifest { @{ path = 'C:\cache\foo.json'; version = '1.0.0'; source='sqlite_exact_match' } }
+        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version = '2.0.0' }, 'main', $null }
+        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache', 'use_git_history') } { $true }
+        Mock Find-HistoricalManifest { @{ path = 'C:\cache\foo.json'; version = '1.0.0'; source = 'sqlite_exact_match' } }
 
         Mock info {}
         Mock warn {}
@@ -232,9 +232,9 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
     }
 
     It 'falls back to git history when cache misses' {
-        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0' }, 'main', $null }
-        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache','use_git_history') } { $true }
-        Mock Find-HistoricalManifest { @{ path = 'C:\git\foo.json'; version = '1.0.0'; source='git_manifest:hash' } }
+        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version = '2.0.0' }, 'main', $null }
+        Mock get_config -ParameterFilter { $name -in @('use_sqlite_cache', 'use_git_history') } { $true }
+        Mock Find-HistoricalManifest { @{ path = 'C:\git\foo.json'; version = '1.0.0'; source = 'git_manifest:hash' } }
         Mock info {}
         Mock warn {}
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
@@ -245,7 +245,7 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
 
     It 'uses autoupdate when no history found and autoupdate exists' {
         $umdir = Join-Path $env:TEMP 'ScoopTestsUM'
-        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0'; autoupdate=@{} }, 'main', $null }
+        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version = '2.0.0'; autoupdate = @{} }, 'main', $null }
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
         Mock Find-HistoricalManifest { $null }
 
@@ -260,7 +260,7 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
 
     It 'returns $null when autoupdate fails (caller surfaces the error)' {
         $umdir = Join-Path $env:TEMP 'ScoopTestsUM'
-        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0'; autoupdate=@{} }, 'main', $null }
+        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version = '2.0.0'; autoupdate = @{} }, 'main', $null }
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
         Mock Find-HistoricalManifest { $null }
         Mock ensure {}
@@ -275,7 +275,7 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
     }
 
     It 'aborts when no history and no autoupdate' {
-        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version='2.0.0' }, 'main', $null }
+        Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version = '2.0.0' }, 'main', $null }
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
         Mock Find-HistoricalManifest { $null }
 
@@ -286,3 +286,31 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
     }
 }
 
+Describe 'manifest bucket auto-discovery' -Tag 'Scoop' {
+    It 'discovers bucket for bare app name' {
+        Mock Get-LocalBucket { @('main') }
+        Mock manifest_path { 'C:\fake.json' }
+        Mock parse_json { @{ version = '1.0.0' } }
+        Mock warn {}
+        $m, $b = Find-AppBucket 'foo'
+        $b | Should -Be 'main'
+        $m.version | Should -Be '1.0.0'
+    }
+
+    It 'returns $null when app not found in any bucket' {
+        Mock Get-LocalBucket { @('main') }
+        Mock manifest_path { 'C:\nonexistent.json' }
+        Mock parse_json { $null }
+        Mock warn {}
+        $m, $b = Find-AppBucket 'foo'
+        $m | Should -BeNullOrEmpty
+        $b | Should -BeNullOrEmpty
+    }
+
+    It 'url used when bucket is null' {
+        Mock url_manifest { @{ version = '1.0.0' } }
+        $m = manifest 'foo' $null 'https://example.com/foo.json'
+        $m.version | Should -Be '1.0.0'
+        Should -Invoke url_manifest -Times 1
+    }
+}
