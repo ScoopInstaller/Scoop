@@ -189,6 +189,24 @@ $Queue | ForEach-Object {
         }
     }
 
+    # GitLab
+    if ($regex) {
+        $gitlabRegex = $regex
+    } else {
+        $gitlabRegex = '/-/releases/(?:v|V)?([\d.]+)'
+    }
+    if ($json.checkver -eq 'gitlab') {
+        if (!$json.homepage.StartsWith('https://gitlab.com/')) {
+            error "$name checkver expects the homepage to be a GitLab repository"
+        }
+        $url = $json.checkver.gitlab.TrimEnd('/') + '/-/releases?format=atom'
+        $regex = $gitlabRegex
+    }
+    if ($json.checkver.gitlab) {
+        $url = $json.checkver.gitlab.TrimEnd('/') + '/-/releases?format=atom'
+        $regex = $gitlabRegex
+    }
+
     # SourceForge
     if ($regex) {
         $sourceforgeRegex = $regex
