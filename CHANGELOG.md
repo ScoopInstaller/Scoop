@@ -47,6 +47,7 @@
 - **output:** Combine the separated outputs into a single output ([#6545](https://github.com/ScoopInstaller/Scoop/issues/6545))
 - **scoop-list:** Use simpler method to check the deprecated status of the manifest to improve performance ([#6599](https://github.com/ScoopInstaller/Scoop/issues/6599))
 - **install:** Get reference for Users group via Principal.WellKnownSidType
+- **install:** Use `scoop-` prefix for `install.json` and `manifest.json` ([#6732](https://github.com/ScoopInstaller/Scoop/issues/6732))
 
 ### Performance Improvements
 
