@@ -521,8 +521,8 @@ function unlink_persist_data($manifest, $dir) {
 function persist_permission($manifest, $global) {
     if ($global -and $manifest.persist -and (is_admin)) {
         $path = persistdir $null $global
-        $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
-        $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
+        $builtinUsersSid = New-Object System.Security.Principal.SecurityIdentifier([System.Security.Principal.WellKnownSidType]::BuiltinUsersSid, $null)
+        $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinUsersSid, 'Write', 'ObjectInherit', 'none', 'Allow')
         $acl = Get-Acl -Path $path
         $acl.SetAccessRule($target_rule)
         $acl | Set-Acl -Path $path
