@@ -82,18 +82,22 @@ function Expand-7zipArchive {
     )
     if ((get_config USE_EXTERNAL_7ZIP)) {
         try {
-            $7zPath = (Get-Command '7z' -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+            $7zPath = (Get-Command -Name '7z' -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         } catch [System.Management.Automation.CommandNotFoundException] {
             abort "`nCannot find external 7-Zip (7z.exe) while 'use_external_7zip' is 'true'!`nRun 'scoop config use_external_7zip false' or install 7-Zip manually and try again."
         }
     } else {
         $7zPath = Get-HelperPath -Helper 7zip
     }
-    $LogPath = "$(Split-Path $Path)\7zip.log"
-    $DestinationPath = $DestinationPath.TrimEnd('\')
+    $LogPath = "$(Split-Path -Path $Path)\7zip.log"
+    $IsTar = ((strip_ext -fname $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
+    $DestinationPath = [string] $DestinationPath.TrimEnd('\')
+    if ($ExtractDir) {
+        $OriDestinationPath = [string] $DestinationPath
+        $DestinationPath = [System.IO.Path]::Combine($env:TEMP, [guid]::NewGuid().'Guid')
+    }
     $ArgList = @('x', $Path, "-o$DestinationPath", '-xr!*.nsis', '-y')
-    $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
-    if (!$IsTar -and $ExtractDir) {
+    if ($ExtractDir -and -not $IsTar) {
         $ArgList += "-ir!$ExtractDir\*"
     }
     if ($Switches) {
@@ -104,42 +108,40 @@ function Expand-7zipArchive {
         'Skip' { $ArgList += '-aos' }
         'Rename' { $ArgList += '-aou' }
     }
-    $Status = Invoke-ExternalCommand $7zPath $ArgList -LogPath $LogPath
-    if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+    $Status = Invoke-ExternalCommand -FilePath $7zPath -ArgumentList $ArgList -LogPath $LogPath
+    if (-not $Status) {
+        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path -path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if ($IsTar) {
         # Check for tar
-        $Status = Invoke-ExternalCommand $7zPath @('l', $Path) -LogPath $LogPath
+        $Status = Invoke-ExternalCommand -FilePath $7zPath -ArgumentList @('l', $Path) -LogPath $LogPath
         if ($Status) {
-            # get inner tar file name
+            # Get inner tar file name
             $TarFile = (Select-String -Path $LogPath -Pattern '[^ ]*tar$').Matches.Value
             Expand-7zipArchive -Path "$DestinationPath\$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
         } else {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
     }
-    if (!$IsTar -and $ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
-        # Remove temporary directory if it is empty
-        $ExtractDirTopPath = [string] "$DestinationPath\$($ExtractDir -replace '[\\/].*')"
-        if ((Get-ChildItem -Path $ExtractDirTopPath -Force -ErrorAction Ignore).Count -eq 0) {
-            Remove-Item -Path $ExtractDirTopPath -Recurse -Force -ErrorAction Ignore
-        }
+    if ($ExtractDir -and -not $IsTar) {
+        # Move content to original destination path
+        $null = movedir -from "$DestinationPath\$ExtractDir" -to $OriDestinationPath
+        # Remove temporary directory
+        Remove-Item -Path $DestinationPath -Recurse -Force -ErrorAction Ignore
     }
-    if (Test-Path $LogPath) {
-        Remove-Item $LogPath -Force
+    if (Test-Path -Path $LogPath -PathType 'Leaf') {
+        Remove-Item -Path $LogPath -Force
     }
     if ($Removal) {
         if (($Path -replace '.*\.([^\.]*)$', '$1') -eq '001') {
             # Remove splitted 7-zip archive parts
-            Get-ChildItem "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
+            Get-ChildItem -Path "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
         } elseif (($Path -replace '.*\.part(\d+)\.rar$', '$1')[-1] -eq '1') {
             # Remove splitted RAR archive parts
             Get-ChildItem "$($Path -replace '\.part(\d+)\.rar$', '').part*.rar" | Remove-Item -Force
         } else {
             # Remove original archive file
-            Remove-Item $Path -Force
+            Remove-Item -Path $Path -Force
         }
     }
 }
@@ -278,9 +280,10 @@ function Expand-ZipArchive {
         [Switch]
         $Removal
     )
+    $DestinationPath = [string] $DestinationPath.TrimEnd('\')
     if ($ExtractDir) {
-        $OriDestinationPath = $DestinationPath
-        $DestinationPath = "$DestinationPath\_tmp"
+        $OriDestinationPath = [string] $DestinationPath
+        $DestinationPath = [string] [System.IO.Path]::Combine($env:TEMP, [guid]::NewGuid().'Guid')
     }
     # Disable progress bar to gain performance
     $oldProgressPreference = $ProgressPreference
@@ -291,12 +294,12 @@ function Expand-ZipArchive {
 
     $global:ProgressPreference = $oldProgressPreference
     if ($ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
-        Remove-Item $DestinationPath -Recurse -Force
+        $null = movedir "$DestinationPath\$ExtractDir" $OriDestinationPath
+        Remove-Item -Path $DestinationPath -Recurse -Force
     }
     if ($Removal) {
         # Remove original archive file
-        Remove-Item $Path -Force
+        Remove-Item -Path $Path -Force
     }
 }
 

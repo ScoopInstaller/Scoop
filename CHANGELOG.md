@@ -41,6 +41,11 @@
 - **checkver:** Harden github checkver ([#6641](https://github.com/ScoopInstaller/Scoop/issues/6641))
 - **scoop-search:** Select latest search result semantically ([#6643](https://github.com/ScoopInstaller/Scoop/issues/6643))
 
+### BREAKING CHANGE
+
+- **decompress:** Expand to temp directory if `$ExtractDir` is specified with `Expand-7zipArchive` and `Expand-ZipArchive`, to make it more robust ([#6515](https://github.com/ScoopInstaller/Scoop/issues/6515))
+  - Changes extraction semantics when `extract_dir` is used; manifests relying on post-extraction cleanup workarounds may need updates.
+
 ### Code Refactoring
 
 - **output:** Replace raw prints with functions for standardized output ([#6449](https://github.com/ScoopInstaller/Scoop/issues/6449))
