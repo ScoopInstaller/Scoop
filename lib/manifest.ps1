@@ -49,9 +49,8 @@ function Get-Manifest($app) {
                 $app, $bucket, $ver = parse_app $app
                 $ver = Select-CurrentVersion -AppName $app -Global:$global
             }
-            $install_info_path = "$(versiondir $app $ver $global)\install.json"
-            if (Test-Path $install_info_path) {
-                $install_info = parse_json $install_info_path
+            $install_info = install_info $app $ver $global
+            if ($install_info) {
                 $bucket = $install_info.bucket
                 if (!$bucket) {
                     $url = $install_info.url
@@ -126,14 +125,17 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
         $wc = New-Object Net.Webclient
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
         $data = $wc.DownloadData($url)
-        (Get-Encoding($wc)).GetString($data) | Out-UTF8File "$dir\manifest.json"
+        (Get-Encoding($wc)).GetString($data) | Out-UTF8File "$dir\scoop-manifest.json"
     } else {
-        Copy-Item (manifest_path $app $bucket) "$dir\manifest.json"
+        Copy-Item (manifest_path $app $bucket) "$dir\scoop-manifest.json"
     }
 }
 
 function installed_manifest($app, $version, $global) {
-    parse_json "$(versiondir $app $version $global)\manifest.json"
+    $dir = versiondir $app $version $global
+    $json = "$dir\scoop-manifest.json"
+    if (Test-Path $json) { return parse_json $json }
+    parse_json "$dir\manifest.json"
 }
 
 function save_install_info($info, $dir) {
@@ -141,13 +143,14 @@ function save_install_info($info, $dir) {
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
     $file_content = $info | ConvertToPrettyJson # in 'json.ps1'
-    [System.IO.File]::WriteAllLines("$dir\install.json", $file_content)
+    [System.IO.File]::WriteAllLines("$dir\scoop-install.json", $file_content)
 }
 
 function install_info($app, $version, $global) {
-    $path = "$(versiondir $app $version $global)\install.json"
-    if (!(Test-Path $path)) { return $null }
-    parse_json $path
+    $dir = versiondir $app $version $global
+    $json = "$dir\scoop-install.json"
+    if (Test-Path $json) { return parse_json $json }
+    parse_json "$dir\install.json"
 }
 
 function arch_specific($prop, $manifest, $architecture) {
