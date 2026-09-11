@@ -274,6 +274,46 @@ function next($er) {
     Write-Host $er -ForegroundColor DarkRed
 }
 
+function Invoke-SanitizeScriptBlock {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $ScriptBlock
+    )
+
+    $tokens = $null
+    $errors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseInput($ScriptBlock, [ref]$tokens, [ref]$errors)
+
+    if ($errors.Count -gt 0 -or -not $ast) {
+        $message = if ($errors) { $errors[0].Message } else { 'unknown parse error' }
+        return $true, $message
+    }
+
+    # Restrict the capability of accessing outer variables via `$using:`
+    if ($ast.Find({ param($node) $node -is [System.Management.Automation.Language.UsingExpressionAst] }, $true)) {
+        return $true, "'`$using:' may not be used"
+    }
+
+    return $false, $null
+}
+
+function Get-CheckverScriptPrelude() {
+    return @(
+        '$ErrorActionPreference = "Stop"',
+        '$ProgressPreference = "SilentlyContinue"',
+        # Set allowed env vars, `SystemRoot` is required for irm/iwr
+        '$allowedEnvs = @("SystemRoot","TEMP","TMP")',
+        'Get-ChildItem Env: | Where-Object { $allowedEnvs -notcontains $_.Name } | Remove-Item',
+        # Use `UseBasicParsing` for Invoke-WebRequest by default (WindowsPowerShell)
+        '$PSDefaultParameterValues["Invoke-WebRequest:UseBasicParsing"] = $true',
+        # Use ConstrainedLanguage language mode to restrict checkver.script capabilities
+        '$ExecutionContext.SessionState.LanguageMode = "ConstrainedLanguage"',
+        # Available variables/functions for checkver.script
+        # - `$page`: the retrieved webpage content
+        '$page = $using:page'
+    )
+}
+
 # wait for all to complete
 while ($in_progress -gt 0) {
     $ev = Wait-Event
@@ -326,12 +366,26 @@ while ($in_progress -gt 0) {
             $page = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
         }
 
+        # checkver.script evaluation
         if ($script) {
-            $page = Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
-            $source = 'the output of script'
+            $script = @($script) -join "`n"
+            $isBadScript, $errorMessage = Invoke-SanitizeScriptBlock $script
+            if ($isBadScript) {
+                next "invalid checkver.script: $errorMessage"
+                continue
+            }
+
+            $prelude = Get-CheckverScriptPrelude
+
+            $script = $prelude + $script
+            $scriptBlock = [scriptblock]::Create($script -join "`n")
+
+            $page = [string](Start-Job -ScriptBlock $scriptBlock | Receive-Job -Wait -AutoRemoveJob)
+            debug "Output from evaluating checkver.script:`r`n$page"
+            $source = 'the output of checkver.script'
         }
 
-        if ($null -eq $page) {
+        if (!$page) {
             next "couldn't retrieve content from $source"
             continue
         }
