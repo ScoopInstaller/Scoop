@@ -280,7 +280,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
             $manifest = manifest $app $null $url
         }
     } else {
-        if ($null -eq $bucket) { $bucket = 'main' }
+        if ($null -eq $bucket -and !$url) { $bucket = 'main' }
         $manifest = manifest $app $bucket $url
     }
     $version = $manifest.version
