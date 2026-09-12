@@ -229,6 +229,7 @@ function Invoke-Git {
     )
 
     $proxy = get_config PROXY
+    $no_proxy = get_config NO_PROXY
     $git = Get-HelperPath -Helper Git
 
     if ($WorkingDirectory) {
@@ -243,11 +244,15 @@ function Invoke-Git {
         $j = Start-Job -ScriptBlock {
             # convert proxy setting for git
             $proxy = $using:proxy
+            $no_proxy = $using:no_proxy
             if ($proxy -and $proxy.StartsWith('currentuser@')) {
                 $proxy = $proxy.Replace('currentuser@', ':@')
             }
             $env:HTTPS_PROXY = $proxy
             $env:HTTP_PROXY = $proxy
+            if ($no_proxy) {
+                $env:NO_PROXY = $no_proxy
+            }
             & $using:git @using:ArgumentList
         }
         $o = $j | Receive-Job -Wait -AutoRemoveJob

@@ -557,6 +557,7 @@ function Get-UserAgent() {
 function setup_proxy() {
     # note: '@' and ':' in password must be escaped, e.g. 'p@ssword' -> p\@ssword'
     $proxy = get_config PROXY
+    $no_proxy = get_config NO_PROXY
     if (!$proxy) {
         return
     }
@@ -577,6 +578,10 @@ function setup_proxy() {
         } elseif ($credentials) {
             $username, $password = $credentials -split '(?<!\\):' | ForEach-Object { $_ -replace '\\([@:])', '$1' }
             [net.webrequest]::defaultwebproxy.credentials = New-Object net.networkcredential($username, $password)
+        }
+        if ($no_proxy) {
+            $bypass_list = $no_proxy.Trim() -split "\s*,\s*" | Where-Object { $_ -ne '' }
+            [net.webrequest]::defaultwebproxy.BypassList = $bypass_list
         }
     } catch {
         warn "Failed to use proxy '$proxy': $($_.exception.message)"
