@@ -427,7 +427,9 @@ while ($in_progress -gt 0) {
 
     Write-Host $ver -ForegroundColor DarkRed -NoNewline
     Write-Host " (scoop version is $expected_ver)" -NoNewline
-    $update_available = (Compare-Version -ReferenceVersion $ver -DifferenceVersion $expected_ver) -ne 0
+    $comparison = Compare-Version -ReferenceVersion $ver -DifferenceVersion $expected_ver
+    $update_available = $comparison -lt 0
+    $version_regressed = $comparison -gt 0
 
     if ($json.autoupdate -and $update_available) {
         Write-Host ' autoupdate available' -ForegroundColor Cyan
@@ -437,6 +439,13 @@ while ($in_progress -gt 0) {
 
     # forcing an update implies updating, right?
     if ($ForceUpdate) { $Update = $true }
+
+    # Refuse to rewrite the manifest backwards. A source that transiently
+    # reports a stale version would otherwise be committed as an "update".
+    if ($version_regressed -and !$ForceUpdate) {
+        warn "${app}: skipping downgrade to $ver (manifest is $expected_ver)"
+        continue
+    }
 
     if ($Update -and $json.autoupdate) {
         if ($ForceUpdate) {
