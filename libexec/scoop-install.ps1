@@ -4,7 +4,7 @@
 #      scoop install git
 #
 # To install a different version of the app
-# (note that this will auto-generate the manifest using current version):
+# (will search sqlite cache if enabled, then git history (if use_git_history is $true), then auto-generate manifest as fallback):
 #      scoop install gh@2.7.0
 #
 # To install an app from a manifest at a URL:
@@ -44,7 +44,7 @@ if (get_config USE_SQLITE_CACHE) {
 }
 
 $opt, $apps, $err = getopt $args 'giksua:' 'global', 'independent', 'no-cache', 'skip-hash-check', 'no-update-scoop', 'arch='
-if ($err) { "scoop install: $err"; exit 1 }
+if ($err) { error "scoop install: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 $check_hash = !($opt.s -or $opt.'skip-hash-check')
@@ -98,14 +98,27 @@ if ($specific_versions.Count -gt 0) {
     $difference = $apps
 }
 
+$resolved = @()
 $specific_versions_paths = $specific_versions | ForEach-Object {
-    $app, $bucket, $version = parse_app $_
+    $spec = $_
+    $app, $bucket, $version = parse_app $spec
     if (installed_manifest $app $version) {
         warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
+        $resolved += $spec
         continue
     }
 
-    generate_user_manifest $app $bucket $version
+    $path = generate_user_manifest $app $bucket $version
+    if (!$path) {
+        warn "Could not find manifest for '$spec'"
+        return
+    }
+    $resolved += $spec
+    $path
+}
+if ($resolved.Count -lt $specific_versions.Count) {
+    $missing = $specific_versions | Where-Object { $_ -notin $resolved }
+    abort "Could not install: $($missing -join ', ')"
 }
 $apps = @((@($specific_versions_paths) + $difference) | Where-Object { $_ } | Select-Object -Unique)
 
