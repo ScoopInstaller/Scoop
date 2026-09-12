@@ -24,6 +24,7 @@
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\restart_manager.ps1"
 . "$PSScriptRoot\..\lib\download.ps1"
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
@@ -63,7 +64,7 @@ $show_update_log = get_config SHOW_UPDATE_LOG $true
 
 function Sync-Scoop {
     [CmdletBinding()]
-    Param (
+    param (
         [Switch]$Log
     )
     # Test if Scoop Core is hold
@@ -153,7 +154,7 @@ function Sync-Scoop {
 }
 
 function Sync-Bucket {
-    Param (
+    param (
         [Switch]$Log
     )
     Write-Host 'Updating Buckets...'
@@ -303,10 +304,25 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
 
     Write-Host "Updating '$app' ($old_version -> $version)"
 
+    $originalAppName = $app
+
     #region Workaround for #2952
-    if (test_running_process $app $global) {
+    $running_ret = check_running_process $app $global
+    $stop_ret = stop_running_process $running_ret
+    $stopped_services = @()
+    $stopped_processes = @()
+
+    if ($stop_ret.Blocked) {
         Write-Host 'Running process detected, skip updating.'
         return
+    } else {
+        if ($stop_ret.ServicesToRestart) {
+            $stopped_services = $stop_ret.ServicesToRestart
+        }
+        if ($stop_ret.ProcessesToRestart) {
+            $stopped_processes = $stop_ret.ProcessesToRestart
+            $old_processdir = $running_ret.ProcessDir
+        }
     }
     #endregion Workaround for #2952
 
@@ -367,7 +383,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
             Move-Item "$dir" "$dir/../_$version.old"
         } else {
             $i = 1
-            While (Test-Path "$dir/../_$version.old($i)") {
+            while (Test-Path "$dir/../_$version.old($i)") {
                 $i++
             }
             Move-Item "$dir" "$dir/../_$version.old($i)"
@@ -391,6 +407,37 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
         # Also add missing dependencies
         $apps = @(Get-Dependency $app $architecture) -ne $app
         $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+    }
+
+    if ($stopped_services.Count -gt 0) {
+        foreach ($svc in $stopped_services) {
+            warn "Restarting service '$svc' associated with '$originalAppName'..."
+            try {
+                Start-Service -Name $svc -ErrorAction Stop
+            } catch {
+                warn "Failed to restart service '$svc': $($_.Exception.Message)"
+            }
+        }
+    }
+
+    if ($stopped_processes.Count -gt 0) {
+        $new_version = current_version $originalAppName $global
+        $new_processdir = versiondir $originalAppName $new_version $global | Convert-Path
+        foreach ($proc in $stopped_processes) {
+            if ($proc.StartsWith($old_processdir)) {
+                $proc = $proc.Replace($old_processdir, $new_processdir)
+            }
+            warn "Restarting process '$(Split-Path $proc -Leaf)' associated with '$originalAppName'..."
+            if (Test-Path $proc) {
+                try {
+                    Start-Process -FilePath $proc -ErrorAction Stop
+                } catch {
+                    warn "Failed to restart process '$(Split-Path $proc -Leaf)': $($_.Exception.Message)"
+                }
+            } else {
+                warn "Process executable no longer exists at '$proc'."
+            }
+        }
     }
 }
 

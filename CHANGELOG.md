@@ -70,6 +70,7 @@
 
 ### Features
 
+- **scoop-forcekill:** Support killing running applications and services ([#6603](https://github.com/ScoopInstaller/Scoop/pull/6603))
 - **autoupdate:** GitHub predefined hashes support ([#6416](https://github.com/ScoopInstaller/Scoop/issues/6416), [#6435](https://github.com/ScoopInstaller/Scoop/issues/6435))
 
 ### Bug Fixes
