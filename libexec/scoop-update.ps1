@@ -189,6 +189,7 @@ function Sync-Bucket {
         $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
             . "$using:PSScriptRoot\..\lib\core.ps1"
             . "$using:PSScriptRoot\..\lib\buckets.ps1"
+            . "$using:PSScriptRoot\..\lib\versions.ps1" # 'currentdir' (indirectly)
 
             $name = $_.name
             $bucketLoc = $_.path
