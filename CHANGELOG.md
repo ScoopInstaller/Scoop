@@ -14,6 +14,7 @@
 ### Bug Fixes
 
 - **scoop-update:** Import `versions.ps1` in the parallel bucket sync to fix `currentdir` failing with `NO_JUNCTION` enabled ([#6735](https://github.com/ScoopInstaller/Scoop/issues/6735))
+- **scoop-update:** Fix updating apps installed from a local manifest path ([#6736](https://github.com/ScoopInstaller/Scoop/issues/6736))
 - **scoop-update:** `scoop update -f` on an `@version` pin now upgrades to the bucket HEAD ([#6730](https://github.com/ScoopInstaller/Scoop/issues/6730))
 - **core:** Fix the grep parameter in the `Invoke-GitLog` function ([#6407](https://github.com/ScoopInstaller/Scoop/issues/6407))
 - **buckets:** Skip Git invocation if unavailable in `new_issue_msg` ([#6591](https://github.com/ScoopInstaller/Scoop/issues/6591))
