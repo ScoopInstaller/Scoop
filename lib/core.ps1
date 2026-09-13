@@ -690,7 +690,14 @@ function is_local($path) {
 
 # True if $check equals $dir or sits under $dir.
 function is_in_dir($dir, $check) {
-    $check -match "^$([regex]::Escape("$dir"))([/\\]|$)"
+    $dir = Get-AbsolutePath $dir
+    $check = Get-AbsolutePath $check
+
+    if ($check -ieq $dir) { return $true }
+    if (-not ($dir.EndsWith('\') -or $dir.EndsWith('/'))) {
+        $dir += [System.IO.Path]::DirectorySeparatorChar
+    }
+    $check.StartsWith($dir, [System.StringComparison]::OrdinalIgnoreCase)
 }
 
 # operations
