@@ -429,8 +429,11 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
         if ($rewrites) {
             # 64-bit reader sees the redirected (real) location via System32
             $line | Should -BeLike "*$env:SystemRoot\System32\notepad.exe*"
+            Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
+        } else {
+            $line | Should -BeLike "*$target*"
+            Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be (Resolve-Path $target).Path
         }
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
     }
 
     It 'does not fail on a shim file without a resolvable target' {
