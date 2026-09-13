@@ -453,16 +453,19 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         Write-Host ''
 
         if ($lastexitcode -gt 0) {
+            # Values containing "'" would break the aria2 command itself, so '...' spans are safe redaction boundaries
+            $aria2Diag = $aria2 -replace "--all-proxy-passwd='[^']*'", "--all-proxy-passwd='***'" -replace "--header='Cookie:[^']*'", "--header='Cookie: ***'"
+            $urlstxtDiag = $urlstxt_content -replace '(?<u>https?\S*)\?\S*', '${u}?***'
             if (get_config ARIA2-FALLBACK-DISABLED) {
                 error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
-                error $urlstxt_content
-                error $aria2
+                error $urlstxtDiag
+                error $aria2Diag
                 abort $(new_issue_msg $app $bucket 'download via aria2 failed')
             }
 
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
-            warn $urlstxt_content
-            warn $aria2
+            warn $urlstxtDiag
+            warn $aria2Diag
 
             Write-Host 'Fallback to default downloader...'
 
