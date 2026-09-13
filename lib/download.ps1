@@ -95,7 +95,7 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
         if (-not ($url -match 'sourceforge\.net' -or $url -match 'portableapps\.com')) {
             $wreq.Referer = strip_filename $url
         }
-        if ($url -match 'api\.github\.com/repos') {
+        if ($url -match '^https://api\.github\.com/repos') {
             $wreq.Accept = 'application/octet-stream'
             $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
             $wreq.Headers['X-GitHub-Api-Version'] = '2022-11-28'
