@@ -627,12 +627,12 @@ function Get-AbsolutePath {
     .SYNOPSIS
         Get absolute path
     .DESCRIPTION
-        Get absolute path, even if not existed
+        Get absolute path, even if it does not exist
     .PARAMETER Path
         Path to manipulate
     .OUTPUTS
         System.String
-            Absolute path, may or maynot existed
+            Absolute path, may or may not exist
     #>
     [CmdletBinding()]
     [OutputType([string])]

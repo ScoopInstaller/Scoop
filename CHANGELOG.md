@@ -69,6 +69,7 @@
 ### Documentation
 
 - **README:** Remove Gitter badge ([#6640](https://github.com/ScoopInstaller/Scoop/issues/6640))
+- **typo:** Correct misspellings in comments and docs ([#6191](https://github.com/ScoopInstaller/Scoop/issues/6191))
 
 ### Tests
 
