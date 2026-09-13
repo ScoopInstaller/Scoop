@@ -22,6 +22,7 @@
 - **scoop-update:** `scoop update -f` on an `@version` pin now upgrades to the bucket HEAD ([#6730](https://github.com/ScoopInstaller/Scoop/issues/6730))
 - **scoop-update:** Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
+- **auto-pr:** Rebase before pushing to prevent push conflicts ([#6624](https://github.com/ScoopInstaller/Scoop/issues/6624))
 - **autoupdate:** Use origin URL to handle URLs with fragment in GitHub mode ([#6455](https://github.com/ScoopInstaller/Scoop/issues/6455))
 - **autoupdate:** Ensure GitHub API requests use token ([#6535](https://github.com/ScoopInstaller/Scoop/issues/6535))
 - **buckets:** Skip Git invocation if unavailable in `new_issue_msg` ([#6591](https://github.com/ScoopInstaller/Scoop/issues/6591))
