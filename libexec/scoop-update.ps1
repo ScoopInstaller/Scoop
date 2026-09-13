@@ -443,7 +443,7 @@ if (-not ($apps -or $all)) {
             # version is resolved (and warned) by update(), not guessed here
             $ver = Select-CurrentVersion -AppName $app -Global:$global
             $pin = install_info $app $ver $global
-            $is_pin = $force -and !$pin.bucket -and $pin.url
+            $is_pin = $force -and !$pin.bucket -and ($pin.url -eq (usermanifest $app))
             if ($status.installed -and ($force -or $status.outdated)) {
                 if (!$status.hold) {
                     $outdated += applist $app $global
