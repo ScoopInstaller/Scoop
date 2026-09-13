@@ -10,6 +10,7 @@
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\download.ps1" # url_filename
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
@@ -58,6 +59,7 @@ if (!$apps) { exit 0 }
         $manifest = installed_manifest $app $version $global
         $install = install_info $app $version $global
         $architecture = $install.architecture
+        $bucket = $install.bucket
 
         Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
 
@@ -74,7 +76,7 @@ if (!$apps) { exit 0 }
             continue
         }
 
-        Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global $global -Uninstall
+        Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
         rm_shims $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 

@@ -57,15 +57,16 @@ function search_bucket($bucket, $query) {
 
     $apps | ForEach-Object {
         $filepath = $_.FullName
+        $name = $_.BaseName
+        $content = [System.IO.File]::ReadAllText($filepath)
+        if ($name -notmatch $query -and $content -notmatch $query) { return }
 
         $json = try {
-            [System.Text.Json.JsonDocument]::Parse([System.IO.File]::ReadAllText($filepath))
+            [System.Text.Json.JsonDocument]::Parse($content)
         } catch {
             debug "Failed to parse manifest file: $filepath (error: $_)"
             return
         }
-
-        $name = $_.BaseName
 
         if ($name -match $query) {
             $list.Add([PSCustomObject]@{
@@ -93,8 +94,12 @@ function search_bucket_legacy($bucket, $query) {
     $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
 
     $apps | ForEach-Object {
-        $manifest = [System.IO.File]::ReadAllText($_.FullName) | ConvertFrom-Json -ErrorAction Continue
+        $filepath = $_.FullName
         $name = $_.BaseName
+        $content = [System.IO.File]::ReadAllText($filepath)
+        if ($name -notmatch $query -and $content -notmatch $query) { return }
+
+        $manifest = ConvertFrom-Json $content -ErrorAction Continue
 
         if ($name -match $query) {
             $list.Add([PSCustomObject]@{
@@ -140,8 +145,7 @@ function search_remotes($query) {
     } | Where-Object { $_.results }
 
     if ($results.count -gt 0) {
-        Write-Host "Results from other known buckets...
-(add them using 'scoop bucket add <bucket name>')"
+        Write-Host "Results from other known buckets...`n(add them using 'scoop bucket add <bucket name>')"
     }
 
     $remote_list = @()
@@ -159,7 +163,7 @@ function search_remotes($query) {
 
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
-    Select-ScoopDBItem $query -From @('name', 'binary', 'shortcut') |
+    Find-ScoopDBItem $query -From @('name', 'binary', 'shortcut') |
         Select-Object -Property name, version, bucket, binary |
         ForEach-Object {
             $list.Add([PSCustomObject]@{

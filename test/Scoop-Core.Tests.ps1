@@ -254,6 +254,41 @@ Describe 'cache_path' -Tag 'Scoop' {
     }
 }
 
+Describe 'Get-RelativePath' -Tag 'Scoop' {
+    It 'returns relative path for child path' {
+        $from = 'C:\root\bucket'
+        $to = 'C:\root\bucket\foo\bar.json'
+        Get-RelativePath $from $to | Should -Be 'foo\bar.json'
+    }
+    It 'returns original when different drive/scheme' {
+        $from = 'C:\root\bucket'
+        $to = 'D:\other\file.json'
+        Get-RelativePath $from $to | Should -Be $to
+    }
+    It 'handles paths containing characters that break [System.Uri]' {
+        $from = 'C:\b#ucket'
+        $to = 'C:\b#ucket\foo.json'
+        Get-RelativePath $from $to | Should -Be 'foo.json'
+    }
+    It 'returns the input when target is not under base' {
+        $from = 'C:\root\bucket'
+        $to = 'C:\other\foo.json'
+        Get-RelativePath $from $to | Should -Be $to
+    }
+}
+
+Describe 'is_in_dir' -Tag 'Scoop' {
+    It 'returns false when path is not under dir' {
+        is_in_dir 'C:\test' 'C:\foo' | Should -BeFalse
+    }
+    It 'returns true when path is under dir' {
+        is_in_dir 'C:\test' 'C:\test\foo\baz.zip' | Should -BeTrue
+    }
+    It 'returns false when path is the parent dir itself' {
+        is_in_dir "$PSScriptRoot\..\" "$PSScriptRoot" | Should -BeFalse
+    }
+}
+
 Describe 'sanitary_path' -Tag 'Scoop' {
     It 'removes invalid path characters from a string' {
         $path = 'test?.json'
@@ -391,5 +426,19 @@ Describe 'Format Architecture String' -Tag 'Scoop' {
 
     It 'should show an error with an invalid architecture' {
         { Format-ArchitectureString 'PPC' } | Should -Throw "Invalid architecture: 'ppc'"
+    }
+}
+
+Describe 'substitute' -Tag 'Scoop' {
+    It 'should properly handle keys that are substrings of other keys' {
+        $params = @{}
+
+        # Run repeatedly (10 times) to reduce the likelihood of accidental correct ordering.
+        1 .. 10 | ForEach-Object {
+            $params["`$name$($_)"] = "$($_).exe"
+            $params["`$name$($_)NoExt"] = "$_"
+
+            substitute ("`$name$($_)NoExt") $params $false | Should -Be "$_"
+        }
     }
 }

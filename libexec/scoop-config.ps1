@@ -30,6 +30,11 @@
 # use_sqlite_cache: $true|$false
 #       Use SQLite database for caching. This is useful for speeding up 'scoop search' and 'scoop shim' commands.
 #
+# use_git_history: $true|$false
+#       Enable searching for specific versions in git history when installing apps with version specifiers.
+#       When enabled, Scoop will first search the bucket's git history for the exact version before falling back to autoupdate.
+#       (Default is $true)
+#
 # no_junction: $true|$false
 #       The 'current' version alias will not be used. Shims and shortcuts will point to specific version instead.
 #
@@ -131,6 +136,9 @@
 #
 # aria2-warning-enabled: $true|$false
 #       Disable Aria2c warning which is shown while downloading.
+#
+# aria2-fallback-disabled: $true|$false
+#       Disable automatic fallback to the default downloader when Aria2c download fails.
 #
 # aria2-retry-wait: 2
 #       Number of seconds to wait between retries.
