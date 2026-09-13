@@ -383,6 +383,9 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
 Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $shimdir = shimdir
+        # CI checkouts have no installed scoop version dir, so point at the bundled shim.exe
+        $repo_shim = Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe'
+        Mock -CommandName get_shim_path -MockWith { $repo_shim }
     }
 
     It 'rewrites System32 to Sysnative in the shim file when the shim exe is x86 on x64 OS' {
