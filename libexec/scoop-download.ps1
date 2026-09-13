@@ -57,6 +57,7 @@ if (is_scoop_outdated) {
 # we only want to show this warning once
 if(!$use_cache) { warn "Cache is being ignored." }
 
+$download_failed = $false
 foreach ($curr_app in $apps) {
     # Prevent leaking variables from previous iteration
     $bucket = $version = $app = $manifest = $url = $null
@@ -71,6 +72,7 @@ foreach ($curr_app in $apps) {
         $generated = generate_user_manifest $app $bucket $version
         if ($null -eq $generated) {
             error 'Manifest cannot be generated with provided version'
+            $download_failed = $true
             continue
         }
         $manifest = parse_json($generated)
@@ -78,15 +80,18 @@ foreach ($curr_app in $apps) {
 
     if(!$manifest) {
         error "Couldn't find manifest for '$app'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
+        $download_failed = $true
         continue
     }
     $version = $manifest.version
     if(!$version) {
         error "Manifest doesn't specify a version."
+        $download_failed = $true
         continue
     }
     if($version -match '[^\w\.\-\+_]') {
         error "Manifest version has unsupported character '$($matches[0])'."
+        $download_failed = $true
         continue
     }
 
@@ -99,6 +104,7 @@ foreach ($curr_app in $apps) {
     $architecture = Get-SupportedArchitecture $manifest $architecture
     if ($null -eq $architecture) {
         error "'$app' doesn't support current architecture!"
+        $download_failed = $true
         continue
     }
 
@@ -144,7 +150,9 @@ foreach ($curr_app in $apps) {
 
     if (!$dl_failure) {
         success "'$app' ($version) was downloaded successfully!"
+    } else {
+        $download_failed = $true
     }
 }
 
-exit 0
+exit [int]$download_failed
