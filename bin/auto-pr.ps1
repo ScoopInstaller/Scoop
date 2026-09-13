@@ -214,7 +214,7 @@ hub diff --name-only | ForEach-Object {
 
 if ($Push) {
     Write-Host 'Rebasing local branch before push ...' -ForegroundColor DarkCyan
-    execute "hub pull --rebase --autostash origin $OriginBranch" { hub rebase --abort 2>$null }
+    execute "hub pull --rebase --autostash origin $OriginBranch" { hub rebase --abort 2>$null; hub reset --hard }
     Write-Host 'Pushing updates ...' -ForegroundColor DarkCyan
     execute "hub push origin $OriginBranch"
 } else {
