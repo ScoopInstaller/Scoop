@@ -15,16 +15,19 @@
 
 - **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
 - **scoop-download:** Fix incorrect download success state ([#6473](https://github.com/ScoopInstaller/Scoop/issues/6473))
+- **scoop-download:** Exit with non-zero status when downloads fail ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **scoop-search:** Select latest search result semantically ([#6643](https://github.com/ScoopInstaller/Scoop/issues/6643))
 - **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
 - **scoop-update:** Import `versions.ps1` in the parallel bucket sync to fix `currentdir` failing with `NO_JUNCTION` enabled ([#6735](https://github.com/ScoopInstaller/Scoop/issues/6735))
 - **scoop-update:** Fix updating apps installed from a local manifest path ([#6736](https://github.com/ScoopInstaller/Scoop/issues/6736))
 - **scoop-update:** `scoop update -f` on an `@version` pin now upgrades to the bucket HEAD ([#6730](https://github.com/ScoopInstaller/Scoop/issues/6730))
+- **scoop-update:** Detect version pins by generated manifest only ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **scoop-update:** Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
 - **auto-pr:** Rebase before pushing to prevent push conflicts ([#6624](https://github.com/ScoopInstaller/Scoop/issues/6624))
 - **autoupdate:** Use origin URL to handle URLs with fragment in GitHub mode ([#6455](https://github.com/ScoopInstaller/Scoop/issues/6455))
 - **autoupdate:** Ensure GitHub API requests use token ([#6535](https://github.com/ScoopInstaller/Scoop/issues/6535))
+- **autoupdate|download:** Require HTTPS before sending GitHub token ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **buckets:** Skip Git invocation if unavailable in `new_issue_msg` ([#6591](https://github.com/ScoopInstaller/Scoop/issues/6591))
 - **buckets:** Fix the filtering condition when retrieving the number of manifests ([#6509](https://github.com/ScoopInstaller/Scoop/issues/6509))
 - **buckets|scoop-info:** Switch git log date format to ISO 8601 to avoid locale issues ([#6446](https://github.com/ScoopInstaller/Scoop/issues/6446))
@@ -38,7 +41,10 @@
 - **core:** Fix substitute handling of substring keys ([#6561](https://github.com/ScoopInstaller/Scoop/issues/6561))
 - **core:** Check `$deprecated_dir` exists before accessing it ([#6574](https://github.com/ScoopInstaller/Scoop/issues/6574))
 - **core:** Give `dark` higher priority when use `Extract-DarkArchive` ([#6637](https://github.com/ScoopInstaller/Scoop/issues/6637))
+- **core:** Resolve paths in `is_in_dir` to prevent containment escape ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **core|manifest:** Avoid error messages when searching non-existent 'deprecated' directory ([#6471](https://github.com/ScoopInstaller/Scoop/issues/6471))
+- **database:** Preserve `DataTable` when returned from SQLite cache queries ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
+- **download:** Redact proxy password and cookie header from aria2 diagnostics ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **getopt:** Teach getopt to respect the `--%` token ([#6477](https://github.com/ScoopInstaller/Scoop/issues/6477))
 - **install:** Don't add to `$Error` when checking for service `cexecsvc` ([#6520](https://github.com/ScoopInstaller/Scoop/issues/6520))
 - **path:** Trim ending slash when initializing paths ([#6501](https://github.com/ScoopInstaller/Scoop/issues/6501))
@@ -66,6 +72,7 @@
 ### Continuous Integration
 
 - **workflow:** Drop Appveyor support and refactor GitHub Actions workflow ([#6626](https://github.com/ScoopInstaller/Scoop/issues/6626))
+- **workflow:** Disable persisted checkout credentials ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 
 ### Documentation
 
