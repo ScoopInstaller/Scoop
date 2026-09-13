@@ -119,7 +119,7 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
         $wc.Headers.Add('Referer', (strip_filename $url))
         $wc.Headers.Add('User-Agent', (Get-UserAgent))
 
-        if (($url -match '^https?://api\.github\.com/.*') -and (Get-GitHubToken)) {
+        if (($url -match '^https://api\.github\.com/.*') -and (Get-GitHubToken)) {
             $wc.Headers.Add('Authorization', "Bearer $(Get-GitHubToken)")
             $wc.Headers.Add('X-GitHub-Api-Version', '2022-11-28')
         }

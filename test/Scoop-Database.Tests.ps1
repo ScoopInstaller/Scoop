@@ -32,12 +32,22 @@ Describe 'database version selection' -Tag 'Scoop' {
         [void]$result.Rows.Add('zotero', '7.0.9', 'he0119', 'zotero')
         [void]$result.Rows.Add('zotero', '7.0.20', 'he0119', 'zotero')
 
-        $latest = @(Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket'))
+        $latest = (Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket')).Rows
 
-        $latest.Count | Should -Be 3
-        (@($latest | Where-Object { $_.name -eq 'copilot-cli' -and $_.bucket -eq 'main' })[0]).version | Should -Be '1.0.31'
-        (@($latest | Where-Object { $_.name -eq 'zotero' -and $_.bucket -eq 'extras' })[0]).version | Should -Be '7.0.20'
-        (@($latest | Where-Object { $_.name -eq 'zotero' -and $_.bucket -eq 'he0119' })[0]).version | Should -Be '7.0.20'
+        ($latest | ForEach-Object { "$($_.name)/$($_.bucket)=$($_.version)" }) -join ' ' |
+            Should -Be 'copilot-cli/main=1.0.31 zotero/extras=7.0.20 zotero/he0119=7.0.20'
+    }
+
+    It 'keeps the DataTable unenumerated when captured directly' {
+        $result = New-Object System.Data.DataTable
+        [void]$result.Columns.Add('name', [string])
+        [void]$result.Columns.Add('version', [string])
+        [void]$result.Rows.Add('zotero', '7.0.20')
+
+        $table = Select-LatestScoopDBRow -Table $result
+
+        ($table -is [System.Data.DataTable]) | Should -BeTrue
+        $table.Rows.Count | Should -Be 1
     }
 
     It 'returns the latest semantic version when no grouping is requested' {
@@ -49,9 +59,8 @@ Describe 'database version selection' -Tag 'Scoop' {
         [void]$result.Rows.Add('zotero', '7.0.9', 'extras', 'zotero')
         [void]$result.Rows.Add('zotero', '7.0.20', 'extras', 'zotero')
 
-        $latest = @(Select-LatestScoopDBRow -Table $result)
+        $latest = (Select-LatestScoopDBRow -Table $result).Rows
 
-        $latest.Count | Should -Be 1
-        $latest[0].version | Should -Be '7.0.20'
+        $latest.version | Should -Be '7.0.20'
     }
 }

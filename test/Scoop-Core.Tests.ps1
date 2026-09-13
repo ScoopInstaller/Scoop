@@ -284,8 +284,11 @@ Describe 'is_in_dir' -Tag 'Scoop' {
     It 'returns true when path is under dir' {
         is_in_dir 'C:\test' 'C:\test\foo\baz.zip' | Should -BeTrue
     }
-    It 'returns false when path is the parent dir itself' {
-        is_in_dir "$PSScriptRoot\..\" "$PSScriptRoot" | Should -BeFalse
+    It 'returns true when dir has a trailing separator' {
+        is_in_dir "$PSScriptRoot\..\" "$PSScriptRoot" | Should -BeTrue
+    }
+    It 'returns false when path escapes dir through dot segments' {
+        is_in_dir 'C:\test\sub' 'C:\test\sub\..\..\Windows\notepad.exe' | Should -BeFalse
     }
 }
 

@@ -256,8 +256,8 @@ function Set-ScoopDB {
 .INPUTS
     System.String
 .OUTPUTS
-    System.Data.DataTable
-    The found database item(s).
+    System.Data.DataRow[]
+    The found database item(s), one row per name and bucket.
 #>
 function Find-ScoopDBItem {
     [CmdletBinding()]
@@ -290,7 +290,7 @@ function Find-ScoopDBItem {
         $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
-        return Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket')
+        return (Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket')).Rows
     }
 }
 
@@ -356,10 +356,10 @@ function Get-ScoopDBItem {
         # With $Version, the PRIMARY KEY guarantees at most one row; without it, the
         # query is already limited to one name+bucket pair, so selecting latest needs no -GroupBy.
         if ($Version) {
-            return $result
+            Write-Output $result -NoEnumerate
+        } else {
+            Select-LatestScoopDBRow -Table $result
         }
-
-        return Select-LatestScoopDBRow -Table $result
     }
 }
 
@@ -434,7 +434,8 @@ function Select-LatestScoopDBRow {
     $latestRows = $Table.Clone()
     $rows = @($Table.Rows)
     if ($rows.Count -eq 0) {
-        return $latestRows
+        Write-Output $latestRows -NoEnumerate
+        return
     }
 
     if ($GroupBy -and $GroupBy.Count -gt 0) {
@@ -445,7 +446,7 @@ function Select-LatestScoopDBRow {
         $latestRows.ImportRow((Get-LatestScoopDBRow -Rows $rows))
     }
 
-    return $latestRows
+    Write-Output $latestRows -NoEnumerate
 }
 
 <#
