@@ -381,44 +381,65 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
 }
 
 Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
-    It 'rewrites System32 to Sysnative for x86 shim on x64 OS' {
-        $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
-        $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
-        $testPath = "$sysdir\notepad.exe"
-
-        if ([System.Environment]::Is64BitOperatingSystem) {
-            $result = $testPath -replace [regex]::Escape($sysdir), $sysnative
-            $result | Should -Be "$sysnative\notepad.exe"
-        } else {
-            Set-ItResult -Skipped -Because 'not a x64 OS'
-        }
+    BeforeAll {
+        $shimdir = shimdir
     }
 
-    It 'rewrites SysWOW64 to System32 for x86 shim on x64 OS' {
-        $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
-        $syswow = [System.IO.Path]::Combine($env:SystemRoot, 'SysWOW64')
-        $testPath = "$syswow\notepad.exe"
+    It 'rewrites System32 to Sysnative in the shim file when the shim exe is x86 on x64 OS' {
+        $target = "$env:SystemRoot\System32\notepad.exe"
+        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (get_shim_path)) -eq 0x014c
 
-        if ([System.Environment]::Is64BitOperatingSystem) {
-            $result = $testPath -replace [regex]::Escape($syswow), $sysdir
-            $result | Should -Be "$sysdir\notepad.exe"
+        shim $target $false 'wow64-test'
+
+        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
+        if ($rewrites) {
+            $line | Should -BeLike "*$env:SystemRoot\Sysnative\notepad.exe*"
         } else {
-            Set-ItResult -Skipped -Because 'not a x64 OS'
+            $line | Should -BeLike "*$env:SystemRoot\System32\notepad.exe*"
         }
+
+        # the 64-bit reader resolves the target back to the real System32 path either way
+        Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be (Resolve-Path $target).Path
     }
 
     It 'does not rewrite paths outside System32 and SysWOW64' {
-        $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
-        $syswow = [System.IO.Path]::Combine($env:SystemRoot, 'SysWOW64')
-        $testPath = 'C:\Program Files\test\app.exe'
+        $target = "$env:SystemRoot\explorer.exe"
 
-        $result = $testPath
-        if ($result -like "$sysdir\*") {
-            $result = $result -replace [regex]::Escape($sysdir), 'Sysnative'
-        } elseif ($result -like "$syswow\*") {
-            $result = $result -replace [regex]::Escape($syswow), $sysdir
+        shim $target $false 'wow64-test'
+
+        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
+        $line | Should -BeLike "*$target*"
+        Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be $target
+    }
+
+    It 'rewrites SysWOW64 to System32 in the shim file when the shim exe is x86 on x64 OS' {
+        $wow = Join-Path ${env:SystemRoot} 'SysWOW64\notepad.exe'
+        if (-not (Test-Path $wow)) {
+            Set-ItResult -Skipped -Because 'SysWOW64 notepad not present'
         }
-        $result | Should -Be $testPath
+        $target = $wow
+        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (get_shim_path)) -eq 0x014c
+
+        shim $target $false 'wow64-test'
+
+        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
+        if ($rewrites) {
+            # 64-bit reader sees the redirected (real) location via System32
+            $line | Should -BeLike "*$env:SystemRoot\System32\notepad.exe*"
+        }
+        Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
+    }
+
+    It 'does not fail on a shim file without a resolvable target' {
+        Write-Output 'echo hi' | Out-File "$shimdir\broken.cmd" -Encoding ascii
+        { Get-ShimTarget "$shimdir\broken.cmd" } | Should -Not -Throw
+        Get-ShimTarget "$shimdir\broken.cmd" | Should -BeNullOrEmpty
+
+        Remove-Item "$shimdir\broken.cmd" -Force
+    }
+
+    AfterEach {
+        rm_shim 'wow64-test' $shimdir
     }
 }
 

@@ -887,7 +887,7 @@ function Get-ShimTarget($ShimPath) {
             $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
         }
         $shimTargetConverted = $shimTarget | Convert-Path -ErrorAction SilentlyContinue
-        if (!$shimTargetConverted -and $shimTarget.Contains('\Sysnative\')) {
+        if (!$shimTargetConverted -and $shimTarget -and $shimTarget.Contains('\Sysnative\')) {
             $shimTarget.Replace('\Sysnative\', '\System32\') | Convert-Path -ErrorAction SilentlyContinue
         } else {
             return $shimTargetConverted
