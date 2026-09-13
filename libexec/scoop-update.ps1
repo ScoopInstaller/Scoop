@@ -270,7 +270,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
     $url = $install.url
 
     # -f on an @version pin re-resolves against the bucket HEAD
-    $pin_broken = $force -and $null -eq $bucket -and $url
+    $pin_broken = $force -and $null -eq $bucket -and ($url -eq (usermanifest $app))
     if ($pin_broken) {
         $scanned, $bucket = Find-AppBucket $app
         if ($scanned) {
