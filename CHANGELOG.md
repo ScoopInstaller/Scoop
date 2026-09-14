@@ -44,6 +44,7 @@
 - **core:** Check `$deprecated_dir` exists before accessing it ([#6574](https://github.com/ScoopInstaller/Scoop/issues/6574))
 - **core:** Give `dark` higher priority when use `Extract-DarkArchive` ([#6637](https://github.com/ScoopInstaller/Scoop/issues/6637))
 - **core:** Resolve paths in `is_in_dir` to prevent containment escape ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
+- **core:** Fix currentdir crash when NO_JUNCTION is enabled ([#6741](https://github.com/ScoopInstaller/Scoop/issues/6741))
 - **core|manifest:** Avoid error messages when searching non-existent 'deprecated' directory ([#6471](https://github.com/ScoopInstaller/Scoop/issues/6471))
 - **database:** Preserve `DataTable` when returned from SQLite cache queries ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **download:** Redact proxy password and cookie header from aria2 diagnostics ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
