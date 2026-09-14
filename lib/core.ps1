@@ -372,6 +372,9 @@ function versiondir($app, $version, $global) { "$(appdir $app $global)\$version"
 
 function currentdir($app, $global) {
     if ((get_config NO_JUNCTION) -and ($app -ne 'scoop')) {
+        if (!(Get-Command 'Select-CurrentVersion' -ErrorAction SilentlyContinue)) {
+            . "$PSScriptRoot\versions.ps1"
+        }
         $version = Select-CurrentVersion -App $app -Global:$global
     } else {
         $version = 'current'

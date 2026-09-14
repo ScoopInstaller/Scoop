@@ -292,6 +292,24 @@ Describe 'is_in_dir' -Tag 'Scoop' {
     }
 }
 
+Describe 'currentdir' -Tag 'Scoop' {
+    It 'resolves version directory when NO_JUNCTION is enabled without preloading versions.ps1' {
+        Mock get_config { $true } -ParameterFilter { $name -eq 'NO_JUNCTION' }
+        Mock appdir { 'C:\scoop\apps\git' }
+        { currentdir 'git' $false } | Should -Not -Throw
+    }
+    It 'returns the junction path when NO_JUNCTION is disabled' {
+        Mock get_config { $false } -ParameterFilter { $name -eq 'NO_JUNCTION' }
+        Mock appdir { 'C:\scoop\apps\git' }
+        currentdir 'git' $false | Should -Be 'C:\scoop\apps\git\current'
+    }
+    It 'keeps using the junction for scoop itself' {
+        Mock get_config { $true } -ParameterFilter { $name -eq 'NO_JUNCTION' }
+        Mock appdir { 'C:\scoop\apps\scoop' }
+        currentdir 'scoop' $false | Should -Be 'C:\scoop\apps\scoop\current'
+    }
+}
+
 Describe 'sanitary_path' -Tag 'Scoop' {
     It 'removes invalid path characters from a string' {
         $path = 'test?.json'

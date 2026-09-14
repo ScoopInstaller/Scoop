@@ -2,8 +2,6 @@
 # Summary: Returns the path to the specified app
 param($app)
 
-. "$PSScriptRoot\..\lib\versions.ps1" # 'currentdir' (indirectly)
-
 if (!$app) {
     my_usage
     exit 1
