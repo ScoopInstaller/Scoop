@@ -16,6 +16,7 @@
 - **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
 - **scoop-download:** Fix incorrect download success state ([#6473](https://github.com/ScoopInstaller/Scoop/issues/6473))
 - **scoop-download:** Exit with non-zero status when downloads fail ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
+- **scoop-search:** Improve error handling for manifest file parsing ([#6345](https://github.com/ScoopInstaller/Scoop/issues/6345))
 - **scoop-search:** Select latest search result semantically ([#6643](https://github.com/ScoopInstaller/Scoop/issues/6643))
 - **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
 - **scoop-update:** Import `versions.ps1` in the parallel bucket sync to fix `currentdir` failing with `NO_JUNCTION` enabled ([#6735](https://github.com/ScoopInstaller/Scoop/issues/6735))
