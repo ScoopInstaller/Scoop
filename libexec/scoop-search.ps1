@@ -58,7 +58,14 @@ function search_bucket($bucket, $query) {
     $apps | ForEach-Object {
         $filepath = $_.FullName
         $name = $_.BaseName
-        $content = [System.IO.File]::ReadAllText($filepath)
+
+        $content = try {
+            [System.IO.File]::ReadAllText($filepath)
+        } catch {
+            debug "Failed to read manifest file: $filepath (error: $_)"
+            return
+        }
+
         if ($name -notmatch $query -and $content -notmatch $query) { return }
 
         $json = try {
@@ -96,10 +103,22 @@ function search_bucket_legacy($bucket, $query) {
     $apps | ForEach-Object {
         $filepath = $_.FullName
         $name = $_.BaseName
-        $content = [System.IO.File]::ReadAllText($filepath)
+
+        $content = try {
+            [System.IO.File]::ReadAllText($filepath)
+        } catch {
+            debug "Failed to read manifest file: $filepath (error: $_)"
+            return
+        }
+
         if ($name -notmatch $query -and $content -notmatch $query) { return }
 
-        $manifest = ConvertFrom-Json $content -ErrorAction Continue
+        $manifest = try {
+            ConvertFrom-Json $content -ErrorAction Stop
+        } catch {
+            debug "Failed to parse manifest file: $filepath (error: $_)"
+            return
+        }
 
         if ($name -match $query) {
             $list.Add([PSCustomObject]@{
