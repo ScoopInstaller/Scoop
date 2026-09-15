@@ -10,6 +10,7 @@ param(
 )
 
 . "$PSScriptRoot\..\lib\manifest.ps1"
+. "$PSScriptRoot\..\lib\database.ps1"
 
 $import = $null
 $bucket_names = @()
