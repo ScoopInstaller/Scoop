@@ -39,6 +39,7 @@
 - **checkver:** Remove redundant always-true condition in GitHub checkver logic ([#6571](https://github.com/ScoopInstaller/Scoop/issues/6571))
 - **checkver:** Harden github checkver ([#6641](https://github.com/ScoopInstaller/Scoop/issues/6641))
 - **checkver:** Skip default GitHub JSONPath when using custom script ([#6681](https://github.com/ScoopInstaller/Scoop/issues/6681))
+- **checkver:** Don't downgrade manifest to older version ([#6717](https://github.com/ScoopInstaller/Scoop/issues/6717))
 - **core:** Fix the grep parameter in the `Invoke-GitLog` function ([#6407](https://github.com/ScoopInstaller/Scoop/issues/6407))
 - **core:** Add null checks before closing BinaryReader/FileStream in update process ([#6507](https://github.com/ScoopInstaller/Scoop/issues/6507), [#6711](https://github.com/ScoopInstaller/Scoop/issues/6711))
 - **core:** Skip NO_JUNCTION logic when $app is 'scoop' in `currentdir` function ([#6541](https://github.com/ScoopInstaller/Scoop/issues/6541))
