@@ -24,9 +24,6 @@
     <a href="https://discord.gg/s9yRQHt">
         <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
     </a>
-    <a href="https://gitter.im/lukesampson/scoop">
-        <img src="https://badges.gitter.im/lukesampson/scoop.png" alt="Gitter Chat" />
-    </a>
     <a href="./LICENSE">
         <img src="https://img.shields.io/badge/license-UNLICENSE%20or%20MIT-blue" alt="License" />
     </a>
@@ -100,7 +97,7 @@ You can tweak the following `aria2` settings with the `scoop config` command:
 
 ## What sort of apps can Scoop install?
 
-The apps that are most likely to get installed fine with Scoop are those referred to as "portable" apps. These apps are compressed files which can run standalone after being extracted. This type of apps does not produce side effects like changing the Windows Registry or placing files outside the app directory.
+The apps that are most likely to get installed fine with Scoop are those referred to as "portable" apps. These apps are compressed files which can run standalone after being extracted. This type of app does not produce side effects like changing the Windows Registry or placing files outside the app directory.
 
 Scoop also supports installer files and their uninstallation methods. Likewise, it can handle single-file apps and PowerShell scripts. These do not even need to be compressed. See the [runat](https://github.com/ScoopInstaller/Main/blob/master/bucket/runat.json) package for an example: it is simply a GitHub gist.
 
@@ -123,7 +120,7 @@ The following buckets are known to Scoop:
 - [games](https://github.com/Calinou/scoop-games) - Open-source and freeware video games and game-related tools.
 - [nerd-fonts](https://github.com/matthewjberger/scoop-nerd-fonts) -  Nerd Fonts.
 - [nirsoft](https://github.com/ScoopInstaller/Nirsoft) - A collection of over 250+ apps from [Nirsoft](https://nirsoft.net).
-- [sysinternals](https://github.com/niheaven/scoop-sysinternals) - The Sysinternals suite from [Microsoft](https://learn.microsoft.com/sysinternals/).
+- [sysinternals](https://github.com/ScoopInstaller/Sysinternals) - The Sysinternals suite from [Microsoft](https://learn.microsoft.com/sysinternals/).
 - [java](https://github.com/ScoopInstaller/Java) - A collection of Java development kits (JDKs) and Java runtime engines (JREs), Java's virtual machine debugging tools and Java based runtime engines.
 - [nonportable](https://github.com/ScoopInstaller/Nonportable) - Non-portable apps (may trigger UAC prompts).
 - [php](https://github.com/ScoopInstaller/PHP) - Installers for most versions of PHP.
