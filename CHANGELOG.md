@@ -17,6 +17,7 @@
 - **scoop-download:** Fix incorrect download success state ([#6473](https://github.com/ScoopInstaller/Scoop/issues/6473))
 - **scoop-download:** Exit with non-zero status when downloads fail ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **scoop-export:** Make exported JSON key order deterministic ([#6697](https://github.com/ScoopInstaller/Scoop/issues/6697))
+- **scoop-import:** Import `database.ps1` at startup ([#6743](https://github.com/ScoopInstaller/Scoop/issues/6743))
 - **scoop-search:** Improve error handling for manifest file parsing ([#6345](https://github.com/ScoopInstaller/Scoop/issues/6345))
 - **scoop-search:** Select latest search result semantically ([#6643](https://github.com/ScoopInstaller/Scoop/issues/6643))
 - **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
