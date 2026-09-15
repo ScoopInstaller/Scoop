@@ -13,7 +13,6 @@
 
 ### Bug Fixes
 
-- **checkver:** Skip default GitHub JSONPath when using custom script ([#6681](https://github.com/ScoopInstaller/Scoop/issues/6681))
 - **scoop-download:** Fix function `nightly_version` not defined error ([#6386](https://github.com/ScoopInstaller/Scoop/issues/6386))
 - **scoop-download:** Fix incorrect download success state ([#6473](https://github.com/ScoopInstaller/Scoop/issues/6473))
 - **scoop-download:** Exit with non-zero status when downloads fail ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
@@ -39,6 +38,7 @@
 - **checkver:** Fix incorrect version returned when script fails without output ([#6547](https://github.com/ScoopInstaller/Scoop/issues/6547))
 - **checkver:** Remove redundant always-true condition in GitHub checkver logic ([#6571](https://github.com/ScoopInstaller/Scoop/issues/6571))
 - **checkver:** Harden github checkver ([#6641](https://github.com/ScoopInstaller/Scoop/issues/6641))
+- **checkver:** Skip default GitHub JSONPath when using custom script ([#6681](https://github.com/ScoopInstaller/Scoop/issues/6681))
 - **core:** Fix the grep parameter in the `Invoke-GitLog` function ([#6407](https://github.com/ScoopInstaller/Scoop/issues/6407))
 - **core:** Add null checks before closing BinaryReader/FileStream in update process ([#6507](https://github.com/ScoopInstaller/Scoop/issues/6507), [#6711](https://github.com/ScoopInstaller/Scoop/issues/6711))
 - **core:** Skip NO_JUNCTION logic when $app is 'scoop' in `currentdir` function ([#6541](https://github.com/ScoopInstaller/Scoop/issues/6541))
