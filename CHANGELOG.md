@@ -438,6 +438,7 @@
 - **scoop-info:** Fix error message when manifest is not found ([#4935](https://github.com/ScoopInstaller/Scoop/issues/4935))
 - **scoop-search:** Require files in 'bucket' dir for remote known buckets ([#4944](https://github.com/ScoopInstaller/Scoop/issues/4944))
 - **update:** Prevent uninstall when update ([#4949](https://github.com/ScoopInstaller/Scoop/issues/4949))
+- **scoop-checkup:** Skip Defender check when `Get-MpPreference` fails ([#6745](https://github.com/ScoopInstaller/Scoop/issues/6745))
 - **scoop-download:** Use correct Args when calling `Get-Manifest` ([#4970](https://github.com/ScoopInstaller/Scoop/issues/4970))
 
 ### Code Refactoring
