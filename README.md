@@ -117,7 +117,7 @@ The following buckets are known to Scoop:
 
 - [main](https://github.com/ScoopInstaller/Main) - Default bucket which contains popular non-GUI apps.
 - [extras](https://github.com/ScoopInstaller/Extras) - Apps that do not fit the main bucket's [criteria](https://github.com/ScoopInstaller/Scoop/wiki/Criteria-for-including-apps-in-the-main-bucket).
-- [games](https://github.com/Calinou/scoop-games) - Open-source and freeware video games and game-related tools.
+- [games](https://github.com/ScoopInstaller/Games) - Open-source and freeware video games and game-related tools.
 - [nerd-fonts](https://github.com/matthewjberger/scoop-nerd-fonts) -  Nerd Fonts.
 - [nirsoft](https://github.com/ScoopInstaller/Nirsoft) - A collection of over 250+ apps from [Nirsoft](https://nirsoft.net).
 - [sysinternals](https://github.com/ScoopInstaller/Sysinternals) - The Sysinternals suite from [Microsoft](https://learn.microsoft.com/sysinternals/).
