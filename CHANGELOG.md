@@ -82,6 +82,7 @@
 ### Documentation
 
 - **README:** Remove Gitter badge ([#6640](https://github.com/ScoopInstaller/Scoop/issues/6640))
+- **bucket:** Transfer `games` bucket to ScoopInstaller ([#6746](https://github.com/ScoopInstaller/Scoop/issues/6746))
 - **bucket:** Transfer `sysinternals` bucket to ScoopInstaller ([#6738](https://github.com/ScoopInstaller/Scoop/issues/6738))
 - **typo:** Correct misspellings in comments and docs ([#6191](https://github.com/ScoopInstaller/Scoop/issues/6191))
 
