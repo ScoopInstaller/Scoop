@@ -315,12 +315,12 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
     # Remove and replace whole region after proper fix
     Write-Host 'Downloading new version'
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $true $check_hash
+        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $check_hash
     } else {
         $urls = script:url $manifest $architecture
 
         foreach ($url in $urls) {
-            Invoke-CachedDownload $app $version $url $null $manifest.cookie $true
+            Invoke-CachedDownload $app $version $url $null $manifest.cookie $use_cache
 
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
@@ -353,6 +353,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
     Write-Host "Uninstalling '$app' ($old_version)"
     Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
     rm_shims $app $old_manifest $global $architecture
+    rm_startmenu_shortcuts $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
@@ -361,6 +362,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
     uninstall_psmodule $old_manifest $refdir $global
     env_rm_path $old_manifest $refdir $global $architecture
     env_rm $old_manifest $global $architecture
+    unlink_persist_data $old_manifest $dir
 
     if ($force -and ($old_version -eq $version)) {
         if (!(Test-Path "$dir/../_$version.old")) {
@@ -385,13 +387,15 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
         $app = $install.url
     }
 
-    if ($independent) {
-        install_app $app $architecture $global $suggested $use_cache $check_hash
-    } else {
+    if (-not $independent) {
         # Also add missing dependencies
         $apps = @(Get-Dependency $app $architecture) -ne $app
-        $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+        $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
+
+    # The new version has already been downloaded (and hash-checked) above,
+    # so re-install it from the cache instead of downloading it a second time.
+    install_app $app $architecture $global $suggested $true $check_hash
 }
 
 if (-not ($apps -or $all)) {
@@ -478,6 +482,8 @@ if (-not ($apps -or $all)) {
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $force $quiet $independent $suggested $use_cache $check_hash }
+
+    show_suggestions $suggested
 }
 
 exit 0

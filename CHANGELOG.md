@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
 
+### Bug Fixes
+
+- **scoop-update:** Run missing uninstall steps and honor `--no-cache` ([#6750](https://github.com/ScoopInstaller/Scoop/issues/6750))
+
 ### Continuous Integration
 
 - **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))
