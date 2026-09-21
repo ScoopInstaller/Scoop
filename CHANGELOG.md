@@ -78,6 +78,7 @@
 
 - **workflow:** Drop Appveyor support and refactor GitHub Actions workflow ([#6626](https://github.com/ScoopInstaller/Scoop/issues/6626))
 - **workflow:** Disable persisted checkout credentials ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
+- **dependabot:** Target `develop` and refine update settings ([#6751](https://github.com/ScoopInstaller/Scoop/issues/6751))
 
 ### Documentation
 
