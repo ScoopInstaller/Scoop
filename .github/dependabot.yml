@@ -9,6 +9,6 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "ci(github-actions)"
+      prefix: "ci(workflow)"
     cooldown:
       default-days: 14
