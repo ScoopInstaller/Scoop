@@ -84,3 +84,50 @@ Describe 'Manifest Validator' -Tag 'Validator' {
         $validator.Errors | Select-Object -Last 1 | Should -Match 'Required properties are missing from object: version\.'
     }
 }
+
+Describe 'Manifest version variables' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\core.ps1"
+        . "$PSScriptRoot\..\lib\autoupdate.ps1"
+        $raw = @'
+{
+    "version": "1.2.3",
+    "url": "https://example.com/v$version/app-$version.zip",
+    "extract_dir": "app-$majorVersion.$minorVersion",
+    "post_install": "Write-Host $versionInfo",
+    "architecture": {
+        "64bit": {
+            "url": "https://example.com/app-$cleanVersion-x64.zip",
+            "pre_install": "$version"
+        }
+    },
+    "autoupdate": {
+        "url": "https://example.com/v$version/app-$version.zip"
+    }
+}
+'@
+    }
+    It 'expands variables in regular properties' {
+        $manifest = Expand-ManifestVariable ($raw | ConvertFrom-Json)
+        $manifest.url | Should -Be 'https://example.com/v1.2.3/app-1.2.3.zip'
+        $manifest.extract_dir | Should -Be 'app-1.2'
+        $manifest.architecture.'64bit'.url | Should -Be 'https://example.com/app-123-x64.zip'
+    }
+    It 'leaves scripts, autoupdate and the source object untouched' {
+        $source = $raw | ConvertFrom-Json
+        $manifest = Expand-ManifestVariable $source
+        $manifest.post_install | Should -Be 'Write-Host $versionInfo'
+        $manifest.architecture.'64bit'.pre_install | Should -Be '$version'
+        $manifest.autoupdate.url | Should -Be 'https://example.com/v$version/app-$version.zip'
+        $source.url | Should -Be 'https://example.com/v$version/app-$version.zip'
+        $source.architecture.'64bit'.url | Should -Be 'https://example.com/app-$cleanVersion-x64.zip'
+    }
+    It 'keeps templated properties on autoupdate' {
+        $manifest = $raw | ConvertFrom-Json
+        $manifest.autoupdate | Add-Member extract_dir 'app-$version'
+        Update-ManifestProperty -Manifest $manifest -Property 'url', 'extract_dir' -Version '2.0.0' -Substitutions (Get-VersionSubstitution '2.0.0') | Should -BeTrue
+        $manifest.version | Should -Be '2.0.0'
+        $manifest.url | Should -Be 'https://example.com/v$version/app-$version.zip'
+        $manifest.extract_dir | Should -Be 'app-$majorVersion.$minorVersion'
+    }
+}

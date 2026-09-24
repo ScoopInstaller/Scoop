@@ -391,6 +391,8 @@ function Update-ManifestProperty {
                 }
             } elseif ($Manifest.$currentProperty -and $Manifest.autoupdate.$currentProperty) {
                 # Update other property (global)
+                # Templated properties are expanded on read, keep them as-is
+                if (Test-VersionTemplate $Manifest.$currentProperty $Version) { continue }
                 $autoupdateProperty = $Manifest.autoupdate.$currentProperty
                 $newValue = substitute $autoupdateProperty $Substitutions
                 if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
@@ -403,7 +405,7 @@ function Update-ManifestProperty {
                 # Update other property (arch-spec)
                 $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
                     $arch = $_.Name
-                    if ($Manifest.architecture.$arch.$currentProperty -and ($Manifest.autoupdate.architecture.$arch.$currentProperty -or $Manifest.autoupdate.$currentProperty)) {
+                    if ($Manifest.architecture.$arch.$currentProperty -and ($Manifest.autoupdate.architecture.$arch.$currentProperty -or $Manifest.autoupdate.$currentProperty) -and !(Test-VersionTemplate $Manifest.architecture.$arch.$currentProperty $Version)) {
                         $autoupdateProperty = @(arch_specific $currentProperty $Manifest.autoupdate $arch)
                         $newValue = substitute $autoupdateProperty $Substitutions
                         if (($autoupdateProperty.GetType().Name -eq 'Object[]') -and ($autoupdateProperty.Length -eq 1)) {
@@ -424,42 +426,6 @@ function Update-ManifestProperty {
         }
         return $hasManifestChanged
     }
-}
-
-function Get-VersionSubstitution {
-    param (
-        [String]
-        $Version,
-        [Hashtable]
-        $CustomMatches
-    )
-
-    $firstPart = $Version.Split('-') | Select-Object -First 1
-    $lastPart = $Version.Split('-') | Select-Object -Last 1
-    $versionVariables = @{
-        '$version'           = $Version
-        '$dotVersion'        = ($Version -replace '[._-]', '.')
-        '$underscoreVersion' = ($Version -replace '[._-]', '_')
-        '$dashVersion'       = ($Version -replace '[._-]', '-')
-        '$cleanVersion'      = ($Version -replace '[._-]', '')
-        '$majorVersion'      = $firstPart.Split('.') | Select-Object -First 1
-        '$minorVersion'      = $firstPart.Split('.') | Select-Object -Skip 1 -First 1
-        '$patchVersion'      = $firstPart.Split('.') | Select-Object -Skip 2 -First 1
-        '$buildVersion'      = $firstPart.Split('.') | Select-Object -Skip 3 -First 1
-        '$preReleaseVersion' = $lastPart
-    }
-    if ($Version -match '(?<head>\d+\.\d+(?:\.\d+)?)(?<tail>.*)') {
-        $versionVariables.Add('$matchHead', $Matches['head'])
-        $versionVariables.Add('$matchTail', $Matches['tail'])
-    }
-    if ($CustomMatches) {
-        $CustomMatches.GetEnumerator() | ForEach-Object {
-            if ($_.Name -ne '0') {
-                $versionVariables.Add('$match' + (Get-Culture).TextInfo.ToTitleCase($_.Name), $_.Value)
-            }
-        }
-    }
-    return $versionVariables
 }
 
 function Invoke-AutoUpdate {
@@ -523,6 +489,11 @@ function Invoke-AutoUpdate {
 }
 
 ## Helper Functions
+
+function Test-VersionTemplate($Value, [String] $Version) {
+    $substitutions = Get-VersionSubstitution $Version
+    (ConvertTo-Json -InputObject (substitute $Value $substitutions) -Depth 5 -Compress) -ne (ConvertTo-Json -InputObject $Value -Depth 5 -Compress)
+}
 
 function PropertyHelper {
     <#
