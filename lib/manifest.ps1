@@ -108,12 +108,31 @@ function Get-Manifest($app) {
         warn "Multiple buckets contain manifest '$app', the current selection is '$bucket/$app'."
     }
 
-    return $app, $manifest, $bucket, $url
+    return $app, (Expand-ManifestVariable $manifest), $bucket, $url
 }
 
 function manifest($app, $bucket, $url) {
-    if ($url) { return url_manifest $url }
-    parse_json (manifest_path $app $bucket)
+    if ($url) { return Expand-ManifestVariable (url_manifest $url) }
+    Expand-ManifestVariable (parse_json (manifest_path $app $bucket))
+}
+
+function Expand-ManifestVariable($manifest, [Hashtable] $substitutions) {
+    if (!$substitutions) {
+        if (!$manifest.version) { return $manifest }
+        $substitutions = Get-VersionSubstitution $manifest.version
+    }
+    # Scripts already see $version at runtime, autoupdate/checkver hold templates of their own
+    $excluded = 'version', 'autoupdate', 'checkver', 'installer', 'uninstaller', 'pre_install', 'post_install', 'pre_uninstall', 'post_uninstall'
+    $expanded = $manifest.PSObject.Copy()
+    $expanded.PSObject.Properties | Where-Object { $_.Name -notin $excluded } | ForEach-Object {
+        if ($_.Name -eq 'architecture') {
+            $_.Value = $_.Value.PSObject.Copy()
+            $_.Value.PSObject.Properties | ForEach-Object { $_.Value = Expand-ManifestVariable $_.Value $substitutions }
+        } else {
+            $_.Value = substitute $_.Value $substitutions
+        }
+    }
+    return $expanded
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
@@ -128,7 +147,7 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
 }
 
 function installed_manifest($app, $version, $global) {
-    parse_json "$(versiondir $app $version $global)\manifest.json"
+    Expand-ManifestVariable (parse_json "$(versiondir $app $version $global)\manifest.json")
 }
 
 function save_install_info($info, $dir) {
@@ -196,8 +215,12 @@ function generate_user_manifest($app, $bucket, $version) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
+    # Autoupdate needs the raw templates, Get-Manifest has already expanded them for the current version
+    $raw = if ($bucket) { parse_json (manifest_path $app $bucket) }
+    if (!$raw) { $raw = $manifest }
+
     try {
-        Invoke-AutoUpdate $app $manifest_path $manifest $version $(@{ })
+        Invoke-AutoUpdate $app $manifest_path $raw $version $(@{ })
         return $manifest_path
     } catch {
         Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
