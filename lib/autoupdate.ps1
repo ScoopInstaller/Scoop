@@ -375,7 +375,9 @@ function Update-ManifestProperty {
                 # Update hash
                 if ($Manifest.hash) {
                     # Global
-                    $newURL = substitute $Manifest.autoupdate.url $Substitutions
+                    # Hash the URL the manifest will actually download, templated urls are kept as-is
+                    $urlSource = if (Test-VersionTemplate $Manifest.url $Version) { $Manifest.url } else { $Manifest.autoupdate.url }
+                    $newURL = substitute $urlSource $Substitutions
                     $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction $Manifest.autoupdate.hash -URL $newURL -Substitutions $Substitutions
                     $Manifest.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.hash -Value $newHash
                     $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged
@@ -383,7 +385,8 @@ function Update-ManifestProperty {
                     # Arch-spec
                     $Manifest.architecture | Get-Member -MemberType NoteProperty | ForEach-Object {
                         $arch = $_.Name
-                        $newURL = substitute (arch_specific 'url' $Manifest.autoupdate $arch) $Substitutions
+                        $urlSource = if (Test-VersionTemplate $Manifest.architecture.$arch.url $Version) { $Manifest.architecture.$arch.url } else { arch_specific 'url' $Manifest.autoupdate $arch }
+                        $newURL = substitute $urlSource $Substitutions
                         $newHash = HashHelper -AppName $AppName -Version $Version -HashExtraction (arch_specific 'hash' $Manifest.autoupdate $arch) -URL $newURL -Substitutions $Substitutions
                         $Manifest.architecture.$arch.hash, $hasPropertyChanged = PropertyHelper -Property $Manifest.architecture.$arch.hash -Value $newHash
                         $hasManifestChanged = $hasManifestChanged -or $hasPropertyChanged

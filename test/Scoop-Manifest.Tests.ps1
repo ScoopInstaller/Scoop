@@ -130,4 +130,17 @@ Describe 'Manifest version variables' -Tag 'Scoop' {
         $manifest.url | Should -Be 'https://example.com/v$version/app-$version.zip'
         $manifest.extract_dir | Should -Be 'app-$majorVersion.$minorVersion'
     }
+    It 'hashes the templated url instead of autoupdate.url' {
+        Mock HashHelper { $URL }
+        $manifest = $raw | ConvertFrom-Json
+        $manifest.url = 'https://mirror.example.com/app-$version.zip'
+        $manifest | Add-Member hash 'old'
+        $manifest.architecture.'64bit' | Add-Member hash 'old'
+        $manifest.autoupdate | Add-Member architecture ([PSCustomObject]@{ '64bit' = [PSCustomObject]@{ url = 'https://example.com/other-$version.zip' } })
+        Update-ManifestProperty -Manifest $manifest -Property 'hash' -Version '2.0.0' -Substitutions (Get-VersionSubstitution '2.0.0') | Out-Null
+        $manifest.hash | Should -Be 'https://mirror.example.com/app-2.0.0.zip'
+        $manifest.PSObject.Properties.Remove('hash')
+        Update-ManifestProperty -Manifest $manifest -Property 'hash' -Version '2.0.0' -Substitutions (Get-VersionSubstitution '2.0.0') | Out-Null
+        $manifest.architecture.'64bit'.hash | Should -Be 'https://example.com/app-200-x64.zip'
+    }
 }
