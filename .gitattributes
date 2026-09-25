@@ -3,3 +3,7 @@
 *.exe -text
 *.zip -text
 *.dll -text
+
+# YAML files use LF; bracket classes make the match case-insensitive
+*.[yY][mM][lL] eol=lf
+*.[yY][aA][mM][lL] eol=lf
