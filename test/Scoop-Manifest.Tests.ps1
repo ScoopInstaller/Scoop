@@ -143,4 +143,15 @@ Describe 'Manifest version variables' -Tag 'Scoop' {
         Update-ManifestProperty -Manifest $manifest -Property 'hash' -Version '2.0.0' -Substitutions (Get-VersionSubstitution '2.0.0') | Out-Null
         $manifest.architecture.'64bit'.hash | Should -Be 'https://example.com/app-200-x64.zip'
     }
+    It 'passes raw templates to autoupdate when generating a user manifest' {
+        . "$PSScriptRoot\..\lib\manifest.ps1"
+        Mock Get-Manifest { 'app', (Expand-ManifestVariable ($raw | ConvertFrom-Json)), 'main', $null }
+        Mock manifest_path { 'app.json' }
+        Mock parse_json { $raw | ConvertFrom-Json }
+        Mock usermanifestsdir { $TestDrive }
+        Mock get_config { $false }
+        Mock Invoke-AutoUpdate {}
+        generate_user_manifest 'app' 'main' '2.0.0' 3>$null | Out-Null
+        Should -Invoke Invoke-AutoUpdate -ParameterFilter { $Manifest.extract_dir -eq 'app-$majorVersion.$minorVersion' }
+    }
 }

@@ -215,8 +215,12 @@ function generate_user_manifest($app, $bucket, $version) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
+    # Autoupdate needs the raw templates, Get-Manifest has already expanded them for the current version
+    $raw = if ($bucket) { parse_json (manifest_path $app $bucket) }
+    if (!$raw) { $raw = $manifest }
+
     try {
-        Invoke-AutoUpdate $app $manifest_path $manifest $version $(@{ })
+        Invoke-AutoUpdate $app $manifest_path $raw $version $(@{ })
         return $manifest_path
     } catch {
         Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
