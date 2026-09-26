@@ -30,11 +30,16 @@
 # use_sqlite_cache: $true|$false
 #       Use SQLite database for caching. This is useful for speeding up 'scoop search' and 'scoop shim' commands.
 #
+# use_git_history: $true|$false
+#       Enable searching for specific versions in git history when installing apps with version specifiers.
+#       When enabled, Scoop will first search the bucket's git history for the exact version before falling back to autoupdate.
+#       (Default is $true)
+#
 # no_junction: $true|$false
 #       The 'current' version alias will not be used. Shims and shortcuts will point to specific version instead.
 #
 # scoop_repo: http://github.com/ScoopInstaller/Scoop
-#       Git repository containining scoop source code.
+#       Git repository containing scoop source code.
 #       This configuration is useful for custom forks.
 #
 # scoop_branch: master|develop
@@ -132,12 +137,15 @@
 # aria2-warning-enabled: $true|$false
 #       Disable Aria2c warning which is shown while downloading.
 #
+# aria2-fallback-disabled: $true|$false
+#       Disable automatic fallback to the default downloader when Aria2c download fails.
+#
 # aria2-retry-wait: 2
 #       Number of seconds to wait between retries.
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-retry-wait'
 #
 # aria2-split: 5
-#       Number of connections used for downlaod.
+#       Number of connections used for download.
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-s'
 #
 # aria2-max-connection-per-server: 5
@@ -145,7 +153,7 @@
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-x'
 #
 # aria2-min-split-size: 5M
-#       Downloaded files will be splitted by this configured size and downloaded using multiple connections.
+#       Downloaded files will be split by this configured size and downloaded using multiple connections.
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-k'
 #
 # aria2-options:
