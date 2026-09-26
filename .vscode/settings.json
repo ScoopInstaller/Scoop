@@ -1,12 +1,11 @@
-// Configure PSScriptAnalyzer settings
 {
-    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
-    "powershell.codeFormatting.preset": "OTBS",
-    "powershell.codeFormatting.alignPropertyValuePairs": true,
-    "powershell.codeFormatting.ignoreOneLineBlock": true,
-    "powershell.codeFormatting.useConstantStrings": true,
-    "powershell.codeFormatting.useCorrectCasing": true,
-    "powershell.codeFormatting.whitespaceBetweenParameters": true,
+    // Apply formatting on save for constistency
+    "[powershell]": {
+        "editor.formatOnSave": true
+    },
+    // Don't automatically create dotnet project .sln file
+    "dotnet.automaticallyCreateSolutionInWorkspace": false,
+    // Files to hide from VSCode file explorer
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
@@ -14,5 +13,16 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "**/tmp": true
-    }
+    },
+    // Insert final newline, .editorconfig is not consistent on this
+    "files.insertFinalNewline": true,
+    // Configure PSScriptAnalyzer settings
+    "powershell.scriptAnalysis.settingsPath": "../PSScriptAnalyzerSettings.psd1",
+    // Set vscode-powershell settings
+    "powershell.codeFormatting.preset": "OTBS",
+    "powershell.codeFormatting.alignPropertyValuePairs": true,
+    "powershell.codeFormatting.ignoreOneLineBlock": true,
+    "powershell.codeFormatting.useConstantStrings": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.codeFormatting.whitespaceBetweenParameters": true
 }
