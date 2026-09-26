@@ -9,14 +9,15 @@ param(
 
 Describe 'Manifest validates against the schema' {
     BeforeDiscovery {
-        $bucketDir = if (Test-Path "$BucketPath\bucket") {
-            "$BucketPath\bucket"
-        } else {
-            $BucketPath
-        }
+        $bucketSubDir = 'bucket'
+        $useSubDir = Test-Path -LiteralPath (Join-Path -Path $BucketPath -ChildPath $bucketSubDir) -PathType Container
+
+        $bucketDir = if ($useSubDir) { Join-Path -Path $BucketPath -ChildPath $bucketSubDir } else { $BucketPath }
+        $filesPattern = if ($useSubDir) { "$bucketSubDir/*.json" } else { '*.json' }
+
         if ($env:CI -eq $true) {
             Set-BuildEnvironment -Force
-            $manifestFiles = @(Get-GitChangedFile -Path $bucketDir -Include '*.json' -Commit $env:BHCommitHash)
+            $manifestFiles = @(Get-GitChangedFile -Path $bucketDir -Include $filesPattern -Commit $env:BHCommitHash)
         } else {
             $manifestFiles = (Get-ChildItem $bucketDir -Filter '*.json' -Recurse).FullName
         }
