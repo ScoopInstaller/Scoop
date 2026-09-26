@@ -90,6 +90,7 @@
 ### Tests
 
 - **bucket:** Compatible with Pester v6 ([#6724](https://github.com/ScoopInstaller/Scoop/issues/6724))
+- **bucket:** Limit validation to bucket manifests ([#6756](https://github.com/ScoopInstaller/Scoop/issues/6756))
 
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
