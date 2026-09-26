@@ -60,6 +60,7 @@
 ### Code Refactoring
 
 - **scoop-list:** Use simpler method to check the deprecated status of the manifest to improve performance ([#6599](https://github.com/ScoopInstaller/Scoop/issues/6599))
+- **scoop-update:** Move `update` function to `update.ps1` ([#6737](https://github.com/ScoopInstaller/Scoop/issues/6737))
 - **install:** Get reference for Users group via Principal.WellKnownSidType ([#6278](https://github.com/ScoopInstaller/Scoop/issues/6278))
 - **install:** Use `scoop-` prefix for `install.json` and `manifest.json` ([#6732](https://github.com/ScoopInstaller/Scoop/issues/6732))
 - **output:** Replace raw prints with functions for standardized output ([#6449](https://github.com/ScoopInstaller/Scoop/issues/6449))
