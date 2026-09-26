@@ -26,6 +26,7 @@
 - **scoop-update:** `scoop update -f` on an `@version` pin now upgrades to the bucket HEAD ([#6730](https://github.com/ScoopInstaller/Scoop/issues/6730))
 - **scoop-update:** Detect version pins by generated manifest only ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **scoop-update:** Force sync tags w/ remote branch while scoop update ([#6439](https://github.com/ScoopInstaller/Scoop/issues/6439))
+- **scoop-update:** Run missing uninstall steps and honor `--no-cache` ([#6750](https://github.com/ScoopInstaller/Scoop/issues/6750))
 - **scoop-version:** Fix logic error caused by missing brackets ([#6463](https://github.com/ScoopInstaller/Scoop/issues/6463))
 - **auto-pr:** Rebase before pushing to prevent push conflicts ([#6624](https://github.com/ScoopInstaller/Scoop/issues/6624))
 - **autoupdate:** Use origin URL to handle URLs with fragment in GitHub mode ([#6455](https://github.com/ScoopInstaller/Scoop/issues/6455))
