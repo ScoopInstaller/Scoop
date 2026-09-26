@@ -4,5 +4,11 @@ version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/" # == /.github/workflows/
+    target-branch: "develop"
+    labels: [ ] # disable all labels
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    commit-message:
+      prefix: "ci(workflow)"
+    cooldown:
+      default-days: 14
