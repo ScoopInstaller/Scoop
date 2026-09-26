@@ -110,6 +110,9 @@ function Add-Path {
                 Write-Host "Adding $(friendly_path $_) to $(if ($Global) {'global'} else {'your'}) path."
             }
         }
+        if ($Global -and !(is_admin)) {
+            abort "ERROR: you need admin rights to add global path environment varibles"
+        }
         Set-EnvVar -Name $TargetEnvVar -Value ((@($Path) + $strippedPath) -join ';') -Global:$Global
     }
     # current session
