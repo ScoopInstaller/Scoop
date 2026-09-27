@@ -145,9 +145,8 @@ Describe 'Manifest version variables' -Tag 'Scoop' {
     }
     It 'passes raw templates to autoupdate when generating a user manifest' {
         . "$PSScriptRoot\..\lib\manifest.ps1"
-        Mock Get-Manifest { 'app', (Expand-ManifestVariable ($raw | ConvertFrom-Json)), 'main', $null }
-        Mock manifest_path { 'app.json' }
-        Mock parse_json { $raw | ConvertFrom-Json }
+        $json = $raw
+        Mock Get-Manifest { 'app', $(if ($Raw) { $json | ConvertFrom-Json } else { Expand-ManifestVariable ($json | ConvertFrom-Json) }), $null, 'https://example.com/app.json' }
         Mock usermanifestsdir { $TestDrive }
         Mock get_config { $false }
         Mock Invoke-AutoUpdate {}

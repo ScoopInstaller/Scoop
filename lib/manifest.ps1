@@ -31,7 +31,7 @@ function url_manifest($url) {
     }
 }
 
-function Get-Manifest($app) {
+function Get-Manifest($app, [Switch] $Raw) {
     $bucket, $manifest, $url = $null
     $app = $app.TrimStart('/')
     # check if app is a URL or UNC path
@@ -108,7 +108,8 @@ function Get-Manifest($app) {
         warn "Multiple buckets contain manifest '$app', the current selection is '$bucket/$app'."
     }
 
-    return $app, (Expand-ManifestVariable $manifest), $bucket, $url
+    if (!$Raw) { $manifest = Expand-ManifestVariable $manifest }
+    return $app, $manifest, $bucket, $url
 }
 
 function manifest($app, $bucket, $url) {
@@ -193,7 +194,8 @@ function Get-SupportedArchitecture($manifest, $architecture) {
 
 function generate_user_manifest($app, $bucket, $version) {
     # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
-    $app, $manifest, $bucket, $null = Get-Manifest "$bucket/$app"
+    # Autoupdate needs the raw templates, not values expanded for the current version
+    $app, $manifest, $bucket, $null = Get-Manifest "$bucket/$app" -Raw
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket
     }
@@ -215,12 +217,8 @@ function generate_user_manifest($app, $bucket, $version) {
         abort "'$app' does not have autoupdate capability`r`ncouldn't find manifest for '$app@$version'"
     }
 
-    # Autoupdate needs the raw templates, Get-Manifest has already expanded them for the current version
-    $raw = if ($bucket) { parse_json (manifest_path $app $bucket) }
-    if (!$raw) { $raw = $manifest }
-
     try {
-        Invoke-AutoUpdate $app $manifest_path $raw $version $(@{ })
+        Invoke-AutoUpdate $app $manifest_path $manifest $version $(@{ })
         return $manifest_path
     } catch {
         Write-Host -ForegroundColor DarkRed "Could not install $app@$version"
