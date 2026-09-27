@@ -34,7 +34,7 @@ $Dir = Convert-Path $Dir
 $Queue = @()
 
 Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
-    $manifest = parse_json $_.FullName
+    $manifest = Expand-ManifestVariable (parse_json $_.FullName)
     $Queue += , @($_.BaseName, $manifest)
 }
 

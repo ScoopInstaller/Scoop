@@ -31,7 +31,7 @@ function url_manifest($url) {
     }
 }
 
-function Get-Manifest($app) {
+function Get-Manifest($app, [Switch] $Raw) {
     $bucket, $manifest, $url = $null
     $app = $app.TrimStart('/')
     # check if app is a URL or UNC path
@@ -108,12 +108,32 @@ function Get-Manifest($app) {
         warn "Multiple buckets contain manifest '$app', the current selection is '$bucket/$app'."
     }
 
+    if (!$Raw) { $manifest = Expand-ManifestVariable $manifest }
     return $app, $manifest, $bucket, $url
 }
 
 function manifest($app, $bucket, $url) {
-    if ($url) { return url_manifest $url }
-    parse_json (manifest_path $app $bucket)
+    if ($url) { return Expand-ManifestVariable (url_manifest $url) }
+    Expand-ManifestVariable (parse_json (manifest_path $app $bucket))
+}
+
+function Expand-ManifestVariable($manifest, [Hashtable] $substitutions) {
+    if (!$substitutions) {
+        if (!$manifest.version) { return $manifest }
+        $substitutions = Get-VersionSubstitution $manifest.version
+    }
+    # Scripts already see $version at runtime, autoupdate/checkver hold templates of their own
+    $excluded = 'version', 'autoupdate', 'checkver', 'installer', 'uninstaller', 'pre_install', 'post_install', 'pre_uninstall', 'post_uninstall'
+    $expanded = $manifest.PSObject.Copy()
+    $expanded.PSObject.Properties | Where-Object { $_.Name -notin $excluded } | ForEach-Object {
+        if ($_.Name -eq 'architecture') {
+            $_.Value = $_.Value.PSObject.Copy()
+            $_.Value.PSObject.Properties | ForEach-Object { $_.Value = Expand-ManifestVariable $_.Value $substitutions }
+        } else {
+            $_.Value = substitute $_.Value $substitutions
+        }
+    }
+    return $expanded
 }
 
 function save_installed_manifest($app, $bucket, $dir, $url) {
@@ -128,7 +148,7 @@ function save_installed_manifest($app, $bucket, $dir, $url) {
 }
 
 function installed_manifest($app, $version, $global) {
-    parse_json "$(versiondir $app $version $global)\manifest.json"
+    Expand-ManifestVariable (parse_json "$(versiondir $app $version $global)\manifest.json")
 }
 
 function save_install_info($info, $dir) {
@@ -174,7 +194,8 @@ function Get-SupportedArchitecture($manifest, $architecture) {
 
 function generate_user_manifest($app, $bucket, $version) {
     # 'autoupdate.ps1' 'buckets.ps1' 'manifest.ps1'
-    $app, $manifest, $bucket, $null = Get-Manifest "$bucket/$app"
+    # Autoupdate needs the raw templates, not values expanded for the current version
+    $app, $manifest, $bucket, $null = Get-Manifest "$bucket/$app" -Raw
     if ("$($manifest.version)" -eq "$version") {
         return manifest_path $app $bucket
     }
