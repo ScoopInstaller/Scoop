@@ -121,7 +121,7 @@ Describe 'Style constraints for non-binary project files' -ForEach @(, $repo_fil
         $badFiles = @(
             foreach ($file in $files) {
                 # YAML files are exempt: they are allowed to use LF line endings
-                if ($file -cmatch '\.ya?ml$') {
+                if ($file -imatch '\.ya?ml$') {
                     continue
                 }
 
