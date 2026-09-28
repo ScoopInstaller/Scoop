@@ -5,7 +5,6 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/" # == /.github/workflows/
     target-branch: "develop"
-    labels: [ ] # disable all labels
     schedule:
       interval: "weekly"
     commit-message:
