@@ -16,8 +16,7 @@ trim_trailing_whitespace = true
 # DOS/Win *requires* BAT/CMD files to have CRLF newlines
 end_of_line = crlf
 
-# YAML files use LF; bracket classes make the match case-insensitive
-[*.{[yY][mM][lL],[yY][aA][mM][lL]}]
+[*.{yml,yaml}]
 indent_size = 2
 end_of_line = lf
 
