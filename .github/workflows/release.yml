@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Release
+    # Tags are cut on master only after develop passed CI on every PR.
+    permissions:
+      contents: write
+      pull-requests: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tag = '${{ github.ref_name }}'
+
+          $section = [regex]::Match(
+              (Get-Content CHANGELOG.md -Raw),
+              "(?ms)^## \[$([regex]::Escape($tag))\].*?(?=^## |\z)")
+          if (-not $section.Success) {
+            throw "CHANGELOG.md has no '$tag' section. Rename '## [Unreleased]' to '## [$tag]' before tagging."
+          }
+
+          # GitHub autolinks bare references in release notes, and the version
+          # header becomes the '## Changelog' heading.
+          $body = [regex]::Replace($section.Value.TrimEnd(), '\[#(\d+)\]\([^)]*\)', '#$1')
+          $body = [regex]::Replace($body, '(?m)^## \[[^\]]+\].*\r?\n\r?\n', '')
+          $body = "## Changelog`n`n$body"
+
+          $prev = [regex]::Match($section.Value, 'compare/(v[0-9]+(?:\.[0-9]+)*?)\.\.\.').Groups[1].Value
+          if (-not $prev) { throw "Cannot read the previous tag from the '$tag' section header" }
+          $search = 'merged:{0}..{1}' -f (git log -1 --format=%cs $prev), (git log -1 --format=%cs HEAD)
+
+          # jq runs inside gh: PR bodies contain bytes PowerShell would mangle when re-parsing.
+          $bodies = gh pr list --state merged --search $search --limit 1000 --json body --jq '.[].body'
+          $closed = $bodies |
+            Select-String -Pattern '(?i)\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)' -AllMatches |
+            ForEach-Object { $_.Matches } |
+            ForEach-Object { [int]$_.Groups[2].Value } |
+            Sort-Object -Unique
+          if ($closed) {
+            $body += "`n`n## Close Issues`n`n" + (($closed | ForEach-Object { "- Closes #$_" }) -join "`n")
+          }
+
+          $authors = gh pr list --state merged --search $search --limit 1000 --json author --jq '[.[].author.login] | unique | reverse | .[]'
+          if ($authors) {
+            $body += "`n`n## Credits`n`nThanks to the following contributors (ordered by PR merging time):`n`n" +
+              (($authors | ForEach-Object { "@$_" }) -join ' ')
+          }
+
+          [System.IO.File]::WriteAllText('body.md', $body + "`n", [System.Text.UTF8Encoding]::new($false))
+      - name: Release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          name: Version ${{ github.ref_name }}
+          body_path: body.md
+          fail_on_unmatched_files: false
