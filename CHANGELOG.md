@@ -76,10 +76,11 @@
 
 ### Continuous Integration
 
+- **dependabot:** Target `develop` and refine update settings ([#6751](https://github.com/ScoopInstaller/Scoop/issues/6751))
 - **workflow:** Drop Appveyor support and refactor GitHub Actions workflow ([#6626](https://github.com/ScoopInstaller/Scoop/issues/6626))
 - **workflow:** Disable persisted checkout credentials ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **workflow:** Update `actions/checkout` to 7.0.1 and `potatoqualitee/psmodulecache` to 6.3 ([#6753](https://github.com/ScoopInstaller/Scoop/issues/6753))
-- **dependabot:** Target `develop` and refine update settings ([#6751](https://github.com/ScoopInstaller/Scoop/issues/6751))
+- **workflow:** Publish releases from `CHANGELOG.md` on tag push ([#6759](https://github.com/ScoopInstaller/Scoop/issues/6759))
 
 ### Documentation
 
