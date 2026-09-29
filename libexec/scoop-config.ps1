@@ -38,7 +38,7 @@
 # no_junction: $true|$false
 #       The 'current' version alias will not be used. Shims and shortcuts will point to specific version instead.
 #
-# scoop_repo: http://github.com/ScoopInstaller/Scoop
+# scoop_repo: https://github.com/ScoopInstaller/Scoop
 #       Git repository containing scoop source code.
 #       This configuration is useful for custom forks.
 #
@@ -133,12 +133,15 @@
 #
 # aria2-enabled: $true|$false
 #       Aria2c will be used for downloading of artifacts.
+#       (Default is $true)
 #
 # aria2-warning-enabled: $true|$false
 #       Disable Aria2c warning which is shown while downloading.
+#       (Default is $true)
 #
-# aria2-fallback-disabled: $true|$false
-#       Disable automatic fallback to the default downloader when Aria2c download fails.
+# aria2-fallback-enabled: $true|$false
+#       Automatically falls back to the default downloader when Aria2c download fails.
+#       (Default is $true)
 #
 # aria2-retry-wait: 2
 #       Number of seconds to wait between retries.

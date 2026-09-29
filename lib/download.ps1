@@ -456,7 +456,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             # Values containing "'" would break the aria2 command itself, so '...' spans are safe redaction boundaries
             $aria2Diag = $aria2 -replace "--all-proxy-passwd='[^']*'", "--all-proxy-passwd='***'" -replace "--header='Cookie:[^']*'", "--header='Cookie: ***'"
             $urlstxtDiag = $urlstxt_content -replace '(?<u>(?:https?|ftp)\S*?)\?\S*', '${u}?***'
-            if (get_config ARIA2-FALLBACK-DISABLED) {
+            if (-not (get_config ARIA2-FALLBACK-ENABLED $true)) {
                 error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
                 error $urlstxtDiag
                 error $aria2Diag

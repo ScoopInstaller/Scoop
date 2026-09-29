@@ -6,7 +6,7 @@
 - **checkver:** Set GitHub mode default jsonpath and regex ([#6653](https://github.com/ScoopInstaller/Scoop/issues/6653))
 - **download:** Enhance Get-GitHubToken to include more token sources ([#6712](https://github.com/ScoopInstaller/Scoop/issues/6712))
 - **download|scoop-download:** Add GitHub issue prompt when the default downloader fails ([#6539](https://github.com/ScoopInstaller/Scoop/issues/6539))
-- **download|scoop-config:** Allow disabling automatic fallback to the default downloader when Aria2c download fails ([#6538](https://github.com/ScoopInstaller/Scoop/issues/6538))
+- **download|scoop-config:** Allow disabling automatic fallback to the default downloader when Aria2c download fails ([#6538](https://github.com/ScoopInstaller/Scoop/issues/6538), [#6744](https://github.com/ScoopInstaller/Scoop/issues/6744))
 - **install:** Add support for historical manifests by git history ([#6370](https://github.com/ScoopInstaller/Scoop/issues/6370))
 - **install:** Add output for the setting and removal of environment variables ([#6460](https://github.com/ScoopInstaller/Scoop/issues/6460))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
