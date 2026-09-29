@@ -57,7 +57,7 @@ jobs:
             $body += "`n`n## Close Issues`n`n" + (($closed | ForEach-Object { "- Closes #$_" }) -join "`n")
           }
 
-          $authors = gh pr list --state merged --search $search --limit 1000 --json author --jq '[.[].author.login] | unique | reverse | .[]'
+          $authors = gh pr list --state merged --search $search --limit 1000 --json author,mergedAt --jq 'sort_by(.mergedAt) | map(.author.login) | reduce .[] as $x ([]; if index($x) then . else . + [$x] end) | .[]'
           if ($authors) {
             $body += "`n`n## Credits`n`nThanks to the following contributors (ordered by PR merging time):`n`n" +
               (($authors | ForEach-Object { "@$_" }) -join ' ')
