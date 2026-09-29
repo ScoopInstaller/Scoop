@@ -54,13 +54,16 @@ jobs:
             $body += "`n`n## Close Issues`n`n" + (($closed | ForEach-Object { "- Closes #$_" }) -join "`n")
           }
 
-          $authors = gh pr list --state merged --search $search --limit 1000 --json author,mergedAt --jq 'sort_by(.mergedAt) | map(.author.login) | reduce .[] as $x ([]; if index($x) then . else . + [$x] end) | .[]'
+          # sort_by is what makes the merge-time order real; unique would re-sort by login.
+          $authors = gh pr list --state merged --search $search --limit 1000 `
+            --json author,mergedAt `
+            --jq 'sort_by(.mergedAt) | map(.author.login) | reduce .[] as $x ([]; if index($x) then . else . + [$x] end) | .[]'
           if ($authors) {
             $body += "`n`n## Credits`n`nThanks to the following contributors (ordered by PR merging time):`n`n" +
               (($authors | ForEach-Object { "@$_" }) -join ' ')
           }
 
-          [System.IO.File]::WriteAllText('body.md', $body + "`n", [System.Text.UTF8Encoding]::new($false))
+          Set-Content -Path body.md -Value $body -Encoding utf8NoBOM
       - name: Release
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
