@@ -17,7 +17,7 @@
 - **scoop-download:** Fix incorrect download success state ([#6473](https://github.com/ScoopInstaller/Scoop/issues/6473))
 - **scoop-download:** Exit with non-zero status when downloads fail ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **scoop-export:** Make exported JSON key order deterministic ([#6697](https://github.com/ScoopInstaller/Scoop/issues/6697))
-- **scoop-import:** Import `database.ps1` at startup ([#6743](https://github.com/ScoopInstaller/Scoop/issues/6743))
+- **scoop-import:** Import `database.ps1` and `download.ps1` at startup ([#6743](https://github.com/ScoopInstaller/Scoop/issues/6743), [#6747](https://github.com/ScoopInstaller/Scoop/issues/6747))
 - **scoop-search:** Improve error handling for manifest file parsing ([#6345](https://github.com/ScoopInstaller/Scoop/issues/6345))
 - **scoop-search:** Select latest search result semantically ([#6643](https://github.com/ScoopInstaller/Scoop/issues/6643))
 - **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
@@ -76,18 +76,24 @@
 
 ### Continuous Integration
 
+- **dependabot:** Target `develop` and refine update settings ([#6751](https://github.com/ScoopInstaller/Scoop/issues/6751))
 - **workflow:** Drop Appveyor support and refactor GitHub Actions workflow ([#6626](https://github.com/ScoopInstaller/Scoop/issues/6626))
 - **workflow:** Disable persisted checkout credentials ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
+- **workflow:** Update `actions/checkout` to 7.0.1 and `potatoqualitee/psmodulecache` to 6.3 ([#6753](https://github.com/ScoopInstaller/Scoop/issues/6753))
+- **workflow:** Publish releases from `CHANGELOG.md` on tag push ([#6759](https://github.com/ScoopInstaller/Scoop/issues/6759))
 
 ### Documentation
 
 - **README:** Remove Gitter badge ([#6640](https://github.com/ScoopInstaller/Scoop/issues/6640))
+- **bucket:** Transfer `games` bucket to ScoopInstaller ([#6746](https://github.com/ScoopInstaller/Scoop/issues/6746))
 - **bucket:** Transfer `sysinternals` bucket to ScoopInstaller ([#6738](https://github.com/ScoopInstaller/Scoop/issues/6738))
 - **typo:** Correct misspellings in comments and docs ([#6191](https://github.com/ScoopInstaller/Scoop/issues/6191))
 
 ### Tests
 
 - **bucket:** Compatible with Pester v6 ([#6724](https://github.com/ScoopInstaller/Scoop/issues/6724))
+- **bucket:** Limit validation to bucket manifests ([#6756](https://github.com/ScoopInstaller/Scoop/issues/6756))
+- **file:** Exempt YAML files from CRLF lint check ([#6758](https://github.com/ScoopInstaller/Scoop/issues/6758))
 
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 

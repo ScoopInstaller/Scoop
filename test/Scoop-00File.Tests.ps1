@@ -120,6 +120,11 @@ Describe 'Style constraints for non-binary project files' -ForEach @(, $repo_fil
     It 'file newlines are CRLF' {
         $badFiles = @(
             foreach ($file in $files) {
+                # YAML files are exempt: they are allowed to use LF line endings
+                if ($file -imatch '\.ya?ml$') {
+                    continue
+                }
+
                 $content = [System.IO.File]::ReadAllText($file)
                 if (!$content) {
                     throw "File contents are null: $($file)"
