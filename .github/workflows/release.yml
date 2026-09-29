@@ -8,7 +8,6 @@ on:
 jobs:
   release:
     name: Release
-    # Tags are cut on master only after develop passed CI on every PR.
     permissions:
       contents: write
       pull-requests: read
@@ -35,20 +34,18 @@ jobs:
           if (-not $section.Success) {
             throw "CHANGELOG.md has no '$tag' section. Rename '## [Unreleased]' to '## [$tag]' before tagging."
           }
+          $text = $section.Value
 
-          # GitHub autolinks bare references in release notes, and the version
-          # header becomes the '## Changelog' heading.
-          $body = [regex]::Replace($section.Value.TrimEnd(), '\[#(\d+)\]\([^)]*\)', '#$1')
+          $body = [regex]::Replace($text.TrimEnd(), '\[#(\d+)\]\([^)]*\)', '#$1')
           $body = [regex]::Replace($body, '(?m)^## \[[^\]]+\].*\r?\n\r?\n', '')
           $body = "## Changelog`n`n$body"
 
-          $prev = [regex]::Match($section.Value, 'compare/(v[0-9]+(?:\.[0-9]+)*?)\.\.\.').Groups[1].Value
+          $prev = [regex]::Match($text, 'compare/(v[0-9]+(?:\.[0-9]+)*?)\.\.\.').Groups[1].Value
           if (-not $prev) { throw "Cannot read the previous tag from the '$tag' section header" }
           $search = 'merged:{0}..{1}' -f (git log -1 --format=%cs $prev), (git log -1 --format=%cs HEAD)
 
           # jq runs inside gh: PR bodies contain bytes PowerShell would mangle when re-parsing.
-          $bodies = gh pr list --state merged --search $search --limit 1000 --json body --jq '.[].body'
-          $closed = $bodies |
+          $closed = gh pr list --state merged --search $search --limit 1000 --json body --jq '.[].body' |
             Select-String -Pattern '(?i)\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)' -AllMatches |
             ForEach-Object { $_.Matches } |
             ForEach-Object { [int]$_.Groups[2].Value } |
