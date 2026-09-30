@@ -1,3 +1,9 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
+
+### Continuous Integration
+
+- **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))
+
 ## [v0.6.0](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...v0.6.0) - 2026-09-30
 
 ### Features
