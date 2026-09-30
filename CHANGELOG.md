@@ -95,6 +95,10 @@
 - **bucket:** Limit validation to bucket manifests ([#6756](https://github.com/ScoopInstaller/Scoop/issues/6756))
 - **file:** Exempt YAML files from CRLF lint check ([#6758](https://github.com/ScoopInstaller/Scoop/issues/6758))
 
+### Features
+
+**checkver**: Add GitLab to `checkver` ([#5508](https://github.com/ScoopInstaller/Scoop/issues/5508))
+
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
 ### Features
