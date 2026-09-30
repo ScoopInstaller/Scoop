@@ -1,6 +1,7 @@
 *.log
 .DS_Store
 ._.DS_Store
+.vagrant/
 scoop.sublime-workspace
 test/installer/tmp/*
 test/tmp/*
