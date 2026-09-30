@@ -5,7 +5,7 @@
 
 . "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
 
-$export = @{}
+$export = [ordered]@{}
 
 if ($args[0] -eq '-c' -or $args[0] -eq '--config') {
     $export.config = $scoopConfig

@@ -103,11 +103,12 @@ if ($IsLinux -or $IsMacOS) {
     }
 }
 
-function execute($cmd) {
+function execute($cmd, [ScriptBlock] $onError) {
     Write-Host $cmd -ForegroundColor Green
     $output = Invoke-Command ([scriptblock]::Create($cmd))
 
     if ($LASTEXITCODE -gt 0) {
+        if ($onError) { Invoke-Command $onError }
         abort "^^^ Error! See above ^^^ (last command: $cmd)"
     }
 
@@ -212,6 +213,8 @@ hub diff --name-only | ForEach-Object {
 }
 
 if ($Push) {
+    Write-Host 'Rebasing local branch before push ...' -ForegroundColor DarkCyan
+    execute "hub pull --rebase --autostash origin $OriginBranch" { hub rebase --abort 2>$null; hub reset --hard }
     Write-Host 'Pushing updates ...' -ForegroundColor DarkCyan
     execute "hub push origin $OriginBranch"
 } else {

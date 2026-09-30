@@ -16,15 +16,15 @@
 . "$PSScriptRoot\..\lib\install.ps1" # persist related
 
 $opt, $apps, $err = getopt $args 'agk' 'all', 'global', 'cache'
-if ($err) { "scoop cleanup: $err"; exit 1 }
+if ($err) { error "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
 $all = $opt.a -or $opt.all
 
-if (!$apps -and !$all) { 'ERROR: <app> missing'; my_usage; exit 1 }
+if (!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
 
 if ($global -and !(is_admin)) {
-    'ERROR: you need admin rights to cleanup global apps'; exit 1
+    error 'you need admin rights to cleanup global apps'; exit 1
 }
 
 function cleanup($app, $global, $verbose, $cache) {

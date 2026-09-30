@@ -64,7 +64,7 @@ foreach ($single in Get-ChildItem $Dir -Filter "$App.json" -Recurse) {
     $file = $single.FullName
     $manifest = parse_json $file
 
-    # Skip nighly manifests, since their hash validation is skipped
+    # Skip nightly manifests, since their hash validation is skipped
     if ($manifest.version -eq 'nightly') { continue }
 
     $urls = @()
@@ -166,7 +166,7 @@ foreach ($current in $MANIFESTS) {
             $32bit_count = 0
             $arm64_count = 0
 
-            # 64bit is get, donwloaded and added first
+            # 64bit is get, downloaded and added first
             if ($platforms.Contains('64bit')) {
                 $64bit_count = $current.manifest.architecture.'64bit'.hash.Count
                 $current.manifest.architecture.'64bit'.hash = $actuals[0..($64bit_count - 1)]

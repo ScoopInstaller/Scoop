@@ -15,7 +15,7 @@
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 
 $opt, $apps, $err = getopt $args 'g' 'global'
-if ($err) { "scoop hold: $err"; exit 1 }
+if ($err) { error "scoop hold: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 

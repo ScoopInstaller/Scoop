@@ -43,7 +43,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
             return
         }
     }
-    Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from '$bucket' bucket" } else { " from '$url'" })"
+    Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from '$bucket' bucket" } elseif ($url -like (usermanifestsdir) + '\*') { ' from generated manifest' } else { " from '$url'" })"
 
     $dir = ensure (versiondir $app $version $global)
     $original_dir = $dir # keep reference to real (not linked) directory
@@ -79,10 +79,6 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     success "'$app' ($version) was installed successfully!"
 
     show_notes $manifest $dir $original_dir $persist_dir
-}
-
-function is_in_dir($dir, $check) {
-    $check -match "^$([regex]::Escape("$dir"))([/\\]|$)"
 }
 
 function Invoke-Installer {
@@ -165,9 +161,9 @@ function Invoke-HookScript {
         $script = $script.script
     }
     if ($script) {
-        Write-Host "Running $HookType script..." -NoNewline
+        Write-Host "Running $HookType script... " -NoNewline
         Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
-        Write-Host 'done.' -ForegroundColor Green
+        Write-Host 'Done.' -ForegroundColor Green
     }
 }
 
@@ -285,7 +281,7 @@ function ensure_install_dir_not_in_path($dir, $global) {
 
     $fixed, $removed = find_dir_or_subdir $path "$dir"
     if ($removed) {
-        $removed | ForEach-Object { "Installer added '$(friendly_path $_)' to path. Removing." }
+        $removed | ForEach-Object { Write-Output "Installer added '$(friendly_path $_)' to path. Removing." }
         Set-EnvVar -Name 'PATH' -Value $fixed -Global:$global
     }
 
@@ -338,6 +334,7 @@ function env_set($manifest, $global, $arch) {
         $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
             $name = $_.Name
             $val = $ExecutionContext.InvokeCommand.ExpandString($env_set.$($name))
+            Write-Output "Setting $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m = $([char]0x1b)[35m$val$([char]0x1b)[0m"
             Set-EnvVar -Name $name -Value $val -Global:$global
             Set-Content env:\$name $val
         }
@@ -348,6 +345,7 @@ function env_rm($manifest, $global, $arch) {
     if ($env_set) {
         $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
             $name = $_.Name
+            Write-Output "Removing $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m"
             Set-EnvVar -Name $name -Value $null -Global:$global
             if (Test-Path env:\$name) { Remove-Item env:\$name }
         }
@@ -359,6 +357,7 @@ function show_notes($manifest, $dir, $original_dir, $persist_dir) {
         Write-Output 'Notes'
         Write-Output '-----'
         Write-Output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir }))
+        Write-Output '-----'
     }
 }
 
@@ -419,7 +418,7 @@ function show_suggestions($suggested) {
             }
 
             if (!$fulfilled) {
-                Write-Host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'."
+                Write-Host "'$app' suggests installing '$([string]::join("' or '", $feature_suggestions))'." -ForegroundColor DarkYellow
             }
         }
     }
@@ -522,8 +521,8 @@ function unlink_persist_data($manifest, $dir) {
 function persist_permission($manifest, $global) {
     if ($global -and $manifest.persist -and (is_admin)) {
         $path = persistdir $null $global
-        $user = New-Object System.Security.Principal.SecurityIdentifier 'S-1-5-32-545'
-        $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($user, 'Write', 'ObjectInherit', 'none', 'Allow')
+        $builtinUsersSid = New-Object System.Security.Principal.SecurityIdentifier([System.Security.Principal.WellKnownSidType]::BuiltinUsersSid, $null)
+        $target_rule = New-Object System.Security.AccessControl.FileSystemAccessRule($builtinUsersSid, 'Write', 'ObjectInherit', 'none', 'Allow')
         $acl = Get-Acl -Path $path
         $acl.SetAccessRule($target_rule)
         $acl | Set-Acl -Path $path
@@ -554,7 +553,7 @@ function test_running_process($app, $global) {
 # Required to handle docker/for-win#12240
 function New-DirectoryJunction($source, $target) {
     # test if this script is being executed inside a docker container
-    if (Get-Service -Name cexecsvc -ErrorAction SilentlyContinue) {
+    if (Get-Service -Name cexecsvc -ErrorAction Ignore) {
         cmd.exe /d /c "mklink /j `"$source`" `"$target`""
     } else {
         New-Item -Path $source -ItemType Junction -Value $target

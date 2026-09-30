@@ -81,13 +81,32 @@ Describe 'getopt' -Tag 'Scoop' {
         $opt, $rem, $err = getopt '--long-arg', '--' '' 'long-arg'
         $err | Should -BeNullOrEmpty
         $opt.'long-arg' | Should -BeTrue
-        $rem[0] | Should -BeNullOrEmpty
+        $rem | Should -BeNullOrEmpty
+    }
+
+    It 'handles remainder args after the option terminator' {
         $opt, $rem, $err = getopt '--long-arg', '--', '-x', '-y' 'xy' 'long-arg'
         $err | Should -BeNullOrEmpty
         $opt.'long-arg' | Should -BeTrue
-        $opt.'x' | Should -BeNullOrEmpty
-        $opt.'y' | Should -BeNullOrEmpty
+        $opt.Keys | Should -Not -Contain 'x'
+        $opt.Keys | Should -Not -Contain 'y'
         $rem[0] | Should -Be '-x'
         $rem[1] | Should -Be '-y'
     }
+
+    It 'handles PowerShell stop-parsing token' {
+        $opt, $rem, $err = getopt '--long-arg', '--%' '' 'long-arg'
+        $err | Should -BeNullOrEmpty
+        $opt.'long-arg' | Should -BeTrue
+        $rem | Should -BeNullOrEmpty
+    }
+
+    It 'handles remainder args after PowerShell stop-parsing token' {
+        $opt, $rem, $err = getopt @('--long-arg', '--%', '--from', 'there', '--to', 'here') '' 'long-arg'
+        $err | Should -BeNullOrEmpty
+        $opt.Keys | Should -Not -Contain 'from'
+        $opt.Keys | Should -Not -Contain 'to'
+        $rem | Should -Be @('--from', 'there', '--to', 'here')
+    }
+
 }

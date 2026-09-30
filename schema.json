@@ -50,6 +50,7 @@
                 },
                 "mode": {
                     "enum": [
+                        "github",
                         "download",
                         "extract",
                         "json",

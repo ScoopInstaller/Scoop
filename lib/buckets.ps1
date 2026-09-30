@@ -108,12 +108,12 @@ function list_buckets {
         $path = Find-BucketDirectory $_ -Root
         if ((Test-Path (Join-Path $path '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
             $bucket.Source = Invoke-Git -Path $path -ArgumentList @('config', 'remote.origin.url')
-            $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', '--format=%aD', '-n', '1') | Get-Date
+            $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', '--format=%aI', '-n', '1') | Get-Date
         } else {
             $bucket.Source = friendly_path $path
             $bucket.Updated = (Get-Item "$path\bucket" -ErrorAction SilentlyContinue).LastWriteTime
         }
-        $bucket.Manifests = Get-ChildItem "$path\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
+        $bucket.Manifests = Get-ChildItem -Path "$path\bucket" -Filter "*.json" -File -Force -Recurse -ErrorAction SilentlyContinue |
                 Measure-Object | Select-Object -ExpandProperty Count
         $buckets += [PSCustomObject]$bucket
     }
@@ -160,7 +160,7 @@ function add_bucket($name, $repo) {
         Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
         return 1
     }
-    Write-Host 'OK'
+    Write-Host 'OK.'
     if (get_config USE_SQLITE_CACHE) {
         info 'Updating cache...'
         Set-ScoopDB -Path (Get-ChildItem (Find-BucketDirectory $name) -Filter '*.json' -Recurse).FullName
@@ -190,7 +190,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $url = known_bucket_repo $bucket
     $bucket_path = "$bucketsdir\$bucket"
 
-    if (Test-Path $bucket_path) {
+    if ((Test-Path $bucket_path) -and (Test-GitAvailable)) {
         $remote = Invoke-Git -Path $bucket_path -ArgumentList @('config', '--get', 'remote.origin.url')
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git

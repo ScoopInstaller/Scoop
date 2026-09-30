@@ -19,10 +19,6 @@
 #     scoop bucket known
 param($cmd, $name, $repo)
 
-if (get_config NO_JUNCTION) {
-    . "$PSScriptRoot\..\lib\versions.ps1"
-}
-
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\manifest.ps1"
     . "$PSScriptRoot\..\lib\database.ps1"
@@ -34,14 +30,14 @@ $usage_rm = 'usage: scoop bucket rm <name>'
 switch ($cmd) {
     'add' {
         if (!$name) {
-            '<name> missing'
+            error '<name> missing'
             $usage_add
             exit 1
         }
         if (!$repo) {
             $repo = known_bucket_repo $name
             if (!$repo) {
-                "Unknown bucket '$name'. Try specifying <repo>."
+                error "Unknown bucket '$name'. Try specifying <repo>."
                 $usage_add
                 exit 1
             }
@@ -51,7 +47,7 @@ switch ($cmd) {
     }
     'rm' {
         if (!$name) {
-            '<name> missing'
+            error '<name> missing'
             $usage_rm
             exit 1
         }
@@ -73,7 +69,7 @@ switch ($cmd) {
         exit 0
     }
     default {
-        "scoop bucket: cmd '$cmd' not supported"
+        error "scoop bucket: cmd '$cmd' not supported"
         my_usage
         exit 1
     }
