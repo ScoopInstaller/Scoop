@@ -92,6 +92,9 @@
 #       GitHub API token used to make authenticated requests.
 #       This is essential for checkver and similar functions to run without
 #       incurring rate limits and download from private repositories.
+#       Set to 'ask-gh' to read the token from the GitHub CLI ('gh auth token')
+#       instead of storing it here, keeping it in the Windows Credential Manager.
+#       Requires 'gh' to be installed and logged in to github.com.
 #
 # virustotal_api_key:
 #       API key used for uploading/scanning files using virustotal.
