@@ -212,6 +212,6 @@ function new_issue_msg($app, $bucket, $title, $body) {
         }
     }
 
-    $msg = "`nPlease try again or create a new issue by using the following link and paste your console output:"
+    $msg = "`nPlease try again or create a new issue by using the following link and paste your console output, with log file (if path printed above):"
     return "$msg`n$url"
 }
