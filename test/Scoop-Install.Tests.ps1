@@ -4,6 +4,7 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
+    . "$PSScriptRoot\..\lib\restart_manager.ps1"
 }
 
 Describe 'appname_from_url' -Tag 'Scoop' {
@@ -92,3 +93,251 @@ Describe 'persist_def' -Tag 'Scoop' {
         $target | Should -Be 'foo'
     }
 }
+
+Describe 'check_running_process' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $global = $false
+    }
+
+    It 'returns correct hashtable when forcekill is enabled with RM-detected service' {
+        Mock install_info { return @{ forcekill = $true; forcekill_services = @('manual_svc') } }
+        Mock get_config { return $false }
+        Mock versiondir { return 'C:\test\app\current' }
+        Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-RunningProcessesInDir { return @() }
+        Mock Get-CimInstance { return @() }
+        Mock Get-LockingProcesses {
+            return @(
+                [PSCustomObject]@{ Id = 123; Name = 'app'; AppName = 'app'; Path = 'C:\test\app\current\app.exe'; ApplicationType = 'Console'; ServiceName = ''; Restartable = $false; MainWindowHandle = [IntPtr]::Zero },
+                [PSCustomObject]@{ Id = 456; Name = 'app_svc'; AppName = 'app_svc'; Path = 'C:\test\app\current\app.exe'; ApplicationType = 'Service'; ServiceName = 'rm_svc'; Restartable = $true; MainWindowHandle = [IntPtr]::Zero }
+            )
+        }
+
+        $result = check_running_process 'testapp' $global
+        $result.Blocked | Should -BeFalse
+        $result.Forcekill | Should -BeTrue
+        $result.ServicesToStop.Count | Should -Be 2
+        $result.ServicesToStop | Should -Contain 'rm_svc'
+        $result.ServicesToStop | Should -Contain 'manual_svc'
+        $result.RunningProcesses.Count | Should -Be 2
+    }
+
+    It 'blocks when processes are running and forcekill is disabled' {
+        Mock install_info { return $null }
+        Mock get_config { return $false }
+        Mock versiondir { return 'C:\test\app\current' }
+        Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-RunningProcessesInDir { return @() }
+        Mock Get-LockingProcesses {
+            return @(
+                [PSCustomObject]@{ Id = 123; Name = 'app'; AppName = 'app'; Path = 'C:\test\app\current\app.exe'; ApplicationType = 'Console'; ServiceName = ''; Restartable = $false; MainWindowHandle = [IntPtr]::Zero }
+            )
+        }
+
+        $result = check_running_process 'testapp' $global
+        $result.Blocked | Should -BeTrue
+        $result.Forcekill | Should -BeFalse
+        $result.RunningProcesses.Count | Should -Be 1
+    }
+
+    It 'filters out Explorer and Critical processes' {
+        Mock install_info { return $null }
+        Mock get_config { return $false }
+        Mock versiondir { return 'C:\test\app\current' }
+        Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-RunningProcessesInDir { return @() }
+        Mock Get-LockingProcesses {
+            return @(
+                [PSCustomObject]@{ Id = 100; Name = 'app'; AppName = 'app'; Path = 'C:\test\app\current\app.exe'; ApplicationType = 'Console'; ServiceName = ''; Restartable = $false; MainWindowHandle = [IntPtr]::Zero },
+                [PSCustomObject]@{ Id = 200; Name = 'explorer'; AppName = 'Windows Explorer'; Path = 'C:\WINDOWS\Explorer.EXE'; ApplicationType = 'Explorer'; ServiceName = ''; Restartable = $true; MainWindowHandle = [IntPtr]::Zero },
+                [PSCustomObject]@{ Id = 300; Name = 'csrss'; AppName = 'csrss'; Path = 'C:\WINDOWS\system32\csrss.exe'; ApplicationType = 'Critical'; ServiceName = ''; Restartable = $false; MainWindowHandle = [IntPtr]::Zero }
+            )
+        }
+
+        $result = check_running_process 'testapp' $global
+        $result.RunningProcesses.Count | Should -Be 1
+        $result.RunningProcesses[0].Id | Should -Be 100
+    }
+
+    It 'falls back to executable-path scan when Restart Manager misses a process' {
+        Mock install_info { return $null }
+        Mock get_config { return $false }
+        Mock versiondir { return 'C:\test\app\current' }
+        Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-LockingProcesses { return @() }
+        Mock Get-RunningProcessesInDir {
+            return @(
+                [PSCustomObject]@{ Id = 321; Name = 'fallback_app'; AppName = 'fallback_app'; Path = 'C:\test\app\current\fallback.exe'; ApplicationType = 'Unknown'; ServiceName = $null; Restartable = $false; MainWindowHandle = [IntPtr]::Zero }
+            )
+        }
+
+        $result = check_running_process 'testapp' $global
+        $result.Blocked | Should -BeTrue
+        $result.RunningProcesses.Count | Should -Be 1
+        $result.RunningProcesses[0].Id | Should -Be 321
+    }
+
+    It 'includes WMI-discovered services when forcekill is enabled' {
+        Mock install_info { return @{ forcekill = $true } }
+        Mock get_config { return $false }
+        Mock versiondir { return 'C:\test\app\current' }
+        Mock Convert-Path { return 'C:\test\app\current' }
+        Mock Get-LockingProcesses { return @() }
+        Mock Get-RunningProcessesInDir { return @() }
+        Mock Get-CimInstance { return @([PSCustomObject]@{ Name = 'wmi_svc' }) }
+
+        $result = check_running_process 'testapp' $global
+        $result.Blocked | Should -BeFalse
+        $result.Forcekill | Should -BeTrue
+        $result.ServicesToStop.Count | Should -Be 1
+        $result.ServicesToStop[0] | Should -Be 'wmi_svc'
+    }
+}
+
+Describe 'stop_running_process' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        Mock warn {}
+        Mock error {}
+        Mock Write-Host {}
+    }
+
+    It 'kills background process and adds to returned restart list' {
+        $test_result = @{
+            Blocked          = $false
+            Forcekill        = $true
+            App              = 'testapp'
+            RunningProcesses = @(
+                [PSCustomObject]@{ Path = 'C:\test\app\current\app.exe'; Id = 123; Name = 'app'; ApplicationType = 'Console'; MainWindowHandle = [IntPtr]::Zero }
+            )
+            ServicesToStop   = @()
+            ProcessDir       = 'C:\test\app\current'
+        }
+
+        Mock Stop-Process {}
+        Mock Get-LockingProcesses { return @() } # No processes still locking after kill
+        Mock Get-RunningProcessesInDir { return @() }
+
+        $result = stop_running_process $test_result
+
+        $result.Blocked | Should -BeFalse
+        $result.ProcessesToRestart.Count | Should -Be 1
+        $result.ProcessesToRestart[0] | Should -Be 'C:\test\app\current\app.exe'
+
+        Should -Invoke -CommandName Stop-Process -Times 1 -ParameterFilter { $Id -eq 123 }
+    }
+
+    It 'does NOT restart processes that had visible windows' {
+        $test_result = @{
+            Blocked          = $false
+            Forcekill        = $true
+            App              = 'testapp'
+            RunningProcesses = @(
+                [PSCustomObject]@{ Path = 'C:\test\app\current\app.exe'; Id = 124; Name = 'app'; ApplicationType = 'Console'; MainWindowHandle = [IntPtr]1 }
+            )
+            ServicesToStop   = @()
+            ProcessDir       = 'C:\test\app\current'
+        }
+
+        Mock Stop-Process {}
+        Mock Get-LockingProcesses { return @() }
+        Mock Get-RunningProcessesInDir { return @() }
+
+        $result = stop_running_process $test_result
+
+        $result.Blocked | Should -BeFalse
+        $result.ProcessesToRestart.Count | Should -Be 0
+        Should -Invoke -CommandName Stop-Process -Times 1 -ParameterFilter { $Id -eq 124 }
+    }
+
+    It 'does not try to kill Service-type processes (handled separately)' {
+        $test_result = @{
+            Blocked          = $false
+            Forcekill        = $true
+            App              = 'testapp'
+            RunningProcesses = @(
+                [PSCustomObject]@{ Path = 'C:\test\app\current\svc.exe'; Id = 500; Name = 'app_svc'; ApplicationType = 'Service'; MainWindowHandle = [IntPtr]::Zero }
+            )
+            ServicesToStop   = @('test_svc')
+            ProcessDir       = 'C:\test\app\current'
+        }
+
+        $Script:mock_svc_status = 'Running'
+        Mock is_admin { return $true }
+        Mock Stop-Process {}
+        Mock Get-LockingProcesses { return @() }
+        Mock Get-Service { return [PSCustomObject]@{ Status = $Script:mock_svc_status } } -ParameterFilter { $Name -eq 'test_svc' }
+        Mock Stop-Service { $Script:mock_svc_status = 'Stopped' }
+
+        $result = stop_running_process $test_result
+
+        # Service-type processes should not be killed via Stop-Process
+        Should -Invoke -CommandName Stop-Process -Times 0
+        # But the service should be stopped via Stop-Service
+        Should -Invoke -CommandName Stop-Service -Times 1 -ParameterFilter { $Name -eq 'test_svc' }
+        $result.ServicesToRestart.Count | Should -Be 1
+        $result.ServicesToRestart[0] | Should -Be 'test_svc'
+    }
+
+    It 'stops services when admin and adds them to restart list' {
+        $test_result = @{
+            Blocked          = $false
+            Forcekill        = $true
+            App              = 'testapp'
+            RunningProcesses = @()
+            ServicesToStop   = @('test_svc')
+            ProcessDir       = 'C:\test\app\current'
+        }
+
+        $Script:mock_svc_status = 'Running'
+        Mock is_admin { return $true }
+        Mock Get-Service { return [PSCustomObject]@{ Status = $Script:mock_svc_status } } -ParameterFilter { $Name -eq 'test_svc' }
+        Mock Stop-Service { $Script:mock_svc_status = 'Stopped' }
+
+        $result = stop_running_process $test_result
+
+        $result.Blocked | Should -BeFalse
+        $result.ServicesToRestart.Count | Should -Be 1
+        $result.ServicesToRestart[0] | Should -Be 'test_svc'
+
+        Should -Invoke -CommandName Stop-Service -Times 1 -ParameterFilter { $Name -eq 'test_svc' }
+    }
+
+    It 'blocks service forcekill if not admin' {
+        $test_result = @{
+            Blocked          = $false
+            Forcekill        = $true
+            App              = 'testapp'
+            RunningProcesses = @()
+            ServicesToStop   = @('test_svc')
+            ProcessDir       = 'C:\test\app\current'
+        }
+
+        Mock is_admin { return $false }
+        Mock Get-Service { return [PSCustomObject]@{ Status = 'Running' } } -ParameterFilter { $Name -eq 'test_svc' }
+
+        $result = stop_running_process $test_result
+
+        $result.Blocked | Should -BeTrue
+    }
+
+    It 'reports service-only blockers when forcekill is disabled' {
+        $test_result = @{
+            Blocked          = $true
+            Forcekill        = $false
+            App              = 'testapp'
+            RunningProcesses = @(
+                [PSCustomObject]@{ Path = 'C:\test\app\current\svc.exe'; Id = 700; Name = 'svc_host'; ApplicationType = 'Service'; ServiceName = 'test_svc'; MainWindowHandle = [IntPtr]::Zero }
+            )
+            ServicesToStop   = @()
+            ProcessDir       = 'C:\test\app\current'
+        }
+
+        Mock get_config { return $false }
+
+        $result = stop_running_process $test_result
+
+        $result.Blocked | Should -BeTrue
+        Should -Invoke -CommandName error -Times 1
+    }
+}
+
