@@ -199,7 +199,7 @@ switch ($SubCommand) {
                 $newApp = $shimInfo.Alternatives[$selected]
                 Write-Host "Use $([char]0x1b)[36m$shimName$([char]0x1b)[0m from $([char]0x1b)[33m$newApp$([char]0x1b)[0m as default... " -NoNewline
                 $pathNoExt = strip_ext $shimPath
-                '', '.shim', '.cmd', '.ps1' | ForEach-Object {
+                '.shim', '.ps1', '.cmd', '' | ForEach-Object {
                     $oldShimPath = "$pathNoExt$_"
                     $newShimPath = "$oldShimPath.$newApp"
                     if (Test-Path -Path $oldShimPath -PathType Leaf) {
