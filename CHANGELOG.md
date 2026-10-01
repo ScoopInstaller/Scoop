@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 - **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
+- **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6762](https://github.com/ScoopInstaller/Scoop/issues/6762))
 
 ### Continuous Integration
 
