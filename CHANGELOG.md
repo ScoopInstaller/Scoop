@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
 
+### Bug Fixes
+
+- **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6762](https://github.com/ScoopInstaller/Scoop/issues/6762))
+
 ### Continuous Integration
 
 - **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))

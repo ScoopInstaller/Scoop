@@ -26,6 +26,26 @@ Describe 'Test-Aria2Enabled' -Tag 'Scoop' {
     }
 }
 
+Describe 'Get-GitHubApiAccept' -Tag 'Scoop' {
+    It 'omits octet-stream for Actions artifact zips so they redirect instead of 415' {
+        Get-GitHubApiAccept 'https://api.github.com/repos/vpinball/vpinball/actions/artifacts/11138249207/zip' | Should -BeNullOrEmpty
+    }
+
+    It 'omits octet-stream for an artifact zip after the filename-override fragment is stripped' {
+        # Invoke-Download passes the fragment-free url; a manifest may append #/app.zip for extraction
+        $url = 'https://api.github.com/repos/vpinball/vpinball/actions/artifacts/11138249207/zip#/VPinballX_BGFX.zip'
+        Get-GitHubApiAccept (($url -split '#')[0]) | Should -BeNullOrEmpty
+    }
+
+    It 'keeps octet-stream for release assets so they return the binary' {
+        Get-GitHubApiAccept 'https://api.github.com/repos/cli/cli/releases/assets/599854636' | Should -Be 'application/octet-stream'
+    }
+
+    It 'keeps octet-stream for other api.github.com paths' {
+        Get-GitHubApiAccept 'https://api.github.com/repos/vpinball/vpinball/actions/artifacts/11138249207' | Should -Be 'application/octet-stream'
+    }
+}
+
 Describe 'url_filename' -Tag 'Scoop' {
     It 'should extract the real filename from an url' {
         url_filename 'http://example.org/foo.txt' | Should -Be 'foo.txt'
