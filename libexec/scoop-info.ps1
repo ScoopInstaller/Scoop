@@ -105,7 +105,7 @@ if ($manifest.license) {
     $url = if ($identifier -match '^((ht)|f)tps?://') {
         $null
     } elseif ($identifier -match '[|,]') {
-        (($identifier -Split '\||,' | ForEach-Object { "https://spdx.org/licenses/$_.html" }) -join ', ')
+        (($identifier -Split '\||,' | ForEach-Object { "https://spdx.org/licenses/$($_.Trim()).html" }) -join ', ')
     } else {
         if ($manifest.license.url) { $manifest.license.url } else { "https://spdx.org/licenses/$identifier.html" }
     }
