@@ -278,6 +278,8 @@ function Expand-ZipArchive {
         [Switch]
         $Removal
     )
+    $Path = Get-AbsolutePath -Path $Path
+    $DestinationPath = Get-AbsolutePath -Path $DestinationPath
     if ($ExtractDir) {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
@@ -287,6 +289,11 @@ function Expand-ZipArchive {
         if (!(Test-Path $DestinationPath)) {
             [System.IO.Directory]::CreateDirectory($DestinationPath) | Out-Null
         }
+        $destFull = [System.IO.Path]::GetFullPath($DestinationPath)
+        if (!$destFull.EndsWith([System.IO.Path]::DirectorySeparatorChar.ToString())) {
+            $destFull += [System.IO.Path]::DirectorySeparatorChar
+        }
+
         $method = [System.IO.Compression.ZipFile].GetMethod('ExtractToDirectory', [Type[]]@([string], [string], [bool]))
         if ($null -ne $method) {
             [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath, $true)
@@ -294,7 +301,10 @@ function Expand-ZipArchive {
             $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
             try {
                 foreach ($entry in $archive.Entries) {
-                    $targetPath = [System.IO.Path]::Combine($DestinationPath, $entry.FullName)
+                    $targetPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($DestinationPath, $entry.FullName))
+                    if (!$targetPath.StartsWith($destFull, [System.StringComparison]::OrdinalIgnoreCase)) {
+                        throw [System.IO.IOException]::new("Zip entry '$($entry.FullName)' attempts path traversal outside destination directory '$DestinationPath'.")
+                    }
                     if ([string]::IsNullOrEmpty($entry.Name)) {
                         [System.IO.Directory]::CreateDirectory($targetPath) | Out-Null
                     } else {
@@ -310,6 +320,10 @@ function Expand-ZipArchive {
             }
         }
     } catch {
+        $exMsg = "$($_.Exception.Message) $($_.Exception.InnerException.Message)"
+        if ($exMsg -like "*outside*destination directory*" -or $exMsg -like "*path traversal*") {
+            throw
+        }
         # Fallback to standard Expand-Archive if unexpected BCL failure
         $oldProgressPreference = $ProgressPreference
         $global:ProgressPreference = 'SilentlyContinue'
