@@ -41,7 +41,8 @@ function cacheremove($app) {
     } elseif ($app -eq '*' -or $app -eq '-a' -or $app -eq '--all') {
         $files = @(Get-ChildItem $cachedir)
     } else {
-        $app = '(' + ($app -join '|') + ')'
+        # Escape the names, so that e.g. the dot in 'foo.bar' doesn't match other apps' files
+        $app = '(' + (($app | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
         # Also match '<app>.txt', the aria2 input file left by an interrupted download
         $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app(#|\.txt$)" -Match)
     }
