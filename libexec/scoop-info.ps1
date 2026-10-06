@@ -102,12 +102,14 @@ if ($manifest.homepage) {
 # Show license
 if ($manifest.license) {
     $identifier = if ($manifest.license.identifier) { $manifest.license.identifier } else { $manifest.license }
-    $url = if ($identifier -match '^((ht)|f)tps?://') {
+    $url = if ($manifest.license.url) {
+        $manifest.license.url
+    } elseif ($identifier -match '^((ht)|f)tps?://') {
         $null
     } elseif ($identifier -match '[|,]') {
         (($identifier -Split '\||,' | ForEach-Object { "https://spdx.org/licenses/$($_.Trim()).html" }) -join ', ')
     } else {
-        if ($manifest.license.url) { $manifest.license.url } else { "https://spdx.org/licenses/$identifier.html" }
+        "https://spdx.org/licenses/$identifier.html"
     }
     $item.License = if ($verbose -and $url) { "$identifier ($url)" } else { $identifier }
 }
