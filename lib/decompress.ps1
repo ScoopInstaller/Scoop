@@ -282,14 +282,43 @@ function Expand-ZipArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    # Disable progress bar to gain performance
-    $oldProgressPreference = $ProgressPreference
-    $global:ProgressPreference = 'SilentlyContinue'
-
-    # Compatible with Pscx v3 (https://github.com/Pscx/Pscx) ('Microsoft.PowerShell.Archive' is not needed for Pscx v4)
-    Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
-
-    $global:ProgressPreference = $oldProgressPreference
+    try {
+        Add-Type -AssemblyName 'System.IO.Compression.FileSystem' -ErrorAction SilentlyContinue
+        if (!(Test-Path $DestinationPath)) {
+            [System.IO.Directory]::CreateDirectory($DestinationPath) | Out-Null
+        }
+        $method = [System.IO.Compression.ZipFile].GetMethod('ExtractToDirectory', [Type[]]@([string], [string], [bool]))
+        if ($null -ne $method) {
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath, $true)
+        } else {
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+            try {
+                foreach ($entry in $archive.Entries) {
+                    $targetPath = [System.IO.Path]::Combine($DestinationPath, $entry.FullName)
+                    if ([string]::IsNullOrEmpty($entry.Name)) {
+                        [System.IO.Directory]::CreateDirectory($targetPath) | Out-Null
+                    } else {
+                        $targetDir = [System.IO.Path]::GetDirectoryName($targetPath)
+                        if (![System.IO.Directory]::Exists($targetDir)) {
+                            [System.IO.Directory]::CreateDirectory($targetDir) | Out-Null
+                        }
+                        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $targetPath, $true)
+                    }
+                }
+            } finally {
+                $archive.Dispose()
+            }
+        }
+    } catch {
+        # Fallback to standard Expand-Archive if unexpected BCL failure
+        $oldProgressPreference = $ProgressPreference
+        $global:ProgressPreference = 'SilentlyContinue'
+        try {
+            Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+        } finally {
+            $global:ProgressPreference = $oldProgressPreference
+        }
+    }
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
