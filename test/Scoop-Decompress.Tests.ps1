@@ -259,5 +259,42 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             test_extract 'Expand-ZipArchive' $test $true
             $test | Should -Not -Exist
         }
+
+        It 'prevents zip slip path traversal outside destination' {
+            $slipZip = "$working_dir\ZipSlip.zip"
+            $slipDest = "$working_dir\slip_dest"
+            New-Item -ItemType Directory -Path $slipDest -Force | Out-Null
+
+            Add-Type -AssemblyName 'System.IO.Compression'
+            Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
+            $fs = [System.IO.File]::Create($slipZip)
+            $zip = [System.IO.Compression.ZipArchive]::new($fs, [System.IO.Compression.ZipArchiveMode]::Create)
+            $entry = $zip.CreateEntry("..\outside.txt")
+            $writer = [System.IO.StreamWriter]::new($entry.Open())
+            $writer.WriteLine("traversal test")
+            $writer.Dispose()
+            $zip.Dispose()
+            $fs.Dispose()
+
+            try {
+                { Expand-ZipArchive -Path $slipZip -DestinationPath $slipDest } | Should -Throw
+                Test-Path "$working_dir\outside.txt" | Should -BeFalse
+            } finally {
+                Remove-Item $slipZip, $slipDest -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item "$working_dir\outside.txt" -Force -ErrorAction SilentlyContinue
+            }
+        }
+
+        It 'extracts archives using legacy per-entry fallback path' {
+            $legacyDest = "$working_dir\legacy_extract"
+            New-Item -ItemType Directory -Path $legacyDest -Force | Out-Null
+            try {
+                Expand-ZipArchive -Path $test -DestinationPath $legacyDest -ForceLegacyExtract
+                Test-Path "$legacyDest\empty" | Should -BeTrue
+            } finally {
+                Remove-Item $legacyDest -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
     }
 }
+

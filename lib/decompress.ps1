@@ -276,20 +276,73 @@ function Expand-ZipArchive {
         [String]
         $ExtractDir,
         [Switch]
-        $Removal
+        $Removal,
+        [Switch]
+        $ForceLegacyExtract
     )
+    $Path = Get-AbsolutePath -Path $Path
+    $DestinationPath = Get-AbsolutePath -Path $DestinationPath
     if ($ExtractDir) {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    # Disable progress bar to gain performance
-    $oldProgressPreference = $ProgressPreference
-    $global:ProgressPreference = 'SilentlyContinue'
 
-    # Compatible with Pscx v3 (https://github.com/Pscx/Pscx) ('Microsoft.PowerShell.Archive' is not needed for Pscx v4)
-    Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+    if (!(Test-Path $DestinationPath)) {
+        [System.IO.Directory]::CreateDirectory($DestinationPath) | Out-Null
+    }
+    $destFull = [System.IO.Path]::GetFullPath($DestinationPath)
+    if (!$destFull.EndsWith([System.IO.Path]::DirectorySeparatorChar.ToString())) {
+        $destFull += [System.IO.Path]::DirectorySeparatorChar
+    }
 
-    $global:ProgressPreference = $oldProgressPreference
+    Add-Type -AssemblyName 'System.IO.Compression.FileSystem' -ErrorAction SilentlyContinue
+
+    # Security check: validate all entries against Zip Slip path traversal upfront before any extraction
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+    try {
+        foreach ($entry in $archive.Entries) {
+            $targetPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($DestinationPath, $entry.FullName))
+            if (!$targetPath.StartsWith($destFull, [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw [System.IO.IOException]::new("Zip entry '$($entry.FullName)' attempts path traversal outside destination directory '$DestinationPath'.")
+            }
+        }
+    } finally {
+        $archive.Dispose()
+    }
+
+    try {
+        $method = [System.IO.Compression.ZipFile].GetMethod('ExtractToDirectory', [Type[]]@([string], [string], [bool]))
+        if ($null -ne $method -and !$ForceLegacyExtract) {
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath, $true)
+        } else {
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+            try {
+                foreach ($entry in $archive.Entries) {
+                    $targetPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($DestinationPath, $entry.FullName))
+                    if ([string]::IsNullOrEmpty($entry.Name)) {
+                        [System.IO.Directory]::CreateDirectory($targetPath) | Out-Null
+                    } else {
+                        $targetDir = [System.IO.Path]::GetDirectoryName($targetPath)
+                        if (![System.IO.Directory]::Exists($targetDir)) {
+                            [System.IO.Directory]::CreateDirectory($targetDir) | Out-Null
+                        }
+                        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $targetPath, $true)
+                    }
+                }
+            } finally {
+                $archive.Dispose()
+            }
+        }
+    } catch {
+        # Fallback to standard Expand-Archive if unexpected BCL failure
+        $oldProgressPreference = $ProgressPreference
+        $global:ProgressPreference = 'SilentlyContinue'
+        try {
+            Microsoft.PowerShell.Archive\Expand-Archive -Path $Path -DestinationPath $DestinationPath -Force
+        } finally {
+            $global:ProgressPreference = $oldProgressPreference
+        }
+    }
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
