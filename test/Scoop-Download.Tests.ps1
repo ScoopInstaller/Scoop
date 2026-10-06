@@ -47,3 +47,41 @@ Describe 'url_remote_filename' -Tag 'Scoop' {
         url_remote_filename 'http://example.org/foo-v2.zip#/foo.zip' | Should -Be 'foo-v2.zip'
     }
 }
+
+Describe 'Link-OrCopyFile' -Tag 'Scoop' {
+    BeforeAll {
+        $testDir = Join-Path $env:TEMP ("ScoopLinkTest_" + [guid]::NewGuid().ToString('N'))
+        New-Item -ItemType Directory -Path $testDir -Force | Out-Null
+        $cacheArchive = Join-Path $testDir 'app.zip'
+        Set-Content -Path $cacheArchive -Value 'test archive payload'
+        $cacheScript = Join-Path $testDir 'app.ps1'
+        Set-Content -Path $cacheScript -Value 'test script payload'
+    }
+    AfterAll {
+        Remove-Item -Recurse -Force $testDir -ErrorAction SilentlyContinue
+    }
+
+    It 'hardlinks archive payloads on the same volume' {
+        $stagedZip = Join-Path $testDir 'staged.zip'
+        Link-OrCopyFile $cacheArchive $stagedZip
+        Test-Path $stagedZip | Should -BeTrue
+        (Get-Item $stagedZip).LinkType | Should -Be 'HardLink'
+    }
+
+    It 'preserves cache file when staged archive link is deleted' {
+        $stagedZip = Join-Path $testDir 'staged_delete.zip'
+        Link-OrCopyFile $cacheArchive $stagedZip
+        Remove-Item $stagedZip -Force
+        Test-Path $cacheArchive | Should -BeTrue
+        (Get-Content $cacheArchive) | Should -Be 'test archive payload'
+    }
+
+    It 'copies non-archive payloads to prevent in-place cache mutation' {
+        $stagedScript = Join-Path $testDir 'staged.ps1'
+        Link-OrCopyFile $cacheScript $stagedScript
+        Test-Path $stagedScript | Should -BeTrue
+        Set-Content -Path $stagedScript -Value 'modified script'
+        (Get-Content $cacheArchive) | Should -Be 'test archive payload'
+        (Get-Content $cacheScript) | Should -Be 'test script payload'
+    }
+}

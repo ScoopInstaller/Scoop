@@ -53,15 +53,23 @@ function Link-OrCopyFile($Source, $Destination) {
     if (Test-Path $Destination) {
         Remove-Item $Destination -Force
     }
-    $sourceDrive = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Source))
-    $destDrive = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Destination))
 
-    if ($sourceDrive -and ($sourceDrive -eq $destDrive)) {
-        try {
-            $null = New-Item -ItemType HardLink -Path $Destination -Target $Source -Force -ErrorAction Stop
-            return
-        } catch {
-            # Fallback to copy if hardlink is unsupported on volume
+    # Only hardlink archives that will be extracted and removed.
+    # Standalone executables, scripts, or payloads that remain in the app directory
+    # are copied so in-place mutations cannot corrupt the shared cache.
+    $isArchive = $Source -match '\.(zip|7z|tar|gz|tgz|bz2|tbz2|xz|txz|zst|lzma|cab|iso|msi)$'
+
+    if ($isArchive) {
+        $sourceDrive = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Source))
+        $destDrive = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Destination))
+
+        if ($sourceDrive -and ($sourceDrive -eq $destDrive)) {
+            try {
+                $null = New-Item -ItemType HardLink -Path $Destination -Target $Source -Force -ErrorAction Stop
+                return
+            } catch {
+                # Fallback to copy if hardlink is unsupported on volume
+            }
         }
     }
     Copy-Item $Source $Destination -Force
