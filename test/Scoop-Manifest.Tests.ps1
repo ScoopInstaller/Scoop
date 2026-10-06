@@ -314,3 +314,34 @@ Describe 'manifest bucket auto-discovery' -Tag 'Scoop' {
         Should -Invoke url_manifest -Times 1
     }
 }
+
+Describe 'manifest_path direct and recursive lookup' -Tag 'Scoop' {
+    BeforeAll {
+        $testBucketDir = Join-Path $env:TEMP ("ScoopTestBucket_" + [guid]::NewGuid().ToString('N'))
+        $nestedDir = Join-Path $testBucketDir 'subfolder'
+        New-Item -ItemType Directory -Path $nestedDir -Force | Out-Null
+        New-Item -ItemType File -Path (Join-Path $testBucketDir 'direct-app.json') -Force | Out-Null
+        New-Item -ItemType File -Path (Join-Path $nestedDir 'nested-app.json') -Force | Out-Null
+    }
+    AfterAll {
+        Remove-Item -Recurse -Force $testBucketDir -ErrorAction SilentlyContinue
+    }
+
+    It 'resolves direct manifest with O(1) path lookup' {
+        Mock Find-BucketDirectory { $testBucketDir }
+        $path = manifest_path 'direct-app' 'test'
+        $path | Should -Be (Join-Path $testBucketDir 'direct-app.json')
+    }
+
+    It 'resolves nested manifest using recursive fallback' {
+        Mock Find-BucketDirectory { $testBucketDir }
+        $path = manifest_path 'nested-app' 'test'
+        $path | Should -Be (Join-Path $nestedDir 'nested-app.json')
+    }
+
+    It 'returns empty when manifest does not exist' {
+        Mock Find-BucketDirectory { $testBucketDir }
+        $path = manifest_path 'nonexistent-app' 'test'
+        $path | Should -BeNullOrEmpty
+    }
+}
