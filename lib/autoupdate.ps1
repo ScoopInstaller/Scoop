@@ -310,11 +310,14 @@ function get_hash_for_app([String] $app, $config, [String] $version, [String] $u
             if (!$hash -and ($originurl -match '^(?<prefix>https?://[^/]+)(?<path>/.*)$')) {
                 # GitHub percent-encodes special characters (e.g. '+', spaces) in browser_download_url,
                 # while manifests often use the raw characters, so the exact match above misses.
-                # Retry with the URL normalized to canonical percent-encoded form.
+                # Retry with the URL normalized to canonical percent-encoded form,
+                # but only when normalization actually changes the URL.
                 $encodedurl = $matches['prefix'] + (($matches['path'] -split '/' | ForEach-Object {
                             if ($_) { [System.Uri]::EscapeDataString([System.Uri]::UnescapeDataString($_)) } else { '' }
                         }) -join '/')
-                $hash = find_hash_in_json $hashfile_url $substitutions ("$..assets[?(@.browser_download_url == '" + $encodedurl + "')].digest")
+                if ($encodedurl -cne $originurl) {
+                    $hash = find_hash_in_json $hashfile_url $substitutions ("$..assets[?(@.browser_download_url == '" + $encodedurl + "')].digest")
+                }
             }
         }
     }
