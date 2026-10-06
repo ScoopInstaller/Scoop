@@ -45,40 +45,115 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     }
     Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from '$bucket' bucket" } elseif ($url -like (usermanifestsdir) + '\*') { ' from generated manifest' } else { " from '$url'" })"
 
-    $dir = ensure (versiondir $app $version $global)
-    $original_dir = $dir # keep reference to real (not linked) directory
-    $persist_dir = persistdir $app $global
+    $target_dir = versiondir $app $version $global
+    $app_dir = appdir $app $global
+    $staging_dir = Join-Path $app_dir "_scoop_staging_$version"
+    $backup_dir = Join-Path $app_dir "_scoop_old_$version"
 
-    $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
-    Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
-
-    Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
-    ensure_install_dir_not_in_path $dir $global
-    $dir = link_current $dir
-    create_shims $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global $architecture
-    install_psmodule $manifest $dir $global
-    env_add_path $manifest $dir $global $architecture
-    env_set $manifest $global $architecture
-
-    # persist data
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
-
-    Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
-
-    # save info for uninstall
-    save_installed_manifest $app $bucket $dir $url
-    save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
-
-    if ($manifest.suggest) {
-        $suggested[$app] = $manifest.suggest
+    if (Test-Path $staging_dir) { Remove-Item $staging_dir -Recurse -Force -ErrorAction Stop }
+    if (Test-Path $backup_dir) {
+        if (!(Test-Path $target_dir)) {
+            Rename-Item -Path $backup_dir -NewName (Split-Path $target_dir -Leaf) -Force -ErrorAction Stop
+            link_current $target_dir | Out-Null
+        } else {
+            # Stale target and stranded backup: unlink and remove stale target to restore working backup
+            try { unlink_current $target_dir | Out-Null } catch { }
+            $unlinked = $true
+            try { unlink_persist_data $manifest $target_dir } catch { $unlinked = $false }
+            if ($unlinked) {
+                Remove-Item $target_dir -Recurse -Force -ErrorAction Stop
+                Rename-Item -Path $backup_dir -NewName (Split-Path $target_dir -Leaf) -Force -ErrorAction Stop
+                link_current $target_dir | Out-Null
+            }
+        }
     }
 
-    success "'$app' ($version) was installed successfully!"
+    $dir = ensure $staging_dir
+    $original_dir = $target_dir # keep reference to real (not linked) directory
+    $persist_dir = persistdir $app $global
+    $installed_successfully = $false
+    $target_promoted = $false
+    $has_backup = $false
 
-    show_notes $manifest $dir $original_dir $persist_dir
+    try {
+        $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+        Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
+
+        # Atomic swap from staging to final version dir
+        if (Test-Path $target_dir) {
+            Rename-Item -Path $target_dir -NewName (Split-Path $backup_dir -Leaf) -Force -ErrorAction Stop
+            $has_backup = $true
+        }
+        Rename-Item -Path $staging_dir -NewName (Split-Path $target_dir -Leaf) -Force -ErrorAction Stop
+        $target_promoted = $true
+        $dir = $target_dir
+
+        Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
+
+        Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
+        ensure_install_dir_not_in_path $dir $global
+        $dir = link_current $dir
+        create_shims $manifest $dir $global $architecture
+        create_startmenu_shortcuts $manifest $dir $global $architecture
+        install_psmodule $manifest $dir $global
+        env_add_path $manifest $dir $global $architecture
+        env_set $manifest $global $architecture
+
+        # persist data
+        persist_data $manifest $original_dir $persist_dir
+        persist_permission $manifest $global
+
+        Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
+
+        # save info for uninstall
+        save_installed_manifest $app $bucket $dir $url
+        save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
+
+        if ($manifest.suggest) {
+            $suggested[$app] = $manifest.suggest
+        }
+
+        success "'$app' ($version) was installed successfully!"
+
+        show_notes $manifest $dir $original_dir $persist_dir
+        $installed_successfully = $true
+    } finally {
+        if (-not $installed_successfully) {
+            if (Test-Path $staging_dir) {
+                try { Remove-Item $staging_dir -Recurse -Force -ErrorAction Stop } catch { }
+            }
+            if ($target_promoted) {
+                try { rm_shims $app $manifest $global $architecture } catch { }
+                try { rm_startmenu_shortcuts $manifest $global $architecture } catch { }
+                try { env_rm_path $manifest $target_dir $global $architecture } catch { }
+                try { unlink_current $target_dir | Out-Null } catch { }
+                $unlinked = $true
+                try { unlink_persist_data $manifest $target_dir } catch { $unlinked = $false }
+                if ($unlinked -and (Test-Path $target_dir)) {
+                    try { Remove-Item $target_dir -Recurse -Force -ErrorAction Stop } catch { }
+                }
+            }
+            if ($has_backup -and (Test-Path $backup_dir)) {
+                if (Test-Path $target_dir) {
+                    $failed_dir = Join-Path $app_dir "_scoop_failed_$version"
+                    if (Test-Path $failed_dir) { try { Remove-Item $failed_dir -Recurse -Force -ErrorAction SilentlyContinue } catch { } }
+                    try { Rename-Item -Path $target_dir -NewName (Split-Path $failed_dir -Leaf) -Force -ErrorAction Stop } catch { }
+                }
+                try {
+                    Rename-Item -Path $backup_dir -NewName (Split-Path $target_dir -Leaf) -Force -ErrorAction Stop
+                    link_current $target_dir | Out-Null
+                    create_shims $manifest $target_dir $global $architecture
+                    create_startmenu_shortcuts $manifest $target_dir $global $architecture
+                    env_add_path $manifest $target_dir $global $architecture
+                } catch { }
+            }
+            if ((Test-Path $app_dir) -and -not (Get-ChildItem $app_dir)) {
+                try { Remove-Item $app_dir -Force -ErrorAction Stop } catch { }
+            }
+        } elseif ($has_backup -and (Test-Path $backup_dir)) {
+            try { Remove-Item $backup_dir -Recurse -Force -ErrorAction Stop } catch { }
+        }
+    }
 }
 
 function Invoke-Installer {
