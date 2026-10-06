@@ -1,5 +1,11 @@
 function manifest_path($app, $bucket) {
-    (Get-ChildItem (Find-BucketDirectory $bucket) -Filter "$(sanitary_path $app).json" -Recurse).FullName
+    $bucketDir = Find-BucketDirectory $bucket
+    $sanitized = "$(sanitary_path $app).json"
+    $directPath = [System.IO.Path]::Combine($bucketDir, $sanitized)
+    if ([System.IO.File]::Exists($directPath)) {
+        return $directPath
+    }
+    (Get-ChildItem $bucketDir -Filter $sanitized -Recurse -File -ErrorAction SilentlyContinue).FullName
 }
 
 function parse_json($path) {
