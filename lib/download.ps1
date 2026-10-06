@@ -49,6 +49,24 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
     return $urls.ForEach({ url_filename $_ })
 }
 
+function Link-OrCopyFile($Source, $Destination) {
+    if (Test-Path $Destination) {
+        Remove-Item $Destination -Force
+    }
+    $sourceDrive = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Source))
+    $destDrive = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Destination))
+
+    if ($sourceDrive -and ($sourceDrive -eq $destDrive)) {
+        try {
+            $null = New-Item -ItemType HardLink -Path $Destination -Target $Source -Force -ErrorAction Stop
+            return
+        } catch {
+            # Fallback to copy if hardlink is unsupported on volume
+        }
+    }
+    Copy-Item $Source $Destination -Force
+}
+
 ## [System.Net] downloader
 
 function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
@@ -62,7 +80,7 @@ function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $us
 
     if (!($null -eq $to)) {
         if ($use_cache) {
-            Copy-Item $cached $to
+            Link-OrCopyFile $cached $to
         } else {
             Move-Item $cached $to -Force
         }
