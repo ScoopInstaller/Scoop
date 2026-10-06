@@ -276,7 +276,9 @@ function Expand-ZipArchive {
         [String]
         $ExtractDir,
         [Switch]
-        $Removal
+        $Removal,
+        [Switch]
+        $ForceLegacyExtract
     )
     $Path = Get-AbsolutePath -Path $Path
     $DestinationPath = Get-AbsolutePath -Path $DestinationPath
@@ -284,27 +286,39 @@ function Expand-ZipArchive {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
     }
-    try {
-        Add-Type -AssemblyName 'System.IO.Compression.FileSystem' -ErrorAction SilentlyContinue
-        if (!(Test-Path $DestinationPath)) {
-            [System.IO.Directory]::CreateDirectory($DestinationPath) | Out-Null
-        }
-        $destFull = [System.IO.Path]::GetFullPath($DestinationPath)
-        if (!$destFull.EndsWith([System.IO.Path]::DirectorySeparatorChar.ToString())) {
-            $destFull += [System.IO.Path]::DirectorySeparatorChar
-        }
 
+    if (!(Test-Path $DestinationPath)) {
+        [System.IO.Directory]::CreateDirectory($DestinationPath) | Out-Null
+    }
+    $destFull = [System.IO.Path]::GetFullPath($DestinationPath)
+    if (!$destFull.EndsWith([System.IO.Path]::DirectorySeparatorChar.ToString())) {
+        $destFull += [System.IO.Path]::DirectorySeparatorChar
+    }
+
+    Add-Type -AssemblyName 'System.IO.Compression.FileSystem' -ErrorAction SilentlyContinue
+
+    # Security check: validate all entries against Zip Slip path traversal upfront before any extraction
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+    try {
+        foreach ($entry in $archive.Entries) {
+            $targetPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($DestinationPath, $entry.FullName))
+            if (!$targetPath.StartsWith($destFull, [System.StringComparison]::OrdinalIgnoreCase)) {
+                throw [System.IO.IOException]::new("Zip entry '$($entry.FullName)' attempts path traversal outside destination directory '$DestinationPath'.")
+            }
+        }
+    } finally {
+        $archive.Dispose()
+    }
+
+    try {
         $method = [System.IO.Compression.ZipFile].GetMethod('ExtractToDirectory', [Type[]]@([string], [string], [bool]))
-        if ($null -ne $method) {
+        if ($null -ne $method -and !$ForceLegacyExtract) {
             [System.IO.Compression.ZipFile]::ExtractToDirectory($Path, $DestinationPath, $true)
         } else {
             $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
             try {
                 foreach ($entry in $archive.Entries) {
                     $targetPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($DestinationPath, $entry.FullName))
-                    if (!$targetPath.StartsWith($destFull, [System.StringComparison]::OrdinalIgnoreCase)) {
-                        throw [System.IO.IOException]::new("Zip entry '$($entry.FullName)' attempts path traversal outside destination directory '$DestinationPath'.")
-                    }
                     if ([string]::IsNullOrEmpty($entry.Name)) {
                         [System.IO.Directory]::CreateDirectory($targetPath) | Out-Null
                     } else {
@@ -320,10 +334,6 @@ function Expand-ZipArchive {
             }
         }
     } catch {
-        $exMsg = "$($_.Exception.Message) $($_.Exception.InnerException.Message)"
-        if ($exMsg -like "*outside*destination directory*" -or $exMsg -like "*path traversal*") {
-            throw
-        }
         # Fallback to standard Expand-Archive if unexpected BCL failure
         $oldProgressPreference = $ProgressPreference
         $global:ProgressPreference = 'SilentlyContinue'

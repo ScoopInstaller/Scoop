@@ -284,5 +284,17 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
                 Remove-Item "$working_dir\outside.txt" -Force -ErrorAction SilentlyContinue
             }
         }
+
+        It 'extracts archives using legacy per-entry fallback path' {
+            $legacyDest = "$working_dir\legacy_extract"
+            New-Item -ItemType Directory -Path $legacyDest -Force | Out-Null
+            try {
+                Expand-ZipArchive -Path $test -DestinationPath $legacyDest -ForceLegacyExtract
+                Test-Path "$legacyDest\empty" | Should -BeTrue
+            } finally {
+                Remove-Item $legacyDest -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
     }
 }
+
