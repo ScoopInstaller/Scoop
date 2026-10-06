@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
 
+### Bug Fixes
+
+- **scoop-info:** Don't treat a folder with the app's name as its source ([#6774](https://github.com/ScoopInstaller/Scoop/issues/6774))
+
 ### Continuous Integration
 
 - **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))
