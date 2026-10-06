@@ -54,8 +54,17 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     if (Test-Path $backup_dir) {
         if (!(Test-Path $target_dir)) {
             Rename-Item -Path $backup_dir -NewName (Split-Path $target_dir -Leaf) -Force -ErrorAction Stop
+            link_current $target_dir | Out-Null
         } else {
-            Remove-Item $backup_dir -Recurse -Force -ErrorAction Stop
+            # Stale target and stranded backup: unlink and remove stale target to restore working backup
+            try { unlink_current $target_dir | Out-Null } catch { }
+            $unlinked = $true
+            try { unlink_persist_data $manifest $target_dir } catch { $unlinked = $false }
+            if ($unlinked) {
+                Remove-Item $target_dir -Recurse -Force -ErrorAction Stop
+                Rename-Item -Path $backup_dir -NewName (Split-Path $target_dir -Leaf) -Force -ErrorAction Stop
+                link_current $target_dir | Out-Null
+            }
         }
     }
 
@@ -118,8 +127,9 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
                 try { rm_startmenu_shortcuts $manifest $global $architecture } catch { }
                 try { env_rm_path $manifest $target_dir $global $architecture } catch { }
                 try { unlink_current $target_dir | Out-Null } catch { }
-                try { unlink_persist_data $manifest $target_dir } catch { }
-                if (Test-Path $target_dir) {
+                $unlinked = $true
+                try { unlink_persist_data $manifest $target_dir } catch { $unlinked = $false }
+                if ($unlinked -and (Test-Path $target_dir)) {
                     try { Remove-Item $target_dir -Recurse -Force -ErrorAction Stop } catch { }
                 }
             }
@@ -132,6 +142,9 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
                 try {
                     Rename-Item -Path $backup_dir -NewName (Split-Path $target_dir -Leaf) -Force -ErrorAction Stop
                     link_current $target_dir | Out-Null
+                    create_shims $manifest $target_dir $global $architecture
+                    create_startmenu_shortcuts $manifest $target_dir $global $architecture
+                    env_add_path $manifest $target_dir $global $architecture
                 } catch { }
             }
             if ((Test-Path $app_dir) -and -not (Get-ChildItem $app_dir)) {
