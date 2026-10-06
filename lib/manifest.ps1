@@ -5,7 +5,7 @@ function manifest_path($app, $bucket) {
     if ([System.IO.File]::Exists($directPath)) {
         return $directPath
     }
-    (Get-ChildItem $bucketDir -Filter $sanitized -Recurse -File -ErrorAction SilentlyContinue).FullName
+    (Get-ChildItem $bucketDir -Filter $sanitized -Recurse -File).FullName
 }
 
 function parse_json($path) {
