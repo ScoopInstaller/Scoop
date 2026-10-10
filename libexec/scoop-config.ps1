@@ -143,6 +143,16 @@
 #       Automatically falls back to the default downloader when Aria2c download fails.
 #       (Default is $true)
 #
+# aria2-rpc-enabled: $true|$false
+#       Submit downloads to a running local aria2 JSON-RPC server. This is independent
+#       of the aria2 package and defaults to $false.
+#
+# aria2-rpc-port: 6800
+#       Local aria2 JSON-RPC server port. Required when aria2-rpc-enabled is $true.
+#
+# aria2-rpc-secret:
+#       Optional secret used to authenticate with the aria2 RPC server.
+#
 # aria2-retry-wait: 2
 #       Number of seconds to wait between retries.
 #       See: 'https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-retry-wait'

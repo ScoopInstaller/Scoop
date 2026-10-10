@@ -26,6 +26,36 @@ Describe 'Test-Aria2Enabled' -Tag 'Scoop' {
     }
 }
 
+Describe 'Test-Aria2RpcEnabled' -Tag 'Scoop' {
+    It 'should be disabled by default' {
+        Mock get_config { param($name, $default) $default }
+        Test-Aria2RpcEnabled | Should -BeFalse
+    }
+
+    It 'should be independent from the installed aria2 helper when explicitly enabled with a port' {
+        Mock get_config {
+            param($name, $default)
+            if ($name -eq 'aria2-rpc-enabled') { return $true }
+            if ($name -eq 'aria2-rpc-port') { return '6800' }
+            return $default
+        }
+        Mock Test-HelperInstalled { throw 'RPC mode should not require aria2c' }
+
+        Test-Aria2RpcEnabled | Should -BeTrue
+    }
+
+    It 'should reject an invalid port when enabled' {
+        Mock get_config {
+            param($name, $default)
+            if ($name -eq 'aria2-rpc-enabled') { return $true }
+            if ($name -eq 'aria2-rpc-port') { return '70000' }
+            return $default
+        }
+
+        { Test-Aria2RpcEnabled } | Should -Throw '*aria2-rpc-port*'
+    }
+}
+
 Describe 'url_filename' -Tag 'Scoop' {
     It 'should extract the real filename from an url' {
         url_filename 'http://example.org/foo.txt' | Should -Be 'foo.txt'
