@@ -90,6 +90,21 @@ You can tweak the following `aria2` settings with the `scoop config` command:
 - [aria2-max-connection-per-server](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-x) (default: 5)
 - [aria2-min-split-size](https://aria2.github.io/manual/en/html/aria2c.html#cmdoption-k) (default: 5M)
 - [aria2-options](https://aria2.github.io/manual/en/html/aria2c.html#options) (default: )
+- aria2-rpc-enabled (default: false)
+- aria2-rpc-port (required when RPC is enabled; port of the local aria2 JSON-RPC server)
+- aria2-rpc-secret (optional; RPC authentication secret)
+
+By default, Scoop uses the local `aria2c` executable when the `aria2` package is installed and `aria2-enabled` is true. RPC is a separate, opt-in download mode and does not require that package. To use a local aria2 RPC server, start it with RPC enabled and configure the port, enable switch, and optional secret:
+
+```powershell
+scoop config aria2-rpc-enabled true
+scoop config aria2-rpc-port 6800
+scoop config aria2-rpc-secret your-secret
+```
+
+Scoop connects to `http://127.0.0.1:<port>/jsonrpc`. Set `aria2-rpc-enabled` to `false` (or remove it) to return to the default behavior, where Scoop uses its installed `aria2c` executable when available. RPC mode waits for submitted downloads to finish before continuing with cache handling and hash verification.
+
+RPC mode applies Scoop's standard aria2 download settings. Additional command-line arguments in `aria2-options` are used only when Scoop launches the local `aria2c` executable.
 
 ## Inspiration
 

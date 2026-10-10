@@ -13,7 +13,9 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
     $cookies = $manifest.cookie
 
     # download first
-    if (Test-Aria2Enabled) {
+    if (Test-Aria2RpcEnabled) {
+        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash -UseRpc
+    } elseif (Test-Aria2Enabled) {
         Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
     } else {
         foreach ($url in $urls) {
@@ -263,6 +265,18 @@ function Test-Aria2Enabled {
     return (Test-HelperInstalled -Helper Aria2) -and (get_config 'aria2-enabled' $true)
 }
 
+function Test-Aria2RpcEnabled {
+    if (-not (get_config 'aria2-rpc-enabled' $false)) { return $false }
+
+    $port = get_config 'aria2-rpc-port'
+    $portNumber = 0
+    if ($port -notmatch '^\d+$' -or -not [int]::TryParse([string]$port, [ref]$portNumber) -or $portNumber -lt 1 -or $portNumber -gt 65535) {
+        throw "aria2-rpc-enabled is true, but aria2-rpc-port must be a port number from 1 to 65535."
+    }
+
+    return $true
+}
+
 function aria_exit_code($exitcode) {
     $codes = @{
         0  = 'All downloads were successful'
@@ -330,9 +344,12 @@ function get_filename_from_metalink($file) {
     return $filename
 }
 
-function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true) {
+function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $dir, $cookies = $null, $use_cache = $true, $check_hash = $true, [switch]$UseRpc) {
     $data = @{}
     $urls = @(script:url $manifest $architecture)
+    $rpcPort = if ($UseRpc) { get_config 'aria2-rpc-port' } else { $null }
+    $rpcUrl = if ($UseRpc) { "http://127.0.0.1:$rpcPort/jsonrpc" } else { $null }
+    $rpcJobs = @()
 
     # aria2 input file
     $urlstxt = Join-Path $cachedir "$app.txt"
@@ -408,6 +425,36 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             }
             $urlstxt_content += "    dir=$cachedir`n"
             $urlstxt_content += "    out=$($data.$url.cachename)`n"
+            if ($UseRpc) {
+                $rpcOptions = @{
+                    dir = $cachedir
+                    out = $data.$url.cachename
+                    'continue' = 'true'
+                    'allow-overwrite' = 'true'
+                    'auto-file-renaming' = 'false'
+                    'retry-wait' = [string](get_config 'aria2-retry-wait' 2)
+                    split = [string](get_config 'aria2-split' 5)
+                    'max-connection-per-server' = [string](get_config 'aria2-max-connection-per-server' 5)
+                    'min-split-size' = [string](get_config 'aria2-min-split-size' '5M')
+                    'user-agent' = (Get-UserAgent)
+                }
+                if (!$url.Contains('sourceforge.net')) {
+                    $rpcOptions.referer = strip_filename $url
+                }
+                if ($cookies) {
+                    $rpcOptions.header = @("Cookie: $(cookie_header $cookies)")
+                }
+                if ($proxy -ne 'none' -and [Net.Webrequest]::DefaultWebProxy.Address) {
+                    $rpcOptions['all-proxy'] = [Net.Webrequest]::DefaultWebProxy.Address.Authority
+                    if ([Net.Webrequest]::DefaultWebProxy.Credentials.UserName) {
+                        $rpcOptions['all-proxy-user'] = [Net.Webrequest]::DefaultWebProxy.Credentials.UserName
+                    }
+                    if ([Net.Webrequest]::DefaultWebProxy.Credentials.Password) {
+                        $rpcOptions['all-proxy-passwd'] = [Net.Webrequest]::DefaultWebProxy.Credentials.Password
+                    }
+                }
+                $rpcJobs += ,@{ Uri = $try_url; Options = $rpcOptions }
+            }
         }
     }
 
@@ -419,8 +466,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             $urlstxt_content | Out-UTF8File -FilePath $urlstxt
         }
 
-        # build aria2 command
-        $aria2 = "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')"
+        # build aria2 command only when using the local executable
+        $aria2 = if ($rpcUrl) { $null } else { "& '$(Get-HelperPath -Helper Aria2)' $($options -join ' ')" }
 
         # handle aria2 console output
         Write-Host 'Starting download with aria2...'
@@ -429,32 +476,42 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         $oriConsoleEncoding = [Console]::OutputEncoding
         [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 
-        Invoke-Command ([scriptblock]::Create($aria2)) | ForEach-Object {
-            # Skip blank lines
-            if ([String]::IsNullOrWhiteSpace($_)) { return }
-
-            # Prevent potential overlapping of text when one line is shorter
-            $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
-            $blank = if ($len -gt 0) { ' ' * $len } else { '' }
-            $color = 'Gray'
-
-            if ($_.StartsWith('(OK):')) {
-                $noNewLine = $true
-                $color = 'Green'
-            } elseif ($_.StartsWith('[') -and $_.EndsWith(']')) {
-                $noNewLine = $true
-                $color = 'Cyan'
-            } elseif ($_.StartsWith('Download Results:')) {
-                $noNewLine = $false
+        if ($rpcUrl) {
+            try {
+                Invoke-Aria2RpcDownloads -RpcUrl $rpcUrl -Jobs $rpcJobs
+                $lastexitcode = 0
+            } catch {
+                $lastexitcode = 1
+                warn "aria2 RPC download failed: $($_.Exception.Message)"
             }
+        } else {
+            Invoke-Command ([scriptblock]::Create($aria2)) | ForEach-Object {
+                # Skip blank lines
+                if ([String]::IsNullOrWhiteSpace($_)) { return }
 
-            Write-Host "`rDownload: $_$blank" -ForegroundColor $color -NoNewline:$noNewLine
+                # Prevent potential overlapping of text when one line is shorter
+                $len = $Host.UI.RawUI.WindowSize.Width - $_.Length - 20
+                $blank = if ($len -gt 0) { ' ' * $len } else { '' }
+                $color = 'Gray'
+
+                if ($_.StartsWith('(OK):')) {
+                    $noNewLine = $true
+                    $color = 'Green'
+                } elseif ($_.StartsWith('[') -and $_.EndsWith(']')) {
+                    $noNewLine = $true
+                    $color = 'Cyan'
+                } elseif ($_.StartsWith('Download Results:')) {
+                    $noNewLine = $false
+                }
+
+                Write-Host "`rDownload: $_$blank" -ForegroundColor $color -NoNewline:$noNewLine
+            }
         }
         Write-Host ''
 
         if ($lastexitcode -gt 0) {
             # Values containing "'" would break the aria2 command itself, so '...' spans are safe redaction boundaries
-            $aria2Diag = $aria2 -replace "--all-proxy-passwd='[^']*'", "--all-proxy-passwd='***'" -replace "--header='Cookie:[^']*'", "--header='Cookie: ***'"
+            $aria2Diag = if ($rpcUrl) { 'aria2 RPC download' } else { $aria2 -replace "--all-proxy-passwd='[^']*'", "--all-proxy-passwd='***'" -replace "--header='Cookie:[^']*'", "--header='Cookie: ***'" }
             $urlstxtDiag = $urlstxt_content -replace '(?<u>(?:https?|ftp)\S*?)\?\S*', '${u}?***'
             if (-not (get_config ARIA2-FALLBACK-ENABLED $true)) {
                 error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
@@ -532,6 +589,99 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
 }
 
 ## Helper functions
+
+function Invoke-Aria2RpcRequest ($RpcUrl, $Method, $Params) {
+    $body = @{
+        jsonrpc = '2.0'
+        id = [guid]::NewGuid().ToString('N')
+        method = $Method
+        params = $Params
+    } | ConvertTo-Json -Depth 10 -Compress
+
+    $response = Invoke-RestMethod -Uri $RpcUrl -Method Post -ContentType 'application/json' -Body $body -TimeoutSec 30 -ErrorAction Stop
+    if ($response.error) {
+        throw "aria2 RPC error $($response.error.code): $($response.error.message)"
+    }
+    return $response.result
+}
+
+function Invoke-Aria2RpcDownloads ($RpcUrl, $Jobs) {
+    $secret = get_config 'aria2-rpc-secret'
+    $prefix = if ($secret) { "token:$secret" } else { $null }
+    $pending = @{}
+    $states = @{}
+    try {
+        foreach ($job in $Jobs) {
+            $params = @()
+            if ($prefix) { $params += $prefix }
+            $params += ,@($job.Uri)
+            $params += $job.Options
+            $gid = Invoke-Aria2RpcRequest $RpcUrl 'aria2.addUri' $params
+            $pending[$gid] = $job
+            $states[$gid] = @{ Completed = [int64]0; Total = [int64]0; Speed = [int64]0 }
+        }
+
+        while ($pending.Count -gt 0) {
+            foreach ($gid in @($pending.Keys)) {
+                $params = @()
+                if ($prefix) { $params += $prefix }
+                $params += $gid
+                $params += ,@('status', 'errorCode', 'errorMessage', 'completedLength', 'totalLength', 'downloadSpeed')
+                $status = Invoke-Aria2RpcRequest $RpcUrl 'aria2.tellStatus' $params
+                switch ($status.status) {
+                    'complete' {
+                        $states[$gid].Completed = [int64]$status.completedLength
+                        $states[$gid].Total = [int64]$status.totalLength
+                        $states[$gid].Speed = 0
+                        $pending.Remove($gid) | Out-Null
+                    }
+                    'error' { throw "aria2 task $gid failed ($($status.errorCode)): $($status.errorMessage)" }
+                    'removed' { throw "aria2 task $gid was removed" }
+                    default {
+                        $states[$gid].Completed = [int64]$status.completedLength
+                        $states[$gid].Total = [int64]$status.totalLength
+                        $states[$gid].Speed = [int64]$status.downloadSpeed
+                    }
+                }
+            }
+
+            $completed = [int64]0
+            $total = [int64]0
+            $speed = [int64]0
+            foreach ($state in $states.Values) {
+                $completed += $state.Completed
+                $total += $state.Total
+                $speed += $state.Speed
+            }
+            $percent = if ($total -gt 0) { [math]::Min(100, [math]::Floor($completed * 100 / $total)) } else { 0 }
+            $barWidth = 24
+            $filled = [math]::Floor($percent * $barWidth / 100)
+            $bar = ('#' * $filled) + ('-' * ($barWidth - $filled))
+            $activeNames = @($pending.Values | ForEach-Object { $_.Options.out })
+            $current = if ($activeNames.Count -gt 0) { $activeNames -join ', ' } else { 'complete' }
+            $progress = "Download: [$bar] $('{0,3}' -f $percent)% ($(filesize $completed)/$(filesize $total)) $(filesize $speed)/s $current"
+            try { $consoleWidth = $Host.UI.RawUI.WindowSize.Width } catch { $consoleWidth = $progress.Length }
+            if ($consoleWidth -gt 1 -and $progress.Length -ge $consoleWidth) {
+                $progress = $progress.Substring(0, $consoleWidth - 1)
+            }
+            $padding = ' ' * [math]::Max(0, $consoleWidth - $progress.Length - 1)
+            Write-Host "`r$progress$padding" -ForegroundColor Cyan -NoNewline
+
+            if ($pending.Count -gt 0) { Start-Sleep -Seconds 1 }
+        }
+        Write-Host ''
+    } catch {
+        foreach ($gid in @($pending.Keys)) {
+            try {
+                $params = @()
+                if ($prefix) { $params += $prefix }
+                $params += $gid
+                $null = Invoke-Aria2RpcRequest $RpcUrl 'aria2.forceRemove' $params
+            } catch { }
+        }
+        throw
+    }
+}
 
 ### Downloader parameters
 
