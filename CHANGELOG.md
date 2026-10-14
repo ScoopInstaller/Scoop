@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
 
+### Bug Fixes
+
+- **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
+
 ### Continuous Integration
 
 - **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))
