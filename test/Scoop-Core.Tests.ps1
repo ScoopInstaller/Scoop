@@ -505,17 +505,19 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'Get-SystemArchitecture' -Tag 'Scoop' {
+Describe 'Get-SystemArchitecture' -Tag 'Scoop', 'Windows' {
     It 'returns a canonical architecture for this machine' {
         Get-SystemArchitecture | Should -BeIn @('64bit', '32bit', 'arm64')
     }
 
     It 'agrees with the native machine architecture reported by IsWow64Process2' {
-        Add-Win32NativeMethods
+        if ($WindowsBuild -lt 16299) {
+            Set-ItResult -Skipped -Because 'IsWow64Process2 needs Windows build 16299'
+        }
         $processMachine = [UInt16]0
         $nativeMachine = [UInt16]0
         $handle = [System.Diagnostics.Process]::GetCurrentProcess().Handle
-        [Win32.NativeMethods]::IsWow64Process2($handle, [ref]$processMachine, [ref]$nativeMachine) | Should -BeTrue
+        [Win32.ScoopArchMethods]::IsWow64Process2($handle, [ref]$processMachine, [ref]$nativeMachine) | Should -BeTrue
         $expected = switch ($nativeMachine) {
             0xAA64 { 'arm64' }
             0x014C { '32bit' }
