@@ -1129,15 +1129,52 @@ function get_shim_path() {
     return $shim_path
 }
 
+function Add-Win32NativeMethods {
+    if (-not ('Win32.NativeMethods' -as [Type])) {
+        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @'
+[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+public static extern IntPtr SendMessageTimeout(
+    IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
+    uint fuFlags, uint uTimeout, out UIntPtr lpdwResult
+);
+[DllImport("kernel32.dll", SetLastError = true)]
+public static extern bool IsWow64Process2(IntPtr hProcess, out ushort processMachine, out ushort nativeMachine);
+'@
+    }
+}
+
+function Get-SystemArchitecture {
+    # GetNativeSystemInfo would answer with the emulated architecture when this process runs
+    # under emulation, so only IsWow64Process2 can tell an x64 host from an Arm64 one.
+    # ref: https://learn.microsoft.com/en-us/windows/arm/apps-on-arm-x86-emulation
+    if ($WindowsBuild -ge 16299) {
+        Add-Win32NativeMethods
+        $processMachine = [UInt16]0
+        $nativeMachine = [UInt16]0
+        $handle = [System.Diagnostics.Process]::GetCurrentProcess().Handle
+        if ([Win32.NativeMethods]::IsWow64Process2($handle, [ref]$processMachine, [ref]$nativeMachine)) {
+            switch ($nativeMachine) {
+                0xAA64 { return 'arm64' }
+                0x014C { return '32bit' }
+                default { return '64bit' }
+            }
+        }
+    } else {
+        # Windows 10 before 1709 has no IsWow64Process2, and the Arm64 builds of that era
+        # set the Program Files folder of 32-bit Arm.
+        if (${env:ProgramFiles(Arm)}) {
+            return 'arm64'
+        } elseif ([System.Environment]::Is64BitOperatingSystem) {
+            return '64bit'
+        } else {
+            return '32bit'
+        }
+    }
+}
+
 function Get-DefaultArchitecture {
     $arch = get_config DEFAULT_ARCHITECTURE
-    $system = if (${env:ProgramFiles(Arm)}) {
-        'arm64'
-    } elseif ([System.Environment]::Is64BitOperatingSystem) {
-        '64bit'
-    } else {
-        '32bit'
-    }
+    $system = Get-SystemArchitecture
     if ($null -eq $arch) {
         $arch = $system
     } else {

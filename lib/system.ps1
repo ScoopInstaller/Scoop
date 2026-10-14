@@ -3,15 +3,7 @@
 ## Environment Variables
 
 function Publish-EnvVar {
-    if (-not ('Win32.NativeMethods' -as [Type])) {
-        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @'
-[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-public static extern IntPtr SendMessageTimeout(
-    IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
-    uint fuFlags, uint uTimeout, out UIntPtr lpdwResult
-);
-'@
-    }
+    Add-Win32NativeMethods
 
     $HWND_BROADCAST = [IntPtr] 0xffff
     $WM_SETTINGCHANGE = 0x1a
