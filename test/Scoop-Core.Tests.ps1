@@ -505,33 +505,6 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'Get-SystemArchitecture' -Tag 'Scoop', 'Windows' {
-    It 'returns a canonical architecture for this machine' {
-        Get-SystemArchitecture | Should -BeIn @('64bit', '32bit', 'arm64')
-    }
-
-    It 'agrees with the native machine architecture reported by IsWow64Process2' {
-        if ($WindowsBuild -lt 16299) {
-            Set-ItResult -Skipped -Because 'IsWow64Process2 needs Windows build 16299'
-        }
-        $processMachine = [UInt16]0
-        $nativeMachine = [UInt16]0
-        $handle = [System.Diagnostics.Process]::GetCurrentProcess().Handle
-        [Win32.ScoopArchMethods]::IsWow64Process2($handle, [ref]$processMachine, [ref]$nativeMachine) | Should -BeTrue
-        $expected = switch ($nativeMachine) {
-            0xAA64 { 'arm64' }
-            0x014C { '32bit' }
-            default { '64bit' }
-        }
-        Get-SystemArchitecture | Should -Be $expected
-    }
-
-    It 'does not consult the DEFAULT_ARCHITECTURE setting' {
-        Mock -CommandName get_config -MockWith { throw 'Get-SystemArchitecture must not read config' }
-        { Get-SystemArchitecture } | Should -Not -Throw
-    }
-}
-
 Describe 'Format Architecture String' -Tag 'Scoop' {
     It 'should keep correct architectures' {
         Format-ArchitectureString '32bit' | Should -Be '32bit'

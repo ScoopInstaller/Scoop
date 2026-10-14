@@ -1134,8 +1134,6 @@ function Get-SystemArchitecture {
     # under emulation, so only IsWow64Process2 can tell an x64 host from an Arm64 one.
     # ref: https://learn.microsoft.com/en-us/windows/arm/apps-on-arm-x86-emulation
     if ($WindowsBuild -ge 16299) {
-        # A separate type name, so that a session which already loaded another definition of
-        # Win32.NativeMethods can still pick this one up
         if (-not ('Win32.ScoopArchMethods' -as [Type])) {
             Add-Type -Namespace Win32 -Name ScoopArchMethods -MemberDefinition @'
 [DllImport("kernel32.dll", SetLastError = true)]
@@ -1153,16 +1151,16 @@ public static extern bool IsWow64Process2(IntPtr hProcess, out ushort processMac
                 default { return '64bit' }
             }
         }
+    }
+
+    # Windows 10 before 1709 has no IsWow64Process2, and the Arm64 builds of that era
+    # set the Program Files folder of 32-bit Arm.
+    if (${env:ProgramFiles(Arm)}) {
+        return 'arm64'
+    } elseif ([System.Environment]::Is64BitOperatingSystem) {
+        return '64bit'
     } else {
-        # Windows 10 before 1709 has no IsWow64Process2, and the Arm64 builds of that era
-        # set the Program Files folder of 32-bit Arm.
-        if (${env:ProgramFiles(Arm)}) {
-            return 'arm64'
-        } elseif ([System.Environment]::Is64BitOperatingSystem) {
-            return '64bit'
-        } else {
-            return '32bit'
-        }
+        return '32bit'
     }
 }
 
