@@ -772,7 +772,7 @@ function Invoke-ExternalCommand {
 function isFileLocked([string]$path) {
     $file = New-Object System.IO.FileInfo $path
 
-    if ((Test-Path -Path $path) -eq $false) {
+    if ((Test-Path -LiteralPath $path) -eq $false) {
         return $false
     }
 

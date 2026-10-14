@@ -70,9 +70,9 @@ function Set-PESubsystem($filePath, $targetSubsystem) {
 }
 
 function get_app_name($path) {
-    if ((Test-Path (appsdir $false)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $false))))[/\\]([^/\\]+)")) {
+    if ((Test-Path -LiteralPath (appsdir $false)) -and ($path -match "$([Regex]::Escape($(Convert-Path -LiteralPath (appsdir $false))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
-    } elseif ((Test-Path (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $true))))[/\\]([^/\\]+)")) {
+    } elseif ((Test-Path -LiteralPath (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path -LiteralPath (appsdir $true))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
     } else {
         $appName = ''
@@ -84,19 +84,20 @@ function get_app_name_from_shim($shim) {
     if (!(Test-Path($shim))) {
         return ''
     }
-    $content = (Get-Content $shim -Encoding UTF8) -join ' '
+    $content = (Get-Content -LiteralPath $shim -Encoding UTF8) -join ' '
     return get_app_name $content
 }
 
 function Get-ShimTarget($ShimPath) {
     if ($ShimPath) {
+        # -LiteralPath, shim names may contain wildcards (#6592)
         $shimTarget = if ($ShimPath.EndsWith('.shim')) {
-            (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
+            (Get-Content -LiteralPath $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
         } else {
-            ((Select-String -Path $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
+            ((Select-String -LiteralPath $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
         }
         if (!$shimTarget) {
-            $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
+            $shimTarget = ((Select-String -LiteralPath $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
         }
         $shimTargetConverted = $shimTarget | Convert-Path -ErrorAction SilentlyContinue
         if (!$shimTargetConverted -and $shimTarget -and $shimTarget.Contains('\Sysnative\')) {
@@ -108,7 +109,8 @@ function Get-ShimTarget($ShimPath) {
 }
 
 function warn_on_overwrite($shim, $path) {
-    if (!(Test-Path $shim)) {
+    # -LiteralPath, shim names may contain wildcards (#6592)
+    if (!(Test-Path -LiteralPath )) {
         return
     }
     $shim_app = get_app_name_from_shim $shim
@@ -127,7 +129,8 @@ function warn_on_overwrite($shim, $path) {
 }
 
 function shim($path, $global, $name, $arg) {
-    if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
+    # -LiteralPath, shim names and targets may contain wildcards (#6592)
+    if (!(Test-Path -LiteralPath )) { abort "Can''t shim ''$(fname $path)': couldn''t find ''$path'." }
     $abs_shimdir = ensure (shimdir $global)
     Add-Path -Path $abs_shimdir -Global:$global
     if (!$name) { $name = strip_ext (fname $path) }
@@ -135,7 +138,7 @@ function shim($path, $global, $name, $arg) {
     $shim = "$abs_shimdir\$($name.tolower())"
 
     # convert to relative path
-    $resolved_path = Convert-Path $path
+    $resolved_path = Convert-Path -LiteralPath $path
     Push-Location $abs_shimdir
     $relative_path = Resolve-Path -Relative $resolved_path
     Pop-Location
@@ -321,9 +324,10 @@ function create_shims($manifest, $dir, $global, $arch) {
         $target, $name, $arg = shim_def $_
         Write-Output "Creating shim for '$name'."
 
-        if (Test-Path "$dir\$target" -PathType leaf) {
+        # -LiteralPath, bin targets may contain wildcards (#6592)
+        if (Test-Path -LiteralPath "$dir\$target" -PathType leaf) {
             $bin = "$dir\$target"
-        } elseif (Test-Path $target -PathType leaf) {
+        } elseif (Test-Path -LiteralPath $target -PathType leaf) {
             $bin = $target
         } else {
             $bin = (Get-Command $target).Source
@@ -338,20 +342,23 @@ function rm_shim($name, $shimdir, $app) {
     '', '.shim', '.cmd', '.ps1' | ForEach-Object {
         $shimPath = "$shimdir\$name$_"
         $altShimPath = "$shimPath.$app"
-        if ($app -and (Test-Path -Path $altShimPath -PathType Leaf)) {
+        # -LiteralPath, shim names may contain wildcards (#6592)
+        if ($app -and (Test-Path -LiteralPath $altShimPath -PathType Leaf)) {
             Write-Output "Removing shim '$name$_.$app'."
-            Remove-Item $altShimPath
-        } elseif (Test-Path -Path $shimPath -PathType Leaf) {
+            Remove-Item -LiteralPath $altShimPath
+        } elseif (Test-Path -LiteralPath $shimPath -PathType Leaf) {
             Write-Output "Removing shim '$name$_'."
-            Remove-Item $shimPath
-            $oldShims = Get-Item -Path "$shimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
+            Remove-Item -LiteralPath $shimPath
+            # a wildcard cannot be combined with -LiteralPath, so the alternatives are listed and filtered
+            $oldShims = Get-ChildItem -LiteralPath $shimdir -File |
+                Where-Object { $_.BaseName -eq $name -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
             if ($null -eq $oldShims) {
                 if ($_ -eq '.shim') {
                     Write-Output "Removing shim '$name.exe'."
-                    Remove-Item -Path "$shimdir\$name.exe"
+                    Remove-Item -LiteralPath "$shimdir\$name.exe"
                 }
             } else {
-                (@($oldShims) | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
+                ($oldShims | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
             }
         }
     }
@@ -374,7 +381,9 @@ function Get-ShimInfo($ShimPath) {
     $info.Path = $ShimPath -replace 'shim$', 'exe'
     $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
     $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
-    $altShims = Get-Item -Path "$ShimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
+    # -LiteralPath, shim names may contain wildcards (#6592)
+    $altShims = Get-ChildItem -LiteralPath (Split-Path $ShimPath -Parent) -File |
+        Where-Object { $_.BaseName -eq $info.Name -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
     if ($altShims) {
         $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
     }

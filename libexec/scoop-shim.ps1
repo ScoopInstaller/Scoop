@@ -178,10 +178,11 @@ switch ($SubCommand) {
                 '', '.shim', '.cmd', '.ps1' | ForEach-Object {
                     $oldShimPath = "$pathNoExt$_"
                     $newShimPath = "$oldShimPath.$newApp"
-                    if (Test-Path -Path $oldShimPath -PathType Leaf) {
-                        Rename-Item -Path $oldShimPath -NewName "$oldShimPath.$($shimInfo.Source)" -Force
-                        if (Test-Path -Path $newShimPath -PathType Leaf) {
-                            Rename-Item -Path $newShimPath -NewName $oldShimPath -Force
+                    # -LiteralPath, shim names may contain wildcards (#6592)
+                    if (Test-Path -LiteralPath $oldShimPath -PathType Leaf) {
+                        Rename-Item -LiteralPath $oldShimPath -NewName "$oldShimPath.$($shimInfo.Source)" -Force
+                        if (Test-Path -LiteralPath $newShimPath -PathType Leaf) {
+                            Rename-Item -LiteralPath $newShimPath -NewName $oldShimPath -Force
                         }
                     }
                 }
