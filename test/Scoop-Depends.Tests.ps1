@@ -10,19 +10,19 @@ BeforeAll {
 Describe 'Package Dependencies' -Tag 'Scoop' {
     Context 'Requirement function' {
         It 'Test 7zip requirement' {
-            Test-7zipRequirement -Uri 'test.xz' | Should -BeTrue
-            Test-7zipRequirement -Uri 'test.bin' | Should -BeFalse
-            Test-7zipRequirement -Uri @('test.xz', 'test.bin') | Should -BeTrue
+            Test-7zipRequirement -Uri 'test.xz' | Should-BeTrue
+            Test-7zipRequirement -Uri 'test.bin' | Should-BeFalse
+            Test-7zipRequirement -Uri @('test.xz', 'test.bin') | Should-BeTrue
         }
         It 'Test lessmsi requirement' {
             Mock get_config { $true }
-            Test-LessmsiRequirement -Uri 'test.msi' | Should -BeTrue
-            Test-LessmsiRequirement -Uri 'test.bin' | Should -BeFalse
-            Test-LessmsiRequirement -Uri @('test.msi', 'test.bin') | Should -BeTrue
+            Test-LessmsiRequirement -Uri 'test.msi' | Should-BeTrue
+            Test-LessmsiRequirement -Uri 'test.bin' | Should-BeFalse
+            Test-LessmsiRequirement -Uri @('test.msi', 'test.bin') | Should-BeTrue
         }
         It 'Allow $Uri be $null' {
-            Test-7zipRequirement -Uri $null | Should -BeFalse
-            Test-LessmsiRequirement -Uri $null | Should -BeFalse
+            Test-7zipRequirement -Uri $null | Should-BeFalse
+            Test-LessmsiRequirement -Uri $null | Should-BeFalse
         }
     }
 
@@ -35,29 +35,29 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
         }
         It 'Get helpers from URL' {
             Mock get_config { $true }
-            Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should -Be @('lessmsi')
+            Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should-BeCollection @('lessmsi')
         }
         It 'Get helpers from script' {
             Mock get_config { $false }
-            Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should -Be @('7zip')
+            Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should-BeCollection @('7zip')
         }
         It 'Helpers reflect config changes' {
             Mock get_config { $false } -ParameterFilter { $name -eq 'USE_LESSMSI' }
             Mock get_config { $true } -ParameterFilter { $name -eq 'USE_EXTERNAL_7ZIP' }
-            Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should -BeNullOrEmpty
-            Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should -BeNullOrEmpty
+            Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should-BeNull
+            Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should-BeNull
         }
         It 'Not return installed helpers' {
             Mock get_config { $true } -ParameterFilter { $name -eq 'USE_LESSMSI' }
             Mock get_config { $false } -ParameterFilter { $name -eq 'USE_EXTERNAL_7ZIP' }
             Mock Test-HelperInstalled { $true }-ParameterFilter { $Helper -eq '7zip' }
             Mock Test-HelperInstalled { $false }-ParameterFilter { $Helper -eq 'Lessmsi' }
-            Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should -Be @('lessmsi')
-            Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should -BeNullOrEmpty
+            Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should-BeCollection @('lessmsi')
+            Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should-BeNull
             Mock Test-HelperInstalled { $false }-ParameterFilter { $Helper -eq '7zip' }
             Mock Test-HelperInstalled { $true }-ParameterFilter { $Helper -eq 'Lessmsi' }
-            Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should -BeNullOrEmpty
-            Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should -Be @('7zip')
+            Get-InstallationHelper -Manifest $manifest1 -Architecture '32bit' | Should-BeNull
+            Get-InstallationHelper -Manifest $manifest2 -Architecture '32bit' | Should-BeCollection @('7zip')
         }
     }
 
@@ -73,23 +73,33 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
 
         It 'Resolve install dependencies' {
             Mock Get-Manifest { 'test', @{ url = 'test.7z' }, $null, $null }
-            Get-Dependency -AppName 'test' -Architecture '32bit' | Should -Be @('lessmsi', '7zip', 'test')
+            $deps = Get-Dependency -AppName 'test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 3
+            $deps | Should-ContainCollection @('lessmsi', '7zip', 'test')
             Mock Get-Manifest { 'test', @{ innosetup = $true }, $null, $null }
-            Get-Dependency -AppName 'test' -Architecture '32bit' | Should -Be @('innounp', 'test')
+            $deps = Get-Dependency -AppName 'test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 2
+            $deps | Should-ContainCollection @('innounp', 'test')
         }
         It 'Resolve script dependencies' {
             Mock Get-Manifest { 'test', @{ pre_install = 'Expand-7zipArchive ' }, $null, $null }
-            Get-Dependency -AppName 'test' -Architecture '32bit' | Should -Be @('lessmsi', '7zip', 'test')
+            $deps = Get-Dependency -AppName 'test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 3
+            $deps | Should-ContainCollection @('lessmsi', '7zip', 'test')
         }
         It 'Resolve runtime dependencies' {
             Mock Get-Manifest { 'depends', @{}, $null, $null } -ParameterFilter { $app -eq 'depends' }
             Mock Get-Manifest { 'test', @{ depends = 'depends' }, $null, $null }
-            Get-Dependency -AppName 'test' -Architecture '32bit' | Should -Be @('depends', 'test')
+            $deps = Get-Dependency -AppName 'test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 2
+            $deps | Should-ContainCollection @('depends', 'test')
         }
         It 'Keep bucket name of app' {
             Mock Get-Manifest { 'depends', @{}, 'anotherbucket', $null } -ParameterFilter { $app -eq 'anotherbucket/depends' }
             Mock Get-Manifest { 'test', @{ depends = 'anotherbucket/depends' }, 'bucket', $null }
-            Get-Dependency -AppName 'bucket/test' -Architecture '32bit' | Should -Be @('anotherbucket/depends', 'bucket/test')
+            $deps = Get-Dependency -AppName 'bucket/test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 2
+            $deps | Should-ContainCollection @('anotherbucket/depends', 'bucket/test')
         }
     }
 }
