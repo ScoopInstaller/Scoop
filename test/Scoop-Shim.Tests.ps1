@@ -100,17 +100,46 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
     }
 }
 
+Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
+    BeforeEach {
+        Mock -CommandName warn
+    }
+
+    It 'returns the body matching the machine architecture' {
+        $arch = switch (Get-SystemArchitecture) {
+            'arm64' { 'arm64' }
+            '64bit' { 'x64' }
+            '32bit' { 'x86' }
+        }
+        Get-ShimExe | Should-BeLikeString "*\supporting\shims\$arch\shim.exe"
+    }
+
+    It 'bundles a body for every architecture' {
+        'x64', 'x86', 'arm64' | ForEach-Object {
+            Test-Path -LiteralPath (Join-Path $PSScriptRoot "..\supporting\shims\$_\shim.exe") | Should-Be $true
+        }
+    }
+
+    It 'warns and falls back to the bundled shim for an unknown value' {
+        Mock -CommandName get_config -MockWith { 'cs' } -ParameterFilter { $Name -eq 'SHIM' }
+        Get-ShimExe | Should-BeLikeString '*\supporting\shims\*\shim.exe'
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*Unknown shim 'cs'*" }
+    }
+
+    It 'does not warn for the bundled shim' {
+        Mock -CommandName get_config -MockWith { 'default' } -ParameterFilter { $Name -eq 'SHIM' }
+        $null = Get-ShimExe
+        Should-Invoke -CommandName warn -Times 0
+    }
+}
+
 Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     It 'returns machine type for a valid PE file' {
         $shim_path = Get-ShimExe
-        if ($shim_path -and (Test-Path $shim_path)) {
-            $machine = Get-PEMachine $shim_path
-            # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
-            # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
-            @(0x014c, 0x8664, 0xAA64) | Should-ContainCollection $machine
-        } else {
-            Set-ItResult -Skipped -Because 'shim exe not found'
-        }
+        $machine = Get-PEMachine $shim_path
+        # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
+        # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
+        @(0x014c, 0x8664, 0xAA64) | Should-ContainCollection $machine
     }
 
     It 'returns 0 for a non-existent file' {
@@ -126,9 +155,8 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
 Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $shimdir = shimdir
-        # CI checkouts have no installed scoop version dir, so point at the bundled shim.exe
-        $repo_shim = Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe'
-        Mock -CommandName Get-ShimExe -MockWith { $repo_shim }
+        # Bundled bodies are all x64, so report x86 to actually exercise the rewrite branch
+        Mock -CommandName Get-PEMachine -MockWith { 0x014c }
     }
 
     It 'rewrites System32 to Sysnative in the shim file when the shim exe is x86 on x64 OS' {

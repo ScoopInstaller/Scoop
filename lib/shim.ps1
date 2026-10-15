@@ -301,15 +301,19 @@ function New-Shim($Path, $Global, $Name, $Arg) {
 }
 
 function Get-ShimExe() {
-    $shim_version = get_config SHIM 'kiennq'
-    $shim_path = switch ($shim_version) {
-        'scoopcs' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
-        '71' { "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe" }
-        'kiennq' { "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe" }
-        'default' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
-        default { warn "Unknown shim version: '$shim_version'" }
+    $shim = get_config SHIM 'default'
+    if ($shim -ne 'default') {
+        warn "Unknown shim '$shim' - using the bundled one."
     }
-    return $shim_path
+    $system = Get-SystemArchitecture
+    # exactly three architectures are vendored, and guessing one would silently produce a broken shim
+    $architecture = switch ($system) {
+        'arm64' { 'arm64' }
+        '64bit' { 'x64' }
+        '32bit' { 'x86' }
+        default { abort "Cannot tell which shim architecture to use (system reports '$system')." }
+    }
+    "$(versiondir 'scoop' 'current')\supporting\shims\$architecture\shim.exe"
 }
 
 # get target, name, arguments for shim
@@ -351,7 +355,7 @@ function Remove-Shim($Name, $ShimDir, $App) {
             Remove-Item -LiteralPath $shimPath
             # a wildcard cannot be combined with -LiteralPath, so the alternatives are listed and filtered
             $oldShims = Get-ChildItem -LiteralPath $ShimDir -File |
-                Where-Object { $_.BaseName -eq $name -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
+                Where-Object { $_.BaseName -eq $Name -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
             if ($null -eq $oldShims) {
                 if ($_ -eq '.shim') {
                     Write-Output "Removing shim '$Name.exe'."
