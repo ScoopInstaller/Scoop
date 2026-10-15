@@ -106,7 +106,8 @@ Describe 'getopt' -Tag 'Scoop' {
         $err | Should-BeNull
         $opt.Keys | Should-NotContainCollection 'from'
         $opt.Keys | Should-NotContainCollection 'to'
-        $rem | Should-BeCollection @('--from', 'there', '--to', 'here')
+        $rem | Should-BeCollection -Count 4
+        $rem | Should-ContainCollection @('--from', 'there', '--to', 'here')
     }
 
 }

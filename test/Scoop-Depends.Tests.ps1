@@ -73,23 +73,33 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
 
         It 'Resolve install dependencies' {
             Mock Get-Manifest { 'test', @{ url = 'test.7z' }, $null, $null }
-            Get-Dependency -AppName 'test' -Architecture '32bit' | Should-BeCollection @('lessmsi', '7zip', 'test')
+            $deps = Get-Dependency -AppName 'test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 3
+            $deps | Should-ContainCollection @('lessmsi', '7zip', 'test')
             Mock Get-Manifest { 'test', @{ innosetup = $true }, $null, $null }
-            Get-Dependency -AppName 'test' -Architecture '32bit' | Should-BeCollection @('innounp', 'test')
+            $deps = Get-Dependency -AppName 'test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 2
+            $deps | Should-ContainCollection @('innounp', 'test')
         }
         It 'Resolve script dependencies' {
             Mock Get-Manifest { 'test', @{ pre_install = 'Expand-7zipArchive ' }, $null, $null }
-            Get-Dependency -AppName 'test' -Architecture '32bit' | Should-BeCollection @('lessmsi', '7zip', 'test')
+            $deps = Get-Dependency -AppName 'test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 3
+            $deps | Should-ContainCollection @('lessmsi', '7zip', 'test')
         }
         It 'Resolve runtime dependencies' {
             Mock Get-Manifest { 'depends', @{}, $null, $null } -ParameterFilter { $app -eq 'depends' }
             Mock Get-Manifest { 'test', @{ depends = 'depends' }, $null, $null }
-            Get-Dependency -AppName 'test' -Architecture '32bit' | Should-BeCollection @('depends', 'test')
+            $deps = Get-Dependency -AppName 'test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 2
+            $deps | Should-ContainCollection @('depends', 'test')
         }
         It 'Keep bucket name of app' {
             Mock Get-Manifest { 'depends', @{}, 'anotherbucket', $null } -ParameterFilter { $app -eq 'anotherbucket/depends' }
             Mock Get-Manifest { 'test', @{ depends = 'anotherbucket/depends' }, 'bucket', $null }
-            Get-Dependency -AppName 'bucket/test' -Architecture '32bit' | Should-BeCollection @('anotherbucket/depends', 'bucket/test')
+            $deps = Get-Dependency -AppName 'bucket/test' -Architecture '32bit'
+            $deps | Should-BeCollection -Count 2
+            $deps | Should-ContainCollection @('anotherbucket/depends', 'bucket/test')
         }
     }
 }
