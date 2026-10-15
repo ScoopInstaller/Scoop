@@ -62,7 +62,7 @@ function write_md_line($line, $color, $pattern) {
             '^`'      { "$($ansi.Green)$($t.Trim('`'))$($ansi.Reset)" }
             '^\*\*'   { "$($ansi.White)$($t.Trim('*'))$($ansi.Reset)" }
             '^!\['    { $l = $t -replace '^!\[([^\]]*)\]\([^)]*\)$', '$1'; "$($ansi.DarkGray)$l$($ansi.Reset)" }
-            '^\['     { $l = $t -replace '^\[([^\]]+)\]\([^)]+\)$', '$1'; "$($ansi.Cyan)$l$($ansi.Reset)" }
+            '^\['     { $l = $t -replace '^\[([^\]]+)\]\(([^)]+)\)$', '$1 ($2)'; "$($ansi.Cyan)$l$($ansi.Reset)" }
             '^https?' { "$($ansi.Cyan)$t$($ansi.Reset)" }
             '^<'      { '' }
             default   { "$($ansi[$color])$($t.Trim('*'))$($ansi.Reset)" }
