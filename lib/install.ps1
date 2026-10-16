@@ -56,7 +56,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
-    create_shims $manifest $dir $global $architecture
+    New-ShimFromManifest $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
     env_add_path $manifest $dir $global $architecture

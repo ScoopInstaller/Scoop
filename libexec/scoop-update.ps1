@@ -150,7 +150,7 @@ function Sync-Scoop {
         }
     }
 
-    shim "$currentdir\bin\scoop.ps1" $false
+    New-Shim "$currentdir\bin\scoop.ps1" $false
 }
 
 function Sync-Bucket {
@@ -353,7 +353,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
 
     Write-Host "Uninstalling '$app' ($old_version)"
     Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-    rm_shims $app $old_manifest $global $architecture
+    Remove-ShimFromManifest $app $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
