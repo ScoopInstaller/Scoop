@@ -354,14 +354,13 @@ function Set-ShimCopy($Exe, $Global, $Names) {
     $shims | ForEach-Object {
         $dest = "$shimDir\$($_.BaseName).exe"
         if (!(Test-Path -LiteralPath $dest)) { return }
-        # a running shim holds its own image, and killing it would take its child processes down too
-        if (isFileLocked $dest) {
+        $wasX86 = (Get-PEMachine $dest) -eq 0x014c
+        try {
+            Copy-Item -LiteralPath $Exe -Destination $dest -Force -ErrorAction Stop
+        } catch {
             $skipped += $_.BaseName
             return
         }
-
-        $wasX86 = (Get-PEMachine $dest) -eq 0x014c
-        Copy-Item -LiteralPath $Exe -Destination $dest -Force
         if ($rewritePaths -and $wasX86 -and !$newIsX86) {
             $lines = @(Get-Content -LiteralPath $_.FullName -Encoding UTF8)
             if ($lines[0] -like "*$sysnative\*") {

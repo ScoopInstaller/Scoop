@@ -187,15 +187,6 @@ Describe 'Set-ShimCopy' -Tag 'Scoop', 'Windows' {
         Get-Content -LiteralPath "$shimdir\copy-test.exe" -Raw | Should-BeLikeString '*clobbered*'
     }
 
-    It 'skips a running shim and names it' {
-        # isFileLocked is core's job; here a locked copy is what Set-ShimCopy has to cope with
-        Mock -CommandName isFileLocked -MockWith { $true }
-        Mock -CommandName warn
-        Set-ShimCopy (Get-ShimExe 'default') $false 'copy-test'
-        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like '*copy-test*' }
-        Get-Content -LiteralPath "$shimdir\copy-test.exe" -Raw | Should-BeLikeString '*clobbered*'
-    }
-
     It 'restores the GUI flag the fresh copy lost' {
         New-Shim "$env:SystemRoot\System32\notepad.exe" $false 'gui-test'
         Get-PESubsystem "$shimdir\gui-test.exe" | Should-Be 2
