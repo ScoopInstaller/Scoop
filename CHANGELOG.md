@@ -1,5 +1,9 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
 
+### Features
+
+- **shim:** Rework the shim system around architecture-native bodies ([#6783](https://github.com/ScoopInstaller/Scoop/issues/6783))
+
 ### Bug Fixes
 
 - **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
