@@ -347,8 +347,6 @@ function Set-ShimCopy($Exe, $Global, $Names) {
 
     $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
     $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
-    $syswow = [System.IO.Path]::Combine($env:SystemRoot, 'SysWOW64')
-    # an x86 body resolves System32 as a 32-bit program, so a saved path only holds while the body's architecture does
     $newIsX86 = (Get-PEMachine $Exe) -eq 0x014c
     $rewritePaths = [System.Environment]::Is64BitOperatingSystem
 
@@ -362,24 +360,15 @@ function Set-ShimCopy($Exe, $Global, $Names) {
             return
         }
 
-        $shimFile = $_.FullName
-        if ($rewritePaths -and (((Get-PEMachine $dest) -eq 0x014c) -ne $newIsX86)) {
-            $lines = @(Get-Content -LiteralPath $shimFile)
-            $rewrote = $false
-            if ($lines[0] -like "*$sysnative\*" -and !$newIsX86) {
-                $lines[0] = $lines[0].Replace($sysnative, $sysdir)
-                $rewrote = $true
-            } elseif ($newIsX86 -and $lines[0] -like "*$sysdir\*") {
-                $lines[0] = $lines[0].Replace($sysdir, $sysnative)
-                $rewrote = $true
-            } elseif ($newIsX86 -and $lines[0] -like "*$syswow\*") {
-                $lines[0] = $lines[0].Replace($syswow, $sysdir)
-                $rewrote = $true
-            }
-            # args = ... has to survive, and only the first line moves
-            if ($rewrote) { ($lines -join "`r`n") | Out-UTF8File -FilePath $shimFile -NoNewline }
-        }
+        $wasX86 = (Get-PEMachine $dest) -eq 0x014c
         Copy-Item -LiteralPath $Exe -Destination $dest -Force
+        if ($rewritePaths -and $wasX86 -and !$newIsX86) {
+            $lines = @(Get-Content -LiteralPath $_.FullName -Encoding UTF8)
+            if ($lines[0] -like "*$sysnative\*") {
+                $lines[0] = $lines[0].Replace($sysnative, $sysdir)
+                ($lines -join "`r`n") | Out-UTF8File -FilePath $_.FullName -NoNewline
+            }
+        }
         # the fresh copy lost the GUI flag the target needs
         if ((Get-PESubsystem (Get-ShimTarget $_.FullName)) -eq 2) {
             Set-PESubsystem $dest 2 | Out-Null
