@@ -77,6 +77,8 @@ function Sync-Scoop {
 
     Write-Host 'Updating Scoop...'
     $currentdir = versiondir 'scoop' 'current'
+    # a re-clone replaces the tree outright, leaving no old body to compare against
+    $oldShimHash = (Get-FileHash -LiteralPath (Get-ShimExe) -EA SilentlyContinue).Hash
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
         $olddir = "$currentdir\..\old"
@@ -151,6 +153,13 @@ function Sync-Scoop {
     }
 
     New-Shim "$currentdir\bin\scoop.ps1" $false
+
+    $shimExe = Get-ShimExe
+    # a new body, or a tree that was replaced wholesale, left every existing copy on the old one
+    if (!$oldShimHash -or $oldShimHash -ne (Get-FileHash -LiteralPath $shimExe).Hash) {
+        Set-ShimCopy $shimExe $false
+        if (is_admin) { Set-ShimCopy $shimExe $true }
+    }
 }
 
 function Sync-Bucket {
