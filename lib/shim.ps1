@@ -409,9 +409,10 @@ function Remove-Shim($Name, $ShimDir, $App) {
         } elseif (Test-Path -LiteralPath $shimPath -PathType Leaf) {
             Write-Output "Removing shim '$Name$_'."
             Remove-Item -LiteralPath $shimPath
-            # a wildcard cannot be combined with -LiteralPath, so the alternatives are listed and filtered
+            # a wildcard cannot be combined with -LiteralPath, so the alternatives are listed and filtered.
+            # .BaseName drops only the last extension, so the shim's own variants need excluding
             $oldShims = Get-ChildItem -LiteralPath $ShimDir -File |
-                Where-Object { $_.BaseName -eq $Name -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
+                Where-Object { $_.BaseName -eq (fname $shimPath) -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
             if ($null -eq $oldShims) {
                 # a shim set without an exe is what a mixed-arch manifest or an interrupted uninstall leaves
                 if ($_ -eq '.shim' -and (Test-Path -LiteralPath "$ShimDir\$Name.exe")) {
@@ -444,7 +445,7 @@ function Get-ShimInfo($ShimPath) {
     $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
     # -LiteralPath, shim names may contain wildcards (#6592)
     $altShims = Get-ChildItem -LiteralPath (Split-Path $ShimPath -Parent) -File |
-        Where-Object { $_.BaseName -eq $info.Name -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
+        Where-Object { $_.BaseName -eq (fname $ShimPath) }
     if ($altShims) {
         $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
     }

@@ -274,6 +274,34 @@ Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
         [bool]($removed -match 'gone\.exe') | Should-BeFalse
         Get-ChildItem $dir | Should-BeCollection -Count 0
     }
+
+    It 'brings back the version it took over' {
+        # two apps shim the same name; Rename-ShimOnConflict kept the first one as a backup
+        $dir = "$working_dir\alt"
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        'second' | Out-File "$dir\dupe.shim" -NoNewline
+        'second' | Out-File "$dir\dupe.cmd" -NoNewline
+        'first' | Out-File "$dir\dupe.shim.first" -NoNewline
+        'first' | Out-File "$dir\dupe.cmd.first" -NoNewline
+
+        Remove-Shim 'dupe' $dir | Out-Null
+
+        # the exe is not per-app, so it is left alone; the backup becomes the default again
+        [IO.File]::ReadAllText("$dir\dupe.shim") | Should-Be 'first'
+        [IO.File]::ReadAllText("$dir\dupe.cmd") | Should-Be 'first'
+    }
+
+    It 'does not mistake the exe for a saved alternative' {
+        # the exe has no app of its own, so it is a copy to remove, not a version to restore
+        $dir = "$working_dir\no-alt"
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        'x' | Out-File "$dir\dupe.shim" -NoNewline
+        'x' | Out-File "$dir\dupe.exe" -NoNewline
+
+        Remove-Shim 'dupe' $dir | Out-Null
+
+        Get-ChildItem $dir | Should-BeCollection -Count 0
+    }
 }
 
 Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
