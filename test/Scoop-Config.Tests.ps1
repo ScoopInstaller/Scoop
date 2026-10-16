@@ -17,6 +17,15 @@ Describe 'config' -Tag 'Scoop' {
         load_cfg $configFile | Should-Be $null
     }
 
+    It 'leaves shims alone when shim_auto_refresh is off' {
+        Mock -CommandName get_config -MockWith { $false } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
+        Mock -CommandName info
+
+        Complete-ConfigChange -Name shim -Value 'scoop-shim-cs'
+
+        Should-Invoke -CommandName info -Times 1 -ParameterFilter { $msg -like "*scoop shim update*" }
+    }
+
     It 'set_config should be able to save typed values correctly' {
         # number
         $scoopConfig = set_config 'one' 1
