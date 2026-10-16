@@ -2,9 +2,9 @@
 # Summary: Locate a shim/executable (similar to 'which' on Linux)
 # Help: Locate the path to a shim/executable that was installed with Scoop (similar to 'which' on Linux)
 
-. "$PSScriptRoot\..\lib\shim.ps1"
-
 param($command)
+
+. "$PSScriptRoot\..\lib\shim.ps1"
 
 if (!$command) {
     error '<command> missing'
