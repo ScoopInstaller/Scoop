@@ -300,10 +300,26 @@ function New-Shim($Path, $Global, $Name, $Arg) {
     }
 }
 
-function Get-ShimExe() {
-    $shim = get_config SHIM 'default'
-    if ($shim -ne 'default') {
-        warn "Unknown shim '$shim' - using the bundled one."
+function Get-ShimExe($Shim) {
+    if (!$Shim) { $Shim = get_config SHIM 'default' }
+    if ($Shim -ne 'default') {
+        # a shim package provides its body as shim.exe next to the app it shims
+        $exe = "$(versiondir $Shim 'current')\shim.exe"
+        if (Test-Path -LiteralPath $exe -PathType Leaf) { return $exe }
+        warn "'$Shim' does not provide a shim - falling back to the bundled one."
+        # TODO: delete this region six months after it ships. 'shim' used to name one of the
+        # three lanes bundled in the tree, and those lanes ship as packages now.
+        #region shim lanes that are no longer bundled
+        $lanes = @{
+            '71'      = 'scoop-shim-cpp'
+            'kiennq'  = 'scoop-shim-cpp'
+            'scoopcs' = 'scoop-shim-cs'
+        }
+        if ($lanes.ContainsKey($Shim)) {
+            warn "You could use '$($lanes[$Shim])' instead; 'scoop install $($lanes[$Shim])', then 'scoop config shim $($lanes[$Shim])'."
+        }
+        #endregion shim lanes that are no longer bundled
+        $Shim = 'default'
     }
     $system = Get-SystemArchitecture
     # exactly three architectures are vendored, and guessing one would silently produce a broken shim
