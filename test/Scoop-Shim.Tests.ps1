@@ -280,7 +280,8 @@ Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
     It 'marks a shim hidden when nothing resolves its name' {
         # the command is gone when an app was uninstalled without its shim; that must not throw (#6206)
         $shimPath = "$working_dir\gone.shim"
-        'path = "C:\nonexistent\gone.exe"' | Out-File $shimPath -Encoding utf8NoBOM
+        # utf8NoBOM is PowerShell 6+, and CI runs 5.1 too
+        [IO.File]::WriteAllText($shimPath, 'path = "C:\nonexistent\gone.exe"')
 
         (Get-ShimInfo $shimPath).IsHidden | Should-BeTrue
     }
