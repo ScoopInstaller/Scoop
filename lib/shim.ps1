@@ -445,7 +445,8 @@ function Get-ShimInfo($ShimPath) {
         $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
     }
     $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
-    $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
+    # the command is gone if the app was uninstalled without its shim; that is not an error (#6206)
+    $info.IsHidden = !((Get-Command -Name $info.Name -ErrorAction 'Ignore').Path -eq $info.Path)
     [PSCustomObject]$info
 }
 

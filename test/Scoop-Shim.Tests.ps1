@@ -183,7 +183,7 @@ Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
 }
 
 Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
-    It 'calls a shim hidden when nothing resolves its name' {
+    It 'marks a shim hidden when nothing resolves its name' {
         # the command is gone when an app was uninstalled without its shim; that must not throw (#6206)
         $shimPath = "$working_dir\gone.shim"
         'path = "C:\nonexistent\gone.exe"' | Out-File $shimPath -Encoding utf8NoBOM
