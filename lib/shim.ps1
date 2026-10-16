@@ -410,7 +410,8 @@ function Remove-Shim($Name, $ShimDir, $App) {
             $oldShims = Get-ChildItem -LiteralPath $ShimDir -File |
                 Where-Object { $_.BaseName -eq $Name -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
             if ($null -eq $oldShims) {
-                if ($_ -eq '.shim') {
+                # a shim set without an exe is what a mixed-arch manifest or an interrupted uninstall leaves
+                if ($_ -eq '.shim' -and (Test-Path -LiteralPath "$ShimDir\$Name.exe")) {
                     Write-Output "Removing shim '$Name.exe'."
                     Remove-Item -LiteralPath "$ShimDir\$Name.exe"
                 }
