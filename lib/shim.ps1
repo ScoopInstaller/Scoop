@@ -316,6 +316,43 @@ function Get-ShimExe() {
     "$(versiondir 'scoop' 'current')\supporting\shims\$architecture\shim.exe"
 }
 
+function Set-ShimCopy($Exe, $Global, $Names) {
+    $shimDir = shimdir $Global
+    if (!(Test-Path $Exe) -or !(Test-Path $shimDir)) { return }
+
+    $shims = Get-ChildItem $shimDir -Filter '*.shim' -ErrorAction SilentlyContinue
+    if ($Names) {
+        $shims = $shims | Where-Object { $_.BaseName -in $Names }
+    }
+
+    $scope = if ($Global) { ' (global)' } else { '' }
+    Write-Host "Updating shim(s)$scope$(if ($Names) { " for $($Names -join ', ')" })... " -NoNewline
+
+    $skipped = @()
+    $shims | ForEach-Object {
+        # -LiteralPath, shim names may contain wildcards (#6592)
+        $dest = "$shimDir\$($_.BaseName).exe"
+        if (!(Test-Path -LiteralPath $dest)) { return }
+        # a running shim holds its own image, and killing it would take its child processes down too
+        if (isFileLocked $dest) {
+            $skipped += $_.BaseName
+            return
+        }
+
+        Copy-Item -LiteralPath $Exe -Destination $dest -Force
+        # the fresh copy lost the GUI flag the target needs
+        if ((Get-PESubsystem (Get-ShimTarget $_.FullName)) -eq 2) {
+            Set-PESubsystem $dest 2 | Out-Null
+        }
+    }
+
+    Write-Host 'Done.' -ForegroundColor Green
+    if ($skipped) {
+        warn "Skipped $($skipped.Count) running shim(s): $($skipped -join ', ')"
+        info "Run 'scoop shim update <app(s)>' again once they have exited."
+    }
+}
+
 # get target, name, arguments for shim
 function Get-ShimDefinition($Item) {
     if ($Item -is [array]) { return $Item }
