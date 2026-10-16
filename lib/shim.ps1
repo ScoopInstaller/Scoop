@@ -90,7 +90,6 @@ function Get-AppNameFromShim($Shim) {
 
 function Get-ShimTarget($ShimPath) {
     if ($ShimPath) {
-        # -LiteralPath, shim names may contain wildcards (#6592)
         $shimTarget = if ($ShimPath.EndsWith('.shim')) {
             (Get-Content -LiteralPath $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
         } else {
@@ -99,9 +98,10 @@ function Get-ShimTarget($ShimPath) {
         if (!$shimTarget) {
             $shimTarget = ((Select-String -LiteralPath $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
         }
-        $shimTargetConverted = $shimTarget | Convert-Path -ErrorAction SilentlyContinue
+        # Convert-Path binds it strictly, so the empty case the pipeline form swallowed is screened out
+        $shimTargetConverted = if ($shimTarget) { Convert-Path -LiteralPath $shimTarget -ErrorAction SilentlyContinue }
         if (!$shimTargetConverted -and $shimTarget -and $shimTarget.Contains('\Sysnative\')) {
-            $shimTarget.Replace('\Sysnative\', '\System32\') | Convert-Path -ErrorAction SilentlyContinue
+            Convert-Path -LiteralPath $shimTarget.Replace('\Sysnative\', '\System32\') -ErrorAction SilentlyContinue
         } else {
             return $shimTargetConverted
         }
@@ -109,7 +109,6 @@ function Get-ShimTarget($ShimPath) {
 }
 
 function Rename-ShimOnConflict($Shim, $Path) {
-    # -LiteralPath, shim names may contain wildcards (#6592)
     if (!(Test-Path -LiteralPath $Shim)) {
         return
     }
@@ -129,7 +128,6 @@ function Rename-ShimOnConflict($Shim, $Path) {
 }
 
 function New-Shim($Path, $Global, $Name, $Arg) {
-    # -LiteralPath, shim names and targets may contain wildcards (#6592)
     if (!(Test-Path -LiteralPath $Path)) { abort "Can't shim '$(fname $Path)': couldn't find '$Path'." }
     $abs_shimdir = ensure (shimdir $Global)
     Add-Path -Path $abs_shimdir -Global:$Global
@@ -335,7 +333,6 @@ function Get-ShimExe($Shim) {
 
 function Set-ShimCopy($Exe, $Global, $Names) {
     $shimDir = shimdir $Global
-    # -LiteralPath, shim names may contain wildcards (#6592)
     if (!(Test-Path -LiteralPath $Exe) -or !(Test-Path -LiteralPath $shimDir)) { return }
 
     $shims = Get-ChildItem $shimDir -Filter '*.shim' -ErrorAction SilentlyContinue
@@ -348,7 +345,6 @@ function Set-ShimCopy($Exe, $Global, $Names) {
 
     $skipped = @()
     $shims | ForEach-Object {
-        # -LiteralPath, shim names may contain wildcards (#6592)
         $dest = "$shimDir\$($_.BaseName).exe"
         if (!(Test-Path -LiteralPath $dest)) { return }
         # a running shim holds its own image, and killing it would take its child processes down too
@@ -383,14 +379,14 @@ function New-ShimFromManifest($Manifest, $Dir, $Global, $Arch) {
         $target, $name, $arg = Get-ShimDefinition $_
         Write-Output "Creating shim for '$name'."
 
-        # -LiteralPath, bin targets may contain wildcards (#6592)
         if (Test-Path -LiteralPath "$Dir\$target" -PathType leaf) {
             $bin = "$Dir\$target"
         } elseif (Test-Path -LiteralPath $target -PathType leaf) {
             $bin = $target
         } else {
-            # a missing target must not throw out of Get-Command, the abort below speaks for it (#6777)
-            $bin = (Get-Command $target -CommandType Application -ErrorAction Ignore | Select-Object -First 1).Source
+            # a missing target must not throw out of Get-Command, the abort below speaks for it
+            # ExternalScript too: a dependency's .ps1 on PATH is a legitimate bin target
+            $bin = (Get-Command $target -CommandType Application, ExternalScript -ErrorAction Ignore | Select-Object -First 1).Source
         }
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
@@ -402,7 +398,6 @@ function Remove-Shim($Name, $ShimDir, $App) {
     '', '.shim', '.cmd', '.ps1' | ForEach-Object {
         $shimPath = "$ShimDir\$Name$_"
         $altShimPath = "$shimPath.$App"
-        # -LiteralPath, shim names may contain wildcards (#6592)
         if ($App -and (Test-Path -LiteralPath $altShimPath -PathType Leaf)) {
             Write-Output "Removing shim '$Name$_.$App'."
             Remove-Item -LiteralPath $altShimPath
@@ -410,7 +405,7 @@ function Remove-Shim($Name, $ShimDir, $App) {
             Write-Output "Removing shim '$Name$_'."
             Remove-Item -LiteralPath $shimPath
             # a wildcard cannot be combined with -LiteralPath, so the alternatives are listed and filtered.
-            # .BaseName drops only the last extension, so the shim's own variants need excluding
+            # .BaseName drops only the last extension, so foo.shim.appA and foo.shim both read as foo.shim
             $oldShims = Get-ChildItem -LiteralPath $ShimDir -File |
                 Where-Object { $_.BaseName -eq (fname $shimPath) -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
             if ($null -eq $oldShims) {
@@ -443,14 +438,13 @@ function Get-ShimInfo($ShimPath) {
     $info.Path = $ShimPath -replace 'shim$', 'exe'
     $info.Source = (Get-AppNameFromShim $ShimPath) -replace '^$', 'External'
     $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
-    # -LiteralPath, shim names may contain wildcards (#6592)
     $altShims = Get-ChildItem -LiteralPath (Split-Path $ShimPath -Parent) -File |
         Where-Object { $_.BaseName -eq (fname $ShimPath) }
     if ($altShims) {
         $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
     }
     $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
-    # the command is gone if the app was uninstalled without its shim; that is not an error (#6206)
+    # the command is gone if the app was uninstalled without its shim; that is not an error
     $info.IsHidden = !((Get-Command -Name $info.Name -ErrorAction 'Ignore').Path -eq $info.Path)
     [PSCustomObject]$info
 }

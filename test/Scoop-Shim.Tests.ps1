@@ -56,7 +56,7 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
     }
 
     It 'reads a shim file whose name contains a wildcard character' {
-        # -Path would read br[a]cket.shim as a character class and miss the file (#6592)
+        # -Path would read br[a]cket.shim as a character class and miss the file
         $p = "$working_dir\br[a]cket.shim"
         [IO.File]::WriteAllText($p, "path = `"$working_dir\mockapp\current\mockapp.exe`"")
 
@@ -263,7 +263,7 @@ Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
     }
 
     It 'does not report an exe it never had' {
-        # a shim set without an exe is what a mixed-arch manifest or an interrupted uninstall leaves (#6529)
+        # a shim set without an exe is what a mixed-arch manifest or an interrupted uninstall leaves
         $dir = "$working_dir\no-exe"
         New-Item -ItemType Directory -Force -Path $dir | Out-Null
         'x' | Out-File "$dir\gone" -NoNewline
@@ -306,7 +306,7 @@ Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
 
 Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
     It 'marks a shim hidden when nothing resolves its name' {
-        # the command is gone when an app was uninstalled without its shim; that must not throw (#6206)
+        # the command is gone when an app was uninstalled without its shim; that must not throw
         $shimPath = "$working_dir\gone.shim"
         # utf8NoBOM is PowerShell 6+, and CI runs 5.1 too
         [IO.File]::WriteAllText($shimPath, 'path = "C:\nonexistent\gone.exe"')
