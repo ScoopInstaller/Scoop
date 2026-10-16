@@ -345,28 +345,25 @@ function Set-ShimCopy($Exe, $Global, $Names) {
     $scope = if ($Global) { ' (global)' } else { '' }
     Write-Host "Updating shim(s)$scope$(if ($Names) { " for $($Names -join ', ')" })... " -NoNewline
 
-    $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
-    $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
-    $newIsX86 = (Get-PEMachine $Exe) -eq 0x014c
-    $rewritePaths = [System.Environment]::Is64BitOperatingSystem
-
     $skipped = @()
     $shims | ForEach-Object {
-        $dest = "$shimDir\$($_.BaseName).exe"
+        $name = $_.BaseName
+        $dest = "$shimDir\$name.exe"
         if (!(Test-Path -LiteralPath $dest)) { return }
-        $wasX86 = (Get-PEMachine $dest) -eq 0x014c
         try {
             Copy-Item -LiteralPath $Exe -Destination $dest -Force -ErrorAction Stop
         } catch {
-            $skipped += $_.BaseName
+            $skipped += $name
             return
         }
-        if ($rewritePaths -and $wasX86 -and !$newIsX86) {
-            $lines = @(Get-Content -LiteralPath $_.FullName -Encoding UTF8)
-            if ($lines[0] -like "*$sysnative\*") {
-                $lines[0] = $lines[0].Replace($sysnative, $sysdir)
-                ($lines -join "`r`n") | Out-UTF8File -FilePath $_.FullName -NoNewline
-            }
+        # Sysnative only resolves inside WOW64, so it is wrong on a 32-bit OS
+        # and for a body that is no longer x86 - a portable install can land on one
+        $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
+        $lines = @(Get-Content -LiteralPath $_.FullName -Encoding UTF8)
+        if ($lines[0] -like "*$sysnative\*" -and
+            (![System.Environment]::Is64BitOperatingSystem -or (Get-PEMachine $Exe) -ne 0x014c)) {
+            $lines[0] = $lines[0].Replace($sysnative, "$env:SystemRoot\System32")
+            ($lines -join "`r`n") | Out-UTF8File -FilePath $_.FullName -NoNewline
         }
         # the fresh copy lost the GUI flag the target needs
         if ((Get-PESubsystem (Get-ShimTarget $_.FullName)) -eq 2) {
