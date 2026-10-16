@@ -81,7 +81,7 @@ function Get-AppNameFromPath($Path) {
 }
 
 function Get-AppNameFromShim($Shim) {
-    if (!(Test-Path($Shim))) {
+    if (!(Test-Path -LiteralPath $Shim)) {
         return ''
     }
     $content = (Get-Content -LiteralPath $Shim -Encoding UTF8) -join ' '
@@ -110,7 +110,7 @@ function Get-ShimTarget($ShimPath) {
 
 function Rename-ShimOnConflict($Shim, $Path) {
     # -LiteralPath, shim names may contain wildcards (#6592)
-    if (!(Test-Path -LiteralPath )) {
+    if (!(Test-Path -LiteralPath $Shim)) {
         return
     }
     $shim_app = Get-AppNameFromShim $Shim
@@ -130,7 +130,7 @@ function Rename-ShimOnConflict($Shim, $Path) {
 
 function New-Shim($Path, $Global, $Name, $Arg) {
     # -LiteralPath, shim names and targets may contain wildcards (#6592)
-    if (!(Test-Path -LiteralPath $Path)) { abort "Can''t shim '$(fname $Path)': couldn't find '$Path'." }
+    if (!(Test-Path -LiteralPath $Path)) { abort "Can't shim '$(fname $Path)': couldn't find '$Path'." }
     $abs_shimdir = ensure (shimdir $Global)
     Add-Path -Path $abs_shimdir -Global:$Global
     if (!$Name) { $Name = strip_ext (fname $Path) }
@@ -334,7 +334,8 @@ function Get-ShimExe($Shim) {
 
 function Set-ShimCopy($Exe, $Global, $Names) {
     $shimDir = shimdir $Global
-    if (!(Test-Path $Exe) -or !(Test-Path $shimDir)) { return }
+    # -LiteralPath, shim names may contain wildcards (#6592)
+    if (!(Test-Path -LiteralPath $Exe) -or !(Test-Path -LiteralPath $shimDir)) { return }
 
     $shims = Get-ChildItem $shimDir -Filter '*.shim' -ErrorAction SilentlyContinue
     if ($Names) {
@@ -387,7 +388,8 @@ function New-ShimFromManifest($Manifest, $Dir, $Global, $Arch) {
         } elseif (Test-Path -LiteralPath $target -PathType leaf) {
             $bin = $target
         } else {
-            $bin = (Get-Command $target).Source
+            # a missing target must not throw out of Get-Command, the abort below speaks for it (#6777)
+            $bin = (Get-Command $target -CommandType Application -ErrorAction Ignore | Select-Object -First 1).Source
         }
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
