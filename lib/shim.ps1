@@ -329,7 +329,8 @@ function Get-ShimExe($Shim) {
         '32bit' { 'x86' }
         default { abort "Cannot tell which shim architecture to use (system reports '$system')." }
     }
-    "$(versiondir 'scoop' 'current')\supporting\shims\$architecture\shim.exe"
+    # this file lives in <root>\lib, so the bundled bodies are relative to the code, not to the install
+    "$PSScriptRoot\..\supporting\shims\$architecture\shim.exe"
 }
 
 function Set-ShimCopy($Exe, $Global, $Names) {
