@@ -10,85 +10,21 @@ BeforeAll {
     Add-Path $shimdir
 }
 
-Describe 'New-ShimFromManifest' -Tag 'Scoop', 'Windows' {
-    BeforeEach {
-        # abort exits the process, so it has to throw for the flow to stop
-        Mock -CommandName abort -MockWith { throw $msg }
+Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
+    It 'returns machine type for a valid PE file' {
+        $shim_path = Get-ShimExe
+        $machine = Get-PEMachine $shim_path
+        # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
+        # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
+        @(0x014c, 0x8664, 0xAA64) | Should-ContainCollection $machine
     }
 
-    It 'shims a target whose name contains a wildcard character' {
-        [IO.File]::WriteAllText("$working_dir\br[a]cket.exe", 'not a real binary')
-
-        New-ShimFromManifest @{ bin = @('br[a]cket.exe') } $working_dir $false '64bit'
-
-        Test-Path -LiteralPath "$shimdir\br[a]cket.exe" | Should-Be $true
+    It 'returns 0 for a non-existent file' {
+        Get-PEMachine 'C:\nonexistent\fake.exe' | Should-Be 0
     }
 
-    It 'names the manifest path instead of throwing a Get-Command error' {
-        { New-ShimFromManifest @{ bin = @('no-such-target.exe') } $working_dir $false '64bit' } |
-            Should-Throw "*Can't shim 'no-such-target.exe'*"
-    }
-
-    It 'names the target it could not find' {
-        { New-Shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
-    }
-
-    AfterEach {
-        Remove-Shim 'br[a]cket' $shimdir -ErrorAction SilentlyContinue
-    }
-}
-
-Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
-    It "links a file onto the user's path" {
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
-
-        New-Shim "$working_dir\shim-test.ps1" $false 'shim-test'
-        $null = & { Get-Command 'shim-test' -ea stop }
-        $null = & { Get-Command 'shim-test.ps1' -ea stop }
-        $null = & { Get-Command 'shim-test.cmd' -ea stop }
-        shim-test | Should-Be 'Hello, world!'
-    }
-
-    It 'shims a file with a quote in its path' {
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
-
-        New-Shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
-        $null = & { Get-Command 'shim-test' -ea stop }
-        shim-test | Should-Be 'Hello, world!'
-    }
-
-    AfterEach {
-        Remove-Shim 'shim-test' $shimdir
-    }
-}
-
-Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
-    It 'removes shim from path' {
-        New-Shim "$working_dir\shim-test.ps1" $false 'shim-test'
-
-        Remove-Shim 'shim-test' $shimdir
-
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
-    }
-
-    It 'does not report an exe it never had' {
-        # a shim set without an exe is what a mixed-arch manifest or an interrupted uninstall leaves (#6529)
-        $dir = "$working_dir\no-exe"
-        New-Item -ItemType Directory -Force -Path $dir | Out-Null
-        'x' | Out-File "$dir\gone" -NoNewline
-        'x' | Out-File "$dir\gone.shim" -NoNewline
-
-        $removed = Remove-Shim 'gone' $dir 'gone'
-
-        [bool]($removed -match 'gone\.exe') | Should-BeFalse
-        Get-ChildItem $dir | Should-BeCollection -Count 0
+    It 'returns 0 for a non-PE file' {
+        Get-PEMachine "$working_dir\shim-test.ps1" | Should-Be 0
     }
 }
 
@@ -114,7 +50,7 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
         Get-AppNameFromShim "$shim_path2" | Should-Be 'mockapp'
     }
 
-    It 'returns empty string if file exists and is not a shim' {
+    It 'returns empty string if file exists but is not a shim' {
         Write-Output 'lorem ipsum' | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
         Get-AppNameFromShim "$working_dir/mock-shim.ps1" | Should-Be ''
     }
@@ -136,6 +72,52 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
         }
         Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
         Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/moch-shim.ps1"
+    }
+}
+
+Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
+    It 'returns null for a shim file whose target is gone' {
+        $broken = "$working_dir\broken.cmd"
+        'echo hi' | Out-File $broken -Encoding ascii
+
+        Get-ShimTarget $broken | Should-BeNull
+    }
+}
+
+Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
+    BeforeEach {
+        # abort exits the process, so it has to throw for the flow to stop
+        Mock -CommandName abort -MockWith { throw $msg }
+    }
+
+    It "links a file onto the user's path" {
+        { Get-Command 'shim-test' -ea stop } | Should-Throw
+        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
+        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
+        { shim-test } | Should-Throw
+
+        New-Shim "$working_dir\shim-test.ps1" $false 'shim-test'
+        $null = & { Get-Command 'shim-test' -ea stop }
+        $null = & { Get-Command 'shim-test.ps1' -ea stop }
+        $null = & { Get-Command 'shim-test.cmd' -ea stop }
+        shim-test | Should-Be 'Hello, world!'
+    }
+
+    It 'shims a file with quote in path' {
+        { Get-Command 'shim-test' -ea stop } | Should-Throw
+        { shim-test } | Should-Throw
+
+        New-Shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
+        $null = & { Get-Command 'shim-test' -ea stop }
+        shim-test | Should-Be 'Hello, world!'
+    }
+
+    It 'names the target it could not find' {
+        { New-Shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
+    }
+
+    AfterEach {
+        Remove-Shim 'shim-test' $shimdir
     }
 }
 
@@ -182,16 +164,6 @@ Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
-    It 'marks a shim hidden when nothing resolves its name' {
-        # the command is gone when an app was uninstalled without its shim; that must not throw (#6206)
-        $shimPath = "$working_dir\gone.shim"
-        'path = "C:\nonexistent\gone.exe"' | Out-File $shimPath -Encoding utf8NoBOM
-
-        (Get-ShimInfo $shimPath).IsHidden | Should-BeTrue
-    }
-}
-
 Describe 'Set-ShimCopy' -Tag 'Scoop', 'Windows' {
     BeforeEach {
         # every case names its shims, so none of them sweeps the real shims directory
@@ -233,25 +205,89 @@ Describe 'Set-ShimCopy' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
-    It 'returns machine type for a valid PE file' {
-        $shim_path = Get-ShimExe
-        $machine = Get-PEMachine $shim_path
-        # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
-        # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
-        @(0x014c, 0x8664, 0xAA64) | Should-ContainCollection $machine
+Describe 'Get-ShimDefinition' -Tag 'Scoop' {
+    It 'should use strings correctly' {
+        $target, $name, $shimArgs = Get-ShimDefinition 'command.exe'
+        $target | Should-Be 'command.exe'
+        $name | Should-Be 'command'
+        $shimArgs | Should-BeNull
     }
 
-    It 'returns 0 for a non-existent file' {
-        Get-PEMachine 'C:\nonexistent\fake.exe' | Should-Be 0
-    }
+    It 'should expand the array correctly' {
+        $target, $name, $shimArgs = Get-ShimDefinition @('foo.exe', 'bar')
+        $target | Should-Be 'foo.exe'
+        $name | Should-Be 'bar'
+        $shimArgs | Should-BeNull
 
-    It 'returns 0 for a non-PE file' {
-        Get-PEMachine "$working_dir\shim-test.ps1" | Should-Be 0
+        $target, $name, $shimArgs = Get-ShimDefinition @('foo.exe', 'bar', '--test')
+        $target | Should-Be 'foo.exe'
+        $name | Should-Be 'bar'
+        $shimArgs | Should-Be '--test'
     }
 }
 
-Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
+Describe 'New-ShimFromManifest' -Tag 'Scoop', 'Windows' {
+    BeforeEach {
+        # abort exits the process, so it has to throw for the flow to stop
+        Mock -CommandName abort -MockWith { throw $msg }
+    }
+
+    It 'shims a target whose name contains a wildcard character' {
+        [IO.File]::WriteAllText("$working_dir\br[a]cket.exe", 'not a real binary')
+
+        New-ShimFromManifest @{ bin = @('br[a]cket.exe') } $working_dir $false '64bit'
+
+        Test-Path -LiteralPath "$shimdir\br[a]cket.exe" | Should-Be $true
+    }
+
+    It 'names the manifest path instead of throwing a Get-Command error' {
+        { New-ShimFromManifest @{ bin = @('no-such-target.exe') } $working_dir $false '64bit' } |
+            Should-Throw "*Can't shim 'no-such-target.exe'*"
+    }
+
+    AfterEach {
+        Remove-Shim 'br[a]cket' $shimdir -ErrorAction SilentlyContinue
+    }
+}
+
+Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
+    It 'removes shim from path' {
+        New-Shim "$working_dir\shim-test.ps1" $false 'shim-test'
+
+        Remove-Shim 'shim-test' $shimdir
+
+        { Get-Command 'shim-test' -ea stop } | Should-Throw
+        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
+        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
+        { shim-test } | Should-Throw
+    }
+
+    It 'does not report an exe it never had' {
+        # a shim set without an exe is what a mixed-arch manifest or an interrupted uninstall leaves (#6529)
+        $dir = "$working_dir\no-exe"
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        'x' | Out-File "$dir\gone" -NoNewline
+        'x' | Out-File "$dir\gone.shim" -NoNewline
+
+        $removed = Remove-Shim 'gone' $dir 'gone'
+
+        [bool]($removed -match 'gone\.exe') | Should-BeFalse
+        Get-ChildItem $dir | Should-BeCollection -Count 0
+    }
+}
+
+Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
+    It 'marks a shim hidden when nothing resolves its name' {
+        # the command is gone when an app was uninstalled without its shim; that must not throw (#6206)
+        $shimPath = "$working_dir\gone.shim"
+        'path = "C:\nonexistent\gone.exe"' | Out-File $shimPath -Encoding utf8NoBOM
+
+        (Get-ShimInfo $shimPath).IsHidden | Should-BeTrue
+    }
+}
+
+# a scenario, not a function: New-Shim writes the path and Get-ShimTarget reads it back
+Describe 'WoW64 path rewriting' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         # Bundled bodies are all x64, so report x86 to actually exercise the rewrite branch
         Mock -CommandName Get-PEMachine -MockWith { 0x014c }
@@ -307,35 +343,5 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
 
     AfterEach {
         Remove-Shim 'wow64-test' $shimdir
-    }
-}
-
-Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
-    It 'returns null for a shim file whose target is gone' {
-        $broken = "$working_dir\broken.cmd"
-        'echo hi' | Out-File $broken -Encoding ascii
-
-        Get-ShimTarget $broken | Should-BeNull
-    }
-}
-
-Describe 'Get-ShimDefinition' -Tag 'Scoop' {
-    It 'should use strings correctly' {
-        $target, $name, $shimArgs = Get-ShimDefinition 'command.exe'
-        $target | Should-Be 'command.exe'
-        $name | Should-Be 'command'
-        $shimArgs | Should-BeNull
-    }
-
-    It 'should expand the array correctly' {
-        $target, $name, $shimArgs = Get-ShimDefinition @('foo.exe', 'bar')
-        $target | Should-Be 'foo.exe'
-        $name | Should-Be 'bar'
-        $shimArgs | Should-BeNull
-
-        $target, $name, $shimArgs = Get-ShimDefinition @('foo.exe', 'bar', '--test')
-        $target | Should-Be 'foo.exe'
-        $name | Should-Be 'bar'
-        $shimArgs | Should-Be '--test'
     }
 }
