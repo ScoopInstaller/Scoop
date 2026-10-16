@@ -157,7 +157,7 @@ Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
         $pkgdir = Join-Path $working_dir 'shim-pkg'
         New-Item -ItemType Directory -Force -Path (Join-Path $pkgdir 'current') | Out-Null
         'a body' | Out-File (Join-Path $pkgdir 'current\shim.exe') -NoNewline
-        Mock -CommandName versiondir -MockWith { param($app, $version) if ($app -eq 'shim-pkg') { Join-Path $pkgdir 'current' } else { "$(versiondir $app $version)" } }
+        Mock -CommandName versiondir -MockWith { param($app, $version, $scope) if ($app -eq 'shim-pkg') { Join-Path $pkgdir 'current' } else { "$(versiondir $app $version $scope)" } }
 
         Get-ShimExe 'shim-pkg' | Should-Be (Join-Path $pkgdir 'current\shim.exe')
         Should-Invoke -CommandName warn -Times 0

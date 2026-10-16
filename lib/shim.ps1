@@ -301,9 +301,11 @@ function New-Shim($Path, $Global, $Name, $Arg) {
 function Get-ShimExe($Shim) {
     if (!$Shim) { $Shim = get_config SHIM 'default' }
     if ($Shim -ne 'default') {
-        # a shim package provides its body as shim.exe next to the app it shims
-        $exe = "$(versiondir $Shim 'current')\shim.exe"
-        if (Test-Path -LiteralPath $exe -PathType Leaf) { return $exe }
+        # a shim package provides its body as shim.exe next to the app it shims, local or global
+        foreach ($scope in $false, $true) {
+            $exe = "$(versiondir $Shim 'current' $scope)\shim.exe"
+            if (Test-Path -LiteralPath $exe -PathType Leaf) { return $exe }
+        }
         warn "'$Shim' does not provide a shim - falling back to the bundled one."
         # TODO: delete this region six months after it ships. 'shim' used to name one of the
         # three lanes bundled in the tree, and those lanes ship as packages now.
