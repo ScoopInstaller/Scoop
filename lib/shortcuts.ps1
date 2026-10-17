@@ -25,6 +25,9 @@ function shortcut_folder($global) {
     } else {
         $startmenu = 'StartMenu'
     }
+    if (get_config START_MENU_ROOT $false) {
+        return Convert-Path (ensure ([System.IO.Path]::Combine([Environment]::GetFolderPath($startmenu), 'Programs')))
+    }
     return Convert-Path (ensure ([System.IO.Path]::Combine([Environment]::GetFolderPath($startmenu), 'Programs', 'Scoop Apps')))
 }
 
