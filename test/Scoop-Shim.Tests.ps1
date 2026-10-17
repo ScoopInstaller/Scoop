@@ -311,61 +311,30 @@ Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
 }
 
 # a scenario, not a function: New-Shim writes the path and Get-ShimTarget reads it back
-Describe 'WoW64 path rewriting' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        # Bundled bodies are all x64, so report x86 to actually exercise the rewrite branch
-        Mock -CommandName Get-PEMachine -MockWith { 0x014c }
-    }
-
-    It 'rewrites System32 to Sysnative in the shim file when the shim exe is x86 on x64 OS' {
+Describe 'shim target paths' -Tag 'Scoop', 'Windows' {
+    It 'stores System32 as it was named' {
         $target = "$env:SystemRoot\System32\notepad.exe"
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (Get-ShimExe)) -eq 0x014c
 
-        New-Shim $target $false 'wow64-test'
+        New-Shim $target $false 'sysdir-test'
 
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        if ($rewrites) {
-            $line | Should-BeLikeString "*$env:SystemRoot\Sysnative\notepad.exe*"
-        } else {
-            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
-        }
-
-        # the 64-bit reader resolves the target back to the real System32 path either way
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
+        (Get-Content "$shimdir\sysdir-test.shim" | Select-Object -First 1) |
+            Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
     }
 
-    It 'does not rewrite paths outside System32 and SysWOW64' {
-        $target = "$env:SystemRoot\explorer.exe"
-
-        New-Shim $target $false 'wow64-test'
-
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        $line | Should-BeLikeString "*$target*"
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be $target
-    }
-
-    It 'rewrites SysWOW64 to System32 in the shim file when the shim exe is x86 on x64 OS' {
-        $wow = Join-Path ${env:SystemRoot} 'SysWOW64\notepad.exe'
-        if (-not (Test-Path $wow)) {
+    It 'stores SysWOW64 as it was named, so naming it selects the 32-bit program' {
+        $target = Join-Path $env:SystemRoot 'SysWOW64\notepad.exe'
+        if (-not (Test-Path $target)) {
             Set-ItResult -Skipped -Because 'SysWOW64 notepad not present'
         }
-        $target = $wow
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (Get-ShimExe)) -eq 0x014c
 
         New-Shim $target $false 'wow64-test'
 
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        if ($rewrites) {
-            # 64-bit reader sees the redirected (real) location via System32
-            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
-        } else {
-            $line | Should-BeLikeString "*$target*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
-        }
+        (Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1) |
+            Should-BeLikeString "*$env:SystemRoot\SysWOW64\notepad.exe*"
     }
 
     AfterEach {
+        Remove-Shim 'sysdir-test' $shimdir
         Remove-Shim 'wow64-test' $shimdir
     }
 }

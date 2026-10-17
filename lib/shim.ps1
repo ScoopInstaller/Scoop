@@ -146,26 +146,9 @@ function New-Shim($Path, $Global, $Name, $Arg) {
         Rename-ShimOnConflict "$shim.shim" $Path
         Copy-Item (Get-ShimExe) "$shim.exe" -Force
 
-        $rewrote_path = $resolved_path
-
-        # If the shim exe is x86 on a x64 OS, rewrite paths so the shim resolves correctly:
-        #   System32 -> Sysnative  (x64 resolve x64 program in System32, and it should be Sysnative in x86 program)
-        #   SysWOW64 -> System32   (x64 resolve x86 program in SysWOW64, and it should be System32 in x86 program)
-        $shim_machine = Get-PEMachine "$shim.exe"
-        # 0x014c is IMAGE_FILE_MACHINE_I386
-        # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
-        if ($shim_machine -eq 0x014c -and [System.Environment]::Is64BitOperatingSystem) {
-            $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
-            $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
-            $syswow = [System.IO.Path]::Combine($env:SystemRoot, 'SysWOW64')
-            if ($rewrote_path -like "$sysdir\*") {
-                $rewrote_path = $rewrote_path -replace [regex]::Escape($sysdir), $sysnative
-            } elseif ($rewrote_path -like "$syswow\*") {
-                $rewrote_path = $rewrote_path -replace [regex]::Escape($syswow), $sysdir
-            }
-        }
-
-        Write-Output "path = `"$rewrote_path`"" | Out-UTF8File "$shim.shim"
+        # the stored path is the one the manifest named, so naming SysWOW64 over System32
+        # is what selects a 32-bit program - translating it here would lose that choice
+        Write-Output "path = `"$resolved_path`"" | Out-UTF8File "$shim.shim"
         if ($Arg) {
             Write-Output "args = $Arg" | Out-UTF8File "$shim.shim" -Append
         }
@@ -357,8 +340,8 @@ function Set-ShimCopy($Exe, $Global, $Names) {
             $skipped += $name
             return
         }
-        # Sysnative only resolves inside WOW64, so it is wrong on a 32-bit OS
-        # and for a body that is no longer x86 - a portable install can land on one
+        # nothing writes Sysnative any more; only shims made before the rewrite was
+        # dropped still carry it, and System32 is the only path it can have come from
         $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
         $lines = @(Get-Content -LiteralPath $_.FullName -Encoding UTF8)
         if ($lines[0] -like "*$sysnative\*" -and
