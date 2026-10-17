@@ -75,7 +75,7 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
             Remove-Shim 'shim-test2' $shimdir -ErrorAction SilentlyContinue
         }
         Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
-        Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/moch-shim.ps1"
+        Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/mock-shim.ps1"
     }
 }
 
@@ -128,6 +128,7 @@ Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
 Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
     BeforeEach {
         Mock -CommandName warn
+        Mock -CommandName get_config -MockWith { $false } -ParameterFilter { $Name -eq 'NO_JUNCTION' }
     }
 
     It 'returns the body matching the machine architecture' {
@@ -161,7 +162,7 @@ Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
         $pkgdir = Join-Path $working_dir 'shim-pkg'
         New-Item -ItemType Directory -Force -Path (Join-Path $pkgdir 'current') | Out-Null
         'a body' | Out-File (Join-Path $pkgdir 'current\shim.exe') -NoNewline
-        Mock -CommandName versiondir -MockWith { param($app, $version, $scope) if ($app -eq 'shim-pkg') { Join-Path $pkgdir 'current' } else { "$(versiondir $app $version $scope)" } }
+        Mock -CommandName currentdir -MockWith { Join-Path $pkgdir 'current' }
 
         Get-ShimExe 'shim-pkg' | Should-Be (Join-Path $pkgdir 'current\shim.exe')
         Should-Invoke -CommandName warn -Times 0

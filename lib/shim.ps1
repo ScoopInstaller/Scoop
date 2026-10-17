@@ -286,7 +286,7 @@ function Get-ShimExe($Shim) {
     if ($Shim -ne 'default') {
         # a shim package provides its body as shim.exe next to the app it shims, local or global
         foreach ($scope in $false, $true) {
-            $exe = "$(versiondir $Shim 'current' $scope)\shim.exe"
+            $exe = "$(currentdir $Shim $scope)\shim.exe"
             if (Test-Path -LiteralPath $exe -PathType Leaf) { return $exe }
         }
         warn "'$Shim' does not provide a shim - falling back to the bundled one."
@@ -413,7 +413,7 @@ function Remove-Shim($Name, $ShimDir, $App) {
             # a wildcard cannot be combined with -LiteralPath, so the alternatives are listed and filtered.
             # .BaseName drops only the last extension, so foo.shim.appA and foo.shim both read as foo.shim
             $oldShims = Get-ChildItem -LiteralPath $ShimDir -File |
-                Where-Object { $_.BaseName -eq (fname $shimPath) -and $_.Extension -notin @('.shim', '.cmd', '.ps1') }
+                Where-Object { $_.BaseName -eq (fname $shimPath) -and $_.Extension -notin @('.shim', '.exe', '.cmd', '.ps1') }
             if ($null -eq $oldShims) {
                 # a shim set without an exe is what a mixed-arch manifest or an interrupted uninstall leaves
                 if ($_ -eq '.shim' -and (Test-Path -LiteralPath "$ShimDir\$Name.exe")) {
@@ -451,7 +451,7 @@ function Get-ShimInfo($ShimPath) {
     }
     $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
     # the command is gone if the app was uninstalled without its shim; that is not an error
-    $info.IsHidden = !((Get-Command -Name $info.Name -ErrorAction 'Ignore').Path -eq $info.Path)
+    $info.IsHidden = !((Get-Command -Name ([regex]::Escape($info.Name)) -ErrorAction 'Ignore').Path -eq $info.Path)
     [PSCustomObject]$info
 }
 
