@@ -23,6 +23,7 @@
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\download.ps1"
 if (get_config USE_SQLITE_CACHE) {
@@ -76,6 +77,8 @@ function Sync-Scoop {
 
     Write-Host 'Updating Scoop...'
     $currentdir = versiondir 'scoop' 'current'
+    # a re-clone replaces the tree outright, leaving no old body to compare against
+    $oldShimHash = (Get-FileHash -LiteralPath (Get-ShimExe) -EA SilentlyContinue).Hash
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
         $olddir = "$currentdir\..\old"
@@ -149,7 +152,14 @@ function Sync-Scoop {
         }
     }
 
-    shim "$currentdir\bin\scoop.ps1" $false
+    New-Shim "$currentdir\bin\scoop.ps1" $false
+
+    $shimExe = Get-ShimExe
+    # a new body, or a tree that was replaced wholesale, left every existing copy on the old one
+    if (!$oldShimHash -or $oldShimHash -ne (Get-FileHash -LiteralPath $shimExe).Hash) {
+        Set-ShimCopy $shimExe $false
+        if (is_admin) { Set-ShimCopy $shimExe $true }
+    }
 }
 
 function Sync-Bucket {
@@ -352,7 +362,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
 
     Write-Host "Uninstalling '$app' ($old_version)"
     Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-    rm_shims $app $old_manifest $global $architecture
+    Remove-ShimFromManifest $app $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
@@ -478,6 +488,14 @@ if (-not ($apps -or $all)) {
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $force $quiet $independent $suggested $use_cache $check_hash }
+
+    # the configured shim package was reinstalled, so the body it provides may have changed
+    $shim = get_config SHIM 'default'
+    if ($shim -ne 'default' -and ($outdated | Where-Object { $_[0] -eq $shim })) {
+        $exe = Get-ShimExe
+        Set-ShimCopy $exe $false
+        if (is_admin) { Set-ShimCopy $exe $true }
+    }
 }
 
 exit 0

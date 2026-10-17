@@ -1,6 +1,6 @@
 # Usage: scoop shim <subcommand> [<shim_name>...] [options] [other_args]
 # Summary: Manipulate Scoop shims
-# Help: Available subcommands: add, rm, list, info, alter.
+# Help: Available subcommands: add, rm, list, info, alter, update.
 #
 # To add a custom shim, use the 'add' subcommand:
 #
@@ -22,6 +22,10 @@
 #
 #     scoop shim alter <shim_name>
 #
+# To update the shim bodies, use the 'update' subcommand:
+#
+#     scoop shim update [<shim_name>...]
+#
 # Options:
 #   -g, --global       Manipulate global shim(s)
 #
@@ -38,14 +42,14 @@
 param($SubCommand)
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
+. "$PSScriptRoot\..\lib\shim.ps1" # for shim functions
 . "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
 
-if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
+if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter', 'update')) {
     if (!$SubCommand) {
         error '<subcommand> missing'
     } else {
-        error "'$SubCommand' is not one of available subcommands: add, rm, list, info, alter"
+        error "'$SubCommand' is not one of available subcommands: add, rm, list, info, alter, update"
     }
     my_usage
     exit 1
@@ -56,7 +60,7 @@ if ($err) { error "scoop shim: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 
-if ($SubCommand -ne 'list' -and $other.Length -eq 0) {
+if ($SubCommand -notin @('list', 'update') -and $other.Length -eq 0) {
     error "<shim_name> must be specified for subcommand '$SubCommand'"
     my_usage
     exit 1
@@ -69,31 +73,10 @@ if (-not (Get-FormatData ScoopShims)) {
 $localShimDir = shimdir $false
 $globalShimDir = shimdir $true
 
-function Get-ShimInfo($ShimPath) {
-    $info = [Ordered]@{}
-    $info.Name = strip_ext (fname $ShimPath)
-    $info.Path = $ShimPath -replace 'shim$', 'exe'
-    $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
-    $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
-    $altShims = Get-Item -Path "$ShimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
-    if ($altShims) {
-        $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
-    }
-    $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
-    $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
-    [PSCustomObject]$info
-}
-
-function Get-ShimPath($ShimName, $Global) {
-    '.shim', '.ps1' | ForEach-Object {
-        $shimPath = Join-Path (shimdir $Global) "$ShimName$_"
-        if (Test-Path -LiteralPath $shimPath) {
-            return $shimPath
-        }
-    }
-}
-
 switch ($SubCommand) {
+    'update' {
+        Set-ShimCopy (Get-ShimExe) $global $other
+    }
     'add' {
         if ($other.Length -lt 2 -or $other[1] -eq '') {
             error "<command_path> must be specified for subcommand 'add'"
@@ -107,7 +90,7 @@ switch ($SubCommand) {
         }
         if ($commandPath -notmatch '[\\/]') {
             $shortPath = $commandPath
-            $commandPath = Get-ShimTarget (Get-ShimPath $shortPath $global)
+            $commandPath = Get-ShimTarget (Get-ShimFile $shortPath $global)
             if (!$commandPath) {
                 $exCommand = Get-Command $shortPath -ErrorAction SilentlyContinue
                 if ($exCommand -and $exCommand.CommandType -eq 'Application') {
@@ -117,7 +100,7 @@ switch ($SubCommand) {
         }
         if ($commandPath -and (Test-Path $commandPath)) {
             Write-Host "Adding $(if ($global) { 'global' } else { 'local' }) shim $([char]0x1b)[36m$shimName$([char]0x1b)[0m..."
-            shim $commandPath $global $shimName $commandArgs
+            New-Shim $commandPath $global $shimName $commandArgs
         } else {
             error "Command path does not exist: $([char]0x1b)[36m$($other[1])$([char]0x1b)[31m"
             exit 3
@@ -126,8 +109,8 @@ switch ($SubCommand) {
     'rm' {
         $failed = @()
         $other | ForEach-Object {
-            if (Get-ShimPath $_ $global) {
-                rm_shim $_ (shimdir $global)
+            if (Get-ShimFile $_ $global) {
+                Remove-Shim $_ (shimdir $global)
             } else {
                 $failed += $_
             }
@@ -167,12 +150,12 @@ switch ($SubCommand) {
     }
     'info' {
         $shimName = $other[0]
-        $shimPath = Get-ShimPath $shimName $global
+        $shimPath = Get-ShimFile $shimName $global
         if ($shimPath) {
             Get-ShimInfo $shimPath
         } else {
             error "$(if ($global) { 'Global' } else { 'Local' }) shim not found: $([char]0x1b)[36m$shimName$([char]0x1b)[31m"
-            if (Get-ShimPath $shimName (!$global)) {
+            if (Get-ShimFile $shimName (!$global)) {
                 Write-Host "But a $(if ($global) { 'local' } else { 'global' }) shim exists, run 'scoop shim info $shimName$(if (!$global) { ' --global' })' to show its info."
                 exit 2
             }
@@ -181,7 +164,7 @@ switch ($SubCommand) {
     }
     'alter' {
         $shimName = $other[0]
-        $shimPath = Get-ShimPath $shimName $global
+        $shimPath = Get-ShimFile $shimName $global
         if ($shimPath) {
             $shimInfo = Get-ShimInfo $shimPath
             if ($null -eq $shimInfo.Alternatives) {
@@ -202,10 +185,10 @@ switch ($SubCommand) {
                 '', '.shim', '.cmd', '.ps1' | ForEach-Object {
                     $oldShimPath = "$pathNoExt$_"
                     $newShimPath = "$oldShimPath.$newApp"
-                    if (Test-Path -Path $oldShimPath -PathType Leaf) {
-                        Rename-Item -Path $oldShimPath -NewName "$oldShimPath.$($shimInfo.Source)" -Force
-                        if (Test-Path -Path $newShimPath -PathType Leaf) {
-                            Rename-Item -Path $newShimPath -NewName $oldShimPath -Force
+                    if (Test-Path -LiteralPath $oldShimPath -PathType Leaf) {
+                        Rename-Item -LiteralPath $oldShimPath -NewName "$oldShimPath.$($shimInfo.Source)" -Force
+                        if (Test-Path -LiteralPath $newShimPath -PathType Leaf) {
+                            Rename-Item -LiteralPath $newShimPath -NewName $oldShimPath -Force
                         }
                     }
                 }
@@ -213,7 +196,7 @@ switch ($SubCommand) {
             }
         } else {
             error "$(if ($global) { 'Global' } else { 'Local' }) shim not found: $([char]0x1b)[36m$shimName$([char]0x1b)[31m"
-            if (Get-ShimPath $shimName (!$global)) {
+            if (Get-ShimFile $shimName (!$global)) {
                 Write-Host "But a $(if ($global) { 'local' } else { 'global' }) shim exists, run 'scoop shim alter $shimName$(if (!$global) { ' --global' })' to alternate its source."
                 exit 2
             }
