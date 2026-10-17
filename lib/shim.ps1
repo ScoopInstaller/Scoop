@@ -138,7 +138,7 @@ function New-Shim($Path, $Global, $Name, $Arg) {
     # convert to relative path
     $resolved_path = Convert-Path -LiteralPath $Path
     Push-Location $abs_shimdir
-    $relative_path = Resolve-Path -Relative $resolved_path
+    $relative_path = Resolve-Path -LiteralPath $resolved_path -Relative
     Pop-Location
 
     if ($Path -match '\.(exe|com)$') {
@@ -403,6 +403,17 @@ function New-ShimFromManifest($Manifest, $Dir, $Global, $Arch) {
 
         New-Shim $bin $Global $name (substitute $arg @{ '$dir' = $Dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
     }
+}
+
+# bucket manifests call these, and Invoke-HookScript replays the copy already saved on disk
+function shim($path, $global, $name, $arg) {
+    Show-DeprecatedWarning $MyInvocation 'New-Shim'
+    New-Shim @PSBoundParameters
+}
+
+function rm_shim($name, $shimdir, $app) {
+    Show-DeprecatedWarning $MyInvocation 'Remove-Shim'
+    Remove-Shim @PSBoundParameters
 }
 
 function Remove-Shim($Name, $ShimDir, $App) {

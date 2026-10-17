@@ -169,7 +169,9 @@ function Complete-ConfigChange {
         $shim = if ($Value) { $Value } else { 'default' }
         if (get_config SHIM_AUTO_REFRESH $true) {
             . "$PSScriptRoot\..\lib\shim.ps1"
-            Set-ShimCopy (Get-ShimExe $shim) $false
+            $exe = Get-ShimExe $shim
+            Set-ShimCopy $exe $false
+            if (is_admin) { Set-ShimCopy $exe $true }
         } else {
             info "Run 'scoop shim update' to apply the new shim."
         }

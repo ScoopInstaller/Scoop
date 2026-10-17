@@ -5,9 +5,13 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\shim.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1" # 'arch_specific'
 
-    $working_dir = setup_working 'shim'
-    $shimdir = shimdir
-    Add-Path $shimdir
+    # setup_working and Add-Path both need a real NTFS volume and the registry, and the
+    # Windows-tagged blocks below are skipped off Windows anyway
+    if ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6) {
+        $working_dir = setup_working 'shim'
+        $shimdir = shimdir
+        Add-Path $shimdir
+    }
 }
 
 Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
