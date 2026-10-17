@@ -308,10 +308,51 @@ function is_admin {
 }
 
 # messages
-function abort($msg, [int] $exit_code = 1) { Write-Host $msg -f red; exit $exit_code }
-function error($msg) { Write-Host "ERROR $msg" -f darkred }
-function warn($msg) { Write-Host "WARN  $msg" -f darkyellow }
-function info($msg) { Write-Host "INFO  $msg" -f darkgray }
+#
+# powershell is losing text colors when output is piped
+# and there's no option to force it to emmit ANSI sequences to resolve this.
+# So on GitHub Actions we wrap the message in ANSI sequences ourselves.
+# See https://github.com/PowerShell/PowerShell/issues/20171
+function Write-Color {
+    param(
+        [String] $Message,
+        [ConsoleColor] $Color,
+        [Switch] $NoNewline
+    )
+    if (!$env:GITHUB_ACTIONS) {
+        Write-Host $Message -ForegroundColor $Color -NoNewline:$NoNewline
+        return
+    }
+    $esc = [char]27
+    $reset = "$esc[0m"
+    # Covering all 16 colors available in `Write-Host`'s `-ForegroundColor`.
+    # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-host#-foregroundcolor
+    $codes = @{
+        Black       = 30
+        DarkRed     = 31
+        DarkGreen   = 32
+        DarkYellow  = 33
+        DarkBlue    = 34
+        DarkMagenta = 35
+        DarkCyan    = 36
+        Gray        = 37
+        DarkGray    = 90
+        Red         = 91
+        Green       = 92
+        Yellow      = 93
+        Blue        = 94
+        Magenta     = 95
+        Cyan        = 96
+        White       = 97
+    }
+    $style = "$esc[$($codes["$Color"])m"
+    Write-Host "$style$Message$reset" -NoNewline:$NoNewline
+}
+
+function abort($msg, [int] $exit_code = 1) { Write-Color $msg red; exit $exit_code }
+function error($msg) { Write-Color "ERROR $msg" darkred }
+function warn($msg) { Write-Color "WARN  $msg" darkyellow }
+function info($msg) { Write-Color "INFO  $msg" darkgray }
 function debug($obj) {
     if ((get_config DEBUG $false) -ine 'true' -and $env:SCOOP_DEBUG -ine 'true') {
         return
@@ -322,26 +363,26 @@ function debug($obj) {
     $msg = $obj | Out-String -Stream
 
     if ($null -eq $obj -or $null -eq $msg) {
-        Write-Host "$prefix $param = " -f DarkCyan -NoNewline
-        Write-Host '$null' -f DarkYellow -NoNewline
-        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        Write-Color "$prefix $param = " DarkCyan -NoNewline
+        Write-Color '$null' DarkYellow -NoNewline
+        Write-Color " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" DarkGray
         return
     }
 
     if ($msg.GetType() -eq [System.Object[]]) {
-        Write-Host "$prefix $param ($($obj.GetType()))" -f DarkCyan -NoNewline
-        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        Write-Color "$prefix $param ($($obj.GetType()))" DarkCyan -NoNewline
+        Write-Color " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" DarkGray
         $msg | Where-Object { ![String]::IsNullOrWhiteSpace($_) } |
             Select-Object -Skip 2 | # Skip headers
             ForEach-Object {
-                Write-Host "$prefix $param.$($_)" -f DarkCyan
+                Write-Color "$prefix $param.$($_)" DarkCyan
             }
     } else {
-        Write-Host "$prefix $param = $($msg.Trim())" -f DarkCyan -NoNewline
-        Write-Host " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" -f DarkGray
+        Write-Color "$prefix $param = $($msg.Trim())" DarkCyan -NoNewline
+        Write-Color " -> $($MyInvocation.PSCommandPath):$($MyInvocation.ScriptLineNumber):$($MyInvocation.OffsetInLine)" DarkGray
     }
 }
-function success($msg) { Write-Host $msg -f darkgreen }
+function success($msg) { Write-Color $msg darkgreen }
 
 function filesize($length) {
     $gb = [math]::pow(2, 30)
