@@ -86,6 +86,12 @@ function Start-Download ($url, $to, $cookies) {
     }
 }
 
+function Get-GitHubApiAccept ($url) {
+    # Release assets need octet-stream; the Actions artifact-zip endpoint rejects it (415)
+    if ($url -match '/actions/artifacts/\d+/zip$') { return $null }
+    return 'application/octet-stream'
+}
+
 function Invoke-Download ($url, $to, $cookies, $progress) {
     # download with filesize and progress indicator
     $reqUrl = ($url -split '#')[0]
@@ -96,7 +102,8 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
             $wreq.Referer = strip_filename $url
         }
         if ($url -match '^https://api\.github\.com/repos') {
-            $wreq.Accept = 'application/octet-stream'
+            $accept = Get-GitHubApiAccept $reqUrl
+            if ($accept) { $wreq.Accept = $accept }
             $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
             $wreq.Headers['X-GitHub-Api-Version'] = '2022-11-28'
         }
