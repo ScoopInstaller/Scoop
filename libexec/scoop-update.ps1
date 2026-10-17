@@ -488,6 +488,14 @@ if (-not ($apps -or $all)) {
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
     $outdated | ForEach-Object { update @_ $force $quiet $independent $suggested $use_cache $check_hash }
+
+    # the configured shim package was reinstalled, so the body it provides may have changed
+    $shim = get_config SHIM 'default'
+    if ($shim -ne 'default' -and ($outdated | Where-Object { $_[0] -eq $shim })) {
+        $exe = Get-ShimExe
+        Set-ShimCopy $exe $false
+        if (is_admin) { Set-ShimCopy $exe $true }
+    }
 }
 
 exit 0

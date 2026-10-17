@@ -321,7 +321,7 @@ function Set-ShimCopy($Exe, $Global, $Names) {
     $shimDir = shimdir $Global
     if (!(Test-Path -LiteralPath $Exe) -or !(Test-Path -LiteralPath $shimDir)) { return }
 
-    $shims = Get-ChildItem $shimDir -Filter '*.shim' -ErrorAction SilentlyContinue
+    $shims = Get-ChildItem -LiteralPath $shimDir -Filter '*.shim' -ErrorAction SilentlyContinue
     if ($Names) {
         $shims = $shims | Where-Object { $_.BaseName -in $Names }
     }
