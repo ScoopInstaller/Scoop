@@ -307,8 +307,9 @@ function Get-ShimExe($Shim) {
             if (Test-Path -LiteralPath $exe -PathType Leaf) { return $exe }
         }
         warn "'$Shim' does not provide a shim - falling back to the bundled one."
-        # TODO: delete this region six months after it ships. 'shim' used to name one of the
-        # three lanes bundled in the tree, and those lanes ship as packages now.
+        # TODO: delete this region together with the supporting\shims\<lane>\ directories,
+        # whose .to_be_removed marker says the same. 'shim' used to name one of the three
+        # lanes bundled in the tree, and those lanes ship as packages now.
         #region shim lanes that are no longer bundled
         $lanes = @{
             '71'      = 'scoop-shim-cpp'
