@@ -381,7 +381,7 @@ function New-ShimFromManifest($Manifest, $Dir, $Global, $Arch) {
         } else {
             # a missing target must not throw out of Get-Command, the abort below speaks for it
             # ExternalScript too: a dependency's .ps1 on PATH is a legitimate bin target
-            $bin = (Get-Command $target -CommandType Application, ExternalScript -ErrorAction Ignore | Select-Object -First 1).Source
+            $bin = (Get-Command -Name ([System.Management.Automation.WildcardPattern]::Escape($target)) -CommandType Application, ExternalScript -ErrorAction Ignore | Select-Object -First 1).Source
         }
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
@@ -451,7 +451,7 @@ function Get-ShimInfo($ShimPath) {
     }
     $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
     # the command is gone if the app was uninstalled without its shim; that is not an error
-    $info.IsHidden = !((Get-Command -Name ([regex]::Escape($info.Name)) -ErrorAction 'Ignore').Path -eq $info.Path)
+    $info.IsHidden = !((Get-Command -Name ([System.Management.Automation.WildcardPattern]::Escape($info.Name)) -ErrorAction 'Ignore').Path -eq $info.Path)
     [PSCustomObject]$info
 }
 
