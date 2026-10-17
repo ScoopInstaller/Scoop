@@ -308,6 +308,66 @@ function is_admin {
 }
 
 # messages
+#
+# powershell is losing text colors when output is piped
+# and there's no option to force it to emit ANSI sequences to resolve this.
+# So on GitHub Actions we add a wrapper around `Write-Host` that wraps colored output in ANSI sequences.
+# We override `Write-Host` instead of adding a new command
+# to make it simpler to use for all `core.ps1` consumers.
+# See https://github.com/PowerShell/PowerShell/issues/20171
+if ($env:GITHUB_ACTIONS) {
+    function Write-Host {
+        # Mirrorring actual `Write-Host` signature.
+        param(
+            [Parameter(Position = 0, ValueFromPipeline, ValueFromRemainingArguments)]
+            [Alias('Msg', 'Message')]
+            [Object[]] $Object,
+            [Switch] $NoNewline,
+            [Object] $Separator = ' ',
+            [Nullable[ConsoleColor]] $ForegroundColor,
+            [Nullable[ConsoleColor]] $BackgroundColor
+        )
+        begin {
+            $esc = [char]27
+            $reset = "$esc[0m"
+            # Covering all 16 colors available in `Write-Host`'s `-ForegroundColor`.
+            # https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-host#-foregroundcolor
+            $codes = @{
+                Black       = 30
+                DarkRed     = 31
+                DarkGreen   = 32
+                DarkYellow  = 33
+                DarkBlue    = 34
+                DarkMagenta = 35
+                DarkCyan    = 36
+                Gray        = 37
+                DarkGray    = 90
+                Red         = 91
+                Green       = 92
+                Yellow      = 93
+                Blue        = 94
+                Magenta     = 95
+                Cyan        = 96
+                White       = 97
+            }
+        }
+        process {
+            $colorCodes = @()
+            if ($null -ne $ForegroundColor) { $colorCodes += $codes["$ForegroundColor"] }
+            # ANSI background codes are foreground + 10
+            if ($null -ne $BackgroundColor) { $colorCodes += $codes["$BackgroundColor"] + 10 }
+            if (!$colorCodes) {
+                Microsoft.PowerShell.Utility\Write-Host $Object -Separator $Separator -NoNewline:$NoNewline
+                return
+            }
+            $style = "$esc[$($colorCodes -join ';')m"
+            Microsoft.PowerShell.Utility\Write-Host $style -NoNewline
+            Microsoft.PowerShell.Utility\Write-Host $Object -Separator $Separator -NoNewline
+            Microsoft.PowerShell.Utility\Write-Host $reset -NoNewline:$NoNewline
+        }
+    }
+}
+
 function abort($msg, [int] $exit_code = 1) { Write-Host $msg -f red; exit $exit_code }
 function error($msg) { Write-Host "ERROR $msg" -f darkred }
 function warn($msg) { Write-Host "WARN  $msg" -f darkyellow }
