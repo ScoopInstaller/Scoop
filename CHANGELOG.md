@@ -1,5 +1,13 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
 
+### Features
+
+- **manifest:** Add `changelog` property to the app manifest schema ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-changelog:** Add `scoop changelog` command to show an app's changelog or latest release notes ([#6291](https://github.com/ScoopInstaller/Scoop/issues/6291), [#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-update:** Show changelog link after updating an app ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-status:** Show changelog link for outdated apps ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-info:** Show changelog URL of the app ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+
 ### Bug Fixes
 
 - **auto-pr:** Add missing `core.ps1` dot source ([#6786](https://github.com/ScoopInstaller/Scoop/pull/6786))

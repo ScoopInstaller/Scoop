@@ -315,3 +315,44 @@ Describe 'manifest bucket auto-discovery' -Tag 'Scoop' {
         Should-Invoke url_manifest -Times 1
     }
 }
+
+Describe 'changelog_url' -Tag 'Scoop' {
+    It 'prefers the manifest changelog property' {
+        $m = [PSCustomObject]@{ changelog = 'https://example.com/changelog'; homepage = 'https://github.com/o/r'; checkver = 'github' }
+        changelog_url $m | Should-Be 'https://example.com/changelog'
+    }
+
+    It 'derives GitHub releases URL from ''github'' checkver shorthand' {
+        $m = [PSCustomObject]@{ checkver = 'github'; homepage = 'https://github.com/ScoopInstaller/Scoop' }
+        changelog_url $m | Should-Be 'https://github.com/ScoopInstaller/Scoop/releases'
+    }
+
+    It 'derives GitHub releases URL from checkver.github' {
+        $m = [PSCustomObject]@{ checkver = [PSCustomObject]@{ github = 'https://github.com/o/r' }; homepage = 'https://example.com' }
+        changelog_url $m | Should-Be 'https://github.com/o/r/releases'
+    }
+
+    It 'derives GitHub releases URL from checkver.github api url' {
+        $m = [PSCustomObject]@{ checkver = [PSCustomObject]@{ github = 'https://api.github.com/repos/o/r/releases/latest' }; homepage = 'https://example.com' }
+        changelog_url $m | Should-Be 'https://github.com/o/r/releases'
+    }
+
+    It 'derives GitHub releases URL from checkver.url' {
+        $m = [PSCustomObject]@{ checkver = [PSCustomObject]@{ url = 'https://github.com/o/r/releases.atom' }; homepage = 'https://example.com' }
+        changelog_url $m | Should-Be 'https://github.com/o/r/releases'
+    }
+
+    It 'derives GitHub releases URL from a GitHub homepage' {
+        $m = [PSCustomObject]@{ homepage = 'https://github.com/o/r/' }
+        changelog_url $m | Should-Be 'https://github.com/o/r/releases'
+    }
+
+    It 'strips a .git suffix from the repository name' {
+        github_repo ([PSCustomObject]@{ homepage = 'https://github.com/o/r.git' }) | Should-Be 'o/r'
+    }
+
+    It 'returns null when no changelog source exists' {
+        changelog_url ([PSCustomObject]@{ homepage = 'https://example.com' }) | Should-BeNullOrEmpty
+        changelog_url $null | Should-BeNullOrEmpty
+    }
+}
