@@ -144,7 +144,7 @@ function New-Shim($Path, $Global, $Name, $Arg) {
     if ($Path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
         Rename-ShimOnConflict "$shim.shim" $Path
-        Copy-Item (Get-ShimExe) "$shim.exe" -Force
+        Copy-Item -LiteralPath (Get-ShimExe) "$shim.exe" -Force
 
         # the stored path is the one the manifest named, so naming SysWOW64 over System32
         # is what selects a 32-bit program - translating it here would lose that choice
