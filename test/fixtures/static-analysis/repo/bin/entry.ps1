@@ -59,6 +59,8 @@ if (-not (get_config fixture_flag)) {
     fixture_or_caller
 }
 
+& "$PSScriptRoot\..\lib\unloaded.ps1"
+
 fixture_outer
 
 fixture_order_helper

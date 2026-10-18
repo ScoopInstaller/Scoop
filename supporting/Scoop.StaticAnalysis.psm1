@@ -200,7 +200,10 @@ function Get-ScriptIndex {
             if (-not $cmd.GetCommandName()) {
                 $invocation = "$($cmd.InvocationOperator)"
                 $target = Get-DotSourceLiteralPath $cmd $file
-                if ($invocation -eq 'Ampersand' -and $target) { $invoked[$target] = $true }
+                if ($invocation -eq 'Ampersand') {
+                    if ($target) { $invoked[$target] = $true }
+                    continue
+                }
                 if ($target) {
                     if ($owner) {
                         if (-not $fnDots.ContainsKey($owner)) { $fnDots[$owner] = @() }
@@ -282,6 +285,12 @@ function Get-ScriptIndex {
     $entries += Get-ChildItem "$Root\bin" -Filter *.ps1 | ForEach-Object FullName
     $entries += Get-ChildItem "$Root\libexec" -Filter *.ps1 | ForEach-Object FullName
     $entries = $entries | Where-Object { -not ($invoked.ContainsKey($_) -and $_ -like "$Root\bin\*") }
+    # An `& path` script outside those folders runs its own top level, so check it as an entry too.
+    # A bin script reached that way runs in its caller's session; test data is not part of the program.
+    foreach ($target in $invoked.Keys) {
+        if ($target -like "$Root\bin\*" -or $target -like "$Root\test\*") { continue }
+        if ($topStmts.ContainsKey($target) -and $entries -notcontains $target) { $entries += $target }
+    }
 
     $result = @{
         root = $Root

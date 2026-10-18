@@ -14,7 +14,7 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
                 '{0}: {1} -> {2}:{3} calls {4}' -f $_.Entry, ($_.Chain -join ' -> '), (Split-Path $_.Path -Leaf), $_.Line, $_.Name
             }) -join "`n"
 
-            $issues | Should-BeCollection -Count 18 -Because $report
+            $issues | Should-BeCollection -Count 19 -Because $report
         }
 
         It 'Reports <Name> once per unreachable call' -TestCases @(
@@ -25,6 +25,7 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             @{ Name = 'fixture_only_when_false'; Count = 1 }
             @{ Name = 'fixture_else_only_helper'; Count = 2 }
             @{ Name = 'fixture_or_only_helper'; Count = 1 }
+            @{ Name = 'fixture_amp_target'; Count = 1 }
             @{ Name = 'fixture_never_helper'; Count = 7 }
             @{ Name = 'fixture_order_helper'; Count = 1 }
         ) {
@@ -45,7 +46,8 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
         It 'Reports only the functions nothing calls' {
             $report = ($unreachable | ForEach-Object { '{0} deprecated={1}' -f $_.Name, $_.Deprecated }) -join "`n"
 
-            $unreachable | Should-BeCollection -Count 3 -Because $report
+            $unreachable | Should-BeCollection -Count 4 -Because $report
+            @($unreachable | Where-Object { $_.Name -eq 'fixture_amp_target' }) | Should-BeCollection -Count 1
             @($unreachable | Where-Object { $_.Name -eq 'fixture_inner' }) | Should-BeCollection -Count 0
             @($unreachable | Where-Object { $_.Name -eq 'fixture_dynamic_helper' }) | Should-BeCollection -Count 0
         }
