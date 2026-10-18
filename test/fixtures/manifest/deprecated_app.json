@@ -3,7 +3,8 @@
     "url": "https://example.com/fixture_old_way/old-app.exe",
     "pre_install": [
         "fixture_old_way 'OLD_APP_HOME' \"$dir\"",
-        "Set-Content (fixture_replaced_way 'config') 'settings'"
+        "Set-Content (fixture_replaced_way 'config') 'settings'",
+        "Write-Host \"It's ready\"; fixture_still_used 'APP_HOME' $dir"
     ],
     "post_install": "fixture_replaced_way 'data' | Out-Null",
     "architecture": {

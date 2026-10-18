@@ -6,6 +6,7 @@
     },
     "pre_install": [
         "Set-Content \"$env:TEMP\\note.txt\" 'hi'",
+        "Write-Output fixture_old_way",
         "Write-Host \"'helper' requires fixture_old_way to run\"",
         "# uses fixture_old_way internally",
         "// legacy fixture_replaced_way setup"

@@ -57,7 +57,6 @@ if ($Dir) {
 
     if ($failed) {
         if ($piped) {
-            # Warning stream: visible on the console, out of the success stream.
             $failed | ForEach-Object { Write-Warning "Failed to parse $($_.File)" }
         } else {
             Write-Host ('{0} manifest(s) failed to parse:' -f $failed.Count) -ForegroundColor Red
@@ -67,7 +66,6 @@ if ($Dir) {
 } else {
     $unreachable = @(Get-UnreachableFunction -Root $Root)
     $dead = @($unreachable | Where-Object { -not $_.Deprecated })
-    # The full deprecated list: still-called ones never appear in the unreachable report.
     $deprecated = @(Get-DeprecatedFunction -Root $Root)
     if (-not $dead -and -not $deprecated) {
         Write-Host 'No dead or deprecated functions found.' -ForegroundColor Green

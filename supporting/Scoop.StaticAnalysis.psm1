@@ -17,9 +17,9 @@ function Get-DotSourceLiteralPath {
 }
 
 function Get-GetConfigConstraint {
-    # Truth value implied by a `get_config X` guard, or $null when none; `-or` pins no single
-    # value, and neither does a comparison chained onto the call: that branch is about the
-    # value, not the config being set.
+    # Truth value implied by a `get_config X` guard, or $null when none: `-or` pins no single
+    # value, a comparison chained onto the call is about the value, and an operator further out,
+    # like `-and ($app -ne 'scoop')`, says nothing about the config.
     param([System.Management.Automation.Language.Ast] $Condition)
 
     if (-not $Condition) { return }
@@ -28,8 +28,6 @@ function Get-GetConfigConstraint {
 
     $name = [regex]::Match($text, 'get_config\s+([A-Za-z0-9_-]+)')
     if (-not $name.Success) { return }
-    # An operator directly behind the call's closing paren applies to the config value;
-    # one further out, like `-and ($app -ne 'scoop')`, does not.
     $rest = $text.Substring($name.Index + $name.Length)
     if ($rest -match '^(?:\s+(?:''[^'']*''|\$\w+))?(?:\s*\))+\s*-(?:eq|ne|ieq|ine|ge|gt|le|lt|like|notlike|match|notmatch|in|notin|contains|is|isnot|band|bor)\b') { return }
 
@@ -64,6 +62,9 @@ function Get-CommandConstraint {
                     $inverted = @{}
                     $dropped = @{}
                     foreach ($candidate in $node.Clauses) {
+                        # Only a guard that stands alone can be inverted: in `A -and B` the else
+                        # branch also runs when A holds and B does not.
+                        if ($candidate.Item1.Extent.Text -match '-(and|or)\b') { continue }
                         $c = Get-GetConfigConstraint $candidate.Item1
                         if (-not $c -or $dropped.ContainsKey($c.Key)) { continue }
                         $value = -not $c.Value
@@ -242,6 +243,29 @@ function Get-ScriptIndex {
         }
     }
 
+    # A dot-sourced script runs its whole body, so the files it pulls in are loaded with it.
+    $dotClosure = @{}
+    $dotQueue = [System.Collections.Generic.Queue[String]]::new()
+    foreach ($file in $files) { $dotQueue.Enqueue($file) }
+    while ($dotQueue.Count) {
+        $current = $dotQueue.Dequeue()
+        if (-not $current -or $dotClosure.ContainsKey($current)) { continue }
+        $targets = @{}
+        foreach ($list in $topDots[$current]) { foreach ($t in $list) { if ($t) { $targets[$t] = $true } } }
+        $dotClosure[$current] = @($targets.Keys)
+        foreach ($t in $targets.Keys) { $dotQueue.Enqueue($t) }
+    }
+    foreach ($key in @($fnDots.Keys)) {
+        $expanded = @{}
+        foreach ($t in $fnDots[$key]) { $expanded[$t] = $true; foreach ($c in $dotClosure[$t]) { $expanded[$c] = $true } }
+        $fnDots[$key] = @($expanded.Keys)
+    }
+    foreach ($key in @($fnAboveDots.Keys)) {
+        $expanded = @{}
+        foreach ($t in $fnAboveDots[$key]) { $expanded[$t] = $true; foreach ($c in $dotClosure[$t]) { $expanded[$c] = $true } }
+        $fnAboveDots[$key] = @($expanded.Keys)
+    }
+
     # Everything bin/scoop.ps1 puts into the session of the libexec script it dispatches to.
     $hostSet = @{}
     $hostQueue = [System.Collections.Generic.Queue[String]]::new()
@@ -264,7 +288,7 @@ function Get-ScriptIndex {
         files = $files; defs = $defs; topStmts = $topStmts; topCmds = $topCmds; topDots = $topDots
         fnBodies = $fnBodies; fnCmds = $fnCmds; fnDots = $fnDots; fnFileKeys = $fnFileKeys
         fnNested = $fnNested; fnAboveDots = $fnAboveDots; cmdConstraints = $cmdConstraints
-        invoked = $invoked; hostSet = $hostSet; entries = $entries; asts = $asts
+        invoked = $invoked; hostSet = $hostSet; entries = $entries; asts = $asts; dotClosure = $dotClosure
     }
     $script:indexCache[$Root] = $result
     $result
@@ -277,10 +301,9 @@ function Get-DotSourceIssue {
     .DESCRIPTION
         Scoop dot-sources lib/*.ps1 as plain scripts, so a function can exist in the repository
         and still be undefined at the call site: a file the entry point never loads, or loads
-        after the call. Entry points are bin/*.ps1 and libexec/*.ps1 (dispatched through
-        `exec`, inheriting whatever bin/scoop.ps1 loaded); lib/*.ps1 never are. Contradictory
-        `get_config` branches and non-repository names are skipped, and calls inside nested
-        function bodies are checked with their owner's visibility.
+        after the call. Entry points are bin/*.ps1 and libexec/*.ps1 (the latter inheriting
+        bin/scoop.ps1's dot-sources); contradictory `get_config` branches are skipped and
+        nested bodies are checked with their owner's visibility.
     .OUTPUTS
         One object per unresolved call: Path, Entry, Chain, Line, Name, DefinedIn.
     #>
@@ -290,8 +313,6 @@ function Get-DotSourceIssue {
         [String] $Root
     )
 
-    # The -like patterns below need the canonical form: a relative or `..`-containing
-    # Root would never match the absolute paths the index records.
     $index = Get-ScriptIndex -Root $Root
     $Root = $index.root
     $defs = $index.defs
@@ -329,13 +350,20 @@ function Get-DotSourceIssue {
         }
 
         $loaded = @{ $entry = $true }
-        foreach ($t in $lazy.Keys) { $loaded[$t] = $true }
+        foreach ($t in $lazy.Keys) {
+            $loaded[$t] = $true
+            foreach ($c in $index.dotClosure[$t]) { $loaded[$c] = $true }
+        }
         $visited = @{}
         $queue = [System.Collections.Generic.Queue[Object]]::new()
 
         # Top level runs in source order: a dot-source below a call cannot satisfy it.
         for ($i = 0; $i -lt $topStmts[$entry].Count; $i++) {
-            foreach ($t in $topDots[$entry][$i]) { if ($t) { $loaded[$t] = $true } }
+            foreach ($t in $topDots[$entry][$i]) {
+                if (-not $t) { continue }
+                $loaded[$t] = $true
+                foreach ($c in $index.dotClosure[$t]) { $loaded[$c] = $true }
+            }
             if ($topCmds[$entry][$i].Count) {
                 $queue.Enqueue(@{ File = $entry; Stmt = $i; Calls = $topCmds[$entry][$i]; Loaded = $loaded.Clone(); Fns = @{}; Env = @{}; Chain = @((Split-Path $entry -Leaf)) })
             }
@@ -384,11 +412,13 @@ function Get-DotSourceIssue {
                 }
 
                 foreach ($d in $defs[$name]) {
-                    if ($visited.ContainsKey($d.Key)) { continue }
-                    $visited[$d.Key] = $true
+                    $visitKey = "$($d.Key)|$($item.EnvKey)"
+                    if ($visited.ContainsKey($visitKey)) { continue }
+                    $visited[$visitKey] = $true
 
                     $child = $item.Loaded.Clone()
                     $child[$d.File] = $true
+                    foreach ($c in $index.dotClosure[$d.File]) { $child[$c] = $true }
                     foreach ($t in $fnAboveDots[$d.Key]) { $child[$t] = $true }
                     foreach ($t in $fnDots[$d.Key]) { if ($t) { $child[$t] = $true } }
 
@@ -397,18 +427,20 @@ function Get-DotSourceIssue {
                     $fns[$d.Key] = $true
 
                     $chain = $item.Chain + "$name()"
+                    $envKey = ($env.Keys | Sort-Object | ForEach-Object { "$_=$($env[$_])" }) -join ','
                     $queue.Enqueue(@{
                         File = $d.File; Calls = $fnCmds[$d.Key]; Loaded = $child
-                        Fns = $fns; Env = $env; Chain = $chain
+                        Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain
                     })
 
                     # A nested function body runs in its owner's session, so its calls get the same state.
                     foreach ($k in $fnNested[$d.Key]) {
-                        if ($visited.ContainsKey($k)) { continue }
-                        $visited[$k] = $true
+                        $nestedKey = "$k|$envKey"
+                        if ($visited.ContainsKey($nestedKey)) { continue }
+                        $visited[$nestedKey] = $true
                         $queue.Enqueue(@{
                             File = $d.File; Calls = $fnCmds[$k]; Loaded = $child
-                            Fns = $fns; Env = $env; Chain = $chain
+                            Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain
                         })
                     }
                 }
@@ -429,6 +461,46 @@ function Get-Deprecation {
     } else {
         @{ Deprecated = $false; ReplacedBy = '' }
     }
+}
+
+function Get-StringReachedNames {
+    # Names the code hands to `& $var` rather than calling directly, including wildcard
+    # strings searched as text. Command names, member names and hashtable keys are syntax
+    # rather than data, so their extents are skipped.
+    param($Index, $Defs)
+
+    $names = @{}
+    foreach ($file in $Index.files) {
+        $syntaxStart = @{}
+        foreach ($cmd in $Index.asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] }, $true)) {
+            if ($cmd.GetCommandName()) { $syntaxStart[$cmd.CommandElements[0].Extent.StartOffset] = $true }
+        }
+        foreach ($member in $Index.asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.MemberExpressionAst] }, $true)) {
+            $syntaxStart[$member.Member.Extent.StartOffset] = $true
+        }
+        foreach ($table in $Index.asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.HashtableAst] }, $true)) {
+            foreach ($pair in $table.KeyValuePairs) { $syntaxStart[$pair.Item1.Extent.StartOffset] = $true }
+        }
+
+        $Index.asts[$file].FindAll({
+                param($n) $n -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+                $n -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
+            }, $true) | ForEach-Object {
+            if ($syntaxStart.ContainsKey($_.Extent.StartOffset)) { return }
+            $value = $_.Value.Trim()
+            if (-not $value) { return }
+            if ($Defs.ContainsKey($value)) {
+                $names[$value] = $true
+                return
+            }
+            if ($value -notmatch '[\*\?]') { return }
+            foreach ($segment in ($value -split '[\*\?]')) {
+                $segment = $segment.Trim()
+                if ($segment -and $Defs.ContainsKey($segment)) { $names[$segment] = $true }
+            }
+        }
+    }
+    $names
 }
 
 function Get-UnreachableFunction {
@@ -477,11 +549,27 @@ function Get-UnreachableFunction {
     }
 
     $reached = @{}
-    $reachedByName = @{}
+    $reachedByName = Get-StringReachedNames -Index $index -Defs $defs
+
     foreach ($seed in @($seeds.Keys)) {
         $visited = @{}
         $queue = [System.Collections.Generic.Queue[Object]]::new()
         foreach ($list in $index.topCmds[$seed]) { $queue.Enqueue(@{ File = $seed; Calls = $list }) }
+
+        foreach ($name in $reachedByName.Keys) {
+            foreach ($d in $defs[$name]) {
+                if ($visited.ContainsKey($d.Key)) { continue }
+                $visited[$d.Key] = $true
+                $reached[$d.Key] = $true
+                $queue.Enqueue(@{ File = $d.File; Calls = $fnCmds[$d.Key] })
+                foreach ($k in $fnNested[$d.Key]) {
+                    if ($visited.ContainsKey($k)) { continue }
+                    $visited[$k] = $true
+                    $reached[$k] = $true
+                    $queue.Enqueue(@{ File = $d.File; Calls = $fnCmds[$k] })
+                }
+            }
+        }
 
         while ($queue.Count) {
             $item = $queue.Dequeue()
@@ -506,42 +594,6 @@ function Get-UnreachableFunction {
         }
     }
 
-    # Names the code hands to `& $var` rather than calling directly, including wildcard strings
-    # searched as text: lib/depends.ps1 looks for '*Expand-DarkArchive *' inside manifest scripts.
-    # Only wildcard strings are split, so a path like '.\lib\versions.ps1' does not match `versions`.
-    # Command names, member names and hashtable keys are syntax rather than data, so their
-    # extents are skipped: a call is already covered by the walk above, and `$status.latest_version`
-    # or a Pester `Run` key is not a call to a function of the same name.
-    foreach ($file in $index.files) {
-        $syntaxStart = @{}
-        foreach ($cmd in $asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] }, $true)) {
-            if ($cmd.GetCommandName()) { $syntaxStart[$cmd.CommandElements[0].Extent.StartOffset] = $true }
-        }
-        foreach ($member in $asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.MemberExpressionAst] }, $true)) {
-            $syntaxStart[$member.Member.Extent.StartOffset] = $true
-        }
-        foreach ($table in $asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.HashtableAst] }, $true)) {
-            foreach ($pair in $table.KeyValuePairs) { $syntaxStart[$pair.Item1.Extent.StartOffset] = $true }
-        }
-
-        $asts[$file].FindAll({
-                param($n) $n -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-                $n -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
-            }, $true) | ForEach-Object {
-            if ($syntaxStart.ContainsKey($_.Extent.StartOffset)) { return }
-            $value = $_.Value.Trim()
-            if (-not $value) { return }
-            if ($defs.ContainsKey($value)) {
-                $reachedByName[$value] = $true
-                return
-            }
-            if ($value -notmatch '[\*\?]') { return }
-            foreach ($segment in ($value -split '[\*\?]')) {
-                $segment = $segment.Trim()
-                if ($segment -and $defs.ContainsKey($segment)) { $reachedByName[$segment] = $true }
-            }
-        }
-    }
     foreach ($name in $reachedByName.Keys) {
         foreach ($d in $defs[$name]) { $reached[$d.Key] = $true }
     }
@@ -572,9 +624,8 @@ function Get-DeprecatedFunction {
         Lists every function marked deprecated, reachable or not.
     .DESCRIPTION
         Deprecated means the body calls `Show-DeprecatedWarning $MyInvocation 'New-Name'`
-        (filling ReplacedBy) or warns 'is deprecated' without naming a replacement.
-        Get-UnreachableFunction reports only the unreachable subset, and test/ files are
-        skipped because fixtures mark functions deprecated on purpose.
+        (filling ReplacedBy) or warns 'is deprecated' without naming a replacement. test/ files
+        are skipped because fixtures mark functions deprecated on purpose.
     .OUTPUTS
         One object per deprecated function: Path, Name, Line, ReplacedBy.
     #>
@@ -625,39 +676,26 @@ function Get-ManifestScripts {
     }
 }
 
-function Get-ScriptLines {
+function Get-ScriptCommands {
     param([String[]] $Scripts)
 
+    $commands = [System.Collections.Generic.HashSet[String]]::new([StringComparer]::OrdinalIgnoreCase)
     foreach ($text in $Scripts) {
-        foreach ($line in ($text -split '\r?\n')) {
-            if ($line -match '^\s*//') { continue }
-            if ($line.Contains('#')) {
-                # Truncate at a `#` that sits outside a string.
-                $quotes = 0
-                for ($i = 0; $i -lt $line.Length; $i++) {
-                    if ($line[$i] -eq '#' -and $quotes % 2 -eq 0) { $line = $line.Substring(0, $i); break }
-                    if ($line[$i] -eq "'" -or $line[$i] -eq '"') { $quotes++ }
-                }
+        $tokens = $null
+        $errors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseInput($text, [ref]$tokens, [ref]$errors)
+        $parts = if ($errors) { $text -split '\r?\n' } else { , $text }
+        foreach ($part in $parts) {
+            $partErrors = $null
+            $partAst = [System.Management.Automation.Language.Parser]::ParseInput($part, [ref]$null, [ref]$partErrors)
+            if ($partErrors) { continue }
+            foreach ($cmd in $partAst.FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] }, $true)) {
+                $name = $cmd.GetCommandName()
+                if ($name) { $null = $commands.Add($name) }
             }
-            $line
         }
     }
-}
-
-function Test-ScriptCall {
-    param(
-        [String[]] $Lines,
-        [String] $Name,
-        [String] $Pattern
-    )
-
-    foreach ($line in $Lines) {
-        foreach ($match in [regex]::Matches($line, $Pattern)) {
-            $nameStart = $match.Index + $match.Length - $Name.Length
-            if ([regex]::Matches($line.Substring(0, $nameStart), '["'']').Count % 2 -eq 0) { return $true }
-        }
-    }
-    $false
+    $commands
 }
 
 function Get-DeprecatedManifestUsage {
@@ -682,10 +720,6 @@ function Get-DeprecatedManifestUsage {
     )
 
     $deprecated = @(Get-DeprecatedFunction -Root $Root)
-    $callPatterns = @{}
-    foreach ($fn in $deprecated) {
-        $callPatterns[$fn.Name] = '(?i)(?:^|[\s&|;(.{=])' + [regex]::Escape($fn.Name) + '(?=[\s(){};,|]|$)'
-    }
 
     $results = @()
     $dirFull = (Convert-Path $Dir).TrimEnd('\', '/')
@@ -699,13 +733,9 @@ function Get-DeprecatedManifestUsage {
         }
 
         $found = @{}
-        $lines = @(Get-ScriptLines @(Get-ManifestScripts $json))
-        if ($lines) {
-            foreach ($fn in $deprecated) {
-                if (Test-ScriptCall $lines $fn.Name $callPatterns[$fn.Name]) {
-                    $found[$fn.Name] = $fn.ReplacedBy
-                }
-            }
+        $commands = @(Get-ScriptCommands @(Get-ManifestScripts $json))
+        foreach ($fn in $deprecated) {
+            if ($commands -contains $fn.Name) { $found[$fn.Name] = $fn.ReplacedBy }
         }
         $results += [PSCustomObject]@{ Manifest = $file.BaseName; File = $relative; Found = $found; Failed = $false }
     }
