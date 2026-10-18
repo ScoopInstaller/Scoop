@@ -18,8 +18,8 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
         }
 
         It 'Reports <Name> once per unreachable call' -TestCases @(
-            @{ Name = 'fixture_late_helper'; Count = 1 }
-            @{ Name = 'fixture_top_helper'; Count = 2 }
+            @{ Name = 'fixture_late_helper'; Count = 2 }
+            @{ Name = 'fixture_top_helper'; Count = 1 }
             @{ Name = 'fixture_never_helper'; Count = 7 }
             @{ Name = 'fixture_order_helper'; Count = 1 }
         ) {
@@ -62,6 +62,7 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             @{ Name = 'fixture_old_way'; ReplacedBy = '' }
             @{ Name = 'fixture_replaced_way'; ReplacedBy = 'fixture_new_way' }
             @{ Name = 'fixture_still_used'; ReplacedBy = 'fixture_modern_way' }
+            @{ Name = 'fixture_install_way'; ReplacedBy = 'fixture_modern_way' }
         ) {
             $fn = @($deprecated | Where-Object { $_.Name -eq $Name })
             $fn | Should-BeCollection -Count 1
@@ -74,10 +75,11 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             $app = @($usage | Where-Object { $_.Manifest -eq 'deprecated_app' })
             $app | Should-BeCollection -Count 1
             $app[0].Failed | Should-BeFalse
-            @($app[0].Found.Keys) | Should-BeCollection -Count 3
+            @($app[0].Found.Keys) | Should-BeCollection -Count 4
             $app[0].Found['fixture_old_way'] | Should-Be ''
             $app[0].Found['fixture_replaced_way'] | Should-Be 'fixture_new_way'
             $app[0].Found['fixture_still_used'] | Should-Be 'fixture_modern_way'
+            $app[0].Found['fixture_install_way'] | Should-Be 'fixture_modern_way'
         }
 
         It 'Ignores names that are not calls' {

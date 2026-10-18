@@ -10,7 +10,7 @@
     "architecture": {
         "64bit": {
             "installer": {
-                "script": "fixture_still_used $dir\\bin"
+                "script": "fixture_install_way $dir\\bin"
             }
         }
     }

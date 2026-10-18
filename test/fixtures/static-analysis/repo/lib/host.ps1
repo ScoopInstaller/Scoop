@@ -33,6 +33,11 @@ function fixture_dynamic_target { fixture_dynamic_helper }
 
 $fixture_dynamic = 'fixture_dynamic_target'
 
+function fixture_install_way {
+    Show-DeprecatedWarning $MyInvocation 'fixture_modern_way'
+}
+
 function fixture_still_used {
+    fixture_install_way
     Show-DeprecatedWarning $MyInvocation 'fixture_modern_way'
 }

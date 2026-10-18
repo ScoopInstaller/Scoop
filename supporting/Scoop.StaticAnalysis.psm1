@@ -419,7 +419,9 @@ function Get-DotSourceIssue {
 
                     $child = $item.Loaded.Clone()
                     $child[$d.File] = $true
-                    foreach ($c in $index.dotClosure[$d.File]) { $child[$c] = $true }
+                    if ($d.File -ne $entry) {
+                        foreach ($c in $index.dotClosure[$d.File]) { $child[$c] = $true }
+                    }
                     foreach ($t in $fnAboveDots[$d.Key]) { $child[$t] = $true }
                     foreach ($t in $fnDots[$d.Key]) { if ($t) { $child[$t] = $true } }
 
@@ -446,7 +448,7 @@ function Get-DotSourceIssue {
                             if ($topCmds[$d.File][$i].Count) {
                                 $queue.Enqueue(@{
                                     File = $d.File; Stmt = $i; Calls = $topCmds[$d.File][$i]
-                                    Loaded = $libLoaded.Clone(); Fns = @{}; Env = @{}; EnvKey = ''; Chain = $chain
+                                    Loaded = $libLoaded.Clone(); Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain
                                 })
                             }
                         }
@@ -490,7 +492,6 @@ function Get-StringReachedNames {
 
     $names = @{}
     foreach ($file in $Index.files) {
-        # One walk collects the syntax offsets and the literals; filtering waits for the full set.
         $syntaxStart = @{}
         $strings = @()
         foreach ($n in $Index.asts[$file].FindAll({
@@ -575,7 +576,6 @@ function Get-UnreachableFunction {
         foreach ($list in $index.topDots[$current]) { foreach ($t in $list) { if ($t -and -not $seeds.ContainsKey($t)) { $seeds[$t] = $true; $loadQueue.Enqueue($t) } } }
     }
 
-    # Every seed reaches the same string-literal names, so one shared walk replaces a walk per seed.
     $reached = @{}
     $queue = [System.Collections.Generic.Queue[Object]]::new()
     foreach ($name in (Get-StringReachedNames -Index $index -Defs $defs).Keys) {
