@@ -1,5 +1,7 @@
 function fixture_never_helper { 'never' }
 
+function fixture_top_helper { 'top' }
+
 function fixture_orphan { 'orphan' }
 
 function fixture_old_way {

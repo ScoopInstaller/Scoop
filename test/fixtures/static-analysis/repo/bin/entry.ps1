@@ -1,3 +1,6 @@
+function fixture_early { fixture_late_helper }
+fixture_early
+
 fixture_late_helper
 . "$PSScriptRoot\..\lib\host.ps1"
 

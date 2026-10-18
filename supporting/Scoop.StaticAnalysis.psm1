@@ -330,6 +330,7 @@ function Get-DotSourceIssue {
     $issues = @()
     foreach ($entry in $entries) {
         $inherits = $entry -like "$Root\libexec\*"
+        $libSeen = @{}
 
         # A function loads files when it runs (lib/core.ps1 does this lazily): treat every file
         # reachable from this entry as available. Top-level dot-sources stay order-sensitive below.
@@ -433,6 +434,24 @@ function Get-DotSourceIssue {
                         Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain
                     })
 
+                    if ($d.File -ne $entry -and -not $libSeen.ContainsKey($d.File)) {
+                        $libSeen[$d.File] = $true
+                        $libLoaded = $child.Clone()
+                        for ($i = 0; $i -lt $topStmts[$d.File].Count; $i++) {
+                            foreach ($t in $topDots[$d.File][$i]) {
+                                if (-not $t) { continue }
+                                $libLoaded[$t] = $true
+                                foreach ($c in $index.dotClosure[$t]) { $libLoaded[$c] = $true }
+                            }
+                            if ($topCmds[$d.File][$i].Count) {
+                                $queue.Enqueue(@{
+                                    File = $d.File; Stmt = $i; Calls = $topCmds[$d.File][$i]
+                                    Loaded = $libLoaded.Clone(); Fns = @{}; Env = @{}; EnvKey = ''; Chain = $chain
+                                })
+                            }
+                        }
+                    }
+
                     # A nested function body runs in its owner's session, so its calls get the same state.
                     foreach ($k in $fnNested[$d.Key]) {
                         $nestedKey = "$k|$envKey"
@@ -471,29 +490,36 @@ function Get-StringReachedNames {
 
     $names = @{}
     foreach ($file in $Index.files) {
+        # One walk collects the syntax offsets and the literals; filtering waits for the full set.
         $syntaxStart = @{}
-        foreach ($cmd in $Index.asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] }, $true)) {
-            if ($cmd.GetCommandName()) { $syntaxStart[$cmd.CommandElements[0].Extent.StartOffset] = $true }
-        }
-        foreach ($member in $Index.asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.MemberExpressionAst] }, $true)) {
-            $syntaxStart[$member.Member.Extent.StartOffset] = $true
-        }
-        foreach ($table in $Index.asts[$file].FindAll({ param($n) $n -is [System.Management.Automation.Language.HashtableAst] }, $true)) {
-            foreach ($pair in $table.KeyValuePairs) { $syntaxStart[$pair.Item1.Extent.StartOffset] = $true }
+        $strings = @()
+        foreach ($n in $Index.asts[$file].FindAll({
+                param($x) $x -is [System.Management.Automation.Language.CommandAst] -or
+                $x -is [System.Management.Automation.Language.MemberExpressionAst] -or
+                $x -is [System.Management.Automation.Language.HashtableAst] -or
+                $x -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
+                $x -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
+            }, $true)) {
+            if ($n -is [System.Management.Automation.Language.StringConstantExpressionAst] -or $n -is [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
+                $strings += $n
+            } elseif ($n -is [System.Management.Automation.Language.CommandAst]) {
+                if ($n.GetCommandName()) { $syntaxStart[$n.CommandElements[0].Extent.StartOffset] = $true }
+            } elseif ($n -is [System.Management.Automation.Language.MemberExpressionAst]) {
+                $syntaxStart[$n.Member.Extent.StartOffset] = $true
+            } else {
+                foreach ($pair in $n.KeyValuePairs) { $syntaxStart[$pair.Item1.Extent.StartOffset] = $true }
+            }
         }
 
-        $Index.asts[$file].FindAll({
-                param($n) $n -is [System.Management.Automation.Language.StringConstantExpressionAst] -or
-                $n -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
-            }, $true) | ForEach-Object {
-            if ($syntaxStart.ContainsKey($_.Extent.StartOffset)) { return }
-            $value = $_.Value.Trim()
-            if (-not $value) { return }
+        foreach ($s in $strings) {
+            if ($syntaxStart.ContainsKey($s.Extent.StartOffset)) { continue }
+            $value = $s.Value.Trim()
+            if (-not $value) { continue }
             if ($Defs.ContainsKey($value)) {
                 $names[$value] = $true
-                return
+                continue
             }
-            if ($value -notmatch '[\*\?]') { return }
+            if ($value -notmatch '[\*\?]') { continue }
             foreach ($segment in ($value -split '[\*\?]')) {
                 $segment = $segment.Trim()
                 if ($segment -and $Defs.ContainsKey($segment)) { $names[$segment] = $true }
@@ -526,6 +552,7 @@ function Get-UnreachableFunction {
     $fnBodies = $index.fnBodies
     $fnCmds = $index.fnCmds
     $fnNested = $index.fnNested
+    $topCmds = $index.topCmds
     $asts = $index.asts
 
     # Load order is ignored on purpose: anything a seed dot-sources is a seed too, and bin scripts
@@ -548,54 +575,40 @@ function Get-UnreachableFunction {
         foreach ($list in $index.topDots[$current]) { foreach ($t in $list) { if ($t -and -not $seeds.ContainsKey($t)) { $seeds[$t] = $true; $loadQueue.Enqueue($t) } } }
     }
 
+    # Every seed reaches the same string-literal names, so one shared walk replaces a walk per seed.
     $reached = @{}
-    $reachedByName = Get-StringReachedNames -Index $index -Defs $defs
-
+    $queue = [System.Collections.Generic.Queue[Object]]::new()
+    foreach ($name in (Get-StringReachedNames -Index $index -Defs $defs).Keys) {
+        foreach ($d in $defs[$name]) {
+            $reached[$d.Key] = $true
+            $queue.Enqueue(@{ File = $d.File; Calls = $fnCmds[$d.Key] })
+            # Nested bodies run with their owner; marking alone would miss calls only they make.
+            foreach ($k in $fnNested[$d.Key]) {
+                $reached[$k] = $true
+                $queue.Enqueue(@{ File = $d.File; Calls = $fnCmds[$k] })
+            }
+        }
+    }
     foreach ($seed in @($seeds.Keys)) {
-        $visited = @{}
-        $queue = [System.Collections.Generic.Queue[Object]]::new()
-        foreach ($list in $index.topCmds[$seed]) { $queue.Enqueue(@{ File = $seed; Calls = $list }) }
+        foreach ($list in $topCmds[$seed]) { $queue.Enqueue(@{ File = $seed; Calls = $list }) }
+    }
 
-        foreach ($name in $reachedByName.Keys) {
+    while ($queue.Count) {
+        $item = $queue.Dequeue()
+        foreach ($call in $item.Calls) {
+            $name = $call.GetCommandName()
+            if (-not $name -or -not $defs.ContainsKey($name)) { continue }
             foreach ($d in $defs[$name]) {
-                if ($visited.ContainsKey($d.Key)) { continue }
-                $visited[$d.Key] = $true
+                if ($reached.ContainsKey($d.Key)) { continue }
                 $reached[$d.Key] = $true
                 $queue.Enqueue(@{ File = $d.File; Calls = $fnCmds[$d.Key] })
                 foreach ($k in $fnNested[$d.Key]) {
-                    if ($visited.ContainsKey($k)) { continue }
-                    $visited[$k] = $true
+                    if ($reached.ContainsKey($k)) { continue }
                     $reached[$k] = $true
                     $queue.Enqueue(@{ File = $d.File; Calls = $fnCmds[$k] })
                 }
             }
         }
-
-        while ($queue.Count) {
-            $item = $queue.Dequeue()
-            foreach ($call in $item.Calls) {
-                $name = $call.GetCommandName()
-                if (-not $name -or -not $defs.ContainsKey($name)) { continue }
-                foreach ($d in $defs[$name]) {
-                    if ($visited.ContainsKey($d.Key)) { continue }
-                    $visited[$d.Key] = $true
-                    $reached[$d.Key] = $true
-                    $queue.Enqueue(@{ File = $d.File; Calls = $fnCmds[$d.Key] })
-
-                    # Nested bodies run with their owner; marking alone would miss calls only they make.
-                    foreach ($k in $fnNested[$d.Key]) {
-                        if ($visited.ContainsKey($k)) { continue }
-                        $visited[$k] = $true
-                        $reached[$k] = $true
-                        $queue.Enqueue(@{ File = $d.File; Calls = $fnCmds[$k] })
-                    }
-                }
-            }
-        }
-    }
-
-    foreach ($name in $reachedByName.Keys) {
-        foreach ($d in $defs[$name]) { $reached[$d.Key] = $true }
     }
 
     $unreachable = @()
@@ -637,16 +650,18 @@ function Get-DeprecatedFunction {
 
     $index = Get-ScriptIndex -Root $Root
     $Root = $index.root
+    $defs = $index.defs
+    $fnBodies = $index.fnBodies
     $deprecated = @()
-    foreach ($entry in $index.defs.GetEnumerator()) {
+    foreach ($entry in $defs.GetEnumerator()) {
         foreach ($def in $entry.Value) {
             if ($def.File -like "$Root\test\*") { continue }
-            $mark = Get-Deprecation $index.fnBodies[$def.Key]
+            $mark = Get-Deprecation $fnBodies[$def.Key]
             if (-not $mark.Deprecated) { continue }
             $deprecated += [PSCustomObject]@{
                 Path      = $def.File
                 Name      = $entry.Key
-                Line      = $index.fnBodies[$def.Key].Extent.StartLineNumber
+                Line      = $fnBodies[$def.Key].Extent.StartLineNumber
                 ReplacedBy = $mark.ReplacedBy
             }
         }

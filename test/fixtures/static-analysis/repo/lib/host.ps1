@@ -1,5 +1,7 @@
 . "$PSScriptRoot\link.ps1"
 
+fixture_top_helper
+
 function fixture_host_helper { 'host' }
 
 function fixture_late_helper { 'late' }
