@@ -5,7 +5,7 @@ BeforeAll {
     $infoScript = "$PSScriptRoot\..\libexec\scoop-info.ps1"
 }
 
-Describe 'scoop info Source' -Tag 'Scoop' {
+Describe 'scoop info Source' -Tag 'Scoop', 'Windows' {
     BeforeEach {
         $scoopdir = "$TestDrive\scoop"
         $globaldir = "$TestDrive\global"
