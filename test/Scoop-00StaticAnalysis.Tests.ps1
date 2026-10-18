@@ -1,7 +1,14 @@
 Describe 'Dot-sourced dependencies' -Tag 'Scoop' {
     BeforeAll {
         Import-Module "$PSScriptRoot\..\supporting\Scoop.StaticAnalysis.psm1" -Force
-        $issues = @(Get-DotSourceIssue -Root (Resolve-Path "$PSScriptRoot\..").Path)
+        $root = (Resolve-Path "$PSScriptRoot\..").Path
+        $issues = @(Get-DotSourceIssue -Root $root)
+        $entries = @(Get-ChildItem "$root\bin", "$root\libexec" -Filter *.ps1)
+    }
+
+    It 'Scans the bin and libexec entry points' {
+        # Guards the gate below against an empty run that would pass vacuously.
+        $entries.Count | Should-BeGreaterThan 0
     }
 
     It 'Every function an entry point calls is loaded before it runs' {
