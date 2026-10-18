@@ -14,12 +14,13 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
                 '{0}: {1} -> {2}:{3} calls {4}' -f $_.Entry, ($_.Chain -join ' -> '), (Split-Path $_.Path -Leaf), $_.Line, $_.Name
             }) -join "`n"
 
-            $issues | Should-BeCollection -Count 11 -Because $report
+            $issues | Should-BeCollection -Count 13 -Because $report
         }
 
         It 'Reports <Name> once per unreachable call' -TestCases @(
             @{ Name = 'fixture_late_helper'; Count = 2 }
             @{ Name = 'fixture_top_helper'; Count = 1 }
+            @{ Name = 'fixture_inner_name'; Count = 2 }
             @{ Name = 'fixture_never_helper'; Count = 7 }
             @{ Name = 'fixture_order_helper'; Count = 1 }
         ) {

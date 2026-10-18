@@ -448,7 +448,7 @@ function Get-DotSourceIssue {
                             if ($topCmds[$d.File][$i].Count) {
                                 $queue.Enqueue(@{
                                     File = $d.File; Stmt = $i; Calls = $topCmds[$d.File][$i]
-                                    Loaded = $libLoaded.Clone(); Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain
+                                    Loaded = $libLoaded.Clone(); Fns = $item.Fns; Env = $env; EnvKey = $envKey; Chain = $chain
                                 })
                             }
                         }

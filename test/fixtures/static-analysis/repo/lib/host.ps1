@@ -33,6 +33,9 @@ function fixture_dynamic_target { fixture_dynamic_helper }
 
 $fixture_dynamic = 'fixture_dynamic_target'
 
+function fixture_inner_owner { function fixture_inner_name { 'inner' } }
+fixture_inner_name
+
 function fixture_install_way {
     Show-DeprecatedWarning $MyInvocation 'fixture_modern_way'
 }
