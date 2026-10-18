@@ -413,7 +413,8 @@ function Get-DotSourceIssue {
                 }
 
                 foreach ($d in $defs[$name]) {
-                    $visitKey = "$($d.Key)|$($item.EnvKey)"
+                    $envKey = ($env.Keys | Sort-Object | ForEach-Object { "$_=$($env[$_])" }) -join ','
+                    $visitKey = "$($d.Key)|$envKey"
                     if ($visited.ContainsKey($visitKey)) { continue }
                     $visited[$visitKey] = $true
 
@@ -430,7 +431,6 @@ function Get-DotSourceIssue {
                     $fns[$d.Key] = $true
 
                     $chain = $item.Chain + "$name()"
-                    $envKey = ($env.Keys | Sort-Object | ForEach-Object { "$_=$($env[$_])" }) -join ','
                     $queue.Enqueue(@{
                         File = $d.File; Calls = $fnCmds[$d.Key]; Loaded = $child
                         Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain

@@ -22,6 +22,43 @@ if ((get_config fixture_flag) -and ($app -ne 'scoop')) {
     fixture_never_helper
 }
 
+if (-not (get_config fixture_flag)) {
+    fixture_guarded_visitor
+} else {
+    fixture_guarded_visitor
+}
+
+function fixture_compound_caller {
+    if ((get_config fixture_flag) -and ($app -ne 'scoop')) {
+        fixture_quiet_helper
+    } else {
+        fixture_else_only_helper
+    }
+}
+if (get_config fixture_flag) {
+    fixture_compound_caller
+}
+
+function fixture_elseif_caller {
+    if (get_config fixture_flag) {
+        fixture_quiet_helper
+    } elseif (get_config other_flag) {
+        fixture_else_only_helper
+    }
+}
+if (-not (get_config fixture_flag)) {
+    fixture_elseif_caller
+}
+
+function fixture_or_caller {
+    if ((get_config fixture_flag) -or (get_config other_flag)) {
+        fixture_or_only_helper
+    }
+}
+if (-not (get_config fixture_flag)) {
+    fixture_or_caller
+}
+
 fixture_outer
 
 fixture_order_helper

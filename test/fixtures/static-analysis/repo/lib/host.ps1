@@ -36,6 +36,16 @@ $fixture_dynamic = 'fixture_dynamic_target'
 function fixture_inner_owner { function fixture_inner_name { 'inner' } }
 fixture_inner_name
 
+function fixture_guarded_visitor {
+    if (get_config fixture_flag) {
+        fixture_only_when_true
+    } else {
+        fixture_only_when_false
+    }
+}
+
+function fixture_quiet_helper { 'quiet' }
+
 function fixture_install_way {
     Show-DeprecatedWarning $MyInvocation 'fixture_modern_way'
 }

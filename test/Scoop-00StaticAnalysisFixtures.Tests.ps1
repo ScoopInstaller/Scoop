@@ -14,13 +14,17 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
                 '{0}: {1} -> {2}:{3} calls {4}' -f $_.Entry, ($_.Chain -join ' -> '), (Split-Path $_.Path -Leaf), $_.Line, $_.Name
             }) -join "`n"
 
-            $issues | Should-BeCollection -Count 13 -Because $report
+            $issues | Should-BeCollection -Count 18 -Because $report
         }
 
         It 'Reports <Name> once per unreachable call' -TestCases @(
             @{ Name = 'fixture_late_helper'; Count = 2 }
             @{ Name = 'fixture_top_helper'; Count = 1 }
             @{ Name = 'fixture_inner_name'; Count = 2 }
+            @{ Name = 'fixture_only_when_true'; Count = 1 }
+            @{ Name = 'fixture_only_when_false'; Count = 1 }
+            @{ Name = 'fixture_else_only_helper'; Count = 2 }
+            @{ Name = 'fixture_or_only_helper'; Count = 1 }
             @{ Name = 'fixture_never_helper'; Count = 7 }
             @{ Name = 'fixture_order_helper'; Count = 1 }
         ) {
@@ -69,6 +73,10 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             $fn | Should-BeCollection -Count 1
             $fn[0].ReplacedBy | Should-Be $ReplacedBy
         }
+
+        It 'Skips functions that only the test suite defines' {
+            @($deprecated | Where-Object { $_.Name -eq 'fixture_test_deprecated' }) | Should-BeCollection -Count 0
+        }
     }
 
     Context 'Get-DeprecatedManifestUsage' {
@@ -88,6 +96,13 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             $clean | Should-BeCollection -Count 1
             $clean[0].Failed | Should-BeFalse
             @($clean[0].Found.Keys) | Should-BeCollection -Count 0
+        }
+
+        It 'Flags a manifest it cannot parse' {
+            $broken = @($usage | Where-Object { $_.Manifest -eq 'broken_app' })
+            $broken | Should-BeCollection -Count 1
+            $broken[0].Failed | Should-BeTrue
+            @($broken[0].Found.Keys) | Should-BeCollection -Count 0
         }
     }
 }
