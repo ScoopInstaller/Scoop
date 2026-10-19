@@ -183,6 +183,8 @@ function create_shims($manifest, $dir, $global, $arch) {
             $bin = "$dir\$target"
         } elseif (Test-Path -LiteralPath $target -PathType leaf) {
             $bin = $target
+        } elseif ($original_dir -and (Test-Path -LiteralPath "$original_dir\$target" -PathType leaf)) {
+            $bin = "$original_dir\$target"
         } else {
             $bin = (Get-CommandLiteral $target @('Application', 'ExternalScript')).Source
         }
