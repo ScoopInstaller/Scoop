@@ -33,9 +33,10 @@ $manifest_file = if ($bucket) {
 }
 
 # Standalone and Source detection
-if ((Test-Path $original_app) -or ($original_app -match '^(ht|f)tps?://|\\\\')) {
+# A local manifest is a file; a folder with the app's name doesn't make it standalone
+if ((Test-Path $original_app -PathType Leaf) -or ($original_app -match '^(ht|f)tps?://|\\\\')) {
     $standalone = $true
-    if (Test-Path $original_app) {
+    if (Test-Path $original_app -PathType Leaf) {
         $original_app = (Get-AbsolutePath "$original_app")
     }
     if ($install.url) {
