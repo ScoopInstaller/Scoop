@@ -392,6 +392,11 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
         $apps = @(Get-Dependency $app $architecture) -ne $app
         $apps.Where({ !(installed $_) }) + $app | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
     }
+
+    $changelog = changelog_url $manifest
+    if ($changelog -and !$quiet) {
+        info "See what's new in this update: $changelog"
+    }
 }
 
 if (-not ($apps -or $all)) {

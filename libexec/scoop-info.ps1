@@ -99,6 +99,11 @@ $item.Source = if ($standalone) {
 if ($manifest.homepage) {
     $item.Website = $manifest.homepage.TrimEnd('/')
 }
+# Show changelog (manifest property or derived GitHub releases URL)
+$changelog = changelog_url $manifest
+if ($changelog) {
+    $item.Changelog = $changelog
+}
 # Show license
 if ($manifest.license) {
     $item.License = if ($manifest.license.identifier -and $manifest.license.url) {

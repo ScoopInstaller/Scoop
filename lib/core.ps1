@@ -585,6 +585,7 @@ function app_status($app, $global) {
     if ($manifest.version) {
         $status.latest_version = $manifest.version
     }
+    $status.changelog = changelog_url $manifest
 
     $status.outdated = $false
     if ($status.version -and $status.latest_version) {
