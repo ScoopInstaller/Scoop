@@ -27,68 +27,74 @@ function Get-BodyStmtIndex {
 }
 
 function Get-GetConfigConstraint {
-    # Truth value a `get_config X` must have for this condition to evaluate to $Assume, or $null
-    # when the condition pins none: a comparison consumes the value, an `-or` above the call (or
-    # an `-and` under a negated else) leaves it free, and only a negation on the call's own spine
-    # inverts it.
+    # Truth values this condition pins for `get_config X` when it evaluates to $Assume, or $null when
+    # it pins none: each call is judged on its own spine, a negation flipping only its operand.
     param(
         [System.Management.Automation.Language.Ast] $Condition,
         [Bool] $Assume = $true
     )
 
     if (-not $Condition) { return }
-    $calls = @($Condition.FindAll({
+    $pinned = @{}
+    $dropped = @{}
+    foreach ($call in $Condition.FindAll({
                 param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'get_config'
-            }, $true))
-    if ($calls.Count -ne 1) { return }
-    $call = $calls[0]
-    if ($call.CommandElements.Count -lt 2 -or $call.CommandElements[1] -isnot [System.Management.Automation.Language.StringConstantExpressionAst]) { return }
-    $key = [string]$call.CommandElements[1].Value
-    if (-not $key) { return }
-
-    $node = $Condition
-    while ($node) {
-        $type = $node.GetType().Name
-        if ($type -eq 'PipelineAst') {
-            if ($node.PipelineElements.Count -ne 1) { return }
-            $node = $node.PipelineElements[0]
-            continue
+            }, $true)) {
+        $value = $Assume
+        $node = $Condition
+        while ($node -ne $call) {
+            $type = $node.GetType().Name
+            if ($type -eq 'PipelineAst') {
+                if ($node.PipelineElements.Count -ne 1) { $node = $null; break }
+                $node = $node.PipelineElements[0]
+            } elseif ($type -eq 'CommandExpressionAst') {
+                $node = $node.Expression
+            } elseif ($type -eq 'ParenExpressionAst') {
+                $node = $node.Pipeline
+            } elseif ($type -eq 'UnaryExpressionAst') {
+                # `-not` and `!` differ only in token kind.
+                if ($node.TokenKind -ne 'Not' -and $node.TokenKind -ne 'Exclaim') { $node = $null; break }
+                $value = -not $value
+                $node = $node.Child
+            } elseif ($type -eq 'BinaryExpressionAst') {
+                if ($node.Operator -eq 'And') {
+                    # A true `A -and B` holds both sides; a false one forces neither.
+                    if (-not $value) { $node = $null; break }
+                } elseif ($node.Operator -eq 'Or') {
+                    # A false `A -or B` fails both sides; a true one forces neither.
+                    if ($value) { $node = $null; break }
+                } else {
+                    # Any other operator compares the call's value, not its truth.
+                    $node = $null; break
+                }
+                if ($node.Left.Extent.StartOffset -le $call.Extent.StartOffset -and $call.Extent.EndOffset -le $node.Left.Extent.EndOffset) {
+                    $node = $node.Left
+                } elseif ($node.Right.Extent.StartOffset -le $call.Extent.StartOffset -and $call.Extent.EndOffset -le $node.Right.Extent.EndOffset) {
+                    $node = $node.Right
+                } else { $node = $null; break }
+            } elseif ($type -eq 'CommandAst') {
+                # A call used as an argument of another command pins nothing.
+                $node = $null; break
+            } else { $node = $null; break }
         }
-        if ($type -eq 'CommandExpressionAst') { $node = $node.Expression; continue }
-        if ($type -eq 'ParenExpressionAst') { $node = $node.Pipeline; continue }
-        if ($type -eq 'UnaryExpressionAst') {
-            # `-not` and `!` differ only in token kind.
-            if ($node.TokenKind -ne 'Not' -and $node.TokenKind -ne 'Exclaim') { return }
-            $Assume = -not $Assume
-            $node = $node.Child
-            continue
+        if (-not $node) { continue }
+        if ($call.CommandElements.Count -lt 2 -or $call.CommandElements[1] -isnot [System.Management.Automation.Language.StringConstantExpressionAst]) { continue }
+        $key = ([string]$call.CommandElements[1].Value).ToLowerInvariant()
+        if (-not $key -or $dropped.ContainsKey($key)) { continue }
+        if ($pinned.ContainsKey($key) -and $pinned[$key] -ne $value) {
+            # A clause pinning both values (`A -and -not A`) never holds, so it pins nothing.
+            $pinned.Remove($key)
+            $dropped[$key] = $true
+        } else {
+            $pinned[$key] = $value
         }
-        if ($type -eq 'BinaryExpressionAst') {
-            $inLeft = $node.Left.Extent.StartOffset -le $call.Extent.StartOffset -and $call.Extent.EndOffset -le $node.Left.Extent.EndOffset
-            $inRight = $node.Right.Extent.StartOffset -le $call.Extent.StartOffset -and $call.Extent.EndOffset -le $node.Right.Extent.EndOffset
-            if (-not ($inLeft -or $inRight)) { return }
-            if ($node.Operator -eq 'And') {
-                # The sibling side says nothing about this call, so only the assumed value matters.
-                if (-not $Assume) { return }
-            } elseif ($node.Operator -eq 'Or') {
-                # A true `A -or B` needs one side only; a false one needs both.
-                if ($Assume) { return }
-            } else { return }
-            $node = if ($inLeft) { $node.Left } else { $node.Right }
-            continue
-        }
-        if ($type -eq 'CommandAst') {
-            # A call used as an argument of another command pins nothing.
-            if ($node -ne $call) { return }
-            return @{ Key = $key.ToLowerInvariant(); Value = $Assume }
-        }
-        return
     }
+    if ($pinned.Count) { $pinned }
 }
 
 function Get-CommandConstraint {
-    # Every `get_config X` guard the command sits behind, out to the enclosing ifs. An `elseif`
-    # chain pins only its containing clause; `else` inverts each clause guard, dropping conflicts.
+    # Every `get_config X` guard the command sits behind, out to the enclosing ifs. An `elseif` pins
+    # only its own clause; an `else` asks each clause for the values it pins when false.
     param([System.Management.Automation.Language.CommandAst] $Command)
 
     $constraints = @{}
@@ -106,23 +112,25 @@ function Get-CommandConstraint {
             }
             if ($clause) {
                 $c = Get-GetConfigConstraint $clause.Item1
-                if ($c) { $constraints[$c.Key] = $c.Value }
+                if ($c) { foreach ($k in $c.Keys) { $constraints[$k] = $c[$k] } }
             } elseif ($node.ElseClause) {
                 $else = $node.ElseClause.Extent
                 if ($Command.Extent.StartOffset -ge $else.StartOffset -and $Command.Extent.EndOffset -le $else.EndOffset) {
                     $inverted = @{}
                     $dropped = @{}
                     foreach ($candidate in $node.Clauses) {
-                        # The else branch runs when every clause is false, so ask for the value
-                        # each clause pins under that assumption.
+                        # An else runs when every clause is false, so ask each for its false-case values.
                         $c = Get-GetConfigConstraint -Condition $candidate.Item1 -Assume $false
-                        if (-not $c -or $dropped.ContainsKey($c.Key)) { continue }
-                        $value = $c.Value
-                        if ($inverted.ContainsKey($c.Key) -and $inverted[$c.Key] -ne $value) {
-                            $inverted.Remove($c.Key)
-                            $dropped[$c.Key] = $true
-                        } else {
-                            $inverted[$c.Key] = $value
+                        if (-not $c) { continue }
+                        foreach ($k in $c.Keys) {
+                            if ($dropped.ContainsKey($k)) { continue }
+                            $value = $c[$k]
+                            if ($inverted.ContainsKey($k) -and $inverted[$k] -ne $value) {
+                                $inverted.Remove($k)
+                                $dropped[$k] = $true
+                            } else {
+                                $inverted[$k] = $value
+                            }
                         }
                     }
                     foreach ($k in $inverted.Keys) { $constraints[$k] = $inverted[$k] }
@@ -151,8 +159,7 @@ function Get-ScriptIndex {
         [String] $Root
     )
 
-    # Canonical cache key and -like base: a relative, `..`-containing or trailing-separator
-    # Root would never match the absolute paths recorded below.
+    # Canonical cache key and -like base: a relative or trailing-separator Root would never match.
     $Root = [IO.Path]::GetFullPath($Root).TrimEnd('\', '/')
     if ($script:indexCache.ContainsKey($Root)) { return $script:indexCache[$Root] }
 
@@ -342,8 +349,7 @@ function Get-ScriptIndex {
         }
     }
 
-    # A dot-sourced script runs its whole body, so the files it pulls in are loaded with it, and a
-    # caller's copy has to carry the whole chain: repeating until stable resolves the nesting.
+    # A dot-sourced script runs its whole body, so a caller needs the whole chain.
     $dotClosure = @{}
     foreach ($file in $files) {
         $set = @{}
@@ -405,10 +411,8 @@ function Get-ScriptIndex {
 }
 
 function Add-TopLevelWalk {
-    # A dot-source below a call cannot satisfy it. `Limits` marks the definitions that had run at
-    # each `& path` call site, so an invoked script cannot see later ones. Returns what this walk
-    # actually loaded: only the dot target itself is marked before its own walk, so a call above
-    # the target's dot-sources is still checked against what ran before it.
+    # A dot-source below a call cannot satisfy it, so only the target is marked before its own
+    # walk; the return value carries back what actually loaded.
     param($Index, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Seen, $Limits)
 
     if ($Seen.ContainsKey($File) -or -not $Index.topStmts.ContainsKey($File)) { return $Loaded }
@@ -444,7 +448,7 @@ function Add-TopLevelWalk {
 }
 
 function Resolve-Env {
-    # $null when the guards contradict the state, which means this call cannot run.
+    # $null when the guards contradict the state: the call cannot run.
     param($Env, $Constraints)
 
     if (-not $Constraints -or -not $Constraints.Count) { return $Env }
@@ -473,7 +477,6 @@ function Get-CallConstraint {
 }
 
 function Add-BodyWalk {
-    # A body runs its statements in order, so a dot-source below a call cannot satisfy it.
     param($Index, [String] $Key, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Limits, $Visited)
 
     $loaded = $Loaded.Clone()
@@ -550,7 +553,7 @@ function Get-DotSourceIssue {
         $inherits = $entry -like "$Root\libexec\*"
 
         # A function loads files when it runs (lib/core.ps1 does this lazily): treat every file
-        # reachable from this entry as available. Top-level dot-sources stay order-sensitive below.
+        # reachable from this entry as available.
         $lazy = @{}
         $seen = @{}
         $names = [System.Collections.Generic.Queue[String]]::new()
@@ -592,8 +595,7 @@ function Get-DotSourceIssue {
                 $visible = $false
                 foreach ($d in $defs[$name]) {
                     if (-not ($item.Loaded.ContainsKey($d.File) -or ($inherits -and $hostSet.ContainsKey($d.File)))) { continue }
-                    # Top-level statements run in order: an entry-file definition below the
-                    # calling statement has not run yet when the call executes.
+                    # Top-level statements run in order, so a definition below the call is not in scope.
                     if ($null -ne $item.Stmt -and $d.File -eq $item.File -and $d.Stmt -gt $item.Stmt) { continue }
                     # Same for a caller's definitions seen by a script it invoked.
                     $limited = $false
@@ -664,8 +666,7 @@ function Get-Deprecation {
 
 function Get-StringReachedNames {
     # Names the code hands to `& $var` rather than calling directly, including wildcard
-    # strings searched as text. Command names, member names and hashtable keys are syntax
-    # rather than data, so their extents are skipped.
+    # strings searched as text. Syntax (command, member, hashtable key) is skipped.
     param($Index, $Defs)
 
     $names = @{}
@@ -733,8 +734,8 @@ function Get-UnreachableFunction {
     $fnNested = $index.fnNested
     $topCmds = $index.topCmds
 
-    # Load order is ignored on purpose: anything a seed dot-sources is a seed too, and bin scripts
-    # reached through `&` run in their caller's session, so they stay seeds without being entries.
+    # Load order is ignored: anything a seed dot-sources is a seed, and `&`-reached bin scripts run
+    # in their caller's session, so they stay seeds without being entries.
     $seeds = @{}
     foreach ($e in Get-ChildItem "$Root\bin", "$Root\libexec" -Filter *.ps1) { $seeds[$e.FullName] = $true }
     # The test suite consumes lib functions too; a function only the tests reach is not dead code.

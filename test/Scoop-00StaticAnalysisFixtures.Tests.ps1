@@ -44,6 +44,7 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             @{ Name = 'fixture_inner_helper' }
             @{ Name = 'fixture_self_helper' }
             @{ Name = 'guard_left_helper' }
+            @{ Name = 'guard_two_call_helper' }
             @{ Name = 'fixture_cycle_helper' }
         ) {
             @($issues | Where-Object { $_.Name -eq $Name }) | Should-BeCollection -Count 0

@@ -85,3 +85,9 @@ function guard_or_caller {
         guard_or_helper
     }
 }
+
+function guard_two_call_outer {
+    if (-not (get_config guard_two_flag) -and (get_config guard_two_other_flag)) {
+        guard_two_call_helper
+    }
+}

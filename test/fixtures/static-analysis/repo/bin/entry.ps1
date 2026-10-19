@@ -122,3 +122,7 @@ if (-not (get_config guard_or_flag)) {
 
 . "$PSScriptRoot\..\lib\cycle_a.ps1"
 fixture_cycle_helper
+
+if (get_config guard_two_flag) {
+    guard_two_call_outer
+}

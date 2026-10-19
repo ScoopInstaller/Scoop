@@ -35,3 +35,5 @@ function guard_left_helper { 'left' }
 function guard_else_helper { 'else' }
 
 function guard_or_helper { 'or' }
+
+function guard_two_call_helper { 'two' }
