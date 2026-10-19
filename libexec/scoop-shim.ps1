@@ -1,6 +1,6 @@
 # Usage: scoop shim <subcommand> [<shim_name>...] [options] [other_args]
 # Summary: Manipulate Scoop shims
-# Help: Available subcommands: add, rm, list, info, alter.
+# Help: Available subcommands: add, rm, list, info, alter, update.
 #
 # To add a custom shim, use the 'add' subcommand:
 #
@@ -22,6 +22,10 @@
 #
 #     scoop shim alter <shim_name>
 #
+# To update the shim bodies, use the 'update' subcommand:
+#
+#     scoop shim update [<shim_name>...]
+#
 # Options:
 #   -g, --global       Manipulate global shim(s)
 #
@@ -41,11 +45,11 @@ param($SubCommand)
 . "$PSScriptRoot\..\lib\shim.ps1" # for shim functions
 . "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
 
-if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
+if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter', 'update')) {
     if (!$SubCommand) {
         error '<subcommand> missing'
     } else {
-        error "'$SubCommand' is not one of available subcommands: add, rm, list, info, alter"
+        error "'$SubCommand' is not one of available subcommands: add, rm, list, info, alter, update"
     }
     my_usage
     exit 1
@@ -56,7 +60,7 @@ if ($err) { error "scoop shim: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
 
-if ($SubCommand -ne 'list' -and $other.Length -eq 0) {
+if ($SubCommand -notin @('list', 'update') -and $other.Length -eq 0) {
     error "<shim_name> must be specified for subcommand '$SubCommand'"
     my_usage
     exit 1
@@ -70,6 +74,9 @@ $localShimDir = shimdir $false
 $globalShimDir = shimdir $true
 
 switch ($SubCommand) {
+    'update' {
+        Set-ShimCopy -Global $global -Names $other
+    }
     'add' {
         if ($other.Length -lt 2 -or $other[1] -eq '') {
             error "<command_path> must be specified for subcommand 'add'"

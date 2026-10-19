@@ -324,6 +324,69 @@ function Get-ShimExe($Shim) {
     $bundled
 }
 
+function Set-ShimCopy($Exe, $Global, $Names) {
+    if (!$Exe) { $Exe = Get-ShimExe }
+    # no scope given means both, the way every refresh does it
+    if ($null -eq $Global) {
+        Set-ShimCopy $Exe $false $Names
+        if (is_admin) { Set-ShimCopy $Exe $true $Names }
+        return
+    }
+    $shimDir = shimdir $Global
+    if (!(Test-Path -LiteralPath $Exe) -or !(Test-Path -LiteralPath $shimDir)) { return }
+    if ($Global -and !(is_admin)) { abort 'you need admin rights to update global shims' }
+
+    $shims = Get-ChildItem -LiteralPath $shimDir -Filter '*.shim' -ErrorAction SilentlyContinue
+    if ($Names) {
+        $shims = $shims | Where-Object { $_.BaseName -in $Names }
+    }
+
+    $scope = if ($Global) { ' (global)' } else { '' }
+    Write-Host "Updating shim(s)$scope$(if ($Names) { " for $($Names -join ', ')" })... " -NoNewline
+
+    # only System32 was ever rewritten to Sysnative, and nothing writes it any more, so
+    # that is the only way back for a shim made before the rewrite was dropped
+    $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
+    $migrate = ![System.Environment]::Is64BitOperatingSystem -or (Get-PEMachine $Exe) -ne 0x014c
+
+    $skipped = @()
+    $shims | ForEach-Object {
+        $name = $_.BaseName
+        $dest = "$shimDir\$name.exe"
+        if (!(Test-Path -LiteralPath $dest)) { return }
+        try {
+            Copy-Item -LiteralPath $Exe -Destination $dest -Force -ErrorAction Stop
+        } catch {
+            $skipped += $name
+            return
+        }
+        # a saved description comes back when the app that took the name is removed, so it migrates too
+        if ($migrate) {
+            $files = @(Get-Item -LiteralPath $_.FullName) + @(Get-ChildItem -LiteralPath $shimDir -Filter "$name.shim.*" -File -ErrorAction SilentlyContinue)
+            foreach ($file in $files) {
+                $lines = @(Get-Content -LiteralPath $file.FullName -Encoding UTF8)
+                if ($lines[0] -like "*$sysnative\*") {
+                    $stamp = $file.LastWriteTimeUtc
+                    $lines[0] = $lines[0].Replace($sysnative, "$env:SystemRoot\System32")
+                    ($lines -join "`r`n") | Out-UTF8File -FilePath $file.FullName -NoNewline
+                    # the newest description is the one restored, so the rewrite must not move it to the front
+                    [IO.File]::SetLastWriteTimeUtc($file.FullName, $stamp)
+                }
+            }
+        }
+        # the fresh copy lost the GUI flag the target needs
+        if ((Get-PESubsystem (Get-ShimTarget $_.FullName)) -eq 2) {
+            Set-PESubsystem $dest 2 | Out-Null
+        }
+    }
+
+    Write-Host 'Done.' -ForegroundColor Green
+    if ($skipped) {
+        warn "Skipped $($skipped.Count) running shim(s): $($skipped -join ', ')"
+        warn "Run 'scoop shim update <shim(s)>' again once they have exited."
+    }
+}
+
 # get target, name, arguments for shim
 function Get-ShimDefinition($Item) {
     if ($Item -is [array]) { return $Item }
