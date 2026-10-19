@@ -42,8 +42,7 @@ function Get-GetConfigConstraint {
     if ($rest -match '^(?:\s+(?:''[^'']*''|\$\w+))?(?:\s*\))+\s*-(?:eq|ne|ieq|ine|ge|gt|le|lt|like|notlike|match|notmatch|in|notin|contains|is|isnot|band|bor)\b') { return }
 
     $negated = ($text -match '^\s*!') -or ($text -match '^\s*\(?\s*-not\b')
-    # `-not (A -and B)` is `!A -or !B`, so it does not pin A one way; reading it as a single value
-    # would skip a branch that still runs. Leave a negated compound condition unconstrained.
+    # `-not (A -and B)` is `!A -or !B`: reading it as a single value would skip a live branch.
     if ($negated -and $text -match '\s-(?:and|or)\s') { return }
     @{ Key = $name.Groups[1].Value.ToLowerInvariant(); Value = (-not $negated) }
 }
@@ -180,7 +179,6 @@ function Get-ScriptIndex {
             $keyOf[$body] = $key
             $fnBodies[$key] = $body
 
-            # Per body statement, so the walk can apply dot-sources in the order they run.
             $bodyStmts = @($body.Body.EndBlock.Statements)
             $fnStmts[$key] = $bodyStmts.Count
             $ranges = [Object[]]::new($bodyStmts.Count)
@@ -245,7 +243,6 @@ function Get-ScriptIndex {
                 $target = Get-DotSourceLiteralPath $cmd $file
                 if ($invocation -eq 'Ampersand') {
                     if (-not $target) {
-                        # A variable-based call can still name one of the owner's nested functions.
                         if ($owner) { $fnStmtDyn[$owner][(Get-BodyStmtIndex $fnStmtRanges $owner $start $end)].Add($cmd) }
                         continue
                     }
@@ -358,8 +355,8 @@ function Get-ScriptIndex {
 }
 
 function Add-TopLevelWalk {
-    # A dot-source below a call cannot satisfy it; an `& path` target keeps its caller's files and
-    # sees only the definitions that ran before the call, recorded in Limits.
+    # A dot-source below a call cannot satisfy it. `Limits` marks the definitions that had run at
+    # each `& path` call site, so an invoked script cannot see later ones.
     param($Index, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Seen, $Limits)
 
     if ($Seen.ContainsKey($File) -or -not $Index.topStmts.ContainsKey($File)) { return }
@@ -371,7 +368,6 @@ function Add-TopLevelWalk {
             if (-not $t) { continue }
             $loaded[$t] = $true
             foreach ($c in $Index.dotClosure[$t]) { $loaded[$c] = $true }
-            # A dot-sourced script runs its whole body here, in this session's current state.
             Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen $Seen -Limits $Limits
         }
@@ -396,7 +392,7 @@ function Add-TopLevelWalk {
 }
 
 function Resolve-Env {
-    # Merges a call's guards into the state it runs under; $null when they contradict it.
+    # $null when the guards contradict the state, which means this call cannot run.
     param($Env, $Constraints)
 
     if (-not $Constraints -or -not $Constraints.Count) { return $Env }
@@ -451,8 +447,7 @@ function Add-BodyWalk {
             Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen @{} -Limits $Limits
         }
-        # A variable-based call at this statement can name a nested function; it runs right here,
-        # so its body is checked with the state this statement has, not the owner's entry state.
+        # A `& $var` at this statement can name a nested function, and runs with this statement's state.
         foreach ($cmd in $Index.fnStmtDyn[$Key][$j]) {
             $dynEnv = Resolve-Env $Env (Get-CallConstraint $Index $cmd)
             if ($null -eq $dynEnv) { continue }
