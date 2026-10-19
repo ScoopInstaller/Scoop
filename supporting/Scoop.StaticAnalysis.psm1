@@ -42,6 +42,9 @@ function Get-GetConfigConstraint {
     if ($rest -match '^(?:\s+(?:''[^'']*''|\$\w+))?(?:\s*\))+\s*-(?:eq|ne|ieq|ine|ge|gt|le|lt|like|notlike|match|notmatch|in|notin|contains|is|isnot|band|bor)\b') { return }
 
     $negated = ($text -match '^\s*!') -or ($text -match '^\s*\(?\s*-not\b')
+    # `-not (A -and B)` is `!A -or !B`, so it does not pin A one way; reading it as a single value
+    # would skip a branch that still runs. Leave a negated compound condition unconstrained.
+    if ($negated -and $text -match '\s-(?:and|or)\s') { return }
     @{ Key = $name.Groups[1].Value.ToLowerInvariant(); Value = (-not $negated) }
 }
 

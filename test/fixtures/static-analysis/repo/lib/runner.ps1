@@ -24,6 +24,17 @@ if (-not (get_config fixture_flag)) {
     fixture_guarded_dynamic
 }
 
+function fixture_negated_dynamic {
+    function fixture_negated_inner { fixture_amp_target }
+    $fixture_picker = 'fixture_negated_inner'
+    if (-not ((get_config fixture_flag) -and $fixture_other)) {
+        & $fixture_picker
+    }
+}
+if (get_config fixture_flag) {
+    fixture_negated_dynamic
+}
+
 function fixture_outer_runner {
     function fixture_inner_loader {
         fixture_amp_target
