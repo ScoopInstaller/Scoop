@@ -1,5 +1,17 @@
 & "$PSScriptRoot\..\libexec\dispatch.ps1"
+
+function fixture_direct_runner { & "$PSScriptRoot\..\lib\unloaded.ps1" }
+fixture_direct_runner
+
+function fixture_nesting_caller {
+    function fixture_nested_runner { & "$PSScriptRoot\..\lib\unloaded.ps1" }
+    fixture_nested_runner
+}
+fixture_nesting_caller
+
 & "$PSScriptRoot\..\lib\unloaded.ps1"
+function fixture_future_helper { 'future' }
+fixture_future_helper
 
 function fixture_early { fixture_late_helper }
 fixture_early
@@ -60,6 +72,17 @@ function fixture_or_caller {
 }
 if (-not (get_config fixture_flag)) {
     fixture_or_caller
+}
+
+function fixture_elseif_not_caller {
+    if (-not (get_config fixture_flag)) {
+        fixture_quiet_helper
+    } elseif (get_config other_flag) {
+        fixture_else_only_helper
+    }
+}
+if (-not (get_config fixture_flag)) {
+    fixture_elseif_not_caller
 }
 
 & "$PSScriptRoot\..\lib\unloaded.ps1"

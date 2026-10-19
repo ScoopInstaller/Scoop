@@ -310,8 +310,9 @@ function Get-ScriptIndex {
 }
 
 function Add-TopLevelWalk {
-    # A dot-source below a call cannot satisfy it; an `& path` target keeps its caller's files.
-    param($Index, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Seen)
+    # A dot-source below a call cannot satisfy it; an `& path` target keeps its caller's files and
+    # sees only the definitions that ran before the call, recorded in Limits.
+    param($Index, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Seen, $Limits)
 
     if ($Seen.ContainsKey($File) -or -not $Index.topStmts.ContainsKey($File)) { return }
     $Seen[$File] = $true
@@ -326,14 +327,17 @@ function Add-TopLevelWalk {
         if ($Index.topCmds[$File][$i].Count) {
             $Queue.Enqueue(@{
                 File = $File; Stmt = $i; Calls = $Index.topCmds[$File][$i]
-                Loaded = $loaded.Clone(); Fns = $Fns; Env = $Env; EnvKey = $EnvKey; Chain = $Chain
+                Loaded = $loaded.Clone(); Fns = $Fns; Env = $Env; EnvKey = $EnvKey
+                Chain = $Chain; Limits = $Limits
             })
         }
         foreach ($r in $Index.topRuns[$File][$i]) {
             # An entry is walked on its own terms, and a libexec one sees more than this call site.
             if ($Index.entries -contains $r) { continue }
+            $nextLimits = @($Limits | Where-Object { $_ })
+            $nextLimits += @{ File = $File; Stmt = $i }
             Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
-                -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen $Seen
+                -EnvKey $EnvKey -Chain $Chain -Queue $queue -Seen $Seen -Limits $nextLimits
         }
     }
     # Only cycles are cut: two call sites of one script each carry their own loaded set.
@@ -433,6 +437,8 @@ function Get-DotSourceIssue {
                     # Top-level statements run in order: an entry-file definition below the
                     # calling statement has not run yet when the call executes.
                     if ($null -ne $item.Stmt -and $d.File -eq $item.File -and $d.Stmt -gt $item.Stmt) { continue }
+                    # Same for a caller's definitions seen by a script it invoked.
+                    if (@($item.Limits | Where-Object { $d.File -eq $_.File -and $d.Stmt -gt $_.Stmt }).Count) { continue }
                     if ($d.Owner -and -not $item.Fns.ContainsKey($d.Owner)) { continue }
                     $visible = $true
                     break
@@ -468,19 +474,21 @@ function Get-DotSourceIssue {
                     $fns[$d.Key] = $true
 
                     $chain = $item.Chain + "$name()"
+                    $callLimits = @($item.Limits | Where-Object { $_ })
+                    if ($null -ne $item.Stmt) { $callLimits += @{ File = $item.File; Stmt = $item.Stmt } }
                     $queue.Enqueue(@{
                         File = $d.File; Calls = $fnCmds[$d.Key]; Loaded = $child
-                        Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain
+                        Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain; Limits = $callLimits
                     })
 
                     if ($d.File -ne $entry -and -not $libSeen.ContainsKey($d.File) -and -not $index.invoked.ContainsKey($d.File)) {
                         $libSeen[$d.File] = $true
                         Add-TopLevelWalk -Index $index -File $d.File -Loaded $child -Fns $item.Fns -Env $env `
-                            -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{}
+                            -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{} -Limits $callLimits
                     }
                     foreach ($r in $fnRuns[$d.Key]) {
                         Add-TopLevelWalk -Index $index -File $r -Loaded $child -Fns $fns -Env $env `
-                            -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{}
+                            -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{} -Limits $callLimits
                     }
 
                     # A nested function body runs in its owner's session, so its calls get the same state.
@@ -490,8 +498,12 @@ function Get-DotSourceIssue {
                         $visited[$nestedKey] = $true
                         $queue.Enqueue(@{
                             File = $d.File; Calls = $fnCmds[$k]; Loaded = $child
-                            Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain
+                            Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain; Limits = $callLimits
                         })
+                        foreach ($r in $fnRuns[$k]) {
+                            Add-TopLevelWalk -Index $index -File $r -Loaded $child -Fns $fns -Env $env `
+                                -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{} -Limits $callLimits
+                        }
                     }
                 }
             }

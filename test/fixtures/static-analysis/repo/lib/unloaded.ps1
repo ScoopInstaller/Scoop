@@ -12,8 +12,11 @@ function fixture_or_only_helper { 'or' }
 
 fixture_amp_target
 
+fixture_future_helper
+
 function fixture_self_helper { 'self' }
 fixture_self_helper
+& "$PSScriptRoot\link.ps1"
 
 function fixture_orphan { 'orphan' }
 

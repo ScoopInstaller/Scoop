@@ -1,6 +1,7 @@
 . "$PSScriptRoot\link.ps1"
 
 fixture_top_helper
+& "$PSScriptRoot\unloaded.ps1"
 
 function fixture_host_helper { 'host' }
 
