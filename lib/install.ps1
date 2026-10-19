@@ -77,6 +77,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     }
 
     success "'$app' ($version) was installed successfully!"
+    if ($app -eq (get_config SHIM 'default')) { Set-ShimCopy }
 
     show_notes $manifest $dir $original_dir $persist_dir
 }
