@@ -1,3 +1,6 @@
+& "$PSScriptRoot\..\libexec\dispatch.ps1"
+& "$PSScriptRoot\..\lib\unloaded.ps1"
+
 function fixture_early { fixture_late_helper }
 fixture_early
 

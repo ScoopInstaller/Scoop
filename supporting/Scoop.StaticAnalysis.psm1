@@ -114,9 +114,11 @@ function Get-ScriptIndex {
     $topStmts = @{}      # file -> top-level statements
     $topCmds = @{}       # file -> CommandAst[] per top-level statement
     $topDots = @{}       # file -> dot-sourced path[] per top-level statement
+    $topRuns = @{}       # file -> `& path` target[] per top-level statement
     $fnBodies = @{}      # Key -> FunctionDefinitionAst
     $fnCmds = @{}        # Key -> CommandAst[], nested bodies excluded
     $fnDots = @{}        # Key -> paths dot-sourced in the body
+    $fnRuns = @{}        # Key -> `& path` targets run in the body
     $fnFileKeys = @{}    # file -> every def Key, same-name defs included
     $invoked = @{}       # file -> hit through a literal `& path`
     $asts = @{}          # file -> AST for the string-literal pass
@@ -146,6 +148,7 @@ function Get-ScriptIndex {
         for ($i = 0; $i -lt $stmts.Count; $i++) {
             $topCmds[$file] += , @()
             $topDots[$file] += , @()
+            $topRuns[$file] += , @()
             if ($stmts[$i] -is [System.Management.Automation.Language.FunctionDefinitionAst]) { $topFn[$i] = $stmts[$i] }
         }
 
@@ -201,7 +204,16 @@ function Get-ScriptIndex {
                 $invocation = "$($cmd.InvocationOperator)"
                 $target = Get-DotSourceLiteralPath $cmd $file
                 if ($invocation -eq 'Ampersand') {
-                    if ($target) { $invoked[$target] = $true }
+                    if (-not $target) { continue }
+                    $invoked[$target] = $true
+                    if ($owner) {
+                        if (-not $fnRuns.ContainsKey($owner)) { $fnRuns[$owner] = @() }
+                        $fnRuns[$owner] += , $target
+                    } else {
+                        for ($i = 0; $i -lt $stmtRanges.Count; $i++) {
+                            if ($start -ge $stmtRanges[$i].Start -and $end -le $stmtRanges[$i].End) { $topRuns[$file][$i] += , $target; break }
+                        }
+                    }
                     continue
                 }
                 if ($target) {
@@ -285,22 +297,47 @@ function Get-ScriptIndex {
     $entries += Get-ChildItem "$Root\bin" -Filter *.ps1 | ForEach-Object FullName
     $entries += Get-ChildItem "$Root\libexec" -Filter *.ps1 | ForEach-Object FullName
     $entries = $entries | Where-Object { -not ($invoked.ContainsKey($_) -and $_ -like "$Root\bin\*") }
-    # An `& path` script outside those folders runs its own top level, so check it as an entry too.
-    # A bin script reached that way runs in its caller's session; test data is not part of the program.
-    foreach ($target in $invoked.Keys) {
-        if ($target -like "$Root\bin\*" -or $target -like "$Root\test\*") { continue }
-        if ($topStmts.ContainsKey($target) -and $entries -notcontains $target) { $entries += $target }
-    }
 
     $result = @{
         root = $Root
-        files = $files; defs = $defs; topStmts = $topStmts; topCmds = $topCmds; topDots = $topDots
-        fnBodies = $fnBodies; fnCmds = $fnCmds; fnDots = $fnDots; fnFileKeys = $fnFileKeys
+        files = $files; defs = $defs; topStmts = $topStmts; topCmds = $topCmds; topDots = $topDots; topRuns = $topRuns
+        fnBodies = $fnBodies; fnCmds = $fnCmds; fnDots = $fnDots; fnRuns = $fnRuns; fnFileKeys = $fnFileKeys
         fnNested = $fnNested; fnAboveDots = $fnAboveDots; cmdConstraints = $cmdConstraints
         invoked = $invoked; hostSet = $hostSet; entries = $entries; asts = $asts; dotClosure = $dotClosure
     }
     $script:indexCache[$Root] = $result
     $result
+}
+
+function Add-TopLevelWalk {
+    # A dot-source below a call cannot satisfy it; an `& path` target keeps its caller's files.
+    param($Index, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Seen)
+
+    if ($Seen.ContainsKey($File) -or -not $Index.topStmts.ContainsKey($File)) { return }
+    $Seen[$File] = $true
+    $loaded = $Loaded.Clone()
+    $loaded[$File] = $true
+    for ($i = 0; $i -lt $Index.topStmts[$File].Count; $i++) {
+        foreach ($t in $Index.topDots[$File][$i]) {
+            if (-not $t) { continue }
+            $loaded[$t] = $true
+            foreach ($c in $Index.dotClosure[$t]) { $loaded[$c] = $true }
+        }
+        if ($Index.topCmds[$File][$i].Count) {
+            $Queue.Enqueue(@{
+                File = $File; Stmt = $i; Calls = $Index.topCmds[$File][$i]
+                Loaded = $loaded.Clone(); Fns = $Fns; Env = $Env; EnvKey = $EnvKey; Chain = $Chain
+            })
+        }
+        foreach ($r in $Index.topRuns[$File][$i]) {
+            # An entry is walked on its own terms, and a libexec one sees more than this call site.
+            if ($Index.entries -contains $r) { continue }
+            Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
+                -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen $Seen
+        }
+    }
+    # Only cycles are cut: two call sites of one script each carry their own loaded set.
+    $Seen.Remove($File)
 }
 
 function Get-DotSourceIssue {
@@ -330,6 +367,7 @@ function Get-DotSourceIssue {
     $topDots = $index.topDots
     $fnCmds = $index.fnCmds
     $fnDots = $index.fnDots
+    $fnRuns = $index.fnRuns
     $fnNested = $index.fnNested
     $fnAboveDots = $index.fnAboveDots
     $cmdConstraints = $index.cmdConstraints
@@ -366,18 +404,8 @@ function Get-DotSourceIssue {
         }
         $visited = @{}
         $queue = [System.Collections.Generic.Queue[Object]]::new()
-
-        # Top level runs in source order: a dot-source below a call cannot satisfy it.
-        for ($i = 0; $i -lt $topStmts[$entry].Count; $i++) {
-            foreach ($t in $topDots[$entry][$i]) {
-                if (-not $t) { continue }
-                $loaded[$t] = $true
-                foreach ($c in $index.dotClosure[$t]) { $loaded[$c] = $true }
-            }
-            if ($topCmds[$entry][$i].Count) {
-                $queue.Enqueue(@{ File = $entry; Stmt = $i; Calls = $topCmds[$entry][$i]; Loaded = $loaded.Clone(); Fns = @{}; Env = @{}; Chain = @((Split-Path $entry -Leaf)) })
-            }
-        }
+        Add-TopLevelWalk -Index $index -File $entry -Loaded $loaded -Fns @{} -Env @{} -EnvKey '' `
+            -Chain @((Split-Path $entry -Leaf)) -Queue $queue -Seen @{}
 
         while ($queue.Count) {
             $item = $queue.Dequeue()
@@ -445,22 +473,14 @@ function Get-DotSourceIssue {
                         Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain
                     })
 
-                    if ($d.File -ne $entry -and -not $libSeen.ContainsKey($d.File)) {
+                    if ($d.File -ne $entry -and -not $libSeen.ContainsKey($d.File) -and -not $index.invoked.ContainsKey($d.File)) {
                         $libSeen[$d.File] = $true
-                        $libLoaded = $child.Clone()
-                        for ($i = 0; $i -lt $topStmts[$d.File].Count; $i++) {
-                            foreach ($t in $topDots[$d.File][$i]) {
-                                if (-not $t) { continue }
-                                $libLoaded[$t] = $true
-                                foreach ($c in $index.dotClosure[$t]) { $libLoaded[$c] = $true }
-                            }
-                            if ($topCmds[$d.File][$i].Count) {
-                                $queue.Enqueue(@{
-                                    File = $d.File; Stmt = $i; Calls = $topCmds[$d.File][$i]
-                                    Loaded = $libLoaded.Clone(); Fns = $item.Fns; Env = $env; EnvKey = $envKey; Chain = $chain
-                                })
-                            }
-                        }
+                        Add-TopLevelWalk -Index $index -File $d.File -Loaded $child -Fns $item.Fns -Env $env `
+                            -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{}
+                    }
+                    foreach ($r in $fnRuns[$d.Key]) {
+                        Add-TopLevelWalk -Index $index -File $r -Loaded $child -Fns $fns -Env $env `
+                            -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{}
                     }
 
                     # A nested function body runs in its owner's session, so its calls get the same state.
@@ -571,6 +591,8 @@ function Get-UnreachableFunction {
     foreach ($e in Get-ChildItem "$Root\bin", "$Root\libexec" -Filter *.ps1) { $seeds[$e.FullName] = $true }
     # The test suite consumes lib functions too; a function only the tests reach is not dead code.
     foreach ($e in Get-ChildItem "$Root\test" -Filter *.ps1 -Recurse -ErrorAction SilentlyContinue) { $seeds[$e.FullName] = $true }
+    # An `& path` script runs, so the functions it calls are live even though it loads nothing here.
+    foreach ($p in $index.invoked.Keys) { $seeds[$p] = $true }
     $loadQueue = [System.Collections.Generic.Queue[String]]::new()
     foreach ($s in @($seeds.Keys)) { $loadQueue.Enqueue($s) }
     while ($loadQueue.Count) {

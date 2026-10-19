@@ -12,6 +12,9 @@ function fixture_or_only_helper { 'or' }
 
 fixture_amp_target
 
+function fixture_self_helper { 'self' }
+fixture_self_helper
+
 function fixture_orphan { 'orphan' }
 
 function fixture_old_way {

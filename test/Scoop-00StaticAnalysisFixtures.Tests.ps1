@@ -39,6 +39,7 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             @($issues | Where-Object { $_.Name -eq 'fixture_link_helper' }) | Should-BeCollection -Count 0
             @($issues | Where-Object { $_.Name -eq 'fixture_host_helper' }) | Should-BeCollection -Count 0
             @($issues | Where-Object { $_.Name -eq 'fixture_inner_helper' }) | Should-BeCollection -Count 0
+            @($issues | Where-Object { $_.Name -eq 'fixture_self_helper' }) | Should-BeCollection -Count 0
         }
     }
 
@@ -46,8 +47,7 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
         It 'Reports only the functions nothing calls' {
             $report = ($unreachable | ForEach-Object { '{0} deprecated={1}' -f $_.Name, $_.Deprecated }) -join "`n"
 
-            $unreachable | Should-BeCollection -Count 4 -Because $report
-            @($unreachable | Where-Object { $_.Name -eq 'fixture_amp_target' }) | Should-BeCollection -Count 1
+            $unreachable | Should-BeCollection -Count 3 -Because $report
             @($unreachable | Where-Object { $_.Name -eq 'fixture_inner' }) | Should-BeCollection -Count 0
             @($unreachable | Where-Object { $_.Name -eq 'fixture_dynamic_helper' }) | Should-BeCollection -Count 0
         }
