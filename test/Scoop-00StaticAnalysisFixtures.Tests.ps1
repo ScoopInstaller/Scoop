@@ -39,7 +39,7 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             @{ Name = 'fixture_host_helper' }
             @{ Name = 'fixture_inner_helper' }
             @{ Name = 'fixture_self_helper' }
-        ) {
+            @{ Name = 'fixture_deep_helper' }        ) {
             @($issues | Where-Object { $_.Name -eq $Name }) | Should-BeCollection -Count 0
         }
     }

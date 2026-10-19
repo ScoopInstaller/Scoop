@@ -302,26 +302,35 @@ function Get-ScriptIndex {
         }
     }
 
-    # A dot-sourced script runs its whole body, so the files it pulls in are loaded with it.
+    # A dot-sourced script runs its whole body, so the files it pulls in are loaded with it, and a
+    # caller's copy has to carry the whole chain: repeating until stable resolves the nesting.
     $dotClosure = @{}
-    $dotQueue = [System.Collections.Generic.Queue[String]]::new()
-    foreach ($file in $files) { $dotQueue.Enqueue($file) }
-    while ($dotQueue.Count) {
-        $current = $dotQueue.Dequeue()
-        if (-not $current -or $dotClosure.ContainsKey($current)) { continue }
-        $targets = @{}
-        foreach ($list in $topDots[$current]) { foreach ($t in $list) { if ($t) { $targets[$t] = $true } } }
-        $dotClosure[$current] = @($targets.Keys)
-        foreach ($t in $targets.Keys) { $dotQueue.Enqueue($t) }
+    foreach ($file in $files) {
+        $set = @{}
+        foreach ($list in $topDots[$file]) { foreach ($t in $list) { if ($t) { $set[$t] = $true } } }
+        $dotClosure[$file] = $set
+    }
+    $grown = $true
+    while ($grown) {
+        $grown = $false
+        foreach ($file in $files) {
+            $set = $dotClosure[$file]
+            foreach ($t in @($set.Keys)) {
+                if (-not $dotClosure.ContainsKey($t)) { continue }
+                foreach ($c in $dotClosure[$t].Keys) {
+                    if (-not $set.ContainsKey($c)) { $set[$c] = $true; $grown = $true }
+                }
+            }
+        }
     }
     foreach ($key in @($fnDots.Keys)) {
         $expanded = @{}
-        foreach ($t in $fnDots[$key]) { $expanded[$t] = $true; foreach ($c in $dotClosure[$t]) { $expanded[$c] = $true } }
+        foreach ($t in $fnDots[$key]) { $expanded[$t] = $true; foreach ($c in @($dotClosure[$t].Keys)) { $expanded[$c] = $true } }
         $fnDots[$key] = @($expanded.Keys)
     }
     foreach ($key in @($fnAboveDots.Keys)) {
         $expanded = @{}
-        foreach ($t in $fnAboveDots[$key]) { $expanded[$t] = $true; foreach ($c in $dotClosure[$t]) { $expanded[$c] = $true } }
+        foreach ($t in $fnAboveDots[$key]) { $expanded[$t] = $true; foreach ($c in @($dotClosure[$t].Keys)) { $expanded[$c] = $true } }
         $fnAboveDots[$key] = @($expanded.Keys)
     }
 
@@ -367,7 +376,7 @@ function Add-TopLevelWalk {
         foreach ($t in $Index.topDots[$File][$i]) {
             if (-not $t) { continue }
             $loaded[$t] = $true
-            foreach ($c in $Index.dotClosure[$t]) { $loaded[$c] = $true }
+            foreach ($c in @($Index.dotClosure[$t].Keys)) { $loaded[$c] = $true }
             Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen $Seen -Limits $Limits
         }
@@ -431,7 +440,7 @@ function Add-BodyWalk {
         foreach ($t in $Index.fnStmtDots[$Key][$j]) {
             if (-not $t) { continue }
             $loaded[$t] = $true
-            foreach ($c in $Index.dotClosure[$t]) { $loaded[$c] = $true }
+            foreach ($c in @($Index.dotClosure[$t].Keys)) { $loaded[$c] = $true }
             Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen @{} -Limits $Limits
         }
@@ -521,7 +530,7 @@ function Get-DotSourceIssue {
         $loaded = @{ $entry = $true }
         foreach ($t in $lazy.Keys) {
             $loaded[$t] = $true
-            foreach ($c in $index.dotClosure[$t]) { $loaded[$c] = $true }
+            foreach ($c in @($index.dotClosure[$t].Keys)) { $loaded[$c] = $true }
         }
         $visited = @{}
         $queue = [System.Collections.Generic.Queue[Object]]::new()
@@ -538,6 +547,7 @@ function Get-DotSourceIssue {
                 $env = Resolve-Env $item.Env (Get-CallConstraint $index $call)
                 if ($null -eq $env) { continue }
 
+                $visible = $false
                 $visible = $false
                 foreach ($d in $defs[$name]) {
                     if (-not ($item.Loaded.ContainsKey($d.File) -or ($inherits -and $hostSet.ContainsKey($d.File)))) { continue }
@@ -580,7 +590,7 @@ function Get-DotSourceIssue {
                     $child = $item.Loaded.Clone()
                     $child[$d.File] = $true
                     if ($d.File -ne $entry) {
-                        foreach ($c in $index.dotClosure[$d.File]) { $child[$c] = $true }
+                        foreach ($c in @($index.dotClosure[$d.File].Keys)) { $child[$c] = $true }
                     }
                     foreach ($t in $fnAboveDots[$d.Key]) { $child[$t] = $true }
 

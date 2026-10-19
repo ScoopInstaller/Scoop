@@ -19,6 +19,7 @@ fixture_early
 
 fixture_late_helper
 . "$PSScriptRoot\..\lib\host.ps1"
+fixture_deep_helper
 
 fixture_never_helper
 
