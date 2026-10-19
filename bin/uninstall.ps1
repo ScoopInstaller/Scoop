@@ -44,7 +44,7 @@ function do_uninstall($app, $global) {
 
     Write-Output "Uninstalling '$app'"
     Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-    rm_shims $app $manifest $global $architecture
+    Remove-ShimFromManifest $app $manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version

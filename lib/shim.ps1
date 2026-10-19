@@ -69,10 +69,10 @@ function Set-PESubsystem($filePath, $targetSubsystem) {
     return $true
 }
 
-function get_app_name($path) {
-    if ((Test-Path -LiteralPath (appsdir $false)) -and ($path -match "$([Regex]::Escape($(Convert-Path -LiteralPath (appsdir $false))))[/\\]([^/\\]+)")) {
+function Get-AppNameFromPath($Path) {
+    if ((Test-Path -LiteralPath (appsdir $false)) -and ($Path -match "$([Regex]::Escape($(Convert-Path -LiteralPath (appsdir $false))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
-    } elseif ((Test-Path -LiteralPath (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path -LiteralPath (appsdir $true))))[/\\]([^/\\]+)")) {
+    } elseif ((Test-Path -LiteralPath (appsdir $true)) -and ($Path -match "$([Regex]::Escape($(Convert-Path -LiteralPath (appsdir $true))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
     } else {
         $appName = ''
@@ -80,12 +80,12 @@ function get_app_name($path) {
     return $appName
 }
 
-function get_app_name_from_shim($shim) {
-    if (!(Test-Path -LiteralPath $shim)) {
+function Get-AppNameFromShim($Shim) {
+    if (!(Test-Path -LiteralPath $Shim)) {
         return ''
     }
-    $content = (Get-Content -LiteralPath $shim -Encoding UTF8) -join ' '
-    return get_app_name $content
+    $content = (Get-Content -LiteralPath $Shim -Encoding UTF8) -join ' '
+    return Get-AppNameFromPath $content
 }
 
 function Get-ShimTarget($ShimPath) {
@@ -110,43 +110,43 @@ function Get-ShimTarget($ShimPath) {
     }
 }
 
-function warn_on_overwrite($shim, $path) {
-    if (!(Test-Path -LiteralPath $shim)) {
+function Rename-ShimOnConflict($Shim, $Path) {
+    if (!(Test-Path -LiteralPath $Shim)) {
         return
     }
-    $shim_app = get_app_name_from_shim $shim
-    $path_app = get_app_name $path
+    $shim_app = Get-AppNameFromShim $Shim
+    $path_app = Get-AppNameFromPath $Path
     if ($shim_app -eq $path_app) {
         return
     } else {
-        if (Test-Path -LiteralPath "$shim.$path_app" -PathType Leaf) {
-            Remove-Item -LiteralPath "$shim.$path_app" -Force -ErrorAction SilentlyContinue
+        if (Test-Path -LiteralPath "$Shim.$path_app" -PathType Leaf) {
+            Remove-Item -LiteralPath "$Shim.$path_app" -Force -ErrorAction SilentlyContinue
         }
-        Rename-Item -LiteralPath $shim -NewName "$shim.$shim_app" -ErrorAction SilentlyContinue
+        Rename-Item -LiteralPath $Shim -NewName "$Shim.$shim_app" -ErrorAction SilentlyContinue
     }
-    $shimname = (fname $shim) -replace '\.shim$', '.exe'
-    $filename = (fname $path) -replace '\.shim$', '.exe'
+    $shimname = (fname $Shim) -replace '\.shim$', '.exe'
+    $filename = (fname $Path) -replace '\.shim$', '.exe'
     warn "Overwriting shim ('$shimname' -> '$filename')$(if ($shim_app) { ' installed from ' + $shim_app })"
 }
 
-function shim($path, $global, $name, $arg) {
-    if (!(Test-Path -LiteralPath $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
-    $abs_shimdir = ensure (shimdir $global)
-    Add-Path -Path $abs_shimdir -Global:$global
-    if (!$name) { $name = strip_ext (fname $path) }
+function New-Shim($Path, $Global, $Name, $Arg) {
+    if (!(Test-Path -LiteralPath $Path)) { abort "Can't shim '$(fname $Path)': couldn't find '$Path'." }
+    $abs_shimdir = ensure (shimdir $Global)
+    Add-Path -Path $abs_shimdir -Global:$Global
+    if (!$Name) { $Name = strip_ext (fname $Path) }
 
-    $shim = "$abs_shimdir\$($name.tolower())"
+    $shim = "$abs_shimdir\$($Name.tolower())"
 
     # convert to relative path
-    $resolved_path = Convert-Path -LiteralPath $path
+    $resolved_path = Convert-Path -LiteralPath $Path
     Push-Location $abs_shimdir
     $relative_path = Resolve-Path -LiteralPath $resolved_path -Relative
     Pop-Location
 
-    if ($path -match '\.(exe|com)$') {
+    if ($Path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
-        warn_on_overwrite "$shim.shim" $path
-        Copy-Item -LiteralPath (get_shim_path) "$shim.exe" -Force
+        Rename-ShimOnConflict "$shim.shim" $Path
+        Copy-Item -LiteralPath (Get-ShimExe) "$shim.exe" -Force
 
         $rewrote_path = $resolved_path
 
@@ -168,8 +168,8 @@ function shim($path, $global, $name, $arg) {
         }
 
         Write-Output "path = `"$rewrote_path`"" | Out-UTF8File "$shim.shim"
-        if ($arg) {
-            Write-Output "args = $arg" | Out-UTF8File "$shim.shim" -Append
+        if ($Arg) {
+            Write-Output "args = $Arg" | Out-UTF8File "$shim.shim" -Append
         }
 
         $target_subsystem = Get-PESubsystem $resolved_path
@@ -178,73 +178,73 @@ function shim($path, $global, $name, $arg) {
             Write-Output "Making $shim.exe a GUI binary."
             Set-PESubsystem "$shim.exe" $target_subsystem | Out-Null
         }
-    } elseif ($path -match '\.(bat|cmd)$') {
+    } elseif ($Path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH
-        warn_on_overwrite "$shim.cmd" $path
+        Rename-ShimOnConflict "$shim.cmd" $Path
         @(
             "@rem $resolved_path",
-            "@`"$resolved_path`" $arg %*"
+            "@`"$resolved_path`" $Arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
-        warn_on_overwrite $shim $path
+        Rename-ShimOnConflict $shim $Path
         @(
             "#!/bin/sh",
             "# $resolved_path",
-            "MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $arg `"$@`""
+            "MSYS2_ARG_CONV_EXCL=/C cmd.exe /C `"$resolved_path`" $Arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
-    } elseif ($path -match '\.ps1$') {
-        # if $path points to another drive resolve-path prepends .\ which could break shims
-        warn_on_overwrite "$shim.ps1" $path
+    } elseif ($Path -match '\.ps1$') {
+        # if $Path points to another drive resolve-path prepends .\ which could break shims
+        Rename-ShimOnConflict "$shim.ps1" $Path
         $ps1text = if ($relative_path -match '^(\.\\)?\w:.*$') {
             @(
                 "# $resolved_path",
-                "`$path = `"$path`"",
-                "if (`$MyInvocation.ExpectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }",
+                "`$path = `"$Path`"",
+                "if (`$MyInvocation.ExpectingInput) { `$input | & `$path $Arg @args } else { & `$path $Arg @args }",
                 "exit `$LASTEXITCODE"
             )
         } else {
             @(
                 "# $resolved_path",
                 "`$path = Join-Path `$PSScriptRoot `"$relative_path`"",
-                "if (`$MyInvocation.ExpectingInput) { `$input | & `$path $arg @args } else { & `$path $arg @args }",
+                "if (`$MyInvocation.ExpectingInput) { `$input | & `$path $Arg @args } else { & `$path $Arg @args }",
                 "exit `$LASTEXITCODE"
             )
         }
         $ps1text -join "`r`n" | Out-UTF8File "$shim.ps1"
 
         # make ps1 accessible from cmd.exe
-        warn_on_overwrite "$shim.cmd" $path
+        Rename-ShimOnConflict "$shim.cmd" $Path
         @(
             "@rem $resolved_path",
             "@echo off",
             "where /q pwsh.exe",
             "if %errorlevel% equ 0 (",
-            "    pwsh -noprofile -ex unrestricted -file `"$resolved_path`" $arg %*",
+            "    pwsh -noprofile -ex unrestricted -file `"$resolved_path`" $Arg %*",
             ") else (",
-            "    powershell -noprofile -ex unrestricted -file `"$resolved_path`" $arg %*",
+            "    powershell -noprofile -ex unrestricted -file `"$resolved_path`" $Arg %*",
             ")"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
-        warn_on_overwrite $shim $path
+        Rename-ShimOnConflict $shim $Path
         @(
             "#!/bin/sh",
             "# $resolved_path",
             "if command -v pwsh.exe > /dev/null 2>&1; then",
-            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg `"$@`"",
+            "    pwsh.exe -noprofile -ex unrestricted -file `"$resolved_path`" $Arg `"$@`"",
             "else",
-            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $arg `"$@`"",
+            "    powershell.exe -noprofile -ex unrestricted -file `"$resolved_path`" $Arg `"$@`"",
             "fi"
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
-    } elseif ($path -match '\.jar$') {
-        warn_on_overwrite "$shim.cmd" $path
+    } elseif ($Path -match '\.jar$') {
+        Rename-ShimOnConflict "$shim.cmd" $Path
         @(
             "@rem $resolved_path",
             "@pushd $(Split-Path $resolved_path -Parent)",
-            "@java -jar `"$resolved_path`" $arg %*",
+            "@java -jar `"$resolved_path`" $Arg %*",
             "@popd"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
-        warn_on_overwrite $shim $path
+        Rename-ShimOnConflict $shim $Path
         @(
             "#!/bin/sh",
             "# $resolved_path",
@@ -254,24 +254,24 @@ function shim($path, $global, $name, $arg) {
             'else',
             "  cd `$(cygpath -u '$(Split-Path $resolved_path -Parent)')",
             'fi',
-            "java.exe -jar `"$resolved_path`" $arg `"$@`""
+            "java.exe -jar `"$resolved_path`" $Arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
-    } elseif ($path -match '\.py$') {
-        warn_on_overwrite "$shim.cmd" $path
+    } elseif ($Path -match '\.py$') {
+        Rename-ShimOnConflict "$shim.cmd" $Path
         @(
             "@rem $resolved_path",
-            "@python `"$resolved_path`" $arg %*"
+            "@python `"$resolved_path`" $Arg %*"
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
-        warn_on_overwrite $shim $path
+        Rename-ShimOnConflict $shim $Path
         @(
             '#!/bin/sh',
             "# $resolved_path",
-            "python.exe `"$resolved_path`" $arg `"$@`""
+            "python.exe `"$resolved_path`" $Arg `"$@`""
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     } else {
-        warn_on_overwrite "$shim.cmd" $path
-        $quoted_arg = if ($arg.Count -gt 0) { $arg | ForEach-Object { "`"$_`"" } }
+        Rename-ShimOnConflict "$shim.cmd" $Path
+        $quoted_arg = if ($Arg.Count -gt 0) { $Arg | ForEach-Object { "`"$_`"" } }
         @(
             "@rem $resolved_path",
             '@echo off',
@@ -286,21 +286,21 @@ function shim($path, $global, $name, $arg) {
             ')'
         ) -join "`r`n" | Out-UTF8File "$shim.cmd"
 
-        warn_on_overwrite $shim $path
+        Rename-ShimOnConflict $shim $Path
         @(
             '#!/bin/sh',
             "# $resolved_path",
             "if [ `$WSL_INTEROP ]",
             'then',
-            "  `"`$(wslpath -u '$resolved_path')`" $arg `"$@`"",
+            "  `"`$(wslpath -u '$resolved_path')`" $Arg `"$@`"",
             'else',
-            "  `"`$(cygpath -u '$resolved_path')`" $arg `"$@`"",
+            "  `"`$(cygpath -u '$resolved_path')`" $Arg `"$@`"",
             'fi'
         ) -join "`n" | Out-UTF8File $shim -NoNewLine
     }
 }
 
-function get_shim_path() {
+function Get-ShimExe() {
     $shim_version = get_config SHIM 'kiennq'
     $shim_path = switch ($shim_version) {
         'scoopcs' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
@@ -313,19 +313,19 @@ function get_shim_path() {
 }
 
 # get target, name, arguments for shim
-function shim_def($item) {
-    if ($item -is [array]) { return $item }
-    return $item, (strip_ext (fname $item)), $null
+function Get-ShimDefinition($Item) {
+    if ($Item -is [array]) { return $Item }
+    return $Item, (strip_ext (fname $Item)), $null
 }
 
-function create_shims($manifest, $dir, $global, $arch) {
-    $shims = @(arch_specific 'bin' $manifest $arch)
+function New-ShimFromManifest($Manifest, $Dir, $Global, $Arch) {
+    $shims = @(arch_specific 'bin' $Manifest $Arch)
     $shims | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target, $name, $arg = shim_def $_
+        $target, $name, $arg = Get-ShimDefinition $_
         Write-Output "Creating shim for '$name'."
 
-        if (Test-Path -LiteralPath "$dir\$target" -PathType leaf) {
-            $bin = "$dir\$target"
+        if (Test-Path -LiteralPath "$Dir\$target" -PathType leaf) {
+            $bin = "$Dir\$target"
         } elseif (Test-Path -LiteralPath $target -PathType leaf) {
             $bin = $target
         } elseif ($original_dir -and (Test-Path -LiteralPath "$original_dir\$target" -PathType leaf)) {
@@ -335,29 +335,40 @@ function create_shims($manifest, $dir, $global, $arch) {
         }
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
-        shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
+        New-Shim $bin $Global $name (substitute $arg @{ '$dir' = $Dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
     }
 }
 
+# bucket manifests call these, and Invoke-HookScript replays the copy already saved on disk
+function shim($path, $global, $name, $arg) {
+    Show-DeprecatedWarning $MyInvocation 'New-Shim'
+    New-Shim @PSBoundParameters
+}
+
 function rm_shim($name, $shimdir, $app) {
+    Show-DeprecatedWarning $MyInvocation 'Remove-Shim'
+    Remove-Shim @PSBoundParameters
+}
+
+function Remove-Shim($Name, $ShimDir, $App) {
     '', '.shim', '.cmd', '.ps1' | ForEach-Object {
-        $shimPath = "$shimdir\$name$_"
-        $altShimPath = "$shimPath.$app"
-        if ($app -and (Test-Path -LiteralPath $altShimPath -PathType Leaf)) {
-            Write-Output "Removing shim '$name$_.$app'."
+        $shimPath = "$ShimDir\$Name$_"
+        $altShimPath = "$shimPath.$App"
+        if ($App -and (Test-Path -LiteralPath $altShimPath -PathType Leaf)) {
+            Write-Output "Removing shim '$Name$_.$App'."
             Remove-Item -LiteralPath $altShimPath
         } elseif (Test-Path -LiteralPath $shimPath -PathType Leaf) {
-            Write-Output "Removing shim '$name$_'."
+            Write-Output "Removing shim '$Name$_'."
             Remove-Item -LiteralPath $shimPath
             $shimName = fname $shimPath
             $wrapperTokens = @('shim', 'exe', 'cmd', 'ps1', 'bat')
             # a saved file of another wrapper (tool.ps1.first) carries that wrapper after the name
-            $oldShims = Get-ChildItem -LiteralPath $shimdir -Filter "$shimName.*" -File |
+            $oldShims = Get-ChildItem -LiteralPath $ShimDir -Filter "$shimName.*" -File |
                 Where-Object { $_.Name.Substring($shimName.Length + 1).Split('.')[0] -notin $wrapperTokens }
             if ($null -eq $oldShims) {
-                if (($_ -eq '.shim') -and (Test-Path -LiteralPath "$shimdir\$name.exe" -PathType Leaf)) {
-                    Write-Output "Removing shim '$name.exe'."
-                    Remove-Item -LiteralPath "$shimdir\$name.exe"
+                if (($_ -eq '.shim') -and (Test-Path -LiteralPath "$ShimDir\$Name.exe" -PathType Leaf)) {
+                    Write-Output "Removing shim '$Name.exe'."
+                    Remove-Item -LiteralPath "$ShimDir\$Name.exe"
                 }
             } else {
                 ($oldShims | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $shimName }
@@ -366,14 +377,14 @@ function rm_shim($name, $shimdir, $app) {
     }
 }
 
-function rm_shims($app, $manifest, $global, $arch) {
-    $shims = @(arch_specific 'bin' $manifest $arch)
+function Remove-ShimFromManifest($App, $Manifest, $Global, $Arch) {
+    $shims = @(arch_specific 'bin' $Manifest $Arch)
 
     $shims | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target, $name, $null = shim_def $_
-        $shimdir = shimdir $global
+        $target, $name, $null = Get-ShimDefinition $_
+        $ShimDir = shimdir $Global
 
-        rm_shim $name $shimdir $app
+        Remove-Shim $name $ShimDir $App
     }
 }
 
@@ -381,7 +392,7 @@ function Get-ShimInfo($ShimPath) {
     $info = [Ordered]@{}
     $info.Name = strip_ext (fname $ShimPath)
     $info.Path = $ShimPath -replace 'shim$', 'exe'
-    $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
+    $info.Source = (Get-AppNameFromShim $ShimPath) -replace '^$', 'External'
     $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
     $shimName = fname $ShimPath
     $altShims = Get-ChildItem -LiteralPath (Split-Path $ShimPath -Parent) -File |
@@ -395,7 +406,7 @@ function Get-ShimInfo($ShimPath) {
     [PSCustomObject]$info
 }
 
-function Get-ShimPath($ShimName, $Global) {
+function Get-ShimFile($ShimName, $Global) {
     '.shim', '.ps1' | ForEach-Object {
         $shimPath = Join-Path (shimdir $Global) "$ShimName$_"
         if (Test-Path -LiteralPath $shimPath) {

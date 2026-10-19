@@ -83,7 +83,7 @@ switch ($SubCommand) {
         }
         if ($commandPath -notmatch '[\\/]') {
             $shortPath = $commandPath
-            $commandPath = Get-ShimTarget (Get-ShimPath $shortPath $global)
+            $commandPath = Get-ShimTarget (Get-ShimFile $shortPath $global)
             if (!$commandPath) {
                 $exCommand = Get-CommandLiteral $shortPath
                 if ($exCommand -and $exCommand.CommandType -eq 'Application') {
@@ -93,7 +93,7 @@ switch ($SubCommand) {
         }
         if ($commandPath -and (Test-Path -LiteralPath $commandPath)) {
             Write-Host "Adding $(if ($global) { 'global' } else { 'local' }) shim $([char]0x1b)[36m$shimName$([char]0x1b)[0m..."
-            shim $commandPath $global $shimName $commandArgs
+            New-Shim $commandPath $global $shimName $commandArgs
         } else {
             error "Command path does not exist: $([char]0x1b)[36m$($other[1])$([char]0x1b)[31m"
             exit 3
@@ -102,8 +102,8 @@ switch ($SubCommand) {
     'rm' {
         $failed = @()
         $other | ForEach-Object {
-            if (Get-ShimPath $_ $global) {
-                rm_shim $_ (shimdir $global)
+            if (Get-ShimFile $_ $global) {
+                Remove-Shim $_ (shimdir $global)
             } else {
                 $failed += $_
             }
@@ -143,12 +143,12 @@ switch ($SubCommand) {
     }
     'info' {
         $shimName = $other[0]
-        $shimPath = Get-ShimPath $shimName $global
+        $shimPath = Get-ShimFile $shimName $global
         if ($shimPath) {
             Get-ShimInfo $shimPath
         } else {
             error "$(if ($global) { 'Global' } else { 'Local' }) shim not found: $([char]0x1b)[36m$shimName$([char]0x1b)[31m"
-            if (Get-ShimPath $shimName (!$global)) {
+            if (Get-ShimFile $shimName (!$global)) {
                 Write-Host "But a $(if ($global) { 'local' } else { 'global' }) shim exists, run 'scoop shim info $shimName$(if (!$global) { ' --global' })' to show its info."
                 exit 2
             }
@@ -157,7 +157,7 @@ switch ($SubCommand) {
     }
     'alter' {
         $shimName = $other[0]
-        $shimPath = Get-ShimPath $shimName $global
+        $shimPath = Get-ShimFile $shimName $global
         if ($shimPath) {
             $shimInfo = Get-ShimInfo $shimPath
             if ($null -eq $shimInfo.Alternatives) {
@@ -189,7 +189,7 @@ switch ($SubCommand) {
             }
         } else {
             error "$(if ($global) { 'Global' } else { 'Local' }) shim not found: $([char]0x1b)[36m$shimName$([char]0x1b)[31m"
-            if (Get-ShimPath $shimName (!$global)) {
+            if (Get-ShimFile $shimName (!$global)) {
                 Write-Host "But a $(if ($global) { 'local' } else { 'global' }) shim exists, run 'scoop shim alter $shimName$(if (!$global) { ' --global' })' to alternate its source."
                 exit 2
             }

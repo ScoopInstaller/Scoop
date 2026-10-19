@@ -15,7 +15,7 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     }
 
     It 'returns machine type for a valid PE file' {
-        $shim_path = get_shim_path
+        $shim_path = Get-ShimExe
         $shim_path | Should-BeLikeString '*\supporting\shims\scoopcs\shim.exe'
         $machine = Get-PEMachine $shim_path
         # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
@@ -33,7 +33,7 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
+Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
@@ -42,25 +42,25 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     }
 
     It 'returns empty string if file does not exist' {
-        get_app_name_from_shim 'non-existent-file' | Should-Be ''
+        Get-AppNameFromShim 'non-existent-file' | Should-Be ''
     }
 
     It 'returns app name if file exists and is a shim to an app' {
         ensure "$working_dir/mockapp/current/"
         Write-Output '' | Out-File "$working_dir/mockapp/current/mockapp1.ps1"
-        shim "$working_dir/mockapp/current/mockapp1.ps1" $false 'shim-test1'
+        New-Shim "$working_dir/mockapp/current/mockapp1.ps1" $false 'shim-test1'
         $shim_path1 = (Get-Command 'shim-test1.ps1').Path
-        get_app_name_from_shim "$shim_path1" | Should-Be 'mockapp'
+        Get-AppNameFromShim "$shim_path1" | Should-Be 'mockapp'
         ensure "$working_dir/mockapp/1.0.0/"
         Write-Output '' | Out-File "$working_dir/mockapp/1.0.0/mockapp2.ps1"
-        shim "$working_dir/mockapp/1.0.0/mockapp2.ps1" $false 'shim-test2'
+        New-Shim "$working_dir/mockapp/1.0.0/mockapp2.ps1" $false 'shim-test2'
         $shim_path2 = (Get-Command 'shim-test2.ps1').Path
-        get_app_name_from_shim "$shim_path2" | Should-Be 'mockapp'
+        Get-AppNameFromShim "$shim_path2" | Should-Be 'mockapp'
     }
 
-    It 'returns empty string if file exists and is not a shim' {
+    It 'returns empty string if file exists but is not a shim' {
         Write-Output 'lorem ipsum' | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
-        get_app_name_from_shim "$working_dir/mock-shim.ps1" | Should-Be ''
+        Get-AppNameFromShim "$working_dir/mock-shim.ps1" | Should-Be ''
     }
 
     It 'reads a shim file whose name contains a wildcard character' {
@@ -68,22 +68,22 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
         $p = "$working_dir\br[a]cket.shim"
         [IO.File]::WriteAllText($p, "path = `"$working_dir\mockapp\current\mockapp.exe`"")
 
-        get_app_name_from_shim $p | Should-Be 'mockapp'
+        Get-AppNameFromShim $p | Should-Be 'mockapp'
     }
 
     AfterAll {
         if (Get-Command 'shim-test1' -ErrorAction SilentlyContinue) {
-            rm_shim 'shim-test1' $shimdir -ErrorAction SilentlyContinue
+            Remove-Shim 'shim-test1' $shimdir
         }
         if (Get-Command 'shim-test2' -ErrorAction SilentlyContinue) {
-            rm_shim 'shim-test2' $shimdir -ErrorAction SilentlyContinue
+            Remove-Shim 'shim-test2' $shimdir
         }
         Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
         Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/mock-shim.ps1"
     }
 }
 
-Describe 'shim' -Tag 'Scoop', 'Windows' {
+Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
@@ -101,18 +101,18 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
         { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
         { shim-test } | Should-Throw
 
-        shim "$working_dir\shim-test.ps1" $false 'shim-test'
+        New-Shim "$working_dir\shim-test.ps1" $false 'shim-test'
         $null = & { Get-Command 'shim-test' -ea stop }
         $null = & { Get-Command 'shim-test.ps1' -ea stop }
         $null = & { Get-Command 'shim-test.cmd' -ea stop }
         shim-test | Should-Be 'Hello, world!'
     }
 
-    It 'shims a file with a quote in its path' {
+    It 'shims a file with quote in path' {
         { Get-Command 'shim-test' -ea stop } | Should-Throw
         { shim-test } | Should-Throw
 
-        shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
+        New-Shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
         $null = & { Get-Command 'shim-test' -ea stop }
         shim-test | Should-Be 'Hello, world!'
     }
@@ -122,18 +122,18 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
         [IO.File]::WriteAllText($shimPath, '')
 
         $Error.Clear()
-        warn_on_overwrite $shimPath "$working_dir\shim-test.ps1"
+        Rename-ShimOnConflict $shimPath "$working_dir\shim-test.ps1"
         $Error.Count | Should-Be 0
 
         Remove-Item -LiteralPath $shimPath -Force
     }
 
     It 'names the target it could not find' {
-        { shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
+        { New-Shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
     }
 
     AfterEach {
-        rm_shim 'shim-test' $shimdir
+        Remove-Shim 'shim-test' $shimdir
     }
 }
 
@@ -171,21 +171,21 @@ Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'shim_def' -Tag 'Scoop' {
+Describe 'Get-ShimDefinition' -Tag 'Scoop' {
     It 'should use strings correctly' {
-        $target, $name, $shimArgs = shim_def 'command.exe'
+        $target, $name, $shimArgs = Get-ShimDefinition 'command.exe'
         $target | Should-Be 'command.exe'
         $name | Should-Be 'command'
         $shimArgs | Should-BeNull
     }
 
     It 'should expand the array correctly' {
-        $target, $name, $shimArgs = shim_def @('foo.exe', 'bar')
+        $target, $name, $shimArgs = Get-ShimDefinition @('foo.exe', 'bar')
         $target | Should-Be 'foo.exe'
         $name | Should-Be 'bar'
         $shimArgs | Should-BeNull
 
-        $target, $name, $shimArgs = shim_def @('foo.exe', 'bar', '--test')
+        $target, $name, $shimArgs = Get-ShimDefinition @('foo.exe', 'bar', '--test')
         $target | Should-Be 'foo.exe'
         $name | Should-Be 'bar'
         $shimArgs | Should-Be '--test'
@@ -197,7 +197,7 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
     It 'shims a target whose name contains a wildcard character' {
         Mock abort -MockWith { throw $msg }
         # the body lookup follows the machine's config, so pin it to the bundled body
-        Mock get_shim_path { Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe' }
+        Mock Get-ShimExe { Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe' }
         # the shims of the machine and its path stay untouched
         $shimdir = Join-Path $TestDrive 'shims-wildcard'
         Mock shimdir { $shimdir }
@@ -208,11 +208,11 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         [IO.File]::WriteAllText("$dir\br[a]cket.exe", 'not a real binary')
 
         try {
-            create_shims @{ bin = 'br[a]cket.exe' } $dir $false $null
+            New-ShimFromManifest @{ bin = 'br[a]cket.exe' } $dir $false $null
 
             Test-Path -LiteralPath "$shimdir\br[a]cket.exe" | Should-Be $true
         } finally {
-            rm_shim 'br[a]cket' $shimdir
+            Remove-Shim 'br[a]cket' $shimdir
         }
     }
 
@@ -223,14 +223,14 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         [IO.File]::WriteAllText("$shimdir\br[a]cket.shim", '')
         [IO.File]::WriteAllText("$shimdir\bracket.shim", '')
 
-        rm_shim 'br[a]cket' $shimdir
+        Remove-Shim 'br[a]cket' $shimdir
 
         Test-Path -LiteralPath "$shimdir\br[a]cket.shim" | Should-BeFalse
         Test-Path -LiteralPath "$shimdir\bracket.shim" | Should-BeTrue
     }
 
     It 'aborts with a friendly message when the shim target is not on PATH' {
-        Mock shim {}
+        Mock New-Shim {}
         $aborted = @{}
         Mock abort { $aborted.Message = $msg; throw $msg }
 
@@ -238,7 +238,7 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         $null = [IO.Directory]::CreateDirectory($dir)
 
         # A caller with $ErrorActionPreference = 'Stop' must still reach the abort below, not a raw Get-Command error.
-        { $ErrorActionPreference = 'Stop'; create_shims @{ bin = 'scoop-nonexistent-command' } $dir $false $null } |
+        { $ErrorActionPreference = 'Stop'; New-ShimFromManifest @{ bin = 'scoop-nonexistent-command' } $dir $false $null } |
             Should-Throw
 
         $aborted.Message | Should-Be "Can't shim 'scoop-nonexistent-command': File doesn't exist."
@@ -246,7 +246,7 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
 
 
     It 'resolves a bin target from $original_dir when it is not under $dir or on PATH' {
-        Mock shim {}
+        Mock New-Shim {}
         Mock abort -MockWith { throw $msg }
 
         $dir = Join-Path $TestDrive 'linked-install'
@@ -255,18 +255,18 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         $null = [IO.Directory]::CreateDirectory($originalDir)
         [IO.File]::WriteAllText("$originalDir\scoop-bare-target.exe", '')
 
-        # create_shims reads $original_dir from the caller's scope, as create_startmenu_shortcuts does.
+        # New-ShimFromManifest reads $original_dir from the caller's scope, as create_startmenu_shortcuts does.
         & {
             $original_dir = $originalDir
-            create_shims @{ bin = 'scoop-bare-target.exe' } $dir $false $null
+            New-ShimFromManifest @{ bin = 'scoop-bare-target.exe' } $dir $false $null
         }
 
-        Should-Invoke -CommandName shim -Times 1 -ParameterFilter { $Path -eq "$originalDir\scoop-bare-target.exe" }
+        Should-Invoke -CommandName New-Shim -Times 1 -ParameterFilter { $Path -eq "$originalDir\scoop-bare-target.exe" }
     }
 
 
     It 'narrows the PATH lookup to applications and external scripts' {
-        Mock shim {}
+        Mock New-Shim {}
         $seen = @{}
         Mock Get-CommandLiteral {
             $seen.CommandType = $CommandType
@@ -276,17 +276,17 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         $dir = Join-Path $TestDrive 'narrowed-path'
         $null = [IO.Directory]::CreateDirectory($dir)
 
-        create_shims @{ bin = 'bin-target.ps1' } $dir $false $null
+        New-ShimFromManifest @{ bin = 'bin-target.ps1' } $dir $false $null
 
         $types = "$($seen.CommandType)"
         ($types -match 'Application') | Should-BeTrue
         ($types -match 'ExternalScript') | Should-BeTrue
-        Should-Invoke -CommandName shim -Times 1 -ParameterFilter { $Path -eq "$TestDrive\bin-target.ps1" }
+        Should-Invoke -CommandName New-Shim -Times 1 -ParameterFilter { $Path -eq "$TestDrive\bin-target.ps1" }
     }
 
     It 'picks one path when the bin name resolves to several commands' {
         $seen = @{}
-        Mock shim { $seen.Path = $Path }
+        Mock New-Shim { $seen.Path = $Path }
 
         $pathDir = Join-Path $TestDrive 'multi-command'
         $null = [IO.Directory]::CreateDirectory($pathDir)
@@ -302,18 +302,18 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
 
             $dir = Join-Path $TestDrive 'multi-command-install'
             $null = [IO.Directory]::CreateDirectory($dir)
-            create_shims @{ bin = 'scoop-multi-target' } $dir $false $null
+            New-ShimFromManifest @{ bin = 'scoop-multi-target' } $dir $false $null
 
             $seen.Path -is [string] | Should-BeTrue
             $seen.Path | Should-Be $expected
-            Should-Invoke -CommandName shim -Times 1
+            Should-Invoke -CommandName New-Shim -Times 1
         } finally {
             $env:PATH = $oldPath
         }
     }
 
     It 'resolves a bin target with wildcard characters from PATH to the literal file' {
-        Mock shim {}
+        Mock New-Shim {}
         Mock abort -MockWith { throw $msg }
 
         $pathDir = Join-Path $TestDrive 'literal-path'
@@ -325,18 +325,18 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         try {
             $dir = Join-Path $TestDrive 'literal-path-install'
             $null = [IO.Directory]::CreateDirectory($dir)
-            create_shims @{ bin = 'br[a]cket.exe' } $dir $false $null
+            New-ShimFromManifest @{ bin = 'br[a]cket.exe' } $dir $false $null
         } finally {
             $env:PATH = $oldPath
         }
 
-        Should-Invoke -CommandName shim -Times 1 -ParameterFilter { $Path -eq "$pathDir\br[a]cket.exe" }
+        Should-Invoke -CommandName New-Shim -Times 1 -ParameterFilter { $Path -eq "$pathDir\br[a]cket.exe" }
     }
 
 
 }
 
-Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
+Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
         $shimdir = shimdir
@@ -344,9 +344,9 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
     }
 
     It 'removes shim from path' {
-        shim "$working_dir\shim-test.ps1" $false 'shim-test'
+        New-Shim "$working_dir\shim-test.ps1" $false 'shim-test'
 
-        rm_shim 'shim-test' $shimdir
+        Remove-Shim 'shim-test' $shimdir
 
         { Get-Command 'shim-test' -ea stop } | Should-Throw
         { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
@@ -361,14 +361,14 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
         'x' | Out-File "$dir\gone" -NoNewline
         'x' | Out-File "$dir\gone.shim" -NoNewline
 
-        $removed = rm_shim 'gone' $dir 'gone'
+        $removed = Remove-Shim 'gone' $dir 'gone'
 
         [bool]($removed -match 'gone\.exe') | Should-BeFalse
         Get-ChildItem $dir | Should-BeCollection -Count 0
     }
 
     It 'brings back the version it took over' {
-        # two apps shim the same name; warn_on_overwrite kept the first one as a backup
+        # two apps shim the same name; Rename-ShimOnConflict kept the first one as a backup
         $dir = "$working_dir\alt"
         New-Item -ItemType Directory -Force -Path $dir | Out-Null
         'second' | Out-File "$dir\dupe.shim" -NoNewline
@@ -382,7 +382,7 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
         # the newest backup belongs to a wrapper, so no other wrapper may take it over
         [IO.File]::SetLastWriteTimeUtc("$dir\dupe.ps1.first", (Get-Date).ToUniversalTime())
 
-        rm_shim 'dupe' $dir | Out-Null
+        Remove-Shim 'dupe' $dir | Out-Null
 
         # the exe is not per-app, so it is left alone; every wrapper gets its own backup back
         [IO.File]::ReadAllText("$dir\dupe.shim") | Should-Be 'first'
@@ -399,7 +399,7 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
         'first' | Out-File "$dir\dupe.shim.foo.bar" -NoNewline
         'x' | Out-File "$dir\dupe.exe" -NoNewline
 
-        rm_shim 'dupe' $dir | Out-Null
+        Remove-Shim 'dupe' $dir | Out-Null
 
         [IO.File]::ReadAllText("$dir\dupe.shim") | Should-Be 'first'
         Test-Path -LiteralPath "$dir\dupe.exe" | Should-Be $true
@@ -412,25 +412,26 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
         'x' | Out-File "$dir\dupe.shim" -NoNewline
         'x' | Out-File "$dir\dupe.exe" -NoNewline
 
-        rm_shim 'dupe' $dir | Out-Null
+        Remove-Shim 'dupe' $dir | Out-Null
 
         Get-ChildItem $dir | Should-BeCollection -Count 0
     }
 }
 
-Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
+# a scenario, not a function: New-Shim writes the path and Get-ShimTarget reads it back
+Describe 'WoW64 path rewriting' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $shimdir = shimdir
         # CI checkouts have no installed scoop version dir, so point at the bundled shim.exe
         $repo_shim = Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe'
-        Mock -CommandName get_shim_path -MockWith { $repo_shim }
+        Mock -CommandName Get-ShimExe -MockWith { $repo_shim }
     }
 
     It 'rewrites System32 to Sysnative in the shim file when the shim exe is x86 on x64 OS' {
         $target = "$env:SystemRoot\System32\notepad.exe"
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (get_shim_path)) -eq 0x014c
+        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (Get-ShimExe)) -eq 0x014c
 
-        shim $target $false 'wow64-test'
+        New-Shim $target $false 'wow64-test'
 
         $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
         if ($rewrites) {
@@ -446,7 +447,7 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
     It 'does not rewrite paths outside System32 and SysWOW64' {
         $target = "$env:SystemRoot\explorer.exe"
 
-        shim $target $false 'wow64-test'
+        New-Shim $target $false 'wow64-test'
 
         $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
         $line | Should-BeLikeString "*$target*"
@@ -459,9 +460,9 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
             Set-ItResult -Skipped -Because 'SysWOW64 notepad not present'
         }
         $target = $wow
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (get_shim_path)) -eq 0x014c
+        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (Get-ShimExe)) -eq 0x014c
 
-        shim $target $false 'wow64-test'
+        New-Shim $target $false 'wow64-test'
 
         $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
         if ($rewrites) {
@@ -483,7 +484,7 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
     }
 
     AfterEach {
-        rm_shim 'wow64-test' $shimdir
+        Remove-Shim 'wow64-test' $shimdir
     }
 }
 

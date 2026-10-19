@@ -78,7 +78,7 @@ if (!$apps) { exit 0 }
         }
 
         Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-        rm_shims $app $manifest $global $architecture
+        Remove-ShimFromManifest $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 
         # If a junction was used during install, that will have been used
