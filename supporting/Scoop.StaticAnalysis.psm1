@@ -16,6 +16,16 @@ function Get-DotSourceLiteralPath {
     else { [IO.Path]::GetFullPath((Join-Path (Split-Path $File -Parent) $value)) }
 }
 
+function Get-BodyStmtIndex {
+    param($FnStmtRanges, [String] $Key, [Int] $Start, [Int] $End)
+
+    $ranges = $FnStmtRanges[$Key]
+    for ($j = 0; $j -lt $ranges.Count; $j++) {
+        if ($Start -ge $ranges[$j].Start -and $End -le $ranges[$j].End) { return $j }
+    }
+    0
+}
+
 function Get-GetConfigConstraint {
     # Truth value implied by a `get_config X` guard, or $null when none: `-or` pins no single
     # value, a comparison chained onto the call is about the value, and an operator further out,
@@ -119,6 +129,11 @@ function Get-ScriptIndex {
     $fnCmds = @{}        # Key -> CommandAst[], nested bodies excluded
     $fnDots = @{}        # Key -> paths dot-sourced in the body
     $fnRuns = @{}        # Key -> `& path` targets run in the body
+    $fnStmts = @{}       # Key -> body statement count
+    $fnStmtRanges = @{}  # Key -> body statement offsets
+    $fnStmtCmds = @{}    # Key -> CommandAst[] per body statement
+    $fnStmtDots = @{}    # Key -> path[] per body statement
+    $fnStmtRuns = @{}    # Key -> `& path` target[] per body statement
     $fnFileKeys = @{}    # file -> every def Key, same-name defs included
     $invoked = @{}       # file -> hit through a literal `& path`
     $asts = @{}          # file -> AST for the string-literal pass
@@ -160,6 +175,24 @@ function Get-ScriptIndex {
             $key = '{0}#{1}' -f $file, $i
             $keyOf[$body] = $key
             $fnBodies[$key] = $body
+
+            # Per body statement, so the walk can apply dot-sources in the order they run.
+            $bodyStmts = @($body.Body.EndBlock.Statements)
+            $fnStmts[$key] = $bodyStmts.Count
+            $ranges = [Object[]]::new($bodyStmts.Count)
+            $cmdGrid = [Object[]]::new($bodyStmts.Count)
+            $dotGrid = [Object[]]::new($bodyStmts.Count)
+            $runGrid = [Object[]]::new($bodyStmts.Count)
+            for ($j = 0; $j -lt $bodyStmts.Count; $j++) {
+                $ranges[$j] = @{ Start = $bodyStmts[$j].Extent.StartOffset; End = $bodyStmts[$j].Extent.EndOffset }
+                $cmdGrid[$j] = [System.Collections.Generic.List[Object]]::new()
+                $dotGrid[$j] = [System.Collections.Generic.List[Object]]::new()
+                $runGrid[$j] = [System.Collections.Generic.List[Object]]::new()
+            }
+            $fnStmtRanges[$key] = $ranges
+            $fnStmtCmds[$key] = $cmdGrid
+            $fnStmtDots[$key] = $dotGrid
+            $fnStmtRuns[$key] = $runGrid
 
             $ownerStmt = -1
             $ownerKey = ''
@@ -209,6 +242,7 @@ function Get-ScriptIndex {
                     if ($owner) {
                         if (-not $fnRuns.ContainsKey($owner)) { $fnRuns[$owner] = @() }
                         $fnRuns[$owner] += , $target
+                        $fnStmtRuns[$owner][(Get-BodyStmtIndex $fnStmtRanges $owner $start $end)].Add($target)
                     } else {
                         for ($i = 0; $i -lt $stmtRanges.Count; $i++) {
                             if ($start -ge $stmtRanges[$i].Start -and $end -le $stmtRanges[$i].End) { $topRuns[$file][$i] += , $target; break }
@@ -220,6 +254,7 @@ function Get-ScriptIndex {
                     if ($owner) {
                         if (-not $fnDots.ContainsKey($owner)) { $fnDots[$owner] = @() }
                         $fnDots[$owner] += , $target
+                        $fnStmtDots[$owner][(Get-BodyStmtIndex $fnStmtRanges $owner $start $end)].Add($target)
                     } else {
                         for ($i = 0; $i -lt $stmtRanges.Count; $i++) {
                             if ($start -ge $stmtRanges[$i].Start -and $end -le $stmtRanges[$i].End) { $topDots[$file][$i] += , $target; break }
@@ -232,6 +267,7 @@ function Get-ScriptIndex {
             if ($owner) {
                 if (-not $fnCmds.ContainsKey($owner)) { $fnCmds[$owner] = @() }
                 $fnCmds[$owner] += , $cmd
+                $fnStmtCmds[$owner][(Get-BodyStmtIndex $fnStmtRanges $owner $start $end)].Add($cmd)
             } else {
                 for ($i = 0; $i -lt $stmtRanges.Count; $i++) {
                     if ($start -ge $stmtRanges[$i].Start -and $end -le $stmtRanges[$i].End) { $topCmds[$file][$i] += , $cmd; break }
@@ -302,6 +338,7 @@ function Get-ScriptIndex {
         root = $Root
         files = $files; defs = $defs; topStmts = $topStmts; topCmds = $topCmds; topDots = $topDots; topRuns = $topRuns
         fnBodies = $fnBodies; fnCmds = $fnCmds; fnDots = $fnDots; fnRuns = $fnRuns; fnFileKeys = $fnFileKeys
+        fnStmts = $fnStmts; fnStmtCmds = $fnStmtCmds; fnStmtDots = $fnStmtDots; fnStmtRuns = $fnStmtRuns
         fnNested = $fnNested; fnAboveDots = $fnAboveDots; cmdConstraints = $cmdConstraints
         invoked = $invoked; hostSet = $hostSet; entries = $entries; asts = $asts; dotClosure = $dotClosure
     }
@@ -342,6 +379,32 @@ function Add-TopLevelWalk {
     }
     # Only cycles are cut: two call sites of one script each carry their own loaded set.
     $Seen.Remove($File)
+}
+
+function Add-BodyWalk {
+    # A body runs its statements in order, so a dot-source below a call cannot satisfy it.
+    param($Index, [String] $Key, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Limits)
+
+    $loaded = $Loaded.Clone()
+    for ($j = 0; $j -lt $Index.fnStmts[$Key]; $j++) {
+        foreach ($t in $Index.fnStmtDots[$Key][$j]) {
+            if (-not $t) { continue }
+            $loaded[$t] = $true
+            foreach ($c in $Index.dotClosure[$t]) { $loaded[$c] = $true }
+        }
+        if ($Index.fnStmtCmds[$Key][$j].Count) {
+            $Queue.Enqueue(@{
+                File = $File; Calls = $Index.fnStmtCmds[$Key][$j]
+                Loaded = $loaded.Clone(); Fns = $Fns; Env = $Env; EnvKey = $EnvKey
+                Chain = $Chain; Limits = $Limits
+            })
+        }
+        foreach ($r in $Index.fnStmtRuns[$Key][$j]) {
+            if ($Index.entries -contains $r) { continue }
+            Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
+                -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen @{} -Limits $Limits
+        }
+    }
 }
 
 function Get-DotSourceIssue {
@@ -479,43 +542,19 @@ function Get-DotSourceIssue {
                         foreach ($c in $index.dotClosure[$d.File]) { $child[$c] = $true }
                     }
                     foreach ($t in $fnAboveDots[$d.Key]) { $child[$t] = $true }
-                    foreach ($t in $fnDots[$d.Key]) { if ($t) { $child[$t] = $true } }
 
                     $fns = $item.Fns.Clone()
                     foreach ($k in $fnNested[$d.Key]) { $fns[$k] = $true }
                     $fns[$d.Key] = $true
 
                     $chain = $item.Chain + "$name()"
-                    $queue.Enqueue(@{
-                        File = $d.File; Calls = $fnCmds[$d.Key]; Loaded = $child
-                        Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain; Limits = $callLimits
-                    })
+                    Add-BodyWalk -Index $index -Key $d.Key -File $d.File -Loaded $child -Fns $fns -Env $env `
+                        -EnvKey $envKey -Chain $chain -Queue $queue -Limits $callLimits
 
                     if ($d.File -ne $entry -and -not $libSeen.ContainsKey($d.File) -and -not $index.invoked.ContainsKey($d.File)) {
                         $libSeen[$d.File] = $true
                         Add-TopLevelWalk -Index $index -File $d.File -Loaded $child -Fns $item.Fns -Env $env `
                             -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{} -Limits $callLimits
-                    }
-                    foreach ($r in $fnRuns[$d.Key]) {
-                        Add-TopLevelWalk -Index $index -File $r -Loaded $child -Fns $fns -Env $env `
-                            -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{} -Limits $callLimits
-                    }
-
-                    # A nested function body runs in its owner's session, so its calls get the same state.
-                    foreach ($k in $fnNested[$d.Key]) {
-                        $nestedKey = "$k|$envKey"
-                        if ($visited.ContainsKey($nestedKey)) { continue }
-                        $visited[$nestedKey] = $true
-                        $nestedLoaded = $child.Clone()
-                        foreach ($t in $fnDots[$k]) { if ($t) { $nestedLoaded[$t] = $true } }
-                        $queue.Enqueue(@{
-                            File = $d.File; Calls = $fnCmds[$k]; Loaded = $nestedLoaded
-                            Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain; Limits = $callLimits
-                        })
-                        foreach ($r in $fnRuns[$k]) {
-                            Add-TopLevelWalk -Index $index -File $r -Loaded $nestedLoaded -Fns $fns -Env $env `
-                                -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{} -Limits $callLimits
-                        }
                     }
                 }
             }
