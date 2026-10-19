@@ -148,26 +148,9 @@ function New-Shim($Path, $Global, $Name, $Arg) {
         Rename-ShimOnConflict "$shim.shim" $Path
         Copy-Item -LiteralPath (Get-ShimExe) "$shim.exe" -Force
 
-        $rewrote_path = $resolved_path
-
-        # If the shim exe is x86 on a x64 OS, rewrite paths so the shim resolves correctly:
-        #   System32 -> Sysnative  (x64 resolve x64 program in System32, and it should be Sysnative in x86 program)
-        #   SysWOW64 -> System32   (x64 resolve x86 program in SysWOW64, and it should be System32 in x86 program)
-        $shim_machine = Get-PEMachine "$shim.exe"
-        # 0x014c is IMAGE_FILE_MACHINE_I386
-        # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
-        if ($shim_machine -eq 0x014c -and [System.Environment]::Is64BitOperatingSystem) {
-            $sysdir = [System.IO.Path]::Combine($env:SystemRoot, 'System32')
-            $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
-            $syswow = [System.IO.Path]::Combine($env:SystemRoot, 'SysWOW64')
-            if ($rewrote_path -like "$sysdir\*") {
-                $rewrote_path = $rewrote_path -replace [regex]::Escape($sysdir), $sysnative
-            } elseif ($rewrote_path -like "$syswow\*") {
-                $rewrote_path = $rewrote_path -replace [regex]::Escape($syswow), $sysdir
-            }
-        }
-
-        Write-Output "path = `"$rewrote_path`"" | Out-UTF8File "$shim.shim"
+        # the stored path is the one the manifest named, so naming SysWOW64 over System32
+        # is what selects a 32-bit program - translating it here would lose that choice
+        Write-Output "path = `"$resolved_path`"" | Out-UTF8File "$shim.shim"
         if ($Arg) {
             Write-Output "args = $Arg" | Out-UTF8File "$shim.shim" -Append
         }
@@ -301,15 +284,20 @@ function New-Shim($Path, $Global, $Name, $Arg) {
 }
 
 function Get-ShimExe() {
-    $shim_version = get_config SHIM 'kiennq'
-    $shim_path = switch ($shim_version) {
-        'scoopcs' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
-        '71' { "$(versiondir 'scoop' 'current')\supporting\shims\71\shim.exe" }
-        'kiennq' { "$(versiondir 'scoop' 'current')\supporting\shims\kiennq\shim.exe" }
-        'default' { "$(versiondir 'scoop' 'current')\supporting\shims\scoopcs\shim.exe" }
-        default { warn "Unknown shim version: '$shim_version'" }
+    $shim = get_config SHIM 'default'
+    if ($shim -ne 'default') {
+        warn "Unknown shim '$shim' - using the bundled one."
     }
-    return $shim_path
+    $system = Get-SystemArchitecture
+    # exactly three architectures are vendored, and guessing one would silently produce a broken shim
+    $architecture = switch ($system) {
+        'arm64' { 'arm64' }
+        '64bit' { 'x64' }
+        '32bit' { 'x86' }
+        default { abort "Cannot tell which shim architecture to use (system reports '$system')." }
+    }
+    # this file lives in <root>\lib, so the bundled bodies are relative to the code, not to the install
+    "$PSScriptRoot\..\supporting\shims\$architecture\shim.exe"
 }
 
 # get target, name, arguments for shim

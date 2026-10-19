@@ -10,13 +10,12 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         # pin the switch input and the install root, so the machine's config cannot decide the verdict
         $repo_root = Join-Path $PSScriptRoot '..'
-        Mock -CommandName get_config -MockWith { 'scoopcs' } -ParameterFilter { $Name -eq 'SHIM' }
+        Mock -CommandName get_config -MockWith { 'default' } -ParameterFilter { $Name -eq 'SHIM' }
         Mock -CommandName versiondir -MockWith { $repo_root } -ParameterFilter { $app -eq 'scoop' -and $version -eq 'current' }
     }
 
     It 'returns machine type for a valid PE file' {
         $shim_path = Get-ShimExe
-        $shim_path | Should-BeLikeString '*\supporting\shims\scoopcs\shim.exe'
         $machine = Get-PEMachine $shim_path
         # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
         # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
@@ -168,6 +167,39 @@ Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
         [IO.File]::WriteAllText($shimPath, "path = `"$target`"", [Text.UTF8Encoding]::new($false))
 
         Get-ShimTarget $shimPath | Should-Be $target
+    }
+}
+
+Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
+    BeforeEach {
+        Mock -CommandName warn
+    }
+
+    It 'returns the body matching the machine architecture' {
+        $arch = switch (Get-SystemArchitecture) {
+            'arm64' { 'arm64' }
+            '64bit' { 'x64' }
+            '32bit' { 'x86' }
+        }
+        Get-ShimExe | Should-BeLikeString "*\supporting\shims\$arch\shim.exe"
+    }
+
+    It 'bundles a body for every architecture' {
+        'x64', 'x86', 'arm64' | ForEach-Object {
+            Test-Path -LiteralPath (Join-Path $PSScriptRoot "..\supporting\shims\$_\shim.exe") | Should-Be $true
+        }
+    }
+
+    It 'warns and falls back to the bundled shim for an unknown value' {
+        Mock -CommandName get_config -MockWith { 'cs' } -ParameterFilter { $Name -eq 'SHIM' }
+        Get-ShimExe | Should-BeLikeString '*\supporting\shims\*\shim.exe'
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*Unknown shim 'cs'*" }
+    }
+
+    It 'does not warn for the bundled shim' {
+        Mock -CommandName get_config -MockWith { 'default' } -ParameterFilter { $Name -eq 'SHIM' }
+        $null = Get-ShimExe
+        Should-Invoke -CommandName warn -Times 0
     }
 }
 
@@ -419,60 +451,30 @@ Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
 }
 
 # a scenario, not a function: New-Shim writes the path and Get-ShimTarget reads it back
-Describe 'WoW64 path rewriting' -Tag 'Scoop', 'Windows' {
+Describe 'shim target paths' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $shimdir = shimdir
-        # CI checkouts have no installed scoop version dir, so point at the bundled shim.exe
-        $repo_shim = Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe'
-        Mock -CommandName Get-ShimExe -MockWith { $repo_shim }
     }
 
-    It 'rewrites System32 to Sysnative in the shim file when the shim exe is x86 on x64 OS' {
+    It 'stores System32 as it was named' {
         $target = "$env:SystemRoot\System32\notepad.exe"
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (Get-ShimExe)) -eq 0x014c
 
-        New-Shim $target $false 'wow64-test'
+        New-Shim $target $false 'sysdir-test'
 
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        if ($rewrites) {
-            $line | Should-BeLikeString "*$env:SystemRoot\Sysnative\notepad.exe*"
-        } else {
-            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
-        }
-
-        # the 64-bit reader resolves the target back to the real System32 path either way
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
+        (Get-Content "$shimdir\sysdir-test.shim" | Select-Object -First 1) |
+            Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
     }
 
-    It 'does not rewrite paths outside System32 and SysWOW64' {
-        $target = "$env:SystemRoot\explorer.exe"
-
-        New-Shim $target $false 'wow64-test'
-
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        $line | Should-BeLikeString "*$target*"
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be $target
-    }
-
-    It 'rewrites SysWOW64 to System32 in the shim file when the shim exe is x86 on x64 OS' {
-        $wow = Join-Path ${env:SystemRoot} 'SysWOW64\notepad.exe'
-        if (-not (Test-Path $wow)) {
+    It 'stores SysWOW64 as it was named, so naming it selects the 32-bit program' {
+        $target = Join-Path $env:SystemRoot 'SysWOW64\notepad.exe'
+        if (-not (Test-Path $target)) {
             Set-ItResult -Skipped -Because 'SysWOW64 notepad not present'
         }
-        $target = $wow
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (Get-ShimExe)) -eq 0x014c
 
         New-Shim $target $false 'wow64-test'
 
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        if ($rewrites) {
-            # 64-bit reader sees the redirected (real) location via System32
-            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
-        } else {
-            $line | Should-BeLikeString "*$target*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
-        }
+        (Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1) |
+            Should-BeLikeString "*$env:SystemRoot\SysWOW64\notepad.exe*"
     }
 
     It 'does not fail on a shim file without a resolvable target' {
@@ -484,6 +486,7 @@ Describe 'WoW64 path rewriting' -Tag 'Scoop', 'Windows' {
     }
 
     AfterEach {
+        Remove-Shim 'sysdir-test' $shimdir
         Remove-Shim 'wow64-test' $shimdir
     }
 }
