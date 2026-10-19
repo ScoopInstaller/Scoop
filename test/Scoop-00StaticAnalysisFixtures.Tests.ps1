@@ -33,14 +33,14 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             @($issues | Where-Object { $_.Name -eq $Name }) | Should-BeCollection -Count $Count
         }
 
-        It 'Does not report calls the entry point can see' {
-            # The guarded branch contradicts its call site, the chained dot-source loads
-            # with the library that pulls it in, and the nested body sees its owner.
-            @($issues | Where-Object { $_.Name -eq 'fixture_guarded_helper' }) | Should-BeCollection -Count 0
-            @($issues | Where-Object { $_.Name -eq 'fixture_link_helper' }) | Should-BeCollection -Count 0
-            @($issues | Where-Object { $_.Name -eq 'fixture_host_helper' }) | Should-BeCollection -Count 0
-            @($issues | Where-Object { $_.Name -eq 'fixture_inner_helper' }) | Should-BeCollection -Count 0
-            @($issues | Where-Object { $_.Name -eq 'fixture_self_helper' }) | Should-BeCollection -Count 0
+        It 'Does not report <Name>' -TestCases @(
+            @{ Name = 'fixture_guarded_helper' }
+            @{ Name = 'fixture_link_helper' }
+            @{ Name = 'fixture_host_helper' }
+            @{ Name = 'fixture_inner_helper' }
+            @{ Name = 'fixture_self_helper' }
+        ) {
+            @($issues | Where-Object { $_.Name -eq $Name }) | Should-BeCollection -Count 0
         }
     }
 

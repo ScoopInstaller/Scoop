@@ -366,9 +366,7 @@ function Get-DotSourceIssue {
     $index = Get-ScriptIndex -Root $Root
     $Root = $index.root
     $defs = $index.defs
-    $topStmts = $index.topStmts
     $topCmds = $index.topCmds
-    $topDots = $index.topDots
     $fnCmds = $index.fnCmds
     $fnDots = $index.fnDots
     $fnRuns = $index.fnRuns
@@ -438,7 +436,13 @@ function Get-DotSourceIssue {
                     # calling statement has not run yet when the call executes.
                     if ($null -ne $item.Stmt -and $d.File -eq $item.File -and $d.Stmt -gt $item.Stmt) { continue }
                     # Same for a caller's definitions seen by a script it invoked.
-                    if (@($item.Limits | Where-Object { $d.File -eq $_.File -and $d.Stmt -gt $_.Stmt }).Count) { continue }
+                    $limited = $false
+                    if ($item.Limits) {
+                        foreach ($l in $item.Limits) {
+                            if ($d.File -eq $l.File -and $d.Stmt -gt $l.Stmt) { $limited = $true; break }
+                        }
+                    }
+                    if ($limited) { continue }
                     if ($d.Owner -and -not $item.Fns.ContainsKey($d.Owner)) { continue }
                     $visible = $true
                     break
@@ -455,8 +459,16 @@ function Get-DotSourceIssue {
                     continue
                 }
 
+                $envKey = ''
+                if ($env.Count) {
+                    $keys = @($env.Keys)
+                    [Array]::Sort($keys)
+                    $envKey = ($keys | ForEach-Object { "$_=$($env[$_])" }) -join ','
+                }
+                $callLimits = @()
+                if ($null -ne $item.Limits) { $callLimits = @($item.Limits) }
+                if ($null -ne $item.Stmt) { $callLimits += @{ File = $item.File; Stmt = $item.Stmt } }
                 foreach ($d in $defs[$name]) {
-                    $envKey = ($env.Keys | Sort-Object | ForEach-Object { "$_=$($env[$_])" }) -join ','
                     $visitKey = "$($d.Key)|$envKey"
                     if ($visited.ContainsKey($visitKey)) { continue }
                     $visited[$visitKey] = $true
@@ -474,8 +486,6 @@ function Get-DotSourceIssue {
                     $fns[$d.Key] = $true
 
                     $chain = $item.Chain + "$name()"
-                    $callLimits = @($item.Limits | Where-Object { $_ })
-                    if ($null -ne $item.Stmt) { $callLimits += @{ File = $item.File; Stmt = $item.Stmt } }
                     $queue.Enqueue(@{
                         File = $d.File; Calls = $fnCmds[$d.Key]; Loaded = $child
                         Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain; Limits = $callLimits
@@ -534,7 +544,7 @@ function Get-StringReachedNames {
     $names = @{}
     foreach ($file in $Index.files) {
         $syntaxStart = @{}
-        $strings = @()
+        $strings = [System.Collections.Generic.List[System.Management.Automation.Language.Ast]]::new()
         foreach ($n in $Index.asts[$file].FindAll({
                 param($x) $x -is [System.Management.Automation.Language.CommandAst] -or
                 $x -is [System.Management.Automation.Language.MemberExpressionAst] -or
@@ -543,7 +553,7 @@ function Get-StringReachedNames {
                 $x -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
             }, $true)) {
             if ($n -is [System.Management.Automation.Language.StringConstantExpressionAst] -or $n -is [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
-                $strings += $n
+                $strings.Add($n)
             } elseif ($n -is [System.Management.Automation.Language.CommandAst]) {
                 if ($n.GetCommandName()) { $syntaxStart[$n.CommandElements[0].Extent.StartOffset] = $true }
             } elseif ($n -is [System.Management.Automation.Language.MemberExpressionAst]) {
@@ -595,7 +605,6 @@ function Get-UnreachableFunction {
     $fnCmds = $index.fnCmds
     $fnNested = $index.fnNested
     $topCmds = $index.topCmds
-    $asts = $index.asts
 
     # Load order is ignored on purpose: anything a seed dot-sources is a seed too, and bin scripts
     # reached through `&` run in their caller's session, so they stay seeds without being entries.
