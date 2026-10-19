@@ -360,6 +360,9 @@ function Add-TopLevelWalk {
             if (-not $t) { continue }
             $loaded[$t] = $true
             foreach ($c in $Index.dotClosure[$t]) { $loaded[$c] = $true }
+            # A dot-sourced script runs its whole body here, in this session's current state.
+            Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
+                -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen $Seen -Limits $Limits
         }
         if ($Index.topCmds[$File][$i].Count) {
             $Queue.Enqueue(@{
@@ -391,6 +394,8 @@ function Add-BodyWalk {
             if (-not $t) { continue }
             $loaded[$t] = $true
             foreach ($c in $Index.dotClosure[$t]) { $loaded[$c] = $true }
+            Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
+                -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen @{} -Limits $Limits
         }
         if ($Index.fnStmtCmds[$Key][$j].Count) {
             $Queue.Enqueue(@{
@@ -442,7 +447,6 @@ function Get-DotSourceIssue {
     $issues = @()
     foreach ($entry in $entries) {
         $inherits = $entry -like "$Root\libexec\*"
-        $libSeen = @{}
 
         # A function loads files when it runs (lib/core.ps1 does this lazily): treat every file
         # reachable from this entry as available. Top-level dot-sources stay order-sensitive below.
@@ -551,10 +555,19 @@ function Get-DotSourceIssue {
                     Add-BodyWalk -Index $index -Key $d.Key -File $d.File -Loaded $child -Fns $fns -Env $env `
                         -EnvKey $envKey -Chain $chain -Queue $queue -Limits $callLimits
 
-                    if ($d.File -ne $entry -and -not $libSeen.ContainsKey($d.File) -and -not $index.invoked.ContainsKey($d.File)) {
-                        $libSeen[$d.File] = $true
-                        Add-TopLevelWalk -Index $index -File $d.File -Loaded $child -Fns $item.Fns -Env $env `
-                            -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{} -Limits $callLimits
+                    # A nested body called by name is walked precisely at its call statement; one
+                    # reached only through a variable (`& $handler`) has no call site to walk from.
+                    $ownerCalls = @{}
+                    foreach ($list in $index.fnStmtCmds[$d.Key]) {
+                        foreach ($c in $list) { $n = $c.GetCommandName(); if ($n) { $ownerCalls[$n] = $true } }
+                    }
+                    foreach ($k in $fnNested[$d.Key]) {
+                        if ($ownerCalls.ContainsKey($index.fnBodies[$k].Name)) { continue }
+                        $nestedKey = "$k|$envKey"
+                        if ($visited.ContainsKey($nestedKey)) { continue }
+                        $visited[$nestedKey] = $true
+                        Add-BodyWalk -Index $index -Key $k -File $d.File -Loaded $child -Fns $fns -Env $env `
+                            -EnvKey $envKey -Chain $chain -Queue $queue -Limits $callLimits
                     }
                 }
             }
