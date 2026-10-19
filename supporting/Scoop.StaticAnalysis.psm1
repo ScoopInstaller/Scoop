@@ -134,7 +134,7 @@ function Get-ScriptIndex {
     $fnStmtCmds = @{}    # Key -> CommandAst[] per body statement
     $fnStmtDots = @{}    # Key -> path[] per body statement
     $fnStmtRuns = @{}    # Key -> `& path` target[] per body statement
-    $fnStmtDyn = @{}     # Key -> variable-based `&` hits per body statement
+    $fnStmtDyn = @{}     # Key -> variable-based `&` CommandAst per body statement
     $fnFileKeys = @{}    # file -> every def Key, same-name defs included
     $invoked = @{}       # file -> hit through a literal `& path`
     $asts = @{}          # file -> AST for the string-literal pass
@@ -243,7 +243,7 @@ function Get-ScriptIndex {
                 if ($invocation -eq 'Ampersand') {
                     if (-not $target) {
                         # A variable-based call can still name one of the owner's nested functions.
-                        if ($owner) { $fnStmtDyn[$owner][(Get-BodyStmtIndex $fnStmtRanges $owner $start $end)].Add($true) }
+                        if ($owner) { $fnStmtDyn[$owner][(Get-BodyStmtIndex $fnStmtRanges $owner $start $end)].Add($cmd) }
                         continue
                     }
                     $invoked[$target] = $true
@@ -392,6 +392,35 @@ function Add-TopLevelWalk {
     $Seen.Remove($File)
 }
 
+function Resolve-Env {
+    # Merges a call's guards into the state it runs under; $null when they contradict it.
+    param($Env, $Constraints)
+
+    if (-not $Constraints -or -not $Constraints.Count) { return $Env }
+    $merged = $Env.Clone()
+    foreach ($c in $Constraints.Keys) {
+        if (-not $merged.ContainsKey($c)) { $merged[$c] = $Constraints[$c] }
+        elseif ($merged[$c] -ne $Constraints[$c]) { return $null }
+    }
+    $merged
+}
+
+function Get-EnvKey {
+    param($Env)
+
+    if (-not $Env.Count) { return '' }
+    $keys = @($Env.Keys)
+    [Array]::Sort($keys)
+    ($keys | ForEach-Object { "$_=$($Env[$_])" }) -join ','
+}
+
+function Get-CallConstraint {
+    param($Index, $Call)
+
+    if (-not $Index.cmdConstraints.ContainsKey($Call)) { $Index.cmdConstraints[$Call] = Get-CommandConstraint $Call }
+    $Index.cmdConstraints[$Call]
+}
+
 function Add-BodyWalk {
     # A body runs its statements in order, so a dot-source below a call cannot satisfy it.
     param($Index, [String] $Key, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Limits, $Visited)
@@ -421,14 +450,17 @@ function Add-BodyWalk {
         }
         # A variable-based call at this statement can name a nested function; it runs right here,
         # so its body is checked with the state this statement has, not the owner's entry state.
-        if ($Index.fnStmtDyn[$Key][$j].Count) {
+        foreach ($cmd in $Index.fnStmtDyn[$Key][$j]) {
+            $dynEnv = Resolve-Env $Env (Get-CallConstraint $Index $cmd)
+            if ($null -eq $dynEnv) { continue }
+            $dynKey = Get-EnvKey $dynEnv
             foreach ($k in $Index.fnNested[$Key]) {
                 if ($k -eq $Key -or $calledNames.ContainsKey($Index.fnBodies[$k].Name)) { continue }
-                $nestedKey = "$k|$EnvKey"
+                $nestedKey = "$k|$dynKey"
                 if ($Visited.ContainsKey($nestedKey)) { continue }
                 $Visited[$nestedKey] = $true
-                Add-BodyWalk -Index $Index -Key $k -File $File -Loaded $loaded -Fns $Fns -Env $Env `
-                    -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Limits $Limits -Visited $Visited
+                Add-BodyWalk -Index $Index -Key $k -File $File -Loaded $loaded -Fns $Fns -Env $dynEnv `
+                    -EnvKey $dynKey -Chain $Chain -Queue $Queue -Limits $Limits -Visited $Visited
             }
         }
     }
@@ -505,18 +537,8 @@ function Get-DotSourceIssue {
                 if (-not $name -or -not $defs.ContainsKey($name)) { continue }
 
                 # Drop branches whose get_config guards contradict an enclosing one.
-                if (-not $cmdConstraints.ContainsKey($call)) { $cmdConstraints[$call] = Get-CommandConstraint $call }
-                $constraints = $cmdConstraints[$call]
-                $env = $item.Env
-                if ($constraints -and $constraints.Count) {
-                    $env = $item.Env.Clone()
-                    $skip = $false
-                    foreach ($c in $constraints.Keys) {
-                        if (-not $env.ContainsKey($c)) { $env[$c] = $constraints[$c] }
-                        elseif ($env[$c] -ne $constraints[$c]) { $skip = $true }
-                    }
-                    if ($skip) { continue }
-                }
+                $env = Resolve-Env $item.Env (Get-CallConstraint $index $call)
+                if ($null -eq $env) { continue }
 
                 $visible = $false
                 foreach ($d in $defs[$name]) {
@@ -548,12 +570,7 @@ function Get-DotSourceIssue {
                     continue
                 }
 
-                $envKey = ''
-                if ($env.Count) {
-                    $keys = @($env.Keys)
-                    [Array]::Sort($keys)
-                    $envKey = ($keys | ForEach-Object { "$_=$($env[$_])" }) -join ','
-                }
+                $envKey = Get-EnvKey $env
                 $callLimits = @()
                 if ($null -ne $item.Limits) { $callLimits = @($item.Limits) }
                 if ($null -ne $item.Stmt) { $callLimits += @{ File = $item.File; Stmt = $item.Stmt } }

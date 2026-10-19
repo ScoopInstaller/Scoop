@@ -13,6 +13,17 @@ function fixture_dynamic_loaded {
 }
 fixture_dynamic_loaded
 
+function fixture_guarded_dynamic {
+    function fixture_guarded_inner { fixture_amp_target }
+    $fixture_picker = 'fixture_guarded_inner'
+    if (get_config fixture_flag) {
+        & $fixture_picker
+    }
+}
+if (-not (get_config fixture_flag)) {
+    fixture_guarded_dynamic
+}
+
 function fixture_outer_runner {
     function fixture_inner_loader {
         fixture_amp_target
