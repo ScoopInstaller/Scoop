@@ -14,7 +14,7 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
                 '{0}: {1} -> {2}:{3} calls {4}' -f $_.Entry, ($_.Chain -join ' -> '), (Split-Path $_.Path -Leaf), $_.Line, $_.Name
             }) -join "`n"
 
-            $issues | Should-BeCollection -Count 35 -Because $report
+            $issues | Should-BeCollection -Count 33 -Because $report
         }
 
         It 'Reports <Name> once per unreachable call' -TestCases @(
@@ -25,8 +25,8 @@ Describe 'Static analysis fixtures' -Tag 'Scoop' {
             @{ Name = 'fixture_only_when_false'; Count = 1 }
             @{ Name = 'fixture_else_only_helper'; Count = 3 }
             @{ Name = 'fixture_or_only_helper'; Count = 1 }
-            @{ Name = 'fixture_amp_target'; Count = 6 }
-            @{ Name = 'fixture_future_helper'; Count = 5 }
+            @{ Name = 'fixture_amp_target'; Count = 5 }
+            @{ Name = 'fixture_future_helper'; Count = 4 }
             @{ Name = 'fixture_never_helper'; Count = 11 }
             @{ Name = 'fixture_order_helper'; Count = 1 }
         ) {

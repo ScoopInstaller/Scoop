@@ -148,7 +148,6 @@ function Get-ScriptIndex {
     $fnBodies = @{}      # Key -> FunctionDefinitionAst
     $fnCmds = @{}        # Key -> CommandAst[], nested bodies excluded
     $fnDots = @{}        # Key -> paths dot-sourced in the body
-    $fnRuns = @{}        # Key -> `& path` targets run in the body
     $fnStmts = @{}       # Key -> body statement count
     $fnStmtRanges = @{}  # Key -> body statement offsets
     $fnStmtCmds = @{}    # Key -> CommandAst[] per body statement
@@ -159,6 +158,7 @@ function Get-ScriptIndex {
     $invoked = @{}       # file -> hit through a literal `& path`
     $asts = @{}          # file -> AST for the string-literal pass
     $fnNested = @{}      # Key -> nested def keys, including itself
+    $fnCallNames = @{}   # Key -> names the body calls by name
     $fnAboveDots = @{}   # Key -> paths dot-sourced above the def's statement
     $cmdConstraints = @{} # CommandAst -> constraints, filled on demand
 
@@ -266,8 +266,6 @@ function Get-ScriptIndex {
                     }
                     $invoked[$target] = $true
                     if ($owner) {
-                        if (-not $fnRuns.ContainsKey($owner)) { $fnRuns[$owner] = @() }
-                        $fnRuns[$owner] += , $target
                         $fnStmtRuns[$owner][(Get-BodyStmtIndex $fnStmtRanges $owner $start $end)].Add($target)
                     } else {
                         for ($i = 0; $i -lt $stmtRanges.Count; $i++) {
@@ -313,6 +311,10 @@ function Get-ScriptIndex {
                 if ($namedExtents[$i].StartOffset -ge $scope.StartOffset -and $namedExtents[$i].EndOffset -le $scope.EndOffset) { $inner += $fileKeys[$i] }
             }
             $fnNested[$key] = $inner
+
+            $names = @{}
+            foreach ($list in $fnStmtCmds[$key]) { foreach ($c in $list) { $n = $c.GetCommandName(); if ($n) { $names[$n] = $true } } }
+            $fnCallNames[$key] = $names
 
             $above = @()
             for ($j = 0; $j -lt $fileStmts[$key]; $j++) { foreach ($t in $topDots[$file][$j]) { if ($t) { $above += $t } } }
@@ -372,8 +374,9 @@ function Get-ScriptIndex {
     $result = @{
         root = $Root
         files = $files; defs = $defs; topStmts = $topStmts; topCmds = $topCmds; topDots = $topDots; topRuns = $topRuns
-        fnBodies = $fnBodies; fnCmds = $fnCmds; fnDots = $fnDots; fnRuns = $fnRuns; fnFileKeys = $fnFileKeys
+        fnBodies = $fnBodies; fnCmds = $fnCmds; fnDots = $fnDots; fnFileKeys = $fnFileKeys
         fnStmts = $fnStmts; fnStmtCmds = $fnStmtCmds; fnStmtDots = $fnStmtDots; fnStmtRuns = $fnStmtRuns; fnStmtDyn = $fnStmtDyn
+        fnCallNames = $fnCallNames
         fnNested = $fnNested; fnAboveDots = $fnAboveDots; cmdConstraints = $cmdConstraints
         invoked = $invoked; hostSet = $hostSet; entries = $entries; asts = $asts; dotClosure = $dotClosure
     }
@@ -408,10 +411,9 @@ function Add-TopLevelWalk {
         foreach ($r in $Index.topRuns[$File][$i]) {
             # An entry is walked on its own terms, and a libexec one sees more than this call site.
             if ($Index.entries -contains $r) { continue }
-            $nextLimits = @($Limits | Where-Object { $_ })
-            $nextLimits += @{ File = $File; Stmt = $i }
+            $nextLimits = @($Limits) + @{ File = $File; Stmt = $i }
             Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
-                -EnvKey $EnvKey -Chain $Chain -Queue $queue -Seen $Seen -Limits $nextLimits
+                -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen $Seen -Limits $nextLimits
         }
     }
     # Only cycles are cut: two call sites of one script each carry their own loaded set.
@@ -452,8 +454,7 @@ function Add-BodyWalk {
     param($Index, [String] $Key, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Limits, $Visited)
 
     $loaded = $Loaded.Clone()
-    $calledNames = @{}
-    foreach ($list in $Index.fnStmtCmds[$Key]) { foreach ($c in $list) { $n = $c.GetCommandName(); if ($n) { $calledNames[$n] = $true } } }
+    $calledNames = $Index.fnCallNames[$Key]
     for ($j = 0; $j -lt $Index.fnStmts[$Key]; $j++) {
         foreach ($t in $Index.fnStmtDots[$Key][$j]) {
             if (-not $t) { continue }
@@ -516,10 +517,8 @@ function Get-DotSourceIssue {
     $topCmds = $index.topCmds
     $fnCmds = $index.fnCmds
     $fnDots = $index.fnDots
-    $fnRuns = $index.fnRuns
     $fnNested = $index.fnNested
     $fnAboveDots = $index.fnAboveDots
-    $cmdConstraints = $index.cmdConstraints
     $hostSet = $index.hostSet
     $entries = $index.entries
 

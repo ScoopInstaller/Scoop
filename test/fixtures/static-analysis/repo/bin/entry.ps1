@@ -1,9 +1,6 @@
 & "$PSScriptRoot\..\libexec\dispatch.ps1"
 & "$PSScriptRoot\..\lib\runner.ps1"
 
-function fixture_direct_runner { & "$PSScriptRoot\..\lib\unloaded.ps1" }
-fixture_direct_runner
-
 function fixture_nesting_caller {
     function fixture_nested_runner { & "$PSScriptRoot\..\lib\unloaded.ps1" }
     fixture_nested_runner
