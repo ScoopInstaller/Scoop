@@ -1,4 +1,5 @@
 & "$PSScriptRoot\..\libexec\dispatch.ps1"
+& "$PSScriptRoot\..\lib\runner.ps1"
 
 function fixture_direct_runner { & "$PSScriptRoot\..\lib\unloaded.ps1" }
 fixture_direct_runner

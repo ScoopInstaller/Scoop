@@ -506,12 +506,14 @@ function Get-DotSourceIssue {
                         $nestedKey = "$k|$envKey"
                         if ($visited.ContainsKey($nestedKey)) { continue }
                         $visited[$nestedKey] = $true
+                        $nestedLoaded = $child.Clone()
+                        foreach ($t in $fnDots[$k]) { if ($t) { $nestedLoaded[$t] = $true } }
                         $queue.Enqueue(@{
-                            File = $d.File; Calls = $fnCmds[$k]; Loaded = $child
+                            File = $d.File; Calls = $fnCmds[$k]; Loaded = $nestedLoaded
                             Fns = $fns; Env = $env; EnvKey = $envKey; Chain = $chain; Limits = $callLimits
                         })
                         foreach ($r in $fnRuns[$k]) {
-                            Add-TopLevelWalk -Index $index -File $r -Loaded $child -Fns $fns -Env $env `
+                            Add-TopLevelWalk -Index $index -File $r -Loaded $nestedLoaded -Fns $fns -Env $env `
                                 -EnvKey $envKey -Chain $chain -Queue $queue -Seen @{} -Limits $callLimits
                         }
                     }
