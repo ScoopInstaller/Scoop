@@ -14,6 +14,15 @@ fixture_nesting_caller
 function fixture_future_helper { 'future' }
 fixture_future_helper
 
+function fixture_partial_negation {
+    if (-not (get_config fixture_flag) -and $fixture_other) {
+        fixture_deep_helper
+    }
+}
+if (get_config fixture_flag) {
+    fixture_partial_negation
+}
+
 function fixture_early { fixture_late_helper }
 fixture_early
 

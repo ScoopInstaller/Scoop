@@ -26,6 +26,24 @@ function Get-BodyStmtIndex {
     0
 }
 
+function Test-WholeNegation {
+    # True when the leading `!` or `-not` wraps a group that holds the operator itself.
+    param([String] $Text)
+
+    $lead = [regex]::Match($Text, '^\s*(?:!\s*\(|-not\s*\()')
+    if (-not $lead.Success) { return $false }
+    $start = $Text.IndexOf('(', $lead.Index)
+    $depth = 0
+    for ($i = $start; $i -lt $Text.Length; $i++) {
+        if ($Text[$i] -eq '(') { $depth++ }
+        elseif ($Text[$i] -eq ')') {
+            $depth--
+            if ($depth -eq 0) { return [bool]($Text.Substring($start, $i - $start) -match '\s-(?:and|or)\s') }
+        }
+    }
+    $false
+}
+
 function Get-GetConfigConstraint {
     # Truth value implied by a `get_config X` guard, or $null when none: `-or` pins no single
     # value, a comparison chained onto the call is about the value, and an operator further out,
@@ -42,8 +60,8 @@ function Get-GetConfigConstraint {
     if ($rest -match '^(?:\s+(?:''[^'']*''|\$\w+))?(?:\s*\))+\s*-(?:eq|ne|ieq|ine|ge|gt|le|lt|like|notlike|match|notmatch|in|notin|contains|is|isnot|band|bor)\b') { return }
 
     $negated = ($text -match '^\s*!') -or ($text -match '^\s*\(?\s*-not\b')
-    # `-not (A -and B)` is `!A -or !B`: reading it as a single value would skip a live branch.
-    if ($negated -and $text -match '\s-(?:and|or)\s') { return }
+    # `-not (A -and B)` is `!A -or !B` and pins nothing; `-not A -and B` negates only A.
+    if ($negated -and $text -match '\s-(?:and|or)\s' -and (Test-WholeNegation $text)) { return }
     @{ Key = $name.Groups[1].Value.ToLowerInvariant(); Value = (-not $negated) }
 }
 
