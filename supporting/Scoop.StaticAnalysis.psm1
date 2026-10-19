@@ -134,6 +134,7 @@ function Get-ScriptIndex {
     $fnStmtCmds = @{}    # Key -> CommandAst[] per body statement
     $fnStmtDots = @{}    # Key -> path[] per body statement
     $fnStmtRuns = @{}    # Key -> `& path` target[] per body statement
+    $fnStmtDyn = @{}     # Key -> variable-based `&` hits per body statement
     $fnFileKeys = @{}    # file -> every def Key, same-name defs included
     $invoked = @{}       # file -> hit through a literal `& path`
     $asts = @{}          # file -> AST for the string-literal pass
@@ -183,16 +184,19 @@ function Get-ScriptIndex {
             $cmdGrid = [Object[]]::new($bodyStmts.Count)
             $dotGrid = [Object[]]::new($bodyStmts.Count)
             $runGrid = [Object[]]::new($bodyStmts.Count)
+            $dynGrid = [Object[]]::new($bodyStmts.Count)
             for ($j = 0; $j -lt $bodyStmts.Count; $j++) {
                 $ranges[$j] = @{ Start = $bodyStmts[$j].Extent.StartOffset; End = $bodyStmts[$j].Extent.EndOffset }
                 $cmdGrid[$j] = [System.Collections.Generic.List[Object]]::new()
                 $dotGrid[$j] = [System.Collections.Generic.List[Object]]::new()
                 $runGrid[$j] = [System.Collections.Generic.List[Object]]::new()
+                $dynGrid[$j] = [System.Collections.Generic.List[Object]]::new()
             }
             $fnStmtRanges[$key] = $ranges
             $fnStmtCmds[$key] = $cmdGrid
             $fnStmtDots[$key] = $dotGrid
             $fnStmtRuns[$key] = $runGrid
+            $fnStmtDyn[$key] = $dynGrid
 
             $ownerStmt = -1
             $ownerKey = ''
@@ -237,7 +241,11 @@ function Get-ScriptIndex {
                 $invocation = "$($cmd.InvocationOperator)"
                 $target = Get-DotSourceLiteralPath $cmd $file
                 if ($invocation -eq 'Ampersand') {
-                    if (-not $target) { continue }
+                    if (-not $target) {
+                        # A variable-based call can still name one of the owner's nested functions.
+                        if ($owner) { $fnStmtDyn[$owner][(Get-BodyStmtIndex $fnStmtRanges $owner $start $end)].Add($true) }
+                        continue
+                    }
                     $invoked[$target] = $true
                     if ($owner) {
                         if (-not $fnRuns.ContainsKey($owner)) { $fnRuns[$owner] = @() }
@@ -338,7 +346,7 @@ function Get-ScriptIndex {
         root = $Root
         files = $files; defs = $defs; topStmts = $topStmts; topCmds = $topCmds; topDots = $topDots; topRuns = $topRuns
         fnBodies = $fnBodies; fnCmds = $fnCmds; fnDots = $fnDots; fnRuns = $fnRuns; fnFileKeys = $fnFileKeys
-        fnStmts = $fnStmts; fnStmtCmds = $fnStmtCmds; fnStmtDots = $fnStmtDots; fnStmtRuns = $fnStmtRuns
+        fnStmts = $fnStmts; fnStmtCmds = $fnStmtCmds; fnStmtDots = $fnStmtDots; fnStmtRuns = $fnStmtRuns; fnStmtDyn = $fnStmtDyn
         fnNested = $fnNested; fnAboveDots = $fnAboveDots; cmdConstraints = $cmdConstraints
         invoked = $invoked; hostSet = $hostSet; entries = $entries; asts = $asts; dotClosure = $dotClosure
     }
@@ -386,9 +394,11 @@ function Add-TopLevelWalk {
 
 function Add-BodyWalk {
     # A body runs its statements in order, so a dot-source below a call cannot satisfy it.
-    param($Index, [String] $Key, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Limits)
+    param($Index, [String] $Key, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Limits, $Visited)
 
     $loaded = $Loaded.Clone()
+    $calledNames = @{}
+    foreach ($list in $Index.fnStmtCmds[$Key]) { foreach ($c in $list) { $n = $c.GetCommandName(); if ($n) { $calledNames[$n] = $true } } }
     for ($j = 0; $j -lt $Index.fnStmts[$Key]; $j++) {
         foreach ($t in $Index.fnStmtDots[$Key][$j]) {
             if (-not $t) { continue }
@@ -408,6 +418,18 @@ function Add-BodyWalk {
             if ($Index.entries -contains $r) { continue }
             Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen @{} -Limits $Limits
+        }
+        # A variable-based call at this statement can name a nested function; it runs right here,
+        # so its body is checked with the state this statement has, not the owner's entry state.
+        if ($Index.fnStmtDyn[$Key][$j].Count) {
+            foreach ($k in $Index.fnNested[$Key]) {
+                if ($k -eq $Key -or $calledNames.ContainsKey($Index.fnBodies[$k].Name)) { continue }
+                $nestedKey = "$k|$EnvKey"
+                if ($Visited.ContainsKey($nestedKey)) { continue }
+                $Visited[$nestedKey] = $true
+                Add-BodyWalk -Index $Index -Key $k -File $File -Loaded $loaded -Fns $Fns -Env $Env `
+                    -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Limits $Limits -Visited $Visited
+            }
         }
     }
 }
@@ -553,22 +575,7 @@ function Get-DotSourceIssue {
 
                     $chain = $item.Chain + "$name()"
                     Add-BodyWalk -Index $index -Key $d.Key -File $d.File -Loaded $child -Fns $fns -Env $env `
-                        -EnvKey $envKey -Chain $chain -Queue $queue -Limits $callLimits
-
-                    # A nested body called by name is walked precisely at its call statement; one
-                    # reached only through a variable (`& $handler`) has no call site to walk from.
-                    $ownerCalls = @{}
-                    foreach ($list in $index.fnStmtCmds[$d.Key]) {
-                        foreach ($c in $list) { $n = $c.GetCommandName(); if ($n) { $ownerCalls[$n] = $true } }
-                    }
-                    foreach ($k in $fnNested[$d.Key]) {
-                        if ($ownerCalls.ContainsKey($index.fnBodies[$k].Name)) { continue }
-                        $nestedKey = "$k|$envKey"
-                        if ($visited.ContainsKey($nestedKey)) { continue }
-                        $visited[$nestedKey] = $true
-                        Add-BodyWalk -Index $index -Key $k -File $d.File -Loaded $child -Fns $fns -Env $env `
-                            -EnvKey $envKey -Chain $chain -Queue $queue -Limits $callLimits
-                    }
+                        -EnvKey $envKey -Chain $chain -Queue $queue -Limits $callLimits -Visited $visited
                 }
             }
         }
