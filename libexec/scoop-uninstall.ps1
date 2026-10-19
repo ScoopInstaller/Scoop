@@ -10,6 +10,7 @@
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\restart_manager.ps1"
 . "$PSScriptRoot\..\lib\download.ps1" # url_filename
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
@@ -64,7 +65,9 @@ if (!$apps) { exit 0 }
         Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
 
         #region Workaround for #2952
-        if (test_running_process $app $global) {
+        $running_ret = check_running_process $app $global
+        $stop_ret = stop_running_process $running_ret
+        if ($stop_ret.Blocked) {
             continue
         }
         #endregion Workaround for #2952
