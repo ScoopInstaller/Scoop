@@ -414,16 +414,20 @@ Describe 'app' -Tag 'Scoop' {
 }
 
 Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        # pin the switch input and the install root, so the machine's config cannot decide the verdict
+        $repo_root = Join-Path $PSScriptRoot '..'
+        Mock -CommandName get_config -MockWith { 'scoopcs' } -ParameterFilter { $Name -eq 'SHIM' }
+        Mock -CommandName versiondir -MockWith { $repo_root } -ParameterFilter { $app -eq 'scoop' -and $version -eq 'current' }
+    }
+
     It 'returns machine type for a valid PE file' {
         $shim_path = get_shim_path
-        if ($shim_path -and (Test-Path $shim_path)) {
-            $machine = Get-PEMachine $shim_path
-            # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
-            # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
-            @(0x014c, 0x8664, 0xAA64) | Should-ContainCollection $machine
-        } else {
-            Set-ItResult -Skipped -Because 'shim exe not found'
-        }
+        $shim_path | Should-BeLikeString '*\supporting\shims\scoopcs\shim.exe'
+        $machine = Get-PEMachine $shim_path
+        # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
+        # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
+        @(0x014c, 0x8664, 0xAA64) | Should-ContainCollection $machine
     }
 
     It 'returns 0 for a non-existent file' {
