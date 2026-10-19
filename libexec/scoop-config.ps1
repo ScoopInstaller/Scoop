@@ -82,6 +82,11 @@
 #       scoop-shim-cs, scoop-shim-cpp, scoop-shim-zig or scoop-shim-rust.
 #       If not specified, the shim bundled with Scoop is used.
 #
+# shim_auto_refresh: $true|$false
+#       Whether 'scoop config shim' also replaces the shim.exe of every shim.
+#       (Default is $true) Set it to $false to change the setting only, then
+#       run 'scoop shim update' yourself.
+#
 # root_path: $Env:UserProfile\scoop
 #       Path to Scoop root directory.
 #
