@@ -103,3 +103,22 @@ function fixture_order_helper { 'order' }
 fixture_host_helper
 fixture_link_helper
 fixture_still_used
+
+if (get_config guard_right_flag) {
+    guard_right_outer
+}
+
+if (get_config guard_left_flag) {
+    guard_left_outer
+}
+
+if (get_config guard_else_flag) {
+    guard_else_outer
+}
+
+if (-not (get_config guard_or_flag)) {
+    guard_or_caller
+}
+
+. "$PSScriptRoot\..\lib\cycle_a.ps1"
+fixture_cycle_helper

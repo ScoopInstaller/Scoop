@@ -27,3 +27,11 @@ function fixture_old_way {
 function fixture_replaced_way {
     Show-DeprecatedWarning $MyInvocation 'fixture_new_way'
 }
+
+function guard_right_helper { 'right' }
+
+function guard_left_helper { 'left' }
+
+function guard_else_helper { 'else' }
+
+function guard_or_helper { 'or' }

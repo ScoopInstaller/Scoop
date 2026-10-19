@@ -26,43 +26,64 @@ function Get-BodyStmtIndex {
     0
 }
 
-function Test-WholeNegation {
-    # True when the leading `!` or `-not` wraps a group that holds the operator itself.
-    param([String] $Text)
-
-    $lead = [regex]::Match($Text, '^\s*(?:!\s*\(|-not\s*\()')
-    if (-not $lead.Success) { return $false }
-    $start = $Text.IndexOf('(', $lead.Index)
-    $depth = 0
-    for ($i = $start; $i -lt $Text.Length; $i++) {
-        if ($Text[$i] -eq '(') { $depth++ }
-        elseif ($Text[$i] -eq ')') {
-            $depth--
-            if ($depth -eq 0) { return [bool]($Text.Substring($start, $i - $start) -match '\s-(?:and|or)\s') }
-        }
-    }
-    $false
-}
-
 function Get-GetConfigConstraint {
-    # Truth value implied by a `get_config X` guard, or $null when none: `-or` pins no single
-    # value, a comparison chained onto the call is about the value, and an operator further out,
-    # like `-and ($app -ne 'scoop')`, says nothing about the config.
-    param([System.Management.Automation.Language.Ast] $Condition)
+    # Truth value a `get_config X` must have for this condition to evaluate to $Assume, or $null
+    # when the condition pins none: a comparison consumes the value, an `-or` above the call (or
+    # an `-and` under a negated else) leaves it free, and only a negation on the call's own spine
+    # inverts it.
+    param(
+        [System.Management.Automation.Language.Ast] $Condition,
+        [Bool] $Assume = $true
+    )
 
     if (-not $Condition) { return }
-    $text = $Condition.Extent.Text
-    if ($text -match '\s-or\s') { return }
+    $calls = @($Condition.FindAll({
+                param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'get_config'
+            }, $true))
+    if ($calls.Count -ne 1) { return }
+    $call = $calls[0]
+    if ($call.CommandElements.Count -lt 2 -or $call.CommandElements[1] -isnot [System.Management.Automation.Language.StringConstantExpressionAst]) { return }
+    $key = [string]$call.CommandElements[1].Value
+    if (-not $key) { return }
 
-    $name = [regex]::Match($text, 'get_config\s+([A-Za-z0-9_-]+)')
-    if (-not $name.Success) { return }
-    $rest = $text.Substring($name.Index + $name.Length)
-    if ($rest -match '^(?:\s+(?:''[^'']*''|\$\w+))?(?:\s*\))+\s*-(?:eq|ne|ieq|ine|ge|gt|le|lt|like|notlike|match|notmatch|in|notin|contains|is|isnot|band|bor)\b') { return }
-
-    $negated = ($text -match '^\s*!') -or ($text -match '^\s*\(?\s*-not\b')
-    # `-not (A -and B)` is `!A -or !B` and pins nothing; `-not A -and B` negates only A.
-    if ($negated -and $text -match '\s-(?:and|or)\s' -and (Test-WholeNegation $text)) { return }
-    @{ Key = $name.Groups[1].Value.ToLowerInvariant(); Value = (-not $negated) }
+    $node = $Condition
+    while ($node) {
+        $type = $node.GetType().Name
+        if ($type -eq 'PipelineAst') {
+            if ($node.PipelineElements.Count -ne 1) { return }
+            $node = $node.PipelineElements[0]
+            continue
+        }
+        if ($type -eq 'CommandExpressionAst') { $node = $node.Expression; continue }
+        if ($type -eq 'ParenExpressionAst') { $node = $node.Pipeline; continue }
+        if ($type -eq 'UnaryExpressionAst') {
+            # `-not` and `!` differ only in token kind.
+            if ($node.TokenKind -ne 'Not' -and $node.TokenKind -ne 'Exclaim') { return }
+            $Assume = -not $Assume
+            $node = $node.Child
+            continue
+        }
+        if ($type -eq 'BinaryExpressionAst') {
+            $inLeft = $node.Left.Extent.StartOffset -le $call.Extent.StartOffset -and $call.Extent.EndOffset -le $node.Left.Extent.EndOffset
+            $inRight = $node.Right.Extent.StartOffset -le $call.Extent.StartOffset -and $call.Extent.EndOffset -le $node.Right.Extent.EndOffset
+            if (-not ($inLeft -or $inRight)) { return }
+            if ($node.Operator -eq 'And') {
+                # The sibling side says nothing about this call, so only the assumed value matters.
+                if (-not $Assume) { return }
+            } elseif ($node.Operator -eq 'Or') {
+                # A true `A -or B` needs one side only; a false one needs both.
+                if ($Assume) { return }
+            } else { return }
+            $node = if ($inLeft) { $node.Left } else { $node.Right }
+            continue
+        }
+        if ($type -eq 'CommandAst') {
+            # A call used as an argument of another command pins nothing.
+            if ($node -ne $call) { return }
+            return @{ Key = $key.ToLowerInvariant(); Value = $Assume }
+        }
+        return
+    }
 }
 
 function Get-CommandConstraint {
@@ -92,12 +113,11 @@ function Get-CommandConstraint {
                     $inverted = @{}
                     $dropped = @{}
                     foreach ($candidate in $node.Clauses) {
-                        # Only a guard that stands alone can be inverted: in `A -and B` the else
-                        # branch also runs when A holds and B does not.
-                        if ($candidate.Item1.Extent.Text -match '-(and|or)\b') { continue }
-                        $c = Get-GetConfigConstraint $candidate.Item1
+                        # The else branch runs when every clause is false, so ask for the value
+                        # each clause pins under that assumption.
+                        $c = Get-GetConfigConstraint -Condition $candidate.Item1 -Assume $false
                         if (-not $c -or $dropped.ContainsKey($c.Key)) { continue }
-                        $value = -not $c.Value
+                        $value = $c.Value
                         if ($inverted.ContainsKey($c.Key) -and $inverted[$c.Key] -ne $value) {
                             $inverted.Remove($c.Key)
                             $dropped[$c.Key] = $true
@@ -386,10 +406,12 @@ function Get-ScriptIndex {
 
 function Add-TopLevelWalk {
     # A dot-source below a call cannot satisfy it. `Limits` marks the definitions that had run at
-    # each `& path` call site, so an invoked script cannot see later ones.
+    # each `& path` call site, so an invoked script cannot see later ones. Returns what this walk
+    # actually loaded: only the dot target itself is marked before its own walk, so a call above
+    # the target's dot-sources is still checked against what ran before it.
     param($Index, [String] $File, $Loaded, $Fns, $Env, [String] $EnvKey, $Chain, $Queue, $Seen, $Limits)
 
-    if ($Seen.ContainsKey($File) -or -not $Index.topStmts.ContainsKey($File)) { return }
+    if ($Seen.ContainsKey($File) -or -not $Index.topStmts.ContainsKey($File)) { return $Loaded }
     $Seen[$File] = $true
     $loaded = $Loaded.Clone()
     $loaded[$File] = $true
@@ -397,8 +419,7 @@ function Add-TopLevelWalk {
         foreach ($t in $Index.topDots[$File][$i]) {
             if (-not $t) { continue }
             $loaded[$t] = $true
-            foreach ($c in @($Index.dotClosure[$t].Keys)) { $loaded[$c] = $true }
-            Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
+            $loaded = Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen $Seen -Limits $Limits
         }
         if ($Index.topCmds[$File][$i].Count) {
@@ -412,12 +433,14 @@ function Add-TopLevelWalk {
             # An entry is walked on its own terms, and a libexec one sees more than this call site.
             if ($Index.entries -contains $r) { continue }
             $nextLimits = @($Limits) + @{ File = $File; Stmt = $i }
-            Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
+            # `& path` runs in its own scope, so its dot-sources do not leak back here.
+            $null = Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen $Seen -Limits $nextLimits
         }
     }
     # Only cycles are cut: two call sites of one script each carry their own loaded set.
     $Seen.Remove($File)
+    $loaded
 }
 
 function Resolve-Env {
@@ -459,8 +482,7 @@ function Add-BodyWalk {
         foreach ($t in $Index.fnStmtDots[$Key][$j]) {
             if (-not $t) { continue }
             $loaded[$t] = $true
-            foreach ($c in @($Index.dotClosure[$t].Keys)) { $loaded[$c] = $true }
-            Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
+            $loaded = Add-TopLevelWalk -Index $Index -File $t -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen @{} -Limits $Limits
         }
         if ($Index.fnStmtCmds[$Key][$j].Count) {
@@ -472,7 +494,8 @@ function Add-BodyWalk {
         }
         foreach ($r in $Index.fnStmtRuns[$Key][$j]) {
             if ($Index.entries -contains $r) { continue }
-            Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
+            # `& path` runs in its own scope, so its dot-sources do not leak back here.
+            $null = Add-TopLevelWalk -Index $Index -File $r -Loaded $loaded -Fns $Fns -Env $Env `
                 -EnvKey $EnvKey -Chain $Chain -Queue $Queue -Seen @{} -Limits $Limits
         }
         # A `& $var` at this statement can name a nested function, and runs with this statement's state.
@@ -551,7 +574,8 @@ function Get-DotSourceIssue {
         }
         $visited = @{}
         $queue = [System.Collections.Generic.Queue[Object]]::new()
-        Add-TopLevelWalk -Index $index -File $entry -Loaded $loaded -Fns @{} -Env @{} -EnvKey '' `
+        # The walk's return is the loaded set it ended with; nothing to keep at top level.
+        $null = Add-TopLevelWalk -Index $index -File $entry -Loaded $loaded -Fns @{} -Env @{} -EnvKey '' `
             -Chain @((Split-Path $entry -Leaf)) -Queue $queue -Seen @{}
 
         while ($queue.Count) {
