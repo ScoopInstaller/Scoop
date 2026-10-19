@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 #Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
-#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.2.0' }
+#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '6.0.0' }
 param(
     [String] $BucketPath = $MyInvocation.PSScriptRoot
 )
@@ -9,14 +9,15 @@ param(
 
 Describe 'Manifest validates against the schema' {
     BeforeDiscovery {
-        $bucketDir = if (Test-Path "$BucketPath\bucket") {
-            "$BucketPath\bucket"
-        } else {
-            $BucketPath
-        }
+        $bucketSubDir = 'bucket'
+        $useSubDir = Test-Path -LiteralPath (Join-Path -Path $BucketPath -ChildPath $bucketSubDir) -PathType Container
+
+        $bucketDir = if ($useSubDir) { Join-Path -Path $BucketPath -ChildPath $bucketSubDir } else { $BucketPath }
+        $filesPattern = if ($useSubDir) { "$bucketSubDir/*.json" } else { '*.json' }
+
         if ($env:CI -eq $true) {
             Set-BuildEnvironment -Force
-            $manifestFiles = @(Get-GitChangedFile -Path $bucketDir -Include '*.json' -Commit $env:BHCommitHash)
+            $manifestFiles = @(Get-GitChangedFile -Path $bucketDir -Include $filesPattern -Commit $env:BHCommitHash)
         } else {
             $manifestFiles = (Get-ChildItem $bucketDir -Filter '*.json' -Recurse).FullName
         }
@@ -39,7 +40,7 @@ Describe 'Manifest validates against the schema' {
                         Write-Host "  [-] $_ has $($validator.Errors.Count) Error$(If($validator.Errors.Count -gt 1) { 's' })!" -ForegroundColor Red
                         Write-Host $validator.ErrorsAsString -ForegroundColor Yellow
                     }
-                    $validator.Errors.Count | Should -Be 0
+                    $validator.Errors.Count | Should-Be 0
                 } catch {
                     if ($_.Exception.Message -like '*The free-quota limit of 1000 schema validations per hour has been reached.*') {
                         $global:quotaExceeded = $true

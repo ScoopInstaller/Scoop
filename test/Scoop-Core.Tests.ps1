@@ -15,23 +15,23 @@ Describe 'Get-AppFilePath' -Tag 'Scoop' {
     It 'should return locally installed program' {
         Mock Test-Path { $true } -Verifiable -ParameterFilter { $Path -eq 'local\i_am_a_file.txt' }
         Mock Test-Path { $false } -Verifiable -ParameterFilter { $Path -eq 'global\i_am_a_file.txt' }
-        Get-AppFilePath -App 'is_directory' -File 'i_am_a_file.txt' | Should -Be 'local\i_am_a_file.txt'
+        Get-AppFilePath -App 'is_directory' -File 'i_am_a_file.txt' | Should-Be 'local\i_am_a_file.txt'
     }
 
     It 'should return globally installed program' {
         Mock Test-Path { $false } -Verifiable -ParameterFilter { $Path -eq 'local\i_am_a_file.txt' }
         Mock Test-Path { $true } -Verifiable -ParameterFilter { $Path -eq 'global\i_am_a_file.txt' }
-        Get-AppFilePath -App 'is_directory' -File 'i_am_a_file.txt' | Should -Be 'global\i_am_a_file.txt'
+        Get-AppFilePath -App 'is_directory' -File 'i_am_a_file.txt' | Should-Be 'global\i_am_a_file.txt'
     }
 
     It 'should return null if program is not installed' {
-        Get-AppFilePath -App 'is_directory' -File 'i_do_not_exist' | Should -BeNullOrEmpty
+        Get-AppFilePath -App 'is_directory' -File 'i_do_not_exist' | Should-BeNull
     }
 
     It 'should throw if parameter is wrong or missing' {
-        { Get-AppFilePath -App 'is_directory' -File } | Should -Throw
-        { Get-AppFilePath -App -File 'i_am_a_file.txt' } | Should -Throw
-        { Get-AppFilePath -App -File } | Should -Throw
+        { Get-AppFilePath -App 'is_directory' -File } | Should-Throw
+        { Get-AppFilePath -App -File 'i_am_a_file.txt' } | Should-Throw
+        { Get-AppFilePath -App -File } | Should-Throw
     }
 }
 
@@ -41,17 +41,17 @@ Describe 'Get-HelperPath' -Tag 'Scoop' {
     }
     It 'should return path if program is installed' {
         Mock Get-AppFilePath { '7zip\current\7z.exe' }
-        Get-HelperPath -Helper 7zip | Should -Be '7zip\current\7z.exe'
+        Get-HelperPath -Helper 7zip | Should-Be '7zip\current\7z.exe'
     }
 
     It 'should return null if program is not installed' {
         Mock Get-AppFilePath { $null }
-        Get-HelperPath -Helper 7zip | Should -BeNullOrEmpty
+        Get-HelperPath -Helper 7zip | Should-BeNull
     }
 
     It 'should throw if parameter is wrong or missing' {
-        { Get-HelperPath -Helper } | Should -Throw
-        { Get-HelperPath -Helper Wrong } | Should -Throw
+        { Get-HelperPath -Helper } | Should-Throw
+        { Get-HelperPath -Helper Wrong } | Should-Throw
     }
 }
 
@@ -59,31 +59,31 @@ Describe 'Get-HelperPath' -Tag 'Scoop' {
 Describe 'Test-HelperInstalled' -Tag 'Scoop' {
     It 'should return true if program is installed' {
         Mock Get-HelperPath { '7z.exe' }
-        Test-HelperInstalled -Helper 7zip | Should -BeTrue
+        Test-HelperInstalled -Helper 7zip | Should-BeTrue
     }
 
     It 'should return false if program is not installed' {
         Mock Get-HelperPath { $null }
-        Test-HelperInstalled -Helper 7zip | Should -BeFalse
+        Test-HelperInstalled -Helper 7zip | Should-BeFalse
     }
 
     It 'should throw if parameter is wrong or missing' {
-        { Test-HelperInstalled -Helper } | Should -Throw
-        { Test-HelperInstalled -Helper Wrong } | Should -Throw
+        { Test-HelperInstalled -Helper } | Should-Throw
+        { Test-HelperInstalled -Helper Wrong } | Should-Throw
     }
 }
 
 Describe 'Test-CommandAvailable' -Tag 'Scoop' {
     It 'should return true if command exists' {
-        Test-CommandAvailable 'Write-Host' | Should -BeTrue
+        Test-CommandAvailable 'Write-Host' | Should-BeTrue
     }
 
     It "should return false if command doesn't exist" {
-        Test-CommandAvailable 'Write-ThisWillProbablyNotExist' | Should -BeFalse
+        Test-CommandAvailable 'Write-ThisWillProbablyNotExist' | Should-BeFalse
     }
 
     It 'should throw if parameter is wrong or missing' {
-        { Test-CommandAvailable } | Should -Throw
+        { Test-CommandAvailable } | Should-Throw
     }
 }
 
@@ -94,14 +94,14 @@ Describe 'is_directory' -Tag 'Scoop' {
     }
 
     It 'is_directory recognize directories' {
-        is_directory "$working_dir\i_am_a_directory" | Should -Be $true
+        is_directory "$working_dir\i_am_a_directory" | Should-Be $true
     }
     It 'is_directory recognize files' {
-        is_directory "$working_dir\i_am_a_file.txt" | Should -Be $false
+        is_directory "$working_dir\i_am_a_file.txt" | Should-Be $false
     }
 
     It 'is_directory is falsey on unknown path' {
-        is_directory "$working_dir\i_do_not_exist" | Should -Be $false
+        is_directory "$working_dir\i_do_not_exist" | Should-Be $false
     }
 }
 
@@ -116,29 +116,29 @@ Describe 'movedir' -Tag 'Scoop', 'Windows' {
         $dir = "$working_dir\user"
         movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
-        "$dir\test.txt" | Should -FileContentMatch 'this is the one'
-        "$dir\_tmp\$extract_dir" | Should -Not -Exist
+        (Get-Content "$dir\test.txt" -Raw) | Should-MatchString 'this is the one'
+        Test-Path "$dir\_tmp\$extract_dir" | Should-BeFalse
     }
 
     It 'moves directories with spaces in path' {
         $dir = "$working_dir\user with space"
         movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
-        "$dir\test.txt" | Should -FileContentMatch 'this is the one'
-        "$dir\_tmp\$extract_dir" | Should -Not -Exist
+        (Get-Content "$dir\test.txt" -Raw) | Should-MatchString 'this is the one'
+        Test-Path "$dir\_tmp\$extract_dir" | Should-BeFalse
 
         # test trailing \ in from dir
         movedir "$dir\_tmp\$null" "$dir\another"
-        "$dir\another\test.txt" | Should -FileContentMatch 'testing'
-        "$dir\_tmp" | Should -Not -Exist
+        (Get-Content "$dir\another\test.txt" -Raw) | Should-MatchString 'testing'
+        Test-Path "$dir\_tmp" | Should-BeFalse
     }
 
     It 'moves directories with quotes in path' {
         $dir = "$working_dir\user with 'quote"
         movedir "$dir\_tmp\$extract_dir" "$dir\$extract_to"
 
-        "$dir\test.txt" | Should -FileContentMatch 'this is the one'
-        "$dir\_tmp\$extract_dir" | Should -Not -Exist
+        (Get-Content "$dir\test.txt" -Raw) | Should-MatchString 'this is the one'
+        Test-Path "$dir\_tmp\$extract_dir" | Should-BeFalse
     }
 }
 
@@ -150,25 +150,25 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
     }
 
     It "links a file onto the user's path" {
-        { Get-Command 'shim-test' -ea stop } | Should -Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should -Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should -Throw
-        { shim-test } | Should -Throw
+        { Get-Command 'shim-test' -ea stop } | Should-Throw
+        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
+        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
+        { shim-test } | Should-Throw
 
         shim "$working_dir\shim-test.ps1" $false 'shim-test'
-        { Get-Command 'shim-test' -ea stop } | Should -Not -Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should -Not -Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should -Not -Throw
-        shim-test | Should -Be 'Hello, world!'
+        $null = & { Get-Command 'shim-test' -ea stop }
+        $null = & { Get-Command 'shim-test.ps1' -ea stop }
+        $null = & { Get-Command 'shim-test.cmd' -ea stop }
+        shim-test | Should-Be 'Hello, world!'
     }
 
     It 'shims a file with quote in path' {
-        { Get-Command 'shim-test' -ea stop } | Should -Throw
-        { shim-test } | Should -Throw
+        { Get-Command 'shim-test' -ea stop } | Should-Throw
+        { shim-test } | Should-Throw
 
         shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
-        { Get-Command 'shim-test' -ea stop } | Should -Not -Throw
-        shim-test | Should -Be 'Hello, world!'
+        $null = & { Get-Command 'shim-test' -ea stop }
+        shim-test | Should-Be 'Hello, world!'
     }
 
     AfterEach {
@@ -188,10 +188,10 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
 
         rm_shim 'shim-test' $shimdir
 
-        { Get-Command 'shim-test' -ea stop } | Should -Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should -Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should -Throw
-        { shim-test } | Should -Throw
+        { Get-Command 'shim-test' -ea stop } | Should-Throw
+        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
+        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
+        { shim-test } | Should-Throw
     }
 }
 
@@ -204,7 +204,7 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     }
 
     It 'returns empty string if file does not exist' {
-        get_app_name_from_shim 'non-existent-file' | Should -Be ''
+        get_app_name_from_shim 'non-existent-file' | Should-Be ''
     }
 
     It 'returns app name if file exists and is a shim to an app' {
@@ -212,17 +212,17 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
         Write-Output '' | Out-File "$working_dir/mockapp/current/mockapp1.ps1"
         shim "$working_dir/mockapp/current/mockapp1.ps1" $false 'shim-test1'
         $shim_path1 = (Get-Command 'shim-test1.ps1').Path
-        get_app_name_from_shim "$shim_path1" | Should -Be 'mockapp'
+        get_app_name_from_shim "$shim_path1" | Should-Be 'mockapp'
         ensure "$working_dir/mockapp/1.0.0/"
         Write-Output '' | Out-File "$working_dir/mockapp/1.0.0/mockapp2.ps1"
         shim "$working_dir/mockapp/1.0.0/mockapp2.ps1" $false 'shim-test2'
         $shim_path2 = (Get-Command 'shim-test2.ps1').Path
-        get_app_name_from_shim "$shim_path2" | Should -Be 'mockapp'
+        get_app_name_from_shim "$shim_path2" | Should-Be 'mockapp'
     }
 
     It 'returns empty string if file exists and is not a shim' {
         Write-Output 'lorem ipsum' | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
-        get_app_name_from_shim "$working_dir/mock-shim.ps1" | Should -Be ''
+        get_app_name_from_shim "$working_dir/mock-shim.ps1" | Should-Be ''
     }
 
     AfterAll {
@@ -243,14 +243,14 @@ Describe 'cache_path' -Tag 'Scoop' {
         $ret = cache_path 'git' '2.44.0' $url
         $inputStream = [System.IO.MemoryStream]::new([System.Text.Encoding]::UTF8.GetBytes($url))
         $sha = (Get-FileHash -Algorithm SHA256 -InputStream $inputStream).Hash.ToLower().Substring(0, 7)
-        $ret | Should -Be "$cachedir\git#2.44.0#$sha.zip"
+        $ret | Should-Be "$cachedir\git#2.44.0#$sha.zip"
     }
 
     # # NOTE: Remove this 6 months after the feature ships.
     It 'returns the old format cache path for a given input' {
         Mock Test-Path { $true }
         $ret = cache_path 'git' '2.44.0' 'https://example.com/git.zip'
-        $ret | Should -Be "$cachedir\git#2.44.0#https_example.com_git.zip"
+        $ret | Should-Be "$cachedir\git#2.44.0#https_example.com_git.zip"
     }
 }
 
@@ -258,37 +258,37 @@ Describe 'Get-RelativePath' -Tag 'Scoop' {
     It 'returns relative path for child path' {
         $from = 'C:\root\bucket'
         $to = 'C:\root\bucket\foo\bar.json'
-        Get-RelativePath $from $to | Should -Be 'foo\bar.json'
+        Get-RelativePath $from $to | Should-Be 'foo\bar.json'
     }
     It 'returns original when different drive/scheme' {
         $from = 'C:\root\bucket'
         $to = 'D:\other\file.json'
-        Get-RelativePath $from $to | Should -Be $to
+        Get-RelativePath $from $to | Should-Be $to
     }
     It 'handles paths containing characters that break [System.Uri]' {
         $from = 'C:\b#ucket'
         $to = 'C:\b#ucket\foo.json'
-        Get-RelativePath $from $to | Should -Be 'foo.json'
+        Get-RelativePath $from $to | Should-Be 'foo.json'
     }
     It 'returns the input when target is not under base' {
         $from = 'C:\root\bucket'
         $to = 'C:\other\foo.json'
-        Get-RelativePath $from $to | Should -Be $to
+        Get-RelativePath $from $to | Should-Be $to
     }
 }
 
 Describe 'is_in_dir' -Tag 'Scoop' {
     It 'returns false when path is not under dir' {
-        is_in_dir 'C:\test' 'C:\foo' | Should -BeFalse
+        is_in_dir 'C:\test' 'C:\foo' | Should-BeFalse
     }
     It 'returns true when path is under dir' {
-        is_in_dir 'C:\test' 'C:\test\foo\baz.zip' | Should -BeTrue
+        is_in_dir 'C:\test' 'C:\test\foo\baz.zip' | Should-BeTrue
     }
     It 'returns true when dir has a trailing separator' {
-        is_in_dir "$PSScriptRoot\..\" "$PSScriptRoot" | Should -BeTrue
+        is_in_dir "$PSScriptRoot\..\" "$PSScriptRoot" | Should-BeTrue
     }
     It 'returns false when path escapes dir through dot segments' {
-        is_in_dir 'C:\test\sub' 'C:\test\sub\..\..\Windows\notepad.exe' | Should -BeFalse
+        is_in_dir 'C:\test\sub' 'C:\test\sub\..\..\Windows\notepad.exe' | Should-BeFalse
     }
 }
 
@@ -296,17 +296,17 @@ Describe 'currentdir' -Tag 'Scoop' {
     It 'resolves version directory when NO_JUNCTION is enabled without preloading versions.ps1' {
         Mock get_config { $true } -ParameterFilter { $name -eq 'NO_JUNCTION' }
         Mock appdir { 'C:\scoop\apps\git' }
-        { currentdir 'git' $false } | Should -Not -Throw
+        $null = & { currentdir 'git' $false }
     }
     It 'returns the junction path when NO_JUNCTION is disabled' {
         Mock get_config { $false } -ParameterFilter { $name -eq 'NO_JUNCTION' }
         Mock appdir { 'C:\scoop\apps\git' }
-        currentdir 'git' $false | Should -Be 'C:\scoop\apps\git\current'
+        currentdir 'git' $false | Should-Be 'C:\scoop\apps\git\current'
     }
     It 'keeps using the junction for scoop itself' {
         Mock get_config { $true } -ParameterFilter { $name -eq 'NO_JUNCTION' }
         Mock appdir { 'C:\scoop\apps\scoop' }
-        currentdir 'scoop' $false | Should -Be 'C:\scoop\apps\scoop\current'
+        currentdir 'scoop' $false | Should-Be 'C:\scoop\apps\scoop\current'
     }
 }
 
@@ -315,7 +315,7 @@ Describe 'sanitary_path' -Tag 'Scoop' {
         $path = 'test?.json'
         $valid_path = sanitary_path $path
 
-        $valid_path | Should -Be 'test.json'
+        $valid_path | Should-Be 'test.json'
     }
 }
 
@@ -323,93 +323,93 @@ Describe 'app' -Tag 'Scoop' {
     It 'parses the bucket name from an app query' {
         $query = 'C:\test.json'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'C:\test.json'
-        $bucket | Should -BeNullOrEmpty
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be 'C:\test.json'
+        $bucket | Should-BeNull
+        $version | Should-BeNull
 
         $query = 'test.json'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test.json'
-        $bucket | Should -BeNullOrEmpty
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be 'test.json'
+        $bucket | Should-BeNull
+        $version | Should-BeNull
 
         $query = '.\test.json'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be '.\test.json'
-        $bucket | Should -BeNullOrEmpty
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be '.\test.json'
+        $bucket | Should-BeNull
+        $version | Should-BeNull
 
         $query = '..\test.json'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be '..\test.json'
-        $bucket | Should -BeNullOrEmpty
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be '..\test.json'
+        $bucket | Should-BeNull
+        $version | Should-BeNull
 
         $query = '\\share\test.json'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be '\\share\test.json'
-        $bucket | Should -BeNullOrEmpty
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be '\\share\test.json'
+        $bucket | Should-BeNull
+        $version | Should-BeNull
 
         $query = 'https://example.com/test.json'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'https://example.com/test.json'
-        $bucket | Should -BeNullOrEmpty
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be 'https://example.com/test.json'
+        $bucket | Should-BeNull
+        $version | Should-BeNull
 
         $query = 'test'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test'
-        $bucket | Should -BeNullOrEmpty
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be 'test'
+        $bucket | Should-BeNull
+        $version | Should-BeNull
 
         $query = 'extras/enso'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'enso'
-        $bucket | Should -Be 'extras'
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be 'enso'
+        $bucket | Should-Be 'extras'
+        $version | Should-BeNull
 
         $query = 'test-app'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test-app'
-        $bucket | Should -BeNullOrEmpty
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be 'test-app'
+        $bucket | Should-BeNull
+        $version | Should-BeNull
 
         $query = 'test-bucket/test-app'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test-app'
-        $bucket | Should -Be 'test-bucket'
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be 'test-app'
+        $bucket | Should-Be 'test-bucket'
+        $version | Should-BeNull
 
         $query = 'test-bucket/test-app@1.8.0'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test-app'
-        $bucket | Should -Be 'test-bucket'
-        $version | Should -Be '1.8.0'
+        $app | Should-Be 'test-app'
+        $bucket | Should-Be 'test-bucket'
+        $version | Should-Be '1.8.0'
 
         $query = 'test-bucket/test-app@1.8.0-rc2'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test-app'
-        $bucket | Should -Be 'test-bucket'
-        $version | Should -Be '1.8.0-rc2'
+        $app | Should-Be 'test-app'
+        $bucket | Should-Be 'test-bucket'
+        $version | Should-Be '1.8.0-rc2'
 
         $query = 'test-bucket/test_app'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test_app'
-        $bucket | Should -Be 'test-bucket'
-        $version | Should -BeNullOrEmpty
+        $app | Should-Be 'test_app'
+        $bucket | Should-Be 'test-bucket'
+        $version | Should-BeNull
 
         $query = 'test-bucket/test_app@1.8.0'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test_app'
-        $bucket | Should -Be 'test-bucket'
-        $version | Should -Be '1.8.0'
+        $app | Should-Be 'test_app'
+        $bucket | Should-Be 'test-bucket'
+        $version | Should-Be '1.8.0'
 
         $query = 'test-bucket/test_app@1.8.0-rc2'
         $app, $bucket, $version = parse_app $query
-        $app | Should -Be 'test_app'
-        $bucket | Should -Be 'test-bucket'
-        $version | Should -Be '1.8.0-rc2'
+        $app | Should-Be 'test_app'
+        $bucket | Should-Be 'test-bucket'
+        $version | Should-Be '1.8.0-rc2'
     }
 }
 
@@ -420,19 +420,19 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
             $machine = Get-PEMachine $shim_path
             # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
             # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
-            $machine | Should -BeIn @(0x014c, 0x8664, 0xAA64)
+            @(0x014c, 0x8664, 0xAA64) | Should-ContainCollection $machine
         } else {
             Set-ItResult -Skipped -Because 'shim exe not found'
         }
     }
 
     It 'returns 0 for a non-existent file' {
-        Get-PEMachine 'C:\nonexistent\fake.exe' | Should -Be 0
+        Get-PEMachine 'C:\nonexistent\fake.exe' | Should-Be 0
     }
 
     It 'returns 0 for a non-PE file' {
         $working_dir = setup_working 'shim'
-        Get-PEMachine "$working_dir\shim-test.ps1" | Should -Be 0
+        Get-PEMachine "$working_dir\shim-test.ps1" | Should-Be 0
     }
 }
 
@@ -452,13 +452,13 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
 
         $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
         if ($rewrites) {
-            $line | Should -BeLike "*$env:SystemRoot\Sysnative\notepad.exe*"
+            $line | Should-BeLikeString "*$env:SystemRoot\Sysnative\notepad.exe*"
         } else {
-            $line | Should -BeLike "*$env:SystemRoot\System32\notepad.exe*"
+            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
         }
 
         # the 64-bit reader resolves the target back to the real System32 path either way
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be (Resolve-Path $target).Path
+        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
     }
 
     It 'does not rewrite paths outside System32 and SysWOW64' {
@@ -467,8 +467,8 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
         shim $target $false 'wow64-test'
 
         $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        $line | Should -BeLike "*$target*"
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be $target
+        $line | Should-BeLikeString "*$target*"
+        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be $target
     }
 
     It 'rewrites SysWOW64 to System32 in the shim file when the shim exe is x86 on x64 OS' {
@@ -484,18 +484,18 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
         $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
         if ($rewrites) {
             # 64-bit reader sees the redirected (real) location via System32
-            $line | Should -BeLike "*$env:SystemRoot\System32\notepad.exe*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
+            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
+            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
         } else {
-            $line | Should -BeLike "*$target*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should -Be (Resolve-Path $target).Path
+            $line | Should-BeLikeString "*$target*"
+            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
         }
     }
 
     It 'does not fail on a shim file without a resolvable target' {
         Write-Output 'echo hi' | Out-File "$shimdir\broken.cmd" -Encoding ascii
-        { Get-ShimTarget "$shimdir\broken.cmd" } | Should -Not -Throw
-        Get-ShimTarget "$shimdir\broken.cmd" | Should -BeNullOrEmpty
+        & { Get-ShimTarget "$shimdir\broken.cmd" }
+        Get-ShimTarget "$shimdir\broken.cmd" | Should-BeNull
 
         Remove-Item "$shimdir\broken.cmd" -Force
     }
@@ -507,38 +507,38 @@ Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
 
 Describe 'Format Architecture String' -Tag 'Scoop' {
     It 'should keep correct architectures' {
-        Format-ArchitectureString '32bit' | Should -Be '32bit'
-        Format-ArchitectureString '32' | Should -Be '32bit'
-        Format-ArchitectureString 'x86' | Should -Be '32bit'
-        Format-ArchitectureString 'X86' | Should -Be '32bit'
-        Format-ArchitectureString 'i386' | Should -Be '32bit'
-        Format-ArchitectureString '386' | Should -Be '32bit'
-        Format-ArchitectureString 'i686' | Should -Be '32bit'
+        Format-ArchitectureString '32bit' | Should-Be '32bit'
+        Format-ArchitectureString '32' | Should-Be '32bit'
+        Format-ArchitectureString 'x86' | Should-Be '32bit'
+        Format-ArchitectureString 'X86' | Should-Be '32bit'
+        Format-ArchitectureString 'i386' | Should-Be '32bit'
+        Format-ArchitectureString '386' | Should-Be '32bit'
+        Format-ArchitectureString 'i686' | Should-Be '32bit'
 
-        Format-ArchitectureString '64bit' | Should -Be '64bit'
-        Format-ArchitectureString '64' | Should -Be '64bit'
-        Format-ArchitectureString 'x64' | Should -Be '64bit'
-        Format-ArchitectureString 'X64' | Should -Be '64bit'
-        Format-ArchitectureString 'amd64' | Should -Be '64bit'
-        Format-ArchitectureString 'AMD64' | Should -Be '64bit'
-        Format-ArchitectureString 'x86_64' | Should -Be '64bit'
-        Format-ArchitectureString 'x86-64' | Should -Be '64bit'
+        Format-ArchitectureString '64bit' | Should-Be '64bit'
+        Format-ArchitectureString '64' | Should-Be '64bit'
+        Format-ArchitectureString 'x64' | Should-Be '64bit'
+        Format-ArchitectureString 'X64' | Should-Be '64bit'
+        Format-ArchitectureString 'amd64' | Should-Be '64bit'
+        Format-ArchitectureString 'AMD64' | Should-Be '64bit'
+        Format-ArchitectureString 'x86_64' | Should-Be '64bit'
+        Format-ArchitectureString 'x86-64' | Should-Be '64bit'
 
-        Format-ArchitectureString 'arm64' | Should -Be 'arm64'
-        Format-ArchitectureString 'arm' | Should -Be 'arm64'
-        Format-ArchitectureString 'aarch64' | Should -Be 'arm64'
-        Format-ArchitectureString 'ARM64' | Should -Be 'arm64'
-        Format-ArchitectureString 'ARM' | Should -Be 'arm64'
-        Format-ArchitectureString 'AARCH64' | Should -Be 'arm64'
+        Format-ArchitectureString 'arm64' | Should-Be 'arm64'
+        Format-ArchitectureString 'arm' | Should-Be 'arm64'
+        Format-ArchitectureString 'aarch64' | Should-Be 'arm64'
+        Format-ArchitectureString 'ARM64' | Should-Be 'arm64'
+        Format-ArchitectureString 'ARM' | Should-Be 'arm64'
+        Format-ArchitectureString 'AARCH64' | Should-Be 'arm64'
     }
 
     It 'should fallback to the default architecture on empty input' {
-        Format-ArchitectureString '' | Should -Be $(Get-DefaultArchitecture)
-        Format-ArchitectureString $null | Should -Be $(Get-DefaultArchitecture)
+        Format-ArchitectureString '' | Should-Be $(Get-DefaultArchitecture)
+        Format-ArchitectureString $null | Should-Be $(Get-DefaultArchitecture)
     }
 
     It 'should show an error with an invalid architecture' {
-        { Format-ArchitectureString 'PPC' } | Should -Throw "Invalid architecture: 'ppc'"
+        { Format-ArchitectureString 'PPC' } | Should-Throw "*Invalid architecture: 'ppc'*"
     }
 }
 
@@ -551,7 +551,7 @@ Describe 'substitute' -Tag 'Scoop' {
             $params["`$name$($_)"] = "$($_).exe"
             $params["`$name$($_)NoExt"] = "$_"
 
-            substitute ("`$name$($_)NoExt") $params $false | Should -Be "$_"
+            substitute ("`$name$($_)NoExt") $params $false | Should-Be "$_"
         }
     }
 }

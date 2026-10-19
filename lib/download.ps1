@@ -456,7 +456,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             # Values containing "'" would break the aria2 command itself, so '...' spans are safe redaction boundaries
             $aria2Diag = $aria2 -replace "--all-proxy-passwd='[^']*'", "--all-proxy-passwd='***'" -replace "--header='Cookie:[^']*'", "--header='Cookie: ***'"
             $urlstxtDiag = $urlstxt_content -replace '(?<u>(?:https?|ftp)\S*?)\?\S*', '${u}?***'
-            if (get_config ARIA2-FALLBACK-DISABLED) {
+            if (-not (get_config ARIA2-FALLBACK-ENABLED $true)) {
                 error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
                 error $urlstxtDiag
                 error $aria2Diag
@@ -554,7 +554,12 @@ function Get-Encoding($wc) {
 }
 
 function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
+    $arch = switch (Get-SystemArchitecture) {
+        'arm64' { 'ARM64; ' }
+        '64bit' { 'Win64; x64; ' }
+        default { '' }
+    }
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $arch$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
 }
 
 function setup_proxy() {

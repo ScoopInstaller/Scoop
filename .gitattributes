@@ -1,5 +1,7 @@
 # retain windows line-endings in case checked out on mac or linux
 * text eol=crlf
+*.yml text eol=lf
+*.yaml text eol=lf
 *.exe -text
 *.zip -text
 *.dll -text

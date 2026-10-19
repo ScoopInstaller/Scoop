@@ -1,4 +1,19 @@
-## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...develop)
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
+
+### Bug Fixes
+
+- **auto-pr:** Add missing `core.ps1` dot source ([#6786](https://github.com/ScoopInstaller/Scoop/pull/6786))
+- **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
+
+### Continuous Integration
+
+- **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))
+
+### Tests
+
+- **pester:** Update to Pester 6 ([#6779](https://github.com/ScoopInstaller/Scoop/issues/6779))
+
+## [v0.6.0](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...v0.6.0) - 2026-09-30
 
 ### Features
 
@@ -6,7 +21,7 @@
 - **checkver:** Set GitHub mode default jsonpath and regex ([#6653](https://github.com/ScoopInstaller/Scoop/issues/6653))
 - **download:** Enhance Get-GitHubToken to include more token sources ([#6712](https://github.com/ScoopInstaller/Scoop/issues/6712))
 - **download|scoop-download:** Add GitHub issue prompt when the default downloader fails ([#6539](https://github.com/ScoopInstaller/Scoop/issues/6539))
-- **download|scoop-config:** Allow disabling automatic fallback to the default downloader when Aria2c download fails ([#6538](https://github.com/ScoopInstaller/Scoop/issues/6538))
+- **download|scoop-config:** Allow disabling automatic fallback to the default downloader when Aria2c download fails ([#6538](https://github.com/ScoopInstaller/Scoop/issues/6538), [#6744](https://github.com/ScoopInstaller/Scoop/issues/6744))
 - **install:** Add support for historical manifests by git history ([#6370](https://github.com/ScoopInstaller/Scoop/issues/6370))
 - **install:** Add output for the setting and removal of environment variables ([#6460](https://github.com/ScoopInstaller/Scoop/issues/6460))
 - **install:** Add separator at the end of notes, highlight suggestions ([#6418](https://github.com/ScoopInstaller/Scoop/issues/6418))
@@ -17,8 +32,8 @@
 - **scoop-download:** Fix incorrect download success state ([#6473](https://github.com/ScoopInstaller/Scoop/issues/6473))
 - **scoop-download:** Exit with non-zero status when downloads fail ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
 - **scoop-export:** Make exported JSON key order deterministic ([#6697](https://github.com/ScoopInstaller/Scoop/issues/6697))
-- **scoop-import:** Import `database.ps1` at startup ([#6743](https://github.com/ScoopInstaller/Scoop/issues/6743))
-- **scoop-search:** Improve error handling for manifest file parsing ([#6345](https://github.com/ScoopInstaller/Scoop/issues/6345))
+- **scoop-import:** Import `database.ps1` and `download.ps1` at startup ([#6743](https://github.com/ScoopInstaller/Scoop/issues/6743), [#6747](https://github.com/ScoopInstaller/Scoop/issues/6747))
+- **scoop-search:** Improve error handling for manifest file parsing ([#6348](https://github.com/ScoopInstaller/Scoop/issues/6348))
 - **scoop-search:** Select latest search result semantically ([#6643](https://github.com/ScoopInstaller/Scoop/issues/6643))
 - **scoop-uninstall:** Correct `-Global` Switch ([#6454](https://github.com/ScoopInstaller/Scoop/issues/6454))
 - **scoop-update:** Import `versions.ps1` in the parallel bucket sync to fix `currentdir` failing with `NO_JUNCTION` enabled ([#6735](https://github.com/ScoopInstaller/Scoop/issues/6735))
@@ -38,7 +53,7 @@
 - **checkver:** Fix incorrect version returned when script fails without output ([#6547](https://github.com/ScoopInstaller/Scoop/issues/6547))
 - **checkver:** Remove redundant always-true condition in GitHub checkver logic ([#6571](https://github.com/ScoopInstaller/Scoop/issues/6571))
 - **checkver:** Harden github checkver ([#6641](https://github.com/ScoopInstaller/Scoop/issues/6641))
-- **checkver:** Skip default GitHub JSONPath when using custom script ([#6681](https://github.com/ScoopInstaller/Scoop/issues/6681))
+- **checkver:** Skip default GitHub JSONPath when using custom script ([#6692](https://github.com/ScoopInstaller/Scoop/issues/6692))
 - **core:** Fix the grep parameter in the `Invoke-GitLog` function ([#6407](https://github.com/ScoopInstaller/Scoop/issues/6407))
 - **core:** Add null checks before closing BinaryReader/FileStream in update process ([#6507](https://github.com/ScoopInstaller/Scoop/issues/6507), [#6711](https://github.com/ScoopInstaller/Scoop/issues/6711))
 - **core:** Skip NO_JUNCTION logic when $app is 'scoop' in `currentdir` function ([#6541](https://github.com/ScoopInstaller/Scoop/issues/6541))
@@ -76,18 +91,24 @@
 
 ### Continuous Integration
 
+- **dependabot:** Target `develop` and refine update settings ([#6751](https://github.com/ScoopInstaller/Scoop/issues/6751))
 - **workflow:** Drop Appveyor support and refactor GitHub Actions workflow ([#6626](https://github.com/ScoopInstaller/Scoop/issues/6626))
 - **workflow:** Disable persisted checkout credentials ([#6739](https://github.com/ScoopInstaller/Scoop/issues/6739))
+- **workflow:** Update `actions/checkout` to 7.0.1 and `potatoqualitee/psmodulecache` to 6.3 ([#6753](https://github.com/ScoopInstaller/Scoop/issues/6753))
+- **workflow:** Publish releases from `CHANGELOG.md` on tag push ([#6759](https://github.com/ScoopInstaller/Scoop/issues/6759), [#6760](https://github.com/ScoopInstaller/Scoop/issues/6760))
 
 ### Documentation
 
 - **README:** Remove Gitter badge ([#6640](https://github.com/ScoopInstaller/Scoop/issues/6640))
+- **bucket:** Transfer `games` bucket to ScoopInstaller ([#6746](https://github.com/ScoopInstaller/Scoop/issues/6746))
 - **bucket:** Transfer `sysinternals` bucket to ScoopInstaller ([#6738](https://github.com/ScoopInstaller/Scoop/issues/6738))
 - **typo:** Correct misspellings in comments and docs ([#6191](https://github.com/ScoopInstaller/Scoop/issues/6191))
 
 ### Tests
 
 - **bucket:** Compatible with Pester v6 ([#6724](https://github.com/ScoopInstaller/Scoop/issues/6724))
+- **bucket:** Limit validation to bucket manifests ([#6756](https://github.com/ScoopInstaller/Scoop/issues/6756))
+- **file:** Exempt YAML files from CRLF lint check ([#6758](https://github.com/ScoopInstaller/Scoop/issues/6758))
 
 ## [v0.5.3](https://github.com/ScoopInstaller/Scoop/compare/v0.5.2...v0.5.3) - 2025-08-11
 
