@@ -207,9 +207,9 @@ function rm_shim($name, $shimdir, $app) {
             $oldShims = Get-ChildItem -LiteralPath $shimdir -File |
                 Where-Object { $_.BaseName -eq (fname $shimPath) -and $_.Extension -notin @('.shim', '.exe', '.cmd', '.ps1') }
             if ($null -eq $oldShims) {
-                if ($_ -eq '.shim') {
+                if (($_ -eq '.shim') -and (Test-Path -LiteralPath "$shimdir\$name.exe" -PathType Leaf)) {
                     Write-Output "Removing shim '$name.exe'."
-                    Remove-Item -Path "$shimdir\$name.exe"
+                    Remove-Item -LiteralPath "$shimdir\$name.exe"
                 }
             } else {
                 ($oldShims | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }

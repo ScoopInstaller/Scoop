@@ -69,21 +69,6 @@ if (-not (Get-FormatData ScoopShims)) {
 $localShimDir = shimdir $false
 $globalShimDir = shimdir $true
 
-function Get-ShimInfo($ShimPath) {
-    $info = [Ordered]@{}
-    $info.Name = strip_ext (fname $ShimPath)
-    $info.Path = $ShimPath -replace 'shim$', 'exe'
-    $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
-    $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
-    $altShims = Get-ChildItem -LiteralPath (Split-Path $ShimPath -Parent) -File |
-        Where-Object { $_.BaseName -eq (fname $ShimPath) }
-    if ($altShims) {
-        $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
-    }
-    $info.IsGlobal = $ShimPath.StartsWith("$globalShimDir")
-    $info.IsHidden = !((Get-Command -Name $info.Name).Path -eq $info.Path)
-    [PSCustomObject]$info
-}
 
 function Get-ShimPath($ShimName, $Global) {
     '.shim', '.ps1' | ForEach-Object {

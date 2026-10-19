@@ -214,6 +214,19 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
         { shim-test } | Should-Throw
     }
 
+    It 'does not report an exe it never had' {
+        # a shim set without an exe is what a mixed-arch manifest or an interrupted uninstall leaves
+        $dir = "$working_dir\no-exe"
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        'x' | Out-File "$dir\gone" -NoNewline
+        'x' | Out-File "$dir\gone.shim" -NoNewline
+
+        $removed = rm_shim 'gone' $dir 'gone'
+
+        [bool]($removed -match 'gone\.exe') | Should-BeFalse
+        Get-ChildItem $dir | Should-BeCollection -Count 0
+    }
+
     It 'brings back the version it took over' {
         # two apps shim the same name; warn_on_overwrite kept the first one as a backup
         $dir = "$working_dir\alt"
@@ -703,3 +716,19 @@ Describe 'Get-CommandPath' -Tag 'Scoop', 'Windows' {
         }
     }
 }
+
+Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $working_dir = setup_working 'shim'
+    }
+
+    It 'marks a shim hidden when nothing resolves its name' {
+        # the command is gone when an app was uninstalled without its shim; that must not throw
+        $shimPath = "$working_dir\gone.shim"
+        # utf8NoBOM is PowerShell 6+, and CI runs 5.1 too
+        [IO.File]::WriteAllText($shimPath, 'path = "C:\nonexistent\gone.exe"')
+
+        (Get-ShimInfo $shimPath).IsHidden | Should-BeTrue
+    }
+}
+

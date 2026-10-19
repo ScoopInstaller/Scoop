@@ -126,4 +126,21 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         Test-Path -LiteralPath "$shimdir\br[a]cket.shim" | Should-BeFalse
         Test-Path -LiteralPath "$shimdir\bracket.shim" | Should-BeTrue
     }
+
+    It 'aborts with a friendly message when the shim target is not on PATH' {
+        Mock shim {}
+        $aborted = @{}
+        Mock abort { $aborted.Message = $msg; throw $msg }
+
+        $dir = Join-Path $TestDrive 'missing'
+        $null = [IO.Directory]::CreateDirectory($dir)
+
+        # A caller with $ErrorActionPreference = 'Stop' must still reach the abort below, not a raw Get-Command error.
+        { $ErrorActionPreference = 'Stop'; create_shims @{ bin = 'scoop-nonexistent-command' } $dir $false $null } |
+            Should-Throw
+
+        $aborted.Message | Should-Be "Can't shim 'scoop-nonexistent-command': File doesn't exist."
+    }
+
+
 }
