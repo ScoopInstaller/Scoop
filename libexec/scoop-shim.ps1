@@ -38,7 +38,7 @@
 param($SubCommand)
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
-. "$PSScriptRoot\..\lib\install.ps1" # for rm_shim
+. "$PSScriptRoot\..\lib\shim.ps1" # for shim functions
 . "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
 
 if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter')) {
@@ -68,16 +68,6 @@ if (-not (Get-FormatData ScoopShims)) {
 
 $localShimDir = shimdir $false
 $globalShimDir = shimdir $true
-
-
-function Get-ShimPath($ShimName, $Global) {
-    '.shim', '.ps1' | ForEach-Object {
-        $shimPath = Join-Path (shimdir $Global) "$ShimName$_"
-        if (Test-Path -LiteralPath $shimPath) {
-            return $shimPath
-        }
-    }
-}
 
 switch ($SubCommand) {
     'add' {

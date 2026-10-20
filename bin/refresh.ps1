@@ -1,6 +1,7 @@
 # for development, update the installed scripts to match local source
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
+. "$PSScriptRoot\..\lib\shim.ps1"
 
 $src = "$PSScriptRoot\.."
 $dest = ensure (versiondir 'scoop' 'current')
