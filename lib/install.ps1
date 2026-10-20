@@ -179,12 +179,12 @@ function create_shims($manifest, $dir, $global, $arch) {
         $target, $name, $arg = shim_def $_
         Write-Output "Creating shim for '$name'."
 
-        if (Test-Path "$dir\$target" -PathType leaf) {
+        if (Test-Path -LiteralPath "$dir\$target" -PathType leaf) {
             $bin = "$dir\$target"
-        } elseif (Test-Path $target -PathType leaf) {
+        } elseif (Test-Path -LiteralPath $target -PathType leaf) {
             $bin = $target
         } else {
-            $bin = (Get-Command $target).Source
+            $bin = (Get-CommandLiteral $target @('Application', 'ExternalScript')).Source
         }
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
@@ -196,20 +196,23 @@ function rm_shim($name, $shimdir, $app) {
     '', '.shim', '.cmd', '.ps1' | ForEach-Object {
         $shimPath = "$shimdir\$name$_"
         $altShimPath = "$shimPath.$app"
-        if ($app -and (Test-Path -Path $altShimPath -PathType Leaf)) {
+        if ($app -and (Test-Path -LiteralPath $altShimPath -PathType Leaf)) {
             Write-Output "Removing shim '$name$_.$app'."
-            Remove-Item $altShimPath
-        } elseif (Test-Path -Path $shimPath -PathType Leaf) {
+            Remove-Item -LiteralPath $altShimPath
+        } elseif (Test-Path -LiteralPath $shimPath -PathType Leaf) {
             Write-Output "Removing shim '$name$_'."
-            Remove-Item $shimPath
-            $oldShims = Get-Item -Path "$shimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
+            Remove-Item -LiteralPath $shimPath
+            # a wildcard cannot be combined with -LiteralPath, so the alternatives are listed and filtered.
+            # .BaseName drops only the last extension, so foo.shim.appA and foo.shim both read as foo.shim
+            $oldShims = Get-ChildItem -LiteralPath $shimdir -File |
+                Where-Object { $_.BaseName -eq (fname $shimPath) -and $_.Extension -notin @('.shim', '.exe', '.cmd', '.ps1') }
             if ($null -eq $oldShims) {
                 if ($_ -eq '.shim') {
                     Write-Output "Removing shim '$name.exe'."
                     Remove-Item -Path "$shimdir\$name.exe"
                 }
             } else {
-                (@($oldShims) | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
+                ($oldShims | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
             }
         }
     }

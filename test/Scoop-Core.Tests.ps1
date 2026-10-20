@@ -149,6 +149,11 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
         Add-Path $shimdir
     }
 
+    BeforeEach {
+        # abort exits the process, so it has to throw for the flow to stop
+        Mock -CommandName abort -MockWith { throw $msg }
+    }
+
     It "links a file onto the user's path" {
         { Get-Command 'shim-test' -ea stop } | Should-Throw
         { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
@@ -169,6 +174,21 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
         shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
         $null = & { Get-Command 'shim-test' -ea stop }
         shim-test | Should-Be 'Hello, world!'
+    }
+
+    It 'handles a shim name containing a wildcard character without raising an error' {
+        $shimPath = "$shimdir\br[acket.shim"
+        [IO.File]::WriteAllText($shimPath, '')
+
+        $Error.Clear()
+        warn_on_overwrite $shimPath "$working_dir\shim-test.ps1"
+        $Error.Count | Should-Be 0
+
+        Remove-Item -LiteralPath $shimPath -Force
+    }
+
+    It 'names the target it could not find' {
+        { shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
     }
 
     AfterEach {
@@ -192,6 +212,34 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
         { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
         { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
         { shim-test } | Should-Throw
+    }
+
+    It 'brings back the version it took over' {
+        # two apps shim the same name; warn_on_overwrite kept the first one as a backup
+        $dir = "$working_dir\alt"
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        'second' | Out-File "$dir\dupe.shim" -NoNewline
+        'second' | Out-File "$dir\dupe.cmd" -NoNewline
+        'first' | Out-File "$dir\dupe.shim.first" -NoNewline
+        'first' | Out-File "$dir\dupe.cmd.first" -NoNewline
+
+        rm_shim 'dupe' $dir | Out-Null
+
+        # the exe is not per-app, so it is left alone; the backup becomes the default again
+        [IO.File]::ReadAllText("$dir\dupe.shim") | Should-Be 'first'
+        [IO.File]::ReadAllText("$dir\dupe.cmd") | Should-Be 'first'
+    }
+
+    It 'does not mistake the exe for a saved alternative' {
+        # the exe has no app of its own, so it is a copy to remove, not a version to restore
+        $dir = "$working_dir\no-alt"
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        'x' | Out-File "$dir\dupe.shim" -NoNewline
+        'x' | Out-File "$dir\dupe.exe" -NoNewline
+
+        rm_shim 'dupe' $dir | Out-Null
+
+        Get-ChildItem $dir | Should-BeCollection -Count 0
     }
 }
 
@@ -223,6 +271,14 @@ Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
     It 'returns empty string if file exists and is not a shim' {
         Write-Output 'lorem ipsum' | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
         get_app_name_from_shim "$working_dir/mock-shim.ps1" | Should-Be ''
+    }
+
+    It 'reads a shim file whose name contains a wildcard character' {
+        # -Path would read br[a]cket.shim as a character class and miss the file
+        $p = "$working_dir\br[a]cket.shim"
+        [IO.File]::WriteAllText($p, "path = `"$working_dir\mockapp\current\mockapp.exe`"")
+
+        get_app_name_from_shim $p | Should-Be 'mockapp'
     }
 
     AfterAll {
@@ -556,6 +612,94 @@ Describe 'substitute' -Tag 'Scoop' {
             $params["`$name$($_)NoExt"] = "$_"
 
             substitute ("`$name$($_)NoExt") $params $false | Should-Be "$_"
+        }
+    }
+}
+
+Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $working_dir = setup_working 'shim'
+        $targetDir = Join-Path $TestDrive 'shim-target'
+        $null = [IO.Directory]::CreateDirectory($targetDir)
+        $targetFile = Join-Path $targetDir 'br[a]cket-target.exe'
+        [IO.File]::WriteAllText($targetFile, '')
+    }
+
+    It 'returns null for a shim file whose target is gone' {
+        $broken = "$working_dir\broken.cmd"
+        'echo hi' | Out-File $broken -Encoding ascii
+
+        Get-ShimTarget $broken | Should-BeNull
+    }
+
+    It 'reads the target stored in a shim whose name contains a wildcard character' {
+        $shimPath = Join-Path $targetDir 'br[a]cket.shim'
+        [IO.File]::WriteAllText($shimPath, "path = $targetFile")
+
+        Get-ShimTarget $shimPath | Should-Be $targetFile
+    }
+}
+
+Describe 'Get-CommandLiteral' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $pathDir = Join-Path $TestDrive 'literal-path'
+        $lookalikeDir = Join-Path $TestDrive 'literal-lookalike'
+        $decoyDir = Join-Path $TestDrive 'literal-decoy'
+        $null = [IO.Directory]::CreateDirectory($pathDir)
+        $null = [IO.Directory]::CreateDirectory($lookalikeDir)
+        $null = [IO.Directory]::CreateDirectory($decoyDir)
+        [IO.File]::WriteAllText("$pathDir\br[a]cket.exe", '')
+        [IO.File]::WriteAllText("$lookalikeDir\bracket.exe", '')
+        [IO.File]::WriteAllText("$decoyDir\clasper.exe", '')
+    }
+
+    It 'resolves a command name containing a wildcard character to the literal file on PATH' {
+        $oldPath = $env:PATH
+        $rest = (($oldPath -split ';') | Where-Object { $_ -and $_ -ne $pathDir -and $_ -ne $lookalikeDir -and $_ -ne $decoyDir }) -join ';'
+        $env:PATH = "$pathDir;$lookalikeDir;$rest"
+        try {
+            (Get-CommandLiteral 'br[a]cket.exe').Path | Should-Be "$pathDir\br[a]cket.exe"
+        } finally {
+            $env:PATH = $oldPath
+        }
+    }
+
+    It 'returns nothing for a command that does not exist' {
+        Get-CommandLiteral 'scoop-no-such-command' | Should-BeNull
+    }
+
+    It 'does not resolve a wildcard command name from a look-alike on PATH' {
+        $oldPath = $env:PATH
+        $rest = (($oldPath -split ';') | Where-Object { $_ -and $_ -ne $pathDir -and $_ -ne $lookalikeDir -and $_ -ne $decoyDir }) -join ';'
+        $env:PATH = "$decoyDir;$rest"
+        try {
+            Get-CommandLiteral 'cl[a]sper.exe' | Should-BeNull
+        } finally {
+            $env:PATH = $oldPath
+        }
+    }
+}
+
+Describe 'Get-CommandPath' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $pathDir = Join-Path $TestDrive 'literal-path'
+        $lookalikeDir = Join-Path $TestDrive 'literal-lookalike'
+        $null = [IO.Directory]::CreateDirectory($pathDir)
+        $null = [IO.Directory]::CreateDirectory($lookalikeDir)
+        [IO.File]::WriteAllText("$pathDir\br[a]cket.exe", '')
+        [IO.File]::WriteAllText("$lookalikeDir\bracket.exe", '')
+    }
+
+    It 'resolves a command name containing a wildcard character to the literal file' {
+        $pathDir = Join-Path $TestDrive 'literal-path'
+        $lookalikeDir = Join-Path $TestDrive 'literal-lookalike'
+        $oldPath = $env:PATH
+        $rest = (($oldPath -split ';') | Where-Object { $_ -and $_ -ne $pathDir -and $_ -ne $lookalikeDir }) -join ';'
+        $env:PATH = "$pathDir;$lookalikeDir;$rest"
+        try {
+            Get-CommandPath 'br[a]cket.exe' | Should-Be "$pathDir\br[a]cket.exe"
+        } finally {
+            $env:PATH = $oldPath
         }
     }
 }

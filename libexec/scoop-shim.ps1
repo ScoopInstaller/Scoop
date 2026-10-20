@@ -75,7 +75,8 @@ function Get-ShimInfo($ShimPath) {
     $info.Path = $ShimPath -replace 'shim$', 'exe'
     $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
     $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
-    $altShims = Get-Item -Path "$ShimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
+    $altShims = Get-ChildItem -LiteralPath (Split-Path $ShimPath -Parent) -File |
+        Where-Object { $_.BaseName -eq (fname $ShimPath) }
     if ($altShims) {
         $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
     }
@@ -109,13 +110,13 @@ switch ($SubCommand) {
             $shortPath = $commandPath
             $commandPath = Get-ShimTarget (Get-ShimPath $shortPath $global)
             if (!$commandPath) {
-                $exCommand = Get-Command $shortPath -ErrorAction SilentlyContinue
+                $exCommand = Get-CommandLiteral $shortPath
                 if ($exCommand -and $exCommand.CommandType -eq 'Application') {
                     $commandPath = $exCommand.Path
                 } # TODO - add support for more command types: Alias, Cmdlet, ExternalScript, Filter, Function, Script, and Workflow
             }
         }
-        if ($commandPath -and (Test-Path $commandPath)) {
+        if ($commandPath -and (Test-Path -LiteralPath $commandPath)) {
             Write-Host "Adding $(if ($global) { 'global' } else { 'local' }) shim $([char]0x1b)[36m$shimName$([char]0x1b)[0m..."
             shim $commandPath $global $shimName $commandArgs
         } else {
@@ -202,10 +203,10 @@ switch ($SubCommand) {
                 '', '.shim', '.cmd', '.ps1' | ForEach-Object {
                     $oldShimPath = "$pathNoExt$_"
                     $newShimPath = "$oldShimPath.$newApp"
-                    if (Test-Path -Path $oldShimPath -PathType Leaf) {
-                        Rename-Item -Path $oldShimPath -NewName "$oldShimPath.$($shimInfo.Source)" -Force
-                        if (Test-Path -Path $newShimPath -PathType Leaf) {
-                            Rename-Item -Path $newShimPath -NewName $oldShimPath -Force
+                    if (Test-Path -LiteralPath $oldShimPath -PathType Leaf) {
+                        Rename-Item -LiteralPath $oldShimPath -NewName "$oldShimPath.$($shimInfo.Source)" -Force
+                        if (Test-Path -LiteralPath $newShimPath -PathType Leaf) {
+                            Rename-Item -LiteralPath $newShimPath -NewName $oldShimPath -Force
                         }
                     }
                 }
