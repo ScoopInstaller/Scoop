@@ -283,11 +283,8 @@ function New-Shim($Path, $Global, $Name, $Arg) {
     }
 }
 
-function Get-ShimExe() {
-    $shim = get_config SHIM 'default'
-    if ($shim -ne 'default') {
-        warn "Unknown shim '$shim' - using the bundled one."
-    }
+function Get-ShimExe($Shim) {
+    if (!$Shim) { $Shim = get_config SHIM 'default' }
     $system = Get-SystemArchitecture
     # exactly three architectures are vendored, and guessing one would silently produce a broken shim
     $architecture = switch ($system) {
@@ -297,7 +294,34 @@ function Get-ShimExe() {
         default { abort "Cannot tell which shim architecture to use (system reports '$system')." }
     }
     # this file lives in <root>\lib, so the bundled bodies are relative to the code, not to the install
-    "$PSScriptRoot\..\supporting\shims\$architecture\shim.exe"
+    $bundled = "$PSScriptRoot\..\supporting\shims\$architecture\shim.exe"
+    if ($Shim -ne 'default') {
+        # a shim package provides its body as shim.exe next to the app it shims, local or global
+        foreach ($scope in $false, $true) {
+            $exe = "$(currentdir $Shim $scope)\shim.exe"
+            if (Test-Path -LiteralPath $exe -PathType Leaf) {
+                # a body for another architecture cannot reach System32 from 32-bit code, so it is unusable here
+                if ((Get-PEMachine $exe) -eq (Get-PEMachine $bundled)) { return $exe }
+                warn "'$Shim' provides a shim for another architecture - using the bundled one."
+                return $bundled
+            }
+        }
+        warn "'$Shim' does not provide a shim - falling back to the bundled one."
+        # TODO: delete this region together with the supporting\shims\<lane>\ directories,
+        # whose .to_be_removed marker says the same. 'shim' used to name one of the three
+        # lanes bundled in the tree, and those lanes ship as packages now.
+        #region shim lanes that are no longer bundled
+        $lanes = @{
+            '71'      = 'scoop-shim-cpp'
+            'kiennq'  = 'scoop-shim-cpp'
+            'scoopcs' = 'scoop-shim-cs'
+        }
+        if ($lanes.ContainsKey($Shim)) {
+            warn "You could use '$($lanes[$Shim])' instead; 'scoop install $($lanes[$Shim])', then 'scoop config shim $($lanes[$Shim])'."
+        }
+        #endregion shim lanes that are no longer bundled
+    }
+    $bundled
 }
 
 # get target, name, arguments for shim

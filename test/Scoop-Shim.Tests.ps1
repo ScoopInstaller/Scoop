@@ -173,6 +173,7 @@ Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
 Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
     BeforeEach {
         Mock -CommandName warn
+        Mock -CommandName get_config -MockWith { $false } -ParameterFilter { $Name -eq 'NO_JUNCTION' }
     }
 
     It 'returns the body matching the machine architecture' {
@@ -181,7 +182,7 @@ Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
             '64bit' { 'x64' }
             '32bit' { 'x86' }
         }
-        Get-ShimExe | Should-BeLikeString "*\supporting\shims\$arch\shim.exe"
+        Get-ShimExe 'default' | Should-BeLikeString "*\supporting\shims\$arch\shim.exe"
     }
 
     It 'bundles a body for every architecture' {
@@ -193,13 +194,40 @@ Describe 'Get-ShimExe' -Tag 'Scoop', 'Windows' {
     It 'warns and falls back to the bundled shim for an unknown value' {
         Mock -CommandName get_config -MockWith { 'cs' } -ParameterFilter { $Name -eq 'SHIM' }
         Get-ShimExe | Should-BeLikeString '*\supporting\shims\*\shim.exe'
-        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*Unknown shim 'cs'*" }
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*'cs' does not provide a shim*" }
     }
 
     It 'does not warn for the bundled shim' {
         Mock -CommandName get_config -MockWith { 'default' } -ParameterFilter { $Name -eq 'SHIM' }
         $null = Get-ShimExe
         Should-Invoke -CommandName warn -Times 0
+    }
+
+    It 'takes the body from an installed shim package' {
+        $pkgdir = Join-Path $TestDrive 'shim-pkg'
+        New-Item -ItemType Directory -Force -Path (Join-Path $pkgdir 'current') | Out-Null
+        Copy-Item -LiteralPath (Get-ShimExe 'default') -Destination (Join-Path $pkgdir 'current\shim.exe')
+        Mock -CommandName currentdir -MockWith { Join-Path $pkgdir 'current' }
+
+        Get-ShimExe 'shim-pkg' | Should-Be (Join-Path $pkgdir 'current\shim.exe')
+        Should-Invoke -CommandName warn -Times 0
+    }
+
+    It 'ignores a package body built for another architecture' {
+        $arch = switch (Get-SystemArchitecture) {
+            'arm64' { 'arm64' }
+            '64bit' { 'x64' }
+            '32bit' { 'x86' }
+        }
+        $other = 'x64', 'x86', 'arm64' | Where-Object { $_ -ne $arch } | Select-Object -First 1
+        $pkgdir = Join-Path $TestDrive 'shim-pkg-other'
+        New-Item -ItemType Directory -Force -Path (Join-Path $pkgdir 'current') | Out-Null
+        Copy-Item -LiteralPath (Join-Path $PSScriptRoot "..\supporting\shims\$other\shim.exe") -Destination (Join-Path $pkgdir 'current\shim.exe')
+        Mock -CommandName currentdir -MockWith { Join-Path $pkgdir 'current' }
+
+        $bundled = Get-ShimExe 'default'
+        Get-ShimExe 'shim-pkg-other' | Should-Be $bundled
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*'shim-pkg-other' provides a shim for another architecture*" }
     }
 }
 
