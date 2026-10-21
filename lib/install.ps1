@@ -204,17 +204,18 @@ function rm_shim($name, $shimdir, $app) {
         } elseif (Test-Path -LiteralPath $shimPath -PathType Leaf) {
             Write-Output "Removing shim '$name$_'."
             Remove-Item -LiteralPath $shimPath
-            # a wildcard cannot be combined with -LiteralPath, so the alternatives are listed and filtered.
-            # .BaseName drops only the last extension, so foo.shim.appA and foo.shim both read as foo.shim
-            $oldShims = Get-ChildItem -LiteralPath $shimdir -File |
-                Where-Object { $_.BaseName -eq (fname $shimPath) -and $_.Extension -notin @('.shim', '.exe', '.cmd', '.ps1') }
+            $shimName = fname $shimPath
+            $wrapperTokens = @('shim', 'exe', 'cmd', 'ps1', 'bat')
+            # a saved file of another wrapper (tool.ps1.first) carries that wrapper after the name
+            $oldShims = Get-ChildItem -LiteralPath $shimdir -Filter "$shimName.*" -File |
+                Where-Object { $_.Name.Substring($shimName.Length + 1).Split('.')[0] -notin $wrapperTokens }
             if ($null -eq $oldShims) {
                 if (($_ -eq '.shim') -and (Test-Path -LiteralPath "$shimdir\$name.exe" -PathType Leaf)) {
                     Write-Output "Removing shim '$name.exe'."
                     Remove-Item -LiteralPath "$shimdir\$name.exe"
                 }
             } else {
-                ($oldShims | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
+                ($oldShims | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $shimName }
             }
         }
     }

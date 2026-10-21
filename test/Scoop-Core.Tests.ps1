@@ -233,14 +233,36 @@ Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
         New-Item -ItemType Directory -Force -Path $dir | Out-Null
         'second' | Out-File "$dir\dupe.shim" -NoNewline
         'second' | Out-File "$dir\dupe.cmd" -NoNewline
+        'second' | Out-File "$dir\dupe" -NoNewline
+        'second' | Out-File "$dir\dupe.ps1" -NoNewline
         'first' | Out-File "$dir\dupe.shim.first" -NoNewline
         'first' | Out-File "$dir\dupe.cmd.first" -NoNewline
+        'plain-first' | Out-File "$dir\dupe.first" -NoNewline
+        'script-first' | Out-File "$dir\dupe.ps1.first" -NoNewline
+        # the newest backup belongs to a wrapper, so no other wrapper may take it over
+        [IO.File]::SetLastWriteTimeUtc("$dir\dupe.ps1.first", (Get-Date).ToUniversalTime())
 
         rm_shim 'dupe' $dir | Out-Null
 
-        # the exe is not per-app, so it is left alone; the backup becomes the default again
+        # the exe is not per-app, so it is left alone; every wrapper gets its own backup back
         [IO.File]::ReadAllText("$dir\dupe.shim") | Should-Be 'first'
         [IO.File]::ReadAllText("$dir\dupe.cmd") | Should-Be 'first'
+        [IO.File]::ReadAllText("$dir\dupe") | Should-Be 'plain-first'
+        [IO.File]::ReadAllText("$dir\dupe.ps1") | Should-Be 'script-first'
+    }
+
+    It 'brings back the version it took over from an app name with dots' {
+        # the backup keeps the whole app name, so the match must not stop at the last dot
+        $dir = "$working_dir\dotted"
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        'second' | Out-File "$dir\dupe.shim" -NoNewline
+        'first' | Out-File "$dir\dupe.shim.foo.bar" -NoNewline
+        'x' | Out-File "$dir\dupe.exe" -NoNewline
+
+        rm_shim 'dupe' $dir | Out-Null
+
+        [IO.File]::ReadAllText("$dir\dupe.shim") | Should-Be 'first'
+        Test-Path -LiteralPath "$dir\dupe.exe" | Should-Be $true
     }
 
     It 'does not mistake the exe for a saved alternative' {
@@ -745,6 +767,14 @@ Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
         [IO.File]::WriteAllText($shimPath, 'path = "C:\nonexistent\gone.exe"')
 
         (Get-ShimInfo $shimPath).IsHidden | Should-BeTrue
+    }
+
+    It 'lists the alternatives of a shim whose app name has dots' {
+        $shimPath = "$working_dir\dupe.shim"
+        [IO.File]::WriteAllText($shimPath, 'path = "C:\nonexistent\dupe.exe"')
+        [IO.File]::WriteAllText("$working_dir\dupe.shim.foo.bar", 'path = "C:\nonexistent\dupe.exe"')
+
+        (Get-ShimInfo $shimPath).Alternatives | Should-Be 'External bar'
     }
 }
 

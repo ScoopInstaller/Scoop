@@ -1455,8 +1455,9 @@ function Get-ShimInfo($ShimPath) {
     $info.Path = $ShimPath -replace 'shim$', 'exe'
     $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
     $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
+    $shimName = fname $ShimPath
     $altShims = Get-ChildItem -LiteralPath (Split-Path $ShimPath -Parent) -File |
-        Where-Object { $_.BaseName -eq (fname $ShimPath) }
+        Where-Object { $_.Name.StartsWith("$shimName.", [StringComparison]::OrdinalIgnoreCase) }
     if ($altShims) {
         $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
     }
