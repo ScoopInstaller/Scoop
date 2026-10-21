@@ -934,7 +934,7 @@ function get_app_name_from_shim($shim) {
 function Get-ShimTarget($ShimPath) {
     if ($ShimPath) {
         $shimTarget = if ($ShimPath.EndsWith('.shim')) {
-            (Get-Content -LiteralPath $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
+            (Get-Content -LiteralPath $ShimPath -Encoding UTF8 | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
         } else {
             ((Select-String -LiteralPath $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
         }

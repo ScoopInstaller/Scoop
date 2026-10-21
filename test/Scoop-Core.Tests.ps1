@@ -673,6 +673,16 @@ Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
 
         Get-ShimTarget $shimPath | Should-Be $targetFile
     }
+
+    It 'reads a target with non-ASCII characters from a shim file' {
+        # the description is UTF-8, and Windows PowerShell 5.1 reads it as ANSI without the encoding
+        $target = Join-Path $targetDir 'bräcket-target.exe'
+        [IO.File]::WriteAllText($target, '')
+        $shimPath = Join-Path $targetDir 'nonascii.shim'
+        [IO.File]::WriteAllText($shimPath, "path = `"$target`"", [Text.UTF8Encoding]::new($false))
+
+        Get-ShimTarget $shimPath | Should-Be $target
+    }
 }
 
 Describe 'Get-CommandLiteral' -Tag 'Scoop', 'Windows' {

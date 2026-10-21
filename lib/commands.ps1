@@ -22,7 +22,7 @@ function command_path($cmd) {
     if (!(Test-Path $cmd_path)) {
         # get path from shim
         $shim_path = "$scoopdir\shims\scoop-$cmd.ps1"
-        $line = ((Get-Content $shim_path) | Where-Object { $_.startswith('$path') })
+        $line = ((Get-Content $shim_path -Encoding UTF8) | Where-Object { $_.startswith('$path') })
         if ($line) {
             Invoke-Command ([scriptblock]::Create($line)) -NoNewScope
             $cmd_path = $path
