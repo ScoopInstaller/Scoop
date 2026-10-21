@@ -111,8 +111,11 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         Mock abort -MockWith { throw $msg }
         # the body lookup follows the machine's config, so pin it to the bundled body
         Mock get_shim_path { Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe' }
+        # the shims of the machine and its path stay untouched
+        $shimdir = Join-Path $TestDrive 'shims-wildcard'
+        Mock shimdir { $shimdir }
+        Mock Add-Path {}
 
-        $shimdir = shimdir
         $dir = Join-Path $TestDrive 'br[a]cket-shim'
         $null = [IO.Directory]::CreateDirectory($dir)
         [IO.File]::WriteAllText("$dir\br[a]cket.exe", 'not a real binary')
