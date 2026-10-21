@@ -677,8 +677,24 @@ Describe 'Get-CommandLiteral' -Tag 'Scoop', 'Windows' {
         }
     }
 
+    It 'resolves a command name with a wildcard character and no extension' {
+        $oldPath = $env:PATH
+        $rest = (($oldPath -split ';') | Where-Object { $_ -and $_ -ne $pathDir -and $_ -ne $lookalikeDir -and $_ -ne $decoyDir }) -join ';'
+        $env:PATH = "$pathDir;$lookalikeDir;$rest"
+        try {
+            (Get-CommandLiteral 'br[a]cket').Path | Should-Be "$pathDir\br[a]cket.exe"
+        } finally {
+            $env:PATH = $oldPath
+        }
+    }
+
     It 'returns nothing for a command that does not exist' {
         Get-CommandLiteral 'scoop-no-such-command' | Should-BeNull
+    }
+
+    It 'resolves a full path containing a wildcard character' {
+        $full = "$pathDir\br[a]cket.exe"
+        (Get-CommandLiteral $full).Path | Should-Be $full
     }
 
     It 'does not resolve a wildcard command name from a look-alike on PATH' {

@@ -517,12 +517,27 @@ function Get-HelperPath {
 }
 
 function Get-CommandLiteral($Name, [string[]]$CommandType = @()) {
-    $commands = Get-Command -Name $Name -ErrorAction 'Ignore'
-    if ($CommandType) {
-        $commands = $commands | Where-Object { $CommandType -contains $_.CommandType }
+    # Get-Command adds the executable extensions to a plain name only
+    $names = @($Name)
+    if (($Name -match '[\[\]*?]') -and (-not [IO.Path]::GetExtension($Name)) -and $env:PATHEXT) {
+        $names += ($env:PATHEXT -split ';') | ForEach-Object { "$Name$_" }
     }
-    # a name with wildcard characters must match exactly, or a look-alike wins
-    $commands | Where-Object { $_.Name -eq $Name -or $Name -notmatch '[\[\]*?]' } | Select-Object -First 1
+    foreach ($n in $names) {
+        $commands = Get-Command -Name $n -ErrorAction 'Ignore'
+        if ($CommandType) {
+            $commands = $commands | Where-Object { $CommandType -contains $_.CommandType }
+        }
+        # a name with wildcard characters must match exactly, or a look-alike wins
+        $wild = $n -match '[\[\]*?]'
+        $isPath = $n -match '[\\/]'
+        $match = $commands | Where-Object {
+            if (!$wild) { return $true }
+            if ($isPath) { return $_.Source -eq $n }
+            return $_.Name -eq $n
+        } | Select-Object -First 1
+        if ($match) { return $match }
+    }
+    return $null
 }
 
 function Get-CommandPath {
