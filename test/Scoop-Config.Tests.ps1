@@ -48,7 +48,7 @@ Describe 'config' -Tag 'Scoop' {
         It 'refreshes with the value being set, not the one still on disk' {
             Mock -CommandName get_config -MockWith { $true } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
 
-            Complete-ConfigChange -Name shim -Value 'default'
+            Complete-ConfigChange -Name shim -Value 'default' 6>$null
 
             (Get-FileHash -LiteralPath "$scoopdir\shims\refresh-test.exe").Hash |
                 Should-Be (Get-FileHash -LiteralPath (Get-ShimExe 'default')).Hash
