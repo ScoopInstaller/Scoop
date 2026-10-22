@@ -42,4 +42,30 @@ Describe 'Manipulate Alias' -Tag 'Scoop' {
         Test-Path $alias_script | Should-BeFalse
         Should-Invoke -CommandName info -Times 1 -ParameterFilter { $msg -eq "Removing alias 'rm'..." }
     }
+
+    It 'Creates an alias whose name contains a wildcard character' {
+        $look_alike = "$shimdir\scoop-bracket.ps1"
+        $alias_script = "$shimdir\scoop-br[a]cket.ps1"
+        New-Item $look_alike -Type File -Force
+        Mock abort {}
+
+        add_alias 'br[a]cket' '"hello"'
+
+        Should-Invoke -CommandName abort -Times 0 -Exactly
+        Test-Path -LiteralPath $alias_script | Should-BeTrue
+    }
+
+    It 'Removes an alias whose name contains a wildcard character' {
+        $look_alike = "$shimdir\scoop-bracket.ps1"
+        $alias_script = "$shimdir\scoop-br[a]cket.ps1"
+        New-Item $look_alike -Type File -Force
+        New-Item $alias_script -Type File -Force
+        Mock get_config { @(@{'br[a]cket' = 'scoop-br[a]cket' }) }
+        Mock info {}
+
+        rm_alias 'br[a]cket'
+
+        Test-Path -LiteralPath $alias_script | Should-BeFalse
+        Test-Path -LiteralPath $look_alike | Should-BeTrue
+    }
 }

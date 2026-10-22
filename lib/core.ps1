@@ -516,6 +516,30 @@ function Get-HelperPath {
     }
 }
 
+function Get-CommandLiteral($Name, [string[]]$CommandType = @()) {
+    # Get-Command adds the executable extensions to a plain name only
+    $names = @($Name)
+    if (($Name -match '[\[\]*?]') -and (-not [IO.Path]::GetExtension($Name)) -and $env:PATHEXT) {
+        $names += ($env:PATHEXT -split ';') | ForEach-Object { "$Name$_" }
+    }
+    foreach ($n in $names) {
+        $commands = Get-Command -Name $n -ErrorAction 'Ignore'
+        if ($CommandType) {
+            $commands = $commands | Where-Object { $CommandType -contains $_.CommandType }
+        }
+        # a name with wildcard characters must match exactly, or a look-alike wins
+        $wild = $n -match '[\[\]*?]'
+        $isPath = $n -match '[\\/]'
+        $match = $commands | Where-Object {
+            if (!$wild) { return $true }
+            if ($isPath) { return $_.Source -eq $n }
+            return $_.Name -eq $n
+        } | Select-Object -First 1
+        if ($match) { return $match }
+    }
+    return $null
+}
+
 function Get-CommandPath {
     [CmdletBinding()]
     [OutputType([String])]
@@ -531,9 +555,8 @@ function Get-CommandPath {
     }
 
     process {
-        try {
-            $comm = Get-Command $Command -ErrorAction Stop
-        } catch {
+        $comm = Get-CommandLiteral $Command
+        if (!$comm) {
             return $null
         }
         $commandPath = if ($comm.Path -like "$userShims\scoop-*.ps1") {
@@ -841,7 +864,7 @@ function Invoke-ExternalCommand {
 function isFileLocked([string]$path) {
     $file = New-Object System.IO.FileInfo $path
 
-    if ((Test-Path -Path $path) -eq $false) {
+    if ((Test-Path -LiteralPath $path) -eq $false) {
         return $false
     }
 
@@ -890,9 +913,9 @@ function movedir($from, $to) {
 }
 
 function get_app_name($path) {
-    if ((Test-Path (appsdir $false)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $false))))[/\\]([^/\\]+)")) {
+    if ((Test-Path -LiteralPath (appsdir $false)) -and ($path -match "$([Regex]::Escape($(Convert-Path -LiteralPath (appsdir $false))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
-    } elseif ((Test-Path (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path (appsdir $true))))[/\\]([^/\\]+)")) {
+    } elseif ((Test-Path -LiteralPath (appsdir $true)) -and ($path -match "$([Regex]::Escape($(Convert-Path -LiteralPath (appsdir $true))))[/\\]([^/\\]+)")) {
         $appName = $Matches[1].ToLower()
     } else {
         $appName = ''
@@ -901,26 +924,29 @@ function get_app_name($path) {
 }
 
 function get_app_name_from_shim($shim) {
-    if (!(Test-Path($shim))) {
+    if (!(Test-Path -LiteralPath $shim)) {
         return ''
     }
-    $content = (Get-Content $shim -Encoding UTF8) -join ' '
+    $content = (Get-Content -LiteralPath $shim -Encoding UTF8) -join ' '
     return get_app_name $content
 }
 
 function Get-ShimTarget($ShimPath) {
     if ($ShimPath) {
         $shimTarget = if ($ShimPath.EndsWith('.shim')) {
-            (Get-Content -Path $ShimPath | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
+            (Get-Content -LiteralPath $ShimPath -Encoding UTF8 | Select-Object -First 1).Replace('path = ', '').Replace('"', '')
         } else {
-            ((Select-String -Path $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
+            ((Select-String -LiteralPath $ShimPath -Pattern '^(?:@rem|#)\s*(.*)$').Matches.Groups | Select-Object -Index 1).Value
         }
         if (!$shimTarget) {
-            $shimTarget = ((Select-String -Path $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
+            $shimTarget = ((Select-String -LiteralPath $ShimPath -Pattern '[''"]([^@&]*?)[''"]' -AllMatches).Matches.Groups | Select-Object -Last 1).Value
         }
-        $shimTargetConverted = $shimTarget | Convert-Path -ErrorAction SilentlyContinue
+        # Convert-Path binds it strictly, so the empty case the pipeline form swallowed is screened out
+        $shimTargetConverted = if ($shimTarget) {
+            Convert-Path -LiteralPath $shimTarget -ErrorAction SilentlyContinue
+        }
         if (!$shimTargetConverted -and $shimTarget -and $shimTarget.Contains('\Sysnative\')) {
-            $shimTarget.Replace('\Sysnative\', '\System32\') | Convert-Path -ErrorAction SilentlyContinue
+            Convert-Path -LiteralPath ($shimTarget.Replace('\Sysnative\', '\System32\')) -ErrorAction SilentlyContinue
         } else {
             return $shimTargetConverted
         }
@@ -928,7 +954,7 @@ function Get-ShimTarget($ShimPath) {
 }
 
 function warn_on_overwrite($shim, $path) {
-    if (!(Test-Path $shim)) {
+    if (!(Test-Path -LiteralPath $shim)) {
         return
     }
     $shim_app = get_app_name_from_shim $shim
@@ -936,10 +962,10 @@ function warn_on_overwrite($shim, $path) {
     if ($shim_app -eq $path_app) {
         return
     } else {
-        if (Test-Path -Path "$shim.$path_app" -PathType Leaf) {
-            Remove-Item -Path "$shim.$path_app" -Force -ErrorAction SilentlyContinue
+        if (Test-Path -LiteralPath "$shim.$path_app" -PathType Leaf) {
+            Remove-Item -LiteralPath "$shim.$path_app" -Force -ErrorAction SilentlyContinue
         }
-        Rename-Item -Path $shim -NewName "$shim.$shim_app" -ErrorAction SilentlyContinue
+        Rename-Item -LiteralPath $shim -NewName "$shim.$shim_app" -ErrorAction SilentlyContinue
     }
     $shimname = (fname $shim) -replace '\.shim$', '.exe'
     $filename = (fname $path) -replace '\.shim$', '.exe'
@@ -947,7 +973,7 @@ function warn_on_overwrite($shim, $path) {
 }
 
 function shim($path, $global, $name, $arg) {
-    if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
+    if (!(Test-Path -LiteralPath $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
     Add-Path -Path $abs_shimdir -Global:$global
     if (!$name) { $name = strip_ext (fname $path) }
@@ -955,15 +981,15 @@ function shim($path, $global, $name, $arg) {
     $shim = "$abs_shimdir\$($name.tolower())"
 
     # convert to relative path
-    $resolved_path = Convert-Path $path
+    $resolved_path = Convert-Path -LiteralPath $path
     Push-Location $abs_shimdir
-    $relative_path = Resolve-Path -Relative $resolved_path
+    $relative_path = Resolve-Path -LiteralPath $resolved_path -Relative
     Pop-Location
 
     if ($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
         warn_on_overwrite "$shim.shim" $path
-        Copy-Item (get_shim_path) "$shim.exe" -Force
+        Copy-Item -LiteralPath (get_shim_path) "$shim.exe" -Force
 
         $rewrote_path = $resolved_path
 
@@ -1422,3 +1448,22 @@ $scoopPathEnvVar = switch (get_config USE_ISOLATED_PATH) {
 
 # OS information
 $WindowsBuild = [System.Environment]::OSVersion.Version.Build
+
+function Get-ShimInfo($ShimPath) {
+    $info = [Ordered]@{}
+    $info.Name = strip_ext (fname $ShimPath)
+    $info.Path = $ShimPath -replace 'shim$', 'exe'
+    $info.Source = (get_app_name_from_shim $ShimPath) -replace '^$', 'External'
+    $info.Type = if ($ShimPath.EndsWith('.ps1')) { 'ExternalScript' } else { 'Application' }
+    $shimName = fname $ShimPath
+    $altShims = Get-ChildItem -LiteralPath (Split-Path $ShimPath -Parent) -File |
+        Where-Object { $_.Name.StartsWith("$shimName.", [StringComparison]::OrdinalIgnoreCase) }
+    if ($altShims) {
+        $info.Alternatives = (@($info.Source) + ($altShims | ForEach-Object { $_.Extension.Remove(0, 1) } | Select-Object -Unique)) -join ' '
+    }
+    $info.IsGlobal = $ShimPath.StartsWith((shimdir $true))
+    # the command is gone if the app was uninstalled without its shim; that is not an error
+    $info.IsHidden = !((Get-CommandLiteral $info.Name).Path -eq $info.Path)
+    [PSCustomObject]$info
+}
+
