@@ -23,6 +23,7 @@
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\download.ps1"
 if (get_config USE_SQLITE_CACHE) {
@@ -149,7 +150,7 @@ function Sync-Scoop {
         }
     }
 
-    shim "$currentdir\bin\scoop.ps1" $false
+    New-Shim "$currentdir\bin\scoop.ps1" $false
 }
 
 function Sync-Bucket {
@@ -352,7 +353,7 @@ function update($app, $global, $force = $false, $quiet = $false, $independent, $
 
     Write-Host "Uninstalling '$app' ($old_version)"
     Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-    rm_shims $app $old_manifest $global $architecture
+    Remove-ShimFromManifest $app $old_manifest $global $architecture
     rm_startmenu_shortcuts $old_manifest $global $architecture
 
     # If a junction was used during install, that will have been used

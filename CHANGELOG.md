@@ -8,6 +8,10 @@
 - **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
 
+### Code Refactoring
+
+- **shim:** Give the shim functions their own file and PowerShell names ([#6789](https://github.com/ScoopInstaller/Scoop/issues/6789))
+
 ### Continuous Integration
 
 - **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))

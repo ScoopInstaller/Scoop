@@ -1,6 +1,7 @@
 # for development, update the installed scripts to match local source
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\system.ps1" # 'Add-Path' (indirectly)
+. "$PSScriptRoot\..\lib\shim.ps1"
 
 $src = "$PSScriptRoot\.."
 $dest = ensure (versiondir 'scoop' 'current')
@@ -14,6 +15,6 @@ $output = robocopy $src $dest /mir /njh /njs /nfl /ndl /xd .git tmp /xf .DS_Stor
 $output | Where-Object { $_ -ne "" }
 
 Write-Output 'creating shim...'
-shim "$dest\bin\scoop.ps1" $false
+New-Shim "$dest\bin\scoop.ps1" $false
 
 success 'scoop was refreshed!'
