@@ -241,12 +241,12 @@ Describe 'Set-ShimCopy' -Tag 'Scoop', 'Windows' {
     }
 
     It 'replaces the exe of the shims it was given' {
-        Set-ShimCopy (Get-ShimExe 'default') $false 'copy-test'
+        Set-ShimCopy (Get-ShimExe 'default') $false 'copy-test' 6>$null
         (Get-FileHash -LiteralPath "$shimdir\copy-test.exe").Hash | Should-Be (Get-FileHash -LiteralPath (Get-ShimExe 'default')).Hash
     }
 
     It 'does not touch a shim it was not given' {
-        Set-ShimCopy (Get-ShimExe 'default') $false 'not-installed'
+        Set-ShimCopy (Get-ShimExe 'default') $false 'not-installed' 6>$null
         Get-Content -LiteralPath "$shimdir\copy-test.exe" -Raw | Should-BeLikeString '*clobbered*'
     }
 
@@ -254,7 +254,7 @@ Describe 'Set-ShimCopy' -Tag 'Scoop', 'Windows' {
         New-Shim "$env:SystemRoot\System32\notepad.exe" $false 'gui-test'
         Get-PESubsystem "$shimdir\gui-test.exe" | Should-Be 2
 
-        Set-ShimCopy (Get-ShimExe 'default') $false 'gui-test'
+        Set-ShimCopy (Get-ShimExe 'default') $false 'gui-test' 6>$null
         Get-PESubsystem "$shimdir\gui-test.exe" | Should-Be 2
     }
 
@@ -264,7 +264,7 @@ Describe 'Set-ShimCopy' -Tag 'Scoop', 'Windows' {
         $stamp = (Get-Date '2020-01-02 03:04:05').ToUniversalTime()
         [IO.File]::SetLastWriteTimeUtc($saved, $stamp)
         try {
-            Set-ShimCopy (Get-ShimExe 'default') $false 'copy-test'
+            Set-ShimCopy (Get-ShimExe 'default') $false 'copy-test' 6>$null
             (Get-Content -LiteralPath $saved -Encoding UTF8) | Select-Object -First 1 | Should-Be "$env:SystemRoot\System32\cmd.exe"
             (Get-Item -LiteralPath $saved).LastWriteTimeUtc | Should-Be $stamp
         } finally {
