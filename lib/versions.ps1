@@ -112,8 +112,6 @@ function Get-InstalledVersion {
             return @()
         }
     }
-    # Deprecated
-    # sort_versions (Get-ChildItem $appPath -dir -attr !reparsePoint | Where-Object { $null -ne $(Get-ChildItem $_.FullName) } | ForEach-Object { $_.Name })
 }
 
 
@@ -154,47 +152,3 @@ function SplitVersion {
     }
 }
 
-# Deprecated
-# Not used anymore in scoop core
-function qsort($ary, $fn) {
-    warn '"qsort" is deprecated. Please avoid using it anymore.'
-    if ($null -eq $ary) { return @() }
-    if (!($ary -is [array])) { return @($ary) }
-
-    $pivot = $ary[0]
-    $rem = $ary[1..($ary.length - 1)]
-
-    $lesser = qsort ($rem | Where-Object { (& $fn $pivot $_) -lt 0 }) $fn
-
-    $greater = qsort ($rem | Where-Object { (& $fn $pivot $_) -ge 0 }) $fn
-
-    return @() + $lesser + @($pivot) + $greater
-}
-
-# Deprecated
-# Not used anymore in scoop core
-function sort_versions($versions) {
-    warn '"sort_versions" is deprecated. Please avoid using it anymore.'
-    qsort $versions { param($a, $b) [Scoop.SemVerComparer]::Compare($a, $b) }
-}
-
-function compare_versions($a, $b) {
-    Show-DeprecatedWarning $MyInvocation 'Compare-Version'
-    # Please note the parameters' sequence
-    return [Scoop.SemVerComparer]::Compare($b, $a)
-}
-
-function latest_version($app, $bucket, $url) {
-    Show-DeprecatedWarning $MyInvocation 'Get-LatestVersion'
-    return Get-LatestVersion -AppName $app -Bucket $bucket -Uri $url
-}
-
-function current_version($app, $global) {
-    Show-DeprecatedWarning $MyInvocation 'Select-CurrentVersion'
-    return Select-CurrentVersion -AppName $app -Global:$global
-}
-
-function versions($app, $global) {
-    Show-DeprecatedWarning $MyInvocation 'Get-InstalledVersion'
-    return Get-InstalledVersion -AppName $app -Global:$global
-}
