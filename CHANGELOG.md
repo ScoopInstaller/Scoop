@@ -15,6 +15,7 @@
 
 ### Performance Improvements
 
+- **database:** Speed up the app cache ([#6793](https://github.com/ScoopInstaller/Scoop/issues/6793))
 - **versions:** Compare versions with a compiled comparer ([#6792](https://github.com/ScoopInstaller/Scoop/issues/6792))
 
 ### Continuous Integration
