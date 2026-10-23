@@ -354,6 +354,7 @@ function Set-ShimCopy($Exe, $Global, $Names) {
         $name = $_.BaseName
         $dest = "$shimDir\$name.exe"
         if (!(Test-Path -LiteralPath $dest)) { return }
+        $oldSubsystem = Get-PESubsystem $dest
         try {
             Copy-Item -LiteralPath $Exe -Destination $dest -Force -ErrorAction Stop
         } catch {
@@ -375,7 +376,10 @@ function Set-ShimCopy($Exe, $Global, $Names) {
             }
         }
         # the fresh copy lost the GUI flag the target needs
-        if ((Get-PESubsystem (Get-ShimTarget $_.FullName)) -eq 2) {
+        $subsystem = Get-PESubsystem (Get-ShimTarget $_.FullName)
+        # an unreadable target means its drive is away, so keep the flag the old copy had
+        if ($subsystem -lt 0) { $subsystem = $oldSubsystem }
+        if ($subsystem -eq 2) {
             Set-PESubsystem $dest 2 | Out-Null
         }
     }
