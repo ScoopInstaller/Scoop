@@ -63,4 +63,29 @@ Describe 'database version selection' -Tag 'Scoop' {
 
         $latest.version | Should-Be '7.0.20'
     }
+
+    It 'groups PSCustomObject rows by their properties' {
+        $rows = @(
+            [pscustomobject]@{ name = 'alpha'; bucket = 'main'; version = '1.0' }
+            [pscustomobject]@{ name = 'alpha'; bucket = 'main'; version = '2.0' }
+            [pscustomobject]@{ name = 'beta'; bucket = 'main'; version = '1.0' }
+        )
+
+        $latest = @(Get-LatestScoopDBRow -Rows $rows -GroupBy @('name', 'bucket'))
+
+        $latest.Count | Should-Be 2
+        ($latest | ForEach-Object { "$($_.name)=$($_.version)" }) -join ' ' | Should-Be 'alpha=2.0 beta=1.0'
+    }
+
+    It 'treats a group key case-insensitively' {
+        $rows = @(
+            [pscustomobject]@{ name = 'App'; bucket = 'Main'; version = '1.0' }
+            [pscustomobject]@{ name = 'app'; bucket = 'main'; version = '2.0' }
+        )
+
+        $latest = @(Get-LatestScoopDBRow -Rows $rows -GroupBy @('name', 'bucket'))
+
+        $latest.Count | Should-Be 1
+        $latest[0].version | Should-Be '2.0'
+    }
 }
