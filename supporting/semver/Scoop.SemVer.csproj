@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import
+        Project="packages\Microsoft.Net.Compilers.Toolset.5.9.0\build\Microsoft.Net.Compilers.Toolset.props"
+        Condition="Exists('packages\Microsoft.Net.Compilers.Toolset.5.9.0\build\Microsoft.Net.Compilers.Toolset.props')" />
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
+        Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{5E4A9B27-8C31-4E7F-9D2A-6F1B3C7E8A54}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <RootNamespace>Scoop</RootNamespace>
+        <AssemblyName>Scoop.SemVer</AssemblyName>
+        <TargetFrameworkVersion>v4.5.0</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="System" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Scoop.SemVer.cs" />
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
