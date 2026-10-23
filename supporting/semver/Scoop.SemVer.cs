@@ -59,8 +59,7 @@ namespace Scoop
 
         int IComparer<string>.Compare(string x, string y)
         {
-            // The static overloads report whether the second argument is newer;
-            // IComparer wants x measured against y, so the arguments swap.
+            // The static overloads report whether the second argument is newer, so the arguments swap.
             return CompareVersion(y, x, false);
         }
 
@@ -98,8 +97,7 @@ namespace Scoop
             List<Part> referenceParts = Split(referenceText, '-');
             List<Part> differenceParts = Split(differenceText, '-');
 
-            // Nightly is a rule about the whole version, not about a segment, so it
-            // is decided once here and never inside the recursion.
+            // Nightly is a rule about the whole version, decided once here and never inside the recursion.
             if (referenceParts.Count > 0 && differenceParts.Count > 0
                 && string.Equals(referenceParts[0].Text, "nightly", StringComparison.OrdinalIgnoreCase)
                 && string.Equals(differenceParts[0].Text, "nightly", StringComparison.OrdinalIgnoreCase))
@@ -210,8 +208,7 @@ namespace Scoop
 
         /// <summary>
         /// Splits a version into segments: every run of ASCII letters is cut out on
-        /// its own, the rest stays together until the next letter run or delimiter,
-        /// and empty segments are dropped.
+        /// its own, the rest stays together until the next letter run or delimiter.
         /// </summary>
         private static List<Part> Split(string version, char delimiter)
         {

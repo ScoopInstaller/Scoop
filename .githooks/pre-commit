@@ -1,8 +1,6 @@
 #!/bin/sh
-# Rebuilds the prebuilt assemblies under supporting/ when their source is in the
-# commit, and stages the result. Mirrors the "Prebuilt binaries" CI job.
-# Enabled by `git config core.hooksPath .githooks` (test/bin/init.ps1 does it on the
-# first run); skip one commit with `git commit --no-verify`.
+# Rebuilds the prebuilt assemblies under supporting/ when their source is in the commit, and stages the result.
+# Enabled by `git config core.hooksPath .githooks` (test/bin/init.ps1 does it); skip one commit with `git commit --no-verify`.
 set -e
 
 root=$(git rev-parse --show-toplevel)
@@ -18,6 +16,12 @@ projects=$(printf '%s\n' "$changed" | sed -E 's#^supporting/([^/]+)/.*#\1#' | so
 for project in $projects; do
     script="$root/supporting/$project/build.ps1"
     [ -f "$script" ] || continue
+    # The build reads the working tree, so unstaged edits would end up in the binary.
+    unstaged=$(git diff --name-only -- "supporting/$project" | grep -E '\.cs$|build\.ps1$' || true)
+    if [ -n "$unstaged" ]; then
+        echo "pre-commit: supporting/$project has unstaged source changes; stage them or use --no-verify" >&2
+        exit 1
+    fi
     # Without the packages the build would need the network; leave that to CI.
     if [ ! -d "$root/supporting/$project/packages" ]; then
         echo "pre-commit: supporting/$project has no packages/ yet, run its build.ps1 once first" >&2

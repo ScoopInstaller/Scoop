@@ -20,9 +20,8 @@ if (Get-InstalledModule -Name BuildHelpers -MinimumVersion 2.0 -ErrorAction Sile
     Install-Module -Repository PSGallery -Scope CurrentUser -Force -Name BuildHelpers -SkipPublisherCheck
 }
 
-# Hooks live in the repository so they can be reviewed, but Git will not run them
-# until core.hooksPath points at them. .githooks/pre-commit rebuilds the assemblies
-# under supporting/ that the commit itself changes.
+# Git runs the hooks in .githooks only once core.hooksPath points at them.
+# .githooks/pre-commit rebuilds the assemblies under supporting/ that the commit changes.
 if ((Test-Path "$PSScriptRoot\..\..\.githooks") -and (Test-Path "$PSScriptRoot\..\..\.git")) {
     if (-not (git config --get core.hooksPath)) {
         git config core.hooksPath .githooks
