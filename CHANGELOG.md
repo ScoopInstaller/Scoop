@@ -11,7 +11,7 @@
 ### Code Refactoring
 
 - **shim:** Give the shim functions their own file and PowerShell names ([#6789](https://github.com/ScoopInstaller/Scoop/issues/6789))
-- **scoop-update:** Move `update` function to `update.ps1` ([#6737](https://github.com/ScoopInstaller/Scoop/issues/6737))
+- **scoop-update:** Move update-related functions to `update.ps1` ([#6737](https://github.com/ScoopInstaller/Scoop/issues/6737))
 
 ### Continuous Integration
 

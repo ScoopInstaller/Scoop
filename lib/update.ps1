@@ -1,4 +1,215 @@
-function update($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
+function Sync-Scoop {
+    [CmdletBinding()]
+    Param (
+        [Switch]$Log
+    )
+    # Test if Scoop Core is hold
+    if (Test-ScoopCoreOnHold) {
+        return
+    }
+
+    # check for git
+    if (!(Test-GitAvailable)) { abort "Scoop uses Git to update itself. Run 'scoop install git' and try again." }
+
+    # Find current update repository from config
+    $configRepo = get_config SCOOP_REPO
+    if (!$configRepo) {
+        $configRepo = 'https://github.com/ScoopInstaller/Scoop'
+        set_config SCOOP_REPO $configRepo | Out-Null
+    }
+
+    # Find current update branch from config
+    $configBranch = get_config SCOOP_BRANCH
+    if (!$configBranch) {
+        $configBranch = 'master'
+        set_config SCOOP_BRANCH $configBranch | Out-Null
+    }
+
+    Write-Host 'Updating Scoop...'
+    $currentdir = versiondir 'scoop' 'current'
+    if (!(Test-Path "$currentdir\.git")) {
+        $newdir = "$currentdir\..\new"
+        $olddir = "$currentdir\..\old"
+
+        # get git scoop
+        Invoke-Git -ArgumentList @('clone', '-q', $configRepo, '--branch', $configBranch, '--single-branch', $newdir)
+
+        # check if scoop was successful downloaded
+        if (!(Test-Path "$newdir\bin\scoop.ps1")) {
+            Remove-Item $newdir -Force -Recurse
+            abort "Scoop download failed. If this appears several times, try removing SCOOP_REPO by 'scoop config rm SCOOP_REPO'"
+        } else {
+            # replace non-git scoop with the git version
+            try {
+                Rename-Item $currentdir 'old' -ErrorAction Stop
+                Rename-Item $newdir 'current' -ErrorAction Stop
+            } catch {
+                Write-Warning $_
+                abort "Scoop update failed. Folder in use. Please rename folders $currentdir to ``old`` and $newdir to ``current``."
+            }
+        }
+    } else {
+        if (Test-Path "$currentdir\..\old") {
+            Remove-Item "$currentdir\..\old" -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
+        $previousCommit = Invoke-Git -Path $currentdir -ArgumentList @('rev-parse', 'HEAD')
+        $currentRepo = Invoke-Git -Path $currentdir -ArgumentList @('config', 'remote.origin.url')
+        $currentBranch = Invoke-Git -Path $currentdir -ArgumentList @('branch')
+
+        $isRepoChanged = !($currentRepo -match $configRepo)
+        $isBranchChanged = !($currentBranch -match "\*\s+$configBranch")
+
+        # Stash uncommitted changes
+        if (Invoke-Git -Path $currentdir -ArgumentList @('diff', 'HEAD', '--name-only')) {
+            if (get_config AUTOSTASH_ON_CONFLICT) {
+                warn 'Uncommitted changes detected. Stashing...'
+                Invoke-Git -Path $currentdir -ArgumentList @('stash', 'push', '-m', "WIP at $([System.DateTime]::Now.ToString('o'))", '-u', '-q')
+            } else {
+                warn 'Uncommitted changes detected. Update aborted.'
+                return
+            }
+        }
+
+        # Change remote url if the repo is changed
+        if ($isRepoChanged) {
+            Invoke-Git -Path $currentdir -ArgumentList @('config', 'remote.origin.url', $configRepo)
+        }
+
+        # Fetch and reset local repo if the repo or the branch is changed
+        if ($isRepoChanged -or $isBranchChanged) {
+            # Reset git fetch refs, so that it can fetch all branches (GH-3368)
+            Invoke-Git -Path $currentdir -ArgumentList @('config', 'remote.origin.fetch', '+refs/heads/*:refs/remotes/origin/*')
+            # fetch remote branch
+            Invoke-Git -Path $currentdir -ArgumentList @('fetch', '--force', 'origin', "refs/heads/$configBranch`:refs/remotes/origin/$configBranch", '-q')
+            # checkout and track the branch
+            Invoke-Git -Path $currentdir -ArgumentList @('checkout', '-B', $configBranch, '-t', "origin/$configBranch", '-q')
+            # reset branch HEAD
+            Invoke-Git -Path $currentdir -ArgumentList @('reset', '--hard', "origin/$configBranch", '-q')
+        } else {
+            Invoke-Git -Path $currentdir -ArgumentList @('pull', '--tags', '--force', '-q')
+        }
+
+        $res = $lastexitcode
+        if ($Log) {
+            Invoke-GitLog -Path $currentdir -CommitHash $previousCommit
+        }
+
+        if ($res -ne 0) {
+            abort 'Update failed.'
+        }
+    }
+
+    New-Shim "$currentdir\bin\scoop.ps1" $false
+}
+
+function Sync-Bucket {
+    Param (
+        [Switch]$Log
+    )
+    Write-Host 'Updating Buckets...'
+
+    if (!(Test-Path (Join-Path (Find-BucketDirectory 'main' -Root) '.git'))) {
+        info "Converting 'main' bucket to git repo..."
+        $status = rm_bucket 'main'
+        if ($status -ne 0) {
+            abort "Failed to remove local 'main' bucket."
+        }
+        $status = add_bucket 'main' (known_bucket_repo 'main')
+        if ($status -ne 0) {
+            abort "Failed to add remote 'main' bucket."
+        }
+    }
+
+
+    $buckets = Get-LocalBucket | ForEach-Object {
+        $path = Find-BucketDirectory $_ -Root
+        return @{
+            name  = $_
+            valid = Test-Path (Join-Path $path '.git')
+            path  = $path
+        }
+    }
+
+    $buckets | Where-Object { !$_.valid } | ForEach-Object { Write-Host "'$($_.name)' is not a git repository. Skipped." }
+
+    $updatedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
+    $removedFiles = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        # Parallel parameter is available since PowerShell 7
+        $buckets | Where-Object { $_.valid } | ForEach-Object -ThrottleLimit 5 -Parallel {
+            . "$using:PSScriptRoot\core.ps1"
+            . "$using:PSScriptRoot\buckets.ps1"
+
+            $name = $_.name
+            $bucketLoc = $_.path
+            $innerBucketLoc = Find-BucketDirectory $name
+
+            $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
+            Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
+            if ($using:Log) {
+                Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
+            }
+            if (get_config USE_SQLITE_CACHE) {
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
+                    $status, $file = $_ -split '\s+', 2
+                    $filePath = Join-Path $bucketLoc $file
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                        switch ($status) {
+                            { $_ -in 'A', 'M', 'R' } {
+                                [void]($using:updatedFiles).Add($filePath)
+                            }
+                            'D' {
+                                [void]($using:removedFiles).Add([pscustomobject]@{
+                                        Name   = ([System.IO.FileInfo]$file).BaseName
+                                        Bucket = $name
+                                    })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        $buckets | Where-Object { $_.valid } | ForEach-Object {
+            $name = $_.name
+            $bucketLoc = $_.path
+            $innerBucketLoc = Find-BucketDirectory $name
+
+            $previousCommit = Invoke-Git -Path $bucketLoc -ArgumentList @('rev-parse', 'HEAD')
+            Invoke-Git -Path $bucketLoc -ArgumentList @('pull', '-q')
+            if ($Log) {
+                Invoke-GitLog -Path $bucketLoc -Name $name -CommitHash $previousCommit
+            }
+            if (get_config USE_SQLITE_CACHE) {
+                Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
+                    $status, $file = $_ -split '\s+', 2
+                    $filePath = Join-Path $bucketLoc $file
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                        switch ($status) {
+                            { $_ -in 'A', 'M', 'R' } {
+                                [void]($updatedFiles).Add($filePath)
+                            }
+                            'D' {
+                                [void]($removedFiles).Add([pscustomobject]@{
+                                        Name   = ([System.IO.FileInfo]$file).BaseName
+                                        Bucket = $name
+                                    })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if ((get_config USE_SQLITE_CACHE) -and ($updatedFiles.Count -gt 0 -or $removedFiles.Count -gt 0)) {
+        info 'Updating cache...'
+        Set-ScoopDB -Path $updatedFiles
+        $removedFiles | Remove-ScoopDBItem
+    }
+}
+
+function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
