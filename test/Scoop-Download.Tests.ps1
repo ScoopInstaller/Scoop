@@ -26,6 +26,35 @@ Describe 'Test-Aria2Enabled' -Tag 'Scoop' {
     }
 }
 
+Describe 'New-DownloadRequest Accept header' -Tag 'Scoop' {
+    BeforeAll {
+        Mock Get-UserAgent { 'Scoop-Test' }
+        Mock Get-GitHubToken { 'fake-token' }
+        Mock get_config { }
+    }
+
+    It 'omits the Accept header for an Actions artifact zip so it is not rejected with 415' {
+        $req = New-DownloadRequest 'https://api.github.com/repos/example/example/actions/artifacts/11138249207/zip'
+        $req.Accept | Should-BeNull
+    }
+
+    It 'omits the Accept header for an artifact zip even when a filename-override fragment is appended' {
+        # Exercises the $reqUrl fragment-strip + Accept-check interaction (the original bug)
+        $req = New-DownloadRequest 'https://api.github.com/repos/example/example/actions/artifacts/11138249207/zip#/example.zip'
+        $req.Accept | Should-BeNull
+    }
+
+    It 'sets octet-stream Accept for a release asset so it returns the binary' {
+        $req = New-DownloadRequest 'https://api.github.com/repos/example/example/releases/assets/599854636'
+        $req.Accept | Should-Be 'application/octet-stream'
+    }
+
+    It 'sets octet-stream Accept for other api.github.com paths' {
+        $req = New-DownloadRequest 'https://api.github.com/repos/example/example/actions/artifacts/11138249207'
+        $req.Accept | Should-Be 'application/octet-stream'
+    }
+}
+
 Describe 'url_filename' -Tag 'Scoop' {
     It 'should extract the real filename from an url' {
         url_filename 'http://example.org/foo.txt' | Should-Be 'foo.txt'
