@@ -2,6 +2,8 @@
 * text eol=crlf
 *.yml text eol=lf
 *.yaml text eol=lf
+# shell hooks are executed by sh, which does not tolerate a CR before the newline
+.githooks/* text eol=lf
 *.exe -text
 *.zip -text
 *.dll -text
