@@ -127,7 +127,7 @@ foreach ($curr_app in $apps) {
             if($curr_check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
                 $cached = cache_path $app $version $url
-                $ok, $err = check_hash $cached $manifest_hash (show_app $app $bucket)
+                $ok, $err, $reason = check_hash $cached $manifest_hash (show_app $app $bucket)
 
                 if(!$ok) {
                     error $err
@@ -138,7 +138,7 @@ foreach ($curr_app in $apps) {
                     if ($url -like '*sourceforge.net*') {
                         warn 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    error (new_issue_msg $app $bucket "hash check failed")
+                    error (new_issue_msg $app $bucket $reason)
                     $dl_failure = $true
                     continue
                 }
