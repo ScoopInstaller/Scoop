@@ -313,7 +313,7 @@ function Get-ShimExe($Shim) {
         #region shim lanes that are no longer bundled
         $lanes = @{
             '71'      = 'scoop-shim-cpp'
-            'kiennq'  = 'scoop-shim-cpp'
+            'kiennq'  = 'scoop-shim-kiennq'
             'scoopcs' = 'scoop-shim-cs'
         }
         if ($lanes.ContainsKey($Shim)) {
