@@ -119,12 +119,36 @@ function Expand-7zipArchive {
             abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
     }
-    if (!$IsTar -and $ExtractDir) {
-        movedir "$DestinationPath\$ExtractDir" $DestinationPath | Out-Null
-        # Remove temporary directory if it is empty
-        $ExtractDirTopPath = [string] "$DestinationPath\$($ExtractDir -replace '[\\/].*')"
-        if ((Get-ChildItem -Path $ExtractDirTopPath -Force -ErrorAction Ignore).Count -eq 0) {
-            Remove-Item -Path $ExtractDirTopPath -Recurse -Force -ErrorAction Ignore
+    if (-not $IsTar -and $ExtractDir) {
+        # Assets
+        $ExtractDirPath = [string] [System.IO.Path]::GetFullPath(
+            [System.IO.Path]::Combine($DestinationPath, $ExtractDir)
+        )
+        $ExtractDirTopPath = [string] [System.IO.Path]::GetFullPath(
+            [System.IO.Path]::Combine(
+                $DestinationPath,
+                (
+                    $ExtractDir -split '[\\/]' |
+                        Where-Object -FilterScript {-not [string]::IsNullOrWhiteSpace($_)} |
+                        Select-Object -First 1
+                )
+            )
+        )
+        # Check if $ExtractDirPath contains a directory with the same name as $ExtractDirTopPath
+        $DeleteExtractDirTopPath = [bool](
+            ([System.IO.DirectoryInfo]($ExtractDirTopPath)).'Name' -notin [System.IO.Directory]::GetDirectories(
+                $ExtractDirPath
+            ).ForEach{
+                $_.Split(
+                    [System.IO.Path]::DirectorySeparatorChar
+                )[-1]
+            }
+        )
+        # Move content of $ExtractDir to destination
+        $null = movedir -from $ExtractDirPath -to $DestinationPath
+        # Remove leftovers after movedir
+        if ($DeleteExtractDirTopPath) {
+            Remove-Item -Path $ExtractDirTopPath -Recurse -Force -ErrorAction 'Ignore'
         }
     }
     if (Test-Path $LogPath) {
