@@ -76,11 +76,10 @@
 #       Displays the manifest of every app that's about to
 #       be installed, then asks user if they wish to proceed.
 #
-# shim: builtin|<package>
-#       Choose the shim template used for installed apps. Either 'builtin', or the
-#       name of an installed package shipping a shim.exe, for example
+# shim: <package>
+#       Use the shim template from an installed package, for example
 #       scoop-shim-cs, scoop-shim-cpp, scoop-shim-zig or scoop-shim-rust.
-#       If not specified, the template shipped with Scoop is used.
+#       Leave it unset to use the template bundled with Scoop.
 #
 # shim_auto_refresh: $true|$false
 #       Whether to auto refresh all existing shims for installed apps

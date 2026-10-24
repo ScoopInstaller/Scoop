@@ -286,15 +286,15 @@ function Get-ShimTemplate {
     .SYNOPSIS
         Get the resolved path to the shim.exe template
     .PARAMETER Source
-        The source of the template: 'builtin' for the one shipped with Scoop,
-        or the name of an installed package that ships a shim.exe
+        A package name, or empty for the template shipped with Scoop.
+        Omitted means the 'shim' setting decides.
     #>
     param(
         [AllowEmptyString()]
         [string] $Source
     )
     # omitted falls back to the setting
-    if (!$PSBoundParameters.ContainsKey('Source')) { $Source = get_config SHIM 'builtin' }
+    if (!$PSBoundParameters.ContainsKey('Source')) { $Source = get_config SHIM }
     $system = Get-SystemArchitecture
     $architecture = switch ($system) {
         'arm64' { 'arm64' }
@@ -303,7 +303,7 @@ function Get-ShimTemplate {
         default { abort "Cannot tell which shim architecture to use (system reports '$system')." }
     }
     $builtin = "$PSScriptRoot\..\supporting\shims\$architecture\shim.exe"
-    if ($Source -ne 'builtin') {
+    if ($Source) {
         foreach ($scope in $false, $true) {
             $template = "$(currentdir $Source $scope)\shim.exe"
             if (Test-Path -LiteralPath $template -PathType Leaf) {

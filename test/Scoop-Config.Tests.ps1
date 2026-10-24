@@ -46,7 +46,7 @@ Describe 'config' -Tag 'Scoop' {
         }
 
         It 'refreshes with the value being set, not the one still on disk' {
-            Mock get_config { 'builtin' } -ParameterFilter { $Name -eq 'SHIM' }
+            Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
             Mock get_config { $true } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
 
             Complete-ConfigChange -Name shim -Value $null 6>$null

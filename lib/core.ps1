@@ -165,10 +165,9 @@ function Complete-ConfigChange {
     }
 
     if ($Name -eq 'shim') {
-        $shim = if ($Value) { $Value } else { 'builtin' }
         if (get_config SHIM_AUTO_REFRESH $true) {
             . "$PSScriptRoot\..\lib\shim.ps1"
-            Update-ShimInstance (Get-ShimTemplate $shim)
+            Update-ShimInstance (Get-ShimTemplate $Value)
         } else {
             info "Run 'scoop shim update' to apply the new shim."
         }

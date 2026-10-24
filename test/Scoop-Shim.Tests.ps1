@@ -16,7 +16,7 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         # pin the switch input and the install root, so the machine's config cannot decide the verdict
         $repo_root = Join-Path $PSScriptRoot '..'
-        Mock get_config { 'builtin' } -ParameterFilter { $Name -eq 'SHIM' }
+        Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
         Mock versiondir { $repo_root } -ParameterFilter { $app -eq 'scoop' -and $version -eq 'current' }
     }
 
@@ -165,7 +165,7 @@ Describe 'Get-ShimTemplate' -Tag 'Scoop', 'Windows' {
     }
 
     BeforeEach {
-        Mock get_config { 'builtin' } -ParameterFilter { $Name -eq 'SHIM' }
+        Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
     }
 
     It 'returns the template matching the machine architecture' {
@@ -219,7 +219,7 @@ Describe 'Get-ShimTemplate' -Tag 'Scoop', 'Windows' {
 
 Describe 'Update-ShimInstance' -Tag 'Scoop', 'Windows' {
     BeforeEach {
-        Mock get_config { 'builtin' } -ParameterFilter { $Name -eq 'SHIM' }
+        Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
         New-Shim "$env:SystemRoot\System32\cmd.exe" $false 'shim-test'
     }
 
