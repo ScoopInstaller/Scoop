@@ -75,7 +75,7 @@ $globalShimDir = shimdir $true
 
 switch ($SubCommand) {
     'update' {
-        Set-ShimCopy -Global $global -Names $other
+        Update-ShimInstance -Instance $other -Global $global
     }
     'add' {
         if ($other.Length -lt 2 -or $other[1] -eq '') {

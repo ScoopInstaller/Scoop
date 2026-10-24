@@ -76,16 +76,17 @@
 #       Displays the manifest of every app that's about to
 #       be installed, then asks user if they wish to proceed.
 #
-# shim: default|<package>
-#       Choose the shim build used for installed apps. Either 'default', or the
+# shim: builtin|<package>
+#       Choose the shim template used for installed apps. Either 'builtin', or the
 #       name of an installed package shipping a shim.exe, for example
 #       scoop-shim-cs, scoop-shim-cpp, scoop-shim-zig or scoop-shim-rust.
-#       If not specified, the shim bundled with Scoop is used.
+#       If not specified, the template shipped with Scoop is used.
 #
 # shim_auto_refresh: $true|$false
-#       Whether 'scoop config shim' also replaces the shim.exe of every shim.
-#       (Default is $true) Set it to $false to change the setting only, then
-#       run 'scoop shim update' yourself.
+#       Whether to auto refresh all existing shims for installed apps
+#       when the 'scoop config shim' setting changes, equivalent to
+#       a 'scoop shim update' call. Defaults to $true. Set to $false to
+#       disable auto refresh for manual updates.
 #
 # root_path: $Env:UserProfile\scoop
 #       Path to Scoop root directory.

@@ -165,11 +165,10 @@ function Complete-ConfigChange {
     }
 
     if ($Name -eq 'shim') {
-        # this runs before the new value is written, and an empty value means the setting is removed
-        $shim = if ($Value) { $Value } else { 'default' }
+        $shim = if ($Value) { $Value } else { 'builtin' }
         if (get_config SHIM_AUTO_REFRESH $true) {
             . "$PSScriptRoot\..\lib\shim.ps1"
-            Set-ShimCopy (Get-ShimExe $shim)
+            Update-ShimInstance (Get-ShimTemplate $shim)
         } else {
             info "Run 'scoop shim update' to apply the new shim."
         }

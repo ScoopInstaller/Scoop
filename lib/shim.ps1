@@ -1,4 +1,4 @@
-# Shim-related functions: creating, removing, and managing shims.
+# Description: Functions for creating, removing, and updating shims.
 
 function Get-PESubsystem($filePath) {
     try {
@@ -146,10 +146,8 @@ function New-Shim($Path, $Global, $Name, $Arg) {
     if ($Path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
         Rename-ShimOnConflict "$shim.shim" $Path
-        Copy-Item -LiteralPath (Get-ShimExe) "$shim.exe" -Force
+        Copy-Item -LiteralPath (Get-ShimTemplate) "$shim.exe" -Force
 
-        # the stored path is the one the manifest named, so naming SysWOW64 over System32
-        # is what selects a 32-bit program - translating it here would lose that choice
         Write-Output "path = `"$resolved_path`"" | Out-UTF8File "$shim.shim"
         if ($Arg) {
             Write-Output "args = $Arg" | Out-UTF8File "$shim.shim" -Append
@@ -283,30 +281,39 @@ function New-Shim($Path, $Global, $Name, $Arg) {
     }
 }
 
-function Get-ShimExe($Shim) {
-    if (!$Shim) { $Shim = get_config SHIM 'default' }
+function Get-ShimTemplate {
+    <#
+    .SYNOPSIS
+        Get the resolved path to the shim.exe template
+    .PARAMETER Source
+        The source of the template: 'builtin' for the one shipped with Scoop,
+        or the name of an installed package that ships a shim.exe
+    #>
+    param(
+        [AllowEmptyString()]
+        [string] $Source
+    )
+    # omitted falls back to the setting
+    if (!$PSBoundParameters.ContainsKey('Source')) { $Source = get_config SHIM 'builtin' }
     $system = Get-SystemArchitecture
-    # exactly three architectures are vendored, and guessing one would silently produce a broken shim
     $architecture = switch ($system) {
         'arm64' { 'arm64' }
         '64bit' { 'x64' }
         '32bit' { 'x86' }
         default { abort "Cannot tell which shim architecture to use (system reports '$system')." }
     }
-    # this file lives in <root>\lib, so the bundled bodies are relative to the code, not to the install
-    $bundled = "$PSScriptRoot\..\supporting\shims\$architecture\shim.exe"
-    if ($Shim -ne 'default') {
-        # a shim package provides its body as shim.exe next to the app it shims, local or global
+    $builtin = "$PSScriptRoot\..\supporting\shims\$architecture\shim.exe"
+    if ($Source -ne 'builtin') {
         foreach ($scope in $false, $true) {
-            $exe = "$(currentdir $Shim $scope)\shim.exe"
-            if (Test-Path -LiteralPath $exe -PathType Leaf) {
-                # a body for another architecture cannot reach System32 from 32-bit code, so it is unusable here
-                if ((Get-PEMachine $exe) -eq (Get-PEMachine $bundled)) { return $exe }
-                warn "'$Shim' provides a shim for another architecture - using the bundled one."
-                return $bundled
+            $template = "$(currentdir $Source $scope)\shim.exe"
+            if (Test-Path -LiteralPath $template -PathType Leaf) {
+                # shim package must provide a template for the correct architecture
+                if ((Get-PEMachine $template) -eq (Get-PEMachine $builtin)) { return $template }
+                warn "'$Source' provides a shim for another architecture - using the builtin one."
+                return $builtin
             }
         }
-        warn "'$Shim' does not provide a shim - falling back to the bundled one."
+        warn "'$Source' does not provide a shim - falling back to the builtin one."
         # TODO: delete this region together with the supporting\shims\<lane>\ directories,
         # whose .to_be_removed marker says the same. 'shim' used to name one of the three
         # lanes bundled in the tree, and those lanes ship as packages now.
@@ -316,38 +323,56 @@ function Get-ShimExe($Shim) {
             'kiennq'  = 'scoop-shim-kiennq'
             'scoopcs' = 'scoop-shim-cs'
         }
-        if ($lanes.ContainsKey($Shim)) {
-            warn "You could use '$($lanes[$Shim])' instead; 'scoop install $($lanes[$Shim])', then 'scoop config shim $($lanes[$Shim])'."
+        if ($lanes.ContainsKey($Source)) {
+            warn "'$Source' is no longer a builtin shim source, you can restore it by installing and configuring to '$($lanes[$Source])':"
+            warn "    scoop install $($lanes[$Source])"
+            warn "    scoop config shim $($lanes[$Source])"
         }
         #endregion shim lanes that are no longer bundled
     }
-    $bundled
+    $builtin
 }
 
-function Set-ShimCopy($Exe, $Global, $Names) {
-    if (!$Exe) { $Exe = Get-ShimExe }
-    # no scope given means both, the way every refresh does it
+function Update-ShimInstance {
+    <#
+    .SYNOPSIS
+        Update shim instances to use the given template
+    .PARAMETER Template
+        The resolved path to the shim.exe template
+    .PARAMETER Instance
+        List of shim instances to update, all shims will be updated if undefined
+    .PARAMETER Global
+        Flag to manipulate shims of global installs
+    #>
+    param(
+        [string] $Template,
+        [string[]] $Instance,
+        [Nullable[bool]] $Global
+    )
+    if (!$Template) { $Template = Get-ShimTemplate }
     if ($null -eq $Global) {
-        Set-ShimCopy $Exe $false $Names
-        if (is_admin) { Set-ShimCopy $Exe $true $Names }
+        Update-ShimInstance $Template $Instance $false
+        if (is_admin) { Update-ShimInstance $Template $Instance $true }
         return
     }
     $shimDir = shimdir $Global
-    if (!(Test-Path -LiteralPath $Exe) -or !(Test-Path -LiteralPath $shimDir)) { return }
+    if (!(Test-Path -LiteralPath $Template) -or !(Test-Path -LiteralPath $shimDir)) { return }
     if ($Global -and !(is_admin)) { abort 'you need admin rights to update global shims' }
 
     $shims = Get-ChildItem -LiteralPath $shimDir -Filter '*.shim' -ErrorAction SilentlyContinue
-    if ($Names) {
-        $shims = $shims | Where-Object { $_.BaseName -in $Names }
+    if ($Instance) {
+        $shims = $shims | Where-Object { $_.BaseName -in $Instance }
     }
 
     $scope = if ($Global) { ' (global)' } else { '' }
-    Write-Host "Updating shim(s)$scope$(if ($Names) { " for $($Names -join ', ')" })... " -NoNewline
+    Write-Host "Updating shim(s)$scope$(if ($Instance) { " for $($Instance -join ', ')" })... " -NoNewline
 
-    # only System32 was ever rewritten to Sysnative, and nothing writes it any more, so
-    # that is the only way back for a shim made before the rewrite was dropped
+    # System32 was once stored as Sysnative; nothing writes it any more, so a stored one is stale
     $sysnative = [System.IO.Path]::Combine($env:SystemRoot, 'Sysnative')
-    $migrate = ![System.Environment]::Is64BitOperatingSystem -or (Get-PEMachine $Exe) -ne 0x014c
+    $migrate = [System.Environment]::Is64BitOperatingSystem
+
+    Get-ChildItem -LiteralPath $shimDir -Filter '*.oldshim' -File -ErrorAction SilentlyContinue |
+        Remove-Item -Force -ErrorAction SilentlyContinue
 
     $skipped = @()
     $shims | ForEach-Object {
@@ -356,12 +381,21 @@ function Set-ShimCopy($Exe, $Global, $Names) {
         if (!(Test-Path -LiteralPath $dest)) { return }
         $oldSubsystem = Get-PESubsystem $dest
         try {
-            Copy-Item -LiteralPath $Exe -Destination $dest -Force -ErrorAction Stop
+            Copy-Item -LiteralPath $Template -Destination $dest -Force -ErrorAction Stop
         } catch {
-            $skipped += $name
-            return
+            $aside = "$name.exe.$([DateTime]::UtcNow.Ticks).oldshim"
+            try {
+                Rename-Item -LiteralPath $dest -NewName $aside -Force -ErrorAction Stop
+                Copy-Item -LiteralPath $Template -Destination $dest -ErrorAction Stop
+            } catch {
+                if (!(Test-Path -LiteralPath $dest) -and (Test-Path -LiteralPath "$shimDir\$aside")) {
+                    Rename-Item -LiteralPath "$shimDir\$aside" -NewName "$name.exe" -Force -ErrorAction SilentlyContinue
+                }
+                $skipped += $name
+                return
+            }
         }
-        # a saved description comes back when the app that took the name is removed, so it migrates too
+        # saved descriptions are restored later, so they migrate too
         if ($migrate) {
             $files = @(Get-Item -LiteralPath $_.FullName) + @(Get-ChildItem -LiteralPath $shimDir -Filter "$name.shim.*" -File -ErrorAction SilentlyContinue)
             foreach ($file in $files) {
@@ -375,9 +409,8 @@ function Set-ShimCopy($Exe, $Global, $Names) {
                 }
             }
         }
-        # the fresh copy lost the GUI flag the target needs
+        # the fresh copy lost the GUI flag; keep the old one when the target is unreadable
         $subsystem = Get-PESubsystem (Get-ShimTarget $_.FullName)
-        # an unreadable target means its drive is away, so keep the flag the old copy had
         if ($subsystem -lt 0) { $subsystem = $oldSubsystem }
         if ($subsystem -eq 2) {
             Set-PESubsystem $dest 2 | Out-Null
@@ -386,8 +419,8 @@ function Set-ShimCopy($Exe, $Global, $Names) {
 
     Write-Host 'Done.' -ForegroundColor Green
     if ($skipped) {
-        warn "Skipped $($skipped.Count) running shim(s): $($skipped -join ', ')"
-        warn "Run 'scoop shim update <shim(s)>' again once they have exited."
+        warn "Skipped $($skipped.Count) shim(s): $($skipped -join ', ')"
+        warn "Run 'scoop shim update <shim(s)>' again to retry."
     }
 }
 

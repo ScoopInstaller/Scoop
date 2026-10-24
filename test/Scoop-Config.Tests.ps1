@@ -27,8 +27,8 @@ Describe 'config' -Tag 'Scoop' {
         BeforeEach {
             'clobbered' | Out-File "$scoopdir\shims\refresh-test.exe" -NoNewline
             'clobbered' | Out-File "$scoopdir\shims\refresh-test.shim" -NoNewline
-            Mock -CommandName get_config -MockWith { $false } -ParameterFilter { $Name -eq 'NO_JUNCTION' }
-            Mock -CommandName info
+            Mock get_config { $false } -ParameterFilter { $Name -eq 'NO_JUNCTION' }
+            Mock info {}
         }
 
         AfterEach {
@@ -37,7 +37,7 @@ Describe 'config' -Tag 'Scoop' {
         }
 
         It 'leaves the copies alone when shim_auto_refresh is off' {
-            Mock -CommandName get_config -MockWith { $false } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
+            Mock get_config { $false } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
 
             Complete-ConfigChange -Name shim -Value 'scoop-shim-cs'
 
@@ -46,12 +46,13 @@ Describe 'config' -Tag 'Scoop' {
         }
 
         It 'refreshes with the value being set, not the one still on disk' {
-            Mock -CommandName get_config -MockWith { $true } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
+            Mock get_config { 'builtin' } -ParameterFilter { $Name -eq 'SHIM' }
+            Mock get_config { $true } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
 
-            Complete-ConfigChange -Name shim -Value 'default' 6>$null
+            Complete-ConfigChange -Name shim -Value $null 6>$null
 
             (Get-FileHash -LiteralPath "$scoopdir\shims\refresh-test.exe").Hash |
-                Should-Be (Get-FileHash -LiteralPath (Get-ShimExe 'default')).Hash
+                Should-Be (Get-FileHash -LiteralPath (Get-ShimTemplate)).Hash
         }
     }
 
