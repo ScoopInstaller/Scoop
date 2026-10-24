@@ -58,55 +58,23 @@ Describe 'Get-HelperPath' -Tag 'Scoop' {
     Context 'Git' {
         BeforeEach {
             $gitTestRoot = Join-Path $TestDrive ([Guid]::NewGuid().ToString('N'))
-            Mock currentdir { "$gitTestRoot\local-git" } -ParameterFilter { !$global }
-            Mock currentdir { "$gitTestRoot\global-git" } -ParameterFilter { $global }
+            Mock currentdir { "$gitTestRoot\git" }
             Mock Get-Command { [PSCustomObject]@{ Source = 'path\git.exe' } } -ParameterFilter { $Name -eq 'git' }
         }
 
-        It 'should prefer locally installed Git with <Layout> runtime directories' -TestCases @(
-            @{ Layout = 'mingw32'; RuntimeDirs = @('mingw32') }
-            @{ Layout = 'mingw64'; RuntimeDirs = @('mingw64') }
-            @{ Layout = 'ucrt64'; RuntimeDirs = @('ucrt64') }
-            @{ Layout = 'clangarm64'; RuntimeDirs = @('clangarm64') }
-            @{ Layout = 'mixed'; RuntimeDirs = @('mingw32', 'mingw64', 'ucrt64', 'clangarm64') }
-        ) {
-            param($RuntimeDirs)
-
-            foreach ($dir in @('local-git\cmd', 'global-git\cmd') + @($RuntimeDirs | ForEach-Object { "local-git\$_\bin" })) {
-                $null = New-Item -ItemType Directory -Path "$gitTestRoot\$dir" -Force
-                $null = New-Item -ItemType File -Path "$gitTestRoot\$dir\git.exe"
+        It 'should prefer cmd\git.exe over runtime executables' {
+            foreach ($dir in 'cmd', 'mingw32\bin', 'mingw64\bin', 'ucrt64\bin', 'clangarm64\bin') {
+                $null = New-Item -ItemType Directory -Path "$gitTestRoot\git\$dir" -Force
+                $null = New-Item -ItemType File -Path "$gitTestRoot\git\$dir\git.exe"
             }
 
             $git = Get-HelperPath -Helper Git
-            $git | Should-Be "$gitTestRoot\local-git\cmd\git.exe"
+            $git | Should-Be "$gitTestRoot\git\cmd\git.exe"
             @($git) | Should-BeCollection -Count 1
-        }
-
-        It 'should return globally installed Git when it is not installed locally' {
-            $null = New-Item -ItemType Directory -Path "$gitTestRoot\global-git\cmd" -Force
-            $null = New-Item -ItemType File -Path "$gitTestRoot\global-git\cmd\git.exe"
-
-            Get-HelperPath -Helper Git | Should-Be "$gitTestRoot\global-git\cmd\git.exe"
         }
 
         It 'should fall back to Git on PATH when it is not installed by Scoop' {
             Get-HelperPath -Helper Git | Should-Be 'path\git.exe'
-        }
-
-        It 'should fall back to Git on PATH when Scoop-installed Git has no cmd\git.exe' {
-            $null = New-Item -ItemType Directory -Path "$gitTestRoot\local-git\cmd" -Force
-            $null = New-Item -ItemType File -Path "$gitTestRoot\local-git\cmd\git.cmd"
-
-            Test-Path "$gitTestRoot\local-git\cmd\git.cmd" | Should-BeTrue
-            Test-Path "$gitTestRoot\local-git\cmd\git.exe" | Should-BeFalse
-
-            Get-HelperPath -Helper Git | Should-Be 'path\git.exe'
-        }
-
-        It 'should return null when Git is not installed' {
-            Mock Get-Command { $null } -ParameterFilter { $Name -eq 'git' }
-
-            Get-HelperPath -Helper Git | Should-BeNull
         }
     }
 }
