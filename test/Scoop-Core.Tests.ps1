@@ -54,6 +54,29 @@ Describe 'Get-HelperPath' -Tag 'Scoop' {
         { Get-HelperPath -Helper } | Should-Throw
         { Get-HelperPath -Helper Wrong } | Should-Throw
     }
+
+    Context 'Git' {
+        BeforeEach {
+            $gitTestRoot = Join-Path $TestDrive ([Guid]::NewGuid().ToString('N'))
+            Mock currentdir { "$gitTestRoot\git" }
+            Mock Get-Command { [PSCustomObject]@{ Source = 'path\git.exe' } } -ParameterFilter { $Name -eq 'git' }
+        }
+
+        It 'should prefer cmd\git.exe over runtime executables' {
+            foreach ($dir in 'cmd', 'mingw32\bin', 'mingw64\bin', 'ucrt64\bin', 'clangarm64\bin') {
+                $null = New-Item -ItemType Directory -Path "$gitTestRoot\git\$dir" -Force
+                $null = New-Item -ItemType File -Path "$gitTestRoot\git\$dir\git.exe"
+            }
+
+            $git = Get-HelperPath -Helper Git
+            $git | Should-Be "$gitTestRoot\git\cmd\git.exe"
+            @($git) | Should-BeCollection -Count 1
+        }
+
+        It 'should fall back to Git on PATH when it is not installed by Scoop' {
+            Get-HelperPath -Helper Git | Should-Be 'path\git.exe'
+        }
+    }
 }
 
 
