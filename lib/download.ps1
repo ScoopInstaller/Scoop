@@ -86,8 +86,8 @@ function Start-Download ($url, $to, $cookies) {
     }
 }
 
-function Invoke-Download ($url, $to, $cookies, $progress) {
-    # download with filesize and progress indicator
+function New-DownloadRequest ($url, $cookies) {
+    # Build the request without issuing it, so the caller behavior is unit-testable without network I/O
     $reqUrl = ($url -split '#')[0]
     $wreq = [Net.WebRequest]::Create($reqUrl)
     if ($wreq -is [Net.HttpWebRequest]) {
@@ -96,7 +96,10 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
             $wreq.Referer = strip_filename $url
         }
         if ($url -match '^https://api\.github\.com/repos') {
-            $wreq.Accept = 'application/octet-stream'
+            # Release assets need octet-stream; the Actions artifact-zip endpoint rejects it (415), so omit it to redirect
+            if ($reqUrl -notmatch '/actions/artifacts/\d+/zip$') {
+                $wreq.Accept = 'application/octet-stream'
+            }
             $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
             $wreq.Headers['X-GitHub-Api-Version'] = '2022-11-28'
         }
@@ -110,6 +113,13 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
             }
         }
     }
+
+    return $wreq
+}
+
+function Invoke-Download ($url, $to, $cookies, $progress) {
+    # Download with filesize and progress indicator
+    $wreq = New-DownloadRequest $url $cookies
 
     try {
         $wres = $wreq.GetResponse()
@@ -554,7 +564,12 @@ function Get-Encoding($wc) {
 }
 
 function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
+    $arch = switch (Get-SystemArchitecture) {
+        'arm64' { 'ARM64; ' }
+        '64bit' { 'Win64; x64; ' }
+        default { '' }
+    }
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $arch$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
 }
 
 function setup_proxy() {

@@ -9,6 +9,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1"
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\download.ps1" # url_filename
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
@@ -77,7 +78,7 @@ if (!$apps) { exit 0 }
         }
 
         Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-        rm_shims $app $manifest $global $architecture
+        Remove-ShimFromManifest $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 
         # If a junction was used during install, that will have been used

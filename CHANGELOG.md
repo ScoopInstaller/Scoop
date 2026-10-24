@@ -1,12 +1,29 @@
 ## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
 
+### Bug Fixes
+
+- **scoop-checkup:** Skip Defender check when `Get-MpPreference` fails ([#6745](https://github.com/ScoopInstaller/Scoop/issues/6745))
+- **scoop-info:** Resolve the license identifier before URL and separator matching ([#6770](https://github.com/ScoopInstaller/Scoop/issues/6770))
+- **scoop-update:** Run missing uninstall steps and honor `--no-cache` ([#6750](https://github.com/ScoopInstaller/Scoop/issues/6750))
+- **auto-pr:** Add missing `core.ps1` dot source ([#6786](https://github.com/ScoopInstaller/Scoop/pull/6786))
+- **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
+- **core:** Resolve Git helper without hardcoded runtime paths ([#6795](https://github.com/ScoopInstaller/Scoop/issues/6795))
+- **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6763](https://github.com/ScoopInstaller/Scoop/issues/6763))
+- **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
+
+### Code Refactoring
+
+- **scoop-update:** Move update-related functions to `update.ps1` ([#6737](https://github.com/ScoopInstaller/Scoop/issues/6737))
+- **shim:** Give the shim functions their own file and PowerShell names ([#6789](https://github.com/ScoopInstaller/Scoop/issues/6789))
+
 ### Continuous Integration
 
 - **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))
 
-### Code Refactoring
+### Tests
 
-- **scoop-info:** Resolve the license identifier before URL and separator matching ([#6770](https://github.com/ScoopInstaller/Scoop/issues/6770))
+- **pester:** Update to Pester 6 ([#6779](https://github.com/ScoopInstaller/Scoop/issues/6779))
+- **static-analysis:** Add dot-source dependency and dead code checks ([#6787](https://github.com/ScoopInstaller/Scoop/issues/6787))
 
 ## [v0.6.0](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...v0.6.0) - 2026-09-30
 
