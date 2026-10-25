@@ -150,6 +150,6 @@ $failed = @{}
 $apps | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
 
 show_suggestions $suggested
-show_install_failures $failed
+$failed_count = show_failed_apps $failed
 
-exit [int]($failed.Count -gt 0)
+exit [int]($failed_count -gt 0)

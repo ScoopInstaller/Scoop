@@ -265,6 +265,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     #region Workaround for #2952
     if (test_running_process $app $global) {
         Write-Host 'Running process detected, skip updating.'
+        $failed[$app] = 'skipped: running process'
         return
     }
     #endregion Workaround for #2952

@@ -29,11 +29,11 @@ Describe 'install_app' -Tag 'Scoop' {
     }
 }
 
-Describe 'show_install_failures' -Tag 'Scoop' {
+Describe 'show_failed_apps' -Tag 'Scoop' {
     It 'should list the failed apps with their reason' {
         Mock error {}
 
-        show_install_failures @{ 'foo' = 'reason one'; 'bar' = 'reason two' } 'update'
+        show_failed_apps @{ 'foo' = 'reason one'; 'bar' = 'reason two' } 'update'
 
         Should-Invoke error -Times 1 -ParameterFilter { $msg -like '*foo (reason one)*' -and $msg -like '*bar (reason two)*' }
     }
@@ -41,9 +41,20 @@ Describe 'show_install_failures' -Tag 'Scoop' {
     It 'should stay silent when nothing failed' {
         Mock error {}
 
-        show_install_failures @{}
+        show_failed_apps @{}
 
         Should-Invoke error -Times 0
+    }
+
+    It 'should report skipped apps separately' {
+        Mock error {}
+        Mock info {}
+
+        $failed_count = show_failed_apps @{ 'foo' = 'skipped: running process'; 'bar' = 'reason' }
+
+        Should-Invoke error -Times 1 -ParameterFilter { $msg -like '*bar (reason)*' }
+        Should-Invoke info -Times 1 -ParameterFilter { $msg -like '*foo (running process)*' }
+        $failed_count | Should-Be 1
     }
 }
 

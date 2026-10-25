@@ -20,6 +20,7 @@ if ($err) { error "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
 $all = $opt.a -or $opt.all
+$failed = @{}
 
 if (!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
 
@@ -70,7 +71,9 @@ if ($apps -or $all) {
         }
     } else {
         $verbose = $true
-        $apps = Confirm-InstallationStatus $apps -Global:$global
+        $install_status = Confirm-InstallationStatus $apps -Global:$global
+        $apps = $install_status.installed
+        $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not installed in the requested scope' } | ForEach-Object { $failed[$_] = $install_status.failed[$_] }
     }
 
     # $apps is now a list of ($app, $global) tuples
@@ -85,4 +88,6 @@ if ($apps -or $all) {
     }
 }
 
-exit 0
+$failed_count = show_failed_apps $failed 'cleanup'
+
+exit [int]($failed_count -gt 0)

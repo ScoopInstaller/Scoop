@@ -342,10 +342,18 @@ function ensure_none_failed($apps) {
     }
 }
 
-function show_install_failures($failed, $action = 'install') {
-    if (!$failed -or $failed.Count -eq 0) { return }
-    $items = $failed.Keys | Sort-Object | ForEach-Object { "$_ ($($failed[$_]))" }
-    error "Failed to $action`: $($items -join ', ')"
+function show_failed_apps($failed, $action = 'install') {
+    if (!$failed -or $failed.Count -eq 0) { return 0 }
+    $errors = @($failed.Keys | Where-Object { $failed[$_] -notlike 'skipped:*' } | Sort-Object)
+    $skipped = @($failed.Keys | Where-Object { $failed[$_] -like 'skipped:*' } | Sort-Object)
+    if ($errors.Count -gt 0) {
+        error "Failed to $action`: $((@($errors | ForEach-Object { "$_ ($($failed[$_]))" })) -join ', ')"
+    }
+    if ($skipped.Count -gt 0) {
+        info "Skipped $action`: $((@($skipped | ForEach-Object { "$_ ($($failed[$_] -replace '^skipped: ', ''))" })) -join ', ')"
+    }
+    # skipped apps are reported but not counted as failures
+    return $errors.Count
 }
 
 function show_suggestions($suggested) {

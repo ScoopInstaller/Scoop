@@ -87,7 +87,9 @@ if (-not ($apps -or $all)) {
         }
     } else {
         if ($apps_param) {
-            $apps = Confirm-InstallationStatus $apps_param -Global:$global
+            $install_status = Confirm-InstallationStatus $apps_param -Global:$global
+            $apps = $install_status.installed
+            $install_status.failed.Keys | ForEach-Object { $failed[$_] = $install_status.failed[$_] }
         }
     }
     if ($apps) {
@@ -136,7 +138,7 @@ if (-not ($apps -or $all)) {
     $outdated | ForEach-Object { update_app @_ $force $quiet $independent $suggested $failed $use_cache $check_hash }
 
     show_suggestions $suggested
-    show_install_failures $failed 'update'
+    $failed_count = show_failed_apps $failed 'update'
 }
 
-exit [int]($failed.Count -gt 0)
+exit [int]($failed_count -gt 0)
