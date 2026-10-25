@@ -163,6 +163,15 @@ function Complete-ConfigChange {
         info 'Initializing SQLite cache in progress... This may take a while, please wait.'
         Set-ScoopDB
     }
+
+    if ($Name -eq 'shim') {
+        if (get_config SHIM_AUTO_REFRESH $true) {
+            . "$PSScriptRoot\..\lib\shim.ps1"
+            Update-ShimInstance (Get-ShimTemplate $Value)
+        } else {
+            info "Run 'scoop shim update' to apply the new shim."
+        }
+    }
 }
 
 function Invoke-Git {

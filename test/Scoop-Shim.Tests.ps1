@@ -4,19 +4,24 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\shim.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1" # 'arch_specific'
+
+    Mock shimdir { "$TestDrive\shims" }
+    Mock Add-Path {}
+    $working_dir = setup_working 'shim'
+    $shimdir = shimdir
+    ensure $shimdir
 }
 
 Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         # pin the switch input and the install root, so the machine's config cannot decide the verdict
         $repo_root = Join-Path $PSScriptRoot '..'
-        Mock -CommandName get_config -MockWith { 'scoopcs' } -ParameterFilter { $Name -eq 'SHIM' }
-        Mock -CommandName versiondir -MockWith { $repo_root } -ParameterFilter { $app -eq 'scoop' -and $version -eq 'current' }
+        Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
+        Mock versiondir { $repo_root } -ParameterFilter { $app -eq 'scoop' -and $version -eq 'current' }
     }
 
     It 'returns machine type for a valid PE file' {
-        $shim_path = Get-ShimExe
-        $shim_path | Should-BeLikeString '*\supporting\shims\scoopcs\shim.exe'
+        $shim_path = Get-ShimTemplate
         $machine = Get-PEMachine $shim_path
         # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
         # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
@@ -28,16 +33,12 @@ Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
     }
 
     It 'returns 0 for a non-PE file' {
-        $working_dir = setup_working 'shim'
         Get-PEMachine "$working_dir\shim-test.ps1" | Should-Be 0
     }
 }
 
 Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
-        $working_dir = setup_working 'shim'
-        $shimdir = shimdir
-        Add-Path $shimdir
         Mock appsdir { $working_dir }
     }
 
@@ -49,12 +50,12 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
         ensure "$working_dir/mockapp/current/"
         Write-Output '' | Out-File "$working_dir/mockapp/current/mockapp1.ps1"
         New-Shim "$working_dir/mockapp/current/mockapp1.ps1" $false 'shim-test1'
-        $shim_path1 = (Get-Command 'shim-test1.ps1').Path
+        $shim_path1 = "$shimdir\shim-test1.ps1"
         Get-AppNameFromShim "$shim_path1" | Should-Be 'mockapp'
         ensure "$working_dir/mockapp/1.0.0/"
         Write-Output '' | Out-File "$working_dir/mockapp/1.0.0/mockapp2.ps1"
         New-Shim "$working_dir/mockapp/1.0.0/mockapp2.ps1" $false 'shim-test2'
-        $shim_path2 = (Get-Command 'shim-test2.ps1').Path
+        $shim_path2 = "$shimdir\shim-test2.ps1"
         Get-AppNameFromShim "$shim_path2" | Should-Be 'mockapp'
     }
 
@@ -72,10 +73,10 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
     }
 
     AfterAll {
-        if (Get-Command 'shim-test1' -ErrorAction SilentlyContinue) {
+        if (Test-Path -LiteralPath "$shimdir\shim-test1.shim") {
             Remove-Shim 'shim-test1' $shimdir
         }
-        if (Get-Command 'shim-test2' -ErrorAction SilentlyContinue) {
+        if (Test-Path -LiteralPath "$shimdir\shim-test2.shim") {
             Remove-Shim 'shim-test2' $shimdir
         }
         Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
@@ -83,38 +84,52 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
     }
 }
 
+Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
+    It 'returns null for a shim file whose target is gone' {
+        $broken = "$working_dir\broken.cmd"
+        'echo hi' | Out-File $broken -Encoding ascii
+
+        Get-ShimTarget $broken | Should-BeNull
+    }
+
+    It 'reads the target stored in a shim whose name contains a wildcard character' {
+        $targetDir = Join-Path $TestDrive 'shim-target'
+        $null = [IO.Directory]::CreateDirectory($targetDir)
+        $targetFile = Join-Path $targetDir 'br[a]cket-target.exe'
+        [IO.File]::WriteAllText($targetFile, '')
+        $shimPath = Join-Path $targetDir 'br[a]cket.shim'
+        [IO.File]::WriteAllText($shimPath, "path = $targetFile")
+
+        Get-ShimTarget $shimPath | Should-Be $targetFile
+    }
+
+    It 'reads a target with non-ASCII characters from a shim file' {
+        # the description is UTF-8, and Windows PowerShell 5.1 reads it as ANSI without the encoding
+        $targetDir = Join-Path $TestDrive 'nonascii-target'
+        $null = [IO.Directory]::CreateDirectory($targetDir)
+        $target = Join-Path $targetDir ("br$([char]0x00E4)cket-target.exe")
+        [IO.File]::WriteAllText($target, '')
+        $shimPath = Join-Path $targetDir 'nonascii.shim'
+        [IO.File]::WriteAllText($shimPath, "path = `"$target`"", [Text.UTF8Encoding]::new($false))
+
+        Get-ShimTarget $shimPath | Should-Be $target
+    }
+}
+
 Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $working_dir = setup_working 'shim'
-        $shimdir = shimdir
-        Add-Path $shimdir
-    }
-
-    BeforeEach {
-        # abort exits the process, so it has to throw for the flow to stop
-        Mock -CommandName abort -MockWith { throw $msg }
-    }
-
     It "links a file onto the user's path" {
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
-
         New-Shim "$working_dir\shim-test.ps1" $false 'shim-test'
-        $null = & { Get-Command 'shim-test' -ea stop }
-        $null = & { Get-Command 'shim-test.ps1' -ea stop }
-        $null = & { Get-Command 'shim-test.cmd' -ea stop }
-        shim-test | Should-Be 'Hello, world!'
+
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains $shimdir }
+        Test-Path -LiteralPath "$shimdir\shim-test.ps1" | Should-BeTrue
+        Test-Path -LiteralPath "$shimdir\shim-test.cmd" | Should-BeTrue
+        & "$shimdir\shim-test.ps1" | Should-Be 'Hello, world!'
     }
 
     It 'shims a file with quote in path' {
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
-
         New-Shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
-        $null = & { Get-Command 'shim-test' -ea stop }
-        shim-test | Should-Be 'Hello, world!'
+
+        & "$shimdir\shim-test.ps1" | Should-Be 'Hello, world!'
     }
 
     It 'handles a shim name containing a wildcard character without raising an error' {
@@ -129,7 +144,13 @@ Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
     }
 
     It 'names the target it could not find' {
+        Mock abort { throw $msg }
         { New-Shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
+    }
+
+    It 'marks a shim for a GUI target, so it does not open a console window' {
+        New-Shim "$env:SystemRoot\System32\notepad.exe" $false 'shim-test'
+        Get-PESubsystem "$shimdir\shim-test.exe" | Should-Be 2
     }
 
     AfterEach {
@@ -137,37 +158,126 @@ Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
     }
 }
 
-Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
+Describe 'Get-ShimTemplate' -Tag 'Scoop', 'Windows' {
     BeforeAll {
-        $working_dir = setup_working 'shim'
-        $targetDir = Join-Path $TestDrive 'shim-target'
-        $null = [IO.Directory]::CreateDirectory($targetDir)
-        $targetFile = Join-Path $targetDir 'br[a]cket-target.exe'
-        [IO.File]::WriteAllText($targetFile, '')
+        Mock warn {}
+        Mock get_config { $false } -ParameterFilter { $Name -eq 'NO_JUNCTION' }
     }
 
-    It 'returns null for a shim file whose target is gone' {
-        $broken = "$working_dir\broken.cmd"
-        'echo hi' | Out-File $broken -Encoding ascii
-
-        Get-ShimTarget $broken | Should-BeNull
+    BeforeEach {
+        Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
     }
 
-    It 'reads the target stored in a shim whose name contains a wildcard character' {
-        $shimPath = Join-Path $targetDir 'br[a]cket.shim'
-        [IO.File]::WriteAllText($shimPath, "path = $targetFile")
-
-        Get-ShimTarget $shimPath | Should-Be $targetFile
+    It 'returns the template matching the machine architecture' {
+        $arch = switch (Get-SystemArchitecture) {
+            'arm64' { 'arm64' }
+            '64bit' { 'x64' }
+            '32bit' { 'x86' }
+        }
+        Get-ShimTemplate | Should-BeLikeString "*\supporting\shims\$arch\shim.exe"
     }
 
-    It 'reads a target with non-ASCII characters from a shim file' {
-        # the description is UTF-8, and Windows PowerShell 5.1 reads it as ANSI without the encoding
-        $target = Join-Path $targetDir ("br$([char]0x00E4)cket-target.exe")
-        [IO.File]::WriteAllText($target, '')
-        $shimPath = Join-Path $targetDir 'nonascii.shim'
-        [IO.File]::WriteAllText($shimPath, "path = `"$target`"", [Text.UTF8Encoding]::new($false))
+    It 'bundles a template for every architecture' {
+        'x64', 'x86', 'arm64' | ForEach-Object {
+            Test-Path -LiteralPath (Join-Path $PSScriptRoot "..\supporting\shims\$_\shim.exe") | Should-Be $true
+        }
+    }
 
-        Get-ShimTarget $shimPath | Should-Be $target
+    It 'warns when the source is not the bundled shim' {
+        Mock get_config { 'cs' } -ParameterFilter { $Name -eq 'SHIM' }
+        Get-ShimTemplate | Should-BeLikeString '*\supporting\shims\*\shim.exe'
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*'cs' is not installed*" }
+    }
+
+    It 'takes the template from an installed shim package' {
+        $pkgdir = Join-Path $TestDrive 'shim-pkg'
+        New-Item -ItemType Directory -Force -Path (Join-Path $pkgdir 'current') | Out-Null
+        Copy-Item -LiteralPath (Get-ShimTemplate) -Destination (Join-Path $pkgdir 'current\shim.exe')
+        Mock currentdir { Join-Path $pkgdir 'current' }
+
+        Get-ShimTemplate 'shim-pkg' | Should-Be (Join-Path $pkgdir 'current\shim.exe')
+        Should-Invoke -CommandName warn -Times 0
+    }
+
+    It 'ignores a package template built for another architecture' {
+        $arch = switch (Get-SystemArchitecture) {
+            'arm64' { 'arm64' }
+            '64bit' { 'x64' }
+            '32bit' { 'x86' }
+        }
+        $other = 'x64', 'x86', 'arm64' | Where-Object { $_ -ne $arch } | Select-Object -First 1
+        $pkgdir = Join-Path $TestDrive 'shim-pkg-other'
+        New-Item -ItemType Directory -Force -Path (Join-Path $pkgdir 'current') | Out-Null
+        Copy-Item -LiteralPath (Join-Path $PSScriptRoot "..\supporting\shims\$other\shim.exe") -Destination (Join-Path $pkgdir 'current\shim.exe')
+        Mock currentdir { Join-Path $pkgdir 'current' }
+
+        $bundled = Get-ShimTemplate
+        Get-ShimTemplate 'shim-pkg-other' | Should-Be $bundled
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*'shim-pkg-other' provides a shim for another architecture*" }
+    }
+}
+
+Describe 'Update-ShimInstance' -Tag 'Scoop', 'Windows' {
+    BeforeEach {
+        Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
+        New-Shim "$env:SystemRoot\System32\cmd.exe" $false 'shim-test'
+    }
+
+    It 'replaces only the exe of the shims it was given' {
+        Update-ShimInstance -Instance 'shim-test' -Global $false 6>$null
+        (Get-FileHash -LiteralPath "$shimdir\shim-test.exe").Hash | Should-Be (Get-FileHash -LiteralPath (Get-ShimTemplate)).Hash
+
+        'clobbered' | Out-File "$shimdir\shim-test.exe"
+        Update-ShimInstance -Instance 'not-installed' -Global $false 6>$null
+        Get-Content -LiteralPath "$shimdir\shim-test.exe" -Raw | Should-BeLikeString '*clobbered*'
+    }
+
+    It 'keeps the GUI flag when the target is gone' {
+        Copy-Item -LiteralPath "$env:SystemRoot\System32\notepad.exe" "$working_dir\gui-target.exe"
+        New-Shim "$working_dir\gui-target.exe" $false 'shim-test'
+        Get-PESubsystem "$shimdir\shim-test.exe" | Should-Be 2
+
+        Remove-Item -LiteralPath "$working_dir\gui-target.exe"
+
+        Update-ShimInstance -Instance 'shim-test' -Global $false 6>$null
+        Get-PESubsystem "$shimdir\shim-test.exe" | Should-Be 2
+    }
+
+    It 'migrates the Sysnative target of a saved shim' {
+        $saved = "$shimdir\shim-test.shim.old-app"
+        [IO.File]::WriteAllText($saved, "$env:SystemRoot\Sysnative\cmd.exe`r`n", (New-Object Text.UTF8Encoding($false)))
+        $stamp = (Get-Date '2020-01-02 03:04:05').ToUniversalTime()
+        [IO.File]::SetLastWriteTimeUtc($saved, $stamp)
+        try {
+            Update-ShimInstance -Instance 'shim-test' -Global $false 6>$null
+            (Get-Content -LiteralPath $saved -Encoding UTF8) | Select-Object -First 1 | Should-Be "$env:SystemRoot\System32\cmd.exe"
+            (Get-Item -LiteralPath $saved).LastWriteTimeUtc | Should-Be $stamp
+        } finally {
+            Remove-Item -LiteralPath $saved -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    It 'replaces a shim whose process is still running' {
+        New-Shim "$env:SystemRoot\System32\ping.exe" $false 'shim-test'
+        $process = Start-Process -FilePath "$shimdir\shim-test.exe" -ArgumentList '-n', '60', '127.0.0.1' -PassThru
+        try {
+            Start-Sleep -Milliseconds 500
+            $process.HasExited | Should-BeFalse
+
+            Update-ShimInstance -Instance 'shim-test' -Global $false 6>$null
+
+            Test-Path -LiteralPath "$shimdir\shim-test.exe" | Should-BeTrue
+            @(Get-ChildItem -LiteralPath $shimdir -Filter 'shim-test.exe.*.oldshim') | Should-BeCollection -Count 1
+        } finally {
+            if (-not $process.HasExited) { $process.Kill(); $process.WaitForExit() }
+        }
+
+        Update-ShimInstance -Instance 'shim-test' -Global $false 6>$null
+        @(Get-ChildItem -LiteralPath $shimdir -Filter 'shim-test.exe.*.oldshim') | Should-BeCollection -Count 0
+    }
+
+    AfterEach {
+        Remove-Shim 'shim-test' $shimdir
     }
 }
 
@@ -193,30 +303,6 @@ Describe 'Get-ShimDefinition' -Tag 'Scoop' {
 }
 
 Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
-
-    It 'shims a target whose name contains a wildcard character' {
-        Mock abort -MockWith { throw $msg }
-        # the body lookup follows the machine's config, so pin it to the bundled body
-        Mock Get-ShimExe { Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe' }
-        # the shims of the machine and its path stay untouched
-        $shimdir = Join-Path $TestDrive 'shims-wildcard'
-        Mock shimdir { $shimdir }
-        Mock Add-Path {}
-
-        $dir = Join-Path $TestDrive 'br[a]cket-shim'
-        $null = [IO.Directory]::CreateDirectory($dir)
-        [IO.File]::WriteAllText("$dir\br[a]cket.exe", 'not a real binary')
-
-        try {
-            New-ShimFromManifest @{ bin = 'br[a]cket.exe' } $dir $false $null
-
-            Test-Path -LiteralPath "$shimdir\br[a]cket.exe" | Should-Be $true
-        } finally {
-            Remove-Shim 'br[a]cket' $shimdir
-        }
-    }
-
-
     It 'removes a shim literally without touching a wildcard look-alike' {
         $shimdir = Join-Path $TestDrive 'shims'
         $null = [IO.Directory]::CreateDirectory($shimdir)
@@ -244,10 +330,8 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
         $aborted.Message | Should-Be "Can't shim 'scoop-nonexistent-command': File doesn't exist."
     }
 
-
     It 'resolves a bin target from $original_dir when it is not under $dir or on PATH' {
         Mock New-Shim {}
-        Mock abort -MockWith { throw $msg }
 
         $dir = Join-Path $TestDrive 'linked-install'
         $originalDir = Join-Path $TestDrive 'original-install'
@@ -263,7 +347,6 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
 
         Should-Invoke -CommandName New-Shim -Times 1 -ParameterFilter { $Path -eq "$originalDir\scoop-bare-target.exe" }
     }
-
 
     It 'narrows the PATH lookup to applications and external scripts' {
         Mock New-Shim {}
@@ -314,7 +397,6 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
 
     It 'resolves a bin target with wildcard characters from PATH to the literal file' {
         Mock New-Shim {}
-        Mock abort -MockWith { throw $msg }
 
         $pathDir = Join-Path $TestDrive 'literal-path'
         $null = [IO.Directory]::CreateDirectory($pathDir)
@@ -332,26 +414,30 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
 
         Should-Invoke -CommandName New-Shim -Times 1 -ParameterFilter { $Path -eq "$pathDir\br[a]cket.exe" }
     }
+}
 
+Describe 'New-ShimFromManifest' -Tag 'Scoop', 'Windows' {
+    It 'shims a target whose name contains a wildcard character' {
+        [IO.File]::WriteAllText("$working_dir\br[a]cket.exe", 'not a real binary')
+        New-ShimFromManifest @{ bin = @('br[a]cket.exe') } $working_dir $false '64bit'
+        Test-Path -LiteralPath "$shimdir\br[a]cket.exe" | Should-Be $true
+    }
 
+    AfterEach {
+        Remove-Shim 'br[a]cket' $shimdir
+    }
 }
 
 Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $working_dir = setup_working 'shim'
-        $shimdir = shimdir
-        Add-Path $shimdir
-    }
-
-    It 'removes shim from path' {
+    It 'removes every file of the shim' {
         New-Shim "$working_dir\shim-test.ps1" $false 'shim-test'
 
         Remove-Shim 'shim-test' $shimdir
 
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
+        Test-Path -LiteralPath "$shimdir\shim-test.shim" | Should-BeFalse
+        Test-Path -LiteralPath "$shimdir\shim-test.exe" | Should-BeFalse
+        Test-Path -LiteralPath "$shimdir\shim-test.ps1" | Should-BeFalse
+        Test-Path -LiteralPath "$shimdir\shim-test.cmd" | Should-BeFalse
     }
 
     It 'does not report an exe it never had' {
@@ -418,81 +504,37 @@ Describe 'Remove-Shim' -Tag 'Scoop', 'Windows' {
     }
 }
 
+
 # a scenario, not a function: New-Shim writes the path and Get-ShimTarget reads it back
-Describe 'WoW64 path rewriting' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $shimdir = shimdir
-        # CI checkouts have no installed scoop version dir, so point at the bundled shim.exe
-        $repo_shim = Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe'
-        Mock -CommandName Get-ShimExe -MockWith { $repo_shim }
-    }
-
-    It 'rewrites System32 to Sysnative in the shim file when the shim exe is x86 on x64 OS' {
+Describe 'shim target paths' -Tag 'Scoop', 'Windows' {
+    It 'stores System32 as it was named' {
         $target = "$env:SystemRoot\System32\notepad.exe"
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (Get-ShimExe)) -eq 0x014c
 
-        New-Shim $target $false 'wow64-test'
+        New-Shim $target $false 'sysdir-test'
 
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        if ($rewrites) {
-            $line | Should-BeLikeString "*$env:SystemRoot\Sysnative\notepad.exe*"
-        } else {
-            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
-        }
-
-        # the 64-bit reader resolves the target back to the real System32 path either way
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
+        (Get-Content "$shimdir\sysdir-test.shim" | Select-Object -First 1) |
+            Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
     }
 
-    It 'does not rewrite paths outside System32 and SysWOW64' {
-        $target = "$env:SystemRoot\explorer.exe"
-
-        New-Shim $target $false 'wow64-test'
-
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        $line | Should-BeLikeString "*$target*"
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be $target
-    }
-
-    It 'rewrites SysWOW64 to System32 in the shim file when the shim exe is x86 on x64 OS' {
-        $wow = Join-Path ${env:SystemRoot} 'SysWOW64\notepad.exe'
-        if (-not (Test-Path $wow)) {
+    It 'stores SysWOW64 as it was named, so naming it selects the 32-bit program' {
+        $target = Join-Path $env:SystemRoot 'SysWOW64\notepad.exe'
+        if (-not (Test-Path $target)) {
             Set-ItResult -Skipped -Because 'SysWOW64 notepad not present'
         }
-        $target = $wow
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (Get-ShimExe)) -eq 0x014c
 
         New-Shim $target $false 'wow64-test'
 
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        if ($rewrites) {
-            # 64-bit reader sees the redirected (real) location via System32
-            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
-        } else {
-            $line | Should-BeLikeString "*$target*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
-        }
-    }
-
-    It 'does not fail on a shim file without a resolvable target' {
-        Write-Output 'echo hi' | Out-File "$shimdir\broken.cmd" -Encoding ascii
-        & { Get-ShimTarget "$shimdir\broken.cmd" }
-        Get-ShimTarget "$shimdir\broken.cmd" | Should-BeNull
-
-        Remove-Item "$shimdir\broken.cmd" -Force
+        (Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1) |
+            Should-BeLikeString "*$env:SystemRoot\SysWOW64\notepad.exe*"
     }
 
     AfterEach {
+        Remove-Shim 'sysdir-test' $shimdir
         Remove-Shim 'wow64-test' $shimdir
     }
 }
 
 Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $working_dir = setup_working 'shim'
-    }
-
     It 'marks a shim hidden when nothing resolves its name' {
         # the command is gone when an app was uninstalled without its shim; that must not throw
         $shimPath = "$working_dir\gone.shim"
@@ -510,4 +552,3 @@ Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
         (Get-ShimInfo $shimPath).Alternatives | Should-Be 'External bar'
     }
 }
-

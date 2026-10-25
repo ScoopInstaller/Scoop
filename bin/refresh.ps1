@@ -16,5 +16,6 @@ $output | Where-Object { $_ -ne "" }
 
 Write-Output 'creating shim...'
 New-Shim "$dest\bin\scoop.ps1" $false
+Update-ShimInstance
 
 success 'scoop was refreshed!'

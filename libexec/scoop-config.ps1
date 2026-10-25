@@ -76,8 +76,16 @@
 #       Displays the manifest of every app that's about to
 #       be installed, then asks user if they wish to proceed.
 #
-# shim: kiennq|scoopcs|71
-#       Choose scoop shim build.
+# shim: <package>
+#       Use the shim template from an installed package, for example
+#       scoop-shim-cs, scoop-shim-cpp, scoop-shim-zig or scoop-shim-rust.
+#       Leave it unset to use the template bundled with Scoop.
+#
+# shim_auto_refresh: $true|$false
+#       Whether to auto refresh all existing shims for installed apps
+#       when the 'scoop config shim' setting changes, equivalent to
+#       a 'scoop shim update' call. Defaults to $true. Set to $false to
+#       disable auto refresh for manual updates.
 #
 # root_path: $Env:UserProfile\scoop
 #       Path to Scoop root directory.
