@@ -14,7 +14,9 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
 
     # download first
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+        if (!(Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash)) {
+            return $null
+        }
     } else {
         foreach ($url in $urls) {
             $fname = url_filename $url
@@ -24,7 +26,8 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
             } catch {
                 Write-Host -ForegroundColor DarkRed $_
                 error "URL $url is not valid"
-                abort $(new_issue_msg $app $bucket 'download failed')
+                error $(new_issue_msg $app $bucket 'download failed')
+                return $null
             }
 
             if ($check_hash) {
@@ -40,7 +43,8 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    abort $(new_issue_msg $app $bucket 'hash check failed')
+                    error $(new_issue_msg $app $bucket 'hash check failed')
+                    return $null
                 }
             }
         }
@@ -470,7 +474,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
                 error $urlstxtDiag
                 error $aria2Diag
-                abort $(new_issue_msg $app $bucket 'download via aria2 failed')
+                error $(new_issue_msg $app $bucket 'download via aria2 failed')
+                return $false
             }
 
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
@@ -486,7 +491,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             } catch {
                 Write-Host $_ -ForegroundColor DarkRed
                 error "URL $url is not valid"
-                abort $(new_issue_msg $app $bucket 'download failed')
+                error $(new_issue_msg $app $bucket 'download failed')
+                return $false
             }
         }
 
@@ -522,13 +528,15 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 if ($url.Contains('sourceforge.net')) {
                     Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
-                abort $(new_issue_msg $app $bucket 'hash check failed')
+                error $(new_issue_msg $app $bucket 'hash check failed')
+                return $false
             }
         }
 
         # copy or move file to target location
         if (!(Test-Path $data.$url.source) ) {
-            abort $(new_issue_msg $app $bucket 'cached file not found')
+            error $(new_issue_msg $app $bucket 'cached file not found')
+            return $false
         }
 
         if (!($dir -eq $cachedir)) {
@@ -539,6 +547,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             }
         }
     }
+    return $true
 }
 
 ## Helper functions

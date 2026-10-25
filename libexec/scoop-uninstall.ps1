@@ -79,7 +79,10 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
             continue
         }
 
-        Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
+        if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+            $failed[$app] = 'uninstaller failed'
+            continue
+        }
         Remove-ShimFromManifest $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 

@@ -275,7 +275,10 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     # Remove and replace whole region after proper fix
     Write-Host 'Downloading new version'
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $check_hash
+        if (!(Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $check_hash)) {
+            $failed[$app] = 'download failed'
+            return
+        }
     } else {
         $urls = script:url $manifest $architecture
 
@@ -296,7 +299,9 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    abort $(new_issue_msg $app $bucket 'hash check failed')
+                    error $(new_issue_msg $app $bucket 'hash check failed')
+                    $failed[$app] = 'hash check failed'
+                    return
                 }
             }
         }
@@ -311,7 +316,10 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
     Write-Host "Uninstalling '$app' ($old_version)"
-    Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
+    if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+        $failed[$app] = 'uninstaller failed'
+        return
+    }
     Remove-ShimFromManifest $app $old_manifest $global $architecture
     rm_startmenu_shortcuts $old_manifest $global $architecture
 

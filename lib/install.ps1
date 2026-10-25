@@ -9,13 +9,21 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if (!$manifest) {
-        abort "Couldn't find manifest for '$app'$(if ($bucket) { " from '$bucket' bucket" } elseif ($url) { " at '$url'" })."
+        error "Couldn't find manifest for '$app'$(if ($bucket) { " from '$bucket' bucket" } elseif ($url) { " at '$url'" })."
+        $failed[$app] = 'no manifest'
+        return
     }
 
     $version = $manifest.version
-    if (!$version) { abort "Manifest doesn't specify a version." }
+    if (!$version) {
+        error "Manifest doesn't specify a version."
+        $failed[$app] = 'invalid manifest'
+        return
+    }
     if ($version -match '[^\w\.\-\+_]') {
-        abort "Manifest version has unsupported character '$($matches[0])'."
+        error "Manifest version has unsupported character '$($matches[0])'."
+        $failed[$app] = 'invalid manifest'
+        return
     }
 
     $is_nightly = $version -eq 'nightly'
@@ -51,10 +59,17 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
     $persist_dir = persistdir $app $global
 
     $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    if ($null -eq $fname) {
+        $failed[$app] = 'download failed'
+        return
+    }
     Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
-    Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
+    if (!(Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global)) {
+        $failed[$app] = 'installer failed'
+        return
+    }
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     New-ShimFromManifest $manifest $dir $global $architecture
@@ -112,9 +127,11 @@ function Invoke-Installer {
         }
         $progName = "$Path\$(coalesce $installer.file $Name[0])"
         if (!(is_in_dir $Path $progName)) {
-            abort "Error in manifest: $((Get-Culture).TextInfo.ToTitleCase($type)) $progName is outside the app directory."
+            error "Error in manifest: $((Get-Culture).TextInfo.ToTitleCase($type)) $progName is outside the app directory."
+            return $false
         } elseif (!(Test-Path $progName)) {
-            abort "$((Get-Culture).TextInfo.ToTitleCase($type)) $progName is missing."
+            error "$((Get-Culture).TextInfo.ToTitleCase($type)) $progName is missing."
+            return $false
         }
         $substitutions = @{
             '$dir'     = $Path
@@ -128,10 +145,11 @@ function Invoke-Installer {
             $status = Invoke-ExternalCommand $progName -ArgumentList $fnArgs -Activity "Running $type ..."
             if (!$status) {
                 if ($Uninstall) {
-                    abort 'Uninstallation aborted.'
+                    error 'Uninstallation failed.'
                 } else {
-                    abort "Installation aborted. You might need to run 'scoop uninstall $AppName' before trying again."
+                    error "Installation failed. You might need to run 'scoop uninstall $AppName' before trying again."
                 }
+                return $false
             }
             # Don't remove installer if "keep" flag is set to true
             if (!$installer.keep) {
@@ -140,6 +158,7 @@ function Invoke-Installer {
         }
     }
     Invoke-HookScript -HookType $type -Manifest $Manifest -ProcessorArchitecture $ProcessorArchitecture
+    return $true
 }
 
 function Invoke-HookScript {
