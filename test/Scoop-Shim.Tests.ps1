@@ -186,7 +186,7 @@ Describe 'Get-ShimTemplate' -Tag 'Scoop', 'Windows' {
     It 'warns when the source is not the bundled shim' {
         Mock get_config { 'cs' } -ParameterFilter { $Name -eq 'SHIM' }
         Get-ShimTemplate | Should-BeLikeString '*\supporting\shims\*\shim.exe'
-        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*'cs' does not provide a shim*" }
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*'cs' is not installed*" }
     }
 
     It 'takes the template from an installed shim package' {

@@ -313,7 +313,13 @@ function Get-ShimTemplate {
                 return $builtin
             }
         }
-        warn "'$Source' does not provide a shim - falling back to the builtin one."
+        . "$PSScriptRoot\versions.ps1" # Select-CurrentVersion
+        . "$PSScriptRoot\manifest.ps1" # parse_json
+        if (installed $Source) {
+            warn "'$Source' is not a shim package - falling back to the builtin one."
+        } else {
+            warn "'$Source' is not installed - falling back to the builtin one."
+        }
         # TODO: delete this region together with the supporting\shims\<lane>\ directories,
         # whose .to_be_removed marker says the same. 'shim' used to name one of the three
         # lanes bundled in the tree, and those lanes ship as packages now.
