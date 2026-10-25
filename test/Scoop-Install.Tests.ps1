@@ -13,6 +13,40 @@ Describe 'appname_from_url' -Tag 'Scoop' {
     }
 }
 
+Describe 'install_app' -Tag 'Scoop' {
+    It 'should report the failure without aborting the batch' {
+        Mock Get-Manifest { 'foo', [PSCustomObject]@{ version = '1.0' }, 'main', $null }
+        Mock Get-SupportedArchitecture { $null }
+        Mock error {}
+        $failed = @{}
+
+        install_app 'foo' '64bit' $false @{} $failed
+
+        Should-Invoke error -Times 1 -ParameterFilter { $msg -like "*doesn't support current architecture*" }
+        $failed.Keys | Should-BeCollection -Count 1
+        $failed.Keys[0] | Should-Be 'foo'
+        $failed['foo'] | Should-Be 'unsupported architecture'
+    }
+}
+
+Describe 'show_install_failures' -Tag 'Scoop' {
+    It 'should list the failed apps with their reason' {
+        Mock error {}
+
+        show_install_failures @{ 'foo' = 'reason one'; 'bar' = 'reason two' } 'update'
+
+        Should-Invoke error -Times 1 -ParameterFilter { $msg -like '*foo (reason one)*' -and $msg -like '*bar (reason two)*' }
+    }
+
+    It 'should stay silent when nothing failed' {
+        Mock error {}
+
+        show_install_failures @{}
+
+        Should-Invoke error -Times 0
+    }
+}
+
 Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         # test data

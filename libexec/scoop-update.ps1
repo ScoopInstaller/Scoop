@@ -48,6 +48,7 @@ if (($PSVersionTable.PSVersion.Major) -lt 5) {
     break
 }
 $show_update_log = get_config SHOW_UPDATE_LOG $true
+$failed = @{}
 
 if (-not ($apps -or $all)) {
     if ($global) {
@@ -132,9 +133,10 @@ if (-not ($apps -or $all)) {
 
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update_app @_ $force $quiet $independent $suggested $use_cache $check_hash }
+    $outdated | ForEach-Object { update_app @_ $force $quiet $independent $suggested $failed $use_cache $check_hash }
 
     show_suggestions $suggested
+    show_install_failures $failed 'update'
 }
 
-exit 0
+exit [int]($failed.Count -gt 0)

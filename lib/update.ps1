@@ -216,7 +216,7 @@ function Sync-Bucket {
     }
 }
 
-function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
+function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -256,6 +256,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     if (!$version) {
         # installed from a custom bucket/no longer supported
         error "No manifest available for '$app'."
+        $failed[$app] = 'no manifest available'
         return
     }
 
@@ -348,10 +349,10 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     if (-not $independent) {
         # Also add missing dependencies
         $apps = @(Get-Dependency $app $architecture) -ne $app
-        $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+        $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
     }
 
     # The new version has already been downloaded (and hash-checked) above,
     # so re-install it from the cache instead of downloading it a second time.
-    install_app $app $architecture $global $suggested $true $check_hash
+    install_app $app $architecture $global $suggested $failed $true $check_hash
 }

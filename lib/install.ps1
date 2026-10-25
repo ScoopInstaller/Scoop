@@ -5,7 +5,7 @@ function nightly_version($quiet = $false) {
     return "nightly-$(Get-Date -Format 'yyyyMMdd')"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
+function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if (!$manifest) {
@@ -27,6 +27,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $architecture = Get-SupportedArchitecture $manifest $architecture
     if ($null -eq $architecture) {
         error "'$app' doesn't support current architecture!"
+        $failed[$app] = 'unsupported architecture'
         return
     }
 
@@ -339,6 +340,12 @@ function ensure_none_failed($apps) {
             }
         }
     }
+}
+
+function show_install_failures($failed, $action = 'install') {
+    if (!$failed -or $failed.Count -eq 0) { return }
+    $items = $failed.Keys | Sort-Object | ForEach-Object { "$_ ($($failed[$_]))" }
+    error "Failed to $action`: $($items -join ', ')"
 }
 
 function show_suggestions($suggested) {
