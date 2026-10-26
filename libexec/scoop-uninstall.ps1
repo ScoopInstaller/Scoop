@@ -76,6 +76,7 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
             Test-Path $dir -ErrorAction Stop | Out-Null
         } catch [UnauthorizedAccessException] {
             error "Access denied: $dir. You might need to restart."
+            $failed[$app] = 'access denied'
             continue
         }
 

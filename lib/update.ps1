@@ -217,6 +217,7 @@ function Sync-Bucket {
 }
 
 function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
+    $app_key = if ($global) { "$app (global)" } else { $app }
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -256,7 +257,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     if (!$version) {
         # installed from a custom bucket/no longer supported
         error "No manifest available for '$app'."
-        $failed[$app] = 'no manifest available'
+        $failed[$app_key] = 'no manifest available'
         return
     }
 
@@ -265,7 +266,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     #region Workaround for #2952
     if (test_running_process $app $global) {
         Write-Host 'Running process detected, skip updating.'
-        $failed[$app] = 'skipped: running process'
+        $failed[$app_key] = 'skipped: running process'
         return
     }
     #endregion Workaround for #2952
@@ -276,14 +277,22 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     Write-Host 'Downloading new version'
     if (Test-Aria2Enabled) {
         if (!(Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $check_hash)) {
-            $failed[$app] = 'download failed'
+            $failed[$app_key] = 'download failed'
             return
         }
     } else {
         $urls = script:url $manifest $architecture
 
         foreach ($url in $urls) {
-            Invoke-CachedDownload $app $version $url $null $manifest.cookie $use_cache
+            try {
+                Invoke-CachedDownload $app $version $url $null $manifest.cookie $use_cache
+            } catch {
+                Write-Host -f darkred $_
+                error "URL $url is not valid"
+                error $(new_issue_msg $app $bucket 'download failed')
+                $failed[$app_key] = 'download failed'
+                return
+            }
 
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
@@ -300,7 +309,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
                     error $(new_issue_msg $app $bucket 'hash check failed')
-                    $failed[$app] = 'hash check failed'
+                    $failed[$app_key] = 'hash check failed'
                     return
                 }
             }
@@ -317,7 +326,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
 
     Write-Host "Uninstalling '$app' ($old_version)"
     if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-        $failed[$app] = 'uninstaller failed'
+        $failed[$app_key] = 'uninstaller failed'
         return
     }
     Remove-ShimFromManifest $app $old_manifest $global $architecture

@@ -35,6 +35,7 @@ function command_path($cmd) {
 function exec($cmd, $arguments) {
     $cmd_path = command_path $cmd
 
+    $global:LASTEXITCODE = 0
     & $cmd_path @arguments
 }
 

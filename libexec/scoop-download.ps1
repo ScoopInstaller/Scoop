@@ -112,7 +112,7 @@ foreach ($curr_app in $apps) {
 
     if(Test-Aria2Enabled) {
         if (!(Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash)) {
-            $dl_failure = $true
+            $download_failed = $true
             continue
         }
     } else {

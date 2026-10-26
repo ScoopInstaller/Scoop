@@ -38,6 +38,12 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         $failed[$app] = 'unsupported architecture'
         return
     }
+    $failed_deps = @($manifest.depends | Where-Object { $_ } | ForEach-Object { (parse_app $_)[0] } | Where-Object { $failed.ContainsKey($_) -or $failed.ContainsKey("$_ (global)") })
+    if ($failed_deps.Count -gt 0) {
+        error "'$app' depends on $($failed_deps -join ', '), which failed."
+        $failed[$app] = "dependency failed: $($failed_deps -join ', ')"
+        return
+    }
 
     if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
         Write-Host "Manifest: $app.json"

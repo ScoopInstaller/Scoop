@@ -27,6 +27,18 @@ Describe 'install_app' -Tag 'Scoop' {
         $failed.Keys[0] | Should-Be 'foo'
         $failed['foo'] | Should-Be 'unsupported architecture'
     }
+
+    It 'should skip an app whose dependency failed' {
+        Mock Get-Manifest { 'bar', [PSCustomObject]@{ version = '1.0'; depends = @('foo') }, 'main', $null }
+        Mock Get-SupportedArchitecture { '64bit' }
+        Mock error {}
+        $failed = @{ 'foo' = 'download failed' }
+
+        install_app 'bar' '64bit' $false @{} $failed
+
+        Should-Invoke error -Times 1 -ParameterFilter { $msg -like '*depends on foo*' }
+        $failed['bar'] | Should-Be 'dependency failed: foo'
+    }
 }
 
 Describe 'show_failed_apps' -Tag 'Scoop' {
