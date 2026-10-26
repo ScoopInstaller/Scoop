@@ -1,0 +1,49 @@
+name: Prebuilt binaries
+
+# Projects under supporting/ commit their build output, so a source change
+# without a rebuild would ship a stale assembly.
+on:
+  pull_request:
+    paths:
+      - 'supporting/**'
+  workflow_dispatch:
+
+jobs:
+  binaries:
+    name: Prebuilt binaries
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Cache the pinned packages
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: supporting/*/packages
+          key: supporting-packages-${{ hashFiles('supporting/*/packages.config') }}
+      # -Fast reuses the packages the cache restored, install.ps1 would fetch them again.
+      - name: Rebuild every prebuilt project
+        shell: pwsh
+        run: |
+          Get-ChildItem supporting -Directory |
+            Where-Object { Test-Path (Join-Path $_.FullName 'build.ps1') } |
+            ForEach-Object {
+              Write-Host "::group::$($_.Name)"
+              $build = Join-Path $_.FullName 'build.ps1'
+              if (Test-Path (Join-Path $_.FullName 'packages')) {
+                & $build -Fast
+              } else {
+                & $build
+              }
+              if ($LASTEXITCODE -ne 0) { throw "$($_.Name): build.ps1 exited with $LASTEXITCODE" }
+              Write-Host '::endgroup::'
+            }
+      - name: Fail when a committed binary is stale
+        shell: pwsh
+        run: |
+          $changed = git status --porcelain -- supporting
+          if ($changed) {
+            $changed | Write-Host
+            throw 'A prebuilt binary does not match its source. Run the build.ps1 of that project and commit the result.'
+          }
