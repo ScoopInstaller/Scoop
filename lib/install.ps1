@@ -5,6 +5,13 @@ function nightly_version($quiet = $false) {
     return "nightly-$(Get-Date -Format 'yyyyMMdd')"
 }
 
+function failed_deps($manifest, $failed) {
+    @($manifest.depends | Where-Object { $_ } | ForEach-Object { (parse_app $_)[0] } | Where-Object {
+            ($failed[$_] -and $failed[$_] -notlike 'skipped:*') -or
+            ($failed["$_ (global)"] -and $failed["$_ (global)"] -notlike 'skipped:*')
+        })
+}
+
 function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
@@ -38,7 +45,7 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         $failed[$app] = 'unsupported architecture'
         return
     }
-    $failed_deps = @($manifest.depends | Where-Object { $_ } | ForEach-Object { (parse_app $_)[0] } | Where-Object { $failed.ContainsKey($_) -or $failed.ContainsKey("$_ (global)") })
+    $failed_deps = failed_deps $manifest $failed
     if ($failed_deps.Count -gt 0) {
         error "'$app' depends on $($failed_deps -join ', '), which failed."
         $failed[$app] = "dependency failed: $($failed_deps -join ', ')"

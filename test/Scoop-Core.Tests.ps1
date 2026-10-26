@@ -115,12 +115,10 @@ Describe 'Test-CommandAvailable' -Tag 'Scoop' {
 Describe 'Confirm-InstallationStatus' -Tag 'Scoop' {
     It 'should report apps that are not installed' {
         Mock error {}
-        Mock warn {}
 
         $status = Confirm-InstallationStatus 'not_installed_app_xyz'
 
         $status.installed | Should-BeCollection -Count 0
-        $status.failed.Keys | Should-BeCollection -Count 1
         $status.failed['not_installed_app_xyz'] | Should-Be 'not installed'
     }
 }

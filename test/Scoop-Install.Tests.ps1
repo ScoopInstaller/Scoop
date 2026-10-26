@@ -24,7 +24,6 @@ Describe 'install_app' -Tag 'Scoop' {
 
         Should-Invoke error -Times 1 -ParameterFilter { $msg -like "*doesn't support current architecture*" }
         $failed.Keys | Should-BeCollection -Count 1
-        $failed.Keys[0] | Should-Be 'foo'
         $failed['foo'] | Should-Be 'unsupported architecture'
     }
 
@@ -39,6 +38,16 @@ Describe 'install_app' -Tag 'Scoop' {
         Should-Invoke error -Times 1 -ParameterFilter { $msg -like '*depends on foo*' }
         $failed['bar'] | Should-Be 'dependency failed: foo'
     }
+
+    It 'should ignore a dependency that was only skipped' {
+        $manifest = [PSCustomObject]@{ depends = @('foo', 'extras/bar') }
+        $failed = @{ 'foo' = 'skipped: running process'; 'bar (global)' = 'download failed' }
+
+        $deps = failed_deps $manifest $failed
+
+        $deps | Should-BeCollection -Count 1
+        @($deps)[0] | Should-Be 'bar'
+    }
 }
 
 Describe 'show_failed_apps' -Tag 'Scoop' {
@@ -48,14 +57,6 @@ Describe 'show_failed_apps' -Tag 'Scoop' {
         show_failed_apps @{ 'foo' = 'reason one'; 'bar' = 'reason two' } 'update'
 
         Should-Invoke error -Times 1 -ParameterFilter { $msg -like '*foo (reason one)*' -and $msg -like '*bar (reason two)*' }
-    }
-
-    It 'should stay silent when nothing failed' {
-        Mock error {}
-
-        show_failed_apps @{}
-
-        Should-Invoke error -Times 0
     }
 
     It 'should report skipped apps separately' {

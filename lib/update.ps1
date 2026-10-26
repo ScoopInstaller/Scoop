@@ -263,6 +263,13 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
 
     Write-Host "Updating '$app' ($old_version -> $version)"
 
+    $failed_deps = failed_deps $manifest $failed
+    if ($failed_deps.Count -gt 0) {
+        error "'$app' depends on $($failed_deps -join ', '), which failed."
+        $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
+        return
+    }
+
     #region Workaround for #2952
     if (test_running_process $app $global) {
         Write-Host 'Running process detected, skip updating.'
