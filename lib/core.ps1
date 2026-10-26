@@ -552,9 +552,9 @@ function app_status($app, $global) {
     $status.outdated = $false
     if ($status.version -and $status.latest_version) {
         if (get_config FORCE_UPDATE $false) {
-            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
+            $status.outdated = ([Scoop.VersionComparer]::Compare($status.version, $status.latest_version, (Get-UpdateNightlySetting))) -ne 0
         } else {
-            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)
+            $status.outdated = ([Scoop.VersionComparer]::Compare($status.version, $status.latest_version, (Get-UpdateNightlySetting))) -gt 0
         }
     }
 

@@ -1,3 +1,11 @@
+if (-not ('Scoop.VersionComparer' -as [Type])) {
+    $semVerDll = "$PSScriptRoot\..\supporting\version\bin\Scoop.VersionComparer.dll"
+    if (-not (Test-Path -LiteralPath $semVerDll)) {
+        throw "Scoop's version comparison requires '$semVerDll'."
+    }
+    Add-Type -Path $semVerDll
+}
+
 function Get-LatestVersion {
     <#
     .SYNOPSIS
@@ -28,15 +36,15 @@ function Get-LatestVersion {
     }
 }
 
-function Select-CurrentVersion { # 'manifest.ps1'
-    <#
+<#
     .SYNOPSIS
-        Select current version of installed app, from 'current\manifest.json' or modified time of version directory
+        Select the version of an installed app that is currently in use
     .PARAMETER AppName
         App's name
     .PARAMETER Global
         Globally installed application
-    #>
+#>
+function Select-CurrentVersion { # 'manifest.ps1'
     [OutputType([String])]
     [CmdletBinding()]
     param (
@@ -103,197 +111,17 @@ function Get-InstalledVersion {
             return @()
         }
     }
-    # Deprecated
-    # sort_versions (Get-ChildItem $appPath -dir -attr !reparsePoint | Where-Object { $null -ne $(Get-ChildItem $_.FullName) } | ForEach-Object { $_.Name })
 }
 
-function Compare-Version {
-    <#
-    .SYNOPSIS
-        Compare versions, mainly according to SemVer's rules
-    .PARAMETER ReferenceVersion
-        Specifies a version used as a reference for comparison
-    .PARAMETER DifferenceVersion
-        Specifies the version that are compared to the reference version
-    .PARAMETER Delimiter
-        Specifies the delimiter of versions
-    .OUTPUTS
-        System.Int32
-            '0' if DifferenceVersion is equal to ReferenceVersion,
-            '1' if DifferenceVersion is greater then ReferenceVersion,
-            '-1' if DifferenceVersion is less then ReferenceVersion
-    #>
-    [OutputType([Int32])]
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true, Position = 0)]
-        [AllowEmptyString()]
-        [String]
-        $ReferenceVersion,
-        [Parameter(Mandatory = $true, Position = 1, ValueFromPipeline = $true)]
-        [AllowEmptyString()]
-        [String]
-        $DifferenceVersion,
-        [String]
-        $Delimiter = '-'
-    )
-    process {
-        # Use '+' sign as post-release, see https://github.com/ScoopInstaller/Scoop/pull/3721#issuecomment-553718093
-        $ReferenceVersion, $DifferenceVersion = @($ReferenceVersion, $DifferenceVersion) -replace '\+', '-'
 
-        # Return 0 if versions are equal
-        if ($DifferenceVersion -eq $ReferenceVersion) {
-            return 0
-        }
-
-        # Preprocess versions (split, convert and separate)
-        $splitReferenceVersion = @(SplitVersion -Version $ReferenceVersion -Delimiter $Delimiter)
-        $splitDifferenceVersion = @(SplitVersion -Version $DifferenceVersion -Delimiter $Delimiter)
-
-        # Nightly versions are always equal unless UPDATE_NIGHTLY is $true
-        if ($splitReferenceVersion[0] -eq 'nightly' -and $splitDifferenceVersion[0] -eq 'nightly') {
-            if (get_config UPDATE_NIGHTLY) {
-                # nightly versions will be compared by date if UPDATE_NIGHTLY is $true
-                if ($null -eq $splitReferenceVersion[1]) {
-                    $splitReferenceVersion += Get-Date -Format 'yyyyMMdd'
-                }
-                if ($null -eq $splitDifferenceVersion[1]) {
-                    $splitDifferenceVersion += Get-Date -Format 'yyyyMMdd'
-                }
-                return [Math]::Sign($splitDifferenceVersion[1] - $splitReferenceVersion[1])
-            } else {
-                return 0
-            }
-        }
-
-        for ($i = 0; $i -lt [Math]::Max($splitReferenceVersion.Length, $splitDifferenceVersion.Length); $i++) {
-            # '1.1-alpha' is less then '1.1'
-            if ($i -ge $splitReferenceVersion.Length) {
-                if ($splitDifferenceVersion[$i] -match 'alpha|beta|rc|pre') {
-                    return -1
-                } else {
-                    return 1
-                }
-            }
-            # '1.1' is greater then '1.1-beta'
-            if ($i -ge $splitDifferenceVersion.Length) {
-                if ($splitReferenceVersion[$i] -match 'alpha|beta|rc|pre') {
-                    return 1
-                } else {
-                    return -1
-                }
-            }
-
-            # If some parts of versions have '.', compare them with delimiter '.'
-            if (($splitReferenceVersion[$i] -match '\.') -or ($splitDifferenceVersion[$i] -match '\.')) {
-                $Result = Compare-Version -ReferenceVersion $splitReferenceVersion[$i] -DifferenceVersion $splitDifferenceVersion[$i] -Delimiter '.'
-                # If the parts are equal, continue to next part, otherwise return
-                if ($Result -ne 0) {
-                    return $Result
-                } else {
-                    continue
-                }
-            }
-
-            # If some parts of versions have '_', compare them with delimiter '_'
-            if (($splitReferenceVersion[$i] -match '_') -or ($splitDifferenceVersion[$i] -match '_')) {
-                $Result = Compare-Version -ReferenceVersion $splitReferenceVersion[$i] -DifferenceVersion $splitDifferenceVersion[$i] -Delimiter '_'
-                # If the parts are equal, continue to next part, otherwise return
-                if ($Result -ne 0) {
-                    return $Result
-                } else {
-                    continue
-                }
-            }
-
-            # Don't try to compare [Long] to [String]
-            if ($null -ne $splitReferenceVersion[$i] -and $null -ne $splitDifferenceVersion[$i]) {
-                if ($splitReferenceVersion[$i] -is [String] -and $splitDifferenceVersion[$i] -isnot [String]) {
-                    $splitDifferenceVersion[$i] = "$($splitDifferenceVersion[$i])"
-                }
-                if ($splitDifferenceVersion[$i] -is [String] -and $splitReferenceVersion[$i] -isnot [String]) {
-                    $splitReferenceVersion[$i] = "$($splitReferenceVersion[$i])"
-                }
-            }
-
-            # Compare [String] or [Long]
-            if ($splitDifferenceVersion[$i] -gt $splitReferenceVersion[$i]) {
-                return 1
-            }
-            if ($splitDifferenceVersion[$i] -lt $splitReferenceVersion[$i]) {
-                return -1
-            }
+# Read once per session: scoop runs as a new process per command
+function Get-UpdateNightlySetting {
+    if ($null -eq $script:UpdateNightly) {
+        $script:UpdateNightly = $false
+        if (Get-Command get_config -ErrorAction Ignore) {
+            $script:UpdateNightly = [bool](get_config UPDATE_NIGHTLY)
         }
     }
+    return $script:UpdateNightly
 }
 
-# Helper function
-function SplitVersion {
-    <#
-    .SYNOPSIS
-        Split version by Delimiter, convert number string to number, and separate letters from numbers
-    .PARAMETER Version
-        Specifies a version
-    .PARAMETER Delimiter
-        Specifies the delimiter of version (Literal)
-    #>
-    [OutputType([Object[]])]
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [AllowEmptyString()]
-        [String]
-        $Version,
-        [String]
-        $Delimiter = '-'
-    )
-    process {
-        $Version = $Version -replace '[a-zA-Z]+', "$Delimiter$&$Delimiter"
-        return ($Version -split [Regex]::Escape($Delimiter) -ne '' | ForEach-Object { if ($_ -match '^\d+$') { [Long]$_ } else { $_ } })
-    }
-}
-
-# Deprecated
-# Not used anymore in scoop core
-function qsort($ary, $fn) {
-    warn '"qsort" is deprecated. Please avoid using it anymore.'
-    if ($null -eq $ary) { return @() }
-    if (!($ary -is [array])) { return @($ary) }
-
-    $pivot = $ary[0]
-    $rem = $ary[1..($ary.length - 1)]
-
-    $lesser = qsort ($rem | Where-Object { (& $fn $pivot $_) -lt 0 }) $fn
-
-    $greater = qsort ($rem | Where-Object { (& $fn $pivot $_) -ge 0 }) $fn
-
-    return @() + $lesser + @($pivot) + $greater
-}
-
-# Deprecated
-# Not used anymore in scoop core
-function sort_versions($versions) {
-    warn '"sort_versions" is deprecated. Please avoid using it anymore.'
-    qsort $versions Compare-Version
-}
-
-function compare_versions($a, $b) {
-    Show-DeprecatedWarning $MyInvocation 'Compare-Version'
-    # Please note the parameters' sequence
-    return Compare-Version -ReferenceVersion $b -DifferenceVersion $a
-}
-
-function latest_version($app, $bucket, $url) {
-    Show-DeprecatedWarning $MyInvocation 'Get-LatestVersion'
-    return Get-LatestVersion -AppName $app -Bucket $bucket -Uri $url
-}
-
-function current_version($app, $global) {
-    Show-DeprecatedWarning $MyInvocation 'Select-CurrentVersion'
-    return Select-CurrentVersion -AppName $app -Global:$global
-}
-
-function versions($app, $global) {
-    Show-DeprecatedWarning $MyInvocation 'Get-InstalledVersion'
-    return Get-InstalledVersion -AppName $app -Global:$global
-}

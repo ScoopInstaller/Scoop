@@ -390,14 +390,14 @@ function Get-LatestScoopDBRow {
         return $null
     }
 
-    if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
+    if (-not ('Scoop.VersionComparer' -as [Type])) {
         . "$PSScriptRoot\versions.ps1"
     }
 
     $latest = $Rows[0]
     for ($i = 1; $i -lt $Rows.Count; $i++) {
         $row = $Rows[$i]
-        if ((Compare-Version -ReferenceVersion $latest.version -DifferenceVersion $row.version) -gt 0) {
+        if (([Scoop.VersionComparer]::Compare($latest.version, $row.version, (Get-UpdateNightlySetting))) -gt 0) {
             $latest = $row
         }
     }
