@@ -79,17 +79,10 @@ $apps | ForEach-Object {
     $architecture = $install.architecture
 
     $dir = link_current $dir
-    New-ShimFromManifest $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global $architecture
     # unset all potential old env before re-adding
     env_rm_path $manifest $dir $persist_dir $global $architecture
     env_rm $manifest $global $architecture
-    env_set $manifest $global $architecture
-    env_add_path $manifest $dir $persist_dir $global $architecture
-    # unlink all potential old link before re-persisting
-    unlink_persist_data $manifest $original_dir
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
+    link_app $manifest $dir $original_dir $persist_dir $global $architecture
 }
 
 exit 0

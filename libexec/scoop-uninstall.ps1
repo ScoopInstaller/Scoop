@@ -84,22 +84,9 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
             $failed[$app] = 'uninstaller failed'
             continue
         }
-        Remove-ShimFromManifest $app $manifest $global $architecture
-        rm_startmenu_shortcuts $manifest $global $architecture
-
-        # If a junction was used during install, that will have been used
-        # as the reference directory. Otherwise it will just be the version
-        # directory.
-        $refdir = unlink_current $dir
-
-        uninstall_psmodule $manifest $refdir $global
-
-        env_rm_path $manifest $refdir $persist_dir $global $architecture
-        env_rm $manifest $global $architecture
+        unlink_app $app $manifest $dir $persist_dir $global $architecture
 
         try {
-            # unlink all potential old link before doing recursive Remove-Item
-            unlink_persist_data $manifest $dir
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             if (Test-Path $dir) {

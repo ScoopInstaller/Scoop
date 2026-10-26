@@ -3,6 +3,8 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\core.ps1"
     . "$PSScriptRoot\..\lib\system.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1"
+    . "$PSScriptRoot\..\lib\shortcuts.ps1"
+    . "$PSScriptRoot\..\lib\psmodules.ps1"
     . "$PSScriptRoot\..\lib\shim.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
 }
@@ -47,6 +49,47 @@ Describe 'install_app' -Tag 'Scoop' {
 
         $deps | Should-BeCollection -Count 1
         @($deps)[0] | Should-Be 'bar'
+    }
+}
+
+Describe 'link_app' -Tag 'Scoop' {
+    It 'should relink an installed version' {
+        Mock New-ShimFromManifest {}
+        Mock create_startmenu_shortcuts {}
+        Mock install_psmodule {}
+        Mock env_add_path {}
+        Mock env_set {}
+        Mock unlink_persist_data {}
+        Mock persist_data {}
+        Mock persist_permission {}
+
+        link_app ([PSCustomObject]@{}) '/fake/app/current' '/fake/app/1.0' '/fake/persist' $false '64bit'
+
+        Should-Invoke New-ShimFromManifest -Times 1 -ParameterFilter { $dir -eq '/fake/app/current' }
+        Should-Invoke create_startmenu_shortcuts -Times 1
+        Should-Invoke install_psmodule -Times 1
+        Should-Invoke env_add_path -Times 1 -ParameterFilter { $dir -eq '/fake/app/current' }
+        Should-Invoke unlink_persist_data -Times 1 -ParameterFilter { $dir -eq '/fake/app/1.0' }
+        Should-Invoke persist_data -Times 1 -ParameterFilter { $original_dir -eq '/fake/app/1.0' }
+    }
+}
+
+Describe 'unlink_app' -Tag 'Scoop' {
+    It 'should unlink a version through the reference directory' {
+        Mock Remove-ShimFromManifest {}
+        Mock rm_startmenu_shortcuts {}
+        Mock unlink_current { '/fake/app/current' }
+        Mock uninstall_psmodule {}
+        Mock env_rm_path {}
+        Mock env_rm {}
+        Mock unlink_persist_data {}
+
+        unlink_app 'foo' ([PSCustomObject]@{}) '/fake/app/1.0' $false '64bit'
+
+        Should-Invoke Remove-ShimFromManifest -Times 1
+        Should-Invoke uninstall_psmodule -Times 1 -ParameterFilter { $dir -eq '/fake/app/current' }
+        Should-Invoke env_rm_path -Times 1 -ParameterFilter { $dir -eq '/fake/app/current' }
+        Should-Invoke unlink_persist_data -Times 1 -ParameterFilter { $dir -eq '/fake/app/1.0' }
     }
 }
 

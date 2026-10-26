@@ -336,17 +336,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         $failed[$app_key] = 'uninstaller failed'
         return
     }
-    Remove-ShimFromManifest $app $old_manifest $global $architecture
-    rm_startmenu_shortcuts $old_manifest $global $architecture
-
-    # If a junction was used during install, that will have been used
-    # as the reference directory. Otherwise it will just be the version
-    # directory.
-    $refdir = unlink_current $dir
-    uninstall_psmodule $old_manifest $refdir $global
-    env_rm_path $old_manifest $refdir $persist_dir $global $architecture
-    env_rm $old_manifest $global $architecture
-    unlink_persist_data $old_manifest $dir
+    unlink_app $app $old_manifest $dir $persist_dir $global $architecture
 
     if ($force -and ($old_version -eq $version)) {
         if (!(Test-Path "$dir/../_$version.old")) {

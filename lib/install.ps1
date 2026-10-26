@@ -85,15 +85,8 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
     }
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
-    New-ShimFromManifest $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global $architecture
+    link_app $manifest $dir $original_dir $persist_dir $global $architecture
     install_psmodule $manifest $dir $global
-    env_set $manifest $global $architecture
-    env_add_path $manifest $dir $persist_dir $global $architecture
-
-    # persist data
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
 
     Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
@@ -254,6 +247,33 @@ function unlink_current($versiondir) {
         return $currentdir
     }
     return $versiondir
+}
+
+# The caller links 'current' first, so $dir is the linked directory.
+function link_app($manifest, $dir, $original_dir, $persist_dir, $global, $architecture) {
+    New-ShimFromManifest $manifest $dir $global $architecture
+    create_startmenu_shortcuts $manifest $dir $global $architecture
+    env_set $manifest $global $architecture
+    env_add_path $manifest $dir $persist_dir $global $architecture
+    # unlink all potential old link before re-persisting
+    unlink_persist_data $manifest $original_dir
+    # persist data
+    persist_data $manifest $original_dir $persist_dir
+    persist_permission $manifest $global
+}
+
+function unlink_app($app, $manifest, $dir, $persist_dir, $global, $architecture) {
+    Remove-ShimFromManifest $app $manifest $global $architecture
+    rm_startmenu_shortcuts $manifest $global $architecture
+    # If a junction was used during install, that will have been used
+    # as the reference directory. Otherwise it will just be the version
+    # directory.
+    $refdir = unlink_current $dir
+    uninstall_psmodule $manifest $refdir $global
+    env_rm_path $manifest $refdir $persist_dir $global $architecture
+    env_rm $manifest $global $architecture
+    # unlink all potential old link before doing recursive Remove-Item
+    unlink_persist_data $manifest $dir
 }
 
 # to undo after installers add to path so that scoop manifest can keep track of this instead
