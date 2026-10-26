@@ -86,7 +86,6 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
     link_app $manifest $dir $original_dir $persist_dir $global $architecture
-    install_psmodule $manifest $dir $global
 
     Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
@@ -253,6 +252,7 @@ function unlink_current($versiondir) {
 function link_app($manifest, $dir, $original_dir, $persist_dir, $global, $architecture) {
     New-ShimFromManifest $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global $architecture
+    install_psmodule $manifest $dir $global
     env_set $manifest $global $architecture
     env_add_path $manifest $dir $persist_dir $global $architecture
     # unlink all potential old link before re-persisting

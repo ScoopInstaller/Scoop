@@ -13,6 +13,7 @@
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
+. "$PSScriptRoot\..\lib\psmodules.ps1"
 
 $opt, $apps, $err = getopt $args 'a' 'all'
 if($err) { error "scoop reset: $err"; exit 1 }

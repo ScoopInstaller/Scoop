@@ -338,20 +338,22 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     }
     unlink_app $app $old_manifest $dir $persist_dir $global $architecture
 
+    $backup = $null
     if ($force -and ($old_version -eq $version)) {
-        if (!(Test-Path "$dir/../_$version.old")) {
-            Move-Item "$dir" "$dir/../_$version.old"
-        } else {
+        $backup = "$dir/../_$version.old"
+        if (Test-Path $backup) {
             $i = 1
-            While (Test-Path "$dir/../_$version.old($i)") {
+            While (Test-Path "$backup($i)") {
                 $i++
             }
-            Move-Item "$dir" "$dir/../_$version.old($i)"
+            $backup = "$backup($i)"
         }
+        Move-Item $dir $backup
     }
 
     Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
 
+    $app_name = $app
     if ($bucket) {
         # add bucket name it was installed from
         $app = "$bucket/$app"
@@ -370,4 +372,17 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     # The new version has already been downloaded (and hash-checked) above,
     # so re-install it from the cache instead of downloading it a second time.
     install_app $app $architecture $global $suggested $failed $true $check_hash
+
+    if ($failed.ContainsKey($app_name)) {
+        # only the wiring was removed, so the old version can be linked again
+        if ($backup) { Move-Item $backup $dir }
+        if (installed_manifest $app_name $old_version $global) {
+            Write-Host "Restoring '$app_name' ($old_version)"
+            $original_dir = $dir
+            $dir = link_current $dir
+            link_app $old_manifest $dir $original_dir $persist_dir $global $architecture
+        } else {
+            warn "'$app_name' ($old_version) cannot be restored; its files were removed by the uninstaller."
+        }
+    }
 }
