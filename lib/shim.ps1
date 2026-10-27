@@ -295,6 +295,9 @@ function Get-ShimTemplate {
     )
     # omitted falls back to the setting
     if (!$PSBoundParameters.ContainsKey('Source')) { $Source = get_config SHIM }
+    if (!$script:shimWarned) { $script:shimWarned = @{} }
+    $key = "$Source"
+    $warn = !$script:shimWarned.ContainsKey($key)
     $system = Get-SystemArchitecture
     $architecture = switch ($system) {
         'arm64' { 'arm64' }
@@ -309,32 +312,38 @@ function Get-ShimTemplate {
             if (Test-Path -LiteralPath $template -PathType Leaf) {
                 # shim package must provide a template for the correct architecture
                 if ((Get-PEMachine $template) -eq (Get-PEMachine $builtin)) { return $template }
-                warn "'$Source' provides a shim for another architecture - using the builtin one."
+                if ($warn) {
+                    warn "'$Source' provides a shim for another architecture - using the builtin one."
+                    $script:shimWarned[$key] = $true
+                }
                 return $builtin
             }
         }
-        . "$PSScriptRoot\versions.ps1" # Select-CurrentVersion
-        . "$PSScriptRoot\manifest.ps1" # parse_json
-        if (installed $Source) {
-            warn "'$Source' is not a shim package - falling back to the builtin one."
-        } else {
-            warn "'$Source' is not installed - falling back to the builtin one."
+        if ($warn) {
+            . "$PSScriptRoot\versions.ps1" # Select-CurrentVersion
+            . "$PSScriptRoot\manifest.ps1" # parse_json
+            if (installed $Source) {
+                warn "'$Source' is not a shim package - falling back to the builtin one."
+            } else {
+                warn "'$Source' is not installed - falling back to the builtin one."
+            }
+            # TODO: delete this region together with the supporting\shims\<lane>\ directories,
+            # whose .to_be_removed marker says the same. 'shim' used to name one of the three
+            # lanes bundled in the tree, and those lanes ship as packages now.
+            #region shim lanes that are no longer bundled
+            $lanes = @{
+                '71'      = 'scoop-shim-cpp'
+                'kiennq'  = 'scoop-shim-kiennq'
+                'scoopcs' = 'scoop-shim-cs'
+            }
+            if ($lanes.ContainsKey($Source)) {
+                warn "'$Source' is no longer a builtin shim source, you can restore it by installing and configuring to '$($lanes[$Source])':"
+                warn "    scoop install $($lanes[$Source])"
+                warn "    scoop config shim $($lanes[$Source])"
+            }
+            #endregion shim lanes that are no longer bundled
+            $script:shimWarned[$key] = $true
         }
-        # TODO: delete this region together with the supporting\shims\<lane>\ directories,
-        # whose .to_be_removed marker says the same. 'shim' used to name one of the three
-        # lanes bundled in the tree, and those lanes ship as packages now.
-        #region shim lanes that are no longer bundled
-        $lanes = @{
-            '71'      = 'scoop-shim-cpp'
-            'kiennq'  = 'scoop-shim-kiennq'
-            'scoopcs' = 'scoop-shim-cs'
-        }
-        if ($lanes.ContainsKey($Source)) {
-            warn "'$Source' is no longer a builtin shim source, you can restore it by installing and configuring to '$($lanes[$Source])':"
-            warn "    scoop install $($lanes[$Source])"
-            warn "    scoop config shim $($lanes[$Source])"
-        }
-        #endregion shim lanes that are no longer bundled
     }
     $builtin
 }
@@ -437,8 +446,11 @@ function Get-ShimDefinition($Item) {
 }
 
 function New-ShimFromManifest($Manifest, $Dir, $Global, $Arch) {
-    $shims = @(arch_specific 'bin' $Manifest $Arch)
-    $shims | Where-Object { $_ -ne $null } | ForEach-Object {
+    $shims = @(arch_specific 'bin' $Manifest $Arch | Where-Object { $_ -ne $null })
+    if (!$shims) { return }
+    # the source is checked before the shims are created, so a bad one warns once
+    $null = Get-ShimTemplate
+    $shims | ForEach-Object {
         $target, $name, $arg = Get-ShimDefinition $_
         Write-Output "Creating shim for '$name'."
 
