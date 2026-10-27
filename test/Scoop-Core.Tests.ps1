@@ -475,29 +475,33 @@ Describe 'Get-CommandPath' -Tag 'Scoop', 'Windows' {
 Describe 'Show-DeprecatedWarning' -Tag 'Scoop' {
     BeforeAll {
         . "$PSScriptRoot\..\lib\manifest.ps1" # 'arch_specific'
+        $script = "rm_shim 'shim-test' '$TestDrive' 'app'`r`nrm_shim 'shim-test' '$TestDrive' 'app'`r`nshim 'target' `$false 'shim-test'`r`nshim 'target' `$false 'shim-test'"
         $manifest = [PSCustomObject]@{
-            uninstaller = [PSCustomObject]@{
-                script = "rm_shim 'shim-test' '$TestDrive' 'app'`r`nrm_shim 'shim-test' '$TestDrive' 'app'"
-            }
+            installer   = [PSCustomObject]@{ script = $script }
+            uninstaller = [PSCustomObject]@{ script = $script }
         }
     }
 
-    It 'warns once per manifest script' {
+    It 'warns once per deprecated function' {
         Mock warn { }
         Mock Remove-Shim { }
+        Mock New-Shim { }
 
         Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
 
-        Should-Invoke warn -Times 1 -Exactly
+        Should-Invoke warn -Times 1 -Exactly -ParameterFilter { $msg -like '"rm_shim"*' }
+        Should-Invoke warn -Times 1 -Exactly -ParameterFilter { $msg -like '"shim"*' }
     }
 
     It 'warns again for the next manifest script' {
         Mock warn { }
         Mock Remove-Shim { }
+        Mock New-Shim { }
 
-        Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+        Invoke-HookScript -HookType 'installer' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
         Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
 
-        Should-Invoke warn -Times 2 -Exactly
+        Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"rm_shim"*' }
+        Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"shim"*' }
     }
 }
