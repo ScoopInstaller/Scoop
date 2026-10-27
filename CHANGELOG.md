@@ -12,6 +12,7 @@
 - **auto-pr:** Add missing `core.ps1` dot source ([#6786](https://github.com/ScoopInstaller/Scoop/pull/6786))
 - **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
 - **core:** Resolve Git helper without hardcoded runtime paths ([#6795](https://github.com/ScoopInstaller/Scoop/issues/6795))
+- **core:** Warn once per deprecated function per manifest ([#6801](https://github.com/ScoopInstaller/Scoop/issues/6801))
 - **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6763](https://github.com/ScoopInstaller/Scoop/issues/6763))
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
 
