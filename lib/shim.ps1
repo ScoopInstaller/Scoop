@@ -446,7 +446,7 @@ function Get-ShimDefinition($Item) {
 }
 
 function New-ShimFromManifest($Manifest, $Dir, $Global, $Arch) {
-    $shims = @(arch_specific 'bin' $Manifest $Arch) | Where-Object { $_ -ne $null }
+    $shims = @(arch_specific 'bin' $Manifest $Arch | Where-Object { $_ -ne $null })
     if (!$shims) { return }
     # the source is checked before the shims are created, so a bad one warns once
     $null = Get-ShimTemplate
