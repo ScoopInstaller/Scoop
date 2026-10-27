@@ -13,6 +13,7 @@
         <RootNamespace>Scoop</RootNamespace>
         <AssemblyName>Scoop.VersionComparer</AssemblyName>
         <TargetFrameworkVersion>v4.5.0</TargetFrameworkVersion>
+        <LangVersion>9.0</LangVersion>
         <FileAlignment>512</FileAlignment>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PropertyGroup>
