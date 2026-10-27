@@ -471,3 +471,33 @@ Describe 'Get-CommandPath' -Tag 'Scoop', 'Windows' {
         }
     }
 }
+
+Describe 'Show-DeprecatedWarning' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\manifest.ps1" # 'arch_specific'
+        $manifest = [PSCustomObject]@{
+            uninstaller = [PSCustomObject]@{
+                script = "rm_shim 'shim-test' '$TestDrive' 'app'`r`nrm_shim 'shim-test' '$TestDrive' 'app'"
+            }
+        }
+    }
+
+    It 'warns once per manifest script' {
+        Mock warn { }
+        Mock Remove-Shim { }
+
+        Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+
+        Should-Invoke warn -Times 1 -Exactly
+    }
+
+    It 'warns again for the next manifest script' {
+        Mock warn { }
+        Mock Remove-Shim { }
+
+        Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+        Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+
+        Should-Invoke warn -Times 2 -Exactly
+    }
+}

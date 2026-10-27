@@ -27,7 +27,13 @@ function Show-DeprecatedWarning {
     #>
     param($Invocation, [String] $New)
 
-    warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
+    # a manifest script can call a deprecated function many times, warn once
+    if (!$script:deprecatedWarned) { $script:deprecatedWarned = @{} }
+    $name = $Invocation.MyCommand.Name
+    if ($script:deprecatedWarned.ContainsKey($name)) { return }
+    $script:deprecatedWarned[$name] = $true
+
+    warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $name, $New)
     Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
 }
 
