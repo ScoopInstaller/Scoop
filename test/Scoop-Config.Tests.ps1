@@ -58,12 +58,9 @@ Describe 'config' -Tag 'Scoop' {
         }
 
         Context 'proxy' {
-            It 'strips an http or https scheme' {
+            It 'stores the address without a scheme' {
                 (set_config 'proxy' 'http://10.0.0.1:8080').proxy | Should-Be '10.0.0.1:8080'
                 (set_config 'proxy' 'https://user:pass@10.0.0.1:8080').proxy | Should-Be 'user:pass@10.0.0.1:8080'
-            }
-
-            It 'stores credentials that look like a scheme' {
                 (set_config 'proxy' 'socks:pass@10.0.0.1:8080').proxy | Should-Be 'socks:pass@10.0.0.1:8080'
             }
 
@@ -75,41 +72,65 @@ Describe 'config' -Tag 'Scoop' {
 
                 $scoopConfig.proxy | Should-Be '10.0.0.1:8080'
             }
-
-            It 'removes the value' {
-                $scoopConfig = set_config 'proxy' '10.0.0.1:8080'
-                set_config 'proxy' $null | Out-Null
-
-                $scoopConfig.proxy | Should-Be $null
-            }
         }
     }
 
-    It 'set_config should be able to save typed values correctly' {
-        # number
-        $scoopConfig = set_config 'one' 1
-        $scoopConfig.one | Should-Be 1
+    Context 'set_config' {
+        It 'applies the value the key returns' {
+            Mock Complete-ConfigChange {}
+            $scoopConfig = set_config 'test-key' 'value'
+            $scoopConfig.'test-key' | Should-Be 'value'
 
-        # boolean
-        $scoopConfig = set_config 'two' $true
-        $scoopConfig.two | Should-BeTrue
-        $scoopConfig = set_config 'three' $false
-        $scoopConfig.three | Should-BeFalse
+            Mock Complete-ConfigChange { 'rewritten' }
+            $scoopConfig = set_config 'test-key' 'value'
+            $scoopConfig.'test-key' | Should-Be 'rewritten'
+        }
 
-        # underline key
-        $scoopConfig = set_config 'under_line' 'four'
-        $scoopConfig.under_line | Should-BeString 'four' -CaseSensitive
+        It 'removes the value even when the key returns one' {
+            Mock Complete-ConfigChange { 'rewritten' }
+            $scoopConfig = set_config 'test-key' 'value'
 
-        # string
-        $scoopConfig = set_config 'five' 'not null'
+            set_config 'test-key' $null | Out-Null
 
-        # datetime
-        $scoopConfig = set_config 'time' ([System.DateTime]::Parse('2019-03-18T15:22:09.3930000+00:00', $null, [System.Globalization.DateTimeStyles]::AdjustToUniversal))
-        $scoopConfig.time | Should-HaveType ([System.DateTime])
+            $scoopConfig.'test-key' | Should-Be $null
+            Should-Invoke -CommandName Complete-ConfigChange -Times 2
+        }
 
-        # non-ASCII
-        $scoopConfig = set_config 'unicode' $unicode
-        $scoopConfig.unicode | Should-Be $unicode
+        It 'saves typed values correctly' {
+            # number
+            $scoopConfig = set_config 'one' 1
+            $scoopConfig.one | Should-Be 1
+
+            # boolean
+            $scoopConfig = set_config 'two' $true
+            $scoopConfig.two | Should-BeTrue
+            $scoopConfig = set_config 'three' $false
+            $scoopConfig.three | Should-BeFalse
+
+            # underline key
+            $scoopConfig = set_config 'under_line' 'four'
+            $scoopConfig.under_line | Should-BeString 'four' -CaseSensitive
+
+            # string
+            $scoopConfig = set_config 'five' 'not null'
+
+            # datetime
+            $scoopConfig = set_config 'time' ([System.DateTime]::Parse('2019-03-18T15:22:09.3930000+00:00', $null, [System.Globalization.DateTimeStyles]::AdjustToUniversal))
+            $scoopConfig.time | Should-HaveType ([System.DateTime])
+
+            # non-ASCII
+            $scoopConfig = set_config 'unicode' $unicode
+            $scoopConfig.unicode | Should-Be $unicode
+        }
+
+        It 'removes a value set to $null' {
+            $scoopConfig = load_cfg $configFile
+            $scoopConfig = set_config 'removable' 'value'
+
+            set_config 'removable' $null | Out-Null
+
+            $scoopConfig.removable | Should-BeNull
+        }
     }
 
     It 'load_cfg should return PSObject if config file exist' {
@@ -136,11 +157,5 @@ Describe 'config' -Tag 'Scoop' {
         (get_config 'time') | Should-HaveType ([System.DateTime])
         (get_config 'time') | Should-Be ([System.DateTime]::Parse('2019-03-18T15:22:09.3930000+00:00', $null, [System.Globalization.DateTimeStyles]::AdjustToUniversal))
         (get_config 'unicode') | Should-Be $unicode
-    }
-
-    It 'set_config should remove a value if being set to $null' {
-        $scoopConfig = load_cfg $configFile
-        $scoopConfig = set_config 'five' $null
-        $scoopConfig.five | Should-BeNull
     }
 }
