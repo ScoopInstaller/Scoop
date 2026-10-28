@@ -78,8 +78,11 @@ function set_config {
         $value = [System.Convert]::ToBoolean($value)
     }
 
-    # Initialize config's change
-    Complete-ConfigChange -Name $name -Value $value
+    # Initialize config's change; a key that rewrites the value returns the new one
+    $adjusted = Complete-ConfigChange -Name $name -Value $value
+    if ($null -ne $value -and $null -ne $adjusted) {
+        $value = $adjusted
+    }
 
     if ($null -eq $scoopConfig.$name) {
         $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
@@ -173,10 +176,17 @@ function Complete-ConfigChange {
     if ($Name -eq 'shim') {
         if (get_config SHIM_AUTO_REFRESH $true) {
             . "$PSScriptRoot\..\lib\shim.ps1"
-            Update-ShimInstance (Get-ShimTemplate $Value)
+            Update-ShimInstance (Get-ShimTemplate $Value) | Out-Host
         } else {
             info "Run 'scoop shim update' to apply the new shim."
         }
+    }
+
+    if ($Name -eq 'proxy') {
+        if ($Value -match '^socks(4a?|5h?)?://') {
+            abort 'Socks proxy is not supported.'
+        }
+        return $Value -replace '^https?://', ''
     }
 }
 
