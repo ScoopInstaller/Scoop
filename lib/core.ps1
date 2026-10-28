@@ -182,9 +182,10 @@ function Complete-ConfigChange {
         }
     }
 
-    if ($Name -eq 'proxy') {
-        if ($Value -match '^socks(4a?|5h?)?://') {
-            abort 'Socks proxy is not supported.'
+    if ($Name -eq 'proxy' -and $Value -match '^([a-z][a-z0-9+.-]*)://') {
+        $scheme = $matches[1]
+        if ($scheme -notmatch '^https?$') {
+            abort "Proxy scheme '${scheme}://' is not supported."
         }
         return $Value -replace '^https?://', ''
     }

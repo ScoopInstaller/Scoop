@@ -23,39 +23,66 @@ Describe 'config' -Tag 'Scoop' {
         load_cfg $configFile | Should-Be $null
     }
 
-    Describe 'shim_auto_refresh' {
-        BeforeEach {
-            'clobbered' | Out-File "$scoopdir\shims\refresh-test.exe" -NoNewline
-            'clobbered' | Out-File "$scoopdir\shims\refresh-test.shim" -NoNewline
-            Mock get_config { $false } -ParameterFilter { $Name -eq 'NO_JUNCTION' }
-            Mock info {}
+    Describe 'Complete-ConfigChange' {
+        Context 'shim_auto_refresh' {
+            BeforeEach {
+                'clobbered' | Out-File "$scoopdir\shims\refresh-test.exe" -NoNewline
+                'clobbered' | Out-File "$scoopdir\shims\refresh-test.shim" -NoNewline
+                Mock get_config { $false } -ParameterFilter { $Name -eq 'NO_JUNCTION' }
+                Mock info {}
+            }
+
+            AfterEach {
+                Remove-Item -Force -ErrorAction SilentlyContinue "$scoopdir\shims\refresh-test.exe"
+                Remove-Item -Force -ErrorAction SilentlyContinue "$scoopdir\shims\refresh-test.shim"
+            }
+
+            It 'leaves the copies alone when shim_auto_refresh is off' {
+                Mock get_config { $false } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
+
+                Complete-ConfigChange -Name shim -Value 'scoop-shim-cs'
+
+                [IO.File]::ReadAllText("$scoopdir\shims\refresh-test.exe") | Should-Be 'clobbered'
+                Should-Invoke -CommandName info -Times 1 -ParameterFilter { $msg -like "*scoop shim update*" }
+            }
+
+            It 'refreshes with the value being set, not the one still on disk' {
+                Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
+                Mock get_config { $true } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
+
+                Complete-ConfigChange -Name shim -Value $null 6>$null
+
+                (Get-FileHash -LiteralPath "$scoopdir\shims\refresh-test.exe").Hash |
+                    Should-Be (Get-FileHash -LiteralPath (Get-ShimTemplate)).Hash
+            }
         }
 
-        AfterEach {
-            Remove-Item -Force -ErrorAction SilentlyContinue "$scoopdir\shims\refresh-test.exe"
-            Remove-Item -Force -ErrorAction SilentlyContinue "$scoopdir\shims\refresh-test.shim"
-        }
+        Context 'proxy' {
+            It 'strips an http or https scheme' {
+                (set_config 'proxy' 'http://10.0.0.1:8080').proxy | Should-Be '10.0.0.1:8080'
+                (set_config 'proxy' 'https://user:pass@10.0.0.1:8080').proxy | Should-Be 'user:pass@10.0.0.1:8080'
+            }
 
-        It 'leaves the copies alone when shim_auto_refresh is off' {
-            Mock get_config { $false } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
+            It 'stores credentials that look like a scheme' {
+                (set_config 'proxy' 'socks:pass@10.0.0.1:8080').proxy | Should-Be 'socks:pass@10.0.0.1:8080'
+            }
 
-            Complete-ConfigChange -Name shim -Value 'scoop-shim-cs'
+            It 'rejects an unsupported scheme and keeps the stored value' {
+                Mock abort { throw $msg }
+                set_config 'proxy' '10.0.0.1:8080' | Out-Null
 
-            [IO.File]::ReadAllText("$scoopdir\shims\refresh-test.exe") | Should-Be 'clobbered'
-            Should-Invoke -CommandName info -Times 1 -ParameterFilter { $msg -like "*scoop shim update*" }
-        }
+                { set_config 'proxy' 'ftp://10.0.0.1:8080' } | Should-Throw '*ftp://*'
 
-        It 'refreshes with the value being set, not the one still on disk' {
-            Mock get_config { $null } -ParameterFilter { $Name -eq 'SHIM' }
-            Mock get_config { $true } -ParameterFilter { $Name -eq 'SHIM_AUTO_REFRESH' }
+                (get_config 'proxy') | Should-Be '10.0.0.1:8080'
+            }
 
-            Complete-ConfigChange -Name shim -Value $null 6>$null
+            It 'removes the value' {
+                set_config 'proxy' $null | Out-Null
 
-            (Get-FileHash -LiteralPath "$scoopdir\shims\refresh-test.exe").Hash |
-                Should-Be (Get-FileHash -LiteralPath (Get-ShimTemplate)).Hash
+                (get_config 'proxy') | Should-Be $null
+            }
         }
     }
-
 
     It 'set_config should be able to save typed values correctly' {
         # number
