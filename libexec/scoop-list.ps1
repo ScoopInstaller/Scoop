@@ -22,7 +22,7 @@ if (-not $apps) {
 }
 
 Write-Host "Installed apps$(if($query) { `" matching '$query'`"}):"
-$list = $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
+$list = @($apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $app = $_.name
     $global = $_.global
     $ver = Select-CurrentVersion -AppName $app -Global:$global
@@ -63,7 +63,7 @@ $list = $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-O
             Info    = $info
         }
     }
-}
+})
 
 $list | Add-Member -TypeName 'ScoopApps' -PassThru
 exit 0
