@@ -69,17 +69,18 @@ Describe 'config' -Tag 'Scoop' {
 
             It 'rejects an unsupported scheme and keeps the stored value' {
                 Mock abort { throw $msg }
-                set_config 'proxy' '10.0.0.1:8080' | Out-Null
+                $scoopConfig = set_config 'proxy' '10.0.0.1:8080'
 
                 { set_config 'proxy' 'ftp://10.0.0.1:8080' } | Should-Throw '*ftp://*'
 
-                (get_config 'proxy') | Should-Be '10.0.0.1:8080'
+                $scoopConfig.proxy | Should-Be '10.0.0.1:8080'
             }
 
             It 'removes the value' {
+                $scoopConfig = set_config 'proxy' '10.0.0.1:8080'
                 set_config 'proxy' $null | Out-Null
 
-                (get_config 'proxy') | Should-Be $null
+                $scoopConfig.proxy | Should-Be $null
             }
         }
     }
