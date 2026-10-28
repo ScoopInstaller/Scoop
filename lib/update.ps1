@@ -283,7 +283,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
                 $source = cache_path $app $version $url
-                $ok, $err = check_hash $source $manifest_hash $(show_app $app $bucket)
+                $ok, $err, $reason = check_hash $source $manifest_hash $(show_app $app $bucket)
 
                 if (!$ok) {
                     error $err
@@ -294,7 +294,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    abort $(new_issue_msg $app $bucket 'hash check failed')
+                    abort $(new_issue_msg $app $bucket $reason)
                 }
             }
         }

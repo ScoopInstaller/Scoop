@@ -29,7 +29,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
 
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
-                $ok, $err = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
+                $ok, $err, $reason = check_hash "$dir\$fname" $manifest_hash $(show_app $app $bucket)
                 if (!$ok) {
                     error $err
                     $cached = cache_path $app $version $url
@@ -40,7 +40,7 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    abort $(new_issue_msg $app $bucket 'hash check failed')
+                    abort $(new_issue_msg $app $bucket $reason)
                 }
             }
         }
@@ -54,10 +54,20 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
 function Invoke-CachedDownload ($app, $version, $url, $to, $cookies = $null, $use_cache = $true) {
     $cached = cache_path $app $version $url
 
-    if (!(Test-Path $cached) -or !$use_cache) {
+    # A leftover '.aria2' control file or '.download' temp file means a previous
+    # download was interrupted: whatever sits at $cached is incomplete and must
+    # not be treated as a cache hit (aria2 writes directly to the final cache
+    # name - see Invoke-CachedAria2Download).
+    $interrupted = (Test-Path -LiteralPath "$cached.aria2") -or (Test-Path -LiteralPath "$cached.download")
+    if ($interrupted -or !(Test-Path $cached) -or !$use_cache) {
         ensure $cachedir | Out-Null
         Start-Download $url "$cached.download" $cookies
         Move-Item "$cached.download" $cached -Force
+        # Only drop the interrupted download's markers once the re-download
+        # succeeded - if it failed, they must stay so the next run retries
+        # instead of treating the leftover partial file as a cache hit.
+        Remove-Item -LiteralPath "$cached.aria2" -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath "$cached.download" -Force -ErrorAction SilentlyContinue
     } else { Write-Host "Loading $(url_remote_filename $url) from cache" }
 
     if (!($null -eq $to)) {
@@ -491,9 +501,16 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         }
 
         # remove aria2 input file when done
-        if (Test-Path $urlstxt, "$($data.$url.source).aria2*") {
+        if (Test-Path $urlstxt) {
             Remove-Item $urlstxt -Force -ErrorAction SilentlyContinue
-            Remove-Item "$($data.$url.source).aria2*" -Force -ErrorAction SilentlyContinue
+        }
+
+        # Keep the '.aria2' control files when the download did not finish, so
+        # the next run can resume it with '--continue' instead of starting over.
+        if ($lastexitcode -eq 0) {
+            foreach ($url in $urls) {
+                Remove-Item -LiteralPath "$($data.$url.source).aria2" -Force -ErrorAction SilentlyContinue
+            }
         }
 
         # Revert console encoding
@@ -511,7 +528,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
         # run hash checks
         if ($check_hash) {
             $manifest_hash = hash_for_url $manifest $url $architecture
-            $ok, $err = check_hash $data.$url.source $manifest_hash $(show_app $app $bucket)
+            $ok, $err, $reason = check_hash $data.$url.source $manifest_hash $(show_app $app $bucket)
             if (!$ok) {
                 error $err
                 if (Test-Path $data.$url.source) {
@@ -522,7 +539,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 if ($url.Contains('sourceforge.net')) {
                     Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
-                abort $(new_issue_msg $app $bucket 'hash check failed')
+                abort $(new_issue_msg $app $bucket $reason)
             }
         }
 
@@ -690,8 +707,8 @@ function get_magic_bytes_pretty($file, $glue = ' ') {
     return (get_magic_bytes $file | ForEach-Object { $_.ToString('x2') }) -join $glue
 }
 
-Function Get-RemoteFileSize ($Uri) {
-    $response = Invoke-WebRequest -Uri $Uri -Method HEAD -UseBasicParsing
+Function Get-RemoteFileSize ($Uri, [int] $TimeoutSec = 0) {
+    $response = Invoke-WebRequest -Uri $Uri -Method HEAD -UseBasicParsing -TimeoutSec $TimeoutSec
     if (!$response.Headers.StatusCode) {
         $response.Headers.'Content-Length' | ForEach-Object { [int]$_ }
     }
@@ -740,23 +757,59 @@ function hash_for_url($manifest, $url, $arch) {
     @($hashes)[$index]
 }
 
+function is_download_incomplete($file, $url) {
+    # Tells a truncated download apart from a genuine hash mismatch: the local
+    # file is smaller than the remote Content-Length.
+    try {
+        $remote_size = @(Get-RemoteFileSize (($url -split '#')[0]) 10)[0]
+        $local_file = Get-Item -LiteralPath $file -ErrorAction SilentlyContinue
+        if ($null -eq $local_file -or $null -eq $remote_size) {
+            # Cannot tell - assume complete and let the hash check decide
+            return $false
+        }
+        return [bool]($local_file.Length -lt $remote_size)
+    } catch {
+        # Remote size unavailable (HEAD unsupported, network error, ...)
+        return $false
+    }
+}
+
+function download_incomplete_msg($app_name, $url) {
+    $msg = "Download incomplete!`n"
+    $msg += "App:         $app_name`n"
+    $msg += "URL:         $url`n"
+    $msg += "The download was interrupted or truncated. Please try again."
+    return $msg
+}
+
 function check_hash($file, $hash, $app_name) {
-    # returns (ok, err)
+    # returns (ok, err, reason)
     if (!$hash) {
         warn "Warning: No hash in manifest. SHA256 for '$(fname $file)' is:`n    $((Get-FileHash -Path $file -Algorithm SHA256).Hash.ToLower())"
-        return $true, $null
+        return $true, $null, $null
     }
 
     Write-Host "Checking hash of $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m... " -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
-        return $false, "Hash type '$algorithm' isn't supported."
+        return $false, "Hash type '$algorithm' isn't supported.", 'hash check failed'
+    }
+
+    # A leftover '.aria2' control file means the transfer was interrupted -
+    # don't hash a partial file, report it as an incomplete download instead.
+    if (Test-Path -LiteralPath "$file.aria2") {
+        return $false, (download_incomplete_msg $app_name $url), 'download incomplete'
     }
 
     $actual = (Get-FileHash -Path $file -Algorithm $algorithm).Hash.ToLower()
     $expected = $expected.ToLower()
 
     if ($actual -ne $expected) {
+        # A truncated download (no control file left behind) is still a download
+        # failure, not a hash mismatch - check the size before blaming the hash.
+        if (is_download_incomplete $file $url) {
+            return $false, (download_incomplete_msg $app_name $url), 'download incomplete'
+        }
         $msg = "Hash check failed!`n"
         $msg += "App:         $app_name`n"
         $msg += "URL:         $url`n"
@@ -767,10 +820,10 @@ function check_hash($file, $hash, $app_name) {
             $msg += "Expected:    $expected`n"
             $msg += "Actual:      $actual"
         }
-        return $false, $msg
+        return $false, $msg, 'hash check failed'
     }
     Write-Host 'OK.' -f Green
-    return $true, $null
+    return $true, $null, $null
 }
 
 function get_hash([String] $multihash) {
