@@ -23,8 +23,10 @@
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\download.ps1"
+. "$PSScriptRoot\..\lib\update.ps1"
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
@@ -38,20 +40,6 @@ $use_cache = !($opt.k -or $opt.'no-cache')
 $quiet = $opt.q -or $opt.quiet
 $independent = $opt.i -or $opt.independent
 $all = $opt.a -or $opt.all
-
-# load config
-$configRepo = get_config SCOOP_REPO
-if (!$configRepo) {
-    $configRepo = 'https://github.com/ScoopInstaller/Scoop'
-    set_config SCOOP_REPO $configRepo | Out-Null
-}
-
-# Find current update channel from config
-$configBranch = get_config SCOOP_BRANCH
-if (!$configBranch) {
-    $configBranch = 'master'
-    set_config SCOOP_BRANCH $configBranch | Out-Null
-}
 
 if (($PSVersionTable.PSVersion.Major) -lt 5) {
     # check powershell version
@@ -482,7 +470,9 @@ if (-not ($apps -or $all)) {
 
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update @_ $force $quiet $independent $suggested $use_cache $check_hash }
+    $outdated | ForEach-Object { update_app @_ $force $quiet $independent $suggested $use_cache $check_hash }
+
+    show_suggestions $suggested
 }
 
 exit 0

@@ -1,0 +1,17 @@
+{
+    "version": "2.0",
+    "url": "https://example.com/fixture_replaced_way/2.0/app.zip",
+    "env_set": {
+        "APP_HOME": "$dir"
+    },
+    "pre_install": [
+        "Set-Content \"$env:TEMP\\note.txt\" 'hi'",
+        "Write-Output fixture_old_way",
+        "Write-Host \"'helper' requires fixture_old_way to run\"",
+        "# uses fixture_old_way internally",
+        "// legacy fixture_replaced_way setup"
+    ],
+    "checkver": {
+        "jsonpath": "$.fixture_still_used[0]"
+    }
+}

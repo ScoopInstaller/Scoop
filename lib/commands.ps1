@@ -22,7 +22,7 @@ function command_path($cmd) {
     if (!(Test-Path $cmd_path)) {
         # get path from shim
         $shim_path = "$scoopdir\shims\scoop-$cmd.ps1"
-        $line = ((Get-Content $shim_path) | Where-Object { $_.startswith('$path') })
+        $line = ((Get-Content $shim_path -Encoding UTF8) | Where-Object { $_.startswith('$path') })
         if ($line) {
             Invoke-Command ([scriptblock]::Create($line)) -NoNewScope
             $cmd_path = $path
@@ -56,7 +56,7 @@ function add_alias {
 
     $alias_script_name = "scoop-$name"
     $shimdir = shimdir $false
-    if (Test-Path "$shimdir\$alias_script_name.ps1") {
+    if (Test-Path -LiteralPath "$shimdir\$alias_script_name.ps1") {
         abort "File '$alias_script_name.ps1' already exists in shims directory."
     }
     $script = @(
@@ -86,8 +86,8 @@ function rm_alias {
     }
 
     info "Removing alias '$name'..."
-    if (Test-Path "$(shimdir $false)\scoop-$name.ps1") {
-        Remove-Item "$(shimdir $false)\scoop-$name.ps1"
+    if (Test-Path -LiteralPath "$(shimdir $false)\scoop-$name.ps1") {
+        Remove-Item -LiteralPath "$(shimdir $false)\scoop-$name.ps1"
     }
     $aliases.PSObject.Properties.Remove($name)
     set_config ALIAS $aliases | Out-Null

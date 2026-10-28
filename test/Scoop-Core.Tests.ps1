@@ -2,6 +2,7 @@ BeforeAll {
     . "$PSScriptRoot\Scoop-TestLib.ps1"
     . "$PSScriptRoot\..\lib\core.ps1"
     . "$PSScriptRoot\..\lib\system.ps1"
+    . "$PSScriptRoot\..\lib\shim.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
 }
 
@@ -52,6 +53,29 @@ Describe 'Get-HelperPath' -Tag 'Scoop' {
     It 'should throw if parameter is wrong or missing' {
         { Get-HelperPath -Helper } | Should-Throw
         { Get-HelperPath -Helper Wrong } | Should-Throw
+    }
+
+    Context 'Git' {
+        BeforeEach {
+            $gitTestRoot = Join-Path $TestDrive ([Guid]::NewGuid().ToString('N'))
+            Mock currentdir { "$gitTestRoot\git" }
+            Mock Get-Command { [PSCustomObject]@{ Source = 'path\git.exe' } } -ParameterFilter { $Name -eq 'git' }
+        }
+
+        It 'should prefer cmd\git.exe over runtime executables' {
+            foreach ($dir in 'cmd', 'mingw32\bin', 'mingw64\bin', 'ucrt64\bin', 'clangarm64\bin') {
+                $null = New-Item -ItemType Directory -Path "$gitTestRoot\git\$dir" -Force
+                $null = New-Item -ItemType File -Path "$gitTestRoot\git\$dir\git.exe"
+            }
+
+            $git = Get-HelperPath -Helper Git
+            $git | Should-Be "$gitTestRoot\git\cmd\git.exe"
+            @($git) | Should-BeCollection -Count 1
+        }
+
+        It 'should fall back to Git on PATH when it is not installed by Scoop' {
+            Get-HelperPath -Helper Git | Should-Be 'path\git.exe'
+        }
     }
 }
 
@@ -139,101 +163,6 @@ Describe 'movedir' -Tag 'Scoop', 'Windows' {
 
         (Get-Content "$dir\test.txt" -Raw) | Should-MatchString 'this is the one'
         Test-Path "$dir\_tmp\$extract_dir" | Should-BeFalse
-    }
-}
-
-Describe 'shim' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $working_dir = setup_working 'shim'
-        $shimdir = shimdir
-        Add-Path $shimdir
-    }
-
-    It "links a file onto the user's path" {
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
-
-        shim "$working_dir\shim-test.ps1" $false 'shim-test'
-        $null = & { Get-Command 'shim-test' -ea stop }
-        $null = & { Get-Command 'shim-test.ps1' -ea stop }
-        $null = & { Get-Command 'shim-test.cmd' -ea stop }
-        shim-test | Should-Be 'Hello, world!'
-    }
-
-    It 'shims a file with quote in path' {
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
-
-        shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
-        $null = & { Get-Command 'shim-test' -ea stop }
-        shim-test | Should-Be 'Hello, world!'
-    }
-
-    AfterEach {
-        rm_shim 'shim-test' $shimdir
-    }
-}
-
-Describe 'rm_shim' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $working_dir = setup_working 'shim'
-        $shimdir = shimdir
-        Add-Path $shimdir
-    }
-
-    It 'removes shim from path' {
-        shim "$working_dir\shim-test.ps1" $false 'shim-test'
-
-        rm_shim 'shim-test' $shimdir
-
-        { Get-Command 'shim-test' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.ps1' -ea stop } | Should-Throw
-        { Get-Command 'shim-test.cmd' -ea stop } | Should-Throw
-        { shim-test } | Should-Throw
-    }
-}
-
-Describe 'get_app_name_from_shim' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $working_dir = setup_working 'shim'
-        $shimdir = shimdir
-        Add-Path $shimdir
-        Mock appsdir { $working_dir }
-    }
-
-    It 'returns empty string if file does not exist' {
-        get_app_name_from_shim 'non-existent-file' | Should-Be ''
-    }
-
-    It 'returns app name if file exists and is a shim to an app' {
-        ensure "$working_dir/mockapp/current/"
-        Write-Output '' | Out-File "$working_dir/mockapp/current/mockapp1.ps1"
-        shim "$working_dir/mockapp/current/mockapp1.ps1" $false 'shim-test1'
-        $shim_path1 = (Get-Command 'shim-test1.ps1').Path
-        get_app_name_from_shim "$shim_path1" | Should-Be 'mockapp'
-        ensure "$working_dir/mockapp/1.0.0/"
-        Write-Output '' | Out-File "$working_dir/mockapp/1.0.0/mockapp2.ps1"
-        shim "$working_dir/mockapp/1.0.0/mockapp2.ps1" $false 'shim-test2'
-        $shim_path2 = (Get-Command 'shim-test2.ps1').Path
-        get_app_name_from_shim "$shim_path2" | Should-Be 'mockapp'
-    }
-
-    It 'returns empty string if file exists and is not a shim' {
-        Write-Output 'lorem ipsum' | Out-File -Encoding ascii "$working_dir/mock-shim.ps1"
-        get_app_name_from_shim "$working_dir/mock-shim.ps1" | Should-Be ''
-    }
-
-    AfterAll {
-        if (Get-Command 'shim-test1' -ErrorAction SilentlyContinue) {
-            rm_shim 'shim-test1' $shimdir -ErrorAction SilentlyContinue
-        }
-        if (Get-Command 'shim-test2' -ErrorAction SilentlyContinue) {
-            rm_shim 'shim-test2' $shimdir -ErrorAction SilentlyContinue
-        }
-        Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$working_dir/mockapp"
-        Remove-Item -Force -ErrorAction SilentlyContinue "$working_dir/moch-shim.ps1"
     }
 }
 
@@ -413,98 +342,6 @@ Describe 'app' -Tag 'Scoop' {
     }
 }
 
-Describe 'Get-PEMachine' -Tag 'Scoop', 'Windows' {
-    It 'returns machine type for a valid PE file' {
-        $shim_path = get_shim_path
-        if ($shim_path -and (Test-Path $shim_path)) {
-            $machine = Get-PEMachine $shim_path
-            # Should be a known machine type (I386 (x86): 0x014c, amd64 (x64): 0x8664, arm64: 0xAA64)
-            # https://learn.microsoft.com/en-us/windows/win32/sysinfo/image-file-machine-constants
-            @(0x014c, 0x8664, 0xAA64) | Should-ContainCollection $machine
-        } else {
-            Set-ItResult -Skipped -Because 'shim exe not found'
-        }
-    }
-
-    It 'returns 0 for a non-existent file' {
-        Get-PEMachine 'C:\nonexistent\fake.exe' | Should-Be 0
-    }
-
-    It 'returns 0 for a non-PE file' {
-        $working_dir = setup_working 'shim'
-        Get-PEMachine "$working_dir\shim-test.ps1" | Should-Be 0
-    }
-}
-
-Describe 'WoW64 path rewriting in shim' -Tag 'Scoop', 'Windows' {
-    BeforeAll {
-        $shimdir = shimdir
-        # CI checkouts have no installed scoop version dir, so point at the bundled shim.exe
-        $repo_shim = Join-Path $PSScriptRoot '..\supporting\shims\scoopcs\shim.exe'
-        Mock -CommandName get_shim_path -MockWith { $repo_shim }
-    }
-
-    It 'rewrites System32 to Sysnative in the shim file when the shim exe is x86 on x64 OS' {
-        $target = "$env:SystemRoot\System32\notepad.exe"
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (get_shim_path)) -eq 0x014c
-
-        shim $target $false 'wow64-test'
-
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        if ($rewrites) {
-            $line | Should-BeLikeString "*$env:SystemRoot\Sysnative\notepad.exe*"
-        } else {
-            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
-        }
-
-        # the 64-bit reader resolves the target back to the real System32 path either way
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
-    }
-
-    It 'does not rewrite paths outside System32 and SysWOW64' {
-        $target = "$env:SystemRoot\explorer.exe"
-
-        shim $target $false 'wow64-test'
-
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        $line | Should-BeLikeString "*$target*"
-        Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be $target
-    }
-
-    It 'rewrites SysWOW64 to System32 in the shim file when the shim exe is x86 on x64 OS' {
-        $wow = Join-Path ${env:SystemRoot} 'SysWOW64\notepad.exe'
-        if (-not (Test-Path $wow)) {
-            Set-ItResult -Skipped -Because 'SysWOW64 notepad not present'
-        }
-        $target = $wow
-        $rewrites = [System.Environment]::Is64BitOperatingSystem -and (Get-PEMachine (get_shim_path)) -eq 0x014c
-
-        shim $target $false 'wow64-test'
-
-        $line = Get-Content "$shimdir\wow64-test.shim" | Select-Object -First 1
-        if ($rewrites) {
-            # 64-bit reader sees the redirected (real) location via System32
-            $line | Should-BeLikeString "*$env:SystemRoot\System32\notepad.exe*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path "$env:SystemRoot\System32\notepad.exe").Path
-        } else {
-            $line | Should-BeLikeString "*$target*"
-            Get-ShimTarget "$shimdir\wow64-test.shim" | Should-Be (Resolve-Path $target).Path
-        }
-    }
-
-    It 'does not fail on a shim file without a resolvable target' {
-        Write-Output 'echo hi' | Out-File "$shimdir\broken.cmd" -Encoding ascii
-        & { Get-ShimTarget "$shimdir\broken.cmd" }
-        Get-ShimTarget "$shimdir\broken.cmd" | Should-BeNull
-
-        Remove-Item "$shimdir\broken.cmd" -Force
-    }
-
-    AfterEach {
-        rm_shim 'wow64-test' $shimdir
-    }
-}
-
 Describe 'Format Architecture String' -Tag 'Scoop' {
     It 'should keep correct architectures' {
         Format-ArchitectureString '32bit' | Should-Be '32bit'
@@ -553,5 +390,118 @@ Describe 'substitute' -Tag 'Scoop' {
 
             substitute ("`$name$($_)NoExt") $params $false | Should-Be "$_"
         }
+    }
+}
+Describe 'Get-CommandLiteral' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $pathDir = Join-Path $TestDrive 'literal-path'
+        $lookalikeDir = Join-Path $TestDrive 'literal-lookalike'
+        $decoyDir = Join-Path $TestDrive 'literal-decoy'
+        $null = [IO.Directory]::CreateDirectory($pathDir)
+        $null = [IO.Directory]::CreateDirectory($lookalikeDir)
+        $null = [IO.Directory]::CreateDirectory($decoyDir)
+        [IO.File]::WriteAllText("$pathDir\br[a]cket.exe", '')
+        [IO.File]::WriteAllText("$lookalikeDir\bracket.exe", '')
+        [IO.File]::WriteAllText("$decoyDir\clasper.exe", '')
+    }
+
+    It 'resolves a command name containing a wildcard character to the literal file on PATH' {
+        $oldPath = $env:PATH
+        $rest = (($oldPath -split ';') | Where-Object { $_ -and $_ -ne $pathDir -and $_ -ne $lookalikeDir -and $_ -ne $decoyDir }) -join ';'
+        $env:PATH = "$pathDir;$lookalikeDir;$rest"
+        try {
+            (Get-CommandLiteral 'br[a]cket.exe').Path | Should-Be "$pathDir\br[a]cket.exe"
+        } finally {
+            $env:PATH = $oldPath
+        }
+    }
+
+    It 'resolves a command name with a wildcard character and no extension' {
+        $oldPath = $env:PATH
+        $rest = (($oldPath -split ';') | Where-Object { $_ -and $_ -ne $pathDir -and $_ -ne $lookalikeDir -and $_ -ne $decoyDir }) -join ';'
+        $env:PATH = "$pathDir;$lookalikeDir;$rest"
+        try {
+            (Get-CommandLiteral 'br[a]cket').Path | Should-Be "$pathDir\br[a]cket.exe"
+        } finally {
+            $env:PATH = $oldPath
+        }
+    }
+
+    It 'returns nothing for a command that does not exist' {
+        Get-CommandLiteral 'scoop-no-such-command' | Should-BeNull
+    }
+
+    It 'resolves a full path containing a wildcard character' {
+        $full = "$pathDir\br[a]cket.exe"
+        (Get-CommandLiteral $full).Path | Should-Be $full
+    }
+
+    It 'does not resolve a wildcard command name from a look-alike on PATH' {
+        $oldPath = $env:PATH
+        $rest = (($oldPath -split ';') | Where-Object { $_ -and $_ -ne $pathDir -and $_ -ne $lookalikeDir -and $_ -ne $decoyDir }) -join ';'
+        $env:PATH = "$decoyDir;$rest"
+        try {
+            Get-CommandLiteral 'cl[a]sper.exe' | Should-BeNull
+        } finally {
+            $env:PATH = $oldPath
+        }
+    }
+}
+
+Describe 'Get-CommandPath' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $pathDir = Join-Path $TestDrive 'literal-path'
+        $lookalikeDir = Join-Path $TestDrive 'literal-lookalike'
+        $null = [IO.Directory]::CreateDirectory($pathDir)
+        $null = [IO.Directory]::CreateDirectory($lookalikeDir)
+        [IO.File]::WriteAllText("$pathDir\br[a]cket.exe", '')
+        [IO.File]::WriteAllText("$lookalikeDir\bracket.exe", '')
+    }
+
+    It 'resolves a command name containing a wildcard character to the literal file' {
+        $pathDir = Join-Path $TestDrive 'literal-path'
+        $lookalikeDir = Join-Path $TestDrive 'literal-lookalike'
+        $oldPath = $env:PATH
+        $rest = (($oldPath -split ';') | Where-Object { $_ -and $_ -ne $pathDir -and $_ -ne $lookalikeDir }) -join ';'
+        $env:PATH = "$pathDir;$lookalikeDir;$rest"
+        try {
+            Get-CommandPath 'br[a]cket.exe' | Should-Be "$pathDir\br[a]cket.exe"
+        } finally {
+            $env:PATH = $oldPath
+        }
+    }
+}
+
+Describe 'Show-DeprecatedWarning' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\manifest.ps1" # 'arch_specific'
+        $script = "rm_shim 'shim-test' '$TestDrive' 'app'`r`nrm_shim 'shim-test' '$TestDrive' 'app'`r`nshim 'target' `$false 'shim-test'`r`nshim 'target' `$false 'shim-test'"
+        $manifest = [PSCustomObject]@{
+            installer   = [PSCustomObject]@{ script = $script }
+            uninstaller = [PSCustomObject]@{ script = $script }
+        }
+    }
+
+    It 'warns once per deprecated function' {
+        Mock warn { }
+        Mock Remove-Shim { }
+        Mock New-Shim { }
+
+        Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+
+        Should-Invoke warn -Times 1 -Exactly -ParameterFilter { $msg -like '"rm_shim"*' }
+        Should-Invoke warn -Times 1 -Exactly -ParameterFilter { $msg -like '"shim"*' }
+    }
+
+    It 'warns again for the next manifest script' {
+        Mock warn { }
+        Mock Remove-Shim { }
+        Mock New-Shim { }
+
+        Invoke-HookScript -HookType 'installer' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+        Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+
+        Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"rm_shim"*' }
+        Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"shim"*' }
     }
 }
