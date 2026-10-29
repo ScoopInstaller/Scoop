@@ -112,6 +112,18 @@ Describe 'Test-CommandAvailable' -Tag 'Scoop' {
 }
 
 
+Describe 'Confirm-InstallationStatus' -Tag 'Scoop' {
+    It 'should report apps that are not installed' {
+        Mock error {}
+
+        $status = Confirm-InstallationStatus 'not_installed_app_xyz'
+
+        $status.installed | Should-BeCollection -Count 0
+        $status.failed['not_installed_app_xyz'] | Should-Be 'not installed'
+    }
+}
+
+
 Describe 'is_directory' -Tag 'Scoop' {
     BeforeAll {
         $working_dir = setup_working 'is_directory'

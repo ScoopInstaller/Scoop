@@ -20,6 +20,7 @@ if ($err) { error "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
 $all = $opt.a -or $opt.all
+$failed = @{}
 
 if (!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
 
@@ -41,22 +42,27 @@ function cleanup($app, $global, $verbose, $cache) {
     }
 
     Write-Host -f yellow "Removing $app`:" -NoNewline
-    $versions | ForEach-Object {
-        $version = $_
-        Write-Host " $version" -NoNewline
-        $dir = versiondir $app $version $global
-        # unlink all potential old link before doing recursive Remove-Item
-        unlink_persist_data (installed_manifest $app $version $global) $dir
-        Remove-Item $dir -ErrorAction Stop -Recurse -Force
-    }
-    $leftVersions = Get-ChildItem $appDir
-    if ($leftVersions.Length -eq 1 -and $leftVersions.Name -eq 'current' -and $leftVersions.LinkType) {
-        attrib $leftVersions.FullName -R /L
-        Remove-Item $leftVersions.FullName -ErrorAction Stop -Force
-        $leftVersions = $null
-    }
-    if (!$leftVersions) {
-        Remove-Item $appDir -ErrorAction Stop -Force
+    try {
+        $versions | ForEach-Object {
+            $version = $_
+            Write-Host " $version" -NoNewline
+            $dir = versiondir $app $version $global
+            # unlink all potential old link before doing recursive Remove-Item
+            unlink_persist_data (installed_manifest $app $version $global) $dir
+            Remove-Item $dir -ErrorAction Stop -Recurse -Force
+        }
+        $leftVersions = Get-ChildItem $appDir
+        if ($leftVersions.Length -eq 1 -and $leftVersions.Name -eq 'current' -and $leftVersions.LinkType) {
+            attrib $leftVersions.FullName -R /L
+            Remove-Item $leftVersions.FullName -ErrorAction Stop -Force
+            $leftVersions = $null
+        }
+        if (!$leftVersions) {
+            Remove-Item $appDir -ErrorAction Stop -Force
+        }
+    } catch {
+        error "Couldn't remove an old version of '$app'; it may be in use."
+        $failed[$app] = 'could not remove an old version'
     }
     Write-Host ''
 }
@@ -70,7 +76,9 @@ if ($apps -or $all) {
         }
     } else {
         $verbose = $true
-        $apps = Confirm-InstallationStatus $apps -Global:$global
+        $install_status = Confirm-InstallationStatus $apps -Global:$global
+        $apps = $install_status.installed
+        $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not installed in the requested scope' } | ForEach-Object { $failed[$_] = $install_status.failed[$_] }
     }
 
     # $apps is now a list of ($app, $global) tuples
@@ -85,4 +93,6 @@ if ($apps -or $all) {
     }
 }
 
-exit 0
+$failed_count = show_failed_apps $failed 'cleanup'
+
+exit [int]($failed_count -gt 0)

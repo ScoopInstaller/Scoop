@@ -934,8 +934,34 @@ function Format-ArchitectureString($Architecture) {
 }
 
 function Confirm-InstallationStatus {
+    <#
+    .SYNOPSIS
+        Check the installation status of the given apps.
+    .DESCRIPTION
+        Reports for every app whether it is installed and whether it can be used
+        as requested. Apps that are not installed, or that are installed in the
+        other scope, are reported as errors.
+    .PARAMETER Apps
+        Apps to check
+    .PARAMETER Global
+        Check the global installation
+    .OUTPUTS
+        System.Collections.Hashtable
+            'installed': the apps that have an app directory, as ($app, $global) tuples
+            'failed': the apps that can't be used as requested, as $app => reason
+                'not installed' - the app is not there at all
+                'not installed in the requested scope' - it is installed in the other scope
+                'not installed correctly' - it is installed, but the install is incomplete
+            Both lists can contain the same app: an install that is present but
+            incomplete is listed as installed (so that 'scoop uninstall' can
+            clean it up) and as failed.
+    .NOTES
+        An app that is not installed at all is not a failure for uninstall and
+        cleanup (nothing to remove), but it is for update. An app installed in
+        the other scope is a failure for every command.
+    #>
     [CmdletBinding()]
-    [OutputType([Object[]])]
+    [OutputType([Hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [String[]]
@@ -944,6 +970,7 @@ function Confirm-InstallationStatus {
         $Global
     )
     $Installed = @()
+    $Failed = @{}
     $Apps | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
         $App, $null, $null = parse_app $_
         if ($Global) {
@@ -952,8 +979,10 @@ function Confirm-InstallationStatus {
             } elseif (Test-Path (appdir $App $false)) {
                 error "'$App' isn't installed globally, but it may be installed locally."
                 warn "Try again without the --global (or -g) flag instead."
+                $Failed[$App] = 'not installed in the requested scope'
             } else {
                 error "'$App' isn't installed."
+                $Failed[$App] = 'not installed'
             }
         } else {
             if (Test-Path (appdir $App $false)) {
@@ -961,15 +990,18 @@ function Confirm-InstallationStatus {
             } elseif (Test-Path (appdir $App $true)) {
                 error "'$App' isn't installed locally, but it may be installed globally."
                 warn "Try again with the --global (or -g) flag instead."
+                $Failed[$App] = 'not installed in the requested scope'
             } else {
                 error "'$App' isn't installed."
+                $Failed[$App] = 'not installed'
             }
         }
         if (failed $App $Global) {
             error "'$App' isn't installed correctly."
+            $Failed[$App] = 'not installed correctly'
         }
     }
-    return , $Installed
+    return @{ installed = $Installed; failed = $Failed }
 }
 
 function wraptext($text, $width) {
