@@ -181,8 +181,8 @@ if (!$name) {
     set_config $value $null | Out-Null
     Write-Host "'$value' has been removed"
 } elseif ($null -ne $value) {
-    set_config $name $value | Out-Null
-    Write-Host "'$name' has been set to '$value'"
+    $scoopConfig = set_config $name $value
+    Write-Host "'$name' has been set to '$($scoopConfig.$name)'"
 } else {
     $value = get_config $name
     if($null -eq $value) {

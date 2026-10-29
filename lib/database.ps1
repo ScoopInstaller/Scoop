@@ -17,7 +17,7 @@
 #>
 function Get-SQLite {
     param (
-        [string]$Version = '2.0.2'
+        [string]$Version = '2.0.4'
     )
     try {
         $sqliteNetPath = "$env:TEMP\sqlite.net.zip"
@@ -29,7 +29,7 @@ function Get-SQLite {
             '32bit' { 'x86' }
             '64bit' { 'x64' }
             'arm64' { 'arm64' }
-            default { Write-Warning "Unknown architecture, using x64 as fallback"; 'x64' }
+            default { Write-Warning 'Unknown architecture, using x64 as fallback'; 'x64' }
         }
 
         Write-Host "Downloading System.Data.SQLite $Version..." -ForegroundColor DarkYellow
@@ -39,7 +39,7 @@ function Get-SQLite {
         if ($downloadPage.Content -match '(?s)<!-- Download product data.*?(PRODUCT,.+?)-->') {
             $productData = $Matches[1] | ConvertFrom-Csv
         } else {
-            throw "Failed to parse SQLite download page product data"
+            throw 'Failed to parse SQLite download page product data'
         }
         $matchRow = $productData | Where-Object { $_.'RELATIVE-URL' -match "sqlite-dll-win-$arch-" }
         if (-not $matchRow) {
@@ -48,7 +48,7 @@ function Get-SQLite {
         Write-Host "Downloading SQLite DLL $($matchRow.VERSION)..." -ForegroundColor DarkYellow
         Invoke-WebRequest -Uri "https://sqlite.org/$($matchRow.'RELATIVE-URL')" -OutFile $sqliteDllPath
 
-        Write-Host "Extracting libraries... " -ForegroundColor DarkYellow -NoNewline
+        Write-Host 'Extracting libraries... ' -ForegroundColor DarkYellow -NoNewline
         $sqliteNetPath, $sqliteDllPath | Expand-Archive -DestinationPath $sqliteTempPath -Force
         $null = New-Item -Path "$sqlitePath\$arch" -ItemType Directory -Force
         Move-Item -Path "$sqliteTempPath\lib\netstandard2.0\System.Data.SQLite.dll" -Destination $sqlitePath -Force
@@ -86,7 +86,8 @@ function Open-ScoopDB {
     }
     $dbPath = Join-Path $scoopdir 'scoop.db'
     $db = New-Object -TypeName System.Data.SQLite.SQLiteConnection
-    $db.ConnectionString = "Data Source=$dbPath"
+    # Wait up to 5s for the write lock instead of failing at once.
+    $db.ConnectionString = "Data Source=$dbPath;BusyTimeout=5000"
     $db.ParseViaFramework = $true # Allow UNC path
     $db.Open()
     $tableCommand = $db.CreateCommand()
@@ -101,10 +102,27 @@ function Open-ScoopDB {
         dependency TEXT,
         suggest TEXT,
         PRIMARY KEY (name, version, bucket)
-    )"
+    );
+    CREATE INDEX IF NOT EXISTS idx_app_bucket_name ON app(bucket, name);"
     $tableCommand.CommandType = [System.Data.CommandType]::Text
     $tableCommand.ExecuteNonQuery() | Out-Null
     $tableCommand.Dispose()
+    # TODO Add PRAGMA user_version gate before the next non-idempotent schema change (FTS5, ADD COLUMN).
+    $pragmaCommand = $db.CreateCommand()
+    try {
+        # WAL needs shared memory and is unavailable on network shares; only relax
+        # synchronous when the journal actually switched to WAL.
+        $pragmaCommand.CommandText = 'PRAGMA journal_mode = WAL'
+        if ($pragmaCommand.ExecuteScalar() -eq 'wal') {
+            $pragmaCommand.CommandText = 'PRAGMA synchronous = NORMAL'
+            $pragmaCommand.ExecuteNonQuery() | Out-Null
+        }
+    } catch {
+        Write-Warning "Could not enable WAL journal mode: $_"
+    }
+    $pragmaCommand.CommandText = 'PRAGMA cache_size = -8192; PRAGMA mmap_size = 268435456;'
+    $pragmaCommand.ExecuteNonQuery() | Out-Null
+    $pragmaCommand.Dispose()
     return $db
 }
 
@@ -131,20 +149,38 @@ function Set-ScoopDBItem {
 
     begin {
         $db = Open-ScoopDB
-        $dbTrans = $db.BeginTransaction()
+        # Serializable maps to BEGIN IMMEDIATE, so the write lock is taken up front.
         # TODO Support [hashtable]$InputObject
-        $colName = @($InputObject | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name)
+        $dbTrans = $db.BeginTransaction([System.Data.IsolationLevel]::Serializable)
+        $colName = 'name', 'description', 'version', 'bucket', 'manifest', 'binary', 'shortcut', 'dependency', 'suggest'
         $dbQuery = "INSERT OR REPLACE INTO app ($($colName -join ', ')) VALUES ($('@' + ($colName -join ', @')))"
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
         $dbCommand.CommandType = [System.Data.CommandType]::Text
+        foreach ($name in $colName) {
+            [void]$dbCommand.Parameters.AddWithValue("@$name", $null)
+        }
     }
     process {
-        foreach ($item in $InputObject) {
-            $item.PSObject.Properties | ForEach-Object {
-                $dbCommand.Parameters.AddWithValue("@$($_.Name)", $_.Value) | Out-Null
+        if ($null -eq $InputObject) { return }
+        try {
+            foreach ($item in $InputObject) {
+                foreach ($name in $colName) {
+                    $dbCommand.Parameters["@$name"].Value = if ($item.PSObject.Properties[$name]) {
+                        $item.PSObject.Properties[$name].Value
+                    } else {
+                        $null
+                    }
+                }
+                [void]$dbCommand.ExecuteNonQuery()
             }
-            $dbCommand.ExecuteNonQuery() | Out-Null
+        } catch {
+            # The end block is skipped when the process block throws, so roll back and release here.
+            $dbTrans.Rollback()
+            $dbCommand.Dispose()
+            $dbTrans.Dispose()
+            $db.Dispose()
+            throw
         }
     }
     end {
@@ -169,9 +205,6 @@ function Set-ScoopDBItem {
 .PARAMETER Path
     System.String
     The path to the bucket.
-.PARAMETER CommitHash
-    System.String
-    The commit hash to compare with the HEAD.
 .INPUTS
     None
 .OUTPUTS
@@ -194,44 +227,49 @@ function Set-ScoopDB {
             $bucketPath = Get-LocalBucket | ForEach-Object { Find-BucketDirectory $_ }
             $Path = (Get-ChildItem $bucketPath -Filter '*.json' -Recurse).FullName
         }
+        $Path = $Path | ForEach-Object {
+            if (Test-Path -LiteralPath $_ -PathType Container) {
+                (Get-ChildItem -LiteralPath $_ -Filter '*.json' -Recurse).FullName
+            } else {
+                $_
+            }
+        }
         $Path | ForEach-Object {
             $manifestRaw = [System.IO.File]::ReadAllText($_)
-            $manifest = ConvertFrom-Json $manifestRaw -ErrorAction SilentlyContinue
-            if ($null -ne $manifest.version) {
-                $list.Add([pscustomobject]@{
-                        name        = $($_ -replace '.*[\\/]([^\\/]+)\.json$', '$1')
-                        description = if ($manifest.description) { $manifest.description } else { '' }
-                        version     = $manifest.version
-                        bucket      = $($_ -replace '.*buckets[\\/]([^\\/]+)(?:[\\/].*)', '$1')
-                        manifest    = $manifestRaw
-                        binary      = $(
-                            $result = @()
-                            @(arch_specific 'bin' $manifest $arch) | ForEach-Object {
-                                if ($_ -is [System.Array]) {
-                                    $result += "$($_[1]).$($_[0].Split('.')[-1])"
-                                } else {
-                                    $result += $_
-                                }
-                            }
-                            $result -replace '.*?([^\\/]+)?(\.(exe|bat|cmd|ps1|jar|py))$', '$1' -join ' | '
-                        )
-                        shortcut    = $(
-                            $result = @()
-                            @(arch_specific 'shortcuts' $manifest $arch) | ForEach-Object {
-                                $result += $_[1]
-                            }
-                            $result -replace '.*?([^\\/]+$)', '$1' -join ' | '
-                        )
-                        dependency  = $manifest.depends -join ' | '
-                        suggest     = $(
-                            $suggest_output = @()
-                            $manifest.suggest.PSObject.Properties | ForEach-Object {
-                                $suggest_output += $_.Value -join ' | '
-                            }
-                            $suggest_output -join ' | '
-                        )
-                    })
+            try {
+                $manifest = ConvertFrom-Json $manifestRaw -ErrorAction Stop
+            } catch {
+                Write-Host "Skipping invalid manifest: $_" -ForegroundColor DarkYellow
+                return
             }
+            if ($null -eq $manifest.version) { return }
+            $list.Add([pscustomobject]@{
+                    name        = $($_ -replace '.*[\\/]([^\\/]+)\.json$', '$1')
+                    description = if ($manifest.description) { $manifest.description } else { '' }
+                    version     = $manifest.version
+                    bucket      = $($_ -replace '.*buckets[\\/]([^\\/]+)(?:[\\/].*)', '$1')
+                    manifest    = $manifestRaw
+                    binary      = $(
+                        $result = @()
+                        @(arch_specific 'bin' $manifest $arch) | ForEach-Object {
+                            if ($_ -is [System.Array]) {
+                                $result += "$($_[1]).$($_[0].Split('.')[-1])"
+                            } else {
+                                $result += $_
+                            }
+                        }
+                        $result -replace '.*?([^\\/]+)?(\.(exe|bat|cmd|ps1|jar|py))$', '$1' -join ' | '
+                    )
+                    shortcut    = $(
+                        $result = @()
+                        @(arch_specific 'shortcuts' $manifest $arch) | ForEach-Object {
+                            $result += $_[1]
+                        }
+                        $result -replace '.*?([^\\/]+$)', '$1' -join ' | '
+                    )
+                    dependency  = $manifest.depends -join ' | '
+                    suggest     = @($manifest.suggest.PSObject.Properties.Value) -join ' | '
+                })
         }
     }
     end {
@@ -247,6 +285,8 @@ function Set-ScoopDB {
 .DESCRIPTION
     Find item(s) from the Scoop SQLite database.
     The pattern is matched against the name, binaries, and shortcuts columns for apps.
+    The manifest column is not selected: search never reads it and skipping it
+    avoids moving the whole raw JSON blob per matching row.
 .PARAMETER Pattern
     System.String
     The pattern to search for. If is an empty string, all items will be returned.
@@ -267,7 +307,7 @@ function Find-ScoopDBItem {
         [string]
         $Pattern,
         [Parameter(Mandatory, Position = 1)]
-        [ValidateNotNullOrEmpty()]
+        [ValidateSet('name', 'binary', 'shortcut')]
         [string[]]
         $From
     )
@@ -276,14 +316,15 @@ function Find-ScoopDBItem {
         $db = Open-ScoopDB
         $dbAdapter = New-Object -TypeName System.Data.SQLite.SQLiteDataAdapter
         $result = New-Object System.Data.DataTable
-        $dbQuery = "SELECT * FROM app WHERE $(($From -join ' LIKE @Pattern OR ') + ' LIKE @Pattern')"
+        $dbQuery = "SELECT name, description, version, bucket, binary, shortcut, dependency, suggest FROM app WHERE $(($From -join ' LIKE @Pattern OR ') + ' LIKE @Pattern')"
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
         $dbCommand.CommandType = [System.Data.CommandType]::Text
         $dbAdapter.SelectCommand = $dbCommand
     }
     process {
-        $dbCommand.Parameters.AddWithValue('@Pattern', $(if ($Pattern -eq '') { '%' } else { '%' + $Pattern + '%' })) | Out-Null
+        $dbCommand.Parameters.Clear()
+        [void]$dbCommand.Parameters.AddWithValue('@Pattern', $(if ($Pattern -eq '') { '%' } else { '%' + $Pattern + '%' }))
         [void]$dbAdapter.Fill($result)
     }
     end {
@@ -342,10 +383,11 @@ function Get-ScoopDBItem {
         $dbAdapter.SelectCommand = $dbCommand
     }
     process {
-        $dbCommand.Parameters.AddWithValue('@Name', $Name) | Out-Null
-        $dbCommand.Parameters.AddWithValue('@Bucket', $Bucket) | Out-Null
+        $dbCommand.Parameters.Clear()
+        [void]$dbCommand.Parameters.AddWithValue('@Name', $Name)
+        [void]$dbCommand.Parameters.AddWithValue('@Bucket', $Bucket)
         if ($Version) {
-            $dbCommand.Parameters.AddWithValue('@Version', $Version) | Out-Null
+            [void]$dbCommand.Parameters.AddWithValue('@Version', $Version)
         }
         [void]$dbAdapter.Fill($result)
     }
@@ -353,8 +395,7 @@ function Get-ScoopDBItem {
         $dbCommand.Dispose()
         $dbAdapter.Dispose()
         $db.Dispose()
-        # With $Version, the PRIMARY KEY guarantees at most one row; without it, the
-        # query is already limited to one name+bucket pair, so selecting latest needs no -GroupBy.
+        # With $Version the PRIMARY KEY yields one row; without it a name+bucket pair can span several versions.
         if ($Version) {
             Write-Output $result -NoEnumerate
         } else {
@@ -365,53 +406,114 @@ function Get-ScoopDBItem {
 
 <#
 .SYNOPSIS
-    Get the latest row from a set of Scoop database rows.
+    Get the latest row(s) from a set of Scoop database rows.
 .DESCRIPTION
-    Compares the `version` property of each row semantically and returns the
-    latest row. Returns `$null` when no rows are provided.
+    Compares the `version` property of each row semantically and returns the latest row.
+    When `GroupBy` is supplied, returns the latest row per group.
+    Returns `$null` when no rows are provided.
 .PARAMETER Rows
     System.Object[]
     The rows to evaluate for the latest version. Each row must have a `version` property.
+.PARAMETER GroupBy
+    System.String[]
+    Optional column names used to group rows before semantic latest-row selection.
 .INPUTS
     System.Object[]
 .OUTPUTS
     System.Object
-    The latest row based on semantic versioning, or `$null` if no rows are provided.
+    The latest row, or `$null` if no rows are provided; an `ICollection` of latest rows when `GroupBy` is set.
 #>
 function Get-LatestScoopDBRow {
+    [CmdletBinding()]
     param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, Position = 0)]
         [AllowEmptyCollection()]
         [object[]]
-        $Rows
+        $Rows,
+        [Parameter(Position = 1)]
+        [string[]]
+        $GroupBy
     )
 
     if (-not $Rows -or $Rows.Count -eq 0) {
         return $null
     }
 
-    if (-not (Get-Command Compare-Version -ErrorAction Ignore)) {
+    # database.ps1 can be dot-sourced on its own, so load the comparer before its setting.
+    if (-not ('Scoop.VersionComparer' -as [Type]) -or -not (Get-Command Get-UpdateNightlySetting -ErrorAction Ignore)) {
         . "$PSScriptRoot\versions.ps1"
     }
 
-    $latest = $Rows[0]
-    for ($i = 1; $i -lt $Rows.Count; $i++) {
-        $row = $Rows[$i]
-        if ((Compare-Version -ReferenceVersion $latest.version -DifferenceVersion $row.version) -gt 0) {
-            $latest = $row
+    $updateNightly = Get-UpdateNightlySetting
+
+    if (-not $GroupBy -or $GroupBy.Count -eq 0) {
+        $latest = $Rows[0]
+        for ($i = 1; $i -lt $Rows.Count; $i++) {
+            $row = $Rows[$i]
+            if (([Scoop.VersionComparer]::Compare($latest.version, $row.version, $updateNightly)) -gt 0) {
+                $latest = $row
+            }
         }
+        return $latest
     }
 
-    return $latest
+    $cols = @($GroupBy)
+    $colCount = $cols.Count
+    $latestByKey = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    $latestOrder = [System.Collections.Generic.List[string]]::new()
+
+    if ($Rows[0] -is [System.Data.DataRow]) {
+        # A DataRow[string] read searches the schema, so the column ordinals are resolved once.
+        $table = $Rows[0].Table
+        $ordinals = [int[]]::new($colCount)
+        for ($g = 0; $g -lt $colCount; $g++) {
+            $ordinals[$g] = $table.Columns[$cols[$g]].Ordinal
+        }
+        $versionOrdinal = $table.Columns['version'].Ordinal
+        foreach ($row in $Rows) {
+            $key = [string]$row[$ordinals[0]]
+            for ($g = 1; $g -lt $colCount; $g++) {
+                $key += '|' + [string]$row[$ordinals[$g]]
+            }
+            if (-not $latestByKey.ContainsKey($key)) {
+                $latestByKey[$key] = $row
+                $latestOrder.Add($key)
+                continue
+            }
+            if ([Scoop.VersionComparer]::Compare($latestByKey[$key][$versionOrdinal], $row[$versionOrdinal], $updateNightly) -gt 0) {
+                $latestByKey[$key] = $row
+            }
+        }
+    } else {
+        foreach ($row in $Rows) {
+            $key = [string]$row.$($cols[0])
+            for ($g = 1; $g -lt $colCount; $g++) {
+                $col = $cols[$g]
+                $key += '|' + [string]$row.$col
+            }
+            if (-not $latestByKey.ContainsKey($key)) {
+                $latestByKey[$key] = $row
+                $latestOrder.Add($key)
+                continue
+            }
+            if ([Scoop.VersionComparer]::Compare($latestByKey[$key].version, $row.version, $updateNightly) -gt 0) {
+                $latestByKey[$key] = $row
+            }
+        }
+    }
+    $latestRows = [System.Collections.Generic.List[object]]::new($latestOrder.Count)
+    foreach ($key in $latestOrder) {
+        $latestRows.Add($latestByKey[$key])
+    }
+    return $latestRows
 }
 
 <#
 .SYNOPSIS
-    Return the semantically latest row or rows from a Scoop database result set.
+    Import the latest row(s) from a Scoop database result set into a fresh DataTable.
 .DESCRIPTION
-    Clones the schema of `Table` and imports the latest row per group when
-    `GroupBy` is supplied, or the single latest row across the whole table when
-    it is omitted. Returns an empty cloned table when the source table has no rows.
+    Thin wrapper over `Get-LatestScoopDBRow` that clones the schema of `Table` and
+    imports the resulting row(s). Returns an empty cloned table when the source has no rows.
 .PARAMETER Table
     System.Data.DataTable
     The source table returned from a Scoop database query.
@@ -420,7 +522,7 @@ function Get-LatestScoopDBRow {
     Optional column names used to group rows before semantic latest-row selection.
 .OUTPUTS
     System.Data.DataTable
-    A cloned table containing the latest matching row for each requested scope.
+    A cloned table containing the latest matching row(s).
 #>
 function Select-LatestScoopDBRow {
     param(
@@ -438,12 +540,8 @@ function Select-LatestScoopDBRow {
         return
     }
 
-    if ($GroupBy -and $GroupBy.Count -gt 0) {
-        foreach ($group in ($rows | Group-Object -Property $GroupBy)) {
-            $latestRows.ImportRow((Get-LatestScoopDBRow -Rows @($group.Group)))
-        }
-    } else {
-        $latestRows.ImportRow((Get-LatestScoopDBRow -Rows $rows))
+    foreach ($row in @(Get-LatestScoopDBRow -Rows $rows -GroupBy $GroupBy)) {
+        $latestRows.ImportRow($row)
     }
 
     Write-Output $latestRows -NoEnumerate
@@ -478,19 +576,29 @@ function Remove-ScoopDBItem {
 
     begin {
         $db = Open-ScoopDB
-        $dbTrans = $db.BeginTransaction()
+        $dbTrans = $db.BeginTransaction([System.Data.IsolationLevel]::Serializable)
         $dbQuery = 'DELETE FROM app WHERE bucket = @Bucket'
         $dbCommand = $db.CreateCommand()
         $dbCommand.CommandText = $dbQuery
         $dbCommand.CommandType = [System.Data.CommandType]::Text
     }
     process {
-        $dbCommand.Parameters.AddWithValue('@Bucket', $Bucket) | Out-Null
-        if ($Name) {
-            $dbCommand.CommandText = $dbQuery + ' AND name = @Name'
-            $dbCommand.Parameters.AddWithValue('@Name', $Name) | Out-Null
+        try {
+            $dbCommand.Parameters.Clear()
+            $dbCommand.CommandText = $dbQuery
+            [void]$dbCommand.Parameters.AddWithValue('@Bucket', $Bucket)
+            if ($Name) {
+                $dbCommand.CommandText = $dbQuery + ' AND name = @Name'
+                [void]$dbCommand.Parameters.AddWithValue('@Name', $Name)
+            }
+            $dbCommand.ExecuteNonQuery() | Out-Null
+        } catch {
+            $dbTrans.Rollback()
+            $dbCommand.Dispose()
+            $dbTrans.Dispose()
+            $db.Dispose()
+            throw
         }
-        $dbCommand.ExecuteNonQuery() | Out-Null
     }
     end {
         try {

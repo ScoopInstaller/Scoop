@@ -216,7 +216,8 @@ function Sync-Bucket {
     }
 }
 
-function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $use_cache = $true, $check_hash = $true) {
+function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
+    $app_key = if ($global) { "$app (global)" } else { $app }
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -256,14 +257,23 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     if (!$version) {
         # installed from a custom bucket/no longer supported
         error "No manifest available for '$app'."
+        $failed[$app_key] = 'no manifest available'
         return
     }
 
     Write-Host "Updating '$app' ($old_version -> $version)"
 
+    $failed_deps = failed_deps $manifest $failed
+    if ($failed_deps.Count -gt 0) {
+        error "'$app' depends on $($failed_deps -join ', '), which failed."
+        $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
+        return
+    }
+
     #region Workaround for #2952
     if (test_running_process $app $global) {
         Write-Host 'Running process detected, skip updating.'
+        $failed[$app_key] = 'skipped: running process'
         return
     }
     #endregion Workaround for #2952
@@ -273,12 +283,23 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     # Remove and replace whole region after proper fix
     Write-Host 'Downloading new version'
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $check_hash
+        if (!(Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $check_hash)) {
+            $failed[$app_key] = 'download failed'
+            return
+        }
     } else {
         $urls = script:url $manifest $architecture
 
         foreach ($url in $urls) {
-            Invoke-CachedDownload $app $version $url $null $manifest.cookie $use_cache
+            try {
+                Invoke-CachedDownload $app $version $url $null $manifest.cookie $use_cache
+            } catch {
+                Write-Host -f darkred $_
+                error "URL $url is not valid"
+                error $(new_issue_msg $app $bucket 'download failed')
+                $failed[$app_key] = 'download failed'
+                return
+            }
 
             if ($check_hash) {
                 $manifest_hash = hash_for_url $manifest $url $architecture
@@ -294,7 +315,9 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    abort $(new_issue_msg $app $bucket 'hash check failed')
+                    error $(new_issue_msg $app $bucket 'hash check failed')
+                    $failed[$app_key] = 'hash check failed'
+                    return
                 }
             }
         }
@@ -309,7 +332,10 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
     Write-Host "Uninstalling '$app' ($old_version)"
-    Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
+    if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+        $failed[$app_key] = 'uninstaller failed'
+        return
+    }
     Remove-ShimFromManifest $app $old_manifest $global $architecture
     rm_startmenu_shortcuts $old_manifest $global $architecture
 
@@ -348,10 +374,10 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     if (-not $independent) {
         # Also add missing dependencies
         $apps = @(Get-Dependency $app $architecture) -ne $app
-        $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+        $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
     }
 
     # The new version has already been downloaded (and hash-checked) above,
     # so re-install it from the cache instead of downloading it a second time.
-    install_app $app $architecture $global $suggested $true $check_hash
+    install_app $app $architecture $global $suggested $failed $true $check_hash
 }

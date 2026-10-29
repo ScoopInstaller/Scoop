@@ -27,7 +27,13 @@ function Show-DeprecatedWarning {
     #>
     param($Invocation, [String] $New)
 
-    warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $Invocation.MyCommand.Name, $New)
+    # a manifest script can call a deprecated function many times, warn once
+    if (!$script:deprecatedWarned) { $script:deprecatedWarned = @{} }
+    $name = $Invocation.MyCommand.Name
+    if ($script:deprecatedWarned.ContainsKey($name)) { return }
+    $script:deprecatedWarned[$name] = $true
+
+    warn ('"{0}" will be deprecated. Please change your code/manifest to use "{1}"' -f $name, $New)
     Write-Host "      -> $($Invocation.PSCommandPath):$($Invocation.ScriptLineNumber):$($Invocation.OffsetInLine)" -ForegroundColor DarkGray
 }
 
@@ -72,8 +78,11 @@ function set_config {
         $value = [System.Convert]::ToBoolean($value)
     }
 
-    # Initialize config's change
-    Complete-ConfigChange -Name $name -Value $value
+    # Initialize config's change; a key that rewrites the value returns the new one
+    $adjusted = Complete-ConfigChange -Name $name -Value $value
+    if ($null -ne $value -and $null -ne $adjusted) {
+        $value = $adjusted
+    }
 
     if ($null -eq $scoopConfig.$name) {
         $scoopConfig | Add-Member -MemberType NoteProperty -Name $name -Value $value
@@ -167,10 +176,18 @@ function Complete-ConfigChange {
     if ($Name -eq 'shim') {
         if (get_config SHIM_AUTO_REFRESH $true) {
             . "$PSScriptRoot\..\lib\shim.ps1"
-            Update-ShimInstance (Get-ShimTemplate $Value)
+            Update-ShimInstance (Get-ShimTemplate $Value) | Out-Host
         } else {
             info "Run 'scoop shim update' to apply the new shim."
         }
+    }
+
+    if ($Name -eq 'proxy' -and $Value -match '^([a-z][a-z0-9+.-]*)://') {
+        $scheme = $matches[1]
+        if ($scheme -notmatch '^https?$') {
+            abort "Proxy scheme '${scheme}://' is not supported."
+        }
+        return $Value -replace '^https?://', ''
     }
 }
 
@@ -552,9 +569,9 @@ function app_status($app, $global) {
     $status.outdated = $false
     if ($status.version -and $status.latest_version) {
         if (get_config FORCE_UPDATE $false) {
-            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -ne 0)
+            $status.outdated = ([Scoop.VersionComparer]::Compare($status.version, $status.latest_version, (Get-UpdateNightlySetting))) -ne 0
         } else {
-            $status.outdated = ((Compare-Version -ReferenceVersion $status.version -DifferenceVersion $status.latest_version) -gt 0)
+            $status.outdated = ([Scoop.VersionComparer]::Compare($status.version, $status.latest_version, (Get-UpdateNightlySetting))) -gt 0
         }
     }
 
@@ -917,8 +934,34 @@ function Format-ArchitectureString($Architecture) {
 }
 
 function Confirm-InstallationStatus {
+    <#
+    .SYNOPSIS
+        Check the installation status of the given apps.
+    .DESCRIPTION
+        Reports for every app whether it is installed and whether it can be used
+        as requested. Apps that are not installed, or that are installed in the
+        other scope, are reported as errors.
+    .PARAMETER Apps
+        Apps to check
+    .PARAMETER Global
+        Check the global installation
+    .OUTPUTS
+        System.Collections.Hashtable
+            'installed': the apps that have an app directory, as ($app, $global) tuples
+            'failed': the apps that can't be used as requested, as $app => reason
+                'not installed' - the app is not there at all
+                'not installed in the requested scope' - it is installed in the other scope
+                'not installed correctly' - it is installed, but the install is incomplete
+            Both lists can contain the same app: an install that is present but
+            incomplete is listed as installed (so that 'scoop uninstall' can
+            clean it up) and as failed.
+    .NOTES
+        An app that is not installed at all is not a failure for uninstall and
+        cleanup (nothing to remove), but it is for update. An app installed in
+        the other scope is a failure for every command.
+    #>
     [CmdletBinding()]
-    [OutputType([Object[]])]
+    [OutputType([Hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [String[]]
@@ -927,6 +970,7 @@ function Confirm-InstallationStatus {
         $Global
     )
     $Installed = @()
+    $Failed = @{}
     $Apps | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
         $App, $null, $null = parse_app $_
         if ($Global) {
@@ -935,8 +979,10 @@ function Confirm-InstallationStatus {
             } elseif (Test-Path (appdir $App $false)) {
                 error "'$App' isn't installed globally, but it may be installed locally."
                 warn "Try again without the --global (or -g) flag instead."
+                $Failed[$App] = 'not installed in the requested scope'
             } else {
                 error "'$App' isn't installed."
+                $Failed[$App] = 'not installed'
             }
         } else {
             if (Test-Path (appdir $App $false)) {
@@ -944,15 +990,18 @@ function Confirm-InstallationStatus {
             } elseif (Test-Path (appdir $App $true)) {
                 error "'$App' isn't installed locally, but it may be installed globally."
                 warn "Try again with the --global (or -g) flag instead."
+                $Failed[$App] = 'not installed in the requested scope'
             } else {
                 error "'$App' isn't installed."
+                $Failed[$App] = 'not installed'
             }
         }
         if (failed $App $Global) {
             error "'$App' isn't installed correctly."
+            $Failed[$App] = 'not installed correctly'
         }
     }
-    return , $Installed
+    return @{ installed = $Installed; failed = $Failed }
 }
 
 function wraptext($text, $width) {

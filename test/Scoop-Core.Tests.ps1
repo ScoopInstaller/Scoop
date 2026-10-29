@@ -112,6 +112,18 @@ Describe 'Test-CommandAvailable' -Tag 'Scoop' {
 }
 
 
+Describe 'Confirm-InstallationStatus' -Tag 'Scoop' {
+    It 'should report apps that are not installed' {
+        Mock error {}
+
+        $status = Confirm-InstallationStatus 'not_installed_app_xyz'
+
+        $status.installed | Should-BeCollection -Count 0
+        $status.failed['not_installed_app_xyz'] | Should-Be 'not installed'
+    }
+}
+
+
 Describe 'is_directory' -Tag 'Scoop' {
     BeforeAll {
         $working_dir = setup_working 'is_directory'
@@ -469,5 +481,39 @@ Describe 'Get-CommandPath' -Tag 'Scoop', 'Windows' {
         } finally {
             $env:PATH = $oldPath
         }
+    }
+}
+
+Describe 'Show-DeprecatedWarning' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\manifest.ps1" # 'arch_specific'
+        $script = "rm_shim 'shim-test' '$TestDrive' 'app'`r`nrm_shim 'shim-test' '$TestDrive' 'app'`r`nshim 'target' `$false 'shim-test'`r`nshim 'target' `$false 'shim-test'"
+        $manifest = [PSCustomObject]@{
+            installer   = [PSCustomObject]@{ script = $script }
+            uninstaller = [PSCustomObject]@{ script = $script }
+        }
+    }
+
+    It 'warns once per deprecated function' {
+        Mock warn { }
+        Mock Remove-Shim { }
+        Mock New-Shim { }
+
+        Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+
+        Should-Invoke warn -Times 1 -Exactly -ParameterFilter { $msg -like '"rm_shim"*' }
+        Should-Invoke warn -Times 1 -Exactly -ParameterFilter { $msg -like '"shim"*' }
+    }
+
+    It 'warns again for the next manifest script' {
+        Mock warn { }
+        Mock Remove-Shim { }
+        Mock New-Shim { }
+
+        Invoke-HookScript -HookType 'installer' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+        Invoke-HookScript -HookType 'uninstaller' -Manifest $manifest -ProcessorArchitecture '64bit' 6>$null
+
+        Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"rm_shim"*' }
+        Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"shim"*' }
     }
 }

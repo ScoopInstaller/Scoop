@@ -43,7 +43,9 @@ function do_uninstall($app, $global) {
     $architecture = $install.architecture
 
     Write-Output "Uninstalling '$app'"
-    Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
+    if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+        abort "Couldn't uninstall '$app'."
+    }
     Remove-ShimFromManifest $app $manifest $global $architecture
 
     # If a junction was used during install, that will have been used

@@ -17,6 +17,7 @@ Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForE
 switch ($subCommand) {
     ({ $subCommand -in @($null, '-h', '--help', '/?') }) {
         exec 'help'
+        exit $LASTEXITCODE
     }
     ({ $subCommand -in @('-v', '--version') }) {
         Write-Host 'Current Scoop version:'
@@ -45,6 +46,7 @@ switch ($subCommand) {
         } else {
             exec $subCommand $arguments
         }
+        exit $LASTEXITCODE
     }
     default {
         warn "scoop: '$subCommand' isn't a scoop command. See 'scoop help'."
