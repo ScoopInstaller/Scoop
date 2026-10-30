@@ -147,7 +147,16 @@ if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
 $failed = @{}
-$apps | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
+$apps | ForEach-Object {
+    $current = $_
+    try {
+        install_app $current $architecture $global $suggested $failed $use_cache $check_hash
+    } catch {
+        $key = if ($global) { "$current (global)" } else { $current }
+        $failed[$key] = $_.Exception.Message
+        error $_.Exception.Message
+    }
+}
 
 show_suggestions $suggested
 $failed_count = show_failed_apps $failed

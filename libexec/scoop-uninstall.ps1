@@ -64,7 +64,13 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
         $architecture = $install.architecture
         $bucket = $install.bucket
 
-        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+        try {
+            Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+        } catch {
+            $failed[$app] = $_.Exception.Message
+            error $_.Exception.Message
+            continue
+        }
 
         #region Workaround for #2952
         if (test_running_process $app $global) {
@@ -96,7 +102,13 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
             }
         }
 
-        Invoke-HookScript -HookType 'post_uninstall' -Manifest $manifest -Arch $architecture
+        try {
+            Invoke-HookScript -HookType 'post_uninstall' -Manifest $manifest -Arch $architecture
+        } catch {
+            $failed[$app] = $_.Exception.Message
+            error $_.Exception.Message
+            continue
+        }
     }
     # remove older versions
     $oldVersions = @(Get-ChildItem $appDir -Name -Exclude 'current')

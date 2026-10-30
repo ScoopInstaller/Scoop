@@ -216,8 +216,24 @@ function Sync-Bucket {
     }
 }
 
+function restore_app($app, $old_manifest, $old_version, $dir, $persist_dir, $global, $architecture, $backup) {
+    # the old manifest expands $version, which still names the failed update
+    $version = $old_version
+    if ($backup) { Move-Item $backup $dir }
+    if (installed_manifest $app $old_version $global) {
+        Write-Host "Restoring '$app' ($old_version)"
+        $original_dir = $dir
+        $dir = link_current $dir
+        link_app $old_manifest $dir $original_dir $persist_dir $global $architecture
+    } else {
+        warn "'$app' ($old_version) cannot be restored; its files were removed by the uninstaller."
+    }
+}
+
 function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app_key = if ($global) { "$app (global)" } else { $app }
+    $app_name = $app
+    $unlinked = $false
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -329,60 +345,60 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     $dir = versiondir $app $old_version $global
     $persist_dir = persistdir $app $global
 
-    Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
+    try {
+        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
-    Write-Host "Uninstalling '$app' ($old_version)"
-    if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-        $failed[$app_key] = 'uninstaller failed'
-        return
-    }
-    unlink_app $app $old_manifest $dir $persist_dir $global $architecture
-
-    $backup = $null
-    if ($force -and ($old_version -eq $version)) {
-        $backup = "$dir/../_$version.old"
-        if (Test-Path $backup) {
-            $i = 1
-            While (Test-Path "$backup($i)") {
-                $i++
-            }
-            $backup = "$backup($i)"
+        Write-Host "Uninstalling '$app' ($old_version)"
+        if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+            $failed[$app_key] = 'uninstaller failed'
+            return
         }
-        Move-Item $dir $backup
-    }
+        unlink_app $app $old_manifest $dir $persist_dir $global $architecture
+        $unlinked = $true
 
-    Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
+        $backup = $null
+        if ($force -and ($old_version -eq $version)) {
+            $backup = "$dir/../_$version.old"
+            if (Test-Path $backup) {
+                $i = 1
+                While (Test-Path "$backup($i)") {
+                    $i++
+                }
+                $backup = "$backup($i)"
+            }
+            Move-Item $dir $backup
+        }
 
-    $app_name = $app
-    if ($bucket) {
-        # add bucket name it was installed from
-        $app = "$bucket/$app"
-    }
-    if ($install.url -and (!$pin_broken -or !$bucket)) {
-        # use the url of the install json if the application was installed through url
-        $app = $install.url
-    }
+        Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
 
-    if (-not $independent) {
-        # Also add missing dependencies
-        $apps = @(Get-Dependency $app $architecture) -ne $app
-        $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
-    }
+        if ($bucket) {
+            # add bucket name it was installed from
+            $app = "$bucket/$app"
+        }
+        if ($install.url -and (!$pin_broken -or !$bucket)) {
+            # use the url of the install json if the application was installed through url
+            $app = $install.url
+        }
 
-    # The new version has already been downloaded (and hash-checked) above,
-    # so re-install it from the cache instead of downloading it a second time.
-    install_app $app $architecture $global $suggested $failed $true $check_hash
+        if (-not $independent) {
+            # Also add missing dependencies
+            $apps = @(Get-Dependency $app $architecture) -ne $app
+            $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
+        }
 
-    if ($failed.ContainsKey($app_name)) {
-        # only the wiring was removed, so the old version can be linked again
-        if ($backup) { Move-Item $backup $dir }
-        if (installed_manifest $app_name $old_version $global) {
-            Write-Host "Restoring '$app_name' ($old_version)"
-            $original_dir = $dir
-            $dir = link_current $dir
-            link_app $old_manifest $dir $original_dir $persist_dir $global $architecture
-        } else {
-            warn "'$app_name' ($old_version) cannot be restored; its files were removed by the uninstaller."
+        # The new version has already been downloaded (and hash-checked) above,
+        # so re-install it from the cache instead of downloading it a second time.
+        # the shared table keeps a failed dependency visible, the scope specific key
+        # keeps a failure of the other scope from triggering a restoration
+        install_app $app $architecture $global $suggested $failed $true $check_hash
+        if ($failed.ContainsKey($app_key)) {
+            restore_app $app_name $old_manifest $old_version $dir $persist_dir $global $architecture $backup
+        }
+    } catch {
+        $failed[$app_key] = $_.Exception.Message
+        error $_.Exception.Message
+        if ($unlinked) {
+            restore_app $app_name $old_manifest $old_version $dir $persist_dir $global $architecture $backup
         }
     }
 }
