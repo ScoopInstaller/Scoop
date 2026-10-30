@@ -57,7 +57,8 @@ function Invoke-Extraction {
                 & $extractFn @fnArgs -Removal
             } catch {
                 Write-Host 'Error.' -ForegroundColor DarkRed
-                throw
+                error $_.Exception.Message
+                exit 1
             }
             Write-Host 'Done.' -ForegroundColor Green
             $extracted++
@@ -89,7 +90,7 @@ function Expand-7zipArchive {
         try {
             $7zPath = (Get-Command '7z' -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         } catch [System.Management.Automation.CommandNotFoundException] {
-            abort "`nCannot find external 7-Zip (7z.exe) while 'use_external_7zip' is 'true'!`nRun 'scoop config use_external_7zip false' or install 7-Zip manually and try again."
+            throw "`nCannot find external 7-Zip (7z.exe) while 'use_external_7zip' is 'true'!`nRun 'scoop config use_external_7zip false' or install 7-Zip manually and try again."
         }
     } else {
         $7zPath = Get-HelperPath -Helper 7zip
@@ -111,7 +112,7 @@ function Expand-7zipArchive {
     }
     $Status = Invoke-ExternalCommand $7zPath $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+        throw "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if ($IsTar) {
         # Check for tar
@@ -121,7 +122,7 @@ function Expand-7zipArchive {
             $TarFile = (Select-String -Path $LogPath -Pattern '[^ ]*tar$').Matches.Value
             Expand-7zipArchive -Path "$DestinationPath\$TarFile" -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Removal
         } else {
-            abort "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
+            throw "Failed to list files in $Path.`nNot a 7-Zip supported archive file."
         }
     }
     if (!$IsTar -and $ExtractDir) {
@@ -168,7 +169,11 @@ function Expand-ZstdArchive {
     )
     # TODO: Remove this function after 2024/12/31
     Show-DeprecatedWarning $MyInvocation 'Expand-7zipArchive'
-    Expand-7zipArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Switches $Switches -Removal:$Removal
+    try {
+        Expand-7zipArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Switches $Switches -Removal:$Removal
+    } catch {
+        abort $_.Exception.Message
+    }
 }
 
 function Expand-MsiArchive {
@@ -206,7 +211,7 @@ function Expand-MsiArchive {
     }
     $Status = Invoke-ExternalCommand $MsiPath $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+        throw "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if ($ExtractDir -and (Test-Path "$DestinationPath\SourceDir")) {
         movedir "$DestinationPath\SourceDir\$ExtractDir" $OriDestinationPath | Out-Null
@@ -258,7 +263,7 @@ function Expand-InnoArchive {
     }
     $Status = Invoke-ExternalCommand (Get-HelperPath -Helper Innounp) $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+        throw "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
@@ -332,7 +337,7 @@ function Expand-DarkArchive {
     }
     $Status = Invoke-ExternalCommand $DarkPath $ArgList -LogPath $LogPath
     if (!$Status) {
-        abort "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
+        throw "Failed to extract files from $Path.`nLog file:`n  $(friendly_path $LogPath)`n$(new_issue_msg $app $bucket 'decompress error')"
     }
     if (Test-Path "$DestinationPath\WixAttachedContainer") {
         Rename-Item "$DestinationPath\WixAttachedContainer" 'AttachedContainer' -ErrorAction Ignore
