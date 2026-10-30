@@ -107,15 +107,17 @@ function Add-Path {
     if (!$inPath -or $Force) {
         if (!$Quiet) {
             $Path | ForEach-Object {
-                Write-Host "Adding $(friendly_path $_) to $(if ($Global) {'global'} else {'your'}) path."
+                Write-Host "Adding $(friendly_path $_) to $(if ($Global) {'global'} else {'your'}) $TargetEnvVar."
             }
         }
+        $strippedPath = if ($strippedPath) { @($strippedPath) } else { @() };
         Set-EnvVar -Name $TargetEnvVar -Value ((@($Path) + $strippedPath) -join ';') -Global:$Global
     }
     # current session
-    $inPath, $strippedPath = Split-PathLikeEnvVar $Path $env:PATH
+    $inPath, $strippedPath = Split-PathLikeEnvVar $Path (Get-Content "env:$TargetEnvVar" -ErrorAction Ignore)
     if (!$inPath -or $Force) {
-        $env:PATH = (@($Path) + $strippedPath) -join ';'
+        $strippedPath = if ($strippedPath) { @($strippedPath) } else { @() };
+        Set-Content "env:$TargetEnvVar" ((@($Path) + $strippedPath) -join ';')
     }
 }
 
@@ -133,15 +135,15 @@ function Remove-Path {
     if ($inPath) {
         if (!$Quiet) {
             $Path | ForEach-Object {
-                Write-Host "Removing $(friendly_path $_) from $(if ($Global) {'global'} else {'your'}) path."
+                Write-Host "Removing $(friendly_path $_) from $(if ($Global) {'global'} else {'your'}) $TargetEnvVar."
             }
         }
         Set-EnvVar -Name $TargetEnvVar -Value $strippedPath -Global:$Global
     }
     # current session
-    $inSessionPath, $strippedPath = Split-PathLikeEnvVar $Path $env:PATH
+    $inSessionPath, $strippedPath = Split-PathLikeEnvVar $Path (Get-Content "env:$TargetEnvVar" -ErrorAction Ignore)
     if ($inSessionPath) {
-        $env:PATH = $strippedPath
+        Set-Content "env:$TargetEnvVar" $strippedPath
     }
     if ($PassThru) {
         return $inPath
