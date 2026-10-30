@@ -55,13 +55,13 @@ function Invoke-Extraction {
             Write-Host "Extracting $([char]0x1b)[36m$(url_remote_filename $uri[$i])$([char]0x1b)[0m... " -NoNewline
             try {
                 & $extractFn @fnArgs -Removal
+                Write-Host 'Done.' -ForegroundColor Green
             } catch {
                 Write-Host 'Error.' -ForegroundColor DarkRed
                 error $_.Exception.Message
-                exit 1
+            } finally {
+                $extracted++
             }
-            Write-Host 'Done.' -ForegroundColor Green
-            $extracted++
         }
     }
 }
@@ -169,11 +169,7 @@ function Expand-ZstdArchive {
     )
     # TODO: Remove this function after 2024/12/31
     Show-DeprecatedWarning $MyInvocation 'Expand-7zipArchive'
-    try {
-        Expand-7zipArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Switches $Switches -Removal:$Removal
-    } catch {
-        abort $_.Exception.Message
-    }
+    Expand-7zipArchive -Path $Path -DestinationPath $DestinationPath -ExtractDir $ExtractDir -Switches $Switches -Removal:$Removal
 }
 
 function Expand-MsiArchive {
