@@ -57,6 +57,7 @@ function Get-SQLite {
         Write-Host 'Done.' -ForegroundColor DarkYellow
         return $true
     } catch {
+        Write-Host 'Error.' -ForegroundColor DarkRed
         return $false
     }
 }

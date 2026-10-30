@@ -53,7 +53,12 @@ function Invoke-Extraction {
                 ExtractDir      = $extractDir[$extracted]
             }
             Write-Host "Extracting $([char]0x1b)[36m$(url_remote_filename $uri[$i])$([char]0x1b)[0m... " -NoNewline
-            & $extractFn @fnArgs -Removal
+            try {
+                & $extractFn @fnArgs -Removal
+            } catch {
+                Write-Host 'Error.' -ForegroundColor DarkRed
+                throw
+            }
             Write-Host 'Done.' -ForegroundColor Green
             $extracted++
         }
