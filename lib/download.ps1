@@ -759,6 +759,7 @@ function check_hash($file, $hash, $app_name) {
     Write-Host "Checking hash of $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m... " -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
+        Write-Host 'Error.' -ForegroundColor DarkRed
         return $false, "Hash type '$algorithm' isn't supported."
     }
 
@@ -776,6 +777,7 @@ function check_hash($file, $hash, $app_name) {
             $msg += "Expected:    $expected`n"
             $msg += "Actual:      $actual"
         }
+        Write-Host 'Error.' -ForegroundColor DarkRed
         return $false, $msg
     }
     Write-Host 'OK.' -f Green

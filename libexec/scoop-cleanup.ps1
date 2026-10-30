@@ -41,11 +41,11 @@ function cleanup($app, $global, $verbose, $cache) {
         return
     }
 
-    Write-Host -f yellow "Removing $app`:" -NoNewline
+    Write-Host -f yellow "Removing $app`: " -NoNewline
     try {
         $versions | ForEach-Object {
             $version = $_
-            Write-Host " $version" -NoNewline
+            Write-Host "$version... " -NoNewline
             $dir = versiondir $app $version $global
             # unlink all potential old link before doing recursive Remove-Item
             unlink_persist_data (installed_manifest $app $version $global) $dir
@@ -61,10 +61,12 @@ function cleanup($app, $global, $verbose, $cache) {
             Remove-Item $appDir -ErrorAction Stop -Force
         }
     } catch {
+        Write-Host 'Error.' -ForegroundColor DarkRed
         error "Couldn't remove an old version of '$app'; it may be in use."
         $failed[$app] = 'could not remove an old version'
+        return
     }
-    Write-Host ''
+    Write-Host 'Done.' -ForegroundColor Green
 }
 
 if ($apps -or $all) {

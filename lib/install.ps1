@@ -197,7 +197,12 @@ function Invoke-HookScript {
     if ($script) {
         Write-Host "Running $HookType script... " -NoNewline
         $script:deprecatedWarned = @{}
-        Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+        try {
+            Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+        } catch {
+            Write-Host 'Error.' -ForegroundColor DarkRed
+            throw
+        }
         Write-Host 'Done.' -ForegroundColor Green
     }
 }

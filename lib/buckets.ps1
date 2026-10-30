@@ -149,6 +149,7 @@ function add_bucket($name, $repo) {
     Write-Host 'Checking repo... ' -NoNewline
     $out = Invoke-Git -ArgumentList @('ls-remote', $repo) 2>&1
     if ($LASTEXITCODE -ne 0) {
+        Write-Host 'Error.' -ForegroundColor DarkRed
         error "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
         return 1
     }
@@ -156,6 +157,7 @@ function add_bucket($name, $repo) {
     $dir = ensure $dir
     $out = Invoke-Git -ArgumentList @('clone', $repo, $dir, '-q')
     if ($LASTEXITCODE -ne 0) {
+        Write-Host 'Error.' -ForegroundColor DarkRed
         error "Failed to clone '$repo' to '$dir'.`n`nError given:`n$out`n`nPlease check the repository URL or network connection and try again."
         Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
         return 1
