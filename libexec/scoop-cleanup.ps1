@@ -55,7 +55,33 @@ function cleanup($app, $global, $verbose, $cache) {
     $appDir = appdir $app $global
     $versions = Get-ChildItem $appDir -Name
     $versions = $versions | Where-Object { $current_version -ne $_ -and $_ -ne 'current' }
-    $versions = $versions | Select-Object -first ([math]::max($versions.count - $keep + 1, 0))
+
+$appDir = appdir $app $global
+    # -Name liefert nur die Verzeichnisnamen als Strings
+    $versions = Get-ChildItem $appDir -Name
+    $versions = $versions | Where-Object { $_ -ne $current_version -and $_ -ne 'current' }
+
+    $versions = $versions | Sort-Object -Property @{
+        Expression = {
+            # Da $_ ein String ist, prüfen wir direkt $_ (ohne .Name)
+            if ($_ -match '^[\d\.]+') {
+                try { [System.Version]$Matches[0] } catch { [System.Version]'0.0.0' }
+            } else {
+                [System.Version]'0.0.0'
+            }
+        }
+    }, @{
+        Expression = {
+            # Auch hier direkt $_ verwenden
+            $remainder = $_ -replace '^[\d\.]+', ''
+            if ($remainder -match '\d+') {
+                [int]$Matches[0]
+            } else {
+                0
+            }
+        }
+    } | Select-Object -first ([math]::max($versions.count - $keep + 1, 0))
+
     if (!$versions) {
         if ($verbose) { success "$app is already clean" }
         return
