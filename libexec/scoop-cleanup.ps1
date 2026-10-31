@@ -10,7 +10,7 @@
 #   -a, --all          Cleanup all apps (alternative to '*')
 #   -g, --global       Cleanup a globally installed app
 #   -k, --cache        Remove outdated download cache
-#   -n, --keep         Option to keep more than one version
+#   -n, --keep         Option to keep more than one version, default 1
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
