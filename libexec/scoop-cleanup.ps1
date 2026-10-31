@@ -17,7 +17,7 @@
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\install.ps1" # persist related
 
-$opt, $apps, $err = getopt $args 'agk' 'all', 'global', 'cache', 'keep='
+$opt, $apps, $err = getopt $args 'agkn:' 'all', 'global', 'cache', 'keep='
 if ($err) { error "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
