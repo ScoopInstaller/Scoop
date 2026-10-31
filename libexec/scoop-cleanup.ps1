@@ -22,12 +22,23 @@ if ($err) { error "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
 $all = $opt.a -or $opt.all
+
 $keep = 1
-if ($opt.n -gt 1) {
-    $keep = $opt.n
+if ($null -ne $opt.n -and $opt.n -ne '') {
+    $parsedN = 0
+    if (-not [int]::TryParse($opt.n, [ref]$parsedN) -or $parsedN -lt 1) {
+        error "scoop cleanup: option '-n' requires an integer >= 1 (got '$($opt.n)')"
+        exit 1
+    }
+    $keep = $parsedN
 }
-if ($opt.keep -gt 1) {
-    $keep = $opt.keep
+if ($null -ne $opt.keep -and $opt.keep -ne '') {
+    $parsedKeep = 0
+    if (-not [int]::TryParse($opt.keep, [ref]$parsedKeep) -or $parsedKeep -lt 1) {
+        error "scoop cleanup: option '--keep' requires an integer >= 1 (got '$($opt.keep)')"
+        exit 1
+    }
+    $keep = $parsedKeep
 }
 
 if (!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
