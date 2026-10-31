@@ -1,11 +1,11 @@
 #Requires -Version 5.1
 Write-Output "PowerShell: $($PSVersionTable.PSVersion)"
 Write-Output 'Check and install testsuite dependencies ...'
-if (Get-InstalledModule -Name Pester -MinimumVersion 5.2 -MaximumVersion 5.99 -ErrorAction SilentlyContinue) {
-    Write-Output 'Pester 5 is already installed.'
+if (Get-InstalledModule -Name Pester -MinimumVersion 6.0 -MaximumVersion 6.99 -ErrorAction SilentlyContinue) {
+    Write-Output 'Pester 6 is already installed.'
 } else {
-    Write-Output 'Installing Pester 5 ...'
-    Install-Module -Repository PSGallery -Scope CurrentUser -Force -Name Pester -MinimumVersion 5.2 -MaximumVersion 5.99 -SkipPublisherCheck
+    Write-Output 'Installing Pester 6 ...'
+    Install-Module -Repository PSGallery -Scope CurrentUser -Force -Name Pester -MinimumVersion 6.0 -MaximumVersion 6.99 -SkipPublisherCheck
 }
 if (Get-InstalledModule -Name PSScriptAnalyzer -MinimumVersion 1.17 -ErrorAction SilentlyContinue) {
     Write-Output 'PSScriptAnalyzer is already installed.'
@@ -18,4 +18,13 @@ if (Get-InstalledModule -Name BuildHelpers -MinimumVersion 2.0 -ErrorAction Sile
 } else {
     Write-Output 'Installing BuildHelpers ...'
     Install-Module -Repository PSGallery -Scope CurrentUser -Force -Name BuildHelpers -SkipPublisherCheck
+}
+
+# Git runs the hooks in .githooks only once core.hooksPath points at them; the
+# pre-commit hook rebuilds the assemblies under supporting/ that the commit changes.
+if ((Test-Path "$PSScriptRoot\..\..\.githooks") -and (Test-Path "$PSScriptRoot\..\..\.git")) {
+    if (-not (git config --get core.hooksPath)) {
+        git config core.hooksPath .githooks
+        Write-Output 'Enabled the repository hooks in .githooks.'
+    }
 }

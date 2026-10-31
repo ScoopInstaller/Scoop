@@ -5,17 +5,32 @@ function nightly_version($quiet = $false) {
     return "nightly-$(Get-Date -Format 'yyyyMMdd')"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
+function failed_deps($manifest, $failed) {
+    @($manifest.depends | Where-Object { $_ } | ForEach-Object { (parse_app $_)[0] } | Where-Object {
+            ($failed[$_] -and $failed[$_] -notlike 'skipped:*') -or
+            ($failed["$_ (global)"] -and $failed["$_ (global)"] -notlike 'skipped:*')
+        })
+}
+
+function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
 
     if (!$manifest) {
-        abort "Couldn't find manifest for '$app'$(if ($bucket) { " from '$bucket' bucket" } elseif ($url) { " at '$url'" })."
+        error "Couldn't find manifest for '$app'$(if ($bucket) { " from '$bucket' bucket" } elseif ($url) { " at '$url'" })."
+        $failed[$app] = 'no manifest'
+        return
     }
 
     $version = $manifest.version
-    if (!$version) { abort "Manifest doesn't specify a version." }
+    if (!$version) {
+        error "Manifest doesn't specify a version."
+        $failed[$app] = 'invalid manifest'
+        return
+    }
     if ($version -match '[^\w\.\-\+_]') {
-        abort "Manifest version has unsupported character '$($matches[0])'."
+        error "Manifest version has unsupported character '$($matches[0])'."
+        $failed[$app] = 'invalid manifest'
+        return
     }
 
     $is_nightly = $version -eq 'nightly'
@@ -27,6 +42,13 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $architecture = Get-SupportedArchitecture $manifest $architecture
     if ($null -eq $architecture) {
         error "'$app' doesn't support current architecture!"
+        $failed[$app] = 'unsupported architecture'
+        return
+    }
+    $failed_deps = failed_deps $manifest $failed
+    if ($failed_deps.Count -gt 0) {
+        error "'$app' depends on $($failed_deps -join ', '), which failed."
+        $failed[$app] = "dependency failed: $($failed_deps -join ', ')"
         return
     }
 
@@ -50,13 +72,20 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    if ($null -eq $fname) {
+        $failed[$app] = 'download failed'
+        return
+    }
     Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
-    Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
+    if (!(Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global)) {
+        $failed[$app] = 'installer failed'
+        return
+    }
     ensure_install_dir_not_in_path $dir $global
     $dir = link_current $dir
-    create_shims $manifest $dir $global $architecture
+    New-ShimFromManifest $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
     env_add_path $manifest $dir $global $architecture
@@ -77,6 +106,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     }
 
     success "'$app' ($version) was installed successfully!"
+    if ($app -eq (get_config SHIM)) { Update-ShimInstance }
 
     show_notes $manifest $dir $original_dir $persist_dir
 }
@@ -110,9 +140,11 @@ function Invoke-Installer {
         }
         $progName = "$Path\$(coalesce $installer.file $Name[0])"
         if (!(is_in_dir $Path $progName)) {
-            abort "Error in manifest: $((Get-Culture).TextInfo.ToTitleCase($type)) $progName is outside the app directory."
+            error "Error in manifest: $((Get-Culture).TextInfo.ToTitleCase($type)) $progName is outside the app directory."
+            return $false
         } elseif (!(Test-Path $progName)) {
-            abort "$((Get-Culture).TextInfo.ToTitleCase($type)) $progName is missing."
+            error "$((Get-Culture).TextInfo.ToTitleCase($type)) $progName is missing."
+            return $false
         }
         $substitutions = @{
             '$dir'     = $Path
@@ -126,10 +158,11 @@ function Invoke-Installer {
             $status = Invoke-ExternalCommand $progName -ArgumentList $fnArgs -Activity "Running $type ..."
             if (!$status) {
                 if ($Uninstall) {
-                    abort 'Uninstallation aborted.'
+                    error 'Uninstallation failed.'
                 } else {
-                    abort "Installation aborted. You might need to run 'scoop uninstall $AppName' before trying again."
+                    error "Installation failed. You might need to run 'scoop uninstall $AppName' before trying again."
                 }
+                return $false
             }
             # Don't remove installer if "keep" flag is set to true
             if (!$installer.keep) {
@@ -138,6 +171,7 @@ function Invoke-Installer {
         }
     }
     Invoke-HookScript -HookType $type -Manifest $Manifest -ProcessorArchitecture $ProcessorArchitecture
+    return $true
 }
 
 function Invoke-HookScript {
@@ -162,67 +196,14 @@ function Invoke-HookScript {
     }
     if ($script) {
         Write-Host "Running $HookType script... " -NoNewline
-        Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+        $script:deprecatedWarned = @{}
+        try {
+            Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+        } catch {
+            Write-Host 'Error.' -ForegroundColor DarkRed
+            throw
+        }
         Write-Host 'Done.' -ForegroundColor Green
-    }
-}
-
-# get target, name, arguments for shim
-function shim_def($item) {
-    if ($item -is [array]) { return $item }
-    return $item, (strip_ext (fname $item)), $null
-}
-
-function create_shims($manifest, $dir, $global, $arch) {
-    $shims = @(arch_specific 'bin' $manifest $arch)
-    $shims | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target, $name, $arg = shim_def $_
-        Write-Output "Creating shim for '$name'."
-
-        if (Test-Path "$dir\$target" -PathType leaf) {
-            $bin = "$dir\$target"
-        } elseif (Test-Path $target -PathType leaf) {
-            $bin = $target
-        } else {
-            $bin = (Get-Command $target).Source
-        }
-        if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
-
-        shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
-    }
-}
-
-function rm_shim($name, $shimdir, $app) {
-    '', '.shim', '.cmd', '.ps1' | ForEach-Object {
-        $shimPath = "$shimdir\$name$_"
-        $altShimPath = "$shimPath.$app"
-        if ($app -and (Test-Path -Path $altShimPath -PathType Leaf)) {
-            Write-Output "Removing shim '$name$_.$app'."
-            Remove-Item $altShimPath
-        } elseif (Test-Path -Path $shimPath -PathType Leaf) {
-            Write-Output "Removing shim '$name$_'."
-            Remove-Item $shimPath
-            $oldShims = Get-Item -Path "$shimPath.*" -Exclude '*.shim', '*.cmd', '*.ps1'
-            if ($null -eq $oldShims) {
-                if ($_ -eq '.shim') {
-                    Write-Output "Removing shim '$name.exe'."
-                    Remove-Item -Path "$shimdir\$name.exe"
-                }
-            } else {
-                (@($oldShims) | Sort-Object -Property LastWriteTimeUtc)[-1] | Rename-Item -NewName { $_.Name -replace '\.[^.]*$', '' }
-            }
-        }
-    }
-}
-
-function rm_shims($app, $manifest, $global, $arch) {
-    $shims = @(arch_specific 'bin' $manifest $arch)
-
-    $shims | Where-Object { $_ -ne $null } | ForEach-Object {
-        $target, $name, $null = shim_def $_
-        $shimdir = shimdir $global
-
-        rm_shim $name $shimdir $app
     }
 }
 
@@ -397,6 +378,20 @@ function ensure_none_failed($apps) {
             }
         }
     }
+}
+
+function show_failed_apps($failed, $action = 'install') {
+    if (!$failed -or $failed.Count -eq 0) { return 0 }
+    $errors = @($failed.Keys | Where-Object { $failed[$_] -notlike 'skipped:*' } | Sort-Object)
+    $skipped = @($failed.Keys | Where-Object { $failed[$_] -like 'skipped:*' } | Sort-Object)
+    if ($errors.Count -gt 0) {
+        error "Failed to $action`: $((@($errors | ForEach-Object { "$_ ($($failed[$_]))" })) -join ', ')"
+    }
+    if ($skipped.Count -gt 0) {
+        info "Skipped $action`: $((@($skipped | ForEach-Object { "$_ ($($failed[$_] -replace '^skipped: ', ''))" })) -join ', ')"
+    }
+    # skipped apps are reported but not counted as failures
+    return $errors.Count
 }
 
 function show_suggestions($suggested) {

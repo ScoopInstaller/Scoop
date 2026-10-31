@@ -9,6 +9,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1" # 'env_add_path' (indirectly)
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
@@ -78,7 +79,7 @@ $apps | ForEach-Object {
     $architecture = $install.architecture
 
     $dir = link_current $dir
-    create_shims $manifest $dir $global $architecture
+    New-ShimFromManifest $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global $architecture
     # unset all potential old env before re-adding
     env_rm_path $manifest $dir $global $architecture

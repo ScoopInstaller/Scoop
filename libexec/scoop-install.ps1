@@ -32,6 +32,7 @@
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'generate_user_manifest' 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1"
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\download.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"
@@ -145,8 +146,10 @@ if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
     warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
-$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+$failed = @{}
+$apps | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
 
 show_suggestions $suggested
+$failed_count = show_failed_apps $failed
 
-exit 0
+exit [int]($failed_count -gt 0)

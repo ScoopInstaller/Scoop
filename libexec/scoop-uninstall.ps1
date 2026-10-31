@@ -9,6 +9,7 @@
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1"
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\download.ps1" # url_filename
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
@@ -42,8 +43,10 @@ if ($apps -eq 'scoop') {
     exit
 }
 
-$apps = Confirm-InstallationStatus $apps -Global:$global
-if (!$apps) { exit 0 }
+$install_status = Confirm-InstallationStatus $apps -Global:$global
+$apps = $install_status.installed
+$failed = @{}
+$install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not installed in the requested scope' } | ForEach-Object { $failed[$_] = $install_status.failed[$_] }
 
 :app_loop foreach ($_ in $apps) {
     ($app, $global) = $_
@@ -73,11 +76,15 @@ if (!$apps) { exit 0 }
             Test-Path $dir -ErrorAction Stop | Out-Null
         } catch [UnauthorizedAccessException] {
             error "Access denied: $dir. You might need to restart."
+            $failed[$app] = 'access denied'
             continue
         }
 
-        Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-        rm_shims $app $manifest $global $architecture
+        if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+            $failed[$app] = 'uninstaller failed'
+            continue
+        }
+        Remove-ShimFromManifest $app $manifest $global $architecture
         rm_startmenu_shortcuts $manifest $global $architecture
 
         # If a junction was used during install, that will have been used
@@ -97,6 +104,7 @@ if (!$apps) { exit 0 }
         } catch {
             if (Test-Path $dir) {
                 error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+                $failed[$app] = 'could not remove the app directory'
                 continue
             }
         }
@@ -114,6 +122,7 @@ if (!$apps) { exit 0 }
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+            $failed[$app] = 'could not remove an old version'
             continue app_loop
         }
     }
@@ -141,6 +150,7 @@ if (!$apps) { exit 0 }
                 Remove-Item $persist_dir -Recurse -Force -ErrorAction Stop
             } catch {
                 error "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use."
+                $failed[$app] = 'could not remove the persisted data'
                 continue
             }
         }
@@ -149,4 +159,6 @@ if (!$apps) { exit 0 }
     success "'$app' was uninstalled."
 }
 
-exit 0
+$failed_count = show_failed_apps $failed 'uninstall'
+
+exit [int]($failed_count -gt 0)

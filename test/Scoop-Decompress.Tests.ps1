@@ -24,11 +24,11 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $testcases = "$working_dir\TestCases.zip"
         }
         It 'Test cases should exist and hash should match' {
-            $testcases | Should -Exist
-            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should -Be '591072faabd419b77932b7023e5899b4e05c0bf8e6859ad367398e6bfe1eb203'
+            Test-Path $testcases | Should-BeTrue
+            (Get-FileHash -Path $testcases -Algorithm SHA256).Hash.ToLower() | Should-Be '591072faabd419b77932b7023e5899b4e05c0bf8e6859ad367398e6bfe1eb203'
         }
         It 'Test cases should be extracted correctly' {
-            { Microsoft.PowerShell.Archive\Expand-Archive -Path $testcases -DestinationPath $working_dir } | Should -Not -Throw
+            & { Microsoft.PowerShell.Archive\Expand-Archive -Path $testcases -DestinationPath $working_dir }
         }
     }
 
@@ -59,104 +59,104 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
 
         It 'extract normal compressed file' {
             $to = test_extract 'Expand-7zipArchive' $test1
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 4
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 4
         }
 
         It 'extract "extract_dir" correctly' {
             $to = test_extract 'Expand-7zipArchive' $test1 $false 'tmp'
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'extract "extract_dir" with spaces correctly' {
             $to = test_extract 'Expand-7zipArchive' $test1 $false 'tmp 2'
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'extract "extract_dir" with nested folder with same name' {
             $to = test_extract 'Expand-7zipArchive' $test1 $false 'keep\sub'
-            $to | Should -Exist
-            "$to\keep\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
-            (Get-ChildItem "$to\keep").Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\keep\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
+            (Get-ChildItem "$to\keep").Count | Should-Be 1
         }
 
         It 'extract nested compressed file' {
             # file ext: tgz
             $to = test_extract 'Expand-7zipArchive' $test2
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
 
             # file ext: tar.bz2
             $to = test_extract 'Expand-7zipArchive' $test3
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'extract nested compressed file with different inner name' {
             $to = test_extract 'Expand-7zipArchive' $test4
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'extract split 7z archives (.001, .002, ...)' {
             $to = test_extract 'Expand-7zipArchive' $test5_1
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'extract split RAR archives (.part01.rar, .part02.rar, ...)' {
             $to = test_extract 'Expand-7zipArchive' $test6_1
-            $to | Should -Exist
-            "$to\dummy" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\dummy" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'extract NSIS installer' {
             $to = test_extract 'Expand-7zipArchive' $test7
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'self-extract NSIS installer' {
             $to = "$working_dir\NSIS Test"
             $null = Invoke-ExternalCommand -FilePath $test7 -ArgumentList @('/S', '/NCRC', "/D=$to")
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'works with "-Removal" switch ($removal param)' {
-            $test1 | Should -Exist
+            Test-Path $test1 | Should-BeTrue
             $to = test_extract 'Expand-7zipArchive' $test1 $true
-            $to | Should -Exist
-            $test1 | Should -Not -Exist
-            $test5_1 | Should -Exist
-            $test5_2 | Should -Exist
-            $test5_3 | Should -Exist
+            Test-Path $to | Should-BeTrue
+            Test-Path $test1 | Should-BeFalse
+            Test-Path $test5_1 | Should-BeTrue
+            Test-Path $test5_2 | Should-BeTrue
+            Test-Path $test5_3 | Should-BeTrue
             $to = test_extract 'Expand-7zipArchive' $test5_1 $true
-            $to | Should -Exist
-            $test5_1 | Should -Not -Exist
-            $test5_2 | Should -Not -Exist
-            $test5_3 | Should -Not -Exist
-            $test6_1 | Should -Exist
-            $test6_2 | Should -Exist
-            $test6_3 | Should -Exist
+            Test-Path $to | Should-BeTrue
+            Test-Path $test5_1 | Should-BeFalse
+            Test-Path $test5_2 | Should-BeFalse
+            Test-Path $test5_3 | Should-BeFalse
+            Test-Path $test6_1 | Should-BeTrue
+            Test-Path $test6_2 | Should-BeTrue
+            Test-Path $test6_3 | Should-BeTrue
             $to = test_extract 'Expand-7zipArchive' $test6_1 $true
-            $to | Should -Exist
-            $test6_1 | Should -Not -Exist
-            $test6_2 | Should -Not -Exist
-            $test6_3 | Should -Not -Exist
+            Test-Path $to | Should-BeTrue
+            Test-Path $test6_1 | Should-BeFalse
+            Test-Path $test6_2 | Should-BeFalse
+            Test-Path $test6_3 | Should-BeFalse
         }
     }
 
@@ -177,42 +177,42 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
         It 'extract normal MSI file using msiexec' {
             Mock get_config { $false }
             $to = test_extract 'Expand-MsiArchive' $test1
-            $to | Should -Exist
-            "$to\MSITest\empty" | Should -Exist
-            (Get-ChildItem "$to\MSITest").Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\MSITest\empty" | Should-BeTrue
+            (Get-ChildItem "$to\MSITest").Count | Should-Be 1
         }
 
         It 'extract normal MSI file with whitespace in path using msiexec' {
             Mock get_config { $false }
             $to = test_extract 'Expand-MsiArchive' $test2
-            $to | Should -Exist
-            "$to\MSITest\empty" | Should -Exist
-            (Get-ChildItem "$to\MSITest").Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\MSITest\empty" | Should-BeTrue
+            (Get-ChildItem "$to\MSITest").Count | Should-Be 1
         }
 
         It 'extract normal MSI file using lessmsi' {
             Mock get_config { $true }
             $to = test_extract 'Expand-MsiArchive' $test1
-            $to | Should -Exist
+            Test-Path $to | Should-BeTrue
         }
 
         It 'extract normal MSI file with whitespace in path using lessmsi' {
             Mock get_config { $true }
             $to = test_extract 'Expand-MsiArchive' $test2
-            $to | Should -Exist
+            Test-Path $to | Should-BeTrue
         }
 
         It 'extract empty MSI file using lessmsi' {
             Mock get_config { $true }
             $to = test_extract 'Expand-MsiArchive' $test3
-            $to | Should -Exist
+            Test-Path $to | Should-BeTrue
         }
 
         It 'works with "-Removal" switch ($removal param)' {
             Mock get_config { $false }
-            $test1 | Should -Exist
+            Test-Path $test1 | Should-BeTrue
             test_extract 'Expand-MsiArchive' $test1 $true
-            $test1 | Should -Not -Exist
+            Test-Path $test1 | Should-BeFalse
         }
     }
 
@@ -229,15 +229,15 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
 
         It 'extract Inno Setup file' {
             $to = test_extract 'Expand-InnoArchive' $test
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'works with "-Removal" switch ($removal param)' {
-            $test | Should -Exist
+            Test-Path $test | Should-BeTrue
             test_extract 'Expand-InnoArchive' $test $true
-            $test | Should -Not -Exist
+            Test-Path $test | Should-BeFalse
         }
     }
 
@@ -249,15 +249,15 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
 
         It 'extract compressed file' {
             $to = test_extract 'Expand-ZipArchive' $test
-            $to | Should -Exist
-            "$to\empty" | Should -Exist
-            (Get-ChildItem $to).Count | Should -Be 1
+            Test-Path $to | Should-BeTrue
+            Test-Path "$to\empty" | Should-BeTrue
+            (Get-ChildItem $to).Count | Should-Be 1
         }
 
         It 'works with "-Removal" switch ($removal param)' {
-            $test | Should -Exist
+            Test-Path $test | Should-BeTrue
             test_extract 'Expand-ZipArchive' $test $true
-            $test | Should -Not -Exist
+            Test-Path $test | Should-BeFalse
         }
     }
 }

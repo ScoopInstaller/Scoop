@@ -64,6 +64,7 @@ param(
     [Switch] $ThrowError
 )
 
+. "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
 

@@ -14,7 +14,9 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
 
     # download first
     if (Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash
+        if (!(Invoke-CachedAria2Download $app $version $manifest $architecture $dir $cookies $use_cache $check_hash)) {
+            return $null
+        }
     } else {
         foreach ($url in $urls) {
             $fname = url_filename $url
@@ -24,7 +26,8 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
             } catch {
                 Write-Host -ForegroundColor DarkRed $_
                 error "URL $url is not valid"
-                abort $(new_issue_msg $app $bucket 'download failed')
+                error $(new_issue_msg $app $bucket 'download failed')
+                return $null
             }
 
             if ($check_hash) {
@@ -40,7 +43,8 @@ function Invoke-ScoopDownload ($app, $version, $manifest, $bucket, $architecture
                     if ($url.Contains('sourceforge.net')) {
                         Write-Host -ForegroundColor Yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                     }
-                    abort $(new_issue_msg $app $bucket 'hash check failed')
+                    error $(new_issue_msg $app $bucket 'hash check failed')
+                    return $null
                 }
             }
         }
@@ -86,8 +90,8 @@ function Start-Download ($url, $to, $cookies) {
     }
 }
 
-function Invoke-Download ($url, $to, $cookies, $progress) {
-    # download with filesize and progress indicator
+function New-DownloadRequest ($url, $cookies) {
+    # Build the request without issuing it, so the caller behavior is unit-testable without network I/O
     $reqUrl = ($url -split '#')[0]
     $wreq = [Net.WebRequest]::Create($reqUrl)
     if ($wreq -is [Net.HttpWebRequest]) {
@@ -96,7 +100,10 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
             $wreq.Referer = strip_filename $url
         }
         if ($url -match '^https://api\.github\.com/repos') {
-            $wreq.Accept = 'application/octet-stream'
+            # Release assets need octet-stream; the Actions artifact-zip endpoint rejects it (415), so omit it to redirect
+            if ($reqUrl -notmatch '/actions/artifacts/\d+/zip$') {
+                $wreq.Accept = 'application/octet-stream'
+            }
             $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
             $wreq.Headers['X-GitHub-Api-Version'] = '2022-11-28'
         }
@@ -110,6 +117,13 @@ function Invoke-Download ($url, $to, $cookies, $progress) {
             }
         }
     }
+
+    return $wreq
+}
+
+function Invoke-Download ($url, $to, $cookies, $progress) {
+    # Download with filesize and progress indicator
+    $wreq = New-DownloadRequest $url $cookies
 
     try {
         $wres = $wreq.GetResponse()
@@ -460,7 +474,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 error "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
                 error $urlstxtDiag
                 error $aria2Diag
-                abort $(new_issue_msg $app $bucket 'download via aria2 failed')
+                error $(new_issue_msg $app $bucket 'download via aria2 failed')
+                return $false
             }
 
             warn "Download failed! (Error $lastexitcode) $(aria_exit_code $lastexitcode)"
@@ -476,7 +491,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             } catch {
                 Write-Host $_ -ForegroundColor DarkRed
                 error "URL $url is not valid"
-                abort $(new_issue_msg $app $bucket 'download failed')
+                error $(new_issue_msg $app $bucket 'download failed')
+                return $false
             }
         }
 
@@ -512,13 +528,15 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
                 if ($url.Contains('sourceforge.net')) {
                     Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
                 }
-                abort $(new_issue_msg $app $bucket 'hash check failed')
+                error $(new_issue_msg $app $bucket 'hash check failed')
+                return $false
             }
         }
 
         # copy or move file to target location
         if (!(Test-Path $data.$url.source) ) {
-            abort $(new_issue_msg $app $bucket 'cached file not found')
+            error $(new_issue_msg $app $bucket 'cached file not found')
+            return $false
         }
 
         if (!($dir -eq $cachedir)) {
@@ -529,6 +547,7 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             }
         }
     }
+    return $true
 }
 
 ## Helper functions
@@ -554,7 +573,12 @@ function Get-Encoding($wc) {
 }
 
 function Get-UserAgent() {
-    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $(if(${env:ProgramFiles(Arm)}){'ARM64; '}elseif($env:PROCESSOR_ARCHITECTURE -eq 'AMD64'){'Win64; x64; '})$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
+    $arch = switch (Get-SystemArchitecture) {
+        'arm64' { 'ARM64; ' }
+        '64bit' { 'Win64; x64; ' }
+        default { '' }
+    }
+    return "Scoop/1.0 (+http://scoop.sh/) PowerShell/$($PSVersionTable.PSVersion.Major).$($PSVersionTable.PSVersion.Minor) (Windows NT $([System.Environment]::OSVersion.Version.Major).$([System.Environment]::OSVersion.Version.Minor); $arch$(if($env:PROCESSOR_ARCHITEW6432 -in 'AMD64','ARM64'){'WOW64; '})$PSEdition)"
 }
 
 function setup_proxy() {
@@ -735,6 +759,7 @@ function check_hash($file, $hash, $app_name) {
     Write-Host "Checking hash of $([char]0x1b)[36m$(url_remote_filename $url)$([char]0x1b)[0m... " -NoNewline
     $algorithm, $expected = get_hash $hash
     if ($null -eq $algorithm) {
+        Write-Host 'Error.' -ForegroundColor DarkRed
         return $false, "Hash type '$algorithm' isn't supported."
     }
 
@@ -752,6 +777,7 @@ function check_hash($file, $hash, $app_name) {
             $msg += "Expected:    $expected`n"
             $msg += "Actual:      $actual"
         }
+        Write-Host 'Error.' -ForegroundColor DarkRed
         return $false, $msg
     }
     Write-Host 'OK.' -f Green
