@@ -1,7 +1,7 @@
 # Usage: scoop cleanup <app> [options]
 # Summary: Cleanup apps by removing old versions
 # Help: 'scoop cleanup' cleans Scoop apps by removing old versions.
-# 'scoop cleanup <app> -n:1' cleans up the old versions of that app if said versions exist,
+# 'scoop cleanup <app> -n 1' cleans up the old versions of that app if said versions exist,
 # but keeps n versions, default 1
 #
 # You can use '*' in place of <app> or `-a`/`--all` switch to cleanup all apps.
