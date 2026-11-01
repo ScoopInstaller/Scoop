@@ -382,15 +382,50 @@ function env_rm_path($manifest, $dir, $persist_dir, $global, $arch) {
     }
 }
 
+function expand_env_set_value($value, $dir, $original_dir, $persist_dir) {
+    # Reproduces the scope of ExpandString as run during installation, where
+    # 'env_set' values are expanded against these variables
+    $ExecutionContext.InvokeCommand.ExpandString($value)
+}
+
+# Checks whether $name holds a non-empty value in the target scope that no
+# installed app in that scope could have written through its 'env_set' block.
+# Such a value was set or edited by the user and must be preserved; a value
+# that an installed manifest accounts for is Scoop-owned and may be re-pointed.
+function Test-EnvVarUserDefined($name, $global) {
+    $current = Get-EnvVar -Name $name -Global:$global
+    if ($null -eq $current -or $current -eq '') { return $false }
+
+    $nojunction = get_config NO_JUNCTION
+    foreach ($app in installed_apps $global) {
+        $version = Select-CurrentVersion -AppName $app -Global:$global
+        if (!$version) { continue }
+        $arch = (install_info $app $version $global).architecture
+        $env_set = arch_specific 'env_set' (installed_manifest $app $version $global) $arch
+        if (!$env_set) { continue }
+        $prop = $env_set.PSObject.Properties | Where-Object { $_.Name -eq $name } | Select-Object -First 1
+        if (!$prop) { continue }
+
+        # The values install-time 'env_set' saw: $dir was the linked (or, with
+        # no_junction, plain) version directory; $original_dir the real one
+        $dir = if ($nojunction) { versiondir $app $version $global } else { "$(appdir $app $global)\current" }
+        $val = expand_env_set_value $prop.Value $dir (versiondir $app $version $global) (persistdir $app $global)
+        if ($val -ceq $current) { return $false }
+    }
+
+    return $true
+}
+
 function env_set($manifest, $global, $arch) {
     $env_set = arch_specific 'env_set' $manifest $arch
     if ($env_set) {
         $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
             $name = $_.Name
-            # Never clobber a variable that the user has already defined in the
-            # target scope (e.g. a custom cache location on another volume)
-            $existing = Get-EnvVar -Name $name -Global:$global
-            if (($null -ne $existing) -and ($existing -ne '')) {
+            # Only values that the user set or edited are off-limits; values left
+            # by Scoop (this or another app) are re-pointed to this manifest's
+            # target (e.g. a custom cache location on another volume stays put)
+            if (Test-EnvVarUserDefined $name $global) {
+                $existing = Get-EnvVar -Name $name -Global:$global
                 Write-Output "Keeping existing $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m = $([char]0x1b)[35m$existing$([char]0x1b)[0m"
                 return
             }

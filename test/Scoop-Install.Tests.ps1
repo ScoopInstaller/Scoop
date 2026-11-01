@@ -8,6 +8,7 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\shim.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
     . "$PSScriptRoot\..\lib\update.ps1"
+    . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 }
 
 Describe 'appname_from_url' -Tag 'Scoop' {
@@ -340,14 +341,29 @@ Describe 'env_set' -Tag 'Scoop', 'Windows' {
         Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and $Value -eq 'C:\scoop\persist\test\cache' }
     }
 
-    It 'keeps a pre-existing variable instead of overwriting it' {
+    It 'keeps a user-defined value' {
         Mock Get-EnvVar { 'D:\custom-cache' }
+        Mock installed_apps {}
         Mock Set-EnvVar {}
         Mock Set-Content {}
 
         env_set $manifest $global $null
 
         Should-Invoke -CommandName Set-EnvVar -Times 0 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' }
+    }
+
+    It 're-points a value that another installed app wrote' {
+        Mock Get-EnvVar { 'D:\scoop\persist\other\cache' }
+        Mock installed_apps { 'other' }
+        Mock Select-CurrentVersion { '1.0' }
+        Mock install_info { @{ architecture = '64bit' } }
+        Mock installed_manifest { [PSCustomObject]@{ env_set = [PSCustomObject]@{ TEST_ENV_SET_VAR = 'D:\scoop\persist\other\cache' } } }
+        Mock Set-EnvVar {}
+        Mock Set-Content {}
+
+        env_set $manifest $global $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and $Value -eq 'C:\scoop\persist\test\cache' }
     }
 
     It 'treats an empty value as undefined' {
@@ -358,6 +374,28 @@ Describe 'env_set' -Tag 'Scoop', 'Windows' {
         env_set $manifest $global $null
 
         Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and $Value -eq 'C:\scoop\persist\test\cache' }
+    }
+}
+
+Describe 'Test-EnvVarUserDefined' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        Mock Get-EnvVar { 'C:\data\cache' }
+        Mock installed_apps { 'other' }
+        Mock Select-CurrentVersion { '1.0' }
+        Mock install_info { @{ architecture = '64bit' } }
+    }
+
+    It 'is true when no installed manifest can account for the value' {
+        Mock installed_manifest { [PSCustomObject]@{ env_set = [PSCustomObject]@{ OTHER_VAR = 'C:\data\cache' } } }
+
+        Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false | Should-BeTrue
+    }
+
+    It 'is false for the exact expansion an installed manifest produces' {
+        Mock persistdir { 'C:\data' }
+        Mock installed_manifest { [PSCustomObject]@{ env_set = [PSCustomObject]@{ TEST_ENV_SET_VAR = '$persist_dir\cache' } } }
+
+        Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false | Should-BeFalse
     }
 }
 

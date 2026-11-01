@@ -41,6 +41,10 @@ if ($global -and !(is_admin)) {
 }
 
 if ($apps -eq 'scoop') {
+    if ($keep_env) {
+        error "scoop uninstall: '--keep-env' is not supported when uninstalling Scoop itself."
+        exit 1
+    }
     & "$PSScriptRoot\..\bin\uninstall.ps1" $global $purge
     exit
 }
