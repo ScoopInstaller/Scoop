@@ -79,6 +79,7 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
         }
         $testdir = Join-Path $PSScriptRoot 'path-test-directory'
         $global = $false
+        $persist_dir = 'D:\persist\app'
     }
 
     It 'should concat the correct path' {
@@ -97,6 +98,59 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
         Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
         Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like $testdir }
         Should-Invoke -CommandName Remove-Path -Times 0 -ParameterFilter { $Path -like $PSScriptRoot }
+    }
+
+    It 'should expand $persist_dir and $dir in env_add_path' {
+        Mock Add-Path {}
+        Mock Remove-Path {}
+
+        $manifest = @{ 'env_add_path' = @('$persist_dir\bin', '$dir\lib') }
+
+        env_add_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like "$persist_dir\bin" }
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\lib" }
+
+        env_rm_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$persist_dir\bin" }
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\lib" }
+    }
+
+    It 'should leave %VAR% alone, but only for a variable env_set has set' {
+        Mock Add-Path {}
+        Mock Set-EnvVar {}
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_DIR' = '$persist_dir\bin' }
+            env_add_path = @('%COOP_TEST_DIR%', '%SOME_OTHER_VAR%')
+        }
+        try {
+            env_set $manifest $global
+            env_add_path $manifest $testdir $persist_dir $global
+
+            # the system resolves it, so it stays as it is
+            Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains '%COOP_TEST_DIR%' }
+            Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains '%SOME_OTHER_VAR%' }
+        } finally {
+            Remove-Item env:\COOP_TEST_DIR -ErrorAction SilentlyContinue
+        }
+    }
+
+    It 'should not accept a %VAR% that points outside the app directories' {
+        Mock Add-Path {}
+        Mock Set-EnvVar {}
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_OUT' = 'D:\elsewhere' }
+            env_add_path = @('%COOP_TEST_OUT%')
+        }
+        try {
+            env_set $manifest $global
+            env_add_path $manifest $testdir $persist_dir $global
+
+            Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains '%COOP_TEST_OUT%' }
+        } finally {
+            Remove-Item env:\COOP_TEST_OUT -ErrorAction SilentlyContinue
+        }
     }
 }
 

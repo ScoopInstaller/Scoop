@@ -124,15 +124,15 @@ function Complete-ConfigChange {
             info 'Turn off Scoop isolated path... This may take a while, please wait.'
             $movedPath = Get-EnvVar -Name $currPathEnvVar
             if ($movedPath) {
-                Add-Path -Path $movedPath -Quiet
                 Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
+                Add-Path -Path $movedPath -Quiet
                 Set-EnvVar -Name $currPathEnvVar -Quiet
             }
             if (is_admin) {
                 $movedPath = Get-EnvVar -Name $currPathEnvVar -Global
                 if ($movedPath) {
-                    Add-Path -Path $movedPath -Global -Quiet
                     Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet
+                    Add-Path -Path $movedPath -Global -Quiet
                     Set-EnvVar -Name $currPathEnvVar -Global -Quiet
                 }
             }
@@ -145,22 +145,22 @@ function Complete-ConfigChange {
             info "Turn on Scoop isolated path ('$newPathEnvVar')... This may take a while, please wait."
             $movedPath = Remove-Path -Path "$scoopdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
             if ($movedPath) {
-                Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Quiet
-                Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
                 if ($currPathEnvVar -ne 'PATH') {
                     Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
                     Set-EnvVar -Name $currPathEnvVar -Quiet
                 }
+                Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Quiet
+                Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
             }
             if (is_admin) {
                 $movedPath = Remove-Path -Path "$globaldir\apps\*" -TargetEnvVar $currPathEnvVar -Global -Quiet -PassThru
                 if ($movedPath) {
-                    Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Global -Quiet
-                    Add-Path -Path ('%' + $newPathEnvVar + '%') -Global -Quiet
                     if ($currPathEnvVar -ne 'PATH') {
                         Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet
                         Set-EnvVar -Name $currPathEnvVar -Global -Quiet
                     }
+                    Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Global -Quiet
+                    Add-Path -Path ('%' + $newPathEnvVar + '%') -Global -Quiet
                 }
             }
         }

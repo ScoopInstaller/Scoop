@@ -88,8 +88,8 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
     New-ShimFromManifest $manifest $dir $global $architecture
     create_startmenu_shortcuts $manifest $dir $global $architecture
     install_psmodule $manifest $dir $global
-    env_add_path $manifest $dir $global $architecture
     env_set $manifest $global $architecture
+    env_add_path $manifest $dir $persist_dir $global $architecture
 
     # persist data
     persist_data $manifest $original_dir $persist_dir
@@ -287,23 +287,48 @@ function find_dir_or_subdir($path, $dir) {
     return [string]::join(';', $fixed), $removed
 }
 
-function env_add_path($manifest, $dir, $global, $arch) {
+# Resolves a path a manifest refers to into a usable one inside the app directories.
+function expand_vars($str, $dir, $persist_dir) {
+    if ($str -match '^%') { return $str }
+    if ($str -match '^\$') { $expanded = $ExecutionContext.InvokeCommand.ExpandString($str) }
+    elseif ([System.IO.Path]::IsPathRooted($str)) { $expanded = $str }
+    else { $expanded = Join-Path $dir $str | Get-AbsolutePath }
+    if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
+}
+
+function env_paths($manifest, $dir, $persist_dir, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
+    if (!$env_add_path) { return }
     $dir = $dir.TrimEnd('\')
-    if ($env_add_path) {
+    $env_set = arch_specific 'env_set' $manifest $arch
+    $names = if ($env_set) { @($env_set | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }) } else { @() }
+    $env_add_path.Where({ $_ }).ForEach({
+        $item = $_
+        if ($item -match '^%(.+)%$') {
+            # the system expands it, so only a variable this manifest sets is accepted
+            if ($Matches[1] -in $names) {
+                $expanded = [Environment]::ExpandEnvironmentVariables($item)
+                if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $item }
+            }
+        } else {
+            expand_vars $item $dir $persist_dir
+        }
+    }).Where({ $_ })
+}
+
+function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
+    $path = env_paths $manifest $dir $persist_dir $arch
+    if ($path) {
         if (get_config USE_ISOLATED_PATH) {
             Add-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
         }
-        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
         Add-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global -Force
     }
 }
 
-function env_rm_path($manifest, $dir, $global, $arch) {
-    $env_add_path = arch_specific 'env_add_path' $manifest $arch
-    $dir = $dir.TrimEnd('\')
-    if ($env_add_path) {
-        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+function env_rm_path($manifest, $dir, $persist_dir, $global, $arch) {
+    $path = env_paths $manifest $dir $persist_dir $arch
+    if ($path) {
         Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
         Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global
     }

@@ -94,7 +94,7 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
 
         uninstall_psmodule $manifest $refdir $global
 
-        env_rm_path $manifest $refdir $global $architecture
+        env_rm_path $manifest $refdir $persist_dir $global $architecture
         env_rm $manifest $global $architecture
 
         try {
