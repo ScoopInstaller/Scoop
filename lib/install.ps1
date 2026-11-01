@@ -382,9 +382,13 @@ function env_rm_path($manifest, $dir, $persist_dir, $global, $arch) {
     }
 }
 
-function expand_env_set_value($value, $dir, $original_dir, $persist_dir) {
-    # Reproduces the scope of ExpandString as run during installation, where
-    # 'env_set' values are expanded against these variables
+function expand_env_set_value($value, [hashtable]$vars) {
+    # Reproduces the expansion 'env_set' values get at installation time, where
+    # ExpandString sees the installer's local variables; they are set here
+    # explicitly so the helper never resolves them through its caller's scope
+    foreach ($entry in $vars.GetEnumerator()) {
+        Set-Variable -Name $entry.Key -Value $entry.Value
+    }
     $ExecutionContext.InvokeCommand.ExpandString($value)
 }
 
@@ -401,8 +405,8 @@ function Test-EnvVarUserDefined($name, $global, $exclude_app) {
         if ($app -eq $exclude_app) { continue }
         $version = Select-CurrentVersion -AppName $app -Global:$global
         if (!$version) { continue }
-        $arch = (install_info $app $version $global).architecture
-        $env_set = arch_specific 'env_set' (installed_manifest $app $version $global) $arch
+        $info = install_info $app $version $global
+        $env_set = arch_specific 'env_set' (installed_manifest $app $version $global) $info.architecture
         if (!$env_set) { continue }
         $prop = $env_set.PSObject.Properties | Where-Object { $_.Name -eq $name } | Select-Object -First 1
         if (!$prop) { continue }
@@ -410,7 +414,16 @@ function Test-EnvVarUserDefined($name, $global, $exclude_app) {
         # The values install-time 'env_set' saw: $dir was the linked (or, with
         # no_junction, plain) version directory; $original_dir the real one
         $dir = if ($nojunction) { versiondir $app $version $global } else { "$(appdir $app $global)\current" }
-        $val = expand_env_set_value $prop.Value $dir (versiondir $app $version $global) (persistdir $app $global)
+        $vars = @{
+            dir = $dir
+            original_dir = (versiondir $app $version $global)
+            persist_dir = (persistdir $app $global)
+            app = $app
+            version = $version
+            url = $info.url
+            bucket = $info.bucket
+        }
+        $val = expand_env_set_value $prop.Value $vars
         if ($val -ceq $current) { return $false }
     }
 

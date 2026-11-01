@@ -417,6 +417,14 @@ Describe 'Test-EnvVarUserDefined' -Tag 'Scoop', 'Windows' {
     }
 }
 
+Describe 'expand_env_set_value' -Tag 'Scoop' {
+    It 'binds the provided variables instead of the caller scope' {
+        $version = '2.0' # caller-scope value must not leak into the expansion
+
+        expand_env_set_value '$app/$version' @{ app = 'other'; version = '1.0' } | Should-Be 'other/1.0'
+    }
+}
+
 Describe 'env_rm' -Tag 'Scoop', 'Windows' {
     It 'removes the variables declared in the manifest' {
         $manifest = [PSCustomObject]@{
