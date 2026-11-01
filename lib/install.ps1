@@ -392,12 +392,13 @@ function expand_env_set_value($value, $dir, $original_dir, $persist_dir) {
 # installed app in that scope could have written through its 'env_set' block.
 # Such a value was set or edited by the user and must be preserved; a value
 # that an installed manifest accounts for is Scoop-owned and may be re-pointed.
-function Test-EnvVarUserDefined($name, $global) {
+function Test-EnvVarUserDefined($name, $global, $exclude_app) {
     $current = Get-EnvVar -Name $name -Global:$global
     if ($null -eq $current -or $current -eq '') { return $false }
 
     $nojunction = get_config NO_JUNCTION
     foreach ($app in installed_apps $global) {
+        if ($app -eq $exclude_app) { continue }
         $version = Select-CurrentVersion -AppName $app -Global:$global
         if (!$version) { continue }
         $arch = (install_info $app $version $global).architecture

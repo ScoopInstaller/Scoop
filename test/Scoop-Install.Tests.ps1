@@ -137,6 +137,9 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
     It 'should remove the dropped environment entries' {
         $old = [PSCustomObject]@{ env_set = [PSCustomObject]@{ OLD_VAR = 'x' } }
         $new = [PSCustomObject]@{ env_set = [PSCustomObject]@{ KEPT_VAR = 'y' } }
+        # the cleanup only removes a value this app's old manifest wrote
+        Mock Get-EnvVar { 'x' } -ParameterFilter { $Name -eq 'OLD_VAR' }
+        Mock installed_apps { @() }
 
         remove_obsolete_wiring $ctx $old $new
 
@@ -395,6 +398,21 @@ Describe 'Test-EnvVarUserDefined' -Tag 'Scoop', 'Windows' {
         Mock persistdir { 'C:\data' }
         Mock installed_manifest { [PSCustomObject]@{ env_set = [PSCustomObject]@{ TEST_ENV_SET_VAR = '$persist_dir\cache' } } }
 
+        Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false | Should-BeFalse
+    }
+
+    It 'excludes the app being updated from attribution' {
+        Mock installed_apps { 'self', 'other' }
+        Mock installed_manifest {
+            param($app)
+            if ($app -eq 'self') {
+                [PSCustomObject]@{ env_set = [PSCustomObject]@{ TEST_ENV_SET_VAR = 'C:\data\cache' } }
+            } else {
+                [PSCustomObject]@{ env_set = [PSCustomObject]@{ UNRELATED_VAR = 'C:\data\cache' } }
+            }
+        }
+
+        Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false 'self' | Should-BeTrue
         Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false | Should-BeFalse
     }
 }
