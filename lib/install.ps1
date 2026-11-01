@@ -280,7 +280,7 @@ function link_app($manifest, $dir, $original_dir, $persist_dir, $global, $archit
     persist_permission $manifest $global
 }
 
-function unlink_app($app, $manifest, $dir, $persist_dir, $global, $architecture) {
+function unlink_app($app, $manifest, $dir, $persist_dir, $global, $architecture, $keep_env = $false) {
     Remove-ShimFromManifest $app $manifest $global $architecture
     rm_startmenu_shortcuts $manifest $global $architecture
     # If a junction was used during install, that will have been used
@@ -289,7 +289,11 @@ function unlink_app($app, $manifest, $dir, $persist_dir, $global, $architecture)
     $refdir = unlink_current $dir
     uninstall_psmodule $manifest $refdir $global
     env_rm_path $manifest $refdir $persist_dir $global $architecture
-    env_rm $manifest $global $architecture
+    if ($keep_env) {
+        Write-Host "Keeping environment variables declared by '$app'."
+    } else {
+        env_rm $manifest $global $architecture
+    }
     # unlink all potential old link before doing recursive Remove-Item
     unlink_persist_data $manifest $dir
 }
@@ -383,6 +387,13 @@ function env_set($manifest, $global, $arch) {
     if ($env_set) {
         $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
             $name = $_.Name
+            # Never clobber a variable that the user has already defined in the
+            # target scope (e.g. a custom cache location on another volume)
+            $existing = Get-EnvVar -Name $name -Global:$global
+            if (($null -ne $existing) -and ($existing -ne '')) {
+                Write-Output "Keeping existing $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m = $([char]0x1b)[35m$existing$([char]0x1b)[0m"
+                return
+            }
             $val = $ExecutionContext.InvokeCommand.ExpandString($env_set.$($name))
             Write-Output "Setting $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m = $([char]0x1b)[35m$val$([char]0x1b)[0m"
             Set-EnvVar -Name $name -Value $val -Global:$global

@@ -80,9 +80,9 @@ $apps | ForEach-Object {
     $architecture = $install.architecture
 
     $dir = link_current $dir
-    # unset all potential old env before re-adding
+    # PATH entries are versioned and must be replaced; 'env_set' variables are
+    # only (re-)set when not already defined (see 'env_set')
     env_rm_path $manifest $dir $persist_dir $global $architecture
-    env_rm $manifest $global $architecture
     link_app $manifest $dir $original_dir $persist_dir $global $architecture
 }
 

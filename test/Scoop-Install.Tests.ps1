@@ -322,6 +322,58 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
     }
 }
 
+Describe 'env_set' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $manifest = [PSCustomObject]@{
+            env_set = [PSCustomObject]@{ 'TEST_ENV_SET_VAR' = 'C:\scoop\persist\test\cache' }
+        }
+        $global = $false
+    }
+
+    It 'sets variables that are not defined' {
+        Mock Get-EnvVar { $null }
+        Mock Set-EnvVar {}
+        Mock Set-Content {}
+
+        env_set $manifest $global $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and $Value -eq 'C:\scoop\persist\test\cache' }
+    }
+
+    It 'keeps a pre-existing variable instead of overwriting it' {
+        Mock Get-EnvVar { 'D:\custom-cache' }
+        Mock Set-EnvVar {}
+        Mock Set-Content {}
+
+        env_set $manifest $global $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 0 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' }
+    }
+
+    It 'treats an empty value as undefined' {
+        Mock Get-EnvVar { '' }
+        Mock Set-EnvVar {}
+        Mock Set-Content {}
+
+        env_set $manifest $global $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and $Value -eq 'C:\scoop\persist\test\cache' }
+    }
+}
+
+Describe 'env_rm' -Tag 'Scoop', 'Windows' {
+    It 'removes the variables declared in the manifest' {
+        $manifest = [PSCustomObject]@{
+            env_set = [PSCustomObject]@{ 'TEST_ENV_SET_VAR' = 'C:\scoop\persist\test\cache' }
+        }
+        Mock Set-EnvVar {}
+
+        env_rm $manifest $false $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and [string]::IsNullOrEmpty($Value) }
+    }
+}
+
 Describe 'persist_def' -Tag 'Scoop' {
     It 'parses string correctly' {
         $source, $target = persist_def 'test'
