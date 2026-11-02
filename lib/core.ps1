@@ -143,7 +143,7 @@ function Complete-ConfigChange {
                 $Value.ToUpperInvariant()
             }
             info "Turn on Scoop isolated path ('$newPathEnvVar')... This may take a while, please wait."
-            $movedPath = Remove-Path -Path "$scoopdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
+            $movedPath = Remove-Path -Path "$scoopdir\apps\*", "$scoopdir\persist\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
             if ($movedPath) {
                 if ($currPathEnvVar -ne 'PATH') {
                     Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
@@ -153,7 +153,7 @@ function Complete-ConfigChange {
                 Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
             }
             if (is_admin) {
-                $movedPath = Remove-Path -Path "$globaldir\apps\*" -TargetEnvVar $currPathEnvVar -Global -Quiet -PassThru
+                $movedPath = Remove-Path -Path "$globaldir\apps\*", "$globaldir\persist\*" -TargetEnvVar $currPathEnvVar -Global -Quiet -PassThru
                 if ($movedPath) {
                     if ($currPathEnvVar -ne 'PATH') {
                         Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet

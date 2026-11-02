@@ -295,7 +295,7 @@ function expand_vars($str, $dir, $persist_dir) {
     if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
 }
 
-function env_paths($manifest, $dir, $persist_dir, $arch, [switch]$Removing) {
+function env_paths($manifest, $dir, $persist_dir, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     if (!$env_add_path) { return }
     $dir = $dir.TrimEnd('\')
@@ -303,11 +303,11 @@ function env_paths($manifest, $dir, $persist_dir, $arch, [switch]$Removing) {
     $names = if ($env_set) { @($env_set | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }) } else { @() }
     $env_add_path.Where({ $_ }).ForEach({
         $item = $_
-        if ($item -match '^%(\w+)%') {
-            if ($Removing) { $item }
-            elseif ($Matches[1] -in $names) {
-                $expanded = [Environment]::ExpandEnvironmentVariables($item)
-                if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $item }
+        if ($item -match '^%(.+)%$') {
+            $name = $Matches[1]
+            if ($name -in $names) {
+                $expanded = $ExecutionContext.InvokeCommand.ExpandString($env_set.$name)
+                if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
             }
         } else {
             expand_vars $item $dir $persist_dir
@@ -319,8 +319,13 @@ function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
     $path = env_paths $manifest $dir $persist_dir $arch
     if ($path) {
         if (get_config USE_ISOLATED_PATH) {
+            # %SCOOP_PATH% is expanded from the process value, keep it in sync with the stored one
             $stored = Get-EnvVar -Name $scoopPathEnvVar -Global:$global
-            if ($stored) { Set-Item "env:$scoopPathEnvVar" $stored }
+            if ($stored) {
+                Set-Item "env:$scoopPathEnvVar" $stored
+            } else {
+                Remove-Item "env:$scoopPathEnvVar" -ErrorAction SilentlyContinue
+            }
             Add-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
         }
         Add-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global -Force
@@ -328,7 +333,7 @@ function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
 }
 
 function env_rm_path($manifest, $dir, $persist_dir, $global, $arch) {
-    $path = env_paths $manifest $dir $persist_dir $arch -Removing
+    $path = env_paths $manifest $dir $persist_dir $arch
     if ($path) {
         Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
         Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global
