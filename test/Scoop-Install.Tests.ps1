@@ -548,6 +548,70 @@ Describe 'persist_def' -Tag 'Scoop' {
     }
 }
 
+Describe 'install_app show_manifest and suggest' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
+        . "$PSScriptRoot\..\lib\download.ps1" # 'Invoke-ScoopDownload'
+        . "$PSScriptRoot\..\lib\decompress.ps1" # 'Invoke-Extraction'
+    }
+    BeforeEach {
+        Mock Get-Manifest { 'app', [PSCustomObject]@{ version = '1.0'; suggest = [PSCustomObject]@{ 'feature' = @('other') } }, 'main', $null }
+        Mock Get-SupportedArchitecture { '64bit' }
+        Mock get_config { $default }
+        Mock get_config { $true } -ParameterFilter { $name -eq 'SHOW_MANIFEST' }
+        Mock ConvertToPrettyJson { '{}' }
+        Mock Read-Host { 'y' }
+        # the install steps, so that it gets as far as collecting the suggestions
+        Mock ensure { $dir }
+        Mock Invoke-ScoopDownload { 'app.zip' }
+        Mock Invoke-Extraction {}
+        Mock Invoke-HookScript {}
+        Mock Invoke-Installer { $true }
+        Mock ensure_install_dir_not_in_path {}
+        Mock link_current { $versiondir }
+        Mock link_app {}
+        Mock save_installed_manifest {}
+        Mock save_install_info {}
+        Mock success {}
+        Mock show_notes {}
+        $suggested = @{}
+        $failed = @{}
+    }
+
+    It 'asks before installing, and suggests' {
+        install_app 'app' '64bit' $false $suggested $failed 6>$null | Out-Null
+        Should-Invoke Read-Host -Times 1 -Exactly
+        $failed.Keys | Should-BeCollection -Count 0
+        $suggested.Keys | Should-BeCollection @('app')
+        $suggested['app'].feature | Should-BeCollection @('other')
+    }
+
+    It 'does not install when declined' {
+        Mock Read-Host { 'n' }
+        install_app 'app' '64bit' $false $suggested $failed 6>$null | Out-Null
+        Should-Invoke ensure -Times 0 -Exactly
+        $failed['app'] | Should-Be 'skipped: installation cancelled'
+        $suggested.Keys | Should-BeCollection -Count 0
+    }
+
+    It 'neither asks nor suggests with -Updating' {
+        install_app 'app' '64bit' $false $suggested $failed -Updating 6>$null | Out-Null
+        Should-Invoke Read-Host -Times 0 -Exactly
+        $failed.Keys | Should-BeCollection -Count 0
+        Should-Invoke success -Times 1 -Exactly
+        $suggested.Keys | Should-BeCollection -Count 0
+    }
+
+    It 'is never asked nor suggested during an update' {
+        # by then the old version is uninstalled, so declining would leave the app removed;
+        # and the suggestions were shown when it was first installed
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile("$PSScriptRoot\..\lib\update.ps1", [ref]$null, [ref]$null)
+        $calls = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.CommandAst] -and $args[0].GetCommandName() -eq 'install_app' }, $true)
+        $calls | Should-BeCollection -Count 2
+        $calls | ForEach-Object { $_.Extent.Text | Should-MatchString '-Updating\b' }
+    }
+}
+
 Describe 'update_app' -Tag 'Scoop' {
     BeforeAll {
         . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'

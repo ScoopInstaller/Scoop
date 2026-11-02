@@ -489,7 +489,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         if (-not $independent) {
             # Also add missing dependencies
             $apps = @(Get-Dependency $app $architecture) -ne $app
-            $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
+            $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash -Updating }
         }
 
         $failed_deps = failed_deps $manifest $failed
@@ -501,7 +501,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
                 Move-Item $prepared.dir $dir -ErrorAction Stop
                 $prepared.dir = $dir
             }
-            install_version $app_name $manifest $version $new_architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
+            install_version $app_name $manifest $version $new_architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname -Updating
         }
         if ($failed.ContainsKey($app_key)) {
             restore_app $ctx $old_manifest $old_version $backup

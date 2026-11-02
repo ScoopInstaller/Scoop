@@ -36,7 +36,7 @@ function prepare_app($app, $architecture, $global, $manifest, $bucket, $version,
     return [PSCustomObject]@{ dir = $dir; fname = $download }
 }
 
-function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
+function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true, [Switch]$Updating) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
     $app_key = if ($global) { "$app (global)" } else { $app }
 
@@ -78,7 +78,7 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
     }
 
     # the update flow lives in 'lib/update.ps1' as well as in 'scoop-update.ps1'
-    if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*update.ps1')) {
+    if (!$Updating -and (get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*update.ps1')) {
         Write-Host "Manifest: $app.json"
         $style = get_config CAT_STYLE
         if ($style) {
@@ -137,7 +137,7 @@ function install_version($app, $manifest, $version, $architecture, $global, $buc
         save_installed_manifest $app $bucket $dir $url
         save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
 
-        if ($manifest.suggest) {
+        if (!$Updating -and $manifest.suggest) {
             $suggested[$app] = $manifest.suggest
         }
 
