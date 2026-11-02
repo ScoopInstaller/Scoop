@@ -287,16 +287,15 @@ function find_dir_or_subdir($path, $dir) {
     return [string]::join(';', $fixed), $removed
 }
 
-# Resolves a path a manifest refers to into a usable one inside the app directories.
 function expand_vars($str, $dir, $persist_dir) {
-    if ($str -match '^%') { return $str }
     if ($str -match '^\$') { $expanded = $ExecutionContext.InvokeCommand.ExpandString($str) }
+    elseif ($str -match '^%') { return }
     elseif ([System.IO.Path]::IsPathRooted($str)) { $expanded = $str }
     else { $expanded = Join-Path $dir $str | Get-AbsolutePath }
     if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
 }
 
-function env_paths($manifest, $dir, $persist_dir, $arch) {
+function env_paths($manifest, $dir, $persist_dir, $arch, [switch]$Removing) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     if (!$env_add_path) { return }
     $dir = $dir.TrimEnd('\')
@@ -304,9 +303,9 @@ function env_paths($manifest, $dir, $persist_dir, $arch) {
     $names = if ($env_set) { @($env_set | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }) } else { @() }
     $env_add_path.Where({ $_ }).ForEach({
         $item = $_
-        if ($item -match '^%(.+)%$') {
-            # the system expands it, so only a variable this manifest sets is accepted
-            if ($Matches[1] -in $names) {
+        if ($item -match '^%(\w+)%') {
+            if ($Removing) { $item }
+            elseif ($Matches[1] -in $names) {
                 $expanded = [Environment]::ExpandEnvironmentVariables($item)
                 if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $item }
             }
@@ -320,6 +319,8 @@ function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
     $path = env_paths $manifest $dir $persist_dir $arch
     if ($path) {
         if (get_config USE_ISOLATED_PATH) {
+            $stored = Get-EnvVar -Name $scoopPathEnvVar -Global:$global
+            if ($stored) { Set-Item "env:$scoopPathEnvVar" $stored }
             Add-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
         }
         Add-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global -Force
@@ -327,7 +328,7 @@ function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
 }
 
 function env_rm_path($manifest, $dir, $persist_dir, $global, $arch) {
-    $path = env_paths $manifest $dir $persist_dir $arch
+    $path = env_paths $manifest $dir $persist_dir $arch -Removing
     if ($path) {
         Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
         Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global

@@ -127,7 +127,6 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
             env_set $manifest $global
             env_add_path $manifest $testdir $persist_dir $global
 
-            # the system resolves it, so it stays as it is
             Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains '%COOP_TEST_DIR%' }
             Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains '%SOME_OTHER_VAR%' }
         } finally {
@@ -150,6 +149,43 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
             Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains '%COOP_TEST_OUT%' }
         } finally {
             Remove-Item env:\COOP_TEST_OUT -ErrorAction SilentlyContinue
+        }
+    }
+
+    It 'should not accept a %VAR% the manifest does not set' {
+        Mock Add-Path {}
+        Mock Set-EnvVar {}
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_DIR' = '$persist_dir\bin' }
+            env_add_path = @('%TEMP%\bin')
+        }
+        try {
+            env_set $manifest $global
+            env_add_path $manifest $testdir $persist_dir $global
+
+            Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains '%TEMP%\bin' }
+        } finally {
+            Remove-Item env:\COOP_TEST_DIR -ErrorAction SilentlyContinue
+        }
+    }
+
+    It 'should remove a %VAR% reference even when this shell does not know it' {
+        Mock Remove-Path {}
+        Mock Set-EnvVar {}
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_DIR' = '$persist_dir\bin' }
+            env_add_path = @('%COOP_TEST_DIR%')
+        }
+        try {
+            env_set $manifest $global
+            Remove-Item env:\COOP_TEST_DIR -ErrorAction SilentlyContinue
+            env_rm_path $manifest $testdir $persist_dir $global
+
+            Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains '%COOP_TEST_DIR%' }
+        } finally {
+            Remove-Item env:\COOP_TEST_DIR -ErrorAction SilentlyContinue
         }
     }
 }
