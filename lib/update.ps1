@@ -344,7 +344,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     # directory.
     $refdir = unlink_current $dir
     uninstall_psmodule $old_manifest $refdir $global
-    env_rm_path $old_manifest $refdir $global $architecture
+    env_rm_path $old_manifest $refdir $persist_dir $global $architecture
     env_rm $old_manifest $global $architecture
     unlink_persist_data $old_manifest $dir
 

@@ -233,6 +233,23 @@ Describe 'is_in_dir' -Tag 'Scoop' {
     }
 }
 
+Describe 'Add-Path' -Tag 'Scoop', 'Windows' {
+    It 'should expand %VAR% in the current session but keep it in the stored value' {
+        Mock Set-EnvVar {}
+        $env:COOP_TEST_PATH = 'C:\some\path'
+        $before = $env:PATH
+        try {
+            Add-Path -Path '%COOP_TEST_PATH%' -Force -Quiet
+
+            ($env:PATH -match 'C:\\some\\path') | Should-BeTrue
+            Should-Invoke Set-EnvVar -Times 1 -ParameterFilter { $Value -like '*%COOP_TEST_PATH%*' }
+        } finally {
+            $env:PATH = $before
+            Remove-Item env:\COOP_TEST_PATH -ErrorAction SilentlyContinue
+        }
+    }
+}
+
 Describe 'currentdir' -Tag 'Scoop' {
     It 'resolves version directory when NO_JUNCTION is enabled without preloading versions.ps1' {
         Mock get_config { $true } -ParameterFilter { $name -eq 'NO_JUNCTION' }

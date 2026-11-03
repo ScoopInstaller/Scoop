@@ -79,6 +79,7 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
         }
         $testdir = Join-Path $PSScriptRoot 'path-test-directory'
         $global = $false
+        $persist_dir = 'D:\persist\app'
     }
 
     It 'should concat the correct path' {
@@ -97,6 +98,70 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
         Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\bar" }
         Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like $testdir }
         Should-Invoke -CommandName Remove-Path -Times 0 -ParameterFilter { $Path -like $PSScriptRoot }
+    }
+
+    It 'should expand $persist_dir and $dir in env_add_path' {
+        Mock Add-Path {}
+        Mock Remove-Path {}
+
+        $manifest = @{ 'env_add_path' = @('$persist_dir\bin', '$dir\lib') }
+
+        env_add_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like "$persist_dir\bin" }
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -like "$testdir\lib" }
+
+        env_rm_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$persist_dir\bin" }
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -like "$testdir\lib" }
+    }
+
+    It 'should expand %VAR% from the variables env_set defines' {
+        Mock Add-Path {}
+        Mock Remove-Path {}
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_DIR' = '$persist_dir\bin'; 'APP-HOME' = '$persist_dir\lib' }
+            env_add_path = @('%COOP_TEST_DIR%', '%APP-HOME%', '%SOME_OTHER_VAR%', '%TEMP%\bin')
+        }
+
+        env_add_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\bin" }
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\lib" }
+        Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains '%SOME_OTHER_VAR%' }
+        Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains '%TEMP%\bin' }
+
+        env_rm_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\bin" }
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\lib" }
+    }
+
+    It 'should not accept a %VAR% that points outside the app directories' {
+        Mock Add-Path {}
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_OUT' = 'D:\elsewhere' }
+            env_add_path = @('%COOP_TEST_OUT%')
+        }
+
+        env_add_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Add-Path -Times 0
+    }
+
+    It 'should keep the session %SCOOP_PATH% in sync with the stored value' {
+        Mock get_config { $true } -ParameterFilter { $Name -eq 'USE_ISOLATED_PATH' }
+        Mock Add-Path {}
+        Mock Set-Item {}
+        Mock Remove-Item {}
+
+        $manifest = @{ 'env_add_path' = @('$dir\bin') }
+
+        Mock Get-EnvVar { 'D:\apps\a\current' }
+        env_add_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Set-Item -Times 1 -ParameterFilter { $Path -eq "env:$scoopPathEnvVar" -and $Value -eq 'D:\apps\a\current' }
+
+        Mock Get-EnvVar { $null }
+        env_add_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq "env:$scoopPathEnvVar" }
     }
 }
 

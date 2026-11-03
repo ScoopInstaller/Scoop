@@ -41,6 +41,7 @@ function do_uninstall($app, $global) {
     $manifest = installed_manifest $app $version $global
     $install = install_info $app $version $global
     $architecture = $install.architecture
+    $persist_dir = persistdir $app $global
 
     Write-Output "Uninstalling '$app'"
     if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
@@ -53,7 +54,7 @@ function do_uninstall($app, $global) {
     # directory.
     $refdir = unlink_current (appdir $app $global)
 
-    env_rm_path $manifest $refdir $global $architecture
+    env_rm_path $manifest $refdir $persist_dir $global $architecture
     env_rm $manifest $global $architecture
 
     $appdir = appdir $app $global
