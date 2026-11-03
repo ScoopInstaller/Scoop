@@ -231,8 +231,8 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
 
     $current = "$(Split-Path $ctx.dir)\current"
     $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.architecture)
-    # the old paths were expanded with the old version
-    $version = $old_manifest.version
+    # the old paths were expanded with the version directory, a nightly manifest keeps the name 'nightly'
+    $version = Split-Path $ctx.dir -Leaf
     if (get_config NO_JUNCTION) {
         # without junctions the paths point at the version directory
         $removed = @(env_paths $old_manifest $ctx.dir $ctx.persist_dir $ctx.architecture)
@@ -260,15 +260,20 @@ function restore_app($ctx, $old_manifest, $old_version, $backup) {
     # the old manifest expands $version, which still names the failed update
     $version = $old_version
     if ($backup -and (Test-Path $backup)) {
-        # the backup would land inside the recreated directory
-        if (Test-Path $ctx.dir) { Remove-Item $ctx.dir -Recurse -Force }
-        Move-Item $backup $ctx.dir
+        try {
+            # the backup would land inside the recreated directory
+            if (Test-Path $ctx.dir) { Remove-Item $ctx.dir -Recurse -Force }
+            Move-Item $backup $ctx.dir
+        } catch {
+            warn "'$($ctx.app)' ($old_version) could not be restored: $($_.Exception.Message)"
+            return
+        }
     }
     if (installed_manifest $ctx.app $old_version $ctx.global) {
         Write-Host "Restoring '$($ctx.app)' ($old_version)"
         $original_dir = $ctx.dir
-        $dir = link_current $ctx.dir
         try {
+            $dir = link_current $ctx.dir
             link_app $old_manifest $dir $original_dir $ctx.persist_dir $ctx.global $ctx.architecture
         } catch {
             warn "'$($ctx.app)' ($old_version) was restored, but its links could not be recreated: $($_.Exception.Message)"

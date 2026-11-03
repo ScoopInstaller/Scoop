@@ -187,6 +187,24 @@ Describe 'restore_app' -Tag 'Scoop' {
 
         restore_app $ctx ([PSCustomObject]@{ version = '1.0' }) '1.0' $null
     }
+
+    It 'should not fail when the current link cannot be created' {
+        $ctx = [PSCustomObject]@{
+            app          = 'foo'
+            dir          = '/fake/app/1.0'
+            persist_dir  = '/fake/persist'
+            global       = $false
+            architecture = '64bit'
+        }
+        Mock installed_manifest { [PSCustomObject]@{ version = '1.0' } }
+        Mock link_current { throw 'cannot link current' }
+        Mock link_app {}
+        Mock warn {}
+
+        restore_app $ctx ([PSCustomObject]@{ version = '1.0' }) '1.0' $null
+
+        Should-Invoke warn -Times 1
+    }
 }
 
 Describe 'show_failed_apps' -Tag 'Scoop' {
