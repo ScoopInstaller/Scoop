@@ -104,7 +104,13 @@ Describe 'unlink_app' -Tag 'Scoop' {
 Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
     BeforeAll {
         $old_path = Get-AbsolutePath '/fake/app/current/old'
-        Mock Remove-ShimFromManifest {}
+        $ctx = [PSCustomObject]@{
+            app          = 'foo'
+            dir          = '/fake/app/1.0'
+            persist_dir  = '/fake/persist'
+            global       = $false
+            architecture = '64bit'
+        }
         Mock rm_startmenu_shortcuts {}
         Mock Remove-Path {}
         Mock Set-EnvVar {}
@@ -112,21 +118,26 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
     }
 
     It 'should remove the entries the new manifest dropped' {
+        $shimdir = Join-Path $TestDrive 'shims'
+        New-Item -ItemType Directory -Path $shimdir -Force | Out-Null
+        'path = "x"' | Set-Content (Join-Path $shimdir 'old.shim')
+        'path = "y"' | Set-Content (Join-Path $shimdir 'kept.shim')
+        Mock shimdir { $shimdir }
+
         $old = [PSCustomObject]@{ bin = @('old.exe', 'kept.exe', 'tool.exe') }
         $new = [PSCustomObject]@{ bin = @('kept.exe', 'tool.cmd') }
 
-        remove_obsolete_wiring 'foo' $old $new '/fake/app/1.0' '/fake/persist' $false '64bit'
+        remove_obsolete_wiring $ctx $old $new
 
-        Should-Invoke Remove-ShimFromManifest -Times 1 -ParameterFilter { 'old.exe' -in $Manifest.bin }
-        Should-Invoke Remove-ShimFromManifest -Times 1 -ParameterFilter { 'tool.exe' -in $Manifest.bin }
-        Should-Invoke Remove-ShimFromManifest -Times 1 -ParameterFilter { 'kept.exe' -notin $Manifest.bin }
+        (Test-Path (Join-Path $shimdir 'old.shim')) | Should-BeFalse
+        (Test-Path (Join-Path $shimdir 'kept.shim')) | Should-BeTrue
     }
 
     It 'should remove the dropped environment entries' {
         $old = [PSCustomObject]@{ env_set = [PSCustomObject]@{ OLD_VAR = 'x' } }
         $new = [PSCustomObject]@{ env_set = [PSCustomObject]@{ KEPT_VAR = 'y' } }
 
-        remove_obsolete_wiring 'foo' $old $new '/fake/app/1.0' '/fake/persist' $false '64bit'
+        remove_obsolete_wiring $ctx $old $new
 
         Should-Invoke Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'OLD_VAR' }
         Should-Invoke Set-EnvVar -Times 0 -ParameterFilter { $Name -eq 'KEPT_VAR' }
@@ -136,7 +147,7 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
         $old = [PSCustomObject]@{ env_add_path = @('old', 'kept') }
         $new = [PSCustomObject]@{ env_add_path = @('kept') }
 
-        remove_obsolete_wiring 'foo' $old $new '/fake/app/1.0' '/fake/persist' $false '64bit'
+        remove_obsolete_wiring $ctx $old $new
 
         Should-Invoke Remove-Path -ParameterFilter { $old_path -in $Path }
     }
@@ -146,7 +157,7 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
         $old = [PSCustomObject]@{ env_add_path = @('scripts') }
         $new = [PSCustomObject]@{ env_add_path = @('scripts') }
 
-        remove_obsolete_wiring 'foo' $old $new '/fake/app/1.0' '/fake/persist' $false '64bit'
+        remove_obsolete_wiring $ctx $old $new
 
         Should-Invoke Remove-Path -ParameterFilter { (Get-AbsolutePath '/fake/app/1.0/scripts') -in $Path }
     }
@@ -155,7 +166,7 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
         $old = [PSCustomObject]@{ psmodule = [PSCustomObject]@{ name = 'mod' } }
         $new = [PSCustomObject]@{ psmodule = [PSCustomObject]@{ name = 'mod' } }
 
-        remove_obsolete_wiring 'foo' $old $new '/fake/app/1.0' '/fake/persist' $false '64bit'
+        remove_obsolete_wiring $ctx $old $new
 
         Should-Invoke uninstall_psmodule -Times 0
     }
@@ -163,11 +174,18 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
 
 Describe 'restore_app' -Tag 'Scoop' {
     It 'should not fail when the links cannot be recreated' {
+        $ctx = [PSCustomObject]@{
+            app          = 'foo'
+            dir          = '/fake/app/1.0'
+            persist_dir  = '/fake/persist'
+            global       = $false
+            architecture = '64bit'
+        }
         Mock installed_manifest { [PSCustomObject]@{ version = '1.0' } }
         Mock link_current { '/fake/app/current' }
         Mock link_app { throw 'cannot link' }
 
-        restore_app 'foo' ([PSCustomObject]@{ version = '1.0' }) '1.0' '/fake/app/1.0' '/fake/persist' $false '64bit' $null
+        restore_app $ctx ([PSCustomObject]@{ version = '1.0' }) '1.0' $null
     }
 }
 

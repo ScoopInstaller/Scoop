@@ -216,60 +216,65 @@ function Sync-Bucket {
     }
 }
 
-function remove_obsolete_wiring($app, $old_manifest, $new_manifest, $dir, $persist_dir, $global, $architecture) {
+function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
+    # a later uninstall would delete the data through the old persist links
+    unlink_persist_data $old_manifest $ctx.dir
+
     $shim_id = { param($entry) $target, $name, $null = Get-ShimDefinition $entry; "$name$([IO.Path]::GetExtension($target))" }
-    $ids = @(arch_specific 'bin' $new_manifest $architecture | Where-Object { $_ -ne $null } | ForEach-Object { & $shim_id $_ })
-    $obsolete = @(arch_specific 'bin' $old_manifest $architecture | Where-Object { $_ -ne $null } | Where-Object { (& $shim_id $_) -notin $ids })
-    if ($obsolete) { Remove-ShimFromManifest $app @{ bin = $obsolete } $global $architecture }
+    $ids = @(arch_specific 'bin' $new_manifest $ctx.architecture | Where-Object { $_ -ne $null } | ForEach-Object { & $shim_id $_ })
+    $removed = @(arch_specific 'bin' $old_manifest $ctx.architecture | Where-Object { $_ -ne $null } | Where-Object { (& $shim_id $_) -notin $ids })
+    if ($removed) { Remove-ShimFromManifest $ctx.app @{ bin = $removed } $ctx.global $ctx.architecture }
 
-    $names = @(arch_specific 'shortcuts' $new_manifest $architecture | Where-Object { $_ -ne $null } | ForEach-Object { $_[1] })
-    $obsolete = @(arch_specific 'shortcuts' $old_manifest $architecture | Where-Object { $_ -ne $null } | Where-Object { $_[1] -notin $names })
-    if ($obsolete) { rm_startmenu_shortcuts @{ shortcuts = $obsolete } $global $architecture }
+    # the shortcut is edited in place, its removed arguments and icons would stay
+    $shortcuts = @(arch_specific 'shortcuts' $old_manifest $ctx.architecture | Where-Object { $_ -ne $null })
+    if ($shortcuts) { rm_startmenu_shortcuts @{ shortcuts = $shortcuts } $ctx.global $ctx.architecture }
 
+    $current = "$(Split-Path $ctx.dir)\current"
+    $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.architecture)
+    # the old paths were expanded with the old version
+    $version = $old_manifest.version
     if (get_config NO_JUNCTION) {
-        # without junctions the paths point at the version directory, which the new version does not use
-        $obsolete = @(env_paths $old_manifest $dir $persist_dir $architecture)
+        # without junctions the paths point at the version directory
+        $removed = @(env_paths $old_manifest $ctx.dir $ctx.persist_dir $ctx.architecture)
     } else {
-        $current = "$(Split-Path $dir)\current"
-        $paths = @(env_paths $new_manifest $current $persist_dir $architecture)
-        $obsolete = @(env_paths $old_manifest $current $persist_dir $architecture) | Where-Object { $_ -notin $paths }
+        $removed = @(env_paths $old_manifest $current $ctx.persist_dir $ctx.architecture) | Where-Object { $_ -notin $paths }
     }
-    if ($obsolete) {
-        Remove-Path -Path $obsolete -Global:$global
-        Remove-Path -Path $obsolete -TargetEnvVar $scoopPathEnvVar -Global:$global
+    if ($removed) {
+        Remove-Path -Path $removed -Global:$ctx.global
+        Remove-Path -Path $removed -TargetEnvVar $scoopPathEnvVar -Global:$ctx.global
     }
 
-    $names = @((arch_specific 'env_set' $new_manifest $architecture).PSObject.Properties.Name)
-    $obsolete = @((arch_specific 'env_set' $old_manifest $architecture).PSObject.Properties.Name) | Where-Object { $_ -notin $names }
-    foreach ($var in $obsolete) {
-        Set-EnvVar -Name $var -Value $null -Global:$global
+    $names = @((arch_specific 'env_set' $new_manifest $ctx.architecture).PSObject.Properties.Name)
+    $removed = @((arch_specific 'env_set' $old_manifest $ctx.architecture).PSObject.Properties.Name) | Where-Object { $_ -notin $names }
+    foreach ($var in $removed) {
+        Set-EnvVar -Name $var -Value $null -Global:$ctx.global
         Remove-Item "env:\$var" -ErrorAction SilentlyContinue
     }
 
     if ($old_manifest.psmodule.name -and $old_manifest.psmodule.name -ne $new_manifest.psmodule.name) {
-        uninstall_psmodule $old_manifest $dir $global
+        uninstall_psmodule $old_manifest $ctx.dir $ctx.global
     }
 }
 
-function restore_app($app, $old_manifest, $old_version, $dir, $persist_dir, $global, $architecture, $backup) {
+function restore_app($ctx, $old_manifest, $old_version, $backup) {
     # the old manifest expands $version, which still names the failed update
     $version = $old_version
-    if ($backup) {
-        # the failed version recreated the directory, the backup would land inside it
-        if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
-        Move-Item $backup $dir
+    if ($backup -and (Test-Path $backup)) {
+        # the backup would land inside the recreated directory
+        if (Test-Path $ctx.dir) { Remove-Item $ctx.dir -Recurse -Force }
+        Move-Item $backup $ctx.dir
     }
-    if (installed_manifest $app $old_version $global) {
-        Write-Host "Restoring '$app' ($old_version)"
-        $original_dir = $dir
-        $dir = link_current $dir
+    if (installed_manifest $ctx.app $old_version $ctx.global) {
+        Write-Host "Restoring '$($ctx.app)' ($old_version)"
+        $original_dir = $ctx.dir
+        $dir = link_current $ctx.dir
         try {
-            link_app $old_manifest $dir $original_dir $persist_dir $global $architecture
+            link_app $old_manifest $dir $original_dir $ctx.persist_dir $ctx.global $ctx.architecture
         } catch {
-            warn "'$app' ($old_version) was restored, but its links could not be recreated: $($_.Exception.Message)"
+            warn "'$($ctx.app)' ($old_version) was restored, but its links could not be recreated: $($_.Exception.Message)"
         }
     } else {
-        warn "'$app' ($old_version) cannot be restored; its files were removed by the uninstaller."
+        warn "'$($ctx.app)' ($old_version) cannot be restored; its files were removed by the uninstaller."
     }
 }
 
@@ -387,6 +392,13 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
 
     $dir = versiondir $app $old_version $global
     $persist_dir = persistdir $app $global
+    $ctx = [PSCustomObject]@{
+        app          = $app
+        dir          = $dir
+        persist_dir  = $persist_dir
+        global       = $global
+        architecture = $architecture
+    }
 
     try {
         Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
@@ -397,19 +409,20 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
             return
         }
         $unlinked = $true
-        remove_obsolete_wiring $app $old_manifest $manifest $dir $persist_dir $global $architecture
+        remove_obsolete_wiring $ctx $old_manifest $manifest
 
         $backup = $null
         if ($force -and ($old_version -eq $version)) {
-            $backup = "$dir/../_$version.old"
-            if (Test-Path $backup) {
+            $new_backup = "$dir/../_$version.old"
+            if (Test-Path $new_backup) {
                 $i = 1
-                While (Test-Path "$backup($i)") {
+                While (Test-Path "$new_backup($i)") {
                     $i++
                 }
-                $backup = "$backup($i)"
+                $new_backup = "$new_backup($i)"
             }
-            Move-Item $dir $backup
+            Move-Item $dir $new_backup
+            $backup = $new_backup
         }
 
         Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
@@ -431,17 +444,17 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
 
         # The new version has already been downloaded (and hash-checked) above,
         # so re-install it from the cache instead of downloading it a second time.
-        # the shared table keeps a failed dependency visible, the scope specific key
-        # keeps a failure of the other scope from triggering a restoration
+        # the dependency failures live in the same table
         install_app $app $architecture $global $suggested $failed $true $check_hash
+        # the scope specific key keeps the other scope from restoring
         if ($failed.ContainsKey($app_key)) {
-            restore_app $app_name $old_manifest $old_version $dir $persist_dir $global $architecture $backup
+            restore_app $ctx $old_manifest $old_version $backup
         }
     } catch {
         $failed[$app_key] = $_.Exception.Message
         error $_.Exception.Message
         if ($unlinked) {
-            restore_app $app_name $old_manifest $old_version $dir $persist_dir $global $architecture $backup
+            restore_app $ctx $old_manifest $old_version $backup
         }
     }
 }
