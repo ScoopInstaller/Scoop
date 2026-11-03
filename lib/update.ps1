@@ -216,32 +216,37 @@ function Sync-Bucket {
     }
 }
 
-function remove_obsolete_wiring($app, $old_manifest, $manifest, $dir, $persist_dir, $global, $architecture) {
-    $names = @(arch_specific 'bin' $manifest $architecture | Where-Object { $_ -ne $null } | ForEach-Object { (Get-ShimDefinition $_)[1] })
-    $obsolete = @(arch_specific 'bin' $old_manifest $architecture | Where-Object { $_ -ne $null } | Where-Object { (Get-ShimDefinition $_)[1] -notin $names })
+function remove_obsolete_wiring($app, $old_manifest, $new_manifest, $dir, $persist_dir, $global, $architecture) {
+    $shim_id = { param($entry) $target, $name, $null = Get-ShimDefinition $entry; "$name$([IO.Path]::GetExtension($target))" }
+    $ids = @(arch_specific 'bin' $new_manifest $architecture | Where-Object { $_ -ne $null } | ForEach-Object { & $shim_id $_ })
+    $obsolete = @(arch_specific 'bin' $old_manifest $architecture | Where-Object { $_ -ne $null } | Where-Object { (& $shim_id $_) -notin $ids })
     if ($obsolete) { Remove-ShimFromManifest $app @{ bin = $obsolete } $global $architecture }
 
-    $names = @(arch_specific 'shortcuts' $manifest $architecture | Where-Object { $_ -ne $null } | ForEach-Object { $_[1] })
+    $names = @(arch_specific 'shortcuts' $new_manifest $architecture | Where-Object { $_ -ne $null } | ForEach-Object { $_[1] })
     $obsolete = @(arch_specific 'shortcuts' $old_manifest $architecture | Where-Object { $_ -ne $null } | Where-Object { $_[1] -notin $names })
     if ($obsolete) { rm_startmenu_shortcuts @{ shortcuts = $obsolete } $global $architecture }
 
-    # the paths were added relative to 'current'
-    $current = "$(Split-Path $dir)\current"
-    $paths = @(env_paths $manifest $current $persist_dir $architecture)
-    $obsolete = @(env_paths $old_manifest $current $persist_dir $architecture) | Where-Object { $_ -notin $paths }
+    if (get_config NO_JUNCTION) {
+        # without junctions the paths point at the version directory, which the new version does not use
+        $obsolete = @(env_paths $old_manifest $dir $persist_dir $architecture)
+    } else {
+        $current = "$(Split-Path $dir)\current"
+        $paths = @(env_paths $new_manifest $current $persist_dir $architecture)
+        $obsolete = @(env_paths $old_manifest $current $persist_dir $architecture) | Where-Object { $_ -notin $paths }
+    }
     if ($obsolete) {
         Remove-Path -Path $obsolete -Global:$global
         Remove-Path -Path $obsolete -TargetEnvVar $scoopPathEnvVar -Global:$global
     }
 
-    $names = @((arch_specific 'env_set' $manifest $architecture).PSObject.Properties.Name)
+    $names = @((arch_specific 'env_set' $new_manifest $architecture).PSObject.Properties.Name)
     $obsolete = @((arch_specific 'env_set' $old_manifest $architecture).PSObject.Properties.Name) | Where-Object { $_ -notin $names }
     foreach ($var in $obsolete) {
         Set-EnvVar -Name $var -Value $null -Global:$global
         Remove-Item "env:\$var" -ErrorAction SilentlyContinue
     }
 
-    if ($old_manifest.psmodule.name -and $old_manifest.psmodule.name -ne $manifest.psmodule.name) {
+    if ($old_manifest.psmodule.name -and $old_manifest.psmodule.name -ne $new_manifest.psmodule.name) {
         uninstall_psmodule $old_manifest $dir $global
     }
 }
@@ -249,12 +254,20 @@ function remove_obsolete_wiring($app, $old_manifest, $manifest, $dir, $persist_d
 function restore_app($app, $old_manifest, $old_version, $dir, $persist_dir, $global, $architecture, $backup) {
     # the old manifest expands $version, which still names the failed update
     $version = $old_version
-    if ($backup) { Move-Item $backup $dir }
+    if ($backup) {
+        # the failed version recreated the directory, the backup would land inside it
+        if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
+        Move-Item $backup $dir
+    }
     if (installed_manifest $app $old_version $global) {
         Write-Host "Restoring '$app' ($old_version)"
         $original_dir = $dir
         $dir = link_current $dir
-        link_app $old_manifest $dir $original_dir $persist_dir $global $architecture
+        try {
+            link_app $old_manifest $dir $original_dir $persist_dir $global $architecture
+        } catch {
+            warn "'$app' ($old_version) was restored, but its links could not be recreated: $($_.Exception.Message)"
+        }
     } else {
         warn "'$app' ($old_version) cannot be restored; its files were removed by the uninstaller."
     }
@@ -383,8 +396,8 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
             $failed[$app_key] = 'uninstaller failed'
             return
         }
-        remove_obsolete_wiring $app $old_manifest $manifest $dir $persist_dir $global $architecture
         $unlinked = $true
+        remove_obsolete_wiring $app $old_manifest $manifest $dir $persist_dir $global $architecture
 
         $backup = $null
         if ($force -and ($old_version -eq $version)) {

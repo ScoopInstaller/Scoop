@@ -112,7 +112,7 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         if ($linked) {
             # the failed version may have added shims or settings of its own
             try {
-                unlink_app $app $manifest $original_dir $global $architecture
+                unlink_app $app $manifest $original_dir $persist_dir $global $architecture
             } catch {
                 warn "Failed to clean up the failed installation: $($_.Exception.Message)"
             }
