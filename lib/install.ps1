@@ -89,8 +89,8 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         }
         ensure_install_dir_not_in_path $dir $global
         $dir = link_current $dir
-        link_app $manifest $dir $original_dir $persist_dir $global $architecture
         $linked = $true
+        link_app $manifest $dir $original_dir $persist_dir $global $architecture
 
         Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
 

@@ -216,6 +216,36 @@ function Sync-Bucket {
     }
 }
 
+function remove_obsolete_wiring($app, $old_manifest, $manifest, $dir, $persist_dir, $global, $architecture) {
+    $names = @(arch_specific 'bin' $manifest $architecture | Where-Object { $_ -ne $null } | ForEach-Object { (Get-ShimDefinition $_)[1] })
+    $obsolete = @(arch_specific 'bin' $old_manifest $architecture | Where-Object { $_ -ne $null } | Where-Object { (Get-ShimDefinition $_)[1] -notin $names })
+    if ($obsolete) { Remove-ShimFromManifest $app @{ bin = $obsolete } $global $architecture }
+
+    $names = @(arch_specific 'shortcuts' $manifest $architecture | Where-Object { $_ -ne $null } | ForEach-Object { $_[1] })
+    $obsolete = @(arch_specific 'shortcuts' $old_manifest $architecture | Where-Object { $_ -ne $null } | Where-Object { $_[1] -notin $names })
+    if ($obsolete) { rm_startmenu_shortcuts @{ shortcuts = $obsolete } $global $architecture }
+
+    # the paths were added relative to 'current'
+    $current = "$(Split-Path $dir)\current"
+    $paths = @(env_paths $manifest $current $persist_dir $architecture)
+    $obsolete = @(env_paths $old_manifest $current $persist_dir $architecture) | Where-Object { $_ -notin $paths }
+    if ($obsolete) {
+        Remove-Path -Path $obsolete -Global:$global
+        Remove-Path -Path $obsolete -TargetEnvVar $scoopPathEnvVar -Global:$global
+    }
+
+    $names = @((arch_specific 'env_set' $manifest $architecture).PSObject.Properties.Name)
+    $obsolete = @((arch_specific 'env_set' $old_manifest $architecture).PSObject.Properties.Name) | Where-Object { $_ -notin $names }
+    foreach ($var in $obsolete) {
+        Set-EnvVar -Name $var -Value $null -Global:$global
+        Remove-Item "env:\$var" -ErrorAction SilentlyContinue
+    }
+
+    if ($old_manifest.psmodule.name -and $old_manifest.psmodule.name -ne $manifest.psmodule.name) {
+        uninstall_psmodule $old_manifest $dir $global
+    }
+}
+
 function restore_app($app, $old_manifest, $old_version, $dir, $persist_dir, $global, $architecture, $backup) {
     # the old manifest expands $version, which still names the failed update
     $version = $old_version
@@ -353,7 +383,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
             $failed[$app_key] = 'uninstaller failed'
             return
         }
-        unlink_app $app $old_manifest $dir $persist_dir $global $architecture
+        remove_obsolete_wiring $app $old_manifest $manifest $dir $persist_dir $global $architecture
         $unlinked = $true
 
         $backup = $null
