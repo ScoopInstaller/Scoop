@@ -262,8 +262,8 @@ function restore_app($ctx, $old_manifest, $old_version, $backup) {
     if ($backup -and (Test-Path $backup)) {
         try {
             # the backup would land inside the recreated directory
-            if (Test-Path $ctx.dir) { Remove-Item $ctx.dir -Recurse -Force }
-            Move-Item $backup $ctx.dir
+            if (Test-Path $ctx.dir) { Remove-Item $ctx.dir -Recurse -Force -ErrorAction Stop }
+            Move-Item $backup $ctx.dir -ErrorAction Stop
         } catch {
             warn "'$($ctx.app)' ($old_version) could not be restored: $($_.Exception.Message)"
             return
@@ -426,7 +426,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
                 }
                 $new_backup = "$new_backup($i)"
             }
-            Move-Item $dir $new_backup
+            Move-Item $dir $new_backup -ErrorAction Stop
             $backup = $new_backup
         }
 
