@@ -561,9 +561,15 @@ function app_status($app, $global) {
     }
 
     $manifest = manifest $app $install_info.bucket $install_info.url
+    $status.pinned = (!$install_info.bucket -and $install_info.url -eq (usermanifest $app))
+    $latest_manifest = $manifest
+    if ($status.pinned) {
+        $scanned, $null = Find-AppBucket $app
+        if ($scanned) { $latest_manifest = $scanned }
+    }
     $status.removed = (!$manifest)
-    if ($manifest.version) {
-        $status.latest_version = $manifest.version
+    if ($latest_manifest.version) {
+        $status.latest_version = $latest_manifest.version
     }
 
     $status.outdated = $false

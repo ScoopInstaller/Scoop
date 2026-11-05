@@ -96,15 +96,19 @@ if (-not ($apps -or $all)) {
         $apps | ForEach-Object {
             ($app, $global) = $_
             $status = app_status $app $global
-            # -f on an @version pin upgrades to the bucket HEAD; the target
-            # version is resolved (and warned) by update(), not guessed here
             $ver = Select-CurrentVersion -AppName $app -Global:$global
             $pin = install_info $app $ver $global
-            $is_pin = $force -and !$pin.bucket -and ($pin.url -eq (usermanifest $app))
+            $is_pin = !$pin.bucket -and ($pin.url -eq (usermanifest $app))
             if ($status.installed -and ($force -or $status.outdated)) {
                 if (!$status.hold) {
+                    if ($is_pin -and !$force) {
+                        $app_key = if ($global) { "$app (global)" } else { $app }
+                        $failed[$app_key] = "skipped: pinned to version $($status.version)"
+                        warn "'$app' is pinned to version $($status.version), $($status.latest_version) is available.`nUse 'scoop update -f $app$(if ($global) { ' --global' })' to install the new version."
+                        return
+                    }
                     $outdated += applist $app $global
-                    $latest = if ($is_pin) { 'HEAD (forced)' } else { $status.latest_version }
+                    $latest = if ($force -and $is_pin) { 'HEAD (forced)' } else { $status.latest_version }
                     Write-Host -f yellow ("$app`: $($status.version) -> $latest{0}" -f ('', ' (global)')[$global])
                 } else {
                     warn "'$app' is held to version $($status.version)"
@@ -127,7 +131,10 @@ if (-not ($apps -or $all)) {
         if ($outdated.Length -gt 1) {
             Write-Host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
         } elseif ($outdated.Length -eq 0) {
-            Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
+            $skipped = @($failed.Keys | Where-Object { $failed[$_] -like 'skipped:*' })
+            if (!$skipped.Count) {
+                Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
+            }
         } else {
             Write-Host -f DarkCyan 'Updating one outdated app:'
         }
