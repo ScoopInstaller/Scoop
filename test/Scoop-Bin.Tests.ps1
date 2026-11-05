@@ -1,0 +1,27 @@
+BeforeAll {
+    $repo_root = (Resolve-Path "$PSScriptRoot\..").Path
+    $shell_exe = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+}
+
+Describe 'bin/scoop.ps1' -Tag 'Scoop', 'Windows' {
+    It 'prints the formatted output of a command that returns objects' {
+        $root = Join-Path $TestDrive 'scoop-root'
+        $shim_dir = Join-Path $root 'shims'
+        New-Item -ItemType Directory -Path $shim_dir -Force | Out-Null
+        $target = Join-Path $root 'scoop-fake-target.ps1'
+        [IO.File]::WriteAllText($target, "[PSCustomObject]@{ Marker = 'zzz-fake-output' }")
+        [IO.File]::WriteAllText((Join-Path $shim_dir 'scoop-fake.ps1'), "`$path = '$target'")
+
+        $old_scoop = $env:SCOOP
+        $env:SCOOP = $root
+        try {
+            $output = & $shell_exe -NoProfile -ExecutionPolicy Bypass -File "$repo_root\bin\scoop.ps1" fake 2>&1 | Out-String
+            $code = $LASTEXITCODE
+        } finally {
+            $env:SCOOP = $old_scoop
+        }
+
+        $code | Should-Be 0
+        ($output -match 'zzz-fake-output') | Should-BeTrue
+    }
+}
