@@ -58,7 +58,7 @@ function Invoke-Extraction {
                 Write-Host 'Done.' -ForegroundColor Green
             } catch {
                 Write-Host 'Error.' -ForegroundColor DarkRed
-                error $_.Exception.Message
+                throw
             } finally {
                 $extracted++
             }

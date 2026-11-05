@@ -216,8 +216,77 @@ function Sync-Bucket {
     }
 }
 
+function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
+    # a later uninstall would delete the data through the old persist links
+    unlink_persist_data $old_manifest $ctx.dir
+
+    $shim_id = { param($entry) $target, $name, $null = Get-ShimDefinition $entry; "$name$([IO.Path]::GetExtension($target))" }
+    $ids = @(arch_specific 'bin' $new_manifest $ctx.architecture | Where-Object { $_ -ne $null } | ForEach-Object { & $shim_id $_ })
+    $removed = @(arch_specific 'bin' $old_manifest $ctx.architecture | Where-Object { $_ -ne $null } | Where-Object { (& $shim_id $_) -notin $ids })
+    if ($removed) { Remove-ShimFromManifest $ctx.app @{ bin = $removed } $ctx.global $ctx.architecture }
+
+    # the shortcut is edited in place, its removed arguments and icons would stay
+    $shortcuts = @(arch_specific 'shortcuts' $old_manifest $ctx.architecture | Where-Object { $_ -ne $null })
+    if ($shortcuts) { rm_startmenu_shortcuts @{ shortcuts = $shortcuts } $ctx.global $ctx.architecture }
+
+    $current = "$(Split-Path $ctx.dir)\current"
+    $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.architecture)
+    # the old paths were expanded with the version directory, a nightly manifest keeps the name 'nightly'
+    $version = Split-Path $ctx.dir -Leaf
+    if (get_config NO_JUNCTION) {
+        # without junctions the paths point at the version directory
+        $removed = @(env_paths $old_manifest $ctx.dir $ctx.persist_dir $ctx.architecture)
+    } else {
+        $removed = @(env_paths $old_manifest $current $ctx.persist_dir $ctx.architecture) | Where-Object { $_ -notin $paths }
+    }
+    if ($removed) {
+        Remove-Path -Path $removed -Global:$ctx.global
+        Remove-Path -Path $removed -TargetEnvVar $scoopPathEnvVar -Global:$ctx.global
+    }
+
+    $names = @((arch_specific 'env_set' $new_manifest $ctx.architecture).PSObject.Properties.Name)
+    $removed = @((arch_specific 'env_set' $old_manifest $ctx.architecture).PSObject.Properties.Name) | Where-Object { $_ -notin $names }
+    foreach ($var in $removed) {
+        Set-EnvVar -Name $var -Value $null -Global:$ctx.global
+        Remove-Item "env:\$var" -ErrorAction SilentlyContinue
+    }
+
+    if ($old_manifest.psmodule.name -and $old_manifest.psmodule.name -ne $new_manifest.psmodule.name) {
+        uninstall_psmodule $old_manifest $ctx.dir $ctx.global
+    }
+}
+
+function restore_app($ctx, $old_manifest, $old_version, $backup) {
+    # the old manifest expands $version, which still names the failed update
+    $version = $old_version
+    if ($backup -and (Test-Path $backup)) {
+        try {
+            # the backup would land inside the recreated directory
+            if (Test-Path $ctx.dir) { Remove-Item $ctx.dir -Recurse -Force -ErrorAction Stop }
+            Move-Item $backup $ctx.dir -ErrorAction Stop
+        } catch {
+            warn "'$($ctx.app)' ($old_version) could not be restored: $($_.Exception.Message)"
+            return
+        }
+    }
+    if (installed_manifest $ctx.app $old_version $ctx.global) {
+        Write-Host "Restoring '$($ctx.app)' ($old_version)"
+        $original_dir = $ctx.dir
+        try {
+            $dir = link_current $ctx.dir
+            link_app $old_manifest $dir $original_dir $ctx.persist_dir $ctx.global $ctx.architecture
+        } catch {
+            warn "'$($ctx.app)' ($old_version) was restored, but its links could not be recreated: $($_.Exception.Message)"
+        }
+    } else {
+        warn "'$($ctx.app)' ($old_version) cannot be restored; its files were removed by the uninstaller."
+    }
+}
+
 function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app_key = if ($global) { "$app (global)" } else { $app }
+    $app_name = $app
+    $unlinked = $false
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -328,56 +397,69 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
 
     $dir = versiondir $app $old_version $global
     $persist_dir = persistdir $app $global
-
-    Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
-
-    Write-Host "Uninstalling '$app' ($old_version)"
-    if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-        $failed[$app_key] = 'uninstaller failed'
-        return
+    $ctx = [PSCustomObject]@{
+        app          = $app
+        dir          = $dir
+        persist_dir  = $persist_dir
+        global       = $global
+        architecture = $architecture
     }
-    Remove-ShimFromManifest $app $old_manifest $global $architecture
-    rm_startmenu_shortcuts $old_manifest $global $architecture
 
-    # If a junction was used during install, that will have been used
-    # as the reference directory. Otherwise it will just be the version
-    # directory.
-    $refdir = unlink_current $dir
-    uninstall_psmodule $old_manifest $refdir $global
-    env_rm_path $old_manifest $refdir $persist_dir $global $architecture
-    env_rm $old_manifest $global $architecture
-    unlink_persist_data $old_manifest $dir
+    try {
+        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
-    if ($force -and ($old_version -eq $version)) {
-        if (!(Test-Path "$dir/../_$version.old")) {
-            Move-Item "$dir" "$dir/../_$version.old"
-        } else {
-            $i = 1
-            While (Test-Path "$dir/../_$version.old($i)") {
-                $i++
+        Write-Host "Uninstalling '$app' ($old_version)"
+        if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+            $failed[$app_key] = 'uninstaller failed'
+            return
+        }
+        $unlinked = $true
+        remove_obsolete_wiring $ctx $old_manifest $manifest
+
+        $backup = $null
+        if ($force -and ($old_version -eq $version)) {
+            $new_backup = "$dir/../_$version.old"
+            if (Test-Path $new_backup) {
+                $i = 1
+                While (Test-Path "$new_backup($i)") {
+                    $i++
+                }
+                $new_backup = "$new_backup($i)"
             }
-            Move-Item "$dir" "$dir/../_$version.old($i)"
+            Move-Item $dir $new_backup -ErrorAction Stop
+            $backup = $new_backup
+        }
+
+        Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
+
+        if ($bucket) {
+            # add bucket name it was installed from
+            $app = "$bucket/$app"
+        }
+        if ($install.url -and (!$pin_broken -or !$bucket)) {
+            # use the url of the install json if the application was installed through url
+            $app = $install.url
+        }
+
+        if (-not $independent) {
+            # Also add missing dependencies
+            $apps = @(Get-Dependency $app $architecture) -ne $app
+            $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
+        }
+
+        # The new version has already been downloaded (and hash-checked) above,
+        # so re-install it from the cache instead of downloading it a second time.
+        # the dependency failures live in the same table
+        install_app $app $architecture $global $suggested $failed $true $check_hash
+        # the scope specific key keeps the other scope from restoring
+        if ($failed.ContainsKey($app_key)) {
+            restore_app $ctx $old_manifest $old_version $backup
+        }
+    } catch {
+        $failed[$app_key] = $_.Exception.Message
+        error $_.Exception.Message
+        if ($unlinked) {
+            restore_app $ctx $old_manifest $old_version $backup
         }
     }
-
-    Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
-
-    if ($bucket) {
-        # add bucket name it was installed from
-        $app = "$bucket/$app"
-    }
-    if ($install.url -and (!$pin_broken -or !$bucket)) {
-        # use the url of the install json if the application was installed through url
-        $app = $install.url
-    }
-
-    if (-not $independent) {
-        # Also add missing dependencies
-        $apps = @(Get-Dependency $app $architecture) -ne $app
-        $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
-    }
-
-    # The new version has already been downloaded (and hash-checked) above,
-    # so re-install it from the cache instead of downloading it a second time.
-    install_app $app $architecture $global $suggested $failed $true $check_hash
 }

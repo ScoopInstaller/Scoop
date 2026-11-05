@@ -135,7 +135,16 @@ if (-not ($apps -or $all)) {
 
     $suggested = @{}
     # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update_app @_ $force $quiet $independent $suggested $failed $use_cache $check_hash }
+    $outdated | ForEach-Object {
+    $current = $_
+    try {
+        update_app @current $force $quiet $independent $suggested $failed $use_cache $check_hash
+    } catch {
+        $key = if ($current[1]) { "$($current[0]) (global)" } else { $current[0] }
+        $failed[$key] = $_.Exception.Message
+        error $_.Exception.Message
+    }
+}
 
     show_suggestions $suggested
     $failed_count = show_failed_apps $failed 'update'
