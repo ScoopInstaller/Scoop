@@ -31,6 +31,10 @@ Describe 'MSIX extraction exclusions with 7-Zip' -Tag 'Scoop', 'Windows', 'Msix'
         $sevenZip = (Get-Command 7z.exe -ErrorAction Stop).Source
     }
 
+    BeforeEach {
+        Mock get_config { $false } -ParameterFilter { $name -eq 'USE_EXTERNAL_7ZIP' }
+    }
+
     It 'restores retained filenames with <Filter> exclusions' -ForEach @(
         @{ Filter = 'default NSIS'; Excluded = 'skip%20two.nsis'; Switches = $null }
         @{ Filter = 'explicit Switches'; Excluded = 'skip%20two.txt'; Switches = '-xr!skip*' }
@@ -50,6 +54,28 @@ Describe 'MSIX extraction exclusions with 7-Zip' -Tag 'Scoop', 'Windows', 'Msix'
         Test-Path -LiteralPath "$destination\app\$Excluded" | Should-BeFalse
         Test-Path -LiteralPath (Join-Path "$destination\app" ([uri]::UnescapeDataString($Excluded))) | Should-BeFalse
     }
+
+    It 'preserves a pre-existing encoded <Kind> with Overwrite Skip' -ForEach @(
+        @{ Kind = 'file'; Existing = 'keep%20one.txt'; Decoded = 'keep one.txt' }
+        @{ Kind = 'directory'; Existing = '%40keep/old.txt'; Decoded = '@keep/old.txt' }
+    ) {
+        $caseDir = Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        [IO.Directory]::CreateDirectory($caseDir) | Out-Null
+        $archivePath = Join-Path $caseDir 'dl.zip'
+        $destination = Join-Path $caseDir 'extracted'
+        $existingPath = Join-Path $destination $Existing
+        [IO.Directory]::CreateDirectory((Split-Path $existingPath)) | Out-Null
+        [IO.File]::WriteAllText($existingPath, 'existing')
+        Mock Get-HelperPath { $sevenZip }
+        Mock Remove-Item {}
+        New-TestArchive $archivePath @($Existing, 'new%20two.txt')
+
+        Expand-7zipArchive $archivePath $destination -Overwrite Skip
+
+        [IO.File]::ReadAllText($existingPath) | Should-Be 'existing'
+        Test-Path -LiteralPath (Join-Path $destination $Decoded) | Should-BeFalse
+        [IO.File]::ReadAllText("$destination\new two.txt") | Should-Be 'payload'
+    }
 }
 
 Describe 'MSIX filenames with <Extractor>' -ForEach @(
@@ -58,7 +84,9 @@ Describe 'MSIX filenames with <Extractor>' -ForEach @(
 ) -Tag 'Scoop', 'Windows', 'Msix' {
     BeforeAll {
         . "$PSScriptRoot\..\lib\depends.ps1"
-        $sevenZip = (Get-Command 7z.exe -ErrorAction Stop).Source
+        if ($Extractor -eq 'Expand-7zipArchive') {
+            $sevenZip = (Get-Command 7z.exe -ErrorAction Stop).Source
+        }
     }
 
     BeforeEach {
@@ -66,7 +94,13 @@ Describe 'MSIX filenames with <Extractor>' -ForEach @(
         [IO.Directory]::CreateDirectory($caseDir) | Out-Null
         $archivePath = Join-Path $caseDir 'dl.zip'
         $destination = Join-Path $caseDir 'extracted'
-        Mock Get-HelperPath { $sevenZip }
+        Mock get_config { $false } -ParameterFilter { $name -eq 'USE_EXTERNAL_7ZIP' }
+        if ($Extractor -eq 'Expand-7zipArchive') {
+            Mock Get-HelperPath { $sevenZip }
+        } else {
+            Mock Get-HelperPath { throw 'Built-in ZIP must not require 7-Zip' }
+            Mock Get-Command { throw '7-Zip is unavailable' } -ParameterFilter { $Name -in @('7z', '7z.exe') }
+        }
         # Archive removal is separate from filename restoration.
         Mock Remove-Item {}
     }
@@ -114,6 +148,27 @@ Describe 'MSIX filenames with <Extractor>' -ForEach @(
         Invoke-Extraction -Path $caseDir -Name 'dl.zip' -Manifest $manifest -Architecture '64bit'
         Test-Path -LiteralPath "$caseDir\out\app\node_modules\@oai\package.json" | Should-BeTrue
         Should-Invoke Remove-Item -ParameterFilter { $Path -eq $archivePath }
+    }
+
+    It 'dispatches to the selected extractor despite external 7-Zip user configuration' {
+        $oldConfig = $scoopConfig
+        try {
+            $scoopConfig = [PSCustomObject]@{ USE_EXTERNAL_7ZIP = $true }
+            New-TestArchive $archivePath @('app/%40oai/package.json')
+            Mock Test-HelperInstalled { $Extractor -eq 'Expand-7zipArchive' }
+            Mock Expand-ZipArchive {}
+            Mock Expand-7zipArchive {}
+            $manifest = [PSCustomObject]@{ url = 'https://example.invalid/package.msix#/dl.zip' }
+
+            Invoke-Extraction -Path $caseDir -Name 'dl.zip' -Manifest $manifest -Architecture '64bit'
+
+            Should-Invoke $Extractor -Exactly -Times 1
+            if ($Extractor -eq 'Expand-ZipArchive') {
+                Should-Invoke Expand-7zipArchive -Exactly -Times 0
+            } else {
+                Should-Invoke Expand-ZipArchive -Exactly -Times 0
+            }
+        } finally { $scoopConfig = $oldConfig }
     }
 
     It 'does not rename unrelated files already in the destination' {

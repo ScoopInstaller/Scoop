@@ -172,6 +172,14 @@ function Expand-7zipArchive {
     }
     $LogPath = "$(Split-Path $Path)\7zip.log"
     $DestinationPath = $DestinationPath.TrimEnd('\')
+    if ($Overwrite -eq 'Skip') {
+        # Snapshot paths skipped by 7-Zip before extraction or extract_dir moves.
+        $existingRoot = $DestinationPath
+        if ($ExtractDir) { $existingRoot = Join-Path $existingRoot $ExtractDir }
+        $msixPaths = @($msixPaths | Where-Object {
+            !(Test-Path -LiteralPath (Join-Path $existingRoot $_.Original))
+        })
+    }
     $ArgList = @('x', $Path, "-o$DestinationPath", '-xr!*.nsis', '-y')
     $IsTar = ((strip_ext $Path) -match '\.tar$') -or ($Path -match '\.t[abgpx]z2?$')
     if (!$IsTar -and $ExtractDir) {
