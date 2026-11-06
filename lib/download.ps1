@@ -81,6 +81,7 @@ function Start-Download ($url, $to, $cookies) {
         $url = handle_special_urls $url
         Invoke-Download $url $to $cookies $progress
     } catch {
+        warn "Download failed for $url"
         $e = $_.exception
         if ($e.Response.StatusCode -eq 'Unauthorized') {
             warn 'Token might be misconfigured.'
