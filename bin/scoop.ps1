@@ -11,7 +11,7 @@ $subCommand = $Args[0]
 # for aliases where there's a local function, re-alias so the function takes precedence
 $aliases = Get-Alias | Where-Object { $_.Options -notmatch 'ReadOnly|AllScope' } | ForEach-Object { $_.Name }
 Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForEach-Object {
-    Set-Alias -Name $_.Name -Value Local:$($_.Name) -Scope Script
+    Set-Alias -Name $_.Name -Value Local:$($_.Name) -Scope Script -WhatIf:$false
 }
 
 $exitCode = 0

@@ -6,6 +6,7 @@
 
 ### Bug Fixes
 
+- **scoop:** Initialize function aliases even when WhatIf is enabled ([#6631](https://github.com/ScoopInstaller/Scoop/issues/6631))
 - **scoop-checkup:** Skip Defender check when `Get-MpPreference` fails ([#6745](https://github.com/ScoopInstaller/Scoop/issues/6745))
 - **scoop-config:** Validate the proxy setting ([#6802](https://github.com/ScoopInstaller/Scoop/issues/6802))
 - **scoop-info:** Resolve the license identifier before URL and separator matching ([#6770](https://github.com/ScoopInstaller/Scoop/issues/6770))
