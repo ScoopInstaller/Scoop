@@ -48,6 +48,7 @@ $list = @($apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach
             if ($is_deprecated) { 'Deprecated package' }
             if ($global) { 'Global install' }
             if ($install_info.hold) { 'Held package' }
+            if (!$install_info.bucket -and $install_info.url -eq (usermanifest $app)) { 'Pinned' }
             if ($install_info.architecture -and $defaultArchitecture -ne $install_info.architecture) {
                 $install_info.architecture
             }

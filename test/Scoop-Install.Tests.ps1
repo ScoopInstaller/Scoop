@@ -352,3 +352,35 @@ Describe 'persist_def' -Tag 'Scoop' {
         $target | Should-Be 'foo'
     }
 }
+
+Describe 'update_app' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+    }
+    BeforeEach {
+        Mock Select-CurrentVersion { '3.24.0' }
+        Mock test_running_process { $true }
+        Mock Write-Host {}
+        Mock warn {}
+        Mock install_info { [PSCustomObject]@{ architecture = '64bit'; url = (usermanifest 'foo') } }
+        Mock manifest { [PSCustomObject]@{ version = '3.24.0' } }
+        Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1' }, 'extras' }
+    }
+
+    It 'keeps the version of an app installed from an auto-generated manifest' {
+        $failed = @{}
+        update_app 'foo' $false $false $false $false @{} $failed
+
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -like "*'foo' (3.24.0) is already installed*" }
+        Should-Invoke -CommandName Find-AppBucket -Times 0
+        $failed.Count | Should-Be 0
+    }
+
+    It 'upgrades an app installed from an auto-generated manifest with -f' {
+        $failed = @{}
+        update_app 'foo' $false $true $true $false @{} $failed
+
+        Should-Invoke -CommandName Write-Host -Times 1 -ParameterFilter { $Object -like '*3.24.0 -> 3.24.1*' }
+        Should-Invoke -CommandName Find-AppBucket -Times 1
+    }
+}

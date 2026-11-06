@@ -534,3 +534,46 @@ Describe 'Show-DeprecatedWarning' -Tag 'Scoop' {
         Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"shim"*' }
     }
 }
+
+Describe 'app_status' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\manifest.ps1" # 'install_info' 'Find-AppBucket'
+        . "$PSScriptRoot\..\lib\buckets.ps1" # 'Find-BucketDirectory'
+        . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+    }
+    BeforeEach {
+        Mock Test-Path { $false }
+        Mock get_config { $false }
+    }
+
+    It 'reports the bucket version of an app installed from an auto-generated manifest' {
+        Mock Select-CurrentVersion { '3.24.0' }
+        Mock install_info { [PSCustomObject]@{ url = (usermanifest 'foo') } }
+        Mock manifest { [PSCustomObject]@{ version = '3.24.0'; depends = @('dep') } }
+        Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1'; depends = @('newdep') }, 'extras' }
+        Mock installed { $app -ne 'dep' }
+
+        $status = app_status 'foo' $false
+
+        $status.latest_version | Should-Be '3.24.1'
+        $status.outdated | Should-BeTrue
+        $status.pinned | Should-BeTrue
+        # the dependencies of the installed version, not of the newer one
+        $status.missing_deps | Should-BeCollection -Count 1
+        $status.missing_deps[0] | Should-Be 'dep'
+    }
+
+    It 'keeps the manifest of an app installed from a bucket' {
+        Mock Select-CurrentVersion { '3.24.1' }
+        Mock install_info { [PSCustomObject]@{ bucket = 'extras' } }
+        Mock manifest { [PSCustomObject]@{ version = '3.24.1' } }
+        Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1' }, 'extras' }
+
+        $status = app_status 'foo' $false
+
+        $status.latest_version | Should-Be '3.24.1'
+        $status.outdated | Should-BeFalse
+        $status.pinned | Should-BeFalse
+        Should-Invoke -CommandName Find-AppBucket -Times 0
+    }
+}
