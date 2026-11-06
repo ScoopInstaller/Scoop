@@ -101,7 +101,7 @@ if (-not ($apps -or $all)) {
                 if (!$status.hold) {
                     if ($is_pin -and !$force) {
                         $app_key = if ($global) { "$app (global)" } else { $app }
-                        $failed[$app_key] = "skipped: pinned to version $($status.version)"
+                        if (!$failed.ContainsKey($app_key)) { $failed[$app_key] = "skipped: pinned to version $($status.version)" }
                         warn "'$app' is pinned to version $($status.version), $($status.latest_version) is available.`nUse 'scoop update -f $app$(if ($global) { ' --global' })' to install the new version."
                         return
                     }
@@ -110,7 +110,7 @@ if (-not ($apps -or $all)) {
                     Write-Host -f yellow ("$app`: $($status.version) -> $latest{0}" -f ('', ' (global)')[$global])
                 } else {
                     $app_key = if ($global) { "$app (global)" } else { $app }
-                    $failed[$app_key] = "skipped: held to version $($status.version)"
+                    if (!$failed.ContainsKey($app_key)) { $failed[$app_key] = "skipped: held to version $($status.version)" }
                     warn "'$app' is held to version $($status.version)`nUse 'scoop unhold $app$(if ($global) { ' --global' })' to enable updates."
                 }
             } elseif ($apps_param -ne '*' -and !$all) {
