@@ -2,6 +2,7 @@
 
 ### Features
 
+- **scoop-cache:** Show human-readable file sizes in the cache listing ([#6672](https://github.com/ScoopInstaller/Scoop/issues/6672))
 - **shim:** Rework the shim system around architecture-native bodies ([#6783](https://github.com/ScoopInstaller/Scoop/issues/6783), [#6799](https://github.com/ScoopInstaller/Scoop/issues/6799))
 
 ### Bug Fixes
