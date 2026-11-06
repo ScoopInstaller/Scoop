@@ -72,6 +72,7 @@ $true, $false | ForEach-Object { # local and global apps
         if ($status.deprecated) { $info += 'Deprecated' }
         if ($status.removed)    { $info += 'Manifest removed' }
         $item.Info = $info -join ', '
+        $item.Changelog = if ($status.outdated) { $status.changelog } else { '' }
         $list += [PSCustomObject]$item
     }
 }

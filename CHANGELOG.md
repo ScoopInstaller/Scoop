@@ -2,6 +2,11 @@
 
 ### Features
 
+- **manifest:** Add `changelog` property to the app manifest schema ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-changelog:** Add `scoop changelog` command to show an app's changelog or latest release notes ([#6291](https://github.com/ScoopInstaller/Scoop/issues/6291), [#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-update:** Show changelog link after updating an app ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-status:** Show changelog link for outdated apps ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
+- **scoop-info:** Show changelog URL of the app ([#2067](https://github.com/ScoopInstaller/Scoop/issues/2067))
 - **shim:** Rework the shim system around architecture-native bodies ([#6783](https://github.com/ScoopInstaller/Scoop/issues/6783), [#6799](https://github.com/ScoopInstaller/Scoop/issues/6799))
 
 ### Bug Fixes
