@@ -60,7 +60,11 @@ $apps | ForEach-Object {
     $install = @{}
     $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
     if (!$install.hold) {
-        info "'$app' is not held."
+        if (!$install.bucket -and $install.url -eq (usermanifest $app)) {
+            info "'$app' is not held, but it is pinned to its installed version."
+        } else {
+            info "'$app' is not held."
+        }
         continue
     }
     $install.hold = $null
