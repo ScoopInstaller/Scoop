@@ -5,6 +5,7 @@
 # Options:
 #   -g, --global   Uninstall a globally installed app
 #   -p, --purge    Remove all persistent data
+#   -k, --keep-env Keep environment variables declared in the manifest
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
@@ -17,7 +18,7 @@
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 
 # options
-$opt, $apps, $err = getopt $args 'gp' 'global', 'purge'
+$opt, $apps, $err = getopt $args 'gpk' 'global', 'purge', 'keep-env'
 
 if ($err) {
     error "scoop uninstall: $err"
@@ -26,6 +27,7 @@ if ($err) {
 
 $global = $opt.g -or $opt.global
 $purge = $opt.p -or $opt.purge
+$keep_env = $opt.k -or $opt.'keep-env'
 
 if (!$apps) {
     error '<app> missing'
@@ -39,6 +41,10 @@ if ($global -and !(is_admin)) {
 }
 
 if ($apps -eq 'scoop') {
+    if ($keep_env) {
+        error "scoop uninstall: '--keep-env' is not supported when uninstalling Scoop itself."
+        exit 1
+    }
     & "$PSScriptRoot\..\bin\uninstall.ps1" $global $purge
     exit
 }
@@ -90,7 +96,7 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
             $failed[$app] = 'uninstaller failed'
             continue
         }
-        unlink_app $app $manifest $dir $persist_dir $global $architecture
+        unlink_app $app $manifest $dir $persist_dir $global $architecture $keep_env
 
         try {
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
