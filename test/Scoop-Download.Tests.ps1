@@ -4,6 +4,39 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\download.ps1"
 }
 
+Describe 'Start-Download failure context' -Tag 'Scoop' {
+    BeforeEach {
+        Mock handle_special_urls { $url }
+        Mock warn { }
+    }
+
+    It 'warns about the failed URL and preserves the download error' {
+        Mock Invoke-Download { throw [Net.WebException]::new('test download failure') }
+
+        { Start-Download 'https://example.org/app.zip' 'unused' } | Should-Throw '*test download failure*'
+
+        Should-Invoke warn -Exactly -Times 1 -ParameterFilter { $msg -eq 'Download failed for https://example.org/app.zip' }
+    }
+
+    It 'reports the resolved URL when a special URL download fails' {
+        Mock handle_special_urls { 'https://example.org/resolved.zip' }
+        Mock Invoke-Download { throw [Net.WebException]::new('resolved download failure') }
+
+        { Start-Download 'https://example.org/original' 'unused' } | Should-Throw '*resolved download failure*'
+
+        Should-Invoke warn -Exactly -Times 1 -ParameterFilter { $msg -eq 'Download failed for https://example.org/resolved.zip' }
+    }
+
+    It 'does not warn after a successful download' {
+        Mock Invoke-Download { }
+
+        Start-Download 'https://example.org/app.zip' 'unused'
+
+        Should-Invoke warn -Exactly -Times 0
+        Should-Invoke Invoke-Download -Exactly -Times 1
+    }
+}
+
 Describe 'Test-Aria2Enabled' -Tag 'Scoop' {
     It 'should return true if aria2 is installed' {
         Mock Test-HelperInstalled { $true }
