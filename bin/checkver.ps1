@@ -429,7 +429,9 @@ while ($in_progress -gt 0) {
 
     Write-Host $ver -ForegroundColor DarkRed -NoNewline
     Write-Host " (scoop version is $expected_ver)" -NoNewline
-    $update_available = ([Scoop.VersionComparer]::Compare($ver, $expected_ver, (Get-UpdateNightlySetting))) -ne 0
+    $comparison = [Scoop.VersionComparer]::Compare($ver, $expected_ver, (Get-UpdateNightlySetting))
+    $update_available = $comparison -ne 0
+    $version_regressed = $comparison -gt 0
 
     if ($json.autoupdate -and $update_available) {
         Write-Host ' autoupdate available' -ForegroundColor Cyan
@@ -439,6 +441,12 @@ while ($in_progress -gt 0) {
 
     # forcing an update implies updating, right?
     if ($ForceUpdate) { $Update = $true }
+
+    # Opt-in guard: skip rewriting the manifest backwards unless forced.
+    if ($version_regressed -and $json.checkver.skipdowngrade -and !$ForceUpdate) {
+        warn "${app}: skipping downgrade to $ver"
+        continue
+    }
 
     if ($Update -and $json.autoupdate) {
         if ($ForceUpdate) {
