@@ -109,7 +109,9 @@ if (-not ($apps -or $all)) {
                     $latest = if ($force -and $is_pin) { 'HEAD (forced)' } else { $status.latest_version }
                     Write-Host -f yellow ("$app`: $($status.version) -> $latest{0}" -f ('', ' (global)')[$global])
                 } else {
-                    warn "'$app' is held to version $($status.version)"
+                    $app_key = if ($global) { "$app (global)" } else { $app }
+                    $failed[$app_key] = "skipped: held to version $($status.version)"
+                    warn "'$app' is held to version $($status.version)`nUse 'scoop unhold $app$(if ($global) { ' --global' })' to enable updates."
                 }
             } elseif ($apps_param -ne '*' -and !$all) {
                 if ($status.installed) {
