@@ -8,6 +8,7 @@
 
 - **scoop-checkup:** Skip Defender check when `Get-MpPreference` fails ([#6745](https://github.com/ScoopInstaller/Scoop/issues/6745))
 - **scoop-config:** Validate the proxy setting ([#6802](https://github.com/ScoopInstaller/Scoop/issues/6802))
+- **scoop-hold:** Report a held app as skipped ([#6820](https://github.com/ScoopInstaller/Scoop/issues/6820))
 - **scoop-info:** Resolve the license identifier before URL and separator matching ([#6770](https://github.com/ScoopInstaller/Scoop/issues/6770))
 - **scoop-install, scoop-update:** Unify error handling and exit codes ([#6798](https://github.com/ScoopInstaller/Scoop/issues/6798))
 - **scoop-list:** Collect items before formatting to prevent column truncation ([#6800](https://github.com/ScoopInstaller/Scoop/issues/6800))
