@@ -25,6 +25,33 @@ BeforeAll {
     }
 }
 
+Describe 'MSIX extraction exclusions with 7-Zip' -Tag 'Scoop', 'Windows', 'Msix' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\depends.ps1"
+        $sevenZip = (Get-Command 7z.exe -ErrorAction Stop).Source
+    }
+
+    It 'restores retained filenames with <Filter> exclusions' -ForEach @(
+        @{ Filter = 'default NSIS'; Excluded = 'skip%20two.nsis'; Switches = $null }
+        @{ Filter = 'explicit Switches'; Excluded = 'skip%20two.txt'; Switches = '-xr!skip*' }
+    ) {
+        $caseDir = Join-Path $TestDrive ([guid]::NewGuid().ToString('N'))
+        [IO.Directory]::CreateDirectory($caseDir) | Out-Null
+        $archivePath = Join-Path $caseDir 'dl.zip'
+        $destination = Join-Path $caseDir 'extracted'
+        Mock Get-HelperPath { $sevenZip }
+        Mock Remove-Item {}
+        New-TestArchive $archivePath @('app/keep%20one.txt', "app/$Excluded")
+
+        Expand-7zipArchive $archivePath $destination -Switches $Switches
+
+        [IO.File]::ReadAllText("$destination\app\keep one.txt") | Should-Be 'payload'
+        Test-Path -LiteralPath "$destination\app\keep%20one.txt" | Should-BeFalse
+        Test-Path -LiteralPath "$destination\app\$Excluded" | Should-BeFalse
+        Test-Path -LiteralPath (Join-Path "$destination\app" ([uri]::UnescapeDataString($Excluded))) | Should-BeFalse
+    }
+}
+
 Describe 'MSIX filenames with <Extractor>' -ForEach @(
     @{ Extractor = 'Expand-ZipArchive' }
     @{ Extractor = 'Expand-7zipArchive' }

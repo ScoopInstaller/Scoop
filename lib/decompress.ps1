@@ -130,6 +130,8 @@ function Rename-MsixEncodedPath {
     # an encoded literal percent sign (%2540) must become %40, not @.
     foreach ($item in $Mapping) {
         $source = Join-Path $DestinationPath $item.Original
+        # Extraction filters can intentionally omit an archive entry.
+        if (!(Test-Path -LiteralPath $source)) { continue }
         $target = Join-Path (Split-Path $source) $item.Name
         if (Test-Path -LiteralPath $target) {
             throw "MSIX filename already exists: $target"
