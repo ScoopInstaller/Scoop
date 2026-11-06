@@ -444,13 +444,13 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         if (-not $independent) {
             # Also add missing dependencies
             $apps = @(Get-Dependency $app $architecture) -ne $app
-            $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
+            $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash -NoManifestPrompt }
         }
 
         # The new version has already been downloaded (and hash-checked) above,
         # so re-install it from the cache instead of downloading it a second time.
         # the dependency failures live in the same table
-        install_app $app $architecture $global $suggested $failed $true $check_hash
+        install_app $app $architecture $global $suggested $failed $true $check_hash -NoManifestPrompt
         # the scope specific key keeps the other scope from restoring
         if ($failed.ContainsKey($app_key)) {
             restore_app $ctx $old_manifest $old_version $backup
