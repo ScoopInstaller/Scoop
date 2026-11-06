@@ -66,6 +66,78 @@ function Invoke-Extraction {
     }
 }
 
+function Get-MsixEncodedPath {
+    param([String] $Path, [String] $ExtractDir)
+
+    if ($Path -notmatch '\.(zip|msix|appx)$') { return }
+
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    try {
+        $archive = [IO.Compression.ZipFile]::OpenRead($Path)
+    } catch [IO.InvalidDataException] {
+        # A filename override can also disguise a non-ZIP archive supported by
+        # 7-Zip. Leave format validation to the existing extractor in that case.
+        return
+    }
+    try {
+        # Manifests commonly rename an MSIX download to dl.zip. Identify the package
+        # by its footprint files, so ordinary ZIP filenames remain literal.
+        if (!$archive.GetEntry('AppxManifest.xml') -or !$archive.GetEntry('AppxBlockMap.xml') -or !$archive.GetEntry('[Content_Types].xml')) { return }
+
+        $prefix = ($ExtractDir -replace '\\', '/').Trim('/')
+        if ($prefix) { $prefix += '/' }
+        $paths = @{}
+        $decodedPaths = @{}
+        foreach ($entry in $archive.Entries) {
+            $relative = $entry.FullName.TrimEnd('/')
+            if ($prefix) {
+                if (!$relative.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) { continue }
+                $relative = $relative.Substring($prefix.Length)
+            }
+            $original = ''
+            $decoded = ''
+            $depth = 0
+            foreach ($part in $relative.Split('/')) {
+                $name = [uri]::UnescapeDataString($part)
+                if (!$name -or $name -eq '.' -or $name -eq '..' -or
+                    $name.IndexOfAny([IO.Path]::GetInvalidFileNameChars()) -ge 0 -or
+                    $name.EndsWith('.') -or $name.EndsWith(' ')) {
+                    throw "Unsafe MSIX filename: $($entry.FullName)"
+                }
+                if ($original) { $original += '/'; $decoded += '/' }
+                $original += $part
+                $decoded += $name
+                $depth++
+                if ($decodedPaths.ContainsKey($decoded) -and $decodedPaths[$decoded] -cne $original) {
+                    throw "Conflicting MSIX filename: $($entry.FullName)"
+                }
+                $decodedPaths[$decoded] = $original
+                if ($part -cne $name) {
+                    $paths[$original] = [PSCustomObject]@{ Original = $original; Name = $name; Depth = $depth }
+                }
+            }
+        }
+        $paths.Values | Sort-Object @{ Expression = 'Depth'; Descending = $true }, @{ Expression = { $_.Original.Length } }
+    } finally {
+        $archive.Dispose()
+    }
+}
+
+function Rename-MsixEncodedPath {
+    param([Object[]] $Mapping, [String] $DestinationPath)
+
+    # Children must be renamed before their parents, and each component only once:
+    # an encoded literal percent sign (%2540) must become %40, not @.
+    foreach ($item in $Mapping) {
+        $source = Join-Path $DestinationPath $item.Original
+        $target = Join-Path (Split-Path $source) $item.Name
+        if (Test-Path -LiteralPath $target) {
+            throw "MSIX filename already exists: $target"
+        }
+        Rename-Item -LiteralPath $source -NewName $item.Name -ErrorAction Stop
+    }
+}
+
 function Expand-7zipArchive {
     [CmdletBinding()]
     param (
@@ -86,6 +158,7 @@ function Expand-7zipArchive {
         [Switch]
         $Removal
     )
+    $msixPaths = @(Get-MsixEncodedPath $Path $ExtractDir)
     if ((get_config USE_EXTERNAL_7ZIP)) {
         try {
             $7zPath = (Get-Command '7z' -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
@@ -133,6 +206,7 @@ function Expand-7zipArchive {
             Remove-Item -Path $ExtractDirTopPath -Recurse -Force -ErrorAction Ignore
         }
     }
+    Rename-MsixEncodedPath $msixPaths $DestinationPath
     if (Test-Path $LogPath) {
         Remove-Item $LogPath -Force
     }
@@ -284,6 +358,7 @@ function Expand-ZipArchive {
         [Switch]
         $Removal
     )
+    $msixPaths = @(Get-MsixEncodedPath $Path $ExtractDir)
     if ($ExtractDir) {
         $OriDestinationPath = $DestinationPath
         $DestinationPath = "$DestinationPath\_tmp"
@@ -299,7 +374,9 @@ function Expand-ZipArchive {
     if ($ExtractDir) {
         movedir "$DestinationPath\$ExtractDir" $OriDestinationPath | Out-Null
         Remove-Item $DestinationPath -Recurse -Force
+        $DestinationPath = $OriDestinationPath
     }
+    Rename-MsixEncodedPath $msixPaths $DestinationPath
     if ($Removal) {
         # Remove original archive file
         Remove-Item $Path -Force
