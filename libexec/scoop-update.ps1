@@ -96,9 +96,7 @@ if (-not ($apps -or $all)) {
         $apps | ForEach-Object {
             ($app, $global) = $_
             $status = app_status $app $global
-            $ver = Select-CurrentVersion -AppName $app -Global:$global
-            $pin = install_info $app $ver $global
-            $is_pin = !$pin.bucket -and ($pin.url -eq (usermanifest $app))
+            $is_pin = $status.pinned
             if ($status.installed -and ($force -or $status.outdated)) {
                 if (!$status.hold) {
                     if ($is_pin -and !$force) {
