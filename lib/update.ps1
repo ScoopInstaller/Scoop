@@ -230,14 +230,17 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
     if ($shortcuts) { rm_startmenu_shortcuts @{ shortcuts = $shortcuts } $ctx.global $ctx.architecture }
 
     $current = "$(Split-Path $ctx.dir)\current"
-    $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.architecture)
+    # the removal side expands what could have been added (the stored value and
+    # the manifest default), while the keep side expands what the new manifest
+    # will write
+    $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.architecture $ctx.global 'manifest')
     # the old paths were expanded with the version directory, a nightly manifest keeps the name 'nightly'
     $version = Split-Path $ctx.dir -Leaf
     if (get_config NO_JUNCTION) {
         # without junctions the paths point at the version directory
-        $removed = @(env_paths $old_manifest $ctx.dir $ctx.persist_dir $ctx.architecture)
+        $removed = @(env_paths $old_manifest $ctx.dir $ctx.persist_dir $ctx.architecture $ctx.global 'remove')
     } else {
-        $removed = @(env_paths $old_manifest $current $ctx.persist_dir $ctx.architecture) | Where-Object { $_ -notin $paths }
+        $removed = @(env_paths $old_manifest $current $ctx.persist_dir $ctx.architecture $ctx.global 'remove') | Where-Object { $_ -notin $paths }
     }
     if ($removed) {
         Remove-Path -Path $removed -Global:$ctx.global

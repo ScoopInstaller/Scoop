@@ -337,7 +337,7 @@ function expand_vars($str, $dir, $persist_dir) {
     if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
 }
 
-function env_paths($manifest, $dir, $persist_dir, $arch) {
+function env_paths($manifest, $dir, $persist_dir, $arch, $global, $mode = 'effective') {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     if (!$env_add_path) { return }
     $dir = $dir.TrimEnd('\')
@@ -348,8 +348,23 @@ function env_paths($manifest, $dir, $persist_dir, $arch) {
         if ($item -match '^%(.+)%$') {
             $name = $Matches[1]
             if ($name -in $names) {
-                $expanded = $ExecutionContext.InvokeCommand.ExpandString($env_set.$name)
-                if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
+                # '%VAR%' names an 'env_set' variable. Adding uses the value
+                # actually in effect ('env_set' preserves user-defined ones);
+                # the update-time keep-list expands the new manifest as written
+                # ('remove_obsolete_wiring' passes $mode = 'manifest'); removal
+                # expands both, because the variable may have been re-pointed
+                # after Scoop already added the default to PATH
+                $default = $ExecutionContext.InvokeCommand.ExpandString($env_set.$name)
+                if ($mode -eq 'manifest') {
+                    $values = @($default)
+                } else {
+                    $stored = Get-EnvVar -Name $name -Global:$global
+                    if ($mode -eq 'remove') { $values = @($stored, $default) }
+                    elseif ($stored) { $values = @($stored) }
+                    else { $values = @($default) }
+                }
+                $values | Where-Object { $_ } | Select-Object -Unique |
+                    Where-Object { (is_in_dir $dir $_) -or (is_in_dir $persist_dir $_) }
             }
         } else {
             expand_vars $item $dir $persist_dir
@@ -358,7 +373,7 @@ function env_paths($manifest, $dir, $persist_dir, $arch) {
 }
 
 function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
-    $path = env_paths $manifest $dir $persist_dir $arch
+    $path = env_paths $manifest $dir $persist_dir $arch $global
     if ($path) {
         if (get_config USE_ISOLATED_PATH) {
             # %SCOOP_PATH% is expanded from the process value, keep it in sync with the stored one
@@ -375,7 +390,7 @@ function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
 }
 
 function env_rm_path($manifest, $dir, $persist_dir, $global, $arch) {
-    $path = env_paths $manifest $dir $persist_dir $arch
+    $path = env_paths $manifest $dir $persist_dir $arch $global 'remove'
     if ($path) {
         Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
         Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global

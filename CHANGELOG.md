@@ -23,6 +23,7 @@
 - **core:** Warn once per deprecated function per manifest ([#6801](https://github.com/ScoopInstaller/Scoop/issues/6801))
 - **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6763](https://github.com/ScoopInstaller/Scoop/issues/6763))
 - **install:** Expand $dir and $persist_dir in env_add_path ([#6808](https://github.com/ScoopInstaller/Scoop/issues/6808))
+- **install:** Use the value in effect for `%VAR%` entries in `env_add_path` ([#8116](https://github.com/ScoopInstaller/Main/issues/8116))
 - **scoop:** Keep the formatted output of a command ([#6813](https://github.com/ScoopInstaller/Scoop/issues/6813))
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
 - **update:** Restore the old version when an update fails ([#6810](https://github.com/ScoopInstaller/Scoop/issues/6810))

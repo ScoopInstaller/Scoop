@@ -112,6 +112,8 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
             global       = $false
             architecture = '64bit'
         }
+        $old_default = "$($ctx.persist_dir)\old"
+        $stored_custom = "$($ctx.persist_dir)\custom"
         Mock rm_startmenu_shortcuts {}
         Mock Remove-Path {}
         Mock Set-EnvVar {}
@@ -145,6 +147,32 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
 
         Should-Invoke Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'OLD_VAR' }
         Should-Invoke Set-EnvVar -Times 0 -ParameterFilter { $Name -eq 'KEPT_VAR' }
+    }
+
+    It 'should remove the old path of a re-pointed %VAR% entry' {
+        # the manifest moved the variable's target; the stored value is still
+        # the old default, and that is the entry actually present on PATH
+        Mock Get-EnvVar { $old_default } -ParameterFilter { $Name -eq 'VAR' }
+        $old = [PSCustomObject]@{ env_set = [PSCustomObject]@{ VAR = "`$persist_dir\old" }; env_add_path = @('%VAR%') }
+        $new = [PSCustomObject]@{ env_set = [PSCustomObject]@{ VAR = "`$persist_dir\new" }; env_add_path = @('%VAR%') }
+
+        remove_obsolete_wiring $ctx $old $new
+
+        Should-Invoke Remove-Path -ParameterFilter { $old_default -in $Path }
+    }
+
+    It 'should remove the stored path when a %VAR% entry is dropped' {
+        # a user-re-pointed directory was the one added to PATH; dropping the
+        # entry from the manifest must remove that directory and, in case the
+        # variable was edited after installation, the manifest default as well
+        Mock Get-EnvVar { $stored_custom } -ParameterFilter { $Name -eq 'VAR' }
+        $old = [PSCustomObject]@{ env_set = [PSCustomObject]@{ VAR = "`$persist_dir\old" }; env_add_path = @('%VAR%') }
+        $new = [PSCustomObject]@{ env_set = [PSCustomObject]@{ VAR = "`$persist_dir\old" } }
+
+        remove_obsolete_wiring $ctx $old $new
+
+        Should-Invoke Remove-Path -ParameterFilter { $stored_custom -in $Path }
+        Should-Invoke Remove-Path -ParameterFilter { $old_default -in $Path }
     }
 
     It 'should remove the dropped paths' {
@@ -294,6 +322,45 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
         env_rm_path $manifest $testdir $persist_dir $global
         Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\bin" }
         Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\lib" }
+    }
+
+    It 'should use the value in effect for a %VAR% entry' {
+        Mock Add-Path {}
+        Mock Remove-Path {}
+        # 'env_set' keeps user-defined values, the path entries must follow them
+        Mock Get-EnvVar { "$persist_dir\custom" } -ParameterFilter { $Name -eq 'COOP_TEST_DIR' }
+        Mock Get-EnvVar { $null } -ParameterFilter { $Name -eq 'APP-HOME' }
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_DIR' = '$persist_dir\bin'; 'APP-HOME' = '$persist_dir\lib' }
+            env_add_path = @('%COOP_TEST_DIR%', '%APP-HOME%')
+        }
+
+        env_add_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\custom" }
+        Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains "$persist_dir\bin" }
+        # undefined variables still fall back to the manifest default
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\lib" }
+
+        env_rm_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\custom" }
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\lib" }
+    }
+
+    It 'should also remove the default of a re-pointed %VAR% entry' {
+        # the variable was edited after installation, so PATH may still hold
+        # the directory added from the manifest default; removal covers both
+        Mock Remove-Path {}
+        Mock Get-EnvVar { "$persist_dir\custom" } -ParameterFilter { $Name -eq 'COOP_TEST_DIR' }
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_DIR' = '$persist_dir\bin' }
+            env_add_path = @('%COOP_TEST_DIR%')
+        }
+
+        env_rm_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\custom" }
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\bin" }
     }
 
     It 'should not accept a %VAR% that points outside the app directories' {
