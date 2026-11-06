@@ -28,7 +28,7 @@ function cacheshow($app) {
     $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
-    $files | ForEach-Object { cacheinfo $_ } | Select-Object Name, Version, Length
+    $files | ForEach-Object { cacheinfo $_ } | Select-Object Name, Version, @{ Name = 'Size'; Expression = { filesize $_.Length } }
 
     Write-Host "Total: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
 }
