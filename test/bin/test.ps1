@@ -6,6 +6,9 @@ param(
     [String] $TestPath = (Convert-Path "$PSScriptRoot\..")
 )
 
+# https://github.com/PowerShell/Microsoft.PowerShell.Archive/issues/77#issuecomment-601947496
+$global:ProgressPreference = "SilentlyContinue"
+
 $pesterConfig = New-PesterConfiguration -Hashtable @{
     Run    = @{
         Path     = $TestPath
