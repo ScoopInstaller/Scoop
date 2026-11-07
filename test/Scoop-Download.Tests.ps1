@@ -105,6 +105,10 @@ Describe 'url_remote_filename' -Tag 'Scoop' {
 
 Describe 'Get-GitHubToken' -Tag 'Scoop' {
     BeforeAll {
+        # Stand-in for the GitHub CLI, so a real 'gh' is never invoked and Mock has something to replace.
+        # Not a 'function' statement: the static analysis would take it for a repo function download.ps1 fails to load.
+        Set-Item -Path function:script:gh -Value { 'gho_realCliMustNotRun' }
+
         $tokenVars = 'SCOOP_GH_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN'
         $origEnv = @{}
         $tokenVars | ForEach-Object { $origEnv[$_] = [Environment]::GetEnvironmentVariable($_) }
