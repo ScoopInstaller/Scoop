@@ -611,7 +611,28 @@ function setup_proxy() {
 }
 
 function Get-GitHubToken {
-    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN), $env:GH_TOKEN, $env:GITHUB_TOKEN | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+    # Filter on truthiness, not on '.Length': unset sources are $null, and StrictMode
+    # turns property access on those into an error
+    if ($env:SCOOP_GH_TOKEN) { return $env:SCOOP_GH_TOKEN }
+    if (get_config GH_TOKEN) { return get_config GH_TOKEN }
+
+    # No token set for Scoop: ask the GitHub CLI, which keeps its token in the system keyring (Windows Credential Manager).
+    # Probed at most once per process, since this function runs for every request. Checking for
+    # the variable's existence, as StrictMode rejects reading it before it is ever assigned.
+    if (-not (Get-Variable -Name ghCliToken -Scope Script -ErrorAction Ignore)) {
+        $script:ghCliToken = $null
+        if (Test-CommandAvailable 'gh') {
+            try {
+                $script:ghCliToken = & gh auth token --hostname 'github.com' 2>$null | Where-Object { $_ } | Select-Object -First 1
+            } catch {
+                debug "'gh auth token' failed: $($_.Exception.Message)"
+            }
+        }
+    }
+
+    if ($script:ghCliToken) { return $script:ghCliToken }
+    if ($env:GH_TOKEN) { return $env:GH_TOKEN }
+    if ($env:GITHUB_TOKEN) { return $env:GITHUB_TOKEN }
 }
 
 function github_ratelimit_reached {
