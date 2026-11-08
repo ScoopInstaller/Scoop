@@ -369,14 +369,20 @@ Describe 'install_app show_manifest' -Tag 'Scoop' {
     }
 
     It 'asks before installing' {
-        install_app 'app' '64bit' $false @{} 6>$null | Out-Null
+        $failed = @{}
+        install_app 'app' '64bit' $false @{} $failed 6>$null | Out-Null
         Should-Invoke Read-Host -Times 1 -Exactly
         Should-Invoke ensure -Times 0 -Exactly
+        $failed['app'] | Should-Be 'skipped: installation cancelled'
     }
 
     It 'does not ask with -NoManifestPrompt' {
-        { install_app 'app' '64bit' $false @{} -NoManifestPrompt 6>$null } | Should-Throw -ExceptionMessage 'reached install'
+        $failed = @{}
+        install_app 'app' '64bit' $false @{} $failed -NoManifestPrompt 6>$null | Out-Null
         Should-Invoke Read-Host -Times 0 -Exactly
+        Should-Invoke ensure -Times 1 -Exactly
+        # install_app catches the failure and records it
+        $failed['app'] | Should-Be 'reached install'
     }
 
     It 'is never asked during an update' {
