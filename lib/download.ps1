@@ -614,29 +614,21 @@ function setup_proxy() {
 }
 
 function Get-GitHubToken {
-    # test truthiness, not on '.Length' since StrictMode fails for properties of $null
     if ($env:SCOOP_GH_TOKEN) { return $env:SCOOP_GH_TOKEN }
     $conf_tok = get_config GH_TOKEN
-    # Any string wins, including '', which opts out of the sources below
-    if ($conf_tok -is [string]) { return $conf_tok }
+    if ($conf_tok) { return $conf_tok }
+    if ($env:GH_TOKEN) { return $env:GH_TOKEN }
+    if ($env:GITHUB_TOKEN) { return $env:GITHUB_TOKEN }
 
-    # No token set for Scoop: ask the GitHub CLI, which keeps its token in the system keyring (Windows Credential Manager).
-    # Probed at most once per process, since this function runs for every request. Checking for
-    # the variable's existence, as StrictMode rejects reading it before it is ever assigned.
     if (-not (Get-Variable -Name ghCliToken -Scope Script -ErrorAction Ignore)) {
-        $script:ghCliToken = $null
-        if (Test-CommandAvailable 'gh') {
-            try {
-                $script:ghCliToken = & gh auth token --hostname 'github.com' 2>$null | Where-Object { $_ } | Select-Object -First 1
-            } catch {
-                debug "'gh auth token' failed: $($_.Exception.Message)"
-            }
+        $script:ghCliToken = try {
+            & gh auth token --hostname 'github.com' 2>$null | Select-Object -First 1
+        } catch {
+            debug "'gh auth token' failed: $($_.Exception.Message)"
         }
     }
 
-    if ($script:ghCliToken) { return $script:ghCliToken }
-    if ($env:GH_TOKEN) { return $env:GH_TOKEN }
-    if ($env:GITHUB_TOKEN) { return $env:GITHUB_TOKEN }
+    $script:ghCliToken
 }
 
 function github_ratelimit_reached {

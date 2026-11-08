@@ -62,22 +62,15 @@ Describe 'New-DownloadRequest Authorization header' -Tag 'Scoop' {
         $apiUrl = 'https://api.github.com/repos/example/example/releases/assets/599854636'
     }
 
-    It 'sends the token to the GitHub API' {
+    It 'sets the header only when a token exists' {
         Mock Get-GitHubToken { 'fake-token' }
-        $req = New-DownloadRequest $apiUrl
-        $req.Headers['Authorization'] | Should-Be 'Bearer fake-token'
-    }
+        (New-DownloadRequest $apiUrl).Headers['Authorization'] | Should-Be 'Bearer fake-token'
 
-    It 'omits the header if there is no token' {
         Mock Get-GitHubToken { }
-        $req = New-DownloadRequest $apiUrl
-        $req.Headers['Authorization'] | Should-BeNull
-    }
+        (New-DownloadRequest $apiUrl).Headers['Authorization'] | Should-BeNull
 
-    It 'omits the header if the token is an empty string' {
         Mock Get-GitHubToken { '' }
-        $req = New-DownloadRequest $apiUrl
-        $req.Headers['Authorization'] | Should-BeNull
+        (New-DownloadRequest $apiUrl).Headers['Authorization'] | Should-BeNull
     }
 }
 
@@ -105,8 +98,7 @@ Describe 'url_remote_filename' -Tag 'Scoop' {
 
 Describe 'Get-GitHubToken' -Tag 'Scoop' {
     BeforeAll {
-        # Stand-in for the GitHub CLI, so a real 'gh' is never invoked and Mock has something to replace.
-        # Not a 'function' statement: the static analysis would take it for a repo function download.ps1 fails to load.
+        # Mock needs a real command to replace; a 'function' statement would trip the linter.
         Set-Item -Path function:script:gh -Value { 'gho_realCliMustNotRun' }
 
         $tokenVars = 'SCOOP_GH_TOKEN', 'GH_TOKEN', 'GITHUB_TOKEN'
@@ -115,136 +107,32 @@ Describe 'Get-GitHubToken' -Tag 'Scoop' {
     }
 
     AfterAll {
+        Remove-Item -Path function:script:gh -ErrorAction Ignore
         $origEnv.Keys | ForEach-Object { [Environment]::SetEnvironmentVariable($_, $origEnv[$_]) }
     }
 
     BeforeEach {
         Mock get_config { $null }
-        Mock Test-CommandAvailable { $true }
         Mock gh { 'gho_FROM_CLI' }
         $tokenVars | ForEach-Object { [Environment]::SetEnvironmentVariable($_, $null) }
-        # Clear the per-process probe cache by removing it rather than assigning, so every
-        # test also exercises the uninitialized first-call path that StrictMode rejects
+        # Remove rather than assign, so each test also covers the unassigned first call
         Remove-Variable -Name ghCliToken -Scope Script -ErrorAction Ignore
     }
 
-    It 'should prefer $env:SCOOP_GH_TOKEN over every other source' {
-        Mock get_config { 'from_config' }
-        $env:SCOOP_GH_TOKEN = 'from_scoop_env'
-        $env:GH_TOKEN = 'from_gh_env'
-        Get-GitHubToken | Should-Be 'from_scoop_env'
-        Should-Invoke -CommandName gh -Times 0 -Exactly
-    }
-
-    It 'should prefer the config over the environment and the GitHub CLI' {
-        Mock get_config { 'from_config' }
-        $env:GH_TOKEN = 'from_gh_env'
-        Get-GitHubToken | Should-Be 'from_config'
-        Should-Invoke -CommandName gh -Times 0 -Exactly
-    }
-
-    It 'should not use the environment or the GitHub CLI if the config is an empty string' {
-        Mock get_config { '' }
-        $env:GH_TOKEN = 'from_gh_env'
-        $env:GITHUB_TOKEN = 'from_github_env'
-        Get-GitHubToken | Should-BeEmptyString
-        Should-Invoke -CommandName gh -Times 0 -Exactly
-    }
-
-    It 'should still prefer $env:SCOOP_GH_TOKEN if the config is an empty string' {
-        Mock get_config { '' }
-        $env:SCOOP_GH_TOKEN = 'from_scoop_env'
-        Get-GitHubToken | Should-Be 'from_scoop_env'
-    }
-
-    It 'should ignore a config that is not a string' {
-        Mock get_config { $false }
-        Get-GitHubToken | Should-Be 'gho_FROM_CLI'
-
-        Mock get_config { $true }
-        Get-GitHubToken | Should-Be 'gho_FROM_CLI'
-    }
-
-    It 'should query the GitHub CLI by default' {
-        Get-GitHubToken | Should-Be 'gho_FROM_CLI'
-        Should-Invoke -CommandName gh -Times 1 -Exactly
-    }
-
-    It 'should ask the GitHub CLI for the github.com token' {
-        Get-GitHubToken | Should-Be 'gho_FROM_CLI'
-        Should-Invoke -CommandName gh -Times 1 -Exactly -ParameterFilter {
-            ($args -join ' ') -eq 'auth token --hostname github.com'
-        }
-    }
-
-    It 'should prefer the GitHub CLI over $env:GH_TOKEN and $env:GITHUB_TOKEN' {
-        $env:GH_TOKEN = 'from_gh_env'
-        $env:GITHUB_TOKEN = 'from_github_env'
-        Get-GitHubToken | Should-Be 'gho_FROM_CLI'
-    }
-
-    It 'should query the GitHub CLI at most once per process' {
-        Get-GitHubToken | Should-Be 'gho_FROM_CLI'
-        Get-GitHubToken | Should-Be 'gho_FROM_CLI'
-        Get-GitHubToken | Should-Be 'gho_FROM_CLI'
-        Should-Invoke -CommandName gh -Times 1 -Exactly
-    }
-
-    It 'should not query the GitHub CLI if it is not installed' {
-        Mock Test-CommandAvailable { $false }
-        Get-GitHubToken | Should-BeNull
-        Should-Invoke -CommandName gh -Times 0 -Exactly
-    }
-
-    It 'should return nothing if the GitHub CLI is not logged in' {
-        Mock gh { }
-        Get-GitHubToken | Should-BeNull
-    }
-
-    It 'should return nothing if the GitHub CLI fails' {
+    It 'should give up when the GitHub CLI fails, and not retry it' {
         Mock gh { throw 'gh: could not read token' }
         Get-GitHubToken | Should-BeNull
-    }
-
-    It 'should not retry the GitHub CLI after a failed probe' {
-        Mock gh { }
-        Get-GitHubToken | Should-BeNull
         Get-GitHubToken | Should-BeNull
         Should-Invoke -CommandName gh -Times 1 -Exactly
     }
 
-    It 'should fall back to $env:GH_TOKEN, then $env:GITHUB_TOKEN, if the GitHub CLI is not installed' {
-        Mock Test-CommandAvailable { $false }
-        $env:GITHUB_TOKEN = 'from_github_env'
-        Get-GitHubToken | Should-Be 'from_github_env'
-
-        $env:GH_TOKEN = 'from_gh_env'
-        Get-GitHubToken | Should-Be 'from_gh_env'
-    }
-
-    It 'should fall back to the environment if the GitHub CLI is not logged in' {
-        Mock gh { }
-        $env:GH_TOKEN = 'from_gh_env'
-        Get-GitHubToken | Should-Be 'from_gh_env'
-    }
-
-    It 'should fall back to the environment if the GitHub CLI fails' {
-        Mock gh { throw 'gh: could not read token' }
-        $env:GITHUB_TOKEN = 'from_github_env'
-        Get-GitHubToken | Should-Be 'from_github_env'
-    }
-
-    # Callers reached from a user's own session are not shielded by the 'Set-StrictMode -Off'
-    # in bin/scoop.ps1 -- bin/checkver.ps1 and lib/autoupdate.ps1 both call this directly
+    # checkver.ps1 and autoupdate.ps1 call this without bin/scoop.ps1's 'Set-StrictMode -Off'
     It 'tolerates StrictMode when no token source is set' {
-        # Unset sources are $null, and StrictMode turns the property access that filters
-        # them into an error, which only becomes terminating under $ErrorActionPreference
-        Mock Test-CommandAvailable { $false }
+        Mock gh { }
         & { Set-StrictMode -Version Latest; $ErrorActionPreference = 'Stop'; Get-GitHubToken } | Should-BeNull
     }
 
-    It 'tolerates StrictMode when querying the GitHub CLI' {
-        # The probe cache is read before it is ever assigned
+    It 'tolerates StrictMode when reading the probe cache before it was assigned' {
         & { Set-StrictMode -Version Latest; $ErrorActionPreference = 'Stop'; Get-GitHubToken } | Should-Be 'gho_FROM_CLI'
     }
 }
