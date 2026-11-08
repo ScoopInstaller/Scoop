@@ -4,6 +4,7 @@
 
 - **download:** Try gh auth token for a github token ([#6725](https://github.com/ScoopInstaller/Scoop/issues/6725))
 - **shim:** Rework the shim system around architecture-native bodies ([#6783](https://github.com/ScoopInstaller/Scoop/issues/6783), [#6799](https://github.com/ScoopInstaller/Scoop/issues/6799))
+- **scoop-uninstall:** Add `-k`, `--keep-env` to keep environment variables declared by the app ([#8116](https://github.com/ScoopInstaller/Main/issues/8116))
 
 ### Bug Fixes
 
@@ -15,6 +16,7 @@
 - **scoop-list:** Collect items before formatting to prevent column truncation ([#6800](https://github.com/ScoopInstaller/Scoop/issues/6800))
 - **scoop-update:** Run missing uninstall steps and honor `--no-cache` ([#6750](https://github.com/ScoopInstaller/Scoop/issues/6750))
 - **scoop-update:** Show the available version of a pinned app ([#6819](https://github.com/ScoopInstaller/Scoop/issues/6819))
+- **install, reset, update:** Stop overwriting or unsetting environment variables the user has already defined ([#8116](https://github.com/ScoopInstaller/Main/issues/8116))
 - **auto-pr:** Add missing `core.ps1` dot source ([#6786](https://github.com/ScoopInstaller/Scoop/pull/6786))
 - **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
 - **core:** End progress lines with a status marker ([#6805](https://github.com/ScoopInstaller/Scoop/issues/6805))
@@ -22,6 +24,7 @@
 - **core:** Warn once per deprecated function per manifest ([#6801](https://github.com/ScoopInstaller/Scoop/issues/6801))
 - **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6763](https://github.com/ScoopInstaller/Scoop/issues/6763))
 - **install:** Expand $dir and $persist_dir in env_add_path ([#6808](https://github.com/ScoopInstaller/Scoop/issues/6808))
+- **install:** Use the value in effect for `%VAR%` entries in `env_add_path` ([#8116](https://github.com/ScoopInstaller/Main/issues/8116))
 - **scoop:** Keep the formatted output of a command ([#6813](https://github.com/ScoopInstaller/Scoop/issues/6813))
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
 - **update:** Restore the old version when an update fails ([#6810](https://github.com/ScoopInstaller/Scoop/issues/6810))

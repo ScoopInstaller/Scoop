@@ -230,14 +230,17 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
     if ($shortcuts) { rm_startmenu_shortcuts @{ shortcuts = $shortcuts } $ctx.global $ctx.architecture }
 
     $current = "$(Split-Path $ctx.dir)\current"
-    $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.architecture)
+    # the removal side expands what could have been added (the stored value and
+    # the manifest default), while the keep side expands what the new manifest
+    # will write
+    $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.architecture $ctx.global 'manifest')
     # the old paths were expanded with the version directory, a nightly manifest keeps the name 'nightly'
     $version = Split-Path $ctx.dir -Leaf
     if (get_config NO_JUNCTION) {
         # without junctions the paths point at the version directory
-        $removed = @(env_paths $old_manifest $ctx.dir $ctx.persist_dir $ctx.architecture)
+        $removed = @(env_paths $old_manifest $ctx.dir $ctx.persist_dir $ctx.architecture $ctx.global 'remove')
     } else {
-        $removed = @(env_paths $old_manifest $current $ctx.persist_dir $ctx.architecture) | Where-Object { $_ -notin $paths }
+        $removed = @(env_paths $old_manifest $current $ctx.persist_dir $ctx.architecture $ctx.global 'remove') | Where-Object { $_ -notin $paths }
     }
     if ($removed) {
         Remove-Path -Path $removed -Global:$ctx.global
@@ -246,9 +249,35 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
 
     $names = @((arch_specific 'env_set' $new_manifest $ctx.architecture).PSObject.Properties.Name)
     $removed = @((arch_specific 'env_set' $old_manifest $ctx.architecture).PSObject.Properties.Name) | Where-Object { $_ -notin $names }
-    foreach ($var in $removed) {
-        Set-EnvVar -Name $var -Value $null -Global:$ctx.global
-        Remove-Item "env:\$var" -ErrorAction SilentlyContinue
+    # Only remove a dropped variable when the value still belongs to the old
+    # version of this app: user settings and values currently owned by another
+    # installed app are left alone.
+    $old_env = arch_specific 'env_set' $old_manifest $ctx.architecture
+    foreach ($name in $removed) {
+        $value = Get-EnvVar -Name $name -Global:$ctx.global
+        if ($null -eq $value -or $value -eq '') { continue }
+        # Another installed app claims this value: that app still needs it
+        if (-not (Test-EnvVarUserDefined $name $ctx.global $ctx.app)) { continue }
+        # Otherwise the value is either user-defined or written by this
+        # app's old version; only remove it in the latter case
+        $prop = $old_env.PSObject.Properties | Where-Object { $_.Name -eq $name } | Select-Object -First 1
+        $old_version = Split-Path $ctx.dir -Leaf
+        $oldinfo = install_info $ctx.app $old_version $ctx.global
+        $linked = if (get_config NO_JUNCTION) { $ctx.dir } else { "$(Split-Path $ctx.dir)\current" }
+        $vars = @{
+            dir = $linked
+            original_dir = $ctx.dir
+            persist_dir = $ctx.persist_dir
+            app = $ctx.app
+            version = $old_version
+            url = $oldinfo.url
+            bucket = $oldinfo.bucket
+        }
+        if ((expand_env_set_value $prop.Value $vars) -ceq $value) {
+            Write-Output "Removing $(if ($ctx.global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m"
+            Set-EnvVar -Name $name -Value $null -Global:$ctx.global
+            if (Test-Path env:\$name) { Remove-Item env:\$name }
+        }
     }
 
     if ($old_manifest.psmodule.name -and $old_manifest.psmodule.name -ne $new_manifest.psmodule.name) {

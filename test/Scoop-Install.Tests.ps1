@@ -8,6 +8,7 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\shim.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
     . "$PSScriptRoot\..\lib\update.ps1"
+    . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
 }
 
 Describe 'appname_from_url' -Tag 'Scoop' {
@@ -111,6 +112,8 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
             global       = $false
             architecture = '64bit'
         }
+        $old_default = "$($ctx.persist_dir)\old"
+        $stored_custom = "$($ctx.persist_dir)\custom"
         Mock rm_startmenu_shortcuts {}
         Mock Remove-Path {}
         Mock Set-EnvVar {}
@@ -136,11 +139,40 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
     It 'should remove the dropped environment entries' {
         $old = [PSCustomObject]@{ env_set = [PSCustomObject]@{ OLD_VAR = 'x' } }
         $new = [PSCustomObject]@{ env_set = [PSCustomObject]@{ KEPT_VAR = 'y' } }
+        # the cleanup only removes a value this app's old manifest wrote
+        Mock Get-EnvVar { 'x' } -ParameterFilter { $Name -eq 'OLD_VAR' }
+        Mock installed_apps { @() }
 
         remove_obsolete_wiring $ctx $old $new
 
         Should-Invoke Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'OLD_VAR' }
         Should-Invoke Set-EnvVar -Times 0 -ParameterFilter { $Name -eq 'KEPT_VAR' }
+    }
+
+    It 'should remove the old path of a re-pointed %VAR% entry' {
+        # the manifest moved the variable's target; the stored value is still
+        # the old default, and that is the entry actually present on PATH
+        Mock Get-EnvVar { $old_default } -ParameterFilter { $Name -eq 'VAR' }
+        $old = [PSCustomObject]@{ env_set = [PSCustomObject]@{ VAR = "`$persist_dir\old" }; env_add_path = @('%VAR%') }
+        $new = [PSCustomObject]@{ env_set = [PSCustomObject]@{ VAR = "`$persist_dir\new" }; env_add_path = @('%VAR%') }
+
+        remove_obsolete_wiring $ctx $old $new
+
+        Should-Invoke Remove-Path -ParameterFilter { $old_default -in $Path }
+    }
+
+    It 'should remove the stored path when a %VAR% entry is dropped' {
+        # a user-re-pointed directory was the one added to PATH; dropping the
+        # entry from the manifest must remove that directory and, in case the
+        # variable was edited after installation, the manifest default as well
+        Mock Get-EnvVar { $stored_custom } -ParameterFilter { $Name -eq 'VAR' }
+        $old = [PSCustomObject]@{ env_set = [PSCustomObject]@{ VAR = "`$persist_dir\old" }; env_add_path = @('%VAR%') }
+        $new = [PSCustomObject]@{ env_set = [PSCustomObject]@{ VAR = "`$persist_dir\old" } }
+
+        remove_obsolete_wiring $ctx $old $new
+
+        Should-Invoke Remove-Path -ParameterFilter { $stored_custom -in $Path }
+        Should-Invoke Remove-Path -ParameterFilter { $old_default -in $Path }
     }
 
     It 'should remove the dropped paths' {
@@ -292,6 +324,45 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
         Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\lib" }
     }
 
+    It 'should use the value in effect for a %VAR% entry' {
+        Mock Add-Path {}
+        Mock Remove-Path {}
+        # 'env_set' keeps user-defined values, the path entries must follow them
+        Mock Get-EnvVar { "$persist_dir\custom" } -ParameterFilter { $Name -eq 'COOP_TEST_DIR' }
+        Mock Get-EnvVar { $null } -ParameterFilter { $Name -eq 'APP-HOME' }
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_DIR' = '$persist_dir\bin'; 'APP-HOME' = '$persist_dir\lib' }
+            env_add_path = @('%COOP_TEST_DIR%', '%APP-HOME%')
+        }
+
+        env_add_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\custom" }
+        Should-Invoke -CommandName Add-Path -Times 0 -ParameterFilter { $Path -contains "$persist_dir\bin" }
+        # undefined variables still fall back to the manifest default
+        Should-Invoke -CommandName Add-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\lib" }
+
+        env_rm_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\custom" }
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\lib" }
+    }
+
+    It 'should also remove the default of a re-pointed %VAR% entry' {
+        # the variable was edited after installation, so PATH may still hold
+        # the directory added from the manifest default; removal covers both
+        Mock Remove-Path {}
+        Mock Get-EnvVar { "$persist_dir\custom" } -ParameterFilter { $Name -eq 'COOP_TEST_DIR' }
+
+        $manifest = [PSCustomObject]@{
+            env_set      = [PSCustomObject]@{ 'COOP_TEST_DIR' = '$persist_dir\bin' }
+            env_add_path = @('%COOP_TEST_DIR%')
+        }
+
+        env_rm_path $manifest $testdir $persist_dir $global
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\custom" }
+        Should-Invoke -CommandName Remove-Path -Times 1 -ParameterFilter { $Path -contains "$persist_dir\bin" }
+    }
+
     It 'should not accept a %VAR% that points outside the app directories' {
         Mock Add-Path {}
 
@@ -319,6 +390,118 @@ Describe 'env add and remove path' -Tag 'Scoop', 'Windows' {
         Mock Get-EnvVar { $null }
         env_add_path $manifest $testdir $persist_dir $global
         Should-Invoke -CommandName Remove-Item -Times 1 -ParameterFilter { $Path -eq "env:$scoopPathEnvVar" }
+    }
+}
+
+Describe 'env_set' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $manifest = [PSCustomObject]@{
+            env_set = [PSCustomObject]@{ 'TEST_ENV_SET_VAR' = 'C:\scoop\persist\test\cache' }
+        }
+        $global = $false
+    }
+
+    It 'sets variables that are not defined' {
+        Mock Get-EnvVar { $null }
+        Mock Set-EnvVar {}
+        Mock Set-Content {}
+
+        env_set $manifest $global $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and $Value -eq 'C:\scoop\persist\test\cache' }
+    }
+
+    It 'keeps a user-defined value' {
+        Mock Get-EnvVar { 'D:\custom-cache' }
+        Mock installed_apps {}
+        Mock Set-EnvVar {}
+        Mock Set-Content {}
+
+        env_set $manifest $global $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 0 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' }
+    }
+
+    It 're-points a value that another installed app wrote' {
+        Mock Get-EnvVar { 'D:\scoop\persist\other\cache' }
+        Mock installed_apps { 'other' }
+        Mock Select-CurrentVersion { '1.0' }
+        Mock install_info { @{ architecture = '64bit' } }
+        Mock installed_manifest { [PSCustomObject]@{ env_set = [PSCustomObject]@{ TEST_ENV_SET_VAR = 'D:\scoop\persist\other\cache' } } }
+        Mock Set-EnvVar {}
+        Mock Set-Content {}
+
+        env_set $manifest $global $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and $Value -eq 'C:\scoop\persist\test\cache' }
+    }
+
+    It 'treats an empty value as undefined' {
+        Mock Get-EnvVar { '' }
+        Mock Set-EnvVar {}
+        Mock Set-Content {}
+
+        env_set $manifest $global $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and $Value -eq 'C:\scoop\persist\test\cache' }
+    }
+}
+
+Describe 'Test-EnvVarUserDefined' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        Mock Get-EnvVar { 'C:\data\cache' }
+        Mock installed_apps { 'other' }
+        Mock Select-CurrentVersion { '1.0' }
+        Mock install_info { @{ architecture = '64bit' } }
+    }
+
+    It 'is true when no installed manifest can account for the value' {
+        Mock installed_manifest { [PSCustomObject]@{ env_set = [PSCustomObject]@{ OTHER_VAR = 'C:\data\cache' } } }
+
+        Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false | Should-BeTrue
+    }
+
+    It 'is false for the exact expansion an installed manifest produces' {
+        Mock persistdir { 'C:\data' }
+        Mock installed_manifest { [PSCustomObject]@{ env_set = [PSCustomObject]@{ TEST_ENV_SET_VAR = '$persist_dir\cache' } } }
+
+        Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false | Should-BeFalse
+    }
+
+    It 'excludes the app being updated from attribution' {
+        Mock installed_apps { 'self', 'other' }
+        Mock installed_manifest {
+            param($app)
+            if ($app -eq 'self') {
+                [PSCustomObject]@{ env_set = [PSCustomObject]@{ TEST_ENV_SET_VAR = 'C:\data\cache' } }
+            } else {
+                [PSCustomObject]@{ env_set = [PSCustomObject]@{ UNRELATED_VAR = 'C:\data\cache' } }
+            }
+        }
+
+        Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false 'self' | Should-BeTrue
+        Test-EnvVarUserDefined 'TEST_ENV_SET_VAR' $false | Should-BeFalse
+    }
+}
+
+Describe 'expand_env_set_value' -Tag 'Scoop' {
+    It 'binds the provided variables instead of the caller scope' {
+        $version = '2.0' # caller-scope value must not leak into the expansion
+
+        expand_env_set_value '$app/$version' @{ app = 'other'; version = '1.0' } | Should-Be 'other/1.0'
+    }
+}
+
+Describe 'env_rm' -Tag 'Scoop', 'Windows' {
+    It 'removes the variables declared in the manifest' {
+        $manifest = [PSCustomObject]@{
+            env_set = [PSCustomObject]@{ 'TEST_ENV_SET_VAR' = 'C:\scoop\persist\test\cache' }
+        }
+        Mock Set-EnvVar {}
+
+        env_rm $manifest $false $null
+
+        Should-Invoke -CommandName Set-EnvVar -Times 1 -ParameterFilter { $Name -eq 'TEST_ENV_SET_VAR' -and [string]::IsNullOrEmpty($Value) }
     }
 }
 

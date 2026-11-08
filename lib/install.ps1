@@ -280,7 +280,7 @@ function link_app($manifest, $dir, $original_dir, $persist_dir, $global, $archit
     persist_permission $manifest $global
 }
 
-function unlink_app($app, $manifest, $dir, $persist_dir, $global, $architecture) {
+function unlink_app($app, $manifest, $dir, $persist_dir, $global, $architecture, $keep_env = $false) {
     Remove-ShimFromManifest $app $manifest $global $architecture
     rm_startmenu_shortcuts $manifest $global $architecture
     # If a junction was used during install, that will have been used
@@ -289,7 +289,11 @@ function unlink_app($app, $manifest, $dir, $persist_dir, $global, $architecture)
     $refdir = unlink_current $dir
     uninstall_psmodule $manifest $refdir $global
     env_rm_path $manifest $refdir $persist_dir $global $architecture
-    env_rm $manifest $global $architecture
+    if ($keep_env) {
+        Write-Host "Keeping environment variables declared by '$app'."
+    } else {
+        env_rm $manifest $global $architecture
+    }
     # unlink all potential old link before doing recursive Remove-Item
     unlink_persist_data $manifest $dir
 }
@@ -333,7 +337,7 @@ function expand_vars($str, $dir, $persist_dir) {
     if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
 }
 
-function env_paths($manifest, $dir, $persist_dir, $arch) {
+function env_paths($manifest, $dir, $persist_dir, $arch, $global, $mode = 'effective') {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
     if (!$env_add_path) { return }
     $dir = $dir.TrimEnd('\')
@@ -344,8 +348,23 @@ function env_paths($manifest, $dir, $persist_dir, $arch) {
         if ($item -match '^%(.+)%$') {
             $name = $Matches[1]
             if ($name -in $names) {
-                $expanded = $ExecutionContext.InvokeCommand.ExpandString($env_set.$name)
-                if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
+                # '%VAR%' names an 'env_set' variable. Adding uses the value
+                # actually in effect ('env_set' preserves user-defined ones);
+                # the update-time keep-list expands the new manifest as written
+                # ('remove_obsolete_wiring' passes $mode = 'manifest'); removal
+                # expands both, because the variable may have been re-pointed
+                # after Scoop already added the default to PATH
+                $default = $ExecutionContext.InvokeCommand.ExpandString($env_set.$name)
+                if ($mode -eq 'manifest') {
+                    $values = @($default)
+                } else {
+                    $stored = Get-EnvVar -Name $name -Global:$global
+                    if ($mode -eq 'remove') { $values = @($stored, $default) }
+                    elseif ($stored) { $values = @($stored) }
+                    else { $values = @($default) }
+                }
+                $values | Where-Object { $_ } | Select-Object -Unique |
+                    Where-Object { (is_in_dir $dir $_) -or (is_in_dir $persist_dir $_) }
             }
         } else {
             expand_vars $item $dir $persist_dir
@@ -354,7 +373,7 @@ function env_paths($manifest, $dir, $persist_dir, $arch) {
 }
 
 function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
-    $path = env_paths $manifest $dir $persist_dir $arch
+    $path = env_paths $manifest $dir $persist_dir $arch $global
     if ($path) {
         if (get_config USE_ISOLATED_PATH) {
             # %SCOOP_PATH% is expanded from the process value, keep it in sync with the stored one
@@ -371,11 +390,59 @@ function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
 }
 
 function env_rm_path($manifest, $dir, $persist_dir, $global, $arch) {
-    $path = env_paths $manifest $dir $persist_dir $arch
+    $path = env_paths $manifest $dir $persist_dir $arch $global 'remove'
     if ($path) {
         Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
         Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global
     }
+}
+
+function expand_env_set_value($value, [hashtable]$vars) {
+    # Reproduces the expansion 'env_set' values get at installation time, where
+    # ExpandString sees the installer's local variables; they are set here
+    # explicitly so the helper never resolves them through its caller's scope
+    foreach ($entry in $vars.GetEnumerator()) {
+        Set-Variable -Name $entry.Key -Value $entry.Value
+    }
+    $ExecutionContext.InvokeCommand.ExpandString($value)
+}
+
+# Checks whether $name holds a non-empty value in the target scope that no
+# installed app in that scope could have written through its 'env_set' block.
+# Such a value was set or edited by the user and must be preserved; a value
+# that an installed manifest accounts for is Scoop-owned and may be re-pointed.
+function Test-EnvVarUserDefined($name, $global, $exclude_app) {
+    $current = Get-EnvVar -Name $name -Global:$global
+    if ($null -eq $current -or $current -eq '') { return $false }
+
+    $nojunction = get_config NO_JUNCTION
+    foreach ($app in installed_apps $global) {
+        if ($app -eq $exclude_app) { continue }
+        $version = Select-CurrentVersion -AppName $app -Global:$global
+        if (!$version) { continue }
+        $info = install_info $app $version $global
+        $env_set = arch_specific 'env_set' (installed_manifest $app $version $global) $info.architecture
+        if (!$env_set) { continue }
+        $prop = $env_set.PSObject.Properties | Where-Object { $_.Name -eq $name } | Select-Object -First 1
+        if (!$prop) { continue }
+
+        # The values install-time 'env_set' saw: $dir was the linked (or, with
+        # no_junction, plain) version directory; $original_dir the real one
+        $dir = if ($nojunction) { versiondir $app $version $global } else { "$(appdir $app $global)\current" }
+        $vars = @{
+            dir = $dir
+            original_dir = (versiondir $app $version $global)
+            persist_dir = (persistdir $app $global)
+            app = $app
+            version = $version
+            url = $info.url
+            bucket = $info.bucket
+        }
+        $val = expand_env_set_value $prop.Value $vars
+        if ($val -ceq $current) { return $false }
+    }
+
+    return $true
 }
 
 function env_set($manifest, $global, $arch) {
@@ -383,6 +450,14 @@ function env_set($manifest, $global, $arch) {
     if ($env_set) {
         $env_set | Get-Member -MemberType NoteProperty | ForEach-Object {
             $name = $_.Name
+            # Only values that the user set or edited are off-limits; values left
+            # by Scoop (this or another app) are re-pointed to this manifest's
+            # target (e.g. a custom cache location on another volume stays put)
+            if (Test-EnvVarUserDefined $name $global) {
+                $existing = Get-EnvVar -Name $name -Global:$global
+                Write-Output "Keeping existing $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m = $([char]0x1b)[35m$existing$([char]0x1b)[0m"
+                return
+            }
             $val = $ExecutionContext.InvokeCommand.ExpandString($env_set.$($name))
             Write-Output "Setting $(if ($global) {'system'} else {'user'}) environment variable: $([char]0x1b)[34m$name$([char]0x1b)[0m = $([char]0x1b)[35m$val$([char]0x1b)[0m"
             Set-EnvVar -Name $name -Value $val -Global:$global
