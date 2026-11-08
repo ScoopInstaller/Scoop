@@ -100,6 +100,8 @@
 #       GitHub API token used to make authenticated requests.
 #       This is essential for checkver and similar functions to run without
 #       incurring rate limits and download from private repositories.
+#       $env:SCOOP_GH_TOKEN overrides it; otherwise Scoop falls back to
+#       $env:GH_TOKEN, $env:GITHUB_TOKEN and then 'gh auth token'.
 #
 # virustotal_api_key:
 #       API key used for uploading/scanning files using virustotal.

@@ -104,7 +104,10 @@ function New-DownloadRequest ($url, $cookies) {
             if ($reqUrl -notmatch '/actions/artifacts/\d+/zip$') {
                 $wreq.Accept = 'application/octet-stream'
             }
-            $wreq.Headers['Authorization'] = "Bearer $(Get-GitHubToken)"
+            $token = Get-GitHubToken
+            if ($token) {
+                $wreq.Headers['Authorization'] = "Bearer $token"
+            }
             $wreq.Headers['X-GitHub-Api-Version'] = '2022-11-28'
         }
         if ($cookies) {
@@ -611,7 +614,21 @@ function setup_proxy() {
 }
 
 function Get-GitHubToken {
-    return $env:SCOOP_GH_TOKEN, (get_config GH_TOKEN), $env:GH_TOKEN, $env:GITHUB_TOKEN | Where-Object -Property Length -Value 0 -GT | Select-Object -First 1
+    if ($env:SCOOP_GH_TOKEN) { return $env:SCOOP_GH_TOKEN }
+    $conf_tok = get_config GH_TOKEN
+    if ($conf_tok) { return $conf_tok }
+    if ($env:GH_TOKEN) { return $env:GH_TOKEN }
+    if ($env:GITHUB_TOKEN) { return $env:GITHUB_TOKEN }
+
+    if (-not (Get-Variable -Name ghCliToken -Scope Script -ErrorAction Ignore)) {
+        $script:ghCliToken = try {
+            & gh auth token --hostname 'github.com' 2>$null | Select-Object -First 1
+        } catch {
+            debug "'gh auth token' failed: $($_.Exception.Message)"
+        }
+    }
+
+    $script:ghCliToken
 }
 
 function github_ratelimit_reached {
