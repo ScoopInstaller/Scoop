@@ -23,11 +23,7 @@ function find_hash_in_rdf([String] $url, [String] $basename) {
     $xml = $null
     try {
         # Download and parse RDF XML file
-        $wc = New-Object Net.Webclient
-        $wc.Headers.Add('Referer', (strip_filename $url))
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $data = $wc.DownloadData($url)
-        [xml]$xml = (Get-Encoding($wc)).GetString($data)
+        [xml]$xml = Get-RemoteText $url
     } catch [System.Net.WebException] {
         Write-Host $_ -ForegroundColor DarkRed
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed
@@ -53,17 +49,7 @@ function find_hash_in_textfile([String] $url, [Hashtable] $substitutions, [Strin
     }
 
     try {
-        $wc = New-Object Net.Webclient
-        $wc.Headers.Add('Referer', (strip_filename $url))
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $data = $wc.DownloadData($url)
-        $ms = New-Object System.IO.MemoryStream
-        $ms.Write($data, 0, $data.Length)
-        $ms.Seek(0, 0) | Out-Null
-        if ($data[0] -eq 0x1F -and $data[1] -eq 0x8B) {
-            $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
-        }
-        $hashfile = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
+        $hashfile = Get-RemoteText $url
     } catch [system.net.webexception] {
         Write-Host $_ -ForegroundColor DarkRed
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed
@@ -115,24 +101,8 @@ function find_hash_in_json([String] $url, [Hashtable] $substitutions, [String] $
     $json = $null
 
     try {
-        $wc = New-Object Net.Webclient
-        $wc.Headers.Add('Referer', (strip_filename $url))
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
-
-        if (($url -match '^https://api\.github\.com/.*') -and (Get-GitHubToken)) {
-            $wc.Headers.Add('Authorization', "Bearer $(Get-GitHubToken)")
-            $wc.Headers.Add('X-GitHub-Api-Version', '2022-11-28')
-        }
-
-        $data = $wc.DownloadData($url)
-        $ms = New-Object System.IO.MemoryStream
-        $ms.Write($data, 0, $data.Length)
-        $ms.Seek(0, 0) | Out-Null
-        if ($data[0] -eq 0x1F -and $data[1] -eq 0x8B) {
-            $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
-        }
-        $json = (New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd()
-    } catch [System.Net.WebException] {
+        $json = Get-GitHubApiContent $url
+    } catch {
         Write-Host $_ -ForegroundColor DarkRed
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed
         return
@@ -149,17 +119,7 @@ function find_hash_in_xml([String] $url, [Hashtable] $substitutions, [String] $x
     $xml = $null
 
     try {
-        $wc = New-Object Net.Webclient
-        $wc.Headers.Add('Referer', (strip_filename $url))
-        $wc.Headers.Add('User-Agent', (Get-UserAgent))
-        $data = $wc.DownloadData($url)
-        $ms = New-Object System.IO.MemoryStream
-        $ms.Write($data, 0, $data.Length)
-        $ms.Seek(0, 0) | Out-Null
-        if ($data[0] -eq 0x1F -and $data[1] -eq 0x8B) {
-            $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
-        }
-        $xml = [xml]((New-Object System.IO.StreamReader($ms, (Get-Encoding $wc))).ReadToEnd())
+        $xml = [xml](Get-RemoteText $url)
     } catch [system.net.webexception] {
         Write-Host $_ -ForegroundColor DarkRed
         Write-Host "URL $url is not valid" -ForegroundColor DarkRed

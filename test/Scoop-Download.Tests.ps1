@@ -74,6 +74,63 @@ Describe 'New-DownloadRequest Authorization header' -Tag 'Scoop' {
     }
 }
 
+Describe 'download_json' -Tag 'Scoop' {
+    BeforeAll {
+        Mock Get-GitHubToken { 'fake-token' }
+    }
+
+    It 'follows a redirect to <final> with the token' -TestCases @(
+        @{ start = 'https://api.github.com/repos/example/example'; redirect = 'https://api.github.com/repositories/1'; final = 'https://api.github.com/repositories/1' }
+        @{ start = 'https://example.com/checksums'; redirect = '/checksums/latest.json'; final = 'https://example.com/checksums/latest.json' }
+    ) {
+        Mock Get-GitHubApiResponse {
+            if ($uri -eq $start) {
+                [PSCustomObject]@{ StatusCode = 302; Location = $redirect; Content = '' }
+            } else {
+                [PSCustomObject]@{ StatusCode = 200; Location = ''; Content = '{"private":true}' }
+            }
+        }
+        (download_json $start).private | Should-BeTrue
+        Should-Invoke -CommandName Get-GitHubApiResponse -ParameterFilter { $uri -eq $final -and $token -eq 'fake-token' } -Times 1 -Exactly
+    }
+
+    It 'does not send the token to <redirect>' -TestCases @(
+        @{ redirect = 'https://example.com/repositories/1' }
+        @{ redirect = 'http://api.github.com/repositories/1' }
+    ) {
+        Mock Get-GitHubApiResponse {
+            [PSCustomObject]@{ StatusCode = 302; Location = $redirect; Content = '' }
+        }
+        { download_json 'https://api.github.com/repos/example/example' } | Should-Throw
+        Should-Invoke -CommandName Get-GitHubApiResponse -Times 1 -Exactly
+    }
+}
+
+Describe 'Get-Encoding' -Tag 'Scoop' {
+    It 'reads the charset of a <source>' -TestCases @(
+        @{ source = 'http response'; property = 'Headers'; charset = 'iso-8859-1' }
+        @{ source = 'web client'; property = 'ResponseHeaders'; charset = 'utf-16' }
+    ) {
+        $headers = New-Object Net.WebHeaderCollection
+        $headers['Content-Type'] = "application/json; charset=$charset"
+        $response = [PSCustomObject]@{}
+        $response | Add-Member -NotePropertyName $property -NotePropertyValue $headers
+        (Get-Encoding $response).WebName | Should-Be $charset
+    }
+}
+
+Describe 'handle_special_urls' -Tag 'Scoop' {
+    BeforeAll {
+        Mock Get-GitHubToken { 'fake-token' }
+        $url = 'https://github.com/example/example/releases/download/v1.0/app.zip'
+    }
+
+    It 'keeps the original url when the token cannot be used' {
+        Mock Get-GitHubApiResponse { throw 'Bad credentials' }
+        handle_special_urls $url | Should-Be $url
+    }
+}
+
 Describe 'url_filename' -Tag 'Scoop' {
     It 'should extract the real filename from an url' {
         url_filename 'http://example.org/foo.txt' | Should-Be 'foo.txt'
