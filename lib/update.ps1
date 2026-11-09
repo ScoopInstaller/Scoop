@@ -27,7 +27,7 @@ function Sync-Scoop {
 
     Write-Host 'Updating Scoop...'
     $currentdir = versiondir 'scoop' 'current'
-    $oldShimHash = (Get-FileHash -LiteralPath (Get-ShimTemplate) -ErrorAction SilentlyContinue).Hash
+    $oldShimHash = Get-ShimBodyHash (Get-ShimTemplate)
     if (!(Test-Path "$currentdir\.git")) {
         $newdir = "$currentdir\..\new"
         $olddir = "$currentdir\..\old"
@@ -105,7 +105,7 @@ function Sync-Scoop {
 
     $shimTemplate = Get-ShimTemplate
     # compare shim template hashes and trigger a refresh if needed
-    if (!$oldShimHash -or $oldShimHash -ne (Get-FileHash -LiteralPath $shimTemplate -ErrorAction SilentlyContinue).Hash) {
+    if (!$oldShimHash -or $oldShimHash -ne (Get-ShimBodyHash $shimTemplate)) {
         Update-ShimInstance $shimTemplate
     }
 }

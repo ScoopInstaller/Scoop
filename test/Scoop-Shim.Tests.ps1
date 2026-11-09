@@ -72,6 +72,22 @@ Describe 'Get-AppNameFromShim' -Tag 'Scoop', 'Windows' {
         Get-AppNameFromShim $p | Should-Be 'mockapp'
     }
 
+    It 'reads the source app from the path field only' {
+        ensure "$working_dir/mockapp/current/"
+        ensure "$working_dir/otherapp/current/"
+        $p = "$working_dir\multi-field.shim"
+        $lines = @(
+            "env:PATH = %PATH%;$working_dir\otherapp\current",
+            "path = `"$working_dir\mockapp\current\mockapp.exe`""
+        )
+        [IO.File]::WriteAllText($p, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
+
+        Get-AppNameFromShim $p | Should-Be 'mockapp'
+
+        Remove-Item -LiteralPath $p -Force
+        Remove-Item -LiteralPath "$working_dir\otherapp" -Recurse -Force
+    }
+
     AfterAll {
         if (Test-Path -LiteralPath "$shimdir\shim-test1.shim") {
             Remove-Shim 'shim-test1' $shimdir
@@ -114,6 +130,126 @@ Describe 'Get-ShimTarget' -Tag 'Scoop', 'Windows' {
 
         Get-ShimTarget $shimPath | Should-Be $target
     }
+
+    It 'reads the path from any line, taking the last and ignoring the key case' {
+        $targetDir = Join-Path $TestDrive 'path-lines'
+        $null = [IO.Directory]::CreateDirectory($targetDir)
+        $target = Join-Path $targetDir 'target.exe'
+        [IO.File]::WriteAllText($target, '')
+        $shimPath = Join-Path $targetDir 'probe.shim'
+        $lines = @(
+            "env!:PATH = %PATH%;$targetDir",
+            "path = `"$targetDir\gone.exe`"",
+            "PATH = `"$target`""
+        )
+        [IO.File]::WriteAllText($shimPath, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
+
+        Get-ShimTarget $shimPath | Should-Be $target
+    }
+}
+
+Describe 'Read-ShimFile' -Tag 'Scoop' {
+    It 'reads every field as written' {
+        $shimPath = "$working_dir\all-fields.shim"
+        $lines = @(
+            '# comment',
+            '; another',
+            '// and another',
+            '',
+            'path = "C:\apps\foo\foo.exe"',
+            'args = --one',
+            'args = "--two three"',
+            'cwd = D:\work',
+            'runas = YES',
+            'env:FOO = ""bar""',
+            'BAR = baz',
+            'env!:PATH = %PATH%;D:\bin'
+        )
+        [IO.File]::WriteAllText($shimPath, ($lines -join "`n"), (New-Object Text.UTF8Encoding($true)))
+
+        $shim = Read-ShimFile $shimPath
+
+        $shim.Path | Should-Be '"C:\apps\foo\foo.exe"'
+        $shim.Arguments | Should-BeCollection @('--one', '"--two three"')
+        $shim.Cwd | Should-Be 'D:\work'
+        $shim.Elevate | Should-BeTrue
+        $shim.Env.Name | Should-BeCollection @('FOO', 'BAR', 'PATH')
+        $shim.Env[0].Value | Should-Be '""bar""'
+        $shim.Env[0].Force | Should-BeFalse
+        $shim.Env[2].Force | Should-BeTrue
+        $shim.Env[2].Value | Should-Be '%PATH%;D:\bin'
+        $shim.Diagnostics | Should-BeCollection -Count 0
+    }
+
+    It 'takes the last path and reports the shadowed one' {
+        $shimPath = "$working_dir\shadowed.shim"
+        $lines = @('path = "C:\gone.exe"', 'path = "C:\kept.exe"')
+        [IO.File]::WriteAllText($shimPath, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
+
+        $shim = Read-ShimFile $shimPath
+
+        $shim.Path | Should-Be '"C:\kept.exe"'
+        ($shim.Diagnostics | Where-Object Code -eq 'ShadowedPath').Line | Should-Be 1
+    }
+
+    It 'reports the lines it cannot use and keeps the rest' {
+        $shimPath = "$working_dir\broken-fields.shim"
+        $lines = @('= value', 'env: = value', 'path = /bin/app', 'runas = "true"')
+        [IO.File]::WriteAllText($shimPath, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
+
+        $shim = Read-ShimFile $shimPath
+
+        $shim.Path | Should-Be '/bin/app'
+        $shim.Elevate | Should-BeFalse
+        $shim.Diagnostics.Code | Should-BeCollection @('MalformedLine', 'BareEnv', 'InvalidPath')
+    }
+}
+
+Describe 'Get-ShimFeatures' -Tag 'Scoop', 'Windows' {
+    It 'reads the version and features the body embeds' {
+        $body = Get-ShimFeatures (Get-ShimTemplate)
+
+        $body.Features | Should-ContainCollection 'env-force'
+        $body.Version | Should-BeLikeString '0.*'
+    }
+
+    It 'leaves both empty for a file and a missing path that carry no resource' {
+        $file = "$working_dir\plain.exe"
+        [IO.File]::WriteAllText($file, 'not a PE')
+
+        (Get-ShimFeatures $file).Version | Should-BeNull
+        (Get-ShimFeatures $file).Features | Should-BeCollection -Count 0
+        (Get-ShimFeatures "$working_dir\missing.exe").Features | Should-BeCollection -Count 0
+    }
+}
+
+Describe 'Resolve-ShimValue' -Tag 'Scoop', 'Windows' {
+    It 'expands only what the body advertises' {
+        $env:SCOOP_SHIM_TEST_QUOTED = '"C:\tools"'
+        try {
+            Resolve-ShimValue '%SystemRoot%\x %~dp0y' 'C:\shim' @('expand', 'dp0') | Should-Be "$env:SystemRoot\x C:\shim\y"
+            Resolve-ShimValue '%SystemRoot%\x %~DP0y' 'C:\shim' @('dp0') | Should-Be '%SystemRoot%\x C:\shim\y'
+            Resolve-ShimValue '%SystemRoot%\x %~dp0y' 'C:\shim' @() | Should-Be '%SystemRoot%\x %~dp0y'
+            Resolve-ShimValue '%SCOOP_SHIM_TEST_QUOTED%' 'C:\shim' @('expand') | Should-Be 'C:\tools'
+        } finally {
+            Remove-Item Env:\SCOOP_SHIM_TEST_QUOTED
+        }
+    }
+}
+
+Describe 'Get-ShimBodyHash' -Tag 'Scoop', 'Windows' {
+    It 'ignores the GUI flip and refuses a file too short to be a PE' {
+        $exe = "$working_dir\gui.exe"
+        Copy-Item -LiteralPath (Get-ShimTemplate) $exe
+        Set-PESubsystem $exe 2 | Out-Null
+        $short = "$working_dir\truncated.exe"
+        [IO.File]::WriteAllText($short, 'MZ')
+
+        Get-ShimBodyHash $exe | Should-Be (Get-ShimBodyHash (Get-ShimTemplate))
+        Get-ShimBodyHash $short | Should-BeNull
+
+        Remove-Item -LiteralPath $exe, $short -Force
+    }
 }
 
 Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
@@ -146,6 +282,14 @@ Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
     It 'names the target it could not find' {
         Mock abort { throw $msg }
         { New-Shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
+    }
+
+    It 'writes each argument line separately' {
+        New-Shim "$env:SystemRoot\System32\notepad.exe" $false 'args-test' @('"one', 'two"')
+
+        @(Get-Content "$shimdir\args-test.shim") | Should-BeCollection @("path = `"$env:SystemRoot\System32\notepad.exe`"", 'args = "one', 'args = two"')
+
+        Remove-Shim 'args-test' $shimdir
     }
 
     It 'marks a shim for a GUI target, so it does not open a console window' {
@@ -550,5 +694,40 @@ Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
         [IO.File]::WriteAllText("$working_dir\dupe.shim.foo.bar", 'path = "C:\nonexistent\dupe.exe"')
 
         (Get-ShimInfo $shimPath).Alternatives | Should-Be 'External bar'
+    }
+
+    It 'adds the body capability and the resolved values when detailed' {
+        $exe = "$working_dir\detailed.exe"
+        Copy-Item -LiteralPath (Get-ShimTemplate) $exe
+        $shimPath = "$working_dir\detailed.shim"
+        $lines = @(
+            'path = tools\app.exe',
+            'args = "%TEMP%" "%~dp0x"',
+            'cwd = %~dp0work',
+            'env!:FOO = %~dp0bin',
+            'env:BAR = ""bar""'
+        )
+        [IO.File]::WriteAllText($shimPath, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
+
+        $info = Get-ShimInfo $shimPath -Detailed
+
+        $info.Features | Should-BeLikeString '*env-force*'
+        $info.Target | Should-Be 'tools\app.exe'
+        $info.Args | Should-Be "`"%TEMP%`" `"$working_dir\tools\x`""
+        $info.Cwd | Should-Be "$working_dir\tools\work"
+        $info.Env | Should-Be "env!:FOO = $working_dir\tools\bin`nenv:BAR = `"bar`""
+
+        Remove-Item -LiteralPath $exe, $shimPath -Force
+    }
+
+    It 'exposes only the shell fields of a .ps1 shim' {
+        $shimPath = "$working_dir\legacy.ps1"
+        [IO.File]::WriteAllText($shimPath, "`$path = 'C:\nonexistent\legacy.exe'")
+
+        $info = Get-ShimInfo $shimPath
+
+        $info.Type | Should-Be 'ExternalScript'
+        $info.Target | Should-BeNull
+        $info.Env | Should-BeNull
     }
 }
