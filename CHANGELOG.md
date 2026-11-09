@@ -3,7 +3,7 @@
 ### Features
 
 - **download:** Try gh auth token for a github token ([#6725](https://github.com/ScoopInstaller/Scoop/issues/6725))
-- **shim:** Rework the shim system around architecture-native bodies ([#6783](https://github.com/ScoopInstaller/Scoop/issues/6783), [#6799](https://github.com/ScoopInstaller/Scoop/issues/6799))
+- **shim:** Rework the shim system around architecture-native bodies ([#6783](https://github.com/ScoopInstaller/Scoop/issues/6783), [#6799](https://github.com/ScoopInstaller/Scoop/issues/6799), [#6824](https://github.com/ScoopInstaller/Scoop/issues/6824))
 
 ### Bug Fixes
 
