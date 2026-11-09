@@ -92,8 +92,13 @@ switch ($SubCommand) {
         }
         if ($commandPath -notmatch '[\\/]') {
             $shortPath = $commandPath
-            $commandPath = Get-ShimTarget (Get-ShimFile $shortPath $global)
-            if (!$commandPath) {
+            $source = Get-ShimFile $shortPath $global
+            $commandPath = Get-ShimTarget $source
+            if ($commandPath) {
+                if (!$commandArgs -and $source.EndsWith('.shim')) {
+                    $commandArgs = (Read-ShimFile $source).Arguments -join ' '
+                }
+            } else {
                 $exCommand = Get-CommandLiteral $shortPath
                 if ($exCommand -and $exCommand.CommandType -eq 'Application') {
                     $commandPath = $exCommand.Path
