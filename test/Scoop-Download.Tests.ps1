@@ -79,42 +79,51 @@ Describe 'download_json' -Tag 'Scoop' {
         Mock Get-GitHubToken { 'fake-token' }
     }
 
-    It 'follows a same origin redirect and keeps the token' {
+    It 'follows a redirect to <final> with the token' -TestCases @(
+        @{ start = 'https://api.github.com/repos/example/example'; redirect = 'https://api.github.com/repositories/1'; final = 'https://api.github.com/repositories/1' }
+        @{ start = 'https://example.com/checksums'; redirect = '/checksums/latest.json'; final = 'https://example.com/checksums/latest.json' }
+    ) {
         Mock Get-GitHubApiResponse {
-            if ($uri -eq 'https://api.github.com/repos/example/example') {
-                [PSCustomObject]@{ StatusCode = 301; Location = 'https://api.github.com/repositories/1'; Content = '' }
+            if ($uri -eq $start) {
+                [PSCustomObject]@{ StatusCode = 302; Location = $redirect; Content = '' }
             } else {
                 [PSCustomObject]@{ StatusCode = 200; Location = ''; Content = '{"private":true}' }
             }
         }
-        (download_json 'https://api.github.com/repos/example/example').private | Should-BeTrue
-        Should-Invoke -CommandName Get-GitHubApiResponse -ParameterFilter {
-            $uri -eq 'https://api.github.com/repositories/1' -and $token -eq 'fake-token'
-        } -Times 1 -Exactly
+        (download_json $start).private | Should-BeTrue
+        Should-Invoke -CommandName Get-GitHubApiResponse -ParameterFilter { $uri -eq $final -and $token -eq 'fake-token' } -Times 1 -Exactly
     }
 
-    It 'does not send the token to <location>' -TestCases @(
-        @{ location = 'https://example.com/repositories/1' }
-        @{ location = 'http://api.github.com/repositories/1' }
+    It 'does not send the token to <redirect>' -TestCases @(
+        @{ redirect = 'https://example.com/repositories/1' }
+        @{ redirect = 'http://api.github.com/repositories/1' }
     ) {
         Mock Get-GitHubApiResponse {
-            [PSCustomObject]@{ StatusCode = 302; Location = $location; Content = '' }
+            [PSCustomObject]@{ StatusCode = 302; Location = $redirect; Content = '' }
         }
         { download_json 'https://api.github.com/repos/example/example' } | Should-Throw
         Should-Invoke -CommandName Get-GitHubApiResponse -Times 1 -Exactly
     }
 }
 
+Describe 'Get-Encoding' -Tag 'Scoop' {
+    It 'reads the charset of a <source>' -TestCases @(
+        @{ source = 'http response'; response = @{ Headers = @{ 'Content-Type' = 'application/json; charset=iso-8859-1' } }; charset = 'iso-8859-1' }
+        @{ source = 'web client'; response = @{ ResponseHeaders = @{ 'Content-Type' = 'text/plain; charset=utf-16' } }; charset = 'utf-16' }
+    ) {
+        (Get-Encoding ([PSCustomObject]$response)).WebName | Should-Be $charset
+    }
+}
+
 Describe 'handle_special_urls' -Tag 'Scoop' {
     BeforeAll {
         Mock Get-GitHubToken { 'fake-token' }
-        Mock get_config { }
+        $url = 'https://github.com/example/example/releases/download/v1.0/app.zip'
     }
 
     It 'keeps the original url when the token cannot be used' {
         Mock Get-GitHubApiResponse { throw 'Bad credentials' }
-        handle_special_urls 'https://github.com/example/example/releases/download/v1.0/app.zip' |
-            Should-Be 'https://github.com/example/example/releases/download/v1.0/app.zip'
+        handle_special_urls $url | Should-Be $url
     }
 }
 

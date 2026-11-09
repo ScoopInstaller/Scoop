@@ -567,7 +567,8 @@ function cookie_header($cookies) {
 }
 
 function Get-Encoding($wc) {
-    if ($null -ne $wc.ResponseHeaders -and $wc.ResponseHeaders['Content-Type'] -match 'charset=([^;]*)') {
+    $headers = if ($null -ne $wc.PSObject.Properties['ResponseHeaders']) { $wc.ResponseHeaders } else { $wc.Headers }
+    if ($null -ne $headers -and $headers['Content-Type'] -match 'charset=([^;]*)') {
         return [System.Text.Encoding]::GetEncoding($Matches[1])
     } else {
         return [System.Text.Encoding]::GetEncoding('utf-8')
@@ -735,7 +736,7 @@ function Get-GitHubApiContent($url) {
     for ($i = 0; $i -lt 5; $i++) {
         $response = Get-GitHubApiResponse $url $token
         if ($response.StatusCode -in 301, 302, 303, 307, 308) {
-            $target = [Uri]$response.Location
+            $target = [Uri]::new([Uri]$url, [String]$response.Location)
             if ($url -match '^https://api\.github\.com/' -and ($target.Scheme -ne 'https' -or $target.Authority -ne 'api.github.com')) {
                 throw "Refusing to redirect to '$target'"
             }
