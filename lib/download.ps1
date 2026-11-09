@@ -415,9 +415,8 @@ function Invoke-CachedAria2Download ($app, $version, $manifest, $architecture, $
             try {
                 $try_url = handle_special_urls $url
             } catch {
-                if ($_.Exception.Response.StatusCode -eq 'Unauthorized') {
-                    warn 'Token might be misconfigured.'
-                }
+                warn "Failed to prepare the download url: $($_.Exception.Message)"
+                $try_url = $url
             }
             $urlstxt_content += "$try_url`n"
             if (!$url.Contains('sourceforge.net')) {
@@ -575,6 +574,23 @@ function Get-Encoding($wc) {
     }
 }
 
+function Get-TextFromBytes($data, $response) {
+    $ms = New-Object System.IO.MemoryStream
+    $ms.Write($data, 0, $data.Length)
+    $ms.Seek(0, 0) | Out-Null
+    if ($data.Length -gt 1 -and $data[0] -eq 0x1F -and $data[1] -eq 0x8B) {
+        $ms = New-Object System.IO.Compression.GZipStream($ms, [System.IO.Compression.CompressionMode]::Decompress)
+    }
+    (New-Object System.IO.StreamReader($ms, (Get-Encoding $response))).ReadToEnd()
+}
+
+function Get-RemoteText($url) {
+    $wc = New-Object Net.Webclient
+    $wc.Headers.Add('Referer', (strip_filename $url))
+    $wc.Headers.Add('User-Agent', (Get-UserAgent))
+    Get-TextFromBytes $wc.DownloadData($url) $wc
+}
+
 function Get-UserAgent() {
     $arch = switch (Get-SystemArchitecture) {
         'arm64' { 'ARM64; ' }
@@ -668,13 +684,21 @@ function handle_special_urls($url) {
     }
 
     # Github.com
-    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and ($token = Get-GitHubToken)) {
-        $headers = @{ 'Authorization' = "token $token" }
-        $privateUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
-        $assetUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)/releases/tags/$($Matches.tag)"
+    if ($url -match 'github.com/(?<owner>[^/]+)/(?<repo>[^/]+)/releases/download/(?<tag>[^/]+)/(?<file>[^/#]+)(?<filename>.*)' -and (Get-GitHubToken)) {
+        $repoUrl = "https://api.github.com/repos/$($Matches.owner)/$($Matches.repo)"
 
-        if ((Invoke-RestMethod -Uri $privateUrl -Headers $headers).Private) {
-            $url = ((Invoke-RestMethod -Uri $assetUrl -Headers $headers).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
+        try {
+            $isPrivate = (download_json $repoUrl).Private
+        } catch {
+            $e = $_.Exception
+            if ($e.InnerException) { $e = $e.InnerException }
+            warn "Could not use the GitHub token ($($e.Message)). Continuing without it."
+            $isPrivate = $false
+        }
+
+        if ($isPrivate) {
+            $assetUrl = "$repoUrl/releases/tags/$($Matches.tag)"
+            $url = ((download_json $assetUrl).Assets | Where-Object -Property Name -EQ -Value $Matches.file).Url, $Matches.filename -join ''
         }
     }
 
@@ -683,16 +707,48 @@ function handle_special_urls($url) {
 
 ### Remote file information
 
-function download_json($url) {
-    $githubtoken = Get-GitHubToken
-    $authheader = @{}
-    if ($githubtoken) {
-        $authheader = @{'Authorization' = "token $githubtoken" }
+function Get-GitHubApiResponse($uri, $token) {
+    $request = [Net.HttpWebRequest]::Create($uri)
+    $request.UserAgent = Get-UserAgent
+    $request.AllowAutoRedirect = $false
+    if ($token -and $uri -match '^https://api\.github\.com/') {
+        $request.Headers['Authorization'] = "token $token"
     }
-    $ProgressPreference = 'SilentlyContinue'
-    $result = Invoke-WebRequest $url -UseBasicParsing -Headers $authheader | Select-Object -ExpandProperty content | ConvertFrom-Json
-    $ProgressPreference = 'Continue'
-    $result
+    try {
+        $response = $request.GetResponse()
+    } catch {
+        $e = $_.Exception
+        if ($e.InnerException) { $e = $e.InnerException }
+        throw $e
+    }
+    $ms = New-Object IO.MemoryStream
+    $response.GetResponseStream().CopyTo($ms)
+    $content = Get-TextFromBytes $ms.ToArray() $response
+    $status = [int]$response.StatusCode
+    $location = $response.Headers['Location']
+    $response.Close()
+    [PSCustomObject]@{ StatusCode = $status; Location = $location; Content = $content }
+}
+
+function Get-GitHubApiContent($url) {
+    $token = Get-GitHubToken
+    for ($i = 0; $i -lt 5; $i++) {
+        $response = Get-GitHubApiResponse $url $token
+        if ($response.StatusCode -in 301, 302, 303, 307, 308) {
+            $target = [Uri]$response.Location
+            if ($url -match '^https://api\.github\.com/' -and ($target.Scheme -ne 'https' -or $target.Authority -ne 'api.github.com')) {
+                throw "Refusing to redirect to '$target'"
+            }
+            $url = $target.AbsoluteUri
+            continue
+        }
+        return $response.Content
+    }
+    throw "Too many redirects while requesting '$url'"
+}
+
+function download_json($url) {
+    Get-GitHubApiContent $url | ConvertFrom-Json
 }
 
 function get_magic_bytes($file) {

@@ -74,6 +74,50 @@ Describe 'New-DownloadRequest Authorization header' -Tag 'Scoop' {
     }
 }
 
+Describe 'download_json' -Tag 'Scoop' {
+    BeforeAll {
+        Mock Get-GitHubToken { 'fake-token' }
+    }
+
+    It 'follows a same origin redirect and keeps the token' {
+        Mock Get-GitHubApiResponse {
+            if ($uri -eq 'https://api.github.com/repos/example/example') {
+                [PSCustomObject]@{ StatusCode = 301; Location = 'https://api.github.com/repositories/1'; Content = '' }
+            } else {
+                [PSCustomObject]@{ StatusCode = 200; Location = ''; Content = '{"private":true}' }
+            }
+        }
+        (download_json 'https://api.github.com/repos/example/example').private | Should-BeTrue
+        Should-Invoke -CommandName Get-GitHubApiResponse -ParameterFilter {
+            $uri -eq 'https://api.github.com/repositories/1' -and $token -eq 'fake-token'
+        } -Times 1 -Exactly
+    }
+
+    It 'does not send the token to <location>' -TestCases @(
+        @{ location = 'https://example.com/repositories/1' }
+        @{ location = 'http://api.github.com/repositories/1' }
+    ) {
+        Mock Get-GitHubApiResponse {
+            [PSCustomObject]@{ StatusCode = 302; Location = $location; Content = '' }
+        }
+        { download_json 'https://api.github.com/repos/example/example' } | Should-Throw
+        Should-Invoke -CommandName Get-GitHubApiResponse -Times 1 -Exactly
+    }
+}
+
+Describe 'handle_special_urls' -Tag 'Scoop' {
+    BeforeAll {
+        Mock Get-GitHubToken { 'fake-token' }
+        Mock get_config { }
+    }
+
+    It 'keeps the original url when the token cannot be used' {
+        Mock Get-GitHubApiResponse { throw 'Bad credentials' }
+        handle_special_urls 'https://github.com/example/example/releases/download/v1.0/app.zip' |
+            Should-Be 'https://github.com/example/example/releases/download/v1.0/app.zip'
+    }
+}
+
 Describe 'url_filename' -Tag 'Scoop' {
     It 'should extract the real filename from an url' {
         url_filename 'http://example.org/foo.txt' | Should-Be 'foo.txt'
