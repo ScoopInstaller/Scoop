@@ -96,7 +96,7 @@ switch ($SubCommand) {
             $commandPath = Get-ShimTarget $source
             if ($commandPath) {
                 if (!$commandArgs -and $source.EndsWith('.shim')) {
-                    $commandArgs = (Read-ShimFile $source).Arguments -join ' '
+                    $commandArgs = (Read-ShimFile $source).Arguments
                 }
             } else {
                 $exCommand = Get-CommandLiteral $shortPath

@@ -169,12 +169,12 @@ Describe 'Read-ShimFile' -Tag 'Scoop' {
 
         $shim = Read-ShimFile $shimPath
 
-        $shim.Path | Should-Be 'C:\apps\foo\foo.exe'
+        $shim.Path | Should-Be '"C:\apps\foo\foo.exe"'
         $shim.Arguments | Should-BeCollection @('--one', '"--two three"')
         $shim.Cwd | Should-Be 'D:\work'
         $shim.Elevate | Should-BeTrue
         $shim.Env.Name | Should-BeCollection @('FOO', 'BAR', 'PATH')
-        $shim.Env[0].Value | Should-Be '"bar"'
+        $shim.Env[0].Value | Should-Be '""bar""'
         $shim.Env[0].Force | Should-BeFalse
         $shim.Env[2].Force | Should-BeTrue
         $shim.Env[2].Value | Should-Be '%PATH%;D:\bin'
@@ -188,7 +188,7 @@ Describe 'Read-ShimFile' -Tag 'Scoop' {
 
         $shim = Read-ShimFile $shimPath
 
-        $shim.Path | Should-Be 'C:\kept.exe'
+        $shim.Path | Should-Be '"C:\kept.exe"'
         ($shim.Diagnostics | Where-Object Code -eq 'ShadowedPath').Line | Should-Be 1
     }
 
@@ -225,14 +225,11 @@ Describe 'Get-ShimFeatures' -Tag 'Scoop', 'Windows' {
 
 Describe 'Resolve-ShimValue' -Tag 'Scoop', 'Windows' {
     It 'expands only what the body advertises' {
-        Resolve-ShimValue '%SystemRoot%\x %~dp0y' 'C:\shim' @('expand', 'dp0') | Should-Be "$env:SystemRoot\x C:\shim\y"
-        Resolve-ShimValue '%SystemRoot%\x %~DP0y' 'C:\shim' @('dp0') | Should-Be '%SystemRoot%\x C:\shim\y'
-        Resolve-ShimValue '%SystemRoot%\x %~dp0y' 'C:\shim' @() | Should-Be '%SystemRoot%\x %~dp0y'
-    }
-
-    It 'strips the quotes an expanded variable supplies' {
         $env:SCOOP_SHIM_TEST_QUOTED = '"C:\tools"'
         try {
+            Resolve-ShimValue '%SystemRoot%\x %~dp0y' 'C:\shim' @('expand', 'dp0') | Should-Be "$env:SystemRoot\x C:\shim\y"
+            Resolve-ShimValue '%SystemRoot%\x %~DP0y' 'C:\shim' @('dp0') | Should-Be '%SystemRoot%\x C:\shim\y'
+            Resolve-ShimValue '%SystemRoot%\x %~dp0y' 'C:\shim' @() | Should-Be '%SystemRoot%\x %~dp0y'
             Resolve-ShimValue '%SCOOP_SHIM_TEST_QUOTED%' 'C:\shim' @('expand') | Should-Be 'C:\tools'
         } finally {
             Remove-Item Env:\SCOOP_SHIM_TEST_QUOTED
@@ -285,6 +282,14 @@ Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
     It 'names the target it could not find' {
         Mock abort { throw $msg }
         { New-Shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
+    }
+
+    It 'writes each argument line separately' {
+        New-Shim "$env:SystemRoot\System32\notepad.exe" $false 'args-test' @('"one', 'two"')
+
+        @(Get-Content "$shimdir\args-test.shim") | Should-BeCollection @("path = `"$env:SystemRoot\System32\notepad.exe`"", 'args = "one', 'args = two"')
+
+        Remove-Shim 'args-test' $shimdir
     }
 
     It 'marks a shim for a GUI target, so it does not open a console window' {
@@ -691,46 +696,26 @@ Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
         (Get-ShimInfo $shimPath).Alternatives | Should-Be 'External bar'
     }
 
-    It 'exposes the target, arguments and environment of a shim' {
-        $shimPath = "$working_dir\fields.shim"
-        $lines = @(
-            'path = "C:\nonexistent\fields.exe"',
-            'args = --flag',
-            'cwd = D:\work',
-            'elevate = no',
-            'env!:BAR = 2',
-            'env:FOO = bar'
-        )
-        [IO.File]::WriteAllText($shimPath, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
-
-        $info = Get-ShimInfo $shimPath
-
-        $info.Target | Should-Be 'C:\nonexistent\fields.exe'
-        $info.Args | Should-Be '--flag'
-        $info.Cwd | Should-Be 'D:\work'
-        $info.Elevate | Should-BeFalse
-        $info.Env | Should-Be "env!:BAR = 2`nenv:FOO = bar"
-    }
-
     It 'adds the body capability and the resolved values when detailed' {
         $exe = "$working_dir\detailed.exe"
         Copy-Item -LiteralPath (Get-ShimTemplate) $exe
         $shimPath = "$working_dir\detailed.shim"
         $lines = @(
-            'path = "%~dp0tools\app.exe"',
+            'path = tools\app.exe',
             'args = "%TEMP%" "%~dp0x"',
             'cwd = %~dp0work',
-            'env!:FOO = %~dp0bin'
+            'env!:FOO = %~dp0bin',
+            'env:BAR = ""bar""'
         )
         [IO.File]::WriteAllText($shimPath, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
 
         $info = Get-ShimInfo $shimPath -Detailed
 
         $info.Features | Should-BeLikeString '*env-force*'
-        $info.Target | Should-Be "$working_dir\tools\app.exe"
+        $info.Target | Should-Be 'tools\app.exe'
         $info.Args | Should-Be "`"%TEMP%`" `"$working_dir\tools\x`""
         $info.Cwd | Should-Be "$working_dir\tools\work"
-        $info.Env | Should-Be "env!:FOO = $working_dir\tools\bin"
+        $info.Env | Should-Be "env!:FOO = $working_dir\tools\bin`nenv:BAR = `"bar`""
 
         Remove-Item -LiteralPath $exe, $shimPath -Force
     }
