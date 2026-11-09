@@ -108,10 +108,14 @@ Describe 'download_json' -Tag 'Scoop' {
 
 Describe 'Get-Encoding' -Tag 'Scoop' {
     It 'reads the charset of a <source>' -TestCases @(
-        @{ source = 'http response'; response = @{ Headers = @{ 'Content-Type' = 'application/json; charset=iso-8859-1' } }; charset = 'iso-8859-1' }
-        @{ source = 'web client'; response = @{ ResponseHeaders = @{ 'Content-Type' = 'text/plain; charset=utf-16' } }; charset = 'utf-16' }
+        @{ source = 'http response'; property = 'Headers'; charset = 'iso-8859-1' }
+        @{ source = 'web client'; property = 'ResponseHeaders'; charset = 'utf-16' }
     ) {
-        (Get-Encoding ([PSCustomObject]$response)).WebName | Should-Be $charset
+        $headers = New-Object Net.WebHeaderCollection
+        $headers['Content-Type'] = "application/json; charset=$charset"
+        $response = [PSCustomObject]@{}
+        $response | Add-Member -NotePropertyName $property -NotePropertyValue $headers
+        (Get-Encoding $response).WebName | Should-Be $charset
     }
 }
 

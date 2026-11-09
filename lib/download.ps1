@@ -567,7 +567,11 @@ function cookie_header($cookies) {
 }
 
 function Get-Encoding($wc) {
-    $headers = if ($null -ne $wc.PSObject.Properties['ResponseHeaders']) { $wc.ResponseHeaders } else { $wc.Headers }
+    if ($null -ne $wc.PSObject.Properties['ResponseHeaders']) {
+        $headers = $wc.ResponseHeaders
+    } else {
+        $headers = $wc.Headers
+    }
     if ($null -ne $headers -and $headers['Content-Type'] -match 'charset=([^;]*)') {
         return [System.Text.Encoding]::GetEncoding($Matches[1])
     } else {
