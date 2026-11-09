@@ -160,8 +160,8 @@ Describe 'Read-ShimFile' -Tag 'Scoop' {
             'args = --one',
             'args = "--two three"',
             'cwd = D:\work',
-            'runas = 1',
-            'env:FOO = bar',
+            'runas = YES',
+            'env:FOO = ""bar""',
             'BAR = baz',
             'env!:PATH = %PATH%;D:\bin'
         )
@@ -174,6 +174,7 @@ Describe 'Read-ShimFile' -Tag 'Scoop' {
         $shim.Cwd | Should-Be 'D:\work'
         $shim.Elevate | Should-BeTrue
         $shim.Env.Name | Should-BeCollection @('FOO', 'BAR', 'PATH')
+        $shim.Env[0].Value | Should-Be '"bar"'
         $shim.Env[0].Force | Should-BeFalse
         $shim.Env[2].Force | Should-BeTrue
         $shim.Env[2].Value | Should-Be '%PATH%;D:\bin'
@@ -188,28 +189,69 @@ Describe 'Read-ShimFile' -Tag 'Scoop' {
         $shim = Read-ShimFile $shimPath
 
         $shim.Path | Should-Be 'C:\kept.exe'
-        $shim.Diagnostics.Code | Should-ContainCollection 'ShadowedPath'
+        ($shim.Diagnostics | Where-Object Code -eq 'ShadowedPath').Line | Should-Be 1
     }
 
-    It 'reports a line with no key and a bare env prefix, and keeps reading' {
-        $shimPath = "$working_dir\broken-lines.shim"
-        $lines = @('= value', 'env: = value', 'path = "C:\kept.exe"')
+    It 'reports the lines it cannot use and keeps the rest' {
+        $shimPath = "$working_dir\broken-fields.shim"
+        $lines = @('= value', 'env: = value', 'path = /bin/app', 'runas = "true"')
         [IO.File]::WriteAllText($shimPath, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
 
         $shim = Read-ShimFile $shimPath
 
-        $shim.Path | Should-Be 'C:\kept.exe'
-        $shim.Diagnostics.Code | Should-BeCollection @('MalformedLine', 'BareEnv')
+        $shim.Path | Should-Be '/bin/app'
+        $shim.Elevate | Should-BeFalse
+        $shim.Diagnostics.Code | Should-BeCollection @('MalformedLine', 'BareEnv', 'InvalidPath')
+    }
+}
+
+Describe 'Get-ShimFeatures' -Tag 'Scoop', 'Windows' {
+    It 'reads the version and features the body embeds' {
+        $body = Get-ShimFeatures (Get-ShimTemplate)
+
+        $body.Features | Should-ContainCollection 'env-force'
+        $body.Version | Should-BeLikeString '0.*'
     }
 
-    It 'reports a path that starts with a slash' {
-        $shimPath = "$working_dir\slash.shim"
-        [IO.File]::WriteAllText($shimPath, 'path = /bin/app', (New-Object Text.UTF8Encoding($false)))
+    It 'leaves both empty for a file and a missing path that carry no resource' {
+        $file = "$working_dir\plain.exe"
+        [IO.File]::WriteAllText($file, 'not a PE')
 
-        $shim = Read-ShimFile $shimPath
+        (Get-ShimFeatures $file).Version | Should-BeNull
+        (Get-ShimFeatures $file).Features | Should-BeCollection -Count 0
+        (Get-ShimFeatures "$working_dir\missing.exe").Features | Should-BeCollection -Count 0
+    }
+}
 
-        $shim.Path | Should-Be '/bin/app'
-        $shim.Diagnostics.Code | Should-ContainCollection 'InvalidPath'
+Describe 'Resolve-ShimValue' -Tag 'Scoop', 'Windows' {
+    It 'expands only what the body advertises' {
+        Resolve-ShimValue '%SystemRoot%\x %~dp0y' 'C:\shim' @('expand', 'dp0') | Should-Be "$env:SystemRoot\x C:\shim\y"
+        Resolve-ShimValue '%SystemRoot%\x %~DP0y' 'C:\shim' @('dp0') | Should-Be '%SystemRoot%\x C:\shim\y'
+        Resolve-ShimValue '%SystemRoot%\x %~dp0y' 'C:\shim' @() | Should-Be '%SystemRoot%\x %~dp0y'
+    }
+
+    It 'strips the quotes an expanded variable supplies' {
+        $env:SCOOP_SHIM_TEST_QUOTED = '"C:\tools"'
+        try {
+            Resolve-ShimValue '%SCOOP_SHIM_TEST_QUOTED%' 'C:\shim' @('expand') | Should-Be 'C:\tools'
+        } finally {
+            Remove-Item Env:\SCOOP_SHIM_TEST_QUOTED
+        }
+    }
+}
+
+Describe 'Get-ShimBodyHash' -Tag 'Scoop', 'Windows' {
+    It 'ignores the GUI flip and refuses a file too short to be a PE' {
+        $exe = "$working_dir\gui.exe"
+        Copy-Item -LiteralPath (Get-ShimTemplate) $exe
+        Set-PESubsystem $exe 2 | Out-Null
+        $short = "$working_dir\truncated.exe"
+        [IO.File]::WriteAllText($short, 'MZ')
+
+        Get-ShimBodyHash $exe | Should-Be (Get-ShimBodyHash (Get-ShimTemplate))
+        Get-ShimBodyHash $short | Should-BeNull
+
+        Remove-Item -LiteralPath $exe, $short -Force
     }
 }
 
@@ -667,7 +709,30 @@ Describe 'Get-ShimInfo' -Tag 'Scoop', 'Windows' {
         $info.Args | Should-Be '--flag'
         $info.Cwd | Should-Be 'D:\work'
         $info.Elevate | Should-BeFalse
-        $info.Env | Should-Be 'env!:BAR = 2; env:FOO = bar'
+        $info.Env | Should-Be "env!:BAR = 2`nenv:FOO = bar"
+    }
+
+    It 'adds the body capability and the resolved values when detailed' {
+        $exe = "$working_dir\detailed.exe"
+        Copy-Item -LiteralPath (Get-ShimTemplate) $exe
+        $shimPath = "$working_dir\detailed.shim"
+        $lines = @(
+            'path = "%~dp0tools\app.exe"',
+            'args = "%TEMP%" "%~dp0x"',
+            'cwd = %~dp0work',
+            'env!:FOO = %~dp0bin'
+        )
+        [IO.File]::WriteAllText($shimPath, ($lines -join "`r`n"), (New-Object Text.UTF8Encoding($false)))
+
+        $info = Get-ShimInfo $shimPath -Detailed
+
+        $info.Features | Should-BeLikeString '*env-force*'
+        $info.Target | Should-Be "$working_dir\tools\app.exe"
+        $info.Args | Should-Be "`"%TEMP%`" `"$working_dir\tools\x`""
+        $info.Cwd | Should-Be "$working_dir\tools\work"
+        $info.Env | Should-Be "env!:FOO = $working_dir\tools\bin"
+
+        Remove-Item -LiteralPath $exe, $shimPath -Force
     }
 
     It 'exposes only the shell fields of a .ps1 shim' {

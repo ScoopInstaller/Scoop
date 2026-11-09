@@ -90,6 +90,7 @@ function Read-ShimFile($ShimPath) {
     $report = { param($Line, $Code, $Message) $diagnostics.Add([pscustomobject]@{ Line = $Line; Code = $Code; Message = $Message }) }
 
     $lineNo = 0
+    $pathLine = 0
     foreach ($line in Get-Content -LiteralPath $ShimPath -Encoding UTF8) {
         $lineNo++
         $line = $line.TrimEnd()
@@ -98,21 +99,23 @@ function Read-ShimFile($ShimPath) {
         $key = if ($i -gt 0) { $line.Substring(0, $i).Trim() }
         if (!$key) { & $report $lineNo 'MalformedLine' 'line has no key'; continue }
         $value = $line.Substring($i + 1).TrimStart()
+        $unquoted = $value -replace '^"(.*)"$', '$1'
         switch ($key.ToLowerInvariant()) {
             'path' {
-                if ($shim.Path) { & $report $lineNo 'ShadowedPath' 'the last path wins, this one is ignored' }
-                $shim.Path = $value.Trim('"')
+                if ($shim.Path) { & $report $pathLine 'ShadowedPath' 'a later path replaces this one' }
+                $pathLine = $lineNo
+                $shim.Path = $unquoted
                 if ($shim.Path -match '^[\\/]') { & $report $lineNo 'InvalidPath' 'path must not start with a slash' }
             }
             'args' { $arguments.Add($value) }
-            { $_ -in 'cwd', 'workdir' } { $shim.Cwd = $value.Trim('"') }
-            { $_ -in 'elevate', 'runas' } { $shim.Elevate = $value.Trim('"') -match '^(?i:true|1|yes)$' }
+            { $_ -in 'cwd', 'workdir' } { $shim.Cwd = $unquoted }
+            { $_ -in 'elevate', 'runas' } { $shim.Elevate = $value -match '^(?i:true|1|yes)$' }
             default {
                 $name = $key
                 $force = $name -imatch '^env!:(.*)$'
                 if ($force) { $name = $Matches[1] } elseif ($name -imatch '^env:(.*)$') { $name = $Matches[1] }
                 if (!$name) { & $report $lineNo 'BareEnv' "$key names no variable"; continue }
-                $env.Add([pscustomobject]@{ Name = $name; Value = $value.Trim('"'); Force = $force; Line = $lineNo })
+                $env.Add([pscustomobject]@{ Name = $name; Value = $unquoted; Force = $force; Line = $lineNo })
             }
         }
     }
@@ -149,7 +152,7 @@ function Get-ShimTarget($ShimPath) {
         }
         # a path starting with a slash is rejected by the shim itself, so it names no target
         # Convert-Path binds it strictly, so the empty case the pipeline form swallowed is screened out
-        $shimTargetConverted = if ($shimTarget -and $shimTarget -notmatch '^[\\/]') {
+        $shimTargetConverted = if ($shimTarget -and (!$isShimFile -or $shimTarget -notmatch '^[\\/]')) {
             Convert-Path -LiteralPath $shimTarget -ErrorAction SilentlyContinue
         }
         if (!$shimTargetConverted -and $shimTarget -and $shimTarget.Contains('\Sysnative\')) {
@@ -568,7 +571,45 @@ function Remove-ShimFromManifest($App, $Manifest, $Global, $Arch) {
     }
 }
 
-function Get-ShimInfo($ShimPath) {
+function Get-ShimFeatures($ExePath) {
+    $body = [pscustomobject]@{ Version = $null; Features = @() }
+    if (!(Test-Path -LiteralPath $ExePath -PathType Leaf)) { return $body }
+    $versionInfo = (Get-Item -LiteralPath $ExePath).VersionInfo
+    if ($versionInfo.Comments -match 'Features:\s*(.*)$') {
+        $body.Features = @($Matches[1].Trim() -split '\s+' | Where-Object { $_ })
+        $body.Version = if ($versionInfo.ProductVersion) { $versionInfo.ProductVersion } else { $versionInfo.FileVersion }
+    }
+    return $body
+}
+
+function Resolve-ShimValue($Value, $Dp0Dir, $Features, [switch]$Raw) {
+    if ($Dp0Dir -and $Features -contains 'dp0') {
+        $Value = $Value -replace '(?i)%~dp0', ($Dp0Dir.TrimEnd('\') + '\').Replace('$', '$$')
+    }
+    if ($Raw) { return $Value }
+    if ($Features -contains 'expand') { $Value = [Environment]::ExpandEnvironmentVariables($Value) }
+    # an expanded variable may supply its own wrapping quotes
+    return $Value -replace '^"(.*)"$', '$1'
+}
+
+function Get-ShimBodyHash($Path) {
+    try {
+        $bytes = [IO.File]::ReadAllBytes($Path)
+        if ($bytes.Length -lt 0x40) { return $null }
+        # Set-PESubsystem flips the subsystem field of a GUI shim, which is still the same body
+        $subsystem = [BitConverter]::ToInt32($bytes, 0x3C) + 92
+        if ($subsystem + 1 -lt $bytes.Length) {
+            $bytes[$subsystem] = 0
+            $bytes[$subsystem + 1] = 0
+        }
+        $stream = [IO.MemoryStream]::new($bytes, $false)
+        try { return (Get-FileHash -InputStream $stream -Algorithm SHA256).Hash } finally { $stream.Dispose() }
+    } catch {
+        return $null
+    }
+}
+
+function Get-ShimInfo($ShimPath, [switch]$Detailed) {
     $info = [Ordered]@{}
     $info.Name = strip_ext (fname $ShimPath)
     $info.Path = $ShimPath -replace 'shim$', 'exe'
@@ -581,10 +622,27 @@ function Get-ShimInfo($ShimPath) {
         if ($shim.Cwd) { $info.Cwd = $shim.Cwd }
         $info.Elevate = $shim.Elevate
         if ($shim.Env) {
-            $info.Env = @($shim.Env | ForEach-Object { '{0}{1} = {2}' -f $(if ($_.Force) { 'env!:' } else { 'env:' }), $_.Name, $_.Value }) -join '; '
+            $info.Env = @($shim.Env | ForEach-Object { '{0}{1} = {2}' -f $(if ($_.Force) { 'env!:' } else { 'env:' }), $_.Name, $_.Value }) -join "`n"
         }
-        if ($shim.Diagnostics) {
-            $info.Diagnostics = @($shim.Diagnostics | ForEach-Object { 'line {0}: {1}' -f $_.Line, $_.Message }) -join '; '
+        $diagnostics = @($shim.Diagnostics | ForEach-Object { 'line {0}: {1}' -f $_.Line, $_.Message })
+        if ($diagnostics) { $info.Diagnostics = $diagnostics -join '; ' }
+        if ($Detailed) {
+            $body = Get-ShimFeatures $info.Path
+            $bodyHash = if (Test-Path -LiteralPath $info.Path) { Get-ShimBodyHash $info.Path }
+            $source = get_config SHIM
+            $packageHash = if ($source) { Get-ShimBodyHash (Get-ShimTemplate) }
+            $origin = if (!$bodyHash) { 'custom' } elseif ($bodyHash -eq (Get-ShimBodyHash (Get-ShimTemplate -Source ''))) { 'bundled' } elseif ($bodyHash -eq $packageHash) { $source } else { 'custom' }
+            $info.Body = '{0} ({1})' -f $(if ($body.Version) { $body.Version } else { 'unknown' }), $origin
+            $info.Features = if ($body.Features) { $body.Features -join ' ' } else { 'unknown' }
+            if ($body.Features -contains 'expand' -or $body.Features -contains 'dp0') {
+                if ($shim.Path) { $info.Target = Resolve-ShimValue $shim.Path (Split-Path -Parent $ShimPath) $body.Features }
+                $targetDir = if ($info.Target) { Split-Path -Parent $info.Target }
+                if ($shim.Arguments) { $info.Args = Resolve-ShimValue ($shim.Arguments -join ' ') $targetDir $body.Features -Raw }
+                if ($shim.Cwd) { $info.Cwd = Resolve-ShimValue $shim.Cwd $targetDir $body.Features }
+                if ($shim.Env) {
+                    $info.Env = @($shim.Env | ForEach-Object { '{0}{1} = {2}' -f $(if ($_.Force) { 'env!:' } else { 'env:' }), $_.Name, (Resolve-ShimValue $_.Value $targetDir $body.Features) }) -join "`n"
+                }
+            }
         }
     }
     $shimName = fname $ShimPath
