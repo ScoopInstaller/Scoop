@@ -20,6 +20,7 @@
 - **core:** End progress lines with a status marker ([#6805](https://github.com/ScoopInstaller/Scoop/issues/6805))
 - **core:** Resolve Git helper without hardcoded runtime paths ([#6795](https://github.com/ScoopInstaller/Scoop/issues/6795))
 - **core:** Warn once per deprecated function per manifest ([#6801](https://github.com/ScoopInstaller/Scoop/issues/6801))
+- **download:** Ignore an unusable GitHub token and keep it on API redirects ([#6826](https://github.com/ScoopInstaller/Scoop/pull/6826))
 - **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6763](https://github.com/ScoopInstaller/Scoop/issues/6763))
 - **install:** Expand $dir and $persist_dir in env_add_path ([#6808](https://github.com/ScoopInstaller/Scoop/issues/6808))
 - **scoop:** Keep the formatted output of a command ([#6813](https://github.com/ScoopInstaller/Scoop/issues/6813))
