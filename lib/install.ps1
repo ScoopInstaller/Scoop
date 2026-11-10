@@ -12,7 +12,9 @@ function failed_deps($manifest, $failed) {
         })
 }
 
-function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
+# -NoManifestPrompt: skip 'show_manifest', e.g. for updates, where the old version is already
+# uninstalled by the time we get here, so declining would leave the app removed
+function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true, [Switch]$NoManifestPrompt) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
     $app_key = if ($global) { "$app (global)" } else { $app }
 
@@ -53,7 +55,7 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         return
     }
 
-    if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+    if (!$NoManifestPrompt -and (get_config SHOW_MANIFEST $false)) {
         Write-Host "Manifest: $app.json"
         $style = get_config CAT_STYLE
         if ($style) {

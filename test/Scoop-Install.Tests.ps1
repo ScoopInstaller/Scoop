@@ -353,6 +353,47 @@ Describe 'persist_def' -Tag 'Scoop' {
     }
 }
 
+Describe 'install_app show_manifest' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
+    }
+    BeforeEach {
+        Mock Get-Manifest { 'app', [PSCustomObject]@{ version = '1.0' }, 'main', $null }
+        Mock Get-SupportedArchitecture { '64bit' }
+        Mock get_config { $default }
+        Mock get_config { $true } -ParameterFilter { $name -eq 'SHOW_MANIFEST' }
+        Mock ConvertToPrettyJson { '{}' }
+        Mock Read-Host { 'n' }
+        # the first step past the prompt; stop there instead of installing for real
+        Mock ensure { throw 'reached install' }
+    }
+
+    It 'asks before installing' {
+        $failed = @{}
+        install_app 'app' '64bit' $false @{} $failed 6>$null | Out-Null
+        Should-Invoke Read-Host -Times 1 -Exactly
+        Should-Invoke ensure -Times 0 -Exactly
+        $failed['app'] | Should-Be 'skipped: installation cancelled'
+    }
+
+    It 'does not ask with -NoManifestPrompt' {
+        $failed = @{}
+        install_app 'app' '64bit' $false @{} $failed -NoManifestPrompt 6>$null | Out-Null
+        Should-Invoke Read-Host -Times 0 -Exactly
+        Should-Invoke ensure -Times 1 -Exactly
+        # install_app catches the failure and records it
+        $failed['app'] | Should-Be 'reached install'
+    }
+
+    It 'is never asked during an update' {
+        # by then the old version is uninstalled, so declining would leave the app removed
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile("$PSScriptRoot\..\lib\update.ps1", [ref]$null, [ref]$null)
+        $calls = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.CommandAst] -and $args[0].GetCommandName() -eq 'install_app' }, $true)
+        $calls | Should-BeCollection -Count 2
+        $calls | ForEach-Object { $_.Extent.Text | Should-MatchString '-NoManifestPrompt\b' }
+    }
+}
+
 Describe 'update_app' -Tag 'Scoop' {
     BeforeAll {
         . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
