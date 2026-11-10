@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+- **scoop-cache:** Delete each cached file only once ([#6773](https://github.com/ScoopInstaller/Scoop/issues/6773))
 - **scoop-checkup:** Skip Defender check when `Get-MpPreference` fails ([#6745](https://github.com/ScoopInstaller/Scoop/issues/6745))
 - **scoop-config:** Validate the proxy setting ([#6802](https://github.com/ScoopInstaller/Scoop/issues/6802))
 - **scoop-hold:** Report a held app as skipped ([#6820](https://github.com/ScoopInstaller/Scoop/issues/6820))

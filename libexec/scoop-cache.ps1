@@ -23,9 +23,9 @@ function cacheshow($app) {
     if (!$app -or $app -eq '*') {
         $app = '.*?'
     } else {
-        $app = '(' + ($app -join '|') + ')'
+        $app = '(' + (($app | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
     }
-    $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+    $files = @(Get-ChildItem -LiteralPath $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
     $files | ForEach-Object { cacheinfo $_ } | Select-Object Name, Version, Length
@@ -39,20 +39,17 @@ function cacheremove($app) {
         my_usage
         exit 1
     } elseif ($app -eq '*' -or $app -eq '-a' -or $app -eq '--all') {
-        $files = @(Get-ChildItem $cachedir)
+        $files = @(Get-ChildItem -LiteralPath $cachedir)
     } else {
-        $app = '(' + ($app -join '|') + ')'
-        $files = @(Get-ChildItem $cachedir | Where-Object -Property Name -Value "^$app#" -Match)
+        $app = '(' + (($app | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
+        # aria2 input file left by an interrupted download
+        $files = @(Get-ChildItem -LiteralPath $cachedir | Where-Object -Property Name -Value "^$app(#|\.txt$)" -Match)
     }
     $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
     $files | ForEach-Object {
-        $curr = cacheinfo $_
         Write-Host "Removing $($_.Name)..."
-        Remove-Item $_.FullName
-        if(Test-Path "$cachedir\$($curr.Name).txt") {
-            Remove-Item "$cachedir\$($curr.Name).txt"
-        }
+        Remove-Item -LiteralPath $_.FullName
     }
 
     Write-Host "Deleted: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
