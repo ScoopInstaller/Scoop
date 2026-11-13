@@ -946,6 +946,26 @@ function warn_on_overwrite($shim, $path) {
     warn "Overwriting shim ('$shimname' -> '$filename')$(if ($shim_app) { ' installed from ' + $shim_app })"
 }
 
+# Checks whether an exception indicates that a file was blocked or quarantined by antivirus software.
+# Win32 error 225 (ERROR_VIRUS_INFECTED, HResult 0x800700E1):
+# "Operation did not complete successfully because the file contains a virus or potentially unwanted software."
+# https://learn.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
+function Test-VirusBlockedError($Exception) {
+    $virusInfectedHResult = -2147024671 # 0x800700E1
+    $current = $Exception
+    while ($current) {
+        if ($current.HResult -eq $virusInfectedHResult) { return $true }
+        $current = $current.InnerException
+    }
+    return $false
+}
+
+function abort_virus_infected($name, $file, $global) {
+    # fail the install instead of reporting success with a broken shim (like chocolatey does)
+    # https://github.com/ScoopInstaller/Scoop/issues/6108
+    abort "Failed to create shim for '$name': the file '$file' was blocked or quarantined by your antivirus software (ERROR_VIRUS_INFECTED).`n  Consider adding an exclusion for '$(basedir $global)' in your antivirus software and install '$name' again."
+}
+
 function shim($path, $global, $name, $arg) {
     if (!(Test-Path $path)) { abort "Can't shim '$(fname $path)': couldn't find '$path'." }
     $abs_shimdir = ensure (shimdir $global)
@@ -963,7 +983,14 @@ function shim($path, $global, $name, $arg) {
     if ($path -match '\.(exe|com)$') {
         # for programs with no awareness of any shell
         warn_on_overwrite "$shim.shim" $path
-        Copy-Item (get_shim_path) "$shim.exe" -Force
+        try {
+            Copy-Item (get_shim_path) "$shim.exe" -Force -ErrorAction Stop
+        } catch {
+            if (Test-VirusBlockedError $_.Exception) {
+                abort_virus_infected $name "$shim.exe" $global
+            }
+            throw
+        }
 
         $rewrote_path = $resolved_path
 
@@ -994,6 +1021,15 @@ function shim($path, $global, $name, $arg) {
             # we only want to make shims GUI
             Write-Output "Making $shim.exe a GUI binary."
             Set-PESubsystem "$shim.exe" $target_subsystem | Out-Null
+        }
+
+        # antivirus software (e.g. Windows Defender) may detect the shim as a virus or
+        # potentially unwanted software and quarantine it as soon as it is written;
+        # previously this failed silently with null-valued expression errors and
+        # scoop reported a successful install with a broken shim
+        $shim_file = Get-Item "$shim.exe" -ErrorAction SilentlyContinue
+        if (!$shim_file -or $shim_file.Length -le 0) {
+            abort_virus_infected $name "$shim.exe" $global
         }
     } elseif ($path -match '\.(bat|cmd)$') {
         # shim .bat, .cmd so they can be used by programs with no awareness of PSH

@@ -142,6 +142,72 @@ Describe 'movedir' -Tag 'Scoop', 'Windows' {
     }
 }
 
+Describe 'abort_defender_detected' -Tag 'Scoop', 'Windows' {
+    BeforeAll {
+        $av_base = Join-Path ([IO.Path]::GetTempPath()) 'scoop-defender-test'
+        Mock Get-Service { [pscustomobject]@{ Status = [System.ServiceProcess.ServiceControllerStatus]::Running } } -ParameterFilter { $Name -eq 'WinDefend' }
+        Mock abort { throw 'aborted' }
+    }
+
+    It 'does not abort for a detection in a sibling version directory' {
+        # sibling version directory (1.2 vs 1.2.1) must not trigger a false positive
+        Mock Get-CimInstance {
+            [pscustomobject]@{
+                InitialDetectionTime = (Get-Date)
+                Resources = @("file:_$av_base\apps\cmdow\1.2.1\bin\cmdow.exe")
+            }
+        }
+        { abort_defender_detected 'cmdow' "$av_base\apps\cmdow\1.2" (Get-Date).AddMinutes(-5) $false } | Should -Not -Throw
+        Should -Invoke -CommandName abort -Times 0
+    }
+
+    It 'does not abort for a detection older than the install start' {
+        Mock Get-CimInstance {
+            [pscustomobject]@{
+                InitialDetectionTime = (Get-Date).AddHours(-1)
+                Resources = @("file:_$av_base\apps\cmdow\1.2\bin\cmdow.exe")
+            }
+        }
+        { abort_defender_detected 'cmdow' "$av_base\apps\cmdow\1.2" (Get-Date).AddMinutes(-5) $false } | Should -Not -Throw
+        Should -Invoke -CommandName abort -Times 0
+    }
+
+    It 'aborts for a detection inside the install directory' {
+        Mock Get-CimInstance {
+            [pscustomobject]@{
+                InitialDetectionTime = (Get-Date)
+                Resources = @("file:_$av_base\apps\cmdow\1.2\bin\cmdow.exe")
+            }
+        }
+        { abort_defender_detected 'cmdow' "$av_base\apps\cmdow\1.2" (Get-Date).AddMinutes(-5) $false } | Should -Throw 'aborted'
+    }
+}
+
+Describe 'Test-VirusBlockedError' -Tag 'Scoop' {
+    It 'detects ERROR_VIRUS_INFECTED (0x800700E1) on the exception itself' {
+        $exception = [System.IO.IOException]::new('blocked')
+        $exception.HResult = 0x800700E1
+        Test-VirusBlockedError $exception | Should -BeTrue
+    }
+
+    It 'detects ERROR_VIRUS_INFECTED on an inner exception' {
+        $inner = [System.IO.IOException]::new('blocked')
+        $inner.HResult = 0x800700E1
+        $exception = [System.InvalidOperationException]::new('outer', $inner)
+        Test-VirusBlockedError $exception | Should -BeTrue
+    }
+
+    It 'returns false for unrelated errors' {
+        $exception = [System.IO.IOException]::new('sharing violation')
+        $exception.HResult = 0x80070020
+        Test-VirusBlockedError $exception | Should -BeFalse
+    }
+
+    It 'returns false for null' {
+        Test-VirusBlockedError $null | Should -BeFalse
+    }
+}
+
 Describe 'shim' -Tag 'Scoop', 'Windows' {
     BeforeAll {
         $working_dir = setup_working 'shim'
@@ -169,6 +235,38 @@ Describe 'shim' -Tag 'Scoop', 'Windows' {
         shim "$working_dir\user with 'quote\shim-test.ps1" $false 'shim-test'
         { Get-Command 'shim-test' -ea stop } | Should -Not -Throw
         shim-test | Should -Be 'Hello, world!'
+    }
+
+    It 'aborts when the shim exe is quarantined by antivirus' {
+        # dummy file, the content is never parsed as a PE because Get-PEMachine is mocked
+        Set-Content "$working_dir\shim-test-av.exe" 'dummy'
+        # don't rely on a real scoop installation for the shim template
+        Mock get_shim_path { "$env:SystemRoot\System32\where.exe" }
+        # simulate antivirus software quarantining the shim right after it is written
+        Mock Get-PEMachine {
+            Remove-Item $filePath -Force -ErrorAction SilentlyContinue
+            return 0
+        }
+        Mock abort { throw 'aborted' }
+
+        { shim "$working_dir\shim-test-av.exe" $false 'shim-test-av' } | Should -Throw 'aborted'
+        Should -Invoke -CommandName abort -Times 1 -ParameterFilter { $msg -like '*antivirus*' }
+
+        Remove-Item "$working_dir\shim-test-av.exe" -Force -ErrorAction SilentlyContinue
+        Remove-Item "$shimdir\shim-test-av.*" -Force -ErrorAction SilentlyContinue
+    }
+
+    It 'rethrows unrelated shim copy failures instead of blaming antivirus' {
+        # dummy target file, the shim template does not exist so Copy-Item fails
+        Set-Content "$working_dir\shim-test-copyfail.exe" 'dummy'
+        Mock get_shim_path { "$working_dir\nonexistent-shim-template.exe" }
+        Mock abort { throw 'aborted' }
+
+        { shim "$working_dir\shim-test-copyfail.exe" $false 'shim-test-copyfail' } | Should -Throw '*nonexistent-shim-template*'
+        Should -Invoke -CommandName abort -Times 0 -ParameterFilter { $msg -like '*antivirus*' }
+
+        Remove-Item "$working_dir\shim-test-copyfail.exe" -Force -ErrorAction SilentlyContinue
+        Remove-Item "$shimdir\shim-test-copyfail.*" -Force -ErrorAction SilentlyContinue
     }
 
     AfterEach {
