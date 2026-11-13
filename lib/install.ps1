@@ -24,6 +24,8 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         $check_hash = $false
     }
 
+    $install_start = Get-Date
+
     $architecture = Get-SupportedArchitecture $manifest $architecture
     if ($null -eq $architecture) {
         error "'$app' doesn't support current architecture!"
@@ -50,7 +52,15 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $persist_dir = persistdir $app $global
 
     $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
+    try {
+        Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
+    } catch {
+        # antivirus software may have interfered with the extraction (e.g. Windows Defender
+        # quarantining the extracted files mid-extraction); tell the user instead of
+        # surfacing a cryptic archive error
+        abort_defender_detected $app $dir $install_start $global
+        throw
+    }
     Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
     Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
@@ -67,6 +77,7 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     persist_permission $manifest $global
 
     Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
+    abort_defender_detected $app $original_dir $install_start $global
 
     # save info for uninstall
     save_installed_manifest $app $bucket $dir $url
@@ -189,7 +200,36 @@ function create_shims($manifest, $dir, $global, $arch) {
         if (!$bin) { abort "Can't shim '$target': File doesn't exist." }
 
         shim $bin $global $name (substitute $arg @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir })
+
+        # antivirus software may have quarantined the executable right after it was extracted
+        # (e.g. Windows Defender blocking 'cmdow'), previously this made scoop report
+        # a successful install with a shim pointing to a missing file
+        if (!(Test-Path $bin -PathType Leaf)) {
+            abort_virus_infected $name $bin $global
+        }
     }
+}
+
+# Windows Defender may detect app files as a virus or potentially unwanted software
+# during the installation and quarantine them, which previously made scoop report
+# a successful install with missing or broken files
+# (https://github.com/ScoopInstaller/Scoop/issues/6108).
+# Defender logs the detection immediately, while the actual quarantining (removal of
+# the files) can happen seconds to minutes later, so file existence checks are not
+# enough to catch it; query the detections for the install directory instead.
+function abort_defender_detected($app, $dir, $since, $global) {
+    $defender = Get-Service -Name WinDefend -ErrorAction SilentlyContinue
+    if (!$defender -or ($defender.Status -ne [System.ServiceProcess.ServiceControllerStatus]::Running)) { return }
+
+    $detections = Get-CimInstance -Namespace 'root/microsoft/windows/defender' -ClassName 'MSFT_MpThreatDetection' -ErrorAction SilentlyContinue |
+        Where-Object { $_.InitialDetectionTime -gt $since -and ($_.Resources | Where-Object { is_in_dir $dir ($_ -replace '^\w+:_', '') }) }
+    if (!$detections) { return }
+
+    $files = @($detections | ForEach-Object { $_.Resources } |
+        ForEach-Object { $_ -replace '^\w+:_', '' } |
+        Where-Object { is_in_dir $dir $_ } |
+        Select-Object -Unique)
+    abort "'$app' was NOT installed successfully: Windows Defender detected the following files as a virus or potentially unwanted software during the installation and quarantined them:`n  $($files -join "`n  ")`n  Consider adding an exclusion for '$(basedir $global)' in your antivirus software and install '$app' again."
 }
 
 function rm_shim($name, $shimdir, $app) {

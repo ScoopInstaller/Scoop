@@ -260,4 +260,23 @@ Describe 'Decompression function' -Tag 'Scoop', 'Windows', 'Decompress' {
             $test | Should -Not -Exist
         }
     }
+
+    Context 'extraction failures' {
+
+        BeforeAll {
+            # the failure messages reference new_issue_msg, which lives in buckets.ps1
+            . "$PSScriptRoot\..\lib\buckets.ps1"
+        }
+
+        It 'throws (instead of exiting the process) when extraction fails, so the caller can handle it' {
+            Mock new_issue_msg { '' }
+            # 7zip is not installed in the test environment; without this the mock proxy
+            # of Invoke-ExternalCommand fails on ValidateNotNullOrEmpty for $FilePath
+            Mock Get-HelperPath { 'C:\fake\7z.exe' }
+            Mock Invoke-ExternalCommand { $false }
+
+            { Expand-7zipArchive "$working_dir\does-not-exist.zip" } | Should -Throw 'Failed to extract files from*'
+            Should -Invoke -CommandName Invoke-ExternalCommand -Times 1
+        }
+    }
 }
