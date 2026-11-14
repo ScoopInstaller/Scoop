@@ -324,6 +324,10 @@
                             "description": "Allows rearrange the regexp matches",
                             "type": "string"
                         },
+                        "skipdowngrade": {
+                            "description": "Skip downgrade to an older detected version",
+                            "type": "boolean"
+                        },
                         "useragent": {
                             "type": "string"
                         },
