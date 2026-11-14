@@ -7,8 +7,8 @@ function nightly_version($quiet = $false) {
 
 function failed_deps($manifest, $failed) {
     @($manifest.depends | Where-Object { $_ } | ForEach-Object { (parse_app $_)[0] } | Where-Object {
-            ($failed[$_] -and $failed[$_] -notlike 'skipped:*') -or
-            ($failed["$_ (global)"] -and $failed["$_ (global)"] -notlike 'skipped:*')
+            ($failed[$_] -and $failed[$_] -notmatch '^(skipped|blocked): ') -or
+            ($failed["$_ (global)"] -and $failed["$_ (global)"] -notmatch '^(skipped|blocked): ')
         })
 }
 
@@ -451,16 +451,17 @@ function ensure_none_failed($apps) {
 
 function show_failed_apps($failed, $action = 'install') {
     if (!$failed -or $failed.Count -eq 0) { return 0 }
-    $errors = @($failed.Keys | Where-Object { $failed[$_] -notlike 'skipped:*' } | Sort-Object)
-    $skipped = @($failed.Keys | Where-Object { $failed[$_] -like 'skipped:*' } | Sort-Object)
+    $errors = @($failed.Keys | Where-Object { $failed[$_] -notmatch '^(skipped|blocked): ' } | Sort-Object)
+    $skipped = @($failed.Keys | Where-Object { $failed[$_] -match '^(skipped|blocked): ' } | Sort-Object)
+    $blocked = @($skipped | Where-Object { $failed[$_] -match '^blocked: ' })
     if ($errors.Count -gt 0) {
         error "Failed to $action`: $((@($errors | ForEach-Object { "$_ ($($failed[$_]))" })) -join ', ')"
     }
     if ($skipped.Count -gt 0) {
-        info "Skipped $action`: $((@($skipped | ForEach-Object { "$_ ($($failed[$_] -replace '^skipped: ', ''))" })) -join ', ')"
+        info "Skipped $action`: $((@($skipped | ForEach-Object { "$_ ($($failed[$_] -replace '^(skipped|blocked): ', ''))" })) -join ', ')"
     }
-    # skipped apps are reported but not counted as failures
-    return $errors.Count
+    # a blocked app is reported as skipped but still fails the command
+    return $errors.Count + $blocked.Count
 }
 
 function show_suggestions($suggested) {
@@ -599,18 +600,11 @@ function test_running_process($app, $global) {
     $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" } | Out-String
 
     if ($running_processes) {
-        if (get_config IGNORE_RUNNING_PROCESSES) {
-            warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
-            Write-Host $running_processes
-            return $false
-        } else {
-            error "The following instances of `"$app`" are still running. Close them and try again."
-            Write-Host $running_processes
-            return $true
-        }
-    } else {
-        return $false
+        error "The following instances of `"$app`" are still running. Close them and try again."
+        Write-Host $running_processes
+        return $true
     }
+    return $false
 }
 
 # wrapper function to create junction links

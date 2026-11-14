@@ -18,6 +18,7 @@
 $opt, $apps, $err = getopt $args 'a' 'all'
 if($err) { error "scoop reset: $err"; exit 1 }
 $all = $opt.a -or $opt.all
+$failed = @{}
 
 if(!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
 
@@ -70,11 +71,11 @@ $apps | ForEach-Object {
     $original_dir = $dir
     $persist_dir = persistdir $app $global
 
-    #region Workaround for #2952
     if (test_running_process $app $global) {
+        Write-Host 'Running process detected, skip resetting.'
+        $failed[$app] = 'blocked: running process'
         return
     }
-    #endregion Workaround for #2952
 
     $install = install_info $app $version $global
     $architecture = $install.architecture
@@ -86,4 +87,6 @@ $apps | ForEach-Object {
     link_app $manifest $dir $original_dir $persist_dir $global $architecture
 }
 
-exit 0
+$failed_count = show_failed_apps $failed 'reset'
+
+exit [int]($failed_count -gt 0)

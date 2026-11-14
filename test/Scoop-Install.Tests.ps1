@@ -77,9 +77,9 @@ Describe 'install_app' -Tag 'Scoop' {
         $failed['bar'] | Should-Be 'dependency failed: foo'
     }
 
-    It 'should ignore a dependency that was only skipped' {
-        $manifest = [PSCustomObject]@{ depends = @('foo', 'extras/bar') }
-        $failed = @{ 'foo' = 'skipped: running process'; 'bar (global)' = 'download failed' }
+    It 'should ignore a dependency that was only skipped or blocked' {
+        $manifest = [PSCustomObject]@{ depends = @('foo', 'baz', 'extras/bar') }
+        $failed = @{ 'foo' = 'skipped: held to version 1.0'; 'baz' = 'blocked: running process'; 'bar (global)' = 'download failed' }
 
         $deps = failed_deps $manifest $failed
 
@@ -255,11 +255,30 @@ Describe 'show_failed_apps' -Tag 'Scoop' {
         Mock error {}
         Mock info {}
 
-        $failed_count = show_failed_apps @{ 'foo' = 'skipped: running process'; 'bar' = 'reason' }
+        $failed_count = show_failed_apps @{ 'foo' = 'skipped: held to version 1.0'; 'bar' = 'reason' }
 
         Should-Invoke error -Times 1 -ParameterFilter { $msg -like '*bar (reason)*' }
+        Should-Invoke info -Times 1 -ParameterFilter { $msg -like '*foo (held to version 1.0)*' }
+        $failed_count | Should-Be 1
+    }
+
+    It 'should count blocked apps towards the exit code' {
+        Mock error {}
+        Mock info {}
+
+        $failed_count = show_failed_apps @{ 'foo' = 'blocked: running process' } 'update'
+
         Should-Invoke info -Times 1 -ParameterFilter { $msg -like '*foo (running process)*' }
         $failed_count | Should-Be 1
+    }
+
+    It 'should not count apps that were skipped on purpose' {
+        Mock error {}
+        Mock info {}
+
+        $failed_count = show_failed_apps @{ 'foo' = 'skipped: held to version 1.0' } 'update'
+
+        $failed_count | Should-Be 0
     }
 }
 
@@ -391,15 +410,21 @@ Describe 'persist_def' -Tag 'Scoop' {
 Describe 'update_app' -Tag 'Scoop' {
     BeforeAll {
         . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+        . "$PSScriptRoot\..\lib\download.ps1" # 'Test-Aria2Enabled', 'Invoke-CachedAria2Download'
+        . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
     }
     BeforeEach {
         Mock Select-CurrentVersion { '3.24.0' }
-        Mock test_running_process { $true }
+        Mock test_running_process { $app -eq 'foo' }
+        Mock get_config { $default }
         Mock Write-Host {}
         Mock warn {}
-        Mock install_info { [PSCustomObject]@{ architecture = '64bit'; url = (usermanifest 'foo') } }
+        Mock install_info { [PSCustomObject]@{ architecture = '64bit'; url = (usermanifest $app) } }
         Mock manifest { [PSCustomObject]@{ version = '3.24.0' } }
         Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1' }, 'extras' }
+        Mock Test-Aria2Enabled { $true }
+        Mock Invoke-CachedAria2Download { $true }
+        Mock install_app {}
     }
 
     It 'keeps the version of an app installed from an auto-generated manifest' {
@@ -417,6 +442,50 @@ Describe 'update_app' -Tag 'Scoop' {
 
         Should-Invoke -CommandName Write-Host -Times 1 -ParameterFilter { $Object -like '*3.24.0 -> 3.24.1*' }
         Should-Invoke -CommandName Find-AppBucket -Times 1
+    }
+
+    It 'downloads the new version before it skips a running app' {
+        $failed = @{}
+        update_app 'foo' $false $true $true $false @{} $failed
+
+        Should-Invoke -CommandName Invoke-CachedAria2Download -Times 1
+        Should-Invoke -CommandName install_app -Times 0
+        $failed['foo'] | Should-Be 'blocked: running process, the new version was downloaded'
+    }
+
+    It 'should skip a running app before downloading when it is configured' {
+        Mock get_config { if ($name -eq 'download_while_running') { $false } else { $default } }
+        $failed = @{}
+        update_app 'foo' $false $true $true $false @{} $failed
+
+        Should-Invoke -CommandName Invoke-CachedAria2Download -Times 0
+        $failed['foo'] | Should-Be 'blocked: running process'
+    }
+}
+
+Describe 'update_apps' -Tag 'Scoop' {
+    It 'should keep updating the other apps when one of them is blocked' {
+        Mock update_app { if ($app -eq 'foo') { $failed['foo'] = 'blocked: running process' } }
+        Mock error {}
+        Mock info {}
+        $failed = @{}
+
+        update_apps @(@('foo', $false), @('bar', $false)) $false $false $false @{} $failed
+
+        Should-Invoke update_app -Times 2
+        show_failed_apps $failed 'update' | Should-Be 1
+    }
+
+    It 'should keep updating the other apps when one of them aborts' {
+        Mock update_app { if ($app -eq 'foo') { abort 'hook failed' } }
+        Mock error {}
+        $failed = @{}
+
+        update_apps @(@('foo', $false), @('bar', $false)) $false $false $false @{} $failed
+
+        $failed['foo'] | Should-Be 'hook failed'
+        Should-Invoke update_app -Times 2
+        show_failed_apps $failed 'update' | Should-Be 1
     }
 }
 Describe 'Invoke-HookScript' -Tag 'Scoop' {

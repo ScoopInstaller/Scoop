@@ -72,11 +72,11 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
             continue
         }
 
-        #region Workaround for #2952
         if (test_running_process $app $global) {
+            Write-Host 'Running process detected, skip uninstalling.'
+            $failed[$app] = 'blocked: running process'
             continue
         }
-        #endregion Workaround for #2952
 
         try {
             Test-Path $dir -ErrorAction Stop | Out-Null
