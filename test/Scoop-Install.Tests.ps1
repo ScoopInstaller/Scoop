@@ -729,6 +729,18 @@ Describe 'update_app' -Tag 'Scoop' {
         $failed['foo'] | Should-Be 'unsupported architecture'
     }
 
+    It 'updates the app when its pre_uninstall hook stopped it' {
+        $script:hookRan = $false
+        Mock Invoke-HookScript { $script:hookRan = $true }
+        Mock test_running_process { -not $script:hookRan }
+        $failed = @{}
+
+        update_app 'foo' $false $true $false $true @{} $failed
+
+        Should-Invoke -CommandName install_version -Times 1
+        $failed.Count | Should-Be 0
+    }
+
     It 'does not remove the old version when the extraction fails' {
         Mock Invoke-Extraction { throw 'archive is broken' }
         $failed = @{}
