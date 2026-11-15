@@ -280,7 +280,6 @@ Describe 'New-Shim' -Tag 'Scoop', 'Windows' {
     }
 
     It 'names the target it could not find' {
-        Mock abort { throw $msg }
         { New-Shim "$working_dir\no-such.ps1" $false 'x' } | Should-Throw "*Can't shim 'no-such.ps1'*"
     }
 
@@ -461,17 +460,13 @@ Describe 'shim names with wildcard characters' -Tag 'Scoop', 'Windows' {
 
     It 'aborts with a friendly message when the shim target is not on PATH' {
         Mock New-Shim {}
-        $aborted = @{}
-        Mock abort { $aborted.Message = $msg; throw $msg }
 
         $dir = Join-Path $TestDrive 'missing'
         $null = [IO.Directory]::CreateDirectory($dir)
 
         # A caller with $ErrorActionPreference = 'Stop' must still reach the abort below, not a raw Get-Command error.
         { $ErrorActionPreference = 'Stop'; New-ShimFromManifest @{ bin = 'scoop-nonexistent-command' } $dir $false $null } |
-            Should-Throw
-
-        $aborted.Message | Should-Be "Can't shim 'scoop-nonexistent-command': File doesn't exist."
+            Should-Throw "*Can't shim 'scoop-nonexistent-command': File doesn't exist.*"
     }
 
     It 'resolves a bin target from $original_dir when it is not under $dir or on PATH' {

@@ -269,10 +269,8 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         Mock Invoke-AutoUpdate { throw 'fail' }
         Mock warn {}
         Mock info {}
-        Mock abort { throw 'aborted' }
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
         $p | Should-BeNull
-        Should-Invoke -CommandName abort -Times 0
     }
 
     It 'aborts when no history and no autoupdate' {
@@ -282,7 +280,6 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
 
         Mock warn {}
         Mock info {}
-        Mock abort { throw 'aborted' }
         { generate_user_manifest 'foo' 'main' '1.0.0' } | Should-Throw
     }
 }

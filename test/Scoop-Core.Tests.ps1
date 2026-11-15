@@ -577,3 +577,14 @@ Describe 'app_status' -Tag 'Scoop' {
         Should-Invoke -CommandName Find-AppBucket -Times 0
     }
 }
+Describe 'abort' -Tag 'Scoop' {
+    It 'should throw instead of ending the process' {
+        { abort 'boom' } | Should-Throw '*boom*'
+    }
+
+    It 'should carry the exit code' {
+        $code = $null
+        try { abort 'boom' 7 } catch { $code = $_.Exception.Data['ExitCode'] }
+        $code | Should-Be 7
+    }
+}

@@ -24,4 +24,23 @@ Describe 'bin/scoop.ps1' -Tag 'Scoop', 'Windows' {
         $code | Should-Be 0
         ($output -match 'zzz-fake-output') | Should-BeTrue
     }
+
+    It 'exits with the code of a command that aborted' {
+        $root = Join-Path $TestDrive 'scoop-root-abort'
+        $shim_dir = Join-Path $root 'shims'
+        New-Item -ItemType Directory -Path $shim_dir -Force | Out-Null
+        [IO.File]::WriteAllText((Join-Path $shim_dir 'scoop-fake.ps1'), "`$e = [System.Exception]::new('aborted by the command')`r`n`$e.Data['ExitCode'] = 7`r`nthrow `$e")
+
+        $old_scoop = $env:SCOOP
+        $env:SCOOP = $root
+        try {
+            $output = & $shell_exe -NoProfile -ExecutionPolicy Bypass -File "$repo_root\bin\scoop.ps1" fake 2>&1 | Out-String
+            $code = $LASTEXITCODE
+        } finally {
+            $env:SCOOP = $old_scoop
+        }
+
+        $code | Should-Be 7
+        ($output -match 'aborted by the command') | Should-BeTrue
+    }
 }

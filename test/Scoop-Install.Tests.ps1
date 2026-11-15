@@ -8,6 +8,8 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\shim.ps1"
     . "$PSScriptRoot\..\lib\install.ps1"
     . "$PSScriptRoot\..\lib\update.ps1"
+    . "$PSScriptRoot\..\lib\download.ps1" # 'Invoke-ScoopDownload'
+    . "$PSScriptRoot\..\lib\decompress.ps1" # 'Invoke-Extraction'
 }
 
 Describe 'appname_from_url' -Tag 'Scoop' {
@@ -28,6 +30,39 @@ Describe 'install_app' -Tag 'Scoop' {
         Should-Invoke error -Times 1 -ParameterFilter { $msg -like "*doesn't support current architecture*" }
         $failed.Keys | Should-BeCollection -Count 1
         $failed['foo'] | Should-Be 'unsupported architecture'
+    }
+
+    It 'should report the failure and keep installing the other apps when a hook aborts' {
+        Mock Get-Manifest {
+            if ($app -eq 'foo') {
+                'foo', [PSCustomObject]@{ version = '1.0'; pre_install = 'abort "hook failed"' }, 'main', $null
+            } else {
+                'bar', [PSCustomObject]@{ version = '1.0' }, 'main', $null
+            }
+        }
+        Mock Get-SupportedArchitecture { '64bit' }
+        Mock ensure { 'C:\fake\1.0' }
+        Mock Invoke-ScoopDownload { 'foo.zip' }
+        Mock Invoke-Extraction {}
+        Mock Invoke-Installer { $true }
+        Mock ensure_install_dir_not_in_path {}
+        Mock link_current { 'C:\fake\current' }
+        Mock link_app {}
+        Mock save_installed_manifest {}
+        Mock save_install_info {}
+        Mock show_notes {}
+        Mock success {}
+        Mock error {}
+        Mock Write-Host {}
+        $failed = @{}
+
+        install_app 'foo' '64bit' $false @{} $failed
+        install_app 'bar' '64bit' $false @{} $failed
+
+        $failed.Keys | Should-BeCollection @('foo')
+        $failed['foo'] | Should-Be 'hook failed'
+        Should-Invoke Invoke-Installer -Times 1 -ParameterFilter { $AppName -eq 'bar' }
+        show_failed_apps $failed 'install' | Should-Be 1
     }
 
     It 'should skip an app whose dependency failed' {
@@ -382,5 +417,13 @@ Describe 'update_app' -Tag 'Scoop' {
 
         Should-Invoke -CommandName Write-Host -Times 1 -ParameterFilter { $Object -like '*3.24.0 -> 3.24.1*' }
         Should-Invoke -CommandName Find-AppBucket -Times 1
+    }
+}
+Describe 'Invoke-HookScript' -Tag 'Scoop' {
+    It 'should fail the hook instead of the whole run when it aborts' {
+        Mock Write-Host {}
+        $manifest = [PSCustomObject]@{ pre_install = 'abort "hook failed"' }
+
+        { Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture '64bit' } | Should-Throw '*hook failed*'
     }
 }

@@ -65,7 +65,6 @@ Describe 'config' -Tag 'Scoop' {
             }
 
             It 'rejects an unsupported scheme and keeps the stored value' {
-                Mock abort { throw $msg }
                 $scoopConfig = set_config 'proxy' '10.0.0.1:8080'
 
                 { set_config 'proxy' 'ftp://10.0.0.1:8080' } | Should-Throw '*ftp://*'

@@ -36,7 +36,13 @@ function exec($cmd, $arguments) {
     $cmd_path = command_path $cmd
 
     $global:LASTEXITCODE = 0
-    & $cmd_path @arguments
+    try {
+        & $cmd_path @arguments
+    } catch {
+        if ($null -eq $_.Exception.Data['ExitCode']) { throw }
+        Write-Host $_.Exception.Message -ForegroundColor red
+        $global:LASTEXITCODE = $_.Exception.Data['ExitCode']
+    }
 }
 
 ## Functions for aliases

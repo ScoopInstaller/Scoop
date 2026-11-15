@@ -265,7 +265,11 @@ function is_admin {
 }
 
 # messages
-function abort($msg, [int] $exit_code = 1) { Write-Host $msg -f red; exit $exit_code }
+function abort($msg, [int] $exit_code = 1) {
+    $e = [System.Exception]::new($msg)
+    $e.Data['ExitCode'] = $exit_code
+    throw $e
+}
 function error($msg) { Write-Host "ERROR $msg" -f darkred }
 function warn($msg) { Write-Host "WARN  $msg" -f darkyellow }
 function info($msg) { Write-Host "INFO  $msg" -f darkgray }

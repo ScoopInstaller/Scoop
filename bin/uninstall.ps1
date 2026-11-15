@@ -45,7 +45,7 @@ function do_uninstall($app, $global) {
 
     Write-Output "Uninstalling '$app'"
     if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-        abort "Couldn't uninstall '$app'."
+        error "Couldn't uninstall '$app'."; exit 1
     }
     Remove-ShimFromManifest $app $manifest $global $architecture
 
@@ -70,7 +70,7 @@ function rm_dir($dir) {
     try {
         Remove-Item $dir -Recurse -Force -ErrorAction Stop
     } catch {
-        abort "Couldn't remove $(friendly_path $dir): $_"
+        error "Couldn't remove $(friendly_path $dir): $_"; exit 1
     }
 }
 
@@ -92,7 +92,7 @@ installed_apps $false | ForEach-Object { # local apps
 }
 
 if ($errors) {
-    abort 'Not all apps could be deleted. Try again or restart.'
+    error 'Not all apps could be deleted. Try again or restart.'; exit 1
 }
 
 if ($purge) {
