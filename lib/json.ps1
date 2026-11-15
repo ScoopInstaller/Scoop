@@ -132,7 +132,7 @@ function json_path_legacy([String] $json, [String] $jsonpath, [Hashtable] $subst
     $jsonpath.split('.') | ForEach-Object {
         $el = $_
 
-        # substitute the basename and version varibales into the jsonpath
+        # substitute the basename and version variables into the jsonpath
         if ($null -ne $substitutions) {
             $el = substitute $el $substitutions
         }

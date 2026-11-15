@@ -52,11 +52,9 @@ function Invoke-Extraction {
                 DestinationPath = Join-Path $Path $extractTo[$extracted]
                 ExtractDir      = $extractDir[$extracted]
             }
-            Write-Host 'Extracting ' -NoNewline
-            Write-Host $(url_remote_filename $uri[$i]) -ForegroundColor Cyan -NoNewline
-            Write-Host ' ... ' -NoNewline
+            Write-Host "Extracting $([char]0x1b)[36m$(url_remote_filename $uri[$i])$([char]0x1b)[0m... " -NoNewline
             & $extractFn @fnArgs -Removal
-            Write-Host 'done.' -ForegroundColor Green
+            Write-Host 'Done.' -ForegroundColor Green
             $extracted++
         }
     }
@@ -134,10 +132,10 @@ function Expand-7zipArchive {
     }
     if ($Removal) {
         if (($Path -replace '.*\.([^\.]*)$', '$1') -eq '001') {
-            # Remove splitted 7-zip archive parts
+            # Remove split 7-zip archive parts
             Get-ChildItem "$($Path -replace '\.[^\.]*$', '').???" | Remove-Item -Force
         } elseif (($Path -replace '.*\.part(\d+)\.rar$', '$1')[-1] -eq '1') {
-            # Remove splitted RAR archive parts
+            # Remove split RAR archive parts
             Get-ChildItem "$($Path -replace '\.part(\d+)\.rar$', '').part*.rar" | Remove-Item -Force
         } else {
             # Remove original archive file

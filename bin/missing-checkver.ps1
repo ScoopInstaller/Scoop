@@ -3,7 +3,7 @@
     Check if manifest contains checkver and autoupdate property.
 .PARAMETER App
     Manifest name.
-    Wirldcard is supported.
+    Wildcard is supported.
 .PARAMETER Dir
     Location of manifests.
 .PARAMETER SkipSupported

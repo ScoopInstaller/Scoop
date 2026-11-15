@@ -27,17 +27,17 @@ function print_summaries {
 
 $commands = commands
 
-if(!($cmd)) {
+if (!($cmd)) {
     Write-Host "Usage: scoop <command> [<args>]
 
 Available commands are listed below.
 
 Type 'scoop help <command>' to get more help for a specific command."
     print_summaries
-} elseif($commands -contains $cmd) {
+} elseif ($commands -contains $cmd) {
     print_help $cmd
 } else {
-    warn "scoop help: no such command '$cmd'"
+    error "scoop help: no such command '$cmd'"
     exit 1
 }
 

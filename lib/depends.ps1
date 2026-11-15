@@ -15,7 +15,7 @@ function Get-Dependency {
         List of app's dependencies
     .NOTES
         When pipeline input is used, the output will have duplicate items, and should be filtered by 'Select-Object -Unique'.
-        ALgorithm: http://www.electricmonk.nl/docs/dependency_resolving_algorithm/dependency_resolving_algorithm.html
+        Algorithm: http://www.electricmonk.nl/docs/dependency_resolving_algorithm/dependency_resolving_algorithm.html
     #>
     [CmdletBinding()]
     [OutputType([Object[]])]
