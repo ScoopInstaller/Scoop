@@ -207,6 +207,32 @@ function Find-HistoricalManifestInCache($app, $bucket, $requestedVersion) {
     return @{ ManifestText = $manifestText; version = $manifestVersion; source = "sqlite_exact_match" }
 }
 
+function Get-HistoricalManifestCommitBatch($BucketDir, $RelativeManifestPath, $Pickaxe, $Value, $Limit) {
+    $argumentList = @('log', '--follow', '--format=%H', $Pickaxe, $Value, '--', $RelativeManifestPath)
+    if ($Limit -gt 0) {
+        $argumentList = @('log', '--follow', '-n', "$Limit", '--format=%H', $Pickaxe, $Value, '--', $RelativeManifestPath)
+    }
+    $out = Invoke-Git -Path $BucketDir -ArgumentList $argumentList
+    return @($out | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+}
+
+function Get-HistoricalManifestFromCommits($BucketDir, $RelativeManifestPath, $Commits, $RequestedVersion) {
+    foreach ($h in $Commits) {
+        foreach ($spec in @("$h^", "$h")) {
+            $content = Invoke-Git -Path $BucketDir -ArgumentList @('show', "$spec`:$RelativeManifestPath") 2>$null
+            if (-not $content) { continue }
+            if ($content -is [Array]) { $content = $content -join "`n" }
+            try {
+                $obj = $content | ConvertFrom-Json -ErrorAction Stop
+            } catch { continue }
+            if ($obj -and $obj.version -eq $RequestedVersion) {
+                return @{ ManifestText = $content; version = $RequestedVersion; source = "git_manifest:$spec" }
+            }
+        }
+    }
+    return $null
+}
+
 function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
     if (!(get_config USE_GIT_HISTORY $true)) {
         return $null
@@ -244,30 +270,32 @@ function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
 
         # Pickaxe. Regex avoids literal '"' because Windows command line strips
         # them before git sees the arg; '.' wildcards stand in for the JSON quotes.
-        $pattern = 'version.: .' + [regex]::Escape($requestedVersion)
+        # The trailing class is the right boundary: without it, a request for
+        # '5.20' also matches '5.20.1'. git -G uses a POSIX regex, so a
+        # lookahead (?!...) is not available.
+        $pattern = 'version.: .' + [regex]::Escape($requestedVersion) + '([^0-9A-Za-z._+-]|$)'
+        $limits = @(1, 20, 100, 0)
         $commits = @()
-        $outG = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '-n', '1', '--format=%H', '-G', $pattern, '--', $relativeManifestPath)
-        if ($outG) { $commits = @($outG | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
+
+        # Try the newest hit first, then widen the window only when it does not
+        # contain the exact version. This keeps the common case at one commit.
+        foreach ($limit in $limits) {
+            $commits = @(Get-HistoricalManifestCommitBatch $bucketDir $relativeManifestPath '-G' $pattern $limit)
+            if ($commits.Count -eq 0) { break }
+            $result = Get-HistoricalManifestFromCommits $bucketDir $relativeManifestPath $commits $requestedVersion
+            if ($result) { return $result }
+            if ($limit -eq 0 -or $commits.Count -lt $limit) { break }
+        }
 
         if ($commits.Count -eq 0) {
             # -S literal fallback (same Windows quoting caveat).
             $searchLiteral = 'version: ' + $requestedVersion
-            $outS = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '-n', '1', '--format=%H', '-S', $searchLiteral, '--', $relativeManifestPath)
-            if ($outS) { $commits = @($outS | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
-        }
-
-        if ($commits.Count -eq 0) { return $null }
-
-        $h = $commits[0]
-        foreach ($spec in @("$h^", "$h")) {
-            $content = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$spec`:$relativeManifestPath") 2>$null
-            if (-not $content) { continue }
-            if ($content -is [Array]) { $content = $content -join "`n" }
-            try {
-                $obj = $content | ConvertFrom-Json -ErrorAction Stop
-            } catch { continue }
-            if ($obj -and $obj.version -eq $requestedVersion) {
-                return @{ ManifestText = $content; version = $requestedVersion; source = "git_manifest:$spec" }
+            foreach ($limit in $limits) {
+                $commits = @(Get-HistoricalManifestCommitBatch $bucketDir $relativeManifestPath '-S' $searchLiteral $limit)
+                if ($commits.Count -eq 0) { break }
+                $result = Get-HistoricalManifestFromCommits $bucketDir $relativeManifestPath $commits $requestedVersion
+                if ($result) { return $result }
+                if ($limit -eq 0 -or $commits.Count -lt $limit) { break }
             }
         }
         return $null
