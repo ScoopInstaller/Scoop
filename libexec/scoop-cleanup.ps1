@@ -49,7 +49,12 @@ function cleanup($app, $global, $verbose, $cache) {
             $dir = versiondir $app $version $global
             # unlink all potential old link before doing recursive Remove-Item
             unlink_persist_data (installed_manifest $app $version $global) $dir
-            Remove-Item $dir -ErrorAction Stop -Recurse -Force
+            try {
+                Remove-Item $dir -ErrorAction Stop -Recurse -Force
+            } catch {
+                Write-Host 'Error.' -ForegroundColor DarkRed
+                $failed[$app] = 'blocked: could not remove an old version (in use)'
+            }
         }
         $leftVersions = Get-ChildItem $appDir
         if ($leftVersions.Length -eq 1 -and $leftVersions.Name -eq 'current' -and $leftVersions.LinkType) {
@@ -66,7 +71,7 @@ function cleanup($app, $global, $verbose, $cache) {
         $failed[$app] = 'could not remove an old version'
         return
     }
-    Write-Host 'Done.' -ForegroundColor Green
+    if (!$failed.ContainsKey($app)) { Write-Host 'Done.' -ForegroundColor Green }
 }
 
 if ($apps -or $all) {

@@ -339,13 +339,12 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         return
     }
 
-    #region Workaround for #2952
-    if (test_running_process $app $global) {
+    $running = test_running_process $app $global
+    if ($running -and !(get_config 'download_while_running' $true)) {
         Write-Host 'Running process detected, skip updating.'
-        $failed[$app_key] = 'skipped: running process'
+        $failed[$app_key] = 'blocked: running process'
         return
     }
-    #endregion Workaround for #2952
 
     # region Workaround
     # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
@@ -394,6 +393,12 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     # There is no need to check hash again while installing
     $check_hash = $false
     # endregion Workaround
+
+    if ($running) {
+        Write-Host 'Running process detected, skip updating.'
+        $failed[$app_key] = 'blocked: running process, the new version was downloaded'
+        return
+    }
 
     $dir = versiondir $app $old_version $global
     $persist_dir = persistdir $app $global
@@ -447,11 +452,8 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
             $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
         }
 
-        # The new version has already been downloaded (and hash-checked) above,
-        # so re-install it from the cache instead of downloading it a second time.
-        # the dependency failures live in the same table
+        # already downloaded above
         install_app $app $architecture $global $suggested $failed $true $check_hash
-        # the scope specific key keeps the other scope from restoring
         if ($failed.ContainsKey($app_key)) {
             restore_app $ctx $old_manifest $old_version $backup
         }
@@ -460,6 +462,19 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         error $_.Exception.Message
         if ($unlinked) {
             restore_app $ctx $old_manifest $old_version $backup
+        }
+    }
+}
+
+function update_apps($apps, $force, $quiet, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
+    $apps | ForEach-Object {
+        $current = $_
+        try {
+            update_app @current $force $quiet $independent $suggested $failed $use_cache $check_hash
+        } catch {
+            $key = if ($current[1]) { "$($current[0]) (global)" } else { $current[0] }
+            $failed[$key] = $_.Exception.Message
+            error $_.Exception.Message
         }
     }
 }

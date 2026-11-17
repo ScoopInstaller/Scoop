@@ -113,10 +113,10 @@
 #       installed (run `scoop install bat` to install it), otherwise errors will be thrown.
 #       The accepted values are the same as ones passed to the --style flag of 'bat'.
 #
-# ignore_running_processes: $true|$false
-#       When set to $false (default), Scoop would stop its procedure immediately if it detects
-#       any target app process is running. Procedure here refers to reset/uninstall/update.
-#       When set to $true, Scoop only displays a warning message and continues procedure.
+# download_while_running: $true|$false
+#       When set to $false, an app that is still running is skipped before its new version
+#       is downloaded. The default is $true: the download is kept in the cache, so the next
+#       'scoop update' installs the app without downloading it again.
 #
 # private_hosts:
 #       Array of private hosts that need additional authentication.
