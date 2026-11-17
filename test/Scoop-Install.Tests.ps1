@@ -10,6 +10,7 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\update.ps1"
     . "$PSScriptRoot\..\lib\download.ps1" # 'Invoke-ScoopDownload'
     . "$PSScriptRoot\..\lib\decompress.ps1" # 'Invoke-Extraction'
+    . "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
 }
 
 Describe 'appname_from_url' -Tag 'Scoop' {
@@ -19,10 +20,16 @@ Describe 'appname_from_url' -Tag 'Scoop' {
 }
 
 Describe 'install_app' -Tag 'Scoop' {
-    It 'should report the failure without aborting the batch' {
+    BeforeEach {
+        $script:appdir = Join-Path $TestDrive ([guid]::NewGuid())
+        Mock versiondir { "$script:appdir\$version" }
         Mock Get-Manifest { 'foo', [PSCustomObject]@{ version = '1.0' }, 'main', $null }
-        Mock Get-SupportedArchitecture { $null }
+        Mock Get-SupportedArchitecture { '64bit' }
         Mock error {}
+    }
+
+    It 'should report the failure without aborting the batch' {
+        Mock Get-SupportedArchitecture { $null }
         $failed = @{}
 
         install_app 'foo' '64bit' $false @{} $failed
@@ -41,8 +48,7 @@ Describe 'install_app' -Tag 'Scoop' {
             }
         }
         Mock Get-SupportedArchitecture { '64bit' }
-        Mock ensure { 'C:\fake\1.0' }
-        Mock Invoke-ScoopDownload { 'foo.zip' }
+        Mock Invoke-ScoopDownload { @('foo.zip') }
         Mock Invoke-Extraction {}
         Mock Invoke-Installer { $true }
         Mock ensure_install_dir_not_in_path {}
@@ -65,6 +71,21 @@ Describe 'install_app' -Tag 'Scoop' {
         show_failed_apps $failed 'install' | Should-Be 1
     }
 
+    It 'should record a failed extraction under the app name' {
+        Mock Get-Manifest { 'foo', [PSCustomObject]@{ version = '1.0' }, 'main', $null }
+        Mock Get-SupportedArchitecture { '64bit' }
+        Mock Invoke-ScoopDownload { @('foo.zip') }
+        Mock Invoke-Extraction { throw 'archive is broken' }
+        Mock error {}
+        $failed = @{}
+
+        install_app 'foo' '64bit' $false @{} $failed
+
+        $failed['foo'] | Should-Be 'archive is broken'
+        failed_deps ([PSCustomObject]@{ depends = @('foo') }) $failed | Should-BeCollection @('foo')
+        Test-Path "$script:appdir\1.0\.scoop-extracted" | Should-BeFalse
+    }
+
     It 'should skip an app whose dependency failed' {
         Mock Get-Manifest { 'bar', [PSCustomObject]@{ version = '1.0'; depends = @('foo') }, 'main', $null }
         Mock Get-SupportedArchitecture { '64bit' }
@@ -77,6 +98,8 @@ Describe 'install_app' -Tag 'Scoop' {
         $failed['bar'] | Should-Be 'dependency failed: foo'
     }
 
+
+
     It 'should ignore a dependency that was only skipped or blocked' {
         $manifest = [PSCustomObject]@{ depends = @('foo', 'baz', 'extras/bar') }
         $failed = @{ 'foo' = 'skipped: held to version 1.0'; 'baz' = 'blocked: running process'; 'bar (global)' = 'download failed' }
@@ -86,7 +109,63 @@ Describe 'install_app' -Tag 'Scoop' {
         $deps | Should-BeCollection -Count 1
         @($deps)[0] | Should-Be 'bar'
     }
+
+    It 'should not ask for the manifest when the update flow installs a dependency' {
+        Mock get_config { if ($name -eq 'SHOW_MANIFEST') { $true } else { $default } }
+        Mock Write-Host {}
+        Mock ConvertToPrettyJson { '{}' }
+        Mock Invoke-ScoopDownload { throw 'stopped' }
+        $asked = [ref]0
+        Mock Read-Host { $asked.Value = $asked.Value + 1; 'y' }
+        # the guard looks at the file the call comes from, so the second call runs from 'update.ps1'
+        $caller = Join-Path $TestDrive 'update.ps1'
+        [IO.File]::WriteAllText($caller, 'install_app $args[0] ''64bit'' $false $args[1] $args[2]')
+
+        install_app 'foo' '64bit' $false @{} @{}
+        $asked.Value | Should-Be 1
+        $asked.Value = 0
+
+        & $caller 'foo' @{} @{}
+
+        $asked.Value | Should-Be 0
+    }
 }
+
+Describe 'prepare_app' -Tag 'Scoop' {
+    BeforeEach {
+        Mock Invoke-ScoopDownload { @('foo.zip') }
+        Mock Invoke-Extraction {}
+    }
+
+    It 'should reuse an extraction while the archive and the layout did not change' {
+        $dir = Join-Path $TestDrive ([guid]::NewGuid())
+        $manifest = [PSCustomObject]@{ version = '1.0'; hash = 'sha256:abc'; url = 'https://example.org/foo.zip' }
+
+        $prepared = prepare_app 'foo' '64bit' $false $manifest 'main' '1.0' $true $true $dir
+        prepare_app 'foo' '64bit' $false $manifest 'main' '1.0' $true $true $dir | Out-Null
+        Should-Invoke Invoke-Extraction -Times 1
+        Should-Invoke Invoke-ScoopDownload -Times 1
+
+        prepare_app 'foo' '64bit' $false $manifest 'main' '1.0' $false $true $dir | Out-Null
+        Should-Invoke Invoke-ScoopDownload -Times 2
+
+        Mock Invoke-HookScript {}
+        Mock Invoke-Installer { $true }
+        Mock ensure_install_dir_not_in_path {}
+        Mock link_current { $dir }
+        Mock link_app {}
+        Mock save_installed_manifest {}
+        Mock save_install_info {}
+        Mock show_notes {}
+        Mock success {}
+        install_version 'foo' $manifest '1.0' '64bit' $false 'main' $null @{} @{} $prepared.dir $prepared.fname
+
+        Test-Path "$dir\.scoop-extracted" | Should-BeFalse
+        prepare_app 'foo' '64bit' $false $manifest 'main' '1.0' $true $true $dir | Out-Null
+        Should-Invoke Invoke-Extraction -Times 3
+    }
+}
+
 
 Describe 'link_app' -Tag 'Scoop' {
     BeforeAll {
@@ -114,6 +193,20 @@ Describe 'link_app' -Tag 'Scoop' {
     }
 }
 
+Describe 'link_current' -Tag 'Scoop' {
+    It 'should record the version as current when junctions are disabled' {
+        Mock get_config { $true }
+        $dir = Join-Path $TestDrive ([guid]::NewGuid())
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+        $record = Join-Path $dir 'scoop-install.json'
+        [IO.File]::WriteAllText($record, '{}')
+        (Get-Item $record).LastWriteTimeUtc = [datetime]::UtcNow.AddHours(-1)
+
+        link_current $dir | Should-Be $dir
+
+        ((Get-Item $record).LastWriteTimeUtc -gt [datetime]::UtcNow.AddMinutes(-1)) | Should-BeTrue
+    }
+}
 Describe 'unlink_app' -Tag 'Scoop' {
     BeforeAll {
         $current = '/fake/app/current'
@@ -140,11 +233,12 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
     BeforeAll {
         $old_path = Get-AbsolutePath '/fake/app/current/old'
         $ctx = [PSCustomObject]@{
-            app          = 'foo'
-            dir          = '/fake/app/1.0'
-            persist_dir  = '/fake/persist'
-            global       = $false
-            architecture = '64bit'
+            app              = 'foo'
+            dir              = '/fake/app/1.0'
+            persist_dir      = '/fake/persist'
+            global           = $false
+            architecture     = '64bit'
+            new_architecture = '64bit'
         }
         Mock rm_startmenu_shortcuts {}
         Mock Remove-Path {}
@@ -166,6 +260,31 @@ Describe 'remove_obsolete_wiring' -Tag 'Scoop' {
 
         (Test-Path (Join-Path $shimdir 'old.shim')) | Should-BeFalse
         (Test-Path (Join-Path $shimdir 'kept.shim')) | Should-BeTrue
+    }
+
+    It 'should compare the new manifest with the new architecture' {
+        $shimdir = Join-Path $TestDrive 'shims'
+        New-Item -ItemType Directory -Path $shimdir -Force | Out-Null
+        'path = "x"' | Set-Content (Join-Path $shimdir 'old.shim')
+        Mock shimdir { $shimdir }
+
+        $arm64_ctx = [PSCustomObject]@{
+            app              = 'foo'
+            dir              = '/fake/app/1.0'
+            persist_dir      = '/fake/persist'
+            global           = $false
+            architecture     = 'arm64'
+            new_architecture = '64bit'
+        }
+        $old = [PSCustomObject]@{ architecture = [PSCustomObject]@{ arm64 = [PSCustomObject]@{ bin = @('old.exe') } } }
+        $new = [PSCustomObject]@{ architecture = [PSCustomObject]@{
+                '64bit' = [PSCustomObject]@{ bin = @('new.exe') }
+                arm64   = [PSCustomObject]@{ bin = @('old.exe') }
+            } }
+
+        remove_obsolete_wiring $arm64_ctx $old $new
+
+        (Test-Path (Join-Path $shimdir 'old.shim')) | Should-BeFalse
     }
 
     It 'should remove the dropped environment entries' {
@@ -410,20 +529,32 @@ Describe 'persist_def' -Tag 'Scoop' {
 Describe 'update_app' -Tag 'Scoop' {
     BeforeAll {
         . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
-        . "$PSScriptRoot\..\lib\download.ps1" # 'Test-Aria2Enabled', 'Invoke-CachedAria2Download'
         . "$PSScriptRoot\..\lib\depends.ps1" # 'Get-Dependency'
+        . "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
     }
     BeforeEach {
         Mock Select-CurrentVersion { '3.24.0' }
         Mock test_running_process { $app -eq 'foo' }
         Mock get_config { $default }
+        $script:depends = $null
+        $script:architecture = '64bit'
+        $script:bucket_version = '3.24.1'
         Mock Write-Host {}
         Mock warn {}
-        Mock install_info { [PSCustomObject]@{ architecture = '64bit'; url = (usermanifest $app) } }
-        Mock manifest { [PSCustomObject]@{ version = '3.24.0' } }
-        Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1' }, 'extras' }
-        Mock Test-Aria2Enabled { $true }
-        Mock Invoke-CachedAria2Download { $true }
+        Mock install_info { [PSCustomObject]@{ architecture = $script:architecture; url = (usermanifest $app) } }
+        Mock installed_manifest { [PSCustomObject]@{ version = '3.24.0' } }
+        Mock manifest { [PSCustomObject]@{ version = '3.24.0'; url = 'https://example.org/foo.zip' } }
+        Mock Find-AppBucket { [PSCustomObject]@{ version = $script:bucket_version; depends = $script:depends; url = 'https://example.org/foo.zip' }, 'extras' }
+        $script:appdir = Join-Path $TestDrive ([guid]::NewGuid())
+        Mock versiondir { "$script:appdir\$version" }
+        $script:archive_hash = 'sha256:abc'
+        Mock Invoke-ScoopDownload { @('foo.zip') }
+        Mock Invoke-Extraction {}
+        Mock Invoke-Installer { $true }
+        Mock remove_obsolete_wiring {}
+        Mock restore_app {}
+        Mock error {}
+        Mock install_version {}
         Mock install_app {}
     }
 
@@ -448,7 +579,7 @@ Describe 'update_app' -Tag 'Scoop' {
         $failed = @{}
         update_app 'foo' $false $true $true $false @{} $failed
 
-        Should-Invoke -CommandName Invoke-CachedAria2Download -Times 1
+        Should-Invoke -CommandName Invoke-ScoopDownload -Times 1
         Should-Invoke -CommandName install_app -Times 0
         $failed['foo'] | Should-Be 'blocked: running process, the new version was downloaded'
     }
@@ -458,8 +589,153 @@ Describe 'update_app' -Tag 'Scoop' {
         $failed = @{}
         update_app 'foo' $false $true $true $false @{} $failed
 
-        Should-Invoke -CommandName Invoke-CachedAria2Download -Times 0
+        Should-Invoke -CommandName Invoke-ScoopDownload -Times 0
         $failed['foo'] | Should-Be 'blocked: running process'
+    }
+
+    It 'should not install the app when a dependency failed' {
+        Mock Get-Dependency { @('dep') }
+        Mock installed { $false }
+        Mock install_app { $failed['dep'] = 'download failed' }
+        Mock test_running_process { $false }
+        $script:depends = @('dep')
+        $failed = @{}
+
+        update_app 'foo' $false $true $true $false @{} $failed
+
+        Should-Invoke install_version -Times 0
+        $failed['foo'] | Should-Be 'dependency failed: dep'
+        Should-Invoke restore_app -Times 1
+    }
+
+    It 'should install the extraction helper before it unpacks the new version' {
+        $script:order = @()
+        Mock Get-InstallationHelper { '7zip' }
+        Mock Get-Dependency { @('7zip') }
+        Mock installed { $false }
+        Mock install_app { $script:order += 'helper' }
+        Mock Invoke-Extraction { $script:order += 'extract' }
+        Mock test_running_process { $false }
+        $failed = @{}
+
+        update_app 'foo' $false $true $true $false @{} $failed
+
+        $script:order.IndexOf('helper') | Should-Be 0
+        $script:order.IndexOf('extract') | Should-Be 1
+    }
+
+    It 'should keep the saved architecture for the old version' {
+        Mock installed_manifest { [PSCustomObject]@{ version = '3.24.0' } }
+        Mock test_running_process { $false }
+        $script:architecture = 'arm64'
+        $failed = @{}
+
+        update_app 'foo' $false $true $true $false @{} $failed
+
+        Should-Invoke Invoke-Installer -Times 1 -ParameterFilter { $ProcessorArchitecture -eq 'arm64' }
+        Should-Invoke install_version -Times 1 -ParameterFilter { $architecture -ne 'arm64' }
+    }
+
+    It 'should download the version before it removes the old one when reinstalling it' {
+        $script:order = @()
+        Mock installed_manifest { [PSCustomObject]@{ version = '3.24.0' } }
+        Mock Invoke-ScoopDownload { $script:order += 'download'; @('foo.zip') }
+        Mock Invoke-Installer { $script:order += 'uninstall'; $true }
+        Mock Move-Item {}
+        Mock Remove-Item {}
+        Mock test_running_process { $false }
+        $script:bucket_version = '3.24.0'
+        $failed = @{}
+
+        update_app 'foo' $false $true $false $false @{} $failed
+
+        $script:order.IndexOf('download') | Should-Be 0
+        $script:order.IndexOf('uninstall') | Should-Be 1
+        Should-Invoke Invoke-ScoopDownload -Times 1 -ParameterFilter { $dir -like '*_3.24.0.new' }
+        Should-Invoke Remove-Item -Times 1 -ParameterFilter { $Path -like '*_3.24.0.new' }
+    }
+
+
+    It 'should switch to a version that is still installed instead of unpacking it' {
+        Mock manifest { [PSCustomObject]@{ version = '3.24.1'; url = 'https://example.org/foo.zip' } }
+        Mock link_current { $versiondir }
+        Mock link_app {}
+        Mock remove_obsolete_wiring {}
+        Mock Invoke-HookScript {}
+        $script:retained = Join-Path $TestDrive ([guid]::NewGuid())
+        Mock versiondir { $script:retained }
+        New-Item -ItemType Directory -Path $script:retained -Force | Out-Null
+        [IO.File]::WriteAllText((Join-Path $script:retained 'scoop-manifest.json'), '{}')
+        $failed = @{}
+
+        update_app 'foo' $false $false $false $true @{} $failed
+
+        $failed['foo'] | Should-Be 'blocked: running process'
+        Should-Invoke -CommandName link_app -Times 0
+
+        Mock test_running_process { $false }
+        $failed = @{}
+        update_app 'foo' $false $false $false $true @{} $failed
+
+        Should-Invoke -CommandName Invoke-ScoopDownload -Times 0
+        Should-Invoke -CommandName Invoke-Extraction -Times 0
+        Should-Invoke -CommandName Invoke-Installer -Times 0
+        Should-Invoke -CommandName install_version -Times 0
+        Should-Invoke -CommandName link_app -Times 1 -ParameterFilter { $original_dir -eq $script:retained }
+        Should-Invoke -CommandName remove_obsolete_wiring -Times 1 -ParameterFilter { $ctx.new_architecture -eq '64bit' }
+        $failed.Count | Should-Be 0
+
+        Mock installed_manifest { [PSCustomObject]@{ version = '3.24.0'; depends = @('dep') } }
+        Mock Get-Dependency { @('dep') }
+        Mock installed { $false }
+        Mock install_app {}
+        $failed = @{}
+        update_app 'foo' $false $false $false $false @{} $failed
+
+        Should-Invoke -CommandName install_app -Times 1 -ParameterFilter { $app -eq 'dep' }
+
+        # a dependency that is already installed keeps its bucket, which may be gone
+        Mock installed { $true }
+        Mock Get-Dependency { throw 'no manifest' }
+        $failed = @{}
+        update_app 'foo' $false $false $false $false @{} $failed
+
+        $failed.Count | Should-Be 0
+
+        # the switch can fail after it linked the target version
+        Mock installed_manifest { [PSCustomObject]@{ version = $version } }
+        Mock link_app { throw 'missing target' }
+        $failed = @{}
+        update_app 'foo' $false $false $false $false @{} $failed
+
+        $failed['foo'] | Should-Be 'missing target'
+        Should-Invoke -CommandName remove_obsolete_wiring -Times 1 -ParameterFilter { $old_manifest.version -eq '3.24.1' -and $new_manifest.version -eq '3.24.0' }
+        Should-Invoke -CommandName restore_app -Times 1
+
+        # nothing is downloaded, so the new manifest need not support the architecture
+        Mock Get-SupportedArchitecture { $null }
+        Mock link_app {}
+        $failed = @{}
+        update_app 'foo' $false $false $false $false @{} $failed
+
+        $failed.Count | Should-Be 0
+        Should-Invoke -CommandName Invoke-ScoopDownload -Times 0
+
+        # without a retained version the architecture has to be supported
+        Remove-Item (Join-Path $script:retained 'scoop-manifest.json')
+        $failed = @{}
+        update_app 'foo' $false $false $false $false @{} $failed
+
+        $failed['foo'] | Should-Be 'unsupported architecture'
+    }
+
+    It 'does not remove the old version when the extraction fails' {
+        Mock Invoke-Extraction { throw 'archive is broken' }
+        $failed = @{}
+
+        { update_app 'foo' $false $true $false $true @{} $failed } | Should-Throw '*archive is broken*'
+
+        Should-Invoke -CommandName Invoke-Installer -Times 0
     }
 }
 

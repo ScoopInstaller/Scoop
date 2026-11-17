@@ -221,7 +221,7 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
     unlink_persist_data $old_manifest $ctx.dir
 
     $shim_id = { param($entry) $target, $name, $null = Get-ShimDefinition $entry; "$name$([IO.Path]::GetExtension($target))" }
-    $ids = @(arch_specific 'bin' $new_manifest $ctx.architecture | Where-Object { $_ -ne $null } | ForEach-Object { & $shim_id $_ })
+    $ids = @(arch_specific 'bin' $new_manifest $ctx.new_architecture | Where-Object { $_ -ne $null } | ForEach-Object { & $shim_id $_ })
     $removed = @(arch_specific 'bin' $old_manifest $ctx.architecture | Where-Object { $_ -ne $null } | Where-Object { (& $shim_id $_) -notin $ids })
     if ($removed) { Remove-ShimFromManifest $ctx.app @{ bin = $removed } $ctx.global $ctx.architecture }
 
@@ -230,7 +230,7 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
     if ($shortcuts) { rm_startmenu_shortcuts @{ shortcuts = $shortcuts } $ctx.global $ctx.architecture }
 
     $current = "$(Split-Path $ctx.dir)\current"
-    $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.architecture)
+    $paths = @(env_paths $new_manifest $current $ctx.persist_dir $ctx.new_architecture)
     # the old paths were expanded with the version directory, a nightly manifest keeps the name 'nightly'
     $version = Split-Path $ctx.dir -Leaf
     if (get_config NO_JUNCTION) {
@@ -244,7 +244,7 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
         Remove-Path -Path $removed -TargetEnvVar $scoopPathEnvVar -Global:$ctx.global
     }
 
-    $names = @((arch_specific 'env_set' $new_manifest $ctx.architecture).PSObject.Properties.Name)
+    $names = @((arch_specific 'env_set' $new_manifest $ctx.new_architecture).PSObject.Properties.Name)
     $removed = @((arch_specific 'env_set' $old_manifest $ctx.architecture).PSObject.Properties.Name) | Where-Object { $_ -notin $names }
     foreach ($var in $removed) {
         Set-EnvVar -Name $var -Value $null -Global:$ctx.global
@@ -329,8 +329,16 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         $failed[$app_key] = 'no manifest available'
         return
     }
+    if ($version -match '[^\w\.\-\+_]') {
+        error "Manifest version has unsupported character '$($matches[0])'."
+        $failed[$app_key] = 'invalid manifest'
+        return
+    }
 
     Write-Host "Updating '$app' ($old_version -> $version)"
+
+    # the new version may be built for another architecture than the installed one
+    $new_architecture = Get-SupportedArchitecture $manifest $architecture
 
     $failed_deps = failed_deps $manifest $failed
     if ($failed_deps.Count -gt 0) {
@@ -346,68 +354,96 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         return
     }
 
-    # region Workaround
-    # Workaround for https://github.com/ScoopInstaller/Scoop/issues/2220 until install is refactored
-    # Remove and replace whole region after proper fix
-    Write-Host 'Downloading new version'
-    if (Test-Aria2Enabled) {
-        if (!(Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $check_hash)) {
-            $failed[$app_key] = 'download failed'
+    # a version that is still installed is switched to here, the same way 'scoop reset' does
+    $forced = $force -and $old_version -eq $version
+    $dir = versiondir $app $old_version $global
+    $persist_dir = persistdir $app $global
+    $ctx = [PSCustomObject]@{
+        app              = $app
+        dir              = $dir
+        persist_dir      = $persist_dir
+        global           = $global
+        architecture     = $architecture
+        new_architecture = $new_architecture
+    }
+    $installed_dir = versiondir $app $version $global
+    $retained = (Test-Path -LiteralPath "$installed_dir\scoop-manifest.json") -or (Test-Path -LiteralPath "$installed_dir\manifest.json")
+    if (!$forced -and $retained) {
+        if ($running) {
+            Write-Host 'Running process detected, skip updating.'
+            $failed[$app_key] = 'blocked: running process'
             return
         }
-    } else {
-        $urls = script:url $manifest $architecture
 
-        foreach ($url in $urls) {
-            try {
-                Invoke-CachedDownload $app $version $url $null $manifest.cookie $use_cache
-            } catch {
-                Write-Host -f darkred $_
-                error "URL $url is not valid"
-                error $(new_issue_msg $app $bucket 'download failed')
-                $failed[$app_key] = 'download failed'
+        $installed = installed_manifest $app $version $global
+        $installed_architecture = Format-ArchitectureString (install_info $app $version $global).architecture
+        if (-not $independent) {
+            # the dependencies of the version that is switched to, not the ones the manifest has now
+            $deps = @($installed.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $installed_architecture } | Where-Object { !(installed $_) } | Select-Object -Unique)
+            $deps | ForEach-Object { install_app $_ $installed_architecture $global $suggested $failed $use_cache $check_hash }
+            $failed_deps = failed_deps $installed $failed
+            if ($failed_deps.Count -gt 0) {
+                error "'$app' depends on $($failed_deps -join ', '), which failed."
+                $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
                 return
             }
-
-            if ($check_hash) {
-                $manifest_hash = hash_for_url $manifest $url $architecture
-                $source = cache_path $app $version $url
-                $ok, $err = check_hash $source $manifest_hash $(show_app $app $bucket)
-
-                if (!$ok) {
-                    error $err
-                    if (Test-Path $source) {
-                        # rm cached file
-                        Remove-Item -Force $source
-                    }
-                    if ($url.Contains('sourceforge.net')) {
-                        Write-Host -f yellow 'SourceForge.net is known for causing hash validation fails. Please try again before opening a ticket.'
-                    }
-                    error $(new_issue_msg $app $bucket 'hash check failed')
-                    $failed[$app_key] = 'hash check failed'
-                    return
-                }
+        }
+        $ctx.new_architecture = $installed_architecture
+        try {
+            Write-Host "Switching '$app' ($old_version -> $version)"
+            remove_obsolete_wiring $ctx $old_manifest $installed
+            $dir = link_current $installed_dir
+            link_app $installed $dir $installed_dir $ctx.persist_dir $global $installed_architecture
+            success "'$app' was switched to the installed $version."
+        } catch {
+            $failed[$app_key] = $_.Exception.Message
+            error $_.Exception.Message
+            # drop what the failed switch linked, then rebuild the links of the old version
+            $installed_ctx = [PSCustomObject]@{
+                app              = $app
+                dir              = $installed_dir
+                persist_dir      = $ctx.persist_dir
+                global           = $global
+                architecture     = $installed_architecture
+                new_architecture = $ctx.architecture
             }
+            remove_obsolete_wiring $installed_ctx $installed $old_manifest
+            restore_app $ctx $old_manifest $old_version
+        }
+        return
+    }
+
+    # switching to a retained version downloads nothing, so only a new installation must support the architecture
+    if ($null -eq $new_architecture) {
+        error "'$app' doesn't support current architecture!"
+        $failed[$app_key] = 'unsupported architecture'
+        return
+    }
+
+    if (-not $independent) {
+        $helpers = Get-InstallationHelper $manifest $new_architecture
+        $needed = @($helpers | ForEach-Object { Get-Dependency $_ $new_architecture } | Select-Object -Unique)
+        $needed | Where-Object { !(installed $_) } | ForEach-Object {
+            install_app $_ $new_architecture $global $suggested $failed $use_cache $check_hash
         }
     }
-    # There is no need to check hash again while installing
-    $check_hash = $false
-    # endregion Workaround
+
+    $stage = $null
+    if ($forced) {
+        $stage = versiondir $app "_$version.new" $global
+        Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    # download and extract the new version first, so a broken archive cannot leave the app uninstalled
+    $prepared = prepare_app $app $new_architecture $global $manifest $bucket $version $use_cache $check_hash $stage
+    if (!$prepared) {
+        $failed[$app_key] = 'download failed'
+        return
+    }
 
     if ($running) {
         Write-Host 'Running process detected, skip updating.'
         $failed[$app_key] = 'blocked: running process, the new version was downloaded'
         return
-    }
-
-    $dir = versiondir $app $old_version $global
-    $persist_dir = persistdir $app $global
-    $ctx = [PSCustomObject]@{
-        app          = $app
-        dir          = $dir
-        persist_dir  = $persist_dir
-        global       = $global
-        architecture = $architecture
     }
 
     try {
@@ -422,7 +458,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         remove_obsolete_wiring $ctx $old_manifest $manifest
 
         $backup = $null
-        if ($force -and ($old_version -eq $version)) {
+        if ($forced) {
             $new_backup = "$dir/../_$version.old"
             if (Test-Path $new_backup) {
                 $i = 1
@@ -452,8 +488,17 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
             $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
         }
 
-        # already downloaded above
-        install_app $app $architecture $global $suggested $failed $true $check_hash
+        $failed_deps = failed_deps $manifest $failed
+        if ($failed_deps.Count -gt 0) {
+            error "'$app_name' depends on $($failed_deps -join ', '), which failed."
+            $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
+        } else {
+            if ($forced) {
+                Move-Item $prepared.dir $dir -ErrorAction Stop
+                $prepared.dir = $dir
+            }
+            install_version $app_name $manifest $version $new_architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
+        }
         if ($failed.ContainsKey($app_key)) {
             restore_app $ctx $old_manifest $old_version $backup
         }
