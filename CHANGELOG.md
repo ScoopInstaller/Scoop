@@ -10,6 +10,7 @@
 
 - **scoop-cache:** Delete each cached file only once ([#6773](https://github.com/ScoopInstaller/Scoop/issues/6773))
 - **scoop-checkup:** Skip Defender check when `Get-MpPreference` fails ([#6745](https://github.com/ScoopInstaller/Scoop/issues/6745))
+- **scoop-cleanup, scoop-reset, scoop-uninstall, scoop-update:** Skip running apps and fail the command ([#6836](https://github.com/ScoopInstaller/Scoop/issues/6836))
 - **scoop-config:** Validate the proxy setting ([#6802](https://github.com/ScoopInstaller/Scoop/issues/6802))
 - **scoop-hold:** Report a held app as skipped ([#6820](https://github.com/ScoopInstaller/Scoop/issues/6820))
 - **scoop-info:** Resolve the license identifier before URL and separator matching ([#6770](https://github.com/ScoopInstaller/Scoop/issues/6770))
