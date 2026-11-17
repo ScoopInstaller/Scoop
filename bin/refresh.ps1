@@ -7,7 +7,7 @@ $src = "$PSScriptRoot\.."
 $dest = ensure (versiondir 'scoop' 'current')
 
 # make sure not running from the installed directory
-if("$src" -eq "$dest") { abort "$(strip_ext $myinvocation.mycommand.name) is for development only" }
+if("$src" -eq "$dest") { error "$(strip_ext $myinvocation.mycommand.name) is for development only"; exit 1 }
 
 'copying files...'
 $output = robocopy $src $dest /mir /njh /njs /nfl /ndl /xd .git tmp /xf .DS_Store last_updated
