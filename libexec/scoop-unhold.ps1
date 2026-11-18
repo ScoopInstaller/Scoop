@@ -29,6 +29,8 @@ if ($global -and !(is_admin)) {
     exit 1
 }
 
+$exitcode = 0
+
 $apps | ForEach-Object {
     $app = $_
 
@@ -43,6 +45,7 @@ $apps | ForEach-Object {
         } else {
             error "'$app' is not installed."
         }
+        $exitcode = 1
         return
     }
 
@@ -55,6 +58,7 @@ $apps | ForEach-Object {
     $json = install_info $app $version $global
     if (!$json) {
         error "Failed to unhold '$app'"
+        $exitcode = 1
         continue
     }
     $install = @{}
