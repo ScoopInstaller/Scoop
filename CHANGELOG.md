@@ -29,6 +29,7 @@
 - **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6763](https://github.com/ScoopInstaller/Scoop/issues/6763))
 - **install:** Expand $dir and $persist_dir in env_add_path ([#6808](https://github.com/ScoopInstaller/Scoop/issues/6808))
 - **install:** Unlink the persisted data before extracting ([#6845](https://github.com/ScoopInstaller/Scoop/issues/6845))
+- **install:** Prevent a stray `break`/`continue` from silently ending the command ([#6842](https://github.com/ScoopInstaller/Scoop/issues/6842))
 - **scoop:** Keep the formatted output of a command ([#6813](https://github.com/ScoopInstaller/Scoop/issues/6813))
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
 - **update:** Extract the new version before removing the old one ([#6839](https://github.com/ScoopInstaller/Scoop/issues/6839))
