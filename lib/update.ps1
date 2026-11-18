@@ -367,7 +367,8 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         new_architecture = $new_architecture
     }
     $installed_dir = versiondir $app $version $global
-    $retained = (Test-Path -LiteralPath "$installed_dir\scoop-manifest.json") -or (Test-Path -LiteralPath "$installed_dir\manifest.json")
+    $retained = !(Test-Path -LiteralPath "$installed_dir\.scoop-extracted") -and
+    ((Test-Path -LiteralPath "$installed_dir\scoop-manifest.json") -or (Test-Path -LiteralPath "$installed_dir\manifest.json"))
     if (!$forced -and $retained) {
         if ($running) {
             Write-Host 'Running process detected, skip updating.'
@@ -407,7 +408,11 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
                 architecture     = $installed_architecture
                 new_architecture = $ctx.architecture
             }
-            remove_obsolete_wiring $installed_ctx $installed $old_manifest
+            try {
+                remove_obsolete_wiring $installed_ctx $installed $old_manifest
+            } catch {
+                Write-Verbose $_.Exception.Message
+            }
             restore_app $ctx $old_manifest $old_version
         }
         return
