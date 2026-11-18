@@ -51,7 +51,7 @@ Describe 'scoop cache rm' -Tag 'Scoop' {
         Test-Path -LiteralPath "$cachedir\demo.txt" | Should-BeFalse
     }
 
-    It 'fails when a file cannot be removed' {
+    It 'fails when a file cannot be removed' -Tag 'Windows' {
         $locked = Join-Path $cachedir 'demo#1.0#abc.zip_'
         $stream = [IO.File]::Open($locked, 'Open', 'Read', 'None')
         try {
