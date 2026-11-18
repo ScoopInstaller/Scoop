@@ -31,6 +31,7 @@
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
 - **update:** Extract the new version before removing the old one ([#6839](https://github.com/ScoopInstaller/Scoop/issues/6839))
 - **update:** Restore the old version when an update fails ([#6810](https://github.com/ScoopInstaller/Scoop/issues/6810))
+- **update:** Run `pre_uninstall` before the running process check ([#6841](https://github.com/ScoopInstaller/Scoop/issues/6841))
 
 ### Code Refactoring
 

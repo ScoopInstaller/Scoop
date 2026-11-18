@@ -347,8 +347,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         return
     }
 
-    $running = test_running_process $app $global
-    if ($running -and !(get_config 'download_while_running' $true)) {
+    if (!(get_config 'download_while_running' $true) -and (test_running_process $app $global)) {
         Write-Host 'Running process detected, skip updating.'
         $failed[$app_key] = 'blocked: running process'
         return
@@ -370,7 +369,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     $retained = !(Test-Path -LiteralPath "$installed_dir\.scoop-extracted") -and
     ((Test-Path -LiteralPath "$installed_dir\scoop-manifest.json") -or (Test-Path -LiteralPath "$installed_dir\manifest.json"))
     if (!$forced -and $retained) {
-        if ($running) {
+        if (test_running_process $app $global) {
             Write-Host 'Running process detected, skip updating.'
             $failed[$app_key] = 'blocked: running process'
             return
@@ -445,14 +444,14 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         return
     }
 
-    if ($running) {
-        Write-Host 'Running process detected, skip updating.'
-        $failed[$app_key] = 'blocked: running process, the new version was downloaded'
-        return
-    }
-
     try {
         Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
+
+        if (test_running_process $app $global) {
+            Write-Host 'Running process detected, skip updating.'
+            $failed[$app_key] = 'blocked: running process, the new version was downloaded'
+            return
+        }
 
         Write-Host "Uninstalling '$app' ($old_version)"
         if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {

@@ -581,6 +581,7 @@ Describe 'update_app' -Tag 'Scoop' {
 
         Should-Invoke -CommandName Invoke-ScoopDownload -Times 1
         Should-Invoke -CommandName install_app -Times 0
+        Should-Invoke -CommandName test_running_process -Times 1
         $failed['foo'] | Should-Be 'blocked: running process, the new version was downloaded'
     }
 
@@ -727,6 +728,18 @@ Describe 'update_app' -Tag 'Scoop' {
         update_app 'foo' $false $false $false $false @{} $failed
 
         $failed['foo'] | Should-Be 'unsupported architecture'
+    }
+
+    It 'updates the app when its pre_uninstall hook stopped it' {
+        $script:hookRan = $false
+        Mock Invoke-HookScript { $script:hookRan = $true }
+        Mock test_running_process { -not $script:hookRan }
+        $failed = @{}
+
+        update_app 'foo' $false $true $false $true @{} $failed
+
+        Should-Invoke -CommandName install_version -Times 1
+        $failed.Count | Should-Be 0
     }
 
     It 'does not remove the old version when the extraction fails' {
