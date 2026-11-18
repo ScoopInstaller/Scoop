@@ -7,11 +7,15 @@
 # You can use '*' in place of <app> or `-a`/`--all` switch to reset all apps.
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\json.ps1" # 'install_app' (indirectly)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1" # 'env_add_path' (indirectly)
 . "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\download.ps1" # 'install_app' (indirectly)
+. "$PSScriptRoot\..\lib\decompress.ps1" # 'install_app' (indirectly)
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\depends.ps1" # 'Test-7zipRequirement' in 'decompress.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 
@@ -79,6 +83,22 @@ $apps | ForEach-Object {
 
     $install = install_info $app $version $global
     $architecture = $install.architecture
+    # the dependencies of the installed version, not the ones the manifest has now
+    try {
+        $deps = @($manifest.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $architecture } | Select-Object -Unique)
+    } catch {
+        $failed[$app] = $_.Exception.Message
+        error $_.Exception.Message
+        return
+    }
+    $suggested = @{}
+    $deps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed }
+    $failed_deps = failed_deps $manifest $failed
+    if ($failed_deps.Count -gt 0) {
+        error "'$app' depends on $($failed_deps -join ', '), which failed."
+        $failed[$app] = "dependency failed: $($failed_deps -join ', ')"
+        return
+    }
 
     $dir = link_current $dir
     # unset all potential old env before re-adding

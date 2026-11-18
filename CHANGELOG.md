@@ -29,6 +29,7 @@
 - **install:** Expand $dir and $persist_dir in env_add_path ([#6808](https://github.com/ScoopInstaller/Scoop/issues/6808))
 - **scoop:** Keep the formatted output of a command ([#6813](https://github.com/ScoopInstaller/Scoop/issues/6813))
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
+- **update:** Extract the new version before removing the old one ([#6839](https://github.com/ScoopInstaller/Scoop/issues/6839))
 - **update:** Restore the old version when an update fails ([#6810](https://github.com/ScoopInstaller/Scoop/issues/6810))
 
 ### Code Refactoring

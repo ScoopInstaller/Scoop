@@ -12,6 +12,30 @@ function failed_deps($manifest, $failed) {
         })
 }
 
+function prepare_app($app, $architecture, $global, $manifest, $bucket, $version, $use_cache = $true, $check_hash = $true, $dir) {
+    if (!$dir) { $dir = versiondir $app $version $global }
+    ensure $dir | Out-Null
+    $fname = @((url $manifest $architecture) | ForEach-Object { url_filename $_ })
+    $hashes = @((hash $manifest $architecture)) | Where-Object { $_ }
+    $key = if ($check_hash -and $hashes.Count) {
+        ConvertTo-Json -Compress @($hashes, $fname, (extract_dir $manifest $architecture), (extract_to $manifest $architecture), [bool]$manifest.innosetup)
+    } else { '' }
+    $marker = "$dir\.scoop-extracted"
+    $extracted = (Get-Content -LiteralPath $marker -Raw -ErrorAction SilentlyContinue) -join ''
+    if ($use_cache -and $key -and $extracted.Trim() -eq $key) {
+        return [PSCustomObject]@{ dir = $dir; fname = $fname }
+    }
+    if ($extracted) {
+        Remove-Item -LiteralPath $dir -Recurse -Force
+        ensure $dir | Out-Null
+    }
+    $download = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    if ($null -eq $download) { return $null }
+    Invoke-Extraction -Path $dir -Name $download -Manifest $manifest -ProcessorArchitecture $architecture
+    if ($key) { [IO.File]::WriteAllText($marker, $key) }
+    return [PSCustomObject]@{ dir = $dir; fname = $download }
+}
+
 function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
     $app_key = if ($global) { "$app (global)" } else { $app }
@@ -53,7 +77,8 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         return
     }
 
-    if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+    # the update flow lives in 'lib/update.ps1' as well as in 'scoop-update.ps1'
+    if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*update.ps1')) {
         Write-Host "Manifest: $app.json"
         $style = get_config CAT_STYLE
         if ($style) {
@@ -69,18 +94,32 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         }
     }
     Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from '$bucket' bucket" } elseif ($url -like (usermanifestsdir) + '\*') { ' from generated manifest' } else { " from '$url'" })"
-    $linked = $false
+
+    $prepared = $null
     try {
-        $dir = ensure (versiondir $app $version $global)
+        $prepared = prepare_app $app $architecture $global $manifest $bucket $version $use_cache $check_hash
+    } catch {
+        # the failure belongs to this app, not to the name it was requested with
+        $failed[$app_key] = $_.Exception.Message
+        error $_.Exception.Message
+        return
+    }
+    if (!$prepared) {
+        $failed[$app_key] = 'download failed'
+        return
+    }
+    install_version $app $manifest $version $architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
+}
+
+function install_version($app, $manifest, $version, $architecture, $global, $bucket, $url, $suggested, $failed, $dir, $fname) {
+    $app_key = if ($global) { "$app (global)" } else { $app }
+    $linked = $false
+    # the installation modifies the extracted files, so they cannot be reused afterwards
+    Remove-Item -LiteralPath "$dir\.scoop-extracted" -Force -ErrorAction SilentlyContinue
+    try {
         $original_dir = $dir # keep reference to real (not linked) directory
         $persist_dir = persistdir $app $global
 
-        $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-        if ($null -eq $fname) {
-            $failed[$app_key] = 'download failed'
-            return
-        }
-        Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
         Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
 
         if (!(Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global)) {
@@ -223,7 +262,12 @@ function Invoke-HookScript {
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if (get_config NO_JUNCTION) { return $versiondir.ToString() }
+    if (get_config NO_JUNCTION) {
+        # without a junction the version with the newest install record is the current one
+        Get-ChildItem -LiteralPath $versiondir -Filter '*install.json' -ErrorAction SilentlyContinue |
+            ForEach-Object { $_.LastWriteTimeUtc = [datetime]::UtcNow }
+        return $versiondir.ToString()
+    }
 
     $currentdir = "$(Split-Path $versiondir)\current"
 
