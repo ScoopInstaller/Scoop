@@ -25,10 +25,10 @@ function prepare_app($app, $architecture, $global, $manifest, $bucket, $version,
     if ($use_cache -and $key -and $extracted.Trim() -eq $key) {
         return [PSCustomObject]@{ dir = $dir; fname = $fname }
     }
-    if ($extracted) {
-        Remove-Item -LiteralPath $dir -Recurse -Force
-        ensure $dir | Out-Null
-    }
+    # a junction is deleted with its target, so the persisted data is unlinked first
+    unlink_persist_data $manifest $dir
+    Remove-Item -LiteralPath $dir -Recurse -Force
+    ensure $dir | Out-Null
     $download = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
     if ($null -eq $download) { return $null }
     Invoke-Extraction -Path $dir -Name $download -Manifest $manifest -ProcessorArchitecture $architecture
