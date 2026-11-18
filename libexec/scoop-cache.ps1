@@ -45,19 +45,28 @@ function cacheremove($app) {
         # aria2 input file left by an interrupted download
         $files = @(Get-ChildItem -LiteralPath $cachedir | Where-Object -Property Name -Value "^$app(#|\.txt$)" -Match)
     }
-    $totalLength = ($files | Measure-Object -Property Length -Sum).Sum
 
+    $deleted = @()
     $files | ForEach-Object {
         Write-Host "Removing $($_.Name)..."
-        Remove-Item -LiteralPath $_.FullName
+        try {
+            Remove-Item -LiteralPath $_.FullName -ErrorAction Stop
+            $deleted += $_
+        } catch {
+            Write-Host 'Error.' -ForegroundColor DarkRed
+        }
     }
+    $totalLength = ($deleted | Measure-Object -Property Length -Sum).Sum
 
-    Write-Host "Deleted: $($files.Length) $(pluralize $files.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
+    Write-Host "Deleted: $($deleted.Length) $(pluralize $deleted.Length 'file' 'files'), $(filesize $totalLength)" -ForegroundColor Yellow
+
+    return $files.Length - $deleted.Length
 }
 
+$exitcode = 0
 switch($cmd) {
     'rm' {
-        cacheremove $Args
+        $exitcode = cacheremove $Args
     }
     'show' {
         cacheshow $Args
@@ -67,4 +76,4 @@ switch($cmd) {
     }
 }
 
-exit 0
+exit $exitcode

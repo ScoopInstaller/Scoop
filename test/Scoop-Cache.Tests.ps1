@@ -50,4 +50,17 @@ Describe 'scoop cache rm' -Tag 'Scoop' {
         & $cacheScript rm demo 6>&1 | Out-Null
         Test-Path -LiteralPath "$cachedir\demo.txt" | Should-BeFalse
     }
+
+    It 'fails when a file cannot be removed' {
+        $locked = Join-Path $cachedir 'demo#1.0#abc.zip_'
+        $stream = [IO.File]::Open($locked, 'Open', 'Read', 'None')
+        try {
+            & $cacheScript rm demo 6>&1 | Out-Null
+
+            $LASTEXITCODE | Should-Be 1
+            Test-Path -LiteralPath $locked | Should-BeTrue
+        } finally {
+            $stream.Dispose()
+        }
+    }
 }
