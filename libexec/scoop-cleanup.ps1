@@ -95,7 +95,7 @@ if ($apps -or $all) {
         Remove-Item "$cachedir\*.download" -ErrorAction Ignore
     }
 
-    if (!$verbose) {
+    if (!$verbose -and $failed.Count -eq 0) {
         success 'Everything is shiny now!'
     }
 }
