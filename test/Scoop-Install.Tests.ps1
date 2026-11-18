@@ -581,6 +581,7 @@ Describe 'update_app' -Tag 'Scoop' {
 
         Should-Invoke -CommandName Invoke-ScoopDownload -Times 1
         Should-Invoke -CommandName install_app -Times 0
+        Should-Invoke -CommandName test_running_process -Times 1
         $failed['foo'] | Should-Be 'blocked: running process, the new version was downloaded'
     }
 
