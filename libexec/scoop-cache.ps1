@@ -53,7 +53,7 @@ function cacheremove($app) {
             Remove-Item -LiteralPath $_.FullName -ErrorAction Stop
             $deleted += $_
         } catch {
-            Write-Host 'Error.' -ForegroundColor DarkRed
+            Write-Host "Error: $($_.Exception.Message)" -ForegroundColor DarkRed
         }
     }
     $totalLength = ($deleted | Measure-Object -Property Length -Sum).Sum
