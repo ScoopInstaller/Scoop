@@ -166,6 +166,28 @@ Describe 'prepare_app' -Tag 'Scoop' {
     }
 }
 
+Describe 'prepare_app over a persisted directory' -Tag 'Scoop', 'Windows' {
+    It 'should keep the persisted data when the version is unpacked again' {
+        $dir = Join-Path $TestDrive 'apps\foo\1.0'
+        $persist = Join-Path $TestDrive 'persist\foo\data'
+        New-Item -ItemType Directory -Path $persist -Force | Out-Null
+        [IO.File]::WriteAllText("$persist\inner.txt", 'USER DATA')
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+        cmd /c mklink /J "$dir\data" $persist | Out-Null
+        New-Item -ItemType Directory -Path "$TestDrive\src\data" -Force | Out-Null
+        [IO.File]::WriteAllText("$TestDrive\src\data\inner.txt", 'ARCHIVE DATA')
+        Compress-Archive -Path "$TestDrive\src\*" -DestinationPath "$TestDrive\foo.zip" -Force
+
+        Mock Invoke-ScoopDownload { Copy-Item "$TestDrive\foo.zip" -Destination (Join-Path $dir 'foo.zip'); @('foo.zip') }
+        $manifest = [PSCustomObject]@{ version = '1.0'; url = 'https://example.org/foo.zip'; persist = 'data' }
+
+        prepare_app 'foo' '64bit' $false $manifest 'main' '1.0' $false $true $dir | Out-Null
+
+        [IO.File]::ReadAllText("$persist\inner.txt") | Should-Be 'USER DATA'
+        [IO.File]::ReadAllText("$dir\data\inner.txt") | Should-Be 'ARCHIVE DATA'
+    }
+}
+
 
 Describe 'link_app' -Tag 'Scoop' {
     BeforeAll {
