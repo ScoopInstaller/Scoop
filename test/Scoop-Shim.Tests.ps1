@@ -402,7 +402,8 @@ Describe 'Update-ShimInstance' -Tag 'Scoop', 'Windows' {
 
     It 'replaces a shim whose process is still running' {
         New-Shim "$env:SystemRoot\System32\ping.exe" $false 'shim-test'
-        $process = Start-Process -FilePath "$shimdir\shim-test.exe" -ArgumentList '-n', '60', '127.0.0.1' -PassThru
+        # in this console, not a new one, with the output out of the way
+        $process = Start-Process -FilePath "$shimdir\shim-test.exe" -ArgumentList '-n', '60', '127.0.0.1' -PassThru -NoNewWindow -RedirectStandardOutput "$TestDrive\ping.out"
         try {
             Start-Sleep -Milliseconds 500
             $process.HasExited | Should-BeFalse
