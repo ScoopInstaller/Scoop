@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+- **scoop-*:** Report failures in messages and exit codes ([#6846](https://github.com/ScoopInstaller/Scoop/pull/6846))
 - **scoop-cache:** Delete each cached file only once ([#6773](https://github.com/ScoopInstaller/Scoop/issues/6773))
 - **scoop-checkup:** Skip Defender check when `Get-MpPreference` fails ([#6745](https://github.com/ScoopInstaller/Scoop/issues/6745))
 - **scoop-cleanup, scoop-reset, scoop-uninstall, scoop-update:** Skip running apps and fail the command ([#6836](https://github.com/ScoopInstaller/Scoop/issues/6836))

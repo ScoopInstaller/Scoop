@@ -67,8 +67,7 @@ function cleanup($app, $global, $verbose, $cache) {
         }
     } catch {
         Write-Host 'Error.' -ForegroundColor DarkRed
-        error "Couldn't remove an old version of '$app'; it may be in use."
-        $failed[$app] = 'could not remove an old version'
+        $failed[$app] = 'blocked: could not remove an old version (in use)'
         return
     }
     if (!$failed.ContainsKey($app)) { Write-Host 'Done.' -ForegroundColor Green }
@@ -95,7 +94,7 @@ if ($apps -or $all) {
         Remove-Item "$cachedir\*.download" -ErrorAction Ignore
     }
 
-    if (!$verbose) {
+    if (!$verbose -and $failed.Count -eq 0) {
         success 'Everything is shiny now!'
     }
 }

@@ -131,8 +131,7 @@ if (-not ($apps -or $all)) {
         if ($outdated.Length -gt 1) {
             Write-Host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
         } elseif ($outdated.Length -eq 0) {
-            $skipped = @($failed.Keys | Where-Object { $failed[$_] -like 'skipped:*' })
-            if (!$skipped.Count) {
+            if ($failed.Count -eq 0) {
                 Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
             }
         } else {

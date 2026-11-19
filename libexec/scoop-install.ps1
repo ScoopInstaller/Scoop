@@ -106,7 +106,7 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
     if (installed_manifest $app $version) {
         warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
         $resolved += $spec
-        continue
+        return
     }
 
     $path = generate_user_manifest $app $bucket $version

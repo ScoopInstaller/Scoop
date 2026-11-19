@@ -29,6 +29,8 @@ if ($global -and !(is_admin)) {
     exit 1
 }
 
+$exitcode = 0
+
 $apps | ForEach-Object {
     $app = $_
 
@@ -43,6 +45,7 @@ $apps | ForEach-Object {
         } else {
             error "'$app' is not installed."
         }
+        $exitcode = 1
         return
     }
 
@@ -55,7 +58,8 @@ $apps | ForEach-Object {
     $json = install_info $app $version $global
     if (!$json) {
         error "Failed to unhold '$app'"
-        continue
+        $exitcode = 1
+        return
     }
     $install = @{}
     $json | Get-Member -MemberType Properties | ForEach-Object { $install.Add($_.Name, $json.($_.Name)) }
@@ -65,7 +69,7 @@ $apps | ForEach-Object {
         } else {
             info "'$app' is not held."
         }
-        continue
+        return
     }
     $install.hold = $null
     save_install_info $install $dir
