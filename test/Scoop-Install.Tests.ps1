@@ -551,8 +551,6 @@ Describe 'persist_def' -Tag 'Scoop' {
 Describe 'install_app show_manifest and suggest' -Tag 'Scoop' {
     BeforeAll {
         . "$PSScriptRoot\..\lib\json.ps1" # 'ConvertToPrettyJson'
-        . "$PSScriptRoot\..\lib\download.ps1" # 'Invoke-ScoopDownload'
-        . "$PSScriptRoot\..\lib\decompress.ps1" # 'Invoke-Extraction'
     }
     BeforeEach {
         Mock Get-Manifest { 'app', [PSCustomObject]@{ version = '1.0'; suggest = [PSCustomObject]@{ 'feature' = @('other') } }, 'main', $null }
@@ -561,10 +559,11 @@ Describe 'install_app show_manifest and suggest' -Tag 'Scoop' {
         Mock get_config { $true } -ParameterFilter { $name -eq 'SHOW_MANIFEST' }
         Mock ConvertToPrettyJson { '{}' }
         Mock Read-Host { 'y' }
-        # the install steps, so that it gets as far as collecting the suggestions
-        Mock ensure { $dir }
-        Mock Invoke-ScoopDownload { 'app.zip' }
-        Mock Invoke-Extraction {}
+        # the install steps, so that it gets as far as collecting the suggestions;
+        # 'prepare_app' wipes the version directory, so it must never reach the real '$SCOOP'
+        $appDir = "$TestDrive\app\1.0"
+        New-Item -ItemType Directory -Path $appDir -Force | Out-Null
+        Mock prepare_app { [PSCustomObject]@{ dir = "$TestDrive\app\1.0"; fname = 'app.zip' } }
         Mock Invoke-HookScript {}
         Mock Invoke-Installer { $true }
         Mock ensure_install_dir_not_in_path {}
@@ -589,7 +588,7 @@ Describe 'install_app show_manifest and suggest' -Tag 'Scoop' {
     It 'does not install when declined' {
         Mock Read-Host { 'n' }
         install_app 'app' '64bit' $false $suggested $failed 6>$null | Out-Null
-        Should-Invoke ensure -Times 0 -Exactly
+        Should-Invoke prepare_app -Times 0 -Exactly
         $failed['app'] | Should-Be 'skipped: installation cancelled'
         $suggested.Keys | Should-BeCollection -Count 0
     }
@@ -602,13 +601,27 @@ Describe 'install_app show_manifest and suggest' -Tag 'Scoop' {
         $suggested.Keys | Should-BeCollection -Count 0
     }
 
+    It 'install_version does not suggest with -Updating' {
+        # 'update_app' calls it directly, so the switch must not depend on the caller's scope
+        $manifest = [PSCustomObject]@{ version = '1.0'; suggest = [PSCustomObject]@{ 'feature' = @('other') } }
+        install_version 'app' $manifest '1.0' '64bit' $false 'main' $null $suggested $failed $appDir 'app.zip' -Updating 6>$null | Out-Null
+        $failed.Keys | Should-BeCollection -Count 0
+        Should-Invoke success -Times 1 -Exactly
+        $suggested.Keys | Should-BeCollection -Count 0
+    }
+
     It 'is never asked nor suggested during an update' {
-        # by then the old version is uninstalled, so declining would leave the app removed;
+        # by then the old version may be uninstalled, so declining would leave the app removed;
         # and the suggestions were shown when it was first installed
         $ast = [System.Management.Automation.Language.Parser]::ParseFile("$PSScriptRoot\..\lib\update.ps1", [ref]$null, [ref]$null)
-        $calls = $ast.FindAll({ $args[0] -is [System.Management.Automation.Language.CommandAst] -and $args[0].GetCommandName() -eq 'install_app' }, $true)
-        $calls | Should-BeCollection -Count 2
-        $calls | ForEach-Object { $_.Extent.Text | Should-MatchString '-Updating\b' }
+        foreach ($name in 'install_app', 'install_version') {
+            $calls = @($ast.FindAll({ $args[0] -is [System.Management.Automation.Language.CommandAst] -and $args[0].GetCommandName() -eq $name }, $true))
+            $calls.Count | Should-BeGreaterThan 0 -Because "'update.ps1' calls '$name'"
+            $missing = @($calls | Where-Object {
+                    !($_.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.CommandParameterAst] -and $_.ParameterName -eq 'Updating' -and !$_.Argument })
+                } | ForEach-Object { "line $($_.Extent.StartLineNumber): $($_.Extent.Text)" })
+            $missing | Should-BeCollection -Count 0
+        }
     }
 }
 

@@ -108,10 +108,10 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         $failed[$app_key] = 'download failed'
         return
     }
-    install_version $app $manifest $version $architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
+    install_version $app $manifest $version $architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname -Updating:$Updating
 }
 
-function install_version($app, $manifest, $version, $architecture, $global, $bucket, $url, $suggested, $failed, $dir, $fname) {
+function install_version($app, $manifest, $version, $architecture, $global, $bucket, $url, $suggested, $failed, $dir, $fname, [Switch]$Updating) {
     $app_key = if ($global) { "$app (global)" } else { $app }
     $linked = $false
     # the installation modifies the extracted files, so they cannot be reused afterwards

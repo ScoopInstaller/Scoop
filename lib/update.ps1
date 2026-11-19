@@ -380,7 +380,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         if (-not $independent) {
             # the dependencies of the version that is switched to, not the ones the manifest has now
             $deps = @($installed.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $installed_architecture } | Where-Object { !(installed $_) } | Select-Object -Unique)
-            $deps | ForEach-Object { install_app $_ $installed_architecture $global $suggested $failed $use_cache $check_hash }
+            $deps | ForEach-Object { install_app $_ $installed_architecture $global $suggested $failed $use_cache $check_hash -Updating }
             $failed_deps = failed_deps $installed $failed
             if ($failed_deps.Count -gt 0) {
                 error "'$app' depends on $($failed_deps -join ', '), which failed."
@@ -428,7 +428,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         $helpers = Get-InstallationHelper $manifest $new_architecture
         $needed = @($helpers | ForEach-Object { Get-Dependency $_ $new_architecture } | Select-Object -Unique)
         $needed | Where-Object { !(installed $_) } | ForEach-Object {
-            install_app $_ $new_architecture $global $suggested $failed $use_cache $check_hash
+            install_app $_ $new_architecture $global $suggested $failed $use_cache $check_hash -Updating
         }
     }
 
