@@ -169,16 +169,41 @@ Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
         $result | Should-NotBeNull
         $result.version | Should-Be '1.0.0'
-        $result.source | Should-Be 'git_manifest:feedface^'
+        $result.source | Should-Be 'git_manifest:feedface'
     }
 
     It 'returns $null when $h / $h^ walk yields no manifest' {
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"9.9.9"}' }
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -match '^[a-f0-9]+\^?:' } { return '{"version":"9.9.9"}' }
-        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-n' } { return @('aaaa1111') }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-G' } { return @('aaaa1111') }
 
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
         $result | Should-BeNull
+    }
+
+    It 'walks older pickaxe hits when the newest ones are later releases' {
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"5.20.2"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-G' } { return @('newer1111', 'older2222') }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -eq 'newer1111:bucket/foo.json' } { return '{"version":"5.20.2"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -eq 'newer1111^:bucket/foo.json' } { return '{"version":"5.20.1"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -eq 'older2222:bucket/foo.json' } { return '{"version":"5.20"}' }
+
+        $result = Find-HistoricalManifestInGit 'foo' 'main' '5.20'
+        $result | Should-NotBeNull
+        $result.version | Should-Be '5.20'
+        $result.source | Should-Be 'git_manifest:older2222'
+    }
+
+    It 'anchors the pickaxe pattern so a longer version cannot match' {
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"5.20.2"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-G' } {
+            $script:pickaxePattern = $ArgumentList[[Array]::IndexOf($ArgumentList, '-G') + 1]
+            return @()
+        }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-S' } { return @() }
+
+        $null = Find-HistoricalManifestInGit 'foo' 'main' '5.20'
+        $script:pickaxePattern | Should-Be 'version.: .5\.20([^0-9A-Za-z._+-]|$)'
     }
 
     It 'returns $null when inner bucket directory cannot be found' {
