@@ -49,9 +49,7 @@ function do_uninstall($app, $global) {
             error "Couldn't uninstall '$app'."; exit 1
         }
     } catch {
-        $script:errors = $true
-        error "Couldn't uninstall '$app': $($_.Exception.Message)"
-        return
+        error "Couldn't uninstall '$app': $($_.Exception.Message)"; exit 1
     }
     Remove-ShimFromManifest $app $manifest $global $architecture
 
