@@ -21,6 +21,7 @@ Describe 'Manifest validates against the schema' {
         } else {
             $manifestFiles = (Get-ChildItem $bucketDir -Filter '*.json' -Recurse).FullName
         }
+        $manifestFiles = @($manifestFiles | Where-Object { (Split-Path -Leaf $_) -ne '.scoop-migrations.json' })
     }
     BeforeAll {
         Add-Type -Path "$PSScriptRoot\..\supporting\validator\bin\Scoop.Validator.dll"

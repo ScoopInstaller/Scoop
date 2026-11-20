@@ -32,12 +32,14 @@ function Get-Dependency {
         $Unresolved = @()
     )
     process {
+        $requested = $AppName
         $AppName, $manifest, $bucket, $url = Get-Manifest $AppName
-        $Unresolved += $AppName
+        # A dependency may still be listed by the name this call was made with.
+        $Unresolved += $requested, $AppName
 
         if (!$manifest) {
             if (((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
-                warn "Bucket '$bucket' not added. Add it with $(if($bucket -in (known_buckets)) { "'scoop bucket add $bucket' or " })'scoop bucket add $bucket <repo>'."
+                warn "Bucket '$bucket' not added. $(Get-BucketAddHint $bucket)"
             }
             abort "Couldn't find manifest for '$AppName'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
         }
@@ -53,15 +55,17 @@ function Get-Dependency {
             }
         }
 
-        $Unresolved = $Unresolved -ne $AppName
-        if ($bucket) {
+        $Unresolved = @($Unresolved | Where-Object { $_ -ne $requested -and $_ -ne $AppName })
+        # An app installed under the old name must not be installed again under the new one.
+        $installed_as_old = (parse_app $requested)[0] -ne $AppName -and (installed $requested)
+        if ($installed_as_old) {
+            $Resolved += $requested
+        } elseif ($bucket) {
             $Resolved += "$bucket/$AppName"
+        } elseif ($url) {
+            $Resolved += $url
         } else {
-            if ($url) {
-                $Resolved += $url
-            } else {
-                $Resolved += $AppName
-            }
+            $Resolved += $AppName
         }
         if ($Unresolved.Length -eq 0) {
             return $Resolved

@@ -564,14 +564,19 @@ function app_status($app, $global) {
         $status.deprecated = (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
     }
 
-    $manifest = manifest $app $install_info.bucket $install_info.url
+    $lookup = if ($install_info.bucket) { "$($install_info.bucket)/$app" } else { $app }
+    $resolved, $manifest, $resolved_bucket, $url = Get-Manifest $lookup
     $status.pinned = (!$install_info.bucket -and $install_info.url -eq (usermanifest $app))
     $latest_manifest = $manifest
     if ($status.pinned) {
         $scanned, $null = Find-AppBucket $app
         if ($scanned) { $latest_manifest = $scanned }
     }
-    $status.removed = (!$manifest)
+    $bucket_moved = $install_info.bucket -and $resolved_bucket -and $resolved_bucket -ine $install_info.bucket
+    if ($resolved -ne $app -or $bucket_moved) {
+        $status.renamed = if ($bucket_moved) { "$resolved_bucket/$resolved" } else { $resolved }
+    }
+    $status.removed = (!$manifest -and !$status.renamed)
     if ($latest_manifest.version) {
         $status.latest_version = $latest_manifest.version
     }
@@ -591,7 +596,8 @@ function app_status($app, $global) {
             return $null
         } else {
             $app, $bucket, $null = parse_app $_
-            return !(installed $app)
+            $lookup = if ($bucket) { "$bucket/$app" } else { $app }
+            !(installed $app) -and !(installed (Get-Manifest $lookup)[0])
         }
     }
     if ($deps) {

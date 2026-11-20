@@ -549,9 +549,12 @@ Describe 'app_status' -Tag 'Scoop' {
     It 'reports the bucket version of an app installed from an auto-generated manifest' {
         Mock Select-CurrentVersion { '3.24.0' }
         Mock install_info { [PSCustomObject]@{ url = (usermanifest 'foo') } }
-        Mock manifest { [PSCustomObject]@{ version = '3.24.0'; depends = @('dep') } }
         Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1'; depends = @('newdep') }, 'extras' }
         Mock installed { $app -ne 'dep' }
+        Mock Get-Manifest {
+            if ($app -eq 'dep') { 'dep', $null, 'main', $null }
+            else { 'foo', [pscustomobject]@{ version = '3.24.0'; depends = @('dep') }, $null, (usermanifest 'foo') }
+        }
 
         $status = app_status 'foo' $false
 
@@ -561,6 +564,18 @@ Describe 'app_status' -Tag 'Scoop' {
         # the dependencies of the installed version, not of the newer one
         $status.missing_deps | Should-BeCollection -Count 1
         $status.missing_deps[0] | Should-Be 'dep'
+    }
+
+    It 'accepts the installed name of a dependency that has been renamed' {
+        Mock Select-CurrentVersion { '1.0.0' }
+        Mock install_info { [PSCustomObject]@{ bucket = 'main' } }
+        Mock manifest { [PSCustomObject]@{ version = '1.0.0'; depends = @('old-dep') } }
+        Mock Get-Manifest { 'new-dep', $null, 'main', $null }
+        Mock installed { $app -eq 'old-dep' }
+
+        $status = app_status 'foo' $false
+
+        $status.missing_deps | Should-BeCollection -Count 0
     }
 
     It 'keeps the manifest of an app installed from a bucket' {
@@ -586,5 +601,61 @@ Describe 'abort' -Tag 'Scoop' {
         $code = $null
         try { abort 'boom' 7 } catch { $code = $_.Exception.Data['ExitCode'] }
         $code | Should-Be 7
+    }
+}
+
+Describe 'app_status of a renamed app' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\versions.ps1"
+        . "$PSScriptRoot\..\lib\manifest.ps1"
+        . "$PSScriptRoot\..\lib\buckets.ps1"
+    }
+
+    BeforeEach {
+        Mock installed { $true }
+        Mock failed { $false }
+        Mock Select-CurrentVersion { '1.0.0' }
+        Mock install_info { [pscustomobject]@{ bucket = 'main'; url = $null; hold = $false } }
+        Mock get_config { $null }
+        Mock Find-BucketDirectory { Join-Path $TestDrive 'no-such-bucket' }
+        Mock manifest { $null }
+    }
+
+    It 'reports the app as moved instead of removed' {
+        Mock Get-Manifest { 'new-name', [pscustomobject]@{ version = '2.0.0' }, 'main', $null }
+
+        $status = app_status 'old-name' $false
+
+        $status.removed | Should-BeFalse
+        $status.renamed | Should-Be 'new-name'
+        $status.latest_version | Should-Be '2.0.0'
+        $status.outdated | Should-BeTrue
+    }
+
+    It 'reports the bucket of a move to another one' {
+        Mock Get-Manifest { 'new-name', [pscustomobject]@{ version = '2.0.0' }, 'extras', $null }
+
+        $status = app_status 'old-name' $false
+
+        $status.renamed | Should-Be 'extras/new-name'
+    }
+
+    It 'reports the app as moved when the target bucket is not installed' {
+        Mock Get-Manifest { 'new-name', $null, 'versions', $null }
+
+        $status = app_status 'old-name' $false
+
+        $status.removed | Should-BeFalse
+        $status.renamed | Should-Be 'versions/new-name'
+        $status.outdated | Should-BeFalse
+    }
+
+    It 'reports the app as removed when nothing resolves the name' {
+        Mock Get-Manifest { 'old-name', $null, 'main', $null }
+
+        $status = app_status 'old-name' $false
+
+        $status.removed | Should-BeTrue
+        $status.renamed | Should-BeNull
     }
 }
