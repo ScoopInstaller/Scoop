@@ -1,3 +1,10 @@
+function Get-NativePath {
+    # Dot-source paths are written with Windows separators, a file-name character on Unix.
+    param([String] $Path)
+
+    if ([IO.Path]::DirectorySeparatorChar -eq '\') { $Path } else { $Path -replace '\\', '/' }
+}
+
 function Get-DotSourceLiteralPath {
     # `$PSScriptRoot` is the only variable Scoop uses in dot-source paths.
     param(
@@ -11,6 +18,7 @@ function Get-DotSourceLiteralPath {
         'ExpandableStringExpressionAst' { $arg.Value -replace '\$PSScriptRoot', (Split-Path $File -Parent) }
     }
     if (-not $value -or $value -match '\$') { return }
+    $value = Get-NativePath $value
     if ([IO.Path]::IsPathRooted($value)) { [IO.Path]::GetFullPath($value) }
     # The process CWD is unknowable statically; the script's directory is the closest guess.
     else { [IO.Path]::GetFullPath((Join-Path (Split-Path $File -Parent) $value)) }
@@ -164,7 +172,8 @@ function Get-ScriptIndex {
     if ($script:indexCache.ContainsKey($Root)) { return $script:indexCache[$Root] }
 
     # test/ is indexed so reachability sees the suite's calls; it holds no entry points.
-    $files = Get-ChildItem "$Root\bin", "$Root\lib", "$Root\libexec", "$Root\test" -Filter *.ps1 -Recurse -ErrorAction SilentlyContinue |
+    $sourceDirs = 'bin', 'lib', 'libexec', 'test' | ForEach-Object { Join-Path $Root $_ }
+    $files = Get-ChildItem $sourceDirs -Filter *.ps1 -Recurse -ErrorAction SilentlyContinue |
         ForEach-Object FullName
 
     $defs = @{}          # name -> @{ File; Key; Owner; Stmt }[]
@@ -383,7 +392,7 @@ function Get-ScriptIndex {
     # Everything bin/scoop.ps1 puts into the session of the libexec script it dispatches to.
     $hostSet = @{}
     $hostQueue = [System.Collections.Generic.Queue[String]]::new()
-    $hostQueue.Enqueue((Join-Path $Root 'bin\scoop.ps1'))
+    $hostQueue.Enqueue((Join-Path $Root (Join-Path 'bin' 'scoop.ps1')))
     while ($hostQueue.Count) {
         $current = $hostQueue.Dequeue()
         if (-not $current -or $hostSet.ContainsKey($current) -or -not $topStmts.ContainsKey($current)) { continue }
@@ -393,9 +402,9 @@ function Get-ScriptIndex {
     }
 
     $entries = @()
-    $entries += Get-ChildItem "$Root\bin" -Filter *.ps1 | ForEach-Object FullName
-    $entries += Get-ChildItem "$Root\libexec" -Filter *.ps1 | ForEach-Object FullName
-    $entries = $entries | Where-Object { -not ($invoked.ContainsKey($_) -and $_ -like "$Root\bin\*") }
+    $entries += Get-ChildItem (Join-Path $Root 'bin') -Filter *.ps1 | ForEach-Object FullName
+    $entries += Get-ChildItem (Join-Path $Root 'libexec') -Filter *.ps1 | ForEach-Object FullName
+    $entries = $entries | Where-Object { -not ($invoked.ContainsKey($_) -and $_ -like "$(Join-Path $Root (Join-Path 'bin' '*'))") }
 
     $result = @{
         root = $Root
@@ -550,7 +559,7 @@ function Get-DotSourceIssue {
 
     $issues = @()
     foreach ($entry in $entries) {
-        $inherits = $entry -like "$Root\libexec\*"
+        $inherits = $entry -like "$(Join-Path $Root (Join-Path 'libexec' '*'))"
 
         # A function loads files when it runs (lib/core.ps1 does this lazily): treat every file
         # reachable from this entry as available.
@@ -737,9 +746,9 @@ function Get-UnreachableFunction {
     # Load order is ignored: anything a seed dot-sources is a seed, and `&`-reached bin scripts run
     # in their caller's session, so they stay seeds without being entries.
     $seeds = @{}
-    foreach ($e in Get-ChildItem "$Root\bin", "$Root\libexec" -Filter *.ps1) { $seeds[$e.FullName] = $true }
+    foreach ($e in Get-ChildItem (Join-Path $Root 'bin'), (Join-Path $Root 'libexec') -Filter *.ps1) { $seeds[$e.FullName] = $true }
     # The test suite consumes lib functions too; a function only the tests reach is not dead code.
-    foreach ($e in Get-ChildItem "$Root\test" -Filter *.ps1 -Recurse -ErrorAction SilentlyContinue) { $seeds[$e.FullName] = $true }
+    foreach ($e in Get-ChildItem (Join-Path $Root 'test') -Filter *.ps1 -Recurse -ErrorAction SilentlyContinue) { $seeds[$e.FullName] = $true }
     # An `& path` script runs, so the functions it calls are live even though it loads nothing here.
     foreach ($p in $index.invoked.Keys) { $seeds[$p] = $true }
     $loadQueue = [System.Collections.Generic.Queue[String]]::new()
@@ -835,7 +844,7 @@ function Get-DeprecatedFunction {
     $deprecated = @()
     foreach ($entry in $defs.GetEnumerator()) {
         foreach ($def in $entry.Value) {
-            if ($def.File -like "$Root\test\*") { continue }
+            if ($def.File -like "$(Join-Path $Root (Join-Path 'test' '*'))") { continue }
             $mark = Get-Deprecation $fnBodies[$def.Key]
             if (-not $mark.Deprecated) { continue }
             $deprecated += [PSCustomObject]@{
