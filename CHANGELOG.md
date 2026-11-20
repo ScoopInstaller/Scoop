@@ -32,6 +32,7 @@
 - **manifest:** Match historical versions exactly ([#6831](https://github.com/ScoopInstaller/Scoop/pull/6831))
 - **scoop:** Keep the formatted output of a command ([#6813](https://github.com/ScoopInstaller/Scoop/issues/6813))
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
+- **static-analysis:** Build and compare paths with the platform separator ([#6850](https://github.com/ScoopInstaller/Scoop/issues/6850))
 - **update:** Extract the new version before removing the old one ([#6839](https://github.com/ScoopInstaller/Scoop/issues/6839))
 - **update:** Restore the old version when an update fails ([#6810](https://github.com/ScoopInstaller/Scoop/issues/6810))
 - **update:** Run `pre_uninstall` before the running process check ([#6841](https://github.com/ScoopInstaller/Scoop/issues/6841))

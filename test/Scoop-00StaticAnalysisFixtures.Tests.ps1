@@ -1,11 +1,11 @@
 Describe 'Static analysis fixtures' -Tag 'Scoop' {
     BeforeAll {
-        Import-Module "$PSScriptRoot\..\supporting\Scoop.StaticAnalysis.psm1" -Force
-        $fixtureRoot = Join-Path $PSScriptRoot 'fixtures\static-analysis\repo'
+        Import-Module (Join-Path (Join-Path (Split-Path $PSScriptRoot -Parent) 'supporting') 'Scoop.StaticAnalysis.psm1') -Force
+        $fixtureRoot = Join-Path (Join-Path (Join-Path $PSScriptRoot 'fixtures') 'static-analysis') 'repo'
         $issues = @(Get-DotSourceIssue -Root $fixtureRoot)
         $unreachable = @(Get-UnreachableFunction -Root $fixtureRoot)
         $deprecated = @(Get-DeprecatedFunction -Root $fixtureRoot)
-        $usage = @(Get-DeprecatedManifestUsage -Root $fixtureRoot -Dir (Join-Path $PSScriptRoot 'fixtures\manifest'))
+        $usage = @(Get-DeprecatedManifestUsage -Root $fixtureRoot -Dir (Join-Path (Join-Path $PSScriptRoot 'fixtures') 'manifest'))
     }
 
     Context 'Get-DotSourceIssue' {
