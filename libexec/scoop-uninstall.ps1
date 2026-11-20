@@ -86,8 +86,14 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
             continue
         }
 
-        if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-            $failed[$app] = 'uninstaller failed'
+        try {
+            if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+                $failed[$app] = 'uninstaller failed'
+                continue
+            }
+        } catch {
+            $failed[$app] = $_.Exception.Message
+            error $_.Exception.Message
             continue
         }
         unlink_app $app $manifest $dir $persist_dir $global $architecture

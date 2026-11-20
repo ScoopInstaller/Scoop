@@ -255,7 +255,7 @@ function Invoke-HookScript {
                 $hookCompleted = $true
             }
             if (!$hookCompleted) {
-                throw "Hook script '$HookType' aborted by 'break'/'continue'."
+                throw "Hook script '$HookType' aborted."
             }
         } catch {
             Write-Host 'Error.' -ForegroundColor DarkRed
