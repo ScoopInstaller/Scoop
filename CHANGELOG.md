@@ -30,8 +30,10 @@
 - **install:** Expand $dir and $persist_dir in env_add_path ([#6808](https://github.com/ScoopInstaller/Scoop/issues/6808))
 - **install:** Unlink the persisted data before extracting ([#6845](https://github.com/ScoopInstaller/Scoop/issues/6845))
 - **install:** Prevent a stray `break`/`continue` from silently ending the command ([#6842](https://github.com/ScoopInstaller/Scoop/issues/6842))
+- **manifest:** Match historical versions exactly ([#6831](https://github.com/ScoopInstaller/Scoop/pull/6831))
 - **scoop:** Keep the formatted output of a command ([#6813](https://github.com/ScoopInstaller/Scoop/issues/6813))
 - **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
+- **static-analysis:** Build and compare paths with the platform separator ([#6850](https://github.com/ScoopInstaller/Scoop/issues/6850))
 - **update:** Extract the new version before removing the old one ([#6839](https://github.com/ScoopInstaller/Scoop/issues/6839))
 - **update:** Restore the old version when an update fails ([#6810](https://github.com/ScoopInstaller/Scoop/issues/6810))
 - **update:** Run `pre_uninstall` before the running process check ([#6841](https://github.com/ScoopInstaller/Scoop/issues/6841))
@@ -53,6 +55,7 @@
 ### Tests
 
 - **pester:** Update to Pester 6 ([#6779](https://github.com/ScoopInstaller/Scoop/issues/6779))
+- **shim:** Subprocess doesn't need a new console ([#6848](https://github.com/ScoopInstaller/Scoop/issues/6848))
 - **static-analysis:** Add dot-source dependency and dead code checks ([#6787](https://github.com/ScoopInstaller/Scoop/issues/6787))
 
 ## [v0.6.0](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...v0.6.0) - 2026-09-30

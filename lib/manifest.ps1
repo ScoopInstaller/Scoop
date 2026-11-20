@@ -244,30 +244,30 @@ function Find-HistoricalManifestInGit($app, $bucket, $requestedVersion) {
 
         # Pickaxe. Regex avoids literal '"' because Windows command line strips
         # them before git sees the arg; '.' wildcards stand in for the JSON quotes.
-        $pattern = 'version.: .' + [regex]::Escape($requestedVersion)
+        # The trailing class bounds the version: git -G has no lookahead for '5.20' vs '5.20.1'.
+        $pattern = 'version.: .' + [regex]::Escape($requestedVersion) + '([^0-9A-Za-z._+-]|$)'
         $commits = @()
-        $outG = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '-n', '1', '--format=%H', '-G', $pattern, '--', $relativeManifestPath)
+        $outG = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '-n', '5', '--format=%H', '-G', $pattern, '--', $relativeManifestPath)
         if ($outG) { $commits = @($outG | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
 
         if ($commits.Count -eq 0) {
             # -S literal fallback (same Windows quoting caveat).
             $searchLiteral = 'version: ' + $requestedVersion
-            $outS = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '-n', '1', '--format=%H', '-S', $searchLiteral, '--', $relativeManifestPath)
+            $outS = Invoke-Git -Path $bucketDir -ArgumentList @('log', '--follow', '-n', '5', '--format=%H', '-S', $searchLiteral, '--', $relativeManifestPath)
             if ($outS) { $commits = @($outS | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) }
         }
 
-        if ($commits.Count -eq 0) { return $null }
-
-        $h = $commits[0]
-        foreach ($spec in @("$h^", "$h")) {
-            $content = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$spec`:$relativeManifestPath") 2>$null
-            if (-not $content) { continue }
-            if ($content -is [Array]) { $content = $content -join "`n" }
-            try {
-                $obj = $content | ConvertFrom-Json -ErrorAction Stop
-            } catch { continue }
-            if ($obj -and $obj.version -eq $requestedVersion) {
-                return @{ ManifestText = $content; version = $requestedVersion; source = "git_manifest:$spec" }
+        foreach ($h in $commits) {
+            foreach ($spec in @("$h", "$h^")) {
+                $content = Invoke-Git -Path $bucketDir -ArgumentList @('show', "$spec`:$relativeManifestPath") 2>$null
+                if (-not $content) { continue }
+                if ($content -is [Array]) { $content = $content -join "`n" }
+                try {
+                    $obj = $content | ConvertFrom-Json -ErrorAction Stop
+                } catch { continue }
+                if ($obj -and $obj.version -eq $requestedVersion) {
+                    return @{ ManifestText = $content; version = $requestedVersion; source = "git_manifest:$spec" }
+                }
             }
         }
         return $null
