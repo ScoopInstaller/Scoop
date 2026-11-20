@@ -53,6 +53,7 @@
 ### Tests
 
 - **pester:** Update to Pester 6 ([#6779](https://github.com/ScoopInstaller/Scoop/issues/6779))
+- **shim:** Subprocess doesn't need a new console ([#6848](https://github.com/ScoopInstaller/Scoop/issues/6848))
 - **static-analysis:** Add dot-source dependency and dead code checks ([#6787](https://github.com/ScoopInstaller/Scoop/issues/6787))
 
 ## [v0.6.0](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...v0.6.0) - 2026-09-30
