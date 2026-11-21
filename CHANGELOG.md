@@ -20,6 +20,7 @@
 - **scoop-update:** Run missing uninstall steps and honor `--no-cache` ([#6750](https://github.com/ScoopInstaller/Scoop/issues/6750))
 - **scoop-update:** Show the available version of a pinned app ([#6819](https://github.com/ScoopInstaller/Scoop/issues/6819))
 - **auto-pr:** Add missing `core.ps1` dot source ([#6786](https://github.com/ScoopInstaller/Scoop/pull/6786))
+- **checkver:** Add opt-in `skipdowngrade` guard against regressing a manifest to an older version ([#6720](https://github.com/ScoopInstaller/Scoop/issues/6720))
 - **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
 - **core:** End progress lines with a status marker ([#6805](https://github.com/ScoopInstaller/Scoop/issues/6805))
 - **core:** Let abort throw instead of ending the process ([#6835](https://github.com/ScoopInstaller/Scoop/issues/6835))
