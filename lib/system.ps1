@@ -3,8 +3,8 @@
 ## Environment Variables
 
 function Publish-EnvVar {
-    if (-not ('Win32.NativeMethods' -as [Type])) {
-        Add-Type -Namespace Win32 -Name NativeMethods -MemberDefinition @'
+    if (-not ('Win32.ScoopEnvMethods' -as [Type])) {
+        Add-Type -Namespace Win32 -Name ScoopEnvMethods -MemberDefinition @'
 [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
 public static extern IntPtr SendMessageTimeout(
     IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam,
@@ -17,7 +17,7 @@ public static extern IntPtr SendMessageTimeout(
     $WM_SETTINGCHANGE = 0x1a
     $result = [UIntPtr]::Zero
 
-    [Win32.NativeMethods]::SendMessageTimeout($HWND_BROADCAST,
+    [Win32.ScoopEnvMethods]::SendMessageTimeout($HWND_BROADCAST,
         $WM_SETTINGCHANGE,
         [UIntPtr]::Zero,
         'Environment',
@@ -113,9 +113,10 @@ function Add-Path {
         Set-EnvVar -Name $TargetEnvVar -Value ((@($Path) + $strippedPath) -join ';') -Global:$Global
     }
     # current session
-    $inPath, $strippedPath = Split-PathLikeEnvVar $Path $env:PATH
+    $sessionPath = @($Path) | ForEach-Object { [Environment]::ExpandEnvironmentVariables($_) }
+    $inPath, $strippedPath = Split-PathLikeEnvVar $sessionPath $env:PATH
     if (!$inPath -or $Force) {
-        $env:PATH = (@($Path) + $strippedPath) -join ';'
+        $env:PATH = (@($sessionPath) + $strippedPath) -join ';'
     }
 }
 
@@ -139,7 +140,8 @@ function Remove-Path {
         Set-EnvVar -Name $TargetEnvVar -Value $strippedPath -Global:$Global
     }
     # current session
-    $inSessionPath, $strippedPath = Split-PathLikeEnvVar $Path $env:PATH
+    $sessionPath = @($Path) | ForEach-Object { [Environment]::ExpandEnvironmentVariables($_) }
+    $inSessionPath, $strippedPath = Split-PathLikeEnvVar $sessionPath $env:PATH
     if ($inSessionPath) {
         $env:PATH = $strippedPath
     }

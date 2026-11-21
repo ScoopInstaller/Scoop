@@ -111,7 +111,10 @@ foreach ($curr_app in $apps) {
     $dl_failure = $false
 
     if(Test-Aria2Enabled) {
-        Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash
+        if (!(Invoke-CachedAria2Download $app $version $manifest $architecture $cachedir $manifest.cookie $use_cache $curr_check_hash)) {
+            $download_failed = $true
+            continue
+        }
     } else {
         foreach($url in script:url $manifest $architecture) {
             try {

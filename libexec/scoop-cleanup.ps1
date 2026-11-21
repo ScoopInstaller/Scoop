@@ -20,6 +20,7 @@ if ($err) { error "scoop cleanup: $err"; exit 1 }
 $global = $opt.g -or $opt.global
 $cache = $opt.k -or $opt.cache
 $all = $opt.a -or $opt.all
+$failed = @{}
 
 if (!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
 
@@ -40,25 +41,36 @@ function cleanup($app, $global, $verbose, $cache) {
         return
     }
 
-    Write-Host -f yellow "Removing $app`:" -NoNewline
-    $versions | ForEach-Object {
-        $version = $_
-        Write-Host " $version" -NoNewline
-        $dir = versiondir $app $version $global
-        # unlink all potential old link before doing recursive Remove-Item
-        unlink_persist_data (installed_manifest $app $version $global) $dir
-        Remove-Item $dir -ErrorAction Stop -Recurse -Force
+    Write-Host -f yellow "Removing $app`: " -NoNewline
+    try {
+        $versions | ForEach-Object {
+            $version = $_
+            Write-Host "$version... " -NoNewline
+            $dir = versiondir $app $version $global
+            # unlink all potential old link before doing recursive Remove-Item
+            unlink_persist_data (installed_manifest $app $version $global) $dir
+            try {
+                Remove-Item $dir -ErrorAction Stop -Recurse -Force
+            } catch {
+                Write-Host 'Error.' -ForegroundColor DarkRed
+                $failed[$app] = 'blocked: could not remove an old version (in use)'
+            }
+        }
+        $leftVersions = Get-ChildItem $appDir
+        if ($leftVersions.Length -eq 1 -and $leftVersions.Name -eq 'current' -and $leftVersions.LinkType) {
+            attrib $leftVersions.FullName -R /L
+            Remove-Item $leftVersions.FullName -ErrorAction Stop -Force
+            $leftVersions = $null
+        }
+        if (!$leftVersions) {
+            Remove-Item $appDir -ErrorAction Stop -Force
+        }
+    } catch {
+        Write-Host 'Error.' -ForegroundColor DarkRed
+        $failed[$app] = 'blocked: could not remove an old version (in use)'
+        return
     }
-    $leftVersions = Get-ChildItem $appDir
-    if ($leftVersions.Length -eq 1 -and $leftVersions.Name -eq 'current' -and $leftVersions.LinkType) {
-        attrib $leftVersions.FullName -R /L
-        Remove-Item $leftVersions.FullName -ErrorAction Stop -Force
-        $leftVersions = $null
-    }
-    if (!$leftVersions) {
-        Remove-Item $appDir -ErrorAction Stop -Force
-    }
-    Write-Host ''
+    if (!$failed.ContainsKey($app)) { Write-Host 'Done.' -ForegroundColor Green }
 }
 
 if ($apps -or $all) {
@@ -70,7 +82,9 @@ if ($apps -or $all) {
         }
     } else {
         $verbose = $true
-        $apps = Confirm-InstallationStatus $apps -Global:$global
+        $install_status = Confirm-InstallationStatus $apps -Global:$global
+        $apps = $install_status.installed
+        $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not installed in the requested scope' } | ForEach-Object { $failed[$_] = $install_status.failed[$_] }
     }
 
     # $apps is now a list of ($app, $global) tuples
@@ -80,9 +94,11 @@ if ($apps -or $all) {
         Remove-Item "$cachedir\*.download" -ErrorAction Ignore
     }
 
-    if (!$verbose) {
+    if (!$verbose -and $failed.Count -eq 0) {
         success 'Everything is shiny now!'
     }
 }
 
-exit 0
+$failed_count = show_failed_apps $failed 'cleanup'
+
+exit [int]($failed_count -gt 0)

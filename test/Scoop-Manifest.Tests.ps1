@@ -10,16 +10,16 @@ BeforeAll {
 Describe 'JSON parse and beautify' -Tag 'Scoop' {
     Context 'Parse JSON' {
         It 'success with valid json' {
-            { parse_json "$PSScriptRoot\fixtures\manifest\wget.json" } | Should -Not -Throw
+            $null = & { parse_json "$PSScriptRoot\fixtures\manifest\wget.json" }
             $parsed = parse_json "$PSScriptRoot\fixtures\manifest\wget.json"
-            $parsed | Should -Not -Be $null
+            $parsed | Should-NotBeNull
         }
         It 'returns null and warns with invalid json' {
             Mock warn {}
-            { parse_json "$PSScriptRoot\fixtures\manifest\broken_wget.json" } | Should -Not -Throw
+            & { parse_json "$PSScriptRoot\fixtures\manifest\broken_wget.json" }
             $parsed = parse_json "$PSScriptRoot\fixtures\manifest\broken_wget.json"
-            $parsed | Should -Be $null
-            Should -Invoke -CommandName warn -Times 1
+            $parsed | Should-BeNull
+            Should-Invoke -CommandName warn -Times 1
         }
     }
     Context 'Beautify JSON' {
@@ -32,7 +32,7 @@ Describe 'JSON parse and beautify' -Tag 'Scoop' {
         It '<_>' -ForEach $manifests {
             $pretty_json = (parse_json "$format\unformatted\$_") | ConvertToPrettyJson
             $correct = (Get-Content "$format\formatted\$_") -join "`r`n"
-            $correct.CompareTo($pretty_json) | Should -Be 0
+            $correct.CompareTo($pretty_json) | Should-Be 0
         }
     }
 }
@@ -42,25 +42,25 @@ Describe 'Handle ARM64 and correctly fallback' -Tag 'Scoop' {
         $manifest1 = @{ url = 'test'; architecture = @{ 'arm64' = @{ pre_install = 'test' } } }
         $manifest2 = @{ url = 'test'; pre_install = "'arm64'" }
         $manifest3 = @{ architecture = @{ 'arm64' = @{ url = 'test' } } }
-        Get-SupportedArchitecture $manifest1 'arm64' | Should -Be 'arm64'
-        Get-SupportedArchitecture $manifest2 'arm64' | Should -Be 'arm64'
-        Get-SupportedArchitecture $manifest3 'arm64' | Should -Be 'arm64'
+        Get-SupportedArchitecture $manifest1 'arm64' | Should-Be 'arm64'
+        Get-SupportedArchitecture $manifest2 'arm64' | Should-Be 'arm64'
+        Get-SupportedArchitecture $manifest3 'arm64' | Should-Be 'arm64'
     }
     It 'Should return "64bit" if unsupported on Windows 11' {
         $WindowsBuild = 22000
         $manifest1 = @{ url = 'test' }
         $manifest2 = @{ architecture = @{ '64bit' = @{ url = 'test' } } }
-        Get-SupportedArchitecture $manifest1 'arm64' | Should -Be '64bit'
-        Get-SupportedArchitecture $manifest2 'arm64' | Should -Be '64bit'
+        Get-SupportedArchitecture $manifest1 'arm64' | Should-Be '64bit'
+        Get-SupportedArchitecture $manifest2 'arm64' | Should-Be '64bit'
     }
     It 'Should return "32bit" if unsupported on Windows 10' {
         $WindowsBuild = 19044
         $manifest2 = @{ url = 'test' }
         $manifest1 = @{ url = 'test'; architecture = @{ '64bit' = @{ pre_install = 'test' } } }
         $manifest3 = @{ architecture = @{ '64bit' = @{ url = 'test' } } }
-        Get-SupportedArchitecture $manifest1 'arm64' | Should -Be '32bit'
-        Get-SupportedArchitecture $manifest2 'arm64' | Should -Be '32bit'
-        Get-SupportedArchitecture $manifest3 'arm64' | Should -BeNullOrEmpty
+        Get-SupportedArchitecture $manifest1 'arm64' | Should-Be '32bit'
+        Get-SupportedArchitecture $manifest2 'arm64' | Should-Be '32bit'
+        Get-SupportedArchitecture $manifest3 'arm64' | Should-BeNull
     }
 }
 
@@ -72,26 +72,26 @@ Describe 'Manifest Validator' -Tag 'Validator' {
     }
 
     It 'Scoop.Validator is available' {
-        ([System.Management.Automation.PSTypeName]'Scoop.Validator').Type | Should -Be 'Scoop.Validator'
+        ([System.Management.Automation.PSTypeName]'Scoop.Validator').Type | Should-Be 'Scoop.Validator'
     }
     It 'fails with broken schema' {
         $validator = New-Object Scoop.Validator("$PSScriptRoot/fixtures/manifest/broken_schema.json", $true)
-        $validator.Validate("$PSScriptRoot/fixtures/manifest/wget.json") | Should -BeFalse
-        $validator.Errors.Count | Should -Be 1
-        $validator.Errors | Select-Object -First 1 | Should -Match 'broken_schema.*(line 6).*(position 4)'
+        $validator.Validate("$PSScriptRoot/fixtures/manifest/wget.json") | Should-BeFalse
+        $validator.Errors.Count | Should-Be 1
+        $validator.Errors | Select-Object -First 1 | Should-MatchString 'broken_schema.*(line 6).*(position 4)'
     }
     It 'fails with broken manifest' {
         $validator = New-Object Scoop.Validator($schema, $true)
-        $validator.Validate("$PSScriptRoot/fixtures/manifest/broken_wget.json") | Should -BeFalse
-        $validator.Errors.Count | Should -Be 1
-        $validator.Errors | Select-Object -First 1 | Should -Match 'broken_wget.*(line 5).*(position 4)'
+        $validator.Validate("$PSScriptRoot/fixtures/manifest/broken_wget.json") | Should-BeFalse
+        $validator.Errors.Count | Should-Be 1
+        $validator.Errors | Select-Object -First 1 | Should-MatchString 'broken_wget.*(line 5).*(position 4)'
     }
     It 'fails with invalid manifest' {
         $validator = New-Object Scoop.Validator($schema, $true)
-        $validator.Validate("$PSScriptRoot/fixtures/manifest/invalid_wget.json") | Should -BeFalse
-        $validator.Errors.Count | Should -Be 16
-        $validator.Errors | Select-Object -First 1 | Should -Match "Property 'randomproperty' has not been defined and the schema does not allow additional properties\."
-        $validator.Errors | Select-Object -Last 1 | Should -Match 'Required properties are missing from object: version\.'
+        $validator.Validate("$PSScriptRoot/fixtures/manifest/invalid_wget.json") | Should-BeFalse
+        $validator.Errors.Count | Should-Be 16
+        $validator.Errors | Select-Object -First 1 | Should-MatchString "Property 'randomproperty' has not been defined and the schema does not allow additional properties\."
+        $validator.Errors | Select-Object -Last 1 | Should-MatchString 'Required properties are missing from object: version\.'
     }
 }
 
@@ -99,7 +99,7 @@ Describe 'Find-HistoricalManifestInCache' -Tag 'Scoop' {
     It 'returns $null when sqlite cache disabled' {
         Mock get_config -ParameterFilter { $name -eq 'use_sqlite_cache' } { $false }
         $result = Find-HistoricalManifestInCache 'foo' 'main' '1.0.0'
-        $result | Should -Be $null
+        $result | Should-BeNull
     }
 
     It 'returns manifest text and version when cache has exact match' {
@@ -115,9 +115,9 @@ Describe 'Find-HistoricalManifestInCache' -Tag 'Scoop' {
         }
         Mock ensure {}
         $result = Find-HistoricalManifestInCache 'foo' 'main' '1.2.3'
-        $result | Should -Not -BeNullOrEmpty
-        $result.version | Should -Be '1.2.3'
-        $result.ManifestText | Should -Match '"version":"1.2.3"'
+        $result | Should-NotBeNull
+        $result.version | Should-Be '1.2.3'
+        $result.ManifestText | Should-MatchString '"version":"1.2.3"'
     }
 }
 
@@ -135,7 +135,7 @@ Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
     It 'returns $null when git history search disabled' {
         Mock get_config -ParameterFilter { $name -eq 'use_git_history' } { $false }
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
-        $result | Should -Be $null
+        $result | Should-BeNull
     }
 
     It 'returns manifest text on version match' {
@@ -144,9 +144,9 @@ Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } { @('abcdef0123456789') }
 
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
-        $result | Should -Not -BeNullOrEmpty
-        $result.version | Should -Be '1.0.0'
-        $result.ManifestText | Should -Match '"version":"1.0.0"'
+        $result | Should-NotBeNull
+        $result.version | Should-Be '1.0.0'
+        $result.ManifestText | Should-MatchString '"version":"1.0.0"'
     }
 
     It 'short-circuits via HEAD fast-path when HEAD already has the requested version' {
@@ -154,10 +154,10 @@ Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } { @('shouldnotbeused') }
 
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
-        $result | Should -Not -BeNullOrEmpty
-        $result.version | Should -Be '1.0.0'
-        $result.source | Should -Be 'git_manifest:HEAD'
-        Should -Invoke -CommandName Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } -Times 0
+        $result | Should-NotBeNull
+        $result.version | Should-Be '1.0.0'
+        $result.source | Should-Be 'git_manifest:HEAD'
+        Should-Invoke -CommandName Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' } -Times 0
     }
 
     It 'falls back to -S pickaxe when -G yields no commits' {
@@ -167,25 +167,50 @@ Describe 'Find-HistoricalManifestInGit' -Tag 'Scoop' {
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -notlike 'HEAD*' } { return '{"version":"1.0.0"}' }
 
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
-        $result | Should -Not -BeNullOrEmpty
-        $result.version | Should -Be '1.0.0'
-        $result.source | Should -Be 'git_manifest:feedface^'
+        $result | Should-NotBeNull
+        $result.version | Should-Be '1.0.0'
+        $result.source | Should-Be 'git_manifest:feedface'
     }
 
     It 'returns $null when $h / $h^ walk yields no manifest' {
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"9.9.9"}' }
         Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -match '^[a-f0-9]+\^?:' } { return '{"version":"9.9.9"}' }
-        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-n' } { return @('aaaa1111') }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-G' } { return @('aaaa1111') }
 
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
-        $result | Should -Be $null
+        $result | Should-BeNull
+    }
+
+    It 'walks older pickaxe hits when the newest ones are later releases' {
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"5.20.2"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-G' } { return @('newer1111', 'older2222') }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -eq 'newer1111:bucket/foo.json' } { return '{"version":"5.20.2"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -eq 'newer1111^:bucket/foo.json' } { return '{"version":"5.20.1"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -eq 'older2222:bucket/foo.json' } { return '{"version":"5.20"}' }
+
+        $result = Find-HistoricalManifestInGit 'foo' 'main' '5.20'
+        $result | Should-NotBeNull
+        $result.version | Should-Be '5.20'
+        $result.source | Should-Be 'git_manifest:older2222'
+    }
+
+    It 'anchors the pickaxe pattern so a longer version cannot match' {
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'show' -and $ArgumentList[1] -like 'HEAD*' } { return '{"version":"5.20.2"}' }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-G' } {
+            $script:pickaxePattern = $ArgumentList[[Array]::IndexOf($ArgumentList, '-G') + 1]
+            return @()
+        }
+        Mock Invoke-Git -ParameterFilter { $ArgumentList[0] -eq 'log' -and $ArgumentList -contains '-S' } { return @() }
+
+        $null = Find-HistoricalManifestInGit 'foo' 'main' '5.20'
+        $script:pickaxePattern | Should-Be 'version.: .5\.20([^0-9A-Za-z._+-]|$)'
     }
 
     It 'returns $null when inner bucket directory cannot be found' {
         Mock Test-Path -ParameterFilter { $Path -eq $innerBucket -and $PathType -eq 'Container' } { $false }
         Mock warn {}
         $result = Find-HistoricalManifestInGit 'foo' 'main' '1.0.0'
-        $result | Should -Be $null
+        $result | Should-BeNull
     }
 }
 
@@ -195,7 +220,7 @@ Describe 'Find-HistoricalManifest (orchestrator)' -Tag 'Scoop' {
         Mock Find-HistoricalManifestInCache { $null }
         Mock Find-HistoricalManifestInGit { $null }
         $result = Find-HistoricalManifest 'foo' 'main' '1.0.0'
-        $result | Should -Be $null
+        $result | Should-BeNull
     }
 }
 
@@ -204,8 +229,8 @@ Describe 'Write-ManifestToUserCache' -Tag 'Scoop' {
         $umdir = Join-Path $env:TEMP ("ScoopUM_" + [guid]::NewGuid().ToString('N'))
         Mock usermanifestsdir { $umdir }
         $p = Write-ManifestToUserCache -App 'foo' -ManifestText '{"version":"1.0.0"}'
-        $p | Should -Be (Join-Path $umdir 'foo.json')
-        Test-Path $p | Should -Be $true
+        $p | Should-Be (Join-Path $umdir 'foo.json')
+        Test-Path $p | Should-BeTrue
         Remove-Item -Recurse -Force $umdir -ErrorAction SilentlyContinue
     }
 }
@@ -215,7 +240,7 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         Mock Get-Manifest -ParameterFilter { $app -eq 'main/foo' } { 'foo', [pscustomobject]@{ version = '1.0.0' }, 'main', $null }
         Mock manifest_path { 'C:\path\foo.json' }
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
-        $p | Should -Be 'C:\path\foo.json'
+        $p | Should-Be 'C:\path\foo.json'
     }
 
     It 'prefers history orchestrator hit (cache) when enabled' {
@@ -226,8 +251,8 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         Mock info {}
         Mock warn {}
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
-        $p | Should -Be 'C:\cache\foo.json'
-        Should -Invoke -CommandName Find-HistoricalManifest -Times 1
+        $p | Should-Be 'C:\cache\foo.json'
+        Should-Invoke -CommandName Find-HistoricalManifest -Times 1
 
     }
 
@@ -238,8 +263,8 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         Mock info {}
         Mock warn {}
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
-        $p | Should -Be 'C:\git\foo.json'
-        Should -Invoke -CommandName Find-HistoricalManifest -Times 1
+        $p | Should-Be 'C:\git\foo.json'
+        Should-Invoke -CommandName Find-HistoricalManifest -Times 1
 
     }
 
@@ -253,9 +278,10 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         Mock usermanifestsdir { $umdir }
         Mock Invoke-AutoUpdate {}
         Mock warn {}
+        Mock info {}
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
-        $p | Should -Be (Join-Path $umdir 'foo.json')
-        Should -Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -match "No historical manifest found for 'foo@1\.0\.0'; attempting autoupdate" }
+        $p | Should-Be (Join-Path $umdir 'foo.json')
+        Should-Invoke -CommandName warn -Times 1 -ParameterFilter { $msg -match "No historical manifest found for 'foo@1\.0\.0'; attempting autoupdate" }
     }
 
     It 'returns $null when autoupdate fails (caller surfaces the error)' {
@@ -268,10 +294,8 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
         Mock Invoke-AutoUpdate { throw 'fail' }
         Mock warn {}
         Mock info {}
-        Mock abort { throw 'aborted' }
         $p = generate_user_manifest 'foo' 'main' '1.0.0'
-        $p | Should -Be $null
-        Should -Invoke -CommandName abort -Times 0
+        $p | Should-BeNull
     }
 
     It 'aborts when no history and no autoupdate' {
@@ -281,8 +305,7 @@ Describe 'generate_user_manifest (history-aware)' -Tag 'Scoop' {
 
         Mock warn {}
         Mock info {}
-        Mock abort { throw 'aborted' }
-        { generate_user_manifest 'foo' 'main' '1.0.0' } | Should -Throw
+        { generate_user_manifest 'foo' 'main' '1.0.0' } | Should-Throw
     }
 }
 
@@ -293,8 +316,8 @@ Describe 'manifest bucket auto-discovery' -Tag 'Scoop' {
         Mock parse_json { @{ version = '1.0.0' } }
         Mock warn {}
         $m, $b = Find-AppBucket 'foo'
-        $b | Should -Be 'main'
-        $m.version | Should -Be '1.0.0'
+        $b | Should-Be 'main'
+        $m.version | Should-Be '1.0.0'
     }
 
     It 'returns $null when app not found in any bucket' {
@@ -303,14 +326,14 @@ Describe 'manifest bucket auto-discovery' -Tag 'Scoop' {
         Mock parse_json { $null }
         Mock warn {}
         $m, $b = Find-AppBucket 'foo'
-        $m | Should -BeNullOrEmpty
-        $b | Should -BeNullOrEmpty
+        $m | Should-BeNull
+        $b | Should-BeNull
     }
 
     It 'url used when bucket is null' {
         Mock url_manifest { @{ version = '1.0.0' } }
         $m = manifest 'foo' $null 'https://example.com/foo.json'
-        $m.version | Should -Be '1.0.0'
-        Should -Invoke url_manifest -Times 1
+        $m.version | Should-Be '1.0.0'
+        Should-Invoke url_manifest -Times 1
     }
 }

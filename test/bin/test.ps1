@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 #Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
-#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.2.0' }
+#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '6.0.0' }
 #Requires -Modules @{ ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.17.1' }
 param(
     [String] $TestPath = (Convert-Path "$PSScriptRoot\..")
@@ -13,6 +13,9 @@ $pesterConfig = New-PesterConfiguration -Hashtable @{
     }
     Output = @{
         Verbosity = 'Detailed'
+    }
+    Should = @{
+        DisableV5 = $true
     }
 }
 $excludes = @()

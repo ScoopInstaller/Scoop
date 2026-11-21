@@ -7,15 +7,22 @@
 # You can use '*' in place of <app> or `-a`/`--all` switch to reset all apps.
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\json.ps1" # 'install_app' (indirectly)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1" # 'env_add_path' (indirectly)
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\download.ps1" # 'install_app' (indirectly)
+. "$PSScriptRoot\..\lib\decompress.ps1" # 'install_app' (indirectly)
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\depends.ps1" # 'Test-7zipRequirement' in 'decompress.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
+. "$PSScriptRoot\..\lib\psmodules.ps1"
 
 $opt, $apps, $err = getopt $args 'a' 'all'
 if($err) { error "scoop reset: $err"; exit 1 }
 $all = $opt.a -or $opt.all
+$failed = @{}
 
 if(!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
 
@@ -68,27 +75,38 @@ $apps | ForEach-Object {
     $original_dir = $dir
     $persist_dir = persistdir $app $global
 
-    #region Workaround for #2952
     if (test_running_process $app $global) {
+        Write-Host 'Running process detected, skip resetting.'
+        $failed[$app] = 'blocked: running process'
         return
     }
-    #endregion Workaround for #2952
 
     $install = install_info $app $version $global
     $architecture = $install.architecture
+    # the dependencies of the installed version, not the ones the manifest has now
+    try {
+        $deps = @($manifest.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $architecture } | Select-Object -Unique)
+    } catch {
+        $failed[$app] = $_.Exception.Message
+        error $_.Exception.Message
+        return
+    }
+    $suggested = @{}
+    $deps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed }
+    $failed_deps = failed_deps $manifest $failed
+    if ($failed_deps.Count -gt 0) {
+        error "'$app' depends on $($failed_deps -join ', '), which failed."
+        $failed[$app] = "dependency failed: $($failed_deps -join ', ')"
+        return
+    }
 
     $dir = link_current $dir
-    create_shims $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global $architecture
     # unset all potential old env before re-adding
-    env_rm_path $manifest $dir $global $architecture
+    env_rm_path $manifest $dir $persist_dir $global $architecture
     env_rm $manifest $global $architecture
-    env_add_path $manifest $dir $global $architecture
-    env_set $manifest $global $architecture
-    # unlink all potential old link before re-persisting
-    unlink_persist_data $manifest $original_dir
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
+    link_app $manifest $dir $original_dir $persist_dir $global $architecture
 }
 
-exit 0
+$failed_count = show_failed_apps $failed 'reset'
+
+exit [int]($failed_count -gt 0)

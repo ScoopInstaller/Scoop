@@ -12,11 +12,11 @@ Describe 'database version selection' -Tag 'Scoop' {
             [pscustomobject]@{ version = '1.0.31' }
         )
 
-        (Get-LatestScoopDBRow -Rows $rows).version | Should -Be '1.0.31'
+        (Get-LatestScoopDBRow -Rows $rows).version | Should-Be '1.0.31'
     }
 
     It 'returns null when no rows are provided' {
-        Get-LatestScoopDBRow -Rows @() | Should -Be $null
+        Get-LatestScoopDBRow -Rows @() | Should-BeNull
     }
 
     It 'returns the latest semantic version per name and bucket' {
@@ -35,7 +35,7 @@ Describe 'database version selection' -Tag 'Scoop' {
         $latest = (Select-LatestScoopDBRow -Table $result -GroupBy @('name', 'bucket')).Rows
 
         ($latest | ForEach-Object { "$($_.name)/$($_.bucket)=$($_.version)" }) -join ' ' |
-            Should -Be 'copilot-cli/main=1.0.31 zotero/extras=7.0.20 zotero/he0119=7.0.20'
+            Should-Be 'copilot-cli/main=1.0.31 zotero/extras=7.0.20 zotero/he0119=7.0.20'
     }
 
     It 'keeps the DataTable unenumerated when captured directly' {
@@ -46,8 +46,8 @@ Describe 'database version selection' -Tag 'Scoop' {
 
         $table = Select-LatestScoopDBRow -Table $result
 
-        ($table -is [System.Data.DataTable]) | Should -BeTrue
-        $table.Rows.Count | Should -Be 1
+        ($table -is [System.Data.DataTable]) | Should-BeTrue
+        $table.Rows.Count | Should-Be 1
     }
 
     It 'returns the latest semantic version when no grouping is requested' {
@@ -61,6 +61,31 @@ Describe 'database version selection' -Tag 'Scoop' {
 
         $latest = (Select-LatestScoopDBRow -Table $result).Rows
 
-        $latest.version | Should -Be '7.0.20'
+        $latest.version | Should-Be '7.0.20'
+    }
+
+    It 'groups PSCustomObject rows by their properties' {
+        $rows = @(
+            [pscustomobject]@{ name = 'alpha'; bucket = 'main'; version = '1.0' }
+            [pscustomobject]@{ name = 'alpha'; bucket = 'main'; version = '2.0' }
+            [pscustomobject]@{ name = 'beta'; bucket = 'main'; version = '1.0' }
+        )
+
+        $latest = @(Get-LatestScoopDBRow -Rows $rows -GroupBy @('name', 'bucket'))
+
+        $latest.Count | Should-Be 2
+        ($latest | ForEach-Object { "$($_.name)=$($_.version)" }) -join ' ' | Should-Be 'alpha=2.0 beta=1.0'
+    }
+
+    It 'treats a group key case-insensitively' {
+        $rows = @(
+            [pscustomobject]@{ name = 'App'; bucket = 'Main'; version = '1.0' }
+            [pscustomobject]@{ name = 'app'; bucket = 'main'; version = '2.0' }
+        )
+
+        $latest = @(Get-LatestScoopDBRow -Rows $rows -GroupBy @('name', 'bucket'))
+
+        $latest.Count | Should-Be 1
+        $latest[0].version | Should-Be '2.0'
     }
 }
