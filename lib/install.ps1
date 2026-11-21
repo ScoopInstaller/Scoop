@@ -247,7 +247,15 @@ function Invoke-HookScript {
         Write-Host "Running $HookType script... " -NoNewline
         $script:deprecatedWarned = @{}
         try {
-            Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+            $hookCompleted = $false
+            # A stray 'break'/'continue' unwinds to the nearest loop; this one absorbs it, leaving the flag unset.
+            foreach ($once in @(1)) {
+                Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+                $hookCompleted = $true
+            }
+            if (!$hookCompleted) {
+                throw "Hook script '$HookType' aborted."
+            }
         } catch {
             Write-Host 'Error.' -ForegroundColor DarkRed
             throw

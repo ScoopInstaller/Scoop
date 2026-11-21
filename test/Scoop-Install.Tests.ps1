@@ -800,10 +800,25 @@ Describe 'update_apps' -Tag 'Scoop' {
     }
 }
 Describe 'Invoke-HookScript' -Tag 'Scoop' {
+    BeforeEach { Mock Write-Host {} }
+
     It 'should fail the hook instead of the whole run when it aborts' {
-        Mock Write-Host {}
         $manifest = [PSCustomObject]@{ pre_install = 'abort "hook failed"' }
 
         { Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture '64bit' } | Should-Throw '*hook failed*'
+    }
+
+    It 'should fail the hook instead of aborting the run on a stray <_>' -ForEach @('break', 'continue') {
+        $manifest = [PSCustomObject]@{ pre_install = $_ }
+
+        # Without the loop a stray jump escapes Should-Throw and the test passes silently.
+        { foreach ($__ in @(1)) { Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture '64bit' } } |
+            Should-Throw "*Hook script 'pre_install' aborted*"
+    }
+
+    It 'should accept a <_> that only exits a loop in the hook' -ForEach @('break', 'continue') {
+        $manifest = [PSCustomObject]@{ pre_install = "foreach (`$i in 1..2) { if (`$i -eq 1) { $_ } }" }
+
+        Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture '64bit'
     }
 }

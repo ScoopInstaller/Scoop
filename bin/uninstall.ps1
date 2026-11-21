@@ -44,8 +44,12 @@ function do_uninstall($app, $global) {
     $persist_dir = persistdir $app $global
 
     Write-Output "Uninstalling '$app'"
-    if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-        error "Couldn't uninstall '$app'."; exit 1
+    try {
+        if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+            error "Couldn't uninstall '$app'."; exit 1
+        }
+    } catch {
+        error "Couldn't uninstall '$app': $($_.Exception.Message)"; exit 1
     }
     Remove-ShimFromManifest $app $manifest $global $architecture
 
