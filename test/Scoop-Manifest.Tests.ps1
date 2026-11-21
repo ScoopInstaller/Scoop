@@ -420,16 +420,15 @@ Describe 'manifest migrations' -Tag 'Scoop' {
         Should-Invoke -CommandName error -ParameterFilter { $msg -match 'circle' } -Times 1 -Exactly
     }
 
-    It 'finds the target by name when the bucket was added under another name' {
+    It 'does not use another bucket that happens to have the name' {
         $script:localBuckets = @('main', 'my-versions')
         Write-AppManifest 'my-versions' 'new-name' '2.0.0'
         Write-MigrationMap 'main' 'old-name' 'versions/new-name'
 
         $app, $manifest, $bucket, $null = Get-Manifest 'old-name'
 
-        $app | Should-Be 'new-name'
-        $bucket | Should-Be 'my-versions'
-        $manifest.version | Should-Be '2.0.0'
+        $manifest | Should-BeNull
+        $bucket | Should-Be 'versions'
     }
 
     It 'reports the bucket to add when the target bucket is not installed' {

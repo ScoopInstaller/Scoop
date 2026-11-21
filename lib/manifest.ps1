@@ -156,11 +156,7 @@ function Get-MigrationTarget($app, $target, $bucket) {
         warn "The migration of '$app' in bucket '$bucket' has an invalid target '$target'; expected 'bucket/app' or 'app'."
         return $null
     }
-    # The record names a bucket, but it may be installed under another local name.
-    if ($target_bucket -notin @(Get-LocalBucket)) {
-        $scanned, $resolved_bucket = Find-AppBucket $target_app
-        if ($resolved_bucket) { $target_bucket = $resolved_bucket }
-    }
+    # The record names the bucket: a bucket that only has the same app name is not the same repository.
     return [pscustomobject]@{ App = $target_app; Bucket = $target_bucket }
 }
 

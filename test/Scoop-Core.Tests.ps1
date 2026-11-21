@@ -549,12 +549,10 @@ Describe 'app_status' -Tag 'Scoop' {
     It 'reports the bucket version of an app installed from an auto-generated manifest' {
         Mock Select-CurrentVersion { '3.24.0' }
         Mock install_info { [PSCustomObject]@{ url = (usermanifest 'foo') } }
+        Mock manifest { [pscustomobject]@{ version = '3.24.0'; depends = @('dep') } }
         Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1'; depends = @('newdep') }, 'extras' }
         Mock installed { $app -ne 'dep' }
-        Mock Get-Manifest {
-            if ($app -eq 'dep') { 'dep', $null, 'main', $null }
-            else { 'foo', [pscustomobject]@{ version = '3.24.0'; depends = @('dep') }, $null, (usermanifest 'foo') }
-        }
+        Mock Get-Manifest { 'dep', $null, 'main', $null }
 
         $status = app_status 'foo' $false
 

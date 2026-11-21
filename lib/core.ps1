@@ -564,8 +564,12 @@ function app_status($app, $global) {
         $status.deprecated = (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse).FullName
     }
 
-    $lookup = if ($install_info.bucket) { "$($install_info.bucket)/$app" } else { $app }
-    $resolved, $manifest, $resolved_bucket, $url = Get-Manifest $lookup
+    if ($install_info.bucket) {
+        $resolved, $manifest, $resolved_bucket, $url = Get-Manifest "$($install_info.bucket)/$app"
+    } else {
+        $resolved, $resolved_bucket, $url = $app, $null, $install_info.url
+        $manifest = manifest $app $null $install_info.url
+    }
     $status.pinned = (!$install_info.bucket -and $install_info.url -eq (usermanifest $app))
     $latest_manifest = $manifest
     if ($status.pinned) {

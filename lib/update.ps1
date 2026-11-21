@@ -374,7 +374,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     }
 
     if (!$force -and !$renamed_to -and ($old_version -eq $version)) {
-        if ($target) {
+        if ($target -and !$renamed_to) {
             save_install_info @{ architecture = $architecture; url = $url; bucket = $bucket } (versiondir $app $old_version $global)
             Write-Host "Migrated '$app' to bucket '$bucket'."
         } elseif (!$quiet) {
@@ -394,7 +394,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         return
     }
 
-    if ($target) {
+    if ($target -and !$renamed_to) {
         Write-Host "Migrating '$app' to bucket '$bucket'"
     }
     Write-Host "Updating '$app' ($old_version -> $version)"
