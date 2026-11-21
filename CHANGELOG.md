@@ -27,6 +27,7 @@
 - **core:** Warn once per deprecated function per manifest ([#6801](https://github.com/ScoopInstaller/Scoop/issues/6801))
 - **download:** Ignore an unusable GitHub token and keep it on API redirects ([#6826](https://github.com/ScoopInstaller/Scoop/pull/6826))
 - **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6763](https://github.com/ScoopInstaller/Scoop/issues/6763))
+- **decompress:** Restore percent-encoded MSIX filenames during ZIP extraction ([#6757](https://github.com/ScoopInstaller/Scoop/issues/6757))
 - **install:** Expand $dir and $persist_dir in env_add_path ([#6808](https://github.com/ScoopInstaller/Scoop/issues/6808))
 - **install:** Unlink the persisted data before extracting ([#6845](https://github.com/ScoopInstaller/Scoop/issues/6845))
 - **install:** Prevent a stray `break`/`continue` from silently ending the command ([#6842](https://github.com/ScoopInstaller/Scoop/issues/6842))
