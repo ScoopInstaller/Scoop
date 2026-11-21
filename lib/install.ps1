@@ -248,8 +248,7 @@ function Invoke-HookScript {
         $script:deprecatedWarned = @{}
         try {
             $hookCompleted = $false
-            # A stray 'break'/'continue' in the hook would otherwise unwind out of this function and silently skip the rest of the command.
-            # The single iteration absorbs the jump here; if the script never reaches the end, fail the hook.
+            # A stray 'break'/'continue' unwinds to the nearest loop; this one absorbs it, leaving the flag unset.
             foreach ($once in @(1)) {
                 Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
                 $hookCompleted = $true
