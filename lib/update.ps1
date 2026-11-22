@@ -283,10 +283,131 @@ function restore_app($ctx, $old_manifest, $old_version, $backup) {
     }
 }
 
+function switch_version($app, $global, $version, $old_version, $installed_dir, $old_manifest, $independent, $suggested, $failed, $use_cache, $check_hash, $app_key, $ctx) {
+    if (test_running_process $app $global) {
+        Write-Host 'Running process detected, skip updating.'
+        $failed[$app_key] = 'blocked: running process'
+        return
+    }
+
+    $installed = installed_manifest $app $version $global
+    $installed_architecture = Format-ArchitectureString (install_info $app $version $global).architecture
+    if (-not $independent) {
+        # the dependencies of the version that is switched to, not the ones the manifest has now
+        $deps = @($installed.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $installed_architecture } | Where-Object { !(installed $_) } | Select-Object -Unique)
+        $deps | ForEach-Object { install_app $_ $installed_architecture $global $suggested $failed $use_cache $check_hash }
+        $failed_deps = failed_deps $installed $failed
+        if ($failed_deps.Count -gt 0) {
+            error "'$app' depends on $($failed_deps -join ', '), which failed."
+            $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
+            return
+        }
+    }
+    $ctx.new_architecture = $installed_architecture
+    try {
+        Write-Host "Switching '$app' ($old_version -> $version)"
+        remove_obsolete_wiring $ctx $old_manifest $installed
+        $dir = link_current $installed_dir
+        link_app $installed $dir $installed_dir $ctx.persist_dir $global $installed_architecture
+        success "'$app' was switched to the installed $version."
+    } catch {
+        $failed[$app_key] = $_.Exception.Message
+        error $_.Exception.Message
+        # drop what the failed switch linked, then rebuild the links of the old version
+        $installed_ctx = [PSCustomObject]@{
+            app              = $app
+            dir              = $installed_dir
+            persist_dir      = $ctx.persist_dir
+            global           = $global
+            architecture     = $installed_architecture
+            new_architecture = $ctx.architecture
+        }
+        try {
+            remove_obsolete_wiring $installed_ctx $installed $old_manifest
+        } catch {
+            Write-Verbose $_.Exception.Message
+        }
+        restore_app $ctx $old_manifest $old_version
+    }
+}
+
+function replace_version($app, $app_key, $global, $architecture, $old_version, $old_manifest, $manifest, $version, $new_architecture, $bucket, $url, $install, $pin_broken, $independent, $suggested, $failed, $use_cache, $check_hash, $ctx, $dir, $prepared, $forced) {
+    $app_name = $app
+    $unlinked = $false
+    try {
+        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
+
+        if (test_running_process $app $global) {
+            Write-Host 'Running process detected, skip updating.'
+            $failed[$app_key] = 'blocked: running process, the new version was downloaded'
+            return
+        }
+
+        Write-Host "Uninstalling '$app' ($old_version)"
+        if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+            $failed[$app_key] = 'uninstaller failed'
+            return
+        }
+        $unlinked = $true
+        remove_obsolete_wiring $ctx $old_manifest $manifest
+
+        $backup = $null
+        if ($forced) {
+            $new_backup = "$dir/../_$version.old"
+            if (Test-Path $new_backup) {
+                $i = 1
+                While (Test-Path "$new_backup($i)") {
+                    $i++
+                }
+                $new_backup = "$new_backup($i)"
+            }
+            Move-Item $dir $new_backup -ErrorAction Stop
+            $backup = $new_backup
+        }
+
+        Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
+
+        if ($bucket) {
+            # add bucket name it was installed from
+            $app = "$bucket/$app"
+        }
+        if ($install.url -and (!$pin_broken -or !$bucket)) {
+            # use the url of the install json if the application was installed through url
+            $app = $install.url
+        }
+
+        if (-not $independent) {
+            # Also add missing dependencies
+            $apps = @(Get-Dependency $app $architecture) -ne $app
+            $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
+        }
+
+        $failed_deps = failed_deps $manifest $failed
+        if ($failed_deps.Count -gt 0) {
+            error "'$app_name' depends on $($failed_deps -join ', '), which failed."
+            $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
+        } else {
+            if ($forced) {
+                Move-Item $prepared.dir $dir -ErrorAction Stop
+                $prepared.dir = $dir
+            }
+            install_version $app_name $manifest $version $new_architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
+        }
+        if ($failed.ContainsKey($app_key)) {
+            restore_app $ctx $old_manifest $old_version $backup
+        }
+    } catch {
+        $failed[$app_key] = $_.Exception.Message
+        error $_.Exception.Message
+        if ($unlinked) {
+            restore_app $ctx $old_manifest $old_version $backup
+        }
+    }
+}
+
 function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app_key = if ($global) { "$app (global)" } else { $app }
     $app_name = $app
-    $unlinked = $false
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -369,51 +490,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     $retained = !(Test-Path -LiteralPath "$installed_dir\.scoop-extracted") -and
     ((Test-Path -LiteralPath "$installed_dir\scoop-manifest.json") -or (Test-Path -LiteralPath "$installed_dir\manifest.json"))
     if (!$forced -and $retained) {
-        if (test_running_process $app $global) {
-            Write-Host 'Running process detected, skip updating.'
-            $failed[$app_key] = 'blocked: running process'
-            return
-        }
-
-        $installed = installed_manifest $app $version $global
-        $installed_architecture = Format-ArchitectureString (install_info $app $version $global).architecture
-        if (-not $independent) {
-            # the dependencies of the version that is switched to, not the ones the manifest has now
-            $deps = @($installed.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $installed_architecture } | Where-Object { !(installed $_) } | Select-Object -Unique)
-            $deps | ForEach-Object { install_app $_ $installed_architecture $global $suggested $failed $use_cache $check_hash }
-            $failed_deps = failed_deps $installed $failed
-            if ($failed_deps.Count -gt 0) {
-                error "'$app' depends on $($failed_deps -join ', '), which failed."
-                $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
-                return
-            }
-        }
-        $ctx.new_architecture = $installed_architecture
-        try {
-            Write-Host "Switching '$app' ($old_version -> $version)"
-            remove_obsolete_wiring $ctx $old_manifest $installed
-            $dir = link_current $installed_dir
-            link_app $installed $dir $installed_dir $ctx.persist_dir $global $installed_architecture
-            success "'$app' was switched to the installed $version."
-        } catch {
-            $failed[$app_key] = $_.Exception.Message
-            error $_.Exception.Message
-            # drop what the failed switch linked, then rebuild the links of the old version
-            $installed_ctx = [PSCustomObject]@{
-                app              = $app
-                dir              = $installed_dir
-                persist_dir      = $ctx.persist_dir
-                global           = $global
-                architecture     = $installed_architecture
-                new_architecture = $ctx.architecture
-            }
-            try {
-                remove_obsolete_wiring $installed_ctx $installed $old_manifest
-            } catch {
-                Write-Verbose $_.Exception.Message
-            }
-            restore_app $ctx $old_manifest $old_version
-        }
+        switch_version $app $global $version $old_version $installed_dir $old_manifest $independent $suggested $failed $use_cache $check_hash $app_key $ctx
         return
     }
 
@@ -444,75 +521,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         return
     }
 
-    try {
-        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
-
-        if (test_running_process $app $global) {
-            Write-Host 'Running process detected, skip updating.'
-            $failed[$app_key] = 'blocked: running process, the new version was downloaded'
-            return
-        }
-
-        Write-Host "Uninstalling '$app' ($old_version)"
-        if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-            $failed[$app_key] = 'uninstaller failed'
-            return
-        }
-        $unlinked = $true
-        remove_obsolete_wiring $ctx $old_manifest $manifest
-
-        $backup = $null
-        if ($forced) {
-            $new_backup = "$dir/../_$version.old"
-            if (Test-Path $new_backup) {
-                $i = 1
-                While (Test-Path "$new_backup($i)") {
-                    $i++
-                }
-                $new_backup = "$new_backup($i)"
-            }
-            Move-Item $dir $new_backup -ErrorAction Stop
-            $backup = $new_backup
-        }
-
-        Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
-
-        if ($bucket) {
-            # add bucket name it was installed from
-            $app = "$bucket/$app"
-        }
-        if ($install.url -and (!$pin_broken -or !$bucket)) {
-            # use the url of the install json if the application was installed through url
-            $app = $install.url
-        }
-
-        if (-not $independent) {
-            # Also add missing dependencies
-            $apps = @(Get-Dependency $app $architecture) -ne $app
-            $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
-        }
-
-        $failed_deps = failed_deps $manifest $failed
-        if ($failed_deps.Count -gt 0) {
-            error "'$app_name' depends on $($failed_deps -join ', '), which failed."
-            $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
-        } else {
-            if ($forced) {
-                Move-Item $prepared.dir $dir -ErrorAction Stop
-                $prepared.dir = $dir
-            }
-            install_version $app_name $manifest $version $new_architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
-        }
-        if ($failed.ContainsKey($app_key)) {
-            restore_app $ctx $old_manifest $old_version $backup
-        }
-    } catch {
-        $failed[$app_key] = $_.Exception.Message
-        error $_.Exception.Message
-        if ($unlinked) {
-            restore_app $ctx $old_manifest $old_version $backup
-        }
-    }
+    replace_version $app $app_key $global $architecture $old_version $old_manifest $manifest $version $new_architecture $bucket $url $install $pin_broken $independent $suggested $failed $use_cache $check_hash $ctx $dir $prepared $forced
 }
 
 function update_apps($apps, $force, $quiet, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
