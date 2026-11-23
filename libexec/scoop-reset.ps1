@@ -70,12 +70,13 @@ $apps | ForEach-Object {
     }
 
     write-host "Resetting $app ($version)."
+    $app_key = app_key $app $global
 
     $dir = Convert-Path (versiondir $app $version $global)
     $original_dir = $dir
     $persist_dir = persistdir $app $global
 
-    if (block_running_app $app $global $app $failed 'resetting') { return }
+    if (block_running_app $app $global $app_key $failed 'resetting') { return }
 
     $install = install_info $app $version $global
     $architecture = $install.architecture
@@ -83,13 +84,13 @@ $apps | ForEach-Object {
     try {
         $deps = @($manifest.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $architecture } | Select-Object -Unique)
     } catch {
-        $failed[$app] = $_.Exception.Message
+        $failed[$app_key] = $_.Exception.Message
         error $_.Exception.Message
         return
     }
     $suggested = @{}
     $deps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed }
-    if (report_failed_deps $manifest $app $app $failed) { return }
+    if (report_failed_deps $manifest $app $app_key $failed) { return }
 
     $dir = link_current $dir
     # unset all potential old env before re-adding

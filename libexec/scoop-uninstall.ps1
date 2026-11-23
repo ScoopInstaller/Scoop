@@ -53,9 +53,8 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
 
     $version = Select-CurrentVersion -AppName $app -Global:$global
     $appDir = appdir $app $global
+    $app_key = app_key $app $global
     if ($version) {
-        Write-Host "Uninstalling '$app' ($version)."
-
         $dir = versiondir $app $version $global
         $persist_dir = persistdir $app $global
 
@@ -64,34 +63,15 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
         $architecture = $install.architecture
         $bucket = $install.bucket
 
+        # an incomplete install is recorded as failed, and is what this cleans up
+        $earlier_failure = $failed[$app_key]
         try {
-            Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+            uninstall_version $app $manifest $version $architecture $global $failed $dir 'uninstalling'
         } catch {
-            $failed[$app] = $_.Exception.Message
+            $failed[$app_key] = $_.Exception.Message
             error $_.Exception.Message
-            continue
         }
-
-        if (block_running_app $app $global $app $failed 'uninstalling') { continue }
-
-        try {
-            Test-Path $dir -ErrorAction Stop | Out-Null
-        } catch [UnauthorizedAccessException] {
-            error "Access denied: $dir. You might need to restart."
-            $failed[$app] = 'access denied'
-            continue
-        }
-
-        try {
-            if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-                $failed[$app] = 'uninstaller failed'
-                continue
-            }
-        } catch {
-            $failed[$app] = $_.Exception.Message
-            error $_.Exception.Message
-            continue
-        }
+        if ($failed[$app_key] -ne $earlier_failure) { continue }
         unlink_app $app $manifest $dir $persist_dir $global $architecture
 
         try {
@@ -99,7 +79,7 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
         } catch {
             if (Test-Path $dir) {
                 error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
-                $failed[$app] = 'could not remove the app directory'
+                $failed[$app_key] = 'could not remove the app directory'
                 continue
             }
         }
@@ -107,7 +87,7 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
         try {
             Invoke-HookScript -HookType 'post_uninstall' -Manifest $manifest -Arch $architecture
         } catch {
-            $failed[$app] = $_.Exception.Message
+            $failed[$app_key] = $_.Exception.Message
             error $_.Exception.Message
             continue
         }
@@ -123,7 +103,7 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
-            $failed[$app] = 'could not remove an old version'
+            $failed[$app_key] = 'could not remove an old version'
             continue app_loop
         }
     }
@@ -151,7 +131,7 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
                 Remove-Item $persist_dir -Recurse -Force -ErrorAction Stop
             } catch {
                 error "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use."
-                $failed[$app] = 'could not remove the persisted data'
+                $failed[$app_key] = 'could not remove the persisted data'
                 continue
             }
         }

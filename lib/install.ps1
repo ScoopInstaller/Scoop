@@ -120,6 +120,23 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
     install_version $app $manifest $version $architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
 }
 
+function uninstall_version($app, $manifest, $version, $architecture, $global, $failed, $dir, $action, $reason = 'running process') {
+    $app_key = app_key $app $global
+    Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+    if (block_running_app $app $global $app_key $failed $action $reason) { return }
+    try {
+        Test-Path $dir -ErrorAction Stop | Out-Null
+    } catch [UnauthorizedAccessException] {
+        error "Access denied: $dir. You might need to restart."
+        $failed[$app_key] = 'access denied'
+        return
+    }
+    Write-Host "Uninstalling '$app' ($version)"
+    if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+        $failed[$app_key] = 'uninstaller failed'
+    }
+}
+
 function install_version($app, $manifest, $version, $architecture, $global, $bucket, $url, $suggested, $failed, $dir, $fname) {
     $app_key = app_key $app $global
     $linked = $false

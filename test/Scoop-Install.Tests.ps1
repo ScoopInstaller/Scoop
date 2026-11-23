@@ -603,12 +603,24 @@ Describe 'update_app' -Tag 'Scoop' {
         Should-Invoke -CommandName Find-AppBucket -Times 1
     }
 
+    It 'replaces the version of an install already recorded as failed' {
+        Mock test_running_process { $false }
+        $failed = @{ foo = 'not installed correctly' }
+        update_app 'foo' $false $true $true $false @{} $failed
+
+        Should-Invoke -CommandName install_version -Times 1
+        $failed['foo'] | Should-Be 'not installed correctly'
+    }
+
     It 'downloads the new version before it skips a running app' {
+        # the hook shares the output stream, so its text must not decide the outcome
+        Mock Invoke-HookScript { Write-Output 'Stopping app' }
         $failed = @{}
         update_app 'foo' $false $true $true $false @{} $failed
 
         Should-Invoke -CommandName Invoke-ScoopDownload -Times 1
         Should-Invoke -CommandName install_app -Times 0
+        Should-Invoke -CommandName install_version -Times 0
         Should-Invoke -CommandName test_running_process -Times 1
         $failed['foo'] | Should-Be 'blocked: running process, the new version was downloaded'
     }

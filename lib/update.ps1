@@ -361,15 +361,10 @@ function replace_version($ctx) {
     $check_hash = $ctx.check_hash
     $ctx.unlinked = $false
     try {
-        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
-
-        if (block_running_app $app $global $app_key $failed 'updating' 'running process, the new version was downloaded') { return }
-
-        Write-Host "Uninstalling '$app' ($old_version)"
-        if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
-            $failed[$app_key] = 'uninstaller failed'
-            return
-        }
+        # an incomplete install is recorded as failed before the update starts
+        $earlier_failure = $failed[$app_key]
+        uninstall_version $app $old_manifest $old_version $architecture $global $failed $dir 'updating' 'running process, the new version was downloaded'
+        if ($failed[$app_key] -ne $earlier_failure) { return }
         $ctx.unlinked = $true
         remove_obsolete_wiring $ctx $old_manifest $manifest
 
