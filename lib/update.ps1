@@ -361,10 +361,12 @@ function replace_version($ctx) {
     $check_hash = $ctx.check_hash
     $ctx.unlinked = $false
     try {
-        # an incomplete install is recorded as failed before the update starts
+        # only this attempt's failure counts: an earlier entry is restored below
         $earlier_failure = $failed[$app_key]
+        $failed.Remove($app_key)
         uninstall_version $app $old_manifest $old_version $architecture $global $failed $dir 'updating' 'running process, the new version was downloaded'
-        if ($failed[$app_key] -ne $earlier_failure) { return }
+        if ($failed.ContainsKey($app_key)) { return }
+        if ($null -ne $earlier_failure) { $failed[$app_key] = $earlier_failure }
         $ctx.unlinked = $true
         remove_obsolete_wiring $ctx $old_manifest $manifest
 

@@ -63,15 +63,17 @@ $install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not
         $architecture = $install.architecture
         $bucket = $install.bucket
 
-        # an incomplete install is recorded as failed, and is what this cleans up
+        # only this attempt's failure counts: an earlier entry is restored below
         $earlier_failure = $failed[$app_key]
+        $failed.Remove($app_key)
         try {
             uninstall_version $app $manifest $version $architecture $global $failed $dir 'uninstalling'
         } catch {
             $failed[$app_key] = $_.Exception.Message
             error $_.Exception.Message
         }
-        if ($failed[$app_key] -ne $earlier_failure) { continue }
+        if ($failed.ContainsKey($app_key)) { continue }
+        if ($null -ne $earlier_failure) { $failed[$app_key] = $earlier_failure }
         unlink_app $app $manifest $dir $persist_dir $global $architecture
 
         try {
