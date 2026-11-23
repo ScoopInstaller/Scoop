@@ -256,7 +256,10 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
     }
 }
 
-function restore_app($ctx, $old_manifest, $old_version, $backup) {
+function restore_app($ctx) {
+    $old_manifest = $ctx.old_manifest
+    $old_version = $ctx.old_version
+    $backup = $ctx.backup
     # the old manifest expands $version, which still names the failed update
     $version = $old_version
     if ($backup -and (Test-Path $backup)) {
@@ -283,7 +286,19 @@ function restore_app($ctx, $old_manifest, $old_version, $backup) {
     }
 }
 
-function switch_version($app, $global, $version, $old_version, $installed_dir, $old_manifest, $independent, $suggested, $failed, $use_cache, $check_hash, $app_key, $ctx) {
+function switch_version($ctx) {
+    $app = $ctx.app
+    $app_key = $ctx.app_key
+    $global = $ctx.global
+    $version = $ctx.version
+    $old_version = $ctx.old_version
+    $installed_dir = $ctx.installed_dir
+    $old_manifest = $ctx.old_manifest
+    $independent = $ctx.independent
+    $suggested = $ctx.suggested
+    $failed = $ctx.failed
+    $use_cache = $ctx.use_cache
+    $check_hash = $ctx.check_hash
     if (test_running_process $app $global) {
         Write-Host 'Running process detected, skip updating.'
         $failed[$app_key] = 'blocked: running process'
@@ -327,13 +342,33 @@ function switch_version($app, $global, $version, $old_version, $installed_dir, $
         } catch {
             Write-Verbose $_.Exception.Message
         }
-        restore_app $ctx $old_manifest $old_version
+        restore_app $ctx
     }
 }
 
-function replace_version($app, $app_key, $global, $architecture, $old_version, $old_manifest, $manifest, $version, $new_architecture, $bucket, $url, $install, $pin_broken, $independent, $suggested, $failed, $use_cache, $check_hash, $ctx, $dir, $prepared, $forced) {
-    $app_name = $app
-    $unlinked = $false
+function replace_version($ctx) {
+    $app = $app_name = $ctx.app
+    $app_key = $ctx.app_key
+    $global = $ctx.global
+    $dir = $ctx.dir
+    $architecture = $ctx.architecture
+    $new_architecture = $ctx.new_architecture
+    $old_version = $ctx.old_version
+    $old_manifest = $ctx.old_manifest
+    $manifest = $ctx.manifest
+    $version = $ctx.version
+    $bucket = $ctx.bucket
+    $url = $ctx.url
+    $install = $ctx.install
+    $pin_broken = $ctx.pin_broken
+    $forced = $ctx.forced
+    $prepared = $ctx.prepared
+    $independent = $ctx.independent
+    $suggested = $ctx.suggested
+    $failed = $ctx.failed
+    $use_cache = $ctx.use_cache
+    $check_hash = $ctx.check_hash
+    $ctx.unlinked = $false
     try {
         Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
@@ -348,10 +383,10 @@ function replace_version($app, $app_key, $global, $architecture, $old_version, $
             $failed[$app_key] = 'uninstaller failed'
             return
         }
-        $unlinked = $true
+        $ctx.unlinked = $true
         remove_obsolete_wiring $ctx $old_manifest $manifest
 
-        $backup = $null
+        $ctx.backup = $null
         if ($forced) {
             $new_backup = "$dir/../_$version.old"
             if (Test-Path $new_backup) {
@@ -362,7 +397,7 @@ function replace_version($app, $app_key, $global, $architecture, $old_version, $
                 $new_backup = "$new_backup($i)"
             }
             Move-Item $dir $new_backup -ErrorAction Stop
-            $backup = $new_backup
+            $ctx.backup = $new_backup
         }
 
         Invoke-HookScript -HookType 'post_uninstall' -Manifest $old_manifest -Arch $architecture
@@ -394,20 +429,19 @@ function replace_version($app, $app_key, $global, $architecture, $old_version, $
             install_version $app_name $manifest $version $new_architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
         }
         if ($failed.ContainsKey($app_key)) {
-            restore_app $ctx $old_manifest $old_version $backup
+            restore_app $ctx
         }
     } catch {
         $failed[$app_key] = $_.Exception.Message
         error $_.Exception.Message
-        if ($unlinked) {
-            restore_app $ctx $old_manifest $old_version $backup
+        if ($ctx.unlinked) {
+            restore_app $ctx
         }
     }
 }
 
 function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app_key = if ($global) { "$app (global)" } else { $app }
-    $app_name = $app
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -478,19 +512,38 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     $forced = $force -and $old_version -eq $version
     $dir = versiondir $app $old_version $global
     $persist_dir = persistdir $app $global
+    $installed_dir = versiondir $app $version $global
     $ctx = [PSCustomObject]@{
         app              = $app
+        app_key          = $app_key
+        global           = $global
         dir              = $dir
         persist_dir      = $persist_dir
-        global           = $global
+        installed_dir    = $installed_dir
         architecture     = $architecture
         new_architecture = $new_architecture
+        old_version      = $old_version
+        old_manifest     = $old_manifest
+        version          = $version
+        manifest         = $manifest
+        bucket           = $bucket
+        url              = $url
+        install          = $install
+        pin_broken       = $pin_broken
+        forced           = $forced
+        prepared         = $null
+        unlinked         = $false
+        backup           = $null
+        independent      = $independent
+        suggested        = $suggested
+        failed           = $failed
+        use_cache        = $use_cache
+        check_hash       = $check_hash
     }
-    $installed_dir = versiondir $app $version $global
     $retained = !(Test-Path -LiteralPath "$installed_dir\.scoop-extracted") -and
     ((Test-Path -LiteralPath "$installed_dir\scoop-manifest.json") -or (Test-Path -LiteralPath "$installed_dir\manifest.json"))
     if (!$forced -and $retained) {
-        switch_version $app $global $version $old_version $installed_dir $old_manifest $independent $suggested $failed $use_cache $check_hash $app_key $ctx
+        switch_version $ctx
         return
     }
 
@@ -515,13 +568,13 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
     }
     # download and extract the new version first, so a broken archive cannot leave the app uninstalled
-    $prepared = prepare_app $app $new_architecture $global $manifest $bucket $version $use_cache $check_hash $stage
-    if (!$prepared) {
+    $ctx.prepared = prepare_app $app $new_architecture $global $manifest $bucket $version $use_cache $check_hash $stage
+    if (!$ctx.prepared) {
         $failed[$app_key] = 'download failed'
         return
     }
 
-    replace_version $app $app_key $global $architecture $old_version $old_manifest $manifest $version $new_architecture $bucket $url $install $pin_broken $independent $suggested $failed $use_cache $check_hash $ctx $dir $prepared $forced
+    replace_version $ctx
 }
 
 function update_apps($apps, $force, $quiet, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {

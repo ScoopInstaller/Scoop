@@ -356,12 +356,15 @@ Describe 'restore_app' -Tag 'Scoop' {
             persist_dir  = '/fake/persist'
             global       = $false
             architecture = '64bit'
+            old_manifest = [PSCustomObject]@{ version = '1.0' }
+            old_version  = '1.0'
+            backup       = $null
         }
         Mock installed_manifest { [PSCustomObject]@{ version = '1.0' } }
         Mock link_current { '/fake/app/current' }
         Mock link_app { throw 'cannot link' }
 
-        restore_app $ctx ([PSCustomObject]@{ version = '1.0' }) '1.0' $null
+        restore_app $ctx
     }
 
     It 'should not fail when the current link cannot be created' {
@@ -371,13 +374,16 @@ Describe 'restore_app' -Tag 'Scoop' {
             persist_dir  = '/fake/persist'
             global       = $false
             architecture = '64bit'
+            old_manifest = [PSCustomObject]@{ version = '1.0' }
+            old_version  = '1.0'
+            backup       = $null
         }
         Mock installed_manifest { [PSCustomObject]@{ version = '1.0' } }
         Mock link_current { throw 'cannot link current' }
         Mock link_app {}
         Mock warn {}
 
-        restore_app $ctx ([PSCustomObject]@{ version = '1.0' }) '1.0' $null
+        restore_app $ctx
 
         Should-Invoke warn -Times 1
     }
