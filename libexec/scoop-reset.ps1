@@ -75,11 +75,7 @@ $apps | ForEach-Object {
     $original_dir = $dir
     $persist_dir = persistdir $app $global
 
-    if (test_running_process $app $global) {
-        Write-Host 'Running process detected, skip resetting.'
-        $failed[$app] = 'blocked: running process'
-        return
-    }
+    if (block_running_app $app $global $app $failed 'resetting') { return }
 
     $install = install_info $app $version $global
     $architecture = $install.architecture
@@ -93,12 +89,7 @@ $apps | ForEach-Object {
     }
     $suggested = @{}
     $deps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed }
-    $failed_deps = failed_deps $manifest $failed
-    if ($failed_deps.Count -gt 0) {
-        error "'$app' depends on $($failed_deps -join ', '), which failed."
-        $failed[$app] = "dependency failed: $($failed_deps -join ', ')"
-        return
-    }
+    if (report_failed_deps $manifest $app $app $failed) { return }
 
     $dir = link_current $dir
     # unset all potential old env before re-adding

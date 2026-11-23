@@ -299,11 +299,7 @@ function switch_version($ctx) {
     $failed = $ctx.failed
     $use_cache = $ctx.use_cache
     $check_hash = $ctx.check_hash
-    if (test_running_process $app $global) {
-        Write-Host 'Running process detected, skip updating.'
-        $failed[$app_key] = 'blocked: running process'
-        return
-    }
+    if (block_running_app $app $global $app_key $failed 'updating') { return }
 
     $installed = installed_manifest $app $version $global
     $installed_architecture = Format-ArchitectureString (install_info $app $version $global).architecture
@@ -311,12 +307,7 @@ function switch_version($ctx) {
         # the dependencies of the version that is switched to, not the ones the manifest has now
         $deps = @($installed.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $installed_architecture } | Where-Object { !(installed $_) } | Select-Object -Unique)
         $deps | ForEach-Object { install_app $_ $installed_architecture $global $suggested $failed $use_cache $check_hash }
-        $failed_deps = failed_deps $installed $failed
-        if ($failed_deps.Count -gt 0) {
-            error "'$app' depends on $($failed_deps -join ', '), which failed."
-            $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
-            return
-        }
+        if (report_failed_deps $installed $app $app_key $failed) { return }
     }
     $ctx.new_architecture = $installed_architecture
     try {
@@ -372,11 +363,7 @@ function replace_version($ctx) {
     try {
         Invoke-HookScript -HookType 'pre_uninstall' -Manifest $old_manifest -Arch $architecture
 
-        if (test_running_process $app $global) {
-            Write-Host 'Running process detected, skip updating.'
-            $failed[$app_key] = 'blocked: running process, the new version was downloaded'
-            return
-        }
+        if (block_running_app $app $global $app_key $failed 'updating' 'running process, the new version was downloaded') { return }
 
         Write-Host "Uninstalling '$app' ($old_version)"
         if (!(Invoke-Installer -Path $dir -Manifest $old_manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
@@ -417,11 +404,7 @@ function replace_version($ctx) {
             $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
         }
 
-        $failed_deps = failed_deps $manifest $failed
-        if ($failed_deps.Count -gt 0) {
-            error "'$app_name' depends on $($failed_deps -join ', '), which failed."
-            $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
-        } else {
+        if (!(report_failed_deps $manifest $app_name $app_key $failed)) {
             if ($forced) {
                 Move-Item $prepared.dir $dir -ErrorAction Stop
                 $prepared.dir = $dir
@@ -441,7 +424,7 @@ function replace_version($ctx) {
 }
 
 function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
-    $app_key = if ($global) { "$app (global)" } else { $app }
+    $app_key = app_key $app $global
     $old_version = Select-CurrentVersion -AppName $app -Global:$global
     $old_manifest = installed_manifest $app $old_version $global
     $install = install_info $app $old_version $global
@@ -466,8 +449,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         $manifest = manifest $app $bucket $url
     }
     $version = $manifest.version
-    $is_nightly = $version -eq 'nightly'
-    if ($is_nightly) {
+    if ($version -eq 'nightly') {
         $version = nightly_version $quiet
         $check_hash = $false
     }
@@ -484,8 +466,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         $failed[$app_key] = 'no manifest available'
         return
     }
-    if ($version -match '[^\w\.\-\+_]') {
-        error "Manifest version has unsupported character '$($matches[0])'."
+    if (!(test_version_chars $version)) {
         $failed[$app_key] = 'invalid manifest'
         return
     }
@@ -495,18 +476,9 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
     # the new version may be built for another architecture than the installed one
     $new_architecture = Get-SupportedArchitecture $manifest $architecture
 
-    $failed_deps = failed_deps $manifest $failed
-    if ($failed_deps.Count -gt 0) {
-        error "'$app' depends on $($failed_deps -join ', '), which failed."
-        $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
-        return
-    }
+    if (report_failed_deps $manifest $app $app_key $failed) { return }
 
-    if (!(get_config 'download_while_running' $true) -and (test_running_process $app $global)) {
-        Write-Host 'Running process detected, skip updating.'
-        $failed[$app_key] = 'blocked: running process'
-        return
-    }
+    if (!(get_config 'download_while_running' $true) -and (block_running_app $app $global $app_key $failed 'updating')) { return }
 
     # a version that is still installed is switched to here, the same way 'scoop reset' does
     $forced = $force -and $old_version -eq $version

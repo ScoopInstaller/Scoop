@@ -329,6 +329,7 @@ function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
 function modulesdir($global) { "$(basedir $global)\modules" }
 function appdir($app, $global) { "$(appsdir $global)\$app" }
+function app_key($app, $global) { if ($global) { "$app (global)" } else { $app } }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 function currentdir($app, $global) {
