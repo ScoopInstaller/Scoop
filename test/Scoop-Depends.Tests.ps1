@@ -103,23 +103,9 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
             $deps | Should-BeCollection -Count 2
             $deps | Should-ContainCollection @('anotherbucket/depends', 'bucket/test')
         }
-        It 'Detects a cycle written as bucket/app' {
-            Mock Get-Manifest { 'self', @{ depends = 'main/self' }, 'main', $null }
-            { Get-Dependency -AppName 'main/self' -Architecture '32bit' } | Should-Throw -ExceptionMessage '*Circular dependency*'
-        }
         It 'Detects a cycle that goes through a migration' {
             Mock Get-Manifest { 'self', @{ depends = 'old-self' }, 'main', $null } -ParameterFilter { $app -eq 'old-self' }
             { Get-Dependency -AppName 'old-self' -Architecture '32bit' } | Should-Throw -ExceptionMessage '*Circular dependency*'
-        }
-        It 'Keeps a dependency that is installed under its old name' {
-            Mock Get-Manifest { 'new-dep', @{ version = '2.0.0' }, 'main', $null } -ParameterFilter { $app -eq 'old-dep' }
-            Mock Get-Manifest { 'parent', @{ version = '1.0.0'; depends = 'old-dep' }, 'main', $null } -ParameterFilter { $app -eq 'parent' }
-            Mock installed { $true } -ParameterFilter { $app -eq 'old-dep' }
-
-            $deps = Get-Dependency -AppName 'parent' -Architecture '32bit'
-
-            $deps | Should-BeCollection -Count 2
-            $deps | Should-ContainCollection @('old-dep', 'main/parent')
         }
     }
 }

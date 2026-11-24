@@ -587,6 +587,11 @@ Describe 'app_status' -Tag 'Scoop' {
         $status.removed | Should-BeFalse
         $status.missing_deps | Should-BeCollection -Count 0
 
+        Mock installed { $app -eq 'new-dep' }
+        $status = app_status 'foo' $false
+
+        $status.missing_deps | Should-BeCollection -Count 0
+
         Mock installed { $false }
         $status = app_status 'foo' $false
 

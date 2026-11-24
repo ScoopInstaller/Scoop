@@ -23,7 +23,18 @@ if (!$manifest) {
 
 $requested_name = if ($original_app -match '^[a-zA-Z0-9-_.]+(?:/[a-zA-Z0-9-_.]+)?(?:@.+)?$') { (parse_app $original_app)[0] }
 # A migrated app keeps the name it is installed under; only the manifest is new.
-$installed_as = if ($requested_name -and (installed $requested_name)) { $requested_name } else { $app }
+$installed_as = $app
+if ($requested_name -and $requested_name -ne $app -and (installed $requested_name)) {
+    $installed_global = installed $requested_name $true
+    $installed_info = install_info $requested_name (Select-CurrentVersion -AppName $requested_name -Global:$installed_global) $installed_global
+    if ($installed_info) {
+        # the record names the bucket that published the move, so compare that move with this request
+        $migration = if ($installed_info.bucket) { Find-AppMigration $requested_name $installed_info.bucket }
+        if (($installed_info.bucket -eq $bucket) -or ($migration -and $migration.App -eq $app -and $migration.Bucket -eq $bucket)) {
+            $installed_as = $requested_name
+        }
+    }
+}
 $global = installed $installed_as $true
 $status = app_status $installed_as $global
 $install = install_info $installed_as $status.version $global

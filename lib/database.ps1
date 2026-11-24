@@ -225,12 +225,11 @@ function Set-ScoopDB {
     }
     process {
         if ($Path.Count -eq 0) {
-            $bucketPath = Get-LocalBucket | ForEach-Object { Find-BucketDirectory $_ }
-            $Path = (Get-ChildItem $bucketPath -Filter '*.json' -Recurse).FullName
+            $Path = Get-LocalBucket | ForEach-Object { (Get-BucketManifestFiles $_).FullName }
         }
         $Path = $Path | ForEach-Object {
             if (Test-Path -LiteralPath $_ -PathType Container) {
-                (Get-ChildItem -LiteralPath $_ -Filter '*.json' -Recurse).FullName
+                (Get-ManifestFiles $_).FullName
             } else {
                 $_
             }

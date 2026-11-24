@@ -114,6 +114,13 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
         warn "Could not find manifest for '$spec'"
         return
     }
+    # a migration may have answered with another app's manifest
+    $target_app = [System.IO.Path]::GetFileNameWithoutExtension($path)
+    if ($target_app -ne $app -and (installed_manifest $target_app $version)) {
+        warn "'$target_app' ($version) is already installed.`nUse 'scoop update $target_app$(if ($global) { ' --global' })' to install a new version."
+        $resolved += $spec
+        return
+    }
     $resolved += $spec
     $path
 }
@@ -133,14 +140,19 @@ if (!$independent) {
 ensure_none_failed $apps
 
 # a request may already be here under the name its bucket migrated it to
-$explicit_names = @($explicit_apps | Where-Object { $_ -notin $specific_versions_paths } | ForEach-Object { (Get-Manifest $_)[0] })
-$app_names = @{}
-$apps | Where-Object { $_ -notin $specific_versions_paths } | ForEach-Object { $app_names[$_] = (Get-Manifest $_)[0] }
-$skip = @($apps | Where-Object { $_ -notin $specific_versions_paths -and $app_names[$_] -and ((installed $app_names[$_] $global) -or (installed (parse_app $_)[0] $global)) })
-$apps = @($apps | Where-Object { $_ -notin $skip })
+$names = @{}
+$apps | Where-Object { $_ -notin $specific_versions_paths -and $_ -notmatch '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$' } | ForEach-Object {
+    $names[$_] = (Get-Manifest $_)[0]
+}
+$skip = @($apps | Where-Object { $names[$_] -and ((installed $names[$_] $global) -or (installed (parse_app $_)[0] $global)) })
+# a Group-Object would sort the names; the order decides which helper installs first
+$seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+$apps = @($apps | Where-Object { $_ -notin $skip } | Where-Object {
+        $seen.Add($(if ($names[$_]) { $names[$_] } else { $_ })) })
 
-$skip | Where-Object { $app_names[$_] -in $explicit_names } | ForEach-Object {
-    $name = $app_names[$_]
+$skip | Where-Object { $_ -in $explicit_apps } | ForEach-Object {
+    $name = (parse_app $_)[0]
+    if (!(installed $name $global)) { $name = $names[$_] }
     $version = Select-CurrentVersion -AppName $name -Global:$global
     warn "'$name' ($version) is already installed. Skipping."
 }

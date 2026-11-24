@@ -161,7 +161,7 @@ function Sync-Bucket {
                 Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
                     $status, $file = $_ -split '\s+', 2
                     $filePath = Join-Path $bucketLoc $file
-                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$" -and $file -ne '.scoop-migrations.json') {
                         switch ($status) {
                             { $_ -in 'A', 'M', 'R' } {
                                 [void]($using:updatedFiles).Add($filePath)
@@ -192,7 +192,7 @@ function Sync-Bucket {
                 Invoke-Git -Path $bucketLoc -ArgumentList @('diff', '--name-status', $previousCommit) | ForEach-Object {
                     $status, $file = $_ -split '\s+', 2
                     $filePath = Join-Path $bucketLoc $file
-                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$") {
+                    if ($filePath -match "^$([regex]::Escape($innerBucketLoc)).*\.json$" -and $file -ne '.scoop-migrations.json') {
                         switch ($status) {
                             { $_ -in 'A', 'M', 'R' } {
                                 [void]($updatedFiles).Add($filePath)
@@ -224,7 +224,7 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
     $ids = @(arch_specific 'bin' $new_manifest $ctx.new_architecture | Where-Object { $_ -ne $null } | ForEach-Object { & $shim_id $_ })
     $removed = @(arch_specific 'bin' $old_manifest $ctx.architecture | Where-Object { $_ -ne $null } | Where-Object { (& $shim_id $_) -notin $ids })
     if ($removed) {
-        # the commands were created under the name the app was installed as
+        # the wiring was created under the name the app was installed as
         $owner = if ($ctx.renamed_from) { $ctx.renamed_from } else { $ctx.app }
         Remove-ShimFromManifest $owner @{ bin = $removed } $ctx.global $ctx.architecture
     }
@@ -234,7 +234,6 @@ function remove_obsolete_wiring($ctx, $old_manifest, $new_manifest) {
     if ($shortcuts) { rm_startmenu_shortcuts @{ shortcuts = $shortcuts } $ctx.global $ctx.architecture }
 
     $current = "$(Split-Path $ctx.dir)\current"
-    # the old paths were recorded at the location the app was installed under
     $old_dir = if ($ctx.renamed_from) { versiondir $ctx.renamed_from (Split-Path $ctx.dir -Leaf) $ctx.global } else { $ctx.dir }
     $old_current = "$(Split-Path $old_dir)\current"
     $old_persist_dir = if ($ctx.renamed_from) { persistdir $ctx.renamed_from $ctx.global } else { $ctx.persist_dir }
@@ -319,18 +318,22 @@ function move_app($app, $new_app, $global, $manifest, $version) {
         Move-Item -LiteralPath $old_persist -Destination (persistdir $new_app $global) -ErrorAction Stop
         $moved_persist = $true
     }
+    $moved_app = $false
     try {
         Move-Item -LiteralPath (appdir $app $global) -Destination (appdir $new_app $global) -ErrorAction Stop
+        $moved_app = $true
+        move_app_cache $app $new_app
+        if ($moved_persist -and $manifest.persist) {
+            # persist_data builds its links from $dir in the caller's scope, and the old uninstall hooks read them there
+            $dir = versiondir $new_app $version $global
+            unlink_persist_data $manifest $dir
+            persist_data $manifest $dir (persistdir $new_app $global)
+        }
     } catch {
-        if ($moved_persist) { Move-Item -LiteralPath (persistdir $new_app $global) -Destination $old_persist -ErrorAction Stop }
+        if ($moved_app) { Move-Item -LiteralPath (appdir $new_app $global) -Destination (appdir $app $global) -ErrorAction SilentlyContinue }
+        if ($moved_persist) { Move-Item -LiteralPath (persistdir $new_app $global) -Destination $old_persist -ErrorAction SilentlyContinue }
+        move_app_cache $new_app $app
         throw
-    }
-    move_app_cache $app $new_app
-    if ($moved_persist -and $manifest.persist) {
-        # persist_data builds its links from $dir in the caller's scope, and the old uninstall hooks read them there
-        $dir = versiondir $new_app $version $global
-        unlink_persist_data $manifest $dir
-        persist_data $manifest $dir (persistdir $new_app $global)
     }
 }
 
@@ -338,7 +341,12 @@ function move_app_cache($app, $new_app) {
     $pattern = '^' + [regex]::Escape($app) + '#'
     Get-ChildItem -LiteralPath $cachedir -File -ErrorAction SilentlyContinue |
         Where-Object { $_.Name -match $pattern } |
-        ForEach-Object { Rename-Item -LiteralPath $_.FullName -NewName ($_.Name -replace $pattern, "$new_app#") }
+        ForEach-Object {
+            # the same download may already be there under the new name
+            if (!(Test-Path -LiteralPath (Join-Path $cachedir ($_.Name -replace $pattern, "$new_app#")))) {
+                Rename-Item -LiteralPath $_.FullName -NewName ($_.Name -replace $pattern, "$new_app#")
+            }
+        }
 }
 
 function remove_saved_commands($manifest, $owner, $arch, $global) {
@@ -357,11 +365,10 @@ function save_app_bucket($app, $bucket, $global) {
     foreach ($version_dir in @(Get-ChildItem -LiteralPath (appdir $app $global) -Directory -Force | Where-Object { $_.Name -notmatch '^(current|_)' })) {
         $info = install_info $app $version_dir.Name $global
         if (!$info -or !$info.bucket) { continue }
-        $record = Join-Path $version_dir.FullName 'scoop-install.json'
-        $stamp = if (Test-Path -LiteralPath $record) { (Get-Item -LiteralPath $record).LastWriteTimeUtc } else { $version_dir.LastWriteTimeUtc }
-        save_install_info @{ architecture = $info.architecture; url = $info.url; bucket = $bucket } $version_dir.FullName
-        # version order is the records' write time, so restoring one must keep it
-        (Get-Item -LiteralPath $record).LastWriteTimeUtc = $stamp
+        $fields = @{}
+        $info.PSObject.Properties | ForEach-Object { $fields[$_.Name] = $_.Value }
+        $fields['bucket'] = $bucket
+        save_install_info $fields $version_dir.FullName
     }
 }
 
@@ -550,8 +557,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
             if ($renamed) {
                 $renamed_to = $target_app
             } else {
-                # a move between buckets changes only where the manifest lives
-                save_install_info @{ architecture = $architecture; url = $url; bucket = $target_bucket } (versiondir $app $old_version $global)
+                save_app_bucket $app $target_bucket $global
                 Write-Host "Migrating '$app_key' to bucket '$target_bucket'"
             }
             $bucket = $target_bucket

@@ -125,11 +125,14 @@ function Get-BucketAddHint($bucket) {
     "Add the bucket with 'scoop bucket add $bucket $(if ($repo) { $repo } else { '<repo>' })', then retry."
 }
 
-function Get-BucketManifestFiles($bucket, $filter = '*.json') {
-    $dir = Find-BucketDirectory $bucket
+function Get-ManifestFiles($dir, $filter = '*.json') {
     if (!(Test-Path -LiteralPath $dir)) { return @() }
     Get-ChildItem -LiteralPath $dir -Filter $filter -Recurse |
         Where-Object { $_.Name -ne '.scoop-migrations.json' }
+}
+
+function Get-BucketManifestFiles($bucket, $filter = '*.json') {
+    Get-ManifestFiles (Find-BucketDirectory $bucket) $filter
 }
 
 function Get-BucketMigrations($bucket) {
@@ -221,11 +224,18 @@ function installed_manifest($app, $version, $global) {
 }
 
 function save_install_info($info, $dir) {
+    # version order is the record's write time, so a rewrite has to keep it
+    $record = "$dir\scoop-install.json"
+    $stamp = if (Test-Path -LiteralPath $record) { (Get-Item -LiteralPath $record).LastWriteTimeUtc }
+    elseif (Test-Path -LiteralPath "$dir\install.json") { (Get-Item -LiteralPath "$dir\install.json").LastWriteTimeUtc }
+    else { (Get-Item -LiteralPath $dir).LastWriteTimeUtc }
+
     $nulls = $info.keys | Where-Object { $null -eq $info[$_] }
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
     $file_content = $info | ConvertToPrettyJson # in 'json.ps1'
-    [System.IO.File]::WriteAllLines("$dir\scoop-install.json", $file_content)
+    [System.IO.File]::WriteAllLines($record, $file_content)
+    (Get-Item -LiteralPath $record).LastWriteTimeUtc = $stamp
 }
 
 function install_info($app, $version, $global) {

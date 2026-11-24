@@ -59,7 +59,7 @@ function err ([String] $name, [String[]] $message) {
 }
 
 $MANIFESTS = @()
-foreach ($single in Get-ChildItem $Dir -Filter "$App.json" -Recurse) {
+foreach ($single in Get-ManifestFiles $Dir "$App.json") {
     $name = $single.BaseName
     $file = $single.FullName
     $manifest = parse_json $file
