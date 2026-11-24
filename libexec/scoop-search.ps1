@@ -52,9 +52,21 @@ function bin_match_json($json, $query) {
     else { return $false }
 }
 
-function search_bucket($bucket, $query) {
-    $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
+function migration_search_results($bucket, $query) {
+    $migrations = Get-BucketMigrations $bucket
+    if (!$migrations) { return }
+    $migrations.PSObject.Properties | Where-Object { $_.Name -match $query } | ForEach-Object {
+        $target = Get-MigrationTarget $_.Name $_.Value $bucket
+        if (!$target -or (manifest_path $_.Name $bucket)) { return }
+        $manifest = (Get-Manifest "$($target.Bucket)/$($target.App)")[1]
+        if ($manifest) {
+            [PSCustomObject]@{ Name = $_.Name; Version = $manifest.version; Source = $bucket; Binaries = '' }
+        }
+    }
+}
 
+function search_bucket($bucket, $query) {
+    $apps = Get-BucketManifestFiles $bucket
     $apps | ForEach-Object {
         $filepath = $_.FullName
         $name = $_.BaseName
@@ -94,12 +106,13 @@ function search_bucket($bucket, $query) {
             }
         }
     }
+
+    migration_search_results $bucket $query | ForEach-Object { $list.Add($_) }
 }
 
 # fallback function for PowerShell 5
 function search_bucket_legacy($bucket, $query) {
-    $apps = Get-ChildItem (Find-BucketDirectory $bucket) -Filter '*.json' -Recurse
-
+    $apps = Get-BucketManifestFiles $bucket
     $apps | ForEach-Object {
         $filepath = $_.FullName
         $name = $_.BaseName
@@ -139,6 +152,8 @@ function search_bucket_legacy($bucket, $query) {
             }
         }
     }
+
+    migration_search_results $bucket $query | ForEach-Object { $list.Add($_) }
 }
 
 function search_remote($bucket, $query) {
@@ -192,6 +207,8 @@ if (get_config USE_SQLITE_CACHE) {
                     Binaries = $_.binary
                 })
         }
+    # The cache has no row for a migrated name.
+    Get-LocalBucket | ForEach-Object { migration_search_results $_ ([regex]::Escape($query)) } | ForEach-Object { $list.Add($_) }
 } else {
     try {
         $query = New-Object Regex $query, 'IgnoreCase'

@@ -132,12 +132,17 @@ if (!$independent) {
 }
 ensure_none_failed $apps
 
-$apps, $skip = prune_installed $apps $global
+# a request may already be here under the name its bucket migrated it to
+$explicit_names = @($explicit_apps | Where-Object { $_ -notin $specific_versions_paths } | ForEach-Object { (Get-Manifest $_)[0] })
+$app_names = @{}
+$apps | Where-Object { $_ -notin $specific_versions_paths } | ForEach-Object { $app_names[$_] = (Get-Manifest $_)[0] }
+$skip = @($apps | Where-Object { $_ -notin $specific_versions_paths -and $app_names[$_] -and ((installed $app_names[$_] $global) -or (installed (parse_app $_)[0] $global)) })
+$apps = @($apps | Where-Object { $_ -notin $skip })
 
-$skip | Where-Object { $explicit_apps -contains $_ } | ForEach-Object {
-    $app, $null, $null = parse_app $_
-    $version = Select-CurrentVersion -AppName $app -Global:$global
-    warn "'$app' ($version) is already installed. Skipping."
+$skip | Where-Object { $app_names[$_] -in $explicit_names } | ForEach-Object {
+    $name = $app_names[$_]
+    $version = Select-CurrentVersion -AppName $name -Global:$global
+    warn "'$name' ($version) is already installed. Skipping."
 }
 
 $suggested = @{ };

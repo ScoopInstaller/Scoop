@@ -49,15 +49,12 @@ function known_buckets {
     known_bucket_repos | ForEach-Object { $_.PSObject.Properties | Select-Object -Expand 'name' }
 }
 
-function apps_in_bucket($dir) {
-    return (Get-ChildItem $dir -Filter '*.json' -Recurse).BaseName
-}
-
 function Get-LocalBucket {
     <#
     .SYNOPSIS
         List all local buckets.
     #>
+    if (!(Test-Path -LiteralPath $bucketsdir)) { return @() }
     $bucketNames = [System.Collections.Generic.List[String]](Get-ChildItem -Path $bucketsdir -Directory).Name
     if ($null -eq $bucketNames) {
         return @() # Return a zero-length list instead of $null.

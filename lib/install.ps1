@@ -6,9 +6,18 @@ function nightly_version($quiet = $false) {
 }
 
 function failed_deps($manifest, $failed) {
-    @($manifest.depends | Where-Object { $_ } | ForEach-Object { (parse_app $_)[0] } | Where-Object {
-            ($failed[$_] -and $failed[$_] -notmatch '^(skipped|blocked): ') -or
-            ($failed["$_ (global)"] -and $failed["$_ (global)"] -notmatch '^(skipped|blocked): ')
+    @(foreach ($spec in @($manifest.depends | Where-Object { $_ })) {
+            $dep, $dep_bucket, $null = parse_app $spec
+            $lookup = if ($dep_bucket) { "$dep_bucket/$dep" } else { $dep }
+            $names = @($dep, (Get-Manifest $lookup)[0] | Select-Object -Unique)
+            foreach ($name in $names) {
+                $reason = @($failed[$name], $failed["$name (global)"]) |
+                    Where-Object { $_ -and $_ -notmatch '^(skipped|blocked): ' } | Select-Object -First 1
+                if ($reason) {
+                    $name
+                    break
+                }
+            }
         })
 }
 
@@ -487,22 +496,6 @@ function show_notes($manifest, $dir, $original_dir, $persist_dir) {
         Write-Output (wraptext (substitute $manifest.notes @{ '$dir' = $dir; '$original_dir' = $original_dir; '$persist_dir' = $persist_dir }))
         Write-Output '-----'
     }
-}
-
-function all_installed($apps, $global) {
-    $apps | Where-Object {
-        $app, $null, $null = parse_app $_
-        installed $app $global
-    }
-}
-
-# returns (uninstalled, installed)
-function prune_installed($apps, $global) {
-    $installed = @(all_installed $apps $global)
-
-    $uninstalled = $apps | Where-Object { $installed -notcontains $_ }
-
-    return @($uninstalled), @($installed)
 }
 
 function ensure_none_failed($apps) {
