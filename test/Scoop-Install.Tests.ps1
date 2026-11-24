@@ -119,7 +119,7 @@ Describe 'install_app' -Tag 'Scoop' {
         Mock Read-Host { $asked.Value = $asked.Value + 1; 'y' }
         # the guard looks at the file the call comes from, so the second call runs from 'update.ps1'
         $caller = Join-Path $TestDrive 'update.ps1'
-        [IO.File]::WriteAllText($caller, 'install_app $args[0] ''64bit'' $false $args[1] $args[2]')
+        [IO.File]::WriteAllText($caller, "`$script:appdir = '$script:appdir'`r`ninstall_app `$args[0] '64bit' `$false `$args[1] `$args[2]")
 
         install_app 'foo' '64bit' $false @{} @{}
         $asked.Value | Should-Be 1
