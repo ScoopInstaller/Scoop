@@ -23,6 +23,7 @@
 - **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
 - **core:** End progress lines with a status marker ([#6805](https://github.com/ScoopInstaller/Scoop/issues/6805))
 - **core:** Let abort throw instead of ending the process ([#6835](https://github.com/ScoopInstaller/Scoop/issues/6835))
+- **core:** Name an app once before checking its status ([#6855](https://github.com/ScoopInstaller/Scoop/issues/6855))
 - **core:** Resolve Git helper without hardcoded runtime paths ([#6795](https://github.com/ScoopInstaller/Scoop/issues/6795))
 - **core:** Warn once per deprecated function per manifest ([#6801](https://github.com/ScoopInstaller/Scoop/issues/6801))
 - **download:** Ignore an unusable GitHub token and keep it on API redirects ([#6826](https://github.com/ScoopInstaller/Scoop/pull/6826))
