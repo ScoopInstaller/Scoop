@@ -121,6 +121,15 @@ Describe 'Confirm-InstallationStatus' -Tag 'Scoop' {
         $status.installed | Should-BeCollection -Count 0
         $status.failed['not_installed_app_xyz'] | Should-Be 'not installed'
     }
+
+    It 'should name an app once when it is given with and without its bucket' {
+        Mock error {}
+
+        $status = Confirm-InstallationStatus 'not_installed_app_xyz', 'main/not_installed_app_xyz'
+
+        Should-Invoke -CommandName error -Times 1 -Exactly
+        $status.failed.Keys | Should-BeCollection -Count 1
+    }
 }
 
 

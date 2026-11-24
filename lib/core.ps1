@@ -982,8 +982,9 @@ function Confirm-InstallationStatus {
     )
     $Installed = @()
     $Failed = @{}
-    $Apps | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
-        $App, $null, $null = parse_app $_
+    # the same app may be named with and without its bucket
+    $Apps | ForEach-Object { (parse_app $_)[0] } | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
+        $App = $_
         if ($Global) {
             if (Test-Path (appdir $App $true)) {
                 $Installed += , @($App, $true)
