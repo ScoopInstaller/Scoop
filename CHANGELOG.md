@@ -56,6 +56,7 @@
 
 ### Tests
 
+- **install:** Keep the mocked version directory inside the test drive ([#6856](https://github.com/ScoopInstaller/Scoop/issues/6856))
 - **pester:** Update to Pester 6 ([#6779](https://github.com/ScoopInstaller/Scoop/issues/6779))
 - **shim:** Subprocess doesn't need a new console ([#6848](https://github.com/ScoopInstaller/Scoop/issues/6848))
 - **static-analysis:** Add dot-source dependency and dead code checks ([#6787](https://github.com/ScoopInstaller/Scoop/issues/6787))
