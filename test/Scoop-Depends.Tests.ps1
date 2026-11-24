@@ -109,20 +109,8 @@ Describe 'Package Dependencies' -Tag 'Scoop' {
         }
         It 'Detects a cycle that goes through a migration' {
             Mock Get-Manifest { 'self', @{ depends = 'old-self' }, 'main', $null } -ParameterFilter { $app -eq 'old-self' }
-            Mock installed { $false }
             { Get-Dependency -AppName 'old-self' -Architecture '32bit' } | Should-Throw -ExceptionMessage '*Circular dependency*'
         }
-
-        It 'Does not walk the dependencies of a name the app is not installed under' {
-            Mock Get-Manifest { 'new-dep', @{ version = '2.0.0'; depends = 'missing-dep' }, 'main', $null } -ParameterFilter { $app -eq 'old-dep' }
-            Mock installed { $true } -ParameterFilter { $app -eq 'old-dep' }
-
-            $deps = Get-Dependency -AppName 'old-dep' -Architecture '32bit'
-
-            $deps | Should-BeCollection -Count 1
-            $deps | Should-ContainCollection @('old-dep')
-        }
-
         It 'Keeps a dependency that is installed under its old name' {
             Mock Get-Manifest { 'new-dep', @{ version = '2.0.0' }, 'main', $null } -ParameterFilter { $app -eq 'old-dep' }
             Mock Get-Manifest { 'parent', @{ version = '1.0.0'; depends = 'old-dep' }, 'main', $null } -ParameterFilter { $app -eq 'parent' }

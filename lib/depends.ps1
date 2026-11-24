@@ -36,8 +36,6 @@ function Get-Dependency {
         $AppName, $manifest, $bucket, $url = Get-Manifest $AppName
         # A dependency may still be listed by the name this call was made with.
         $Unresolved += $requested, $AppName
-        # An app installed under the old name must not be installed again under the new one.
-        $installed_as_old = (parse_app $requested)[0] -ne $AppName -and (installed $requested)
 
         # An installed app needs no manifest here: its dependencies are in place already.
         if (!$manifest -and !(installed $requested)) {
@@ -47,7 +45,7 @@ function Get-Dependency {
             abort "Couldn't find manifest for '$AppName'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
         }
 
-        $deps = if ($manifest -and !$installed_as_old) { @(Get-InstallationHelper $manifest $Architecture) + @($manifest.depends) | Select-Object -Unique } else { @() }
+        $deps = if ($manifest) { @(Get-InstallationHelper $manifest $Architecture) + @($manifest.depends) | Select-Object -Unique } else { @() }
 
         foreach ($dep in $deps) {
             if ($Resolved -notcontains $dep) {
@@ -59,6 +57,8 @@ function Get-Dependency {
         }
 
         $Unresolved = @($Unresolved | Where-Object { $_ -ne $requested -and $_ -ne $AppName })
+        # An app installed under the old name must not be installed again under the new one.
+        $installed_as_old = (parse_app $requested)[0] -ne $AppName -and (installed $requested)
         if ($installed_as_old) {
             $Resolved += $requested
         } elseif ($bucket) {
