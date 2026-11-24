@@ -12,6 +12,22 @@ function failed_deps($manifest, $failed) {
         })
 }
 
+function test_version_chars($version) {
+    if ($version -match '[^\w\.\-\+_]') {
+        error "Manifest version has unsupported character '$($matches[0])'."
+        return $false
+    }
+    return $true
+}
+
+function report_failed_deps($manifest, $app, $app_key, $failed) {
+    $failed_deps = failed_deps $manifest $failed
+    if ($failed_deps.Count -eq 0) { return $false }
+    error "'$app' depends on $($failed_deps -join ', '), which failed."
+    $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
+    return $true
+}
+
 function prepare_app($app, $architecture, $global, $manifest, $bucket, $version, $use_cache = $true, $check_hash = $true, $dir) {
     if (!$dir) { $dir = versiondir $app $version $global }
     ensure $dir | Out-Null
@@ -38,7 +54,7 @@ function prepare_app($app, $architecture, $global, $manifest, $bucket, $version,
 
 function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
-    $app_key = if ($global) { "$app (global)" } else { $app }
+    $app_key = app_key $app $global
 
     if (!$manifest) {
         error "Couldn't find manifest for '$app'$(if ($bucket) { " from '$bucket' bucket" } elseif ($url) { " at '$url'" })."
@@ -52,14 +68,12 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         $failed[$app_key] = 'invalid manifest'
         return
     }
-    if ($version -match '[^\w\.\-\+_]') {
-        error "Manifest version has unsupported character '$($matches[0])'."
+    if (!(test_version_chars $version)) {
         $failed[$app_key] = 'invalid manifest'
         return
     }
 
-    $is_nightly = $version -eq 'nightly'
-    if ($is_nightly) {
+    if ($version -eq 'nightly') {
         $version = nightly_version
         $check_hash = $false
     }
@@ -70,12 +84,7 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
         $failed[$app_key] = 'unsupported architecture'
         return
     }
-    $failed_deps = failed_deps $manifest $failed
-    if ($failed_deps.Count -gt 0) {
-        error "'$app' depends on $($failed_deps -join ', '), which failed."
-        $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
-        return
-    }
+    if (report_failed_deps $manifest $app $app_key $failed) { return }
 
     # the update flow lives in 'lib/update.ps1' as well as in 'scoop-update.ps1'
     if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*update.ps1')) {
@@ -111,8 +120,25 @@ function install_app($app, $architecture, $global, $suggested, $failed, $use_cac
     install_version $app $manifest $version $architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
 }
 
+function uninstall_version($app, $manifest, $version, $architecture, $global, $failed, $dir, $action, $reason = 'running process') {
+    $app_key = app_key $app $global
+    Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+    if (block_running_app $app $global $app_key $failed $action $reason) { return }
+    try {
+        Test-Path $dir -ErrorAction Stop | Out-Null
+    } catch [UnauthorizedAccessException] {
+        error "Access denied: $dir. You might need to restart."
+        $failed[$app_key] = 'access denied'
+        return
+    }
+    Write-Host "Uninstalling '$app' ($version)"
+    if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+        $failed[$app_key] = 'uninstaller failed'
+    }
+}
+
 function install_version($app, $manifest, $version, $architecture, $global, $bucket, $url, $suggested, $failed, $dir, $fname) {
-    $app_key = if ($global) { "$app (global)" } else { $app }
+    $app_key = app_key $app $global
     $linked = $false
     # the installation modifies the extracted files, so they cannot be reused afterwards
     Remove-Item -LiteralPath "$dir\.scoop-extracted" -Force -ErrorAction SilentlyContinue
@@ -657,6 +683,13 @@ function test_running_process($app, $global) {
         return $true
     }
     return $false
+}
+
+function block_running_app($app, $global, $app_key, $failed, $action, $reason = 'running process') {
+    if (!(test_running_process $app $global)) { return $false }
+    Write-Host "Running process detected, skip $action."
+    $failed[$app_key] = "blocked: $reason"
+    return $true
 }
 
 # wrapper function to create junction links

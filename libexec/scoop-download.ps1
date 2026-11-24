@@ -89,8 +89,7 @@ foreach ($curr_app in $apps) {
         $download_failed = $true
         continue
     }
-    if($version -match '[^\w\.\-\+_]') {
-        error "Manifest version has unsupported character '$($matches[0])'."
+    if(!(test_version_chars $version)) {
         $download_failed = $true
         continue
     }
