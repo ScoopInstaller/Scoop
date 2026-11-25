@@ -351,14 +351,14 @@ function move_app_cache($app, $new_app) {
 
 function remove_saved_commands($manifest, $owner, $arch, $global) {
     $shim_dir = shimdir $global
-    @(arch_specific 'bin' $manifest $arch) | Where-Object { $_ } | ForEach-Object {
-        $target, $name, $null = Get-ShimDefinition $_
-        # not Remove-Shim: it also deletes an active command that now belongs to another app
-        @('', '.shim', '.cmd', '.ps1') | ForEach-Object {
-            $saved = "$shim_dir\$name" + $_ + ".$owner"
-            if (Test-Path -LiteralPath $saved -PathType Leaf) { Remove-Item -LiteralPath $saved -Force }
-        }
-    }
+    # not Remove-Shim: it also deletes an active command that now belongs to another app
+    $wanted = @(arch_specific 'bin' $manifest $arch | Where-Object { $_ } | ForEach-Object {
+            $target, $name, $null = Get-ShimDefinition $_
+            @('', '.shim', '.cmd', '.ps1') | ForEach-Object { "$name$_.$owner" }
+        })
+    if (!$wanted) { return }
+    Get-ChildItem -LiteralPath $shim_dir -File -Force -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -in $wanted } | Remove-Item -Force
 }
 
 function save_app_bucket($app, $bucket, $global) {

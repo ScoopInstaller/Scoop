@@ -40,6 +40,7 @@
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\update.ps1"
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
@@ -116,7 +117,7 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
     }
     # a migration may have answered with another app's manifest
     $target_app = [System.IO.Path]::GetFileNameWithoutExtension($path)
-    if ($target_app -ne $app -and (installed_manifest $target_app $version)) {
+    if ($target_app -ne $app -and (installed_manifest $target_app $version $global)) {
         warn "'$target_app' ($version) is already installed.`nUse 'scoop update $target_app$(if ($global) { ' --global' })' to install a new version."
         $resolved += $spec
         return
@@ -144,7 +145,54 @@ $names = @{}
 $apps | Where-Object { $_ -notin $specific_versions_paths -and $_ -notmatch '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$' } | ForEach-Object {
     $names[$_] = (Get-Manifest $_)[0]
 }
-$skip = @($apps | Where-Object { $names[$_] -and ((installed $names[$_] $global) -or (installed (parse_app $_)[0] $global)) })
+$suggested = @{ }
+$failed = @{}
+# an app that moved keeps the normal update path: it is moved once instead of installed twice
+$missing = @($apps | Where-Object {
+        $_ -notin $specific_versions_paths -and $_ -notmatch '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$' -and
+        !(installed (parse_app $_)[0] $global)
+    })
+if ($missing) {
+    $recorded = @(Get-LocalBucket | ForEach-Object { Get-BucketMigrations $_ } | Where-Object { $_ } |
+        ForEach-Object { $_.PSObject.Properties.Name } | Select-Object -Unique)
+    $moved = @{}
+    foreach ($name in $recorded) {
+        if (!(installed $name $global)) { continue }
+        $version = Select-CurrentVersion -AppName $name -Global:$global
+        $info = install_info $name $version $global
+        if (!$info.bucket) { continue }
+        # the record of this scope: the same name may be installed in both
+        $resolved_app, $null, $resolved_bucket, $null = Get-Manifest "$($info.bucket)/$name"
+        $moved["$resolved_bucket/$resolved_app"] = [pscustomobject]@{ Name = $name; Version = $version; Hold = $info.hold }
+    }
+    foreach ($entry in $missing) {
+        # a request may still be one hop short of the app it names
+        $wanted_app, $null, $wanted_bucket, $null = Get-Manifest $entry
+        $key = "$wanted_bucket/$wanted_app"
+        if (!$moved.ContainsKey($key)) { continue }
+        $candidate = $moved[$key]
+        if ($candidate.Hold) {
+            $failed[$candidate.Name] = "'$wanted_app' is needed but '$($candidate.Name)' is held to $($candidate.Version)"
+            continue
+        }
+        try {
+            update_app $candidate.Name $global $false $false $independent $suggested $failed $use_cache $check_hash
+        } catch {
+            $failed[$candidate.Name] = $_.Exception.Message
+        }
+        $moved.Remove($key)
+    }
+}
+if ($failed.Count -gt 0) {
+    # nothing was installed, so a moved app must not pass for success
+    foreach ($key in @($failed.Keys)) { $failed[$key] = "$($failed[$key])" -replace '^(skipped|blocked): ', '' }
+    $apps = @()
+}
+# a dependency follows the name its manifest has now; only a request keeps the name it was made with
+$skip = @($apps | Where-Object {
+        $names[$_] -and ((installed $names[$_] $global) -or
+            ($_ -in $explicit_apps -and (installed (parse_app $_)[0] $global)))
+    })
 # a Group-Object would sort the names; the order decides which helper installs first
 $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 $apps = @($apps | Where-Object { $_ -notin $skip } | Where-Object {
@@ -157,13 +205,11 @@ $skip | Where-Object { $_ -in $explicit_apps } | ForEach-Object {
     warn "'$name' ($version) is already installed. Skipping."
 }
 
-$suggested = @{ };
 if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "Scoop uses 'aria2c' for multi-connection downloads."
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
     warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
-$failed = @{}
 $apps | ForEach-Object {
     $current = $_
     try {
