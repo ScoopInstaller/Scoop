@@ -182,6 +182,10 @@ if ($missing) {
         }
         $moved.Remove($key)
     }
+    # a move installs the dependencies of the app it moved, and a URL never shows up in $names
+    $apps = @($apps | Where-Object {
+            !($_ -match '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$') -or !(installed ((Get-Manifest $_)[0]) $global)
+        })
 }
 if ($failed.Count -gt 0) {
     # nothing was installed, so a moved app must not pass for success
