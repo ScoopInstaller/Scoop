@@ -532,7 +532,7 @@ function move_installed_apps($apps, $global, $independent, $suggested, $failed, 
                     $failed[$wanted_app] = "'$wanted_app' is needed but '$($candidate.Name)' is held to $($candidate.Version)"
                 } else {
                     try {
-                        update_app $candidate.Name $global $false $false $independent $suggested $failed $use_cache $check_hash
+                        update_app $candidate.Name $global $false $false $independent $suggested $failed $use_cache $check_hash | Out-Host
                     } catch {
                         $failed[$wanted_app] = $_.Exception.Message
                     }
