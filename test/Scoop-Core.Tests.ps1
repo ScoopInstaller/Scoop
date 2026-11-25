@@ -641,33 +641,22 @@ Describe 'app_status of a renamed app' -Tag 'Scoop' {
         Mock manifest { $null }
     }
 
-    It 'reports the app as moved instead of removed' {
-        Mock Get-Manifest { 'new-name', [pscustomobject]@{ version = '2.0.0' }, 'main', $null }
+    It 'reports where the app moved to' {
+        @(
+            @{ Bucket = 'main'; Manifest = [pscustomobject]@{ version = '2.0.0' }; Renamed = 'new-name'; Latest = '2.0.0'; Outdated = $true }
+            @{ Bucket = 'extras'; Manifest = [pscustomobject]@{ version = '2.0.0' }; Renamed = 'extras/new-name'; Latest = '2.0.0'; Outdated = $true }
+            @{ Bucket = 'versions'; Manifest = $null; Renamed = 'versions/new-name'; Latest = $null; Outdated = $false }
+        ) | ForEach-Object {
+            $case = $_
+            Mock Get-Manifest { 'new-name', $case.Manifest, $case.Bucket, $null }
 
-        $status = app_status 'old-name' $false
+            $status = app_status 'old-name' $false
 
-        $status.removed | Should-BeFalse
-        $status.renamed | Should-Be 'new-name'
-        $status.latest_version | Should-Be '2.0.0'
-        $status.outdated | Should-BeTrue
-    }
-
-    It 'reports the bucket of a move to another one' {
-        Mock Get-Manifest { 'new-name', [pscustomobject]@{ version = '2.0.0' }, 'extras', $null }
-
-        $status = app_status 'old-name' $false
-
-        $status.renamed | Should-Be 'extras/new-name'
-    }
-
-    It 'reports the app as moved when the target bucket is not installed' {
-        Mock Get-Manifest { 'new-name', $null, 'versions', $null }
-
-        $status = app_status 'old-name' $false
-
-        $status.removed | Should-BeFalse
-        $status.renamed | Should-Be 'versions/new-name'
-        $status.outdated | Should-BeFalse
+            $status.removed | Should-BeFalse
+            $status.renamed | Should-Be $case.Renamed
+            if ($case.Latest) { $status.latest_version | Should-Be $case.Latest }
+            $status.outdated | Should-Be $case.Outdated
+        }
     }
 
     It 'reports the app as removed when nothing resolves the name' {

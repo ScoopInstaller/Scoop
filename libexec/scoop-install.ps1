@@ -147,59 +147,12 @@ $apps | Where-Object { $_ -notin $specific_versions_paths -and $_ -notmatch '^(h
 }
 $suggested = @{ }
 $failed = @{}
-# an app that moved keeps the normal update path: it is moved once instead of installed twice
-$missing = @($apps | Where-Object {
-        $_ -notin $specific_versions_paths -and $_ -notmatch '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$' -and
-        !(installed (parse_app $_)[0] $global)
+$apps = @(move_installed_apps $apps $global $independent $suggested $failed $use_cache $check_hash)
+# a URL never shows up in $names, so a move may have installed it already
+$apps = @($apps | Where-Object {
+        $_ -in $explicit_apps -or !($_ -match '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$') -or
+        !(installed ((Get-Manifest $_)[0]) $global)
     })
-if ($missing) {
-    $recorded = @(Get-LocalBucket | ForEach-Object { Get-BucketMigrations $_ } | Where-Object { $_ } |
-        ForEach-Object { $_.PSObject.Properties.Name } | Select-Object -Unique)
-    $moved = @{}
-    $migrated = @{}
-    foreach ($name in $recorded) {
-        if (!(installed $name $global)) { continue }
-        $version = Select-CurrentVersion -AppName $name -Global:$global
-        $info = install_info $name $version $global
-        if (!$info.bucket) { continue }
-        # the record of this scope: the same name may be installed in both
-        $resolved_app, $null, $resolved_bucket, $null = Get-Manifest "$($info.bucket)/$name"
-        $moved["$resolved_bucket/$resolved_app"] = [pscustomobject]@{ Name = $name; Version = $version; Hold = $info.hold }
-    }
-    foreach ($entry in $missing) {
-        # a request may still be one hop short of the app it names
-        $wanted_app, $null, $wanted_bucket, $null = Get-Manifest $entry
-        $key = "$wanted_bucket/$wanted_app"
-        if (!$moved.ContainsKey($key)) { continue }
-        $candidate = $moved[$key]
-        if ($candidate.Hold) {
-            $failed[$wanted_app] = "'$wanted_app' is needed but '$($candidate.Name)' is held to $($candidate.Version)"
-            # installing the new name would leave two copies of the same app
-            $apps = @($apps | Where-Object { $_ -ne $entry })
-            continue
-        }
-        try {
-            update_app $candidate.Name $global $false $false $independent $suggested $failed $use_cache $check_hash
-            $migrated[$wanted_app] = $candidate.Name
-        } catch {
-            $failed[$wanted_app] = $_.Exception.Message
-        }
-        $moved.Remove($key)
-    }
-    # a move that did not happen fails the apps that need it, and a skipped reason still counts
-    foreach ($app in $migrated.Keys) {
-        $reason = @($failed[$migrated[$app]], $failed["$($migrated[$app]) (global)"]) | Where-Object { $_ } | Select-Object -First 1
-        if ($reason) { $failed[$app] = "$reason" -replace '^(skipped|blocked): ', '' }
-    }
-    if ($migrated.Count) {
-        # a move installs the dependencies of the app it moved, and a URL never shows up in $names
-        $apps = @($apps | Where-Object {
-                $_ -in $specific_versions_paths -or $_ -in $explicit_apps -or
-                !($_ -match '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$') -or
-                !(installed ((Get-Manifest $_)[0]) $global)
-            })
-    }
-}
 # a dependency follows the name its manifest has now; only a request keeps the name it was made with
 $skip = @($apps | Where-Object {
         $names[$_] -and ((installed $names[$_] $global) -or

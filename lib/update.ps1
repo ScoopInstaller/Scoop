@@ -392,6 +392,7 @@ function switch_version($ctx) {
     if (-not $independent) {
         # the dependencies of the version that is switched to, not the ones the manifest has now
         $deps = @($installed.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $installed_architecture } | Where-Object { !(installed $_) } | Select-Object -Unique)
+        $deps = @(move_installed_apps $deps $global $independent $suggested $failed $use_cache $check_hash)
         $deps | ForEach-Object { install_app $_ $installed_architecture $global $suggested $failed $use_cache $check_hash }
         if (report_failed_deps $installed $app $app_key $failed) { return }
     }
@@ -485,6 +486,7 @@ function replace_version($ctx) {
         if (-not $independent) {
             # Also add missing dependencies
             $apps = @(Get-Dependency $app $architecture) -ne $app
+            $apps = @(move_installed_apps $apps $global $independent $suggested $failed $use_cache $check_hash)
             $apps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed $use_cache $check_hash }
         }
 
@@ -499,6 +501,52 @@ function replace_version($ctx) {
         $failed[$app_key] = $_.Exception.Message
         error $_.Exception.Message
     }
+}
+
+# Moves an app installed under an old name, so the plan never installs a second copy.
+function move_installed_apps($apps, $global, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
+    $missing = @($apps | Where-Object { !(installed (parse_app $_)[0] $global) })
+    if (!$missing) { return $apps }
+    $recorded = @(Get-LocalBucket | ForEach-Object { Get-BucketMigrations $_ } | Where-Object { $_ } |
+        ForEach-Object { $_.PSObject.Properties.Name } | Select-Object -Unique)
+    $moved = @{}
+    foreach ($name in $recorded) {
+        if (!(installed $name $global)) { continue }
+        $version = Select-CurrentVersion -AppName $name -Global:$global
+        $info = install_info $name $version $global
+        if (!$info.bucket) { continue }
+        # the record of this scope: the same name may be installed in both
+        $resolved_app, $null, $resolved_bucket, $null = Get-Manifest "$($info.bucket)/$name"
+        $moved["$resolved_bucket/$resolved_app"] = [pscustomobject]@{ Name = $name; Version = $version; Hold = $info.hold }
+    }
+    $rest = @()
+    foreach ($entry in $apps) {
+        $wanted_app = $null
+        if ($entry -in $missing) {
+            # a request may still be one hop short of the app it names
+            $wanted_app, $null, $wanted_bucket, $null = Get-Manifest $entry
+            $key = "$wanted_bucket/$wanted_app"
+            if ($moved.ContainsKey($key)) {
+                $candidate = $moved[$key]
+                if ($candidate.Hold) {
+                    $failed[$wanted_app] = "'$wanted_app' is needed but '$($candidate.Name)' is held to $($candidate.Version)"
+                } else {
+                    try {
+                        update_app $candidate.Name $global $false $false $independent $suggested $failed $use_cache $check_hash
+                    } catch {
+                        $failed[$wanted_app] = $_.Exception.Message
+                    }
+                    # a skipped move still has to fail the apps that need it
+                    $reason = @($failed[$candidate.Name], $failed["$($candidate.Name) (global)"]) | Where-Object { $_ } | Select-Object -First 1
+                    if ($reason) { $failed[$wanted_app] = "$reason" -replace '^(skipped|blocked): ', '' }
+                }
+                $moved.Remove($key)
+                continue
+            }
+        }
+        $rest += $entry
+    }
+    return $rest
 }
 
 function update_app($app, $global, $force = $false, $quiet = $false, $independent, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
@@ -661,6 +709,7 @@ function update_app($app, $global, $force = $false, $quiet = $false, $independen
         if (-not $independent) {
             $helpers = Get-InstallationHelper $manifest $new_architecture
             $needed = @($helpers | ForEach-Object { Get-Dependency $_ $new_architecture } | Select-Object -Unique)
+            $needed = @(move_installed_apps $needed $global $independent $suggested $failed $use_cache $check_hash)
             $needed | Where-Object { !(installed $_) } | ForEach-Object {
                 install_app $_ $new_architecture $global $suggested $failed $use_cache $check_hash
             }
