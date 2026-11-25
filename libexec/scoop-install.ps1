@@ -156,6 +156,7 @@ if ($missing) {
     $recorded = @(Get-LocalBucket | ForEach-Object { Get-BucketMigrations $_ } | Where-Object { $_ } |
         ForEach-Object { $_.PSObject.Properties.Name } | Select-Object -Unique)
     $moved = @{}
+    $migrated = $false
     foreach ($name in $recorded) {
         if (!(installed $name $global)) { continue }
         $version = Select-CurrentVersion -AppName $name -Global:$global
@@ -177,15 +178,20 @@ if ($missing) {
         }
         try {
             update_app $candidate.Name $global $false $false $independent $suggested $failed $use_cache $check_hash
+            $migrated = $true
         } catch {
             $failed[$candidate.Name] = $_.Exception.Message
         }
         $moved.Remove($key)
     }
-    # a move installs the dependencies of the app it moved, and a URL never shows up in $names
-    $apps = @($apps | Where-Object {
-            !($_ -match '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$') -or !(installed ((Get-Manifest $_)[0]) $global)
-        })
+    if ($migrated) {
+        # a move installs the dependencies of the app it moved, and a URL never shows up in $names
+        $apps = @($apps | Where-Object {
+                $_ -in $specific_versions_paths -or $_ -in $explicit_apps -or
+                !($_ -match '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$') -or
+                !(installed ((Get-Manifest $_)[0]) $global)
+            })
+    }
 }
 if ($failed.Count -gt 0) {
     # nothing was installed, so a moved app must not pass for success
