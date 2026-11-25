@@ -156,7 +156,7 @@ if ($missing) {
     $recorded = @(Get-LocalBucket | ForEach-Object { Get-BucketMigrations $_ } | Where-Object { $_ } |
         ForEach-Object { $_.PSObject.Properties.Name } | Select-Object -Unique)
     $moved = @{}
-    $migrated = $false
+    $migrated = @{}
     foreach ($name in $recorded) {
         if (!(installed $name $global)) { continue }
         $version = Select-CurrentVersion -AppName $name -Global:$global
@@ -173,18 +173,25 @@ if ($missing) {
         if (!$moved.ContainsKey($key)) { continue }
         $candidate = $moved[$key]
         if ($candidate.Hold) {
-            $failed[$candidate.Name] = "'$wanted_app' is needed but '$($candidate.Name)' is held to $($candidate.Version)"
+            $failed[$wanted_app] = "'$wanted_app' is needed but '$($candidate.Name)' is held to $($candidate.Version)"
+            # installing the new name would leave two copies of the same app
+            $apps = @($apps | Where-Object { $_ -ne $entry })
             continue
         }
         try {
             update_app $candidate.Name $global $false $false $independent $suggested $failed $use_cache $check_hash
-            $migrated = $true
+            $migrated[$wanted_app] = $candidate.Name
         } catch {
-            $failed[$candidate.Name] = $_.Exception.Message
+            $failed[$wanted_app] = $_.Exception.Message
         }
         $moved.Remove($key)
     }
-    if ($migrated) {
+    # a move that did not happen fails the apps that need it, and a skipped reason still counts
+    foreach ($app in $migrated.Keys) {
+        $reason = @($failed[$migrated[$app]], $failed["$($migrated[$app]) (global)"]) | Where-Object { $_ } | Select-Object -First 1
+        if ($reason) { $failed[$app] = "$reason" -replace '^(skipped|blocked): ', '' }
+    }
+    if ($migrated.Count) {
         # a move installs the dependencies of the app it moved, and a URL never shows up in $names
         $apps = @($apps | Where-Object {
                 $_ -in $specific_versions_paths -or $_ -in $explicit_apps -or
@@ -192,11 +199,6 @@ if ($missing) {
                 !(installed ((Get-Manifest $_)[0]) $global)
             })
     }
-}
-if ($failed.Count -gt 0) {
-    # nothing was installed, so a moved app must not pass for success
-    foreach ($key in @($failed.Keys)) { $failed[$key] = "$($failed[$key])" -replace '^(skipped|blocked): ', '' }
-    $apps = @()
 }
 # a dependency follows the name its manifest has now; only a request keeps the name it was made with
 $skip = @($apps | Where-Object {
