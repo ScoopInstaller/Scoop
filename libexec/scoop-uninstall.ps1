@@ -43,17 +43,18 @@ if ($apps -eq 'scoop') {
     exit
 }
 
-$apps = Confirm-InstallationStatus $apps -Global:$global
-if (!$apps) { exit 0 }
+$install_status = Confirm-InstallationStatus $apps -Global:$global
+$apps = $install_status.installed
+$failed = @{}
+$install_status.failed.Keys | Where-Object { $install_status.failed[$_] -eq 'not installed in the requested scope' } | ForEach-Object { $failed[$_] = $install_status.failed[$_] }
 
 :app_loop foreach ($_ in $apps) {
     ($app, $global) = $_
 
     $version = Select-CurrentVersion -AppName $app -Global:$global
     $appDir = appdir $app $global
+    $app_key = app_key $app $global
     if ($version) {
-        Write-Host "Uninstalling '$app' ($version)."
-
         $dir = versiondir $app $version $global
         $persist_dir = persistdir $app $global
 
@@ -62,47 +63,36 @@ if (!$apps) { exit 0 }
         $architecture = $install.architecture
         $bucket = $install.bucket
 
-        Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
-
-        #region Workaround for #2952
-        if (test_running_process $app $global) {
-            continue
+        # only this attempt's failure counts: an earlier entry is restored below
+        $earlier_failure = $failed[$app_key]
+        $failed.Remove($app_key)
+        try {
+            uninstall_version $app $manifest $version $architecture $global $failed $dir 'uninstalling'
+        } catch {
+            $failed[$app_key] = $_.Exception.Message
+            error $_.Exception.Message
         }
-        #endregion Workaround for #2952
+        if ($failed.ContainsKey($app_key)) { continue }
+        if ($null -ne $earlier_failure) { $failed[$app_key] = $earlier_failure }
+        unlink_app $app $manifest $dir $persist_dir $global $architecture
 
         try {
-            Test-Path $dir -ErrorAction Stop | Out-Null
-        } catch [UnauthorizedAccessException] {
-            error "Access denied: $dir. You might need to restart."
-            continue
-        }
-
-        Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-        Remove-ShimFromManifest $app $manifest $global $architecture
-        rm_startmenu_shortcuts $manifest $global $architecture
-
-        # If a junction was used during install, that will have been used
-        # as the reference directory. Otherwise it will just be the version
-        # directory.
-        $refdir = unlink_current $dir
-
-        uninstall_psmodule $manifest $refdir $global
-
-        env_rm_path $manifest $refdir $global $architecture
-        env_rm $manifest $global $architecture
-
-        try {
-            # unlink all potential old link before doing recursive Remove-Item
-            unlink_persist_data $manifest $dir
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             if (Test-Path $dir) {
                 error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+                $failed[$app_key] = 'could not remove the app directory'
                 continue
             }
         }
 
-        Invoke-HookScript -HookType 'post_uninstall' -Manifest $manifest -Arch $architecture
+        try {
+            Invoke-HookScript -HookType 'post_uninstall' -Manifest $manifest -Arch $architecture
+        } catch {
+            $failed[$app_key] = $_.Exception.Message
+            error $_.Exception.Message
+            continue
+        }
     }
     # remove older versions
     $oldVersions = @(Get-ChildItem $appDir -Name -Exclude 'current')
@@ -115,6 +105,7 @@ if (!$apps) { exit 0 }
             Remove-Item $dir -Recurse -Force -ErrorAction Stop
         } catch {
             error "Couldn't remove '$(friendly_path $dir)'; it may be in use."
+            $failed[$app_key] = 'could not remove an old version'
             continue app_loop
         }
     }
@@ -142,6 +133,7 @@ if (!$apps) { exit 0 }
                 Remove-Item $persist_dir -Recurse -Force -ErrorAction Stop
             } catch {
                 error "Couldn't remove '$(friendly_path $persist_dir)'; it may be in use."
+                $failed[$app_key] = 'could not remove the persisted data'
                 continue
             }
         }
@@ -150,4 +142,6 @@ if (!$apps) { exit 0 }
     success "'$app' was uninstalled."
 }
 
-exit 0
+$failed_count = show_failed_apps $failed 'uninstall'
+
+exit [int]($failed_count -gt 0)

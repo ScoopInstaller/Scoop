@@ -113,9 +113,10 @@ function Add-Path {
         Set-EnvVar -Name $TargetEnvVar -Value ((@($Path) + $strippedPath) -join ';') -Global:$Global
     }
     # current session
-    $inPath, $strippedPath = Split-PathLikeEnvVar $Path $env:PATH
+    $sessionPath = @($Path) | ForEach-Object { [Environment]::ExpandEnvironmentVariables($_) }
+    $inPath, $strippedPath = Split-PathLikeEnvVar $sessionPath $env:PATH
     if (!$inPath -or $Force) {
-        $env:PATH = (@($Path) + $strippedPath) -join ';'
+        $env:PATH = (@($sessionPath) + $strippedPath) -join ';'
     }
 }
 
@@ -139,7 +140,8 @@ function Remove-Path {
         Set-EnvVar -Name $TargetEnvVar -Value $strippedPath -Global:$Global
     }
     # current session
-    $inSessionPath, $strippedPath = Split-PathLikeEnvVar $Path $env:PATH
+    $sessionPath = @($Path) | ForEach-Object { [Environment]::ExpandEnvironmentVariables($_) }
+    $inSessionPath, $strippedPath = Split-PathLikeEnvVar $sessionPath $env:PATH
     if ($inSessionPath) {
         $env:PATH = $strippedPath
     }

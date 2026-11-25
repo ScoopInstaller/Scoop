@@ -5,21 +5,75 @@ function nightly_version($quiet = $false) {
     return "nightly-$(Get-Date -Format 'yyyyMMdd')"
 }
 
-function install_app($app, $architecture, $global, $suggested, $use_cache = $true, $check_hash = $true) {
+function failed_deps($manifest, $failed) {
+    @($manifest.depends | Where-Object { $_ } | ForEach-Object { (parse_app $_)[0] } | Where-Object {
+            ($failed[$_] -and $failed[$_] -notmatch '^(skipped|blocked): ') -or
+            ($failed["$_ (global)"] -and $failed["$_ (global)"] -notmatch '^(skipped|blocked): ')
+        })
+}
+
+function test_version_chars($version) {
+    if ($version -match '[^\w\.\-\+_]') {
+        error "Manifest version has unsupported character '$($matches[0])'."
+        return $false
+    }
+    return $true
+}
+
+function report_failed_deps($manifest, $app, $app_key, $failed) {
+    $failed_deps = failed_deps $manifest $failed
+    if ($failed_deps.Count -eq 0) { return $false }
+    error "'$app' depends on $($failed_deps -join ', '), which failed."
+    $failed[$app_key] = "dependency failed: $($failed_deps -join ', ')"
+    return $true
+}
+
+function prepare_app($app, $architecture, $global, $manifest, $bucket, $version, $use_cache = $true, $check_hash = $true, $dir) {
+    if (!$dir) { $dir = versiondir $app $version $global }
+    ensure $dir | Out-Null
+    $fname = @((url $manifest $architecture) | ForEach-Object { url_filename $_ })
+    $hashes = @((hash $manifest $architecture)) | Where-Object { $_ }
+    $key = if ($check_hash -and $hashes.Count) {
+        ConvertTo-Json -Compress @($hashes, $fname, (extract_dir $manifest $architecture), (extract_to $manifest $architecture), [bool]$manifest.innosetup)
+    } else { '' }
+    $marker = "$dir\.scoop-extracted"
+    $extracted = (Get-Content -LiteralPath $marker -Raw -ErrorAction SilentlyContinue) -join ''
+    if ($use_cache -and $key -and $extracted.Trim() -eq $key) {
+        return [PSCustomObject]@{ dir = $dir; fname = $fname }
+    }
+    # a junction is deleted with its target, so the persisted data is unlinked first
+    unlink_persist_data $manifest $dir
+    Remove-Item -LiteralPath $dir -Recurse -Force
+    ensure $dir | Out-Null
+    $download = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
+    if ($null -eq $download) { return $null }
+    Invoke-Extraction -Path $dir -Name $download -Manifest $manifest -ProcessorArchitecture $architecture
+    if ($key) { [IO.File]::WriteAllText($marker, $key) }
+    return [PSCustomObject]@{ dir = $dir; fname = $download }
+}
+
+function install_app($app, $architecture, $global, $suggested, $failed, $use_cache = $true, $check_hash = $true) {
     $app, $manifest, $bucket, $url = Get-Manifest $app
+    $app_key = app_key $app $global
 
     if (!$manifest) {
-        abort "Couldn't find manifest for '$app'$(if ($bucket) { " from '$bucket' bucket" } elseif ($url) { " at '$url'" })."
+        error "Couldn't find manifest for '$app'$(if ($bucket) { " from '$bucket' bucket" } elseif ($url) { " at '$url'" })."
+        $failed[$app_key] = 'no manifest'
+        return
     }
 
     $version = $manifest.version
-    if (!$version) { abort "Manifest doesn't specify a version." }
-    if ($version -match '[^\w\.\-\+_]') {
-        abort "Manifest version has unsupported character '$($matches[0])'."
+    if (!$version) {
+        error "Manifest doesn't specify a version."
+        $failed[$app_key] = 'invalid manifest'
+        return
+    }
+    if (!(test_version_chars $version)) {
+        $failed[$app_key] = 'invalid manifest'
+        return
     }
 
-    $is_nightly = $version -eq 'nightly'
-    if ($is_nightly) {
+    if ($version -eq 'nightly') {
         $version = nightly_version
         $check_hash = $false
     }
@@ -27,10 +81,13 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
     $architecture = Get-SupportedArchitecture $manifest $architecture
     if ($null -eq $architecture) {
         error "'$app' doesn't support current architecture!"
+        $failed[$app_key] = 'unsupported architecture'
         return
     }
+    if (report_failed_deps $manifest $app $app_key $failed) { return }
 
-    if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*scoop-update*')) {
+    # the update flow lives in 'lib/update.ps1' as well as in 'scoop-update.ps1'
+    if ((get_config SHOW_MANIFEST $false) -and ($MyInvocation.ScriptName -notlike '*update.ps1')) {
         Write-Host "Manifest: $app.json"
         $style = get_config CAT_STYLE
         if ($style) {
@@ -40,46 +97,93 @@ function install_app($app, $architecture, $global, $suggested, $use_cache = $tru
         }
         $answer = Read-Host -Prompt 'Continue installation? [Y/n]'
         if (($answer -eq 'n') -or ($answer -eq 'N')) {
+            # so that an update restores the version it replaced
+            $failed[$app_key] = 'skipped: installation cancelled'
             return
         }
     }
     Write-Output "Installing '$app' ($version) [$architecture]$(if ($bucket) { " from '$bucket' bucket" } elseif ($url -like (usermanifestsdir) + '\*') { ' from generated manifest' } else { " from '$url'" })"
 
-    $dir = ensure (versiondir $app $version $global)
-    $original_dir = $dir # keep reference to real (not linked) directory
-    $persist_dir = persistdir $app $global
-
-    $fname = Invoke-ScoopDownload $app $version $manifest $bucket $architecture $dir $use_cache $check_hash
-    Invoke-Extraction -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture
-    Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
-
-    Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global
-    ensure_install_dir_not_in_path $dir $global
-    $dir = link_current $dir
-    New-ShimFromManifest $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global $architecture
-    install_psmodule $manifest $dir $global
-    env_add_path $manifest $dir $global $architecture
-    env_set $manifest $global $architecture
-
-    # persist data
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
-
-    Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
-
-    # save info for uninstall
-    save_installed_manifest $app $bucket $dir $url
-    save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
-
-    if ($manifest.suggest) {
-        $suggested[$app] = $manifest.suggest
+    $prepared = $null
+    try {
+        $prepared = prepare_app $app $architecture $global $manifest $bucket $version $use_cache $check_hash
+    } catch {
+        # the failure belongs to this app, not to the name it was requested with
+        $failed[$app_key] = $_.Exception.Message
+        error $_.Exception.Message
+        return
     }
+    if (!$prepared) {
+        $failed[$app_key] = 'download failed'
+        return
+    }
+    install_version $app $manifest $version $architecture $global $bucket $url $suggested $failed $prepared.dir $prepared.fname
+}
 
-    success "'$app' ($version) was installed successfully!"
-    if ($app -eq (get_config SHIM)) { Update-ShimInstance }
+function uninstall_version($app, $manifest, $version, $architecture, $global, $failed, $dir, $action, $reason = 'running process') {
+    $app_key = app_key $app $global
+    Invoke-HookScript -HookType 'pre_uninstall' -Manifest $manifest -Arch $architecture
+    if (block_running_app $app $global $app_key $failed $action $reason) { return }
+    try {
+        Test-Path $dir -ErrorAction Stop | Out-Null
+    } catch [UnauthorizedAccessException] {
+        error "Access denied: $dir. You might need to restart."
+        $failed[$app_key] = 'access denied'
+        return
+    }
+    Write-Host "Uninstalling '$app' ($version)"
+    if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+        $failed[$app_key] = 'uninstaller failed'
+    }
+}
 
-    show_notes $manifest $dir $original_dir $persist_dir
+function install_version($app, $manifest, $version, $architecture, $global, $bucket, $url, $suggested, $failed, $dir, $fname) {
+    $app_key = app_key $app $global
+    $linked = $false
+    # the installation modifies the extracted files, so they cannot be reused afterwards
+    Remove-Item -LiteralPath "$dir\.scoop-extracted" -Force -ErrorAction SilentlyContinue
+    try {
+        $original_dir = $dir # keep reference to real (not linked) directory
+        $persist_dir = persistdir $app $global
+
+        Invoke-HookScript -HookType 'pre_install' -Manifest $manifest -ProcessorArchitecture $architecture
+
+        if (!(Invoke-Installer -Path $dir -Name $fname -Manifest $manifest -ProcessorArchitecture $architecture -AppName $app -Global:$global)) {
+            $failed[$app_key] = 'installer failed'
+            return
+        }
+        ensure_install_dir_not_in_path $dir $global
+        $dir = link_current $dir
+        $linked = $true
+        link_app $manifest $dir $original_dir $persist_dir $global $architecture
+
+        Invoke-HookScript -HookType 'post_install' -Manifest $manifest -ProcessorArchitecture $architecture
+
+        # save info for uninstall
+        save_installed_manifest $app $bucket $dir $url
+        save_install_info @{ 'architecture' = $architecture; 'url' = $url; 'bucket' = $bucket } $dir
+
+        if ($manifest.suggest) {
+            $suggested[$app] = $manifest.suggest
+        }
+
+        success "'$app' ($version) was installed successfully!"
+        if ($app -eq (get_config SHIM)) { Update-ShimInstance }
+
+        show_notes $manifest $dir $original_dir $persist_dir
+    } catch {
+        $failed[$app_key] = $_.Exception.Message
+        error $_.Exception.Message
+        if ($linked) {
+            # the failed version may have added shims or settings of its own
+            try {
+                unlink_app $app $manifest $original_dir $persist_dir $global $architecture
+            } catch {
+                warn "Failed to clean up the failed installation: $($_.Exception.Message)"
+            }
+        }
+        return
+    }
 }
 
 function Invoke-Installer {
@@ -111,9 +215,11 @@ function Invoke-Installer {
         }
         $progName = "$Path\$(coalesce $installer.file $Name[0])"
         if (!(is_in_dir $Path $progName)) {
-            abort "Error in manifest: $((Get-Culture).TextInfo.ToTitleCase($type)) $progName is outside the app directory."
+            error "Error in manifest: $((Get-Culture).TextInfo.ToTitleCase($type)) $progName is outside the app directory."
+            return $false
         } elseif (!(Test-Path $progName)) {
-            abort "$((Get-Culture).TextInfo.ToTitleCase($type)) $progName is missing."
+            error "$((Get-Culture).TextInfo.ToTitleCase($type)) $progName is missing."
+            return $false
         }
         $substitutions = @{
             '$dir'     = $Path
@@ -127,10 +233,11 @@ function Invoke-Installer {
             $status = Invoke-ExternalCommand $progName -ArgumentList $fnArgs -Activity "Running $type ..."
             if (!$status) {
                 if ($Uninstall) {
-                    abort 'Uninstallation aborted.'
+                    error 'Uninstallation failed.'
                 } else {
-                    abort "Installation aborted. You might need to run 'scoop uninstall $AppName' before trying again."
+                    error "Installation failed. You might need to run 'scoop uninstall $AppName' before trying again."
                 }
+                return $false
             }
             # Don't remove installer if "keep" flag is set to true
             if (!$installer.keep) {
@@ -139,6 +246,7 @@ function Invoke-Installer {
         }
     }
     Invoke-HookScript -HookType $type -Manifest $Manifest -ProcessorArchitecture $ProcessorArchitecture
+    return $true
 }
 
 function Invoke-HookScript {
@@ -164,7 +272,20 @@ function Invoke-HookScript {
     if ($script) {
         Write-Host "Running $HookType script... " -NoNewline
         $script:deprecatedWarned = @{}
-        Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+        try {
+            $hookCompleted = $false
+            # A stray 'break'/'continue' unwinds to the nearest loop; this one absorbs it, leaving the flag unset.
+            foreach ($once in @(1)) {
+                Invoke-Command ([scriptblock]::Create($script -join "`r`n"))
+                $hookCompleted = $true
+            }
+            if (!$hookCompleted) {
+                throw "Hook script '$HookType' aborted."
+            }
+        } catch {
+            Write-Host 'Error.' -ForegroundColor DarkRed
+            throw
+        }
         Write-Host 'Done.' -ForegroundColor Green
     }
 }
@@ -175,7 +296,12 @@ function Invoke-HookScript {
 # Returns the 'current' junction directory if in use, otherwise
 # the version directory.
 function link_current($versiondir) {
-    if (get_config NO_JUNCTION) { return $versiondir.ToString() }
+    if (get_config NO_JUNCTION) {
+        # without a junction the version with the newest install record is the current one
+        Get-ChildItem -LiteralPath $versiondir -Filter '*install.json' -ErrorAction SilentlyContinue |
+            ForEach-Object { $_.LastWriteTimeUtc = [datetime]::UtcNow }
+        return $versiondir.ToString()
+    }
 
     $currentdir = "$(Split-Path $versiondir)\current"
 
@@ -218,6 +344,34 @@ function unlink_current($versiondir) {
     return $versiondir
 }
 
+# The caller links 'current' first, so $dir is the linked directory.
+function link_app($manifest, $dir, $original_dir, $persist_dir, $global, $architecture) {
+    New-ShimFromManifest $manifest $dir $global $architecture
+    create_startmenu_shortcuts $manifest $dir $global $architecture
+    install_psmodule $manifest $dir $global
+    env_set $manifest $global $architecture
+    env_add_path $manifest $dir $persist_dir $global $architecture
+    # unlink all potential old link before re-persisting
+    unlink_persist_data $manifest $original_dir
+    # persist data
+    persist_data $manifest $original_dir $persist_dir
+    persist_permission $manifest $global
+}
+
+function unlink_app($app, $manifest, $dir, $persist_dir, $global, $architecture) {
+    Remove-ShimFromManifest $app $manifest $global $architecture
+    rm_startmenu_shortcuts $manifest $global $architecture
+    # If a junction was used during install, that will have been used
+    # as the reference directory. Otherwise it will just be the version
+    # directory.
+    $refdir = unlink_current $dir
+    uninstall_psmodule $manifest $refdir $global
+    env_rm_path $manifest $refdir $persist_dir $global $architecture
+    env_rm $manifest $global $architecture
+    # unlink all potential old link before doing recursive Remove-Item
+    unlink_persist_data $manifest $dir
+}
+
 # to undo after installers add to path so that scoop manifest can keep track of this instead
 function ensure_install_dir_not_in_path($dir, $global) {
     $path = (Get-EnvVar -Name 'PATH' -Global:$global)
@@ -249,23 +403,54 @@ function find_dir_or_subdir($path, $dir) {
     return [string]::join(';', $fixed), $removed
 }
 
-function env_add_path($manifest, $dir, $global, $arch) {
+function expand_vars($str, $dir, $persist_dir) {
+    if ($str -match '^\$') { $expanded = $ExecutionContext.InvokeCommand.ExpandString($str) }
+    elseif ($str -match '^%') { return }
+    elseif ([System.IO.Path]::IsPathRooted($str)) { $expanded = $str }
+    else { $expanded = Join-Path $dir $str | Get-AbsolutePath }
+    if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
+}
+
+function env_paths($manifest, $dir, $persist_dir, $arch) {
     $env_add_path = arch_specific 'env_add_path' $manifest $arch
+    if (!$env_add_path) { return }
     $dir = $dir.TrimEnd('\')
-    if ($env_add_path) {
+    $env_set = arch_specific 'env_set' $manifest $arch
+    $names = if ($env_set) { @($env_set | Get-Member -MemberType NoteProperty | ForEach-Object { $_.Name }) } else { @() }
+    $env_add_path.Where({ $_ }).ForEach({
+        $item = $_
+        if ($item -match '^%(.+)%$') {
+            $name = $Matches[1]
+            if ($name -in $names) {
+                $expanded = $ExecutionContext.InvokeCommand.ExpandString($env_set.$name)
+                if ((is_in_dir $dir $expanded) -or (is_in_dir $persist_dir $expanded)) { $expanded }
+            }
+        } else {
+            expand_vars $item $dir $persist_dir
+        }
+    }).Where({ $_ })
+}
+
+function env_add_path($manifest, $dir, $persist_dir, $global, $arch) {
+    $path = env_paths $manifest $dir $persist_dir $arch
+    if ($path) {
         if (get_config USE_ISOLATED_PATH) {
+            # %SCOOP_PATH% is expanded from the process value, keep it in sync with the stored one
+            $stored = Get-EnvVar -Name $scoopPathEnvVar -Global:$global
+            if ($stored) {
+                Set-Item "env:$scoopPathEnvVar" $stored
+            } else {
+                Remove-Item "env:$scoopPathEnvVar" -ErrorAction SilentlyContinue
+            }
             Add-Path -Path ('%' + $scoopPathEnvVar + '%') -Global:$global
         }
-        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
         Add-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global -Force
     }
 }
 
-function env_rm_path($manifest, $dir, $global, $arch) {
-    $env_add_path = arch_specific 'env_add_path' $manifest $arch
-    $dir = $dir.TrimEnd('\')
-    if ($env_add_path) {
-        $path = $env_add_path.Where({ $_ }).ForEach({ Join-Path $dir $_ | Get-AbsolutePath }).Where({ is_in_dir $dir $_ })
+function env_rm_path($manifest, $dir, $persist_dir, $global, $arch) {
+    $path = env_paths $manifest $dir $persist_dir $arch
+    if ($path) {
         Remove-Path -Path $path -Global:$global # TODO: Remove after forced isolating Scoop path
         Remove-Path -Path $path -TargetEnvVar $scoopPathEnvVar -Global:$global
     }
@@ -340,6 +525,21 @@ function ensure_none_failed($apps) {
             }
         }
     }
+}
+
+function show_failed_apps($failed, $action = 'install') {
+    if (!$failed -or $failed.Count -eq 0) { return 0 }
+    $errors = @($failed.Keys | Where-Object { $failed[$_] -notmatch '^(skipped|blocked): ' } | Sort-Object)
+    $skipped = @($failed.Keys | Where-Object { $failed[$_] -match '^(skipped|blocked): ' } | Sort-Object)
+    $blocked = @($skipped | Where-Object { $failed[$_] -match '^blocked: ' })
+    if ($errors.Count -gt 0) {
+        error "Failed to $action`: $((@($errors | ForEach-Object { "$_ ($($failed[$_]))" })) -join ', ')"
+    }
+    if ($skipped.Count -gt 0) {
+        info "Skipped $action`: $((@($skipped | ForEach-Object { "$_ ($($failed[$_] -replace '^(skipped|blocked): ', ''))" })) -join ', ')"
+    }
+    # a blocked app is reported as skipped but still fails the command
+    return $errors.Count + $blocked.Count
 }
 
 function show_suggestions($suggested) {
@@ -478,18 +678,18 @@ function test_running_process($app, $global) {
     $running_processes = Get-Process | Where-Object { $_.Path -like "$processdir\*" } | Out-String
 
     if ($running_processes) {
-        if (get_config IGNORE_RUNNING_PROCESSES) {
-            warn "The following instances of `"$app`" are still running. Scoop is configured to ignore this condition."
-            Write-Host $running_processes
-            return $false
-        } else {
-            error "The following instances of `"$app`" are still running. Close them and try again."
-            Write-Host $running_processes
-            return $true
-        }
-    } else {
-        return $false
+        error "The following instances of `"$app`" are still running. Close them and try again."
+        Write-Host $running_processes
+        return $true
     }
+    return $false
+}
+
+function block_running_app($app, $global, $app_key, $failed, $action, $reason = 'running process') {
+    if (!(test_running_process $app $global)) { return $false }
+    Write-Host "Running process detected, skip $action."
+    $failed[$app_key] = "blocked: $reason"
+    return $true
 }
 
 # wrapper function to create junction links

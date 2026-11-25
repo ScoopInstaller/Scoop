@@ -112,6 +112,27 @@ Describe 'Test-CommandAvailable' -Tag 'Scoop' {
 }
 
 
+Describe 'Confirm-InstallationStatus' -Tag 'Scoop' {
+    It 'should report apps that are not installed' {
+        Mock error {}
+
+        $status = Confirm-InstallationStatus 'not_installed_app_xyz'
+
+        $status.installed | Should-BeCollection -Count 0
+        $status.failed['not_installed_app_xyz'] | Should-Be 'not installed'
+    }
+
+    It 'should name an app once when it is given with and without its bucket' {
+        Mock error {}
+
+        $status = Confirm-InstallationStatus 'not_installed_app_xyz', 'main/not_installed_app_xyz'
+
+        Should-Invoke -CommandName error -Times 1 -Exactly
+        $status.failed.Keys | Should-BeCollection -Count 1
+    }
+}
+
+
 Describe 'is_directory' -Tag 'Scoop' {
     BeforeAll {
         $working_dir = setup_working 'is_directory'
@@ -218,6 +239,23 @@ Describe 'is_in_dir' -Tag 'Scoop' {
     }
     It 'returns false when path escapes dir through dot segments' {
         is_in_dir 'C:\test\sub' 'C:\test\sub\..\..\Windows\notepad.exe' | Should-BeFalse
+    }
+}
+
+Describe 'Add-Path' -Tag 'Scoop', 'Windows' {
+    It 'should expand %VAR% in the current session but keep it in the stored value' {
+        Mock Set-EnvVar {}
+        $env:COOP_TEST_PATH = 'C:\some\path'
+        $before = $env:PATH
+        try {
+            Add-Path -Path '%COOP_TEST_PATH%' -Force -Quiet
+
+            ($env:PATH -match 'C:\\some\\path') | Should-BeTrue
+            Should-Invoke Set-EnvVar -Times 1 -ParameterFilter { $Value -like '*%COOP_TEST_PATH%*' }
+        } finally {
+            $env:PATH = $before
+            Remove-Item env:\COOP_TEST_PATH -ErrorAction SilentlyContinue
+        }
     }
 }
 
@@ -503,5 +541,59 @@ Describe 'Show-DeprecatedWarning' -Tag 'Scoop' {
 
         Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"rm_shim"*' }
         Should-Invoke warn -Times 2 -Exactly -ParameterFilter { $msg -like '"shim"*' }
+    }
+}
+
+Describe 'app_status' -Tag 'Scoop' {
+    BeforeAll {
+        . "$PSScriptRoot\..\lib\manifest.ps1" # 'install_info' 'Find-AppBucket'
+        . "$PSScriptRoot\..\lib\buckets.ps1" # 'Find-BucketDirectory'
+        . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+    }
+    BeforeEach {
+        Mock Test-Path { $false }
+        Mock get_config { $false }
+    }
+
+    It 'reports the bucket version of an app installed from an auto-generated manifest' {
+        Mock Select-CurrentVersion { '3.24.0' }
+        Mock install_info { [PSCustomObject]@{ url = (usermanifest 'foo') } }
+        Mock manifest { [PSCustomObject]@{ version = '3.24.0'; depends = @('dep') } }
+        Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1'; depends = @('newdep') }, 'extras' }
+        Mock installed { $app -ne 'dep' }
+
+        $status = app_status 'foo' $false
+
+        $status.latest_version | Should-Be '3.24.1'
+        $status.outdated | Should-BeTrue
+        $status.pinned | Should-BeTrue
+        # the dependencies of the installed version, not of the newer one
+        $status.missing_deps | Should-BeCollection -Count 1
+        $status.missing_deps[0] | Should-Be 'dep'
+    }
+
+    It 'keeps the manifest of an app installed from a bucket' {
+        Mock Select-CurrentVersion { '3.24.1' }
+        Mock install_info { [PSCustomObject]@{ bucket = 'extras' } }
+        Mock manifest { [PSCustomObject]@{ version = '3.24.1' } }
+        Mock Find-AppBucket { [PSCustomObject]@{ version = '3.24.1' }, 'extras' }
+
+        $status = app_status 'foo' $false
+
+        $status.latest_version | Should-Be '3.24.1'
+        $status.outdated | Should-BeFalse
+        $status.pinned | Should-BeFalse
+        Should-Invoke -CommandName Find-AppBucket -Times 0
+    }
+}
+Describe 'abort' -Tag 'Scoop' {
+    It 'should throw instead of ending the process' {
+        { abort 'boom' } | Should-Throw '*boom*'
+    }
+
+    It 'should carry the exit code' {
+        $code = $null
+        try { abort 'boom' 7 } catch { $code = $_.Exception.Data['ExitCode'] }
+        $code | Should-Be 7
     }
 }

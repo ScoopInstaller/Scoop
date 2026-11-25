@@ -29,6 +29,8 @@ if ($global -and !(is_admin)) {
     exit 1
 }
 
+$exitcode = 0
+
 foreach ($app in $apps) {
 
     if ($app -eq 'scoop') {
@@ -43,6 +45,7 @@ foreach ($app in $apps) {
         } else {
             error "'$app' is not installed."
         }
+        $exitcode = 1
         continue
     }
 
@@ -55,6 +58,7 @@ foreach ($app in $apps) {
     $json = install_info $app $version $global
     if (!$json) {
         error "Failed to hold '$app'."
+        $exitcode = 1
         continue
     }
     $install = @{}

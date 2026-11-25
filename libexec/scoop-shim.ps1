@@ -16,7 +16,7 @@
 #
 # To show a shim's information, use the 'info' subcommand:
 #
-#     scoop shim info <shim_name>
+#     scoop shim info <shim_name> [-v]
 #
 # To alternate a shim's target source, use the 'alter' subcommand:
 #
@@ -28,6 +28,7 @@
 #
 # Options:
 #   -g, --global       Manipulate global shim(s)
+#   -v, --verbose      Show the body capability and the resolved values (works only for "info")
 #
 # HINT: The FIRST terminator token ('--' or PowerShell '--%'), if any, is treated as the option
 # terminator and will NOT be included; everything after it is passed to the shim.
@@ -55,10 +56,11 @@ if ($SubCommand -notin @('add', 'rm', 'list', 'info', 'alter', 'update')) {
     exit 1
 }
 
-$opt, $other, $err = getopt $Args 'g' 'global'
+$opt, $other, $err = getopt $Args 'gv' 'global', 'verbose'
 if ($err) { error "scoop shim: $err"; exit 1 }
 
 $global = $opt.g -or $opt.global
+$verbose = $opt.v -or $opt.verbose
 
 if ($SubCommand -notin @('list', 'update') -and $other.Length -eq 0) {
     error "<shim_name> must be specified for subcommand '$SubCommand'"
@@ -90,8 +92,13 @@ switch ($SubCommand) {
         }
         if ($commandPath -notmatch '[\\/]') {
             $shortPath = $commandPath
-            $commandPath = Get-ShimTarget (Get-ShimFile $shortPath $global)
-            if (!$commandPath) {
+            $source = Get-ShimFile $shortPath $global
+            $commandPath = Get-ShimTarget $source
+            if ($commandPath) {
+                if (!$commandArgs -and $source.EndsWith('.shim')) {
+                    $commandArgs = (Read-ShimFile $source).Arguments
+                }
+            } else {
                 $exCommand = Get-CommandLiteral $shortPath
                 if ($exCommand -and $exCommand.CommandType -eq 'Application') {
                     $commandPath = $exCommand.Path
@@ -152,7 +159,7 @@ switch ($SubCommand) {
         $shimName = $other[0]
         $shimPath = Get-ShimFile $shimName $global
         if ($shimPath) {
-            Get-ShimInfo $shimPath
+            Get-ShimInfo $shimPath -Detailed:$verbose
         } else {
             error "$(if ($global) { 'Global' } else { 'Local' }) shim not found: $([char]0x1b)[36m$shimName$([char]0x1b)[31m"
             if (Get-ShimFile $shimName (!$global)) {

@@ -22,7 +22,7 @@ if (-not $apps) {
 }
 
 Write-Host "Installed apps$(if($query) { `" matching '$query'`"}):"
-$apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
+$list = @($apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
     $app = $_.name
     $global = $_.global
     $ver = Select-CurrentVersion -AppName $app -Global:$global
@@ -48,6 +48,7 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
             if ($is_deprecated) { 'Deprecated package' }
             if ($global) { 'Global install' }
             if ($install_info.hold) { 'Held package' }
+            if (!$install_info.bucket -and $install_info.url -eq (usermanifest $app)) { 'Pinned' }
             if ($install_info.architecture -and $defaultArchitecture -ne $install_info.architecture) {
                 $install_info.architecture
             }
@@ -63,5 +64,7 @@ $apps | Where-Object { !$query -or ($_.name -match $query) } | ForEach-Object {
             Info    = $info
         }
     }
-} | Add-Member -TypeName 'ScoopApps' -PassThru
+})
+
+$list | Add-Member -TypeName 'ScoopApps' -PassThru
 exit 0

@@ -48,6 +48,7 @@ if (($PSVersionTable.PSVersion.Major) -lt 5) {
     break
 }
 $show_update_log = get_config SHOW_UPDATE_LOG $true
+$failed = @{}
 
 function Sync-Scoop {
     [CmdletBinding()]
@@ -424,25 +425,31 @@ if (-not ($apps -or $all)) {
         }
     } else {
         if ($apps_param) {
-            $apps = Confirm-InstallationStatus $apps_param -Global:$global
+            $install_status = Confirm-InstallationStatus $apps_param -Global:$global
+            $apps = $install_status.installed
+            $install_status.failed.Keys | ForEach-Object { $failed[$_] = $install_status.failed[$_] }
         }
     }
     if ($apps) {
         $apps | ForEach-Object {
             ($app, $global) = $_
             $status = app_status $app $global
-            # -f on an @version pin upgrades to the bucket HEAD; the target
-            # version is resolved (and warned) by update(), not guessed here
-            $ver = Select-CurrentVersion -AppName $app -Global:$global
-            $pin = install_info $app $ver $global
-            $is_pin = $force -and !$pin.bucket -and ($pin.url -eq (usermanifest $app))
+            $is_pin = $status.pinned
             if ($status.installed -and ($force -or $status.outdated)) {
                 if (!$status.hold) {
+                    if ($is_pin -and !$force) {
+                        $app_key = app_key $app $global
+                        if (!$failed.ContainsKey($app_key)) { $failed[$app_key] = "skipped: pinned to version $($status.version)" }
+                        warn "'$app' is pinned to version $($status.version), $($status.latest_version) is available.`nUse 'scoop update -f $app$(if ($global) { ' --global' })' to install the new version."
+                        return
+                    }
                     $outdated += applist $app $global
-                    $latest = if ($is_pin) { 'HEAD (forced)' } else { $status.latest_version }
+                    $latest = if ($force -and $is_pin) { 'HEAD (forced)' } else { $status.latest_version }
                     Write-Host -f yellow ("$app`: $($status.version) -> $latest{0}" -f ('', ' (global)')[$global])
                 } else {
-                    warn "'$app' is held to version $($status.version)"
+                    $app_key = app_key $app $global
+                    if (!$failed.ContainsKey($app_key)) { $failed[$app_key] = "skipped: held to version $($status.version)" }
+                    warn "'$app' is held to version $($status.version)`nUse 'scoop unhold $app$(if ($global) { ' --global' })' to enable updates."
                 }
             } elseif ($apps_param -ne '*' -and !$all) {
                 if ($status.installed) {
@@ -462,17 +469,19 @@ if (-not ($apps -or $all)) {
         if ($outdated.Length -gt 1) {
             Write-Host -f DarkCyan "Updating $($outdated.Length) outdated apps:"
         } elseif ($outdated.Length -eq 0) {
-            Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
+            if ($failed.Count -eq 0) {
+                Write-Host -f Green "Latest versions for all apps are installed! For more information try 'scoop status'"
+            }
         } else {
             Write-Host -f DarkCyan 'Updating one outdated app:'
         }
     }
 
     $suggested = @{}
-    # $outdated is a list of ($app, $global) tuples
-    $outdated | ForEach-Object { update_app @_ $force $quiet $independent $suggested $use_cache $check_hash }
+    update_apps $outdated $force $quiet $independent $suggested $failed $use_cache $check_hash
 
     show_suggestions $suggested
+    $failed_count = show_failed_apps $failed 'update'
 }
 
-exit 0
+exit [int]($failed_count -gt 0)

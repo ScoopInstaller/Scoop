@@ -69,6 +69,7 @@ $true, $false | ForEach-Object { # local and global apps
         $info = @()
         if ($status.failed)     { $info += 'Install failed' }
         if ($status.hold)       { $info += 'Held package' }
+        if ($status.pinned)     { $info += 'Pinned' }
         if ($status.deprecated) { $info += 'Deprecated' }
         if ($status.removed)    { $info += 'Manifest removed' }
         $item.Info = $info -join ', '

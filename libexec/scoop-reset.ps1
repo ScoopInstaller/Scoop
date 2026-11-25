@@ -7,16 +7,22 @@
 # You can use '*' in place of <app> or `-a`/`--all` switch to reset all apps.
 
 . "$PSScriptRoot\..\lib\getopt.ps1"
+. "$PSScriptRoot\..\lib\json.ps1" # 'install_app' (indirectly)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1" # 'env_add_path' (indirectly)
 . "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
+. "$PSScriptRoot\..\lib\download.ps1" # 'install_app' (indirectly)
+. "$PSScriptRoot\..\lib\decompress.ps1" # 'install_app' (indirectly)
 . "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion'
+. "$PSScriptRoot\..\lib\depends.ps1" # 'Test-7zipRequirement' in 'decompress.ps1' (indirectly)
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
+. "$PSScriptRoot\..\lib\psmodules.ps1"
 
 $opt, $apps, $err = getopt $args 'a' 'all'
 if($err) { error "scoop reset: $err"; exit 1 }
 $all = $opt.a -or $opt.all
+$failed = @{}
 
 if(!$apps -and !$all) { error '<app> missing'; my_usage; exit 1 }
 
@@ -64,32 +70,35 @@ $apps | ForEach-Object {
     }
 
     write-host "Resetting $app ($version)."
+    $app_key = app_key $app $global
 
     $dir = Convert-Path (versiondir $app $version $global)
     $original_dir = $dir
     $persist_dir = persistdir $app $global
 
-    #region Workaround for #2952
-    if (test_running_process $app $global) {
-        return
-    }
-    #endregion Workaround for #2952
+    if (block_running_app $app $global $app_key $failed 'resetting') { return }
 
     $install = install_info $app $version $global
     $architecture = $install.architecture
+    # the dependencies of the installed version, not the ones the manifest has now
+    try {
+        $deps = @($manifest.depends | Where-Object { $_ -and !(installed $_) } | ForEach-Object { Get-Dependency $_ $architecture } | Select-Object -Unique)
+    } catch {
+        $failed[$app_key] = $_.Exception.Message
+        error $_.Exception.Message
+        return
+    }
+    $suggested = @{}
+    $deps.Where({ !(installed $_) }) | ForEach-Object { install_app $_ $architecture $global $suggested $failed }
+    if (report_failed_deps $manifest $app $app_key $failed) { return }
 
     $dir = link_current $dir
-    New-ShimFromManifest $manifest $dir $global $architecture
-    create_startmenu_shortcuts $manifest $dir $global $architecture
     # unset all potential old env before re-adding
-    env_rm_path $manifest $dir $global $architecture
+    env_rm_path $manifest $dir $persist_dir $global $architecture
     env_rm $manifest $global $architecture
-    env_add_path $manifest $dir $global $architecture
-    env_set $manifest $global $architecture
-    # unlink all potential old link before re-persisting
-    unlink_persist_data $manifest $original_dir
-    persist_data $manifest $original_dir $persist_dir
-    persist_permission $manifest $global
+    link_app $manifest $dir $original_dir $persist_dir $global $architecture
 }
 
-exit 0
+$failed_count = show_failed_apps $failed 'reset'
+
+exit [int]($failed_count -gt 0)

@@ -24,12 +24,10 @@ Describe 'Manipulate Alias' -Tag 'Scoop' {
 
     It 'Skips an existing alias' {
         $alias_script = "$shimdir\scoop-rm.ps1"
-        Mock abort {}
         New-Item $alias_script -Type File -Force
         Test-Path $alias_script | Should-BeTrue
 
-        add_alias 'rm' '"test"'
-        Should-Invoke -CommandName abort -Times 1 -ParameterFilter { $msg -eq "File 'scoop-rm.ps1' already exists in shims directory." }
+        { add_alias 'rm' '"test"' } | Should-Throw "*already exists in shims directory*"
     }
 
     It 'Removes an existing alias' {
@@ -47,11 +45,9 @@ Describe 'Manipulate Alias' -Tag 'Scoop' {
         $look_alike = "$shimdir\scoop-bracket.ps1"
         $alias_script = "$shimdir\scoop-br[a]cket.ps1"
         New-Item $look_alike -Type File -Force
-        Mock abort {}
 
         add_alias 'br[a]cket' '"hello"'
 
-        Should-Invoke -CommandName abort -Times 0 -Exactly
         Test-Path -LiteralPath $alias_script | Should-BeTrue
     }
 

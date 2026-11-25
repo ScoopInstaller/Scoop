@@ -124,15 +124,15 @@ function Complete-ConfigChange {
             info 'Turn off Scoop isolated path... This may take a while, please wait.'
             $movedPath = Get-EnvVar -Name $currPathEnvVar
             if ($movedPath) {
-                Add-Path -Path $movedPath -Quiet
                 Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
+                Add-Path -Path $movedPath -Quiet
                 Set-EnvVar -Name $currPathEnvVar -Quiet
             }
             if (is_admin) {
                 $movedPath = Get-EnvVar -Name $currPathEnvVar -Global
                 if ($movedPath) {
-                    Add-Path -Path $movedPath -Global -Quiet
                     Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet
+                    Add-Path -Path $movedPath -Global -Quiet
                     Set-EnvVar -Name $currPathEnvVar -Global -Quiet
                 }
             }
@@ -143,24 +143,24 @@ function Complete-ConfigChange {
                 $Value.ToUpperInvariant()
             }
             info "Turn on Scoop isolated path ('$newPathEnvVar')... This may take a while, please wait."
-            $movedPath = Remove-Path -Path "$scoopdir\apps\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
+            $movedPath = Remove-Path -Path "$scoopdir\apps\*", "$scoopdir\persist\*" -TargetEnvVar $currPathEnvVar -Quiet -PassThru
             if ($movedPath) {
-                Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Quiet
-                Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
                 if ($currPathEnvVar -ne 'PATH') {
                     Remove-Path -Path ('%' + $currPathEnvVar + '%') -Quiet
                     Set-EnvVar -Name $currPathEnvVar -Quiet
                 }
+                Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Quiet
+                Add-Path -Path ('%' + $newPathEnvVar + '%') -Quiet
             }
             if (is_admin) {
-                $movedPath = Remove-Path -Path "$globaldir\apps\*" -TargetEnvVar $currPathEnvVar -Global -Quiet -PassThru
+                $movedPath = Remove-Path -Path "$globaldir\apps\*", "$globaldir\persist\*" -TargetEnvVar $currPathEnvVar -Global -Quiet -PassThru
                 if ($movedPath) {
-                    Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Global -Quiet
-                    Add-Path -Path ('%' + $newPathEnvVar + '%') -Global -Quiet
                     if ($currPathEnvVar -ne 'PATH') {
                         Remove-Path -Path ('%' + $currPathEnvVar + '%') -Global -Quiet
                         Set-EnvVar -Name $currPathEnvVar -Global -Quiet
                     }
+                    Add-Path -Path $movedPath -TargetEnvVar $newPathEnvVar -Global -Quiet
+                    Add-Path -Path ('%' + $newPathEnvVar + '%') -Global -Quiet
                 }
             }
         }
@@ -265,7 +265,11 @@ function is_admin {
 }
 
 # messages
-function abort($msg, [int] $exit_code = 1) { Write-Host $msg -f red; exit $exit_code }
+function abort($msg, [int] $exit_code = 1) {
+    $e = [System.Exception]::new($msg)
+    $e.Data['ExitCode'] = $exit_code
+    throw $e
+}
 function error($msg) { Write-Host "ERROR $msg" -f darkred }
 function warn($msg) { Write-Host "WARN  $msg" -f darkyellow }
 function info($msg) { Write-Host "INFO  $msg" -f darkgray }
@@ -325,6 +329,7 @@ function appsdir($global) { "$(basedir $global)\apps" }
 function shimdir($global) { "$(basedir $global)\shims" }
 function modulesdir($global) { "$(basedir $global)\modules" }
 function appdir($app, $global) { "$(appsdir $global)\$app" }
+function app_key($app, $global) { if ($global) { "$app (global)" } else { $app } }
 function versiondir($app, $version, $global) { "$(appdir $app $global)\$version" }
 
 function currentdir($app, $global) {
@@ -561,9 +566,15 @@ function app_status($app, $global) {
     }
 
     $manifest = manifest $app $install_info.bucket $install_info.url
+    $status.pinned = (!$install_info.bucket -and $install_info.url -eq (usermanifest $app))
+    $latest_manifest = $manifest
+    if ($status.pinned) {
+        $scanned, $null = Find-AppBucket $app
+        if ($scanned) { $latest_manifest = $scanned }
+    }
     $status.removed = (!$manifest)
-    if ($manifest.version) {
-        $status.latest_version = $manifest.version
+    if ($latest_manifest.version) {
+        $status.latest_version = $latest_manifest.version
     }
     $status.changelog = changelog_url $manifest
 
@@ -935,8 +946,34 @@ function Format-ArchitectureString($Architecture) {
 }
 
 function Confirm-InstallationStatus {
+    <#
+    .SYNOPSIS
+        Check the installation status of the given apps.
+    .DESCRIPTION
+        Reports for every app whether it is installed and whether it can be used
+        as requested. Apps that are not installed, or that are installed in the
+        other scope, are reported as errors.
+    .PARAMETER Apps
+        Apps to check
+    .PARAMETER Global
+        Check the global installation
+    .OUTPUTS
+        System.Collections.Hashtable
+            'installed': the apps that have an app directory, as ($app, $global) tuples
+            'failed': the apps that can't be used as requested, as $app => reason
+                'not installed' - the app is not there at all
+                'not installed in the requested scope' - it is installed in the other scope
+                'not installed correctly' - it is installed, but the install is incomplete
+            Both lists can contain the same app: an install that is present but
+            incomplete is listed as installed (so that 'scoop uninstall' can
+            clean it up) and as failed.
+    .NOTES
+        An app that is not installed at all is not a failure for uninstall and
+        cleanup (nothing to remove), but it is for update. An app installed in
+        the other scope is a failure for every command.
+    #>
     [CmdletBinding()]
-    [OutputType([Object[]])]
+    [OutputType([Hashtable])]
     param(
         [Parameter(Mandatory = $true)]
         [String[]]
@@ -945,16 +982,20 @@ function Confirm-InstallationStatus {
         $Global
     )
     $Installed = @()
-    $Apps | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
-        $App, $null, $null = parse_app $_
+    $Failed = @{}
+    # the same app may be named with and without its bucket
+    $Apps | ForEach-Object { (parse_app $_)[0] } | Select-Object -Unique | Where-Object { $_ -ne 'scoop' } | ForEach-Object {
+        $App = $_
         if ($Global) {
             if (Test-Path (appdir $App $true)) {
                 $Installed += , @($App, $true)
             } elseif (Test-Path (appdir $App $false)) {
                 error "'$App' isn't installed globally, but it may be installed locally."
                 warn "Try again without the --global (or -g) flag instead."
+                $Failed[$App] = 'not installed in the requested scope'
             } else {
                 error "'$App' isn't installed."
+                $Failed[$App] = 'not installed'
             }
         } else {
             if (Test-Path (appdir $App $false)) {
@@ -962,15 +1003,18 @@ function Confirm-InstallationStatus {
             } elseif (Test-Path (appdir $App $true)) {
                 error "'$App' isn't installed locally, but it may be installed globally."
                 warn "Try again with the --global (or -g) flag instead."
+                $Failed[$App] = 'not installed in the requested scope'
             } else {
                 error "'$App' isn't installed."
+                $Failed[$App] = 'not installed'
             }
         }
         if (failed $App $Global) {
             error "'$App' isn't installed correctly."
+            $Failed[$App] = 'not installed correctly'
         }
     }
-    return , $Installed
+    return @{ installed = $Installed; failed = $Failed }
 }
 
 function wraptext($text, $width) {
