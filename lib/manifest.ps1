@@ -1,5 +1,5 @@
 function manifest_path($app, $bucket) {
-    (Get-ChildItem (Find-BucketDirectory $bucket) -Filter "$(sanitary_path $app).json" -Recurse).FullName
+    (Get-BucketManifestFiles $bucket "$(sanitary_path $app).json").FullName
 }
 
 function parse_json($path) {
@@ -31,10 +31,11 @@ function url_manifest($url) {
     }
 }
 
-function Get-Manifest($app) {
-    $bucket, $manifest, $url = $null
+function Get-Manifest($app, $route = @()) {
     $app = $app.TrimStart('/')
-    # check if app is a URL or UNC path
+    $bucket, $manifest, $url, $deprecated_dir = $null
+    $allow_migration = $true
+
     if ($app -match '^(ht|f)tps?://|\\\\') {
         $url = $app
         $app = appname_from_url $url
@@ -69,32 +70,97 @@ function Get-Manifest($app) {
                     $manifest = manifest $app $bucket
                     if (!$manifest) {
                         $deprecated_dir = (Find-BucketDirectory -Name $bucket -Root) + '\deprecated'
-                        $manifest = parse_json (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse -ErrorAction Ignore).FullName
                     }
                 }
             }
+            # Without a recorded bucket the app must not be redirected at all.
+            $allow_migration = [bool]$bucket
         } else {
             $app, $bucket, $version = parse_app $app
             if ($bucket) {
                 $manifest = manifest $app $bucket
             } else {
                 $manifest, $bucket = Find-AppBucket $app
-                if (!$manifest) {
-                    # couldn't find app in buckets: check if it's a local path
-                    if (Test-Path $app) {
-                        $url = Convert-Path $app
-                        $app = appname_from_url $url
-                        $manifest = parse_json $url
-                    } else {
-                        if (($app -match '\\/') -or $app.EndsWith('.json')) { $url = $app }
-                        $app = appname_from_url $app
-                    }
+            }
+
+            if (!$manifest -and !$bucket) {
+                if (Test-Path $app) {
+                    $url = Convert-Path $app
+                    $app = appname_from_url $url
+                    $manifest = parse_json $url
+                } else {
+                    if (($app -match '\\/') -or $app.EndsWith('.json')) { $url = $app }
+                    $app = appname_from_url $app
                 }
             }
+        }
+
+        if ($allow_migration -and !$manifest -and !$url) {
+            $migration = Find-AppMigration $app $bucket
+            if ($migration) {
+                $from = "$bucket/$app"
+                if ($from -in $route) {
+                    error "App '$app' is migrated in a circle."
+                    return $app, $null, $null, $null
+                }
+                $target = "$($migration.Bucket)/$($migration.App)"
+                $resolved = @(Get-Manifest $target (@($route) + $from))
+                if (!$resolved[1] -and $resolved[2] -and $resolved[2] -notin @(Get-LocalBucket)) {
+                    error "App '$app' was moved to '$target'. $(Get-BucketAddHint $resolved[2])"
+                }
+                return $resolved
+            }
+        }
+
+        if (!$manifest -and $deprecated_dir) {
+            $manifest = parse_json (Get-ChildItem $deprecated_dir -Filter "$(sanitary_path $app).json" -Recurse -ErrorAction Ignore).FullName
         }
     }
 
     return $app, $manifest, $bucket, $url
+}
+
+function Get-BucketAddHint($bucket) {
+    $repo = known_bucket_repo $bucket
+    "Add the bucket with 'scoop bucket add $bucket $(if ($repo) { $repo } else { '<repo>' })', then retry."
+}
+
+function Get-ManifestFiles($dir, $filter = '*.json') {
+    if (!(Test-Path -LiteralPath $dir)) { return @() }
+    Get-ChildItem -LiteralPath $dir -Filter $filter -Recurse |
+        Where-Object { $_.Name -ne '.scoop-migrations.json' }
+}
+
+function Get-BucketManifestFiles($bucket, $filter = '*.json') {
+    Get-ManifestFiles (Find-BucketDirectory $bucket) $filter
+}
+
+function Get-BucketMigrations($bucket) {
+    $path = Join-Path (Find-BucketDirectory -Name $bucket -Root) '.scoop-migrations.json'
+    if (!(Test-Path -LiteralPath $path -PathType Leaf)) { return $null }
+    $migrations = parse_json $path
+    if ($migrations -isnot [System.Management.Automation.PSCustomObject]) {
+        if ($null -ne $migrations) { warn "The migration map at '$path' must be a JSON object." }
+        return $null
+    }
+    return $migrations
+}
+
+function Get-MigrationTarget($app, $target, $bucket) {
+    if ($target -isnot [string]) {
+        warn "The migration of '$app' in bucket '$bucket' must point to a 'bucket/app' or 'app' string."
+        return $null
+    }
+    $target_app, $target_bucket, $target_version = parse_app $target
+    if (!$target_bucket) { $target_bucket = $bucket }
+    if ($target_version -or
+        $target_app -notmatch '^[a-zA-Z0-9-_.]+$' -or $target_app -in '.', '..' -or $target_app -match '\.json$' -or
+        $target_bucket -in '.', '..') {
+        warn "The migration of '$app' in bucket '$bucket' has an invalid target '$target'; expected 'bucket/app' or 'app'."
+        return $null
+    }
+    # The record names the bucket: a bucket that only has the same app name is not the same repository.
+    return [pscustomobject]@{ App = $target_app; Bucket = $target_bucket }
 }
 
 function Find-AppBucket($app) {
@@ -112,6 +178,25 @@ function Find-AppBucket($app) {
     return $manifest, $matched_buckets[0]
 }
 
+function Find-AppMigration($app, $source) {
+    # Only the install source bucket may redirect; a fresh install may be claimed by any.
+    $buckets = if ($source) { @($source) } else { @(Get-LocalBucket) }
+    $found = @()
+    foreach ($bucket in $buckets) {
+        $map = Get-BucketMigrations $bucket
+        if (!$map) { continue }
+        $entry = @($map.PSObject.Properties | Where-Object { $_.Name -ieq $app })
+        if ($entry.Count -eq 0) { continue }
+        $target = Get-MigrationTarget $app $entry[0].Value $bucket
+        if ($target) { $found += $target }
+    }
+    if (@($found | Group-Object { "$($_.Bucket)/$($_.App)" }).Count -gt 1) {
+        $sources = if ($source) { $source } else { (Get-LocalBucket) -join ', ' }
+        error "App '$app' is migrated differently in buckets ($sources). Specify a bucket."
+        return $null
+    }
+    return $found[0]
+}
 function manifest($app, $bucket, $url) {
     # bucket HEAD wins; url is only the source for URL/pinned installs
     if ($bucket) { return parse_json (manifest_path $app $bucket) }
@@ -139,11 +224,18 @@ function installed_manifest($app, $version, $global) {
 }
 
 function save_install_info($info, $dir) {
+    # version order is the record's write time, so a rewrite has to keep it
+    $record = "$dir\scoop-install.json"
+    $stamp = if (Test-Path -LiteralPath $record) { (Get-Item -LiteralPath $record).LastWriteTimeUtc }
+    elseif (Test-Path -LiteralPath "$dir\install.json") { (Get-Item -LiteralPath "$dir\install.json").LastWriteTimeUtc }
+    else { (Get-Item -LiteralPath $dir).LastWriteTimeUtc }
+
     $nulls = $info.keys | Where-Object { $null -eq $info[$_] }
     $nulls | ForEach-Object { $info.remove($_) } # strip null-valued
 
     $file_content = $info | ConvertToPrettyJson # in 'json.ps1'
-    [System.IO.File]::WriteAllLines("$dir\scoop-install.json", $file_content)
+    [System.IO.File]::WriteAllLines($record, $file_content)
+    (Get-Item -LiteralPath $record).LastWriteTimeUtc = $stamp
 }
 
 function install_info($app, $version, $global) {

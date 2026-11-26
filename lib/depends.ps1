@@ -32,12 +32,14 @@ function Get-Dependency {
         $Unresolved = @()
     )
     process {
+        $requested = $AppName
         $AppName, $manifest, $bucket, $url = Get-Manifest $AppName
-        $Unresolved += $AppName
+        # A record can point a name back at a name already on the route.
+        $Unresolved += $requested, $AppName
 
         if (!$manifest) {
             if (((Get-LocalBucket) -notcontains $bucket) -and $bucket) {
-                warn "Bucket '$bucket' not added. Add it with $(if($bucket -in (known_buckets)) { "'scoop bucket add $bucket' or " })'scoop bucket add $bucket <repo>'."
+                warn "Bucket '$bucket' not added. $(Get-BucketAddHint $bucket)"
             }
             abort "Couldn't find manifest for '$AppName'$(if($bucket) { " from '$bucket' bucket" } elseif($url) { " at '$url'" })."
         }
@@ -53,7 +55,7 @@ function Get-Dependency {
             }
         }
 
-        $Unresolved = $Unresolved -ne $AppName
+        $Unresolved = @($Unresolved | Where-Object { $_ -ne $requested -and $_ -ne $AppName })
         if ($bucket) {
             $Resolved += "$bucket/$AppName"
         } else {

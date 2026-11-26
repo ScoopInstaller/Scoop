@@ -3,6 +3,7 @@ BeforeAll {
     . "$PSScriptRoot\..\lib\core.ps1"
     . "$PSScriptRoot\..\lib\manifest.ps1"
     . "$PSScriptRoot\..\lib\buckets.ps1"
+    . "$PSScriptRoot\..\lib\versions.ps1"
     . "$PSScriptRoot\..\lib\database.ps1"
     . "$PSScriptRoot\..\lib\autoupdate.ps1"
 }
@@ -335,5 +336,204 @@ Describe 'manifest bucket auto-discovery' -Tag 'Scoop' {
         $m = manifest 'foo' $null 'https://example.com/foo.json'
         $m.version | Should-Be '1.0.0'
         Should-Invoke url_manifest -Times 1
+    }
+}
+
+Describe 'manifest migrations' -Tag 'Scoop' {
+    BeforeAll {
+        Function Write-MigrationMap([string] $bucket, [string] $app, [string] $target) {
+            $dir = Join-Path $migrationTestRoot $bucket
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            [System.IO.File]::WriteAllText((Join-Path $dir '.scoop-migrations.json'), ('{"' + $app + '":"' + $target + '"}'))
+        }
+
+        Function Write-AppManifest([string] $bucket, [string] $app, [string] $version) {
+            $dir = Join-Path $migrationTestRoot "$bucket\bucket"
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            [System.IO.File]::WriteAllText((Join-Path $dir "$app.json"), ('{"version":"' + $version + '"}'))
+        }
+    }
+
+    BeforeEach {
+        $migrationTestRoot = Join-Path $env:TEMP ("ScoopMigrationTests_" + [guid]::NewGuid().ToString('N'))
+        New-Item -ItemType Directory -Path $migrationTestRoot | Out-Null
+        $script:localBuckets = @('extras', 'main')
+        Mock Get-LocalBucket { $script:localBuckets }
+        Mock Find-BucketDirectory {
+            $repo = Join-Path $migrationTestRoot $Name
+            if ($Root -or !(Test-Path (Join-Path $repo 'bucket'))) {
+                $repo
+            } else {
+                Join-Path $repo 'bucket'
+            }
+        }
+        Mock warn {}
+        Mock error {}
+        Mock installed { $false }
+    }
+
+    AfterEach {
+        Remove-Item -LiteralPath $migrationTestRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    It 'prefers an exact manifest over a migration record' {
+        Write-AppManifest 'main' 'old-name' '1.0.0'
+        Write-AppManifest 'main' 'new-name' '2.0.0'
+        Write-MigrationMap 'main' 'old-name' 'new-name'
+
+        $app, $manifest, $null, $null = Get-Manifest 'old-name'
+
+        $app | Should-Be 'old-name'
+        $manifest.version | Should-Be '1.0.0'
+    }
+
+    It 'follows a record of another bucket after the first one moved it there' {
+        Write-AppManifest 'extras' 'final' '3.0.0'
+        Write-MigrationMap 'main' 'old-name' 'extras/middle'
+        Write-MigrationMap 'extras' 'middle' 'final'
+
+        $app, $manifest, $bucket, $null = Get-Manifest 'old-name'
+
+        $app | Should-Be 'final'
+        $bucket | Should-Be 'extras'
+        $manifest.version | Should-Be '3.0.0'
+    }
+
+    It 'stops a migration that points back at its own start' {
+        Write-MigrationMap 'main' 'old-name' 'extras/middle'
+        Write-MigrationMap 'extras' 'middle' 'main/old-name'
+
+        $app, $manifest, $null, $null = Get-Manifest 'old-name'
+
+        $manifest | Should-BeNull
+        Should-Invoke -CommandName error -ParameterFilter { $msg -match 'circle' } -Times 1 -Exactly
+    }
+
+    It 'does not use another bucket that happens to have the name' {
+        $script:localBuckets = @('main', 'my-versions')
+        Write-AppManifest 'my-versions' 'new-name' '2.0.0'
+        Write-MigrationMap 'main' 'old-name' 'versions/new-name'
+
+        $app, $manifest, $bucket, $null = Get-Manifest 'old-name'
+
+        $manifest | Should-BeNull
+        $bucket | Should-Be 'versions'
+    }
+
+    It 'reports the bucket to add when the target bucket is not installed' {
+        Write-MigrationMap 'main' 'old-name' 'versions/new-name'
+        Mock known_bucket_repo { 'https://github.com/ScoopInstaller/Versions' }
+
+        $app, $manifest, $bucket, $null = Get-Manifest 'old-name'
+
+        $manifest | Should-BeNull
+        $app | Should-Be 'new-name'
+        $bucket | Should-Be 'versions'
+        Should-Invoke -CommandName error -ParameterFilter { $msg -match 'scoop bucket add versions' } -Times 1 -Exactly
+    }
+
+    It 'prefers the bucket the app came from over another one that also has the name' {
+        Write-AppManifest 'main' 'new-name' '2.0.0'
+        Write-AppManifest 'extras' 'new-name' '9.0.0'
+        Write-MigrationMap 'main' 'old-name' 'new-name'
+
+        $null, $manifest, $bucket, $null = Get-Manifest 'old-name'
+
+        $manifest.version | Should-Be '2.0.0'
+        $bucket | Should-Be 'main'
+    }
+
+    It 'keeps the migration file out of the manifests of a flat bucket' {
+        $dir = Join-Path $migrationTestRoot 'flat'
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+        [System.IO.File]::WriteAllText((Join-Path $dir '.scoop-migrations.json'), '{"old-name":"new-name"}')
+        [System.IO.File]::WriteAllText((Join-Path $dir 'new-name.json'), '{"version":"1.0.0"}')
+        $script:localBuckets = @('flat')
+
+        $names = @(Get-BucketManifestFiles 'flat' | ForEach-Object { $_.Name })
+
+        $names.Count | Should-Be 1
+        $names[0] | Should-Be 'new-name.json'
+    }
+
+    Context 'resolving one record' {
+        It 'reads only the map of the given source bucket' {
+            Write-AppManifest 'extras' 'new-name' '2.0.0'
+            Write-MigrationMap 'extras' 'old-name' 'new-name'
+
+            Find-AppMigration 'old-name' 'main' | Should-BeNull
+            (Find-AppMigration 'old-name' $null).App | Should-Be 'new-name'
+        }
+
+        It 'rejects an invalid target' {
+            $cases = @(
+                @{ target = 'main/'; why = 'the app part is empty' }
+                @{ target = '/name'; why = 'the bucket part is empty' }
+                @{ target = ' main/name'; why = 'it holds leading whitespace' }
+                @{ target = 'main/ name'; why = 'it holds whitespace after the separator' }
+                @{ target = 'main/new*name'; why = 'it holds a character that is invalid in a file name' }
+                @{ target = 'main/name.json'; why = 'it holds a .json suffix' }
+                @{ target = 'main/..'; why = 'it escapes the bucket' }
+                @{ target = 'main/name@1.0'; why = 'it pins a version' }
+                @{ target = 5; why = 'it is not a string' }
+            )
+            foreach ($case in $cases) {
+                Get-MigrationTarget 'old-name' $case.target 'main' | Should-BeNull -Because $case.why
+            }
+            Should-Invoke -CommandName warn -Times $cases.Count -Exactly
+        }
+
+        It 'rejects a map that is not an object' {
+            $dir = Join-Path $migrationTestRoot 'main'
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            [System.IO.File]::WriteAllText((Join-Path $dir '.scoop-migrations.json'), '["old-name"]')
+
+            Get-BucketMigrations 'main' | Should-BeNull
+            Should-Invoke -CommandName warn -Times 1 -Exactly
+        }
+    }
+
+    Context 'installed app' {
+        BeforeEach {
+            Mock installed { $true }
+            Mock Select-CurrentVersion { '1.0.0' }
+        }
+
+        It 'resolves it to the name its own bucket moved it to' {
+            Write-AppManifest 'extras' 'new-name' '2.0.0'
+            Write-MigrationMap 'main' 'old-name' 'extras/new-name'
+            Mock install_info { [pscustomobject]@{ bucket = 'main'; url = $null } }
+            Mock installed_manifest { [pscustomobject]@{ version = '1.0.0' } }
+
+            $app, $manifest, $bucket, $null = Get-Manifest 'old-name'
+
+            $app | Should-Be 'new-name'
+            $bucket | Should-Be 'extras'
+            $manifest.version | Should-Be '2.0.0'
+        }
+
+        It 'does not let another bucket redirect it' {
+            Write-AppManifest 'main' 'new-name' '2.0.0'
+            Write-MigrationMap 'extras' 'old-name' 'main/new-name'
+            Mock install_info { [pscustomobject]@{ bucket = 'main'; url = $null } }
+            Mock installed_manifest { [pscustomobject]@{ version = '1.0.0' } }
+
+            $app, $manifest, $null, $null = Get-Manifest 'old-name'
+
+            $app | Should-Be 'old-name'
+            $manifest | Should-BeNull
+        }
+
+        It 'does not redirect it when the source bucket is unknown' {
+            Write-AppManifest 'main' 'new-name' '2.0.0'
+            Write-MigrationMap 'main' 'old-name' 'new-name'
+            Mock install_info { [pscustomobject]@{ bucket = $null; url = 'old-name.json' } }
+            Mock installed_manifest { [pscustomobject]@{ version = '1.0.0' } }
+
+            $app, $manifest, $null, $null = Get-Manifest 'old-name'
+
+            $app | Should-Be 'old-name'
+            $manifest.version | Should-Be '1.0.0'
+        }
     }
 }

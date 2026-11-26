@@ -80,7 +80,7 @@ if ($App -ne '*' -and (Test-Path $App -PathType Leaf)) {
     $files = Get-ChildItem $Dir -Filter (Split-Path $App -Leaf)
 } elseif ($Dir) {
     $Dir = Convert-Path $Dir
-    $files = Get-ChildItem $Dir -Filter "$App.json" -Recurse
+    $files = Get-ManifestFiles $Dir "$App.json"
 } else {
     throw "'-Dir' parameter required if '-App' is not a filepath!"
 }
