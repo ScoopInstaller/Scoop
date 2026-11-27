@@ -1,3 +1,68 @@
+## [Unreleased](https://github.com/ScoopInstaller/Scoop/compare/v0.6.0...develop)
+
+### Features
+
+- **download:** Try gh auth token for a github token ([#6725](https://github.com/ScoopInstaller/Scoop/issues/6725))
+- **manifest:** Resolve renamed apps through a bucket migration map ([#6847](https://github.com/ScoopInstaller/Scoop/issues/6847))
+- **shim:** Rework the shim system around architecture-native bodies ([#6783](https://github.com/ScoopInstaller/Scoop/issues/6783), [#6799](https://github.com/ScoopInstaller/Scoop/issues/6799), [#6824](https://github.com/ScoopInstaller/Scoop/issues/6824))
+- **shim:** Read `.shim` fields and body features ([#6827](https://github.com/ScoopInstaller/Scoop/issues/6827))
+- **shim:** Read the `env?:` prefix from a shim file ([#6857](https://github.com/ScoopInstaller/Scoop/issues/6857))
+
+### Bug Fixes
+
+- **scoop-*:** Report failures in messages and exit codes ([#6846](https://github.com/ScoopInstaller/Scoop/pull/6846))
+- **scoop-cache:** Delete each cached file only once ([#6773](https://github.com/ScoopInstaller/Scoop/issues/6773))
+- **scoop-checkup:** Skip Defender check when `Get-MpPreference` fails ([#6745](https://github.com/ScoopInstaller/Scoop/issues/6745))
+- **scoop-cleanup, scoop-reset, scoop-uninstall, scoop-update:** Skip running apps and fail the command ([#6836](https://github.com/ScoopInstaller/Scoop/issues/6836))
+- **scoop-config:** Validate the proxy setting ([#6802](https://github.com/ScoopInstaller/Scoop/issues/6802))
+- **scoop-hold:** Report a held app as skipped ([#6820](https://github.com/ScoopInstaller/Scoop/issues/6820))
+- **scoop-info:** Resolve the license identifier before URL and separator matching ([#6770](https://github.com/ScoopInstaller/Scoop/issues/6770))
+- **scoop-install, scoop-update:** Unify error handling and exit codes ([#6798](https://github.com/ScoopInstaller/Scoop/issues/6798))
+- **scoop-list:** Collect items before formatting to prevent column truncation ([#6800](https://github.com/ScoopInstaller/Scoop/issues/6800))
+- **scoop-update:** Run missing uninstall steps and honor `--no-cache` ([#6750](https://github.com/ScoopInstaller/Scoop/issues/6750))
+- **scoop-update:** Show the available version of a pinned app ([#6819](https://github.com/ScoopInstaller/Scoop/issues/6819))
+- **auto-pr:** Add missing `core.ps1` dot source ([#6786](https://github.com/ScoopInstaller/Scoop/pull/6786))
+- **core:** Detect the native system architecture on Arm ([#6778](https://github.com/ScoopInstaller/Scoop/issues/6778))
+- **core:** End progress lines with a status marker ([#6805](https://github.com/ScoopInstaller/Scoop/issues/6805))
+- **core:** Let abort throw instead of ending the process ([#6835](https://github.com/ScoopInstaller/Scoop/issues/6835))
+- **core:** Name an app once before checking its status ([#6855](https://github.com/ScoopInstaller/Scoop/issues/6855))
+- **core:** Resolve Git helper without hardcoded runtime paths ([#6795](https://github.com/ScoopInstaller/Scoop/issues/6795))
+- **core:** Warn once per deprecated function per manifest ([#6801](https://github.com/ScoopInstaller/Scoop/issues/6801))
+- **download:** Ignore an unusable GitHub token and keep it on API redirects ([#6826](https://github.com/ScoopInstaller/Scoop/pull/6826))
+- **download:** Skip `octet-stream` Accept header for GitHub Actions artifact zips ([#6763](https://github.com/ScoopInstaller/Scoop/issues/6763))
+- **install:** Expand $dir and $persist_dir in env_add_path ([#6808](https://github.com/ScoopInstaller/Scoop/issues/6808))
+- **install:** Unlink the persisted data before extracting ([#6845](https://github.com/ScoopInstaller/Scoop/issues/6845))
+- **install:** Prevent a stray `break`/`continue` from silently ending the command ([#6842](https://github.com/ScoopInstaller/Scoop/issues/6842))
+- **manifest:** Match historical versions exactly ([#6831](https://github.com/ScoopInstaller/Scoop/pull/6831))
+- **scoop:** Keep the formatted output of a command ([#6813](https://github.com/ScoopInstaller/Scoop/issues/6813))
+- **shim:** Handle names literally and stop the lookups from throwing ([#6788](https://github.com/ScoopInstaller/Scoop/issues/6788))
+- **static-analysis:** Build and compare paths with the platform separator ([#6850](https://github.com/ScoopInstaller/Scoop/issues/6850))
+- **update:** Extract the new version before removing the old one ([#6839](https://github.com/ScoopInstaller/Scoop/issues/6839))
+- **update:** Restore the old version when an update fails ([#6810](https://github.com/ScoopInstaller/Scoop/issues/6810))
+- **update:** Run `pre_uninstall` before the running process check ([#6841](https://github.com/ScoopInstaller/Scoop/issues/6841))
+
+### Code Refactoring
+
+- **scoop-update:** Move update-related functions to `update.ps1` ([#6737](https://github.com/ScoopInstaller/Scoop/issues/6737))
+- **install, update:** Share the steps the install and update flows repeat ([#6854](https://github.com/ScoopInstaller/Scoop/issues/6854))
+- **shim:** Give the shim functions their own file and PowerShell names ([#6789](https://github.com/ScoopInstaller/Scoop/issues/6789))
+
+### Performance Improvements
+
+- **database:** Speed up the app cache ([#6793](https://github.com/ScoopInstaller/Scoop/issues/6793))
+- **versions:** Compare versions with a compiled comparer ([#6792](https://github.com/ScoopInstaller/Scoop/issues/6792))
+
+### Continuous Integration
+
+- **workflow:** Drop the `v` prefix from the release title ([#6761](https://github.com/ScoopInstaller/Scoop/issues/6761))
+
+### Tests
+
+- **install:** Keep the mocked version directory inside the test drive ([#6856](https://github.com/ScoopInstaller/Scoop/issues/6856))
+- **pester:** Update to Pester 6 ([#6779](https://github.com/ScoopInstaller/Scoop/issues/6779))
+- **shim:** Subprocess doesn't need a new console ([#6848](https://github.com/ScoopInstaller/Scoop/issues/6848))
+- **static-analysis:** Add dot-source dependency and dead code checks ([#6787](https://github.com/ScoopInstaller/Scoop/issues/6787))
+
 ## [v0.6.0](https://github.com/ScoopInstaller/Scoop/compare/v0.5.3...v0.6.0) - 2026-09-30
 
 ### Features

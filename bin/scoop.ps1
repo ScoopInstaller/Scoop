@@ -14,9 +14,12 @@ Get-ChildItem Function: | Where-Object -Property Name -In -Value $aliases | ForE
     Set-Alias -Name $_.Name -Value Local:$($_.Name) -Scope Script
 }
 
+$exitCode = 0
+
 switch ($subCommand) {
     ({ $subCommand -in @($null, '-h', '--help', '/?') }) {
         exec 'help'
+        $exitCode = $LASTEXITCODE
     }
     ({ $subCommand -in @('-v', '--version') }) {
         Write-Host 'Current Scoop version:'
@@ -45,9 +48,13 @@ switch ($subCommand) {
         } else {
             exec $subCommand $arguments
         }
+        $exitCode = $LASTEXITCODE
     }
     default {
         warn "scoop: '$subCommand' isn't a scoop command. See 'scoop help'."
-        exit 1
+        $exitCode = 1
     }
 }
+
+# 'exit' ends the runspace before the host formats the pending objects
+if ($exitCode -ne 0) { exit $exitCode }

@@ -12,6 +12,7 @@ param(
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\database.ps1"
 . "$PSScriptRoot\..\lib\download.ps1" # 'Get-UserAgent' (indirectly)
+. "$PSScriptRoot\..\lib\versions.ps1" # 'Select-CurrentVersion' (indirectly)
 
 $import = $null
 $bucket_names = @()
@@ -39,7 +40,8 @@ foreach ($item in $import.apps) {
     $instArgs = @()
     $holdArgs = @()
     $info = $item.Info -Split ', '
-    if ('Global install' -in $info) {
+    $is_global = 'Global install' -in $info
+    if ($is_global) {
         $instArgs += '--global'
         $holdArgs += '--global'
     }
@@ -62,6 +64,7 @@ foreach ($item in $import.apps) {
     & "$PSScriptRoot\scoop-install.ps1" $app @instArgs
 
     if ('Held package' -in $info) {
-        & "$PSScriptRoot\scoop-hold.ps1" $item.Name @holdArgs
+        $installed_name = if (installed $item.Name $is_global) { $item.Name } else { (Get-Manifest $app)[0] }
+        & "$PSScriptRoot\scoop-hold.ps1" $installed_name @holdArgs
     }
 }

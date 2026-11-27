@@ -36,7 +36,7 @@ Write-Host 'A' -NoNewLine -ForegroundColor Cyan
 Write-Host ']utoupdate'
 Write-Host ' |  |'
 
-Get-ChildItem $Dir -Filter "$App.json" -Recurse | ForEach-Object {
+Get-ManifestFiles $Dir "$App.json" | ForEach-Object {
     $json = parse_json $_.FullName
 
     if ($SkipSupported -and $json.checkver -and $json.autoupdate) { return }

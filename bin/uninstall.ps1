@@ -13,6 +13,7 @@ param(
 
 . "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\system.ps1"
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\shortcuts.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
@@ -40,17 +41,24 @@ function do_uninstall($app, $global) {
     $manifest = installed_manifest $app $version $global
     $install = install_info $app $version $global
     $architecture = $install.architecture
+    $persist_dir = persistdir $app $global
 
     Write-Output "Uninstalling '$app'"
-    Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall
-    rm_shims $app $manifest $global $architecture
+    try {
+        if (!(Invoke-Installer -Path $dir -Manifest $manifest -ProcessorArchitecture $architecture -Global:$global -Uninstall)) {
+            error "Couldn't uninstall '$app'."; exit 1
+        }
+    } catch {
+        error "Couldn't uninstall '$app': $($_.Exception.Message)"; exit 1
+    }
+    Remove-ShimFromManifest $app $manifest $global $architecture
 
     # If a junction was used during install, that will have been used
     # as the reference directory. Otherwise it will just be the version
     # directory.
     $refdir = unlink_current (appdir $app $global)
 
-    env_rm_path $manifest $refdir $global $architecture
+    env_rm_path $manifest $refdir $persist_dir $global $architecture
     env_rm $manifest $global $architecture
 
     $appdir = appdir $app $global
@@ -66,7 +74,7 @@ function rm_dir($dir) {
     try {
         Remove-Item $dir -Recurse -Force -ErrorAction Stop
     } catch {
-        abort "Couldn't remove $(friendly_path $dir): $_"
+        error "Couldn't remove $(friendly_path $dir): $_"; exit 1
     }
 }
 
@@ -88,7 +96,7 @@ installed_apps $false | ForEach-Object { # local apps
 }
 
 if ($errors) {
-    abort 'Not all apps could be deleted. Try again or restart.'
+    error 'Not all apps could be deleted. Try again or restart.'; exit 1
 }
 
 if ($purge) {

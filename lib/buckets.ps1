@@ -49,15 +49,12 @@ function known_buckets {
     known_bucket_repos | ForEach-Object { $_.PSObject.Properties | Select-Object -Expand 'name' }
 }
 
-function apps_in_bucket($dir) {
-    return (Get-ChildItem $dir -Filter '*.json' -Recurse).BaseName
-}
-
 function Get-LocalBucket {
     <#
     .SYNOPSIS
         List all local buckets.
     #>
+    if (!(Test-Path -LiteralPath $bucketsdir)) { return @() }
     $bucketNames = [System.Collections.Generic.List[String]](Get-ChildItem -Path $bucketsdir -Directory).Name
     if ($null -eq $bucketNames) {
         return @() # Return a zero-length list instead of $null.
@@ -149,6 +146,7 @@ function add_bucket($name, $repo) {
     Write-Host 'Checking repo... ' -NoNewline
     $out = Invoke-Git -ArgumentList @('ls-remote', $repo) 2>&1
     if ($LASTEXITCODE -ne 0) {
+        Write-Host 'Error.' -ForegroundColor DarkRed
         error "'$repo' doesn't look like a valid git repository`n`nError given:`n$out"
         return 1
     }
@@ -156,6 +154,7 @@ function add_bucket($name, $repo) {
     $dir = ensure $dir
     $out = Invoke-Git -ArgumentList @('clone', $repo, $dir, '-q')
     if ($LASTEXITCODE -ne 0) {
+        Write-Host 'Error.' -ForegroundColor DarkRed
         error "Failed to clone '$repo' to '$dir'.`n`nError given:`n$out`n`nPlease check the repository URL or network connection and try again."
         Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue
         return 1
@@ -163,7 +162,7 @@ function add_bucket($name, $repo) {
     Write-Host 'OK.'
     if (get_config USE_SQLITE_CACHE) {
         info 'Updating cache...'
-        Set-ScoopDB -Path (Get-ChildItem (Find-BucketDirectory $name) -Filter '*.json' -Recurse).FullName
+        Set-ScoopDB -Path (Get-BucketManifestFiles $name).FullName
     }
     success "The $name bucket was added successfully."
     return 0

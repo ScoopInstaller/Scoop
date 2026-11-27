@@ -1,6 +1,6 @@
 #Requires -Version 5.1
 #Requires -Modules @{ ModuleName = 'BuildHelpers'; ModuleVersion = '2.0.1' }
-#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.2.0' }
+#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '6.0.0' }
 param(
     [String] $BucketPath = $MyInvocation.PSScriptRoot
 )
@@ -21,6 +21,7 @@ Describe 'Manifest validates against the schema' {
         } else {
             $manifestFiles = (Get-ChildItem $bucketDir -Filter '*.json' -Recurse).FullName
         }
+        $manifestFiles = @($manifestFiles | Where-Object { (Split-Path -Leaf $_) -ne '.scoop-migrations.json' })
     }
     BeforeAll {
         Add-Type -Path "$PSScriptRoot\..\supporting\validator\bin\Scoop.Validator.dll"
@@ -40,7 +41,7 @@ Describe 'Manifest validates against the schema' {
                         Write-Host "  [-] $_ has $($validator.Errors.Count) Error$(If($validator.Errors.Count -gt 1) { 's' })!" -ForegroundColor Red
                         Write-Host $validator.ErrorsAsString -ForegroundColor Yellow
                     }
-                    $validator.Errors.Count | Should -Be 0
+                    $validator.Errors.Count | Should-Be 0
                 } catch {
                     if ($_.Exception.Message -like '*The free-quota limit of 1000 schema validations per hour has been reached.*') {
                         $global:quotaExceeded = $true

@@ -64,6 +64,7 @@ param(
     [Switch] $ThrowError
 )
 
+. "$PSScriptRoot\..\lib\core.ps1"
 . "$PSScriptRoot\..\lib\manifest.ps1"
 . "$PSScriptRoot\..\lib\json.ps1"
 
@@ -109,7 +110,7 @@ function execute($cmd, [ScriptBlock] $onError) {
 
     if ($LASTEXITCODE -gt 0) {
         if ($onError) { Invoke-Command $onError }
-        abort "^^^ Error! See above ^^^ (last command: $cmd)"
+        error "^^^ Error! See above ^^^ (last command: $cmd)"; exit 1
     }
 
     return $output
@@ -160,7 +161,7 @@ a new version of [$app]($homepage) is available.
     hub pull-request -m "$msg" -b "$upstream" -h "$branch"
     if ($LASTEXITCODE -gt 0) {
         execute 'hub reset'
-        abort "Pull Request failed! (hub pull-request -m '$commitMessage' -b '$upstream' -h '$branch')"
+        error "Pull Request failed! (hub pull-request -m '$commitMessage' -b '$upstream' -h '$branch')"; exit 1
     }
 }
 

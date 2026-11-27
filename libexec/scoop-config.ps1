@@ -76,8 +76,16 @@
 #       Displays the manifest of every app that's about to
 #       be installed, then asks user if they wish to proceed.
 #
-# shim: kiennq|scoopcs|71
-#       Choose scoop shim build.
+# shim: <package>
+#       Use the shim template from an installed package, for example
+#       scoop-shim-cs, scoop-shim-cpp, scoop-shim-zig or scoop-shim-rust.
+#       Leave it unset to use the template bundled with Scoop.
+#
+# shim_auto_refresh: $true|$false
+#       Whether to auto refresh all existing shims for installed apps
+#       when the 'scoop config shim' setting changes, equivalent to
+#       a 'scoop shim update' call. Defaults to $true. Set to $false to
+#       disable auto refresh for manual updates.
 #
 # root_path: $Env:UserProfile\scoop
 #       Path to Scoop root directory.
@@ -92,6 +100,8 @@
 #       GitHub API token used to make authenticated requests.
 #       This is essential for checkver and similar functions to run without
 #       incurring rate limits and download from private repositories.
+#       $env:SCOOP_GH_TOKEN overrides it; otherwise Scoop falls back to
+#       $env:GH_TOKEN, $env:GITHUB_TOKEN and then 'gh auth token'.
 #
 # virustotal_api_key:
 #       API key used for uploading/scanning files using virustotal.
@@ -103,10 +113,10 @@
 #       installed (run `scoop install bat` to install it), otherwise errors will be thrown.
 #       The accepted values are the same as ones passed to the --style flag of 'bat'.
 #
-# ignore_running_processes: $true|$false
-#       When set to $false (default), Scoop would stop its procedure immediately if it detects
-#       any target app process is running. Procedure here refers to reset/uninstall/update.
-#       When set to $true, Scoop only displays a warning message and continues procedure.
+# download_while_running: $true|$false
+#       When set to $false, an app that is still running is skipped before its new version
+#       is downloaded. The default is $true: the download is kept in the cache, so the next
+#       'scoop update' installs the app without downloading it again.
 #
 # private_hosts:
 #       Array of private hosts that need additional authentication.
@@ -173,8 +183,8 @@ if (!$name) {
     set_config $value $null | Out-Null
     Write-Host "'$value' has been removed"
 } elseif ($null -ne $value) {
-    set_config $name $value | Out-Null
-    Write-Host "'$name' has been set to '$value'"
+    $scoopConfig = set_config $name $value
+    Write-Host "'$name' has been set to '$($scoopConfig.$name)'"
 } else {
     $value = get_config $name
     if($null -eq $value) {

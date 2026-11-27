@@ -32,6 +32,7 @@
 . "$PSScriptRoot\..\lib\autoupdate.ps1" # 'generate_user_manifest' (indirectly)
 . "$PSScriptRoot\..\lib\manifest.ps1" # 'generate_user_manifest' 'Get-Manifest' 'Select-CurrentVersion' (indirectly)
 . "$PSScriptRoot\..\lib\system.ps1"
+. "$PSScriptRoot\..\lib\shim.ps1"
 . "$PSScriptRoot\..\lib\install.ps1"
 . "$PSScriptRoot\..\lib\download.ps1"
 . "$PSScriptRoot\..\lib\decompress.ps1"
@@ -39,6 +40,7 @@
 . "$PSScriptRoot\..\lib\psmodules.ps1"
 . "$PSScriptRoot\..\lib\versions.ps1"
 . "$PSScriptRoot\..\lib\depends.ps1"
+. "$PSScriptRoot\..\lib\update.ps1"
 if (get_config USE_SQLITE_CACHE) {
     . "$PSScriptRoot\..\lib\database.ps1"
 }
@@ -105,12 +107,19 @@ $specific_versions_paths = $specific_versions | ForEach-Object {
     if (installed_manifest $app $version) {
         warn "'$app' ($version) is already installed.`nUse 'scoop update $app$(if ($global) { ' --global' })' to install a new version."
         $resolved += $spec
-        continue
+        return
     }
 
     $path = generate_user_manifest $app $bucket $version
     if (!$path) {
         warn "Could not find manifest for '$spec'"
+        return
+    }
+    # a migration may have answered with another app's manifest
+    $target_app = [System.IO.Path]::GetFileNameWithoutExtension($path)
+    if ($target_app -ne $app -and (installed_manifest $target_app $version $global)) {
+        warn "'$target_app' ($version) is already installed.`nUse 'scoop update $target_app$(if ($global) { ' --global' })' to install a new version."
+        $resolved += $spec
         return
     }
     $resolved += $spec
@@ -131,22 +140,53 @@ if (!$independent) {
 }
 ensure_none_failed $apps
 
-$apps, $skip = prune_installed $apps $global
+# a request may already be here under the name its bucket migrated it to
+$names = @{}
+$apps | Where-Object { $_ -notin $specific_versions_paths -and $_ -notmatch '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$' } | ForEach-Object {
+    $names[$_] = (Get-Manifest $_)[0]
+}
+$suggested = @{ }
+$failed = @{}
+$apps = @(move_installed_apps $apps $global $independent $suggested $failed $use_cache $check_hash)
+# a URL never shows up in $names, so a move may have installed it already
+$apps = @($apps | Where-Object {
+        $_ -in $explicit_apps -or !($_ -match '^(ht|f)tps?://|\\\\|^[a-zA-Z]:[\\/]|\.json$') -or
+        !(installed ((Get-Manifest $_)[0]) $global)
+    })
+# a dependency follows the name its manifest has now; only a request keeps the name it was made with
+$skip = @($apps | Where-Object {
+        $names[$_] -and ((installed $names[$_] $global) -or
+            ($_ -in $explicit_apps -and (installed (parse_app $_)[0] $global)))
+    })
+# a Group-Object would sort the names; the order decides which helper installs first
+$seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+$apps = @($apps | Where-Object { $_ -notin $skip } | Where-Object {
+        $seen.Add($(if ($names[$_]) { $names[$_] } else { $_ })) })
 
-$skip | Where-Object { $explicit_apps -contains $_ } | ForEach-Object {
-    $app, $null, $null = parse_app $_
-    $version = Select-CurrentVersion -AppName $app -Global:$global
-    warn "'$app' ($version) is already installed. Skipping."
+$skip | Where-Object { $_ -in $explicit_apps } | ForEach-Object {
+    $name = (parse_app $_)[0]
+    if (!(installed $name $global)) { $name = $names[$_] }
+    $version = Select-CurrentVersion -AppName $name -Global:$global
+    warn "'$name' ($version) is already installed. Skipping."
 }
 
-$suggested = @{ };
 if ((Test-Aria2Enabled) -and (get_config 'aria2-warning-enabled' $true)) {
     warn "Scoop uses 'aria2c' for multi-connection downloads."
     warn "Should it cause issues, run 'scoop config aria2-enabled false' to disable it."
     warn "To disable this warning, run 'scoop config aria2-warning-enabled false'."
 }
-$apps | ForEach-Object { install_app $_ $architecture $global $suggested $use_cache $check_hash }
+$apps | ForEach-Object {
+    $current = $_
+    try {
+        install_app $current $architecture $global $suggested $failed $use_cache $check_hash
+    } catch {
+        $key = if ($global) { "$current (global)" } else { $current }
+        $failed[$key] = $_.Exception.Message
+        error $_.Exception.Message
+    }
+}
 
 show_suggestions $suggested
+$failed_count = show_failed_apps $failed
 
-exit 0
+exit [int]($failed_count -gt 0)

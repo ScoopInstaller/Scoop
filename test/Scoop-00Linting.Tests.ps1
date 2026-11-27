@@ -8,7 +8,7 @@ Describe 'PSScriptAnalyzer' -Tag 'Linter' {
     }
 
     It 'PSScriptAnalyzerSettings.ps1 should exist' {
-        $lintSettings | Should -Exist
+        Test-Path $lintSettings | Should-BeTrue
     }
 
     Context 'Linting all *.psd1, *.psm1 and *.ps1 files' {
@@ -16,7 +16,7 @@ Describe 'PSScriptAnalyzer' -Tag 'Linter' {
             $analysis = Invoke-ScriptAnalyzer -Path "$PSScriptRoot\..\$_" -Settings $lintSettings
         }
         It 'Should pass: <_>' -TestCases $scriptDir {
-            $analysis | Should -HaveCount 0
+            $analysis | Should-BeCollection -Count 0
             if ($analysis) {
                 foreach ($result in $analysis) {
                     switch -wildCard ($result.ScriptName) {
