@@ -84,6 +84,9 @@
                             <TableColumnItem>
                                 <PropertyName>Info</PropertyName>
                             </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Changelog</PropertyName>
+                            </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>
                 </TableRowEntries>

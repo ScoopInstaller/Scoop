@@ -223,6 +223,29 @@ function installed_manifest($app, $version, $global) {
     parse_json "$dir\manifest.json"
 }
 
+function github_repo($manifest) {
+    # Returns 'owner/repo' when the manifest references a GitHub repository,
+    # via 'checkver' ('github' shorthand or the 'github'/'url' properties)
+    # or a GitHub 'homepage'
+    $urls = @($manifest.checkver.github, $manifest.checkver.url)
+    if ($manifest.checkver -eq 'github') { $urls += $manifest.homepage }
+    $urls += $manifest.homepage
+    foreach ($url in $urls) {
+        if ($url -match '(?:api\.github\.com/repos|raw\.githubusercontent\.com|(?<!api\.)github\.com)/(?<owner>[\w.-]+)/(?<repo>[\w.-]+)') {
+            return "$($Matches.owner)/$($Matches.repo -replace '\.git$', '')"
+        }
+    }
+}
+
+function changelog_url($manifest) {
+    # Resolves the URL of the app's changelog: the manifest's 'changelog'
+    # property when present, otherwise the releases page of the app's
+    # GitHub repository (if any)
+    if ($manifest.changelog) { return $manifest.changelog }
+    $repo = github_repo $manifest
+    if ($repo) { return "https://github.com/$repo/releases" }
+}
+
 function save_install_info($info, $dir) {
     # version order is the record's write time, so a rewrite has to keep it
     $record = "$dir\scoop-install.json"

@@ -74,6 +74,7 @@ $true, $false | ForEach-Object { # local and global apps
         if ($status.removed)    { $info += 'Manifest removed' }
         if ($status.renamed)    { $info += "Moved to $($status.renamed)" }
         $item.Info = $info -join ', '
+        $item.Changelog = if ($status.outdated) { $status.changelog } else { '' }
         $list += [PSCustomObject]$item
     }
 }

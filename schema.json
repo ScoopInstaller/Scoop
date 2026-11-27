@@ -558,6 +558,11 @@
         "persist": {
             "$ref": "#/definitions/stringOrArrayOfStringsOrAnArrayOfArrayOfStrings"
         },
+        "changelog": {
+            "description": "URL of the app's changelog or release notes",
+            "format": "uri",
+            "type": "string"
+        },
         "checkver": {
             "$ref": "#/definitions/checkver"
         },
