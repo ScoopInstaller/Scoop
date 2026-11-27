@@ -377,6 +377,8 @@ Describe 'changelog_url' -Tag 'Scoop' {
     It 'returns null when no changelog source exists' {
         changelog_url ([PSCustomObject]@{ homepage = 'https://example.com' }) | Should-BeNullOrEmpty
         changelog_url $null | Should-BeNullOrEmpty
+    }
+}
 Describe 'manifest migrations' -Tag 'Scoop' {
     BeforeAll {
         Function Write-MigrationMap([string] $bucket, [string] $app, [string] $target) {
